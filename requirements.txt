@@ -1,0 +1,15 @@
+Django==1.11
+django-haystack==2.7.dev0
+whoosh==2.7.4
+mistune==0.7.4
+Pillow==4.2.1
+django-infinite-scroll-pagination>=0.2.0,<0.3
+django-djconfig>=0.5.1,<0.6
+uni-slugify==0.1.4
+pytz
+python-magic==0.4.13
+numpy==1.16.2
+spirit==1.8.6
+ipython==5.8.0
+psycopg2==2.7.7
+psycopg2-binary==2.7.7
