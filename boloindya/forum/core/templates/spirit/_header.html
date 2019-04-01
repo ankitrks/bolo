@@ -1,7 +1,7 @@
 {% load spirit_tags i18n %}
 
-    <header class="header js-tabs-container">
-		<a class="header-logo" href="{% url "spirit:index" %}"><img src="/media/img/bi_logo.png" style="width:50px;position: absolute;top:5px;"></a>
+    <header class="header js-tabs-container" style="border-bottom: 1px solid;height: 75px;">
+		<a class="header-logo" href="{% url "spirit:index" %}"><img src="/media/img/bi_logo.png" style="width: 120px;position: absolute;top: 10px;"></a>
 
         {% if user.is_authenticated %}
             {% has_topic_notifications user as has_notifications %}
