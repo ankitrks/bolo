@@ -11,10 +11,6 @@ from collections import OrderedDict
 
 import warnings
 
-class RemovedInNextVersionWarning2(DeprecationWarning):
-    """"""
-
-
 import os
 PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV = 'boloindya'#PROJECT_PATH.split(os.sep)[-1]
@@ -238,7 +234,6 @@ DATABASES = {
 
 SECRET_KEY = 'qh^ag%eobze^uylgvt2of3#t(3wze)2!-s=@_@zuua1$56mu41'
 
-
 TIME_ZONE = 'Asia/Kolkata'
 
 # Language code for this installation. All choices can be found here:
@@ -307,3 +302,7 @@ EMAIL_RECEIVERS = ['ankit@careeranna.com']
 
 COMMENTS_PER_PAGE = 30
 TOPICS_PER_PAGE = 30
+
+
+import django
+django.setup()
