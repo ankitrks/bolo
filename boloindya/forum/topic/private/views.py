@@ -96,7 +96,7 @@ def detail(request, topic_id, slug):
 
     comments = paginate(
         comments,
-        per_page=config.comments_per_page,
+        per_page=settings.COMMENTS_PER_PAGE,
         page_number=request.GET.get('page', 1)
     )
 

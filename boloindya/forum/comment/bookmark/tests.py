@@ -11,6 +11,7 @@ from djconfig import config
 from ...core.tests import utils
 from .models import CommentBookmark
 from .forms import BookmarkForm
+from django.conf import settings
 
 
 class CommentBookmarkViewTest(TestCase):
@@ -42,7 +43,7 @@ class CommentBookmarkModelsTest(TestCase):
         self.category = utils.create_category()
         self.topic = utils.create_topic(category=self.category, user=self.user)
 
-        for _ in range(config.comments_per_page * 4):  # 4 pages
+        for _ in range(settings.COMMENTS_PER_PAGE * 4):  # 4 pages
             utils.create_comment(user=self.user, topic=self.topic)
 
     def test_comment_bookmark_get_new_comment_url(self):
@@ -64,7 +65,7 @@ class CommentBookmarkModelsTest(TestCase):
             comment_number=CommentBookmark.page_to_comment_number(page)
         )
         comment_bookmark = CommentBookmark.objects.get(user=self.user, topic=self.topic)
-        self.assertEqual(comment_bookmark.comment_number, config.comments_per_page * (page - 1) + 1)
+        self.assertEqual(comment_bookmark.comment_number, settings.COMMENTS_PER_PAGE * (page - 1) + 1)
 
     def test_comment_bookmark_update_or_create_invalid_page(self):
         """

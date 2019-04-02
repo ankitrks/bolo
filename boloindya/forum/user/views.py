@@ -19,6 +19,7 @@ from .utils.tokens import UserEmailChangeTokenGenerator
 from ..topic.models import Topic
 from ..comment.models import Comment
 from .forms import UserProfileForm, EmailChangeForm, UserForm, EmailCheckForm
+from django.conf import settings
 
 User = get_user_model()
 
@@ -153,7 +154,7 @@ def comments(request, pk, slug):
         template='spirit/user/profile_comments.html',
         reverse_to='spirit:user:detail',
         context_name='comments',
-        per_page=config.comments_per_page,
+        per_page=settings.COMMENTS_PER_PAGE,
     )
 
 
@@ -171,7 +172,7 @@ def likes(request, pk, slug):
         template='spirit/user/profile_likes.html',
         reverse_to='spirit:user:likes',
         context_name='comments',
-        per_page=config.comments_per_page,
+        per_page=settings.COMMENTS_PER_PAGE,
     )
 
 

@@ -28,7 +28,7 @@ class CommentBookmark(models.Model):
         return paginator.get_url(
             url=self.topic.get_absolute_url(),
             obj_number=comment_number,
-            per_page=config.comments_per_page,
+            per_page=settings.COMMENTS_PER_PAGE,
             page_var='page'
         )
 
@@ -46,7 +46,7 @@ class CommentBookmark(models.Model):
         except ValueError:
             return
 
-        return config.comments_per_page * (page_number - 1) + 1
+        return settings.COMMENTS_PER_PAGE * (page_number - 1) + 1
 
     @classmethod
     def update_or_create(cls, user, topic, comment_number):

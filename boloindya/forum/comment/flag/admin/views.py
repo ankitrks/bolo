@@ -13,6 +13,7 @@ from forum.core.utils.paginator import yt_paginate
 from forum.core.utils.decorators import administrator_required
 from .forms import CommentFlagForm
 from ..models import CommentFlag, Flag
+from django.conf import settings
 
 
 @administrator_required
@@ -31,7 +32,7 @@ def detail(request, pk):
 
     flags = yt_paginate(
         Flag.objects.filter(comment=flag.comment),
-        per_page=config.comments_per_page,
+        per_page=settings.COMMENTS_PER_PAGE,
         page_number=request.GET.get('page', 1)
     )
 
@@ -48,7 +49,7 @@ def detail(request, pk):
 def _index(request, queryset, template):
     flags = yt_paginate(
         queryset,
-        per_page=config.comments_per_page,
+        per_page=settings.COMMENTS_PER_PAGE,
         page_number=request.GET.get('page', 1)
     )
     context = {'flags': flags, }

@@ -10,6 +10,7 @@ from djconfig import config
 from ...core.utils.paginator import yt_paginate
 from .models import CommentHistory
 from ..models import Comment
+from django.conf import settings
 
 
 @login_required
@@ -24,7 +25,7 @@ def detail(request, comment_id):
 
     comments = yt_paginate(
         comments,
-        per_page=config.comments_per_page,
+        per_page=settings.COMMENTS_PER_PAGE,
         page_number=request.GET.get('page', 1)
     )
 
