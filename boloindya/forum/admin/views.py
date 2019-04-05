@@ -41,7 +41,7 @@ def config_basic(request):
 def dashboard(request):
     # Strongly inaccurate counters below...
     context = {
-        'version': forum.__version__,
+        'version': spirit.__version__,
         'category_count': Category.objects.all().count() - 1,  # - private
         'topics_count': Topic.objects.all().count(),
         'comments_count': Comment.objects.all().count(),

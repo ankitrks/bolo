@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.utils.translation import ugettext as _
 
 from djconfig import config
+from django.conf import settings
 
 from ...core.utils.paginator import yt_paginate
 from ...core.utils.decorators import administrator_required

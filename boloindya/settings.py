@@ -99,7 +99,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'forum.core',
-    # 'forum.admin',
+    'forum.admin',
     'forum.search',
 
     'forum.user',
