@@ -15,8 +15,8 @@ import forum.topic.urls
 import forum.comment.urls
 
 # Uncomment the next two lines to enable the admin:
-# from django.contrib import admin
-# admin.autodiscover()
+from django.contrib import admin
+admin.autodiscover()
 
 patterns = [
     url(r'^$', forum.topic.views.index_active, name='index'),
