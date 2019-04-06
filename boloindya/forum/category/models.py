@@ -36,6 +36,7 @@ class Category(models.Model):
     is_closed = models.BooleanField(_("closed"), default=False)
     is_removed = models.BooleanField(_("removed"), default=False)
     is_private = models.BooleanField(_("private"), default=False)
+    category_image = models.CharField(_("color"), max_length=150, blank=True)
 
     objects = CategoryQuerySet.as_manager()
 

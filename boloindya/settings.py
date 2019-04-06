@@ -15,7 +15,6 @@ import os
 PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV = 'boloindya'#PROJECT_PATH.split(os.sep)[-1]
 
-
 # warnings.simplefilter("default", RemovedInNextVersionWarning2)
 
 # warnings.warn(
@@ -299,10 +298,8 @@ EMAIL_PORT = 465
 EMAIL_SENDER = EMAIL_HOST_USER
 EMAIL_RECEIVERS = ['ankit@careeranna.com']
 
-
 COMMENTS_PER_PAGE = 30
 TOPICS_PER_PAGE = 30
-
 
 import django
 django.setup()

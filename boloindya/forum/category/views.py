@@ -8,6 +8,7 @@ from django.http import HttpResponsePermanentRedirect
 
 from django.conf import  settings
 from djconfig import config
+from django.conf import settings
 
 from ..core.utils.paginator import yt_paginate
 from ..topic.models import Topic
