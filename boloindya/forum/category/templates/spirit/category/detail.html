@@ -1,4 +1,4 @@
-{% extends "spirit/_base.html" %}
+{% extends "spirit/_index_base.html" %}
 
 {% load spirit_tags i18n %}
 
@@ -6,10 +6,25 @@
 
 {% block content %}
 
-    {% include "spirit/topic/_top_bar.html" with category=category categories=subcategories %}
+    {% include "spirit/topic/_top_bar.html" with category=None categories=categories %}
 
-    {% include "spirit/topic/_render_list.html" with show_subcategory=True %}
 
-    {% render_paginator topics %}
+
+    <section class="sub_cate_sec">
+         {% for c in subcategories %}
+            <div class="sub_cate_head">
+                <div class="row margin0">
+                    <div class="col-md-4 col-sm-4 col-4">
+                        <h3>{{ c.title }}</h3>
+                    </div>
+                    <div class="col-md-5 col-sm-5 col-8">
+                        <p>Hostel facility is not available for its students.
+                        Additional campus facilities such as boys Hostel.</p>
+                    </div>
+                    <div class="col-md-3"></div>
+                </div>
+            </div>
+         {% endfor %}
+    </section>
 
 {% endblock %}

@@ -6,6 +6,7 @@ from django.views.generic import ListView
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponsePermanentRedirect
 
+from django.conf import  settings
 from djconfig import config
 
 from ..core.utils.paginator import yt_paginate
@@ -14,6 +15,10 @@ from .models import Category
 
 
 def detail(request, pk, slug):
+    categories = Category.objects \
+        .visible() \
+        .parents()
+
     category = get_object_or_404(Category.objects.visible(),
                                  pk=pk)
 
@@ -38,10 +43,13 @@ def detail(request, pk, slug):
     )
 
     context = {
+        'categories': categories,
         'category': category,
         'subcategories': subcategories,
         'topics': topics
     }
+
+    print(subcategories)
 
     return render(request, 'spirit/category/detail.html', context)
 

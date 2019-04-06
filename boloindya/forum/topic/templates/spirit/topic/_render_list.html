@@ -1,9 +1,9 @@
 {% load spirit_tags i18n %}
 
-{# topic list #}
+<!-- {# topic list #}
         <div class="rows">
 
-        {% for t in topics %}
+        {% comment %} {% for t in topics %}
 			<div class="row">
 
                 <div class="row-title">
@@ -35,16 +35,31 @@
                                 </a>
                             {% endif %}
                         {% endif %}
-                    </div><!--
-                    --><div><i class="fa fa-comment{% if t.has_new_comments %} js-comment-is-new{% endif %}"></i> {{ t.comment_count }}</div><!--
-                 --><div title="{{ t.last_active }}"><i class="fa fa-clock-o"></i> {{ t.last_active|shortnaturaltime }}</div>
+                    </div>
+                    -->
+                    <!-- <div><i class="fa fa-comment{% if t.has_new_comments %} js-comment-is-new{% endif %}"></i> {{ t.comment_count }}</div>
+                 -->
+                 <!-- <div title="{{ t.last_active }}"><i class="fa fa-clock-o"></i> {{ t.last_active|shortnaturaltime }}</div> 
                 </div>
 
-			</div>
+			</div> 
         {% empty %}
             <p>{% trans "There are no topics here, yet" %}</p>
-        {% endfor %}
-
+        {% endfor %} {% endcomment %} -->
+        <section class="sub_cate_sec">
+        <div class="sub_cate_head">
+                <div class="row margin0">
+                    <div class="col-md-4 col-sm-4 col-4">
+                        <h3>Sub-category</h3>
+                    </div>
+                    <div class="col-md-5 col-sm-5 col-8">
+                        <p>Hostel facility is not available for its students. 
+                        Additional campus facilities such as boys Hostel.</p>
+                    </div>
+                    <div class="col-md-3"></div>
+                </div>
+            </div>
+        </section>
 		</div>
 
 <script>

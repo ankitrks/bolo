@@ -2,7 +2,19 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="950e95bb-3a96-4cca-9631-a29e6ca7a385" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/boloindya/forum/core/templates/spirit/_index_header.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/boloindya/media/css/bootstrap.min.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/boloindya/media/css/dnSlideR.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/boloindya/media/css/style.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boloindya/forum/category/templates/spirit/category/detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/boloindya/forum/category/templates/spirit/category/detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boloindya/forum/category/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/boloindya/forum/category/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boloindya/forum/core/static/spirit/stylesheets/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/boloindya/forum/core/static/spirit/stylesheets/styles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boloindya/forum/core/templates/spirit/_base.html" beforeDir="false" afterPath="$PROJECT_DIR$/boloindya/forum/core/templates/spirit/_base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boloindya/forum/core/templates/spirit/_header.html" beforeDir="false" afterPath="$PROJECT_DIR$/boloindya/forum/core/templates/spirit/_header.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boloindya/forum/topic/templates/spirit/topic/_render_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/boloindya/forum/topic/templates/spirit/topic/_render_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boloindya/forum/topic/templates/spirit/topic/_top_bar.html" beforeDir="false" afterPath="$PROJECT_DIR$/boloindya/forum/topic/templates/spirit/topic/_top_bar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boloindya/forum/topic/templates/spirit/topic/active.html" beforeDir="false" afterPath="$PROJECT_DIR$/boloindya/forum/topic/templates/spirit/topic/active.html" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -41,8 +53,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="ProjectPane" />
       <pane id="Scope" />
+      <pane id="ProjectPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -75,6 +87,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1280" height="777" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2494043" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
