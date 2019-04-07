@@ -39,6 +39,7 @@ class Comment(models.Model):
     is_media = models.BooleanField(default=False)
     media_duration = models.CharField(_("duration"), max_length=20, default='')
     language_id = models.CharField(_("language"), max_length=5, default='1')
+    thumbnail = models.CharField(_("thumbnail"), max_length=150, default='')
 
     modified_count = models.PositiveIntegerField(_("modified count"), default=0)
     likes_count = models.PositiveIntegerField(_("likes count"), default=0)
