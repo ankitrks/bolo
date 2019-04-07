@@ -20,9 +20,9 @@
         var swiper = new Swiper('.swiper-container', {
             effect: 'coverflow',
             loop: true,
-            //centeredSlides: true,
-            slidesPerView: 4,
-            //initialSlide: 3,
+            centeredSlides: true,
+            slidesPerView: 3,
+            initialSlide: {{ current_index }},
             keyboardControl: true,
             mousewheelControl: true,
             lazyLoading: true,

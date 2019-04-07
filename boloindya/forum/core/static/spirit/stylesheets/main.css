@@ -23,6 +23,10 @@
 body{
     font-family: 'Roboto', sans-serif;
 }
+.row {
+    margin-right:0px !important;
+    margin-left:0px !important;
+}
 /* common css for website */
 .padding0{padding: 0px;}
 .margin0{margin:0px;}
@@ -31,14 +35,14 @@ body{
 .margin-left0{margin-left: 0px;}
 .margin-right0{margin-right: 0px;}
 .fill_start{
-    background: url(../img/icons/fill_start.svg) no-repeat;
+    background: url(/media/img/icons/fill_start.svg) no-repeat;
     background-size: cover;
     width: 15px;
     height: 15px;
     display: inline-block;
 }
 .unfill_start{
-    background: url(../img/icons/unfill_start.svg) no-repeat;
+    background: url(/media/img/icons/unfill_start.svg) no-repeat;
     background-size: cover;
     width: 15px;
     height: 15px;
@@ -123,7 +127,7 @@ body{
 }
 .sub_cate_sec .cate_listing .viewMore a:before{
     content: '';
-    background: url('media/img/icons/arrow_right_red.svg') no-repeat;
+    background: url('/media/img/icons/arrow_right_red.svg') no-repeat;
     width: 11px;
     height: 12px;
     position: absolute;
@@ -134,7 +138,7 @@ body{
 .sub_cate_sec .cate_listing .img_sec{position: relative;}
 .sub_cate_sec .cate_listing .img_sec:after {
     content: '';
-    background: url(../images/icons/play_button.svg) no-repeat;
+    background: url(/media/img/icons/play_button.svg) no-repeat;
     position: absolute;
     width: 45px;
     height: 45px;
@@ -151,6 +155,24 @@ body{
     height: 100%;
     width: 100%;
     border-radius: 3px;
+}
+.sub_cate_tab_layout {
+    display: block;
+    overflow-x: scroll;
+}
+.sub_cate_tab {
+    display: inline-block;
+    padding:10px;
+    font-size: 18px;
+}
+.sub_cate_tab.active {
+    border-bottom: 1px solid #CA3B3D;
+    color: #CA3B3D;
+}
+.load_more{
+    float:right;
+    cursor: pointer;
+    color: #CA3B3D;
 }
 /* Media query */
 @media (min-width: 1200px){

@@ -21,7 +21,7 @@ class Category(models.Model):
     it must be set explicitly
     :vartype reindex_at: `:py:class:models.DateTimeField`
     """
-    parent = models.ForeignKey('self', verbose_name=_("category parent"), null=True, blank=True)
+    parent = models.ForeignKey('self', verbose_name=_("category parent"), null=True, blank=True , related_name="parent_category")
 
     title = models.CharField(_("title"), max_length=75)
     slug = AutoSlugField(populate_from="title", db_index=False, blank=True)

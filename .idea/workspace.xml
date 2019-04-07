@@ -2,19 +2,20 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="950e95bb-3a96-4cca-9631-a29e6ca7a385" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/boloindya/forum/core/templates/spirit/_index_header.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/boloindya/media/css/bootstrap.min.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/boloindya/media/css/dnSlideR.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/boloindya/media/css/style.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/boloindya/forum/category/templates/spirit/category/sub_category_detail.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/boloindya/forum/topic/templates/spirit/topic/_render_sub_cat_tab.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/boloindya/forum/category/templates/spirit/category/detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/boloindya/forum/category/templates/spirit/category/detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boloindya/forum/category/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/boloindya/forum/category/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/boloindya/forum/category/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/boloindya/forum/category/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boloindya/forum/core/static/spirit/stylesheets/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/boloindya/forum/core/static/spirit/stylesheets/styles.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boloindya/forum/core/templates/spirit/_base.html" beforeDir="false" afterPath="$PROJECT_DIR$/boloindya/forum/core/templates/spirit/_base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boloindya/forum/core/templates/spirit/_header.html" beforeDir="false" afterPath="$PROJECT_DIR$/boloindya/forum/core/templates/spirit/_header.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boloindya/forum/core/static/spirit/stylesheets/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/boloindya/forum/core/static/spirit/stylesheets/main.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boloindya/forum/core/templates/spirit/_index_footer.html" beforeDir="false" afterPath="$PROJECT_DIR$/boloindya/forum/core/templates/spirit/_index_footer.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boloindya/forum/topic/admin/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/boloindya/forum/topic/admin/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boloindya/forum/topic/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/boloindya/forum/topic/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boloindya/forum/topic/templates/spirit/topic/_index.html" beforeDir="false" afterPath="$PROJECT_DIR$/boloindya/forum/topic/templates/spirit/topic/_index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/boloindya/forum/topic/templates/spirit/topic/_render_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/boloindya/forum/topic/templates/spirit/topic/_render_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boloindya/forum/topic/templates/spirit/topic/_top_bar.html" beforeDir="false" afterPath="$PROJECT_DIR$/boloindya/forum/topic/templates/spirit/topic/_top_bar.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/boloindya/forum/topic/templates/spirit/topic/active.html" beforeDir="false" afterPath="$PROJECT_DIR$/boloindya/forum/topic/templates/spirit/topic/active.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boloindya/forum/topic/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/boloindya/forum/topic/views.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -40,10 +41,19 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/requirements.txt" />
+        <option value="$PROJECT_DIR$/boloindya/forum/topic/templates/spirit/topic/_render_list.html" />
+        <option value="$PROJECT_DIR$/boloindya/forum/category/templates/spirit/category/sub_category_detail.html" />
+        <option value="$PROJECT_DIR$/boloindya/forum/core/templates/spirit/_index_footer.html" />
+        <option value="$PROJECT_DIR$/boloindya/forum/topic/admin/views.py" />
+        <option value="$PROJECT_DIR$/boloindya/forum/category/views.py" />
+        <option value="$PROJECT_DIR$/boloindya/forum/topic/views.py" />
+        <option value="$PROJECT_DIR$/boloindya/forum/topic/templates/spirit/topic/_index.html" />
+        <option value="$PROJECT_DIR$/boloindya/forum/core/static/spirit/stylesheets/main.css" />
+        <option value="$PROJECT_DIR$/boloindya/forum/topic/templates/spirit/topic/_render_sub_cat_tab.html" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds">
     <option name="y" value="23" />
     <option name="width" value="1280" />
     <option name="height" value="777" />
@@ -53,8 +63,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -86,8 +96,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1280" height="777" extended-state="6" />
-    <editor active="true" />
+    <frame x="0" y="23" width="1280" height="777" extended-state="0" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2494043" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -109,22 +118,9 @@
     </layout>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/boloindya/forum/topic/admin/views.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/boloindya/forum/admin/templates/spirit/admin/dashboard.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-259" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/boloindya/forum/topic/templates/spirit/topic/_top_bar.html">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/boloindya/forum/topic/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="338">
-          <caret line="125" column="33" selection-start-line="125" selection-start-column="33" selection-end-line="125" selection-end-column="33" />
-        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/env/lib/python3.7/types.py" />
@@ -149,10 +145,128 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/boloindya/forum/topic/templates/spirit/topic/_top_bar.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="326">
+          <caret line="40" column="58" selection-start-line="40" selection-start-column="40" selection-end-line="40" selection-end-column="58" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/boloindya/forum/core/templates/spirit/_index_base.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-544" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/boloindya/forum/category/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-195" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/boloindya/forum/core/templates/spirit/_index_header.html">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/boloindya/forum/core/templates/spirit/_index_footer.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="24" column="42" selection-start-line="24" selection-start-column="42" selection-end-line="24" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/boloindya/forum/topic/admin/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/boloindya/forum/topic/admin/urls.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/boloindya/forum/category/templates/spirit/category/detail.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="13" column="14" lean-forward="true" selection-end-line="13" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/boloindya/forum/category/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="226">
+          <caret line="39" lean-forward="true" selection-start-line="36" selection-start-column="4" selection-end-line="39" />
+          <folding>
+            <element signature="e#25#64#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/boloindya/forum/topic/utils.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/boloindya/forum/admin/urls.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/boloindya/forum/topic/templates/spirit/topic/_render_list.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="517">
+          <caret line="49" column="18" lean-forward="true" selection-start-line="17" selection-start-column="12" selection-end-line="49" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/boloindya/forum/topic/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="15" column="18" selection-start-line="15" selection-start-column="11" selection-end-line="15" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/boloindya/forum/topic/templates/spirit/topic/_index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="11" lean-forward="true" selection-start-line="11" selection-end-line="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/boloindya/forum/topic/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="248">
+          <caret line="133" column="28" selection-start-line="133" selection-start-column="28" selection-end-line="133" selection-end-column="28" />
+          <folding>
+            <element signature="e#25#64#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/boloindya/forum/category/templates/spirit/category/sub_category_detail.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" lean-forward="true" selection-start-line="8" selection-end-line="12" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/boloindya/urls.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="17" column="45" selection-start-line="17" selection-start-column="33" selection-end-line="17" selection-end-column="45" />
+        <state relative-caret-position="255">
+          <caret line="17" column="32" lean-forward="true" selection-start-line="17" selection-start-column="32" selection-end-line="17" selection-end-column="32" />
+          <folding>
+            <element signature="e#25#64#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/boloindya/forum/core/static/spirit/stylesheets/main.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="175" column="19" selection-start-line="175" selection-start-column="19" selection-end-line="175" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/boloindya/forum/topic/templates/spirit/topic/_render_sub_cat_tab.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="765">
+          <caret line="51" column="85" selection-start-line="51" selection-start-column="85" selection-end-line="51" selection-end-column="85" />
+          <folding>
+            <element signature="n#style#0;n#a#0;n#div#0;n#section#0;n#!!top" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
