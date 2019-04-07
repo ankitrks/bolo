@@ -12,4 +12,5 @@ urlpatterns = [
 
     url(r'^(?P<pk>\d+)/$', views.detail, kwargs={'slug': "", }, name='detail'),
     url(r'^(?P<pk>\d+)/(?P<slug>[\w-]+)/$', views.detail, name='detail'),
+    url(r'^(?P<pk>\d+)/(?P<slug>[\w-]+)/(?P<sub_cat_pk>\d+)/(?P<sub_cat_slug>[\w-]+)/$', views.sub_detail, name='detail'),
 ]

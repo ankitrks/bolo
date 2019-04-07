@@ -114,26 +114,51 @@ def detail(request, pk, slug):
 
 
 def index_active(request):
-    categories = Category.objects\
-        .visible()\
+
+    categories = Category.objects \
+        .visible() \
         .parents()
 
-    topics = Topic.objects\
-        .visible()\
-        .global_()\
-        .with_bookmarks(user=request.user)\
-        .order_by('-is_globally_pinned', '-last_active')\
-        .select_related('category')
+    category = get_object_or_404(Category.objects.visible(),
+                                 pk=5)
 
-    topics = yt_paginate(
-        topics,
-        per_page=settings.TOPICS_PER_PAGE,
-        page_number=request.GET.get('page', 1)
-    )
+    subcategories = Category.objects \
+        .visible() \
+        .children(parent=category)
+
+    sub_category = []
+    topics = []
+
+    if len(subcategories) > 0:
+        sub_category = get_object_or_404(Category.objects.visible(), pk=subcategories[0].pk)
+        topics = sub_category.category_topics.all()[0:8]
+
+
+    current_index = 0
+
+    for index, category_each in enumerate(categories):
+        if category_each.id == category.id:
+            current_index = index
 
     context = {
         'categories': categories,
-        'topics': topics
+        'category': category,
+        'subcategories': subcategories,
+        'sub_category': sub_category,
+        'topics': topics,
+        'current_index': current_index
     }
 
-    return render(request, 'spirit/topic/active.html', context)
+    return render(request, 'spirit/topic/_index.html', context)
+
+def ques_ans_index(request):
+    
+    categories = Category.objects \
+        .visible() \
+        .parents()
+
+    context = {
+        'categories': categories
+    }
+
+    return render(request, 'spirit/topic/_ques_and_ans_index.html', context)

@@ -10,6 +10,9 @@
         <!-- Main Banner section-->
         {% include "spirit/topic/_top_bar.html" with category=None categories=categories %}
 
+
+        {% include "spirit/topic/_render_list.html" %}
+
         <!-- Sub category section-->
         <section class="sub_cate_sec">
             <div class="sub_cate_head">
@@ -145,8 +148,7 @@
     <!-- /.container -->
 
     {% comment %}
-
-    {% include "spirit/topic/_render_list.html" %} {% endcomment %}
+ {% endcomment %}
 
     {% comment %} {% render_paginator topics %} {% endcomment %}
 

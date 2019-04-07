@@ -16,6 +16,7 @@ from .models import Category
 
 
 def detail(request, pk, slug):
+
     categories = Category.objects \
         .visible() \
         .parents()
@@ -30,29 +31,71 @@ def detail(request, pk, slug):
         .visible()\
         .children(parent=category)
 
-    topics = Topic.objects\
-        .unremoved()\
-        .with_bookmarks(user=request.user)\
-        .for_category(category=category)\
-        .order_by('-is_globally_pinned', '-is_pinned', '-last_active')\
-        .select_related('category')
+    sub_category = []
+    topics = []
 
-    topics = yt_paginate(
-        topics,
-        per_page=settings.TOPICS_PER_PAGE,
-        page_number=request.GET.get('page', 1)
-    )
+    if len(subcategories) > 0:
+        sub_category = get_object_or_404(Category.objects.visible(), pk=subcategories[0].pk)
+        topics = sub_category.category_topics.all()[0:8]
+
+    current_index = 0
+
+    for index, category_each in enumerate(categories):
+        if category_each.id == category.id:
+            current_index = index
+
+
 
     context = {
         'categories': categories,
         'category': category,
         'subcategories': subcategories,
-        'topics': topics
+        'sub_category': sub_category,
+        'topics': topics,
+        'current_index': current_index
     }
 
-    print(subcategories)
+    return render(request, 'spirit/category/sub_category_detail.html', context)
 
     return render(request, 'spirit/category/detail.html', context)
+
+
+def sub_detail(request, pk, slug, sub_cat_pk, sub_cat_slug):
+
+    categories = Category.objects \
+        .visible() \
+        .parents()
+
+    category = get_object_or_404(Category.objects.visible(),
+                                 pk=pk)
+
+    sub_category = get_object_or_404(Category.objects.visible(), pk=sub_cat_pk)
+
+    if category.slug != slug:
+        return HttpResponsePermanentRedirect(category.get_absolute_url())
+
+    subcategories = Category.objects\
+        .visible()\
+        .children(parent=category)
+
+    topics = sub_category.category_topics.all()[0:8]
+
+    current_index = 0
+
+    for index, category_each in enumerate(categories):
+        if category_each.id == category.id:
+            current_index = index
+
+    context = {
+        'categories': categories,
+        'category': category,
+        'subcategories': subcategories,
+        'sub_category': sub_category,
+        'topics': topics,
+        'current_index': current_index
+    }
+
+    return render(request, 'spirit/category/sub_category_detail.html', context)
 
 
 class IndexView(ListView):

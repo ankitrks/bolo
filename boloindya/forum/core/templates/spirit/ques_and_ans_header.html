@@ -1,0 +1,35 @@
+{% load spirit_tags i18n %}
+
+<header>
+        <nav class="navbar navbar-light  navbar-expand-md">
+                <a class="navbar-brand" href="/" title="Bolo Indiya">
+                    <img src="/media/img/bolo_indiya_logo.svg" class="" alt="Bolo Indiya Logo" />
+                </a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" >Videos</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a href="" >Change Language</a>
+                            <ul class="sub-menu list-unstyled">
+                                <li><a href="#" class="dropdown-item">English</a></li>
+                                <li><a href="#" class="dropdown-item">Hindi</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a href="" class="profile_link">{{ user.username }} </a>
+                            <ul class="sub-menu list-unstyled">
+                                <li><a href="#" class="dropdown-item">Profile</a></li>
+                                <li><a href="#" class="dropdown-item">Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+        </nav>
+    </header>

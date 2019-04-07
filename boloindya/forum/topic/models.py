@@ -26,7 +26,7 @@ class Topic(models.Model):
     :vartype reindex_at: `:py:class:models.DateTimeField`
     """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='st_topics')
-    category = models.ForeignKey('forum_category.Category', verbose_name=_("category"))
+    category = models.ForeignKey('forum_category.Category', verbose_name=_("category"), related_name="category_topics")
 
     title = models.CharField(_("title"), max_length=255)
     slug = AutoSlugField(populate_from="title", db_index=False, blank=True)
