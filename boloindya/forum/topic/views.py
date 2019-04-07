@@ -155,10 +155,12 @@ def ques_ans_index(request):
     
     categories = Category.objects \
         .visible() \
-        .parents()
+        .parents()    
 
+    topics = Topic.objects.filter(is_media=True)[:5]
     context = {
-        'categories': categories
+        'categories': categories,
+        'topics': topics
     }
 
     return render(request, 'spirit/topic/_ques_and_ans_index.html', context)

@@ -27,7 +27,7 @@ ACTION = (
 class Comment(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='st_comments')
-    topic = models.ForeignKey('forum_topic.Topic')
+    topic = models.ForeignKey('forum_topic.Topic', related_name='topic_comment')
 
     comment = models.TextField(_("comment"))
     comment_html = models.TextField(_("comment html"))

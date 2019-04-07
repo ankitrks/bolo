@@ -33,6 +33,7 @@
                             </div>
                         </div>
                         <!-- question feed -->
+                        {% for topic in topics %}
                         <div class="quest_feed">
                             <!-- user info -->
                             <div class="quest_user_info">
@@ -40,12 +41,12 @@
                                     <img src="http://lorempixel.com/200/200/" alt="user image" class="quest_user_image"/>
                                 </div>
                                 <div class="quest_user_detail">
-                                    <div class="user_name">Swapnil Verma</div>
-                                    <div class="feed_post_date">Answered 19h ago</div>
+                                    <div class="user_name">{{ topic.user.username }}</div>
+                                    <div class="feed_post_date">Answered On {{ topic.date.date }}</div>
                                 </div>
                             </div>
                             <!-- Question -->
-                            <div class="question">How was Pakistani Air Defense unable to detect 12 Mirage-2000?</div>
+                            <div class="question">{{ topic.title }}</div>
                             <!-- Answer options -->
                             <div class="answer_option">
                                 <div class="ans_opt_list">
@@ -67,27 +68,13 @@
                                 <div class="head_text">Top Answer</div>
                                 <div class="inner_ans_area">
                                     <div class="owl-carousel owl-theme">
-                                        <div class="item" data-videosrc="http://vpmdev.com/window.mp4">
+                                        {% for video in topic.topic_comment.all %}
+                                        <div class="item" data-videosrc="">
                                             <div class="posted_by">
-                                                Posted by Gitesh Shastri <span>4h ago</span>
+                                                Posted by {{ video.user.username }} <span>{{ video.date.date }}</span>
                                             </div>
                                         </div>
-                                        <div class="item" data-videosrc="http://vpmdev.com/window.mp4">
-                                            <div class="posted_by">
-                                                Posted by Gitesh Shastri <span>4h ago</span>
-                                            </div>
-                                        </div>
-                                        <div class="item" data-videosrc="http://vpmdev.com/window.mp4">
-                                            <div class="posted_by">
-                                                Posted by Gitesh Shastri <span>4h ago</span>
-                                            </div>
-                                        </div>
-                                        <div class="item" data-videosrc="http://vpmdev.com/window.mp4">
-                                            <div class="posted_by">
-                                                Posted by Gitesh Shastri <span>4h ago</span>
-                                            </div>
-                                        </div>
-                                            
+                                        {% endfor %}
                                     </div>    
                                 </div>
                                 <div class="show_more">
@@ -139,7 +126,9 @@
                                    <a href="#">read more answer</a>
                                 </div>
                             </div>
+
                         </div>
+                        {% endfor %}
 
                     </div>
                     <!-- Right section for Questions -->

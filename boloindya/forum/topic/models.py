@@ -35,6 +35,8 @@ class Topic(models.Model):
     reindex_at = models.DateTimeField(_("reindex at"), default=timezone.now)
     language_id = models.CharField(_("language"), max_length=5, default='1')
 
+    is_media = models.BooleanField(default=True)
+
     is_pinned = models.BooleanField(_("pinned"), default=False)
     is_globally_pinned = models.BooleanField(_("globally pinned"), default=False)
     is_closed = models.BooleanField(_("closed"), default=False)
