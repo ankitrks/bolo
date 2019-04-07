@@ -37,6 +37,7 @@ class CommentForm(forms.ModelForm):
     comment = forms.CharField(
         label=_('Comment'),
         max_length=settings.ST_COMMENT_MAX_LEN,
+        required=False,
         widget=forms.Textarea)
     comment_hash = forms.CharField(
         max_length=32,
