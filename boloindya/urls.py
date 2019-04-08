@@ -16,7 +16,6 @@ import forum.comment.urls
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
-admin.autodiscover()
 
 patterns = [
     url(r'^$', forum.topic.views.index_active, name='index'),
@@ -26,10 +25,11 @@ patterns = [
     url(r'^category/', include(forum.category.urls, namespace='category')),
     url(r'^topic/', include(forum.topic.urls, namespace='topic')),
     url(r'^comment/', include(forum.comment.urls, namespace='comment')),
-    # url(r'^superadmin/', include(admin.site.urls)),
+    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
 urlpatterns = [
+	url(r'^superman/', include(admin.site.urls)),
     url(r'^', include(patterns, namespace='spirit', app_name='forum')),
 ]
