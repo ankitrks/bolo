@@ -1,12 +1,12 @@
 <section class="sub_cate_sec">
-    <div class="sub_cate_tab_layout">
+    <div class="sub_cate_tab_layout" style="border-bottom: 1px solid lightgrey;">
         {% for c in subcategories %}
         <a style="text-decoration:none;color:black;" href="{{ c.parent.get_absolute_url }}{{ c.id }}/{{c.slug}} " class="sub_cate_tab {% if c.id == sub_category.id %} active {% endif %}">
             {{ c.title }}
         </a>
         {% endfor %}
     </div>
-    <div class="sub_cate_head">
+    <!-- <div class="sub_cate_head">
         <div class="row margin0">
             <div class="col-md-4 col-sm-4 col-4">
                 <h3>{{ sub_category.title }}</h3>
@@ -16,7 +16,7 @@
                     Additional campus facilities such as boys Hostel.</p>
             </div>
         </div>
-    </div>
+    </div> -->
     <div class="cate_listing">
         <div class="container">
             <div class="row margin0">
@@ -27,11 +27,11 @@
                         <div class="row margin0">
                             <div class="col-md-4 left_wrapper">
                                 <div class="img_sec">
-                                    <img src="{{each_topic.thumbnail}}" class="rounded" alt=""/>
+                                    <a href="{% url 'spirit:topic:detail' each_topic.id %}"><img src="{{each_topic.thumbnail}}" class="rounded" alt=""/> </a>
                                 </div>
                             </div>
                             <div class="col-md-8 right_wrapper">
-                                <a href="/topic/{{ each_topic.pk}}/"><h4>{{ each_topic.title }}</h4></a>
+                                <a href="{% url 'spirit:topic:detail' each_topic.id %}"><h4>{{ each_topic.title }}</h4></a>
                                 <div class="rating_star">
                                     <i class="fill_start"></i>
                                     <i class="fill_start"></i>
@@ -49,8 +49,8 @@
                 </div>
                 {% endfor %}
 
-                {% if not topics %}
-                <p>This category has no data. You can start <a href="/topic/discussion/">Contribution here</a></p>
+                {% if  topics %}
+                <p>This category has no data. You can start <a href="/topic/publish/" style="color:#CA3B3D;"><b><u>contributing here</u></b></a>.</p>
                 {% endif  %}    
 
             </div>

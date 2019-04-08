@@ -92,16 +92,16 @@ def detail(request, pk, slug):
         .visible() \
         .parents()    
 
-    topics = Topic.objects.all()[:10]
+    topics = Topic.objects.filter(id = pk)#.all()[:10]
 
-    topic = get_object_or_404(Topic.objects.visible(),pk=pk)
+    # topic = get_object_or_404(Topic.objects.visible(),pk=pk)
 
 
     context = {
         'categories': categories,
         'topics': topics,
         'is_single_topic': pk,
-        'single_topic': topic
+        # 'single_topic': topic
     }
 
     return render(request, 'spirit/topic/_ques_and_ans_index.html', context)
@@ -186,11 +186,12 @@ def index_videos(request):
     return render(request, 'spirit/topic/_index.html', context)
 
 def ques_ans_index(request,category_id=None):#, is_single_topic=0):
+    lid = request.GET.get('lid', 2)
     categories = Category.objects \
         .visible() \
         .parents()    
 
-    topics = Topic.objects.all()[:10]
+    topics = Topic.objects.filter(language_id = lid)[:10]
 
     # topic = {}
     # if is_single_topic not in [0, '0']:
