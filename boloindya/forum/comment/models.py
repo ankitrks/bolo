@@ -56,6 +56,8 @@ class Comment(models.Model):
         return reverse('spirit:comment:find', kwargs={'pk': str(self.id), })
 
     def get_updated_url(self):
+        if 'uploads' in self.comment:
+            return self.comment.replace("boloindya", "careeranna")    
         return self.comment.replace("careeranna", "boloindya")
 
     @property
