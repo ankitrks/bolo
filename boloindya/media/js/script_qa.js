@@ -14,22 +14,22 @@ if ($(window).width() <= 767) {
 }
 
 //jwplayer for audio
-    var playerInstance = jwplayer("ans_audio");
-    playerInstance.setup({
-        file: "",
-        width:530,
-        height:10,
-        skin: {
-            active: "#bb3335",
-            inactive: "#bb3335",
-            background: "white"
-        }
-    });
+    // var playerInstance = jwplayer("ans_audio");
+    // playerInstance.setup({
+    //     file: "",
+    //     width:530,
+    //     height:10,
+    //     skin: {
+    //         active: "#bb3335",
+    //         inactive: "#bb3335",
+    //         background: "white"
+    //     }
+    // });
 
 //slider for top video answer    
 var owl = $('.owl-carousel');
   owl.owlCarousel({
-    loop:false,
+    loop:true,
     margin:10,
     nav:true,
     dots:false,

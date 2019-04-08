@@ -87,12 +87,11 @@
                                         {% endif %}
                                         {% endfor %}
                                     </div>    
-                                </div>
-                                <div class="show_more">
-                                    <a href="#">view more answer</a>
                                 </div> 
                             </div>
                             <!-- user answer as audo -->
+
+                            <div class="head_text">Top Audio</div>
                             <div class="user_ans_audio common_ans_area">
                                 <div class="inner_ans_area">
                                     <!-- User info -->
@@ -101,30 +100,30 @@
                                     <div class="quest_user_info">
                                         <div class="quest_user_info_img">
                                             <img src="http://lorempixel.com/200/200/" alt="user image" class="quest_user_image"/>
-                                    
                                         </div>
                                         <div class="quest_user_detail">
                                             <div class="user_name">{{ video.user.username }}</div>
                                             <div class="feed_post_date">Answered {{ video.date.date }}</div>
                                         </div>
-                                                <audio controls>
-                                    <source src="{{ video.get_updated_url }}">  
-                                Your browser does not support the audio element.
-                                    </audio>
+                                                
                                     
                                     </div>
                                     <!-- Audio player -->
-                                    <div id="ans_audio" data-videosrc="{{ video.get_updated_url }}"></div>
+                                    <div id="ans_audio" data-videosrc="{{ video.get_updated_url }}" style="width: 100%;">
+                                        <audio controls style="width: 100%;">
+                                        <source src="{{ video.get_updated_url }}" type="audio/ogg" style="width: 100%;">  
+                                        Your browser does not support the audio element.
+                                    </audio>
+                                    </div>
                                     {% endif %}
                                     {% endfor %}
                                 </div>   
-                                <div class="show_more">
-                                    <a href="#">listen more answer</a>
-                                </div> 
                             </div>
                             <!-- user answer as text -->
+
+                            <div class="head_text">Top Text</div>
                             {% for video in topic.topic_comment.all %}
-                            {% if not video.is_media %}
+                            {% if not video.is_media and 's3' not in video.comment and video.comment %}
                             <div class="user_ans_text common_ans_area">
                                 <div class="inner_ans_area">
                                         <!-- User info -->

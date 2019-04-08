@@ -41,8 +41,10 @@ def publish(request, topic_id, pk=None, type=None):
                            .get_absolute_url())
 
             comment = form.save()
-            comment.is_media = request.POST.get('is_media')
-            comment.is_audio = request.POST.get('is_audio')
+            if(request.POST.get('is_media')):
+                comment.is_media = request.POST.get('is_media')
+            if(request.POST.get('is_audio')):    
+                comment.is_audio = request.POST.get('is_audio')
             comment.save()
             comment_posted(comment=comment, mentions=form.mentions)
             return redirect(request.POST.get('next', comment.get_absolute_url()))
