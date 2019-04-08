@@ -13,8 +13,9 @@
 
     <div class="container">
         {% include "spirit/comment/_editor.html" %}
-
-        <input class="button reply-button" type="submit" value="{% trans "Publish" %}" />
+        <p><input type="text" name="audio_url" id="audio_url"></p>    
+        <p><input type="text" name="video_url" id="video_url"></p>    
+        <input class="button reply-button" id="btnPublish" type="submit" value="{% trans "Publish" %}" />
     </div>
 </form>
 
