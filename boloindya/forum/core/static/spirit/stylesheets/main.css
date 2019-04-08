@@ -104,7 +104,7 @@ body{
 /* Banner section */
 .banner_sec{background:#CA3B3D;padding:60px 0px;box-shadow:inset 0px 0px 8px 2px #964344;}
 .banner_sec .inner_content{background:#CA3B3D;}
-.banner_sec .inner_content .swiper-slide img{height: 210px;}
+/*.banner_sec .inner_content .swiper-slide img{height: 210px;}*/
 
 /* sub cate section */
 .sub_cate_sec .sub_cate_head{color:#1E313A;background:#F1F0F0;padding:50px 0px;}
