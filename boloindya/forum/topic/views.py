@@ -86,31 +86,23 @@ def update(request, pk):
 
 
 def detail(request, pk, slug):
-    topic = Topic.objects.get_public_or_404(pk, request.user)
+    categories = Category.objects \
+        .visible() \
+        .parents()    
 
-    if topic.slug != slug:
-        return HttpResponsePermanentRedirect(topic.get_absolute_url())
+    topics = Topic.objects.all()[:10]
 
-    utils.topic_viewed(request=request, topic=topic)
+    topic = get_object_or_404(Topic.objects.visible(),pk=pk)
 
-    comments = Comment.objects\
-        .for_topic(topic=topic)\
-        .with_likes(user=request.user)\
-        .with_polls(user=request.user)\
-        .order_by('date')
-
-    comments = paginate(
-        comments,
-        per_page=settings.COMMENTS_PER_PAGE,
-        page_number=request.GET.get('page', 1)
-    )
 
     context = {
-        'topic': topic,
-        'comments': comments
+        'categories': categories,
+        'topics': topics,
+        'is_single_topic': pk,
+        'single_topic': topic
     }
 
-    return render(request, 'spirit/topic/detail.html', context)
+    return render(request, 'spirit/topic/_ques_and_ans_index.html', context)
 
 
 def index_active(request):
@@ -151,7 +143,7 @@ def index_active(request):
 
     return render(request, 'spirit/topic/_index.html', context)
 
-def ques_ans_index(request,category_id=None):
+def ques_ans_index(request,category_id=None, is_single_topic=0):
     
     categories = Category.objects \
         .visible() \
@@ -159,13 +151,19 @@ def ques_ans_index(request,category_id=None):
 
     topics = Topic.objects.all()[:10]
 
+    topic = {}
+    if(is_single_topic != 0):
+        topic = get_object_or_404(Topic.objects.visible(),pk=is_single_topic)
+
     if(category_id != None):
         category = get_object_or_404(Category.objects.visible(),pk=category_id)
         topics = category.category_topics.all()[0:10]                         
 
     context = {
         'categories': categories,
-        'topics': topics
+        'topics': topics,
+        'is_single_topic': is_single_topic,
+        'single_topic': topic
     }
 
     return render(request, 'spirit/topic/_ques_and_ans_index.html', context)

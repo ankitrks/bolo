@@ -66,92 +66,6 @@
                         left: 100px;
                         position: relative;
                     }
-
-                  }
-                };
-                xhr.onerror = function (e) {
-                  console.error(xhr.statusText);
-                };
-                xhr.send(formData); 
-
-                }
-
-            record.onclick = e => {
-              console.log('I was clicked')
-              record.disabled = true;
-              record.style.backgroundColor = "blue"
-              stopRecord.disabled=false;
-              audioChunks = [];
-              rec.start();
-            }
-            stopRecord.onclick = e => {
-              console.log("I was clicked")
-              record.disabled = false;
-              stop.disabled=true;
-              record.style.backgroundColor = "red"
-              rec.stop();
-            }
-
-
-            function createDownloadLink(blob) {
-            recorder && recorder.exportWAV(function(blob) {
-            var url = URL.createObjectURL(blob);
-            var li = document.createElement('li');
-            var au = document.createElement('audio');
-            var hf = document.createElement('a');
-
-            au.controls = true;
-            au.src = url;
-            hf.href = url;
-            hf.download = new Date().toISOString() + '.wav';
-            hf.innerHTML = hf.download;
-            li.appendChild(au);
-            li.appendChild(hf);
-            recordingslist.appendChild(li);
-            });
-            }  
-
-    </script>
-
-    {% endif %}
-
-
-    <form action="." method="post" class="js-reply">
-        {% csrf_token %}
-
-        {% include "spirit/_form.html" %}
-
-        <div class="container">
-        {% if type != 'text' %}
-
-            <style>
-
-            #id_comment {
-                display:none;
-            }
-
-            .reply-markdown{
-                display:none;
-            }
-
-        
-            </style>
-            <input type="text" value="1" name="is_media" hidden>
-            {% if type == 'audio' %}    
-
-            <input type="text" value="1" name="is_audio" hidden>
-            {% endif %}
-
-            {% endif %}
-
-             {% include "spirit/comment/_editor.html" %}   
-            <input class="button reply-button "  id="btnPublish" type="submit" value="{% trans "Publish" %}" />
-        </div>
-    </form>
-
-
-<script>
-</script>
                     /*#recordedAudio {
                       left: 100px;
                       right: 100px;
@@ -165,7 +79,7 @@
                           <div>
                             <button id="recordVid">Start Recording</button>
                             <button id="play" disabled>Play</button>
-                            <!-- <button id="download" disabled>Download</button> -->
+                            <button id="download" disabled hidden>Download</button>
                           </div>
                           <script>
                             var mediaSource = new MediaSource();
@@ -173,58 +87,45 @@
                             var mediaRecorder;
                             var recordedBlobs;
                             var sourceBuffer;
-
                             var gumVideo = document.querySelector('video#gum');
                             var recordedVideo = document.querySelector('video#recorded');
-
                             var recordButton = document.querySelector('button#recordVid');
                             var playButton = document.querySelector('button#play');
                             var downloadButton = document.querySelector('button#download');
                             recordButton.onclick = toggleRecording;
                             playButton.onclick = play;
                             downloadButton.onclick = download;
-
-
                             var constraints = {
                               audio: false,
                               video: true
                             };
-
                             navigator.mediaDevices.getUserMedia(
                               constraints
                             ).then(
                               successCallback,
                               errorCallback
                             );
-
                             function successCallback(stream) {
                               console.log('getUserMedia() got stream: ', stream);
                               window.stream = stream;
                               gumVideo.srcObject = stream;
                             }
-
                             function errorCallback(error) {
                               console.log('navigator.getUserMedia error: ', error);
                             }
-
-
-
                             function handleSourceOpen(event) {
                               console.log('MediaSource opened');
                               sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="vp8"');
                               console.log('Source buffer: ', sourceBuffer);
                             }
-
                             function handleDataAvailable(event) {
                               if (event.data && event.data.size > 0) {
                                 recordedBlobs.push(event.data);
                               }
                             }
-
                             function handleStop(event) {
                               console.log('Recorder stopped: ', event);
                             }
-
                             function toggleRecording() {
                               if (recordButton.textContent === 'Start Recording') {
                                 $('#btnPublish').hide()
@@ -238,7 +139,6 @@
                                 downloadButton.disabled = false;
                               }
                             }
-
                             // The nested try blocks will be simplified when Chrome 47 moves to Stable
                             function startRecordingVideo() {
                               var options = {mimeType: 'video/webm', bitsPerSecond: 100000};
@@ -272,7 +172,6 @@
                               mediaRecorder.start(10); // collect 10ms of data
                               console.log('MediaRecorder started', mediaRecorder);
                             }
-
                             function stopRecordingVideo() {
                               mediaRecorder.stop();
                               console.log('Recorded Blobs: ', recordedBlobs);
@@ -282,8 +181,6 @@
                               recordedVideo.controls = true;
                               sendVideoData(blob);
                             }
-
-
                             function sendVideoData(File) {
                                 console.log(File);
                                 formData = new FormData();
@@ -310,7 +207,6 @@
                                   console.error(xhr.statusText);
                                 };
                                 xhr.send(formData); 
-
                             }
                             function play() {
                               var superBuffer = new Blob(recordedBlobs, {type: 'video/webm'});
@@ -374,9 +270,7 @@
                                       console.error(xhr.statusText);
                                     };
                                     xhr.send(formData); 
-
                                     }
-
                                 record.onclick = e => {
                                   $('.record_info').html('Recording in progress...')
                                   record.disabled = true;
@@ -391,14 +285,12 @@
                                   // record.style.backgroundColor = "red"
                                   rec.stop();
                                 }
-
                               function createDownloadLink(blob) {
                                 recorder && recorder.exportWAV(function(blob) {
                                 var url = URL.createObjectURL(blob);
                                 var li = document.createElement('li');
                                 var au = document.createElement('audio');
                                 var hf = document.createElement('a');
-
                                 au.controls = true;
                                 au.src = url;
                                 hf.href = url;
@@ -431,7 +323,7 @@
                                 {% endif %}
                                 {% endif %}
                                  {% include "spirit/comment/_editor.html" %}   
-                                <br><input class="button reply-button" style="display: none" id="btnPublish" type="submit" value="{% trans "Publish" %}" />
+                                <br><input class="button reply-button" style="{% if type != 'text' %} display: none {% endif %}" id="btnPublish" type="submit" value="{% trans "Publish" %}" />
                                 <span class="record_info"></span>
                             <!-- </div> -->
                         </form>
@@ -485,6 +377,8 @@
 
 
 
+
+    
 
     
 {% endblock %}
