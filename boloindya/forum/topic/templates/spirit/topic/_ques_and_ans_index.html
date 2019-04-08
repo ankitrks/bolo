@@ -33,14 +33,14 @@
                         <div class="write_quest_sec">
                             <a href="/topic">
                             <div class="write_sec">
-                                <div class="quest_text">What is <span>your questions?</span></div>
+                                <div class="quest_text">Ask <span>your question</span></div>
                             </div>
                             </a>
                         </div>
                         <!-- question feed -->
                         {% if is_single_topic == 0 %}
                         {% for topic in topics %}
-                        <div class="quest_feed">
+                        <div class="quest_feed" style="margin-bottom: 10px;">
                             <!-- user info -->
                             <div class="quest_user_info">
                                 <div class="quest_user_info_img">
@@ -77,7 +77,7 @@
                             </div>
                             <!-- user answer as video -->
                             <div class="user_ans_video common_ans_area">
-                                <div class="head_text">Top Answer</div>
+                                <div class="head_text">Top video answers</div>
                                 <div class="inner_ans_area">
                                     <div class="owl-carousel owl-theme">
                                         {% for video in topic.topic_comment.all %}
@@ -94,12 +94,15 @@
                             </div>
                             <!-- user answer as audo -->
 
-                            <div class="head_text">Top Audio</div>
+                            <div class="head_text ta_hs_{{topic.id}}" style="display: none;">Top audio answers</div>
                             <div class="user_ans_audio common_ans_area">
-                                <div class="inner_ans_area">
                                     <!-- User info -->
-                                    {% for video in topic.topic_comment.all %}
-                                    {% if video.is_media and video.is_audio %}
+                                {% for video in topic.topic_comment.all %}
+                                {% if video.is_media and video.is_audio %}
+                                <script type="text/javascript">
+                                    $('.ta_hs_' + '{{topic.id}}').show();
+                                </script>
+                                <div class="inner_ans_area" style="margin-bottom: 5px;">
                                     <div class="quest_user_info">
                                         <div class="quest_user_info_img">
                                             <img src="http://lorempixel.com/200/200/" alt="user image" class="quest_user_image"/>
@@ -118,15 +121,18 @@
                                         Your browser does not support the audio element.
                                     </audio>
                                     </div>
-                                    {% endif %}
-                                    {% endfor %}
                                 </div>   
+                                {% endif %}
+                                {% endfor %}
                             </div>
                             <!-- user answer as text -->
 
-                            <div class="head_text">Top Text</div>
+                            <div class="head_text tt_hs_{{topic.id}}" style="display: none;">Top text answers</div>
                             {% for video in topic.topic_comment.all %}
                             {% if not video.is_media and 's3' not in video.comment and video.comment %}
+                            <script type="text/javascript">
+                                $('.tt_hs_' + '{{topic.id}}').show();
+                            </script>
                             <div class="user_ans_text common_ans_area">
                                 <div class="inner_ans_area">
                                         <!-- User info -->

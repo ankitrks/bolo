@@ -49,6 +49,8 @@ def publish(request, category_id=None):
             comment_posted(comment=comment, mentions=cform.mentions)
             return redirect(topic.get_absolute_url())
     else:
+        if not category_id:
+            category_id = 1
         form = TopicForm(user=user, initial={'category': category_id})
         cform = CommentForm()
 

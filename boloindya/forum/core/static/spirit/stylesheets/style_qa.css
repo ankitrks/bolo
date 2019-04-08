@@ -241,11 +241,11 @@ a,a:hover,a:active,a:visited{text-decoration:none;color: inherit; }
     background-size: 201% 100%;
     background-position: right bottom;
     transition: all .5s ease-out;
-    color:#BB3335;}
+    color:#BB3335;width: 33%;}
 
 .qa_sec .mid_sec .answer_option .ans_opt_list:hover{cursor: pointer;color:#fff;background-position: left bottom;}
 .qa_sec .mid_sec .answer_option .ans_opt_list:hover img{filter:brightness(600%);}
-.qa_sec .mid_sec .answer_option .ans_opt_list .ans_opt_text{margin-left:10px;margin-top:4px;}
+.qa_sec .mid_sec .answer_option .ans_opt_list .ans_opt_text{margin-left:10px;margin-top:4px;display: inline;}
 .qa_sec .mid_sec .answer_option .ans_opt_list:not(:last-child){margin-right:15px;}
 
 .qa_sec .mid_sec .common_ans_area{margin-bottom: 20px;}
