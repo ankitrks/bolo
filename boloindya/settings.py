@@ -150,7 +150,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 LOGIN_URL = 'spirit:user:auth:login'
-LOGIN_REDIRECT_URL = 'spirit:user:update'
+LOGIN_REDIRECT_URL = 'spirit:topic:discussion'
 
 MIDDLEWARE_CLASSES = [
     'django.contrib.sessions.middleware.SessionMiddleware',

@@ -26,20 +26,20 @@
                     <div class="inner_list">
                         <div class="row margin0">
                             <div class="col-md-4 left_wrapper">
-                                <div class="img_sec">
-                                    <a href="{% url 'spirit:topic:detail' each_topic.id %}"><img src="{{each_topic.thumbnail}}" class="rounded" alt=""/> </a>
-                                </div>
+                                <a href="{% url 'spirit:topic:detail' each_topic.id %}"><div class="img_sec">
+                                    <img src="{{each_topic.thumbnail}}" class="rounded" alt=""/>
+                                </div></a>
                             </div>
                             <div class="col-md-8 right_wrapper">
-                                <a href="{% url 'spirit:topic:detail' each_topic.id %}"><h4>{{ each_topic.title }}</h4></a>
-                                <div class="rating_star">
+                                <br><a href="{% url 'spirit:topic:detail' each_topic.id %}"><h4>{{ each_topic.title }}</h4></a>
+                                <!-- <div class="rating_star">
                                     <i class="fill_start"></i>
                                     <i class="fill_start"></i>
                                     <i class="fill_start"></i>
                                     <i class="fill_start"></i>
                                     <i class="unfill_start"></i>
-                                </div>
-                                <div class="post_date">
+                                </div> -->
+                                <br><div class="post_date">
                                     Published on {{ each_topic.date.date }}
                                 </div>
                                 <div class="author">by {{ each_topic.user.username }}</div>
@@ -49,14 +49,14 @@
                 </div>
                 {% endfor %}
 
-                {% if  topics %}
+                {% if not topics %}
                 <p>This category has no data. You can start <a href="/topic/publish/" style="color:#CA3B3D;"><b><u>contributing here</u></b></a>.</p>
                 {% endif  %}    
 
             </div>
-            <div class="load_more">
+            <!-- <div class="load_more">
                 Load More <i class="fa fa-angle-double-right" aria-hidden="true"></i>
-            </div>
+            </div> -->
         </div>
     </div>
 </section>

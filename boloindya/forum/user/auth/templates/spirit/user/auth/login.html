@@ -6,9 +6,10 @@
 
 {% block content %}
 
-    <h1 class="headline">{% trans "Login" %}</h1>
+    
 
-    <div class="login">
+    <div class="login" style="width: 58%;margin: 0 auto;">
+        <br><h4 class="headline">{% trans "Login" %}</h4><br>
         <form action="." method="post">
             {% csrf_token %}
             {% include "spirit/_form.html" %}
@@ -17,10 +18,10 @@
         </form>
     </div>
 
-    <div class="login-links">
+    <div class="login-links" style="width: 58%;margin: 0 auto;margin-top: 15px;">
 		<a class="login-link" href="{% url "spirit:user:auth:register" %}">{% trans "Create an account" %}</a>
 		<a class="login-link" href="{% url "spirit:user:auth:password-reset" %}">{% trans "I don't know my password" %}</a>
-        <a class="login-link" href="{% url "spirit:user:auth:resend-activation" %}">{% trans "Resend activation email" %}</a>
+        <!-- <a class="login-link" href="{% url "spirit:user:auth:resend-activation" %}">{% trans "Resend activation email" %}</a> -->
 	</div>
 
 {% endblock %}

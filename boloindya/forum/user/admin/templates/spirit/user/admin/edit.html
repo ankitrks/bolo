@@ -5,15 +5,15 @@
 {% block title %}{% trans "Edit user" %}{% endblock %}
 
 {% block content %}
+	<div class="login" style="width: 58%;margin: 0 auto;">
+    	<br><h4 class="headline">{% trans "Edit user" %}</h4><br>
+	    <form action="." method="post">
+	        {% csrf_token %}
+	        {% include "spirit/_form.html" with form=uform %}
+	        {% include "spirit/_form.html" %}
 
-    <h1 class="headline">{% trans "Edit user" %}</h1>
-
-    <form action="." method="post">
-        {% csrf_token %}
-        {% include "spirit/_form.html" with form=uform %}
-        {% include "spirit/_form.html" %}
-
-        <input class="button" type="submit" name="post" value="{% trans "Save" %}" />
-    </form>
+	        <input class="button" type="submit" name="post" value="{% trans "Save" %}" />
+	    </form>
+	</div>
 
 {% endblock %}
