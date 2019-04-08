@@ -37,6 +37,7 @@ class Comment(models.Model):
     is_modified = models.BooleanField(default=False)
     ip_address = models.GenericIPAddressField(blank=True, null=True)
     is_media = models.BooleanField(default=False)
+    is_audio = models.BooleanField(default=False)
     media_duration = models.CharField(_("duration"), max_length=20, default='')
     language_id = models.CharField(_("language"), max_length=5, default='1')
     thumbnail = models.CharField(_("thumbnail"), max_length=150, default='')
@@ -63,11 +64,12 @@ class Comment(models.Model):
         except (AttributeError, IndexError):
             return
 
+
     def increase_modified_count(self):
         Comment.objects\
             .filter(pk=self.pk)\
             .update(modified_count=F('modified_count') + 1)
-
+            
     def increase_likes_count(self):
         Comment.objects\
             .filter(pk=self.pk)\

@@ -69,11 +69,13 @@
                                 <div class="inner_ans_area">
                                     <div class="owl-carousel owl-theme">
                                         {% for video in topic.topic_comment.all %}
-                                        <div class="item" data-videosrc="">
+                                        {% if video.is_media %}
+                                        <div class="item" data-videosrc="{{ video.comment }}">
                                             <div class="posted_by">
                                                 Posted by {{ video.user.username }} <span>{{ video.date.date }}</span>
                                             </div>
                                         </div>
+                                        {% endif %}
                                         {% endfor %}
                                     </div>    
                                 </div>
@@ -85,17 +87,21 @@
                             <div class="user_ans_audio common_ans_area">
                                 <div class="inner_ans_area">
                                     <!-- User info -->
+                                    {% for video in topic.topic_comment.all %}
+                                    {% if video.is_media %}
                                     <div class="quest_user_info">
                                         <div class="quest_user_info_img">
                                             <img src="http://lorempixel.com/200/200/" alt="user image" class="quest_user_image"/>
                                         </div>
                                         <div class="quest_user_detail">
-                                            <div class="user_name">Swapnil Verma</div>
-                                            <div class="feed_post_date">Answered 19h ago</div>
+                                            <div class="user_name">{{ video.user.username }}</div>
+                                            <div class="feed_post_date">Answered {{ video.date.date }}</div>
                                         </div>
                                     </div>
                                     <!-- Audio player -->
                                     <div id="ans_audio"></div>
+                                    {% endif %}
+                                    {% endfor %}
                                 </div>   
                                 <div class="show_more">
                                     <a href="#">listen more answer</a>
@@ -105,22 +111,24 @@
                             <div class="user_ans_text common_ans_area">
                                 <div class="inner_ans_area">
                                         <!-- User info -->
+
+                                        {% for video in topic.topic_comment.all %}
+                                        {% if not video.is_media %}
                                         <div class="quest_user_info">
                                             <div class="quest_user_info_img">
                                                 <img src="http://lorempixel.com/200/200/" alt="user image" class="quest_user_image"/>
                                             </div>
                                             <div class="quest_user_detail">
-                                                <div class="user_name">Swapnil Verma</div>
-                                                <div class="feed_post_date">Answered 19h ago</div>
+                                                <div class="user_name">{{ video.user.username }}</div>
+                                                <div class="feed_post_date">Answered {{ video.date.date }}</div>
                                             </div>
                                         </div>
                                         <!-- answer text -->
                                         <div class="ans_text">
-                                                This is not true. The Pakistani Air Defense and Pakistani Air 
-                                                Force was able to detect the 12 Mirage-2000 Aircraft.
-                                                The problem for Pakistan was, India had sent a hell a lot
-                                                 more fighters at multipl.
+                                                {{ video.comment }}
                                         </div>
+                                        {% endif %}
+                                        {% endfor %}
                                 </div>
                                 <div class="show_more">
                                    <a href="#">read more answer</a>

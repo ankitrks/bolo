@@ -157,7 +157,7 @@ def ques_ans_index(request):
         .visible() \
         .parents()    
 
-    topics = Topic.objects.filter(is_media=True)[:5]
+    topics = Topic.objects.filter(is_media=True)[:10]
     context = {
         'categories': categories,
         'topics': topics
