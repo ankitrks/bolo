@@ -145,7 +145,7 @@ def index_active(request):
 
     return render(request, 'spirit/topic/_index.html', context)
 
-def ques_ans_index(request,category_id=None, is_single_topic=0):
+def ques_ans_index(request,category_id=None):#, is_single_topic=0):
     
     categories = Category.objects \
         .visible() \
@@ -153,9 +153,10 @@ def ques_ans_index(request,category_id=None, is_single_topic=0):
 
     topics = Topic.objects.all()[:10]
 
-    topic = {}
-    if(is_single_topic != 0):
-        topic = get_object_or_404(Topic.objects.visible(),pk=is_single_topic)
+    # topic = {}
+    # if is_single_topic not in [0, '0']:
+    #     print 'Yoo'
+    #     topic = get_object_or_404(Topic.objects.visible(),pk=is_single_topic)
 
     if(category_id != None):
         category = get_object_or_404(Category.objects.visible(),pk=category_id)
@@ -164,8 +165,9 @@ def ques_ans_index(request,category_id=None, is_single_topic=0):
     context = {
         'categories': categories,
         'topics': topics,
-        'is_single_topic': is_single_topic,
-        'single_topic': topic
+        'category_id' : category_id,
+        # 'is_single_topic': is_single_topic,
+        # 'single_topic': topic
     }
 
     return render(request, 'spirit/topic/_ques_and_ans_index.html', context)

@@ -17,7 +17,8 @@ urlpatterns = [
     url(r'^publish/(?P<category_id>\d+)/$', views.publish, name='publish'),
     url(r'^publish/$', views.publish, name='publish'),
     url(r'^discussion/$', views.ques_ans_index, name='discussion'),
-    url(r'^discussion/(?P<category_id>\d+)/(?P<is_single_topic>\d+)/$', views.ques_ans_index, name='discussion_sub_cat'),
+    # url(r'^discussion/(?P<category_id>\d+)/(?P<is_single_topic>\d+)/$', views.ques_ans_index, name='discussion_sub_cat'),
+    url(r'^discussion/(?P<category_id>\d+)/$', views.ques_ans_index, name='discussion_sub_cat'),
     
     url(r'^update/(?P<pk>\d+)/$', views.update, name='update'),
 
