@@ -259,6 +259,18 @@ a,a:hover,a:active,a:visited{text-decoration:none;color: inherit; }
     transition: all .5s ease-out;
     color:#BB3335;width: 33%;}
 
+@media only screen and (max-width: 768px) {
+  .qa_sec .mid_sec .answer_option .ans_opt_list {
+    width: 100%;
+  }
+  .left_sec, .right_sec{display: none;}
+  .ans_opt_text{display: none !important;}
+  .ans_opt_list a{margin: auto;}
+  .qa_sec{padding:0;}
+  .qa_sec .mid_sec .quest_feed{padding: 10px;}
+  .qa_sec .mid_sec .write_quest_sec .write_sec .quest_text{font-size: 25px;padding: 10px;position: relative;padding-left: 70px;border-radius: 4px;}
+}
+
 .qa_sec .mid_sec .answer_option .ans_opt_list:hover{cursor: pointer;color:#fff;background-position: left bottom;}
 .qa_sec .mid_sec .answer_option .ans_opt_list:hover img{filter:brightness(600%);}
 .qa_sec .mid_sec .answer_option .ans_opt_list .ans_opt_text{margin-left:10px;margin-top:4px;display: inline;}
