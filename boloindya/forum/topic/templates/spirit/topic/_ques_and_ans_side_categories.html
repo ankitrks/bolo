@@ -10,8 +10,8 @@
                 <ul>
                                 {% for sub in c.parent_category.all %}     
                                             <li class="radio">
-                                                <input type="radio" id="test1" name="qa-group" checked>
-                                                <label class="radio-label" for="test1">{{ sub.title }}</label>
+                                                <input type="radio" id="{{sub.id}}" name="qa-group" onclick="click_sub({{sub.id}})">
+                                                <label class="radio-label" for="{{sub.id}}">{{ sub.title }}</label>
                                             </li>
                                              {% endfor %} 
                                         </ul>
@@ -19,4 +19,14 @@
                                 </div>
                             </div>
                             {% endfor %} 
+<script>
+
+    function click_sub(id) {
+window.location.assign('/topic/discussion/'+id+"/");
+        //window.location('/topic/dicussion/'+id)
+
+    }
+
+</script>
+
                                 

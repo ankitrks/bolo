@@ -55,6 +55,9 @@ class Comment(models.Model):
     def get_absolute_url(self):
         return reverse('spirit:comment:find', kwargs={'pk': str(self.id), })
 
+    def get_updated_url(self):
+        return self.comment.replace("careeranna", "boloindya")
+
     @property
     def like(self):
         # *likes* is dynamically created by manager.with_likes()

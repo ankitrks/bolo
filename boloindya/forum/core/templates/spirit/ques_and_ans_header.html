@@ -22,6 +22,7 @@
                                 <li><a href="#" class="dropdown-item">Hindi</a></li>
                             </ul>
                         </li>
+                         {% if user.is_authenticated %}
                         <li class="nav-item dropdown">
                             <a href="" class="profile_link">{{ user.username }} </a>
                             <ul class="sub-menu list-unstyled">
@@ -29,6 +30,7 @@
                                 <li><a href="#" class="dropdown-item">Logout</a></li>
                             </ul>
                         </li>
+                        {% endif %}
                     </ul>
                 </div>
         </nav>

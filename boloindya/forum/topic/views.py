@@ -151,13 +151,18 @@ def index_active(request):
 
     return render(request, 'spirit/topic/_index.html', context)
 
-def ques_ans_index(request):
+def ques_ans_index(request,category_id=None):
     
     categories = Category.objects \
         .visible() \
         .parents()    
 
-    topics = Topic.objects.filter(is_media=True)[:10]
+    topics = Topic.objects.all()[:10]
+
+    if(category_id != None):
+        category = get_object_or_404(Category.objects.visible(),pk=category_id)
+        topics = category.category_topics.all()[0:10]                         
+
     context = {
         'categories': categories,
         'topics': topics

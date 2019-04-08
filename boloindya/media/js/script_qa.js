@@ -16,7 +16,7 @@ if ($(window).width() <= 767) {
 //jwplayer for audio
     var playerInstance = jwplayer("ans_audio");
     playerInstance.setup({
-        file: "http://www.hochmuth.com/mp3/Tchaikovsky_Rococo_Var_orch.mp3",
+        file: "",
         width:530,
         height:10,
         skin: {
@@ -29,11 +29,10 @@ if ($(window).width() <= 767) {
 //slider for top video answer    
 var owl = $('.owl-carousel');
   owl.owlCarousel({
-    loop:true,
+    loop:false,
     margin:10,
     nav:true,
     dots:false,
-    items:3,
     video:true,
     lazyLoad:true,
     center:true,
