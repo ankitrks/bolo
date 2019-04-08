@@ -1,4 +1,4 @@
-{% extends "spirit/_base.html" %}
+{% extends "spirit/_base_index_ques.html" %}
 
 {% load spirit_tags i18n %}
 
@@ -18,24 +18,29 @@
 
 {% block content %}
 
-    <h1 class="headline">{% trans "Publish topic" %}</h1>
+    <div class="container">
 
-    <form action="." method="post" class="js-reply">
-        {% csrf_token %}
+        <h1 class="headline">{% trans "Publish topic" %}</h1>
 
-        {# topic #}
-        {% include "spirit/_form.html" %}
+        <form action="." method="post" class="js-reply">
+            {% csrf_token %}
+    
+            {# topic #}
+            {% include "spirit/_form.html" %}
+    
+            {# comment #}
+            <div class="topic-publish-comment">
+                {% include "spirit/_form.html" with form=cform %}
+            </div>
+    
+            <div class="container">
+                {% include "spirit/comment/_editor.html" %}
+    
+                <input class="button reply-button" type="submit" value="{% trans "Publish" %}" />
+            </div>
+        </form>
+    
 
-        {# comment #}
-        <div class="topic-publish-comment">
-            {% include "spirit/_form.html" with form=cform %}
-        </div>
-
-        <div class="container">
-            {% include "spirit/comment/_editor.html" %}
-
-            <input class="button reply-button" type="submit" value="{% trans "Publish" %}" />
-        </div>
-    </form>
+    </div>
 
 {% endblock %}

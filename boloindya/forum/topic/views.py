@@ -28,7 +28,7 @@ def publish(request, category_id=None):
         get_object_or_404(
             Category.objects.visible(),
             pk=category_id)
-
+            
     user = request.user
 
     if request.method == 'POST':
