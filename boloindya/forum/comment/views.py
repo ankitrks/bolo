@@ -18,6 +18,7 @@ from .models import Comment
 from .forms import CommentForm, CommentMoveForm, CommentImageForm, CommentFileForm
 from .utils import comment_posted, post_comment_update, pre_comment_update
 from django.conf import settings
+from forum.category.models import Category
 
 
 @login_required
@@ -41,9 +42,9 @@ def publish(request, topic_id, pk=None, type=None):
                            .get_absolute_url())
 
             comment = form.save()
-            if(request.POST.get('is_media')):
+            if request.POST.get('is_media'):
                 comment.is_media = request.POST.get('is_media')
-            if(request.POST.get('is_audio')):    
+            if request.POST.get('is_audio'):
                 comment.is_audio = request.POST.get('is_audio')
             comment.save()
             comment_posted(comment=comment, mentions=form.mentions)
@@ -58,10 +59,14 @@ def publish(request, topic_id, pk=None, type=None):
 
         form = CommentForm(initial=initial)
 
+    categories = Category.objects \
+        .visible() \
+        .parents()    
     context = {
         'form': form,
         'topic': topic,
-        'type': type
+        'type': type,
+        'categories': categories,
     }
 
     return render(request, 'spirit/comment/publish.html', context)

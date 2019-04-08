@@ -56,8 +56,7 @@ def detail(request, pk, slug):
     }
 
     return render(request, 'spirit/category/sub_category_detail.html', context)
-
-    return render(request, 'spirit/category/detail.html', context)
+    # return render(request, 'spirit/category/detail.html', context)
 
 
 def sub_detail(request, pk, slug, sub_cat_pk, sub_cat_slug):
