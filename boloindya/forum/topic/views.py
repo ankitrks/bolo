@@ -49,6 +49,8 @@ def publish(request, category_id=None):
             comment_posted(comment=comment, mentions=cform.mentions)
             return redirect(topic.get_absolute_url())
     else:
+        if not category_id:
+            category_id = 1
         form = TopicForm(user=user, initial={'category': category_id})
         cform = CommentForm()
 
@@ -141,19 +143,59 @@ def index_active(request):
         'current_index': current_index
     }
 
+    return render(request, 'spirit/topic/_home.html', context)
+
+
+def index_videos(request):
+
+    categories = Category.objects \
+        .visible() \
+        .parents()
+
+    category = get_object_or_404(Category.objects.visible(),
+                                 pk=5)
+
+    subcategories = Category.objects \
+        .visible() \
+        .children(parent=category)
+
+    sub_category = []
+    topics = []
+
+    if len(subcategories) > 0:
+        sub_category = get_object_or_404(Category.objects.visible(), pk=subcategories[0].pk)
+        topics = sub_category.category_topics.all()[0:8]
+
+
+    current_index = 0
+
+    for index, category_each in enumerate(categories):
+        if category_each.id == category.id:
+            current_index = index
+
+    context = {
+        'categories': categories,
+        'category': category,
+        'subcategories': subcategories,
+        'sub_category': sub_category,
+        'topics': topics,
+        'current_index': current_index
+    }
+
+
     return render(request, 'spirit/topic/_index.html', context)
 
-def ques_ans_index(request,category_id=None, is_single_topic=0):
-    
+def ques_ans_index(request,category_id=None):#, is_single_topic=0):
     categories = Category.objects \
         .visible() \
         .parents()    
 
     topics = Topic.objects.all()[:10]
 
-    topic = {}
-    if(is_single_topic != 0):
-        topic = get_object_or_404(Topic.objects.visible(),pk=is_single_topic)
+    # topic = {}
+    # if is_single_topic not in [0, '0']:
+    #     print 'Yoo'
+    #     topic = get_object_or_404(Topic.objects.visible(),pk=is_single_topic)
 
     if(category_id != None):
         category = get_object_or_404(Category.objects.visible(),pk=category_id)
@@ -162,8 +204,15 @@ def ques_ans_index(request,category_id=None, is_single_topic=0):
     context = {
         'categories': categories,
         'topics': topics,
-        'is_single_topic': is_single_topic,
-        'single_topic': topic
+        'category_id' : category_id,
+        # 'is_single_topic': is_single_topic,
+        # 'single_topic': topic
     }
 
     return render(request, 'spirit/topic/_ques_and_ans_index.html', context)
+
+
+def index(request):
+    return render(request, 'spirit/topic/_home.html')
+
+

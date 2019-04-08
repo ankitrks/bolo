@@ -20,17 +20,18 @@
     <div class="cate_listing">
         <div class="container">
             <div class="row margin0">
+
                 {% for each_topic in topics %}
                 <div class="col-lg-6 col-md-6 col-12">
                     <div class="inner_list">
                         <div class="row margin0">
                             <div class="col-md-4 left_wrapper">
                                 <div class="img_sec">
-                                    <img src="/media/img/demo_img.png" class="rounded" alt=""/>
+                                    <img src="{{each_topic.thumbnail}}" class="rounded" alt=""/>
                                 </div>
                             </div>
                             <div class="col-md-8 right_wrapper">
-                                <h4>{{ each_topic.title }}</h4>
+                                <a href="/topic/{{ each_topic.pk}}/"><h4>{{ each_topic.title }}</h4></a>
                                 <div class="rating_star">
                                     <i class="fill_start"></i>
                                     <i class="fill_start"></i>
@@ -47,6 +48,11 @@
                     </div>
                 </div>
                 {% endfor %}
+
+                {% if not topics %}
+                <p>This category has no data. You can start <a href="/topic/discussion/">Contribution here</a></p>
+                {% endif  %}    
+
             </div>
             <div class="load_more">
                 Load More <i class="fa fa-angle-double-right" aria-hidden="true"></i>

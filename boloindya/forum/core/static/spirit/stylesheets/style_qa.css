@@ -2,7 +2,23 @@ body{
     font-family: 'Roboto', sans-serif;
 }
 a,a:hover,a:active,a:visited{text-decoration:none;color: inherit; }
-
+.navbar .navbar-nav li a.lang_link:after {
+    content: '';
+    position: absolute;
+    background: url(/media/img/icons/arrow_down_black.svg) no-repeat;
+    width: 14px;
+    height: 12px;
+    right: -18px;
+    top: 17px;
+    background-size: contain;
+}
+.videoBtn{
+    color: #fff !important ;
+    background-color: #dc3545;
+    border-color:#dc3545;
+    padding-left: 14px !important;
+        margin-right: 20px;
+}
 /* common css for website */
 .padding0{padding: 0px;}
 .margin0{margin:0px;}
@@ -241,11 +257,11 @@ a,a:hover,a:active,a:visited{text-decoration:none;color: inherit; }
     background-size: 201% 100%;
     background-position: right bottom;
     transition: all .5s ease-out;
-    color:#BB3335;}
+    color:#BB3335;width: 33%;}
 
 .qa_sec .mid_sec .answer_option .ans_opt_list:hover{cursor: pointer;color:#fff;background-position: left bottom;}
 .qa_sec .mid_sec .answer_option .ans_opt_list:hover img{filter:brightness(600%);}
-.qa_sec .mid_sec .answer_option .ans_opt_list .ans_opt_text{margin-left:10px;margin-top:4px;}
+.qa_sec .mid_sec .answer_option .ans_opt_list .ans_opt_text{margin-left:10px;margin-top:4px;display: inline;}
 .qa_sec .mid_sec .answer_option .ans_opt_list:not(:last-child){margin-right:15px;}
 
 .qa_sec .mid_sec .common_ans_area{margin-bottom: 20px;}

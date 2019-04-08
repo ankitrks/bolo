@@ -33,7 +33,7 @@ var owl = $('.owl-carousel');
     margin:10,
     nav:true,
     dots:false,
-    items:3,
+    items:1,
     video:true,
     lazyLoad:true,
     center:true,

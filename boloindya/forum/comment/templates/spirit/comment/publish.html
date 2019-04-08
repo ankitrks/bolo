@@ -24,6 +24,7 @@
                     <div class="quest_feed">
                     <style>
                     label[for="id_comment"]{display: none;}
+                    #id_comment{height: 130px;}
                     /*#record {
                         background-color: red;
                         border-width: medium;
@@ -323,7 +324,7 @@
                                 {% endif %}
                                 {% endif %}
                                  {% include "spirit/comment/_editor.html" %}   
-                                <br><input class="button reply-button" style="{% if type != 'text' %} display: none {% endif %}" id="btnPublish" type="submit" value="{% trans "Publish" %}" />
+                                <br><input class="button reply-button" style="{% if type != 'text' %} display: none {% endif %}" id="btnPublish" type="submit" value="{% trans "Publish" %}" /><br>
                                 <span class="record_info"></span>
                             <!-- </div> -->
                         </form>

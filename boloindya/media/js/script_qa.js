@@ -32,25 +32,26 @@ var owl = $('.owl-carousel');
     loop:true,
     margin:10,
     nav:true,
-    dots:false,
+    dots:true,
     video:true,
     lazyLoad:true,
-    center:true,
+    center:false,
     navText: [
         "<i class='fa fa-chevron-left'></i>",
         "<i class='fa fa-chevron-right'></i>"
      ],
     responsive:{
         480:{
-            items:2
+            items:1
         },
         600:{
-            items:3
+            items:1
         }
     }
   })
   owl.on('translate.owl.carousel',function(e){
     $('.owl-item video').each(function(){
+      console.log('11')
       $(this).get(0).pause();
       $('.qa_sec .owl-item .item img').css('z-index','0')
     });
