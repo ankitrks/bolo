@@ -41,7 +41,7 @@ class Topic(models.Model):
     is_globally_pinned = models.BooleanField(_("globally pinned"), default=False)
     is_closed = models.BooleanField(_("closed"), default=False)
     is_removed = models.BooleanField(default=False)
-
+    thumbnail = models.CharField(_("thumbnail"), max_length=150, default='')
     view_count = models.PositiveIntegerField(_("views count"), default=0)
     comment_count = models.PositiveIntegerField(_("comment count"), default=0)
 

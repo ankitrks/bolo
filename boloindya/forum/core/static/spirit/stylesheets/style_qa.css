@@ -2,7 +2,23 @@ body{
     font-family: 'Roboto', sans-serif;
 }
 a,a:hover,a:active,a:visited{text-decoration:none;color: inherit; }
-
+.navbar .navbar-nav li a.lang_link:after {
+    content: '';
+    position: absolute;
+    background: url(/media/img/icons/arrow_down_black.svg) no-repeat;
+    width: 14px;
+    height: 12px;
+    right: -18px;
+    top: 17px;
+    background-size: contain;
+}
+.videoBtn{
+    color: #fff !important ;
+    background-color: #dc3545;
+    border-color:#dc3545;
+    padding-left: 14px !important;
+        margin-right: 20px;
+}
 /* common css for website */
 .padding0{padding: 0px;}
 .margin0{margin:0px;}

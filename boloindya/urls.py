@@ -19,6 +19,7 @@ from django.contrib import admin
 
 patterns = [
     url(r'^$', forum.topic.views.index_active, name='index'),
+    url(r'^videos/$', forum.topic.views.index_videos, name='videos'),
     url(r'^st/admin/', include(forum.admin.urls, namespace='admin')),
     url(r'^user/', include(forum.user.urls, namespace='user')),
     url(r'^search/', include(forum.search.urls, namespace='search')),
