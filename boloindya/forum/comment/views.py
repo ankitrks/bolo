@@ -22,13 +22,14 @@ from django.conf import settings
 
 @login_required
 @ratelimit(rate='1/10s')
-def publish(request, topic_id, pk=None):
+def publish(request, topic_id, pk=None, type=None):
     user = request.user
     topic = get_object_or_404(
         Topic.objects.opened().for_access(user),
         pk=topic_id)
 
     if request.method == 'POST':
+        print(request.POST)
         form = CommentForm(user=user, topic=topic, data=request.POST)
 
         if not request.is_limited() and form.is_valid():
@@ -40,6 +41,9 @@ def publish(request, topic_id, pk=None):
                            .get_absolute_url())
 
             comment = form.save()
+            comment.is_media = request.POST.get('is_media')
+            comment.is_audio = request.POST.get('is_audio')
+            comment.save()
             comment_posted(comment=comment, mentions=form.mentions)
             return redirect(request.POST.get('next', comment.get_absolute_url()))
     else:
@@ -55,6 +59,7 @@ def publish(request, topic_id, pk=None):
     context = {
         'form': form,
         'topic': topic,
+        'type': type
     }
 
     return render(request, 'spirit/comment/publish.html', context)

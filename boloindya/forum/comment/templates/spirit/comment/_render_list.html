@@ -32,7 +32,9 @@
 
                         <div class="comment-text">
                             {% if not c.action %}
-                                {% if c.is_media %}
+
+                                    {{ c.is_audio }}
+                                {% if c.is_audio %}
                                     <video width="400" controls><source src="{{ c.comment }}" type="video/mp4">
                                     <source src="{{ c.comment }}" type="video/ogg"></video>
                                 {% else %}

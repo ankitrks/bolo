@@ -15,6 +15,7 @@ from . import views
 
 urlpatterns = [
     url(r'^(?P<topic_id>\d+)/publish/$', views.publish, name='publish'),
+    url(r'^(?P<topic_id>\d+)/publish/(?P<type>[\w-]+)/$', views.publish, name='publish_type'),
     url(r'^(?P<topic_id>\d+)/publish/(?P<pk>\d+)/quote/$', views.publish, name='publish'),
 
     url(r'^(?P<pk>\d+)/update/$', views.update, name='update'),
