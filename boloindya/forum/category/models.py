@@ -21,7 +21,7 @@ class Category(models.Model):
     it must be set explicitly
     :vartype reindex_at: `:py:class:models.DateTimeField`
     """
-    parent = models.ForeignKey('self', verbose_name=_("category parent"), null=True, blank=True)
+    parent = models.ForeignKey('self', verbose_name=_("category parent"), null=True, blank=True , related_name="parent_category")
 
     title = models.CharField(_("title"), max_length=75)
     slug = AutoSlugField(populate_from="title", db_index=False, blank=True)
@@ -36,6 +36,7 @@ class Category(models.Model):
     is_closed = models.BooleanField(_("closed"), default=False)
     is_removed = models.BooleanField(_("removed"), default=False)
     is_private = models.BooleanField(_("private"), default=False)
+    category_image = models.CharField(_("color"), max_length=150, blank=True)
 
     objects = CategoryQuerySet.as_manager()
 

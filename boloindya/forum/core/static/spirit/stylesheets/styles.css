@@ -7437,6 +7437,9 @@ ul.reply-markdown {
   @media screen and (min-width: 768px) {
     .new-category {
       text-align: right; } }
+.header {
+  padding: 10px;
+}     
 
 /*
 div.container {

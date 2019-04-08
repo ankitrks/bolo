@@ -26,19 +26,22 @@ class Topic(models.Model):
     :vartype reindex_at: `:py:class:models.DateTimeField`
     """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='st_topics')
-    category = models.ForeignKey('forum_category.Category', verbose_name=_("category"))
+    category = models.ForeignKey('forum_category.Category', verbose_name=_("category"), related_name="category_topics")
 
     title = models.CharField(_("title"), max_length=255)
     slug = AutoSlugField(populate_from="title", db_index=False, blank=True)
     date = models.DateTimeField(_("date"), default=timezone.now)
     last_active = models.DateTimeField(_("last active"), default=timezone.now)
     reindex_at = models.DateTimeField(_("reindex at"), default=timezone.now)
+    language_id = models.CharField(_("language"), max_length=5, default='1')
+
+    is_media = models.BooleanField(default=True)
 
     is_pinned = models.BooleanField(_("pinned"), default=False)
     is_globally_pinned = models.BooleanField(_("globally pinned"), default=False)
     is_closed = models.BooleanField(_("closed"), default=False)
     is_removed = models.BooleanField(default=False)
-
+    thumbnail = models.CharField(_("thumbnail"), max_length=150, default='')
     view_count = models.PositiveIntegerField(_("views count"), default=0)
     comment_count = models.PositiveIntegerField(_("comment count"), default=0)
 

@@ -1,0 +1,23 @@
+{% for c in categories %}        
+    <div class="card">
+        <div class="card-header">
+            <a class="card-link" data-toggle="collapse" href="#{{c.id}}">
+                {{ c.title }}
+            </a>
+        </div>
+        <div id="{{c.id}}" class="collapse show" data-parent="#accordion">
+            <div class="card-body">
+                <ul>
+                                {% for sub in c.parent_category.all %} 
+                                   
+                                            <li class="radio">
+                                                <input type="radio" id="test{{sub.id}}" name="qa-group" checked>
+                                                <label class="radio-label" for="test{{sub.id}}">{{ sub.title }}</label>
+                                            </li>
+                                             {% endfor %} 
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %} 
+                                

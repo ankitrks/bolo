@@ -1,0 +1,189 @@
+{% extends "spirit/_base_index_ques.html" %}
+
+{% load spirit_tags i18n %}
+{% comment %} 
+{% block title %}{% trans "Latest active topics" %}{% endblock %} {% endcomment %}
+
+{% block content %}
+ <main role="main">
+
+    <section class="main_wrapper qa_sec">
+                <div class="row">
+                    <!-- Left section for QA Category -->
+                    <div class="col-md-3 left_sec">
+                        <div class="inner_head">Q/A Categories</div>
+                        <!-- category accordian or collapse section -->
+                        <div id="accordion">
+                        {% include "spirit/topic/_ques_and_ans_side_categories.html" with category=None categories=categories %}
+
+                        </div>
+                        
+                    </div>
+                    <!-- Middle section for main content -->
+                    <div class="col-md-6 mid_sec">
+                        <!-- user information -->
+                        <div class="user_info">
+                            <img src="http://lorempixel.com/200/200/" alt="user image" class="user_image"/>
+                            <div class="user_name"> {{ user.username }} </div>
+                        </div>
+                        <!-- User ask the questions -->
+                        <div class="write_quest_sec">
+                            <div class="write_sec">
+                                <div class="quest_text">What is <span>your questions?</span></div>
+                            </div>
+                        </div>
+                        <!-- question feed -->
+                        {% for topic in topics %}
+                        <div class="quest_feed">
+                            <!-- user info -->
+                            <div class="quest_user_info">
+                                <div class="quest_user_info_img">
+                                    <img src="http://lorempixel.com/200/200/" alt="user image" class="quest_user_image"/>
+                                </div>
+                                <div class="quest_user_detail">
+                                    <div class="user_name">{{ topic.user.username }}</div>
+                                    <div class="feed_post_date">Answered On {{ topic.date.date }}</div>
+                                </div>
+                            </div>
+                            <!-- Question -->
+                            <div class="question">{{ topic.title }}</div>
+                            <!-- Answer options -->
+                            <div class="answer_option">
+                                <div class="ans_opt_list">
+                                    <img src="/media/img/icons/video_camera.svg" alt="video recording" />
+                                    <div class="ans_opt_text">Answer in Video</div>
+                                </div>
+                                <div class="ans_opt_list">
+                                    <img src="/media/img/icons/audio_mic.svg" alt="audio recording" />
+                                    <div class="ans_opt_text">Answer in Audio</div>
+                                </div>
+                                <div class="ans_opt_list">
+                                    <img src="/media/img/icons/pencil_red.svg" alt="write text" />
+                                    <div class="ans_opt_text">Answer in Text</div>
+                                </div>
+
+                            </div>
+                            <!-- user answer as video -->
+                            <div class="user_ans_video common_ans_area">
+                                <div class="head_text">Top Answer</div>
+                                <div class="inner_ans_area">
+                                    <div class="owl-carousel owl-theme">
+                                        {% for video in topic.topic_comment.all %}
+                                        {% if video.is_media %}
+                                        <div class="item" data-videosrc="{{ video.comment }}">
+                                            <div class="posted_by">
+                                                Posted by {{ video.user.username }} <span>{{ video.date.date }}</span>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>    
+                                </div>
+                                <div class="show_more">
+                                    <a href="#">view more answer</a>
+                                </div> 
+                            </div>
+                            <!-- user answer as audo -->
+                            <div class="user_ans_audio common_ans_area">
+                                <div class="inner_ans_area">
+                                    <!-- User info -->
+                                    {% for video in topic.topic_comment.all %}
+                                    {% if video.is_media %}
+                                    <div class="quest_user_info">
+                                        <div class="quest_user_info_img">
+                                            <img src="http://lorempixel.com/200/200/" alt="user image" class="quest_user_image"/>
+                                        </div>
+                                        <div class="quest_user_detail">
+                                            <div class="user_name">{{ video.user.username }}</div>
+                                            <div class="feed_post_date">Answered {{ video.date.date }}</div>
+                                        </div>
+                                    </div>
+                                    <!-- Audio player -->
+                                    <div id="ans_audio"></div>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>   
+                                <div class="show_more">
+                                    <a href="#">listen more answer</a>
+                                </div> 
+                            </div>
+                            <!-- user answer as text -->
+                            <div class="user_ans_text common_ans_area">
+                                <div class="inner_ans_area">
+                                        <!-- User info -->
+
+                                        {% for video in topic.topic_comment.all %}
+                                        {% if not video.is_media %}
+                                        <div class="quest_user_info">
+                                            <div class="quest_user_info_img">
+                                                <img src="http://lorempixel.com/200/200/" alt="user image" class="quest_user_image"/>
+                                            </div>
+                                            <div class="quest_user_detail">
+                                                <div class="user_name">{{ video.user.username }}</div>
+                                                <div class="feed_post_date">Answered {{ video.date.date }}</div>
+                                            </div>
+                                        </div>
+                                        <!-- answer text -->
+                                        <div class="ans_text">
+                                                {{ video.comment }}
+                                        </div>
+                                        {% endif %}
+                                        {% endfor %}
+                                </div>
+                                <div class="show_more">
+                                   <a href="#">read more answer</a>
+                                </div>
+                            </div>
+
+                        </div>
+                        {% endfor %}
+
+                    </div>
+                    <!-- Right section for Questions -->
+                    <div class="col-md-3 right_sec">
+                        <div class="inner_head">Frequently Asked Questions</div>
+                        <div class="que_bank">
+                            <ul>
+                                <li>
+                                    <a href="#">
+                                        How was Pakistani Air Defense unable to detect 12 Mirage-2000?
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        How was Pakistani Air Defense unable to detect 12 Mirage-2000?
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        How was Pakistani Air Defense unable to detect 12 Mirage-2000?
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        How was Pakistani Air Defense unable to detect 12 Mirage-2000?
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        How was Pakistani Air Defense unable to detect 12 Mirage-2000?
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        How was Pakistani Air Defense unable to detect 12 Mirage-2000?
+                                    </a>
+                                </li>
+                                    
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+        </section>
+
+ </main>
+
+
+
+
+{% endblock %}

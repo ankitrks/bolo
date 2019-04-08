@@ -1,15 +1,155 @@
-{% extends "spirit/_base.html" %}
+{% extends "spirit/_index_base.html" %}
 
 {% load spirit_tags i18n %}
-
-{% block title %}{% trans "Latest active topics" %}{% endblock %}
+{% comment %} 
+{% block title %}{% trans "Latest active topics" %}{% endblock %} {% endcomment %}
 
 {% block content %}
 
-    {% include "spirit/topic/_top_bar.html" with category=None categories=categories %}
+    <main role="main">
+        <!-- Main Banner section-->
+        {% include "spirit/topic/_top_bar.html" with category=None categories=categories %}
 
-    {% include "spirit/topic/_render_list.html" %}
 
-    {% render_paginator topics %}
+        {% include "spirit/topic/_render_list.html" %}
+
+        <!-- Sub category section-->
+        <section class="sub_cate_sec">
+            <div class="sub_cate_head">
+                <div class="row margin0">
+                    <div class="col-md-4 col-sm-4 col-4">
+                        <h3>Sub-category</h3>
+                    </div>
+                    <div class="col-md-5 col-sm-5 col-8">
+                        <p>Hostel facility is not available for its students. 
+                        Additional campus facilities such as boys Hostel.</p>
+                    </div>
+                    <div class="col-md-3"></div>
+                </div>
+            </div>
+            <div class="cate_listing">
+                <div class="container">
+                    <div class="row margin0">
+                        <div class="col-lg-4 col-md-6 col-12">
+                            <div class="inner_list">
+                                <div class="row margin0">
+                                    <div class="col-md-4 left_wrapper">
+                                        <div class="img_sec">
+                                        <img src="media/img/demo_img.png" class="rounded" alt="" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8 right_wrapper">
+                                        <h4>Hostel facility is not available for its students.</h4>
+                                        <div class="rating_star">
+                                            <i class="fill_start"></i>
+                                            <i class="fill_start"></i>
+                                            <i class="fill_start"></i>
+                                            <i class="fill_start"></i>
+                                            <i class="unfill_start"></i>
+                                        </div>
+                                        <div class="post_date">
+                                            Published on 14th Jan, 2019
+                                        </div>
+                                        <div class="author">by careeranna</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-6 col-12">
+                            <div class="inner_list">
+                                <div class="row margin0">
+                                    <div class="col-md-4 left_wrapper">
+                                        <div class="img_sec">
+                                        <img src="media/img/demo_img.png" class="rounded" alt="" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8 right_wrapper">
+                                        <h4>Hostel facility is not available for its students.</h4>
+                                        <div class="rating_star">
+                                            <i class="fill_start"></i>
+                                            <i class="fill_start"></i>
+                                            <i class="fill_start"></i>
+                                            <i class="fill_start"></i>
+                                            <i class="unfill_start"></i>
+                                        </div>
+                                        <div class="post_date">
+                                            Published on 14th Jan, 2019
+                                        </div>
+                                        <div class="author">by careeranna</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-6 col-12">
+                            <div class="inner_list">
+                                <div class="row margin0">
+                                    <div class="col-md-4 left_wrapper">
+                                        <div class="img_sec">
+                                        <img src="media/img/demo_img.png" class="rounded" alt="" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8 right_wrapper">
+                                        <h4>Hostel facility is not available for its students.</h4>
+                                        <div class="rating_star">
+                                            <i class="fill_start"></i>
+                                            <i class="fill_start"></i>
+                                            <i class="fill_start"></i>
+                                            <i class="fill_start"></i>
+                                            <i class="unfill_start"></i>
+                                        </div>
+                                        <div class="post_date">
+                                            Published on 14th Jan, 2019
+                                        </div>
+                                        <div class="author">by careeranna</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-6 col-12">
+                            <div class="inner_list">
+                                <div class="row margin0">
+                                    <div class="col-md-4 left_wrapper">
+                                        <div class="img_sec">
+                                        <img src="media/img/demo_img.png" class="rounded" alt="" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8 right_wrapper">
+                                        <h4>Hostel facility is not available for its students.</h4>
+                                        <div class="rating_star">
+                                            <i class="fill_start"></i>
+                                            <i class="fill_start"></i>
+                                            <i class="fill_start"></i>
+                                            <i class="fill_start"></i>
+                                            <i class="unfill_start"></i>
+                                        </div>
+                                        <div class="post_date">
+                                            Published on 14th Jan, 2019
+                                        </div>
+                                        <div class="author">by careeranna</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <div class="row margin0 viewMore">
+                        <a href="#">
+                            view more
+                        </a>
+                    </div>    
+            </div>
+            
+        </section>
+        
+
+    </main>
+    <!-- /.container -->
+
+    {% comment %}
+ {% endcomment %}
+
+    {% comment %} {% render_paginator topics %} {% endcomment %}
 
 {% endblock %}

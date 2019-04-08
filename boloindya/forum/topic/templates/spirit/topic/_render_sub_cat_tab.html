@@ -1,0 +1,62 @@
+<section class="sub_cate_sec">
+    <div class="sub_cate_tab_layout">
+        {% for c in subcategories %}
+        <a style="text-decoration:none;color:black;" href="{{ c.parent.get_absolute_url }}{{ c.id }}/{{c.slug}} " class="sub_cate_tab {% if c.id == sub_category.id %} active {% endif %}">
+            {{ c.title }}
+        </a>
+        {% endfor %}
+    </div>
+    <div class="sub_cate_head">
+        <div class="row margin0">
+            <div class="col-md-4 col-sm-4 col-4">
+                <h3>{{ sub_category.title }}</h3>
+            </div>
+            <div class="col-md-5 col-sm-5 col-8">
+                <p>Hostel facility is not available for its students.
+                    Additional campus facilities such as boys Hostel.</p>
+            </div>
+        </div>
+    </div>
+    <div class="cate_listing">
+        <div class="container">
+            <div class="row margin0">
+
+                {% for each_topic in topics %}
+                <div class="col-lg-6 col-md-6 col-12">
+                    <div class="inner_list">
+                        <div class="row margin0">
+                            <div class="col-md-4 left_wrapper">
+                                <div class="img_sec">
+                                    <img src="{{each_topic.thumbnail}}" class="rounded" alt=""/>
+                                </div>
+                            </div>
+                            <div class="col-md-8 right_wrapper">
+                                <a href="/topic/{{ each_topic.pk}}/"><h4>{{ each_topic.title }}</h4></a>
+                                <div class="rating_star">
+                                    <i class="fill_start"></i>
+                                    <i class="fill_start"></i>
+                                    <i class="fill_start"></i>
+                                    <i class="fill_start"></i>
+                                    <i class="unfill_start"></i>
+                                </div>
+                                <div class="post_date">
+                                    Published on {{ each_topic.date.date }}
+                                </div>
+                                <div class="author">by {{ each_topic.user.username }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+                {% if not topics %}
+                <p>This category has no data. You can start <a href="/topic/discussion/">Contribution here</a></p>
+                {% endif  %}    
+
+            </div>
+            <div class="load_more">
+                Load More <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+            </div>
+        </div>
+    </div>
+</section>

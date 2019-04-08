@@ -1,0 +1,14 @@
+{% extends "spirit/_index_base.html" %}
+
+{% load spirit_tags i18n %}
+
+{% block title %}BoloIndya{% endblock %}
+
+{% block content %}
+
+    {% include "spirit/topic/_top_bar.html" with category=None categories=categories %}
+
+    {% include "spirit/topic/_render_sub_cat_tab.html" with subcategories=subcategories  sub_category=sub_category %}
+
+
+{% endblock %}

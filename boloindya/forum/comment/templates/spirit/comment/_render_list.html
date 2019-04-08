@@ -32,7 +32,13 @@
 
                         <div class="comment-text">
                             {% if not c.action %}
-                                {% post_render_comment comment=c %}
+                                {% if c.is_media %}
+                                    <video width="400" controls><source src="{{ c.comment }}" type="video/mp4">
+                                    <source src="{{ c.comment }}" type="video/ogg"></video>
+                                {% else %}
+                                    {% post_render_comment comment=c %}
+                                {% endif %}
+                                
                             {% else %}
                                 <p>{% get_comment_action_text c.action %}.</p>
                             {% endif %}

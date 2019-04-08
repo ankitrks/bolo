@@ -1,0 +1,58 @@
+ <script src="/media/js/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js"></script>
+    <script src="/media/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/3.3.1/js/swiper.min.js"></script>
+    <script>
+        if ($(window).width() <= 767) {
+  
+            $('.profile_link').click(function(e){
+                e.preventDefault();
+                //$('.navbar .navbar-nav .sub-menu').toggle('slow')
+                if($('.navbar .navbar-nav li .sub-menu').hasClass('active')){
+                    $('.navbar .navbar-nav li .sub-menu').removeClass('active').hide('slow');
+                }
+                else{
+                    $('.navbar .navbar-nav li .sub-menu').addClass('active').show('slow');
+                }
+            })
+        }
+        //banner swipe slider
+        var swiper = new Swiper('.swiper-container', {
+            effect: 'coverflow',
+            loop: true,
+            centeredSlides: true,
+            slidesPerView: 3,
+            initialSlide: {{ current_index }},
+            keyboardControl: true,
+            mousewheelControl: true,
+            lazyLoading: true,
+            preventClicks: false,
+            preventClicksPropagation: false,
+            lazyLoadingInPrevNext: true,
+            nextButton: '.swiper-button-next',
+            prevButton: '.swiper-button-prev',
+            coverflow: {
+                rotate: 0,
+                stretch: 0,
+                depth: 250,
+                modifier: 1,
+                slideShadows : false,
+            },
+            breakpoints: {
+                // when window width is <= 320px
+                320: {
+                slidesPerView: 1,
+                spaceBetween: 10
+                },
+                480: {
+                slidesPerView: 2,
+                spaceBetween: 20
+                },
+                // when window width is <= 640px
+                640: {
+                slidesPerView: 3,
+                spaceBetween: 30
+                }
+            }    
+        });
+    </script>
