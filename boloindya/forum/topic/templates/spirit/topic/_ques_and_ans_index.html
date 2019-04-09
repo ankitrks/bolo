@@ -25,6 +25,8 @@
                 <div class="row">
                     <!-- Left section for QA Category -->
                     <div class="col-md-3 left_sec">
+
+                    <input name="pageno" id="pageno" class="btn btn-primary" type="button" value="1">
                         <div class="inner_head">Q/A Categories</div>
                         <!-- category accordian or collapse section -->
                         <div id="accordion">
@@ -53,6 +55,8 @@
                         </div>
                         <!-- question feed -->
                         {% comment %}{% if is_single_topic == 0 %}{% endcomment %}
+                        <div id="question_tab">
+                            
                         {% if topics %}
                             {% for topic in topics %}
                             <div class="quest_feed" style="margin-bottom: 10px;">
@@ -172,6 +176,8 @@
                             </div>
                             {% endfor %}
                             {% comment %}{% endif %}{% endcomment %}
+
+                        </div>
                         {% else %}
                            <div class="quest_feed">This category has no questions yet!<br><a href="/topic/publish" style="color: #BB3335"><b><u>Ask your Question Now</u></b></a></div>
                         {% endif %}
@@ -295,7 +301,9 @@
                                             </div>
                             {% endif %}
                         {% endcomment %}   
-
+                    <div class="load_more" style="float:right;" id="load_more">
+                        Load More <i class="fas fa-angle-double-right"></i>
+                    </div>
                     </div>
                     <!-- Right section for Questions -->
                     <div class="col-md-3 right_sec">
@@ -341,6 +349,66 @@
 
  </main>
 
+<script>
+
+     $("#load_more").click(function () {
+      console.log('hiy')   
+      var pageno = $('#pageno').val();
+
+      $.ajax({
+        url: '/ajax/pageno/',
+        data: {
+          'pageno': pageno,
+          'category_id': '{{ category_id }}',
+          'lid': '{{lid}}'
+        },
+        dataType: 'json',
+        success: function (data) {
+            $('#pageno').val(Number(pageno)+1+"")
+            $('#question_tab').append(data)
+           var owl = $('.owl-carousel');
+  owl.owlCarousel({
+    loop:true,
+    margin:10,
+    nav:true,
+    dots:true,
+    items:1,
+    video:true,
+    lazyLoad:true,
+    center:false,
+    navText: [
+        "<i class='fa fa-chevron-left'></i>",
+        "<i class='fa fa-chevron-right'></i>"
+     ],
+    // responsive:{
+    //     480:{
+    //         items:1
+    //     },
+    //     600:{
+    //         items:1
+    //     }
+    // }
+  })
+  // }
+
+
+function isMobile(width) {
+	if(width == undefined){
+		width = 719;
+	}
+	if(window.innerWidth <= width) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+        }
+      });
+
+    });
+
+</script>
 
 
 

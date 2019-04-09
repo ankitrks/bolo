@@ -19,6 +19,10 @@ from ..comment.models import Comment
 from .models import Topic
 from .forms import TopicForm
 from . import utils
+from django.template.loader import render_to_string
+from django.http import JsonResponse
+import json
+from django.core.paginator import Paginator
 
 
 @login_required
@@ -185,13 +189,36 @@ def index_videos(request):
 
     return render(request, 'spirit/topic/_index.html', context)
 
+def get_topics_feed(request):
+    pageno = request.GET.get('pageno', None)
+    topic_list = Topic.objects.filter(language_id = request.GET.get('lid', 1))
+    paginator = Paginator(topic_list, 10) # Show 25 contacts per page
+
+    topics = paginator.page(pageno)  
+
+    if(request.GET.get('category_id', None) != 'None'):
+        category = get_object_or_404(Category.objects.visible(),pk=int((request.GET.get('category_id', 14))))
+        topics = category.category_topics.all()[0:10]                         
+        paginator = Paginator(topic_list, 10) # Show 25 contacts per page
+
+        page = 1
+        topics = paginator.page(page) 
+
+    data = render_to_string('spirit/topic/_single_topic.html', {'topics': topics})
+    return JsonResponse(data, safe=False)
+
+
 def ques_ans_index(request,category_id=None):#, is_single_topic=0):
     lid = request.GET.get('lid', 2)
     categories = Category.objects \
         .visible() \
         .parents()    
 
-    topics = Topic.objects.filter(language_id = lid)[:10]
+    topic_list = Topic.objects.filter(language_id = lid)
+    paginator = Paginator(topic_list, 10) # Show 25 contacts per page
+
+    page = 1
+    topics = paginator.page(page)
 
     # topic = {}
     # if is_single_topic not in [0, '0']:
@@ -200,12 +227,17 @@ def ques_ans_index(request,category_id=None):#, is_single_topic=0):
 
     if(category_id != None):
         category = get_object_or_404(Category.objects.visible(),pk=category_id)
-        topics = category.category_topics.all()[0:10]                         
+        topic_list = category.category_topics.all()    
+        paginator = Paginator(topic_list, 10) # Show 25 contacts per page
+
+        page = 1
+        topics = paginator.page(page)                    
 
     context = {
         'categories': categories,
         'topics': topics,
         'category_id' : category_id,
+        'lid': lid
         # 'is_single_topic': is_single_topic,
         # 'single_topic': topic
     }
@@ -216,4 +248,7 @@ def ques_ans_index(request,category_id=None):#, is_single_topic=0):
 def index(request):
     return render(request, 'spirit/topic/_home.html')
 
+
+def new_home(request):
+    return render(request, 'spirit/topic/_new_home.html')
 
