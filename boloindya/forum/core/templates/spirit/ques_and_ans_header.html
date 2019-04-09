@@ -15,22 +15,22 @@
                         <li class="nav-item">
                             <a class="videoBtn"  href="/videos/" >Videos</a>
                         </li>
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <a class=""  href="/topic/discussion/" >Q/A</a>
-                        </li>
+                        </li> -->
                         <li class="nav-item dropdown" style="margin-right: 20px;">
                             <a href="" class="lang_link">Change Language </a>
                             <ul class="sub-menu list-unstyled">
-                                <li><a href="#" class="dropdown-item">English</a></li>
-                                <li><a href="#" class="dropdown-item">Hindi</a></li>
+                                <li><a href="/topic/discussion/?lid=1" class="dropdown-item">English</a></li>
+                                <li><a href="/topic/discussion/?lid=2" class="dropdown-item">Hindi</a></li>
                             </ul>
                         </li>
                          {% if user.is_authenticated %}
                         <li class="nav-item dropdown">
                             <a href="" class="profile_link">{{ user.username }} </a>
                             <ul class="sub-menu list-unstyled">
-                                <li><a href="#" class="dropdown-item">Profile</a></li>
-                                <li><a href="#" class="dropdown-item">Logout</a></li>
+                                <!-- <li><a href="#" class="dropdown-item">Profile</a></li> -->
+                                <li><a href="/user/logout/" class="dropdown-item">Logout</a></li>
                             </ul>
                         </li>
                         {% endif %}

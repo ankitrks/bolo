@@ -20,31 +20,32 @@ from ..topic.models import Topic
 from ..comment.models import Comment
 from .forms import UserProfileForm, EmailChangeForm, UserForm, EmailCheckForm
 from django.conf import settings
+from django.http import HttpResponseRedirect
 
 User = get_user_model()
 
-
 @login_required
 def update(request):
-    if request.method == 'POST':
-        uform = UserForm(data=request.POST, instance=request.user)
-        form = UserProfileForm(data=request.POST, instance=request.user.st)
+    return HttpResponseRedirect('/topic/discussion/')
+    # if request.method == 'POST':
+    #     uform = UserForm(data=request.POST, instance=request.user)
+    #     form = UserProfileForm(data=request.POST, instance=request.user.st)
 
-        if all([uform.is_valid(), form.is_valid()]):  # TODO: test!
-            uform.save()
-            form.save()
-            messages.info(request, _("Your profile has been updated!"))
-            return redirect(reverse('spirit:user:update'))
-    else:
-        uform = UserForm(instance=request.user)
-        form = UserProfileForm(instance=request.user.st)
+    #     if all([uform.is_valid(), form.is_valid()]):  # TODO: test!
+    #         uform.save()
+    #         form.save()
+    #         messages.info(request, _("Your profile has been updated!"))
+    #         return redirect(reverse('spirit:user:update'))
+    # else:
+    #     uform = UserForm(instance=request.user)
+    #     form = UserProfileForm(instance=request.user.st)
 
-    context = {
-        'form': form,
-        'uform': uform
-    }
+    # context = {
+    #     'form': form,
+    #     'uform': uform
+    # }
 
-    return render(request, 'spirit/user/profile_update.html', context)
+    # return render(request, 'spirit/user/profile_update.html', context)
 
 
 @login_required

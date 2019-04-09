@@ -1,17 +1,17 @@
 // enable nav dropdown in mobile device
-if ($(window).width() <= 767) {
+// if ($(window).width() <= 767) {
   
-    $('.profile_link').click(function(e){
-        e.preventDefault();
-        //$('.navbar .navbar-nav .sub-menu').toggle('slow')
-        if($('.navbar .navbar-nav li .sub-menu').hasClass('active')){
-            $('.navbar .navbar-nav li .sub-menu').removeClass('active').hide('slow');
-        }
-        else{
-            $('.navbar .navbar-nav li .sub-menu').addClass('active').show('slow');
-        }
-    })
-}
+//     $('.profile_link').click(function(e){
+//         e.preventDefault();
+//         //$('.navbar .navbar-nav .sub-menu').toggle('slow')
+//         if($('.navbar .navbar-nav li .sub-menu').hasClass('active')){
+//             $('.navbar .navbar-nav li .sub-menu').removeClass('active').hide('slow');
+//         }
+//         else{
+//             $('.navbar .navbar-nav li .sub-menu').addClass('active').show('slow');
+//         }
+//     })
+// }
 
 //jwplayer for audio
     // var playerInstance = jwplayer("ans_audio");
@@ -33,6 +33,7 @@ var owl = $('.owl-carousel');
     margin:10,
     nav:true,
     dots:true,
+    items:1,
     video:true,
     lazyLoad:true,
     center:false,
@@ -40,14 +41,14 @@ var owl = $('.owl-carousel');
         "<i class='fa fa-chevron-left'></i>",
         "<i class='fa fa-chevron-right'></i>"
      ],
-    responsive:{
-        480:{
-            items:1
-        },
-        600:{
-            items:1
-        }
-    }
+    // responsive:{
+    //     480:{
+    //         items:1
+    //     },
+    //     600:{
+    //         items:1
+    //     }
+    // }
   })
   owl.on('translate.owl.carousel',function(e){
     $('.owl-item video').each(function(){
@@ -60,7 +61,7 @@ var owl = $('.owl-carousel');
     $('.owl-item.active video').get(0).play();
     $('.qa_sec .owl-item .item img').css('z-index','-1')
   })
-  if(!isMobile()){
+  // if(!isMobile()){
     $('.owl-item .item').each(function(){
       var attr = $(this).attr('data-videosrc');
       if (typeof attr !== typeof undefined && attr !== false) {
@@ -71,7 +72,7 @@ var owl = $('.owl-carousel');
       
     });
     $('.owl-item.active video').attr('autoplay',false).attr('loop',true);
-  }
+  // }
 
 
 

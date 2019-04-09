@@ -150,7 +150,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 LOGIN_URL = 'spirit:user:auth:login'
-LOGIN_REDIRECT_URL = 'spirit:user:update'
+LOGIN_REDIRECT_URL = 'spirit:topic:discussion'
 
 MIDDLEWARE_CLASSES = [
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -292,8 +292,8 @@ STATICFILES_FINDERS = (
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'mail.careeranna.com'
 EMAIL_HOST_USER = 'security@careeranna.com'
-EMAIL_HOST_PASSWORD = 'Security@!23'
-EMAIL_PORT = 465
+EMAIL_HOST_PASSWORD = 'INAS!bOrtn}{'
+EMAIL_PORT = 26
 
 EMAIL_SENDER = EMAIL_HOST_USER
 EMAIL_RECEIVERS = ['ankit@careeranna.com']
