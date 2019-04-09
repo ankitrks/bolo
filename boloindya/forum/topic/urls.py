@@ -13,7 +13,7 @@ from . import views
 
 
 urlpatterns = [
-    url(r'^/$', views.index, name='index'),
+    url(r'^$', views.index, name='index'),
     url(r'^new_home/$', views.new_home, name='index_new_home'),
     url(r'^publish/$', views.publish, name='publish'),
     url(r'^publish/(?P<category_id>\d+)/$', views.publish, name='publish'),
