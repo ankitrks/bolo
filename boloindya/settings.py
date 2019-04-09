@@ -96,6 +96,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
 
     'forum.core',
     'forum.admin',
@@ -277,7 +278,7 @@ STATICFILES_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(PROJECT_PATH, ENV, 'staticfiles'),
-    os.path.join(PROJECT_PATH, ENV, 'schedule', 'static'),
+    # os.path.join(PROJECT_PATH, ENV, 'schedule', 'static'),
 )
 
 # List of finder classes that know how to find static files in
