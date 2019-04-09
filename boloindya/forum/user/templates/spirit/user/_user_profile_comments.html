@@ -1,0 +1,11 @@
+{% extends "spirit/_base_index_user.html" %}
+
+{% load spirit_tags i18n tz %}
+
+{% block title %}{{ p_user.username }} {% trans "comments" %}{% endblock %}
+
+{% block content %}
+
+    {% include "spirit/user/_user_profile.html" with active_tab=0 %}
+    
+{% endblock %}
