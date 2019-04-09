@@ -8,5 +8,5 @@ from django.apps import AppConfig
 class SpiritCommentConfig(AppConfig):
 
     name = 'forum.comment'
-    verbose_name = "Spirit Comment"
+    verbose_name = "Forum Comments"
     label = 'forum_comment'

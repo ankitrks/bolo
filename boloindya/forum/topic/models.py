@@ -47,6 +47,9 @@ class Topic(models.Model):
 
     objects = TopicQuerySet.as_manager()
 
+    def __unicode__(self):
+        return self.title
+
     class Meta:
         ordering = ['-last_active', '-pk']
         verbose_name = _("topic")
