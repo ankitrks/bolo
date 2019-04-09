@@ -193,3 +193,195 @@ body{
     .navbar .navbar-nav li .sub-menu.active{display:block;}
     .sub_cate_sec .cate_listing .img_sec:after{left:40%;}
 }
+
+.ask_question h2{
+    background: #CA3B3D;
+    text-align: center;
+    color: #fff;
+    padding: 20px;
+    font-size: 44px;  
+    margin: 0px;
+}
+
+.bolo_user_tab {
+    background: #CA3B3D;
+    padding: 40px;
+}
+
+.user_info_inside_tab{
+    color: white;
+    text-align: center;
+    padding: 30px;
+}
+
+.user_info_inside_tab img {
+    margin-bottom: 20px;
+    border: 10px solid #fff;
+    border-radius: 50%;
+}
+
+.google_play {
+    padding: 40px;
+}
+
+.google_info {
+    font-size: 24px;
+}
+
+.bolo_user_count_tabs {
+    background: #273544;
+    padding: 30px;    
+}
+.bolo_user_count_tab{
+    color: white;
+    padding: 40px;
+    text-align: center;
+    font-size: 25px;
+}
+
+.bolo_user{
+    color: white;
+    text-align: center;
+}
+
+.get_id {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    background: #CA3B3D;
+    color: white;
+    border-radius: 20px;
+    margin-top: 10%;
+    margin-left: 35%;
+}
+
+.login_card {
+    margin: 50px;
+    box-shadow: 0px 0px 5px 5px rgba(0,0,0,0.10);
+    border-radius: 4px;
+    padding: 40px;
+    width: 55%;
+    margin-left: 20% !important;
+}
+
+.header_info {
+    font-weight: 500;
+    font-size: 18px;
+    margin-bottom: 30px;
+}
+
+input{
+    padding: 10px;
+    font-size: 10px;
+    border: none;
+    width: 100%;
+    border-bottom: 1px solid #ccc;
+    outline: none;
+}
+
+.card_profile {
+    margin: 50px;
+    padding: 20px;
+    box-shadow: 0px 0px 5px 5px rgba(0,0,0,0.05);
+    border-radius: 6px;
+    background: #fff;
+}
+
+.info{
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.user_about {
+    font-size: 13px;
+}
+
+.name {
+    font-size: 16px;
+    margin-top: 10px;
+    font-weight: 600; 
+}
+.address{
+    font-size: 12px;
+}
+
+.Footer {
+    background: #496375;
+    padding: 2rem 110px;
+    text-align: left;
+}
+.left_wrapper {
+    color: #FFFF;
+    width: 35%;
+}
+.brand_name {
+    font-size: 2rem;
+    font-weight: 900;
+}
+.social-icons {
+            margin: 0;
+            padding: 1.2rem 0;
+            list-style: none;
+}
+.social-icons li {
+                display: inline-block;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                margin-right: 12px;
+                color: #496375;   
+                text-align: center;
+                line-height: 40px;
+                background: #FFF;
+            }
+            .social-icons li a {
+                color: #496375;    
+            }
+
+            .social-icons form {
+            padding-top: 1.5rem;
+            }
+            .social-icons form .heading {
+                padding-bottom: 0.5rem;
+                font-weight: 700;
+                font-weight: 1.1rem;
+            }
+            .social-icons form #email {
+                width: 63%;
+                outline: none;
+                font-size: 0.8rem;
+                border-radius: 4px;
+                padding: 0.4rem;
+            }
+            .social-icons form .submit {
+                font-weight: 800;
+                margin-left: 5px;
+                color: white;
+                background: #496375;
+                border-radius: 4px;
+                padding: 10px 25px;
+            }
+            .social-icons form .row {
+                margin: 0px;
+            }
+    .Footer .right_wrapper {
+        width: 65%;
+        padding-left: 6rem;
+    }
+        .Footer .right_wrapper .footer_links {
+            color: white;
+            padding-right: 20px;
+        }
+        .Footer .right_wrapper .footer_links h6 {
+                font-size: 14px;
+                font-weight: 900;   
+            }
+            .Footer .right_wrapper .footer_links ul {
+                padding: 0;
+            }
+            .Footer .right_wrapper .footer_links ul li a {
+                        font-size: 12px;
+                        color: white;
+                        text-decoration: none;
+                    }
