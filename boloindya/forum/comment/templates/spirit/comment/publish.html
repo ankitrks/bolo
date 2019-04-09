@@ -43,7 +43,10 @@
                     </style>
                         <div class="question">{% trans "Publishing comment on" %} "{{ topic.title }}"</div>
                         {% if type == 'video' %}
-                          <a href="#"> Switch to upload video</a>
+                          
+                          <!-- <button class="btn btn-danger" style="display: none;"><i class="fa fa-upload marginRight10" aria-hidden="true"></i>Upload Video</button><br> -->
+                          <!-- <button class="btn btn-danger" style="display: none;"><i class="fa fa-video-camera marginRight10" aria-hidden="true"></i>Record Video</button><br> -->
+
                           <video id="gum" autoplay muted></video>
                           <video id="recorded" autoplay loop controls hidden></video>
                           <div class="marginTop">
