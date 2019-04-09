@@ -6,6 +6,17 @@
   <script src="/media/js/script_qa.js" %}"></script>
 
   {% block js %}{% endblock %}
+
+  <script type="text/javascript">
+    
+$('audio,video').bind('play', function() {
+	activated = this;
+	$('audio,video').each(function() {
+		if(this != activated) this.pause();
+	});
+});
+
+</script>
    
   </body>
 </html>
