@@ -292,8 +292,8 @@ STATICFILES_FINDERS = (
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'mail.careeranna.com'
 EMAIL_HOST_USER = 'security@careeranna.com'
-EMAIL_HOST_PASSWORD = 'Security@!23'
-EMAIL_PORT = 465
+EMAIL_HOST_PASSWORD = 'INAS!bOrtn}{'
+EMAIL_PORT = 26
 
 EMAIL_SENDER = EMAIL_HOST_USER
 EMAIL_RECEIVERS = ['ankit@careeranna.com']

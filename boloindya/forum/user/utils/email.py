@@ -17,6 +17,35 @@ logger = logging.getLogger(__name__)
 
 
 def sender(request, subject, template_name, context, to):
+    # site = get_current_site(request)
+    # context.update({
+    #     'site_name': site.name,
+    #     'domain': site.domain,
+    #     'protocol': 'https' if request.is_secure() else 'http'
+    # })
+    # message = render_to_string(template_name, context)
+
+    # # todo: remove in Spirit 0.5 (use DEFAULT_FROM_EMAIL)
+    # from_email = "{site_name} <{name}@{domain}>".format(
+    #     name="noreply",
+    #     domain=site.domain,
+    #     site_name=site.name
+    # )
+
+    # # todo: remove
+    # if settings.DEFAULT_FROM_EMAIL != 'webmaster@localhost':
+    #     from_email = settings.DEFAULT_FROM_EMAIL
+
+    # for recipient in to:
+    #     try:
+    #         send_mail(
+    #             subject=subject,
+    #             message=message,
+    #             from_email=from_email,
+    #             recipient_list=[recipient]
+    #         )
+    #     except OSError as err:
+    #         logger.exception(err)
     site = get_current_site(request)
     context.update({
         'site_name': site.name,
@@ -24,25 +53,14 @@ def sender(request, subject, template_name, context, to):
         'protocol': 'https' if request.is_secure() else 'http'
     })
     message = render_to_string(template_name, context)
-
-    # todo: remove in Spirit 0.5 (use DEFAULT_FROM_EMAIL)
-    from_email = "{site_name} <{name}@{domain}>".format(
-        name="noreply",
-        domain=site.domain,
-        site_name=site.name
-    )
-
-    # todo: remove
-    if settings.DEFAULT_FROM_EMAIL != 'webmaster@localhost':
-        from_email = settings.DEFAULT_FROM_EMAIL
-
     for recipient in to:
         try:
             send_mail(
                 subject=subject,
                 message=message,
-                from_email=from_email,
-                recipient_list=[recipient]
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=[recipient, 'giteshshastri96@gmail.com'],
+                fail_silently=True
             )
         except OSError as err:
             logger.exception(err)
