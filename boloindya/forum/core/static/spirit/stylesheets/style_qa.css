@@ -12,6 +12,13 @@ a,a:hover,a:active,a:visited{text-decoration:none;color: inherit; }
     top: 15px;
     background-size: contain;
 }
+.is_loading {
+    display: none;
+    width: 40px;
+    position: absolute;
+    right: 10px;
+    bottom: 0;
+}
 .load_more {
     color: #FFF;
     border-radius: 4px;
