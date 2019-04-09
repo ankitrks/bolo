@@ -37,11 +37,12 @@ class Category(models.Model):
     is_removed = models.BooleanField(_("removed"), default=False)
     is_private = models.BooleanField(_("private"), default=False)
     category_image = models.CharField(_("color"), max_length=150, blank=True)
+    order_no = models.IntegerField(default = 0)
 
     objects = CategoryQuerySet.as_manager()
 
     class Meta:
-        ordering = ['title', 'pk']
+        ordering = ['ordering']
         verbose_name = _("category")
         verbose_name_plural = _("categories")
 
