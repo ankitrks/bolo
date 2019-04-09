@@ -26,7 +26,7 @@
                     <!-- Left section for QA Category -->
                     <div class="col-md-3 left_sec">
 
-                    <input name="pageno" id="pageno" class="btn btn-primary" type="button" value="1">
+                    <input name="pageno" id="pageno" class="btn btn-primary" type="button" value="1" hidden>
                         <div class="inner_head">Q/A Categories</div>
                         <!-- category accordian or collapse section -->
                         <div id="accordion">
@@ -306,6 +306,9 @@
                     <div class="load_more" style="float:right;" id="load_more">
                         Load More <i class="fas fa-angle-double-right"></i>
                     </div>
+                    <div class="is_loading" id="is_loading" style="display: none;">
+                       <img src="/media/img/lg.dual-ring-loader.gif" alt="">
+                    </div>
                     </div>
                     <!-- Right section for Questions -->
                     <div class="col-md-3 right_sec">
@@ -356,7 +359,8 @@
      $("#load_more").click(function () {
       console.log('hiy')   
       var pageno = $('#pageno').val();
-
+      $('#is_loading').show();
+      $("#load_more").hide();
       $.ajax({
         url: '/ajax/pageno/',
         data: {
@@ -368,6 +372,8 @@
         success: function (data) {
             $('#pageno').val(Number(pageno)+1+"")
             $('#question_tab').append(data)
+            $('#is_loading').hide();
+            $("#load_more").show();
            var owl = $('.owl-carousel');
   owl.owlCarousel({
     loop:true,
