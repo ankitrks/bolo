@@ -6,7 +6,6 @@ from django.apps import AppConfig
 
 
 class SpiritTopicConfig(AppConfig):
-
     name = 'forum.topic'
-    verbose_name = "Spirit Topic"
+    verbose_name = "Forum Topic"
     label = 'forum_topic'

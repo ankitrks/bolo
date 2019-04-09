@@ -74,7 +74,8 @@
                     }*/
                     </style>
                         <div class="question">{% trans "Publishing comment on" %} "{{ topic.title }}"</div>
-                        {% if type == 'video' %}    
+                        {% if type == 'video' %}
+                          <a href="#"> Switch to upload video</a>
                           <video id="gum" autoplay muted></video>
                           <video id="recorded" autoplay loop controls hidden></video>
                           <div>

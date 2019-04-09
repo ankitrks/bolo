@@ -9,7 +9,7 @@ a,a:hover,a:active,a:visited{text-decoration:none;color: inherit; }
     width: 14px;
     height: 12px;
     right: -18px;
-    top: 17px;
+    top: 15px;
     background-size: contain;
 }
 .load_more {
@@ -50,12 +50,13 @@ a,a:hover,a:active,a:visited{text-decoration:none;color: inherit; }
 
 /* css for header */
 .navbar .navbar-nav a{
-    font-size:17px;
+    font-size:15px;
     color:#000;
     position:relative;
     padding:0.5rem 1rem 0.5rem 0.5rem;
     transition: 0.3s ease;
 }
+.videoBtn{border-radius: 3px;}
 .navbar .navbar-nav a:hover{color: #7b7474;}
 
 .navbar .navbar-nav a.profile_link{padding:0.5rem 1.5rem;}

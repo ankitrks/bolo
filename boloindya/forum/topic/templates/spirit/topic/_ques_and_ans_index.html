@@ -42,17 +42,19 @@
                         <div class="user_info">
                             <img src="http://lorempixel.com/200/200/" alt="user image" class="user_image"/>
                             <div class="user_name"> {{ user.username }} </div>
+                            <a href="/topic/publish" class="ask_link" style="position: absolute;right: 30px;margin-top: 3px;color: #dc3545;">Ask Question</a>
+
                         </div>
                         {% endif %}
                         <!-- User ask the questions -->
-                        <div class="write_quest_sec">
+                        <!-- <div class="write_quest_sec">
                             <a href="/topic/publish/" class="ask_link">
                             <a href="/topic/publish" class="ask_link">
                             <div class="write_sec">
                                 <div class="quest_text">Ask <span>your question</span></div>
                             </div>
                             </a>
-                        </div>
+                        </div> -->
                         <!-- question feed -->
                         {% comment %}{% if is_single_topic == 0 %}{% endcomment %}
                         <div id="question_tab">
