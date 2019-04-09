@@ -43,9 +43,64 @@
                     </style>
                         <div class="question">{% trans "Publishing comment on" %} "{{ topic.title }}"</div>
                         {% if type == 'video' %}
+                          <button class="btn btn-danger" id="upload" style="display: block;"><i class="fa fa-upload marginRight10" aria-hidden="true"></i>Upload Video</button><br> 
+                          <div id="upload_file" style="display: none;">
+                              <input type="file" class="btn btn-primary" id="choose" />
+                              <button class="btn btn-success" id="submit_file"><i class="fa fa-upload marginRight10" aria-hidden="true"></i>Submit</button>
+                          </div>
+                          <br/>                          
+                          <button class="btn btn-danger" style="display: none;" id="record_again"><i class="fa fa-video-camera marginRight10" aria-hidden="true"></i>Record Video</button><br>
                           
-                          <!-- <button class="btn btn-danger" style="display: none;"><i class="fa fa-upload marginRight10" aria-hidden="true"></i>Upload Video</button><br> -->
-                          <!-- <button class="btn btn-danger" style="display: none;"><i class="fa fa-video-camera marginRight10" aria-hidden="true"></i>Record Video</button><br> -->
+<div class="modal" tabindex="-1" role="dialog" id="exampleModal" >
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">File Uploaded</h5>
+          <button type="button" class="close" data-dismiss="exampleModal" aria-label="Close" id="close1"> 
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Your video has been submitted. Our content team would review and publish it shortly. You will get notified once the video goes live.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="exampleModal" id="close">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+                          <script>
+                              $('#upload').click(function(){
+                                $('#recordVid').hide();
+                                $('#gum').hide();
+                                $('#record_again').show();
+                                $('#upload_file').show();
+                              });
+                              $('#record_again').click(function(){
+                                $('#upload').show();
+                                $('#recordVid').show();
+                                $('#upload_file').hide();
+                                $('#gum').show();
+                                $('#record_again').hide();
+                              });
+                              $('#submit_file').click(function(){
+                                if($('#choose').get(0).files.length == 0) {
+                                  alert('Please Select File First!')
+                                } else {
+                                  $('#exampleModal').show();
+                                }
+                              });
+                              $('#close1').click(function(){
+                                $('#exampleModal').hide();
+                                window.location.assign('/topic/discussion/');
+                              });
+                              $('#close').click(function(){
+                                $('#exampleModal').hide();
+                                window.location.assign('/topic/discussion/');
+                              });
+                              
+                          </script>
+
 
                           <video id="gum" autoplay muted></video>
                           <video id="recorded" autoplay loop controls hidden></video>
