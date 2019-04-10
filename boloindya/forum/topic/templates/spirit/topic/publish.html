@@ -26,6 +26,7 @@
 <script src="https://cdn.webrtc-experiment.com/RecordRTC.js"></script>
 <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
 <style>
+    .record_info{color:#138c13;font-weight: 100!important;}
     [for="id_title"], #id_title{display: none;}
     label[for="id_comment"]{display: none;}
     #id_comment{height: 130px;}
@@ -147,7 +148,7 @@
                     <button class="hide" id="btn-release-microphone" disabled>Release Microphone</button>
                     <button class="hide" id="btn-download-recording" disabled>Download</button>
                     <div style="margin-top: 10px;"><audio controls autoplay muted playsinline></audio></div>
-
+                    <span class="record_info"></span>
                     <script>
 
                       //============== New Updated Code ================
@@ -492,6 +493,7 @@
                             <button id="download" disabled hidden>Download</button>
                             <!-- <a href="/topic/discussion/" class="btn btn-danger cnlRight colorCHange">Cancel</a> -->
                           </div>
+                          <span class="record_info"></span>
                         <script>
                             navigator.mediaDevices.getUserMedia({
                                 audio: isEdge ? true : {
