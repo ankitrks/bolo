@@ -127,7 +127,9 @@
                 Get Your <span style="font-weight:600;">Bolo Indya Mobile App</span>
         </div>
         <div class="google_info col-md-2">
+            <a href="https://play.google.com/store/apps/details?id=com.boloindya.android">
             <img src="/media/img/app_image.svg" alt="" height="40px">
+            </a>
         </div> 
     </div>
     <div class="student_tabs row m-0">
@@ -144,23 +146,23 @@
         </div>
         <div class="owl-carousel owl-theme col-md-9 col-12">
                 <div class="item">
-                    <video controls="" autoplay="false" name="media"><source type="video/mp4" src="https://s3.amazonaws.com/careeranna/Mownika_telugu.mp4"></video>
+                    <video controls="" name="media"><source type="video/mp4" src="https://s3.amazonaws.com/careeranna/rahul_hindi.mp4"></video>
                 </div>  
                 <div class="item">
-                    <video controls="" autoplay="false" name="media"><source type="video/mp4" src="https://s3.amazonaws.com/careeranna/Mownika_telugu.mp4"></video>
+                    <video controls=""  name="media"><source type="video/mp4" src="https://s3.amazonaws.com/careeranna/saddam_hindi.mp4"></video>
                 </div>  
                 <div class="item">
-                    <video controls="" autoplay="false" name="media"><source type="video/mp4" src="https://s3.amazonaws.com/careeranna/Mownika_telugu.mp4"></video>
+                    <video controls=""  name="media"><source type="video/mp4" src="https://s3.amazonaws.com/careeranna/Karthika_tamil.mp4"></video>
                 </div>  
                 <div class="item">
-                    <video controls="" autoplay="false" name="media"><source type="video/mp4" src="https://s3.amazonaws.com/careeranna/Mownika_telugu.mp4"></video>
+                    <video controls=""  name="media"><source type="video/mp4" src="https://s3.amazonaws.com/careeranna/Mownika_telugu.mp4"></video>
                 </div> 
         </div>
     </div>
     <div class="Footer">
     <div class="row px-0">
     <div class="left_wrapper">
-    <div class="brand_name">Careeranna</div>
+    <div class="brand_name">Bolo Indya</div>
     <div class="copyright">© CAREERANNA Pvt. Ltd. 2019</div>
     <ul class="social-icons">
     <li><a href="https://m.facebook.com/careerannacorp/"><i class="fab fa-facebook-f"></i></a></li>
@@ -228,6 +230,11 @@
     // }
   });
 
+  owl.on('translate.owl.carousel',function(e){
+    $('.owl-item video').each(function(){
+      $(this).get(0).pause();
+    });
+  });
     </script>
 
 {% endblock %}

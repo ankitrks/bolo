@@ -119,12 +119,34 @@ def publish(request, category_id=None):
 
 @login_required
 def search(request):
-    items = []
+    category_id = None
+    lid = request.GET.get('lid', 2)
+    categories = Category.objects \
+        .visible() \
+        .parents()   
+
+    # topic = {}
+    # if is_single_topic not in [0, '0']:
+    #     print 'Yoo'
+    #     topic = get_object_or_404(Topic.objects.visible(),pk=is_single_topic)
+
+    if(category_id != None):
+        category = get_object_or_404(Category.objects.visible(),pk=category_id)                  
+
+    topics = []
     search_term = request.GET.get('q')
     if search_term:
-        items = Topic.objects.filter(title__icontains = search_term)
+        topics = Topic.objects.filter(title__icontains = search_term)
 
-    return render(request, 'spirit/topic/publish.html', context)
+    context = {
+        'categories': categories,
+        'topics': topics,
+        'category_id' : category_id,
+        'lid': lid
+        # 'is_single_topic': is_single_topic,
+        # 'single_topic': topic
+    }
+    return render(request, 'spirit/topic/_ques_and_ans_index.html', context)
 
 @login_required
 def update(request, pk):

@@ -74,6 +74,16 @@
                                 </div>
                                 <!-- Question -->
                                 <div class="question"><a href="{% url 'spirit:topic:detail' topic.id %}" class="ques_link">{{ topic.title }}</a></div>
+                                {% if topic.question_audio.length > 0 %}
+                                 <div id="ans_audio" data-videosrc="{{ topic.question_audio }}" style="width: 100%;">
+                                            <audio controls style="width: 100%;">
+                                            <source src="{{ topic.question_audio }}" type="audio/ogg" style="width: 100%;">  
+                                            Your browser does not support the audio element.
+                                </audio>
+                                {% endif %}
+                                {% if topic.question_video.length > 0 %}
+                                    <video controls muted><source src="{{ video.question_video }}" type="video/mp4"></video>
+                                {% endif %}
                                 <!-- Answer options -->
                                 <div class="answer_option">
                                     <div class="ans_opt_list">
@@ -182,6 +192,7 @@
                         </div>
                         {% else %}
                            <div class="quest_feed">This category has no questions yet!<br><a href="/topic/publish" style="color: #BB3335"><b><u>Ask your Question Now</u></b></a></div>
+                    </div>
                         {% endif %}
                         {% comment %}
                             {% if is_single_topic != 0 %} 
