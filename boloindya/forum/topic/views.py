@@ -23,7 +23,48 @@ from django.template.loader import render_to_string
 from django.http import JsonResponse
 import json
 from django.core.paginator import Paginator
+# from utils import convert_speech_to_text
 
+import io
+import os
+import wget
+import copy
+import subprocess
+from datetime import datetime
+from google.cloud import speech
+from google.cloud.speech import enums
+from google.cloud.speech import types
+def convert_speech_to_text(blob_url):
+    import os
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/live_code/careerAnna/cred.json"
+    
+    fname = datetime.now().strftime('%s')
+    wget_command = "python -m wget -o /tmp/" + fname + " " + blob_url
+    subprocess.call(wget_command, shell=True)
+
+    command = "ffmpeg -i /tmp/" + fname + " -ab 160k -ac 1 -ar 44100 -vn /tmp/" + fname + ".wav"
+    subprocess.call(command, shell=True)
+    client = speech.SpeechClient()
+
+    with io.open('/tmp/' + fname + '.wav', 'rb') as audio_file:
+      content = audio_file.read()
+      audio = types.RecognitionAudio(content=content)
+
+    config = types.RecognitionConfig( encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16, \
+                    sample_rate_hertz=44100, language_code='en-US')
+    response = client.recognize(config, audio)
+
+    return_str = ''
+    for result in response.results:
+        print ('{}'.format(result.alternatives[0].transcript))
+        return_str += ('{}'.format(result.alternatives[0].transcript))
+        # print('Transcript: {}'.format(result.alternatives[0].transcript))
+    f1_rm = "rm -rf /tmp/" + fname
+    f2_rm = "rm -rf /tmp/" + fname + ".wav"
+    subprocess.call(f1_rm, shell=True)
+    subprocess.call(f2_rm, shell=True)
+
+    return return_str
 
 @login_required
 @ratelimit(rate='1/10s')
@@ -36,9 +77,16 @@ def publish(request, category_id=None):
     user = request.user
 
     if request.method == 'POST':
-        form = TopicForm(user=user, data=request.POST)
+        title = ''
+        if request.POST.get('question_audio'):
+            title = convert_speech_to_text( request.POST.get('question_audio') )
+        if request.POST.get('question_video'):
+            title = convert_speech_to_text( request.POST.get('question_video') )
+        post_data = copy.deepcopy(request.POST)
+        if title:
+            post_data['title'] = title
+        form = TopicForm(user=user, data=post_data)
         cform = CommentForm(user=user, data=request.POST)
-
         if (all([form.is_valid(), cform.is_valid()]) and
                 not request.is_limited()):
             if not user.st.update_post_hash(form.get_topic_hash()):
@@ -48,6 +96,13 @@ def publish(request, category_id=None):
 
             # wrap in transaction.atomic?
             topic = form.save()
+            if title:
+                topic.title = title
+            if request.POST.get('question_audio'):
+                topic.question_audio = request.POST.get('question_audio')
+            if request.POST.get('question_video'):
+                topic.question_audio = request.POST.get('question_video')
+            topic.save()
             cform.topic = topic
             comment = cform.save()
             comment_posted(comment=comment, mentions=cform.mentions)
@@ -65,6 +120,14 @@ def publish(request, category_id=None):
 
     return render(request, 'spirit/topic/publish.html', context)
 
+@login_required
+def search(request):
+    items = []
+    search_term = request.GET.get('q')
+    if search_term:
+        items = Topic.objects.filter(title__icontains = search_term)
+
+    return render(request, 'spirit/topic/publish.html', context)
 
 @login_required
 def update(request, pk):
