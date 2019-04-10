@@ -32,17 +32,27 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js"></script>
       <script src="/media/js/bootstrap.min.js"></script>
     <script src="https://owlcarousel2.github.io/OwlCarousel2/assets/owlcarousel/owl.carousel.js"></script>
+
     <script>
 
 	$( document ).ready(function() {
+        $('.perform_search').click(function(){
+            window.location = '/topic/search/?q=' + $('[name="search"]').val();
+        });
+        $('[name="search"]').keypress(function (e) {
+            var key = e.which;
+            if(key == 13){
+                $('.perform_search').click();
+                return false;  
+            }
+        }); 
+        // $.tab();
 
-        $.tab();
+        // $( 'a.js-post' ).postify( {
+        //     csrfToken: "{{ csrf_token }}",
+        // } );
 
-        $( 'a.js-post' ).postify( {
-            csrfToken: "{{ csrf_token }}",
-        } );
-
-        $('.js-messages').messages();
+        // $('.js-messages').messages();
 
         {% if user.is_authenticated %}
             $.notification( {
@@ -55,6 +65,9 @@
                 unread: "{% trans "unread" %}",
             } );
         {% endif %}
+
+	});
+
 	</script>
 
     {% block head-extra %}{% endblock %}
