@@ -279,7 +279,16 @@ input{
     border-bottom: 1px solid #ccc;
     outline: none;
 }
-
+input[type=submit]{
+    background: #CA3B3D;
+    border: none;
+    outline: none;
+    color: white;
+    width: 50%;
+    margin-left: 25%;
+    margin-top: 20px;
+    border-radius: 10px;
+}
 .card_profile {
     margin: 50px;
     padding: 20px;
@@ -308,8 +317,29 @@ input{
 
 .Footer {
     background: #496375;
-    padding: 2rem 110px;
+    padding: 2rem 40px;
+    width: 100%;
     text-align: left;
+}
+.student_tabs {
+    padding: 40px;
+}
+.student_tabs .left_tab .line{
+    height: 3px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    background: #000;
+    width: 100%;
+}
+.student_tabs .left_tab .what_student {
+    font-size: 24px;
+}
+
+.student_tabs .left_tab .what_student .lower{
+    font-weight: 600;
+}
+li {
+    list-style: none;
 }
 .left_wrapper {
     color: #FFFF;
@@ -385,3 +415,39 @@ input{
                         color: white;
                         text-decoration: none;
                     }
+
+@media (max-width: 600px){
+    .left_wrapper {
+        width: 100%;
+    }
+    .Footer .right_wrapper {
+        padding: 0px;
+        width: 100%;
+    }
+    .ask_question h2{
+        font-size: 20px;
+    }
+    .bolo_user_tab {
+        padding: 10px;
+    }
+    .card_profile {
+        margin: 10px;
+    }
+    .info {
+        margin-top: 10px;
+    }
+    .login_card {
+        margin: 20px;
+        width: 80%;
+        padding: 10px;
+        margin-left: 10% !important; 
+    }
+    .bolo_user_count_tab {
+        font-size: 15px;
+        padding: 10px;
+    }
+    .bolo_user {
+        font-size: 24px;
+    }
+
+}

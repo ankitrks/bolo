@@ -82,7 +82,6 @@ def register(request, registration_form=RegistrationForm):
 
     return render(request, 'spirit/user/auth/register.html', context)
 
-
 def registration_activation(request, pk, token):
     user = get_object_or_404(User, pk=pk)
     activation = UserActivationTokenGenerator()
