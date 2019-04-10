@@ -55,45 +55,6 @@
                 unread: "{% trans "unread" %}",
             } );
         {% endif %}
-
-         var owl = $('.owl-carousel');
-  owl.owlCarousel({
-    loop:true,
-    margin:10,
-    nav:true,
-    dots:true,
-    items:1,
-    video:true,
-    lazyLoad:true,
-    center:false,
-    navText: [
-        "<i class='fa fa-chevron-left'></i>",
-        "<i class='fa fa-chevron-right'></i>"
-     ],
-    // responsive:{
-    //     480:{
-    //         items:1
-    //     },
-    //     600:{
-    //         items:1
-    //     }
-    // }
-  })
-  // }
-
-
-function isMobile(width) {
-	if(width == undefined){
-		width = 719;
-	}
-	if(window.innerWidth <= width) {
-		return true;
-	} else {
-		return false;
-	}
-}
-})
-
 	</script>
 
     {% block head-extra %}{% endblock %}

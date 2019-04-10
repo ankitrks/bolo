@@ -415,7 +415,14 @@ li {
                         color: white;
                         text-decoration: none;
                     }
-
+.user_info_inside_tab img {
+    height: 139px;
+    width: 139px;
+}
+.student_tabs video {
+    height: 240px;
+    width: 400px;
+}
 @media (max-width: 600px){
     .left_wrapper {
         width: 100%;
