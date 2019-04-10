@@ -4,7 +4,7 @@
 
         {% for c in comments %}
 
-            <div class="comment">
+            <!-- <div class="comment">
 
                 <div class="comment-media">
                     <div class="comment-img">
@@ -19,8 +19,8 @@
                             </div>
 
                             <ul class="comment-date">
-                                <li><a href="{{ c.get_absolute_url }}"><i class="fa fa-comments"></i> {{ c.topic.title }}</a></li><!--
-			                 --><li title="{{ c.date }}">{{ c.date|shortnaturaltime }}</li>
+                                <li><a href="{{ c.get_absolute_url }}"><i class="fa fa-comments"></i> {{ c.topic.title }}</a></li>
+			                 <li title="{{ c.date }}">{{ c.date|shortnaturaltime }}</li>
                             </ul>
 
                         </div>
@@ -29,6 +29,42 @@
                             {% post_render_comment comment=c %}
                         </div>
                     </div>
+                </div>
+            </div> -->
+            <style>
+                .comment-avatar{
+                    border-radius: 50%;
+                    width: 30px;
+                    margin-right: 10px;
+                    height: 30px;
+                }
+                .topic{
+                    margin-bottom: 5px;
+                    font-size: 20px;
+                }
+            </style>
+
+            <div class="row m-0 user_ans">
+
+                <div class="col-lg-12 col-md-12 col-sm-12">
+                    Q. <a href="{{ c.get_absolute_url }}" class="topic">{{ c.topic.title }}</a>
+                </div>    
+                <div class="col-lg-12 col-md-12 col-sm-12 row m-0">
+                    <img class="comment-avatar" src="{% get_gravatar_url user=c.user size=50 %}" />
+                    <div class="comment-username">
+                            <a href="{{ c.user.st.get_absolute_url }}">{{ c.user.username }} {{ c.date|shortnaturaltime }} ago</a>
+                    </div>
+                </div>    
+
+                <div class="col-lg-12 col-md-12 col-sm-12">
+                    {% if not c.is_media %}
+                    <div class="comment-date">
+                        <div><i class="fa fa-comments"></i>{{ c.comment }}</div>
+                       
+                    </div>
+                    {% else %}
+                        <div><video controls muted><source src="{{ c.comment }}" type="video/mp4"></video></li>
+                    {% endif %}
                 </div>
             </div>
 

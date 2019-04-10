@@ -1,11 +1,13 @@
 {% load spirit_tags i18n %}
-    
+
+{% block content %}
+
     <main role="main">   
         <!-- user info sec -->
         <div class="user_profile_sec">
                 <div class="row">
                   <div class="col-sm-2"></div>
-                  <div class="col-sm-8 profile_mid_sec">
+                  <div class="col-sm-8 profile_mid_sec" style="margin-top: 30px;">
                         <div class="row">
                             <div class="col-md-3 left_wrapper">
                                 <!-- User profile image -->
@@ -46,42 +48,61 @@
 
         <!-- user question and answer section -->
         <div class="user_profile_ans">
+                <style>
+                    a.active {
+                        background: #dc3545;
+                        color: white !important;
+                        border-radius: 4px;
+                    }
+                </style>
                 <div class="row">
                     <div class="col-sm-2"></div>
                     <div class="col-sm-8 tab_area">
                         <!-- Question answer tab -->
                         <ul class="nav nav-pills">
-                            <li class="active"><a data-toggle="pill" href="#home">answer</a></li>
-                            <li><a data-toggle="pill" href="#menu1">questions</a></li>
-                            <li><a data-toggle="pill" href="#menu2">blog</a></li>
-                            <li><a data-toggle="pill" href="#menu3">answer</a></li>
-                            <li><a data-toggle="pill" href="#menu3">answer</a></li>
-                            <li><a data-toggle="pill" href="#menu3">answer</a></li>
-                            <li><a data-toggle="pill" href="#menu3">answer</a></li>
+                            <li><a data-toggle="pill" class="active" href="#Topics" style="color:inherit;text-decoration:none;">Topics</a></li>
+                            <li><a data-toggle="pill" href="#Answers" style="color:inherit;text-decoration:none;">Answers</a></li>
+                            <li><a data-toggle="pill" href="#Likes" style="color:inherit;text-decoration:none;">Likes</a></li>
                         </ul>
                         
                         <div class="tab-content">
-                            <div id="home" class="tab-pane fade in active">
-                                <h3>HOME</h3>
-                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                            <div id="Topics" class="tab-pane fade in active show">
+                                <div class="qa_sec">
+                                    <div class="mid_sec">
+                                            {% include "spirit/topic/_single_topic.html" with topics=p_user.st_topics.all %}
+                                    </div>
+                                </div>
                             </div>
-                            <div id="menu1" class="tab-pane fade">
-                                <h3>Menu 1</h3>
-                                <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                            <div id="Answers" class="tab-pane fade">
+                                 {% include "spirit/user/_render_comments_list.html" %}
                             </div>
-                            <div id="menu2" class="tab-pane fade">
-                                <h3>Menu 2</h3>
-                                <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.</p>
+                            <div id="Likes" class="tab-pane fade">
+                                <p>You Dont Have Likes Any Comment</p>
                             </div>
-                            <div id="menu3" class="tab-pane fade">
-                                <h3>Menu 3</h3>
-                                <p>Eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
-                            </div>
+                            
                         </div>
                     </div>
                     <div class="col-sm-2"></div>
+
                 </div>
             </div>
         
 
     </main><!-- /.container -->
+    <script>
+
+        $('#Topics').click(function(){
+            $('#Topics').addClass('in active');
+            $('#Answers').removeClass('in active');
+            $('#Likes').removeClass('in active');
+        });
+
+        $('#Topics').click(function(){
+            $('#Topics').addClass('in active');
+            $('#Answers').removeClass('in active');
+            $('#Likes').removeClass('in active');
+        });
+
+    </script>
+
+{% endblock %}

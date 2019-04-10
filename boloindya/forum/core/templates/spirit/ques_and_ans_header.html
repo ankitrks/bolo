@@ -35,13 +35,22 @@
                         <!-- <li class="nav-item">
                             <a class=""  href="/topic/discussion/" >Q/A</a>
                         </li> -->
+
+                        <style>
+
+                            .dropdown-item.selected{
+                                background: #1989cd !important;
+                            }
+
+                        </style>
+
                         <li class="nav-item dropdown" style="margin-right: 20px;">
                             <a href="" class="lang_link">Change Language </a>
                             <ul class="sub-menu list-unstyled">
-                                <li><a href="/topic/discussion/?lid=1" class="dropdown-item">English</a></li>
-                                <li><a href="/topic/discussion/?lid=2" class="dropdown-item">Hindi</a></li>
-                                <li><a href="/topic/discussion/?lid=3" class="dropdown-item">Tamil</a></li>
-                                <li><a href="/topic/discussion/?lid=4" class="dropdown-item">Telugu</a></li>
+                                <li><a href="/topic/discussion/?lid=1" class="dropdown-item {% if lid == '1' %} selected {% endif %} ">English</a></li>
+                                <li><a href="/topic/discussion/?lid=2" class="dropdown-item {% if lid == '2' %} selected {% endif %}">Hindi</a></li>
+                                <li><a href="/topic/discussion/?lid=3" class="dropdown-item {% if lid == '3' %} selected {% endif %}">Tamil</a></li>
+                                <li><a href="/topic/discussion/?lid=4" class="dropdown-item {% if lid == '4' %} selected {% endif %}">Telugu</a></li>
                             </ul>
                         </li>
                          {% if user.is_authenticated %}

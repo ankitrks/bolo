@@ -26,26 +26,26 @@ User = get_user_model()
 
 @login_required
 def update(request):
-    return HttpResponseRedirect('/topic/discussion/')
-    # if request.method == 'POST':
-    #     uform = UserForm(data=request.POST, instance=request.user)
-    #     form = UserProfileForm(data=request.POST, instance=request.user.st)
+    # return HttpResponseRedirect('/topic/discussion/')
+    if request.method == 'POST':
+        uform = UserForm(data=request.POST, instance=request.user)
+        form = UserProfileForm(data=request.POST, instance=request.user.st)
 
-    #     if all([uform.is_valid(), form.is_valid()]):  # TODO: test!
-    #         uform.save()
-    #         form.save()
-    #         messages.info(request, _("Your profile has been updated!"))
-    #         return redirect(reverse('spirit:user:update'))
-    # else:
-    #     uform = UserForm(instance=request.user)
-    #     form = UserProfileForm(instance=request.user.st)
+        if all([uform.is_valid(), form.is_valid()]):  # TODO: test!
+            uform.save()
+            form.save()
+            messages.info(request, _("Your profile has been updated!"))
+            return redirect(reverse('spirit:user:update'))
+    else:
+        uform = UserForm(instance=request.user)
+        form = UserProfileForm(instance=request.user.st)
 
-    # context = {
-    #     'form': form,
-    #     'uform': uform
-    # }
+    context = {
+        'form': form,
+        'uform': uform
+    }
 
-    # return render(request, 'spirit/user/profile_update.html', context)
+    return render(request, 'spirit/user/profile_update.html', context)
 
 
 @login_required
@@ -152,7 +152,7 @@ def comments(request, pk, slug):
     return _activity(
         request, pk, slug,
         queryset=user_comments,
-        template='spirit/user/profile_comments.html',
+        template='spirit/user/_user_profile_comments.html',
         reverse_to='spirit:user:detail',
         context_name='comments',
         per_page=settings.COMMENTS_PER_PAGE,

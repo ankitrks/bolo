@@ -13,10 +13,10 @@
         <div class="col-lg-6 col-md-6 col-sm-12" style="background: #F1F0F0;">
             <div class="card_profile">
                 <div class="row m-0">
-                    <div class="user_img col-lg-4 col-md-4">
+                    <div class="user_img col-lg-4 col-md-4 col-xs-4">
                         <img src="/media/img/preeti.png" alt="">
                     </div>
-                    <div class="col-md-8 col-lg-8">
+                    <div class="col-md-8 col-lg-8 col-xs-8">
                         <div class="info">
                             Mere 21.5k followers dekh k Bolo Indya pe mere aas pass office k log khud mujhse coffee ke time Economy aur Politics pe baat karne aate hai aur mere diye hue answers pe aur discussion karte hai
                         </div>
@@ -46,15 +46,22 @@
                         Get Your <span style="color: #CA3B3D;">Bolo ID</span>
                         <img src="/media/img/card.png" alt="image" style="float: right;">
                 </div>
-                <form action="" class="col-md-12 col-lg-12">
-                    <input type="text" name="name" placeholder="Full Name" required />
-                    <input type="text" name="phone" placeholder="+91 Contact Number" required />
-                    <input type="email" name="email" placeholder="Enter Email" required />
-                    <button class="get_id">Get ID</button>
+                <form action="/user/register/" class="col-md-12 col-lg-12" method="POST">
+                    {% csrf_token %}
+                    <input type="text" name="username" id="id_username" max-length="150" placeholder="Full Name" required />
+                    <input type="email" name="email" placeholder="Enter Email" id="id_email" max-length="254" required />
+                    <input type="email" name="email2" maxlength="254" required="" id="id_email2" hidden>
+                    <input type="password" name="password" placeholder="Enter Password" required id="id_password"/>
+                    <input class="button" type="submit" name="post" value="Get ID">
                 </form>
             </div>
         </div>
     </div>
+    <script>
+        $('#id_email').change(function(){
+            $('#id_email2').val($('#id_email').val());
+        })
+    </script>
     <div class="bolo_user_tab row m-0">
         <div class="col-md-12 col-lg-12 col-sm-12">
             <h2 class="bolo_user">STAR Bolo Indya Users</h2>
@@ -62,10 +69,10 @@
         <div class="col-md-12 col-lg-12 col-sm-12 row m-0">
             <div class="col-md-4 col-lg-4 col-sm-12">
                 <div class="user_info_inside_tab">
-                    <img src="/media/img/preeti.png" alt="">
-                    <h4 class="name">Preeti Nigam</h4>
+                    <img src="/media/img/rah.jpg" alt="">
+                    <h4 class="name">Rahul Kumar</h4>
                     <div class="address">From Purnia, Bihar</div>
-                    <div class="user_about">Working in a small services company at Patna, Bihar. Contributes both Videos and answers in Hindi at Bolo Indya</div>
+                    <div class="user_about">Education: B.Com, Working as a sales representative at INR 22,000 salary in a pharmaceutical company in Gorakhpur</div>
                 </div>
             </div>
             <div class="col-md-4 col-lg-4 col-sm-12">
@@ -79,17 +86,17 @@
             </div>
             <div class="col-md-4 col-lg-4 col-sm-12">
                     <div class="user_info_inside_tab">
-                            <img src="/media/img/preeti.png" alt="">
-                            <h4 class="name">Preeti Nigam</h4>
+                            <img src="/media/img/m.png" alt="">
+                            <h4 class="name">Mohammad Neesam</h4>
                             <div class="address">From Purnia, Bihar</div>
-                            <div class="user_about">Working in a small services company at Patna, Bihar. Contributes both Videos and answers in Hindi at Bolo Indya</div>
+                            <div class="user_about">Education: B.A, Working as technician at INR 21,000 salary in a factory at Hyderabad</div>
                         
                         </div>
             </div>
         </div>
     </div>
     <div class="bolo_user_count_tabs row m-0">
-            <div class="col-md-4 col-lg-4 col-sm-12 bolo_user_count_tab">
+            <div class="col-4 col-md-4 col-lg-4 bolo_user_count_tab">
                 <div class="counter">
                     400+
                 </div>
@@ -97,20 +104,20 @@
                     Hours of content consumed
                 </div>
             </div>
-            <div class="col-md-4 col-lg-4 col-sm-12 bolo_user_count_tab">
+            <div class="col-md-4 col-lg-4 col-4 bolo_user_count_tab">
                     <div class="counter">
-                            400+
+                            1000+
                         </div>
                         <div class="hours">
-                            Hours of content consumed
+                            Videos Contributed
                         </div>
             </div>
-            <div class="col-md-4 col-lg-4 col-sm-12 bolo_user_count_tab">
+            <div class="col-md-4 col-lg-4 col-4 bolo_user_count_tab">
                     <div class="counter">
-                            400+
+                            6.5 lakh+
                         </div>
                         <div class="hours">
-                            Hours of content consumed
+                            Happy Users
                         </div>
             </div>
     </div>
@@ -123,6 +130,33 @@
             <img src="/media/img/app_image.svg" alt="" height="40px">
         </div> 
     </div>
+    <div class="student_tabs row m-0">
+        <div class="left_tab col-md-3 col-12">
+            <div class="line"></div>
+            <div class="what_student">
+                <div class="upper">
+                    What Users Says
+                </div>
+                <div class="lower">
+                    About Us.
+                </div>
+            </div>
+        </div>
+        <div class="owl-carousel owl-theme col-md-9 col-12">
+                <div class="item">
+                    <video controls="" autoplay="false" name="media"><source type="video/mp4" src="https://s3.amazonaws.com/careeranna/Mownika_telugu.mp4"></video>
+                </div>  
+                <div class="item">
+                    <video controls="" autoplay="false" name="media"><source type="video/mp4" src="https://s3.amazonaws.com/careeranna/Mownika_telugu.mp4"></video>
+                </div>  
+                <div class="item">
+                    <video controls="" autoplay="false" name="media"><source type="video/mp4" src="https://s3.amazonaws.com/careeranna/Mownika_telugu.mp4"></video>
+                </div>  
+                <div class="item">
+                    <video controls="" autoplay="false" name="media"><source type="video/mp4" src="https://s3.amazonaws.com/careeranna/Mownika_telugu.mp4"></video>
+                </div> 
+        </div>
+    </div>
     <div class="Footer">
     <div class="row px-0">
     <div class="left_wrapper">
@@ -134,12 +168,13 @@
     <li><a href="https://www.instagram.com/careeranna"><i class="fab fa-instagram"></i></a></li>
     <li><a href="https://twitter.com/CareerAnna"><i class="fab fa-twitter"></i></a></li>
     <li><a href="https://www.youtube.com/channel/UCZmLZ68KNZotm3BxkGsuU4g"><i class="fab fa-youtube"></i></a></li>
-    </ul><form><div class="heading">Subscribe to the newsletter</div>
+    </ul>
+    {% comment %} <form><div class="heading">Subscribe to the newsletter</div>
     <div class="row px-0">
     <input type="email" name="email" id="email" autocomplete="off" placeholder="Enter Your Email">
     <input type="submit" class="submit" value="Subscribe">
     </div>
-    </form>
+    </form> {% endcomment %}
     </div>
     <div class="right_wrapper">
     <div class="row px-0">
@@ -167,5 +202,32 @@
     <li><a id="ga-2dc1d0" href="https://www.careeranna.com/about">About Us</a></li>
     <li><a id="ga-2dc1d0" href="https://www.careeranna.com/contact">Contact Us</a></li>
     <li><a id="ga-2dc1d0" href="https://www.careeranna.com/terms-of-service">Terms of Service</a></li></ul></div></div></div></div></div>
+
+    <script>
+    
+    $('.owl-carousel').owlCarousel({
+    loop:true,
+    margin:10,
+    nav:true,
+    dots:true,
+    items:2,
+    video:true,
+    lazyLoad:true,
+    center:false,
+    navText: [
+        "<i class='fa fa-chevron-left'></i>",
+        "<i class='fa fa-chevron-right'></i>"
+     ],
+    // responsive:{
+    //     480:{
+    //         items:1
+    //     },
+    //     600:{
+    //         items:1
+    //     }
+    // }
+  });
+
+    </script>
 
 {% endblock %}
