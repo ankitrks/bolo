@@ -6,11 +6,14 @@
 
 {% block head-extra %}
     <script>
-
+    function showtextfields(){
+        $('[for="id_title"], #id_title').show();
+    }
+    function hidetextfields(){
+        $('[for="id_title"], #id_title').hide();
+    }
 	$( document ).ready(function() {
-
 		$( "textarea" ).store( "topic_publish_comment" );
-
 	});
 
 	</script>
@@ -23,8 +26,10 @@
 <script src="https://cdn.webrtc-experiment.com/RecordRTC.js"></script>
 <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
 <style>
+    [for="id_title"], #id_title{display: none;}
     label[for="id_comment"]{display: none;}
     #id_comment{height: 130px;}
+    [for="id_title"]{margin-top: 10px;}
 
     h2 {
     left: 100px;
@@ -89,16 +94,20 @@
             {% csrf_token %}
     
             {# topic #}
+            <div>
+                <a href="javascript:void()" class="btn btn-danger" onclick="hidetextfields()" data-toggle="modal" data-target="#myModalAudio"> <i class="fa fa-microphone marginRight10" aria-hidden="true"></i>
+               Ask in Audio
+                </a>
+                <a href="javascript:void()" class="btn btn-danger" onclick="hidetextfields()" data-toggle="modal" data-target="#myModalVideo"><i class="fa fa-video-camera marginRight10" aria-hidden="true"></i>
+                    Ask in Video
+                </a>
+                <a href="#" class="btn btn-danger ask_text" onclick="showtextfields()"><i class="fa fa-edit marginRight10"></i>
+                    <span style="color: #fff">Ask in Text</span>
+                </a>
+            </div>
             {% include "spirit/_form.html" %}
-    
-            <a href="javascript:void()" class="btn btn-danger" data-toggle="modal" data-target="#myModalAudio"> <i class="fa fa-microphone marginRight10" aria-hidden="true"></i>
-               Question in Audio
-              </a>
-
-            <a href="javascript:void()" class="btn btn-danger" data-toggle="modal" data-target="#myModalVideo"><i class="fa fa-video-camera marginRight10" aria-hidden="true"></i>
-                Question in Video
-              </a>
-            <hr>
+            <input type="hidden" name="question_audio" value="">
+            <input type="hidden" name="question_video" value=""> 
             {# comment #}
             <div class="topic-publish-comment">
                 {% include "spirit/_form.html" with form=cform %}
@@ -127,7 +136,7 @@
               
                 <!-- Modal Header -->
                 <div class="modal-header">
-                  <h4 class="modal-title">Modal Heading</h4>
+                  <h4 class="modal-title">Ask Question [Audio]</h4>
                   <button type="button" class="close btnCloseAudio" data-dismiss="modal">&times;</button>
                 </div>
                 
@@ -137,9 +146,7 @@
                     <button class="btn btn-danger" id="btn-stop-recording" disabled><i class="fa fa-microphone-slash" aria-hidden="true"></i> Stop Recording</button>
                     <button class="hide" id="btn-release-microphone" disabled>Release Microphone</button>
                     <button class="hide" id="btn-download-recording" disabled>Download</button>
-                    <div><audio controls autoplay playsinline></audio></div>
-
-
+                    <div style="margin-top: 10px;"><audio controls autoplay playsinline></audio></div>
 
                     <script>
 
@@ -380,12 +387,13 @@
                                   xhr.onload = function (e) {
                                   if (xhr.readyState === 4) {
                                       if (xhr.status === 200) {
-                                          console.log("success");
-                                          console.log(xhr.responseText);
-                                          $("#id_comment").html(xhr.responseText);
+                                          // console.log("success");
+                                          // console.log(xhr.responseText);
+                                          $('[name="question_audio"]').val(xhr.responseText);
                                           $('#btnPublish').show();
                                           $('.record_info').html('');
                                           //$('#myModalAudio').modal('toggle');
+                                          $('.modal-backdrop').hide();
                                           $('.btnCloseAudio').click();
                                           
                                       } else {
@@ -412,11 +420,13 @@
                                       xhr.onload = function (e) {
                                       if (xhr.readyState === 4) {
                                           if (xhr.status === 200) {
-                                              console.log("success");
-                                              console.log(xhr.responseText);
-                                              $("#id_comment").html(xhr.responseText);
+                                              // console.log("success");
+                                              // console.log(xhr.responseText);
+                                              // $("#id_comment").html(xhr.responseText);
+                                              $('[name="question_audio"]').val(xhr.responseText);
                                               $('#btnPublish').show();
                                               $('.record_info').html('');
+                                              $('.modal-backdrop').hide();
                                               //$('#myModalAudio').modal('toggle');
                                               $('.btnCloseAudio').click();
                                               
@@ -442,9 +452,9 @@
                 </div>
                 
                 <!-- Modal footer -->
-                <div class="modal-footer">
+                <!-- <div class="modal-footer">
                   <button type="button" class="btn btn-danger btnCloseAudio" data-dismiss="modal">Close</button>
-                </div>
+                </div> -->
                 
               </div>
             </div>
@@ -468,7 +478,7 @@
           
             <!-- Modal Header -->
             <div class="modal-header">
-              <h4 class="modal-title">Modal Heading</h4>
+              <h4 class="modal-title">Ask Question [Video]</h4>
               <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             
@@ -480,18 +490,17 @@
                             <button class="btn btn-danger" id="recordVid"><i class="fa fa-video-camera marginRight10" aria-hidden="true"></i>Start Recording</button>
                             <button class="btn btn-danger hide" id="play" disabled><i class="fa fa-play marginRight10" aria-hidden="true"></i>Play</button>
                             <button id="download" disabled hidden>Download</button>
-                            <a href="/topic/discussion/" class="btn btn-danger cnlRight colorCHange">Cancel</a>
+                            <!-- <a href="/topic/discussion/" class="btn btn-danger cnlRight colorCHange">Cancel</a> -->
                           </div>
                         <script>
-
-                                navigator.mediaDevices.getUserMedia({
-                                    audio: isEdge ? true : {
-                                        echoCancellation: false
-                                    }
-                                }).catch(function(error) {
-                                    alert('Unable to capture your microphone. Please check console logs.');
-                                    console.error(error);
-                                });
+                            navigator.mediaDevices.getUserMedia({
+                                audio: isEdge ? true : {
+                                    echoCancellation: false
+                                }
+                            }).catch(function(error) {
+                                alert('Unable to capture your microphone. Please check console logs.');
+                                console.error(error);
+                            });
 
                             var mediaSource = new MediaSource();
                             mediaSource.addEventListener('sourceopen', handleSourceOpen, false);
@@ -507,7 +516,7 @@
                             playButton.onclick = play;
                             downloadButton.onclick = download;
                             var constraints = {
-                              audio: false,
+                              audio: true,
                               video: true
                             };
 
@@ -517,8 +526,6 @@
                                   alert('Unable to capture your microphone. Please check console logs.');
                                   console.error(error);
                               });
-
-
 
                             function successCallback(stream) {
                               console.log('getUserMedia() got stream: ', stream);
@@ -592,7 +599,6 @@
                               console.log('Recorded Blobs: ', recordedBlobs);
                             var blob = new Blob(recordedBlobs, {type: 'video/webm'});
                               //postVideoToServer(recordedBlobs);
-                              
                               recordedVideo.controls = true;
                               sendVideoData(blob);
                             }
@@ -608,11 +614,13 @@
                                 xhr.onload = function (e) {
                                 if (xhr.readyState === 4) {
                                     if (xhr.status === 200) {
-                                        console.log("success");
-                                        console.log(xhr.responseText);
-                                        $("#id_comment").html(xhr.responseText);
+                                        // console.log("success");
+                                        // console.log(xhr.responseText);
+                                        // $("#id_comment").html(xhr.responseText);
+                                        $('[name="question_video"]').val(xhr.responseText);
                                         $('#btnPublish').show()
                                         $('.record_info').html('')
+                                        $('.modal-backdrop, #myModalVideo').hide();
                                     } else {
                                       console.error(xhr.statusText);
                                     }
@@ -631,9 +639,9 @@
             </div>
             
             <!-- Modal footer -->
-            <div class="modal-footer">
+            <!-- <div class="modal-footer">
               <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-            </div>
+            </div> -->
             
           </div>
         </div>

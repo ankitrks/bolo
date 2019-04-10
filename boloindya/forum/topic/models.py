@@ -28,7 +28,9 @@ class Topic(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='st_topics')
     category = models.ForeignKey('forum_category.Category', verbose_name=_("category"), related_name="category_topics")
 
-    title = models.CharField(_("title"), max_length=255)
+    title = models.CharField(_("title"), max_length=255, blank = True, null = True)
+    question_audio = models.CharField(_("audio title"), max_length=255, blank = True, null = True)
+    question_video = models.CharField(_("video title"), max_length=255, blank = True, null = True)
     slug = AutoSlugField(populate_from="title", db_index=False, blank=True)
     date = models.DateTimeField(_("date"), default=timezone.now)
     last_active = models.DateTimeField(_("last active"), default=timezone.now)

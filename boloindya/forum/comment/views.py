@@ -30,7 +30,6 @@ def publish(request, topic_id, pk=None, type=None):
         pk=topic_id)
 
     if request.method == 'POST':
-        print(request.POST)
         form = CommentForm(user=user, topic=topic, data=request.POST)
 
         if not request.is_limited() and form.is_valid():
