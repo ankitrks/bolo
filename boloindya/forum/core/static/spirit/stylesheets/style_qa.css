@@ -104,6 +104,11 @@ a,a:hover,a:active,a:visited{text-decoration:none;color: inherit; }
     border-radius: 5px;
     margin-bottom: 10px;
 }
+.inner_head{
+    background: #bb3335 !important;
+    color: #fff !important; 
+}
+
 .qa_sec .left_sec #accordion{
     background: #fff;
     padding: 7px;
