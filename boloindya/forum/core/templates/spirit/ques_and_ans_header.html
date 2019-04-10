@@ -1,5 +1,18 @@
 {% load spirit_tags i18n %}
-
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('.perform_search').click(function(){
+            window.location = '/topic/search/?q=' + $('[name="search"]').val();
+        });
+        $('[name="search"]').keypress(function (e) {
+            var key = e.which;
+            if(key == 13){
+                $('.perform_search').click();
+                return false;  
+            }
+        }); 
+    });
+</script>
 <header>
         <nav class="navbar navbar-light  navbar-expand-md">
                 <a class="navbar-brand" href="/" title="Bolo Indiya">
@@ -12,6 +25,10 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                     
                     <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <input type="text" name="search" value="" placeHolder="Search" style="height: 34px;width: 150px;font-size: 12px;margin-right: 10px;position: relative;top: -4px;">
+                            <a href="#" class="perform_search" style="color:grey;position: relative;margin-left: -39px;left: -8px;top: -2px;border-left: 1px solid #cecece;"><i class="fa fa-search"></i></a>
+                        </li>
                         <li class="nav-item">
                             <a class="videoBtn"  href="/videos/" >Videos</a>
                         </li>

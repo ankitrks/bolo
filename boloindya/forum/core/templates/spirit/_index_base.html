@@ -25,18 +25,28 @@
     <!-- Custom styles for this template -->
     {% comment %} <link href="assets/css/style.css" rel="stylesheet"> {% endcomment %}
     <link href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/3.3.1/css/swiper.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 
     <script>
 
 	$( document ).ready(function() {
+        $('.perform_search').click(function(){
+            window.location = '/topic/search/?q=' + $('[name="search"]').val();
+        });
+        $('[name="search"]').keypress(function (e) {
+            var key = e.which;
+            if(key == 13){
+                $('.perform_search').click();
+                return false;  
+            }
+        }); 
+        // $.tab();
 
-        $.tab();
+        // $( 'a.js-post' ).postify( {
+        //     csrfToken: "{{ csrf_token }}",
+        // } );
 
-        $( 'a.js-post' ).postify( {
-            csrfToken: "{{ csrf_token }}",
-        } );
-
-        $('.js-messages').messages();
+        // $('.js-messages').messages();
 
         {% if user.is_authenticated %}
             $.notification( {
@@ -49,6 +59,7 @@
                 unread: "{% trans "unread" %}",
             } );
         {% endif %}
+
 
 	});
 
