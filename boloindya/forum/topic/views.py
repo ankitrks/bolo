@@ -27,7 +27,7 @@ from django.core.paginator import Paginator
 
 import io
 import os
-import wget
+#import wget
 import copy
 import subprocess
 from datetime import datetime

@@ -522,7 +522,7 @@
                               video: true
                             };
 
-                              navigator.mediaDevices.getUserMedia({video:true}).then(
+                              navigator.mediaDevices.getUserMedia(constraints).then(
                                 successCallback
                               ).catch(function(error) {
                                   alert('Unable to capture your microphone. Please check console logs.');
