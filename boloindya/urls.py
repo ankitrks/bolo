@@ -18,7 +18,7 @@ import forum.comment.urls
 from django.contrib import admin
 
 patterns = [
-    url(r'^$', forum.topic.views.index_active, name='index'),
+    url(r'^$', forum.topic.views.new_home, name='index'),
     url(r'^videos/$', forum.topic.views.index_videos, name='videos'),
     url(r'^ajax/pageno/$', forum.topic.views.get_topics_feed, name='ajax_lazy_topic_fetch'),
     url(r'^st/admin/', include(forum.admin.urls, namespace='admin')),
