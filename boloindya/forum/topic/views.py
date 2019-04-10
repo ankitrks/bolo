@@ -35,9 +35,6 @@ from google.cloud import speech
 from google.cloud.speech import enums
 from google.cloud.speech import types
 def convert_speech_to_text(blob_url):
-    import os
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/live_code/careerAnna/cred.json"
-    
     fname = datetime.now().strftime('%s')
     wget_command = "python -m wget -o /tmp/" + fname + " " + blob_url
     subprocess.call(wget_command, shell=True)

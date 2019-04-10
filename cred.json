@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "carerranna",
+  "private_key_id": "be03e271288f9d8dab94f65b52bbdaa2726b3a0f",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCmkm4CdGczujKR\nHCLyceHMM9zdtq1MXGBrjFiie7SFLg62mxgACiWr4Bulcqk7FrXNGoj8URaiGq6D\nvK2iKsSZL33UHejdcrdWFCuFDpw9JyIMQpjSlaNe+uaOBdGWl5zhc0uW56HuCUSG\nM03LRadwJtI2R7ju9Xgh5E7RNE6MOQf37DSYUNuzCu1JOSbmvOwZ2CeKfmSFjV+V\neVQpMVCkLG5LCNK1/Ma3ji/Bg4WBnRuqY0tZfF47ri6sfiNnxs1iNr1TksDMONCS\n5spJLOwHsEANwSdOrp0+kSvXcVmLqpyholixWm6OMqEtPszob11ZJvwR6YExb4bI\ntUPXfHnHAgMBAAECggEAUWHefLWJjJTOyuX/zwtD4iR+pxZu8g16EGGoFm6xIpZ/\nmskIv1A12pUqfLmaJCPy3Aw4XGpzz+yQUg3XmZEir6Mr63xXfwZiu5wsLRyXyir5\n8BqDlvOEN84G4eHG5jgZ7m6JwmdWTrnZcGXVfth/t4RIFTwShzGIKarltUHElK4o\nd+1jJA2goJxlogUBY0COf4uNdEGgJS2W17zR3DT4Sox/78sj31NAfBT+UW48KlG+\ns0UFlyCXiJ3/hobg2ZlCFh4dM7Mz1Z96/m/EUnTTnCwli0YOQ2i3aot/qUphIEgu\n9VU0VwBkTyM8mvACEemq3FmQ8FqRnz3uPjygF9SfqQKBgQDaIHiRTfJr74yyLWjm\nd3/Eg/4hvWReBjEuqNK9h7y8YIby/TYJuy0Y3B/O25jWK4YxXOUX4Kujpi/4eg26\n4/BlA1w3mFLlpa6xUMr86kQF6ddnKLlqFxX5eTKrbQ1d0n3KAlJBqrXCrr79T2r+\nUo4ui8YWBiBKxk9MI92PE6Uu7wKBgQDDfmUndVxM6TW8s8y9E5ZRe6a1vlWCihuS\nAK1fGa3yvhXhm3iwzoZ2FZ+2lysVu8OnYR6GRK6BIRmFGcp3Y94+1TQxdM8i76qd\nBbMHK3Oxm8zdZH3kDcUYEvJRYcaGHyiRQg1owSbYdyeoDfgYx+hAmGQxvZTieJv4\nRFvDVBdiqQKBgHOgCslbfEni7b31fEnOxpexMCFKd82vkpqdOzjknxNsR5y+xMpb\nwggPh3zrwxSkdbns+DO0EMfq7DrW2DhdY6zoHxYJVMgPD49GuJNgyzYnQtuYJtEp\n86gOquFcKV22mp9eo6PTjg3o+6zjUGAH+v6JcTNzg+KfRKGj0Wpqi4FZAoGAFLm9\nt6U1l+HRlKPrPNBqy1C0p+f54NELgzsXJlHuoyGL6FM3RGdg0fwQ5qa4JqG1aHVf\naxS0+3Oq5PWLBYVM9pRb6DJeE3IdQHBuPoBYz6eY3I/e2OKs1pSLpB0dkvKStnOu\nQEDaAXEAf0yb1OS8trxxQuS6eBgZUQTORbMQl6ECgYBhzNNHO82/JREGxjn2Yur4\nUgWLEBrPNIuj7l23mvvvrJ6c56Od33kjQHFvqUyd9hB0LmVqcOLdDItGGv3v5SIV\nU10DpnQLp0iBIkz0rBs1p4aMvbdgTZ0iTw5aNjRuiZxmqgDjAzlOkO1KR5uPtpxY\nTt2A7bdqcEuQ2XALV8xrqA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "speech-recog@carerranna.iam.gserviceaccount.com",
+  "client_id": "103869480172664889227",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/speech-recog%40carerranna.iam.gserviceaccount.com"
+}
