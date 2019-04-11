@@ -2,13 +2,8 @@ User-agent: *
 Disallow:
  
 # too many repeated hits, too quick
-User-agent: litefinder
+User-agent: superman
 Disallow: /
- 
-# Yahoo. too many repeated hits, too quick
-User-agent: Slurp
-Disallow: /
- 
+  
 # too many repeated hits, too quick
-User-agent: Baidu
-Disallow: /
+Allow: /
