@@ -74,14 +74,14 @@
                                 </div>
                                 <!-- Question -->
                                 <div class="question"><a href="{% url 'spirit:topic:detail' topic.id %}" class="ques_link">{{ topic.title }}</a></div>
-                                {% if topic.question_audio.length > 0 %}
+                                {% if topic.question_audio %}
                                  <div id="ans_audio" data-videosrc="{{ topic.question_audio }}" style="width: 100%;">
                                             <audio controls style="width: 100%;">
                                             <source src="{{ topic.question_audio }}" type="audio/ogg" style="width: 100%;">  
                                             Your browser does not support the audio element.
                                 </audio>
                                 {% endif %}
-                                {% if topic.question_video.length > 0 %}
+                                {% if topic.question_video %}
                                     <video controls muted><source src="{{ video.question_video }}" type="video/mp4"></video>
                                 {% endif %}
                                 <!-- Answer options -->
@@ -115,7 +115,16 @@
                                                 {% if video.is_media and not video.is_audio %}
                                                     <div class="item" data-videosrc="{{ video.get_updated_url }}">
                                                         <div class="posted_by">
-                                                            Posted by {{ video.user.username }} <span>{{ video.date.date }}</span>
+                                                            Posted by {{ video.user.username }} <span>{{ video.date.date }}  &nbsp;</span>
+                                                            <span id="like_comment{{video.id}}" data_user='{% if user.username %}1{% else %}0{% endif %}' data_id="{{ video.id }}" onClick="changeLikeFunction({{ video.id }})" style="cursor:pointer;">
+                                                            <i class="fa fa-heart"></i>
+                                                            <span id="updated_like{{ video.id}}">{{ video.likes_count }}</span> likes
+                                                            </span> &nbsp;
+                                                            <span> <i class="fas fa-share-square"> Share On</i>
+                                                                <a target="blank" href="https://api.whatsapp.com/send?phone=+919741133224&text={{ topic.title }} https://www.boloindya.com/topic/{{topic.id}}/" data-action="share/whatsapp/share"><i class="fab fa-whatsapp-square"></i></a>
+
+                                                            <a href="https://www.facebook.com/sharer.php?u=https://www.boloindya.com/topic/{{topic.id}}&t={{ topic.title }}"><i class="fab fa-facebook-square"></i></a>
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 {% endif %}
@@ -367,6 +376,40 @@
 
 <script>
 
+    function changeLikeFunction(data_id) {
+        console.log($('#updated_like'+data_id).css('color'));
+
+        if($('#like_comment'+data_id).attr('data_user') == 0) {
+            alert('Login To Like');
+        } else {
+            if($('#updated_like'+data_id).css('color') == 'rgb(0, 149, 255)') {
+            alert('Already Liked');
+        } else {
+            $.ajax({
+                url: '/comment/update_like/',
+                data: {
+                'comment_id': data_id,
+                dataType: 'json',
+                success: function (data) {
+                    if(data == 'Already Liked') {
+                        alert('Already Liked')
+                        $('#like_comment'+data_id).css('color', '#0095ff')
+                        $('#updated_like'+data_id).css('color', '#0095ff')
+                    } else {
+                        var like = $('#updated_like'+data_id).text();
+                        $('#updated_like'+data_id).html(Number(like)+1+'');
+                        $('#updated_like'+data_id).trigger('create');
+                        $('#like_comment'+data_id).css('color', '#0095ff')
+                        $('#updated_like'+data_id).css('color', '#0095ff')
+                    }
+                }
+                }
+                }
+            );
+        }
+    }
+    }
+
      $("#load_more").click(function () {
       console.log('hiy')   
       var pageno = $('#pageno').val();
@@ -387,7 +430,7 @@
             $("#load_more").show();
            var owl = $('.owl-carousel');
   owl.owlCarousel({
-    loop:true,
+    loop:false,
     margin:10,
     nav:true,
     dots:true,

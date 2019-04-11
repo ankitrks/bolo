@@ -19,6 +19,8 @@ from django.contrib import admin
 
 patterns = [
     url(r'^$', forum.topic.views.new_home, name='index'),
+    url(r'^ajax/login/$', forum.user.auth.views.login_new_bolo_user, name='index_login_new_bolo_user'),
+    url(r'^ajax/verify_user/$', forum.user.auth.views.verify_user, name='index_login_new_bolo_user'),
     url(r'^videos/$', forum.topic.views.index_videos, name='videos'),
     url(r'^ajax/pageno/$', forum.topic.views.get_topics_feed, name='ajax_lazy_topic_fetch'),
     url(r'^st/admin/', include(forum.admin.urls, namespace='admin')),

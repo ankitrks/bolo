@@ -53,7 +53,7 @@
                                 <li><a href="/topic/discussion/?lid=4" class="dropdown-item {% if lid == '4' %} selected {% endif %}">Telugu</a></li>
                             </ul>
                         </li>
-                         {% if user.is_authenticated %}
+                        {% if user.username %}
                         <li class="nav-item dropdown">
                             <a href="" class="profile_link">{{ user.username }} </a>
                             <ul class="sub-menu list-unstyled">
@@ -61,6 +61,8 @@
                                 <li><a href="/user/logout/" class="dropdown-item">Logout</a></li>
                             </ul>
                         </li>
+                        {% else %}
+                            <li><a href="/user/login/?next=/user/login/%3Fnext%3D/st/admin/">Login</a></li>
                         {% endif %}
                     </ul>
                 </div>

@@ -27,7 +27,7 @@
     });
 
 //slider for top video answer    
-var owl = $('.owl-carousel');
+var owl = $('.owl-carousel1');
   owl.owlCarousel({
     loop:true,
     margin:10,

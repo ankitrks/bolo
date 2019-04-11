@@ -29,7 +29,7 @@
 //slider for top video answer    
 var owl = $('.owl-carousel');
   owl.owlCarousel({
-    loop:true,
+    loop:false,
     margin:10,
     nav:true,
     dots:true,

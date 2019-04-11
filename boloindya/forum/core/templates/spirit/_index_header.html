@@ -78,7 +78,22 @@
 }
 
 </style>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('.perform_search').click(function(){
+            window.location = '/topic/search/?q=' + $('[name="search"]').val();
+        });
+        $('[name="search"]').keypress(function (e) {
+            var key = e.which;
+            if(key == 13){
+                $('.perform_search').click();
+                return false;  
+            }
+        }); 
+    });
+</script>
 <nav class="navbar navbar-light  navbar-expand-md">
+        <div class="container">
             <a class="navbar-brand" href="/" title="Bolo Indiya">
                 <img src="/media/img/boloindya_logo.png" class="" style="width: 172px;height: 57px;" alt="Bolo Indiya Logo" />
             </a>
@@ -105,6 +120,8 @@
                             <li><a href="/topic/discussion/?lid=4" class="dropdown-item">Telugu</a></li>
                         </ul>
                     </li>
+
+                    {% if user.username %}
                     <li class="nav-item dropdown">
                         <a href="" class="nav-link profile_link">{{ user.username }}</a>
                         <ul class="sub-menu list-unstyled">
@@ -112,6 +129,10 @@
                             <li><a href="/user/logout/" class="dropdown-item">Logout</a></li>
                         </ul>
                     </li>
+                    {% else %}
+                        <li><a href="/user/login/?next=/user/login/%3Fnext%3D/st/admin/" class="dropdown-item">Login</a></li>
+                    {% endif %}
                 </ul>
             </div>
+        </div>
     </nav>
