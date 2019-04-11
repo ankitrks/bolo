@@ -19,7 +19,10 @@ from django.contrib import admin
 
 patterns = [
     url(r'^$', forum.topic.views.new_home, name='index'),
+    url(r'^robots.txt$', forum.topic.views.robotstext, name='roboxt'),
+    url(r'^sitemap.xml$', forum.topic.views.robotstext, name='sitemap'),
     url(r'^videos/$', forum.topic.views.index_videos, name='videos'),
+
     url(r'^ajax/pageno/$', forum.topic.views.get_topics_feed, name='ajax_lazy_topic_fetch'),
     url(r'^st/admin/', include(forum.admin.urls, namespace='admin')),
     url(r'^user/', include(forum.user.urls, namespace='user')),

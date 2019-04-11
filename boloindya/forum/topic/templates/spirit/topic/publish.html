@@ -210,7 +210,7 @@
                                 setTimeout(function() {
                                     if(!audio.paused) return;
                                     audio.play();
-                                }, 1000);
+                                }, 1024);
                                 
                                 audio.play();
                             }, 300);
@@ -281,7 +281,7 @@
                                 type: 'audio',
                                 numberOfAudioChannels: isEdge ? 1 : 2,
                                 checkForInactiveTracks: true,
-                                bufferSize: 16384
+                                bufferSize: 44100
                             };
 
                             if(isSafari || isEdge) {
@@ -565,14 +565,14 @@
                             }
                             // The nested try blocks will be simplified when Chrome 47 moves to Stable
                             function startRecordingVideo() {
-                              var options = {mimeType: 'video/webm', bitsPerSecond: 100000};
+                              var options = {mimeType: 'video/webm', bitsPerSecond: 1000000};
                               recordedBlobs = [];
                               try {
                                 mediaRecorder = new MediaRecorder(window.stream, options);
                               } catch (e0) {
                                 console.log('Unable to create MediaRecorder with options Object: ', e0);
                                 try {
-                                  options = {mimeType: 'video/webm,codecs=vp9', bitsPerSecond: 100000};
+                                  options = {mimeType: 'video/webm,codecs=vp9', bitsPerSecond: 1000000};
                                   mediaRecorder = new MediaRecorder(window.stream, options);
                                 } catch (e1) {
                                   console.log('Unable to create MediaRecorder with options Object: ', e1);

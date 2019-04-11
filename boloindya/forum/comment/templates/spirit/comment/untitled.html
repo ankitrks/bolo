@@ -40,7 +40,6 @@
                     </div>
                     <!-- Middle section for main content -->
                     <div class="col-md-6 mid_sec">
-                        {% if search_term %}<div class="inner_head">Search Results for <i>"<u>{{ search_term }}</u>"</i></div>{% endif %}
                         <!-- user information -->
                         {% if user.is_authenticated %}
                         <div class="user_info">
@@ -78,17 +77,8 @@
                                     </div>
                                 </div>
                                 <!-- Question -->
-                                <div class="question"><a href="{% url 'spirit:topic:detail' topic.id %}" class="ques_link">{{ topic.title|capfirst }}</a></div>
-                                {% if topic.question_audio.length > 0 %}
-                                 <div id="ans_audio" data-videosrc="{{ topic.question_audio }}" style="width: 100%;">
-                                            <audio controls style="width: 100%;">
-                                            <source src="{{ topic.question_audio }}" type="audio/ogg" style="width: 100%;">  
-                                            Your browser does not support the audio element.
-                                </audio>
-                                {% endif %}
-                                {% if topic.question_video.length > 0 %}
-                                    <video controls muted><source src="{{ video.question_video }}" type="video/mp4"></video>
-                                {% endif %}
+                                <div class="question"><a href="{% url 'spirit:topic:detail' topic.id %}" class="ques_link">{{ topic.title }}</a></div>
+
                                 <!-- Answer options -->
                                 <div class="answer_option">
                                     <div class="ans_opt_list">
@@ -113,14 +103,11 @@
                                 </div>
                                 <!-- user answer as video -->
                                 <div class="user_ans_video common_ans_area">
-                                    <div class="head_text tv_hs_{{topic.id}}" style="display: none;">Top video answers</div>
+                                    <div class="head_text">Top video answers</div>
                                     <div class="inner_ans_area">
                                         <div class="owl-carousel owl-theme">
                                             {% for video in topic.topic_comment.all %}
                                                 {% if video.is_media and not video.is_audio %}
-                                                    <script type="text/javascript">
-                                                        $('.tv_hs_' + '{{topic.id}}').show();
-                                                    </script>
                                                     <div class="item" data-videosrc="{{ video.get_updated_url }}">
                                                         <div class="posted_by">
                                                             Posted by {{ video.user.username }} <span>{{ video.date.date }} </span> 
@@ -156,7 +143,7 @@
                                     <meta property="og:type" content="website" />
                                     <meta property='og:title' content='{{topic.title}}' />
                                     <meta property='og:description' content='Bolo Indya- Questions, Answers and Discussions Platform in Indian Languages' /> 
-                                    <meta property='og:image' content='https://www.careeranna.com/uploads/product_images/Course_Images/2019/02/1550560058tissnet.jpg' />
+                                    <meta property='og:image' content='https://s3.amazonaws.com/boloindya/social_share/boloanna_social_share.jpg' />
 
 
 
@@ -227,7 +214,7 @@
                         </div>
                         {% else %}
                            <div class="quest_feed">This category has no questions yet!<br><a href="/topic/publish" style="color: #BB3335"><b><u>Ask your Question Now</u></b></a></div>
-                        </div>
+                       </div>
                         {% endif %}
                         {% comment %}
                             {% if is_single_topic != 0 %} 
@@ -246,7 +233,7 @@
 
 
                                 <!-- Question -->
-                                <div class="question">{{ single_topic.title|capfirst }}</div>
+                                <div class="question">{{ single_topic.title }}</div>
                                 <!-- Answer options -->
                                 <div class="answer_option">
                                     <div class="ans_opt_list">
@@ -271,15 +258,12 @@
                                 </div>
                                 <!-- user answer as video -->
                                 <div class="user_ans_video common_ans_area">
-                                    <div class="head_text tv_hs_{{single_topic.id}}" style="display: none;">Top video answers</div>
+                                    <div class="head_text">Top video answers</div>
                                     <div class="inner_ans_area">
 
                                         <div class="owl-carousel owl-theme">
                                             {% for video in single_topic.topic_comment.all %}
                                             {% if video.is_media and not video.is_audio%}
-                                            <script type="text/javascript">
-                                                $('.tv_hs_' + '{{single_topic.id}}').show();
-                                            </script>
                                             <div class="item" data-videosrc="{{ video.get_updated_url }}">
                                                 <div class="posted_by">
                                                     Posted by {{ video.user.username }} <span>{{ video.date.date }} </span> 

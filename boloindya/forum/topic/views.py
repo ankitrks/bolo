@@ -334,3 +334,9 @@ def index(request):
 def new_home(request):
     return render(request, 'spirit/topic/_new_home.html')
 
+def robotstext(request):
+    return render(request, 'spirit/topic/robots.txt') 
+
+def robotstext(request):
+    return render(request, 'spirit/topic/sitemap.xml')       
+
