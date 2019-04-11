@@ -80,11 +80,12 @@
                                 <!-- Question -->
                                 <div class="question"><a href="{% url 'spirit:topic:detail' topic.id %}" class="ques_link">{{ topic.title|capfirst }}</a></div>
                                 {% if topic.question_audio %}
-
                                  <div id="ans_audio" data-videosrc="{{ topic.question_audio }}" style="width: 100%;">
-                                            <audio controls style="width: 100%;">
-                                            <source src="{{ topic.question_audio }}" type="audio/ogg" style="width: 100%;">  
-                                            Your browser does not support the audio element.
+                                    <div style="margin-bottom: 25px;">
+                                        <audio controls style="width: 100%;">
+                                        <source src="{{ topic.question_audio }}" type="audio/ogg" style="width: 100%;">  
+                                        Your browser does not support the audio element.
+                                    </div>
                                 </audio>
                                 {% endif %}
                                 {% if topic.question_video %}
@@ -113,35 +114,36 @@
 
                                 </div>
                                 <!-- user answer as video -->
-                                <div class="user_ans_video common_ans_area">
-                                    <div class="head_text tv_hs_{{topic.id}}" style="display: none;">Top video answers</div>
-                                    <div class="inner_ans_area">
-                                        <div class="owl-carousel owl-theme">
-                                            {% for video in topic.topic_comment.all %}
-                                                {% if video.is_media and not video.is_audio %}
-                                                    <script type="text/javascript">
-                                                        $('.tv_hs_' + '{{topic.id}}').show();
-                                                    </script>
-                                                    <div class="item" data-videosrc="{{ video.get_updated_url }}">
-                                                        <div class="posted_by">
-                                                            Posted by {{ video.user.username }} <span>{{ video.date.date }}  &nbsp;</span>
-                                                            <span id="like_comment{{video.id}}" data_user='{% if user.username %}1{% else %}0{% endif %}' data_id="{{ video.id }}" onClick="changeLikeFunction({{ video.id }})" style="cursor:pointer;">
-                                                            <i class="fa fa-heart"></i>
-                                                            <span id="updated_like{{ video.id}}">{{ video.likes_count }}</span> likes
-                                                            </span> &nbsp;
-                                                            <span> <i class="fas fa-share-square"> Share On</i>
-                                                                <a target="blank" href="https://api.whatsapp.com/send?phone=+919741133224&text={{ topic.title }} https://www.boloindya.com/topic/{{topic.id}}/" data-action="share/whatsapp/share"><i class="fab fa-whatsapp-square"></i></a>
+                                {% if topic.topic_comment.all|length %}
+                                    <div class="user_ans_video common_ans_area">
+                                        <div class="head_text tv_hs_{{topic.id}}">Top video answers</div>
+                                        <div class="inner_ans_area">
+                                            <div class="owl-carousel owl-theme">
+                                                {% for video in topic.topic_comment.all %}
+                                                    {% if video.is_media and not video.is_audio %}
+                                                        <!-- <script type="text/javascript">
+                                                            $('.tv_hs_' + '{{topic.id}}').show();
+                                                        </script> -->
+                                                        <div class="item" data-videosrc="{{ video.get_updated_url }}">
+                                                            <div class="posted_by">
+                                                                Posted by {{ video.user.username }} <span>{{ video.date.date }}  &nbsp;</span>
+                                                                <span id="like_comment{{video.id}}" data_user='{% if user.username %}1{% else %}0{% endif %}' data_id="{{ video.id }}" onClick="changeLikeFunction({{ video.id }})" style="cursor:pointer;">
+                                                                <i class="fa fa-heart"></i>
+                                                                <span id="updated_like{{ video.id}}">{{ video.likes_count }}</span> likes
+                                                                </span> &nbsp;
+                                                                <span> <i class="fas fa-share-square"> Share On</i>
+                                                                    <a target="blank" href="https://api.whatsapp.com/send?phone=+919741133224&text={{ topic.title }} https://www.boloindya.com/topic/{{topic.id}}/" data-action="share/whatsapp/share"><i class="fab fa-whatsapp-square"></i></a>
 
-                                                            <a href="https://www.facebook.com/sharer.php?u=https://www.boloindya.com/topic/{{topic.id}}&t={{ topic.title }}"><i class="fab fa-facebook-square"></i></a>
-                                                            </span>
+                                                                <a href="https://www.facebook.com/sharer.php?u=https://www.boloindya.com/topic/{{topic.id}}&t={{ topic.title }}"><i class="fab fa-facebook-square"></i></a>
+                                                                </span>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                {% endif %}
-                                            {% endfor %}
-
-                                        </div>    
-                                    </div> 
-                                </div>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>    
+                                        </div> 
+                                    </div>
+                                {% endif %}
                                 <!-- user answer as audo -->
 
                                 <div class="head_text ta_hs_{{topic.id}}" style="display: none;">Top audio answers</div>
@@ -175,7 +177,7 @@
                                             <div class="quest_user_detail">
                                                 <div class="user_name">{{ video.user.username }}</div>
                                                 <div class="feed_post_date">Answered {{ video.date.date }} Views {{ topic.view_count }}</div>
-                                                    <div>shre on 
+                                                    <div>share on 
                                                         <a target="blank" href="https://api.whatsapp.com/send?phone=+919741133224&text={{ topic.title }} https://www.boloindya.com/comment/{{topic.id}}/publish/audio/" data-action="share/whatsapp/share"><i class="fab fa-whatsapp-square"></i></a>
 
                                                         <a href="https://www.facebook.com/sharer.php?u=https://www.boloindya.com/comment/{{topic.id}}/publish/audio/&t={{ topic.title }}"><i class="fab fa-facebook-square"></i></a>
@@ -289,7 +291,7 @@
                                                     Posted by {{ video.user.username }} <span>{{ video.date.date }} </span> 
                                                 </div>
 
-                                                <div>shre on 
+                                                <div>share on 
                                                     <a target="blank" href="https://api.whatsapp.com/send?phone=+919741133224&text={{ topic.title }} https://www.boloindya.com/comment/{{topic.id}}/publish/video/" data-action="share/whatsapp/share"><i class="fab fa-whatsapp-square"></i></a>
 
                                                     <a href="https://www.facebook.com/sharer.php?u=https://www.boloindya.com/comment/{{topic.id}}/publish/video/&t={{ topic.title }}"><i class="fab fa-facebook-square"></i></a>
@@ -322,7 +324,7 @@
                                                 </div>
                                                         
                                             
-                                                        <div>shre on 
+                                                        <div>share on 
                                                             <a target="blank" href="https://api.whatsapp.com/send?phone=+919741133224&text={{ topic.title }} https://www.boloindya.com/comment/{{topic.id}}/publish/audio/" data-action="share/whatsapp/share"><i class="fab fa-whatsapp-square"></i></a>
 
                                                             <a href="https://www.facebook.com/sharer.php?u=https://www.boloindya.com/comment/{{topic.id}}/publish/audio/&t={{ topic.title }}"><i class="fab fa-facebook-square"></i></a>
@@ -371,14 +373,15 @@
                             </div>
                             {% endif %}
                         {% endcomment %}   
-                    <div class="load_more" style="float:right;" id="load_more">
-                        Load More <i class="fas fa-angle-double-right"></i>
+                        <div class="load_more" style="float:right;" id="load_more">
+                            Load More <i class="fas fa-angle-double-right"></i>
+                        </div>
+                        <div class="is_loading" id="is_loading" style="display: none;">
+                           <img src="/media/img/lg.dual-ring-loader.gif" alt="">
+                        </div>
+                        </div>
+                        <div class="" style="clear: both;"></div>
                     </div>
-                    <div class="is_loading" id="is_loading" style="display: none;">
-                       <img src="/media/img/lg.dual-ring-loader.gif" alt="">
-                    </div>
-                    </div>
-                    <div class="" style="clear: both;"></div>
                     <!-- Right section for Questions -->
                     <div class="col-md-3 right_sec">
                         <div class="inner_head">Recent Questions </div>
