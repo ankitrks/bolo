@@ -51,24 +51,24 @@
                               <button class="btn btn-success" id="submit_file"><i class="fa fa-upload marginRight10" aria-hidden="true"></i>Submit</button>
                           </div>
                           
-<div class="modal" tabindex="-1" role="dialog" id="exampleModal" >
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">File Uploaded</h5>
-          <button type="button" class="close" data-dismiss="exampleModal" aria-label="Close" id="close1"> 
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <p>Your video has been submitted. Our content team would review and publish it shortly. You will get notified once the video goes live.</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="exampleModal" id="close">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
+                      <div class="modal" tabindex="-1" role="dialog" id="exampleModal" >
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title">File Uploaded</h5>
+                                <button type="button" class="close" data-dismiss="exampleModal" aria-label="Close" id="close1"> 
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body">
+                                <p>Your video has been submitted. Our content team would review and publish it shortly. You will get notified once the video goes live.</p>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="exampleModal" id="close">Close</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                           <script>
                               $('#upload').click(function(){
                                 $(this).hide();
@@ -176,14 +176,14 @@
                             }
                             // The nested try blocks will be simplified when Chrome 47 moves to Stable
                             function startRecordingVideo() {
-                              var options = {mimeType: 'video/webm', bitsPerSecond: 100000};
+                              var options = {mimeType: 'video/webm', bitsPerSecond: 1000000};
                               recordedBlobs = [];
                               try {
                                 mediaRecorder = new MediaRecorder(window.stream, options);
                               } catch (e0) {
                                 console.log('Unable to create MediaRecorder with options Object: ', e0);
                                 try {
-                                  options = {mimeType: 'video/webm,codecs=vp9', bitsPerSecond: 100000};
+                                  options = {mimeType: 'video/webm,codecs=vp9', bitsPerSecond: 1000000};
                                   mediaRecorder = new MediaRecorder(window.stream, options);
                                 } catch (e1) {
                                   console.log('Unable to create MediaRecorder with options Object: ', e1);
