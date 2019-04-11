@@ -81,7 +81,7 @@ def publish(request, category_id=None):
             title = convert_speech_to_text( request.POST.get('question_video') )
         post_data = copy.deepcopy(request.POST)
         if title:
-            post_data['title'] = title
+            post_data['title'] = title[0].upper() + title[1:]
         form = TopicForm(user=user, data=post_data)
         cform = CommentForm(user=user, data=request.POST)
         if (all([form.is_valid(), cform.is_valid()]) and
@@ -117,7 +117,6 @@ def publish(request, category_id=None):
 
     return render(request, 'spirit/topic/publish.html', context)
 
-@login_required
 def search(request):
     category_id = None
     lid = request.GET.get('lid', 2)
@@ -136,13 +135,14 @@ def search(request):
     topics = []
     search_term = request.GET.get('q')
     if search_term:
-        topics = Topic.objects.filter(title__icontains = search_term)
+        topics = Topic.objects.filter(title__icontains = search_term)[:35]
 
     context = {
         'categories': categories,
         'topics': topics,
         'category_id' : category_id,
-        'lid': lid
+        'lid': lid,
+        'search_term': search_term
         # 'is_single_topic': is_single_topic,
         # 'single_topic': topic
     }

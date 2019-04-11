@@ -37,6 +37,7 @@
                     </div>
                     <!-- Middle section for main content -->
                     <div class="col-md-6 mid_sec">
+                        {% if search_term %}<div class="inner_head">Search Results for <i>"<u>{{ search_term }}</u>"</i></div>{% endif %}
                         <!-- user information -->
                         {% if user.is_authenticated %}
                         <div class="user_info">
@@ -73,7 +74,7 @@
                                     </div>
                                 </div>
                                 <!-- Question -->
-                                <div class="question"><a href="{% url 'spirit:topic:detail' topic.id %}" class="ques_link">{{ topic.title }}</a></div>
+                                <div class="question"><a href="{% url 'spirit:topic:detail' topic.id %}" class="ques_link">{{ topic.title|capfirst }}</a></div>
                                 {% if topic.question_audio.length > 0 %}
                                  <div id="ans_audio" data-videosrc="{{ topic.question_audio }}" style="width: 100%;">
                                             <audio controls style="width: 100%;">
@@ -108,11 +109,14 @@
                                 </div>
                                 <!-- user answer as video -->
                                 <div class="user_ans_video common_ans_area">
-                                    <div class="head_text">Top video answers</div>
+                                    <div class="head_text tv_hs_{{topic.id}}" style="display: none;">Top video answers</div>
                                     <div class="inner_ans_area">
                                         <div class="owl-carousel owl-theme">
                                             {% for video in topic.topic_comment.all %}
                                                 {% if video.is_media and not video.is_audio %}
+                                                    <script type="text/javascript">
+                                                        $('.tv_hs_' + '{{topic.id}}').show();
+                                                    </script>
                                                     <div class="item" data-videosrc="{{ video.get_updated_url }}">
                                                         <div class="posted_by">
                                                             Posted by {{ video.user.username }} <span>{{ video.date.date }}</span>
@@ -191,12 +195,8 @@
 
                         </div>
                         {% else %}
-<<<<<<< HEAD
-                           <div class="quest_feed">This category has no questions yet!<br><a href="/topic/publish" style="color: #BB3335"><b><u>Ask your Question Now</u></b></a></div></div>
-=======
                            <div class="quest_feed">This category has no questions yet!<br><a href="/topic/publish" style="color: #BB3335"><b><u>Ask your Question Now</u></b></a></div>
-                    </div>
->>>>>>> origin/gitesh_career
+                        </div>
                         {% endif %}
                         {% comment %}
                             {% if is_single_topic != 0 %} 
@@ -212,7 +212,7 @@
                                     </div>
                                 </div>
                                 <!-- Question -->
-                                <div class="question">{{ single_topic.title }}</div>
+                                <div class="question">{{ single_topic.title|capfirst }}</div>
                                 <!-- Answer options -->
                                 <div class="answer_option">
                                     <div class="ans_opt_list">
@@ -237,11 +237,14 @@
                                 </div>
                                 <!-- user answer as video -->
                                 <div class="user_ans_video common_ans_area">
-                                    <div class="head_text">Top video answers</div>
+                                    <div class="head_text tv_hs_{{single_topic.id}}" style="display: none;">Top video answers</div>
                                     <div class="inner_ans_area">
                                         <div class="owl-carousel owl-theme">
                                             {% for video in single_topic.topic_comment.all %}
                                             {% if video.is_media and not video.is_audio%}
+                                            <script type="text/javascript">
+                                                $('.tv_hs_' + '{{single_topic.id}}').show();
+                                            </script>
                                             <div class="item" data-videosrc="{{ video.get_updated_url }}">
                                                 <div class="posted_by">
                                                     Posted by {{ video.user.username }} <span>{{ video.date.date }}</span>

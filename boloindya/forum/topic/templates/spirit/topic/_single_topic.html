@@ -11,7 +11,7 @@
                                     </div>
                                 </div>
                                 <!-- Question -->
-                                <div class="question"><a href="{% url 'spirit:topic:detail' topic.id %}" class="ques_link">{{ topic.title }}</a></div>
+                                <div class="question"><a href="{% url 'spirit:topic:detail' topic.id %}" class="ques_link">{{ topic.title|capfirst }}</a></div>
                                 <!-- Answer options -->
                                 <div class="answer_option">
                                     <div class="ans_opt_list">
@@ -36,11 +36,14 @@
                                 </div>
                                 <!-- user answer as video -->
                                 <div class="user_ans_video common_ans_area">
-                                    <div class="head_text">Top video answers</div>
+                                    <div class="head_text tv_hs_{{topic.id}}" style="display: none;">Top video answers</div>
                                     <div class="inner_ans_area">
                                         <div class="owl-carousel owl-theme">
                                             {% for video in topic.topic_comment.all %}
                                                 {% if video.is_media and not video.is_audio %}
+                                                    <script type="text/javascript">
+                                                        $('.tv_hs_' + '{{topic.id}}').show();
+                                                    </script>
                                                     <div class="item">
                                                     <video controls muted><source src="{{ video.get_updated_url }}" type="video/mp4"></video>
                                                         <div class="posted_by">

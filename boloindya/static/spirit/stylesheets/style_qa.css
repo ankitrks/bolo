@@ -261,7 +261,7 @@ a,a:hover,a:active,a:visited{text-decoration:none;color: inherit; }
 .qa_sec .mid_sec .quest_feed .quest_user_info .quest_user_detail .user_name{font-size:14px;color:#000;line-height:normal;font-weight:500;}
 .qa_sec .mid_sec .quest_feed .quest_user_info .quest_user_detail .feed_post_date{font-size:11px;color:#716a6a;line-height:normal;}
 
-.qa_sec .mid_sec .quest_feed .question{margin-bottom:20px;line-height:20px;font-size:20px;color:#000;font-weight:500;position:relative;padding-left:25px;}
+.qa_sec .mid_sec .quest_feed .question{margin-bottom:20px;line-height:20px;font-size:20px;color:#000;font-weight:500;position:relative;}
 .qa_sec .mid_sec .quest_feed .question:before{content:'Q.';position: absolute;left:0px;}
 
 .qa_sec .mid_sec .answer_option{display:flex;margin-bottom:20px;}
