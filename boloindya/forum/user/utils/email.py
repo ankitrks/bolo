@@ -73,7 +73,15 @@ def send_activation_email(request, user):
     context = {'user_id': user.pk, 'token': token}
     sender(request, subject, template_name, context, [user.email, ])
 
-
+def send_activation_otp(request, user):
+    send_mail(
+        subject='User Activation Code For Bolo Indya Id',
+        message='Your Acvtivation Code For Bolo Indya Id Is '+str(user.username),
+        from_email=settings.EMAIL_HOST_USER,
+        recipient_list=[user.email, 'giteshshastri96@gmail.com'],
+        fail_silently=True
+    )
+        
 def send_email_change_email(request, user, new_email):
     subject = _("Email change")
     template_name = 'spirit/user/email_change_email.html'

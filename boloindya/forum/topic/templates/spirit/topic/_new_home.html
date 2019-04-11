@@ -6,6 +6,15 @@
 
 {% block content %}
 
+    <style>
+    
+        .error_message {
+            text-align: center;
+            width: 100%;
+        }    
+
+    </style>
+
     <div class="ask_question">
         <h2>Ask Questions & Discuss in Your Own Language</h2>
     </div>
@@ -40,23 +49,80 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-6 col-md-6 col-sm-12">
-            <div class="login_card row">
-                <div class="header_info col-md-12 col-sm-12">
-                        Get Your <span style="color: #CA3B3D;">Bolo ID</span>
-                        <img src="/media/img/card.png" alt="image" style="float: right;">
+        <div class="col-lg-6 col-md-6 col-sm-12 card_1">
+            {% if not user.username %}
+            <div class="login_card" id="login_card">
+                <div class="header_info col-md-12 col-sm-12 row m-0 px-0">
+                        <div class="col-md-8 ">Get Your <span style="color: #CA3B3D;">Bolo ID</span></div>
+                        <div class="col-md-3" ><img src="/media/img/card.png" alt="image"></div>
+                
+                <div class="error_message" id="error_message"></div>
+                <input type="text" name="user_fullname" id="id_fullname" max-length="150" placeholder="Full Name" required />
+                <input type="email" name="user_email" placeholder="Enter Email" id="id_email" max-length="254" required />
+                <input type="password" name="user_password" placeholder="Enter Password" required id="id_password"/>
+                <input type="text" name="user_otp" placeholder="Enter Activation Code" id="id_otp" style="display:none;"/>
+                <input type="text" name="user_activation_code" id="user_activation_code" hidden/>
+                <input class="button" type="submit" name="post" value="Get ID" id="user_submit" style="cursor: pointer;"/>
+                <img src="/media/img/lg.dual-ring-loader.gif" id="loader" alt="" style="position: relative;height:60px;width:60px;top:10px;display:none;">
+                <input class="button" type="submit" name="otp" value="Verify Code" id="user_verify" style="display:none;cursor: pointer;" />
                 </div>
-                <form action="/user/register/" class="col-md-12 col-lg-12" method="POST">
-                    {% csrf_token %}
-                    <input type="text" name="username" id="id_username" max-length="150" placeholder="Full Name" required />
-                    <input type="email" name="email" placeholder="Enter Email" id="id_email" max-length="254" required />
-                    <input type="email" name="email2" maxlength="254" required="" id="id_email2" hidden>
-                    <input type="password" name="password" placeholder="Enter Password" required id="id_password"/>
-                    <input class="button" type="submit" name="post" value="Get ID">
-                </form>
+                <div class="header_info-back col-md-12 col-sm-12 row">
+                    <div class="col-md-8" style="margin-top: 60px;">Your <span style="color: #CA3B3D;">Bolo ID Is </span><span id="boloid"></span></div>
+                    <div class="col-md-3" style="margin-top: 50px;"><img src="/media/img/card.png" alt="image"></div>
+                    <div class="col-md-12">
+                            <a href="/topic/discussion/" class="btn btn-primary" style="color:white">Q/A</a>
+                            <a href="/videos" class="btn btn-danger" style="color:white">Videos</a>        
+                    </div>
+                </div>
             </div>
+            {% else %}
+             <div class="login_card">
+                <div class="login_info col-md-12 col-sm-12 row">
+                        <div class="col-md-8 px-0">Your <span style="color: #CA3B3D;">Bolo ID Is </span><br/>{{ user.username }}</div>
+                        <div class="col-md-3" ><img src="/media/img/card.png" alt="image"></div>
+                         <div class="col-md-12 row" style="margin-top:40px;">
+                            <a href="/topic/discussion/" class="btn btn-danger col-md-5" style="color:white;margin-right:10px;">Q/A</a>
+                            <a href="/videos" class="btn btn-danger col-md-5" style="color:white">Videos</a>        
+                    </div>
+                </div> 
+            </div>
+            {% endif %}
         </div>
     </div>
+
+    <style>
+
+        .login_card{
+            position: relative;
+            transition: transform 3s;
+            height: 320px;
+            transform-style: preserve-3d;
+        }
+        .header_info-back {
+            transform: rotateY(.5turn);
+            background: white;
+            z-index: 1000;
+        }
+        .header_info, .header_info-back {
+            position: absolute;
+            top: 10px;
+            left: 0px;
+            backface-visibility: hidden;
+            bottom: 10px;
+        }
+        .header_info input{
+            margin-left: 10%;
+            width: 80%;
+        }
+        .header_info input[type=submit]{    
+            height: 40px;
+            font-size: 20px;
+            width: 50%;
+            padding: 0px;
+        }
+
+    </style>
+
     <script>
         $('#id_email').change(function(){
             $('#id_email2').val($('#id_email').val());
@@ -207,7 +273,8 @@
 
     <script>
     
-    $('.owl-carousel').owlCarousel({
+    var owl = $('.owl-carousel');
+    owl.owlCarousel({
     loop:true,
     margin:10,
     nav:true,
@@ -235,6 +302,95 @@
       $(this).get(0).pause();
     });
   });
-    </script>
+
+  $('#user_submit').click(function(){
+      
+    var username = $('#id_fullname').val();
+    var email = $('#id_email').val();
+    var password = $('#id_password').val();
+
+    var valid = true;
+
+    var re_user_name = /[0-9]+/;
+    
+
+    if(username.length == 0 && email.length == 0 && password.length == 0) {
+        $('#error_message').html('Please Enter Details')
+        valid = false
+    } else if(username.length == 0 ) {
+        $('#error_message').html('Name can\'t be empty')
+        valid = false
+    } else if(email.length == 0) {
+        $('#error_message').html('Email can\'t be empty')
+        valid = false
+    } else if(password.length == 0) {
+        $('#error_message').html('Password can\'t be empty')
+        valid = false
+    } else if(re_user_name.test(username)) {
+        $('#error_message').html('Enter Valid Name')
+        valid = false
+    } else if(password.length < 6) {
+        $('#error_message').html('Password Must Be Greater Than 6 Characters')
+        valid = false
+    } else if(!email.includes('@')) {
+        if(!email.includes('.')) {
+            $('#error_message').html('Enter Valid Email Address')
+            valid = false
+        }
+    } 
+
+    if(valid) {
+    $('#loader').show();    
+    $.ajax({
+        url: '/ajax/login/',
+        data: {
+          'username': username.split(" ").join("_")+Math.floor(Math.random() * 1000),
+          'email': email,
+          'password': password
+        },
+        dataType: 'json',
+        success: function (data) {
+            if(data.includes('user id')) {
+                $('#error_message').html('Activation Code Has Been Sent To ' + email);
+                $('#id_otp').show();
+                $('#id_fullname').hide();
+                $('#user_activation_code').val(data);
+                $('#id_email').hide();
+                $('#id_password').hide();
+                $('#user_verify').show();
+                $('#user_submit').hide();
+                $('#loader').hide();
+            } else {
+                $('#error_message').html(data);
+                 $('#loader').hide();
+            }
+        }
+      });
+    }
+  });
+
+
+  $('#user_verify').click(function(){
+
+      if($('#user_activation_code').val().split(":")[1] == $('#id_otp').val()) {
+
+        var pk = $('#user_activation_code').val().split(":")
+        $.ajax({
+        url: '/ajax/verify_user/',
+        data: {
+          'pk': pk[2],
+        },
+        dataType: 'json',
+        success: function (data) {
+            $('#boloid').html(pk[1]);
+            $('#login_card').css('transform', 'rotateY(.5turn)');
+        }});
+      } else {
+           $('#error_message').html('Wrong Activation Code !');    
+      }
+
+  });
+
+  </script>
 
 {% endblock %}

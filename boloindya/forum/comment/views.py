@@ -19,7 +19,8 @@ from .forms import CommentForm, CommentMoveForm, CommentImageForm, CommentFileFo
 from .utils import comment_posted, post_comment_update, pre_comment_update
 from django.conf import settings
 from forum.category.models import Category
-
+from django.http import JsonResponse
+from .like.models import CommentLike
 
 @login_required
 @ratelimit(rate='1/10s')
@@ -165,3 +166,15 @@ def file_upload_ajax(request):
         return json_response({'url': file.url, })
 
     return json_response({'error': dict(form.errors.items()), })
+
+def update_like(request):
+
+    comment_id = request.GET.get('comment_id', None)
+
+    comment = get_object_or_404(Comment, pk=comment_id)
+    comment.likes_count = comment.likes_count + 1;
+    comment.save()
+
+    return JsonResponse('Liked', safe=False)
+
+

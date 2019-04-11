@@ -10,9 +10,10 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth import get_user_model
 
 from ...core.utils.ratelimit.decorators import ratelimit
-from ..utils.email import send_activation_email
+from ..utils.email import send_activation_email, send_activation_otp
 from ..utils.tokens import UserActivationTokenGenerator
 from .forms import RegistrationForm, LoginForm, ResendActivationForm
+from django.http import JsonResponse
 
 User = get_user_model()
 
@@ -118,3 +119,40 @@ def resend_activation_email(request):
     context = {'form': form, }
 
     return render(request, 'spirit/user/auth/activation_resend.html', context)
+
+
+def login_new_bolo_user(request):
+
+    username = request.GET.get('username', None)
+    email = request.GET.get('email', None)
+    password = request.GET.get('password', None)
+
+    is_email_taken = User.objects\
+        .filter(email=email)\
+        .exists()
+
+    is_taken = User.objects\
+        .filter(username=username)\
+        .exists()
+
+    if is_taken and is_email_taken:
+        return JsonResponse('Username And Email Exists', safe=False)    
+    if is_email_taken:
+        return JsonResponse('Email Exists', safe=False)
+    if is_taken:
+        return JsonResponse('Username Exists', safe=False)  
+
+    u = User.objects.create_user(username, email, password)
+    u.is_active = False
+    u.save()
+    send_activation_otp(request, u)
+    return JsonResponse('user id:' + str(u.username) +":"+ str(u.id), safe=False) 
+    
+def verify_user(request) :
+
+    pk = request.GET.get('pk', None)
+    user = get_object_or_404(User, pk=pk)
+    user.st.is_verified = True
+    user.is_active = True
+    user.save()
+    return JsonResponse('Your account has been activated!', safe=False) 

@@ -78,40 +78,61 @@
 }
 
 </style>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('.perform_search').click(function(){
+            window.location = '/topic/search/?q=' + $('[name="search"]').val();
+        });
+        $('[name="search"]').keypress(function (e) {
+            var key = e.which;
+            if(key == 13){
+                $('.perform_search').click();
+                return false;  
+            }
+        }); 
+    });
+</script>
 <nav class="navbar navbar-light  navbar-expand-md">
-            <a class="navbar-brand" href="/" title="Bolo Indiya">
-                <img src="/media/img/boloindya_logo.png" class="" style="width: 172px;height: 57px;" alt="Bolo Indiya Logo" />
-            </a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
-                aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
+    <div class="container">
+        <a class="navbar-brand" href="/" title="Bolo Indiya">
+            <img src="/media/img/boloindya_logo.png" class="" style="width: 172px;height: 57px;" alt="Bolo Indiya Logo" />
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+            aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
 
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <input type="text" name="search" value="" placeHolder="Search" style="height: 34px;width: 150px;font-size: 12px;margin-right: 10px;position: relative;top: 2px;border: 1px solid #cecece;">
-                        <a href="#" class="perform_search" style="color:grey;position: relative;margin-left: -39px;left: -8px;top: 3px;border-left: 1px solid #cecece;"><i class="fa fa-search"></i></a>
-                    </li>
-                    <li class="nav-item item1">
-                        <a class="videoBtn"  href="/topic/discussion/" >Q/A</a>
-                    </li>
-                    <li class="nav-item dropdown item1" style="margin-right: 20px;">
-                        <a href="" class="lang_link">Change Language </a>
-                        <ul class="sub-menu list-unstyled">
-                            <li><a href="/topic/discussion/?lid=1" class="dropdown-item">English</a></li>
-                            <li><a href="/topic/discussion/?lid=2" class="dropdown-item">Hindi</a></li>
-                            <li><a href="/topic/discussion/?lid=3" class="dropdown-item">Tamil</a></li>
-                            <li><a href="/topic/discussion/?lid=4" class="dropdown-item">Telugu</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a href="" class="nav-link profile_link">{{ user.username }}</a>
-                        <ul class="sub-menu list-unstyled">
-                            <!-- <li><a href="#" class="dropdown-item">Profile</a></li> -->
-                            <li><a href="/user/logout/" class="dropdown-item">Logout</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-    </nav>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <input type="text" name="search" value="" placeHolder="Search" style="height: 34px;width: 150px;font-size: 12px;margin-right: 10px;position: relative;top: 2px;border: 1px solid #cecece;">
+                    <a href="#" class="perform_search" style="color:grey;position: relative;margin-left: -39px;left: -8px;top: 3px;border-left: 1px solid #cecece;"><i class="fa fa-search"></i></a>
+                </li>
+                <li class="nav-item item1">
+                    <a class="videoBtn"  href="/topic/discussion/" >Q/A</a>
+                </li>
+                <li class="nav-item dropdown item1" style="margin-right: 20px;">
+                    <a href="" class="lang_link">Change Language </a>
+                    <ul class="sub-menu list-unstyled">
+                        <li><a href="/topic/discussion/?lid=1" class="dropdown-item">English</a></li>
+                        <li><a href="/topic/discussion/?lid=2" class="dropdown-item">Hindi</a></li>
+                        <li><a href="/topic/discussion/?lid=3" class="dropdown-item">Tamil</a></li>
+                        <li><a href="/topic/discussion/?lid=4" class="dropdown-item">Telugu</a></li>
+                    </ul>
+                </li>
+
+                {% if user.username %}
+                <li class="nav-item dropdown">
+                    <a href="" class="nav-link profile_link">{{ user.username }}</a>
+                    <ul class="sub-menu list-unstyled">
+                        <!-- <li><a href="#" class="dropdown-item">Profile</a></li> -->
+                        <li><a href="/user/logout/" class="dropdown-item">Logout</a></li>
+                    </ul>
+                </li>
+                {% else %}
+                    <li><a href="/user/login/?next=/user/login/%3Fnext%3D/st/admin/" class="dropdown-item">Login</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
