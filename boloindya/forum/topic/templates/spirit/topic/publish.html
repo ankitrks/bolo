@@ -26,6 +26,7 @@
 <script src="https://cdn.webrtc-experiment.com/RecordRTC.js"></script>
 <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
 <style>
+    .record_info{color:#138c13;font-weight: 100!important;}
     [for="id_title"], #id_title{display: none;}
     label[for="id_comment"]{display: none;}
     #id_comment{height: 130px;}
@@ -147,7 +148,7 @@
                     <button class="hide" id="btn-release-microphone" disabled>Release Microphone</button>
                     <button class="hide" id="btn-download-recording" disabled>Download</button>
                     <div style="margin-top: 10px;"><audio controls autoplay muted playsinline></audio></div>
-
+                    <span class="record_info"></span>
                     <script>
 
                       //============== New Updated Code ================
@@ -209,7 +210,7 @@
                                 setTimeout(function() {
                                     if(!audio.paused) return;
                                     audio.play();
-                                }, 1000);
+                                }, 1024);
                                 
                                 audio.play();
                             }, 300);
@@ -280,7 +281,7 @@
                                 type: 'audio',
                                 numberOfAudioChannels: isEdge ? 1 : 2,
                                 checkForInactiveTracks: true,
-                                bufferSize: 16384
+                                bufferSize: 44100
                             };
 
                             if(isSafari || isEdge) {
@@ -492,6 +493,7 @@
                             <button id="download" disabled hidden>Download</button>
                             <!-- <a href="/topic/discussion/" class="btn btn-danger cnlRight colorCHange">Cancel</a> -->
                           </div>
+                          <span class="record_info"></span>
                         <script>
                             navigator.mediaDevices.getUserMedia({
                                 audio: isEdge ? true : {
@@ -520,7 +522,7 @@
                               video: true
                             };
 
-                              navigator.mediaDevices.getUserMedia({video:true}).then(
+                              navigator.mediaDevices.getUserMedia(constraints).then(
                                 successCallback
                               ).catch(function(error) {
                                   alert('Unable to capture your microphone. Please check console logs.');
@@ -563,14 +565,14 @@
                             }
                             // The nested try blocks will be simplified when Chrome 47 moves to Stable
                             function startRecordingVideo() {
-                              var options = {mimeType: 'video/webm', bitsPerSecond: 100000};
+                              var options = {mimeType: 'video/webm', bitsPerSecond: 1000000};
                               recordedBlobs = [];
                               try {
                                 mediaRecorder = new MediaRecorder(window.stream, options);
                               } catch (e0) {
                                 console.log('Unable to create MediaRecorder with options Object: ', e0);
                                 try {
-                                  options = {mimeType: 'video/webm,codecs=vp9', bitsPerSecond: 100000};
+                                  options = {mimeType: 'video/webm,codecs=vp9', bitsPerSecond: 1000000};
                                   mediaRecorder = new MediaRecorder(window.stream, options);
                                 } catch (e1) {
                                   console.log('Unable to create MediaRecorder with options Object: ', e1);

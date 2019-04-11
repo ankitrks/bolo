@@ -19,6 +19,9 @@
     });
     
 </script>
+
+
+
  <main role="main">
 
     <section class="main_wrapper qa_sec">
@@ -58,11 +61,12 @@
                         <!-- question feed -->
                         {% comment %}{% if is_single_topic == 0 %}{% endcomment %}
                         <div id="question_tab">
-                            
+                           
                         {% if topics %}
                             {% for topic in topics %}
                             <div class="quest_feed" style="margin-bottom: 10px;">
                                 <!-- user info -->
+
                                 <div class="quest_user_info">
                                     <div class="quest_user_info_img">
                                         <img src="http://lorempixel.com/200/200/" alt="user image" class="quest_user_image"/>
@@ -74,16 +78,7 @@
                                 </div>
                                 <!-- Question -->
                                 <div class="question"><a href="{% url 'spirit:topic:detail' topic.id %}" class="ques_link">{{ topic.title }}</a></div>
-                                {% if topic.question_audio %}
-                                 <div id="ans_audio" data-videosrc="{{ topic.question_audio }}" style="width: 100%;">
-                                            <audio controls style="width: 100%;">
-                                            <source src="{{ topic.question_audio }}" type="audio/ogg" style="width: 100%;">  
-                                            Your browser does not support the audio element.
-                                </audio>
-                                {% endif %}
-                                {% if topic.question_video %}
-                                    <video controls muted><source src="{{ video.question_video }}" type="video/mp4"></video>
-                                {% endif %}
+
                                 <!-- Answer options -->
                                 <div class="answer_option">
                                     <div class="ans_opt_list">
@@ -107,28 +102,27 @@
 
                                 </div>
                                 <!-- user answer as video -->
+                                
                                 <div class="user_ans_video common_ans_area">
-                                    <div class="head_text">Top video answers</div>
+                                    <div class="head_text">Top video answers </div>
                                     <div class="inner_ans_area">
                                         <div class="owl-carousel owl-theme">
                                             {% for video in topic.topic_comment.all %}
                                                 {% if video.is_media and not video.is_audio %}
                                                     <div class="item" data-videosrc="{{ video.get_updated_url }}">
                                                         <div class="posted_by">
-                                                            Posted by {{ video.user.username }} <span>{{ video.date.date }}  &nbsp;</span>
-                                                            <span id="like_comment{{video.id}}" data_user='{% if user.username %}1{% else %}0{% endif %}' data_id="{{ video.id }}" onClick="changeLikeFunction({{ video.id }})" style="cursor:pointer;">
-                                                            <i class="fa fa-heart"></i>
-                                                            <span id="updated_like{{ video.id}}">{{ video.likes_count }}</span> likes
-                                                            </span> &nbsp;
-                                                            <span> <i class="fas fa-share-square"> Share On</i>
-                                                                <a target="blank" href="https://api.whatsapp.com/send?phone=+919741133224&text={{ topic.title }} https://www.boloindya.com/topic/{{topic.id}}/" data-action="share/whatsapp/share"><i class="fab fa-whatsapp-square"></i></a>
+                                                            Posted by {{ video.user.username }} <span>{{ video.date.date }} </span> 
+                                                        </div>
+
+                                                        <div>share on 
+                                                            <a target="blank" href="https://api.whatsapp.com/send?phone=+919741133224&text={{ topic.title }} https://www.boloindya.com/topic/{{topic.id}}/" data-action="share/whatsapp/share"><i class="fab fa-whatsapp-square"></i></a>
 
                                                             <a href="https://www.facebook.com/sharer.php?u=https://www.boloindya.com/topic/{{topic.id}}&t={{ topic.title }}"><i class="fab fa-facebook-square"></i></a>
-                                                            </span>
                                                         </div>
                                                     </div>
                                                 {% endif %}
                                             {% endfor %}
+
                                         </div>    
                                     </div> 
                                 </div>
@@ -139,6 +133,21 @@
                                         <!-- User info -->
                                     {% for video in topic.topic_comment.all %}
                                     {% if video.is_media and video.is_audio %}
+
+
+                                    <title>{{topic.title}}</title>
+                                    <meta name="description" content="Bolo Indya- Questions, Answers and Discussions Platform in Indian Languages" />
+                                    <link rel="canonical" href="https://www.boloindya.com/topic/{{topic.id}}/" />
+
+                                      
+                                    <meta property="og:url" content="https://www.boloindya.com/topic/{{topic.id}}/"/>
+                                    <meta property="og:type" content="website" />
+                                    <meta property='og:title' content='{{topic.title}}' />
+                                    <meta property='og:description' content='Bolo Indya- Questions, Answers and Discussions Platform in Indian Languages' /> 
+                                    <meta property='og:image' content='https://www.careeranna.com/uploads/product_images/Course_Images/2019/02/1550560058tissnet.jpg' />
+
+
+
                                     <script type="text/javascript">
                                         $('.ta_hs_' + '{{topic.id}}').show();
                                     </script>
@@ -149,7 +158,12 @@
                                             </div>
                                             <div class="quest_user_detail">
                                                 <div class="user_name">{{ video.user.username }}</div>
-                                                <div class="feed_post_date">Answered {{ video.date.date }}</div>
+                                                <div class="feed_post_date">Answered {{ video.date.date }} <i class="fas fa-share-square"></i> share on <a target="blank" href="https://api.whatsapp.com/send?phone=+919741133224&text={{ topic.title }} https://www.boloindya.com/comment/{{topic.id}}/publish/audio/" data-action="share/whatsapp/share"><i class="fab fa-whatsapp-square"></i></a>
+
+                                                        <a href="https://www.facebook.com/sharer.php?u=https://www.boloindya.com/comment/{{topic.id}}/publish/audio/&t={{ topic.title }}"><i class="fab fa-facebook-square"></i></a></div>
+                                                    <div class="posted_by" > 
+                                                        
+                                                    </div>
                                             </div>
                                                     
                                         
@@ -192,8 +206,8 @@
                                     </div>
                                 </div>
 
-                                            {% endif %}
-                                            {% endfor %}
+                                {% endif %}
+                                {% endfor %}
                             </div>
                             {% endfor %}
                             {% comment %}{% endif %}{% endcomment %}
@@ -201,10 +215,11 @@
                         </div>
                         {% else %}
                            <div class="quest_feed">This category has no questions yet!<br><a href="/topic/publish" style="color: #BB3335"><b><u>Ask your Question Now</u></b></a></div>
-                    </div>
+                       </div>
                         {% endif %}
                         {% comment %}
                             {% if is_single_topic != 0 %} 
+
                              <div class="quest_feed">
                                 <!-- user info -->
                                 <div class="quest_user_info">
@@ -216,6 +231,8 @@
                                         <div class="feed_post_date">Answered On {{ single_topic.date.date }}</div>
                                     </div>
                                 </div>
+
+
                                 <!-- Question -->
                                 <div class="question">{{ single_topic.title }}</div>
                                 <!-- Answer options -->
@@ -244,12 +261,19 @@
                                 <div class="user_ans_video common_ans_area">
                                     <div class="head_text">Top video answers</div>
                                     <div class="inner_ans_area">
+
                                         <div class="owl-carousel owl-theme">
                                             {% for video in single_topic.topic_comment.all %}
                                             {% if video.is_media and not video.is_audio%}
                                             <div class="item" data-videosrc="{{ video.get_updated_url }}">
                                                 <div class="posted_by">
-                                                    Posted by {{ video.user.username }} <span>{{ video.date.date }}</span>
+                                                    Posted by {{ video.user.username }} <span>{{ video.date.date }} </span> 
+                                                </div>
+
+                                                <div>shre on 
+                                                    <a target="blank" href="https://api.whatsapp.com/send?phone=+919741133224&text={{ topic.title }} https://www.boloindya.com/comment/{{topic.id}}/publish/video/" data-action="share/whatsapp/share"><i class="fab fa-whatsapp-square"></i></a>
+
+                                                    <a href="https://www.facebook.com/sharer.php?u=https://www.boloindya.com/comment/{{topic.id}}/publish/video/&t={{ topic.title }}"><i class="fab fa-facebook-square"></i></a>
                                                 </div>
                                             </div>
                                             {% endif %}
@@ -275,10 +299,15 @@
                                                 </div>
                                                 <div class="quest_user_detail">
                                                     <div class="user_name">{{ video.user.username }}</div>
-                                                    <div class="feed_post_date">Answered {{ video.date.date }}</div>
+                                                    <div class="feed_post_date">Answered {{ video.date.date }} <a href="javascript:void()"><i class="fa fa-whatsapp" aria-hidden="true"></i></a></div>
                                                 </div>
                                                         
                                             
+                                                        <div>shre on 
+                                                            <a target="blank" href="https://api.whatsapp.com/send?phone=+919741133224&text={{ topic.title }} https://www.boloindya.com/comment/{{topic.id}}/publish/audio/" data-action="share/whatsapp/share"><i class="fab fa-whatsapp-square"></i></a>
+
+                                                            <a href="https://www.facebook.com/sharer.php?u=https://www.boloindya.com/comment/{{topic.id}}/publish/audio/&t={{ topic.title }}"><i class="fab fa-facebook-square"></i></a>
+                                                        </div>
                                             </div>
                                             <!-- Audio player -->
                                             <div id="ans_audio" data-videosrc="{{ video.get_updated_url }}" style="width: 100%;">
@@ -308,7 +337,7 @@
                                                 </div>
                                                 <div class="quest_user_detail">
                                                     <div class="user_name">{{ video.user.username }}</div>
-                                                    <div class="feed_post_date">Answered {{ video.date.date }}</div>
+                                                    <div class="feed_post_date">Answered {{ video.date.date }} <a href="javascript:void()"><i class="fa fa-whatsapp" aria-hidden="true"></i></a></div>
                                                 </div>
                                             </div>
                                             <!-- answer text -->
@@ -318,9 +347,9 @@
                                     </div>
                                 </div>
 
-                                            {% endif %}
-                                            {% endfor %}
-                                            </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
                             {% endif %}
                         {% endcomment %}   
                     <div class="load_more" style="float:right;" id="load_more">
@@ -330,16 +359,21 @@
                        <img src="/media/img/lg.dual-ring-loader.gif" alt="">
                     </div>
                     </div>
+                    <div class="" style="clear: both;"></div>
                     <!-- Right section for Questions -->
                     <div class="col-md-3 right_sec">
-                        <div class="inner_head">Recent Questions</div>
+                        <div class="inner_head">Recent Questions </div>
                         <div class="que_bank">
                             <ul>
+
+                                {% for recentTpoic in recent_topics  %}
+
                                 <li>
-                                    <a href="/topic/983/">
-                                        क्यों Smartphone समय के साथ SLOW होते हैं ?
+                                    <a href="/topic/{{recentTpoic.id}}/">
+                                        {{recentTpoic.title}}
                                     </a>
                                 </li>
+                                {% endfor %}
                                 <li>
                                     <a href="/topic/982/">
                                         क्यों भारतीय स्मार्टफोन ब्रांड हुए  विफल ?
@@ -364,7 +398,7 @@
                                     <a href="/topic/977/">
                                         पॉपुलर स्क्रीन टेक्नोलॉजी कौनसी है ?
                                     </a>
-                                </li>
+                                </li> 
                                     
                             </ul>
                         </div>
@@ -375,40 +409,6 @@
  </main>
 
 <script>
-
-    function changeLikeFunction(data_id) {
-        console.log($('#updated_like'+data_id).css('color'));
-
-        if($('#like_comment'+data_id).attr('data_user') == 0) {
-            alert('Login To Like');
-        } else {
-            if($('#updated_like'+data_id).css('color') == 'rgb(0, 149, 255)') {
-            alert('Already Liked');
-        } else {
-            $.ajax({
-                url: '/comment/update_like/',
-                data: {
-                'comment_id': data_id,
-                dataType: 'json',
-                success: function (data) {
-                    if(data == 'Already Liked') {
-                        alert('Already Liked')
-                        $('#like_comment'+data_id).css('color', '#0095ff')
-                        $('#updated_like'+data_id).css('color', '#0095ff')
-                    } else {
-                        var like = $('#updated_like'+data_id).text();
-                        $('#updated_like'+data_id).html(Number(like)+1+'');
-                        $('#updated_like'+data_id).trigger('create');
-                        $('#like_comment'+data_id).css('color', '#0095ff')
-                        $('#updated_like'+data_id).css('color', '#0095ff')
-                    }
-                }
-                }
-                }
-            );
-        }
-    }
-    }
 
      $("#load_more").click(function () {
       console.log('hiy')   
@@ -430,7 +430,7 @@
             $("#load_more").show();
            var owl = $('.owl-carousel');
   owl.owlCarousel({
-    loop:false,
+    loop:true,
     margin:10,
     nav:true,
     dots:true,
@@ -455,14 +455,14 @@
 
 
 function isMobile(width) {
-	if(width == undefined){
-		width = 719;
-	}
-	if(window.innerWidth <= width) {
-		return true;
-	} else {
-		return false;
-	}
+    if(width == undefined){
+        width = 719;
+    }
+    if(window.innerWidth <= width) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
         }

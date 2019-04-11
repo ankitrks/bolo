@@ -1,0 +1,9 @@
+User-agent: *
+Disallow:
+ 
+# too many repeated hits, too quick
+User-agent: superman
+Disallow: /
+  
+# too many repeated hits, too quick
+Allow: /

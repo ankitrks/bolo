@@ -1,0 +1,74 @@
+    .item1{margin-top: 7px !important;}
+ a,a:hover,a:active,a:visited{text-decoration:none;color: inherit; }
+.navbar .navbar-nav li a.lang_link:after {
+    content: '';
+    position: absolute;
+    background: url(/media/img/icons/arrow_down_black.svg) no-repeat;
+    width: 14px;
+    height: 12px;
+    right: -18px;
+    top: 17px;
+    background-size: contain;
+}
+.videoBtn{
+    color: #fff !important ;
+    background-color: #dc3545;
+    border-color:#dc3545;
+    padding-left: 14px !important;
+        margin-right: 20px;
+}   
+.navbar .navbar-nav a{
+    font-size:17px;
+    color:#000;
+    position:relative;
+    padding:0.5rem 1rem 0.5rem 0.5rem;
+    transition: 0.3s ease;
+}
+.navbar .navbar-nav a:hover{color: #7b7474;}
+
+.navbar .navbar-nav a.profile_link{padding:0.5rem 1.5rem;}
+.navbar .navbar-nav li .sub-menu{
+    padding:0px;
+    border:none;
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    transform: translateY(-2em);
+    z-index: -1;
+    transition: all 0.3s ease-in-out 0s, display 0s linear 0.3s, z-index 0s linear 0.01s;
+}
+.navbar .navbar-nav li:hover  .sub-menu{
+    z-index: 1;
+    transform: translateY(0%);
+    transition-delay: 0s, 0s, 0.3s;
+    display: block;
+}
+.navbar .navbar-nav .sub-menu li a{background:#262626;color:#fff ;padding: 0.45rem 1.5rem;}
+.navbar .navbar-nav .sub-menu li a:hover{background:#2581DC;}
+.navbar .navbar-nav li a.profile_link:before{
+    content: '';
+    position: absolute;
+    background: url(/media/img/icons/user_profile.svg) no-repeat;
+    width: 21px;
+    height: 20px;
+    left: -3px;
+    top: 9px;
+    background-size: cover;
+}
+.navbar .navbar-nav li a.profile_link:after{
+    content: '';
+    position: absolute;
+    background: url(/media/img/icons/arrow_down_black.svg) no-repeat;
+    width: 14px;
+    height: 12px;
+    right: 0px;
+    top: 17px;
+    background-size: contain;
+}
+@media (max-width:767px){
+   
+    .navbar .navbar-nav li .sub-menu{position: relative;}
+    .navbar .navbar-nav li .sub-menu.active{display:block;}
+}
