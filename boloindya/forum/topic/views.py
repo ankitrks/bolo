@@ -337,6 +337,6 @@ def new_home(request):
 def robotstext(request):
     return render(request, 'spirit/topic/robots.txt') 
 
-def robotstext(request):
+def sitemapxml(request):
     return render(request, 'spirit/topic/sitemap.xml')       
 
