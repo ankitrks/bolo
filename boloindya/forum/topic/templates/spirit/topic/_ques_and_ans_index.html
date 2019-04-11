@@ -40,7 +40,6 @@
                     </div>
                     <!-- Middle section for main content -->
                     <div class="col-md-6 mid_sec">
-                        {% if search_term %}<div class="inner_head">Search Results for <i>"<u>{{ search_term }}</u>"</i></div>{% endif %}
                         <!-- user information -->
                         {% if user.is_authenticated %}
                         <div class="user_info">
@@ -78,19 +77,8 @@
                                     </div>
                                 </div>
                                 <!-- Question -->
-                                <div class="question"><a href="{% url 'spirit:topic:detail' topic.id %}" class="ques_link">{{ topic.title|capfirst }}</a></div>
-                                {% if topic.question_audio %}
-                                 <div id="ans_audio" data-videosrc="{{ topic.question_audio }}" style="width: 100%;">
-                                    <div style="margin-bottom: 25px;">
-                                        <audio controls style="width: 100%;">
-                                        <source src="{{ topic.question_audio }}" type="audio/ogg" style="width: 100%;">  
-                                        Your browser does not support the audio element.
-                                    </div>
-                                </audio>
-                                {% endif %}
-                                {% if topic.question_video %}
-                                    <video controls muted><source src="{{ video.question_video }}" type="video/mp4"></video>
-                                {% endif %}
+                                <div class="question"><a href="{% url 'spirit:topic:detail' topic.id %}" class="ques_link">{{ topic.title }}</a></div>
+
                                 <!-- Answer options -->
                                 <div class="answer_option">
                                     <div class="ans_opt_list">
@@ -114,8 +102,9 @@
 
                                 </div>
                                 <!-- user answer as video -->
+                                
                                 <div class="user_ans_video common_ans_area">
-                                    <div class="head_text">Top video answers</div>
+                                    <div class="head_text">Top video answers </div>
                                     <div class="inner_ans_area">
                                         <div class="owl-carousel owl-theme">
                                             {% for video in topic.topic_comment.all %}
@@ -130,12 +119,13 @@
 
                                                             <a href="https://www.facebook.com/sharer.php?u=https://www.boloindya.com/topic/{{topic.id}}&t={{ topic.title }}"><i class="fab fa-facebook-square"></i></a>
                                                         </div>
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </div>    
-                                        </div> 
-                                    </div>
-                                {% endif %}
+                                                    </div>
+                                                {% endif %}
+                                            {% endfor %}
+
+                                        </div>    
+                                    </div> 
+                                </div>
                                 <!-- user answer as audo -->
 
                                 <div class="head_text ta_hs_{{topic.id}}" style="display: none;">Top audio answers</div>
@@ -225,7 +215,7 @@
                         </div>
                         {% else %}
                            <div class="quest_feed">This category has no questions yet!<br><a href="/topic/publish" style="color: #BB3335"><b><u>Ask your Question Now</u></b></a></div>
-                        </div>
+                       </div>
                         {% endif %}
                         {% comment %}
                             {% if is_single_topic != 0 %} 
@@ -244,7 +234,7 @@
 
 
                                 <!-- Question -->
-                                <div class="question">{{ single_topic.title|capfirst }}</div>
+                                <div class="question">{{ single_topic.title }}</div>
                                 <!-- Answer options -->
                                 <div class="answer_option">
                                     <div class="ans_opt_list">
@@ -269,21 +259,18 @@
                                 </div>
                                 <!-- user answer as video -->
                                 <div class="user_ans_video common_ans_area">
-                                    <div class="head_text tv_hs_{{single_topic.id}}" style="display: none;">Top video answers</div>
+                                    <div class="head_text">Top video answers</div>
                                     <div class="inner_ans_area">
 
                                         <div class="owl-carousel owl-theme">
                                             {% for video in single_topic.topic_comment.all %}
                                             {% if video.is_media and not video.is_audio%}
-                                            <script type="text/javascript">
-                                                $('.tv_hs_' + '{{single_topic.id}}').show();
-                                            </script>
                                             <div class="item" data-videosrc="{{ video.get_updated_url }}">
                                                 <div class="posted_by">
                                                     Posted by {{ video.user.username }} <span>{{ video.date.date }} </span> 
                                                 </div>
 
-                                                <div>share on 
+                                                <div>shre on 
                                                     <a target="blank" href="https://api.whatsapp.com/send?phone=+919741133224&text={{ topic.title }} https://www.boloindya.com/comment/{{topic.id}}/publish/video/" data-action="share/whatsapp/share"><i class="fab fa-whatsapp-square"></i></a>
 
                                                     <a href="https://www.facebook.com/sharer.php?u=https://www.boloindya.com/comment/{{topic.id}}/publish/video/&t={{ topic.title }}"><i class="fab fa-facebook-square"></i></a>
@@ -316,7 +303,7 @@
                                                 </div>
                                                         
                                             
-                                                        <div>share on 
+                                                        <div>shre on 
                                                             <a target="blank" href="https://api.whatsapp.com/send?phone=+919741133224&text={{ topic.title }} https://www.boloindya.com/comment/{{topic.id}}/publish/audio/" data-action="share/whatsapp/share"><i class="fab fa-whatsapp-square"></i></a>
 
                                                             <a href="https://www.facebook.com/sharer.php?u=https://www.boloindya.com/comment/{{topic.id}}/publish/audio/&t={{ topic.title }}"><i class="fab fa-facebook-square"></i></a>
@@ -365,15 +352,14 @@
                             </div>
                             {% endif %}
                         {% endcomment %}   
-                        <div class="load_more" style="float:right;" id="load_more">
-                            Load More <i class="fas fa-angle-double-right"></i>
-                        </div>
-                        <div class="is_loading" id="is_loading" style="display: none;">
-                           <img src="/media/img/lg.dual-ring-loader.gif" alt="">
-                        </div>
-                        </div>
-                        <div class="" style="clear: both;"></div>
+                    <div class="load_more" style="float:right;" id="load_more">
+                        Load More <i class="fas fa-angle-double-right"></i>
                     </div>
+                    <div class="is_loading" id="is_loading" style="display: none;">
+                       <img src="/media/img/lg.dual-ring-loader.gif" alt="">
+                    </div>
+                    </div>
+                    <div class="" style="clear: both;"></div>
                     <!-- Right section for Questions -->
                     <div class="col-md-3 right_sec">
                         <div class="inner_head">Recent Questions </div>
@@ -424,40 +410,6 @@
 
 <script>
 
-    function changeLikeFunction(data_id) {
-        console.log($('#updated_like'+data_id).css('color'));
-
-        if($('#like_comment'+data_id).attr('data_user') == 0) {
-            alert('Login To Like');
-        } else {
-            if($('#updated_like'+data_id).css('color') == 'rgb(0, 149, 255)') {
-            alert('Already Liked');
-        } else {
-            $.ajax({
-                url: '/comment/update_like/',
-                data: {
-                'comment_id': data_id,
-                dataType: 'json',
-                success: function (data) {
-                    if(data == 'Already Liked') {
-                        alert('Already Liked')
-                        $('#like_comment'+data_id).css('color', '#0095ff')
-                        $('#updated_like'+data_id).css('color', '#0095ff')
-                    } else {
-                        var like = $('#updated_like'+data_id).text();
-                        $('#updated_like'+data_id).html(Number(like)+1+'');
-                        $('#updated_like'+data_id).trigger('create');
-                        $('#like_comment'+data_id).css('color', '#0095ff')
-                        $('#updated_like'+data_id).css('color', '#0095ff')
-                    }
-                }
-                }
-                }
-            );
-        }
-    }
-    }
-
      $("#load_more").click(function () {
       console.log('hiy')   
       var pageno = $('#pageno').val();
@@ -478,7 +430,7 @@
             $("#load_more").show();
            var owl = $('.owl-carousel');
   owl.owlCarousel({
-    loop:false,
+    loop:true,
     margin:10,
     nav:true,
     dots:true,
@@ -503,14 +455,14 @@
 
 
 function isMobile(width) {
-	if(width == undefined){
-		width = 719;
-	}
-	if(window.innerWidth <= width) {
-		return true;
-	} else {
-		return false;
-	}
+    if(width == undefined){
+        width = 719;
+    }
+    if(window.innerWidth <= width) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
         }
