@@ -27,7 +27,7 @@ from django.core.paginator import Paginator
 
 import io
 import os
-#import wget
+import urllib2
 import copy
 import subprocess
 from datetime import datetime
@@ -36,8 +36,12 @@ from google.cloud.speech import enums
 from google.cloud.speech import types
 def convert_speech_to_text(blob_url):
     fname = datetime.now().strftime('%s')
-    wget_command = "python -m wget -o /tmp/" + fname + " " + blob_url
-    subprocess.call(wget_command, shell=True)
+    #wget_command = "python -m wget -o /tmp/" + fname + " " + blob_url
+    #subprocess.call(wget_command, shell=True)
+    file_response = urllib2.urlopen(blob_url)
+    file_obj = open("/tmp/" + fname, 'w')
+    file_obj.write(file_response.read())
+    file_obj.close()
 
     command = "ffmpeg -i /tmp/" + fname + " -ab 160k -ac 1 -ar 44100 -vn /tmp/" + fname + ".wav"
     subprocess.call(command, shell=True)
@@ -56,11 +60,10 @@ def convert_speech_to_text(blob_url):
         print ('{}'.format(result.alternatives[0].transcript))
         return_str += ('{}'.format(result.alternatives[0].transcript))
         # print('Transcript: {}'.format(result.alternatives[0].transcript))
-    f1_rm = "rm -rf /tmp/" + fname
-    f2_rm = "rm -rf /tmp/" + fname + ".wav"
-    subprocess.call(f1_rm, shell=True)
-    subprocess.call(f2_rm, shell=True)
-
+    #f1_rm = "rm -rf /tmp/" + fname
+    #f2_rm = "rm -rf /tmp/" + fname + ".wav"
+    #subprocess.call(f1_rm, shell=True)
+    #subprocess.call(f2_rm, shell=True)
     return return_str
 
 @login_required
