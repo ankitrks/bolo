@@ -4,10 +4,14 @@ navigator.mediaDevices.getUserMedia({
         echoCancellation: false
     }
 }).catch(function(error) {
-    var res = confirm("Device / browser doesn't support this feature. Press OK to Answer in Text & Cancel to go back");
-    if (res == true) {window.location = window.location.href.replace('/audio', '/text');}
-    else { window.location = '/topic/' + window.location.href.split('/')[4] + '/';}
+    var onPublish = $('[name="onPublish"]').val();
+    if(onPublish != '1'){
+        var res = confirm("Device / browser doesn't support this feature. Press OK to Answer in Text & Cancel to go back");
+        if (res == true) {window.location = window.location.href.replace('/audio', '/text');}
+        else { window.location = '/topic/' + window.location.href.split('/')[4] + '/';}
+    }
 });
+
 
 var audio = document.querySelector('audio');
 function captureMicrophone(callback) {

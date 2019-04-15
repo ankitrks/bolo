@@ -7,150 +7,150 @@
 
 {% block head-extra %}
     <script>
-    function showtextfields(){
-        $('[for="id_title"], #id_title').show();
-    }
-    function hidetextfields(){
-        $('[for="id_title"], #id_title').hide();
-    }
-	$( document ).ready(function() {
-		// $( "textarea" ).store( "topic_publish_comment" );
-        // $("#id_category option").filter(function() { return $(this).text().indexOf("---") != 0; }).attr("disabled","disabled");
-	});
-
+        function showtextfields(){
+            $('[for="id_title"], #id_title').show();
+        }
+        function hidetextfields(){
+            $('[for="id_title"], #id_title').hide();
+            
+            navigator.mediaDevices.getUserMedia({
+              audio: isEdge ? true : {
+                  echoCancellation: false
+              }
+            }).catch(function(error) {
+                alert("Device / browser doesn't support this feature.");
+                $('[data-toggle="modal"]').removeAttr('data-toggle').removeAttr('data-target');
+                return false
+            });
+        }
+    	$( document ).ready(function() {
+    		// $( "textarea" ).store( "topic_publish_comment" );
+            // $("#id_category option").filter(function() { return $(this).text().indexOf("---") != 0; }).attr("disabled","disabled");
+    	});
 	</script>
-
 {% endblock %}
 
 
 {% block content %}
-    
-<script src="/media/js/RecordRTC.js"></script>
-<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
-<style>
-    .record_info{color:#138c13;font-weight: 100!important;}
-    [for="id_title"], #id_title{display: none;}
-    label[for="id_comment"]{display: none;}
-    #id_comment{height: 130px;}
-    [for="id_title"]{margin-top: 10px;}
-    h2 {left: 100px;position: relative;}
-    .marginTop{margin-top: 10px;}
-    .marginRight10{margin-right: 10px;}
-    .cnlRight{float: right;}
-    .record_info{color:#138c13;font-weight: 800;}
-    .colorCHange{color:#fff !important;}
-    .hide{display: none;}
-    .LoaderBalls {width: 90px;display: flex;justify-content: space-between;align-items: center;
-    &__item {
-        // .LoaderBalls__wrapper__item
-        $anim-drt: 0.4s;
-        $anim-ease: cubic-bezier(.6,.05,.15,.95);
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: #00f1ca;
-        &:nth-child(1) {
-            animation: bouncing $anim-drt alternate infinite $anim-ease;
-        }
-        &:nth-child(2) {
-            animation: bouncing $anim-drt $anim-drt/4 alternate infinite $anim-ease backwards;
-        }
-        &:nth-child(3) {
-            animation: bouncing $anim-drt $anim-drt/2 alternate infinite $anim-ease backwards;
+    <script src="/media/js/RecordRTC.js"></script>
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    <style>
+        .record_info{color:#138c13;font-weight: 100!important;}
+        [for="id_title"], #id_title{display: none;}
+        label[for="id_comment"]{display: none;}
+        #id_comment{height: 130px;}
+        [for="id_title"]{margin-top: 10px;}
+        h2 {left: 100px;position: relative;}
+        .marginTop{margin-top: 10px;}
+        .marginRight10{margin-right: 10px;}
+        .cnlRight{float: right;}
+        .record_info{color:#138c13;font-weight: 800;}
+        .colorCHange{color:#fff !important;}
+        .hide{display: none;}
+        .LoaderBalls {width: 90px;display: flex;justify-content: space-between;align-items: center;
+        &__item {
+            // .LoaderBalls__wrapper__item
+            $anim-drt: 0.4s;
+            $anim-ease: cubic-bezier(.6,.05,.15,.95);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #00f1ca;
+            &:nth-child(1) {
+                animation: bouncing $anim-drt alternate infinite $anim-ease;
+            }
+            &:nth-child(2) {
+                animation: bouncing $anim-drt $anim-drt/4 alternate infinite $anim-ease backwards;
+            }
+            &:nth-child(3) {
+                animation: bouncing $anim-drt $anim-drt/2 alternate infinite $anim-ease backwards;
+            }
         }
     }
-}
-@keyframes bouncing {
-    0% {
-        transform: translate3d(0, 10px, 0) scale(1.2, 0.85);
+    @keyframes bouncing {
+        0% {
+            transform: translate3d(0, 10px, 0) scale(1.2, 0.85);
+        }
+        100% {
+            transform: translate3d(0, -20px, 0) scale(0.9, 1.1);
+        }
     }
-    100% {
-        transform: translate3d(0, -20px, 0) scale(0.9, 1.1);
-    }
-}
-</style>
-    
-<hr><div class="container">
-    <br><h4 class="headline">{% trans "Start discussion" %}</h4>
-    <form action="." method="post" class="js-reply">
-        {% csrf_token %}
-        {# topic #}
-        <div>
-            <a href="javascript:void()" class="btn btn-danger" onclick="hidetextfields()" data-toggle="modal" data-target="#myModalAudio"> <i class="fa fa-microphone marginRight10" aria-hidden="true"></i>
-           Ask in Audio
-            </a>
-            <a href="javascript:void()" class="btn btn-danger" onclick="hidetextfields()" data-toggle="modal" data-target="#myModalVideo"><i class="fa fa-video-camera marginRight10" aria-hidden="true"></i>
-                Ask in Video
-            </a>
-            <a href="#" class="btn btn-danger ask_text" onclick="showtextfields()"><i class="fa fa-edit marginRight10"></i>
-                <span style="color: #fff">Ask in Text</span>
-            </a>
-        </div>
-        {% include "spirit/_form.html" %}
-        <input type="hidden" name="question_audio" value="">
-        <input type="hidden" name="question_video" value=""> 
-        {# comment #}
-        <div class="topic-publish-comment">
-            {% include "spirit/_form.html" with form=cform %}
-        </div>
-
-        <div class="container">
-            {% include "spirit/comment/_editor.html" %}
-
-            <input class="button reply-button" type="submit" value="{% trans "Publish" %}" />
-        </div>
-    </form>
-</div>
-
-<!-- The Modal -->
-<div class="modal" id="myModalAudio">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <!-- Modal Header -->
-        <div class="modal-header">
-          <h4 class="modal-title">Ask Question [Audio]</h4>
-          <button type="button" class="close btnCloseAudio" data-dismiss="modal">&times;</button>
-        </div>
-        <!-- Modal body -->
-        <div class="modal-body">
-            <button class="btn btn-danger" id="btn-start-recording"><i class="fa fa-microphone" aria-hidden="true"></i> Start Recording</button>
-            <button class="btn btn-danger" id="btn-stop-recording" disabled><i class="fa fa-microphone-slash" aria-hidden="true"></i> Stop Recording</button><br>
-            <button class="hide" id="btn-release-microphone" disabled>Release Microphone</button>
-            <button class="hide" id="btn-download-recording" disabled>Download</button>
-            <div style="margin-top: 10px;display: none;"><audio controls autoplay muted playsinline></audio></div>
-            <span class="record_info"></span>
-            <script src="/media/js/audio_record.js"></script>
-        </div>
-      </div>
+    </style>
+        
+    <hr><div class="container">
+        <input type="hidden" name="onPublish" value="1">
+        <br><h4 class="headline">{% trans "Start discussion" %}</h4>
+        <form action="." method="post" class="js-reply">
+            {% csrf_token %}
+            {# topic #}
+            <div>
+                <a href="javascript:void()" class="btn btn-danger" onclick="hidetextfields()" data-toggle="modal" data-target="#myModalAudio"> <i class="fa fa-microphone marginRight10" aria-hidden="true"></i>Ask in Audio</a>
+                <a href="javascript:void()" class="btn btn-danger" onclick="hidetextfields()" data-toggle="modal" data-target="#myModalVideo"><i class="fa fa-video-camera marginRight10" aria-hidden="true"></i>Ask in Video</a>
+                <a href="#" class="btn btn-danger ask_text" onclick="showtextfields()"><i class="fa fa-edit marginRight10"></i><span style="color: #fff">Ask in Text</span></a>
+            </div>
+            {% include "spirit/_form.html" %}
+            <input type="hidden" name="question_audio" value="">
+            <input type="hidden" name="question_video" value=""> 
+            {# comment #}
+            <div class="topic-publish-comment">
+                {% include "spirit/_form.html" with form=cform %}
+            </div>
+            <div class="container">
+                {% include "spirit/comment/_editor.html" %}
+                <input class="button reply-button" type="submit" value="{% trans "Publish" %}" />
+            </div>
+        </form>
     </div>
-</div>
 
-<!-- The Modal -->
-<div class="modal" id="myModalVideo">
-    <div class="modal-dialog">
-        <div class="modal-content">
+    <!-- The Modal -->
+    <div class="modal" id="myModalAudio">
+        <div class="modal-dialog">
+          <div class="modal-content">
             <!-- Modal Header -->
             <div class="modal-header">
-              <h4 class="modal-title">Ask Question [Video]</h4>
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title">Ask Question [Audio]</h4>
+              <button type="button" class="close btnCloseAudio" data-dismiss="modal">&times;</button>
             </div>
             <!-- Modal body -->
             <div class="modal-body">
-                <video id="gum" autoplay muted></video>
-                <video id="recorded" autoplay loop controls hidden></video>
-                <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
-                <div class="marginTop">
-                <button class="btn btn-danger" id="recordVid"><i class="fa fa-video-camera marginRight10" aria-hidden="true"></i>Start Recording</button>
-                <button class="btn btn-danger hide" id="play" disabled><i class="fa fa-play marginRight10" aria-hidden="true"></i>Play</button>
-                <button id="download" disabled hidden>Download</button>
-                <!-- <a href="/topic/discussion/" class="btn btn-danger cnlRight colorCHange">Cancel</a> -->
-                </div>
+                <button class="btn btn-danger" id="btn-start-recording"><i class="fa fa-microphone" aria-hidden="true"></i> Start Recording</button>
+                <button class="btn btn-danger" id="btn-stop-recording" disabled><i class="fa fa-microphone-slash" aria-hidden="true"></i> Stop Recording</button><br>
+                <button class="hide" id="btn-release-microphone" disabled>Release Microphone</button>
+                <button class="hide" id="btn-download-recording" disabled>Download</button>
+                <div style="margin-top: 10px;display: none;"><audio controls autoplay muted playsinline></audio></div>
                 <span class="record_info"></span>
-                <script src="/media/js/video_record.js"></script>
+                <script src="/media/js/audio_record.js"></script>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <!-- The Modal -->
+    <div class="modal" id="myModalVideo">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                  <h4 class="modal-title">Ask Question [Video]</h4>
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <video id="gum" autoplay muted></video>
+                    <video id="recorded" autoplay loop controls hidden></video>
+                    <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
+                    <div class="marginTop">
+                    <button class="btn btn-danger" id="recordVid"><i class="fa fa-video-camera marginRight10" aria-hidden="true"></i>Start Recording</button>
+                    <button class="btn btn-danger hide" id="play" disabled><i class="fa fa-play marginRight10" aria-hidden="true"></i>Play</button>
+                    <button id="download" disabled hidden>Download</button>
+                    <!-- <a href="/topic/discussion/" class="btn btn-danger cnlRight colorCHange">Cancel</a> -->
+                    </div>
+                    <span class="record_info"></span>
+                    <script src="/media/js/video_record.js"></script>
+                </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock %}
 
 

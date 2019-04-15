@@ -1,13 +1,17 @@
 navigator.mediaDevices.getUserMedia({
-    audio: isEdge ? true : {
-        echoCancellation: false
-    }
+  audio: isEdge ? true : {
+      echoCancellation: false
+  }
 }).catch(function(error) {
-    $('#upload').hide();
+  $('#upload').hide();
+  var onPublish = $('[name="onPublish"]').val();
+  if(onPublish != '1'){
     var res = confirm("Device / browser doesn't support this feature. Press OK to Answer in Text & Cancel to go back");
     if (res == true) {window.location = window.location.href.replace('/video', '/text');}
     else { window.location = '/topic/' + window.location.href.split('/')[4] + '/';}
+  }
 });
+
 
 var mediaSource = new MediaSource();
 mediaSource.addEventListener('sourceopen', handleSourceOpen, false);
