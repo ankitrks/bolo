@@ -12,7 +12,6 @@ navigator.mediaDevices.getUserMedia({
   }
 });
 
-
 var mediaSource = new MediaSource();
 mediaSource.addEventListener('sourceopen', handleSourceOpen, false);
 var mediaRecorder;
@@ -30,14 +29,12 @@ var constraints = {
   audio: true,
   video: true
 };
-
-// navigator.mediaDevices.getUserMedia(constraints).then(
-//   successCallback
-// ).catch(function(error) {
-//     alert("Device / browser doesn't support this feature.");
-//     // console.error(error);
-// });
-
+navigator.mediaDevices.getUserMedia(
+  constraints
+).then(
+  successCallback,
+  errorCallback
+);
 function successCallback(stream) {
   // console.log('getUserMedia() got stream: ', stream);
   window.stream = stream;
@@ -66,8 +63,7 @@ function toggleRecording() {
     startRecordingVideo();
   } else {
     stopRecordingVideo();
-    recordButton.textContent = 'Start Recording';
-    recordButton.disabled = true;
+    recordButton.textContent = 'Record Again';
     $('.record_info').html('Please wait... <br>uploading file! ')
     playButton.disabled = false;
     downloadButton.disabled = false;
@@ -111,6 +107,7 @@ function stopRecordingVideo() {
   // console.log('Recorded Blobs: ', recordedBlobs);
 var blob = new Blob(recordedBlobs, {type: 'video/webm'});
   //postVideoToServer(recordedBlobs);
+  
   recordedVideo.controls = true;
   sendVideoData(blob);
 }
@@ -126,15 +123,18 @@ function sendVideoData(File) {
     xhr.onload = function (e) {
     if (xhr.readyState === 4) {
         if (xhr.status === 200) {
-          // console.log("success");
-          // console.log(xhr.responseText);
-          $("#id_comment").html(xhr.responseText);
-          $('[name="question_audio"]').val('');
-          $('[name="question_video"]').val(xhr.responseText);
-          $('#btnPublish').show()
-          $('.record_info').html('')
-          $('.modal-backdrop, #myModalVideo').hide();
-          recordButton.disabled = false;
+            // console.log("success");
+            // console.log(xhr.responseText);
+            // $("#id_comment").html(xhr.responseText);
+            // $('#btnPublish').show()
+            // $('.record_info').html('')
+            if( !$('[name="question_video"]').length ){$("#id_comment").html(xhr.responseText);}
+            $('[name="question_audio"]').val('');
+            $('[name="question_video"]').val(xhr.responseText);
+            $('#btnPublish').show()
+            $('.record_info').html('')
+            $('.modal-backdrop, #myModalVideo').hide();
+            recordButton.disabled = false;
         } else {
           console.error(xhr.statusText);
         }

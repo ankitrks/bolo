@@ -12,42 +12,55 @@ navigator.mediaDevices.getUserMedia({
     }
 });
 
-
 var audio = document.querySelector('audio');
+
 function captureMicrophone(callback) {
     btnReleaseMicrophone.disabled = false;
+
     if(microphone) {
         callback(microphone);
         return;
     }
+
     if(typeof navigator.mediaDevices === 'undefined' || !navigator.mediaDevices.getUserMedia) {
         alert('This browser does not supports WebRTC getUserMedia API.');
+
         if(!!navigator.getUserMedia) {
             alert('This browser seems supporting deprecated getUserMedia API.');
         }
     }
+    navigator.mediaDevices.getUserMedia({
+        audio: isEdge ? true : {
+            echoCancellation: false
+        }
+    }).then(function(mic) {
+        callback(mic);
+    }).catch(function(error) {
+        alert('Unable to capture your microphone. Please check console logs.');
+        console.error(error);
+    });
 }
 
 function replaceAudio(src) {
-    // var newAudio = document.createElement('audio');
-    // newAudio.controls = true;
-    // newAudio.autoplay = true;
+    var newAudio = document.createElement('audio');
+    newAudio.controls = true;
+    newAudio.autoplay = true;
 
-    // if(src) {
-    //     newAudio.src = src;
-    // }
+    if(src) {
+        newAudio.src = src;
+    }
     
-    // var parentNode = audio.parentNode;
-    // parentNode.innerHTML = '';
-    // parentNode.appendChild(newAudio);
+    var parentNode = audio.parentNode;
+    parentNode.innerHTML = '';
+    parentNode.appendChild(newAudio);
 
-    // audio = newAudio;
+    audio = newAudio;
 }
 
 function stopRecordingCallback() {
     replaceAudio(URL.createObjectURL(recorder.getBlob()));
 
-    // btnStartRecording.disabled = false;
+    btnStartRecording.disabled = false;
 
     setTimeout(function() {
         if(!audio.paused) return;
@@ -55,7 +68,7 @@ function stopRecordingCallback() {
         setTimeout(function() {
             if(!audio.paused) return;
             audio.play();
-        }, 1024);
+        }, 1000);
         
         audio.play();
     }, 300);
@@ -126,7 +139,7 @@ btnStartRecording.onclick = function() {
         type: 'audio',
         numberOfAudioChannels: isEdge ? 1 : 2,
         checkForInactiveTracks: true,
-        bufferSize: 44100
+        bufferSize: 16384
     };
 
     if(isSafari || isEdge) {
@@ -158,19 +171,21 @@ btnStartRecording.onclick = function() {
 
 
 btnStopRecording.onclick = function() {
+
     this.disabled = true;
-    // $('#btn-start-recording').attr('disabled', true);
-    $('.record_info').html('Please wait... <br>uploading file!');
+    $('.record_info').html('Please wait... <br>uploading file! ');
     recorder.stopRecording(stopRecordingCallback);
 };
 
 btnReleaseMicrophone.onclick = function() {
     this.disabled = true;
     btnStartRecording.disabled = false;
+
     if(microphone) {
         microphone.stop();
         microphone = null;
     }
+
     if(recorder) {
         // click(btnStopRecording);
     }
@@ -215,66 +230,73 @@ function getFileName(fileExtension) {
     return 'RecordRTC-' + year + month + date + '-' + getRandomString() + '.' + fileExtension;
 }
 
-function SaveToDisk(File, fileName) {debugger;
-  // for non-IE
-  if (!window.ActiveXObject) {
-    formData = new FormData();
-    formData.append('files_varname', 'file');
-    formData.append('file', File);
-    formData.append('file_dest', "video.webm");
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', "https://www.careeranna.com/demo/getAudioData", true);
-    xhr.onload = function (e) {
-      if (xhr.readyState === 4) {
-        if (xhr.status === 200) {
-          $("#id_comment").html(xhr.responseText);
-          $('[name="question_video"]').val('');
-          $('[name="question_audio"]').val(xhr.responseText);
-          $('#btnPublish').show();
-          $('.record_info').html('');
-          $('.modal-backdrop').hide();
-          $('.btnCloseAudio').click();
-          btnStartRecording.disabled = false;
-        } else {
-          console.error(xhr.statusText);
-        }
-      }
-    };
-    xhr.onerror = function (e) {
-      console.error(xhr.statusText);
-    };
-    xhr.send(formData); 
-  }
 
-  // for IE
-  else if (!!window.ActiveXObject && document.execCommand) {
-    // console.log(File);
-    formData = new FormData();
-    formData.append('files_varname', 'file');
-    formData.append('file', File);
-    formData.append('file_dest', "video.webm");
-    var xhr = new XMLHttpRequest();
-    //xhr.setRequestHeader("Content-Type","multipart/form-data");
-    xhr.open('POST', "https://www.careeranna.com/demo/getAudioData", true);
-    xhr.onload = function (e) {
-    if (xhr.readyState === 4) {
-        if (xhr.status === 200) {
-          $("#id_comment").html(xhr.responseText);
-          $('[name="question_video"]').val('');
-          $('[name="question_audio"]').val(xhr.responseText);
-          $('#btnPublish').show();
-          $('.record_info').html('');
-          $('.modal-backdrop').hide();
-          $('.btnCloseAudio').click();
-        } else {
-          console.error(xhr.statusText);
-        }
-      }
-    };
-    xhr.onerror = function (e) {
-      console.error(xhr.statusText);
-    };
-    xhr.send(formData); 
-  }
+
+function SaveToDisk(File, fileName) {debugger;
+    // for non-IE
+    if (!window.ActiveXObject) {
+          // console.log(File);
+          formData = new FormData();
+          formData.append('files_varname', 'file');
+          formData.append('file', File);
+          formData.append('file_dest', "video.webm");
+          var xhr = new XMLHttpRequest();
+          //xhr.setRequestHeader("Content-Type","multipart/form-data");
+          xhr.open('POST', "https://www.careeranna.com/demo/getAudioData", true);
+          xhr.onload = function (e) {
+          if (xhr.readyState === 4) {
+              if (xhr.status === 200) {
+                  // console.log("success");
+                  // console.log(xhr.responseText);
+                  if( !$('[name="question_video"]').length ){$("#id_comment").html(xhr.responseText);}
+                  $('[name="question_video"]').val('');
+                  $('[name="question_audio"]').val(xhr.responseText);
+                  $('#btnPublish').show();
+                  $('.record_info').html('');
+                  $('.modal-backdrop').hide();
+                  $('.btnCloseAudio').click();
+              } else {
+                console.error(xhr.statusText);
+              }
+            }
+          };
+          xhr.onerror = function (e) {
+            console.error(xhr.statusText);
+          };
+          xhr.send(formData); 
+    }
+
+    // for IE
+    else if (!!window.ActiveXObject && document.execCommand) {
+              // console.log(File);
+              formData = new FormData();
+              formData.append('files_varname', 'file');
+              formData.append('file', File);
+              formData.append('file_dest', "video.webm");
+              var xhr = new XMLHttpRequest();
+              //xhr.setRequestHeader("Content-Type","multipart/form-data");
+              xhr.open('POST', "https://www.careeranna.com/demo/getAudioData", true);
+              xhr.onload = function (e) {
+              if (xhr.readyState === 4) {
+                  if (xhr.status === 200) {
+                      // console.log("success");
+                      // console.log(xhr.responseText);
+                      if( !$('[name="question_video"]').length ){$("#id_comment").html(xhr.responseText);}
+                      $('[name="question_video"]').val('');
+                      $('[name="question_audio"]').val(xhr.responseText);
+                      $('#btnPublish').show();
+                      $('.record_info').html('');
+                      $('.modal-backdrop').hide();
+                      $('.btnCloseAudio').click();
+                  } else {
+                    console.error(xhr.statusText);
+                  }
+                }
+              };
+              xhr.onerror = function (e) {
+                console.error(xhr.statusText);
+              };
+              xhr.send(formData); 
+    }
 }
 //====================End=========================  
