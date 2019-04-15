@@ -64,7 +64,7 @@ def convert_speech_to_text(request, blob_url):
 
         return_str = ''
         for result in response.results:
-            print ('{}'.format(result.alternatives[0].transcript))
+            # print ('{}'.format(result.alternatives[0].transcript))
             return_str += ('{}'.format(result.alternatives[0].transcript))
             # print('Transcript: {}'.format(result.alternatives[0].transcript))
         f1_rm = "rm -rf /tmp/" + fname
