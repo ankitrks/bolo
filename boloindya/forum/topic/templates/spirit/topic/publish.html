@@ -1,6 +1,7 @@
 {% extends "spirit/_base_index_ques.html" %}
 
 {% load spirit_tags i18n %}
+{% load static %}
 
 {% block title %}{% trans "Publish topic" %}{% endblock %}
 
@@ -13,7 +14,8 @@
         $('[for="id_title"], #id_title').hide();
     }
 	$( document ).ready(function() {
-		$( "textarea" ).store( "topic_publish_comment" );
+		// $( "textarea" ).store( "topic_publish_comment" );
+        // $("#id_category option").filter(function() { return $(this).text().indexOf("---") != 0; }).attr("disabled","disabled");
 	});
 
 	</script>
@@ -23,7 +25,7 @@
 
 {% block content %}
     
-<script src="https://cdn.webrtc-experiment.com/RecordRTC.js"></script>
+<script src="/media/js/RecordRTC.js"></script>
 <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
 <style>
     .record_info{color:#138c13;font-weight: 100!important;}
@@ -31,25 +33,14 @@
     label[for="id_comment"]{display: none;}
     #id_comment{height: 130px;}
     [for="id_title"]{margin-top: 10px;}
-
-    h2 {
-    left: 100px;
-    position: relative;
-    }
-
+    h2 {left: 100px;position: relative;}
     .marginTop{margin-top: 10px;}
     .marginRight10{margin-right: 10px;}
     .cnlRight{float: right;}
     .record_info{color:#138c13;font-weight: 800;}
     .colorCHange{color:#fff !important;}
     .hide{display: none;}
-
-.LoaderBalls {
-    width: 90px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
+    .LoaderBalls {width: 90px;display: flex;justify-content: space-between;align-items: center;
     &__item {
         // .LoaderBalls__wrapper__item
         $anim-drt: 0.4s;
@@ -58,603 +49,108 @@
         height: 20px;
         border-radius: 50%;
         background: #00f1ca;
-
         &:nth-child(1) {
             animation: bouncing $anim-drt alternate infinite $anim-ease;
         }
-
         &:nth-child(2) {
             animation: bouncing $anim-drt $anim-drt/4 alternate infinite $anim-ease backwards;
         }
-
         &:nth-child(3) {
             animation: bouncing $anim-drt $anim-drt/2 alternate infinite $anim-ease backwards;
         }
     }
 }
-
 @keyframes bouncing {
-
     0% {
         transform: translate3d(0, 10px, 0) scale(1.2, 0.85);
     }
-
     100% {
         transform: translate3d(0, -20px, 0) scale(0.9, 1.1);
     }
 }
-
-
-
 </style>
-        <hr><div class="container">
+    
+<hr><div class="container">
+    <br><h4 class="headline">{% trans "Start discussion" %}</h4>
+    <form action="." method="post" class="js-reply">
+        {% csrf_token %}
+        {# topic #}
+        <div>
+            <a href="javascript:void()" class="btn btn-danger" onclick="hidetextfields()" data-toggle="modal" data-target="#myModalAudio"> <i class="fa fa-microphone marginRight10" aria-hidden="true"></i>
+           Ask in Audio
+            </a>
+            <a href="javascript:void()" class="btn btn-danger" onclick="hidetextfields()" data-toggle="modal" data-target="#myModalVideo"><i class="fa fa-video-camera marginRight10" aria-hidden="true"></i>
+                Ask in Video
+            </a>
+            <a href="#" class="btn btn-danger ask_text" onclick="showtextfields()"><i class="fa fa-edit marginRight10"></i>
+                <span style="color: #fff">Ask in Text</span>
+            </a>
+        </div>
+        {% include "spirit/_form.html" %}
+        <input type="hidden" name="question_audio" value="">
+        <input type="hidden" name="question_video" value=""> 
+        {# comment #}
+        <div class="topic-publish-comment">
+            {% include "spirit/_form.html" with form=cform %}
+        </div>
 
-        <br><h4 class="headline">{% trans "Start discussion" %}</h4>
+        <div class="container">
+            {% include "spirit/comment/_editor.html" %}
 
-        <form action="." method="post" class="js-reply">
-            {% csrf_token %}
-    
-            {# topic #}
-            <div>
-                <a href="javascript:void()" class="btn btn-danger" onclick="hidetextfields()" data-toggle="modal" data-target="#myModalAudio"> <i class="fa fa-microphone marginRight10" aria-hidden="true"></i>
-               Ask in Audio
-                </a>
-                <a href="javascript:void()" class="btn btn-danger" onclick="hidetextfields()" data-toggle="modal" data-target="#myModalVideo"><i class="fa fa-video-camera marginRight10" aria-hidden="true"></i>
-                    Ask in Video
-                </a>
-                <a href="#" class="btn btn-danger ask_text" onclick="showtextfields()"><i class="fa fa-edit marginRight10"></i>
-                    <span style="color: #fff">Ask in Text</span>
-                </a>
-            </div>
-            {% include "spirit/_form.html" %}
-            <input type="hidden" name="question_audio" value="">
-            <input type="hidden" name="question_video" value=""> 
-            {# comment #}
-            <div class="topic-publish-comment">
-                {% include "spirit/_form.html" with form=cform %}
-            </div>
-    
-            <div class="container">
-                {% include "spirit/comment/_editor.html" %}
-    
-                <input class="button reply-button" type="submit" value="{% trans "Publish" %}" />
-            </div>
-        </form>
-    
+            <input class="button reply-button" type="submit" value="{% trans "Publish" %}" />
+        </div>
+    </form>
+</div>
 
+<!-- The Modal -->
+<div class="modal" id="myModalAudio">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Ask Question [Audio]</h4>
+          <button type="button" class="close btnCloseAudio" data-dismiss="modal">&times;</button>
+        </div>
+        <!-- Modal body -->
+        <div class="modal-body">
+            <button class="btn btn-danger" id="btn-start-recording"><i class="fa fa-microphone" aria-hidden="true"></i> Start Recording</button>
+            <button class="btn btn-danger" id="btn-stop-recording" disabled><i class="fa fa-microphone-slash" aria-hidden="true"></i> Stop Recording</button><br>
+            <button class="hide" id="btn-release-microphone" disabled>Release Microphone</button>
+            <button class="hide" id="btn-download-recording" disabled>Download</button>
+            <div style="margin-top: 10px;display: none;"><audio controls autoplay muted playsinline></audio></div>
+            <span class="record_info"></span>
+            <script src="/media/js/audio_record.js"></script>
+        </div>
+      </div>
     </div>
-
-
-
-    <!-- Model Popup for Audio -->
-
-
-          <!-- The Modal -->
-          <div class="modal" id="myModalAudio">
-            
-            <div class="modal-dialog">
-              <div class="modal-content">
-              
-                <!-- Modal Header -->
-                <div class="modal-header">
-                  <h4 class="modal-title">Ask Question [Audio]</h4>
-                  <button type="button" class="close btnCloseAudio" data-dismiss="modal">&times;</button>
-                </div>
-                
-                <!-- Modal body -->
-                <div class="modal-body">
-                    <button class="btn btn-danger" id="btn-start-recording"><i class="fa fa-microphone" aria-hidden="true"></i> Start Recording</button>
-                    <button class="btn btn-danger" id="btn-stop-recording" disabled><i class="fa fa-microphone-slash" aria-hidden="true"></i> Stop Recording</button>
-                    <button class="hide" id="btn-release-microphone" disabled>Release Microphone</button>
-                    <button class="hide" id="btn-download-recording" disabled>Download</button>
-                    <div style="margin-top: 10px;"><audio controls autoplay muted playsinline></audio></div>
-                    <span class="record_info"></span>
-                    <script>
-
-                      //============== New Updated Code ================
-
-                        var audio = document.querySelector('audio');
-
-                        function captureMicrophone(callback) {
-                            btnReleaseMicrophone.disabled = false;
-
-                            if(microphone) {
-                                callback(microphone);
-                                return;
-                            }
-
-                            if(typeof navigator.mediaDevices === 'undefined' || !navigator.mediaDevices.getUserMedia) {
-                                alert('This browser does not supports WebRTC getUserMedia API.');
-
-                                if(!!navigator.getUserMedia) {
-                                    alert('This browser seems supporting deprecated getUserMedia API.');
-                                }
-                            }
-
-                            navigator.mediaDevices.getUserMedia({
-                                audio: isEdge ? true : {
-                                    echoCancellation: false
-                                }
-                            }).then(function(mic) {
-                                callback(mic);
-                            }).catch(function(error) {
-                                alert('Unable to capture your microphone. Please check console logs.');
-                                console.error(error);
-                            });
-                        }
-
-                        function replaceAudio(src) {
-                            var newAudio = document.createElement('audio');
-                            newAudio.controls = true;
-                            newAudio.autoplay = true;
-
-                            if(src) {
-                                newAudio.src = src;
-                            }
-                            
-                            var parentNode = audio.parentNode;
-                            parentNode.innerHTML = '';
-                            parentNode.appendChild(newAudio);
-
-                            audio = newAudio;
-                        }
-
-                        function stopRecordingCallback() {
-                            replaceAudio(URL.createObjectURL(recorder.getBlob()));
-
-                            btnStartRecording.disabled = false;
-
-                            setTimeout(function() {
-                                if(!audio.paused) return;
-
-                                setTimeout(function() {
-                                    if(!audio.paused) return;
-                                    audio.play();
-                                }, 1024);
-                                
-                                audio.play();
-                            }, 300);
-
-                            audio.play();
-
-                            btnDownloadRecording.disabled = false;
-
-                            if(isSafari) {
-                                click(btnReleaseMicrophone);
-                            }
-
-                            if(!recorder || !recorder.getBlob()) return;
-
-                            var blob = recorder.getBlob();
-                            var file = new File([blob], getFileName('mp3'), {
-                                type: 'audio/mp3'
-                            });
-                            SaveToDisk(file, getFileName('mp3'));
-
-                        }
-
-                        var isEdge = navigator.userAgent.indexOf('Edge') !== -1 && (!!navigator.msSaveOrOpenBlob || !!navigator.msSaveBlob);
-                        var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-
-                        var recorder; // globally accessible
-                        var microphone;
-
-                        var btnStartRecording = document.getElementById('btn-start-recording');
-                        var btnStopRecording = document.getElementById('btn-stop-recording');
-                        var btnReleaseMicrophone = document.querySelector('#btn-release-microphone');
-                        var btnDownloadRecording = document.getElementById('btn-download-recording');
-
-                        btnStartRecording.onclick = function() {
-                          $('.record_info').html('Recording in progress...');
-                            this.disabled = true;
-                            this.style.border = '';
-                            this.style.fontSize = '';
-
-                            if (!microphone) {
-                                captureMicrophone(function(mic) {
-                                    microphone = mic;
-
-                                    if(isSafari) {
-                                        replaceAudio();
-
-                                        audio.muted = true;
-                                        audio.srcObject = microphone;
-
-                                        btnStartRecording.disabled = false;
-                                        btnStartRecording.style.border = '1px solid red';
-                                        btnStartRecording.style.fontSize = '150%';
-                                        click(btnStartRecording);
-                                        return;
-                                    }
-
-                                    click(btnStartRecording);
-                                });
-                                return;
-                            }
-
-                            replaceAudio();
-
-                            audio.muted = true;
-                            audio.srcObject = microphone;
-
-                            var options = {
-                                type: 'audio',
-                                numberOfAudioChannels: isEdge ? 1 : 2,
-                                checkForInactiveTracks: true,
-                                bufferSize: 44100
-                            };
-
-                            if(isSafari || isEdge) {
-                                options.recorderType = StereoAudioRecorder;
-                            }
-
-                            if(navigator.platform && navigator.platform.toString().toLowerCase().indexOf('win') === -1) {
-                                options.sampleRate = 48000; // or 44100 or remove this line for default
-                            }
-
-                            if(isSafari) {
-                                options.sampleRate = 44100;
-                                options.bufferSize = 4096;
-                                options.numberOfAudioChannels = 2;
-                            }
-
-                            if(recorder) {
-                                recorder.destroy();
-                                recorder = null;
-                            }
-
-                            recorder = RecordRTC(microphone, options);
-
-                            recorder.startRecording();
-
-                            btnStopRecording.disabled = false;
-                            btnDownloadRecording.disabled = true;
-                        };
-
-
-                        btnStopRecording.onclick = function() {
-
-                            this.disabled = true;
-                            $('.record_info').html('Please wait... <br>uploading file! ');
-                            recorder.stopRecording(stopRecordingCallback);
-                        };
-
-                        btnReleaseMicrophone.onclick = function() {
-                            this.disabled = true;
-                            btnStartRecording.disabled = false;
-
-                            if(microphone) {
-                                microphone.stop();
-                                microphone = null;
-                            }
-
-                            if(recorder) {
-                                // click(btnStopRecording);
-                            }
-                        };
-
-                        btnDownloadRecording.onclick = function() {
-                            this.disabled = true;
-                            if(!recorder || !recorder.getBlob()) return;
-
-                            var blob = recorder.getBlob();
-                            var file = new File([blob], getFileName('mp3'), {
-                                type: 'audio/mp3'
-                            });
-                            SaveToDisk(file, getFileName('mp3'));
-                        };
-
-                        function click(el) {
-                            el.disabled = false; // make sure that element is not disabled
-                            var evt = document.createEvent('Event');
-                            evt.initEvent('click', true, true);
-                            el.dispatchEvent(evt);
-                        }
-
-                        function getRandomString() {
-                            if (window.crypto && window.crypto.getRandomValues && navigator.userAgent.indexOf('Safari') === -1) {
-                                var a = window.crypto.getRandomValues(new Uint32Array(3)),
-                                    token = '';
-                                for (var i = 0, l = a.length; i < l; i++) {
-                                    token += a[i].toString(36);
-                                }
-                                return token;
-                            } else {
-                                return (Math.random() * new Date().getTime()).toString(36).replace(/\./g, '');
-                            }
-                        }
-
-                        function getFileName(fileExtension) {
-                            var d = new Date();
-                            var year = d.getFullYear();
-                            var month = d.getMonth();
-                            var date = d.getDate();
-                            return 'RecordRTC-' + year + month + date + '-' + getRandomString() + '.' + fileExtension;
-                        }
-
-
-
-                        function SaveToDisk(File, fileName) {debugger;
-                            // for non-IE
-                            if (!window.ActiveXObject) {
-                                  console.log(File);
-                                  formData = new FormData();
-                                  formData.append('files_varname', 'file');
-                                  formData.append('file', File);
-                                  formData.append('file_dest', "video.webm");
-                                  var xhr = new XMLHttpRequest();
-                                  //xhr.setRequestHeader("Content-Type","multipart/form-data");
-                                  xhr.open('POST', "https://www.careeranna.com/demo/getAudioData", true);
-                                  xhr.onload = function (e) {
-                                  if (xhr.readyState === 4) {
-                                      if (xhr.status === 200) {
-                                          // console.log("success");
-                                          // console.log(xhr.responseText);
-                                          $('[name="question_audio"]').val(xhr.responseText);
-                                          $('#btnPublish').show();
-                                          $('.record_info').html('');
-                                          //$('#myModalAudio').modal('toggle');
-                                          $('.modal-backdrop').hide();
-                                          $('.btnCloseAudio').click();
-                                          
-                                      } else {
-                                        console.error(xhr.statusText);
-                                      }
-                                    }
-                                  };
-                                  xhr.onerror = function (e) {
-                                    console.error(xhr.statusText);
-                                  };
-                                  xhr.send(formData); 
-                            }
-
-                            // for IE
-                            else if (!!window.ActiveXObject && document.execCommand) {
-                                      console.log(File);
-                                      formData = new FormData();
-                                      formData.append('files_varname', 'file');
-                                      formData.append('file', File);
-                                      formData.append('file_dest', "video.webm");
-                                      var xhr = new XMLHttpRequest();
-                                      //xhr.setRequestHeader("Content-Type","multipart/form-data");
-                                      xhr.open('POST', "https://www.careeranna.com/demo/getAudioData", true);
-                                      xhr.onload = function (e) {
-                                      if (xhr.readyState === 4) {
-                                          if (xhr.status === 200) {
-                                              // console.log("success");
-                                              // console.log(xhr.responseText);
-                                              // $("#id_comment").html(xhr.responseText);
-                                              $('[name="question_audio"]').val(xhr.responseText);
-                                              $('#btnPublish').show();
-                                              $('.record_info').html('');
-                                              $('.modal-backdrop').hide();
-                                              //$('#myModalAudio').modal('toggle');
-                                              $('.btnCloseAudio').click();
-                                              
-                                          } else {
-                                            console.error(xhr.statusText);
-                                          }
-                                        }
-                                      };
-                                      xhr.onerror = function (e) {
-                                        console.error(xhr.statusText);
-                                      };
-                                      xhr.send(formData); 
-                            }
-                        }
-
-
-
-                      //====================End=========================  
-
-                    </script>
-
-
-                </div>
-                
-                <!-- Modal footer -->
-                <!-- <div class="modal-footer">
-                  <button type="button" class="btn btn-danger btnCloseAudio" data-dismiss="modal">Close</button>
-                </div> -->
-                
-              </div>
-            </div>
-          </div>
-  
-
-
-
-    <!-- end -->
-
-
-
-    <!-- Video Model Popup -->
-
-
-
-      <!-- The Modal -->
-      <div class="modal" id="myModalVideo">
-        <div class="modal-dialog">
-          <div class="modal-content">
-          
+</div>
+
+<!-- The Modal -->
+<div class="modal" id="myModalVideo">
+    <div class="modal-dialog">
+        <div class="modal-content">
             <!-- Modal Header -->
             <div class="modal-header">
               <h4 class="modal-title">Ask Question [Video]</h4>
               <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
-            
             <!-- Modal body -->
             <div class="modal-body">
-                    <video id="gum" autoplay muted></video>
-                          <video id="recorded" autoplay loop controls hidden></video>
-                          <div class="marginTop">
-                            <button class="btn btn-danger" id="recordVid"><i class="fa fa-video-camera marginRight10" aria-hidden="true"></i>Start Recording</button>
-                            <button class="btn btn-danger hide" id="play" disabled><i class="fa fa-play marginRight10" aria-hidden="true"></i>Play</button>
-                            <button id="download" disabled hidden>Download</button>
-                            <!-- <a href="/topic/discussion/" class="btn btn-danger cnlRight colorCHange">Cancel</a> -->
-                          </div>
-                          <span class="record_info"></span>
-                        <script>
-                            navigator.mediaDevices.getUserMedia({
-                                audio: isEdge ? true : {
-                                    echoCancellation: false
-                                }
-                            }).catch(function(error) {
-                                alert('Unable to capture your microphone. Please check console logs.');
-                                console.error(error);
-                            });
-
-                            var mediaSource = new MediaSource();
-                            mediaSource.addEventListener('sourceopen', handleSourceOpen, false);
-                            var mediaRecorder;
-                            var recordedBlobs;
-                            var sourceBuffer;
-                            var gumVideo = document.querySelector('video#gum');
-                            var recordedVideo = document.querySelector('video#recorded');
-                            var recordButton = document.querySelector('button#recordVid');
-                            var playButton = document.querySelector('button#play');
-                            var downloadButton = document.querySelector('button#download');
-                            recordButton.onclick = toggleRecording;
-                            playButton.onclick = play;
-                            downloadButton.onclick = download;
-                            var constraints = {
-                              audio: true,
-                              video: true
-                            };
-
-                              navigator.mediaDevices.getUserMedia(constraints).then(
-                                successCallback
-                              ).catch(function(error) {
-                                  alert('Unable to capture your microphone. Please check console logs.');
-                                  console.error(error);
-                              });
-
-                            function successCallback(stream) {
-                              console.log('getUserMedia() got stream: ', stream);
-                              window.stream = stream;
-                              gumVideo.srcObject = stream;
-                            }
-                            function errorCallback(error) {
-                              console.log('navigator.getUserMedia error: ', error);
-                            }
-                            function handleSourceOpen(event) {
-                              console.log('MediaSource opened');
-                              sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="vp8"');
-                              console.log('Source buffer: ', sourceBuffer);
-                            }
-                            function handleDataAvailable(event) {
-                              if (event.data && event.data.size > 0) {
-                                recordedBlobs.push(event.data);
-                              }
-                            }
-                            function handleStop(event) {
-                              console.log('Recorder stopped: ', event);
-                            }
-                            function toggleRecording() {
-                              if (recordButton.textContent === 'Start Recording') {
-                                $('#btnPublish').hide()
-                                $('.record_info').html('Recording in progress...')
-                                startRecordingVideo();
-                              } else {
-                                stopRecordingVideo();
-                                recordButton.textContent = 'Record Again';
-                                $('.record_info').html('Please wait... <br>uploading file! ')
-                                playButton.disabled = false;
-                                downloadButton.disabled = false;
-                              }
-                            }
-                            // The nested try blocks will be simplified when Chrome 47 moves to Stable
-                            function startRecordingVideo() {
-                              var options = {mimeType: 'video/webm', bitsPerSecond: 1000000};
-                              recordedBlobs = [];
-                              try {
-                                mediaRecorder = new MediaRecorder(window.stream, options);
-                              } catch (e0) {
-                                console.log('Unable to create MediaRecorder with options Object: ', e0);
-                                try {
-                                  options = {mimeType: 'video/webm,codecs=vp9', bitsPerSecond: 1000000};
-                                  mediaRecorder = new MediaRecorder(window.stream, options);
-                                } catch (e1) {
-                                  console.log('Unable to create MediaRecorder with options Object: ', e1);
-                                  try {
-                                    options = 'video/vp8'; // Chrome 47
-                                    mediaRecorder = new MediaRecorder(window.stream, options);
-                                  } catch (e2) {
-                                    alert('MediaRecorder is not supported by this browser.\n\n' +
-                                        'Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Platform features enabled from chrome://flags.');
-                                    console.error('Exception while creating MediaRecorder:', e2);
-                                    return;
-                                  }
-                                }
-                              }
-                              console.log('Created MediaRecorder', mediaRecorder, 'with options', options);
-                              recordButton.textContent = 'Stop Recording';
-                              playButton.disabled = true;
-                              downloadButton.disabled = true;
-                              mediaRecorder.onstop = handleStop;
-                              mediaRecorder.ondataavailable = handleDataAvailable;
-                              mediaRecorder.start(10); // collect 10ms of data
-                              console.log('MediaRecorder started', mediaRecorder);
-                            }
-                            function stopRecordingVideo() {
-                              mediaRecorder.stop();
-                              console.log('Recorded Blobs: ', recordedBlobs);
-                            var blob = new Blob(recordedBlobs, {type: 'video/webm'});
-                              //postVideoToServer(recordedBlobs);
-                              recordedVideo.controls = true;
-                              sendVideoData(blob);
-                            }
-                            function sendVideoData(File) {
-                                console.log(File);
-                                formData = new FormData();
-                                formData.append('files_varname', 'file');
-                                formData.append('file', File);
-                                formData.append('file_dest', "video.webm");
-                                var xhr = new XMLHttpRequest();
-                                //xhr.setRequestHeader("Content-Type","multipart/form-data");
-                                xhr.open('POST', "https://www.careeranna.com/demo/getAudioData", true);
-                                xhr.onload = function (e) {
-                                if (xhr.readyState === 4) {
-                                    if (xhr.status === 200) {
-                                        // console.log("success");
-                                        // console.log(xhr.responseText);
-                                        // $("#id_comment").html(xhr.responseText);
-                                        $('[name="question_video"]').val(xhr.responseText);
-                                        $('#btnPublish').show()
-                                        $('.record_info').html('')
-                                        $('.modal-backdrop, #myModalVideo').hide();
-                                    } else {
-                                      console.error(xhr.statusText);
-                                    }
-                                  }
-                                };
-                                xhr.onerror = function (e) {
-                                  console.error(xhr.statusText);
-                                };
-                                xhr.send(formData); 
-                            }
-                            function play() {
-                              var superBuffer = new Blob(recordedBlobs, {type: 'video/webm'});
-                              recordedVideo.src = window.URL.createObjectURL(superBuffer);
-                            }
-                        </script>
+                <video id="gum" autoplay muted></video>
+                <video id="recorded" autoplay loop controls hidden></video>
+                <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
+                <div class="marginTop">
+                <button class="btn btn-danger" id="recordVid"><i class="fa fa-video-camera marginRight10" aria-hidden="true"></i>Start Recording</button>
+                <button class="btn btn-danger hide" id="play" disabled><i class="fa fa-play marginRight10" aria-hidden="true"></i>Play</button>
+                <button id="download" disabled hidden>Download</button>
+                <!-- <a href="/topic/discussion/" class="btn btn-danger cnlRight colorCHange">Cancel</a> -->
+                </div>
+                <span class="record_info"></span>
+                <script src="/media/js/video_record.js"></script>
             </div>
-            
-            <!-- Modal footer -->
-            <!-- <div class="modal-footer">
-              <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-            </div> -->
-            
-          </div>
         </div>
-      </div>
-      
-
-
-    <!-- end -->
-
-
-
+    </div>
+</div>
 {% endblock %}
 
 

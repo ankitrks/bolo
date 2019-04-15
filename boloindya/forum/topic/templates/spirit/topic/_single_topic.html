@@ -1,130 +1,135 @@
-    {% for topic in topics %}
-                            <div class="quest_feed" style="margin-bottom: 10px;">
-                                <!-- user info -->
-                                <div class="quest_user_info">
-                                    <div class="quest_user_info_img">
-                                        <img src="http://lorempixel.com/200/200/" alt="user image" class="quest_user_image"/>
-                                    </div>
-                                    <div class="quest_user_detail">
-                                        <div class="user_name">{{ topic.user.username }}</div>
-                                        <div class="feed_post_date">Answered On {{ topic.date.date }}</div>
-                                    </div>
-                                </div>
-                                <!-- Question -->
-                                <div class="question"><a href="{% url 'spirit:topic:detail' topic.id %}" class="ques_link">{{ topic.title|capfirst }}</a></div>
-                                <!-- Answer options -->
-                                <div class="answer_option">
-                                    <div class="ans_opt_list">
-                                    <a href="/comment/{{topic.id}}/publish/video/" style="text-decoration:none;color:inherit;">
-                                        <img src="/media/img/icons/video_camera.svg" alt="video recording" />
-                                        <div class="ans_opt_text">Answer in Video</div>
-                                        </a>
-                                    </div>
-                                    <div class="ans_opt_list">
-                                    <a href="/comment/{{topic.id}}/publish/audio/" style="text-decoration:none;color:inherit;">
-                                        <img src="/media/img/icons/audio_mic.svg" alt="audio recording" />
-                                        <div class="ans_opt_text">Answer in Audio</div>
-                                        </a>
-                                    </div>
-                                    <div class="ans_opt_list">
-                                    <a href="/comment/{{topic.id}}/publish/text/" style="text-decoration:none;color:inherit;">
-                                        <img src="/media/img/icons/pencil_red.svg" alt="write text" />
-                                        <div class="ans_opt_text">Answer in Text</div>
-                                        </a>
-                                    </div>
+{% for topic in topics %}
+    <div class="quest_feed" style="margin-bottom: 10px;">
+        <!-- user info -->
+        <div class="quest_user_info">
+            <div class="quest_user_info_img">
+                <img src="http://lorempixel.com/200/200/" alt="user image" class="quest_user_image"/>
+            </div>
+            <div class="quest_user_detail">
+                <div class="user_name">{{ topic.user.username }}</div>
+                <div class="feed_post_date">Answered On {{ topic.date.date }}</div>
+            </div>
+        </div>
+        <!-- Question -->
+        <div class="question"><a href="{% url 'spirit:topic:detail' topic.id %}" class="ques_link">{{ topic.title|capfirst }}</a></div>
+        <!-- Answer options -->
+        <div class="answer_option">
+            <div class="ans_opt_list">
+            <a href="/comment/{{topic.id}}/publish/video/" style="text-decoration:none;color:inherit;">
+                <img src="/media/img/icons/video_camera.svg" alt="video recording" />
+                <div class="ans_opt_text">Answer in Video</div>
+                </a>
+            </div>
+            <div class="ans_opt_list">
+            <a href="/comment/{{topic.id}}/publish/audio/" style="text-decoration:none;color:inherit;">
+                <img src="/media/img/icons/audio_mic.svg" alt="audio recording" />
+                <div class="ans_opt_text">Answer in Audio</div>
+                </a>
+            </div>
+            <div class="ans_opt_list">
+            <a href="/comment/{{topic.id}}/publish/text/" style="text-decoration:none;color:inherit;">
+                <img src="/media/img/icons/pencil_red.svg" alt="write text" />
+                <div class="ans_opt_text">Answer in Text</div>
+                </a>
+            </div>
 
-                                </div>
-                                <!-- user answer as video -->
-                                <div class="user_ans_video common_ans_area">
-                                    <div class="head_text tv_hs_{{topic.id}}" style="display: nones;">Top video answers</div>
-                                    <div class="inner_ans_area">
-                                        <div class="owl-carousel owl-theme">
-                                            {% for video in topic.topic_comment.all %}
-                                                {% if video.is_media and not video.is_audio %}
-                                                    <!-- <script type="text/javascript">
-                                                        $('.tv_hs_' + '{{topic.id}}').show();
-                                                    </script> -->
-                                                    <div class="item">
-                                                    <video controls muted><source src="{{ video.get_updated_url }}" type="video/mp4"></video>
-                                                        <div class="posted_by">
-                                                            Posted by {{ video.user.username }} <span>{{ video.date.date }}  &nbsp;</span>
-                                                            <span id="like_comment{{video.id}}" data_user='{% if user.username %}1{% else %}0{% endif %}' data_id="{{ video.id }}" onClick="changeLikeFunction({{ video.id }})" style="cursor:pointer;">
-                                                            <i class="fa fa-heart"></i>
-                                                            <span id="updated_like{{ video.id}}">{{ video.likes_count }}</span> likes
-                                                            </span> &nbsp;
-                                                            <span> <i class="fas fa-share-square"> Share On</i>
-                                                                <a target="blank" href="https://api.whatsapp.com/send?phone=+919741133224&text={{ topic.title }} https://www.boloindya.com/topic/{{topic.id}}/" data-action="share/whatsapp/share"><i class="fab fa-whatsapp-square"></i></a>
+        </div>
 
-                                                            <a href="https://www.facebook.com/sharer.php?u=https://www.boloindya.com/topic/{{topic.id}}&t={{ topic.title }}"><i class="fab fa-facebook-square"></i></a>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </div>    
-                                    </div> 
-                                </div>
-                                <!-- user answer as audo -->
+        {% if not topic.has_answers %}
+            <div><small>This topic has not answers yet!<br>
+                <!-- <a href="/topic/publish" style="color: #BB3335"><b><u>Ask your Question Now</u></b></a> -->
+            </small></div>
+        {% endif %}
 
-                                <div class="head_text ta_hs_{{topic.id}}" style="display: none;">Top audio answers</div>
-                                <div class="user_ans_audio common_ans_area">
-                                        <!-- User info -->
-                                    {% for video in topic.topic_comment.all %}
-                                    {% if video.is_media and video.is_audio %}
-                                    <script type="text/javascript">
-                                        $('.ta_hs_' + '{{topic.id}}').show();
-                                    </script>
-                                    <div class="inner_ans_area" style="margin-bottom: 5px;">
-                                        <div class="quest_user_info">
-                                            <div class="quest_user_info_img">
-                                                <img src="http://lorempixel.com/200/200/" alt="user image" class="quest_user_image"/>
-                                            </div>
-                                            <div class="quest_user_detail">
-                                                <div class="user_name">{{ video.user.username }}</div>
-                                                <div class="feed_post_date">Answered {{ video.date.date }}</div>
-                                            </div>
-                                                    
-                                        
-                                        </div>
-                                        <!-- Audio player -->
-                                        <div id="ans_audio" data-videosrc="{{ video.get_updated_url }}" style="width: 100%;">
-                                            <audio controls style="width: 100%;">
-                                            <source src="{{ video.get_updated_url }}" type="audio/ogg" style="width: 100%;">  
-                                            Your browser does not support the audio element.
-                                        </audio>
-                                        </div>
-                                    </div>   
-                                    {% endif %}
-                                    {% endfor %}
-                                </div>
-                                <!-- user answer as text -->
+        <!-- user answer as video -->
+        {% if topic.get_video_comments|length %}
+            <div class="user_ans_video common_ans_area">
+                <div class="head_text tv_hs_{{topic.id}}">Top video answers</div>
+                <div class="inner_ans_area">
+                    <div class="owl-carousel owl-theme">
+                        {% for video in topic.get_video_comments %}
+                            <div class="item">
+                            <video controls muted><source src="{{ video.get_updated_url }}" type="video/mp4"></video>
+                                <div class="posted_by">
+                                    Posted by {{ video.user.username }} <span>{{ video.date.date }}  &nbsp;</span>
+                                    <span id="like_comment{{video.id}}" data_user='{% if user.username %}1{% else %}0{% endif %}' data_id="{{ video.id }}" onClick="changeLikeFunction({{ video.id }})" style="cursor:pointer;">
+                                    <i class="fa fa-heart"></i>
+                                    <span id="updated_like{{ video.id}}">{{ video.likes_count }}</span> likes
+                                    </span> &nbsp;
+                                    <span> <i class="fas fa-share-square"> Share On</i>
+                                        <a target="blank" href="https://api.whatsapp.com/send?phone=+919741133224&text={{ topic.title }} https://www.boloindya.com/topic/{{topic.id}}/" data-action="share/whatsapp/share"><i class="fab fa-whatsapp-square"></i></a>
 
-                                <div class="head_text tt_hs_{{topic.id}}" style="display: none;">Top text answers</div>
-                                {% for video in topic.topic_comment.all %}
-                                {% if not video.is_media and 's3' not in video.comment and video.comment %}
-                                <script type="text/javascript">
-                                    $('.tt_hs_' + '{{topic.id}}').show();
-                                </script>
-                                <div class="user_ans_text common_ans_area">
-                                    <div class="inner_ans_area">
-                                            <!-- User info -->
-                                            <div class="quest_user_info">
-                                                <div class="quest_user_info_img">
-                                                    <img src="http://lorempixel.com/200/200/" alt="user image" class="quest_user_image"/>
-                                                </div>
-                                                <div class="quest_user_detail">
-                                                    <div class="user_name">{{ video.user.username }}</div>
-                                                    <div class="feed_post_date">Answered {{ video.date.date }}</div>
-                                                </div>
-                                            </div>
-                                            <!-- answer text -->
-                                            <div class="ans_text">
-                                                    {{ video.comment }}
-                                            </div>
-                                    </div>
+                                    <a href="https://www.facebook.com/sharer.php?u=https://www.boloindya.com/topic/{{topic.id}}&t={{ topic.title }}"><i class="fab fa-facebook-square"></i></a>
+                                    </span>
                                 </div>
-
-                                            {% endif %}
-                                            {% endfor %}
                             </div>
-                            {% endfor %}
+                        {% endfor %}
+                    </div>    
+                </div> 
+            </div>
+        {% endif %}
+        <!-- user answer as audo -->
+
+        {% if topic.get_audio_comments|length %}
+            <div class="head_text">Top audio answers</div>
+            <div class="user_ans_audio common_ans_area">
+                {% for video in topic.get_audio_comments %}
+                    <title>{{topic.title}}</title>
+                    <meta name="description" content="Bolo Indya- Questions, Answers and Discussions Platform in Indian Languages" />
+                    <link rel="canonical" href="https://www.boloindya.com/topic/{{topic.id}}/" />
+                    <meta property="og:url" content="https://www.boloindya.com/topic/{{topic.id}}/"/>
+                    <meta property="og:type" content="website" />
+                    <meta property='og:title' content='{{topic.title}}' />
+                    <meta property='og:description' content='Bolo Indya- Questions, Answers and Discussions Platform in Indian Languages' /> 
+                    <meta property='og:image' content='https://www.careeranna.com/uploads/product_images/Course_Images/2019/02/1550560058tissnet.jpg' />
+
+                    <div class="inner_ans_area" style="margin-bottom: 5px;">
+                        <div class="quest_user_info">
+                            <div class="quest_user_info_img">
+                                <img src="http://lorempixel.com/200/200/" alt="user image" class="quest_user_image"/>
+                            </div>
+                            <div class="quest_user_detail">
+                                <div class="user_name">{{ video.user.username }}</div>
+                                <div class="feed_post_date">Answered {{ video.date.date }}</div>
+                            </div>
+                                    
+                        
+                        </div>
+                        <!-- Audio player -->
+                        <div id="ans_audio" data-videosrc="{{ video.get_updated_url }}" style="width: 100%;">
+                            <audio controls style="width: 100%;">
+                            <source src="{{ video.get_updated_url }}" type="audio/ogg" style="width: 100%;">  
+                            Your browser does not support the audio element.
+                        </audio>
+                        </div>
+                    </div>   
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <!-- user answer as text -->
+        {% if topic.get_text_comments|length %}
+            <div class="head_text">Top text answers</div>
+            {% for video in topic.get_text_comments %}
+                <div class="user_ans_text common_ans_area">
+                    <div class="inner_ans_area">
+                            <!-- User info -->
+                            <div class="quest_user_info">
+                                <div class="quest_user_info_img">
+                                    <img src="http://lorempixel.com/200/200/" alt="user image" class="quest_user_image"/>
+                                </div>
+                                <div class="quest_user_detail">
+                                    <div class="user_name">{{ video.user.username }}</div>
+                                    <div class="feed_post_date">Answered {{ video.date.date }}</div>
+                                </div>
+                            </div>
+                            <!-- answer text -->
+                            <div class="ans_text">
+                                    {{ video.comment }}
+                            </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endfor %}

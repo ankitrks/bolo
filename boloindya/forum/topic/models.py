@@ -52,6 +52,15 @@ class Topic(models.Model):
     def __unicode__(self):
         return self.title
 
+    def has_answers(self):
+        return self.topic_comment.all().count()
+    def get_video_comments(self):
+        return self.topic_comment.filter(is_media = True, is_audio = False)
+    def get_audio_comments(self):
+        return self.topic_comment.filter(is_media = True, is_audio = True)
+    def get_text_comments(self):
+        return self.topic_comment.filter(is_media = False)
+
     class Meta:
         ordering = ['-last_active', '-pk']
         verbose_name = _("topic")

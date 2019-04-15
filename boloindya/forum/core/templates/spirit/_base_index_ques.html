@@ -39,25 +39,46 @@
       <script src="https://owlcarousel2.github.io/OwlCarousel2/assets/owlcarousel/owl.carousel.js"></script>
       <script src="/media/js/script_qa.js"></script>
       <script>
+        function getCookie(cname) {
+          var name = cname + "=";
+          var decodedCookie = decodeURIComponent(document.cookie);
+          var ca = decodedCookie.split(';');
+          for(var i = 0; i <ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') {
+              c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+              return c.substring(name.length, c.length);
+            }
+          }
+          return "";
+        }
         $( document ).ready(function() {
-          $.tab();
-          $( 'a.js-post' ).postify( {
-              csrfToken: "{{ csrf_token }}",
-          } );
-
-          $('.js-messages').messages();
-
-          {% if user.is_authenticated %}
-              $.notification( {
-                  notificationUrl: "{% url "spirit:topic:notification:index-ajax" %}",
-                  notificationListUrl: "{% url "spirit:topic:notification:index-unread" %}",
-                  mentionTxt: "{% trans "{user} has mention you on {topic}" %}",
-                  commentTxt: "{% trans "{user} has commented on {topic}" %}",
-                  showAll: "{% trans "Show all" %}",
-                  empty: "{% trans "No new notifications, yet" %}",
-                  unread: "{% trans "unread" %}",
-              } );
-          {% endif %}
+          $("#id_category option").filter(function() { return $(this).text().indexOf("---") != 0; }).attr("disabled","disabled"); 
+          // $.tab();
+          // $( 'a.js-post' ).postify( {
+          //     csrfToken: "{{ csrf_token }}",
+          // } );
+          // $('.js-messages').messages();
+          // {% if user.is_authenticated %}
+          //     $.notification( {
+          //         notificationUrl: "{% url "spirit:topic:notification:index-ajax" %}",
+          //         notificationListUrl: "{% url "spirit:topic:notification:index-unread" %}",
+          //         mentionTxt: "{% trans "{user} has mention you on {topic}" %}",
+          //         commentTxt: "{% trans "{user} has commented on {topic}" %}",
+          //         showAll: "{% trans "Show all" %}",
+          //         empty: "{% trans "No new notifications, yet" %}",
+          //         unread: "{% trans "unread" %}",
+          //     } );
+          // {% endif %}
+          $('.change_language[lcode="' + getCookie('language') +'"]').addClass('selected');
+          $('.change_language').click(function(e){
+            e.preventDefault()
+            var lcode = $(this).attr('lcode');
+            document.cookie = "language=" + lcode;
+            window.location = $(this).attr('href');
+          });
         });
       </script>
     {% endblock %}

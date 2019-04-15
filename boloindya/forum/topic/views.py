@@ -23,8 +23,8 @@ from django.template.loader import render_to_string
 from django.http import JsonResponse
 import json
 from django.core.paginator import Paginator
-# from utils import convert_speech_to_text
 
+# Required for speech to text...
 import io
 import os
 import urllib2
@@ -34,36 +34,45 @@ from datetime import datetime
 from google.cloud import speech
 from google.cloud.speech import enums
 from google.cloud.speech import types
-def convert_speech_to_text(blob_url):
-    fname = datetime.now().strftime('%s')
-    #wget_command = "python -m wget -o /tmp/" + fname + " " + blob_url
-    #subprocess.call(wget_command, shell=True)
-    file_response = urllib2.urlopen(blob_url)
-    file_obj = open("/tmp/" + fname, 'w')
-    file_obj.write(file_response.read())
-    file_obj.close()
 
-    command = "ffmpeg -i /tmp/" + fname + " -ab 160k -ac 1 -ar 44100 -vn /tmp/" + fname + ".wav"
-    subprocess.call(command, shell=True)
-    client = speech.SpeechClient()
+def get_current_language(request):
+    return request.COOKIES.get('language', request.GET.get('lid', 2))
 
-    with io.open('/tmp/' + fname + '.wav', 'rb') as audio_file:
-      content = audio_file.read()
-      audio = types.RecognitionAudio(content=content)
+def get_language_code(request):
+    language_code_map = {'1' : 'en-US', '2' : 'hi', '3' : 'ta', '4' : 'te', 1 : 'en-US', 2 : 'hi', 3 : 'ta', 4 : 'te'}
+    return language_code_map[get_current_language(request)]
 
-    config = types.RecognitionConfig( encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16, \
-                    sample_rate_hertz=44100, language_code='en-US')
-    response = client.recognize(config, audio)
+def convert_speech_to_text(request, blob_url):
+    try:
+        fname = datetime.now().strftime('%s')
+        file_response = urllib2.urlopen(blob_url)
+        file_obj = open("/tmp/" + fname, 'w')
+        file_obj.write(file_response.read())
+        file_obj.close()
 
-    return_str = ''
-    for result in response.results:
-        print ('{}'.format(result.alternatives[0].transcript))
-        return_str += ('{}'.format(result.alternatives[0].transcript))
-        # print('Transcript: {}'.format(result.alternatives[0].transcript))
-    #f1_rm = "rm -rf /tmp/" + fname
-    #f2_rm = "rm -rf /tmp/" + fname + ".wav"
-    #subprocess.call(f1_rm, shell=True)
-    #subprocess.call(f2_rm, shell=True)
+        command = "ffmpeg -i /tmp/" + fname + " -ab 160k -ac 1 -ar 44100 -vn /tmp/" + fname + ".wav"
+        subprocess.call(command, shell=True)
+        client = speech.SpeechClient()
+
+        with io.open('/tmp/' + fname + '.wav', 'rb') as audio_file:
+          content = audio_file.read()
+          audio = types.RecognitionAudio(content=content)
+
+        config = types.RecognitionConfig( encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16, \
+                        sample_rate_hertz=44100, language_code=get_language_code(request))
+        response = client.recognize(config, audio)
+
+        return_str = ''
+        for result in response.results:
+            print ('{}'.format(result.alternatives[0].transcript))
+            return_str += ('{}'.format(result.alternatives[0].transcript))
+            # print('Transcript: {}'.format(result.alternatives[0].transcript))
+        f1_rm = "rm -rf /tmp/" + fname
+        f2_rm = "rm -rf /tmp/" + fname + ".wav"
+        subprocess.call(f1_rm, shell=True)
+        subprocess.call(f2_rm, shell=True)
+    except Exception as e:
+        return_str = ' - - '
     return return_str
 
 @login_required
@@ -73,15 +82,14 @@ def publish(request, category_id=None):
         get_object_or_404(
             Category.objects.visible(),
             pk=category_id)
-            
+    
     user = request.user
-
     if request.method == 'POST':
         title = ''
         if request.POST.get('question_audio'):
-            title = convert_speech_to_text( request.POST.get('question_audio') )
+            title = convert_speech_to_text( request, request.POST.get('question_audio') )
         if request.POST.get('question_video'):
-            title = convert_speech_to_text( request.POST.get('question_video') )
+            title = convert_speech_to_text( request, request.POST.get('question_video') )
         post_data = copy.deepcopy(request.POST)
         if title:
             post_data['title'] = title[0].upper() + title[1:]
@@ -103,9 +111,10 @@ def publish(request, category_id=None):
             if request.POST.get('question_video'):
                 topic.question_audio = request.POST.get('question_video')
             topic.save()
-            cform.topic = topic
-            comment = cform.save()
-            comment_posted(comment=comment, mentions=cform.mentions)
+            if request.POST.get('comment'):
+                cform.topic = topic
+                comment = cform.save()
+                comment_posted(comment=comment, mentions=cform.mentions)
             return redirect(topic.get_absolute_url())
     else:
         if not category_id:
@@ -122,7 +131,7 @@ def publish(request, category_id=None):
 
 def search(request):
     category_id = None
-    lid = request.GET.get('lid', 2)
+    lid = get_current_language(request)
     categories = Category.objects \
         .visible() \
         .parents()   
@@ -276,7 +285,7 @@ def index_videos(request):
 
 def get_topics_feed(request):
     pageno = request.GET.get('pageno', None)
-    topic_list = Topic.objects.filter(language_id = request.GET.get('lid', 1))
+    topic_list = Topic.objects.filter(language_id = get_current_language(request))
     paginator = Paginator(topic_list, 10) # Show 25 contacts per page
 
     topics = paginator.page(pageno)  
@@ -294,7 +303,7 @@ def get_topics_feed(request):
 
 
 def ques_ans_index(request,category_id=None):#, is_single_topic=0):
-    lid = request.GET.get('lid', 2)
+    lid = get_current_language(request)
     categories = Category.objects \
         .visible() \
         .parents()    

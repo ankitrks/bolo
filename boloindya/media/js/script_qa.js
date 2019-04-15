@@ -52,7 +52,6 @@ var owl = $('.owl-carousel');
   })
   owl.on('translate.owl.carousel',function(e){
     $('.owl-item video').each(function(){
-      console.log('11')
       $(this).get(0).pause();
       $('.qa_sec .owl-item .item img').css('z-index','0')
     });
@@ -65,7 +64,6 @@ var owl = $('.owl-carousel');
     $('.owl-item .item').each(function(){
       var attr = $(this).attr('data-videosrc');
       if (typeof attr !== typeof undefined && attr !== false) {
-        console.log('hit');
         var videosrc = $(this).attr('data-videosrc');
         $(this).prepend('<video controls muted><source src="'+videosrc+'" type="video/mp4"></video>');
       }
