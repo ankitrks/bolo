@@ -29,6 +29,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/3.3.1/css/swiper.css" rel="stylesheet">
     {% block js %}
       <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+      <!-- <script src="/media/js/jquery.cookie.js"></script> -->
+      <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js"></script>
       <script src="/media/js/bootstrap.min.js"></script>
       <script src="https://content.jwplatform.com/libraries/GpYvcHPU.js"></script>
@@ -50,6 +52,12 @@
           }
           return "";
         }
+        function clearCookie(cname) {
+          var mydate = new Date();
+          mydate.setTime(mydate.getTime() - 1);
+          document.cookie = cname + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        }
+
         $( document ).ready(function() {
           $("#id_category option").filter(function() { return $(this).text().indexOf("---") != 0; }).attr("disabled","disabled"); 
           // $.tab();
@@ -68,11 +76,14 @@
           //         unread: "{% trans "unread" %}",
           //     } );
           // {% endif %}
-          $('.change_language[lcode="' + getCookie('language') +'"]').addClass('selected');
+          // Cookies.remove("language");
+
+          $('.change_language[lcode="' + getCookie("language") +'"]').addClass('selected');
           $('.change_language').click(function(e){
-            e.preventDefault()
+            e.preventDefault();
+            clearCookie("language");
             var lcode = $(this).attr('lcode');
-            document.cookie = "language=" + lcode + "; expires=Fri, 31 Dec 9999 23:59:59 GMT";
+            document.cookie = "language=" + lcode + "; expires=Fri, 31 Dec 2025 00:00:00 UTC; path=/;";
             window.location = $(this).attr('href');
           });
         });
