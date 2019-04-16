@@ -7,21 +7,27 @@
 
 {% block head-extra %}
     <script>
+        var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
         function showtextfields(){
             $('[for="id_title"], #id_title').show();
         }
+        function disableAndClose(){
+            alert("Device / browser doesn't support this feature.");
+            $('[data-toggle="modal"]').removeAttr('data-toggle').removeAttr('data-target');
+            return false
+        }
         function hidetextfields(){
             $('[for="id_title"], #id_title').hide();
-            
-            navigator.mediaDevices.getUserMedia({
-              audio: isEdge ? true : {
-                  echoCancellation: false
-              }
-            }).catch(function(error) {
-                alert("Device / browser doesn't support this feature.");
-                $('[data-toggle="modal"]').removeAttr('data-toggle').removeAttr('data-target');
-                return false
-            });
+            if(isSafari){ disableAndClose(); }
+            else{
+                navigator.mediaDevices.getUserMedia({
+                  audio: isEdge ? true : {
+                      echoCancellation: false
+                  }
+                }).catch(function(error) {
+                    disableAndClose();
+                });
+            }
         }
     	$( document ).ready(function() {
     		// $( "textarea" ).store( "topic_publish_comment" );

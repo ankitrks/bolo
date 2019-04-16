@@ -1,19 +1,27 @@
 //============== New Updated Code ================
-navigator.mediaDevices.getUserMedia({
-    audio: isEdge ? true : {
-        echoCancellation: false
-    }
-}).catch(function(error) {
-    var onPublish = $('[name="onPublish"]').val();
+function disableAndMove(){
+  var onPublish = $('[name="onPublish"]').val();
     if(onPublish != '1'){
-        var res = confirm("Device / browser doesn't support this feature. Press OK to Answer in Text & Cancel to go back");
-        if (res == true) {window.location = window.location.href.replace('/audio', '/text');}
-        else { window.location = '/topic/' + window.location.href.split('/')[4] + '/';}
+      var res = confirm("Device / browser doesn't support this feature. Press OK to Answer in Text & Cancel to go back");
+      if (res == true) {window.location = window.location.href.replace('/audio', '/text');}
+      else { window.location = '/topic/' + window.location.href.split('/')[4] + '/';}
     }
-});
+}
+var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+if(isSafari){
+  disableAndMove();
+}
+else{
+  navigator.mediaDevices.getUserMedia({
+    audio: isEdge ? true : {
+      echoCancellation: false
+    }
+  }).catch(function(error) {
+      disableAndMove();
+  });
+}
 
 var audio = document.querySelector('audio');
-
 function captureMicrophone(callback) {
     btnReleaseMicrophone.disabled = false;
 

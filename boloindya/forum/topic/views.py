@@ -64,9 +64,7 @@ def convert_speech_to_text(request, blob_url):
 
         return_str = ''
         for result in response.results:
-            # print ('{}'.format(result.alternatives[0].transcript))
             return_str += ('{}'.format(result.alternatives[0].transcript))
-            # print('Transcript: {}'.format(result.alternatives[0].transcript))
         f1_rm = "rm -rf /tmp/" + fname
         f2_rm = "rm -rf /tmp/" + fname + ".wav"
         subprocess.call(f1_rm, shell=True)
@@ -79,9 +77,7 @@ def convert_speech_to_text(request, blob_url):
 @ratelimit(rate='1/10s')
 def publish(request, category_id=None):
     if category_id:
-        get_object_or_404(
-            Category.objects.visible(),
-            pk=category_id)
+        get_object_or_404(Category.objects.visible(), pk=category_id)
     
     user = request.user
     if request.method == 'POST':

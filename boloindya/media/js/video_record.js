@@ -1,16 +1,25 @@
-navigator.mediaDevices.getUserMedia({
-  audio: isEdge ? true : {
-      echoCancellation: false
-  }
-}).catch(function(error) {
-  $('#upload').hide();
+function disableAndMove(){
   var onPublish = $('[name="onPublish"]').val();
   if(onPublish != '1'){
     var res = confirm("Device / browser doesn't support this feature. Press OK to Answer in Text & Cancel to go back");
     if (res == true) {window.location = window.location.href.replace('/video', '/text');}
     else { window.location = '/topic/' + window.location.href.split('/')[4] + '/';}
   }
-});
+}
+var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+if(isSafari){
+  disableAndMove();
+}
+else{
+  navigator.mediaDevices.getUserMedia({
+    audio: isEdge ? true : {
+        echoCancellation: false
+    }
+  }).catch(function(error) {
+    $('#upload').hide();
+    disableAndMove();
+  });
+}
 
 var mediaSource = new MediaSource();
 mediaSource.addEventListener('sourceopen', handleSourceOpen, false);
@@ -29,12 +38,14 @@ var constraints = {
   audio: true,
   video: true
 };
-navigator.mediaDevices.getUserMedia(
-  constraints
-).then(
-  successCallback,
-  errorCallback
-);
+if(!isSafari){
+  navigator.mediaDevices.getUserMedia(
+    constraints
+  ).then(
+    successCallback,
+    errorCallback
+  );
+}
 function successCallback(stream) {
   // console.log('getUserMedia() got stream: ', stream);
   window.stream = stream;
