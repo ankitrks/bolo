@@ -37,6 +37,21 @@
     <script src="https://owlcarousel2.github.io/OwlCarousel2/assets/owlcarousel/owl.carousel.js"></script>
 
     <script>
+    // function getCookie(cname) {
+    //   var name = cname + "=";
+    //   var decodedCookie = decodeURIComponent(document.cookie);
+    //   var ca = decodedCookie.split(';');
+    //   for(var i = 0; i <ca.length; i++) {
+    //     var c = ca[i];
+    //     while (c.charAt(0) == ' ') {
+    //       c = c.substring(1);
+    //     }
+    //     if (c.indexOf(name) == 0) {
+    //       return c.substring(name.length, c.length);
+    //     }
+    //   }
+    //   return "";
+    }
 
 	$( document ).ready(function() {
         $('.perform_search').click(function(){
@@ -49,6 +64,15 @@
                 return false;  
             }
         });
+
+        // $('.change_language[lcode="' + getCookie('language') +'"]').addClass('selected');
+        // $('.change_language').click(function(e){
+        //     e.preventDefault()
+        //     var lcode = $(this).attr('lcode');
+        //     document.cookie = "language=" + lcode + "; expires=Fri, 31 Dec 9999 23:59:59 GMT";
+        //     window.location = $(this).attr('href');
+        // });
+        
         // $.tab();
 
         // $( 'a.js-post' ).postify( {

@@ -72,7 +72,7 @@
           $('.change_language').click(function(e){
             e.preventDefault()
             var lcode = $(this).attr('lcode');
-            document.cookie = "language=" + lcode;
+            document.cookie = "language=" + lcode + "; expires=Fri, 31 Dec 9999 23:59:59 GMT";
             window.location = $(this).attr('href');
           });
         });
