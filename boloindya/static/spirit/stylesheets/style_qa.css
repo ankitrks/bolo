@@ -22,9 +22,9 @@ a,a:hover,a:active,a:visited{text-decoration:none;color: inherit; }
 .load_more {
     color: #FFF;
     border-radius: 4px;
-    padding: 10px; 
+    padding: 0; 
     cursor: pointer;
-    background: #dc3545;
+    color: #dc3545;
 }
 .videoBtn{
     color: #fff !important ;
@@ -262,7 +262,6 @@ a,a:hover,a:active,a:visited{text-decoration:none;color: inherit; }
 .qa_sec .mid_sec .quest_feed .quest_user_info .quest_user_detail .feed_post_date{font-size:11px;color:#716a6a;line-height:normal;}
 
 .qa_sec .mid_sec .quest_feed .question{margin-bottom:20px;line-height:20px;font-size:20px;color:#000;font-weight:500;position:relative;}
-.qa_sec .mid_sec .quest_feed .question:before{position: absolute;left:0px;}
 
 .qa_sec .mid_sec .answer_option{display:flex;margin-bottom:20px;}
 .qa_sec .mid_sec .answer_option .ans_opt_list{
@@ -394,7 +393,6 @@ a,a:hover,a:active,a:visited{text-decoration:none;color: inherit; }
     
 }
 @media (max-width:767px){
-   
     .navbar .navbar-nav li .sub-menu{position: relative;}
     .navbar .navbar-nav li .sub-menu.active{display:block;}
 }
