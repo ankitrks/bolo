@@ -64,7 +64,6 @@ var owl = $('.owl-carousel');
     $('.owl-item .item').each(function(){
       var attr = $(this).attr('data-videosrc');
       if (typeof attr !== typeof undefined && attr !== false) {
-        console.log('hit');
         var videosrc = $(this).attr('data-videosrc');
         $(this).prepend('<video controls muted><source src="'+videosrc+'" type="video/mp4"></video>');
       }

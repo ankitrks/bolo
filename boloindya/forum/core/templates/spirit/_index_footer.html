@@ -16,13 +16,15 @@
                 }
             })
         }
+        var current_index = "{{ current_index }}";
+        if(!current_index){ current_index = 0;}
         //banner swipe slider
         var swiper = new Swiper('.swiper-container', {
             effect: 'coverflow',
             loop: true,
             centeredSlides: true,
             slidesPerView: 3,
-            initialSlide: {{ current_index }},
+            initialSlide: current_index,
             keyboardControl: true,
             mousewheelControl: true,
             lazyLoading: true,

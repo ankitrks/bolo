@@ -36,9 +36,7 @@
         </div>
 
         {% if not topic.has_answers %}
-            <div><small>This topic has no answers yet!<br>
-                <!-- <a href="/topic/publish" style="color: #BB3335"><b><u>Ask your Question Now</u></b></a> -->
-            </small></div>
+            <div><small>This topic has no answers yet!<br></small></div>
         {% endif %}
 
         <!-- user answer as video -->
@@ -49,7 +47,8 @@
                     <div class="owl-carousel owl-theme">
                         {% for video in topic.get_video_comments %}
                             <div class="item">
-                            <video controls muted><source src="{{ video.get_updated_url }}" type="video/mp4"></video>
+                                <!-- <video controls muted><source src="{{ video.get_updated_url }}" type="video/mp4"></video> -->
+                                <div id="video-div-{{ video.id }}" class="video-div" src="{{ video.get_updated_url }}"></div>
                                 <div class="posted_by">
                                     Posted by {{ video.user.username }} <span>{{ video.date.date }}  &nbsp;</span>
                                     <span id="like_comment{{video.id}}" data_user='{% if user.username %}1{% else %}0{% endif %}' data_id="{{ video.id }}" onClick="changeLikeFunction({{ video.id }})" style="cursor:pointer;">
@@ -95,12 +94,13 @@
                                     
                         
                         </div>
+                        <div id="video-div-{{ video.id }}" class="video-div audio-div" src="{{ video.get_updated_url }}"></div>
                         <!-- Audio player -->
-                        <div id="ans_audio" data-videosrc="{{ video.get_updated_url }}" style="width: 100%;">
+                        <!-- <div id="ans_audio" data-videosrc="{{ video.get_updated_url }}" style="width: 100%;">
                             <audio controls style="width: 100%;">
                             <source src="{{ video.get_updated_url }}" type="audio/ogg" style="width: 100%;">  
                             Your browser does not support the audio element.
-                        </audio>
+                        </audio> -->
                         </div>
                     </div>   
                 {% endfor %}

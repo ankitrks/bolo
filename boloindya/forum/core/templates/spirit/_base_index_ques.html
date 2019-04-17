@@ -8,7 +8,7 @@
     <link rel="shortcut icon" href="/media/img/favicon.ico">
 <!--     <title>Bolo Indiya</title>
     <meta name="description" content="{{ config.site_description }}"> -->
-        <title>Bolo Indya -  Questions Answers and Discussions Platform in Local Languages</title>
+    <title>Bolo Indya -  Questions Answers and Discussions Platform in Local Languages</title>
     <meta name="description" content="Share Knowledge through Questions & Answers and Discussions on topic of your choice, in Indian Languages using voice and video." />
     <meta name="keywords" content="Hindi Videos, Hindi Content Platform, Local Languages Content, Love Questions, Sex Questions, Relationship Questions, Life questions, English Videos, Questions and Answers, GK Answers, Politics Discussion, Entertainment, Tamil Videos, Tamil Questions, Tamil Answers, Telugu Questions, Telugu Answers, Exams, UPSC Videos, UPSC Questions, Kannada Questions, Kannada Videos, Punjabi Videos, Punjabi Questions, Gujarati Questions, Gujarati Videos, bengali questions, bengali videos" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -25,78 +25,98 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" rel="stylesheet">
     <link href="https://owlcarousel2.github.io/OwlCarousel2/assets/owlcarousel/assets/owl.theme.default.min.css" rel="stylesheet">
     <!-- Custom styles for this template -->
-    {% comment %} <link href="assets/css/style.css" rel="stylesheet"> {% endcomment %}
     <link href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/3.3.1/css/swiper.css" rel="stylesheet">
-    {% block js %}
-      <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-      <!-- <script src="/media/js/jquery.cookie.js"></script> -->
-      <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js"></script>
-      <script src="/media/js/bootstrap.min.js"></script>
-      <script src="https://content.jwplatform.com/libraries/GpYvcHPU.js"></script>
-      <script src="https://owlcarousel2.github.io/OwlCarousel2/assets/owlcarousel/owl.carousel.js"></script>
-      <script src="/media/js/script_qa.js"></script>
-      <script>
-        function getCookie(cname) {
-          var name = cname + "=";
-          var decodedCookie = decodeURIComponent(document.cookie);
-          var ca = decodedCookie.split(';');
-          for(var i = 0; i <ca.length; i++) {
-            var c = ca[i];
-            while (c.charAt(0) == ' ') {
-              c = c.substring(1);
-            }
-            if (c.indexOf(name) == 0) {
-              return c.substring(name.length, c.length);
-            }
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <!-- <script src="/media/js/jquery.cookie.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js"></script>
+    <script src="/media/js/bootstrap.min.js"></script>
+    <script src="https://content.jwplatform.com/libraries/GpYvcHPU.js"></script>
+    <script src="https://owlcarousel2.github.io/OwlCarousel2/assets/owlcarousel/owl.carousel.js"></script>
+    <script src="/media/js/script_qa.js"></script>
+    <script>
+      function getCookie(cname) {
+        var name = cname + "=";
+        var decodedCookie = decodeURIComponent(document.cookie);
+        var ca = decodedCookie.split(';');
+        for(var i = 0; i <ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0) == ' ') {
+            c = c.substring(1);
           }
-          return "";
+          if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+          }
         }
-        function clearCookie(cname) {
-          var mydate = new Date();
-          mydate.setTime(mydate.getTime() - 1);
-          document.cookie = cname + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        }
+        return "";
+      }
+      function clearCookie(cname) {
+        var mydate = new Date();
+        mydate.setTime(mydate.getTime() - 1);
+        document.cookie = cname + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      }
 
-        $( document ).ready(function() {
-          $("#id_category option").filter(function() { return $(this).text().indexOf("---") != 0; }).attr("disabled","disabled"); 
-          // $.tab();
-          // $( 'a.js-post' ).postify( {
-          //     csrfToken: "{{ csrf_token }}",
-          // } );
-          // $('.js-messages').messages();
-          // {% if user.is_authenticated %}
-          //     $.notification( {
-          //         notificationUrl: "{% url "spirit:topic:notification:index-ajax" %}",
-          //         notificationListUrl: "{% url "spirit:topic:notification:index-unread" %}",
-          //         mentionTxt: "{% trans "{user} has mention you on {topic}" %}",
-          //         commentTxt: "{% trans "{user} has commented on {topic}" %}",
-          //         showAll: "{% trans "Show all" %}",
-          //         empty: "{% trans "No new notifications, yet" %}",
-          //         unread: "{% trans "unread" %}",
-          //     } );
-          // {% endif %}
-          // Cookies.remove("language");
+      $( document ).ready(function() {
+        $("#id_category option").filter(function() { return $(this).text().indexOf("---") != 0; }).attr("disabled","disabled"); 
+        // $.tab();
+        // $( 'a.js-post' ).postify( {
+        //     csrfToken: "{{ csrf_token }}",
+        // } );
+        // $('.js-messages').messages();
+        // {% if user.is_authenticated %}
+        //     $.notification( {
+        //         notificationUrl: "{% url "spirit:topic:notification:index-ajax" %}",
+        //         notificationListUrl: "{% url "spirit:topic:notification:index-unread" %}",
+        //         mentionTxt: "{% trans "{user} has mention you on {topic}" %}",
+        //         commentTxt: "{% trans "{user} has commented on {topic}" %}",
+        //         showAll: "{% trans "Show all" %}",
+        //         empty: "{% trans "No new notifications, yet" %}",
+        //         unread: "{% trans "unread" %}",
+        //     } );
+        // {% endif %}
+        // Cookies.remove("language");
 
-          $('.change_language[lcode="' + getCookie("language") +'"]').addClass('selected');
-          $('.change_language').click(function(e){
-            e.preventDefault();
-            clearCookie("language");
-            var lcode = $(this).attr('lcode');
-            document.cookie = "language=" + lcode + "; expires=Fri, 31 Dec 2025 00:00:00 UTC; path=/;";
-            window.location = $(this).attr('href');
+        $('.change_language[lcode="' + getCookie("language") +'"]').addClass('selected');
+        $('.change_language').click(function(e){
+          e.preventDefault();
+          clearCookie("language");
+          var lcode = $(this).attr('lcode');
+          document.cookie = "language=" + lcode + "; expires=Fri, 31 Dec 2025 00:00:00 UTC; path=/;";
+          window.location = $(this).attr('href');
+        });
+      });
+    </script>
+    <!-- Setup / code for JW Player -->
+    <script type="text/javascript" src="https://content.jwplatform.com/libraries/GpYvcHPU.js"></script>
+    <script type="text/javascript">
+      $( document ).ready(function() {
+        $(document).on('click', '.video-div', function(e){
+          var divId = $(this).attr('id');
+          jwplayer(divId).setup({
+            "playlist": [{
+              "displayPlaybackLabel":true,
+              "seek":90,
+              "mediaid": "ddrx3v2",
+              "sources": [{
+                "file": $(this).attr('src') // Give m3u8 url here
+              }]
+            }]
           });
         });
-      </script>
-    {% endblock %}
-
+      });
+    </script>
+    <style type="text/css">
+      .video-div{height: 175px;background: url(http://lorempixel.com/200/200/) 0% 40% no-repeat;background-size: 100%;cursor: pointer;}
+      .video-div:after{content: '';background: url(/media/img/icons/play_button.svg) no-repeat;position: absolute;width: 45px;height: 45px;left: 46%;top: 38%;}
+      .audio-div{height: 100px !important;}
+    </style>
+    
+    {% block js %}{% endblock %}
     {% block head-extra %}{% endblock %}
-
     <!--[if (lt IE 9) & (!IEMobile)]>
     <script src="//cdnjs.cloudflare.com/ajax/libs/selectivizr/1.0.2/selectivizr-min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.6/html5shiv.min.js"></script>
     <![endif]-->
-
   </head>
 
   <body style="margin-left:0px; margin-right: 0px;max-width:100%;">

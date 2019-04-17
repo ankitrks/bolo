@@ -1,13 +1,9 @@
-{% load spirit_tags i18n %}
+<!-- {% load spirit_tags i18n %}
 
 <div class="comments">
-
     {% for c in comments %}
-
 		<div class="comment{% if c.action %} is-highlighted{% endif %}" id="c{{forloop.counter0|add:comments.start_index }}" data-number="{{ forloop.counter0|add:comments.start_index }}" data-pk="{{ c.pk }}">
-
             {% if not c.is_removed %}
-
                 <div class="comment-media">
                     <div class="comment-img">
                         <img class="comment-avatar" src="{% get_gravatar_url user=c.user size=50 %}" />
@@ -15,7 +11,6 @@
 
                     <div class="comment-body">
                         <div class="comment-info">
-
                             <div class="comment-username">
                                 <a class="username{% if c.user.st.is_administrator %} is-admin{% elif c.user.st.is_moderator %} is-mod{% endif %}" href="{{ c.user.st.get_absolute_url }}">{{ c.user.username }}</a><span class="comment-realname">{{ c.user.get_full_name }}</span>
                             </div>
@@ -27,20 +22,15 @@
 
                                 <li title="{{ c.date }}">{{ c.date|shortnaturaltime }}</li>
                             </ul>
-
                         </div>
 
                         <div class="comment-text">
                             {% if not c.action %}
-
-                                    {{ c.is_audio }}
                                 {% if c.is_audio %}
-                                    <video width="400" controls><source src="{{ c.comment }}" type="video/mp4">
-                                    <source src="{{ c.comment }}" type="video/ogg"></video>
+                                    <div id="video-div-{{ c.id }}" class="video-div" src="{{ c.comment }}"></div>
                                 {% else %}
                                     {% post_render_comment comment=c %}
                                 {% endif %}
-                                
                             {% else %}
                                 <p>{% get_comment_action_text c.action %}.</p>
                             {% endif %}
@@ -54,7 +44,6 @@
                             {% if user.st.is_moderator %}
                                 <li><a href="{% url "spirit:comment:delete" c.pk %}"><i class="fa fa-times"></i> {% trans "delete" %}</a></li>
                             {% endif %}
-
                             <li><a href="{% url "spirit:comment:flag:create" c.pk %}"><i class="fa fa-flag"></i> {% trans "report" %}</a></li>
                         {% endif %}
 
@@ -89,10 +78,10 @@
                             {% with comment_url=c.get_absolute_url %}
                                 <input class="share-url" type="text" value="{% get_share_url url=comment_url %}" />
                                 <ul class="share-actions">
-                                    <li><a href="{% get_twitter_share_url url=comment_url title=topic.title %}" target="_blank" rel="noopener noreferrer nofollow"><i class="fa fa-twitter"></i></a></li><!--
-                                 --><li><a href="{% get_facebook_share_url url=comment_url title=topic.title %}" target="_blank" rel="noopener noreferrer nofollow"><i class="fa fa-facebook"></i></a></li><!--
-                                 --><li><a href="{% get_gplus_share_url url=comment_url %}" target="_blank" rel="noopener noreferrer nofollow"><i class="fa fa-google-plus"></i></a></li><!--
-                                 --><li><a href="{% get_email_share_url url=comment_url title=topic.title %}" ><i class="fa fa-envelope"></i></a></li>
+                                    <li><a href="{% get_twitter_share_url url=comment_url title=topic.title %}" target="_blank" rel="noopener noreferrer nofollow"><i class="fa fa-twitter"></i></a></li>
+                                 <li><a href="{% get_facebook_share_url url=comment_url title=topic.title %}" target="_blank" rel="noopener noreferrer nofollow"><i class="fa fa-facebook"></i></a></li>
+                                 <li><a href="{% get_gplus_share_url url=comment_url %}" target="_blank" rel="noopener noreferrer nofollow"><i class="fa fa-google-plus"></i></a></li>
+                                 <li><a href="{% get_email_share_url url=comment_url title=topic.title %}" ><i class="fa fa-envelope"></i></a></li>
                                 </ul>
                             {% endwith %}
 
@@ -155,3 +144,4 @@
 	});
 
 	</script>
+ -->
