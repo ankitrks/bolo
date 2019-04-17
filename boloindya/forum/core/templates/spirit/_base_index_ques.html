@@ -92,11 +92,12 @@
       $( document ).ready(function() {
         $(document).on('click', '.video-div', function(e){
           var divId = $(this).attr('id');
+          console.log($(this).attr('src'))
           jwplayer(divId).setup({
             "playlist": [{
               "displayPlaybackLabel":true,
               "seek":90,
-              "mediaid": "ddrx3v2",
+              // "mediaid": "ddrx3v2",
               "sources": [{
                 "file": $(this).attr('src') // Give m3u8 url here
               }]
@@ -106,11 +107,11 @@
       });
     </script>
     <style type="text/css">
-      .video-div{height: 175px;background: url(http://lorempixel.com/200/200/) 0% 40% no-repeat;background-size: 100%;cursor: pointer;}
-      .video-div:after{content: '';background: url(/media/img/icons/play_button.svg) no-repeat;position: absolute;width: 45px;height: 45px;left: 46%;top: 38%;}
+      .video-div{height: 270px;background: url(http://lorempixel.com/200/200/) 0% 40% no-repeat;background-size: 100%;cursor: pointer;}
+      .video-div img{min-width: 50px !important;width: 50px !important;min-height: 50px !important;left: 49% !important;top: 49% !important;}
+      .audio-div img{position: relative;left: 45% !important;top: 25% !important;}
       .audio-div{height: 100px !important;}
     </style>
-    
     {% block js %}{% endblock %}
     {% block head-extra %}{% endblock %}
     <!--[if (lt IE 9) & (!IEMobile)]>
@@ -124,7 +125,5 @@
     {% render_messages messages %}
     {% block content %}{% endblock %}
     {% include 'spirit/ques_and_ans_footer.html' %}
-
   </body>
-
 </html>

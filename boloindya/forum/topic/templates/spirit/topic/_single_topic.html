@@ -48,7 +48,7 @@
                         {% for video in topic.get_video_comments %}
                             <div class="item">
                                 <!-- <video controls muted><source src="{{ video.get_updated_url }}" type="video/mp4"></video> -->
-                                <div id="video-div-{{ video.id }}" class="video-div" src="{{ video.get_updated_url }}"></div>
+                                <div id="video-div-{{ video.id }}" class="video-div" src="{{ video.get_updated_url }}"><img src="/media/img/icons/play_button.svg"></div>
                                 <div class="posted_by">
                                     Posted by {{ video.user.username }} <span>{{ video.date.date }}  &nbsp;</span>
                                     <span id="like_comment{{video.id}}" data_user='{% if user.username %}1{% else %}0{% endif %}' data_id="{{ video.id }}" onClick="changeLikeFunction({{ video.id }})" style="cursor:pointer;">
@@ -91,18 +91,9 @@
                                 <div class="user_name">{{ video.user.username }}</div>
                                 <div class="feed_post_date">Answered {{ video.date.date }}</div>
                             </div>
-                                    
-                        
                         </div>
-                        <div id="video-div-{{ video.id }}" class="video-div audio-div" src="{{ video.get_updated_url }}"></div>
-                        <!-- Audio player -->
-                        <!-- <div id="ans_audio" data-videosrc="{{ video.get_updated_url }}" style="width: 100%;">
-                            <audio controls style="width: 100%;">
-                            <source src="{{ video.get_updated_url }}" type="audio/ogg" style="width: 100%;">  
-                            Your browser does not support the audio element.
-                        </audio> -->
-                        </div>
-                    </div>   
+                        <div id="video-div-{{ video.id }}" class="video-div audio-div" src="{{ video.get_updated_url }}"><img src="/media/img/icons/play_button.svg"></div>
+                    </div>
                 {% endfor %}
             </div>
         {% endif %}
@@ -113,20 +104,20 @@
             {% for video in topic.get_text_comments %}
                 <div class="user_ans_text common_ans_area">
                     <div class="inner_ans_area">
-                            <!-- User info -->
-                            <div class="quest_user_info">
-                                <div class="quest_user_info_img">
-                                    <img src="http://lorempixel.com/200/200/" alt="user image" class="quest_user_image"/>
-                                </div>
-                                <div class="quest_user_detail">
-                                    <div class="user_name">{{ video.user.username }}</div>
-                                    <div class="feed_post_date">Answered {{ video.date.date }}</div>
-                                </div>
+                        <!-- User info -->
+                        <div class="quest_user_info">
+                            <div class="quest_user_info_img">
+                                <img src="http://lorempixel.com/200/200/" alt="user image" class="quest_user_image"/>
                             </div>
-                            <!-- answer text -->
-                            <div class="ans_text">
-                                    {{ video.comment }}
+                            <div class="quest_user_detail">
+                                <div class="user_name">{{ video.user.username }}</div>
+                                <div class="feed_post_date">Answered {{ video.date.date }}</div>
                             </div>
+                        </div>
+                        <!-- answer text -->
+                        <div class="ans_text">
+                            {{ video.comment }}
+                        </div>
                     </div>
                 </div>
             {% endfor %}
