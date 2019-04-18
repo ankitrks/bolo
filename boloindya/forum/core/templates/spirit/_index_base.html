@@ -15,13 +15,7 @@
     <meta name="keywords" content="Hindi Videos, Hindi Content Platform, Local Languages Content, Love Questions, Sex Questions, Relationship Questions, Life questions, English Videos, Questions and Answers, GK Answers, Politics Discussion, Entertainment, Tamil Videos, Tamil Questions, Tamil Answers, Telugu Questions, Telugu Answers, Exams, UPSC Videos, UPSC Questions, Kannada Questions, Kannada Videos, Punjabi Videos, Punjabi Questions, Gujarati Questions, Gujarati Videos, bengali questions, bengali videos" />    
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!--<link rel="stylesheet" href="{% static "spirit/stylesheets/styles.all.min.css" %}">-->
     <link rel="stylesheet" href="{% static "spirit/stylesheets/main.css" %}">
-
-
-    <!--<script src="{% static "spirit/scripts/all.min.js" %}"></script>-->
-
-    
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" >
     <link href="{% static "spirit/stylesheets/bootstrap.min.css" %}" rel="stylesheet">
@@ -29,43 +23,59 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" rel="stylesheet">
     <link href="https://owlcarousel2.github.io/OwlCarousel2/assets/owlcarousel/assets/owl.theme.default.min.css" rel="stylesheet">
   
-    {% comment %} <link href="assets/css/style.css" rel="stylesheet"> {% endcomment %}
     <link href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/3.3.1/css/swiper.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js"></script>
-      <script src="/media/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js"></script>
+    <script src="/media/js/bootstrap.min.js"></script>
     <script src="https://owlcarousel2.github.io/OwlCarousel2/assets/owlcarousel/owl.carousel.js"></script>
 
-    <script>
-	$( document ).ready(function() {
-        $('.perform_search').click(function(){
-            window.location = '/topic/search/?q=' + $('[name="search"]').val();
-        });
-        $('[name="search"]').keypress(function (e) {
-            var key = e.which;
-            if(key == 13){
-                $('.perform_search').click();
-                return false;  
-            }
-        });
-        // $.tab();
-        // $( 'a.js-post' ).postify( {
-        //     csrfToken: "{{ csrf_token }}",
-        // } );
-        // $('.js-messages').messages();
-        // {% if user.is_authenticated %}
-        //     $.notification( {
-        //         notificationUrl: "{% url "spirit:topic:notification:index-ajax" %}",
-        //         notificationListUrl: "{% url "spirit:topic:notification:index-unread" %}",
-        //         mentionTxt: "{% trans "{user} has mention you on {topic}" %}",
-        //         commentTxt: "{% trans "{user} has commented on {topic}" %}",
-        //         showAll: "{% trans "Show all" %}",
-        //         empty: "{% trans "No new notifications, yet" %}",
-        //         unread: "{% trans "unread" %}",
-        //     } );
-        // {% endif %}
+    <style type="text/css">
+        .dropdown-item.selected {background: #1989cd !important;}
+        .navbar .navbar-nav li .sub-menu{z-index: 100 !important;}
+    </style>
 
-	});
+    <script>
+        function getCookie(cname) {
+            var name = cname + "=";
+            var decodedCookie = decodeURIComponent(document.cookie);
+            var ca = decodedCookie.split(';');
+            for(var i = 0; i <ca.length; i++) {
+              var c = ca[i];
+              while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+              }
+              if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+              }
+            }
+            return "";
+        }
+        function clearCookie(cname) {
+            var mydate = new Date();
+            mydate.setTime(mydate.getTime() - 1);
+            document.cookie = cname + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        }
+    	$( document ).ready(function() {
+            $('.perform_search').click(function(){
+                window.location = '/topic/search/?q=' + $('[name="search"]').val();
+            });
+            $('[name="search"]').keypress(function (e) {
+                var key = e.which;
+                if(key == 13){
+                    $('.perform_search').click();
+                    return false;  
+                }
+            });
+            $('.change_language[lcode="' + getCookie("language") +'"]').addClass('selected');
+            $('.lang_link').html($('.change_language[lcode="' + getCookie("language") +'"]').text() + '<small style="color:lightgrey">&nbsp;&nbsp;[change]</small>');
+            $('.change_language').click(function(e){
+                e.preventDefault();
+                clearCookie("language");
+                var lcode = $(this).attr('lcode');
+                document.cookie = "language=" + lcode + "; expires=Fri, 31 Dec 2025 00:00:00 UTC; path=/;";
+                window.location = $(this).attr('href');
+            });
+    	});
 
 	</script>
 

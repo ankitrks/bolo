@@ -116,9 +116,8 @@ function startRecordingVideo() {
 function stopRecordingVideo() {
   mediaRecorder.stop();
   // console.log('Recorded Blobs: ', recordedBlobs);
-var blob = new Blob(recordedBlobs, {type: 'video/webm'});
+  var blob = new Blob(recordedBlobs, {type: 'video/webm'});
   //postVideoToServer(recordedBlobs);
-  
   recordedVideo.controls = true;
   sendVideoData(blob);
 }

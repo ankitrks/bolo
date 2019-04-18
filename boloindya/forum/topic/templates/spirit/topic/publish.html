@@ -83,9 +83,9 @@
     }
     </style>
         
-    <hr><div class="container">
+    <div class="container" style="position:relative;top: 100px;">
         <input type="hidden" name="onPublish" value="1">
-        <br><h4 class="headline">{% trans "Start discussion" %}</h4>
+        <br><h4 class="headline">{% trans "Start discussion" %}</h4><br>
         <form action="." method="post" class="js-reply">
             {% csrf_token %}
             {# topic #}
@@ -104,6 +104,7 @@
             <div class="container">
                 {% include "spirit/comment/_editor.html" %}
                 <input class="button reply-button" type="submit" value="{% trans "Publish" %}" />
+                <a href="#" onclick="window.history.back();" style="position: relative;top: -10px;left: -10px;color: #007bff;font-size: 14px;"> < Back</a>
             </div>
         </form>
     </div>

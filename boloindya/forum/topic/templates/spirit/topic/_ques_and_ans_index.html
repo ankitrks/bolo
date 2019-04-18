@@ -37,9 +37,14 @@
                 <div class="user_info">
                     <img src="http://lorempixel.com/200/200/" alt="user image" class="user_image"/>
                     <div class="user_name"> {{ user.username }} </div>
-                    <a href="/topic/publish" class="ask_link" style="position: absolute;right: 30px;margin-top: 3px;color: #dc3545;">Ask Question</a>
+                    <a href="/topic/discussion" class="ask_link" style="position: absolute;right: 30px;margin-top: 3px;color: #dc3545;">Q/A Listing</a>
                 </div>
                 {% endif %}
+                <div class="write_quest_sec">
+                    <a href="/topic/publish/" class="ask_link">
+                        <div class="write_sec"><div class="quest_text">Ask <span>your question</span></div></div>
+                    </a>
+                </div>
                 <div id="question_tab">
                     {% if topics %}
                         {% include "spirit/topic/_single_topic.html" %}
@@ -47,7 +52,7 @@
                         <div class="quest_feed">This category has no questions yet!<br><a href="/topic/publish" style="color: #BB3335"><b><u>Ask your Question Now</u></b></a></div>
                     {% endif %}
                 </div>
-                {% if not is_single_topic %}
+                {% if not is_single_topic and topics|length > 9 %}
                     <div class="load_more" style="float:right;" id="load_more">
                         Load More <i class="fas fa-angle-double-right"></i>
                     </div>
@@ -59,44 +64,9 @@
             <div class="" style="clear: both;"></div>
             <!-- Right section for Questions -->
             <div class="col-md-3 right_sec">
-                <div class="inner_head">Recent Questions </div>
+                <div class="inner_head">Recent Topics </div>
                 <div class="que_bank">
-                    <ul>
-                        {% for recentTpoic in recent_topics  %}
-
-                        <li>
-                            <a href="/topic/{{recentTpoic.id}}/">
-                                {{recentTpoic.title}}
-                            </a>
-                        </li>
-                        {% endfor %}
-                        <li>
-                            <a href="/topic/982/">
-                                क्यों भारतीय स्मार्टफोन ब्रांड हुए  विफल ?
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/topic/980/">
-                                क्रिप्टोफोन क्या है? Privacy के लिए बेस्ट फ़ोन कौनसा है ?
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/topic/979/">
-                                माइक्रो SD कार्ड खरीदने से पहले क्या देखें ?
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/topic/978/">
-                                2019 में कौनसे स्मार्टफोन आने वाले हैं ?
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/topic/977/">
-                                पॉपुलर स्क्रीन टेक्नोलॉजी कौनसी है ?
-                            </a>
-                        </li> 
-                            
-                    </ul>
+                    <iframe src="/topic/recent/" style="height: 100%;min-height: 73vh;"></iframe>
                 </div>
             </div>
         </div>

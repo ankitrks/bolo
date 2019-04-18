@@ -106,6 +106,7 @@ def publish(request, category_id=None):
                 topic.question_audio = request.POST.get('question_audio')
             if request.POST.get('question_video'):
                 topic.question_audio = request.POST.get('question_video')
+            topic.language_id = get_current_language(request)
             topic.save()
             if request.POST.get('comment'):
                 cform.topic = topic
@@ -128,14 +129,7 @@ def publish(request, category_id=None):
 def search(request):
     category_id = None
     lid = get_current_language(request)
-    categories = Category.objects \
-        .visible() \
-        .parents()   
-
-    # topic = {}
-    # if is_single_topic not in [0, '0']:
-    #     print 'Yoo'
-    #     topic = get_object_or_404(Topic.objects.visible(),pk=is_single_topic)
+    categories = Category.objects.visible().parents()
 
     if(category_id != None):
         category = get_object_or_404(Category.objects.visible(),pk=category_id)                  
@@ -151,8 +145,6 @@ def search(request):
         'category_id' : category_id,
         'lid': lid,
         'search_term': search_term
-        # 'is_single_topic': is_single_topic,
-        # 'single_topic': topic
     }
     return render(request, 'spirit/topic/_ques_and_ans_index.html', context)
 
@@ -182,38 +174,19 @@ def update(request, pk):
 
 
 def detail(request, pk, slug):
-    categories = Category.objects \
-        .visible() \
-        .parents()    
-
-    topics = Topic.objects.filter(id = pk)#.all()[:10]
-
-    # topic = get_object_or_404(Topic.objects.visible(),pk=pk)
-
-
+    categories = Category.objects.visible().parents()
+    topics = Topic.objects.filter(id = pk)
     context = {
         'categories': categories,
         'topics': topics,
         'is_single_topic': pk,
-        # 'single_topic': topic
     }
-
     return render(request, 'spirit/topic/_ques_and_ans_index.html', context)
 
-
 def index_active(request):
-
-    categories = Category.objects \
-        .visible() \
-        .parents()
-
-    category = get_object_or_404(Category.objects.visible(),
-                                 pk=5)
-
-    subcategories = Category.objects \
-        .visible() \
-        .children(parent=category)
-
+    categories = Category.objects.visible().parents()
+    category = get_object_or_404(Category.objects.visible(), pk=5)
+    subcategories = Category.objects.visible().children(parent=category)
     sub_category = []
     topics = []
 
@@ -221,9 +194,7 @@ def index_active(request):
         sub_category = get_object_or_404(Category.objects.visible(), pk=subcategories[0].pk)
         topics = sub_category.category_topics.all()[0:8]
 
-
     current_index = 0
-
     for index, category_each in enumerate(categories):
         if category_each.id == category.id:
             current_index = index
@@ -236,23 +207,19 @@ def index_active(request):
         'topics': topics,
         'current_index': current_index
     }
-
     return render(request, 'spirit/topic/_home.html', context)
 
+def recent_topics(request):
+    topics = Topic.objects.filter(language_id = get_current_language(request)).order_by('-date')[:30]
+    context = {
+        'topics': topics,
+    }
+    return render(request, 'spirit/topic/recent.html', context)
 
 def index_videos(request):
-
-    categories = Category.objects \
-        .visible() \
-        .parents()
-
-    category = get_object_or_404(Category.objects.visible(),
-                                 pk=5)
-
-    subcategories = Category.objects \
-        .visible() \
-        .children(parent=category)
-
+    categories = Category.objects.visible().parents()
+    category = get_object_or_404(Category.objects.visible(), pk=5)
+    subcategories = Category.objects.visible().children(parent=category)
     sub_category = []
     topics = []
 
@@ -260,13 +227,10 @@ def index_videos(request):
         sub_category = get_object_or_404(Category.objects.visible(), pk=subcategories[0].pk)
         topics = sub_category.category_topics.all()[0:8]
 
-
     current_index = 0
-
     for index, category_each in enumerate(categories):
         if category_each.id == category.id:
             current_index = index
-
     context = {
         'categories': categories,
         'category': category,
@@ -275,8 +239,6 @@ def index_videos(request):
         'topics': topics,
         'current_index': current_index
     }
-
-
     return render(request, 'spirit/topic/_index.html', context)
 
 def get_topics_feed(request):
@@ -298,46 +260,32 @@ def get_topics_feed(request):
     return JsonResponse(data, safe=False)
 
 
-def ques_ans_index(request,category_id=None):#, is_single_topic=0):
-    lid = get_current_language(request)
-    categories = Category.objects \
-        .visible() \
-        .parents()    
-
-    topic_list = Topic.objects.filter(language_id = lid)
-    paginator = Paginator(topic_list, 10) # Show 25 contacts per page
-
+def ques_ans_index(request,category_id=None):
     page = 1
-    topics = paginator.page(page)
-
-    # topic = {}
-    # if is_single_topic not in [0, '0']:
-    #     print 'Yoo'
-    #     topic = get_object_or_404(Topic.objects.visible(),pk=is_single_topic)
-
+    topics = []
+    lid = get_current_language(request)
+    categories = Category.objects.visible().parents()
+    
     if(category_id != None):
         category = get_object_or_404(Category.objects.visible(),pk=category_id)
-        topic_list = category.category_topics.all()    
+        topic_list = category.category_topics.filter(language_id = lid)
         paginator = Paginator(topic_list, 10) # Show 25 contacts per page
-
-        page = 1
-        topics = paginator.page(page)                    
+        topics = paginator.page(page)
+    else:
+        topic_list = Topic.objects.filter(language_id = lid)
+        paginator = Paginator(topic_list, 10) # Show 25 contacts per page
+        topics = paginator.page(page)
 
     context = {
         'categories': categories,
         'topics': topics,
         'category_id' : category_id,
         'lid': lid
-        # 'is_single_topic': is_single_topic,
-        # 'single_topic': topic
     }
-
     return render(request, 'spirit/topic/_ques_and_ans_index.html', context)
-
 
 def index(request):
     return render(request, 'spirit/topic/_home.html')
-
 
 def new_home(request):
     return render(request, 'spirit/topic/_new_home.html')

@@ -47,8 +47,7 @@
                     <div class="owl-carousel owl-theme">
                         {% for video in topic.get_video_comments %}
                             <div class="item">
-                                <!-- <video controls muted><source src="{{ video.get_updated_url }}" type="video/mp4"></video> -->
-                                <div id="video-div-{{ video.id }}" class="video-div" src="{{ video.get_updated_url }}"><img src="/media/img/icons/play_button.svg"></div>
+                                <div id="video-div-{{ video.id }}" class="video-div" src="{{ video.get_updated_url }}"><img src="/media/img/play.svg"></div>
                                 <div class="posted_by">
                                     Posted by {{ video.user.username }} <span>{{ video.date.date }}  &nbsp;</span>
                                     <span id="like_comment{{video.id}}" data_user='{% if user.username %}1{% else %}0{% endif %}' data_id="{{ video.id }}" onClick="changeLikeFunction({{ video.id }})" style="cursor:pointer;">
@@ -92,7 +91,7 @@
                                 <div class="feed_post_date">Answered {{ video.date.date }}</div>
                             </div>
                         </div>
-                        <div id="video-div-{{ video.id }}" class="video-div audio-div" src="{{ video.get_updated_url }}"><img src="/media/img/icons/play_button.svg"></div>
+                        <div id="video-div-{{ video.id }}" class="video-div audio-div" src="{{ video.get_updated_url }}"><img src="/media/img/play.svg"></div>
                     </div>
                 {% endfor %}
             </div>
