@@ -260,7 +260,7 @@ def get_topics_feed(request):
     return JsonResponse(data, safe=False)
 
 
-def ques_ans_index(request,category_id=None):
+def ques_ans_index(request, category_id = None, cat_slug = ''):
     page = 1
     topics = []
     lid = get_current_language(request)

@@ -50,11 +50,11 @@
                                 <div id="video-div-{{ video.id }}" class="video-div" src="{{ video.get_updated_url }}"><img src="/media/img/play.svg"></div>
                                 <div class="posted_by">
                                     Posted by {{ video.user.username }} <span>{{ video.date.date }}  &nbsp;</span>
-                                    <span id="like_comment{{video.id}}" data_user='{% if user.username %}1{% else %}0{% endif %}' data_id="{{ video.id }}" onClick="changeLikeFunction({{ video.id }})" style="cursor:pointer;">
+                                    <!-- <span id="like_comment{{video.id}}" data_user='{% if user.username %}1{% else %}0{% endif %}' data_id="{{ video.id }}" onClick="changeLikeFunction({{ video.id }})" style="cursor:pointer;">
                                     <i class="fa fa-heart"></i>
                                     <span id="updated_like{{ video.id}}">{{ video.likes_count }}</span> likes
-                                    </span> &nbsp;
-                                    <span> <i class="fas fa-share-square"> Share On</i>
+                                    </span> --> &nbsp;
+                                    <span style="float: right;"><i class="fas fa-share-square"></i> Share On
                                         <a target="blank" href="https://api.whatsapp.com/send?phone=+919741133224&text={{ topic.title }} https://www.boloindya.com/topic/{{topic.id}}/" data-action="share/whatsapp/share"><i class="fab fa-whatsapp-square"></i></a>
                                         <a href="https://www.facebook.com/sharer.php?u=https://www.boloindya.com/topic/{{topic.id}}&t={{ topic.title }}"><i class="fab fa-facebook-square"></i></a>
                                     </span>
