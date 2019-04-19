@@ -98,6 +98,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'rest_framework',
 
     'forum.core',
     'forum.admin',
@@ -126,6 +127,7 @@ INSTALLED_APPS = [
     'forum.comment.history',
     'forum.comment.like',
     'forum.comment.poll',
+    'drf_spirit',
 
     # 'forum.core.tests'
 ]
@@ -302,6 +304,16 @@ EMAIL_RECEIVERS = ['ankit@careeranna.com']
 
 COMMENTS_PER_PAGE = 30
 TOPICS_PER_PAGE = 30
+
+#### Rest Framework Settings ###
+DRF_SPIRIT = {
+    'USER_SLUG_FIELD': 'slug'
+}
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
 
 import django
 django.setup()

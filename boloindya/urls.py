@@ -13,6 +13,7 @@ import forum.search.urls
 import forum.category.urls
 import forum.topic.urls
 import forum.comment.urls
+import drf_spirit.urls
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -34,6 +35,7 @@ patterns = [
     url(r'^category/', include(forum.category.urls, namespace='category')),
     url(r'^topic/', include(forum.topic.urls, namespace='topic')),
     url(r'^comment/', include(forum.comment.urls, namespace='comment')),
+    url(r'^api/v1/', include(drf_spirit.urls, namespace='api')),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
