@@ -8,7 +8,7 @@
     <link rel="shortcut icon" href="/media/img/favicon.ico">
 <!--     <title>Bolo Indiya</title>
     <meta name="description" content="{{ config.site_description }}"> -->
-        <title>Bolo Indya -  Questions Answers and Discussions Platform in Local Languages</title>
+    <title>Bolo Indya -  Questions Answers and Discussions Platform in Local Languages</title>
     <meta name="description" content="Share Knowledge through Questions & Answers and Discussions on topic of your choice, in Indian Languages using voice and video." />
     <meta name="keywords" content="Hindi Videos, Hindi Content Platform, Local Languages Content, Love Questions, Sex Questions, Relationship Questions, Life questions, English Videos, Questions and Answers, GK Answers, Politics Discussion, Entertainment, Tamil Videos, Tamil Questions, Tamil Answers, Telugu Questions, Telugu Answers, Exams, UPSC Videos, UPSC Questions, Kannada Questions, Kannada Videos, Punjabi Videos, Punjabi Questions, Gujarati Questions, Gujarati Videos, bengali questions, bengali videos" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,79 +17,110 @@
     <link rel="stylesheet" href="{% static "spirit/stylesheets/style_qa.css" %}">
 
     <!--<script src="{% static "spirit/scripts/all.min.js" %}"></script>-->
-
-
     <link rel="stylesheet" href="{% static "spirit/stylesheets/styles.all.min.css" %}">
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" >
     <link href="{% static "spirit/stylesheets/bootstrap.min.css" %}" rel="stylesheet">
 
-
-
     <link href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" rel="stylesheet">
     <link href="https://owlcarousel2.github.io/OwlCarousel2/assets/owlcarousel/assets/owl.theme.default.min.css" rel="stylesheet">
     <!-- Custom styles for this template -->
-    {% comment %} <link href="assets/css/style.css" rel="stylesheet"> {% endcomment %}
     <link href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/3.3.1/css/swiper.css" rel="stylesheet">
-    {% block js %}
-      <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js"></script>
-      <script src="/media/js/bootstrap.min.js"></script>
-      <script src="https://content.jwplatform.com/libraries/GpYvcHPU.js"></script>
-      <script src="https://owlcarousel2.github.io/OwlCarousel2/assets/owlcarousel/owl.carousel.js"></script>
-      <script src="/media/js/script_qa.js"></script>
-      <script>
-        function getCookie(cname) {
-          var name = cname + "=";
-          var decodedCookie = decodeURIComponent(document.cookie);
-          var ca = decodedCookie.split(';');
-          for(var i = 0; i <ca.length; i++) {
-            var c = ca[i];
-            while (c.charAt(0) == ' ') {
-              c = c.substring(1);
-            }
-            if (c.indexOf(name) == 0) {
-              return c.substring(name.length, c.length);
-            }
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <!-- <script src="/media/js/jquery.cookie.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js"></script>
+    <script src="/media/js/bootstrap.min.js"></script>
+    <script src="https://content.jwplatform.com/libraries/GpYvcHPU.js"></script>
+    <script src="https://owlcarousel2.github.io/OwlCarousel2/assets/owlcarousel/owl.carousel.js"></script>
+    <script src="/media/js/script_qa.js"></script>
+
+    <style type="text/css">
+      .video-div{height: 270px;background: url(http://lorempixel.com/200/200/) 0% 40% no-repeat;/*background: url(/media/img/video_thumb.jpg) 0% 40% no-repeat;*/background-size: 100%;cursor: pointer;}
+      .video-div img{min-width: 50px !important;width: 50px !important;min-height: 50px !important;left: 50% !important;top: 51% !important;background: white;padding: 10px 5px;border-radius: 5px;opacity: 0.95;width: 90px !important;height: 70px !important;}
+      .audio-div img{position: relative;left: 3% !important;top: 15% !important;width: 50px !important;padding: 0;background: none;}
+      .audio-div{height: 100px !important;background: url(/media/img/audio_thumb.png) 75px 40% no-repeat;background-size: 102%;}
+      .qa_sec .row:first-child{margin-top: 68px;margin-left: -20px;margin-right: -20px;border: none;}
+      .maxheight100{max-height: 100px !important;}
+
+      header{position: fixed;background: #fff;width: 100%;border-bottom: #cecece 1px solid;z-index: 100;top: 0;}
+      .right_sec{position: fixed;right: 10px;}
+      .left_sec{position: fixed;}
+      .mid_sec{margin: 0 auto;}
+      #accordion{max-height: 79vh;overflow: auto;}
+    </style>
+
+    <script>
+      function getCookie(cname) {
+        var name = cname + "=";
+        var decodedCookie = decodeURIComponent(document.cookie);
+        var ca = decodedCookie.split(';');
+        for(var i = 0; i <ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0) == ' ') {
+            c = c.substring(1);
           }
-          return "";
+          if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+          }
         }
-        $( document ).ready(function() {
-          $("#id_category option").filter(function() { return $(this).text().indexOf("---") != 0; }).attr("disabled","disabled"); 
-          // $.tab();
-          // $( 'a.js-post' ).postify( {
-          //     csrfToken: "{{ csrf_token }}",
-          // } );
-          // $('.js-messages').messages();
-          // {% if user.is_authenticated %}
-          //     $.notification( {
-          //         notificationUrl: "{% url "spirit:topic:notification:index-ajax" %}",
-          //         notificationListUrl: "{% url "spirit:topic:notification:index-unread" %}",
-          //         mentionTxt: "{% trans "{user} has mention you on {topic}" %}",
-          //         commentTxt: "{% trans "{user} has commented on {topic}" %}",
-          //         showAll: "{% trans "Show all" %}",
-          //         empty: "{% trans "No new notifications, yet" %}",
-          //         unread: "{% trans "unread" %}",
-          //     } );
-          // {% endif %}
-          $('.change_language[lcode="' + getCookie('language') +'"]').addClass('selected');
-          $('.change_language').click(function(e){
-            e.preventDefault()
-            var lcode = $(this).attr('lcode');
-            document.cookie = "language=" + lcode;
-            window.location = $(this).attr('href');
+        return "";
+      }
+      function clearCookie(cname) {
+        var mydate = new Date();
+        mydate.setTime(mydate.getTime() - 1);
+        document.cookie = cname + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      }
+
+      $( document ).ready(function() {
+        $("#id_category option").filter(function() { return $(this).text().indexOf("---") != 0; }).attr("disabled","disabled"); 
+        
+        $('.change_language[lcode="' + getCookie("language") +'"]').addClass('selected');
+        $('.lang_link').html($('.change_language[lcode="' + getCookie("language") +'"]').text() + '<small style="color:lightgrey">&nbsp;&nbsp;[change]</small>');
+        $('.change_language').click(function(e){
+          e.preventDefault();
+          clearCookie("language");
+          var lcode = $(this).attr('lcode');
+          document.cookie = "language=" + lcode + "; expires=Fri, 31 Dec 2025 00:00:00 UTC; path=/;";
+          window.location = $(this).attr('href');
+        });
+      });
+    </script>
+    <!-- Setup / code for JW Player -->
+    <script type="text/javascript" src="https://content.jwplatform.com/libraries/GpYvcHPU.js"></script>
+    <!-- <script src="//content.jwplatform.com/libraries/eX4mp13.js"></script> -->
+    <script type="text/javascript">
+      $( document ).ready(function() {
+        $(document).on('click', '.video-div', function(e){
+          var divId = $(this).attr('id');
+          var pl_width = $('.quest_feed').width() - 30;
+          var pl_height = 270;
+          if($('#' + divId).hasClass('audio-div')){
+            pl_height = 100;
+          }
+          jwplayer(divId).setup({
+            repeat: false,
+            width: pl_width,
+            height: pl_height,
+            "playlist": [{
+              "displayPlaybackLabel":true,
+              "seek":90,
+              // "mediaid": "ddrx3v2",
+              "sources": [{
+                "file": $(this).attr('src'), // Give m3u8 url here
+                "type": 'video/mp4',
+              }]
+            }]
           });
         });
-      </script>
-    {% endblock %}
-
+      });
+    </script>
+    {% block js %}{% endblock %}
     {% block head-extra %}{% endblock %}
-
     <!--[if (lt IE 9) & (!IEMobile)]>
     <script src="//cdnjs.cloudflare.com/ajax/libs/selectivizr/1.0.2/selectivizr-min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.6/html5shiv.min.js"></script>
     <![endif]-->
-
   </head>
 
   <body style="margin-left:0px; margin-right: 0px;max-width:100%;">
@@ -97,7 +128,5 @@
     {% render_messages messages %}
     {% block content %}{% endblock %}
     {% include 'spirit/ques_and_ans_footer.html' %}
-
   </body>
-
 </html>

@@ -8,25 +8,19 @@
         <div id="{{c.id}}" class="collapse show" data-parent="#accordion">
             <div class="card-body">
                 <ul>
-                                {% for sub in c.parent_category.all %} 
-                                   
-                                            <li class="radio">
-                                                <input type="radio" id="{{sub.id}}" name="qa-group" onclick="click_sub({{sub.id}})">
-                                                <label class="radio-label" for="{{sub.id}}">{{ sub.title }}</label>
-                                            </li>
-                                             {% endfor %} 
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %} 
+                    {% for sub in c.parent_category.all %} 
+                        <li class="radio">
+                            <input type="radio" id="{{sub.id}}" name="qa-group" onclick='click_sub({{sub.id}}, "{{sub.title}}")'>
+                            <label class="radio-label" for="{{sub.id}}">{{ sub.title }}</label>
+                        </li>
+                     {% endfor %} 
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endfor %} 
 <script>
-
-    function click_sub(id) {
-        window.location.assign('/topic/discussion/'+id + '/?lid={{lid}}');//+"/0");
-        //window.location('/topic/dicussion/'+id)
+    function click_sub(id, name) {
+        window.location.assign('/topic/discussion/'+ id + '/' + name.toLowerCase() + '/?language=' + $('.change_language.selected').text().toLowerCase() + '&lid=' + getCookie('language') );
     }
-
-</script>
-
-                                
+</script>                       

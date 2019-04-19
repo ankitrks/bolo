@@ -52,11 +52,16 @@ class Comment(models.Model):
         verbose_name = _("comment")
         verbose_name_plural = _("comments")
 
+    def __str__(self):
+        return self.comment
+
     def get_absolute_url(self):
         return reverse('spirit:comment:find', kwargs={'pk': str(self.id), })
 
     def get_updated_url(self):
-        return self.comment
+        if self.comment:
+            return self.comment
+        return '-'
         # if 'uploads' in self.comment:
         #     return self.comment.replace("boloindya", "careeranna")    
         # return self.comment.replace("careeranna", "boloindya")
@@ -68,8 +73,7 @@ class Comment(models.Model):
             assert len(self.likes) <= 1, "Panic, too many likes"
             return self.likes[0]
         except (AttributeError, IndexError):
-            return
-
+            return 0
 
     def increase_modified_count(self):
         Comment.objects\

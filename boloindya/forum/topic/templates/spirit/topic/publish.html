@@ -7,21 +7,27 @@
 
 {% block head-extra %}
     <script>
+        var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
         function showtextfields(){
             $('[for="id_title"], #id_title').show();
         }
+        function disableAndClose(){
+            alert("Device / browser doesn't support this feature.");
+            $('[data-toggle="modal"]').removeAttr('data-toggle').removeAttr('data-target');
+            return false
+        }
         function hidetextfields(){
             $('[for="id_title"], #id_title').hide();
-            
-            navigator.mediaDevices.getUserMedia({
-              audio: isEdge ? true : {
-                  echoCancellation: false
-              }
-            }).catch(function(error) {
-                alert("Device / browser doesn't support this feature.");
-                $('[data-toggle="modal"]').removeAttr('data-toggle').removeAttr('data-target');
-                return false
-            });
+            if(isSafari){ disableAndClose(); }
+            else{
+                navigator.mediaDevices.getUserMedia({
+                  audio: isEdge ? true : {
+                      echoCancellation: false
+                  }
+                }).catch(function(error) {
+                    disableAndClose();
+                });
+            }
         }
     	$( document ).ready(function() {
     		// $( "textarea" ).store( "topic_publish_comment" );
@@ -77,15 +83,15 @@
     }
     </style>
         
-    <hr><div class="container">
+    <div class="container" style="position:relative;top: 100px;">
         <input type="hidden" name="onPublish" value="1">
-        <br><h4 class="headline">{% trans "Start discussion" %}</h4>
+        <br><h4 class="headline">{% trans "Start discussion" %}</h4><br>
         <form action="." method="post" class="js-reply">
             {% csrf_token %}
             {# topic #}
             <div>
                 <a href="javascript:void()" class="btn btn-danger" onclick="hidetextfields()" data-toggle="modal" data-target="#myModalAudio"> <i class="fa fa-microphone marginRight10" aria-hidden="true"></i>Ask in Audio</a>
-                <a href="javascript:void()" class="btn btn-danger" onclick="hidetextfields()" data-toggle="modal" data-target="#myModalVideo"><i class="fa fa-video-camera marginRight10" aria-hidden="true"></i>Ask in Video</a>
+                <!-- <a href="javascript:void()" class="btn btn-danger" onclick="hidetextfields()" data-toggle="modal" data-target="#myModalVideo"><i class="fa fa-video-camera marginRight10" aria-hidden="true"></i>Ask in Video</a> -->
                 <a href="#" class="btn btn-danger ask_text" onclick="showtextfields()"><i class="fa fa-edit marginRight10"></i><span style="color: #fff">Ask in Text</span></a>
             </div>
             {% include "spirit/_form.html" %}
@@ -98,6 +104,7 @@
             <div class="container">
                 {% include "spirit/comment/_editor.html" %}
                 <input class="button reply-button" type="submit" value="{% trans "Publish" %}" />
+                <a href="#" onclick="window.history.back();" style="position: relative;top: -10px;left: -10px;color: #007bff;font-size: 14px;"> < Back</a>
             </div>
         </form>
     </div>
