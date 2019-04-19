@@ -1,20 +1,5 @@
-# from django.contrib import admin
-
-# from .models import Category, Topic, Comment
-
-
-# class CategoryAdmin(admin.ModelAdmin):
-#     list_display = ('title',)
-
-
-# class TopicAdmin(admin.ModelAdmin):
-#     list_display = ('title',)
-
-
-# class CommentAdmin(admin.ModelAdmin):
-#     list_display = ('comment', 'date')
-
-
-# admin.site.register(Category, CategoryAdmin)
-# admin.site.register(Topic, TopicAdmin)
-# admin.site.register(Comment, CommentAdmin)
+from django.contrib import admin
+from .models import SingUpOTP
+class SingUpOTPAdmin(admin.ModelAdmin):
+    list_display = ('mobile_no', 'otp', 'is_active', 'created_at', 'used_at', 'is_reset_password', 'for_user', )
+admin.site.register(SingUpOTP, SingUpOTPAdmin)

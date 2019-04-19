@@ -1,3 +1,27 @@
+from django.db import models
+from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
+
+class SingUpOTP(models.Model):
+    mobile_no = models.CharField(_("title"), max_length=75)
+    otp = models.CharField(_("OTP"), max_length=10, editable=False)
+    is_active = models.BooleanField(_("Active?"), default=True)
+    created_at = models.DateTimeField(_("Created At"), default=timezone.now, blank=True, editable=False)
+    used_at = models.DateTimeField(_("Used At"), blank=True, null = True, editable=False)
+    is_reset_password = models.BooleanField(_("is reset password?"), default=False)
+    is_for_change_phone = models.BooleanField(_("is for change phone number?"), default=False)
+    for_user = models.ForeignKey('auth.User', blank = True, null = True)
+    api_response_dump = models.TextField(null = True, blank = True)
+    
+    def __unicode__(self):
+        return self.mobile_no
+
+    # def save(self, *args, **kwargs):
+    #	if not self.id:
+    #		self.otp = generateOTP(6)
+    #		response, status = send_sms(self.mobile_no, self.otp)
+	#	super(SingUpOTP, self).save(*args, **kwargs)
+
 # # -*- coding: utf-8 -*-
 
 # from __future__ import unicode_literals

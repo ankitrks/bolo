@@ -305,15 +305,25 @@ EMAIL_RECEIVERS = ['ankit@careeranna.com']
 COMMENTS_PER_PAGE = 30
 TOPICS_PER_PAGE = 30
 
-#### Rest Framework Settings ###
-DRF_SPIRIT = {
-    'USER_SLUG_FIELD': 'slug'
-}
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
-}
+TWO_FACTOR_SMS_API_KEY = "7ce3da5e-6297-11e9-90e4-0200cd936042"
+TWO_FACTOR_SMS_TEMPLATE = "BoloIndyaOTP" 
 
-import django
-django.setup()
+#### Rest Framework Settings ###
+import datetime
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework_simplejwt.authentication.JWTAuthentication',],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 10
+}
+JWT_AUTH = {
+    # how long the original token is valid for
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=90),
+    # allow refreshing of tokens
+    'JWT_ALLOW_REFRESH': True,
+    # this is the maximum time AFTER the token was issued that
+    # it can be refreshed.  exprired tokens can't be refreshed.
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=90),
+}
+#### Rest Framework Settings ###
+# import django
+# django.setup()
