@@ -1,0 +1,340 @@
+{% extends "spirit/_index_base.html" %}
+
+{% load spirit_tags i18n %}
+
+{% block title %}BoloIndya{% endblock %}
+
+{% block content %}
+
+    <style>
+        
+        .upper_tab {
+            background: #f1f0f0;
+            padding: 30px 0px;
+        }
+        .get_your_bolo_app {
+            font-size: 24px;
+        }
+        .get_your_bolo_app span{
+            font-weight: 600;
+        }
+        .get_your_bolo_app img {
+            margin-left: 20px;
+        }
+        .card_profile .line{
+            height: 1px;width: 100%;background: rgba(0,0,0,0.4);margin: 15px 0px;
+        }
+        .card_profile .description {
+            font-size: 16px;
+            padding-left: 5px;
+        }
+        .card_profile .profile_name {
+            font-weight: 700;
+        }
+        .card_profile .profile_name span{
+            font-weight: 400;
+        }
+        .card_profile .about {
+            font-size: 13px;
+        }
+        .ask_question {
+            text-align: center;
+        }
+        .ask_question .row .ask_english{
+            background: white;
+            padding: 10px 29%;
+            border-radius: 4px;
+            -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.25);
+            -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.25);
+            box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.25);
+        }
+        .ask_question .row .ask_hindi{
+            background: #BB3335;
+            border-radius: 4px;
+            color: white;
+            padding: 10px 29%;
+            transition: all 0.3s ease-in-out;
+            -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.25);
+            -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.25);
+            box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.25);
+        }
+        .play_store_pic {
+            padding: 20px 0px;
+        }
+        .play_store_pic img{
+            margin-left: 40px;
+        }
+        .lower_tab {
+            padding: 30px 0px;
+        }
+        .lower_tab .container h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .lower_tab .container .choose_language_tabs {
+            text-align: center;
+        }
+        .lower_tab .container .choose_language_tabs .language{
+            background: #f1f0f0;
+            margin: 1%;
+            width: 23%;
+            font-size: 20px;
+            padding: 10px 0px;
+            border-radius: 4px;
+            -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.25);
+        }
+        .lower_tab .container .choose_language_tabs .language.active{
+            background: #CB3B3D;
+            color: white;
+            font-weight: 600;
+        }
+        .lower_tab .container h4 { 
+            text-align: center;
+            margin: 20px 0px;
+        }
+        .upcoming_languages {
+            text-align: center;
+            font-size: 18px;
+        }
+        .want_to_get_updated {
+            font-size: 18px;
+            font-weight: 600;   
+            margin-top: 30px; 
+            text-align: center;
+        }
+        .want_to_get_updated span{
+            opacity: 0.7;
+        }
+        form {
+            margin-top: 20px;
+            width: 70%;
+        }
+        form select {
+            width: 100%;
+            position: absolute;
+            bottom: 0;
+        }
+        form .submit {
+            width: 30%;
+            margin-left: 35%;
+            font-size: 13px;
+        }
+        .footer {
+            background: #f1f0f0;
+            padding: 30px 0px;
+        }
+        .social-icons li {
+            background: #323F4E;
+        }
+        .social-icons li .fab{
+            color: white;
+        }
+        .subscribe_form h4{
+            opacity: 0.7;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .footer_links {
+            padding: 10px;
+        }
+        .footer_links h6 {
+            font-size: 14px;
+            text-align: left;
+        }
+        .footer_links ul {
+            padding: 0px;
+        }
+        .footer_links ul li {
+            font-size: 12px;
+            text-align: left;
+        }
+        .subscribe_form {
+            width: 100%;
+        }
+        .form_group input[type=email]{
+            width: 200px;
+            font-size: 12px;
+        } 
+        .form_group input[type=submit]{
+            font-size: 12px;
+            width: 120px;
+            margin-left: 20px;
+        } 
+        .play_store_image_footer {
+            float: right;
+        }
+        @media (max-width:650px){
+            .get_your_bolo_app {
+                font-size: 16px;
+            }
+            .get_your_bolo_app img{ 
+                width: 95px;
+                margin-left: 10px;
+            }
+            .card_profile img{
+                margin-bottom: 10px;
+            }
+            .ask_english {
+                margin-bottom: 10px;
+            }
+            .play_store_pic img{
+                margin-left: 15%;
+                margin-bottom: 10px;
+            }
+            .lower_tab .container h2 {
+                font-size: 24px;
+            }
+            .lower_tab .container .choose_language_tabs .language{
+                width: 45%;
+                margin-left: 3%;
+                margin-bottom: 15px;
+            }
+            .lower_tab .container h4 { 
+                font-size: 20px;
+                text-decoration: underline;
+            }
+            form {
+                margin-left: 0px !important;
+            }
+            form .form_group {
+                margin: 20px 0px ;
+            }
+            form .submit {
+                width: 60%;
+                margin-left: 20%;
+                font-size: 13px;
+            }
+        }
+
+    </style>
+
+   <div class="upper_tab">
+        <div class="container">
+            <div class="row m-0">
+                <div class="col-md-6 px-0">
+                    <div class="get_your_bolo_app">
+                        Get Your <span>Bolo Indya App</span>
+                        <img src="/media/img/app_image.svg" alt="play_store" width="120px"/>
+                    </div>
+                    <div class="card_profile row px-0">
+                        <div class="col-md-4">
+                            <img src="/media/img/preeti.png" alt="">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="description">
+                                <i class="fas fa-quote-left"></i>&nbsp; Mere 21.5k followers dekh k Bolo Indya pe mere aas pass office k log khud mujhse coffee ke time Economy aur Politics pe baat karne aate hai aur mere diye hue answers pe aur discussion karte hai&nbsp; <i class="fas fa-quote-right"></i>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="line" style=""></div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="profile_name">
+                                Preeti Nigam <span style="display:block;">From Purnia, Bihar</span>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="about">
+                                Working in a small services company at Patna, Bihar – Contributes both Videos and answers in Hindi at Bolo Indya
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ask_question">
+                        <div class="row m-0">
+                            <a href="" class="col-md-6 ask_english col-12 px-0">Ask a Question</a>
+                            <a class="col-md-6 col-12 px-0 ask_hindi col-12"> सवाल पूछिए</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="play_store_pic col-md-6 px-0 row m-0">
+                    <div class="col-md-6 col-12">
+                        <img src="/media/img/profile.png" alt="">
+                    </div>
+                    <div class="col-md-6 col-12">
+                        <img src="/media/img/video.png" alt="">
+                    </div>
+                </div>
+            </div>
+        </div>
+   </div> 
+   <div class="lower_tab">
+        <div class="container">
+            <h2>Choose Your Language</h2>
+            <div class="row choose_language_tabs m-0">
+                <a href="" class="language active">English</a>
+                <a href="" class="language">हिंदी</a>
+                <a href="" class="language">தமிழ்</a>
+                <a href="" class="language">తెలుగు</a>
+            </div>
+            <h4>UPCOMING LANGUAGES</h4>
+            <div class="row upcoming_languages m-0">
+                <div class="col-md-2 col-4">ગુજરાતી</div>
+                <div class="col-md-2 col-4">বাংলা</div>
+                <div class="col-md-2 col-4">മലയാളം</div>
+                <div class="col-md-2 col-4">ਪੰਜਾਬੀ</div>
+                <div class="col-md-2 col-4">मराठी</div>
+                <div class="col-md-2 col-4">ಕನ್ನಡ</div>
+            </div>
+            <div class="want_to_get_updated">Want to Get Updated <span>When Your Language is Launched?</span></div>
+            <form class="row" action="" style=" margin-left: 15% !important;">
+                <div class="col-md-6 form_group col-12 ">
+                    <input type="text" name="eamil" placeholder="Enter Your Email" />
+                </div>
+                <div class="col-md-6 col-12 form_group">
+                    <select name="choose_upcoming_language" id="">
+                        <option value="Kanada">Kanada</option>
+                        <option value="Marathi">Marathi</option>
+                        <option value="Bangla">Bangla</option>
+                        <option value="Gujrati">Gujrati</option>
+                        <option value="Malayalam">Malayalam</option>
+                        <option value="Odiya">Odiya</option>
+                    </select>
+                </div>
+                <div class="col-md-12 col-12 ">
+                    <input type="submit" class="submit" value="Submit"/>
+                </div>
+            </form>
+        </div>
+   </div>
+   <div class="footer">
+        <div class="container">
+            <div class="row m-o">
+                <div class="col-md-5 col-12">
+                    <div class="brand_name">
+                        Bolo Indya
+                    </div>
+                    <div class="copy_right">
+                        © Career Anna Education Pvt. Ltd. 2019
+                    </div>
+                    <ul class="social-icons">
+                        <li><a href="https://m.facebook.com/careerannacorp/"><i class="fab fa-facebook-f"></i></a></li>
+                        <li><a href="https://www.linkedin.com/company/careeranna"><i class="fab fa-linkedin"></i></a></li>
+                        <li><a href="https://www.instagram.com/careeranna"><i class="fab fa-instagram"></i></a></li>
+                        <li><a href="https://twitter.com/CareerAnna"><i class="fab fa-twitter"></i></a></li>
+                        <li><a href="https://www.youtube.com/channel/UCZmLZ68KNZotm3BxkGsuU4g"><i class="fab fa-youtube"></i></a></li>
+                    </ul>
+                    <form action="" class="subscribe_form">
+                        <h4>Subscribe to the newsletter</h4>
+                        <div class="form_group">
+                            <input type="email" required placeholder="Enter Your Email" />
+                            <input type="submit" value="Subscribe" />
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-7 col-12">
+                    <div class="row m-0">
+                        <div class="footer_links"><h6>FREE VIDEO RESOURCE</h6><ul><li><a href="https://www.careeranna.com/english/free/videos" title="Finance">English Free Videos</a></li><li><a href="https://www.careeranna.com/hindi/free/videos" title="Marketing">Hindi Free Videos</a></li><li><a href="https://www.careeranna.com/tamil/free/videos" title="Marketing">Tamil Free Videos</a></li><li><a href="https://www.careeranna.com/telugu/free/videos" title="Human Resource">Telugu Free Videos</a></li></ul></div>
+                        <div class="footer_links"><h6>MBA</h6><ul><li><a href="https://www.careeranna.com/CAT" title="CAT">CAT</a></li><li><a href="https://www.careeranna.com/XAT" title="XAT">XAT</a></li><li><a href="https://www.careeranna.com/NMAT" title="NMAT">NMAT</a></li><li><a href="https://www.careeranna.com/SNAP" title="SNAP">SNAP</a></li><li><a href="https://www.careeranna.com/TISSNET" title="TISSNET">TISSNET</a></li><li><a href="https://www.careeranna.com/MICAT" title="MICAT">MICAT</a></li><li><a href="https://www.careeranna.com/IIFT" title="IIFT">IIFT</a></li></ul></div>
+                        <div class="footer_links"><h6>Certificate Courses</h6><ul><li><a href="https://www.careeranna.com/certification/machine-learning-course" title="Machine Learning">Machine Learning</a></li><li><a href="https://www.careeranna.com/certification/artificial-intelligence-course" title="Artificial Intelligence">Artificial Intelligence</a></li><li><a href="https://www.careeranna.com/certification/Certified-Associate-in-Material-Management" title="Material Management">Material Management</a></li><li><a href="https://www.careeranna.com/certification/product-management" title="Product Management">Product Management</a></li></ul></div>
+                        <div class="footer_links"><h6>RESOURCE</h6><ul><li><a id="ga-14df32" href="https://www.careeranna.com/courses">Test Prep</a></li><li><a id="ga-41441e" href="https://www.careeranna.com/articles">Articles</a></li></ul></div>
+                        <div class="footer_links"><h6>SUPPORT</h6><ul><li><a id="ga-14df32" href="https://www.careeranna.com/careers">Jobs</a></li><li><a id="ga-2dc1d0" href="https://www.careeranna.com/about">About Us</a></li><li><a id="ga-2dc1d0" href="https://www.careeranna.com/contact">Contact Us</a></li><li><a id="ga-2dc1d0" href="https://www.careeranna.com/terms-of-service">Terms of Service</a></li></ul></div>
+                    </div>
+                    <div class="col-md-12 col-12">
+                        <img src="/media/img/app_image.svg" alt="play_store" width="120px" class="play_store_image_footer"/>
+                    </div>
+                </div> 
+               
+            </div>  
+        </div>
+
+{% endblock %}
