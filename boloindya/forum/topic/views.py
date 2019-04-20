@@ -288,7 +288,7 @@ def index(request):
     return render(request, 'spirit/topic/_home.html')
 
 def new_home(request):
-    return render(request, 'spirit/topic/_new_home.html')
+    return render(request, 'spirit/topic/main_landing.html')
 
 def robotstext(request):
     return render(request, 'spirit/topic/robots.txt') 
