@@ -11,6 +11,22 @@ from django.utils import timezone
 from ..core.conf import settings
 from ..core.utils.models import AutoSlugField
 
+class RecordTimeStamp(models.Model):
+    created_at=models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False) # auto_now will add the current time and date whenever field is saved.
+    last_modified=models.DateTimeField(auto_now=True,auto_now_add=False)                     # while auto_now_add will save the date and time only when record is first created
+    class Meta:
+        abstract = True
+
+language_options = (
+    ('0', "English"),
+    ('1', "Hindi"),
+    ('2', "Tamil"),
+    ('3', "Telgu"),
+)
+refrence_options = (
+    ('0', "native"),
+    ('1', "facebook"),
+)
 
 class UserProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, verbose_name=_("profile"), related_name='st')
@@ -32,6 +48,17 @@ class UserProfile(models.Model):
 
     last_post_hash = models.CharField(_("last post hash"), max_length=32, blank=True)
     last_post_on = models.DateTimeField(_("last post on"), null=True, blank=True)
+    # new  profile fields:{maaz} #
+    profile_pic = models.CharField(_("Profile Pic"), max_length=1000, blank=True)
+    name = models.CharField(_("Name"), max_length=100, blank=True)
+    bio = models.CharField(_("Bio"), max_length=300, blank=True)
+    about = models.CharField(_("About"), max_length=500, blank=True)
+    language = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='0')
+    sub_category=models.ManyToManyField('forum_category.Category', verbose_name=_("Sub Category"),related_name='%(app_label)s_%(class)s_sub_category')
+    refrence = models.CharField(choices=refrence_options, blank = True, null = True, max_length=10,default='0')
+    extra_data = models.TextField(null=True,blank=True)
+    social_identifier = models.CharField(_("Social Identifier"), max_length=100, blank=True)
+    # end #
 
     class Meta:
         verbose_name = _("forum profile")
@@ -63,3 +90,11 @@ class UserProfile(models.Model):
                     .update(
                         last_post_hash=post_hash,
                         last_post_on=timezone.now()))
+
+class Follower(RecordTimeStamp):
+    user_following = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='user_following')# User being Followed
+    user_follower = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='user_follower')# User Start Following
+    is_active = models.BooleanField(default = True)
+
+    class Meta:
+        verbose_name_plural = 'User\'s Followers'

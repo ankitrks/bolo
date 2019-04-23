@@ -14,10 +14,20 @@ from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
 from .permissions import IsOwnerOrReadOnly
 from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,UserSerializer
-from forum.topic.models import Topic
+from forum.topic.models import Topic,ShareTopic,Like
 from forum.category.models import Category
 from forum.comment.models import Comment
+from forum.user.models import UserProfile,Follower
 from django.db.models import Q
+from rest_framework_simplejwt.tokens import RefreshToken
+
+def get_tokens_for_user(user):
+    refresh = RefreshToken.for_user(user)
+
+    return {
+        'refresh': str(refresh),
+        'access': str(refresh.access_token),
+    }
 
 class TopicList(generics.ListCreateAPIView):
     serializer_class = TopicSerializer
@@ -59,16 +69,28 @@ class Usertimeline(generics.ListCreateAPIView):
 
     def get_queryset(self):
         topics = []
+        is_user_timeline = False
         search_term=self.request.GET.keys()
         if search_term:
             filter_dic={}
+            post = []
             for term_key in search_term:
                 if term_key:
                     value=self.request.GET.get(term_key)
                     filter_dic[term_key]=value
+                    if term_key =='user_id':
+                        is_user_timeline = True
             if filter_dic:
                 topics = Topic.objects.filter(**filter_dic)
-                
+                if is_user_timeline:
+                    all_shared_post = ShareTopic.objects.filter(user_id = filter_dic['user_id'])
+                    if all_shared_post:
+                        for each_post in all_shared_post:
+                            post.append(each_post)
+                    if topics:
+                        for each_post in topics:
+                            post.append(each_post)
+                    topics = post
         else:
                 topics = Topic.objects.all()
 
@@ -200,7 +222,8 @@ def verify_otp(request):
                 user = User.objects.create(username = mobile_no)
                 otp_obj.for_user = user
                 otp_obj.save()
-                return JsonResponse({'message': 'User created', 'username' : mobile_no}, status=status.HTTP_200_OK)
+                user_tokens = get_tokens_for_user(user)
+                return JsonResponse({'message': 'User created', 'username' : mobile_no,'access':user_tokens['access'],'refresh':user_tokens['refresh']}, status=status.HTTP_200_OK)
             otp_obj.save()
             return JsonResponse({'message': 'OTP Validated', 'username' : mobile_no}, status=status.HTTP_200_OK)
         except Exception as e:
@@ -225,5 +248,137 @@ def password_set(request):
 
 
 @api_view(['POST'])
-def create_user_facebook(request):
-    pass
+def fb_profile_settings(request):
+    profile_pic = request.POST.get('profile_pic',None)
+    name = request.POST.get('name',None)
+    bio = request.POST.get('bio',None)
+    about = request.POST.get('about',None)
+    username = request.POST.get('username',None)
+    refrence = request.POST.get('refrence',None)
+    extra_data = request.POST.get('extra_data',None)
+    activity = request.POST.get('activity',None)
+    language = request.POST.get('language',None)
+    sub_category_prefrences = request.POST.get('categories',None)
+    try:
+        if activity == 'facebook_login' and refrence == 'facebook':
+            userprofile,is_created = UserProfile.objects.get_or_create(social_identifier = extra_data['id'])
+            if is_created:
+                user = User.objects.create(username = extra_data['id'])
+                user.first_name = extra_data['first_name']
+                user.last_name = extra_data['last_name']
+                userprofile.name = extra_data['name']
+                userprofile.bio = bio
+                userprofile.about = about
+                userprofile.refrence = refrence
+                userprofile.extra_data = extra_data
+                userprofile.user = user
+                userprofile.save()
+                user.save()
+                user_tokens = get_tokens_for_user(user)
+                return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh']}, status=status.HTTP_200_OK)
+            else:
+                user = userprofile.user
+                user_tokens = get_tokens_for_user(user)
+                return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh']}, status=status.HTTP_200_OK)
+        elif activity == 'profile_save':
+            try:
+                userprofile = UserProfile.objects.get(user = request.user)
+                userprofile.bio = bio
+                userprofile.about = about
+                userprofile.profile_pic =profile_pic
+                if username:
+                    user = userprofile.user
+                    user.username = username
+                    user.save()
+                userprofile.save()
+                return JsonResponse({'message': 'Profile Saved'}, status=status.HTTP_200_OK)
+            except Exception as e:
+                return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+        elif activity == 'settings_changed':
+            try:
+                userprofile = UserProfile.objects.get(user = request.user)
+                if sub_category_prefrences:
+                    for each_sub_category in sub_category_prefrences:
+                        userprofile.sub_category_id = each_sub_category
+                        userprofile.save()
+                if language:
+                    userprofile.language = str(language)
+                    userprofile.save()
+                return JsonResponse({'message': 'Settings Chnaged'}, status=status.HTTP_200_OK)
+            except Exception as e:
+                return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def follow_user(request):
+    user_following_id = request.POST.get('user_following_id',None)
+    try:
+        follow,is_created = Follower.objects.get_or_create(user_follower = request.user,user_following_id=user_following_id)
+        if is_created:
+            return JsonResponse({'message': 'Followed'}, status=status.HTTP_200_OK)
+        else:
+            if follow.is_active:
+                follow.is_active = False
+                follow.save()
+                return JsonResponse({'message': 'Unfollowed'}, status=status.HTTP_200_OK)
+            else:
+                follow.is_active = True
+                follow.save()
+                return JsonResponse({'message': 'Unfollowed'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def follow_sub_category(request):
+    user_sub_category_id = request.POST.get('sub_category_id',None)
+    try:
+        userprofile = UserProfile.objects.get(user = request.user)
+        all_sub_category = userprofile.sub_category.all()
+        for each_sub_category in all_sub_category:
+            if each_sub_category.id == user_sub_category_id:
+                each_sub_category.remove()
+                return JsonResponse({'message': 'Unfollowed'}, status=status.HTTP_200_OK)
+            else:
+                userprofile.sub_category_id = user_sub_category_id
+                userprofile.save()
+                return JsonResponse({'message': 'Followed'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def like(request):
+    topic_id = request.POST.get('topic_id',None)
+    try:
+        liked,is_created = Like.objects.get_or_create(topic_id = topic_id,user = request.user)
+        if is_created:
+            return JsonResponse({'message': 'liked'}, status=status.HTTP_200_OK)
+        else:
+            liked.like = False
+            liked.save()
+            return JsonResponse({'message': 'unliked'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+@api_view(['POST'])
+def shareontimeline(request):
+    topic_id = request.POST.get('topic_id',None)
+    try:
+        liked,is_created = ShareTopic.objects.create(topic_id = topic_id,user = request.user)
+        return JsonResponse({'message': 'shared'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+# @api_view(['POST'])
+# def 
+
+
+
+
+
+
+
+
+
+
+
+

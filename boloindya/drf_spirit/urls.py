@@ -1,7 +1,8 @@
 # from django.urls import path
 from django.conf.urls import include, url
-from .views import TopicList,SearchTopic,SearchUser, TopicDetails, TopicCommentList, CategoryList, CommentList, CommentDetails, SingUpOTPView,\
-	verify_otp, password_set, create_user_facebook,Usertimeline
+
+from .views import TopicList, TopicDetails,SearchTopic,SearchUser, TopicCommentList, CategoryList, CommentList, CommentDetails, SingUpOTPView,\
+	verify_otp, password_set, fb_profile_settings,Usertimeline
 from rest_framework_simplejwt import views as jwt_views
 
 app_name = 'drf_spirit'
@@ -46,6 +47,6 @@ urlpatterns = [
     # Get Params could be ?is_reset_password=1 OR ?is_for_change_phone=1
     url(r'^otp/verify/$', verify_otp, name='token_obtain_pair'),
 
-    url(r'^create/user/facebook/$', create_user_facebook, name='create_user_facebook'),
+    url(r'^fb_profile_settings$', fb_profile_settings, name='fb_profile_settings'),
     url(r'^password/set/$', password_set, name='password_set'),
 ]
