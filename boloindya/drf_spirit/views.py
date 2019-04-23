@@ -71,16 +71,28 @@ class Usertimeline(generics.ListCreateAPIView):
 
     def get_queryset(self):
         topics = []
+        is_user_timeline = False
         search_term=self.request.GET.keys()
         if search_term:
             filter_dic={}
+            post = []
             for term_key in search_term:
                 if term_key:
                     value=self.request.GET.get(term_key)
                     filter_dic[term_key]=value
+                    if term_key =='user_id':
+                        is_user_timeline = True
             if filter_dic:
                 topics = Topic.objects.filter(**filter_dic)
-                
+                if is_user_timeline:
+                    all_shared_post = ShareTopic.objects.filter(user_id = filter_dic['user_id'])
+                    if all_shared_post:
+                        for each_post in all_shared_post:
+                            post.append(each_post)
+                    if topics:
+                        for each_post in topics:
+                            post.append(each_post)
+                    topics = post
         else:
                 topics = Topic.objects.all()
 
@@ -367,6 +379,9 @@ def shareontimeline(request):
         return JsonResponse({'message': 'shared'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+# @api_view(['POST'])
+# def 
 
 
 
