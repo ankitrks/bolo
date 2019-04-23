@@ -13,20 +13,103 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
 from .permissions import IsOwnerOrReadOnly
-from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer
+from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment
 from forum.topic.models import Topic
 from forum.category.models import Category
 from forum.comment.models import Comment
 
 class TopicList(generics.ListCreateAPIView):
     serializer_class = TopicSerializer
-    queryset = Topic.objects.all()
+    #queryset = Topic.objects.all()
+
     filter_backends = (DjangoFilterBackend,)
     filter_class = TopicFilter
     permission_classes = (IsAuthenticatedOrReadOnly,)
+    
+
+    def get_queryset(self):
+        topics = []
+
+        search_term=self.request.GET.keys()
+        if search_term:
+            filter_dic={}
+            for term_key in search_term:
+                if term_key:
+                    value=self.request.GET.get(term_key)
+                    filter_dic[term_key]=value
+            if filter_dic:
+                topics = Topic.objects.filter(**filter_dic)
+                pagination_class = LimitOffsetPagination
+        else:
+                topics = Topic.objects.all()
+                pagination_class = LimitOffsetPagination
+        return topics
+
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+# Timeline 
+
+class Usertimeline(generics.ListCreateAPIView):
+    serializer_class = TopicSerializerwithComment
+    # serializer_class = CommentSerializer
+
+    permission_classes = (IsOwnerOrReadOnly,)
+
+    def get_queryset(self):
+        topics = []
+        search_term=self.request.GET.keys()
+        if search_term:
+            filter_dic={}
+            for term_key in search_term:
+                if term_key:
+                    value=self.request.GET.get(term_key)
+                    filter_dic[term_key]=value
+            if filter_dic:
+                topics = Topic.objects.filter(**filter_dic)
+                
+        else:
+                topics = Topic.objects.all()
+
+        return topics;
+
+    # def get_context_data(self):
+
+    #     videoComments = []
+    #     audioComments = []
+    #     textComments = []
+    #     context = super().get_context_data(**kwargs)
+    #     queryset = self.get_queryset()
+    #     videoComments = Comment.objects.filter(is_media = True, is_audio = False)          
+    #     audioComments = Comment.objects.filter(is_media = True, is_audio = True)          
+    #     textComments  = Comment.objects.filter(is_media = False)                
+
+    #     context = {
+    #         'videoComments' : videoComments,
+    #         'audioComments' : audioComments,
+    #         'textComments'  : textComments,
+    #         'qs': queryset
+    #     }
+    #     return context
+
+class SearchTopic(generics.ListCreateAPIView):
+    serializer_class = TopicSerializerwithComment
+    # serializer_class = CommentSerializer
+    permission_classes = (IsOwnerOrReadOnly,)
+
+    def get_queryset(self):
+        topics = []
+        search_term = self.request.GET.get('term')
+        if search_term:
+            topics = Topic.objects.filter(title__icontains = search_term)
+
+        return topics;
+
+                        
+
+
 
 class TopicDetails(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = TopicSerializer
