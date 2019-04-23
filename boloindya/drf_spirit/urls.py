@@ -1,7 +1,7 @@
 # from django.urls import path
 from django.conf.urls import include, url
 from .views import TopicList, TopicDetails, TopicCommentList, CategoryList, CommentList, CommentDetails, SingUpOTPView,\
-	verify_otp, password_set, fb_profile_settings
+	verify_otp, password_set, fb_profile_settings,Usertimeline
 from rest_framework_simplejwt import views as jwt_views
 
 app_name = 'drf_spirit'
@@ -10,6 +10,9 @@ topic_urls = [
     url(r'^$', TopicList.as_view(), name='topic-list'),
     url(r'^(?P<slug>[\w-]+)/$', TopicDetails.as_view(), name='topic-detail'),
     url(r'^(?P<slug>[\w-]+)/comments/$', TopicCommentList.as_view(), name='topic-comment-list')
+]
+timeline_urls = [
+    url(r'^$', Usertimeline.as_view(), name='usertimeline-list'),
 ]
 
 comment_urls = [
@@ -23,6 +26,7 @@ category_urls = [
 
 urlpatterns = [
     url(r'^topics/', include(topic_urls)),
+    url(r'^timeline/', include(timeline_urls)),
     url(r'^categories/', include(category_urls)),
     url(r'^comments/', include(comment_urls)),
     
