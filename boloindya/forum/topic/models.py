@@ -13,6 +13,23 @@ from ..core.utils.models import AutoSlugField
 from ..core.conf import settings
 
 
+class RecordTimeStamp(models.Model):
+    created_at=models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False) # auto_now will add the current time and date whenever field is saved.
+    last_modified=models.DateTimeField(auto_now=True,auto_now_add=False)                     # while auto_now_add will save the date and time only when record is first created
+    class Meta:
+        abstract = True
+
+class UserInfo(RecordTimeStamp):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='%(app_label)s_%(class)s_user')
+    is_active = models.BooleanField(default = True)
+
+    def get_user(self):
+        if self.user is not None and self.user.userprofile is not None:
+            return '%s' %(self.user.userprofile.name)
+        return None
+    class Meta:
+        abstract = True
+
 class Topic(models.Model):
     """
     Topic model
@@ -46,6 +63,8 @@ class Topic(models.Model):
     thumbnail = models.CharField(_("thumbnail"), max_length=150, default='')
     view_count = models.PositiveIntegerField(_("views count"), default=0)
     comment_count = models.PositiveIntegerField(_("comment count"), default=0)
+    # share_user = models.ForeignKey(settings.AUTH_USER_MODEL,null=True,blank=True, related_name='share_topic_user')
+    # shared_post = models.ForeignKey('self', blank = True, null = True, related_name='user_shared_post')
 
     objects = TopicQuerySet.as_manager()
 
@@ -136,3 +155,18 @@ class Topic(models.Model):
         :return: List of comments in HTML
         """
         return self.comment_set.values_list('comment_html', flat=True)
+
+class ShareTopic(UserInfo):
+    
+    def __unicode__(self):
+        return self.topic
+class Like(UserInfo):
+    topic = models.ForeignKey(Topic, related_name='topic_like')
+    like = models.BooleanField(default = True)
+
+    def __unicode__(self):
+        return self.topic
+
+
+
+

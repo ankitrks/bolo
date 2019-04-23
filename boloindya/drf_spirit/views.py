@@ -14,7 +14,7 @@ from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
 from .permissions import IsOwnerOrReadOnly
 from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer
-from forum.topic.models import Topic
+from forum.topic.models import Topic,ShareTopic,Like
 from forum.category.models import Category
 from forum.comment.models import Comment
 from forum.user.models import UserProfile,Follower
@@ -243,6 +243,45 @@ def follow_user(request):
                 follow.is_active = True
                 follow.save()
                 return JsonResponse({'message': 'Unfollowed'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def follow_sub_category(request):
+    user_sub_category_id = request.POST.get('sub_category_id',None)
+    try:
+        userprofile = UserProfile.objects.get(user = request.user)
+        all_sub_category = userprofile.sub_category.all()
+        for each_sub_category in all_sub_category:
+            if each_sub_category.id == user_sub_category_id:
+                each_sub_category.remove()
+                return JsonResponse({'message': 'Unfollowed'}, status=status.HTTP_200_OK)
+            else:
+                userprofile.sub_category_id = user_sub_category_id
+                userprofile.save()
+                return JsonResponse({'message': 'Followed'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def like(request):
+    topic_id = request.POST.get('topic_id',None)
+    try:
+        liked,is_created = Like.objects.get_or_create(topic_id = topic_id,user = request.user)
+        if is_created:
+            return JsonResponse({'message': 'liked'}, status=status.HTTP_200_OK)
+        else:
+            liked.like = False
+            liked.save()
+            return JsonResponse({'message': 'unliked'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+@api_view(['POST'])
+def shareontimeline(request):
+    topic_id = request.POST.get('topic_id',None)
+    try:
+        liked,is_created = ShareTopic.objects.create(topic_id = topic_id,user = request.user)
+        return JsonResponse({'message': 'shared'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
