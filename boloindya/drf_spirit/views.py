@@ -13,10 +13,11 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
 from .permissions import IsOwnerOrReadOnly
-from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment
+from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,UserSerializer
 from forum.topic.models import Topic
 from forum.category.models import Category
 from forum.comment.models import Comment
+from django.db.models import Q
 
 class TopicList(generics.ListCreateAPIView):
     serializer_class = TopicSerializer
@@ -54,8 +55,6 @@ class TopicList(generics.ListCreateAPIView):
 
 class Usertimeline(generics.ListCreateAPIView):
     serializer_class = TopicSerializerwithComment
-    # serializer_class = CommentSerializer
-
     permission_classes = (IsOwnerOrReadOnly,)
 
     def get_queryset(self):
@@ -75,28 +74,9 @@ class Usertimeline(generics.ListCreateAPIView):
 
         return topics;
 
-    # def get_context_data(self):
-
-    #     videoComments = []
-    #     audioComments = []
-    #     textComments = []
-    #     context = super().get_context_data(**kwargs)
-    #     queryset = self.get_queryset()
-    #     videoComments = Comment.objects.filter(is_media = True, is_audio = False)          
-    #     audioComments = Comment.objects.filter(is_media = True, is_audio = True)          
-    #     textComments  = Comment.objects.filter(is_media = False)                
-
-    #     context = {
-    #         'videoComments' : videoComments,
-    #         'audioComments' : audioComments,
-    #         'textComments'  : textComments,
-    #         'qs': queryset
-    #     }
-    #     return context
 
 class SearchTopic(generics.ListCreateAPIView):
     serializer_class = TopicSerializerwithComment
-    # serializer_class = CommentSerializer
     permission_classes = (IsOwnerOrReadOnly,)
 
     def get_queryset(self):
@@ -107,10 +87,19 @@ class SearchTopic(generics.ListCreateAPIView):
 
         return topics;
 
-                        
+class SearchUser(generics.ListCreateAPIView):
+    serializer_class = UserSerializer
+    permission_classes = (IsOwnerOrReadOnly,)
 
+    def get_queryset(self):
+        users = []
+        search_term = self.request.GET.get('term')
+        if search_term:
+            users = User.objects.filter(Q(username__icontains = search_term)|Q(first_name__icontains = search_term))
 
+        return users;
 
+                
 class TopicDetails(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = TopicSerializer
     queryset = Topic.objects.all()
