@@ -244,6 +244,13 @@ class SingUpOTPView(generics.CreateAPIView):
     permission_classes  = (AllowAny,)
     serializer_class    = SingUpOTPSerializer
 
+    """
+    get:
+        Required Parameters
+        request.GET.get('is_reset_password')
+        request.GET.get('is_for_change_phone')
+    """
+
     def perform_create(self, serializer):
         instance        = serializer.save()
         instance.otp    = generateOTP(6)
@@ -262,6 +269,14 @@ class SingUpOTPView(generics.CreateAPIView):
 
 @api_view(['POST'])
 def verify_otp(request):
+    """
+    get:
+        Required Parameters
+        mobile_no = request.POST.get('mobile_no', None)
+        otp = request.POST.get('otp', None)
+        request.GET.get('is_reset_password')
+        request.GET.get('is_for_change_phone')
+    """
     mobile_no = request.POST.get('mobile_no', None)
     otp = request.POST.get('otp', None)
     exclude_is_reset_password = True # inverted because of exclude
@@ -296,11 +311,16 @@ def verify_otp(request):
 
 @api_view(['POST'])
 def password_set(request):
+    """
+    post:
+        Required Parameters
+        password = request.POST.get('password', '')
+    """
     password = request.POST.get('password', '')
-    username = request.POST.get('username', '')
+    
     if username and password:
         try:
-            user = User.objects.get(username = username)
+            user = request.user
             user.set_password( password )
             return JsonResponse({'message': 'Password updated!', 'username' : username}, status=status.HTTP_201_CREATED)
         except User.DoesNotExist:
@@ -311,6 +331,20 @@ def password_set(request):
 
 @api_view(['POST'])
 def fb_profile_settings(request):
+    """
+    post:
+        Required Parameters
+        activity        = request.POST.get('activity',None) #Mandatory [facebook_login,profile_save,settings_changed]
+        profile_pic     = request.POST.get('profile_pic',None) #Optional
+        name            = request.POST.get('name',None) #Optional
+        bio             = request.POST.get('bio',None) #Optional
+        about           = request.POST.get('about',None) #Optional
+        username        = request.POST.get('username',None) #Optional
+        refrence        = request.POST.get('refrence',None) #Optional
+        extra_data      = request.POST.get('extra_data',None) #Optional
+        language        = request.POST.get('language',None) #Optional
+        sub_category_prefrences = request.POST.get('categories',None) #Optional
+    """
     profile_pic     = request.POST.get('profile_pic',None)
     name            = request.POST.get('name',None)
     bio             = request.POST.get('bio',None)
@@ -323,66 +357,71 @@ def fb_profile_settings(request):
     sub_category_prefrences = request.POST.get('categories',None)
     if extra_data:
         extra_data = json.loads(extra_data)
-    # try:
-    if activity == 'facebook_login' and refrence == 'facebook':
-        try:
-            userprofile,is_created = UserProfile.objects.get_or_create(social_identifier = extra_data['id'])
-            user=userprofile.user
-        except:
-            user = User.objects.create(username = extra_data['id'])
-            userprofile = UserProfile.objects.get(user = user)
-            is_created = True
+    try:
+        if activity == 'facebook_login' and refrence == 'facebook':
+            try:
+                userprofile,is_created = UserProfile.objects.get_or_create(social_identifier = extra_data['id'])
+                user=userprofile.user
+            except:
+                user = User.objects.create(username = extra_data['id'])
+                userprofile = UserProfile.objects.get(user = user)
+                is_created = True
 
-        if is_created:
-            add_bolo_score(user.id,'initial_signup')
-            user.first_name = extra_data['first_name']
-            user.last_name = extra_data['last_name']
-            userprofile.name = extra_data['name']
-            userprofile.social_identifier = extra_data['id']
-            userprofile.bio = bio
-            userprofile.about = about
-            userprofile.refrence = refrence
-            userprofile.extra_data = extra_data
-            userprofile.user = user
-            userprofile.save()
-            user.save()
-            user_tokens = get_tokens_for_user(user)
-            return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh']}, status=status.HTTP_200_OK)
-        else:
-            user_tokens = get_tokens_for_user(user)
-            return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh']}, status=status.HTTP_200_OK)
-    elif activity == 'profile_save':
-        try:
-            userprofile = UserProfile.objects.get(user = request.user)
-            userprofile.bio = bio
-            userprofile.about = about
-            userprofile.profile_pic =profile_pic
-            if username:
-                user = userprofile.user
-                user.username = username
-                user.save()
-            userprofile.save()
-            return JsonResponse({'message': 'Profile Saved'}, status=status.HTTP_200_OK)
-        except Exception as e:
-            return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
-    elif activity == 'settings_changed':
-        try:
-            userprofile = UserProfile.objects.get(user = request.user)
-            if sub_category_prefrences:
-                for each_sub_category in sub_category_prefrences:
-                    userprofile.sub_category_id = each_sub_category
-                    userprofile.save()
-            if language:
-                userprofile.language = str(language)
+            if is_created:
+                add_bolo_score(user.id,'initial_signup')
+                user.first_name = extra_data['first_name']
+                user.last_name = extra_data['last_name']
+                userprofile.name = extra_data['name']
+                userprofile.social_identifier = extra_data['id']
+                userprofile.bio = bio
+                userprofile.about = about
+                userprofile.refrence = refrence
+                userprofile.extra_data = extra_data
+                userprofile.user = user
                 userprofile.save()
-            return JsonResponse({'message': 'Settings Chnaged'}, status=status.HTTP_200_OK)
-        except Exception as e:
-            return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
-    # except Exception as e:
-    #     return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+                user.save()
+                user_tokens = get_tokens_for_user(user)
+                return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh']}, status=status.HTTP_200_OK)
+            else:
+                user_tokens = get_tokens_for_user(user)
+                return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh']}, status=status.HTTP_200_OK)
+        elif activity == 'profile_save':
+            try:
+                userprofile = UserProfile.objects.get(user = request.user)
+                userprofile.bio = bio
+                userprofile.about = about
+                userprofile.profile_pic =profile_pic
+                if username:
+                    user = userprofile.user
+                    user.username = username
+                    user.save()
+                userprofile.save()
+                return JsonResponse({'message': 'Profile Saved'}, status=status.HTTP_200_OK)
+            except Exception as e:
+                return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+        elif activity == 'settings_changed':
+            try:
+                userprofile = UserProfile.objects.get(user = request.user)
+                if sub_category_prefrences:
+                    for each_sub_category in sub_category_prefrences:
+                        userprofile.sub_category_id = each_sub_category
+                        userprofile.save()
+                if language:
+                    userprofile.language = str(language)
+                    userprofile.save()
+                return JsonResponse({'message': 'Settings Chnaged'}, status=status.HTTP_200_OK)
+            except Exception as e:
+                return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def follow_user(request):
+    """
+    post:
+        Required Parameters
+        user_following_id = request.POST.get('user_following_id',None)
+    """
     user_following_id = request.POST.get('user_following_id',None)
     try:
         follow,is_created = Follower.objects.get_or_create(user_follower = request.user,user_following_id=user_following_id)
@@ -417,6 +456,11 @@ def follow_user(request):
 
 @api_view(['POST'])
 def follow_sub_category(request):
+    """
+    post:
+        Required Parameters
+        user_sub_category_id = request.POST.get('sub_category_id',None)
+    """
     user_sub_category_id = request.POST.get('sub_category_id',None)
     try:
         userprofile = UserProfile.objects.get(user = request.user)
@@ -434,12 +478,17 @@ def follow_sub_category(request):
 
 @api_view(['POST'])
 def like(request):
+    """
+    post:
+        Required Parameters
+        topic_id = request.POST.get('topic_id',None)
+    """
     topic_id = request.POST.get('topic_id',None)
     userprofile = UserProfile.objects.get(user = request.user)
     try:
         liked,is_created = Like.objects.get_or_create(topic_id = topic_id,user = request.user)
         if is_created:
-            add_bolo_score(request.user.id,'like')
+            add_bolo_score(request.user.id,'liked')
             userprofile.like_count = F('like_count')+1
             userprofile.save()
             return JsonResponse({'message': 'liked'}, status=status.HTTP_200_OK)
@@ -453,6 +502,12 @@ def like(request):
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 @api_view(['POST'])
 def shareontimeline(request):
+    """
+    post:
+        Required Parameters
+        topic_id = request.POST.get('topic_id',None)
+        share_on = request.POST.get('share_on',None)
+    """
     topic_id = request.POST.get('topic_id',None)
     share_on = request.POST.get('share_on',None)
     userprofile = UserProfile.objects.get(user = request.user)
