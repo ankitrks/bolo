@@ -157,7 +157,7 @@ class Topic(models.Model):
         return self.comment_set.values_list('comment_html', flat=True)
 
 class ShareTopic(UserInfo):
-    
+
     def __unicode__(self):
         return self.topic
 class Like(UserInfo):
@@ -166,6 +166,16 @@ class Like(UserInfo):
 
     def __unicode__(self):
         return self.topic
+
+share_type_options = (
+    ('0', "facebook"),
+    ('1', "whatsapp"),
+)
+class SocialShare(UserInfo):
+    share_type = models.CharField(choices=share_type_options, blank = True, null = True, max_length=10)
+    def __unicode__(self):
+        return self.topic
+
 
 
 

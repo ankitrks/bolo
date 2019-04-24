@@ -128,6 +128,7 @@ INSTALLED_APPS = [
     'forum.comment.like',
     'forum.comment.poll',
     'drf_spirit',
+    'rest_framework_swagger',
 
     # 'forum.core.tests'
 ]

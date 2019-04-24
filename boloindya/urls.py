@@ -17,6 +17,12 @@ import drf_spirit.urls
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
+from rest_framework_swagger.views import get_swagger_view
+from rest_framework.documentation import include_docs_urls
+
+
+schema_view = get_swagger_view(title='BoloIndya API')
+
 
 patterns = [
     url(r'^$', forum.topic.views.new_home, name='index'),
@@ -36,6 +42,7 @@ patterns = [
     url(r'^topic/', include(forum.topic.urls, namespace='topic')),
     url(r'^comment/', include(forum.comment.urls, namespace='comment')),
     url(r'^api/v1/', include(drf_spirit.urls, namespace='api')),
+    url(r'swagger-docs/', schema_view),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
@@ -43,4 +50,5 @@ patterns = [
 urlpatterns = [
 	url(r'^superman/', include(admin.site.urls)),
     url(r'^', include(patterns, namespace='spirit', app_name='forum')),
+    url(r'docs/', include_docs_urls(title='Boloindya API')),
 ]

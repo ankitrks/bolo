@@ -58,6 +58,14 @@ class UserProfile(models.Model):
     refrence = models.CharField(choices=refrence_options, blank = True, null = True, max_length=10,default='0')
     extra_data = models.TextField(null=True,blank=True)
     social_identifier = models.CharField(_("Social Identifier"), max_length=100, blank=True)
+    follow_count = models.PositiveIntegerField(null=True,blank=True,default=0)
+    follower_count = models.PositiveIntegerField(null=True,blank=True,default=0)
+    question_count = models.PositiveIntegerField(null=True,blank=True,default=0)
+    answer_count = models.PositiveIntegerField(null=True,blank=True,default=0)
+    share_count = models.PositiveIntegerField(null=True,blank=True,default=0)
+    like_count = models.PositiveIntegerField(null=True,blank=True,default=0)
+    bolo_score = models.PositiveIntegerField(null=True,blank=True,default=0)
+
     # end #
 
     class Meta:
@@ -98,3 +106,11 @@ class Follower(RecordTimeStamp):
 
     class Meta:
         verbose_name_plural = 'User\'s Followers'
+
+
+class Weight(RecordTimeStamp):
+    features=models.CharField(max_length=20)
+    weight= models.FloatField(default=0,null=True)
+
+    def __unicode__(self):
+        return self.features
