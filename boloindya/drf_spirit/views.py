@@ -97,6 +97,22 @@ class Usertimeline(generics.ListCreateAPIView):
 
 
 class SearchTopic(generics.ListCreateAPIView):
+    """
+    get:
+    Search By Topic.
+    term        = request.GET.get('term', '')
+    Required Parameters:
+    term---Topic Title
+
+    post:
+
+
+
+    Required Parameters:
+    title and category_id 
+    """
+
+
     serializer_class    = TopicSerializerwithComment
     permission_classes  = (IsOwnerOrReadOnly,)
 
@@ -109,6 +125,21 @@ class SearchTopic(generics.ListCreateAPIView):
         return topics;
 
 class SearchUser(generics.ListCreateAPIView):
+
+    """
+    get:
+    Search By User.
+    term        = request.GET.get('term', '')
+    Required Parameters:
+    term--- Username and First Name
+
+    post: 
+
+
+    Required Parameters:
+    title and category_id 
+    """
+
     serializer_class    = UserSerializer
     permission_classes  = (IsOwnerOrReadOnly,)
 
@@ -123,7 +154,24 @@ class SearchUser(generics.ListCreateAPIView):
 
 @api_view(['POST'])
 def replyOnTopic(request):
-    user_id      = request.POST.get('user_id', '')
+
+    """
+    get:
+    Return a list of all the existing users.
+
+    post:
+    Reply on topic.
+    topic_id     = request.POST.get('topic_id', '')
+    language_id  = request.POST.get('language_id', '')
+    comment_html = request.POST.get('comment', '')
+    mobile_no    = request.POST.get('mobile_no', '')
+
+    Required Parameters:
+    user_id and topic_id and comment_html
+
+    """
+
+    user_id      = request.user.id
     topic_id     = request.POST.get('topic_id', '')
     language_id  = request.POST.get('language_id', '')
     comment_html = request.POST.get('comment', '')
@@ -145,6 +193,7 @@ def replyOnTopic(request):
             comment.topic_id      = topic_id
             comment.mobile_no     = mobile_no
             comment.save()
+            add_bolo_score(request.user.id,'reply_on_topic')
             return JsonResponse({'message': 'Reply Submitted'}, status=status.HTTP_201_CREATED)
         except User.DoesNotExist:
             return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
@@ -154,8 +203,25 @@ def replyOnTopic(request):
 @api_view(['POST'])
 def createTopic(request):
 
+    """
+    get:
+    Return a list of all the existing users.
+
+    post:
+    Create Topic.
+    title        = request.POST.get('title', '')
+    language_id  = request.POST.get('language_id', '')
+    category_id  = request.POST.get('category_id', '')
+    topic.question_audio = request.POST.get('question_video')
+    topic.question_audio = request.POST.get('question_audio')
+
+    Required Parameters:
+    title and category_id 
+
+    """
+
     topic        = Topic()
-    user_id      = request.POST.get('user_id', '')
+    user_id      = request.user.id
     title        = request.POST.get('title', '')
     language_id  = request.POST.get('language_id', '')
     category_id  = request.POST.get('category_id', '')
@@ -168,14 +234,14 @@ def createTopic(request):
         topic.question_audio = request.POST.get('question_video')
 
 
-    if title and user_id and category_id:
+    if title and category_id:
         try:
 
             topic.language_id   = language_id
             topic.category_id   = category_id
             topic.user_id       = user_id
-
             topic.save()
+            add_bolo_score(request.user.id,'create_topic')
             return JsonResponse({'message': 'Topic Created'}, status=status.HTTP_201_CREATED)
         except User.DoesNotExist:
             return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
