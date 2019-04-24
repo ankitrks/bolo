@@ -336,7 +336,7 @@ class SingUpOTPView(generics.CreateAPIView):
 @api_view(['POST'])
 def verify_otp(request):
     """
-    get:
+    post:
         Required Parameters
         mobile_no = request.POST.get('mobile_no', None)
         otp = request.POST.get('otp', None)
