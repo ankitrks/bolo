@@ -70,3 +70,5 @@ class SingUpOTPSerializer(ModelSerializer):
     class Meta:
         model = SingUpOTP
         fields = ('mobile_no', )
+
+      
