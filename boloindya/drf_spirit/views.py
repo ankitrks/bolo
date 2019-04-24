@@ -311,10 +311,10 @@ class SingUpOTPView(generics.CreateAPIView):
     serializer_class    = SingUpOTPSerializer
 
     """
-    get:
+    post:
         Required Parameters
-        request.GET.get('is_reset_password')
-        request.GET.get('is_for_change_phone')
+        request.POST.get('is_reset_password')
+        request.POST.get('is_for_change_phone')
     """
 
     def perform_create(self, serializer):
@@ -322,9 +322,9 @@ class SingUpOTPView(generics.CreateAPIView):
         instance.otp    = generateOTP(6)
         response, response_status   = send_sms(instance.mobile_no, instance.otp)
         instance.api_response_dump  = response
-        if self.request.GET.get('is_reset_password') and self.request.GET.get('is_reset_password') == '1':
+        if self.request.POST.get('is_reset_password') and self.request.POST.get('is_reset_password') == '1':
             instance.is_reset_password = True
-        if self.request.GET.get('is_for_change_phone') and self.request.GET.get('is_for_change_phone') == '1':
+        if self.request.POST.get('is_for_change_phone') and self.request.POST.get('is_for_change_phone') == '1':
             instance.is_for_change_phone = True
         if not response_status:
             instance.is_active = False
@@ -336,20 +336,20 @@ class SingUpOTPView(generics.CreateAPIView):
 @api_view(['POST'])
 def verify_otp(request):
     """
-    get:
+    post:
         Required Parameters
         mobile_no = request.POST.get('mobile_no', None)
         otp = request.POST.get('otp', None)
-        request.GET.get('is_reset_password')
-        request.GET.get('is_for_change_phone')
+        request.POST.get('is_reset_password')
+        request.POST.get('is_for_change_phone')
     """
     mobile_no = request.POST.get('mobile_no', None)
     otp = request.POST.get('otp', None)
     exclude_is_reset_password = True # inverted because of exclude
     is_for_change_phone = False
-    if request.GET.get('is_reset_password') and request.GET.get('is_reset_password') == '1':
+    if request.POST.get('is_reset_password') and request.POST.get('is_reset_password') == '1':
         exclude_is_reset_password = False # inverted because of exclude
-    if request.GET.get('is_for_change_phone') and request.GET.get('is_for_change_phone') == '1':
+    if request.POST.get('is_for_change_phone') and request.POST.get('is_for_change_phone') == '1':
         is_for_change_phone = True
 
     if mobile_no and otp:
