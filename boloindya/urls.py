@@ -41,8 +41,8 @@ patterns = [
     url(r'^category/', include(forum.category.urls, namespace='category')),
     url(r'^topic/', include(forum.topic.urls, namespace='topic')),
     url(r'^comment/', include(forum.comment.urls, namespace='comment')),
+    url(r'^api/v1/docs/$', schema_view),
     url(r'^api/v1/', include(drf_spirit.urls, namespace='api')),
-    url(r'swagger-docs/', schema_view),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
