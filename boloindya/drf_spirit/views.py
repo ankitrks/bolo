@@ -67,6 +67,22 @@ class Usertimeline(generics.ListCreateAPIView):
     serializer_class   = TopicSerializerwithComment
     permission_classes = (IsOwnerOrReadOnly,)
 
+
+    """
+    get:
+    Search By Topic Title,Audio,Video...
+    term        = request.GET.get('term', '')
+    Required Parameters:
+    term---Topic Title
+
+    post:
+
+
+    Required Parameters:
+    title and category_id 
+    """  
+
+
     def get_queryset(self):
         topics              = []
         is_user_timeline    = False
