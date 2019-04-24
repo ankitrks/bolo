@@ -2,6 +2,7 @@ from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
 from .fields import UserReadOnlyField
 from forum.topic.models import Topic
+from django.contrib.auth.models import User
 from forum.category.models import Category
 from forum.comment.models import Comment
 from .relations import PresentableSlugRelatedField
@@ -59,9 +60,15 @@ class TopicSerializerwithComment(ModelSerializer):
         return CommentSerializer(instance.topic_comment.filter(is_media = True, is_audio = True) ,many=True).data
     def get_text_comments(self,instance):
         return CommentSerializer(instance.topic_comment.filter(is_media = False) ,many=True).data
- 
+
+class UserSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = '__all__' 
 
 class SingUpOTPSerializer(ModelSerializer):
     class Meta:
         model = SingUpOTP
         fields = ('mobile_no', )
+
+      

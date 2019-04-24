@@ -13,13 +13,12 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
 from .permissions import IsOwnerOrReadOnly
-from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment
+from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,UserSerializer
 from forum.topic.models import Topic,ShareTopic,Like,SocialShare
 from forum.category.models import Category
 from forum.comment.models import Comment
 from forum.user.models import UserProfile,Follower
-from django.db.models import F
-
+from django.db.models import F,Q
 from rest_framework_simplejwt.tokens import RefreshToken
 import json
 from .utils import get_weight,add_bolo_score
@@ -33,12 +32,10 @@ def get_tokens_for_user(user):
     }
 
 class TopicList(generics.ListCreateAPIView):
-    serializer_class = TopicSerializer
-    #queryset = Topic.objects.all()
-
-    filter_backends = (DjangoFilterBackend,)
-    filter_class = TopicFilter
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    serializer_class    = TopicSerializer
+    filter_backends     = (DjangoFilterBackend,)
+    filter_class        = TopicFilter
+    permission_classes  = (IsAuthenticatedOrReadOnly,)
     
 
     def get_queryset(self):
@@ -52,11 +49,11 @@ class TopicList(generics.ListCreateAPIView):
                     value=self.request.GET.get(term_key)
                     filter_dic[term_key]=value
             if filter_dic:
-                topics = Topic.objects.filter(**filter_dic)
-                pagination_class = LimitOffsetPagination
+                topics              = Topic.objects.filter(**filter_dic)
+                pagination_class    = LimitOffsetPagination
         else:
-                topics = Topic.objects.all()
-                pagination_class = LimitOffsetPagination
+                topics              = Topic.objects.all()
+                pagination_class    = LimitOffsetPagination
         return topics
 
 
@@ -67,21 +64,19 @@ class TopicList(generics.ListCreateAPIView):
 # Timeline 
 
 class Usertimeline(generics.ListCreateAPIView):
-    serializer_class = TopicSerializerwithComment
-    # serializer_class = CommentSerializer
-
+    serializer_class   = TopicSerializerwithComment
     permission_classes = (IsOwnerOrReadOnly,)
 
     def get_queryset(self):
-        topics = []
-        is_user_timeline = False
-        search_term=self.request.GET.keys()
+        topics              = []
+        is_user_timeline    = False
+        search_term         =self.request.GET.keys()
         if search_term:
-            filter_dic={}
-            post = []
+            filter_dic      ={}
+            post            = []
             for term_key in search_term:
                 if term_key:
-                    value=self.request.GET.get(term_key)
+                    value               =self.request.GET.get(term_key)
                     filter_dic[term_key]=value
                     if term_key =='user_id':
                         is_user_timeline = True
@@ -98,55 +93,106 @@ class Usertimeline(generics.ListCreateAPIView):
                     topics = post
         else:
                 topics = Topic.objects.all()
-
         return topics;
 
-    # def get_context_data(self):
-
-    #     videoComments = []
-    #     audioComments = []
-    #     textComments = []
-    #     context = super().get_context_data(**kwargs)
-    #     queryset = self.get_queryset()
-    #     videoComments = Comment.objects.filter(is_media = True, is_audio = False)          
-    #     audioComments = Comment.objects.filter(is_media = True, is_audio = True)          
-    #     textComments  = Comment.objects.filter(is_media = False)                
-
-    #     context = {
-    #         'videoComments' : videoComments,
-    #         'audioComments' : audioComments,
-    #         'textComments'  : textComments,
-    #         'qs': queryset
-    #     }
-    #     return context
 
 class SearchTopic(generics.ListCreateAPIView):
-    serializer_class = TopicSerializerwithComment
-    # serializer_class = CommentSerializer
-    permission_classes = (IsOwnerOrReadOnly,)
+    serializer_class    = TopicSerializerwithComment
+    permission_classes  = (IsOwnerOrReadOnly,)
 
     def get_queryset(self):
-        topics = []
+        topics      = []
         search_term = self.request.GET.get('term')
         if search_term:
-            topics = Topic.objects.filter(title__icontains = search_term)
+            topics  = Topic.objects.filter(title__icontains = search_term)
 
         return topics;
 
-                        
+class SearchUser(generics.ListCreateAPIView):
+    serializer_class    = UserSerializer
+    permission_classes  = (IsOwnerOrReadOnly,)
+
+    def get_queryset(self):
+        users       = []
+        search_term = self.request.GET.get('term')
+        if search_term:
+            users   = User.objects.filter(Q(username__icontains = search_term)|Q(first_name__icontains = search_term))
+
+        return users;
 
 
+@api_view(['POST'])
+def replyOnTopic(request):
+    user_id      = request.POST.get('user_id', '')
+    topic_id     = request.POST.get('topic_id', '')
+    language_id  = request.POST.get('language_id', '')
+    comment_html = request.POST.get('comment', '')
+    mobile_no    = request.POST.get('mobile_no', '')
+    comment      = Comment()
 
+    if request.POST.get('is_media'):
+        comment.is_media = request.POST.get('is_media')
+    if request.POST.get('is_audio'):
+        comment.is_audio = request.POST.get('is_audio')
+
+    if user_id and topic_id and comment_html:
+        try:
+
+            comment.comment       = comment_html
+            comment.comment_html  = comment_html
+            comment.language_id   = language_id
+            comment.user_id       = user_id
+            comment.topic_id      = topic_id
+            comment.mobile_no     = mobile_no
+            comment.save()
+            return JsonResponse({'message': 'Reply Submitted'}, status=status.HTTP_201_CREATED)
+        except User.DoesNotExist:
+            return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return JsonResponse({'message': 'Topic Id / User Id / Comment provided'}, status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['POST'])
+def createTopic(request):
+
+    topic        = Topic()
+    user_id      = request.POST.get('user_id', '')
+    title        = request.POST.get('title', '')
+    language_id  = request.POST.get('language_id', '')
+    category_id  = request.POST.get('category_id', '')
+
+    if title:
+        topic.title          = title.upper()
+    if request.POST.get('question_audio'):
+        topic.question_audio = request.POST.get('question_audio')
+    if request.POST.get('question_video'):
+        topic.question_audio = request.POST.get('question_video')
+
+
+    if title and user_id and category_id:
+        try:
+
+            topic.language_id   = language_id
+            topic.category_id   = category_id
+            topic.user_id       = user_id
+
+            topic.save()
+            return JsonResponse({'message': 'Topic Created'}, status=status.HTTP_201_CREATED)
+        except User.DoesNotExist:
+            return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return JsonResponse({'message': 'Topic Id / User Id / Comment provided'}, status=status.HTTP_204_NO_CONTENT)
+
+                
 class TopicDetails(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = TopicSerializer
-    queryset = Topic.objects.all()
-    permission_classes = (IsOwnerOrReadOnly,)
-    lookup_field = 'slug'
+    serializer_class    = TopicSerializer
+    queryset            = Topic.objects.all()
+    permission_classes  = (IsOwnerOrReadOnly,)
+    lookup_field        = 'slug'
 
 class TopicCommentList(generics.ListAPIView):
-    serializer_class = CommentSerializer
-    queryset = Comment.objects.filter()
-    permission_classes = (IsOwnerOrReadOnly,)
+    serializer_class    = CommentSerializer
+    queryset            = Comment.objects.filter()
+    permission_classes  = (IsOwnerOrReadOnly,)
 
     def get_queryset(self):
         topic_slug = self.kwargs['slug']
@@ -156,24 +202,24 @@ class CategoryList(generics.ListAPIView):
     serializer_class = CategorySerializer
     queryset = Category.objects.filter(is_engagement = False)
     # permission_classes = (IsAuthenticated,)
-    permission_classes = (AllowAny,)
+    permission_classes  = (AllowAny,)
 
 class CommentList(generics.ListCreateAPIView):
-    serializer_class = CommentSerializer
-    queryset = Comment.objects.all()
-    filter_backends = (DjangoFilterBackend,)
-    filter_class = CommentFilter
-    permission_classes = (IsAuthenticatedOrReadOnly,)
-    pagination_class = LimitOffsetPagination
+    serializer_class    = CommentSerializer
+    queryset            = Comment.objects.all()
+    filter_backends     = (DjangoFilterBackend,)
+    filter_class        = CommentFilter
+    permission_classes  = (IsAuthenticatedOrReadOnly,)
+    pagination_class    = LimitOffsetPagination
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
 class CommentDetails(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = CommentSerializer
-    queryset = Comment.objects.all()
-    permission_classes = (IsOwnerOrReadOnly,)
-    lookup_field = 'id'
+    serializer_class    = CommentSerializer
+    queryset            = Comment.objects.all()
+    permission_classes  = (IsOwnerOrReadOnly,)
+    lookup_field        = 'id'
 
 def generateOTP(n):
     import math, random 
@@ -186,23 +232,23 @@ def generateOTP(n):
 def send_sms(phone_number, otp):
     import json
     import urllib2
-    sms_url = 'https://2factor.in/API/V1/' + settings.TWO_FACTOR_SMS_API_KEY +  '/SMS/' +  phone_number +\
+    sms_url         = 'https://2factor.in/API/V1/' + settings.TWO_FACTOR_SMS_API_KEY +  '/SMS/' +  phone_number +\
              '/' + otp + '/' + settings.TWO_FACTOR_SMS_TEMPLATE
-    response = urllib2.urlopen(sms_url).read()
-    json_response = json.loads( response )
+    response        = urllib2.urlopen(sms_url).read()
+    json_response   = json.loads( response )
     if json_response.has_key('Status') and json_response['Status'] == 'Success':
         return response, True
     return response, False
 
 class SingUpOTPView(generics.CreateAPIView):
-    permission_classes = (AllowAny,)
-    serializer_class = SingUpOTPSerializer
+    permission_classes  = (AllowAny,)
+    serializer_class    = SingUpOTPSerializer
 
     def perform_create(self, serializer):
-        instance = serializer.save()
-        instance.otp = generateOTP(6)
-        response, response_status = send_sms(instance.mobile_no, instance.otp)
-        instance.api_response_dump = response
+        instance        = serializer.save()
+        instance.otp    = generateOTP(6)
+        response, response_status   = send_sms(instance.mobile_no, instance.otp)
+        instance.api_response_dump  = response
         if self.request.GET.get('is_reset_password') and self.request.GET.get('is_reset_password') == '1':
             instance.is_reset_password = True
         if self.request.GET.get('is_for_change_phone') and self.request.GET.get('is_for_change_phone') == '1':
@@ -265,15 +311,15 @@ def password_set(request):
 
 @api_view(['POST'])
 def fb_profile_settings(request):
-    profile_pic = request.POST.get('profile_pic',None)
-    name = request.POST.get('name',None)
-    bio = request.POST.get('bio',None)
-    about = request.POST.get('about',None)
-    username = request.POST.get('username',None)
-    refrence = request.POST.get('refrence',None)
-    extra_data = request.POST.get('extra_data',None)
-    activity = request.POST.get('activity',None)
-    language = request.POST.get('language',None)
+    profile_pic     = request.POST.get('profile_pic',None)
+    name            = request.POST.get('name',None)
+    bio             = request.POST.get('bio',None)
+    about           = request.POST.get('about',None)
+    username        = request.POST.get('username',None)
+    refrence        = request.POST.get('refrence',None)
+    extra_data      = request.POST.get('extra_data',None)
+    activity        = request.POST.get('activity',None)
+    language        = request.POST.get('language',None)
     sub_category_prefrences = request.POST.get('categories',None)
     if extra_data:
         extra_data = json.loads(extra_data)

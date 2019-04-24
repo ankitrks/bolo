@@ -1,6 +1,6 @@
 # from django.urls import path
 from django.conf.urls import include, url
-from .views import TopicList, TopicDetails, TopicCommentList, CategoryList, CommentList, CommentDetails, SingUpOTPView,\
+from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,createTopic, TopicCommentList, CategoryList, CommentList, CommentDetails, SingUpOTPView,\
 	verify_otp, password_set, fb_profile_settings,Usertimeline,follow_user,follow_sub_category,like,shareontimeline
 from rest_framework_simplejwt import views as jwt_views
 
@@ -13,6 +13,19 @@ topic_urls = [
 ]
 timeline_urls = [
     url(r'^$', Usertimeline.as_view(), name='usertimeline-list'),
+]
+topicsearch_urls = [
+    url(r'^$', SearchTopic.as_view(), name='search-topic'),
+]
+usersearch_urls = [
+    url(r'^$', SearchUser.as_view(), name='search-user'),
+]
+replyontopic_urls = [
+    url(r'^$', replyOnTopic, name='reply-topic'),
+]
+
+createtopic_urls = [
+    url(r'^$', createTopic, name='create-topic'),
 ]
 
 comment_urls = [
@@ -27,6 +40,10 @@ category_urls = [
 urlpatterns = [
     url(r'^topics/', include(topic_urls)),
     url(r'^timeline/', include(timeline_urls)),
+    url(r'^search/', include(topicsearch_urls)),
+    url(r'^search/users/', include(usersearch_urls)),
+    url(r'^create_topic', include(createtopic_urls)),
+    url(r'^reply_on_topic', include(replyontopic_urls)),
     url(r'^categories/', include(category_urls)),
     url(r'^comments/', include(comment_urls)),
     
