@@ -5,6 +5,7 @@ from forum.topic.models import Topic
 from django.contrib.auth.models import User
 from forum.category.models import Category
 from forum.comment.models import Comment
+from forum.user.models import UserProfile
 from .relations import PresentableSlugRelatedField
 from .models import SingUpOTP
 
@@ -39,7 +40,7 @@ class CommentSerializer(ModelSerializer):
         fields = '__all__'
 
 class TopicSerializerwithComment(ModelSerializer):
-    user = UserReadOnlyField()
+    user = SerializerMethodField()
     category = PresentableSlugRelatedField(queryset=Category.objects.all(),
                                            presentation_serializer=CategoryLiteSerializer,
                                            slug_field='slug')
@@ -60,11 +61,22 @@ class TopicSerializerwithComment(ModelSerializer):
         return CommentSerializer(instance.topic_comment.filter(is_media = True, is_audio = True) ,many=True).data
     def get_text_comments(self,instance):
         return CommentSerializer(instance.topic_comment.filter(is_media = False) ,many=True).data
+    def get_user(self,instance):
+        return UserSerializer(instance.user).data
+
+class UserProfileSerializer(ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = '__all__' 
 
 class UserSerializer(ModelSerializer):
+    userprofile = SerializerMethodField()
     class Meta:
         model = User
-        fields = '__all__' 
+        #fields = '__all__'
+        exclude = ('password', )
+    def get_userprofile(self,instance):
+        return UserProfileSerializer(UserProfile.objects.get(user=instance)).data
 
 class SingUpOTPSerializer(ModelSerializer):
     class Meta:
