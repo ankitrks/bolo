@@ -437,6 +437,7 @@ def fb_profile_settings(request):
     activity        = request.POST.get('activity',None)
     language        = request.POST.get('language',None)
     sub_category_prefrences = request.POST.get('categories',None)
+    sub_category_prefrences = sub_category_prefrences.split(',')
     if extra_data:
         extra_data = json.loads(extra_data)
     try:
@@ -486,7 +487,9 @@ def fb_profile_settings(request):
                 userprofile = UserProfile.objects.get(user = request.user)
                 if sub_category_prefrences:
                     for each_sub_category in sub_category_prefrences:
-                        userprofile.sub_category_id = each_sub_category
+                        category = Category.objects.get(pk = each_sub_category)
+                        print each_sub_category
+                        userprofile.sub_category.add(category)
                         userprofile.save()
                 if language:
                     userprofile.language = str(language)
@@ -552,7 +555,8 @@ def follow_sub_category(request):
                 each_sub_category.remove()
                 return JsonResponse({'message': 'Unfollowed'}, status=status.HTTP_200_OK)
             else:
-                userprofile.sub_category_id = user_sub_category_id
+                category = Category.objects.get(pk = user_sub_category_id)
+                userprofile.sub_category.add(category)
                 userprofile.save()
                 return JsonResponse({'message': 'Followed'}, status=status.HTTP_200_OK)
     except Exception as e:
@@ -582,6 +586,7 @@ def like(request):
             return JsonResponse({'message': 'unliked'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
 @api_view(['POST'])
 def shareontimeline(request):
     """
