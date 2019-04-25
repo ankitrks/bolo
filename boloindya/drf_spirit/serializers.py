@@ -67,7 +67,8 @@ class TopicSerializerwithComment(ModelSerializer):
 class UserProfileSerializer(ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = '__all__' 
+        # fields = '__all__' 
+        exclude = ('extra_data', )
 
 class UserSerializer(ModelSerializer):
     userprofile = SerializerMethodField()
