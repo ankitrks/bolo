@@ -55,11 +55,11 @@ urlpatterns = [
     # Get Params could be ?is_reset_password=1 OR ?is_for_change_phone=1
     url(r'^otp/verify/$', verify_otp, name='token_obtain_pair'),
 
-    url(r'^fb_profile_settings$', fb_profile_settings, name='fb_profile_settings'),
-    url(r'^follow_user$', follow_user, name='follow_user'),
-    url(r'^follow_sub_category$', follow_sub_category, name='follow_sub_category'),
-    url(r'^shareontimeline$', shareontimeline, name='shareontimeline'),
-    url(r'^like$', like, name='like'),
+    url(r'^fb_profile_settings/$', fb_profile_settings, name='fb_profile_settings'),
+    url(r'^follow_user/$', follow_user, name='follow_user'),
+    url(r'^follow_sub_category/$', follow_sub_category, name='follow_sub_category'),
+    url(r'^shareontimeline/$', shareontimeline, name='shareontimeline'),
+    url(r'^like/$', like, name='like'),
     url(r'^password/set/$', password_set, name='password_set'),
-    url(r'^get_profile$', GetProfile.as_view(), name='get_profile'),
+    url(r'^get_profile/$', GetProfile.as_view(), name='get_profile'),
 ]
