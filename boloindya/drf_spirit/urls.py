@@ -1,7 +1,7 @@
 # from django.urls import path
 from django.conf.urls import include, url
 from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,createTopic, TopicCommentList, CategoryList, CommentList, CommentDetails, SingUpOTPView,\
-	verify_otp, password_set, fb_profile_settings,Usertimeline,follow_user,follow_sub_category,like,shareontimeline
+	verify_otp, password_set, fb_profile_settings,Usertimeline,follow_user,follow_sub_category,like,shareontimeline,GetProfile
 from rest_framework_simplejwt import views as jwt_views
 
 app_name = 'drf_spirit'
@@ -61,4 +61,5 @@ urlpatterns = [
     url(r'^shareontimeline$', shareontimeline, name='shareontimeline'),
     url(r'^like$', like, name='like'),
     url(r'^password/set/$', password_set, name='password_set'),
+    url(r'^get_profile$', GetProfile.as_view(), name='get_profile'),
 ]

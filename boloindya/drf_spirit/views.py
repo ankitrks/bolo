@@ -410,6 +410,18 @@ def password_set(request):
     else:
         return JsonResponse({'message': 'No username / password provided'}, status=status.HTTP_204_NO_CONTENT)
 
+class GetProfile(generics.ListAPIView):
+    """
+    post:
+        Required Parameters
+        user witc access and refresh code
+    """
+    serializer_class    = UserSerializer
+    permission_classes  = (IsAuthenticatedOrReadOnly,)
+    def get_queryset(self):
+        user = self.request.user
+
+        return [user];
 
 @api_view(['POST'])
 def fb_profile_settings(request):
