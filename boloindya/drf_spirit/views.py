@@ -370,9 +370,9 @@ def verify_otp(request):
 
     if mobile_no and otp:
         try:
-            exclude_dict = {'is_active' : False, 'is_reset_password' : is_reset_password}
+            exclude_dict = {'is_active' : True, 'is_reset_password' : is_reset_password}
             if is_for_change_phone:
-                exclude_dict = {'is_active' : False, 'is_for_change_phone' : is_for_change_phone}
+                exclude_dict = {'is_active' : True, 'is_for_change_phone' : is_for_change_phone}
             otp_obj = SingUpOTP.objects.filter(**exclude_dict).get(mobile_no=mobile_no, otp=otp)
             otp_obj.is_active = False
             otp_obj.used_at = timezone.now()
@@ -387,7 +387,6 @@ def verify_otp(request):
             otp_obj.save()
             return JsonResponse({'message': 'OTP Validated', 'username' : mobile_no}, status=status.HTTP_200_OK)
         except Exception as e:
-            # print e
             return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
     else:
         return JsonResponse({'message': 'No Mobile No / OTP provided'}, status=status.HTTP_204_NO_CONTENT)

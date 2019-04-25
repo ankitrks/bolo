@@ -326,5 +326,5 @@ JWT_AUTH = {
     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=90),
 }
 #### Rest Framework Settings ###
-# import django
-# django.setup()
+import django
+django.setup()
