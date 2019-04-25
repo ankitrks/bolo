@@ -361,32 +361,33 @@ def verify_otp(request):
     """
     mobile_no = request.POST.get('mobile_no', None)
     otp = request.POST.get('otp', None)
-    exclude_is_reset_password = True # inverted because of exclude
+    is_reset_password = False
     is_for_change_phone = False
     if request.POST.get('is_reset_password') and request.POST.get('is_reset_password') == '1':
-        exclude_is_reset_password = False # inverted because of exclude
+        is_reset_password = True # inverted because of exclude
     if request.POST.get('is_for_change_phone') and request.POST.get('is_for_change_phone') == '1':
         is_for_change_phone = True
 
     if mobile_no and otp:
         try:
-            exclude_dict = {'is_active' : False, 'is_reset_password' : exclude_is_reset_password}
+            exclude_dict = {'is_active' : False, 'is_reset_password' : is_reset_password}
             if is_for_change_phone:
                 exclude_dict = {'is_active' : False, 'is_for_change_phone' : is_for_change_phone}
-            otp_obj = SingUpOTP.objects.exclude(**exclude_dict).get(mobile_no=mobile_no, otp=otp)
+            otp_obj = SingUpOTP.objects.filter(**exclude_dict).get(mobile_no=mobile_no, otp=otp)
             otp_obj.is_active = False
             otp_obj.used_at = timezone.now()
-            if exclude_is_reset_password:
+            if not is_reset_password and not is_for_change_phone:
                 user = User.objects.create(username = mobile_no)
-                add_bolo_score(user.id,'initial_signup')
+                add_bolo_score(user.id, 'initial_signup')
                 otp_obj.for_user = user
                 otp_obj.save()
                 user_tokens = get_tokens_for_user(user)
-                return JsonResponse({'message': 'User created', 'username' : mobile_no,'access':user_tokens['access'],'refresh':user_tokens['refresh']}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'User created', 'username' : mobile_no, \
+                        'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh']}, status=status.HTTP_200_OK)
             otp_obj.save()
             return JsonResponse({'message': 'OTP Validated', 'username' : mobile_no}, status=status.HTTP_200_OK)
         except Exception as e:
-            print e
+            # print e
             return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
     else:
         return JsonResponse({'message': 'No Mobile No / OTP provided'}, status=status.HTTP_204_NO_CONTENT)

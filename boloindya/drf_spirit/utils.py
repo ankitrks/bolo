@@ -1,10 +1,9 @@
 
 from django.apps import apps
-from forum.user.models import UserProfile
+from forum.user.models import UserProfile, Weight
 
 def get_weight(key):
-	model = apps.get_model('user','Weight')
-	weights = model.objects.values('features','weight')
+	weights = Weight.objects.values('features','weight')
 	for element in weights:
 		if str(element.get('features').lower()) == str(key.lower()):
 			return element.get('weight')
