@@ -377,11 +377,15 @@ def verify_otp(request):
             otp_obj.is_active = False
             otp_obj.used_at = timezone.now()
             if not is_reset_password and not is_for_change_phone:
-                user = User.objects.create(username = mobile_no)
-                add_bolo_score(user.id, 'initial_signup')
+                userprofile = UserProfile.objects.filter(mobile_no = mobile_no)
+                if userprofile:
+                    user = userprofile.user
+                else:
+                    user = User.objects.create(username = mobile_no)
+                    add_bolo_score(user.id, 'initial_signup')
+                user_tokens = get_tokens_for_user(user)
                 otp_obj.for_user = user
                 otp_obj.save()
-                user_tokens = get_tokens_for_user(user)
                 return JsonResponse({'message': 'User created', 'username' : mobile_no, \
                         'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh']}, status=status.HTTP_200_OK)
             otp_obj.save()
@@ -400,15 +404,15 @@ def password_set(request):
     """
     password = request.POST.get('password', '')
     
-    if username and password:
+    if password:
         try:
             user = request.user
             user.set_password( password )
-            return JsonResponse({'message': 'Password updated!', 'username' : username}, status=status.HTTP_201_CREATED)
+            return JsonResponse({'message': 'Password updated!'}, status=status.HTTP_201_CREATED)
         except User.DoesNotExist:
-            return JsonResponse({'message': 'Invalid username'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'message': 'Invalid User'}, status=status.HTTP_400_BAD_REQUEST)
     else:
-        return JsonResponse({'message': 'No username / password provided'}, status=status.HTTP_204_NO_CONTENT)
+        return JsonResponse({'message': 'No user found/password provided'}, status=status.HTTP_204_NO_CONTENT)
 
 class GetProfile(generics.ListAPIView):
     """

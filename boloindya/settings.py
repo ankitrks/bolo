@@ -316,14 +316,17 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 10
 }
-JWT_AUTH = {
-    # how long the original token is valid for
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=90),
-    # allow refreshing of tokens
-    'JWT_ALLOW_REFRESH': True,
-    # this is the maximum time AFTER the token was issued that
-    # it can be refreshed.  exprired tokens can't be refreshed.
-    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=90),
+# JWT_AUTH = {
+#     # how long the original token is valid for
+#     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=90),
+#     # allow refreshing of tokens
+#     'JWT_ALLOW_REFRESH': True,
+#     # this is the maximum time AFTER the token was issued that
+#     # it can be refreshed.  exprired tokens can't be refreshed.
+#     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=90),
+# }
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=999),
 }
 #### Rest Framework Settings ###
 import django
