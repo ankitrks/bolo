@@ -487,6 +487,7 @@ def fb_profile_settings(request):
         elif activity == 'profile_save':
             try:
                 userprofile = UserProfile.objects.get(user = request.user)
+                userprofile.name= name
                 userprofile.bio = bio
                 userprofile.about = about
                 userprofile.profile_pic =profile_pic
