@@ -45,9 +45,10 @@ class TopicList(generics.ListCreateAPIView):
         if search_term:
             filter_dic={}
             for term_key in search_term:
-                if term_key:
-                    value=self.request.GET.get(term_key)
-                    filter_dic[term_key]=value
+                if term_key not in ['limit','offset']
+                    if term_key:
+                        value=self.request.GET.get(term_key)
+                        filter_dic[term_key]=value
             if filter_dic:
                 topics              = Topic.objects.filter(**filter_dic)
                 pagination_class    = LimitOffsetPagination
@@ -91,11 +92,12 @@ class Usertimeline(generics.ListCreateAPIView):
             filter_dic      ={}
             post            = []
             for term_key in search_term:
-                if term_key:
-                    value               =self.request.GET.get(term_key)
-                    filter_dic[term_key]=value
-                    if term_key =='user_id':
-                        is_user_timeline = True
+                if term_key not in ['limit','offset']
+                    if term_key:
+                        value               =self.request.GET.get(term_key)
+                        filter_dic[term_key]=value
+                        if term_key =='user_id':
+                            is_user_timeline = True
             if filter_dic:
                 topics = Topic.objects.filter(**filter_dic)
                 if is_user_timeline:
@@ -373,6 +375,7 @@ def verify_otp(request):
             exclude_dict = {'is_active' : True, 'is_reset_password' : is_reset_password}
             if is_for_change_phone:
                 exclude_dict = {'is_active' : True, 'is_for_change_phone' : is_for_change_phone}
+
             otp_obj = SingUpOTP.objects.filter(**exclude_dict).get(mobile_no=mobile_no, otp=otp)
             otp_obj.is_active = False
             otp_obj.used_at = timezone.now()
