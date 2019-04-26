@@ -48,7 +48,7 @@ class Comment(models.Model):
     objects = CommentQuerySet.as_manager()
 
     class Meta:
-        ordering = ['-date', '-pk']
+        ordering = ['-likes_count']
         verbose_name = _("comment")
         verbose_name_plural = _("comments")
 

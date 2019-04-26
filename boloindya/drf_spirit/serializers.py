@@ -56,11 +56,20 @@ class TopicSerializerwithComment(ModelSerializer):
         read_only_fields = ('is_pinned',)
 
     def get_video_comments(self,instance):
-        return CommentSerializer(instance.topic_comment.filter(is_media = True, is_audio = False),many=True).data
+        if instance.topic_comment.filter(is_media = True, is_audio = False):
+            return CommentSerializer([instance.topic_comment.filter(is_media = True, is_audio = False)[0]],many=True).data
+        else:
+            return CommentSerializer(instance.topic_comment.filter(is_media = True, is_audio = False),many=True).data
     def get_audio_comments(self,instance):
-        return CommentSerializer(instance.topic_comment.filter(is_media = True, is_audio = True) ,many=True).data
+        if instance.topic_comment.filter(is_media = True, is_audio = True):
+            return CommentSerializer([instance.topic_comment.filter(is_media = True, is_audio = True)[0]] ,many=True).data
+        else:
+            return CommentSerializer(instance.topic_comment.filter(is_media = True, is_audio = True) ,many=True).data
     def get_text_comments(self,instance):
-        return CommentSerializer(instance.topic_comment.filter(is_media = False) ,many=True).data
+        if instance.topic_comment.filter(is_media = False):
+            return CommentSerializer([instance.topic_comment.filter(is_media = False)[0]] ,many=True).data
+        else:
+            return CommentSerializer(instance.topic_comment.filter(is_media = False) ,many=True).data
     def get_user(self,instance):
         return UserSerializer(instance.user).data
 
