@@ -157,6 +157,7 @@ class Topic(models.Model):
         return self.comment_set.values_list('comment_html', flat=True)
 
 class ShareTopic(UserInfo):
+    topic = models.ForeignKey(Topic, related_name='topic_share')
 
     def __unicode__(self):
         return self.topic

@@ -66,6 +66,7 @@ class TopicList(generics.ListCreateAPIView):
 class Usertimeline(generics.ListCreateAPIView):
     serializer_class   = TopicSerializerwithComment
     permission_classes = (IsOwnerOrReadOnly,)
+    pagination_class    = LimitOffsetPagination
 
 
     """
@@ -91,18 +92,20 @@ class Usertimeline(generics.ListCreateAPIView):
             filter_dic      ={}
             post            = []
             for term_key in search_term:
-                if term_key:
+                if term_key and not term_key in ['offset','limit']:
                     value               =self.request.GET.get(term_key)
                     filter_dic[term_key]=value
+                    print filter_dic
                     if term_key =='user_id':
                         is_user_timeline = True
             if filter_dic:
+                print "maaz"
                 topics = Topic.objects.filter(**filter_dic)
                 if is_user_timeline:
                     all_shared_post = ShareTopic.objects.filter(user_id = filter_dic['user_id'])
                     if all_shared_post:
                         for each_post in all_shared_post:
-                            post.append(each_post)
+                            post.append(each_post.topic)
                     if topics:
                         for each_post in topics:
                             post.append(each_post)
@@ -282,9 +285,26 @@ class TopicCommentList(generics.ListAPIView):
 
 class CategoryList(generics.ListAPIView):
     serializer_class = CategorySerializer
-    queryset = Category.objects.filter(is_engagement = False)
+    queryset = Category.objects.filter(is_engagement = False).exclude(parent__isnull = False)
     # permission_classes = (IsAuthenticated,)
     permission_classes  = (AllowAny,)
+
+class SubCategoryList(generics.ListAPIView):
+    """
+    post:
+        Required Parameters
+        self.request.POST.get('category_id')
+    """
+    serializer_class = CategorySerializer
+    # permission_classes = (IsAuthenticated,)
+    permission_classes  = (AllowAny,)
+    def get_queryset(self):
+        sub_category =[]
+        category_id = self.request.POST.get('category_id')
+        if category_id:
+            sub_category=Category.objects.filter(is_engagement = False, parent_id = category_id)
+
+        return sub_category;
 
 class CommentList(generics.ListCreateAPIView):
     serializer_class    = CommentSerializer
@@ -327,7 +347,7 @@ class SingUpOTPView(generics.CreateAPIView):
     serializer_class    = SingUpOTPSerializer
 
     """
-    get:
+    post:
         Required Parameters
         request.POST.get('is_reset_password')
         request.POST.get('is_for_change_phone')
