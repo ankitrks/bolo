@@ -34,10 +34,14 @@ class TopicSerializer(ModelSerializer):
 
 
 class CommentSerializer(ModelSerializer):
-    user = UserReadOnlyField()
+    # user = UserReadOnlyField()
+    user = SerializerMethodField()
     class Meta:
         model = Comment
         fields = '__all__'
+
+    def get_user(self,instance):
+        return UserSerializer(instance.user).data
 
 class TopicSerializerwithComment(ModelSerializer):
     user = SerializerMethodField()
