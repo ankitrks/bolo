@@ -300,11 +300,10 @@ class SubCategoryList(generics.ListAPIView):
     permission_classes  = (AllowAny,)
     def get_queryset(self):
         sub_category =[]
-        category_id = self.request.POST.get('category_id')
+        category_id = self.request.GET.get('category_id')
         if category_id:
-            sub_category=Category.objects.filter(is_engagement = False, parent_id = category_id)
-
-        return sub_category;
+            return Category.objects.filter(is_engagement = False, parent_id = category_id)
+        return Category.objects.filter(is_engagement = False, parent__isnull = False)
 
 class CommentList(generics.ListCreateAPIView):
     serializer_class    = CommentSerializer
