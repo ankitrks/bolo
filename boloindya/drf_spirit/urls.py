@@ -9,7 +9,7 @@ app_name = 'drf_spirit'
 topic_urls = [
     url(r'^$', TopicList.as_view(), name='topic-list'),
     url(r'^(?P<slug>[\w-]+)/$', TopicDetails.as_view(), name='topic-detail'),
-    url(r'^(?P<slug>[\w-]+)/comments/$', TopicCommentList.as_view(), name='topic-comment-list')
+    url(r'^(?P<slug>[\w-]+)/(?P<topic_id>\d+)/comments/$', TopicCommentList.as_view(), name='topic-comment-list')
 ]
 timeline_urls = [
     url(r'^$', Usertimeline.as_view(), name='usertimeline-list'),
