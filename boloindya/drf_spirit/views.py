@@ -276,7 +276,7 @@ class TopicDetails(generics.RetrieveUpdateDestroyAPIView):
 
 class TopicCommentList(generics.ListAPIView):
     serializer_class    = CommentSerializer
-    # queryset            = Comment.objects.filter()
+    queryset            = Comment.objects.all()
     permission_classes  = (IsOwnerOrReadOnly,)
 
     def get_queryset(self):
