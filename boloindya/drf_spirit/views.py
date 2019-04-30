@@ -276,12 +276,13 @@ class TopicDetails(generics.RetrieveUpdateDestroyAPIView):
 
 class TopicCommentList(generics.ListAPIView):
     serializer_class    = CommentSerializer
-    queryset            = Comment.objects.filter()
+    # queryset            = Comment.objects.filter()
     permission_classes  = (IsOwnerOrReadOnly,)
 
     def get_queryset(self):
         topic_slug = self.kwargs['slug']
-        return self.queryset.filter(topic__slug=topic_slug)
+        topic_id = self.kwargs['topic_id']
+        return self.queryset.filter(topic_id=topic_id)
 
 class CategoryList(generics.ListAPIView):
     serializer_class = CategorySerializer
