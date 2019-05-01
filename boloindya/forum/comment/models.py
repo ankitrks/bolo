@@ -44,6 +44,7 @@ class Comment(models.Model):
 
     modified_count = models.PositiveIntegerField(_("modified count"), default=0)
     likes_count = models.PositiveIntegerField(_("likes count"), default=0)
+    share_count = models.PositiveIntegerField(_("share count"), default=0)
 
     objects = CommentQuerySet.as_manager()
 

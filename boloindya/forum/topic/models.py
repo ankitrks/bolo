@@ -64,6 +64,8 @@ class Topic(models.Model):
     thumbnail = models.CharField(_("thumbnail"), max_length=150, default='')
     view_count = models.PositiveIntegerField(_("views count"), default=0)
     comment_count = models.PositiveIntegerField(_("comment count"), default=0)
+    total_share_count = models.PositiveIntegerField(_("Total Share count"), default=0)# self plus comment
+    share_count = models.PositiveIntegerField(_("Share count"), default=0)# only topic share
     # share_user = models.ForeignKey(settings.AUTH_USER_MODEL,null=True,blank=True, related_name='share_topic_user')
     # shared_post = models.ForeignKey('self', blank = True, null = True, related_name='user_shared_post')
 
@@ -82,7 +84,7 @@ class Topic(models.Model):
         return self.topic_comment.filter(is_media = False)
 
     class Meta:
-        ordering = ['-last_active', '-pk']
+        ordering = ['-comment_count', '-total_share_count']
         verbose_name = _("topic")
         verbose_name_plural = _("topics")
 
@@ -158,12 +160,14 @@ class Topic(models.Model):
         return self.comment_set.values_list('comment_html', flat=True)
 
 class ShareTopic(UserInfo):
-    topic = models.ForeignKey(Topic, related_name='topic_share')
+    topic = models.ForeignKey(Topic, related_name='share_topic_topic_share',null=True,blank=True)
+    comment = models.ForeignKey('forum_comment.Comment',related_name='share_topic_topic_comment',null=True,blank=True)
 
     def __unicode__(self):
         return self.topic
 class Like(UserInfo):
-    topic = models.ForeignKey(Topic, related_name='topic_like')
+    comment = models.ForeignKey('forum_comment.Comment',related_name='like_topic_comment',null=True,blank=True)
+    topic = models.ForeignKey(Topic, related_name='like_topic_share',null=True,blank=True)
     like = models.BooleanField(default = True)
 
     def __unicode__(self):
@@ -175,6 +179,8 @@ share_type_options = (
 )
 class SocialShare(UserInfo):
     share_type = models.CharField(choices=share_type_options, blank = True, null = True, max_length=10)
+    topic = models.ForeignKey(Topic, related_name='social_share_topic_share',null=True,blank=True)
+    comment = models.ForeignKey('forum_comment.Comment',related_name='social_share_topic_comment',null=True,blank=True)
     def __unicode__(self):
         return self.topic
 
