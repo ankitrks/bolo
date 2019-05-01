@@ -285,6 +285,8 @@ STATICFILES_DIRS = (
     # os.path.join(PROJECT_PATH, ENV, 'schedule', 'static'),
 )
 
+MEDIA_UPLOAD_PATH = os.path.join(PROJECT_PATH, ENV, 'media','media_upload')
+
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
@@ -306,7 +308,7 @@ EMAIL_RECEIVERS = ['ankit@careeranna.com']
 COMMENTS_PER_PAGE = 30
 TOPICS_PER_PAGE = 30
 
-TWO_FACTOR_SMS_API_KEY = "7ce3da5e-6297-11e9-90e4-0200cd936042"
+TWO_FACTOR_SMS_API_KEY = "06a80ab1-6806-11e9-90e4-0200cd936042"
 TWO_FACTOR_SMS_TEMPLATE = "BoloIndyaOTP" 
 
 #### Rest Framework Settings ###
@@ -331,3 +333,14 @@ SIMPLE_JWT = {
 #### Rest Framework Settings ###
 import django
 django.setup()
+
+
+#### S3 bucket #####
+AWS_ACCESS_KEY_ID = 'AKIAJMOBRHDIXGKM6W6Q'
+AWS_SECRET_ACCESS_KEY = 'atPeuoCelLllefyeQVAF4f/NOBTfiE0WheFS8iGp'
+
+AWS_BUCKET_NAME = 'boloindya'
+
+# The region of your bucket, more info:
+# http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
+REGION_HOST = 'us-east-1'

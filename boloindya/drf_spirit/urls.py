@@ -1,7 +1,7 @@
 # from django.urls import path
 from django.conf.urls import include, url
 from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,createTopic, TopicCommentList, CategoryList, CommentList, CommentDetails, SingUpOTPView,\
-	verify_otp, password_set, fb_profile_settings,Usertimeline,follow_user,follow_sub_category,like,shareontimeline,GetProfile
+	verify_otp, password_set, fb_profile_settings,Usertimeline,follow_user,follow_sub_category,like,shareontimeline,GetProfile,SubCategoryList,upload_media_to_s3
 from rest_framework_simplejwt import views as jwt_views
 
 app_name = 'drf_spirit'
@@ -9,7 +9,7 @@ app_name = 'drf_spirit'
 topic_urls = [
     url(r'^$', TopicList.as_view(), name='topic-list'),
     url(r'^(?P<slug>[\w-]+)/$', TopicDetails.as_view(), name='topic-detail'),
-    url(r'^(?P<slug>[\w-]+)/comments/$', TopicCommentList.as_view(), name='topic-comment-list')
+    url(r'^(?P<slug>[\w-]+)/(?P<topic_id>\d+)/comments/$', TopicCommentList.as_view(), name='topic-comment-list')
 ]
 timeline_urls = [
     url(r'^$', Usertimeline.as_view(), name='usertimeline-list'),
@@ -62,4 +62,6 @@ urlpatterns = [
     url(r'^like/$', like, name='like'),
     url(r'^password/set/$', password_set, name='password_set'),
     url(r'^get_profile/$', GetProfile.as_view(), name='get_profile'),
+    url(r'^get_sub_category/$', SubCategoryList.as_view(), name='get_sub_category'),
+    url(r'^upload_media_to_s3/$', upload_media_to_s3, name='upload_media_to_s3'),
 ]
