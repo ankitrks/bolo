@@ -383,6 +383,7 @@ class TopicCommentList(generics.ListAPIView):
 class CategoryList(generics.ListAPIView):
     serializer_class = CategorySerializer
     queryset = Category.objects.filter(is_engagement = False).exclude(parent__isnull = False)
+    pagination_class=None
     # permission_classes = (IsAuthenticated,)
     permission_classes  = (AllowAny,)
 
@@ -395,6 +396,7 @@ class SubCategoryList(generics.ListAPIView):
     serializer_class = CategorySerializer
     # permission_classes = (IsAuthenticated,)
     permission_classes  = (AllowAny,)
+    pagination_class=None
     def get_queryset(self):
         sub_category =[]
         category_id = self.request.GET.get('category_id')
