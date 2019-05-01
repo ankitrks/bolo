@@ -108,7 +108,6 @@ class Usertimeline(generics.ListCreateAPIView):
                     if term_key =='user_id':
                         is_user_timeline = True
             if filter_dic:
-                print "maaz"
                 topics = Topic.objects.filter(**filter_dic)
                 if is_user_timeline:
                     all_shared_post = ShareTopic.objects.filter(user_id = filter_dic['user_id'])

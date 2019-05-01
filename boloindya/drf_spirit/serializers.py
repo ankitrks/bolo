@@ -8,6 +8,7 @@ from forum.comment.models import Comment
 from forum.user.models import UserProfile
 from .relations import PresentableSlugRelatedField
 from .models import SingUpOTP
+from .utils import shortnaturaltime
 
 class CategorySerializer(ModelSerializer):
     class Meta:
@@ -36,12 +37,16 @@ class TopicSerializer(ModelSerializer):
 class CommentSerializer(ModelSerializer):
     # user = UserReadOnlyField()
     user = SerializerMethodField()
+    date = SerializerMethodField()
     class Meta:
         model = Comment
         fields = '__all__'
 
     def get_user(self,instance):
         return UserSerializer(instance.user).data
+        
+    def get_date(self,instance):
+        return shortnaturaltime(instance.date)
 
 class TopicSerializerwithComment(ModelSerializer):
     user = SerializerMethodField()
@@ -51,6 +56,7 @@ class TopicSerializerwithComment(ModelSerializer):
     video_comments = SerializerMethodField()
     audio_comments = SerializerMethodField()
     text_comments = SerializerMethodField()
+    date = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
 
     class Meta:
@@ -76,6 +82,9 @@ class TopicSerializerwithComment(ModelSerializer):
             return CommentSerializer(instance.topic_comment.filter(is_media = False) ,many=True).data
     def get_user(self,instance):
         return UserSerializer(instance.user).data
+
+    def get_date(self,instance):
+        return shortnaturaltime(instance.date)
 
 class UserProfileSerializer(ModelSerializer):
     class Meta:
