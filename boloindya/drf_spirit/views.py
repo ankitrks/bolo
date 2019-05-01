@@ -117,7 +117,7 @@ class Usertimeline(generics.ListCreateAPIView):
                     if topics:
                         for each_post in topics:
                             post.append(each_post)
-                    topics = post
+                    topics=sorted(itertools.chain(post),key=lambda x: x.comment_count, reverse=True)
         else:
                 topics = Topic.objects.all()
         return topics;
@@ -706,11 +706,14 @@ def like(request):
         Required Parameters
         topic_id = request.POST.get('topic_id',None)
     """
-    topic_id = request.POST.get('topic_id',None)
+    comment_id = request.POST.get('comment_id',None)
     userprofile = UserProfile.objects.get(user = request.user)
     try:
-        liked,is_created = Like.objects.get_or_create(topic_id = topic_id,user = request.user)
+        liked,is_created = Like.objects.get_or_create(comment_id = comment_id,user = request.user)
+        comment = Comment.objects.get(pk = comment_id)
         if is_created:
+            comment.likes_count = F('likes_count')+1
+            comment.save()
             add_bolo_score(request.user.id,'liked')
             userprofile.like_count = F('like_count')+1
             userprofile.save()
@@ -718,6 +721,8 @@ def like(request):
         else:
             liked.like = False
             liked.save()
+            comment.likes_count = F('likes_count')-1
+            comment.save()
             userprofile.like_count = F('like_count')-1
             userprofile.save()
             return JsonResponse({'message': 'unliked'}, status=status.HTTP_200_OK)
@@ -730,15 +735,27 @@ def shareontimeline(request):
     post:
         Required Parameters
         topic_id = request.POST.get('topic_id',None)
+        comment_id = request.POST.get('comment_id',None)
         share_on = request.POST.get('share_on',None)
     """
     topic_id = request.POST.get('topic_id',None)
+    comment_id = request.POST.get('comment_id',None)
     share_on = request.POST.get('share_on',None)
     userprofile = UserProfile.objects.get(user = request.user)
     if share_on == 'share_timeline':
         try:
-            liked = ShareTopic.objects.create(topic_id = topic_id,user = request.user)
+            liked = ShareTopic.objects.create(topic_id = topic_id,comment_id = comment_id,user = request.user)
             add_bolo_score(request.user.id,'share_timeline')
+            if comment_id:
+                comment = Comment.objects.get(pk = comment_id)
+                comment.share_count = F('share_count')+1
+                comment.save()
+                topic = comment.topic
+            else:
+                topic = Topic.objects.get(pk = topic_id)
+                topic.share_count = F('share_count')+1
+            topic.total_share_count = F('total_share_count')+1
+            topic.save()
             userprofile.share_count = F('share_count')+1
             userprofile.save()
             return JsonResponse({'message': 'shared'}, status=status.HTTP_200_OK)
@@ -746,7 +763,17 @@ def shareontimeline(request):
             return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
     elif share_on == 'facebook_share':
         try:
-            liked = SocialShare.objects.create(topic_id = topic_id,user = request.user,share_type = '0')
+            liked = SocialShare.objects.create(topic_id = topic_id,comment_id = comment_id,user = request.user,share_type = '0')
+            if comment_id:
+                comment = Comment.objects.get(pk = comment_id)
+                comment.share_count = F('share_count')+1
+                comment.save()
+                topic= comment.topic
+            else:
+                topic = Topic.objects.get(pk = topic_id)
+                topic.share_count = F('share_count')+1    
+            topic.total_share_count = F('total_share_count')+1
+            topic.save()
             add_bolo_score(request.user.id,'facebook_share')
             userprofile.share_count = F('share_count')+1
             userprofile.save()
@@ -755,7 +782,17 @@ def shareontimeline(request):
             return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
     elif share_on == 'whatsapp_share':
         try:
-            liked = SocialShare.objects.create(topic_id = topic_id,user = request.user,share_type = '1')
+            liked = SocialShare.objects.create(topic_id = topic_id,comment_id = comment_id,user = request.user,share_type = '1')
+            if comment_id:
+                comment = Comment.objects.get(pk = comment_id)
+                comment.share_count = F('share_count')+1
+                comment.save()
+                topic = comment.topic
+            else:
+                topic = Topic.objects.get(pk = topic_id)
+                topic.share_count = F('share_count')+1
+            topic.total_share_count = F('total_share_count')+1
+            topic.save()
             add_bolo_score(request.user.id,'whatsapp_share')
             userprofile.share_count = F('share_count')+1
             userprofile.save()
@@ -764,8 +801,25 @@ def shareontimeline(request):
             return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# @api_view(['POST'])
-# def 
+def comment_view(request):
+    comment_ids = request.GET.get('comment_ids',None)
+    """
+    get:
+        Required Parameters
+        comment_ids = request.GET.get('comment_ids',None)
+    """
+    #### add models for seen users
+    try:
+        comment_list = comment_ids.split(',')
+        for each_comment_id in comment_list:
+            comment = Comment.objects.get(pk = each_comment_id)
+            topic= comment.topic
+            topic.view_count = F('view_count') +1
+            topic.save()
+            return JsonResponse({'message': 'item viewed'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 

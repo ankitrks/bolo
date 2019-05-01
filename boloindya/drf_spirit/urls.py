@@ -1,7 +1,7 @@
 # from django.urls import path
 from django.conf.urls import include, url
 from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,createTopic, TopicCommentList, CategoryList, CommentList, CommentDetails, SingUpOTPView,\
-	verify_otp, password_set, fb_profile_settings,Usertimeline,follow_user,follow_sub_category,like,shareontimeline,GetProfile,SubCategoryList,upload_media_to_s3
+	verify_otp, password_set, fb_profile_settings,Usertimeline,follow_user,follow_sub_category,like,shareontimeline,GetProfile,SubCategoryList,upload_media_to_s3,comment_view
 from rest_framework_simplejwt import views as jwt_views
 
 app_name = 'drf_spirit'
@@ -38,7 +38,6 @@ category_urls = [
 ]
 
 urlpatterns = [
-    url(r'^topics/', include(topic_urls)),
     url(r'^timeline/', include(timeline_urls)),
     url(r'^search/', include(topicsearch_urls)),
     url(r'^search/users/', include(usersearch_urls)),
@@ -64,4 +63,7 @@ urlpatterns = [
     url(r'^get_profile/$', GetProfile.as_view(), name='get_profile'),
     url(r'^get_sub_category/$', SubCategoryList.as_view(), name='get_sub_category'),
     url(r'^upload_media_to_s3/$', upload_media_to_s3, name='upload_media_to_s3'),
+    url(r'^comment_view/$', comment_view, name='comment_view'),
+    url(r'^topics/', include(topic_urls)),
+    
 ]
