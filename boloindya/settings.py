@@ -285,6 +285,8 @@ STATICFILES_DIRS = (
     # os.path.join(PROJECT_PATH, ENV, 'schedule', 'static'),
 )
 
+MEDIA_UPLOAD_PATH = os.path.join(PROJECT_PATH, ENV, 'media','media_upload')
+
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (

@@ -26,6 +26,8 @@ from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencod
 import boto3
 import time
 import os
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 from datetime import datetime
 import json
 from .utils import get_weight,add_bolo_score
@@ -178,24 +180,31 @@ class SearchUser(generics.ListCreateAPIView):
         return users;
 
 
-def get_video_thumbnail(obj,video_url):
-        video = VideoCapture(video_url)
-        frames_count = int(video.get(CAP_PROP_FRAME_COUNT))
-        print frames_count
-        frame_no = frames_count*2/3
-        video.set(CAP_PROP_POS_FRAMES, frame_no)
-        success, frame = video.read()
-        if success:
-            b = imencode('.jpg', frame)[1].tostring()
-            ts = time.time()
-            virtual_thumb_file = ContentFile(b, name = "img-" + str(ts).replace(".", "")  + ".jpg" )
-            url_thumbnail= upload_thumbail(virtual_thumb_file)
-            obj.thumbnail = url_thumbnail
-            obj.media_duration = frames_count
-            obj.save()
-            return True
-        else:
-            return False
+def get_video_thumbnail(video_url):
+    video = VideoCapture(video_url)
+    frames_count = int(video.get(CAP_PROP_FRAME_COUNT))
+    frame_no = frames_count*2/3
+    video.set(CAP_PROP_POS_FRAMES, frame_no)
+    success, frame = video.read()
+    if success:
+        b = imencode('.jpg', frame)[1].tostring()
+        ts = time.time()
+        virtual_thumb_file = ContentFile(b, name = "img-" + str(ts).replace(".", "")  + ".jpg" )
+        print virtual_thumb_file
+        url_thumbnail= upload_thumbail(virtual_thumb_file)
+        print url_thumbnail
+        # obj.thumbnail = url_thumbnail
+        # obj.media_duration = media_duration
+        # obj.save()
+        return url_thumbnail
+    else:
+        return False
+
+from moviepy.editor import VideoFileClip
+def getVideoLength(input_video):
+    clip = VideoFileClip(input_video)
+    print clip.duration 
+    return clip.duration
 
 def upload_thumbail(virtual_thumb_file):
     try:
@@ -212,6 +221,41 @@ def upload_thumbail(virtual_thumb_file):
     except:
         return None
 
+def upload_media(media_file):
+    try:
+        client = boto3.client('s3',aws_access_key_id = settings.AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.AWS_SECRET_ACCESS_KEY)
+        ts = time.time()
+        created_at = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+        filenameNext= str(media_file.name).split('.')
+        final_filename = str(filenameNext[0])+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[1])
+        client.put_object(Bucket=settings.AWS_BUCKET_NAME, Key='media/' + final_filename, Body=media_file)
+        filepath = "https://s3.amazonaws.com/"+settings.AWS_BUCKET_NAME+"/media/"+final_filename
+        # if os.path.exists(file):
+        #     os.remove(file)
+        return filepath
+    except:
+        return None
+
+
+@api_view(['POST'])
+def upload_media_to_s3(request):
+    media_file = request.FILES['media']
+    is_audio = request.POST.get('is_audio',None)
+    if media_file:
+        media_url = upload_media(media_file)
+        path = default_storage.save(media_file.name, ContentFile(media_file.read()))
+        with default_storage.open(media_file.name, 'wb+') as destination:
+            for chunk in media_file.chunks():
+                destination.write(chunk)
+        tmp_file = os.path.join(settings.MEDIA_ROOT, path)
+        if not is_audio:
+            thumbnail_url  = get_video_thumbnail(tmp_file)
+            videolength = getVideoLength(tmp_file)
+            os.remove(tmp_file)
+            return JsonResponse({'status': 'success','body':media_url,'thumbnail':thumbnail_url,'media_duration':videolength}, status=status.HTTP_201_CREATED)
+        return JsonResponse({'status': 'success','body':media_url,'thumbnail':'','media_duration':''}, status=status.HTTP_201_CREATED)
+    else:
+        return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def replyOnTopic(request):
@@ -226,6 +270,8 @@ def replyOnTopic(request):
     language_id  = request.POST.get('language_id', '')
     comment_html = request.POST.get('comment', '')
     mobile_no    = request.POST.get('mobile_no', '')
+    thumbnail = request.POST.get('thumbnail', '')
+    media_duration = request.POST.get('media_duration', '')
 
     Required Parameters:
     user_id and topic_id and comment_html
@@ -237,6 +283,8 @@ def replyOnTopic(request):
     language_id  = request.POST.get('language_id', '')
     comment_html = request.POST.get('comment', '')
     mobile_no    = request.POST.get('mobile_no', '')
+    thumbnail = request.POST.get('thumbnail', '')
+    media_duration = request.POST.get('media_duration', '')
     comment      = Comment()
 
     if request.POST.get('is_media'):
@@ -255,7 +303,9 @@ def replyOnTopic(request):
             comment.mobile_no     = mobile_no
             comment.save()
             if request.POST.get('is_media') and not request.POST.get('is_audio'):
-                get_video_thumbnail(comment,comment_html)
+                comment.thumbnail = thumbnail
+                comment.media_duration = media_duration
+                comment.save()
             add_bolo_score(request.user.id,'reply_on_topic')
             return JsonResponse({'message': 'Reply Submitted'}, status=status.HTTP_201_CREATED)
         except User.DoesNotExist:
@@ -288,6 +338,8 @@ def createTopic(request):
     title        = request.POST.get('title', '')
     language_id  = request.POST.get('language_id', '')
     category_id  = request.POST.get('category_id', '')
+    media_file = request.FILES['media']
+    print media_file
 
     if title:
         topic.title          = title.upper()
@@ -305,8 +357,6 @@ def createTopic(request):
             topic.category_id   = category_id
             topic.user_id       = user_id
             topic.save()
-            if request.POST.get('question_video'):
-                get_video_thumbnail(topic,request.POST.get('question_video'))
             add_bolo_score(request.user.id,'create_topic')
             return JsonResponse({'message': 'Topic Created'}, status=status.HTTP_201_CREATED)
         except User.DoesNotExist:
