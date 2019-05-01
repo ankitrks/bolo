@@ -331,3 +331,14 @@ SIMPLE_JWT = {
 #### Rest Framework Settings ###
 import django
 django.setup()
+
+
+#### S3 bucket #####
+AWS_ACCESS_KEY_ID = 'AKIAJMOBRHDIXGKM6W6Q'
+AWS_SECRET_ACCESS_KEY = 'atPeuoCelLllefyeQVAF4f/NOBTfiE0WheFS8iGp'
+
+AWS_BUCKET_NAME = 'boloindya'
+
+# The region of your bucket, more info:
+# http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
+REGION_HOST = 'us-east-1'

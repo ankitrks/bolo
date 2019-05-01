@@ -55,6 +55,7 @@ class Topic(models.Model):
     language_id = models.CharField(_("language"), max_length=5, default='1')
 
     is_media = models.BooleanField(default=True)
+    media_duration = models.CharField(_("duration"), max_length=20, default='')
 
     is_pinned = models.BooleanField(_("pinned"), default=False)
     is_globally_pinned = models.BooleanField(_("globally pinned"), default=False)

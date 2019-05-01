@@ -9,6 +9,8 @@ from rest_framework import generics
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
+from django.core.files.base import ContentFile
+
 
 from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
@@ -20,6 +22,11 @@ from forum.comment.models import Comment
 from forum.user.models import UserProfile,Follower
 from django.db.models import F,Q
 from rest_framework_simplejwt.tokens import RefreshToken
+from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
+import boto3
+import time
+import os
+from datetime import datetime
 import json
 from .utils import get_weight,add_bolo_score
 
@@ -171,6 +178,41 @@ class SearchUser(generics.ListCreateAPIView):
         return users;
 
 
+def get_video_thumbnail(obj,video_url):
+        video = VideoCapture(video_url)
+        frames_count = int(video.get(CAP_PROP_FRAME_COUNT))
+        print frames_count
+        frame_no = frames_count*2/3
+        video.set(CAP_PROP_POS_FRAMES, frame_no)
+        success, frame = video.read()
+        if success:
+            b = imencode('.jpg', frame)[1].tostring()
+            ts = time.time()
+            virtual_thumb_file = ContentFile(b, name = "img-" + str(ts).replace(".", "")  + ".jpg" )
+            url_thumbnail= upload_thumbail(virtual_thumb_file)
+            obj.thumbnail = url_thumbnail
+            obj.media_duration = frames_count
+            obj.save()
+            return True
+        else:
+            return False
+
+def upload_thumbail(virtual_thumb_file):
+    try:
+        client = boto3.client('s3',aws_access_key_id = settings.AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.AWS_SECRET_ACCESS_KEY)
+        ts = time.time()
+        created_at = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+        final_filename = "img-" + str(ts).replace(".", "")  + ".jpg" 
+        client.put_object(Bucket=settings.AWS_BUCKET_NAME, Key='thumbnail/' + final_filename, Body=virtual_thumb_file)
+        # client.resource('s3').Object(settings.AWS_BUCKET_NAME, 'thumbnail/' + final_filename).put(Body=open(virtual_thumb_file, 'rb'))
+        filepath = "https://s3.amazonaws.com/"+settings.AWS_BUCKET_NAME+"/thumbnail/"+final_filename
+        # if os.path.exists(file):
+        #     os.remove(file)
+        return filepath
+    except:
+        return None
+
+
 @api_view(['POST'])
 def replyOnTopic(request):
 
@@ -212,6 +254,8 @@ def replyOnTopic(request):
             comment.topic_id      = topic_id
             comment.mobile_no     = mobile_no
             comment.save()
+            if request.POST.get('is_media') and not request.POST.get('is_audio'):
+                get_video_thumbnail(comment,comment_html)
             add_bolo_score(request.user.id,'reply_on_topic')
             return JsonResponse({'message': 'Reply Submitted'}, status=status.HTTP_201_CREATED)
         except User.DoesNotExist:
@@ -253,6 +297,7 @@ def createTopic(request):
         topic.question_video = request.POST.get('question_video')
 
 
+
     if title and category_id:
         try:
 
@@ -260,6 +305,8 @@ def createTopic(request):
             topic.category_id   = category_id
             topic.user_id       = user_id
             topic.save()
+            if request.POST.get('question_video'):
+                get_video_thumbnail(topic,request.POST.get('question_video'))
             add_bolo_score(request.user.id,'create_topic')
             return JsonResponse({'message': 'Topic Created'}, status=status.HTTP_201_CREATED)
         except User.DoesNotExist:
