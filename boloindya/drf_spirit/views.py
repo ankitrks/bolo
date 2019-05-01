@@ -45,7 +45,7 @@ class TopicList(generics.ListCreateAPIView):
         if search_term:
             filter_dic={}
             for term_key in search_term:
-                if term_key not in ['limit','offset']
+                if term_key not in ['limit','offset']:
                     if term_key:
                         value=self.request.GET.get(term_key)
                         filter_dic[term_key]=value
@@ -92,13 +92,16 @@ class Usertimeline(generics.ListCreateAPIView):
             filter_dic      ={}
             post            = []
             for term_key in search_term:
-                if term_key not in ['limit','offset']
-                    if term_key:
+                if term_key not in ['limit','offset']:
+                    if term_key =='category':
+                        filter_dic['category__slug'] = self.request.GET.get(term_key)
+                    elif term_key:
                         value               =self.request.GET.get(term_key)
                         filter_dic[term_key]=value
                         if term_key =='user_id':
                             is_user_timeline = True
             if filter_dic:
+                print filter_dic
                 topics = Topic.objects.filter(**filter_dic)
                 if is_user_timeline:
                     all_shared_post = ShareTopic.objects.filter(user_id = filter_dic['user_id'])
