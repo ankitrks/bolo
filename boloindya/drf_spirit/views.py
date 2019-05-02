@@ -499,11 +499,11 @@ def verify_otp(request):
 
     if mobile_no and otp:
         try:
-            exclude_dict = {'is_active' : True, 'is_reset_password' : is_reset_password}
+            exclude_dict = {'is_active' : True, 'is_reset_password' : is_reset_password,"mobile_no":mobile_no, "otp":otp}
             if is_for_change_phone:
-                exclude_dict = {'is_active' : True, 'is_for_change_phone' : is_for_change_phone}
+                exclude_dict = {'is_active' : True, 'is_for_change_phone' : is_for_change_phone,"mobile_no":mobile_no, "otp":otp}
 
-            otp_obj = SingUpOTP.objects.filter(**exclude_dict).filter(mobile_no=mobile_no, otp=otp).order_by('-id')
+            otp_obj = SingUpOTP.objects.filter(**exclude_dict).order_by('-id')
             if otp_obj:
                 otp_obj=otp_obj[0]
             otp_obj.is_active = False
