@@ -367,7 +367,8 @@ def createTopic(request):
             topic.user_id       = user_id
             topic.save()
             add_bolo_score(request.user.id,'create_topic')
-            return JsonResponse({'message': 'Topic Created'}, status=status.HTTP_201_CREATED)
+            topic_json = TopicSerializerwithComment(topic).data
+            return JsonResponse({'message': 'Topic Created','topic':topic_json}, status=status.HTTP_201_CREATED)
         except User.DoesNotExist:
             return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
     else:
