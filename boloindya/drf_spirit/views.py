@@ -509,7 +509,7 @@ def verify_otp(request):
             if not is_reset_password and not is_for_change_phone:
                 userprofile = UserProfile.objects.filter(mobile_no = mobile_no)
                 if userprofile:
-                    user = userprofile.user
+                    user = userprofile[0].user
                 else:
                     user = User.objects.create(username = mobile_no)
                     add_bolo_score(user.id, 'initial_signup')
