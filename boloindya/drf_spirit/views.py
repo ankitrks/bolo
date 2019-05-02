@@ -725,12 +725,20 @@ def like(request):
             userprofile.save()
             return JsonResponse({'message': 'liked'}, status=status.HTTP_200_OK)
         else:
-            liked.like = False
-            liked.save()
-            comment.likes_count = F('likes_count')-1
-            comment.save()
-            userprofile.like_count = F('like_count')-1
-            userprofile.save()
+            if liked.like:
+                liked.like = False
+                liked.save()
+                comment.likes_count = F('likes_count')-1
+                comment.save()
+                userprofile.like_count = F('like_count')-1
+                userprofile.save()
+            else:
+                liked.like = True
+                liked.save()
+                comment.likes_count = F('likes_count')+1
+                comment.save()
+                userprofile.like_count = F('like_count')+1
+                userprofile.save()
             return JsonResponse({'message': 'unliked'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
