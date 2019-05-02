@@ -649,9 +649,12 @@ def fb_profile_settings(request):
                 if sub_category_prefrences:
                     for each_sub_category in sub_category_prefrences:
                         category = Category.objects.get(pk = each_sub_category)
-                        print each_sub_category
                         userprofile.sub_category.add(category)
                         userprofile.save()
+                    if userprofile.sub_category.all():
+                        for each_category in userprofile.sub_category.all():
+                            if not str(each_category.id) in sub_category_prefrences:
+                                userprofile.sub_category.remove(category)
                 if language:
                     userprofile.language = str(language)
                     userprofile.save()
