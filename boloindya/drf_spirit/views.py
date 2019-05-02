@@ -250,7 +250,7 @@ def upload_media_to_s3(request):
             for chunk in media_file.chunks():
                 destination.write(chunk)
         tmp_file = os.path.join(settings.MEDIA_ROOT, path)
-        if not is_audio or is_audio =="":
+        if is_audio =="video":
             thumbnail_url  = get_video_thumbnail(tmp_file)
             videolength = getVideoLength(tmp_file)
             os.remove(tmp_file)
