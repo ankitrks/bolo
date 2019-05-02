@@ -240,9 +240,8 @@ def upload_media(media_file):
 
 
 @api_view(['POST'])
-def upload_media_to_s3(request):
+def upload_video_to_s3(request):
     media_file = request.FILES['media']
-    is_audio = request.POST.get('is_audio',None)
     if media_file:
         media_url = upload_media(media_file)
         path = default_storage.save(media_file.name, ContentFile(media_file.read()))
@@ -250,11 +249,18 @@ def upload_media_to_s3(request):
             for chunk in media_file.chunks():
                 destination.write(chunk)
         tmp_file = os.path.join(settings.MEDIA_ROOT, path)
-        if is_audio =="video":
-            thumbnail_url  = get_video_thumbnail(tmp_file)
-            videolength = getVideoLength(tmp_file)
-            os.remove(tmp_file)
-            return JsonResponse({'status': 'success','body':media_url,'thumbnail':thumbnail_url,'media_duration':videolength}, status=status.HTTP_201_CREATED)
+        thumbnail_url  = get_video_thumbnail(tmp_file)
+        videolength = getVideoLength(tmp_file)
+        os.remove(tmp_file)
+        return JsonResponse({'status': 'success','body':media_url,'thumbnail':thumbnail_url,'media_duration':videolength}, status=status.HTTP_201_CREATED)
+    else:
+        return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def upload_audio_to_s3(request):
+    media_file = request.FILES['media']
+    if media_file:
+        media_url = upload_media(media_file)
         return JsonResponse({'status': 'success','body':media_url,'thumbnail':'','media_duration':''}, status=status.HTTP_201_CREATED)
     else:
         return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
