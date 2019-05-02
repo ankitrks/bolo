@@ -826,7 +826,17 @@ def comment_view(request):
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
-
+@api_view(['POST'])
+def follow_like_list(request):
+    try:
+        all_like = Like.objects.filter(user = request.user,like = True).values_list('comment_id', flat=True)
+        all_follow = Follower.objects.filter(user_follower = request.user,is_active = True).values_list('user_following_id', flat=True)
+        userprofile = UserProfile.objects.get(user = request.user)
+        all_category_follow = userprofile.sub_category.all().values_list('id', flat=True)
+        print all_like,all_follow,all_category_follow
+        return JsonResponse({'all_like':list(all_like),'all_follow':list(all_follow),'all_category_follow':list(all_category_follow)}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
