@@ -715,8 +715,8 @@ def follow_sub_category(request):
         userprofile = UserProfile.objects.get(user = request.user)
         all_sub_category = userprofile.sub_category.all().values_list('id', flat=True)
         for each_sub_category in all_sub_category:
-            if each_sub_category.id == user_sub_category_id:
-                each_sub_category.remove()
+            if str(each_sub_category) == str(user_sub_category_id):
+                userprofile.sub_category.remove(Category.objects.get(pk = user_sub_category_id))
                 return JsonResponse({'message': 'Unfollowed'}, status=status.HTTP_200_OK)
             else:
                 category = Category.objects.get(pk = user_sub_category_id)
