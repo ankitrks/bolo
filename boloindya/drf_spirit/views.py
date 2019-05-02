@@ -654,7 +654,7 @@ def fb_profile_settings(request):
                     if userprofile.sub_category.all():
                         for each_category in userprofile.sub_category.all():
                             if not str(each_category.id) in sub_category_prefrences:
-                                userprofile.sub_category.remove(category)
+                                userprofile.sub_category.remove(each_category)
                 if language:
                     userprofile.language = str(language)
                     userprofile.save()
