@@ -685,7 +685,7 @@ def follow_user(request):
                 followed_user.follower_count = F('follower_count')+1
                 follow.save()
                 followed_user.save()
-                return JsonResponse({'message': 'Unfollowed'}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'Followed'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
