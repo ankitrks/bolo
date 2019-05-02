@@ -108,6 +108,7 @@ class Usertimeline(generics.ListCreateAPIView):
                     if term_key =='user_id':
                         is_user_timeline = True
             if filter_dic:
+                print filter_dic
                 topics = Topic.objects.filter(**filter_dic)
                 if is_user_timeline:
                     all_shared_post = ShareTopic.objects.filter(user_id = filter_dic['user_id'])
@@ -337,8 +338,8 @@ def createTopic(request):
     title        = request.POST.get('title', '')
     language_id  = request.POST.get('language_id', '')
     category_id  = request.POST.get('category_id', '')
-    media_file = request.FILES['media']
-    print media_file
+    # media_file = request.FILES.get['media']
+    # print media_file
 
     if title:
         topic.title          = title.upper()
