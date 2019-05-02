@@ -514,6 +514,9 @@ def verify_otp(request):
                     user = userprofile[0].user
                 else:
                     user = User.objects.create(username = mobile_no)
+                    userprofile = UserProfile.objects.get(user = user)
+                    userprofile.mobile_no = mobile_no
+                    userprofile.save()
                     add_bolo_score(user.id, 'initial_signup')
                 user_tokens = get_tokens_for_user(user)
                 otp_obj.for_user = user
