@@ -503,7 +503,9 @@ def verify_otp(request):
             if is_for_change_phone:
                 exclude_dict = {'is_active' : True, 'is_for_change_phone' : is_for_change_phone}
 
-            otp_obj = SingUpOTP.objects.filter(**exclude_dict).get(mobile_no=mobile_no, otp=otp)
+            otp_obj = SingUpOTP.objects.filter(**exclude_dict).filter(mobile_no=mobile_no, otp=otp).order_by('-id')
+            if otp_obj:
+                otp_obj=otp_obj[0]
             otp_obj.is_active = False
             otp_obj.used_at = timezone.now()
             if not is_reset_password and not is_for_change_phone:
