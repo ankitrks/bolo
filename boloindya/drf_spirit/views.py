@@ -310,10 +310,11 @@ def replyOnTopic(request):
             comment.topic_id      = topic_id
             comment.mobile_no     = mobile_no
             comment.save()
-            if request.POST.get('is_media') and not request.POST.get('is_audio'):
+            if thumbnail:
                 comment.thumbnail = thumbnail
+            if media_duration:
                 comment.media_duration = media_duration
-                comment.save()
+            comment.save()
             add_bolo_score(request.user.id,'reply_on_topic')
             return JsonResponse({'message': 'Reply Submitted'}, status=status.HTTP_201_CREATED)
         except User.DoesNotExist:
