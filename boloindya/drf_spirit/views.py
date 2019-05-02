@@ -31,6 +31,7 @@ from django.core.files.base import ContentFile
 from datetime import datetime
 import json
 from .utils import get_weight,add_bolo_score
+import itertools
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -135,8 +136,6 @@ class SearchTopic(generics.ListCreateAPIView):
     term---Topic Title
 
     post:
-
-
 
     Required Parameters:
     title and category_id 
