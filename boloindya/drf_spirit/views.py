@@ -512,8 +512,10 @@ def verify_otp(request):
                 userprofile = UserProfile.objects.filter(mobile_no = mobile_no)
                 if userprofile:
                     user = userprofile[0].user
+                    message = 'User Logged In'
                 else:
                     user = User.objects.create(username = mobile_no)
+                    message = 'User created'
                     userprofile = UserProfile.objects.get(user = user)
                     userprofile.mobile_no = mobile_no
                     userprofile.save()
@@ -521,7 +523,7 @@ def verify_otp(request):
                 user_tokens = get_tokens_for_user(user)
                 otp_obj.for_user = user
                 otp_obj.save()
-                return JsonResponse({'message': 'User created', 'username' : mobile_no, \
+                return JsonResponse({'message': message, 'username' : mobile_no, \
                         'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh']}, status=status.HTTP_200_OK)
             otp_obj.save()
             return JsonResponse({'message': 'OTP Validated', 'username' : mobile_no}, status=status.HTTP_200_OK)
@@ -588,7 +590,10 @@ def fb_profile_settings(request):
     activity        = request.POST.get('activity',None)
     language        = request.POST.get('language',None)
     sub_category_prefrences = request.POST.get('categories',None)
-    sub_category_prefrences = sub_category_prefrences.split(',')
+    try:
+        sub_category_prefrences = sub_category_prefrences.split(',')
+    except:
+        sub_category_prefrences = []
     if extra_data:
         extra_data = json.loads(extra_data)
     try:
