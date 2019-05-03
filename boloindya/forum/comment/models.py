@@ -54,7 +54,7 @@ class Comment(models.Model):
         verbose_name_plural = _("comments")
 
     def __unicode__(self):
-        return self.comment
+        return str(self.comment)
 
     def get_absolute_url(self):
         return reverse('spirit:comment:find', kwargs={'pk': str(self.id), })

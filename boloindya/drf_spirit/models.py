@@ -14,7 +14,7 @@ class SingUpOTP(models.Model):
     api_response_dump = models.TextField(null = True, blank = True)
     
     def __unicode__(self):
-        return self.mobile_no
+        return str(self.mobile_no)
 
     # def save(self, *args, **kwargs):
     #	if not self.id:
