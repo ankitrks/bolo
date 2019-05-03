@@ -24,6 +24,9 @@ class Category(models.Model):
     parent = models.ForeignKey('self', verbose_name=_("category parent"), null=True, blank=True , related_name="parent_category")
 
     title = models.CharField(_("title"), max_length=75)
+    hindi_title = models.CharField(_("hindi_title"), max_length=75,null=True,blank=True)
+    tamil_title = models.CharField(_("tamil_title"), max_length=75,null=True,blank=True)
+    telgu_title = models.CharField(_("telgu_title"), max_length=75,null=True,blank=True)
     slug = AutoSlugField(populate_from="title", db_index=False, blank=True)
     description = models.CharField(_("description"), max_length=255, blank=True)
     color = models.CharField(_("color"), max_length=7, blank=True,
