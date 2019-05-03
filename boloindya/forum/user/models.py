@@ -111,7 +111,7 @@ class Follower(RecordTimeStamp):
         verbose_name_plural = 'User\'s Followers'
 
     def __unicode__(self):
-            return self.user_following
+            return str(self.user_following)
 
 
 class Weight(RecordTimeStamp):
