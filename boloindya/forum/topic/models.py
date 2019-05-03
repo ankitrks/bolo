@@ -164,14 +164,14 @@ class ShareTopic(UserInfo):
     comment = models.ForeignKey('forum_comment.Comment',related_name='share_topic_topic_comment',null=True,blank=True)
 
     def __unicode__(self):
-        return self.topic
+        return self.topic if self.topic else self.comment
 class Like(UserInfo):
     comment = models.ForeignKey('forum_comment.Comment',related_name='like_topic_comment',null=True,blank=True)
     topic = models.ForeignKey(Topic, related_name='like_topic_share',null=True,blank=True)
     like = models.BooleanField(default = True)
 
     def __unicode__(self):
-        return self.topic
+        return self.like
 
 share_type_options = (
     ('0', "facebook"),
@@ -182,7 +182,7 @@ class SocialShare(UserInfo):
     topic = models.ForeignKey(Topic, related_name='social_share_topic_share',null=True,blank=True)
     comment = models.ForeignKey('forum_comment.Comment',related_name='social_share_topic_comment',null=True,blank=True)
     def __unicode__(self):
-        return self.topic
+        return self.share_type
 
 
 
