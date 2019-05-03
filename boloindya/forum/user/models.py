@@ -99,6 +99,8 @@ class UserProfile(models.Model):
                     .update(
                         last_post_hash=post_hash,
                         last_post_on=timezone.now()))
+        def __unicode__(self):
+            return self.user
 
 class Follower(RecordTimeStamp):
     user_following = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='user_following')# User being Followed
@@ -107,6 +109,9 @@ class Follower(RecordTimeStamp):
 
     class Meta:
         verbose_name_plural = 'User\'s Followers'
+
+    def __unicode__(self):
+            return self.user_following
 
 
 class Weight(RecordTimeStamp):
