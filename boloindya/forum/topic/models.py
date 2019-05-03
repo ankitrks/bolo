@@ -171,8 +171,8 @@ class Like(UserInfo):
     like = models.BooleanField(default = True)
 
     def __unicode__(self):
-        return self.like
-
+        return self.topic if self.topic else self.comment
+        
 share_type_options = (
     ('0', "facebook"),
     ('1', "whatsapp"),
