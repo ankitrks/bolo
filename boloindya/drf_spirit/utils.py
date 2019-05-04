@@ -22,9 +22,14 @@ import time
 from datetime import datetime, timedelta, date
 
 TIME_STRINGS = {
-    'year': '%dy',
-    'month': '%dM',
-    'day': '%dd',
+    'year': '%d year',
+    'month': '%d month',
+    'day': '%d day',
+}
+TIME_STRINGS_SECOND = {
+    'year': '%d years',
+    'month': '%d months',
+    'day': '%d days',
 }
 
 TIMESINCE_CHUNKS = (
@@ -44,18 +49,26 @@ def shortnaturaltime(value, now_time=None):
                 count = since // seconds
                 if count != 0:
                     break
+            if count <=1:
+                return TIME_STRINGS[name] % count
             
-            return TIME_STRINGS[name] % count
+            return TIME_STRINGS_SECOND[name] % count
         elif delta.seconds == 0:
             return 'now'
         elif delta.seconds < 60:
-            return "%ds" % delta.seconds
+            if delta.seconds <= 1:
+                return "%d second" % delta.seconds
+            return "%d seconds" % delta.seconds
         elif delta.seconds // 60 < 60:
             count = delta.seconds // 60
-            return "%dm" % count
+            if count <= 1:
+                return  "%d minute" % count
+            return "%d minutes" % count
         else:
             count = delta.seconds // 60 // 60
-            return "%dh" % count
+            if count <= 1:
+                return  "%d hour" % count
+            return "%d hours" % count
     
     # For future strings, we return now
     return 'now'
