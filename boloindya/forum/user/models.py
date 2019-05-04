@@ -29,7 +29,7 @@ refrence_options = (
 )
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, verbose_name=_("profile"), related_name='st')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, verbose_name=_("profile"), related_name='st',editable=False)
 
     slug = AutoSlugField(populate_from="user.username", db_index=False, blank=True)
     location = models.CharField(_("location"), max_length=75, blank=True)

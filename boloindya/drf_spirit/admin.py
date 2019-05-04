@@ -12,4 +12,4 @@ class WeightAdmin(admin.ModelAdmin):
 admin.site.register(Weight, WeightAdmin)
 class UserProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'bolo_score', )
-#admin.site.register(UserProfile,UserProfileAdmin)
+admin.site.register(UserProfile,UserProfileAdmin)

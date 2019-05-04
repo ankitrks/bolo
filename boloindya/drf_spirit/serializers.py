@@ -8,7 +8,7 @@ from forum.comment.models import Comment
 from forum.user.models import UserProfile
 from .relations import PresentableSlugRelatedField
 from .models import SingUpOTP
-from .utils import shortnaturaltime
+from .utils import shortnaturaltime,shortcounterprofile,shorcountertopic
 
 class CategorySerializer(ModelSerializer):
     class Meta:
@@ -53,6 +53,8 @@ class TopicSerializerwithComment(ModelSerializer):
     category = PresentableSlugRelatedField(queryset=Category.objects.all(),
                                            presentation_serializer=CategoryLiteSerializer,
                                            slug_field='slug')
+    view_count = SerializerMethodField()
+    comment_count = SerializerMethodField()
     video_comments = SerializerMethodField()
     audio_comments = SerializerMethodField()
     text_comments = SerializerMethodField()
@@ -86,11 +88,29 @@ class TopicSerializerwithComment(ModelSerializer):
     def get_date(self,instance):
         return shortnaturaltime(instance.date)
 
+    def get_view_count(self,instance):
+        return shorcountertopic(instance.view_count)
+
+    def get_comment_count(self,instance):
+        return shorcountertopic(instance.comment_count)
+
 class UserProfileSerializer(ModelSerializer):
+    follow_count= SerializerMethodField()
+    follower_count= SerializerMethodField()
+    bolo_score= SerializerMethodField()
     class Meta:
         model = UserProfile
         # fields = '__all__' 
         exclude = ('extra_data', )
+
+    def get_follow_count(self,instance):
+        return shortcounterprofile(instance.follow_count)
+
+    def get_follower_count(self,instance):
+        return shortcounterprofile(instance.follower_count)
+
+    def get_bolo_score(self,instance):
+        return shortcounterprofile(instance.bolo_score)
 
 class UserSerializer(ModelSerializer):
     userprofile = SerializerMethodField()

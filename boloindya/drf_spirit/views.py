@@ -111,6 +111,11 @@ class Usertimeline(generics.ListCreateAPIView):
                         filter_dic[term_key]=value
                         if term_key =='user_id':
                             is_user_timeline = True
+            if not is_user_timeline:
+                all_follower = Follow.objects.filter(user_follower = request.user).values_list('user_following_id',flat=True)
+                filter_dic['user_id__in'] = all_follower
+
+
             if filter_dic:
                 print filter_dic
                 topics = Topic.objects.filter(**filter_dic)
@@ -656,6 +661,8 @@ def fb_profile_settings(request):
                             if not str(each_category.id) in sub_category_prefrences:
                                 userprofile.sub_category.remove(each_category)
                 if language:
+                    if not userprofile.language:
+                        default_follow = deafult_boloindya_follow(request.user,language)
                     userprofile.language = str(language)
                     userprofile.save()
                 return JsonResponse({'message': 'Settings Chnaged'}, status=status.HTTP_200_OK)
@@ -868,6 +875,22 @@ def follow_like_list(request):
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+def deafult_boloindya_follow(user,language):
+    try:
+        if language == '1':
+            bolo_indya_user = User.objects.get(pk = 3)
+        elif language == '2':
+            bolo_indya_user = User.objects.get(pk = 4)
+        elif language == '3':
+            bolo_indya_user = User.objects.get(pk = 5)
+        else:
+            bolo_indya_user = User.objects.get(pk = 2)
+        follow,is_created = Follower.objects.get_or_create(user_follower = user,user_following=bolo_indya_user)
+        add_bolo_score(user.id,'follow')
+        return True
+    except:
+        return False
 
 
 
