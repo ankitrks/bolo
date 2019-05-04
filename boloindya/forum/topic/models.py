@@ -20,7 +20,7 @@ class RecordTimeStamp(models.Model):
         abstract = True
 
 class UserInfo(RecordTimeStamp):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='%(app_label)s_%(class)s_user')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='%(app_label)s_%(class)s_user',editable=False)
     is_active = models.BooleanField(default = True)
 
     def get_user(self):
@@ -42,7 +42,7 @@ class Topic(models.Model):
     it must be set explicitly
     :vartype reindex_at: `:py:class:models.DateTimeField`
     """
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='st_topics')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='st_topics',editable=False)
     category = models.ForeignKey('forum_category.Category', verbose_name=_("category"), related_name="category_topics")
 
     title = models.CharField(_("title"), max_length=255, blank = True, null = True)
