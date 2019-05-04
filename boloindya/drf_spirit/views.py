@@ -99,8 +99,8 @@ class Usertimeline(generics.ListCreateAPIView):
         topics              = []
         is_user_timeline    = False
         search_term         =self.request.GET.keys()
+        filter_dic      ={}
         if search_term:
-            filter_dic      ={}
             post            = []
             for term_key in search_term:
                 if term_key not in ['limit','offset']:
@@ -111,13 +111,7 @@ class Usertimeline(generics.ListCreateAPIView):
                         filter_dic[term_key]=value
                         if term_key =='user_id':
                             is_user_timeline = True
-            if not is_user_timeline:
-                all_follower = Follower.objects.filter(user_follower = self.request.user).values_list('user_following_id',flat=True)
-                filter_dic['user_id__in'] = all_follower
-
-
             if filter_dic:
-                print filter_dic
                 topics = Topic.objects.filter(**filter_dic)
                 if is_user_timeline:
                     all_shared_post = ShareTopic.objects.filter(user_id = filter_dic['user_id'])
@@ -127,9 +121,13 @@ class Usertimeline(generics.ListCreateAPIView):
                     if topics:
                         for each_post in topics:
                             post.append(each_post)
-                    topics=sorted(itertools.chain(post),key=lambda x: x.date, reverse=True)
+                else:
+                    post = topics
+                topics=sorted(itertools.chain(post),key=lambda x: x.date, reverse=True)
         else:
-                topics = Topic.objects.all()
+            all_follower = Follower.objects.filter(user_follower = self.request.user).values_list('user_following_id',flat=True)
+            category_follow = UserProfile.objects.get(user= self.request.user).sub_category.all().values_list('id',flat = True)
+            topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow))
         return topics;
 
 
