@@ -6,10 +6,12 @@ class SingUpOTPAdmin(admin.ModelAdmin):
 admin.site.register(SingUpOTP, SingUpOTPAdmin)
 
 
-from forum.user.models import Weight,UserProfile
+from forum.user.models import Weight,UserProfile,AppVersion
 class WeightAdmin(admin.ModelAdmin):
     list_display = ('features', 'weight', )
 admin.site.register(Weight, WeightAdmin)
 class UserProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'bolo_score', )
 admin.site.register(UserProfile,UserProfileAdmin)
+
+admin.site.register(AppVersion)

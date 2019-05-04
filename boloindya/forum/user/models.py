@@ -120,3 +120,13 @@ class Weight(RecordTimeStamp):
 
     def __unicode__(self):
         return self.features
+
+class AppVersion(RecordTimeStamp):
+    app_name = models.CharField(_("Name"), max_length=100, blank=True)
+    app_version = models.CharField(_("Version"), max_length=100, blank=True)
+
+    class Meta:
+        verbose_name_plural = 'AppVersions'
+
+    def __unicode__(self):
+            return str(self.app_name)

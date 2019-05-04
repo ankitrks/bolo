@@ -19,7 +19,7 @@ from .serializers import TopicSerializer, CategorySerializer, CommentSerializer,
 from forum.topic.models import Topic,ShareTopic,Like,SocialShare
 from forum.category.models import Category
 from forum.comment.models import Comment
-from forum.user.models import UserProfile,Follower
+from forum.user.models import UserProfile,Follower,AppVersion
 from django.db.models import F,Q
 from rest_framework_simplejwt.tokens import RefreshToken
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
@@ -869,8 +869,9 @@ def follow_like_list(request):
         all_follow = Follower.objects.filter(user_follower = request.user,is_active = True).values_list('user_following_id', flat=True)
         userprofile = UserProfile.objects.get(user = request.user)
         all_category_follow = userprofile.sub_category.all().values_list('id', flat=True)
-        print all_like,all_follow,all_category_follow
-        return JsonResponse({'all_like':list(all_like),'all_follow':list(all_follow),'all_category_follow':list(all_category_follow)}, status=status.HTTP_200_OK)
+        app_version = AppVersion.objects.get(app_name = 'android')
+        print all_like,all_follow,all_category_follow,app_version
+        return JsonResponse({'all_like':list(all_like),'all_follow':list(all_follow),'all_category_follow':list(all_category_follow),'app_version':str(app_version.app_version)}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
