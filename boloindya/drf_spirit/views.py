@@ -122,7 +122,7 @@ class Usertimeline(generics.ListCreateAPIView):
                     if topics:
                         for each_post in topics:
                             post.append(each_post)
-                    topics=sorted(itertools.chain(post),key=lambda x: x.comment_count, reverse=True)
+                    topics=sorted(itertools.chain(post),key=lambda x: x.date, reverse=True)
         else:
                 topics = Topic.objects.all()
         return topics;
