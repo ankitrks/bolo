@@ -112,7 +112,7 @@ class Usertimeline(generics.ListCreateAPIView):
                         if term_key =='user_id':
                             is_user_timeline = True
             if not is_user_timeline:
-                all_follower = Follow.objects.filter(user_follower = request.user).values_list('user_following_id',flat=True)
+                all_follower = Follower.objects.filter(user_follower = self.request.user).values_list('user_following_id',flat=True)
                 filter_dic['user_id__in'] = all_follower
 
 
