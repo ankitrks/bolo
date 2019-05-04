@@ -351,7 +351,7 @@ def createTopic(request):
     # print media_file
 
     if title:
-        topic.title          = title.upper()
+        topic.title          = title[0].upper()+title[1:]
     if request.POST.get('question_audio'):
         topic.question_audio = request.POST.get('question_audio')
     if request.POST.get('question_video'):
