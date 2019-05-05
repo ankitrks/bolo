@@ -313,6 +313,9 @@ def replyOnTopic(request):
             comment.topic_id      = topic_id
             comment.mobile_no     = mobile_no
             comment.save()
+            topic = Topic.objects.get(pk = topic_id)
+            topic.comment_count = F('comment_count')+1
+            topic.save()
             if thumbnail:
                 comment.thumbnail = thumbnail
             if media_duration:
