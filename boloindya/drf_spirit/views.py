@@ -881,13 +881,13 @@ def follow_like_list(request):
 def deafult_boloindya_follow(user,language):
     try:
         if language == '1':
-            bolo_indya_user = User.objects.get(pk = 3)
+            bolo_indya_user = User.objects.get(pk = 7)
         elif language == '2':
-            bolo_indya_user = User.objects.get(pk = 4)
+            bolo_indya_user = User.objects.get(pk = 9)
         elif language == '3':
-            bolo_indya_user = User.objects.get(pk = 5)
+            bolo_indya_user = User.objects.get(pk = 10)
         else:
-            bolo_indya_user = User.objects.get(pk = 2)
+            bolo_indya_user = User.objects.get(pk = 6)
         follow,is_created = Follower.objects.get_or_create(user_follower = user,user_following=bolo_indya_user)
         add_bolo_score(user.id,'follow')
         return True
