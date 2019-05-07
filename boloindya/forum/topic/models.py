@@ -56,7 +56,7 @@ class Topic(models.Model):
     last_active = models.DateTimeField(_("last active"), default=timezone.now)
     reindex_at = models.DateTimeField(_("reindex at"), default=timezone.now)
     language_id = models.CharField(_("language"), max_length=5, default='1')
-    question_image = models.CharField(_("Question image"), max_length=255, blank = True, null = True)
+    question_image = models.TextField(_("Question image"),null=True,blank=True)
 
     is_media = models.BooleanField(default=True)
     media_duration = models.CharField(_("duration"), max_length=20, default='',null=True,blank=True)
