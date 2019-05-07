@@ -9,3 +9,5 @@ class SpiritTopicConfig(AppConfig):
     name = 'forum.topic'
     verbose_name = "Forum Topic"
     label = 'forum_topic'
+    def ready(self):
+        import forum.topic.signals  # noqa

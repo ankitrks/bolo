@@ -11,6 +11,9 @@ from django.db.models import F
 from .managers import TopicQuerySet
 from ..core.utils.models import AutoSlugField
 from ..core.conf import settings
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
+from fcm.models import AbstractDevice
 
 
 class RecordTimeStamp(models.Model):
@@ -53,6 +56,7 @@ class Topic(models.Model):
     last_active = models.DateTimeField(_("last active"), default=timezone.now)
     reindex_at = models.DateTimeField(_("reindex at"), default=timezone.now)
     language_id = models.CharField(_("language"), max_length=5, default='1')
+    question_image = models.CharField(_("Question image"), max_length=255, blank = True, null = True)
 
     is_media = models.BooleanField(default=True)
     media_duration = models.CharField(_("duration"), max_length=20, default='',null=True,blank=True)
@@ -183,6 +187,52 @@ class SocialShare(UserInfo):
     comment = models.ForeignKey('forum_comment.Comment',related_name='social_share_topic_comment',null=True,blank=True)
     def __unicode__(self):
         return str(self.share_type)
+
+class FCMDevice(AbstractDevice):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='%(app_label)s_%(class)s_user',editable=False)
+
+    def __unicode__(self):
+        return str(self.user)
+
+
+    def register_device(self,request):
+        try:
+            instance = FCMDevice.objects.filter(device_id = request.POST['device_id'])
+            if not len(instance):
+                raise Exception
+            instance.update(user = request.user,is_active = True)
+            return JsonResponse({"status":"Success"},safe = False)
+        except Exception as e:
+            instance = FCMDevice.objects.create(device_id =request.POST['device_id'],user =request.user)
+            return JsonResponse({"status":"Success"},safe = False)
+
+
+    def remove_device(self,request):
+        try:
+            instance = FCMDevice.objects.filter(device_id = request.POST['device_id'], is_active = True, user = request.user)
+            if not len(instance):
+                raise Exception
+            instance.update(is_active = False)
+            return JsonResponse({"status":"Success"},safe = False)
+        except Exception as e:
+            return JsonResponse({"status":"Failed","message":"Device not found for this user"},safe = False)
+
+
+
+
+class Notification(UserInfo):
+    for_user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True,blank=True,editable=False)
+    # device_id = models.CharField(_("Device Id"), max_length=255, blank = True, null = True)
+    notification_type = models.CharField(_("notification_type"), max_length=5, default='1')
+    is_read = models.BooleanField(default=False)
+    read_at = models.DateTimeField(null=True,blank=True)
+    topic_type = models.ForeignKey(ContentType, verbose_name=('topic type'),null=True,blank=True)
+    topic_id = models.PositiveIntegerField(('object ID'),null=True,blank=True)
+    topic = GenericForeignKey('topic_type', 'topic_id')
+
+    def __unicode__(self):
+        return str(self.topic)
+
 
 
 

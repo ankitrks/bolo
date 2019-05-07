@@ -129,6 +129,7 @@ INSTALLED_APPS = [
     'forum.comment.poll',
     'drf_spirit',
     'rest_framework_swagger',
+    'fcm',
 
     # 'forum.core.tests'
 ]
@@ -148,6 +149,8 @@ CACHES.update({
         'TIMEOUT': None
     }
 })
+
+FCM_APIKEY = "AIzaSyBMF3hxMosSjE-95inmJTcaR-rNEWn2zpQ"
 
 AUTHENTICATION_BACKENDS = [
     'forum.user.auth.backends.UsernameAuthBackend',

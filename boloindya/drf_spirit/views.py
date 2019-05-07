@@ -342,6 +342,7 @@ def createTopic(request):
     category_id  = request.POST.get('category_id', '')
     topic.question_audio = request.POST.get('question_video')
     topic.question_video = request.POST.get('question_audio')
+    request.POST.get('question_image')
 
     Required Parameters:
     title and category_id 
@@ -362,6 +363,8 @@ def createTopic(request):
         topic.question_audio = request.POST.get('question_audio')
     if request.POST.get('question_video'):
         topic.question_video = request.POST.get('question_video')
+    if request.POST.get('question_image'):
+        topic.question_image = request.POST.get('question_image')
 
 
 
@@ -372,7 +375,7 @@ def createTopic(request):
             topic.category_id   = category_id
             topic.user_id       = user_id
             topic.save()
-            add_bolo_score(request.user.id,'create_topic')
+            # add_bolo_score(request.user.id,'create_topic')
             topic_json = TopicSerializerwithComment(topic).data
             return JsonResponse({'message': 'Topic Created','topic':topic_json}, status=status.HTTP_201_CREATED)
         except User.DoesNotExist:
