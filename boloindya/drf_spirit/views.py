@@ -498,6 +498,7 @@ def verify_otp(request):
     otp = request.POST.get('otp', None)
     is_reset_password = False
     is_for_change_phone = False
+    all_category_follow = []
     if request.POST.get('is_reset_password') and request.POST.get('is_reset_password') == '1':
         is_reset_password = True # inverted because of exclude
     if request.POST.get('is_for_change_phone') and request.POST.get('is_for_change_phone') == '1':
@@ -517,7 +518,8 @@ def verify_otp(request):
             if not is_reset_password and not is_for_change_phone:
                 userprofile = UserProfile.objects.filter(mobile_no = mobile_no)
                 if userprofile:
-                    user = userprofile[0].user
+                    userprofile = userprofile[0]
+                    user = userprofile.user
                     message = 'User Logged In'
                 else:
                     user = User.objects.create(username = mobile_no)
@@ -530,7 +532,7 @@ def verify_otp(request):
                 otp_obj.for_user = user
                 otp_obj.save()
                 return JsonResponse({'message': message, 'username' : mobile_no, \
-                        'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh']}, status=status.HTTP_200_OK)
+                        'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
             otp_obj.save()
             return JsonResponse({'message': 'OTP Validated', 'username' : mobile_no}, status=status.HTTP_200_OK)
         except Exception as e:
@@ -605,9 +607,12 @@ def fb_profile_settings(request):
     try:
         if activity == 'facebook_login' and refrence == 'facebook':
             try:
-                userprofile,is_created = UserProfile.objects.get_or_create(social_identifier = extra_data['id'])
+                userprofile = UserProfile.objects.get(social_identifier = extra_data['id'])
                 user=userprofile.user
-            except:
+                is_created=False
+            except Exception as e:
+                print e
+
                 user = User.objects.create(username = extra_data['id'])
                 userprofile = UserProfile.objects.get(user = user)
                 is_created = True
@@ -626,10 +631,10 @@ def fb_profile_settings(request):
                 userprofile.save()
                 user.save()
                 user_tokens = get_tokens_for_user(user)
-                return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh']}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
             else:
                 user_tokens = get_tokens_for_user(user)
-                return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh']}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
         elif activity == 'profile_save':
             try:
                 userprofile = UserProfile.objects.get(user = request.user)
