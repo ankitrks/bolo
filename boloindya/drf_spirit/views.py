@@ -316,9 +316,9 @@ def replyOnTopic(request):
             topic = Topic.objects.get(pk = topic_id)
             topic.comment_count = F('comment_count')+1
             topic.save()
-            user = request.user
-            user.answer_count = F('answer_count')+1
-            user.save()
+            userprofile = UserProfile.objects.get(user = request.user)
+            userprofile.answer_count = F('answer_count')+1
+            userprofile.save()
             if thumbnail:
                 comment.thumbnail = thumbnail
             if media_duration:
@@ -378,9 +378,9 @@ def createTopic(request):
             topic.category_id   = category_id
             topic.user_id       = user_id
             topic.save()
-            user = request.user
-            user.question_count = F('question_count')+1
-            user.save()
+            userprofile = UserProfile.objects.get(user = request.user)
+            userprofile.question_count = F('question_count')+1
+            userprofile.save()
             # add_bolo_score(request.user.id,'create_topic')
             topic_json = TopicSerializerwithComment(topic).data
             return JsonResponse({'message': 'Topic Created','topic':topic_json}, status=status.HTTP_201_CREATED)
