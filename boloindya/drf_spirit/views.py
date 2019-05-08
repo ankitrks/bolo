@@ -381,7 +381,7 @@ def createTopic(request):
             userprofile = UserProfile.objects.get(user = request.user)
             userprofile.question_count = F('question_count')+1
             userprofile.save()
-            # add_bolo_score(request.user.id,'create_topic')
+            add_bolo_score(request.user.id,'create_topic')
             topic_json = TopicSerializerwithComment(topic).data
             return JsonResponse({'message': 'Topic Created','topic':topic_json}, status=status.HTTP_201_CREATED)
         except User.DoesNotExist:
