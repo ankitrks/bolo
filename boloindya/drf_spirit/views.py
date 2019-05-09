@@ -112,17 +112,17 @@ class Usertimeline(generics.ListCreateAPIView):
                         if term_key =='user_id':
                             is_user_timeline = True
             if filter_dic:
-                topics = Topic.objects.filter(**filter_dic)
+                temp = Topic.objects.filter(**filter_dic)
                 if is_user_timeline:
                     all_shared_post = ShareTopic.objects.filter(user_id = filter_dic['user_id'])
                     if all_shared_post:
                         for each_post in all_shared_post:
                             post.append(each_post.topic)
                     if topics:
-                        for each_post in topics:
+                        for each_post in temp:
                             post.append(each_post)
                 else:
-                    post = topics
+                    post = temp
                 topics=sorted(itertools.chain(post),key=lambda x: x.date, reverse=True)
         else:
             all_follower = Follower.objects.filter(user_follower = self.request.user).values_list('user_following_id',flat=True)
