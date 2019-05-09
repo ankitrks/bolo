@@ -18,7 +18,7 @@ class CategorySerializer(ModelSerializer):
 class CategoryLiteSerializer(ModelSerializer):
     class Meta:
         model = Category
-        fields = ('id','title', 'slug', 'color')
+        fields = ('id','title', 'slug', 'color','hindi_title','tamil_title','telgu_title')
 
 class TopicSerializer(ModelSerializer):
     user = UserReadOnlyField()
