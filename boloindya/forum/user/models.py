@@ -124,6 +124,7 @@ class Weight(RecordTimeStamp):
 class AppVersion(RecordTimeStamp):
     app_name = models.CharField(_("Name"), max_length=100, blank=True)
     app_version = models.CharField(_("Version"), max_length=100, blank=True)
+    is_hard_push = models.BooleanField(default = False)
 
     class Meta:
         verbose_name_plural = 'AppVersions'
