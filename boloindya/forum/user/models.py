@@ -125,6 +125,9 @@ class AppVersion(RecordTimeStamp):
     app_name = models.CharField(_("Name"), max_length=100, blank=True)
     app_version = models.CharField(_("Version"), max_length=100, blank=True)
     is_hard_push = models.BooleanField(default = False)
+    changes_title = models.CharField(_("Changes Title"), max_length=225, null=True,blank=True)
+    changes = models.TextField(_("Changes"),null=True,blank=True)
+
 
     class Meta:
         verbose_name_plural = 'AppVersions'

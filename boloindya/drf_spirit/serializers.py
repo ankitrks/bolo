@@ -5,7 +5,7 @@ from forum.topic.models import Topic
 from django.contrib.auth.models import User
 from forum.category.models import Category
 from forum.comment.models import Comment
-from forum.user.models import UserProfile
+from forum.user.models import UserProfile,AppVersion
 from .relations import PresentableSlugRelatedField
 from .models import SingUpOTP
 from .utils import shortnaturaltime,shortcounterprofile,shorcountertopic
@@ -13,6 +13,11 @@ from .utils import shortnaturaltime,shortcounterprofile,shorcountertopic
 class CategorySerializer(ModelSerializer):
     class Meta:
         model = Category
+        fields = '__all__'
+
+class AppVersionSerializer(ModelSerializer):
+    class Meta:
+        model = AppVersion
         fields = '__all__'
 
 class CategoryLiteSerializer(ModelSerializer):

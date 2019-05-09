@@ -15,7 +15,7 @@ from django.core.files.base import ContentFile
 from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
 from .permissions import IsOwnerOrReadOnly
-from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,UserSerializer
+from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,AppVersionSerializer,UserSerializer
 from forum.topic.models import Topic,ShareTopic,Like,SocialShare
 from forum.category.models import Category
 from forum.comment.models import Comment
@@ -885,8 +885,8 @@ def follow_like_list(request):
         userprofile = UserProfile.objects.get(user = request.user)
         all_category_follow = userprofile.sub_category.all().values_list('id', flat=True)
         app_version = AppVersion.objects.get(app_name = 'android')
-        print all_like,all_follow,all_category_follow,app_version
-        return JsonResponse({'all_like':list(all_like),'all_follow':list(all_follow),'all_category_follow':list(all_category_follow),'app_version':str(app_version.app_version),'is_hard_push':str(app_version.is_hard_push)}, status=status.HTTP_200_OK)
+        app_version = AppVersionSerializer(app_version).data
+        return JsonResponse({'all_like':list(all_like),'all_follow':list(all_follow),'all_category_follow':list(all_category_follow),'app_version':app_version}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
