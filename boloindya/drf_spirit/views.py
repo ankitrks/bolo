@@ -117,7 +117,10 @@ class Usertimeline(generics.ListCreateAPIView):
                     all_shared_post = ShareTopic.objects.filter(user_id = filter_dic['user_id'])
                     if all_shared_post:
                         for each_post in all_shared_post:
-                            post.append(each_post.topic)
+                            if each_post.topic:
+                                post.append(each_post.topic)
+                            elif each_post.comment:
+                                post.append(each_post.comment.topic)
                     if topics:
                         for each_post in topics:
                             post.append(each_post)
