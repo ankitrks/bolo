@@ -3,10 +3,262 @@
 {% block title %}BoloIndya{% endblock %}
 {% block content %}
 <style>
-    .upper_tab {
-            background: #f1f0f0;
-            padding: 30px 0px;
-        }
+.upper_tab {
+    background: #f1f0f0;
+    padding: 30px 0px;
+}
+
+.get_your_bolo_app {
+    font-size: 30px;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.get_your_bolo_app span {
+    font-weight: 600;
+}
+
+.get_your_bolo_app img {}
+
+.card_profile .line {
+    height: 1px;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    margin: 15px 0px;
+}
+
+.card_profile .description {
+    font-size: 16px;
+    padding-left: 5px;
+}
+
+.card_profile .profile_name {
+    font-weight: 700;
+}
+
+.card_profile .profile_name span {
+    font-weight: 400;
+}
+
+.card_profile .about {
+    font-size: 13px;
+}
+
+.ask_question {
+    text-align: center;
+}
+
+.ask_question .row .ask_english {
+    background: white;
+    padding: 10px 29%;
+    border-radius: 4px;
+    -webkit-box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.25);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.25);
+    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.25);
+}
+
+.ask_question .row .ask_hindi {
+    background: #BB3335;
+    border-radius: 4px;
+    color: white;
+    padding: 10px 29%;
+    transition: all 0.3s ease-in-out;
+    -webkit-box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.25);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.25);
+    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.25);
+}
+
+.play_store_pic {
+    padding: 20px 0px;
+}
+
+.play_store_pic img {
+    margin-left: 40px;
+}
+
+.lower_tab {
+    padding: 30px 0px;
+}
+
+.lower_tab .container h2 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.lower_tab .container .choose_language_tabs {
+    text-align: center;
+}
+
+.lower_tab .container .choose_language_tabs .language {
+    background: #f1f0f0;
+    margin: 1%;
+    width: 23%;
+    font-size: 20px;
+    padding: 10px 0px;
+    border-radius: 4px;
+    -webkit-box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.25);
+}
+
+.lower_tab .container .choose_language_tabs .language.active {
+    background: #CB3B3D;
+    color: white;
+    font-weight: 600;
+}
+
+.lower_tab .container h4 {
+    text-align: center;
+    margin: 20px 0px;
+}
+
+.upcoming_languages {
+    text-align: center;
+    font-size: 18px;
+}
+
+.want_to_get_updated {
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 30px;
+    text-align: center;
+}
+
+.want_to_get_updated span {
+    opacity: 0.7;
+}
+
+form {
+    margin-top: 20px;
+    width: 70%;
+}
+
+form select {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+}
+
+form .submit {
+    width: 30%;
+    margin-left: 35%;
+    font-size: 13px;
+}
+
+.footer {
+    background: #f1f0f0;
+    padding: 30px 0px;
+}
+
+.social-icons li {
+    background: #323F4E;
+}
+
+.social-icons li .fab {
+    color: white;
+}
+
+.subscribe_form h4 {
+    opacity: 0.7;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.footer_links {
+    padding: 10px;
+}
+
+.footer_links h6 {
+    font-size: 14px;
+    text-align: left;
+}
+
+.footer_links ul {
+    padding: 0px;
+}
+
+.footer_links ul li {
+    font-size: 12px;
+    text-align: left;
+}
+
+.subscribe_form {
+    width: 100%;
+}
+
+.form_group input[type=email] {
+    width: 200px;
+    font-size: 12px;
+}
+
+.form_group input[type=submit] {
+    font-size: 12px;
+    width: 120px;
+    margin-left: 20px;
+}
+
+.play_store_image_footer {
+    float: right;
+}
+.play_services_1{
+    display: none;
+}
+
+@media (max-width:650px) {
+    .get_your_bolo_app {
+        font-size: 16px;
+    }
+
+    .get_your_bolo_app img {
+        width: 150px;
+    }
+
+    .card_profile img {
+        margin-bottom: 10px;
+    }
+
+    .ask_english {
+        margin-bottom: 10px;
+    }
+
+    .play_store_pic img {
+        margin-left: 15%;
+        margin-bottom: 10px;
+    }
+
+    .lower_tab .container h2 {
+        font-size: 24px;
+    }
+
+    .lower_tab .container .choose_language_tabs .language {
+        width: 45%;
+        margin-left: 3%;
+        margin-bottom: 15px;
+    }
+
+    .lower_tab .container h4 {
+        font-size: 20px;
+        text-decoration: underline;
+    }
+
+    form {
+        margin-left: 0px !important;
+    }
+
+    form .form_group {
+        margin: 20px 0px;
+    }
+
+    form .submit {
+        width: 60%;
+        margin-left: 20%;
+        font-size: 13px;
+    }
+    .play_services_1{
+    display: block;
+}
+.play_services_2{
+    display: none;
+}
+}
         
 
     </style>
