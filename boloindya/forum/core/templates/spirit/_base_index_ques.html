@@ -36,7 +36,7 @@
     <script src="/media/js/script_qa.js"></script>
 
     <style type="text/css">
-      .video-div{height: 270px;background: url(http://lorempixel.com/200/200/) 0% 40% no-repeat;/*background: url(/media/img/video_thumb.jpg) 0% 40% no-repeat;*/background-size: 100%;cursor: pointer;}
+      
       .video-div img{min-width: 50px !important;width: 50px !important;min-height: 50px !important;left: 50% !important;top: 51% !important;background: white;padding: 10px 5px;border-radius: 5px;opacity: 0.95;width: 90px !important;height: 70px !important;}
       .audio-div img{position: relative;left: 3% !important;top: 15% !important;width: 50px !important;padding: 0;background: none;}
       .audio-div{height: 100px !important;background: url(/media/img/audio_thumb.png) 75px 40% no-repeat;background-size: 102%;}
@@ -48,6 +48,12 @@
       .left_sec{position: fixed;}
       .mid_sec{margin: 0 auto;}
       #accordion{max-height: 79vh;overflow: auto;}
+      .displayBlock{
+        display: block;
+      }
+      .displayNone{
+        display: none;
+      }
     </style>
 
     <script>
@@ -115,7 +121,33 @@
         });
       });
     </script>
-    {% block js %}{% endblock %}
+    {% block js %}<script>
+    function changeLikeFunction(comment_id){
+    console.log(comment_id);
+    var url = '/topic/comment_likes/'
+    var form_data = new FormData()
+    form_data.set('csrfmiddlewaretoken',getCookie('csrftoken'))
+    form_data.set('comment_id',comment_id)
+
+    $.ajax({
+    type : 'POST',
+    url : url,
+    data : form_data,
+    contentType : false,
+    processData : false,
+    success : function(response){
+      console.log(response)
+      
+    },
+    error:function(response){
+          console.log(response)
+    },
+  })
+    }
+    </script>
+
+
+    {% endblock %}
     {% block head-extra %}{% endblock %}
     <!--[if (lt IE 9) & (!IEMobile)]>
     <script src="//cdnjs.cloudflare.com/ajax/libs/selectivizr/1.0.2/selectivizr-min.js"></script>
@@ -128,5 +160,28 @@
     {% render_messages messages %}
     {% block content %}{% endblock %}
     {% include 'spirit/ques_and_ans_footer.html' %}
+
+
+
+    <!-- Modal -->
+<div id="exampleModalLive" class="modal fade show" tabindex="-1" role="dialog" aria-labelledby="exampleModalLiveLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
   </body>
 </html>

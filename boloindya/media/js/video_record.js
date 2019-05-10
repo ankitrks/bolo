@@ -1,6 +1,7 @@
 function disableAndMove(){
   var onPublish = $('[name="onPublish"]').val();
   if(onPublish != '1'){
+    // $('#exampleModalLive').addClass('displayBlock')
     var res = confirm("Device / browser doesn't support this feature. Press OK to Answer in Text & Cancel to go back");
     if (res == true) {window.location = window.location.href.replace('/video', '/text');}
     else { window.location = '/topic/' + window.location.href.split('/')[4] + '/';}

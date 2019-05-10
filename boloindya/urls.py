@@ -24,8 +24,12 @@ from rest_framework.documentation import include_docs_urls
 schema_view = get_swagger_view(title='BoloIndya API')
 
 
+
 patterns = [
     url(r'^$', forum.topic.views.new_home, name='index'),
+    url(r'^about/$', forum.topic.views.get_about, name='get_about'),
+    url(r'^terms-of-service/$', forum.topic.views.get_termofservice, name='get_termofservice'),
+    url(r'^privacy-policy/$', forum.topic.views.get_privacypolicy, name='get_privacypolicy'),
 
     url(r'^robots.txt$', forum.topic.views.robotstext, name='roboxt'),
     url(r'^sitemap.xml$', forum.topic.views.sitemapxml, name='sitemap'),

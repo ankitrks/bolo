@@ -20,9 +20,11 @@ from .models import Topic
 from .forms import TopicForm
 from . import utils
 from django.template.loader import render_to_string
-from django.http import JsonResponse
+from django.http import JsonResponse,HttpResponse
 import json
 from django.core.paginator import Paginator
+from forum.topic.models import Like
+from django.db.models import F,Q
 
 # Required for speech to text...
 import io
@@ -284,11 +286,52 @@ def ques_ans_index(request, category_id = None, cat_slug = ''):
     }
     return render(request, 'spirit/topic/_ques_and_ans_index.html', context)
 
+def comment_likes(request):
+    comment_id = request.POST.get('comment_id',None)
+    comment = Comment.objects.get(pk = comment_id)
+    userprofile = request.user.st
+    liked,is_created = Like.objects.get_or_create(comment_id = comment_id,user = request.user)
+    if is_created:
+            comment.likes_count = F('likes_count')+1
+            comment.save()
+            add_bolo_score(request.user.id,'liked')
+            userprofile.like_count = F('like_count')+1
+            userprofile.save()
+            return HttpResponse(json.dumps({'success':'Success'}),content_type="application/json")
+    else:
+        if liked.like:
+            liked.like = False
+            liked.save()
+            comment.likes_count = F('likes_count')-1
+            comment.save()
+            userprofile.like_count = F('like_count')-1
+            userprofile.save()
+        else:
+            liked.like = True
+            liked.save()
+            comment.likes_count = F('likes_count')+1
+            comment.save()
+            userprofile.like_count = F('like_count')+1
+            userprofile.save()
+        return HttpResponse(json.dumps({'success':'Success'}),content_type="application/json")
+    return HttpResponse(json.dumps({'fail':'Fail'}),content_type="application/json")
+
+
 def index(request):
     return render(request, 'spirit/topic/_home.html')
 
 def new_home(request):
-    return render(request, 'spirit/topic/main_landing.html')
+    return render(request, 'spirit/topic/temporary_landing.html')
+    # return render(request, 'spirit/topic/main_landing.html')
+
+def get_about(request):
+    return render(request, 'spirit/topic/about.html')
+
+def get_termofservice(request):
+    return render(request, 'spirit/topic/termsofservice.html')
+
+def get_privacypolicy(request):
+    return render(request, 'spirit/topic/privacypolicy.html')
 
 def robotstext(request):
     return render(request, 'spirit/topic/robots.txt') 

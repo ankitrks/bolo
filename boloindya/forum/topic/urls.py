@@ -28,6 +28,7 @@ urlpatterns = [
 
     url(r'^active/$', views.index_active, name='index-active'),
     url(r'^recent/$', views.recent_topics, name='recent_topics'),
+    url(r'^comment_likes/$', views.comment_likes, name='comment_likes'),
 
     url(r'^moderate/', include(forum.topic.moderate.urls, namespace='moderate')),
     url(r'^unread/', include(forum.topic.unread.urls, namespace='unread')),

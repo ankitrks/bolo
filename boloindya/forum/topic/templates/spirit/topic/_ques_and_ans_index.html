@@ -32,19 +32,19 @@
             </div>
             <!-- Middle section for main content -->
             <div class="col-md-6 mid_sec">
-                <!-- user information -->
+                <!-- user information 
                 {% if user.is_authenticated %}
                 <div class="user_info">
                     <img src="http://lorempixel.com/200/200/" alt="user image" class="user_image"/>
                     <div class="user_name"> {{ user.username }} </div>
                     <a href="/topic/discussion" class="ask_link" style="position: absolute;right: 30px;margin-top: 3px;color: #dc3545;">Q/A Listing</a>
                 </div>
-                {% endif %}
-                <div class="write_quest_sec">
+                {% endif %}-->
+                <!--<div class="write_quest_sec">
                     <a href="/topic/publish/" class="ask_link">
                         <div class="write_sec"><div class="quest_text">Ask <span>your question</span></div></div>
                     </a>
-                </div>
+                </div>-->
                 <div id="question_tab">
                     {% if topics %}
                         {% include "spirit/topic/_single_topic.html" %}

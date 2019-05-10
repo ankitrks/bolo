@@ -3,15 +3,19 @@
         <!-- user info -->
         <div class="quest_user_info">
             <div class="quest_user_info_img">
-                <img src="http://lorempixel.com/200/200/" alt="user image" class="quest_user_image"/>
+                <img src="{% if user.st.profile_pic %}{{user.st.profile_pic}}{% else %}https://proxy.duckduckgo.com/iu/?u=http%3A%2F%2Fwww.masscue.org%2Fwp-content%2Fuploads%2F2017%2F03%2Fmale-no-image.jpg&f=1{% endif %}" alt="user image" class="quest_user_image"/>
             </div>
             <div class="quest_user_detail">
-                <div class="user_name">{{ topic.user.username }}</div>
-                <div class="feed_post_date">Answered On {{ topic.date.date }}</div>
+                <div class="user_name">{{ topic.user.username }} . <i class="fas fa-user-plus"></i></div>
+                <div class="feed_post_date">Answered On {{ topic.date.date }} .  {% if topic.language_id == '1' %}{{topic.category.title}}{% elif topic.language_id == '2' %}{{topic.category.hindi_title}}{% elif topic.language_id == '3' %}{{topic.category.tamil_title}}{% elif topic.language_id == '4' %}{{topic.category.telgu_title}}{% endif %}</div>
             </div>
         </div>
         <!-- Question -->
         <div class="question"><a href="{% url 'spirit:topic:detail' topic.id %}" class="ques_link">{{ topic.title|capfirst }}</a></div>
+                                    <i class="fa fa-eye"></i>
+                                    <span id="updated_like{{ video.id}}">{{ topic.view_count }}</span> Views
+                                    </span>
+
         <!-- Answer options -->
         <div class="answer_option">
             <div class="ans_opt_list">
@@ -47,13 +51,13 @@
                     <div class="owl-carousel owl-theme">
                         {% for video in topic.get_video_comments %}
                             <div class="item">
-                                <div id="video-div-{{ video.id }}" class="video-div" src="{{ video.get_updated_url }}"><img src="/media/img/play.svg"></div>
+                                <div id="video-div-{{ video.id }}" class="video-div" src="{{ video.get_updated_url }}" style="height: 270px;background: url({% if video.thumbnail %}{{video.thumbnail}}{% else %}http://lorempixel.com/200/200/{% endif %}) 0% 40% no-repeat;background-size: 100%;cursor: pointer;"><img src="/media/img/play.svg"></div>
                                 <div class="posted_by">
                                     Posted by {{ video.user.username }} <span>{{ video.date.date }}  &nbsp;</span>
-                                    <!-- <span id="like_comment{{video.id}}" data_user='{% if user.username %}1{% else %}0{% endif %}' data_id="{{ video.id }}" onClick="changeLikeFunction({{ video.id }})" style="cursor:pointer;">
-                                    <i class="fa fa-heart"></i>
+                                    <span id="like_comment{{video.id}}" data_user='{% if user.username %}1{% else %}0{% endif %}' data_id="{{ video.id }}" onClick="changeLikeFunction({{ video.id }})" style="cursor:pointer;">
+                                    <i class="far fa-thumbs-up"></i>
                                     <span id="updated_like{{ video.id}}">{{ video.likes_count }}</span> likes
-                                    </span> --> &nbsp;
+                                    </span>  &nbsp;
                                     <span style="float: right;"><i class="fas fa-share-square"></i> Share On
                                         <a target="blank" href="https://api.whatsapp.com/send?text={{ topic.title }} https://www.boloindya.com/topic/{{topic.id}}/" data-action="share/whatsapp/share"><i class="fab fa-whatsapp-square"></i></a>
                                         <a href="https://www.facebook.com/sharer.php?u=https://www.boloindya.com/topic/{{topic.id}}&t={{ topic.title }}"><i class="fab fa-facebook-square"></i></a>
@@ -83,14 +87,19 @@
                     <div class="inner_ans_area" style="margin-bottom: 5px;">
                         <div class="quest_user_info">
                             <div class="quest_user_info_img">
-                                <img src="http://lorempixel.com/200/200/" alt="user image" class="quest_user_image"/>
+                                <img src="{% if user.st.profile_pic %}{{user.st.profile_pic}}{% else %}https://proxy.duckduckgo.com/iu/?u=http%3A%2F%2Fwww.masscue.org%2Fwp-content%2Fuploads%2F2017%2F03%2Fmale-no-image.jpg&f=1{% endif %}" alt="user image" class="quest_user_image"/>
                             </div>
                             <div class="quest_user_detail">
-                                <div class="user_name">{{ video.user.username }}</div>
+                                <div class="user_name">{{ video.user.username }} . <i class="fas fa-user-plus"></i></div>
                                 <div class="feed_post_date">Answered {{ video.date.date }}</div>
                             </div>
                         </div>
-                        <div id="video-div-{{ video.id }}" class="video-div audio-div" src="{{ video.get_updated_url }}"><img src="/media/img/play.svg"></div>
+                        <div id="video-div-{{ video.id }}" class="video-div audio-div" src="{{ video.get_updated_url }}"><img src="/media/img/play.svg">
+                        </div>
+                        <span id="like_comment{{video.id}}" data_user='{% if user.username %}1{% else %}0{% endif %}' data_id="{{ video.id }}" onClick="changeLikeFunction({{ video.id }})" style="cursor:pointer;">
+                                    <i class="far fa-thumbs-up"></i>
+                                    <span id="updated_like{{ video.id}}">{{ video.likes_count }}</span> likes
+                                    </span> 
                     </div>
                 {% endfor %}
             </div>
@@ -105,10 +114,10 @@
                         <!-- User info -->
                         <div class="quest_user_info">
                             <div class="quest_user_info_img">
-                                <img src="http://lorempixel.com/200/200/" alt="user image" class="quest_user_image"/>
+                                <img src="{% if user.st.profile_pic %}{{user.st.profile_pic}}{% else %}https://proxy.duckduckgo.com/iu/?u=http%3A%2F%2Fwww.masscue.org%2Fwp-content%2Fuploads%2F2017%2F03%2Fmale-no-image.jpg&f=1{% endif %}" alt="user image" class="quest_user_image"/>
                             </div>
                             <div class="quest_user_detail">
-                                <div class="user_name">{{ video.user.username }}</div>
+                                <div class="user_name">{{ video.user.username }} . <i class="fas fa-user-plus"></i></div>
                                 <div class="feed_post_date">Answered {{ video.date.date }}</div>
                             </div>
                         </div>
@@ -116,6 +125,10 @@
                         <div class="ans_text">
                             {{ video.comment }}
                         </div>
+                        <span id="like_comment{{video.id}}" data_user='{% if user.username %}1{% else %}0{% endif %}' data_id="{{ video.id }}" onClick="changeLikeFunction({{ video.id }})" style="cursor:pointer;">
+                                    <i class="far fa-thumbs-up"></i>
+                                    <span id="updated_like{{ video.id}}">{{ video.likes_count }}</span> likes
+                                    </span>
                     </div>
                 </div>
             {% endfor %}
