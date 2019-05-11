@@ -112,8 +112,8 @@ class Usertimeline(generics.ListCreateAPIView):
                         if term_key =='user_id':
                             is_user_timeline = True
             if filter_dic:
-                topics = Topic.objects.filter(**filter_dic)
                 if is_user_timeline:
+                    topics = Topic.objects.filter(**filter_dic)
                     all_shared_post = ShareTopic.objects.filter(user_id = filter_dic['user_id'])
                     if all_shared_post:
                         for each_post in all_shared_post:
@@ -125,6 +125,16 @@ class Usertimeline(generics.ListCreateAPIView):
                         for each_post in topics:
                             post.append(each_post)
                 else:
+                    all_follower = Follower.objects.filter(user_follower = self.request.user).values_list('user_following_id',flat=True)
+                    category_follow = UserProfile.objects.get(user= self.request.user).sub_category.all().values_list('id',flat = True)
+                    if 'language_id' in search_term and 'category' in search_term:
+                        topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),category__slug =self.request.GET.get('category'))
+                    elif 'language_id' in search_term:
+                        topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'))
+                    elif 'category' in search_term:
+                        topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),category__slug =self.request.GET.get('category'))
+                    else:
+                        topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow))
                     post = topics
             topics=sorted(itertools.chain(post),key=lambda x: x.date, reverse=True)
         else:
@@ -679,8 +689,7 @@ def fb_profile_settings(request):
                             if not str(each_category.id) in sub_category_prefrences:
                                 userprofile.sub_category.remove(each_category)
                 if language:
-                    if not userprofile.language:
-                        default_follow = deafult_boloindya_follow(request.user,language)
+                    default_follow = deafult_boloindya_follow(request.user,str(language))
                     userprofile.language = str(language)
                     userprofile.save()
                 return JsonResponse({'message': 'Settings Chnaged'}, status=status.HTTP_200_OK)
@@ -906,7 +915,8 @@ def deafult_boloindya_follow(user,language):
         else:
             bolo_indya_user = User.objects.get(username = 'boloindya_en')
         follow,is_created = Follower.objects.get_or_create(user_follower = user,user_following=bolo_indya_user)
-        add_bolo_score(user.id,'follow')
+        if is_created:
+            add_bolo_score(user.id,'follow')
         return True
     except:
         return False
