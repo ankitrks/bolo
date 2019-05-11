@@ -517,6 +517,7 @@ def verify_otp(request):
         request.POST.get('is_for_change_phone')
     """
     mobile_no = request.POST.get('mobile_no', None)
+    language = request.POST.get('language',None)
     otp = request.POST.get('otp', None)
     is_reset_password = False
     is_for_change_phone = False
@@ -549,6 +550,8 @@ def verify_otp(request):
                     userprofile = UserProfile.objects.get(user = user)
                     userprofile.mobile_no = mobile_no
                     userprofile.save()
+                    if language:
+                        default_follow = deafult_boloindya_follow(user.id,str(language))
                     add_bolo_score(user.id, 'initial_signup')
                 user_tokens = get_tokens_for_user(user)
                 otp_obj.for_user = user
@@ -651,6 +654,9 @@ def fb_profile_settings(request):
                 userprofile.extra_data = extra_data
                 userprofile.user = user
                 userprofile.save()
+                if language:
+                    default_follow = deafult_boloindya_follow(user.id,str(language))
+                    userprofile.language = str(language)
                 user.save()
                 user_tokens = get_tokens_for_user(user)
                 return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
@@ -917,6 +923,12 @@ def deafult_boloindya_follow(user,language):
         follow,is_created = Follower.objects.get_or_create(user_follower = user,user_following=bolo_indya_user)
         if is_created:
             add_bolo_score(user.id,'follow')
+            userprofile = UserProfile.objects.get(user = user)
+            bolo_indya_profile = UserProfile.objects.get(user = bolo_indya_user)
+            userprofile.follow_count = F('follow_count')+1
+            userprofile.save()
+            bolo_indya_profile.follower_count = F('follower_count')+1
+            bolo_indya_profile.save()
         return True
     except:
         return False
