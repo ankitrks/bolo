@@ -911,27 +911,27 @@ def follow_like_list(request):
 
 
 def deafult_boloindya_follow(user,language):
-    try:
-        if language == '1':
-            bolo_indya_user = User.objects.get(username = 'boloindya_hi')
-        elif language == '2':
-            bolo_indya_user = User.objects.get(username = 'boloindya_ta')
-        elif language == '3':
-            bolo_indya_user = User.objects.get(username = 'boloindya_te')
-        else:
-            bolo_indya_user = User.objects.get(username = 'boloindya_en')
-        follow,is_created = Follower.objects.get_or_create(user_follower = user,user_following=bolo_indya_user)
-        if is_created:
-            add_bolo_score(user.id,'follow')
-            userprofile = UserProfile.objects.get(user = user)
-            bolo_indya_profile = UserProfile.objects.get(user = bolo_indya_user)
-            userprofile.follow_count = F('follow_count')+1
-            userprofile.save()
-            bolo_indya_profile.follower_count = F('follower_count')+1
-            bolo_indya_profile.save()
-        return True
-    except:
-        return False
+    # try:
+    if language == '1':
+        bolo_indya_user = User.objects.get(username = 'boloindya_hi')
+    elif language == '2':
+        bolo_indya_user = User.objects.get(username = 'boloindya_ta')
+    elif language == '3':
+        bolo_indya_user = User.objects.get(username = 'boloindya_te')
+    else:
+        bolo_indya_user = User.objects.get(username = 'boloindya_en')
+    follow,is_created = Follower.objects.get_or_create(user_follower = user,user_following=bolo_indya_user)
+    if is_created:
+        add_bolo_score(user.id,'follow')
+        userprofile = UserProfile.objects.get(user = user)
+        bolo_indya_profile = UserProfile.objects.get(user = bolo_indya_user)
+        userprofile.follow_count = F('follow_count') + 1
+        userprofile.save()
+        bolo_indya_profile.follower_count = F('follower_count') + 1
+        bolo_indya_profile.save()
+    #     return True
+    # except:
+    #     return False
 
 
 
