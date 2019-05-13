@@ -653,6 +653,8 @@ def fb_profile_settings(request):
                 userprofile.refrence = refrence
                 userprofile.extra_data = extra_data
                 userprofile.user = user
+                userprofile.bolo_score += 100
+                userprofile.follow_count += 1
                 userprofile.save()
                 if str(language):
                     default_follow = deafult_boloindya_follow(user,str(language))
@@ -695,7 +697,7 @@ def fb_profile_settings(request):
                             if not str(each_category.id) in sub_category_prefrences:
                                 userprofile.sub_category.remove(each_category)
                 if language:
-                    default_follow = deafult_boloindya_follow(request.user,str(language))
+                    # default_follow = deafult_boloindya_follow(request.user,str(language))
                     userprofile.language = str(language)
                     userprofile.save()
                 return JsonResponse({'message': 'Settings Chnaged'}, status=status.HTTP_200_OK)
