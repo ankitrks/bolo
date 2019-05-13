@@ -550,8 +550,8 @@ def verify_otp(request):
                     userprofile = UserProfile.objects.get(user = user)
                     userprofile.mobile_no = mobile_no
                     userprofile.save()
-                    if language:
-                        default_follow = deafult_boloindya_follow(user.id,str(language))
+                    if str(language):
+                        default_follow = deafult_boloindya_follow(user,str(language))
                     add_bolo_score(user.id, 'initial_signup')
                 user_tokens = get_tokens_for_user(user)
                 otp_obj.for_user = user
@@ -654,8 +654,8 @@ def fb_profile_settings(request):
                 userprofile.extra_data = extra_data
                 userprofile.user = user
                 userprofile.save()
-                if language:
-                    default_follow = deafult_boloindya_follow(user.id,str(language))
+                if str(language):
+                    default_follow = deafult_boloindya_follow(user,str(language))
                     userprofile.language = str(language)
                 user.save()
                 user_tokens = get_tokens_for_user(user)
