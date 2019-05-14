@@ -130,6 +130,7 @@ INSTALLED_APPS = [
     'drf_spirit',
     'rest_framework_swagger',
     'fcm',
+    'rangefilter',
 
     # 'forum.core.tests'
 ]
