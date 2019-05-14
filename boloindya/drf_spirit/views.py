@@ -25,6 +25,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
 import boto3
 import time
+import random
 import os
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
@@ -390,6 +391,7 @@ def createTopic(request):
             topic.language_id   = language_id
             topic.category_id   = category_id
             topic.user_id       = user_id
+            topic.view_count = random.randint(10,30)
             topic.save()
             userprofile = UserProfile.objects.get(user = request.user)
             userprofile.question_count = F('question_count')+1
