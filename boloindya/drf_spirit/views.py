@@ -497,6 +497,7 @@ def topic_delete(request):
     topic_id     = request.POST.get('topic_id', '')
 
     topic = Topic.objects.get(pk= topic_id)
+    print topic.user, request.user
 
     if topic.user == request.user:
         try:

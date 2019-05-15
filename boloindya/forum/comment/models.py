@@ -12,6 +12,7 @@ from ..core.conf import settings
 from .managers import CommentQuerySet
 from drf_spirit.utils import reduce_bolo_score
 from django.db.models import F,Q
+from forum.user.models import UserProfile
 
 language_options = (
     ('1', "English"),

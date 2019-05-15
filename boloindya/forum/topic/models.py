@@ -16,6 +16,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from fcm.models import AbstractDevice
 from django.db.models import F,Q
 from drf_spirit.utils import reduce_bolo_score
+from forum.user.models import UserProfile
 
 language_options = (
     ('1', "English"),
