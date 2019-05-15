@@ -61,10 +61,11 @@ class TopicList(generics.ListCreateAPIView):
                         value=self.request.GET.get(term_key)
                         filter_dic[term_key]=value
             if filter_dic:
+                filter_dic['is_removed'] = False
                 topics              = Topic.objects.filter(**filter_dic)
                 pagination_class    = LimitOffsetPagination
         else:
-                topics              = Topic.objects.all()
+                topics              = Topic.objects.filter(is_removed = False)
                 pagination_class    = LimitOffsetPagination
         return topics
 
@@ -113,7 +114,9 @@ class Usertimeline(generics.ListCreateAPIView):
                         if term_key =='user_id':
                             is_user_timeline = True
             if filter_dic:
+
                 if is_user_timeline:
+                    filter_dic['is_removed'] = False
                     topics = Topic.objects.filter(**filter_dic)
                     all_shared_post = ShareTopic.objects.filter(user_id = filter_dic['user_id'])
                     if all_shared_post:
@@ -129,19 +132,19 @@ class Usertimeline(generics.ListCreateAPIView):
                     all_follower = Follower.objects.filter(user_follower = self.request.user).values_list('user_following_id',flat=True)
                     category_follow = UserProfile.objects.get(user= self.request.user).sub_category.all().values_list('id',flat = True)
                     if 'language_id' in search_term and 'category' in search_term:
-                        topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),category__slug =self.request.GET.get('category'))
+                        topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),category__slug =self.request.GET.get('category'),is_removed = False)
                     elif 'language_id' in search_term:
-                        topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'))
+                        topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False)
                     elif 'category' in search_term:
-                        topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),category__slug =self.request.GET.get('category'))
+                        topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),category__slug =self.request.GET.get('category'),is_removed = False)
                     else:
-                        topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow))
+                        topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False)
                     post = topics
             topics=sorted(itertools.chain(post),key=lambda x: x.date, reverse=True)
         else:
             all_follower = Follower.objects.filter(user_follower = self.request.user).values_list('user_following_id',flat=True)
             category_follow = UserProfile.objects.get(user= self.request.user).sub_category.all().values_list('id',flat = True)
-            topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow))
+            topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False)
         return topics;
 
 
@@ -167,7 +170,7 @@ class SearchTopic(generics.ListCreateAPIView):
         topics      = []
         search_term = self.request.GET.get('term')
         if search_term:
-            topics  = Topic.objects.filter(title__icontains = search_term)
+            topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False)
 
         return topics;
 
@@ -346,6 +349,34 @@ def replyOnTopic(request):
         return JsonResponse({'message': 'Topic Id / User Id / Comment provided'}, status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['POST'])
+def reply_delete(request):
+
+    """
+    get:
+    Delete Specific.
+
+    post:
+    Delete Reply.
+    comment_id     = request.POST.get('comment_id', '')
+
+    Required Parameters:
+    user_id and comment_id
+
+    """
+
+    comment_id     = request.POST.get('comment_id', '')
+    comment = Comment.objects.get(pk= comment_id)
+
+    if comment.user == request.user:
+        try:
+            comment.delete()
+            return JsonResponse({'message': 'Comment Deleted'}, status=status.HTTP_201_CREATED)
+        except:
+            return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return JsonResponse({'message': 'Invalid Delete Request'}, status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['POST'])
 def createTopic(request):
 
     """
@@ -404,6 +435,78 @@ def createTopic(request):
     else:
         return JsonResponse({'message': 'Topic Id / User Id / Comment provided'}, status=status.HTTP_204_NO_CONTENT)
 
+@api_view(['POST'])
+def editTopic(request):
+
+    """
+    get:
+    Return a list of all the existing users.
+
+    post:
+    edit Topic.
+    title        = request.POST.get('title', '')
+    category_id  = request.POST.get('category_id', '')
+    language_id  = request.POST.get('language_id', '')
+    topic_id = request.POST.get('topic_id', '')
+
+    Required Parameters:
+    title and category_id 
+
+    """
+    try:
+        topic_id = request.POST.get('topic_id', '')
+        title        = request.POST.get('title', '')
+        category_id  = request.POST.get('category_id', '')
+        language_id  = request.POST.get('language_id', '')
+        topic        = Topic.objects.get(pk = topic_id)
+
+        if topic.user == request.user:
+
+            if title:
+                topic.title = title[0].upper()+title[1:]
+            if category_id:
+                topic.category_id = category_id
+            if language_id:
+                topic.language_id = language_id
+            topic.save()
+
+            topic_json = TopicSerializerwithComment(topic).data
+            return JsonResponse({'message': 'Topic Edited','topic':topic_json}, status=status.HTTP_201_CREATED)
+        else:
+            return JsonResponse({'message': 'Invalid Edit Request'}, status=status.HTTP_400_BAD_REQUEST)
+    except:
+        return JsonResponse({'message': 'Invalid Edit Request'}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def topic_delete(request):
+
+    """
+    get:
+    Delete Specific.
+
+    post:
+    Delete Reply.
+    topic_id     = request.POST.get('topic_id', '')
+
+    Required Parameters:
+    user_id and topic_id
+
+    """
+
+    user_id      = request.user.id
+    topic_id     = request.POST.get('topic_id', '')
+
+    topic = Topic.objects.get(pk= topic_id)
+
+    if topic.user == request.user:
+        try:
+            topic.delete()
+            return JsonResponse({'message': 'Topic Deleted'}, status=status.HTTP_201_CREATED)
+        except:
+            return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return JsonResponse({'message': 'Invalid Delete Request'}, status=status.HTTP_204_NO_CONTENT)
+
                 
 class TopicDetails(generics.RetrieveUpdateDestroyAPIView):
     serializer_class    = TopicSerializer
@@ -419,7 +522,7 @@ class TopicCommentList(generics.ListAPIView):
     def get_queryset(self):
         topic_slug = self.kwargs['slug']
         topic_id = self.kwargs['topic_id']
-        return self.queryset.filter(topic_id=topic_id)
+        return self.queryset.filter(topic_id=topic_id,is_removed = False)
 
 class CategoryList(generics.ListAPIView):
     serializer_class = CategorySerializer
@@ -916,11 +1019,11 @@ def follow_like_list(request):
 
 def deafult_boloindya_follow(user,language):
     try:
-        if language == '1':
+        if language == '2':
             bolo_indya_user = User.objects.get(username = 'boloindya_hi')
-        elif language == '2':
-            bolo_indya_user = User.objects.get(username = 'boloindya_ta')
         elif language == '3':
+            bolo_indya_user = User.objects.get(username = 'boloindya_ta')
+        elif language == '4':
             bolo_indya_user = User.objects.get(username = 'boloindya_te')
         else:
             bolo_indya_user = User.objects.get(username = 'boloindya_en')

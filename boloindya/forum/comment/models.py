@@ -10,7 +10,15 @@ from django.utils import timezone
 
 from ..core.conf import settings
 from .managers import CommentQuerySet
+from drf_spirit.utils import reduce_bolo_score
+from django.db.models import F,Q
 
+language_options = (
+    ('1', "English"),
+    ('2', "Hindi"),
+    ('3', "Tamil"),
+    ('4', "Telgu"),
+)
 
 COMMENT, MOVED, CLOSED, UNCLOSED, PINNED, UNPINNED = range(6)
 
@@ -39,7 +47,7 @@ class Comment(models.Model):
     is_media = models.BooleanField(default=False)
     is_audio = models.BooleanField(default=False)
     media_duration = models.CharField(_("duration"), max_length=20, default='',null=True,blank=True)
-    language_id = models.CharField(_("language"), max_length=5, default='1')
+    language_id = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='0')
     thumbnail = models.CharField(_("thumbnail"), max_length=150, default='')
 
     modified_count = models.PositiveIntegerField(_("modified count"), default=0)
@@ -66,6 +74,19 @@ class Comment(models.Model):
         # if 'uploads' in self.comment:
         #     return self.comment.replace("boloindya", "careeranna")    
         # return self.comment.replace("careeranna", "boloindya")
+
+    def delete(self):
+        self.is_removed = True
+        self.save()
+        topic= self.topic
+        topic.comment_count = F('comment_count')-1
+        topic.save()
+        userprofile = UserProfile.objects.get(user = self.user)
+        userprofile.answer_count = F('answer_count')-1
+        userprofile.save()
+        reduce_bolo_score(self.user.id,'reply_on_topic')
+        return True
+
 
     @property
     def like(self):

@@ -14,6 +14,12 @@ def add_bolo_score(user_id,feature):
 	userprofile.bolo_score+= int(score)
 	userprofile.save()
 
+def reduce_bolo_score(user_id,feature):
+    score = get_weight(feature)
+    userprofile = UserProfile.objects.get(user_id = user_id)
+    userprofile.bolo_score-= int(score)
+    userprofile.save()
+
 from django.utils.timezone import utc
 from django.utils import timezone
 from django.utils.timezone import is_aware, utc

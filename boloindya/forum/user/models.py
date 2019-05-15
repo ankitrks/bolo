@@ -18,10 +18,10 @@ class RecordTimeStamp(models.Model):
         abstract = True
 
 language_options = (
-    ('0', "English"),
-    ('1', "Hindi"),
-    ('2', "Tamil"),
-    ('3', "Telgu"),
+    ('1', "English"),
+    ('2', "Hindi"),
+    ('3', "Tamil"),
+    ('4', "Telgu"),
 )
 refrence_options = (
     ('0', "native"),

@@ -2,7 +2,7 @@
 from django.conf.urls import include, url
 from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,createTopic, TopicCommentList, CategoryList, CommentList, CommentDetails, SingUpOTPView,\
 	verify_otp, password_set, fb_profile_settings,Usertimeline,follow_user,follow_sub_category,like,shareontimeline,GetProfile,SubCategoryList,upload_video_to_s3,comment_view,\
-    follow_like_list,upload_audio_to_s3
+    follow_like_list,upload_audio_to_s3,reply_delete,editTopic,topic_delete
 from rest_framework_simplejwt import views as jwt_views
 
 app_name = 'drf_spirit'
@@ -67,6 +67,9 @@ urlpatterns = [
     url(r'^upload_audio_to_s3/$', upload_audio_to_s3, name='upload_audio_to_s3'),
     url(r'^comment_view/$', comment_view, name='comment_view'),
     url(r'^follow_like_list/$', follow_like_list, name='follow_like_list'),
+    url(r'^reply_delete/$', reply_delete, name='reply_delete'),
+    url(r'^editTopic/$', editTopic, name='editTopic'),
+    url(r'^topic_delete/$', topic_delete, name='topic_delete'),
     url(r'^topics/', include(topic_urls)),
     
 ]

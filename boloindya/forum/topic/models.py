@@ -14,7 +14,15 @@ from ..core.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from fcm.models import AbstractDevice
+from django.db.models import F,Q
+from drf_spirit.utils import reduce_bolo_score
 
+language_options = (
+    ('1', "English"),
+    ('2', "Hindi"),
+    ('3', "Tamil"),
+    ('4', "Telgu"),
+)
 
 class RecordTimeStamp(models.Model):
     created_at=models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False) # auto_now will add the current time and date whenever field is saved.
@@ -55,7 +63,7 @@ class Topic(models.Model):
     date = models.DateTimeField(_("date"), default=timezone.now)
     last_active = models.DateTimeField(_("last active"), default=timezone.now)
     reindex_at = models.DateTimeField(_("reindex at"), default=timezone.now)
-    language_id = models.CharField(_("language"), max_length=5, default='1')
+    language_id = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='0')
     question_image = models.TextField(_("Question image"),null=True,blank=True)
 
     is_media = models.BooleanField(default=True)
@@ -162,6 +170,15 @@ class Topic(models.Model):
         :return: List of comments in HTML
         """
         return self.comment_set.values_list('comment_html', flat=True)
+
+    def delete(self):
+        self.is_removed = True
+        self.save()
+        userprofile = UserProfile.objects.get(user = self.user)
+        userprofile.question_count = F('question_count')-1
+        userprofile.save()
+        reduce_bolo_score(self.user.id,'create_topic')
+        return True
 
 class ShareTopic(UserInfo):
     topic = models.ForeignKey(Topic, related_name='share_topic_topic_share',null=True,blank=True)
