@@ -53,7 +53,7 @@ class UserProfile(models.Model):
     name = models.CharField(_("Name"), max_length=100, blank=True)
     bio = models.CharField(_("Bio"), max_length=300, blank=True)
     about = models.CharField(_("About"), max_length=500, blank=True)
-    language = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='0')
+    language = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='1')
     sub_category=models.ManyToManyField('forum_category.Category', verbose_name=_("Sub Category"),related_name='%(app_label)s_%(class)s_sub_category')
     refrence = models.CharField(choices=refrence_options, blank = True, null = True, max_length=10,default='0')
     extra_data = models.TextField(null=True,blank=True)
