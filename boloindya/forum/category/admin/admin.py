@@ -9,15 +9,12 @@ class CommentAdmin(admin.ModelAdmin):
 	list_filter = ('is_media', 'is_audio', 'language_id', 'topic__category')
 	list_display = ('id', 'topic', 'user', 'is_media', 'is_audio', 'language_id')
 	def changelist_view(self, request, extra_context=None):
-		qs = super(CommentAdmin, self).get_queryset(request)
-		print qs.count()
-		# if len(request.GET) == 0:
-		q = request.GET.copy()
-		print q
-		request.GET = q
-		request.META['QUERY_STRING'] = request.GET.urlencode()
-		# print qs.filter(**q)
-
+		search_fields = ('topic', )
+		list_filter = ('is_media', 'is_audio', 'language_id', 'topic__category')
+		list_display = ('id', 'topic', 'user', 'is_media', 'is_audio', 'language_id')
+		ChangeList = self.get_changelist(request)
+		cl = ChangeList(request, self.model, list_display,self.list_display_links, list_filter, self.date_hierarchy,search_fields, self.list_select_related, self.list_per_page, self.list_max_show_all, self.list_editable, self)
+		qs=cl.get_queryset(request)
 		extra_context = extra_context or {}
 		audio_duration = get_audio_duration(qs)
 		video_duration = get_video_duration(qs)

@@ -114,6 +114,7 @@ class Usertimeline(generics.ListCreateAPIView):
                         if term_key =='user_id':
                             is_user_timeline = True
             if filter_dic:
+                print filter_dic
 
                 if is_user_timeline:
                     filter_dic['is_removed'] = False
@@ -507,6 +508,30 @@ def topic_delete(request):
             return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
     else:
         return JsonResponse({'message': 'Invalid Delete Request'}, status=status.HTTP_204_NO_CONTENT)
+
+# @api_view(['POST'])
+def notification_topic(request):
+
+    """
+    post:
+    Return a list of all the existing users.
+
+    get:
+    edit Topic.
+    topic_id = request.GET.get('topic_id', '')
+
+    Required Parameters:
+    title and category_id 
+
+    """
+    try:
+        topic_id = request.GET.get('topic_id', '')
+        topic        = Topic.objects.get(pk = topic_id)
+        topic_json = TopicSerializerwithComment(topic).data
+        print topic_json
+        return JsonResponse({'result':[topic_json]}, status=status.HTTP_201_CREATED)   
+    except:
+        return JsonResponse({'message': 'Invalid Request'}, status=status.HTTP_400_BAD_REQUEST)
 
                 
 class TopicDetails(generics.RetrieveUpdateDestroyAPIView):
