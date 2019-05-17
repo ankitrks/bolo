@@ -7,7 +7,7 @@ from datetime import datetime,timedelta
 class CommentAdmin(admin.ModelAdmin):
 	search_fields = ('topic', )
 	list_filter = ('is_media', 'is_audio', 'language_id', 'topic__category')
-	list_display = ('id', 'topic', 'user', 'is_media', 'is_audio', 'language_id')
+	list_display = ('id', 'topic', 'user', 'is_media', 'is_audio','media_duration', 'language_id')
 	def changelist_view(self, request, extra_context=None):
 		search_fields = ('topic', )
 		list_filter = ('is_media', 'is_audio', 'language_id', 'topic__category')

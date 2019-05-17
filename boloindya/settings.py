@@ -131,6 +131,7 @@ INSTALLED_APPS = [
     'rest_framework_swagger',
     'fcm',
     'rangefilter',
+    'import_export',
 
     # 'forum.core.tests'
 ]
@@ -288,7 +289,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(PROJECT_PATH, ENV, 'staticfiles'),
+    # os.path.join(PROJECT_PATH, ENV, 'static'),
     # os.path.join(PROJECT_PATH, ENV, 'schedule', 'static'),
 )
 
@@ -299,7 +300,7 @@ MEDIA_UPLOAD_PATH = os.path.join(PROJECT_PATH, ENV, 'media','media_upload')
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+   'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

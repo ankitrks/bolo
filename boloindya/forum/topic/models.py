@@ -18,6 +18,8 @@ from django.db.models import F,Q
 from drf_spirit.utils import reduce_bolo_score
 from forum.user.models import UserProfile
 
+from datetime import datetime,timedelta
+
 language_options = (
     ('1', "English"),
     ('2', "Hindi"),
@@ -180,6 +182,49 @@ class Topic(models.Model):
         userprofile.save()
         reduce_bolo_score(self.user.id,'create_topic')
         return True
+
+    def audio_duration(self):
+        all_audio_answer = self.topic_comment.filter(is_media=True,is_audio = True)
+        duration =datetime.strptime('00:00', '%M:%S')
+        for each_audio in all_audio_answer:
+            # print each_audio.media_duration,"maaz"
+            if each_audio.media_duration and not each_audio.media_duration =='00:00':
+                # print each_audio.media_duration,'a'
+                datetime_object = datetime.strptime(each_audio.media_duration, '%M:%S')
+                a = timedelta(minutes=datetime_object.minute, seconds=datetime_object.second)
+                # b = timedelta(minutes=duration.minute, seconds=duration.second)
+                # print a,duration
+                duration=a+duration
+                # print duration, type(duration)
+                # duration = timedelta(hours = b.hour,minutes=b.minute, seconds=b.second)
+            else:
+                pass
+        duration = str(duration.hour)+":"+str(duration.minute)+":"+str(duration.second)
+        return duration
+
+    def video_duration(self):
+        all_audio_answer = self.topic_comment.filter(is_media=True,is_audio = False)
+        duration =datetime.strptime('00:00', '%M:%S')
+        for each_audio in all_audio_answer:
+            # print each_audio.media_duration,"maaz"
+            if each_audio.media_duration and not each_audio.media_duration =='00:00':
+                # print each_audio.media_duration,'a'
+                datetime_object = datetime.strptime(each_audio.media_duration, '%M:%S')
+                a = timedelta(minutes=datetime_object.minute, seconds=datetime_object.second)
+                # b = timedelta(minutes=duration.minute, seconds=duration.second)
+                # print a,duration
+                duration=a+duration
+                # print duration, type(duration)
+                # duration = timedelta(hours = b.hour,minutes=b.minute, seconds=b.second)
+            else:
+                pass
+        duration = str(duration.hour)+":"+str(duration.minute)+":"+str(duration.second)
+        return duration
+
+    def comments(self):
+        from django.utils.html import format_html
+
+        return format_html(str('<a href="/superman/forum_comment/comment/?topic_id='+str(self.id)+'" target="_blank">'+str(self.comment_count)+'</a>'))
 
 class ShareTopic(UserInfo):
     topic = models.ForeignKey(Topic, related_name='share_topic_topic_share',null=True,blank=True)

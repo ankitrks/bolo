@@ -14,29 +14,29 @@
 // }
 
 //jwplayer for audio
-    var playerInstance = jwplayer("ans_audio");
-    playerInstance.setup({
-        file: "http://www.hochmuth.com/mp3/Tchaikovsky_Rococo_Var_orch.mp3",
-        width:530,
-        height:10,
-        skin: {
-            active: "#bb3335",
-            inactive: "#bb3335",
-            background: "white"
-        }
-    });
+    // var playerInstance = jwplayer("ans_audio");
+    // playerInstance.setup({
+    //     file: "",
+    //     width:530,
+    //     height:10,
+    //     skin: {
+    //         active: "#bb3335",
+    //         inactive: "#bb3335",
+    //         background: "white"
+    //     }
+    // });
 
 //slider for top video answer    
-var owl = $('.owl-carousel1');
+var owl = $('.owl-carousel');
   owl.owlCarousel({
-    loop:true,
+    loop:false,
     margin:10,
     nav:true,
     dots:true,
     items:1,
     video:true,
     lazyLoad:true,
-    center:true,
+    center:false,
     navText: [
         "<i class='fa fa-chevron-left'></i>",
         "<i class='fa fa-chevron-right'></i>"
@@ -60,21 +60,15 @@ var owl = $('.owl-carousel1');
     $('.owl-item.active video').get(0).play();
     $('.qa_sec .owl-item .item img').css('z-index','-1')
   })
-  // if(!isMobile()){
-    $('.owl-item .item').each(function(){
-      var attr = $(this).attr('data-videosrc');
-      if (typeof attr !== typeof undefined && attr !== false) {
-        console.log('hit');
-        var videosrc = $(this).attr('data-videosrc');
-        $(this).prepend('<video controls muted><source src="'+videosrc+'" type="video/mp4"></video>');
-      }
-      
-    });
-    $('.owl-item.active video').attr('autoplay',false).attr('loop',true);
-  // }
-
-
-
+  // $('.owl-item .item').each(function(){
+  //   var attr = $(this).attr('data-videosrc');
+  //   if (typeof attr !== typeof undefined && attr !== false) {
+  //     var videosrc = $(this).attr('data-videosrc');
+  //     $(this).prepend('<div id="video-div-{{ video.id }}" class="video-div" src="' + videosrc + '"></div>');
+  //   }
+  // });
+  // $('.owl-item.active video').attr('autoplay',false).attr('loop',true);
+  
 function isMobile(width) {
 	if(width == undefined){
 		width = 719;
