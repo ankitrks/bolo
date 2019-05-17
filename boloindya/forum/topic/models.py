@@ -17,6 +17,8 @@ from fcm.models import AbstractDevice
 from django.db.models import F,Q
 from drf_spirit.utils import reduce_bolo_score
 from forum.user.models import UserProfile
+from django.http import JsonResponse
+
 
 from datetime import datetime,timedelta
 
@@ -260,19 +262,19 @@ class FCMDevice(AbstractDevice):
 
     def register_device(self,request):
         try:
-            instance = FCMDevice.objects.filter(device_id = request.POST['device_id'])
+            instance = FCMDevice.objects.filter(dev_id = request.POST.get('dev_id'))
             if not len(instance):
                 raise Exception
             instance.update(user = request.user,is_active = True)
             return JsonResponse({"status":"Success"},safe = False)
         except Exception as e:
-            instance = FCMDevice.objects.create(device_id =request.POST['device_id'],user =request.user)
+            instance = FCMDevice.objects.create(dev_id =request.POST.get('dev_id'),user =request.user)
             return JsonResponse({"status":"Success"},safe = False)
 
 
     def remove_device(self,request):
         try:
-            instance = FCMDevice.objects.filter(device_id = request.POST['device_id'], is_active = True, user = request.user)
+            instance = FCMDevice.objects.filter(dev_id = request.POST.get('dev_id'), is_active = True, user = request.user)
             if not len(instance):
                 raise Exception
             instance.update(is_active = False)

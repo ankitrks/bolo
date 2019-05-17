@@ -16,7 +16,7 @@ from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
 from .permissions import IsOwnerOrReadOnly
 from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,AppVersionSerializer,UserSerializer
-from forum.topic.models import Topic,ShareTopic,Like,SocialShare
+from forum.topic.models import Topic,ShareTopic,Like,SocialShare,FCMDevice
 from forum.category.models import Category
 from forum.comment.models import Comment
 from forum.user.models import UserProfile,Follower,AppVersion
@@ -149,6 +149,37 @@ class Usertimeline(generics.ListCreateAPIView):
         return topics;
 
 
+@api_view(['POST'])
+def RegisterDevice(request):
+    """
+    
+
+    post:
+    device_id = request.POST.get('device_id','')
+
+   
+    """
+
+    fcm_decvice = FCMDevice()
+    return fcm_decvice.register_device(request)
+
+
+@api_view(['POST'])
+def UnregisterDevice(request):
+    """
+    
+
+    post:
+    device_id = request.POST.get('device_id','')
+
+    Required Parameters:
+    title and category_id 
+    """
+
+    fcm_decvice = FCMDevice()
+    return fcm_decvice.remove_device(request)
+
+
 class SearchTopic(generics.ListCreateAPIView):
     """
     get:
@@ -174,6 +205,24 @@ class SearchTopic(generics.ListCreateAPIView):
             topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False)
 
         return topics;
+
+class GetUserProfile(generics.ListCreateAPIView):
+    """
+    post:
+    user_id = request.POST.get('user_id', '')
+
+    Required Parameters:
+    title and category_id 
+    """ 
+    serializer_class    = UserSerializer
+    permission_classes  = (IsOwnerOrReadOnly,)
+
+    def get_queryset(self):
+        user_id = self.request.POST.get('user_id','')
+        if user_id:
+            user = User.objects.filter(pk=user_id)
+
+        return user;
 
 class SearchUser(generics.ListCreateAPIView):
 
