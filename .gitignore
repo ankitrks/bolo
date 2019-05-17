@@ -54,6 +54,8 @@ coverage.xml
 # Django stuff:
 *.log
 local_settings.py
+settings_local.py
+manage_local.py
 db.sqlite3
 
 # Flask stuff:
