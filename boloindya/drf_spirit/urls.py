@@ -71,7 +71,7 @@ urlpatterns = [
     url(r'^editTopic/$', editTopic, name='editTopic'),
     url(r'^topic_delete/$', topic_delete, name='topic_delete'),
     url(r'^notification_topic/$', notification_topic, name='notification_topic'),
-    url(r'^get_userprofile/$', GetUserProfile.as_view(), name='get_userprofile'),
+    url(r'^get_userprofile/$', GetUserProfile, name='get_userprofile'),
     url(r'^register_device/$', RegisterDevice, name='register_device'),
     url(r'^unregister_device/$', UnregisterDevice, name='unregister_device'),
     url(r'^topics/', include(topic_urls)),

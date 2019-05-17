@@ -147,7 +147,7 @@ class Usertimeline(generics.ListCreateAPIView):
             all_follower = Follower.objects.filter(user_follower = self.request.user).values_list('user_following_id',flat=True)
             category_follow = UserProfile.objects.get(user= self.request.user).sub_category.all().values_list('id',flat = True)
             topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False)
-        return topics;
+        return topics
 
 
 @api_view(['POST'])
@@ -205,25 +205,34 @@ class SearchTopic(generics.ListCreateAPIView):
         if search_term:
             topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False)
 
-        return topics;
+        return topics
 
-class GetUserProfile(generics.ListCreateAPIView):
+
+@api_view(['POST'])
+def GetUserProfile(request):
     """
     post:
     user_id = request.POST.get('user_id', '')
-
-    Required Parameters:
-    title and category_id 
     """ 
-    serializer_class    = UserSerializer
-    permission_classes  = (IsOwnerOrReadOnly,)
-
-    def get_queryset(self):
-        user_id = self.request.POST.get('user_id','')
+    # serializer_class    = UserSerializer
+    # permission_classes  = (IsOwnerOrReadOnly,)
+    try:
+        user_id = request.POST.get('user_id','')
         if user_id:
-            user = User.objects.filter(pk=user_id)
+            user = User.objects.get(id=user_id)
+            print user
+        user_json = UserSerializer(user).data
+        return JsonResponse({'message': 'success','result':user_json}, status=status.HTTP_200_OK)
+    except:
+        return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)     
 
-        return user;
+
+    # def get_queryset(self):
+    #     user_id = self.request.POST.get('user_id','')
+    #     if user_id:
+    #         user = User.objects.get(id=user_id)
+
+    #     return [user]
 
 class SearchUser(generics.ListCreateAPIView):
 
@@ -250,7 +259,7 @@ class SearchUser(generics.ListCreateAPIView):
         if search_term:
             users   = User.objects.filter(Q(username__icontains = search_term)|Q(first_name__icontains = search_term))
 
-        return users;
+        return users
 
 
 def get_video_thumbnail(video_url):
@@ -776,7 +785,7 @@ class GetProfile(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
 
-        return [user];
+        return [user]
 
 @api_view(['POST'])
 def fb_profile_settings(request):
