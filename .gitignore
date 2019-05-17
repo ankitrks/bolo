@@ -57,6 +57,7 @@ local_settings.py
 settings_local.py
 manage_local.py
 db.sqlite3
+static/
 
 # Flask stuff:
 instance/

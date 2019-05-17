@@ -129,9 +129,12 @@ class Usertimeline(generics.ListCreateAPIView):
                     if topics:
                         for each_post in topics:
                             post.append(each_post)
+                    topics=sorted(itertools.chain(post),key=lambda x: x.date, reverse=True)
                 else:
                     all_follower = Follower.objects.filter(user_follower = self.request.user).values_list('user_following_id',flat=True)
                     category_follow = UserProfile.objects.get(user= self.request.user).sub_category.all().values_list('id',flat = True)
+                    all_follower = [1,2,3,5]
+                    category_follow = [8,9,10,11,12,13,14,15,15]
                     if 'language_id' in search_term and 'category' in search_term:
                         topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),category__slug =self.request.GET.get('category'),is_removed = False)
                     elif 'language_id' in search_term:
@@ -140,8 +143,6 @@ class Usertimeline(generics.ListCreateAPIView):
                         topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),category__slug =self.request.GET.get('category'),is_removed = False)
                     else:
                         topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False)
-                    post = topics
-            topics=sorted(itertools.chain(post),key=lambda x: x.date, reverse=True)
         else:
             all_follower = Follower.objects.filter(user_follower = self.request.user).values_list('user_following_id',flat=True)
             category_follow = UserProfile.objects.get(user= self.request.user).sub_category.all().values_list('id',flat = True)
@@ -155,7 +156,7 @@ def RegisterDevice(request):
     
 
     post:
-    device_id = request.POST.get('device_id','')
+    dev_id = request.POST.get('dev_id','')
 
    
     """
@@ -170,7 +171,7 @@ def UnregisterDevice(request):
     
 
     post:
-    device_id = request.POST.get('device_id','')
+    dev_id = request.POST.get('dev_id','')
 
     Required Parameters:
     title and category_id 
