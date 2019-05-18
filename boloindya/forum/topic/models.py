@@ -262,19 +262,19 @@ class FCMDevice(AbstractDevice):
 
     def register_device(self,request):
         try:
-            instance = FCMDevice.objects.filter(dev_id = request.POST.get('dev_id'))
+            instance = FCMDevice.objects.filter(dev_id = request.POST.get('dev_id'),reg_id = request.POST.get('reg_id'))
             if not len(instance):
                 raise Exception
             instance.update(user = request.user,is_active = True)
             return JsonResponse({"status":"Success"},safe = False)
         except Exception as e:
-            instance = FCMDevice.objects.create(dev_id =request.POST.get('dev_id'),user =request.user)
+            instance = FCMDevice.objects.create(dev_id =request.POST.get('dev_id'),user =request.user,reg_id = request.POST.get('reg_id'))
             return JsonResponse({"status":"Success"},safe = False)
 
 
     def remove_device(self,request):
         try:
-            instance = FCMDevice.objects.filter(dev_id = request.POST.get('dev_id'), is_active = True, user = request.user)
+            instance = FCMDevice.objects.filter(dev_id = request.POST.get('dev_id'),reg_id = request.POST.get('reg_id'), is_active = True, user = request.user)
             if not len(instance):
                 raise Exception
             instance.update(is_active = False)
@@ -290,6 +290,7 @@ class Notification(UserInfo):
     # device_id = models.CharField(_("Device Id"), max_length=255, blank = True, null = True)
     notification_type = models.CharField(_("notification_type"), max_length=5, default='1')
     is_read = models.BooleanField(default=False)
+    status = models.PositiveIntegerField(default=0)# 0=new, 1=pushed, 2=read
     read_at = models.DateTimeField(null=True,blank=True)
     topic_type = models.ForeignKey(ContentType, verbose_name=('topic type'),null=True,blank=True)
     topic_id = models.PositiveIntegerField(('object ID'),null=True,blank=True)
@@ -297,6 +298,79 @@ class Notification(UserInfo):
 
     def __unicode__(self):
         return str(self.topic)
+
+    def get_notification_json(self):
+        notific ={}
+        if self.notification_type=='1':
+            notific['title'] = str(self.user.st.name)+' asked a question : '+str(self.topic.title)+'. Would you like to answer?'
+            notific['hindi_title'] = str(self.user.st.name)+' ने एक प्रश्न पूछा : '+str(self.topic.title)+'. क्या आप जवाब देना चाहेंगे?'
+            notific['tamil_title'] = str(self.user.st.name)+' கேள்வி கேட்டுள்ளார் : '+str(self.topic.title)+' பதிலளிக்க விரும்புகிறீர்களா?'
+            notific['telgu_title'] = str(self.user.st.name)+' ఒక ప్రశ్న అడిగారు: '+str(self.topic.title)+'. మీరు సమాధానం చెప్పాలనుకుంటున్నారా?'
+            notific['notification_type'] = '1'
+            notific['id'] = self.topic.id
+            notific['read_status'] = self.status
+
+        elif self.notification_type=='2':
+            notific['title'] = str(self.user.st.name)+' answered : '+str(self.topic.title)+'.'
+            notific['hindi_title'] = str(self.user.st.name)+' जवाब : '+str(self.topic.title)
+            notific['tamil_title'] = str(self.user.st.name)+' பதிலளித்துள்ளார்: '+str(self.topic.title)
+            notific['telgu_title'] = str(self.user.st.name)+' సమాధానం: '+str(self.topic.title)
+            notific['notification_type'] = '2'
+            notific['id'] = self.topic.topic.id
+            notific['read_status'] = self.status 
+
+        elif self.notification_type=='3':
+            notific['title'] = str(self.user.st.name)+' answered your Question: '+str(self.topic.title)
+            notific['hindi_title'] = str(self.user.st.name)+' ने आपके सवाल का जवाब दिया : '+str(self.topic.title)
+            notific['tamil_title'] = str(self.user.st.name)+' உங்கள் கேள்விக்கு பதிலளித்துள்ளார் '+str(self.topic.title)
+            notific['telgu_title'] = str(self.user.st.name)+' మీ ప్రశ్నకు సమాధానమిచ్చారు: '+str(self.topic.title)
+            notific['notification_type'] = '3'
+            notific['id'] = self.topic.id
+            notific['read_status'] = self.status 
+
+        elif self.notification_type=='4':
+            notific['title'] = str(self.user.st.name)+' followed you'
+            notific['hindi_title'] = str(self.user.st.name)+' ने आपको फॉलो किया'
+            notific['tamil_title'] = str(self.user.st.name)+' பாலோ செய்துள்ளார்'
+            notific['telgu_title'] = str(self.user.st.name)+' మీరు అనుసరించారు'
+            notific['notification_type'] = '4'
+            notific['id'] = self.for_user.id
+            notific['read_status'] = self.status 
+
+        elif self.notification_type=='5':
+            notific['title'] = str(self.user.st.name)+' liked your answer'
+            notific['hindi_title'] = str(self.user.st.name)+' को आपका जवाब पसंद आया'
+            notific['tamil_title'] = str(self.user.st.name)+' உங்கள் பதிலை லைக் செய்துள்ளார்'
+            notific['telgu_title'] = str(self.user.st.name)+' మీ సమాధానం ఇష్టపడ్డారు'
+            notific['notification_type'] = '5'
+            notific['id'] = self.topic.comment.topic.id
+            notific['read_status'] = self.status 
+
+        return notific
+
+    @staticmethod
+    def get_notification_count(user_id):
+        n_count =  Notification.objects.filter(for_user_id=user_id,status=0,is_active=True)
+        return len(n_count)
+
+
+    @staticmethod
+    def get_notification(user,last_read=None,count=None):
+        if not count:
+            count = 5
+        if last_read == None:
+            notifications = Notification.objects.filter(for_user=user,is_active=True).order_by('-modified_at')[:count]
+        else:
+            notifications = Notification.objects.filter(for_user=user,modified_at__gte=last_read,is_active=True).order_by('-modified_at')[:count]
+        Notification.objects.filter(status=0).update(status=1)
+        result = []
+        for notification in notifications:
+            result.append(notification.get_notification_json())
+        return result
+
+
+
+
 
 
 
