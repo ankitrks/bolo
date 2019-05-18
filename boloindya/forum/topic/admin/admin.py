@@ -12,7 +12,8 @@ class TopicResource(resources.ModelResource):
 		model = Topic
 		skip_unchanged = True
 		report_skipped = True
-		fields = ( 'title', 'category','language_id')
+		import_id_fields = ( 'title', 'category__title','language_id','user_id')
+		fields = ( 'id', 'title','user__username','category__title','is_media','comments','audio_duration' ,'video_duration')
 
 
 class TopicAdmin(ImportExportModelAdmin):

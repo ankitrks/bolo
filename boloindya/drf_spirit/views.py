@@ -1187,6 +1187,16 @@ def deafult_boloindya_follow(user,language):
     except:
         return False
 
+@api_view(['POST'])
+def get_bolo_score(request):
+    try:
+        userprofile = UserProfile.objects.get(user = request.user)
+        return JsonResponse({'bolo_score':userprofile.bolo_score,'message':'success'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 
 
 
