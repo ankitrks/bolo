@@ -1,3 +1,4 @@
+ # -*- coding: utf-8 -*-
 from django.http import JsonResponse
 from django.utils import timezone
 from django.conf import settings
@@ -10,13 +11,14 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
 from django.core.files.base import ContentFile
+from rest_framework.generics import GenericAPIView
 
 
 from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
 from .permissions import IsOwnerOrReadOnly
 from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,AppVersionSerializer,UserSerializer
-from forum.topic.models import Topic,ShareTopic,Like,SocialShare,FCMDevice
+from forum.topic.models import Topic,ShareTopic,Like,SocialShare,FCMDevice,Notification
 from forum.category.models import Category
 from forum.comment.models import Comment
 from forum.user.models import UserProfile,Follower,AppVersion
@@ -41,6 +43,66 @@ def get_tokens_for_user(user):
         'refresh': str(refresh),
         'access': str(refresh.access_token),
     }
+
+
+class NotificationAPI(GenericAPIView):
+    permissions_classes = (IsOwnerOrReadOnly,)
+
+    limit = 10
+
+    def post(self, request, action, format = None):
+        # print "request user", request.user, action
+
+        if action == 'get':
+            notifications = self.get_notifications(request.user.id)
+
+
+            notification_data = self.serialize_notification(notifications)
+
+            # print "notification_data",notification_data
+            return JsonResponse(notification_data, safe=False)
+
+        elif action == 'click':
+            self.mark_notification_as_read()
+            return JsonResponse({
+                    'status': "SUCCESS"
+                })
+
+
+
+    def get_notifications(self, user_id):
+        user_id = self.request.user.id
+        # last_read = get_redis(redis_keymap%(user_id))
+        # notifications = Notification.get_notification(self.request.user, count = 100)
+
+        offset = self.request.data.get('offset') or 0
+        limit = self.request.data.get('limit') or self.limit
+
+        # print "offset",offset,"page_size",page_size
+
+        notifications = Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-last_modified')[offset:offset+limit]
+
+        
+        Notification.objects.filter(status = 0).update(status = 1)
+
+        result = []
+        for notification in notifications:
+            result.append(notification)
+        return result
+
+
+    def serialize_notification(self, notifications):
+        serialized_data =[]
+        for each_noti in notifications:
+            serialized_data.append(each_noti.get_notification_json())
+        return serialized_data
+
+    
+    def mark_notification_as_read(self):
+        notification = Notification.objects.get(id = self.request.data.get("id"))
+        notification.status = 2
+        notification.save()
+
 
 class TopicList(generics.ListCreateAPIView):
     serializer_class    = TopicSerializer

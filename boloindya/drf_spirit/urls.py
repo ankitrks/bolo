@@ -2,7 +2,7 @@
 from django.conf.urls import include, url
 from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,createTopic, TopicCommentList, CategoryList, CommentList, CommentDetails, SingUpOTPView,\
 	verify_otp, password_set, fb_profile_settings,Usertimeline,follow_user,follow_sub_category,like,shareontimeline,GetProfile,SubCategoryList,upload_video_to_s3,comment_view,\
-    follow_like_list,upload_audio_to_s3,reply_delete,editTopic,topic_delete,notification_topic,GetUserProfile,RegisterDevice,UnregisterDevice
+    follow_like_list,upload_audio_to_s3,reply_delete,editTopic,topic_delete,notification_topic,GetUserProfile,RegisterDevice,UnregisterDevice,NotificationAPI
 from rest_framework_simplejwt import views as jwt_views
 
 app_name = 'drf_spirit'
@@ -70,6 +70,7 @@ urlpatterns = [
     url(r'^reply_delete/$', reply_delete, name='reply_delete'),
     url(r'^editTopic/$', editTopic, name='editTopic'),
     url(r'^topic_delete/$', topic_delete, name='topic_delete'),
+    url(r'^notification/(?P<action>click|get)$', NotificationAPI.as_view(), name='notification'),
     url(r'^notification_topic/$', notification_topic, name='notification_topic'),
     url(r'^get_userprofile/$', GetUserProfile, name='get_userprofile'),
     url(r'^register_device/$', RegisterDevice, name='register_device'),

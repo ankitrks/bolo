@@ -15,7 +15,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from fcm.models import AbstractDevice
 from django.db.models import F,Q
-from drf_spirit.utils import reduce_bolo_score
+from drf_spirit.utils import reduce_bolo_score,shortnaturaltime
 from forum.user.models import UserProfile
 from django.http import JsonResponse
 
@@ -302,31 +302,40 @@ class Notification(UserInfo):
     def get_notification_json(self):
         notific ={}
         if self.notification_type=='1':
-            notific['title'] = str(self.user.st.name)+' asked a question : '+str(self.topic.title)+'. Would you like to answer?'
-            notific['hindi_title'] = str(self.user.st.name)+' ने एक प्रश्न पूछा : '+str(self.topic.title)+'. क्या आप जवाब देना चाहेंगे?'
-            notific['tamil_title'] = str(self.user.st.name)+' கேள்வி கேட்டுள்ளார் : '+str(self.topic.title)+' பதிலளிக்க விரும்புகிறீர்களா?'
-            notific['telgu_title'] = str(self.user.st.name)+' ఒక ప్రశ్న అడిగారు: '+str(self.topic.title)+'. మీరు సమాధానం చెప్పాలనుకుంటున్నారా?'
+            notific['title'] = str(self.user.st.name)+' asked a question : '+self.topic.title+'. Would you like to answer?'
+            notific['hindi_title'] = str(self.user.st.name)+' ने एक प्रश्न पूछा : '+self.topic.title+'. क्या आप जवाब देना चाहेंगे?'
+            notific['tamil_title'] = str(self.user.st.name)+' கேள்வி கேட்டுள்ளார் : '+self.topic.title+' பதிலளிக்க விரும்புகிறீர்களா?'
+            notific['telgu_title'] = str(self.user.st.name)+' ఒక ప్రశ్న అడిగారు: '+self.topic.title+'. మీరు సమాధానం చెప్పాలనుకుంటున్నారా?'
             notific['notification_type'] = '1'
-            notific['id'] = self.topic.id
+            notific['instance_id'] = self.topic.id
             notific['read_status'] = self.status
+            notific['id'] = self.id
+            notific['created_at'] = shortnaturaltime(self.created_at)
+            notific['actor_profile_pic'] = self.user.st.profile_pic
 
         elif self.notification_type=='2':
-            notific['title'] = str(self.user.st.name)+' answered : '+str(self.topic.title)+'.'
-            notific['hindi_title'] = str(self.user.st.name)+' जवाब : '+str(self.topic.title)
-            notific['tamil_title'] = str(self.user.st.name)+' பதிலளித்துள்ளார்: '+str(self.topic.title)
-            notific['telgu_title'] = str(self.user.st.name)+' సమాధానం: '+str(self.topic.title)
+            notific['title'] = str(self.user.st.name)+' answered : '+self.topic.topic.title+'.'
+            notific['hindi_title'] = str(self.user.st.name)+' जवाब : '+self.topic.topic.title
+            notific['tamil_title'] = str(self.user.st.name)+' பதிலளித்துள்ளார்: '+self.topic.topic.title
+            notific['telgu_title'] = str(self.user.st.name)+' సమాధానం: '+self.topic.topic.title
             notific['notification_type'] = '2'
-            notific['id'] = self.topic.topic.id
-            notific['read_status'] = self.status 
+            notific['instance_id'] = self.topic.topic.id
+            notific['read_status'] = self.status
+            notific['id'] = self.id
+            notific['created_at'] = shortnaturaltime(self.created_at)
+            notific['actor_profile_pic'] = self.user.st.profile_pic 
 
         elif self.notification_type=='3':
-            notific['title'] = str(self.user.st.name)+' answered your Question: '+str(self.topic.title)
-            notific['hindi_title'] = str(self.user.st.name)+' ने आपके सवाल का जवाब दिया : '+str(self.topic.title)
-            notific['tamil_title'] = str(self.user.st.name)+' உங்கள் கேள்விக்கு பதிலளித்துள்ளார் '+str(self.topic.title)
-            notific['telgu_title'] = str(self.user.st.name)+' మీ ప్రశ్నకు సమాధానమిచ్చారు: '+str(self.topic.title)
+            notific['title'] = str(self.user.st.name)+' answered your Question: '+self.topic.topic.title
+            notific['hindi_title'] = str(self.user.st.name)+' ने आपके सवाल का जवाब दिया : '+self.topic.topic.title
+            notific['tamil_title'] = str(self.user.st.name)+' உங்கள் கேள்விக்கு பதிலளித்துள்ளார் '+self.topic.topic.title
+            notific['telgu_title'] = str(self.user.st.name)+' మీ ప్రశ్నకు సమాధానమిచ్చారు: '+self.topic.topic.title
             notific['notification_type'] = '3'
-            notific['id'] = self.topic.id
-            notific['read_status'] = self.status 
+            notific['instance_id'] = self.topic.topic.id
+            notific['read_status'] = self.status
+            notific['id'] = self.id
+            notific['created_at'] = shortnaturaltime(self.created_at)
+            notific['actor_profile_pic'] = self.user.st.profile_pic 
 
         elif self.notification_type=='4':
             notific['title'] = str(self.user.st.name)+' followed you'
@@ -334,8 +343,11 @@ class Notification(UserInfo):
             notific['tamil_title'] = str(self.user.st.name)+' பாலோ செய்துள்ளார்'
             notific['telgu_title'] = str(self.user.st.name)+' మీరు అనుసరించారు'
             notific['notification_type'] = '4'
-            notific['id'] = self.for_user.id
-            notific['read_status'] = self.status 
+            notific['instance_id'] = self.for_user.id
+            notific['read_status'] = self.status
+            notific['id'] = self.id
+            notific['created_at'] = shortnaturaltime(self.created_at)
+            notific['actor_profile_pic'] = self.user.st.profile_pic 
 
         elif self.notification_type=='5':
             notific['title'] = str(self.user.st.name)+' liked your answer'
@@ -343,8 +355,11 @@ class Notification(UserInfo):
             notific['tamil_title'] = str(self.user.st.name)+' உங்கள் பதிலை லைக் செய்துள்ளார்'
             notific['telgu_title'] = str(self.user.st.name)+' మీ సమాధానం ఇష్టపడ్డారు'
             notific['notification_type'] = '5'
-            notific['id'] = self.topic.comment.topic.id
-            notific['read_status'] = self.status 
+            notific['instance_id'] = self.topic.topic.id
+            notific['read_status'] = self.status
+            notific['id'] = self.id
+            notific['created_at'] = shortnaturaltime(self.created_at)
+            notific['actor_profile_pic'] = self.user.st.profile_pic 
 
         return notific
 
@@ -359,9 +374,9 @@ class Notification(UserInfo):
         if not count:
             count = 5
         if last_read == None:
-            notifications = Notification.objects.filter(for_user=user,is_active=True).order_by('-modified_at')[:count]
+            notifications = Notification.objects.filter(for_user=user,is_active=True).order_by('-last_modified')[:count]
         else:
-            notifications = Notification.objects.filter(for_user=user,modified_at__gte=last_read,is_active=True).order_by('-modified_at')[:count]
+            notifications = Notification.objects.filter(for_user=user,modified_at__gte=last_read,is_active=True).order_by('-last_modified')[:count]
         Notification.objects.filter(status=0).update(status=1)
         result = []
         for notification in notifications:
