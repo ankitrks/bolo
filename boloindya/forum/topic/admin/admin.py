@@ -3,7 +3,7 @@ from forum.topic.models import *
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
-from forum.topic.models import Topic
+from forum.topic.models import Topic,Notification
 # admin_all(models)
 
 class TopicResource(resources.ModelResource):
@@ -28,8 +28,12 @@ class TopicAdmin(ImportExportModelAdmin):
 	# comment_count.allow_tags = True
 	# comment_count.short_description = 'Click to open the detail list of answers'
 
+class NotificationAdmin(admin.ModelAdmin):
+	list_display = ('id', 'for_user', 'user', 'notification_type')
+
 
 admin.site.register(Topic, TopicAdmin)
+admin.site.register(Notification,NotificationAdmin)
 
 
 
