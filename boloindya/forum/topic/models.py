@@ -262,19 +262,19 @@ class FCMDevice(AbstractDevice):
 
     def register_device(self,request):
         try:
-            instance = FCMDevice.objects.filter(dev_id = request.POST.get('dev_id'),reg_id = request.POST.get('reg_id'))
+            instance = FCMDevice.objects.filter(reg_id = request.POST.get('reg_id'))
             if not len(instance):
                 raise Exception
             instance.update(user = request.user,is_active = True)
             return JsonResponse({"status":"Success"},safe = False)
         except Exception as e:
-            instance = FCMDevice.objects.create(dev_id =request.POST.get('dev_id'),user =request.user,reg_id = request.POST.get('reg_id'))
+            instance = FCMDevice.objects.create(user =request.user,reg_id = request.POST.get('reg_id'))
             return JsonResponse({"status":"Success"},safe = False)
 
 
     def remove_device(self,request):
         try:
-            instance = FCMDevice.objects.filter(dev_id = request.POST.get('dev_id'),reg_id = request.POST.get('reg_id'), is_active = True, user = request.user)
+            instance = FCMDevice.objects.filter(reg_id = request.POST.get('reg_id'), is_active = True, user = request.user)
             if not len(instance):
                 raise Exception
             instance.update(is_active = False)

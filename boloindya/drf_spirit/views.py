@@ -156,7 +156,7 @@ def RegisterDevice(request):
     
 
     post:
-    dev_id = request.POST.get('dev_id','')
+    reg_id = request.POST.get('reg_id','')
 
    
     """
@@ -171,7 +171,7 @@ def UnregisterDevice(request):
     
 
     post:
-    dev_id = request.POST.get('dev_id','')
+    reg_id = request.POST.get('reg_id','')
 
     Required Parameters:
     title and category_id 
