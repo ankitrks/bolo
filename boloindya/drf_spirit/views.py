@@ -31,7 +31,7 @@ import random
 import os
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
-from datetime import datetime
+from datetime import datetime,timedelta
 import json
 from .utils import get_weight,add_bolo_score
 import itertools
@@ -347,7 +347,7 @@ def get_video_thumbnail(video_url):
 from moviepy.editor import VideoFileClip
 def getVideoLength(input_video):
     clip = VideoFileClip(input_video)
-    dt = datetime.timedelta(seconds = int(clip.duration))
+    dt = timedelta(seconds = int(clip.duration))
     minutes = '00'
     seconds = '00'
     if dt.seconds/60:
