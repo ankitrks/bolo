@@ -31,7 +31,7 @@ import random
 import os
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
-from datetime import datetime,timedelta
+from datetime import datetime,timedelta,date
 import json
 from .utils import get_weight,add_bolo_score
 import itertools
@@ -196,19 +196,42 @@ class Usertimeline(generics.ListCreateAPIView):
                     all_follower = Follower.objects.filter(user_follower = self.request.user).values_list('user_following_id',flat=True)
                     category_follow = UserProfile.objects.get(user= self.request.user).sub_category.all().values_list('id',flat = True)
                     # all_follower = [1,2,3,5]
-                    # category_follow = [8,9,10,11,12,13,14,15,15]
-                    if 'language_id' in search_term and 'category' in search_term:
-                        topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),category__slug =self.request.GET.get('category'),is_removed = False)
-                    elif 'language_id' in search_term:
-                        topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False)
+                    # category_follow = [8,9,10,11,12,13,14,15]
+                    post=[]
+                    topics=[]
+                    startdate = datetime.today()
+                    enddate = startdate - timedelta(days=1)
+                    if 'language_id' in search_term:
+                        post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,date__gte=enddate)
+                        post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,date__lte=enddate)
                     elif 'category' in search_term:
-                        topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),category__slug =self.request.GET.get('category'),is_removed = False)
+                        post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),category__slug =self.request.GET.get('category'),is_removed = False,date__gte=enddate)
+                        post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),category__slug =self.request.GET.get('category'),is_removed = False,date__lte=enddate)
+                    elif 'language_id' in search_term and 'category' in search_term:
+                        post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),category__slug =self.request.GET.get('category'),is_removed = False,date__gte=enddate)
+                        post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),category__slug =self.request.GET.get('category'),is_removed = False,date__lte=enddate)
                     else:
-                        topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False)
+                        post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,date__gte=enddate)
+                        post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,date__lte=enddate)
+                    print post1,post2
+                    if post1:
+                        topics = topics+list(post1)
+                    if post2:
+                        topics = topics+list(post2)
+
         else:
             all_follower = Follower.objects.filter(user_follower = self.request.user).values_list('user_following_id',flat=True)
             category_follow = UserProfile.objects.get(user= self.request.user).sub_category.all().values_list('id',flat = True)
-            topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False)
+            post=[]
+            topics=[]
+            startdate = datetime.today()
+            enddate = startdate - timedelta(days=1)
+            post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,date__gte=enddate)
+            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,date__lte=enddate)
+            if post1:
+                topics = topics+list(post1) 
+            if post2:
+                topics = topics+list(post2)
         return topics
 
 
