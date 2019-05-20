@@ -17,7 +17,7 @@ from rest_framework.generics import GenericAPIView
 from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
 from .permissions import IsOwnerOrReadOnly
-from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,AppVersionSerializer,UserSerializer
+from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,AppVersionSerializer,UserSerializer,SingleTopicSerializerwithComment
 from forum.topic.models import Topic,ShareTopic,Like,SocialShare,FCMDevice,Notification
 from forum.category.models import Category
 from forum.comment.models import Comment
@@ -212,6 +212,23 @@ class Usertimeline(generics.ListCreateAPIView):
         return topics
 
 
+
+class GetTopic(generics.ListCreateAPIView):
+    serializer_class   = SingleTopicSerializerwithComment
+    permission_classes = (IsOwnerOrReadOnly,)
+    pagination_class    = LimitOffsetPagination
+    """
+    post:
+    topic_id =self.request.POST.get('topic_id','')
+    """ 
+
+    def get_queryset(self):
+        topic_id =self.request.GET.get('topic_id','')
+        topic = Topic.objects.filter(id=topic_id)
+        return topic
+
+
+
 @api_view(['POST'])
 def RegisterDevice(request):
     """
@@ -286,8 +303,7 @@ def GetUserProfile(request):
         user_json = UserSerializer(user).data
         return JsonResponse({'message': 'success','result':user_json}, status=status.HTTP_200_OK)
     except:
-        return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)     
-
+        return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
     # def get_queryset(self):
     #     user_id = self.request.POST.get('user_id','')
