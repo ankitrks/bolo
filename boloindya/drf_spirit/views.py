@@ -347,8 +347,30 @@ def get_video_thumbnail(video_url):
 from moviepy.editor import VideoFileClip
 def getVideoLength(input_video):
     clip = VideoFileClip(input_video)
-    print clip.duration 
-    return clip.duration
+    dt = datetime.timedelta(seconds = int(clip.duration))
+    minutes = '00'
+    seconds = '00'
+    if dt.seconds/60:
+        if len(str(dt.seconds/60))==1:
+            minutes = '0'+str(dt.seconds/60)
+        else:
+            minutes = str(dt.seconds/60)
+    else:
+        minutes='00'
+    if dt.seconds:
+        if dt.seconds<60:
+            if len(str(dt.seconds))==1:
+                seconds = '0'+str(dt.seconds)
+            else:
+                seconds = str(dt.seconds)
+        else:
+            seconds = str(dt.seconds -(dt.seconds/60)*60)
+            if len(seconds)==1:
+                seconds = '0'+seconds
+    else:
+        seconds='00'
+    duration= minutes+":"+seconds
+    return duration
 
 def upload_thumbail(virtual_thumb_file):
     try:
