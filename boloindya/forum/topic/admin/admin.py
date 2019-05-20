@@ -3,7 +3,7 @@ from forum.topic.models import *
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
-from forum.topic.models import Topic,Notification
+from forum.topic.models import Topic,Notification,ShareTopic
 # admin_all(models)
 
 class TopicResource(resources.ModelResource):
@@ -32,9 +32,12 @@ class TopicAdmin(ImportExportModelAdmin):
 class NotificationAdmin(admin.ModelAdmin):
 	list_display = ('id', 'for_user', 'user', 'notification_type')
 
+class ShareTopicAdmin(admin.ModelAdmin):
+	list_display = ('id','user')
 
 admin.site.register(Topic, TopicAdmin)
 admin.site.register(Notification,NotificationAdmin)
+admin.site.register(ShareTopic,ShareTopicAdmin)
 
 
 
