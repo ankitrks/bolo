@@ -195,8 +195,8 @@ class Usertimeline(generics.ListCreateAPIView):
                 else:
                     all_follower = Follower.objects.filter(user_follower = self.request.user).values_list('user_following_id',flat=True)
                     category_follow = UserProfile.objects.get(user= self.request.user).sub_category.all().values_list('id',flat = True)
-                    all_follower = [1,2,3,5]
-                    category_follow = [8,9,10,11,12,13,14,15,15]
+                    # all_follower = [1,2,3,5]
+                    # category_follow = [8,9,10,11,12,13,14,15,15]
                     if 'language_id' in search_term and 'category' in search_term:
                         topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),category__slug =self.request.GET.get('category'),is_removed = False)
                     elif 'language_id' in search_term:
@@ -802,8 +802,8 @@ def verify_otp(request):
                     userprofile = UserProfile.objects.get(user = user)
                     userprofile.mobile_no = mobile_no
                     userprofile.save()
-                    if str(language):
-                        default_follow = deafult_boloindya_follow(user,str(language))
+                    # if str(language):
+                    #     default_follow = deafult_boloindya_follow(user,str(language))
                     add_bolo_score(user.id, 'initial_signup')
                 user_tokens = get_tokens_for_user(user)
                 otp_obj.for_user = user
@@ -908,9 +908,10 @@ def fb_profile_settings(request):
                 userprofile.bolo_score += 100
                 userprofile.follow_count += 1
                 userprofile.save()
-                if str(language):
-                    default_follow = deafult_boloindya_follow(user,str(language))
-                    userprofile.language = str(language)
+                # if str(language):
+                #     default_follow = deafult_boloindya_follow(user,str(language))
+                userprofile.language = str(language)
+                userprofile.save()
                 user.save()
                 user_tokens = get_tokens_for_user(user)
                 return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
