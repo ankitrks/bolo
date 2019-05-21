@@ -3,7 +3,7 @@ from django.conf.urls import include, url
 from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,createTopic, TopicCommentList, CategoryList, CommentList, CommentDetails, SingUpOTPView,\
 	verify_otp, password_set, fb_profile_settings,Usertimeline,follow_user,follow_sub_category,like,shareontimeline,GetProfile,SubCategoryList,upload_video_to_s3,comment_view,\
     follow_like_list,upload_audio_to_s3,reply_delete,editTopic,topic_delete,notification_topic,GetUserProfile,RegisterDevice,UnregisterDevice,NotificationAPI,get_bolo_score,\
-    GetTopic
+    GetTopic,GetQuestion,GetAnswers
 from rest_framework_simplejwt import views as jwt_views
 
 app_name = 'drf_spirit'
@@ -42,6 +42,8 @@ category_urls = [
 urlpatterns = [
     url(r'^timeline/', include(timeline_urls)),
     url(r'^get_topic/$', GetTopic.as_view(), name='get_topic'),
+    url(r'^get_question/$', GetQuestion.as_view(), name='get_question'),
+    url(r'^get_answers/$', GetAnswers.as_view(), name='get_answers'),
     url(r'^search/', include(topicsearch_urls)),
     url(r'^search/users/', include(usersearch_urls)),
     url(r'^create_topic', include(createtopic_urls)),

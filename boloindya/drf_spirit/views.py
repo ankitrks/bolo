@@ -17,7 +17,8 @@ from rest_framework.generics import GenericAPIView
 from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
 from .permissions import IsOwnerOrReadOnly
-from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,AppVersionSerializer,UserSerializer,SingleTopicSerializerwithComment
+from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,AppVersionSerializer,UserSerializer,SingleTopicSerializerwithComment,\
+UserAnswerSerializerwithComment
 from forum.topic.models import Topic,ShareTopic,Like,SocialShare,FCMDevice,Notification
 from forum.category.models import Category
 from forum.comment.models import Comment
@@ -255,6 +256,42 @@ class GetTopic(generics.ListCreateAPIView):
         topic = Topic.objects.filter(id=topic_id)
         return topic
 
+
+class GetQuestion(generics.ListCreateAPIView):
+    serializer_class   = TopicSerializerwithComment
+    permission_classes = (IsOwnerOrReadOnly,)
+    pagination_class    = LimitOffsetPagination
+    """
+    post:
+    """
+    def get_serializer_context(self):
+        """
+        Extra context provided to the serializer class.
+        """
+        return {
+            'request': self.request,
+        } 
+
+    def get_queryset(self):
+        topic = Topic.objects.filter(user=self.request.user,is_removed=False)
+        return topic
+
+
+class GetAnswers(generics.ListCreateAPIView):
+    serializer_class   = UserAnswerSerializerwithComment
+    permission_classes = (IsOwnerOrReadOnly,)
+    pagination_class    = LimitOffsetPagination
+    """
+    post:
+    """ 
+
+    def get_queryset(self):
+        get_topic_user_commented = Comment.objects.filter(user = self.request.user).values_list('topic_id',flat=True)
+        topics=[]
+        if get_topic_user_commented:
+            topics = Topic.objects.filter(id__in=get_topic_user_commented)
+
+        return topics
 
 
 @api_view(['POST'])

@@ -136,6 +136,43 @@ class SingleTopicSerializerwithComment(ModelSerializer):
     def get_comment_count(self,instance):
         return shorcountertopic(instance.comment_count)
 
+class UserAnswerSerializerwithComment(ModelSerializer):
+    user = SerializerMethodField()
+    category = PresentableSlugRelatedField(queryset=Category.objects.all(),
+                                           presentation_serializer=CategoryLiteSerializer,
+                                           slug_field='slug')
+    view_count = SerializerMethodField()
+    comment_count = SerializerMethodField()
+    video_comments = SerializerMethodField()
+    audio_comments = SerializerMethodField()
+    text_comments = SerializerMethodField()
+    date = SerializerMethodField()
+    # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
+
+    class Meta:
+        model = Topic
+        fields = '__all__'
+        # TODO:: refactor after deciding about globally pinned.
+        read_only_fields = ('is_pinned',)
+
+    def get_video_comments(self,instance):
+        return CommentSerializer(instance.topic_comment.filter(is_media = True, is_audio = False, is_removed = False,user = self.context['request'].user),many=True).data
+    def get_audio_comments(self,instance):
+        return CommentSerializer(instance.topic_comment.filter(is_media = True, is_audio = True, is_removed = False,user = self.context['request'].user) ,many=True).data
+    def get_text_comments(self,instance):
+        return CommentSerializer(instance.topic_comment.filter(is_media = False, is_removed = False,user = self.context['request'].user) ,many=True).data
+    def get_user(self,instance):
+        return UserSerializer(instance.user).data
+
+    def get_date(self,instance):
+        return shortnaturaltime(instance.date)
+
+    def get_view_count(self,instance):
+        return shorcountertopic(instance.view_count)
+
+    def get_comment_count(self,instance):
+        return shorcountertopic(instance.comment_count)
+
 class UserProfileSerializer(ModelSerializer):
     follow_count= SerializerMethodField()
     follower_count= SerializerMethodField()
