@@ -264,16 +264,11 @@ class GetQuestion(generics.ListCreateAPIView):
     """
     post:
     """
-    def get_serializer_context(self):
-        """
-        Extra context provided to the serializer class.
-        """
-        return {
-            'request': self.request,
-        } 
+    
 
     def get_queryset(self):
-        topic = Topic.objects.filter(user=self.request.user,is_removed=False)
+        user_id = self.request.GET.get('user_id','')
+        topic = Topic.objects.filter(user_id=user_id, is_removed=False)
         return topic
 
 
@@ -284,9 +279,17 @@ class GetAnswers(generics.ListCreateAPIView):
     """
     post:
     """ 
+    def get_serializer_context(self):
+        """
+        Extra context provided to the serializer class.
+        """
+        return {
+            'user_id': self.request.GET.get('user_id',''),
+        } 
 
     def get_queryset(self):
-        get_topic_user_commented = Comment.objects.filter(user = self.request.user).values_list('topic_id',flat=True)
+        user_id = self.request.GET.get('user_id','')
+        get_topic_user_commented = Comment.objects.filter(user_id = user_id,is_removed=False).values_list('topic_id',flat=True)
         topics=[]
         if get_topic_user_commented:
             topics = Topic.objects.filter(id__in=get_topic_user_commented)

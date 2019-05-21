@@ -156,11 +156,11 @@ class UserAnswerSerializerwithComment(ModelSerializer):
         read_only_fields = ('is_pinned',)
 
     def get_video_comments(self,instance):
-        return CommentSerializer(instance.topic_comment.filter(is_media = True, is_audio = False, is_removed = False,user = self.context['request'].user),many=True).data
+        return CommentSerializer(instance.topic_comment.filter(is_media = True, is_audio = False, is_removed = False,user_id = self.context['user_id']),many=True).data
     def get_audio_comments(self,instance):
-        return CommentSerializer(instance.topic_comment.filter(is_media = True, is_audio = True, is_removed = False,user = self.context['request'].user) ,many=True).data
+        return CommentSerializer(instance.topic_comment.filter(is_media = True, is_audio = True, is_removed = False,user_id = self.context['user_id']) ,many=True).data
     def get_text_comments(self,instance):
-        return CommentSerializer(instance.topic_comment.filter(is_media = False, is_removed = False,user = self.context['request'].user) ,many=True).data
+        return CommentSerializer(instance.topic_comment.filter(is_media = False, is_removed = False,user_id = self.context['user_id']) ,many=True).data
     def get_user(self,instance):
         return UserSerializer(instance.user).data
 
