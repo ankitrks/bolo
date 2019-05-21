@@ -236,7 +236,7 @@ class ShareTopic(UserInfo):
         return str(self.topic if self.topic else self.comment)
 
 
-        
+
 class Like(UserInfo):
     comment = models.ForeignKey('forum_comment.Comment',related_name='like_topic_comment',null=True,blank=True)
     topic = models.ForeignKey(Topic, related_name='like_topic_share',null=True,blank=True)

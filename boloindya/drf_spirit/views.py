@@ -836,6 +836,9 @@ def verify_otp(request):
     mobile_no = request.POST.get('mobile_no', None)
     language = request.POST.get('language',None)
     otp = request.POST.get('otp', None)
+    is_geo_location = request.POST.get('is_geo_location',None)
+    lat = request.POST.get('lat',None)
+    lang = request.POST.get('lang',None)
     is_reset_password = False
     is_for_change_phone = False
     all_category_follow = []
@@ -866,6 +869,9 @@ def verify_otp(request):
                     message = 'User created'
                     userprofile = UserProfile.objects.get(user = user)
                     userprofile.mobile_no = mobile_no
+                    if str(is_geo_location) =="1":
+                        userprofile.lat = lat
+                        userprofile.lang = lang
                     userprofile.save()
                     # if str(language):
                     #     default_follow = deafult_boloindya_follow(user,str(language))
@@ -939,6 +945,9 @@ def fb_profile_settings(request):
     extra_data      = request.POST.get('extra_data',None)
     activity        = request.POST.get('activity',None)
     language        = request.POST.get('language',None)
+    is_geo_location = request.POST.get('is_geo_location',None)
+    lat = request.POST.get('lat',None)
+    lang = request.POST.get('lang',None)
     sub_category_prefrences = request.POST.get('categories',None)
     try:
         sub_category_prefrences = sub_category_prefrences.split(',')
@@ -970,8 +979,11 @@ def fb_profile_settings(request):
                 userprofile.refrence = refrence
                 userprofile.extra_data = extra_data
                 userprofile.user = user
-                userprofile.bolo_score += 100
-                userprofile.follow_count += 1
+                userprofile.bolo_score += 95
+                # userprofile.follow_count += 1
+                if str(is_geo_location) =="1":
+                    userprofile.lat = lat
+                    userprofile.lang = lang
                 userprofile.save()
                 # if str(language):
                 #     default_follow = deafult_boloindya_follow(user,str(language))
