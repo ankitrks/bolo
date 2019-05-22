@@ -1254,7 +1254,7 @@ def shareontimeline(request):
 
 
 def comment_view(request):
-    comment_ids = request.GET.get('comment_ids',None)
+    topic_id = request.GET.get('topic_id',None)
     """
     get:
         Required Parameters
@@ -1262,13 +1262,13 @@ def comment_view(request):
     """
     #### add models for seen users
     try:
-        comment_list = comment_ids.split(',')
-        for each_comment_id in comment_list:
-            comment = Comment.objects.get(pk = each_comment_id)
-            topic= comment.topic
-            topic.view_count = F('view_count') +1
-            topic.save()
-            return JsonResponse({'message': 'item viewed'}, status=status.HTTP_200_OK)
+        # comment_list = comment_ids.split(',')
+        # for each_comment_id in comment_list:
+        topic = Topic.objects.get(pk = topic_id)
+        # topic= comment.topic
+        topic.view_count = F('view_count') +1
+        topic.save()
+        return JsonResponse({'message': 'item viewed'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
