@@ -1055,7 +1055,7 @@ def fb_profile_settings(request):
                         user.username = username
                         user.save()
                     else:
-                        return JsonResponse({'message': 'Username already exist'}, status=status.HTTP_400_BAD_REQUEST)
+                        return JsonResponse({'message': 'Username already exist'}, status=status.HTTP_200_OK)
                 return JsonResponse({'message': 'Profile Saved'}, status=status.HTTP_200_OK)
             except Exception as e:
                 return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
