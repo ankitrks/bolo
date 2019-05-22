@@ -4,6 +4,8 @@ from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
 from forum.topic.models import Topic,Notification,ShareTopic
+from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
+
 # admin_all(models)
 
 class TopicResource(resources.ModelResource):
@@ -18,9 +20,9 @@ class TopicResource(resources.ModelResource):
 
 class TopicAdmin(ImportExportModelAdmin):
 	search_fields = ('title', )
-	list_filter = ('language_id', 'category', 'is_media')
-	list_display = ('id', 'title', 'user', 'category', 'is_media','comments','audio_duration' ,'video_duration',)
-	list_editable = ('title', )
+	list_filter = ('language_id', 'category', 'is_media','date', ('date', DateRangeFilter),)
+	list_display = ('id', 'title', 'user', 'category', 'is_media','comments','audio_duration' ,'video_duration','date')
+	list_editable = ('title', 'category',)
 	resource_class = TopicResource
 	# def comment_count(self, obj):
 	# 	url = '/forum_comment/comment/?topic_id='+obj.id

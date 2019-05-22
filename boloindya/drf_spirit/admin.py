@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import SingUpOTP
 from forum.user.models import Weight,UserProfile,AppVersion
+from forum.category.models import Category
 from import_export.admin import ImportExportModelAdmin,ExportMixin
 from import_export import resources
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
@@ -20,11 +21,16 @@ class SingUpOTPAdmin(admin.ModelAdmin):
 	list_editable = ('is_active', )
 admin.site.register(SingUpOTP, SingUpOTPAdmin)
 
+class CategoryAdmin(admin.ModelAdmin):
+	list_display = ('title', 'hindi_title','tamil_title','telgu_title', )
+admin.site.register(Category, CategoryAdmin)
+
 class WeightAdmin(admin.ModelAdmin):
 	list_display = ('features', 'weight', )
 admin.site.register(Weight, WeightAdmin)
 
 class UserProfileAdmin(ImportExportModelAdmin):
+	search_fields = ('user__username','name',)
 	list_display = ('user', 'name','language','bolo_score','follow_count','follower_count','question_count','answer_count','share_count','like_count')
 	list_filter = ('user__date_joined', ('user__date_joined', DateRangeFilter), 'language')
 	resource_class = UserProfileResource
