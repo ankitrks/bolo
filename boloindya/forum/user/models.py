@@ -70,6 +70,9 @@ class UserProfile(models.Model):
     lat = models.CharField(_('Latitude'), blank=True, null=True, max_length = 50, default = '')
     lang = models.CharField(_('Langitude'), blank=True, null=True, max_length = 50, default = '')
 
+    click_id = models.CharField(_("Click Id"), max_length=300, blank=True)
+    click_id_response = models.TextField(_("Click Id Response"),null=True, blank=True)
+
     # end #
 
     class Meta:

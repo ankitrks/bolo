@@ -36,6 +36,8 @@ from datetime import datetime,timedelta,date
 import json
 from .utils import get_weight,add_bolo_score
 import itertools
+import json
+import urllib2
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -884,6 +886,7 @@ def verify_otp(request):
     is_geo_location = request.POST.get('is_geo_location',None)
     lat = request.POST.get('lat',None)
     lang = request.POST.get('lang',None)
+    click_id = request.POST.get('click_id',None)
     is_reset_password = False
     is_for_change_phone = False
     all_category_follow = []
@@ -917,6 +920,11 @@ def verify_otp(request):
                     if str(is_geo_location) =="1":
                         userprofile.lat = lat
                         userprofile.lang = lang
+                    if click_id:
+                        userprofile.click_id = click_id
+                        click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
+                        response = urllib2.urlopen(click_url).read()
+                        userprofile.click_id_response = str(response)
                     userprofile.save()
                     # if str(language):
                     #     default_follow = deafult_boloindya_follow(user,str(language))
@@ -991,6 +999,7 @@ def fb_profile_settings(request):
     activity        = request.POST.get('activity',None)
     language        = request.POST.get('language',None)
     is_geo_location = request.POST.get('is_geo_location',None)
+    click_id = request.POST.get('click_id',None)
     lat = request.POST.get('lat',None)
     lang = request.POST.get('lang',None)
     sub_category_prefrences = request.POST.get('categories',None)
@@ -1029,6 +1038,11 @@ def fb_profile_settings(request):
                 if str(is_geo_location) =="1":
                     userprofile.lat = lat
                     userprofile.lang = lang
+                if click_id:
+                    userprofile.click_id = click_id
+                    click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
+                    response = urllib2.urlopen(click_url).read()
+                    userprofile.click_id_response = str(response)
                 userprofile.save()
                 # if str(language):
                 #     default_follow = deafult_boloindya_follow(user,str(language))
