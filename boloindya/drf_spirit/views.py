@@ -58,6 +58,7 @@ class NotificationAPI(GenericAPIView):
 
         if action == 'get':
             notifications = self.get_notifications(request.user.id)
+            print notifications
 
 
             notification_data = self.serialize_notification(notifications)
@@ -167,10 +168,11 @@ class Usertimeline(generics.ListCreateAPIView):
         is_user_timeline    = False
         search_term         =self.request.GET.keys()
         filter_dic      ={}
+        sort_recent= False
         if search_term:
             post            = []
             for term_key in search_term:
-                if term_key not in ['limit','offset']:
+                if term_key not in ['limit','offset','order_by']:
                     if term_key =='category':
                         filter_dic['category__slug'] = self.request.GET.get(term_key)
                     elif term_key:
@@ -178,6 +180,9 @@ class Usertimeline(generics.ListCreateAPIView):
                         filter_dic[term_key]=value
                         if term_key =='user_id':
                             is_user_timeline = True
+            if 'order_by' in search_term:
+                sort_recent = True
+
             if filter_dic:
                 print filter_dic
 
@@ -202,28 +207,40 @@ class Usertimeline(generics.ListCreateAPIView):
                     # category_follow = [8,9,10,11,12,13,14,15]
                     post=[]
                     topics=[]
-                    startdate = datetime.today()
-                    enddate = startdate - timedelta(days=1)
+                    # startdate = datetime.today()
+                    # enddate = startdate - timedelta(days=1)
                     # print search_term
                     if 'language_id' in search_term and not 'category' in search_term:
                         # print "a"
-                        post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,date__gte=enddate)
-                        post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,date__lte=enddate)
+                        # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,date__gte=enddate)
+                        if not sort_recent:
+                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False)
+                        else:
+                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False).order_by('-date')
                     elif 'category' in search_term and not 'language_id' in search_term:
                         # print "b"
-                        post1 = Topic.objects.filter(category__slug =self.request.GET.get('category'),is_removed = False,date__gte=enddate)
-                        post2 = Topic.objects.filter(category__slug =self.request.GET.get('category'),is_removed = False,date__lte=enddate)
+                        # post1 = Topic.objects.filter(category__slug =self.request.GET.get('category'),is_removed = False,date__gte=enddate)
+                        if not sort_recent:
+                            post2 = Topic.objects.filter(category__slug =self.request.GET.get('category'),is_removed = False)
+                        else:
+                            post2 = Topic.objects.filter(category__slug =self.request.GET.get('category'),is_removed = False).order_by('-date')
                     elif 'language_id' in search_term and 'category' in search_term:
                         # print "maaz"
-                        post1 = Topic.objects.filter(language_id = self.request.GET.get('language_id'),category__slug =self.request.GET.get('category'),is_removed = False,date__gte=enddate)
-                        post2 = Topic.objects.filter(language_id = self.request.GET.get('language_id'),category__slug =self.request.GET.get('category'),is_removed = False,date__lte=enddate)
+                        # post1 = Topic.objects.filter(language_id = self.request.GET.get('language_id'),category__slug =self.request.GET.get('category'),is_removed = False,date__gte=enddate)
+                        if not sort_recent:
+                            post2 = Topic.objects.filter(language_id = self.request.GET.get('language_id'),category__slug =self.request.GET.get('category'),is_removed = False)
+                        else:
+                            post2 = Topic.objects.filter(language_id = self.request.GET.get('language_id'),category__slug =self.request.GET.get('category'),is_removed = False).order_by('-date')
                     else:
                         # print "d"
-                        post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,date__gte=enddate)
-                        post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,date__lte=enddate)
+                        # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,date__gte=enddate)
+                        if not sort_recent:
+                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False)
+                        else:
+                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False).order_by('-date')
                     # print post1,post2
-                    if post1:
-                        topics = topics+list(post1)
+                    # if post1:
+                    #     topics = topics+list(post1)
                     if post2:
                         topics = topics+list(post2)
 
@@ -232,12 +249,15 @@ class Usertimeline(generics.ListCreateAPIView):
             category_follow = UserProfile.objects.get(user= self.request.user).sub_category.all().values_list('id',flat = True)
             post=[]
             topics=[]
-            startdate = datetime.today()
-            enddate = startdate - timedelta(days=1)
-            post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,date__gte=enddate)
-            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,date__lte=enddate)
-            if post1:
-                topics = topics+list(post1) 
+            # startdate = datetime.today()
+            # enddate = startdate - timedelta(days=1)
+            # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,date__gte=enddate)
+            if not sort_recent:
+                post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False)
+            else:
+                post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False).order_by('-date')
+            # if post1:
+            #     topics = topics+list(post1) 
             if post2:
                 topics = topics+list(post2)
         return topics
