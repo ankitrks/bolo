@@ -1315,7 +1315,8 @@ def follow_like_list(request):
         all_category_follow = userprofile.sub_category.all().values_list('id', flat=True)
         app_version = AppVersion.objects.get(app_name = 'android')
         app_version = AppVersionSerializer(app_version).data
-        return JsonResponse({'all_like':list(all_like),'all_follow':list(all_follow),'all_category_follow':list(all_category_follow),'app_version':app_version}, status=status.HTTP_200_OK)
+        notification_count = Notification.objects.filter(for_user= request.user,status=0).count()
+        return JsonResponse({'all_like':list(all_like),'all_follow':list(all_follow),'all_category_follow':list(all_category_follow),'app_version':app_version,'notification_count':notification_count}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
