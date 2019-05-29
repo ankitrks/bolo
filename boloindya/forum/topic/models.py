@@ -346,7 +346,7 @@ class Notification(UserInfo):
             notific['tamil_title'] = str(self.user.st.name)+' பாலோ செய்துள்ளார்'
             notific['telgu_title'] = str(self.user.st.name)+' మీరు అనుసరించారు'
             notific['notification_type'] = '4'
-            notific['instance_id'] = self.for_user.id
+            notific['instance_id'] = self.user.id
             notific['read_status'] = self.status
             notific['id'] = self.id
             notific['created_at'] = shortnaturaltime(self.created_at)
