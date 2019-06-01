@@ -387,6 +387,69 @@ class Notification(UserInfo):
         return result
 
 
+class CricketMatch(models.Model):
+    match_name = models.CharField(_("Match Name"),max_length=255,null=True,blank=True)
+    team_1 = models.CharField(_("Team 1"),max_length=255,null=True,blank=True)
+    team_1_flag = models.TextField(_("Team 1 Flag"),null=True,blank=True)
+    team_2 = models.CharField(_("Team 2"),max_length=255,null=True,blank=True)
+    team_2_flag = models.TextField(_("Team 2 Flag"),null=True,blank=True)
+    match_datetime = models.DateTimeField(_("Match Datetime"), null=True,blank=True)
+    created_at=models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False) # auto_now will add the current time and date whenever field is saved.
+    last_modified=models.DateTimeField(auto_now=True,auto_now_add=False)
+    is_active = models.BooleanField(default = True)
+
+    def __unicode__(self):
+        return str(self.match_name)+" - "+str(self.match_datetime.date())
+
+class Poll(models.Model):
+    title = models.CharField(_("Title"),max_length=255,null=True,blank=True)
+    activate_datetime = models.DateTimeField(_("Activate DateTime"), null=True,blank=True)
+    deactivate_datetime = models.DateTimeField(_("Deactivate DateTime"), null=True,blank=True)
+    score = models.PositiveIntegerField(_("Score"), default=0)
+    bolo_score = models.PositiveIntegerField(_("Bolo Score"), default=0)
+    cricketmatch = models.ForeignKey(CricketMatch, related_name='st_cricket_match',null=True,blank=True)
+    created_at=models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False) # auto_now will add the current time and date whenever field is saved.
+    last_modified=models.DateTimeField(auto_now=True,auto_now_add=False)
+    is_active = models.BooleanField(default = True)
+
+    def __unicode__(self):
+        return str(self.id)+" - "+str(self.title)
+
+class Choice(models.Model):
+    title = models.CharField(_("Title"),max_length=255,null=True,blank=True)
+    image = models.CharField(_("Option Image"),max_length=255,null=True,blank=True)
+    is_correct_choice = models.BooleanField(default=False)
+    poll = models.ForeignKey(Poll, related_name='st_cricket_match_choice',null=False,blank=False)
+    created_at=models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False) # auto_now will add the current time and date whenever field is saved.
+    last_modified=models.DateTimeField(auto_now=True,auto_now_add=False)
+    is_active = models.BooleanField(default = True)
+
+    def __unicode__(self):
+        return str(self.title)
+
+class Voting(UserInfo):
+    poll = models.ForeignKey(Poll, related_name='st_voting_match',null=False,blank=False)
+    cricketmatch = models.ForeignKey(CricketMatch, related_name='st_voting_poll',null=True,blank=True)
+    choice = models.ForeignKey(Choice, related_name='st_voting_choice',null=False,blank=False)
+    is_active = models.BooleanField(default = True)
+
+    def __unicode__(self):
+        return str(self.choice)
+
+class Leaderboard(UserInfo):
+    total_score = models.PositiveIntegerField(_("Total Score"), default=0)
+    total_prediction_count = models.PositiveIntegerField(_("Total Prediction"), default=0)
+    correct_prediction_count = models.PositiveIntegerField(_("Correct Prediction"), default=0)
+
+    def __unicode__(self):
+        return str(self.total_score)
+
+
+
+
+
+
+
 
 
 

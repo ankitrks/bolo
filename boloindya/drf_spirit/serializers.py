@@ -1,7 +1,7 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
 from .fields import UserReadOnlyField
-from forum.topic.models import Topic
+from forum.topic.models import Topic,CricketMatch,Poll,Choice,Voting,Leaderboard
 from django.contrib.auth.models import User
 from forum.category.models import Category
 from forum.comment.models import Comment
@@ -204,5 +204,84 @@ class SingUpOTPSerializer(ModelSerializer):
     class Meta:
         model = SingUpOTP
         fields = ('mobile_no', )
+
+class CricketMatchSerializer(ModelSerializer):
+    class Meta:
+        model = CricketMatch
+        fields = '__all__'
+
+class PollSerializer(ModelSerializer):
+    cricketmatch = SerializerMethodField()
+    class Meta:
+        model = Poll
+        fields = '__all__'
+
+
+    def get_cricketmatch(self,instance):
+        return CricketMatchSerializer(instance.cricketmatch).data
+
+    
+class PollSerializerwithChoice(ModelSerializer):
+    cricketmatch = SerializerMethodField()
+    choices = SerializerMethodField()
+    class Meta:
+        model = Poll
+        fields = '__all__'
+
+
+    def get_cricketmatch(self,instance):
+        return CricketMatchSerializer(instance.cricketmatch).data
+    def get_choices(self,instance):
+        choices = Choice.objects.filter(poll = instance,is_active = True)
+        return OnlyChoiceSerializer(choices,many = True).data
+
+
+class OnlyChoiceSerializer(ModelSerializer):
+    class Meta:
+        model = Choice
+        fields = '__all__'
+
+class ChoiceSerializer(ModelSerializer):
+    poll = SerializerMethodField()
+    class Meta:
+        model = Choice
+        fields = '__all__'
+
+
+    def get_poll(self,instance):
+        return PollSerializer(instance.poll).data
+
+class VotingSerializer(ModelSerializer):
+    cricketmatch = SerializerMethodField()
+    poll = SerializerMethodField()
+    choice = SerializerMethodField()
+    user = SerializerMethodField()
+    class Meta:
+        model = Voting
+        fields = '__all__'
+
+
+    def get_poll(self,instance):
+        return PollSerializer(instance.poll).data
+
+    def get_cricketmatch(self,instance):
+        return CricketMatchSerializer(instance.cricketmatch).data
+
+    def get_choice(self,instance):
+        return ChoiceSerializer(instance.choice).data
+
+    def get_user(self,instance):
+        return UserSerializer(instance.user).data
+
+
+class LeaderboardSerializer(ModelSerializer):
+    user = SerializerMethodField()
+    class Meta:
+        model = Leaderboard
+        fields = '__all__'
+
+
+    def get_user(self,instance):
+        return UserSerializer(instance.user).data 
 
       

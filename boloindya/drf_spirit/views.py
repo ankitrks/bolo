@@ -18,8 +18,9 @@ from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
 from .permissions import IsOwnerOrReadOnly
 from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,AppVersionSerializer,UserSerializer,SingleTopicSerializerwithComment,\
-UserAnswerSerializerwithComment
-from forum.topic.models import Topic,ShareTopic,Like,SocialShare,FCMDevice,Notification
+UserAnswerSerializerwithComment,CricketMatchSerializer,PollSerializer,ChoiceSerializer,VotingSerializer,LeaderboardSerializer,\
+PollSerializerwithChoice
+from forum.topic.models import Topic,ShareTopic,Like,SocialShare,FCMDevice,Notification,CricketMatch,Poll,Choice,Voting,Leaderboard
 from forum.category.models import Category
 from forum.comment.models import Comment
 from forum.user.models import UserProfile,Follower,AppVersion
@@ -1353,13 +1354,88 @@ def get_bolo_score(request):
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
+####
+# Prediction
+####
+
+class CricketMatchList(generics.ListCreateAPIView):
+    serializer_class    = CricketMatchSerializer
+    # queryset            = CricketMatch.objects.filter(is_active = True)
+    permission_classes  = (IsAuthenticatedOrReadOnly,)
+    pagination_class    = LimitOffsetPagination
+
+    def get_queryset(self):
+        matches = []
+        startdate = datetime.today().date()
+        enddate = startdate - timedelta(days=1)
+        match_list_1 = CricketMatch.objects.filter(match_datetime__gte=startdate).order_by('match_datetime')
+        match_list_2 = CricketMatch.objects.filter(match_datetime__lte=startdate).order_by('match_datetime')
+        if match_list_1:
+            for each in match_list_1:
+                matches.append(each)
+        if match_list_2:
+            for each in match_list_2:
+                matches.append(each)
+        return matches
 
 
+@api_view(['POST'])
+def get_single_match(request):
+    """
+    post:
+        Required Parameters
+        password = request.POST.get('password', '')
+    """
+    match_id = request.POST.get('match_id', '')
+    
+    if match_id:
+        try:
+            cricket_match = CricketMatch.objects.get(pk=match_id)
+            cricketmatch_json = CricketMatchSerializer(cricket_match).data
+            polls = Poll.objects.filter(cricketmatch = cricket_match,is_active = True)
+            polls_json = PollSerializer(polls,many=True).data
+            new_polls_json = []
+            if polls:
+                for each in polls_json:
+                    try:
+                        Voting.objects.get(poll_id=each['id'],user = request.user)
+                        voting_status = True
+                    except:
+                        voting_status = False
+                    each['voting_status'] = voting_status
+                new_polls_json.append(each)
+            return JsonResponse({'message': 'success','polls':new_polls_json,'cricketmatch':cricketmatch_json}, status=status.HTTP_201_CREATED)
+        except User.DoesNotExist:
+            return JsonResponse({'message': 'Invalid User'}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return JsonResponse({'message': 'No user found/password provided'}, status=status.HTTP_204_NO_CONTENT)
 
-
-
-
-
-
+@api_view(['POST'])
+def get_single_poll(request):
+    """
+    post:
+        Required Parameters
+        password = request.POST.get('password', '')
+    """
+    poll_id = request.POST.get('poll_id', '')
+    
+    if poll_id:
+        try:
+            poll = Poll.objects.get(pk=poll_id)
+            polls_json = PollSerializerwithChoice(poll).data
+            new_polls_json = []
+            if poll:
+                try:
+                    voted = Voting.objects.get(poll_id=polls_json['id'],user = request.user)
+                    if voted:
+                        voted_on = voted.choice
+                except:
+                     voted_on = ''
+                polls_json['voted_on'] = voted_on
+            return JsonResponse({'message': 'success','polls':polls_json}, status=status.HTTP_201_CREATED)
+        except User.DoesNotExist:
+            return JsonResponse({'message': 'Invalid User'}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return JsonResponse({'message': 'No user found/password provided'}, status=status.HTTP_204_NO_CONTENT)
 
 
