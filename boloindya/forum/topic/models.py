@@ -411,6 +411,7 @@ class Poll(models.Model):
     created_at=models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False) # auto_now will add the current time and date whenever field is saved.
     last_modified=models.DateTimeField(auto_now=True,auto_now_add=False)
     is_active = models.BooleanField(default = True)
+    is_evaluated = models.BooleanField(default = False)
 
     def __unicode__(self):
         return str(self.id)+" - "+str(self.title)
@@ -440,6 +441,8 @@ class Leaderboard(UserInfo):
     total_score = models.PositiveIntegerField(_("Total Score"), default=0)
     total_prediction_count = models.PositiveIntegerField(_("Total Prediction"), default=0)
     correct_prediction_count = models.PositiveIntegerField(_("Correct Prediction"), default=0)
+    last_rank = models.PositiveIntegerField(_("Correct Prediction"),default=0)
+    current_rank = models.PositiveIntegerField(_("Correct Prediction"),null=True,blank=True)
 
     def __unicode__(self):
         return str(self.total_score)

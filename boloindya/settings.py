@@ -85,6 +85,7 @@ ST_CASE_INSENSITIVE_EMAILS = True
 ST_TESTS_RATELIMIT_NEVER_EXPIRE = False
 
 ST_BASE_DIR = os.path.dirname(__file__)
+BASE_DIR = os.path.dirname(__file__)
 
 #
 # Django & Spirit settings defined below...
@@ -132,6 +133,7 @@ INSTALLED_APPS = [
     'fcm',
     'rangefilter',
     'import_export',
+    'django_extensions',
 
     # 'forum.core.tests'
 ]
