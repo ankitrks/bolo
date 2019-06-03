@@ -1439,3 +1439,56 @@ def get_single_poll(request):
         return JsonResponse({'message': 'No user found/password provided'}, status=status.HTTP_204_NO_CONTENT)
 
 
+@api_view(['POST'])
+def predict(request):
+    """
+    post:
+        Required Parameters
+        password = request.POST.get('password', '')
+    """
+    poll_id = request.POST.get('poll_id', '')
+    choice_id = request.POST.get('choice_id', '')
+    message = ''
+    
+    if request.user:
+        try:
+            poll = Poll.objects.get(pk=poll_id)
+            cricketmatch = poll.cricketmatch
+            voted,is_created = Voting.objects.get_or_create(poll_id = poll_id,user= request.user)
+            if is_created:
+                voted.choice_id = choice_id
+                voted.cricketmatch = poll.cricketmatch
+                message = "Prediction Created"
+            else:
+                if not str(voted.choice_id)  == str(choice_id):
+                    voted.choice_id = choice_id
+                    message = "Prediction Updated"
+                else:
+                    message = "No change"
+            voted.save()
+            return JsonResponse({'message': message}, status=status.HTTP_201_CREATED)
+        except User.DoesNotExist:
+            return JsonResponse({'message': 'Invalid User'}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return JsonResponse({'message': 'No user found/password provided'}, status=status.HTTP_204_NO_CONTENT)
+
+class LeaderBoradList(generics.ListCreateAPIView):
+    serializer_class    = LeaderboardSerializer
+    # queryset            = CricketMatch.objects.filter(is_active = True)
+    permission_classes  = (IsAuthenticatedOrReadOnly,)
+    pagination_class    = LimitOffsetPagination
+
+    def get_queryset(self):
+        leaderboard = []
+        leaderboard_list_1 = Leaderboard.objects.filter(user = self.request.user)
+        leaderboard_list_2 = leaderboard.objects.exclude(user = self.request.user).order_by('-total_score')
+        if leaderboard_list_1:
+            for each in leaderboard_list_1:
+                leaderboard.append(each)
+        if leaderboard_list_2:
+            for each in leaderboard_list_2:
+                leaderboard.append(each)
+        return leaderboard
+
+
+
