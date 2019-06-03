@@ -1454,9 +1454,13 @@ def predict(request):
         try:
             poll = Poll.objects.get(pk=poll_id)
             cricketmatch = poll.cricketmatch
-            voted,is_created = Voting.objects.get_or_create(poll_id = poll_id,user= request.user)
+            try:
+                voted = Voting.objects.get(poll_id = poll_id,user= request.user)
+                is_created = False
+            except:
+                voted = Voting.objects.create(poll_id = poll_id,user= request.user,choice_id = choice_id)
+                is_created = True
             if is_created:
-                voted.choice_id = choice_id
                 voted.cricketmatch = poll.cricketmatch
                 message = "Prediction Created"
             else:
