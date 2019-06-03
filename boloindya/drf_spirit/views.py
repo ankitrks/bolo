@@ -19,7 +19,7 @@ from .models import SingUpOTP
 from .permissions import IsOwnerOrReadOnly
 from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,AppVersionSerializer,UserSerializer,SingleTopicSerializerwithComment,\
 UserAnswerSerializerwithComment,CricketMatchSerializer,PollSerializer,ChoiceSerializer,VotingSerializer,LeaderboardSerializer,\
-PollSerializerwithChoice, OnlyChoiceSerializer
+PollSerializerwithChoice, OnlyChoiceSerializer, NotificationSerializer
 from forum.topic.models import Topic,ShareTopic,Like,SocialShare,FCMDevice,Notification,CricketMatch,Poll,Choice,Voting,Leaderboard
 from forum.category.models import Category
 from forum.comment.models import Comment
@@ -51,6 +51,7 @@ def get_tokens_for_user(user):
 
 class NotificationAPI(GenericAPIView):
     permissions_classes = (IsOwnerOrReadOnly,)
+    serializer_class   = NotificationSerializer
 
     limit = 10
 
@@ -59,12 +60,7 @@ class NotificationAPI(GenericAPIView):
 
         if action == 'get':
             notifications = self.get_notifications(request.user.id)
-            print notifications
-
-
             notification_data = self.serialize_notification(notifications)
-
-            # print "notification_data",notification_data
             return JsonResponse(notification_data, safe=False)
 
         elif action == 'click':
@@ -72,8 +68,6 @@ class NotificationAPI(GenericAPIView):
             return JsonResponse({
                     'status': "SUCCESS"
                 })
-
-
 
     def get_notifications(self, user_id):
         user_id = self.request.user.id

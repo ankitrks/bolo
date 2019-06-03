@@ -1,7 +1,7 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
 from .fields import UserReadOnlyField
-from forum.topic.models import Topic,CricketMatch,Poll,Choice,Voting,Leaderboard
+from forum.topic.models import Topic,CricketMatch,Poll,Choice,Voting,Leaderboard, Notification
 from django.contrib.auth.models import User
 from forum.category.models import Category
 from forum.comment.models import Comment
@@ -208,6 +208,11 @@ class SingUpOTPSerializer(ModelSerializer):
 class CricketMatchSerializer(ModelSerializer):
     class Meta:
         model = CricketMatch
+        fields = '__all__'
+
+class NotificationSerializer(ModelSerializer):
+    class Meta:
+        model = Notification
         fields = '__all__'
 
 class PollSerializer(ModelSerializer):
