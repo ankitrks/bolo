@@ -1403,7 +1403,7 @@ def get_single_match(request):
                     except:
                         voting_status = False
                     each['voting_status'] = voting_status
-                new_polls_json.append(each)
+                    new_polls_json.append(each)
             return JsonResponse({'message': 'success','polls':new_polls_json,'cricketmatch':cricketmatch_json}, status=status.HTTP_201_CREATED)
         except User.DoesNotExist:
             return JsonResponse({'message': 'Invalid User'}, status=status.HTTP_400_BAD_REQUEST)
