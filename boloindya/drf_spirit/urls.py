@@ -84,7 +84,7 @@ urlpatterns = [
     url(r'^get_single_match/$', get_single_match, name='get_single_match'),
     url(r'^get_single_poll/$', get_single_poll, name='get_single_poll'),
     url(r'^predict/$', predict, name='predict'),
-    url(r'^leaderboard_view/$', LeaderBoradList.as_view(), name='leaderboard_view')
+    url(r'^leaderboard_view/$', LeaderBoradList.as_view(), name='leaderboard_view'),
     url(r'^topics/', include(topic_urls)),
     
 ]
