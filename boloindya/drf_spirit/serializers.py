@@ -216,11 +216,9 @@ class PollSerializer(ModelSerializer):
         model = Poll
         fields = '__all__'
 
-
     def get_cricketmatch(self,instance):
         return CricketMatchSerializer(instance.cricketmatch).data
 
-    
 class PollSerializerwithChoice(ModelSerializer):
     cricketmatch = SerializerMethodField()
     choices = SerializerMethodField()
@@ -228,13 +226,12 @@ class PollSerializerwithChoice(ModelSerializer):
         model = Poll
         fields = '__all__'
 
-
     def get_cricketmatch(self,instance):
         return CricketMatchSerializer(instance.cricketmatch).data
+
     def get_choices(self,instance):
         choices = Choice.objects.filter(poll = instance,is_active = True)
-        return OnlyChoiceSerializer(choices,many = True).data
-
+        return OnlyChoiceSerializer(choices, many = True).data
 
 class OnlyChoiceSerializer(ModelSerializer):
     class Meta:
@@ -246,7 +243,6 @@ class ChoiceSerializer(ModelSerializer):
     class Meta:
         model = Choice
         fields = '__all__'
-
 
     def get_poll(self,instance):
         return PollSerializer(instance.poll).data

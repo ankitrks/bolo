@@ -19,7 +19,7 @@ from .models import SingUpOTP
 from .permissions import IsOwnerOrReadOnly
 from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,AppVersionSerializer,UserSerializer,SingleTopicSerializerwithComment,\
 UserAnswerSerializerwithComment,CricketMatchSerializer,PollSerializer,ChoiceSerializer,VotingSerializer,LeaderboardSerializer,\
-PollSerializerwithChoice
+PollSerializerwithChoice, OnlyChoiceSerializer
 from forum.topic.models import Topic,ShareTopic,Like,SocialShare,FCMDevice,Notification,CricketMatch,Poll,Choice,Voting,Leaderboard
 from forum.category.models import Category
 from forum.comment.models import Comment
@@ -1418,7 +1418,6 @@ def get_single_poll(request):
         password = request.POST.get('password', '')
     """
     poll_id = request.POST.get('poll_id', '')
-    
     if poll_id:
         try:
             poll = Poll.objects.get(pk=poll_id)
@@ -1428,7 +1427,7 @@ def get_single_poll(request):
                 try:
                     voted = Voting.objects.get(poll_id=polls_json['id'],user = request.user)
                     if voted:
-                        voted_on = voted.choice
+                        voted_on = OnlyChoiceSerializer(voted.choice, many = True).data
                 except:
                      voted_on = ''
                 polls_json['voted_on'] = voted_on
