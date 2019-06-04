@@ -37,13 +37,55 @@ class NotificationAdmin(admin.ModelAdmin):
 class ShareTopicAdmin(admin.ModelAdmin):
 	list_display = ('id','user')
 
+class CricketMatchAdmin(admin.ModelAdmin):
+	list_display = ('match_name', 'team_1', 'team_2', 'match_datetime', 'is_active')
+	fieldsets = (
+        (None, {
+            'fields': ('match_name', )
+        }),
+        ('Team 1', {
+            'fields': ('team_1', 'team_1_flag'),
+        }),
+        ('Team 2', {
+            'fields': ('team_2', 'team_2_flag'),
+        }),
+        ('Advance Options', {
+            'fields': ('match_datetime', 'is_active'),
+        }),
+    )
+admin.site.register(CricketMatch, CricketMatchAdmin)
+
+class ChoiceInline(admin.TabularInline):
+	model = Choice
+	extra = 0
+
+class PollAdmin(admin.ModelAdmin):
+	list_display = ('title', 'cricketmatch', 'activate_datetime', 'deactivate_datetime', 'score', 'bolo_score', 'is_evaluated')
+	list_editable = ('activate_datetime', 'deactivate_datetime', 'score', 'bolo_score', 'is_evaluated')
+	inlines = [ChoiceInline]
+	fieldsets = (
+        (None, {
+            'fields': ('cricketmatch', 'title')
+        }),
+        ('Score', {
+            'fields': (('score', 'bolo_score'), ),
+        }),
+        ('Date / Time', {
+            'fields': (('activate_datetime', 'deactivate_datetime'), ),
+        }),
+        ('Advance Options', {
+        	'classes': ('collapse',),
+            'fields': ('is_evaluated', 'is_active'),
+        }),
+    )
+admin.site.register(Poll, PollAdmin)
+
+
+
+
 admin.site.register(Topic, TopicAdmin)
 admin.site.register(Notification,NotificationAdmin)
 admin.site.register(ShareTopic,ShareTopicAdmin)
-
-admin.site.register(CricketMatch)
-admin.site.register(Poll)
-admin.site.register(Choice)
 admin.site.register(Voting)
 admin.site.register(Leaderboard)
 
