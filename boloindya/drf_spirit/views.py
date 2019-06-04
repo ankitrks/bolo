@@ -1478,7 +1478,7 @@ class LeaderBoradList(generics.ListCreateAPIView):
     def get_queryset(self):
         leaderboard = []
         leaderboard_list_1 = Leaderboard.objects.filter(user = self.request.user)
-        leaderboard_list_2 = leaderboard.objects.exclude(user = self.request.user).order_by('-total_score')
+        leaderboard_list_2 = Leaderboard.objects.exclude(user = self.request.user).order_by('-total_score')
         if leaderboard_list_1:
             for each in leaderboard_list_1:
                 leaderboard.append(each)
