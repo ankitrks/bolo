@@ -28,3 +28,4 @@ def run():
 		else:
 			leader.current_rank = rank
 		leader.save()
+	Poll.objects.filter(pk__in = correct_choice_polls_list).update(is_evaluated=True)
