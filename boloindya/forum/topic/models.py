@@ -398,6 +398,9 @@ class CricketMatch(models.Model):
     last_modified=models.DateTimeField(auto_now=True,auto_now_add=False)
     is_active = models.BooleanField(default = True)
 
+    class Meta:
+        ordering = ['match_datetime']
+
     def __unicode__(self):
         return str(self.match_name)+" - "+str(self.match_datetime.date())
 
