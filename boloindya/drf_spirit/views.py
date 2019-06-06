@@ -1425,7 +1425,7 @@ def get_single_poll(request):
                     if voted:
                         voted_on = OnlyChoiceSerializer(voted.choice, many = False).data
                 except:
-                     voted_on = ''
+                     voted_on = {}
                 polls_json['voted_on'] = voted_on
             return JsonResponse({'message': 'success','polls':polls_json}, status=status.HTTP_201_CREATED)
         except User.DoesNotExist:
