@@ -1423,7 +1423,7 @@ def get_single_poll(request):
                 try:
                     voted = Voting.objects.get(poll_id=polls_json['id'],user = request.user)
                     if voted:
-                        voted_on = OnlyChoiceSerializer(voted.choice, many = True).data
+                        voted_on = OnlyChoiceSerializer(voted.choice, many = False).data
                 except:
                      voted_on = ''
                 polls_json['voted_on'] = voted_on
