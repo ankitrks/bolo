@@ -9,6 +9,7 @@ from forum.user.models import UserProfile,AppVersion
 from .relations import PresentableSlugRelatedField
 from .models import SingUpOTP
 from .utils import shortnaturaltime,shortcounterprofile,shorcountertopic
+from django.conf import settings
 
 class CategorySerializer(ModelSerializer):
     class Meta:
@@ -206,6 +207,11 @@ class SingUpOTPSerializer(ModelSerializer):
         fields = ('mobile_no', )
 
 class CricketMatchSerializer(ModelSerializer):
+    prediction_start_hour= SerializerMethodField()
+
+    def get_prediction_start_hour(self,instance):
+        return settings.PREDICTION_START_HOUR
+    
     class Meta:
         model = CricketMatch
         fields = '__all__'

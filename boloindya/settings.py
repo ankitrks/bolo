@@ -354,3 +354,5 @@ AWS_BUCKET_NAME = 'boloindya'
 # The region of your bucket, more info:
 # http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
 REGION_HOST = 'us-east-1'
+
+PREDICTION_START_HOUR = 3

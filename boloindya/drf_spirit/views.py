@@ -1400,7 +1400,9 @@ def get_single_match(request):
                         voting_status = False
                     each['voting_status'] = voting_status
                     new_polls_json.append(each)
-            return JsonResponse({'message': 'success','polls':new_polls_json,'cricketmatch':cricketmatch_json}, status=status.HTTP_201_CREATED)
+            return JsonResponse({'message': 'success','polls':new_polls_json,\
+                    'cricketmatch':cricketmatch_json, 'prediction_start_hour' : settings.PREDICTION_START_HOUR}, \
+                        status=status.HTTP_201_CREATED)
         except User.DoesNotExist:
             return JsonResponse({'message': 'Invalid User'}, status=status.HTTP_400_BAD_REQUEST)
     else:
@@ -1427,7 +1429,8 @@ def get_single_poll(request):
                 except:
                      voted_on = {}
                 polls_json['voted_on'] = voted_on
-            return JsonResponse({'message': 'success','polls':polls_json}, status=status.HTTP_201_CREATED)
+            return JsonResponse({'message': 'success', 'polls' : polls_json, 'prediction_start_hour' : settings.PREDICTION_START_HOUR}\
+                        , status=status.HTTP_201_CREATED)
         except User.DoesNotExist:
             return JsonResponse({'message': 'Invalid User'}, status=status.HTTP_400_BAD_REQUEST)
     else:
