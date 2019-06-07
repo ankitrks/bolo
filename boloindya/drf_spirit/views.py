@@ -1481,16 +1481,17 @@ class LeaderBoradList(generics.ListCreateAPIView):
     pagination_class    = LimitOffsetPagination
 
     def get_queryset(self):
-        leaderboard = []
-        leaderboard_list_1 = Leaderboard.objects.filter(user = self.request.user)
-        leaderboard_list_2 = Leaderboard.objects.exclude(user = self.request.user).order_by('-total_score')
-        if leaderboard_list_1:
-            for each in leaderboard_list_1:
-                leaderboard.append(each)
-        if leaderboard_list_2:
-            for each in leaderboard_list_2:
-                leaderboard.append(each)
-        return leaderboard
+        return Leaderboard.objects.all().order_by('-total_score')
+        # leaderboard = []
+        # leaderboard_list_1 = Leaderboard.objects.filter(user = self.request.user)
+        # leaderboard_list_2 = Leaderboard.objects.exclude(user = self.request.user).order_by('-total_score')
+        # if leaderboard_list_1:
+        #     for each in leaderboard_list_1:
+        #         leaderboard.append(each)
+        # if leaderboard_list_2:
+        #     for each in leaderboard_list_2:
+        #         leaderboard.append(each)
+        # return leaderboard
 
 
 
