@@ -16,7 +16,7 @@ from ..comment.models import MOVED
 from ..comment.forms import CommentForm
 from ..comment.utils import comment_posted
 from ..comment.models import Comment
-from .models import Topic
+from .models import Topic,CricketMatch,Poll,Voting,Choice
 from .forms import TopicForm
 from . import utils
 from django.template.loader import render_to_string
@@ -339,3 +339,39 @@ def robotstext(request):
 def sitemapxml(request):
     return render(request, 'spirit/topic/sitemap.xml')       
 
+# Share Pages Match 
+def share_match_page(request, match_id, slug):
+    cricket_match = CricketMatch.objects.get(pk=match_id)
+    polls = Poll.objects.filter(cricketmatch = cricket_match,is_active = True)
+    voting_status_array = []
+    if polls:
+        for index, poll in enumerate(polls):
+            try:
+                voting = Voting.objects.get(poll_id=poll.id,user = request.user)
+                voting_status = True
+            except:
+                voting_status = False
+            voting_status_array.append(poll)
+            voting_status_array[index].voting_status = voting_status
+    context = {
+    'cricket_match': cricket_match,
+    'polls': voting_status_array
+    }
+    return render(request, 'spirit/topic/cricket_match.html', context)
+   
+# Share Poll Match 
+def share_poll_page(request, poll_id, slug):
+    poll = Poll.objects.get(pk=poll_id)
+    choices = Choice.objects.filter(poll = poll,is_active = True)
+    voting = None
+    try:
+        voting = Voting.objects.get(poll_id=poll.id,user = request.user)
+    except:
+        voting = None
+    context = {
+        'cricket_match': poll.cricketmatch,
+        'poll': poll,
+        'choices': choices,
+        'voting': voting
+    }
+    return render(request, 'spirit/topic/predict_match.html', context)

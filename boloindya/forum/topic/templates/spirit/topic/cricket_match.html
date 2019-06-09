@@ -1,0 +1,198 @@
+{% extends "spirit/_index_base.html" %}
+{% load spirit_tags i18n %}
+{% block title %}{{ cricket_match.title }}{% endblock %}
+{% block content %}
+    <style>
+        .match_title {
+            background: #b52828;
+            color: white;
+            font-size: 18px;
+            padding: 10px;
+            text-align: center;
+        }
+        .row { 
+            margin-left: 0px !important;
+            margin-right: 0px !important;
+        }
+        .team_name {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .team_flag img{ 
+            margin-top: 10px;
+            width: 60px;
+            height: 40px;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+        }
+        .leader{
+            margin-top: 10px;
+            text-align: end;
+            color: #b52828;
+        }
+        .line{
+            margin-top: 20px;
+            margin-bottom: 10px;
+            background: #e6e6e6;
+            height: 5px;
+        }
+        .polls {
+            margin: 5px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 1px 1px rgba(0,0,0,0.20);  
+        }
+        .polls_title{
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .prediction_no {
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+        .share {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .ans {
+            background: #FBEFEF;
+        }
+        main {
+           width: 100vw;
+        }
+        .modal{
+            background: rgba(0,0,0,0.5);
+        }
+        .modal_title {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 18px;
+        }
+        .logo_image img {
+            width: 45px;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+        }
+        .playstore_link img {
+            width: 130px;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+        }
+        @media only screen and (min-width: 600px) {
+            .left_main {
+                width: 67vw;
+                background-image: url("/media/img/back_cover.webp");
+                background-repeat: no-repeat;
+                background-position: center; 
+                background-size: cover; 
+            }
+            main {
+                width: 33vw;
+                border: 1px solid #e6e6e6;
+                height: 100vh;
+            }
+            #versus{
+                left: -10px;
+                top: 40px;
+            }
+    }
+    </style>
+    <div class="row">
+    <main onclick="showModal()">
+        <div class="match_title">
+            {{ cricket_match.match_name }}
+        </div>
+        <div class="row">
+            <div class="col-5 team_name">
+                {{ cricket_match.team_1 }}
+                <div class="team_flag">
+                    <img src={{ cricket_match.team_1_flag }} alt="">
+                </div>
+            </div>
+            <div class="col-2">
+                <img src="/media/img/versus_icon.png" alt="" width="80px" style="position: relative;left: -25px;top: 35px;">
+            </div>
+            <div class="col-5 team_name">
+                {{ cricket_match.team_2 }}
+                <div class="team_flag">
+                    <img src={{ cricket_match.team_2_flag }} alt="">
+                </div>
+            </div>
+            <div class="col-12 leader">
+                Leaderboard
+            </div>
+            <div class="col-12 line">
+            </div>
+            {% for poll in polls %}
+            <div class="col-12">
+                <div class="polls {% if poll.voting_status %} ans  {% endif %}">
+                    <div class="prediction_no">
+                        Prediction #{{ forloop.counter }}
+                        {% if poll.voting_status %}
+                            <span style="float: right">Answered</span>
+                        {% else  %}
+                            <span style="float: right">Not Answered</span>
+                        {% endif %}
+                    </div>
+                    <div class="polls_title">
+                        {{ poll.title }}
+                    </div>
+                    <div class="share row">
+                        <div class="col-6 px-0">
+                            <img src="/media/img/coins.jpeg" alt="" width="20px" >{{ poll.score }}
+                        </div>
+                        <div class="col-3 px-0">
+                            <img src="/media/img/whatsapp.svg" alt="" width="20px">
+                        </div>
+                        <div class="col-3 px-0">
+                            <img src="/media/img/share.jpg" alt="" width="20px" style="float: right;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="modal" id="myModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-body">
+                <button type="button" class="close" data-dismiss="modal" onclick="hideModal()" >&times;</button>
+                <h6 class="modal_title">
+                    Get Bolo Indya to participate in Polls 
+                </h6>
+                <div class="logo_image">
+                    <img src="/media/img/boloindya.png" alt="">
+                </div>
+                <p style="text-align: center;margin-top: 10px;">
+                    Download the Mobile App
+                </p>
+                <div class="playstore_link">
+                    <a href="https://play.google.com/store/apps/details?id=com.boloindya.boloindya" alt="Bolo Indya">
+                        <img src="/media/img/app_image.svg" alt="play_store">
+                    </a>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+    </main>
+    <div class="left_main">
+    
+    </div>
+    </div>
+    <script>
+        function showModal() {
+            $('#myModal').show();
+        }
+        function hideModal() {
+            $('#myModal').hide();
+        }
+    </script>
+{% endblock %}

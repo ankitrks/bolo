@@ -1,0 +1,238 @@
+{% extends "spirit/_index_base.html" %}
+{% load spirit_tags i18n %}
+{% block title %}Bolo Indya{% endblock %}
+{% block content %}
+<style>
+    .match_title {
+        background: #b52828;
+        color: white;
+        font-size: 18px;
+        padding: 10px;
+        text-align: center;
+    }
+    .row { 
+        margin-left: 0px !important;
+        margin-right: 0px !important;
+    }
+    .team_name {
+        text-align: center;
+        font-size: 18px;
+        font-weight: 600;
+    }
+    .team_flag img{ 
+        margin-top: 10px;
+        width: 60px;
+        height: 40px;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+    }
+    .line{
+        margin-top: 20px;
+        margin-bottom: 10px;
+        background: #e6e6e6;
+        height: 5px;
+    }
+    .poll_title{
+        margin-top: 10px;
+        font-weight: 600;
+        font-size: 18px;
+    }
+    .choices {
+        margin-top: 10px; 
+    }
+    .choice_title {
+        font-size: 14px;
+        font-weight: 600;
+        margin-top: 5px;
+    }
+    .save {
+        position: fixed;
+        bottom:0;
+        background: #b52828;
+        width: 100vw;
+        padding: 5px;
+        outline: none;
+        border: none;
+        color: white;
+    }
+    .modal {
+        background: rgba(0,0,0,0.5);
+    }
+    .modal_title {
+        margin-top: 40px;
+        text-align: center;
+        font-size: 18px;
+    }
+    .logo_image img {
+        width: 45px;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+    }
+    .playstore_link img {
+        width: 130px;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+    }
+    #versus{
+        position: relative;
+        left: -25px;
+        top: 35px;
+    }
+    main {
+        width: 100vw;
+    }
+    @media only screen and (min-width: 600px) {
+        .left_main {
+            width: 67vw;
+            background-image: url("/media/img/back_cover.webp");
+            background-repeat: no-repeat;
+            background-position: center; 
+            background-size: cover; 
+        }
+        main {
+            width: 33vw;
+            border: 1px solid #e6e6e6;
+            height: 100vh;
+        }
+        .save {
+            width: 33vw;
+        }
+        #versus{
+            left: -10px;
+            top: 40px;
+        }
+    }
+</style>
+<div class="row">
+<main>
+    <div id="date_and_time" hidden>
+        {{ cricket_match.match_datetime|date:'M j, Y H:i:s' }}
+    </div>
+    <div class="match_title" onclick="showModal()">
+        {{ cricket_match.match_name }}
+    </div>
+    <div class="row" onclick="showModal()">
+        <div class="col-5 team_name">
+            {{ cricket_match.team_1 }}
+            <div class="team_flag">
+                <img src={{ cricket_match.team_1_flag }} alt="">
+            </div>
+        </div>
+        <div class="col-2">
+            <img src="/media/img/versus_icon.png" alt="" width="80px" id="versus">
+        </div>
+        <div class="col-5 team_name">
+            {{ cricket_match.team_2 }}
+            <div class="team_flag">
+                <img src={{ cricket_match.team_2_flag }} alt="">
+            </div>
+        </div>
+        <div class="col-12 line">
+        </div>
+        <div class="col-12 prediction_no">
+            Prediction #1
+            <span style="float:right;">
+                <img src="/media/img/coins.jpeg" alt="" width="20px" >{{ poll.score }}
+            </span>
+        </div>
+        <div class="col-12 poll_title">
+            {{ poll.title }}
+        </div>
+        <div class="col-12">
+            <div class="row">
+            {% for choice in choices %}
+                <div class="col-12 choices row px-0">
+                    {% if choice.image != null%}
+                    <div class="col-2 px-0">
+                        <img src={{ choice.image }} alt="" style="width: 35px;height: 35px;border-radius:50%;">
+                    </div>    
+                    {% endif %}
+                    <div class="col-8 px-0 choice_title">
+                        {{ choice.title }}
+                    </div>
+                    <div class="col-2 px-0">
+                        {% if voting != None and voting.choice.id == choice.id %}
+                            <input type="radio" name="choice_id" value="" id="radio" style="margin-top: 10px;" checked>    
+                        {% else %}
+                            <input type="radio" name="choice_id" value="" id="radio" style="margin-top: 10px;">    
+                        {% endif %}
+                    </div>
+                </div>        
+            {% endfor %}
+            </div>
+        </div>
+        <button class="save" id="save">Save</button>
+    </div>
+    <div class="modal" id="myModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-body">
+                <button type="button" class="close" data-dismiss="modal" onclick="hideModal()" >&times;</button>
+                <h6 class="modal_title">
+                    Get Bolo Indya to participate in Polls 
+                </h6>
+                <div class="logo_image">
+                    <img src="/media/img/boloindya.png" alt="">
+                </div>
+                <p style="text-align: center;margin-top: 10px;">
+                    Download the Mobile App
+                </p>
+                <div class="playstore_link">
+                    <a href="https://play.google.com/store/apps/details?id=com.boloindya.boloindya" alt="Bolo Indya">
+                        <img src="/media/img/app_image.svg" alt="play_store">
+                    </a>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</main>
+<div class="left_main">
+    
+</div>
+</div>
+<script>
+    var a = document.getElementById('date_and_time');
+    // Set the date we're counting down to
+    var countDownDate = new Date(a.innerHTML).getTime();
+    
+    // Update the count down every 1 second
+    var x = setInterval(function() {
+
+    // Get today's date and time
+    var now = new Date().getTime();
+
+   
+    // Find the distance between now and the count down date
+    var distance = countDownDate - now;
+
+    // Time calculations for days, hours, minutes and seconds
+    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    // Display the result in the element with id="demo"
+    document.getElementById("save").innerHTML = 'Prediction opens in ' + days + "d " + hours + "h "
+    + minutes + "m " + seconds + "s ";
+
+    // If the count down is finished, write some text 
+    if (distance < 0) {
+    clearInterval(x);
+    document.getElementById("save").innerHTML = "Prediction Window Sarted";
+    }
+}, 1000);
+
+function showModal() {
+    $('#myModal').show();
+}
+
+function hideModal() {
+    $('#myModal').hide();
+}
+
+</script>
+{% endblock %}

@@ -27,6 +27,8 @@ schema_view = get_swagger_view(title='BoloIndya API')
 
 patterns = [
     url(r'^$', forum.topic.views.new_home, name='index'),
+    url(r'^match/(?P<match_id>\d+)/(?P<slug>[\w-]+)/$', forum.topic.views.share_match_page, name='share_match_page'),
+    url(r'^predict/(?P<poll_id>\d+)/(?P<slug>[\w-]+)/$', forum.topic.views.share_poll_page, name='share_poll_page'),
     url(r'^about/$', forum.topic.views.get_about, name='get_about'),
     url(r'^terms-of-service/$', forum.topic.views.get_termofservice, name='get_termofservice'),
     url(r'^privacy-policy/$', forum.topic.views.get_privacypolicy, name='get_privacypolicy'),

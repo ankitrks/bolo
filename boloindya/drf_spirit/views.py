@@ -1492,6 +1492,3 @@ class LeaderBoradList(generics.ListCreateAPIView):
         #     for each in leaderboard_list_2:
         #         leaderboard.append(each)
         # return leaderboard
-
-
-
