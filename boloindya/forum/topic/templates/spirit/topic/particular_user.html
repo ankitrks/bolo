@@ -1,0 +1,319 @@
+{% extends "spirit/_index_base.html" %}
+{% load spirit_tags i18n %}
+{% block title %}Bolo Indya{% endblock %}
+{% block content %}
+<style>
+    .user_bar {
+        padding: 10px;
+        background: #B52828;
+        color: white;
+        font-size: 14px;
+        text-align: center;
+    }
+    .ask_question {
+        font-size: 13px;
+        padding: 10px;
+        text-align: center;
+    }
+    .bolo_action_count { 
+        font-weight: 700;
+    }
+    .question_tab {
+        padding: 10px;
+    }
+    .username {
+        margin-top: 5px; 
+    }
+    .category {
+        color: #B52828;
+        font-weight: 600;
+        font-size: 12px;
+    }
+    .fas.fa-circle {
+        font-weight: 900;
+        font-size: 5px;
+        top: -2px;
+        position: relative;
+        color: #ccc;
+    }
+    .views {
+        font-size: 12px;
+        color: #c3c2c2;
+    }
+    .question_title {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+    .lower {
+        font-size: 13px;
+        color: #B52828;
+    }
+    .line {
+        margin-top: 5px;
+        height: 1px;
+        background: #E6E6E6;
+    }
+    .single_comment {
+        padding: 10px;
+    }
+    .user_details {
+        font-size: 10px;
+    }
+    .created_at {
+        color: #ccc;
+    }
+    .answer, .likes{
+        font-size: 10px;
+    }
+    .music_player {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        padding: 10px;
+        background: #FBEFEF;
+    }
+    .text { 
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+    .image {
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+    .duration_and_time {
+        height: 20px    ;
+    }
+    .circle {
+        height: 45px;
+        width: 45px;
+        border-radius: 50%;
+        background: white;
+        padding: 5px;
+    }
+    .wide_line {
+        background: #E6E6E6;
+        height: 5px;
+    }
+    .name, .userhandle, .bio {
+        font-size: 14px;
+        text-align: center;
+        font-weight: 400;
+    }
+    .bio {
+        color: #ccc;
+    }
+    .about {
+        text-align: center;
+        font-size: 12px;
+        padding: 10px;
+    }
+    .user_pic {
+        background: #496375;
+        height: 50px;
+        margin-bottom: 40px;
+    }
+    .user_pic .circle {
+        height: 60px;
+        width: 60px;
+        position: relative;
+        left: 42%;
+        top: 20px;
+    }
+    .user_pic .circle img {
+        height: 50px;
+        width: 50px;
+        border-radius: 50%;
+    }
+    .like_and_share {
+        margin-top: 10px;
+    }
+    .modal{
+        background: rgba(0,0,0,0.5);
+    }
+    .modal_title {
+        margin-top: 40px;
+        text-align: center;
+        font-size: 18px;
+    }
+    .logo_image img {
+        width: 45px;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+    }
+    .playstore_link img {
+        width: 130px;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+    }
+    @media only screen and (min-width: 600px) {
+            main {
+                width: 33vw;
+                border: 1px solid #e6e6e6;
+                height: 100vh;
+            }
+            .left_main {
+                width: 67vw;
+                background-image: url("https://boloindya.s3.amazonaws.com/share_pages/share_topic.webp");
+                background-repeat: no-repeat;
+                background-position: center; 
+                background-size: cover; 
+            }
+        }
+</style>
+     <div class="row">
+    <main onclick="showModal()">
+    <div class="user_pic">
+        <div class="circle">
+            <img src={% if user_profile.profile_pic %} {{ user_profile.profile_pic }}  {% endif %} alt="User Image" >
+        </div>
+    </div>
+    <h3 class="name">{{ user_profile.name }}</h3>
+    <h4 class="userhandle">{{ user_profile.user.username }}</h4>
+    <h4 class="bio">{{ user_profile.bio }}</h4>
+    <h5 class="about">{{ user_profile.about }}</h5>
+    <div class="row user_bar" style="margin-right:0px !important;margin-left:0px !important; ">
+        <div class="col-4 px-0">
+            <div class="bolo_action_count">{{ user_profile.follower_count }}</div>
+            <div class="bolo_action_label">Followers</div>
+        </div>
+        <div class="col-4 px-0">
+            <div class="bolo_action_count">{{ user_profile.follow_count }}</div>
+            <div class="bolo_action_label">Following</div>
+        </div>
+        <div class="col-4 px-0">
+            <div class="bolo_action_count">{{ user_profile.bolo_score }}</div>
+            <div class="bolo_action_label">Bolo Actions</div>
+        </div>
+    </div>
+    <div class="row ask_question" style="margin-right:0px !important;margin-left:0px !important; ">
+        <div class="col-6 px-0">
+            <div class="bolo_action_count">{{ user_profile.question_count }} Questions Asked</div>
+        </div>
+        <div class="col-6 px-0">
+            <div class="bolo_action_count">{{ user_profile.follow_count }} Answers Given</div>
+        </div>
+    </div>
+    <div class="wide_line"></div>
+    {%  for topic in topics  %}
+    <div class="question_tab">
+        <div class="upper_part">
+            <span class="category">{{ topic.category.title }}</span> <i class="fas fa-circle"></i> <span class="views"> {{ topic.view_count }} Views</span>  <i class="fas fa-ellipsis-h" style="float: right; margin-top: 5px;"></i>
+        </div>
+        <h5 class="question_title">
+            {{ topic.title }}
+        </h5>
+        <div class="lower">
+            <i class="fas fa-edit"></i> Post Answer
+        </div>
+        <div class="line"></div>
+    </div>
+    {% if topic.topic_comment.all.0 %}
+    <div class="single_comment">
+        <div class="row user_details mx-0">
+            <div class="col-2 pl-0">
+                <img src="{% if comment.user.profile_pic %}{{ comment.user.profile_pic }} {% endif %} https://boloindya.s3.amazonaws.com/media/user.png" alt="User Image" class="img-fluid">
+            </div>
+            <div class="col-8 px-0">
+                <div class="username">
+                    {{ topic.topic_comment.all.0.user.username }}
+                </div>
+                <div class="created_at">
+                    Answered {{ topic.topic_comment.all.0.date }}
+                </div>
+            </div>
+            <div class="col-2 px-0">
+            </div>
+        </div>
+        {% if topic.topic_comment.all.0.is_media %}
+        {% if topic.topic_comment.all.0.is_audio %}
+        <div class="row music_player mx-0">
+            <div class="col-2 px-0">
+                <img src="/media/img/ic_play.png" alt="" class="img-fluid" style="position: relative; top: 5px;height: 45px;">
+            </div>
+            <div class="col-7 px-0">
+                <div class="seekbar">
+                    <input type="range" name="" id="" value=0 max=100 min=0>
+                </div>
+                <div class="duration_and_time">
+                    <span class="duration" style="float: left;font-size: 10px;">
+                        {{ topic.topic_comment.all.0.media_duration }}
+                    </span>
+                    <span class="time" style="float: right;font-size: 10px;">
+                        12:31 pm
+                    </span>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="circle">
+                    <img src="{% if comment.user.profile_pic %}{{ comment.user.profile_pic }} {% endif %} https://boloindya.s3.amazonaws.com/media/user.png" alt="User Image" class="img-fluid">
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% else %}
+        {% if 'data:image/png;' in topic.topic_comment.all.0.comment %}
+        <div class="image">
+            <img src="{{ topic.topic_comment.all.0.comment }}" alt="" >
+        </div>
+        {% else %}
+        <div class="text">
+            {{ topic.topic_comment.all.0.comment }}
+        </div>
+        {% endif %}
+        {% endif %}
+        <div class="row like_and_share">
+            <div class="col-4 px-0 answer">
+                <img src="/media/img/answer.svg" alt="" style="height: 18px;position: relative;top: 2px;"> 0 Answers
+            </div>
+            <div class="col-4 pr-0 likes">
+                    <i class="far fa-thumbs-up" style="font-size: 18px;"></i> {{ topic.comment_count }} Likes
+            </div>
+            <div class="col-2">
+                <img src="/media/img/whatsapp.svg" alt="User Image" class="img-fluid" style="height: 18px;position: relative;top: -4px;">                
+            </div>
+            <div class="col-2 pr-0">
+                <i class="far fa-clone" style="float: right"></i>
+            </div>
+        </div>
+        <div class="line"></div>
+    </div>
+    {% endif %}
+    {% endfor %}
+    <div class="modal" id="myModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-body">
+                <button type="button" class="close" data-dismiss="modal" onclick="hideModal()" >&times;</button>
+                <h6 class="modal_title">
+                    Get Bolo Indya to Post Question
+                </h6>
+                <div class="logo_image">
+                    <img src="/media/img/boloindya.png" alt="">
+                </div>
+                <p style="text-align: center;margin-top: 10px;">
+                    Download the Mobile App
+                </p>
+                <div class="playstore_link">
+                    <a href="https://play.google.com/store/apps/details?id=com.boloindya.boloindya" alt="Bolo Indya">
+                        <img src="/media/img/app_image.svg" alt="play_store">
+                    </a>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+    </main>
+    <div class="left_main">
+    </div>
+    </div>
+    <script>
+        function showModal() {
+            $('#myModal').show();
+        }
+        function hideModal() {
+            $('#myModal').hide();
+        }
+    </script>
+{% endblock %}
