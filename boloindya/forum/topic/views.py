@@ -9,6 +9,8 @@ from django.http import HttpResponsePermanentRedirect
 from djconfig import config
 from django.conf import settings
 
+from django.contrib.auth.models import User
+
 from ..core.utils.paginator import paginate, yt_paginate
 from ..core.utils.ratelimit.decorators import ratelimit
 from ..category.models import Category
@@ -36,6 +38,9 @@ from datetime import datetime
 from google.cloud import speech
 from google.cloud.speech import enums
 from google.cloud.speech import types
+
+
+from forum.user.models import UserProfile
 
 def get_current_language(request):
     return request.COOKIES.get('language', request.GET.get('lid', 2))
@@ -176,14 +181,17 @@ def update(request, pk):
 
 
 def detail(request, pk, slug):
-    categories = Category.objects.visible().parents()
-    topics = Topic.objects.filter(id = pk)
+    topics = Topic.objects.get(id = pk)
+    try:
+        user_profile = UserProfile.objects.get(user = request.user)
+    except:
+        user_profile = None
     context = {
-        'categories': categories,
-        'topics': topics,
+        'topic': topics,
         'is_single_topic': pk,
+        'user_profile': user_profile
     }
-    return render(request, 'spirit/topic/_ques_and_ans_index.html', context)
+    return render(request, 'spirit/topic/particular_topic.html', context)
 
 def index_active(request):
     categories = Category.objects.visible().parents()
@@ -375,3 +383,17 @@ def share_poll_page(request, poll_id, slug):
         'voting': voting
     }
     return render(request, 'spirit/topic/predict_match.html', context)
+
+# Share User  
+def share_user_page(request, user_id, username):
+    try:        
+        user = User.objects.get(id=user_id)
+        user_profile = UserProfile.objects.get(user = user)
+        topics = Topic.objects.filter(user_id=user_id, is_removed=False)
+        context = {
+            'user_profile': user_profile,
+            'topics': topics
+        }
+        return render(request, 'spirit/topic/particular_user.html', context)
+    except:
+        return render(request, 'spirit/topic/temporary_landing.html')

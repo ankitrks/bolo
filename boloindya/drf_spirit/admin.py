@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import SingUpOTP
-from forum.user.models import Weight,UserProfile,AppVersion
+from forum.user.models import Weight,UserProfile,AppVersion, UserProfile
 from forum.category.models import Category
 from import_export.admin import ImportExportModelAdmin,ExportMixin
 from import_export import resources
