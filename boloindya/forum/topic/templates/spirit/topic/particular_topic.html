@@ -4,11 +4,20 @@
 <meta property="og:site_name" content="Bolo Indya">
 <meta property="og:title" content="{{ topic.title }}" />
 <meta property="og:description" content="Answer this question on Bolo Indya app - Knowledge Sharing community for 100 crore Indians" />
-<meta property="og:image" itemprop="image" content="https://boloindya.com/media/img/boloindya.png">
 <meta property="og:type" content="website" />
 
 <meta property="title" content="{{ topic.title }}" />
 <meta name="description" content="Answer this question on Bolo Indya app - Knowledge Sharing community for 100 crore Indians" />
+
+<meta data-react-helmet="true" name="twitter:card" content="summary"/>
+<meta data-react-helmet="true" name="twitter:site" content="{{ request.get_full_path }}"/>
+<meta data-react-helmet="true" name="twitter:title" content="{{ topic.title }}"/>
+<meta data-react-helmet="true" name="twitter:description" content="Answer this question on Bolo Indya app - Knowledge Sharing community for 100 crore Indians"/>
+<meta data-react-helmet="true" name="twitter:image" content="https://boloindya.s3.amazonaws.com/thumbnail/boloindya_logo.pngg"/>
+
+<meta data-react-helmet="true" property="og:url" content="{{ request.get_full_path }}"/>
+<meta data-react-helmet="true" property="og:image" content="https://boloindya.s3.amazonaws.com/thumbnail/boloindya_logo.png"/>
+
 {% endblock %}
 {% block title %}Bolo Indya{% endblock %}
 {% block content %}
