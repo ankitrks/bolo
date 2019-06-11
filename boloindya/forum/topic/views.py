@@ -252,7 +252,7 @@ def index_videos(request):
     return render(request, 'spirit/topic/_index.html', context)
 
 def get_topics_feed(request):
-    pageno = request.GET.get('pageno', None)
+    pageno = request.GET.get('pageno', 1)
     topic_list = Topic.objects.filter(language_id = get_current_language(request))
     paginator = Paginator(topic_list, 10) # Show 25 contacts per page
 
