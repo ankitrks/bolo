@@ -238,4 +238,39 @@
      </main>
     <div class="left_main">
     </div>
+    <div class="modal" id="myModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-body">
+                <button type="button" class="close" data-dismiss="modal" onclick="hideModal()" >&times;</button>
+                <h6 class="modal_title">
+                    Get Bolo Indya to participate in Polls 
+                </h6>
+                <div class="logo_image">
+                    <img src="/media/img/boloindya.png" alt="">
+                </div>
+                <p style="text-align: center;margin-top: 10px;">
+                    Download the Mobile App
+                </p>
+                <div class="playstore_link">
+                    <a href="https://play.google.com/store/apps/details?id=com.boloindya.boloindya" alt="Bolo Indya">
+                        <img src="/media/img/app_image.svg" alt="play_store">
+                    </a>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+    </div>
+     <script>
+        $('document').ready(function(){
+            window.location.href = "https://play.google.com/store/apps/details?id=com.boloindya.boloindya";
+        });
+        function showModal() {
+            $('#myModal').show();
+        }
+        function hideModal() {
+            $('#myModal').hide();
+        }
+    </script>
 {% endblock %}
