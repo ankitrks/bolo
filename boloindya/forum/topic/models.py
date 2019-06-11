@@ -36,7 +36,7 @@ class RecordTimeStamp(models.Model):
         abstract = True
 
 class UserInfo(RecordTimeStamp):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='%(app_label)s_%(class)s_user',editable=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='%(app_label)s_%(class)s_user',editable=True)
     is_active = models.BooleanField(default = True)
 
     def get_user(self):

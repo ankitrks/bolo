@@ -341,9 +341,8 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=999),
 }
 #### Rest Framework Settings ###
-import django
-django.setup()
-
+#import django
+#django.setup()
 
 #### S3 bucket #####
 AWS_ACCESS_KEY_ID = 'AKIAJMOBRHDIXGKM6W6Q'
