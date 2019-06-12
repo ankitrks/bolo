@@ -427,6 +427,8 @@ class Choice(models.Model):
     created_at=models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False) # auto_now will add the current time and date whenever field is saved.
     last_modified=models.DateTimeField(auto_now=True,auto_now_add=False)
     is_active = models.BooleanField(default = True)
+    class Meta:
+        ordering = ['id']
 
     def __unicode__(self):
         return str(self.title)
