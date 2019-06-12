@@ -1358,7 +1358,7 @@ class CricketMatchList(generics.ListCreateAPIView):
     serializer_class    = CricketMatchSerializer
     # queryset            = CricketMatch.objects.filter(is_active = True)
     permission_classes  = (IsAuthenticatedOrReadOnly,)
-    pagination_class    = LimitOffsetPagination
+    # pagination_class    = LimitOffsetPagination
 
     def get_queryset(self):
         matches = []
