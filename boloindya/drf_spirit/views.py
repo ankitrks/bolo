@@ -198,8 +198,8 @@ class Usertimeline(generics.ListCreateAPIView):
                 else:
                     all_follower = Follower.objects.filter(user_follower = self.request.user).values_list('user_following_id',flat=True)
                     category_follow = UserProfile.objects.get(user= self.request.user).sub_category.all().values_list('id',flat = True)
-                    all_follower = [1,2,3,5]
-                    category_follow = [57,58,59,60,61,62,63]
+                    # all_follower = [1,2,3,5]
+                    # category_follow = [57,58,59,60,61,62,63]
                     post=[]
                     topics=[]
                     # startdate = datetime.today()
