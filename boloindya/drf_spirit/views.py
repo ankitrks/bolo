@@ -20,7 +20,7 @@ from .permissions import IsOwnerOrReadOnly
 from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,AppVersionSerializer,UserSerializer,SingleTopicSerializerwithComment,\
 UserAnswerSerializerwithComment,CricketMatchSerializer,PollSerializer,ChoiceSerializer,VotingSerializer,LeaderboardSerializer,\
 PollSerializerwithChoice, OnlyChoiceSerializer, NotificationSerializer
-from forum.topic.models import Topic,ShareTopic,Like,SocialShare,FCMDevice,Notification,CricketMatch,Poll,Choice,Voting,Leaderboard
+from forum.topic.models import Topic,ShareTopic,Like,SocialShare,FCMDevice,Notification,CricketMatch,Poll,Choice,Voting,Leaderboard,VBseen
 from forum.category.models import Category
 from forum.comment.models import Comment
 from forum.user.models import UserProfile,Follower,AppVersion
@@ -209,30 +209,30 @@ class Usertimeline(generics.ListCreateAPIView):
                         # print "a"
                         # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,date__gte=enddate)
                         if not sort_recent:
-                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False)
+                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,is_vb = False)
                         else:
-                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False).order_by('-date')
+                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,is_vb = False).order_by('-date')
                     elif 'category' in search_term and not 'language_id' in search_term:
                         # print "b"
                         # post1 = Topic.objects.filter(category__slug =self.request.GET.get('category'),is_removed = False,date__gte=enddate)
                         if not sort_recent:
-                            post2 = Topic.objects.filter(category__slug =self.request.GET.get('category'),is_removed = False)
+                            post2 = Topic.objects.filter(category__slug =self.request.GET.get('category'),is_removed = False,is_vb = False)
                         else:
-                            post2 = Topic.objects.filter(category__slug =self.request.GET.get('category'),is_removed = False).order_by('-date')
+                            post2 = Topic.objects.filter(category__slug =self.request.GET.get('category'),is_removed = False,is_vb = False).order_by('-date')
                     elif 'language_id' in search_term and 'category' in search_term:
                         # print "maaz"
                         # post1 = Topic.objects.filter(language_id = self.request.GET.get('language_id'),category__slug =self.request.GET.get('category'),is_removed = False,date__gte=enddate)
                         if not sort_recent:
-                            post2 = Topic.objects.filter(language_id = self.request.GET.get('language_id'),category__slug =self.request.GET.get('category'),is_removed = False)
+                            post2 = Topic.objects.filter(language_id = self.request.GET.get('language_id'),category__slug =self.request.GET.get('category'),is_removed = False,is_vb = False)
                         else:
-                            post2 = Topic.objects.filter(language_id = self.request.GET.get('language_id'),category__slug =self.request.GET.get('category'),is_removed = False).order_by('-date')
+                            post2 = Topic.objects.filter(language_id = self.request.GET.get('language_id'),category__slug =self.request.GET.get('category'),is_removed = False,is_vb = False).order_by('-date')
                     else:
                         # print "d"
                         # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,date__gte=enddate)
                         if not sort_recent:
-                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False)
+                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,is_vb = False)
                         else:
-                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False).order_by('-date')
+                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,is_vb = False).order_by('-date')
                     # print post1,post2
                     # if post1:
                     #     topics = topics+list(post1)
@@ -248,13 +248,80 @@ class Usertimeline(generics.ListCreateAPIView):
             # enddate = startdate - timedelta(days=1)
             # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,date__gte=enddate)
             if not sort_recent:
-                post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False)
+                post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,is_vb = False)
             else:
-                post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False).order_by('-date')
+                post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,is_vb = False).order_by('-date')
             # if post1:
             #     topics = topics+list(post1) 
             if post2:
                 topics = topics+list(post2)
+        return topics
+
+class VBList(generics.ListCreateAPIView):
+    serializer_class   = TopicSerializerwithComment
+    permission_classes = (IsOwnerOrReadOnly,)
+    pagination_class    = LimitOffsetPagination
+
+
+    """
+    get:
+    Search By Topic Title,Audio,Video...
+    term        = request.GET.get('term', '')
+    Required Parameters:
+    term---Topic Title
+
+    post:
+
+
+    Required Parameters:
+    title and category_id 
+    """  
+
+
+    def get_queryset(self):
+        topics              = []
+        is_user_timeline    = False
+        search_term         =self.request.GET.keys()
+        filter_dic      ={}
+        sort_recent= False
+        if search_term:
+            for term_key in search_term:
+                if term_key not in ['limit','offset','order_by']:
+                    # if term_key =='category':
+                    #     filter_dic['category__slug'] = self.request.GET.get(term_key)
+                    if term_key:
+                        value = self.request.GET.get(term_key)
+                        filter_dic[term_key]=value
+                        if term_key =='user_id':
+                            is_user_timeline = True
+            filter_dic['is_vb'] = True
+            if 'order_by' in search_term:
+                sort_recent = True
+
+            if filter_dic:
+                print filter_dic
+
+                if is_user_timeline:
+                    filter_dic['is_removed'] = False
+                    topics = Topic.objects.filter(**filter_dic)
+                    post = topics
+                    topics=sorted(itertools.chain(post),key=lambda x: x.date, reverse=True)
+                else:
+                    topics = []
+                    all_seen_vb = VBseen.objects.filter(user = self.request.user).values_list('topic_id',flat=True)
+                    if 'language_id' in search_term:
+
+                        # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,date__gte=enddate)
+                        post1 = Topic.objects.filter(Q(topic_id__in=all_seen_vb),language_id = self.request.GET.get('language_id'),is_removed = False,is_vb = True).order_by('-date')
+                        post2 = Topic.objects.filter(language_id = self.request.GET.get('language_id'),is_removed = False,is_vb = True).exclude(Q(topic_id__in=all_seen_vb)).order_by('-date')
+                        if post1:
+                            topics+=list(post1)
+                        if post2:
+                            topics+=list(post2)
+                    else:
+                        topics = Topic.objects.filter(is_removed = False,is_vb = True)
+        else:
+            topics = Topic.objects.filter(is_removed = False,is_vb = True)
         return topics
 
 
@@ -651,6 +718,7 @@ def createTopic(request):
     title        = request.POST.get('title', '')
     language_id  = request.POST.get('language_id', '')
     category_id  = request.POST.get('category_id', '')
+    is_vb = request.POST.get('is_vb',False)
     # media_file = request.FILES.get['media']
     # print media_file
 
@@ -665,24 +733,32 @@ def createTopic(request):
 
 
 
-    if title and category_id:
-        try:
+    try:
 
-            topic.language_id   = language_id
-            topic.category_id   = category_id
-            topic.user_id       = user_id
-            topic.view_count = random.randint(10,30)
-            topic.save()
+        topic.language_id   = language_id
+        topic.category_id   = category_id
+        topic.user_id       = user_id
+        if is_vb:
+            topic.is_vb = True
+        topic.view_count = random.randint(10,30)
+        topic.save()
+        if not is_vb:
             userprofile = UserProfile.objects.get(user = request.user)
             userprofile.question_count = F('question_count')+1
             userprofile.save()
             add_bolo_score(request.user.id,'create_topic')
             topic_json = TopicSerializerwithComment(topic).data
-            return JsonResponse({'message': 'Topic Created','topic':topic_json}, status=status.HTTP_201_CREATED)
-        except User.DoesNotExist:
-            return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
-    else:
-        return JsonResponse({'message': 'Topic Id / User Id / Comment provided'}, status=status.HTTP_204_NO_CONTENT)
+            message = 'Topic Created'
+        else:
+            userprofile = UserProfile.objects.get(user = request.user)
+            userprofile.question_count = F('vb_count')+1
+            userprofile.save()
+            add_bolo_score(request.user.id,'create_vb')
+            topic_json = TopicSerializerwithComment(topic).data
+            message = 'Video Byte Created'
+        return JsonResponse({'message': message,'topic':topic_json}, status=status.HTTP_201_CREATED)
+    except User.DoesNotExist:
+        return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def editTopic(request):
@@ -1300,6 +1376,29 @@ def comment_view(request):
         return JsonResponse({'message': 'item viewed'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def vb_seen(request):
+    topic_id = request.POST.get('topic_id',None)
+    """
+    get:
+        Required Parameters
+        topic_id = request.POST.get('topic_id',None)
+        authorixation token
+    """
+    #### add models for seen users
+    try:
+        # comment_list = comment_ids.split(',')
+        # for each_comment_id in comment_list:
+        topic = Topic.objects.get(pk = topic_id)
+        # topic= comment.topic
+        topic.view_count = F('view_count')+1
+        topic.save()
+        vbseen,is_created = VBseen.objects.get_or_create(user = request.user,topic_id = topic_id)
+        return JsonResponse({'message': 'vb seen'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['POST'])
 def follow_like_list(request):

@@ -59,7 +59,7 @@ class Topic(models.Model):
     :vartype reindex_at: `:py:class:models.DateTimeField`
     """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='st_topics',editable=False)
-    category = models.ForeignKey('forum_category.Category', verbose_name=_("category"), related_name="category_topics")
+    category = models.ForeignKey('forum_category.Category', verbose_name=_("category"), related_name="category_topics",null=True,blank=True)
 
     title = models.CharField(_("title"), max_length=255, blank = True, null = True)
     question_audio = models.CharField(_("audio title"), max_length=255, blank = True, null = True)
@@ -85,6 +85,7 @@ class Topic(models.Model):
     share_count = models.PositiveIntegerField(_("Share count"), default=0)# only topic share
     # share_user = models.ForeignKey(settings.AUTH_USER_MODEL,null=True,blank=True, related_name='share_topic_user')
     # shared_post = models.ForeignKey('self', blank = True, null = True, related_name='user_shared_post')
+    is_vb = models.BooleanField(_("Is Video Bytes"), default=False)
 
     objects = TopicQuerySet.as_manager()
 
@@ -227,6 +228,13 @@ class Topic(models.Model):
         from django.utils.html import format_html
 
         return format_html(str('<a href="/superman/forum_comment/comment/?topic_id='+str(self.id)+'" target="_blank">'+str(self.comment_count)+'</a>'))
+
+class VBseen(UserInfo):
+    topic = models.ForeignKey(Topic, related_name='vb_seen',null=True,blank=True)
+    def __unicode__(self):
+        return str(self.topic if self.topic else 'VB')
+
+
 
 class ShareTopic(UserInfo):
     topic = models.ForeignKey(Topic, related_name='share_topic_topic_share',null=True,blank=True)
