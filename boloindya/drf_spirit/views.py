@@ -312,8 +312,8 @@ class VBList(generics.ListCreateAPIView):
                     if 'language_id' in search_term:
 
                         # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,date__gte=enddate)
-                        post1 = Topic.objects.filter(Q(topic_id__in=all_seen_vb),language_id = self.request.GET.get('language_id'),is_removed = False,is_vb = True).order_by('-date')
-                        post2 = Topic.objects.filter(language_id = self.request.GET.get('language_id'),is_removed = False,is_vb = True).exclude(Q(topic_id__in=all_seen_vb)).order_by('-date')
+                        post1 = Topic.objects.filter(Q(id__in=all_seen_vb),language_id = self.request.GET.get('language_id'),is_removed = False,is_vb = True).order_by('-date')
+                        post2 = Topic.objects.filter(language_id = self.request.GET.get('language_id'),is_removed = False,is_vb = True).exclude(Q(id__in=all_seen_vb)).order_by('-date')
                         if post1:
                             topics+=list(post1)
                         if post2:
