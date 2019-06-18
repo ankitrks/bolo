@@ -73,6 +73,7 @@ class Topic(models.Model):
 
     is_media = models.BooleanField(default=True)
     media_duration = models.CharField(_("duration"), max_length=20, default='',null=True,blank=True)
+    last_commented = models.DateTimeField(_("Last Commented"),null=True,blank=True)
 
     is_pinned = models.BooleanField(_("pinned"), default=False)
     is_globally_pinned = models.BooleanField(_("globally pinned"), default=False)

@@ -211,28 +211,28 @@ class Usertimeline(generics.ListCreateAPIView):
                         if not sort_recent:
                             post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,is_vb = False)
                         else:
-                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,is_vb = False).order_by('-date')
+                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,is_vb = False).order_by('-date','-last_commented')
                     elif 'category' in search_term and not 'language_id' in search_term:
                         # print "b"
                         # post1 = Topic.objects.filter(category__slug =self.request.GET.get('category'),is_removed = False,date__gte=enddate)
                         if not sort_recent:
                             post2 = Topic.objects.filter(category__slug =self.request.GET.get('category'),is_removed = False,is_vb = False)
                         else:
-                            post2 = Topic.objects.filter(category__slug =self.request.GET.get('category'),is_removed = False,is_vb = False).order_by('-date')
+                            post2 = Topic.objects.filter(category__slug =self.request.GET.get('category'),is_removed = False,is_vb = False).order_by('-date','-last_commented')
                     elif 'language_id' in search_term and 'category' in search_term:
                         # print "maaz"
                         # post1 = Topic.objects.filter(language_id = self.request.GET.get('language_id'),category__slug =self.request.GET.get('category'),is_removed = False,date__gte=enddate)
                         if not sort_recent:
                             post2 = Topic.objects.filter(language_id = self.request.GET.get('language_id'),category__slug =self.request.GET.get('category'),is_removed = False,is_vb = False)
                         else:
-                            post2 = Topic.objects.filter(language_id = self.request.GET.get('language_id'),category__slug =self.request.GET.get('category'),is_removed = False,is_vb = False).order_by('-date')
+                            post2 = Topic.objects.filter(language_id = self.request.GET.get('language_id'),category__slug =self.request.GET.get('category'),is_removed = False,is_vb = False).order_by('-date','-last_commented')
                     else:
                         # print "d"
                         # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,date__gte=enddate)
                         if not sort_recent:
                             post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,is_vb = False)
                         else:
-                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,is_vb = False).order_by('-date')
+                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,is_vb = False).order_by('-date','-last_commented')
                     # print post1,post2
                     # if post1:
                     #     topics = topics+list(post1)
@@ -250,7 +250,7 @@ class Usertimeline(generics.ListCreateAPIView):
             if not sort_recent:
                 post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,is_vb = False)
             else:
-                post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,is_vb = False).order_by('-date')
+                post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,is_vb = False).order_by('-date','-last_commented')
             # if post1:
             #     topics = topics+list(post1) 
             if post2:
@@ -648,6 +648,7 @@ def replyOnTopic(request):
             comment.save()
             topic = Topic.objects.get(pk = topic_id)
             topic.comment_count = F('comment_count')+1
+            topic.last_commented = timezone.now()
             topic.save()
             userprofile = UserProfile.objects.get(user = request.user)
             userprofile.answer_count = F('answer_count')+1
