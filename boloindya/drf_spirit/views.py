@@ -260,7 +260,7 @@ class Usertimeline(generics.ListCreateAPIView):
 class VBList(generics.ListCreateAPIView):
     serializer_class   = TopicSerializerwithComment
     permission_classes = (IsOwnerOrReadOnly,)
-    pagination_class    = LimitOffsetPagination
+    pagination_class   = None #LimitOffsetPagination
 
 
     """
