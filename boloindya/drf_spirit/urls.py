@@ -76,6 +76,7 @@ urlpatterns = [
     url(r'^topic_delete/$', topic_delete, name='topic_delete'),
     url(r'^notification/(?P<action>click|get)$', NotificationAPI.as_view(), name='notification'),
     url(r'^notification_topic/$', notification_topic, name='notification_topic'),
+    url(r'^experts/$', ExpertList.as_view(), name='list_experts'),
     url(r'^get_userprofile/$', GetUserProfile, name='get_userprofile'),
     url(r'^register_device/$', RegisterDevice, name='register_device'),
     url(r'^unregister_device/$', UnregisterDevice, name='unregister_device'),
