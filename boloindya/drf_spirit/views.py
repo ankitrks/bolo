@@ -718,6 +718,8 @@ def createTopic(request):
     title        = request.POST.get('title', '')
     language_id  = request.POST.get('language_id', '')
     category_id  = request.POST.get('category_id', '')
+    media_duration  = request.POST.get('media_duration', '')
+    question_image  = request.POST.get('question_image', '')
     is_vb = request.POST.get('is_vb',False)
     # media_file = request.FILES.get['media']
     # print media_file
@@ -740,6 +742,8 @@ def createTopic(request):
         topic.user_id       = user_id
         if is_vb:
             topic.is_vb = True
+            topic.media_duration = media_duration
+            topic.question_image = question_image
         topic.view_count = random.randint(10,30)
         topic.save()
         if not is_vb:
