@@ -903,6 +903,20 @@ class SubCategoryList(generics.ListAPIView):
             return Category.objects.filter(is_engagement = False, parent_id = category_id)
         return Category.objects.filter(is_engagement = False, parent__isnull = False)
 
+class ExpertList(generics.ListAPIView):
+    """
+    GET:
+        Required Parameters
+        None.
+    """
+    serializer_class = UserProfileSerializer
+    # permission_classes = (IsAuthenticated,)
+    permission_classes  = (AllowAny,)
+    pagination_class=None
+    
+    def get_queryset(self):
+        return UserProfile.objects.filter(is_expert = True)
+
 class CommentList(generics.ListCreateAPIView):
     serializer_class    = CommentSerializer
     queryset            = Comment.objects.all()
