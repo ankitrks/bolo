@@ -745,7 +745,9 @@ def createTopic(request):
             topic.is_vb = True
             topic.media_duration = media_duration
             topic.question_image = question_image
-        topic.view_count = random.randint(10,30)
+            topic.view_count = random.randint(300,400)
+        else:
+            topic.view_count = random.randint(10,30)
         topic.save()
         if not is_vb:
             userprofile = UserProfile.objects.get(user = request.user)
