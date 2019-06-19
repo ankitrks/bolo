@@ -201,7 +201,7 @@ def share_vb_page(request, user_id, poll_id, slug):
         user_profile = None
     context = {
         'topic': topics,
-        'is_single_topic': pk,
+        'is_single_topic': poll_id,
         'user_profile': user_profile
     }
     return render(request, 'spirit/topic/particular_topic.html', context)
