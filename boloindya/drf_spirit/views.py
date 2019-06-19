@@ -352,7 +352,7 @@ class GetQuestion(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user_id = self.request.GET.get('user_id','')
-        topic = Topic.objects.filter(user_id=user_id, is_removed=False)
+        topic = Topic.objects.filter(user_id=user_id, is_removed=False,is_vb=False)
         return topic
 
 
