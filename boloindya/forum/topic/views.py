@@ -193,6 +193,19 @@ def detail(request, pk, slug):
     }
     return render(request, 'spirit/topic/particular_topic.html', context)
 
+def share_vb_page(request, uid, pk, slug):
+    topics = Topic.objects.get(id = pk)
+    try:
+        user_profile = UserProfile.objects.get(user_id = uid)
+    except:
+        user_profile = None
+    context = {
+        'topic': topics,
+        'is_single_topic': pk,
+        'user_profile': user_profile
+    }
+    return render(request, 'spirit/topic/particular_topic.html', context)
+
 def index_active(request):
     categories = Category.objects.visible().parents()
     category = get_object_or_404(Category.objects.visible(), pk=5)
