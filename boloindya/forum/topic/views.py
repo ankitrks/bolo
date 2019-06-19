@@ -193,10 +193,10 @@ def detail(request, pk, slug):
     }
     return render(request, 'spirit/topic/particular_topic.html', context)
 
-def share_vb_page(request, uid, pk, slug):
-    topics = Topic.objects.get(id = pk)
+def share_vb_page(request, user_id, poll_id, slug):
+    topics = Topic.objects.get(id = poll_id)
     try:
-        user_profile = UserProfile.objects.get(user_id = uid)
+        user_profile = UserProfile.objects.get(user_id = user_id)
     except:
         user_profile = None
     context = {
