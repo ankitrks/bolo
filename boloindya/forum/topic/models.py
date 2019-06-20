@@ -367,7 +367,7 @@ class Notification(UserInfo):
             notific['tamil_title'] = str(self.user.st.name)+' உங்கள் பதிலை லைக் செய்துள்ளார்'
             notific['telgu_title'] = str(self.user.st.name)+' మీ సమాధానం ఇష్టపడ్డారు'
             notific['notification_type'] = '5'
-            notific['instance_id'] = self.topic.topic.id
+            notific['instance_id'] = self.topic.comment.topic.id
             notific['read_status'] = self.status
             notific['id'] = self.id
             notific['created_at'] = shortnaturaltime(self.created_at)
