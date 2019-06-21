@@ -309,17 +309,17 @@ class VBList(generics.ListCreateAPIView):
                 else:
                     topics = []
                     all_seen_vb = VBseen.objects.filter(user = self.request.user).values_list('topic_id',flat=True)
-                    if 'language_id' in search_term:
+                    # if 'language_id' in search_term:
 
                         # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,date__gte=enddate)
-                        post1 = Topic.objects.filter(Q(id__in=all_seen_vb),language_id = self.request.GET.get('language_id'),is_removed = False,is_vb = True).order_by('-date')
-                        post2 = Topic.objects.filter(language_id = self.request.GET.get('language_id'),is_removed = False,is_vb = True).exclude(Q(id__in=all_seen_vb)).order_by('-date')
-                        if post1:
-                            topics+=list(post1)
-                        if post2:
-                            topics+=list(post2)
-                    else:
-                        topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-date')
+                    post1 = Topic.objects.filter(is_removed = False,is_vb = True).exclude(id__in=all_seen_vb).order_by('-date')
+                    post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True).order_by('-date')
+                    if post1:
+                        topics+=list(post1)
+                    if post2:
+                        topics+=list(post2)
+                    # else:
+                    #     topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-date')
         else:
             topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-date')
         return topics
@@ -1159,7 +1159,7 @@ def fb_profile_settings(request):
                 print e
                 user_exists,num_user = check_user(extra_data['first_name'],extra_data['last_name'])
                 username = generate_username(extra_data['first_name'],extra_data['last_name'],num_user) if user_exists else str(str(extra_data['first_name'])+str(extra_data['last_name']))
-                user = User.objects.create(username = extra_data['id'])
+                user = User.objects.create(username = username.lower())
                 userprofile = UserProfile.objects.get(user = user)
                 is_created = True
 
