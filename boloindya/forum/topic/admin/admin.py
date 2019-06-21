@@ -88,5 +88,6 @@ admin.site.register(Notification,NotificationAdmin)
 admin.site.register(ShareTopic,ShareTopicAdmin)
 admin.site.register(Voting)
 admin.site.register(Leaderboard)
+admin.site.register(VBseen)
 
 
