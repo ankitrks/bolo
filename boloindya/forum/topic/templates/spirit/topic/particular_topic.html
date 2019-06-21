@@ -3,16 +3,27 @@
 {% block head-meta %}
 <meta property="og:site_name" content="Bolo Indya">
 <meta property="og:title" content="{{ topic.title }}" />
-<meta property="og:description" content="Answer this question on Bolo Indya app - Knowledge Sharing community for 100 crore Indians" />
+{% if topic.is_vb %}
+<meta name="description" content="Watch and create video bytes on your interest areas - Only on Bolo Indya, app for 100 crore Indians" />
+{% else %}
+<meta name="description" content="Answer this question on Bolo Indya app - Knowledge Sharing community for 100 crore Indians" />
+{% endif %}
 <meta property="og:type" content="website" />
 
 <meta property="title" content="{{ topic.title }}" />
+{% if topic.is_vb %}
+<meta name="description" content="Watch and create video bytes on your interest areas - Only on Bolo Indya, app for 100 crore Indians" />
+{% else %}
 <meta name="description" content="Answer this question on Bolo Indya app - Knowledge Sharing community for 100 crore Indians" />
-
+{% endif %}
 <meta data-react-helmet="true" name="twitter:card" content="summary"/>
 <meta data-react-helmet="true" name="twitter:site" content="{{ request.get_full_path }}"/>
 <meta data-react-helmet="true" name="twitter:title" content="{{ topic.title }}"/>
+{% if topic.is_vb %}
+<meta data-react-helmet="true" name="twitter:description" content="Watch and create video bytes on your interest areas - Only on Bolo Indya, app for 100 crore Indians" />
+{% else %}
 <meta data-react-helmet="true" name="twitter:description" content="Answer this question on Bolo Indya app - Knowledge Sharing community for 100 crore Indians"/>
+{% endif %}
 <meta data-react-helmet="true" name="twitter:image" content="https://boloindya.s3.amazonaws.com/share_pages/share_topic.webp"/>
 
 <meta data-react-helmet="true" property="og:url" content="{{ request.get_full_path }}"/>
