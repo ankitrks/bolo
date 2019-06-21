@@ -319,9 +319,9 @@ class VBList(generics.ListCreateAPIView):
                         if post2:
                             topics+=list(post2)
                     else:
-                        topics = Topic.objects.filter(is_removed = False,is_vb = True)
+                        topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-date')
         else:
-            topics = Topic.objects.filter(is_removed = False,is_vb = True)
+            topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-date')
         return topics
 
 
@@ -376,7 +376,26 @@ class GetAnswers(generics.ListCreateAPIView):
         get_topic_user_commented = Comment.objects.filter(user_id = user_id,is_removed=False).values_list('topic_id',flat=True)
         topics=[]
         if get_topic_user_commented:
-            topics = Topic.objects.filter(id__in=get_topic_user_commented)
+            topics = Topic.objects.filter(id__in=get_topic_user_commented,is_removed=False)
+
+        return topics
+
+class GetHomeAnswer(generics.ListCreateAPIView):
+    serializer_class   = TopicSerializerwithComment
+    permission_classes = (IsOwnerOrReadOnly,)
+    pagination_class    = LimitOffsetPagination
+    """
+    post:
+    """ 
+     
+    def get_queryset(self):
+        user_id = self.request.GET.get('user_id','')
+        get_topic_user_commented = Comment.objects.filter(user_id = self.request.user,is_removed=False).values_list('topic_id',flat=True)
+        topics=[]
+        if get_topic_user_commented:
+            topics = Topic.objects.filter(is_removed=False).exclude(id__in=get_topic_user_commented).order_by('-date')
+        else:
+            topics = Topic.objects.filter(is_removed=False).order_by('-date')
 
         return topics
 
@@ -573,6 +592,15 @@ def upload_media(media_file):
         return filepath
     except:
         return None
+
+import random, string
+def get_random_username():
+    x = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
+    try:
+        user = User.objects.get(username=x)
+        get_random_username()
+    except:
+        return x
 
 
 @api_view(['POST'])
@@ -1025,7 +1053,7 @@ def verify_otp(request):
                     user = userprofile.user
                     message = 'User Logged In'
                 else:
-                    user = User.objects.create(username = mobile_no)
+                    user = User.objects.create(username = get_random_username())
                     message = 'User created'
                     userprofile = UserProfile.objects.get(user = user)
                     userprofile.mobile_no = mobile_no
@@ -1129,7 +1157,8 @@ def fb_profile_settings(request):
                 is_created=False
             except Exception as e:
                 print e
-
+                user_exists,num_user = check_user(extra_data['first_name'],extra_data['last_name'])
+                username = generate_username(extra_data['first_name'],extra_data['last_name'],num_user) if user_exists else str(str(extra_data['first_name'])+str(extra_data['last_name']))
                 user = User.objects.create(username = extra_data['id'])
                 userprofile = UserProfile.objects.get(user = user)
                 is_created = True
@@ -1206,6 +1235,24 @@ def fb_profile_settings(request):
                 return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+def generate_username(first,last,num_of_users):
+        username=first+last+str(num_of_users)
+        while(check_username(username)):
+            num_of_users+=1
+            username=first+last+str(num_of_users)
+        return username
+
+def check_username(name):
+    return User.objects.filter(username__iexact=name)
+
+
+def check_user(first,last):
+    all_users = User.objects.filter(first_name__iexact=first,last_name__iexact=last)    
+    if all_users:
+        return True,len(all_users)
+    else:
+        return False,0
 
 @api_view(['POST'])
 def follow_user(request):
@@ -1433,7 +1480,7 @@ def follow_like_list(request):
         notification_count = Notification.objects.filter(for_user= request.user,status=0).count()
         return JsonResponse({'all_like':list(all_like),'all_follow':list(all_follow),\
             'all_category_follow':list(all_category_follow),'app_version':app_version,\
-            'notification_count':notification_count, 'is_test_user':userprofile.is_test_user}, status=status.HTTP_200_OK)
+            'notification_count':notification_count, 'is_test_user':userprofile.is_test_user,'user':UserSerializer(request.user).data}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 

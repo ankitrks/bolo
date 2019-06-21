@@ -3,11 +3,12 @@ from forum.comment.models import *
 from django.contrib import admin
 # admin_all(models)
 from datetime import datetime,timedelta
+from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 
 class CommentAdmin(admin.ModelAdmin):
 	search_fields = ('topic', )
-	list_filter = ('is_media', 'is_audio', 'language_id', 'topic__category')
-	list_display = ('id', 'topic', 'user', 'is_media', 'is_audio','media_duration', 'language_id')
+	list_filter = ('is_media', 'is_audio', 'language_id', 'topic__category','date', ('date', DateRangeFilter))
+	list_display = ('id', 'topic', 'user', 'is_media', 'is_audio','media_duration', 'language_id','date')
 	def changelist_view(self, request, extra_context=None):
 		search_fields = ('topic', )
 		list_filter = ('is_media', 'is_audio', 'language_id', 'topic__category')
