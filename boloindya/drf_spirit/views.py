@@ -393,9 +393,9 @@ class GetHomeAnswer(generics.ListCreateAPIView):
         get_topic_user_commented = Comment.objects.filter(user_id = self.request.user,is_removed=False).values_list('topic_id',flat=True)
         topics=[]
         if get_topic_user_commented:
-            topics = Topic.objects.filter(is_removed=False).exclude(id__in=get_topic_user_commented).order_by('-date')
+            topics = Topic.objects.exclude(is_vb = True).filter(is_removed=False).exclude(id__in=get_topic_user_commented).order_by('-date')
         else:
-            topics = Topic.objects.filter(is_removed=False).order_by('-date')
+            topics = Topic.objects.exclude(is_vb = True).filter(is_removed=False).order_by('-date')
 
         return topics
 
