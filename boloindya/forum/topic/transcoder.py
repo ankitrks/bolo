@@ -1,10 +1,12 @@
-import hashlib
+import os
 import json
 import boto3
+import hashlib
 from django.conf import settings
 
 def transcode_media_file(input_key):
     data_dump = ''
+    m3u8_url = ''
     # HLS Presets that will be used to create an adaptive bitrate playlist.
     hls_64k_audio_preset_id = '1351620000001-200071';
     hls_0400k_preset_id     = '1351620000001-200050';
@@ -78,5 +80,10 @@ def transcode_media_file(input_key):
     }
     data_dump += json.dumps(create_job_request)
     create_job_result=transcoder_client.create_job(**create_job_request)
-    data_dump += 'HLS job has been created: ', json.dumps(create_job_result['Job'], indent=4, sort_keys=True)
-    return data_dump
+    try:
+        m3u8_url = os.path.join('https://' + settings.AWS_BUCKET_NAME_TS + '.s3.amazonaws.com', \
+                create_job_result['OutputKeyPrefix'], create_job_request['Playlists']['Name'])
+        data_dump += 'HLS job has been created: ', json.dumps(create_job_result['Job'], indent=4, sort_keys=True)
+    except Exception as e:
+        data_dump += 'Exception: ' + str(e)
+    return data_dump, m3u8_url
