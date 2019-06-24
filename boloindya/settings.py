@@ -347,8 +347,13 @@ SIMPLE_JWT = {
 #### S3 bucket #####
 AWS_ACCESS_KEY_ID = 'AKIAJMOBRHDIXGKM6W6Q'
 AWS_SECRET_ACCESS_KEY = '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'
-
 AWS_BUCKET_NAME = 'boloindya'
+
+#### Transcoder settings #####
+PIPELINE_ID_TS = '1545987947390-hpo4hx'
+AWS_ACCESS_KEY_ID_TS = 'AKIAZNK4CM5CW4W4VWP7'
+AWS_SECRET_ACCESS_KEY_TS = 'Odl4xfZTJZM0mq89XtNXf95g2zY8NwRuhp5+zp87'
+#### Transcoder settings #####
 
 # The region of your bucket, more info:
 # http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region

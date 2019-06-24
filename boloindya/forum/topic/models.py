@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from __future__ import unicode_literals
 
 from django.db import models
@@ -19,8 +18,9 @@ from drf_spirit.utils import reduce_bolo_score,shortnaturaltime
 from forum.user.models import UserProfile
 from django.http import JsonResponse
 
-
 from datetime import datetime,timedelta
+
+from .transcoder import transcode_media_file
 
 language_options = (
     ('1', "English"),
@@ -88,6 +88,10 @@ class Topic(models.Model):
     # shared_post = models.ForeignKey('self', blank = True, null = True, related_name='user_shared_post')
     is_vb = models.BooleanField(_("Is Video Bytes"), default=False)
 
+    backup_url = models.TextField(_("backup url"), blank = True)
+    is_transcoded = models.BooleanField(default = False)
+    transcode_dump = models.TextField(_("backup url"), blank = True)
+
     objects = TopicQuerySet.as_manager()
 
     def __unicode__(self):
@@ -106,6 +110,15 @@ class Topic(models.Model):
         ordering = ['-comment_count', '-total_share_count']
         verbose_name = _("topic")
         verbose_name_plural = _("topics")
+
+    def save(self, *args, **kwargs):
+        if not self.id or not self.is_transcoded:
+            if self.is_media and not self.is_audio:
+                data_dump = transcode_media_file(self.comment)
+                self.backup_url = self.video_title.split('s3.amazonaws.com')[1]
+                self.transcode_dump = data_dump
+                self.is_transcoded = True
+        super(Topic, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
         if self.category_id == settings.ST_TOPIC_PRIVATE_CATEGORY_PK:
