@@ -71,7 +71,7 @@ def transcode_media_file(input_key):
 
     # Creating the job.
     create_job_request = {
-        'PipelineId' : pipeline_id,
+        'PipelineId' : settings.PIPELINE_ID_TS,
         'Input' : job_input,
         'OutputKeyPrefix' : output_key_prefix + output_key +'/',
         'Outputs' : job_outputs,
