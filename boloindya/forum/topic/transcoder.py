@@ -22,8 +22,7 @@ def transcode_media_file(input_key):
     output_key_prefix = 'elastic-transcoder/output/hls/'
 
     # Creating client for accessing elastic transcoder 
-    transcoder_client = boto3.elastictranscoder.connect_to_region(settings.REGION_HOST, \
-            aws_access_key_id = settings.AWS_ACCESS_KEY_ID_TS, \
+    transcoder_client = boto3.client('elastictranscoder', settings.REGION_HOST, aws_access_key_id = settings.AWS_ACCESS_KEY_ID_TS, \
             aws_secret_access_key = settings.AWS_SECRET_ACCESS_KEY_TS)
 
     # Setup the job input using the provided input key.
@@ -72,11 +71,11 @@ def transcode_media_file(input_key):
 
     # Creating the job.
     create_job_request = {
-        'pipeline_id' : settings.PIPELINE_ID_TS,
-        'input_name' : job_input,
-        'output_key_prefix' : output_key_prefix + output_key +'/',
-        'outputs' : job_outputs,
-        'playlists' : [ playlist ]
+        'PipelineId' : pipeline_id,
+        'Input' : job_input,
+        'OutputKeyPrefix' : output_key_prefix + output_key +'/',
+        'Outputs' : job_outputs,
+        'Playlists' : [ playlist ]
     }
     data_dump += json.dumps(create_job_request)
     create_job_result=transcoder_client.create_job(**create_job_request)
