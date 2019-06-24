@@ -113,7 +113,7 @@ class Topic(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.id or not self.is_transcoded:
-            if self.is_vb:
+            if self.is_vb and self.question_video:
                 data_dump, m3u8_url = transcode_media_file(self.question_video.split('s3.amazonaws.com')[1])
                 if m3u8_url:
                     self.backup_url = self.question_video
