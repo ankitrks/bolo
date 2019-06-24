@@ -82,7 +82,7 @@ def transcode_media_file(input_key):
     try:
         m3u8_url = os.path.join('https://' + settings.AWS_BUCKET_NAME_TS + '.s3.amazonaws.com', \
                 create_job_result['OutputKeyPrefix'], create_job_request['Playlists']['Name'])
-        data_dump += 'HLS job has been created: ', json.dumps(create_job_result['Job'], indent=4, sort_keys=True)
+        data_dump += 'HLS job has been created: ', json.dumps(create_job_result['Job'])
     except Exception as e:
         data_dump += 'Exception: ' + str(e)
     return data_dump, m3u8_url
