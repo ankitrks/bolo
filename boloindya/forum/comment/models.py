@@ -14,6 +14,8 @@ from drf_spirit.utils import reduce_bolo_score
 from django.db.models import F,Q
 from forum.user.models import UserProfile
 
+# from .transcoder import transcode_media_file
+
 language_options = (
     ('1', "English"),
     ('2', "Hindi"),
@@ -40,6 +42,7 @@ class Comment(models.Model):
 
     comment = models.TextField(_("comment"))
     comment_html = models.TextField(_("comment html"))
+    # backup_url = models.TextField(_("backup url"))
     action = models.IntegerField(_("action"), choices=ACTION, default=COMMENT)
     date = models.DateTimeField(default=timezone.now)
     is_removed = models.BooleanField(default=False)
@@ -50,6 +53,9 @@ class Comment(models.Model):
     media_duration = models.CharField(_("duration"), max_length=20, default='',null=True,blank=True)
     language_id = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='0')
     thumbnail = models.CharField(_("thumbnail"), max_length=150, default='')
+    
+    # is_transcoded = models.BooleanField(default = False)
+    # transcode_dump = models.TextField(_("backup url"))
 
     modified_count = models.PositiveIntegerField(_("modified count"), default=0)
     likes_count = models.PositiveIntegerField(_("likes count"), default=0)
@@ -67,6 +73,15 @@ class Comment(models.Model):
             return str(self.comment_html)
         except:
             return str(self.id)
+
+    # def save(self, *args, **kwargs):
+    #     if not self.id or not self.is_transcoded:
+    #         if self.is_media and not self.is_audio:
+    #             data_dump = transcode_media_file(self.comment)
+    #             self.backup_url = self.comment
+    #             self.transcode_dump = data_dump
+    #             self.is_transcoded = True
+    #     super(Comment, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('spirit:comment:find', kwargs={'pk': str(self.id), })
