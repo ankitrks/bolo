@@ -354,6 +354,7 @@ AWS_BUCKET_NAME = 'boloindya'
 PIPELINE_ID_TS = '1545987947390-hpo4hx'
 AWS_ACCESS_KEY_ID_TS = 'AKIAZNK4CM5CW4W4VWP7'
 AWS_SECRET_ACCESS_KEY_TS = 'Odl4xfZTJZM0mq89XtNXf95g2zY8NwRuhp5+zp87'
+AWS_BUCKET_NAME_TS = 'boloindya-et'
 #### Transcoder settings #####
 
 # The region of your bucket, more info:
