@@ -62,18 +62,20 @@ def transcode_media_file(input_key):
     }
     job_outputs = [ hls_audio, hls_400k, hls_600k, hls_1000k, hls_1500k, hls_2000k ]
 
+    playlist_name = 'hls_' + output_key
     # Setup master playlist which can be used to play using adaptive bitrate.
     playlist = {
-        'Name' : 'hls_' + output_key,
+        'Name' : playlist_name,
         'Format' : 'HLSv3',
         'OutputKeys' : map(lambda x: x['Key'], job_outputs)
     }
 
+    output_key_prefix_final = output_key_prefix + output_key + '/'
     # Creating the job.
     create_job_request = {
         'PipelineId' : settings.PIPELINE_ID_TS,
         'Input' : job_input,
-        'OutputKeyPrefix' : output_key_prefix + output_key +'/',
+        'OutputKeyPrefix' : output_key_prefix_final,
         'Outputs' : job_outputs,
         'Playlists' : [ playlist ]
     }
@@ -81,7 +83,7 @@ def transcode_media_file(input_key):
     create_job_result=transcoder_client.create_job(**create_job_request)
     try:
         m3u8_url = os.path.join('https://' + settings.AWS_BUCKET_NAME_TS + '.s3.amazonaws.com', \
-                create_job_result['OutputKeyPrefix'], create_job_request['Playlists']['Name'])
+                output_key_prefix_final, playlist_name)
         data_dump += 'HLS job has been created: ', json.dumps(create_job_result['Job'])
     except Exception as e:
         data_dump += 'Exception: ' + str(e)
