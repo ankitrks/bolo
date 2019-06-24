@@ -117,7 +117,7 @@ class Topic(models.Model):
                 data_dump, m3u8_url = transcode_media_file(self.question_video.split('s3.amazonaws.com')[1])
                 if m3u8_url:
                     self.backup_url = self.question_video
-                    self.m3u8_url = m3u8_url
+                    self.question_video = m3u8_url
                     self.transcode_dump = data_dump
                     self.is_transcoded = True
         super(Topic, self).save(*args, **kwargs)
