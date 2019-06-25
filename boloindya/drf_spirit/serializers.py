@@ -10,7 +10,9 @@ from .relations import PresentableSlugRelatedField
 from .models import SingUpOTP
 from .utils import shortnaturaltime,shortcounterprofile,shorcountertopic
 from django.conf import settings
+import re
 
+cloufront_url = "https://d1fa4tg1fvr6nj.cloudfront.net"
 class CategorySerializer(ModelSerializer):
     class Meta:
         model = Category
@@ -34,6 +36,7 @@ class TopicSerializer(ModelSerializer):
     view_count = SerializerMethodField()
     comment_count = SerializerMethodField()
     date = SerializerMethodField()
+    video_cdn = SerializerMethodField()
 
     class Meta:
         model = Topic
@@ -52,6 +55,18 @@ class TopicSerializer(ModelSerializer):
 
     def get_comment_count(self,instance):
         return shorcountertopic(instance.comment_count)
+
+    def get_video_cdn(self,instance):
+        if self.question_video:
+            regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+            find_urls_in_string = re.compile(regex, re.IGNORECASE)
+            url = find_urls_in_string.search(self.question_video)
+            return str(self.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net/"))
+        else:
+            return ''
+
+
+
 
 
 
@@ -80,6 +95,7 @@ class TopicSerializerwithComment(ModelSerializer):
     audio_comments = SerializerMethodField()
     text_comments = SerializerMethodField()
     date = SerializerMethodField()
+    video_cdn = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
 
     class Meta:
@@ -114,6 +130,15 @@ class TopicSerializerwithComment(ModelSerializer):
 
     def get_comment_count(self,instance):
         return shorcountertopic(instance.comment_count)
+        
+    def get_video_cdn(self,instance):
+        if self.question_video:
+            regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+            find_urls_in_string = re.compile(regex, re.IGNORECASE)
+            url = find_urls_in_string.search(self.question_video)
+            return str(self.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net/"))
+        else:
+            return ''
 
 class SingleTopicSerializerwithComment(ModelSerializer):
     user = SerializerMethodField()
