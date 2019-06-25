@@ -381,7 +381,7 @@ class GetAnswers(generics.ListCreateAPIView):
         return topics
 
 class GetHomeAnswer(generics.ListCreateAPIView):
-    serializer_class   = TopicSerializerwithComment
+    serializer_class   = TopicSerializer
     permission_classes = (IsOwnerOrReadOnly,)
     pagination_class    = LimitOffsetPagination
     """
@@ -389,7 +389,6 @@ class GetHomeAnswer(generics.ListCreateAPIView):
     """ 
      
     def get_queryset(self):
-        user_id = self.request.GET.get('user_id','')
         language_id = self.request.GET.get('language_id','')
         get_topic_user_commented = Comment.objects.filter(user_id = self.request.user,is_removed=False).values_list('topic_id',flat=True)
         topics=[]
