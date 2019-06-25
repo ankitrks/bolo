@@ -27,16 +27,31 @@ class CategoryLiteSerializer(ModelSerializer):
         fields = ('id','title', 'slug', 'color','hindi_title','tamil_title','telgu_title')
 
 class TopicSerializer(ModelSerializer):
-    user = UserReadOnlyField()
+    user = SerializerMethodField()
     category = PresentableSlugRelatedField(queryset=Category.objects.all(),
                                            presentation_serializer=CategoryLiteSerializer,
                                            slug_field='slug')
+    view_count = SerializerMethodField()
+    comment_count = SerializerMethodField()
+    date = SerializerMethodField()
 
     class Meta:
         model = Topic
         fields = '__all__'
         # TODO:: refactor after deciding about globally pinned.
         read_only_fields = ('is_pinned',)
+
+    def get_user(self,instance):
+        return UserSerializer(instance.user).data
+
+    def get_date(self,instance):
+        return shortnaturaltime(instance.date)
+
+    def get_view_count(self,instance):
+        return shorcountertopic(instance.view_count)
+
+    def get_comment_count(self,instance):
+        return shorcountertopic(instance.comment_count)
 
 
 
