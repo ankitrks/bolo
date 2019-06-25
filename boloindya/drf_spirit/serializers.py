@@ -40,7 +40,8 @@ class TopicSerializer(ModelSerializer):
 
     class Meta:
         model = Topic
-        fields = '__all__'
+        #fields = '__all__'
+        exclude = ('transcode_dump', )
         # TODO:: refactor after deciding about globally pinned.
         read_only_fields = ('is_pinned',)
 
@@ -57,18 +58,13 @@ class TopicSerializer(ModelSerializer):
         return shorcountertopic(instance.comment_count)
 
     def get_video_cdn(self,instance):
-        if self.question_video:
+        if instance.question_video:
             regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
             find_urls_in_string = re.compile(regex, re.IGNORECASE)
             url = find_urls_in_string.search(self.question_video)
-            return str(self.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net/"))
+            return str(self.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
         else:
             return ''
-
-
-
-
-
 
 class CommentSerializer(ModelSerializer):
     # user = UserReadOnlyField()
@@ -80,7 +76,7 @@ class CommentSerializer(ModelSerializer):
 
     def get_user(self,instance):
         return UserSerializer(instance.user).data
-        
+
     def get_date(self,instance):
         return shortnaturaltime(instance.date)
 
@@ -100,7 +96,8 @@ class TopicSerializerwithComment(ModelSerializer):
 
     class Meta:
         model = Topic
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('transcode_dump', )
         # TODO:: refactor after deciding about globally pinned.
         read_only_fields = ('is_pinned',)
 
@@ -130,13 +127,13 @@ class TopicSerializerwithComment(ModelSerializer):
 
     def get_comment_count(self,instance):
         return shorcountertopic(instance.comment_count)
-        
+
     def get_video_cdn(self,instance):
-        if self.question_video:
+        if instance.question_video:
             regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
             find_urls_in_string = re.compile(regex, re.IGNORECASE)
-            url = find_urls_in_string.search(self.question_video)
-            return str(self.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net/"))
+            url = find_urls_in_string.search(instance.question_video)
+            return str(instance.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
         else:
             return ''
 
@@ -155,7 +152,8 @@ class SingleTopicSerializerwithComment(ModelSerializer):
 
     class Meta:
         model = Topic
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('transcode_dump', )
         # TODO:: refactor after deciding about globally pinned.
         read_only_fields = ('is_pinned',)
 
@@ -192,7 +190,8 @@ class UserAnswerSerializerwithComment(ModelSerializer):
 
     class Meta:
         model = Topic
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('transcode_dump', )
         # TODO:: refactor after deciding about globally pinned.
         read_only_fields = ('is_pinned',)
 
