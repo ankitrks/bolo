@@ -398,7 +398,7 @@ class Notification(UserInfo):
             notific['tamil_title'] = 'Your Video Bytes has been Published'
             notific['telgu_title'] = 'Your Video Bytes has been Published'
             notific['notification_type'] = '6'
-            notific['instance_id'] = self.topic.topic.id
+            notific['instance_id'] = self.topic.id
             notific['read_status'] = self.status
             notific['id'] = self.id
             notific['created_at'] = shortnaturaltime(self.created_at)
