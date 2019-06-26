@@ -41,7 +41,7 @@ class TopicSerializer(ModelSerializer):
     class Meta:
         model = Topic
         #fields = '__all__'
-        exclude = ('transcode_dump', )
+        exclude = ('transcode_dump','transcode_status_dump' )
         # TODO:: refactor after deciding about globally pinned.
         read_only_fields = ('is_pinned',)
 
@@ -97,7 +97,7 @@ class TopicSerializerwithComment(ModelSerializer):
     class Meta:
         model = Topic
         # fields = '__all__'
-        exclude = ('transcode_dump', )
+        exclude = ('transcode_dump', 'transcode_status_dump')
         # TODO:: refactor after deciding about globally pinned.
         read_only_fields = ('is_pinned',)
 
@@ -153,7 +153,7 @@ class SingleTopicSerializerwithComment(ModelSerializer):
     class Meta:
         model = Topic
         # fields = '__all__'
-        exclude = ('transcode_dump', )
+        exclude = ('transcode_dump', 'transcode_status_dump' )
         # TODO:: refactor after deciding about globally pinned.
         read_only_fields = ('is_pinned',)
 
@@ -191,7 +191,7 @@ class UserAnswerSerializerwithComment(ModelSerializer):
     class Meta:
         model = Topic
         # fields = '__all__'
-        exclude = ('transcode_dump', )
+        exclude = ('transcode_dump', 'transcode_status_dump' )
         # TODO:: refactor after deciding about globally pinned.
         read_only_fields = ('is_pinned',)
 
