@@ -1672,12 +1672,12 @@ from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
 def transcoder_notification(request):
     # if request.POST:
-    jobId = json.loads(request.body)['Message']['jobId']
-    status = json.loads(request.body)['Message']['state']
-    f =open('maz.txt','a')
-    f.write(jobId)
-    f.write(status)
-    f.close()
+    jobId = json.loads(json.loads(request.body)['Message'])['jobId']
+    status = json.loads(json.loads(request.body)['Message'])['state']
+    # f =open('maz.txt','a')
+    # f.write(jobId)
+    # f.write(status)
+    # f.close()
     if status == 'COMPLETED':
         topic = Topic.objects.get(is_vb = True, is_transcoded = False, transcode_job_id = jobId)
         topic.is_transcoded = True
