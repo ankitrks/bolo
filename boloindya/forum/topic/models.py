@@ -90,7 +90,10 @@ class Topic(models.Model):
 
     backup_url = models.TextField(_("backup url"), blank = True)
     is_transcoded = models.BooleanField(default = False)
-    transcode_dump = models.TextField(_("backup url"), blank = True)
+    is_transcoded_error = models.BooleanField(default = False)
+    transcode_job_id = models.TextField(_("Transcode Job ID"), blank = True)
+    transcode_dump = models.TextField(_("Transcode Dump"), blank = True)
+    transcode_status_dump = models.TextField(_("Transcode Status Dump (Job Status)"), blank = True)
 
     objects = TopicQuerySet.as_manager()
 
@@ -119,7 +122,8 @@ class Topic(models.Model):
                     self.backup_url = self.question_video
                     self.question_video = m3u8_url
                     self.transcode_dump = data_dump
-                    self.is_transcoded = True
+                    self.transcode_job_id = data_dump['Job']['id']
+                    #self.is_transcoded = True
         super(Topic, self).save(*args, **kwargs)
 
     def get_absolute_url(self):

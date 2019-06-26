@@ -1668,7 +1668,26 @@ class LeaderBoradList(generics.ListCreateAPIView):
         #         leaderboard.append(each)
         # return leaderboard
 
-
 def transcoder_notification(request):
-    print request.__dict__
-    return request
+    if request.POST:
+        jobId = request.POST.get('jobId')
+        status = request.POST.get('status')
+        if status == 'COMPLETED':
+            topic = Topic.objects.get(is_vb = True, is_transcoded = False, transcode_job_id = jobId)
+            topic.is_transcoded = True
+        else:
+            topic.is_transcoded_error = True
+        topic.transcode_status_dump = json.dumps(request.POST)
+        topic.save()
+        if topic.is_transcoded:
+            pass
+            # send notification to user table for success
+        else:
+            pass
+            # send notification to user table for error
+
+
+
+
+
+
