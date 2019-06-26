@@ -7,6 +7,7 @@ from django.conf import settings
 def transcode_media_file(input_key):
     data_dump = ''
     m3u8_url = ''
+    job_id = ''
     # HLS Presets that will be used to create an adaptive bitrate playlist.
     hls_64k_audio_preset_id = '1351620000001-200071';
     hls_0400k_preset_id     = '1351620000001-200050';
@@ -87,7 +88,8 @@ def transcode_media_file(input_key):
     try:
         m3u8_url = os.path.join('https://' + settings.AWS_BUCKET_NAME_TS + '.s3.amazonaws.com', \
                 output_key_prefix_final, playlist_name + '.m3u8')
+        job_id = create_job_result['Job']['id']
         data_dump += 'HLS job has been created: ' + json.dumps(create_job_result)
     except Exception as e:
         data_dump += 'Exception: ' + str(e)
-    return data_dump, m3u8_url
+    return data_dump, m3u8_url, job_id
