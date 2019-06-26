@@ -56,7 +56,7 @@ def save_like(sender, instance,created, **kwargs):
 def save_vb(sender, instance,created, **kwargs):
 	try:
 		if instance.is_vb and instance.is_transcoded:
-			notify_owner = Notification.objects.create(for_user = instance.topic.user ,topic = instance,notification_type='6',user = instance.user)
+			notify_owner = Notification.objects.create(for_user = instance.user ,topic = instance,notification_type='6',user = instance.user)
 	except Exception as e:
 		print e
 		print e
