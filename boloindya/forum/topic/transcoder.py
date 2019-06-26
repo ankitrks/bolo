@@ -16,9 +16,9 @@ def transcode_media_file(input_key):
     hls_2000k_preset_id     = '1351620000001-200010';
 
     # HLS Segment duration that will be targeted.
-    segment_duration_audio = '10'
-    segment_duration_400 = '6'
-    segment_duration_1000 = '3'
+    segment_duration_audio = '2'
+    segment_duration_400 = '2'
+    segment_duration_1000 = '2'
     segment_duration_2000 = '2'
 
     #All outputs will have this prefix prepended to their output key.
