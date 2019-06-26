@@ -1671,22 +1671,26 @@ from django.db.models.signals import post_save
 from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
 def transcoder_notification(request):
-    if request.POST:
-        jobId = request.POST.get('jobId')
-        status = request.POST.get('status')
-        if status == 'COMPLETED':
-            topic = Topic.objects.get(is_vb = True, is_transcoded = False, transcode_job_id = jobId)
-            topic.is_transcoded = True
-        else:
-            topic.is_transcoded_error = True
-        topic.transcode_status_dump = json.dumps(request.POST)
-        topic.save()
-        if topic.is_transcoded:
-            post_save.send(Topic, instance=topic, created=False)
-            # send notification to user table for success
-        else:
-            pass
-            # send notification to user table for error
+    # if request.POST:
+    jobId = json.loads(request.body)['Message']['jobId']
+    status = json.loads(request.body)['Message']['state']
+    f =open('maz.txt','a')
+    f.write(jobId)
+    f.write(status)
+    f.close()
+    if status == 'COMPLETED':
+        topic = Topic.objects.get(is_vb = True, is_transcoded = False, transcode_job_id = jobId)
+        topic.is_transcoded = True
+    else:
+        topic.is_transcoded_error = True
+    topic.transcode_status_dump = json.dumps(request.body)
+    topic.save()
+    if topic.is_transcoded:
+        post_save.send(Topic, instance=topic, created=False)
+        # send notification to user table for success
+    else:
+        pass
+        # send notification to user table for error
     return JsonResponse({'post' : 'post'})
 
 
