@@ -392,6 +392,18 @@ class Notification(UserInfo):
             notific['created_at'] = shortnaturaltime(self.created_at)
             notific['actor_profile_pic'] = self.user.st.profile_pic 
 
+        elif self.notification_type=='6':
+            notific['title'] = 'Your Video Bytes has been Published'
+            notific['hindi_title'] = 'Your Video Bytes has been Published'
+            notific['tamil_title'] = 'Your Video Bytes has been Published'
+            notific['telgu_title'] = 'Your Video Bytes has been Published'
+            notific['notification_type'] = '6'
+            notific['instance_id'] = self.topic.topic.id
+            notific['read_status'] = self.status
+            notific['id'] = self.id
+            notific['created_at'] = shortnaturaltime(self.created_at)
+            notific['actor_profile_pic'] = ""
+
         return notific
 
     @staticmethod
