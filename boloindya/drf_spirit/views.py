@@ -1668,6 +1668,8 @@ class LeaderBoradList(generics.ListCreateAPIView):
         #         leaderboard.append(each)
         # return leaderboard
 from django.db.models.signals import post_save
+from django.views.decorators.csrf import csrf_exempt
+@csrf_exempt
 def transcoder_notification(request):
     if request.POST:
         jobId = request.POST.get('jobId')
@@ -1685,6 +1687,7 @@ def transcoder_notification(request):
         else:
             pass
             # send notification to user table for error
+    return JsonResponse({'post' : 'post'})
 
 
 
