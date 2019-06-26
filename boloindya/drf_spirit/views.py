@@ -1686,7 +1686,8 @@ def transcoder_notification(request):
     topic.transcode_status_dump = json.dumps(request.body)
     topic.save()
     if topic.is_transcoded:
-        post_save.send(Topic, instance=topic, created=False)
+        notify_owner = Notification.objects.create(for_user = topic.user ,topic = topic,notification_type='6',user = topic.user)
+        # post_save.send(Topic, instance=topic, created=False)
         # send notification to user table for success
     else:
         pass
