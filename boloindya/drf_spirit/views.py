@@ -1667,3 +1667,8 @@ class LeaderBoradList(generics.ListCreateAPIView):
         #     for each in leaderboard_list_2:
         #         leaderboard.append(each)
         # return leaderboard
+
+
+def transcoder_notification(request):
+    print request.__dict__
+    return request

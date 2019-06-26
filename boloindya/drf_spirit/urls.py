@@ -87,6 +87,7 @@ urlpatterns = [
     url(r'^get_single_poll/$', get_single_poll, name='get_single_poll'),
     url(r'^predict/$', predict, name='predict'),
     url(r'^vb_seen/$', vb_seen, name='vb_seen'),
+    url(r'^transcoder_notification/$', transcoder_notification, name='transcoder_notification'),
     url(r'^get_vb_list/$', VBList.as_view(), name='get_vb_list'),
     url(r'^leaderboard_view/$', LeaderBoradList.as_view(), name='leaderboard_view'),
     url(r'^topics/', include(topic_urls)),
