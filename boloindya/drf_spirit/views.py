@@ -1700,8 +1700,9 @@ def vb_transcode_status(request):
     topic = Topic.objects.get(pk=topic_id)
     if topic.is_transcoded:
         return JsonResponse({'messgae' : 'success'})
-    else:
+    elif topic.is_transcoded_error:
         return JsonResponse({'messgae' : 'fail'})
+    return JsonResponse({'messgae' : 'waiting'})
 
 
 
