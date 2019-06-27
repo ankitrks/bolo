@@ -1694,6 +1694,16 @@ def transcoder_notification(request):
         # send notification to user table for error
     return JsonResponse({'post' : 'post'})
 
+@api_view(['POST'])
+def vb_transcode_status(request):
+    topic_id = request.POST.get('topic_id', '')
+    topic = Topic.objects.get(pk=topic_id)
+    if topic.is_transcoded:
+        return JsonResponse({'messgae' : 'success'})
+    else:
+        return JsonResponse({'messgae' : 'fail'})
+
+
 
 
 
