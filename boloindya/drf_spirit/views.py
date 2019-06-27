@@ -947,7 +947,7 @@ class ExpertList(generics.ListAPIView):
     pagination_class=None
     
     def get_queryset(self):
-        return UserProfile.objects.filter(is_expert = True)
+        return UserProfile.objects.filter(is_expert = True).order_by('name')
 
 class CommentList(generics.ListCreateAPIView):
     serializer_class    = CommentSerializer
