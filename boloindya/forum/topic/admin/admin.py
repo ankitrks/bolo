@@ -3,7 +3,7 @@ from forum.topic.models import *
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
-from forum.topic.models import Topic,Notification,ShareTopic,CricketMatch,Poll,Choice,Voting,Leaderboard
+from forum.topic.models import Topic,Notification,ShareTopic,CricketMatch,Poll,Choice,Voting,Leaderboard,FCMDevice
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 
 # admin_all(models)
