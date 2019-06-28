@@ -597,7 +597,15 @@ def upload_media(media_file):
 
 import random, string
 def get_random_username():
-    x = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
+    today_datetime = datetime.now()
+    year = str(today_datetime.year%100)
+    month = today_datetime.month
+    if month <10:
+        month = '0'+str(month)
+    else:
+        month = str(month)
+    x = 'BI'+year+month+''.join(random.choice(string.digits) for _ in range(4))
+    # x = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
     try:
         user = User.objects.get(username=x)
         get_random_username()
