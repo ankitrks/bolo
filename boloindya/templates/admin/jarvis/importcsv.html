@@ -1,0 +1,71 @@
+{% extends "admin/jarvis/base.html" %}
+{% block content %}
+<form id="upload" action="/jarvis/importcsv/" method="POST" enctype="multipart/form-data" class="form-horizontal"> 
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">File: </label>
+        <div class="col-md-8">
+            <input type="file" name="csv_file" id="csv_file" required="True" class="form-control">
+        </div>                    
+    </div>
+    <div class="form-group" style="float:left;">                    
+        <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
+             <button type="submit" class="btn btn-primary"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Upload </button>
+        </div> 
+    </div>
+</form>
+<div id="csv_table">
+
+</div>
+<script>
+        function upload(event) {
+            var d = document.getElementById("confirm");
+            if(d.style.display = "none")
+                event.preventDefault();
+
+            var data = new FormData($('#upload').get(0));
+            $.ajax({
+                url: '/jarvis/getcsvdata/',
+                type: 'POST',
+                data: data,
+                cache: false,
+                dataType:"json",
+                processData: false,
+                contentType: false,
+                success: function(employee_data) {
+                   
+                   // var employee_data = data.split(/\r?\n|\r/);
+                    var table_data = '<table class="table table-bordered table-striped">';
+                    for(var count=0;count<employee_data.length;count++)
+                    {
+                        table_data += '<tr>'
+                        for(var cell_count=0;cell_count<employee_data[count].length;cell_count++)
+                        {
+                            if(count === 0)
+                            {
+                                table_data += '<th>'+employee_data[count][cell_count]+'</th>';
+                            }
+                            else
+                            {
+                                table_data += '<td>'+employee_data[count][cell_count]+'</td>';
+                            }
+                        }
+                        table_data += '</tr>';
+                    }
+                    table_data += '</table>';
+                    $('#csv_table').html(table_data);
+                    var d = document.getElementById("confirm");
+                    d.style.display = "block";
+        
+                }
+            });
+            return false;
+            }
+        
+        $(function() {
+        $('#upload').submit(upload);
+        });
+        
+</script>
+{% endblock content %}        
+        

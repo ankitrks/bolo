@@ -14,6 +14,7 @@ import forum.category.urls
 import forum.topic.urls
 import forum.comment.urls
 import drf_spirit.urls
+import jarvis.urls
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -51,6 +52,7 @@ patterns = [
     url(r'^api/v1/docs/$', schema_view),
     url(r'^api/v1/', include(drf_spirit.urls, namespace='api')),
     url(r'fcm/', include('fcm.urls')),
+    url(r'^jarvis/',include('jarvis.urls', namespace='jarvis')),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
