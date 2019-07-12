@@ -1,6 +1,6 @@
 {% extends "admin/jarvis/base.html" %}
 {% block content %}
-<form id="upload" action="/jarvis/importcsv/" method="POST" enctype="multipart/form-data" class="form-horizontal"> 
+<form id="upload" action="" method="POST" enctype="multipart/form-data" class="form-horizontal"> 
     {% csrf_token %}
     <div class="form-group">
         <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">File: </label>
@@ -19,11 +19,10 @@
 </div>
 <script>
         function upload(event) {
-            var d = document.getElementById("confirm");
-            if(d.style.display = "none")
-                event.preventDefault();
-
+            event.preventDefault();
             var data = new FormData($('#upload').get(0));
+            var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+            var all_data = []
             $.ajax({
                 url: '/jarvis/getcsvdata/',
                 type: 'POST',
@@ -48,14 +47,48 @@
                             else
                             {
                                 table_data += '<td>'+employee_data[count][cell_count]+'</td>';
+                                if (cell_count==0){
+                                }
                             }
+                        }
+                        if(count!=0){
+                            table_data += '<td class="grey" name="'+employee_data[count][0]+'">Pending</td>';
+                            all_data.push({"url":employee_data[count][0],"description":employee_data[count][1],"username":employee_data[count][2],"csrfmiddlewaretoken":csrfmiddlewaretoken})
                         }
                         table_data += '</tr>';
                     }
                     table_data += '</table>';
                     $('#csv_table').html(table_data);
-                    var d = document.getElementById("confirm");
-                    d.style.display = "block";
+
+                    console.log(all_data)
+                    var j=0
+                    for(j=0;j<all_data.length;j++){
+                        $("td[name='"+all_data[j].url+"']").text('Processing');
+                        $("td[name='"+all_data[j].url+"']").removeClass('grey').addClass('orange');
+                        $.ajax({
+                            url: '/jarvis/geturl/',
+                            type: 'POST',
+                            data:all_data[j],
+                            dataType:"json",
+                            // processData: true,
+                            // contentType: true,
+                            success: function(response) {
+                                if(response.message =='success'){
+                                    $("td[name='"+response.url+"']").text('Completed');
+                                    $("td[name='"+response.url+"']").removeClass('orange').addClass('green');
+                                }
+                                if(response.message =='fail'){
+                                    $("td[name='"+response.url+"']").text('Failed');
+                                    $("td[name='"+response.url+"']").removeClass('orange').addClass('red');
+                                }
+                               
+                                
+                    
+                            }
+                        });
+                    }
+
+
         
                 }
             });

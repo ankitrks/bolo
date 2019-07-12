@@ -6,4 +6,5 @@ urlpatterns = [
     url(r'^importcsv/$',views.importcsv,name = 'import-csv'),
     url(r'^getcsvdata/$',views.getcsvdata),
     url(r'^csvupload/$',views.uploaddata),
+    url(r'^geturl/$',views.geturl),
 ]
