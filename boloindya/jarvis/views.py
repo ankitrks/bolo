@@ -16,13 +16,18 @@ import random
 import os
 import hashlib
 import re
+from drf_spirit.views import get_video_thumbnail,getVideoLength
+from forum.topic.models import Topic
+from forum.category.models import Category
+from django.contrib.auth.models import User
+
 
 
 def upload_tos3(file_name,bucket):
     client = boto3.client('s3',aws_access_key_id='AKIAJMOBRHDIXGKM6W6Q',aws_secret_access_key='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')
     transfer = S3Transfer(client)
     transfer.upload_file(file_name,bucket,'instagram/'+file_name,extra_args={'ACL':'public-read'})
-    file_url = 'https://'+bucket+'buckets3.amazonaws.com/%s'%('instagram/'+file_name)
+    file_url = 'https://'+bucket+'.s3.amazonaws.com/%s'%('instagram/'+file_name)
     transcode = transcode_media_file('instagram/'+file_name,('instagram/'+file_name).split('/')[-1].split('.')[0])
     return file_url,transcode
 
@@ -32,28 +37,39 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
 
 def geturl(request):
     try:
-        print request.POST.get('url',None)
-        url = requests.get(request.POST.get('url',None))
         description = request.POST.get('description',None)
-        username = request.POST.get('username',None)
-        print username,description
-        html_page = url.text
-        html = BeautifulSoup(html_page,'html.parser')
-        video_url = html.find(property="og:video").get('content')
-        video_title = html.find(property="og:title").get('content')
-        video_image = html.find(property="og:image").get('content')
-        video_file = requests.get(video_url,stream=True)
-        file_name = video_url.split('/')[-1]
-        temp_name = file_name.split('?')[0].split('.')
-        file_name = temp_name[0]+"_"+id_generator()+'.'+temp_name[1]
-    
-        with open(file_name,'wb') as f:
-            for chunk in video_file.iter_content(chunk_size = 1024*1024):
-                if chunk:
-                    f.write(chunk)
-        uploaded_url,transcode = upload_tos3(file_name,'boloindyapp-prod')
-        print uploaded_url
-        return HttpResponse(json.dumps({'message':'success','url':request.POST.get('url',None)}),content_type="application/json")
+        is_vb_exist = Topic.objects.filter(title = description)
+        if not is_vb_exist:
+
+            username = request.POST.get('username',None)
+            user = User.objects.get(username = username)
+            category = request.POST.get('category',None)
+            url = requests.get(request.POST.get('url',None))
+            html_page = url.text
+            html = BeautifulSoup(html_page,'html.parser')
+            video_url = html.find(property="og:video").get('content')
+            video_title = html.find(property="og:title").get('content')
+            video_image = html.find(property="og:image").get('content')
+            video_file = requests.get(video_url,stream=True)
+            file_name = video_url.split('/')[-1]
+            temp_name = file_name.split('?')[0].split('.')
+            file_name = temp_name[0]+"_"+id_generator()+'.'+temp_name[1]
+        
+            with open(file_name,'wb') as f:
+                for chunk in video_file.iter_content(chunk_size = 1024*1024):
+                    if chunk:
+                        f.write(chunk)
+            uploaded_url,transcode = upload_tos3(file_name,'boloindyapp-prod')
+            print uploaded_url
+            thumbnail = get_video_thumbnail(file_name)
+            media_duration = getVideoLength(file_name)
+            create_vb = Topic.objects.create(title = description,language_id = '1',category = Category.objects.get(title__icontains=category,parent__isnull = False),media_duration=media_duration,\
+                thumbnail = thumbnail,is_vb = True,view_count = random.randint(300,400),question_image = thumbnail, backup_url=uploaded_url,question_video = transcode['new_m3u8_url']\
+                ,is_transcoded = True,transcode_job_id = transcode['job_id'],user = user)
+            os.remove(file_name)
+            return HttpResponse(json.dumps({'message':'success','url':request.POST.get('url',None)}),content_type="application/json")
+        else:
+            return HttpResponse(json.dumps({'message':'success','url':request.POST.get('url',None)}),content_type="application/json")
     except Exception as e:
         print e
         return HttpResponse(json.dumps({'message':'fail','url':request.POST.get('url',None)}),content_type="application/json")

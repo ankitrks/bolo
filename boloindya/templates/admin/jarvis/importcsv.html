@@ -53,7 +53,7 @@
                         }
                         if(count!=0){
                             table_data += '<td class="grey" name="'+employee_data[count][0]+'">Pending</td>';
-                            all_data.push({"url":employee_data[count][0],"description":employee_data[count][1],"username":employee_data[count][2],"csrfmiddlewaretoken":csrfmiddlewaretoken})
+                            all_data.push({"url":employee_data[count][0],"description":employee_data[count][1],"username":employee_data[count][2],"csrfmiddlewaretoken":csrfmiddlewaretoken,"category":employee_data[count][3]})
                         }
                         table_data += '</tr>';
                     }
