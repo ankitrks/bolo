@@ -316,11 +316,11 @@ class VBList(generics.ListCreateAPIView):
 
                         # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,date__gte=enddate)
                     if category__slug:
-                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,category__slug=category__slug).exclude(id__in=all_seen_vb).order_by('-date')
-                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,category__slug=category__slug).order_by('-date')
+                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,category__slug=category__slug,language_id = self.request.GET.get('language_id')).exclude(id__in=all_seen_vb).order_by('-date')
+                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,category__slug=category__slug,language_id = self.request.GET.get('language_id')).order_by('-date')
                     else:
-                        post1 = Topic.objects.filter(is_removed = False,is_vb = True).exclude(id__in=all_seen_vb).order_by('-date')
-                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True).order_by('-date')
+                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).exclude(id__in=all_seen_vb).order_by('-date')
+                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).order_by('-date')
                     if post1:
                         topics+=list(post1)
                     if post2:
