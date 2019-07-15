@@ -81,7 +81,7 @@ def geturl(request):
             return HttpResponse(json.dumps({'message':'success','url':request.POST.get('url',None)}),content_type="application/json")
     except Exception as e:
         print e
-        return HttpResponse(json.dumps({'message':'fail','url':request.POST.get('url',None)}),content_type="application/json")
+        return HttpResponse(json.dumps({'message':'fail','url':request.POST.get('url',None),'fail_message':str(e)}),content_type="application/json")
     
 
 
