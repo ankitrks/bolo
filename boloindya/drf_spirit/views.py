@@ -784,6 +784,7 @@ def createTopic(request):
             topic.media_duration = media_duration
             topic.question_image = question_image
             topic.view_count = random.randint(300,400)
+            topic.update_vb()
         else:
             topic.view_count = random.randint(10,30)
         topic.save()
