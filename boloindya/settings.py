@@ -134,6 +134,7 @@ INSTALLED_APPS = [
     'rangefilter',
     'import_export',
     'django_extensions',
+    'jarvis',
 
     # 'forum.core.tests'
 ]

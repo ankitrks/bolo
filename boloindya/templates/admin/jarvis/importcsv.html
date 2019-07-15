@@ -1,0 +1,104 @@
+{% extends "admin/jarvis/base.html" %}
+{% block content %}
+<form id="upload" action="" method="POST" enctype="multipart/form-data" class="form-horizontal"> 
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">File: </label>
+        <div class="col-md-8">
+            <input type="file" name="csv_file" id="csv_file" required="True" class="form-control">
+        </div>                    
+    </div>
+    <div class="form-group" style="float:left;">                    
+        <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
+             <button type="submit" class="btn btn-primary"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Upload </button>
+        </div> 
+    </div>
+</form>
+<div id="csv_table">
+
+</div>
+<script>
+        function upload(event) {
+            event.preventDefault();
+            var data = new FormData($('#upload').get(0));
+            var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+            var all_data = []
+            $.ajax({
+                url: '/jarvis/getcsvdata/',
+                type: 'POST',
+                data: data,
+                cache: false,
+                dataType:"json",
+                processData: false,
+                contentType: false,
+                success: function(employee_data) {
+                   
+                   // var employee_data = data.split(/\r?\n|\r/);
+                    var table_data = '<table class="table table-bordered table-striped">';
+                    for(var count=0;count<employee_data.length;count++)
+                    {
+                        table_data += '<tr>'
+                        for(var cell_count=0;cell_count<employee_data[count].length;cell_count++)
+                        {
+                            if(count === 0)
+                            {
+                                table_data += '<th>'+employee_data[count][cell_count]+'</th>';
+                            }
+                            else
+                            {
+                                table_data += '<td>'+employee_data[count][cell_count]+'</td>';
+                                if (cell_count==0){
+                                }
+                            }
+                        }
+                        if(count!=0){
+                            table_data += '<td class="grey" name="'+employee_data[count][0]+'">Pending</td>';
+                            all_data.push({"url":employee_data[count][0],"description":employee_data[count][1],"username":employee_data[count][2],"csrfmiddlewaretoken":csrfmiddlewaretoken,"category":employee_data[count][3]})
+                        }
+                        table_data += '</tr>';
+                    }
+                    table_data += '</table>';
+                    $('#csv_table').html(table_data);
+
+                    console.log(all_data)
+                    var j=0
+                    for(j=0;j<all_data.length;j++){
+                        $("td[name='"+all_data[j].url+"']").text('Processing');
+                        $("td[name='"+all_data[j].url+"']").removeClass('grey').addClass('orange');
+                        $.ajax({
+                            url: '/jarvis/geturl/',
+                            type: 'POST',
+                            data:all_data[j],
+                            dataType:"json",
+                            // processData: true,
+                            // contentType: true,
+                            success: function(response) {
+                                if(response.message =='success'){
+                                    $("td[name='"+response.url+"']").text('Completed');
+                                    $("td[name='"+response.url+"']").removeClass('orange').addClass('green');
+                                }
+                                if(response.message =='fail'){
+                                    $("td[name='"+response.url+"']").text('Failed');
+                                    $("td[name='"+response.url+"']").removeClass('orange').addClass('red');
+                                }
+                               
+                                
+                    
+                            }
+                        });
+                    }
+
+
+        
+                }
+            });
+            return false;
+            }
+        
+        $(function() {
+        $('#upload').submit(upload);
+        });
+        
+</script>
+{% endblock content %}        
+        
