@@ -1496,6 +1496,14 @@ def follow_like_list(request):
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+def get_follow_user(request):
+    try:
+        all_follow = Follower.objects.filter(user_follower = request.user,is_active = True).values_list('user_following', flat=True)
+        return JsonResponse({'all_follow':UserSerializer(all_follow,many= True).data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 def deafult_boloindya_follow(user,language):

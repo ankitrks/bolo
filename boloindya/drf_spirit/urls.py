@@ -4,7 +4,7 @@ from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,c
 	verify_otp, password_set, fb_profile_settings,Usertimeline,follow_user,follow_sub_category,like,shareontimeline,GetProfile,SubCategoryList,upload_video_to_s3,comment_view,\
     follow_like_list,upload_audio_to_s3,reply_delete,editTopic,topic_delete,notification_topic,GetUserProfile,RegisterDevice,UnregisterDevice,NotificationAPI,get_bolo_score,\
     GetTopic,GetQuestion,GetAnswers,CricketMatchList,get_single_match,get_single_poll,predict,LeaderBoradList,vb_seen,VBList,ExpertList,GetHomeAnswer,transcoder_notification,\
-    vb_transcode_status
+    vb_transcode_status,get_follow_user
 from rest_framework_simplejwt import views as jwt_views
 
 app_name = 'drf_spirit'
@@ -64,6 +64,7 @@ urlpatterns = [
     url(r'^fb_profile_settings/$', fb_profile_settings, name='fb_profile_settings'),
     url(r'^follow_user/$', follow_user, name='follow_user'),
     url(r'^follow_sub_category/$', follow_sub_category, name='follow_sub_category'),
+    url(r'^get_follow_user/$', get_follow_user, name='get_follow_user'),
     url(r'^shareontimeline/$', shareontimeline, name='shareontimeline'),
     url(r'^like/$', like, name='like'),
     url(r'^password/set/$', password_set, name='password_set'),
