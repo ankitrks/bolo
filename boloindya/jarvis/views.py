@@ -20,7 +20,7 @@ from drf_spirit.views import get_video_thumbnail,getVideoLength
 from forum.topic.models import Topic
 from forum.category.models import Category
 from django.contrib.auth.models import User
-
+from django.contrib.auth.decorators import login_required
 
 
 def upload_tos3(file_name,bucket):
@@ -88,7 +88,7 @@ def geturl(request):
 def home(request):
     return render(request,'admin/jarvis/base.html')
 
-
+@login_required
 def importcsv(request):
     data = []
     title = []
