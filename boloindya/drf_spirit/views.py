@@ -260,7 +260,7 @@ class Usertimeline(generics.ListCreateAPIView):
 class VBList(generics.ListCreateAPIView):
     serializer_class   = TopicSerializerwithComment
     permission_classes = (IsOwnerOrReadOnly,)
-    pagination_class   = None #LimitOffsetPagination
+    pagination_class   = LimitOffsetPagination
 
 
     """
@@ -284,6 +284,7 @@ class VBList(generics.ListCreateAPIView):
         search_term         =self.request.GET.keys()
         filter_dic      ={}
         sort_recent= False
+        category__slug = False
         if search_term:
             for term_key in search_term:
                 if term_key not in ['limit','offset','order_by']:
@@ -294,6 +295,8 @@ class VBList(generics.ListCreateAPIView):
                         filter_dic[term_key]=value
                         if term_key =='user_id':
                             is_user_timeline = True
+                        if term_key =='category':
+                            category__slug = self.request.GET.get(term_key)
             filter_dic['is_vb'] = True
             if 'order_by' in search_term:
                 sort_recent = True
@@ -312,8 +315,12 @@ class VBList(generics.ListCreateAPIView):
                     # if 'language_id' in search_term:
 
                         # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,date__gte=enddate)
-                    post1 = Topic.objects.filter(is_removed = False,is_vb = True).exclude(id__in=all_seen_vb).order_by('-date')
-                    post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True).order_by('-date')
+                    if category__slug:
+                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,category__slug=category__slug).exclude(id__in=all_seen_vb).order_by('-date')
+                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,category__slug=category__slug).order_by('-date')
+                    else:
+                        post1 = Topic.objects.filter(is_removed = False,is_vb = True).exclude(id__in=all_seen_vb).order_by('-date')
+                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True).order_by('-date')
                     if post1:
                         topics+=list(post1)
                     if post2:
