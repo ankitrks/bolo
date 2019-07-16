@@ -169,7 +169,7 @@ class Usertimeline(generics.ListCreateAPIView):
             for term_key in search_term:
                 if term_key not in ['limit','offset','order_by']:
                     if term_key =='category':
-                        filter_dic['category__slug'] = self.request.GET.get(term_key)
+                        filter_dic['m2mcategory__slug'] = self.request.GET.get(term_key)
                     elif term_key:
                         value               =self.request.GET.get(term_key)
                         filter_dic[term_key]=value
@@ -209,30 +209,30 @@ class Usertimeline(generics.ListCreateAPIView):
                         # print "a"
                         # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,date__gte=enddate)
                         if not sort_recent:
-                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,is_vb = False)
+                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,is_vb = False)
                         else:
-                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,is_vb = False).order_by('-last_commented')
+                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,is_vb = False).order_by('-last_commented')
                     elif 'category' in search_term and not 'language_id' in search_term:
                         # print "b"
                         # post1 = Topic.objects.filter(category__slug =self.request.GET.get('category'),is_removed = False,date__gte=enddate)
                         if not sort_recent:
-                            post2 = Topic.objects.filter(category__slug =self.request.GET.get('category'),is_removed = False,is_vb = False)
+                            post2 = Topic.objects.filter(m2mcategory__slug =self.request.GET.get('category'),is_removed = False,is_vb = False)
                         else:
-                            post2 = Topic.objects.filter(category__slug =self.request.GET.get('category'),is_removed = False,is_vb = False).order_by('-last_commented')
+                            post2 = Topic.objects.filter(m2mcategory__slug =self.request.GET.get('category'),is_removed = False,is_vb = False).order_by('-last_commented')
                     elif 'language_id' in search_term and 'category' in search_term:
                         # print "maaz"
                         # post1 = Topic.objects.filter(language_id = self.request.GET.get('language_id'),category__slug =self.request.GET.get('category'),is_removed = False,date__gte=enddate)
                         if not sort_recent:
-                            post2 = Topic.objects.filter(language_id = self.request.GET.get('language_id'),category__slug =self.request.GET.get('category'),is_removed = False,is_vb = False)
+                            post2 = Topic.objects.filter(language_id = self.request.GET.get('language_id'),m2mcategory__slug =self.request.GET.get('category'),is_removed = False,is_vb = False)
                         else:
-                            post2 = Topic.objects.filter(language_id = self.request.GET.get('language_id'),category__slug =self.request.GET.get('category'),is_removed = False,is_vb = False).order_by('-last_commented')
+                            post2 = Topic.objects.filter(language_id = self.request.GET.get('language_id'),m2mcategory__slug =self.request.GET.get('category'),is_removed = False,is_vb = False).order_by('-last_commented')
                     else:
                         # print "d"
                         # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,date__gte=enddate)
                         if not sort_recent:
-                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,is_vb = False)
+                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory_id__in = category_follow),is_removed = False,is_vb = False)
                         else:
-                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,is_vb = False).order_by('-last_commented')
+                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory_id__in = category_follow),is_removed = False,is_vb = False).order_by('-last_commented')
                     # print post1,post2
                     # if post1:
                     #     topics = topics+list(post1)
@@ -248,9 +248,9 @@ class Usertimeline(generics.ListCreateAPIView):
             # enddate = startdate - timedelta(days=1)
             # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,date__gte=enddate)
             if not sort_recent:
-                post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,is_vb = False)
+                post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory_id__in = category_follow),is_removed = False,is_vb = False)
             else:
-                post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,is_vb = False).order_by('-last_commented')
+                post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory_id__in = category_follow),is_removed = False,is_vb = False).order_by('-last_commented')
             # if post1:
             #     topics = topics+list(post1) 
             if post2:
@@ -296,7 +296,7 @@ class VBList(generics.ListCreateAPIView):
                         if term_key =='user_id':
                             is_user_timeline = True
                         if term_key =='category':
-                            category__slug = self.request.GET.get(term_key)
+                            m2mcategory__slug = self.request.GET.get(term_key)
             filter_dic['is_vb'] = True
             if 'order_by' in search_term:
                 sort_recent = True
@@ -315,9 +315,9 @@ class VBList(generics.ListCreateAPIView):
                     # if 'language_id' in search_term:
 
                         # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,date__gte=enddate)
-                    if category__slug:
-                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,category__slug=category__slug,language_id = self.request.GET.get('language_id')).exclude(id__in=all_seen_vb).order_by('-date')
-                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,category__slug=category__slug,language_id = self.request.GET.get('language_id')).order_by('-date')
+                    if m2mcategory__slug:
+                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id')).exclude(id__in=all_seen_vb).order_by('-date')
+                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id')).order_by('-date')
                     else:
                         post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).exclude(id__in=all_seen_vb).order_by('-date')
                         post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).order_by('-date')
@@ -785,6 +785,7 @@ def createTopic(request):
 
         topic.language_id   = language_id
         topic.category_id   = category_id
+        topic.m2mcategory_id.add(category_id)
         topic.user_id       = user_id
         if is_vb:
             topic.is_vb = True
