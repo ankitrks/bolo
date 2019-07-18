@@ -1508,8 +1508,12 @@ def follow_like_list(request):
 def get_follow_user(request):
     try:
         all_follow_id = Follower.objects.filter(user_follower = request.user,is_active = True).values_list('user_following_id', flat=True)
-        all_user = User.objects.filter(pk__in = all_follow_id)
-        return JsonResponse({'all_follow':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
+        all_vb_of_follower = Topic.objects.filter(is_vb=True,is_removed=False,user_id__in=all_follow_id).values_list('user_id',flat=True)
+        if all_vb_of_follower:
+            all_user = User.objects.filter(pk__in = all_vb_of_follower)
+            return JsonResponse({'all_follow':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'all_follow':[]}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
