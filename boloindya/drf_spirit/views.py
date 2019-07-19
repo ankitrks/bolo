@@ -331,7 +331,14 @@ class VBList(generics.ListCreateAPIView):
             topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-date')
         return topics
 
+class GetChallenge(generics.ListCreateAPIView):
+    serializer_class = TopicSerializer
+    permission_classes = (IsOwnerOrReadOnly,)
+    pagination_class = LimitOffsetPagination
 
+    def get_queryset(self):
+        all_topic = Topic.objects.filter(title__icontains = '#GameOfTongues')
+        return all_topic
 
 class GetTopic(generics.ListCreateAPIView):
     serializer_class   = SingleTopicSerializerwithComment
