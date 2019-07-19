@@ -332,7 +332,7 @@ class VBList(generics.ListCreateAPIView):
         return topics
 
 class GetChallenge(generics.ListCreateAPIView):
-    serializer_class = TopicSerializer
+    serializer_class = TopicSerializerwithComment
     permission_classes = (IsOwnerOrReadOnly,)
     pagination_class = LimitOffsetPagination
 
