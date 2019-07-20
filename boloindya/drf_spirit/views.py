@@ -793,7 +793,7 @@ def createTopic(request):
 
         topic.language_id   = language_id
         topic.category_id   = category_id
-        topic.m2mcategory_id.add(category_id)
+        topic.m2mcategory.add(Category.objects.get(pk=category_id))
         topic.user_id       = user_id
         if is_vb:
             topic.is_vb = True
