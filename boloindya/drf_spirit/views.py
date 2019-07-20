@@ -1738,11 +1738,30 @@ def vb_transcode_status(request):
     topic_id = request.POST.get('topic_id', '')
     topic = Topic.objects.get(pk=topic_id)
     if topic.is_transcoded:
-        return JsonResponse({'messgae' : 'success'})
+        try:
+            cloudfront_status = check_url(get_cloudfront_url(topic))
+        except:
+            cloudfront_status = '400'
+        return JsonResponse({'messgae' : 'success','cloudfront_status':cloudfront_status})
     elif topic.is_transcoded_error:
         return JsonResponse({'messgae' : 'fail'})
     return JsonResponse({'messgae' : 'waiting'})
 
+import urllib2
+import re
+def check_url(file_path):
+    try:
+        u = urllib2.urlopen(str(file_path))
+        return "200"
+    except Exception as e:
+        print e,file_path
+        return "403"
+def get_cloudfront_url(instance):
+    if instance.question_video:
+        regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+        find_urls_in_string = re.compile(regex, re.IGNORECASE)
+        url = find_urls_in_string.search(instance.question_video)
+        return str(instance.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
 
 
 
