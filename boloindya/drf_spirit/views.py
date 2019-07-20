@@ -285,6 +285,7 @@ class VBList(generics.ListCreateAPIView):
         filter_dic      ={}
         sort_recent= False
         category__slug = False
+        m2mcategory__slug = False
         if search_term:
             for term_key in search_term:
                 if term_key not in ['limit','offset','order_by']:
