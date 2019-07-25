@@ -602,6 +602,22 @@ def upload_media(media_file):
     except:
         return None
 
+@api_view(['POST'])
+def upload_profile_image(request):
+    try:
+        my_image = request.FILES['file']
+        my_image_url = upload_thumbail(my_image)
+        if my_image_url:
+            return JsonResponse({'status': 'success','body':my_image_url}, status=status.HTTP_201_CREATED)
+        else:
+            return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
 import random, string
 def get_random_username():
     today_datetime = datetime.now()
