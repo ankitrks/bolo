@@ -52,7 +52,7 @@ urlpatterns = [
     url(r'^reply_on_topic', include(replyontopic_urls)),
     url(r'^categories/', include(category_urls)),
     url(r'^comments/', include(comment_urls)),
-    url(r'^upload_profile_image/$', upload_profile_image, name='upload_profile_image'),
+    url(r'^upload_profile_image$', upload_profile_image, name='upload_profile_image'),
     
     url(r'^token/$', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
     url(r'^token/refresh/$', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
