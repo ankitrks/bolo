@@ -87,6 +87,7 @@ class Topic(models.Model):
     # share_user = models.ForeignKey(settings.AUTH_USER_MODEL,null=True,blank=True, related_name='share_topic_user')
     # shared_post = models.ForeignKey('self', blank = True, null = True, related_name='user_shared_post')
     is_vb = models.BooleanField(_("Is Video Bytes"), default=False)
+    likes_count = models.PositiveIntegerField(_("Likes count"), default=0)
 
     backup_url = models.TextField(_("backup url"), blank = True)
     is_transcoded = models.BooleanField(default = False)

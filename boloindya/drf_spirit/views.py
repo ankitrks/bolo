@@ -316,19 +316,19 @@ class VBList(generics.ListCreateAPIView):
 
                         # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,date__gte=enddate)
                     if category__slug:
-                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,category__slug=category__slug,language_id = self.request.GET.get('language_id')).exclude(id__in=all_seen_vb).order_by('-date')
-                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,category__slug=category__slug,language_id = self.request.GET.get('language_id')).order_by('-date')
+                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,category__slug=category__slug,language_id = self.request.GET.get('language_id')).exclude(id__in=all_seen_vb).order_by('-id')
+                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,category__slug=category__slug,language_id = self.request.GET.get('language_id')).order_by('-id')
                     else:
-                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).exclude(id__in=all_seen_vb).order_by('-date')
-                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).order_by('-date')
+                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).exclude(id__in=all_seen_vb).order_by('-id')
+                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).order_by('-id')
                     if post1:
                         topics+=list(post1)
                     if post2:
                         topics+=list(post2)
                     # else:
-                    #     topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-date')
+                    #     topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-id')
         else:
-            topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-date')
+            topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-id')
         return topics
 
 
@@ -1358,14 +1358,14 @@ def like(request):
         Required Parameters
         topic_id = request.POST.get('topic_id',None)
     """
-    comment_id = request.POST.get('comment_id',None)
+    topic_id = request.POST.get('topic_id',None)
     userprofile = UserProfile.objects.get(user = request.user)
     try:
-        liked,is_created = Like.objects.get_or_create(comment_id = comment_id,user = request.user)
-        comment = Comment.objects.get(pk = comment_id)
+        liked,is_created = Like.objects.get_or_create(topic_id = topic_id,user = request.user)
+        topic = Topic.objects.get(pk = topic_id)
         if is_created:
-            comment.likes_count = F('likes_count')+1
-            comment.save()
+            topic.likes_count = F('likes_count')+1
+            topic.save()
             add_bolo_score(request.user.id,'liked')
             userprofile.like_count = F('like_count')+1
             userprofile.save()
@@ -1374,15 +1374,15 @@ def like(request):
             if liked.like:
                 liked.like = False
                 liked.save()
-                comment.likes_count = F('likes_count')-1
-                comment.save()
+                topic.likes_count = F('likes_count')-1
+                topic.save()
                 userprofile.like_count = F('like_count')-1
                 userprofile.save()
             else:
                 liked.like = True
                 liked.save()
-                comment.likes_count = F('likes_count')+1
-                comment.save()
+                topic.likes_count = F('likes_count')+1
+                topic.save()
                 userprofile.like_count = F('like_count')+1
                 userprofile.save()
             return JsonResponse({'message': 'unliked'}, status=status.HTTP_200_OK)
@@ -1534,6 +1534,32 @@ def get_follow_user(request):
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['POST'])
+def get_following_list(request):
+    try:
+        all_following_id = Follower.objects.filter(user_following = request.user,is_active = True).values_list('user_follower_id', flat=True)
+        if all_following_id:
+            all_user = User.objects.filter(pk__in = all_following_id)
+            return JsonResponse({'all_following_list':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'all_following_list':[]}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def get_follower_list(request):
+    try:
+        all_follower_id = Follower.objects.filter(user_follower = request.user,is_active = True).values_list('user_following_id', flat=True)
+        if all_follower_id:
+            all_user = User.objects.filter(pk__in = all_follower_id)
+            return JsonResponse({'all_follower_list':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'all_follower_list':[]}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
 
 def deafult_boloindya_follow(user,language):
