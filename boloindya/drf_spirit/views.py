@@ -1538,7 +1538,7 @@ def get_follow_user(request):
 @api_view(['POST'])
 def get_following_list(request):
     try:
-        all_following_id = Follower.objects.filter(user_following = request.user,is_active = True).values_list('user_follower_id', flat=True)
+        all_following_id = Follower.objects.filter(user_following = request.POST.get('user_id', ''),is_active = True).values_list('user_follower_id', flat=True)
         if all_following_id:
             all_user = User.objects.filter(pk__in = all_following_id)
             return JsonResponse({'all_following_list':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
@@ -1551,7 +1551,7 @@ def get_following_list(request):
 @api_view(['POST'])
 def get_follower_list(request):
     try:
-        all_follower_id = Follower.objects.filter(user_follower = request.user,is_active = True).values_list('user_following_id', flat=True)
+        all_follower_id = Follower.objects.filter(user_follower = request.POST.get('user_id', ''),is_active = True).values_list('user_following_id', flat=True)
         if all_follower_id:
             all_user = User.objects.filter(pk__in = all_follower_id)
             return JsonResponse({'all_follower_list':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
