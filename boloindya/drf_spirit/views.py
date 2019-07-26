@@ -1541,9 +1541,9 @@ def get_following_list(request):
         all_following_id = Follower.objects.filter(user_following = request.POST.get('user_id', ''),is_active = True).values_list('user_follower_id', flat=True)
         if all_following_id:
             all_user = User.objects.filter(pk__in = all_following_id)
-            return JsonResponse({'all_following_list':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
+            return JsonResponse({'result':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
         else:
-            return JsonResponse({'all_following_list':[]}, status=status.HTTP_200_OK)
+            return JsonResponse({'result':[]}, status=status.HTTP_200_OK)
 
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
@@ -1554,9 +1554,9 @@ def get_follower_list(request):
         all_follower_id = Follower.objects.filter(user_follower = request.POST.get('user_id', ''),is_active = True).values_list('user_following_id', flat=True)
         if all_follower_id:
             all_user = User.objects.filter(pk__in = all_follower_id)
-            return JsonResponse({'all_follower_list':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
+            return JsonResponse({'result':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
         else:
-            return JsonResponse({'all_follower_list':[]}, status=status.HTTP_200_OK)
+            return JsonResponse({'result':[]}, status=status.HTTP_200_OK)
 
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
