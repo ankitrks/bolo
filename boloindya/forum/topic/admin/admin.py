@@ -15,13 +15,13 @@ class TopicResource(resources.ModelResource):
 		skip_unchanged = True
 		report_skipped = True
 		import_id_fields = ( 'title', 'category__title','language_id','user_id')
-		fields = ( 'id', 'title','user__username','category__title','is_media','comments','audio_duration' ,'video_duration')
+		fields = ( 'id', 'title','user__username','category__title','media_duration','is_media','comments')
 
 
 class TopicAdmin(ImportExportModelAdmin):
 	search_fields = ('title', )
 	list_filter = ('language_id', 'category', 'is_media','date', ('date', DateRangeFilter),)
-	list_display = ('id', 'title', 'user', 'category', 'is_media','comments','audio_duration' ,'video_duration','date')
+	list_display = ('id', 'title', 'user', 'category','media_duration', 'is_media','comments','date')
 	list_editable = ('title', 'category',)
 	resource_class = TopicResource
 	# def comment_count(self, obj):
