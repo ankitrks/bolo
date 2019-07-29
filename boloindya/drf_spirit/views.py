@@ -720,7 +720,7 @@ def replyOnTopic(request):
                 comment.media_duration = media_duration
             comment.save()
             add_bolo_score(request.user.id,'reply_on_topic')
-            return JsonResponse({'message': 'Reply Submitted'}, status=status.HTTP_201_CREATED)
+            return JsonResponse({'message': 'Reply Submitted','comment':CommentSerializer(comment).data}, status=status.HTTP_201_CREATED)
         except User.DoesNotExist:
             return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
     else:
@@ -1173,6 +1173,8 @@ def fb_profile_settings(request):
     activity        = request.POST.get('activity',None)
     language        = request.POST.get('language',None)
     is_geo_location = request.POST.get('is_geo_location',None)
+    d_o_b = request.POST.get('d_o_b',None)
+    gender = request.POST.get('gender',None)
     click_id = request.POST.get('click_id',None)
     lat = request.POST.get('lat',None)
     lang = request.POST.get('lang',None)
@@ -1204,6 +1206,8 @@ def fb_profile_settings(request):
                 userprofile.name = extra_data['name']
                 userprofile.social_identifier = extra_data['id']
                 userprofile.bio = bio
+                userprofile.d_o_b = d_o_b
+                userprofile.gender = gender
                 userprofile.about = about
                 userprofile.refrence = refrence
                 userprofile.extra_data = extra_data
@@ -1235,6 +1239,8 @@ def fb_profile_settings(request):
                 userprofile.name= name
                 userprofile.bio = bio
                 userprofile.about = about
+                userprofile.d_o_b = d_o_b
+                userprofile.gender = gender
                 userprofile.profile_pic =profile_pic
                 userprofile.save()
                 if username:
@@ -1359,13 +1365,18 @@ def like(request):
         topic_id = request.POST.get('topic_id',None)
     """
     topic_id = request.POST.get('topic_id',None)
+    comment_id = request.POST.get('comment_id',None)
     userprofile = UserProfile.objects.get(user = request.user)
     try:
-        liked,is_created = Like.objects.get_or_create(topic_id = topic_id,user = request.user)
-        topic = Topic.objects.get(pk = topic_id)
+        if topic_id:
+            liked,is_created = Like.objects.get_or_create(topic_id = topic_id,user = request.user)
+            acted_obj = Topic.objects.get(pk = topic_id)
+        elif comment_id:
+            liked,is_created = Like.objects.get_or_create(comment_id = comment_id,user = request.user)
+            acted_obj = Comment.objects.get(pk = comment_id)
         if is_created:
-            topic.likes_count = F('likes_count')+1
-            topic.save()
+            acted_obj.likes_count = F('likes_count')+1
+            acted_obj.save()
             add_bolo_score(request.user.id,'liked')
             userprofile.like_count = F('like_count')+1
             userprofile.save()
@@ -1374,18 +1385,19 @@ def like(request):
             if liked.like:
                 liked.like = False
                 liked.save()
-                topic.likes_count = F('likes_count')-1
-                topic.save()
+                acted_obj.likes_count = F('likes_count')-1
+                acted_obj.save()
                 userprofile.like_count = F('like_count')-1
                 userprofile.save()
+                return JsonResponse({'message': 'unliked'}, status=status.HTTP_200_OK)
             else:
                 liked.like = True
                 liked.save()
-                topic.likes_count = F('likes_count')+1
-                topic.save()
+                acted_obj.likes_count = F('likes_count')+1
+                acted_obj.save()
                 userprofile.like_count = F('like_count')+1
                 userprofile.save()
-            return JsonResponse({'message': 'unliked'}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'liked'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1506,7 +1518,8 @@ def vb_seen(request):
 @api_view(['POST'])
 def follow_like_list(request):
     try:
-        all_like = Like.objects.filter(user = request.user,like = True).values_list('topic_id', flat=True)
+        comment_like = Like.objects.filter(user = request.user,like = True).values_list('comment_id', flat=True)
+        topic_like = Like.objects.filter(user = request.user,like = True).values_list('topic_id', flat=True)
         all_follow = Follower.objects.filter(user_follower = request.user,is_active = True).values_list('user_following_id', flat=True)
         userprofile = UserProfile.objects.get(user = request.user)
         all_category_follow = userprofile.sub_category.all().values_list('id', flat=True)
