@@ -1527,7 +1527,7 @@ def follow_like_list(request):
         app_version = AppVersion.objects.get(app_name = 'android')
         app_version = AppVersionSerializer(app_version).data
         notification_count = Notification.objects.filter(for_user= request.user,status=0).count()
-        return JsonResponse({'all_like':list(all_like),'all_follow':list(all_follow),\
+        return JsonResponse({'comment_like':list(comment_like),'topic_like':list(topic_like),'all_follow':list(all_follow),\
             'all_category_follow':list(all_category_follow),'app_version':app_version,\
             'notification_count':notification_count, 'is_test_user':userprofile.is_test_user,'user':UserSerializer(request.user).data,\
             'detialed_category':CategorySerializer(detialed_category,many = True).data}, status=status.HTTP_200_OK)
