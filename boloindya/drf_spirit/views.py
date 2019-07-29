@@ -1518,8 +1518,8 @@ def vb_seen(request):
 @api_view(['POST'])
 def follow_like_list(request):
     try:
-        comment_like = Like.objects.filter(user = request.user,like = True).values_list('comment_id', flat=True)
-        topic_like = Like.objects.filter(user = request.user,like = True).values_list('topic_id', flat=True)
+        comment_like = Like.objects.filter(user = request.user,like = True,topic__isnull = True).values_list('comment_id', flat=True)
+        topic_like = Like.objects.filter(user = request.user,like = True,comment__is_null = True).values_list('topic_id', flat=True)
         all_follow = Follower.objects.filter(user_follower = request.user,is_active = True).values_list('user_following_id', flat=True)
         userprofile = UserProfile.objects.get(user = request.user)
         all_category_follow = userprofile.sub_category.all().values_list('id', flat=True)
