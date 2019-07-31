@@ -37,6 +37,7 @@ class TopicSerializer(ModelSerializer):
     comment_count = SerializerMethodField()
     date = SerializerMethodField()
     video_cdn = SerializerMethodField()
+    m2mcategory = SerializerMethodField()
 
     class Meta:
         model = Topic
@@ -57,12 +58,15 @@ class TopicSerializer(ModelSerializer):
     def get_comment_count(self,instance):
         return shorcountertopic(instance.comment_count)
 
+    def get_m2mcategory(self,instance):
+        return CategoryLiteSerializer(instance.m2mcategory.all(),many=True).data
+
     def get_video_cdn(self,instance):
         if instance.question_video:
             regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
             find_urls_in_string = re.compile(regex, re.IGNORECASE)
-            url = find_urls_in_string.search(self.question_video)
-            return str(self.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
+            url = find_urls_in_string.search(instance.question_video)
+            return str(instance.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
         else:
             return ''
 
@@ -92,6 +96,7 @@ class TopicSerializerwithComment(ModelSerializer):
     text_comments = SerializerMethodField()
     date = SerializerMethodField()
     video_cdn = SerializerMethodField()
+    m2mcategory = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
 
     class Meta:
@@ -128,6 +133,9 @@ class TopicSerializerwithComment(ModelSerializer):
     def get_comment_count(self,instance):
         return shorcountertopic(instance.comment_count)
 
+    def get_m2mcategory(self,instance):
+        return CategoryLiteSerializer(instance.m2mcategory.all(),many=True).data
+
     def get_video_cdn(self,instance):
         if instance.question_video:
             regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
@@ -148,6 +156,7 @@ class SingleTopicSerializerwithComment(ModelSerializer):
     audio_comments = SerializerMethodField()
     text_comments = SerializerMethodField()
     date = SerializerMethodField()
+    m2mcategory = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
 
     class Meta:
@@ -171,6 +180,9 @@ class SingleTopicSerializerwithComment(ModelSerializer):
 
     def get_view_count(self,instance):
         return shorcountertopic(instance.view_count)
+        
+    def get_m2mcategory(self,instance):
+        return CategoryLiteSerializer(instance.m2mcategory.all(),many=True).data
 
     def get_comment_count(self,instance):
         return shorcountertopic(instance.comment_count)
