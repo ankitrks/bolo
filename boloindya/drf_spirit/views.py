@@ -35,7 +35,7 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from datetime import datetime,timedelta,date
 import json
-from .utils import get_weight,add_bolo_score
+from .utils import get_weight,add_bolo_score,shorcountertopic
 from django.db.models import Sum
 import itertools
 import json
@@ -355,7 +355,7 @@ def GetChallengeDetails(request):
         all_vb = Topic.objects.filter(title__icontains = '#GameOfTongues',is_removed=False)
         vb_count = all_vb.count()
         all_seen = all_vb.aggregate(Sum('view_count'))
-        return JsonResponse({'message': 'success','vb_count':vb_count,'all_seen':all_seen['view_count__sum']}, status=status.HTTP_200_OK)
+        return JsonResponse({'message': 'success','vb_count':vb_count,'all_seen':shorcountertopic(all_seen['view_count__sum'])}, status=status.HTTP_200_OK)
     except:
         return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
