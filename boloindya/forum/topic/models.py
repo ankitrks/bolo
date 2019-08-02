@@ -258,7 +258,10 @@ class VBseen(UserInfo):
 
 class TongueTwister(models.Model):
     hash_tag = models.CharField(_("Hash Tag"), max_length=255, blank = True, null = True)
-    descpription = models.TextField(_("Hash Tag Description"),blank = True, null = True)
+    en_descpription = models.TextField(_("English Hash Tag Description"),blank = True, null = True)
+    hi_descpription = models.TextField(_("Hindi Hash Tag Description"),blank = True, null = True)
+    ta_descpription = models.TextField(_("Tamil Hash Tag Description"),blank = True, null = True)
+    te_descpription = models.TextField(_("Telgu Hash Tag Description"),blank = True, null = True)
     def __unicode__(self):
         return str(self.hash_tag)
 
