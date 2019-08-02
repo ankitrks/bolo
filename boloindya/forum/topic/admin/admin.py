@@ -3,7 +3,7 @@ from forum.topic.models import *
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
-from forum.topic.models import Topic,Notification,ShareTopic,CricketMatch,Poll,Choice,Voting,Leaderboard,FCMDevice
+from forum.topic.models import Topic,Notification,ShareTopic,CricketMatch,Poll,Choice,Voting,Leaderboard,FCMDevice,TongueTwister
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 
 # admin_all(models)
@@ -90,5 +90,5 @@ admin.site.register(Voting)
 admin.site.register(Leaderboard)
 admin.site.register(VBseen)
 admin.site.register(FCMDevice)
-
+admin.site.register(TongueTwister)
 
