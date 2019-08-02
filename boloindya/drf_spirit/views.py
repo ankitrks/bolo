@@ -354,8 +354,8 @@ def GetChallengeDetails(request):
         all_vb = Topic.objects.filter(title__icontains = '#GameOfTongues',is_removed=False)
         vb_count = all_vb.count()
         all_seen = all_vb.aggregate(Sum('view_count'))
-        tounge_descp = TongueTwister.objects.get(hash_tag__icontains='#GameOfTongues').descpription
-        return JsonResponse({'message': 'success','vb_count':vb_count,'tounge_descp':tounge_descp,'all_seen':shorcountertopic(all_seen['view_count__sum'])}, status=status.HTTP_200_OK)
+        tongue_descp = TongueTwister.objects.get(hash_tag__icontains='#GameOfTongues').descpription
+        return JsonResponse({'message': 'success','vb_count':vb_count,'tongue_descp':tongue_descp,'all_seen':shorcountertopic(all_seen['view_count__sum'])}, status=status.HTTP_200_OK)
     except:
         return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
