@@ -333,10 +333,28 @@ class VBList(generics.ListCreateAPIView):
             topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-id')
         return topics
 
+from random import shuffle
+
+from rest_framework.response import Response
+from collections import OrderedDict
+
+class ShufflePagination(LimitOffsetPagination):
+
+    def get_paginated_response(self, data):
+        shuffle(data)
+        return Response(OrderedDict([
+            ('count', self.count),
+            ('next', self.get_next_link()),
+            ('previous', self.get_previous_link()),
+            ('results', data)
+        ]))
+
+
+
 class GetChallenge(generics.ListCreateAPIView):
     serializer_class = TopicSerializerwithComment
     permission_classes = (IsOwnerOrReadOnly,)
-    pagination_class = LimitOffsetPagination
+    pagination_class = ShufflePagination
 
     def get_queryset(self):
         all_topic = Topic.objects.filter(title__icontains = '#GameOfTongues',is_removed=False)
