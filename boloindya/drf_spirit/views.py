@@ -333,7 +333,6 @@ class VBList(generics.ListCreateAPIView):
             topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-id')
         return topics
 
-
 class GetChallenge(generics.ListCreateAPIView):
     serializer_class = TopicSerializerwithComment
     permission_classes = (IsOwnerOrReadOnly,)
