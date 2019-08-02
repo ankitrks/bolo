@@ -1764,8 +1764,10 @@ def get_cloudfront_url(instance):
         url = find_urls_in_string.search(instance.question_video)
         return str(instance.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
 
-
-
-
-
-
+@csrf_exempt
+def SyncUserData(request):
+    if request.method == "POST":
+        user_id = request.POST.get('user_id','')
+        #user = User.objects.get(pk=user_id)
+        dump = request.POST
+        return JsonResponse({'user id': user_id,'dump': dump})

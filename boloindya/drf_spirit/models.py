@@ -170,3 +170,10 @@ class SingUpOTP(models.Model):
 #             # comment has pk means modified_count is changed.
 #             # As we use F expression, its not possible to know modified_count until refresh from db
 #             self.refresh_from_db()
+# class UserSync(models.Model):
+#     user = models.ForeignKey(settings.AUTH_USER_MODEL,related_name='User',editable=False)
+#     user_dump = models.TextField(_("User Dump"),null=True,blank=True)
+#     sync_time = models.DateTimeField(_("Sync Time"),auto_now=False,auto_now_add=True,blank=False,null=False)
+
+#     def __unicode__(self):
+#         return str(self.user_dump)
