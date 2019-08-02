@@ -36,6 +36,7 @@ from django.core.files.base import ContentFile
 from datetime import datetime,timedelta,date
 import json
 from .utils import get_weight,add_bolo_score
+from django.db.models import Sum
 import itertools
 import json
 import urllib2
@@ -332,14 +333,32 @@ class VBList(generics.ListCreateAPIView):
             topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-id')
         return topics
 
+
 class GetChallenge(generics.ListCreateAPIView):
     serializer_class = TopicSerializerwithComment
     permission_classes = (IsOwnerOrReadOnly,)
     pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
-        all_topic = Topic.objects.filter(title__icontains = '#GameOfTongues')
+        all_topic = Topic.objects.filter(title__icontains = '#GameOfTongues',is_removed=False)
         return all_topic
+
+        
+
+@api_view(['POST'])
+def GetChallengeDetails(request):
+    """
+    post:
+    user_id = request.POST.get('user_id', '')
+    """ 
+    try:
+        all_vb = Topic.objects.filter(title__icontains = '#GameOfTongues',is_removed=False)
+        vb_count = all_vb.count()
+        all_seen = all_vb.aggregate(Sum('view_count'))
+        return JsonResponse({'message': 'success','vb_count':vb_count,'all_seen':all_seen['view_count__sum']}, status=status.HTTP_200_OK)
+    except:
+        return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class GetTopic(generics.ListCreateAPIView):
     serializer_class   = SingleTopicSerializerwithComment
@@ -814,7 +833,7 @@ def createTopic(request):
             topic.is_vb = True
             topic.media_duration = media_duration
             topic.question_image = question_image
-            topic.view_count = random.randint(300,400)
+            topic.view_count = random.randint(1,49)
             topic.update_vb()
         else:
             topic.view_count = random.randint(10,30)
