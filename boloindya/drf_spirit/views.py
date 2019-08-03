@@ -1765,9 +1765,20 @@ def get_cloudfront_url(instance):
         return str(instance.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
 
 @csrf_exempt
-def SyncUserData(request):
+def SyncUserErrorLogs(request):
     if request.method == "POST":
-        user_id = request.POST.get('user_id','')
-        #user = User.objects.get(pk=user_id)
-        dump = request.POST
-        return JsonResponse({'user id': user_id,'dump': dump})
+        user = request.user
+        error_dump = request.POST
+        print(user)
+        return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)
+
+@csrf_exempt
+def SyncUserActivitiesData(request):
+    if request.method == "POST":
+        user = request.user
+        actions_dump = request.POST
+        return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)
+
+
+
+        
