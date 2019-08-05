@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import SingUpOTP
-from forum.user.models import Weight,UserProfile,AppVersion, UserProfile
+from forum.user.models import Weight,UserProfile,AppVersion, UserProfile,AndroidLogs
 from forum.category.models import Category
 from import_export.admin import ImportExportModelAdmin,ExportMixin
 from import_export import resources
@@ -37,3 +37,4 @@ class UserProfileAdmin(ImportExportModelAdmin):
 admin.site.register(UserProfile,UserProfileAdmin)
 
 admin.site.register(AppVersion)
+admin.site.register(AndroidLogs)

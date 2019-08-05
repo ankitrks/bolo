@@ -4,7 +4,7 @@ from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,c
 	verify_otp, password_set, fb_profile_settings,Usertimeline,follow_user,follow_sub_category,like,shareontimeline,GetProfile,SubCategoryList,upload_video_to_s3,comment_view,\
     follow_like_list,upload_audio_to_s3,reply_delete,editTopic,topic_delete,notification_topic,GetUserProfile,RegisterDevice,UnregisterDevice,NotificationAPI,get_bolo_score,\
     GetTopic,GetQuestion,GetAnswers,CricketMatchList,get_single_match,get_single_poll,predict,LeaderBoradList,vb_seen,VBList,ExpertList,GetHomeAnswer,transcoder_notification,\
-    vb_transcode_status,get_follow_user,upload_profile_image,get_following_list,get_follower_list,GetChallenge,GetChallengeDetails
+    vb_transcode_status,get_follow_user,upload_profile_image,get_following_list,get_follower_list,GetChallenge,GetChallengeDetails,save_android_logs
 from rest_framework_simplejwt import views as jwt_views
 
 app_name = 'drf_spirit'
@@ -87,6 +87,7 @@ urlpatterns = [
     url(r'^experts/$', ExpertList.as_view(), name='list_experts'),
     url(r'^get_userprofile/$', GetUserProfile, name='get_userprofile'),
     url(r'^register_device/$', RegisterDevice, name='register_device'),
+    url(r'^save_android_logs/$', save_android_logs, name='save_android_logs'),
     url(r'^unregister_device/$', UnregisterDevice, name='unregister_device'),
     url(r'^get_bolo_score/$', get_bolo_score, name='get_bolo_score'),
     url(r'^get_match_list/$', CricketMatchList.as_view(), name='get_match_list'),

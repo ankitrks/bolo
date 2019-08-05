@@ -23,7 +23,7 @@ PollSerializerwithChoice, OnlyChoiceSerializer, NotificationSerializer, UserProf
 from forum.topic.models import Topic,ShareTopic,Like,SocialShare,FCMDevice,Notification,CricketMatch,Poll,Choice,Voting,Leaderboard,VBseen,TongueTwister
 from forum.category.models import Category
 from forum.comment.models import Comment
-from forum.user.models import UserProfile,Follower,AppVersion
+from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs
 from django.db.models import F,Q
 from rest_framework_simplejwt.tokens import RefreshToken
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
@@ -287,9 +287,10 @@ class VBList(generics.ListCreateAPIView):
         sort_recent= False
         category__slug = False
         m2mcategory__slug = False
+        popular_post = False
         if search_term:
             for term_key in search_term:
-                if term_key not in ['limit','offset','order_by']:
+                if term_key not in ['limit','offset','order_by','is_popular']:
                     # if term_key =='category':
                     #     filter_dic['category__slug'] = self.request.GET.get(term_key)
                     if term_key:
@@ -302,6 +303,8 @@ class VBList(generics.ListCreateAPIView):
             filter_dic['is_vb'] = True
             if 'order_by' in search_term:
                 sort_recent = True
+            if 'is_popular' in search_term:
+                popular_post = True
 
             if filter_dic:
                 print filter_dic
@@ -311,6 +314,24 @@ class VBList(generics.ListCreateAPIView):
                     topics = Topic.objects.filter(**filter_dic)
                     post = topics
                     topics=sorted(itertools.chain(post),key=lambda x: x.date, reverse=True)
+                elif popular_post:
+                    topics = []
+                    all_seen_vb = VBseen.objects.filter(user = self.request.user).values_list('topic_id',flat=True)
+                    startdate = datetime.today()
+                    enddate = startdate - timedelta(days=15)
+                    # if 'language_id' in search_term:
+
+                        # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,date__gte=enddate)
+                    if m2mcategory__slug:
+                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-date')
+                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),date__gte=enddate).order_by('-date')
+                    else:
+                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-id')
+                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),date__gte=enddate).order_by('-id')
+                    if post1:
+                        topics+=list(post1)
+                    if post2:
+                        topics+=list(post2)
                 else:
                     topics = []
                     all_seen_vb = VBseen.objects.filter(user = self.request.user).values_list('topic_id',flat=True)
@@ -1859,6 +1880,15 @@ def get_cloudfront_url(instance):
 
 
 
-
+@api_view(['POST'])
+def save_android_logs(request):
+    try:
+        if request.user:
+            AndroidLogs.objects.create(user=request.user,logs=request.POST.get('error_log', ''))
+            return JsonResponse({'messgae' : 'success'})
+        else:
+            return JsonResponse({'messgae' : 'user_missing'})
+    except Exception as e:
+        return JsonResponse({'messgae' : 'fail','error':str(e)})
 
 

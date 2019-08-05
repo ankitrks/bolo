@@ -139,6 +139,13 @@ class Weight(RecordTimeStamp):
     def __unicode__(self):
         return self.features
 
+class AndroidLogs(RecordTimeStamp):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("profile"), related_name='st_logs',editable=False)
+    logs = models.TextField(_("Android Logs"),null=True, blank=True)
+
+    def __unicode__(self):
+        return str(self.user)
+
 class AppVersion(RecordTimeStamp):
     app_name = models.CharField(_("Name"), max_length=100, blank=True)
     app_version = models.CharField(_("Version"), max_length=100, blank=True)
