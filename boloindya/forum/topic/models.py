@@ -262,6 +262,7 @@ class TongueTwister(models.Model):
     hi_descpription = models.TextField(_("Hindi Hash Tag Description"),blank = True, null = True)
     ta_descpription = models.TextField(_("Tamil Hash Tag Description"),blank = True, null = True)
     te_descpription = models.TextField(_("Telgu Hash Tag Description"),blank = True, null = True)
+    picture = models.CharField(_("Picture URL"),max_length=255, blank=True,null=True)
     def __unicode__(self):
         return str(self.hash_tag)
 

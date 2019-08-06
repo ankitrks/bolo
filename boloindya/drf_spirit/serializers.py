@@ -1,7 +1,7 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
 from .fields import UserReadOnlyField
-from forum.topic.models import Topic,CricketMatch,Poll,Choice,Voting,Leaderboard, Notification
+from forum.topic.models import Topic,CricketMatch,Poll,Choice,Voting,Leaderboard, Notification, TongueTwister
 from django.contrib.auth.models import User
 from forum.category.models import Category
 from forum.comment.models import Comment
@@ -27,6 +27,13 @@ class CategoryLiteSerializer(ModelSerializer):
     class Meta:
         model = Category
         fields = ('id','title', 'slug', 'color','hindi_title','tamil_title','telgu_title')
+
+
+class TongueTwisterSerializer(ModelSerializer):
+    class Meta:
+        model = TongueTwister
+        fields = '__all__'
+
 
 class TopicSerializer(ModelSerializer):
     user = SerializerMethodField()

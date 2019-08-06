@@ -19,7 +19,7 @@ from .models import SingUpOTP
 from .permissions import IsOwnerOrReadOnly
 from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,AppVersionSerializer,UserSerializer,SingleTopicSerializerwithComment,\
 UserAnswerSerializerwithComment,CricketMatchSerializer,PollSerializer,ChoiceSerializer,VotingSerializer,LeaderboardSerializer,\
-PollSerializerwithChoice, OnlyChoiceSerializer, NotificationSerializer, UserProfileSerializer
+PollSerializerwithChoice, OnlyChoiceSerializer, NotificationSerializer, UserProfileSerializer, TongueTwisterSerializer
 from forum.topic.models import Topic,ShareTopic,Like,SocialShare,FCMDevice,Notification,CricketMatch,Poll,Choice,Voting,Leaderboard,VBseen,TongueTwister
 from forum.category.models import Category
 from forum.comment.models import Comment
@@ -1594,10 +1594,11 @@ def follow_like_list(request):
         app_version = AppVersion.objects.get(app_name = 'android')
         app_version = AppVersionSerializer(app_version).data
         notification_count = Notification.objects.filter(for_user= request.user,status=0).count()
+        hashes = TongueTwister.objects.all().values_list('hash_tag')
         return JsonResponse({'comment_like':list(comment_like),'topic_like':list(topic_like),'all_follow':list(all_follow),\
             'all_category_follow':list(all_category_follow),'app_version':app_version,\
             'notification_count':notification_count, 'is_test_user':userprofile.is_test_user,'user':UserSerializer(request.user).data,\
-            'detialed_category':CategorySerializer(detialed_category,many = True).data}, status=status.HTTP_200_OK)
+            'detialed_category':CategorySerializer(detialed_category,many = True).data,'hashes':list(hashes)}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1889,6 +1890,26 @@ def save_android_logs(request):
         else:
             return JsonResponse({'messgae' : 'user_missing'})
     except Exception as e:
-        return JsonResponse({'messgae' : 'fail','error':str(e)})
+        return JsonResponse({'message' : 'fail','error':str(e)})
 
-
+@api_view(['GET'])
+def get_hash_list(request):
+    tags = TongueTwister.objects.all()
+    hashtaglist = []
+    try:
+        for tag in tags:
+            all_videos = Topic.objects.filter(title__icontains=tag.hash_tag)
+            videos = all_videos[:3]
+            total_views = all_videos.aggregate(Sum('view_count'))
+            total_videos_count = all_videos.count()
+            hash_data = TongueTwisterSerializer(tag).data
+            videos_dict = []
+            for video in videos:    
+                videos_dict.append(TopicSerializer(video).data)
+            hash_data['total_views'] = total_views['view_count__sum']
+            hash_data['total_videos_count'] = total_videos_count
+            hash_data['videos'] = videos_dict
+            hashtaglist.append(hash_data)
+        return JsonResponse({'data':hashtaglist,'message':'Success'})
+    except Exception as e:
+        return JsonResponse({'message':'fail','error':str(e)})
