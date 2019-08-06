@@ -1906,7 +1906,10 @@ def get_hash_list(request):
             videos_dict = []
             for video in videos:    
                 videos_dict.append(TopicSerializer(video).data)
-            hash_data['total_views'] = total_views['view_count__sum']
+            if total_views['view_count__sum']:
+                hash_data['total_views'] = total_views['view_count__sum']
+            else:
+                hash_data['total_views'] = 0
             hash_data['total_videos_count'] = total_videos_count
             hash_data['videos'] = videos_dict
             hashtaglist.append(hash_data)
