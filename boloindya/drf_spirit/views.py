@@ -16,6 +16,7 @@ from rest_framework.generics import GenericAPIView
 
 from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
+from .models import UserJarvisDump
 from .permissions import IsOwnerOrReadOnly
 from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,AppVersionSerializer,UserSerializer,SingleTopicSerializerwithComment,\
 UserAnswerSerializerwithComment,CricketMatchSerializer,PollSerializer,ChoiceSerializer,VotingSerializer,LeaderboardSerializer,\
@@ -1878,7 +1879,17 @@ def get_cloudfront_url(instance):
         url = find_urls_in_string.search(instance.question_video)
         return str(instance.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
 
+@csrf_exempt
+def SyncDump(request):
+    if request.method == "POST":
+        user = request.user
+        dump = request.POST.get('dump')
+        dump_type = request.POST.get('dump_type')
 
+        #Storing the dump in database
+        stored_data = UserJarvisDump(dump=dump, dump_type=dump_type)
+        stored_data.save()
+        return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def save_android_logs(request):
@@ -1890,5 +1901,4 @@ def save_android_logs(request):
             return JsonResponse({'messgae' : 'user_missing'})
     except Exception as e:
         return JsonResponse({'messgae' : 'fail','error':str(e)})
-
-
+        
