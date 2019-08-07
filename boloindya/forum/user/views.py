@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-
+from rest_framework.decorators import api_view
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.urlresolvers import reverse
@@ -21,6 +21,8 @@ from ..comment.models import Comment
 from .forms import UserProfileForm, EmailChangeForm, UserForm, EmailCheckForm
 from django.conf import settings
 from django.http import HttpResponseRedirect
+from django.http import JsonResponse
+from forum.user.models import AppPageContent
 
 User = get_user_model()
 
@@ -180,3 +182,14 @@ def likes(request, pk, slug):
 @login_required
 def menu(request):
     return render(request, 'spirit/user/menu.html')
+
+@api_view(['GET'])
+def getpagecontent(request):
+    try:
+        name = request.GET.get('name')
+        app_page_object = AppPageContent.objects.get(page_name = name)
+        print(app_page_object.page_description)
+        return JsonResponse({'message' : 'success','description' : app_page_object.page_description})
+    except Exception as e:
+        return JsonResponse({'message' : 'fail','error':str(e)})
+    

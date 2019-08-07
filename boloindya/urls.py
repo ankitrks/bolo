@@ -55,6 +55,7 @@ patterns = [
     url(r'^api/v1/', include(drf_spirit.urls, namespace='api')),
     url(r'fcm/', include('fcm.urls')),
     url(r'^jarvis/',include('jarvis.urls', namespace='jarvis')),
+    url(r'^get-html-content-app/',forum.user.views.getpagecontent,name='get_html_content_app')
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
