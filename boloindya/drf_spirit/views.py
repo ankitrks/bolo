@@ -21,10 +21,10 @@ from .permissions import IsOwnerOrReadOnly
 from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,AppVersionSerializer,UserSerializer,SingleTopicSerializerwithComment,\
 UserAnswerSerializerwithComment,CricketMatchSerializer,PollSerializer,ChoiceSerializer,VotingSerializer,LeaderboardSerializer,\
 PollSerializerwithChoice, OnlyChoiceSerializer, NotificationSerializer, UserProfileSerializer
-from forum.topic.models import Topic,ShareTopic,Like,SocialShare,FCMDevice,Notification,CricketMatch,Poll,Choice,Voting,Leaderboard,VBseen
+from forum.topic.models import Topic,ShareTopic,Like,SocialShare,FCMDevice,Notification,CricketMatch,Poll,Choice,Voting,Leaderboard,VBseen,TongueTwister
 from forum.category.models import Category
 from forum.comment.models import Comment
-from forum.user.models import UserProfile,Follower,AppVersion
+from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs
 from django.db.models import F,Q
 from rest_framework_simplejwt.tokens import RefreshToken
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
@@ -36,7 +36,8 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from datetime import datetime,timedelta,date
 import json
-from .utils import get_weight,add_bolo_score
+from .utils import get_weight,add_bolo_score,shorcountertopic
+from django.db.models import Sum
 import itertools
 import json
 import urllib2
@@ -287,9 +288,10 @@ class VBList(generics.ListCreateAPIView):
         sort_recent= False
         category__slug = False
         m2mcategory__slug = False
+        popular_post = False
         if search_term:
             for term_key in search_term:
-                if term_key not in ['limit','offset','order_by']:
+                if term_key not in ['limit','offset','order_by','is_popular']:
                     # if term_key =='category':
                     #     filter_dic['category__slug'] = self.request.GET.get(term_key)
                     if term_key:
@@ -302,6 +304,8 @@ class VBList(generics.ListCreateAPIView):
             filter_dic['is_vb'] = True
             if 'order_by' in search_term:
                 sort_recent = True
+            if 'is_popular' in search_term:
+                popular_post = True
 
             if filter_dic:
                 print filter_dic
@@ -311,6 +315,24 @@ class VBList(generics.ListCreateAPIView):
                     topics = Topic.objects.filter(**filter_dic)
                     post = topics
                     topics=sorted(itertools.chain(post),key=lambda x: x.date, reverse=True)
+                elif popular_post:
+                    topics = []
+                    all_seen_vb = VBseen.objects.filter(user = self.request.user).values_list('topic_id',flat=True)
+                    startdate = datetime.today()
+                    enddate = startdate - timedelta(days=15)
+                    # if 'language_id' in search_term:
+
+                        # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,date__gte=enddate)
+                    if m2mcategory__slug:
+                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-date')
+                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),date__gte=enddate).order_by('-date')
+                    else:
+                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-id')
+                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),date__gte=enddate).order_by('-id')
+                    if post1:
+                        topics+=list(post1)
+                    if post2:
+                        topics+=list(post2)
                 else:
                     topics = []
                     all_seen_vb = VBseen.objects.filter(user = self.request.user).values_list('topic_id',flat=True)
@@ -321,26 +343,62 @@ class VBList(generics.ListCreateAPIView):
                         post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id')).exclude(id__in=all_seen_vb).order_by('-date')
                         post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id')).order_by('-date')
                     else:
-                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).exclude(id__in=all_seen_vb).order_by('-date')
-                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).order_by('-date')
+                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).exclude(id__in=all_seen_vb).order_by('-id')
+                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).order_by('-id')
                     if post1:
                         topics+=list(post1)
                     if post2:
                         topics+=list(post2)
                     # else:
-                    #     topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-date')
+                    #     topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-id')
         else:
-            topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-date')
+            topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-id')
         return topics
+
+from random import shuffle
+
+from rest_framework.response import Response
+from collections import OrderedDict
+
+class ShufflePagination(LimitOffsetPagination):
+
+    def get_paginated_response(self, data):
+        shuffle(data)
+        return Response(OrderedDict([
+            ('count', self.count),
+            ('next', self.get_next_link()),
+            ('previous', self.get_previous_link()),
+            ('results', data)
+        ]))
+
+
 
 class GetChallenge(generics.ListCreateAPIView):
     serializer_class = TopicSerializerwithComment
     permission_classes = (IsOwnerOrReadOnly,)
-    pagination_class = LimitOffsetPagination
+    pagination_class = ShufflePagination
 
     def get_queryset(self):
-        all_topic = Topic.objects.filter(title__icontains = '#GameOfTongues')
+        all_topic = Topic.objects.filter(title__icontains = '#GameOfTongues',is_removed=False)
         return all_topic
+
+        
+
+@api_view(['POST'])
+def GetChallengeDetails(request):
+    """
+    post:
+    user_id = request.POST.get('user_id', '')
+    """ 
+    try:
+        all_vb = Topic.objects.filter(title__icontains = '#GameOfTongues',is_removed=False)
+        vb_count = all_vb.count()
+        all_seen = all_vb.aggregate(Sum('view_count'))
+        tongue = TongueTwister.objects.get(hash_tag__icontains='#GameOfTongues')
+        return JsonResponse({'message': 'success','vb_count':vb_count,'en_tongue_descp':tongue.en_descpription,'hi_tongue_descp':tongue.hi_descpription,'ta_tongue_descp':tongue.ta_descpription,'te_tongue_descp':tongue.te_descpription,'all_seen':shorcountertopic(all_seen['view_count__sum'])}, status=status.HTTP_200_OK)
+    except:
+        return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class GetTopic(generics.ListCreateAPIView):
     serializer_class   = SingleTopicSerializerwithComment
@@ -471,7 +529,7 @@ class SearchTopic(generics.ListCreateAPIView):
         topics      = []
         search_term = self.request.GET.get('term')
         if search_term:
-            topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False)
+            topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True)
 
         return topics
 
@@ -611,6 +669,22 @@ def upload_media(media_file):
     except:
         return None
 
+@api_view(['POST'])
+def upload_profile_image(request):
+    try:
+        my_image = request.FILES['file']
+        my_image_url = upload_thumbail(my_image)
+        if my_image_url:
+            return JsonResponse({'status': 'success','body':my_image_url}, status=status.HTTP_201_CREATED)
+        else:
+            return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
 import random, string
 def get_random_username():
     today_datetime = datetime.now()
@@ -713,7 +787,7 @@ def replyOnTopic(request):
                 comment.media_duration = media_duration
             comment.save()
             add_bolo_score(request.user.id,'reply_on_topic')
-            return JsonResponse({'message': 'Reply Submitted'}, status=status.HTTP_201_CREATED)
+            return JsonResponse({'message': 'Reply Submitted','comment':CommentSerializer(comment).data}, status=status.HTTP_201_CREATED)
         except User.DoesNotExist:
             return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
     else:
@@ -799,7 +873,7 @@ def createTopic(request):
             topic.is_vb = True
             topic.media_duration = media_duration
             topic.question_image = question_image
-            topic.view_count = random.randint(300,400)
+            topic.view_count = random.randint(1,49)
             topic.update_vb()
         else:
             topic.view_count = random.randint(10,30)
@@ -1167,6 +1241,8 @@ def fb_profile_settings(request):
     activity        = request.POST.get('activity',None)
     language        = request.POST.get('language',None)
     is_geo_location = request.POST.get('is_geo_location',None)
+    d_o_b = request.POST.get('d_o_b',None)
+    gender = request.POST.get('gender',None)
     click_id = request.POST.get('click_id',None)
     lat = request.POST.get('lat',None)
     lang = request.POST.get('lang',None)
@@ -1198,6 +1274,8 @@ def fb_profile_settings(request):
                 userprofile.name = extra_data['name']
                 userprofile.social_identifier = extra_data['id']
                 userprofile.bio = bio
+                userprofile.d_o_b = d_o_b
+                userprofile.gender = gender
                 userprofile.about = about
                 userprofile.refrence = refrence
                 userprofile.extra_data = extra_data
@@ -1229,6 +1307,8 @@ def fb_profile_settings(request):
                 userprofile.name= name
                 userprofile.bio = bio
                 userprofile.about = about
+                userprofile.d_o_b = d_o_b
+                userprofile.gender = gender
                 userprofile.profile_pic =profile_pic
                 userprofile.save()
                 if username:
@@ -1317,6 +1397,7 @@ def follow_user(request):
                 followed_user.follower_count = F('follower_count')+1
                 follow.save()
                 followed_user.save()
+                userprofile.save()
                 return JsonResponse({'message': 'Followed'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
@@ -1351,14 +1432,19 @@ def like(request):
         Required Parameters
         topic_id = request.POST.get('topic_id',None)
     """
+    topic_id = request.POST.get('topic_id',None)
     comment_id = request.POST.get('comment_id',None)
     userprofile = UserProfile.objects.get(user = request.user)
     try:
-        liked,is_created = Like.objects.get_or_create(comment_id = comment_id,user = request.user)
-        comment = Comment.objects.get(pk = comment_id)
+        if topic_id:
+            liked,is_created = Like.objects.get_or_create(topic_id = topic_id,user = request.user)
+            acted_obj = Topic.objects.get(pk = topic_id)
+        elif comment_id:
+            liked,is_created = Like.objects.get_or_create(comment_id = comment_id,user = request.user)
+            acted_obj = Comment.objects.get(pk = comment_id)
         if is_created:
-            comment.likes_count = F('likes_count')+1
-            comment.save()
+            acted_obj.likes_count = F('likes_count')+1
+            acted_obj.save()
             add_bolo_score(request.user.id,'liked')
             userprofile.like_count = F('like_count')+1
             userprofile.save()
@@ -1367,18 +1453,19 @@ def like(request):
             if liked.like:
                 liked.like = False
                 liked.save()
-                comment.likes_count = F('likes_count')-1
-                comment.save()
+                acted_obj.likes_count = F('likes_count')-1
+                acted_obj.save()
                 userprofile.like_count = F('like_count')-1
                 userprofile.save()
+                return JsonResponse({'message': 'unliked'}, status=status.HTTP_200_OK)
             else:
                 liked.like = True
                 liked.save()
-                comment.likes_count = F('likes_count')+1
-                comment.save()
+                acted_obj.likes_count = F('likes_count')+1
+                acted_obj.save()
                 userprofile.like_count = F('like_count')+1
                 userprofile.save()
-            return JsonResponse({'message': 'unliked'}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'liked'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1499,7 +1586,8 @@ def vb_seen(request):
 @api_view(['POST'])
 def follow_like_list(request):
     try:
-        all_like = Like.objects.filter(user = request.user,like = True).values_list('comment_id', flat=True)
+        comment_like = Like.objects.filter(user = request.user,like = True,topic_id__isnull = True).values_list('comment_id', flat=True)
+        topic_like = Like.objects.filter(user = request.user,like = True,comment_id__isnull = True).values_list('topic_id', flat=True)
         all_follow = Follower.objects.filter(user_follower = request.user,is_active = True).values_list('user_following_id', flat=True)
         userprofile = UserProfile.objects.get(user = request.user)
         all_category_follow = userprofile.sub_category.all().values_list('id', flat=True)
@@ -1507,7 +1595,7 @@ def follow_like_list(request):
         app_version = AppVersion.objects.get(app_name = 'android')
         app_version = AppVersionSerializer(app_version).data
         notification_count = Notification.objects.filter(for_user= request.user,status=0).count()
-        return JsonResponse({'all_like':list(all_like),'all_follow':list(all_follow),\
+        return JsonResponse({'comment_like':list(comment_like),'topic_like':list(topic_like),'all_follow':list(all_follow),\
             'all_category_follow':list(all_category_follow),'app_version':app_version,\
             'notification_count':notification_count, 'is_test_user':userprofile.is_test_user,'user':UserSerializer(request.user).data,\
             'detialed_category':CategorySerializer(detialed_category,many = True).data}, status=status.HTTP_200_OK)
@@ -1527,6 +1615,32 @@ def get_follow_user(request):
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['POST'])
+def get_following_list(request):
+    try:
+        all_following_id = Follower.objects.filter(user_following = request.POST.get('user_id', ''),is_active = True).values_list('user_follower_id', flat=True)
+        if all_following_id:
+            all_user = User.objects.filter(pk__in = all_following_id)
+            return JsonResponse({'result':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'result':[]}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def get_follower_list(request):
+    try:
+        all_follower_id = Follower.objects.filter(user_follower = request.POST.get('user_id', ''),is_active = True).values_list('user_following_id', flat=True)
+        if all_follower_id:
+            all_user = User.objects.filter(pk__in = all_follower_id)
+            return JsonResponse({'result':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'result':[]}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
 
 def deafult_boloindya_follow(user,language):
@@ -1775,8 +1889,16 @@ def SyncDump(request):
         #Storing the dump in database
         stored_data = UserJarvisDump(dump=dump, dump_type=dump_type)
         stored_data.save()
-
         return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)
 
-
+@api_view(['POST'])
+def save_android_logs(request):
+    try:
+        if request.user:
+            AndroidLogs.objects.create(user=request.user,logs=request.POST.get('error_log', ''))
+            return JsonResponse({'messgae' : 'success'})
+        else:
+            return JsonResponse({'messgae' : 'user_missing'})
+    except Exception as e:
+        return JsonResponse({'messgae' : 'fail','error':str(e)})
         

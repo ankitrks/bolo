@@ -4,7 +4,7 @@ from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,c
 	verify_otp, password_set, fb_profile_settings,Usertimeline,follow_user,follow_sub_category,like,shareontimeline,GetProfile,SubCategoryList,upload_video_to_s3,comment_view,\
     follow_like_list,upload_audio_to_s3,reply_delete,editTopic,topic_delete,notification_topic,GetUserProfile,RegisterDevice,UnregisterDevice,NotificationAPI,get_bolo_score,\
     GetTopic,GetQuestion,GetAnswers,CricketMatchList,get_single_match,get_single_poll,predict,LeaderBoradList,vb_seen,VBList,ExpertList,GetHomeAnswer,transcoder_notification,\
-    vb_transcode_status,get_follow_user,GetChallenge,SyncDump
+    vb_transcode_status,get_follow_user,upload_profile_image,get_following_list,get_follower_list,GetChallenge,GetChallengeDetails,save_android_logs,SyncDump
 from rest_framework_simplejwt import views as jwt_views
 
 app_name = 'drf_spirit'
@@ -52,6 +52,7 @@ urlpatterns = [
     url(r'^reply_on_topic', include(replyontopic_urls)),
     url(r'^categories/', include(category_urls)),
     url(r'^comments/', include(comment_urls)),
+    url(r'^upload_profile_image$', upload_profile_image, name='upload_profile_image'),
     
     url(r'^token/$', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
     url(r'^token/refresh/$', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
@@ -65,9 +66,12 @@ urlpatterns = [
     url(r'^follow_user/$', follow_user, name='follow_user'),
     url(r'^follow_sub_category/$', follow_sub_category, name='follow_sub_category'),
     url(r'^get_follow_user/$', get_follow_user, name='get_follow_user'),
+    url(r'^get_following_list/$', get_following_list, name='get_following_list'),
+    url(r'^get_follower_list/$', get_follower_list, name='get_follower_list'),
     url(r'^shareontimeline/$', shareontimeline, name='shareontimeline'),
     url(r'^like/$', like, name='like'),
     url(r'^get_challenge/$', GetChallenge.as_view(), name='get_challenge'),
+    url(r'^get_challenge_details/$', GetChallengeDetails, name='get_challenge_details'),
     url(r'^password/set/$', password_set, name='password_set'),
     url(r'^get_profile/$', GetProfile.as_view(), name='get_profile'),
     url(r'^get_sub_category/$', SubCategoryList.as_view(), name='get_sub_category'),
@@ -83,6 +87,7 @@ urlpatterns = [
     url(r'^experts/$', ExpertList.as_view(), name='list_experts'),
     url(r'^get_userprofile/$', GetUserProfile, name='get_userprofile'),
     url(r'^register_device/$', RegisterDevice, name='register_device'),
+    url(r'^save_android_logs/$', save_android_logs, name='save_android_logs'),
     url(r'^unregister_device/$', UnregisterDevice, name='unregister_device'),
     url(r'^get_bolo_score/$', get_bolo_score, name='get_bolo_score'),
     url(r'^get_match_list/$', CricketMatchList.as_view(), name='get_match_list'),

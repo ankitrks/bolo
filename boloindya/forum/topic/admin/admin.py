@@ -3,7 +3,7 @@ from forum.topic.models import *
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
-from forum.topic.models import Topic,Notification,ShareTopic,CricketMatch,Poll,Choice,Voting,Leaderboard,FCMDevice
+from forum.topic.models import Topic,Notification,ShareTopic,CricketMatch,Poll,Choice,Voting,Leaderboard,FCMDevice,TongueTwister
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 
 # admin_all(models)
@@ -15,13 +15,13 @@ class TopicResource(resources.ModelResource):
 		skip_unchanged = True
 		report_skipped = True
 		import_id_fields = ( 'title', 'category__title','language_id','user_id')
-		fields = ( 'id', 'title','user__username','category__title','is_media','comments','audio_duration' ,'video_duration')
+		fields = ( 'id', 'title','user__username','category__title','media_duration','is_media','comments')
 
 
 class TopicAdmin(ImportExportModelAdmin):
 	search_fields = ('title', )
 	list_filter = ('language_id', 'category', 'is_media','date', ('date', DateRangeFilter),)
-	list_display = ('id', 'title', 'user', 'category', 'is_media','comments','audio_duration' ,'video_duration','date')
+	list_display = ('id', 'title', 'user', 'category','media_duration', 'is_media','comments','date')
 	list_editable = ('title', 'category',)
 	resource_class = TopicResource
 	# def comment_count(self, obj):
@@ -90,5 +90,5 @@ admin.site.register(Voting)
 admin.site.register(Leaderboard)
 admin.site.register(VBseen)
 admin.site.register(FCMDevice)
-
+admin.site.register(TongueTwister)
 

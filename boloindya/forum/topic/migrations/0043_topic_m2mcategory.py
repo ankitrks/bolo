@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('forum_category', '0012_auto_20190503_1444'),
-        ('forum_topic', '0042_auto_20190626_1621'),
+        ('forum_topic', '0043_topic_likes_count'),
     ]
 
     operations = [

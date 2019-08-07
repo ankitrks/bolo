@@ -18,7 +18,7 @@ from ..comment.models import MOVED
 from ..comment.forms import CommentForm
 from ..comment.utils import comment_posted
 from ..comment.models import Comment
-from .models import Topic,CricketMatch,Poll,Voting,Choice
+from .models import Topic,CricketMatch,Poll,Voting,Choice,TongueTwister
 from .forms import TopicForm
 from . import utils
 from django.template.loader import render_to_string
@@ -379,6 +379,14 @@ def share_match_page(request, match_id, slug):
     'polls': voting_status_array
     }
     return render(request, 'spirit/topic/cricket_match.html', context)
+
+# Share Pages Match 
+def share_challenge_page(request):
+    challenge = TongueTwister.objects.first()
+    context = {
+    'challenge': challenge,
+    }
+    return render(request, 'spirit/topic/challenge_details.html', context)
    
 # Share Poll Match 
 def share_poll_page(request, poll_id, slug):

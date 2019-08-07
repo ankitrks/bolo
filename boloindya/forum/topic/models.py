@@ -88,6 +88,7 @@ class Topic(models.Model):
     # share_user = models.ForeignKey(settings.AUTH_USER_MODEL,null=True,blank=True, related_name='share_topic_user')
     # shared_post = models.ForeignKey('self', blank = True, null = True, related_name='user_shared_post')
     is_vb = models.BooleanField(_("Is Video Bytes"), default=False)
+    likes_count = models.PositiveIntegerField(_("Likes count"), default=0)
 
     backup_url = models.TextField(_("backup url"), blank = True)
     is_transcoded = models.BooleanField(default = False)
@@ -255,6 +256,15 @@ class VBseen(UserInfo):
     def __unicode__(self):
         return str(self.topic if self.topic else 'VB')
 
+class TongueTwister(models.Model):
+    hash_tag = models.CharField(_("Hash Tag"), max_length=255, blank = True, null = True)
+    en_descpription = models.TextField(_("English Hash Tag Description"),blank = True, null = True)
+    hi_descpription = models.TextField(_("Hindi Hash Tag Description"),blank = True, null = True)
+    ta_descpription = models.TextField(_("Tamil Hash Tag Description"),blank = True, null = True)
+    te_descpription = models.TextField(_("Telgu Hash Tag Description"),blank = True, null = True)
+    def __unicode__(self):
+        return str(self.hash_tag)
+
 
 
 class ShareTopic(UserInfo):
@@ -387,7 +397,11 @@ class Notification(UserInfo):
             notific['tamil_title'] = str(self.user.st.name)+' உங்கள் பதிலை லைக் செய்துள்ளார்'
             notific['telgu_title'] = str(self.user.st.name)+' మీ సమాధానం ఇష్టపడ్డారు'
             notific['notification_type'] = '5'
-            notific['instance_id'] = self.topic.comment.topic.id
+            if self.topic:
+                if self.topic.comment:
+                    notific['instance_id'] = self.topic.comment.topic.id
+                else:
+                    notific['instance_id'] = self.topic.topic.id
             notific['read_status'] = self.status
             notific['id'] = self.id
             notific['created_at'] = shortnaturaltime(self.created_at)
