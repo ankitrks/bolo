@@ -1931,9 +1931,12 @@ def SyncDump(request):
         dump_type = request.POST.get('dump_type')
 
         #Storing the dump in database
-        stored_data = UserJarvisDump(dump=dump, dump_type=dump_type)
-        stored_data.save()
-        return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)
+        try:
+            stored_data = UserJarvisDump(user=user, dump=dump, dump_type=dump_type)
+            stored_data.save()
+            return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)    
+        except Exception as e:
+            return JsonResponse({'messgae' : 'fail','error':str(e)})
 
 @api_view(['POST'])
 def save_android_logs(request):
