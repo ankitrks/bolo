@@ -4,7 +4,7 @@ from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,c
 	verify_otp, password_set, fb_profile_settings,Usertimeline,follow_user,follow_sub_category,like,shareontimeline,GetProfile,SubCategoryList,upload_video_to_s3,comment_view,\
     follow_like_list,upload_audio_to_s3,reply_delete,editTopic,topic_delete,notification_topic,GetUserProfile,RegisterDevice,UnregisterDevice,NotificationAPI,get_bolo_score,\
     GetTopic,GetQuestion,GetAnswers,CricketMatchList,get_single_match,get_single_poll,predict,LeaderBoradList,vb_seen,VBList,ExpertList,GetHomeAnswer,transcoder_notification,\
-    vb_transcode_status,get_follow_user,GetChallenge,SyncUserErrorLogs,SyncUserActivitiesData
+    vb_transcode_status,get_follow_user,GetChallenge,SyncDump
 from rest_framework_simplejwt import views as jwt_views
 
 app_name = 'drf_spirit'
@@ -95,6 +95,5 @@ urlpatterns = [
     url(r'^get_vb_list/$', VBList.as_view(), name='get_vb_list'),
     url(r'^leaderboard_view/$', LeaderBoradList.as_view(), name='leaderboard_view'),
     url(r'^topics/', include(topic_urls)),
-    url(r'^sync/error_logs/',SyncUserErrorLogs,name='sync_error_logs'),
-    url(r'^sync/jarvis/',SyncUserActivitiesData,name='sync_jarvis'),
+    url(r'^sync/dump/',SyncDump,name='sync_dump'),
 ]

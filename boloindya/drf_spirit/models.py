@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from forum.core.conf import settings
 
 class SingUpOTP(models.Model):
     mobile_no = models.CharField(_("title"), max_length=75)
@@ -170,10 +171,16 @@ class SingUpOTP(models.Model):
 #             # comment has pk means modified_count is changed.
 #             # As we use F expression, its not possible to know modified_count until refresh from db
 #             self.refresh_from_db()
-# class UserSync(models.Model):
-#     user = models.ForeignKey(settings.AUTH_USER_MODEL,related_name='User',editable=False)
-#     user_dump = models.TextField(_("User Dump"),null=True,blank=True)
-#     sync_time = models.DateTimeField(_("Sync Time"),auto_now=False,auto_now_add=True,blank=False,null=False)
+class UserJarvisDump(models.Model):
+    DUMP_TYPE = [
+    ('1', 'user_activities_data'),
+    ('2', 'error_logs'),
+    ]
 
-#     def __unicode__(self):
-#         return str(self.user_dump)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,related_name='User',editable=False)
+    dump = models.TextField(_("User Dump"),null=True,blank=True)
+    dump_type = models.CharField(_("Dump Type"),choices=DUMP_TYPE,max_length=50)
+    sync_time = models.DateTimeField(_("Sync Time"),auto_now=False,auto_now_add=True,blank=False,null=False)
+
+    def __unicode__(self):
+        return str(self.user_dump)

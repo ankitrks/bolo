@@ -16,6 +16,7 @@ from rest_framework.generics import GenericAPIView
 
 from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
+from .models import UserJarvisDump
 from .permissions import IsOwnerOrReadOnly
 from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,AppVersionSerializer,UserSerializer,SingleTopicSerializerwithComment,\
 UserAnswerSerializerwithComment,CricketMatchSerializer,PollSerializer,ChoiceSerializer,VotingSerializer,LeaderboardSerializer,\
@@ -1765,20 +1766,17 @@ def get_cloudfront_url(instance):
         return str(instance.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
 
 @csrf_exempt
-def SyncUserErrorLogs(request):
+def SyncDump(request):
     if request.method == "POST":
         user = request.user
-        error_dump = request.POST
-        print(user)
-        return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)
+        dump = request.POST.get('dump')
+        dump_type = request.POST.get('dump_type')
 
-@csrf_exempt
-def SyncUserActivitiesData(request):
-    if request.method == "POST":
-        user = request.user
-        actions_dump = request.POST
-        return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)
+        #Storing the dump in database
+        stored_data = UserJarvisDump(dump=dump, dump_type=dump_type)
+        stored_data.save()
 
+        return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)
 
 
         
