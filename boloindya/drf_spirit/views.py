@@ -1148,7 +1148,7 @@ def verify_otp(request):
             otp_obj.is_active = False
             otp_obj.used_at = timezone.now()
             if not is_reset_password and not is_for_change_phone:
-                userprofile = UserProfile.objects.filter(mobile_no = mobile_no)
+                userprofile = UserProfile.objects.filter(mobile_no = mobile_no,user__is_active = True)
                 if userprofile:
                     userprofile = userprofile[0]
                     user = userprofile.user
@@ -1255,7 +1255,7 @@ def fb_profile_settings(request):
     try:
         if activity == 'facebook_login' and refrence == 'facebook':
             try:
-                userprofile = UserProfile.objects.get(social_identifier = extra_data['id'])
+                userprofile = UserProfile.objects.get(social_identifier = extra_data['id'],user__is_active = True)
                 user=userprofile.user
                 is_created=False
             except Exception as e:
