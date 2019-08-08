@@ -110,7 +110,7 @@ def referral_code_validate(request):
     status = 'success'
     message = 'Referral code valid!'
     try:
-        code_obj = ReferralCode.objects.exclude(is_active = False).get(code = ref_code)
+        code_obj = ReferralCode.objects.exclude(is_active = False).get(code__iexact = ref_code)
     except Exception as e:
         status = 'error'
         message = 'Invalid referral code! Please try again.'
@@ -123,7 +123,7 @@ def referral_code_update(request):
     status = 'success'
     message = 'Referral code updated!'
     try:
-        code_obj = ReferralCode.objects.exclude(is_active = False).get(code = ref_code)
+        code_obj = ReferralCode.objects.exclude(is_active = False).get(code__iexact = ref_code)
         created, used_obj = ReferralCodeUsed.objects.get_or_create(code = code_obj, by_user_id = user_id)
         if not created:
             message = 'Referral code already used by user!'
