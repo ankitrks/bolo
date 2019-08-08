@@ -43,8 +43,8 @@ patterns = [
     url(r'^ajax/verify_user/$', forum.user.auth.views.verify_user, name='index_login_new_bolo_user'),
     url(r'^videos/$', forum.topic.views.index_videos, name='videos'),
 
-    url(r'^referral-code/validate/$', forum.topic.views.referral_code_validate, name='referral_code_validate'),
-    url(r'^referral-code/update/$', forum.topic.views.referral_code_update, name='referral_code_update'),
+    url(r'^referral-code/validate/$', forum.user.views.referral_code_validate, name='referral_code_validate'),
+    url(r'^referral-code/update/$', forum.user.views.referral_code_update, name='referral_code_update'),
 
     url(r'^ajax/pageno/$', forum.topic.views.get_topics_feed, name='ajax_lazy_topic_fetch'),
     url(r'^st/admin/', include(forum.admin.urls, namespace='admin')),
