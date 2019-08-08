@@ -381,9 +381,9 @@ class GetChallenge(generics.ListCreateAPIView):
 
     def get_queryset(self):
         challenge_hash = self.request.GET.get('challengehash')
-        all_videos = Topic.objects.filter(title__icontains=challenge_hash,is_removed=False)
+        challengehash = '#' + challenge_hash
+        all_videos = Topic.objects.filter(title__icontains=challengehash,is_removed=False)
         return all_videos
-
         
 
 @api_view(['POST'])
@@ -393,11 +393,12 @@ def GetChallengeDetails(request):
     user_id = request.POST.get('user_id', '')
     """ 
     challengehash = request.POST.get('ChallengeHash')
+    challengehash = '#' + challengehash
     try:
         all_vb = Topic.objects.filter(title__icontains = challengehash,is_removed=False)
         vb_count = all_vb.count()
         all_seen = all_vb.aggregate(Sum('view_count'))
-        tongue = TongueTwister.objects.get(hash_tag__icontains=challengehash)
+        tongue = TongueTwister.objects.get(hash_tag__icontains=challengehash[1:])
         return JsonResponse({'message': 'success','vb_count':vb_count,'en_tongue_descp':tongue.en_descpription,'hi_tongue_descp':tongue.hi_descpription,'ta_tongue_descp':tongue.ta_descpription,'te_tongue_descp':tongue.te_descpription,'all_seen':shorcountertopic(all_seen['view_count__sum'])}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Invalid','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
