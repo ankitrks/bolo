@@ -10,6 +10,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 from django.http import HttpResponsePermanentRedirect
+from django.views.decorators.csrf import csrf_exempt
 
 from djconfig import config
 
@@ -103,6 +104,7 @@ def email_change_confirm(request, token):
     messages.error(request, _("Sorry, we were not able to change your email."))
     return redirect(reverse('spirit:user:update'))
 
+@csrf_exempt
 def referral_code_validate(request):
     ref_code = request.POST.get('code', '')
     status = 'success'
@@ -114,6 +116,7 @@ def referral_code_validate(request):
         message = 'Invalid referral code! Please try again.'
     return JsonResponse({'status' : status, 'message' : message})
 
+@csrf_exempt
 def referral_code_update(request):
     ref_code = request.POST.get('code', '')
     user_id = request.POST.get('user_id', '')
@@ -125,6 +128,7 @@ def referral_code_update(request):
         if not created:
             message = 'Referral code already used by user!'
     except Exception as e:
+        print e
         status = 'error'
         message = 'Invalid referral code! Please try again.'
     return JsonResponse({'status' : status, 'message' : message})
