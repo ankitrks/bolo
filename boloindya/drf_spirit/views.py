@@ -20,7 +20,7 @@ from .models import UserJarvisDump
 from .permissions import IsOwnerOrReadOnly
 from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,AppVersionSerializer,UserSerializer,SingleTopicSerializerwithComment,\
 UserAnswerSerializerwithComment,CricketMatchSerializer,PollSerializer,ChoiceSerializer,VotingSerializer,LeaderboardSerializer,\
-PollSerializerwithChoice, OnlyChoiceSerializer, NotificationSerializer, UserProfileSerializer
+PollSerializerwithChoice, OnlyChoiceSerializer, NotificationSerializer, UserProfileSerializer, TongueTwisterSerializer
 from forum.topic.models import Topic,ShareTopic,Like,SocialShare,FCMDevice,Notification,CricketMatch,Poll,Choice,Voting,Leaderboard,VBseen,TongueTwister
 from forum.category.models import Category
 from forum.comment.models import Comment
@@ -376,11 +376,12 @@ class ShufflePagination(LimitOffsetPagination):
 class GetChallenge(generics.ListCreateAPIView):
     serializer_class = TopicSerializerwithComment
     permission_classes = (IsOwnerOrReadOnly,)
-    pagination_class = ShufflePagination
+    pagination_class = ShufflePagination 
 
     def get_queryset(self):
-        all_topic = Topic.objects.filter(title__icontains = '#GameOfTongues',is_removed=False)
-        return all_topic
+        challenge_hash = self.request.GET.get('challengehash')
+        all_videos = Topic.objects.filter(title__icontains=challenge_hash,is_removed=False)
+        return all_videos
 
         
 
@@ -390,14 +391,15 @@ def GetChallengeDetails(request):
     post:
     user_id = request.POST.get('user_id', '')
     """ 
+    challengehash = request.POST.get('ChallengeHash')
     try:
-        all_vb = Topic.objects.filter(title__icontains = '#GameOfTongues',is_removed=False)
+        all_vb = Topic.objects.filter(title__icontains = challengehash,is_removed=False)
         vb_count = all_vb.count()
         all_seen = all_vb.aggregate(Sum('view_count'))
-        tongue = TongueTwister.objects.get(hash_tag__icontains='#GameOfTongues')
+        tongue = TongueTwister.objects.get(hash_tag__icontains=challengehash)
         return JsonResponse({'message': 'success','vb_count':vb_count,'en_tongue_descp':tongue.en_descpription,'hi_tongue_descp':tongue.hi_descpription,'ta_tongue_descp':tongue.ta_descpription,'te_tongue_descp':tongue.te_descpription,'all_seen':shorcountertopic(all_seen['view_count__sum'])}, status=status.HTTP_200_OK)
-    except:
-        return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return JsonResponse({'message': 'Invalid','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class GetTopic(generics.ListCreateAPIView):
@@ -1595,10 +1597,11 @@ def follow_like_list(request):
         app_version = AppVersion.objects.get(app_name = 'android')
         app_version = AppVersionSerializer(app_version).data
         notification_count = Notification.objects.filter(for_user= request.user,status=0).count()
+        hashes = TongueTwister.objects.all().values_list('hash_tag')
         return JsonResponse({'comment_like':list(comment_like),'topic_like':list(topic_like),'all_follow':list(all_follow),\
             'all_category_follow':list(all_category_follow),'app_version':app_version,\
             'notification_count':notification_count, 'is_test_user':userprofile.is_test_user,'user':UserSerializer(request.user).data,\
-            'detialed_category':CategorySerializer(detialed_category,many = True).data}, status=status.HTTP_200_OK)
+            'detialed_category':CategorySerializer(detialed_category,many = True).data,'hashes':list(hashes)}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1900,5 +1903,29 @@ def save_android_logs(request):
         else:
             return JsonResponse({'messgae' : 'user_missing'})
     except Exception as e:
-        return JsonResponse({'messgae' : 'fail','error':str(e)})
-        
+        return JsonResponse({'message' : 'fail','error':str(e)})
+
+@api_view(['GET'])
+def get_hash_list(request):
+    tags = TongueTwister.objects.all()
+    hashtaglist = []
+    try:
+        for tag in tags:
+            all_videos = Topic.objects.filter(title__icontains=tag.hash_tag)
+            videos = all_videos[:3]
+            total_views = all_videos.aggregate(Sum('view_count'))
+            total_videos_count = all_videos.count()
+            hash_data = TongueTwisterSerializer(tag).data
+            videos_dict = []
+            for video in videos:    
+                videos_dict.append(TopicSerializer(video).data)
+            if total_views['view_count__sum']:
+                hash_data['total_views'] = total_views['view_count__sum']
+            else:
+                hash_data['total_views'] = 0
+            hash_data['total_videos_count'] = total_videos_count
+            hash_data['videos'] = videos_dict
+            hashtaglist.append(hash_data)
+        return JsonResponse({'data':hashtaglist,'message':'Success'})
+    except Exception as e:
+        return JsonResponse({'message':'fail','error':str(e)})
