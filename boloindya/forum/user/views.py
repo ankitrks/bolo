@@ -22,7 +22,7 @@ from .forms import UserProfileForm, EmailChangeForm, UserForm, EmailCheckForm
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
-from forum.user.models import AppPageContent
+from forum.user.models import AppPageContent, ReferralCode, ReferralCodeUsed
 
 User = get_user_model()
 
@@ -103,6 +103,31 @@ def email_change_confirm(request, token):
     messages.error(request, _("Sorry, we were not able to change your email."))
     return redirect(reverse('spirit:user:update'))
 
+def referral_code_validate(request):
+    ref_code = request.POST.get('code', '')
+    status = 'success'
+    message = 'Referral code valid!'
+    try:
+        code_obj = ReferralCode.objects.exclude(is_active = False).get(code = ref_code)
+    except Exception as e:
+        status = 'error'
+        message = 'Invalid referral code! Please try again.'
+    return JsonResponse({'status' : status, 'message' : message})
+
+def referral_code_update(request):
+    ref_code = request.POST.get('code', '')
+    user_id = request.POST.get('user_id', '')
+    status = 'success'
+    message = 'Referral code updated!'
+    try:
+        code_obj = ReferralCode.objects.exclude(is_active = False).get(code = ref_code)
+        created, used_obj = ReferralCodeUsed.objects.get_or_create(code = code_obj, by_user_id = user_id)
+        if not created:
+            message = 'Referral code already used by user!'
+    except Exception as e:
+        status = 'error'
+        message = 'Invalid referral code! Please try again.'
+    return JsonResponse({'status' : status, 'message' : message})
 
 @login_required
 def _activity(request, pk, slug, queryset, template, reverse_to, context_name, per_page):

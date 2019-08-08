@@ -15,6 +15,9 @@ urlpatterns = [
     url(r'^email-change/$', views.email_change, name='email-change'),
     url(r'^email-change/(?P<token>[0-9A-Za-z_\-\.]+)/$', views.email_change_confirm, name='email-change-confirm'),
 
+    url(r'^referral-code/validate/$', views.referral_code_validate, name='referral_code_validate'),
+    url(r'^referral-code/update/$', views.referral_code_update, name='referral_code_update'),
+
     url(r'^(?P<pk>\d+)/$', views.comments, kwargs={'slug': "", }, name='detail'),
     url(r'^(?P<pk>\d+)/(?P<slug>[\w-]+)/$', views.comments, name='detail'),
 

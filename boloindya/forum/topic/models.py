@@ -60,7 +60,7 @@ class Topic(models.Model):
     """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='st_topics',editable=False)
     category = models.ForeignKey('forum_category.Category', verbose_name=_("category"), related_name="category_topics",null=True,blank=True)
-    m2mcategory = models.ManyToManyField('forum_category.Category', verbose_name=_("m2mcategories"), related_name="m2mcategories_topics",null=True,blank=True)
+    m2mcategory = models.ManyToManyField('forum_category.Category', verbose_name=_("m2mcategories"), related_name="m2mcategories_topics",blank=True)
 
     title = models.CharField(_("title"), max_length=255, blank = True, null = True)
     question_audio = models.CharField(_("audio title"), max_length=255, blank = True, null = True)
