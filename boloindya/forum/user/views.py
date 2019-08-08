@@ -124,11 +124,11 @@ def referral_code_update(request):
     message = 'Referral code updated!'
     try:
         code_obj = ReferralCode.objects.exclude(is_active = False).get(code__iexact = ref_code)
-        created, used_obj = ReferralCodeUsed.objects.get_or_create(code = code_obj, by_user_id = user_id)
+        used_obj, created = ReferralCodeUsed.objects.get_or_create(code = code_obj, by_user_id = user_id)
         if not created:
+            status = 'error'
             message = 'Referral code already used by user!'
     except Exception as e:
-        print e
         status = 'error'
         message = 'Invalid referral code! Please try again.'
     return JsonResponse({'status' : status, 'message' : message})
