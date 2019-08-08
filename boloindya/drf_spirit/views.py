@@ -41,6 +41,7 @@ from django.db.models import Sum
 import itertools
 import json
 import urllib2
+from django.http import HttpResponseRedirect
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -1929,3 +1930,7 @@ def get_hash_list(request):
         return JsonResponse({'data':hashtaglist,'message':'Success'})
     except Exception as e:
         return JsonResponse({'message':'fail','error':str(e)})
+
+
+def redirect_to_store(request):
+    return HttpResponseRedirect('https://play.google.com/store/apps/details?id=com.boloindya.boloindya')

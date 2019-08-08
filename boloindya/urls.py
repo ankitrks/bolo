@@ -21,6 +21,7 @@ from django.contrib import admin
 from rest_framework_swagger.views import get_swagger_view
 from rest_framework.documentation import include_docs_urls
 
+import drf_spirit.views
 
 schema_view = get_swagger_view(title='BoloIndya API')
 
@@ -55,6 +56,7 @@ patterns = [
     url(r'^api/v1/', include(drf_spirit.urls, namespace='api')),
     url(r'fcm/', include('fcm.urls')),
     url(r'^jarvis/',include('jarvis.urls', namespace='jarvis')),
+    url(r'^download/$',drf_spirit.views.redirect_to_store,name='download')
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
