@@ -20,8 +20,8 @@ class TopicAdmin(ImportExportModelAdmin):
     ordering = ['is_vb', '-id']
     search_fields = ('title', 'user__username', 'user__st__name')
     list_filter = ('language_id','date', ('date', DateRangeFilter), 'm2mcategory')
-    list_display = ('id', 'title', 'name', 'duration', 'is_monetized', 'comments', 'is_removed', 'date')
-    list_editable = ('title',)
+    list_display = ('id', 'title', 'name', 'duration', 'language_id', 'is_monetized', 'comments', 'is_removed', 'date')
+    list_editable = ('title', 'language_id')
     filter_horizontal = ('m2mcategory', )
     resource_class = TopicResource
 
@@ -86,7 +86,9 @@ class TopicAdmin(ImportExportModelAdmin):
     # comment_count.short_description = 'Click to open the detail list of answers'
 
 class BoloActionHistoryAdmin(admin.ModelAdmin):
-    list_display = ('user', 'score', 'action', 'action_object', 'is_removed')
+    list_display = ('id', 'name', 'score', 'action', 'action_object', 'is_removed')
+    # list_filter = ('user__st__name', )
+    search_fields = ('user__username', 'user__st__name')
 admin.site.register(BoloActionHistory, BoloActionHistoryAdmin)
 
 class NotificationAdmin(admin.ModelAdmin):

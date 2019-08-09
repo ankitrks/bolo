@@ -37,10 +37,12 @@ admin.site.register(UserProfile,UserProfileAdmin)
 
 class ReferralCodeAdmin(admin.ModelAdmin):
 	list_display = ('code', 'for_user', 'purpose', 'is_active', 'created_at', 'last_modified')
+	search_fields = ('code', )
 admin.site.register(ReferralCode, ReferralCodeAdmin)
 
 class ReferralCodeUsedAdmin(admin.ModelAdmin):
-	list_display = ('code', 'by_user', 'created_at', 'last_modified')
+	list_display = ('code', 'by_user', 'is_download', 'created_at', 'last_modified')
+	search_fields = ('code__code', )
 admin.site.register(ReferralCodeUsed, ReferralCodeUsedAdmin)
 
 admin.site.register(AppVersion)

@@ -58,6 +58,14 @@ class BoloActionHistory(RecordTimeStamp):
     def __unicode__(self):
         return self.user.username
 
+    def name(self):
+        from django.utils.html import format_html
+        if self.user.st.name:
+            return format_html('<a href="/superman/forum_user/userprofile/' + str(self.user.st.id) \
+                + '/change/" target="_blank">' + self.user.st.name + '</a>' )
+        return format_html('<a href="/superman/forum_user/userprofile/' + str(self.user.st.id) \
+            + '/change/" target="_blank">' + self.user.username + '</a>' )
+
 class Topic(models.Model):
     """
     Topic model
