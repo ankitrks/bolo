@@ -158,4 +158,11 @@ class AppVersion(RecordTimeStamp):
         verbose_name_plural = 'AppVersions'
 
     def __unicode__(self):
-            return str(self.app_name)
+        return str(self.app_name)
+
+class AppPageContent(RecordTimeStamp):
+    page_name = models.CharField(_("Page Name"),max_length=100,blank=True)
+    page_description = models.TextField(_("Page Description"),null=True,blank=True)
+
+    def __unicode__(self):
+        return str(self.page_name)
