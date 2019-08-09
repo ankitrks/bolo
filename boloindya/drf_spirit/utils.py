@@ -2,23 +2,45 @@
 from django.apps import apps
 from forum.user.models import UserProfile, Weight
 
+def add_to_history(user, score, action, action_object, is_removed):
+    from forum.topic.models import BoloActionHistory
+    try:
+        history_obj = BoloActionHistory.objects.get( user = user, action_object = action_object, action = action )
+    except:
+        history_obj = BoloActionHistory( user = user, action_object = action_object, action = action, score = score )
+    history_obj.is_removed = is_removed
+    history_obj.save()
+
+def get_weight_object(key):
+    try:
+        return Weight.objects.get(features = key)
+    except:
+        return None
+
 def get_weight(key):
-	weights = Weight.objects.values('features','weight')
-	for element in weights:
-		if str(element.get('features').lower()) == str(key.lower()):
-			return element.get('weight')
+    weights = Weight.objects.values('features','weight')
+    for element in weights:
+        if str(element.get('features').lower()) == str(key.lower()):
+            return element.get('weight')
+    return 0
 
-def add_bolo_score(user_id,feature):
-	score = get_weight(feature)
-	userprofile = UserProfile.objects.get(user_id = user_id)
-	userprofile.bolo_score+= int(score)
-	userprofile.save()
+def add_bolo_score(user_id, feature, action_object):
+    score = get_weight(feature)
+    userprofile = UserProfile.objects.get(user_id = user_id)
+    userprofile.bolo_score+= int(score)
+    userprofile.save()
+    weight_obj = get_weight_object(feature)
+    if weight_obj:
+        add_to_history(userprofile.user, score, get_weight_object(feature), action_object, False)
 
-def reduce_bolo_score(user_id,feature):
+def reduce_bolo_score(user_id, feature, action_object):
     score = get_weight(feature)
     userprofile = UserProfile.objects.get(user_id = user_id)
     userprofile.bolo_score-= int(score)
     userprofile.save()
+    weight_obj = get_weight_object(feature)
+    if weight_obj:
+        add_to_history(userprofile.user, score, get_weight_object(feature), action_object, True)
 
 from django.utils.timezone import utc
 from django.utils import timezone

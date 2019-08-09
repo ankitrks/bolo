@@ -8,7 +8,6 @@ from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 
 
 class UserProfileResource(resources.ModelResource):
-
 	class Meta:
 		model = UserProfile
 		skip_unchanged = True

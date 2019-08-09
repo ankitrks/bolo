@@ -36,7 +36,7 @@ refrence_options = (
 )
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, verbose_name=_("profile"), related_name='st',editable=False)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, verbose_name=_("profile"), related_name='st', editable=False)
 
     slug = AutoSlugField(populate_from="user.username", db_index=False, blank=True)
     location = models.CharField(_("location"), max_length=75, blank=True)
@@ -178,7 +178,8 @@ class ReferralCode(RecordTimeStamp):
 
 class ReferralCodeUsed(RecordTimeStamp):
     code = models.ForeignKey(ReferralCode, blank=False, null = False)
-    by_user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = False, null = False)
+    by_user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True)
+    is_download = models.BooleanField(default = True)
 
     def __unicode__(self):
         return str(self.code)

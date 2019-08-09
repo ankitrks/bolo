@@ -123,8 +123,12 @@ def referral_code_update(request):
     status = 'success'
     message = 'Referral code updated!'
     try:
+        created = True
         code_obj = ReferralCode.objects.exclude(is_active = False).get(code__iexact = ref_code)
-        used_obj, created = ReferralCodeUsed.objects.get_or_create(code = code_obj, by_user_id = user_id)
+        if user_id: # IF no user_id, means user downloaded the app (not signup)
+            used_obj, created = ReferralCodeUsed.objects.get_or_create(code = code_obj, by_user_id = user_id)
+        else:
+            used_obj = ReferralCodeUsed.objects.create(code = code_obj)
         if not created:
             status = 'error'
             message = 'Referral code already used by user!'
