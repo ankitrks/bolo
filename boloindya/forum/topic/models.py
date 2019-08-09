@@ -14,7 +14,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from fcm.models import AbstractDevice
 from django.db.models import F,Q
-from drf_spirit.utils import reduce_bolo_score,shortnaturaltime
+from drf_spirit.utils import reduce_bolo_score, shortnaturaltime, add_bolo_score
 from forum.user.models import UserProfile, Weight
 from django.http import JsonResponse
 
