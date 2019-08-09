@@ -1924,6 +1924,7 @@ def get_cloudfront_url(instance):
         return str(instance.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
 
 @csrf_exempt
+@api_view(['POST'])
 def SyncDump(request):
     if request.method == "POST":
         user = request.user
@@ -1936,7 +1937,8 @@ def SyncDump(request):
             stored_data.save()
             return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)    
         except Exception as e:
-            return JsonResponse({'messgae' : 'fail','error':str(e)})
+            return JsonResponse({'message' : 'fail','error':str(e)})
+    return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)    
 
 @api_view(['POST'])
 def save_android_logs(request):
