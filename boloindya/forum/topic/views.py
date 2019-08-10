@@ -381,8 +381,8 @@ def share_match_page(request, match_id, slug):
     return render(request, 'spirit/topic/cricket_match.html', context)
 
 # Share Pages Match 
-def share_challenge_page(request):
-    challenge = TongueTwister.objects.first()
+def share_challenge_page(request, hashtag):
+    challenge = TongueTwister.objects.get(hash_tag = hashtag)
     context = {
     'challenge': challenge,
     }

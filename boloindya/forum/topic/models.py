@@ -432,7 +432,7 @@ class Notification(UserInfo):
             notific['actor_profile_pic'] = self.user.st.profile_pic 
 
         elif self.notification_type=='3':
-            notific['title'] = str(self.user.st.name)+' answered your Question: '+self.topic.topic.title
+            notific['title'] = str(self.user.st.name)+' commented on your video: '+self.topic.topic.title
             notific['hindi_title'] = str(self.user.st.name)+' ने आपके सवाल का जवाब दिया : '+self.topic.topic.title
             notific['tamil_title'] = str(self.user.st.name)+' உங்கள் கேள்விக்கு பதிலளித்துள்ளார் '+self.topic.topic.title
             notific['telgu_title'] = str(self.user.st.name)+' మీ ప్రశ్నకు సమాధానమిచ్చారు: '+self.topic.topic.title
