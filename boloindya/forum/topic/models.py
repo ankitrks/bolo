@@ -329,16 +329,12 @@ class TongueTwister(models.Model):
     def __unicode__(self):
         return str(self.hash_tag)
 
-
-
 class ShareTopic(UserInfo):
     topic = models.ForeignKey(Topic, related_name='share_topic_topic_share',null=True,blank=True)
     comment = models.ForeignKey('forum_comment.Comment',related_name='share_topic_topic_comment',null=True,blank=True)
 
     def __unicode__(self):
         return str(self.topic if self.topic else self.comment)
-
-
 
 class Like(UserInfo):
     comment = models.ForeignKey('forum_comment.Comment',related_name='like_topic_comment',null=True,blank=True)
@@ -388,9 +384,6 @@ class FCMDevice(AbstractDevice):
         except Exception as e:
             return JsonResponse({"status":"Failed","message":"Device not found for this user"},safe = False)
 
-
-
-
 class Notification(UserInfo):
     for_user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True,blank=True,editable=False)
     # device_id = models.CharField(_("Device Id"), max_length=255, blank = True, null = True)
@@ -408,10 +401,10 @@ class Notification(UserInfo):
     def get_notification_json(self):
         notific ={}
         if self.notification_type=='1':
-            notific['title'] = str(self.user.st.name)+' asked a question : '+self.topic.title+'. Would you like to answer?'
-            notific['hindi_title'] = str(self.user.st.name)+' ने एक प्रश्न पूछा : '+self.topic.title+'. क्या आप जवाब देना चाहेंगे?'
-            notific['tamil_title'] = str(self.user.st.name)+' கேள்வி கேட்டுள்ளார் : '+self.topic.title+' பதிலளிக்க விரும்புகிறீர்களா?'
-            notific['telgu_title'] = str(self.user.st.name)+' ఒక ప్రశ్న అడిగారు: '+self.topic.title+'. మీరు సమాధానం చెప్పాలనుకుంటున్నారా?'
+            notific['title'] = str(self.user.st.name)+' has posted a video: '+self.topic.title+'. Would you like to comment?'
+            notific['hindi_title'] = str(self.user.st.name)+' ने एक वीडियो पोस्ट किया है: '+self.topic.title+'. क्या आप टिपण्णी करना चाहेंगे?'
+            notific['tamil_title'] = str(self.user.st.name)+' ஒரு வீடியோவை வெளியிட்டுள்ளது: '+self.topic.title+' நீங்கள் கருத்து தெரிவிக்க விரும்புகிறீர்களா?'
+            notific['telgu_title'] = str(self.user.st.name)+' ఒక వీడియోను పోస్ట్ చేసింది: '+self.topic.title+'. మీరు వ్యాఖ్యానించాలనుకుంటున్నారా?'
             notific['notification_type'] = '1'
             notific['instance_id'] = self.topic.id
             notific['read_status'] = self.status
@@ -420,10 +413,10 @@ class Notification(UserInfo):
             notific['actor_profile_pic'] = self.user.st.profile_pic
 
         elif self.notification_type=='2':
-            notific['title'] = str(self.user.st.name)+' answered : '+self.topic.topic.title+'.'
-            notific['hindi_title'] = str(self.user.st.name)+' जवाब : '+self.topic.topic.title
-            notific['tamil_title'] = str(self.user.st.name)+' பதிலளித்துள்ளார்: '+self.topic.topic.title
-            notific['telgu_title'] = str(self.user.st.name)+' సమాధానం: '+self.topic.topic.title
+            notific['title'] = str(self.user.st.name)+' has commented on video: '+self.topic.topic.title+'.'
+            notific['hindi_title'] = str(self.user.st.name)+' ने वीडियो पर टिप्पणी की है: '+self.topic.topic.title
+            notific['tamil_title'] = str(self.user.st.name)+' வீடியோவில் கருத்து தெரிவித்துள்ளது: '+self.topic.topic.title
+            notific['telgu_title'] = str(self.user.st.name)+' వీడియోపై వ్యాఖ్యానించారు: '+self.topic.topic.title
             notific['notification_type'] = '2'
             notific['instance_id'] = self.topic.topic.id
             notific['read_status'] = self.status
@@ -432,10 +425,10 @@ class Notification(UserInfo):
             notific['actor_profile_pic'] = self.user.st.profile_pic 
 
         elif self.notification_type=='3':
-            notific['title'] = str(self.user.st.name)+' commented on your video: '+self.topic.topic.title
-            notific['hindi_title'] = str(self.user.st.name)+' ने आपके सवाल का जवाब दिया : '+self.topic.topic.title
-            notific['tamil_title'] = str(self.user.st.name)+' உங்கள் கேள்விக்கு பதிலளித்துள்ளார் '+self.topic.topic.title
-            notific['telgu_title'] = str(self.user.st.name)+' మీ ప్రశ్నకు సమాధానమిచ్చారు: '+self.topic.topic.title
+            notific['title'] = str(self.user.st.name)+' has commented on your video: '+self.topic.topic.title
+            notific['hindi_title'] = str(self.user.st.name)+' ने आपके वीडियो पर टिप्पणी की है: '+self.topic.topic.title
+            notific['tamil_title'] = str(self.user.st.name)+' உங்கள் வீடியோவில் கருத்து தெரிவித்துள்ளது: '+self.topic.topic.title
+            notific['telgu_title'] = str(self.user.st.name)+' మీ వీడియోపై వ్యాఖ్యానించారు: '+self.topic.topic.title
             notific['notification_type'] = '3'
             notific['instance_id'] = self.topic.topic.id
             notific['read_status'] = self.status
@@ -456,10 +449,10 @@ class Notification(UserInfo):
             notific['actor_profile_pic'] = self.user.st.profile_pic 
 
         elif self.notification_type=='5':
-            notific['title'] = str(self.user.st.name)+' liked your answer'
-            notific['hindi_title'] = str(self.user.st.name)+' को आपका जवाब पसंद आया'
-            notific['tamil_title'] = str(self.user.st.name)+' உங்கள் பதிலை லைக் செய்துள்ளார்'
-            notific['telgu_title'] = str(self.user.st.name)+' మీ సమాధానం ఇష్టపడ్డారు'
+            notific['title'] = str(self.user.st.name)+' liked your video'
+            notific['hindi_title'] = str(self.user.st.name)+' को आपका वीडियो पसंद आया'
+            notific['tamil_title'] = str(self.user.st.name)+' உங்கள் வீடியோவை விரும்பியது'
+            notific['telgu_title'] = str(self.user.st.name)+' మీ వీడియోను ఇష్టపడ్డారు'
             notific['notification_type'] = '5'
             if self.topic:
                 if self.topic.comment:
