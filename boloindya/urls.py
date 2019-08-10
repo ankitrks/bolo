@@ -37,7 +37,7 @@ patterns = [
     url(r'^about/$', forum.topic.views.get_about, name='get_about'),
     url(r'^terms-of-service/$', forum.topic.views.get_termofservice, name='get_termofservice'),
     url(r'^privacy-policy/$', forum.topic.views.get_privacypolicy, name='get_privacypolicy'),
-    url(r'^challenge/GameOfTongues$', forum.topic.views.share_challenge_page, name='share_challenge_page'),
+    url(r'^challenge/(?P<hashtag>[\w-]+)$', forum.topic.views.share_challenge_page, name='share_challenge_page'),
     url(r'^robots.txt$', forum.topic.views.robotstext, name='roboxt'),
     url(r'^sitemap.xml$', forum.topic.views.sitemapxml, name='sitemap'),
 
