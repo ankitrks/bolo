@@ -10,6 +10,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 from django.http import HttpResponsePermanentRedirect
+from django.views.decorators.csrf import csrf_exempt
 
 from djconfig import config
 
@@ -22,7 +23,7 @@ from .forms import UserProfileForm, EmailChangeForm, UserForm, EmailCheckForm
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
-from forum.user.models import AppPageContent
+from forum.user.models import AppPageContent, ReferralCode, ReferralCodeUsed
 
 User = get_user_model()
 
@@ -103,6 +104,38 @@ def email_change_confirm(request, token):
     messages.error(request, _("Sorry, we were not able to change your email."))
     return redirect(reverse('spirit:user:update'))
 
+@csrf_exempt
+def referral_code_validate(request):
+    ref_code = request.POST.get('code', '')
+    status = 'success'
+    message = 'Referral code valid!'
+    try:
+        code_obj = ReferralCode.objects.exclude(is_active = False).get(code__iexact = ref_code)
+    except Exception as e:
+        status = 'error'
+        message = 'Invalid referral code! Please try again.'
+    return JsonResponse({'status' : status, 'message' : message})
+
+@csrf_exempt
+def referral_code_update(request):
+    ref_code = request.POST.get('code', '')
+    user_id = request.POST.get('user_id', '')
+    status = 'success'
+    message = 'Referral code updated!'
+    try:
+        created = True
+        code_obj = ReferralCode.objects.exclude(is_active = False).get(code__iexact = ref_code)
+        if user_id: # IF no user_id, means user downloaded the app (not signup)
+            used_obj, created = ReferralCodeUsed.objects.get_or_create(code = code_obj, by_user_id = user_id)
+        else:
+            used_obj = ReferralCodeUsed.objects.create(code = code_obj)
+        if not created:
+            status = 'error'
+            message = 'Referral code already used by user!'
+    except Exception as e:
+        status = 'error'
+        message = 'Invalid referral code! Please try again.'
+    return JsonResponse({'status' : status, 'message' : message})
 
 @login_required
 def _activity(request, pk, slug, queryset, template, reverse_to, context_name, per_page):

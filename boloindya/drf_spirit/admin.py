@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import SingUpOTP
-from forum.user.models import Weight,UserProfile,AppVersion, UserProfile,AndroidLogs, AppPageContent
+from forum.user.models import Weight,UserProfile,AppVersion, UserProfile,AndroidLogs, AppPageContent, ReferralCode, ReferralCodeUsed
 from forum.category.models import Category
 from import_export.admin import ImportExportModelAdmin,ExportMixin
 from import_export import resources
@@ -8,7 +8,6 @@ from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 
 
 class UserProfileResource(resources.ModelResource):
-
 	class Meta:
 		model = UserProfile
 		skip_unchanged = True
@@ -35,6 +34,16 @@ class UserProfileAdmin(ImportExportModelAdmin):
 	list_filter = ('user__date_joined', ('user__date_joined', DateRangeFilter), 'language')
 	resource_class = UserProfileResource
 admin.site.register(UserProfile,UserProfileAdmin)
+
+class ReferralCodeAdmin(admin.ModelAdmin):
+	list_display = ('code', 'for_user', 'purpose', 'is_active', 'created_at', 'last_modified')
+	search_fields = ('code', )
+admin.site.register(ReferralCode, ReferralCodeAdmin)
+
+class ReferralCodeUsedAdmin(admin.ModelAdmin):
+	list_display = ('code', 'by_user', 'is_download', 'created_at', 'last_modified')
+	search_fields = ('code__code', )
+admin.site.register(ReferralCodeUsed, ReferralCodeUsedAdmin)
 
 admin.site.register(AppVersion)
 admin.site.register(AndroidLogs)

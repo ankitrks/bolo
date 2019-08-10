@@ -171,10 +171,11 @@ class SingUpOTP(models.Model):
 #             # comment has pk means modified_count is changed.
 #             # As we use F expression, its not possible to know modified_count until refresh from db
 #             self.refresh_from_db()
+
 class UserJarvisDump(models.Model):
     DUMP_TYPE = [
-    ('1', 'user_activities_data'),
-    ('2', 'error_logs'),
+        ('1', 'user_activities_data'),
+        ('2', 'error_logs'),
     ]
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL,related_name='User',editable=False)

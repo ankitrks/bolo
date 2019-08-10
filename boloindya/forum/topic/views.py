@@ -315,7 +315,7 @@ def comment_likes(request):
     if is_created:
             comment.likes_count = F('likes_count')+1
             comment.save()
-            add_bolo_score(request.user.id,'liked')
+            add_bolo_score(request.user.id, 'liked', comment)
             userprofile.like_count = F('like_count')+1
             userprofile.save()
             return HttpResponse(json.dumps({'success':'Success'}),content_type="application/json")

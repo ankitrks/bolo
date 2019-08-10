@@ -103,9 +103,8 @@ class Comment(models.Model):
         userprofile = UserProfile.objects.get(user = self.user)
         userprofile.answer_count = F('answer_count')-1
         userprofile.save()
-        reduce_bolo_score(self.user.id,'reply_on_topic')
+        reduce_bolo_score(self.user.id, 'reply_on_topic', topic)
         return True
-
 
     @property
     def like(self):

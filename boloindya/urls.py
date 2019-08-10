@@ -25,8 +25,6 @@ import drf_spirit.views
 
 schema_view = get_swagger_view(title='BoloIndya API')
 
-
-
 patterns = [
     url(r'^$', forum.topic.views.new_home, name='index'),
     url(r'^match/(?P<match_id>\d+)/(?P<slug>[\w-]+)/$', forum.topic.views.share_match_page, name='share_match_page'),
@@ -45,6 +43,9 @@ patterns = [
     url(r'^ajax/verify_user/$', forum.user.auth.views.verify_user, name='index_login_new_bolo_user'),
     url(r'^videos/$', forum.topic.views.index_videos, name='videos'),
 
+    url(r'^referral-code/validate/$', forum.user.views.referral_code_validate, name='referral_code_validate'),
+    url(r'^referral-code/update/$', forum.user.views.referral_code_update, name='referral_code_update'),
+
     url(r'^ajax/pageno/$', forum.topic.views.get_topics_feed, name='ajax_lazy_topic_fetch'),
     url(r'^st/admin/', include(forum.admin.urls, namespace='admin')),
     url(r'^user/', include(forum.user.urls, namespace='user')),
@@ -57,7 +58,7 @@ patterns = [
     url(r'fcm/', include('fcm.urls')),
     url(r'^jarvis/',include('jarvis.urls', namespace='jarvis')),
     url(r'^get-html-content-app/',forum.user.views.getpagecontent,name='get_html_content_app'),
-    url(r'^download/$',drf_spirit.views.redirect_to_store,name='download')
+    url(r'^download/$',drf_spirit.views.redirect_to_store,name='download'),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

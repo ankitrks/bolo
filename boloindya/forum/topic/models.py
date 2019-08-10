@@ -14,8 +14,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from fcm.models import AbstractDevice
 from django.db.models import F,Q
-from drf_spirit.utils import reduce_bolo_score,shortnaturaltime
-from forum.user.models import UserProfile
+from drf_spirit.utils import reduce_bolo_score, shortnaturaltime, add_bolo_score
+from forum.user.models import UserProfile, Weight
 from django.http import JsonResponse
 
 from datetime import datetime,timedelta
@@ -46,6 +46,26 @@ class UserInfo(RecordTimeStamp):
     class Meta:
         abstract = True
 
+class BoloActionHistory(RecordTimeStamp):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, editable=False)
+    score = models.PositiveIntegerField(_("Bolo Score"), default=0)
+    action = models.ForeignKey(Weight, editable=False)
+    action_object_type = models.ForeignKey(ContentType, verbose_name=('topic type'),null=True,blank=True)
+    action_object_id = models.PositiveIntegerField(('object ID'),null=True,blank=True)
+    action_object = GenericForeignKey('action_object_type', 'action_object_id')
+    is_removed = models.BooleanField(default=False)
+    
+    def __unicode__(self):
+        return self.user.username
+
+    def name(self):
+        from django.utils.html import format_html
+        if self.user.st.name:
+            return format_html('<a href="/superman/forum_user/userprofile/' + str(self.user.st.id) \
+                + '/change/" target="_blank">' + self.user.st.name + '</a>' )
+        return format_html('<a href="/superman/forum_user/userprofile/' + str(self.user.st.id) \
+            + '/change/" target="_blank">' + self.user.username + '</a>' )
+
 class Topic(models.Model):
     """
     Topic model
@@ -60,7 +80,7 @@ class Topic(models.Model):
     """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='st_topics',editable=False)
     category = models.ForeignKey('forum_category.Category', verbose_name=_("category"), related_name="category_topics",null=True,blank=True)
-    m2mcategory = models.ManyToManyField('forum_category.Category', verbose_name=_("m2mcategories"), related_name="m2mcategories_topics",null=True,blank=True)
+    m2mcategory = models.ManyToManyField('forum_category.Category', verbose_name=_("m2mcategories"), related_name="m2mcategories_topics",blank=True)
 
     title = models.CharField(_("title"), max_length=255, blank = True, null = True)
     question_audio = models.CharField(_("audio title"), max_length=255, blank = True, null = True)
@@ -80,7 +100,7 @@ class Topic(models.Model):
     is_globally_pinned = models.BooleanField(_("globally pinned"), default=False)
     is_closed = models.BooleanField(_("closed"), default=False)
     is_removed = models.BooleanField(default=False)
-    thumbnail = models.CharField(_("thumbnail"), max_length=150, default='')
+    thumbnail = models.CharField(_("thumbnail"), max_length=150, blank = True, null = True, default='')
     view_count = models.PositiveIntegerField(_("views count"), default=0)
     comment_count = models.PositiveIntegerField(_("comment count"), default=0)
     total_share_count = models.PositiveIntegerField(_("Total Share count"), default=0)# self plus comment
@@ -89,6 +109,7 @@ class Topic(models.Model):
     # shared_post = models.ForeignKey('self', blank = True, null = True, related_name='user_shared_post')
     is_vb = models.BooleanField(_("Is Video Bytes"), default=False)
     likes_count = models.PositiveIntegerField(_("Likes count"), default=0)
+    is_monetized = models.BooleanField(_("Is Monetized?"), default=True)
 
     backup_url = models.TextField(_("backup url"), blank = True)
     is_transcoded = models.BooleanField(default = False)
@@ -199,13 +220,55 @@ class Topic(models.Model):
         """
         return self.comment_set.values_list('comment_html', flat=True)
 
+    def name(self):
+        from django.utils.html import format_html
+        if self.user.st.name:
+            return format_html('<a href="/superman/forum_user/userprofile/' + str(self.user.st.id) \
+                + '/change/" target="_blank">' + self.user.st.name + '</a>' )
+        return format_html('<a href="/superman/forum_user/userprofile/' + str(self.user.st.id) \
+            + '/change/" target="_blank">' + self.user.username + '</a>' )
+
+    def duration(self):
+        from django.utils.html import format_html
+        return format_html('<a href="' + self.backup_url + '" target="_blank">' + self.media_duration + '</a>' )
+
     def delete(self):
+        self.is_monetized = False
         self.is_removed = True
         self.save()
         userprofile = UserProfile.objects.get(user = self.user)
-        userprofile.question_count = F('question_count')-1
+        if userprofile.question_count:
+            userprofile.question_count = F('question_count')-1
         userprofile.save()
-        reduce_bolo_score(self.user.id,'create_topic')
+        reduce_bolo_score(self.user.id, 'create_topic', self)
+        return True
+
+    def restore(self):
+        self.is_removed = False
+        self.save()
+        userprofile = UserProfile.objects.get(user = self.user)
+        if userprofile.question_count:
+            userprofile.question_count = F('question_count')+1
+        userprofile.save()
+        # Bolo actions will be added only when the monetization is enabled
+        # add_bolo_score(self.user.id, 'create_topic', self)
+        return True
+
+    def no_monetization(self):
+        self.is_monetized = False
+        self.save()
+        userprofile = UserProfile.objects.get(user = self.user)
+        userprofile.save()
+        reduce_bolo_score(self.user.id, 'create_topic', self)
+        return True
+
+    def add_monetization(self):
+        self.is_removed = False
+        self.is_monetized = True
+        self.save()
+        userprofile = UserProfile.objects.get(user = self.user)
+        userprofile.save()
+        add_bolo_score(self.user.id, 'create_topic', self)
         return True
 
     def audio_duration(self):
@@ -248,8 +311,8 @@ class Topic(models.Model):
 
     def comments(self):
         from django.utils.html import format_html
-
-        return format_html(str('<a href="/superman/forum_comment/comment/?topic_id='+str(self.id)+'" target="_blank">'+str(self.comment_count)+'</a>'))
+        return format_html(str('<a href="/superman/forum_comment/comment/?topic_id='+str(self.id)+'" target="_blank">' \
+                + str(self.comment_count)+'</a>'))
 
 class VBseen(UserInfo):
     topic = models.ForeignKey(Topic, related_name='vb_seen',null=True,blank=True)

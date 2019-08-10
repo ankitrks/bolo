@@ -384,7 +384,6 @@ class GetChallenge(generics.ListCreateAPIView):
         challengehash = '#' + challenge_hash
         all_videos = Topic.objects.filter(title__icontains=challengehash,is_removed=False,is_vb=True)
         return all_videos
-
         
 
 @api_view(['POST'])
@@ -394,6 +393,7 @@ def GetChallengeDetails(request):
     user_id = request.POST.get('user_id', '')
     """ 
     challengehash = request.POST.get('ChallengeHash')
+    challengehash = '#' + challengehash
     try:
         userprofile = UserProfile.objects.get(user = request.user)
         all_vb = Topic.objects.filter(title__icontains = challengehash,is_removed=False,is_vb=True)
@@ -797,7 +797,7 @@ def replyOnTopic(request):
             if media_duration:
                 comment.media_duration = media_duration
             comment.save()
-            add_bolo_score(request.user.id,'reply_on_topic')
+            add_bolo_score(request.user.id, 'reply_on_topic', comment)
             return JsonResponse({'message': 'Reply Submitted','comment':CommentSerializer(comment).data}, status=status.HTTP_201_CREATED)
         except User.DoesNotExist:
             return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
@@ -894,14 +894,14 @@ def createTopic(request):
             userprofile = UserProfile.objects.get(user = request.user)
             userprofile.question_count = F('question_count')+1
             userprofile.save()
-            add_bolo_score(request.user.id,'create_topic')
+            add_bolo_score(request.user.id,'create_topic', topic)
             topic_json = TopicSerializerwithComment(topic).data
             message = 'Topic Created'
         else:
             userprofile = UserProfile.objects.get(user = request.user)
             userprofile.question_count = F('vb_count')+1
             userprofile.save()
-            add_bolo_score(request.user.id,'create_vb')
+            add_bolo_score(request.user.id, 'create_topic', topic)
             topic_json = TopicSerializerwithComment(topic).data
             message = 'Video Byte Created'
         return JsonResponse({'message': message,'topic':topic_json}, status=status.HTTP_201_CREATED)
@@ -1181,7 +1181,7 @@ def verify_otp(request):
                     userprofile.save()
                     # if str(language):
                     #     default_follow = deafult_boloindya_follow(user,str(language))
-                    add_bolo_score(user.id, 'initial_signup')
+                    add_bolo_score(user.id, 'initial_signup', userprofile)
                 user_tokens = get_tokens_for_user(user)
                 otp_obj.for_user = user
                 otp_obj.save()
@@ -1279,7 +1279,7 @@ def fb_profile_settings(request):
                 is_created = True
 
             if is_created:
-                add_bolo_score(user.id,'initial_signup')
+                add_bolo_score(user.id, 'initial_signup', userprofile)
                 user.first_name = extra_data['first_name']
                 user.last_name = extra_data['last_name']
                 userprofile.name = extra_data['name']
@@ -1386,8 +1386,8 @@ def follow_user(request):
         userprofile = UserProfile.objects.get(user = request.user)
         followed_user = UserProfile.objects.get(user_id = user_following_id)
         if is_created:
-            add_bolo_score(request.user.id,'follow')
-            add_bolo_score(user_following_id,'followed')
+            add_bolo_score(request.user.id, 'follow', userprofile)
+            add_bolo_score(user_following_id, 'followed', followed_user)
             userprofile.follow_count = F('follow_count')+1
             userprofile.save()
             followed_user.follower_count = F('follower_count')+1
@@ -1456,7 +1456,7 @@ def like(request):
         if is_created:
             acted_obj.likes_count = F('likes_count')+1
             acted_obj.save()
-            add_bolo_score(request.user.id,'liked')
+            add_bolo_score(request.user.id, 'liked', acted_obj)
             userprofile.like_count = F('like_count')+1
             userprofile.save()
             return JsonResponse({'message': 'liked'}, status=status.HTTP_200_OK)
@@ -1496,7 +1496,7 @@ def shareontimeline(request):
     if share_on == 'share_timeline':
         try:
             liked = ShareTopic.objects.create(topic_id = topic_id,comment_id = comment_id,user = request.user)
-            add_bolo_score(request.user.id,'share_timeline')
+            add_bolo_score(request.user.id, 'share_timeline', liked)
             if comment_id:
                 comment = Comment.objects.get(pk = comment_id)
                 comment.share_count = F('share_count')+1
@@ -1525,7 +1525,7 @@ def shareontimeline(request):
                 topic.share_count = F('share_count')+1    
             topic.total_share_count = F('total_share_count')+1
             topic.save()
-            add_bolo_score(request.user.id,'facebook_share')
+            add_bolo_score(request.user.id, 'facebook_share', topic)
             userprofile.share_count = F('share_count')+1
             userprofile.save()
             return JsonResponse({'message': 'fb shared'}, status=status.HTTP_200_OK)
@@ -1544,7 +1544,7 @@ def shareontimeline(request):
                 topic.share_count = F('share_count')+1
             topic.total_share_count = F('total_share_count')+1
             topic.save()
-            add_bolo_score(request.user.id,'whatsapp_share')
+            add_bolo_score(request.user.id, 'whatsapp_share', topic)
             userprofile.share_count = F('share_count')+1
             userprofile.save()
             return JsonResponse({'message': 'whatsapp shared'}, status=status.HTTP_200_OK)
@@ -1667,7 +1667,7 @@ def deafult_boloindya_follow(user,language):
             bolo_indya_user = User.objects.get(username = 'boloindya_en')
         follow,is_created = Follower.objects.get_or_create(user_follower = user,user_following=bolo_indya_user)
         if is_created:
-            add_bolo_score(user.id,'follow')
+            add_bolo_score(user.id, 'follow', follow)
             userprofile = UserProfile.objects.get(user = user)
             bolo_indya_profile = UserProfile.objects.get(user = bolo_indya_user)
             userprofile.follow_count = F('follow_count') + 1
