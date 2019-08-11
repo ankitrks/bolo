@@ -10,6 +10,7 @@ from django.utils import timezone
 
 from ..core.conf import settings
 from ..core.utils.models import AutoSlugField
+from tinymce.models import HTMLField
 
 class RecordTimeStamp(models.Model):
     created_at=models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False) # auto_now will add the current time and date whenever field is saved.
@@ -162,7 +163,7 @@ class AppVersion(RecordTimeStamp):
 
 class AppPageContent(RecordTimeStamp):
     page_name = models.CharField(_("Page Name"),max_length=100,blank=True)
-    page_description = models.TextField(_("Page Description"),null=True,blank=True)
+    page_description = HTMLField(_("Page Description"), null=True, blank=True)
 
     def __unicode__(self):
         return str(self.page_name)

@@ -67,4 +67,5 @@ urlpatterns = [
 	url(r'^superman/', include(admin.site.urls)),
     url(r'^', include(patterns, namespace='spirit', app_name='forum')),
     url(r'docs/', include_docs_urls(title='Boloindya API')),
+    url(r'^tinymce/', include('tinymce.urls')),
 ]

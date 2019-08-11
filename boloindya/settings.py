@@ -135,7 +135,8 @@ INSTALLED_APPS = [
     'import_export',
     'django_extensions',
     'jarvis',
-
+    'tinymce',
+    
     # 'forum.core.tests'
 ]
 
