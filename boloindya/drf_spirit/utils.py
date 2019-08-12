@@ -33,7 +33,7 @@ def add_bolo_score(user_id, feature, action_object):
     if weight_obj:
         add_to_history(userprofile.user, score, get_weight_object(feature), action_object, False)
 
-def reduce_bolo_score(user_id, feature, action_object):
+def reduce_bolo_score(user_id, feature, action_object, admin_action_type=''):
     score = get_weight(feature)
     userprofile = UserProfile.objects.get(user_id = user_id)
     userprofile.bolo_score-= int(score)
@@ -43,6 +43,12 @@ def reduce_bolo_score(user_id, feature, action_object):
     weight_obj = get_weight_object(feature)
     if weight_obj:
         add_to_history(userprofile.user, score, get_weight_object(feature), action_object, True)
+    if feature == 'create_topic':
+        notification_type = '7'
+        if admin_action_type == 'no_monetize':
+            notification_type = '8'
+        notify_owner = Notification.objects.create(for_user_id = user_id ,topic = action_object, \
+                notification_type=notification_type, user_id = user_id)
 
 from django.utils.timezone import utc
 from django.utils import timezone
