@@ -1,6 +1,5 @@
 from django.apps import apps
 from forum.user.models import UserProfile, Weight
-from forum.topic.models import Notification
 
 def add_to_history(user, score, action, action_object, is_removed):
     from forum.topic.models import BoloActionHistory
@@ -44,6 +43,7 @@ def reduce_bolo_score(user_id, feature, action_object, admin_action_type=''):
     if weight_obj:
         add_to_history(userprofile.user, score, get_weight_object(feature), action_object, True)
     if feature == 'create_topic':
+        from forum.topic.models import Notification
         notification_type = '7'
         if admin_action_type == 'no_monetize':
             notification_type = '8'

@@ -78,7 +78,7 @@ class Topic(models.Model):
     it must be set explicitly
     :vartype reindex_at: `:py:class:models.DateTimeField`
     """
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='st_topics',editable=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='st_topics')
     category = models.ForeignKey('forum_category.Category', verbose_name=_("category"), related_name="category_topics",null=True,blank=True)
     m2mcategory = models.ManyToManyField('forum_category.Category', verbose_name=_("m2mcategories"), related_name="m2mcategories_topics",blank=True)
 
@@ -147,6 +147,16 @@ class Topic(models.Model):
                     self.transcode_dump = data_dump
                     self.transcode_job_id = job_id
                     #self.is_transcoded = True
+        self.save()
+    def watermark_vb(self, *args, **kwargs):
+        data_dump, m3u8_url, job_id = transcode_media_file(self.question_video.split('s3.amazonaws.com/')[1])
+        print m3u8_url,"====>",job_id
+        if m3u8_url:
+            self.backup_url = self.question_video
+            self.question_video = m3u8_url
+            self.transcode_dump = data_dump
+            self.transcode_job_id = job_id
+            self.is_transcoded = True
         self.save()
 
     def get_absolute_url(self):
@@ -473,7 +483,10 @@ class Notification(UserInfo):
             notific['tamil_title'] = 'உங்கள் வீடியோ பைட்: "' + self.topic.title + '" வெளியிடப்பட்டுள்ளது'
             notific['telgu_title'] = 'మీ వీడియో బైట్: "' + self.topic.title + '" ప్రచురించబడింది'
             notific['notification_type'] = '6'
-            notific['instance_id'] = self.topic.id
+            if self.topic:
+            	notific['instance_id'] = self.topic.id
+            else:
+                notific['instance_id'] = ''
             notific['read_status'] = self.status
             notific['id'] = self.id
             notific['created_at'] = shortnaturaltime(self.created_at)
