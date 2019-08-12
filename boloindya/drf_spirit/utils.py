@@ -1,6 +1,6 @@
-
 from django.apps import apps
 from forum.user.models import UserProfile, Weight
+from forum.topic.models import Notification
 
 def add_to_history(user, score, action, action_object, is_removed):
     from forum.topic.models import BoloActionHistory
