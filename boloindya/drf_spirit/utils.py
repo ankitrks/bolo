@@ -37,6 +37,8 @@ def reduce_bolo_score(user_id, feature, action_object):
     score = get_weight(feature)
     userprofile = UserProfile.objects.get(user_id = user_id)
     userprofile.bolo_score-= int(score)
+    if userprofile.bolo_score < 95:
+        userprofile.bolo_score = 95
     userprofile.save()
     weight_obj = get_weight_object(feature)
     if weight_obj:
