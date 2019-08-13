@@ -2,19 +2,19 @@
 {% load spirit_tags i18n %}
 {% block head-meta %}
 <meta property="og:site_name" content="Bolo Indya">
-<meta property="og:title" content="Tongue Twister" />
-<meta property="og:description" content="Only a Genius can say these words 10-times really fast in 60 seconds without getting tongue twisted. Are You up to chant and win this tongue game?" />
+<meta property="og:title" content="Trending on Bolo Indya" />
+<meta property="og:description" content="India’s favorite short videos based knowledge platform in local languages. Are You on it?" />
 <meta property="og:type" content="website" />
-<meta property="title" content="Predict and Win this Cricket World Cup with Bolo Indya" />
-<meta name="description" content="Only a Genius can say these words 10-times really fast in 60 seconds without getting tongue twisted. Are You up to chant and win this tongue game?" />
+<meta property="title" content="Trending on Bolo Indya" />
+<meta name="description" content="India’s favorite short videos based knowledge platform in local languages. Are You on it?" />
 
 <meta data-react-helmet="true" name="twitter:card" content="summary"/>
 <meta data-react-helmet="true" name="twitter:site" content="{{ request.get_full_path }}"/>
-<meta data-react-helmet="true" name="twitter:title" content="Only a Genius can say these words 10-times really fast in 60 seconds without getting tongue twisted. Are You up to chant and win this tongue game?"/>
-<meta data-react-helmet="true" name="twitter:image" content="https://boloindya.s3.amazonaws.com/share_pages/GOTongues.jpg"/>
+<meta data-react-helmet="true" name="twitter:title" content="Trending on Bolo Indya"/>
+<meta data-react-helmet="true" name="twitter:image" content="{{ challenge.picture }}"/>
 
 <meta data-react-helmet="true" property="og:url" content="{{ request.get_full_path }}"/>
-<meta data-react-helmet="true" property="og:image" content="https://boloindya.s3.amazonaws.com/share_pages/GOTongues.jpg"/>
+<meta data-react-helmet="true" property="og:image" content="{{ challenge.picture }}"/>
 
 {% endblock %}
 {% block title %}{{ cricket_match.title }}{% endblock %}
