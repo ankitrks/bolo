@@ -1272,7 +1272,8 @@ def fb_profile_settings(request):
             except Exception as e:
                 print e
                 user_exists,num_user = check_user(extra_data['first_name'],extra_data['last_name'])
-                username = generate_username(extra_data['first_name'],extra_data['last_name'],num_user) if user_exists else str(str(extra_data['first_name'])+str(extra_data['last_name']))
+                #username = generate_username(extra_data['first_name'],extra_data['last_name'],num_user) if user_exists else str(str(extra_data['first_name'])+str(extra_data['last_name']))
+                username = get_random_username()
                 user = User.objects.create(username = username.lower())
                 userprofile = UserProfile.objects.get(user = user)
                 is_created = True
