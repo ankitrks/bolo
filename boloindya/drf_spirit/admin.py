@@ -36,7 +36,8 @@ class UserProfileAdmin(ImportExportModelAdmin):
 admin.site.register(UserProfile,UserProfileAdmin)
 
 class ReferralCodeAdmin(admin.ModelAdmin):
-	list_display = ('code', 'for_user', 'purpose', 'is_active', 'created_at', 'last_modified')
+	list_display = ('code', 'for_user', 'purpose', 'is_active', 'campaign_url', 'downloads', 'signup', 'created_at')
+	list_filter = ('code', 'is_active')
 	search_fields = ('code', )
 admin.site.register(ReferralCode, ReferralCodeAdmin)
 

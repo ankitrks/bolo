@@ -173,10 +173,22 @@ class ReferralCode(RecordTimeStamp):
     code = models.CharField(_("Ref Code"), max_length=20, blank=True)
     for_user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = False, null = False)
     purpose = models.CharField(_("Purpose"), max_length=50, blank=True)
+    campaign_url = models.CharField(_("Campaign URL"), max_length=350, blank=True, null = True)
     is_active = models.BooleanField(default = True)
 
     def __unicode__(self):
         return str(self.code)
+
+    def save(self, *args, **kwargs):
+        self.campaign_url = 'https://play.google.com/store/apps/details?id=com.boloindya.boloindya&\
+                    referrer=utm_source%3D' + self.code + '%26utm_medium%3Dcpc%26anid%3Dadmob'
+        super(ReferralCode, self).save(*args, **kwargs)
+
+    def downloads(self):
+        return ReferralCodeUsed.objects.filter(code = self, is_download = True, by_user__isnull = True).count()
+
+    def signup(self):
+        return ReferralCodeUsed.objects.filter(code = self, is_download = True, by_user__isnull = False).count()
 
 class ReferralCodeUsed(RecordTimeStamp):
     code = models.ForeignKey(ReferralCode, blank=False, null = False)
