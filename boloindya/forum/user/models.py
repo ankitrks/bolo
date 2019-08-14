@@ -173,7 +173,7 @@ class ReferralCode(RecordTimeStamp):
     code = models.CharField(_("Ref Code"), max_length=20, blank=True)
     for_user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = False, null = False)
     purpose = models.CharField(_("Purpose"), max_length=50, blank=True)
-    campaign_url = models.CharField(_("Playstore URL"), max_length=350, blank=True, null = True)
+    campaign_url = models.CharField(_("Playstore URL"), max_length=350, blank=True, null = True, editable = False)
     is_active = models.BooleanField(_("live"), default = True)
 
     def __unicode__(self):
