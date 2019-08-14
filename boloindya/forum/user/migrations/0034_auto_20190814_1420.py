@@ -17,9 +17,9 @@ class Migration(migrations.Migration):
             name='code',
             field=models.CharField(blank=True, max_length=20, verbose_name='Ref Code'),
         ),
-        migrations.AddField(
-            model_name='referralcode',
-            name='campaign_url',
-            field=models.CharField(blank=True, max_length=350, null=True, verbose_name='Campaign URL'),
-        ),
+        #migrations.AddField(
+        #    model_name='referralcode',
+        #    name='campaign_url',
+        #    field=models.CharField(blank=True, max_length=350, null=True, verbose_name='Campaign URL'),
+        #),
     ]
