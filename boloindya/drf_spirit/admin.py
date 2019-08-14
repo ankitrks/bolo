@@ -37,7 +37,7 @@ admin.site.register(UserProfile,UserProfileAdmin)
 
 class ReferralCodeAdmin(admin.ModelAdmin):
 	change_list_template = "admin/forum_user/referralcode/change_list.html"
-	list_display = ('code', 'purpose', 'is_active', 'downloads', 'signup', 'campaign_url', 'no_playstore_url', 'created_at')
+	list_display = ('code', 'purpose', 'is_active', 'downloads', 'signup', 'playstore_url', 'no_playstore_url', 'created_at')
 	list_filter = ('code', 'is_active')
 	search_fields = ('code', )
 admin.site.register(ReferralCode, ReferralCodeAdmin)
