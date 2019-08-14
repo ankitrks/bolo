@@ -19,7 +19,7 @@ class TopicResource(resources.ModelResource):
 class TopicAdmin(ImportExportModelAdmin):
     ordering = ['is_vb', '-id']
     search_fields = ('title', 'user__username', 'user__st__name')
-    list_filter = ('language_id','date', ('date', DateRangeFilter), 'm2mcategory')
+    list_filter = ('language_id','date', ('date', DateRangeFilter), 'is_removed', 'is_monetized', 'm2mcategory')
     list_display = ('id', 'title', 'name', 'duration', 'language_id', 'is_monetized', 'comments', 'is_removed', 'date')
     list_editable = ('title', 'language_id')
     filter_horizontal = ('m2mcategory', )
