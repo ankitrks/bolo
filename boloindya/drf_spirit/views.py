@@ -1945,4 +1945,6 @@ def get_hash_list(request):
 
 
 def redirect_to_store(request):
+    if request.GET.urlencode():
+        return HttpResponseRedirect('https://play.google.com/store/apps/details?' + request.GET.urlencode())
     return HttpResponseRedirect('https://play.google.com/store/apps/details?id=com.boloindya.boloindya')
