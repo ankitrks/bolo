@@ -185,7 +185,7 @@ class ReferralCode(RecordTimeStamp):
         super(ReferralCode, self).save(*args, **kwargs)
 
     def playstore_url(self):
-        return '<b>playstore URL - </b> https://www.boloindya.com/download/?id=com.boloindya.boloindya&\
+        return '<b>playstore URL - </b> https://play.google.com/store/apps/details?id=com.boloindya.boloindya&\
                     referrer=utm_source%3D' + self.code + '%26utm_medium%3Dcpc%26anid%3Dadmob'
     playstore_url.allow_tags = True
 
