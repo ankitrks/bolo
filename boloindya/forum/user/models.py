@@ -61,7 +61,7 @@ class UserProfile(models.Model):
     profile_pic = models.CharField(_("Profile Pic"), max_length=1000, blank=True)
     name = models.CharField(_("Name"), max_length=100, blank=True)
     bio = models.CharField(_("Bio"), max_length=300, blank=True)
-    d_o_b = models.CharField(_("Date of Birth"), max_length=100, blank=True)
+    d_o_b = models.CharField(_("Date of Birth"), max_length=100, blank=True, null = True)
     gender = models.CharField(choices=gender_option, blank = True, null = True, max_length=10, default='')
     about = models.CharField(_("About"), max_length=500, blank=True)
     language = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='1')
