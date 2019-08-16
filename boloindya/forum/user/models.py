@@ -180,13 +180,11 @@ class ReferralCode(RecordTimeStamp):
         return str(self.code)
 
     def save(self, *args, **kwargs):
-        self.campaign_url = 'https://play.google.com/store/apps/details?id=com.boloindya.boloindya&\
-                    referrer=utm_source%3D' + self.code + '%26utm_medium%3Dcpc%26anid%3Dadmob'
+        self.campaign_url = 'https://play.google.com/store/apps/details?id=com.boloindya.boloindya&referrer=utm_source%3D' + self.code + '%26utm_medium%3Dcpc%26anid%3Dadmob'
         super(ReferralCode, self).save(*args, **kwargs)
 
     def playstore_url(self):
-        return '<b>playstore URL - </b> https://play.google.com/store/apps/details?id=com.boloindya.boloindya&\
-                    referrer=utm_source%3D' + self.code + '%26utm_medium%3Dcpc%26anid%3Dadmob'
+        return '<b>playstore URL - </b> https://play.google.com/store/apps/details?id=com.boloindya.boloindya&referrer=utm_source%3D' + self.code + '%26utm_medium%3Dcpc%26anid%3Dadmob'
     playstore_url.allow_tags = True
 
     def no_playstore_url(self):
