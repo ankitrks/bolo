@@ -1499,25 +1499,18 @@ def shareontimeline(request):
     post:
         Required Parameters
         topic_id = request.POST.get('topic_id',None)
-        comment_id = request.POST.get('comment_id',None)
+        topic_id = request.POST.get('topic_id',None)
         share_on = request.POST.get('share_on',None)
     """
     topic_id = request.POST.get('topic_id',None)
-    comment_id = request.POST.get('comment_id',None)
     share_on = request.POST.get('share_on',None)
     userprofile = UserProfile.objects.get(user = request.user)
     if share_on == 'share_timeline':
         try:
-            liked = ShareTopic.objects.create(topic_id = topic_id,comment_id = comment_id,user = request.user)
+            shared = ShareTopic.objects.create(topic_id = topic_id,user = request.user)
             add_bolo_score(request.user.id, 'share_timeline', liked)
-            if comment_id:
-                comment = Comment.objects.get(pk = comment_id)
-                comment.share_count = F('share_count')+1
-                comment.save()
-                topic = comment.topic
-            else:
-                topic = Topic.objects.get(pk = topic_id)
-                topic.share_count = F('share_count')+1
+            topic = Topic.objects.get(pk = topic_id)
+            topic.share_count = F('share_count')+1
             topic.total_share_count = F('total_share_count')+1
             topic.save()
             userprofile.share_count = F('share_count')+1
@@ -1527,15 +1520,9 @@ def shareontimeline(request):
             return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
     elif share_on == 'facebook_share':
         try:
-            liked = SocialShare.objects.create(topic_id = topic_id,comment_id = comment_id,user = request.user,share_type = '0')
-            if comment_id:
-                comment = Comment.objects.get(pk = comment_id)
-                comment.share_count = F('share_count')+1
-                comment.save()
-                topic= comment.topic
-            else:
-                topic = Topic.objects.get(pk = topic_id)
-                topic.share_count = F('share_count')+1    
+            shared = SocialShare.objects.create(topic_id = topic_id,user = request.user,share_type = '0')
+            topic = Topic.objects.get(pk = topic_id)
+            topic.facebook_share_count = F('facebook_share_count')+1    
             topic.total_share_count = F('total_share_count')+1
             topic.save()
             add_bolo_score(request.user.id, 'facebook_share', topic)
@@ -1546,21 +1533,28 @@ def shareontimeline(request):
             return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
     elif share_on == 'whatsapp_share':
         try:
-            liked = SocialShare.objects.create(topic_id = topic_id,comment_id = comment_id,user = request.user,share_type = '1')
-            if comment_id:
-                comment = Comment.objects.get(pk = comment_id)
-                comment.share_count = F('share_count')+1
-                comment.save()
-                topic = comment.topic
-            else:
-                topic = Topic.objects.get(pk = topic_id)
-                topic.share_count = F('share_count')+1
+            shared = SocialShare.objects.create(topic_id = topic_id,user = request.user,share_type = '1')
+            topic = Topic.objects.get(pk = topic_id)
+            topic.whatsapp_share_count = F('whatsapp_share_count')+1
             topic.total_share_count = F('total_share_count')+1
             topic.save()
             add_bolo_score(request.user.id, 'whatsapp_share', topic)
             userprofile.share_count = F('share_count')+1
             userprofile.save()
             return JsonResponse({'message': 'whatsapp shared'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+    elif share_on == 'linkedin_share':
+        try:
+            shared = SocialShare.objects.create(topic_id = topic_id,user = request.user,share_type = '2')
+            topic = Topic.objects.get(pk = topic_id)
+            topic.linkedin_share_count = F('linkedin_share_count')+1
+            topic.total_share_count = F('total_share_count')+1
+            topic.save()
+            add_bolo_score(request.user.id, 'linkedin_share', topic)
+            userprofile.share_count = F('share_count')+1
+            userprofile.save()
+            return JsonResponse({'message': 'linkedin shared'}, status=status.HTTP_200_OK)
         except Exception as e:
             return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 

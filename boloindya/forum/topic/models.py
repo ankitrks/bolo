@@ -111,6 +111,10 @@ class Topic(models.Model):
     likes_count = models.PositiveIntegerField(_("Likes count"), default=0)
     is_monetized = models.BooleanField(_("Is Monetized?"), default=True)
 
+    whatsapp_share_count = models.PositiveIntegerField(null=True,blank=True,default=0)
+    linkedin_share_count = models.PositiveIntegerField(null=True,blank=True,default=0)
+    facebook_share_count = models.PositiveIntegerField(null=True,blank=True,default=0)
+
     backup_url = models.TextField(_("backup url"), blank = True)
     is_transcoded = models.BooleanField(default = False)
     is_transcoded_error = models.BooleanField(default = False)
@@ -360,6 +364,7 @@ class Like(UserInfo):
 share_type_options = (
     ('0', "facebook"),
     ('1', "whatsapp"),
+    ('2', "linkedin"),
 )
 class SocialShare(UserInfo):
     share_type = models.CharField(choices=share_type_options, blank = True, null = True, max_length=10)
