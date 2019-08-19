@@ -1251,6 +1251,9 @@ def fb_profile_settings(request):
     activity        = request.POST.get('activity',None)
     language        = request.POST.get('language',None)
     is_geo_location = request.POST.get('is_geo_location',None)
+    likedin_url = request.POST.get('likedin_url',None)
+    instagarm_id = request.POST.get('instagarm_id',None)
+    twitter_id = request.POST.get('twitter_id',None)
     d_o_b = request.POST.get('d_o_b',None)
     gender = request.POST.get('gender',None)
     click_id = request.POST.get('click_id',None)
@@ -1292,6 +1295,10 @@ def fb_profile_settings(request):
                 userprofile.extra_data = extra_data
                 userprofile.user = user
                 userprofile.bolo_score += 95
+                userprofile.linkedin_url = likedin_url
+                userprofile.twitter_id = twitter_id
+                userprofile.instagarm_id = instagarm_id
+
                 # userprofile.follow_count += 1
                 if str(is_geo_location) =="1":
                     userprofile.lat = lat
@@ -1321,6 +1328,9 @@ def fb_profile_settings(request):
                 userprofile.d_o_b = d_o_b
                 userprofile.gender = gender
                 userprofile.profile_pic =profile_pic
+                userprofile.linkedin_url = likedin_url
+                userprofile.twitter_id = twitter_id
+                userprofile.instagarm_id = instagarm_id
                 userprofile.save()
                 if username:
                     check_username = User.objects.filter(username = username).exclude(pk =request.user.id)
@@ -1336,6 +1346,9 @@ def fb_profile_settings(request):
         elif activity == 'settings_changed':
             try:
                 userprofile = UserProfile.objects.get(user = request.user)
+                userprofile.linkedin_url = likedin_url
+                userprofile.twitter_id = twitter_id
+                userprofile.instagarm_id = instagarm_id
                 if sub_category_prefrences:
                     for each_sub_category in sub_category_prefrences:
                         category = Category.objects.get(pk = each_sub_category)
