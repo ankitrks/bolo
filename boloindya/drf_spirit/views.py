@@ -1557,7 +1557,19 @@ def shareontimeline(request):
             return JsonResponse({'message': 'linkedin shared'}, status=status.HTTP_200_OK)
         except Exception as e:
             return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
-
+    elif share_on == 'twitter_share':
+        try:
+            shared = SocialShare.objects.create(topic_id = topic_id,user = request.user,share_type = '3')
+            topic = Topic.objects.get(pk = topic_id)
+            topic.twitter_share_count = F('twitter_share_count')+1
+            topic.total_share_count = F('total_share_count')+1
+            topic.save()
+            add_bolo_score(request.user.id, 'twitter_share', topic)
+            userprofile.share_count = F('share_count')+1
+            userprofile.save()
+            return JsonResponse({'message': 'twitter shared'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
 def comment_view(request):
     topic_id = request.GET.get('topic_id',None)
