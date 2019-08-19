@@ -83,6 +83,10 @@ class UserProfile(models.Model):
     lat = models.CharField(_('Latitude'), blank=True, null=True, max_length = 50, default = '')
     lang = models.CharField(_('Langitude'), blank=True, null=True, max_length = 50, default = '')
     is_test_user = models.BooleanField(default=False)
+    
+    linkedin_url = models.CharField(_("LinkedIn URL"), max_length=200, blank=True)
+    twitter_url = models.CharField(_("Twitter URL"), max_length=200, blank=True)
+    Instagarm_ID = models.CharField(_("Instagram ID"), max_length=200, blank=True)
 
     click_id = models.CharField(_("Click Id"), max_length=300, blank=True)
     click_id_response = models.TextField(_("Click Id Response"),null=True, blank=True)

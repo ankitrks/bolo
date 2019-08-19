@@ -1567,6 +1567,9 @@ def comment_view(request):
         # topic= comment.topic
         topic.view_count = F('view_count') +1
         topic.save()
+        userprofile = topic.user.st
+        userprofile.view_count = F('view_count')+1
+        userprofile.save()
         return JsonResponse({'message': 'item viewed'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
@@ -1588,6 +1591,9 @@ def vb_seen(request):
         # topic= comment.topic
         topic.view_count = F('view_count')+1
         topic.save()
+        userprofile = topic.user.st
+        userprofile.view_count = F('view_count')+1
+        userprofile.save()
         vbseen,is_created = VBseen.objects.get_or_create(user = request.user,topic_id = topic_id)
         return JsonResponse({'message': 'vb seen'}, status=status.HTTP_200_OK)
     except Exception as e:
