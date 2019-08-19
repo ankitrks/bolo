@@ -114,6 +114,7 @@ class Topic(models.Model):
     whatsapp_share_count = models.PositiveIntegerField(null=True,blank=True,default=0)
     linkedin_share_count = models.PositiveIntegerField(null=True,blank=True,default=0)
     facebook_share_count = models.PositiveIntegerField(null=True,blank=True,default=0)
+    twitter_share_count = models.PositiveIntegerField(null=True,blank=True,default=0)
 
     backup_url = models.TextField(_("backup url"), blank = True)
     is_transcoded = models.BooleanField(default = False)
@@ -365,6 +366,7 @@ share_type_options = (
     ('0', "facebook"),
     ('1', "whatsapp"),
     ('2', "linkedin"),
+    ('2', "twitter"),
 )
 class SocialShare(UserInfo):
     share_type = models.CharField(choices=share_type_options, blank = True, null = True, max_length=10)
