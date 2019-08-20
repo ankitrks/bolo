@@ -1251,6 +1251,9 @@ def fb_profile_settings(request):
     activity        = request.POST.get('activity',None)
     language        = request.POST.get('language',None)
     is_geo_location = request.POST.get('is_geo_location',None)
+    likedin_url = request.POST.get('likedin_url',None)
+    instagarm_id = request.POST.get('instagarm_id',None)
+    twitter_id = request.POST.get('twitter_id',None)
     d_o_b = request.POST.get('d_o_b',None)
     gender = request.POST.get('gender',None)
     click_id = request.POST.get('click_id',None)
@@ -1292,6 +1295,10 @@ def fb_profile_settings(request):
                 userprofile.extra_data = extra_data
                 userprofile.user = user
                 userprofile.bolo_score += 95
+                userprofile.linkedin_url = likedin_url
+                userprofile.twitter_id = twitter_id
+                userprofile.instagarm_id = instagarm_id
+
                 # userprofile.follow_count += 1
                 if str(is_geo_location) =="1":
                     userprofile.lat = lat
@@ -1321,6 +1328,9 @@ def fb_profile_settings(request):
                 userprofile.d_o_b = d_o_b
                 userprofile.gender = gender
                 userprofile.profile_pic =profile_pic
+                userprofile.linkedin_url = likedin_url
+                userprofile.twitter_id = twitter_id
+                userprofile.instagarm_id = instagarm_id
                 userprofile.save()
                 if username:
                     check_username = User.objects.filter(username = username).exclude(pk =request.user.id)
@@ -1336,6 +1346,9 @@ def fb_profile_settings(request):
         elif activity == 'settings_changed':
             try:
                 userprofile = UserProfile.objects.get(user = request.user)
+                userprofile.linkedin_url = likedin_url
+                userprofile.twitter_id = twitter_id
+                userprofile.instagarm_id = instagarm_id
                 if sub_category_prefrences:
                     for each_sub_category in sub_category_prefrences:
                         category = Category.objects.get(pk = each_sub_category)
@@ -1486,25 +1499,18 @@ def shareontimeline(request):
     post:
         Required Parameters
         topic_id = request.POST.get('topic_id',None)
-        comment_id = request.POST.get('comment_id',None)
+        topic_id = request.POST.get('topic_id',None)
         share_on = request.POST.get('share_on',None)
     """
     topic_id = request.POST.get('topic_id',None)
-    comment_id = request.POST.get('comment_id',None)
     share_on = request.POST.get('share_on',None)
     userprofile = UserProfile.objects.get(user = request.user)
     if share_on == 'share_timeline':
         try:
-            liked = ShareTopic.objects.create(topic_id = topic_id,comment_id = comment_id,user = request.user)
+            shared = ShareTopic.objects.create(topic_id = topic_id,user = request.user)
             add_bolo_score(request.user.id, 'share_timeline', liked)
-            if comment_id:
-                comment = Comment.objects.get(pk = comment_id)
-                comment.share_count = F('share_count')+1
-                comment.save()
-                topic = comment.topic
-            else:
-                topic = Topic.objects.get(pk = topic_id)
-                topic.share_count = F('share_count')+1
+            topic = Topic.objects.get(pk = topic_id)
+            topic.share_count = F('share_count')+1
             topic.total_share_count = F('total_share_count')+1
             topic.save()
             userprofile.share_count = F('share_count')+1
@@ -1514,15 +1520,9 @@ def shareontimeline(request):
             return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
     elif share_on == 'facebook_share':
         try:
-            liked = SocialShare.objects.create(topic_id = topic_id,comment_id = comment_id,user = request.user,share_type = '0')
-            if comment_id:
-                comment = Comment.objects.get(pk = comment_id)
-                comment.share_count = F('share_count')+1
-                comment.save()
-                topic= comment.topic
-            else:
-                topic = Topic.objects.get(pk = topic_id)
-                topic.share_count = F('share_count')+1    
+            shared = SocialShare.objects.create(topic_id = topic_id,user = request.user,share_type = '0')
+            topic = Topic.objects.get(pk = topic_id)
+            topic.facebook_share_count = F('facebook_share_count')+1    
             topic.total_share_count = F('total_share_count')+1
             topic.save()
             add_bolo_score(request.user.id, 'facebook_share', topic)
@@ -1533,15 +1533,9 @@ def shareontimeline(request):
             return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
     elif share_on == 'whatsapp_share':
         try:
-            liked = SocialShare.objects.create(topic_id = topic_id,comment_id = comment_id,user = request.user,share_type = '1')
-            if comment_id:
-                comment = Comment.objects.get(pk = comment_id)
-                comment.share_count = F('share_count')+1
-                comment.save()
-                topic = comment.topic
-            else:
-                topic = Topic.objects.get(pk = topic_id)
-                topic.share_count = F('share_count')+1
+            shared = SocialShare.objects.create(topic_id = topic_id,user = request.user,share_type = '1')
+            topic = Topic.objects.get(pk = topic_id)
+            topic.whatsapp_share_count = F('whatsapp_share_count')+1
             topic.total_share_count = F('total_share_count')+1
             topic.save()
             add_bolo_score(request.user.id, 'whatsapp_share', topic)
@@ -1550,7 +1544,32 @@ def shareontimeline(request):
             return JsonResponse({'message': 'whatsapp shared'}, status=status.HTTP_200_OK)
         except Exception as e:
             return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
-
+    elif share_on == 'linkedin_share':
+        try:
+            shared = SocialShare.objects.create(topic_id = topic_id,user = request.user,share_type = '2')
+            topic = Topic.objects.get(pk = topic_id)
+            topic.linkedin_share_count = F('linkedin_share_count')+1
+            topic.total_share_count = F('total_share_count')+1
+            topic.save()
+            add_bolo_score(request.user.id, 'linkedin_share', topic)
+            userprofile.share_count = F('share_count')+1
+            userprofile.save()
+            return JsonResponse({'message': 'linkedin shared'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+    elif share_on == 'twitter_share':
+        try:
+            shared = SocialShare.objects.create(topic_id = topic_id,user = request.user,share_type = '3')
+            topic = Topic.objects.get(pk = topic_id)
+            topic.twitter_share_count = F('twitter_share_count')+1
+            topic.total_share_count = F('total_share_count')+1
+            topic.save()
+            add_bolo_score(request.user.id, 'twitter_share', topic)
+            userprofile.share_count = F('share_count')+1
+            userprofile.save()
+            return JsonResponse({'message': 'twitter shared'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
 def comment_view(request):
     topic_id = request.GET.get('topic_id',None)
@@ -1567,6 +1586,9 @@ def comment_view(request):
         # topic= comment.topic
         topic.view_count = F('view_count') +1
         topic.save()
+        userprofile = topic.user.st
+        userprofile.view_count = F('view_count')+1
+        userprofile.save()
         return JsonResponse({'message': 'item viewed'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
@@ -1588,6 +1610,9 @@ def vb_seen(request):
         # topic= comment.topic
         topic.view_count = F('view_count')+1
         topic.save()
+        userprofile = topic.user.st
+        userprofile.view_count = F('view_count')+1
+        userprofile.save()
         vbseen,is_created = VBseen.objects.get_or_create(user = request.user,topic_id = topic_id)
         return JsonResponse({'message': 'vb seen'}, status=status.HTTP_200_OK)
     except Exception as e:
