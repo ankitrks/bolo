@@ -860,6 +860,8 @@ def createTopic(request):
     media_duration  = request.POST.get('media_duration', '')
     question_image  = request.POST.get('question_image', '')
     is_vb = request.POST.get('is_vb',False)
+    vb_width = request.POST.get('vb_width',0)
+    vb_height = request.POST.get('vb_height',0)
     # media_file = request.FILES.get['media']
     # print media_file
 
@@ -883,6 +885,8 @@ def createTopic(request):
             topic.is_vb = True
             topic.media_duration = media_duration
             topic.question_image = question_image
+            topic.vb_width = vb_width
+            topic.vb_height = vb_height
             topic.view_count = random.randint(1,49)
             topic.update_vb()
         else:
