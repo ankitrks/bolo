@@ -110,6 +110,8 @@ class Topic(models.Model):
     is_vb = models.BooleanField(_("Is Video Bytes"), default=False)
     likes_count = models.PositiveIntegerField(_("Likes count"), default=0)
     is_monetized = models.BooleanField(_("Is Monetized?"), default=True)
+    vb_width = models.PositiveIntegerField(_("vb width"), default=0)
+    vb_height = models.PositiveIntegerField(_("vb height"), default=0)
 
     whatsapp_share_count = models.PositiveIntegerField(null=True,blank=True,default=0)
     linkedin_share_count = models.PositiveIntegerField(null=True,blank=True,default=0)
