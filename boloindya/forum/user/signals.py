@@ -6,6 +6,7 @@ from django.db.models.signals import post_save
 from django.contrib.auth import get_user_model
 
 from .models import UserProfile
+from forum.userkyc.models import UserKYC
 
 User = get_user_model()
 
@@ -15,6 +16,8 @@ def update_or_create_user_profile(sender, instance, created, **kwargs):
 
     if created:
         UserProfile.objects.create(user=user)
+        UserKYC.objects.create(user=user)
+
     else:
         user.st.save()
 

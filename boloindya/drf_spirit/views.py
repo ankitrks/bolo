@@ -22,6 +22,7 @@ from .serializers import TopicSerializer, CategorySerializer, CommentSerializer,
 UserAnswerSerializerwithComment,CricketMatchSerializer,PollSerializer,ChoiceSerializer,VotingSerializer,LeaderboardSerializer,\
 PollSerializerwithChoice, OnlyChoiceSerializer, NotificationSerializer, UserProfileSerializer, TongueTwisterSerializer
 from forum.topic.models import Topic,ShareTopic,Like,SocialShare,FCMDevice,Notification,CricketMatch,Poll,Choice,Voting,Leaderboard,VBseen,TongueTwister
+from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.category.models import Category
 from forum.comment.models import Comment
 from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs
@@ -1367,6 +1368,41 @@ def fb_profile_settings(request):
                 return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+#### KYC Views ####
+@api_view(['POST'])
+def save_kyc_basic_info(request):
+    try:
+        first_name = request.POST.get('first_name',None)
+        middle_name = request.POST.get('middle_name',None)
+        lastname_name = request.POST.get('lastname_name',None)
+        d_o_b = request.POST.get('d_o_b',None)
+        mobile_no = request.POST.get('mobile_no',None)
+        email = request.POST.get('email',None)
+        data_dict = {
+        'first_name':first_name,
+        'middle_name':middle_name,
+        'lastname_name':lastname_name,
+        'd_o_b':d_o_b,
+        'mobile_no':mobile_no,
+        'email':email,
+        'user':request.user
+        }
+        if not (first_name and d_o_b and (mobile_no or email)):
+            return JsonResponse({'message': 'Mandatory Data Missing'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_kyc,is_created = UserKYC.objects.get_or_create(user=request.user)
+        if is_created:
+            kyc_basic_info = KYCBasicInfo.objects.create(**data_dict)
+        else:
+            kyc_basic_info = KYCBasicInfo.objects.get_or_create(user=request.user)
+
+
+    except Exception as e:
+        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 
 def generate_username(first,last,num_of_users):
         username=first+last+str(num_of_users)
