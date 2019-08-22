@@ -102,4 +102,5 @@ urlpatterns = [
     url(r'^topics/', include(topic_urls)),
     url(r'^get_hash_list/$',get_hash_list,name='get_hash_list'),
     url(r'^sync/dump/',SyncDump,name='sync_dump'),
+    url(r'^user/statistics/$', user_statistics, name = 'user_statistics'),          # url for dumping values in user statistics table
 ]
