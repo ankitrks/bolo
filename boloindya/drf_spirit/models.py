@@ -184,6 +184,7 @@ class UserJarvisDump(models.Model):
     dump = models.TextField(_("User Dump"),null=True,blank=True)
     dump_type = models.CharField(_("Dump Type"),choices=DUMP_TYPE,max_length=50)
     sync_time = models.DateTimeField(_("Sync Time"),auto_now=False,auto_now_add=True,blank=False,null=False)
+    is_executed = models.BooleanField(_("Is Executed"), default=False)
 
     def __unicode__(self):
         return str(self.user_dump)

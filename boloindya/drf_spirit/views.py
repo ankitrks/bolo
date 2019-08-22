@@ -1926,19 +1926,21 @@ def get_cloudfront_url(instance):
 @csrf_exempt
 @api_view(['POST'])
 def SyncDump(request):
-    if request.method == "POST":
-        user = request.user
-        dump = request.POST.get('dump')
-        dump_type = request.POST.get('dump_type')
+    if request.user:
+        if request.method == "POST":
+            user = request.user
+            dump = request.POST.get('dump')
+            dump_type = request.POST.get('dump_type')
 
-        #Storing the dump in database
-        try:
-            stored_data = UserJarvisDump(user=user, dump=dump, dump_type=dump_type)
-            stored_data.save()
-            return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)    
-        except Exception as e:
-            return JsonResponse({'message' : 'fail','error':str(e)})
-    return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)    
+            #Storing the dump in database
+            try:
+                stored_data = UserJarvisDump(user=user, dump=dump, dump_type=dump_type)
+                stored_data.save()
+                return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)    
+            except Exception as e:
+                return JsonResponse({'message' : 'fail','error':str(e)})
+    else:
+        return JsonResponse({'messgae' : 'user_missing'})
 
 @api_view(['POST'])
 def save_android_logs(request):
