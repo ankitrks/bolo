@@ -4,7 +4,8 @@ from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,c
 	verify_otp, password_set, fb_profile_settings,Usertimeline,follow_user,follow_sub_category,like,shareontimeline,GetProfile,SubCategoryList,upload_video_to_s3,comment_view,\
     follow_like_list,upload_audio_to_s3,reply_delete,editTopic,topic_delete,notification_topic,GetUserProfile,RegisterDevice,UnregisterDevice,NotificationAPI,get_bolo_score,\
     GetTopic,GetQuestion,GetAnswers,CricketMatchList,get_single_match,get_single_poll,predict,LeaderBoradList,vb_seen,VBList,ExpertList,GetHomeAnswer,transcoder_notification,\
-    vb_transcode_status,get_follow_user,upload_profile_image,get_following_list,get_follower_list,GetChallenge,GetChallengeDetails,save_android_logs,SyncDump,get_hash_list
+    vb_transcode_status,get_follow_user,upload_profile_image,get_following_list,get_follower_list,GetChallenge,GetChallengeDetails,save_android_logs,SyncDump,get_hash_list,\
+    KYCDocumentTypeList
 from rest_framework_simplejwt import views as jwt_views
 
 app_name = 'drf_spirit'
@@ -51,6 +52,7 @@ urlpatterns = [
     url(r'^create_topic', include(createtopic_urls)),
     url(r'^reply_on_topic', include(replyontopic_urls)),
     url(r'^categories/', include(category_urls)),
+    url(r'^kyc_document_types/', KYCDocumentTypeList.as_view(), name='kyc_document_types'),
     url(r'^comments/', include(comment_urls)),
     url(r'^upload_profile_image$', upload_profile_image, name='upload_profile_image'),
     

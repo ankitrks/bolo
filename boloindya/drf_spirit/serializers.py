@@ -11,6 +11,7 @@ from .models import SingUpOTP
 from .utils import shortnaturaltime,shortcounterprofile,shorcountertopic
 from django.conf import settings
 import re
+from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 
 cloufront_url = "https://d1fa4tg1fvr6nj.cloudfront.net"
 class CategorySerializer(ModelSerializer):
@@ -348,5 +349,10 @@ class LeaderboardSerializer(ModelSerializer):
 
     def get_user(self,instance):
         return UserSerializer(instance.user).data 
+
+class KYCDocumnetsTypeSerializer(ModelSerializer):
+    class Meta:
+        model = KYCDocumentType
+        fields = '__all__'
 
       

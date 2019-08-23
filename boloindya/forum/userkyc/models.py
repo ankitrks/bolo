@@ -5,6 +5,10 @@ from django.utils.translation import ugettext_lazy as _
 from forum.topic.models import RecordTimeStamp, UserInfo
 
 class UserKYC(UserInfo):
+    mode_of_transaction_options = (
+    ('1', "Bank Account"),
+    ('2', "Paytm Wallet"),
+    )
     kyc_basic_info_submitted = models.BooleanField(default = False)
     is_kyc_basic_info_accepted = models.BooleanField(default = False)
     kyc_document_info_submitted = models.BooleanField(default = False)
@@ -15,8 +19,11 @@ class UserKYC(UserInfo):
     is_kyc_selfie_info_accepted = models.BooleanField(default = False)
     kyc_additional_info_submitted = models.BooleanField(default = False)
     is_kyc_additional_info_accepted = models.BooleanField(default = False)
+    kyc_bank_details_submitted = models.BooleanField(default = False)
+    is_kyc_bank_details_accepted = models.BooleanField(default = False)
     is_kyc_completed = models.BooleanField(default = False)
     is_kyc_accepted = models.BooleanField(default = False)
+    mode_of_transaction = models.CharField(choices=mode_of_transaction_options, blank = True, null = True, max_length=10, default='1')
     # last_step_performed = model.CharField(to get know the last step of user )
 
     def __unicode__(self):
@@ -30,7 +37,7 @@ class UserKYC(UserInfo):
 class KYCBasicInfo(UserInfo):
     first_name = models.CharField(_("First Name"), max_length=255, blank=True)
     middle_name = models.CharField(_("Middle Name"), max_length=255, blank=True)
-    lastname_name = models.CharField(_("Last Name"), max_length=255, blank=True)
+    last_name = models.CharField(_("Last Name"), max_length=255, blank=True)
     d_o_b = models.DateField(auto_now_add = False, auto_now = False, blank = True, null = True)
     mobile_no = models.CharField(_("Mobile No"), max_length=100, blank = True, null = True)
     is_mobile_verified = models.BooleanField(default = False)
@@ -97,8 +104,10 @@ class AdditionalInfo(UserInfo):
 
 class BankDetail(UserInfo):
     bank_name = models.CharField(_("Bank Name"), max_length=255, blank=True)# later it will be replaced with the choice field
+    account_name = models.CharField(_("Account Holder Name"), max_length=255, blank=True)
     account_number = models.CharField(_("Account Number"), max_length=255, blank=True)
     IFSC_code = models.CharField(_("IFSC Code"), max_length=255, blank=True)# prevalidate in backend and allow to seacrh in frontedn
+    paytm_number = models.CharField(_("Paytm Mobile No"), max_length=100, blank = True, null = True)
 
     def __unicode__(self):
         return self.user.username

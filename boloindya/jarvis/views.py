@@ -21,6 +21,8 @@ from forum.topic.models import Topic
 from forum.category.models import Category
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
+
 
 
 def upload_tos3(file_name,bucket):
@@ -237,3 +239,24 @@ def transcode_media_file(input_key,file_name):
 
 def uploaddata(request):
     return HttpResponse()
+
+def get_kyc_user_list(request):
+    if request.user.is_superuser:
+        all_kyc = UserKYC.objects.all()
+        return render(request,'admin/jarvis/userkyc/user_kyc_list.html',{'all_kyc':all_kyc})
+
+def get_kyc_of_user(request):
+    if request.user.is_superuser:
+        username = request.GET.get('username',None)
+        kyc_user = User.objects.get(username=username)
+        kyc_details = UserKYC.objects.filter(user=kyc_user)
+        kyc_basic_info = KYCBasicInfo.objects.filter(user=kyc_user)
+        kyc_document = KYCDocument.objects.filter(user=kyc_user,is_active=True)
+        additional_info = AdditionalInfo.objects.filter(user=kyc_user)
+        bank_details = BankDetail.objects.filter(user=kyc_user,is_active=True)
+        return render(request,'admin/jarvis/userkyc/single_kyc.html',{'kyc_details':kyc_details,'kyc_basic_info':kyc_basic_info,'kyc_document':kyc_document,'additional_info':additional_info,'bank_details':bank_details,'userprofile':kyc_user.st})
+
+
+
+
+
