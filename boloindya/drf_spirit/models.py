@@ -181,13 +181,13 @@ class UserJarvisDump(models.Model):
     ]
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL,related_name='User',editable=False)
-    dump = models.TextField(_("User Dump"),null=True,blank=True)
-    dump_type = models.CharField(_("Dump Type"),choices=DUMP_TYPE,max_length=50)
-    sync_time = models.DateTimeField(_("Sync Time"),auto_now=False,auto_now_add=True,blank=False,null=False)
-    is_executed = models.BooleanField(_("Is Executed"), default=False)
+    dump = models.TextField(_("dump"),null=True,blank=True)
+    dump_type = models.CharField(_("dump_type"),choices=DUMP_TYPE,max_length=50)
+    sync_time = models.DateTimeField(_("sync_time"),auto_now=False,auto_now_add=True,blank=False,null=False)
+    is_executed = models.BooleanField(_("is_executed"), default=False)
 
     def __unicode__(self):
-        return str(self.user_dump)
+        return "%s" % self.dump
 
     
 # code created by akash
