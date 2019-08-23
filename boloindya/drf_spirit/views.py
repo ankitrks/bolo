@@ -1058,6 +1058,7 @@ class EncashableDetailList(generics.ListAPIView):
         all_encash_detail = EncashableDetail.objects.filter(user = request.user)
         return all_encash_detail
 
+
 class SubCategoryList(generics.ListAPIView):
     """
     post:

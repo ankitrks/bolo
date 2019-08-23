@@ -391,5 +391,4 @@ class PaymentInfoSerializer(ModelSerializer):
     class Meta:
         model = PaymentInfo
         fields = '__all__'
-
       
