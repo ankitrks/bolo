@@ -1330,10 +1330,10 @@ def fb_profile_settings(request):
                 userprofile.bio = bio
                 userprofile.about = about
                 if not userprofile.d_o_b and d_o_b:
-                    add_bolo_score(user.id, 'dob_added', userprofile)
+                    add_bolo_score(userprofile.user.id, 'dob_added', userprofile)
                 userprofile.d_o_b = d_o_b
                 if not userprofile.gender and gender:
-                    add_bolo_score(user.id, 'gender_added', userprofile)
+                    add_bolo_score(userprofile.user.id, 'gender_added', userprofile)
                 userprofile.gender = gender
                 userprofile.profile_pic =profile_pic
                 userprofile.linkedin_url = likedin_url
