@@ -22,6 +22,8 @@ from forum.category.models import Category
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
+from django.conf import settings
+
 
 
 
@@ -254,7 +256,24 @@ def get_kyc_of_user(request):
         kyc_document = KYCDocument.objects.filter(user=kyc_user,is_active=True)
         additional_info = AdditionalInfo.objects.filter(user=kyc_user)
         bank_details = BankDetail.objects.filter(user=kyc_user,is_active=True)
-        return render(request,'admin/jarvis/userkyc/single_kyc.html',{'kyc_details':kyc_details,'kyc_basic_info':kyc_basic_info,'kyc_document':kyc_document,'additional_info':additional_info,'bank_details':bank_details,'userprofile':kyc_user.st})
+        return render(request,'admin/jarvis/userkyc/single_kyc.html',{'kyc_details':kyc_details,'kyc_basic_info':kyc_basic_info,'kyc_document':kyc_document,'additional_info':additional_info,'bank_details':bank_details,'userprofile':kyc_user.st,'user':user})
+
+
+def SecretFileView(request):
+    u = request.user
+    filepath = request.GET.get('url').split('https://'+settings.AWS_STORAGE_BUCKET_NAME+'.s3.amazonaws.com/')[0]
+    print filepath,"##################"
+    if u.is_authenticated() and  u.is_staff:
+        client = boto3.client('s3',aws_access_key_id = settings.AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.AWS_SECRET_ACCESS_KEY)
+        # s3 = S3Connection(settings.AWS_ACCESS_KEY_ID,
+        #                     settings.AWS_SECRET_ACCESS_KEY,
+        #                     is_secure=True)
+        # Create a URL valid for 60 seconds.
+        return client.generate_url(60, 'GET',
+                            bucket=settings.AWS_STORAGE_BUCKET_NAME,
+                            key=filepath,
+                            force_http=True)
+
 
 
 

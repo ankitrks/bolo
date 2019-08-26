@@ -1,3 +1,4 @@
+{% load kyc_template_tag %}
 {% extends "admin/jarvis/base.html" %}
 {% block content %}
     <div>
@@ -77,7 +78,7 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="w3-card-4 test" style="width:100%;margin: 0 auto;">
-                                    <img src="{{userprofile.profile_pic}}" alt="Avatar" style="width:100%;margin: 0 auto;">
+                                    <img src="{% url  SecretFileView %}?url=https://thumbnailsnew1.s3.amazonaws.com/careerannafinal/careeranna/-00001.png" alt="Avatar" style="width:100%;margin: 0 auto;">
                                 </div>
                             </div>
                         </div>
@@ -169,7 +170,7 @@
                                                             </div>
                                                             <div class="box-body">
                                                                 <div class="row">
-                                                                    <img src="">
+                                                                    <img src="{{each_document.frontside_url|get_safe_url:user}}">
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -184,7 +185,7 @@
                                                             </div>
                                                             <div class="box-body">
                                                                 <div class="row">
-                                                                    <img src="">
+                                                                    <img src="{{each_document.backside_url|get_safe_url:user}}">
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -200,7 +201,7 @@
                                                             </div>
                                                             <div class="box-body">
                                                                 <div class="row">
-                                                                    <img src="">
+                                                                    <img src="{{each_document.frontside_url|get_safe_url:user}}">
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -224,7 +225,7 @@
                     <div class="box-body">
                         <div class="box box-danger">
                             <div class="box-header">
-                                <h3 class="box-title">Documnet Info</h3>
+                                <h3 class="box-title">PAN Info</h3>
                             </div>
                             <div class="box-body">
                                 <div class="row">
@@ -239,7 +240,7 @@
                                                             </div>
                                                             <div class="box-body">
                                                                 <div class="row">
-                                                                    <img src="">
+                                                                    <img src="{{each_document.frontside_url|get_safe_url:user}}">
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -254,7 +255,7 @@
                                                             </div>
                                                             <div class="box-body">
                                                                 <div class="row">
-                                                                    <img src="">
+                                                                    <img src="{{each_document.backside_url|get_safe_url:user}}">
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -263,7 +264,18 @@
                                                 </div>
                                             {%elif each_document.kyc_document_type.no_image_required == 1 %}
                                                 <div class="col-md-12">
-                                    
+                                                    <div class="box-body">
+                                                        <div class="box box-primary">
+                                                            <div class="box-header">
+                                                                <h3 class="box-title">Doc Image</h3>
+                                                            </div>
+                                                            <div class="box-body">
+                                                                <div class="row">
+                                                                    <img src="{{each_document.frontside_url|get_safe_url:user}}">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             {% endif %}
                                         </div>

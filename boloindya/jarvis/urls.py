@@ -7,6 +7,7 @@ urlpatterns = [
     url(r'^getcsvdata/$',views.getcsvdata),
     url(r'^csvupload/$',views.uploaddata),
     url(r'^geturl/$',views.geturl),
-    url(r'^get_kyc_user_list/$',views.get_kyc_user_list),
-    url(r'^single_kyc/$',views.get_kyc_of_user)
+    url(r'^get_kyc_user_list/$',views.get_kyc_user_list,name='get_kyc_user_list'),
+    url(r'^single_kyc/$',views.get_kyc_of_user,name='get_kyc_of_user'),
+    url(r'^single_kyc/$',views.SecretFileView, name='SecretFileView')
 ]
