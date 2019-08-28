@@ -278,15 +278,14 @@ class VBList(generics.ListCreateAPIView):
 
     Required Parameters:
     title and category_id 
-    """  
-
+    """
 
     def get_queryset(self):
-        topics              = []
-        is_user_timeline    = False
-        search_term         =self.request.GET.keys()
-        filter_dic      ={}
-        sort_recent= False
+        topics = []
+        is_user_timeline = False
+        search_term = self.request.GET.keys()
+        filter_dic = {}
+        sort_recent = False
         category__slug = False
         m2mcategory__slug = False
         popular_post = False
@@ -309,8 +308,6 @@ class VBList(generics.ListCreateAPIView):
                 popular_post = True
 
             if filter_dic:
-                print filter_dic
-
                 if is_user_timeline:
                     filter_dic['is_removed'] = False
                     topics = Topic.objects.filter(**filter_dic)
