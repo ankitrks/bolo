@@ -107,6 +107,7 @@ INSTALLED_APPS = [
 
     'forum.user',
     'forum.userkyc',
+    'forum.payment',
     'forum.user.admin',
     'forum.user.auth',
 
