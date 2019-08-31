@@ -50,7 +50,20 @@ def get_tokens_for_user(user):
         'refresh': str(refresh),
         'access': str(refresh.access_token),
     }
+from random import shuffle
+from rest_framework.response import Response
+from collections import OrderedDict
 
+class ShufflePagination(LimitOffsetPagination):
+
+    def get_paginated_response(self, data):
+        shuffle(data)
+        return Response(OrderedDict([
+            ('count', self.count),
+            ('next', self.get_next_link()),
+            ('previous', self.get_previous_link()),
+            ('results', data)
+        ]))
 
 class NotificationAPI(GenericAPIView):
     permissions_classes = (IsOwnerOrReadOnly,)
@@ -263,7 +276,7 @@ class Usertimeline(generics.ListCreateAPIView):
 class VBList(generics.ListCreateAPIView):
     serializer_class   = TopicSerializerwithComment
     permission_classes = (IsOwnerOrReadOnly,)
-    pagination_class   = LimitOffsetPagination
+    pagination_class   = ShufflePagination
 
 
     """
@@ -352,22 +365,6 @@ class VBList(generics.ListCreateAPIView):
         else:
             topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-id')
         return topics
-
-from random import shuffle
-
-from rest_framework.response import Response
-from collections import OrderedDict
-
-class ShufflePagination(LimitOffsetPagination):
-
-    def get_paginated_response(self, data):
-        shuffle(data)
-        return Response(OrderedDict([
-            ('count', self.count),
-            ('next', self.get_next_link()),
-            ('previous', self.get_previous_link()),
-            ('results', data)
-        ]))
 
 
 
