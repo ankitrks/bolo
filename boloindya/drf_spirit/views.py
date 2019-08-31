@@ -20,9 +20,11 @@ from .models import UserJarvisDump
 from .permissions import IsOwnerOrReadOnly
 from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,AppVersionSerializer,UserSerializer,SingleTopicSerializerwithComment,\
 UserAnswerSerializerwithComment,CricketMatchSerializer,PollSerializer,ChoiceSerializer,VotingSerializer,LeaderboardSerializer,\
-PollSerializerwithChoice, OnlyChoiceSerializer, NotificationSerializer, UserProfileSerializer, TongueTwisterSerializer,KYCDocumnetsTypeSerializer
+PollSerializerwithChoice, OnlyChoiceSerializer, NotificationSerializer, UserProfileSerializer, TongueTwisterSerializer,KYCDocumnetsTypeSerializer,\
+PaymentCycleSerializer,EncashableDetailSerializer,PaymentInfoSerializer
 from forum.topic.models import Topic,ShareTopic,Like,SocialShare,FCMDevice,Notification,CricketMatch,Poll,Choice,Voting,Leaderboard,VBseen,TongueTwister
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
+from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 from forum.category.models import Category
 from forum.comment.models import Comment
 from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs
@@ -37,7 +39,7 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from datetime import datetime,timedelta,date
 import json
-from .utils import get_weight,add_bolo_score,shorcountertopic
+from .utils import get_weight,add_bolo_score,shorcountertopic,calculate_encashable_details
 from django.db.models import Sum
 import itertools
 import json
@@ -1034,6 +1036,15 @@ class KYCDocumentTypeList(generics.ListAPIView):
     pagination_class=None
     # permission_classes = (IsAuthenticated,)
     permission_classes  = (AllowAny,)
+
+class EncashableDetailList(generics.ListAPIView):
+    serializer_class = EncashableDetailSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        calculate_encashable_details(request.user)
+        all_encash_detail = EncashableDetail.objects.filter(user = request.user)
+        return all_encash_detail
 
 class SubCategoryList(generics.ListAPIView):
     """

@@ -17,8 +17,6 @@ from django.db.models import F,Q
 from drf_spirit.utils import reduce_bolo_score, shortnaturaltime, add_bolo_score
 from forum.user.models import UserProfile, Weight
 from django.http import JsonResponse
-from forum.payment.models import EncashableDetail
-
 from datetime import datetime,timedelta
 
 from .transcoder import transcode_media_file
@@ -57,7 +55,7 @@ class BoloActionHistory(RecordTimeStamp):
     is_removed = models.BooleanField(default=False)
     is_encashed = models.BooleanField(default=False)
     is_eligible_for_encash = models.BooleanField(default=True)
-    encashble_detail = models.ForeignKey(EncashableDetail,null=True,blank=True)
+    enchashable_detail = models.ForeignKey('forum_payment.EncashableDetail',null=True,blank=True,related_name='bolo_score_items')
     
     def __unicode__(self):
         return self.user.username

@@ -79,6 +79,7 @@ class UserProfile(models.Model):
     vb_count = models.PositiveIntegerField(null=True,blank=True,default=0)
     view_count = models.PositiveIntegerField(null=True,blank=True,default=0)
     bolo_score = models.PositiveIntegerField(null=True,blank=True,default=0)
+    encashable_bolo_score = models.PositiveIntegerField(null=True,blank=True,default=0)
     is_geo_location = models.BooleanField(default=False)
     lat = models.CharField(_('Latitude'), blank=True, null=True, max_length = 50, default = '')
     lang = models.CharField(_('Langitude'), blank=True, null=True, max_length = 50, default = '')
