@@ -1,5 +1,5 @@
-{% load kyc_template_tag %}
 {% extends "admin/jarvis/base.html" %}
+{% load kyc_template_tag %}
 {% block content %}
     <div>
         <div class="userinfo">
@@ -78,7 +78,7 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="w3-card-4 test" style="width:100%;margin: 0 auto;">
-                                    <img src="{% url  SecretFileView %}?url=https://thumbnailsnew1.s3.amazonaws.com/careerannafinal/careeranna/-00001.png" alt="Avatar" style="width:100%;margin: 0 auto;">
+                                    <img src="{{each_document.frontside_url|get_safe_url:user}}" alt="Avatar" style="width:100%;margin: 0 auto;">
                                 </div>
                             </div>
                         </div>

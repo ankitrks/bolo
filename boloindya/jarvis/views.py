@@ -24,7 +24,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
-from
 from django.conf import settings
 
 
@@ -259,7 +258,7 @@ def get_kyc_of_user(request):
         kyc_document = KYCDocument.objects.filter(user=kyc_user,is_active=True)
         additional_info = AdditionalInfo.objects.filter(user=kyc_user)
         bank_details = BankDetail.objects.filter(user=kyc_user,is_active=True)
-        return render(request,'admin/jarvis/userkyc/single_kyc.html',{'kyc_details':kyc_details,'kyc_basic_info':kyc_basic_info,'kyc_document':kyc_document,'additional_info':additional_info,'bank_details':bank_details,'userprofile':kyc_user.st,'user':user})
+        return render(request,'admin/jarvis/userkyc/single_kyc.html',{'kyc_details':kyc_details,'kyc_basic_info':kyc_basic_info,'kyc_document':kyc_document,'additional_info':additional_info,'bank_details':bank_details,'userprofile':kyc_user.st,'user':kyc_user})
 
 
 def SecretFileView(request):
@@ -278,11 +277,22 @@ def SecretFileView(request):
                             force_http=True)
 
 def get_encashable_detail(request):
+    to_be_calculated = request.GET.get("calculate",None)
     if request.user.is_superuser or request.user.is_staff:
-        for each_user in User.objects.all():
-            calculate_encashable_details(each_user)
-        all_encash_details = EncashableDetail.objects.all()
+        if to_be_calculated:
+            for each_user in User.objects.all():
+                calculate_encashable_details(each_user)
+        all_encash_details = EncashableDetail.objects.all().order_by('-bolo_score_earned')
     return render(request,'admin/jarvis/payment/encashable_detail.html',{'all_encash_details':all_encash_details})
+
+def get_single_encash_detail(request):
+    if request.user.is_superuser or request.user.is_staff:
+        username = request.GET.get('username',None)
+        user = User.objects.get(username=username)
+        kyc_details = UserKYC.objects.filter(user=user)
+        all_encash_details = EncashableDetail.objects.filter(user = user).order_by('-id')
+        return render(request,'admin/jarvis/payment/single_encash_details.html',{'all_encash_details':all_encash_details,'userprofile':user.st,'user':user,'kyc_details':kyc_details})
+
 
 
 

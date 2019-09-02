@@ -13,7 +13,7 @@ def add_to_history(user, score, action, action_object, is_removed):
 
 def get_weight_object(key):
     try:
-        return Weight.objects.get(features = key)
+        return Weight.objects.get(featuress = key)
     except:
         return None
 
@@ -129,63 +129,66 @@ def shorcountertopic(counter):
         return counter
 
 def calculate_encashable_details(user):
-    from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
-    from forum.topic.models import BoloActionHistory
-    now = datetime.now(utc if is_aware(value) else None) if not now_time else now_time
-    is_in_cycle = False
-    i=0
-    payment_cycle = PaymentCycle.objects.all().first()
-    start_date = payment_cycle.duration_start_date
-    if payment_cycle.duration_type == '1':
-        end_date = start_date + timedelta(days=payment_cycle.duration_period)
-    elif payment_cycle.duration_type == '2':
-        end_date = start_date + timedelta(days=payment_cycle.duration_period*7)
-    elif payment_cycle.duration_type == '3':
-        end_date = start_date + timedelta(days=payment_cycle.duration_period*30)
-    elif payment_cycle.duration_type == '4':
-        end_date = start_date + timedelta(days=payment_cycle.duration_period*365)
-    while not is_in_cycle:
+    try:
+        from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
+        from forum.topic.models import BoloActionHistory
+        now = datetime.now().date()
+        is_in_cycle = False
+        i=0
+        payment_cycle = PaymentCycle.objects.all().first()
+        start_date = payment_cycle.duration_start_date
         if payment_cycle.duration_type == '1':
-            start_date = payment_cycle.duration_start_date + timedelta(days=i*payment_cycle.duration_period)
             end_date = start_date + timedelta(days=payment_cycle.duration_period)
         elif payment_cycle.duration_type == '2':
-            start_date = payment_cycle.duration_start_date + timedelta(days=i*payment_cycle.duration_period*7)
             end_date = start_date + timedelta(days=payment_cycle.duration_period*7)
         elif payment_cycle.duration_type == '3':
-            start_date = payment_cycle.duration_start_date + timedelta(days=i*payment_cycle.duration_period*30)
             end_date = start_date + timedelta(days=payment_cycle.duration_period*30)
         elif payment_cycle.duration_type == '4':
-            start_date = payment_cycle.duration_start_date + timedelta(days=i*payment_cycle.duration_period*365)
             end_date = start_date + timedelta(days=payment_cycle.duration_period*365)
-        i+=1
-        if now > start_date and now <= end_date:
-            is_in_cycle = True
-    enchashable_detail,i_created = EncashableDetail.objects.get_or_create(user=user,duration_start_date = start_date,duration_end_date = end_date)
-    all_bolo_action = BoloActionHistory.objects.filter(user = user,created_at__gt = start_date,created_at__lte=end_date)
-    total_bolo_score_in_this_cycle = 0
-    all_weights = Weight.objects.all()
-    bolo_details = {}
-    for each_bolo_weight in all_weights:
-        score = 0
-        all_action_bolo_score = all_bolo_action.filter(action = each_bolo_weight)
-        if all_action_bolo_score:
-            for each_all_action_bolo_score in all_action_bolo_score:
-                score+= each_all_action_bolo_score.score
+        while not is_in_cycle:
+            if payment_cycle.duration_type == '1':
+                start_date = payment_cycle.duration_start_date + timedelta(days=i*payment_cycle.duration_period)
+                end_date = start_date + timedelta(days=payment_cycle.duration_period)
+            elif payment_cycle.duration_type == '2':
+                start_date = payment_cycle.duration_start_date + timedelta(days=i*payment_cycle.duration_period*7)
+                end_date = start_date + timedelta(days=payment_cycle.duration_period*7)
+            elif payment_cycle.duration_type == '3':
+                start_date = payment_cycle.duration_start_date + timedelta(days=i*payment_cycle.duration_period*30)
+                end_date = start_date + timedelta(days=payment_cycle.duration_period*30)
+            elif payment_cycle.duration_type == '4':
+                start_date = payment_cycle.duration_start_date + timedelta(days=i*payment_cycle.duration_period*365)
+                end_date = start_date + timedelta(days=payment_cycle.duration_period*365)
+            i+=1
+            if now > start_date and now <= end_date:
+                is_in_cycle = True
+        enchashable_detail,i_created = EncashableDetail.objects.get_or_create(user=user,duration_start_date = start_date,duration_end_date = end_date)
+        all_bolo_action = BoloActionHistory.objects.filter(user = user,created_at__gt = start_date,created_at__lte=end_date)
+        total_bolo_score_in_this_cycle = 0
+        all_weights = Weight.objects.all()
+        bolo_details = {}
+        for each_bolo_weight in all_weights:
+            score = 0
+            all_action_bolo_score = all_bolo_action.filter(action = each_bolo_weight)
+            if all_action_bolo_score:
+                for each_all_action_bolo_score in all_action_bolo_score:
+                    score+= each_all_action_bolo_score.score
 
-        bolo_details[each_bolo_weight.feature] = score
-    enchashable_detail.bolo_score_details = bolo_details
-    for each_bolo in all_bolo_action:
-        total_bolo_score_in_this_cycle +=each_bolo.score
-    userprofile = user.st
-    userprofile.encashable_bolo_score = total_bolo_score_in_this_cycle
-    userprofile.save()
-    all_bolo_action.update(enchashable_detail = enchashable_detail)
-    enchashable_detail.bolo_score_earned = total_bolo_score_in_this_cycle
-    if payment_cycle.minimum_bolo_score <= total_bolo_score_in_this_cycle:
-        enchashable_detail.is_eligible_for_encash = True
-    enchashable_detail.save()
-    non_eligible_bolo_score = BoloActionHistory.objects.filter(,created_at__lte = start_date,is_encashed=False)
-    non_eligible_bolo_score.update(is_eligible_for_encash = False)
+            bolo_details[each_bolo_weight.features] = score
+        enchashable_detail.bolo_score_details = str(bolo_details)
+        for each_bolo in all_bolo_action:
+            total_bolo_score_in_this_cycle +=each_bolo.score
+        userprofile = UserProfile.objects.get(user = user)
+        userprofile.encashable_bolo_score = total_bolo_score_in_this_cycle
+        userprofile.save()
+        all_bolo_action.update(enchashable_detail = enchashable_detail)
+        enchashable_detail.bolo_score_earned = total_bolo_score_in_this_cycle
+        if payment_cycle.minimum_bolo_score <= total_bolo_score_in_this_cycle:
+            enchashable_detail.is_eligible_for_encash = True
+        enchashable_detail.save()
+        non_eligible_bolo_score = BoloActionHistory.objects.filter(created_at__lte = start_date,is_encashed=False)
+        non_eligible_bolo_score.update(is_eligible_for_encash = False)
+    except Exception as e:
+         print e
 
 
 

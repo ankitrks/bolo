@@ -1,1 +1,35 @@
-{{all_encash_details}}
+{% extends "admin/jarvis/base.html" %}
+{% block content %}
+<div id="user_kyc">
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>username</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Bolo Score Earned</th>
+                <th>Already Encashed?</th>
+                <th>Encashed On</th>
+                <th>Eligible For Encash?</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for each_encash in all_encash_details %}
+                <tr>
+                    <td><a href="/jarvis/get_single_encash_detail/?username={{ each_encash.user.username}}"><strong>{{ each_encash.user.username}}</strong></a></td>
+                    <td>{{ each_encash.duration_start_date}}</td>
+                    <td>{{ each_encash.duration_end_date}}</td>
+
+                    <td>{{ each_encash.bolo_score_earned}}</td>
+
+                    <td>{{ each_encash.is_encashed}}</td>
+                    <td>{{ each_encash.enchashed_on}}</td>
+
+                    <td>{{ each_encash.is_eligible_for_encash}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+{% endblock content %} 
