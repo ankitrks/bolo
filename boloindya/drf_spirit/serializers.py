@@ -356,7 +356,7 @@ class KYCDocumnetsTypeSerializer(ModelSerializer):
         model = KYCDocumentType
         fields = '__all__'
 
- class BoloActionHistorySerializer(ModelSerializer):
+class BoloActionHistorySerializer(ModelSerializer):
     class Meta:
         model = BoloActionHistory
         fields = '__all__'

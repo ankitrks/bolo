@@ -27,6 +27,7 @@ class EncashableDetail(UserInfo):
     duration_start_date = models.DateField(_("Duration Start Date"),null=True,blank=True)
     duration_end_date = models.DateField(_("Duration End Date"),null=True,blank=True)
     bolo_score_earned = models.PositiveIntegerField(_("Bolo Scores Earned"),null=True,blank=True,default=0)
+    bolo_score_details = models.TextField(_("Bolo Score Details"),null=True,blank=True)
     is_encashed = models.BooleanField(_("Is Encashed?"),default=False)
     enchashed_on = models.DateTimeField(null=True,blank=True)
     is_eligible_for_encash = models.BooleanField(_("Is Eligible For Encash?"),default=False)

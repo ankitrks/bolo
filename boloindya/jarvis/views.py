@@ -17,11 +17,14 @@ import os
 import hashlib
 import re
 from drf_spirit.views import get_video_thumbnail,getVideoLength
+from drf_spirit.utils  import calculate_encashable_details
 from forum.topic.models import Topic
 from forum.category.models import Category
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
+from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
+from
 from django.conf import settings
 
 
@@ -248,7 +251,7 @@ def get_kyc_user_list(request):
         return render(request,'admin/jarvis/userkyc/user_kyc_list.html',{'all_kyc':all_kyc})
 
 def get_kyc_of_user(request):
-    if request.user.is_superuser:
+    if request.user.is_superuser or request.user.is_staff:
         username = request.GET.get('username',None)
         kyc_user = User.objects.get(username=username)
         kyc_details = UserKYC.objects.filter(user=kyc_user)
@@ -273,6 +276,13 @@ def SecretFileView(request):
                             bucket=settings.AWS_STORAGE_BUCKET_NAME,
                             key=filepath,
                             force_http=True)
+
+def get_encashable_detail(request):
+    if request.user.is_superuser or request.user.is_staff:
+        for each_user in User.objects.all():
+            calculate_encashable_details(each_user)
+        all_encash_details = EncashableDetail.objects.all()
+    return render(request,'admin/jarvis/payment/encashable_detail.html',{'all_encash_details':all_encash_details})
 
 
 
