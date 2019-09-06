@@ -93,7 +93,7 @@
             <tr>
               <th>Bolo Bifurcation</th>
               <th>Bolo Score</th>
-              <th>Bolo Value</th>
+              <th>Bolo Value(INR)</th>
               <th>Amount Paid</th>
             </tr>
             </thead>
@@ -103,9 +103,14 @@
                 {% for key, value in bolo_details.items %} 
                     <tr>
                       <td>{{ key }}</td>
-                      <td>{{ value }}</td>
-                      <td>{{ value }}change to the rs</td>
-                      <td>₹ {{ receipt.amount }}</td>
+                      {% for key2, value2 in value.items %}
+                        {% if key2 == 'bolo_score' %}
+                          <td>{{ value2 }}</td>
+                        {% elif key2 == 'bolo_money' %}
+                          <td>₹ {{ value2 }}</td>
+                          <td>₹ {{ value2 }}</td>
+                        {% endif %}
+                      {% endfor %}
                     </tr>
                 {% endfor %}
             {% endwith %}

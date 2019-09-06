@@ -1423,7 +1423,7 @@ def save_kyc_documents(request):
         frontside_url = request.POST.get('frontside_url',None)
         backside_url = request.POST.get('backside_url',None)
         data_dict = {
-            'kyc_document_type':document_type,
+            'kyc_document_type_id':document_type,
             'frontside_url':frontside_url,
             'backside_url':backside_url,
             'user':request.user
@@ -1444,12 +1444,12 @@ def save_kyc_documents(request):
             user_kyc = UserKYC.objects.get(user=request.user)
             if kyc_document_type.document_name in ['PAN','pan']:
                 message = 'PAN Info Saved'
-                userkyc.kyc_pan_info_submitted = True
-                userkyc.save()
+                user_kyc.kyc_pan_info_submitted = True
+                user_kyc.save()
             else:
                 message = 'Document Info Saved'
-                userkyc.kyc_document_info_submitted = True
-                userkyc.save()
+                user_kyc.kyc_document_info_submitted = True
+                user_kyc.save()
         return JsonResponse({'message': message}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -1464,8 +1464,8 @@ def save_kyc_selfie(request):
         }
         user_kyc = UserKYC.objects.get(user=request.user)
         selfie_info,is_created = KYCBasicInfo.objects.update_or_create(user=request.user,defaults=data_dict)
-        userkyc.kyc_selfie_info_submitted = True
-        userkyc.save()
+        user_kyc.kyc_selfie_info_submitted = True
+        user_kyc.save()
         return JsonResponse({'message': 'additional info saved'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -1490,8 +1490,8 @@ def save_kyc_additional_info(request):
         }
         user_kyc = UserKYC.objects.get(user=request.user)
         additional_info,is_created = AdditionalInfo.objects.update_or_create(user=request.user,defaults=data_dict)
-        userkyc.kyc_additional_info_submitted = True
-        userkyc.save()
+        user_kyc.kyc_additional_info_submitted = True
+        user_kyc.save()
         return JsonResponse({'message': 'additional info saved'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
