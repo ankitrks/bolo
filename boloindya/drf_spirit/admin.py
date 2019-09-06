@@ -25,7 +25,7 @@ class CategoryAdmin(admin.ModelAdmin):
 admin.site.register(Category, CategoryAdmin)
 
 class WeightAdmin(admin.ModelAdmin):
-	list_display = ('features', 'weight', )
+	list_display = ('features', 'weight','is_monetize','bolo_score','equivalent_INR' )
 admin.site.register(Weight, WeightAdmin)
 
 class UserProfileAdmin(ImportExportModelAdmin):

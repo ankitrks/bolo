@@ -19,12 +19,17 @@ import re
 from drf_spirit.views import get_video_thumbnail,getVideoLength
 from drf_spirit.utils  import calculate_encashable_details
 from forum.topic.models import Topic
+from forum.user.models import UserProfile
 from forum.category.models import Category
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 from django.conf import settings
+from forum.payment.forms import PaymentForm
+from django.views.generic.edit import FormView
+from datetime import datetime
+
 
 
 
@@ -291,9 +296,33 @@ def get_single_encash_detail(request):
         user = User.objects.get(username=username)
         kyc_details = UserKYC.objects.filter(user=user)
         all_encash_details = EncashableDetail.objects.filter(user = user).order_by('-id')
-        return render(request,'admin/jarvis/payment/single_encash_details.html',{'all_encash_details':all_encash_details,'userprofile':user.st,'user':user,'kyc_details':kyc_details})
+        payment_form = PaymentForm()
+        return render(request,'admin/jarvis/payment/single_encash_details.html',{'all_encash_details':all_encash_details,'userprofile':user.st,'user':user,'kyc_details':kyc_details,'payment_form':payment_form})
 
 
+class PaymentView(FormView):
+    form_class = PaymentForm
+    template_name='admin/jarvis/payment/invoice_error.html'
+
+    def form_valid(self, form,**kwargs):
+        receipt = form.save(commit = False)
+        receipt.save()
+        enchashable_detail = receipt.enchashable_detail
+        receipt.user = enchashable_detail.user
+        userprofile = UserProfile.objects.get(user=receipt.user)
+        enchashable_detail.is_encashed = True
+        enchashable_detail.enchashed_on = datetime.now()
+        receipt.save()
+        enchashable_detail.save()
+        #send_mail_functionality_to_admin_and_to_user_if_mail_exist
+        #send_sms_functionality_user
+        # return HttpResponse(json.dumps({'success': 'success','receipt':receipt,'userprofile':userprofile }),content_type="application/json")
+        return render(self.request,'admin/jarvis/payment/invoice.html',{'success': 'success','receipt':receipt,'userprofile':userprofile })
+
+    def get_context_data(self,*args,**kwargs):
+        kwargs=super(PaymentView,self).get_context_data(*args,**kwargs)
+        kwargs['http_referer']=self.request.META.get('HTTP_REFERER',None)
+        return super(PaymentView,self).get_context_data(*args,**kwargs)
 
 
 

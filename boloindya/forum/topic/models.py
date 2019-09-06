@@ -35,7 +35,7 @@ class RecordTimeStamp(models.Model):
         abstract = True
 
 class UserInfo(RecordTimeStamp):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='%(app_label)s_%(class)s_user',editable=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='%(app_label)s_%(class)s_user',editable=False)
     is_active = models.BooleanField(default = True)
 
     def get_user(self):
@@ -55,7 +55,7 @@ class BoloActionHistory(RecordTimeStamp):
     is_removed = models.BooleanField(default=False)
     is_encashed = models.BooleanField(default=False)
     is_eligible_for_encash = models.BooleanField(default=True)
-    enchashable_detail = models.ForeignKey('forum_payment.EncashableDetail',null=True,blank=True,related_name='bolo_score_items')
+    enchashable_detail = models.ForeignKey('forum_payment.EncashableDetail',null=True,blank=True,related_name='bolo_score_items',editable=False)
     
     def __unicode__(self):
         return self.user.username
@@ -337,7 +337,7 @@ class Topic(models.Model):
 class VBseen(UserInfo):
     topic = models.ForeignKey(Topic, related_name='vb_seen',null=True,blank=True)
     def __unicode__(self):
-        return str(self.topic if self.topic else 'VB')
+        return unicode(str(self.topic if self.topic else 'VB'), 'utf-8')
 
 class TongueTwister(models.Model):
     hash_tag = models.CharField(_("Hash Tag"), max_length=255, blank = True, null = True)

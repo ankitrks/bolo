@@ -142,6 +142,9 @@ class Follower(RecordTimeStamp):
 class Weight(RecordTimeStamp):
     features=models.CharField(max_length=20)
     weight= models.FloatField(default=0,null=True)
+    is_monetize = models.BooleanField(default=False)
+    bolo_score = models.PositiveIntegerField(_('Minimum Bolo Score For Monetize/Bolo Score Equivalent Money'),null=True,blank=True,default=0)
+    equivalent_INR = models.PositiveIntegerField(_('Bolo Equivalent Money in INR'),null=True,blank=True,default=0)
 
     def __unicode__(self):
         return self.features

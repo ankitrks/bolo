@@ -14,8 +14,7 @@ class PaymentCycle(models.Model):
     duration_type = models.CharField(_("Duration Type"), choices=duration_type_options,max_length=10,null=True,blank=True)
     duration_period = models.PositiveIntegerField(_("Duration Period"),null=True,blank=True)
     duration_start_date = models.DateField(_("Duration Start Date"),null=True,blank=True)
-    minimum_bolo_score = models.PositiveIntegerField(_("Minimum Bolo Score For Eligibility"),null=True,blank=True,default=0)
-
+    
     def __unicode__(self):
         return str('Period:  '+str(self.duration_period)+'-'+self.get_duration_type_display()+'-->BoloScore:'+str(self.minimum_bolo_score)+'-->Start Date '+str(self.duration_start_date))
 
@@ -27,6 +26,7 @@ class EncashableDetail(UserInfo):
     duration_start_date = models.DateField(_("Duration Start Date"),null=True,blank=True)
     duration_end_date = models.DateField(_("Duration End Date"),null=True,blank=True)
     bolo_score_earned = models.PositiveIntegerField(_("Bolo Scores Earned"),null=True,blank=True,default=0)
+    equivalent_INR = models.PositiveIntegerField(_("Equivalnet INR"),null=True,blank=True,default=0)
     bolo_score_details = models.TextField(_("Bolo Score Details"),null=True,blank=True)
     is_encashed = models.BooleanField(_("Is Encashed?"),default=False)
     enchashed_on = models.DateTimeField(null=True,blank=True)
@@ -45,7 +45,7 @@ class PaymentInfo(UserInfo):
         ('1','Bank Account'),
         ('2','Paytm'),
         )
-    encashble_detail = models.ForeignKey(EncashableDetail,null=True,blank=True)
+    enchashable_detail = models.ForeignKey(EncashableDetail,null=True,blank=True)
     amount = models.PositiveIntegerField(null=True,blank=True,default=0)
     transaction_method = models.CharField(_('Transaction Method'),choices=transaction_choices_options,null=True,blank=True,default='2',max_length=10)
     transaction_number = models.CharField(_('Transaction Number'),max_length=255,null=True,blank=True)

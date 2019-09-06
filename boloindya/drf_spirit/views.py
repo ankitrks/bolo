@@ -900,9 +900,9 @@ def createTopic(request):
             message = 'Topic Created'
         else:
             userprofile = UserProfile.objects.get(user = request.user)
-            userprofile.question_count = F('vb_count')+1
+            userprofile.vb_count = F('vb_count')+1
             userprofile.save()
-            add_bolo_score(request.user.id, 'create_topic', topic)
+            add_bolo_score(request.user.id, 'create_vb', topic)
             topic_json = TopicSerializerwithComment(topic).data
             message = 'Video Byte Created'
         return JsonResponse({'message': message,'topic':topic_json}, status=status.HTTP_201_CREATED)
@@ -1794,6 +1794,8 @@ def vb_seen(request):
         userprofile.view_count = F('view_count')+1
         userprofile.save()
         vbseen,is_created = VBseen.objects.get_or_create(user = request.user,topic_id = topic_id)
+        if is_created:
+            add_bolo_score(topic.user.id, 'vb_view', vbseen)
         return JsonResponse({'message': 'vb seen'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
