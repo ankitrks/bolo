@@ -1410,8 +1410,8 @@ def save_kyc_basic_info(request):
 
         user_kyc,is_created = UserKYC.objects.get_or_create(user=request.user)
         kyc_basic_info,kyc_basic_info_is_created = KYCBasicInfo.objects.update_or_create(user=request.user,defaults=data_dict)
-        userkyc.kyc_basic_info_submitted = True
-        userkyc.save()
+        user_kyc.kyc_basic_info_submitted = True
+        user_kyc.save()
         return JsonResponse({'message': 'basic_info_saved'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -1429,12 +1429,10 @@ def save_kyc_documents(request):
             'user':request.user
         }
         kyc_document_type = KYCDocumentType.objects.get(pk=document_type)
-        if kyc_document_type.no_image_required == 2:
-            if not frontside_url or not backside_url:
-                return JsonResponse({'message': 'Need front and back both images url'}, status=status.HTTP_400_BAD_REQUEST)
-        elif kyc_document_type.no_image_required == 1:
-            if not frontside_url:
-                return JsonResponse({'message': 'please share the front image url'}, status=status.HTTP_400_BAD_REQUEST)
+        if (not frontside_url or not backside_url) and kyc_document_type.no_image_required == 2:
+            return JsonResponse({'message': 'Need front and back both images url'}, status=status.HTTP_400_BAD_REQUEST)
+        elif not frontside_url and kyc_document_type.no_image_required == 1:
+            return JsonResponse({'message': 'please share the front image url'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             try:
                 kyc_document = KYCDocument.objects.get(kyc_document_type=document_type,user=request.user,is_active=True)
@@ -1507,7 +1505,7 @@ def save_bank_details_info(request):
         account_number = request.POST.get('account_number',None)
         IFSC_code = request.POST.get('IFSC_code',None)
         paytm_number = request.POST.get('paytm_number',None)
-        if not (bank_name and account_name and account_number and IFSC_code and mode_of_transaction):
+        if not (bank_name and account_name and account_number and IFSC_code and mode_of_transaction) or not paytm_number:
             return JsonResponse({'message': 'Mandatory Data Missing'}, status=status.HTTP_400_BAD_REQUEST)
         data_dict = {
             'bank_name':bank_name,
