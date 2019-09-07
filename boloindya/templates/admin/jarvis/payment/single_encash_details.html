@@ -94,7 +94,7 @@
                     <div class="box box-primary">
                         <div class="box-header">
                             <h3 class="box-title">Encash Cycle Details</h3>
-                            {% if not each_encash.is_encashed %}
+                            {% if not each_encash.is_encashed and each_encash.is_eligible_for_encash %}
                         <span style="float:right;">
                             <button type="button" class="btn btn-danger encash_bolo" data-toggle="modal" data-target="#fees" encashable_id="{{each_encash.id}}" encash_amount="{{ each_encash.equivalent_INR }}">Pay</button>
                         </span>
