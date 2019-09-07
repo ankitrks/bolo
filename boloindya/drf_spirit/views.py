@@ -1489,7 +1489,7 @@ def save_kyc_additional_info(request):
         'user':request.user
         }
         user_kyc = UserKYC.objects.get(user=request.user)
-        additional_info,is_created = AdditionalInfo.objects.update_or_create(user=request.user,defaults=data_dict)
+        additional_info,is_created = AdditionalInfo.objects.update_or_create(user=request.user,defaults=data_dict,)
         user_kyc.kyc_additional_info_submitted = True
         user_kyc.save()
         return JsonResponse({'message': 'additional info saved'}, status=status.HTTP_200_OK)
@@ -1505,8 +1505,13 @@ def save_bank_details_info(request):
         account_number = request.POST.get('account_number',None)
         IFSC_code = request.POST.get('IFSC_code',None)
         paytm_number = request.POST.get('paytm_number',None)
-        if not (bank_name and account_name and account_number and IFSC_code and mode_of_transaction) or not paytm_number:
-            return JsonResponse({'message': 'Mandatory Data Missing'}, status=status.HTTP_400_BAD_REQUEST)
+        if mode_of_transaction:
+            if mode_of_transaction=='1' and not (bank_name and account_name and account_number and IFSC_code):
+                return JsonResponse({'message': 'Mandatory Bank Data Missing'}, status=status.HTTP_400_BAD_REQUEST)
+            elif mode_of_transaction=='2' and not paytm_number:
+                return JsonResponse({'message': 'Mandatory Paytm Data Missing'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return JsonResponse({'message': 'Mode Of Transaction Missing'}, status=status.HTTP_400_BAD_REQUEST)
         data_dict = {
             'bank_name':bank_name,
             'account_number':account_number,
