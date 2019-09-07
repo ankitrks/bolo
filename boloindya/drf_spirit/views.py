@@ -1521,7 +1521,7 @@ def save_kyc_additional_info(request):
         'user':request.user
         }
         user_kyc = UserKYC.objects.get(user=request.user)
-        additional_info,is_created = AdditionalInfo.objects.update_or_create(user=request.user,defaults=data_dict)
+        additional_info,is_created = AdditionalInfo.objects.update_or_create(user=request.user,defaults=data_dict,)
         user_kyc.kyc_additional_info_submitted = True
         user_kyc.save()
         return JsonResponse({'message': 'additional info saved'}, status=status.HTTP_200_OK)
