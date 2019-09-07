@@ -94,58 +94,71 @@
                     <div class="box box-primary">
                         <div class="box-header">
                             <h3 class="box-title">Encash Cycle Details</h3>
-                        </div>
-                        {% if not each_encash.is_encashed %}
-                        <div style="float:right;">
-                            <button type="button" class="btn btn-primary encash_bolo" data-toggle="modal" data-target="#fees" encashable_id="{{each_encash.id}}">Pay</button>
-                        </div>
+                            {% if not each_encash.is_encashed %}
+                        <span style="float:right;">
+                            <button type="button" class="btn btn-danger encash_bolo" data-toggle="modal" data-target="#fees" encashable_id="{{each_encash.id}}" encash_amount="{{ each_encash.equivalent_INR }}">Pay</button>
+                        </span>
                         {% endif %}
+                        </div>
                         <div class="box-body">
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="form-group" style="padding-bottom: 30px;">
-                                                <label for="" class="col-sm-4 control-label">Start Date</label>
-                                                <span class="col-sm-8">
-                                                    <i>{{ each_encash.duration_start_date }}</i>
-                                                </span>
+                                                <div class="box-body">
+                                                    <div class="box box-default">
+                                                        <div class="box-body">
+                                                            <div class="row">
+                                                                <div class="col-xs-12 table-responsive">
+                                                                  <table class="table table-striped">
+                                                                    <thead>
+                                                                    <tr>
+                                                                      <th>Property</th>
+                                                                      <th>Value</th>
+                                                                    </tr>
+                                                                    </thead>
+
+                                                                    <tbody>
+                                                                      <tr>
+                                                                          <td>Start Date</td>
+                                                                          <td>{{ each_encash.duration_start_date }}</td>
+                                                                      </tr>
+                                                                      <tr>
+                                                                          <td>End Date</td>
+                                                                          <td>{{ each_encash.duration_end_date }}</td>
+                                                                      </tr>
+                                                                      <tr>
+                                                                          <td>Bolo Score Earned</td>
+                                                                          <td>{{ each_encash.bolo_score_earned }}</td>
+                                                                      </tr>
+                                                                      <tr>
+                                                                          <td>Equivalent Amount(INR)</td>
+                                                                          <td>{{ each_encash.equivalent_INR }}</td>
+                                                                      </tr>
+                                                                      <tr>
+                                                                          <td>Is Encahsed?</td>
+                                                                          <td>{{ each_encash.is_encashed }}</td>
+                                                                      </tr>
+                                                                      <tr>
+                                                                          <td>Encashed On</td>
+                                                                          <td>{{ each_encash.enchashed_on }}</td>
+                                                                      </tr>
+                                                                      <tr>
+                                                                          <td>Is Eligible for Encash?</td>
+                                                                          <td>{{ each_encash.is_eligible_for_encash }}</td>
+                                                                      </tr>
+                                                                    </tbody>
+                                                                  </table>
+                                                                </div>
+                                                                <!-- /.col -->
+                                                              </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="clearer" style="clear: both;"></div>
-                                            <div class="form-group" style="padding-bottom: 30px;">
-                                                <label for="" class="col-sm-4 control-label">End Date</label>
-                                                <span class="col-sm-8">
-                                                    <i>{{ each_encash.duration_end_date }}</i>
-                                                </span>
-                                            </div>
-                                            <div class="clearer" style="clear: both;"></div>
-                                            <div class="form-group" style="padding-bottom: 30px;">
-                                                <label for="" class="col-sm-4 control-label">Bolo Score Earned</label>
-                                                <span class="col-sm-8">
-                                                    <i>{{ each_encash.bolo_score_earned }}</i>
-                                                </span>
-                                            </div>
-                                            <div class="clearer" style="clear: both;"></div>
-                                            <div class="form-group" style="padding-bottom: 30px;">
-                                                <label for="" class="col-sm-4 control-label">Is Already Encashed?</label>
-                                                <span class="col-sm-8">
-                                                    <i>{{ each_encash.is_encashed }}</i>
-                                                </span>
-                                            </div>
-                                            <div class="clearer" style="clear: both;"></div>
-                                            <div class="form-group" style="padding-bottom: 30px;">
-                                                <label for="" class="col-sm-4 control-label">Encashed Date</label>
-                                                <span class="col-sm-8">
-                                                    <i>{{ each_encash.enchashed_on }}</i>
-                                                </span>
-                                            </div>
-                                            <div class="clearer" style="clear: both;"></div>
-                                            <div class="form-group" style="padding-bottom: 30px;">
-                                                <label for="" class="col-sm-4 control-label">Is Eligible For Encash?</label>
-                                                <span class="col-sm-8">
-                                                    <i>{{ each_encash.is_eligible_for_encash }}</i>
-                                                </span>
-                                            </div>
+
+
                                             <div class="form-group" style="padding-bottom: 30px;">
                                                 <div class="box-body">
                                                     <div class="box box-default">
@@ -153,23 +166,43 @@
                                                             <h3 class="box-title">Encash Details</h3>
                                                         </div>
                                                         <div class="box-body">
-                                                            {% with each_encash.bolo_score_details|convert_string_to_json as bolo_details %}
-                                                                {% for key, value in bolo_details.items %} 
-                                                                    <div class="form-group" style="padding-bottom: 30px;">
-                                                                        <label for="" class="col-sm-4 control-label">{{ key }}</label>
-                                                                        <span class="col-sm-8">
-                                                                            {% for key2, value2 in value.items %}
-                                                                                <div class="form-group" style="padding-bottom: 30px;">
-                                                                                    <label for="" class="col-sm-4 control-label">{{ key2 }}</label>
-                                                                                    <span class="col-sm-8">
-                                                                                        <i>{{ value2 }}</i>
-                                                                                    </span>
-                                                                                </div>
-                                                                            {% endfor %}
-                                                                        </span>
-                                                                    </div>
-                                                                {% endfor %}
-                                                            {% endwith %}
+                                                            <div class="row">
+                                                                <div class="col-xs-12 table-responsive">
+                                                                  <table class="table table-striped">
+                                                                    <thead>
+                                                                    <tr>
+                                                                      <th>Bolo Bifurcation</th>
+                                                                      <th>Bolo Score</th>
+                                                                      <th>Bolo Value(INR)</th>
+                                                                      <th>Amount</th>
+                                                                    </tr>
+                                                                    </thead>
+
+                                                                    <tbody>
+                                                                      {% with each_encash.bolo_score_details|convert_string_to_json as bolo_details %}
+                                                                        {% for key, value in bolo_details.items %} 
+                                                                            <tr>
+                                                                              <td>{{ key }}</td>
+                                                                              {% for key2, value2 in value.items %}
+                                                                                {% if key2 == 'bolo_score' %}
+                                                                                  <td>{{ value2 }}</td>
+                                                                                {% endif %}
+                                                                              {% endfor %}
+                                                                              {% for key2, value2 in value.items %}
+                                                                                {% if key2 == 'bolo_money' %}
+                                                                                  <td>₹ {{ value2 }}</td>
+                                                                                  <td>₹ {{ value2 }}</td>
+                                                                                {% endif %}
+                                                                              {% endfor %}
+                                                                                
+                                                                            </tr>
+                                                                        {% endfor %}
+                                                                    {% endwith %}
+                                                                    </tbody>
+                                                                  </table>
+                                                                </div>
+                                                                <!-- /.col -->
+                                                              </div>
                                                         </div>
                                                     </div>
                                                 </div>

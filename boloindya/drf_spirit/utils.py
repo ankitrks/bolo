@@ -177,6 +177,7 @@ def calculate_encashable_details(user):
             if score and score>=each_bolo_weight.bolo_score:
                 bolo_money = (score/each_bolo_weight.bolo_score)*each_bolo_weight.equivalent_INR
                 each_action_dict = {'bolo_score':score,'bolo_money':bolo_money}
+                total_money+=bolo_money
                 if each_bolo_weight.features=='create_vb':
                     is_eligible_for_encash = True
             else:

@@ -305,15 +305,17 @@ class PaymentView(FormView):
     template_name='admin/jarvis/payment/invoice_error.html'
 
     def form_valid(self, form,**kwargs):
-        receipt = form.save(commit = False)
-        receipt.save()
-        enchashable_detail = receipt.enchashable_detail
-        receipt.user = enchashable_detail.user
-        userprofile = UserProfile.objects.get(user=receipt.user)
-        enchashable_detail.is_encashed = True
-        enchashable_detail.enchashed_on = datetime.now()
-        receipt.save()
-        enchashable_detail.save()
+        receipt, created = PaymentInfo.objects.get_or_create(**form.cleaned_data)
+        if created:
+            enchashable_detail = receipt.enchashable_detail
+            receipt.user = enchashable_detail.user
+            userprofile = enchashable_detail.user.st
+            enchashable_detail.is_encashed = True
+            enchashable_detail.enchashed_on = datetime.now()
+            receipt.save()
+            enchashable_detail.save()
+        else:
+            userprofile = receipt.user.st
         #send_mail_functionality_to_admin_and_to_user_if_mail_exist
         #send_sms_functionality_user
         # return HttpResponse(json.dumps({'success': 'success','receipt':receipt,'userprofile':userprofile }),content_type="application/json")

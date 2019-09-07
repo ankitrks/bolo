@@ -18,6 +18,10 @@ function showninttostring(){
 function encash_bolo(){
   var encashable_id=$(this).attr('encashable_id')
   $('#id_enchashable_detail').val(encashable_id);
+  var encashable_amount=$(this).attr('encash_amount');
+  $('#id_amount').val(encashable_amount);
+  showninttostring();
+  $('#id_amount').attr('disabled','');
 }
 
 

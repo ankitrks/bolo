@@ -106,11 +106,15 @@
                       {% for key2, value2 in value.items %}
                         {% if key2 == 'bolo_score' %}
                           <td>{{ value2 }}</td>
-                        {% elif key2 == 'bolo_money' %}
+                        {% endif %}
+                      {% endfor %}
+                      {% for key2, value2 in value.items %}
+                        {% if key2 == 'bolo_money' %}
                           <td>₹ {{ value2 }}</td>
                           <td>₹ {{ value2 }}</td>
                         {% endif %}
                       {% endfor %}
+                        
                     </tr>
                 {% endfor %}
             {% endwith %}
@@ -132,11 +136,11 @@
             <table class="table">
               <tr>
                 <th style="width:50%">Subtotal:</th>
-                <td>₹ {{ receipt.amount }}</td>
+                <td>₹ {{ receipt.enchashable_detail.equivalent_INR }}</td>
               </tr>
               <tr>
                 <th>Total:</th>
-                <td>₹ {{ receipt.amount }}</td>
+                <td>₹ {{ receipt.enchashable_detail.equivalent_INR }}</td>
               </tr>
               <tr>
                 <th>Paid On:</th>
