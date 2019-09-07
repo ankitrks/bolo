@@ -1,0 +1,285 @@
+{% extends "admin/jarvis/base.html" %}
+{% load kyc_template_tag %}
+{% load static %}
+{% block content %}
+    <div>
+        <div class="userinfo">
+            <div class="box-body">
+                <div class="box box-success">
+                    <div class="box-header">
+                        <h3 class="box-title">Personal Details</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-md-9">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group" style="padding-bottom: 30px;">
+                                            <label for="" class="col-sm-4 control-label">Username</label>
+                                            <span class="col-sm-8">
+                                                <i>{{userprofile.user.username}}</i>
+                                            </span>
+                                        </div>
+                                        <div class="clearer" style="clear: both;"></div>
+                                        <div class="form-group" style="padding-bottom: 30px;">
+                                            <label for="" class="col-sm-4 control-label">User Full Name</label>
+                                            <span class="col-sm-8">
+                                                <i>{{ userprofile.name }}</i>
+                                            </span>
+                                        </div>
+                                        <div class="clearer" style="clear: both;"></div>
+                                        <div class="form-group" style="padding-bottom: 30px;">
+                                            <label for="" class="col-sm-4 control-label">User Bolo Score</label>
+                                            <span class="col-sm-8">
+                                                <i>{{ userprofile.bolo_score }}</i>
+                                            </span>
+                                        </div>
+                                        <div class="clearer" style="clear: both;"></div>
+                                        <div class="form-group" style="padding-bottom: 30px;">
+                                            <label for="" class="col-sm-4 control-label">User Bio</label>
+                                            <span class="col-sm-8">
+                                                <i>{{ userprofile.bio }}</i>
+                                            </span>
+                                        </div>
+                                        <div class="clearer" style="clear: both;"></div>
+                                        <div class="form-group" style="padding-bottom: 30px;">
+                                            <label for="" class="col-sm-4 control-label">User About</label>
+                                            <span class="col-sm-8">
+                                                <i>{{ userprofile.about }}</i>
+                                            </span>
+                                        </div>
+                                        <div class="clearer" style="clear: both;"></div>
+                                        <div class="form-group" style="padding-bottom: 30px;">
+                                            <label for="" class="col-sm-4 control-label">Gender</label>
+                                            <span class="col-sm-8">
+                                                <i>{{ userprofile.get_gender_display }}</i>
+                                            </span>
+                                        </div>
+                                        <div class="form-group" style="padding-bottom: 30px;">
+                                            <label for="" class="col-sm-4 control-label">User Mobile No</label>
+                                            <span class="col-sm-8">
+                                                <i>{{ userprofile.mobile_no }}</i>
+                                            </span>
+                                        </div>
+                                        <div class="form-group" style="padding-bottom: 30px;">
+                                            <label for="" class="col-sm-4 control-label">VB Count</label>
+                                            <span class="col-sm-8">
+                                                <i>{{ userprofile.vb_count }}</i>
+                                            </span>
+                                        </div>
+                                        <div class="form-group" style="padding-bottom: 30px;">
+                                            <label for="" class="col-sm-4 control-label">VB view_count</label>
+                                            <span class="col-sm-8">
+                                                <i>{{ userprofile.view_count }}</i>
+                                            </span>
+                                        </div>
+                                        <div class="clearer" style="clear: both;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="w3-card-4 test" style="width:100%;margin: 0 auto;">
+                                    <img src="{{ userprofile.profile_pic }}" alt="Avatar" style="width:100%;margin: 0 auto;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.box-body -->
+            </div>
+        </div>
+        {% for each_encash in all_encash_details %}
+            <div class="basic_info">
+                <div class="box-body">
+                    <div class="box box-primary">
+                        <div class="box-header">
+                            <h3 class="box-title">Encash Cycle Details</h3>
+                            {% if not each_encash.is_encashed %}
+                        <span style="float:right;">
+                            <button type="button" class="btn btn-danger encash_bolo" data-toggle="modal" data-target="#fees" encashable_id="{{each_encash.id}}" encash_amount="{{ each_encash.equivalent_INR }}">Pay</button>
+                        </span>
+                        {% endif %}
+                        </div>
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group" style="padding-bottom: 30px;">
+                                                <div class="box-body">
+                                                    <div class="box box-default">
+                                                        <div class="box-body">
+                                                            <div class="row">
+                                                                <div class="col-xs-12 table-responsive">
+                                                                  <table class="table table-striped">
+                                                                    <thead>
+                                                                    <tr>
+                                                                      <th>Property</th>
+                                                                      <th>Value</th>
+                                                                    </tr>
+                                                                    </thead>
+
+                                                                    <tbody>
+                                                                      <tr>
+                                                                          <td>Start Date</td>
+                                                                          <td>{{ each_encash.duration_start_date }}</td>
+                                                                      </tr>
+                                                                      <tr>
+                                                                          <td>End Date</td>
+                                                                          <td>{{ each_encash.duration_end_date }}</td>
+                                                                      </tr>
+                                                                      <tr>
+                                                                          <td>Bolo Score Earned</td>
+                                                                          <td>{{ each_encash.bolo_score_earned }}</td>
+                                                                      </tr>
+                                                                      <tr>
+                                                                          <td>Equivalent Amount(INR)</td>
+                                                                          <td>{{ each_encash.equivalent_INR }}</td>
+                                                                      </tr>
+                                                                      <tr>
+                                                                          <td>Is Encahsed?</td>
+                                                                          <td>{{ each_encash.is_encashed }}</td>
+                                                                      </tr>
+                                                                      <tr>
+                                                                          <td>Encashed On</td>
+                                                                          <td>{{ each_encash.enchashed_on }}</td>
+                                                                      </tr>
+                                                                      <tr>
+                                                                          <td>Is Eligible for Encash?</td>
+                                                                          <td>{{ each_encash.is_eligible_for_encash }}</td>
+                                                                      </tr>
+                                                                    </tbody>
+                                                                  </table>
+                                                                </div>
+                                                                <!-- /.col -->
+                                                              </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="form-group" style="padding-bottom: 30px;">
+                                                <div class="box-body">
+                                                    <div class="box box-default">
+                                                        <div class="box-header">
+                                                            <h3 class="box-title">Encash Details</h3>
+                                                        </div>
+                                                        <div class="box-body">
+                                                            <div class="row">
+                                                                <div class="col-xs-12 table-responsive">
+                                                                  <table class="table table-striped">
+                                                                    <thead>
+                                                                    <tr>
+                                                                      <th>Bolo Bifurcation</th>
+                                                                      <th>Bolo Score</th>
+                                                                      <th>Bolo Value(INR)</th>
+                                                                      <th>Amount</th>
+                                                                    </tr>
+                                                                    </thead>
+
+                                                                    <tbody>
+                                                                      {% with each_encash.bolo_score_details|convert_string_to_json as bolo_details %}
+                                                                        {% for key, value in bolo_details.items %} 
+                                                                            <tr>
+                                                                              <td>{{ key }}</td>
+                                                                              {% for key2, value2 in value.items %}
+                                                                                {% if key2 == 'bolo_score' %}
+                                                                                  <td>{{ value2 }}</td>
+                                                                                {% endif %}
+                                                                              {% endfor %}
+                                                                              {% for key2, value2 in value.items %}
+                                                                                {% if key2 == 'bolo_money' %}
+                                                                                  <td>₹ {{ value2 }}</td>
+                                                                                  <td>₹ {{ value2 }}</td>
+                                                                                {% endif %}
+                                                                              {% endfor %}
+                                                                                
+                                                                            </tr>
+                                                                        {% endfor %}
+                                                                    {% endwith %}
+                                                                    </tbody>
+                                                                  </table>
+                                                                </div>
+                                                                <!-- /.col -->
+                                                              </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="clearer" style="clear: both;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+            </div>
+        {% endfor %}
+        <div class="modal fade" id="fees" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Payment</h4>
+                </div>
+                <form id="fee_submit_form" action="/jarvis/bolo_payment/" method="post">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="id_{{ payment_form.transaction_method.name }}" class="col-sm-12 control-label">{{payment_form.transaction_method.label}}:</label>
+                            <div class="col-sm-12">
+                                {{payment_form.transaction_method}} {% if payment_form.transaction_method.errors %}
+                                <span class="text-red"><span class="fa fa-hand-pointer-o"></span><b> Error: </b>{{payment_form.transaction_method.errors.0}}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-group id_{{ payment_form.transaction_number.name }}">
+                            <label for="id_{{ payment_form.transaction_number.name }}" class="col-sm-12 control-label">{{payment_form.transaction_number.label}}:</label>
+                            <div class="col-sm-12">
+                                {{payment_form.transaction_number}} {% if payment_form.transaction_number.errors %}
+                                <span class="text-red"><span class="fa fa-hand-pointer-o"></span><b> Error: </b>{{payment_form.transaction_number.errors.0}}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="id_{{ payment_form.amount.name }}" class="col-sm-12 control-label">{{payment_form.amount.label}}:</label>
+                            <div class="col-sm-12">
+                                {{payment_form.amount}} {% if payment_form.amount.errors %}
+                                <span class="text-red"><span class="fa fa-hand-pointer-o"></span><b> Error: </b>{{payment_form.amount.errors.0}}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="id_{{ payment_form.enchashable_detail.name }}" class="col-sm-12 control-label"></label>
+                            <div class="col-sm-12">
+                                {{payment_form.enchashable_detail}} {% if payment_form.enchashable_detail.errors %}
+                                <span class="text-red"><span class="fa fa-hand-pointer-o"></span><b> Error: </b>{{payment_form.enchashable_detail.errors.0}}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-group" style="padding-top:50px;">
+                            <label for="" class='col-md-4 control-label'>Amount in Text</label>
+                            <div class='col-md-8' style="padding-top: 8px;">
+                                <strong class="string_amount text-uppercase"></strong> Only
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button class="btn btn-primary submit_payment" value="submit" name="submit">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+{% endblock content %}
+{% block center_js %}
+<script src="{% static 'js/wordMath.jquery.min.js' %}"></script>
+<script src="{% static 'js/bolo_details.js' %}"></script>  
+{% endblock center_js %}    
+        

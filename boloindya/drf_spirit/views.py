@@ -20,8 +20,11 @@ from .models import UserJarvisDump
 from .permissions import IsOwnerOrReadOnly
 from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,AppVersionSerializer,UserSerializer,SingleTopicSerializerwithComment,\
 UserAnswerSerializerwithComment,CricketMatchSerializer,PollSerializer,ChoiceSerializer,VotingSerializer,LeaderboardSerializer,\
-PollSerializerwithChoice, OnlyChoiceSerializer, NotificationSerializer, UserProfileSerializer, TongueTwisterSerializer
+PollSerializerwithChoice, OnlyChoiceSerializer, NotificationSerializer, UserProfileSerializer, TongueTwisterSerializer,KYCDocumnetsTypeSerializer,\
+PaymentCycleSerializer,EncashableDetailSerializer,PaymentInfoSerializer
 from forum.topic.models import Topic,ShareTopic,Like,SocialShare,FCMDevice,Notification,CricketMatch,Poll,Choice,Voting,Leaderboard,VBseen,TongueTwister
+from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
+from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 from forum.category.models import Category
 from forum.comment.models import Comment
 from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs
@@ -36,7 +39,7 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from datetime import datetime,timedelta,date
 import json
-from .utils import get_weight,add_bolo_score,shorcountertopic
+from .utils import get_weight,add_bolo_score,shorcountertopic,calculate_encashable_details
 from django.db.models import Sum
 import itertools
 import json
@@ -279,7 +282,6 @@ class VBList(generics.ListCreateAPIView):
     Required Parameters:
     title and category_id 
     """  
-
 
     def get_queryset(self):
         topics              = []
@@ -902,9 +904,9 @@ def createTopic(request):
             message = 'Topic Created'
         else:
             userprofile = UserProfile.objects.get(user = request.user)
-            userprofile.question_count = F('vb_count')+1
+            userprofile.vb_count = F('vb_count')+1
             userprofile.save()
-            add_bolo_score(request.user.id, 'create_topic', topic)
+            add_bolo_score(request.user.id, 'create_vb', topic)
             topic_json = TopicSerializerwithComment(topic).data
             message = 'Video Byte Created'
         return JsonResponse({'message': message,'topic':topic_json}, status=status.HTTP_201_CREATED)
@@ -1031,6 +1033,22 @@ class CategoryList(generics.ListAPIView):
     pagination_class=None
     # permission_classes = (IsAuthenticated,)
     permission_classes  = (AllowAny,)
+
+class KYCDocumentTypeList(generics.ListAPIView):
+    serializer_class = KYCDocumnetsTypeSerializer
+    queryset = KYCDocumentType.objects.all()
+    pagination_class=None
+    # permission_classes = (IsAuthenticated,)
+    permission_classes  = (AllowAny,)
+
+class EncashableDetailList(generics.ListAPIView):
+    serializer_class = EncashableDetailSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        calculate_encashable_details(request.user)
+        all_encash_detail = EncashableDetail.objects.filter(user = request.user)
+        return all_encash_detail
 
 class SubCategoryList(generics.ListAPIView):
     """
@@ -1372,6 +1390,166 @@ def fb_profile_settings(request):
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
+#### KYC Views ####
+@api_view(['POST'])
+def save_kyc_basic_info(request):
+    try:
+        first_name = request.POST.get('first_name',None)
+        middle_name = request.POST.get('middle_name',None)
+        last_name = request.POST.get('last_name',None)
+        d_o_b = request.POST.get('d_o_b',None)
+        mobile_no = request.POST.get('mobile_no',None)
+        email = request.POST.get('email',None)
+        data_dict = {
+        'first_name':first_name,
+        'middle_name':middle_name,
+        'last_name':last_name,
+        'd_o_b':d_o_b,
+        'mobile_no':mobile_no,
+        'email':email,
+        'user':request.user
+        }
+        if not (first_name and d_o_b and (mobile_no or email)):
+            return JsonResponse({'message': 'Mandatory Data Missing'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_kyc,is_created = UserKYC.objects.get_or_create(user=request.user)
+        kyc_basic_info,kyc_basic_info_is_created = KYCBasicInfo.objects.update_or_create(user=request.user,defaults=data_dict)
+        user_kyc.kyc_basic_info_submitted = True
+        user_kyc.save()
+        return JsonResponse({'message': 'basic_info_saved'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def save_kyc_documents(request):
+    try:
+        document_type = request.POST.get('document_type',None)
+        frontside_url = request.POST.get('frontside_url',None)
+        backside_url = request.POST.get('backside_url',None)
+        data_dict = {
+            'kyc_document_type_id':document_type,
+            'frontside_url':frontside_url,
+            'backside_url':backside_url,
+            'user':request.user
+        }
+        kyc_document_type = KYCDocumentType.objects.get(pk=document_type)
+        if (not frontside_url or not backside_url) and kyc_document_type.no_image_required == 2:
+            return JsonResponse({'message': 'Need front and back both images url'}, status=status.HTTP_400_BAD_REQUEST)
+        elif not frontside_url and kyc_document_type.no_image_required == 1:
+            return JsonResponse({'message': 'please share the front image url'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            try:
+                kyc_document = KYCDocument.objects.get(kyc_document_type=document_type,user=request.user,is_active=True)
+                kyc_document.is_active=False
+                kyc_document.save()
+            except:
+                pass
+            kyc_document = KYCDocument.objects.create(**data_dict)
+            user_kyc = UserKYC.objects.get(user=request.user)
+            if kyc_document_type.document_name in ['PAN','pan']:
+                message = 'PAN Info Saved'
+                user_kyc.kyc_pan_info_submitted = True
+                user_kyc.save()
+            else:
+                message = 'Document Info Saved'
+                user_kyc.kyc_document_info_submitted = True
+                user_kyc.save()
+        return JsonResponse({'message': message}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def save_kyc_selfie(request):
+    try:
+        pic_selfie_url = request.POST.get('pic_selfie_url',None)
+        data_dict={
+        'pic_selfie_url':pic_selfie_url,
+        'user':request.user
+        }
+        user_kyc = UserKYC.objects.get(user=request.user)
+        selfie_info,is_created = KYCBasicInfo.objects.update_or_create(user=request.user,defaults=data_dict)
+        user_kyc.kyc_selfie_info_submitted = True
+        user_kyc.save()
+        return JsonResponse({'message': 'additional info saved'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def save_kyc_additional_info(request):
+    try:
+        father_firstname = request.POST.get('father_firstname',None)
+        father_lastname = request.POST.get('father_lastname',None)
+        mother_firstname = request.POST.get('mother_firstname',None)
+        mother_lastname = request.POST.get('mother_lastname',None)
+        profession = request.POST.get('profession',None)
+        status = request.POST.get('status',None)
+        data_dict={
+        'father_firstname':father_firstname,
+        'father_lastname':father_lastname,
+        'mother_firstname':mother_firstname,
+        'mother_lastname':mother_lastname,
+        'profession':profession,
+        'status':status,
+        'user':request.user
+        }
+        user_kyc = UserKYC.objects.get(user=request.user)
+        additional_info,is_created = AdditionalInfo.objects.update_or_create(user=request.user,defaults=data_dict)
+        user_kyc.kyc_additional_info_submitted = True
+        user_kyc.save()
+        return JsonResponse({'message': 'additional info saved'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def save_bank_details_info(request):
+    try:
+        mode_of_transaction = request.POST.get('mode_of_transaction',None)
+        bank_name = request.POST.get('bank_name',None)
+        account_name = request.POST.get('account_name',None)
+        account_number = request.POST.get('account_number',None)
+        IFSC_code = request.POST.get('IFSC_code',None)
+        paytm_number = request.POST.get('paytm_number',None)
+        if not (bank_name and account_name and account_number and IFSC_code and mode_of_transaction) or not paytm_number:
+            return JsonResponse({'message': 'Mandatory Data Missing'}, status=status.HTTP_400_BAD_REQUEST)
+        data_dict = {
+            'bank_name':bank_name,
+            'account_number':account_number,
+            'account_name':account_name,
+            'IFSC_code':IFSC_code,
+            'user':request.user
+        }
+        user_kyc = UserKYC.objects.get(user=request.user)
+        if mode_of_transaction == '1':
+            try:
+                user_bank_details = BankDetail.objects.get(user=request.user ,is_active=True)
+                user_bank_details.is_active = False
+                user_bank_details.save()
+            except:
+                pass
+            user_bank_details = BankDetail.objects.create(**data_dict)
+            userkyc.kyc_bank_details_submitted = True
+            message = 'bank details saved'
+        elif mode_of_transaction == '2':
+            try:
+                user_bank_details = BankDetail.objects.get(user=request.user ,is_active=True)
+                user_bank_details.is_active = False
+                user_bank_details.save()
+            except:
+                pass
+            user_bank_details = BankDetail.objects.create(user=request.user,paytm_number=paytm_number)
+            user_kyc.mode_of_transaction = 2
+            message = 'payment to paytm'
+        userkyc.is_kyc_completed=True
+        userkyc.save()
+        return JsonResponse({'message': message}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
 def generate_username(first,last,num_of_users):
         username=first+last+str(num_of_users)
         while(check_username(username)):
@@ -1618,6 +1796,8 @@ def vb_seen(request):
         userprofile.view_count = F('view_count')+1
         userprofile.save()
         vbseen,is_created = VBseen.objects.get_or_create(user = request.user,topic_id = topic_id)
+        if is_created:
+            add_bolo_score(topic.user.id, 'vb_view', vbseen)
         return JsonResponse({'message': 'vb seen'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)

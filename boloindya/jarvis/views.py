@@ -17,10 +17,21 @@ import os
 import hashlib
 import re
 from drf_spirit.views import get_video_thumbnail,getVideoLength
+from drf_spirit.utils  import calculate_encashable_details
 from forum.topic.models import Topic
+from forum.user.models import UserProfile
 from forum.category.models import Category
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
+from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
+from django.conf import settings
+from forum.payment.forms import PaymentForm
+from django.views.generic.edit import FormView
+from datetime import datetime
+
+
+
 
 
 def upload_tos3(file_name,bucket):
@@ -237,3 +248,85 @@ def transcode_media_file(input_key,file_name):
 
 def uploaddata(request):
     return HttpResponse()
+
+def get_kyc_user_list(request):
+    if request.user.is_superuser:
+        all_kyc = UserKYC.objects.all()
+        return render(request,'admin/jarvis/userkyc/user_kyc_list.html',{'all_kyc':all_kyc})
+
+def get_kyc_of_user(request):
+    if request.user.is_superuser or request.user.is_staff:
+        username = request.GET.get('username',None)
+        kyc_user = User.objects.get(username=username)
+        kyc_details = UserKYC.objects.filter(user=kyc_user)
+        kyc_basic_info = KYCBasicInfo.objects.filter(user=kyc_user)
+        kyc_document = KYCDocument.objects.filter(user=kyc_user,is_active=True)
+        additional_info = AdditionalInfo.objects.filter(user=kyc_user)
+        bank_details = BankDetail.objects.filter(user=kyc_user,is_active=True)
+        return render(request,'admin/jarvis/userkyc/single_kyc.html',{'kyc_details':kyc_details,'kyc_basic_info':kyc_basic_info,'kyc_document':kyc_document,'additional_info':additional_info,'bank_details':bank_details,'userprofile':kyc_user.st,'user':kyc_user})
+
+
+def SecretFileView(request):
+    u = request.user
+    filepath = request.GET.get('url').split('https://'+settings.AWS_STORAGE_BUCKET_NAME+'.s3.amazonaws.com/')[0]
+    print filepath,"##################"
+    if u.is_authenticated() and  u.is_staff:
+        client = boto3.client('s3',aws_access_key_id = settings.AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.AWS_SECRET_ACCESS_KEY)
+        # s3 = S3Connection(settings.AWS_ACCESS_KEY_ID,
+        #                     settings.AWS_SECRET_ACCESS_KEY,
+        #                     is_secure=True)
+        # Create a URL valid for 60 seconds.
+        return client.generate_url(60, 'GET',
+                            bucket=settings.AWS_STORAGE_BUCKET_NAME,
+                            key=filepath,
+                            force_http=True)
+
+def get_encashable_detail(request):
+    to_be_calculated = request.GET.get("calculate",None)
+    if request.user.is_superuser or request.user.is_staff:
+        if to_be_calculated:
+            for each_user in User.objects.all():
+                calculate_encashable_details(each_user)
+        all_encash_details = EncashableDetail.objects.all().order_by('-bolo_score_earned')
+    return render(request,'admin/jarvis/payment/encashable_detail.html',{'all_encash_details':all_encash_details})
+
+def get_single_encash_detail(request):
+    if request.user.is_superuser or request.user.is_staff:
+        username = request.GET.get('username',None)
+        user = User.objects.get(username=username)
+        kyc_details = UserKYC.objects.filter(user=user)
+        all_encash_details = EncashableDetail.objects.filter(user = user).order_by('-id')
+        payment_form = PaymentForm()
+        return render(request,'admin/jarvis/payment/single_encash_details.html',{'all_encash_details':all_encash_details,'userprofile':user.st,'user':user,'kyc_details':kyc_details,'payment_form':payment_form})
+
+
+class PaymentView(FormView):
+    form_class = PaymentForm
+    template_name='admin/jarvis/payment/invoice_error.html'
+
+    def form_valid(self, form,**kwargs):
+        receipt, created = PaymentInfo.objects.get_or_create(**form.cleaned_data)
+        if created:
+            enchashable_detail = receipt.enchashable_detail
+            receipt.user = enchashable_detail.user
+            userprofile = enchashable_detail.user.st
+            enchashable_detail.is_encashed = True
+            enchashable_detail.enchashed_on = datetime.now()
+            receipt.save()
+            enchashable_detail.save()
+        else:
+            userprofile = receipt.user.st
+        #send_mail_functionality_to_admin_and_to_user_if_mail_exist
+        #send_sms_functionality_user
+        # return HttpResponse(json.dumps({'success': 'success','receipt':receipt,'userprofile':userprofile }),content_type="application/json")
+        return render(self.request,'admin/jarvis/payment/invoice.html',{'success': 'success','receipt':receipt,'userprofile':userprofile })
+
+    def get_context_data(self,*args,**kwargs):
+        kwargs=super(PaymentView,self).get_context_data(*args,**kwargs)
+        kwargs['http_referer']=self.request.META.get('HTTP_REFERER',None)
+        return super(PaymentView,self).get_context_data(*args,**kwargs)
+
+
+
+
+
