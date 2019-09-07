@@ -1537,7 +1537,7 @@ def save_bank_details_info(request):
             except:
                 pass
             user_bank_details = BankDetail.objects.create(**data_dict)
-            userkyc.kyc_bank_details_submitted = True
+            user_kyc.kyc_bank_details_submitted = True
             message = 'bank details saved'
         elif mode_of_transaction == '2':
             try:
@@ -1549,8 +1549,8 @@ def save_bank_details_info(request):
             user_bank_details = BankDetail.objects.create(user=request.user,paytm_number=paytm_number)
             user_kyc.mode_of_transaction = 2
             message = 'payment to paytm'
-        userkyc.is_kyc_completed=True
-        userkyc.save()
+        user_kyc.is_kyc_completed=True
+        user_kyc.save()
         return JsonResponse({'message': message}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
