@@ -53,7 +53,20 @@ def get_tokens_for_user(user):
         'refresh': str(refresh),
         'access': str(refresh.access_token),
     }
+from random import shuffle
+from rest_framework.response import Response
+from collections import OrderedDict
 
+class ShufflePagination(LimitOffsetPagination):
+
+    def get_paginated_response(self, data):
+        shuffle(data)
+        return Response(OrderedDict([
+            ('count', self.count),
+            ('next', self.get_next_link()),
+            ('previous', self.get_previous_link()),
+            ('results', data)
+        ]))
 
 class NotificationAPI(GenericAPIView):
     permissions_classes = (IsOwnerOrReadOnly,)
@@ -266,7 +279,7 @@ class Usertimeline(generics.ListCreateAPIView):
 class VBList(generics.ListCreateAPIView):
     serializer_class   = TopicSerializerwithComment
     permission_classes = (IsOwnerOrReadOnly,)
-    pagination_class   = LimitOffsetPagination
+    pagination_class   = ShufflePagination
 
 
     """
@@ -330,8 +343,8 @@ class VBList(generics.ListCreateAPIView):
                         post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-date')
                         post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),date__gte=enddate).order_by('-date')
                     else:
-                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-id')
-                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),date__gte=enddate).order_by('-id')
+                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-view_count')
+                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),date__gte=enddate).order_by('-view_count')
                     if post1:
                         topics+=list(post1)
                     if post2:
@@ -357,22 +370,6 @@ class VBList(generics.ListCreateAPIView):
         else:
             topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-id')
         return topics
-
-from random import shuffle
-
-from rest_framework.response import Response
-from collections import OrderedDict
-
-class ShufflePagination(LimitOffsetPagination):
-
-    def get_paginated_response(self, data):
-        shuffle(data)
-        return Response(OrderedDict([
-            ('count', self.count),
-            ('next', self.get_next_link()),
-            ('previous', self.get_previous_link()),
-            ('results', data)
-        ]))
 
 
 
@@ -1310,7 +1307,11 @@ def fb_profile_settings(request):
                 userprofile.name = extra_data['name']
                 userprofile.social_identifier = extra_data['id']
                 userprofile.bio = bio
+                if not userprofile.d_o_b and d_o_b:
+                    add_bolo_score(user.id, 'dob_added', userprofile)
                 userprofile.d_o_b = d_o_b
+                if not userprofile.gender and gender:
+                    add_bolo_score(user.id, 'gender_added', userprofile)
                 userprofile.gender = gender
                 userprofile.about = about
                 userprofile.refrence = refrence
@@ -1347,7 +1348,11 @@ def fb_profile_settings(request):
                 userprofile.name= name
                 userprofile.bio = bio
                 userprofile.about = about
+                if not userprofile.d_o_b and d_o_b:
+                    add_bolo_score(userprofile.user.id, 'dob_added', userprofile)
                 userprofile.d_o_b = d_o_b
+                if not userprofile.gender and gender:
+                    add_bolo_score(userprofile.user.id, 'gender_added', userprofile)
                 userprofile.gender = gender
                 userprofile.profile_pic =profile_pic
                 userprofile.linkedin_url = likedin_url

@@ -238,6 +238,7 @@ class UserProfileSerializer(ModelSerializer):
     follow_count= SerializerMethodField()
     follower_count= SerializerMethodField()
     bolo_score= SerializerMethodField()
+    slug = SerializerMethodField()
     class Meta:
         model = UserProfile
         # fields = '__all__' 
@@ -251,6 +252,9 @@ class UserProfileSerializer(ModelSerializer):
 
     def get_bolo_score(self,instance):
         return shortcounterprofile(instance.bolo_score)
+
+    def get_slug(self,instance):
+        return instance.user.username
 
 class UserSerializer(ModelSerializer):
     userprofile = SerializerMethodField()

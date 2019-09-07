@@ -210,6 +210,9 @@ class ReferralCodeUsed(RecordTimeStamp):
     code = models.ForeignKey(ReferralCode, blank=False, null = False)
     by_user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True)
     is_download = models.BooleanField(default = True)
+    click_id = models.CharField(_("Click Id"), max_length=255, blank=True)
+    pid = models.CharField(_("PID"), max_length=255, blank=True)
+    referral_dump = models.TextField(_("Referral Dump"),null=True,blank=True)
 
     def __unicode__(self):
         return str(self.code)
