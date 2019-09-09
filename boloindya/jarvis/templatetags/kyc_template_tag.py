@@ -8,8 +8,8 @@ register = template.Library()
 
 @register.filter(name = "get_safe_url")
 def get_safe_url(path,user):
-    filepath = path.split('https://'+settings.AWS_BUCKET_NAME+'.s3.amazonaws.com/')[1]
     AWS_BUCKET_NAME = urlparse(path).netloc.split('.')[0]
+    filepath = path.split('https://'+AWS_BUCKET_NAME+'.s3.amazonaws.com/')[1]
     print filepath,"##################"
     if user.is_authenticated() and  user.is_staff:
         s3 = S3Connection(settings.AWS_ACCESS_KEY_ID,settings.AWS_SECRET_ACCESS_KEY,is_secure=True)
