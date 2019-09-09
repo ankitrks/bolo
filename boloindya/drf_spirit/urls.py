@@ -5,7 +5,7 @@ from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,c
     follow_like_list,upload_audio_to_s3,reply_delete,editTopic,topic_delete,notification_topic,GetUserProfile,RegisterDevice,UnregisterDevice,NotificationAPI,get_bolo_score,\
     GetTopic,GetQuestion,GetAnswers,CricketMatchList,get_single_match,get_single_poll,predict,LeaderBoradList,vb_seen,VBList,ExpertList,GetHomeAnswer,transcoder_notification,\
     vb_transcode_status,get_follow_user,upload_profile_image,get_following_list,get_follower_list,GetChallenge,GetChallengeDetails,save_android_logs,SyncDump,get_hash_list,\
-    KYCDocumentTypeList,save_kyc_basic_info,save_kyc_documents,save_kyc_selfie,save_kyc_additional_info,save_bank_details_info
+    KYCDocumentTypeList,save_kyc_basic_info,save_kyc_documents,save_kyc_selfie,save_kyc_additional_info,save_bank_details_info,kyc_profession_status,get_kyc_status
 from rest_framework_simplejwt import views as jwt_views
 
 app_name = 'drf_spirit'
@@ -53,6 +53,7 @@ urlpatterns = [
     url(r'^reply_on_topic', include(replyontopic_urls)),
     url(r'^categories/', include(category_urls)),
     url(r'^kyc_document_types/', KYCDocumentTypeList.as_view(), name='kyc_document_types'),
+    url(r'^kyc_profession_status/', kyc_profession_status, name='kyc_profession_status'),
     url(r'^comments/', include(comment_urls)),
     url(r'^upload_profile_image$', upload_profile_image, name='upload_profile_image'),
     
@@ -69,6 +70,7 @@ urlpatterns = [
     url(r'^save_kyc_selfie/$', save_kyc_selfie, name='save_kyc_selfie'),
     url(r'^save_kyc_additional_info/$', save_kyc_additional_info, name='save_kyc_additional_info'),
     url(r'^save_bank_details_info/$', save_bank_details_info, name='save_bank_details_info'),
+    url(r'^get_kyc_status/$', get_kyc_status, name='get_kyc_status'),
 
 
     url(r'^fb_profile_settings/$', fb_profile_settings, name='fb_profile_settings'),
