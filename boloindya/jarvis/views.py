@@ -261,8 +261,8 @@ def get_kyc_of_user(request):
         kyc_details = UserKYC.objects.filter(user=kyc_user)
         kyc_basic_info = KYCBasicInfo.objects.filter(user=kyc_user)
         kyc_document = KYCDocument.objects.filter(user=kyc_user,is_active=True)
-        additional_info = AdditionalInfo.objects.filter(user=kyc_user)
-        bank_details = BankDetail.objects.filter(user=kyc_user,is_active=True)
+        additional_info = AdditionalInfo.objects.get(user=kyc_user)
+        bank_details = BankDetail.objects.get(user=kyc_user,is_active=True)
         return render(request,'admin/jarvis/userkyc/single_kyc.html',{'kyc_details':kyc_details,'kyc_basic_info':kyc_basic_info,'kyc_document':kyc_document,'additional_info':additional_info,'bank_details':bank_details,'userprofile':kyc_user.st,'user':kyc_user})
 
 
