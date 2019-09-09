@@ -21,7 +21,7 @@ from .permissions import IsOwnerOrReadOnly
 from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,AppVersionSerializer,UserSerializer,SingleTopicSerializerwithComment,\
 UserAnswerSerializerwithComment,CricketMatchSerializer,PollSerializer,ChoiceSerializer,VotingSerializer,LeaderboardSerializer,\
 PollSerializerwithChoice, OnlyChoiceSerializer, NotificationSerializer, UserProfileSerializer, TongueTwisterSerializer,KYCDocumnetsTypeSerializer,\
-PaymentCycleSerializer,EncashableDetailSerializer,PaymentInfoSerializer
+PaymentCycleSerializer,EncashableDetailSerializer,PaymentInfoSerializer,UserKYCSerializer
 from forum.topic.models import Topic,ShareTopic,Like,SocialShare,FCMDevice,Notification,CricketMatch,Poll,Choice,Voting,Leaderboard,VBseen,TongueTwister
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
@@ -1037,6 +1037,18 @@ class KYCDocumentTypeList(generics.ListAPIView):
     pagination_class=None
     # permission_classes = (IsAuthenticated,)
     permission_classes  = (AllowAny,)
+ 
+def Convert_tuple_to_dict(tup, di): 
+    for a, b in tup: 
+        di.setdefault(a, []).append(b) 
+    return di
+
+@api_view(['POST'])
+def kyc_profession_status(request):
+    profession_option = Convert_tuple_to_dict(AdditionalInfo.profession_options,{})
+    status_option = Convert_tuple_to_dict(AdditionalInfo.status_options,{})
+
+    return JsonResponse({'message': 'succeess','profession_option':profession_option,'status_option':status_option}, status=status.HTTP_200_OK)
 
 class EncashableDetailList(generics.ListAPIView):
     serializer_class = EncashableDetailSerializer
@@ -1396,6 +1408,17 @@ def fb_profile_settings(request):
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
 #### KYC Views ####
+
+@api_view(['POST'])
+def get_kyc_status(request):
+    try:
+        user_kyc = UserKYC.objects.get(user = request.user)
+        return JsonResponse({'message': 'success','user_kyc':UserKYCSerializer(user_kyc).data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 @api_view(['POST'])
 def save_kyc_basic_info(request):
     try:
