@@ -26,7 +26,7 @@ from django.contrib.auth.decorators import login_required
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 from django.conf import settings
-from forum.payment.forms import PaymentForm
+from forum.payment.forms import PaymentForm,PaymentCycleForm
 from django.views.generic.edit import FormView
 from datetime import datetime
 
@@ -288,7 +288,9 @@ def get_encashable_detail(request):
             for each_user in User.objects.all():
                 calculate_encashable_details(each_user)
         all_encash_details = EncashableDetail.objects.all().order_by('-bolo_score_earned')
-    return render(request,'admin/jarvis/payment/encashable_detail.html',{'all_encash_details':all_encash_details})
+    pay_cycle = PaymentCycle.objects.all().first()
+    payement_cycle_form = PaymentCycleForm(initial=pay_cycle.__dict__)
+    return render(request,'admin/jarvis/payment/encashable_detail.html',{'all_encash_details':all_encash_details,'payement_cycle_form':payement_cycle_form})
 
 def get_single_encash_detail(request):
     if request.user.is_superuser or request.user.is_staff:
@@ -325,6 +327,22 @@ class PaymentView(FormView):
         kwargs=super(PaymentView,self).get_context_data(*args,**kwargs)
         kwargs['http_referer']=self.request.META.get('HTTP_REFERER',None)
         return super(PaymentView,self).get_context_data(*args,**kwargs)
+
+class PaymentCycleView(FormView):
+    form_class = PaymentCycleForm
+    template_name='admin/jarvis/payment/invoice_error.html'
+
+    def form_valid(self,form,**kwargs):
+        if self.request.user.is_superuser or self.request.user.is_staff:
+            pay_cycle = PaymentCycle.objects.all().update(**form.cleaned_data)
+            for each_user in User.objects.all():
+                calculate_encashable_details(each_user)
+            all_encash_details = EncashableDetail.objects.all().order_by('-bolo_score_earned')
+            pay_cycle = PaymentCycle.objects.all().first()
+            payement_cycle_form = PaymentCycleForm(initial=pay_cycle.__dict__)
+            return render(request,'admin/jarvis/payment/encashable_detail.html',{'all_encash_details':all_encash_details,'payement_cycle_form':payement_cycle_form})
+
+
 
 
 
