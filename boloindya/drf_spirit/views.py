@@ -1046,7 +1046,6 @@ def kyc_profession_status(request):
     profession_option = Convert_tuple_to_dict(AdditionalInfo.profession_options,{})
     status_option = Convert_tuple_to_dict(AdditionalInfo.status_options,{})
     mode_of_transaction_options = Convert_tuple_to_dict(UserKYC.mode_of_transaction_options,{})
-
     return JsonResponse({'message': 'succeess','profession_option':profession_option,'status_option':status_option,'mode_of_transaction_options':mode_of_transaction_options}, status=status.HTTP_200_OK)
 
 class EncashableDetailList(generics.ListAPIView):

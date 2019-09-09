@@ -71,10 +71,7 @@ urlpatterns = [
     url(r'^save_kyc_selfie/$', save_kyc_selfie, name='save_kyc_selfie'),
     url(r'^save_kyc_additional_info/$', save_kyc_additional_info, name='save_kyc_additional_info'),
     url(r'^save_bank_details_info/$', save_bank_details_info, name='save_bank_details_info'),
-<<<<<<< HEAD
     url(r'^get_kyc_status/$', get_kyc_status, name='get_kyc_status'),
-=======
->>>>>>> urls added for kyc
 
 
     url(r'^fb_profile_settings/$', fb_profile_settings, name='fb_profile_settings'),
