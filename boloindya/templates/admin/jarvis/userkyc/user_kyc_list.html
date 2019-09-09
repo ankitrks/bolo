@@ -26,7 +26,7 @@
         <tbody>
             {% for each_kyc in all_kyc %}
                 <tr>
-                    <td><a href="/jarvis/get_kyc_of_user/?username={{ each_kyc.user.username}}"><strong>{{ each_kyc.user.username}}</strong></a></td>
+                    <td><a href="/jarvis/single_kyc/?username={{ each_kyc.user.username}}"><strong>{{ each_kyc.user.username}}</strong></a></td>
                     <td>{{ each_kyc.kyc_basic_info_submitted}}</td>
                     <td>{{ each_kyc.is_kyc_basic_info_accepted}}</td>
 
