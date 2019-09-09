@@ -1478,18 +1478,18 @@ def save_kyc_additional_info(request):
         mother_firstname = request.POST.get('mother_firstname',None)
         mother_lastname = request.POST.get('mother_lastname',None)
         profession = request.POST.get('profession',None)
-        status = request.POST.get('status',None)
+        marrigae_status = request.POST.get('status',None)
         data_dict={
         'father_firstname':father_firstname,
         'father_lastname':father_lastname,
         'mother_firstname':mother_firstname,
         'mother_lastname':mother_lastname,
         'profession':profession,
-        'status':status,
+        'status':marrigae_status,
         'user':request.user
         }
         user_kyc = UserKYC.objects.get(user=request.user)
-        additional_info,is_created = AdditionalInfo.objects.update_or_create(user=request.user,defaults=data_dict,)
+        additional_info,is_created = AdditionalInfo.objects.update_or_create(user=request.user,defaults=data_dict)
         user_kyc.kyc_additional_info_submitted = True
         user_kyc.save()
         return JsonResponse({'message': 'additional info saved'}, status=status.HTTP_200_OK)

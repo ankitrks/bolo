@@ -16,7 +16,7 @@ class PaymentCycle(models.Model):
     duration_start_date = models.DateField(_("Duration Start Date"),null=True,blank=True)
     
     def __unicode__(self):
-        return str('Period:  '+str(self.duration_period)+'-'+self.get_duration_type_display()+'-->BoloScore:'+str(self.minimum_bolo_score)+'-->Start Date '+str(self.duration_start_date))
+        return str('Period:  '+str(self.duration_period)+'-'+self.get_duration_type_display()+'-->Start Date '+str(self.duration_start_date))
 
     class Meta:
         verbose_name = _("PaymentCycle")
@@ -31,6 +31,7 @@ class EncashableDetail(UserInfo):
     is_encashed = models.BooleanField(_("Is Encashed?"),default=False)
     enchashed_on = models.DateTimeField(null=True,blank=True)
     is_eligible_for_encash = models.BooleanField(_("Is Eligible For Encash?"),default=False)
+    encashable_cycle = models.CharField(_('Encash Cycle'),max_length=255,null=True,blank=True)
 
     def __unicode__(self):
         return self.user.username

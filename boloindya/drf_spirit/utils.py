@@ -161,7 +161,10 @@ def calculate_encashable_details(user):
             i+=1
             if now > start_date and now <= end_date:
                 is_in_cycle = True
-        enchashable_detail,i_created = EncashableDetail.objects.get_or_create(user=user,duration_start_date = start_date,duration_end_date = end_date)
+        enchashable_detail,is_created = EncashableDetail.objects.get_or_create(user=user,duration_start_date = start_date,duration_end_date = end_date)
+        if is_created:
+            cycle_count = EncashableDetail.objects.filter(user = user).count()
+            enchashable_detail.encashable_cycle = 'cycle_count_'+str(cycle_count)
         all_bolo_action = BoloActionHistory.objects.filter(user = user,created_at__gt = start_date,created_at__lte=end_date,action__is_monetize=True)
         total_bolo_score_in_this_cycle = 0
         all_weights = Weight.objects.filter(is_monetize = True)
