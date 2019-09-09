@@ -9,9 +9,11 @@ register = template.Library()
 @register.filter(name = "get_safe_url")
 def get_safe_url(path,user):
     AWS_BUCKET_NAME = urlparse(path).netloc.split('.')[0]
+    print AWS_BUCKET_NAME
     filepath = path.split('https://'+AWS_BUCKET_NAME+'.s3.amazonaws.com/')[1]
-    print filepath,"##################"
-    if user.is_authenticated() and  user.is_superuser:
+    print filepath,"##################",user.is_superuser
+    if user.is_authenticated():
+        print "maaz"
         s3 = S3Connection(settings.AWS_ACCESS_KEY_ID,settings.AWS_SECRET_ACCESS_KEY,is_secure=True)
         # client = boto3.client('s3',aws_access_key_id = settings.AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.AWS_SECRET_ACCESS_KEY)
         # s3 = S3Connection(settings.AWS_ACCESS_KEY_ID,
