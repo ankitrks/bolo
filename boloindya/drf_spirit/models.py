@@ -2,6 +2,8 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from forum.core.conf import settings
+import os
+import json
 
 class SingUpOTP(models.Model):
     mobile_no = models.CharField(_("title"), max_length=75)
@@ -178,10 +180,144 @@ class UserJarvisDump(models.Model):
         ('2', 'error_logs'),
     ]
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,related_name='User',editable=False)
-    dump = models.TextField(_("User Dump"),null=True,blank=True)
-    dump_type = models.CharField(_("Dump Type"),choices=DUMP_TYPE,max_length=50)
-    sync_time = models.DateTimeField(_("Sync Time"),auto_now=False,auto_now_add=True,blank=False,null=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,related_name='User',editable=False, db_index = True)
+    dump = models.TextField(_("dump"),null=True,blank=True)
+    dump_type = models.CharField(_("dump_type"),choices=DUMP_TYPE,max_length=50)
+    sync_time = models.DateTimeField(_("sync_time"),auto_now=False,auto_now_add=True,blank=False,null=False)
+    is_executed = models.BooleanField(_("is_executed"), default=False)
 
     def __unicode__(self):
-        return str(self.user_dump)
+        return "%s" % self.dump
+
+    
+# code created by akash
+# 5 different models for recording user based data
+# read the sample dump file and create columns for the same
+
+# class recording the model storing user based statistics 
+class user_log_statistics(models.Model):
+    #user_log_fname = os.getcwd() + '/user_log.json'         # file recording the logs of user
+
+    # record these details of the user
+    #user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name = 'User', editable = False, max_length = 20)
+    user = models.CharField(_("user"), null = True, blank = False, max_length=250, db_index = True)
+    user_phone_details = models.CharField(_("phone_details"), null = True, blank = True, max_length=250)
+    user_lang = models.CharField(_("user_lang"), null = True, blank = True, max_length=250)
+    num_profile_follow = models.TextField(_("num_profile_follow"), null = True, blank = True)
+    num_profile_unfollow = models.TextField(_("num_profile_unfollow"), null = True, blank = True)
+    num_viewed_profiles = models.TextField(_("num_viewed_profiles"), null = True, blank = True)
+    num_profile_reported = models.TextField(_("num_profile_reported"), null = True, blank = True)
+    num_viewed_following_list = models.TextField(_("num_viewed_following_list"), null = True, blank = True)
+    num_entry_points = models.TextField(_("num_entry_points"), null = True, blank = True)
+    num_vb_commented = models.TextField(_("num_vb_commented"), null = True, blank = True)
+    num_vb_liked = models.TextField(_("num_vb_liked"), null = True, blank = True)
+    num_vb_shared = models.TextField(_("num_vb_shared"), null = True, blank = True)
+    num_vb_unliked = models.TextField(_("num_vb_unliked"), null = True, blank = True)
+    num_vb_viewed = models.TextField(_("num_vb_viewed"), null = True, blank = True)
+    session_starttime = models.DateTimeField(_("session_starttime"), null = True, blank = True)
+
+# class storing the model recroding follow, unfollow, report, share details of a user                  
+class user_follow_unfollow_details(models.Model):
+
+    # denoting the type of relationshhip applicable here
+    relationship_info = [
+        ('1', 'follow'),
+        ('2', 'unfollow'),
+        ('3', 'report'),
+        ('4', 'shared'),
+    ]
+
+    user = models.CharField(_("user"), null = True, blank = False, max_length = 250, db_index = True)
+    profileid = models.TextField(_("profileid"), null = True, blank = True, db_index = True)
+    timestamp = models.DateTimeField(_("timestamp"), blank = False, null = False)
+    relationship_type = models.CharField(_("relationship_type"), choices = relationship_info, max_length = 50)
+
+
+# class storing user-videotype details applicable for user, which videos s/he watched, commented, shared etc
+class user_videotype_details(models.Model):
+    
+    videoinfo_type = [
+        ('1', 'commented'),
+        ('2', 'shared'),
+        ('3', 'liked'),
+        ('4', 'unliked'),
+        ('5', 'viewed'),
+    ]    
+
+    user = models.CharField(_("user"), null = True, blank = False, max_length = 250, db_index = True)
+    videoid = models.CharField(_("videoid"), null = True, blank = True, max_length = 250, db_index = True)
+    timestamp = models.DateTimeField(_("timestamp"), null = False, blank = True)
+    video_type = models.CharField(_("video_type"), choices = videoinfo_type, max_length = 250)
+
+# class storing video creation details 
+class video_details(models.Model):
+
+    videoid = models.CharField(_("videoid"), null = False, blank = False, max_length = 250, db_index = True)
+    timestamp = models.DateTimeField(_("timestamp"), null = True, blank = False)
+
+# class storing user entry point details
+class user_entry_point(models.Model):
+
+    user = models.CharField(_("user"), null = True, blank = False, max_length = 250, db_index = True)
+    entrypoint = models.CharField(_("entrypoint"), null = False, max_length = 400)
+    timestamp = models.DateTimeField(_("timestamp"), blank = False, null = False)
+
+
+# class storing "following" list and "followers" list viewed by a user
+class user_viewed_followers_following(models.Model):
+
+    profile_choices = [
+        ('1', 'following'),
+        ('2', 'followers'),
+    ]
+    user = models.CharField(_("user"), null = True, blank = False, max_length = 250, db_index = True)
+    profileid = models.CharField(_("profileid"), null = False, blank = False, max_length = 250, db_index = True)
+    timestamp = models.CharField(_("timestamp"), null = False, blank = True, max_length = 250)
+    relationship_type = models.CharField(_("relationship_type"), choices = profile_choices, max_length = 250)
+
+# class storing user category interests 
+class user_interest(models.Model):
+
+    choices = [
+        ('1', 'added'),
+        ('2', 'removed'),
+    ]
+    user = models.CharField(_("user"), null = True, blank = False, max_length = 250, db_index = True)
+    categoryid = models.CharField(_("categoryid"), null = True, blank = False, max_length = 250, db_index = True)
+    timestamp = models.DateTimeField(_("timestamp"), blank = False, null = False)
+    category_status = models.CharField(_("category_status"), choices = choices, max_length = 250)
+
+# class storing details of video shared by the user
+class video_shared_details(models.Model):
+
+    choices = [
+        ('1', 'shared_on_whatsapp'),
+        ('2', 'shared_on_fb'),
+        ('3', 'shared_on_linkedin'),
+        ('4', 'copied_on_clipboard'),
+        ('5', 'shared_on_twitter'),
+    ]
+
+    user = models.CharField(_("user"), null = True, blank = False, max_length = 250, db_index = True)
+    videoid = models.CharField(_("videoid"), null = True, blank = False, max_length = 250, db_index = True)
+    share_platform = models.CharField(_("share_platform"), null = True, blank = True, max_length = 400)
+    timestamp = models.DateTimeField(_("timestamp"), null = False, blank = False)
+
+# class storing the start and the end time
+# class video_loading_info(models.Model):
+
+#     user = models.CharField(_("user"), null = True, blank = False, max_length = 250)
+#     videoid = models.CharField(_("videoid"), null = True, blank = False, max_length = 250)
+#     starttime = models.DateTimeField(_("starttime"), null = True, blank = True)
+#     clicktime = models.DateTimeField(_("clicktime"), null = True, blank = True)
+
+# # class storing the user phone configurations
+# class user_phone_config(models.Model):
+
+#     user = models.CharField(_("user"), null = True, blank = False, max_length = 250)
+#     processor = 
+
+
+
+
+
