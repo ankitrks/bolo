@@ -4,7 +4,7 @@
 {% endblock styles%}
 {% block content %}
 <div id="user_kyc">
-    <a href="/jarvis/get_encashable_detail/?calculate=1" style="float:right;margin:30px;"><button type="button" class="btn btn-primary">Re Calculate Bolo Scores</button></a>
+    <a href="/jarvis/get_encashable_detail/?calculate=1" style="margin:30px;"><button type="button" class="btn btn-primary">Re Calculate Bolo Scores</button></a>
     <button type="button" class="btn btn-danger encash_bolo" data-toggle="modal" data-target="#change_cycle" encashable_id="{{each_encash.id}}" encash_amount="{{ each_encash.equivalent_INR }}">Change Cycle</button>
         <div class="row">
         <div class="col-xs-12 table-responsive">
@@ -88,7 +88,41 @@
 <script src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.18/js/dataTables.bootstrap4.min.js"></script>
 <script>
-$("#encash_details_table").DataTable();
+// $("#encash_details_table").DataTable();
+$(document).ready( function () {
+  
+  var table = $('#encash_details_table').DataTable({
+        "order": [[ 3, "desc" ]],
+        "oLanguage": {
+            "sInfo": "Showing _START_ to _END_ of _TOTAL_ items."
+        }
+    });
+
+    $("#encash_details_table thead th").each( function ( i ) {
+        var encash_column = (($(this).text() == 'Encash Cycle') ? true : false);
+        if (encash_column) {
+            var select = $('<select><option value="">Encash Cycle</option></select>')
+                .appendTo( $(this).empty() )
+                .on( 'change', function () {
+                    var val = $(this).val();
+                    
+                    table.column( i )
+                        .search( val ? '^'+$(this).val()+'$' : val, true, false )
+                        .draw();
+                } );
+            
+            // Get the Status values a specific way since the status is a anchor/image
+            // All other non-Status columns (like the example)
+                table.column( i ).data().unique().sort().each( function ( d, j ) {  
+                    select.append( '<option value="'+d+'">'+d+'</option>' );
+                } ); 
+            }   
+    } );
+  
+  
+  
+  
+} );
     
 </script>
 {% endblock center_js%}

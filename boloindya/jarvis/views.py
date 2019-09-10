@@ -343,6 +343,27 @@ class PaymentCycleView(FormView):
             return render(request,'admin/jarvis/payment/encashable_detail.html',{'all_encash_details':all_encash_details,'payement_cycle_form':payement_cycle_form})
 
 
+def accept_kyc(request):
+    if request.user.is_superuser or request.user.is_staff:
+        kyc_type = request.GET.get('kyc_type',None)
+        kyc_id = request.GET.get('kyc_id',None)
+        user_id = request.GET.get('user_id',None)
+        user_kyc = UserKYC.objects.get(user_id = user_id)
+        if kyc_type == "basic_info":
+            user_kyc.is_kyc_basic_info_accepted = True
+        elif kyc_type == "kyc_document":
+            user_kyc.is_kyc_document_info_accepted = True
+        elif kyc_type == "kyc_pan":
+            user_kyc.is_kyc_pan_info_accepted = True
+        elif kyc_type == "kyc_profile_pic":
+            user_kyc.is_kyc_selfie_info_accepted = True
+        elif kyc_type == "kyc_additional_info":
+            user_kyc.is_kyc_additional_info_accepted = True
+        elif kyc_type == "kyc_bank_details":
+            user_kyc.is_kyc_bank_details_accepted = True
+        user_kyc.saved()
+
+
 
 
 
