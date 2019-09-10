@@ -1856,6 +1856,16 @@ def follow_like_list(request):
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
+def my_app_version(request):
+    try:
+        app_version = AppVersion.objects.get(app_name = 'android')
+        app_version = AppVersionSerializer(app_version).data
+        return JsonResponse({'app_version':app_version}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
 def get_follow_user(request):
     try:
         #all_follow_id = Follower.objects.filter(user_follower = request.user,is_active = True).values_list('user_following_id', flat=True)
