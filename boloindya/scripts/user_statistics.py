@@ -1,6 +1,15 @@
 from drf_spirit.models import UserJarvisDump, user_log_statistics, user_follow_unfollow_details, user_videotype_details, video_details, user_entry_point
 import time
 import ast
+from django.http import JsonResponse
+from rest_framework import status
+
+#! /usr/bin/python
+import sys
+import os
+import django
+os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
+sys.path.append( '/'.join(os.path.realpath(__file__).split('/')[:5]) )
 
 # func for dumping user statistics in the model (userid, userphoneinfo, vb_viwed, vb_commented, )
 def user_statistics(user_data_dump):
@@ -92,7 +101,7 @@ def user_statistics(user_data_dump):
         print(user_data_obj)
 
     except Exception as e:
-            print(str(e))
+            print('Exception 1: ' + str(e))
 
     return JsonResponse({'message':'success'}, status=status.HTTP_201_CREATED)
 
@@ -142,7 +151,7 @@ def follow_unfollow_details(user_data_dump):
             user_data_obj.save()
 
     except Exception as e:
-        print(str(e))
+        print('Exception2: ' + str(e))
 
 
     return JsonResponse({'message':'success'}, status = status.HTTP_201_CREATED)               
@@ -175,7 +184,7 @@ def video_type_details(user_data_dump):
             user_data_obj.save()
 
     except Exception as e:
-        print(str(e))
+        print('Exception 3:' + str(e))
 
     return JsonResponse({'message':'success'}, status = status.HTTP_201_CREATED)        
 
@@ -190,9 +199,9 @@ def video_info(user_data_dump):
             user_data_obj.save()
 
     except Exception as e:
-        print(str(e))
+        print('Exception 4: ' + str(e))
 
-    return JsonResponse({'message':'success'}, status = HTTP_201_CREATED)          
+    return JsonResponse({'message':'success'}, status = status.HTTP_201_CREATED)          
 
 
 #func for dumping user entry points into the model(profileid, entrytype, timestamp)      
@@ -205,9 +214,9 @@ def record_user_entry_points(user_data_dump):
             user_data_obj.save()
 
     except Exception as e:
-        print(str(e))
+        print('Exception 5: ' + str(e))
 
-    return JsonResponse({'message':'success'}, status = HTTP_201_CREATED)        
+    return JsonResponse({'message':'success'}, status = status.HTTP_201_CREATED)        
 
 
 #func for dumping the profileids of profiles viewed and followed
@@ -225,9 +234,9 @@ def userviewed_follower_following(user_data_dump):
             user_data_obj.save()
 
     except Exception as e:
-        print(str(e))
+        print('Exception 6: ' + str(e))
 
-    return JsonResponse({'message':'success'}, status = HTTP_201_CREATED)        
+    return JsonResponse({'message':'success'}, status = status.HTTP_201_CREATED)        
 
 #func for storing user interests 
 def user_category_intereset(user_data_dump):
@@ -246,11 +255,10 @@ def user_category_intereset(user_data_dump):
     except Exception as e:
         print(str(e))
 
-    return JsonResponse({'message':'success'}, status = HTTP_201_CREATED)            
+    return JsonResponse({'message':'success'}, status = status.HTTP_201_CREATED)            
 
 #func for storing video platform shared details of the user
 def video_share(user_data_dump):
-    
     try:
         userid = user_data_dump['user_id']
         for (a,b,c) in user_data_dump['vb_share']:
@@ -258,11 +266,9 @@ def video_share(user_data_dump):
             user_data_obj = video_shared_details(user = userid, videoid = a, share_platform = b, timestamp = datetime_format)
             user_data_obj.save()
     except Exception as e:
-        print(str(e))
+        print('Exception 7: ' + str(e))
 
-    except JsonResponse({'message':'success'}, status = HTTP_201_CREATED)
-
-
+    return JsonResponse({'message':'success'}, status = status.HTTP_201_CREATED)
 
 def main():
     # pick only those dumps which have not been executed 
@@ -271,7 +277,6 @@ def main():
         try:
             user_data_string = user_jarvis.dump
             user_data_dump = ast.literal_eval(user_data_string)
-
             # pass the collected user dump through a set of methods
             user_statistics(user_data_dump)
             follow_unfollow_details(user_data_dump)
@@ -279,18 +284,17 @@ def main():
             video_info(user_data_dump)
             record_user_entry_points(user_data_dump)
             user_category_intereset(user_data_dump)
-            video_share(user_data_dump)    
-
-        unique_id = user_jarvis.pk     # get primary key of the dump
-        UserJarvisDump.objects.filter(pk = unique_id).update(is_executed = True, dump_type = 1)  #mark the is_executed field as true
-
+            video_share(user_data_dump)
+            unique_id = user_jarvis.pk # get primary key of the dump
+            UserJarvisDump.objects.filter(pk = unique_id).update(is_executed = True, dump_type = 1)  #mark the is_executed field as true
         except Exception as e:
-            print(str(e))
+            print('Exception 8: ' + str(e))
 
-        
-
-if __name__ == '__main__':
+def run():
     main()
+
+#if __name__ == '__main__':
+#    main()
 
 
 
