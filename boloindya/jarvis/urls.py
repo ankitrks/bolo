@@ -14,4 +14,6 @@ urlpatterns = [
     url(r'^get_single_encash_detail/$',views.get_single_encash_detail, name='get_single_encash_detail'),
     url(r'^bolo_payment/$',views.PaymentView.as_view(),name='bolo_payment'),
     url(r'^bolo_cycle/$',views.PaymentCycleView.as_view(),name='bolo_cycle'),
+    url(r'^accept_kyc/$',views.accept_kyc, name='accept_kyc'),
+    url(r'^reject_kyc/$',views.reject_kyc, name='reject_kyc'),
 ]

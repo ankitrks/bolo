@@ -1,27 +1,74 @@
-$(document).ready(function(){
-      addEvents();
+$(document).ready(function() {
+    addEvents();
+
 });
 
-
 function addEvents() {
-      $('.form-group').on('keyup',"#id_amount",showninttostring);
-      $(document).on('click','.encash_bolo',encash_bolo);
-
+    $(document).on('click', '.kyc_accept', kyc_accept);
+    $(document).on('click', '.kyc_reject', kyc_reject);
+    $(document).on('click', '.reject_submit', reject_submit);
 }
 
-function showninttostring(){
-  var int_amount = $("input[id=id_amount]").val();
-  console.log(int_amount);
-  var string_amount = $.wordMath.toString(int_amount);
-  $(".string_amount").text(string_amount);
-}
-function encash_bolo(){
-  var encashable_id=$(this).attr('encashable_id')
-  $('#id_enchashable_detail').val(encashable_id);
-  var encashable_amount=$(this).attr('encash_amount');
-  $('#id_amount').val(encashable_amount);
-  showninttostring();
-  $('#id_amount').attr('disabled','');
+function kyc_accept() {
+    var kyc_type = $(this).attr("kyc_type");
+    var user_id = $(this).attr("user_id");
+    data = {
+        kyc_type: kyc_type,
+        user_id: user_id
+    }
+    $.ajax({
+        url: "/jarvis/accept_kyc/",
+        //contentType: false,
+        dataType: "json",
+        //processData: false,
+        type: "GET",
+        data: data,
+        success: function(data) {
+            console.log(data)
+        },
+        error: function(data) {
+            console.log(data)
+        }
+    });
 }
 
+function kyc_reject(e) {
+    e.preventDefault();
+    var kyc_type = $(this).attr("kyc_type");
+    var kyc_id = $(this).attr("kyc_id");
+    var user_id = $(this).attr("user_id");
+    $($(this).attr('data-target')).find('.reject_submit').attr('kyc_type',kyc_type)
+    $($(this).attr('data-target')).find('.reject_submit').attr('kyc_id',kyc_id)
+    $($(this).attr('data-target')).find('.reject_submit').attr('user_id',user_id)
+}
 
+function reject_submit(){
+    var kyc_reject_reason = $(this).parents('form').find('#id_reject_reason').val();
+    var kyc_reject_text = $(this).parents('form').find('#id_reject_text').val();
+    var kyc_type = $(this).attr("kyc_type");
+    var kyc_id = $(this).attr("kyc_id");
+    var user_id = $(this).attr("user_id");
+    data = {
+        kyc_type: kyc_type,
+        kyc_id: kyc_id,
+        user_id: user_id,
+        kyc_reject_reason:kyc_reject_reason,
+        kyc_reject_text:kyc_reject_text
+
+    }
+    $.ajax({
+        url: "/jarvis/reject_kyc/",
+        //contentType: false,
+        dataType: "json",
+        //processData: false,
+        type: "GET",
+        data: data,
+        success: function(data) {
+            console.log(data)
+        },
+        error: function(data) {
+            console.log(data)
+        }
+    });
+
+}

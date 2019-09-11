@@ -54,7 +54,7 @@ class KYCBasicInfo(UserInfo):
     # nationality = models.CharField(choice field for selecting country)
     is_rejected = models.BooleanField(default=False)
     reject_reason = models.CharField(choices=reject_options, blank = True, null = True, max_length=10)
-    reject_text = models.CharField(_("Reject Text"), max_length=1000, blank=True,null=True)
+    reject_text = models.TextField(_("Reject Text"), max_length=1000, blank=True,null=True)
 
     def __unicode__(self):
         return self.user.username
@@ -86,7 +86,7 @@ class KYCDocument(UserInfo):
     backside_url= models.CharField(_("Document Back Url"), max_length=1000, blank=True)
     is_rejected = models.BooleanField(default=False)
     reject_reason = models.CharField(choices=reject_options, blank = True, null = True, max_length=10)
-    reject_text = models.CharField(_("Reject Text"), max_length=1000, blank=True,null=True)
+    reject_text = models.TextField(_("Reject Text"), max_length=1000, blank=True,null=True)
 
     def __unicode__(self):
         return self.user.username
@@ -120,7 +120,7 @@ class AdditionalInfo(UserInfo):
     status = models.CharField(choices=status_options, blank = True, null = True, max_length=10, default='1')
     is_rejected = models.BooleanField(default=False)
     reject_reason = models.CharField(choices=reject_options, blank = True, null = True, max_length=10)
-    reject_text = models.CharField(_("Reject Text"), max_length=1000, blank=True,null=True)
+    reject_text = models.TextField(_("Reject Text"), max_length=1000, blank=True,null=True)
 
     def __unicode__(self):
         return self.user.username
@@ -142,7 +142,7 @@ class BankDetail(UserInfo):
     paytm_number = models.CharField(_("Paytm Mobile No"), max_length=100, blank = True, null = True)
     is_rejected = models.BooleanField(default=False)
     reject_reason = models.CharField(choices=reject_options, blank = True, null = True, max_length=10)
-    reject_text = models.CharField(_("Reject Text"), max_length=1000, blank=True,null=True)
+    reject_text = models.TextField(_("Reject Text"), max_length=1000, blank=True,null=True)
 
     def __unicode__(self):
         return self.user.username

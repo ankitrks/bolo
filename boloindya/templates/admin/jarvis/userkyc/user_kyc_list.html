@@ -26,7 +26,7 @@
         <tbody>
             {% for each_kyc in all_kyc %}
                 <tr>
-                    <td><a href="/jarvis/single_kyc/?username={{ each_kyc.user.username}}"><strong>{{ each_kyc.user.username}}</strong></a></td>
+                    <td><a href="{% if each_kyc.is_kyc_completed %}/jarvis/single_kyc/?username={{ each_kyc.user.username}}{% else %}#{% endif %}"><strong>{{ each_kyc.user.username}}</strong></a></td>
                     <td>{{ each_kyc.kyc_basic_info_submitted}}</td>
                     <td>{{ each_kyc.is_kyc_basic_info_accepted}}</td>
 
@@ -45,7 +45,7 @@
                     <td>{{ each_kyc.kyc_bank_details_submitted}}</td>
                     <td>{{ each_kyc.is_kyc_bank_details_accepted}}</td>
 
-                    <td>{{ each_kyc.is_kyc_completed}}</td>
+                    <td>{{ each_kyc.is_kyc_completed }}</td>
                     <td>{{ each_kyc.is_kyc_accepted}}</td>
                     <td>{{ each_kyc.get_mode_of_transaction_display}}</td>
                 </tr>

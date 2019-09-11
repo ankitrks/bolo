@@ -29,6 +29,7 @@ from django.conf import settings
 from forum.payment.forms import PaymentForm,PaymentCycleForm
 from django.views.generic.edit import FormView
 from datetime import datetime
+from forum.userkyc.forms import KYCBasicInfoRejectForm,KYCDocumentRejectForm,AdditionalInfoRejectForm,BankDetailRejectForm
 
 
 
@@ -259,11 +260,18 @@ def get_kyc_of_user(request):
         username = request.GET.get('username',None)
         kyc_user = User.objects.get(username=username)
         kyc_details = UserKYC.objects.get(user=kyc_user)
-        kyc_basic_info = KYCBasicInfo.objects.get(user=kyc_user,is_rejected=False)
-        kyc_document = KYCDocument.objects.filter(user=kyc_user,is_active=True,is_rejected=False)
-        additional_info = AdditionalInfo.objects.get(user=kyc_user,is_rejected=False)
-        bank_details = BankDetail.objects.get(user=kyc_user,is_active=True,is_rejected=False)
-        return render(request,'admin/jarvis/userkyc/single_kyc.html',{'kyc_details':kyc_details,'kyc_basic_info':kyc_basic_info,'kyc_document':kyc_document,'additional_info':additional_info,'bank_details':bank_details,'userprofile':kyc_user.st,'user':kyc_user})
+        kyc_basic_info = KYCBasicInfo.objects.get(user=kyc_user)
+        kyc_document = KYCDocument.objects.filter(user=kyc_user,is_active=True)
+        additional_info = AdditionalInfo.objects.get(user=kyc_user)
+        bank_details = BankDetail.objects.get(user=kyc_user,is_active=True)
+        kyc_basic_reject_form = KYCBasicInfoRejectForm()
+        kyc_document_reject_form = KYCDocumentRejectForm()
+        kyc_additional_reject_form = AdditionalInfoRejectForm()
+        kyc_bank_reject_form = BankDetailRejectForm()
+        return render(request,'admin/jarvis/userkyc/single_kyc.html',{'kyc_details':kyc_details,'kyc_basic_info':kyc_basic_info,\
+            'kyc_document':kyc_document,'additional_info':additional_info,'bank_details':bank_details,'userprofile':kyc_user.st,\
+            'user':kyc_user,'kyc_basic_reject_form':kyc_basic_reject_form,'kyc_document_reject_form':kyc_document_reject_form,'kyc_additional_reject_form':kyc_additional_reject_form,
+            'kyc_bank_reject_form':kyc_bank_reject_form})
 
 
 def SecretFileView(request):
@@ -360,7 +368,7 @@ def accept_kyc(request):
             user_kyc.is_kyc_additional_info_accepted = True
         elif kyc_type == "kyc_bank_details":
             user_kyc.is_kyc_bank_details_accepted = True
-        user_kyc.saved()
+        user_kyc.save()
         if user_kyc.is_kyc_basic_info_accepted and user_kyc.is_kyc_document_info_accepted and user_kyc.is_kyc_selfie_info_accepted and\
         user_kyc.is_kyc_additional_info_accepted and user_kyc.is_kyc_bank_details_accepted:
             user_kyc.is_kyc_accepted = True
@@ -380,36 +388,40 @@ def reject_kyc(request):
             user_kyc.is_kyc_basic_info_accepted = False
             obj = KYCBasicInfo.objects.get(pk=kyc_id)
             obj.reject_reason = kyc_reject_reason
-            obj.reject_reason = kyc_reject_text
+            obj.reject_text = kyc_reject_text
         elif kyc_type == "kyc_document":
             user_kyc.is_kyc_document_info_accepted = False
             obj = KYCDocument.objects.get(pk=kyc_id)
             obj.reject_reason = kyc_reject_reason
-            obj.reject_reason = kyc_reject_text
+            obj.reject_text = kyc_reject_text
         elif kyc_type == "kyc_pan":
             user_kyc.is_kyc_pan_info_accepted = False
             obj = KYCDocument.objects.get(pk=kyc_id)
             obj.reject_reason = kyc_reject_reason
-            obj.reject_reason = kyc_reject_text
+            obj.reject_text = kyc_reject_text
         elif kyc_type == "kyc_profile_pic":
             user_kyc.is_kyc_selfie_info_accepted = False
             obj = KYCBasicInfo.objects.get(pk=kyc_id)
             obj.reject_reason = kyc_reject_reason
-            obj.reject_reason = kyc_reject_text
+            obj.reject_text = kyc_reject_text
         elif kyc_type == "kyc_additional_info":
             user_kyc.is_kyc_additional_info_accepted = False
-            obj = BankDetail.objects.get(pk=kyc_id)
+            obj = AdditionalInfo.objects.get(pk=kyc_id)
             obj.reject_reason = kyc_reject_reason
-            obj.reject_reason = kyc_reject_text
+            obj.reject_text = kyc_reject_text      
         elif kyc_type == "kyc_bank_details":
             user_kyc.is_kyc_bank_details_accepted = False
+            obj = BankDetail.objects.get(pk=kyc_id)
+            obj.reject_reason = kyc_reject_reason
+            obj.reject_text = kyc_reject_text
         obj.is_rejected = True
         obj.is_active = True
         obj.save()
-        user_kyc.saved()
+        user_kyc.save()
         if not (user_kyc.is_kyc_basic_info_accepted and user_kyc.is_kyc_document_info_accepted and user_kyc.is_kyc_selfie_info_accepted and \
         user_kyc.is_kyc_additional_info_accepted and user_kyc.is_kyc_bank_details_accepted):
             user_kyc.is_kyc_accepted = False
+            user_kyc.is_kyc_completed = False
             user_kyc.save()
 
         return HttpResponse(json.dumps({'success':'success','kyc_accepted':user_kyc.is_kyc_accepted}),content_type="application/json")

@@ -1,5 +1,6 @@
 {% extends "admin/jarvis/base.html" %}
 {% load kyc_template_tag %}
+{% load static %}
 {% block content %}
     <div>
         <div class="userinfo">
@@ -85,10 +86,14 @@
                                 <div class="w3-card-4 test" style="width:100%;margin: 0 auto;text-align:center;">
                                     <img style="width:100%;" src="{{ kyc_basic_info.pic_selfie_url|get_safe_url:user }}" alt="Avatar" style="width:100%;margin: 0 auto;">
                                     <p>Selfie</p>
+                                    {% if not kyc_details.is_kyc_additional_info_accepted %}
                                     <span>
                                         <button type="button" class="btn btn-primary kyc_accept" kyc_id="{{kyc_basic_info.id}}" kyc_type="kyc_profile_pic" user_id="{{kyc_basic_info.user.id}}" >Accept</button>
-                                        <button type="button" class="btn btn-danger kyc_reject" kyc_id="{{kyc_basic_info.id}}" kyc_type="kyc_profile_pic" user_id="{{kyc_basic_info.user.id}}" >Reject</button>
+                                        <button type="button" class="btn btn-danger kyc_reject" kyc_id="{{kyc_basic_info.id}}" kyc_type="kyc_profile_pic" user_id="{{kyc_basic_info.user.id}}" data-toggle="modal" data-target="#basic_reject_modal">Reject</button>
                                     </span>
+                                    {% else %}
+                                    <span class="btn-primary" style="padding:10px;">Accepted</span>
+                                    {% endif %}
 
                                 </div>
                             </div>
@@ -104,10 +109,12 @@
                     <div class="box-header">
                         <h3 class="box-title">Baisc Info</h3>
                         {% if not kyc_details.is_kyc_basic_info_accepted %}
-                            <span style="float:right;">
+                            <span class="action_button" style="float:right;">
                                 <button type="button" class="btn btn-primary kyc_accept" kyc_id="{{kyc_basic_info.id}}" kyc_type="basic_info" user_id="{{kyc_basic_info.user.id}}" >Accept</button>
-                                <button type="button" class="btn btn-danger kyc_reject" kyc_id="{{kyc_basic_info.id}}" kyc_type="basic_info" user_id="{{kyc_basic_info.user.id}}" >Reject</button>
+                                <button type="button" class="btn btn-danger kyc_reject" kyc_id="{{kyc_basic_info.id}}" kyc_type="basic_info" user_id="{{kyc_basic_info.user.id}}" data-toggle="modal" data-target="#basic_reject_modal">Reject</button>
                             </span>
+                        {% else %}
+                             <span class="btn-primary" style="float:right;padding:10px;">Accepted</span>
                     {% endif %}
                     </div>
                     <div class="box-body">
@@ -167,17 +174,20 @@
             </div>
         </div>
         {% for each_document in kyc_document %}
-            {% if not each_document.kyc_document_type.name == 'pan' or not each_document.kyc_document_type.name == 'PAN'%}
+            {% if not each_document.kyc_document_type.document_name == 'pan' %}
+                {% if not each_document.kyc_document_type.document_name == 'PAN'%}
                 <div class="document_info">
                     <div class="box-body">
                         <div class="box box-danger">
                             <div class="box-header">
                                 <h3 class="box-title">Documnet Info</h3>
                                 {% if not kyc_details.is_kyc_document_info_accepted %}
-                                    <span style="float:right;">
-                                        <button type="button" class="btn btn-primary kyc_accept" kyc_id="{{kyc_basic_info.id}}" kyc_type="kyc_document" user_id="{{kyc_basic_info.user.id}}" >Accept</button>
-                                        <button type="button" class="btn btn-danger kyc_reject" kyc_id="{{each_document.id}}" kyc_type="kyc_document" user_id="{{each_document.user.id}}" >Reject</button>
+                                    <span class="action_button" style="float:right;">
+                                        <button type="button" class="btn btn-primary kyc_accept" kyc_id="{{kyc_basic_info.id}}" kyc_type="kyc_document" user_id="{{kyc_basic_info.user.id}}" >Accept </button>
+                                        <button type="button" class="btn btn-danger kyc_reject" kyc_id="{{each_document.id}}" kyc_type="kyc_document" user_id="{{each_document.user.id}}" data-toggle="modal" data-target="#doc_reject_modal">Reject</button>
                                     </span>
+                                {% else %}
+                                    <span class="btn-primary" style="float:right;padding:10px;">Accepted</span>
                                 {% endif %}
                             </div>
                             <div class="box-body">
@@ -241,19 +251,22 @@
                     </div>
                 </div>
             {% endif %}
+            {% endif %}
         {% endfor %}
         {% for each_document in kyc_document %}
-            {% if each_document.kyc_document_type.name == 'pan' or each_document.kyc_document_type.name == 'PAN'%}
+            {% if each_document.kyc_document_type.document_name == 'pan' or each_document.kyc_document_type.document_name == 'PAN'%}
                 <div class="pan_info">
                     <div class="box-body">
                         <div class="box box-danger">
                             <div class="box-header">
                                 <h3 class="box-title">PAN Info</h3>
                                 {% if not kyc_details.is_kyc_pan_info_accepted %}
-                                    <span style="float:right;">
+                                    <span class="action_button" style="float:right;">
                                         <button type="button" class="btn btn-primary kyc_accept" kyc_id="{{each_document.id}}" kyc_type="kyc_pan" user_id="{{each_document.user.id}}" >Accept</button>
-                                        <button type="button" class="btn btn-danger kyc_reject" kyc_id="{{each_document.id}}" kyc_type="kyc_pan" user_id="{{each_document.user.id}}" >Reject</button>
+                                        <button type="button" class="btn btn-danger kyc_reject" kyc_id="{{each_document.id}}" kyc_type="kyc_pan" user_id="{{each_document.user.id}}" data-toggle="modal" data-target="#doc_reject_modal">Reject</button>
                                     </span>
+                                {% else %}
+                                    <span class="btn-primary" style="float:right;padding:10px;">Accepted</span>
                                 {% endif %}
                             </div>
                             <div class="box-body">
@@ -323,10 +336,12 @@
                     <div class="box-header">
                         <h3 class="box-title">Additional Info</h3>
                         {% if not kyc_details.is_kyc_additional_info_accepted %}
-                                    <span style="float:right;">
+                                    <span class="action_button" style="float:right;">
                                         <button type="button" class="btn btn-primary kyc_accept" kyc_id="{{additional_info.id}}" kyc_type="kyc_additional_info" user_id="{{additional_info.user.id}}" >Accept</button>
-                                        <button type="button" class="btn btn-danger kyc_reject" kyc_id="{{additional_info.id}}" kyc_type="kyc_additional_info" user_id="{{additional_info.user.id}}" >Reject</button>
+                                        <button type="button" class="btn btn-danger kyc_reject" kyc_id="{{additional_info.id}}" kyc_type="kyc_additional_info" user_id="{{additional_info.user.id}}" data-toggle="modal" data-target="#additional_reject_modal">Reject</button>
                                     </span>
+                                {% else %}
+                                    <span class="btn-primary" style="float:right;padding:10px;">Accepted</span>
                                 {% endif %}
                     </div>
                     <div class="box-body">
@@ -390,11 +405,13 @@
                     <div class="box-header">
                         <h3 class="box-title">Bank Details</h3>
                         {% if not kyc_details.is_kyc_additional_info_accepted %}
-                                    <span style="float:right;">
+                                    <span class="action_button" style="float:right;">
                                         <button type="button" class="btn btn-primary kyc_accept" kyc_id="{{bank_details.id}}" kyc_type="kyc_bank_details" user_id="{{bank_details.user.id}}" >Accept</button>
-                                        <button type="button" class="btn btn-danger kyc_reject" kyc_id="{{bank_details.id}}" kyc_type="kyc_bank_details" user_id="{{bank_details.user.id}}" >Reject</button>
+                                        <button type="button" class="btn btn-danger kyc_reject" kyc_id="{{bank_details.id}}" kyc_type="kyc_bank_details" user_id="{{bank_details.user.id}}" data-toggle="modal" data-target="#bank_reject_modal">Reject</button>
                                     </span>
-                                {% endif %}
+                        {% else %}
+                                    <span class="btn-primary" style="float:right;padding:10px;">Accepted</span>
+                        {% endif %}
                     </div>
                     <div class="box-body">
                         <div class="row">
@@ -445,6 +462,149 @@
                 </div>
             </div> 
         </div>
+        <div class="modal fade" id="basic_reject_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Reject Form</h4>
+                </div>
+                <form id="fee_submit_form" action="" method="" onsubmit="event.preventDefault();">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="id_{{ kyc_basic_reject_form.reject_reason.name }}" class="col-sm-12 control-label">{{kyc_basic_reject_form.reject_reason.label}}:</label>
+                            <div class="col-sm-12">
+                                {{kyc_basic_reject_form.reject_reason}} {% if kyc_basic_reject_form.reject_reason.errors %}
+                                <span class="text-red"><span class="fa fa-hand-pointer-o"></span><b> Error: </b>{{kyc_basic_reject_form.reject_reason.errors.0}}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-group id_{{ kyc_basic_reject_form.reject_text.name }}">
+                            <label for="id_{{ kyc_basic_reject_form.reject_text.name }}" class="col-sm-12 control-label">{{kyc_basic_reject_form.reject_text.label}}:</label>
+                            <div class="col-sm-12">
+                                {{kyc_basic_reject_form.reject_text}} {% if kyc_basic_reject_form.reject_text.errors %}
+                                <span class="text-red"><span class="fa fa-hand-pointer-o"></span><b> Error: </b>{{kyc_basic_reject_form.reject_text.errors.0}}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button class="btn btn-primary reject_submit" value="button" name="button">Reject</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="doc_reject_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Reject Form</h4>
+                </div>
+                <form id="fee_submit_form" action="" method="" onsubmit="event.preventDefault();">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="id_{{ kyc_document_reject_form.reject_reason.name }}" class="col-sm-12 control-label">{{kyc_document_reject_form.reject_reason.label}}:</label>
+                            <div class="col-sm-12">
+                                {{kyc_document_reject_form.reject_reason}} {% if kyc_document_reject_form.reject_reason.errors %}
+                                <span class="text-red"><span class="fa fa-hand-pointer-o"></span><b> Error: </b>{{kyc_document_reject_form.reject_reason.errors.0}}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-group id_{{ kyc_document_reject_form.reject_text.name }}">
+                            <label for="id_{{ kyc_document_reject_form.reject_text.name }}" class="col-sm-12 control-label">{{kyc_document_reject_form.reject_text.label}}:</label>
+                            <div class="col-sm-12">
+                                {{kyc_document_reject_form.reject_text}} {% if kyc_document_reject_form.reject_text.errors %}
+                                <span class="text-red"><span class="fa fa-hand-pointer-o"></span><b> Error: </b>{{kyc_document_reject_form.reject_text.errors.0}}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button class="btn btn-primary reject_submit" value="button" name="button">Reject</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="additional_reject_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Reject Form</h4>
+                </div>
+                <form id="fee_submit_form" action="" method="" onsubmit="event.preventDefault();">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="id_{{ kyc_additional_reject_form.reject_reason.name }}" class="col-sm-12 control-label">{{kyc_additional_reject_form.reject_reason.label}}:</label>
+                            <div class="col-sm-12">
+                                {{kyc_additional_reject_form.reject_reason}} {% if kyc_additional_reject_form.reject_reason.errors %}
+                                <span class="text-red"><span class="fa fa-hand-pointer-o"></span><b> Error: </b>{{kyc_additional_reject_form.reject_reason.errors.0}}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-group id_{{ kyc_additional_reject_form.reject_text.name }}">
+                            <label for="id_{{ kyc_additional_reject_form.reject_text.name }}" class="col-sm-12 control-label">{{kyc_additional_reject_form.reject_text.label}}:</label>
+                            <div class="col-sm-12">
+                                {{kyc_additional_reject_form.reject_text}} {% if kyc_additional_reject_form.reject_text.errors %}
+                                <span class="text-red"><span class="fa fa-hand-pointer-o"></span><b> Error: </b>{{kyc_additional_reject_form.reject_text.errors.0}}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button class="btn btn-primary reject_submit" value="button" name="button">Reject</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="bank_reject_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Reject Form</h4>
+                </div>
+                <form id="fee_submit_form" action="" method="" onsubmit="event.preventDefault();">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="id_{{ kyc_bank_reject_form.reject_reason.name }}" class="col-sm-12 control-label">{{kyc_bank_reject_form.reject_reason.label}}:</label>
+                            <div class="col-sm-12">
+                                {{kyc_bank_reject_form.reject_reason}} {% if kyc_bank_reject_form.reject_reason.errors %}
+                                <span class="text-red"><span class="fa fa-hand-pointer-o"></span><b> Error: </b>{{kyc_bank_reject_form.reject_reason.errors.0}}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-group id_{{ kyc_bank_reject_form.reject_text.name }}">
+                            <label for="id_{{ kyc_bank_reject_form.reject_text.name }}" class="col-sm-12 control-label">{{kyc_bank_reject_form.reject_text.label}}:</label>
+                            <div class="col-sm-12">
+                                {{kyc_bank_reject_form.reject_text}} {% if kyc_bank_reject_form.reject_text.errors %}
+                                <span class="text-red"><span class="fa fa-hand-pointer-o"></span><b> Error: </b>{{kyc_bank_reject_form.reject_text.errors.0}}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button class="btn btn-primary reject_submit" value="button" name="button">Reject</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     </div>
 {% endblock content %}
 {% block center_js %}
