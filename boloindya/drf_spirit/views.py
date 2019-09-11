@@ -1413,7 +1413,7 @@ def fb_profile_settings(request):
 @api_view(['POST'])
 def get_kyc_status(request):
     try:
-        user_kyc = UserKYC.objects.get(user = request.user)
+        user_kyc,is_created = UserKYC.objects.get_or_create(user = request.user)
         return JsonResponse({'message': 'success','user_kyc':UserKYCSerializer(user_kyc).data}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)

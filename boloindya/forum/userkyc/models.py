@@ -35,6 +35,13 @@ class UserKYC(UserInfo):
         verbose_name_plural = _("UserKYC's")
 
 class KYCBasicInfo(UserInfo):
+    reject_options = (
+    ('1', "Information Incomplete"),
+    ('2', "Mobile not Verified"),
+    ('3', "Email not Verified"),
+    ('4','Pic not clear'),
+    ('99', "Others"),
+    )
     first_name = models.CharField(_("First Name"), max_length=255, blank=True)
     middle_name = models.CharField(_("Middle Name"), max_length=255, blank=True)
     last_name = models.CharField(_("Last Name"), max_length=255, blank=True)
@@ -45,6 +52,9 @@ class KYCBasicInfo(UserInfo):
     is_email_verified = models.BooleanField(default = False)
     pic_selfie_url = models.CharField(_("Pic Selfie"), max_length=1000, blank=True)
     # nationality = models.CharField(choice field for selecting country)
+    is_rejected = models.BooleanField(default=False)
+    reject_reason = models.CharField(choices=reject_options, blank = True, null = True, max_length=10)
+    reject_text = models.CharField(_("Reject Text"), max_length=1000, blank=True,null=True)
 
     def __unicode__(self):
         return self.user.username
@@ -65,9 +75,18 @@ class KYCDocumentType(RecordTimeStamp):
         verbose_name_plural = _("KYCDocumentType's")
 
 class KYCDocument(UserInfo):
+    reject_options = (
+    ('1', "Information Incomplete"),
+    ('2','Information not matched'),
+    ('3','Pic not clear'),
+    ('99', "Others"),
+    )
     kyc_document_type = models.ForeignKey(KYCDocumentType, related_name='documents',null=True,blank=True)
     frontside_url = models.CharField(_("Document Front Url"), max_length=1000, blank=True)
     backside_url= models.CharField(_("Document Back Url"), max_length=1000, blank=True)
+    is_rejected = models.BooleanField(default=False)
+    reject_reason = models.CharField(choices=reject_options, blank = True, null = True, max_length=10)
+    reject_text = models.CharField(_("Reject Text"), max_length=1000, blank=True,null=True)
 
     def __unicode__(self):
         return self.user.username
@@ -77,6 +96,11 @@ class KYCDocument(UserInfo):
         verbose_name_plural = _("KYCDocument's")
 
 class AdditionalInfo(UserInfo):
+    reject_options = (
+    ('1', "Information Incomplete"),
+    ('2','Information not matched'),
+    ('99', "Others"),
+    )
     profession_options = (
     ('1', "Govermnet Employee"),
     ('2', "Private Sector"),
@@ -94,6 +118,9 @@ class AdditionalInfo(UserInfo):
     mother_lastname = models.CharField(_("Mother Last Name"), max_length=255, blank=True)
     profession = models.CharField(choices=profession_options, blank = True, null = True, max_length=10, default='99')
     status = models.CharField(choices=status_options, blank = True, null = True, max_length=10, default='1')
+    is_rejected = models.BooleanField(default=False)
+    reject_reason = models.CharField(choices=reject_options, blank = True, null = True, max_length=10)
+    reject_text = models.CharField(_("Reject Text"), max_length=1000, blank=True,null=True)
 
     def __unicode__(self):
         return self.user.username
@@ -103,11 +130,19 @@ class AdditionalInfo(UserInfo):
         verbose_name_plural = _("AdditionalInfo's")
 
 class BankDetail(UserInfo):
+    reject_options = (
+    ('1', "Information Incomplete"),
+    ('2','Information not matched'),
+    ('99', "Others"),
+    )
     bank_name = models.CharField(_("Bank Name"), max_length=255, blank=True)# later it will be replaced with the choice field
     account_name = models.CharField(_("Account Holder Name"), max_length=255, blank=True)
     account_number = models.CharField(_("Account Number"), max_length=255, blank=True)
     IFSC_code = models.CharField(_("IFSC Code"), max_length=255, blank=True)# prevalidate in backend and allow to seacrh in frontedn
     paytm_number = models.CharField(_("Paytm Mobile No"), max_length=100, blank = True, null = True)
+    is_rejected = models.BooleanField(default=False)
+    reject_reason = models.CharField(choices=reject_options, blank = True, null = True, max_length=10)
+    reject_text = models.CharField(_("Reject Text"), max_length=1000, blank=True,null=True)
 
     def __unicode__(self):
         return self.user.username

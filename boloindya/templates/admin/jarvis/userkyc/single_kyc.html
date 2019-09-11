@@ -10,7 +10,7 @@
                     </div>
                     <div class="box-body">
                         <div class="row">
-                            <div class="col-md-9">
+                            <div class="col-md-6">
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="form-group" style="padding-bottom: 30px;">
@@ -81,6 +81,17 @@
                                     <img style="width:100%;" src="{{ userprofile.profile_pic }}" alt="Avatar" style="width:100%;margin: 0 auto;">
                                 </div>
                             </div>
+                            <div class="col-md-3">
+                                <div class="w3-card-4 test" style="width:100%;margin: 0 auto;text-align:center;">
+                                    <img style="width:100%;" src="{{ kyc_basic_info.pic_selfie_url|get_safe_url:user }}" alt="Avatar" style="width:100%;margin: 0 auto;">
+                                    <p>Selfie</p>
+                                    <span>
+                                        <button type="button" class="btn btn-primary kyc_accept" kyc_id="{{kyc_basic_info.id}}" kyc_type="kyc_profile_pic" user_id="{{kyc_basic_info.user.id}}" >Accept</button>
+                                        <button type="button" class="btn btn-danger kyc_reject" kyc_id="{{kyc_basic_info.id}}" kyc_type="kyc_profile_pic" user_id="{{kyc_basic_info.user.id}}" >Reject</button>
+                                    </span>
+
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -92,6 +103,12 @@
                 <div class="box box-primary">
                     <div class="box-header">
                         <h3 class="box-title">Baisc Info</h3>
+                        {% if not kyc_details.is_kyc_basic_info_accepted %}
+                            <span style="float:right;">
+                                <button type="button" class="btn btn-primary kyc_accept" kyc_id="{{kyc_basic_info.id}}" kyc_type="basic_info" user_id="{{kyc_basic_info.user.id}}" >Accept</button>
+                                <button type="button" class="btn btn-danger kyc_reject" kyc_id="{{kyc_basic_info.id}}" kyc_type="basic_info" user_id="{{kyc_basic_info.user.id}}" >Reject</button>
+                            </span>
+                    {% endif %}
                     </div>
                     <div class="box-body">
                         <div class="row">
@@ -156,6 +173,12 @@
                         <div class="box box-danger">
                             <div class="box-header">
                                 <h3 class="box-title">Documnet Info</h3>
+                                {% if not kyc_details.is_kyc_document_info_accepted %}
+                                    <span style="float:right;">
+                                        <button type="button" class="btn btn-primary kyc_accept" kyc_id="{{kyc_basic_info.id}}" kyc_type="kyc_document" user_id="{{kyc_basic_info.user.id}}" >Accept</button>
+                                        <button type="button" class="btn btn-danger kyc_reject" kyc_id="{{each_document.id}}" kyc_type="kyc_document" user_id="{{each_document.user.id}}" >Reject</button>
+                                    </span>
+                                {% endif %}
                             </div>
                             <div class="box-body">
                                 <div class="row">
@@ -226,6 +249,12 @@
                         <div class="box box-danger">
                             <div class="box-header">
                                 <h3 class="box-title">PAN Info</h3>
+                                {% if not kyc_details.is_kyc_pan_info_accepted %}
+                                    <span style="float:right;">
+                                        <button type="button" class="btn btn-primary kyc_accept" kyc_id="{{each_document.id}}" kyc_type="kyc_pan" user_id="{{each_document.user.id}}" >Accept</button>
+                                        <button type="button" class="btn btn-danger kyc_reject" kyc_id="{{each_document.id}}" kyc_type="kyc_pan" user_id="{{each_document.user.id}}" >Reject</button>
+                                    </span>
+                                {% endif %}
                             </div>
                             <div class="box-body">
                                 <div class="row">
@@ -293,6 +322,12 @@
                 <div class="box box-success">
                     <div class="box-header">
                         <h3 class="box-title">Additional Info</h3>
+                        {% if not kyc_details.is_kyc_additional_info_accepted %}
+                                    <span style="float:right;">
+                                        <button type="button" class="btn btn-primary kyc_accept" kyc_id="{{additional_info.id}}" kyc_type="kyc_additional_info" user_id="{{additional_info.user.id}}" >Accept</button>
+                                        <button type="button" class="btn btn-danger kyc_reject" kyc_id="{{additional_info.id}}" kyc_type="kyc_additional_info" user_id="{{additional_info.user.id}}" >Reject</button>
+                                    </span>
+                                {% endif %}
                     </div>
                     <div class="box-body">
                         <div class="row">
@@ -354,6 +389,12 @@
                 <div class="box box-success">
                     <div class="box-header">
                         <h3 class="box-title">Bank Details</h3>
+                        {% if not kyc_details.is_kyc_additional_info_accepted %}
+                                    <span style="float:right;">
+                                        <button type="button" class="btn btn-primary kyc_accept" kyc_id="{{bank_details.id}}" kyc_type="kyc_bank_details" user_id="{{bank_details.user.id}}" >Accept</button>
+                                        <button type="button" class="btn btn-danger kyc_reject" kyc_id="{{bank_details.id}}" kyc_type="kyc_bank_details" user_id="{{bank_details.user.id}}" >Reject</button>
+                                    </span>
+                                {% endif %}
                     </div>
                     <div class="box-body">
                         <div class="row">
@@ -405,5 +446,8 @@
             </div> 
         </div>
     </div>
-{% endblock content %}        
+{% endblock content %}
+{% block center_js %}
+    <script src="{% static 'js/kyc.js' %}"></script>
+{% endblock center_js %}    
         
