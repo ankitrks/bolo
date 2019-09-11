@@ -266,8 +266,7 @@ def video_share(user_data_dump):
 
 def main():
     # pick only those dumps which have not been executed 
-    all_traction_data = UserJarvisDump.objects.filter(is_executed = False)
-
+    all_traction_data = UserJarvisDump.objects.filter(is_executed = False, dump_type = 1)
     for user_jarvis in all_traction_data:
         try:
             user_data_string = user_jarvis.dump
@@ -283,7 +282,7 @@ def main():
             video_share(user_data_dump)    
 
         unique_id = user_jarvis.pk     # get primary key of the dump
-        UserJarvisDump.objects.filter(pk = unique_id).update(is_executed = True)  #mark the is_executed field as true
+        UserJarvisDump.objects.filter(pk = unique_id).update(is_executed = True, dump_type = 1)  #mark the is_executed field as true
 
         except Exception as e:
             print(str(e))
