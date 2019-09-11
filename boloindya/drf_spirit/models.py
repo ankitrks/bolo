@@ -246,7 +246,7 @@ class user_videotype_details(models.Model):
     ]    
 
     user = models.CharField(_("user"), null = True, blank = False, max_length = 250, db_index = True)
-    videoid = models.ForeignKey(_("videoid"), null = True, blank = True, max_length = 250, db_index = True)
+    videoid = models.CharField(_("videoid"), null = True, blank = True, max_length = 250, db_index = True)
     timestamp = models.DateTimeField(_("timestamp"), null = False, blank = True)
     video_type = models.CharField(_("video_type"), choices = videoinfo_type, max_length = 250)
 

@@ -106,6 +106,8 @@ INSTALLED_APPS = [
     'forum.search',
 
     'forum.user',
+    'forum.userkyc',
+    'forum.payment',
     'forum.user.admin',
     'forum.user.auth',
 
@@ -349,7 +351,7 @@ SIMPLE_JWT = {
 #### S3 bucket #####
 AWS_ACCESS_KEY_ID = 'AKIAJMOBRHDIXGKM6W6Q'
 AWS_SECRET_ACCESS_KEY = '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'
-AWS_BUCKET_NAME = 'boloindya'
+AWS_BUCKET_NAME = 'thumbnailsnew1'
 
 #### Transcoder settings #####
 PIPELINE_ID_TS = '1545987947390-hpo4hx'

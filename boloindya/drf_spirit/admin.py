@@ -26,7 +26,7 @@ class CategoryAdmin(admin.ModelAdmin):
 admin.site.register(Category, CategoryAdmin)
 
 class WeightAdmin(admin.ModelAdmin):
-	list_display = ('features', 'weight', )
+	list_display = ('features', 'weight','is_monetize','bolo_score','equivalent_INR' )
 admin.site.register(Weight, WeightAdmin)
 
 class UserProfileAdmin(ImportExportModelAdmin):
@@ -44,7 +44,7 @@ class ReferralCodeAdmin(admin.ModelAdmin):
 admin.site.register(ReferralCode, ReferralCodeAdmin)
 
 class ReferralCodeUsedAdmin(admin.ModelAdmin):
-	list_display = ('code', 'by_user', 'is_download', 'created_at', 'last_modified')
+	list_display = ('code', 'by_user', 'is_download', 'created_at', 'last_modified','click_id','pid')
 	search_fields = ('code__code', )
 admin.site.register(ReferralCodeUsed, ReferralCodeUsedAdmin)
 
