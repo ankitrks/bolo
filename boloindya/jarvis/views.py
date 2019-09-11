@@ -258,11 +258,11 @@ def get_kyc_of_user(request):
     if request.user.is_superuser or request.user.is_staff:
         username = request.GET.get('username',None)
         kyc_user = User.objects.get(username=username)
-        kyc_details = UserKYC.objects.filter(user=kyc_user)
-        kyc_basic_info = KYCBasicInfo.objects.filter(user=kyc_user)
-        kyc_document = KYCDocument.objects.filter(user=kyc_user,is_active=True)
-        additional_info = AdditionalInfo.objects.get(user=kyc_user)
-        bank_details = BankDetail.objects.get(user=kyc_user,is_active=True)
+        kyc_details = UserKYC.objects.get(user=kyc_user)
+        kyc_basic_info = KYCBasicInfo.objects.get(user=kyc_user,is_rejected=False)
+        kyc_document = KYCDocument.objects.filter(user=kyc_user,is_active=True,is_rejected=False)
+        additional_info = AdditionalInfo.objects.get(user=kyc_user,is_rejected=False)
+        bank_details = BankDetail.objects.get(user=kyc_user,is_active=True,is_rejected=False)
         return render(request,'admin/jarvis/userkyc/single_kyc.html',{'kyc_details':kyc_details,'kyc_basic_info':kyc_basic_info,'kyc_document':kyc_document,'additional_info':additional_info,'bank_details':bank_details,'userprofile':kyc_user.st,'user':kyc_user})
 
 
@@ -346,7 +346,6 @@ class PaymentCycleView(FormView):
 def accept_kyc(request):
     if request.user.is_superuser or request.user.is_staff:
         kyc_type = request.GET.get('kyc_type',None)
-        kyc_id = request.GET.get('kyc_id',None)
         user_id = request.GET.get('user_id',None)
         user_kyc = UserKYC.objects.get(user_id = user_id)
         if kyc_type == "basic_info":
@@ -362,6 +361,58 @@ def accept_kyc(request):
         elif kyc_type == "kyc_bank_details":
             user_kyc.is_kyc_bank_details_accepted = True
         user_kyc.saved()
+        if user_kyc.is_kyc_basic_info_accepted and user_kyc.is_kyc_document_info_accepted and user_kyc.is_kyc_selfie_info_accepted and\
+        user_kyc.is_kyc_additional_info_accepted and user_kyc.is_kyc_bank_details_accepted:
+            user_kyc.is_kyc_accepted = True
+            user_kyc.save()
+
+        return HttpResponse(json.dumps({'success':'success','kyc_accepted':user_kyc.is_kyc_accepted}),content_type="application/json")
+
+def reject_kyc(request):
+    if request.user.is_superuser or request.user.is_staff:
+        kyc_type = request.GET.get('kyc_type',None)
+        kyc_id = request.GET.get('kyc_id',None)
+        kyc_reject_reason = request.GET.get('kyc_reject_reason',None)
+        kyc_reject_text = request.GET.get('kyc_reject_text',None)
+        user_id = request.GET.get('user_id',None)
+        user_kyc = UserKYC.objects.get(user_id = user_id)
+        if kyc_type == "basic_info":
+            user_kyc.is_kyc_basic_info_accepted = False
+            obj = KYCBasicInfo.objects.get(pk=kyc_id)
+            obj.reject_reason = kyc_reject_reason
+            obj.reject_reason = kyc_reject_text
+        elif kyc_type == "kyc_document":
+            user_kyc.is_kyc_document_info_accepted = False
+            obj = KYCDocument.objects.get(pk=kyc_id)
+            obj.reject_reason = kyc_reject_reason
+            obj.reject_reason = kyc_reject_text
+        elif kyc_type == "kyc_pan":
+            user_kyc.is_kyc_pan_info_accepted = False
+            obj = KYCDocument.objects.get(pk=kyc_id)
+            obj.reject_reason = kyc_reject_reason
+            obj.reject_reason = kyc_reject_text
+        elif kyc_type == "kyc_profile_pic":
+            user_kyc.is_kyc_selfie_info_accepted = False
+            obj = KYCBasicInfo.objects.get(pk=kyc_id)
+            obj.reject_reason = kyc_reject_reason
+            obj.reject_reason = kyc_reject_text
+        elif kyc_type == "kyc_additional_info":
+            user_kyc.is_kyc_additional_info_accepted = False
+            obj = BankDetail.objects.get(pk=kyc_id)
+            obj.reject_reason = kyc_reject_reason
+            obj.reject_reason = kyc_reject_text
+        elif kyc_type == "kyc_bank_details":
+            user_kyc.is_kyc_bank_details_accepted = False
+        obj.is_rejected = True
+        obj.is_active = True
+        obj.save()
+        user_kyc.saved()
+        if not (user_kyc.is_kyc_basic_info_accepted and user_kyc.is_kyc_document_info_accepted and user_kyc.is_kyc_selfie_info_accepted and \
+        user_kyc.is_kyc_additional_info_accepted and user_kyc.is_kyc_bank_details_accepted):
+            user_kyc.is_kyc_accepted = False
+            user_kyc.save()
+
+        return HttpResponse(json.dumps({'success':'success','kyc_accepted':user_kyc.is_kyc_accepted}),content_type="application/json")
 
 
 
