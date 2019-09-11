@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import SingUpOTP
+from .models import SingUpOTP, UserJarvisDump
 from forum.user.models import Weight,UserProfile,AppVersion, UserProfile,AndroidLogs, AppPageContent, ReferralCode, ReferralCodeUsed
 from forum.category.models import Category
 from import_export.admin import ImportExportModelAdmin,ExportMixin
@@ -50,3 +50,4 @@ admin.site.register(ReferralCodeUsed, ReferralCodeUsedAdmin)
 admin.site.register(AppVersion)
 admin.site.register(AndroidLogs)
 admin.site.register(AppPageContent)
+admin.site.register(UserJarvisDump)

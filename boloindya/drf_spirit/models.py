@@ -178,6 +178,7 @@ class UserJarvisDump(models.Model):
     DUMP_TYPE = [
         ('1', 'user_activities_data'),
         ('2', 'error_logs'),
+        ('3', 'hardware_info'),
     ]
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL,related_name='User',editable=False, db_index = True)
@@ -303,19 +304,15 @@ class video_shared_details(models.Model):
     share_platform = models.CharField(_("share_platform"), null = True, blank = True, max_length = 400)
     timestamp = models.DateTimeField(_("timestamp"), null = False, blank = False)
 
-# class storing the start and the end time
-# class video_loading_info(models.Model):
+# class recording the start and pause time for activities
+# class activity_start_paused(models.Model):
 
-#     user = models.CharField(_("user"), null = True, blank = False, max_length = 250)
-#     videoid = models.CharField(_("videoid"), null = True, blank = False, max_length = 250)
-#     starttime = models.DateTimeField(_("starttime"), null = True, blank = True)
-#     clicktime = models.DateTimeField(_("clicktime"), null = True, blank = True)
+#     userid = models.CharField(_("user"), null = True, blank = False, max_length = 250, db_index = True)
+#     activtyid = models.CharField(_("activtyid"), null = True, blank = False, max_length = 250, db_index = True)
+#     starttime = models.DateTimeField(_("starttime"), null = True, blank = False)
+#     pausetime = models.DateTimeField(_("pausetime"), null = True, blank = False)
+    
 
-# # class storing the user phone configurations
-# class user_phone_config(models.Model):
-
-#     user = models.CharField(_("user"), null = True, blank = False, max_length = 250)
-#     processor = 
 
 
 
