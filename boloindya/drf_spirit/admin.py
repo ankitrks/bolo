@@ -47,6 +47,11 @@ class ReferralCodeUsedAdmin(admin.ModelAdmin):
 	search_fields = ('code__code', )
 admin.site.register(ReferralCodeUsed, ReferralCodeUsedAdmin)
 
+class AndroidLogsAdmin(admin.ModelAdmin):
+	list_display = ('user', 'created_at', 'last_modified',)
+	search_fields = ('user', )
+
+
 admin.site.register(AppVersion)
-admin.site.register(AndroidLogs)
+admin.site.register(AndroidLogs, AndroidLogsAdmin)
 admin.site.register(AppPageContent)
