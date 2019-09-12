@@ -1,4 +1,5 @@
-from drf_spirit.models import UserJarvisDump, user_log_statistics, user_follow_unfollow_details, user_videotype_details, video_details, user_entry_point
+from drf_spirit.models import UserJarvisDump, user_log_statistics, user_follow_unfollow_details, user_videotype_details, video_details, user_entry_point, \
+	user_interest, video_shared_details
 import time
 import ast
 import datetime
@@ -82,7 +83,7 @@ def user_statistics(user_data_dump):
 
         vb_share = []
         if('vb_share' in user_data_dump):
-            for (a,b) in user_data_dump['vb_share']:
+            for (a, b, c) in user_data_dump['vb_share']:
                 vb_share.append(a)
         vb_share_count = len(set(vb_share))
         user_data_list.append(vb_share_count)
@@ -132,7 +133,7 @@ def follow_unfollow_details(user_data_dump):
         user_id = user_data_dump['user_id']
         follow_list = []
         if('profile_follow' in user_data_dump):
-            for(a,b) in user_data_dump['profile_follow']:
+            for(a,b) in user_data_dump['profile_follow'].iteritems():
                 #datetime_format = time.strftime('%m/%d/%Y %H:%M:%S',  time.gmtime(b/1000.))
                 utc_dt = datetime.utcfromtimestamp(float(b)/ 1000).replace(tzinfo=pytz.utc)
                 follow_list.append(a)
@@ -140,7 +141,7 @@ def follow_unfollow_details(user_data_dump):
 
         unfollow_list = []
         if('profile_unfollow' in user_data_dump):
-            for (a,b) in user_data_dump['profile_unfollow']:
+            for (a,b) in user_data_dump['profile_unfollow'].iteritems():
                 #datetime_format = time.strftime('%m/%d/%Y %H:%M:%S',  time.gmtime(b/1000.))
                 utc_dt = datetime.utcfromtimestamp(float(b)/ 1000).replace(tzinfo=pytz.utc)
                 unfollow_list.append(a)
@@ -148,7 +149,7 @@ def follow_unfollow_details(user_data_dump):
 
         report_list = []
         if('profile_report' in user_data_dump):
-            for (a,b) in user_data_dump['profile_report']:
+            for (a,b) in user_data_dump['profile_report'].iteritems():
                 #datetime_format = time.strftime('%m/%d/%Y %H:%M:%S',  time.gmtime(b/1000.))
                 utc_dt = datetime.utcfromtimestamp(float(b)/ 1000).replace(tzinfo=pytz.utc)
                 report_list.append(a)
@@ -156,26 +157,26 @@ def follow_unfollow_details(user_data_dump):
 
         share_list = []
         if('profile_share' in user_data_dump):
-            for (a,b) in user_data_dump['profile_share']:
+            for (a,b) in user_data_dump['profile_share'].iteritems():
                 #datetime_format = time.strftime('%m/%d/%Y %H:%M:%S',  time.gmtime(b/1000.))
                 utc_dt = datetime.utcfromtimestamp(float(b)/ 1000).replace(tzinfo=pytz.utc)
                 share_list.append(a)
                 share_list.append(utc_dt)
 
         for (a,b) in follow_list:
-            user_data_obj = user_follow_unfollow_details(user = user_id, profileid = a, timestamp = b, relationship_type = ('1'))
+            user_data_obj = user_follow_unfollow_details(user = user_id, profileid = a, timestamp = b, relationship_type = '1')
             user_data_obj.save()
 
         for (a,b) in unfollow_list:
-            user_data_obj = user_follow_unfollow_details(user = user_id, profileid= a, timestamp = b, relationship_type = ('2'))
+            user_data_obj = user_follow_unfollow_details(user = user_id, profileid= a, timestamp = b, relationship_type = '2')
             user_data_obj.save()                        
 
         for(a,b) in report_list:
-            user_data_obj = user_follow_unfollow_details(user = user_id, profileid= a, timestamp = b, relationship_type = ('3'))
+            user_data_obj = user_follow_unfollow_details(user = user_id, profileid= a, timestamp = b, relationship_type = '3')
             user_data_obj.save()
 
         for(a,b) in share_list:
-            user_data_obj = user_follow_unfollow_details(user = user_id, profileid= a, timestamp = b, relationship_type = ('4'))
+            user_data_obj = user_follow_unfollow_details(user = user_id, profileid= a, timestamp = b, relationship_type = '4')
             user_data_obj.save()
 
     except Exception as e:
@@ -195,35 +196,35 @@ def video_type_details(user_data_dump):
             for(a,b) in user_data_dump['vb_viewed']:
                 #datetime_format = time.strftime('%m/%d/%Y %H:%M:%S',  time.gmtime(b/1000.))
                 utc_dt = datetime.utcfromtimestamp(float(b)/ 1000).replace(tzinfo=pytz.utc)
-                user_data_obj = user_videotype_details(user = user_id, videoid = a, timestamp = utc_dt, video_type = ('5'))
+                user_data_obj = user_videotype_details(user = user_id, videoid = a, timestamp = utc_dt, video_type = '5')
                 user_data_obj.save()
 
         if('vb_share' in user_data_dump):        
             for (a,b) in user_data_dump['vb_share']:
                 #datetime_format = time.strftime('%m/%d/%Y %H:%M:%S',  time.gmtime(b/1000.))
                 utc_dt = datetime.utcfromtimestamp(float(b)/ 1000).replace(tzinfo=pytz.utc)
-                user_data_obj = user_videotype_details(user = user_id, videoid = a, timestamp = utc_dt, video_type = ('2'))
+                user_data_obj = user_videotype_details(user = user_id, videoid = a, timestamp = utc_dt, video_type = '2')
                 user_data_obj.save()
 
         if('vb_commented' in user_data_dump):
             for(a,b) in user_data_dump['vb_commented']:
                 #datetime_format = time.strftime('%m/%d/%Y %H:%M:%S',  time.gmtime(b/1000.))
                 utc_dt = datetime.utcfromtimestamp(float(b)/ 1000).replace(tzinfo=pytz.utc)
-                user_data_obj = user_videotype_details(user = user_id, videoid = a, timestamp = utc_dt, video_type = ('1'))
+                user_data_obj = user_videotype_details(user = user_id, videoid = a, timestamp = utc_dt, video_type = '1')
                 user_data_obj.save()
 
         if('vb_liked' in user_data_dump):
             for (a,b) in user_data_dump['vb_liked']:
                 #datetime_format = time.strftime('%m/%d/%Y %H:%M:%S',  time.gmtime(b/1000.))
                 utc_dt = datetime.utcfromtimestamp(float(b)/ 1000).replace(tzinfo=pytz.utc)
-                user_data_obj = user_videotype_details(user = user_id, videoid = a, timestamp = utc_dt, video_type = ('3'))
+                user_data_obj = user_videotype_details(user = user_id, videoid = a, timestamp = utc_dt, video_type = '3')
                 user_data_obj.save()
 
         if('vb_unliked' in user_data_dump):        
             for (a,b) in user_data_dump['vb_unliked']:
                 #datetime_format = time.strftime('%m/%d/%Y %H:%M:%S',  time.gmtime(b/1000.))
                 utc_dt = datetime.utcfromtimestamp(float(b)/ 1000).replace(tzinfo=pytz.utc)
-                user_data_obj = user_videotype_details(user = user_id, videoid = a, timestamp = utc_dt, video_type = ('4'))
+                user_data_obj = user_videotype_details(user = user_id, videoid = a, timestamp = utc_dt, video_type = '4')
                 user_data_obj.save()
 
     except Exception as e:
@@ -299,14 +300,14 @@ def user_category_intereset(user_data_dump):
             for (a,b) in user_data_dump['interest_added']:
                 #datetime_format = time.strftime('%m/%d/%Y %H:%M:%S',  time.gmtime(b/1000.))
                 utc_dt = datetime.utcfromtimestamp(float(b)/ 1000).replace(tzinfo=pytz.utc)
-                user_data_obj = user_interest(user = userid, categoryid = a, timestamp = utc_dt, category_status = ('1'))
+                user_data_obj = user_interest(user = userid, categoryid = a, timestamp = utc_dt, category_status = '1')
                 user_data_obj.save()
 
         if('interest_removed' in user_data_dump):        
             for (a,b) in user_data_dump['interest_removed']:
                 #datetime_format = time.strftime('%m/%d/%Y %H:%M:%S',  time.gmtime(b/1000.))
                 utc_dt = datetime.utcfromtimestamp(float(b)/ 1000).replace(tzinfo=pytz.utc)
-                user_data_obj = user_interest(user = userid, categoryid = a, timestamp = utc_dt, category_status = ('2'))
+                user_data_obj = user_interest(user = userid, categoryid = a, timestamp = utc_dt, category_status = '2')
                 user_data_obj.save()
 
     except Exception as e:
@@ -322,7 +323,7 @@ def video_share(user_data_dump):
         if('vb_share' in user_data_dump):
             for (a,b,c) in user_data_dump['vb_share']:
                 #datetime_format = time.strftime('%m/%d/%Y %H:%M:%S',  time.gmtime(c/1000.))
-                utc_dt = datetime.utcfromtimestamp(float(b)/ 1000).replace(tzinfo=pytz.utc)
+                utc_dt = datetime.utcfromtimestamp(float(c)/ 1000).replace(tzinfo=pytz.utc)
                 user_data_obj = video_shared_details(user = userid, videoid = a, share_platform = b, timestamp = utc_dt)
                 user_data_obj.save()
 
