@@ -304,14 +304,22 @@ class video_shared_details(models.Model):
     share_platform = models.CharField(_("share_platform"), null = True, blank = True, max_length = 400)
     timestamp = models.DateTimeField(_("timestamp"), null = False, blank = False)
 
-# class recording the start and pause time for activities
-# class activity_start_paused(models.Model):
+# class recording the video loading details
+# class video_playtime_details(models.Model):
 
-#     userid = models.CharField(_("user"), null = True, blank = False, max_length = 250, db_index = True)
-#     activtyid = models.CharField(_("activtyid"), null = True, blank = False, max_length = 250, db_index = True)
-#     starttime = models.DateTimeField(_("starttime"), null = True, blank = False)
-#     pausetime = models.DateTimeField(_("pausetime"), null = True, blank = False)
-    
+#     videoid = models.CharField(_("videoid"), null = True, blank = False, max_length = 250, db_index = True)
+#     clicktimestamp = models.DateTimeField(_("clicktimestamp"), null = True, blank = False)
+#     metatimestamp = models.DateTimeField(_("metatimestamp"), null = True, blank = False)
+#     buffertimestamp = models.DateTimeField(_("buffertimestamp"), null = True, blank = False)
+#     startedtimestamp = models.DateTimeField(_("startedtimestamp"), null = True, blank = False)
+#     pausedtimestamp = models.DateTimeField(_("pausedtimestamp"), null = True, blank = False)
+
+# # class recroding the search records of a user
+# class search_records(models.Model):
+
+#     user = user.CharField(_("userid"), null = True, blank = False, max_length = 250, db_index = True)
+#     search
+
 
 
 
