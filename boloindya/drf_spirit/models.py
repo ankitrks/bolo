@@ -305,8 +305,9 @@ class video_shared_details(models.Model):
     timestamp = models.DateTimeField(_("timestamp"), null = False, blank = False)
 
 # class recording the video loading details
-# class video_playtime_details(models.Model):
+# class video_load_details(models.Model):
 
+#     user = models.CharField(_("userid"), null = True, blank = False, max_length = 250, db_index = True)
 #     videoid = models.CharField(_("videoid"), null = True, blank = False, max_length = 250, db_index = True)
 #     clicktimestamp = models.DateTimeField(_("clicktimestamp"), null = True, blank = False)
 #     metatimestamp = models.DateTimeField(_("metatimestamp"), null = True, blank = False)
@@ -314,11 +315,28 @@ class video_shared_details(models.Model):
 #     startedtimestamp = models.DateTimeField(_("startedtimestamp"), null = True, blank = False)
 #     pausedtimestamp = models.DateTimeField(_("pausedtimestamp"), null = True, blank = False)
 
-# # class recroding the search records of a user
-# class search_records(models.Model):
+# # class recroding the video playtime details
+# class video_playtime_details(models.Model):
 
-#     user = user.CharField(_("userid"), null = True, blank = False, max_length = 250, db_index = True)
-#     search
+#     user = models.CharField(_("userid"), null = True, blank = False, max_length = 250, db_index = True)
+#     videoid = models.CharField(_("videoid"), null = True, blank = False, max_length = 250, db_index = True)
+#     playtime = models.CharField(_("playtime"), null = True, blank = False, max_length = 100)
+
+
+# # class recording the activity time spend by the user
+# class activity_time_spend(models.Model):
+
+#     user = models.CharField(_("userid"), null = True, blank = False, max_length = 250, db_index = True)
+#     categoryid = models.CharField(_("categoryid"), null = True, blank = False, max_length = 250, db_index = True)
+#     starttime = models.DateTimeField(_("starttime"), null = True, blank = False)
+#     pausetime = models.DateTimeField(_("pausetime"), null = True, blank = False)
+
+# # class recording the seach records of a user
+# class user_search(models.Model):
+
+#     user = models.CharField(_("userid"), null = True, blank = False, max_length = 250, db_index = True)
+#     searchquery = models.CharField(_("searchquery"), null = True, blank = False)
+#     timestamp = models.DateTimeField(_("timestamp"), null = True, blank = False)
 
 
 
