@@ -1,5 +1,28 @@
 {% extends "admin/jarvis/base.html" %}
+
 {% block content %}
+<style>
+    #overlay {
+  position: fixed; /* Sit on top of the page content */
+  display: none; /* Hidden by default */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+  z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
+}
+.percentcomplete{
+    position: absolute;
+    top: 50%;
+    left:50%;
+    color: white;
+    transform: translate(-50%,-50%);
+}
+</style>
 <form id="upload" action="" method="POST" enctype="multipart/form-data" class="form-horizontal"> 
     {% csrf_token %}
     <div class="form-group">
@@ -25,6 +48,11 @@
         </div> 
     </div>
 </form>
+<div id="overlay">
+    <div class="text"><br>
+        <br><span style="font-size:50px;" class="percentcomplete"></span></div>
+</div>
+
 <div id="csv_table">
 
 </div>
@@ -35,10 +63,32 @@
         } else {
             $('.submit_from_button').addClass("opened");
             event.preventDefault();
+            $('#overlay').show();
             var data = new FormData($('#upload').get(0));
             var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
             var all_data = []
             $.ajax({
+                xhr: function () {
+                    var xhr = new window.XMLHttpRequest();
+                    xhr.upload.addEventListener("progress", function (evt) {
+                        if (evt.lengthComputable) {
+                            var percentComplete = evt.loaded / evt.total;
+                            console.log(percentComplete);
+                            $('.percentcomplete').text(percentComplete * 100 +' %');
+                            if (percentComplete === 1) {
+                                $('.percentcomplete').text('Processing and Transcoding');
+                            }
+                        }
+                    }, false);
+                    xhr.addEventListener("progress", function (evt) {
+                        if (evt.lengthComputable) {
+                            var percentComplete = evt.loaded / evt.total;
+                            console.log(percentComplete);
+                            $('.percentcomplete').text(percentComplete * 100 +' %')
+                        }
+                    }, false);
+                    return xhr;
+                },
                 url: '/jarvis/upload_n_transcode/',
                 type: 'POST',
                 data: data,
@@ -47,14 +97,13 @@
                 processData: false,
                 contentType: false,
                 success: function(data) {
+                    $('#overlay').hide()
                     $('.submit_from_button').removeClass("opened");
                     if(data.message=='fail'){
                         alert(data.reason)
                     }
                     else if(data.message=='success'){
                         var url = '/jarvis/upload_details/?id='+data.file_id
-                        alert(data.message)
-                        alert(url)
                         // do your redirect
                         window.location=url
                     }
@@ -62,6 +111,7 @@
                     console.log(data)
                 },
                 error: function(data) {
+                    $('#overlay').hide()
                     $('.submit_from_button').removeClass("opened");
                     console.log(data)
                     alert(data)
