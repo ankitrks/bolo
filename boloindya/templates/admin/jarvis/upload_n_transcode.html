@@ -74,7 +74,7 @@
                         if (evt.lengthComputable) {
                             var percentComplete = evt.loaded / evt.total;
                             console.log(percentComplete);
-                            $('.percentcomplete').text(percentComplete * 100 +' %');
+                            $('.percentcomplete').text((percentComplete * 100).toPrecision(4) +' %');
                             if (percentComplete === 1) {
                                 $('.percentcomplete').text('Processing and Transcoding');
                             }
@@ -84,7 +84,7 @@
                         if (evt.lengthComputable) {
                             var percentComplete = evt.loaded / evt.total;
                             console.log(percentComplete);
-                            $('.percentcomplete').text(percentComplete * 100 +' %')
+                            $('.percentcomplete').text((percentComplete * 100 ).toPrecision(4)+' %')
                         }
                     }, false);
                     return xhr;
