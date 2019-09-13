@@ -298,6 +298,7 @@ STATICFILES_DIRS = (
 )
 
 MEDIA_UPLOAD_PATH = os.path.join(PROJECT_PATH, ENV, 'media','media_upload')
+TEMP_UPLOAD_FILE_PATH = os.path.join(PROJECT_PATH, ENV, 'media','tmp')
 
 # List of finder classes that know how to find static files in
 # various locations.
@@ -346,16 +347,30 @@ SIMPLE_JWT = {
 #import django
 #django.setup()
 
+#####Bolo Indya Prod ######
 #### S3 bucket #####
-AWS_ACCESS_KEY_ID = 'AKIAJMOBRHDIXGKM6W6Q'
-AWS_SECRET_ACCESS_KEY = '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'
-AWS_BUCKET_NAME = 'boloindya'
+BOLOINDYA_AWS_ACCESS_KEY_ID = 'AKIAJMOBRHDIXGKM6W6Q'
+BOLOINDYA_AWS_SECRET_ACCESS_KEY = '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'
+BOLOINDYA_AWS_BUCKET_NAME = 'boloindya-prod'
 
 #### Transcoder settings #####
-PIPELINE_ID_TS = '1545987947390-hpo4hx'
-AWS_ACCESS_KEY_ID_TS = 'AKIAZNK4CM5CW4W4VWP7'
-AWS_SECRET_ACCESS_KEY_TS = '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'
-AWS_BUCKET_NAME_TS = 'boloindya-et'
+BOLOINDYA_PIPELINE_ID_TS = '1545987947390-hpo4hx'
+BOLOINDYA_AWS_ACCESS_KEY_ID_TS = 'AKIAZNK4CM5CW4W4VWP7'
+BOLOINDYA_AWS_SECRET_ACCESS_KEY_TS = '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'
+BOLOINDYA_AWS_BUCKET_NAME_TS = 'boloindya-et'
+#### Transcoder settings #####
+
+#####CareerAnna ######
+#### S3 bucket #####
+CAREERANNA_AWS_ACCESS_KEY_ID = 'AKIAJMOBRHDIXGKM6W6Q'
+CAREERANNA_AWS_SECRET_ACCESS_KEY = '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'
+CAREERANNA_AWS_BUCKET_NAME = 'careeranna'
+
+#### Transcoder settings #####
+CAREERANNA_PIPELINE_ID_TS = '1545115329326-xs95pe'
+CAREERANNA_AWS_ACCESS_KEY_ID_TS = 'AKIAZNK4CM5CW4W4VWP7'
+CAREERANNA_AWS_SECRET_ACCESS_KEY_TS = 'Odl4xfZTJZM0mq89XtNXf95g2zY8NwRuhp5+zp87'
+CAREERANNA_AWS_BUCKET_NAME_TS = 'elastictranscode.videos'
 #### Transcoder settings #####
 
 # The region of your bucket, more info:
