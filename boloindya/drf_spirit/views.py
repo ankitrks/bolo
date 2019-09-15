@@ -897,7 +897,7 @@ def createTopic(request):
             userprofile = UserProfile.objects.get(user = request.user)
             userprofile.question_count = F('vb_count')+1
             userprofile.save()
-            add_bolo_score(request.user.id, 'create_topic', topic)
+            # add_bolo_score(request.user.id, 'create_topic', topic)
             topic_json = TopicSerializerwithComment(topic).data
             message = 'Video Byte Created'
         return JsonResponse({'message': message,'topic':topic_json}, status=status.HTTP_201_CREATED)
