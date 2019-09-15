@@ -109,7 +109,7 @@ class Topic(models.Model):
     # shared_post = models.ForeignKey('self', blank = True, null = True, related_name='user_shared_post')
     is_vb = models.BooleanField(_("Is Video Bytes"), default=False)
     likes_count = models.PositiveIntegerField(_("Likes count"), default=0)
-    is_monetized = models.BooleanField(_("Is Monetized?"), default=True)
+    is_monetized = models.BooleanField(_("Is Monetized?"), default=False)
 
     whatsapp_share_count = models.PositiveIntegerField(null=True,blank=True,default=0)
     linkedin_share_count = models.PositiveIntegerField(null=True,blank=True,default=0)
