@@ -31,6 +31,13 @@ def add_bolo_score(user_id, feature, action_object):
     weight_obj = get_weight_object(feature)
     if weight_obj:
         add_to_history(userprofile.user, score, get_weight_object(feature), action_object, False)
+    if feature == 'create_topic':
+        from forum.topic.models import Notification
+        notification_type = '8'
+        # if admin_action_type == 'no_monetize':
+        #     notification_type = '8'
+        notify_owner = Notification.objects.create(for_user_id = user_id ,topic = action_object, \
+                notification_type=notification_type, user_id = user_id)
 
 def reduce_bolo_score(user_id, feature, action_object, admin_action_type=''):
     score = get_weight(feature)
@@ -42,13 +49,13 @@ def reduce_bolo_score(user_id, feature, action_object, admin_action_type=''):
     weight_obj = get_weight_object(feature)
     if weight_obj:
         add_to_history(userprofile.user, score, get_weight_object(feature), action_object, True)
-    if feature == 'create_topic':
-        from forum.topic.models import Notification
-        notification_type = '7'
-        if admin_action_type == 'no_monetize':
-            notification_type = '8'
-        notify_owner = Notification.objects.create(for_user_id = user_id ,topic = action_object, \
-                notification_type=notification_type, user_id = user_id)
+    # if feature == 'create_topic':
+    #     from forum.topic.models import Notification
+    #     notification_type = '7'
+    #     if admin_action_type == 'no_monetize':
+    #         notification_type = '8'
+    #     notify_owner = Notification.objects.create(for_user_id = user_id ,topic = action_object, \
+    #             notification_type=notification_type, user_id = user_id)
 
 from django.utils.timezone import utc
 from django.utils import timezone
