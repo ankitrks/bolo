@@ -251,6 +251,8 @@ class Topic(models.Model):
         return format_html('<a href="' + self.backup_url + '" target="_blank">' + self.media_duration + '</a>' )
 
     def delete(self):
+        if self.is_monetized:
+            reduce_bolo_score(self.user.id, 'create_topic', self, 'deleted')
         self.is_monetized = False
         self.is_removed = True
         self.save()
@@ -258,7 +260,6 @@ class Topic(models.Model):
         if userprofile.question_count:
             userprofile.question_count = F('question_count')-1
         userprofile.save()
-        reduce_bolo_score(self.user.id, 'create_topic', self, 'deleted')
         return True
 
     def restore(self):
@@ -273,12 +274,15 @@ class Topic(models.Model):
         return True
 
     def no_monetization(self):
-        self.is_monetized = False
-        self.save()
-        userprofile = UserProfile.objects.get(user = self.user)
-        userprofile.save()
-        reduce_bolo_score(self.user.id, 'create_topic', self, 'no_monetize')
-        return True
+        if self.is_monetized:
+            self.is_monetized = False
+            self.save()
+            userprofile = UserProfile.objects.get(user = self.user)
+            userprofile.save()
+            reduce_bolo_score(self.user.id, 'create_topic', self, 'no_monetize')
+            return True
+        else:
+            return True
 
     def add_monetization(self):
         self.is_removed = False
@@ -511,11 +515,23 @@ class Notification(UserInfo):
             notific['created_at'] = shortnaturaltime(self.created_at)
             notific['actor_profile_pic'] = ""
 
+        # elif self.notification_type=='8':
+        #     notific['title'] = 'Your video byte: "' + self.topic.title + '" has been removed for payment'
+        #     notific['hindi_title'] = 'आपका वीडियो बाइट: "' + self.topic.title + '" भुगतान के लिए वंचित किया गया है'
+        #     notific['tamil_title'] = 'உங்கள் வீடியோ பைட்: "' + self.topic.title + '" கட்டணம் செலுத்தப்படவில்லை'
+        #     notific['telgu_title'] = 'మీ వీడియో బైట్: "' + self.topic.title + '" చెల్లింపు కోసం కోల్పోయింది'
+        #     notific['notification_type'] = '8'
+        #     notific['instance_id'] = self.topic.id
+        #     notific['read_status'] = self.status
+        #     notific['id'] = self.id
+        #     notific['created_at'] = shortnaturaltime(self.created_at)
+        #     notific['actor_profile_pic'] = ""
+
         elif self.notification_type=='8':
-            notific['title'] = 'Your video byte: "' + self.topic.title + '" has been removed for payment'
-            notific['hindi_title'] = 'आपका वीडियो बाइट: "' + self.topic.title + '" भुगतान के लिए वंचित किया गया है'
-            notific['tamil_title'] = 'உங்கள் வீடியோ பைட்: "' + self.topic.title + '" கட்டணம் செலுத்தப்படவில்லை'
-            notific['telgu_title'] = 'మీ వీడియో బైట్: "' + self.topic.title + '" చెల్లింపు కోసం కోల్పోయింది'
+            notific['title'] = 'Your video byte: "' + self.topic.title + '"  is eligible for earnings. It will be part of your payout.'
+            notific['hindi_title'] = 'आपका वीडियो बाइट: "' + self.topic.title + '" मुद्रीकरण के लिए चुना गया है। इसके लिए आपको पैसे मिलेंगे।'
+            notific['tamil_title'] = 'உங்கள் வீடியோ பைட்: "' + self.topic.title + '" பணமாக்குதலுக்காக தேர்ந்தெடுக்கப்பட்டது. இதற்கு நீங்கள் பணம் பெறுவீர்கள்.'
+            notific['telgu_title'] = 'మీ వీడియో బైట్: "' + self.topic.title + '" డబ్బు ఆర్జన కోసం ఎంపిక చేయబడింది. దీని కోసం మీకు డబ్బు వస్తుంది.'
             notific['notification_type'] = '8'
             notific['instance_id'] = self.topic.id
             notific['read_status'] = self.status
