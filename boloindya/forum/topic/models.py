@@ -251,6 +251,8 @@ class Topic(models.Model):
         return format_html('<a href="' + self.backup_url + '" target="_blank">' + self.media_duration + '</a>' )
 
     def delete(self):
+        if self.is_monetized:
+            reduce_bolo_score(self.user.id, 'create_topic', self, 'deleted')
         self.is_monetized = False
         self.is_removed = True
         self.save()
@@ -258,7 +260,6 @@ class Topic(models.Model):
         if userprofile.question_count:
             userprofile.question_count = F('question_count')-1
         userprofile.save()
-        reduce_bolo_score(self.user.id, 'create_topic', self, 'deleted')
         return True
 
     def restore(self):
@@ -273,12 +274,15 @@ class Topic(models.Model):
         return True
 
     def no_monetization(self):
-        self.is_monetized = False
-        self.save()
-        userprofile = UserProfile.objects.get(user = self.user)
-        userprofile.save()
-        reduce_bolo_score(self.user.id, 'create_topic', self, 'no_monetize')
-        return True
+        if self.is_monetized:
+            self.is_monetized = False
+            self.save()
+            userprofile = UserProfile.objects.get(user = self.user)
+            userprofile.save()
+            reduce_bolo_score(self.user.id, 'create_topic', self, 'no_monetize')
+            return True
+        else:
+            return True
 
     def add_monetization(self):
         self.is_removed = False
