@@ -315,7 +315,7 @@ class video_shared_details(models.Model):
 #     startedtimestamp = models.DateTimeField(_("startedtimestamp"), null = True, blank = False)
 #     pausedtimestamp = models.DateTimeField(_("pausedtimestamp"), null = True, blank = False)
 
-# # class recroding the video playtime details
+# class recroding the video playtime details
 # class video_playtime_details(models.Model):
 
 #     user = models.CharField(_("userid"), null = True, blank = False, max_length = 250, db_index = True)

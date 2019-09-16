@@ -190,7 +190,6 @@ def video_type_details(user_data_dump):
     try:
 
         user_id = user_data_dump['user_id']
-
         if('vb_viewed' in user_data_dump):
             for(a,b) in user_data_dump['vb_viewed']:
                 #datetime_format = time.strftime('%m/%d/%Y %H:%M:%S',  time.gmtime(b/1000.))
