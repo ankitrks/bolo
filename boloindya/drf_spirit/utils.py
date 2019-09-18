@@ -184,9 +184,10 @@ def calculate_encashable_details(user):
                 if each_bolo_weight.features=='create_vb':
                     is_eligible_for_encash = True
             else:
-                each_action_dict = {'bolo_score':0,'bolo_money':0}
+                each_action_dict = {'bolo_score':score,'bolo_money':0}
 
             bolo_details[each_bolo_weight.features] = each_action_dict
+        print user,bolo_details,'\n\n\n----------------------------------------------------------------------------\n'
         enchashable_detail.bolo_score_details = str(bolo_details)
         for each_bolo in all_bolo_action:
             total_bolo_score_in_this_cycle +=each_bolo.score

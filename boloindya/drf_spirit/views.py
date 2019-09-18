@@ -1055,8 +1055,10 @@ class EncashableDetailList(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        calculate_encashable_details(request.user)
-        all_encash_detail = EncashableDetail.objects.filter(user = request.user)
+        username = self.request.GET.get('username',None)
+        user = User.objects.get(username=username)
+        calculate_encashable_details(user)
+        all_encash_detail = EncashableDetail.objects.filter(user =user)
         return all_encash_detail
 
 class SubCategoryList(generics.ListAPIView):
@@ -1570,17 +1572,27 @@ def save_bank_details_info(request):
     except Exception as e:
         return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+def get_bolo_details(request):
+    try:
+        username = request.GET.get('username',None)
+        user = User.objects.get(username=username)
+        kyc_details,is_careted = UserKYC.objects.get_or_create(user=user)
+        all_encash_details = EncashableDetail.objects.filter(user = user).order_by('-id')
+        return JsonResponse({'all_encash_details': EncashableDetailSerializer(all_encash_details).data,'kyc_details':UserKYCSerializer(kyc_details).data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
 
 
 def generate_username(first,last,num_of_users):
+    username=first+last+str(num_of_users)
+    while(check_username(username)):
+        num_of_users+=1
         username=first+last+str(num_of_users)
-        while(check_username(username)):
-            num_of_users+=1
-            username=first+last+str(num_of_users)
-        return username
+    return username
 
 def check_username(name):
     return User.objects.filter(username__iexact=name)

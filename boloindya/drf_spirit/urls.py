@@ -5,7 +5,8 @@ from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,c
     follow_like_list,upload_audio_to_s3,reply_delete,editTopic,topic_delete,notification_topic,GetUserProfile,RegisterDevice,UnregisterDevice,NotificationAPI,get_bolo_score,\
     GetTopic,GetQuestion,GetAnswers,CricketMatchList,get_single_match,get_single_poll,predict,LeaderBoradList,vb_seen,VBList,ExpertList,GetHomeAnswer,transcoder_notification,\
     vb_transcode_status,get_follow_user,upload_profile_image,get_following_list,get_follower_list,GetChallenge,GetChallengeDetails,save_android_logs,SyncDump,get_hash_list,\
-    KYCDocumentTypeList,save_kyc_basic_info,save_kyc_documents,save_kyc_selfie,save_kyc_additional_info,save_bank_details_info,kyc_profession_status,get_kyc_status
+    KYCDocumentTypeList,save_kyc_basic_info,save_kyc_documents,save_kyc_selfie,save_kyc_additional_info,save_bank_details_info,kyc_profession_status,get_kyc_status,EncashableDetailList,\
+    get_bolo_details
 from rest_framework_simplejwt import views as jwt_views
 
 app_name = 'drf_spirit'
@@ -71,6 +72,8 @@ urlpatterns = [
     url(r'^save_kyc_additional_info/$', save_kyc_additional_info, name='save_kyc_additional_info'),
     url(r'^save_bank_details_info/$', save_bank_details_info, name='save_bank_details_info'),
     url(r'^get_kyc_status/$', get_kyc_status, name='get_kyc_status'),
+    url(r'^get_bolo_details/$', get_bolo_details, name='get_bolo_details'),
+    url(r'^get_encash_details/$', EncashableDetailList.as_view(), name='get_encash_details'),
 
 
     url(r'^fb_profile_settings/$', fb_profile_settings, name='fb_profile_settings'),
