@@ -5,8 +5,8 @@ from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,c
     follow_like_list,upload_audio_to_s3,reply_delete,editTopic,topic_delete,notification_topic,GetUserProfile,RegisterDevice,UnregisterDevice,NotificationAPI,get_bolo_score,\
     GetTopic,GetQuestion,GetAnswers,CricketMatchList,get_single_match,get_single_poll,predict,LeaderBoradList,vb_seen,VBList,ExpertList,GetHomeAnswer,transcoder_notification,\
     vb_transcode_status,get_follow_user,upload_profile_image,get_following_list,get_follower_list,GetChallenge,GetChallengeDetails,save_android_logs,SyncDump,get_hash_list,\
-    KYCDocumentTypeList,save_kyc_basic_info,save_kyc_documents,save_kyc_selfie,save_kyc_additional_info,save_bank_details_info,kyc_profession_status,get_kyc_status,EncashableDetailList,\
-    get_bolo_details
+    KYCDocumentTypeList,save_kyc_basic_info,save_kyc_documents,save_kyc_selfie,save_kyc_additional_info,save_bank_details_info,kyc_profession_status,get_kyc_status,user_statistics,my_app_version,\
+    EncashableDetailList,get_bolo_details
 from rest_framework_simplejwt import views as jwt_views
 
 app_name = 'drf_spirit'
@@ -57,6 +57,7 @@ urlpatterns = [
     url(r'^kyc_profession_status/', kyc_profession_status, name='kyc_profession_status'),
     url(r'^comments/', include(comment_urls)),
     url(r'^upload_profile_image$', upload_profile_image, name='upload_profile_image'),
+    url(r'^my_app_version/$', my_app_version, name='my_app_version'),
     
     url(r'^token/$', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
     url(r'^token/refresh/$', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
@@ -116,4 +117,5 @@ urlpatterns = [
     url(r'^topics/', include(topic_urls)),
     url(r'^get_hash_list/$',get_hash_list,name='get_hash_list'),
     url(r'^sync/dump/',SyncDump,name='sync_dump'),
+    url(r'^user/statistics/$', user_statistics, name = 'user_statistics'),          # url for dumping values in user statistics table
 ]

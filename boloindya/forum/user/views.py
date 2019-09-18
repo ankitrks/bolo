@@ -120,6 +120,9 @@ def referral_code_validate(request):
 def referral_code_update(request):
     ref_code = request.POST.get('code', '')
     user_id = request.POST.get('user_id', '')
+    click_id = request.POST.get('click_id',None)
+    pid = request.POST.get('pid',None)
+    referral_dump = request.POST.get('referral_dump',None)
     status = 'success'
     message = 'Referral code updated!'
     try:
@@ -129,6 +132,13 @@ def referral_code_update(request):
             used_obj, created = ReferralCodeUsed.objects.get_or_create(code = code_obj, by_user_id = user_id)
         else:
             used_obj = ReferralCodeUsed.objects.create(code = code_obj)
+        try:
+            used_obj.click_id = click_id
+            used_obj.pid =pid
+            used_obj.referral_dump = referral_dump
+            used_obj.save()
+        except:
+            pass
         if not created:
             status = 'error'
             message = 'Referral code already used by user!'

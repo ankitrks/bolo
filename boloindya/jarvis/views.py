@@ -430,5 +430,3 @@ def reject_kyc(request):
 
 
 
-
-

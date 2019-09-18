@@ -116,20 +116,23 @@ class TopicSerializerwithComment(ModelSerializer):
         read_only_fields = ('is_pinned',)
 
     def get_video_comments(self,instance):
+        return []
         # if instance.topic_comment.filter(is_media = True, is_audio = False,is_removed = False):
         #     return CommentSerializer([instance.topic_comment.filter(is_media = True, is_audio = False, is_removed = False)[0]],many=True).data
         # else:
-        return CommentSerializer(instance.topic_comment.filter(is_media = True, is_audio = False, is_removed = False),many=True).data
+        ## return CommentSerializer(instance.topic_comment.filter(is_media = True, is_audio = False, is_removed = False),many=True).data
     def get_audio_comments(self,instance):
+        return []
         # if instance.topic_comment.filter(is_media = True, is_audio = True,is_removed = False):
         #     return CommentSerializer([instance.topic_comment.filter(is_media = True, is_audio = True, is_removed = False)[0]] ,many=True).data
         # else:
-        return CommentSerializer(instance.topic_comment.filter(is_media = True, is_audio = True, is_removed = False) ,many=True).data
+        ## return CommentSerializer(instance.topic_comment.filter(is_media = True, is_audio = True, is_removed = False) ,many=True).data
     def get_text_comments(self,instance):
-        # if instance.topic_comment.filter(is_media = False,is_removed = False):
-        #     return CommentSerializer([instance.topic_comment.filter(is_media = False, is_removed = False)[0]] ,many=True).data
+        if instance.topic_comment.filter(is_media = False,is_removed = False).count():
+            return CommentSerializer([instance.topic_comment.filter(is_media = False, is_removed = False)[0]] ,many=True).data
+        return []
         # else:
-        return CommentSerializer(instance.topic_comment.filter(is_media = False, is_removed = False) ,many=True).data
+        # return CommentSerializer(instance.topic_comment.filter(is_media = False, is_removed = False) ,many=True).data
     def get_user(self,instance):
         return UserSerializer(instance.user).data
 
@@ -238,6 +241,7 @@ class UserProfileSerializer(ModelSerializer):
     follow_count= SerializerMethodField()
     follower_count= SerializerMethodField()
     bolo_score= SerializerMethodField()
+    slug = SerializerMethodField()
     class Meta:
         model = UserProfile
         # fields = '__all__' 
@@ -251,6 +255,9 @@ class UserProfileSerializer(ModelSerializer):
 
     def get_bolo_score(self,instance):
         return shortcounterprofile(instance.bolo_score)
+
+    def get_slug(self,instance):
+        return instance.user.username
 
 class UserSerializer(ModelSerializer):
     userprofile = SerializerMethodField()
@@ -384,5 +391,4 @@ class PaymentInfoSerializer(ModelSerializer):
     class Meta:
         model = PaymentInfo
         fields = '__all__'
-
       
