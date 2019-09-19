@@ -298,6 +298,7 @@ class VBList(generics.ListCreateAPIView):
     title and category_id 
     """ 
 
+
     def get_queryset(self):
         topics = []
         is_user_timeline = False
@@ -903,7 +904,7 @@ def createTopic(request):
             userprofile = UserProfile.objects.get(user = request.user)
             userprofile.vb_count = F('vb_count')+1
             userprofile.save()
-            add_bolo_score(request.user.id, 'create_vb', topic)
+            # add_bolo_score(request.user.id, 'create_topic', topic)
             topic_json = TopicSerializerwithComment(topic).data
             message = 'Video Byte Created'
         return JsonResponse({'message': message,'topic':topic_json}, status=status.HTTP_201_CREATED)
