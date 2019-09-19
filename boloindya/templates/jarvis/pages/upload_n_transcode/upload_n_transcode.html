@@ -1,0 +1,133 @@
+{% extends "jarvis/layout/base.html" %}
+{% block styles %}
+<style>
+    #overlay {
+  position: fixed; /* Sit on top of the page content */
+  display: none; /* Hidden by default */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+  z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
+}
+.percentcomplete{
+    position: absolute;
+    top: 50%;
+    left:50%;
+    color: white;
+    transform: translate(-50%,-50%);
+}
+</style>
+{% endblock styles %}
+{% block content %}
+<section class="content">
+    <form id="upload" action="" method="POST" enctype="multipart/form-data" class="form-horizontal">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">File: </label>
+            <div class="col-md-8">
+                <input type="file" name="csv_file" id="csv_file" required="True" class="form-control">
+            </div>
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Bucket</label>
+            <div class="col-md-8">
+                <select name="bucket_name" id="bucket_name" required="True" class="form-control">
+                    <option value="boloindya">Boloindya</option>
+                    <option value="boloindyapp-prod">Boloindya Prod</option>
+                    <option value="careeranna">CareerAnna</option>
+                </select>
+            </div>
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Folder Prefix</label>
+            <div class="col-md-8">
+                <input type="text" name="folder_prefix" id="folder_prefix" class="form-control" placeholder="optional: NAME ANY FOLDER OR CREATE ANYFOLDER TO PUT FILE IN IT">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
+                <button type="submit" class="btn btn-primary submit_from_button"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Upload </button>
+            </div>
+        </div>
+    </form>
+    <div id="overlay">
+        <div class="text"><br>
+            <br><span style="font-size:50px;" class="percentcomplete"></span></div>
+    </div>
+    <div id="csv_table">
+    </div>
+</section>
+{% endblock content %}
+{% block center_js %}
+<script>
+function upload(event) {
+    if ($('.submit_from_button').hasClass("opened")) {
+        return false;
+    } else {
+        $('.submit_from_button').addClass("opened");
+        event.preventDefault();
+        $('#overlay').show();
+        var data = new FormData($('#upload').get(0));
+        var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+        var all_data = []
+        $.ajax({
+            xhr: function() {
+                var xhr = new window.XMLHttpRequest();
+                xhr.upload.addEventListener("progress", function(evt) {
+                    if (evt.lengthComputable) {
+                        var percentComplete = evt.loaded / evt.total;
+                        console.log(percentComplete);
+                        $('.percentcomplete').text((percentComplete * 100).toPrecision(4) + ' %');
+                        if (percentComplete === 1) {
+                            $('.percentcomplete').text('Processing and Transcoding');
+                        }
+                    }
+                }, false);
+                xhr.addEventListener("progress", function(evt) {
+                    if (evt.lengthComputable) {
+                        var percentComplete = evt.loaded / evt.total;
+                        console.log(percentComplete);
+                        $('.percentcomplete').text((percentComplete * 100).toPrecision(4) + ' %')
+                    }
+                }, false);
+                return xhr;
+            },
+            url: '/jarvis/upload_n_transcode/',
+            type: 'POST',
+            data: data,
+            cache: false,
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(data) {
+                $('#overlay').hide()
+                $('.submit_from_button').removeClass("opened");
+                if (data.message == 'fail') {
+                    alert(data.reason)
+                } else if (data.message == 'success') {
+                    var url = '/jarvis/upload_details/?id=' + data.file_id
+                    // do your redirect
+                    window.location = url
+                }
+                $('.submit_from_button').removeClass("opened");
+                console.log(data)
+            },
+            error: function(data) {
+                $('#overlay').hide()
+                $('.submit_from_button').removeClass("opened");
+                console.log(data)
+                alert(data)
+                alert('Consult Tech')
+            },
+
+        });
+        return false;
+    }
+}
+
+$(function() {
+    $('#upload').submit(upload);
+});
+</script>
+{% endblock center_js %}
