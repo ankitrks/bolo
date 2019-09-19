@@ -98,7 +98,7 @@ def geturl(request):
 
 
 def home(request):
-    return render(request,'admin/jarvis/base.html')
+    return render(request,'jarvis/layout/base.html')
 
 @login_required
 def importcsv(request):
@@ -253,7 +253,7 @@ def uploaddata(request):
 def get_kyc_user_list(request):
     if request.user.is_superuser:
         all_kyc = UserKYC.objects.all()
-        return render(request,'admin/jarvis/userkyc/user_kyc_list.html',{'all_kyc':all_kyc})
+        return render(request,'jarvis/pages/userkyc/user_kyc_list.html',{'all_kyc':all_kyc})
 
 def get_kyc_of_user(request):
     if request.user.is_superuser or request.user.is_staff:
@@ -298,7 +298,7 @@ def get_encashable_detail(request):
         all_encash_details = EncashableDetail.objects.all().order_by('-bolo_score_earned')
     pay_cycle = PaymentCycle.objects.all().first()
     payement_cycle_form = PaymentCycleForm(initial=pay_cycle.__dict__)
-    return render(request,'admin/jarvis/payment/encashable_detail.html',{'all_encash_details':all_encash_details,'payement_cycle_form':payement_cycle_form})
+    return render(request,'jarvis/pages/payment/encashable_detail.html',{'all_encash_details':all_encash_details,'payement_cycle_form':payement_cycle_form})
 
 def calculate_encashable_detail(request):
     if request.user.is_superuser or request.user.is_staff:
@@ -314,12 +314,12 @@ def get_single_encash_detail(request):
         kyc_details = UserKYC.objects.filter(user=user)
         all_encash_details = EncashableDetail.objects.filter(user = user).order_by('-id')
         payment_form = PaymentForm()
-        return render(request,'admin/jarvis/payment/single_encash_details.html',{'all_encash_details':all_encash_details,'userprofile':user.st,'user':user,'kyc_details':kyc_details,'payment_form':payment_form})
+        return render(request,'jarvis/pages/payment/single_encash_details.html',{'all_encash_details':all_encash_details,'userprofile':user.st,'user':user,'kyc_details':kyc_details,'payment_form':payment_form})
 
 
 class PaymentView(FormView):
     form_class = PaymentForm
-    template_name='admin/jarvis/payment/invoice_error.html'
+    template_name='jarvis/pages/payment/invoice_error.html'
 
     def form_valid(self, form,**kwargs):
         receipt, created = PaymentInfo.objects.get_or_create(**form.cleaned_data)
@@ -336,7 +336,7 @@ class PaymentView(FormView):
         #send_mail_functionality_to_admin_and_to_user_if_mail_exist
         #send_sms_functionality_user
         # return HttpResponse(json.dumps({'success': 'success','receipt':receipt,'userprofile':userprofile }),content_type="application/json")
-        return render(self.request,'admin/jarvis/payment/invoice.html',{'success': 'success','receipt':receipt,'userprofile':userprofile })
+        return render(self.request,'jarvis/pages/payment/invoice.html',{'success': 'success','receipt':receipt,'userprofile':userprofile })
 
     def get_context_data(self,*args,**kwargs):
         kwargs=super(PaymentView,self).get_context_data(*args,**kwargs)
@@ -345,7 +345,7 @@ class PaymentView(FormView):
 
 class PaymentCycleView(FormView):
     form_class = PaymentCycleForm
-    template_name='admin/jarvis/payment/invoice_error.html'
+    template_name='jarvis/pages/payment/invoice_error.html'
 
     def form_valid(self,form,**kwargs):
         if self.request.user.is_superuser or self.request.user.is_staff:
@@ -355,7 +355,7 @@ class PaymentCycleView(FormView):
             all_encash_details = EncashableDetail.objects.all().order_by('-bolo_score_earned')
             pay_cycle = PaymentCycle.objects.all().first()
             payement_cycle_form = PaymentCycleForm(initial=pay_cycle.__dict__)
-            return render(request,'admin/jarvis/payment/encashable_detail.html',{'all_encash_details':all_encash_details,'payement_cycle_form':payement_cycle_form})
+            return render(request,'jarvis/pages/payment/encashable_detail.html',{'all_encash_details':all_encash_details,'payement_cycle_form':payement_cycle_form})
 
 
 def accept_kyc(request):

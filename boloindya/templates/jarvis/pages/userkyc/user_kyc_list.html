@@ -1,0 +1,60 @@
+{% extends "jarvis/layout/base.html" %}
+{% block content %}
+<section class="content">
+<div id="user_kyc">
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>username</th>
+                <th>kyc basic info submitted</th>
+                <th>is kyc basic info accepted</th>
+                <th>kyc document info submitted</th>
+                <th>is kyc document info accepted</th>
+                <th>kyc pan info submitted</th>
+                <th>is kyc pan info accepted</th>
+                <th>kyc selfie info submitted</th>
+                <th>is kyc selfie info accepted</th>
+                <th>kyc additional info submitted</th>
+                <th>is kyc additional info accepted</th>
+                <th>kyc bank details submitted</th>
+                <th>is kyc bank details accepted</th>
+                <th>is kyc completed</th>
+                <th>is kyc accepted</th>
+                <th>mode of transaction</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for each_kyc in all_kyc %}
+                <tr>
+                    <td><a href="{% if each_kyc.is_kyc_completed %}/jarvis/single_kyc/?username={{ each_kyc.user.username}}{% else %}#{% endif %}"><strong>{{ each_kyc.user.username}}</strong></a></td>
+                    <td>{{ each_kyc.kyc_basic_info_submitted}}</td>
+                    <td>{{ each_kyc.is_kyc_basic_info_accepted}}</td>
+
+                    <td>{{ each_kyc.kyc_document_info_submitted}}</td>
+                    <td>{{ each_kyc.is_kyc_document_info_accepted}}</td>
+
+                    <td>{{ each_kyc.kyc_pan_info_submitted}}</td>
+                    <td>{{ each_kyc.is_kyc_pan_info_accepted}}</td>
+
+                    <td>{{ each_kyc.kyc_selfie_info_submitted}}</td>
+                    <td>{{ each_kyc.is_kyc_selfie_info_accepted}}</td>
+
+                    <td>{{ each_kyc.kyc_additional_info_submitted}}</td>
+                    <td>{{ each_kyc.is_kyc_additional_info_accepted}}</td>
+
+                    <td>{{ each_kyc.kyc_bank_details_submitted}}</td>
+                    <td>{{ each_kyc.is_kyc_bank_details_accepted}}</td>
+
+                    <td>{{ each_kyc.is_kyc_completed }}</td>
+                    <td>{{ each_kyc.is_kyc_accepted}}</td>
+                    <td>{{ each_kyc.get_mode_of_transaction_display}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+</section>
+{% endblock content %}        
+        
