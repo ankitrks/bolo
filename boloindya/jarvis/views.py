@@ -310,6 +310,7 @@ def get_single_encash_detail(request):
     if request.user.is_superuser or request.user.is_staff:
         username = request.GET.get('username',None)
         user = User.objects.get(username=username)
+        calculate_encashable_details(user)
         kyc_details = UserKYC.objects.filter(user=user)
         all_encash_details = EncashableDetail.objects.filter(user = user).order_by('-id')
         payment_form = PaymentForm()
