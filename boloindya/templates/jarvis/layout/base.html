@@ -38,6 +38,7 @@
 
   <!-- Google Font -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.18/css/dataTables.bootstrap4.min.css">
   {% block styles %}
   
   {% endblock styles %}
@@ -52,10 +53,10 @@
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
-    {% block center_content %}
+    {% block content %}
 
 
-    {% endblock center_content %}
+    {% endblock content %}
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
@@ -103,6 +104,9 @@
 <script src="{% static 'AdminLTE/dist/js/pages/dashboard.js' %}"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="{% static 'AdminLTE/dist/js/demo.js' %}"></script>
+<script src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.18/js/dataTables.bootstrap4.min.js"></script>
+<script src="{% static 'js/clipboard.min.js'%}"></script>
 <script type="text/javascript">
       $('.wrapper').on('click','.sign_out_button',function(){
         window.location.replace('/superman/logout');

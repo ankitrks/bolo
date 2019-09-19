@@ -131,7 +131,7 @@ def geturl(request):
 
 
 def home(request):
-    return render(request,'admin/jarvis/base.html')
+    return render(request,'jarvis/layout/base.html')
 
 @login_required
 def importcsv(request):
@@ -158,7 +158,7 @@ def importcsv(request):
 
 @login_required
 def uploadvideofile(request):    
-    return render(request,'admin/jarvis/upload_n_transcode.html')
+    return render(request,'jarvis/pages/upload_n_transcode/upload_n_transcode.html')
 
 def getcsvdata(request):
     data = []
@@ -361,14 +361,14 @@ def upload_details(request):
     file_id = request.GET.get('id',None)
     if file_id:
         my_video = VideoUploadTranscode.objects.get(pk=file_id)
-        return render(request,'admin/jarvis/video_urls.html',{'my_video':my_video})
-    return render(request,'admin/jarvis/video_urls.html')
+        return render(request,'jarvis/pages/upload_n_transcode/video_urls.html',{'my_video':my_video})
+    return render(request,'jarvis/pages/upload_n_transcode/video_urls.html')
 
 
 @login_required
 def uploaded_list(request):
     all_uploaded = VideoUploadTranscode.objects.all()
-    return render(request,'admin/jarvis/uploaded_list.html',{'all_uploaded':all_uploaded})
+    return render(request,'jarvis/pages/upload_n_transcode/uploaded_list.html',{'all_uploaded':all_uploaded})
 
 
 
