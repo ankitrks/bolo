@@ -131,7 +131,7 @@ def geturl(request):
         return HttpResponse(json.dumps({'message':'fail','url':request.POST.get('url',None),'fail_message':str(e)}),content_type="application/json")
     
 
-
+@login_required
 def home(request):
     return render(request,'jarvis/layout/base.html')
 
