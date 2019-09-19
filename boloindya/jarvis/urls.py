@@ -12,6 +12,7 @@ urlpatterns = [
     url(r'^get_secret_file/$',views.SecretFileView, name='SecretFileView'),
     url(r'^get_encashable_detail/$',views.get_encashable_detail, name='get_encashable_detail'),
     url(r'^get_single_encash_detail/$',views.get_single_encash_detail, name='get_single_encash_detail'),
+    url(r'^calculate_encashable_detail/$',views.calculate_encashable_detail, name='calculate_encashable_detail'),
     url(r'^bolo_payment/$',views.PaymentView.as_view(),name='bolo_payment'),
     url(r'^bolo_cycle/$',views.PaymentCycleView.as_view(),name='bolo_cycle'),
     url(r'^accept_kyc/$',views.accept_kyc, name='accept_kyc'),

@@ -379,13 +379,9 @@ class PaymentCycleSerializer(ModelSerializer):
         fields = '__all__'
 
 class EncashableDetailSerializer(ModelSerializer):
-    bolo_item = SerializerMethodField()
     class Meta:
         model = EncashableDetail
         fields = '__all__'
-
-    def get_bolo_item(self,instance):
-        return BoloActionHistorySerializer(BoloActionHistory.objects.filter(enchashable_detail = instance),many=True).data
 
 class PaymentInfoSerializer(ModelSerializer):
     class Meta:

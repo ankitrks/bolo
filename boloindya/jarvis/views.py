@@ -300,6 +300,12 @@ def get_encashable_detail(request):
     payement_cycle_form = PaymentCycleForm(initial=pay_cycle.__dict__)
     return render(request,'admin/jarvis/payment/encashable_detail.html',{'all_encash_details':all_encash_details,'payement_cycle_form':payement_cycle_form})
 
+def calculate_encashable_detail(request):
+    if request.user.is_superuser or request.user.is_staff:
+        for each_user in User.objects.all():
+            calculate_encashable_details(each_user)
+    return HttpResponse(json.dumps({'success':'success'}),content_type="application/json")
+
 def get_single_encash_detail(request):
     if request.user.is_superuser or request.user.is_staff:
         username = request.GET.get('username',None)

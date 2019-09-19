@@ -4,7 +4,7 @@
 {% endblock styles%}
 {% block content %}
 <div id="user_kyc">
-    <a href="/jarvis/get_encashable_detail/?calculate=1" style="margin:30px;"><button type="button" class="btn btn-primary">Re Calculate Bolo Scores</button></a>
+    <button type="button" class="btn btn-primary re_calulate">Re Calculate Bolo Scores</button>
     <button type="button" class="btn btn-danger encash_bolo" data-toggle="modal" data-target="#change_cycle" encashable_id="{{each_encash.id}}" encash_amount="{{ each_encash.equivalent_INR }}">Change Cycle</button>
         <div class="row">
         <div class="col-xs-12 table-responsive">
@@ -118,6 +118,32 @@ $(document).ready( function () {
                 } ); 
             }   
     } );
+    $(document).on('click','.re_calulate',function(){
+        if($(this).hasClass('clicked')){
+            return 
+        }
+        $(this).addClass('clicked')
+        var button_text = $(this).text()
+        $(this).html('Processing')
+        var that = $(this)
+        $.ajax({
+        url: "/jarvis/calculate_encashable_detail/",
+        //contentType: false,
+        dataType: "json",
+        //processData: false,
+        type: "GET",
+        success: function(data) {
+            that.html(button_text);
+            that.removeClass('clicked')
+            console.log(data)
+        },
+        error: function(data) {
+            that.html(button_text);
+            that.removeClass('clicked')
+            console.log(data)
+        }
+    });
+    });
   
   
   
