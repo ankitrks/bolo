@@ -65,14 +65,16 @@ def get_bucket_details(bucket_name=None):
 
 
 def upload_tos3(file_name,bucket,folder_name=None):
+
     if folder_name:
-        file_key = urlify(folder_name)+'/'+urlify(file_name.name)
+        folder_name = folder_name.lower()
+        file_key = urlify(folder_name)+'/'+urlify(file_name.name.lower())
     else:
-        file_key = urlify(file_name.name)
+        file_key = urlify(file_name.name.lower())
     bucket_credentials = get_bucket_details(bucket)
     client = boto3.client('s3',aws_access_key_id=bucket_credentials['AWS_ACCESS_KEY_ID'],aws_secret_access_key=bucket_credentials['AWS_SECRET_ACCESS_KEY'])
     transfer = S3Transfer(client)
-    transfer.upload_file(urlify(file_name.name),bucket,file_key,extra_args={'ACL':'public-read'})
+    transfer.upload_file(urlify(file_name.name.lower()),bucket,file_key,extra_args={'ACL':'public-read'})
     file_url = 'https://'+bucket+'.s3.amazonaws.com/%s'%(file_key)
     transcode = transcode_media_file(urlify(folder_name),file_key,(file_key).split('/')[-1].split('.')[0],bucket)
     return file_url,transcode
@@ -129,7 +131,7 @@ def geturl(request):
         return HttpResponse(json.dumps({'message':'fail','url':request.POST.get('url',None),'fail_message':str(e)}),content_type="application/json")
     
 
-
+@login_required
 def home(request):
     return render(request,'jarvis/layout/base.html')
 
@@ -319,12 +321,14 @@ def upload_n_transcode(request):
     bucket_credentials = get_bucket_details(upload_to_bucket)
     conn = boto3.client('s3', bucket_credentials['REGION_HOST'], aws_access_key_id = bucket_credentials['AWS_ACCESS_KEY_ID'], \
             aws_secret_access_key = bucket_credentials['AWS_SECRET_ACCESS_KEY'])
+    upload_file_name = upload_file.name.lower()
     if upload_folder_name:
-        file_key_1 = urlify(upload_folder_name)+'/'+urlify(upload_file.name)
-        file_key_2 = urlify(upload_file.name)
+        upload_folder_name = upload_folder_name.lower()
+        file_key_1 = urlify(upload_folder_name)+'/'+urlify(upload_file_name)
+        file_key_2 = urlify(upload_file_name)
     else:
-        file_key_1 = urlify(upload_file.name)
-        file_key_2 = urlify(upload_file.name)
+        file_key_1 = urlify(upload_file_name)
+        file_key_2 = urlify(upload_file_name)
     try:
         conn.head_object(Bucket=upload_to_bucket, Key=file_key_1)
         return HttpResponse(json.dumps({'message':'fail','reason':'File already exist'}),content_type="application/json")
@@ -333,7 +337,7 @@ def upload_n_transcode(request):
             conn.head_object(Bucket=upload_to_bucket, Key=file_key_2)
             return HttpResponse(json.dumps({'message':'fail','reason':'File already exist'}),content_type="application/json")
         except Exception as e:
-            with open(urlify(upload_file.name),'wb') as f:
+            with open(urlify(upload_file_name),'wb') as f:
                 for chunk in upload_file.chunks():
                     if chunk:
                         f.write(chunk)
@@ -346,12 +350,12 @@ def upload_n_transcode(request):
             my_dict['transcode_dump'] = transcode['data_dump']
             if 'new_m3u8_url' in transcode:
                 my_dict['transcoded_file_url'] = transcode['new_m3u8_url']
-            my_dict['filename_uploaded'] = upload_file.name
-            my_dict['filename_changed'] = urlify(upload_file.name)
+            my_dict['filename_uploaded'] = upload_file_name
+            my_dict['filename_changed'] = urlify(upload_file_name)
             my_dict['folder_to_upload'] = upload_folder_name
             my_dict['folder_to_upload_changed'] = urlify(upload_folder_name)
             my_upload_transcode = VideoUploadTranscode.objects.create(**my_dict)
-            os.remove(urlify(upload_file.name))
+            os.remove(urlify(upload_file_name))
 
     return HttpResponse(json.dumps({'message':'success','file_id':my_upload_transcode.id}),content_type="application/json")
 
