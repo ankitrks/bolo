@@ -1947,7 +1947,7 @@ def SyncDump(request):
 def save_android_logs(request):
     try:
         if request.user:
-            AndroidLogs.objects.create(user=request.user,logs=request.POST.get('error_log', ''))
+            AndroidLogs.objects.create(user=request.user,logs=request.POST.get('error_log', ''),log_type = request.POST.get('log_type',None))
             return JsonResponse({'messgae' : 'success'})
         else:
             return JsonResponse({'messgae' : 'user_missing'})
