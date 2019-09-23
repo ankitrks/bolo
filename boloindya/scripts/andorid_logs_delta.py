@@ -160,11 +160,11 @@ def extract_minmax_delta(log_text_dump, userid):
 			data_iter.append(str_username)
 			data_iter.append(str_videotitle)
 			data_iter.append(mintime_player_ready)
-			data_iter.append(maxtime_player_ready)
-			data_iter.append(delta_player_ready)
+			#data_iter.append(maxtime_player_ready)
+			#data_iter.append(delta_player_ready)
 			data_iter.append(mintime_start)
-			data_iter.append(maxtime_start)
-			data_iter.append(delta_start)
+			#data_iter.append(maxtime_start)
+			#data_iter.append(delta_start)
 			data_iter.append(net_details)
 			data_iter = [str(i) for i in data_iter]
 			#print(','.join(map(str,data_iter)))
@@ -175,8 +175,9 @@ def extract_minmax_delta(log_text_dump, userid):
 # func for writing data into csv
 def write_csv():
 	print(len(complete_data))
-	headers = ['USERNAME', 'VIDEOTITLE', 'PLAYER READY(MIN)', 'PLAYER READY(MAX)', 'PLAYER READY(DELTA)', 'START PLAY(MIN)', 'START PLAY(MAX)', 'START PLAY(DELTA)', 'NETWORK']
-	f_name = 'deltarecords.csv'
+	#headers = ['USERNAME', 'VIDEOTITLE', 'PLAYER READY(MIN)', 'PLAYER READY(MAX)', 'PLAYER READY(DELTA)', 'START PLAY(MIN)', 'START PLAY(MAX)', 'START PLAY(DELTA)', 'NETWORK']
+	headers = ['User', 'Video title', 'Player Ready', 'Play Time', 'Network']
+        f_name = 'deltarecords.csv'
 	with open(f_name, 'w') as f:
 		writer = csv.writer(f)
 		writer.writerow(headers)
@@ -185,11 +186,11 @@ def write_csv():
 
 # func for sending the csv created to the mail
 def send_file_mail():
-	emailfrom = "akash.g@careeranna.com"
+	emailfrom = "support@careeranna.com"
 	emailto = "ankit@careeranna.com"
 	filetosend = os.getcwd() + "/deltarecords.csv"
-	username = "akash.g@careeranna.com"
-	password = "aefpk3559r"				# please do not use this()
+	username = "support@careeranna.com"
+	password = "Support@3011"				# please do not use this()
 
 	msg = MIMEMultipart()
 	msg["From"] = emailfrom
@@ -207,13 +208,13 @@ def send_file_mail():
 	attachment.set_payload(fp.read())
 	fp.close()
 	encoders.encode_base64(attachment)
-	attachment.add_header("Content-Disposition", "attachment", filename = filetosend)
+	attachment.add_header("Content-Disposition", "attachment", filename = 'buffering-report-boloindya-' + str(datetime.now().date()))
 	msg.attach(attachment)
 
 	server = smtplib.SMTP("smtp.gmail.com:587")
 	server.starttls()
 	server.login(username, password)
-	server.sendmail(emailfrom, emailto, msg.as_string())
+	server.sendmail(emailfrom, [emailto, 'akash@careeranna.com'], msg.as_string())
 	server.quit()
 
 
