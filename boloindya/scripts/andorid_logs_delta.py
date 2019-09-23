@@ -195,7 +195,7 @@ def send_file_mail():
 	msg = MIMEMultipart()
 	msg["From"] = emailfrom
 	msg["To"] = emailto
-	msg["Subject"] = "CSV file recording the time taken to run the videos on boloindya(last Mon to current Mon)"
+	msg["Subject"] = "Bolo Indya: Weekly users buffering report date: " + str(datetime.now().date())
 	msg.preamble = ""
 
 	ctype, encoding = mimetypes.guess_type(filetosend)
@@ -214,7 +214,7 @@ def send_file_mail():
 	server = smtplib.SMTP("smtp.gmail.com:587")
 	server.starttls()
 	server.login(username, password)
-	server.sendmail(emailfrom, [emailto, 'akash@careeranna.com'], msg.as_string())
+	server.sendmail(emailfrom, [emailto, 'akash.g@careeranna.com', 'varun1@careeranna.com'], msg.as_string())
 	server.quit()
 
 
