@@ -26,8 +26,8 @@ def transcode_media_file(input_key):
     output_key_prefix = 'elastic-transcoder/output/hls/'
 
     # Creating client for accessing elastic transcoder 
-    transcoder_client = boto3.client('elastictranscoder', settings.REGION_HOST, aws_access_key_id = settings.AWS_ACCESS_KEY_ID_TS, \
-            aws_secret_access_key = settings.AWS_SECRET_ACCESS_KEY_TS)
+    transcoder_client = boto3.client('elastictranscoder', settings.REGION_HOST, aws_access_key_id = settings.BOLOINDYA_AWS_ACCESS_KEY_ID_TS, \
+            aws_secret_access_key = settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY_TS)
 
     # Setup the job input using the provided input key.
     job_input = { 'Key': input_key }
@@ -77,7 +77,7 @@ def transcode_media_file(input_key):
     output_key_prefix_final = output_key_prefix + output_key + '/'
     # Creating the job.
     create_job_request = {
-        'PipelineId' : settings.PIPELINE_ID_TS,
+        'PipelineId' : settings.BOLOINDYA_PIPELINE_ID_TS,
         'Input' : job_input,
         'OutputKeyPrefix' : output_key_prefix_final,
         'Outputs' : job_outputs,
@@ -86,7 +86,7 @@ def transcode_media_file(input_key):
     data_dump += json.dumps(create_job_request)
     create_job_result=transcoder_client.create_job(**create_job_request)
     try:
-        m3u8_url = os.path.join('https://' + settings.AWS_BUCKET_NAME_TS + '.s3.amazonaws.com', \
+        m3u8_url = os.path.join('https://' + settings.BOLOINDYA_AWS_BUCKET_NAME_TS + '.s3.amazonaws.com', \
                 output_key_prefix_final, playlist_name + '.m3u8')
         job_id = create_job_result['Job']['Id']
         data_dump += 'HLS job has been created: ' + json.dumps(create_job_result)

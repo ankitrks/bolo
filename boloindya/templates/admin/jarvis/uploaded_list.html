@@ -1,0 +1,33 @@
+{% extends "admin/jarvis/base.html" %}
+{% block content %}
+<div>
+	<div class="col-xs-12 table-responsive">
+            <table class="table table-striped" id="uploaded_list">
+                <thead>
+                    <tr>
+                        <th>Filename Uploaded</th>
+                        <th>In Folder Uploaded</th>
+                        <th>S3 File URL</th>
+                        <th>Trancoded URL</th>
+                        <th>Urlify filename</th>
+                        <th>Urlify folder name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for each_uploaded in all_uploaded %}
+                    <tr>
+                        <td><a href="/jarvis/upload_details/?id={{ each_uploaded.id}}"><strong>{{ each_uploaded.filename_uploaded }}</strong></a></td>
+                        <td>{{ each_uploaded.folder_to_upload}}</td>
+                        <td>{{ each_uploaded.s3_file_url}}</td>
+                        <td>{{ each_uploaded.transcoded_file_url}}</td>
+                        <td>{{ each_uploaded.filename_changed}}</td>
+                        <td>{{ each_uploaded.folder_to_upload_changed}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <script>
+        var table = $('#uploaded_list').DataTable();</script>
+</div>
+{% endblock content %} 

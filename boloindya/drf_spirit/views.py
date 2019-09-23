@@ -651,13 +651,13 @@ def getVideoLength(input_video):
 
 def upload_thumbail(virtual_thumb_file):
     try:
-        client = boto3.client('s3',aws_access_key_id = settings.AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.AWS_SECRET_ACCESS_KEY)
+        client = boto3.client('s3',aws_access_key_id = settings.BOLOINDYA_AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY)
         ts = time.time()
         created_at = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
         final_filename = "img-" + str(ts).replace(".", "")  + ".jpg" 
-        client.put_object(Bucket=settings.AWS_BUCKET_NAME, Key='thumbnail/' + final_filename, Body=virtual_thumb_file)
-        # client.resource('s3').Object(settings.AWS_BUCKET_NAME, 'thumbnail/' + final_filename).put(Body=open(virtual_thumb_file, 'rb'))
-        filepath = "https://s3.amazonaws.com/"+settings.AWS_BUCKET_NAME+"/thumbnail/"+final_filename
+        client.put_object(Bucket=settings.BOLOINDYA_AWS_BUCKET_NAME, Key='thumbnail/' + final_filename, Body=virtual_thumb_file)
+        # client.resource('s3').Object(settings.BOLOINDYA_AWS_BUCKET_NAME, 'thumbnail/' + final_filename).put(Body=open(virtual_thumb_file, 'rb'))
+        filepath = "https://s3.amazonaws.com/"+settings.BOLOINDYA_AWS_BUCKET_NAME+"/thumbnail/"+final_filename
         # if os.path.exists(file):
         #     os.remove(file)
         return filepath
@@ -666,13 +666,13 @@ def upload_thumbail(virtual_thumb_file):
 
 def upload_media(media_file):
     try:
-        client = boto3.client('s3',aws_access_key_id = settings.AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.AWS_SECRET_ACCESS_KEY)
+        client = boto3.client('s3',aws_access_key_id = settings.BOLOINDYA_AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY)
         ts = time.time()
         created_at = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
         filenameNext= str(media_file.name).split('.')
         final_filename = str(filenameNext[0])+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[1])
-        client.put_object(Bucket=settings.AWS_BUCKET_NAME, Key='media/' + final_filename, Body=media_file)
-        filepath = "https://s3.amazonaws.com/"+settings.AWS_BUCKET_NAME+"/media/"+final_filename
+        client.put_object(Bucket=settings.BOLOINDYA_AWS_BUCKET_NAME, Key='media/' + final_filename, Body=media_file)
+        filepath = "https://s3.amazonaws.com/"+settings.BOLOINDYA_AWS_BUCKET_NAME+"/media/"+final_filename
         # if os.path.exists(file):
         #     os.remove(file)
         return filepath
