@@ -196,7 +196,7 @@ class UserJarvisDump(models.Model):
 # read the sample dump file and create columns for the same
 
 # class recording the model storing user based statistics 
-class user_log_statistics(models.Model):
+class UserLogStatistics(models.Model):
     #user_log_fname = os.getcwd() + '/user_log.json'         # file recording the logs of user
 
     # record these details of the user
@@ -218,7 +218,7 @@ class user_log_statistics(models.Model):
     session_starttime = models.DateTimeField(_("session_starttime"), null = True, blank = True)
 
 # class storing the model recroding follow, unfollow, report, share details of a user                  
-class user_follow_unfollow_details(models.Model):
+class UserFollowUnfollowDetails(models.Model):
 
     # denoting the type of relationshhip applicable here
     relationship_info = [
@@ -235,7 +235,7 @@ class user_follow_unfollow_details(models.Model):
 
 
 # class storing user-videotype details applicable for user, which videos s/he watched, commented, shared etc
-class user_videotype_details(models.Model):
+class UserVideoTypeDetails(models.Model):
     
     videoinfo_type = [
         ('1', 'commented'),
@@ -251,13 +251,13 @@ class user_videotype_details(models.Model):
     video_type = models.CharField(_("video_type"), choices = videoinfo_type, max_length = 250)
 
 # class storing video creation details 
-class video_details(models.Model):
+class VideoDetails(models.Model):
 
     videoid = models.CharField(_("videoid"), null = False, blank = False, max_length = 250, db_index = True)
     timestamp = models.DateTimeField(_("timestamp"), null = True, blank = False)
 
 # class storing user entry point details
-class user_entry_point(models.Model):
+class UserEntryPoint(models.Model):
 
     user = models.CharField(_("user"), null = True, blank = False, max_length = 250, db_index = True)
     entrypoint = models.CharField(_("entrypoint"), null = False, max_length = 400)
@@ -265,7 +265,7 @@ class user_entry_point(models.Model):
 
 
 # class storing "following" list and "followers" list viewed by a user
-class user_viewed_followers_following(models.Model):
+class UserViewedFollowersFollowing(models.Model):
 
     profile_choices = [
         ('1', 'following'),
@@ -277,7 +277,7 @@ class user_viewed_followers_following(models.Model):
     relationship_type = models.CharField(_("relationship_type"), choices = profile_choices, max_length = 250)
 
 # class storing user category interests 
-class user_interest(models.Model):
+class UserInterest(models.Model):
 
     choices = [
         ('1', 'added'),
@@ -289,7 +289,7 @@ class user_interest(models.Model):
     category_status = models.CharField(_("category_status"), choices = choices, max_length = 250)
 
 # class storing details of video shared by the user
-class video_shared_details(models.Model):
+class VideoSharedDetails(models.Model):
 
     choices = [
         ('1', 'shared_on_whatsapp'),
@@ -304,39 +304,23 @@ class video_shared_details(models.Model):
     share_platform = models.CharField(_("share_platform"), null = True, blank = True, max_length = 400)
     timestamp = models.DateTimeField(_("timestamp"), null = False, blank = False)
 
-# class recording the video loading details
-# class video_load_details(models.Model):
 
-#     user = models.CharField(_("userid"), null = True, blank = False, max_length = 250, db_index = True)
-#     videoid = models.CharField(_("videoid"), null = True, blank = False, max_length = 250, db_index = True)
-#     clicktimestamp = models.DateTimeField(_("clicktimestamp"), null = True, blank = False)
-#     metatimestamp = models.DateTimeField(_("metatimestamp"), null = True, blank = False)
-#     buffertimestamp = models.DateTimeField(_("buffertimestamp"), null = True, blank = False)
-#     startedtimestamp = models.DateTimeField(_("startedtimestamp"), null = True, blank = False)
-#     pausedtimestamp = models.DateTimeField(_("pausedtimestamp"), null = True, blank = False)
+# class recording the activity time spend by the user
+class ActivityTimeSpend(models.Model):
 
-# class recroding the video playtime details
-# class video_playtime_details(models.Model):
-
-#     user = models.CharField(_("userid"), null = True, blank = False, max_length = 250, db_index = True)
-#     videoid = models.CharField(_("videoid"), null = True, blank = False, max_length = 250, db_index = True)
-#     playtime = models.CharField(_("playtime"), null = True, blank = False, max_length = 100)
+    user = models.CharField(_("userid"), null = True, blank = False, max_length = 250, db_index = True)
+    fragmentid = models.CharField(_("fragmentid"), null = True, blank = False, max_length = 550, db_index = True)
+    starttime = models.DateTimeField(_("starttime"), null = True, blank = False)
+    pausetime = models.DateTimeField(_("pausetime"), null = True, blank = False)
+    difference = models.PositiveIntegerField(_("time_difference"), default=0, editable=False)
 
 
-# # class recording the activity time spend by the user
-# class activity_time_spend(models.Model):
+# class recording the seach records of a user
+class UserSearch(models.Model):
 
-#     user = models.CharField(_("userid"), null = True, blank = False, max_length = 250, db_index = True)
-#     categoryid = models.CharField(_("categoryid"), null = True, blank = False, max_length = 250, db_index = True)
-#     starttime = models.DateTimeField(_("starttime"), null = True, blank = False)
-#     pausetime = models.DateTimeField(_("pausetime"), null = True, blank = False)
-
-# # class recording the seach records of a user
-# class user_search(models.Model):
-
-#     user = models.CharField(_("userid"), null = True, blank = False, max_length = 250, db_index = True)
-#     searchquery = models.CharField(_("searchquery"), null = True, blank = False)
-#     timestamp = models.DateTimeField(_("timestamp"), null = True, blank = False)
+    user = models.CharField(_("user"), null = True, blank = False, max_length = 250, db_index = True)
+    searchquery = models.CharField(_("searchquery"), null = True, blank = False, max_length = 1000)
+    timestamp = models.DateTimeField(_("timestamp"), null = True, blank = False)
 
 
 
