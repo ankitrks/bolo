@@ -152,17 +152,6 @@ class AndroidLogs(RecordTimeStamp):
     def __unicode__(self):
         return str(self.user)
 
-#class for recording the time diff for users
-# class DeltaAndroidLogs(models.Model):
-#     #user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = False, null = False, db_index = True)
-#     user = models.CharField(_("userid"), max_length = 200, blank = False, null = False, db_index = True)
-#     videoid = models.CharField(_("videoid"), max_length = 150, blank = False, null = False, db_index = True)
-#     #timeplayerready = models.TextField(_("timeplayerready"), null = True, blank = True)
-#     #timeplay = models.TextField(_("timeplay"), null = True, blank = True)
-#     timeplayerready = models.PositiveIntegerField(null=True, blank=True, default=0)
-#     timeplay = models.PositiveIntegerField(null=True, blank=True, default=0)
-
-
 class AppVersion(RecordTimeStamp):
     app_name = models.CharField(_("Name"), max_length=100, blank=True)
     app_version = models.CharField(_("Version"), max_length=100, blank=True)
