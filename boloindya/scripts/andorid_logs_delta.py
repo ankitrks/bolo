@@ -214,7 +214,7 @@ def send_file_mail():
 	server = smtplib.SMTP("smtp.gmail.com:587")
 	server.starttls()
 	server.login(username, password)
-	server.sendmail(emailfrom, [emailto, 'akash.g@careeranna.com', 'varun1@careeranna.com'], msg.as_string())
+	server.sendmail(emailfrom, [emailto, 'akash.g@careeranna.com', 'varun@careeranna.com'], msg.as_string())
 	server.quit()
 
 
