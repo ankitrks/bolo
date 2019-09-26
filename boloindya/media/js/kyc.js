@@ -12,6 +12,7 @@ function addEvents() {
 function kyc_accept() {
     var kyc_type = $(this).attr("kyc_type");
     var user_id = $(this).attr("user_id");
+    var that = this
     data = {
         kyc_type: kyc_type,
         user_id: user_id
@@ -24,9 +25,12 @@ function kyc_accept() {
         type: "GET",
         data: data,
         success: function(data) {
-            console.log(data)
+            toastr.success('Accepted');
+            $(that).parents('.action_button').empty();
+            $(that).parents('.action_button').append('<span class="btn-primary" style="padding:10px;">Accepted</span>')
         },
         error: function(data) {
+            toastr.error('Error: '+data);
             console.log(data)
         }
     });

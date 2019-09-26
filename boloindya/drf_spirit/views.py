@@ -1536,20 +1536,18 @@ def save_kyc_additional_info(request):
 def save_bank_details_info(request):
     try:
         mode_of_transaction = request.POST.get('mode_of_transaction',None)
-        bank_name = request.POST.get('bank_name',None)
         account_name = request.POST.get('account_name',None)
         account_number = request.POST.get('account_number',None)
         IFSC_code = request.POST.get('IFSC_code',None)
         paytm_number = request.POST.get('paytm_number',None)
         if mode_of_transaction:
-            if mode_of_transaction=='1' and not (bank_name and account_name and account_number and IFSC_code):
+            if mode_of_transaction=='1' and not (account_name and account_number and IFSC_code):
                 return JsonResponse({'message': 'Mandatory Bank Data Missing'}, status=status.HTTP_400_BAD_REQUEST)
             elif mode_of_transaction=='2' and not paytm_number:
                 return JsonResponse({'message': 'Mandatory Paytm Data Missing'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return JsonResponse({'message': 'Mode Of Transaction Missing'}, status=status.HTTP_400_BAD_REQUEST)
         data_dict = {
-            'bank_name':bank_name,
             'account_number':account_number,
             'account_name':account_name,
             'IFSC_code':IFSC_code,

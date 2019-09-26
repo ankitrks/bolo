@@ -316,6 +316,21 @@ def get_kyc_user_list(request):
         all_kyc = UserKYC.objects.all()
         return render(request,'jarvis/pages/userkyc/user_kyc_list.html',{'all_kyc':all_kyc})
 
+def get_submitted_kyc_user_list(request):
+    if request.user.is_superuser:
+        all_kyc = UserKYC.objects.filter(is_kyc_completed=True,is_kyc_accepted=False)
+        return render(request,'jarvis/pages/userkyc/submitted_kyc.html',{'all_kyc':all_kyc})
+
+def get_pending_kyc_user_list(request):
+    if request.user.is_superuser:
+        all_kyc = UserKYC.objects.filter(is_kyc_completed=False,is_kyc_accepted=False)
+        return render(request,'jarvis/pages/userkyc/pending_kyc.html',{'all_kyc':all_kyc})
+
+def get_accepted_kyc_user_list(request):
+    if request.user.is_superuser:
+        all_kyc = UserKYC.objects.filter(is_kyc_completed=True,is_kyc_accepted=True)
+        return render(request,'jarvis/pages/userkyc/accepted_kyc.html',{'all_kyc':all_kyc})
+
 def get_kyc_of_user(request):
     if request.user.is_superuser or request.user.is_staff:
         username = request.GET.get('username',None)
@@ -329,9 +344,9 @@ def get_kyc_of_user(request):
         kyc_document_reject_form = KYCDocumentRejectForm()
         kyc_additional_reject_form = AdditionalInfoRejectForm()
         kyc_bank_reject_form = BankDetailRejectForm()
-        return render(request,'admin/jarvis/userkyc/single_kyc.html',{'kyc_details':kyc_details,'kyc_basic_info':kyc_basic_info,\
+        return render(request,'jarvis/pages/userkyc/single_kyc.html',{'kyc_details':kyc_details,'kyc_basic_info':kyc_basic_info,\
             'kyc_document':kyc_document,'additional_info':additional_info,'bank_details':bank_details,'userprofile':kyc_user.st,\
-            'user':kyc_user,'kyc_basic_reject_form':kyc_basic_reject_form,'kyc_document_reject_form':kyc_document_reject_form,'kyc_additional_reject_form':kyc_additional_reject_form,
+            'user_details':kyc_user,'kyc_basic_reject_form':kyc_basic_reject_form,'kyc_document_reject_form':kyc_document_reject_form,'kyc_additional_reject_form':kyc_additional_reject_form,
             'kyc_bank_reject_form':kyc_bank_reject_form})
 
 

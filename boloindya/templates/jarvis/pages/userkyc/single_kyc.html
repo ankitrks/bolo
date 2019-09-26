@@ -85,10 +85,10 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="w3-card-4 test" style="width:100%;margin: 0 auto;text-align:center;">
-                                    <img style="width:100%;" src="{{ kyc_basic_info.pic_selfie_url|get_safe_url:user }}" alt="Avatar" style="width:100%;margin: 0 auto;">
+                                    <img style="width:100%;" src="{{ kyc_basic_info.pic_selfie_url|get_safe_url:user_details }}" alt="Avatar" style="width:100%;margin: 0 auto;">
                                     <p>Selfie</p>
-                                    {% if not kyc_details.is_kyc_additional_info_accepted %}
-                                    <span>
+                                    {% if not kyc_details.is_kyc_selfie_info_accepted %}
+                                    <span class="action_button">
                                         <button type="button" class="btn btn-primary kyc_accept" kyc_id="{{kyc_basic_info.id}}" kyc_type="kyc_profile_pic" user_id="{{kyc_basic_info.user.id}}" >Accept</button>
                                         <button type="button" class="btn btn-danger kyc_reject" kyc_id="{{kyc_basic_info.id}}" kyc_type="kyc_profile_pic" user_id="{{kyc_basic_info.user.id}}" data-toggle="modal" data-target="#basic_reject_modal">Reject</button>
                                     </span>
@@ -204,7 +204,7 @@
                                                             </div>
                                                             <div class="box-body">
                                                                 <div class="row">
-                                                                    <img style="width:100%;" src="{{each_document.frontside_url|get_safe_url:user}}">
+                                                                    <img style="width:100%;" src="{{each_document.frontside_url|get_safe_url:user_details}}">
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -219,7 +219,7 @@
                                                             </div>
                                                             <div class="box-body">
                                                                 <div class="row">
-                                                                    <img style="width:100%;" src="{{each_document.backside_url|get_safe_url:user}}">
+                                                                    <img style="width:100%;" src="{{each_document.backside_url|get_safe_url:user_details}}">
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -235,7 +235,7 @@
                                                             </div>
                                                             <div class="box-body">
                                                                 <div class="row">
-                                                                    <img style="width:320px;height:480px;margin:0 auto;" src="{{each_document.frontside_url|get_safe_url:user}}">
+                                                                    <img style="width:320px;height:480px;margin:0 auto;" src="{{each_document.frontside_url|get_safe_url:user_details}}">
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -283,7 +283,7 @@
                                                             </div>
                                                             <div class="box-body">
                                                                 <div class="row">
-                                                                    <img style="width:100%;" src="{{each_document.frontside_url|get_safe_url:user}}">
+                                                                    <img style="width:100%;" src="{{each_document.frontside_url|get_safe_url:user_details}}">
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -298,7 +298,7 @@
                                                             </div>
                                                             <div class="box-body">
                                                                 <div class="row">
-                                                                    <img style="width:100%;" src="{{each_document.backside_url|get_safe_url:user}}">
+                                                                    <img style="width:100%;" src="{{each_document.backside_url|get_safe_url:user_details}}">
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -314,7 +314,7 @@
                                                             </div>
                                                             <div class="box-body">
                                                                 <div class="row">
-                                                                    <img style="width:320px;height:480px;margin:0 auto;" src="{{each_document.frontside_url|get_safe_url:user}}">
+                                                                    <img style="width:320px;height:480px;margin:0 auto;" src="{{each_document.frontside_url|get_safe_url:user_details}}">
                                                                 </div>
                                                             </div>
                                                         </div>
