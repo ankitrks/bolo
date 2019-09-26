@@ -1,0 +1,30 @@
+{% extends "jarvis/layout/base.html" %}
+{% load static %}
+{% block content %}
+<section class="content">
+<div id="user_kyc">
+    <table class="table table-bordered table-striped" id="accepted_kyc">
+        <thead>
+            <tr>
+                <th>username</th>
+                <th>KYC Accepted</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for each_kyc in all_kyc %}
+                <tr>
+                    <td><a href="/jarvis/single_kyc/?username={{ each_kyc.user.username}}"><strong>{{ each_kyc.user.username}}</strong></a></td>
+                    <td>{% if each_kyc.is_kyc_accepted %}<img src="{% static 'img/green_tick.jpg' %}" style="width:20px;">{% else %}<img src="{% static 'img/wrong.png' %}" style="width:20px;">{% endif %}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+</section>
+{% endblock content %}
+{% block center_js %}
+<script>
+    $('#accepted_kyc').DataTable();
+</script>
+{% endblock center_js %}

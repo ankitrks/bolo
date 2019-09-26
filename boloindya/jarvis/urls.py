@@ -21,4 +21,7 @@ urlpatterns = [
     url(r'^upload_n_transcode/$',views.upload_n_transcode),
     url(r'^upload_details/$',views.upload_details),
     url(r'^uploaded_list/$',views.uploaded_list),
+    url(r'^get_submitted_kyc_user_list/$',views.get_submitted_kyc_user_list, name='get_submitted_kyc_user_list'),
+    url(r'^get_pending_kyc_user_list/$',views.get_pending_kyc_user_list, name='get_pending_kyc_user_list'),
+    url(r'^get_accepted_kyc_user_list/$',views.get_accepted_kyc_user_list, name='get_accepted_kyc_user_list'),
 ]
