@@ -1446,6 +1446,11 @@ def save_kyc_basic_info(request):
 
         user_kyc,is_created = UserKYC.objects.get_or_create(user=request.user)
         kyc_basic_info,kyc_basic_info_is_created = KYCBasicInfo.objects.update_or_create(user=request.user,defaults=data_dict)
+        if not kyc_basic_info_is_created:
+            kyc_basic_info.is_rejected = False
+            kyc_basic_info.is_active = True
+            kyc_basic_info.save()
+
         user_kyc.kyc_basic_info_submitted = True
         user_kyc.save()
         return JsonResponse({'message': 'basic_info_saved'}, status=status.HTTP_200_OK)
@@ -1500,6 +1505,10 @@ def save_kyc_selfie(request):
         }
         user_kyc = UserKYC.objects.get(user=request.user)
         selfie_info,is_created = KYCBasicInfo.objects.update_or_create(user=request.user,defaults=data_dict)
+        if not is_created:
+            selfie_info.is_rejected = False
+            selfie_info.is_active = True
+            selfie_info.save()
         user_kyc.kyc_selfie_info_submitted = True
         user_kyc.save()
         return JsonResponse({'message': 'additional info saved'}, status=status.HTTP_200_OK)

@@ -504,11 +504,11 @@ def reject_kyc(request):
             obj.reject_reason = kyc_reject_reason
             obj.reject_text = kyc_reject_text
         obj.is_rejected = True
-        obj.is_active = True
+        obj.is_active = False
         obj.save()
         user_kyc.save()
         if not (user_kyc.is_kyc_basic_info_accepted and user_kyc.is_kyc_document_info_accepted and user_kyc.is_kyc_selfie_info_accepted and \
-        user_kyc.is_kyc_bank_details_accepted):
+        user_kyc.is_kyc_bank_details_accepted and userkyc.is_kyc_selfie_info_accepted):
             user_kyc.is_kyc_accepted = False
             user_kyc.is_kyc_completed = False
             user_kyc.save()
