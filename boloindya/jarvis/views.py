@@ -453,7 +453,7 @@ def accept_kyc(request):
             user_kyc.is_kyc_bank_details_accepted = True
         user_kyc.save()
         if user_kyc.is_kyc_basic_info_accepted and user_kyc.is_kyc_document_info_accepted and user_kyc.is_kyc_selfie_info_accepted and\
-        user_kyc.is_kyc_additional_info_accepted and user_kyc.is_kyc_bank_details_accepted:
+        user_kyc.is_kyc_bank_details_accepted:
             user_kyc.is_kyc_accepted = True
             user_kyc.save()
 
@@ -469,31 +469,37 @@ def reject_kyc(request):
         user_kyc = UserKYC.objects.get(user_id = user_id)
         if kyc_type == "basic_info":
             user_kyc.is_kyc_basic_info_accepted = False
+            user_kyc.kyc_basic_info_submitted = False
             obj = KYCBasicInfo.objects.get(pk=kyc_id)
             obj.reject_reason = kyc_reject_reason
             obj.reject_text = kyc_reject_text
         elif kyc_type == "kyc_document":
             user_kyc.is_kyc_document_info_accepted = False
+            user_kyc.kyc_document_info_submitted = False
             obj = KYCDocument.objects.get(pk=kyc_id)
             obj.reject_reason = kyc_reject_reason
             obj.reject_text = kyc_reject_text
         elif kyc_type == "kyc_pan":
             user_kyc.is_kyc_pan_info_accepted = False
+            user_kyc.kyc_pan_info_submitted = False
             obj = KYCDocument.objects.get(pk=kyc_id)
             obj.reject_reason = kyc_reject_reason
             obj.reject_text = kyc_reject_text
         elif kyc_type == "kyc_profile_pic":
             user_kyc.is_kyc_selfie_info_accepted = False
+            user_kyc.kyc_selfie_info_submitted = False
             obj = KYCBasicInfo.objects.get(pk=kyc_id)
             obj.reject_reason = kyc_reject_reason
             obj.reject_text = kyc_reject_text
-        elif kyc_type == "kyc_additional_info":
-            user_kyc.is_kyc_additional_info_accepted = False
-            obj = AdditionalInfo.objects.get(pk=kyc_id)
-            obj.reject_reason = kyc_reject_reason
-            obj.reject_text = kyc_reject_text      
+        # elif kyc_type == "kyc_additional_info":
+        #     user_kyc.is_kyc_additional_info_accepted = False
+        #     user_kyc.kyc_additional_info_submitted = False
+        #     obj = AdditionalInfo.objects.get(pk=kyc_id)
+        #     obj.reject_reason = kyc_reject_reason
+        #     obj.reject_text = kyc_reject_text      
         elif kyc_type == "kyc_bank_details":
             user_kyc.is_kyc_bank_details_accepted = False
+            user_kyc.kyc_bank_details_submitted = False
             obj = BankDetail.objects.get(pk=kyc_id)
             obj.reject_reason = kyc_reject_reason
             obj.reject_text = kyc_reject_text
@@ -502,7 +508,7 @@ def reject_kyc(request):
         obj.save()
         user_kyc.save()
         if not (user_kyc.is_kyc_basic_info_accepted and user_kyc.is_kyc_document_info_accepted and user_kyc.is_kyc_selfie_info_accepted and \
-        user_kyc.is_kyc_additional_info_accepted and user_kyc.is_kyc_bank_details_accepted):
+        user_kyc.is_kyc_bank_details_accepted):
             user_kyc.is_kyc_accepted = False
             user_kyc.is_kyc_completed = False
             user_kyc.save()
