@@ -338,14 +338,14 @@ def get_kyc_of_user(request):
         kyc_details = UserKYC.objects.get(user=kyc_user)
         kyc_basic_info = KYCBasicInfo.objects.get(user=kyc_user)
         kyc_document = KYCDocument.objects.filter(user=kyc_user,is_active=True)
-        additional_info = AdditionalInfo.objects.get(user=kyc_user)
+        # additional_info = AdditionalInfo.objects.get(user=kyc_user)
         bank_details = BankDetail.objects.get(user=kyc_user,is_active=True)
         kyc_basic_reject_form = KYCBasicInfoRejectForm()
         kyc_document_reject_form = KYCDocumentRejectForm()
         kyc_additional_reject_form = AdditionalInfoRejectForm()
         kyc_bank_reject_form = BankDetailRejectForm()
         return render(request,'jarvis/pages/userkyc/single_kyc.html',{'kyc_details':kyc_details,'kyc_basic_info':kyc_basic_info,\
-            'kyc_document':kyc_document,'additional_info':additional_info,'bank_details':bank_details,'userprofile':kyc_user.st,\
+            'kyc_document':kyc_document,'additional_info':'','bank_details':bank_details,'userprofile':kyc_user.st,\
             'user_details':kyc_user,'kyc_basic_reject_form':kyc_basic_reject_form,'kyc_document_reject_form':kyc_document_reject_form,'kyc_additional_reject_form':kyc_additional_reject_form,
             'kyc_bank_reject_form':kyc_bank_reject_form})
 
