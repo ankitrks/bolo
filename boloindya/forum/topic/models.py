@@ -279,7 +279,10 @@ class Topic(models.Model):
             self.save()
             userprofile = UserProfile.objects.get(user = self.user)
             userprofile.save()
-            reduce_bolo_score(self.user.id, 'create_topic', self, 'no_monetize')
+            if self.language_id == '1':
+                reduce_bolo_score(self.user.id, 'create_topic_en', self, 'no_monetize')
+            else:
+                reduce_bolo_score(self.user.id, 'create_topic', self, 'no_monetize')
             return True
         else:
             return True
@@ -290,7 +293,10 @@ class Topic(models.Model):
         self.save()
         userprofile = UserProfile.objects.get(user = self.user)
         userprofile.save()
-        add_bolo_score(self.user.id, 'create_topic', self)
+        if self.language_id =='1':
+            add_bolo_score(self.user.id, 'create_topic_en', self)
+        else:
+            add_bolo_score(self.user.id, 'create_topic', self)
         return True
 
     def audio_duration(self):
