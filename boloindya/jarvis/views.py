@@ -571,5 +571,6 @@ def uploaded_list(request):
 
 
 
+#def create_barchart(request):
 
 
