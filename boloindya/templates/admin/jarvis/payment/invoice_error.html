@@ -1,0 +1,42 @@
+{% extends "admin/jarvis/base.html" %}
+{% block content %}
+<style type="text/css">
+  .container
+  {
+    height: 500px;
+    width: 500px;
+    margin-top: 50px;
+  }
+
+  .jumbotron {
+  padding-top: 30px;
+  padding-bottom: 30px;
+  margin-bottom: 30px;
+  color: inherit;
+  background-color:#B0E0E6;
+}
+</style>
+
+<div class="times">  
+  <br>
+     <div class="container">
+        <div class="jumbotron">
+            <h2>Submission Failed</h2>
+                <p class="lead">{{ form.er.as_table }}
+                                {% for field in form %}
+	                              {% if field.errors %}
+	                              {{ field.name }}<h4>{{ field.errors }}</h4>
+	                              {% endif %}
+                                {% endfor %}
+                </p>
+                <hr class="my-4">
+                <p class="lead">
+               <a class="btn btn-primary btn-lg" href="{{ http_referer }}" role="button">  Back </a>
+              </p>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+

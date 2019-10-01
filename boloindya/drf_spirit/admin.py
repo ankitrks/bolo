@@ -1,10 +1,11 @@
 from django.contrib import admin
-from .models import SingUpOTP
+from .models import SingUpOTP, UserJarvisDump
 from forum.user.models import Weight,UserProfile,AppVersion, UserProfile,AndroidLogs, AppPageContent, ReferralCode, ReferralCodeUsed
 from forum.category.models import Category
 from import_export.admin import ImportExportModelAdmin,ExportMixin
 from import_export import resources
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
+from .models import user_follow_unfollow_details, user_videotype_details, video_details, user_entry_point, user_viewed_followers_following, user_interest, video_shared_details
 
 
 class UserProfileResource(resources.ModelResource):
@@ -25,7 +26,7 @@ class CategoryAdmin(admin.ModelAdmin):
 admin.site.register(Category, CategoryAdmin)
 
 class WeightAdmin(admin.ModelAdmin):
-	list_display = ('features', 'weight', )
+	list_display = ('features', 'weight','is_monetize','bolo_score','equivalent_INR' )
 admin.site.register(Weight, WeightAdmin)
 
 class UserProfileAdmin(ImportExportModelAdmin):
@@ -55,3 +56,16 @@ class AndroidLogsAdmin(admin.ModelAdmin):
 admin.site.register(AppVersion)
 admin.site.register(AndroidLogs, AndroidLogsAdmin)
 admin.site.register(AppPageContent)
+
+# user information models
+admin.site.register(UserJarvisDump)
+admin.site.register(user_follow_unfollow_details)
+admin.site.register(user_videotype_details)
+admin.site.register(video_details)
+admin.site.register(user_entry_point)
+admin.site.register(user_viewed_followers_following)
+admin.site.register(user_interest)
+admin.site.register(video_shared_details)
+
+
+

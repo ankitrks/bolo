@@ -4,7 +4,9 @@ from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,c
 	verify_otp, password_set, fb_profile_settings,Usertimeline,follow_user,follow_sub_category,like,shareontimeline,GetProfile,SubCategoryList,upload_video_to_s3,comment_view,\
     follow_like_list,upload_audio_to_s3,reply_delete,editTopic,topic_delete,notification_topic,GetUserProfile,RegisterDevice,UnregisterDevice,NotificationAPI,get_bolo_score,\
     GetTopic,GetQuestion,GetAnswers,CricketMatchList,get_single_match,get_single_poll,predict,LeaderBoradList,vb_seen,VBList,ExpertList,GetHomeAnswer,transcoder_notification,\
-    vb_transcode_status,get_follow_user,upload_profile_image,get_following_list,get_follower_list,GetChallenge,GetChallengeDetails,save_android_logs,SyncDump,get_hash_list,my_app_version
+    vb_transcode_status,get_follow_user,upload_profile_image,get_following_list,get_follower_list,GetChallenge,GetChallengeDetails,save_android_logs,SyncDump,get_hash_list,\
+    KYCDocumentTypeList,save_kyc_basic_info,save_kyc_documents,save_kyc_selfie,save_kyc_additional_info,save_bank_details_info,kyc_profession_status,get_kyc_status,user_statistics,my_app_version,\
+    EncashableDetailList,get_bolo_details
 from rest_framework_simplejwt import views as jwt_views
 
 app_name = 'drf_spirit'
@@ -51,6 +53,8 @@ urlpatterns = [
     url(r'^create_topic', include(createtopic_urls)),
     url(r'^reply_on_topic', include(replyontopic_urls)),
     url(r'^categories/', include(category_urls)),
+    url(r'^kyc_document_types/', KYCDocumentTypeList.as_view(), name='kyc_document_types'),
+    url(r'^kyc_profession_status/', kyc_profession_status, name='kyc_profession_status'),
     url(r'^comments/', include(comment_urls)),
     url(r'^upload_profile_image$', upload_profile_image, name='upload_profile_image'),
     url(r'^my_app_version/$', my_app_version, name='my_app_version'),
@@ -62,6 +66,16 @@ urlpatterns = [
 
     # Get Params could be ?is_reset_password=1 OR ?is_for_change_phone=1
     url(r'^otp/verify/$', verify_otp, name='token_obtain_pair'),
+
+    url(r'^save_kyc_basic_info/$', save_kyc_basic_info, name='save_kyc_basic_info'),
+    url(r'^save_kyc_documents/$', save_kyc_documents, name='save_kyc_documents'),
+    url(r'^save_kyc_selfie/$', save_kyc_selfie, name='save_kyc_selfie'),
+    url(r'^save_kyc_additional_info/$', save_kyc_additional_info, name='save_kyc_additional_info'),
+    url(r'^save_bank_details_info/$', save_bank_details_info, name='save_bank_details_info'),
+    url(r'^get_kyc_status/$', get_kyc_status, name='get_kyc_status'),
+    url(r'^get_bolo_details/$', get_bolo_details, name='get_bolo_details'),
+    url(r'^get_encash_details/$', EncashableDetailList.as_view(), name='get_encash_details'),
+
 
     url(r'^fb_profile_settings/$', fb_profile_settings, name='fb_profile_settings'),
     url(r'^follow_user/$', follow_user, name='follow_user'),
@@ -103,4 +117,5 @@ urlpatterns = [
     url(r'^topics/', include(topic_urls)),
     url(r'^get_hash_list/$',get_hash_list,name='get_hash_list'),
     url(r'^sync/dump/',SyncDump,name='sync_dump'),
+    url(r'^user/statistics/$', user_statistics, name = 'user_statistics'),          # url for dumping values in user statistics table
 ]

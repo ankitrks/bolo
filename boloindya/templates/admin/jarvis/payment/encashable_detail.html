@@ -1,0 +1,154 @@
+{% extends "admin/jarvis/base.html" %}
+{% block styles %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.18/css/dataTables.bootstrap4.min.css">
+{% endblock styles%}
+{% block content %}
+<div id="user_kyc">
+    <button type="button" class="btn btn-primary re_calulate">Re Calculate Bolo Scores</button>
+    <button type="button" class="btn btn-danger encash_bolo" data-toggle="modal" data-target="#change_cycle" encashable_id="{{each_encash.id}}" encash_amount="{{ each_encash.equivalent_INR }}">Change Cycle</button>
+        <div class="row">
+        <div class="col-xs-12 table-responsive">
+            <table class="table table-striped" id="encash_details_table">
+                <thead>
+                    <tr>
+                        <th>username</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Bolo Score Earned</th>
+                        <th>Already Encashed?</th>
+                        <th>Encashed On</th>
+                        <th>Eligible For Encash?</th>
+                        <th>Encash Cycle</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for each_encash in all_encash_details %}
+                    <tr>
+                        <td><a href="/jarvis/get_single_encash_detail/?username={{ each_encash.user.username}}"><strong>{{ each_encash.user.username}}</strong></a></td>
+                        <td>{{ each_encash.duration_start_date}}</td>
+                        <td>{{ each_encash.duration_end_date}}</td>
+                        <td>{{ each_encash.bolo_score_earned}}</td>
+                        <td>{{ each_encash.is_encashed}}</td>
+                        <td>{{ each_encash.enchashed_on}}</td>
+                        <td>{{ each_encash.is_eligible_for_encash}}</td>
+                        <td>{{ each_encash.encashable_cycle}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <!-- /.col -->
+    </div>
+    <div class="modal fade" id="change_cycle" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Payment Cycle</h4>
+                </div>
+                <form id="fee_submit_form" action="/jarvis/bolo_cycle/" method="post">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="id_{{ payement_cycle_form.duration_type.name }}" class="col-sm-12 control-label">{{payement_cycle_form.duration_type.label}}:</label>
+                            <div class="col-sm-12">
+                                {{payement_cycle_form.duration_type}} {% if payement_cycle_form.duration_type.errors %}
+                                <span class="text-red"><span class="fa fa-hand-pointer-o"></span><b> Error: </b>{{payement_cycle_form.duration_type.errors.0}}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-group id_{{ payement_cycle_form.duration_period.name }}">
+                            <label for="id_{{ payement_cycle_form.duration_period.name }}" class="col-sm-12 control-label">{{payement_cycle_form.duration_period.label}}:</label>
+                            <div class="col-sm-12">
+                                {{payement_cycle_form.duration_period}} {% if payement_cycle_form.duration_period.errors %}
+                                <span class="text-red"><span class="fa fa-hand-pointer-o"></span><b> Error: </b>{{payement_cycle_form.duration_period.errors.0}}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="id_{{ payement_cycle_form.duration_start_date.name }}" class="col-sm-12 control-label">{{payement_cycle_form.duration_start_date.label}}:</label>
+                            <div class="col-sm-12">
+                                {{payement_cycle_form.duration_start_date}} {% if payement_cycle_form.duration_start_date.errors %}
+                                <span class="text-red"><span class="fa fa-hand-pointer-o"></span><b> Error: </b>{{payement_cycle_form.duration_start_date.errors.0}}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button class="btn btn-primary submit_payment" value="submit" name="submit">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+{% block center_js %}
+<script src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.18/js/dataTables.bootstrap4.min.js"></script>
+<script>
+// $("#encash_details_table").DataTable();
+$(document).ready( function () {
+  
+  var table = $('#encash_details_table').DataTable({
+        "order": [[ 3, "desc" ]],
+        "oLanguage": {
+            "sInfo": "Showing _START_ to _END_ of _TOTAL_ items."
+        }
+    });
+
+    $("#encash_details_table thead th").each( function ( i ) {
+        var encash_column = (($(this).text() == 'Encash Cycle') ? true : false);
+        if (encash_column) {
+            var select = $('<select><option value="">Encash Cycle</option></select>')
+                .appendTo( $(this).empty() )
+                .on( 'change', function () {
+                    var val = $(this).val();
+                    
+                    table.column( i )
+                        .search( val ? '^'+$(this).val()+'$' : val, true, false )
+                        .draw();
+                } );
+            
+            // Get the Status values a specific way since the status is a anchor/image
+            // All other non-Status columns (like the example)
+                table.column( i ).data().unique().sort().each( function ( d, j ) {  
+                    select.append( '<option value="'+d+'">'+d+'</option>' );
+                } ); 
+            }   
+    } );
+    $(document).on('click','.re_calulate',function(){
+        if($(this).hasClass('clicked')){
+            return 
+        }
+        $(this).addClass('clicked')
+        var button_text = $(this).text()
+        $(this).html('Processing')
+        var that = $(this)
+        $.ajax({
+        url: "/jarvis/calculate_encashable_detail/",
+        //contentType: false,
+        dataType: "json",
+        //processData: false,
+        type: "GET",
+        success: function(data) {
+            that.html(button_text);
+            that.removeClass('clicked')
+            console.log(data)
+        },
+        error: function(data) {
+            that.html(button_text);
+            that.removeClass('clicked')
+            console.log(data)
+        }
+    });
+    });
+  
+  
+  
+  
+} );
+    
+</script>
+{% endblock center_js%}
