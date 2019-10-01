@@ -31,6 +31,7 @@ class EncashableDetail(UserInfo):
     is_encashed = models.BooleanField(_("Is Encashed?"),default=False)
     enchashed_on = models.DateTimeField(null=True,blank=True)
     is_eligible_for_encash = models.BooleanField(_("Is Eligible For Encash?"),default=False)
+    is_expired = models.BooleanField(_("Is Expired?"),default=False)
     encashable_cycle = models.CharField(_('Encash Cycle'),max_length=255,null=True,blank=True)
 
     def __unicode__(self):

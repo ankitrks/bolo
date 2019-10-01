@@ -171,8 +171,8 @@ def calculate_encashable_details(user):
         enchashable_detail,is_created = EncashableDetail.objects.get_or_create(user=user,duration_start_date = start_date,duration_end_date = end_date)
         if is_created:
             cycle_count = EncashableDetail.objects.filter(user = user).count()
-            enchashable_detail.encashable_cycle = 'cycle_count_'+str(cycle_count)
-        all_bolo_action = BoloActionHistory.objects.filter(user = user,created_at__gt = start_date,created_at__lte=end_date,action__is_monetize=True)
+            enchashable_detail.encashable_cycle = str(start_date)+ ' - '+str(end_date)
+        all_bolo_action = BoloActionHistory.objects.filter(user = user,created_at__gt = start_date,created_at__lte=end_date,action__is_monetize=True,is_removed=False)
         total_bolo_score_in_this_cycle = 0
         all_weights = Weight.objects.filter(is_monetize = True)
         bolo_details = {}
@@ -188,7 +188,7 @@ def calculate_encashable_details(user):
                 bolo_money = (score/each_bolo_weight.bolo_score)*each_bolo_weight.equivalent_INR
                 each_action_dict = {'bolo_score':score,'bolo_money':bolo_money}
                 total_money+=bolo_money
-                if each_bolo_weight.features=='create_vb':
+                if each_bolo_weight.features=='create_topic':
                     is_eligible_for_encash = True
             else:
                 each_action_dict = {'bolo_score':score,'bolo_money':0}
@@ -196,7 +196,7 @@ def calculate_encashable_details(user):
             bolo_details[each_bolo_weight.features] = each_action_dict
         enchashable_detail.bolo_score_details = str(bolo_details)
         for each_bolo in all_bolo_action:
-            total_bolo_score_in_this_cycle +=each_bolo.score
+            total_bolo_score_in_this_cycle += each_bolo.score
         userprofile = UserProfile.objects.get(user = user)
         userprofile.encashable_bolo_score = total_bolo_score_in_this_cycle
         userprofile.save()
@@ -205,8 +205,10 @@ def calculate_encashable_details(user):
         enchashable_detail.equivalent_INR = total_money
         enchashable_detail.is_eligible_for_encash = is_eligible_for_encash
         enchashable_detail.save()
-        non_eligible_bolo_score = BoloActionHistory.objects.filter(created_at__lte = start_date,is_encashed=False)
+        non_eligible_bolo_score = BoloActionHistory.objects.filter(created_at__lte = start_date - timedelta(days=(end_date-start_date).days),is_encashed=False)
         non_eligible_bolo_score.update(is_eligible_for_encash = False)
+        old_encash = EncashableDetail.objects.filter(user=user,duration_end_date__lte = start_date - timedelta(days=(end_date-start_date).days))
+        old_encash.update(is_expired = True)
     except Exception as e:
          print e
 
