@@ -31,7 +31,7 @@ def add_bolo_score(user_id, feature, action_object):
     weight_obj = get_weight_object(feature)
     if weight_obj:
         add_to_history(userprofile.user, score, get_weight_object(feature), action_object, False)
-    if feature == 'create_topic':
+    if feature in['create_topic','create_topic_en']:
         from forum.topic.models import Notification
         notification_type = '8'
         # if admin_action_type == 'no_monetize':
