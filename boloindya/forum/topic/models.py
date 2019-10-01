@@ -89,7 +89,7 @@ class Topic(models.Model):
     date = models.DateTimeField(_("date"), default=timezone.now)
     last_active = models.DateTimeField(_("last active"), default=timezone.now)
     reindex_at = models.DateTimeField(_("reindex at"), default=timezone.now)
-    language_id = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='0')
+    language_id = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='1')
     question_image = models.TextField(_("Question image"),null=True,blank=True)
 
     is_media = models.BooleanField(default=True)
