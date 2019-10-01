@@ -358,6 +358,7 @@ def search_query(user_data_dump):
                     utc_dt = datetime.utcfromtimestamp(float(b)/ 1000).replace(tzinfo=pytz.utc)
                     user_data_obj = UserSearch(user = userid, searchquery = a, timestamp = utc_dt)
                     user_data_obj.save()
+                    
 
     except Exception as e:
         print('Exception 8:' + str(e))    
