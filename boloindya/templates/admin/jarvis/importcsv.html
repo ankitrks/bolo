@@ -1,5 +1,5 @@
 {% extends "jarvis/layout/base.html" %}
-{% block center_content %}
+{% block content %}
 <section class="content">
 <form id="upload" action="" method="POST" enctype="multipart/form-data" class="form-horizontal"> 
     {% csrf_token %}
@@ -19,7 +19,7 @@
 
 </div>
 </section>
-{% endblock center_content %} 
+{% endblock content %} 
 {% block center_js %}
 <script>
         function upload(event) {

@@ -20,8 +20,11 @@ from .models import UserJarvisDump
 from .permissions import IsOwnerOrReadOnly
 from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,AppVersionSerializer,UserSerializer,SingleTopicSerializerwithComment,\
 UserAnswerSerializerwithComment,CricketMatchSerializer,PollSerializer,ChoiceSerializer,VotingSerializer,LeaderboardSerializer,\
-PollSerializerwithChoice, OnlyChoiceSerializer, NotificationSerializer, UserProfileSerializer, TongueTwisterSerializer
+PollSerializerwithChoice, OnlyChoiceSerializer, NotificationSerializer, UserProfileSerializer, TongueTwisterSerializer,KYCDocumnetsTypeSerializer,\
+PaymentCycleSerializer,EncashableDetailSerializer,PaymentInfoSerializer,UserKYCSerializer
 from forum.topic.models import Topic,ShareTopic,Like,SocialShare,FCMDevice,Notification,CricketMatch,Poll,Choice,Voting,Leaderboard,VBseen,TongueTwister
+from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
+from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 from forum.category.models import Category
 from forum.comment.models import Comment
 from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs
@@ -36,12 +39,14 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from datetime import datetime,timedelta,date
 import json
-from .utils import get_weight,add_bolo_score,shorcountertopic
+from .utils import get_weight,add_bolo_score,shorcountertopic,calculate_encashable_details
 from django.db.models import Sum
 import itertools
 import json
 import urllib2
 from django.http import HttpResponseRedirect
+from django.forms.models import model_to_dict
+import ast
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -291,7 +296,8 @@ class VBList(generics.ListCreateAPIView):
 
     Required Parameters:
     title and category_id 
-    """
+    """ 
+
 
     def get_queryset(self):
         topics = []
@@ -615,7 +621,7 @@ def get_video_thumbnail(video_url):
     else:
         return False
 
-from moviepy.editor import VideoFileClip
+# from moviepy.editor import VideoFileClip
 def getVideoLength(input_video):
     clip = VideoFileClip(input_video)
     dt = timedelta(seconds = int(clip.duration))
@@ -854,6 +860,8 @@ def createTopic(request):
     media_duration  = request.POST.get('media_duration', '')
     question_image  = request.POST.get('question_image', '')
     is_vb = request.POST.get('is_vb',False)
+    vb_width = request.POST.get('vb_width',0)
+    vb_height = request.POST.get('vb_height',0)
     # media_file = request.FILES.get['media']
     # print media_file
 
@@ -877,6 +885,8 @@ def createTopic(request):
             topic.is_vb = True
             topic.media_duration = media_duration
             topic.question_image = question_image
+            topic.vb_width = vb_width
+            topic.vb_height = vb_height
             topic.view_count = random.randint(1,49)
             topic.update_vb()
         else:
@@ -892,7 +902,7 @@ def createTopic(request):
             message = 'Topic Created'
         else:
             userprofile = UserProfile.objects.get(user = request.user)
-            userprofile.question_count = F('vb_count')+1
+            userprofile.vb_count = F('vb_count')+1
             userprofile.save()
             # add_bolo_score(request.user.id, 'create_topic', topic)
             topic_json = TopicSerializerwithComment(topic).data
@@ -1021,6 +1031,37 @@ class CategoryList(generics.ListAPIView):
     pagination_class=None
     # permission_classes = (IsAuthenticated,)
     permission_classes  = (AllowAny,)
+
+class KYCDocumentTypeList(generics.ListAPIView):
+    serializer_class = KYCDocumnetsTypeSerializer
+    queryset = KYCDocumentType.objects.all()
+    pagination_class=None
+    # permission_classes = (IsAuthenticated,)
+    permission_classes  = (AllowAny,)
+ 
+def Convert_tuple_to_dict(tup, di): 
+    for a, b in tup: 
+        di.setdefault(a, []).append(b) 
+    return di
+
+@api_view(['POST'])
+def kyc_profession_status(request):
+    profession_option = Convert_tuple_to_dict(AdditionalInfo.profession_options,{})
+    status_option = Convert_tuple_to_dict(AdditionalInfo.status_options,{})
+    mode_of_transaction_options = Convert_tuple_to_dict(UserKYC.mode_of_transaction_options,{})
+    return JsonResponse({'message': 'succeess','profession_option':profession_option,'status_option':status_option,'mode_of_transaction_options':mode_of_transaction_options}, status=status.HTTP_200_OK)
+
+class EncashableDetailList(generics.ListAPIView):
+    serializer_class = EncashableDetailSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        username = self.request.GET.get('username',None)
+        user = User.objects.get(username=username)
+        calculate_encashable_details(user)
+        all_encash_detail = EncashableDetail.objects.filter(user =user)
+        return all_encash_detail
+
 
 class SubCategoryList(generics.ListAPIView):
     """
@@ -1370,12 +1411,205 @@ def fb_profile_settings(request):
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
+#### KYC Views ####
+
+@api_view(['POST'])
+def get_kyc_status(request):
+    try:
+        user_kyc,is_created = UserKYC.objects.get_or_create(user = request.user)
+        return JsonResponse({'message': 'success','user_kyc':UserKYCSerializer(user_kyc).data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+@api_view(['POST'])
+def save_kyc_basic_info(request):
+    try:
+        first_name = request.POST.get('first_name',None)
+        middle_name = request.POST.get('middle_name',None)
+        last_name = request.POST.get('last_name',None)
+        d_o_b = request.POST.get('d_o_b',None)
+        mobile_no = request.POST.get('mobile_no',None)
+        email = request.POST.get('email',None)
+        data_dict = {
+        'first_name':first_name,
+        'middle_name':middle_name,
+        'last_name':last_name,
+        'd_o_b':d_o_b,
+        'mobile_no':mobile_no,
+        'email':email,
+        'user':request.user
+        }
+        if not (first_name and d_o_b and (mobile_no or email)):
+            return JsonResponse({'message': 'Mandatory Data Missing'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_kyc,is_created = UserKYC.objects.get_or_create(user=request.user)
+        kyc_basic_info,kyc_basic_info_is_created = KYCBasicInfo.objects.update_or_create(user=request.user,defaults=data_dict)
+        if not kyc_basic_info_is_created:
+            kyc_basic_info.is_rejected = False
+            kyc_basic_info.is_active = True
+            kyc_basic_info.save()
+
+        user_kyc.kyc_basic_info_submitted = True
+        user_kyc.save()
+        return JsonResponse({'message': 'basic_info_saved'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def save_kyc_documents(request):
+    try:
+        document_type = request.POST.get('document_type',None)
+        frontside_url = request.POST.get('frontside_url',None)
+        backside_url = request.POST.get('backside_url',None)
+        data_dict = {
+            'kyc_document_type_id':document_type,
+            'frontside_url':frontside_url,
+            'backside_url':backside_url,
+            'user':request.user
+        }
+        kyc_document_type = KYCDocumentType.objects.get(pk=document_type)
+        if (not frontside_url or not backside_url) and kyc_document_type.no_image_required == 2:
+            return JsonResponse({'message': 'Need front and back both images url'}, status=status.HTTP_400_BAD_REQUEST)
+        elif not frontside_url and kyc_document_type.no_image_required == 1:
+            return JsonResponse({'message': 'please share the front image url'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            try:
+                kyc_document = KYCDocument.objects.get(kyc_document_type=document_type,user=request.user,is_active=True)
+                kyc_document.is_active=False
+                kyc_document.save()
+            except:
+                pass
+            kyc_document = KYCDocument.objects.create(**data_dict)
+            user_kyc = UserKYC.objects.get(user=request.user)
+            if kyc_document_type.document_name in ['PAN','pan']:
+                message = 'PAN Info Saved'
+                user_kyc.kyc_pan_info_submitted = True
+                user_kyc.save()
+            else:
+                message = 'Document Info Saved'
+                user_kyc.kyc_document_info_submitted = True
+                user_kyc.save()
+        return JsonResponse({'message': message}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def save_kyc_selfie(request):
+    try:
+        pic_selfie_url = request.POST.get('pic_selfie_url',None)
+        data_dict={
+        'pic_selfie_url':pic_selfie_url,
+        'user':request.user
+        }
+        user_kyc = UserKYC.objects.get(user=request.user)
+        selfie_info,is_created = KYCBasicInfo.objects.update_or_create(user=request.user,defaults=data_dict)
+        if not is_created:
+            selfie_info.is_rejected = False
+            selfie_info.is_active = True
+            selfie_info.save()
+        user_kyc.kyc_selfie_info_submitted = True
+        user_kyc.save()
+        return JsonResponse({'message': 'additional info saved'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def save_kyc_additional_info(request):
+    try:
+        father_firstname = request.POST.get('father_firstname',None)
+        father_lastname = request.POST.get('father_lastname',None)
+        mother_firstname = request.POST.get('mother_firstname',None)
+        mother_lastname = request.POST.get('mother_lastname',None)
+        profession = request.POST.get('profession',None)
+        marrigae_status = request.POST.get('status',None)
+        data_dict={
+        'father_firstname':father_firstname,
+        'father_lastname':father_lastname,
+        'mother_firstname':mother_firstname,
+        'mother_lastname':mother_lastname,
+        'profession':profession,
+        'status':marrigae_status,
+        'user':request.user
+        }
+        user_kyc = UserKYC.objects.get(user=request.user)
+        additional_info,is_created = AdditionalInfo.objects.update_or_create(user=request.user,defaults=data_dict)
+        user_kyc.kyc_additional_info_submitted = True
+        user_kyc.save()
+        return JsonResponse({'message': 'additional info saved'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def save_bank_details_info(request):
+    try:
+        mode_of_transaction = request.POST.get('mode_of_transaction',None)
+        account_name = request.POST.get('account_name',None)
+        account_number = request.POST.get('account_number',None)
+        IFSC_code = request.POST.get('IFSC_code',None)
+        paytm_number = request.POST.get('paytm_number',None)
+        if mode_of_transaction:
+            if mode_of_transaction=='1' and not (account_name and account_number and IFSC_code):
+                return JsonResponse({'message': 'Mandatory Bank Data Missing'}, status=status.HTTP_400_BAD_REQUEST)
+            elif mode_of_transaction=='2' and not paytm_number:
+                return JsonResponse({'message': 'Mandatory Paytm Data Missing'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return JsonResponse({'message': 'Mode Of Transaction Missing'}, status=status.HTTP_400_BAD_REQUEST)
+        data_dict = {
+            'account_number':account_number,
+            'account_name':account_name,
+            'IFSC_code':IFSC_code,
+            'user':request.user
+        }
+        user_kyc = UserKYC.objects.get(user=request.user)
+        if mode_of_transaction == '1':
+            try:
+                user_bank_details = BankDetail.objects.get(user=request.user ,is_active=True)
+                user_bank_details.is_active = False
+                user_bank_details.save()
+            except:
+                pass
+            user_bank_details = BankDetail.objects.create(**data_dict)
+            user_kyc.kyc_bank_details_submitted = True
+            message = 'bank details saved'
+        elif mode_of_transaction == '2':
+            try:
+                user_bank_details = BankDetail.objects.get(user=request.user ,is_active=True)
+                user_bank_details.is_active = False
+                user_bank_details.save()
+            except:
+                pass
+            user_bank_details = BankDetail.objects.create(user=request.user,paytm_number=paytm_number)
+            user_kyc.mode_of_transaction = 2
+            message = 'payment to paytm'
+        user_kyc.is_kyc_completed=True
+        user_kyc.save()
+        return JsonResponse({'message': message}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def get_bolo_details(request):
+    try:
+        username = request.GET.get('username',None)
+        user = User.objects.get(username=username)
+        kyc_details,is_careted = UserKYC.objects.get_or_create(user=user)
+        all_encash_details = EncashableDetail.objects.filter(user = user).order_by('-id')
+        return JsonResponse({'all_encash_details': EncashableDetailSerializer(all_encash_details).data,'kyc_details':UserKYCSerializer(kyc_details).data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
 def generate_username(first,last,num_of_users):
+    username=first+last+str(num_of_users)
+    while(check_username(username)):
+        num_of_users+=1
         username=first+last+str(num_of_users)
-        while(check_username(username)):
-            num_of_users+=1
-            username=first+last+str(num_of_users)
-        return username
+    return username
 
 def check_username(name):
     return User.objects.filter(username__iexact=name)
@@ -1616,6 +1850,8 @@ def vb_seen(request):
         userprofile.view_count = F('view_count')+1
         userprofile.save()
         vbseen,is_created = VBseen.objects.get_or_create(user = request.user,topic_id = topic_id)
+        if is_created:
+            add_bolo_score(topic.user.id, 'vb_view', vbseen)
         return JsonResponse({'message': 'vb seen'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
@@ -1932,16 +2168,23 @@ def get_cloudfront_url(instance):
         return str(instance.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
 
 @csrf_exempt
+@api_view(['POST'])
 def SyncDump(request):
-    if request.method == "POST":
-        user = request.user
-        dump = request.POST.get('dump')
-        dump_type = request.POST.get('dump_type')
+    if request.user:
+        if request.method == "POST":
+            user = request.user
+            dump = str(request.POST.get('dump'))
+            dump_type = request.POST.get('dump_type')
 
-        #Storing the dump in database
-        stored_data = UserJarvisDump(dump=dump, dump_type=dump_type)
-        stored_data.save()
-        return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)
+            #Storing the dump in database
+            try:
+                stored_data = UserJarvisDump(user=user, dump=dump, dump_type=dump_type)
+                stored_data.save()
+                return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)    
+            except Exception as e:
+                return JsonResponse({'message' : 'fail','error':str(e)})
+    else:
+        return JsonResponse({'messgae' : 'user_missing'})
 
 @api_view(['POST'])
 def save_android_logs(request):
@@ -1985,3 +2228,127 @@ def redirect_to_store(request):
     if request.GET.urlencode():
         return HttpResponseRedirect('https://play.google.com/store/apps/details?' + request.GET.urlencode())
     return HttpResponseRedirect('https://play.google.com/store/apps/details?id=com.boloindya.boloindya')
+
+# this view is repsonsible for dumping values in already created models
+#
+# @api_view(['POST'])
+# def user_statistics(request):
+#     #user_log_fname = os.getcwd() + '/drf_spirit/user_log.json'
+#     # user_data_dump = json.loads(request.body)         # loading data from body of request
+#     #dump_data = models.TextField()
+#     user_data_list = []                 # the list which will be returned for putting values in model
+
+#     #with open(user_log_fname) as json_file:
+#     #    user_data_dump = json.load(json_file)       # storing the data in a dict
+
+#     all_traction_data = UserJarvisDump.objects.filter(is_executed=False)
+#     # print all_traction_data
+    
+#     for user_jarvis in all_traction_data:
+
+#         try:
+#             user_data_string = user_jarvis.dump
+#             user_data_dump = ast.literal_eval(user_data_string)
+
+#             user_data_list = []                 # the list which will be returned for putting values in model
+
+#             #with open(user_log_fname) as json_file:
+#             #    user_data_dump = json.load(json_file)       # storing the data in a dict
+
+#             user_id = user_data_dump['user_id']
+#             user_phone_info = user_data_dump['user_phone_info']
+#             user_language = len(set(user_data_dump['user_languages']))
+#             user_data_list.append(user_id)
+#             user_data_list.append(user_phone_info)
+#             user_data_list.append(user_language)
+
+#             #vb_viewed_count = len(set(user_data_dump['vb_viewed']))
+#             #vb_commented_count = len(set(user_data_dump['vb_commented']))
+#             #vb_unliked_count = len(set(user_data_dump['vb_unliked']))
+#             #vb_share_count= len(set(user_data_dump['vb_share']))
+#             #profile_follow_count = len(set(user_data_dump['profile_follow']))
+#             #profile_unfollow_count = len(set(user_data_dump['profile_unfollow']))
+#             #profile_report_count = len(set(user_data_dump['profile_report']))
+
+#             vb_viewed = []
+#             for (a,b) in user_data_dump['vb_viewed']:
+#                 vb_viewed.append(a)
+#             vb_viewed_count = len(set(vb_viewed))
+#             user_data_list.append(vb_viewed_count)
+
+#             vb_commented = []
+#             for (a,b) in user_data_dump['vb_commented']:
+#                 vb_commented.append(a)
+#             vb_commented_count = len(set(vb_commented))
+#             user_data_list.append(vb_commented_count)
+
+#             vb_unliked = []
+#             for (a,b) in user_data_dump['vb_unliked']:
+#                 vb_unliked.append(a)
+#             vb_unliked_count = len(set(vb_unliked))
+#             user_data_list.append(vb_unliked_count)
+
+#             vb_liked = []
+#             for (a,b) in user_data_dump['vb_liked']:
+#                 vb_liked.append(a)
+#             vb_liked_count = len(set(vb_liked))
+#             user_data_list.append(vb_liked_count)
+
+#             profile_follow = []
+#             for (a,b) in user_data_dump['profile_follow']:
+#                 profile_follow.append(a)
+#             profile_follow_count = len(set(profile_follow))
+#             user_data_list.append(profile_follow_count)
+
+#             profile_unfollow = []
+#             for (a,b) in user_data_dump['profile_unfollow']:
+#                 profile_unfollow.append(a)
+#             profile_unfollow_count = len(set(profile_unfollow))
+#             user_data_list.append(profile_unfollow_count)
+
+#             profile_report = []
+#             for (a,b) in user_data_dump['profile_report']:
+#                 profile_report.append(a)
+#             profile_report_count = len(set(profile_report))
+#             user_data_list.append(profile_report_count)
+
+#             vb_share = []
+#             for (a,b) in user_data_dump['vb_share']:
+#                 vb_share.append(a)
+#             vb_share_count = len(set(vb_share))
+#             user_data_list.append(vb_share_count)
+
+#             profile_viewed_following = []    
+#             for(a,b) in user_data_dump['profile_viewed_following']:
+#                 profile_viewed_following.append(a)
+#             profile_viewed_following_count = len(set(profile_viewed_following))
+#             user_data_list.append(profile_viewed_following_count)
+
+#             profile_viewed_followers = []
+#             for (a,b) in user_data_dump['profile_viewed_followers']:
+#                 profile_viewed_followers.append(a)
+#             profile_viewed_followers_count = len(set(profile_viewed_followers))
+#             user_data_list.append(profile_viewed_followers_count)
+
+#             profile_visit_entry = []
+#             for (a,b,c) in user_data_dump['profile_visit_entry']:
+#                 profile_visit_entry.append(a)
+#             profile_visit_entry_count = len(set(profile_visit_entry))
+#             user_data_list.append(profile_visit_entry_count)
+
+#             #return user_data_list           #return the list of entries in the form of list
+
+#             #p1 = user_log_statistics()
+#             #user_data_list = p1.user_statistics()               # take data from the method in the form of list
+#             user_data_obj = user_log_statistics(user = user_data_list[0], user_phone_details = user_data_list[1], user_lang = user_data_list[2], num_vb_viewed = user_data_list[3],
+#                 num_vb_commented = user_data_list[4], num_vb_unliked = user_data_list[5], num_vb_liked = user_data_list[6], num_profile_follow = user_data_list[7], num_profile_unfollow = user_data_list[8],
+#                 num_profile_reported = user_data_list[9], num_vb_shared = user_data_list[10], num_viewed_following_list = user_data_list[11], num_entry_points = user_data_list[13]
+#             )
+#             user_data_obj.save()
+#             print(user_data_obj)
+
+#         except Exception as e:
+#             print(str(e))
+
+#     return JsonResponse({'message':'success'}, status=status.HTTP_201_CREATED)    
+

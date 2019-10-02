@@ -1,7 +1,7 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
 from .fields import UserReadOnlyField
-from forum.topic.models import Topic,CricketMatch,Poll,Choice,Voting,Leaderboard, Notification, TongueTwister
+from forum.topic.models import Topic,CricketMatch,Poll,Choice,Voting,Leaderboard, Notification, TongueTwister,BoloActionHistory
 from django.contrib.auth.models import User
 from forum.category.models import Category
 from forum.comment.models import Comment
@@ -11,6 +11,8 @@ from .models import SingUpOTP
 from .utils import shortnaturaltime,shortcounterprofile,shorcountertopic
 from django.conf import settings
 import re
+from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
+from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 
 cloufront_url = "https://d1fa4tg1fvr6nj.cloudfront.net"
 class CategorySerializer(ModelSerializer):
@@ -356,4 +358,33 @@ class LeaderboardSerializer(ModelSerializer):
     def get_user(self,instance):
         return UserSerializer(instance.user).data 
 
+class KYCDocumnetsTypeSerializer(ModelSerializer):
+    class Meta:
+        model = KYCDocumentType
+        fields = '__all__'
+
+class UserKYCSerializer(ModelSerializer):
+    class Meta:
+        model = UserKYC
+        fields = '__all__'
+
+class BoloActionHistorySerializer(ModelSerializer):
+    class Meta:
+        model = BoloActionHistory
+        fields = '__all__'
+
+class PaymentCycleSerializer(ModelSerializer):
+    class Meta:
+        model = PaymentCycle
+        fields = '__all__'
+
+class EncashableDetailSerializer(ModelSerializer):
+    class Meta:
+        model = EncashableDetail
+        fields = '__all__'
+
+class PaymentInfoSerializer(ModelSerializer):
+    class Meta:
+        model = PaymentInfo
+        fields = '__all__'
       

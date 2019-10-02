@@ -17,7 +17,19 @@ import os
 import hashlib
 import re
 from drf_spirit.views import get_video_thumbnail,getVideoLength
+from drf_spirit.utils  import calculate_encashable_details
 from forum.topic.models import Topic
+from forum.user.models import UserProfile
+from forum.category.models import Category
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
+from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
+from django.conf import settings
+from forum.payment.forms import PaymentForm,PaymentCycleForm
+from django.views.generic.edit import FormView
+from datetime import datetime
+from forum.userkyc.forms import KYCBasicInfoRejectForm,KYCDocumentRejectForm,AdditionalInfoRejectForm,BankDetailRejectForm
 from .models import VideoUploadTranscode
 from forum.category.models import Category
 from django.contrib.auth.models import User
@@ -299,6 +311,210 @@ def transcode_media_file(prefix,input_key,file_name,bucket):
 def uploaddata(request):
     return HttpResponse()
 
+def get_kyc_user_list(request):
+    if request.user.is_superuser:
+        all_kyc = UserKYC.objects.all()
+        return render(request,'jarvis/pages/userkyc/user_kyc_list.html',{'all_kyc':all_kyc})
+
+def get_submitted_kyc_user_list(request):
+    if request.user.is_superuser:
+        all_kyc = UserKYC.objects.filter(is_kyc_completed=True,is_kyc_accepted=False)
+        return render(request,'jarvis/pages/userkyc/submitted_kyc.html',{'all_kyc':all_kyc})
+
+def get_pending_kyc_user_list(request):
+    if request.user.is_superuser:
+        all_kyc = UserKYC.objects.filter(is_kyc_completed=False,is_kyc_accepted=False)
+        return render(request,'jarvis/pages/userkyc/pending_kyc.html',{'all_kyc':all_kyc})
+
+def get_accepted_kyc_user_list(request):
+    if request.user.is_superuser:
+        all_kyc = UserKYC.objects.filter(is_kyc_completed=True,is_kyc_accepted=True)
+        return render(request,'jarvis/pages/userkyc/accepted_kyc.html',{'all_kyc':all_kyc})
+
+def get_kyc_of_user(request):
+    if request.user.is_superuser or request.user.is_staff:
+        username = request.GET.get('username',None)
+        kyc_user = User.objects.get(username=username)
+        kyc_details = UserKYC.objects.get(user=kyc_user)
+        kyc_basic_info = KYCBasicInfo.objects.get(user=kyc_user)
+        kyc_document = KYCDocument.objects.filter(user=kyc_user,is_active=True)
+        # additional_info = AdditionalInfo.objects.get(user=kyc_user)
+        bank_details = BankDetail.objects.get(user=kyc_user,is_active=True)
+        kyc_basic_reject_form = KYCBasicInfoRejectForm()
+        kyc_document_reject_form = KYCDocumentRejectForm()
+        kyc_additional_reject_form = AdditionalInfoRejectForm()
+        kyc_bank_reject_form = BankDetailRejectForm()
+        return render(request,'jarvis/pages/userkyc/single_kyc.html',{'kyc_details':kyc_details,'kyc_basic_info':kyc_basic_info,\
+            'kyc_document':kyc_document,'additional_info':'','bank_details':bank_details,'userprofile':kyc_user.st,\
+            'user_details':kyc_user,'kyc_basic_reject_form':kyc_basic_reject_form,'kyc_document_reject_form':kyc_document_reject_form,'kyc_additional_reject_form':kyc_additional_reject_form,
+            'kyc_bank_reject_form':kyc_bank_reject_form})
+
+
+def SecretFileView(request):
+    u = request.user
+    filepath = request.GET.get('url').split('https://'+settings.AWS_STORAGE_BUCKET_NAME+'.s3.amazonaws.com/')[0]
+    print filepath,"##################"
+    if u.is_authenticated() and  u.is_staff:
+        client = boto3.client('s3',aws_access_key_id = settings.AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.AWS_SECRET_ACCESS_KEY)
+        # s3 = S3Connection(settings.AWS_ACCESS_KEY_ID,
+        #                     settings.AWS_SECRET_ACCESS_KEY,
+        #                     is_secure=True)
+        # Create a URL valid for 60 seconds.
+        return client.generate_url(60, 'GET',
+                            bucket=settings.AWS_STORAGE_BUCKET_NAME,
+                            key=filepath,
+                            force_http=True)
+
+def get_encashable_detail(request):
+    to_be_calculated = request.GET.get("calculate",None)
+    if request.user.is_superuser or request.user.is_staff:
+        if to_be_calculated:
+            for each_user in User.objects.all():
+                calculate_encashable_details(each_user)
+        all_encash_details = EncashableDetail.objects.all().order_by('-bolo_score_earned')[:300]
+    pay_cycle = PaymentCycle.objects.all().first()
+    payement_cycle_form = PaymentCycleForm(initial=pay_cycle.__dict__)
+    return render(request,'jarvis/pages/payment/encashable_detail.html',{'all_encash_details':all_encash_details,'payement_cycle_form':payement_cycle_form})
+
+def calculate_encashable_detail(request):
+    if request.user.is_superuser or request.user.is_staff:
+        for each_user in User.objects.all():
+            calculate_encashable_details(each_user)
+    return HttpResponse(json.dumps({'success':'success'}),content_type="application/json")
+
+def get_single_encash_detail(request):
+    if request.user.is_superuser or request.user.is_staff:
+        username = request.GET.get('username',None)
+        user = User.objects.get(username=username)
+        calculate_encashable_details(user)
+        kyc_details = UserKYC.objects.filter(user=user)
+        all_encash_details = EncashableDetail.objects.filter(user = user).order_by('-id')
+        payment_form = PaymentForm()
+        return render(request,'jarvis/pages/payment/single_encash_details.html',{'all_encash_details':all_encash_details,'userprofile':user.st,'user':user,'kyc_details':kyc_details,'payment_form':payment_form})
+
+
+class PaymentView(FormView):
+    form_class = PaymentForm
+    template_name='jarvis/pages/payment/invoice_error.html'
+
+    def form_valid(self, form,**kwargs):
+        receipt, created = PaymentInfo.objects.get_or_create(**form.cleaned_data)
+        if created:
+            enchashable_detail = receipt.enchashable_detail
+            receipt.user = enchashable_detail.user
+            userprofile = enchashable_detail.user.st
+            enchashable_detail.is_encashed = True
+            enchashable_detail.enchashed_on = datetime.now()
+            receipt.save()
+            enchashable_detail.save()
+        else:
+            userprofile = receipt.user.st
+        #send_mail_functionality_to_admin_and_to_user_if_mail_exist
+        #send_sms_functionality_user
+        # return HttpResponse(json.dumps({'success': 'success','receipt':receipt,'userprofile':userprofile }),content_type="application/json")
+        return render(self.request,'jarvis/pages/payment/invoice.html',{'success': 'success','receipt':receipt,'userprofile':userprofile })
+
+    def get_context_data(self,*args,**kwargs):
+        kwargs=super(PaymentView,self).get_context_data(*args,**kwargs)
+        kwargs['http_referer']=self.request.META.get('HTTP_REFERER',None)
+        return super(PaymentView,self).get_context_data(*args,**kwargs)
+
+class PaymentCycleView(FormView):
+    form_class = PaymentCycleForm
+    template_name='jarvis/pages/payment/invoice_error.html'
+
+    def form_valid(self,form,**kwargs):
+        if self.request.user.is_superuser or self.request.user.is_staff:
+            pay_cycle = PaymentCycle.objects.all().update(**form.cleaned_data)
+            for each_user in User.objects.all():
+                calculate_encashable_details(each_user)
+            all_encash_details = EncashableDetail.objects.all().order_by('-bolo_score_earned')
+            pay_cycle = PaymentCycle.objects.all().first()
+            payement_cycle_form = PaymentCycleForm(initial=pay_cycle.__dict__)
+            return render(request,'jarvis/pages/payment/encashable_detail.html',{'all_encash_details':all_encash_details,'payement_cycle_form':payement_cycle_form})
+
+
+def accept_kyc(request):
+    if request.user.is_superuser or request.user.is_staff:
+        kyc_type = request.GET.get('kyc_type',None)
+        user_id = request.GET.get('user_id',None)
+        user_kyc = UserKYC.objects.get(user_id = user_id)
+        if kyc_type == "basic_info":
+            user_kyc.is_kyc_basic_info_accepted = True
+        elif kyc_type == "kyc_document":
+            user_kyc.is_kyc_document_info_accepted = True
+        elif kyc_type == "kyc_pan":
+            user_kyc.is_kyc_pan_info_accepted = True
+        elif kyc_type == "kyc_profile_pic":
+            user_kyc.is_kyc_selfie_info_accepted = True
+        elif kyc_type == "kyc_additional_info":
+            user_kyc.is_kyc_additional_info_accepted = True
+        elif kyc_type == "kyc_bank_details":
+            user_kyc.is_kyc_bank_details_accepted = True
+        user_kyc.save()
+        if user_kyc.is_kyc_basic_info_accepted and user_kyc.is_kyc_document_info_accepted and user_kyc.is_kyc_selfie_info_accepted and\
+        user_kyc.is_kyc_bank_details_accepted:
+            user_kyc.is_kyc_accepted = True
+            user_kyc.save()
+
+        return HttpResponse(json.dumps({'success':'success','kyc_accepted':user_kyc.is_kyc_accepted}),content_type="application/json")
+
+def reject_kyc(request):
+    if request.user.is_superuser or request.user.is_staff:
+        kyc_type = request.GET.get('kyc_type',None)
+        kyc_id = request.GET.get('kyc_id',None)
+        kyc_reject_reason = request.GET.get('kyc_reject_reason',None)
+        kyc_reject_text = request.GET.get('kyc_reject_text',None)
+        user_id = request.GET.get('user_id',None)
+        user_kyc = UserKYC.objects.get(user_id = user_id)
+        if kyc_type == "basic_info":
+            user_kyc.is_kyc_basic_info_accepted = False
+            user_kyc.kyc_basic_info_submitted = False
+            obj = KYCBasicInfo.objects.get(pk=kyc_id)
+            obj.reject_reason = kyc_reject_reason
+            obj.reject_text = kyc_reject_text
+        elif kyc_type == "kyc_document":
+            user_kyc.is_kyc_document_info_accepted = False
+            user_kyc.kyc_document_info_submitted = False
+            obj = KYCDocument.objects.get(pk=kyc_id)
+            obj.reject_reason = kyc_reject_reason
+            obj.reject_text = kyc_reject_text
+        elif kyc_type == "kyc_pan":
+            user_kyc.is_kyc_pan_info_accepted = False
+            user_kyc.kyc_pan_info_submitted = False
+            obj = KYCDocument.objects.get(pk=kyc_id)
+            obj.reject_reason = kyc_reject_reason
+            obj.reject_text = kyc_reject_text
+        elif kyc_type == "kyc_profile_pic":
+            user_kyc.is_kyc_selfie_info_accepted = False
+            user_kyc.kyc_selfie_info_submitted = False
+            obj = KYCBasicInfo.objects.get(pk=kyc_id)
+            obj.reject_reason = kyc_reject_reason
+            obj.reject_text = kyc_reject_text
+        # elif kyc_type == "kyc_additional_info":
+        #     user_kyc.is_kyc_additional_info_accepted = False
+        #     user_kyc.kyc_additional_info_submitted = False
+        #     obj = AdditionalInfo.objects.get(pk=kyc_id)
+        #     obj.reject_reason = kyc_reject_reason
+        #     obj.reject_text = kyc_reject_text      
+        elif kyc_type == "kyc_bank_details":
+            user_kyc.is_kyc_bank_details_accepted = False
+            user_kyc.kyc_bank_details_submitted = False
+            obj = BankDetail.objects.get(pk=kyc_id)
+            obj.reject_reason = kyc_reject_reason
+            obj.reject_text = kyc_reject_text
+        obj.is_rejected = True
+        obj.is_active = False
+        obj.save()
+        user_kyc.save()
+        if not (user_kyc.is_kyc_basic_info_accepted and user_kyc.is_kyc_document_info_accepted and user_kyc.is_kyc_selfie_info_accepted and \
+        user_kyc.is_kyc_bank_details_accepted and userkyc.is_kyc_selfie_info_accepted):
+            user_kyc.is_kyc_accepted = False
+            user_kyc.is_kyc_completed = False
+            user_kyc.save()
+
+        return HttpResponse(json.dumps({'success':'success','kyc_accepted':user_kyc.is_kyc_accepted}),content_type="application/json")
+
 def urlify(s):
     # Replace all runs of whitespace with a single dash
     s = re.sub(r"\s+", '_', s)
@@ -373,7 +589,6 @@ def upload_details(request):
 def uploaded_list(request):
     all_uploaded = VideoUploadTranscode.objects.all()
     return render(request,'jarvis/pages/upload_n_transcode/uploaded_list.html',{'all_uploaded':all_uploaded})
-
 
 
 
