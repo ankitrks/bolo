@@ -91,7 +91,7 @@ class Topic(models.Model):
     date = models.DateTimeField(_("date"), default=timezone.now)
     last_active = models.DateTimeField(_("last active"), default=timezone.now)
     reindex_at = models.DateTimeField(_("reindex at"), default=timezone.now)
-    language_id = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='0')
+    language_id = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='1')
     question_image = models.TextField(_("Question image"),null=True,blank=True)
 
     is_media = models.BooleanField(default=True)
@@ -283,7 +283,10 @@ class Topic(models.Model):
             self.save()
             userprofile = UserProfile.objects.get(user = self.user)
             userprofile.save()
-            reduce_bolo_score(self.user.id, 'create_topic', self, 'no_monetize')
+            if self.language_id == '1':
+                reduce_bolo_score(self.user.id, 'create_topic_en', self, 'no_monetize')
+            else:
+                reduce_bolo_score(self.user.id, 'create_topic', self, 'no_monetize')
             return True
         else:
             return True
@@ -294,7 +297,10 @@ class Topic(models.Model):
         self.save()
         userprofile = UserProfile.objects.get(user = self.user)
         userprofile.save()
-        add_bolo_score(self.user.id, 'create_topic', self)
+        if self.language_id =='1':
+            add_bolo_score(self.user.id, 'create_topic_en', self)
+        else:
+            add_bolo_score(self.user.id, 'create_topic', self)
         return True
 
     def audio_duration(self):

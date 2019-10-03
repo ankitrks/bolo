@@ -30,7 +30,7 @@ function kyc_accept() {
             $(that).parents('.action_button').append('<span class="btn-primary" style="padding:10px;">Accepted</span>')
         },
         error: function(data) {
-            toastr.error('Error: '+data);
+            toastr.info('Error Occured: '+data);
             console.log(data)
         }
     });
@@ -68,9 +68,13 @@ function reject_submit(){
         type: "GET",
         data: data,
         success: function(data) {
+            toastr.error('Rejected');
+            $('.close').click()
             console.log(data)
         },
         error: function(data) {
+            toastr.info('Error Occured: '+data);
+            $('.close').click()
             console.log(data)
         }
     });

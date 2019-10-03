@@ -371,7 +371,7 @@ def get_encashable_detail(request):
         if to_be_calculated:
             for each_user in User.objects.all():
                 calculate_encashable_details(each_user)
-        all_encash_details = EncashableDetail.objects.all().order_by('-bolo_score_earned')
+        all_encash_details = EncashableDetail.objects.all().order_by('-bolo_score_earned')[:300]
     pay_cycle = PaymentCycle.objects.all().first()
     payement_cycle_form = PaymentCycleForm(initial=pay_cycle.__dict__)
     return render(request,'jarvis/pages/payment/encashable_detail.html',{'all_encash_details':all_encash_details,'payement_cycle_form':payement_cycle_form})

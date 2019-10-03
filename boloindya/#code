@@ -1,0 +1,20 @@
+#code
+
+def main():
+    t = int(input())
+    while t > 0:
+        n = int(input())
+        arr = [int(i) for i in input().split()]
+        print(fun(len(arr), arr))
+        t -= 1
+
+def fun(n, arr):
+    dp = [10000001]*n
+    i = 0
+    while i < n:
+        for j in range(i+1, min(i+arr[i]+1, n)):
+            dp[j] = min(dp[j], dp[i]+i)
+        i += 1
+    print(dp)    
+    return dp[-1]    
+main()        
