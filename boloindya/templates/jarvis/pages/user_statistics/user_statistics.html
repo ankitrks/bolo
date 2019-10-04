@@ -1,0 +1,72 @@
+{% extends "jarvis/layout/base.html" %}
+
+{% block styles %}
+<style>
+    #overlay {
+  position: fixed; /* Sit on top of the page content */
+  display: none; /* Hidden by default */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+  z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
+}
+.percentcomplete{
+    position: absolute;
+    top: 50%;
+    left:50%;
+    color: white;
+    transform: translate(-50%,-50%);
+}
+</style>
+{% endblock styles %}
+
+
+{% block content %}
+{% load staticfiles %}
+<section>
+  <div style="text-align: center;">
+      <h1>DAU and MAU</h1>
+  </div>
+  
+  <canvas id="myChart"></canvas>
+
+  <!-- jQuery 3 -->
+  <!-- <script src="../../bower_components/jquery/dist/jquery.min.js"></script> -->
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
+
+  <!-- Bootstrap 3.3.7 -->
+  <!-- <script src="../../bower_components/bootstrap/dist/js/bootstrap.min.js"></script> -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+  <!-- ChartJS -->
+  <script type="text/javascript" src="{% static 'js/Chart.min.js' %}"></script>
+
+  <script type="text/javascript">
+      var ctx = document.getElementById('myChart').getContext('2d');
+      var chart = new Chart(ctx, {
+          // The type of chart we want to create
+          type: 'line',
+
+          // The data for our dataset
+          data: {
+              labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+              datasets: [{
+                  label: 'My First dataset',
+                  backgroundColor: 'rgb(255, 99, 132)',
+                  borderColor: 'rgb(255, 99, 132)',
+                  data: [0, 10, 5, 2, 20, 30, 45]
+              }]
+          },
+
+          // Configuration options go here
+          options: {}
+      });
+  </script>
+
+</section>
+{% endblock content %}

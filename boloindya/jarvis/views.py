@@ -569,7 +569,8 @@ def uploaded_list(request):
     all_uploaded = VideoUploadTranscode.objects.all()
     return render(request,'jarvis/pages/upload_n_transcode/uploaded_list.html',{'all_uploaded':all_uploaded})
 
-
+def user_statistics(request):
+    return render(request, 'jarvis/pages/user_statistics/user_statistics.html', {})
 
 #def create_barchart(request):
 
