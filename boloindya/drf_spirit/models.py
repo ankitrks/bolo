@@ -355,7 +355,6 @@ class MonthlyActiveUser(models.Model):
     year = models.PositiveIntegerField(_("year"), default = 2019, editable = False)
     frequency = models.PositiveIntegerField(_("frequency"), default = 0, editable = False)
 
-
 # class recording the hardware data corrosponding the logs
 class HardwareData(models.Model):
 
@@ -388,9 +387,6 @@ class HardwareData(models.Model):
     malloc_total = models.PositiveIntegerField(_("malloc_total"), default = 0, editable = False)
     malloc_used = models.PositiveIntegerField(_("malloc_used"), default = 0, editable = False)
     malloc_chunk = models.PositiveIntegerField(_("malloc_chunk"), default = 0, editable = False)
-
-    
-
 
 
 # et = epoch time
