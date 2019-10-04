@@ -572,6 +572,9 @@ def uploaded_list(request):
 def user_statistics(request):
     return render(request, 'jarvis/pages/user_statistics/user_statistics.html', {})
 
+
 #def create_barchart(request):
+
+
 
 

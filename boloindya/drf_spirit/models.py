@@ -323,8 +323,36 @@ class UserSearch(models.Model):
     timestamp = models.DateTimeField(_("timestamp"), null = True, blank = False)
 
 
+# class recording the user --> datetime mapping
+class UserTimeRecord(models.Model):
+
+    user = models.CharField(_("user"), null = True, blank = True, max_length = 250, db_index = True)
+    timestamp = models.DateTimeField(_("timestamp"), null = True, blank = False)
+
+# class recording the day, hour --> frequency mapping
+class HourlyActiveUser(models.Model):
+
+    day_week = models.CharField(_("day_week"), null = True, blank = False, max_length = 250)
+    hour_week = models.CharField(_("hour_week"), null = True, blank = False, max_length = 250)
+    frequency = models.PositiveIntegerField(_("frequency"), default=0, editable=False)
+
+# class recording the day --> frequency mapping
+class DailyActiveUser(models.Model):
+
+    day_month_year = models.CharField(_("day_month_year"), null = True, blank = False, max_length = 250)
+    frequency = models.PositiveIntegerField(_("frequency"), default = 0, editable = False)
+
+# class recording the month, year --> frequency
+class MonthlyActiveUser(models.Model):    
+
+    month = models.CharField(_("month"), null = True, blank = False, max_length = 250)
+    year = models.PositiveIntegerField(_("year"), default = 2019, editable = False)
+    frequency = models.PositiveIntegerField(_("frequency"), default = 0, editable = False)
 
 
 
+
+# et = epoch time
+# dt=datetime.datetime.fromtimestamp(float(et/ 1000.0))
 
 
