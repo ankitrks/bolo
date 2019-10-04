@@ -32,8 +32,13 @@
   <div style="text-align: center;">
       <h1>DAU and MAU</h1>
   </div>
-  
-  <canvas id="myChart"></canvas>
+  <div class="row">
+    <canvas id="myChart" class="col-6"></canvas>    
+    <canvas id="myChart1" class="col-6"></canvas>    
+    <canvas id="myChart2" class="col-6"></canvas>    
+    <canvas id="myChart3" class="col-6"></canvas>    
+  </div>
+
 
   <!-- jQuery 3 -->
   <!-- <script src="../../bower_components/jquery/dist/jquery.min.js"></script> -->
@@ -47,8 +52,66 @@
   <script type="text/javascript" src="{% static 'js/Chart.min.js' %}"></script>
 
   <script type="text/javascript">
+      var data_set_item = [];
       var ctx = document.getElementById('myChart').getContext('2d');
       var chart = new Chart(ctx, {
+          // The type of chart we want to create
+          type: 'line',
+
+          // The data for our dataset
+          data: {
+              labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+              datasets: [{
+                  label: 'My First dataset',
+                  backgroundColor: 'rgb(255, 99, 132)',
+                  borderColor: 'rgb(255, 99, 132)',
+                  data: [0, 10, 5, 2, 20, 30, 45]
+              }]
+          },
+
+          // Configuration options go here
+          options: {}
+      });
+     var ctx = document.getElementById('myChart1').getContext('2d');
+     var chart = new Chart(ctx, {
+          // The type of chart we want to create
+          type: 'line',
+
+          // The data for our dataset
+          data: {
+              labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+              datasets: [{
+                  label: 'My First dataset',
+                  backgroundColor: 'rgb(255, 99, 132)',
+                  borderColor: 'rgb(255, 99, 132)',
+                  data: [23, 1, 4, 19, 20, 30, 3]
+              }]
+          },
+
+          // Configuration options go here
+          options: {}
+      });
+     var ctx = document.getElementById('myChart2').getContext('2d');
+     var chart = new Chart(ctx, {
+          // The type of chart we want to create
+          type: 'line',
+
+          // The data for our dataset
+          data: {
+              labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+              datasets: [{
+                  label: 'My First dataset',
+                  backgroundColor: 'rgb(255, 99, 132)',
+                  borderColor: 'rgb(255, 99, 132)',
+                  data: [12, 5, 5, 2, 0, 1, 45]
+              }]
+          },
+
+          // Configuration options go here
+          options: {}
+      });
+     var ctx = document.getElementById('myChart3').getContext('2d');
+     var chart = new Chart(ctx, {
           // The type of chart we want to create
           type: 'line',
 

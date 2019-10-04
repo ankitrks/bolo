@@ -569,8 +569,10 @@ def uploaded_list(request):
     all_uploaded = VideoUploadTranscode.objects.all()
     return render(request,'jarvis/pages/upload_n_transcode/uploaded_list.html',{'all_uploaded':all_uploaded})
 
+@login_required
 def user_statistics(request):
-    return render(request, 'jarvis/pages/user_statistics/user_statistics.html', {})
+    stats_data = [10,30,20,35,40,15]
+    return render(request, 'jarvis/pages/user_statistics/user_statistics.html', {'stats_data':stats_data, 'message': 'Hie'})
 
 
 
