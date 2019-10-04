@@ -329,11 +329,14 @@ class UserTimeRecord(models.Model):
     user = models.CharField(_("user"), null = True, blank = True, max_length = 250, db_index = True)
     timestamp = models.DateTimeField(_("timestamp"), null = True, blank = False)
 
-# class recording the day, hour --> frequency mapping
+# class recording the day, hour, month, year --> frequency mapping
 class HourlyActiveUser(models.Model):
 
+    day_month = models.CharField(_("day_month"), null = True, blank = False, max_length = 250)
     day_week = models.CharField(_("day_week"), null = True, blank = False, max_length = 250)
-    hour_week = models.CharField(_("hour_week"), null = True, blank = False, max_length = 250)
+    hour = models.CharField(_("hour"), null = True, blank = False, max_length = 250)
+    month = models.CharField(_("month"), null = True, blank = False, max_length = 250)
+    year = models.PositiveIntegerField(_("year"), default = 2019, editable = False)
     frequency = models.PositiveIntegerField(_("frequency"), default=0, editable=False)
 
 # class recording the day --> frequency mapping
