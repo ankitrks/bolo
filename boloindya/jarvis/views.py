@@ -570,7 +570,9 @@ def uploaded_list(request):
     return render(request,'jarvis/pages/upload_n_transcode/uploaded_list.html',{'all_uploaded':all_uploaded})
 
 
-
+# view defined for rendering a bar chart showing the user statistics
 #def create_barchart(request):
+
+
 
 
