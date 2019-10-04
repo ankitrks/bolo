@@ -1,4 +1,4 @@
-from drf_spirit.models import UserJarvisDump, UserLogStatistics, UserFollowUnfollowDetails, UserVideoTypeDetails, VideoDetails, UserEntryPoint, UserViewedFollowersFollowing, VideoSharedDetails,UserSearch
+from drf_spirit.models import UserJarvisDump, UserLogStatistics, UserFollowUnfollowDetails, UserVideoTypeDetails, VideoDetails, UserEntryPoint, UserViewedFollowersFollowing, VideoSharedDetails,UserSearch, UserTimeRecord, DailyActiveUser, MonthlyActiveUser
 import time
 import ast
 import re
@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from rest_framework import status
 import pytz
 import os
+import datetime
 from datetime import datetime
 local_tz = pytz.timezone("Asia/Kolkata")
 
@@ -409,6 +410,71 @@ def record_activity_time_spend(user_data_dump):
         print('Exception 9:' + str(e))   
 
 
+# method for recording the mapping (userid --> sessiontime) in the model usertimerecord
+def record_session_time(user_data_dump):
+
+    #print("coming here")
+    #print(user_data_dump)
+    try:
+        userid = user_data_dump['user_id']
+        sessiontime = int(user_data_dump['session_start_time'])
+        #print(sessiontime, type(sessiontime))
+        datetime_st = datetime.fromtimestamp((sessiontime)/ 1000.0)           # datetime in datetime format
+        user_data_obj = UserTimeRecord(user = userid, timestamp = datetime_st)
+        user_data_obj.save()
+
+    except Exception as e:
+        print('Exception 10:' + str(e))
+
+    return JsonResponse({'message':'success'}, status = status.HTTP_201_CREATED)        
+
+# method for recording the mapping day of the month-->frequncy, day of the week--> frequency
+def Dau_Mau():
+
+    curr_dt = datetime.now()
+    curr_dt_month = curr_dt.month
+    curr_dt_year = curr_dt.year
+    dau_dict = {}
+    month_name_list = ["Jan", "Feb", "March", "April", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"]           # list consisting of english names of months
+
+    try:
+        #userid = user_data_dump['user_id']
+        all_data = UserTimeRecord.objects.all()
+        #print(all_data)
+        for each_data in all_data:
+            user_id = each_data.user
+            dt_obj = each_data.timestamp 
+            dt_day = dt_obj.day
+            dt_month = dt_obj.month 
+            dt_year = dt_obj.year 
+            if((dt_day, dt_month, dt_year) in dau_dict):
+                dau_dict[(dt_day, dt_month, dt_year)]+=1
+            else:
+                dau_dict[(dt_day, dt_month, dt_year)] = 1
+
+        #print(len(dau_dict))        
+        for key, val in dau_dict.items():               # iterating the dictonary created
+            dt_triplet = key
+            if(dt_triplet[1] == curr_dt_month or dt_triplet[1] == curr_dt_month-1):    # only put the results of the last two months(imp step)
+                name_month = month_name_list[dt_triplet[1] -1 ]
+                day_month_year_str = ""+ str(dt_triplet[0]) + " " + name_month + " " + str(dt_triplet[2])
+                freq = val
+                #print(day_month_year_str, freq)                 
+                user_data_obj = DailyActiveUser(day_month_year = day_month_year_str, frequency = freq)
+                user_data_obj.save()
+
+
+                existing_records = MonthlyActiveUser.objects.filter(month = name_month, year = curr_dt_year).count()        # check if records already exists else
+                if(existing_records!= 0):
+                    MonthlyActiveUser.objects.filter(month = name_month, year = curr_dt_year).update(frequency = val)
+                else:    
+                    user_data_obj_month = MonthlyActiveUser(month = name_month, frequency = val)
+                    user_data_obj_month.save()
+
+    except Exception as e:
+        print('Exception 11:' + str(e))    
+
+
 def main():
     # pick only those dumps which have not been executed 
     all_traction_data = UserJarvisDump.objects.filter(is_executed = False, dump_type = 1)
@@ -418,22 +484,26 @@ def main():
             user_data_dump = ast.literal_eval(user_data_string)
             #print(user_data_dump)
             #pass the collected user dump through a set of methods
-            user_statistics(user_data_dump)
-            follow_unfollow_details(user_data_dump)
-            video_type_details(user_data_dump)
-            video_info(user_data_dump)
-            record_user_entry_points(user_data_dump)
-            userviewed_follower_following(user_data_dump)
-            user_category_intereset(user_data_dump)
-            video_share(user_data_dump)
-            search_query(user_data_dump)
+            #user_statistics(user_data_dump)
+            #follow_unfollow_details(user_data_dump)
+            #video_type_details(user_data_dump)
+            #video_info(user_data_dump)
+            #record_user_entry_points(user_data_dump)
+            #userviewed_follower_following(user_data_dump)
+            #user_category_intereset(user_data_dump)
+            #video_share(user_data_dump)
+            #search_query(user_data_dump)
             #record_activity_time_spend(user_data_dump)
-
-            
+            #record_session_time(user_data_dump)
             unique_id = user_jarvis.pk # get primary key of the dump
-            UserJarvisDump.objects.filter(pk = unique_id).update(is_executed = True, dump_type = 1)  #mark the is_executed field as true
+            #UserJarvisDump.objects.filter(pk = unique_id).update(is_executed = True, dump_type = 1)  #mark the is_executed field as true
+
         except Exception as e:
-            print('Exception 8: ' + str(e))
+            print('Exception 8:' + str(e))
+
+   # method calls for calculation of dau and mau       
+    Dau_Mau()                  
+
 
 def run():
     main()
