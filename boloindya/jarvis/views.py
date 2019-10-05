@@ -35,6 +35,8 @@ from forum.category.models import Category
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.http import JsonResponse
+from rest_framework import status
 
 def get_bucket_details(bucket_name=None):
     bucket_credentials = {}
@@ -571,8 +573,11 @@ def uploaded_list(request):
 
 @login_required
 def user_statistics(request):
-    stats_data = [10,30,20,35,40,15]
-    return render(request, 'jarvis/pages/user_statistics/user_statistics.html', {'stats_data':stats_data, 'message': 'Hie'})
+    return render(request, 'jarvis/pages/user_statistics/user_statistics.html')
+
+def get_stats_data(request):
+    sample_data = [34, 42, 23, 78, 90, 2]
+    return JsonResponse({'stats_data': sample_data}, status=status.HTTP_200_OK)
 
 
 

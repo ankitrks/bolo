@@ -52,26 +52,27 @@
   <script type="text/javascript" src="{% static 'js/Chart.min.js' %}"></script>
 
   <script type="text/javascript">
-      var data_set_item = [];
+
       var ctx = document.getElementById('myChart').getContext('2d');
       var chart = new Chart(ctx, {
-          // The type of chart we want to create
-          type: 'line',
+      // The type of chart we want to create
+        type: 'line',
 
-          // The data for our dataset
-          data: {
-              labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-              datasets: [{
-                  label: 'My First dataset',
-                  backgroundColor: 'rgb(255, 99, 132)',
-                  borderColor: 'rgb(255, 99, 132)',
-                  data: [0, 10, 5, 2, 20, 30, 45]
-              }]
-          },
+        // The data for our dataset
+        data: {
+            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+            datasets: [{
+                label: 'My First dataset',
+                backgroundColor: 'rgb(255, 99, 132)',
+                borderColor: 'rgb(255, 99, 132)',
+                data: data.stats_data
+            }]
+        },
 
-          // Configuration options go here
-          options: {}
-      });
+        // Configuration options go here
+        options: {}
+      }); 
+
      var ctx = document.getElementById('myChart1').getContext('2d');
      var chart = new Chart(ctx, {
           // The type of chart we want to create
@@ -91,6 +92,7 @@
           // Configuration options go here
           options: {}
       });
+
      var ctx = document.getElementById('myChart2').getContext('2d');
      var chart = new Chart(ctx, {
           // The type of chart we want to create
@@ -110,6 +112,7 @@
           // Configuration options go here
           options: {}
       });
+
      var ctx = document.getElementById('myChart3').getContext('2d');
      var chart = new Chart(ctx, {
           // The type of chart we want to create
@@ -128,7 +131,39 @@
 
           // Configuration options go here
           options: {}
+      });     
+
+      $( document ).ready(function() {
+        getStatsData();
       });
+
+      function getStatsData(){
+        $.ajax({
+            headers: { "X-CSRFToken": getCookie("csrftoken") },
+            url: "/jarvis/get_user_stats/",
+            type: "GET", 
+            contentType : 'application/json',
+            success: function (data) {
+               
+            }
+          });
+      }
+
+      function getCookie(c_name)
+      {
+          if (document.cookie.length > 0)
+          {
+              c_start = document.cookie.indexOf(c_name + "=");
+              if (c_start != -1)
+              {
+                  c_start = c_start + c_name.length + 1;
+                  c_end = document.cookie.indexOf(";", c_start);
+                  if (c_end == -1) c_end = document.cookie.length;
+                  return unescape(document.cookie.substring(c_start,c_end));
+              }
+          }
+          return "";
+      }
   </script>
 
 </section>

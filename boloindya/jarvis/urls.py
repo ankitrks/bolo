@@ -22,5 +22,6 @@ urlpatterns = [
     url(r'^upload_details/$',views.upload_details),
     url(r'^uploaded_list/$',views.uploaded_list),
     url(r'^user_statistics/$', views.user_statistics),
+    url(r'^get_user_stats/$', views.get_stats_data),
     #url(r'^barchart/$', views.barchart, name= 'create_barchart'),              # url for rendering the bar chart
 ]
