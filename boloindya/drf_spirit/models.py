@@ -355,6 +355,41 @@ class MonthlyActiveUser(models.Model):
     frequency = models.PositiveIntegerField(_("frequency"), default = 0, editable = False)
 
 
+# class recording the hardware data corrosponding the logs
+class HardwareData(models.Model):
+
+    user_id = models.CharField(_("userid"), null = True, blank = True, max_length = 250, db_index = True)
+    total_memory = models.PositiveIntegerField(_("total_memory"), default = 0., editable = False)
+    memory_free = models.PositiveIntegerField(_("memory_free"), default = 0, editable = False)
+    memory_available = models.PositiveIntegerField(_("memory_available"), default = 0, editable = False)
+    swap_cached = models.PositiveIntegerField(_("swap_cached"), default = 0, editable = False)
+    active = models.PositiveIntegerField(_("active"), default = 0, editable = False)
+    inactive = models.PositiveIntegerField(_("inactive"), default = 0, editable = False)
+    unevictable = models.PositiveIntegerField(_("unevictable"), default = 0, editable = False)
+    locked = models.PositiveIntegerField(_("locked"), default = 0, editable = False)
+    swap_total = models.PositiveIntegerField(_("swap_total"), default = 0, editable = False)
+    swap_free = models.PositiveIntegerField(_("swap_free"), default = 0, editable = False)
+    dirty = models.PositiveIntegerField(_("dirty"), default = 0, editable = False)
+    write_back = models.PositiveIntegerField(_("write_back"), default = 0, editable = False)
+    annon_pages = models.PositiveIntegerField(_("annon_pages"), default = 0, editable = False)
+    mapped = models.PositiveIntegerField(_("mapped"), default = 0, editable = False)
+    shmem = models.PositiveIntegerField(_("shmem"), default = 0, editable = False)
+    slab = models.PositiveIntegerField(_("slab"), default = 0, editable = False)
+    sreclaimable = models.PositiveIntegerField(_("sreclaimable"), default = 0, editable = False)
+    sunreclaimable = models.PositiveIntegerField(_("sunreclaimable"), default = 0, editable = False)
+    kernelstack = models.PositiveIntegerField(_("kernelstack"), default = 0, editable = False)
+    pagetables = models.PositiveIntegerField(_("pagetables"), default = 0, editable = False)
+    nfs_unstable = models.PositiveIntegerField(_("nfs_unstable"), default = 0, editable = False)
+    bounce = models.PositiveIntegerField(_("bounce"), default = 0, editable = False)
+    writebacktemp = models.PositiveIntegerField(_("writebacktemp"), default = 0, editable = False)
+    commit_limit = models.PositiveIntegerField(_("commit_limit"), default = 0, editable = False)
+    commit_as = models.PositiveIntegerField(_("commit_as"), default = 0, editable = False)
+    malloc_total = models.PositiveIntegerField(_("malloc_total"), default = 0, editable = False)
+    malloc_used = models.PositiveIntegerField(_("malloc_used"), default = 0, editable = False)
+    malloc_chunk = models.PositiveIntegerField(_("malloc_chunk"), default = 0, editable = False)
+
+    
+
 
 
 # et = epoch time
