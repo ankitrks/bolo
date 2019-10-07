@@ -8,7 +8,8 @@ from rest_framework import status
 import pytz
 import os
 import datetime
-from datetime import datetime
+from datetime import datetime  # do not delete this statement please
+import dateutil.parser
 local_tz = pytz.timezone("Asia/Kolkata")
 
 #! /usr/bin/python
@@ -459,9 +460,17 @@ def dau_mau():
                 name_month = month_name_list[dt_triplet[1] -1 ]
                 day_month_year_str = ""+ str(dt_triplet[0]) + " " + name_month + " " + str(dt_triplet[2])
                 freq = val
-                #print(day_month_year_str, freq)                 
-                user_data_obj = DailyActiveUser(day_month_year = day_month_year_str, frequency = freq)      # update the freq of daily active user
-                user_data_obj.save()
+                date_string = str(dt_triplet[0]) + "-" + str(dt_triplet[1]) + "-" + str(dt_triplet[2])
+                date_time_obj = dateutil.parser.parse(date_string)
+                #print(date_time_obj)
+
+                #print(day_month_year_str, freq)
+                prev_records = DailyActiveUser.objects.filter(day_month_year = day_month_year_str).count()
+                if(prev_records!=0):
+                    user_data_obj = DailyActiveUser.objects.filter(day_month_year = day_month_year_str).update(frequency = val)
+                else:
+                    user_data_obj = DailyActiveUser(date_time_field = date_time_obj, day_month_year = day_month_year_str, frequency = freq)      # update the freq of daily active user
+                    user_data_obj.save()
 
                 existing_records = MonthlyActiveUser.objects.filter(month = name_month, year = curr_dt_year).count()        # check if records already exists else
                 if(existing_records!= 0):
@@ -506,12 +515,16 @@ def hourly_au():
             dt_quad = key
             month_name = month_name_list[dt_quad[3] - 1]
             day_week_name = day_week[dt_quad[2] - 1]
+            date_string = str(dt_quad[4]) + "-" + str(dt_quad[3]) + "-" + str(dt_quad[1]) + " " + str(dt_quad[0]) + ":00:00"
+            #print(date_string)
+            date_time_obj = dateutil.parser.parse(date_string)      # creating datetime object for the same
+            #print(date_time_obj)
 
             existing_records = HourlyActiveUser.objects.filter(day_month = dt_quad[1], day_week = day_week_name, hour = dt_quad[0], month = month_name, year = dt_quad[4]).count() 
             if(existing_records!= 0):
                 HourlyActiveUser.objects.filter(day_month = dt_quad[1], hour = dt_quad[0], day_week = day_week_name, month = month_name, year = dt_quad[4]).update(frequency = val)
             else:
-                user_data_obj_hr = HourlyActiveUser(day_month = dt_quad[1], hour = dt_quad[0], day_week = day_week_name, month = month_name, year = dt_quad[4], frequency = val)
+                user_data_obj_hr = HourlyActiveUser(date_time_field = date_time_obj, day_month = dt_quad[1], hour = dt_quad[0], day_week = day_week_name, month = month_name, year = dt_quad[4], frequency = val)
                 user_data_obj_hr.save()  
 
 
@@ -519,9 +532,10 @@ def hourly_au():
         print('Exception 12:' + str(e))
 
 
+
 def main():
     # pick only those dumps which have not been executed 
-    all_traction_data = UserJarvisDump.objects.filter(is_executed = False, dump_type = 1)
+    all_traction_data = UserJarvisDump.objects.filter(is_executed = True, dump_type = 1)
     for user_jarvis in all_traction_data:
         try:
             user_data_string = user_jarvis.dump
@@ -539,13 +553,13 @@ def main():
             search_query(user_data_dump)
             record_session_time(user_data_dump)
             unique_id = user_jarvis.pk # get primary key of the dump
-            UserJarvisDump.objects.filter(pk = unique_id).update(is_executed = True, dump_type = 1)  #mark the is_executed field as true
+            UserJarvisDump.objects.filter(pk = unique_id).update(is_executed = False, dump_type = 1)  #mark the is_executed field as true
 
         except Exception as e:
             print('Exception 8:' + str(e))
 
     #method calls for calculation of dau and mau       
-    #dau_mau()                  
+    dau_mau()                  
     hourly_au()
 
 def run():
