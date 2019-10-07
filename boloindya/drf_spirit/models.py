@@ -338,12 +338,14 @@ class HourlyActiveUser(models.Model):
     month = models.CharField(_("month"), null = True, blank = False, max_length = 250)
     year = models.PositiveIntegerField(_("year"), default = 2019, editable = False)
     frequency = models.PositiveIntegerField(_("frequency"), default=0, editable=False)
+    date_time_field = models.DateTimeField(_("date_time_field"), null = True, blank = False)
 
 # class recording the day --> frequency mapping
 class DailyActiveUser(models.Model):
 
     day_month_year = models.CharField(_("day_month_year"), null = True, blank = False, max_length = 250)
     frequency = models.PositiveIntegerField(_("frequency"), default = 0, editable = False)
+    date_time_field = models.DateTimeField(_("date_time_field"), null = True, blank = False)
 
 # class recording the month, year --> frequency
 class MonthlyActiveUser(models.Model):    
