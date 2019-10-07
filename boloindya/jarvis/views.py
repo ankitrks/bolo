@@ -31,6 +31,7 @@ from django.views.generic.edit import FormView
 from datetime import datetime
 from forum.userkyc.forms import KYCBasicInfoRejectForm,KYCDocumentRejectForm,AdditionalInfoRejectForm,BankDetailRejectForm
 from .models import VideoUploadTranscode
+from drf_spirit.models import MonthlyActiveUser, HourlyActiveUser
 from forum.category.models import Category
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -569,13 +570,17 @@ def upload_details(request):
 @login_required
 def uploaded_list(request):
     all_uploaded = VideoUploadTranscode.objects.all()
-    return render(request,'jarvis/pages/upload_n_transcode/uploaded_list.html',{'all_uploaded':all_uploaded})
+    return render(request,'jarvis/pages/1upload_n_transcode/uploaded_list.html',{'all_uploaded':all_uploaded})
 
 @login_required
 def user_statistics(request):
     return render(request, 'jarvis/pages/user_statistics/user_statistics.html')
 
 def get_stats_data(request):
+
+    hau_data = HourlyActiveUser.objects.all()
+    print(hau_data)
+
     sample_data = [34, 42, 23, 78, 90, 2]
     return JsonResponse({'stats_data': sample_data}, status=status.HTTP_200_OK)
 
