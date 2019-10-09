@@ -44,6 +44,11 @@
       <canvas id="chart_mau"></canvas>    
     </div>
 
+    <div style="text-align: center;"  class="col-6">
+      <h2>Hourly Active Users</h2>
+      <canvas id="chart_hau"></canvas>    
+    </div>    
+
   </div>
 
   <!-- jQuery 3 -->
@@ -61,6 +66,7 @@
 
       var chart_dau = document.getElementById('chart_dau').getContext('2d');
       var chart_mau = document.getElementById('chart_mau').getContext('2d');
+      var chart_hau = document.getElementById('chart_hau').getContext('2d');
 
       $( document ).ready(function() {
         getStatsData();
@@ -86,12 +92,14 @@
             type: 'line',
 
             data: {
-                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                // labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                labels: data.dau_labels,
                 datasets: [{
-                    label: 'My First dataset',
+                    label: 'Daily Active Users',
+                    // label: data.dau_labels
                     backgroundColor: 'rgb(255, 99, 132)',
                     borderColor: 'rgb(255, 99, 132)',
-                    data: data.stats_data
+                    data: data.dau_freq
                 }]
             },
 
@@ -103,12 +111,30 @@
             type: 'line',
 
             data: {
-                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                // labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                labels: data.mau_labels,
                 datasets: [{
-                    label: 'My First dataset',
-                    backgroundColor: 'rgb(255, 99, 132)',
-                    borderColor: 'rgb(255, 99, 132)',
-                    data: data.stats_data
+                    label: 'Monthly Active Users',
+                    backgroundColor: 'rgb(141, 233, 190)',
+                    borderColor: 'rgb(141, 233, 190)',
+                    data: data.mau_freq
+                }]
+            },
+
+            options: {}
+          }); 
+
+          //****** Setting HAU chart
+          var chart = new Chart(chart_hau, {
+            type: 'line',
+
+            data: {
+                labels: data.hau_labels,
+                datasets: [{
+                    label: 'Hourly Active Users',
+                    backgroundColor: 'rgb(100, 167, 255)',
+                    borderColor: 'rgb(100, 167, 255)',
+                    data: data.hau_freq
                 }]
             },
 

@@ -31,7 +31,7 @@ from django.views.generic.edit import FormView
 from datetime import datetime
 from forum.userkyc.forms import KYCBasicInfoRejectForm,KYCDocumentRejectForm,AdditionalInfoRejectForm,BankDetailRejectForm
 from .models import VideoUploadTranscode
-from drf_spirit.models import MonthlyActiveUser, HourlyActiveUser
+from drf_spirit.models import MonthlyActiveUser, HourlyActiveUser, DailyActiveUser
 from forum.category.models import Category
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -578,11 +578,46 @@ def user_statistics(request):
 
 def get_stats_data(request):
 
-    hau_data = HourlyActiveUser.objects.all()
-    print(hau_data)
+    #MAU Data
+    mau_data = MonthlyActiveUser.objects.all()
+    mau_labels = []
+    mau_freq = []
+    for obj in mau_data:
+        month = str(obj.month)+" "+str(obj.year)
+        mau_freq.append(str(obj.frequency))
+        mau_labels.append(month)
 
-    sample_data = [34, 42, 23, 78, 90, 2]
-    return JsonResponse({'stats_data': sample_data}, status=status.HTTP_200_OK)
+    mau_freq.append("10")
+    mau_labels.append("Nov 2019")
+
+    print(mau_labels)
+    print(mau_freq)
+
+    #DAU Data
+    dau_data = DailyActiveUser.objects.all().order_by('date_time_field')
+    dau_labels = []
+    dau_freq = []
+    for obj in dau_data:
+        dau_labels.append(str(obj.date_time_field.strftime("%d %B %Y")))
+        dau_freq.append(str(obj.frequency))
+
+    print(dau_labels)
+    print(dau_freq)
+
+    #HAU Data
+    hau_data = HourlyActiveUser.objects.all().order_by('date_time_field')
+    hau_labels = []
+    hau_freq = []
+    for obj in hau_data:
+        hau_labels.append(str(obj.date_time_field.strftime("%I %p, %d %B")))
+        hau_freq.append(str(obj.frequency))
+
+    print(hau_labels)
+    print(hau_freq)
+
+    all_data = {'dau_labels': dau_labels, 'dau_freq': dau_freq, 'hau_labels': hau_labels, 'hau_freq': hau_freq}
+
+    return JsonResponse(all_data, status=status.HTTP_200_OK)
 
 
 
