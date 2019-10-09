@@ -1,4 +1,4 @@
-from drf_spirit.models import UserJarvisDump, UserLogStatistics, UserFollowUnfollowDetails, UserVideoTypeDetails, VideoDetails, UserEntryPoint, UserViewedFollowersFollowing, VideoSharedDetails,UserSearch, UserTimeRecord, DailyActiveUser, MonthlyActiveUser, UserInterest, HourlyActiveUser
+from drf_spirit.models import UserJarvisDump, UserLogStatistics, UserFollowUnfollowDetails, UserVideoTypeDetails, VideoDetails, UserEntryPoint, UserViewedFollowersFollowing, VideoSharedDetails,UserSearch, UserTimeRecord, DailyActiveUser, MonthlyActiveUser, UserInterest, HourlyActiveUser, ActivityTimeSpend
 import time
 import ast
 import re
@@ -418,8 +418,9 @@ def dau_mau():
                 name_month = month_name_list[dt_triplet[1] -1 ]
                 day_month_year_str = ""+ str(dt_triplet[0]) + " " + name_month + " " + str(dt_triplet[2])
                 freq = val
-                date_string = str(dt_triplet[0]) + "-" + str(dt_triplet[1]) + "-" + str(dt_triplet[2])
-                date_time_obj = dateutil.parser.parse(date_string, dayfirst = True)
+                #date_string = str(dt_triplet[0]) + "-" + str(dt_triplet[1]) + "-" + str(dt_triplet[2])
+                date_string = str(dt_triplet[2]) + "-" + str(dt_triplet[1]) + "-" + str(dt_triplet[0])
+                date_time_obj = dateutil.parser.parse(date_string)
                 #print(date_time_obj)
 
                 #print(day_month_year_str, freq)
@@ -435,8 +436,7 @@ def dau_mau():
                 else:
                     mau_dict[name_month] = val     
 
-
-        
+        # iterate mau dict and find the freq of users for each of th month
         for key, val in mau_dict.items():
             curr_month = key 
             curr_val = val 
@@ -484,7 +484,7 @@ def hourly_au():
             day_week_name = day_week[dt_quad[2] - 1]
             date_string = str(dt_quad[4]) + "-" + str(dt_quad[3]) + "-" + str(dt_quad[1]) + " " + str(dt_quad[0]) + ":00:00"
             #print(date_string)
-            date_time_obj = dateutil.parser.parse(date_string, dayfirst = True)      # creating datetime object for the same
+            date_time_obj = dateutil.parser.parse(date_string)      # creating datetime object for the same
             #print(date_time_obj)
 
             existing_records = HourlyActiveUser.objects.filter(day_month = dt_quad[1], day_week = day_week_name, hour = dt_quad[0], month = month_name, year = dt_quad[4]).count() 
@@ -499,19 +499,20 @@ def hourly_au():
         print('Exception 12:' + str(e))
 
 # func for recording the time spend by the user for activities
-# def activity_time_spend(user_data_dump):
+def activity_time_spend(user_data_dump):
 
-#     try:
-#         userid = user_data_dump['user_id']
-#         if('record_time_spend' in user_data_dump):
-#             all_records = user_data_dump['record_time_spend']
-#             if(len(all_records)>0):
-
-
-
-#     except Exception as e:
-#         print('Exception 9:' + str(e))
-
+    try:
+        userid = user_data_dump['user_id']
+        if('record_time_spend' in user_data_dump):
+            all_records = user_data_dump['record_time_spend']
+            if(len(all_records)>0):
+                for key, val in all_records.items():
+                    fragement_id = key 
+                    time_ms = val['timeSpentTillNow']
+                    user_data_obj = ActivityTimeSpend(user = userid, fragmentid = fragement_id, time_spent = time_ms)
+                    user_data_obj.save()
+    except Exception as e:
+        print('Exception 9:' + str(e))
 
 
 
@@ -534,6 +535,7 @@ def main():
             # video_share(user_data_dump)
             # search_query(user_data_dump)
             # record_session_time(user_data_dump)
+            activity_time_spend(user_data_dump)
             # unique_id = user_jarvis.pk # get primary key of the dump
             # UserJarvisDump.objects.filter(pk = unique_id).update(is_executed = True, dump_type = 1)  #mark the is_executed field as true
 
