@@ -310,9 +310,8 @@ class ActivityTimeSpend(models.Model):
 
     user = models.CharField(_("userid"), null = True, blank = False, max_length = 250, db_index = True)
     fragmentid = models.CharField(_("fragmentid"), null = True, blank = False, max_length = 550, db_index = True)
-    starttime = models.DateTimeField(_("starttime"), null = True, blank = False)
-    pausetime = models.DateTimeField(_("pausetime"), null = True, blank = False)
-    difference = models.PositiveIntegerField(_("time_difference"), default=0, editable=False)
+    time_spent = models.PositiveIntegerField(_("time_spent(ms)"), default = 0, editable = False)
+
 
 
 # class recording the seach records of a user
