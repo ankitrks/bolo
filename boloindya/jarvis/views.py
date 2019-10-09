@@ -30,11 +30,12 @@ from forum.payment.forms import PaymentForm,PaymentCycleForm
 from django.views.generic.edit import FormView
 from datetime import datetime
 from forum.userkyc.forms import KYCBasicInfoRejectForm,KYCDocumentRejectForm,AdditionalInfoRejectForm,BankDetailRejectForm
-from .models import VideoUploadTranscode
+from .models import VideoUploadTranscode,VideoCategory
 from forum.category.models import Category
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from .forms import VideoUploadTranscodeForm
 
 def get_bucket_details(bucket_name=None):
     bucket_credentials = {}
@@ -171,8 +172,12 @@ def importcsv(request):
     return render(request,'admin/jarvis/importcsv.html',{'data':data,'title':title})
 
 @login_required
-def uploadvideofile(request):    
-    return render(request,'jarvis/pages/upload_n_transcode/upload_n_transcode.html')
+def uploadvideofile(request):
+    all_category = VideoCategory.objects.all()
+    from django.db.models import Count
+    all_upload = VideoUploadTranscode.objects.all().distinct().values('folder_to_upload').annotate(folder_count=Count('folder_to_upload')).order_by('folder_to_upload')
+    print all_upload
+    return render(request,'jarvis/pages/upload_n_transcode/upload_n_transcode.html',{'all_category':all_category,'all_upload':all_upload})
 
 def getcsvdata(request):
     data = []
@@ -523,9 +528,20 @@ def urlify(s):
 
 @login_required
 def upload_n_transcode(request):
-    upload_file = request.FILES['csv_file']
+    upload_file = request.FILES['media_file']
     upload_to_bucket = request.POST.get('bucket_name',None)
     upload_folder_name = request.POST.get('folder_prefix',None)
+    upload_category = request.POST.get('category_choice',None)
+    free_video = request.POST.get('free_video',None)
+    video_title = request.POST.get('video_title',None)
+    video_descp = request.POST.get('video_descp',None)
+    print free_video,video_descp,video_title
+    video_category = False
+    if upload_category:
+        upload_category = upload_category.strip()
+        if upload_category:
+            video_category,is_created = VideoCategory.objects.get_or_create(category_name = upload_category.lower())
+
     # print upload_file,upload_to_bucket,upload_folder_name
     if not upload_to_bucket:
         return HttpResponse(json.dumps({'message':'fail','reason':'bucket_missing'}),content_type="application/json")
@@ -533,6 +549,8 @@ def upload_n_transcode(request):
         return HttpResponse(json.dumps({'message':'fail','reason':'File Missing'}),content_type="application/json")
     if not upload_file.name.endswith('.mp4'):
         return HttpResponse(json.dumps({'message':'fail','reason':'This is not a mp4 file'}),content_type="application/json")
+    if free_video and (not video_title or not video_descp):
+        return HttpResponse(json.dumps({'message':'fail','reason':'Title or Description is missing'}),content_type="application/json")
 
     bucket_credentials = get_bucket_details(upload_to_bucket)
     conn = boto3.client('s3', bucket_credentials['REGION_HOST'], aws_access_key_id = bucket_credentials['AWS_ACCESS_KEY_ID'], \
@@ -570,6 +588,12 @@ def upload_n_transcode(request):
             my_dict['filename_changed'] = urlify(upload_file_name)
             my_dict['folder_to_upload'] = upload_folder_name
             my_dict['folder_to_upload_changed'] = urlify(upload_folder_name)
+            if video_category:
+                my_dict['category'] = video_category
+            if free_video:
+                my_dict['is_free_video'] = True
+                my_dict['video_title'] = video_title
+                my_dict['video_descp'] = video_descp
             my_upload_transcode = VideoUploadTranscode.objects.create(**my_dict)
             os.remove(urlify(upload_file_name))
 
@@ -587,10 +611,46 @@ def upload_details(request):
 
 @login_required
 def uploaded_list(request):
-    all_uploaded = VideoUploadTranscode.objects.all()
+    all_uploaded = VideoUploadTranscode.objects.filter(is_active = True)
     return render(request,'jarvis/pages/upload_n_transcode/uploaded_list.html',{'all_uploaded':all_uploaded})
 
+@login_required
+def edit_upload(request):
+    if request.method == 'GET':
+        file_id = request.GET.get('id',None)
+        if file_id:
+            my_video = VideoUploadTranscode.objects.get(pk=file_id)
+            my_dict = {'category':my_video.category,'video_title':my_video.video_title,'video_descp':my_video.video_descp,'is_free_video':my_video.is_free_video}
+            video_form = VideoUploadTranscodeForm(initial=my_dict)
+            return render(request,'jarvis/pages/upload_n_transcode/edit_upload.html',{'my_video':my_video,'video_form':video_form})
+        return render(request,'jarvis/pages/upload_n_transcode/edit_upload.html')
+    elif request.method == 'POST':
+        print request.POST
+        video_id = request.POST.get('video_id',None)
+        if video_id:
+            my_video = VideoUploadTranscode.objects.get(pk=video_id)
+            is_free_video = request.POST.get('is_free_video',None)
+            if is_free_video:
+                my_video.is_free_video = True
+            else:
+                my_video.is_free_video = False
+            my_video.video_title = request.POST.get('video_title','')
+            my_video.video_descp = request.POST.get('video_descp','')
+            my_video.category_id = request.POST.get('category',None)
+            my_video.save()
+            return HttpResponse(json.dumps({'message':'success','video_id':my_video.id}),content_type="application/json")
+        else:
 
+            return HttpResponse(json.dumps({'message':'fail','reason':'file id not found'}),content_type="application/json")
 
+@login_required
+def delete_upload(request):
+    file_id = request.GET.get('id',None)
+    if file_id:
+        my_video = VideoUploadTranscode.objects.get(pk=file_id)
+        my_video.is_active = False
+        my_video.save()
+        all_uploaded = VideoUploadTranscode.objects.filter(is_active = True)
+        return render(request,'jarvis/pages/upload_n_transcode/uploaded_list.html',{'all_uploaded':all_uploaded})
 
 

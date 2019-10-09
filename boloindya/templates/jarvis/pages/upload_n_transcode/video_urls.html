@@ -18,6 +18,24 @@
         <p class="lead" id="m3u8url">{{ my_video.transcoded_file_url}}</p>
         <a href="#" data-clipboard-target="#m3u8url" class="copy-text">Copy URL</a>
     </div>
+    {% if my_video.video_title %}
+    <div>
+        <h3>Video Title</h3>
+        <p class="lead" id="m3u8url">{{ my_video.video_title }}</p>
+    </div>
+    {% endif %}
+    {% if my_video.video_descp %}
+    <div>
+        <h3>Video Description</h3>
+        <p class="lead" id="m3u8url">{{ my_video.video_descp }}</p>
+    </div>
+    {% endif %}
+    {% if my_video.category %}
+    <div>
+        <h3>Video Category</h3>
+        <p class="lead" id="m3u8url">{{ my_video.category.category_name }}</p>
+    </div>
+    {% endif %}
     <div>
         <a href="/jarvis/uploadvideofile/"><button type="button" class="btn btn-danger"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Upload Page </button></a>
         <a href="/jarvis/uploaded_list/"><button type="button" class="btn btn-primary"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Uploaded List </button></a>
