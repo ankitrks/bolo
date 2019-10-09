@@ -587,9 +587,6 @@ def get_stats_data(request):
         mau_freq.append(str(obj.frequency))
         mau_labels.append(month)
 
-    mau_freq.append("10")
-    mau_labels.append("Nov 2019")
-
     print(mau_labels)
     print(mau_freq)
 
@@ -615,7 +612,7 @@ def get_stats_data(request):
     print(hau_labels)
     print(hau_freq)
 
-    all_data = {'dau_labels': dau_labels, 'dau_freq': dau_freq, 'hau_labels': hau_labels, 'hau_freq': hau_freq}
+    all_data = {'dau_labels': dau_labels, 'dau_freq': dau_freq, 'hau_labels': hau_labels, 'hau_freq': hau_freq, 'mau_freq':mau_freq, 'mau_labels':mau_labels}
 
     return JsonResponse(all_data, status=status.HTTP_200_OK)
 
