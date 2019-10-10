@@ -232,6 +232,7 @@ class UserFollowUnfollowDetails(models.Model):
     profileid = models.TextField(_("profileid"), null = True, blank = True, db_index = True)
     timestamp = models.DateTimeField(_("timestamp"), blank = False, null = False)
     relationship_type = models.CharField(_("relationship_type"), choices = relationship_info, max_length = 50)
+    share_medium = models.CharField(_("share_medium"), blank = True, max_length = 300, null = True)
 
 
 # class storing user-videotype details applicable for user, which videos s/he watched, commented, shared etc
