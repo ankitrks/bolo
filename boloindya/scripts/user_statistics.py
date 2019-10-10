@@ -518,26 +518,26 @@ def activity_time_spend(user_data_dump):
 
 def main():
     # pick only those dumps which have not been executed 
-    all_traction_data = UserJarvisDump.objects.filter(dump_type = 1)
+    all_traction_data = UserJarvisDump.objects.filter(is_executed = False, dump_type = 1)
     for user_jarvis in all_traction_data:
         try:
             user_data_string = user_jarvis.dump
             user_data_dump = ast.literal_eval(user_data_string)
             #print(user_data_dump)
             #pass the collected user dump through a set of methods
-            # user_statistics(user_data_dump)
-            # follow_unfollow_details(user_data_dump)
-            # video_type_details(user_data_dump)
-            # video_info(user_data_dump)
-            # record_user_entry_points(user_data_dump)
-            # userviewed_follower_following(user_data_dump)
-            # user_category_intereset(user_data_dump)
-            # video_share(user_data_dump)
-            # search_query(user_data_dump)
+            user_statistics(user_data_dump)
+            follow_unfollow_details(user_data_dump)
+            video_type_details(user_data_dump)
+            video_info(user_data_dump)
+            record_user_entry_points(user_data_dump)
+            userviewed_follower_following(user_data_dump)
+            user_category_intereset(user_data_dump)
+            video_share(user_data_dump)
+            search_query(user_data_dump)
             record_session_time(user_data_dump)               #please run this before running dau and mau
             activity_time_spend(user_data_dump)
-            # unique_id = user_jarvis.pk # get primary key of the dump
-            # UserJarvisDump.objects.filter(pk = unique_id).update(is_executed = True, dump_type = 1)  #mark the is_executed field as true
+            unique_id = user_jarvis.pk # get primary key of the dump
+            UserJarvisDump.objects.filter(pk = unique_id).update(is_executed = True, dump_type = 1)  #mark the is_executed field as true
 
         except Exception as e:
             print('Exception 8:' + str(e))
