@@ -131,6 +131,7 @@ def user_statistics(user_data_dump):
 # func for dumping follow unfollow details in model(userid, profileid, timestamp, relationshiptype -{follow, unfollow, report, share})
 def follow_unfollow_details(user_data_dump):
     
+
     try:
         user_id = user_data_dump['user_id']
         follow_list = []
@@ -156,36 +157,37 @@ def follow_unfollow_details(user_data_dump):
                     utc_dt = datetime.utcfromtimestamp(float(item2)/ 1000).replace(tzinfo=pytz.utc)
                     report_list.append((item1, utc_dt))
 
-        share_list = []
+        share_list = []         # there are 3 items in profile share list(please note)
         if('profile_share' in user_data_dump):
             if(len(user_data_dump['profile_share']) > 0):
-                for (item1, item2) in user_data_dump['profile_share']:
+                for (item1, item2, item3) in user_data_dump['profile_share']:
                     
-                    utc_dt = datetime.utcfromtimestamp(float(item2)/ 1000).replace(tzinfo=pytz.utc)
-                    share_list.append((item1, utc_dt))
+                    utc_dt = datetime.utcfromtimestamp(float(item3)/ 1000).replace(tzinfo=pytz.utc)
+                    share_list.append((item1, item2, utc_dt))
 
 
         if(len(follow_list) > 0):
             for (a,b) in follow_list:
-                user_data_obj = UserFollowUnfollowDetails(user = user_id, profileid = a, timestamp = b, relationship_type = 'follow')
+                user_data_obj = UserFollowUnfollowDetails(user = user_id, profileid = a, timestamp = b, relationship_type = 'follow', share_medium = 'None')
                 user_data_obj.save()
 
         if(len(unfollow_list) > 0):        
             for (a,b) in unfollow_list:
-                user_data_obj = UserFollowUnfollowDetails(user = user_id, profileid= a, timestamp = b, relationship_type = 'unfollow')
+                user_data_obj = UserFollowUnfollowDetails(user = user_id, profileid= a, timestamp = b, relationship_type = 'unfollow', share_medium = 'None')
                 user_data_obj.save()                        
 
         if(len(report_list) > 0):        
             for(a,b) in report_list:
-                user_data_obj = UserFollowUnfollowDetails(user = user_id, profileid= a, timestamp = b, relationship_type = 'report')
+                user_data_obj = UserFollowUnfollowDetails(user = user_id, profileid= a, timestamp = b, relationship_type = 'report', share_medium = 'None')
                 user_data_obj.save()
 
         if(len(share_list) > 0 ):        
-            for(a,b) in share_list:
-                user_data_obj = UserFollowUnfollowDetails(user = user_id, profileid= a, timestamp = b, relationship_type = 'share')
+            for(a,b,c) in share_list:
+                user_data_obj = UserFollowUnfollowDetails(user = user_id, profileid= a, timestamp = c, relationship_type = 'share', share_medium = b)
                 user_data_obj.save()
 
     except Exception as e:
+        print(user_data_dump)
         print('Exception2: ' + str(e))
 
 
@@ -518,7 +520,7 @@ def activity_time_spend(user_data_dump):
 
 def main():
     # pick only those dumps which have not been executed 
-    all_traction_data = UserJarvisDump.objects.filter(is_executed = False, dump_type = 1)
+    all_traction_data = UserJarvisDump.objects.filter(is_executed = True, dump_type = 1)
     for user_jarvis in all_traction_data:
         try:
             user_data_string = user_jarvis.dump
@@ -537,7 +539,7 @@ def main():
             record_session_time(user_data_dump)               #please run this before running dau and mau
             activity_time_spend(user_data_dump)
             unique_id = user_jarvis.pk # get primary key of the dump
-            UserJarvisDump.objects.filter(pk = unique_id).update(is_executed = True, dump_type = 1)  #mark the is_executed field as true
+            UserJarvisDump.objects.filter(pk = unique_id).update(is_executed = False, dump_type = 1)  #mark the is_executed field as true
 
         except Exception as e:
             print('Exception 8:' + str(e))
