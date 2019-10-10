@@ -1361,12 +1361,12 @@ def fb_profile_settings(request):
                 return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
         elif activity == 'google_login' and refrence == 'google':
             try:
-                userprofile = UserProfile.objects.get(social_identifier = extra_data['id'],user__is_active = True)
+                userprofile = UserProfile.objects.get(social_identifier = extra_data['google_id'],user__is_active = True)
                 user=userprofile.user
                 is_created=False
             except Exception as e:
                 print e
-                user_exists,num_user = check_user(extra_data['first_name'],extra_data['last_name'])
+                # user_exists,num_user = check_user(extra_data['first_name'],extra_data['last_name'])
                 #username = generate_username(extra_data['first_name'],extra_data['last_name'],num_user) if user_exists else str(str(extra_data['first_name'])+str(extra_data['last_name']))
                 username = get_random_username()
                 user = User.objects.create(username = username.lower())
@@ -1375,11 +1375,13 @@ def fb_profile_settings(request):
 
             if is_created:
                 add_bolo_score(user.id, 'initial_signup', userprofile)
-                user.first_name = extra_data['first_name']
-                user.last_name = extra_data['last_name']
+                # user.first_name = extra_data['first_name']
+                # user.last_name = extra_data['last_name']
                 userprofile.name = extra_data['name']
-                userprofile.social_identifier = extra_data['id']
+                userprofile.social_identifier = extra_data['google_id']
                 userprofile.bio = bio
+                if extra_data['profile_pic']:
+                    userprofile.profile_pic = profile_pic
                 if not userprofile.d_o_b and d_o_b:
                     add_bolo_score(user.id, 'dob_added', userprofile)
                 userprofile.d_o_b = d_o_b
