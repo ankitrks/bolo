@@ -91,6 +91,7 @@ class UserProfile(models.Model):
 
     click_id = models.CharField(_("Click Id"), max_length=300, blank=True)
     click_id_response = models.TextField(_("Click Id Response"),null=True, blank=True)
+    is_dark_mode_enabled = models.BooleanField(default=False)
 
     # end #
 
