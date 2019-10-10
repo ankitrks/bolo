@@ -1295,6 +1295,7 @@ def fb_profile_settings(request):
     lat = request.POST.get('lat',None)
     lang = request.POST.get('lang',None)
     sub_category_prefrences = request.POST.get('categories',None)
+    is_dark_mode_enabled = request.POST.get('is_dark_mode_enabled',None)
     try:
         sub_category_prefrences = sub_category_prefrences.split(',')
     except:
@@ -1358,6 +1359,64 @@ def fb_profile_settings(request):
             else:
                 user_tokens = get_tokens_for_user(user)
                 return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+        elif activity == 'google_login' and refrence == 'google':
+            try:
+                userprofile = UserProfile.objects.get(social_identifier = extra_data['google_id'],user__is_active = True)
+                user=userprofile.user
+                is_created=False
+            except Exception as e:
+                print e
+                # user_exists,num_user = check_user(extra_data['first_name'],extra_data['last_name'])
+                #username = generate_username(extra_data['first_name'],extra_data['last_name'],num_user) if user_exists else str(str(extra_data['first_name'])+str(extra_data['last_name']))
+                username = get_random_username()
+                user = User.objects.create(username = username.lower())
+                userprofile = UserProfile.objects.get(user = user)
+                is_created = True
+
+            if is_created:
+                add_bolo_score(user.id, 'initial_signup', userprofile)
+                # user.first_name = extra_data['first_name']
+                # user.last_name = extra_data['last_name']
+                userprofile.name = extra_data['name']
+                userprofile.social_identifier = extra_data['google_id']
+                userprofile.bio = bio
+                if extra_data['profile_pic']:
+                    userprofile.profile_pic = profile_pic
+                if not userprofile.d_o_b and d_o_b:
+                    add_bolo_score(user.id, 'dob_added', userprofile)
+                userprofile.d_o_b = d_o_b
+                if not userprofile.gender and gender:
+                    add_bolo_score(user.id, 'gender_added', userprofile)
+                userprofile.gender = gender
+                userprofile.about = about
+                userprofile.refrence = refrence
+                userprofile.extra_data = extra_data
+                userprofile.user = user
+                userprofile.bolo_score += 95
+                userprofile.linkedin_url = likedin_url
+                userprofile.twitter_id = twitter_id
+                userprofile.instagarm_id = instagarm_id
+
+                # userprofile.follow_count += 1
+                if str(is_geo_location) =="1":
+                    userprofile.lat = lat
+                    userprofile.lang = lang
+                if click_id:
+                    userprofile.click_id = click_id
+                    click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
+                    response = urllib2.urlopen(click_url).read()
+                    userprofile.click_id_response = str(response)
+                userprofile.save()
+                # if str(language):
+                #     default_follow = deafult_boloindya_follow(user,str(language))
+                userprofile.language = str(language)
+                userprofile.save()
+                user.save()
+                user_tokens = get_tokens_for_user(user)
+                return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+            else:
+                user_tokens = get_tokens_for_user(user)
+                return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
         elif activity == 'profile_save':
             try:
                 userprofile = UserProfile.objects.get(user = request.user)
@@ -1369,6 +1428,10 @@ def fb_profile_settings(request):
                 userprofile.d_o_b = d_o_b
                 if not userprofile.gender and gender:
                     add_bolo_score(userprofile.user.id, 'gender_added', userprofile)
+                if str(is_dark_mode_enabled) == '1':
+                    userprofile.is_dark_mode_enabled = True
+                else:
+                    userprofile.is_dark_mode_enabled = False
                 userprofile.gender = gender
                 userprofile.profile_pic =profile_pic
                 userprofile.linkedin_url = likedin_url
