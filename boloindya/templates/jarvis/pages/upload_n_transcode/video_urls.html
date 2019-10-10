@@ -8,6 +8,11 @@
           Your browser does not support HTML5 video.
         </video>
     </div>
+    {% if my_video.meta_keywords %}
+    <div class="thumbnail">
+        <img src="{{ my_video.thumnbnail_url }}" style="width:400px;">
+    </div>
+    {% endif %}
     <div>
         <h3>MP4 file URL</h3>
         <p class="lead" id="mp4url">{{ my_video.s3_file_url}}</p>
@@ -21,19 +26,37 @@
     {% if my_video.video_title %}
     <div>
         <h3>Video Title</h3>
-        <p class="lead" id="m3u8url">{{ my_video.video_title }}</p>
+        <p>{{ my_video.video_title }}</p>
     </div>
     {% endif %}
     {% if my_video.video_descp %}
     <div>
         <h3>Video Description</h3>
-        <p class="lead" id="m3u8url">{{ my_video.video_descp }}</p>
+        <p>{{ my_video.video_descp }}</p>
     </div>
     {% endif %}
     {% if my_video.category %}
     <div>
         <h3>Video Category</h3>
-        <p class="lead" id="m3u8url">{{ my_video.category.category_name }}</p>
+        <p>{{ my_video.category.category_name }}</p>
+    </div>
+    {% endif %}
+    {% if my_video.meta_title %}
+    <div>
+        <h3>Meta Title</h3>
+        <p>{{ my_video.meta_title }}</p>
+    </div>
+    {% endif %}
+    {% if my_video.meta_descp %}
+    <div>
+        <h3>Meta Description</h3>
+        <p>{{ my_video.meta_descp }}</p>
+    </div>
+    {% endif %}
+    {% if my_video.meta_keywords %}
+    <div>
+        <h3>Meta Keywords</h3>
+        <p>{{ my_video.meta_keywords }}</p>
     </div>
     {% endif %}
     <div>

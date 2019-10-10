@@ -29,8 +29,19 @@ class VideoUploadTranscode(models.Model):
     folder_to_upload_changed = models.CharField(_("Filename changed"),null=True,blank=True,max_length=1000)
     is_free_video = models.BooleanField(_("Is Free Video?"),default=False)
     video_title = models.CharField(_("Video Title"),null=True,blank=True,max_length=1000)
+    slug = models.SlugField(max_length=1000)
     video_descp = models.TextField(_("Video Description"),null=True,blank=True)
+    meta_title = models.CharField(_("Meta Title"),null=True,blank=True,max_length=1000)
+    meta_descp = models.TextField(_("Meta Description"),null=True,blank=True)
+    meta_keywords = models.CharField(_("Meta Keywords"),null=True,blank=True,max_length=1000)
+    thumbnail_url = models.CharField(_("Thumbnail URL"),null=True,blank=True,max_length=1000)
+    media_duration = models.CharField(_("duration"), max_length=20, default='',null=True,blank=True)
     is_active = models.BooleanField(default=True)
     
     def __unicode__(self):
         return self.filename_uploaded
+
+    def save(self, *args, **kwargs):
+        if self.video_title:
+            self.slug= slugify(self.video_title)
+        super(VideoUploadTranscode, self).save(*args, **kwargs)

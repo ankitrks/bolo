@@ -621,7 +621,7 @@ def get_video_thumbnail(video_url):
     else:
         return False
 
-# from moviepy.editor import VideoFileClip
+from moviepy.editor import VideoFileClip
 def getVideoLength(input_video):
     clip = VideoFileClip(input_video)
     dt = timedelta(seconds = int(clip.duration))

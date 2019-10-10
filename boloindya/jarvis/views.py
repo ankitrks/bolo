@@ -15,8 +15,9 @@ import string
 import random
 import os
 import hashlib
+import time
 import re
-from drf_spirit.views import get_video_thumbnail,getVideoLength
+from drf_spirit.views import getVideoLength
 from drf_spirit.utils  import calculate_encashable_details
 from forum.topic.models import Topic
 from forum.user.models import UserProfile
@@ -36,6 +37,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from .forms import VideoUploadTranscodeForm
+from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
+from django.core.files.base import ContentFile
 
 def get_bucket_details(bucket_name=None):
     bucket_credentials = {}
@@ -131,7 +134,7 @@ def geturl(request):
                         f.write(chunk)
             bucket_credentials = get_bucket_details('boloindyapp-prod')
             uploaded_url,transcode = upload_tos3(file_name,bucket_credentials['AWS_BUCKET_NAME'],'instagram')
-            thumbnail = get_video_thumbnail(file_name)
+            thumbnail = get_video_thumbnail(file_name,bucket_credentials['AWS_BUCKET_NAME'])
             media_duration = getVideoLength(file_name)
             create_vb = Topic.objects.create(title = description,language_id = language_id,category = Category.objects.get(title__icontains=category,parent__isnull = False),media_duration=media_duration,\
                 thumbnail = thumbnail,is_vb = True,view_count = random.randint(300,400),question_image = thumbnail, backup_url=uploaded_url,question_video = transcode['new_m3u8_url']\
@@ -535,7 +538,9 @@ def upload_n_transcode(request):
     free_video = request.POST.get('free_video',None)
     video_title = request.POST.get('video_title',None)
     video_descp = request.POST.get('video_descp',None)
-    print free_video,video_descp,video_title
+    meta_title = request.POST.get('meta_title',None)
+    meta_descp = request.POST.get('meta_descp',None)
+    meta_keywords = request.POST.get('meta_keywords',None)
     video_category = False
     if upload_category:
         upload_category = upload_category.strip()
@@ -576,7 +581,14 @@ def upload_n_transcode(request):
                     if chunk:
                         f.write(chunk)
 
+
             uploaded_url,transcode = upload_tos3(upload_file,upload_to_bucket,upload_folder_name)
+            thumbnail_url = get_video_thumbnail(uploaded_url,upload_to_bucket)
+            try:
+                videolength = getVideoLength(uploaded_url)
+            except:
+                videolength = ''
+            print videolength
             my_dict = {}
             my_dict['s3_file_url']=uploaded_url
             if 'job_id' in transcode:
@@ -588,14 +600,23 @@ def upload_n_transcode(request):
             my_dict['filename_changed'] = urlify(upload_file_name)
             my_dict['folder_to_upload'] = upload_folder_name
             my_dict['folder_to_upload_changed'] = urlify(upload_folder_name)
+            my_dict['thumbnail_url'] = thumbnail_url
+            my_dict['media_duration'] = videolength
             if video_category:
                 my_dict['category'] = video_category
             if free_video:
                 my_dict['is_free_video'] = True
                 my_dict['video_title'] = video_title
                 my_dict['video_descp'] = video_descp
+                my_dict['meta_title'] = meta_title
+                my_dict['meta_descp'] = meta_descp
+                my_dict['meta_keywords'] = meta_keywords
             my_upload_transcode = VideoUploadTranscode.objects.create(**my_dict)
             os.remove(urlify(upload_file_name))
+            try:
+                update_careeranna_db(my_upload_transcode)
+            except:
+                pass
 
     return HttpResponse(json.dumps({'message':'success','file_id':my_upload_transcode.id}),content_type="application/json")
 
@@ -620,7 +641,8 @@ def edit_upload(request):
         file_id = request.GET.get('id',None)
         if file_id:
             my_video = VideoUploadTranscode.objects.get(pk=file_id)
-            my_dict = {'category':my_video.category,'video_title':my_video.video_title,'video_descp':my_video.video_descp,'is_free_video':my_video.is_free_video}
+            my_dict = {'category':my_video.category,'video_title':my_video.video_title,'video_descp':my_video.video_descp,'is_free_video':my_video.is_free_video,\
+            'meta_title':my_video.meta_title,'meta_descp':my_video.meta_descp,'meta_keywords':my_video.meta_keywords}
             video_form = VideoUploadTranscodeForm(initial=my_dict)
             return render(request,'jarvis/pages/upload_n_transcode/edit_upload.html',{'my_video':my_video,'video_form':video_form})
         return render(request,'jarvis/pages/upload_n_transcode/edit_upload.html')
@@ -637,7 +659,14 @@ def edit_upload(request):
             my_video.video_title = request.POST.get('video_title','')
             my_video.video_descp = request.POST.get('video_descp','')
             my_video.category_id = request.POST.get('category',None)
+            my_video.meta_title = request.POST.get('meta_title','')
+            my_video.meta_descp = request.POST.get('meta_descp','')
+            my_video.meta_keywords = request.POST.get('meta_keywords','')
             my_video.save()
+            try:
+                update_careeranna_db(my_video)
+            except Exception as e:
+                print e
             return HttpResponse(json.dumps({'message':'success','video_id':my_video.id}),content_type="application/json")
         else:
 
@@ -650,7 +679,74 @@ def delete_upload(request):
         my_video = VideoUploadTranscode.objects.get(pk=file_id)
         my_video.is_active = False
         my_video.save()
+        try:
+            update_careeranna_db(my_video)
+        except Exception as e:
+             print e
         all_uploaded = VideoUploadTranscode.objects.filter(is_active = True)
         return render(request,'jarvis/pages/upload_n_transcode/uploaded_list.html',{'all_uploaded':all_uploaded})
+
+def get_video_thumbnail(video_url,bucket_name):
+    video = VideoCapture(video_url)
+    frames_count = int(video.get(CAP_PROP_FRAME_COUNT))
+    frame_no = frames_count*2/3
+    video.set(CAP_PROP_POS_FRAMES, frame_no)
+    success, frame = video.read()
+    if success:
+        b = imencode('.jpg', frame)[1].tostring()
+        ts = time.time()
+        virtual_thumb_file = ContentFile(b, name = "img-" + str(ts).replace(".", "")  + ".jpg" )
+        print virtual_thumb_file
+        url_thumbnail= upload_thumbail(virtual_thumb_file,bucket_name)
+        print url_thumbnail
+        # obj.thumbnail = url_thumbnail
+        # obj.media_duration = media_duration
+        # obj.save()
+        return url_thumbnail
+    else:
+        return False
+
+def upload_thumbail(virtual_thumb_file,bucket_name):
+    try:
+        bucket_credentials = get_bucket_details('careeranna')
+        client = boto3.client('s3',aws_access_key_id=bucket_credentials['AWS_ACCESS_KEY_ID'],aws_secret_access_key=bucket_credentials['AWS_SECRET_ACCESS_KEY'])
+        ts = time.time()
+        created_at = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+        final_filename = "img-" + str(ts).replace(".", "")  + ".jpg"
+        client.put_object(Bucket=bucket_credentials['AWS_BUCKET_NAME'], Key='thumbnail/' +bucket_name+"/"+final_filename, Body=virtual_thumb_file, ACL='public-read')
+        # client.resource('s3').Object(settings.BOLOINDYA_AWS_BUCKET_NAME, 'thumbnail/' + final_filename).put(Body=open(virtual_thumb_file, 'rb'))
+        filepath = "https://"+bucket_credentials['AWS_BUCKET_NAME']+".s3.amazonaws.com/thumbnail/"+bucket_name+"/"+final_filename
+        # if os.path.exists(file):
+        #     os.remove(file)
+        return filepath
+    except:
+        return None
+
+def update_careeranna_db(uploaded_video):
+    import requests
+    headers = {'X-API-TOKEN': 'your_token_here'}
+    if uploaded_video.is_active:
+        status = '1'
+    else:
+        status = '0'
+    payload = {
+        'cid': uploaded_video.category.id,
+        'cat_name' : uploaded_video.category.category_name,
+        'cat_slug' : uploaded_video.category.slug,
+        'heading' : uploaded_video.title,
+        'heading_slug' : uploaded_video.slug,
+        'description' : uploaded_video.video_descp,
+        'social_image' : uploaded_video.thumbnail_url,
+        'meta_title' : uploaded_video.meta_title,
+        'meta_descp' : uploaded_video.meta_descp,
+        'meta_keywords' : uploaded_video.meta_keywords,
+        'video_url' : uploaded_video.transcoded_file_url,
+        'backup_url' : uploaded_video.s3_file_url,
+        'status' : status,
+        'duration' : uploaded_video.media_duration
+
+    }
+    r = requests.post("https://stage.careeranna.in/search/insertOrUpdateFreeVideo", data=payload, headers=headers)
+    
 
 
