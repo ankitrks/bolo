@@ -575,7 +575,7 @@ def main():
         try:
             user_data_string = user_jarvis.dump
             user_data_dump = ast.literal_eval(user_data_string)
-            #print(user_data_dump)
+            
             #pass the collected user dump through a set of methods
             #user_statistics(user_data_dump)
             #follow_unfollow_details(user_data_dump)

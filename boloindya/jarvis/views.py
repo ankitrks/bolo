@@ -38,6 +38,9 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.http import JsonResponse
 from rest_framework import status
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.timezone import make_aware
+from datetime import timedelta
 
 def get_bucket_details(bucket_name=None):
     bucket_credentials = {}
@@ -591,7 +594,8 @@ def get_stats_data(request):
     print(mau_freq)
 
     #DAU Data
-    dau_data = DailyActiveUser.objects.all().order_by('date_time_field')
+    #Show the data of past 7 days by default
+    dau_data = DailyActiveUser.objects.all().order_by('date_time_field')[:7]
     dau_labels = []
     dau_freq = []
     for obj in dau_data:
@@ -602,20 +606,95 @@ def get_stats_data(request):
     print(dau_freq)
 
     #HAU Data
-    hau_data = HourlyActiveUser.objects.all().order_by('date_time_field')
+    date_begin = datetime.now() + timedelta(days=-1)
+    date_end = datetime.now() + timedelta(days=+1)
+
+    data = HourlyActiveUser.objects.filter(date_time_field__gte=date_begin,
+                                        date_time_field__lte=date_end).order_by('date_time_field')
+
     hau_labels = []
     hau_freq = []
-    for obj in hau_data:
-        hau_labels.append(str(obj.date_time_field.strftime("%I %p, %d %B")))
-        hau_freq.append(str(obj.frequency))
+    for hau_data in data:
+        hau_labels.append(str(hau_data.date_time_field.strftime("%I %p, %d %B")))
+        hau_freq.append(str(hau_data.frequency))            
 
     print(hau_labels)
     print(hau_freq)
 
     all_data = {'dau_labels': dau_labels, 'dau_freq': dau_freq, 'hau_labels': hau_labels, 'hau_freq': hau_freq, 'mau_freq':mau_freq, 'mau_labels':mau_labels}
-
     return JsonResponse(all_data, status=status.HTTP_200_OK)
 
+@csrf_exempt
+def get_hau_data(request):
+    if request.is_ajax():
+        raw_data = json.loads(request.body)
+        try:
+            hau_day = raw_data['hau_day']
+            print hau_day
+            hau_day_begin = hau_day + " 00:00:00"
 
+            date_begin = datetime.strptime(hau_day_begin,"%d-%m-%Y %H:%M:%S").date()
+            date_end = date_begin + timedelta(days=1)
+
+            data = HourlyActiveUser.objects.filter(date_time_field__gte=date_begin,
+                                                date_time_field__lte=date_end).order_by('date_time_field')
+
+            hau_labels = []
+            hau_freq = []
+            for obj in data:
+                hau_labels.append(str(obj.date_time_field.strftime("%I %p")))
+                hau_freq.append(str(obj.frequency))
+
+            print(hau_labels)
+            print(hau_freq)
+
+            all_data = {'hau_labels': hau_labels, 'hau_freq': hau_freq}
+            return JsonResponse(all_data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(e)
+            return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
+    else:
+        return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)        
+    
+@csrf_exempt
+def get_dau_data(request):
+    if request.is_ajax():
+        raw_data = json.loads(request.body)
+        try:
+            # hau_day = raw_data['hau_day']
+
+            dau_begin = raw_data['dau_from']
+            dau_end = raw_data['dau_to']
+
+            print(dau_begin+" "+dau_end)
+
+            begin_time = dau_begin + " 00:00:00"
+            end_time = dau_end + " 00:00:00"
+
+            begin_time_obj = datetime.strptime(begin_time,"%d-%m-%Y %H:%M:%S").date()
+            end_temp_obj = datetime.strptime(end_time,"%d-%m-%Y %H:%M:%S").date()
+            end_time_obj = end_temp_obj + timedelta(days=1)
+
+            data = DailyActiveUser.objects.filter(date_time_field__gte=begin_time_obj,
+                                                date_time_field__lte=end_temp_obj).order_by('date_time_field')
+
+            dau_labels = []
+            dau_freq = []
+            for obj in data:
+                dau_labels.append(str(obj.date_time_field.strftime("%d %B %y")))
+                dau_freq.append(str(obj.frequency))
+
+            print(dau_labels)
+            print(dau_freq)
+
+            all_data = {'dau_labels': dau_labels, 'dau_freq': dau_freq}
+            return JsonResponse(all_data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(e)
+            return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
+    else:
+        return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)  
 
 
