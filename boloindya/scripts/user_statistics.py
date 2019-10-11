@@ -409,9 +409,9 @@ def dau_mau():
             dt_month = dt_obj.month 
             dt_year = dt_obj.year 
             if((dt_day, dt_month, dt_year) in dau_dict):
-                dau_dict[(dt_day, dt_month, dt_year)]+=1
+                dau_dict[(dt_day, dt_month, dt_year)].append(user_id)
             else:
-                dau_dict[(dt_day, dt_month, dt_year)] = 1
+                dau_dict[(dt_day, dt_month, dt_year)] = [user_id]
 
         #print(len(dau_dict))        
         for key, val in dau_dict.items():               # iterating the dictonary created
@@ -419,7 +419,8 @@ def dau_mau():
             if(dt_triplet[1] == curr_dt_month or dt_triplet[1] == curr_dt_month-1):    # only put the results of the last two months(imp step)
                 name_month = month_name_list[dt_triplet[1] -1 ]
                 day_month_year_str = ""+ str(dt_triplet[0]) + " " + name_month + " " + str(dt_triplet[2])
-                freq = val
+                dist_freq = len(set(val))        # record the len of set(unique records)
+
                 #date_string = str(dt_triplet[0]) + "-" + str(dt_triplet[1]) + "-" + str(dt_triplet[2])
                 date_string = str(dt_triplet[2]) + "-" + str(dt_triplet[1]) + "-" + str(dt_triplet[0])
                 date_time_obj = dateutil.parser.parse(date_string)
@@ -428,15 +429,15 @@ def dau_mau():
                 #print(day_month_year_str, freq)
                 prev_records = DailyActiveUser.objects.filter(day_month_year = day_month_year_str).count()
                 if(prev_records!=0):
-                    user_data_obj = DailyActiveUser.objects.filter(day_month_year = day_month_year_str).update(frequency = val)
+                    user_data_obj = DailyActiveUser.objects.filter(day_month_year = day_month_year_str).update(frequency = dist_freq)
                 else:
-                    user_data_obj = DailyActiveUser(date_time_field = date_time_obj, day_month_year = day_month_year_str, frequency = freq)      # update the freq of daily active user
+                    user_data_obj = DailyActiveUser(date_time_field = date_time_obj, day_month_year = day_month_year_str, frequency = dist_freq)      # update the freq of daily active user
                     user_data_obj.save()
 
                 if(name_month in mau_dict):
-                    mau_dict[name_month]+= val 
+                    mau_dict[name_month]+= dist_freq 
                 else:
-                    mau_dict[name_month] = val     
+                    mau_dict[name_month] = dist_freq     
 
         # iterate mau dict and find the freq of users for each of th month
         for key, val in mau_dict.items():
