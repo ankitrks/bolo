@@ -615,8 +615,8 @@ def upload_n_transcode(request):
             os.remove(urlify(upload_file_name))
             try:
                 update_careeranna_db(my_upload_transcode)
-            except:
-                pass
+            except Exception as e:
+                return HttpResponse(json.dumps({'message':'fail','reason':'Could not update careeranna db'+str(e)}),content_type="application/json")
 
     return HttpResponse(json.dumps({'message':'success','file_id':my_upload_transcode.id}),content_type="application/json")
 
@@ -666,7 +666,7 @@ def edit_upload(request):
             try:
                 update_careeranna_db(my_video)
             except Exception as e:
-                print e
+                return HttpResponse(json.dumps({'message':'fail','reason':'Could not update careeranna db'+str(e)}),content_type="application/json")
             return HttpResponse(json.dumps({'message':'success','video_id':my_video.id}),content_type="application/json")
         else:
 
@@ -682,7 +682,7 @@ def delete_upload(request):
         try:
             update_careeranna_db(my_video)
         except Exception as e:
-             print e
+             return HttpResponse(json.dumps({'message':'fail','reason':'Could not update careeranna db'+str(e)}),content_type="application/json")
         all_uploaded = VideoUploadTranscode.objects.filter(is_active = True)
         return render(request,'jarvis/pages/upload_n_transcode/uploaded_list.html',{'all_uploaded':all_uploaded})
 
@@ -733,7 +733,7 @@ def update_careeranna_db(uploaded_video):
         'cid': uploaded_video.category.id,
         'cat_name' : uploaded_video.category.category_name,
         'cat_slug' : uploaded_video.category.slug,
-        'heading' : uploaded_video.title,
+        'heading' : uploaded_video.video_title,
         'heading_slug' : uploaded_video.slug,
         'description' : uploaded_video.video_descp,
         'social_image' : uploaded_video.thumbnail_url,
@@ -746,7 +746,8 @@ def update_careeranna_db(uploaded_video):
         'duration' : uploaded_video.media_duration
 
     }
-    r = requests.post("https://stage.careeranna.in/search/insertOrUpdateFreeVideo", data=payload, headers=headers)
+    reseponse_careeranna = requests.post(settings.CAREERANNA_VIDEOFILE_UPDATE_URL, data=payload, headers=headers)
+    return reseponse_careeranna
     
 
 

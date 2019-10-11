@@ -380,3 +380,5 @@ CAREERANNA_AWS_BUCKET_NAME_TS = 'elastictranscode.videos'
 REGION_HOST = 'us-east-1'
 
 PREDICTION_START_HOUR = 3
+
+CAREERANNA_VIDEOFILE_UPDATE_URL = "https://www.careeranna.com/search/insertOrUpdateFreeVideo"
