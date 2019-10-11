@@ -132,7 +132,8 @@
                 labels: data.hau_labels,
                 datasets: [{
                     label: 'Hourly Active Users',
-                    backgroundColor: 'rgb(100, 167, 255)',
+                    // backgroundColor: 'rgb(100, 167, 255)',
+                    fill: false,
                     borderColor: 'rgb(100, 167, 255)',
                     data: data.hau_freq
                 }]
@@ -153,7 +154,8 @@
                 datasets: [{
                     label: 'Daily Active Users',
                     // label: data.dau_labels
-                    backgroundColor: 'rgb(255, 99, 132)',
+                    // backgroundColor: 'rgb(255, 99, 132)',
+                    fill: false,
                     borderColor: 'rgb(255, 99, 132)',
                     data: data.dau_freq
                 }]

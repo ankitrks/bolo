@@ -595,7 +595,15 @@ def get_stats_data(request):
 
     #DAU Data
     #Show the data of past 7 days by default
-    dau_data = DailyActiveUser.objects.all().order_by('date_time_field')[:7]
+    # dau_data = DailyActiveUser.objects.all().order_by('-date_time_field')
+    today = datetime.today()
+    ago_7_days = today + timedelta(days=-8)
+
+    print(str(today)+" "+str(ago_7_days))
+
+    dau_data = DailyActiveUser.objects.filter(date_time_field__gte=ago_7_days,
+                                        date_time_field__lte=today).order_by('date_time_field')
+
     dau_labels = []
     dau_freq = []
     for obj in dau_data:
@@ -606,8 +614,9 @@ def get_stats_data(request):
     print(dau_freq)
 
     #HAU Data
-    date_begin = datetime.now() + timedelta(days=-1)
-    date_end = datetime.now() + timedelta(days=+1)
+    date_begin = datetime.today() + timedelta(days=-1)
+    date_begin.replace(hour=0, minute=0, second=0)
+    date_end = datetime.today()
 
     data = HourlyActiveUser.objects.filter(date_time_field__gte=date_begin,
                                         date_time_field__lte=date_end).order_by('date_time_field')
