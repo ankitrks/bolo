@@ -260,6 +260,9 @@ class Topic(models.Model):
                 reduce_bolo_score(self.user.id, 'create_topic_en', self, 'deleted')
             else:
                 reduce_bolo_score(self.user.id, 'create_topic', self, 'deleted')
+        else:
+            notify_owner = Notification.objects.create(for_user_id = self.user.id ,topic = self, \
+                notification_type='7', user_id = self.user.id)
         self.is_monetized = False
         self.is_removed = True
         self.save()
