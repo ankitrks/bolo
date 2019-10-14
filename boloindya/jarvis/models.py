@@ -5,6 +5,10 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.template.defaultfilters import slugify
+from fcm.models import AbstractDevice
+from django.http import JsonResponse
+
+
 
 class VideoCategory(models.Model):
     category_name = models.CharField(_('Category Name'),max_length=100,null=True,blank=True)
@@ -45,3 +49,43 @@ class VideoUploadTranscode(models.Model):
         if self.video_title:
             self.slug= slugify(self.video_title)
         super(VideoUploadTranscode, self).save(*args, **kwargs)
+
+device_options = (
+    ('1', "Android"),
+    ('2', "iOS"),
+    ('3', "Web"),
+)
+
+class FCMDevice(AbstractDevice):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='%(app_label)s_%(class)s_user',editable=False)
+    device_type = models.CharField(choices=device_options, blank = True, null = True, max_length=10, default='0')
+
+    def __unicode__(self):
+        return str(self.user)
+
+
+    def register_device(self,request):
+        try:
+            instance = FCMDevice.objects.filter(reg_id = request.POST.get('reg_id'))
+            if not len(instance):
+                raise Exception
+            if request.user:
+                instance.update(user = request.user,is_active = True,name=request.user.username,dev_id=request.POST.get('dev_id'),device_type = request.POST.get('device_type'))
+            return JsonResponse({"status":"Success"},safe = False)
+        except Exception as e:
+            if request.user:
+                instance = FCMDevice.objects.create(user = request.user,reg_id = request.POST.get('reg_id'),name=request.user.username,dev_id=request.POST.get('dev_id'),device_type = request.POST.get('device_type'))
+            else:
+                instance = FCMDevice.objects.create(reg_id = request.POST.get('reg_id'),name='Anonymous',dev_id=request.POST.get('dev_id'),device_type = request.POST.get('device_type'))
+            return JsonResponse({"status":"Success"},safe = False)
+
+
+    def remove_device(self,request):
+        try:
+            instance = FCMDevice.objects.filter(reg_id = request.POST.get('reg_id'), is_active = True, user = request.user,dev_id=request.POST.get('dev_id'))
+            if not len(instance):
+                raise Exception
+            instance.update(is_active = False)
+            return JsonResponse({"status":"Success"},safe = False)
+        except Exception as e:
+            return JsonResponse({"status":"Failed","message":"Device not found for this user"},safe = False)

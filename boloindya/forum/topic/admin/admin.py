@@ -3,8 +3,8 @@ from forum.topic.models import *
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
-from forum.topic.models import Topic, Notification, ShareTopic, CricketMatch, Poll, Choice, Voting, Leaderboard, \
-        FCMDevice, TongueTwister, BoloActionHistory
+from forum.topic.models import Topic, Notification, ShareTopic, CricketMatch, Poll, Choice, Voting, Leaderboard,\
+ TongueTwister, BoloActionHistory
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 
 class TopicResource(resources.ModelResource):
@@ -161,6 +161,5 @@ admin.site.register(ShareTopic,ShareTopicAdmin)
 admin.site.register(Voting)
 admin.site.register(Leaderboard)
 admin.site.register(VBseen)
-admin.site.register(FCMDevice)
 admin.site.register(TongueTwister)
 

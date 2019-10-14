@@ -159,6 +159,8 @@ CACHES.update({
 })
 
 FCM_APIKEY = "AIzaSyBMF3hxMosSjE-95inmJTcaR-rNEWn2zpQ"
+FCM_DEVICE_MODEL = 'jarvis.FCMDevice'
+
 
 AUTHENTICATION_BACKENDS = [
     'forum.user.auth.backends.UsernameAuthBackend',
