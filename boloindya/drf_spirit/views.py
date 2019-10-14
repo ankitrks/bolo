@@ -22,12 +22,13 @@ from .serializers import TopicSerializer, CategorySerializer, CommentSerializer,
 UserAnswerSerializerwithComment,CricketMatchSerializer,PollSerializer,ChoiceSerializer,VotingSerializer,LeaderboardSerializer,\
 PollSerializerwithChoice, OnlyChoiceSerializer, NotificationSerializer, UserProfileSerializer, TongueTwisterSerializer,KYCDocumnetsTypeSerializer,\
 PaymentCycleSerializer,EncashableDetailSerializer,PaymentInfoSerializer,UserKYCSerializer
-from forum.topic.models import Topic,ShareTopic,Like,SocialShare,FCMDevice,Notification,CricketMatch,Poll,Choice,Voting,Leaderboard,VBseen,TongueTwister
+from forum.topic.models import Topic,ShareTopic,Like,SocialShare,Notification,CricketMatch,Poll,Choice,Voting,Leaderboard,VBseen,TongueTwister
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 from forum.category.models import Category
 from forum.comment.models import Comment
 from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs
+from jarvis.models import FCMDevice
 from django.db.models import F,Q
 from rest_framework_simplejwt.tokens import RefreshToken
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
@@ -621,7 +622,7 @@ def get_video_thumbnail(video_url):
     else:
         return False
 
-# from moviepy.editor import VideoFileClip
+from moviepy.editor import VideoFileClip
 def getVideoLength(input_video):
     clip = VideoFileClip(input_video)
     dt = timedelta(seconds = int(clip.duration))

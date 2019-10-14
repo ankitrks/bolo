@@ -1,11 +1,13 @@
 {% extends "jarvis/layout/base.html" %}
 {% block content %}
 <div>
-	<div class="col-xs-12 table-responsive">
+	<div class="col-xs-12 table-responsive nowrap">
             <table class="table table-striped" id="uploaded_list">
                 <thead>
                     <tr>
                         <th>Filename Uploaded</th>
+                        <th>Action</th>
+                        <th>Category</th>
                         <th>In Folder Uploaded</th>
                         <th>S3 File URL</th>
                         <th>Trancoded URL</th>
@@ -17,6 +19,8 @@
                     {% for each_uploaded in all_uploaded %}
                     <tr>
                         <td><a href="/jarvis/upload_details/?id={{ each_uploaded.id}}"><strong>{{ each_uploaded.filename_uploaded }}</strong></a></td>
+                        <td><a href="/jarvis/edit_upload/?id={{ each_uploaded.id}}"><button style="margin:5px;" type="button" class="btn btn-primary"> <span class="glyphicon glyphicon-edit" style="margin-right:5px;"></span>Edit</button></a>    <a href="/jarvis/delete_upload/?id={{ each_uploaded.id}}"><button style="margin:5px;" type="button" class="btn btn-danger"> <span class="glyphicon glyphicon-remove" style="margin-right:5px;"></span>DELETE</button></a></td>
+                        <td>{% if each_uploaded.category %}{{ each_uploaded.category}}{% else %}Category Not Found{% endif %}</td>
                         <td>{{ each_uploaded.folder_to_upload}}</td>
                         <td>{{ each_uploaded.s3_file_url}}</td>
                         <td>{{ each_uploaded.transcoded_file_url}}</td>
