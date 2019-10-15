@@ -248,7 +248,7 @@ def video_type_details(user_data_dump):
 def video_info(user_data_dump):
     
     try:
-        if('vb_impressions' in user_data_dump):
+        if('ressions' in user_data_dump):
             if(len(user_data_dump['vb_impressions']) > 0):
                 for(a,b) in user_data_dump['vb_impressions']:
                     #datetime_format = time.strftime('%m/%d/%Y %H:%M:%S',  time.gmtime(b/1000.))
