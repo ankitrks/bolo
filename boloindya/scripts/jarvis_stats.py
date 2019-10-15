@@ -98,7 +98,7 @@ def main():
 			each_android_log_dump = ast.literal_eval(each_log.logs)
 			each_android_log_dump_id = each_log.user
 			#print(each_android_log_dump, each_android_log_dump_id) 
-			#record_duration_play(each_android_log_dump, each_android_log_dump_id)
+			record_duration_play(each_android_log_dump, each_android_log_dump_id)
 
 		except Exception as e:
 			print('Exception: 1' + str(e))
