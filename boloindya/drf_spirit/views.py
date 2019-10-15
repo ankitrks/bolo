@@ -890,7 +890,7 @@ def createTopic(request):
             topic.view_count = random.randint(1,49)
             topic.update_vb()
         else:
-            topic.view_count = random.randint(10,30)
+            topic.view_count = random.randint(1,5)
         topic.save()
         topic.m2mcategory.add(Category.objects.get(pk=category_id))
         if not is_vb:
