@@ -1,0 +1,65 @@
+{% extends "jarvis/layout/base.html" %}
+{% load push_notification_tag %}
+{% block content %}
+<style>
+    .filter_notification {
+        padding: 10px;
+    }
+    #search_title_input {
+        margin-left: 10px;
+        margin-right: 10px;
+        width: 400px;
+    }
+    .operation {
+        margin-left: 5px;
+        margin-right: 5px;
+        margin-bottom: 5px;
+    }
+</style>
+    <div class="row" style="padding: 10px;">
+        <div class="col-md-12 filter_notification">
+            <a href="/jarvis/send_notification/" class="btn btn-primary">Create New</a>
+            <input type="text" placeholder="Search Title" class="btn" id="search_title_input"/>
+            <button class="btn btn-info">Export CSV</button>
+        </div>
+        <div class="col-xs-12 table-responsive ">
+            <table class="table table-striped nowrap" id="notification_table">
+                <thead>
+                    <tr>
+                        <th>S No.</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Date</th>
+                        <th>Delivered</th>
+                        <th>Language</th>
+                        <th>User Group</th>
+                        <th>Action</th>
+                        <th>Open</th>
+                        <th>Open %</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pushNotification in pushNotifications %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ pushNotification.title }}</td>
+                            <td>{{ pushNotification.description }}</td>
+                            <td>{% if pushNotification.is_scheduled %}Scheduled at {% else %}Sent {% endif %}{{ pushNotification.scheduled_time }}</td>
+                            <td>{{ pushNotification.push_notification_id.all.count }}</td>
+                            <td>{% get_language_name pushNotification.language %}</td>
+                            <td><a href="/jarvis/particular_notification/{{pushNotification.pk}}" class="btn btn-primary"> {% get_user_group_name pushNotification.user_group %} </a></td>
+                            <td>{% if pushNotification.is_scheduled %}<a href="/jarvis/particular_notification/{{pushNotification.pk}}" class="btn btn-primary">Edit</a> <button class="btn btn-danger operation">Cancel</button>{% else %}<button class="btn btn-success operation">Re-Schedule</button>{% endif %}</td>
+                            <td>{% get_user_opened_notification pushNotification %}</td>
+                            <td></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock content %} 
+{% block center_js %}
+<script>
+    $('#notification_table').DataTable();
+</script>
+{% endblock center_js%}

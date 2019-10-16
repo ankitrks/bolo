@@ -8,7 +8,7 @@ from django.template.defaultfilters import slugify
 from fcm.models import AbstractDevice
 from django.http import JsonResponse
 
-
+from forum.topic.models import RecordTimeStamp
 
 class VideoCategory(models.Model):
     category_name = models.CharField(_('Category Name'),max_length=100,null=True,blank=True)
@@ -89,3 +89,42 @@ class FCMDevice(AbstractDevice):
             return JsonResponse({"status":"Success"},safe = False)
         except Exception as e:
             return JsonResponse({"status":"Failed","message":"Device not found for this user"},safe = False)
+
+
+language_options = (
+    ('0', "All"),
+    ('1', "English"),
+    ('2', "Hindi"),
+    ('3', "Tamil"),
+    ('4', "Telgu"),
+)
+
+user_group_options = (
+    ('0', "All"),
+)
+
+status_options = (
+    ('0', "Not Opened"),
+    ('1', "Opened"),
+)
+
+class PushNotification(RecordTimeStamp):
+
+    title = models.CharField(_('title'),max_length=100,null=True,blank=True)
+    description = models.CharField(_('description'),max_length=100,null=True,blank=True)
+    language = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='0')
+    user_group = models.CharField(choices=user_group_options, blank = True, null = True, max_length=10, default='0')
+    scheduled_time = models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False)
+    is_scheduled = models.BooleanField(default=False)
+    
+class PushNotificationUser(RecordTimeStamp):
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='push_notification_user',editable=False)
+    push_notification_id = models.ForeignKey(PushNotification, blank = True, null = True, related_name='push_notification_id',editable=False)
+    status = models.CharField(choices=status_options, blank = True, null = True, max_length=10, default='0')
+
+
+
+
+    
+    

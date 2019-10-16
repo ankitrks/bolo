@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
-from .models import VideoUploadTranscode,FCMDevice
+from .models import VideoUploadTranscode,FCMDevice, PushNotificationUser, PushNotification
 
 from functools import update_wrapper
 from django.contrib import admin
@@ -69,5 +69,7 @@ class FCMDeviceAdmin(admin.ModelAdmin):
         return redirect(url)
     send_message_action.short_description = _("Send message")
 admin.site.unregister(FCMDevice)
-admin.site.register(FCMDevice, FCMDeviceAdmin)
+admin.site.register(FCMDevice, FCMDeviceAdmin) 
+admin.site.register(PushNotification)
+admin.site.register(PushNotificationUser)
 # Register your models here.

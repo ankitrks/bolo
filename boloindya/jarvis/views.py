@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 import boto3
 from botocore.exceptions import NoCredentialsError
 from boto3.s3.transfer import S3Transfer
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 import json
 import string
 import random
@@ -20,7 +20,7 @@ import re
 from drf_spirit.views import getVideoLength
 from drf_spirit.utils  import calculate_encashable_details
 from forum.topic.models import Topic
-from forum.user.models import UserProfile
+from forum.user.models import UserProfile, ReferralCode, ReferralCodeUsed
 from forum.category.models import Category
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -31,7 +31,7 @@ from forum.payment.forms import PaymentForm,PaymentCycleForm
 from django.views.generic.edit import FormView
 from datetime import datetime
 from forum.userkyc.forms import KYCBasicInfoRejectForm,KYCDocumentRejectForm,AdditionalInfoRejectForm,BankDetailRejectForm
-from .models import VideoUploadTranscode,VideoCategory
+from .models import VideoUploadTranscode,VideoCategory, PushNotification, PushNotificationUser, language_options, user_group_options
 from forum.category.models import Category
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -39,6 +39,7 @@ from django.conf import settings
 from .forms import VideoUploadTranscodeForm
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
 from django.core.files.base import ContentFile
+from drf_spirit.serializers import UserWithUserSerializer
 
 def get_bucket_details(bucket_name=None):
     bucket_credentials = {}
@@ -750,4 +751,17 @@ def update_careeranna_db(uploaded_video):
     return reseponse_careeranna
     
 
+def notification_panel(request):
+    pushNotifications = PushNotification.objects.all().order_by('-created_at')
 
+    return render(request,'jarvis/pages/notification/index.html', {'pushNotifications': pushNotifications})
+
+def send_notification(request):
+    return render(request,'jarvis/pages/notification/send_notification.html', { 'language_options': language_options, 'user_group_options' : user_group_options })
+
+
+def particular_notification(request, notification_id=None):
+    pushNotification = PushNotification.objects.get(pk=notification_id)
+    return render(request,'jarvis/pages/notification/particular_notification.html', {'pushNotification': pushNotification})
+
+    
