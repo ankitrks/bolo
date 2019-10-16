@@ -10,14 +10,14 @@ from forum.comment.models import Comment
 def run():
     all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)
     user_ids = list(all_test_userprofile_id)
-    user_ids = random.sample(user_ids,50)
+    user_ids = random.sample(user_ids,500)
     all_test_user = User.objects.filter(pk__in =user_ids)
     action_type =['comment','like','seen','follow','share','comment_like']
     opt_action = random.choice(action_type)
     now = datetime.now()
     topic_ids = Topic.objects.filter(is_vb=True,is_removed=False).values_list('id', flat=True)
     topic_ids = list(topic_ids)
-    rand_ids = random.sample(topic_ids,50)
+    rand_ids = random.sample(topic_ids,200)
     actionable_topic = Topic.objects.filter(id__in=rand_ids)
     for each_topic in actionable_topic:
         action_type =['comment','like','follow','share','comment_like']
@@ -26,7 +26,8 @@ def run():
         if opt_action =='comment':
             action_comment(opt_action_user,each_topic)
         elif opt_action == 'like':
-            action_like(opt_action_user,each_topic)
+            if each_topic.likes_count<1000:
+                action_like(opt_action_user,each_topic)
         elif opt_action == 'follow':
             action_follow(opt_action_user,random.choice(User.objects.all()).id)
         elif opt_action == 'share':
