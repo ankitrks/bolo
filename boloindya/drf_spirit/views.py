@@ -319,6 +319,7 @@ class VBList(generics.ListCreateAPIView):
                         filter_dic[term_key]=value
                         if term_key =='user_id':
                             is_user_timeline = True
+                            self.pagination_class = LimitOffsetPagination
                         if term_key =='category':
                             m2mcategory__slug = self.request.GET.get(term_key)
             filter_dic['is_vb'] = True
