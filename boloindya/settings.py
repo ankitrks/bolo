@@ -92,6 +92,8 @@ BASE_DIR = os.path.dirname(__file__)
 #
 
 INSTALLED_APPS = [
+    # 'jet',
+    'grappelli',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -138,7 +140,6 @@ INSTALLED_APPS = [
     'django_extensions',
     'jarvis',
     'tinymce',
-    
     # 'forum.core.tests'
 ]
 
@@ -207,13 +208,6 @@ TEMPLATES = [
         },
     },
 ]
-
-
-#
-# Third-party apps settings defined below...
-#
-
-# django-djconfig
 
 INSTALLED_APPS += [
     'djconfig',

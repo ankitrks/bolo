@@ -64,6 +64,8 @@ patterns = [
 
 
 urlpatterns = [
+    # url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLS
+    url('grappelli/', include('grappelli.urls')), # grappelli URLS
 	url(r'^superman/', include(admin.site.urls)),
     url(r'^', include(patterns, namespace='spirit', app_name='forum')),
     url(r'docs/', include_docs_urls(title='Boloindya API')),

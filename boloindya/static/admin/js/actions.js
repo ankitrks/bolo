@@ -71,16 +71,16 @@
                 showClear();
             }
         });
-        $(options.allToggle).show().click(function() {
+        $(options.allToggle).show().on('click', function() {
             checker($(this).prop("checked"));
             updateCounter();
         });
-        $("a", options.acrossQuestions).click(function(event) {
+        $("a", options.acrossQuestions).on('click', function(event) {
             event.preventDefault();
             $(options.acrossInput).val(1);
             showClear();
         });
-        $("a", options.acrossClears).click(function(event) {
+        $("a", options.acrossClears).on('click', function(event) {
             event.preventDefault();
             $(options.allToggle).prop("checked", false);
             clearAcross();
@@ -88,7 +88,7 @@
             updateCounter();
         });
         lastChecked = null;
-        $(actionCheckboxes).click(function(event) {
+        $(actionCheckboxes).on('click', function(event) {
             if (!event) { event = window.event; }
             var target = event.target ? event.target : event.srcElement;
             if (lastChecked && $.data(lastChecked) !== $.data(target) && event.shiftKey === true) {
@@ -109,15 +109,15 @@
             lastChecked = target;
             updateCounter();
         });
-        $('form#changelist-form table#result_list tr').find('td:gt(0) :input').change(function() {
+        $('form#changelist-form table#result_list tr').on('change', 'td:gt(0) :input', function() {
             list_editable_changed = true;
         });
-        $('form#changelist-form button[name="index"]').click(function(event) {
+        $('form#changelist-form button[name="index"]').on('click', function(event) {
             if (list_editable_changed) {
                 return confirm(gettext("You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost."));
             }
         });
-        $('form#changelist-form input[name="_save"]').click(function(event) {
+        $('form#changelist-form input[name="_save"]').on('click', function(event) {
             var action_changed = false;
             $('select option:selected', options.actionContainer).each(function() {
                 if ($(this).val()) {
@@ -135,14 +135,15 @@
     };
     /* Setup plugin defaults */
     $.fn.actions.defaults = {
-        actionContainer: "div.actions",
-        counterContainer: "span.action-counter",
-        allContainer: "div.actions span.all",
-        acrossInput: "div.actions input.select-across",
-        acrossQuestions: "div.actions span.question",
-        acrossClears: "div.actions span.clear",
+        actionContainer: "div.grp-changelist-actions",
+        counterContainer: "li.grp-action-counter span.grp-action-counter",
+        allContainer: "div.grp-changelist-actions li.grp-all",
+        acrossInput: "div.grp-changelist-actions input.select-across",
+        acrossQuestions: "div.grp-changelist-actions li.grp-question",
+        acrossClears: "div.grp-changelist-actions li.grp-clear-selection",
         allToggle: "#action-toggle",
-        selectedClass: "selected"
+        actionSelect: "div.grp-changelist-actions select",
+        selectedClass: "grp-selected"
     };
     $(document).ready(function() {
         var $actionsEls = $('tr input.action-select');
@@ -150,4 +151,4 @@
             $actionsEls.actions();
         }
     });
-})(django.jQuery);
+})(grp.jQuery);

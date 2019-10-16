@@ -46,9 +46,10 @@ class Category(models.Model):
     objects = CategoryQuerySet.as_manager()
 
     def __unicode__(self):
-        if not self.parent:
-            return self.title
-        return self.title + ' [' + self.parent.title + ']'
+        return self.title
+        # if not self.parent:
+        #     return self.title
+        # return self.title + ' [' + self.parent.title + ']'
 
     class Meta:
         ordering = ['order_no']

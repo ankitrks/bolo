@@ -5,6 +5,9 @@ from import_export.admin import ImportExportModelAdmin
 from import_export import resources
 from forum.topic.models import Topic, Notification, ShareTopic, CricketMatch, Poll, Choice, Voting, Leaderboard,\
  TongueTwister, BoloActionHistory
+from forum.category.models import Category
+from forum.topic.models import Topic, Notification, ShareTopic, CricketMatch, Poll, Choice, Voting, Leaderboard, \
+        TongueTwister, BoloActionHistory
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 
 class TopicResource(resources.ModelResource):
@@ -15,15 +18,87 @@ class TopicResource(resources.ModelResource):
         import_id_fields = ( 'title', 'category__title','language_id','user_id')
         fields = ( 'id', 'title','user__username','category__title','media_duration','is_media','comments')
 
+from django import forms
+class TopicChangeListForm(forms.ModelForm):
+    m2mcategory = forms.ModelMultipleChoiceField(queryset=Category.objects.all(), \
+            widget=forms.CheckboxSelectMultiple, required=False)
 
-class TopicAdmin(ImportExportModelAdmin):
+from django.contrib.admin.views.main import ChangeList
+PAGE_VAR = 'p'
+ALL_VAR = 'all'
+ORDER_VAR = 'o'
+ORDER_TYPE_VAR = 'ot'
+PAGE_VAR = 'p'
+SEARCH_VAR = 'q'
+ERROR_FLAG = 'e'
+from django.contrib.admin.options import (
+    IS_POPUP_VAR, TO_FIELD_VAR, IncorrectLookupParameters,
+)
+from django.utils.translation import ugettext
+from django.utils.encoding import force_text
+class TopicChangeList(ChangeList):
+    def __init__(self, request, model, list_display, list_display_links,
+            list_filter, date_hierarchy, search_fields, list_select_related,
+            list_per_page, list_max_show_all, list_editable, model_admin):
+
+        super(TopicChangeList, self).__init__(request, model, list_display, list_display_links,
+            list_filter, date_hierarchy, search_fields, list_select_related,
+            list_per_page, list_max_show_all, list_editable, model_admin)
+
+        self.list_display = ('action_checkbox', 'id', 'title', 'name', 'duration', 'language_id', 'view_count',\
+            'comments', 'is_monetized', 'is_removed', 'date', 'm2mcategory')
+        self.list_display_links = ['id']
+        self.list_editable = ('title', 'language_id', 'm2mcategory')
+
+        self.model = model
+        self.opts = model._meta
+        self.lookup_opts = self.opts
+        self.root_queryset = model_admin.get_queryset(request)
+        self.list_filter = list_filter
+        self.date_hierarchy = date_hierarchy
+        self.search_fields = search_fields
+        self.list_select_related = list_select_related
+        self.list_per_page = list_per_page
+        self.list_max_show_all = list_max_show_all
+        self.model_admin = model_admin
+        self.preserved_filters = model_admin.get_preserved_filters(request)
+
+        # Get search parameters from the query string.
+        try:
+            self.page_num = int(request.GET.get(PAGE_VAR, 0))
+        except ValueError:
+            self.page_num = 0
+        self.show_all = ALL_VAR in request.GET
+        self.is_popup = IS_POPUP_VAR in request.GET
+        to_field = request.GET.get(TO_FIELD_VAR)
+        if to_field and not model_admin.to_field_allowed(request, to_field):
+            raise DisallowedModelAdminToField("The field %s cannot be referenced." % to_field)
+        self.to_field = to_field
+        self.params = dict(request.GET.items())
+        if PAGE_VAR in self.params:
+            del self.params[PAGE_VAR]
+        if ERROR_FLAG in self.params:
+            del self.params[ERROR_FLAG]
+
+        self.query = request.GET.get(SEARCH_VAR, '')
+        self.queryset = self.get_queryset(request)
+        self.get_results(request)
+        if self.is_popup:
+            title = ugettext('Select %s')
+        else:
+            title = ugettext('Select %s to change')
+        self.title = title % force_text(self.opts.verbose_name)
+        self.pk_attname = self.lookup_opts.pk.attname
+        
+class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExportModelAdmin" NOT "admin.ModelAdmin"
     ordering = ['is_vb', '-id']
     search_fields = ('title', 'user__username', 'user__st__name')
-    list_filter = ('language_id','date', ('date', DateRangeFilter), 'is_removed', 'is_monetized', 'm2mcategory')
-    list_display = ('id', 'title', 'name', 'duration', 'language_id', 'is_monetized', 'comments', 'is_removed', 'date')
-    list_editable = ('title', 'language_id')
+    list_filter = (('date', DateRangeFilter), 'date', 'language_id', 'm2mcategory', 'is_monetized', 'is_removed')
     filter_horizontal = ('m2mcategory', )
-    resource_class = TopicResource
+    # resource_class = TopicResource
+    # list_filter = ('language_id','date', ('date', DateRangeFilter), 'm2mcategory', 'is_monetized', 'is_removed')
+    # list_display = ('id', 'title', 'name', 'duration', 'language_id', 'view_count', 'comments', 'date')
+    # list_editable = ('title', 'language_id')
 
     fieldsets = (
         (None, {
@@ -41,6 +116,22 @@ class TopicAdmin(ImportExportModelAdmin):
                         'transcode_dump', 'transcode_status_dump'),
         }),
     )
+
+    def get_changelist(self, request, **kwargs):
+        return TopicChangeList
+
+    def get_changelist_form(self, request, **kwargs):
+        return TopicChangeListForm
+
+    def duration(self, obj):
+        return obj.duration()
+    duration.short_description = "duration"
+    duration.admin_order_field = 'media_duration'
+
+    def comments(self, obj):
+        return obj.comments()
+    comments.short_description = "comments"
+    comments.admin_order_field = 'comment_count'
 
     actions = ['remove_selected', 'remove_from_monetization', 'restore_selected', 'add_monetization']
     def remove_selected(self, request, queryset):
@@ -66,12 +157,6 @@ class TopicAdmin(ImportExportModelAdmin):
             if not each_obj.is_monetized:
                 each_obj.add_monetization()
     add_monetization.short_description = "Restore & Add to Monetization!"
-
-    # def remove_from_monetization(self, request, queryset):
-    #     for each_obj in queryset:
-    #         if each_obj.is_monetized:
-    #             each_obj.no_monetization()
-    # remove_from_monetization.short_description = "Remove from Monetization!"
 
     def get_actions(self, request):
         actions = super(TopicAdmin, self).get_actions(request)
