@@ -41,6 +41,7 @@ def run():
                 action_comment_like(opt_action_user,each_comment)
     last_n_days_post = Topic.objects.filter(is_vb=True,is_removed=False,date__gte=now-timedelta(days=3))
     for each_like in last_n_days_post:
+        each_like = random.choice(list(last_n_days_post))
         if each_like.date +timedelta(minutes=10) >= now:
             number_like = random.randrange(6,100)
         elif each_like.date +timedelta(minutes=10) <= now and each_like.date +timedelta(minutes=30) >= now and each_like.view_count > 200 and each_like.likes_count < 200:
@@ -70,6 +71,7 @@ def run():
             i += 1
 
     for each_seen in last_n_days_post:
+        each_seen = random.choice(list(last_n_days_post))
         if each_seen.date +timedelta(minutes=10) >= now:
             number_seen = random.randrange(6,100)
         elif each_seen.date +timedelta(minutes=10) <= now and each_seen.date +timedelta(minutes=30) >= now and each_seen.view_count < 1000:
@@ -137,7 +139,6 @@ def action_comment(user,topic):
 #like
 def action_like(user,topic):
     liked,is_created = Like.objects.get_or_create(topic = topic ,user = user)
-    print is_created
     if is_created:
         topic.likes_count = F('likes_count')+1
         topic.save()
