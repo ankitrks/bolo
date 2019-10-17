@@ -39,8 +39,37 @@ def run():
             all_comment = Comment.objects.filter(pk__in =user_ids)
             for each_comment in all_comment:
                 action_comment_like(opt_action_user,each_comment)
-    seen_topic = Topic.objects.filter(is_vb=True,is_removed=False,date__gte=now-timedelta(days=3))
-    for each_seen in seen_topic:
+    last_n_days_post = Topic.objects.filter(is_vb=True,is_removed=False,date__gte=now-timedelta(days=30))
+    for each_like in last_n_days_post:
+        if each_like.date +timedelta(minutes=10) >= now:
+            number_like = random.randrange(6,100)
+        elif each_like.date +timedelta(minutes=10) <= now and each_like.date +timedelta(minutes=30) >= now and each_like.likes_count < 200:
+            number_like = random.randrange(100,200-each_like.likes_count)
+        elif each_like.date +timedelta(minutes=30) <= now and each_like.date +timedelta(hours=2) >= now and each_like.likes_count < 300:
+            number_like = random.randrange(1,300-each_like.likes_count)
+        elif each_like.date +timedelta(hours=2) <= now and each_like.date +timedelta(hours=4) >= now and each_like.likes_count < 400:
+            number_like = random.randrange(1,400-each_like.likes_count)
+        elif each_like.date +timedelta(hours=4) <= now and each_like.date +timedelta(hours=6) >= now and each_like.likes_count < 500:
+            number_like = random.randrange(1,500-each_like.likes_count)
+        elif each_like.date +timedelta(hours=6) <= now and each_like.date +timedelta(hours=8) >= now and each_like.likes_count < 600:
+            number_like = random.randrange(1,600-each_like.likes_count)
+        elif each_like.date +timedelta(hours=10) <= now and each_like.date +timedelta(hours=12) >= now and each_like.likes_count < 700:
+            number_like = random.randrange(1,700-each_like.likes_count)
+        elif each_like.date +timedelta(hours=12) <= now and each_like.date +timedelta(hours=14) >= now and each_like.likes_count < 800:
+            number_like = random.randrange(1,800-each_like.likes_count)
+        elif each_like.date +timedelta(hours=14) <= now and each_like.date +timedelta(hours=16) >= now and each_like.likes_count < 900:
+            number_like = random.randrange(1,900-each_like.likes_count)
+        elif each_like.date +timedelta(hours=16) <= now and each_like.date +timedelta(hours=18) >= now and each_like.likes_count < 1000:
+            number_like = random.randrange(1,1000-each_like.likes_count)
+        else:
+            number_like = 1
+        i = 0
+        while i < number_like:
+            opt_action_user = random.choice(list(all_test_user))
+            action_like(opt_action_user,each_like)
+            i += 1
+
+    for each_seen in last_n_days_post:
         if each_seen.date +timedelta(minutes=10) >= now:
             number_seen = random.randrange(6,100)
         elif each_seen.date +timedelta(minutes=10) <= now and each_seen.date +timedelta(minutes=30) >= now and each_seen.view_count < 1000:
@@ -108,6 +137,7 @@ def action_comment(user,topic):
 #like
 def action_like(user,topic):
     liked,is_created = Like.objects.get_or_create(topic = topic ,user = user)
+    print is_created
     if is_created:
         topic.likes_count = F('likes_count')+1
         topic.save()
