@@ -139,8 +139,10 @@ def action_comment(user,topic):
 
 #like
 def action_like(user,topic):
-    liked,is_created = Like.objects.get_or_create(topic = topic ,user = user)
-    if is_created:
+    try:
+        liked = Like.objects.get(topic = topic ,user = user)
+    except:
+        liked = Like.objects.create(topic = topic ,user = user)
         topic.likes_count = F('likes_count')+1
         topic.save()
         userprofile = UserProfile.objects.get(user = user.id)
