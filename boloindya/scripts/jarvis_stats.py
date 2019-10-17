@@ -1,6 +1,6 @@
 
-from forum.user.models import AndroidLogs, VideoPlaytime, VideoCompleteRate
-from drf_spirit.models import UserJarvisDump, UserLogStatistics
+from forum.user.models import AndroidLogs, VideoPlaytime, VideoCompleteRate, UserAppTimeSpend
+from drf_spirit.models import UserJarvisDump, UserLogStatistics, ActivityTimeSpend
 from forum.topic.models import Topic
 import time
 import ast 
@@ -67,7 +67,7 @@ def parse_duration(time):
 
 
 
-# model responsible for finding the completetion rate of videos
+# func responsible for finding the completetion rate of videos
 def calculate_completetion_rate():
 
 	video_records = VideoPlaytime.objects.all()
@@ -89,6 +89,26 @@ def calculate_completetion_rate():
 		user_data_obj.save()		
 
 
+# func responsible for finding the time spend by the user across various activities
+def app_activity_time_spend():
+
+	user_records = ActivityTimeSpend.objects.all()
+	for each_record in user_records:
+		user_id = each_record.user 
+		fragment_id = each_record.fragmentid 
+		user_activity_records = ActivityTimeSpend.objects.filter(user = user_id)
+		tot_time = 0
+		for each_activity_record in user_activity_records:
+			tot_time+= each_activity_record.time_spent 
+
+		existing_records = UserAppTimeSpend.objects.filter(user = user_id, total_time = tot_time).count()
+		if(existing_records!=0):
+			UserAppTimeSpend.objects.filter(user = user_id).update(total_time = tot_time)
+		else:		
+			user_data_obj = UserAppTimeSpend(user = user_id, total_time = tot_time)
+			user_data_obj.save()
+
+
 
 def main():
 	
@@ -103,7 +123,8 @@ def main():
 		except Exception as e:
 			print('Exception: 1' + str(e))
 
-	calculate_completetion_rate()			
+	#calculate_completetion_rate()			
+	app_activity_time_spend()
 
 
 def run():
