@@ -41,8 +41,9 @@
       <h1>Active User Statistics</h1>
   </div>
   
+  <!-- Daily active users template -->
   <div class="row">
-    <div style="text-align: center;"  class="col-6 col-xl-6 col-md-12 col--12">
+    <div style="text-align: center;"  class="col-6 col-xl-6 col-md-12 col-sm-12">
       <h2>Daily Active Users</h2>
       <span>From:</span><input type="text" id="datepicker_1" readonly="readonly">
       <span>To:</span><input type="text" id="datepicker_2" readonly="readonly">
@@ -50,18 +51,44 @@
       <canvas id="chart_dau"></canvas>    
     </div>
 
-    <div style="text-align: center;"  class="col-6 col-xl-6 col-md-12 col-md-12">
+  <!-- Monthly active users template -->
+    <div style="text-align: center;"  class="col-6 col-xl-6 col-md-12 col-sm-12">
       <h2>Monthly Active Users</h2>
       <canvas id="chart_mau"></canvas>    
     </div>
+  </div>  
 
-    <div style="text-align: center;"  class="col-6 col-xl-6 col-md-12 col-md-12">
+  <!-- Hourly active users template -->
+  <br><br><br>
+  <div class="row">
+    <div style="text-align: center;"  class="col-6 col-xl-6 col-md-12 col-sm-12">
       <h2>Hourly Active Users</h2>
       <span>Select day:</span><input type="text" id="datepicker_3" readonly="readonly">
       <button onclick="hau_click_ok()" type="button" id="filter_day_btn">Ok</button>
       <canvas id="chart_hau"></canvas>    
     </div>    
+  </div>
 
+  <!-- Installs template -->
+  <br>
+  <div class="row">
+    <div style="text-align: center;" class="col-6 col-xl-6 col-md-12 col-sm-12">
+      <h2>Installs</h2>
+      <span>From:</span><input type="text" id="datepicker_4" readonly="readonly">
+      <span>To:</span><input type="text" id="datepicker_5" readonly="readonly">
+      <br><br>
+      <span>Campaign: </span>
+      <select id="selected_campaign" name="Campaign_select">
+        <option value="-1" selected="selected">All Campaigns</option>
+
+        {% for campaign in campaigns_list %}
+          <option value="{{ campaign.id }}">{{campaign.code}} - {{campaign.purpose}}</option>  
+        {% endfor %}
+
+      </select>
+      <button onclick="installs_click_ok()" type="button" id="filter_install_btn">Ok</button>
+      <canvas id="chart_installs"></canvas>    
+    </div>
   </div>
 
   <!-- jQuery 3 -->
@@ -77,9 +104,12 @@
 
   <script type="text/javascript">
 
-      var chart_dau = document.getElementById('chart_dau').getContext('2d');
-      var chart_mau = document.getElementById('chart_mau').getContext('2d');
-      var chart_hau = document.getElementById('chart_hau').getContext('2d');
+      var chart_dau_ctx = document.getElementById('chart_dau').getContext('2d');
+      var chart_mau_ctx = document.getElementById('chart_mau').getContext('2d');
+      var chart_hau_ctx = document.getElementById('chart_hau').getContext('2d');
+      var chart_installs_ctx = document.getElementById('chart_installs').getContext('2d');
+      
+      var chart_dau, chart_mau, chart_hau, chart_installs;
 
       $( document ).ready(function() {
         getStatsData();
@@ -97,15 +127,22 @@
         });
       }
 
+      //***** CHART SETTING FUNCTIONS ******
       function setCharts(data){
           console.log(data);
 
           setDAUChart(data)
-          // setMAUChart()
+          setMAUChart(data)
           setHAUChart(data)
+          setInstallsChart(data)
+      }
 
-          //****** Setting MAU chart
-          var chart = new Chart(chart_mau, {
+      function setMAUChart(data){
+        //****** Setting MAU chart
+          if(chart_mau != undefined && chart_mau != null){
+             chart_mau.destroy(); 
+          }
+          chart_mau = new Chart(chart_mau_ctx, {
             type: 'line',
 
             data: {
@@ -124,8 +161,12 @@
       }
 
       function setHAUChart(data){
+        if(chart_hau != undefined && chart_hau != null){
+          chart_hau.destroy();  
+        }
+        
           //****** Setting HAU chart
-          var chart = new Chart(chart_hau, {
+          chart_hau = new Chart(chart_hau_ctx, {
             type: 'line',
 
             data: {
@@ -144,8 +185,11 @@
       }
 
       function setDAUChart(data){
+        if(chart_dau != undefined && chart_dau != null){
+          chart_dau.destroy();  
+        }
         //******** Setting DAU Chart
-        var chart = new Chart(chart_dau, {
+        chart_dau = new Chart(chart_dau_ctx, {
             type: 'line',
 
             data: {
@@ -158,6 +202,38 @@
                     fill: false,
                     borderColor: 'rgb(255, 99, 132)',
                     data: data.dau_freq
+                }]
+            },
+
+            options: {}
+          }); 
+      }
+
+      function setInstallsChart(data){
+        if(chart_installs != undefined && chart_installs != null){
+          chart_installs.destroy();  
+        }
+        //******** Setting DAU Chart
+        console.log(data)
+
+        installs_labels = []
+        installs_freq = []
+
+        if(data.all_data != undefined){
+            installs_labels = data.all_data.installs_labels;
+            installs_freq = data.all_data.installs_freq;
+        }
+
+        chart_installs = new Chart(chart_installs_ctx, {
+            type: 'line',
+
+            data: {
+                labels: installs_labels,
+                datasets: [{
+                    label: 'Installs',
+                    fill: false,
+                    borderColor: 'rgb(109, 255, 69)',
+                    data: installs_freq
                 }]
             },
 
@@ -182,6 +258,8 @@
       }
   </script>
 
+  <!-- ****** DATA FETCHING FUNCTIONS -->
+
   <script>
     var dau_from, dau_to, hau_day;
      $(function() {
@@ -190,6 +268,10 @@
         dau_to = $("#datepicker_2" )
             .datepicker({ format: 'dd-mm-yyyy'});
         hau_day = $("#datepicker_3")
+            .datepicker({ format: 'dd-mm-yyyy'});
+        installs_from = $("#datepicker_4")
+            .datepicker({ format: 'dd-mm-yyyy'});
+        installs_to = $("#datepicker_5")
             .datepicker({ format: 'dd-mm-yyyy'});
      });
 
@@ -228,6 +310,29 @@
         });
 
      }
+
+     var installs_from, installs_to;
+
+     function installs_click_ok() {
+        var selected_campaign = $("#selected_campaign").val()
+        console.log(installs_from.val()+" "+installs_to.val()+" "+selected_campaign)
+
+        $.ajax({
+            headers: { "X-CSRFToken": getCookie("csrftoken") },
+            url: "/jarvis/get_installs_data/",
+            type: "POST",
+            contentType : 'application/json',
+            data: JSON.stringify({
+             'installs_from': installs_from.val(),
+             'installs_to': installs_to.val(),
+             'campaign' : selected_campaign
+            }),
+            success: function (data) {
+                setInstallsChart(data)
+            }
+        });
+     }
+
   </script>
 
 </section>

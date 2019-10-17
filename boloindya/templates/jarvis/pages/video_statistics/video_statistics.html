@@ -1,0 +1,232 @@
+{% extends "jarvis/layout/base.html" %}
+
+{% block styles %}
+<style>
+    #overlay {
+        position: fixed;
+        /* Sit on top of the page content */
+        display: none;
+        /* Hidden by default */
+        width: 100%;
+        /* Full width (cover the whole page) */
+        height: 100%;
+        /* Full height (cover the whole page) */
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        /* Black background with opacity */
+        z-index: 2;
+        /* Specify a stack order in case you're using a different order for other elements */
+        cursor: pointer;
+        /* Add a pointer on hover */
+    }
+
+    .percentcomplete {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        color: white;
+        transform: translate(-50%, -50%);
+    }
+</style>
+{% endblock styles %}
+
+
+{% block content %}
+{% load staticfiles %}
+
+<section>
+    <div style="text-align: center;">
+        <h1>Video Statistics</h1>
+    </div>
+
+    <!-- Daily active users template -->
+    <div class="row">
+        <div style="text-align: center;" class="col-6 col-xl-6 col-md-12 col-sm-12">
+            <h2>Daily Video Impressions</h2>
+            <span>From:</span><input type="text" id="dp_impr_from" readonly="readonly">
+            <span>To:</span><input type="text" id="dp_impr_to" readonly="readonly">
+            <button onclick="impr_click_ok()" type="button" id="filter_date_btn">Ok</button>
+            <canvas id="chart_impr"></canvas>
+        </div>
+
+        <div class="col-6 col-xl-6 col-md-12 col-sm-12">
+            <h2>Top 10 Videos (By Impressions)</h2>
+            <span>Select day:</span><input type="text" id="dp_top_impr" readonly="readonly">
+            <button onclick="top_impr_click_ok()" type="button" id="filter_day_btn">Ok</button>
+            <canvas id="chart_top_impr_vids"></canvas>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                            <th>Total Impressions</th>
+                            <th>Video Name</th>
+                            <th>User name</th>
+                    </tr>
+                </thead>
+
+                <tbody id="top_impr_table">
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- jQuery 3 -->
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
+
+    <!-- Bootstrap 3.3.7 -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <!-- ChartJS -->
+    <script type="text/javascript" src="{% static 'js/Chart.min.js' %}"></script>
+
+    <script type="text/javascript">
+        var chart_impr_ctx = document.getElementById('chart_impr').getContext('2d');
+        var chart_top_impr_vids_ctx = document.getElementById('chart_top_impr_vids').getContext('2d');
+
+        var chart_impr, chart_top_impr_vids;
+
+        //***** CHART SETTING FUNCTIONS ******
+
+        function setImpressionsChart(data) {
+            if (chart_impr != undefined && chart_impr != null) {
+                chart_impr.destroy();
+            }
+
+            console.log(data)
+            //******** Setting DAU Chart
+            chart_impr = new Chart(chart_impr_ctx, {
+                type: 'line',
+
+                data: {
+                    labels: data.impr_labels,
+                    datasets: [{
+                        label: 'Video Impressions',
+                        fill: false,
+                        borderColor: 'rgb(213, 56, 255)',
+                        data: data.impr_freq
+                    }]
+                },
+
+                options: {}
+            });
+        }
+
+        function setTopImpVideosChart(data) {
+            if (chart_top_impr_vids != undefined && chart_top_impr_vids != null) {
+                chart_top_impr_vids.destroy();
+            }
+
+            $("#top_impr_table tr").remove(); 
+
+            console.log(data)
+            console.log(data.vid_all_info)
+
+            for(item in data.vid_all_info){
+                var top_impr_table = document.getElementById('top_impr_table');
+                var newRow = top_impr_table.insertRow(-1);
+                var cell_impr = newRow.insertCell(0);
+                var cell_vid_name = newRow.insertCell(1);
+                var cell_user_name=newRow.insertCell(2);
+
+                cell_impr.innerHTML = data.vid_all_info[item]['impressions'];
+                cell_vid_name.innerHTML = data.vid_all_info[item]['title'];
+                cell_user_name.innerHTML = data.vid_all_info[item]['user__username'];
+            }
+
+            //******** Setting DAU Chart
+            // chart_top_impr_vids = new Chart(chart_top_impr_vids_ctx, {
+            //     type: 'bar',
+
+            //     data: {
+            //         // labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+            //         labels: data.top_impr_labels,
+            //         datasets: [{
+            //             label: 'Video Impressions',
+            //             fill: false,
+            //             backgroundColor: 'rgb(255, 216, 56)',
+            //             borderColor: 'rgb(255, 216, 56)',
+            //             data: data.top_impr_freq
+            //         }]
+            //     },
+
+            //     options: {}
+            // });
+        }
+
+        //****** DATA FETCHING FUNCTIONS
+
+        var impr_from, impr_to, top_impr_date;
+        $(function () {
+            impr_from = $("#dp_impr_from")
+                .datepicker({
+                    format: 'dd-mm-yyyy'
+                });
+            impr_to = $("#dp_impr_to")
+                .datepicker({
+                    format: 'dd-mm-yyyy'
+                });
+            top_impr_date = $("#dp_top_impr")
+                .datepicker({
+                    format: 'dd-mm-yyyy'
+                });
+        });
+
+        function getCookie(c_name) {
+            if (document.cookie.length > 0) {
+                c_start = document.cookie.indexOf(c_name + "=");
+                if (c_start != -1) {
+                    c_start = c_start + c_name.length + 1;
+                    c_end = document.cookie.indexOf(";", c_start);
+                    if (c_end == -1) c_end = document.cookie.length;
+                    return unescape(document.cookie.substring(c_start, c_end));
+                }
+            }
+            return "";
+        }
+
+        function impr_click_ok() {
+            console.log(impr_from.val() + " " + impr_to.val())
+
+            $.ajax({
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken")
+                },
+                url: "/jarvis/get_impr_data/",
+                type: "POST",
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    'impr_from': impr_from.val(),
+                    'impr_to': impr_to.val()
+                }),
+                success: function (data) {
+                    setImpressionsChart(data)
+                }
+            });
+        }
+
+        function top_impr_click_ok() {
+            console.log(top_impr_date.val())
+
+            $.ajax({
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken")
+                },
+                url: "/jarvis/get_top_impr/",
+                type: "POST",
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    'date': top_impr_date.val()
+                }),
+                success: function (data) {
+                    setTopImpVideosChart(data)
+                }
+            });
+        }
+    </script>
+
+</section>
+{% endblock content %}
