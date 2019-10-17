@@ -20,13 +20,13 @@ def run():
     rand_ids = random.sample(topic_ids,200)
     actionable_topic = Topic.objects.filter(id__in=rand_ids)
     for each_topic in actionable_topic:
-        action_type =['comment','like','follow','share','comment_like']
+        action_type =['seen','comment','like','follow','share','comment_like']
         opt_action = random.choice(action_type)
         opt_action_user = random.choice(list(all_test_user))
         if opt_action =='comment':
             action_comment(opt_action_user,each_topic)
         elif opt_action == 'like':
-            if each_topic.likes_count<1000:
+            if each_topic.likes_count<1000 and each_topic.likes_count < each_topic.view_count:
                 action_like(opt_action_user,each_topic)
         elif opt_action == 'follow':
             action_follow(opt_action_user,random.choice(User.objects.all()).id)
@@ -39,6 +39,8 @@ def run():
             all_comment = Comment.objects.filter(pk__in =user_ids)
             for each_comment in all_comment:
                 action_comment_like(opt_action_user,each_comment)
+        elif opt_action == 'seen':
+            action_seen(opt_action_user.id,each_seen)
     last_n_days_post = Topic.objects.filter(is_vb=True,is_removed=False,date__gte=now-timedelta(days=3))
     for each_like in last_n_days_post:
         each_like = random.choice(list(last_n_days_post))
