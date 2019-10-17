@@ -40,10 +40,9 @@ def run():
             for each_comment in all_comment:
                 action_comment_like(opt_action_user,each_comment)
         elif opt_action == 'seen':
-            action_seen(opt_action_user.id,each_seen)
-    last_n_days_post = Topic.objects.filter(is_vb=True,is_removed=False,date__gte=now-timedelta(days=3))
+            action_seen(opt_action_user.id,each_topic)
+    last_n_days_post = Topic.objects.filter(is_vb=True,is_removed=False,date__gte=now-timedelta(days=3)).order_by('-date')
     for each_like in last_n_days_post:
-        each_like = random.choice(list(last_n_days_post))
         if each_like.date +timedelta(minutes=10) >= now:
             number_like = random.randrange(6,100)
         elif each_like.date +timedelta(minutes=10) <= now and each_like.date +timedelta(minutes=30) >= now and each_like.view_count/10 > 200 and each_like.likes_count < 200:
@@ -73,7 +72,6 @@ def run():
             i += 1
 
     for each_seen in last_n_days_post:
-        each_seen = random.choice(list(last_n_days_post))
         if each_seen.date +timedelta(minutes=10) >= now:
             number_seen = random.randrange(6,100)
         elif each_seen.date +timedelta(minutes=10) <= now and each_seen.date +timedelta(minutes=30) >= now and each_seen.view_count < 1000:
