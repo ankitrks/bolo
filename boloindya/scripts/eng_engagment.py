@@ -40,7 +40,7 @@ def run():
             for each_comment in all_comment:
                 action_comment_like(opt_action_user,each_comment)
         elif opt_action == 'seen':
-            action_seen(opt_action_user.id,each_seen)
+            action_seen(opt_action_user.id,each_topic)
     last_n_days_post = Topic.objects.filter(is_vb=True,is_removed=False,date__gte=now-timedelta(days=3)).order_by('-date')
     for each_like in last_n_days_post:
         if each_like.date +timedelta(minutes=10) >= now:
