@@ -173,6 +173,12 @@ class VideoCompleteRate(models.Model):
     playtime = models.PositiveIntegerField(_("playtime"), default = 0, editable = False)
     percentage_viewed = models.DecimalField(_("percentage_viewed"), max_digits = 5, decimal_places = 2)
 
+# class storing the total time spend by the user on the app
+class UserAppTimeSpend(models.Model):
+
+    user = models.CharField(_("user"), null = True, blank = False, max_length = 250, db_index = True)
+    total_time = models.PositiveIntegerField(_("totaltime"), default = 0, editable = False)
+
 
 class AppVersion(RecordTimeStamp):
     app_name = models.CharField(_("Name"), max_length=100, blank=True)
