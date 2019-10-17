@@ -39,7 +39,7 @@ def run():
             all_comment = Comment.objects.filter(pk__in =user_ids)
             for each_comment in all_comment:
                 action_comment_like(opt_action_user,each_comment)
-    last_n_days_post = Topic.objects.filter(is_vb=True,is_removed=False,date__gte=now-timedelta(days=30))
+    last_n_days_post = Topic.objects.filter(is_vb=True,is_removed=False,date__gte=now-timedelta(days=3))
     for each_like in last_n_days_post:
         if each_like.date +timedelta(minutes=10) >= now:
             number_like = random.randrange(6,100)
@@ -59,7 +59,7 @@ def run():
             number_like = random.randrange(1,800-each_like.likes_count)
         elif each_like.date +timedelta(hours=14) <= now and each_like.date +timedelta(hours=16) >= now and each_like.likes_count < 900:
             number_like = random.randrange(1,900-each_like.likes_count)
-        elif each_like.date +timedelta(hours=16) <= now and each_like.date +timedelta(hours=18) >= now and each_like.likes_count < 1000:
+        elif each_like.date +timedelta(hours=16) <= now and each_like.date +timedelta(hours=72) >= now and each_like.likes_count < 1000:
             number_like = random.randrange(1,1000-each_like.likes_count)
         else:
             number_like = 1
