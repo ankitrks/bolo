@@ -177,7 +177,7 @@ class VideoCompleteRate(models.Model):
 class UserAppTimeSpend(models.Model):
 
     user = models.CharField(_("user"), null = True, blank = False, max_length = 250, db_index = True)
-    total_time = models.PositiveIntegerField(_("totaltime"), default = 0, editable = False)
+    total_time = models.DecimalField(_("totaltime"), max_digits = 5, decimal_places = 2)
 
 
 class AppVersion(RecordTimeStamp):
