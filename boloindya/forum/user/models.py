@@ -163,6 +163,7 @@ class VideoPlaytime(models.Model):
     user = models.CharField(_("user"), null = True, blank = True, max_length = 250, db_index = True)
     videoid = models.CharField(_("videoid"), null = True, blank = True, max_length = 250, db_index = True)
     playtime = models.PositiveIntegerField(_("playtime"), default=0, editable = False)
+    timestamp = models.DateTimeField(_("timestamp"), null = True, blank = False)
 
 # class recording the fraction of videos played
 class VideoCompleteRate(models.Model):
@@ -172,6 +173,7 @@ class VideoCompleteRate(models.Model):
     duration = models.PositiveIntegerField(_("duration"), default = 0, editable = False)
     playtime = models.PositiveIntegerField(_("playtime"), default = 0, editable = False)
     percentage_viewed = models.DecimalField(_("percentage_viewed"), max_digits = 5, decimal_places = 2)
+    timestamp = models.DateTimeField(_("timestamp"), null = True, blank = False)
 
 # class storing the total time spend by the user on the app
 class UserAppTimeSpend(models.Model):
