@@ -19,7 +19,7 @@ import time
 import re
 from drf_spirit.views import getVideoLength
 from drf_spirit.utils  import calculate_encashable_details
-from forum.topic.models import Topic
+from forum.topic.models import Topic, VBseen
 from forum.user.models import UserProfile, ReferralCode, ReferralCodeUsed
 from forum.category.models import Category
 from django.contrib.auth.models import User
@@ -31,7 +31,7 @@ from forum.payment.forms import PaymentForm,PaymentCycleForm
 from django.views.generic.edit import FormView
 from datetime import datetime
 from forum.userkyc.forms import KYCBasicInfoRejectForm,KYCDocumentRejectForm,AdditionalInfoRejectForm,BankDetailRejectForm
-from .models import VideoUploadTranscode,VideoCategory, PushNotification, PushNotificationUser, language_options, user_group_options
+from .models import VideoUploadTranscode,VideoCategory, PushNotification, PushNotificationUser, language_options, user_group_options, FCMDevice
 from forum.category.models import Category
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -756,7 +756,53 @@ def notification_panel(request):
 
     return render(request,'jarvis/pages/notification/index.html', {'pushNotifications': pushNotifications})
 
+from django.db.models import Q
+from drf_spirit.models import UserLogStatistics
+import datetime
+
 def send_notification(request):
+
+    if request.method == 'POST':
+        title = request.POST.get('title', "")
+        upper_title = request.POST.get('upper_title', "")
+        id = request.POST.get('id', "")
+        user_group = request.POST.get('user_group', "")
+        lang = request.POST.get('lang', "")
+
+        if user_group == '1':
+            vBseen = VBseen.objects.all().distinct('user__pk').values_list('user__pk', flat=True)
+            device = FCMDevice.objects.filter(~Q(user__pk__in=vBseen), user__st__language=lang)
+            print(device)
+        elif user_group == '2':
+            time_24_hours_ago = datetime.datetime.now() - datetime.timedelta(days=1)
+            userLogStatistics = UserLogStatistics.objects.filter(session_starttime__gte=time_24_hours_ago).values_list('user', flat=True)
+            userLogStatistics = map(int , userLogStatistics)
+            device = FCMDevice.objects.filter(~Q(user__pk__in=userLogStatistics), user__st__language=lang)
+            print(device)
+        elif user_group == '3':
+            time_24_hours_ago = datetime.datetime.now() - datetime.timedelta(days=2)
+            userLogStatistics = UserLogStatistics.objects.filter(session_starttime__gte=time_24_hours_ago).values_list('user', flat=True)
+            userLogStatistics = map(int , userLogStatistics)
+            device = FCMDevice.objects.filter(~Q(user__pk__in=userLogStatistics), user__st__language=lang)
+            print(device)
+        elif user_group == '4':
+            topic = Topic.objects.filter(is_vb=True).values_list('user__pk', flat=True)
+            device = FCMDevice.objects.filter(~Q(user__pk__in=topic), user__st__language=lang)
+            print(device)
+        else:        
+            pushNotification = PushNotification()
+            pushNotification.title = upper_title
+            pushNotification.description = title
+            pushNotification.language = lang
+            pushNotification.notification_type = notification_type
+            pushNotification.user_group = user_group
+            pushNotification.instance_id = id
+            pushNotification.save()
+        
+            device = FCMDevice.objects.filter(user__st__language=lang)
+            print(device)
+            device.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk})
+
     return render(request,'jarvis/pages/notification/send_notification.html', { 'language_options': language_options, 'user_group_options' : user_group_options })
 
 
@@ -764,4 +810,31 @@ def particular_notification(request, notification_id=None):
     pushNotification = PushNotification.objects.get(pk=notification_id)
     return render(request,'jarvis/pages/notification/particular_notification.html', {'pushNotification': pushNotification})
 
-    
+from rest_framework.decorators import api_view
+
+@api_view(['POST'])
+def create_user_notification_delivered(request):
+    notification_id = request.POST.get('notification_id', "")
+
+    pushNotificationUser = PushNotificationUser()
+    if request.user:
+        print(request.user)
+        pushNotificationUser.user = request.user
+    pushNotification = PushNotification.objects.get(pk=notification_id)
+    pushNotificationUser.push_notification_id = pushNotification
+    pushNotificationUser.save()
+
+    return JsonResponse({"status":"Success"})
+
+@api_view(['POST'])
+def open_notification_delivered(request):
+    notification_id = request.POST.get('notification_id', "")
+
+    pushNotification = PushNotification.objects.get(pk=notification_id)
+    if request.user:
+        pushNotificationUser = PushNotificationUser.objects.get(push_notification_id=pushNotification, user=request.user)
+        pushNotificationUser.status = '1'
+        pushNotificationUser.save()
+
+    return JsonResponse({"status":"Success"})
+

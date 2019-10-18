@@ -30,4 +30,6 @@ urlpatterns = [
     url(r'^notification_panel/$',views.notification_panel, name='notification_panel'),
     url(r'^particular_notification/(?P<notification_id>\d+)/$',views.particular_notification, name='particular_notification'),
     url(r'^send_notification/$',views.send_notification, name='send_notification'),
+    url(r'^create_user_notification_delivered/$',views.create_user_notification_delivered, name='create_user_notification_delivered'),
+    url(r'^open_notification_delivered/$',views.open_notification_delivered, name='open_notification_delivered'),   
 ]

@@ -13,7 +13,9 @@
     .operation {
         margin-left: 5px;
         margin-right: 5px;
-        margin-bottom: 5px;
+    }
+    tr th {
+
     }
 </style>
     <div class="row" style="padding: 10px;">
@@ -28,14 +30,13 @@
                     <tr>
                         <th>S No.</th>
                         <th>Title</th>
-                        <th>Description</th>
                         <th>Date</th>
                         <th>Delivered</th>
+                        <th>Open</th>
+                        <th>Open %</th>
                         <th>Language</th>
                         <th>User Group</th>
                         <th>Action</th>
-                        <th>Open</th>
-                        <th>Open %</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -43,14 +44,13 @@
                         <tr>
                             <td>{{ forloop.counter }}</td>
                             <td>{{ pushNotification.title }}</td>
-                            <td>{{ pushNotification.description }}</td>
-                            <td>{% if pushNotification.is_scheduled %}Scheduled at {% else %}Sent {% endif %}{{ pushNotification.scheduled_time }}</td>
+                            <td style="color: {% if pushNotification.is_scheduled %} #b52828 {% else %} #1989cd {% endif %};">{{ pushNotification.scheduled_time }}</td>
                             <td>{{ pushNotification.push_notification_id.all.count }}</td>
+                            <td>{% get_user_opened_notification pushNotification %}</td>
+                            <td>{% get_percentage pushNotification.push_notification_id.all.count pushNotification %}</td>
                             <td>{% get_language_name pushNotification.language %}</td>
                             <td><a href="/jarvis/particular_notification/{{pushNotification.pk}}" class="btn btn-primary"> {% get_user_group_name pushNotification.user_group %} </a></td>
-                            <td>{% if pushNotification.is_scheduled %}<a href="/jarvis/particular_notification/{{pushNotification.pk}}" class="btn btn-primary">Edit</a> <button class="btn btn-danger operation">Cancel</button>{% else %}<button class="btn btn-success operation">Re-Schedule</button>{% endif %}</td>
-                            <td>{% get_user_opened_notification pushNotification %}</td>
-                            <td></td>
+                            <td>{% if pushNotification.is_scheduled %}<a href="/jarvis/particular_notification/{{pushNotification.pk}}" class="btn btn-primary"><i class="fa fa-pencil" aria-hidden="true"></i></a> <button class="btn btn-danger operation"><i class="fa fa-times" aria-hidden="true"></i></button>{% else %}<button class="btn btn-success operation"><i class="fa fa-repeat" aria-hidden="true"></i></button>{% endif %}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

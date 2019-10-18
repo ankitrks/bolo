@@ -381,6 +381,8 @@ CAREERANNA_AWS_BUCKET_NAME_TS = 'elastictranscode.videos'
 # http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
 REGION_HOST = 'us-east-1'
 
+FCM_MAX_RECIPIENTS = 1000
+
 PREDICTION_START_HOUR = 3
 
 CAREERANNA_VIDEOFILE_UPDATE_URL = "https://www.careeranna.com/search/insertOrUpdateFreeVideo"

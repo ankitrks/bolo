@@ -57,7 +57,8 @@
     }
 </style>
 <div class="notification_container">
-    <form id="notification_form">
+    <form id="notification_form" method="POST">
+        {% csrf_token %}
         <h2>App Push Notification</h2>
         <h3 id="notification_sent">Push Notification Sent To Users!</h3>
         <div class="form_group">
@@ -67,7 +68,7 @@
             <input type="text" name="title" placeholder="Notification Text">
         </div>
         <div class="form_group">
-            <select name="type">
+            <select name="lang">
                 <option value="" disabled selected>Select Language</option>
                 {% for lang in language_options %}
                     <option value="{{ lang.0 }}" >{{ lang.1 }}</option>
@@ -75,7 +76,7 @@
             </select>
         </div>
         <div class="form_group">
-            <select name="type">
+            <select name="user_group">
                 <option value="" disabled selected>Select User Group</option>
                 {% for user_group_option in user_group_options %}
                     <option value="{{ user_group_option.0 }}" >{{ user_group_option.1 }}</option>
@@ -96,4 +97,5 @@
 </div>
 {% endblock content %} 
 {% block center_js %}
+
 {% endblock center_js%}

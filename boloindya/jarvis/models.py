@@ -101,6 +101,10 @@ language_options = (
 
 user_group_options = (
     ('0', "All"),
+    ('1', "Signed up but never played a video"),
+    ('2', "Signed up but no opening of app since 24 hours"),
+    ('3', "Signed up but no opening of app since 72 hours "),
+    ('4', "Never created a video"),
 )
 
 status_options = (
@@ -113,6 +117,8 @@ class PushNotification(RecordTimeStamp):
     title = models.CharField(_('title'),max_length=100,null=True,blank=True)
     description = models.CharField(_('description'),max_length=100,null=True,blank=True)
     language = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='0')
+    notification_type = models.CharField('notification_type', blank = True, null = True, max_length=10, default='')
+    instance_id = models.CharField('instance_id', blank = True, null = True, max_length=10, default='')
     user_group = models.CharField(choices=user_group_options, blank = True, null = True, max_length=10, default='0')
     scheduled_time = models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False)
     is_scheduled = models.BooleanField(default=False)

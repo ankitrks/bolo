@@ -20,3 +20,9 @@ def get_user_group_name(id):
 @register.simple_tag()
 def get_notification_status(id):
     return status_options[int(id)][1]
+
+@register.simple_tag()
+def get_percentage(total, num):
+    if total == 0:
+        return 100
+    return str(get_user_opened_notification(num)*100/total)+" %"
