@@ -110,10 +110,39 @@ def run():
         while i < number_seen:
             seen_profile_user_id = random.choice(seen_profile_user_ids)
             action_seen(seen_profile_user_id,each_seen)
+            action_like_seen(each_seen,all_test_user)
             i += 1
 
 
-
+def action_like_seen(each_like,all_test_user):
+    if each_like.likes_count < 1000:
+        if each_like.date +timedelta(minutes=10) > now and each_like.view_count/10 > 100 and each_like.likes_count < 100:
+            number_like = random.randrange(6,100)
+        elif each_like.date +timedelta(minutes=10) < now and each_like.date +timedelta(minutes=30) > now and each_like.view_count/10 > 200 and each_like.likes_count < 200:
+            number_like = random.randrange(100,200-each_like.likes_count)
+        elif each_like.date +timedelta(minutes=30) < now and each_like.date +timedelta(hours=2) > now and each_like.view_count/10 > 300 and each_like.likes_count < 300:
+            number_like = random.randrange(1,300-each_like.likes_count)
+        elif each_like.date +timedelta(hours=2) < now and each_like.date +timedelta(hours=4) > now and each_like.view_count/10 > 400 and each_like.likes_count < 400:
+            number_like = random.randrange(1,400-each_like.likes_count)
+        elif each_like.date +timedelta(hours=4) < now and each_like.date +timedelta(hours=6) > now and each_like.view_count/10 > 500 and each_like.likes_count < 500:
+            number_like = random.randrange(1,500-each_like.likes_count)
+        elif each_like.date +timedelta(hours=6) < now and each_like.date +timedelta(hours=8) > now and each_like.view_count/10 > 600 and each_like.likes_count < 600:
+            number_like = random.randrange(1,600-each_like.likes_count)
+        elif each_like.date +timedelta(hours=10) < now and each_like.date +timedelta(hours=12) > now and each_like.view_count/10 > 700 and each_like.likes_count < 700:
+            number_like = random.randrange(1,700-each_like.likes_count)
+        elif each_like.date +timedelta(hours=12) < now and each_like.date +timedelta(hours=14) > now and each_like.view_count/10 > 800 and each_like.likes_count < 800:
+            number_like = random.randrange(1,800-each_like.likes_count)
+        elif each_like.date +timedelta(hours=14) < now and each_like.date +timedelta(hours=16) > now and each_like.view_count/10 > 900 and each_like.likes_count < 900:
+            number_like = random.randrange(1,900-each_like.likes_count)
+        elif each_like.date +timedelta(hours=16) < now and each_like.date +timedelta(hours=72) > now and each_like.view_count/10 > 1000 and each_like.likes_count < 1000:
+            number_like = random.randrange(1,1000-each_like.likes_count)
+        else:
+            number_like = 1
+        i = 0
+        while i < number_like:
+            opt_action_user = random.choice(list(all_test_user))
+            action_like(opt_action_user,each_like)
+            i += 1
 
 
 
@@ -128,10 +157,12 @@ def action_comment(user,topic):
     comment.topic_id      = topic.id
     comment.save()
     topic = Topic.objects.get(pk = topic.id)
+    topic = make_topic_counter_zero(topic)
     topic.comment_count = F('comment_count')+1
     topic.last_commented = timezone.now()
     topic.save()
     userprofile = UserProfile.objects.get(user = user.id)
+    userprofile = make_userprofile_counter_zero(userprofile)
     userprofile.answer_count = F('answer_count')+1
     userprofile.save()
     comment.save()
@@ -141,18 +172,22 @@ def action_comment(user,topic):
 def action_like(user,topic):
     liked,is_created = Like.objects.get_or_create(topic = topic ,user = user)
     if is_created:
+        topic = make_topic_counter_zero(topic)
         topic.likes_count = F('likes_count')+1
         topic.save()
         userprofile = UserProfile.objects.get(user = user.id)
+        userprofile = make_userprofile_counter_zero(userprofile)
         userprofile.like_count = F('like_count')+1
         userprofile.save()
         add_bolo_score(user.id, 'liked', topic)
 
 #seen
 def action_seen(user_id,topic):
+    topic = make_topic_counter_zero(topic)
     topic.view_count = F('view_count')+1
     topic.save()
-    userprofile = UserProfile.objects.get(user = topic.user)
+    userprofile = topic.user.st
+    userprofile = make_userprofile_counter_zero(userprofile)
     userprofile.view_count = F('view_count')+1
     userprofile.save()
     vbseen,is_created = VBseen.objects.get_or_create(user_id = user_id,topic = topic)
@@ -162,8 +197,8 @@ def action_seen(user_id,topic):
 #follow
 def action_follow(test_user,any_user):
     follow,is_created = Follower.objects.get_or_create(user_follower = test_user,user_following_id=any_user)
-    userprofile = UserProfile.objects.get(user = test_user)
-    followed_user = UserProfile.objects.get(user_id = any_user)
+    userprofile = make_userprofile_counter_zero(UserProfile.objects.get(user = test_user))
+    followed_user = make_userprofile_counter_zero(UserProfile.objects.get(user_id = any_user))
     if is_created:
         add_bolo_score(test_user.id, 'follow', userprofile)
         add_bolo_score(any_user, 'followed', followed_user)
@@ -176,6 +211,8 @@ def action_share(user, topic):
     share_type =['facebook_share','whatsapp_share','linkedin_share','twitter_share']
     share_on = random.choice(share_type)
     userprofile = user.st
+    topic = make_topic_counter_zero(topic)
+    userprofile = make_userprofile_counter_zero(userprofile)
     if share_on == 'facebook_share':
         shared = SocialShare.objects.create(topic = topic,user = user,share_type = '0')
         topic.facebook_share_count = F('facebook_share_count')+1    
@@ -216,7 +253,28 @@ def action_comment_like(user,comment):
         comment.likes_count = F('likes_count')+1
         comment.save()
         add_bolo_score(user.id, 'liked', comment)
-        userprofile = UserProfile.objects.get(user = user.id)
+        userprofile = make_userprofile_counter_zero(UserProfile.objects.get(user = user.id))
         userprofile.like_count = F('like_count')+1
         userprofile.save()
+
+def make_topic_counter_zero(topic):
+    topic.comment_count = F('comment_count')+0
+    topic.view_count = F('view_count')+0
+    topic.likes_count = F('likes_count')+0
+    topic.facebook_share_count = F('facebook_share_count')+0 
+    topic.total_share_count = F('total_share_count')+0
+    topic.whatsapp_share_count = F('whatsapp_share_count')+0
+    topic.linkedin_share_count = F('linkedin_share_count')+0
+    topic.twitter_share_count = F('twitter_share_count')+0
+    return topic
+
+def make_userprofile_counter_zero(userprofile):
+    userprofile.answer_count = F('answer_count')+0
+    userprofile.view_count = F('view_count')+0
+    userprofile.like_count = F('like_count')+0
+    userprofile.follow_count = F('follow_count')+0
+    userprofile.follower_count = F('follower_count')+0
+    userprofile.share_count = F('share_count')+0
+
+    return userprofile
 
