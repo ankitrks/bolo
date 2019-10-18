@@ -43,76 +43,89 @@ def run():
     last_n_days_post = Topic.objects.filter(is_vb=True,is_removed=False,date__gte=now-timedelta(days=3)).order_by('-date').values_list('id',flat=True)
     last_n_days_post = list(last_n_days_post)
     for each_like_id in last_n_days_post:
-        each_like = Topic.objects.get(pk=each_like_id)
-        if each_like.likes_count < each_like.view_count/random.randrange(10,21):
-            if each_like.date +timedelta(minutes=10) > now and each_like.view_count/random.randrange(10,21) > 100 and each_like.likes_count < 100:
-                number_like = random.randrange(6,100)
-            elif each_like.date +timedelta(minutes=10) < now and each_like.date +timedelta(minutes=30) > now and each_like.view_count/random.randrange(10,21) > 200 and each_like.likes_count < 200:
-                number_like = random.randrange(100,200-each_like.likes_count)
-            elif each_like.date +timedelta(minutes=30) < now and each_like.date +timedelta(hours=2) > now and each_like.view_count/random.randrange(10,21) > 300 and each_like.likes_count < 300:
-                number_like = random.randrange(1,300-each_like.likes_count)
-            elif each_like.date +timedelta(hours=2) < now and each_like.date +timedelta(hours=4) > now and each_like.view_count/random.randrange(10,21) > 400 and each_like.likes_count < 400:
-                number_like = random.randrange(1,400-each_like.likes_count)
-            elif each_like.date +timedelta(hours=4) < now and each_like.date +timedelta(hours=6) > now and each_like.view_count/random.randrange(10,21) > 500 and each_like.likes_count < 500:
-                number_like = random.randrange(1,500-each_like.likes_count)
-            elif each_like.date +timedelta(hours=6) < now and each_like.date +timedelta(hours=8) > now and each_like.view_count/random.randrange(10,21) > 600 and each_like.likes_count < 600:
-                number_like = random.randrange(1,600-each_like.likes_count)
-            elif each_like.date +timedelta(hours=10) < now and each_like.date +timedelta(hours=12) > now and each_like.view_count/random.randrange(10,21) > 700 and each_like.likes_count < 700:
-                number_like = random.randrange(1,700-each_like.likes_count)
-            elif each_like.date +timedelta(hours=12) < now and each_like.date +timedelta(hours=14) > now and each_like.view_count/random.randrange(10,21) > 800 and each_like.likes_count < 800:
-                number_like = random.randrange(1,800-each_like.likes_count)
-            elif each_like.date +timedelta(hours=14) < now and each_like.date +timedelta(hours=16) > now and each_like.view_count/random.randrange(10,21) > 900 and each_like.likes_count < 900:
-                number_like = random.randrange(1,900-each_like.likes_count)
-            elif each_like.date +timedelta(hours=16) < now and each_like.date +timedelta(hours=72) > now and each_like.view_count/random.randrange(10,21) > 1000 and each_like.likes_count < 1000:
-                number_like = random.randrange(1,1000-each_like.likes_count)
-            else:
-                number_like = 1
-            i = 0
-            while i < number_like:
-                opt_action_user_id = random.choice(user_ids)
-                action_like(opt_action_user_id,each_like_id)
-                i += 1
+        try:
+            each_like = Topic.objects.get(pk=each_like_id)
+            if each_like.likes_count < each_like.view_count/random.randrange(10,21):
+                if each_like.date +timedelta(minutes=10) > now and each_like.view_count/random.randrange(10,21) > 100 and each_like.likes_count < 100:
+                    number_like = random.randrange(6,100)
+                elif each_like.date +timedelta(minutes=10) < now and each_like.date +timedelta(minutes=30) > now and each_like.view_count/random.randrange(10,21) > 200 and each_like.likes_count < 200:
+                    number_like = random.randrange(100,200-each_like.likes_count)
+                elif each_like.date +timedelta(minutes=30) < now and each_like.date +timedelta(hours=2) > now and each_like.view_count/random.randrange(10,21) > 300 and each_like.likes_count < 300:
+                    number_like = random.randrange(1,300-each_like.likes_count)
+                elif each_like.date +timedelta(hours=2) < now and each_like.date +timedelta(hours=4) > now and each_like.view_count/random.randrange(10,21) > 400 and each_like.likes_count < 400:
+                    number_like = random.randrange(1,400-each_like.likes_count)
+                elif each_like.date +timedelta(hours=4) < now and each_like.date +timedelta(hours=6) > now and each_like.view_count/random.randrange(10,21) > 500 and each_like.likes_count < 500:
+                    number_like = random.randrange(1,500-each_like.likes_count)
+                elif each_like.date +timedelta(hours=6) < now and each_like.date +timedelta(hours=8) > now and each_like.view_count/random.randrange(10,21) > 600 and each_like.likes_count < 600:
+                    number_like = random.randrange(1,600-each_like.likes_count)
+                elif each_like.date +timedelta(hours=10) < now and each_like.date +timedelta(hours=12) > now and each_like.view_count/random.randrange(10,21) > 700 and each_like.likes_count < 700:
+                    number_like = random.randrange(1,700-each_like.likes_count)
+                elif each_like.date +timedelta(hours=12) < now and each_like.date +timedelta(hours=14) > now and each_like.view_count/random.randrange(10,21) > 800 and each_like.likes_count < 800:
+                    number_like = random.randrange(1,800-each_like.likes_count)
+                elif each_like.date +timedelta(hours=14) < now and each_like.date +timedelta(hours=16) > now and each_like.view_count/random.randrange(10,21) > 900 and each_like.likes_count < 900:
+                    number_like = random.randrange(1,900-each_like.likes_count)
+                elif each_like.date +timedelta(hours=16) < now and each_like.date +timedelta(hours=72) > now and each_like.view_count/random.randrange(10,21) > 1000 and each_like.likes_count < 1000:
+                    number_like = random.randrange(1,1000-each_like.likes_count)
+                else:
+                    number_like = 1
+                i = 0
+                while i < number_like:
+                    try:
+                        opt_action_user_id = random.choice(user_ids)
+                        action_like(opt_action_user_id,each_like_id)
+                        i += 1
+                    except:
+                        pass
+        except:
+            pass
 
     for each_seen_id in last_n_days_post:
-        each_seen = Topic.objects.get(pk=each_seen_id)
-        if each_seen.date +timedelta(minutes=10) > now:
-            number_seen = random.randrange(6,100)
-        elif each_seen.date +timedelta(minutes=10) < now and each_seen.date +timedelta(minutes=30) > now and each_seen.view_count < 1000:
-            number_seen = random.randrange(100,1000-each_seen.view_count)
-        elif each_seen.date +timedelta(minutes=30) < now and each_seen.date +timedelta(hours=2) > now and each_seen.view_count < 10000:
-            number_seen = random.randrange(1,10000-each_seen.view_count)
-        elif each_seen.date +timedelta(hours=2) < now and each_seen.date +timedelta(hours=4) > now and each_seen.view_count < 12000:
-            number_seen = random.randrange(1,12000-each_seen.view_count)
-        elif each_seen.date +timedelta(hours=4) < now and each_seen.date +timedelta(hours=6) > now and each_seen.view_count < 13000:
-            number_seen = random.randrange(1,13000-each_seen.view_count)
-        elif each_seen.date +timedelta(hours=6) < now and each_seen.date +timedelta(hours=8) > now and each_seen.view_count < 14000:
-            number_seen = random.randrange(1,14000-each_seen.view_count)
-        elif each_seen.date +timedelta(hours=10) < now and each_seen.date +timedelta(hours=12) > now and each_seen.view_count < 15000:
-            number_seen = random.randrange(1,15000-each_seen.view_count)
-        elif each_seen.date +timedelta(hours=12) < now and each_seen.date +timedelta(hours=14) > now and each_seen.view_count < 16000:
-            number_seen = random.randrange(1,16000-each_seen.view_count)
-        elif each_seen.date +timedelta(hours=14) < now and each_seen.date +timedelta(hours=16) > now and each_seen.view_count < 17000:
-            number_seen = random.randrange(1,17000-each_seen.view_count)
-        elif each_seen.date +timedelta(hours=16) < now and each_seen.date +timedelta(hours=18) > now and each_seen.view_count < 18000:
-            number_seen = random.randrange(1,18000-each_seen.view_count)
-        elif each_seen.date +timedelta(hours=18) < now and each_seen.date +timedelta(hours=19) > now and each_seen.view_count < 19000:
-            number_seen = random.randrange(1,19000-each_seen.view_count)
-        elif each_seen.date +timedelta(hours=19) < now and each_seen.date +timedelta(hours=20) > now and each_seen.view_count < 20000:
-            number_seen = random.randrange(1,20000-each_seen.view_count)
-        elif each_seen.date +timedelta(hours=20) < now and each_seen.date +timedelta(hours=21) > now and each_seen.view_count < 25000:
-            number_seen = random.randrange(1,25000-each_seen.view_count)
-        elif each_seen.date +timedelta(hours=21) < now and each_seen.date +timedelta(hours=24) > now and each_seen.view_count < 30000:
-            number_seen = random.randrange(1,30000-each_seen.view_count)
-        elif each_seen.date +timedelta(hours=24) < now and each_seen.date +timedelta(hours=72) > now and each_seen.view_count < 200000:
-            number_seen = random.randrange(1,200000-each_seen.view_count)
-        else:
-            number_seen = 1
-        i = 0
-        while i < number_seen:
-            seen_profile_user_id = random.choice(user_ids)
-            action_seen(seen_profile_user_id,each_seen_id)
-            check_like(each_seen_id,all_test_userprofile_id)
-            i += 1
+        try:
+            each_seen = Topic.objects.get(pk=each_seen_id)
+            if each_seen.date +timedelta(minutes=10) > now:
+                number_seen = random.randrange(6,100)
+            elif each_seen.date +timedelta(minutes=10) < now and each_seen.date +timedelta(minutes=30) > now and each_seen.view_count < 1000:
+                number_seen = random.randrange(100,1000-each_seen.view_count)
+            elif each_seen.date +timedelta(minutes=30) < now and each_seen.date +timedelta(hours=2) > now and each_seen.view_count < 10000:
+                number_seen = random.randrange(1,10000-each_seen.view_count)
+            elif each_seen.date +timedelta(hours=2) < now and each_seen.date +timedelta(hours=4) > now and each_seen.view_count < 12000:
+                number_seen = random.randrange(1,12000-each_seen.view_count)
+            elif each_seen.date +timedelta(hours=4) < now and each_seen.date +timedelta(hours=6) > now and each_seen.view_count < 13000:
+                number_seen = random.randrange(1,13000-each_seen.view_count)
+            elif each_seen.date +timedelta(hours=6) < now and each_seen.date +timedelta(hours=8) > now and each_seen.view_count < 14000:
+                number_seen = random.randrange(1,14000-each_seen.view_count)
+            elif each_seen.date +timedelta(hours=10) < now and each_seen.date +timedelta(hours=12) > now and each_seen.view_count < 15000:
+                number_seen = random.randrange(1,15000-each_seen.view_count)
+            elif each_seen.date +timedelta(hours=12) < now and each_seen.date +timedelta(hours=14) > now and each_seen.view_count < 16000:
+                number_seen = random.randrange(1,16000-each_seen.view_count)
+            elif each_seen.date +timedelta(hours=14) < now and each_seen.date +timedelta(hours=16) > now and each_seen.view_count < 17000:
+                number_seen = random.randrange(1,17000-each_seen.view_count)
+            elif each_seen.date +timedelta(hours=16) < now and each_seen.date +timedelta(hours=18) > now and each_seen.view_count < 18000:
+                number_seen = random.randrange(1,18000-each_seen.view_count)
+            elif each_seen.date +timedelta(hours=18) < now and each_seen.date +timedelta(hours=19) > now and each_seen.view_count < 19000:
+                number_seen = random.randrange(1,19000-each_seen.view_count)
+            elif each_seen.date +timedelta(hours=19) < now and each_seen.date +timedelta(hours=20) > now and each_seen.view_count < 20000:
+                number_seen = random.randrange(1,20000-each_seen.view_count)
+            elif each_seen.date +timedelta(hours=20) < now and each_seen.date +timedelta(hours=21) > now and each_seen.view_count < 25000:
+                number_seen = random.randrange(1,25000-each_seen.view_count)
+            elif each_seen.date +timedelta(hours=21) < now and each_seen.date +timedelta(hours=24) > now and each_seen.view_count < 30000:
+                number_seen = random.randrange(1,30000-each_seen.view_count)
+            elif each_seen.date +timedelta(hours=24) < now and each_seen.date +timedelta(hours=72) > now and each_seen.view_count < 200000:
+                number_seen = random.randrange(1,200000-each_seen.view_count)
+            else:
+                number_seen = 1
+            i = 0
+            while i < number_seen:
+                try:
+                    seen_profile_user_id = random.choice(user_ids)
+                    action_seen(seen_profile_user_id,each_seen_id)
+                    check_like(each_seen_id,all_test_userprofile_id)
+                    i += 1
+                except:
+                    pass
+        except:
+            pass
+            
 
 def check_like(topic_id,user_ids):
     now = datetime.now()
@@ -142,9 +155,12 @@ def check_like(topic_id,user_ids):
             number_like = 1
         i = 0
         while i < number_like:
-            opt_action_user_id = random.choice(user_ids)
-            action_like(opt_action_user_id,topic_id)
-            i += 1
+            try:
+                opt_action_user_id = random.choice(user_ids)
+                action_like(opt_action_user_id,topic_id)
+                i += 1
+            except:
+                pass
 
 
 
