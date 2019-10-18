@@ -41,8 +41,10 @@ def run():
                 action_comment_like(opt_action_user,each_comment)
         elif opt_action == 'seen':
             action_seen(opt_action_user.id,each_topic)
-    last_n_days_post = Topic.objects.filter(is_vb=True,is_removed=False,date__gte=now-timedelta(days=3)).order_by('-date')
-    for each_like in last_n_days_post:
+    last_n_days_seen = Topic.objects.filter(is_vb=True,is_removed=False,date__gte=now-timedelta(days=3)).order_by('-date')
+    last_n_days_like = Topic.objects.filter(is_vb=True,is_removed=False,date__gte=now-timedelta(days=3)).order_by('-date')
+
+    for each_like in last_n_days_like:
         if each_like.likes_count < 1000:
             if each_like.date +timedelta(minutes=10) > now and each_like.view_count/10 > 100 and each_like.likes_count < 100:
                 number_like = random.randrange(6,100)
@@ -72,7 +74,7 @@ def run():
                 action_like(opt_action_user,each_like)
                 i += 1
 
-    for each_seen in last_n_days_post:
+    for each_seen in last_n_days_seen:
         if each_seen.date +timedelta(minutes=10) > now:
             number_seen = random.randrange(6,100)
         elif each_seen.date +timedelta(minutes=10) < now and each_seen.date +timedelta(minutes=30) > now and each_seen.view_count < 1000:
@@ -126,12 +128,10 @@ def action_comment(user,topic):
     comment.topic_id      = topic.id
     comment.save()
     topic = Topic.objects.get(pk = topic.id)
-    topic = make_topic_counter_zero(topic)
     topic.comment_count = F('comment_count')+1
     topic.last_commented = timezone.now()
     topic.save()
     userprofile = UserProfile.objects.get(user = user.id)
-    userprofile = make_userprofile_counter_zero(userprofile)
     userprofile.answer_count = F('answer_count')+1
     userprofile.save()
     comment.save()
@@ -141,22 +141,18 @@ def action_comment(user,topic):
 def action_like(user,topic):
     liked,is_created = Like.objects.get_or_create(topic = topic ,user = user)
     if is_created:
-        topic = make_topic_counter_zero(topic)
         topic.likes_count = F('likes_count')+1
         topic.save()
         userprofile = UserProfile.objects.get(user = user.id)
-        userprofile = make_userprofile_counter_zero(userprofile)
         userprofile.like_count = F('like_count')+1
         userprofile.save()
         add_bolo_score(user.id, 'liked', topic)
 
 #seen
 def action_seen(user_id,topic):
-    topic = make_topic_counter_zero(topic)
     topic.view_count = F('view_count')+1
     topic.save()
     userprofile = topic.user.st
-    userprofile = make_userprofile_counter_zero(userprofile)
     userprofile.view_count = F('view_count')+1
     userprofile.save()
     vbseen,is_created = VBseen.objects.get_or_create(user_id = user_id,topic = topic)
@@ -166,8 +162,8 @@ def action_seen(user_id,topic):
 #follow
 def action_follow(test_user,any_user):
     follow,is_created = Follower.objects.get_or_create(user_follower = test_user,user_following_id=any_user)
-    userprofile = make_userprofile_counter_zero(UserProfile.objects.get(user = test_user))
-    followed_user = make_userprofile_counter_zero(UserProfile.objects.get(user_id = any_user))
+    userprofile = UserProfile.objects.get(user = test_user)
+    followed_user = UserProfile.objects.get(user_id = any_user)
     if is_created:
         add_bolo_score(test_user.id, 'follow', userprofile)
         add_bolo_score(any_user, 'followed', followed_user)
@@ -180,8 +176,6 @@ def action_share(user, topic):
     share_type =['facebook_share','whatsapp_share','linkedin_share','twitter_share']
     share_on = random.choice(share_type)
     userprofile = user.st
-    topic = make_topic_counter_zero(topic)
-    userprofile = make_userprofile_counter_zero(userprofile)
     if share_on == 'facebook_share':
         shared = SocialShare.objects.create(topic = topic,user = user,share_type = '0')
         topic.facebook_share_count = F('facebook_share_count')+1    
@@ -222,28 +216,7 @@ def action_comment_like(user,comment):
         comment.likes_count = F('likes_count')+1
         comment.save()
         add_bolo_score(user.id, 'liked', comment)
-        userprofile = make_userprofile_counter_zero(UserProfile.objects.get(user = user.id))
+        userprofile = UserProfile.objects.get(user = user.id)
         userprofile.like_count = F('like_count')+1
         userprofile.save()
-
-def make_topic_counter_zero(topic):
-    topic.comment_count = F('comment_count')+0
-    topic.view_count = F('view_count')+0
-    topic.likes_count = F('likes_count')+0
-    topic.facebook_share_count = F('facebook_share_count')+0 
-    topic.total_share_count = F('total_share_count')+0
-    topic.whatsapp_share_count = F('whatsapp_share_count')+0
-    topic.linkedin_share_count = F('linkedin_share_count')+0
-    topic.twitter_share_count = F('twitter_share_count')+0
-    return topic
-
-def make_userprofile_counter_zero(userprofile):
-    userprofile.answer_count = F('answer_count')+0
-    userprofile.view_count = F('view_count')+0
-    userprofile.like_count = F('like_count')+0
-    userprofile.follow_count = F('follow_count')+0
-    userprofile.follower_count = F('follower_count')+0
-    userprofile.share_count = F('share_count')+0
-
-    return userprofile
 
