@@ -243,12 +243,20 @@ def video_type_details(user_data_dump):
 
     return JsonResponse({'message':'success'}, status = status.HTTP_201_CREATED)        
 
+def find_video_impressions(user_data_dump):
+    if('vb_impressions' in user_data_dump):
+        if(len(user_data_dump['vb_impressions']) > 0):
+            userid = user_data_dump['user_id']
+            for(a,b) in user_data_dump['vb_impressions']:
+                utc_dt = datetime.utcfromtimestamp(float(b)/ 1000).replace(tzinfo=pytz.utc)
+                print(userid, a, utc_dt)
+
 
 #func for dumping video creation details into the model(videoid, timestamp)
 def video_info(user_data_dump):
     
     try:
-        if('ressions' in user_data_dump):
+        if('vb_impressions' in user_data_dump):
             if(len(user_data_dump['vb_impressions']) > 0):
                 for(a,b) in user_data_dump['vb_impressions']:
                     #datetime_format = time.strftime('%m/%d/%Y %H:%M:%S',  time.gmtime(b/1000.))
@@ -504,16 +512,57 @@ def hourly_au():
 # func for recording the time spend by the user for activities
 def activity_time_spend(user_data_dump):
 
+    userid = user_data_dump['user_id']
+    refer_timestamp = datetime.utcfromtimestamp(float(user_data_dump['session_start_time'])/ 1000).replace(tzinfo=pytz.utc)
+
     try:
-        userid = user_data_dump['user_id']
+        
         if('record_time_spend' in user_data_dump):
             all_records = user_data_dump['record_time_spend']
             if(len(all_records)>0):
                 for key, val in all_records.items():
                     fragement_id = key 
                     time_ms = val['timeSpentTillNow']
-                    user_data_obj = ActivityTimeSpend(user = userid, fragmentid = fragement_id, time_spent = time_ms)
+                    user_data_obj = ActivityTimeSpend(user = userid, fragmentid = fragement_id, time_spent = time_ms, timestamp = refer_timestamp)
                     user_data_obj.save()
+
+        #print("here")
+        if('activity_time_spend' in user_data_dump):
+            all_records = user_data_dump['activity_time_spend']
+            #print(all_records)
+            if(len(all_records) > 0):
+                str_start = 'STARTED'
+                str_pause = 'PAUSED'
+                for key, val in all_records.items():
+                    prev_start = -1
+                    prev_pause = -1
+                    for item in val:
+                        if(re.search(str_start, item) and prev_start == -1):
+                            start_temp_str = (re.sub('STARTED_', '', item))
+                            #print(start_temp_str)
+                            if(not re.search('[a-zA-Z]', start_temp_str)):
+                                prev_start = int(start_temp_str)
+
+                        if(re.search(str_pause, item) and prev_start > 0):
+                            pause_temp_str = (re.sub('PAUSED_', '', item))
+                            if(not re.search('[a-zA-Z]', pause_temp_str)):
+                                prev_pause = int(pause_temp_str)
+                                #print(prev_start, prev_pause)
+
+                            time_diff = int((prev_pause - prev_start) / 1000)
+                            if(time_diff >=0):
+                                existing_records = ActivityTimeSpend.objects.filter(user = userid, fragmentid = key, timestamp = refer_timestamp).count()
+                                if(existing_records==0):
+                                    user_data_obj = ActivityTimeSpend(user = userid, fragmentid = key, time_spent = time_diff, timestamp = refer_timestamp)
+                                    user_data_obj.save()
+                                else:
+                                    ActivityTimeSpend.objects.filter(user = userid, fragmentid = key, timestamp = refer_timestamp).update(time_spent = time_diff)    
+
+                            if(re.search(str_start, item) and prev_start > 1):
+                                prev_start = (re.sub('STARTED_', '', item))
+                                if(not re.search('[a-zA-Z]', prev_start)):
+                                    prev_start = int(prev_start)
+
     except Exception as e:
         print('Exception 9:' + str(e))
 
@@ -521,24 +570,25 @@ def activity_time_spend(user_data_dump):
 
 def main():
     # pick only those dumps which have not been executed 
-    all_traction_data = UserJarvisDump.objects.filter(is_executed = True, dump_type = 1)
+    all_traction_data = UserJarvisDump.objects.filter(is_executed = False, dump_type = 1)
     for user_jarvis in all_traction_data:
         try:
             user_data_string = user_jarvis.dump
             user_data_dump = ast.literal_eval(user_data_string)
             #print(user_data_dump)
             #pass the collected user dump through a set of methods
-            user_statistics(user_data_dump)
-            follow_unfollow_details(user_data_dump)
-            video_type_details(user_data_dump)
-            video_info(user_data_dump)
-            record_user_entry_points(user_data_dump)
-            userviewed_follower_following(user_data_dump)
-            user_category_intereset(user_data_dump)
-            video_share(user_data_dump)
-            search_query(user_data_dump)
-            record_session_time(user_data_dump)               #please run this before running dau and mau
+            #user_statistics(user_data_dump)
+            #follow_unfollow_details(user_data_dump)
+            #video_type_details(user_data_dump)
+            #video_info(user_data_dump)
+            #record_user_entry_points(user_data_dump)
+            #userviewed_follower_following(user_data_dump)
+            #user_category_intereset(user_data_dump)
+            #video_share(user_data_dump)
+            #search_query(user_data_dump)
+            #record_session_time(user_data_dump)               #please run this before running dau and mau
             activity_time_spend(user_data_dump)
+            #find_video_impressions(user_data_dump)
             unique_id = user_jarvis.pk # get primary key of the dump
             UserJarvisDump.objects.filter(pk = unique_id).update(is_executed = False, dump_type = 1)  #mark the is_executed field as true
 

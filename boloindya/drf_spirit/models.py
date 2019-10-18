@@ -312,6 +312,7 @@ class ActivityTimeSpend(models.Model):
     user = models.CharField(_("userid"), null = True, blank = False, max_length = 250, db_index = True)
     fragmentid = models.CharField(_("fragmentid"), null = True, blank = False, max_length = 550, db_index = True)
     time_spent = models.PositiveIntegerField(_("time_spent(ms)"), default = 0, editable = False)
+    timestamp = models.DateTimeField(_("timestamp"), null = True, blank = False)
 
 
 

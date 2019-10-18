@@ -101,6 +101,9 @@ def app_activity_time_spend():
 		for each_activity_record in user_activity_records:
 			tot_time+= each_activity_record.time_spent 
 
+		#tot_time = ((float(tot_time) / 1000))
+		tot_time = float(tot_time)
+		print(tot_time)	
 		existing_records = UserAppTimeSpend.objects.filter(user = user_id, total_time = tot_time).count()
 		if(existing_records!=0):
 			UserAppTimeSpend.objects.filter(user = user_id).update(total_time = tot_time)
@@ -124,7 +127,7 @@ def main():
 			print('Exception: 1' + str(e))
 
 	#calculate_completetion_rate()			
-	app_activity_time_spend()
+	#app_activity_time_spend()				#commented as of now, we will look into this later
 
 
 def run():
