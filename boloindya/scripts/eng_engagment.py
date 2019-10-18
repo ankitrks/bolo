@@ -25,7 +25,7 @@ def run():
             action_comment(opt_action_user_id,each_topic_id)
         elif opt_action == 'like':
             each_topic = Topic.objects.get(pk=each_topic_id)
-            if each_topic.likes_count<each_topic.view_count/10 and each_topic.likes_count < each_topic.view_count:
+            if each_topic.likes_count<each_topic.view_count/random.randrange(10,21) and each_topic.likes_count < each_topic.view_count:
                 action_like(opt_action_user_id,each_topic_id)
         elif opt_action == 'follow':
             action_follow(opt_action_user_id,random.choice(User.objects.all()).id)
@@ -44,7 +44,7 @@ def run():
     last_n_days_post = list(last_n_days_post)
     for each_like_id in last_n_days_post:
         each_like = Topic.objects.get(pk=each_like_id)
-        if each_like.likes_count < each_like.view_count/10:
+        if each_like.likes_count < each_like.view_count/random.randrange(10,21):
             if each_like.date +timedelta(minutes=10) > now and each_like.view_count/10 > 100 and each_like.likes_count < 100:
                 number_like = random.randrange(6,100)
             elif each_like.date +timedelta(minutes=10) < now and each_like.date +timedelta(minutes=30) > now and each_like.view_count/10 > 200 and each_like.likes_count < 200:
@@ -117,7 +117,7 @@ def run():
 def check_like(topic_id,user_ids):
     now = datetime.now()
     each_like = Topic.objects.get(pk=topic_id)
-    if each_like.likes_count < each_like.view_count/10:
+    if each_like.likes_count < each_like.view_count/random.randrange(10,21):
         if each_like.date +timedelta(minutes=10) > now and each_like.view_count/10 > 100 and each_like.likes_count < 100:
             number_like = random.randrange(6,100)
         elif each_like.date +timedelta(minutes=10) < now and each_like.date +timedelta(minutes=30) > now and each_like.view_count/10 > 200 and each_like.likes_count < 200:
