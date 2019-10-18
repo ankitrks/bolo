@@ -516,11 +516,13 @@ def activity_time_spend(user_data_dump):
     refer_timestamp = datetime.utcfromtimestamp(float(user_data_dump['session_start_time'])/ 1000).replace(tzinfo=pytz.utc)
 
     try:
-        
         if('record_time_spend' in user_data_dump):
+            print("+1")
             all_records = user_data_dump['record_time_spend']
             if(len(all_records)>0):
+                print("+2")
                 for key, val in all_records.items():
+                    print("+3")
                     fragement_id = key 
                     time_ms = val['timeSpentTillNow']
                     user_data_obj = ActivityTimeSpend(user = userid, fragmentid = fragement_id, time_spent = time_ms, timestamp = refer_timestamp)
@@ -590,7 +592,7 @@ def main():
             activity_time_spend(user_data_dump)
             #find_video_impressions(user_data_dump)
             unique_id = user_jarvis.pk # get primary key of the dump
-            UserJarvisDump.objects.filter(pk = unique_id).update(is_executed = False, dump_type = 1)  #mark the is_executed field as true
+            UserJarvisDump.objects.filter(pk = unique_id).update(is_executed = True, dump_type = 1)  #mark the is_executed field as true
 
         except Exception as e:
             print('Exception 8:' + str(e))

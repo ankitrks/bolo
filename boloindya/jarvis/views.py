@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 import boto3
 from botocore.exceptions import NoCredentialsError
 from boto3.s3.transfer import S3Transfer
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpRequest
 import json
 import string
 import random
@@ -43,6 +43,7 @@ from django.utils.timezone import make_aware
 from datetime import timedelta
 from itertools import groupby
 from django.db.models import Count
+import ast
 
 def get_bucket_details(bucket_name=None):
     bucket_credentials = {}
@@ -766,16 +767,16 @@ def get_installs_data(request):
 
 @login_required
 def video_statistics(request):
-    return render(request, 'jarvis/pages/video_statistics/video_statistics.html')
+    return render(request,'jarvis/pages/video_statistics/video_statistics.html')
 
 def get_daily_impressions_data(request):
     if request.is_ajax():
-        raw_data = json.loads(request.body)
+        raw_data = json.loads(request.body)            
         try:
             impr_begin = raw_data['impr_from']
             impr_end = raw_data['impr_to']
 
-            print(impr_begin+", "+impr_end)
+            print("impr_begin and end = "+impr_begin+", "+impr_end)
 
             begin_time = impr_begin + " 00:00:00"
             end_time = impr_end + " 00:00:00"
@@ -798,13 +799,11 @@ def get_daily_impressions_data(request):
 
             all_data = {'impr_labels':impr_labels, 'impr_freq':impr_freq}    
 
-            return JsonResponse({'impr_labels':impr_labels, 'impr_freq':impr_freq}, status=status.HTTP_200_OK)    
+            return JsonResponse({'impr_labels':impr_labels, 'impr_freq':impr_freq}, status=status.HTTP_200_OK) 
 
         except Exception as e:
             print("Exception: "+str(e))
-            return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
-    else:
-        return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)  
+            return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)  
 
 <<<<<<< HEAD
 =======

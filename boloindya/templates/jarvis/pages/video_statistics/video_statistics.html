@@ -60,7 +60,7 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                            <th>Total Impressions</th>
+                            <th>Impressions</th>
                             <th>Video Name</th>
                             <th>User name</th>
                     </tr>
@@ -122,8 +122,8 @@
 
             $("#top_impr_table tr").remove(); 
 
-            console.log(data)
-            console.log(data.vid_all_info)
+            console.log(data);
+            console.log(data.vid_all_info);
 
             for(item in data.vid_all_info){
                 var top_impr_table = document.getElementById('top_impr_table');
@@ -136,25 +136,6 @@
                 cell_vid_name.innerHTML = data.vid_all_info[item]['title'];
                 cell_user_name.innerHTML = data.vid_all_info[item]['user__username'];
             }
-
-            //******** Setting DAU Chart
-            // chart_top_impr_vids = new Chart(chart_top_impr_vids_ctx, {
-            //     type: 'bar',
-
-            //     data: {
-            //         // labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-            //         labels: data.top_impr_labels,
-            //         datasets: [{
-            //             label: 'Video Impressions',
-            //             fill: false,
-            //             backgroundColor: 'rgb(255, 216, 56)',
-            //             borderColor: 'rgb(255, 216, 56)',
-            //             data: data.top_impr_freq
-            //         }]
-            //     },
-
-            //     options: {}
-            // });
         }
 
         //****** DATA FETCHING FUNCTIONS
@@ -226,6 +207,44 @@
                 }
             });
         }
+        
+        function getTodayAndWeekAgo(){
+            var today = new Date();
+            var sevenDaysAgo = new Date(today.getTime() - (10*24*60*60*1000));
+
+            var today_dd = today.getDate();
+            var today_mm = today.getMonth() + 1; //January is 0!
+            var today_yyyy = today.getFullYear();
+
+            var sda_dd = sevenDaysAgo.getDate();
+            var sda_mm = sevenDaysAgo.getMonth() + 1; //January is 0!
+            var sda_yyyy = sevenDaysAgo.getFullYear();
+
+            var today_string = today_dd + '-' + today_mm + '-' + today_yyyy;
+            var sda_string = sda_dd + '-' + sda_mm + '-' + sda_yyyy;
+
+            console.log("dates: "+today_string+" "+sda_string);
+
+            return [today_string, sda_string];
+        }
+
+        $( document ).ready(function() {
+            // Show the default graph of past 1 week
+
+            var dates = getTodayAndWeekAgo();
+
+            //Set daily impressions chart with past 7 days data
+            $('#dp_impr_to').val(dates[0]);
+            $('#dp_impr_from').val(dates[1]);
+
+            //Set empty top impressions table
+            $('#dp_top_impr').val(dates[1]);
+
+            impr_click_ok();
+            top_impr_click_ok();
+
+        });
+
     </script>
 
 </section>
