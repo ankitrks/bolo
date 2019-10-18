@@ -139,10 +139,8 @@ def action_comment(user,topic):
 
 #like
 def action_like(user,topic):
-    try:
-        liked = Like.objects.get(topic = topic ,user = user)
-    except:
-        liked = Like.objects.create(topic = topic ,user = user)
+    liked,is_created = Like.objects.get_or_create(topic = topic ,user = user)
+    if is_created:
         topic.likes_count = F('likes_count')+1
         topic.save()
         userprofile = UserProfile.objects.get(user = user.id)
@@ -154,7 +152,7 @@ def action_like(user,topic):
 def action_seen(user_id,topic):
     topic.view_count = F('view_count')+1
     topic.save()
-    userprofile = topic.user.st
+    userprofile = UserProfile.objects.get(user = topic.user)
     userprofile.view_count = F('view_count')+1
     userprofile.save()
     vbseen,is_created = VBseen.objects.get_or_create(user_id = user_id,topic = topic)
