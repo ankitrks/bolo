@@ -110,39 +110,8 @@ def run():
         while i < number_seen:
             seen_profile_user_id = random.choice(seen_profile_user_ids)
             action_seen(seen_profile_user_id,each_seen)
-            action_like_seen(each_seen,all_test_user)
             i += 1
 
-
-def action_like_seen(each_like,all_test_user):
-    if each_like.likes_count < 1000:
-        if each_like.date +timedelta(minutes=10) > now and each_like.view_count/10 > 100 and each_like.likes_count < 100:
-            number_like = random.randrange(6,100)
-        elif each_like.date +timedelta(minutes=10) < now and each_like.date +timedelta(minutes=30) > now and each_like.view_count/10 > 200 and each_like.likes_count < 200:
-            number_like = random.randrange(100,200-each_like.likes_count)
-        elif each_like.date +timedelta(minutes=30) < now and each_like.date +timedelta(hours=2) > now and each_like.view_count/10 > 300 and each_like.likes_count < 300:
-            number_like = random.randrange(1,300-each_like.likes_count)
-        elif each_like.date +timedelta(hours=2) < now and each_like.date +timedelta(hours=4) > now and each_like.view_count/10 > 400 and each_like.likes_count < 400:
-            number_like = random.randrange(1,400-each_like.likes_count)
-        elif each_like.date +timedelta(hours=4) < now and each_like.date +timedelta(hours=6) > now and each_like.view_count/10 > 500 and each_like.likes_count < 500:
-            number_like = random.randrange(1,500-each_like.likes_count)
-        elif each_like.date +timedelta(hours=6) < now and each_like.date +timedelta(hours=8) > now and each_like.view_count/10 > 600 and each_like.likes_count < 600:
-            number_like = random.randrange(1,600-each_like.likes_count)
-        elif each_like.date +timedelta(hours=10) < now and each_like.date +timedelta(hours=12) > now and each_like.view_count/10 > 700 and each_like.likes_count < 700:
-            number_like = random.randrange(1,700-each_like.likes_count)
-        elif each_like.date +timedelta(hours=12) < now and each_like.date +timedelta(hours=14) > now and each_like.view_count/10 > 800 and each_like.likes_count < 800:
-            number_like = random.randrange(1,800-each_like.likes_count)
-        elif each_like.date +timedelta(hours=14) < now and each_like.date +timedelta(hours=16) > now and each_like.view_count/10 > 900 and each_like.likes_count < 900:
-            number_like = random.randrange(1,900-each_like.likes_count)
-        elif each_like.date +timedelta(hours=16) < now and each_like.date +timedelta(hours=72) > now and each_like.view_count/10 > 1000 and each_like.likes_count < 1000:
-            number_like = random.randrange(1,1000-each_like.likes_count)
-        else:
-            number_like = 1
-        i = 0
-        while i < number_like:
-            opt_action_user = random.choice(list(all_test_user))
-            action_like(opt_action_user,each_like)
-            i += 1
 
 
 
