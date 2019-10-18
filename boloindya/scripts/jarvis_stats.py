@@ -7,6 +7,7 @@ import ast
 from django.http import JsonResponse
 import re
 import datetime
+from datetime import datetime
 import os 
 import pytz 
 import dateutil.parser 
@@ -30,6 +31,9 @@ def record_duration_play(log_text_dump, userid):
 			curr_stamp = int(record_i['miliseconds'])
 			curr_state = record_i.get('state')
 			curr_videoid = int(record_i.get('video_byte_id'))
+			if(curr_state == 'ClickOnPlay'):
+				reference_time = datetime.utcfromtimestamp((curr_stamp)/ 1000).replace(tzinfo=pytz.utc)
+
 
 			if(curr_videoid in unique_video_play and (curr_state == 'StartPlaying' or curr_state == 'ClickOnPause')):
 				unique_video_play[curr_videoid][curr_state].append(curr_stamp)
@@ -50,7 +54,7 @@ def record_duration_play(log_text_dump, userid):
 				start_play_sorted = sorted(v_tuple['StartPlaying'])
 				pause_play_sorted = sorted(v_tuple['ClickOnPause'])
 				time_video_played = (pause_play_sorted[len(pause_play_sorted) - 1] - start_play_sorted[0]) / 1000			# duration of the video play
-				user_data_obj = VideoPlaytime(user = userid, videoid = v_id, playtime = time_video_played)
+				user_data_obj = VideoPlaytime(user = userid, videoid = v_id, playtime = time_video_played, timestamp = reference_time)
 				user_data_obj.save()
 
 	except Exception as e:
@@ -73,7 +77,8 @@ def calculate_completetion_rate():
 	video_records = VideoPlaytime.objects.all()
 	for each_record in video_records:
 		user_id = each_record.user
-		video_id = each_record.videoid 
+		video_id = each_record.videoid
+		reference_time = each_record.timestamp  
 		video_media_info = Topic.objects.get(is_vb = True, id = video_id)
 		playtime_duration = each_record.playtime
 		total_duration = parse_duration(video_media_info.media_duration)
@@ -85,7 +90,7 @@ def calculate_completetion_rate():
 		else:
 			scaled_per_viewed = per_viewed
 		#print(playtime_duration, total_duration, per_viewed, scaled_per_viewed)
-		user_data_obj = VideoCompleteRate(user = user_id, videoid = video_id, duration = total_duration, playtime = playtime_duration, percentage_viewed= scaled_per_viewed)
+		user_data_obj = VideoCompleteRate(user = user_id, videoid = video_id, duration = total_duration, playtime = playtime_duration, percentage_viewed= scaled_per_viewed, timestamp = reference_time)
 		user_data_obj.save()		
 
 
@@ -126,7 +131,7 @@ def main():
 		except Exception as e:
 			print('Exception: 1' + str(e))
 
-	#calculate_completetion_rate()			
+	calculate_completetion_rate()			
 	#app_activity_time_spend()				#commented as of now, we will look into this later
 
 
