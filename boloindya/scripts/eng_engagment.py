@@ -137,7 +137,7 @@ def run():
             if each_topic.likes_count<each_topic.view_count/random.randrange(10,21) and each_topic.likes_count < each_topic.view_count:
                 action_like(opt_action_user_id,each_topic_id)
         elif opt_action == 'follow':
-            action_follow(opt_action_user_id,random.choice(User.objects.all()).id)
+            action_follow(opt_action_user_id,Topic.objects.get(pk=each_topic_id).user.id)
         elif opt_action == 'share':
             action_share(opt_action_user_id,each_topic_id)
         elif opt_action == 'comment_like':
