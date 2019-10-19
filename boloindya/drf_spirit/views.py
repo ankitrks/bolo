@@ -318,6 +318,7 @@ class VBList(generics.ListCreateAPIView):
                         filter_dic[term_key]=value
                         if term_key =='user_id':
                             is_user_timeline = True
+                            self.pagination_class = LimitOffsetPagination
                         if term_key =='category':
                             m2mcategory__slug = self.request.GET.get(term_key)
             filter_dic['is_vb'] = True
@@ -1915,7 +1916,10 @@ def vb_seen(request):
         vbseen,is_created = VBseen.objects.get_or_create(user = request.user,topic_id = topic_id)
         if is_created:
             add_bolo_score(topic.user.id, 'vb_view', vbseen)
+        else:
+            vbseen = VBseen.objects.create(user = request.user,topic_id = topic_id)
         return JsonResponse({'message': 'vb seen'}, status=status.HTTP_200_OK)
+
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
