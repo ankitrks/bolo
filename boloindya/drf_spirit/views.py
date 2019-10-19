@@ -925,7 +925,7 @@ def provide_view_count(view_count,topic):
     user_ids = random.sample(user_ids,100)
     while counter<view_count:
         opt_action_user_id = random.choice(user_ids)
-        VBseen.objects.create(topic= topic,user =opt_action_user_id)
+        VBseen.objects.create(topic= topic,user_id =opt_action_user_id)
         counter+=1
 
 @api_view(['POST'])
