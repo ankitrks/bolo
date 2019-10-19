@@ -888,11 +888,17 @@ def createTopic(request):
             topic.question_image = question_image
             topic.vb_width = vb_width
             topic.vb_height = vb_height
-            topic.view_count = random.randint(1,49)
+            view_count = random.randint(1,5)
+            topic.view_count = view_count
             topic.update_vb()
         else:
-            topic.view_count = random.randint(10,30)
+            view_count = random.randint(10,30)
+            topic.view_count = view_count
         topic.save()
+        try:
+            provide_view_count(view_count,topic)
+        except:
+            pass
         topic.m2mcategory.add(Category.objects.get(pk=category_id))
         if not is_vb:
             userprofile = UserProfile.objects.get(user = request.user)
@@ -911,6 +917,16 @@ def createTopic(request):
         return JsonResponse({'message': message,'topic':topic_json}, status=status.HTTP_201_CREATED)
     except User.DoesNotExist:
         return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+
+def provide_view_count(view_count,topic):
+    counter =0
+    all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)
+    user_ids = list(all_test_userprofile_id)
+    user_ids = random.sample(user_ids,100)
+    while counter<view_count:
+        opt_action_user_id = random.choice(user_ids)
+        VBseen.objects.create(topic= topic,user =opt_action_user_id)
+        counter+=1
 
 @api_view(['POST'])
 def editTopic(request):
