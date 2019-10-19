@@ -231,6 +231,8 @@ def action_seen(user_id,topic_id):
     vbseen,is_created = VBseen.objects.get_or_create(user_id = user_id,topic_id = topic_id)
     if is_created:
         add_bolo_score(topic.user.id, 'vb_view', vbseen)
+    else:
+       vbseen = VBseen.objects.create(user_id = user_id,topic_id = topic_id)
 
 #follow
 def action_follow(test_user_id,any_user_id):
