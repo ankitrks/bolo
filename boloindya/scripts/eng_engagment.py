@@ -40,9 +40,9 @@ def run():
                 action_comment_like(opt_action_user_id,each_comment)
         elif opt_action == 'seen':
             action_seen(opt_action_user_id,each_topic_id)
-    last_n_days_post = Topic.objects.filter(is_vb=True,is_removed=False,date__gte=now-timedelta(days=3)).order_by('-date').values_list('id',flat=True)
-    last_n_days_post = list(last_n_days_post)
-    for each_like_id in last_n_days_post:
+    last_n_days_post_ids = Topic.objects.filter(is_vb=True,is_removed=False,date__gte=now-timedelta(days=3)).order_by('-date').values_list('id',flat=True)
+    last_n_days_post_ids = list(last_n_days_post_ids)
+    for each_like_id in last_n_days_post_ids:
         try:
             each_like = Topic.objects.get(pk=each_like_id)
             if each_like.likes_count < each_like.view_count/random.randrange(10,21):
@@ -79,7 +79,7 @@ def run():
         except:
             pass
 
-    for each_seen_id in last_n_days_post:
+    for each_seen_id in last_n_days_post_ids:
         try:
             each_seen = Topic.objects.get(pk=each_seen_id)
             if each_seen.date +timedelta(minutes=10) > now:
@@ -125,7 +125,31 @@ def run():
                     pass
         except:
             pass
-            
+
+    for each_topic_id in last_n_days_post_ids:
+        action_type =['seen','comment','like','follow','share','comment_like']
+        opt_action = random.choice(action_type)
+        opt_action_user_id = random.choice(user_ids)
+        if opt_action =='comment':
+            action_comment(opt_action_user_id,each_topic_id)
+        elif opt_action == 'like':
+            each_topic = Topic.objects.get(pk=each_topic_id)
+            if each_topic.likes_count<each_topic.view_count/random.randrange(10,21) and each_topic.likes_count < each_topic.view_count:
+                action_like(opt_action_user_id,each_topic_id)
+        elif opt_action == 'follow':
+            action_follow(opt_action_user_id,random.choice(User.objects.all()).id)
+        elif opt_action == 'share':
+            action_share(opt_action_user_id,each_topic_id)
+        elif opt_action == 'comment_like':
+            all_comment_list_id = Comment.objects.filter(is_removed=False).values_list('user_id',flat=True)
+            comment_ids = list(all_comment_list_id)
+            comment_ids = random.sample(comment_ids,50)
+            all_comment = Comment.objects.filter(pk__in =user_ids)
+            for each_comment in all_comment:
+                action_comment_like(opt_action_user_id,each_comment)
+        elif opt_action == 'seen':
+            action_seen(opt_action_user_id,each_topic_id)
+
 
 def check_like(topic_id,user_ids):
     now = datetime.now()
