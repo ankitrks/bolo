@@ -18,11 +18,11 @@ from fcm.utils import get_device_model
 admin.site.register(VideoUploadTranscode)
 
 class FCMDeviceAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'dev_id', 'reg_id', 'user', 'device_type')
+    list_display = ('id', 'name', 'dev_id', 'reg_id', 'user', 'device_type',)
     # list_filter = ('user__st__name', )
     search_fields = ('user__username', 'user__st__name')
     list_filter = ['is_active']
-    readonly_fields = ('dev_id', 'reg_id')
+    readonly_fields = ('dev_id', 'reg_id', 'created_at')
     actions = ['send_message_action']
 
     def get_urls(self):

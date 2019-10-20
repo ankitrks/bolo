@@ -1954,12 +1954,17 @@ def my_app_version(request):
 @api_view(['POST'])
 def get_follow_user(request):
     try:
+        language = request.POST.get('language', None)
         #all_follow_id = Follower.objects.filter(user_follower = request.user,is_active = True).values_list('user_following_id', flat=True)
         #all_vb_of_follower = Topic.objects.filter(is_vb=True,is_removed=False,user_id__in=all_follow_id).values_list('user_id',flat=True)
         #if all_vb_of_follower:
         #    all_user = User.objects.filter(pk__in = all_vb_of_follower)
         #    return JsonResponse({'all_follow':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
-        all_user = User.objects.filter(st__bolo_score__gte = 2000)
+        all_user = []
+        if language:
+            all_user = User.objects.filter(st__bolo_score__gte = 2000, st__language=language)
+        else:
+            all_user = User.objects.filter(st__bolo_score__gte = 2000)
         if all_user.count():
             return JsonResponse({'all_follow':UserSerializer(all_user.order_by('?'), many= True).data}, status=status.HTTP_200_OK)
         else:

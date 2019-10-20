@@ -14,15 +14,57 @@
         margin-left: 5px;
         margin-right: 5px;
     }
-    tr th {
-
-    }
 </style>
     <div class="row" style="padding: 10px;">
         <div class="col-md-12 filter_notification">
             <a href="/jarvis/send_notification/" class="btn btn-primary">Create New</a>
-            <input type="text" placeholder="Search Title" class="btn" id="search_title_input"/>
+            <form method="POST" style="display: inline;">
+                {% csrf_token %}
+                <input type="text" name="title" placeholder="Search Title" class="btn" id="search_title_input" value="{{title}}"/>
+            </form>
             <button class="btn btn-info">Export CSV</button>
+        </div>
+        <div class="col-md-12">
+            <h4>Symbols </h4>
+            (( Installed but did not sign up till 3 hours <i class="fa fa-user-plus"></i> 3 hrs ))
+            (( Installed and never signed up <i class="fa fa-user-plus"></i> ))
+            (( Signed up but never played a video <i class="fa fa-play"></i> ))
+            (( Signed up but no opening of app since 24 hours <i class="fa fa-android"></i> 24 hrs ))
+            (( Signed up but no opening of app since 72 hours <i class="fa fa-android"></i> 72 hrs ))
+            (( Never created a video <i class="fa fa-video-camera" aria-hidden="true"></i> ))
+            (( Re - Schedule <i class="fa fa-repeat" aria-hidden="true"></i>))
+            (( Cancel <i class="fa fa-remove"></i>))
+            (( Delete <i class="fa fa-trash" aria-hidden="true"></i> ))
+            <br/>
+        </div>
+        <div class="col-md-12" style="margin-top: 10px">
+            <form method="POST">
+                {% csrf_token %}
+                <select name="lang" >
+                    <option value="" disabled selected>Select Language</option>
+                    {% for lang in language_options %}
+                        <option value="{{ lang.0 }}" {% if language == lang.0 %}selected="selected"{% endif %}>{{ lang.1 }}</option>
+                    {% endfor %}
+                </select>
+                <select name="notification_type">
+                    <option value="" disabled selected>Notification Type</option>
+                    {% for noti_type in notification_types %}
+                        <option value="{{ noti_type.0 }}" {% if notification_type == noti_type.0 %}selected="selected"{% endif %}>{{ noti_type.1 }}</option>
+                    {% endfor %}
+                </select>
+                <select name="user_group">
+                    <option value="" disabled selected>Select User Group</option>
+                    {% for user_group_option in user_group_options %}
+                        <option value="{{ user_group_option.0 }}" {% if user_group == user_group_option.0 %}selected="selected"{% endif %}>{{ user_group_option.1 }}</option>
+                    {% endfor %}
+                </select>
+                <select name="scheduled_status">
+                    <option value="" disabled selected>Select Scheduled Status</option>
+                    <option value="0" {% if scheduled_status == '0' %}selected="selected"{% endif %}>Sent</option>
+                    <option value="1" {% if scheduled_status == '1' %}selected="selected"{% endif %}>Scheduled</option>
+                </select>
+                <button type="submit" class="btn btn-info">Filter</button>
+            </form>
         </div>
         <div class="col-xs-12 table-responsive ">
             <table class="table table-striped nowrap" id="notification_table">
@@ -35,7 +77,7 @@
                         <th>Open</th>
                         <th>Open %</th>
                         <th>Language</th>
-                        <th>User Group</th>
+                        <th><i class="fa fa-users" aria-hidden="true"></i></th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -49,8 +91,8 @@
                             <td>{% get_user_opened_notification pushNotification %}</td>
                             <td>{% get_percentage pushNotification.push_notification_id.all.count pushNotification %}</td>
                             <td>{% get_language_name pushNotification.language %}</td>
-                            <td><a href="/jarvis/particular_notification/{{pushNotification.pk}}" class="btn btn-primary"> {% get_user_group_name pushNotification.user_group %} </a></td>
-                            <td>{% if pushNotification.is_scheduled %}<a href="/jarvis/particular_notification/{{pushNotification.pk}}" class="btn btn-primary"><i class="fa fa-pencil" aria-hidden="true"></i></a> <button class="btn btn-danger operation"><i class="fa fa-times" aria-hidden="true"></i></button>{% else %}<button class="btn btn-success operation"><i class="fa fa-repeat" aria-hidden="true"></i></button>{% endif %}</td>
+                            <td><a href="/jarvis/particular_notification/{{pushNotification.pk}}"> {% get_user_group_name pushNotification.user_group %} </a></td>
+                            <td>{% if pushNotification.is_scheduled %}<a href="/jarvis/send_notification/?id={{pushNotification.pk}}" class="btn btn-primary"><i class="fa fa-pencil" aria-hidden="true"></i></a> <button class="btn btn-danger operation"><i class="fa fa-times" aria-hidden="true"></i></button>{% else %}<a class="btn btn-success operation" href="/jarvis/send_notification/?id={{pushNotification.pk}}"><i class="fa fa-repeat" aria-hidden="true"></i></a><a class="btn btn-danger operation" href="/jarvis/remove_notification/?id={{pushNotification.pk}}"><i class="fa fa-trash" aria-hidden="true"></i></a>{% endif %}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -61,5 +103,13 @@
 {% block center_js %}
 <script>
     $('#notification_table').DataTable();
+    $(document).ready(function() {
+    $('.search_title_input').keydown(function(event) {
+        if (event.keyCode == 13) {
+            this.form.submit();
+            return false;
+        }
+    });
+});
 </script>
 {% endblock center_js%}

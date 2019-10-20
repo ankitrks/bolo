@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 import csv, io
 from django.contrib import messages
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import permission_required
 import requests
 from bs4 import BeautifulSoup
@@ -31,7 +31,7 @@ from forum.payment.forms import PaymentForm,PaymentCycleForm
 from django.views.generic.edit import FormView
 from datetime import datetime
 from forum.userkyc.forms import KYCBasicInfoRejectForm,KYCDocumentRejectForm,AdditionalInfoRejectForm,BankDetailRejectForm
-from .models import VideoUploadTranscode,VideoCategory, PushNotification, PushNotificationUser, language_options, user_group_options, FCMDevice
+from .models import VideoUploadTranscode,VideoCategory, PushNotification, PushNotificationUser, language_options, user_group_options, FCMDevice, notification_type_options
 from forum.category.models import Category
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -752,9 +752,21 @@ def update_careeranna_db(uploaded_video):
     
 
 def notification_panel(request):
-    pushNotifications = PushNotification.objects.all().order_by('-created_at')
 
-    return render(request,'jarvis/pages/notification/index.html', {'pushNotifications': pushNotifications})
+    lang = request.POST.get('lang')
+    notification_type = request.POST.get('notification_type')
+    user_group = request.POST.get('user_group')
+    scheduled_status = request.POST.get('scheduled_status')
+    title = request.POST.get('title', '')
+
+    filters = {'language': lang, 'notification_type': notification_type, 'user_group': user_group, 'is_scheduled': scheduled_status, 'title__icontains': title}
+
+    pushNotifications = PushNotification.objects.filter(*[Q(**{k: v}) for k, v in filters.items() if v], is_removed=False).order_by('-created_at')
+
+    return render(request,'jarvis/pages/notification/index.html', {'pushNotifications': pushNotifications, \
+        'language_options': language_options, 'notification_types': notification_type_options, \
+            'user_group_options': user_group_options, 'language': lang, 'notification_type': notification_type, \
+                'user_group': user_group, 'scheduled_status': scheduled_status, 'title': title})
 
 from django.db.models import Q
 from drf_spirit.models import UserLogStatistics
@@ -762,48 +774,80 @@ import datetime
 
 def send_notification(request):
 
+    pushNotification = {}
     if request.method == 'POST':
+        
         title = request.POST.get('title', "")
         upper_title = request.POST.get('upper_title', "")
+        notification_type = request.POST.get('notification_type', "")
         id = request.POST.get('id', "")
         user_group = request.POST.get('user_group', "")
         lang = request.POST.get('lang', "")
+        schedule_status = request.POST.get('schedule_status', "")
+        datepicker = request.POST.get('datepicker', '')
+        timepicker = request.POST.get('timepicker', '')
 
+        device = ''
+        
         if user_group == '1':
-            vBseen = VBseen.objects.all().distinct('user__pk').values_list('user__pk', flat=True)
-            device = FCMDevice.objects.filter(~Q(user__pk__in=vBseen), user__st__language=lang)
+            end_date = datetime.datetime.today()
+            start_date = end_date - datetime.timedelta(hours=3)
+            device = FCMDevice.objects.filter(user__isnull=True, created_at__range=(start_date, end_date))
             print(device)
         elif user_group == '2':
+            device = FCMDevice.objects.filter(user__isnull=True)
+            print(device)
+        elif user_group == '3':
+            vBseen = VBseen.objects.distinct('user__pk').values_list('user__pk', flat=True)
+            device = FCMDevice.objects.filter(~Q(user__pk__in=vBseen), user__st__language=lang)
+            print(device)
+        elif user_group == '4':
             time_24_hours_ago = datetime.datetime.now() - datetime.timedelta(days=1)
             userLogStatistics = UserLogStatistics.objects.filter(session_starttime__gte=time_24_hours_ago).values_list('user', flat=True)
             userLogStatistics = map(int , userLogStatistics)
             device = FCMDevice.objects.filter(~Q(user__pk__in=userLogStatistics), user__st__language=lang)
             print(device)
-        elif user_group == '3':
+        elif user_group == '5':
             time_24_hours_ago = datetime.datetime.now() - datetime.timedelta(days=2)
             userLogStatistics = UserLogStatistics.objects.filter(session_starttime__gte=time_24_hours_ago).values_list('user', flat=True)
             userLogStatistics = map(int , userLogStatistics)
             device = FCMDevice.objects.filter(~Q(user__pk__in=userLogStatistics), user__st__language=lang)
             print(device)
-        elif user_group == '4':
+        elif user_group == '6':
             topic = Topic.objects.filter(is_vb=True).values_list('user__pk', flat=True)
             device = FCMDevice.objects.filter(~Q(user__pk__in=topic), user__st__language=lang)
             print(device)
-        else:        
-            pushNotification = PushNotification()
-            pushNotification.title = upper_title
-            pushNotification.description = title
-            pushNotification.language = lang
-            pushNotification.notification_type = notification_type
-            pushNotification.user_group = user_group
-            pushNotification.instance_id = id
-            pushNotification.save()
-        
+        else:                
             device = FCMDevice.objects.filter(user__st__language=lang)
             print(device)
-            device.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk})
+        
+        pushNotification = PushNotification()
+        pushNotification.title = upper_title
+        pushNotification.description = title
+        pushNotification.language = lang
+        pushNotification.notification_type = notification_type
+        pushNotification.user_group = user_group
+        pushNotification.instance_id = id
+        pushNotification.save()
+        if schedule_status == '1':
+            if datepicker:
+                pushNotification.scheduled_time = datetime.datetime.strptime(datepicker + " " + timepicker, "%m/%d/%Y %H : %M").date()
 
-    return render(request,'jarvis/pages/notification/send_notification.html', { 'language_options': language_options, 'user_group_options' : user_group_options })
+            pushNotification.is_scheduled = True            
+
+        pushNotification.save()
+
+        device.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk})
+        return redirect('/jarvis/notification_panel/')
+
+    if request.method == 'GET':
+        id = request.GET.get('id', None)
+        if id != None:
+            try:
+                pushNotification = PushNotification.objects.get(pk=id)
+            except Exception as e:
+                print e
+    return render(request,'jarvis/pages/notification/send_notification.html', { 'language_options': language_options, 'user_group_options' : user_group_options, 'notification_types': notification_type_options, 'pushNotification': pushNotification })
 
 
 def particular_notification(request, notification_id=None):
@@ -838,3 +882,13 @@ def open_notification_delivered(request):
 
     return JsonResponse({"status":"Success"})
 
+
+def remove_notification(request):
+    id = request.GET.get('id', None)
+    try:
+        pushNotification = PushNotification.objects.get(pk=id)
+        pushNotification.is_removed = True
+        pushNotification.save()
+    except Exception as e:
+        print e
+    return redirect('/jarvis/notification_panel/')
