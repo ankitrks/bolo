@@ -251,9 +251,11 @@ class UserVideoTypeDetails(models.Model):
     timestamp = models.DateTimeField(_("timestamp"), null = False, blank = True)
     video_type = models.CharField(_("video_type"), choices = videoinfo_type, max_length = 250)
 
-# class storing video creation details 
+# class storing video impression details 
 class VideoDetails(models.Model):
 
+    # userid has been added a new field
+    userid = models.CharField(_("user"), null = True, blank = False, max_length = 250, db_index = True)
     videoid = models.CharField(_("videoid"), null = False, blank = False, max_length = 250, db_index = True)
     timestamp = models.DateTimeField(_("timestamp"), null = True, blank = False)
 
@@ -314,8 +316,7 @@ class ActivityTimeSpend(models.Model):
     time_spent = models.PositiveIntegerField(_("time_spent(ms)"), default = 0, editable = False)
     timestamp = models.DateTimeField(_("timestamp"), null = True, blank = False)
 
-
-
+3
 # class recording the seach records of a user
 class UserSearch(models.Model):
 

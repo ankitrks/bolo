@@ -12,7 +12,6 @@ import os
 import pytz 
 import dateutil.parser 
 
-
 local_tz = pytz.timezone("Asia/Kolkata")
 import sys
 import django
@@ -28,12 +27,12 @@ def record_duration_play(log_text_dump, userid):
 	try:
 		for i in range(0, len(log_text_dump)):
 			record_i = log_text_dump[i]
-			curr_stamp = int(record_i['miliseconds'])
+			curr_stamp = float(record_i['miliseconds'])
 			curr_state = record_i.get('state')
 			curr_videoid = int(record_i.get('video_byte_id'))
 			if(curr_state == 'ClickOnPlay'):
 				reference_time = datetime.utcfromtimestamp((curr_stamp)/ 1000).replace(tzinfo=pytz.utc)
-
+				#print(reference_time)
 
 			if(curr_videoid in unique_video_play and (curr_state == 'StartPlaying' or curr_state == 'ClickOnPause')):
 				unique_video_play[curr_videoid][curr_state].append(curr_stamp)
@@ -90,8 +89,8 @@ def calculate_completetion_rate():
 		else:
 			scaled_per_viewed = per_viewed
 		#print(playtime_duration, total_duration, per_viewed, scaled_per_viewed)
-		user_data_obj = VideoCompleteRate(user = user_id, videoid = video_id, duration = total_duration, playtime = playtime_duration, percentage_viewed= scaled_per_viewed, timestamp = reference_time)
-		user_data_obj.save()		
+		#user_data_obj = VideoCompleteRate(user = user_id, videoid = video_id, duration = total_duration, playtime = playtime_duration, percentage_viewed= scaled_per_viewed, timestamp = reference_time)
+		#user_data_obj.save()		
 
 
 # func responsible for finding the time spend by the user across various activities
@@ -131,7 +130,7 @@ def main():
 		except Exception as e:
 			print('Exception: 1' + str(e))
 
-	calculate_completetion_rate()			
+	#calculate_completetion_rate()			
 	#app_activity_time_spend()				#commented as of now, we will look into this later
 
 

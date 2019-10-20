@@ -243,6 +243,7 @@ def video_type_details(user_data_dump):
 
     return JsonResponse({'message':'success'}, status = status.HTTP_201_CREATED)        
 
+# not a func required to be put in production
 def find_video_impressions(user_data_dump):
     if('vb_impressions' in user_data_dump):
         if(len(user_data_dump['vb_impressions']) > 0):
@@ -256,12 +257,13 @@ def find_video_impressions(user_data_dump):
 def video_info(user_data_dump):
     
     try:
+        dist_userid = user_data_dump['user_id']
         if('vb_impressions' in user_data_dump):
             if(len(user_data_dump['vb_impressions']) > 0):
                 for(a,b) in user_data_dump['vb_impressions']:
                     #datetime_format = time.strftime('%m/%d/%Y %H:%M:%S',  time.gmtime(b/1000.))
                     utc_dt = datetime.utcfromtimestamp(float(b)/ 1000).replace(tzinfo=pytz.utc)
-                    user_data_obj = VideoDetails(videoid = a, timestamp = utc_dt)
+                    user_data_obj = VideoDetails(userid = dist_userid, videoid = a, timestamp = utc_dt)
                     user_data_obj.save()
 
     except Exception as e:
@@ -580,14 +582,14 @@ def main():
             #user_statistics(user_data_dump)
             #follow_unfollow_details(user_data_dump)
             #video_type_details(user_data_dump)
-            #video_info(user_data_dump)
+            video_info(user_data_dump)
             #record_user_entry_points(user_data_dump)
             #userviewed_follower_following(user_data_dump)
             #user_category_intereset(user_data_dump)
             #video_share(user_data_dump)
             #search_query(user_data_dump)
             #record_session_time(user_data_dump)               #please run this before running dau and mau
-            activity_time_spend(user_data_dump)
+            #activity_time_spend(user_data_dump)
             #find_video_impressions(user_data_dump)
             unique_id = user_jarvis.pk # get primary key of the dump
             UserJarvisDump.objects.filter(pk = unique_id).update(is_executed = False, dump_type = 1)  #mark the is_executed field as true
