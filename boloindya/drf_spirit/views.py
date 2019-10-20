@@ -1929,8 +1929,9 @@ def vb_seen(request):
         userprofile = topic.user.st
         userprofile.view_count = F('view_count')+1
         userprofile.save()
-        vbseen,is_created = VBseen.objects.get_or_create(user = request.user,topic_id = topic_id)
-        if is_created:
+        vbseen = VBseen.objects.filter(user = request.user,topic_id = topic_id)
+        if not vbseen:
+            vbseen = VBseen.objects.create(user = request.user,topic_id = topic_id)
             add_bolo_score(topic.user.id, 'vb_view', vbseen)
         else:
             vbseen = VBseen.objects.create(user = request.user,topic_id = topic_id)

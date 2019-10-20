@@ -10,7 +10,7 @@ from forum.comment.models import Comment
 def run():
     all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)
     user_ids = list(all_test_userprofile_id)
-    user_ids = random.sample(user_ids,500)
+    user_ids = random.sample(user_ids,1000)
     action_type =['comment','like','seen','follow','share','comment_like']
     opt_action = random.choice(action_type)
     now = datetime.now()
@@ -228,8 +228,9 @@ def action_seen(user_id,topic_id):
     userprofile = get_userprofile(user_id)
     userprofile.view_count = F('view_count')+1
     userprofile.save()
-    vbseen,is_created = VBseen.objects.get_or_create(user_id = user_id,topic_id = topic_id)
-    if is_created:
+    vbseen = VBseen.objects.filter(user_id = user_id,topic_id = topic_id)
+    if not vbseen:
+        vbseen = VBseen.objects.create(user_id = user_id,topic_id = topic_id)
         add_bolo_score(topic.user.id, 'vb_view', vbseen)
     else:
        vbseen = VBseen.objects.create(user_id = user_id,topic_id = topic_id)
