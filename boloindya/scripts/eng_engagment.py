@@ -223,17 +223,17 @@ def action_like(user_id,topic_id):
 #seen
 def action_seen(user_id,topic_id):
     topic = get_topic(topic_id)
-    topic.view_count = F('view_count')+1
-    topic.save()
-    userprofile = get_userprofile(user_id)
-    userprofile.view_count = F('view_count')+1
-    userprofile.save()
     vbseen = VBseen.objects.filter(user_id = user_id,topic_id = topic_id)
     if not vbseen:
         vbseen = VBseen.objects.create(user_id = user_id,topic_id = topic_id)
         add_bolo_score(topic.user.id, 'vb_view', vbseen)
     else:
        vbseen = VBseen.objects.create(user_id = user_id,topic_id = topic_id)
+    topic.view_count = F('view_count')+1
+    topic.save()
+    userprofile = get_userprofile(user_id)
+    userprofile.view_count = F('view_count')+1
+    userprofile.save()
 
 #follow
 def action_follow(test_user_id,any_user_id):
