@@ -2421,3 +2421,12 @@ def redirect_to_store(request):
 
 #     return JsonResponse({'message':'success'}, status=status.HTTP_201_CREATED)    
 
+
+@api_view(['POST'])
+def get_category_detail(request):
+    try:
+        category_id = request.POST.get('category_id', None)
+        category = Category.objects.get(pk=category_id)
+        return JsonResponse({'category_details': CategorySerializer(category).data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
