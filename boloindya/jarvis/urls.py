@@ -29,5 +29,7 @@ urlpatterns = [
     url(r'^get_installs_data/$', views.get_installs_data),
     url(r'^get_impr_data/$', views.get_daily_impressions_data),
     url(r'^get_top_impr/$', views.get_top_impressions_data),
+    url(r'^get_weekly_vplay_data/$', views.weekly_vplay_data),
+    url(r'^get_daily_vplay_data/$', views.daily_vplay_data),
     #url(r'^barchart/$', views.barchart, name= 'create_barchart'),              # url for rendering the bar chart
 ]

@@ -19,7 +19,7 @@ import re
 from drf_spirit.views import get_video_thumbnail,getVideoLength
 from drf_spirit.utils  import calculate_encashable_details
 from forum.topic.models import Topic
-from forum.user.models import UserProfile, ReferralCode, ReferralCodeUsed
+from forum.user.models import UserProfile, ReferralCode, ReferralCodeUsed, VideoCompleteRate, VideoPlaytime
 from forum.category.models import Category
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -44,6 +44,7 @@ from datetime import timedelta
 from itertools import groupby
 from django.db.models import Count
 import ast
+from drf_spirit.serializers import VideoCompleteRateSerializer
 
 def get_bucket_details(bucket_name=None):
     bucket_credentials = {}
@@ -845,7 +846,94 @@ def get_top_impressions_data(request):
     else:
         return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)  
 
+def weekly_vplay_data(request):
+    if request.is_ajax():
+        raw_data = json.loads(request.body)
+        weekly_begin = raw_data['week_begin']
+        weekly_end = raw_data['week_end']
 
+        print("weekly_begin and end = "+weekly_begin+", "+weekly_end)
+
+        begin_time = weekly_begin + " 00:00:00"
+        end_time = weekly_end + " 00:00:00"
+
+        begin_time_obj = datetime.strptime(begin_time,"%d-%m-%Y %H:%M:%S").date()
+        end_temp_obj = datetime.strptime(end_time,"%d-%m-%Y %H:%M:%S").date()
+        end_time_obj = end_temp_obj + timedelta(days=1)
+
+        weekly_vplay_data_ungrouped = VideoPlaytime.objects.filter(timestamp__gte=begin_time_obj, timestamp__lte=end_time_obj).order_by('timestamp')
+
+        weekly_vplay_data_grouped = groupby(weekly_vplay_data_ungrouped, key= lambda x: x.timestamp.date())
+
+        weekly_vplay_data = []
+
+        for date, group in weekly_vplay_data_grouped:
+            this_date_data = {}
+            total_playtime = 0.0
+            total_plays = 0
+            
+            print("***** "+str(date))
+
+            for obj in group:
+                total_playtime += obj.playtime
+                total_plays += 1
+
+                print(str(obj.user)+"    "+str(obj.videoid)+"     "+str(obj.playtime))
+
+            this_date_data['total_playtime'] = total_playtime
+            this_date_data['total_plays'] = total_plays    
+            this_date_data['date'] = date.strftime("%d-%B-%Y")
+
+            weekly_vplay_data.append(this_date_data)
+
+        print(weekly_vplay_data)
+
+        return JsonResponse({'weekly_data': weekly_vplay_data}, status=status.HTTP_200_OK) 
+
+    else:
+        return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)              
+
+def daily_vplay_data(request):
+    if request.is_ajax():
+        raw_data = json.loads(request.body)
+        try:
+            vplay_date = raw_data['date']
+            print vplay_date
+
+            day_begin = vplay_date + " 00:00:00"
+
+            date_begin = datetime.strptime(day_begin,"%d-%m-%Y %H:%M:%S").date()
+            date_end = date_begin + timedelta(days=1)
+
+            vid_id_queryset = VideoCompleteRate.objects.filter(timestamp__gte=date_begin,\
+                timestamp__lte=date_end)\
+                .order_by('videoid')
+            
+            vid_list = VideoCompleteRateSerializer(vid_id_queryset, many=True).data
+
+            vid_id = []
+
+            for obj in vid_list:
+                vid_id.append(obj.get('videoid'))
+               
+            vid_titles_queryset = list(Topic.objects.filter(id__in=vid_id).values('id','title'))
+            vid_titles = {}
+            for item in vid_titles_queryset:
+                vid_titles[str(item.get('id'))] = item.get('title')
+
+            for obj in vid_list:
+                obj['title'] = vid_titles.get(obj.get('videoid'))
+            
+            print("vid titles : "+str(vid_titles))
+            print("vid info: "+str(vid_list))
+
+            return JsonResponse({'daily_data': vid_list}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print("Exception: "+str(e))
+            return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
+    else:
+        return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)   
 
 
 >>>>>>> Added impressions chart and table
