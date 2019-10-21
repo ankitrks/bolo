@@ -58,7 +58,7 @@ def record_duration_play(log_text_dump, userid):
 				user_data_obj.save()
 
 	except Exception as e:
-		print('Exception 2' + str(e))			
+		print('Exception 2' + str(e))	
 
 # parse string duration of the video and return the time in second
 def parse_duration(time):
@@ -132,7 +132,7 @@ def main():
 			print('Exception: 1' + str(e))
 
 	calculate_completetion_rate()			
-	#app_activity_time_spend()				#commented as of now, we will look into this later
+	app_activity_time_spend()				#commented as of now, we will look into this later
 
 
 def run():

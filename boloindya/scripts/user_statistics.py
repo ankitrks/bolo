@@ -579,18 +579,18 @@ def main():
             user_data_dump = ast.literal_eval(user_data_string)
             
             #pass the collected user dump through a set of methods
-            #user_statistics(user_data_dump)
-            #follow_unfollow_details(user_data_dump)
-            #video_type_details(user_data_dump)
-            #video_info(user_data_dump)
-            #record_user_entry_points(user_data_dump)
-            #userviewed_follower_following(user_data_dump)
-            #user_category_intereset(user_data_dump)
-            #video_share(user_data_dump)
-            #search_query(user_data_dump)
-            #record_session_time(user_data_dump)               #please run this before running dau and mau
+            user_statistics(user_data_dump)
+            follow_unfollow_details(user_data_dump)
+            video_type_details(user_data_dump)
+            video_info(user_data_dump)
+            record_user_entry_points(user_data_dump)
+            userviewed_follower_following(user_data_dump)
+            user_category_intereset(user_data_dump)
+            video_share(user_data_dump)
+            search_query(user_data_dump)
+            record_session_time(user_data_dump)               #please run this before running dau and mau
             activity_time_spend(user_data_dump)
-            #find_video_impressions(user_data_dump)
+            find_video_impressions(user_data_dump)
             unique_id = user_jarvis.pk # get primary key of the dump
             UserJarvisDump.objects.filter(pk = unique_id).update(is_executed = True, dump_type = 1)  #mark the is_executed field as true
 
