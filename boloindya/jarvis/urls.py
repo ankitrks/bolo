@@ -32,4 +32,12 @@ urlpatterns = [
     url(r'^get_weekly_vplay_data/$', views.weekly_vplay_data),
     url(r'^get_daily_vplay_data/$', views.daily_vplay_data),
     #url(r'^barchart/$', views.barchart, name= 'create_barchart'),              # url for rendering the bar chart
+    url(r'^edit_upload/$',views.edit_upload),
+    url(r'^delete_upload/$',views.delete_upload),
+    url(r'^upload_details/$',views.upload_details),
+    url(r'^uploaded_list/$',views.uploaded_list),
+    url(r'^edit_upload/$',views.edit_upload),
+    url(r'^get_submitted_kyc_user_list/$',views.get_submitted_kyc_user_list, name='get_submitted_kyc_user_list'),
+    url(r'^get_pending_kyc_user_list/$',views.get_pending_kyc_user_list, name='get_pending_kyc_user_list'),
+    url(r'^get_accepted_kyc_user_list/$',views.get_accepted_kyc_user_list, name='get_accepted_kyc_user_list'),
 ]

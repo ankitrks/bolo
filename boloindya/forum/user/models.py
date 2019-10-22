@@ -91,6 +91,7 @@ class UserProfile(models.Model):
 
     click_id = models.CharField(_("Click Id"), max_length=300, blank=True)
     click_id_response = models.TextField(_("Click Id Response"),null=True, blank=True)
+    is_dark_mode_enabled = models.BooleanField(default=False)
 
     # end #
 
@@ -185,6 +186,7 @@ class UserAppTimeSpend(models.Model):
 class AppVersion(RecordTimeStamp):
     app_name = models.CharField(_("Name"), max_length=100, blank=True)
     app_version = models.CharField(_("Version"), max_length=100, blank=True)
+    version_to_be_pushed = models.CharField(_("Version To be Pushed"), max_length=100, blank=True)
     is_hard_push = models.BooleanField(default = False)
     changes_title = models.CharField(_("Changes Title"), max_length=225, null=True,blank=True)
     changes = models.TextField(_("Changes"),null=True,blank=True)

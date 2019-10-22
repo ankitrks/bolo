@@ -354,7 +354,7 @@ SIMPLE_JWT = {
 #### S3 bucket #####
 BOLOINDYA_AWS_ACCESS_KEY_ID = 'AKIAJMOBRHDIXGKM6W6Q'
 BOLOINDYA_AWS_SECRET_ACCESS_KEY = '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'
-BOLOINDYA_AWS_BUCKET_NAME = 'boloindya-prod'
+BOLOINDYA_AWS_BUCKET_NAME = 'boloindyapp-prod'
 
 #### Transcoder settings #####
 BOLOINDYA_PIPELINE_ID_TS = '1545987947390-hpo4hx'
@@ -381,3 +381,5 @@ CAREERANNA_AWS_BUCKET_NAME_TS = 'elastictranscode.videos'
 REGION_HOST = 'us-east-1'
 
 PREDICTION_START_HOUR = 3
+
+CAREERANNA_VIDEOFILE_UPDATE_URL = "https://www.careeranna.com/search/insertOrUpdateFreeVideo"

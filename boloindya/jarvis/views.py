@@ -15,8 +15,9 @@ import string
 import random
 import os
 import hashlib
+import time
 import re
-from drf_spirit.views import get_video_thumbnail,getVideoLength
+from drf_spirit.views import getVideoLength
 from drf_spirit.utils  import calculate_encashable_details
 from forum.topic.models import Topic
 from forum.user.models import UserProfile, ReferralCode, ReferralCodeUsed, VideoCompleteRate, VideoPlaytime
@@ -30,8 +31,8 @@ from forum.payment.forms import PaymentForm,PaymentCycleForm
 from django.views.generic.edit import FormView
 from datetime import datetime
 from forum.userkyc.forms import KYCBasicInfoRejectForm,KYCDocumentRejectForm,AdditionalInfoRejectForm,BankDetailRejectForm
-from .models import VideoUploadTranscode
 from drf_spirit.models import MonthlyActiveUser, HourlyActiveUser, DailyActiveUser, VideoDetails
+from .models import VideoUploadTranscode,VideoCategory
 from forum.category.models import Category
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -45,6 +46,9 @@ from itertools import groupby
 from django.db.models import Count
 import ast
 from drf_spirit.serializers import VideoCompleteRateSerializer
+from .forms import VideoUploadTranscodeForm
+from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
+from django.core.files.base import ContentFile
 
 def get_bucket_details(bucket_name=None):
     bucket_credentials = {}
@@ -140,7 +144,7 @@ def geturl(request):
                         f.write(chunk)
             bucket_credentials = get_bucket_details('boloindyapp-prod')
             uploaded_url,transcode = upload_tos3(file_name,bucket_credentials['AWS_BUCKET_NAME'],'instagram')
-            thumbnail = get_video_thumbnail(file_name)
+            thumbnail = get_video_thumbnail(file_name,bucket_credentials['AWS_BUCKET_NAME'])
             media_duration = getVideoLength(file_name)
             create_vb = Topic.objects.create(title = description,language_id = language_id,category = Category.objects.get(title__icontains=category,parent__isnull = False),media_duration=media_duration,\
                 thumbnail = thumbnail,is_vb = True,view_count = random.randint(300,400),question_image = thumbnail, backup_url=uploaded_url,question_video = transcode['new_m3u8_url']\
@@ -181,8 +185,12 @@ def importcsv(request):
     return render(request,'admin/jarvis/importcsv.html',{'data':data,'title':title})
 
 @login_required
-def uploadvideofile(request):    
-    return render(request,'jarvis/pages/upload_n_transcode/upload_n_transcode.html')
+def uploadvideofile(request):
+    all_category = VideoCategory.objects.all()
+    from django.db.models import Count
+    all_upload = VideoUploadTranscode.objects.all().distinct().values('folder_to_upload').annotate(folder_count=Count('folder_to_upload')).order_by('folder_to_upload')
+    print all_upload
+    return render(request,'jarvis/pages/upload_n_transcode/upload_n_transcode.html',{'all_category':all_category,'all_upload':all_upload})
 
 def getcsvdata(request):
     data = []
@@ -325,6 +333,20 @@ def get_kyc_user_list(request):
     if request.user.is_superuser:
         all_kyc = UserKYC.objects.all()
         return render(request,'jarvis/pages/userkyc/user_kyc_list.html',{'all_kyc':all_kyc})
+def get_submitted_kyc_user_list(request):
+    if request.user.is_superuser:
+        all_kyc = UserKYC.objects.filter(is_kyc_completed=True,is_kyc_accepted=False)
+        return render(request,'jarvis/pages/userkyc/submitted_kyc.html',{'all_kyc':all_kyc})
+
+def get_pending_kyc_user_list(request):
+    if request.user.is_superuser:
+        all_kyc = UserKYC.objects.filter(is_kyc_completed=False,is_kyc_accepted=False)
+        return render(request,'jarvis/pages/userkyc/pending_kyc.html',{'all_kyc':all_kyc})
+
+def get_accepted_kyc_user_list(request):
+    if request.user.is_superuser:
+        all_kyc = UserKYC.objects.filter(is_kyc_completed=True,is_kyc_accepted=True)
+        return render(request,'jarvis/pages/userkyc/accepted_kyc.html',{'all_kyc':all_kyc})
 
 def get_kyc_of_user(request):
     if request.user.is_superuser or request.user.is_staff:
@@ -333,15 +355,15 @@ def get_kyc_of_user(request):
         kyc_details = UserKYC.objects.get(user=kyc_user)
         kyc_basic_info = KYCBasicInfo.objects.get(user=kyc_user)
         kyc_document = KYCDocument.objects.filter(user=kyc_user,is_active=True)
-        additional_info = AdditionalInfo.objects.get(user=kyc_user)
+        # additional_info = AdditionalInfo.objects.get(user=kyc_user)
         bank_details = BankDetail.objects.get(user=kyc_user,is_active=True)
         kyc_basic_reject_form = KYCBasicInfoRejectForm()
         kyc_document_reject_form = KYCDocumentRejectForm()
         kyc_additional_reject_form = AdditionalInfoRejectForm()
         kyc_bank_reject_form = BankDetailRejectForm()
-        return render(request,'admin/jarvis/userkyc/single_kyc.html',{'kyc_details':kyc_details,'kyc_basic_info':kyc_basic_info,\
-            'kyc_document':kyc_document,'additional_info':additional_info,'bank_details':bank_details,'userprofile':kyc_user.st,\
-            'user':kyc_user,'kyc_basic_reject_form':kyc_basic_reject_form,'kyc_document_reject_form':kyc_document_reject_form,'kyc_additional_reject_form':kyc_additional_reject_form,
+        return render(request,'jarvis/pages/userkyc/single_kyc.html',{'kyc_details':kyc_details,'kyc_basic_info':kyc_basic_info,\
+            'kyc_document':kyc_document,'additional_info':'','bank_details':bank_details,'userprofile':kyc_user.st,\
+            'user_details':kyc_user,'kyc_basic_reject_form':kyc_basic_reject_form,'kyc_document_reject_form':kyc_document_reject_form,'kyc_additional_reject_form':kyc_additional_reject_form,
             'kyc_bank_reject_form':kyc_bank_reject_form})
 
 
@@ -366,7 +388,7 @@ def get_encashable_detail(request):
         if to_be_calculated:
             for each_user in User.objects.all():
                 calculate_encashable_details(each_user)
-        all_encash_details = EncashableDetail.objects.all().order_by('-bolo_score_earned')
+        all_encash_details = EncashableDetail.objects.all().order_by('-bolo_score_earned')[:300]
     pay_cycle = PaymentCycle.objects.all().first()
     payement_cycle_form = PaymentCycleForm(initial=pay_cycle.__dict__)
     return render(request,'jarvis/pages/payment/encashable_detail.html',{'all_encash_details':all_encash_details,'payement_cycle_form':payement_cycle_form})
@@ -448,7 +470,7 @@ def accept_kyc(request):
             user_kyc.is_kyc_bank_details_accepted = True
         user_kyc.save()
         if user_kyc.is_kyc_basic_info_accepted and user_kyc.is_kyc_document_info_accepted and user_kyc.is_kyc_selfie_info_accepted and\
-        user_kyc.is_kyc_additional_info_accepted and user_kyc.is_kyc_bank_details_accepted:
+        user_kyc.is_kyc_bank_details_accepted:
             user_kyc.is_kyc_accepted = True
             user_kyc.save()
 
@@ -464,40 +486,46 @@ def reject_kyc(request):
         user_kyc = UserKYC.objects.get(user_id = user_id)
         if kyc_type == "basic_info":
             user_kyc.is_kyc_basic_info_accepted = False
+            user_kyc.kyc_basic_info_submitted = False
             obj = KYCBasicInfo.objects.get(pk=kyc_id)
             obj.reject_reason = kyc_reject_reason
             obj.reject_text = kyc_reject_text
         elif kyc_type == "kyc_document":
             user_kyc.is_kyc_document_info_accepted = False
+            user_kyc.kyc_document_info_submitted = False
             obj = KYCDocument.objects.get(pk=kyc_id)
             obj.reject_reason = kyc_reject_reason
             obj.reject_text = kyc_reject_text
         elif kyc_type == "kyc_pan":
             user_kyc.is_kyc_pan_info_accepted = False
+            user_kyc.kyc_pan_info_submitted = False
             obj = KYCDocument.objects.get(pk=kyc_id)
             obj.reject_reason = kyc_reject_reason
             obj.reject_text = kyc_reject_text
         elif kyc_type == "kyc_profile_pic":
             user_kyc.is_kyc_selfie_info_accepted = False
+            user_kyc.kyc_selfie_info_submitted = False
             obj = KYCBasicInfo.objects.get(pk=kyc_id)
             obj.reject_reason = kyc_reject_reason
             obj.reject_text = kyc_reject_text
-        elif kyc_type == "kyc_additional_info":
-            user_kyc.is_kyc_additional_info_accepted = False
-            obj = AdditionalInfo.objects.get(pk=kyc_id)
-            obj.reject_reason = kyc_reject_reason
-            obj.reject_text = kyc_reject_text      
+        # elif kyc_type == "kyc_additional_info":
+        #     user_kyc.is_kyc_additional_info_accepted = False
+        #     user_kyc.kyc_additional_info_submitted = False
+        #     obj = AdditionalInfo.objects.get(pk=kyc_id)
+        #     obj.reject_reason = kyc_reject_reason
+        #     obj.reject_text = kyc_reject_text      
         elif kyc_type == "kyc_bank_details":
             user_kyc.is_kyc_bank_details_accepted = False
+            user_kyc.kyc_bank_details_submitted = False
             obj = BankDetail.objects.get(pk=kyc_id)
             obj.reject_reason = kyc_reject_reason
             obj.reject_text = kyc_reject_text
         obj.is_rejected = True
-        obj.is_active = True
+        obj.is_active = False
         obj.save()
         user_kyc.save()
         if not (user_kyc.is_kyc_basic_info_accepted and user_kyc.is_kyc_document_info_accepted and user_kyc.is_kyc_selfie_info_accepted and \
-        user_kyc.is_kyc_additional_info_accepted and user_kyc.is_kyc_bank_details_accepted):
+        user_kyc.is_kyc_bank_details_accepted and userkyc.is_kyc_selfie_info_accepted):
             user_kyc.is_kyc_accepted = False
             user_kyc.is_kyc_completed = False
             user_kyc.save()
@@ -512,9 +540,22 @@ def urlify(s):
 
 @login_required
 def upload_n_transcode(request):
-    upload_file = request.FILES['csv_file']
+    upload_file = request.FILES['media_file']
     upload_to_bucket = request.POST.get('bucket_name',None)
     upload_folder_name = request.POST.get('folder_prefix',None)
+    upload_category = request.POST.get('category_choice',None)
+    free_video = request.POST.get('free_video',None)
+    video_title = request.POST.get('video_title',None)
+    video_descp = request.POST.get('video_descp',None)
+    meta_title = request.POST.get('meta_title',None)
+    meta_descp = request.POST.get('meta_descp',None)
+    meta_keywords = request.POST.get('meta_keywords',None)
+    video_category = False
+    if upload_category:
+        upload_category = upload_category.strip()
+        if upload_category:
+            video_category,is_created = VideoCategory.objects.get_or_create(category_name = upload_category.lower())
+
     # print upload_file,upload_to_bucket,upload_folder_name
     if not upload_to_bucket:
         return HttpResponse(json.dumps({'message':'fail','reason':'bucket_missing'}),content_type="application/json")
@@ -522,6 +563,8 @@ def upload_n_transcode(request):
         return HttpResponse(json.dumps({'message':'fail','reason':'File Missing'}),content_type="application/json")
     if not upload_file.name.endswith('.mp4'):
         return HttpResponse(json.dumps({'message':'fail','reason':'This is not a mp4 file'}),content_type="application/json")
+    if free_video and (not video_title or not video_descp):
+        return HttpResponse(json.dumps({'message':'fail','reason':'Title or Description is missing'}),content_type="application/json")
 
     bucket_credentials = get_bucket_details(upload_to_bucket)
     conn = boto3.client('s3', bucket_credentials['REGION_HOST'], aws_access_key_id = bucket_credentials['AWS_ACCESS_KEY_ID'], \
@@ -547,7 +590,14 @@ def upload_n_transcode(request):
                     if chunk:
                         f.write(chunk)
 
+
             uploaded_url,transcode = upload_tos3(upload_file,upload_to_bucket,upload_folder_name)
+            thumbnail_url = get_video_thumbnail(uploaded_url,upload_to_bucket)
+            try:
+                videolength = getVideoLength(uploaded_url)
+            except:
+                videolength = ''
+            print videolength
             my_dict = {}
             my_dict['s3_file_url']=uploaded_url
             if 'job_id' in transcode:
@@ -559,8 +609,23 @@ def upload_n_transcode(request):
             my_dict['filename_changed'] = urlify(upload_file_name)
             my_dict['folder_to_upload'] = upload_folder_name
             my_dict['folder_to_upload_changed'] = urlify(upload_folder_name)
+            my_dict['thumbnail_url'] = thumbnail_url
+            my_dict['media_duration'] = videolength
+            if video_category:
+                my_dict['category'] = video_category
+            if free_video:
+                my_dict['is_free_video'] = True
+                my_dict['video_title'] = video_title
+                my_dict['video_descp'] = video_descp
+                my_dict['meta_title'] = meta_title
+                my_dict['meta_descp'] = meta_descp
+                my_dict['meta_keywords'] = meta_keywords
             my_upload_transcode = VideoUploadTranscode.objects.create(**my_dict)
             os.remove(urlify(upload_file_name))
+            try:
+                update_careeranna_db(my_upload_transcode)
+            except Exception as e:
+                return HttpResponse(json.dumps({'message':'fail','reason':'Could not update careeranna db'+str(e)}),content_type="application/json")
 
     return HttpResponse(json.dumps({'message':'success','file_id':my_upload_transcode.id}),content_type="application/json")
 
@@ -576,8 +641,124 @@ def upload_details(request):
 
 @login_required
 def uploaded_list(request):
-    all_uploaded = VideoUploadTranscode.objects.all()
-    return render(request,'jarvis/pages/1upload_n_transcode/uploaded_list.html',{'all_uploaded':all_uploaded})
+    all_uploaded = VideoUploadTranscode.objects.filter(is_active = True)
+    return render(request,'jarvis/pages/upload_n_transcode/uploaded_list.html',{'all_uploaded':all_uploaded})
+
+@login_required
+def edit_upload(request):
+    if request.method == 'GET':
+        file_id = request.GET.get('id',None)
+        if file_id:
+            my_video = VideoUploadTranscode.objects.get(pk=file_id)
+            my_dict = {'category':my_video.category,'video_title':my_video.video_title,'video_descp':my_video.video_descp,'is_free_video':my_video.is_free_video,\
+            'meta_title':my_video.meta_title,'meta_descp':my_video.meta_descp,'meta_keywords':my_video.meta_keywords}
+            video_form = VideoUploadTranscodeForm(initial=my_dict)
+            return render(request,'jarvis/pages/upload_n_transcode/edit_upload.html',{'my_video':my_video,'video_form':video_form})
+        return render(request,'jarvis/pages/upload_n_transcode/edit_upload.html')
+    elif request.method == 'POST':
+        print request.POST
+        video_id = request.POST.get('video_id',None)
+        if video_id:
+            my_video = VideoUploadTranscode.objects.get(pk=video_id)
+            is_free_video = request.POST.get('is_free_video',None)
+            if is_free_video:
+                my_video.is_free_video = True
+            else:
+                my_video.is_free_video = False
+            my_video.video_title = request.POST.get('video_title','')
+            my_video.video_descp = request.POST.get('video_descp','')
+            my_video.category_id = request.POST.get('category',None)
+            my_video.meta_title = request.POST.get('meta_title','')
+            my_video.meta_descp = request.POST.get('meta_descp','')
+            my_video.meta_keywords = request.POST.get('meta_keywords','')
+            my_video.save()
+            try:
+                update_careeranna_db(my_video)
+            except Exception as e:
+                return HttpResponse(json.dumps({'message':'fail','reason':'Could not update careeranna db'+str(e)}),content_type="application/json")
+            return HttpResponse(json.dumps({'message':'success','video_id':my_video.id}),content_type="application/json")
+        else:
+
+            return HttpResponse(json.dumps({'message':'fail','reason':'file id not found'}),content_type="application/json")
+
+@login_required
+def delete_upload(request):
+    file_id = request.GET.get('id',None)
+    if file_id:
+        my_video = VideoUploadTranscode.objects.get(pk=file_id)
+        my_video.is_active = False
+        my_video.save()
+        try:
+            update_careeranna_db(my_video)
+        except Exception as e:
+             return HttpResponse(json.dumps({'message':'fail','reason':'Could not update careeranna db'+str(e)}),content_type="application/json")
+        all_uploaded = VideoUploadTranscode.objects.filter(is_active = True)
+        return render(request,'jarvis/pages/upload_n_transcode/uploaded_list.html',{'all_uploaded':all_uploaded})
+
+def get_video_thumbnail(video_url,bucket_name):
+    video = VideoCapture(video_url)
+    frames_count = int(video.get(CAP_PROP_FRAME_COUNT))
+    frame_no = frames_count*2/3
+    video.set(CAP_PROP_POS_FRAMES, frame_no)
+    success, frame = video.read()
+    if success:
+        b = imencode('.jpg', frame)[1].tostring()
+        ts = time.time()
+        virtual_thumb_file = ContentFile(b, name = "img-" + str(ts).replace(".", "")  + ".jpg" )
+        print virtual_thumb_file
+        url_thumbnail= upload_thumbail(virtual_thumb_file,bucket_name)
+        print url_thumbnail
+        # obj.thumbnail = url_thumbnail
+        # obj.media_duration = media_duration
+        # obj.save()
+        return url_thumbnail
+    else:
+        return False
+
+def upload_thumbail(virtual_thumb_file,bucket_name):
+    try:
+        bucket_credentials = get_bucket_details('careeranna')
+        client = boto3.client('s3',aws_access_key_id=bucket_credentials['AWS_ACCESS_KEY_ID'],aws_secret_access_key=bucket_credentials['AWS_SECRET_ACCESS_KEY'])
+        ts = time.time()
+        created_at = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+        final_filename = "img-" + str(ts).replace(".", "")  + ".jpg"
+        client.put_object(Bucket=bucket_credentials['AWS_BUCKET_NAME'], Key='thumbnail/' +bucket_name+"/"+final_filename, Body=virtual_thumb_file, ACL='public-read')
+        # client.resource('s3').Object(settings.BOLOINDYA_AWS_BUCKET_NAME, 'thumbnail/' + final_filename).put(Body=open(virtual_thumb_file, 'rb'))
+        filepath = "https://"+bucket_credentials['AWS_BUCKET_NAME']+".s3.amazonaws.com/thumbnail/"+bucket_name+"/"+final_filename
+        # if os.path.exists(file):
+        #     os.remove(file)
+        return filepath
+    except:
+        return None
+
+def update_careeranna_db(uploaded_video):
+    import requests
+    headers = {'X-API-TOKEN': 'your_token_here'}
+    if uploaded_video.is_active:
+        status = '1'
+    else:
+        status = '0'
+    payload = {
+        'cid': uploaded_video.category.id,
+        'cat_name' : uploaded_video.category.category_name,
+        'cat_slug' : uploaded_video.category.slug,
+        'heading' : uploaded_video.video_title,
+        'heading_slug' : uploaded_video.slug,
+        'description' : uploaded_video.video_descp,
+        'social_image' : uploaded_video.thumbnail_url,
+        'meta_title' : uploaded_video.meta_title,
+        'meta_descp' : uploaded_video.meta_descp,
+        'meta_keywords' : uploaded_video.meta_keywords,
+        'video_url' : uploaded_video.transcoded_file_url,
+        'backup_url' : uploaded_video.s3_file_url,
+        'status' : status,
+        'duration' : uploaded_video.media_duration
+
+    }
+    reseponse_careeranna = requests.post(settings.CAREERANNA_VIDEOFILE_UPDATE_URL, data=payload, headers=headers)
+    return reseponse_careeranna
+    
+
 
 @login_required
 def user_statistics(request):
@@ -806,8 +987,6 @@ def get_daily_impressions_data(request):
             print("Exception: "+str(e))
             return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)  
 
-<<<<<<< HEAD
-=======
 def get_top_impressions_data(request):
     if request.is_ajax():
         raw_data = json.loads(request.body)
@@ -934,7 +1113,4 @@ def daily_vplay_data(request):
             return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
     else:
         return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)   
-
-
->>>>>>> Added impressions chart and table
 

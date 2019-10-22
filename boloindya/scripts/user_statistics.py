@@ -1,4 +1,5 @@
-from drf_spirit.models import UserJarvisDump, UserLogStatistics, UserFollowUnfollowDetails, UserVideoTypeDetails, VideoDetails, UserEntryPoint, UserViewedFollowersFollowing, VideoSharedDetails,UserSearch, UserTimeRecord, DailyActiveUser, MonthlyActiveUser, UserInterest, HourlyActiveUser, ActivityTimeSpend
+from drf_spirit.models import UserJarvisDump, UserLogStatistics, UserFollowUnfollowDetails, UserVideoTypeDetails, VideoDetails,\
+UserEntryPoint, UserViewedFollowersFollowing, VideoSharedDetails,UserSearch
 import time
 import ast
 import re
