@@ -16,7 +16,7 @@ from rest_framework.generics import GenericAPIView
 
 from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
-from .models import UserJarvisDump
+from .models import UserJarvisDump, UserLogStatistics
 from .permissions import IsOwnerOrReadOnly
 from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,AppVersionSerializer,UserSerializer,SingleTopicSerializerwithComment,\
 UserAnswerSerializerwithComment,CricketMatchSerializer,PollSerializer,ChoiceSerializer,VotingSerializer,LeaderboardSerializer,\
@@ -2312,6 +2312,8 @@ def redirect_to_store(request):
     if request.GET.urlencode():
         return HttpResponseRedirect('https://play.google.com/store/apps/details?' + request.GET.urlencode())
     return HttpResponseRedirect('https://play.google.com/store/apps/details?id=com.boloindya.boloindya')
+
+
 
 # this view is repsonsible for dumping values in already created models
 #

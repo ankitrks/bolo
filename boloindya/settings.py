@@ -138,6 +138,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'jarvis',
     'tinymce',
+    'chartjs',
     
     # 'forum.core.tests'
 ]

@@ -158,6 +158,31 @@ class AndroidLogs(RecordTimeStamp):
     def __unicode__(self):
         return str(self.user)
 
+# class recording the playime for videos
+class VideoPlaytime(models.Model):
+
+    user = models.CharField(_("user"), null = True, blank = True, max_length = 250, db_index = True)
+    videoid = models.CharField(_("videoid"), null = True, blank = True, max_length = 250, db_index = True)
+    playtime = models.PositiveIntegerField(_("playtime"), default=0, editable = False)
+    timestamp = models.DateTimeField(_("timestamp"), null = True, blank = False)
+
+# class recording the fraction of videos played
+class VideoCompleteRate(models.Model):
+
+    user = models.CharField(_("user"), null = True, blank = False, max_length = 250, db_index = True)
+    videoid = models.CharField(_("videoid"), null = True, blank = False, max_length = 250, db_index = True)
+    duration = models.PositiveIntegerField(_("duration"), default = 0, editable = False)
+    playtime = models.PositiveIntegerField(_("playtime"), default = 0, editable = False)
+    percentage_viewed = models.DecimalField(_("percentage_viewed"), max_digits = 5, decimal_places = 2)
+    timestamp = models.DateTimeField(_("timestamp"), null = True, blank = False)
+
+# class storing the total time spend by the user on the app
+class UserAppTimeSpend(models.Model):
+
+    user = models.CharField(_("user"), null = True, blank = False, max_length = 250, db_index = True)
+    total_time = models.DecimalField(_("totaltime"), max_digits = 5, decimal_places = 2)
+
+
 class AppVersion(RecordTimeStamp):
     app_name = models.CharField(_("Name"), max_length=100, blank=True)
     app_version = models.CharField(_("Version"), max_length=100, blank=True)

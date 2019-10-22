@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 import boto3
 from botocore.exceptions import NoCredentialsError
 from boto3.s3.transfer import S3Transfer
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpRequest
 import json
 import string
 import random
@@ -20,7 +20,7 @@ import re
 from drf_spirit.views import getVideoLength
 from drf_spirit.utils  import calculate_encashable_details
 from forum.topic.models import Topic
-from forum.user.models import UserProfile
+from forum.user.models import UserProfile, ReferralCode, ReferralCodeUsed, VideoCompleteRate, VideoPlaytime
 from forum.category.models import Category
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -31,11 +31,21 @@ from forum.payment.forms import PaymentForm,PaymentCycleForm
 from django.views.generic.edit import FormView
 from datetime import datetime
 from forum.userkyc.forms import KYCBasicInfoRejectForm,KYCDocumentRejectForm,AdditionalInfoRejectForm,BankDetailRejectForm
+from drf_spirit.models import MonthlyActiveUser, HourlyActiveUser, DailyActiveUser, VideoDetails
 from .models import VideoUploadTranscode,VideoCategory
 from forum.category.models import Category
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.http import JsonResponse
+from rest_framework import status
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.timezone import make_aware
+from datetime import timedelta
+from itertools import groupby
+from django.db.models import Count
+import ast
+from drf_spirit.serializers import VideoCompleteRateSerializer
 from .forms import VideoUploadTranscodeForm
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
 from django.core.files.base import ContentFile
@@ -323,7 +333,6 @@ def get_kyc_user_list(request):
     if request.user.is_superuser:
         all_kyc = UserKYC.objects.all()
         return render(request,'jarvis/pages/userkyc/user_kyc_list.html',{'all_kyc':all_kyc})
-
 def get_submitted_kyc_user_list(request):
     if request.user.is_superuser:
         all_kyc = UserKYC.objects.filter(is_kyc_completed=True,is_kyc_accepted=False)
@@ -750,4 +759,358 @@ def update_careeranna_db(uploaded_video):
     return reseponse_careeranna
     
 
+
+@login_required
+def user_statistics(request):
+
+    #Extract campaigns list from the models
+    campaigns = ReferralCode.objects.all()
+
+    return render(request, 'jarvis/pages/user_statistics/user_statistics.html', {'campaigns_list':campaigns})
+
+def get_stats_data(request):
+
+    #MAU Data
+    mau_data = MonthlyActiveUser.objects.all()
+    mau_labels = []
+    mau_freq = []
+    for obj in mau_data:
+        month = str(obj.month)+" "+str(obj.year)
+        mau_freq.append(str(obj.frequency))
+        mau_labels.append(month)
+
+    print(mau_labels)
+    print(mau_freq)
+
+    #DAU Data
+    #Show the data of past 7 days by default
+    # dau_data = DailyActiveUser.objects.all().order_by('-date_time_field')
+    today = datetime.today()
+    ago_7_days = today + timedelta(days=-8)
+
+    print(str(today)+" "+str(ago_7_days))
+
+    dau_data = DailyActiveUser.objects.filter(date_time_field__gte=ago_7_days,
+                                        date_time_field__lte=today).order_by('date_time_field')
+
+    dau_labels = []
+    dau_freq = []
+    for obj in dau_data:
+        dau_labels.append(str(obj.date_time_field.strftime("%d %B %Y")))
+        dau_freq.append(str(obj.frequency))
+
+    print(dau_labels)
+    print(dau_freq)
+
+    #HAU Data
+    date_begin = datetime.today() + timedelta(days=-1)
+    date_begin.replace(hour=0, minute=0, second=0)
+    date_end = datetime.today()
+
+    data = HourlyActiveUser.objects.filter(date_time_field__gte=date_begin,
+                                        date_time_field__lte=date_end).order_by('date_time_field')
+
+    hau_labels = []
+    hau_freq = []
+    for hau_data in data:
+        hau_labels.append(str(hau_data.date_time_field.strftime("%I %p, %d %B")))
+        hau_freq.append(str(hau_data.frequency))            
+
+    print(hau_labels)
+    print(hau_freq)
+
+    installs_labels = []
+    installs_freq = []
+
+    all_data = {'dau_labels': dau_labels, 'dau_freq': dau_freq, 'hau_labels': hau_labels, 'hau_freq': hau_freq, 'mau_freq':mau_freq, 'mau_labels':mau_labels,
+    'installs_labels':installs_labels, 'installs_freq':installs_freq}
+    return JsonResponse(all_data, status=status.HTTP_200_OK)
+
+
+
+@csrf_exempt
+def get_hau_data(request):
+    if request.is_ajax():
+        raw_data = json.loads(request.body)
+        try:
+            hau_day = raw_data['hau_day']
+            print hau_day
+            hau_day_begin = hau_day + " 00:00:00"
+
+            date_begin = datetime.strptime(hau_day_begin,"%d-%m-%Y %H:%M:%S").date()
+            date_end = date_begin + timedelta(days=1)
+
+            data = HourlyActiveUser.objects.filter(date_time_field__gte=date_begin,
+                                                date_time_field__lte=date_end).order_by('date_time_field')
+
+            hau_labels = []
+            hau_freq = []
+            for obj in data:
+                hau_labels.append(str(obj.date_time_field.strftime("%I %p")))
+                hau_freq.append(str(obj.frequency))
+
+            print(hau_labels)
+            print(hau_freq)
+
+            all_data = {'hau_labels': hau_labels, 'hau_freq': hau_freq}
+            return JsonResponse(all_data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(e)
+            return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
+    else:
+        return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)        
+    
+@csrf_exempt
+def get_dau_data(request):
+    if request.is_ajax():
+        raw_data = json.loads(request.body)
+        try:
+            # hau_day = raw_data['hau_day']
+
+            dau_begin = raw_data['dau_from']
+            dau_end = raw_data['dau_to']
+
+            print(dau_begin+", "+dau_end)
+
+            begin_time = dau_begin + " 00:00:00"
+            end_time = dau_end + " 00:00:00"
+
+            begin_time_obj = datetime.strptime(begin_time,"%d-%m-%Y %H:%M:%S").date()
+            end_temp_obj = datetime.strptime(end_time,"%d-%m-%Y %H:%M:%S").date()
+            end_time_obj = end_temp_obj + timedelta(days=1)
+
+            data = DailyActiveUser.objects.filter(date_time_field__gte=begin_time_obj,
+                                                date_time_field__lte=end_temp_obj).order_by('date_time_field')
+
+            dau_labels = []
+            dau_freq = []
+            for obj in data:
+                dau_labels.append(str(obj.date_time_field.strftime("%d %B %y")))
+                dau_freq.append(str(obj.frequency))
+
+            print(dau_labels)
+            print(dau_freq)
+
+            all_data = {'dau_labels': dau_labels, 'dau_freq': dau_freq}
+            return JsonResponse(all_data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print("Exception: "+e)
+            return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
+    else:
+        return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)  
+
+def get_installs_data(request):
+    if request.is_ajax():
+        raw_data = json.loads(request.body)
+        try:
+            installs_begin = raw_data['installs_from']
+            installs_end = raw_data['installs_to']
+            campaign = raw_data['campaign']
+
+            print(installs_begin+", "+installs_end+", "+campaign)
+
+            begin_time = installs_begin + " 00:00:00"
+            end_time = installs_end + " 00:00:00"
+
+            begin_time_obj = datetime.strptime(begin_time,"%d-%m-%Y %H:%M:%S").date()
+            end_temp_obj = datetime.strptime(end_time,"%d-%m-%Y %H:%M:%S").date()
+            end_time_obj = end_temp_obj + timedelta(days=1)
+
+            installs_labels = []
+            installs_freq = []
+            installs_data = 0
+
+            if campaign == '-1':
+                installs_data_without_group = ReferralCodeUsed.objects.filter(created_at__gte=begin_time_obj,
+                                                created_at__lte=end_temp_obj).order_by('created_at')
+            else:
+                installs_data_without_group = ReferralCodeUsed.objects.filter(created_at__gte=begin_time_obj,
+                                                created_at__lte=end_temp_obj, code_id=campaign).order_by('created_at')
+                print(len(installs_data_without_group))
+
+            installs_data = groupby(installs_data_without_group, key=lambda x: x.created_at.date())
+            for date, group in installs_data:
+                size_of_this_group = sum(1 for x in group)
+                installs_labels.append(str(date.strftime("%d %B %y")))
+                installs_freq.append(str(size_of_this_group))
+                print(str(date)+" "+str(size_of_this_group))
+
+            all_data = {'installs_labels':installs_labels, 'installs_freq':installs_freq}    
+
+            return JsonResponse({'all_data':all_data}, status=status.HTTP_200_OK)    
+
+        except Exception as e:
+            print("Exception: "+str(e))
+            return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
+    else:
+        return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)            
+
+@login_required
+def video_statistics(request):
+    return render(request,'jarvis/pages/video_statistics/video_statistics.html')
+
+def get_daily_impressions_data(request):
+    if request.is_ajax():
+        raw_data = json.loads(request.body)            
+        try:
+            impr_begin = raw_data['impr_from']
+            impr_end = raw_data['impr_to']
+
+            print("impr_begin and end = "+impr_begin+", "+impr_end)
+
+            begin_time = impr_begin + " 00:00:00"
+            end_time = impr_end + " 00:00:00"
+
+            begin_time_obj = datetime.strptime(begin_time,"%d-%m-%Y %H:%M:%S").date()
+            end_temp_obj = datetime.strptime(end_time,"%d-%m-%Y %H:%M:%S").date()
+            end_time_obj = end_temp_obj + timedelta(days=1)
+
+            impr_labels = []
+            impr_freq = []
+
+            impr_data_ungrouped = VideoDetails.objects.filter(timestamp__gte=begin_time_obj, timestamp__lte=end_time_obj).order_by('timestamp')
+
+            impr_data = groupby(impr_data_ungrouped, key= lambda x: x.timestamp.date())
+            for date, group in impr_data:
+                size_of_this_group = sum(1 for x in group)
+                impr_labels.append(str(date.strftime("%d %B %y")))
+                impr_freq.append(str(size_of_this_group))
+                print(str(date)+" "+str(size_of_this_group))
+
+            all_data = {'impr_labels':impr_labels, 'impr_freq':impr_freq}    
+
+            return JsonResponse({'impr_labels':impr_labels, 'impr_freq':impr_freq}, status=status.HTTP_200_OK) 
+
+        except Exception as e:
+            print("Exception: "+str(e))
+            return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)  
+
+def get_top_impressions_data(request):
+    if request.is_ajax():
+        raw_data = json.loads(request.body)
+        try:
+            top_impr_date = raw_data['date']
+            print top_impr_date
+
+            day_begin = top_impr_date + " 00:00:00"
+
+            date_begin = datetime.strptime(day_begin,"%d-%m-%Y %H:%M:%S").date()
+            date_end = date_begin + timedelta(days=1)
+
+            vid_id_queryset = VideoDetails.objects.filter(timestamp__gte=date_begin,\
+                timestamp__lte=date_end)\
+                .values('videoid').annotate(impr_count=Count('videoid'))\
+                .order_by('-impr_count')[:10]
+
+            vid_id = []
+            vid_id_and_impr = {}
+
+            for obj in vid_id_queryset:
+                vid_id.append(obj.get('videoid'))
+                vid_id_and_impr[obj.get('videoid')] = obj.get('impr_count')
+
+            vid_all_info = list(Topic.objects.filter(id__in=vid_id).values('id', 'title', 'user__first_name', 'user__username'))
+            for item in vid_all_info:
+                item['impressions'] = vid_id_and_impr.get(str(item.get('id')))
+
+            vid_all_info.sort(key=lambda item: item['impressions'], reverse=True)
+
+            return JsonResponse({'vid_all_info': vid_all_info}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print("Exception: "+str(e))
+            return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
+    else:
+        return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)  
+
+def weekly_vplay_data(request):
+    if request.is_ajax():
+        raw_data = json.loads(request.body)
+        weekly_begin = raw_data['week_begin']
+        weekly_end = raw_data['week_end']
+
+        print("weekly_begin and end = "+weekly_begin+", "+weekly_end)
+
+        begin_time = weekly_begin + " 00:00:00"
+        end_time = weekly_end + " 00:00:00"
+
+        begin_time_obj = datetime.strptime(begin_time,"%d-%m-%Y %H:%M:%S").date()
+        end_temp_obj = datetime.strptime(end_time,"%d-%m-%Y %H:%M:%S").date()
+        end_time_obj = end_temp_obj + timedelta(days=1)
+
+        weekly_vplay_data_ungrouped = VideoPlaytime.objects.filter(timestamp__gte=begin_time_obj, timestamp__lte=end_time_obj).order_by('timestamp')
+
+        weekly_vplay_data_grouped = groupby(weekly_vplay_data_ungrouped, key= lambda x: x.timestamp.date())
+
+        weekly_vplay_data = []
+
+        for date, group in weekly_vplay_data_grouped:
+            this_date_data = {}
+            total_playtime = 0.0
+            total_plays = 0
+            
+            print("***** "+str(date))
+
+            for obj in group:
+                total_playtime += obj.playtime
+                total_plays += 1
+
+                print(str(obj.user)+"    "+str(obj.videoid)+"     "+str(obj.playtime))
+
+            this_date_data['total_playtime'] = total_playtime
+            this_date_data['total_plays'] = total_plays    
+            this_date_data['date'] = date.strftime("%d-%B-%Y")
+
+            weekly_vplay_data.append(this_date_data)
+
+        print(weekly_vplay_data)
+
+        return JsonResponse({'weekly_data': weekly_vplay_data}, status=status.HTTP_200_OK) 
+
+    else:
+        return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)              
+
+def daily_vplay_data(request):
+    if request.is_ajax():
+        raw_data = json.loads(request.body)
+        try:
+            vplay_date = raw_data['date']
+            print vplay_date
+
+            day_begin = vplay_date + " 00:00:00"
+
+            date_begin = datetime.strptime(day_begin,"%d-%m-%Y %H:%M:%S").date()
+            date_end = date_begin + timedelta(days=1)
+
+            vid_id_queryset = VideoCompleteRate.objects.filter(timestamp__gte=date_begin,\
+                timestamp__lte=date_end)\
+                .order_by('videoid')
+            
+            vid_list = VideoCompleteRateSerializer(vid_id_queryset, many=True).data
+
+            vid_id = []
+
+            for obj in vid_list:
+                vid_id.append(obj.get('videoid'))
+               
+            vid_titles_queryset = list(Topic.objects.filter(id__in=vid_id).values('id','title'))
+            vid_titles = {}
+            for item in vid_titles_queryset:
+                vid_titles[str(item.get('id'))] = item.get('title')
+
+            for obj in vid_list:
+                obj['title'] = vid_titles.get(obj.get('videoid'))
+            
+            print("vid titles : "+str(vid_titles))
+            print("vid info: "+str(vid_list))
+
+            return JsonResponse({'daily_data': vid_list}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print("Exception: "+str(e))
+            return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
+    else:
+        return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)   
 

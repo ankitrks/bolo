@@ -24,6 +24,8 @@
           <ul class="treeview-menu">
             <li class=""><a href="index.html"><i class="fa fa-circle-o"></i> Dashboard v1</a></li>
             <li><a href="index2.html"><i class="fa fa-circle-o"></i> Dashboard v2</a></li>
+            <li class="{% if request.path in '/jarvis/user_statistics/'%}active{% endif %}"><a href="/jarvis/user_statistics/"><i class="fa fa-laptop"></i> <span>User Statistics</span></a></li>
+            <li class="{% if request.path in '/jarvis/video_statistics/'%}active{% endif %}"><a href="/jarvis/video_statistics/"><i class="fa fa-laptop"></i> <span>Video Statistics</span></a></li>
           </ul>
         </li>
 
@@ -39,6 +41,7 @@
             <li class="{% if request.path in '/jarvis/get_submitted_kyc_user_list/'%}active{% endif %}"><a href="/jarvis/get_submitted_kyc_user_list/"><i class="fa fa-circle-o"></i>Submitted KYC's</a></li>
             <li class="{% if request.path in '/jarvis/get_pending_kyc_user_list/'%}active{% endif %}"><a href="/jarvis/get_pending_kyc_user_list/"><i class="fa fa-circle-o"></i>Pending KYC's</a></li>
             <li class="{% if request.path in '/jarvis/get_kyc_user_list/'%}active{% endif %}"><a href="/jarvis/get_kyc_user_list/"><i class="fa fa-laptop"></i> <span>All KYC</span></a></li>
+            
           </ul>
         </li>
 
