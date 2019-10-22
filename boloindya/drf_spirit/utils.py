@@ -120,7 +120,7 @@ def shortnaturaltime(value, now_time=None):
 def shortcounterprofile(counter):
     counter = int(counter)
     if counter>10000 and counter< 99999:
-        return str(counter/1000.0)[:4]+'K'
+        return str(counter/1000.0)[:5]+'K'
     else:
         return counter
 
@@ -131,7 +131,7 @@ def shorcountertopic(counter):
     if counter>1000 and counter< 9999:
         return str(counter/1000.0)[:3]+'K'
     elif counter >9999:
-        return str(counter/1000.0)[:4]+'K'
+        return str(counter/1000.0)[:5]+'K'
     else:
         return counter
 
