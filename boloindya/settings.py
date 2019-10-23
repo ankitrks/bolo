@@ -160,6 +160,8 @@ CACHES.update({
 })
 
 FCM_APIKEY = "AIzaSyBMF3hxMosSjE-95inmJTcaR-rNEWn2zpQ"
+FCM_DEVICE_MODEL = 'jarvis.FCMDevice'
+
 
 AUTHENTICATION_BACKENDS = [
     'forum.user.auth.backends.UsernameAuthBackend',
@@ -379,6 +381,8 @@ CAREERANNA_AWS_BUCKET_NAME_TS = 'elastictranscode.videos'
 # The region of your bucket, more info:
 # http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
 REGION_HOST = 'us-east-1'
+
+FCM_MAX_RECIPIENTS = 1000
 
 PREDICTION_START_HOUR = 3
 

@@ -22,12 +22,13 @@ from .serializers import TopicSerializer, CategorySerializer, CommentSerializer,
 UserAnswerSerializerwithComment,CricketMatchSerializer,PollSerializer,ChoiceSerializer,VotingSerializer,LeaderboardSerializer,\
 PollSerializerwithChoice, OnlyChoiceSerializer, NotificationSerializer, UserProfileSerializer, TongueTwisterSerializer,KYCDocumnetsTypeSerializer,\
 PaymentCycleSerializer,EncashableDetailSerializer,PaymentInfoSerializer,UserKYCSerializer
-from forum.topic.models import Topic,ShareTopic,Like,SocialShare,FCMDevice,Notification,CricketMatch,Poll,Choice,Voting,Leaderboard,VBseen,TongueTwister
+from forum.topic.models import Topic,ShareTopic,Like,SocialShare,Notification,CricketMatch,Poll,Choice,Voting,Leaderboard,VBseen,TongueTwister
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 from forum.category.models import Category
 from forum.comment.models import Comment
 from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs
+from jarvis.models import FCMDevice
 from django.db.models import F,Q
 from rest_framework_simplejwt.tokens import RefreshToken
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
@@ -622,7 +623,7 @@ def get_video_thumbnail(video_url):
     else:
         return False
 
-from moviepy.editor import VideoFileClip
+#from moviepy.editor import VideoFileClip
 def getVideoLength(input_video):
     clip = VideoFileClip(input_video)
     dt = timedelta(seconds = int(clip.duration))
@@ -1974,12 +1975,17 @@ def my_app_version(request):
 @api_view(['POST'])
 def get_follow_user(request):
     try:
+        language = request.POST.get('language', None)
         #all_follow_id = Follower.objects.filter(user_follower = request.user,is_active = True).values_list('user_following_id', flat=True)
         #all_vb_of_follower = Topic.objects.filter(is_vb=True,is_removed=False,user_id__in=all_follow_id).values_list('user_id',flat=True)
         #if all_vb_of_follower:
         #    all_user = User.objects.filter(pk__in = all_vb_of_follower)
         #    return JsonResponse({'all_follow':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
-        all_user = User.objects.filter(st__bolo_score__gte = 2000)
+        all_user = []
+        if language:
+            all_user = User.objects.filter(st__bolo_score__gte = 2000, st__language=language)
+        else:
+            all_user = User.objects.filter(st__bolo_score__gte = 2000)
         if all_user.count():
             return JsonResponse({'all_follow':UserSerializer(all_user.order_by('?'), many= True).data}, status=status.HTTP_200_OK)
         else:
@@ -2438,3 +2444,12 @@ def redirect_to_store(request):
 
 #     return JsonResponse({'message':'success'}, status=status.HTTP_201_CREATED)    
 
+
+@api_view(['POST'])
+def get_category_detail(request):
+    try:
+        category_id = request.POST.get('category_id', None)
+        category = Category.objects.get(pk=category_id)
+        return JsonResponse({'category_details': CategorySerializer(category).data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)

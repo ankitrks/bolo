@@ -40,4 +40,10 @@ urlpatterns = [
     url(r'^get_submitted_kyc_user_list/$',views.get_submitted_kyc_user_list, name='get_submitted_kyc_user_list'),
     url(r'^get_pending_kyc_user_list/$',views.get_pending_kyc_user_list, name='get_pending_kyc_user_list'),
     url(r'^get_accepted_kyc_user_list/$',views.get_accepted_kyc_user_list, name='get_accepted_kyc_user_list'),
+    url(r'^notification_panel/$',views.notification_panel, name='notification_panel'),
+    url(r'^particular_notification/(?P<notification_id>\d+)/$',views.particular_notification, name='particular_notification'),
+    url(r'^send_notification/$',views.send_notification, name='send_notification'),
+    url(r'^create_user_notification_delivered/$',views.create_user_notification_delivered, name='create_user_notification_delivered'),
+    url(r'^open_notification_delivered/$',views.open_notification_delivered, name='open_notification_delivered'),   
+    url(r'^remove_notification/$',views.remove_notification, name='remove_notification'),   
 ]

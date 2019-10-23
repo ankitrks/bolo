@@ -241,6 +241,7 @@ class ReferralCodeUsed(RecordTimeStamp):
     click_id = models.CharField(_("Click Id"), max_length=255, blank=True)
     pid = models.CharField(_("PID"), max_length=255, blank=True)
     referral_dump = models.TextField(_("Referral Dump"),null=True,blank=True)
+    android_id = models.CharField(_("android_id"), max_length=100, blank=True, null = True, editable = False)
 
     def __unicode__(self):
         return str(self.code)

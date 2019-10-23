@@ -395,35 +395,6 @@ class SocialShare(UserInfo):
     def __unicode__(self):
         return str(self.share_type)
 
-class FCMDevice(AbstractDevice):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='%(app_label)s_%(class)s_user',editable=False)
-
-    def __unicode__(self):
-        return str(self.user)
-
-
-    def register_device(self,request):
-        try:
-            instance = FCMDevice.objects.filter(reg_id = request.POST.get('reg_id'))
-            if not len(instance):
-                raise Exception
-            instance.update(user = request.user,is_active = True)
-            return JsonResponse({"status":"Success"},safe = False)
-        except Exception as e:
-            instance = FCMDevice.objects.create(user =request.user,reg_id = request.POST.get('reg_id'))
-            return JsonResponse({"status":"Success"},safe = False)
-
-
-    def remove_device(self,request):
-        try:
-            instance = FCMDevice.objects.filter(reg_id = request.POST.get('reg_id'), is_active = True, user = request.user)
-            if not len(instance):
-                raise Exception
-            instance.update(is_active = False)
-            return JsonResponse({"status":"Success"},safe = False)
-        except Exception as e:
-            return JsonResponse({"status":"Failed","message":"Device not found for this user"},safe = False)
-
 class Notification(UserInfo):
     for_user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True,blank=True,editable=False)
     # device_id = models.CharField(_("Device Id"), max_length=255, blank = True, null = True)

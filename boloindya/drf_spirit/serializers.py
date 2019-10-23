@@ -5,7 +5,7 @@ from forum.topic.models import Topic,CricketMatch,Poll,Choice,Voting,Leaderboard
 from django.contrib.auth.models import User
 from forum.category.models import Category
 from forum.comment.models import Comment
-from forum.user.models import UserProfile,AppVersion, VideoCompleteRate
+from forum.user.models import UserProfile,AppVersion, ReferralCodeUsed, VideoCompleteRate
 from .relations import PresentableSlugRelatedField
 from .models import SingUpOTP
 from .utils import shortnaturaltime,shortcounterprofile,shorcountertopic
@@ -388,6 +388,26 @@ class PaymentInfoSerializer(ModelSerializer):
         model = PaymentInfo
         fields = '__all__'
 
+class UserWithUserSerializer(ModelSerializer):
+    user = SerializerMethodField()
+    sub_category = SerializerMethodField()
+
+    class Meta:
+        model = UserProfile
+        fields = '__all__'
+
+    def get_user(self,instance):
+        return UserWithoutUserProfileSerializer(instance.user).data
+    
+    def get_sub_category(self,instance):
+        return CategorySerializer(instance.sub_category, many=True).data
+
+class UserWithoutUserProfileSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        #fields = '__all__'
+        exclude = ('password', )
+        
 class VideoCompleteRateSerializer(ModelSerializer):
     class Meta:
         model = VideoCompleteRate
