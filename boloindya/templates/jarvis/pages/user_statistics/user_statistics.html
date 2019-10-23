@@ -43,7 +43,7 @@
   
   <!-- Daily active users template -->
   <div class="row">
-    <div style="text-align: center;"  class="col-6 col-xl-6 col-md-12 col-sm-12">
+    <div style="text-align: center;"  class="col-6 col-xl-6 col-md-6 col-sm-12">
       <h2>Daily Active Users</h2>
       <span>From:</span><input type="text" id="datepicker_1" readonly="readonly">
       <span>To:</span><input type="text" id="datepicker_2" readonly="readonly">
@@ -52,7 +52,7 @@
     </div>
 
   <!-- Monthly active users template -->
-    <div style="text-align: center;"  class="col-6 col-xl-6 col-md-12 col-sm-12">
+    <div style="text-align: center;"  class="col-6 col-xl-6 col-md-6 col-sm-12">
       <h2>Monthly Active Users</h2>
       <canvas id="chart_mau"></canvas>    
     </div>
@@ -61,7 +61,7 @@
   <!-- Hourly active users template -->
   <br><br><br>
   <div class="row">
-    <div style="text-align: center;"  class="col-6 col-xl-6 col-md-12 col-sm-12">
+    <div style="text-align: center;"  class="col-6 col-xl-6 col-md-6 col-sm-12">
       <h2>Hourly Active Users</h2>
       <span>Select day:</span><input type="text" id="datepicker_3" readonly="readonly">
       <button onclick="hau_click_ok()" type="button" id="filter_day_btn">Ok</button>
@@ -72,7 +72,7 @@
   <!-- Installs template -->
   <br>
   <div class="row">
-    <div style="text-align: center;" class="col-6 col-xl-6 col-md-12 col-sm-12">
+    <div style="text-align: center;" class="col-6 col-xl-6 col-md-6 col-sm-12">
       <h2>Installs</h2>
       <span>From:</span><input type="text" id="datepicker_4" readonly="readonly">
       <span>To:</span><input type="text" id="datepicker_5" readonly="readonly">
@@ -93,11 +93,11 @@
 
   <!-- jQuery 3 -->
   <!-- <script src="../../bower_components/jquery/dist/jquery.min.js"></script> -->
-  <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
+  <script src="/media/js/jquery-3.3.1.min.js"></script>
 
   <!-- Bootstrap 3.3.7 -->
   <!-- <script src="../../bower_components/bootstrap/dist/js/bootstrap.min.js"></script> -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <script src="/media/js/bootstrap.min.js"></script>
 
   <!-- ChartJS -->
   <script type="text/javascript" src="{% static 'js/Chart.min.js' %}"></script>

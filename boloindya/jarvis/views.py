@@ -50,6 +50,7 @@ from .forms import VideoUploadTranscodeForm
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
 from django.core.files.base import ContentFile
 from drf_spirit.serializers import UserWithUserSerializer
+import traceback
 
 def get_bucket_details(bucket_name=None):
     bucket_credentials = {}
@@ -913,63 +914,65 @@ def user_statistics(request):
     return render(request, 'jarvis/pages/user_statistics/user_statistics.html', {'campaigns_list':campaigns})
 
 def get_stats_data(request):
+    try:
+        #MAU Data
+        mau_data = MonthlyActiveUser.objects.all()
+        mau_labels = []
+        mau_freq = []
+        for obj in mau_data:
+            month = str(obj.month)+" "+str(obj.year)
+            mau_freq.append(str(obj.frequency))
+            mau_labels.append(month)
 
-    #MAU Data
-    mau_data = MonthlyActiveUser.objects.all()
-    mau_labels = []
-    mau_freq = []
-    for obj in mau_data:
-        month = str(obj.month)+" "+str(obj.year)
-        mau_freq.append(str(obj.frequency))
-        mau_labels.append(month)
+        print(mau_labels)
+        print(mau_freq)
 
-    print(mau_labels)
-    print(mau_freq)
+        #DAU Data
+        #Show the data of past 7 days by default
+        # dau_data = DailyActiveUser.objects.all().order_by('-date_time_field')
+        today = datetime.datetime.today()
+        ago_7_days = today + timedelta(days=-8)
 
-    #DAU Data
-    #Show the data of past 7 days by default
-    # dau_data = DailyActiveUser.objects.all().order_by('-date_time_field')
-    today = datetime.today()
-    ago_7_days = today + timedelta(days=-8)
+        print(str(today)+" "+str(ago_7_days))
 
-    print(str(today)+" "+str(ago_7_days))
+        dau_data = DailyActiveUser.objects.filter(date_time_field__gte=ago_7_days,
+                                            date_time_field__lte=today).order_by('date_time_field')
 
-    dau_data = DailyActiveUser.objects.filter(date_time_field__gte=ago_7_days,
-                                        date_time_field__lte=today).order_by('date_time_field')
+        dau_labels = []
+        dau_freq = []
+        for obj in dau_data:
+            dau_labels.append(str(obj.date_time_field.strftime("%d %B %Y")))
+            dau_freq.append(str(obj.frequency))
 
-    dau_labels = []
-    dau_freq = []
-    for obj in dau_data:
-        dau_labels.append(str(obj.date_time_field.strftime("%d %B %Y")))
-        dau_freq.append(str(obj.frequency))
+        print(dau_labels)
+        print(dau_freq)
 
-    print(dau_labels)
-    print(dau_freq)
+        #HAU Data
+        date_begin = datetime.datetime.today() + timedelta(days=-1)
+        date_begin.replace(hour=0, minute=0, second=0)
+        date_end = datetime.datetime.today()
 
-    #HAU Data
-    date_begin = datetime.today() + timedelta(days=-1)
-    date_begin.replace(hour=0, minute=0, second=0)
-    date_end = datetime.today()
+        data = HourlyActiveUser.objects.filter(date_time_field__gte=date_begin,
+                                            date_time_field__lte=date_end).order_by('date_time_field')
 
-    data = HourlyActiveUser.objects.filter(date_time_field__gte=date_begin,
-                                        date_time_field__lte=date_end).order_by('date_time_field')
+        hau_labels = []
+        hau_freq = []
+        for hau_data in data:
+            hau_labels.append(str(hau_data.date_time_field.strftime("%I %p, %d %B")))
+            hau_freq.append(str(hau_data.frequency))            
 
-    hau_labels = []
-    hau_freq = []
-    for hau_data in data:
-        hau_labels.append(str(hau_data.date_time_field.strftime("%I %p, %d %B")))
-        hau_freq.append(str(hau_data.frequency))            
+        print(hau_labels)
+        print(hau_freq)
 
-    print(hau_labels)
-    print(hau_freq)
+        installs_labels = []
+        installs_freq = []
 
-    installs_labels = []
-    installs_freq = []
-
-    all_data = {'dau_labels': dau_labels, 'dau_freq': dau_freq, 'hau_labels': hau_labels, 'hau_freq': hau_freq, 'mau_freq':mau_freq, 'mau_labels':mau_labels,
-    'installs_labels':installs_labels, 'installs_freq':installs_freq}
-    return JsonResponse(all_data, status=status.HTTP_200_OK)
-
+        all_data = {'dau_labels': dau_labels, 'dau_freq': dau_freq, 'hau_labels': hau_labels, 'hau_freq': hau_freq, 'mau_freq':mau_freq, 'mau_labels':mau_labels,
+        'installs_labels':installs_labels, 'installs_freq':installs_freq}
+        return JsonResponse(all_data, status=status.HTTP_200_OK)
+    except Exception as e:
+        print(traceback.format_exc())
+        return JsonResponse({'message':str(e)}, status=status.HTTP_200_OK)
 
 
 @csrf_exempt
@@ -981,7 +984,7 @@ def get_hau_data(request):
             print hau_day
             hau_day_begin = hau_day + " 00:00:00"
 
-            date_begin = datetime.strptime(hau_day_begin,"%d-%m-%Y %H:%M:%S").date()
+            date_begin = datetime.datetime.strptime(hau_day_begin,"%d-%m-%Y %H:%M:%S").date()
             date_end = date_begin + timedelta(days=1)
 
             data = HourlyActiveUser.objects.filter(date_time_field__gte=date_begin,
@@ -996,7 +999,7 @@ def get_hau_data(request):
             all_data = {'hau_labels': hau_labels, 'hau_freq': hau_freq}
             return JsonResponse(all_data, status=status.HTTP_200_OK)
         except Exception as e:
-            print(e)
+            print(traceback.format_exc())
             return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
     else:
         return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)        
@@ -1016,8 +1019,8 @@ def get_dau_data(request):
             begin_time = dau_begin + " 00:00:00"
             end_time = dau_end + " 00:00:00"
 
-            begin_time_obj = datetime.strptime(begin_time,"%d-%m-%Y %H:%M:%S").date()
-            end_temp_obj = datetime.strptime(end_time,"%d-%m-%Y %H:%M:%S").date()
+            begin_time_obj = datetime.datetime.strptime(begin_time,"%d-%m-%Y %H:%M:%S").date()
+            end_temp_obj = datetime.datetime.strptime(end_time,"%d-%m-%Y %H:%M:%S").date()
             end_time_obj = end_temp_obj + timedelta(days=1)
 
             data = DailyActiveUser.objects.filter(date_time_field__gte=begin_time_obj,
@@ -1036,7 +1039,7 @@ def get_dau_data(request):
             return JsonResponse(all_data, status=status.HTTP_200_OK)
 
         except Exception as e:
-            print("Exception: "+e)
+            print(traceback.format_exc())
             return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
     else:
         return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)  
@@ -1054,8 +1057,8 @@ def get_installs_data(request):
             begin_time = installs_begin + " 00:00:00"
             end_time = installs_end + " 00:00:00"
 
-            begin_time_obj = datetime.strptime(begin_time,"%d-%m-%Y %H:%M:%S").date()
-            end_temp_obj = datetime.strptime(end_time,"%d-%m-%Y %H:%M:%S").date()
+            begin_time_obj = datetime.datetime.strptime(begin_time,"%d-%m-%Y %H:%M:%S").date()
+            end_temp_obj = datetime.datetime.strptime(end_time,"%d-%m-%Y %H:%M:%S").date()
             end_time_obj = end_temp_obj + timedelta(days=1)
 
             installs_labels = []
@@ -1082,7 +1085,7 @@ def get_installs_data(request):
             return JsonResponse({'all_data':all_data}, status=status.HTTP_200_OK)    
 
         except Exception as e:
-            print("Exception: "+str(e))
+            print(traceback.format_exc())
             return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
     else:
         return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)            
@@ -1103,8 +1106,8 @@ def get_daily_impressions_data(request):
             begin_time = impr_begin + " 00:00:00"
             end_time = impr_end + " 00:00:00"
 
-            begin_time_obj = datetime.strptime(begin_time,"%d-%m-%Y %H:%M:%S").date()
-            end_temp_obj = datetime.strptime(end_time,"%d-%m-%Y %H:%M:%S").date()
+            begin_time_obj = datetime.datetime.strptime(begin_time,"%d-%m-%Y %H:%M:%S").date()
+            end_temp_obj = datetime.datetime.strptime(end_time,"%d-%m-%Y %H:%M:%S").date()
             end_time_obj = end_temp_obj + timedelta(days=1)
 
             impr_labels = []
@@ -1124,7 +1127,7 @@ def get_daily_impressions_data(request):
             return JsonResponse({'impr_labels':impr_labels, 'impr_freq':impr_freq}, status=status.HTTP_200_OK) 
 
         except Exception as e:
-            print("Exception: "+str(e))
+            print(traceback.format_exc())
             return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)  
 
 def get_top_impressions_data(request):
@@ -1136,7 +1139,7 @@ def get_top_impressions_data(request):
 
             day_begin = top_impr_date + " 00:00:00"
 
-            date_begin = datetime.strptime(day_begin,"%d-%m-%Y %H:%M:%S").date()
+            date_begin = datetime.datetime.strptime(day_begin,"%d-%m-%Y %H:%M:%S").date()
             date_end = date_begin + timedelta(days=1)
 
             vid_id_queryset = VideoDetails.objects.filter(timestamp__gte=date_begin,\
@@ -1160,55 +1163,58 @@ def get_top_impressions_data(request):
             return JsonResponse({'vid_all_info': vid_all_info}, status=status.HTTP_200_OK)
 
         except Exception as e:
-            print("Exception: "+str(e))
+            print(traceback.format_exc())
             return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
     else:
         return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)  
 
 def weekly_vplay_data(request):
     if request.is_ajax():
-        raw_data = json.loads(request.body)
-        weekly_begin = raw_data['week_begin']
-        weekly_end = raw_data['week_end']
+        try:
+            raw_data = json.loads(request.body)
+            weekly_begin = raw_data['week_begin']
+            weekly_end = raw_data['week_end']
 
-        print("weekly_begin and end = "+weekly_begin+", "+weekly_end)
+            print("weekly_begin and end = "+weekly_begin+", "+weekly_end)
 
-        begin_time = weekly_begin + " 00:00:00"
-        end_time = weekly_end + " 00:00:00"
+            begin_time = weekly_begin + " 00:00:00"
+            end_time = weekly_end + " 00:00:00"
 
-        begin_time_obj = datetime.strptime(begin_time,"%d-%m-%Y %H:%M:%S").date()
-        end_temp_obj = datetime.strptime(end_time,"%d-%m-%Y %H:%M:%S").date()
-        end_time_obj = end_temp_obj + timedelta(days=1)
+            begin_time_obj = datetime.datetime.strptime(begin_time,"%d-%m-%Y %H:%M:%S").date()
+            end_temp_obj = datetime.datetime.strptime(end_time,"%d-%m-%Y %H:%M:%S").date()
+            end_time_obj = end_temp_obj + timedelta(days=1)
 
-        weekly_vplay_data_ungrouped = VideoPlaytime.objects.filter(timestamp__gte=begin_time_obj, timestamp__lte=end_time_obj).order_by('timestamp')
+            weekly_vplay_data_ungrouped = VideoPlaytime.objects.filter(timestamp__gte=begin_time_obj, timestamp__lte=end_time_obj).order_by('timestamp')
 
-        weekly_vplay_data_grouped = groupby(weekly_vplay_data_ungrouped, key= lambda x: x.timestamp.date())
+            weekly_vplay_data_grouped = groupby(weekly_vplay_data_ungrouped, key= lambda x: x.timestamp.date())
 
-        weekly_vplay_data = []
+            weekly_vplay_data = []
 
-        for date, group in weekly_vplay_data_grouped:
-            this_date_data = {}
-            total_playtime = 0.0
-            total_plays = 0
-            
-            print("***** "+str(date))
+            for date, group in weekly_vplay_data_grouped:
+                this_date_data = {}
+                total_playtime = 0.0
+                total_plays = 0
+                
+                print("***** "+str(date))
 
-            for obj in group:
-                total_playtime += obj.playtime
-                total_plays += 1
+                for obj in group:
+                    total_playtime += obj.playtime
+                    total_plays += 1
 
-                print(str(obj.user)+"    "+str(obj.videoid)+"     "+str(obj.playtime))
+                    print(str(obj.user)+"    "+str(obj.videoid)+"     "+str(obj.playtime))
 
-            this_date_data['total_playtime'] = total_playtime
-            this_date_data['total_plays'] = total_plays    
-            this_date_data['date'] = date.strftime("%d-%B-%Y")
+                this_date_data['total_playtime'] = total_playtime
+                this_date_data['total_plays'] = total_plays    
+                this_date_data['date'] = date.strftime("%d-%B-%Y")
 
-            weekly_vplay_data.append(this_date_data)
+                weekly_vplay_data.append(this_date_data)
 
-        print(weekly_vplay_data)
+            print(weekly_vplay_data)
 
-        return JsonResponse({'weekly_data': weekly_vplay_data}, status=status.HTTP_200_OK) 
-
+            return JsonResponse({'weekly_data': weekly_vplay_data}, status=status.HTTP_200_OK) 
+        except Exception as e:
+            print(traceback.format_exc())
+            return JsonResponse({'message': str(e)}, status=status.HTTP_200_OK) 
     else:
         return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)              
 
@@ -1221,7 +1227,7 @@ def daily_vplay_data(request):
 
             day_begin = vplay_date + " 00:00:00"
 
-            date_begin = datetime.strptime(day_begin,"%d-%m-%Y %H:%M:%S").date()
+            date_begin = datetime.datetime.strptime(day_begin,"%d-%m-%Y %H:%M:%S").date()
             date_end = date_begin + timedelta(days=1)
 
             vid_id_queryset = VideoCompleteRate.objects.filter(timestamp__gte=date_begin,\
@@ -1249,7 +1255,7 @@ def daily_vplay_data(request):
             return JsonResponse({'daily_data': vid_list}, status=status.HTTP_200_OK)
 
         except Exception as e:
-            print("Exception: "+str(e))
+            print(traceback.format_exc())
             return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
     else:
         return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)   

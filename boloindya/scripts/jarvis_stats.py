@@ -53,9 +53,12 @@ def record_duration_play(log_text_dump, userid):
 
 				start_play_sorted = sorted(v_tuple['StartPlaying'])
 				pause_play_sorted = sorted(v_tuple['ClickOnPause'])
-				time_video_played = (pause_play_sorted[len(pause_play_sorted) - 1] - start_play_sorted[0]) / 1000			# duration of the video play
-				user_data_obj = VideoPlaytime(user = userid, videoid = v_id, playtime = time_video_played, timestamp = reference_time)
-				user_data_obj.save()
+				time_video_played = (pause_play_sorted[len(pause_play_sorted) - 1] - start_play_sorted[0]) / 1000
+				if(time_video_played<0):
+					time_video_played = 0
+				if(reference_time):				# duration of the video play
+					user_data_obj = VideoPlaytime(user = userid, videoid = v_id, playtime = time_video_played, timestamp = reference_time)
+					user_data_obj.save()
 
 	except Exception as e:
 		print('Exception 2' + str(e))			
