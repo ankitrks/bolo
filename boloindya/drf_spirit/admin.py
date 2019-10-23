@@ -14,7 +14,7 @@ class UserProfileResource(resources.ModelResource):
 		skip_unchanged = True
 		report_skipped = True
 		list_filter = ('language', )
-		fields = ( 'user__username', 'name','language','bolo_score','user__date_joined','follow_count','follower_count','question_count','answer_count','share_count','like_count')
+		fields = ( 'user__username', 'name','language','bolo_score','user__date_joined','follow_count','follower_count','vb_count','answer_count','share_count','like_count')
 
 class SingUpOTPAdmin(admin.ModelAdmin):
 	list_display = ('mobile_no', 'otp', 'is_active', 'created_at', 'used_at', 'is_reset_password', 'is_for_change_phone', 'for_user', )
@@ -31,7 +31,7 @@ admin.site.register(Weight, WeightAdmin)
 
 class UserProfileAdmin(ImportExportModelAdmin):
 	search_fields = ('user__username','name',)
-	list_display = ('user', 'name','language','bolo_score','follow_count','follower_count','question_count','answer_count','share_count','like_count')
+	list_display = ('user', 'name','language','bolo_score','follow_count','follower_count','vb_count','answer_count','share_count','like_count')
 	list_filter = ('user__date_joined', ('user__date_joined', DateRangeFilter), 'language')
 	resource_class = UserProfileResource
 admin.site.register(UserProfile,UserProfileAdmin)
@@ -44,7 +44,7 @@ class ReferralCodeAdmin(admin.ModelAdmin):
 admin.site.register(ReferralCode, ReferralCodeAdmin)
 
 class ReferralCodeUsedAdmin(admin.ModelAdmin):
-	list_display = ('code', 'by_user', 'is_download', 'created_at', 'last_modified','click_id','pid')
+	list_display = ('code', 'by_user', 'is_download', 'created_at', 'last_modified','click_id','pid', 'android_id')
 	search_fields = ('code__code', )
 admin.site.register(ReferralCodeUsed, ReferralCodeUsedAdmin)
 

@@ -3,8 +3,8 @@ from forum.topic.models import *
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
-from forum.topic.models import Topic, Notification, ShareTopic, CricketMatch, Poll, Choice, Voting, Leaderboard, \
-        FCMDevice, TongueTwister, BoloActionHistory
+from forum.topic.models import Topic, Notification, ShareTopic, CricketMatch, Poll, Choice, Voting, Leaderboard,\
+ TongueTwister, BoloActionHistory
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 
 class TopicResource(resources.ModelResource):
@@ -78,6 +78,21 @@ class TopicAdmin(ImportExportModelAdmin):
         del actions['delete_selected']
         return actions
 
+    def save_model(self, request, obj, form, change):
+        if 'language_id' in form.changed_data and obj.is_monetized:
+            # print form.initial['language_id'],obj.language_id,"####",change
+            if form.initial['language_id'] == '1':
+                userprofile = UserProfile.objects.get(user = obj.user)
+                userprofile.save()
+                reduce_bolo_score(obj.user.id, 'create_topic_en', obj, 'no_monetize')
+                obj.add_monetization()
+            elif obj.language_id == '1':
+                userprofile = UserProfile.objects.get(user = obj.user)
+                userprofile.save()
+                reduce_bolo_score(obj.user.id, 'create_topic', obj, 'no_monetize')
+                obj.add_monetization()
+        super(TopicAdmin,self).save_model(request, obj, form, change)
+
     # def comment_count(self, obj):
     #     url = '/forum_comment/comment/?topic_id='+obj.id
     #     print url, obj.comment_count
@@ -146,6 +161,5 @@ admin.site.register(ShareTopic,ShareTopicAdmin)
 admin.site.register(Voting)
 admin.site.register(Leaderboard)
 admin.site.register(VBseen)
-admin.site.register(FCMDevice)
 admin.site.register(TongueTwister)
 

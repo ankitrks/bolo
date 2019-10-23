@@ -91,7 +91,7 @@ class Topic(models.Model):
     date = models.DateTimeField(_("date"), default=timezone.now)
     last_active = models.DateTimeField(_("last active"), default=timezone.now)
     reindex_at = models.DateTimeField(_("reindex at"), default=timezone.now)
-    language_id = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='0')
+    language_id = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='1')
     question_image = models.TextField(_("Question image"),null=True,blank=True)
 
     is_media = models.BooleanField(default=True)
@@ -256,13 +256,19 @@ class Topic(models.Model):
 
     def delete(self):
         if self.is_monetized:
-            reduce_bolo_score(self.user.id, 'create_topic', self, 'deleted')
+            if self.language_id == '1':
+                reduce_bolo_score(self.user.id, 'create_topic_en', self, 'deleted')
+            else:
+                reduce_bolo_score(self.user.id, 'create_topic', self, 'deleted')
+        else:
+            notify_owner = Notification.objects.create(for_user_id = self.user.id ,topic = self, \
+                notification_type='7', user_id = self.user.id)
         self.is_monetized = False
         self.is_removed = True
         self.save()
         userprofile = UserProfile.objects.get(user = self.user)
-        if userprofile.question_count:
-            userprofile.question_count = F('question_count')-1
+        if userprofile.vb_count and self.is_vb:
+            userprofile.vb_count = F('vb_count')-1
         userprofile.save()
         return True
 
@@ -270,8 +276,8 @@ class Topic(models.Model):
         self.is_removed = False
         self.save()
         userprofile = UserProfile.objects.get(user = self.user)
-        if userprofile.question_count:
-            userprofile.question_count = F('question_count')+1
+        if userprofile.vb_count and self.is_vb:
+            userprofile.vb_count = F('vb_count')+1
         userprofile.save()
         # Bolo actions will be added only when the monetization is enabled
         # add_bolo_score(self.user.id, 'create_topic', self)
@@ -283,7 +289,10 @@ class Topic(models.Model):
             self.save()
             userprofile = UserProfile.objects.get(user = self.user)
             userprofile.save()
-            reduce_bolo_score(self.user.id, 'create_topic', self, 'no_monetize')
+            if self.language_id == '1':
+                reduce_bolo_score(self.user.id, 'create_topic_en', self, 'no_monetize')
+            else:
+                reduce_bolo_score(self.user.id, 'create_topic', self, 'no_monetize')
             return True
         else:
             return True
@@ -294,7 +303,10 @@ class Topic(models.Model):
         self.save()
         userprofile = UserProfile.objects.get(user = self.user)
         userprofile.save()
-        add_bolo_score(self.user.id, 'create_topic', self)
+        if self.language_id =='1':
+            add_bolo_score(self.user.id, 'create_topic_en', self)
+        else:
+            add_bolo_score(self.user.id, 'create_topic', self)
         return True
 
     def audio_duration(self):
@@ -382,35 +394,6 @@ class SocialShare(UserInfo):
     comment = models.ForeignKey('forum_comment.Comment',related_name='social_share_topic_comment',null=True,blank=True)
     def __unicode__(self):
         return str(self.share_type)
-
-class FCMDevice(AbstractDevice):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='%(app_label)s_%(class)s_user',editable=False)
-
-    def __unicode__(self):
-        return str(self.user)
-
-
-    def register_device(self,request):
-        try:
-            instance = FCMDevice.objects.filter(reg_id = request.POST.get('reg_id'))
-            if not len(instance):
-                raise Exception
-            instance.update(user = request.user,is_active = True)
-            return JsonResponse({"status":"Success"},safe = False)
-        except Exception as e:
-            instance = FCMDevice.objects.create(user =request.user,reg_id = request.POST.get('reg_id'))
-            return JsonResponse({"status":"Success"},safe = False)
-
-
-    def remove_device(self,request):
-        try:
-            instance = FCMDevice.objects.filter(reg_id = request.POST.get('reg_id'), is_active = True, user = request.user)
-            if not len(instance):
-                raise Exception
-            instance.update(is_active = False)
-            return JsonResponse({"status":"Success"},safe = False)
-        except Exception as e:
-            return JsonResponse({"status":"Failed","message":"Device not found for this user"},safe = False)
 
 class Notification(UserInfo):
     for_user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True,blank=True,editable=False)
@@ -536,6 +519,18 @@ class Notification(UserInfo):
             notific['hindi_title'] = 'आपका वीडियो बाइट: "' + self.topic.title + '" मुद्रीकरण के लिए चुना गया है। इसके लिए आपको पैसे मिलेंगे।'
             notific['tamil_title'] = 'உங்கள் வீடியோ பைட்: "' + self.topic.title + '" பணமாக்குதலுக்காக தேர்ந்தெடுக்கப்பட்டது. இதற்கு நீங்கள் பணம் பெறுவீர்கள்.'
             notific['telgu_title'] = 'మీ వీడియో బైట్: "' + self.topic.title + '" డబ్బు ఆర్జన కోసం ఎంపిక చేయబడింది. దీని కోసం మీకు డబ్బు వస్తుంది.'
+            notific['notification_type'] = '8'
+            notific['instance_id'] = self.topic.id
+            notific['read_status'] = self.status
+            notific['id'] = self.id
+            notific['created_at'] = shortnaturaltime(self.created_at)
+            notific['actor_profile_pic'] = ""
+
+        elif self.notification_type=='9':
+            notific['title'] = 'Your video byte: "' + self.topic.title + '" has been removed for payment'
+            notific['hindi_title'] = 'आपका वीडियो बाइट: "' + self.topic.title + '" भुगतान के लिए वंचित किया गया है'
+            notific['tamil_title'] = 'உங்கள் வீடியோ பைட்: "' + self.topic.title + '" கட்டணம் செலுத்தப்படவில்லை'
+            notific['telgu_title'] = 'మీ వీడియో బైట్: "' + self.topic.title + '" చెల్లింపు కోసం కోల్పోయింది'
             notific['notification_type'] = '8'
             notific['instance_id'] = self.topic.id
             notific['read_status'] = self.status

@@ -32,7 +32,7 @@ def add_bolo_score(user_id, feature, action_object):
     weight_obj = get_weight_object(feature)
     if weight_obj:
         add_to_history(userprofile.user, score, get_weight_object(feature), action_object, False)
-    if feature == 'create_topic':
+    if feature in ['create_topic','create_topic_en']:
         from forum.topic.models import Notification
         notification_type = '8'
         # if admin_action_type == 'no_monetize':
@@ -50,13 +50,13 @@ def reduce_bolo_score(user_id, feature, action_object, admin_action_type=''):
     weight_obj = get_weight_object(feature)
     if weight_obj:
         add_to_history(userprofile.user, score, get_weight_object(feature), action_object, True)
-    # if feature == 'create_topic':
-    #     from forum.topic.models import Notification
-    #     notification_type = '7'
-    #     if admin_action_type == 'no_monetize':
-    #         notification_type = '8'
-    #     notify_owner = Notification.objects.create(for_user_id = user_id ,topic = action_object, \
-    #             notification_type=notification_type, user_id = user_id)
+    if feature in ['create_topic','create_topic_en']:
+        from forum.topic.models import Notification
+        notification_type = '7'
+        if admin_action_type == 'no_monetize':
+            notification_type = '9'
+        notify_owner = Notification.objects.create(for_user_id = user_id ,topic = action_object, \
+                notification_type=notification_type, user_id = user_id)
 
 from django.utils.timezone import utc
 from django.utils import timezone
@@ -120,7 +120,7 @@ def shortnaturaltime(value, now_time=None):
 def shortcounterprofile(counter):
     counter = int(counter)
     if counter>10000 and counter< 99999:
-        return str(counter/1000.0)[:4]+'K'
+        return str(counter/1000.0)[:5]+'K'
     else:
         return counter
 
@@ -131,7 +131,7 @@ def shorcountertopic(counter):
     if counter>1000 and counter< 9999:
         return str(counter/1000.0)[:3]+'K'
     elif counter >9999:
-        return str(counter/1000.0)[:4]+'K'
+        return str(counter/1000.0)[:5]+'K'
     else:
         return counter
 
@@ -171,8 +171,8 @@ def calculate_encashable_details(user):
         enchashable_detail,is_created = EncashableDetail.objects.get_or_create(user=user,duration_start_date = start_date,duration_end_date = end_date)
         if is_created:
             cycle_count = EncashableDetail.objects.filter(user = user).count()
-            enchashable_detail.encashable_cycle = 'cycle_count_'+str(cycle_count)
-        all_bolo_action = BoloActionHistory.objects.filter(user = user,created_at__gt = start_date,created_at__lte=end_date,action__is_monetize=True)
+            enchashable_detail.encashable_cycle = str(start_date)+ ' - '+str(end_date)
+        all_bolo_action = BoloActionHistory.objects.filter(user = user,created_at__gt = start_date,created_at__lte=end_date,action__is_monetize=True,is_removed=False)
         total_bolo_score_in_this_cycle = 0
         all_weights = Weight.objects.filter(is_monetize = True)
         bolo_details = {}
@@ -188,7 +188,7 @@ def calculate_encashable_details(user):
                 bolo_money = (score/each_bolo_weight.bolo_score)*each_bolo_weight.equivalent_INR
                 each_action_dict = {'bolo_score':score,'bolo_money':bolo_money}
                 total_money+=bolo_money
-                if each_bolo_weight.features=='create_vb':
+                if each_bolo_weight.features=='create_topic':
                     is_eligible_for_encash = True
             else:
                 each_action_dict = {'bolo_score':score,'bolo_money':0}
@@ -196,7 +196,7 @@ def calculate_encashable_details(user):
             bolo_details[each_bolo_weight.features] = each_action_dict
         enchashable_detail.bolo_score_details = str(bolo_details)
         for each_bolo in all_bolo_action:
-            total_bolo_score_in_this_cycle +=each_bolo.score
+            total_bolo_score_in_this_cycle += each_bolo.score
         userprofile = UserProfile.objects.get(user = user)
         userprofile.encashable_bolo_score = total_bolo_score_in_this_cycle
         userprofile.save()
@@ -205,8 +205,10 @@ def calculate_encashable_details(user):
         enchashable_detail.equivalent_INR = total_money
         enchashable_detail.is_eligible_for_encash = is_eligible_for_encash
         enchashable_detail.save()
-        non_eligible_bolo_score = BoloActionHistory.objects.filter(created_at__lte = start_date,is_encashed=False)
+        non_eligible_bolo_score = BoloActionHistory.objects.filter(created_at__lte = start_date - timedelta(days=(end_date-start_date).days),is_encashed=False)
         non_eligible_bolo_score.update(is_eligible_for_encash = False)
+        old_encash = EncashableDetail.objects.filter(user=user,duration_end_date__lte = start_date - timedelta(days=(end_date-start_date).days))
+        old_encash.update(is_expired = True)
     except Exception as e:
          print e
 

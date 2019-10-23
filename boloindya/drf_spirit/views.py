@@ -22,12 +22,13 @@ from .serializers import TopicSerializer, CategorySerializer, CommentSerializer,
 UserAnswerSerializerwithComment,CricketMatchSerializer,PollSerializer,ChoiceSerializer,VotingSerializer,LeaderboardSerializer,\
 PollSerializerwithChoice, OnlyChoiceSerializer, NotificationSerializer, UserProfileSerializer, TongueTwisterSerializer,KYCDocumnetsTypeSerializer,\
 PaymentCycleSerializer,EncashableDetailSerializer,PaymentInfoSerializer,UserKYCSerializer
-from forum.topic.models import Topic,ShareTopic,Like,SocialShare,FCMDevice,Notification,CricketMatch,Poll,Choice,Voting,Leaderboard,VBseen,TongueTwister
+from forum.topic.models import Topic,ShareTopic,Like,SocialShare,Notification,CricketMatch,Poll,Choice,Voting,Leaderboard,VBseen,TongueTwister
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 from forum.category.models import Category
 from forum.comment.models import Comment
 from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs
+from jarvis.models import FCMDevice
 from django.db.models import F,Q
 from rest_framework_simplejwt.tokens import RefreshToken
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
@@ -318,6 +319,7 @@ class VBList(generics.ListCreateAPIView):
                         filter_dic[term_key]=value
                         if term_key =='user_id':
                             is_user_timeline = True
+                            self.pagination_class = LimitOffsetPagination
                         if term_key =='category':
                             m2mcategory__slug = self.request.GET.get(term_key)
             filter_dic['is_vb'] = True
@@ -621,7 +623,7 @@ def get_video_thumbnail(video_url):
     else:
         return False
 
-# from moviepy.editor import VideoFileClip
+#from moviepy.editor import VideoFileClip
 def getVideoLength(input_video):
     clip = VideoFileClip(input_video)
     dt = timedelta(seconds = int(clip.duration))
@@ -655,7 +657,7 @@ def upload_thumbail(virtual_thumb_file):
         ts = time.time()
         created_at = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
         final_filename = "img-" + str(ts).replace(".", "")  + ".jpg" 
-        client.put_object(Bucket=settings.BOLOINDYA_AWS_BUCKET_NAME, Key='thumbnail/' + final_filename, Body=virtual_thumb_file)
+        client.put_object(Bucket=settings.BOLOINDYA_AWS_BUCKET_NAME, Key='thumbnail/' + final_filename, Body=virtual_thumb_file, ACL='public-read')
         # client.resource('s3').Object(settings.BOLOINDYA_AWS_BUCKET_NAME, 'thumbnail/' + final_filename).put(Body=open(virtual_thumb_file, 'rb'))
         filepath = "https://s3.amazonaws.com/"+settings.BOLOINDYA_AWS_BUCKET_NAME+"/thumbnail/"+final_filename
         # if os.path.exists(file):
@@ -887,11 +889,17 @@ def createTopic(request):
             topic.question_image = question_image
             topic.vb_width = vb_width
             topic.vb_height = vb_height
-            topic.view_count = random.randint(1,49)
+            view_count = random.randint(1,5)
+            topic.view_count = view_count
             topic.update_vb()
         else:
-            topic.view_count = random.randint(10,30)
+            view_count = random.randint(10,30)
+            topic.view_count = view_count
         topic.save()
+        try:
+            provide_view_count(view_count,topic)
+        except:
+            pass
         topic.m2mcategory.add(Category.objects.get(pk=category_id))
         if not is_vb:
             userprofile = UserProfile.objects.get(user = request.user)
@@ -910,6 +918,16 @@ def createTopic(request):
         return JsonResponse({'message': message,'topic':topic_json}, status=status.HTTP_201_CREATED)
     except User.DoesNotExist:
         return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+
+def provide_view_count(view_count,topic):
+    counter =0
+    all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)
+    user_ids = list(all_test_userprofile_id)
+    user_ids = random.sample(user_ids,100)
+    while counter<view_count:
+        opt_action_user_id = random.choice(user_ids)
+        VBseen.objects.create(topic= topic,user_id =opt_action_user_id)
+        counter+=1
 
 @api_view(['POST'])
 def editTopic(request):
@@ -1295,6 +1313,7 @@ def fb_profile_settings(request):
     lat = request.POST.get('lat',None)
     lang = request.POST.get('lang',None)
     sub_category_prefrences = request.POST.get('categories',None)
+    is_dark_mode_enabled = request.POST.get('is_dark_mode_enabled',None)
     try:
         sub_category_prefrences = sub_category_prefrences.split(',')
     except:
@@ -1358,6 +1377,64 @@ def fb_profile_settings(request):
             else:
                 user_tokens = get_tokens_for_user(user)
                 return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+        elif activity == 'google_login' and refrence == 'google':
+            try:
+                userprofile = UserProfile.objects.get(social_identifier = extra_data['google_id'],user__is_active = True)
+                user=userprofile.user
+                is_created=False
+            except Exception as e:
+                print e
+                # user_exists,num_user = check_user(extra_data['first_name'],extra_data['last_name'])
+                #username = generate_username(extra_data['first_name'],extra_data['last_name'],num_user) if user_exists else str(str(extra_data['first_name'])+str(extra_data['last_name']))
+                username = get_random_username()
+                user = User.objects.create(username = username.lower())
+                userprofile = UserProfile.objects.get(user = user)
+                is_created = True
+
+            if is_created:
+                add_bolo_score(user.id, 'initial_signup', userprofile)
+                # user.first_name = extra_data['first_name']
+                # user.last_name = extra_data['last_name']
+                userprofile.name = extra_data['name']
+                userprofile.social_identifier = extra_data['google_id']
+                userprofile.bio = bio
+                if extra_data['profile_pic']:
+                    userprofile.profile_pic = profile_pic
+                if not userprofile.d_o_b and d_o_b:
+                    add_bolo_score(user.id, 'dob_added', userprofile)
+                userprofile.d_o_b = d_o_b
+                if not userprofile.gender and gender:
+                    add_bolo_score(user.id, 'gender_added', userprofile)
+                userprofile.gender = gender
+                userprofile.about = about
+                userprofile.refrence = refrence
+                userprofile.extra_data = extra_data
+                userprofile.user = user
+                userprofile.bolo_score += 95
+                userprofile.linkedin_url = likedin_url
+                userprofile.twitter_id = twitter_id
+                userprofile.instagarm_id = instagarm_id
+
+                # userprofile.follow_count += 1
+                if str(is_geo_location) =="1":
+                    userprofile.lat = lat
+                    userprofile.lang = lang
+                if click_id:
+                    userprofile.click_id = click_id
+                    click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
+                    response = urllib2.urlopen(click_url).read()
+                    userprofile.click_id_response = str(response)
+                userprofile.save()
+                # if str(language):
+                #     default_follow = deafult_boloindya_follow(user,str(language))
+                userprofile.language = str(language)
+                userprofile.save()
+                user.save()
+                user_tokens = get_tokens_for_user(user)
+                return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+            else:
+                user_tokens = get_tokens_for_user(user)
+                return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
         elif activity == 'profile_save':
             try:
                 userprofile = UserProfile.objects.get(user = request.user)
@@ -1369,6 +1446,10 @@ def fb_profile_settings(request):
                 userprofile.d_o_b = d_o_b
                 if not userprofile.gender and gender:
                     add_bolo_score(userprofile.user.id, 'gender_added', userprofile)
+                if str(is_dark_mode_enabled) == '1':
+                    userprofile.is_dark_mode_enabled = True
+                else:
+                    userprofile.is_dark_mode_enabled = False
                 userprofile.gender = gender
                 userprofile.profile_pic =profile_pic
                 userprofile.linkedin_url = likedin_url
@@ -1446,6 +1527,11 @@ def save_kyc_basic_info(request):
 
         user_kyc,is_created = UserKYC.objects.get_or_create(user=request.user)
         kyc_basic_info,kyc_basic_info_is_created = KYCBasicInfo.objects.update_or_create(user=request.user,defaults=data_dict)
+        if not kyc_basic_info_is_created:
+            kyc_basic_info.is_rejected = False
+            kyc_basic_info.is_active = True
+            kyc_basic_info.save()
+
         user_kyc.kyc_basic_info_submitted = True
         user_kyc.save()
         return JsonResponse({'message': 'basic_info_saved'}, status=status.HTTP_200_OK)
@@ -1500,6 +1586,10 @@ def save_kyc_selfie(request):
         }
         user_kyc = UserKYC.objects.get(user=request.user)
         selfie_info,is_created = KYCBasicInfo.objects.update_or_create(user=request.user,defaults=data_dict)
+        if not is_created:
+            selfie_info.is_rejected = False
+            selfie_info.is_active = True
+            selfie_info.save()
         user_kyc.kyc_selfie_info_submitted = True
         user_kyc.save()
         return JsonResponse({'message': 'additional info saved'}, status=status.HTTP_200_OK)
@@ -1536,20 +1626,18 @@ def save_kyc_additional_info(request):
 def save_bank_details_info(request):
     try:
         mode_of_transaction = request.POST.get('mode_of_transaction',None)
-        bank_name = request.POST.get('bank_name',None)
         account_name = request.POST.get('account_name',None)
         account_number = request.POST.get('account_number',None)
         IFSC_code = request.POST.get('IFSC_code',None)
         paytm_number = request.POST.get('paytm_number',None)
         if mode_of_transaction:
-            if mode_of_transaction=='1' and not (bank_name and account_name and account_number and IFSC_code):
+            if mode_of_transaction=='1' and not (account_name and account_number and IFSC_code):
                 return JsonResponse({'message': 'Mandatory Bank Data Missing'}, status=status.HTTP_400_BAD_REQUEST)
             elif mode_of_transaction=='2' and not paytm_number:
                 return JsonResponse({'message': 'Mandatory Paytm Data Missing'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return JsonResponse({'message': 'Mode Of Transaction Missing'}, status=status.HTTP_400_BAD_REQUEST)
         data_dict = {
-            'bank_name':bank_name,
             'account_number':account_number,
             'account_name':account_name,
             'IFSC_code':IFSC_code,
@@ -1842,10 +1930,14 @@ def vb_seen(request):
         userprofile = topic.user.st
         userprofile.view_count = F('view_count')+1
         userprofile.save()
-        vbseen,is_created = VBseen.objects.get_or_create(user = request.user,topic_id = topic_id)
-        if is_created:
+        vbseen = VBseen.objects.filter(user = request.user,topic_id = topic_id)
+        if not vbseen:
+            vbseen = VBseen.objects.create(user = request.user,topic_id = topic_id)
             add_bolo_score(topic.user.id, 'vb_view', vbseen)
+        else:
+            vbseen = VBseen.objects.create(user = request.user,topic_id = topic_id)
         return JsonResponse({'message': 'vb seen'}, status=status.HTTP_200_OK)
+
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1883,12 +1975,17 @@ def my_app_version(request):
 @api_view(['POST'])
 def get_follow_user(request):
     try:
+        language = request.POST.get('language', None)
         #all_follow_id = Follower.objects.filter(user_follower = request.user,is_active = True).values_list('user_following_id', flat=True)
         #all_vb_of_follower = Topic.objects.filter(is_vb=True,is_removed=False,user_id__in=all_follow_id).values_list('user_id',flat=True)
         #if all_vb_of_follower:
         #    all_user = User.objects.filter(pk__in = all_vb_of_follower)
         #    return JsonResponse({'all_follow':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
-        all_user = User.objects.filter(st__bolo_score__gte = 2000)
+        all_user = []
+        if language:
+            all_user = User.objects.filter(st__bolo_score__gte = 2000, st__language=language)
+        else:
+            all_user = User.objects.filter(st__bolo_score__gte = 2000)
         if all_user.count():
             return JsonResponse({'all_follow':UserSerializer(all_user.order_by('?'), many= True).data}, status=status.HTTP_200_OK)
         else:
@@ -2347,3 +2444,12 @@ def redirect_to_store(request):
 
 #     return JsonResponse({'message':'success'}, status=status.HTTP_201_CREATED)    
 
+
+@api_view(['POST'])
+def get_category_detail(request):
+    try:
+        category_id = request.POST.get('category_id', None)
+        category = Category.objects.get(pk=category_id)
+        return JsonResponse({'category_details': CategorySerializer(category).data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)

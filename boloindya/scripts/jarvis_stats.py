@@ -11,13 +11,11 @@ from datetime import datetime
 import os 
 import pytz 
 import dateutil.parser 
-
 local_tz = pytz.timezone("Asia/Kolkata")
 import sys
 import django
 os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
 sys.path.append( '/'.join(os.path.realpath(__file__).split('/')[:5]) )
-
 
 # record the time taken for the videos to run
 def record_duration_play(log_text_dump, userid):
@@ -35,6 +33,7 @@ def record_duration_play(log_text_dump, userid):
 			if(curr_state == 'ClickOnPlay'):
 				reference_time = datetime.utcfromtimestamp((curr_stamp)/ 1000).replace(tzinfo=pytz.utc)
 				#print(reference_time)
+
 
 			if(curr_videoid in unique_video_play and (curr_state == 'StartPlaying' or curr_state == 'ClickOnPause')):
 				unique_video_play[curr_videoid][curr_state].append(curr_stamp)
@@ -98,7 +97,6 @@ def record_duration_play_estimate(log_text_dump, uniq_userid):
 	except Exception as e:	
 		print('Exception 3' + str(e))
 
-
 # parse string duration of the video and return the time in second
 def parse_duration(time):
 
@@ -129,8 +127,8 @@ def calculate_completetion_rate():
 		else:
 			scaled_per_viewed = per_viewed
 		#print(playtime_duration, total_duration, per_viewed, scaled_per_viewed)
-		#user_data_obj = VideoCompleteRate(user = user_id, videoid = video_id, duration = total_duration, playtime = playtime_duration, percentage_viewed= scaled_per_viewed, timestamp = reference_time)
-		#user_data_obj.save()		
+		user_data_obj = VideoCompleteRate(user = user_id, videoid = video_id, duration = total_duration, playtime = playtime_duration, percentage_viewed= scaled_per_viewed, timestamp = reference_time)
+		user_data_obj.save()		
 
 
 # func responsible for finding the time spend by the user across various activities
@@ -174,8 +172,9 @@ def main():
 		except Exception as e:
 			print('Exception: 1' + str(e))
 
-	calculate_completetion_rate()			
+  calculate_completetion_rate()			
 	#app_activity_time_spend()				#commented as of now, we will look into this later
+
 
 
 def run():

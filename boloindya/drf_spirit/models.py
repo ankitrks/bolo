@@ -180,7 +180,6 @@ class UserJarvisDump(models.Model):
         ('2', 'error_logs'),
         ('3', 'hardware_info'),
     ]
-
     user = models.ForeignKey(settings.AUTH_USER_MODEL,related_name='User',editable=False, db_index = True)
     dump = models.TextField(_("dump"),null=True,blank=True)
     dump_type = models.CharField(_("dump_type"),choices=DUMP_TYPE,max_length=50)
@@ -189,8 +188,7 @@ class UserJarvisDump(models.Model):
 
     def __unicode__(self):
         return "%s" % self.dump
-
-    
+      
 # code created by akash
 # 5 different models for recording user based data
 # read the sample dump file and create columns for the same
@@ -198,7 +196,6 @@ class UserJarvisDump(models.Model):
 # class recording the model storing user based statistics 
 class UserLogStatistics(models.Model):
     #user_log_fname = os.getcwd() + '/user_log.json'         # file recording the logs of user
-
     # record these details of the user
     #user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name = 'User', editable = False, max_length = 20)
     user = models.CharField(_("user"), null = True, blank = False, max_length=250, db_index = True)
@@ -219,7 +216,6 @@ class UserLogStatistics(models.Model):
 
 # class storing the model recroding follow, unfollow, report, share details of a user                  
 class UserFollowUnfollowDetails(models.Model):
-
     # denoting the type of relationshhip applicable here
     relationship_info = [
         ('1', 'follow'),
@@ -233,11 +229,9 @@ class UserFollowUnfollowDetails(models.Model):
     timestamp = models.DateTimeField(_("timestamp"), blank = False, null = False)
     relationship_type = models.CharField(_("relationship_type"), choices = relationship_info, max_length = 50)
     share_medium = models.CharField(_("share_medium"), blank = True, max_length = 300, null = True)
-
-
+    
 # class storing user-videotype details applicable for user, which videos s/he watched, commented, shared etc
 class UserVideoTypeDetails(models.Model):
-    
     videoinfo_type = [
         ('1', 'commented'),
         ('2', 'shared'),
@@ -245,7 +239,6 @@ class UserVideoTypeDetails(models.Model):
         ('4', 'unliked'),
         ('5', 'viewed'),
     ]    
-
     user = models.CharField(_("user"), null = True, blank = False, max_length = 250, db_index = True)
     videoid = models.CharField(_("videoid"), null = True, blank = True, max_length = 250, db_index = True)
     timestamp = models.DateTimeField(_("timestamp"), null = False, blank = True)
@@ -310,16 +303,13 @@ class VideoSharedDetails(models.Model):
 
 # class recording the activity time spend by the user
 class ActivityTimeSpend(models.Model):
-
     user = models.CharField(_("userid"), null = True, blank = False, max_length = 250, db_index = True)
     fragmentid = models.CharField(_("fragmentid"), null = True, blank = False, max_length = 550, db_index = True)
     time_spent = models.PositiveIntegerField(_("time_spent(ms)"), default = 0, editable = False)
     timestamp = models.DateTimeField(_("timestamp"), null = True, blank = False)
-
-3
+    
 # class recording the seach records of a user
 class UserSearch(models.Model):
-
     user = models.CharField(_("user"), null = True, blank = False, max_length = 250, db_index = True)
     searchquery = models.CharField(_("searchquery"), null = True, blank = False, max_length = 1000)
     timestamp = models.DateTimeField(_("timestamp"), null = True, blank = False)
@@ -327,13 +317,11 @@ class UserSearch(models.Model):
 
 # class recording the user --> datetime mapping
 class UserTimeRecord(models.Model):
-
     user = models.CharField(_("user"), null = True, blank = True, max_length = 250, db_index = True)
     timestamp = models.DateTimeField(_("timestamp"), null = True, blank = False)
 
 # class recording the day, hour, month, year --> frequency mapping
 class HourlyActiveUser(models.Model):
-
     day_month = models.CharField(_("day_month"), null = True, blank = False, max_length = 250)
     day_week = models.CharField(_("day_week"), null = True, blank = False, max_length = 250)
     hour = models.CharField(_("hour"), null = True, blank = False, max_length = 250)
@@ -344,22 +332,18 @@ class HourlyActiveUser(models.Model):
 
 # class recording the day --> frequency mapping
 class DailyActiveUser(models.Model):
-
     day_month_year = models.CharField(_("day_month_year"), null = True, blank = False, max_length = 250)
     frequency = models.PositiveIntegerField(_("frequency"), default = 0, editable = False)
     date_time_field = models.DateTimeField(_("date_time_field"), null = True, blank = False)
 
 # class recording the month, year --> frequency
 class MonthlyActiveUser(models.Model):    
-
     month = models.CharField(_("month"), null = True, blank = False, max_length = 250)
     year = models.PositiveIntegerField(_("year"), default = 2019, editable = False)
     frequency = models.PositiveIntegerField(_("frequency"), default = 0, editable = False)
 
-
 # class recording the hardware data corrosponding the logs
 class HardwareData(models.Model):
-
     user_id = models.CharField(_("userid"), null = True, blank = True, max_length = 250, db_index = True)
     total_memory = models.PositiveIntegerField(_("total_memory"), default = 0., editable = False)
     memory_free = models.PositiveIntegerField(_("memory_free"), default = 0, editable = False)
@@ -389,12 +373,3 @@ class HardwareData(models.Model):
     malloc_total = models.PositiveIntegerField(_("malloc_total"), default = 0, editable = False)
     malloc_used = models.PositiveIntegerField(_("malloc_used"), default = 0, editable = False)
     malloc_chunk = models.PositiveIntegerField(_("malloc_chunk"), default = 0, editable = False)
-
-    
-
-
-
-# et = epoch time
-# dt=datetime.datetime.fromtimestamp(float(et/ 1000.0))
-
-

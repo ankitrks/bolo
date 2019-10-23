@@ -1,3 +1,4 @@
+
 from drf_spirit.models import UserJarvisDump, UserLogStatistics, UserFollowUnfollowDetails, UserVideoTypeDetails, VideoDetails, UserEntryPoint, UserViewedFollowersFollowing, VideoSharedDetails,UserSearch, UserTimeRecord, DailyActiveUser, MonthlyActiveUser, UserInterest, HourlyActiveUser, ActivityTimeSpend
 import time
 import ast
@@ -254,7 +255,6 @@ def video_type_details(user_data_dump):
 
 
 
-
 #func for dumping video creation details into the model(videoid, timestamp)
 def video_info(user_data_dump):
     
@@ -394,7 +394,6 @@ def record_session_time(user_data_dump):
         datetime_st = datetime.fromtimestamp((sessiontime)/ 1000.0)           # datetime in datetime format
         user_data_obj = UserTimeRecord(user = userid, timestamp = datetime_st)
         user_data_obj.save()
-
     except Exception as e:
         print('Exception 10:' + str(e))
 
@@ -519,8 +518,7 @@ def activity_time_spend(user_data_dump):
     userid = user_data_dump['user_id']
     refer_timestamp = datetime.utcfromtimestamp(float(user_data_dump['session_start_time'])/ 1000).replace(tzinfo=pytz.utc)
 
-    try:
-        
+    try:        
         if('record_time_spend' in user_data_dump):
             all_records = user_data_dump['record_time_spend']
             if(len(all_records)>0):
@@ -579,7 +577,7 @@ def main():
         try:
             user_data_string = user_jarvis.dump
             user_data_dump = ast.literal_eval(user_data_string)
-            #print(user_data_dump)
+            
             #pass the collected user dump through a set of methods
             user_statistics(user_data_dump)
             follow_unfollow_details(user_data_dump)

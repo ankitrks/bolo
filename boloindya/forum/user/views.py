@@ -120,9 +120,10 @@ def referral_code_validate(request):
 def referral_code_update(request):
     ref_code = request.POST.get('code', '')
     user_id = request.POST.get('user_id', '')
-    click_id = request.POST.get('click_id',None)
-    pid = request.POST.get('pid',None)
-    referral_dump = request.POST.get('referral_dump',None)
+    click_id = request.POST.get('click_id','')
+    pid = request.POST.get('pid','')
+    referral_dump = request.POST.get('referral_dump','')
+    android_id = request.POST.get('android_id','')
     status = 'success'
     message = 'Referral code updated!'
     try:
@@ -136,8 +137,10 @@ def referral_code_update(request):
             used_obj.click_id = click_id
             used_obj.pid =pid
             used_obj.referral_dump = referral_dump
+            used_obj.android_id = android_id
             used_obj.save()
-        except:
+        except Exception as e1:
+            print e1
             pass
         if not created:
             status = 'error'

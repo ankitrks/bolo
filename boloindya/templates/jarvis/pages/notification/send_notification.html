@@ -1,0 +1,202 @@
+{% extends "jarvis/layout/base.html" %}
+{% load push_notification_tag %}
+{% block content %}
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/wickedpicker@0.4.1/dist/wickedpicker.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
+<style>
+    .notification_container {
+        padding: 10%;
+    }
+    form {
+        margin: 0 auto;
+        border: 1px solid #ccc;
+        width: 40vw;
+    }
+    form h2 {
+        text-align: center;
+    }
+    form h3 {
+        text-align: center;
+        width: 80%;
+        background: #d4edda;
+        color: #155724;
+        display: none;
+        margin-left: 10%;
+        margin-right: 10%;
+        padding: 10px 0px;
+        border-radius: 5px;
+    }
+    form .form_group {
+        margin: 20px 10%;
+        width: 80%;
+    }
+    form .form_group select {
+        width: 100%; 
+        outline: none;
+        font-size: 14px;
+    }
+    form .form_group img {
+        display: none;
+    }
+    form .form_group input {
+        width: 100%;
+        font-size: 14px;
+        padding: 4px;
+        outline: none;
+        border-radius: 4px;
+    }
+    form .form_group Button {
+        display: block;
+        background: #1989CD;
+        border: none;
+        outline: none;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 4px;
+        color: white;
+        margin: 0 auto;
+        padding: 10px;
+    }
+    .ui-timepicker-container {
+        z-index: 2000 !important;
+    }
+</style>
+<div class="notification_container">
+    <div class="alert alert-danger alert-dismissible" id="error_message" role="alert" style="display: none;">
+       <span id="message"></span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="color:white">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <form id="notification_form" method="POST">
+        {% csrf_token %}
+        <h2>App Push Notification</h2>
+        <h4 style="text-align: center;">Enter id in case of Video Byte, User, Category, hash in case of hashtag, for Announcements leave blank</h4>
+        <div class="form_group">
+            <input type="text" name="upper_title" id="upper_title" placeholder="Notification Title" value="{{pushNotification.title}}">
+        </div>
+        <div class="form_group">
+            <input type="text" name="title" id="title" placeholder="Notification Text" value="{{pushNotification.description}}">
+        </div>
+        <div class="form_group row">
+            <div class="col-md-6" style="padding: 0px;">
+                <select name="lang" id="lang">
+                    <option value="Select Language" disabled selected>Select Language</option>
+                    {% for lang in language_options %}
+                        <option value="{{ lang.0 }}" {% if pushNotification.language == lang.0 %}selected="selected"{% endif %}>{{ lang.1 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6" style="padding: 0px;">
+                <select name="notification_type" id="notification_type">
+                    <option value="Notification Type" disabled selected>Notification Type</option>
+                    {% for notification_type in notification_types %}
+                        <option value="{{ notification_type.0 }}" {% if pushNotification.notification_type == notification_type.0 %}selected="selected"{% endif %}>{{ notification_type.1 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form_group">
+            <select name="user_group" id="user_group">
+                <option value="User Group" disabled selected>User Group</option>
+                {% for user_group_option in user_group_options %}
+                    <option value="{{ user_group_option.0 }}" {% if pushNotification.user_group == user_group_option.0 %}selected="selected"{% endif %}>{{ user_group_option.1 }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form_group">
+            <input type="text" name="id" placeholder="Id/Hash" value="{{ pushNotification.instance_id }}">
+        </div>    
+        <input type="text" name="schedule_status" value="0" hidden id="schedule_status">
+        <div class="form_group">
+            <img src="https://www.careeranna.com/uploads/loading.gif" height="40" width="40" id="loader_image">
+        </div>
+        <div class="form_group row" id="date_picker" style="display:none;">
+            <div class="col-md-6" style="padding: 0px;">
+                Date : <input type="text" id="datepicker" name="datepicker"/>
+            </div>
+            <div class="col-md-6"  style="padding: 0px;">
+                Time: <input type="text" id="timepicker" name="timepicker"/>
+            </div>
+        </div>
+        <div class="form_group">
+            <button type="submit" style="display: inline;width: 45%;">Send Now</button>
+            <button type="button" style="display: inline;width: 45%;margin-left: 9%;" onclick="schedule_notification()" id="schedule">Schedule</button>
+        </div>
+    </form>
+</div>
+{% endblock content %} 
+{% block center_js %}
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/wickedpicker@0.4.1/dist/wickedpicker.min.js"></script>
+<script>
+    $(function() {
+        $("#datepicker").datepicker({ minDate: 0});
+        var today = new Date();
+        $('#timepicker').wickedpicker({twentyFour: true});
+        // $('input#timepicker').timepicker({
+        //     timeFormat: 'HH:mm',
+        //     interval: 60,
+        //     startTime: today.getHours() + ':' + today.getMinutes(),
+        //     dynamic: false,
+        //     dropdown: true,
+        //     scrollbar: true
+        // });
+    });
+
+    function schedule_notification() {
+        var schedule = $('#schedule').text();
+        if(schedule == 'Schedule') {
+            $('#date_picker').show();
+            $('#schedule').text('Save')
+        } else {
+            var date = $('#datepicker').val()
+            var time = $('#timepicker').val()
+            if (date == '') {
+                $('#error_message').show()
+                $('#message').text('Please Select Date')
+            } else if (time == '') {
+                $('#error_message').show()
+                $('#message').text('Please Select Time')
+            } else {
+                $('#error_message').hide()
+                $('#schedule_status').val('1')
+                $('#notification_form').submit();
+            }
+        }
+    }
+
+    $('#notification_form').submit(function(){
+        var upper_title = $('#upper_title').val()
+        var title =  $('#title').val()
+        var lang =  $('#lang :selected').text()
+        var notification_type = $('#notification_type :selected').text()
+        var user_group = $('#user_group :selected').text()
+        
+        if (upper_title  == '') {
+            $('#error_message').show()
+            $('#message').text('Please Enter Title')
+            return false;
+        } else if (title  =='') {
+            $('#error_message').show()
+            $('#message').text('Please Enter Description')
+            return false;
+        } else if (lang  == 'Select Language') {
+            $('#error_message').show()
+            $('#message').text('Please Select Language')
+            return false;
+        } else if (notification_type  == 'Notification Type') {
+            $('#error_message').show()
+            $('#message').text('Please Select Notification Type')
+            return false;
+        } else if (user_group  == 'User Group') {
+            $('#error_message').show()
+            $('#message').text('Please Select User Group')
+            return false;
+        } 
+    });
+
+</script>
+{% endblock center_js%}

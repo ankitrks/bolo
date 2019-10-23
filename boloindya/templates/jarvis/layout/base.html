@@ -28,6 +28,7 @@
   <link rel="stylesheet" href="{% static 'AdminLTE/bower_components/bootstrap-daterangepicker/daterangepicker.css' %}">
   <!-- bootstrap wysihtml5 - text editor -->
   <link rel="stylesheet" href="{% static 'AdminLTE/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css' %}">
+  <link href="{% static 'css/toastr.min.css' %}" rel="stylesheet"/>
 
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -107,6 +108,7 @@
 <script src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.18/js/dataTables.bootstrap4.min.js"></script>
 <script src="{% static 'js/clipboard.min.js'%}"></script>
+<script src="{% static 'js/toastr.min.js' %}"></script>
 <script type="text/javascript">
       $('.wrapper').on('click','.sign_out_button',function(){
         window.location.replace('/superman/logout');

@@ -1,0 +1,52 @@
+{% extends "jarvis/layout/base.html" %}
+{% load push_notification_tag %}
+{% block content %}
+<style>
+    .filter_notification {
+        padding: 10px;
+    }
+    #search_title_input {
+        margin-left: 10px;
+        margin-right: 10px;
+        width: 400px;
+    }
+    .operation {
+        margin-left: 5px;
+        margin-right: 5px;
+    }
+</style>
+    <div class="row" style="padding: 10px;">
+        <div class="col-md-12 filter_notification">
+            <a href="/jarvis/send_notification/" class="btn btn-primary">Create New</a>
+            <input type="text" placeholder="Search Title" class="btn" id="search_title_input"/>
+            <button class="btn btn-info">Export CSV</button>
+        </div>
+        <div class="col-xs-12 table-responsive ">
+            <table class="table table-bordered table-striped nowrap" id="notification_table">
+                <thead>
+                    <tr>
+                        <th>S No.</th>
+                        <th>Username</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pushNotification in pushNotification.push_notification_id.all %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ pushNotification.user.username }}</td>
+                            <td>{{ pushNotification.user }}</td>
+                            <td style="color: {% if pushNotification.status == 0 %} #b52828 {% else %} #1989cd {% endif %}">{% get_notification_status pushNotification.status %}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock content %} 
+{% block center_js %}
+<script>
+    $('#notification_table').DataTable();
+</script>
+{% endblock center_js%}
