@@ -1,6 +1,6 @@
 
 from forum.user.models import AndroidLogs, VideoPlaytime, VideoCompleteRate, UserAppTimeSpend
-from drf_spirit.models import UserJarvisDump, UserLogStatistics, ActivityTimeSpend
+from drf_spirit.models import UserJarvisDump, UserLogStatistics, ActivityTimeSpend, VideoDetails
 from forum.topic.models import Topic
 import time
 import ast 
@@ -11,14 +11,11 @@ from datetime import datetime
 import os 
 import pytz 
 import dateutil.parser 
-
-
 local_tz = pytz.timezone("Asia/Kolkata")
 import sys
 import django
 os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
 sys.path.append( '/'.join(os.path.realpath(__file__).split('/')[:5]) )
-
 
 # record the time taken for the videos to run
 def record_duration_play(log_text_dump, userid):
@@ -28,11 +25,14 @@ def record_duration_play(log_text_dump, userid):
 	try:
 		for i in range(0, len(log_text_dump)):
 			record_i = log_text_dump[i]
-			curr_stamp = int(record_i['miliseconds'])
+			curr_stamp = float(record_i['miliseconds'])
 			curr_state = record_i.get('state')
 			curr_videoid = int(record_i.get('video_byte_id'))
+
+			# this will be used for reference time calculation
 			if(curr_state == 'ClickOnPlay'):
 				reference_time = datetime.utcfromtimestamp((curr_stamp)/ 1000).replace(tzinfo=pytz.utc)
+				#print(reference_time)
 
 
 			if(curr_videoid in unique_video_play and (curr_state == 'StartPlaying' or curr_state == 'ClickOnPause')):
@@ -58,7 +58,44 @@ def record_duration_play(log_text_dump, userid):
 				user_data_obj.save()
 
 	except Exception as e:
-		print('Exception 2' + str(e))	
+		print('Exception 2' + str(e))			
+
+
+# this method estimates the video play time for the records which do not have 'click on pause' time
+# please note that this is just an estimate
+# in some cases values may need to be mannually inspected
+def record_duration_play_estimate(log_text_dump, uniq_userid):
+
+	#print(uniq_userid)
+	try:
+		for i in range(0, len(log_text_dump)):
+			record_i = log_text_dump[i]
+			curr_stamp = float(record_i['miliseconds'])
+			curr_state = record_i.get('state')
+			curr_videoid = int(record_i.get('video_byte_id'))
+			#print(curr_state)
+			if(curr_state == 'ClickOnPlay'):
+				# reference time 
+				ref_timestamp = datetime.utcfromtimestamp((curr_stamp)/ 1000).replace()
+				#print(ref_timestamp)
+				results = VideoDetails.objects.filter(userid = uniq_userid, timestamp__gt = ref_timestamp).order_by('timestamp')
+				results_count = results.count()
+				#print(results_count)
+				if(results_count > 0):
+					results_sorted = results[0]
+					print(results_sorted.timestamp, ref_timestamp)
+					upper_cap_timestamp = results_sorted.timestamp
+					#print(upper_cap_timestamp)
+					time_diff = upper_cap_timestamp - ref_timestamp
+					#print(time_diff)
+					print(time_diff.total_seconds())
+					time_diff_hrs = (time_diff.total_seconds() / 3600)
+					print(time_diff_hrs)
+				
+
+
+	except Exception as e:	
+		print('Exception 3' + str(e))
 
 # parse string duration of the video and return the time in second
 def parse_duration(time):
@@ -124,15 +161,20 @@ def main():
 	for each_log in android_logs:
 		try:
 			each_android_log_dump = ast.literal_eval(each_log.logs)
-			each_android_log_dump_id = each_log.user
+			each_android_log_dump_id = each_log.user     # username
+			each_android_userid = each_log.user_id       # user id corrosponding to the log
+			#print(each_android_userid)
 			#print(each_android_log_dump, each_android_log_dump_id) 
 			record_duration_play(each_android_log_dump, each_android_log_dump_id)
+			#record_duration_play_estimate(each_android_log_dump, each_android_userid)
+
 
 		except Exception as e:
 			print('Exception: 1' + str(e))
 
-	calculate_completetion_rate()			
-	app_activity_time_spend()				#commented as of now, we will look into this later
+  calculate_completetion_rate()			
+	#app_activity_time_spend()				#commented as of now, we will look into this later
+
 
 
 def run():

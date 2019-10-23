@@ -993,12 +993,8 @@ def get_hau_data(request):
                 hau_labels.append(str(obj.date_time_field.strftime("%I %p")))
                 hau_freq.append(str(obj.frequency))
 
-            print(hau_labels)
-            print(hau_freq)
-
             all_data = {'hau_labels': hau_labels, 'hau_freq': hau_freq}
             return JsonResponse(all_data, status=status.HTTP_200_OK)
-
         except Exception as e:
             print(e)
             return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
@@ -1257,4 +1253,6 @@ def daily_vplay_data(request):
             return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
     else:
         return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)   
+
+
 
