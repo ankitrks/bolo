@@ -20,6 +20,7 @@ from django.http import JsonResponse
 from datetime import datetime,timedelta
 
 from .transcoder import transcode_media_file
+from django.utils.html import format_html
 
 language_options = (
     ('1', "English"),
@@ -82,7 +83,8 @@ class Topic(models.Model):
     """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='st_topics')
     category = models.ForeignKey('forum_category.Category', verbose_name=_("category"), related_name="category_topics",null=True,blank=True)
-    m2mcategory = models.ManyToManyField('forum_category.Category', verbose_name=_("m2mcategories"), related_name="m2mcategories_topics",blank=True)
+    m2mcategory = models.ManyToManyField('forum_category.Category', verbose_name=_("category"), \
+            related_name="m2mcategories_topics",blank=True)
 
     title = models.CharField(_("title"), max_length=255, blank = True, null = True)
     question_audio = models.CharField(_("audio title"), max_length=255, blank = True, null = True)
@@ -91,7 +93,7 @@ class Topic(models.Model):
     date = models.DateTimeField(_("date"), default=timezone.now)
     last_active = models.DateTimeField(_("last active"), default=timezone.now)
     reindex_at = models.DateTimeField(_("reindex at"), default=timezone.now)
-    language_id = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='1')
+    language_id = models.CharField(_("language"), choices=language_options, blank = True, null = True, max_length=10, default='1')
     question_image = models.TextField(_("Question image"),null=True,blank=True)
 
     is_media = models.BooleanField(default=True)
@@ -101,9 +103,9 @@ class Topic(models.Model):
     is_pinned = models.BooleanField(_("pinned"), default=False)
     is_globally_pinned = models.BooleanField(_("globally pinned"), default=False)
     is_closed = models.BooleanField(_("closed"), default=False)
-    is_removed = models.BooleanField(default=False)
+    is_removed = models.BooleanField(_("removed"), default=False)
     thumbnail = models.CharField(_("thumbnail"), max_length=150, blank = True, null = True, default='')
-    view_count = models.PositiveIntegerField(_("views count"), default=0)
+    view_count = models.PositiveIntegerField(_("views"), default=0)
     comment_count = models.PositiveIntegerField(_("comment count"), default=0)
     total_share_count = models.PositiveIntegerField(_("Total Share count"), default=0)# self plus comment
     share_count = models.PositiveIntegerField(_("Share count"), default=0)# only topic share
@@ -111,7 +113,8 @@ class Topic(models.Model):
     # shared_post = models.ForeignKey('self', blank = True, null = True, related_name='user_shared_post')
     is_vb = models.BooleanField(_("Is Video Bytes"), default=False)
     likes_count = models.PositiveIntegerField(_("Likes count"), default=0)
-    is_monetized = models.BooleanField(_("Is Monetized?"), default=False)
+
+    is_monetized = models.BooleanField(_("monetized"), default=False)
     vb_width = models.PositiveIntegerField(_("vb width"), default=0)
     vb_height = models.PositiveIntegerField(_("vb height"), default=0)
 
@@ -250,10 +253,6 @@ class Topic(models.Model):
         return format_html('<a href="/superman/forum_user/userprofile/' + str(self.user.st.id) \
             + '/change/" target="_blank">' + self.user.username + '</a>' )
 
-    def duration(self):
-        from django.utils.html import format_html
-        return format_html('<a href="' + self.backup_url + '" target="_blank">' + self.media_duration + '</a>' )
-
     def delete(self):
         if self.is_monetized:
             if self.language_id == '1':
@@ -347,10 +346,16 @@ class Topic(models.Model):
         duration = str(duration.hour)+":"+str(duration.minute)+":"+str(duration.second)
         return duration
 
+    def duration(self):
+        if self.media_duration:
+            return format_html('<a href="' + self.backup_url + '" target="_blank">' + self.media_duration + '</a>' )
+        return "00:00"
+
     def comments(self):
-        from django.utils.html import format_html
-        return format_html(str('<a href="/superman/forum_comment/comment/?topic_id='+str(self.id)+'" target="_blank">' \
+        if self.comment_count:
+            return format_html(str('<a href="/superman/forum_comment/comment/?topic_id='+str(self.id)+'" target="_blank">' \
                 + str(self.comment_count)+'</a>'))
+        return 0
 
 class VBseen(UserInfo):
     topic = models.ForeignKey(Topic, related_name='vb_seen',null=True,blank=True)

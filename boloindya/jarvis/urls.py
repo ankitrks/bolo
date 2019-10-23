@@ -18,6 +18,7 @@ urlpatterns = [
     url(r'^accept_kyc/$',views.accept_kyc, name='accept_kyc'),
     url(r'^reject_kyc/$',views.reject_kyc, name='reject_kyc'),
     url(r'^uploadvideofile/$',views.uploadvideofile,name = 'uploadvideofile'),
+    url(r'^management/video/$',views.video_management,name = 'video_management'),
     url(r'^upload_n_transcode/$',views.upload_n_transcode),
     url(r'^upload_details/$',views.upload_details),
     url(r'^uploaded_list/$',views.uploaded_list),

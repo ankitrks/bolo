@@ -190,9 +190,14 @@ def importcsv(request):
 def uploadvideofile(request):
     all_category = VideoCategory.objects.all()
     from django.db.models import Count
-    all_upload = VideoUploadTranscode.objects.all().distinct().values('folder_to_upload').annotate(folder_count=Count('folder_to_upload')).order_by('folder_to_upload')
-    print all_upload
-    return render(request,'jarvis/pages/upload_n_transcode/upload_n_transcode.html',{'all_category':all_category,'all_upload':all_upload})
+    all_upload = VideoUploadTranscode.objects.all().distinct().values('folder_to_upload')\
+        .annotate(folder_count=Count('folder_to_upload')).order_by('folder_to_upload')
+    return render(request,'jarvis/pages/upload_n_transcode/upload_n_transcode.html',
+            {'all_category':all_category,'all_upload':all_upload})
+
+@login_required
+def video_management(request):
+    return render(request,'admin/jarvis/video_management.html',{})
 
 def getcsvdata(request):
     data = []
