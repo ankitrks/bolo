@@ -44,7 +44,7 @@
 
     <!-- Daily active users template -->
     <div class="row">
-        <div style="text-align: center;" class="col-6 col-xl-6 col-md-12 col-sm-12">
+        <div style="text-align: center;" class="col-6 col-xl-6 col-md-6 col-sm-12">
             <h2>Daily Video Impressions</h2>
             <span>From:</span><input type="text" id="dp_impr_from" readonly="readonly">
             <span>To:</span><input type="text" id="dp_impr_to" readonly="readonly">
@@ -52,7 +52,7 @@
             <canvas id="chart_impr"></canvas>
         </div>
 
-        <div class="col-6 col-xl-6 col-md-12 col-sm-12">
+        <div class="col-6 col-xl-6 col-md-6 col-sm-12">
             <h2>Top 10 Videos (By Impressions)</h2>
             <span>Select day:</span><input type="text" id="dp_top_impr" readonly="readonly">
             <button onclick="top_impr_click_ok()" type="button" id="filter_day_btn">Ok</button>
@@ -73,7 +73,7 @@
     </div>
 
     <div class="row">
-        <div style="text-align: center;" class="col-6 col-xl-6 col-md-12 col-sm-12">
+        <div style="text-align: center;" class="col-6 col-xl-6 col-md-6 col-sm-12">
             <h2>Video Plays </h2>
             <span>From:</span><input type="text" id="dp_play_week_from" readonly="readonly">
             <span>To:</span><input type="text" id="dp_play_week_to" readonly="readonly">
@@ -92,7 +92,7 @@
             </table>
         </div>
         
-        <div style="text-align: center;" class="col-6 col-xl-6 col-md-12 col-sm-12">
+        <div style="text-align: center;" class="col-6 col-xl-6 col-md-6 col-sm-12">
             <h2>Video Plays (Day wise breakdown)</h2>
             <span>Day: </span><input type="text" id="dp_daily_vplays" readonly="readonly">
             <button onclick="daily_vplays_ok()" type="button" id="filter_date_btn">Ok</button>
@@ -114,11 +114,10 @@
     </div>
 
     <!-- jQuery 3 -->
-    <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
+    <script src="/media/js/jquery-3.3.1.min.js"></script>
 
     <!-- Bootstrap 3.3.7 -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="/media/js/bootstrap.min.js"></script>
 
     <!-- ChartJS -->
     <script type="text/javascript" src="{% static 'js/Chart.min.js' %}"></script>
@@ -199,7 +198,7 @@
         function setDailyVPlayTable(data) {
             $("#daily_vplays_table tr").remove(); 
 
-            console.log(data);
+            console.log("****"+data.daily_data);
 
             for(item in data.daily_data){
                 var weekly_vplays_table = document.getElementById('daily_vplays_table');
