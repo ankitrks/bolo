@@ -1234,7 +1234,7 @@ def daily_vplay_data(request):
 
             date_begin = datetime.datetime.strptime(day_begin,"%d-%m-%Y %H:%M:%S").date()
             date_end = date_begin + timedelta(days=1)
-
+    
             vid_id_queryset = VideoCompleteRate.objects.filter(timestamp__gte=date_begin,\
                 timestamp__lte=date_end)\
                 .order_by('videoid')
@@ -1253,9 +1253,10 @@ def daily_vplay_data(request):
 
             for obj in vid_list:
                 obj['title'] = vid_titles.get(obj.get('videoid'))
+                print(str(obj))
             
-            print("vid titles : "+str(vid_titles))
-            print("vid info: "+str(vid_list))
+            # print("vid titles : "+str(vid_titles))
+            # print("vid info: "+str(vid_list))
 
             return JsonResponse({'daily_data': vid_list}, status=status.HTTP_200_OK)
 
