@@ -156,7 +156,6 @@ def app_activity_time_spend():
 
 
 def main():
-	
 	android_logs = AndroidLogs.objects.filter(log_type = 'click2play')
 	for each_log in android_logs:
 		try:
@@ -172,10 +171,8 @@ def main():
 		except Exception as e:
 			print('Exception: 1' + str(e))
 
-  calculate_completetion_rate()			
+        calculate_completetion_rate()
 	#app_activity_time_spend()				#commented as of now, we will look into this later
-
-
 
 def run():
 	main()
