@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 from django.contrib import admin
 from .models import VideoUploadTranscode,FCMDevice, PushNotificationUser, PushNotification
-
 from functools import update_wrapper
 from django.contrib import admin
 from django.shortcuts import redirect, render
