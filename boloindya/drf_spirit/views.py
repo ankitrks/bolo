@@ -343,11 +343,15 @@ class VBList(generics.ListCreateAPIView):
 
                         # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,date__gte=enddate)
                     if m2mcategory__slug:
-                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-date')
-                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),date__gte=enddate).order_by('-date')
+                        # post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-date')
+                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),is_popular = True).order_by('-date')
+
+                        # post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),date__gte=enddate).order_by('-date')
+                        post2 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),is_popular=False).order_by('-date')
                     else:
-                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-view_count')
-                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),date__gte=enddate).order_by('-view_count')
+                        # post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-view_count')
+                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),is_popular = True).order_by('-view_count')
+                        post2 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),is_popular = False).order_by('-view_count')
                     if post1:
                         topics+=list(post1)
                     if post2:
@@ -359,11 +363,15 @@ class VBList(generics.ListCreateAPIView):
 
                         # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,date__gte=enddate)
                     if m2mcategory__slug:
-                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id')).exclude(id__in=all_seen_vb).order_by('-date')
-                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id')).order_by('-date')
+                        # post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id')).exclude(id__in=all_seen_vb).order_by('-date') 
+                        # post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id')).order_by('-date')
+                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),is_popular = True).order_by('-date')
+                        post2 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),is_popular = False).order_by('-date')
                     else:
-                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).exclude(id__in=all_seen_vb).order_by('-id')
-                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).order_by('-id')
+                        # post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).exclude(id__in=all_seen_vb).order_by('-id')
+                        # post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).order_by('-id')
+                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),is_popular = True).order_by('-id')
+                        post2 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),is_popular = False).order_by('-id')
                     if post1:
                         topics+=list(post1)
                     if post2:
@@ -1983,9 +1991,9 @@ def get_follow_user(request):
         #    return JsonResponse({'all_follow':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
         all_user = []
         if language:
-            all_user = User.objects.filter(st__bolo_score__gte = 2000, st__language=language)
+            all_user = User.objects.filter(st__is_popular = True, st__language=language)
         else:
-            all_user = User.objects.filter(st__bolo_score__gte = 2000)
+            all_user = User.objects.filter(st__is_popular = True)
         if all_user.count():
             return JsonResponse({'all_follow':UserSerializer(all_user.order_by('?'), many= True).data}, status=status.HTTP_200_OK)
         else:
