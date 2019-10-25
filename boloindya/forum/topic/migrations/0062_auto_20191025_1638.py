@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('forum_topic', '0061_auto_20191014_1315'),
+        ('forum_topic', '0062_auto_20191025_1412'),
     ]
 
     operations = [
@@ -16,30 +16,5 @@ class Migration(migrations.Migration):
             model_name='topic',
             name='is_popular',
             field=models.BooleanField(default=False),
-        ),
-        migrations.AlterField(
-            model_name='topic',
-            name='is_monetized',
-            field=models.BooleanField(default=False, verbose_name='monetized'),
-        ),
-        migrations.AlterField(
-            model_name='topic',
-            name='is_removed',
-            field=models.BooleanField(default=False, verbose_name='removed'),
-        ),
-        migrations.AlterField(
-            model_name='topic',
-            name='language_id',
-            field=models.CharField(blank=True, choices=[('1', 'English'), ('2', 'Hindi'), ('3', 'Tamil'), ('4', 'Telgu')], default='1', max_length=10, null=True, verbose_name='language'),
-        ),
-        migrations.AlterField(
-            model_name='topic',
-            name='m2mcategory',
-            field=models.ManyToManyField(blank=True, related_name='m2mcategories_topics', to='forum_category.Category', verbose_name='category'),
-        ),
-        migrations.AlterField(
-            model_name='topic',
-            name='view_count',
-            field=models.PositiveIntegerField(default=0, verbose_name='views'),
-        ),
+        )
     ]
