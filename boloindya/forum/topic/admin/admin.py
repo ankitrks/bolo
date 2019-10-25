@@ -46,7 +46,7 @@ class TopicChangeList(ChangeList):
             list_per_page, list_max_show_all, list_editable, model_admin)
 
         self.list_display = ('action_checkbox', 'id', 'title', 'name', 'duration', 'language_id', 'view_count',\
-            'comments', 'is_monetized', 'is_removed', 'date', 'm2mcategory')
+            'comments', 'is_monetized', 'is_removed', 'date', 'm2mcategory','is_popular')
         self.list_display_links = ['id']
         self.list_editable = ('title', 'language_id', 'm2mcategory')
 
@@ -105,7 +105,7 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
             'fields': ('title', 'm2mcategory')
         }),
         ('VB Details', {
-            'fields': ('language_id', 'media_duration'),
+            'fields': ('language_id', 'media_duration','is_popular'),
         }),
         ('Counts', {
             'fields': (('view_count', 'comment_count'), ('total_share_count', 'share_count'), 'likes_count'),
