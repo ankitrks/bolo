@@ -157,7 +157,6 @@ def app_activity_time_spend():
 			user_data_obj.save()
 
 
-
 def main():
 	android_logs = AndroidLogs.objects.filter(log_type = 'click2play')
 	for each_log in android_logs:

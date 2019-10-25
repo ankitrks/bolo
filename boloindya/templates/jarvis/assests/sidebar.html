@@ -4,7 +4,7 @@
       <!-- Sidebar user panel -->
       <div class="user-panel">
         <div class="pull-left image">
-          <img src="{{ user.st.profile_pic }}" class="img-circle" alt="User Image">
+          <!--<img src="{{ user.st.profile_pic }}" class="img-circle" alt="User Image">-->
         </div>
         <div class="pull-left info">
           <p>{{ user.username }}</p>
@@ -16,22 +16,23 @@
         <li class="header">MAIN NAVIGATION</li>
         <li class=" treeview">
           <a href="#">
-            <i class="fa fa-dashboard"></i> <span>Dashboard</span>
+            <i class="fa fa-pie-chart"></i> <span>Dashboard</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
           </a>
           <ul class="treeview-menu">
-            <li class=""><a href="index.html"><i class="fa fa-circle-o"></i> Dashboard v1</a></li>
+            <!--<li class=""><a href="index.html"><i class="fa fa-circle-o"></i> Dashboard v1</a></li>
             <li><a href="index2.html"><i class="fa fa-circle-o"></i> Dashboard v2</a></li>
-            <li class="{% if request.path in '/jarvis/user_statistics/'%}active{% endif %}"><a href="/jarvis/user_statistics/"><i class="fa fa-laptop"></i> <span>User Statistics</span></a></li>
-            <li class="{% if request.path in '/jarvis/video_statistics/'%}active{% endif %}"><a href="/jarvis/video_statistics/"><i class="fa fa-laptop"></i> <span>Video Statistics</span></a></li>
+          -->
+            <li class="{% if request.path in '/jarvis/user_statistics/'%}active{% endif %}"><a href="/jarvis/user_statistics/"><i class="fa fa-pie-chart"></i> <span>User Statistics</span></a></li>
+            <li class="{% if request.path in '/jarvis/video_statistics/'%}active{% endif %}"><a href="/jarvis/video_statistics/"><i class="fa fa-pie-chart"></i> <span>Video Statistics</span></a></li>
           </ul>
         </li>
 
         <li class="{% if request.path in '/jarvis/get_accepted_kyc_user_list/,/jarvis/get_submitted_kyc_user_list/,/jarvis/get_pending_kyc_user_list/,/jarvis/get_kyc_user_list/'%}active{% endif %} treeview">
           <a href="#">
-            <i class="fa fa-dashboard"></i> <span>User KYC</span>
+            <i class="fa fa-book"></i> <span>User KYC</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
@@ -40,13 +41,14 @@
             <li class="{% if request.path in '/jarvis/get_accepted_kyc_user_list/'%}active{% endif %}"><a href="/jarvis/get_accepted_kyc_user_list/"><i class="fa fa-circle-o"></i>Accpeted KYC's</a></li>
             <li class="{% if request.path in '/jarvis/get_submitted_kyc_user_list/'%}active{% endif %}"><a href="/jarvis/get_submitted_kyc_user_list/"><i class="fa fa-circle-o"></i>Submitted KYC's</a></li>
             <li class="{% if request.path in '/jarvis/get_pending_kyc_user_list/'%}active{% endif %}"><a href="/jarvis/get_pending_kyc_user_list/"><i class="fa fa-circle-o"></i>Pending KYC's</a></li>
-            <li class="{% if request.path in '/jarvis/get_kyc_user_list/'%}active{% endif %}"><a href="/jarvis/get_kyc_user_list/"><i class="fa fa-laptop"></i> <span>All KYC</span></a></li>
+            <li class="{% if request.path in '/jarvis/get_kyc_user_list/'%}active{% endif %}"><a href="/jarvis/get_kyc_user_list/"><i class="fa fa-circle-o"></i> <span>All KYC</span></a></li>
             
           </ul>
         </li>
 
 
-        <li class="{% if request.path in '/jarvis/get_encashable_detail/'%}active{% endif %}"><a href="/jarvis/get_encashable_detail/"><i class="fa fa-pie-chart"></i> <span>Show Encash Records</span></a></li>
+        <!--<li class="{% if request.path in '/jarvis/get_encashable_detail/'%}active{% endif %}"><a href="/jarvis/get_encashable_detail/"><i class="fa fa-pie-chart"></i> <span>Show Encash Records</span></a></li> -->
+
         <li class="{% if request.path in '/jarvis/uploadvideofile/,/jarvis/uploaded_list/'%}active{% endif %} treeview">
           <a href="#">
             <i class="fa fa-dashboard"></i> <span>Video File Upload</span>
@@ -55,13 +57,13 @@
             </span>
           </a>
           <ul class="treeview-menu">
-            <li class="{% if request.path in '/jarvis/uploadvideofile/'%}active{% endif %}"><a href="/jarvis/uploadvideofile/"><i class="fa fa-circle-o"></i> Uplaod N Transcode</a></li>
-            <li class="{% if request.path in '/jarvis/uploaded_list/'%}active{% endif %}"><a href="/jarvis/uploaded_list/"><i class="fa fa-circle-o"></i> Uploaded List</a></li>
+            <li class="{% if request.path in '/jarvis/uploadvideofile/'%}active{% endif %}"><a href="/jarvis/uploadvideofile/"><i class="fa fa-circle-o"></i> Upload N Transcode</a></li>
+            <li class="{% if request.path in '/jarvis/uploaded_list/'%}active{% endif %}"><a href="/jarvis/uploaded_list/"><i class="fa fa-share"></i> Uploaded List</a></li>
           </ul>
         </li>
         <li class="{% if request.path in '/jarvis/importcsv/'%}active{% endif %}"><a href="/jarvis/importcsv/"><i class="fa fa-th"></i> <span>Upload Instagram CSV</span></a></li>
-        <li class="{% if request.path in '/jarvis/notification_panel/'%}active{% endif %}"><a href="/jarvis/notification_panel/"><i class="fa fa-th"></i> <span>Notification Panel</span></a></li>
-        <li class="{% if request.path in '/jarvis/management/video/'%}active{% endif %}"><a href="/jarvis/management/video/"><i class="fa fa-th"></i> <span>Video Management</span></a></li>
+        <li class="{% if request.path in '/jarvis/notification_panel/'%}active{% endif %}"><a href="/jarvis/notification_panel/"><i class="fa fa-bell-o"></i> <span>Notification Panel</span></a></li>
+        <li class="{% if request.path in '/jarvis/management/video/'%}active{% endif %}"><a href="/jarvis/management/video/"><i class="fa fa-edit"></i> <span>Video Management</span></a></li>
       </ul>
 
     </section>
