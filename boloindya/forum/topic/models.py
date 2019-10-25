@@ -95,6 +95,7 @@ class Topic(models.Model):
     reindex_at = models.DateTimeField(_("reindex at"), default=timezone.now)
     language_id = models.CharField(_("language"), choices=language_options, blank = True, null = True, max_length=10, default='1')
     question_image = models.TextField(_("Question image"),null=True,blank=True)
+    is_popular = models.BooleanField(default = False)
 
     is_media = models.BooleanField(default=True)
     media_duration = models.CharField(_("duration"), max_length=20, default='',null=True,blank=True)
