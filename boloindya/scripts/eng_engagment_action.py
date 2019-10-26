@@ -17,12 +17,12 @@ def run():
     last_n_days_post_ids = list(last_n_days_post_ids)
 
     for each_topic_id in last_n_days_post_ids:
-        print 'topic_id:',each_topic_id
+        # print 'topic_id:',each_topic_id
         action_type =['like','comment','follow','share','comment_like',]
         opt_action = random.choice(action_type)
-        print 'action type:',opt_action
+        # print 'action type:',opt_action
         opt_action_user_id = random.choice(user_ids)
-        print 'action user_id',opt_action_user_id
+        # print 'action user_id',opt_action_user_id
         if opt_action =='comment':
             action_comment(opt_action_user_id,each_topic_id)
         elif opt_action == 'like':

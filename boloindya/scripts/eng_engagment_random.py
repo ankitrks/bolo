@@ -19,12 +19,12 @@ def run():
     topic_ids = list(topic_ids)
     actionable_ids = random.sample(topic_ids,1000)
     for each_topic_id in actionable_ids:
-        print 'toipc_id',each_topic_id
+        # print 'toipc_id',each_topic_id
         action_type =['seen','comment','like','follow','share','comment_like']
         opt_action = random.choice(action_type)
-        print "action_type",opt_action
+        # print "action_type",opt_action
         opt_action_user_id = random.choice(user_ids)
-        print "action user",opt_action_user_id,'\n'
+        # print "action user",opt_action_user_id,'\n'
         if opt_action =='comment':
             action_comment(opt_action_user_id,each_topic_id)
         elif opt_action == 'like':
