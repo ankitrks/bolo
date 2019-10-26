@@ -8,6 +8,7 @@ from drf_spirit.utils import add_bolo_score
 from forum.comment.models import Comment
 
 def run():
+    print "Start Time Eng_Engagment Action: ",datetime.now()
     all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)
     user_ids = list(all_test_userprofile_id)
     user_ids = random.sample(user_ids,2000)
@@ -41,6 +42,7 @@ def run():
                 action_comment_like(opt_action_user_id,each_comment)
         elif opt_action == 'seen':
             action_seen(opt_action_user_id,each_topic_id)
+    print "End Time Eng_Engagment Action: ",datetime.now()
 
 
 

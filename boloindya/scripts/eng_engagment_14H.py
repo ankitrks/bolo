@@ -8,6 +8,7 @@ from drf_spirit.utils import add_bolo_score
 from forum.comment.models import Comment
 
 def run():
+    print "Start Time Eng_Engagment 14H: ",datetime.now()
     all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)
     user_ids = list(all_test_userprofile_id)
     user_ids = random.sample(user_ids,1000)
@@ -54,6 +55,7 @@ def run():
                     pass
         except:
             pass
+    print "End Time Eng_Engagment 14H: ",datetime.now()
 
 
 def check_like(topic_id,user_ids):
