@@ -175,7 +175,3 @@ class PushNotificationUser(RecordTimeStamp):
     push_notification_id = models.ForeignKey(PushNotification, blank = True, null = True, related_name='push_notification_id',editable=False)
     status = models.CharField(choices=status_options, blank = True, null = True, max_length=10, default='0')
 
-
-
-
-   

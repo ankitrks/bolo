@@ -6,7 +6,7 @@ from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,c
     GetTopic,GetQuestion,GetAnswers,CricketMatchList,get_single_match,get_single_poll,predict,LeaderBoradList,vb_seen,VBList,ExpertList,GetHomeAnswer,transcoder_notification,\
     vb_transcode_status,get_follow_user,upload_profile_image,get_following_list,get_follower_list,GetChallenge,GetChallengeDetails,save_android_logs,SyncDump,get_hash_list,\
     KYCDocumentTypeList,save_kyc_basic_info,save_kyc_documents,save_kyc_selfie,save_kyc_additional_info,save_bank_details_info,kyc_profession_status,get_kyc_status,my_app_version,\
-    EncashableDetailList,get_bolo_details, get_category_detail, UserLogStatistics
+    EncashableDetailList,get_bolo_details, get_category_detail, UserLogStatistics,GetFollowigList,GetFollowerList
 from rest_framework_simplejwt import views as jwt_views
 
 app_name = 'drf_spirit'
@@ -81,8 +81,8 @@ urlpatterns = [
     url(r'^follow_user/$', follow_user, name='follow_user'),
     url(r'^follow_sub_category/$', follow_sub_category, name='follow_sub_category'),
     url(r'^get_follow_user/$', get_follow_user, name='get_follow_user'),
-    url(r'^get_following_list/$', get_following_list, name='get_following_list'),
-    url(r'^get_follower_list/$', get_follower_list, name='get_follower_list'),
+    url(r'^get_following_list/$', GetFollowigList.as_view(), name='get_following_list'),
+    url(r'^get_follower_list/$', GetFollowerList.as_view(), name='get_follower_list'),
     url(r'^shareontimeline/$', shareontimeline, name='shareontimeline'),
     url(r'^like/$', like, name='like'),
     url(r'^get_challenge/$', GetChallenge.as_view(), name='get_challenge'),
