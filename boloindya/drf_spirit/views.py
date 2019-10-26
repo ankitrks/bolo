@@ -888,7 +888,7 @@ def createTopic(request):
 
     try:
 
-        topic.language_id   = language_id
+        topic.language_id   = request.user.st.language
         topic.category_id   = category_id
         topic.user_id       = user_id
         if is_vb:
