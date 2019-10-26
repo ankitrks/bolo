@@ -130,6 +130,9 @@ language_options = (
     ('2', "Hindi"),
     ('3', "Tamil"),
     ('4', "Telgu"),
+    ('5', "Bengali"),
+    ('4', "Kannada"),
+
 )
 
 user_group_options = (
