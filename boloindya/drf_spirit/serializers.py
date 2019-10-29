@@ -408,3 +408,48 @@ class UserWithoutUserProfileSerializer(ModelSerializer):
         model = User
         #fields = '__all__'
         exclude = ('password', )
+
+class CategoryVideoByteSerializer(ModelSerializer):
+    user = SerializerMethodField()
+    view_count = SerializerMethodField()
+    comment_count = SerializerMethodField()
+    date = SerializerMethodField()
+    video_cdn = SerializerMethodField()
+
+    class Meta:
+        model = Topic
+        #fields = '__all__'
+        exclude = ('transcode_dump','transcode_status_dump' )
+        # TODO:: refactor after deciding about globally pinned.
+        read_only_fields = ('is_pinned',)
+
+    def get_user(self,instance):
+        return UserSerializer(instance.user).data
+
+    def get_date(self,instance):
+        return shortnaturaltime(instance.date)
+
+    def get_view_count(self,instance):
+        return shorcountertopic(instance.view_count)
+
+    def get_comment_count(self,instance):
+        return shorcountertopic(instance.comment_count)
+
+    def get_video_cdn(self,instance):
+        if instance.question_video:
+            regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+            find_urls_in_string = re.compile(regex, re.IGNORECASE)
+            url = find_urls_in_string.search(instance.question_video)
+            return str(instance.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
+        else:
+            return ''
+
+class CategoryWithVideoSerializer(ModelSerializer):
+    topics = SerializerMethodField()
+    class Meta:
+        model = Category
+        fields = '__all__'
+
+    def get_topics(self,instance):
+        topic = Topic.objects.filter(m2mcategory=instance, is_removed=False, is_vb=True)[0:10]
+        return CategoryVideoByteSerializer(topic, many=True).data
