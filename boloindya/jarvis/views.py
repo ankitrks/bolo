@@ -1228,7 +1228,7 @@ def daily_vplay_data(request):
         raw_data = json.loads(request.body)
         try:
             vplay_date = raw_data['date']
-            print vplay_date
+            #print vplay_date
 
             day_begin = vplay_date + " 00:00:00"
 
@@ -1247,18 +1247,28 @@ def daily_vplay_data(request):
                 vid_id.append(obj.get('videoid'))
                
             vid_titles_queryset = list(Topic.objects.filter(id__in=vid_id).values('id','title'))
+            #print(vid_titles_queryset)
+
+            #vid_titles_queryset = list(set(vid_titles_queryset))
             vid_titles = {}
             for item in vid_titles_queryset:
                 vid_titles[str(item.get('id'))] = item.get('title')
 
             for obj in vid_list:
                 obj['title'] = vid_titles.get(obj.get('videoid'))
-                print(str(obj))
+                #print(str(obj))
             
             # print("vid titles : "+str(vid_titles))
             # print("vid info: "+str(vid_list))
+            print(vid_list)
+            vid_list_uniq = []
 
-            return JsonResponse({'daily_data': vid_list}, status=status.HTTP_200_OK)
+            for item in vid_list:
+                if(item not in vid_list_uniq):
+                    vid_list_uniq.append(item)
+
+
+            return JsonResponse({'daily_data': vid_list_uniq}, status=status.HTTP_200_OK)
 
         except Exception as e:
             print(traceback.format_exc())

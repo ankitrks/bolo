@@ -154,11 +154,7 @@
         }
 
         function setTopImpVideosChart(data) {
-            if (chart_top_impr_vids != undefined && chart_top_impr_vids != null) {
-                chart_top_impr_vids.destroy();
-            }
-
-            $("#weekly_vplay_table tr").remove(); 
+            $("#top_impr_table tr").remove(); 
 
             console.log(data);
 
@@ -176,7 +172,7 @@
         }
 
         function setWeeklyVPlayTable(data) {
-            $("#weekly_vplay_table tr").remove(); 
+            $("#weekly_vplays_table tr").remove(); 
 
             console.log(data.weekly_data);
 
