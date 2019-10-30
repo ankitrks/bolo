@@ -1,0 +1,339 @@
+    {% extends "jarvis/layout/base.html" %}
+
+{% block styles %}
+<style>
+    #overlay {
+  position: fixed; /* Sit on top of the page content */
+  display: none; /* Hidden by default */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+  z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
+}
+.percentcomplete{
+    position: absolute;
+    top: 50%;
+    left:50%;
+    color: white;
+    transform: translate(-50%,-50%);
+}
+</style>
+{% endblock styles %}
+
+
+{% block content %}
+{% load staticfiles %}
+
+<style type="text/css">
+  #filter_date_btn{
+  }
+  #filter_date_btn:hover{
+  }
+</style>
+
+<section>
+  <div style="text-align: center;">
+      <h1>Active User Statistics</h1>
+  </div>
+  
+  <!-- Daily active users template -->
+  <div class="row">
+    <div style="text-align: center;"  class="col-6 col-xl-6 col-md-12 col-sm-12">
+      <h2>Daily Active Users</h2>
+      <span>From:</span><input type="text" id="datepicker_1" readonly="readonly">
+      <span>To:</span><input type="text" id="datepicker_2" readonly="readonly">
+      <button onclick="dau_click_ok()" type="button" id="filter_date_btn">Ok</button>
+      <canvas id="chart_dau"></canvas>    
+    </div>
+
+  <!-- Monthly active users template -->
+    <div style="text-align: center;"  class="col-6 col-xl-6 col-md-12 col-sm-12">
+      <h2>Monthly Active Users</h2>
+      <canvas id="chart_mau"></canvas>    
+    </div>
+  </div>  
+
+  <!-- Hourly active users template -->
+  <br><br><br>
+  <div class="row">
+    <div style="text-align: center;"  class="col-6 col-xl-6 col-md-12 col-sm-12">
+      <h2>Hourly Active Users</h2>
+      <span>Select day:</span><input type="text" id="datepicker_3" readonly="readonly">
+      <button onclick="hau_click_ok()" type="button" id="filter_day_btn">Ok</button>
+      <canvas id="chart_hau"></canvas>    
+    </div>    
+  </div>
+
+  <!-- Installs template -->
+  <br>
+  <div class="row">
+    <div style="text-align: center;" class="col-6 col-xl-6 col-md-12 col-sm-12">
+      <h2>Installs</h2>
+      <span>From:</span><input type="text" id="datepicker_4" readonly="readonly">
+      <span>To:</span><input type="text" id="datepicker_5" readonly="readonly">
+      <br><br>
+      <span>Campaign: </span>
+      <select id="selected_campaign" name="Campaign_select">
+        <option value="-1" selected="selected">All Campaigns</option>
+
+        {% for campaign in campaigns_list %}
+          <option value="{{ campaign.id }}">{{campaign.code}} - {{campaign.purpose}}</option>  
+        {% endfor %}
+
+      </select>
+      <button onclick="installs_click_ok()" type="button" id="filter_install_btn">Ok</button>
+      <canvas id="chart_installs"></canvas>    
+    </div>
+  </div>
+
+  <!-- jQuery 3 -->
+  <!-- <script src="../../bower_components/jquery/dist/jquery.min.js"></script> -->
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
+
+  <!-- Bootstrap 3.3.7 -->
+  <!-- <script src="../../bower_components/bootstrap/dist/js/bootstrap.min.js"></script> -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+  <!-- ChartJS -->
+  <script type="text/javascript" src="{% static 'js/Chart.min.js' %}"></script>
+
+  <script type="text/javascript">
+
+      var chart_dau_ctx = document.getElementById('chart_dau').getContext('2d');
+      var chart_mau_ctx = document.getElementById('chart_mau').getContext('2d');
+      var chart_hau_ctx = document.getElementById('chart_hau').getContext('2d');
+      var chart_installs_ctx = document.getElementById('chart_installs').getContext('2d');
+      
+      var chart_dau, chart_mau, chart_hau, chart_installs;
+
+      $( document ).ready(function() {
+        getStatsData();
+      });
+
+      function getStatsData(){
+        $.ajax({
+            headers: { "X-CSRFToken": getCookie("csrftoken") },
+            url: "/jarvis/get_user_stats/",
+            type: "GET", 
+            contentType : 'application/json',
+            success: function (data) {
+                setCharts(data);
+            }
+        });
+      }
+
+      //***** CHART SETTING FUNCTIONS ******
+      function setCharts(data){
+          console.log(data);
+
+          setDAUChart(data)
+          setMAUChart(data)
+          setHAUChart(data)
+          setInstallsChart(data)
+      }
+
+      function setMAUChart(data){
+        //****** Setting MAU chart
+          if(chart_mau != undefined && chart_mau != null){
+             chart_mau.destroy(); 
+          }
+          chart_mau = new Chart(chart_mau_ctx, {
+            type: 'line',
+
+            data: {
+                // labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                labels: data.mau_labels,
+                datasets: [{
+                    label: 'Monthly Active Users',
+                    backgroundColor: 'rgb(141, 233, 190)',
+                    borderColor: 'rgb(141, 233, 190)',
+                    data: data.mau_freq
+                }]
+            },
+
+            options: {}
+          }); 
+      }
+
+      function setHAUChart(data){
+        if(chart_hau != undefined && chart_hau != null){
+          chart_hau.destroy();  
+        }
+        
+          //****** Setting HAU chart
+          chart_hau = new Chart(chart_hau_ctx, {
+            type: 'line',
+
+            data: {
+                labels: data.hau_labels,
+                datasets: [{
+                    label: 'Hourly Active Users',
+                    // backgroundColor: 'rgb(100, 167, 255)',
+                    fill: false,
+                    borderColor: 'rgb(100, 167, 255)',
+                    data: data.hau_freq
+                }]
+            },
+
+            options: {}
+          }); 
+      }
+
+      function setDAUChart(data){
+        if(chart_dau != undefined && chart_dau != null){
+          chart_dau.destroy();  
+        }
+        //******** Setting DAU Chart
+        chart_dau = new Chart(chart_dau_ctx, {
+            type: 'line',
+
+            data: {
+                // labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                labels: data.dau_labels,
+                datasets: [{
+                    label: 'Daily Active Users',
+                    // label: data.dau_labels
+                    // backgroundColor: 'rgb(255, 99, 132)',
+                    fill: false,
+                    borderColor: 'rgb(255, 99, 132)',
+                    data: data.dau_freq
+                }]
+            },
+
+            options: {}
+          }); 
+      }
+
+      function setInstallsChart(data){
+        if(chart_installs != undefined && chart_installs != null){
+          chart_installs.destroy();  
+        }
+        //******** Setting DAU Chart
+        console.log(data)
+
+        installs_labels = []
+        installs_freq = []
+
+        if(data.all_data != undefined){
+            installs_labels = data.all_data.installs_labels;
+            installs_freq = data.all_data.installs_freq;
+        }
+
+        chart_installs = new Chart(chart_installs_ctx, {
+            type: 'line',
+
+            data: {
+                labels: installs_labels,
+                datasets: [{
+                    label: 'Installs',
+                    fill: false,
+                    borderColor: 'rgb(109, 255, 69)',
+                    data: installs_freq
+                }]
+            },
+
+            options: {}
+          }); 
+      }
+
+      function getCookie(c_name)
+      {
+          if (document.cookie.length > 0)
+          {
+              c_start = document.cookie.indexOf(c_name + "=");
+              if (c_start != -1)
+              {
+                  c_start = c_start + c_name.length + 1;
+                  c_end = document.cookie.indexOf(";", c_start);
+                  if (c_end == -1) c_end = document.cookie.length;
+                  return unescape(document.cookie.substring(c_start,c_end));
+              }
+          }
+          return "";
+      }
+  </script>
+
+  <!-- ****** DATA FETCHING FUNCTIONS -->
+
+  <script>
+    var dau_from, dau_to, hau_day;
+     $(function() {
+        dau_from = $("#datepicker_1")
+            .datepicker({ format: 'dd-mm-yyyy'});
+        dau_to = $("#datepicker_2" )
+            .datepicker({ format: 'dd-mm-yyyy'});
+        hau_day = $("#datepicker_3")
+            .datepicker({ format: 'dd-mm-yyyy'});
+        installs_from = $("#datepicker_4")
+            .datepicker({ format: 'dd-mm-yyyy'});
+        installs_to = $("#datepicker_5")
+            .datepicker({ format: 'dd-mm-yyyy'});
+     });
+
+     function dau_click_ok() {
+        console.log(dau_from.val()+" "+dau_to.val())
+
+        $.ajax({
+            headers: { "X-CSRFToken": getCookie("csrftoken") },
+            url: "/jarvis/get_dau_data/",
+            type: "POST",
+            contentType : 'application/json',
+            data: JSON.stringify({
+             'dau_from': dau_from.val(),
+             'dau_to': dau_to.val()
+            }),
+            success: function (data) {
+                setDAUChart(data)
+            }
+        });
+     }
+
+     function hau_click_ok() {
+        console.log(hau_day.val())
+
+        $.ajax({
+            headers: { "X-CSRFToken": getCookie("csrftoken") },
+            url: "/jarvis/get_hau_data/",
+            type: "POST",
+            contentType : 'application/json',
+            data: JSON.stringify({
+             'hau_day': hau_day.val(),
+            }),
+            success: function (data) {
+                setHAUChart(data)
+            }
+        });
+
+     }
+
+     var installs_from, installs_to;
+
+     function installs_click_ok() {
+        var selected_campaign = $("#selected_campaign").val()
+        console.log(installs_from.val()+" "+installs_to.val()+" "+selected_campaign)
+
+        $.ajax({
+            headers: { "X-CSRFToken": getCookie("csrftoken") },
+            url: "/jarvis/get_installs_data/",
+            type: "POST",
+            contentType : 'application/json',
+            data: JSON.stringify({
+             'installs_from': installs_from.val(),
+             'installs_to': installs_to.val(),
+             'campaign' : selected_campaign
+            }),
+            success: function (data) {
+                setInstallsChart(data)
+            }
+        });
+     }
+
+  </script>
+
+</section>
+{% endblock content %}

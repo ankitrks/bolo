@@ -232,6 +232,7 @@ class UserFollowUnfollowDetails(models.Model):
     profileid = models.TextField(_("profileid"), null = True, blank = True, db_index = True)
     timestamp = models.DateTimeField(_("timestamp"), blank = False, null = False)
     relationship_type = models.CharField(_("relationship_type"), choices = relationship_info, max_length = 50)
+    share_medium = models.CharField(_("share_medium"), blank = True, max_length = 300, null = True)
 
 
 # class storing user-videotype details applicable for user, which videos s/he watched, commented, shared etc
@@ -310,9 +311,9 @@ class ActivityTimeSpend(models.Model):
 
     user = models.CharField(_("userid"), null = True, blank = False, max_length = 250, db_index = True)
     fragmentid = models.CharField(_("fragmentid"), null = True, blank = False, max_length = 550, db_index = True)
-    starttime = models.DateTimeField(_("starttime"), null = True, blank = False)
-    pausetime = models.DateTimeField(_("pausetime"), null = True, blank = False)
-    difference = models.PositiveIntegerField(_("time_difference"), default=0, editable=False)
+    time_spent = models.PositiveIntegerField(_("time_spent(ms)"), default = 0, editable = False)
+    timestamp = models.DateTimeField(_("timestamp"), null = True, blank = False)
+
 
 
 # class recording the seach records of a user
@@ -323,8 +324,72 @@ class UserSearch(models.Model):
     timestamp = models.DateTimeField(_("timestamp"), null = True, blank = False)
 
 
+# class recording the user --> datetime mapping
+class UserTimeRecord(models.Model):
+
+    user = models.CharField(_("user"), null = True, blank = True, max_length = 250, db_index = True)
+    timestamp = models.DateTimeField(_("timestamp"), null = True, blank = False)
+
+# class recording the day, hour, month, year --> frequency mapping
+class HourlyActiveUser(models.Model):
+
+    day_month = models.CharField(_("day_month"), null = True, blank = False, max_length = 250)
+    day_week = models.CharField(_("day_week"), null = True, blank = False, max_length = 250)
+    hour = models.CharField(_("hour"), null = True, blank = False, max_length = 250)
+    month = models.CharField(_("month"), null = True, blank = False, max_length = 250)
+    year = models.PositiveIntegerField(_("year"), default = 2019, editable = False)
+    frequency = models.PositiveIntegerField(_("frequency"), default=0, editable=False)
+    date_time_field = models.DateTimeField(_("date_time_field"), null = True, blank = False)
+
+# class recording the day --> frequency mapping
+class DailyActiveUser(models.Model):
+
+    day_month_year = models.CharField(_("day_month_year"), null = True, blank = False, max_length = 250)
+    frequency = models.PositiveIntegerField(_("frequency"), default = 0, editable = False)
+    date_time_field = models.DateTimeField(_("date_time_field"), null = True, blank = False)
+
+# class recording the month, year --> frequency
+class MonthlyActiveUser(models.Model):    
+
+    month = models.CharField(_("month"), null = True, blank = False, max_length = 250)
+    year = models.PositiveIntegerField(_("year"), default = 2019, editable = False)
+    frequency = models.PositiveIntegerField(_("frequency"), default = 0, editable = False)
+
+# class recording the hardware data corrosponding the logs
+class HardwareData(models.Model):
+
+    user_id = models.CharField(_("userid"), null = True, blank = True, max_length = 250, db_index = True)
+    total_memory = models.PositiveIntegerField(_("total_memory"), default = 0., editable = False)
+    memory_free = models.PositiveIntegerField(_("memory_free"), default = 0, editable = False)
+    memory_available = models.PositiveIntegerField(_("memory_available"), default = 0, editable = False)
+    swap_cached = models.PositiveIntegerField(_("swap_cached"), default = 0, editable = False)
+    active = models.PositiveIntegerField(_("active"), default = 0, editable = False)
+    inactive = models.PositiveIntegerField(_("inactive"), default = 0, editable = False)
+    unevictable = models.PositiveIntegerField(_("unevictable"), default = 0, editable = False)
+    locked = models.PositiveIntegerField(_("locked"), default = 0, editable = False)
+    swap_total = models.PositiveIntegerField(_("swap_total"), default = 0, editable = False)
+    swap_free = models.PositiveIntegerField(_("swap_free"), default = 0, editable = False)
+    dirty = models.PositiveIntegerField(_("dirty"), default = 0, editable = False)
+    write_back = models.PositiveIntegerField(_("write_back"), default = 0, editable = False)
+    annon_pages = models.PositiveIntegerField(_("annon_pages"), default = 0, editable = False)
+    mapped = models.PositiveIntegerField(_("mapped"), default = 0, editable = False)
+    shmem = models.PositiveIntegerField(_("shmem"), default = 0, editable = False)
+    slab = models.PositiveIntegerField(_("slab"), default = 0, editable = False)
+    sreclaimable = models.PositiveIntegerField(_("sreclaimable"), default = 0, editable = False)
+    sunreclaimable = models.PositiveIntegerField(_("sunreclaimable"), default = 0, editable = False)
+    kernelstack = models.PositiveIntegerField(_("kernelstack"), default = 0, editable = False)
+    pagetables = models.PositiveIntegerField(_("pagetables"), default = 0, editable = False)
+    nfs_unstable = models.PositiveIntegerField(_("nfs_unstable"), default = 0, editable = False)
+    bounce = models.PositiveIntegerField(_("bounce"), default = 0, editable = False)
+    writebacktemp = models.PositiveIntegerField(_("writebacktemp"), default = 0, editable = False)
+    commit_limit = models.PositiveIntegerField(_("commit_limit"), default = 0, editable = False)
+    commit_as = models.PositiveIntegerField(_("commit_as"), default = 0, editable = False)
+    malloc_total = models.PositiveIntegerField(_("malloc_total"), default = 0, editable = False)
+    malloc_used = models.PositiveIntegerField(_("malloc_used"), default = 0, editable = False)
+    malloc_chunk = models.PositiveIntegerField(_("malloc_chunk"), default = 0, editable = False)
 
 
-
+# et = epoch time
+# dt=datetime.datetime.fromtimestamp(float(et/ 1000.0))
 
 

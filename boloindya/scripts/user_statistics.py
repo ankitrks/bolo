@@ -8,7 +8,9 @@ from django.http import JsonResponse
 from rest_framework import status
 import pytz
 import os
-from datetime import datetime
+import datetime
+from datetime import datetime  # do not delete this statement please
+import dateutil.parser
 local_tz = pytz.timezone("Asia/Kolkata")
 
 #! /usr/bin/python
@@ -130,6 +132,7 @@ def user_statistics(user_data_dump):
 # func for dumping follow unfollow details in model(userid, profileid, timestamp, relationshiptype -{follow, unfollow, report, share})
 def follow_unfollow_details(user_data_dump):
     
+
     try:
         user_id = user_data_dump['user_id']
         follow_list = []
@@ -155,36 +158,37 @@ def follow_unfollow_details(user_data_dump):
                     utc_dt = datetime.utcfromtimestamp(float(item2)/ 1000).replace(tzinfo=pytz.utc)
                     report_list.append((item1, utc_dt))
 
-        share_list = []
+        share_list = []         # there are 3 items in profile share list(please note)
         if('profile_share' in user_data_dump):
             if(len(user_data_dump['profile_share']) > 0):
-                for (item1, item2) in user_data_dump['profile_share']:
+                for (item1, item2, item3) in user_data_dump['profile_share']:
                     
-                    utc_dt = datetime.utcfromtimestamp(float(item2)/ 1000).replace(tzinfo=pytz.utc)
-                    share_list.append((item1, utc_dt))
+                    utc_dt = datetime.utcfromtimestamp(float(item3)/ 1000).replace(tzinfo=pytz.utc)
+                    share_list.append((item1, item2, utc_dt))
 
 
         if(len(follow_list) > 0):
             for (a,b) in follow_list:
-                user_data_obj = UserFollowUnfollowDetails(user = user_id, profileid = a, timestamp = b, relationship_type = 'follow')
+                user_data_obj = UserFollowUnfollowDetails(user = user_id, profileid = a, timestamp = b, relationship_type = 'follow', share_medium = 'None')
                 user_data_obj.save()
 
         if(len(unfollow_list) > 0):        
             for (a,b) in unfollow_list:
-                user_data_obj = UserFollowUnfollowDetails(user = user_id, profileid= a, timestamp = b, relationship_type = 'unfollow')
+                user_data_obj = UserFollowUnfollowDetails(user = user_id, profileid= a, timestamp = b, relationship_type = 'unfollow', share_medium = 'None')
                 user_data_obj.save()                        
 
         if(len(report_list) > 0):        
             for(a,b) in report_list:
-                user_data_obj = UserFollowUnfollowDetails(user = user_id, profileid= a, timestamp = b, relationship_type = 'report')
+                user_data_obj = UserFollowUnfollowDetails(user = user_id, profileid= a, timestamp = b, relationship_type = 'report', share_medium = 'None')
                 user_data_obj.save()
 
         if(len(share_list) > 0 ):        
-            for(a,b) in share_list:
-                user_data_obj = UserFollowUnfollowDetails(user = user_id, profileid= a, timestamp = b, relationship_type = 'share')
+            for(a,b,c) in share_list:
+                user_data_obj = UserFollowUnfollowDetails(user = user_id, profileid= a, timestamp = c, relationship_type = 'share', share_medium = b)
                 user_data_obj.save()
 
     except Exception as e:
+        print(user_data_dump)
         print('Exception2: ' + str(e))
 
 
@@ -239,6 +243,14 @@ def video_type_details(user_data_dump):
         print('Exception 3:' + str(e))
 
     return JsonResponse({'message':'success'}, status = status.HTTP_201_CREATED)        
+
+def find_video_impressions(user_data_dump):
+    if('vb_impressions' in user_data_dump):
+        if(len(user_data_dump['vb_impressions']) > 0):
+            userid = user_data_dump['user_id']
+            for(a,b) in user_data_dump['vb_impressions']:
+                utc_dt = datetime.utcfromtimestamp(float(b)/ 1000).replace(tzinfo=pytz.utc)
+                print(userid, a, utc_dt)
 
 
 #func for dumping video creation details into the model(videoid, timestamp)
@@ -366,48 +378,197 @@ def search_query(user_data_dump):
 
     return JsonResponse({'message':'success'}, status = status.HTTP_201_CREATED)  
 
-# func for recording the activity time spend of the user
-def record_activity_time_spend(user_data_dump):
-    str_start = 'STARTED'
-    str_paused = 'PAUSED'
 
+# method for recording the mapping (userid --> sessiontime) in the model usertimerecord
+def record_session_time(user_data_dump):
+
+    #print("coming here")
+    #print(user_data_dump)
     try:
         userid = user_data_dump['user_id']
-        if('activity_time_spend' in user_data_dump):
-            if(len(user_data_dump['activity_time_spend']) > 0):
-                for key, val in user_data_dump['activity_time_spend'].items():
-                    previous_start = -1
-                    previous_pause = -1
-                    for item in val:
-                        if(re.search(str_start, item) and previous_start == -1):
-                            #previous_start = int(re.sub('STARTED\_', '',item))
-                            start_str = (re.sub('STARTED_', '', item))
-                            if(not re.search('[a-zA-Z]', start_str)):
-                                previous_start = int(start_str)
-                                #print(previous_start)
-
-                        if((re.search(str_paused, item)) and previous_start > 0):           # pair found
-                            #pause_time = int(re.sub('PAUSED\_', '',item))
-                            pause_str = (re.sub('PAUSED_', '', item))
-                            if(not re.search('[a-zA-Z]', )):
-                                previous_pause = int(previous_pause)
-                                print(previous_pause)
-
-                            time_diff = int((pause_time - previous_start)/ 1000)
-                            #print((previous_start, pause_time, time_diff))     
-                            #user_data_obj = activity_time_spend(user = userid, fragmentid = key, starttime = previous_start, pausetime = pause_time)
-                            #user_data_obj.save()
-
-                        if(re.search(str_start, item) and previous_start > 1):          # update the previous time record
-                            #previous_start = int(re.sub(('STARTED\_', '',item)))
-                            previous_start = (re.sub('STARTED_', '', item))
-                            if(not re.search('[a-zA-Z]', previous_start)):
-                                previous_start = int(previous_start)
-
-
+        sessiontime = int(user_data_dump['session_start_time'])
+        #print(sessiontime, type(sessiontime))
+        datetime_st = datetime.fromtimestamp((sessiontime)/ 1000.0)           # datetime in datetime format
+        user_data_obj = UserTimeRecord(user = userid, timestamp = datetime_st)
+        user_data_obj.save()
 
     except Exception as e:
-        print('Exception 9:' + str(e))   
+        print('Exception 10:' + str(e))
+
+    return JsonResponse({'message':'success'}, status = status.HTTP_201_CREATED)        
+
+# method for recording the mapping day of the month-->frequncy, day of the week--> frequency
+def dau_mau():
+
+    curr_dt = datetime.now()
+    curr_dt_month = curr_dt.month
+    curr_dt_year = curr_dt.year
+    dau_dict = {}
+    month_name_list = ["Jan", "Feb", "March", "April", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"]           # list consisting of english names of months
+    mau_dict = {}           # dict storing monthly records
+
+    try:
+        #userid = user_data_dump['user_id']
+        all_data = UserTimeRecord.objects.all()
+        #print(all_data)
+        for each_data in all_data:
+            user_id = each_data.user
+            dt_obj = each_data.timestamp 
+            dt_day = dt_obj.day
+            dt_month = dt_obj.month 
+            dt_year = dt_obj.year 
+            if((dt_day, dt_month, dt_year) in dau_dict):
+                dau_dict[(dt_day, dt_month, dt_year)].append(user_id)
+            else:
+                dau_dict[(dt_day, dt_month, dt_year)] = [user_id]
+
+        #print(len(dau_dict))        
+        for key, val in dau_dict.items():               # iterating the dictonary created
+            dt_triplet = key
+            if(dt_triplet[1] == curr_dt_month or dt_triplet[1] == curr_dt_month-1):    # only put the results of the last two months(imp step)
+                name_month = month_name_list[dt_triplet[1] -1 ]
+                day_month_year_str = ""+ str(dt_triplet[0]) + " " + name_month + " " + str(dt_triplet[2])
+                dist_freq = len(set(val))        # record the len of set(unique records)
+
+                #date_string = str(dt_triplet[0]) + "-" + str(dt_triplet[1]) + "-" + str(dt_triplet[2])
+                date_string = str(dt_triplet[2]) + "-" + str(dt_triplet[1]) + "-" + str(dt_triplet[0])
+                date_time_obj = dateutil.parser.parse(date_string)
+                #print(date_time_obj)
+
+                #print(day_month_year_str, freq)
+                prev_records = DailyActiveUser.objects.filter(day_month_year = day_month_year_str).count()
+                if(prev_records!=0):
+                    user_data_obj = DailyActiveUser.objects.filter(day_month_year = day_month_year_str).update(frequency = dist_freq)
+                else:
+                    user_data_obj = DailyActiveUser(date_time_field = date_time_obj, day_month_year = day_month_year_str, frequency = dist_freq)      # update the freq of daily active user
+                    user_data_obj.save()
+
+                if(name_month in mau_dict):
+                    mau_dict[name_month]+= dist_freq 
+                else:
+                    mau_dict[name_month] = dist_freq     
+
+        # iterate mau dict and find the freq of users for each of th month
+        for key, val in mau_dict.items():
+            curr_month = key 
+            curr_val = val 
+            existing_records = MonthlyActiveUser.objects.filter(month = curr_month, year = curr_dt_year).count()        # check if records already exists else
+            if(existing_records!= 0):
+                MonthlyActiveUser.objects.filter(month = curr_month, year = curr_dt_year).update(frequency = curr_val)
+            else:    
+                user_data_obj_month = MonthlyActiveUser(month = curr_month, year = curr_dt_year, frequency = curr_val)
+                user_data_obj_month.save()
+
+    except Exception as e:
+        print('Exception 11:' + str(e))    
+
+# record the mapping hour, day of month, week, year --> frequency
+def hourly_au():
+
+    curr_dt = datetime.now()
+    curr_dt_year = curr_dt.year
+    curr_dt_month = curr_dt.month 
+    curr_dt_day = curr_dt.year 
+    month_name_list = ["Jan", "Feb", "March", "April", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"]
+    day_week = ["Mon", "Tues", "Wed", "Thurs", "Fri", "Sat", "Sun"] 
+    hour_dict = {}
+
+    try:
+        all_data = UserTimeRecord.objects.all()
+        for each_data in all_data:
+            user_id = each_data.user
+            dt_obj = each_data.timestamp
+            dt_day_month = dt_obj.day 
+            dt_day_week = dt_obj.isoweekday()
+            dt_month = dt_obj.month
+            dt_year = dt_obj.year 
+            dt_hour = dt_obj.hour 
+
+            if((dt_hour, dt_day_month, dt_day_week, dt_month, dt_year) in hour_dict):
+                hour_dict[(dt_hour, dt_day_month, dt_day_week, dt_month, dt_year)]+=1
+            else:
+                hour_dict[(dt_hour, dt_day_month, dt_day_week, dt_month, dt_year)] = 1
+
+        #print(len(hour_dict))
+        for key, val in hour_dict.items():
+            dt_quad = key
+            month_name = month_name_list[dt_quad[3] - 1]
+            day_week_name = day_week[dt_quad[2] - 1]
+            date_string = str(dt_quad[4]) + "-" + str(dt_quad[3]) + "-" + str(dt_quad[1]) + " " + str(dt_quad[0]) + ":00:00"
+            #print(date_string)
+            date_time_obj = dateutil.parser.parse(date_string)      # creating datetime object for the same
+            #print(date_time_obj)
+
+            existing_records = HourlyActiveUser.objects.filter(day_month = dt_quad[1], day_week = day_week_name, hour = dt_quad[0], month = month_name, year = dt_quad[4]).count() 
+            if(existing_records!= 0):
+                HourlyActiveUser.objects.filter(day_month = dt_quad[1], hour = dt_quad[0], day_week = day_week_name, month = month_name, year = dt_quad[4]).update(frequency = val)
+            else:
+                user_data_obj_hr = HourlyActiveUser(date_time_field = date_time_obj, day_month = dt_quad[1], hour = dt_quad[0], day_week = day_week_name, month = month_name, year = dt_quad[4], frequency = val)
+                user_data_obj_hr.save()  
+
+
+    except Exception as e:   
+        print('Exception 12:' + str(e))
+
+# func for recording the time spend by the user for activities
+def activity_time_spend(user_data_dump):
+
+    userid = user_data_dump['user_id']
+    refer_timestamp = datetime.utcfromtimestamp(float(user_data_dump['session_start_time'])/ 1000).replace(tzinfo=pytz.utc)
+
+    try:
+        if('record_time_spend' in user_data_dump):
+            print("+1")
+            all_records = user_data_dump['record_time_spend']
+            if(len(all_records)>0):
+                print("+2")
+                for key, val in all_records.items():
+                    print("+3")
+                    fragement_id = key 
+                    time_ms = val['timeSpentTillNow']
+                    user_data_obj = ActivityTimeSpend(user = userid, fragmentid = fragement_id, time_spent = time_ms, timestamp = refer_timestamp)
+                    user_data_obj.save()
+
+        #print("here")
+        if('activity_time_spend' in user_data_dump):
+            all_records = user_data_dump['activity_time_spend']
+            #print(all_records)
+            if(len(all_records) > 0):
+                str_start = 'STARTED'
+                str_pause = 'PAUSED'
+                for key, val in all_records.items():
+                    prev_start = -1
+                    prev_pause = -1
+                    for item in val:
+                        if(re.search(str_start, item) and prev_start == -1):
+                            start_temp_str = (re.sub('STARTED_', '', item))
+                            #print(start_temp_str)
+                            if(not re.search('[a-zA-Z]', start_temp_str)):
+                                prev_start = int(start_temp_str)
+
+                        if(re.search(str_pause, item) and prev_start > 0):
+                            pause_temp_str = (re.sub('PAUSED_', '', item))
+                            if(not re.search('[a-zA-Z]', pause_temp_str)):
+                                prev_pause = int(pause_temp_str)
+                                #print(prev_start, prev_pause)
+
+                            time_diff = int((prev_pause - prev_start) / 1000)
+                            if(time_diff >=0):
+                                existing_records = ActivityTimeSpend.objects.filter(user = userid, fragmentid = key, timestamp = refer_timestamp).count()
+                                if(existing_records==0):
+                                    user_data_obj = ActivityTimeSpend(user = userid, fragmentid = key, time_spent = time_diff, timestamp = refer_timestamp)
+                                    user_data_obj.save()
+                                else:
+                                    ActivityTimeSpend.objects.filter(user = userid, fragmentid = key, timestamp = refer_timestamp).update(time_spent = time_diff)    
+
+                            if(re.search(str_start, item) and prev_start > 1):
+                                prev_start = (re.sub('STARTED_', '', item))
+                                if(not re.search('[a-zA-Z]', prev_start)):
+                                    prev_start = int(prev_start)
+
+    except Exception as e:
+        print('Exception 9:' + str(e))
+
 
 
 def main():
@@ -417,7 +578,7 @@ def main():
         try:
             user_data_string = user_jarvis.dump
             user_data_dump = ast.literal_eval(user_data_string)
-            #print(user_data_dump)
+            
             #pass the collected user dump through a set of methods
             user_statistics(user_data_dump)
             follow_unfollow_details(user_data_dump)
@@ -428,13 +589,18 @@ def main():
             user_category_intereset(user_data_dump)
             video_share(user_data_dump)
             search_query(user_data_dump)
-            #record_activity_time_spend(user_data_dump)
-
-            
+            record_session_time(user_data_dump)               #please run this before running dau and mau
+            activity_time_spend(user_data_dump)
+            find_video_impressions(user_data_dump)
             unique_id = user_jarvis.pk # get primary key of the dump
             UserJarvisDump.objects.filter(pk = unique_id).update(is_executed = True, dump_type = 1)  #mark the is_executed field as true
+
         except Exception as e:
-            print('Exception 8: ' + str(e))
+            print('Exception 8:' + str(e))
+
+    #method calls for calculation of dau and mau       
+    dau_mau()                  
+    hourly_au()
 
 def run():
     main()
