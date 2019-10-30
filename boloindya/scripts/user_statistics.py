@@ -590,7 +590,7 @@ def main():
             search_query(user_data_dump)
             record_session_time(user_data_dump)               #please run this before running dau and mau
             activity_time_spend(user_data_dump)
-            #find_video_impressions(user_data_dump)
+            find_video_impressions(user_data_dump)
             unique_id = user_jarvis.pk # get primary key of the dump
             UserJarvisDump.objects.filter(pk = unique_id).update(is_executed = True, dump_type = 1)  #mark the is_executed field as true
 

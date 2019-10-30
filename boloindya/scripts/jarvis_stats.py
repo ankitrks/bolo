@@ -1,6 +1,6 @@
 
 from forum.user.models import AndroidLogs, VideoPlaytime, VideoCompleteRate, UserAppTimeSpend
-from drf_spirit.models import UserJarvisDump, UserLogStatistics, ActivityTimeSpend, VideoDetails
+from drf_spirit.models import UserJarvisDump, UserLogStatistics, ActivityTimeSpend, VideoDetails,UserTimeRecord
 from forum.topic.models import Topic
 import time
 import ast 
@@ -173,7 +173,8 @@ def main():
 		except Exception as e:
 			print('Exception: 1' + str(e))
 
-        calculate_completetion_rate()
+
+	calculate_completetion_rate()
 	#app_activity_time_spend()				#commented as of now, we will look into this later
 
 def run():
