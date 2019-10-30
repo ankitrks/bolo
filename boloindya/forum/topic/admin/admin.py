@@ -95,6 +95,8 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
     search_fields = ('title', 'user__username', 'user__st__name')
     list_filter = (('date', DateRangeFilter), 'language_id', 'm2mcategory', 'is_monetized', 'is_removed')
     filter_horizontal = ('m2mcategory', )
+    list_editable = ('is_popular')
+
     # resource_class = TopicResource
     # list_filter = ('language_id','date', ('date', DateRangeFilter), 'm2mcategory', 'is_monetized', 'is_removed')
     # list_display = ('id', 'title', 'name', 'duration', 'language_id', 'view_count', 'comments', 'date')
