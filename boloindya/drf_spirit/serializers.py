@@ -450,7 +450,7 @@ class CategoryWithVideoSerializer(ModelSerializer):
         fields = '__all__'
 
     def get_topics(self,instance):
-        topic = Topic.objects.filter(m2mcategory=instance, is_removed=False, is_vb=True).order_by('-last_commented')[0:10]
+        topic = Topic.objects.filter(m2mcategory=instance, is_removed=False, is_vb=True).order_by('-date')[0:10]
         return CategoryVideoByteSerializer(topic, many=True).data
 
 class VideoCompleteRateSerializer(ModelSerializer):
