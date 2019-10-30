@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework import generics
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
 from django.core.files.base import ContentFile
@@ -2434,10 +2434,15 @@ def get_category_detail(request):
 @api_view(['GET'])
 def get_category_with_video_bytes(request):
     try:
-        category = Category.objects.all()
+        category = []
+        paginator = PageNumberPagination()
+        paginator.page_size = 5
         if request.user.id:
             userprofile = UserProfile.objects.get(user = request.user)
             category = userprofile.sub_category.all()
+        else:
+            category = Category.objects.filter(parent__isnull=False)
+        category = paginator.paginate_queryset(category, request)
         return JsonResponse({'category_details': CategoryWithVideoSerializer(category, many=True).data}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
