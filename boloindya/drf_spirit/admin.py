@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import SingUpOTP, UserJarvisDump
-from forum.user.models import Weight,UserProfile,AppVersion, UserProfile,AndroidLogs, AppPageContent, ReferralCode, ReferralCodeUsed
+from forum.user.models import Weight,UserProfile,AppVersion, UserProfile,AndroidLogs, AppPageContent, ReferralCode, ReferralCodeUsed, VideoPlaytime, VideoCompleteRate
 from forum.category.models import Category
 from import_export.admin import ImportExportModelAdmin,ExportMixin
 from import_export import resources
@@ -22,7 +22,7 @@ class SingUpOTPAdmin(admin.ModelAdmin):
 admin.site.register(SingUpOTP, SingUpOTPAdmin)
 
 class CategoryAdmin(admin.ModelAdmin):
-	list_display = ('title', 'hindi_title','tamil_title','telgu_title', )
+	list_display = ('title', 'hindi_title','tamil_title','telgu_title','bengali_title','kannada_title', )
 admin.site.register(Category, CategoryAdmin)
 
 class WeightAdmin(admin.ModelAdmin):
@@ -31,7 +31,7 @@ admin.site.register(Weight, WeightAdmin)
 
 class UserProfileAdmin(ImportExportModelAdmin):
 	search_fields = ('user__username','name',)
-	list_display = ('user', 'name','language','bolo_score','follow_count','follower_count','vb_count','answer_count','share_count','like_count')
+	list_display = ('user', 'name','language','bolo_score','follow_count','follower_count','vb_count','answer_count','share_count','like_count','is_popular','is_business')
 	list_filter = ('user__date_joined', ('user__date_joined', DateRangeFilter), 'language')
 	resource_class = UserProfileResource
 admin.site.register(UserProfile,UserProfileAdmin)
@@ -68,4 +68,6 @@ admin.site.register(UserInterest)
 admin.site.register(VideoSharedDetails)
 admin.site.register(UserSearch)
 admin.site.register(UserLogStatistics)
+admin.site.register(VideoPlaytime)
+admin.site.register(VideoCompleteRate)
 

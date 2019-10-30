@@ -23,6 +23,9 @@ language_options = (
     ('2', "Hindi"),
     ('3', "Tamil"),
     ('4', "Telgu"),
+    ('5', "Bengali"),
+    ('6', "Kannada"),
+
 )
 
 gender_option = (
@@ -54,6 +57,8 @@ class UserProfile(models.Model):
 
     topic_count = models.PositiveIntegerField(_("topic count"), default=0)
     comment_count = models.PositiveIntegerField(_("comment count"), default=0)
+    is_popular = models.BooleanField(_('Is Popular'),default = False)
+    is_business = models.BooleanField(_('Is Business'),default = False)
 
     last_post_hash = models.CharField(_("last post hash"), max_length=32, blank=True)
     last_post_on = models.DateTimeField(_("last post on"), null=True, blank=True)

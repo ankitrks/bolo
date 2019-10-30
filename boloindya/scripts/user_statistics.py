@@ -1,5 +1,5 @@
-from drf_spirit.models import UserJarvisDump, UserLogStatistics, UserFollowUnfollowDetails, UserVideoTypeDetails, VideoDetails,\
-UserEntryPoint, UserViewedFollowersFollowing, VideoSharedDetails,UserSearch
+
+from drf_spirit.models import UserJarvisDump, UserLogStatistics, UserFollowUnfollowDetails, UserVideoTypeDetails, VideoDetails, UserEntryPoint, UserViewedFollowersFollowing, VideoSharedDetails,UserSearch, UserTimeRecord, DailyActiveUser, MonthlyActiveUser, UserInterest, HourlyActiveUser, ActivityTimeSpend
 import time
 import ast
 import re
@@ -244,25 +244,28 @@ def video_type_details(user_data_dump):
 
     return JsonResponse({'message':'success'}, status = status.HTTP_201_CREATED)        
 
-def find_video_impressions(user_data_dump):
-    if('vb_impressions' in user_data_dump):
-        if(len(user_data_dump['vb_impressions']) > 0):
-            userid = user_data_dump['user_id']
-            for(a,b) in user_data_dump['vb_impressions']:
-                utc_dt = datetime.utcfromtimestamp(float(b)/ 1000).replace(tzinfo=pytz.utc)
-                print(userid, a, utc_dt)
+# not a func required to be put in production
+# def find_video_impressions(user_data_dump):
+#     if('vb_impressions' in user_data_dump):
+#         if(len(user_data_dump['vb_impressions']) > 0):
+#             userid = user_data_dump['user_id']
+#             for(a,b) in user_data_dump['vb_impressions']:
+#                 utc_dt = datetime.utcfromtimestamp(float(b)/ 1000).replace(tzinfo=pytz.utc)
+#                 print(userid, a, utc_dt)
+
 
 
 #func for dumping video creation details into the model(videoid, timestamp)
 def video_info(user_data_dump):
     
     try:
+        dist_userid = user_data_dump['user_id']
         if('vb_impressions' in user_data_dump):
             if(len(user_data_dump['vb_impressions']) > 0):
                 for(a,b) in user_data_dump['vb_impressions']:
                     #datetime_format = time.strftime('%m/%d/%Y %H:%M:%S',  time.gmtime(b/1000.))
                     utc_dt = datetime.utcfromtimestamp(float(b)/ 1000).replace(tzinfo=pytz.utc)
-                    user_data_obj = VideoDetails(videoid = a, timestamp = utc_dt)
+                    user_data_obj = VideoDetails(userid = dist_userid, videoid = a, timestamp = utc_dt)
                     user_data_obj.save()
 
     except Exception as e:
@@ -391,7 +394,6 @@ def record_session_time(user_data_dump):
         datetime_st = datetime.fromtimestamp((sessiontime)/ 1000.0)           # datetime in datetime format
         user_data_obj = UserTimeRecord(user = userid, timestamp = datetime_st)
         user_data_obj.save()
-
     except Exception as e:
         print('Exception 10:' + str(e))
 
@@ -516,14 +518,11 @@ def activity_time_spend(user_data_dump):
     userid = user_data_dump['user_id']
     refer_timestamp = datetime.utcfromtimestamp(float(user_data_dump['session_start_time'])/ 1000).replace(tzinfo=pytz.utc)
 
-    try:
+    try:        
         if('record_time_spend' in user_data_dump):
-            print("+1")
             all_records = user_data_dump['record_time_spend']
             if(len(all_records)>0):
-                print("+2")
                 for key, val in all_records.items():
-                    print("+3")
                     fragement_id = key 
                     time_ms = val['timeSpentTillNow']
                     user_data_obj = ActivityTimeSpend(user = userid, fragmentid = fragement_id, time_spent = time_ms, timestamp = refer_timestamp)
@@ -591,7 +590,7 @@ def main():
             search_query(user_data_dump)
             record_session_time(user_data_dump)               #please run this before running dau and mau
             activity_time_spend(user_data_dump)
-            find_video_impressions(user_data_dump)
+            #find_video_impressions(user_data_dump)
             unique_id = user_jarvis.pk # get primary key of the dump
             UserJarvisDump.objects.filter(pk = unique_id).update(is_executed = True, dump_type = 1)  #mark the is_executed field as true
 
