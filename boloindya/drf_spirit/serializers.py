@@ -454,9 +454,9 @@ class CategoryWithVideoSerializer(ModelSerializer):
     def get_topics(self,instance):
         topic = Topic.objects.filter(m2mcategory=instance, is_removed=False, is_vb=True).order_by('-is_popular').order_by('-date')
 
-        page_size = self.context['request'].query_params.get('size') or 10
+        page_size = 10
         paginator = Paginator(topic, page_size)
-        page = self.context['request'].query_params.get('page') or 1
+        page = 1
 
         topic_page = paginator.page(page)
 
