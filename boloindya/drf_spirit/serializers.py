@@ -450,8 +450,15 @@ class CategoryWithVideoSerializer(ModelSerializer):
         fields = '__all__'
 
     def get_topics(self,instance):
-        topic = Topic.objects.filter(m2mcategory=instance, is_removed=False, is_vb=True).order_by('-is_popular').order_by('-date')[0:10]
-        return CategoryVideoByteSerializer(topic, many=True).data
+        topic = Topic.objects.filter(m2mcategory=instance, is_removed=False, is_vb=True).order_by('-is_popular').order_by('-date')
+
+        page_size = self.context['request'].query_params.get('size') or 10
+        paginator = Paginator(topic, page_size)
+        page = self.context['request'].query_params.get('page') or 1
+
+        topic_page = paginator.page(page)
+
+        return CategoryVideoByteSerializer(topic_page, many=True).data
 
 
 class VideoCompleteRateSerializer(ModelSerializer):
