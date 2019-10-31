@@ -121,6 +121,7 @@ urlpatterns = [
 
     url(r'^get_category_detail/$', get_category_detail),
     url(r'^get_category_detail_with_views/$', get_category_detail_with_views),
+    url(r'^get_category_video_bytes/$', get_category_video_bytes),
     
     url(r'^get_category_with_video_bytes/$', get_category_with_video_bytes),
 ]
