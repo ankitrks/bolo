@@ -443,6 +443,8 @@ class CategoryVideoByteSerializer(ModelSerializer):
         else:
             return ''
 
+from django.core.paginator import Paginator
+
 class CategoryWithVideoSerializer(ModelSerializer):
     topics = SerializerMethodField()
     class Meta:
