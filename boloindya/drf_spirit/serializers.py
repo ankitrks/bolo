@@ -453,6 +453,7 @@ class CategoryWithVideoSerializer(ModelSerializer):
         topic = Topic.objects.filter(m2mcategory=instance, is_removed=False, is_vb=True, is_popular=True).order_by('-date')[0:10]
         return CategoryVideoByteSerializer(topic, many=True).data
 
+
 class VideoCompleteRateSerializer(ModelSerializer):
     class Meta:
         model = VideoCompleteRate

@@ -92,10 +92,9 @@ class TopicChangeList(ChangeList):
         
 class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExportModelAdmin" NOT "admin.ModelAdmin"
     ordering = ['is_vb', '-id']
-    search_fields = ('title', 'user__username', 'user__st__name')
-    list_filter = (('date', DateRangeFilter), 'language_id', 'm2mcategory', 'is_monetized', 'is_removed')
+    search_fields = ('title', 'user__username', 'user__st__name', )
+    list_filter = (('date', DateRangeFilter), 'language_id', 'm2mcategory', 'is_monetized', 'is_removed', )
     filter_horizontal = ('m2mcategory', )
-    list_editable = ('is_popular', )
 
     # resource_class = TopicResource
     # list_filter = ('language_id','date', ('date', DateRangeFilter), 'm2mcategory', 'is_monetized', 'is_removed')
