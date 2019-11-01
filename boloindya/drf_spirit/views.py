@@ -2487,6 +2487,8 @@ def get_category_with_video_bytes(request):
         category = []
         topics = []
         paginator = PageNumberPagination()
+        paginator_topics = PageNumberPagination()
+        paginator_topics.page_size = 10
         paginator.page_size = 5
         if request.user.id:
             userprofile = UserProfile.objects.get(user = request.user)
@@ -2496,7 +2498,7 @@ def get_category_with_video_bytes(request):
         else:
             category = Category.objects.filter(parent__isnull=False)
         category = paginator.paginate_queryset(category, request)
-        topics = paginator.paginate_queryset(topics, request)
+        topics = paginator_topics.paginate_queryset(topics, request)
         return JsonResponse({'category_details': CategoryWithVideoSerializer(category, many=True).data, 'trending_topics': CategoryVideoByteSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
