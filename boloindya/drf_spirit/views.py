@@ -2494,7 +2494,7 @@ def get_category_with_video_bytes(request):
             userprofile = UserProfile.objects.get(user = request.user)
             category = userprofile.sub_category.all()
 
-            topics = Topic.objects.filter(m2mcategory=category, is_removed=False, is_vb=True).order_by('-is_popular').order_by('-date')
+            topics = Topic.objects.filter(is_removed=False, is_vb=True, is_popular=True).order_by('-date')
 
             page_size = 10
             paginator = Paginator(topics, page_size)
