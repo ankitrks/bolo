@@ -2494,13 +2494,6 @@ def get_category_with_video_bytes(request):
         else:
             category = Category.objects.filter(parent__isnull=False)
         category = paginator.paginate_queryset(category, request)
-
-        if request.user.id and request.GET.get('page') == 1:
-            paginator_topics = PageNumberPagination()
-            paginator_topics.page_size = 10
-            topics = Topic.objects.filter(is_removed=False, is_vb=True, is_popular=True).order_by('-date')
-            topics = paginator_topics.paginate_queryset(topics, request)
-
         return JsonResponse({'category_details': CategoryWithVideoSerializer(category, many=True).data, 'trending_topics': CategoryVideoByteSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
