@@ -14,7 +14,8 @@ class UserProfileResource(resources.ModelResource):
 		skip_unchanged = True
 		report_skipped = True
 		list_filter = ('language', )
-		fields = ( 'user__username', 'name','language','bolo_score','user__date_joined','follow_count','follower_count','vb_count','answer_count','share_count','like_count')
+		fields = ( 'user__username', 'name', 'language', 'bolo_score', 'user__date_joined', 'follow_count', 'follower_count', \
+			'vb_count', 'answer_count', 'share_count', 'like_count')
 
 class SingUpOTPAdmin(admin.ModelAdmin):
 	list_display = ('mobile_no', 'otp', 'is_active', 'created_at', 'used_at', 'is_reset_password', 'is_for_change_phone', 'for_user', )
@@ -22,16 +23,18 @@ class SingUpOTPAdmin(admin.ModelAdmin):
 admin.site.register(SingUpOTP, SingUpOTPAdmin)
 
 class CategoryAdmin(admin.ModelAdmin):
-	list_display = ('title', 'hindi_title','tamil_title','telgu_title', )
+	list_display = ('title', 'hindi_title', 'tamil_title', 'telgu_title', )
 admin.site.register(Category, CategoryAdmin)
 
 class WeightAdmin(admin.ModelAdmin):
-	list_display = ('features', 'weight','is_monetize','bolo_score','equivalent_INR' )
+	list_display = ('features', 'weight', 'is_monetize', 'bolo_score', 'equivalent_INR' )
 admin.site.register(Weight, WeightAdmin)
 
 class UserProfileAdmin(ImportExportModelAdmin):
-	search_fields = ('user__username','name',)
-	list_display = ('user', 'name','language','bolo_score','follow_count','follower_count','vb_count','answer_count','share_count','like_count','is_popular','is_business')
+	search_fields = ('user__username', 'name',)
+	list_display = ('user', 'name', 'language', 'bolo_score', 'follow_count', 'follower_count', 'vb_count', 'answer_count', \
+		'share_count', 'like_count', 'is_popular', 'is_business')
+	list_editable = ('is_popular', 'is_business')
 	list_filter = ('user__date_joined', ('user__date_joined', DateRangeFilter), 'language')
 	resource_class = UserProfileResource
 admin.site.register(UserProfile,UserProfileAdmin)
@@ -44,12 +47,12 @@ class ReferralCodeAdmin(admin.ModelAdmin):
 admin.site.register(ReferralCode, ReferralCodeAdmin)
 
 class ReferralCodeUsedAdmin(admin.ModelAdmin):
-	list_display = ('code', 'by_user', 'is_download', 'created_at', 'last_modified','click_id','pid', 'android_id')
+	list_display = ('code', 'by_user', 'is_download', 'created_at', 'last_modified', 'click_id', 'pid', 'android_id')
 	search_fields = ('code__code', )
 admin.site.register(ReferralCodeUsed, ReferralCodeUsedAdmin)
 
 class AndroidLogsAdmin(admin.ModelAdmin):
-	list_display = ('user', 'created_at', 'last_modified','log_type',)
+	list_display = ('user', 'created_at', 'last_modified', 'log_type',)
 	search_fields = ('user', )
 
 
