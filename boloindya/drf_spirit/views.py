@@ -2481,19 +2481,30 @@ def get_category_detail(request):
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
+from django.core.paginator import Paginator
+
 @api_view(['GET'])
 def get_category_with_video_bytes(request):
     try:
         category = []
+        topics = []
         paginator = PageNumberPagination()
         paginator.page_size = 5
         if request.user.id:
             userprofile = UserProfile.objects.get(user = request.user)
             category = userprofile.sub_category.all()
+
+            topics = Topic.objects.filter(m2mcategory=category, is_removed=False, is_vb=True).order_by('-is_popular').order_by('-date')
+
+            page_size = 10
+            paginator = Paginator(topics, page_size)
+            page = 1
+
+            topics = paginator.page(page)
         else:
             category = Category.objects.filter(parent__isnull=False)
         category = paginator.paginate_queryset(category, request)
-        return JsonResponse({'category_details': CategoryWithVideoSerializer(category, many=True).data}, status=status.HTTP_200_OK)
+        return JsonResponse({'category_details': CategoryWithVideoSerializer(category, many=True).data, 'trending_topics': CategoryVideoByteSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
