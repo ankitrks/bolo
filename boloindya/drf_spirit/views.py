@@ -2495,7 +2495,7 @@ def get_category_with_video_bytes(request):
             category = Category.objects.filter(parent__isnull=False)
         category = paginator.paginate_queryset(category, request)
 
-        if request.user.id and request.GET.get('page') == '1':
+        if request.user.id and request.GET.get('page') == 1:
             paginator_topics = PageNumberPagination()
             paginator_topics.page_size = 10
             topics = Topic.objects.filter(is_removed=False, is_vb=True, is_popular=True).order_by('-date')
