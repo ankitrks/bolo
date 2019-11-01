@@ -444,12 +444,22 @@ class CategoryVideoByteSerializer(ModelSerializer):
             return ''
 
 from django.core.paginator import Paginator
+from django.db.models import Sum
 
 class CategoryWithVideoSerializer(ModelSerializer):
     topics = SerializerMethodField()
+    total_view = SerializerMethodField()
+
     class Meta:
         model = Category
         fields = '__all__'
+
+    def get_total_view(self, instance):
+        all_vb = Topic.objects.filter(m2mcategory=instance, is_removed=False, is_vb=True)
+        all_seen = all_vb.aggregate(Sum('view_count'))
+        if not all_seen['view_count__sum']:
+            all_seen['view_count__sum']=0
+        return shorcountertopic(all_seen['view_count__sum'])
 
     def get_topics(self,instance):
         topic = Topic.objects.filter(m2mcategory=instance, is_removed=False, is_vb=True).order_by('-is_popular').order_by('-date')
