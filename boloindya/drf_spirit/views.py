@@ -2493,6 +2493,11 @@ def get_category_with_video_bytes(request):
         else:
             category = Category.objects.filter(parent__isnull=False)
         category = paginator.paginate_queryset(category, request)
+        if request.GET.get('is_with_popular'):
+            topics = Topic.objects.filter(is_removed=False, is_vb=True, is_popular=True).order_by('-date')
+            paginator.page_size = 10
+            topics = paginator.paginate_queryset(topics, request)
+            return JsonResponse({'category_details': CategoryWithVideoSerializer(category, many=True).data, 'trending_topics': CategoryVideoByteSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
         return JsonResponse({'category_details': CategoryWithVideoSerializer(category, many=True).data}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
@@ -2529,3 +2534,19 @@ def get_category_video_bytes(request):
          return JsonResponse({'topics': CategoryVideoByteSerializer(topic_page, many=True).data}, status=status.HTTP_200_OK)
      except Exception as e:
          return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_popular_video_bytes(request):
+try:
+    category_id = request.GET.get('category_id', None)
+    category = Category.objects.get(pk=category_id)
+    topic = Topic.objects.filter(m2mcategory=category, is_removed=False, is_vb=True).order_by('-is_popular').order_by('-date')
+
+    page_size = 10
+    paginator = Paginator(topic, page_size)
+    page = request.GET.get('page', 2)
+
+    topic_page = paginator.page(page)
+    return JsonResponse({'topics': CategoryVideoByteSerializer(topic_page, many=True).data}, status=status.HTTP_200_OK)
+except Exception as e:
+    return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
