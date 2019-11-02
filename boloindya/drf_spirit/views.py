@@ -2537,16 +2537,16 @@ def get_category_video_bytes(request):
 
 @api_view(['GET'])
 def get_popular_video_bytes(request):
-try:
-    category_id = request.GET.get('category_id', None)
-    category = Category.objects.get(pk=category_id)
-    topic = Topic.objects.filter(m2mcategory=category, is_removed=False, is_vb=True).order_by('-is_popular').order_by('-date')
+    try:
+        category_id = request.GET.get('category_id', None)
+        category = Category.objects.get(pk=category_id)
+        topic = Topic.objects.filter(m2mcategory=category, is_removed=False, is_vb=True).order_by('-is_popular').order_by('-date')
 
-    page_size = 10
-    paginator = Paginator(topic, page_size)
-    page = request.GET.get('page', 2)
+        page_size = 10
+        paginator = Paginator(topic, page_size)
+        page = request.GET.get('page', 2)
 
-    topic_page = paginator.page(page)
-    return JsonResponse({'topics': CategoryVideoByteSerializer(topic_page, many=True).data}, status=status.HTTP_200_OK)
-except Exception as e:
-    return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+        topic_page = paginator.page(page)
+        return JsonResponse({'topics': CategoryVideoByteSerializer(topic_page, many=True).data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
