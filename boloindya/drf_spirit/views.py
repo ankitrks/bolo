@@ -2547,7 +2547,7 @@ def get_popular_video_bytes(request):
         language_id = request.POST.get('language_id', 1)
         startdate = datetime.today()
         enddate = startdate - timedelta(days=15)
-        all_seen_vb = VBseen.objects.filter(user = self.request.user).values_list('topic_id',flat=True)
+        all_seen_vb = VBseen.objects.filter(user = request.user).values_list('topic_id',flat=True)
         topics = Topic.objects.filter(is_removed=False, is_vb=True, is_popular=True, language_id=language_id, date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-date')
         topics_seen = Topic.objects.filter(is_removed=False, is_vb=True, is_popular=True, language_id=language_id, date__gte=enddate, id__in=all_seen_vb).order_by('-date')
         topics.extend(topics_seen)
