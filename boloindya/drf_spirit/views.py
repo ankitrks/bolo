@@ -2552,8 +2552,10 @@ def get_popular_video_bytes(request):
             all_seen_vb = VBseen.objects.filter(user = request.user).values_list('topic_id',flat=True)
         except Exception as e1:
             all_seen_vb = []
-        topics = Topic.objects.filter(is_removed=False, is_vb=True, is_popular=True, language_id=language_id, date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-date')
+        topics = []
+        topics_not_seen = Topic.objects.filter(is_removed=False, is_vb=True, is_popular=True, language_id=language_id, date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-date')
         topics_seen = Topic.objects.filter(is_removed=False, is_vb=True, is_popular=True, language_id=language_id, date__gte=enddate, id__in=all_seen_vb).order_by('-date')
+        topics.extend(topics_not_seen)
         topics.extend(topics_seen)
         paginator_topics.page_size = 10
         topics = paginator_topics.paginate_queryset(topics, request)
