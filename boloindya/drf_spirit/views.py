@@ -2544,7 +2544,7 @@ def get_category_video_bytes(request):
 def get_popular_video_bytes(request):
     try:
         paginator_topics = PageNumberPagination()
-        language_id = request.GET.get('language_id', 1)
+        language_id = request.POST.get('language_id', 1)
         startdate = datetime.today()
         enddate = startdate - timedelta(days=15)
         all_seen_vb = []
