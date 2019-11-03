@@ -2547,7 +2547,10 @@ def get_popular_video_bytes(request):
         language_id = request.POST.get('language_id', 1)
         startdate = datetime.today()
         enddate = startdate - timedelta(days=15)
-        topics = Topic.objects.filter(is_removed=False, is_vb=True, is_popular=True, language_id=language_id, date__gte=enddate).order_by('-date')
+        all_seen_vb = VBseen.objects.filter(user = self.request.user).values_list('topic_id',flat=True)
+        topics = Topic.objects.filter(is_removed=False, is_vb=True, is_popular=True, language_id=language_id, date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-date')
+        topics_seen = Topic.objects.filter(is_removed=False, is_vb=True, is_popular=True, language_id=language_id, date__gte=enddate, id__in=all_seen_vb).order_by('-date')
+        topics.extend(topics_seen)
         paginator_topics.page_size = 10
         topics = paginator_topics.paginate_queryset(topics, request)
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
