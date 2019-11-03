@@ -2497,7 +2497,7 @@ def get_category_with_video_bytes(request):
         if request.GET.get('is_with_popular'):
             startdate = datetime.today()
             enddate = startdate - timedelta(days=15)
-            topics = Topic.objects.filter(is_removed=False, is_vb=True, is_popular=True, language_id=language_id, date__gte=enddate).order_by('-view_count', '-comment_count')
+            topics = Topic.objects.filter(is_removed=False, is_vb=True, is_popular=True, language_id=language_id, date__gte=enddate).order_by('-view_count')
             paginator.page_size = 10
             topics = paginator.paginate_queryset(topics, request)
             return JsonResponse({'category_details': CategoryWithVideoSerializer(category, many=True, context={'language_id': language_id}).data, 'trending_topics': CategoryVideoByteSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
@@ -2553,8 +2553,8 @@ def get_popular_video_bytes(request):
         except Exception as e1:
             all_seen_vb = []
         topics = []
-        topics_not_seen = Topic.objects.filter(is_removed=False, is_vb=True, is_popular=True, language_id=language_id, date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-view_count', '-comment_count')
-        topics_seen = Topic.objects.filter(is_removed=False, is_vb=True, is_popular=True, language_id=language_id, date__gte=enddate, id__in=all_seen_vb).order_by('-view_count', '-comment_count')
+        topics_not_seen = Topic.objects.filter(is_removed=False, is_vb=True, is_popular=True, language_id=language_id, date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-view_count')
+        topics_seen = Topic.objects.filter(is_removed=False, is_vb=True, is_popular=True, language_id=language_id, date__gte=enddate, id__in=all_seen_vb).order_by('-view_count')
         topics.extend(topics_not_seen)
         topics.extend(topics_seen)
         paginator_topics.page_size = 10
