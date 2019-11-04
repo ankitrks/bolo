@@ -2502,7 +2502,7 @@ def get_category_with_video_bytes(request):
             else:
                 all_user = User.objects.filter(st__is_popular = True)
             if all_user.count():
-                popular_bolo = UserSerializer(all_user.order_by('?'))
+                popular_bolo = UserSerializer(all_user.order_by('?'), many=True).data
         if request.GET.get('is_with_popular'):
             startdate = datetime.today()
             enddate = startdate - timedelta(days=15)
