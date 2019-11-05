@@ -2490,6 +2490,7 @@ def get_category_with_video_bytes(request):
         language_id = request.GET.get('language_id', 1)
         popular_bolo = []
         trending_videos = []
+        following_user = []
         if request.user.id:
             userprofile = UserProfile.objects.get(user = request.user)
             category = userprofile.sub_category.all()
@@ -2510,7 +2511,7 @@ def get_category_with_video_bytes(request):
             paginator.page_size = 10
             topics = paginator.paginate_queryset(topics, request)
             trending_videos = CategoryVideoByteSerializer(topics, many=True).data
-        return JsonResponse({'category_details': CategoryWithVideoSerializer(category, many=True, context={'language_id': language_id}).data, 'trending_topics': trending_videos, 'popular_boloindyans': popular_bolo}, status=status.HTTP_200_OK)
+        return JsonResponse({'category_details': CategoryWithVideoSerializer(category, many=True, context={'language_id': language_id}).data, 'trending_topics': trending_videos, 'popular_boloindyans': popular_bolo, 'following_user': following_user}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -2526,7 +2527,7 @@ def get_category_detail_with_views(request):
         all_seen = all_vb.aggregate(Sum('view_count'))
         if not all_seen['view_count__sum']:
             all_seen['view_count__sum']=0
-        return JsonResponse({'category_details': CategoryWithVideoSerializer(category).data, 'video_count': vb_count, 'all_seen':shorcountertopic(all_seen['view_count__sum'])}, status=status.HTTP_200_OK)
+        return JsonResponse({'category_details': CategoryWithVideoSerializer(category, context={'language_id': language_id}).data, 'video_count': vb_count, 'all_seen':shorcountertopic(all_seen['view_count__sum'])}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
