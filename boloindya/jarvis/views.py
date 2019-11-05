@@ -632,6 +632,7 @@ def upload_n_transcode(request):
             try:
                 update_careeranna_db(my_upload_transcode)
             except Exception as e:
+                return HttpResponse(json.dumps({'message':'success','file_id':my_upload_transcode.id}),content_type="application/json")
                 return HttpResponse(json.dumps({'message':'fail','reason':'Could not update careeranna db'+str(e)}),content_type="application/json")
 
     return HttpResponse(json.dumps({'message':'success','file_id':my_upload_transcode.id}),content_type="application/json")
@@ -724,10 +725,10 @@ def get_video_thumbnail(video_url,bucket_name):
 
 def upload_thumbail(virtual_thumb_file,bucket_name):
     try:
-        bucket_credentials = get_bucket_details('careeranna')
+        bucket_credentials = get_bucket_details(bucket_name)
         client = boto3.client('s3',aws_access_key_id=bucket_credentials['AWS_ACCESS_KEY_ID'],aws_secret_access_key=bucket_credentials['AWS_SECRET_ACCESS_KEY'])
         ts = time.time()
-        created_at = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+        # created_at = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
         final_filename = "img-" + str(ts).replace(".", "")  + ".jpg"
         client.put_object(Bucket=bucket_credentials['AWS_BUCKET_NAME'], Key='thumbnail/' +bucket_name+"/"+final_filename, Body=virtual_thumb_file, ACL='public-read')
         # client.resource('s3').Object(settings.BOLOINDYA_AWS_BUCKET_NAME, 'thumbnail/' + final_filename).put(Body=open(virtual_thumb_file, 'rb'))

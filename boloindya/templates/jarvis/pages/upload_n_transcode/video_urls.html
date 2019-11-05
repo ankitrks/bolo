@@ -8,11 +8,12 @@
           Your browser does not support HTML5 video.
         </video>
     </div>
-    {% if my_video.meta_keywords %}
     <div class="thumbnail">
         <img src="{{ my_video.thumbnail_url }}" style="width:400px;">
+        <h3>Thumbnail URL</h3>
+        <p class="lead" id="thumbnailurl">{{ my_video.thumbnail_url}}</p>
+        <a href="#" data-clipboard-target="#thumbnailurl" class="copy-text">Copy URL</a>
     </div>
-    {% endif %}
     <div>
         <h3>MP4 file URL</h3>
         <p class="lead" id="mp4url">{{ my_video.s3_file_url}}</p>
