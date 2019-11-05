@@ -41,14 +41,15 @@ class TopicChangeList(ChangeList):
             list_filter, date_hierarchy, search_fields, list_select_related,
             list_per_page, list_max_show_all, list_editable, model_admin):
 
-        super(TopicChangeList, self).__init__(request, model, list_display, list_display_links,
-            list_filter, date_hierarchy, search_fields, list_select_related,
-            list_per_page, list_max_show_all, list_editable, model_admin)
+        # super(TopicChangeList, self).__init__(request, model, list_display, list_display_links,
+        #     list_filter, date_hierarchy, search_fields, list_select_related,
+        #     list_per_page, list_max_show_all, list_editable, model_admin)
 
         self.list_display = ('action_checkbox', 'id', 'title', 'name', 'duration', 'language_id', 'view_count',\
-            'comments', 'is_monetized', 'is_removed', 'date', 'm2mcategory','is_popular')
+            'comments', 'is_monetized', 'is_removed', 'is_popular', 'date', 'm2mcategory')
         self.list_display_links = ['id']
         self.list_editable = ('title', 'language_id', 'm2mcategory', 'is_popular')
+        self.list_editable = ('title', 'language_id', 'is_popular')
 
         self.model = model
         self.opts = model._meta
@@ -98,8 +99,8 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
 
     # resource_class = TopicResource
     # list_filter = ('language_id','date', ('date', DateRangeFilter), 'm2mcategory', 'is_monetized', 'is_removed')
-    # list_display = ('id', 'title', 'name', 'duration', 'language_id', 'view_count', 'comments', 'date')
-    # list_editable = ('title', 'language_id')
+    list_display = ('id', 'title', 'language_id', 'is_popular')
+    list_editable = ('title', 'language_id', 'is_popular')
 
     fieldsets = (
         (None, {
