@@ -23,7 +23,7 @@ class SingUpOTPAdmin(admin.ModelAdmin):
 admin.site.register(SingUpOTP, SingUpOTPAdmin)
 
 class CategoryAdmin(admin.ModelAdmin):
-	list_display = ('title', 'hindi_title', 'tamil_title', 'telgu_title', )
+	list_display = ('title', 'hindi_title','tamil_title','telgu_title','bengali_title','kannada_title', )
 admin.site.register(Category, CategoryAdmin)
 
 class WeightAdmin(admin.ModelAdmin):

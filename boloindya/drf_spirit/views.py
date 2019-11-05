@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework import generics
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
 from django.core.files.base import ContentFile
@@ -21,7 +21,7 @@ from .permissions import IsOwnerOrReadOnly
 from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,AppVersionSerializer,UserSerializer,SingleTopicSerializerwithComment,\
 UserAnswerSerializerwithComment,CricketMatchSerializer,PollSerializer,ChoiceSerializer,VotingSerializer,LeaderboardSerializer,\
 PollSerializerwithChoice, OnlyChoiceSerializer, NotificationSerializer, UserProfileSerializer, TongueTwisterSerializer,KYCDocumnetsTypeSerializer,\
-PaymentCycleSerializer,EncashableDetailSerializer,PaymentInfoSerializer,UserKYCSerializer
+PaymentCycleSerializer,EncashableDetailSerializer,PaymentInfoSerializer,UserKYCSerializer, CategoryWithVideoSerializer, CategoryVideoByteSerializer
 from forum.topic.models import Topic,ShareTopic,Like,SocialShare,Notification,CricketMatch,Poll,Choice,Voting,Leaderboard,VBseen,TongueTwister
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
@@ -888,7 +888,7 @@ def createTopic(request):
 
     try:
 
-        topic.language_id   = language_id
+        topic.language_id   = request.user.st.language
         topic.category_id   = category_id
         topic.user_id       = user_id
         if is_vb:
@@ -2001,11 +2001,30 @@ def get_follow_user(request):
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
+class GetFollowigList(generics.ListCreateAPIView):
+    serializer_class   = UserSerializer
+    permission_classes = (IsOwnerOrReadOnly,)
+    pagination_class    = LimitOffsetPagination
 
+    def get_queryset(self):
+        all_following_id = Follower.objects.filter(user_following_id = self.request.GET.get('user_id', ''),is_active = True).values_list('user_follower_id', flat=True)
+        all_user = User.objects.filter(pk__in = all_following_id)
+        return all_user
+
+class GetFollowerList(generics.ListCreateAPIView):
+    serializer_class   = UserSerializer
+    permission_classes = (IsOwnerOrReadOnly,)
+    pagination_class    = LimitOffsetPagination
+
+    def get_queryset(self):
+        all_follower_id = Follower.objects.filter(user_follower_id = self.request.GET.get('user_id', ''),is_active = True).values_list('user_following_id', flat=True)
+        all_user = User.objects.filter(pk__in = all_follower_id)
+        return all_user
+    
 @api_view(['POST'])
 def get_following_list(request):
     try:
-        all_following_id = Follower.objects.filter(user_following = request.POST.get('user_id', ''),is_active = True).values_list('user_follower_id', flat=True)
+        all_following_id = Follower.objects.filter(user_following_id = request.POST.get('user_id', ''),is_active = True).values_list('user_follower_id', flat=True)
         if all_following_id:
             all_user = User.objects.filter(pk__in = all_following_id)
             return JsonResponse({'result':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
@@ -2018,7 +2037,7 @@ def get_following_list(request):
 @api_view(['POST'])
 def get_follower_list(request):
     try:
-        all_follower_id = Follower.objects.filter(user_follower = request.POST.get('user_id', ''),is_active = True).values_list('user_following_id', flat=True)
+        all_follower_id = Follower.objects.filter(user_follower_id = request.POST.get('user_id', ''),is_active = True).values_list('user_following_id', flat=True)
         if all_follower_id:
             all_user = User.objects.filter(pk__in = all_follower_id)
             return JsonResponse({'result':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
@@ -2459,5 +2478,111 @@ def get_category_detail(request):
         category_id = request.POST.get('category_id', None)
         category = Category.objects.get(pk=category_id)
         return JsonResponse({'category_details': CategorySerializer(category).data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_category_with_video_bytes(request):
+    try:
+        category=[]
+        paginator = PageNumberPagination()
+        paginator.page_size = 5
+        language_id = request.GET.get('language_id', 1)
+        popular_bolo = []
+        trending_videos = []
+        following_user = []
+        if request.user.id:
+            userprofile = UserProfile.objects.get(user = request.user)
+            category = userprofile.sub_category.all()
+        else:
+            category = Category.objects.filter(parent__isnull=False)
+        category = paginator.paginate_queryset(category, request)
+        if request.GET.get('popular_boloindyans'):
+            if language_id:
+                all_user = User.objects.filter(st__is_popular = True, st__language=language_id)
+            else:
+                all_user = User.objects.filter(st__is_popular = True)
+            if all_user.count():
+                popular_bolo = UserSerializer(all_user.order_by('?'), many=True).data
+        if request.GET.get('is_with_popular'):
+            startdate = datetime.today()
+            enddate = startdate - timedelta(days=15)
+            topics = Topic.objects.filter(is_removed=False, is_vb=True, is_popular=True, language_id=language_id, date__gte=enddate).order_by('-view_count')
+            paginator.page_size = 10
+            topics = paginator.paginate_queryset(topics, request)
+            trending_videos = CategoryVideoByteSerializer(topics, many=True).data
+        return JsonResponse({'category_details': CategoryWithVideoSerializer(category, many=True, context={'language_id': language_id}).data, 'trending_topics': trending_videos, 'popular_boloindyans': popular_bolo, 'following_user': following_user}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def get_category_detail_with_views(request):
+    try:
+        category_id = request.POST.get('category_id', None)
+        language_id = request.POST.get('language_id', 1)
+        category = Category.objects.get(pk=category_id)
+        all_vb = Topic.objects.filter(m2mcategory=category, is_removed=False, is_vb=True, language_id=language_id)
+        vb_count = all_vb.count()
+        all_seen = all_vb.aggregate(Sum('view_count'))
+        if not all_seen['view_count__sum']:
+            all_seen['view_count__sum']=0
+        return JsonResponse({'category_details': CategoryWithVideoSerializer(category, context={'language_id': language_id}).data, 'video_count': vb_count, 'all_seen':shorcountertopic(all_seen['view_count__sum'])}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+from django.core.paginator import Paginator
+
+@api_view(['POST'])
+def get_category_video_bytes(request):
+     try:
+         category_id = request.POST.get('category_id', None)
+         language_id = request.POST.get('language_id', 1)
+         category = Category.objects.get(pk=category_id)
+         topic = Topic.objects.filter(m2mcategory=category, is_removed=False, is_vb=True, language_id=language_id).order_by('-is_popular').order_by('-date')
+
+         page_size = 10
+         paginator = Paginator(topic, page_size)
+         page = request.POST.get('page', 2)
+
+         topic_page = paginator.page(page)
+         return JsonResponse({'topics': CategoryVideoByteSerializer(topic_page, many=True).data}, status=status.HTTP_200_OK)
+     except Exception as e:
+         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_popular_video_bytes(request):
+    try:
+        paginator_topics = PageNumberPagination()
+        language_id = request.GET.get('language_id', 1)
+        startdate = datetime.today()
+        enddate = startdate - timedelta(days=15)
+        all_seen_vb = []
+        try:
+            all_seen_vb = VBseen.objects.filter(user = request.user).values_list('topic_id',flat=True)
+        except Exception as e1:
+            all_seen_vb = []
+        topics = []
+        topics_not_seen = Topic.objects.filter(is_removed=False, is_vb=True, is_popular=True, language_id=language_id, date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-view_count')
+        topics_seen = Topic.objects.filter(is_removed=False, is_vb=True, is_popular=True, language_id=language_id, date__gte=enddate, id__in=all_seen_vb).order_by('-view_count')
+        topics.extend(topics_not_seen)
+        topics.extend(topics_seen)
+        paginator_topics.page_size = 10
+        topics = paginator_topics.paginate_queryset(topics, request)
+        return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def get_user_follow_and_like_list(request):
+    try:
+        comment_like = Like.objects.filter(user = request.user,like = True,topic_id__isnull = True).values_list('comment_id', flat=True)
+        topic_like = Like.objects.filter(user = request.user,like = True,comment_id__isnull = True).values_list('topic_id', flat=True)
+        all_follow = Follower.objects.filter(user_follower = request.user,is_active = True).values_list('user_following_id', flat=True)
+        notification_count = Notification.objects.filter(for_user= request.user,status=0).count()
+        hashes = TongueTwister.objects.all().values_list('hash_tag', flat=True)
+        return JsonResponse({'comment_like':list(comment_like),'topic_like':list(topic_like),'all_follow':list(all_follow), \
+                             'notification_count':notification_count, 'user':UserSerializer(request.user).data, \
+                             'hashes':list(hashes)}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)

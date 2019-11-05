@@ -23,6 +23,9 @@ language_options = (
     ('2', "Hindi"),
     ('3', "Tamil"),
     ('4', "Telgu"),
+    ('5', "Bengali"),
+    ('6', "Kannada"),
+
 )
 
 gender_option = (

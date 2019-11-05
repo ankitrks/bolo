@@ -48,6 +48,7 @@ class TopicChangeList(ChangeList):
         self.list_display = ('action_checkbox', 'id', 'title', 'name', 'duration', 'language_id', 'view_count',\
             'comments', 'is_monetized', 'is_removed', 'is_popular', 'date', 'm2mcategory')
         self.list_display_links = ['id']
+        self.list_editable = ('title', 'language_id', 'm2mcategory', 'is_popular')
         self.list_editable = ('title', 'language_id', 'is_popular')
 
         self.model = model
@@ -92,9 +93,10 @@ class TopicChangeList(ChangeList):
         
 class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExportModelAdmin" NOT "admin.ModelAdmin"
     ordering = ['is_vb', '-id']
-    search_fields = ('title', 'user__username', 'user__st__name')
-    list_filter = (('date', DateRangeFilter), 'language_id', 'm2mcategory', 'is_monetized', 'is_removed')
+    search_fields = ('title', 'user__username', 'user__st__name', )
+    list_filter = (('date', DateRangeFilter), 'language_id', 'm2mcategory', 'is_monetized', 'is_removed', )
     filter_horizontal = ('m2mcategory', )
+
     # resource_class = TopicResource
     # list_filter = ('language_id','date', ('date', DateRangeFilter), 'm2mcategory', 'is_monetized', 'is_removed')
     list_display = ('id', 'title', 'language_id', 'is_popular')
