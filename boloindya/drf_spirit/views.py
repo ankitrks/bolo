@@ -2588,11 +2588,11 @@ def get_user_follow_and_like_list(request):
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 def get_recent_videos(request):
     try:
         paginator_topics = PageNumberPagination()
-        language_id = request.POST.get('language_id', 1)
+        language_id = request.GET.get('language_id', 1)
         all_seen_vb = []
         try:
             all_seen_vb = VBseen.objects.filter(user = request.user).values_list('topic_id',flat=True)
