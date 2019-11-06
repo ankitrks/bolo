@@ -2627,7 +2627,7 @@ def get_popular_bolo(request):
         if all_user.count():
             popular_bolo = paginator.paginate_queryset(all_user, request)
             popular_bolo = UserSerializer(popular_bolo, many=True).data
-            return JsonResponse({'results': UserSerializer(popular_bolo, many=True).data}, status=status.HTTP_200_OK)
+            return JsonResponse({'results': popular_bolo}, status=status.HTTP_200_OK)
         else:
             return JsonResponse({'results': []}, status=status.HTTP_200_OK)
     except Exception as e:
