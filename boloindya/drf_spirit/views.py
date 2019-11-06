@@ -2586,3 +2586,26 @@ def get_user_follow_and_like_list(request):
                              'hashes':list(hashes)}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def get_recent_videos(request):
+    try:
+        paginator_topics = PageNumberPagination()
+        language_id = request.POST.get('language_id', 1)
+        all_seen_vb = []
+        try:
+            all_seen_vb = VBseen.objects.filter(user = request.user).values_list('topic_id',flat=True)
+        except Exception as e1:
+            all_seen_vb = []
+        topics = []
+        category = Category.objects.get(pk=58)
+        topics_not_seen = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, m2mcategory=category).exclude(id__in=all_seen_vb).order_by('-date')
+        topics_seen = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, m2mcategory=category, id__in=all_seen_vb).order_by('-date')
+        topics.extend(topics_not_seen)
+        topics.extend(topics_seen)
+        paginator_topics.page_size = 10
+        topics = paginator_topics.paginate_queryset(topics, request)
+        return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
