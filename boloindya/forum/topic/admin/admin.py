@@ -7,7 +7,7 @@ from forum.topic.models import Topic, Notification, ShareTopic, CricketMatch, Po
  TongueTwister, BoloActionHistory
 from forum.category.models import Category
 from forum.topic.models import Topic, Notification, ShareTopic, CricketMatch, Poll, Choice, Voting, Leaderboard, \
-        TongueTwister, BoloActionHistory
+        TongueTwister, BoloActionHistory, language_options
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 
 class TopicResource(resources.ModelResource):
@@ -20,8 +20,11 @@ class TopicResource(resources.ModelResource):
 
 from django import forms
 class TopicChangeListForm(forms.ModelForm):
-    m2mcategory = forms.ModelMultipleChoiceField(queryset=Category.objects.all(), \
-            widget=forms.CheckboxSelectMultiple, required=False)
+    m2mcategory = forms.ModelMultipleChoiceField(queryset = Category.objects.all(), \
+            widget = forms.CheckboxSelectMultiple, required = False)
+    title = forms.CharField(required = True)
+    language_id = forms.ChoiceField(choices = language_options,required = True)
+    is_popular = forms.BooleanField(required = False)
 
 from django.contrib.admin.views.main import ChangeList
 PAGE_VAR = 'p'
@@ -49,7 +52,6 @@ class TopicChangeList(ChangeList):
             'comments', 'is_monetized', 'is_removed', 'is_popular', 'date', 'm2mcategory')
         self.list_display_links = ['id']
         self.list_editable = ('title', 'language_id', 'm2mcategory', 'is_popular')
-        self.list_editable = ('title', 'language_id', 'is_popular')
 
         self.model = model
         self.opts = model._meta
@@ -96,11 +98,6 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
     search_fields = ('title', 'user__username', 'user__st__name', )
     list_filter = (('date', DateRangeFilter), 'language_id', 'm2mcategory', 'is_monetized', 'is_removed', )
     filter_horizontal = ('m2mcategory', )
-
-    # resource_class = TopicResource
-    # list_filter = ('language_id','date', ('date', DateRangeFilter), 'm2mcategory', 'is_monetized', 'is_removed')
-    list_display = ('id', 'title', 'language_id', 'is_popular')
-    list_editable = ('title', 'language_id', 'is_popular')
 
     fieldsets = (
         (None, {
@@ -166,6 +163,13 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
         return actions
 
     def save_model(self, request, obj, form, change):
+        if 'title' in form.changed_data:
+            obj.title = form.cleaned_data['title']
+        if 'language_id' in form.changed_data:
+            obj.language_id = form.cleaned_data['language_id']
+        if 'is_popular' in form.changed_data:
+            obj.is_popular = form.cleaned_data['is_popular']
+        obj.save()
         if 'language_id' in form.changed_data and obj.is_monetized:
             # print form.initial['language_id'],obj.language_id,"####",change
             if form.initial['language_id'] == '1':
