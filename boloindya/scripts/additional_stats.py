@@ -162,17 +162,17 @@ def write_csv():
 
 def dump_csv(sample_dict):
 
-	headers = ['Category', 'Language', 'Play Count', 'Contributers', 'Impression Count', 'Number of Videos']
+	headers = ['Language', 'category', 'Number of Videos', 'Play Count', 'Contributers', 'Impression Count']
 	f_name = 'add_records.csv'
 
 	for(a,b), val in sample_dict.items():
 		list_print = []
-		list_print.append(a)
 		list_print.append(b)
+		list_print.append(a)
+		list_print.append(val[3])
 		list_print.append(val[0])
 		list_print.append(val[1])
 		list_print.append(val[2])
-		list_print.append(val[3])
 		print(','.join(map(str, list_print)))
 
 
