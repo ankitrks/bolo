@@ -2503,7 +2503,9 @@ def get_category_with_video_bytes(request):
             else:
                 all_user = User.objects.filter(st__is_popular = True)
             if all_user.count():
-                popular_bolo = UserSerializer(all_user.order_by('?'), many=True).data
+                paginator.page_size = 10
+                popular_bolo = paginator.paginate_queryset(all_user, request)
+                popular_bolo = UserSerializer(popular_bolo, many=True).data
         if request.GET.get('is_with_popular'):
             startdate = datetime.today()
             enddate = startdate - timedelta(days=15)
@@ -2607,5 +2609,26 @@ def get_recent_videos(request):
         paginator_topics.page_size = 10
         topics = paginator_topics.paginate_queryset(topics, request)
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def get_popular_bolo(request):
+    try:
+        paginator = PageNumberPagination()
+        paginator.page_size = 10
+        language_id = request.GET.get('language_id', 1)
+        all_user = []
+        if language_id:
+            all_user = User.objects.filter(st__is_popular = True, st__language=language_id)
+        else:
+            all_user = User.objects.filter(st__is_popular = True)
+        if all_user.count():
+            popular_bolo = paginator.paginate_queryset(all_user, request)
+            popular_bolo = UserSerializer(popular_bolo, many=True).data
+            return JsonResponse({'results': UserSerializer(popular_bolo, many=True).data}, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'results': []}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
