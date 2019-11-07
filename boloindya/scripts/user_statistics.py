@@ -260,6 +260,7 @@ def video_info(user_data_dump):
     
     try:
         dist_userid = user_data_dump['user_id']
+        print(dist_userid)
         if('vb_impressions' in user_data_dump):
             if(len(user_data_dump['vb_impressions']) > 0):
                 for(a,b) in user_data_dump['vb_impressions']:
@@ -572,12 +573,11 @@ def activity_time_spend(user_data_dump):
 
 def main():
     # pick only those dumps which have not been executed 
-    all_traction_data = UserJarvisDump.objects.filter(is_executed = True, dump_type = 1)
+    all_traction_data = UserJarvisDump.objects.filter(is_executed = False, dump_type = 1)
     for user_jarvis in all_traction_data:
         try:
             user_data_string = user_jarvis.dump
             user_data_dump = ast.literal_eval(user_data_string)
-            
             #pass the collected user dump through a set of methods
             user_statistics(user_data_dump)
             follow_unfollow_details(user_data_dump)

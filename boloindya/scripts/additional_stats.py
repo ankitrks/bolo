@@ -55,7 +55,8 @@ def report_stats():
 
 			playtime_count_details = VideoPlaytime.objects.filter(videoid = videoid)
 			freq_playtime_count = len(playtime_count_details)
-			user_count = len(playtime_count_details)
+			user_count_details = VideoDetails.objects.filter(videoid = videoid)
+			user_count = len(user_count_details)
 			impression_details = VideoDetails.objects.filter(videoid = videoid)
 			impression_count = len(impression_details)
 
@@ -173,8 +174,13 @@ def dump_csv(sample_dict):
 		list_print.append(val[1])
 		list_print.append(val[2])
 		list_print.append(val[3])
-		print(','.join(map(str, list_print)))
 
+		if(list_print[3] == 0):
+			list_print[3] = list_print[5]
+		if(list_print[4] == 0):
+			list_print[4] = list_print[2]	
+
+		print(','.join(map(str, list_print)))
 
 
 
