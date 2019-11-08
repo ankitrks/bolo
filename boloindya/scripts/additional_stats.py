@@ -52,6 +52,10 @@ def report_stats():
 					language_type = 'Tamil'
 				if(each_topic_data.language_id == '4'):
 					language_type = 'Telgu'
+				if(each_topic_data.language_id == '5'):
+					language_type = 'Bengali'
+				if(each_topic_data.language_id == '6'):
+					language_type = 'Kannada'		
 
 			playtime_count_details = VideoPlaytime.objects.filter(videoid = videoid)
 			freq_playtime_count = len(playtime_count_details)
@@ -122,6 +126,10 @@ def report_additional_stats():
 					language_type = 'Tamil'
 				if(each_topic_data.language_id == '4'):
 					language_type = 'Telgu'
+				if(each_topic_data.language_id == '5'):
+					language_type = 'Bengali'
+				if(each_topic_data.language_id == '6'):
+					language_type = 'Kannada'		
 
 					
 				#print(language_type)		
@@ -149,6 +157,7 @@ def report_additional_stats():
 		#print('some exception' + str(e))	
 		count = 0	
 
+# not being used
 def write_csv():
 	print(len(complete_data))
 	#headers = ['USERNAME', 'VIDEOTITLE', 'PLAYER READY(MIN)', 'PLAYER READY(MAX)', 'PLAYER READY(DELTA)', 'START PLAY(MIN)', 'START PLAY(MAX)', 'START PLAY(DELTA)', 'NETWORK']
