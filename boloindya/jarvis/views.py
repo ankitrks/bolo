@@ -1206,7 +1206,7 @@ def weekly_vplay_data(request):
                     total_playtime += obj.playtime
                     total_plays += 1
 
-                    print(str(obj.user)+"    "+str(obj.videoid)+"     "+str(obj.playtime))
+                    #print(str(obj.user).encode('utf-8') + "    "+str(obj.videoid).encode('utf-8')+"     "+str(obj.playtime).encode('utf-8'))
 
                 this_date_data['total_playtime'] = total_playtime
                 this_date_data['total_plays'] = total_plays    
