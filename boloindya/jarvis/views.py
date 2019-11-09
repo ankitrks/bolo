@@ -860,7 +860,7 @@ def send_notification(request):
 
                 device = FCMDevice.objects.exclude(user__pk__in=filter_list).filter(**language_filter)
 
-        #    device.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk})
+            device.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk})
         return redirect('/jarvis/notification_panel/')
 
     if request.method == 'GET':
