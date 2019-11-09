@@ -143,6 +143,7 @@ user_group_options = (
     ('4', "Signed up but no opening of app since 24 hours"),
     ('5', "Signed up but no opening of app since 72 hours "),
     ('6', "Never created a video"),
+    ('7', "Test User"),
 )
 
 notification_type_options = (

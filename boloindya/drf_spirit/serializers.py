@@ -411,6 +411,7 @@ class UserWithoutUserProfileSerializer(ModelSerializer):
 class CategoryVideoByteSerializer(ModelSerializer):
     user = SerializerMethodField()
     view_count = SerializerMethodField()
+    likes_count = SerializerMethodField()
     comment_count = SerializerMethodField()
     date = SerializerMethodField()
     video_cdn = SerializerMethodField()
@@ -430,6 +431,9 @@ class CategoryVideoByteSerializer(ModelSerializer):
 
     def get_view_count(self,instance):
         return shorcountertopic(instance.view_count)
+
+    def get_likes_count(self,instance):
+        return shorcountertopic(instance.likes_count)
 
     def get_comment_count(self,instance):
         return shorcountertopic(instance.comment_count)
