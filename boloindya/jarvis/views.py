@@ -836,9 +836,8 @@ def send_notification(request):
                 device = FCMDevice.objects.filter(user__isnull=True)
             
             elif user_group == '7':
-                filter_list = UserProfile.objects.filter(is_test_user=True).values_list('user__pk', flat=True)
+                filter_list = [1492, 20347, 1491, 1456, 1494]
                 device = FCMDevice.objects.filter(user__pk__in=filter_list)
-                print(device)
             else:
                 filter_list = []
 
