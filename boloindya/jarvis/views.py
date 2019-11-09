@@ -765,8 +765,8 @@ def update_careeranna_db(uploaded_video):
     }
     reseponse_careeranna = requests.post(settings.CAREERANNA_VIDEOFILE_UPDATE_URL, data=payload, headers=headers)
     return reseponse_careeranna
-    
 
+@login_required
 def notification_panel(request):
   
     lang = request.POST.get('lang')
@@ -787,6 +787,7 @@ def notification_panel(request):
 from drf_spirit.models import UserLogStatistics
 import datetime
 
+@login_required
 def send_notification(request):
 
     pushNotification = {}
@@ -834,6 +835,10 @@ def send_notification(request):
             elif user_group == '2':
                 device = FCMDevice.objects.filter(user__isnull=True)
             
+            elif user_group == '7':
+                filter_list = UserProfile.objects.filter(is_test_user=True).values_list('user__pk', flat=True)
+                device = FCMDevice.objects.filter(user__pk__in=filter_list)
+
             else:
                 filter_list = []
 
@@ -855,7 +860,6 @@ def send_notification(request):
 
                 device = FCMDevice.objects.exclude(user__pk__in=filter_list).filter(**language_filter)
 
-            print(device)
             device.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk})
         return redirect('/jarvis/notification_panel/')
 
@@ -868,6 +872,7 @@ def send_notification(request):
     return render(request,'jarvis/pages/notification/send_notification.html', { 'language_options': language_options, 'user_group_options' : user_group_options, 'notification_types': notification_type_options, 'pushNotification': pushNotification })
 
 
+@login_required
 def particular_notification(request, notification_id=None):
     pushNotification = PushNotification.objects.get(pk=notification_id)
     return render(request,'jarvis/pages/notification/particular_notification.html', {'pushNotification': pushNotification})
