@@ -279,7 +279,7 @@ class Topic(models.Model):
         self.is_removed = False
         self.save()
         userprofile = UserProfile.objects.get(user = self.user)
-        if userprofile.vb_count and self.is_vb:
+        if self.is_vb: # userprofile.vb_count
             userprofile.vb_count = F('vb_count')+1
         userprofile.save()
         # Bolo actions will be added only when the monetization is enabled

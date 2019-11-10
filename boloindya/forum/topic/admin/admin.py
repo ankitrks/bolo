@@ -153,6 +153,8 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
 
     def add_monetization(self, request, queryset):
         for each_obj in queryset:
+            if each_obj.is_removed:
+                each_obj.restore()
             if not each_obj.is_monetized:
                 each_obj.add_monetization()
     add_monetization.short_description = "Restore & Add to Monetization!"
