@@ -459,29 +459,21 @@ class CategoryWithVideoSerializer(ModelSerializer):
         fields = '__all__'
 
     def get_total_view(self, instance):
-        language_id = 1
-        if self.context.get("language_id"):
-            language_id =  self.context.get("language_id")
-        all_vb = Topic.objects.filter(m2mcategory=instance, is_removed=False, is_vb=True, language_id=language_id)
-        all_seen = all_vb.aggregate(Sum('view_count'))
-        if not all_seen['view_count__sum']:
-            all_seen['view_count__sum']=0
-        return shorcountertopic(all_seen['view_count__sum'])
+        return shorcountertopic(instance.view_count)
 
     def get_topics(self,instance):
+        # return []
         language_id = 1
         if self.context.get("language_id"):
             language_id =  self.context.get("language_id")
-        topic = Topic.objects.filter(m2mcategory=instance, is_removed=False, is_vb=True, language_id=language_id).order_by('-is_popular').order_by('-date')
+        topic = Topic.objects.filter(m2mcategory=instance, is_removed=False, is_vb=True, language_id=language_id)\
+            .order_by('-is_popular').order_by('-date')
 
-        page_size = 10
+        page_size = 5
         paginator = Paginator(topic, page_size)
         page = 1
-
         topic_page = paginator.page(page)
-
         return CategoryVideoByteSerializer(topic_page, many=True).data
-
 
 class VideoCompleteRateSerializer(ModelSerializer):
     class Meta:

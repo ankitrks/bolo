@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import urllib2
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
@@ -134,6 +135,10 @@ class Topic(models.Model):
     transcode_dump = models.TextField(_("Transcode Dump"), blank = True)
     transcode_status_dump = models.TextField(_("Transcode Status Dump (Job Status)"), blank = True)
 
+    m3u8_content = models.TextField(_("M3U8 Content"), blank = True)
+    audio_m3u8_content = models.TextField(_("Audio M3U8 Content"), blank = True)
+    video_m3u8_content = models.TextField(_("Video M3U8 Content"), blank = True)
+
     objects = TopicQuerySet.as_manager()
 
     def __unicode__(self):
@@ -153,6 +158,18 @@ class Topic(models.Model):
         verbose_name = _("topic")
         verbose_name_plural = _("topics")
 
+    def update_m3u8_content(self):
+        if self.question_video:
+            m3u8_url = self.question_video
+            url_split = m3u8_url.split('/')
+            audio_url = '/'.join( url_split[:-1] + ['hlsAudio'] + [url_split[-1].replace('hls_', '')] )
+            video_url = '/'.join( url_split[:-1] + ['hls1000k'] + [url_split[-1].replace('hls_', '')] )
+
+            self.m3u8_content = urllib2.urlopen(m3u8_url).read()
+            self.audio_m3u8_content = urllib2.urlopen(audio_url).read()
+            self.video_m3u8_content = urllib2.urlopen(video_url).read()
+            self.save()
+
     def update_vb(self, *args, **kwargs):
         if not self.id or not self.is_transcoded:
             if self.is_vb and self.question_video:
@@ -162,11 +179,13 @@ class Topic(models.Model):
                     self.question_video = m3u8_url
                     self.transcode_dump = data_dump
                     self.transcode_job_id = job_id
-                    #self.is_transcoded = True
-        self.save()
+                    self.is_transcoded = True
+                    self.save()
+                    self.update_m3u8_content()
+    
     def watermark_vb(self, *args, **kwargs):
         data_dump, m3u8_url, job_id = transcode_media_file(self.question_video.split('s3.amazonaws.com/')[1])
-        print m3u8_url,"====>",job_id
+        # print m3u8_url,"====>",job_id
         if m3u8_url:
             self.backup_url = self.question_video
             self.question_video = m3u8_url

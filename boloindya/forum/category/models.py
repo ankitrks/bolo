@@ -43,6 +43,7 @@ class Category(models.Model):
     is_private = models.BooleanField(_("private"), default=False)
     category_image = models.CharField(_("color"), max_length=150, blank=True)
     order_no = models.IntegerField(default = 0)
+    view_count = models.BigIntegerField(default = 0)
     is_engagement = models.BooleanField(default=False)
 
     objects = CategoryQuerySet.as_manager()

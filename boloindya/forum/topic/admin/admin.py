@@ -112,7 +112,7 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
         ('Transcode Options', {
             'classes': ('collapse',),
             'fields': ('backup_url', ('is_transcoded', 'is_transcoded_error'), 'transcode_job_id', \
-                        'transcode_dump', 'transcode_status_dump'),
+                        'transcode_dump', 'transcode_status_dump', 'm3u8_content', 'audio_m3u8_content', 'video_m3u8_content'),
         }),
     )
 
