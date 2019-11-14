@@ -373,3 +373,11 @@ class HardwareData(models.Model):
     malloc_total = models.PositiveIntegerField(_("malloc_total"), default = 0, editable = False)
     malloc_used = models.PositiveIntegerField(_("malloc_used"), default = 0, editable = False)
     malloc_chunk = models.PositiveIntegerField(_("malloc_chunk"), default = 0, editable = False)
+
+# class related to user feedback
+class UserFeedback(models.Model):
+    by_user = models.ForeignKey('auth.User', blank = True, null = True)
+    created_at=models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False)
+    contact_email=models.CharField(_("contact_email"), max_length=30)
+    description=models.TextField(null = True, blank = True)
+    feedback_image=models.CharField(_("contact_email"), max_length=255)

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import SingUpOTP, UserJarvisDump
+from .models import SingUpOTP, UserJarvisDump, UserFeedback
 from forum.user.models import Weight,UserProfile,AppVersion, UserProfile,AndroidLogs, AppPageContent, ReferralCode, ReferralCodeUsed, VideoPlaytime, VideoCompleteRate
 from forum.category.models import Category
 from import_export.admin import ImportExportModelAdmin,ExportMixin
@@ -55,6 +55,9 @@ class AndroidLogsAdmin(admin.ModelAdmin):
 	list_display = ('user', 'created_at', 'last_modified', 'log_type',)
 	search_fields = ('user', )
 
+class UserFeedbackAdmin(admin.ModelAdmin):
+	list_display = ('by_user', 'created_at', 'contact_email', )
+	search_fields = ('by_user', )
 
 admin.site.register(AppVersion)
 admin.site.register(AndroidLogs, AndroidLogsAdmin)
@@ -62,6 +65,7 @@ admin.site.register(AppPageContent)
 
 #user information models
 admin.site.register(UserJarvisDump)
+admin.site.register(UserFeedback, UserFeedbackAdmin)
 admin.site.register(UserFollowUnfollowDetails)
 admin.site.register(UserVideoTypeDetails)
 admin.site.register(VideoDetails)
