@@ -380,4 +380,4 @@ class UserFeedback(models.Model):
     created_at=models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False)
     contact_email=models.CharField(_("contact_email"), max_length=30)
     description=models.TextField(null = True, blank = True)
-    feedback_image=models.CharField(_("contact_email"), max_length=255)
+    feedback_image=models.CharField(_("feedback_image"), max_length=255)

@@ -56,8 +56,8 @@ class AndroidLogsAdmin(admin.ModelAdmin):
 	search_fields = ('user', )
 
 class UserFeedbackAdmin(admin.ModelAdmin):
-	list_display = ('by_user', 'created_at', 'contact_email', )
-	search_fields = ('by_user', )
+	list_display = ('by_user', 'created_at', 'contact_email', 'feedback_image')
+	search_fields = ('by_user', 'contact_email')
 
 admin.site.register(AppVersion)
 admin.site.register(AndroidLogs, AndroidLogsAdmin)
