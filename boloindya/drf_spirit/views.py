@@ -2648,6 +2648,7 @@ def submit_user_feedback(request):
     try:
         contact_email = request.POST.get('contact_email', '')
         description = request.POST.get('description', '')
+        feedback_image = request.POST.get('feedback_image', '')
         if request.user.id:
             userFeedback=UserFeedback(by_user=request.user, description=description, contact_email=contact_email, feedback_image=feedback_image)
             userFeedback.save()
