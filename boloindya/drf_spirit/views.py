@@ -16,7 +16,7 @@ from rest_framework.generics import GenericAPIView
 
 from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
-from .models import UserJarvisDump, UserLogStatistics
+from .models import UserJarvisDump, UserLogStatistics, UserFeedback
 from .permissions import IsOwnerOrReadOnly
 from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,AppVersionSerializer,UserSerializer,SingleTopicSerializerwithComment,\
 UserAnswerSerializerwithComment,CricketMatchSerializer,PollSerializer,ChoiceSerializer,VotingSerializer,LeaderboardSerializer,\
@@ -2639,5 +2639,19 @@ def get_popular_bolo(request):
             return JsonResponse({'results': popular_bolo}, status=status.HTTP_200_OK)
         else:
             return JsonResponse({'results': []}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def submit_user_feedback(request):
+    try:
+        contact_email = request.POST.get('contact_email', '')
+        description = request.POST.get('description', '')
+        if request.user.id:
+            userFeedback=UserFeedback(by_user=request.user, description=description, contact_email=contact_email, feedback_image=feedback_image)
+            userFeedback.save()
+            return JsonResponse({'message': 'saved feedback'}, status=status.HTTP_200_OK)
+        return JsonResponse({'message': 'invalid user'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
