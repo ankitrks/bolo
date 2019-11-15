@@ -549,8 +549,9 @@ class SearchTopic(generics.ListCreateAPIView):
     def get_queryset(self):
         topics      = []
         search_term = self.request.GET.get('term')
+        language_id = self.request.GET.get('language_id', 1)
         if search_term:
-            topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True)
+            topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True, language_id=language_id)
 
         return topics
 
