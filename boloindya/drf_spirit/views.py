@@ -2552,7 +2552,7 @@ def get_category_video_bytes(request):
          category = Category.objects.get(pk=category_id)
          topic = Topic.objects.filter(m2mcategory=category, is_removed=False, is_vb=True, language_id=language_id).order_by('-is_popular').order_by('-date')
 
-         page_size = 5
+         page_size = 10
          paginator = Paginator(topic, page_size)
          page = request.POST.get('page', 2)
 
