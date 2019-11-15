@@ -135,9 +135,9 @@ class Topic(models.Model):
     transcode_dump = models.TextField(_("Transcode Dump"), blank = True)
     transcode_status_dump = models.TextField(_("Transcode Status Dump (Job Status)"), blank = True)
 
-    m3u8_content = models.TextField(_("M3U8 Content"), blank = True)
-    audio_m3u8_content = models.TextField(_("Audio M3U8 Content"), blank = True)
-    video_m3u8_content = models.TextField(_("Video M3U8 Content"), blank = True)
+    m3u8_content = models.TextField(_("M3U8 Content"), blank = True, null = True)
+    audio_m3u8_content = models.TextField(_("Audio M3U8 Content"), blank = True, null = True)
+    video_m3u8_content = models.TextField(_("Video M3U8 Content"), blank = True, null = True)
 
     objects = TopicQuerySet.as_manager()
 
@@ -159,16 +159,19 @@ class Topic(models.Model):
         verbose_name_plural = _("topics")
 
     def update_m3u8_content(self):
-        if self.question_video:
-            m3u8_url = self.question_video
-            url_split = m3u8_url.split('/')
-            audio_url = '/'.join( url_split[:-1] + ['hlsAudio'] + [url_split[-1].replace('hls_', '')] )
-            video_url = '/'.join( url_split[:-1] + ['hls1000k'] + [url_split[-1].replace('hls_', '')] )
+        try:
+            if self.question_video:
+                m3u8_url = self.question_video
+                url_split = m3u8_url.split('/')
+                audio_url = '/'.join( url_split[:-1] + ['hlsAudio'] + [url_split[-1].replace('hls_', '')] )
+                video_url = '/'.join( url_split[:-1] + ['hls1000k'] + [url_split[-1].replace('hls_', '')] )
 
-            self.m3u8_content = urllib2.urlopen(m3u8_url).read()
-            self.audio_m3u8_content = urllib2.urlopen(audio_url).read()
-            self.video_m3u8_content = urllib2.urlopen(video_url).read()
-            self.save()
+                self.m3u8_content = urllib2.urlopen(m3u8_url).read()
+                self.audio_m3u8_content = urllib2.urlopen(audio_url).read()
+                self.video_m3u8_content = urllib2.urlopen(video_url).read()
+                self.save()
+        except:
+            pass
 
     def update_vb(self, *args, **kwargs):
         if not self.id or not self.is_transcoded:
@@ -179,7 +182,7 @@ class Topic(models.Model):
                     self.question_video = m3u8_url
                     self.transcode_dump = data_dump
                     self.transcode_job_id = job_id
-                    self.is_transcoded = True
+                    # self.is_transcoded = True
                     self.save()
                     self.update_m3u8_content()
     
