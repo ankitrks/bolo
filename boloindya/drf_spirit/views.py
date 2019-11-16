@@ -16,7 +16,7 @@ from rest_framework.generics import GenericAPIView
 
 from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
-from .models import UserJarvisDump, UserLogStatistics
+from .models import UserJarvisDump, UserLogStatistics, UserFeedback
 from .permissions import IsOwnerOrReadOnly
 from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,AppVersionSerializer,UserSerializer,SingleTopicSerializerwithComment,\
 UserAnswerSerializerwithComment,CricketMatchSerializer,PollSerializer,ChoiceSerializer,VotingSerializer,LeaderboardSerializer,\
@@ -549,8 +549,9 @@ class SearchTopic(generics.ListCreateAPIView):
     def get_queryset(self):
         topics      = []
         search_term = self.request.GET.get('term')
+        language_id = self.request.GET.get('language_id', 1)
         if search_term:
-            topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True)
+            topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True, language_id=language_id)
 
         return topics
 
@@ -2551,7 +2552,7 @@ def get_category_video_bytes(request):
          category = Category.objects.get(pk=category_id)
          topic = Topic.objects.filter(m2mcategory=category, is_removed=False, is_vb=True, language_id=language_id).order_by('-is_popular').order_by('-date')
 
-         page_size = 5
+         page_size = 10
          paginator = Paginator(topic, page_size)
          page = request.POST.get('page', 2)
 
@@ -2638,5 +2639,20 @@ def get_popular_bolo(request):
             return JsonResponse({'results': popular_bolo}, status=status.HTTP_200_OK)
         else:
             return JsonResponse({'results': []}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def submit_user_feedback(request):
+    try:
+        contact_email = request.POST.get('contact_email', '')
+        description = request.POST.get('description', '')
+        feedback_image = request.POST.get('feedback_image', '')
+        if request.user.id:
+            userFeedback=UserFeedback(by_user=request.user, description=description, contact_email=contact_email, feedback_image=feedback_image)
+            userFeedback.save()
+            return JsonResponse({'message': 'saved feedback'}, status=status.HTTP_200_OK)
+        return JsonResponse({'message': 'invalid user'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
