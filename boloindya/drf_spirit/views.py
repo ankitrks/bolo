@@ -2642,17 +2642,11 @@ def get_popular_bolo(request):
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
-
-@api_view(['POST'])
-def submit_user_feedback(request):
-    try:
-        contact_email = request.POST.get('contact_email', '')
-        description = request.POST.get('description', '')
-        feedback_image = request.POST.get('feedback_image', '')
-        if request.user.id:
-            userFeedback=UserFeedback(by_user=request.user, description=description, contact_email=contact_email, feedback_image=feedback_image)
-            userFeedback.save()
-            return JsonResponse({'message': 'saved feedback'}, status=status.HTTP_200_OK)
-        return JsonResponse({'message': 'invalid user'}, status=status.HTTP_200_OK)
-    except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+#Code for testing the working of email sending using smtp
+from tasks import send_sample_mail_task
+def sample_mail():
+    subject = 'Celery Test'
+    message = 'This is a sample email to test if celery is working fine.'
+    email_from = settings.EMAIL_HOST_USER
+    recipient_list = ['ab96sh@gmail.com']
+    send_sample_mail_task.delay(subject, message, email_from, recipient_list)
