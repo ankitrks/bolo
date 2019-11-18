@@ -381,21 +381,3 @@ FCM_MAX_RECIPIENTS = 1000
 PREDICTION_START_HOUR = 3
 
 CAREERANNA_VIDEOFILE_UPDATE_URL = "https://www.careeranna.com/search/insertOrUpdateFreeVideo"
-
-###### Celery Stuff ######
-# BROKER_URL = 'redis://localhost:6379'
-# CELERY_RESULT_BACKEND = 'redis://localhost:6379'
-# CELERY_ACCEPT_CONTENT = ['application/json']
-# CELERY_TASK_SERIALIZER = 'json'
-# CELERY_RESULT_SERIALIZER = 'json'
-# CELERY_TIMEZONE = 'Asia/Kolkata'
-###### Celery Stuff ######
-
-# Sample email sending setting #
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_USE_TLS = True
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'johitucmee@gmail.com'
-EMAIL_HOST_PASSWORD = "johitalien"
-# Sample email sending setting #

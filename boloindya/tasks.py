@@ -1,16 +1,11 @@
 from __future__ import absolute_import, unicode_literals
-from celery1 import app
+from celery_boloindya import app
 from celery.utils.log import get_task_logger
 from django.core.mail import send_mail
-import settings
+import os
 
-DJANGO_SETTINGS_MODULE = settings
-# DJANGO_SETTINGS_MODULE = 'settings'
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 logger = get_task_logger(__name__)
-
-@app.task
-def send_sample_mail_task(subject, message, email_from, getter):
-    return send_mail(subject, message, email_from, getter)
 
 @app.task
 def send_notifications_task(data, pushNotification):
@@ -20,8 +15,6 @@ def send_notifications_task(data, pushNotification):
     from drf_spirit.models import UserLogStatistics
     from jarvis.models import PushNotification, FCMDevice
 
-    # from jarvis.views import send_notifications_thru_celery
-    # return send_notifications_thru_celery(data, pushNotification)
     try:
         title = data.get('title', "")
         upper_title = data.get('upper_title', "")
@@ -70,8 +63,6 @@ def send_notifications_task(data, pushNotification):
                 #This list contains user IDs for test users: Gitesh, Abhishek and Akash
                 filter_list = [39342, 1465, 2801]
                 device = FCMDevice.objects.filter(user__pk__in=filter_list)
-                # device.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk})
-                # logger.info(len(device))
             else:
                 filter_list = []
 
@@ -94,7 +85,6 @@ def send_notifications_task(data, pushNotification):
                 device = FCMDevice.objects.exclude(user__pk__in=filter_list).filter(**language_filter)
 
             logger.info(device)
-            # print(device)
             device.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk})
     except Exception as e:
         logger.info(str(e))
