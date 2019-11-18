@@ -467,7 +467,7 @@ class CategoryWithVideoSerializer(ModelSerializer):
         if self.context.get("language_id"):
             language_id =  self.context.get("language_id")
         topic = Topic.objects.filter(m2mcategory=instance, is_removed=False, is_vb=True, language_id=language_id)\
-            .order_by('-is_popular').order_by('-date')
+            .order_by('-date').order_by('-is_popular')
 
         page_size = 10
         paginator = Paginator(topic, page_size)
