@@ -2551,7 +2551,7 @@ def get_category_video_bytes(request):
         language_id = request.POST.get('language_id', 1)
         category = Category.objects.get(pk=category_id)
         topics = []
-        topic = Topic.objects.filter(m2mcategory=category, is_removed=False, is_vb=True, language_id=language_id)
+        topic = Topic.objects.filter(m2mcategory=category, is_removed=False, is_vb=True, language_id=language_id).order_by('-date')
         topic_not_popular = topic.filter(is_popular=False)
         topic_popular = topic.filter(is_popular=True)
         topics.extend(topic_popular)

@@ -467,7 +467,7 @@ class CategoryWithVideoSerializer(ModelSerializer):
         if self.context.get("language_id"):
             language_id =  self.context.get("language_id")
         topics = []
-        topic = Topic.objects.filter(m2mcategory=instance, is_removed=False, is_vb=True, language_id=language_id)
+        topic = Topic.objects.filter(m2mcategory=instance, is_removed=False, is_vb=True, language_id=language_id).order_by('-date')
         topic_not_popular = topic.filter(is_popular=False)
         topic_popular = topic.filter(is_popular=True)
         topics.extend(topic_popular)
