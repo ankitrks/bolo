@@ -2547,17 +2547,21 @@ from django.core.paginator import Paginator
 @api_view(['POST'])
 def get_category_video_bytes(request):
      try:
-         category_id = request.POST.get('category_id', None)
-         language_id = request.POST.get('language_id', 1)
-         category = Category.objects.get(pk=category_id)
-         topic = Topic.objects.filter(m2mcategory=category, is_removed=False, is_vb=True, language_id=language_id).order_by('-is_popular')
+        category_id = request.POST.get('category_id', None)
+        language_id = request.POST.get('language_id', 1)
+        category = Category.objects.get(pk=category_id)
+        topics = []
+        topic = Topic.objects.filter(m2mcategory=category, is_removed=False, is_vb=True, language_id=language_id)
+        topic_not_popular = topic.filter(is_popular=False)
+        topic_popular = topic.filter(is_popular=True)
+        topics.extend(topic_popular)
+        topics.extend(topic_not_popular)
+        page_size = 10
+        paginator = Paginator(topics, page_size)
+        page = request.POST.get('page', 2)
 
-         page_size = 10
-         paginator = Paginator(topic, page_size)
-         page = request.POST.get('page', 2)
-
-         topic_page = paginator.page(page)
-         return JsonResponse({'topics': CategoryVideoByteSerializer(topic_page, many=True).data}, status=status.HTTP_200_OK)
+        topic_page = paginator.page(page)
+        return JsonResponse({'topics': CategoryVideoByteSerializer(topic_page, many=True).data}, status=status.HTTP_200_OK)
      except Exception as e:
          return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
