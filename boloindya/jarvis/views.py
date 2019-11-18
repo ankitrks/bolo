@@ -51,6 +51,7 @@ from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencod
 from django.core.files.base import ContentFile
 from drf_spirit.serializers import UserWithUserSerializer
 import traceback
+from tasks import send_notifications_task
 
 def get_bucket_details(bucket_name=None):
     bucket_credentials = {}
@@ -794,72 +795,20 @@ def send_notification(request):
     
     if request.method == 'POST':
         
-        title = request.POST.get('title', "")
-        upper_title = request.POST.get('upper_title', "")
-        notification_type = request.POST.get('notification_type', "")
-        id = request.POST.get('id', "")
-        user_group = request.POST.get('user_group', "")
-        lang = request.POST.get('lang', "")
-        schedule_status = request.POST.get('schedule_status', "")
-        datepicker = request.POST.get('datepicker', '')
-        timepicker = request.POST.get('timepicker', '').replace(" : ", ":")
+        data = {}
 
-        pushNotification = PushNotification()
-        pushNotification.title = upper_title
-        pushNotification.description = title
-        pushNotification.language = lang
-        pushNotification.notification_type = notification_type
-        pushNotification.user_group = user_group
-        pushNotification.instance_id = id
-        pushNotification.save()
+        data['title'] = request.POST.get('title', "")
+        data['upper_title'] = request.POST.get('upper_title', "")
+        data['notification_type'] = request.POST.get('notification_type', "")
+        data['id'] = request.POST.get('id', "")
+        data['user_group'] = request.POST.get('user_group', "")
+        data['lang'] = request.POST.get('lang', "")
+        data['schedule_status'] = request.POST.get('schedule_status', "")
+        data['datepicker'] = request.POST.get('datepicker', '')
+        data['timepicker'] = request.POST.get('timepicker', '').replace(" : ", ":")
 
-        if schedule_status == '1':
-            if datepicker:
-                pushNotification.scheduled_time = datetime.datetime.strptime(datepicker + " " + timepicker, "%m/%d/%Y %H:%M")
-            pushNotification.is_scheduled = True            
-            pushNotification.save()
-        else:
+        send_notifications_task.delay(data, pushNotification)
 
-            device = ''
-
-            language_filter = {} 
-        
-            if lang != '0':
-                language_filter = { 'user__st__language': lang }
-            
-            if user_group == '1':
-                end_date = datetime.datetime.today()
-                start_date = end_date - datetime.timedelta(hours=3)
-                device = FCMDevice.objects.filter(user__isnull=True, created_at__range=(start_date, end_date))
-            
-            elif user_group == '2':
-                device = FCMDevice.objects.filter(user__isnull=True)
-            
-            elif user_group == '7':
-                filter_list = [1492, 20347, 1491, 1456, 1494]
-                device = FCMDevice.objects.filter(user__pk__in=filter_list)
-            else:
-                filter_list = []
-
-                if user_group == '3':
-                    filter_list = VBseen.objects.distinct('user__pk').values_list('user__pk', flat=True)
-                
-                elif user_group == '4' or user_group == '5':
-                    hours_ago = datetime.datetime.now()
-                    if user_group == '4':
-                        hours_ago -= datetime.timedelta(days=1)
-                    else:
-                        hours_ago -=  datetime.timedelta(days=2)
-
-                    filter_list = UserLogStatistics.objects.filter(session_starttime__gte=hours_ago).values_list('user', flat=True)
-                    filter_list = map(int , filter_list)
-                    
-                elif user_group == '6':
-                    filter_list = Topic.objects.filter(is_vb=True).values_list('user__pk', flat=True)
-
-                device = FCMDevice.objects.exclude(user__pk__in=filter_list).filter(**language_filter)
-
-            device.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk})
         return redirect('/jarvis/notification_panel/')
 
     if request.method == 'GET':
@@ -869,7 +818,6 @@ def send_notification(request):
         except Exception as e:
             print e
     return render(request,'jarvis/pages/notification/send_notification.html', { 'language_options': language_options, 'user_group_options' : user_group_options, 'notification_types': notification_type_options, 'pushNotification': pushNotification })
-
 
 @login_required
 def particular_notification(request, notification_id=None):
