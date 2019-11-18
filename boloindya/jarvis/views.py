@@ -807,8 +807,6 @@ def send_notification(request):
         data['datepicker'] = request.POST.get('datepicker', '')
         data['timepicker'] = request.POST.get('timepicker', '').replace(" : ", ":")
 
-        print(data.get('user_group'))
-
         send_notifications_task.delay(data, pushNotification)
 
         return redirect('/jarvis/notification_panel/')
@@ -818,7 +816,6 @@ def send_notification(request):
         try:
             pushNotification = PushNotification.objects.get(pk=id)
         except Exception as e:
-            print("asfasf")
             print e
     return render(request,'jarvis/pages/notification/send_notification.html', { 'language_options': language_options, 'user_group_options' : user_group_options, 'notification_types': notification_type_options, 'pushNotification': pushNotification })
 
