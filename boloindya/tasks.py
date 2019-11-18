@@ -61,7 +61,7 @@ def send_notifications_task(data, pushNotification):
             elif user_group == '7':
 
                 #This list contains user IDs for test users: Gitesh, Abhishek and Akash
-                filter_list = [39342, 1465, 2801]
+                filter_list = [39342, 1465, 2801, 19, 40, 328, 23, 3142, 1494]
                 device = FCMDevice.objects.filter(user__pk__in=filter_list)
             else:
                 filter_list = []
