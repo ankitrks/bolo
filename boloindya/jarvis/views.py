@@ -1241,12 +1241,15 @@ def search_notification(request):
     notification_type = raw_data['notification_type']
     data = []
     try:
-        if notification_type == '2':
-            category=Category.objects.filter(title__icontains=query) 
-            data=CategoryWithTitleSerializer(category, many=True).data
+        if notification_type == '0':
+            topics=Topic.objects.filter(is_removed=False, is_vb=True, title__icontains=query)
+            data=CategoryVideoByteSerializer(topics, many=True).data
         elif notification_type == '1':
             users=UserProfile.objects.filter((Q(user__username__icontains=query)|Q(name__icontains=query))&Q(is_test_user=False))
             data=UserWithNameSerializer(users, many=True).data
+        elif notification_type == '2':
+            category=Category.objects.filter(title__icontains=query) 
+            data=CategoryWithTitleSerializer(category, many=True).data
         elif notification_type == '3':
             challenges=TongueTwister.objects.filter(hash_tag__icontains=query)
             data=TongueTwisterWithHashSerializer(challenges, many=True).data

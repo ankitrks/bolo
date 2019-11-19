@@ -498,3 +498,8 @@ class TongueTwisterWithHashSerializer(ModelSerializer):
     class Meta:
         model = TongueTwister
         fields = ('hash_tag', 'id')
+
+class TongueWithTitleSerializer(ModelSerializer):
+    class Meta:
+        model = Topic
+        fields = ('title', 'id')
