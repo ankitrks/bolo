@@ -89,6 +89,8 @@ class Topic(models.Model):
     category = models.ForeignKey('forum_category.Category', verbose_name=_("category"), related_name="category_topics",null=True,blank=True)
     m2mcategory = models.ManyToManyField('forum_category.Category', verbose_name=_("category"), \
             related_name="m2mcategories_topics",blank=True)
+    hash_tags = models.ManyToManyField('forum_topic.TongueTwister', verbose_name=_("hash_tags"), \
+            related_name="hash_tag_topics",blank=True)
 
     title = models.CharField(_("title"), max_length=255, blank = True, null = True)
     question_audio = models.CharField(_("audio title"), max_length=255, blank = True, null = True)
@@ -397,6 +399,7 @@ class TongueTwister(models.Model):
     be_descpription = models.TextField(_("Bengali Hash Tag Description"),blank = True, null = True)
     ka_descpription = models.TextField(_("Kannada Hash Tag Description"),blank = True, null = True)
     picture = models.CharField(_("Picture URL"),max_length=255, blank=True,null=True)
+    hash_counter = models.PositiveIntegerField(default=1,null=True,blank=True)
     def __unicode__(self):
         return str(self.hash_tag)
 
