@@ -392,7 +392,7 @@ class UserFeedback(models.Model):
                 We have received a feedback from %s. Please find the details below:<br><br>
                 <b>Name:</b> %s <br>
                 <b>Feedback:</b> %s <br>
-                <b>Image:</b> %s <br>
+                <b>Image:</b> <img src="%s"> <br>
                 <b>Contact:</b> %s <br><br>
                 Thanks,<br>
                 Team BoloIndya
