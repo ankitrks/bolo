@@ -2518,17 +2518,7 @@ def get_category_with_video_bytes(request):
         if request.GET.get('is_with_popular'):
             startdate = datetime.today()
             enddate = startdate - timedelta(days=30)
-            all_seen_vb = []
-            try:
-                all_seen_vb = VBseen.objects.filter(user = request.user).values_list('topic_id',flat=True)
-            except Exception as e1:
-                all_seen_vb = []
-            topics = []
-            topic = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, is_popular=True, date__gte=enddate).order_by('-date')
-            topics_not_seen = topic.exclude(id__in=all_seen_vb)
-            topics_seen = topic.filter(id__in=all_seen_vb)
-            topics.extend(topics_not_seen)
-            topics.extend(topics_seen)
+            topics = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, is_popular=True, date__gte=enddate).order_by('-date')
             try:
                 paginator.page_size = 10
                 topics = paginator.paginate_queryset(topics, request)
@@ -2586,17 +2576,7 @@ def get_popular_video_bytes(request):
         language_id = request.GET.get('language_id', 1)
         startdate = datetime.today()
         enddate = startdate - timedelta(days=30)
-        all_seen_vb = []
-        try:
-            all_seen_vb = VBseen.objects.filter(user = request.user).values_list('topic_id',flat=True)
-        except Exception as e1:
-            all_seen_vb = []
-        topics = []
-        topic = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, is_popular=True, date__gte=enddate).order_by('-date')
-        topics_not_seen = topic.exclude(id__in=all_seen_vb)
-        topics_seen = topic.filter(id__in=all_seen_vb)
-        topics.extend(topics_not_seen)
-        topics.extend(topics_seen)
+        topics = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, is_popular=True, date__gte=enddate).order_by('-date')
         paginator_topics.page_size = 10
         topics = paginator_topics.paginate_queryset(topics, request)
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
