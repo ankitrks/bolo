@@ -47,4 +47,7 @@ urlpatterns = [
     url(r'^create_user_notification_delivered/$',views.create_user_notification_delivered, name='create_user_notification_delivered'),
     url(r'^open_notification_delivered/$',views.open_notification_delivered, name='open_notification_delivered'),   
     url(r'^remove_notification/$',views.remove_notification, name='remove_notification'),   
+
+    # api for notification search
+    url(r'^search_notification/$',views.search_notification, name='search_notification'),   
 ]

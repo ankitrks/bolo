@@ -1230,4 +1230,30 @@ def daily_vplay_data(request):
         return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)   
 
 
-
+@api_view(['POST'])
+# view for notification search
+def search_notification(request):
+    from drf_spirit.serializers import CategoryWithTitleSerializer, CategoryVideoByteSerializer, UserWithNameSerializer, TongueTwisterWithHashSerializer
+    from forum.topic.models import TongueTwister
+    from django.db.models import Q
+    raw_data = json.loads(request.body)
+    query = raw_data['query']
+    notification_type = raw_data['notification_type']
+    data = []
+    try:
+        if notification_type == '2':
+            category=Category.objects.filter(title__icontains=query) 
+            data=CategoryWithTitleSerializer(category, many=True).data
+        elif notification_type == '1':
+            users=UserProfile.objects.filter((Q(user__username__icontains=query)|Q(name__icontains=query))&Q(is_test_user=False))
+            data=UserWithNameSerializer(users, many=True).data
+        elif notification_type == '3':
+            challenges=TongueTwister.objects.filter(hash_tag__icontains=query)
+            data=TongueTwisterWithHashSerializer(challenges, many=True).data
+        else:
+            data = []
+        return JsonResponse({'data': data}, status=status.HTTP_200_OK)  
+    except Exception as e:
+        print(e)
+        return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
+    
