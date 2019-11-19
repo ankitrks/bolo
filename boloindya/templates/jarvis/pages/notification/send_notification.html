@@ -189,12 +189,19 @@
                         loading = 0;
                         $('#loading').hide();
                         $('#response').empty();
+                        if (data.data.length == 0) {
+                            $('#response').append('<li id="no_result">No results found ...</li>');
+                        }
                         for(var i=0;i<data.data.length;i++) {
                             console.log(data.data[i])
                             if(notification_type == '2' || notification_type == '0') {
                                 $('#response').append('<li onclick="addIdToField('+data.data[i].id+')">'+data.data[i].title+'</li>');
                             } else if(notification_type == '1') {
-                                $('#response').append('<li onclick="addIdToField('+data.data[i].user+')">'+data.data[i].name+'</li>');
+                                if (data.data[i].name == '') {
+                                    $('#response').append('<li onclick="addIdToField('+data.data[i].user+')">'+data.data[i].user_name+'</li>');
+                                } else {
+                                    $('#response').append('<li onclick="addIdToField('+data.data[i].user+')">'+data.data[i].name+'</li>');
+                                }
                             } else if(notification_type == '3') {
                                 $('#response').append('<li onclick="addIdToField('+data.data[i].hash_tag+')">'+data.data[i].hash_tag+'</li>');
                             } 

@@ -1245,7 +1245,7 @@ def search_notification(request):
             topics=Topic.objects.filter(is_removed=False, is_vb=True, title__icontains=query)
             data=CategoryVideoByteSerializer(topics, many=True).data
         elif notification_type == '1':
-            users=UserProfile.objects.filter((Q(user__username__icontains=query)|Q(name__icontains=query))&Q(is_test_user=False))
+            users=UserProfile.objects.filter((Q(user__username__icontains=query)|Q(name__icontains=query)|Q(mobile_no__icontains=query))&Q(is_test_user=False))
             data=UserWithNameSerializer(users, many=True).data
         elif notification_type == '2':
             category=Category.objects.filter(title__icontains=query) 
@@ -1258,5 +1258,5 @@ def search_notification(request):
         return JsonResponse({'data': data}, status=status.HTTP_200_OK)  
     except Exception as e:
         print(e)
-        return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
+        return JsonResponse({'data': []}, status=status.HTTP_200_OK)
     

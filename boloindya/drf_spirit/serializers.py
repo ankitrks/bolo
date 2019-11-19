@@ -490,9 +490,14 @@ class CategoryWithTitleSerializer(ModelSerializer):
         fields = ('title', 'id',)
 
 class UserWithNameSerializer(ModelSerializer):
+    user_name = SerializerMethodField()
+
     class Meta:
         model = UserProfile
-        fields = ('name', 'user')
+        fields = ('name', 'user', 'user_name',)
+
+    def get_user_name(self,instance):
+        return instance.user.username
 
 class TongueTwisterWithHashSerializer(ModelSerializer):
     class Meta:
