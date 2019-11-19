@@ -466,11 +466,14 @@ class CategoryWithVideoSerializer(ModelSerializer):
         language_id = 1
         if self.context.get("language_id"):
             language_id =  self.context.get("language_id")
-        topic = Topic.objects.filter(m2mcategory=instance, is_removed=False, is_vb=True, language_id=language_id)\
-            .order_by('-is_popular').order_by('-date')
-
+        topics = []
+        topic = Topic.objects.filter(m2mcategory=instance, is_removed=False, is_vb=True, language_id=language_id).order_by('-date')
+        topic_not_popular = topic.filter(is_popular=False)
+        topic_popular = topic.filter(is_popular=True)
+        topics.extend(topic_popular)
+        topics.extend(topic_not_popular)
         page_size = 10
-        paginator = Paginator(topic, page_size)
+        paginator = Paginator(topics, page_size)
         page = 1
         topic_page = paginator.page(page)
         return CategoryVideoByteSerializer(topic_page, many=True).data
