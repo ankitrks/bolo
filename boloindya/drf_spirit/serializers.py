@@ -482,3 +482,29 @@ class VideoCompleteRateSerializer(ModelSerializer):
     class Meta:
         model = VideoCompleteRate
         fields = ('videoid','user', 'playtime', 'percentage_viewed')
+
+# searializer for serach _notification
+class CategoryWithTitleSerializer(ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ('title', 'id',)
+
+class UserWithNameSerializer(ModelSerializer):
+    user_name = SerializerMethodField()
+
+    class Meta:
+        model = UserProfile
+        fields = ('name', 'user', 'user_name',)
+
+    def get_user_name(self,instance):
+        return instance.user.username
+
+class TongueTwisterWithHashSerializer(ModelSerializer):
+    class Meta:
+        model = TongueTwister
+        fields = ('hash_tag', 'id')
+
+class TongueWithTitleSerializer(ModelSerializer):
+    class Meta:
+        model = Topic
+        fields = ('title', 'id')
