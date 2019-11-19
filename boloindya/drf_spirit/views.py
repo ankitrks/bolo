@@ -2641,3 +2641,18 @@ def get_popular_bolo(request):
             return JsonResponse({'results': []}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def submit_user_feedback(request):
+    try:
+        contact_email = request.POST.get('contact_email', '')
+        description = request.POST.get('description', '')
+        feedback_image = request.POST.get('feedback_image', '')
+        if request.user.id:
+            userFeedback=UserFeedback(by_user=request.user, description=description, contact_email=contact_email, feedback_image=feedback_image)
+            userFeedback.save()
+            return JsonResponse({'message': 'saved feedback'}, status=status.HTTP_200_OK)
+        return JsonResponse({'message': 'invalid user'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
