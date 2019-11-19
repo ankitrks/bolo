@@ -341,6 +341,22 @@ def comment_likes(request):
 def index(request):
     return render(request, 'spirit/topic/_home.html')
 
+def video_discover(request):
+    return render(request, 'spirit/topic/video_discover.html')
+
+def video_details(request,username='',slug='',id=''):
+    # topics = Topic.objects.get(id = pk)
+    # try:
+    #     user_profile = UserProfile.objects.get(user = request.user)
+    # except:
+    #     user_profile = None
+    context = {
+        'topic': "",
+        'is_single_topic': "",
+        'user_profile': ""
+    }
+    return render(request, 'spirit/topic/video_details.html', context)
+
 def new_home(request):
     return render(request, 'spirit/topic/new_landing.html')
     #return render(request, 'spirit/topic/temporary_landing.html')
@@ -359,7 +375,10 @@ def robotstext(request):
     return render(request, 'spirit/topic/robots.txt') 
 
 def sitemapxml(request):
-    return render(request, 'spirit/topic/sitemap.xml')       
+    return render(request, 'spirit/topic/sitemap.xml') 
+
+def video_status(request):
+    return  '{"success":"true"}';      
 
 # Share Pages Match 
 def share_match_page(request, match_id, slug):

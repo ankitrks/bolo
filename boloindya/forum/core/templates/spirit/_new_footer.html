@@ -3,9 +3,9 @@
                 <div class="jsx-1541511338 download-content download-link">
                     <h2 class="jsx-1541511338">Download</h2>
                     <div class="jsx-1541511338 download-wrapper">
-                        <a href="#" target="_blank" rel="nofollow"><img src="media/apple_store.png" alt="apple-store" class="jsx-1541511338"></a>
-                        <a href="#" target="_blank" rel="nofollow"><img src="media/google_store.png" alt="google-store" class="jsx-1541511338"></a>
-                        <a href="#" target="_blank" rel="nofollow"><img src="media/amazon_store.png" alt="amazon-store" class="jsx-1541511338"></a>
+                        <a href="#" target="_blank" rel="nofollow"><img src="/media/apple_store.png" alt="apple-store" class="jsx-1541511338"></a>
+                        <a href="#" target="_blank" rel="nofollow"><img src="/media/google_store.png" alt="google-store" class="jsx-1541511338"></a>
+                        <a href="#" target="_blank" rel="nofollow"><img src="/media/amazon_store.png" alt="amazon-store" class="jsx-1541511338"></a>
                     </div>
                 </div>
             </div>
@@ -391,9 +391,43 @@ var feedData={
 </script>
 
 <script type="text/javascript">
+  var platlistItems;
+  (function() {
+
+
+$.get('http://127.0.0.1:8000/api/v1/get_popular_video_bytes/?page=1', function (data, textStatus, jqXHR) {
+    console.log(data);
+});
+
+    // var httpRequest = new XMLHttpRequest();
+    // if (!httpRequest) {
+    //   return false;
+    // }
+    // httpRequest.onreadystatechange = function() {
+    //   if (httpRequest.readyState === XMLHttpRequest.DONE) {
+    //     if (httpRequest.status === 200) {debugger;
+    //       //var json = JSON.parse(httpRequest.response);
+    //       console.log(httpRequest.response);
+    //       var json = JSON.parse(jsonRespons);
+    //       playList=json;
+
+          
+    //     } else {
+    //       console.log(httpRequest.statusText);
+    //     }
+    //   }
+    // }
+    // var URL='https//www.boloindya.com/api/v1/get_popular_video_bytes/?page=1';
+    // httpRequest.open('GET', URL);
+    // httpRequest.send();
+  })();
+
 (function() {
   var listItems="";
   var itemCount=0;
+
+
+  
 
     playList.forEach(function(itemVideo) {itemCount++;
       var isPlaying="";
@@ -430,9 +464,14 @@ $("figure").mouseleave(
 
 <script type="text/javascript">
   
+$(document).ready(function() {
+  loaderHide();
+    //DOM manipulation code
 
+});
 
 </script>
+
 
 <script type="text/javascript">
 
@@ -579,7 +618,7 @@ $("#jwBox").click(function(){
           $('.videoPlayButton').addClass('_video_card_playbtn_wraaper');
           
       }else{
-        var newSrc='media/mute_icon.svg';
+        var newSrc='/media/mute_icon.svg';
         $('#mutedImageId').attr('src', newSrc);
         jwplayer('player').play(true);
         jwplayer('player').setMute(false);
@@ -589,7 +628,7 @@ $("#jwBox").click(function(){
 });
 
 $('.videoPlayButton').click(function(){debugger;
-      var newSrc='media/mute_icon.svg';
+      var newSrc='/media/mute_icon.svg';
       $('#mutedImageId').attr('src', newSrc);
       $('.videoPlayButton').removeClass('_video_card_playbtn_wraaper');
       jwplayer('player').setMute(false);
@@ -597,27 +636,57 @@ $('.videoPlayButton').click(function(){debugger;
 });
 
  var player;
- function openVideoInPopup(file,image){
+ var playerInstance = jwplayer("player");
+ $(document).ready(function() {
+    playerInstance.play();
+    //DOM manipulation code
 
+});
+
+function loaderShow(){
+    $(".LoaderBalls").show();
+ }
+function loaderHide(){
+    $(".LoaderBalls").hide();
+ }
+
+ function openVideoInPopup(file,image){
+  loaderShow();
   $("#modelPopup").show();
   jwplayer('player').setMute(false);
-  var newSrc='media/mute_icon.svg';
+  var newSrc='/media/mute_icon.svg';
   $('#mutedImageId').attr('src', newSrc);
   $('.videoPlayButton').removeClass('_video_card_playbtn_wraaper');
 
-    if (player) {
-      player.remove();
-    }
+      var preBufferDone = false;
+      
+        playerInstance.setup({
+          file: file,
+          controls: false,
+          image:image,
+          autostart:'true',
+          mute:'false'
+      });
+      playerInstance.on('play', function() {
+            loaderHide();
+            preBufferDone = true;
+          
+      }); 
 
-    // Chain .play() onto player setup (rather than autostart: true)
-    player = jwplayer('player').setup({
-      file: file,
-      controls: false,
-      image:image
-    }).play();
+    playerInstance.on('buffer', function() {
 
-    // Destroy the player and replace with thumbnail
-    player.on('complete', function() {
+      var time = 1;
+
+    });   
+
+
+ playerInstance.on('error', function(event) {
+    loaderHide();
+    var erroCode=event.code;
+
+});
+
+    playerInstance.on('complete', function() {
     jwplayer('player').setMute(true);
     $("#modelPopup").hide();
       player.remove();
@@ -627,8 +696,81 @@ $('.videoPlayButton').click(function(){debugger;
 
  }
 
+  function VideoPlayByURL(file,image){
+  loaderShow();
+ var playerInstanceDe = jwplayer("playerDetails");
+  jwplayer('playerDetails').setMute(false);
+  var newSrc='/media/mute_icon.svg';
+  $('#mutedImageId').attr('src', newSrc);
+  $('.videoPlayButton').removeClass('_video_card_playbtn_wraaper');
+
+      var preBufferDone = false;
+      
+        playerInstanceDe.setup({
+          file: file,
+          controls: false,
+          repeat:'true',
+          image:image,
+          preload: 'metadata',
+          autostart:'true',
+          primary: "html5",
+          mute:'false'
+      });
+      playerInstanceDe.on('playerDetails', function() {
+            loaderHide();
+            preBufferDone = true;
+          
+      }); 
+
+    playerInstanceDe.on('buffer', function() {
+
+      var time = 1;
+
+    });   
 
 
+ playerInstanceDe.on('error', function(event) {
+    loaderHide();
+    var erroCode=event.code;
+
+});
+
+    playerInstanceDe.on('complete', function() {
+    jwplayer('playerDetails').setMute(true);
+
+      playerInstanceDe.remove();
+      playerInstanceDe = null;
+    });
+
+
+ }
+
+
+$(".event-delegate-mask").click(function(){debugger;
+  var plaerState=jwplayer('playerDetails').getState();
+
+  if( jwplayer('playerDetails').getState() == "playing" || jwplayer('playerDetails').getState() == "buffering" ) {
+          jwplayer('playerDetails').pause();
+          $('.videoPlayButtonDetails').removeClass('play-button');
+          $('.videoPlayButtonDetails').addClass('play-button');
+          
+      }else{
+        var newSrc='/media/mute_icon.svg';
+        $('#mutedImageId').attr('src', newSrc);
+        jwplayer('playerDetails').play(true);
+        jwplayer('playerDetails').setMute(false);
+        $('.videoPlayButtonDetails').removeClass('play-button');
+      }
+  
+});
+
+$('.videoPlayButtonDetails').click(function(){debugger;
+      var newSrc='/media/mute_icon.svg';
+      $('#mutedImageIdDe').attr('src', newSrc);
+      $('.videoPlayButtonDetails').removeClass('play-button');
+      jwplayer('playerDetails').setMute(false);
+      jwplayer('playerDetails').play(true);
+});
 
  $("._global_modal_cancel").click(function(){
   jwplayer('player').setMute(true);
@@ -643,12 +785,31 @@ function muteAndUnmutePlayer(){
   jwplayer().setMute();
   var muteStatus=jwplayer('player').getMute();
   if(muteStatus==true){
-    var newSrc='media/sound_mute.svg';
+    var newSrc='/media/sound_mute.svg';
     $('#mutedImageId').attr('src', newSrc);
   }else{
-    var newSrc='media/mute_icon.svg';
+    var newSrc='/media/mute_icon.svg';
     $('#mutedImageId').attr('src', newSrc);
   }
+
+}
+function muteAndUnmutePlayerDet(){debugger;
+  var muteStatus=jwplayer('playerDetails').getMute();
+  if(muteStatus==true){
+    var newSrc='/media/sound_mute.svg';
+    $('#mutedImageIdDe').attr('src', newSrc);
+  }else{
+    var newSrc='/media/mute_icon.svg';
+    $('#mutedImageIdDe').attr('src', newSrc);
+  }
+
+}
+
+function copyShareLink() {
+  var copyText = document.getElementById("shareInputbox");
+  copyText.select();
+  copyText.setSelectionRange(0, 99999)
+  document.execCommand("copy");
 
 }
 
