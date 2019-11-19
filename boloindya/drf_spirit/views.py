@@ -1,53 +1,62 @@
  # -*- coding: utf-8 -*-
+import os
+import ast
+import time
+import json
+import boto3
+import random
+import urllib2
+import itertools
+from random import shuffle
+from collections import OrderedDict
+from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
+
 from django.http import JsonResponse
 from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.files.base import ContentFile
+from django.db.models import F,Q
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from django.db.models import Sum
+from django.http import HttpResponseRedirect
+from django.forms.models import model_to_dict
+from datetime import datetime,timedelta,date
+from django.db.models.signals import post_save
+from django.views.decorators.csrf import csrf_exempt
+from django.core.paginator import Paginator
 
 from rest_framework import status
-from rest_framework.decorators import api_view
 from rest_framework import generics
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
 from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
-from django_filters.rest_framework import DjangoFilterBackend
-from django.core.files.base import ContentFile
 from rest_framework.generics import GenericAPIView
-
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
 from .models import UserJarvisDump, UserLogStatistics, UserFeedback
 from .permissions import IsOwnerOrReadOnly
-from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,AppVersionSerializer,UserSerializer,SingleTopicSerializerwithComment,\
-UserAnswerSerializerwithComment,CricketMatchSerializer,PollSerializer,ChoiceSerializer,VotingSerializer,LeaderboardSerializer,\
-PollSerializerwithChoice, OnlyChoiceSerializer, NotificationSerializer, UserProfileSerializer, TongueTwisterSerializer,KYCDocumnetsTypeSerializer,\
-PaymentCycleSerializer,EncashableDetailSerializer,PaymentInfoSerializer,UserKYCSerializer, CategoryWithVideoSerializer, CategoryVideoByteSerializer
-from forum.topic.models import Topic,ShareTopic,Like,SocialShare,Notification,CricketMatch,Poll,Choice,Voting,Leaderboard,VBseen,TongueTwister
+from .utils import get_weight, add_bolo_score, shorcountertopic, calculate_encashable_details
+
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 from forum.category.models import Category
 from forum.comment.models import Comment
 from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs
 from jarvis.models import FCMDevice
-from django.db.models import F,Q
-from rest_framework_simplejwt.tokens import RefreshToken
-from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
-import boto3
-import time
-import random
-import os
-from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
-from datetime import datetime,timedelta,date
-import json
-from .utils import get_weight,add_bolo_score,shorcountertopic,calculate_encashable_details
-from django.db.models import Sum
-import itertools
-import json
-import urllib2
-from django.http import HttpResponseRedirect
-from django.forms.models import model_to_dict
-import ast
+from forum.topic.models import Topic, ShareTopic, Like, SocialShare, Notification, CricketMatch, Poll, Choice, Voting, \
+    Leaderboard, VBseen, TongueTwister
+from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer, TopicSerializerwithComment, \
+    AppVersionSerializer, UserSerializer, SingleTopicSerializerwithComment, UserAnswerSerializerwithComment, \
+    CricketMatchSerializer, PollSerializer, ChoiceSerializer, VotingSerializer, LeaderboardSerializer, PollSerializerwithChoice, \
+    OnlyChoiceSerializer, NotificationSerializer, UserProfileSerializer, TongueTwisterSerializer,KYCDocumnetsTypeSerializer, \
+    PaymentCycleSerializer, EncashableDetailSerializer, PaymentInfoSerializer, UserKYCSerializer, CategoryWithVideoSerializer, \
+    CategoryVideoByteSerializer
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -56,9 +65,6 @@ def get_tokens_for_user(user):
         'refresh': str(refresh),
         'access': str(refresh.access_token),
     }
-from random import shuffle
-from rest_framework.response import Response
-from collections import OrderedDict
 
 class ShufflePagination(LimitOffsetPagination):
 
@@ -2228,8 +2234,7 @@ class LeaderBoradList(generics.ListCreateAPIView):
         #     for each in leaderboard_list_2:
         #         leaderboard.append(each)
         # return leaderboard
-from django.db.models.signals import post_save
-from django.views.decorators.csrf import csrf_exempt
+
 @csrf_exempt
 def transcoder_notification(request):
     # if request.POST:
@@ -2542,7 +2547,7 @@ def get_category_detail_with_views(request):
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
-from django.core.paginator import Paginator
+
 
 @api_view(['POST'])
 def get_category_video_bytes(request):
@@ -2654,9 +2659,15 @@ def submit_user_feedback(request):
         description = request.POST.get('description', '')
         feedback_image = request.POST.get('feedback_image', '')
         if request.user.id:
-            userFeedback=UserFeedback(by_user=request.user, description=description, contact_email=contact_email, feedback_image=feedback_image)
-            userFeedback.save()
+            user_feedback = UserFeedback(by_user=request.user, description=description, contact_email=contact_email, \
+                        feedback_image=feedback_image)
+            user_feedback.save()
+            user_feedback.send_feedback_email()
             return JsonResponse({'message': 'saved feedback'}, status=status.HTTP_200_OK)
         return JsonResponse({'message': 'invalid user'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+

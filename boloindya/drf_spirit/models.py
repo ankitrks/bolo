@@ -1,9 +1,12 @@
+import os
+import json
+import requests
+
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+
 from forum.core.conf import settings
-import os
-import json
 
 class SingUpOTP(models.Model):
     mobile_no = models.CharField(_("title"), max_length=75)
@@ -376,8 +379,57 @@ class HardwareData(models.Model):
 
 # class related to user feedback
 class UserFeedback(models.Model):
-    by_user = models.ForeignKey('auth.User', blank = True, null = True)
-    created_at=models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False)
-    contact_email=models.CharField(_("contact_email"), max_length=30)
-    description=models.TextField(null = True, blank = True)
-    feedback_image=models.CharField(_("feedback_image"), max_length=255)
+    by_user = models.ForeignKey('auth.User', blank = True, null = True, editable = False)
+    created_at = models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False)
+    contact_email = models.CharField(_("contact_email"), max_length=30)
+    description = models.TextField(null = True, blank = True)
+    feedback_image = models.CharField(_("feedback_image"), max_length=255)
+
+    def send_feedback_email(self):
+        try:
+            content_email = """
+                Hello, <br><br>
+                We have received a feedback from %s. Please find the details below:<br><br>
+                <b>Name:</b> %s <br>
+                <b>Feedback:</b> %s <br>
+                <b>Image:</b> %s <br>
+                <b>Contact:</b> %s <br><br>
+                Thanks,<br>
+                Team BoloIndya
+                """ %(self.user_name(), self.user_name(), self.description, \
+                        self.feedback_image, self.user_contact())
+            requests.post(
+                "https://api.mailgun.net/v3/mail.careeranna.com/messages",
+                auth=("api", "d6c66f5dd85b4451bbcbd94cb7406f92-bbbc8336-97426998"),
+                data={"from": "BoloIndya Feedback <feedback@mail.careeranna.com>",
+                      "to": ["anshika@careeranna.com", "varun@careeranna.com", "maaz@careeranna.com", \
+                            "ankit@careeranna.com", "bhoomika@careeranna.com"],
+                      "subject": "BoloIndya Feedback Received | " + self.user_name() + ' | ' + self.user_contact(),
+                      "html": content_email
+                }
+            )
+        except:
+            pass
+        return True
+
+    def user_contact(self):
+        try:
+            if self.by_user and self.by_user.st and self.by_user.st.mobile_no:
+                return self.by_user.st.mobile_no
+            else:
+                return self.contact_email
+        except Exception as e:
+            print e
+            return self.contact_email
+
+    def user_name(self):
+        try:
+            if self.by_user and self.by_user.st and self.by_user.st.name:
+                return self.by_user.st.name
+            else:
+                return self.by_user.username
+        except Exception as e:
+            print e
+            return self.by_user.username
+
+

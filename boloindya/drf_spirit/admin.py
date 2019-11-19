@@ -6,7 +6,7 @@ from import_export.admin import ImportExportModelAdmin,ExportMixin
 from import_export import resources
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 from .models import UserFollowUnfollowDetails, UserVideoTypeDetails, VideoDetails, UserEntryPoint, UserViewedFollowersFollowing, UserInterest, VideoSharedDetails, UserSearch, UserLogStatistics
-
+from django.contrib.auth.models import User
 
 class UserProfileResource(resources.ModelResource):
 	class Meta:
@@ -56,8 +56,12 @@ class AndroidLogsAdmin(admin.ModelAdmin):
 	search_fields = ('user', )
 
 class UserFeedbackAdmin(admin.ModelAdmin):
-	list_display = ('by_user', 'created_at', 'contact_email', 'feedback_image')
+	list_display = ('by_user', 'created_at', 'contact_email', 'feedback_image', 'user_contact')
 	search_fields = ('by_user', 'contact_email')
+
+	# def render_change_form(self, request, context, *args, **kwargs):
+	# 	context['adminform'].form.fields['by_user'].queryset = User.objects.filter(st__is_test_user = False)
+	# 	return super(UserFeedbackAdmin, self).render_change_form(request, context, *args, **kwargs)
 
 admin.site.register(AppVersion)
 admin.site.register(AndroidLogs, AndroidLogsAdmin)
