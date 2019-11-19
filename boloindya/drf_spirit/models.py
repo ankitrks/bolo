@@ -398,7 +398,7 @@ class UserFeedback(models.Model):
                 Thanks,<br>
                 Team BoloIndya
                 """ %(self.user_name(), self.user_name(), self.description, \
-                        self.feedback_image, self.user_contact())
+                        self.user_contact(), self.feedback_image)
             requests.post(
                 "https://api.mailgun.net/v3/mail.careeranna.com/messages",
                 auth=("api", "d6c66f5dd85b4451bbcbd94cb7406f92-bbbc8336-97426998"),
