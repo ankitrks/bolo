@@ -193,7 +193,6 @@
                             $('#response').append('<li id="no_result">No results found ...</li>');
                         }
                         for(var i=0;i<data.data.length;i++) {
-                            console.log(data.data[i])
                             if(notification_type == '2' || notification_type == '0') {
                                 $('#response').append('<li onclick="addIdToField('+data.data[i].id+')">'+data.data[i].title+'</li>');
                             } else if(notification_type == '1') {
@@ -203,7 +202,7 @@
                                     $('#response').append('<li onclick="addIdToField('+data.data[i].user+')">'+data.data[i].name+'</li>');
                                 }
                             } else if(notification_type == '3') {
-                                $('#response').append('<li onclick="addIdToField('+data.data[i].hash_tag+')">'+data.data[i].hash_tag+'</li>');
+                                $('#response').append('<li onclick="addIdToField(\''+data.data[i].hash_tag+'\')">'+data.data[i].hash_tag+'</li>');
                             } 
                         }
                     }
@@ -255,7 +254,8 @@
         var lang =  $('#lang :selected').text()
         var notification_type = $('#notification_type :selected').text()
         var user_group = $('#user_group :selected').text()
-        
+        id = $('#search_id').val();
+
         if (upper_title  == '') {
             $('#error_message').show()
             $('#message').text('Please Enter Title')
@@ -273,15 +273,28 @@
             $('#message').text('Please Select Notification Type')
             return false;
         } else if (user_group  == 'User Group') {
-            $('#error_message').show()
-            $('#message').text('Please Select User Group')
+            $('#error_message').show();
+            $('#message').text('Please Select User Group');
             return false;
-        } 
+        } else if (notification_type != 'Announcements') {
+            if (id == '') {
+                $('#error_message').show();
+                $('#message').text('Please Enter Id / Hash');
+                return false;
+            }
+            if (notification_type != 'hashtag') {
+                if (isNaN(id)) {
+                    $('#error_message').show();
+                    $('#message').text('Please Enter Id');
+                    return false;
+                }
+            }
+        }
     });
 
     function addIdToField(id) {
         clearResponse();
-        $('#search_id').val(id)
+        $('#search_id').val(String(id));
     }
 
     function clearResponse() {
