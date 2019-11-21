@@ -459,7 +459,7 @@ class CategoryWithVideoSerializer(ModelSerializer):
     class Meta:
         model = Category
         # fields = '__all__'
-        exclude = ('is_engagement','reindex_at', 'is_global', 'is_closed', 'is_removed', 'is_private', 'is_engagement' )
+        exclude = ('reindex_at', 'is_global', 'is_closed', 'is_removed', 'is_private', 'is_engagement' )
 
     def get_total_view(self, instance):
         return shorcountertopic(instance.view_count)
