@@ -18,7 +18,8 @@ cloufront_url = "https://d1fa4tg1fvr6nj.cloudfront.net"
 class CategorySerializer(ModelSerializer):
     class Meta:
         model = Category
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('is_engagement','reindex_at', 'is_global', 'is_closed', 'is_removed', 'is_private', 'is_engagement' )
 
 class AppVersionSerializer(ModelSerializer):
     class Meta:
@@ -457,7 +458,8 @@ class CategoryWithVideoSerializer(ModelSerializer):
 
     class Meta:
         model = Category
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('is_engagement','reindex_at', 'is_global', 'is_closed', 'is_removed', 'is_private', 'is_engagement' )
 
     def get_total_view(self, instance):
         return shorcountertopic(instance.view_count)
