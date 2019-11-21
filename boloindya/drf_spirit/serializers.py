@@ -85,7 +85,8 @@ class CommentSerializer(ModelSerializer):
     date = SerializerMethodField()
     class Meta:
         model = Comment
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('action', 'is_removed', 'is_modified', 'ip_address', 'is_media', 'is_audio', 'media_duration', 'thumbnail', )
 
     def get_user(self,instance):
         return UserSerializer(instance.user).data
@@ -264,7 +265,7 @@ class UserSerializer(ModelSerializer):
     class Meta:
         model = User
         #fields = '__all__'
-        exclude = ('password', )
+        exclude = ('password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login')
     def get_userprofile(self,instance):
         return UserProfileSerializer(UserProfile.objects.get(user=instance)).data
 
