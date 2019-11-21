@@ -421,7 +421,7 @@ class CategoryVideoByteSerializer(ModelSerializer):
     class Meta:
         model = Topic
         #fields = '__all__'
-        exclude = ('transcode_dump','transcode_status_dump' )
+        exclude = ('transcode_dump','transcode_status_dump', 'is_transcoded_error', 'transcode_job_id', 'is_transcoded', 'is_removed', 'is_closed', 'is_globally_pinned', 'is_pinned', 'last_commented', 'reindex_at', 'last_active' )
         # TODO:: refactor after deciding about globally pinned.
         read_only_fields = ('is_pinned',)
 
