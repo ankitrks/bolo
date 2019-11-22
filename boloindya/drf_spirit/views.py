@@ -2603,6 +2603,9 @@ def get_recent_videos(request):
     try:
         paginator_topics = PageNumberPagination()
         language_id = request.GET.get('language_id', 1)
+        paginator_topics.page_size = 10
+        if request.GET.get('page', 1) == '1':
+            paginator_topics.page_size = 2
         all_seen_vb = []
         try:
             all_seen_vb = VBseen.objects.filter(user = request.user).values_list('topic_id',flat=True)
@@ -2614,7 +2617,6 @@ def get_recent_videos(request):
         topics_seen = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, m2mcategory=category, id__in=all_seen_vb).order_by('-date')
         topics.extend(topics_not_seen)
         topics.extend(topics_seen)
-        paginator_topics.page_size = 10
         topics = paginator_topics.paginate_queryset(topics, request)
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
     except Exception as e:
