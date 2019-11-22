@@ -2662,9 +2662,7 @@ def submit_user_feedback(request):
 @api_view(['POST'])
 def get_landing_page_video(request):
     try:
-        paginator_topics = PageNumberPagination()
-        language_id = request.GET.get('language_id', 1)
-        paginator_topics.page_size = 10
+        language_id = request.POST.get('language_id', 1)
         startdate = datetime.today()
         enddate = startdate - timedelta(days=30)
         topics = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, is_popular=True, date__gte=enddate).order_by('-date')[0:2]
