@@ -2574,6 +2574,8 @@ def get_popular_video_bytes(request):
     try:
         paginator_topics = PageNumberPagination()
         language_id = request.GET.get('language_id', 1)
+        if request.GET.get('page', 1) == '1':
+            paginator_topics.page_size = 2
         startdate = datetime.today()
         enddate = startdate - timedelta(days=30)
         topics = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, is_popular=True, date__gte=enddate).order_by('-date')
@@ -2604,8 +2606,6 @@ def get_recent_videos(request):
         paginator_topics = PageNumberPagination()
         language_id = request.GET.get('language_id', 1)
         paginator_topics.page_size = 10
-        if request.GET.get('page', 1) == '1':
-            paginator_topics.page_size = 2
         all_seen_vb = []
         try:
             all_seen_vb = VBseen.objects.filter(user = request.user).values_list('topic_id',flat=True)
