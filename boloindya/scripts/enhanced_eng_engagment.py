@@ -88,7 +88,7 @@ def run():
             if user_want_vbseen:
                 set_list1 = set(tuple(sorted(d.items())) for d in user_want_vbseen)
                 set_list2 = set(tuple(sorted(d.items())) for d in already_vbseen)
-                set_difference = set_list1.symmetric_difference(set_list2)
+                set_difference = set_list1.difference(set_list2)
                 for tuple_element in set_difference:
                     new_vb_seen.append(dict((x, y) for x, y in tuple_element))
             if new_vb_seen:
@@ -102,7 +102,7 @@ def run():
                     del each['id']
                 set_list1 = set(tuple(sorted(d.items())) for d in already_vbseen)
                 set_list2 = set(tuple(sorted(d.items())) for d in bolo_history)
-                set_difference = set_list1.symmetric_difference(set_list2)
+                set_difference = set_list1.difference(set_list2)
                 for tuple_element in set_difference:
                     to_be_created_bolo.append(dict((x, y) for x, y in tuple_element))
                 print "After: bolo_score_processing",datetime.now()
@@ -239,7 +239,7 @@ def check_like(topic_id,user_ids):
             vb_like_type = ContentType.objects.get(app_label='forum_topic', model='like')
             set_list1 = set(tuple(sorted(d.items())) for d in user_want_like)
             set_list2 = set(tuple(sorted(d.items())) for d in already_like)
-            set_difference = set_list1.symmetric_difference(set_list2)
+            set_difference = set_list1.difference(set_list2)
             for tuple_element in set_difference:
                 new_vb_like.append(dict((x, y) for x, y in tuple_element))
             if new_vb_like:
@@ -256,7 +256,7 @@ def check_like(topic_id,user_ids):
                     del each['id']
                 set_list1 = set(tuple(sorted(d.items())) for d in already_liked)
                 set_list2 = set(tuple(sorted(d.items())) for d in bolo_history)
-                set_difference = set_list1.symmetric_difference(set_list2)
+                set_difference = set_list1.difference(set_list2)
                 for tuple_element in set_difference:
                     to_be_created_bolo.append(dict((x, y) for x, y in tuple_element))
                 action = get_weight_object('liked')
