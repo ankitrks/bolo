@@ -29,7 +29,7 @@ def run():
     for each_seen_id in last_n_days_post_ids:
         try:
             each_seen = Topic.objects.get(pk=each_seen_id)
-            already_vbseen = VBseen.objects.filter(topic_id = each_seen_id).values('user_id','topic_id')
+            already_vbseen = list(VBseen.objects.filter(topic_id = each_seen_id).values('user_id','topic_id'))
             # print already_vbseen,len(already_vbseen)
             user_want_vbseen =[]
             new_vb_seen = []
@@ -86,25 +86,29 @@ def run():
             this_topic.view_count = F('view_count')+number_seen
             this_topic.save()
             if user_want_vbseen:
-                set_list1 = set(tuple(sorted(d.items())) for d in user_want_vbseen)
-                set_list2 = set(tuple(sorted(d.items())) for d in already_vbseen)
-                set_difference=[d for d in set_list1 if not d in set_list2]
-                for tuple_element in set_difference:
-                    new_vb_seen.append(dict((x, y) for x, y in tuple_element))
+                # set_list1 = set(tuple(sorted(d.items())) for d in user_want_vbseen)
+                # set_list2 = set(tuple(sorted(d.items())) for d in already_vbseen)
+                # # set_difference1 = set_list1.symmetric_difference(set_list2)
+                # for tuple_element in set_difference1:
+                #     new_vb_seen.append(dict((x, y) for x, y in tuple_element))
+                new_vb_seen = get_list_dict_diff(user_want_vbseen,already_vbseen)
+                # pri nt len(new_vb_seen),"len(new_vb_seen)"
             if new_vb_seen:
                 print "Before: bolo_score_processing",datetime.now()
                 score = get_weight('vb_view')
                 vb_seen_type = ContentType.objects.get(app_label='forum_topic', model='vbseen')
-                already_vbseen = VBseen.objects.filter(topic_id = each_seen_id).values('user_id','id').distinct('user_id')
-                bolo_history = BoloActionHistory.objects.filter(action_object_type = vb_seen_type).values('user_id','action_object_id').distinct('action_object_id')
+                already_vbseen = list(VBseen.objects.filter(topic_id = each_seen_id).values('user_id','id').distinct('user_id'))
+                bolo_history = list(BoloActionHistory.objects.filter(action_object_type = vb_seen_type).values('user_id','action_object_id').distinct('action_object_id'))
                 for each in already_vbseen:
                     each['action_object_id'] = each['id']
                     del each['id']
-                set_list1 = set(tuple(sorted(d.items())) for d in already_vbseen)
-                set_list2 = set(tuple(sorted(d.items())) for d in bolo_history)
-                set_difference=[d for d in set_list1 if not d in set_list2]
-                for tuple_element in set_difference:
-                    to_be_created_bolo.append(dict((x, y) for x, y in tuple_element))
+                # set_list3 = set(tuple(sorted(d.items())) for d in already_vbseen)
+                # set_list4 = set(tuple(sorted(d.items())) for d in bolo_history)
+                # # set_difference2 = set_list3.symmetric_difference(set_list4)
+                # for tuple_element in set_difference2:
+                #     to_be_created_bolo.append(dict((x, y) for x, y in tuple_element))
+                to_be_created_bolo = get_list_dict_diff(already_vbseen,bolo_history)
+                # print len(to_be_created_bolo),"len(to_be_created_bolo)"
                 print "After: bolo_score_processing",datetime.now()
                 if to_be_created_bolo:
                     
@@ -198,7 +202,7 @@ def run():
 def check_like(topic_id,user_ids):
     now = datetime.now()
     each_like = Topic.objects.get(pk=topic_id)
-    already_like = Like.objects.filter(topic_id = topic_id).values('user_id','topic_id')
+    already_like = list(Like.objects.filter(topic_id = topic_id).values('user_id','topic_id'))
     user_want_like=[]
     new_vb_like =[]
     to_be_created_bolo=[]
@@ -237,12 +241,13 @@ def check_like(topic_id,user_ids):
         if user_want_like:
             score = get_weight('liked')
             vb_like_type = ContentType.objects.get(app_label='forum_topic', model='like')
-            set_list1 = set(tuple(sorted(d.items())) for d in user_want_like)
-            set_list2 = set(tuple(sorted(d.items())) for d in already_like)
-            set_difference=[d for d in set_list1 if not d in set_list2]
-            # set_difference=[d for d in set_list1 if not d in set_list2]
-            for tuple_element in set_difference:
-                new_vb_like.append(dict((x, y) for x, y in tuple_element))
+            # set_list5 = set(tuple(sorted(d.items())) for d in user_want_like)
+            # set_list6 = set(tuple(sorted(d.items())) for d in already_like)
+            # set_difference3 = set_list5.symmetric_difference(set_list6)
+            # for tuple_element in set_difference3:
+            #     new_vb_like.append(dict((x, y) for x, y in tuple_element))
+            new_vb_like = get_list_dict_diff(user_want_like,already_like)
+            # print len(new_vb_like),"len(new_vb_like)"
             if new_vb_like:
                 aList = [Like(**vals) for vals in new_vb_like]
                 newly_created = Like.objects.bulk_create(aList)
@@ -250,16 +255,18 @@ def check_like(topic_id,user_ids):
                 each_like.save()
                 bolo_increment_user_id = [x['user_id'] for x in new_vb_like]
                 bolo_increment_user = UserProfile.objects.filter(user_id__in = bolo_increment_user_id ).update(bolo_score =F('bolo_score')+score,like_count = F('like_count')+1)
-                already_liked = Like.objects.filter(topic_id = topic_id).values('user_id','id').distinct('user_id')
-                bolo_history = BoloActionHistory.objects.filter(action_object_type = vb_like_type).values('user_id','action_object_id').distinct('action_object_id')
+                already_liked = list(Like.objects.filter(topic_id = topic_id).values('user_id','id').distinct('user_id'))
+                bolo_history = list(BoloActionHistory.objects.filter(action_object_type = vb_like_type).values('user_id','action_object_id').distinct('action_object_id'))
                 for each in already_liked:
                     each['action_object_id'] = each['id']
                     del each['id']
-                set_list1 = set(tuple(sorted(d.items())) for d in already_liked)
-                set_list2 = set(tuple(sorted(d.items())) for d in bolo_history)
-                set_difference=[d for d in set_list1 if not d in set_list2]
-                for tuple_element in set_difference:
-                    to_be_created_bolo.append(dict((x, y) for x, y in tuple_element))
+                # set_list7 = set(tuple(sorted(d.items())) for d in already_liked)
+                # set_list8 = set(tuple(sorted(d.items())) for d in bolo_history)
+                # set_difference4 = set_list7.symmetric_difference(set_list8)
+                # for tuple_element in set_difference4:
+                #     to_be_created_bolo.append(dict((x, y) for x, y in tuple_element))
+                to_be_created_bolo = get_list_dict_diff(already_liked,bolo_history)
+                # print len(to_be_created_bolo),"len(to_be_created_bolo)"
                 action = get_weight_object('liked')
                 notific_dic = copy.deepcopy(to_be_created_bolo)
                 for each_bolo in to_be_created_bolo:
@@ -460,3 +467,13 @@ def add_bolo_score(user_id, feature, action_object):
         #     notification_type = '8'
         notify_owner = Notification.objects.create(for_user_id = user_id ,topic = action_object, \
                 notification_type=notification_type, user_id = user_id)
+
+def get_list_dict_diff(list1,list2):
+    final_list=[]
+    if not list1 or not list2:
+        return list1
+    else:
+        for each in list1:
+            if not each in list2:
+                final_list.append(each)
+    return final_list
