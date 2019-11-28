@@ -104,9 +104,9 @@ def run():
                 print "Before: bolo_score_processing",datetime.now()
                 score = get_weight('vb_view')
                 vb_seen_type = ContentType.objects.get(app_label='forum_topic', model='vbseen')
-                already_vbseen = list(VBseen.objects.filter(topic_id = each_seen_id).values('user_id','id').distinct('user_id'))
-                filter_bolo_vbseen = [d['id'] for d in already_vbseen]
-                bolo_history = list(BoloActionHistory.objects.filter(action_object_type = vb_seen_type,action_object_id__in=filter_bolo_vbseen).values('user_id','action_object_id').distinct('action_object_id'))
+                already_vbseen = list(VBseen.objects.filter(topic_id = each_seen_id,user_id__in=[d['user_id'] for d in new_vb_seen]).values('user_id','id'))
+                # filter_bolo_vbseen = [d['id'] for d in already_vbseen]
+                # bolo_history = list(BoloActionHistory.objects.filter(action_object_type = vb_seen_type,action_object_id__in=filter_bolo_vbseen).values('user_id','action_object_id').distinct('action_object_id'))
                 for each in already_vbseen:
                     each['action_object_id'] = each['id']
                     del each['id']
@@ -116,10 +116,11 @@ def run():
                 # # set_difference2 = set_list3.symmetric_difference(set_list4)
                 # for tuple_element in set_difference2:
                 #     to_be_created_bolo.append(dict((x, y) for x, y in tuple_element))
-                print "Before: bolo diff check",datetime.now()
-                # to_be_created_bolo = get_list_dict_diff(already_vbseen,bolo_history)
-                to_be_created_bolo = find_set_diff(already_vbseen,bolo_history,['user_id','action_object_id'])
-                print "After: bolo diff check",datetime.now()
+                # print "Before: bolo diff check",datetime.now()
+                # # to_be_created_bolo = get_list_dict_diff(already_vbseen,bolo_history)
+                to_be_created_bolo = already_vbseen
+                # to_be_created_bolo = find_set_diff(already_vbseen,bolo_history,['user_id','action_object_id'])
+                # print "After: bolo diff check",datetime.now()
                 # print len(to_be_created_bolo),"len(to_be_created_bolo)"
 
                 if to_be_created_bolo:
@@ -271,9 +272,9 @@ def check_like(topic_id,user_ids):
                 each_like.save()
                 bolo_increment_user_id = [x['user_id'] for x in new_vb_like]
                 bolo_increment_user = UserProfile.objects.filter(user_id__in = bolo_increment_user_id ).update(bolo_score =F('bolo_score')+score,like_count = F('like_count')+1)
-                already_liked = list(Like.objects.filter(topic_id = topic_id).values('user_id','id').distinct('user_id'))
-                filter_bolo_like = [d['id'] for d in already_liked]
-                bolo_history = list(BoloActionHistory.objects.filter(action_object_type = vb_like_type,action_object_id__in=filter_bolo_like).values('user_id','action_object_id').distinct('action_object_id'))
+                already_liked = list(Like.objects.filter(topic_id = topic_id,user_id__in=[d['user_id'] for d in new_vb_like]).values('user_id','id'))
+                # filter_bolo_like = [d['id'] for d in already_liked]
+                # bolo_history = list(BoloActionHistory.objects.filter(action_object_type = vb_like_type,action_object_id__in=filter_bolo_like).values('user_id','action_object_id').distinct('action_object_id'))
                 for each in already_liked:
                     each['action_object_id'] = each['id']
                     del each['id']
@@ -283,7 +284,8 @@ def check_like(topic_id,user_ids):
                 # for tuple_element in set_difference4:
                 #     to_be_created_bolo.append(dict((x, y) for x, y in tuple_element))
                 # to_be_created_bolo = get_list_dict_diff(already_liked,bolo_history)
-                to_be_created_bolo = find_set_diff(already_liked,bolo_history,['user_id','action_object_id'])
+                # to_be_created_bolo = find_set_diff(already_liked,bolo_history,['user_id','action_object_id'])
+                to_be_created_bolo= already_liked
                 # print len(to_be_created_bolo),"len(to_be_created_bolo)"
                 action = get_weight_object('liked')
                 notific_dic = copy.deepcopy(to_be_created_bolo)
