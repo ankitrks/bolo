@@ -10,6 +10,7 @@ from django.apps import apps
 from forum.user.models import UserProfile, Weight
 from django.contrib.contenttypes.models import ContentType
 import copy
+import pandas as pd 
 
 def run():
     counter_objects_created=0
@@ -94,7 +95,10 @@ def run():
                 # # set_difference1 = set_list1.symmetric_difference(set_list2)
                 # for tuple_element in set_difference1:
                 #     new_vb_seen.append(dict((x, y) for x, y in tuple_element))
-                new_vb_seen = get_list_dict_diff(user_want_vbseen,already_vbseen)
+                # new_vb_seen = get_list_dict_diff(user_want_vbseen,already_vbseen)
+                print "Before: vbseen diff checker",datetime.now()
+                new_vb_seen = find_set_diff(user_want_vbseen,already_vbseen,['user_id','topic_id'])
+                print "After: vbseen diff checker",datetime.now()
                 # pri nt len(new_vb_seen),"len(new_vb_seen)"
             if new_vb_seen:
                 print "Before: bolo_score_processing",datetime.now()
@@ -112,7 +116,8 @@ def run():
                 # for tuple_element in set_difference2:
                 #     to_be_created_bolo.append(dict((x, y) for x, y in tuple_element))
                 print "Before: bolo diff check",datetime.now()
-                to_be_created_bolo = get_list_dict_diff(already_vbseen,bolo_history)
+                # to_be_created_bolo = get_list_dict_diff(already_vbseen,bolo_history)
+                to_be_created_bolo = find_set_diff(already_vbseen,bolo_history,['user_id','action_object_id'])
                 print "After: bolo diff check",datetime.now()
                 # print len(to_be_created_bolo),"len(to_be_created_bolo)"
 
@@ -255,7 +260,8 @@ def check_like(topic_id,user_ids):
             # set_difference3 = set_list5.symmetric_difference(set_list6)
             # for tuple_element in set_difference3:
             #     new_vb_like.append(dict((x, y) for x, y in tuple_element))
-            new_vb_like = get_list_dict_diff(user_want_like,already_like)
+            # new_vb_like = get_list_dict_diff(user_want_like,already_like)
+            new_vb_like = find_set_diff(user_want_like,already_like,['user_id','topic_id'])
             # print len(new_vb_like),"len(new_vb_like)"
             if new_vb_like:
                 aList = [Like(**vals) for vals in new_vb_like]
@@ -274,7 +280,8 @@ def check_like(topic_id,user_ids):
                 # set_difference4 = set_list7.symmetric_difference(set_list8)
                 # for tuple_element in set_difference4:
                 #     to_be_created_bolo.append(dict((x, y) for x, y in tuple_element))
-                to_be_created_bolo = get_list_dict_diff(already_liked,bolo_history)
+                # to_be_created_bolo = get_list_dict_diff(already_liked,bolo_history)
+                to_be_created_bolo = find_set_diff(already_liked,bolo_history,['user_id','action_object_id'])
                 # print len(to_be_created_bolo),"len(to_be_created_bolo)"
                 action = get_weight_object('liked')
                 notific_dic = copy.deepcopy(to_be_created_bolo)
@@ -486,3 +493,15 @@ def get_list_dict_diff(list1,list2):
             if not each in list2:
                 final_list.append(each)
     return final_list
+
+def find_set_diff(list_a, list_b, key_list):
+    if not list_a or not list_b:
+        return []
+    
+    df_a = pd.DataFrame(list_a, columns = key_list)
+    df_b = pd.DataFrame(list_b, columns = key_list)
+    set_diff = pd.concat([df_a, df_b]).drop_duplicates(keep = False)
+    # print(set_diff.T.to_dict().values())
+    return set_diff.T.to_dict().values()
+
+
