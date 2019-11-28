@@ -25,7 +25,7 @@ from django.forms.models import model_to_dict
 from datetime import datetime,timedelta,date
 from django.db.models.signals import post_save
 from django.views.decorators.csrf import csrf_exempt
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from rest_framework import status
 from rest_framework import generics
@@ -51,12 +51,7 @@ from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs
 from jarvis.models import FCMDevice
 from forum.topic.models import Topic, ShareTopic, Like, SocialShare, Notification, CricketMatch, Poll, Choice, Voting, \
     Leaderboard, VBseen, TongueTwister
-from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer, TopicSerializerwithComment, \
-    AppVersionSerializer, UserSerializer, SingleTopicSerializerwithComment, UserAnswerSerializerwithComment, \
-    CricketMatchSerializer, PollSerializer, ChoiceSerializer, VotingSerializer, LeaderboardSerializer, PollSerializerwithChoice, \
-    OnlyChoiceSerializer, NotificationSerializer, UserProfileSerializer, TongueTwisterSerializer,KYCDocumnetsTypeSerializer, \
-    PaymentCycleSerializer, EncashableDetailSerializer, PaymentInfoSerializer, UserKYCSerializer, CategoryWithVideoSerializer, \
-    CategoryVideoByteSerializer
+from .serializers import *
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -2576,12 +2571,28 @@ def get_popular_video_bytes(request):
         language_id = request.GET.get('language_id', 1)
         startdate = datetime.today()
         enddate = startdate - timedelta(days=30)
-        topics = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, is_popular=True, date__gte=enddate).order_by('-date')
+        topics = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, is_popular=True, \
+            date__gte=enddate).order_by('-date')
         paginator_topics.page_size = 10
         topics = paginator_topics.paginate_queryset(topics, request)
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({'message': 'Error Occured:' + str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def pubsub_popular(request):
+    try:
+        paginator_topics = PageNumberPagination()
+        language_id = request.GET.get('language_id', 1)
+        startdate = datetime.today()
+        enddate = startdate - timedelta(days=30)
+        topics_all = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, is_popular=True, \
+            date__gte=enddate).order_by('-date')
+        paginator_topics.page_size = 10
+        topics = paginator_topics.paginate_queryset(topics_all, request)
+        return JsonResponse({'topics': PubSubPopularSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:' + str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def get_user_follow_and_like_list(request):
