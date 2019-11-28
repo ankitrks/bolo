@@ -25,8 +25,11 @@ def run():
     actionable_ids = random.sample(topic_ids,250)
     last_n_days_post_ids = Topic.objects.filter(is_vb=True,is_removed=False,date__gte=now-timedelta(days=3)).order_by('-date').values_list('id',flat=True)
     last_n_days_post_ids = list(last_n_days_post_ids)
-    
+
+    post_counter = 0
     for each_seen_id in last_n_days_post_ids:
+        post_counter+=1
+        print "#######################   ",post_counter,"/",len(last_n_days_post_ids),"      ##########################"
         try:
             each_seen = Topic.objects.get(pk=each_seen_id)
             already_vbseen = list(VBseen.objects.filter(topic_id = each_seen_id).values('user_id','topic_id'))
@@ -210,27 +213,29 @@ def check_like(topic_id,user_ids):
     new_vb_like =[]
     to_be_created_bolo=[]
     notific_dic= []
+    random_counter = each_like.view_count/random.randrange(10,21)
+    print random_counter,"random_counter"
     if each_like.likes_count < each_like.view_count/random.randrange(10,21):
-        if each_like.date +timedelta(minutes=10) > now and each_like.view_count/random.randrange(10,21) > 100 and each_like.likes_count < 100:
-            number_like = random.randrange(6,100)
-        elif each_like.date +timedelta(minutes=10) < now and each_like.date +timedelta(minutes=30) > now and each_like.view_count/random.randrange(10,21) > 200 and each_like.likes_count < 200:
-            number_like = random.randrange(100,200-each_like.likes_count)
-        elif each_like.date +timedelta(minutes=30) < now and each_like.date +timedelta(hours=2) > now and each_like.view_count/random.randrange(10,21) > 300 and each_like.likes_count < 300:
-            number_like = random.randrange(1,300-each_like.likes_count)
-        elif each_like.date +timedelta(hours=2) < now and each_like.date +timedelta(hours=4) > now and each_like.view_count/random.randrange(10,21) > 400 and each_like.likes_count < 400:
-            number_like = random.randrange(1,400-each_like.likes_count)
-        elif each_like.date +timedelta(hours=4) < now and each_like.date +timedelta(hours=6) > now and each_like.view_count/random.randrange(10,21) > 500 and each_like.likes_count < 500:
-            number_like = random.randrange(1,500-each_like.likes_count)
-        elif each_like.date +timedelta(hours=6) < now and each_like.date +timedelta(hours=8) > now and each_like.view_count/random.randrange(10,21) > 600 and each_like.likes_count < 600:
-            number_like = random.randrange(1,600-each_like.likes_count)
-        elif each_like.date +timedelta(hours=10) < now and each_like.date +timedelta(hours=12) > now and each_like.view_count/random.randrange(10,21) > 700 and each_like.likes_count < 700:
-            number_like = random.randrange(1,700-each_like.likes_count)
-        elif each_like.date +timedelta(hours=12) < now and each_like.date +timedelta(hours=14) > now and each_like.view_count/random.randrange(10,21) > 800 and each_like.likes_count < 800:
-            number_like = random.randrange(1,800-each_like.likes_count)
-        elif each_like.date +timedelta(hours=14) < now and each_like.date +timedelta(hours=16) > now and each_like.view_count/random.randrange(10,21) > 900 and each_like.likes_count < 900:
-            number_like = random.randrange(1,900-each_like.likes_count)
-        elif each_like.date +timedelta(hours=16) < now and each_like.date +timedelta(hours=72) > now and each_like.view_count/random.randrange(10,21) > 1000 and each_like.likes_count < 1000:
-            number_like = random.randrange(1,1000-each_like.likes_count)
+        if each_like.date +timedelta(minutes=10) > now and random_counter > 100 and each_like.likes_count < random_counter:
+            number_like = random.randrange(6,random_counter)
+        elif each_like.date +timedelta(minutes=10) < now and each_like.date +timedelta(minutes=30) > now and each_like.likes_count < random_counter:
+            number_like = random.randrange(100,random_counter-each_like.likes_count)
+        elif each_like.date +timedelta(minutes=30) < now and each_like.date +timedelta(hours=2) > now and each_like.likes_count < random_counter:
+            number_like = random.randrange(1,random_counter-each_like.likes_count)
+        elif each_like.date +timedelta(hours=2) < now and each_like.date +timedelta(hours=4) > now and each_like.likes_count < random_counter:
+            number_like = random.randrange(1,random_counter-each_like.likes_count)
+        elif each_like.date +timedelta(hours=4) < now and each_like.date +timedelta(hours=6) > now and each_like.likes_count < random_counter:
+            number_like = random.randrange(1,random_counter-each_like.likes_count)
+        elif each_like.date +timedelta(hours=6) < now and each_like.date +timedelta(hours=8) > now and each_like.likes_count < random_counter:
+            number_like = random.randrange(1,random_counter-each_like.likes_count)
+        elif each_like.date +timedelta(hours=10) < now and each_like.date +timedelta(hours=12) > now and each_like.likes_count < random_counter:
+            number_like = random.randrange(1,random_counter-each_like.likes_count)
+        elif each_like.date +timedelta(hours=12) < now and each_like.date +timedelta(hours=14) > now and each_like.likes_count < random_counter:
+            number_like = random.randrange(1,random_counter-each_like.likes_count)
+        elif each_like.date +timedelta(hours=14) < now and each_like.date +timedelta(hours=16) > now and each_like.likes_count < random_counter:
+            number_like = random.randrange(1,random_counter-each_like.likes_count)
+        elif each_like.date +timedelta(hours=16) < now and each_like.date +timedelta(hours=72) > now and each_like.likes_count < random_counter:
+            number_like = random.randrange(1,random_counter-each_like.likes_count)
         else:
             number_like = 1
         i = 0
@@ -241,6 +246,7 @@ def check_like(topic_id,user_ids):
                 i += 1
             except:
                 pass
+        print number_like,"number_like"
         if user_want_like:
             score = get_weight('liked')
             vb_like_type = ContentType.objects.get(app_label='forum_topic', model='like')
