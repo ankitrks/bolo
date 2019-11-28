@@ -82,7 +82,7 @@ def run():
                     pass
             print "Before: VBseen.objects.bulk_create(aList)",datetime.now()
             aList = [VBseen(**vals) for vals in user_want_vbseen]
-            newly_careted = VBseen.objects.bulk_create(aList,, batch_size=20000)
+            newly_careted = VBseen.objects.bulk_create(aList, batch_size=20000)
             counter_objects_created+=len(user_want_vbseen)
             print "After: VBseen.objects.bulk_create(aList)",datetime.now()
             this_topic = Topic.objects.get(pk=each_seen_id)
@@ -127,7 +127,7 @@ def run():
                     print "after: bolo_dict",datetime.now()
                     print "Before: bolo_score bulk",datetime.now()
                     aList = [BoloActionHistory(**vals) for vals in to_be_created_bolo]
-                    newly_bolo = BoloActionHistory.objects.bulk_create(aList,, batch_size=20000)
+                    newly_bolo = BoloActionHistory.objects.bulk_create(aList, batch_size=20000)
                     counter_objects_created+=len(to_be_created_bolo)
                     print "after: bolo_score bulk",datetime.now()
                     print "before: profile updation",datetime.now()
