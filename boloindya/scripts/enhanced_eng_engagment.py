@@ -82,7 +82,7 @@ def run():
                     pass
             print "Before: VBseen.objects.bulk_create(aList)",datetime.now()
             aList = [VBseen(**vals) for vals in user_want_vbseen]
-            newly_careted = VBseen.objects.bulk_create(aList)
+            newly_careted = VBseen.objects.bulk_create(aList,, batch_size=20000)
             counter_objects_created+=len(user_want_vbseen)
             print "After: VBseen.objects.bulk_create(aList)",datetime.now()
             this_topic = Topic.objects.get(pk=each_seen_id)
@@ -127,7 +127,7 @@ def run():
                     print "after: bolo_dict",datetime.now()
                     print "Before: bolo_score bulk",datetime.now()
                     aList = [BoloActionHistory(**vals) for vals in to_be_created_bolo]
-                    newly_bolo = BoloActionHistory.objects.bulk_create(aList)
+                    newly_bolo = BoloActionHistory.objects.bulk_create(aList,, batch_size=20000)
                     counter_objects_created+=len(to_be_created_bolo)
                     print "after: bolo_score bulk",datetime.now()
                     print "before: profile updation",datetime.now()
@@ -259,7 +259,7 @@ def check_like(topic_id,user_ids):
             # print len(new_vb_like),"len(new_vb_like)"
             if new_vb_like:
                 aList = [Like(**vals) for vals in new_vb_like]
-                newly_created = Like.objects.bulk_create(aList)
+                newly_created = Like.objects.bulk_create(aList, batch_size=20000)
                 each_like.likes_count = F('likes_count')+len(new_vb_like)
                 each_like.save()
                 bolo_increment_user_id = [x['user_id'] for x in new_vb_like]
@@ -283,7 +283,7 @@ def check_like(topic_id,user_ids):
                     each_bolo['score'] = score
                     each_bolo['action_object_type'] = vb_like_type
                 aList = [BoloActionHistory(**vals) for vals in to_be_created_bolo]
-                newly_bolo = BoloActionHistory.objects.bulk_create(aList)
+                newly_bolo = BoloActionHistory.objects.bulk_create(aList, batch_size=20000)
                 for each in notific_dic:
                     each['topic_id']=each['action_object_id']
                     del each['action_object_id']
