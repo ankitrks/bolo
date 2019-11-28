@@ -105,7 +105,8 @@ def run():
                 score = get_weight('vb_view')
                 vb_seen_type = ContentType.objects.get(app_label='forum_topic', model='vbseen')
                 already_vbseen = list(VBseen.objects.filter(topic_id = each_seen_id).values('user_id','id').distinct('user_id'))
-                bolo_history = list(BoloActionHistory.objects.filter(action_object_type = vb_seen_type).values('user_id','action_object_id').distinct('action_object_id'))
+                filter_bolo_vbseen = list(VBseen.objects.filter(topic_id = each_seen_id).values_list('id',flat=True))
+                bolo_history = list(BoloActionHistory.objects.filter(action_object_type = vb_seen_type,action_object_id__in=filter_bolo_vbseen).values('user_id','action_object_id').distinct('action_object_id'))
                 for each in already_vbseen:
                     each['action_object_id'] = each['id']
                     del each['id']
@@ -271,7 +272,8 @@ def check_like(topic_id,user_ids):
                 bolo_increment_user_id = [x['user_id'] for x in new_vb_like]
                 bolo_increment_user = UserProfile.objects.filter(user_id__in = bolo_increment_user_id ).update(bolo_score =F('bolo_score')+score,like_count = F('like_count')+1)
                 already_liked = list(Like.objects.filter(topic_id = topic_id).values('user_id','id').distinct('user_id'))
-                bolo_history = list(BoloActionHistory.objects.filter(action_object_type = vb_like_type).values('user_id','action_object_id').distinct('action_object_id'))
+                filter_bolo_like = list(VBseen.objects.filter(topic_id = topic_id).values_list('id',flat=True))
+                bolo_history = list(BoloActionHistory.objects.filter(action_object_type = vb_like_type,action_object_id__in=filter_bolo_like).values('user_id','action_object_id').distinct('action_object_id'))
                 for each in already_liked:
                     each['action_object_id'] = each['id']
                     del each['id']
