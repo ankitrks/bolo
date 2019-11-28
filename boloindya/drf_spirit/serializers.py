@@ -99,7 +99,7 @@ class PubSubPopularSerializer(ModelSerializer):
     class Meta:
         model = Topic
         fields = ('id', 'm3u8_content', 'audio_m3u8_content', \
-                'video_m3u8_content', 'question_video', 'video_cdn')
+                'video_m3u8_content', 'question_video', 'video_cdn', 'language_id')
 
     def get_video_cdn(self,instance):
         if instance.question_video:
