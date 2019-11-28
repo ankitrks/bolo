@@ -500,7 +500,7 @@ def find_set_diff(list_a, list_b, key_list):
     
     df_a = pd.DataFrame(list_a, columns = key_list)
     df_b = pd.DataFrame(list_b, columns = key_list)
-    set_diff = pd.concat([df_a, df_b]).drop_duplicates(keep = False)
+    set_diff = pd.concat([df_a, df_b, df_b]).drop_duplicates(keep = False)
     # print(set_diff.T.to_dict().values())
     return set_diff.T.to_dict().values()
 
