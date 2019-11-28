@@ -102,14 +102,17 @@ def run():
                 for each in already_vbseen:
                     each['action_object_id'] = each['id']
                     del each['id']
+                print "After: bolo_score_processing",datetime.now()
                 # set_list3 = set(tuple(sorted(d.items())) for d in already_vbseen)
                 # set_list4 = set(tuple(sorted(d.items())) for d in bolo_history)
                 # # set_difference2 = set_list3.symmetric_difference(set_list4)
                 # for tuple_element in set_difference2:
                 #     to_be_created_bolo.append(dict((x, y) for x, y in tuple_element))
+                print "Before: bolo diff check",datetime.now()
                 to_be_created_bolo = get_list_dict_diff(already_vbseen,bolo_history)
+                print "After: bolo diff check",datetime.now()
                 # print len(to_be_created_bolo),"len(to_be_created_bolo)"
-                print "After: bolo_score_processing",datetime.now()
+
                 if to_be_created_bolo:
                     
                     action = get_weight_object('vb_view')
