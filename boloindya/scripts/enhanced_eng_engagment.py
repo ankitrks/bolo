@@ -30,6 +30,7 @@ def run():
     post_counter = 0
     for each_seen_id in last_n_days_post_ids:
         post_counter+=1
+        already_vbseen=None
         print "#######################   ",post_counter,"/",len(last_n_days_post_ids),"      ##########################"
         try:
             each_seen = Topic.objects.get(pk=each_seen_id)
@@ -141,6 +142,7 @@ def run():
                     bolo_increment_user_id = [x['user_id'] for x in new_vb_seen]
                     bolo_increment_user = UserProfile.objects.filter(user_id__in = bolo_increment_user_id ).update(bolo_score =F('bolo_score')+score,view_count = F('view_count')+1)
                     print "after: profile updation",datetime.now()
+                    aList=bolo_increment_user_id=None
             print "total created: ", counter_objects_created
             print "before: like creation",datetime.now()
             check_like(each_seen_id,user_ids)
@@ -213,6 +215,7 @@ def run():
 
 
 def check_like(topic_id,user_ids):
+    already_like=None
     now = datetime.now()
     each_like = Topic.objects.get(pk=topic_id)
     already_like = list(Like.objects.filter(topic_id = topic_id).values('user_id','topic_id'))
@@ -303,6 +306,7 @@ def check_like(topic_id,user_ids):
                     each['notification_type']='5'
                 aList = [Notification(**vals) for vals in notific_dic]
                 notify = Notification.objects.bulk_create(aList)
+                aList=None
                 print "notfic completed"
 
 
