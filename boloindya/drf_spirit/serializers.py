@@ -94,22 +94,10 @@ class CommentSerializer(ModelSerializer):
         return shortnaturaltime(instance.date)
 
 class PubSubPopularSerializer(ModelSerializer):
-    video_cdn = SerializerMethodField()
-
     class Meta:
         model = Topic
-        fields = ('id', 'm3u8_content', 'audio_m3u8_content', \
-                'video_m3u8_content', 'question_video', 'video_cdn', 'language_id')
-
-    def get_video_cdn(self,instance):
-        if instance.question_video:
-            regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
-            find_urls_in_string = re.compile(regex, re.IGNORECASE)
-            url = find_urls_in_string.search(instance.question_video)
-            return str(instance.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
-        else:
-            return ''
-
+        fields = ('id', 'language_id')
+        
 class TopicSerializerwithComment(ModelSerializer):
     user = SerializerMethodField()
     category = PresentableSlugRelatedField(queryset=Category.objects.all(),
