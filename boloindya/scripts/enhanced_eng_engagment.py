@@ -70,7 +70,7 @@ def run():
             elif each_seen.date +timedelta(hours=21) < now and each_seen.date +timedelta(hours=24) > now and each_seen.view_count < 30000:
                 number_seen = random.randrange(1,30000-each_seen.view_count)
             elif each_seen.date +timedelta(hours=24) < now and each_seen.date +timedelta(hours=72) > now and each_seen.view_count < 200000:
-                number_seen = random.randrange(1,200000-each_seen.view_count)
+                number_seen = random.randrange(1,random.randrange(150000,250000)-each_seen.view_count)
             else:
                 number_seen = 1
             i = 0
