@@ -10,7 +10,8 @@ from django.apps import apps
 from forum.user.models import UserProfile, Weight
 from django.contrib.contenttypes.models import ContentType
 import copy
-import pandas as pd 
+import pandas as pd
+import gc
 
 def run():
     counter_objects_created=0
@@ -29,6 +30,7 @@ def run():
 
     post_counter = 0
     for each_seen_id in last_n_days_post_ids:
+        gc.collect()
         post_counter+=1
         already_vbseen=None
         print "#######################   ",post_counter,"/",len(last_n_days_post_ids),"      ##########################"
