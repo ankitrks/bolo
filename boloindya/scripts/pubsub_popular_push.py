@@ -13,7 +13,9 @@ def run():
         for index in xrange(0, len(devices), 1000):
             device = devices[index:index + 1000]
             print len(device)
-            devices.send_message(data={'pupluar_data': serialized_data })
+
+            # devices.send_message(data={'pupluar_data': serialized_data })
+        print devices
         # print devices
         # Send Popular Data to Users 
 
