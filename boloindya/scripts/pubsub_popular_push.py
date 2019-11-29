@@ -14,9 +14,9 @@ def run():
         # for index in xrange(0, len(devices), 1000):
         #     device = devices[index:index + 1000]
         #     print len(device)
-        # print devices
-        devices.send_message(data={'pupluar_data': serialized_data })
-        # print devices
+        print devices[0].reg_id
+        t = devices.send_message(data={'pupluar_data': serialized_data })
+        print t
         # Send Popular Data to Users 
 
     # pubsub_obj.update(is_popular = True)
