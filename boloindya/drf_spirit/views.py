@@ -2666,13 +2666,13 @@ def get_ip_to_language(request):
         user_ip = request.GET.get('user_ip',None)
         if user_ip:
             url = 'http://ip-api.com/json/'+user_ip
-            response = urllib2.urlopen(sms_url).read()
+            response = urllib2.urlopen(url).read()
             json_response = json.loads(response)
             my_language,is_created = StateDistrictLanguage.objects.get_or_create(state_name=json_response['regionName'],district_name=json_response['city'])
             if is_created:
                 if json_response['regionName'] in state_language:
-                    language_options = dict(language_options)
-                    for key,value in language_options.items():
+                    language_option = dict(language_options)
+                    for key,value in language_option.items():
                         if value==state_language[json_response['regionName']]:
                             my_language.state_language = key
                             my_language.district_language = key
