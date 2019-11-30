@@ -1,4 +1,5 @@
 {% extends "jarvis/layout/base.html" %}
+{% load static %}
 {% block content %}
 <section class="content">
 <div style="text-align:center;">
@@ -34,7 +35,9 @@
     </div>
     <div>
         <h3>Video M2M Category</h3>
-        <p>{{ my_video.topic.m2mcategory }}</p>
+        {% for each in my_video.topic.m2mcategory.all %}
+        <p>{{ each }}</p>
+        {% endfor %}
     </div>
     <div>
         <h3>Video Language</h3>
@@ -42,7 +45,7 @@
     </div>
     <div>
         <h3>Is Popular</h3>
-        <p>{% if my_video.topic.is_popular %}<img src="{% static 'img/green_tick.jpg' %}" style="width:20px;">{% else %}<img src="{% static 'img/wrong.png' %}" style="width:20px;"</p>
+        <p>{% if my_video.topic.is_popular %}<img src="{% static 'img/green_tick.jpg' %}" style="width:20px;">{% else %}<img src="{% static 'img/wrong.png' %}" style="width:20px;">{% endif %}</p>
     </div>
     <div>
         <a href="/jarvis/boloindya_uploadvideofile/"><button type="button" class="btn btn-danger"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Upload Page</button></a>

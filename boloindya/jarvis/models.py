@@ -48,7 +48,7 @@ class VideoUploadTranscode(models.Model):
     topic = models.ForeignKey(Topic,null=True,blank=True)
     
     def __unicode__(self):
-        return self.filename_uploaded
+        return str(self.filename_uploaded)
 
     def save(self, *args, **kwargs):
         if self.video_title:
