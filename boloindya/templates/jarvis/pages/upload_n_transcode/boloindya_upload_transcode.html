@@ -37,23 +37,10 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Category:</label>
-            <div class="col-md-8">
-                <input list="category_options" id="category_choice" name="category_choice" />
-                <datalist id="category_options">
-                    {% for each_category in all_category %}
-                    <option value="{{ each_category.category_name }}">
-                        {% endfor %}
-                </datalist>
-            </div>
-        </div>
-        <div class="form-group">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Bucket</label>
             <div class="col-md-8">
                 <select name="bucket_name" id="bucket_name" required="True" class="form-control">
-                    <!---<option value="boloindya">Boloindya</option>
-                    <option value="boloindyapp-prod">Boloindya Prod</option>-->
-                    <option value="careeranna" selected>CareerAnna</option>
+                    <option value="boloindyapp-prod" selected>Boloindya Prod</option>
                 </select>
             </div>
         </div>
@@ -69,41 +56,33 @@
             </div>
         </div>
         <div class="form-group">
-                    <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Is Free Video?</label>
-                    <div class="col-md-8">
-                        <input type="checkbox" name="free_video" style="width:30px;height:30px;" id="free_video" class="free_video">
-                    </div>
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Video Title</label>
+            <div class="col-md-8">
+                {{topic_form.title}}
+            </div>
         </div>
-        <div class="video_elements">
-            <div class="form-group">
-                <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Video Title</label>
-                <div class="col-md-8">
-                    <input type="text" name="video_title" id="video_title" class="form-control" placeholder="Enter The Title of the Video">
-                </div>
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Video Category</label>
+            <div class="col-md-8">
+                {{topic_form.category}}
             </div>
-            <div class="form-group">
-                <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Video Descrption</label>
-                <div class="col-md-8">
-                    <textarea rows="4" cols="50" type="text" name="video_descp" id="video_descp" class="form-control" placeholder="Enter The Descreption of the Video"></textarea>
-                </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">M2M Category</label>
+            <div class="col-md-8">
+                {{topic_form.m2mcategory}}
             </div>
-            <div class="form-group">
-                <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Meta Title</label>
-                <div class="col-md-8">
-                    <input rows="4" cols="50" type="text" name="meta_title" id="meta_title" class="form-control" placeholder="Enter The Meta title of the Video">
-                </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Video Language</label>
+            <div class="col-md-8">
+                {{topic_form.language_id}}
             </div>
-            <div class="form-group">
-                <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Meta Description</label>
-                <div class="col-md-8">
-                    <textarea rows="4" cols="50" type="text" name="meta_descp" id="meta_descp" class="form-control" placeholder="Enter The Meta Descreption of the Video"></textarea>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Meta Keywords</label>
-                <div class="col-md-8">
-                    <input rows="4" cols="50" type="text" name="meta_keywords" id="meta_keywords" class="form-control" placeholder="Enter The comma separted meta Keywords for the Video">
-                </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Is Popular?</label>
+            <div class="col-md-8">
+                {{topic_form.is_popular}}
             </div>
         </div>
         <div class="form-group">
@@ -154,7 +133,7 @@ function upload(event) {
                 }, false);
                 return xhr;
             },
-            url: '/jarvis/upload_n_transcode/',
+            url: '/jarvis/boloindya_upload_n_transcode/',
             type: 'POST',
             data: data,
             cache: false,
@@ -167,7 +146,7 @@ function upload(event) {
                 if (data.message == 'fail') {
                     alert(data.reason)
                 } else if (data.message == 'success') {
-                    var url = '/jarvis/upload_details/?id=' + data.file_id
+                    var url = '/jarvis/boloindya_upload_details/?id=' + data.file_id
                     // do your redirect
                     window.location = url
                 }
@@ -191,13 +170,12 @@ function upload(event) {
 $(function() {
     $('#upload').submit(upload);
     $('#free_video').click(function() {
-    if ($(this).is(':checked')) {
-      $('.video_elements').show();
-    }
-    else{
-        $('.video_elements').hide()
-    }
-  });
+        if ($(this).is(':checked')) {
+            $('.video_elements').show();
+        } else {
+            $('.video_elements').hide()
+        }
+    });
 });
 </script>
 {% endblock center_js %}

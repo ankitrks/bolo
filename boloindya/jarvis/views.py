@@ -46,7 +46,7 @@ from itertools import groupby
 from django.db.models import Count
 import ast
 from drf_spirit.serializers import VideoCompleteRateSerializer
-from .forms import VideoUploadTranscodeForm
+from .forms import VideoUploadTranscodeForm,TopicUploadTranscodeForm
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
 from django.core.files.base import ContentFile
 from drf_spirit.serializers import UserWithUserSerializer
@@ -195,6 +195,15 @@ def uploadvideofile(request):
         .annotate(folder_count=Count('folder_to_upload')).order_by('folder_to_upload')
     return render(request,'jarvis/pages/upload_n_transcode/upload_n_transcode.html',
             {'all_category':all_category,'all_upload':all_upload})
+
+@login_required
+def boloindya_uploadvideofile(request):
+    from django.db.models import Count
+    all_upload = VideoUploadTranscode.objects.all().distinct().values('folder_to_upload')\
+        .annotate(folder_count=Count('folder_to_upload')).order_by('folder_to_upload')
+    topic_form = TopicUploadTranscodeForm()
+    return render(request,'jarvis/pages/upload_n_transcode/boloindya_upload_transcode.html',
+            {'all_upload':all_upload,'topic_form':topic_form})
 
 @login_required
 def video_management(request):
@@ -638,6 +647,122 @@ def upload_n_transcode(request):
 
     return HttpResponse(json.dumps({'message':'success','file_id':my_upload_transcode.id}),content_type="application/json")
 
+@login_required
+def boloindya_upload_n_transcode(request):
+    upload_file = request.FILES['media_file']
+    upload_to_bucket = request.POST.get('bucket_name',None)
+    upload_folder_name = request.POST.get('folder_prefix',None)
+    # upload_category = request.POST.get('category_choice',None)
+    # free_video = request.POST.get('free_video',None)
+    title = request.POST.get('title',None)
+    category_id = request.POST.get('category',None)
+    m2mcategory = request.POST.get('m2mcategory',None)
+    language_id = request.POST.get('language_id',None)
+    is_popular = request.POST.get('is_popular',None)
+
+    # print upload_file,upload_to_bucket,upload_folder_name
+    if not upload_to_bucket:
+        return HttpResponse(json.dumps({'message':'fail','reason':'bucket_missing'}),content_type="application/json")
+    if not upload_file:
+        return HttpResponse(json.dumps({'message':'fail','reason':'File Missing'}),content_type="application/json")
+    if not upload_file.name.endswith('.mp4'):
+        return HttpResponse(json.dumps({'message':'fail','reason':'This is not a mp4 file'}),content_type="application/json")
+    if not title or not category:
+        return HttpResponse(json.dumps({'message':'fail','reason':'Title or Category is missing'}),content_type="application/json")
+
+    bucket_credentials = get_bucket_details(upload_to_bucket)
+    conn = boto3.client('s3', bucket_credentials['REGION_HOST'], aws_access_key_id = bucket_credentials['AWS_ACCESS_KEY_ID'], \
+            aws_secret_access_key = bucket_credentials['AWS_SECRET_ACCESS_KEY'])
+    upload_file_name = upload_file.name.lower()
+    if upload_folder_name:
+        upload_folder_name = upload_folder_name.lower()
+        file_key_1 = urlify(upload_folder_name)+'/'+urlify(upload_file_name)
+        file_key_2 = urlify(upload_file_name)
+    else:
+        file_key_1 = urlify(upload_file_name)
+        file_key_2 = urlify(upload_file_name)
+    try:
+        conn.head_object(Bucket=upload_to_bucket, Key=file_key_1)
+        return HttpResponse(json.dumps({'message':'fail','reason':'File already exist'}),content_type="application/json")
+    except Exception as e:
+        try:
+            conn.head_object(Bucket=upload_to_bucket, Key=file_key_2)
+            return HttpResponse(json.dumps({'message':'fail','reason':'File already exist'}),content_type="application/json")
+        except Exception as e:
+            with open(urlify(upload_file_name),'wb') as f:
+                for chunk in upload_file.chunks():
+                    if chunk:
+                        f.write(chunk)
+
+
+            uploaded_url,transcode = upload_tos3(upload_file,upload_to_bucket,upload_folder_name)
+            thumbnail_url = get_video_thumbnail(uploaded_url,upload_to_bucket)
+            try:
+                videolength = getVideoLength(uploaded_url)
+            except:
+                videolength = ''
+            print videolength
+            my_dict = {}
+            topic_dict = {}
+            my_dict['s3_file_url'] = uploaded_url
+            topic_dict['backup_url'] = uploaded_url
+            if 'job_id' in transcode:
+                my_dict['transcode_job_id'] = transcode['job_id']
+                topic_dict['transcode_job_id'] = transcode['job_id']
+            my_dict['transcode_dump'] = transcode['data_dump']
+            topic_dict['transcode_dump'] = transcode['data_dump']
+            if 'new_m3u8_url' in transcode:
+                my_dict['transcoded_file_url'] = transcode['new_m3u8_url']
+                topic_dict['question_video'] = transcode['new_m3u8_url']
+            my_dict['filename_uploaded'] = upload_file_name
+            my_dict['filename_changed'] = urlify(upload_file_name)
+            my_dict['folder_to_upload'] = upload_folder_name
+            my_dict['folder_to_upload_changed'] = urlify(upload_folder_name)
+            topic_dict['is_transcoded'] = True
+            topic_dict['question_image'] = thumbnail_url
+            my_dict['thumbnail_url'] = thumbnail_url
+            my_dict['media_duration'] = videolength
+            topic_dict['media_duration'] = videolength
+            view_count = random.randint(1,5)
+            width,height = get_video_width_height(uploaded_url)
+            topic_dict['vb_width'] = width
+            topic_dict['vb_height'] = height
+            my_upload_transcode = VideoUploadTranscode.objects.create(**my_dict)
+            topic_dict['user_id'] = random.choice(list(UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)))
+            my_topic = Topic.objects.create(**topic_dict)
+            for each in m2mcategory:
+                my_topic.m2mcategory.add(Category.objects.get(pk=each))
+            my_upload_transcode.is_topic = True
+            my_upload_transcode.topic = my_topic
+            my_upload_transcode.save()
+
+            os.remove(urlify(upload_file_name))
+
+    return HttpResponse(json.dumps({'message':'success','file_id':my_upload_transcode.id}),content_type="application/json")
+
+def provide_view_count(view_count,topic):
+    counter =0
+    all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)
+    user_ids = list(all_test_userprofile_id)
+    user_ids = random.sample(user_ids,100)
+    while counter<view_count:
+        opt_action_user_id = random.choice(user_ids)
+        VBseen.objects.create(topic= topic,user_id =opt_action_user_id)
+        counter+=1
+
+def get_video_width_height(video_url):
+    try:
+        import subprocess
+        cmds2 = ['ffprobe','-v','error' , '-show_entries','stream=width,height','-of','csv=p=0:s=x',video_url]
+        ps2 = subprocess.Popen(cmds2, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+        (output, stderr) = ps2.communicate()
+        widthandheight = output.replace('\n','').split('x')
+        return video_width
+        video_width = widthandheight[0]
+        video_height = widthandheight[1]
+        return video_width,video_height
+    except:
+        return None,None
 
 @login_required
 def upload_details(request):
@@ -647,11 +772,24 @@ def upload_details(request):
         return render(request,'jarvis/pages/upload_n_transcode/video_urls.html',{'my_video':my_video})
     return render(request,'jarvis/pages/upload_n_transcode/video_urls.html')
 
+@login_required
+def boloindya_upload_details(request):
+    file_id = request.GET.get('id',None)
+    if file_id:
+        my_video = VideoUploadTranscode.objects.get(pk=file_id)
+        return render(request,'jarvis/pages/upload_n_transcode/boloindya_video_urls.html',{'my_video':my_video})
+    return render(request,'jarvis/pages/upload_n_transcode/video_urls.html')
+
 
 @login_required
 def uploaded_list(request):
-    all_uploaded = VideoUploadTranscode.objects.filter(is_active = True)
+    all_uploaded = VideoUploadTranscode.objects.filter(is_active = True,is_topic=False)
     return render(request,'jarvis/pages/upload_n_transcode/uploaded_list.html',{'all_uploaded':all_uploaded})
+
+@login_required
+def boloindya_uploaded_list(request):
+    all_uploaded = VideoUploadTranscode.objects.filter(is_active = True,is_topic = True)
+    return render(request,'jarvis/pages/upload_n_transcode/boloindya_uploaded_list.html',{'all_uploaded':all_uploaded})
 
 @login_required
 def edit_upload(request):
@@ -688,6 +826,41 @@ def edit_upload(request):
             return HttpResponse(json.dumps({'message':'success','video_id':my_video.id}),content_type="application/json")
         else:
 
+            return HttpResponse(json.dumps({'message':'fail','reason':'file id not found'}),content_type="application/json")
+
+@login_required
+def boloindya_edit_upload(request):
+    if request.method == 'GET':
+        file_id = request.GET.get('id',None)
+        if file_id:
+            my_video = VideoUploadTranscode.objects.get(pk=file_id)
+            topic = my_video.topic
+            my_dict = {'title':topic.title,'category':topic.category,'m2mcategory':topic.m2mcategory,'language_id':topic.language_id,\
+            'is_popular':topic.is_popular}
+            video_form = TopicUploadTranscodeForm(initial=my_dict)
+            return render(request,'jarvis/pages/upload_n_transcode/boloindya_edit_upload.html',{'my_video':my_video,'video_form':video_form})
+        return render(request,'jarvis/pages/upload_n_transcode/boloindya_edit_upload.html')
+    elif request.method == 'POST':
+        print request.POST
+        video_id = request.POST.get('video_id',None)
+        if video_id:
+            my_video = VideoUploadTranscode.objects.get(pk=video_id)
+            topic = my_video.topic
+            print request.POST
+            topic.title = request.POST.get('title','')
+            topic.category_id = request.POST.get('category',None)
+            m2mcategory = request.POST.get('m2mcategory',None)
+            if m2mcategory:
+                all_category = topic.m2mcategory.all()
+                for each_category in all_category:
+                    topic.m2mcategory.remove(each_category)
+                for each in m2mcategory:
+                    topic.m2mcategory.add(Category.objects.get(pk=each))
+            topic.language_id = request.POST.get('language_id','')
+            topic.is_popular = request.POST.get('is_popular',False)
+            topic.save()
+            return HttpResponse(json.dumps({'message':'success','video_id':my_video.id}),content_type="application/json")
+        else:
             return HttpResponse(json.dumps({'message':'fail','reason':'file id not found'}),content_type="application/json")
 
 @login_required
