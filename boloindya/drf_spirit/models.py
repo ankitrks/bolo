@@ -392,12 +392,13 @@ class UserFeedback(models.Model):
                 We have received a feedback from %s. Please find the details below:<br><br>
                 <b>Name:</b> %s <br>
                 <b>Feedback:</b> %s <br>
-                <b>Image:</b> %s <br>
-                <b>Contact:</b> %s <br><br>
+                <b>Contact:</b> %s <br>
+                <b>Image:</b><br>
+                <img src="%s"> <br><br>
                 Thanks,<br>
                 Team BoloIndya
                 """ %(self.user_name(), self.user_name(), self.description, \
-                        self.feedback_image, self.user_contact())
+                        self.user_contact(), self.feedback_image)
             requests.post(
                 "https://api.mailgun.net/v3/mail.careeranna.com/messages",
                 auth=("api", "d6c66f5dd85b4451bbcbd94cb7406f92-bbbc8336-97426998"),

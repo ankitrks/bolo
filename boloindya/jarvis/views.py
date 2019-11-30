@@ -18,7 +18,7 @@ import hashlib
 import time
 import re
 from drf_spirit.views import getVideoLength
-from drf_spirit.utils  import calculate_encashable_details
+from drf_spirit.utils  import calculate_encashable_details,language_options
 from forum.user.models import UserProfile, ReferralCode, ReferralCodeUsed, VideoCompleteRate, VideoPlaytime
 from forum.topic.models import Topic, VBseen
 from forum.category.models import Category
@@ -31,7 +31,7 @@ from forum.payment.forms import PaymentForm,PaymentCycleForm
 from django.views.generic.edit import FormView
 from datetime import datetime
 from forum.userkyc.forms import KYCBasicInfoRejectForm,KYCDocumentRejectForm,AdditionalInfoRejectForm,BankDetailRejectForm
-from .models import VideoUploadTranscode,VideoCategory, PushNotification, PushNotificationUser, language_options, user_group_options, FCMDevice, notification_type_options
+from .models import VideoUploadTranscode,VideoCategory, PushNotification, PushNotificationUser, user_group_options, FCMDevice, notification_type_options
 from drf_spirit.models import MonthlyActiveUser, HourlyActiveUser, DailyActiveUser, VideoDetails
 from forum.category.models import Category
 from django.contrib.auth.models import User
@@ -1230,4 +1230,33 @@ def daily_vplay_data(request):
         return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)   
 
 
-
+@api_view(['POST'])
+# view for notification search
+def search_notification(request):
+    from drf_spirit.serializers import CategoryWithTitleSerializer, CategoryVideoByteSerializer, UserWithNameSerializer, TongueTwisterWithHashSerializer
+    from forum.topic.models import TongueTwister
+    from django.db.models import Q
+    raw_data = json.loads(request.body)
+    query = raw_data['query']
+    notification_type = raw_data['notification_type']
+    data = []
+    try:
+        if notification_type == '0':
+            topics=Topic.objects.filter(is_removed=False, is_vb=True, title__icontains=query)
+            data=CategoryVideoByteSerializer(topics, many=True).data
+        elif notification_type == '1':
+            users=UserProfile.objects.filter((Q(user__username__icontains=query)|Q(name__icontains=query)|Q(mobile_no__icontains=query))&Q(is_test_user=False))
+            data=UserWithNameSerializer(users, many=True).data
+        elif notification_type == '2':
+            category=Category.objects.filter(title__icontains=query) 
+            data=CategoryWithTitleSerializer(category, many=True).data
+        elif notification_type == '3':
+            challenges=TongueTwister.objects.filter(hash_tag__icontains=query)
+            data=TongueTwisterWithHashSerializer(challenges, many=True).data
+        else:
+            data = []
+        return JsonResponse({'data': data}, status=status.HTTP_200_OK)  
+    except Exception as e:
+        print(e)
+        return JsonResponse({'data': []}, status=status.HTTP_200_OK)
+    

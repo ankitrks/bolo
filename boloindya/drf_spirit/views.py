@@ -41,14 +41,14 @@ from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
 from .models import UserJarvisDump, UserLogStatistics, UserFeedback
 from .permissions import IsOwnerOrReadOnly
-from .utils import get_weight, add_bolo_score, shorcountertopic, calculate_encashable_details
+from .utils import get_weight, add_bolo_score, shorcountertopic, calculate_encashable_details, state_language, language_options
 
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 from forum.category.models import Category
 from forum.comment.models import Comment
 from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs
-from jarvis.models import FCMDevice
+from jarvis.models import FCMDevice,StateDistrictLanguage
 from forum.topic.models import Topic, ShareTopic, Like, SocialShare, Notification, CricketMatch, Poll, Choice, Voting, \
     Leaderboard, VBseen, TongueTwister
 from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer, TopicSerializerwithComment, \
@@ -2517,9 +2517,8 @@ def get_category_with_video_bytes(request):
                     popular_bolo = []
         if request.GET.get('is_with_popular'):
             startdate = datetime.today()
-            enddate = startdate - timedelta(days=15)
-            topics = Topic.objects.filter(is_removed=False, is_vb=True, is_popular=True, language_id=language_id, \
-                    date__gte=enddate).order_by('-view_count')
+            enddate = startdate - timedelta(days=30)
+            topics = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, is_popular=True, date__gte=enddate).order_by('-date')
             try:
                 paginator.page_size = 10
                 topics = paginator.paginate_queryset(topics, request)
@@ -2576,17 +2575,8 @@ def get_popular_video_bytes(request):
         paginator_topics = PageNumberPagination()
         language_id = request.GET.get('language_id', 1)
         startdate = datetime.today()
-        enddate = startdate - timedelta(days=15)
-        all_seen_vb = []
-        try:
-            all_seen_vb = VBseen.objects.filter(user = request.user).values_list('topic_id',flat=True)
-        except Exception as e1:
-            all_seen_vb = []
-        topics = []
-        topics_not_seen = Topic.objects.filter(is_removed=False, is_vb=True, is_popular=True, language_id=language_id, date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-view_count')
-        topics_seen = Topic.objects.filter(is_removed=False, is_vb=True, is_popular=True, language_id=language_id, date__gte=enddate, id__in=all_seen_vb).order_by('-view_count')
-        topics.extend(topics_not_seen)
-        topics.extend(topics_seen)
+        enddate = startdate - timedelta(days=30)
+        topics = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, is_popular=True, date__gte=enddate).order_by('-date')
         paginator_topics.page_size = 10
         topics = paginator_topics.paginate_queryset(topics, request)
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
@@ -2669,5 +2659,30 @@ def submit_user_feedback(request):
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
+@api_view(['GET'])
+def get_ip_to_language(request):
+    try:
+        pass
+        user_ip = request.GET.get('user_ip',None)
+        if user_ip:
+            url = 'http://ip-api.com/json/'+user_ip
+            response = urllib2.urlopen(sms_url).read()
+            json_response = json.loads(response)
+            my_language,is_created = StateDistrictLanguage.objects.get_or_create(state_name=json_response['regionName'],district_name=json_response['city'])
+            if is_created:
+                if json_response['regionName'] in state_language:
+                    language_options = dict(language_options)
+                    for key,value in language_options.items():
+                        if value==state_language[json_response['regionName']]:
+                            my_language.state_language = key
+                            my_language.district_language = key
+                else:
+                    my_language.state_language = '1'
+                    my_language.district_language = '1'
+                my_language.save()
+            return JsonResponse({'language_id': my_language.district_language}, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'message': 'Error Occured: IP not in GET request',}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
