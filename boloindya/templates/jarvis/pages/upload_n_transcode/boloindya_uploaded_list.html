@@ -1,0 +1,42 @@
+{% extends "jarvis/layout/base.html" %}
+{% block content %}
+<div>
+	<div class="col-xs-12 table-responsive nowrap">
+            <table class="table table-striped" id="uploaded_list">
+                <thead>
+                    <tr>
+                        <th>Filename Uploaded</th>
+                        <th>Action</th>
+                        <th>In Folder Uploaded</th>
+                        <th>S3 File URL</th>
+                        <th>Trancoded URL</th>
+                        <th>Video Byte</th>
+                        <th>Language</th>
+                        <td>By User</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for each_uploaded in all_uploaded %}
+                    <tr>
+                        <td><a href="/jarvis/boloindya_upload_details/?id={{ each_uploaded.id}}"><strong>{{ each_uploaded.filename_uploaded }}</strong></a></td>
+                        <td><a href="/jarvis/boloindya_edit_upload/?id={{ each_uploaded.id}}"><button style="margin:5px;" type="button" class="btn btn-primary"> <span class="glyphicon glyphicon-edit" style="margin-right:5px;"></span>Edit</button></a></td>
+                        <td>{{ each_uploaded.folder_to_upload}}</td>
+                        <td>{{ each_uploaded.s3_file_url}}</td>
+                        <td>{{ each_uploaded.transcoded_file_url}}</td>
+                        <td>{{ each_uploaded.topic}}</td>
+                        <td>{{ each_uploaded.topic.get_language_id_display }}</td>
+                        <td>{{ each_uploaded.topic.user}}</td>
+
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+</div>
+{% endblock content %} 
+{% block center_js %}
+<script>
+    var table = $('#uploaded_list').DataTable();
+</script>
+{% endblock center_js%}

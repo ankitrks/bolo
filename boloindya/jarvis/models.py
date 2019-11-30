@@ -10,8 +10,8 @@ from django.http import JsonResponse
 
 from django.db.models import Q
 
-from forum.topic.models import RecordTimeStamp
 from drf_spirit.utils import language_options
+from forum.topic.models import RecordTimeStamp,Topic
 
 class VideoCategory(models.Model):
     category_name = models.CharField(_('Category Name'),max_length=100,null=True,blank=True)
@@ -44,6 +44,8 @@ class VideoUploadTranscode(models.Model):
     thumbnail_url = models.CharField(_("Thumbnail URL"),null=True,blank=True,max_length=1000)
     media_duration = models.CharField(_("duration"), max_length=20, default='',null=True,blank=True)
     is_active = models.BooleanField(default=True)
+    is_topic = models.BooleanField(default=False)
+    topic = models.ForeignKey(Topic,null=True,blank=True)
     
     def __unicode__(self):
         return self.filename_uploaded
