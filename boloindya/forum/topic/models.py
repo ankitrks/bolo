@@ -15,7 +15,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from fcm.models import AbstractDevice
 from django.db.models import F,Q
-from drf_spirit.utils import reduce_bolo_score, shortnaturaltime, add_bolo_score
+from drf_spirit.utils import reduce_bolo_score, shortnaturaltime, add_bolo_score,language_options
 from forum.user.models import UserProfile, Weight
 from django.http import JsonResponse
 from datetime import datetime,timedelta
@@ -23,15 +23,6 @@ from datetime import datetime,timedelta
 from .transcoder import transcode_media_file
 from django.utils.html import format_html
 
-language_options = (
-    ('1', "English"),
-    ('2', "Hindi"),
-    ('3', "Tamil"),
-    ('4', "Telgu"),
-    ('5', "Bengali"),
-    ('6', "Kannada"),
-
-)
 
 class RecordTimeStamp(models.Model):
     created_at=models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False) # auto_now will add the current time and date whenever field is saved.

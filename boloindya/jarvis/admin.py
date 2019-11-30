@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
-from .models import VideoUploadTranscode,FCMDevice, PushNotificationUser, PushNotification
+from .models import VideoUploadTranscode,FCMDevice, PushNotificationUser, PushNotification,StateDistrictLanguage
 from functools import update_wrapper
 from django.contrib import admin
 from django.shortcuts import redirect, render
@@ -67,8 +67,16 @@ class FCMDeviceAdmin(admin.ModelAdmin):
         url = 'admin:%s' % self.build_admin_url('send_message')
         return redirect(url)
     send_message_action.short_description = _("Send message")
+
+class StateDistrictLanguageAdmin(admin.ModelAdmin):
+    list_display = ('id','state_name','district_name','state_language','district_language')
+    search_fields = ('state_name', 'district_name','state_language','district_language')
+
+
+
 admin.site.unregister(FCMDevice)
 admin.site.register(FCMDevice, FCMDeviceAdmin) 
 admin.site.register(PushNotification)
 admin.site.register(PushNotificationUser)
+admin.site.register(StateDistrictLanguage,StateDistrictLanguageAdmin)
 # Register your models here.

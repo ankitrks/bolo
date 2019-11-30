@@ -18,7 +18,7 @@ import hashlib
 import time
 import re
 from drf_spirit.views import getVideoLength
-from drf_spirit.utils  import calculate_encashable_details
+from drf_spirit.utils  import calculate_encashable_details,language_options
 from forum.user.models import UserProfile, ReferralCode, ReferralCodeUsed, VideoCompleteRate, VideoPlaytime
 from forum.topic.models import Topic, VBseen
 from forum.category.models import Category
@@ -31,7 +31,7 @@ from forum.payment.forms import PaymentForm,PaymentCycleForm
 from django.views.generic.edit import FormView
 from datetime import datetime
 from forum.userkyc.forms import KYCBasicInfoRejectForm,KYCDocumentRejectForm,AdditionalInfoRejectForm,BankDetailRejectForm
-from .models import VideoUploadTranscode,VideoCategory, PushNotification, PushNotificationUser, language_options, user_group_options, FCMDevice, notification_type_options
+from .models import VideoUploadTranscode,VideoCategory, PushNotification, PushNotificationUser, user_group_options, FCMDevice, notification_type_options
 from drf_spirit.models import MonthlyActiveUser, HourlyActiveUser, DailyActiveUser, VideoDetails
 from forum.category.models import Category
 from django.contrib.auth.models import User

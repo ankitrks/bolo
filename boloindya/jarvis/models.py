@@ -11,6 +11,7 @@ from django.http import JsonResponse
 from django.db.models import Q
 
 from forum.topic.models import RecordTimeStamp
+from drf_spirit.utils import language_options
 
 class VideoCategory(models.Model):
     category_name = models.CharField(_('Category Name'),max_length=100,null=True,blank=True)
@@ -124,16 +125,6 @@ class FCMDevice(AbstractDevice):
             return JsonResponse({"status":"Failed","message":"Device not found for this user"},safe = False)
 
 
-language_options = (
-    ('0', "All"),
-    ('1', "English"),
-    ('2', "Hindi"),
-    ('3', "Tamil"),
-    ('4', "Telgu"),
-    ('5', "Bengali"),
-    ('4', "Kannada"),
-
-)
 
 user_group_options = (
     ('0', "All"),
@@ -178,4 +169,24 @@ class PushNotificationUser(RecordTimeStamp):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='push_notification_user',editable=False)
     push_notification_id = models.ForeignKey(PushNotification, blank = True, null = True, related_name='push_notification_id',editable=False)
     status = models.CharField(choices=status_options, blank = True, null = True, max_length=10, default='0')
+
+class StateDistrictLanguage(RecordTimeStamp):
+    state_name = models.CharField(_('State Name'),max_length=200,null=True,blank=True)
+    district_name = models.CharField(_('District Name'),max_length=200,null=True,blank=True)
+    state_language = models.CharField(choices=language_options,blank=True,null=True,max_length=10,default='1')
+    district_language = models.CharField(choices=language_options,blank=True,null=True,max_length=10,default='1')
+    response_dump = models.TextField(null=True,blank=True)
+
+    class Meta:
+        verbose_name = _("State District Language")
+        verbose_name_plural = _("State District Languages")
+
+    def __unicode__(self):
+        return str(self.district_name)+"--"+str(self.language)
+
+    def save(self, *args, **kwargs):
+        if not self.district_language:
+            self.district_language = self.state_language
+        super(StateDistrictLanguage, self).save(*args, **kwargs)
+
 

@@ -1,5 +1,13 @@
 # from django.urls import path
 from django.conf.urls import include, url
+from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,createTopic, TopicCommentList, CategoryList, CommentList, CommentDetails, SingUpOTPView,\
+	verify_otp, password_set, fb_profile_settings,Usertimeline,follow_user,follow_sub_category,like,shareontimeline,GetProfile,SubCategoryList,upload_video_to_s3,comment_view,\
+    follow_like_list,upload_audio_to_s3,reply_delete,editTopic,topic_delete,notification_topic,GetUserProfile,RegisterDevice,UnregisterDevice,NotificationAPI,get_bolo_score,\
+    GetTopic,GetQuestion,GetAnswers,CricketMatchList,get_single_match,get_single_poll,predict,LeaderBoradList,vb_seen,VBList,ExpertList,GetHomeAnswer,transcoder_notification,\
+    vb_transcode_status,get_follow_user,upload_profile_image,get_following_list,get_follower_list,GetChallenge,GetChallengeDetails,save_android_logs,SyncDump,get_hash_list,\
+    KYCDocumentTypeList,save_kyc_basic_info,save_kyc_documents,save_kyc_selfie,save_kyc_additional_info,save_bank_details_info,kyc_profession_status,get_kyc_status,my_app_version,\
+    EncashableDetailList,get_bolo_details, get_category_detail, UserLogStatistics,GetFollowigList,GetFollowerList, get_category_with_video_bytes, get_category_detail_with_views, \
+    get_category_video_bytes, get_popular_video_bytes, get_user_follow_and_like_list, get_recent_videos, get_popular_bolo, submit_user_feedback,get_ip_to_language
 from rest_framework_simplejwt import views as jwt_views
 from .views import *
 
@@ -102,6 +110,7 @@ urlpatterns = [
     url(r'^get_match_list/$', CricketMatchList.as_view(), name='get_match_list'),
     url(r'^get_single_match/$', get_single_match, name='get_single_match'),
     url(r'^get_single_poll/$', get_single_poll, name='get_single_poll'),
+    url(r'^get_ip_to_language/$', get_ip_to_language, name='get_ip_to_language'),
     url(r'^predict/$', predict, name='predict'),
     url(r'^vb_seen/$', vb_seen, name='vb_seen'),
     url(r'^transcoder_notification/$', transcoder_notification, name='transcoder_notification'),
