@@ -2,6 +2,7 @@ from django import template
 from boto.s3.connection import S3Connection
 from django.conf import settings
 from jarvis.models import language_options, user_group_options, status_options
+from drf_spirit.utils  import language_options
 
 from django.utils.safestring import mark_safe
 

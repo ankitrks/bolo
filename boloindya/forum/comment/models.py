@@ -13,15 +13,11 @@ from .managers import CommentQuerySet
 from drf_spirit.utils import reduce_bolo_score
 from django.db.models import F,Q
 from forum.user.models import UserProfile
+from drf_spirit.utils import language_options
 
 # from .transcoder import transcode_media_file
 
-language_options = (
-    ('1', "English"),
-    ('2', "Hindi"),
-    ('3', "Tamil"),
-    ('4', "Telgu"),
-)
+
 
 COMMENT, MOVED, CLOSED, UNCLOSED, PINNED, UNPINNED = range(6)
 
@@ -51,7 +47,7 @@ class Comment(models.Model):
     is_media = models.BooleanField(default=False)
     is_audio = models.BooleanField(default=False)
     media_duration = models.CharField(_("duration"), max_length=20, default='',null=True,blank=True)
-    language_id = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='0')
+    language_id = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='1')
     thumbnail = models.CharField(_("thumbnail"), max_length=150, default='')
     
     # is_transcoded = models.BooleanField(default = False)
