@@ -656,7 +656,7 @@ def boloindya_upload_n_transcode(request):
     # free_video = request.POST.get('free_video',None)
     title = request.POST.get('title',None)
     category_id = request.POST.get('category',None)
-    m2mcategory = request.POST.get('m2mcategory',None)
+    m2mcategory = request.POST.getlist('m2mcategory',None)
     language_id = request.POST.get('language_id',None)
     is_popular = request.POST.get('is_popular',None)
 
@@ -667,7 +667,7 @@ def boloindya_upload_n_transcode(request):
         return HttpResponse(json.dumps({'message':'fail','reason':'File Missing'}),content_type="application/json")
     if not upload_file.name.endswith('.mp4'):
         return HttpResponse(json.dumps({'message':'fail','reason':'This is not a mp4 file'}),content_type="application/json")
-    if not title or not category:
+    if not title or not category_id:
         return HttpResponse(json.dumps({'message':'fail','reason':'Title or Category is missing'}),content_type="application/json")
 
     bucket_credentials = get_bucket_details(upload_to_bucket)
@@ -701,7 +701,6 @@ def boloindya_upload_n_transcode(request):
                 videolength = getVideoLength(uploaded_url)
             except:
                 videolength = ''
-            print videolength
             my_dict = {}
             topic_dict = {}
             my_dict['s3_file_url'] = uploaded_url
@@ -727,10 +726,15 @@ def boloindya_upload_n_transcode(request):
             width,height = get_video_width_height(uploaded_url)
             topic_dict['vb_width'] = width
             topic_dict['vb_height'] = height
+            topic_dict['title'] = title
+            topic_dict['category_id'] = category_id
+            if is_popular:
+                topic_dict['is_popular'] = True
             my_upload_transcode = VideoUploadTranscode.objects.create(**my_dict)
             topic_dict['user_id'] = random.choice(list(UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)))
             my_topic = Topic.objects.create(**topic_dict)
             for each in m2mcategory:
+                print each,m2mcategory,type(m2mcategory)
                 my_topic.m2mcategory.add(Category.objects.get(pk=each))
             my_upload_transcode.is_topic = True
             my_upload_transcode.topic = my_topic
@@ -762,7 +766,7 @@ def get_video_width_height(video_url):
         video_height = widthandheight[1]
         return video_width,video_height
     except:
-        return None,None
+        return 0,0
 
 @login_required
 def upload_details(request):
@@ -803,7 +807,6 @@ def edit_upload(request):
             return render(request,'jarvis/pages/upload_n_transcode/edit_upload.html',{'my_video':my_video,'video_form':video_form})
         return render(request,'jarvis/pages/upload_n_transcode/edit_upload.html')
     elif request.method == 'POST':
-        print request.POST
         video_id = request.POST.get('video_id',None)
         if video_id:
             my_video = VideoUploadTranscode.objects.get(pk=video_id)
@@ -835,21 +838,19 @@ def boloindya_edit_upload(request):
         if file_id:
             my_video = VideoUploadTranscode.objects.get(pk=file_id)
             topic = my_video.topic
-            my_dict = {'title':topic.title,'category':topic.category,'m2mcategory':topic.m2mcategory,'language_id':topic.language_id,\
+            my_dict = {'title':topic.title,'category':topic.category,'m2mcategory':list(topic.m2mcategory.all().values_list('id',flat=True)),'language_id':topic.language_id,\
             'is_popular':topic.is_popular}
             video_form = TopicUploadTranscodeForm(initial=my_dict)
             return render(request,'jarvis/pages/upload_n_transcode/boloindya_edit_upload.html',{'my_video':my_video,'video_form':video_form})
         return render(request,'jarvis/pages/upload_n_transcode/boloindya_edit_upload.html')
     elif request.method == 'POST':
-        print request.POST
         video_id = request.POST.get('video_id',None)
         if video_id:
             my_video = VideoUploadTranscode.objects.get(pk=video_id)
             topic = my_video.topic
-            print request.POST
             topic.title = request.POST.get('title','')
             topic.category_id = request.POST.get('category',None)
-            m2mcategory = request.POST.get('m2mcategory',None)
+            m2mcategory = request.POST.getlist('m2mcategory',None)
             if m2mcategory:
                 all_category = topic.m2mcategory.all()
                 for each_category in all_category:
@@ -857,7 +858,7 @@ def boloindya_edit_upload(request):
                 for each in m2mcategory:
                     topic.m2mcategory.add(Category.objects.get(pk=each))
             topic.language_id = request.POST.get('language_id','')
-            topic.is_popular = request.POST.get('is_popular',False)
+            topic.is_popular = True if request.POST.get('is_popular',False) else False
             topic.save()
             return HttpResponse(json.dumps({'message':'success','video_id':my_video.id}),content_type="application/json")
         else:
@@ -887,9 +888,7 @@ def get_video_thumbnail(video_url,bucket_name):
         b = imencode('.jpg', frame)[1].tostring()
         ts = time.time()
         virtual_thumb_file = ContentFile(b, name = "img-" + str(ts).replace(".", "")  + ".jpg" )
-        print virtual_thumb_file
         url_thumbnail= upload_thumbail(virtual_thumb_file,bucket_name)
-        print url_thumbnail
         # obj.thumbnail = url_thumbnail
         # obj.media_duration = media_duration
         # obj.save()

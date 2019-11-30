@@ -144,7 +144,7 @@ function upload(event) {
                 $('#overlay').hide()
                 $('.submit_from_button').removeClass("opened");
                 if (data.message == 'fail') {
-                    alert(data.reason)
+                    alert(data['reason'])
                 } else if (data.message == 'success') {
                     var url = '/jarvis/boloindya_upload_details/?id=' + data.file_id
                     // do your redirect
