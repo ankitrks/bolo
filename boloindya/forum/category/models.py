@@ -29,6 +29,9 @@ class Category(models.Model):
     telgu_title = models.CharField(_("telgu_title"), max_length=75,null=True,blank=True)
     bengali_title = models.CharField(_("bengali_title"), max_length=75,null=True,blank=True)
     kannada_title = models.CharField(_("kannada_title"), max_length=75,null=True,blank=True)
+    malayalam_title = models.CharField(_("malayalam_title"), max_length=75,null=True,blank=True)
+    gujrati_title = models.CharField(_("gujrati_title"), max_length=75,null=True,blank=True)
+    marathi_title = models.CharField(_("marathi_title"), max_length=75,null=True,blank=True)
     slug = AutoSlugField(populate_from="title", db_index=False, blank=True)
     description = models.CharField(_("description"), max_length=255, blank=True)
     color = models.CharField(_("color"), max_length=7, blank=True,
