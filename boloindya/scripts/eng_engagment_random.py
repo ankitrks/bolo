@@ -6,6 +6,7 @@ import random
 from datetime import datetime, timedelta, date
 from drf_spirit.utils import add_bolo_score
 from forum.comment.models import Comment
+import gc
 
 def run():
     print "Start Time Eng_Engagment Random: ",datetime.now()
@@ -18,7 +19,11 @@ def run():
     topic_ids = Topic.objects.filter(is_vb=True,is_removed=False).values_list('id', flat=True)
     topic_ids = list(topic_ids)
     actionable_ids = random.sample(topic_ids,250)
+    post_counter = 0
     for each_topic_id in actionable_ids:
+        post_counter+=1
+        print "#######################   ",post_counter,"/",len(actionable_ids),"      ##########################"
+        gc.collect()
         # print 'toipc_id',each_topic_id
         action_type =['seen','comment','like','follow','share','comment_like']
         opt_action = random.choice(action_type)
