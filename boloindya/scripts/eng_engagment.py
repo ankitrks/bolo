@@ -8,77 +8,19 @@ from drf_spirit.utils import add_bolo_score
 from forum.comment.models import Comment
 
 def run():
+    print "Start Time Eng_Engagment: ",datetime.now()
     all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)
     user_ids = list(all_test_userprofile_id)
-    user_ids = random.sample(user_ids,1000)
+    user_ids = random.sample(user_ids,5000)
     action_type =['comment','like','seen','follow','share','comment_like']
     opt_action = random.choice(action_type)
     now = datetime.now()
     topic_ids = Topic.objects.filter(is_vb=True,is_removed=False).values_list('id', flat=True)
     topic_ids = list(topic_ids)
-    actionable_ids = random.sample(topic_ids,200)
-    for each_topic_id in actionable_ids:
-        action_type =['seen','comment','like','follow','share','comment_like']
-        opt_action = random.choice(action_type)
-        opt_action_user_id = random.choice(user_ids)
-        if opt_action =='comment':
-            action_comment(opt_action_user_id,each_topic_id)
-        elif opt_action == 'like':
-            each_topic = Topic.objects.get(pk=each_topic_id)
-            if each_topic.likes_count<each_topic.view_count/random.randrange(10,21) and each_topic.likes_count < each_topic.view_count:
-                action_like(opt_action_user_id,each_topic_id)
-        elif opt_action == 'follow':
-            action_follow(opt_action_user_id,random.choice(User.objects.all()).id)
-        elif opt_action == 'share':
-            action_share(opt_action_user_id,each_topic_id)
-        elif opt_action == 'comment_like':
-            all_comment_list_id = Comment.objects.filter(is_removed=False).values_list('user_id',flat=True)
-            comment_ids = list(all_comment_list_id)
-            comment_ids = random.sample(comment_ids,50)
-            all_comment = Comment.objects.filter(pk__in =user_ids)
-            for each_comment in all_comment:
-                action_comment_like(opt_action_user_id,each_comment)
-        elif opt_action == 'seen':
-            action_seen(opt_action_user_id,each_topic_id)
+    actionable_ids = random.sample(topic_ids,1000)
     last_n_days_post_ids = Topic.objects.filter(is_vb=True,is_removed=False,date__gte=now-timedelta(days=3)).order_by('-date').values_list('id',flat=True)
     last_n_days_post_ids = list(last_n_days_post_ids)
-    for each_like_id in last_n_days_post_ids:
-        try:
-            each_like = Topic.objects.get(pk=each_like_id)
-            if each_like.likes_count < each_like.view_count/random.randrange(10,21):
-                if each_like.date +timedelta(minutes=10) > now and each_like.view_count/random.randrange(10,21) > 100 and each_like.likes_count < 100:
-                    number_like = random.randrange(6,100)
-                elif each_like.date +timedelta(minutes=10) < now and each_like.date +timedelta(minutes=30) > now and each_like.view_count/random.randrange(10,21) > 200 and each_like.likes_count < 200:
-                    number_like = random.randrange(100,200-each_like.likes_count)
-                elif each_like.date +timedelta(minutes=30) < now and each_like.date +timedelta(hours=2) > now and each_like.view_count/random.randrange(10,21) > 300 and each_like.likes_count < 300:
-                    number_like = random.randrange(1,300-each_like.likes_count)
-                elif each_like.date +timedelta(hours=2) < now and each_like.date +timedelta(hours=4) > now and each_like.view_count/random.randrange(10,21) > 400 and each_like.likes_count < 400:
-                    number_like = random.randrange(1,400-each_like.likes_count)
-                elif each_like.date +timedelta(hours=4) < now and each_like.date +timedelta(hours=6) > now and each_like.view_count/random.randrange(10,21) > 500 and each_like.likes_count < 500:
-                    number_like = random.randrange(1,500-each_like.likes_count)
-                elif each_like.date +timedelta(hours=6) < now and each_like.date +timedelta(hours=8) > now and each_like.view_count/random.randrange(10,21) > 600 and each_like.likes_count < 600:
-                    number_like = random.randrange(1,600-each_like.likes_count)
-                elif each_like.date +timedelta(hours=10) < now and each_like.date +timedelta(hours=12) > now and each_like.view_count/random.randrange(10,21) > 700 and each_like.likes_count < 700:
-                    number_like = random.randrange(1,700-each_like.likes_count)
-                elif each_like.date +timedelta(hours=12) < now and each_like.date +timedelta(hours=14) > now and each_like.view_count/random.randrange(10,21) > 800 and each_like.likes_count < 800:
-                    number_like = random.randrange(1,800-each_like.likes_count)
-                elif each_like.date +timedelta(hours=14) < now and each_like.date +timedelta(hours=16) > now and each_like.view_count/random.randrange(10,21) > 900 and each_like.likes_count < 900:
-                    number_like = random.randrange(1,900-each_like.likes_count)
-                elif each_like.date +timedelta(hours=16) < now and each_like.date +timedelta(hours=72) > now and each_like.view_count/random.randrange(10,21) > 1000 and each_like.likes_count < 1000:
-                    number_like = random.randrange(1,1000-each_like.likes_count)
-                else:
-                    number_like = 1
-                i = 0
-                while i < number_like:
-                    try:
-                        opt_action_user_id = random.choice(user_ids)
-                        action_like(opt_action_user_id,each_like_id)
-                        i += 1
-                    except:
-                        pass
-        except:
-            pass
-
+    
     for each_seen_id in last_n_days_post_ids:
         try:
             each_seen = Topic.objects.get(pk=each_seen_id)
@@ -126,6 +68,43 @@ def run():
         except:
             pass
 
+    for each_like_id in last_n_days_post_ids:
+        try:
+            each_like = Topic.objects.get(pk=each_like_id)
+            if each_like.likes_count < each_like.view_count/random.randrange(10,21):
+                if each_like.date +timedelta(minutes=10) > now and each_like.view_count/random.randrange(10,21) > 100 and each_like.likes_count < 100:
+                    number_like = random.randrange(6,100)
+                elif each_like.date +timedelta(minutes=10) < now and each_like.date +timedelta(minutes=30) > now and each_like.view_count/random.randrange(10,21) > 200 and each_like.likes_count < 200:
+                    number_like = random.randrange(100,200-each_like.likes_count)
+                elif each_like.date +timedelta(minutes=30) < now and each_like.date +timedelta(hours=2) > now and each_like.view_count/random.randrange(10,21) > 300 and each_like.likes_count < 300:
+                    number_like = random.randrange(1,300-each_like.likes_count)
+                elif each_like.date +timedelta(hours=2) < now and each_like.date +timedelta(hours=4) > now and each_like.view_count/random.randrange(10,21) > 400 and each_like.likes_count < 400:
+                    number_like = random.randrange(1,400-each_like.likes_count)
+                elif each_like.date +timedelta(hours=4) < now and each_like.date +timedelta(hours=6) > now and each_like.view_count/random.randrange(10,21) > 500 and each_like.likes_count < 500:
+                    number_like = random.randrange(1,500-each_like.likes_count)
+                elif each_like.date +timedelta(hours=6) < now and each_like.date +timedelta(hours=8) > now and each_like.view_count/random.randrange(10,21) > 600 and each_like.likes_count < 600:
+                    number_like = random.randrange(1,600-each_like.likes_count)
+                elif each_like.date +timedelta(hours=10) < now and each_like.date +timedelta(hours=12) > now and each_like.view_count/random.randrange(10,21) > 700 and each_like.likes_count < 700:
+                    number_like = random.randrange(1,700-each_like.likes_count)
+                elif each_like.date +timedelta(hours=12) < now and each_like.date +timedelta(hours=14) > now and each_like.view_count/random.randrange(10,21) > 800 and each_like.likes_count < 800:
+                    number_like = random.randrange(1,800-each_like.likes_count)
+                elif each_like.date +timedelta(hours=14) < now and each_like.date +timedelta(hours=16) > now and each_like.view_count/random.randrange(10,21) > 900 and each_like.likes_count < 900:
+                    number_like = random.randrange(1,900-each_like.likes_count)
+                elif each_like.date +timedelta(hours=16) < now and each_like.date +timedelta(hours=72) > now and each_like.view_count/random.randrange(10,21) > 1000 and each_like.likes_count < 1000:
+                    number_like = random.randrange(1,1000-each_like.likes_count)
+                else:
+                    number_like = 1
+                i = 0
+                while i < number_like:
+                    try:
+                        opt_action_user_id = random.choice(user_ids)
+                        action_like(opt_action_user_id,each_like_id)
+                        i += 1
+                    except:
+                        pass
+        except:
+            pass
+
     for each_topic_id in last_n_days_post_ids:
         action_type =['seen','comment','like','follow','share','comment_like']
         opt_action = random.choice(action_type)
@@ -149,6 +128,33 @@ def run():
                 action_comment_like(opt_action_user_id,each_comment)
         elif opt_action == 'seen':
             action_seen(opt_action_user_id,each_topic_id)
+
+
+    for each_topic_id in actionable_ids:
+        action_type =['seen','comment','like','follow','share','comment_like']
+        opt_action = random.choice(action_type)
+        opt_action_user_id = random.choice(user_ids)
+        if opt_action =='comment':
+            action_comment(opt_action_user_id,each_topic_id)
+        elif opt_action == 'like':
+            each_topic = Topic.objects.get(pk=each_topic_id)
+            if each_topic.likes_count<each_topic.view_count/random.randrange(10,21) and each_topic.likes_count < each_topic.view_count:
+                action_like(opt_action_user_id,each_topic_id)
+        elif opt_action == 'follow':
+            action_follow(opt_action_user_id,random.choice(User.objects.all()).id)
+        elif opt_action == 'share':
+            action_share(opt_action_user_id,each_topic_id)
+        elif opt_action == 'comment_like':
+            all_comment_list_id = Comment.objects.filter(is_removed=False).values_list('user_id',flat=True)
+            comment_ids = list(all_comment_list_id)
+            comment_ids = random.sample(comment_ids,50)
+            all_comment = Comment.objects.filter(pk__in =user_ids)
+            for each_comment in all_comment:
+                action_comment_like(opt_action_user_id,each_comment)
+        elif opt_action == 'seen':
+            action_seen(opt_action_user_id,each_topic_id)
+
+    print "End Time Eng_Engagment: ",datetime.now()
 
 
 def check_like(topic_id,user_ids):
