@@ -271,7 +271,7 @@ def check_like(topic_id,user_ids):
             if new_vb_like:
                 aList = [Like(**vals) for vals in new_vb_like]
                 newly_created = Like.objects.bulk_create(aList, batch_size=10000)
-                Topic.objects.filter(pk=topic_id).update(F('likes_count')+len(new_vb_like))
+                Topic.objects.filter(pk=topic_id).update(likes_count = F('likes_count')+len(new_vb_like))
                 bolo_increment_user_id = [x['user_id'] for x in new_vb_like]
                 bolo_increment_user = UserProfile.objects.filter(user_id__in = bolo_increment_user_id ).update(bolo_score =F('bolo_score')+score,like_count = F('like_count')+1)
                 already_liked = list(Like.objects.filter(topic_id = topic_id,user_id__in=[d['user_id'] for d in new_vb_like]).values('user_id','id'))
