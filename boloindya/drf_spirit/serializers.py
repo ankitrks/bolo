@@ -18,7 +18,8 @@ cloufront_url = "https://d1fa4tg1fvr6nj.cloudfront.net"
 class CategorySerializer(ModelSerializer):
     class Meta:
         model = Category
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('is_engagement','reindex_at', 'is_global', 'is_closed', 'is_removed', 'is_private', 'is_engagement' )
 
 class AppVersionSerializer(ModelSerializer):
     class Meta:
@@ -85,7 +86,8 @@ class CommentSerializer(ModelSerializer):
     date = SerializerMethodField()
     class Meta:
         model = Comment
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('action', 'is_removed', 'is_modified', 'ip_address', 'is_media', 'is_audio', 'media_duration', 'thumbnail', )
 
     def get_user(self,instance):
         return UserSerializer(instance.user).data
@@ -250,7 +252,7 @@ class UserProfileSerializer(ModelSerializer):
     class Meta:
         model = UserProfile
         # fields = '__all__' 
-        exclude = ('extra_data', )
+        exclude = ('extra_data', 'location', 'last_seen', 'last_ip', 'timezone', 'is_administrator', 'is_moderator', 'is_verified', 'last_post_on', 'last_post_hash', 'is_geo_location', 'lat', 'lang', 'click_id', 'click_id_response')
 
     def get_follow_count(self,instance):
         return shortcounterprofile(instance.follow_count)
@@ -269,7 +271,7 @@ class UserSerializer(ModelSerializer):
     class Meta:
         model = User
         #fields = '__all__'
-        exclude = ('password', )
+        exclude = ('password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login')
     def get_userprofile(self,instance):
         return UserProfileSerializer(UserProfile.objects.get(user=instance)).data
 
@@ -424,7 +426,7 @@ class CategoryVideoByteSerializer(ModelSerializer):
     class Meta:
         model = Topic
         #fields = '__all__'
-        exclude = ('transcode_dump','transcode_status_dump' )
+        exclude = ('transcode_dump','transcode_status_dump', 'is_transcoded_error', 'transcode_job_id', 'is_transcoded', 'is_removed', 'is_closed', 'is_globally_pinned', 'is_pinned', 'last_commented', 'reindex_at', 'last_active' )
         # TODO:: refactor after deciding about globally pinned.
         read_only_fields = ('is_pinned',)
 
@@ -461,7 +463,8 @@ class CategoryWithVideoSerializer(ModelSerializer):
 
     class Meta:
         model = Category
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('reindex_at', 'is_global', 'is_closed', 'is_removed', 'is_private', )
 
     def get_total_view(self, instance):
         return shorcountertopic(instance.view_count)
