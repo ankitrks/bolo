@@ -655,10 +655,9 @@ def boloindya_upload_n_transcode(request):
     # upload_category = request.POST.get('category_choice',None)
     # free_video = request.POST.get('free_video',None)
     title = request.POST.get('title',None)
-    category_id = request.POST.get('category',None)
     m2mcategory = request.POST.getlist('m2mcategory',None)
     language_id = request.POST.get('language_id',None)
-    is_popular = request.POST.get('is_popular',None)
+    is_pubsub_popular_push = request.POST.get('is_pubsub_popular_push',None)
 
     # print upload_file,upload_to_bucket,upload_folder_name
     if not upload_to_bucket:
@@ -667,7 +666,7 @@ def boloindya_upload_n_transcode(request):
         return HttpResponse(json.dumps({'message':'fail','reason':'File Missing'}),content_type="application/json")
     if not upload_file.name.endswith('.mp4'):
         return HttpResponse(json.dumps({'message':'fail','reason':'This is not a mp4 file'}),content_type="application/json")
-    if not title or not category_id:
+    if not title or not m2mcategory:
         return HttpResponse(json.dumps({'message':'fail','reason':'Title or Category is missing'}),content_type="application/json")
 
     bucket_credentials = get_bucket_details(upload_to_bucket)
@@ -727,11 +726,10 @@ def boloindya_upload_n_transcode(request):
             topic_dict['vb_width'] = width
             topic_dict['vb_height'] = height
             topic_dict['title'] = title
-            topic_dict['category_id'] = category_id
             topic_dict['view_count'] = view_count
             topic_dict['is_vb'] = True
-            if is_popular:
-                topic_dict['is_popular'] = True
+            if is_pubsub_popular_push:
+                topic_dict['is_pubsub_popular_push'] = True
             my_upload_transcode = VideoUploadTranscode.objects.create(**my_dict)
             topic_dict['user_id'] = random.choice(list(UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)))
             my_topic = Topic.objects.create(**topic_dict)
@@ -841,7 +839,7 @@ def boloindya_edit_upload(request):
             my_video = VideoUploadTranscode.objects.get(pk=file_id)
             topic = my_video.topic
             my_dict = {'title':topic.title,'category':topic.category,'m2mcategory':list(topic.m2mcategory.all().values_list('id',flat=True)),'language_id':topic.language_id,\
-            'is_popular':topic.is_popular}
+            'is_pubsub_popular_push':topic.is_pubsub_popular_push}
             video_form = TopicUploadTranscodeForm(initial=my_dict)
             return render(request,'jarvis/pages/upload_n_transcode/boloindya_edit_upload.html',{'my_video':my_video,'video_form':video_form})
         return render(request,'jarvis/pages/upload_n_transcode/boloindya_edit_upload.html')
@@ -851,7 +849,6 @@ def boloindya_edit_upload(request):
             my_video = VideoUploadTranscode.objects.get(pk=video_id)
             topic = my_video.topic
             topic.title = request.POST.get('title','')
-            topic.category_id = request.POST.get('category',None)
             m2mcategory = request.POST.getlist('m2mcategory',None)
             if m2mcategory:
                 all_category = topic.m2mcategory.all()
@@ -860,7 +857,8 @@ def boloindya_edit_upload(request):
                 for each in m2mcategory:
                     topic.m2mcategory.add(Category.objects.get(pk=each))
             topic.language_id = request.POST.get('language_id','')
-            topic.is_popular = True if request.POST.get('is_popular',False) else False
+            if not topic.is_pubsub_popular_push and request.POST.get('is_pubsub_popular_push',False):
+                topic.is_pubsub_popular_push = True
             topic.save()
             return HttpResponse(json.dumps({'message':'success','video_id':my_video.id}),content_type="application/json")
         else:

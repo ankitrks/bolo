@@ -17,10 +17,10 @@ class VideoUploadTranscodeForm(ModelForm):
 class TopicUploadTranscodeForm(ModelForm):
     class Meta():
         model = Topic
-        fields = ['title','category','m2mcategory','language_id','is_popular']
+        fields = ['title','m2mcategory','language_id','is_pubsub_popular_push']
 
     def __init__(self,*args,**kwargs):
         super(TopicUploadTranscodeForm,self).__init__(*args,**kwargs)
         for field in self: 
-            if not field.name=='is_popular':
+            if not field.name=='is_pubsub_popular_push':
                 field.field.widget.attrs['class'] = 'form-control'
