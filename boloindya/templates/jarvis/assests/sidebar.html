@@ -57,8 +57,10 @@
             </span>
           </a>
           <ul class="treeview-menu">
-            <li class="{% if request.path in '/jarvis/uploadvideofile/'%}active{% endif %}"><a href="/jarvis/uploadvideofile/"><i class="fa fa-circle-o"></i> Upload N Transcode</a></li>
-            <li class="{% if request.path in '/jarvis/uploaded_list/'%}active{% endif %}"><a href="/jarvis/uploaded_list/"><i class="fa fa-share"></i> Uploaded List</a></li>
+            <li class="{% if request.path in '/jarvis/uploadvideofile/'%}active{% endif %}"><a href="/jarvis/uploadvideofile/"><i class="fa fa-circle-o"></i>CAnna Upload n Transcode</a></li>
+            <li class="{% if request.path in '/jarvis/boloindya_uploadvideofile/'%}active{% endif %}"><a href="/jarvis/boloindya_uploadvideofile/"><i class="fa fa-circle-o"></i>Boloindya Upload n Transcode</a></li>
+            <li class="{% if request.path in '/jarvis/uploaded_list/'%}active{% endif %}"><a href="/jarvis/uploaded_list/"><i class="fa fa-share"></i>CAnna Uploaded List</a></li>
+            <li class="{% if request.path in '/jarvis/boloindya_uploaded_list/'%}active{% endif %}"><a href="/jarvis/boloindya_uploaded_list/"><i class="fa fa-share"></i>Boloindya Uploaded List</a></li>
           </ul>
         </li>
         <li class="{% if request.path in '/jarvis/importcsv/'%}active{% endif %}"><a href="/jarvis/importcsv/"><i class="fa fa-th"></i> <span>Upload Instagram CSV</span></a></li>
