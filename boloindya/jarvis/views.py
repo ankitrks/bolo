@@ -609,9 +609,9 @@ def upload_n_transcode(request):
 
 
             uploaded_url,transcode = upload_tos3(upload_file,upload_to_bucket,upload_folder_name)
-            thumbnail_url = get_video_thumbnail(uploaded_url,upload_to_bucket)
+            thumbnail_url = get_video_thumbnail(urlify(upload_file_name),upload_to_bucket)
             try:
-                videolength = getVideoLength(uploaded_url)
+                videolength = getVideoLength(urlify(upload_file_name))
             except:
                 videolength = ''
             print videolength
@@ -696,9 +696,9 @@ def boloindya_upload_n_transcode(request):
 
 
             uploaded_url,transcode = upload_tos3(upload_file,upload_to_bucket,upload_folder_name)
-            thumbnail_url = get_video_thumbnail(uploaded_url,upload_to_bucket)
+            thumbnail_url = get_video_thumbnail(urlify(upload_file_name),upload_to_bucket)
             try:
-                videolength = getVideoLength(uploaded_url)
+                videolength = getVideoLength(urlify(upload_file_name))
             except:
                 videolength = ''
             my_dict = {}
