@@ -89,7 +89,7 @@ def run():
             newly_careted = VBseen.objects.bulk_create(aList, batch_size=10000)
             counter_objects_created+=len(user_want_vbseen)
             print "After: VBseen.objects.bulk_create(aList)",datetime.now()
-            Topic.objects.filter(pk=each_seen_id).update(F('view_count')+number_seen)
+            Topic.objects.filter(pk=each_seen_id).update(view_count = F('view_count')+number_seen)
             if user_want_vbseen:
                 # set_list1 = set(tuple(sorted(d.items())) for d in user_want_vbseen)
                 # set_list2 = set(tuple(sorted(d.items())) for d in already_vbseen)
