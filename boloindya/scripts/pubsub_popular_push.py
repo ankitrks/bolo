@@ -5,16 +5,13 @@ from django.db.models import Q
 from jarvis.models import FCMDevice
 
 def run():
+    from django.core.paginator import Paginator
     pubsub_obj = Topic.objects.filter(Q(is_pubsub_popular_push=True) & Q(is_popular = False))
     if pubsub_obj:
-        devices = FCMDevice.objects.filter(user__pk=41)
-        print len(devices)
-        # for index in xrange(0, len(devices), 1000):
-        #     device = devices[index:index + 1000]
-        #     print len(device)
-        print devices
-        t = devices.send_message(data={'pupluar_data': 'true' })
-        # print devices
-        # Send Popular Data to Users 
-
-    # pubsub_obj.update(is_popular = True)
+        devices = FCMDevice.objects.all(user__isnull=False)
+        device_pagination = Paginator(devices, 1)
+        for index in range(1, (device_pagination.num_pages+1)):
+            device = device_pagination.page(index)
+            t = device.object_list.send_message(data={'pupluar_data': 'true' })
+                
+    pubsub_obj.update(is_popular = True)
