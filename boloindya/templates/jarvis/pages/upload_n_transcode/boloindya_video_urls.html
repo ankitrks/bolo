@@ -30,10 +30,6 @@
         <p>{{ my_video.topic.title }}</p>
     </div>
     <div>
-        <h3>Video Category</h3>
-        <p>{{ my_video.topic.category }}</p>
-    </div>
-    <div>
         <h3>Video M2M Category</h3>
         {% for each in my_video.topic.m2mcategory.all %}
         <p>{{ each }}</p>
@@ -44,8 +40,8 @@
         <p>{{ my_video.topic.get_language_id_display }}</p>
     </div>
     <div>
-        <h3>Is Popular</h3>
-        <p>{% if my_video.topic.is_popular %}<img src="{% static 'img/green_tick.jpg' %}" style="width:20px;">{% else %}<img src="{% static 'img/wrong.png' %}" style="width:20px;">{% endif %}</p>
+        <h3>Is Popular Push?</h3>
+        <p>{% if my_video.topic.is_pubsub_popular_push %}<img src="{% static 'img/green_tick.jpg' %}" style="width:20px;">{% else %}<img src="{% static 'img/wrong.png' %}" style="width:20px;">{% endif %}</p>
     </div>
     <div>
         <a href="/jarvis/boloindya_uploadvideofile/"><button type="button" class="btn btn-danger"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Upload Page</button></a>
