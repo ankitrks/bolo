@@ -9,6 +9,7 @@ from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,c
     EncashableDetailList,get_bolo_details, get_category_detail, UserLogStatistics,GetFollowigList,GetFollowerList, get_category_with_video_bytes, get_category_detail_with_views, \
     get_category_video_bytes, get_popular_video_bytes, get_user_follow_and_like_list, get_recent_videos, get_popular_bolo, submit_user_feedback,get_ip_to_language
 from rest_framework_simplejwt import views as jwt_views
+from .views import *
 
 app_name = 'drf_spirit'
 
@@ -125,6 +126,7 @@ urlpatterns = [
     url(r'^get_category_detail_with_views/$', get_category_detail_with_views),
     url(r'^get_category_video_bytes/$', get_category_video_bytes),
     url(r'^get_popular_video_bytes/$', get_popular_video_bytes),
+    url(r'^pubsub/popular/$', pubsub_popular),
     url(r'^get_user_follow_and_like_list/$', get_user_follow_and_like_list),
     url(r'^get_recent_videos/$', get_recent_videos),
     url(r'^get_popular_bolo/$', get_popular_bolo),

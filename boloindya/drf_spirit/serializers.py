@@ -93,6 +93,11 @@ class CommentSerializer(ModelSerializer):
     def get_date(self,instance):
         return shortnaturaltime(instance.date)
 
+class PubSubPopularSerializer(ModelSerializer):
+    class Meta:
+        model = Topic
+        fields = ('id', 'language_id')
+        
 class TopicSerializerwithComment(ModelSerializer):
     user = SerializerMethodField()
     category = PresentableSlugRelatedField(queryset=Category.objects.all(),
