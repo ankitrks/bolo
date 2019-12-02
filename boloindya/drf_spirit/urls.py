@@ -7,8 +7,9 @@ from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,c
     vb_transcode_status,get_follow_user,upload_profile_image,get_following_list,get_follower_list,GetChallenge,GetChallengeDetails,save_android_logs,SyncDump,get_hash_list,\
     KYCDocumentTypeList,save_kyc_basic_info,save_kyc_documents,save_kyc_selfie,save_kyc_additional_info,save_bank_details_info,kyc_profession_status,get_kyc_status,my_app_version,\
     EncashableDetailList,get_bolo_details, get_category_detail, UserLogStatistics,GetFollowigList,GetFollowerList, get_category_with_video_bytes, get_category_detail_with_views, \
-    get_category_video_bytes, get_popular_video_bytes, get_user_follow_and_like_list, get_recent_videos, get_popular_bolo, submit_user_feedback, get_landing_page_video
+    get_category_video_bytes, get_popular_video_bytes, get_user_follow_and_like_list, get_recent_videos, get_popular_bolo, submit_user_feedback,get_ip_to_language, get_landing_page_video
 from rest_framework_simplejwt import views as jwt_views
+from .views import *
 
 app_name = 'drf_spirit'
 
@@ -109,6 +110,7 @@ urlpatterns = [
     url(r'^get_match_list/$', CricketMatchList.as_view(), name='get_match_list'),
     url(r'^get_single_match/$', get_single_match, name='get_single_match'),
     url(r'^get_single_poll/$', get_single_poll, name='get_single_poll'),
+    url(r'^get_ip_to_language/$', get_ip_to_language, name='get_ip_to_language'),
     url(r'^predict/$', predict, name='predict'),
     url(r'^vb_seen/$', vb_seen, name='vb_seen'),
     url(r'^transcoder_notification/$', transcoder_notification, name='transcoder_notification'),
@@ -124,6 +126,7 @@ urlpatterns = [
     url(r'^get_category_detail_with_views/$', get_category_detail_with_views),
     url(r'^get_category_video_bytes/$', get_category_video_bytes),
     url(r'^get_popular_video_bytes/$', get_popular_video_bytes),
+    url(r'^pubsub/popular/$', pubsub_popular),
     url(r'^get_user_follow_and_like_list/$', get_user_follow_and_like_list),
     url(r'^get_recent_videos/$', get_recent_videos),
 

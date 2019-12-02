@@ -25,7 +25,7 @@ from django.forms.models import model_to_dict
 from datetime import datetime,timedelta,date
 from django.db.models.signals import post_save
 from django.views.decorators.csrf import csrf_exempt
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from rest_framework import status
 from rest_framework import generics
@@ -41,22 +41,17 @@ from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
 from .models import UserJarvisDump, UserLogStatistics, UserFeedback
 from .permissions import IsOwnerOrReadOnly
-from .utils import get_weight, add_bolo_score, shorcountertopic, calculate_encashable_details
+from .utils import get_weight, add_bolo_score, shorcountertopic, calculate_encashable_details, state_language, language_options
 
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 from forum.category.models import Category
 from forum.comment.models import Comment
 from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs
-from jarvis.models import FCMDevice
+from jarvis.models import FCMDevice,StateDistrictLanguage
 from forum.topic.models import Topic, ShareTopic, Like, SocialShare, Notification, CricketMatch, Poll, Choice, Voting, \
     Leaderboard, VBseen, TongueTwister
-from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer, TopicSerializerwithComment, \
-    AppVersionSerializer, UserSerializer, SingleTopicSerializerwithComment, UserAnswerSerializerwithComment, \
-    CricketMatchSerializer, PollSerializer, ChoiceSerializer, VotingSerializer, LeaderboardSerializer, PollSerializerwithChoice, \
-    OnlyChoiceSerializer, NotificationSerializer, UserProfileSerializer, TongueTwisterSerializer,KYCDocumnetsTypeSerializer, \
-    PaymentCycleSerializer, EncashableDetailSerializer, PaymentInfoSerializer, UserKYCSerializer, CategoryWithVideoSerializer, \
-    CategoryVideoByteSerializer
+from .serializers import *
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -109,8 +104,8 @@ class NotificationAPI(GenericAPIView):
 
         notifications = Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-last_modified')[offset:offset+limit]
 
-        
-        Notification.objects.filter(status = 0).update(status = 1)
+        if notifications:
+            notifications.update(status = 1)
 
         result = []
         for notification in notifications:
@@ -2577,11 +2572,28 @@ def get_popular_video_bytes(request):
         paginator_topics.page_size = 10
         startdate = datetime.today()
         enddate = startdate - timedelta(days=30)
-        topics = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, is_popular=True, date__gte=enddate).order_by('-date')
+        topics = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, is_popular=True, \
+            date__gte=enddate).order_by('-date')
+        paginator_topics.page_size = 10
         topics = paginator_topics.paginate_queryset(topics, request)
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({'message': 'Error Occured:' + str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def pubsub_popular(request):
+    try:
+        paginator_topics = PageNumberPagination()
+        language_id = request.GET.get('language_id', 1)
+        startdate = datetime.today()
+        enddate = startdate - timedelta(days=30)
+        topics_all = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, is_popular=True, \
+            date__gte=enddate).order_by('-date')
+        paginator_topics.page_size = 10
+        topics = paginator_topics.paginate_queryset(topics_all, request)
+        return JsonResponse({'topics': PubSubPopularSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:' + str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def get_user_follow_and_like_list(request):
@@ -2667,6 +2679,33 @@ def get_landing_page_video(request):
         enddate = startdate - timedelta(days=30)
         topics = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, is_popular=True, date__gte=enddate).order_by('-date')[0:2]
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+      
+@api_view(['GET'])
+def get_ip_to_language(request):
+    try:
+        pass
+        user_ip = request.GET.get('user_ip',None)
+        if user_ip:
+            url = 'http://ip-api.com/json/'+user_ip
+            response = urllib2.urlopen(url).read()
+            json_response = json.loads(response)
+            my_language,is_created = StateDistrictLanguage.objects.get_or_create(state_name=json_response['regionName'],district_name=json_response['city'])
+            if is_created:
+                if json_response['regionName'] in state_language:
+                    language_option = dict(language_options)
+                    for key,value in language_option.items():
+                        if value==state_language[json_response['regionName']]:
+                            my_language.state_language = key
+                            my_language.district_language = key
+                else:
+                    my_language.state_language = '1'
+                    my_language.district_language = '1'
+                my_language.save()
+            return JsonResponse({'language_id': my_language.district_language}, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'message': 'Error Occured: IP not in GET request',}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 

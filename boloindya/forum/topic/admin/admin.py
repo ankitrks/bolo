@@ -24,7 +24,8 @@ class TopicChangeListForm(forms.ModelForm):
             widget = forms.CheckboxSelectMultiple, required = False)
     title = forms.CharField(required = True)
     language_id = forms.ChoiceField(choices = language_options,required = True)
-    is_popular = forms.BooleanField(required = False)
+    is_pubsub_popular_push = forms.BooleanField(required = False)
+    # is_popular = forms.BooleanField(required = False)
 
 from django.contrib.admin.views.main import ChangeList
 PAGE_VAR = 'p'
@@ -49,9 +50,9 @@ class TopicChangeList(ChangeList):
         #     list_per_page, list_max_show_all, list_editable, model_admin)
 
         self.list_display = ('action_checkbox', 'id', 'title', 'name', 'duration', 'language_id', 'view_count',\
-            'comments', 'is_monetized', 'is_removed', 'is_popular', 'date', 'm2mcategory')
+            'comments', 'is_monetized', 'is_removed', 'is_pubsub_popular_push', 'date', 'm2mcategory') #is_popular
         self.list_display_links = ['id']
-        self.list_editable = ('title', 'language_id', 'm2mcategory', 'is_popular')
+        self.list_editable = ('title', 'language_id', 'm2mcategory', 'is_pubsub_popular_push')
 
         self.model = model
         self.opts = model._meta
@@ -104,7 +105,7 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
             'fields': ('title', 'm2mcategory')
         }),
         ('VB Details', {
-            'fields': ('language_id', 'media_duration','is_popular'),
+            'fields': ('language_id', 'media_duration','is_pubsub_popular_push'),
         }),
         ('Counts', {
             'fields': (('view_count', 'comment_count'), ('total_share_count', 'share_count'), 'likes_count'),
@@ -169,11 +170,14 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
             obj.title = form.cleaned_data['title']
         if 'language_id' in form.changed_data:
             obj.language_id = form.cleaned_data['language_id']
-        if 'is_popular' in form.changed_data:
-            obj.is_popular = form.cleaned_data['is_popular']
+        if 'is_pubsub_popular_push' in form.changed_data:
+            obj.is_pubsub_popular_push = True
+        # if 'is_popular' in form.changed_data:
+        #     obj.is_popular = form.cleaned_data['is_popular']
+        #     if obj.is_popular and obj.is_vb and not obj.is_removed:
+        #         obj.is_pubsub_popular_push = True
         obj.save()
         if 'language_id' in form.changed_data and obj.is_monetized:
-            # print form.initial['language_id'],obj.language_id,"####",change
             if form.initial['language_id'] == '1':
                 userprofile = UserProfile.objects.get(user = obj.user)
                 userprofile.save()

@@ -15,7 +15,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from fcm.models import AbstractDevice
 from django.db.models import F,Q
-from drf_spirit.utils import reduce_bolo_score, shortnaturaltime, add_bolo_score
+from drf_spirit.utils import reduce_bolo_score, shortnaturaltime, add_bolo_score,language_options
 from forum.user.models import UserProfile, Weight
 from django.http import JsonResponse
 from datetime import datetime,timedelta
@@ -23,15 +23,6 @@ from datetime import datetime,timedelta
 from .transcoder import transcode_media_file
 from django.utils.html import format_html
 
-language_options = (
-    ('1', "English"),
-    ('2', "Hindi"),
-    ('3', "Tamil"),
-    ('4', "Telgu"),
-    ('5', "Bengali"),
-    ('6', "Kannada"),
-
-)
 
 class RecordTimeStamp(models.Model):
     created_at=models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False) # auto_now will add the current time and date whenever field is saved.
@@ -100,6 +91,7 @@ class Topic(models.Model):
     language_id = models.CharField(_("language"), choices=language_options, blank = True, null = True, max_length=10, default='1')
     question_image = models.TextField(_("Question image"),null=True,blank=True)
     is_popular = models.BooleanField(_("Popular"), default = False)
+    is_pubsub_popular_push = models.BooleanField(_("Popular Push"), default = False)
 
     is_media = models.BooleanField(default=True)
     media_duration = models.CharField(_("duration"), max_length=20, default='',null=True,blank=True)
@@ -396,6 +388,9 @@ class TongueTwister(models.Model):
     te_descpription = models.TextField(_("Telgu Hash Tag Description"),blank = True, null = True)
     be_descpription = models.TextField(_("Bengali Hash Tag Description"),blank = True, null = True)
     ka_descpription = models.TextField(_("Kannada Hash Tag Description"),blank = True, null = True)
+    ma_descpription = models.TextField(_("Malyalam Hash Tag Description"),blank = True, null = True)
+    gj_descpription = models.TextField(_("Gujrati Hash Tag Description"),blank = True, null = True)
+    mt_descpription = models.TextField(_("Marathi Hash Tag Description"),blank = True, null = True)
     picture = models.CharField(_("Picture URL"),max_length=255, blank=True,null=True)
     def __unicode__(self):
         return str(self.hash_tag)
@@ -451,6 +446,10 @@ class Notification(UserInfo):
             notific['telgu_title'] = str(self.user.st.name)+' ఒక వీడియోను పోస్ట్ చేసింది: '+self.topic.title+'. మీరు వ్యాఖ్యానించాలనుకుంటున్నారా?'
             notific['bengali_title'] = str(self.user.st.name)+' has posted a video: '+self.topic.title+'. Would you like to comment?'
             notific['kannada_title'] = str(self.user.st.name)+' has posted a video: '+self.topic.title+'. Would you like to comment?'
+            notific['malayalam_title'] = str(self.user.st.name)+' has posted a video: '+self.topic.title+'. Would you like to comment?'
+            notific['gujrati_title'] = str(self.user.st.name)+' has posted a video: '+self.topic.title+'. Would you like to comment?'
+            notific['marathi_title'] = str(self.user.st.name)+' has posted a video: '+self.topic.title+'. Would you like to comment?'
+            
             notific['notification_type'] = '1'
             notific['instance_id'] = self.topic.id
             notific['read_status'] = self.status
@@ -465,6 +464,10 @@ class Notification(UserInfo):
             notific['telgu_title'] = str(self.user.st.name)+' వీడియోపై వ్యాఖ్యానించారు: '+self.topic.topic.title
             notific['bengali_title'] = str(self.user.st.name)+' has commented on video: '+self.topic.topic.title+'.'
             notific['kannada_title'] = str(self.user.st.name)+' has commented on video: '+self.topic.topic.title+'.'
+            notific['malayalam_title'] = str(self.user.st.name)+' has commented on video: '+self.topic.topic.title+'.'
+            notific['gujrati_title'] = str(self.user.st.name)+' has commented on video: '+self.topic.topic.title+'.'
+            notific['marathi_title'] = str(self.user.st.name)+' has commented on video: '+self.topic.topic.title+'.'
+            
             notific['notification_type'] = '2'
             notific['instance_id'] = self.topic.topic.id
             notific['read_status'] = self.status
@@ -479,6 +482,9 @@ class Notification(UserInfo):
             notific['telgu_title'] = str(self.user.st.name)+' మీ వీడియోపై వ్యాఖ్యానించారు: '+self.topic.topic.title
             notific['bengali_title'] = str(self.user.st.name)+' has commented on your video: '+self.topic.topic.title
             notific['kannada_title'] = str(self.user.st.name)+' has commented on your video: '+self.topic.topic.title
+            notific['malayalam_title'] = str(self.user.st.name)+' has commented on your video: '+self.topic.topic.title
+            notific['gujrati_title'] = str(self.user.st.name)+' has commented on your video: '+self.topic.topic.title
+            notific['marathi_title'] = str(self.user.st.name)+' has commented on your video: '+self.topic.topic.title
             notific['notification_type'] = '3'
             notific['instance_id'] = self.topic.topic.id
             notific['read_status'] = self.status
@@ -493,6 +499,9 @@ class Notification(UserInfo):
             notific['telgu_title'] = str(self.user.st.name)+' మీరు అనుసరించారు'
             notific['bengali_title'] = str(self.user.st.name)+' followed you'
             notific['kannada_title'] = str(self.user.st.name)+' followed you'
+            notific['malayalam_title'] = str(self.user.st.name)+' followed you'
+            notific['gujrati_title'] = str(self.user.st.name)+' followed you'
+            notific['marathi_title'] = str(self.user.st.name)+' followed you'
             notific['notification_type'] = '4'
             notific['instance_id'] = self.user.id
             notific['read_status'] = self.status
@@ -507,6 +516,9 @@ class Notification(UserInfo):
             notific['telgu_title'] = str(self.user.st.name)+' మీ వీడియోను ఇష్టపడ్డారు'
             notific['bengali_title'] = str(self.user.st.name)+' liked your video'
             notific['kannada_title'] = str(self.user.st.name)+' liked your video'
+            notific['malayalam_title'] = str(self.user.st.name)+' liked your video'
+            notific['gujrati_title'] = str(self.user.st.name)+' liked your video'
+            notific['marathi_title'] = str(self.user.st.name)+' liked your video'
             notific['notification_type'] = '5'
             if self.topic:
                 if self.topic.comment:
@@ -525,6 +537,9 @@ class Notification(UserInfo):
             notific['telgu_title'] = 'మీ వీడియో బైట్: "' + self.topic.title + '" ప్రచురించబడింది'
             notific['bengali_title'] = 'Your video byte: "' + self.topic.title + '" has been published'
             notific['kannada_title'] = 'Your video byte: "' + self.topic.title + '" has been published'
+            notific['malayalam_title'] = 'Your video byte: "' + self.topic.title + '" has been published'
+            notific['gujrati_title'] = 'Your video byte: "' + self.topic.title + '" has been published'
+            notific['marathi_title'] = 'Your video byte: "' + self.topic.title + '" has been published'
             notific['notification_type'] = '6'
             if self.topic:
             	notific['instance_id'] = self.topic.id
@@ -542,6 +557,9 @@ class Notification(UserInfo):
             notific['telgu_title'] = 'మీ వీడియో బైట్: "' + self.topic.title + '" పంపబడింది'
             notific['bengali_title'] = 'Your video byte: "' + self.topic.title + '" has been deleted'
             notific['kannada_title'] = 'Your video byte: "' + self.topic.title + '" has been deleted'
+            notific['malayalam_title'] = 'Your video byte: "' + self.topic.title + '" has been deleted'
+            notific['gujrati_title'] = 'Your video byte: "' + self.topic.title + '" has been deleted'
+            notific['marathi_title'] = 'Your video byte: "' + self.topic.title + '" has been deleted'
             notific['notification_type'] = '7'
             notific['instance_id'] = self.topic.id
             notific['read_status'] = self.status
@@ -556,6 +574,9 @@ class Notification(UserInfo):
         #     notific['telgu_title'] = 'మీ వీడియో బైట్: "' + self.topic.title + '" చెల్లింపు కోసం కోల్పోయింది'
         #     notific['bengali_title'] = 'Your video byte: "' + self.topic.title + '" has been removed for payment'
         #     notific['kannada_title'] = 'Your video byte: "' + self.topic.title + '" has been removed for payment'
+        #     notific['malayalam_title'] = 'Your video byte: "' + self.topic.title + '" has been removed for payment'
+        #     notific['gujrati_title'] = 'Your video byte: "' + self.topic.title + '" has been removed for payment'
+        #     notific['marathi_title'] = 'Your video byte: "' + self.topic.title + '" has been removed for payment'
         #     notific['notification_type'] = '8'
         #     notific['instance_id'] = self.topic.id
         #     notific['read_status'] = self.status
@@ -570,6 +591,9 @@ class Notification(UserInfo):
             notific['telgu_title'] = 'మీ వీడియో బైట్: "' + self.topic.title + '" డబ్బు ఆర్జన కోసం ఎంపిక చేయబడింది. దీని కోసం మీకు డబ్బు వస్తుంది.'
             notific['bengali_title'] = 'Your video byte: "' + self.topic.title + '"  is eligible for earnings. It will be part of your payout.'
             notific['kannada_title'] = 'Your video byte: "' + self.topic.title + '"  is eligible for earnings. It will be part of your payout.'
+            notific['malayalam_title'] = 'Your video byte: "' + self.topic.title + '"  is eligible for earnings. It will be part of your payout.'
+            notific['gujrati_title'] = 'Your video byte: "' + self.topic.title + '"  is eligible for earnings. It will be part of your payout.'
+            notific['marathi_title'] = 'Your video byte: "' + self.topic.title + '"  is eligible for earnings. It will be part of your payout.'
             notific['notification_type'] = '8'
             notific['instance_id'] = self.topic.id
             notific['read_status'] = self.status
@@ -584,6 +608,9 @@ class Notification(UserInfo):
             notific['telgu_title'] = 'మీ వీడియో బైట్: "' + self.topic.title + '" చెల్లింపు కోసం కోల్పోయింది'
             notific['bengali_title'] = 'Your video byte: "' + self.topic.title + '" has been removed for payment'
             notific['kannada_title'] = 'Your video byte: "' + self.topic.title + '" has been removed for payment'
+            notific['malayalam_title'] = 'Your video byte: "' + self.topic.title + '" has been removed for payment'
+            notific['gujrati_title'] = 'Your video byte: "' + self.topic.title + '" has been removed for payment'
+            notific['marathi_title'] = 'Your video byte: "' + self.topic.title + '" has been removed for payment'
             notific['notification_type'] = '8'
             notific['instance_id'] = self.topic.id
             notific['read_status'] = self.status
