@@ -728,6 +728,7 @@ def boloindya_upload_n_transcode(request):
             topic_dict['vb_height'] = height
             topic_dict['title'] = title
             topic_dict['category_id'] = category_id
+            topic_dict['view_count'] = view_count
             topic_dict['is_vb'] = True
             if is_popular:
                 topic_dict['is_popular'] = True
