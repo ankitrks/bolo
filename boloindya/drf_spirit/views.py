@@ -109,8 +109,8 @@ class NotificationAPI(GenericAPIView):
 
         notifications = Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-last_modified')[offset:offset+limit]
 
-        
-        Notification.objects.filter(status = 0).update(status = 1)
+        if notifications:
+            notifications.update(status = 1)
 
         result = []
         for notification in notifications:
