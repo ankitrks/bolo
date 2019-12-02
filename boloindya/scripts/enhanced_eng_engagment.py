@@ -89,9 +89,7 @@ def run():
             newly_careted = VBseen.objects.bulk_create(aList, batch_size=10000)
             counter_objects_created+=len(user_want_vbseen)
             print "After: VBseen.objects.bulk_create(aList)",datetime.now()
-            this_topic = Topic.objects.get(pk=each_seen_id)
-            this_topic.view_count = F('view_count')+number_seen
-            this_topic.save()
+            Topic.objects.filter(pk=each_seen_id).update(F('view_count')+number_seen)
             if user_want_vbseen:
                 # set_list1 = set(tuple(sorted(d.items())) for d in user_want_vbseen)
                 # set_list2 = set(tuple(sorted(d.items())) for d in already_vbseen)
@@ -273,8 +271,7 @@ def check_like(topic_id,user_ids):
             if new_vb_like:
                 aList = [Like(**vals) for vals in new_vb_like]
                 newly_created = Like.objects.bulk_create(aList, batch_size=10000)
-                each_like.likes_count = F('likes_count')+len(new_vb_like)
-                each_like.save()
+                Topic.objects.filter(pk=topic_id).update(F('likes_count')+len(new_vb_like))
                 bolo_increment_user_id = [x['user_id'] for x in new_vb_like]
                 bolo_increment_user = UserProfile.objects.filter(user_id__in = bolo_increment_user_id ).update(bolo_score =F('bolo_score')+score,like_count = F('like_count')+1)
                 already_liked = list(Like.objects.filter(topic_id = topic_id,user_id__in=[d['user_id'] for d in new_vb_like]).values('user_id','id'))
