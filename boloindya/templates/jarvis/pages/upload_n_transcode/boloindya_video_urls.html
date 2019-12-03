@@ -40,10 +40,6 @@
         <p>{{ my_video.topic.get_language_id_display }}</p>
     </div>
     <div>
-        <h3>Is Popular Push?</h3>
-        <p>{% if my_video.topic.is_pubsub_popular_push %}<img src="{% static 'img/green_tick.jpg' %}" style="width:20px;">{% else %}<img src="{% static 'img/wrong.png' %}" style="width:20px;">{% endif %}</p>
-    </div>
-    <div>
         <a href="/jarvis/boloindya_uploadvideofile/"><button type="button" class="btn btn-danger"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Upload Page</button></a>
         <a href="/jarvis/boloindya_uploaded_list/"><button type="button" class="btn btn-primary"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Uploaded List</button></a>
 

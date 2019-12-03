@@ -197,13 +197,10 @@ def uploadvideofile(request):
             {'all_category':all_category,'all_upload':all_upload})
 
 @login_required
-def boloindya_uploadvideofile(request):
-    from django.db.models import Count
-    all_upload = VideoUploadTranscode.objects.all().distinct().values('folder_to_upload')\
-        .annotate(folder_count=Count('folder_to_upload')).order_by('folder_to_upload')
+def boloindya_uploadvideofile(request):    
     topic_form = TopicUploadTranscodeForm()
     return render(request,'jarvis/pages/upload_n_transcode/boloindya_upload_transcode.html',
-            {'all_upload':all_upload,'topic_form':topic_form})
+            {'topic_form':topic_form})
 
 @login_required
 def video_management(request):
@@ -637,6 +634,7 @@ def upload_n_transcode(request):
                 my_dict['meta_title'] = meta_title
                 my_dict['meta_descp'] = meta_descp
                 my_dict['meta_keywords'] = meta_keywords
+                my_dict['uploaded_user'] = request.user
             my_upload_transcode = VideoUploadTranscode.objects.create(**my_dict)
             os.remove(urlify(upload_file_name))
             try:
@@ -651,13 +649,12 @@ def upload_n_transcode(request):
 def boloindya_upload_n_transcode(request):
     upload_file = request.FILES['media_file']
     upload_to_bucket = request.POST.get('bucket_name',None)
-    upload_folder_name = request.POST.get('folder_prefix',None)
+    upload_folder_name = request.POST.get('folder_prefix','from_upload_panel')
     # upload_category = request.POST.get('category_choice',None)
     # free_video = request.POST.get('free_video',None)
     title = request.POST.get('title',None)
     m2mcategory = request.POST.getlist('m2mcategory',None)
     language_id = request.POST.get('language_id',None)
-    is_pubsub_popular_push = request.POST.get('is_pubsub_popular_push',None)
 
     # print upload_file,upload_to_bucket,upload_folder_name
     if not upload_to_bucket:
@@ -716,6 +713,7 @@ def boloindya_upload_n_transcode(request):
             my_dict['filename_changed'] = urlify(upload_file_name)
             my_dict['folder_to_upload'] = upload_folder_name
             my_dict['folder_to_upload_changed'] = urlify(upload_folder_name)
+            my_dict['uploaded_user'] = request.user
             topic_dict['is_transcoded'] = True
             topic_dict['question_image'] = thumbnail_url
             my_dict['thumbnail_url'] = thumbnail_url
@@ -728,13 +726,10 @@ def boloindya_upload_n_transcode(request):
             topic_dict['title'] = title
             topic_dict['view_count'] = view_count
             topic_dict['is_vb'] = True
-            if is_pubsub_popular_push:
-                topic_dict['is_pubsub_popular_push'] = True
             my_upload_transcode = VideoUploadTranscode.objects.create(**my_dict)
             topic_dict['user_id'] = random.choice(list(UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)))
             my_topic = Topic.objects.create(**topic_dict)
             for each in m2mcategory:
-                print each,m2mcategory,type(m2mcategory)
                 my_topic.m2mcategory.add(Category.objects.get(pk=each))
             my_upload_transcode.is_topic = True
             my_upload_transcode.topic = my_topic
@@ -838,8 +833,7 @@ def boloindya_edit_upload(request):
         if file_id:
             my_video = VideoUploadTranscode.objects.get(pk=file_id)
             topic = my_video.topic
-            my_dict = {'title':topic.title,'category':topic.category,'m2mcategory':list(topic.m2mcategory.all().values_list('id',flat=True)),'language_id':topic.language_id,\
-            'is_pubsub_popular_push':topic.is_pubsub_popular_push}
+            my_dict = {'title':topic.title,'category':topic.category,'m2mcategory':list(topic.m2mcategory.all().values_list('id',flat=True)),'language_id':topic.language_id}
             video_form = TopicUploadTranscodeForm(initial=my_dict)
             return render(request,'jarvis/pages/upload_n_transcode/boloindya_edit_upload.html',{'my_video':my_video,'video_form':video_form})
         return render(request,'jarvis/pages/upload_n_transcode/boloindya_edit_upload.html')
@@ -856,9 +850,7 @@ def boloindya_edit_upload(request):
                     topic.m2mcategory.remove(each_category)
                 for each in m2mcategory:
                     topic.m2mcategory.add(Category.objects.get(pk=each))
-            topic.language_id = request.POST.get('language_id','')
-            if not topic.is_pubsub_popular_push and request.POST.get('is_pubsub_popular_push',False):
-                topic.is_pubsub_popular_push = True
+            topic.language_id = request.POST.get('language_id','1')
             topic.save()
             return HttpResponse(json.dumps({'message':'success','video_id':my_video.id}),content_type="application/json")
         else:
