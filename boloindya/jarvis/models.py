@@ -46,6 +46,7 @@ class VideoUploadTranscode(models.Model):
     is_active = models.BooleanField(default=True)
     is_topic = models.BooleanField(default=False)
     topic = models.ForeignKey(Topic,null=True,blank=True)
+    uploaded_user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='%(app_label)s_%(class)s_user',editable=False)
     
     def __unicode__(self):
         return str(self.filename_uploaded)

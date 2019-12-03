@@ -13,6 +13,7 @@
                         <th>Trancoded URL</th>
                         <th>Urlify filename</th>
                         <th>Urlify folder name</th>
+                        <th>Uploaded By</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -26,6 +27,7 @@
                         <td>{{ each_uploaded.transcoded_file_url}}</td>
                         <td>{{ each_uploaded.filename_changed}}</td>
                         <td>{{ each_uploaded.folder_to_upload_changed}}</td>
+                        <td>{{ each_uploaded.uploaded_user}}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

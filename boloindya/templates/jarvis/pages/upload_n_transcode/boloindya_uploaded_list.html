@@ -13,6 +13,7 @@
                         <th>Video Byte</th>
                         <th>Language</th>
                         <th>By User</th>
+                        <th>Uploaded User</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -26,6 +27,7 @@
                         <td>{{ each_uploaded.topic}}</td>
                         <td>{{ each_uploaded.topic.get_language_id_display }}</td>
                         <td>{{ each_uploaded.topic.user}}</td>
+                        <td>{{ each_uploaded.uploaded_user}}</td>
 
 
                     </tr>
