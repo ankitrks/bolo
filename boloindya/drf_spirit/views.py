@@ -2685,7 +2685,6 @@ def get_landing_page_video(request):
 @api_view(['GET'])
 def get_ip_to_language(request):
     try:
-        pass
         user_ip = request.GET.get('user_ip',None)
         if user_ip:
             url = 'http://ip-api.com/json/'+user_ip
