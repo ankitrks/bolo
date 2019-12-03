@@ -94,6 +94,8 @@ class UserProfile(models.Model):
     is_dark_mode_enabled = models.BooleanField(default=False)
     total_vb_playtime = models.PositiveIntegerField(null=True,blank=True,default=0)
     total_time_spent = models.PositiveIntegerField(null=True,blank=True,default=0)
+    state_name = models.CharField(_('State Name'),max_length=200,null=True,blank=True)
+    city_name = models.CharField(_('City Name'),max_length=200,null=True,blank=True)
 
     # end #
 

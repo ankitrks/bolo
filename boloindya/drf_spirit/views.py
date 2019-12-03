@@ -1649,6 +1649,7 @@ def verify_otp(request):
     lat = request.POST.get('lat',None)
     lang = request.POST.get('lang',None)
     click_id = request.POST.get('click_id',None)
+    user_ip = request.POST.get('user_ip',None)
     is_reset_password = False
     is_for_change_phone = False
     all_category_follow = []
@@ -1681,6 +1682,12 @@ def verify_otp(request):
                     message = 'User created'
                     userprofile = UserProfile.objects.get(user = user)
                     userprofile.mobile_no = mobile_no
+                    if user_ip:
+                        url = 'http://ip-api.com/json/'+user_ip
+                        response = urllib2.urlopen(url).read()
+                        json_response = json.loads(response)
+                        userprofile.state_name = json_response['regionName']
+                        userprofile.city_name = json_response['city']
                     if str(is_geo_location) =="1":
                         userprofile.lat = lat
                         userprofile.lang = lang
@@ -1772,6 +1779,7 @@ def fb_profile_settings(request):
     click_id = request.POST.get('click_id',None)
     lat = request.POST.get('lat',None)
     lang = request.POST.get('lang',None)
+    user_ip = request.POST.get('user_ip',None)
     sub_category_prefrences = request.POST.get('categories',None)
     is_dark_mode_enabled = request.POST.get('is_dark_mode_enabled',None)
     try:
@@ -1807,6 +1815,12 @@ def fb_profile_settings(request):
                 userprofile.d_o_b = d_o_b
                 if not userprofile.gender and gender:
                     add_bolo_score(user.id, 'gender_added', userprofile)
+                if user_ip:
+                    url = 'http://ip-api.com/json/'+user_ip
+                    response = urllib2.urlopen(url).read()
+                    json_response = json.loads(response)
+                    userprofile.state_name = json_response['regionName']
+                    userprofile.city_name = json_response['city']
                 userprofile.gender = gender
                 userprofile.about = about
                 userprofile.refrence = refrence
@@ -1865,6 +1879,12 @@ def fb_profile_settings(request):
                 userprofile.d_o_b = d_o_b
                 if not userprofile.gender and gender:
                     add_bolo_score(user.id, 'gender_added', userprofile)
+                if user_ip:
+                    url = 'http://ip-api.com/json/'+user_ip
+                    response = urllib2.urlopen(url).read()
+                    json_response = json.loads(response)
+                    userprofile.state_name = json_response['regionName']
+                    userprofile.city_name = json_response['city']
                 userprofile.gender = gender
                 userprofile.about = about
                 userprofile.refrence = refrence
@@ -1910,6 +1930,12 @@ def fb_profile_settings(request):
                     userprofile.is_dark_mode_enabled = True
                 else:
                     userprofile.is_dark_mode_enabled = False
+                if user_ip:
+                    url = 'http://ip-api.com/json/'+user_ip
+                    response = urllib2.urlopen(url).read()
+                    json_response = json.loads(response)
+                    userprofile.state_name = json_response['regionName']
+                    userprofile.city_name = json_response['city']
                 userprofile.gender = gender
                 userprofile.profile_pic =profile_pic
                 userprofile.cover_pic=cover_pic
