@@ -28,7 +28,9 @@ def run():
         opt_action_user_id = random.choice(user_ids)
         # print 'action user_id',opt_action_user_id
         if opt_action =='comment':
+            print "before: comment creation",datetime.now()
             action_comment(opt_action_user_id,each_topic_id)
+            print "after: comment creation",datetime.now()
         elif opt_action == 'like':
             each_topic = Topic.objects.get(pk=each_topic_id)
             if each_topic.likes_count<each_topic.view_count/random.randrange(10,21) and each_topic.likes_count < each_topic.view_count:
