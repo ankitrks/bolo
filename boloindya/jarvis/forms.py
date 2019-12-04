@@ -15,9 +15,15 @@ class VideoUploadTranscodeForm(ModelForm):
                 field.field.widget.attrs['class'] = 'form-control'
 
 class TopicUploadTranscodeForm(ModelForm):
+    gender_options = (
+        ('0','Please Select User Gender'),
+        ('1', 'Male'),
+        ('2', 'Female'),
+    )
+    gender = forms.ChoiceField(choices=gender_options, required=True, label='Gender')
     class Meta():
         model = Topic
-        fields = ['title','m2mcategory','language_id']
+        fields = ['title','m2mcategory','language_id','gender']
 
     def __init__(self,*args,**kwargs):
         super(TopicUploadTranscodeForm,self).__init__(*args,**kwargs)
