@@ -342,8 +342,8 @@ def index(request):
     return render(request, 'spirit/topic/_home.html')
 
 def new_home(request):
-    return render(request, 'spirit/topic/new_landing.html')
-    #return render(request, 'spirit/topic/temporary_landing.html')
+    # return render(request, 'spirit/topic/new_landing.html')
+    return render(request, 'spirit/topic/temporary_landing.html')
     # return render(request, 'spirit/topic/main_landing.html')
 
 def get_about(request):
