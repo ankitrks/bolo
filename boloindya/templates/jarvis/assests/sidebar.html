@@ -81,7 +81,7 @@
         <li class="{% if request.path in '/jarvis/importcsv/'%}active{% endif %}"><a href="/jarvis/importcsv/"><i class="fa fa-th"></i> <span>Upload Instagram CSV</span></a></li>
         <li class="{% if request.path in '/jarvis/notification_panel/'%}active{% endif %}"><a href="/jarvis/notification_panel/"><i class="fa fa-bell-o"></i> <span>Notification Panel</span></a></li>
         {% endif %}
-        {% if user|is_user_in_group:"moderator" or user|is_user_in_group:"video_uploader" %}
+        {% if user|is_user_in_group:"moderator" %}
         <li class="{% if request.path in '/jarvis/management/video/'%}active{% endif %}"><a href="/jarvis/management/video/"><i class="fa fa-edit"></i> <span>Video Management</span></a></li>
         {% endif %}
       </ul>
