@@ -14,6 +14,7 @@ def send_notifications_task(data, pushNotification):
     from forum.topic.models import Topic, VBseen
     from drf_spirit.models import UserLogStatistics
     from jarvis.models import PushNotification, FCMDevice
+    from django.core.paginator import Paginator
 
     try:
         title = data.get('title', "")
@@ -86,7 +87,10 @@ def send_notifications_task(data, pushNotification):
                 device = FCMDevice.objects.exclude(user__pk__in=filter_list).filter(**language_filter)
 
             logger.info(device)
-            device.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk})
+            device_pagination = Paginator(device, 1000)
+            for index in range(1, (device_pagination.num_pages+1)):
+                device_after_slice = device_pagination.page(index)
+                t = device_after_slice.object_list.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk})
     except Exception as e:
         logger.info(str(e))
 
