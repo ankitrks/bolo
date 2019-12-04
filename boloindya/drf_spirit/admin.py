@@ -13,7 +13,7 @@ class UserProfileResource(resources.ModelResource):
 		model = UserProfile
 		skip_unchanged = True
 		report_skipped = True
-		list_filter = ('language', )
+		list_filter = ('language','is_popular','is_business')
 		fields = ( 'user__username', 'name', 'language', 'bolo_score', 'user__date_joined', 'follow_count', 'follower_count', \
 			'vb_count', 'answer_count', 'share_count', 'like_count')
 
@@ -35,7 +35,7 @@ class UserProfileAdmin(ImportExportModelAdmin):
 	list_display = ('user', 'name', 'language', 'bolo_score', 'follow_count', 'follower_count', 'vb_count', 'answer_count', \
 		'share_count', 'like_count', 'is_popular', 'is_business')
 	list_editable = ('is_popular', 'is_business')
-	list_filter = ('user__date_joined', ('user__date_joined', DateRangeFilter), 'language')
+	list_filter = ('user__date_joined', ('user__date_joined', DateRangeFilter), 'language','is_popular', 'is_business')
 	resource_class = UserProfileResource
 admin.site.register(UserProfile,UserProfileAdmin)
 

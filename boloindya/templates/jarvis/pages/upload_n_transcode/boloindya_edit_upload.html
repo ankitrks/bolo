@@ -140,6 +140,39 @@
         return;
     }
     });
+     $('#id_language_id').change(function () {
+        if ($("#change_user").is(':checked')) {
+        var gender_id = $(this).val();
+        var language_id = $("#id_gender").val();
+        var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+        $.ajax({
+            type: 'POST',
+            url: '/jarvis/get_filtered_user/',
+            data: {
+                'gender_id': gender_id,
+                'language_id':language_id,
+                'csrfmiddlewaretoken':csrfmiddlewaretoken
+            },
+            success: function (data) {
+                // the next thing you want to do 
+                var $user_id = $('#id_user_id');
+                $user_id.empty();
+                filtered_user = data.filtered_user
+                $user_id.append('<option>User Name --- VB Count</option>');
+                for (var i = 0; i < filtered_user.length; i++) {
+                    $user_id.append('<option value=' + filtered_user[i][0] + '>' + filtered_user[i][1]+' --- (' +filtered_user[i][2] + ')</option>');
+                }
+
+                // //manually trigger a change event for the contry so that the change handler will get triggered
+                // $country.change();
+            }
+        });
+
+    }
+    else{
+        return;
+    }
+    });
 
 </script>
 
