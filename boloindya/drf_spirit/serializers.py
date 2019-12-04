@@ -19,7 +19,7 @@ class CategorySerializer(ModelSerializer):
     class Meta:
         model = Category
         # fields = '__all__'
-        exclude = ('is_engagement','reindex_at', 'is_global', 'is_closed', 'is_removed', 'is_private', 'is_engagement' )
+        exclude = ('reindex_at', 'is_global', 'is_closed', 'is_removed', 'is_private', 'is_engagement' )
 
 class AppVersionSerializer(ModelSerializer):
     class Meta:
