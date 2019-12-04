@@ -105,10 +105,10 @@
         <h2>App Push Notification</h2>
         <h4 style="text-align: center;">Enter id in case of Video Byte, User, Category, hash in case of hashtag, for Announcements leave blank</h4>
         <div class="form_group">
-            <input type="text" name="upper_title" id="upper_title" placeholder="Notification Title" value="{{pushNotification.title}}">
+            <input type="text" name="upper_title" id="upper_title" placeholder="Notification Title" value="{{pushNotification.title}}" maxlength="200">
         </div>
         <div class="form_group">
-            <input type="text" name="title" id="title" placeholder="Notification Text" value="{{pushNotification.description}}">
+            <input type="text" name="title" id="title" placeholder="Notification Text" value="{{pushNotification.description}}" maxlength="500">
         </div>
         <div class="form_group row">
             <div class="col-md-6" style="padding: 0px;">
