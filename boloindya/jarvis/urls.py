@@ -22,6 +22,7 @@ urlpatterns = [
     url(r'^management/video/$',views.video_management,name = 'video_management'),
     url(r'^upload_n_transcode/$',views.upload_n_transcode),
     url(r'^boloindya_upload_n_transcode/$',views.boloindya_upload_n_transcode),
+    url(r'^get_filtered_user/$',views.get_filtered_user,name = 'get_filtered_user'),
     url(r'^upload_details/$',views.upload_details),
     url(r'^uploaded_list/$',views.uploaded_list),
     url(r'^user_statistics/$', views.user_statistics),

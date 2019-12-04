@@ -50,6 +50,7 @@ from .forms import VideoUploadTranscodeForm,TopicUploadTranscodeForm
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
 from django.core.files.base import ContentFile
 from drf_spirit.serializers import UserWithUserSerializer
+from django.db.models import F,Q
 import traceback
 from tasks import send_notifications_task
 
@@ -655,6 +656,7 @@ def boloindya_upload_n_transcode(request):
     title = request.POST.get('title',None)
     m2mcategory = request.POST.getlist('m2mcategory',None)
     language_id = request.POST.get('language_id',None)
+    user_id = request.POST.get('user_id',None)
 
     # print upload_file,upload_to_bucket,upload_folder_name
     if not upload_to_bucket:
@@ -663,8 +665,8 @@ def boloindya_upload_n_transcode(request):
         return HttpResponse(json.dumps({'message':'fail','reason':'File Missing'}),content_type="application/json")
     if not upload_file.name.endswith('.mp4'):
         return HttpResponse(json.dumps({'message':'fail','reason':'This is not a mp4 file'}),content_type="application/json")
-    if not title or not m2mcategory:
-        return HttpResponse(json.dumps({'message':'fail','reason':'Title or Category is missing'}),content_type="application/json")
+    if not title or not m2mcategory or not user_id:
+        return HttpResponse(json.dumps({'message':'fail','reason':'Title, User or Category is missing'}),content_type="application/json")
 
     bucket_credentials = get_bucket_details(upload_to_bucket)
     conn = boto3.client('s3', bucket_credentials['REGION_HOST'], aws_access_key_id = bucket_credentials['AWS_ACCESS_KEY_ID'], \
@@ -727,8 +729,9 @@ def boloindya_upload_n_transcode(request):
             topic_dict['view_count'] = view_count
             topic_dict['is_vb'] = True
             my_upload_transcode = VideoUploadTranscode.objects.create(**my_dict)
-            topic_dict['user_id'] = random.choice(list(UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)))
+            topic_dict['user_id'] = user_id
             my_topic = Topic.objects.create(**topic_dict)
+            UserProfile.objects.filter(user_id=user_id).update(vb_count=F('vb_count')+1)
             for each in m2mcategory:
                 my_topic.m2mcategory.add(Category.objects.get(pk=each))
             my_upload_transcode.is_topic = True
@@ -762,6 +765,11 @@ def get_video_width_height(video_url):
         return video_width,video_height
     except:
         return 0,0
+def get_filtered_user(request):
+    gender_id = request.POST.get('gender_id','1')
+    language_id = request.POST.get('language_id','1')
+    filtered_user = list(UserProfile.objects.filter(language = language_id,gender=gender_id,is_moderator=True,is_test_user=True).values_list('user_id','name','vb_count').order_by('-vb_count'))
+    return HttpResponse(json.dumps({'message':'success','filtered_user':filtered_user}),content_type="application/json")
 
 @login_required
 def upload_details(request):
@@ -782,12 +790,12 @@ def boloindya_upload_details(request):
 
 @login_required
 def uploaded_list(request):
-    all_uploaded = VideoUploadTranscode.objects.filter(is_active = True,is_topic=False)
+    all_uploaded = VideoUploadTranscode.objects.filter(is_active = True,is_topic=False).order_by('-id')
     return render(request,'jarvis/pages/upload_n_transcode/uploaded_list.html',{'all_uploaded':all_uploaded})
 
 @login_required
 def boloindya_uploaded_list(request):
-    all_uploaded = VideoUploadTranscode.objects.filter(is_active = True,is_topic = True)
+    all_uploaded = VideoUploadTranscode.objects.filter(is_active = True,is_topic = True).order_by('-id')
     return render(request,'jarvis/pages/upload_n_transcode/boloindya_uploaded_list.html',{'all_uploaded':all_uploaded})
 
 @login_required
@@ -833,9 +841,9 @@ def boloindya_edit_upload(request):
         if file_id:
             my_video = VideoUploadTranscode.objects.get(pk=file_id)
             topic = my_video.topic
-            my_dict = {'title':topic.title,'category':topic.category,'m2mcategory':list(topic.m2mcategory.all().values_list('id',flat=True)),'language_id':topic.language_id}
+            my_dict = {'title':topic.title,'category':topic.category,'m2mcategory':list(topic.m2mcategory.all().values_list('id',flat=True)),'language_id':topic.language_id,'gender':topic.user.st.gender}
             video_form = TopicUploadTranscodeForm(initial=my_dict)
-            return render(request,'jarvis/pages/upload_n_transcode/boloindya_edit_upload.html',{'my_video':my_video,'video_form':video_form})
+            return render(request,'jarvis/pages/upload_n_transcode/boloindya_edit_upload.html',{'my_video':my_video,'video_form':video_form,'posted_userprofile':topic.user.st})
         return render(request,'jarvis/pages/upload_n_transcode/boloindya_edit_upload.html')
     elif request.method == 'POST':
         video_id = request.POST.get('video_id',None)
@@ -851,6 +859,13 @@ def boloindya_edit_upload(request):
                 for each in m2mcategory:
                     topic.m2mcategory.add(Category.objects.get(pk=each))
             topic.language_id = request.POST.get('language_id','1')
+            if request.POST.get('change_user',False):
+                try:
+                    UserProfile.objects.filter(user=topic.user).update(vb_count=F('vb_count')-1)
+                except:
+                    pass
+                topic.user_id = request.POST.get('user_id',topic.user.id)
+                UserProfile.objects.filter(user_id=request.POST.get('user_id',topic.user.id)).update(vb_count=F('vb_count')+1)
             topic.save()
             return HttpResponse(json.dumps({'message':'success','video_id':my_video.id}),content_type="application/json")
         else:

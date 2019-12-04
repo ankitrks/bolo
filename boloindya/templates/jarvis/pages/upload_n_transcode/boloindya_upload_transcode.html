@@ -63,6 +63,20 @@
             </div>
         </div>
         <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">User Gender</label>
+            <div class="col-md-8">
+                {{topic_form.gender}}
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Posting User</label>
+            <div class="col-md-8">
+                <select name="user_id" class="form-control" id="id_user_id">
+                    <option value="">User Name --- VB Count</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
             <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
                 <button type="submit" class="btn btn-primary submit_from_button"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Upload </button>
             </div>
@@ -152,6 +166,33 @@ $(function() {
         } else {
             $('.video_elements').hide()
         }
+    });
+    $('#id_gender').change(function () {
+    var gender_id = $(this).val();
+    var language_id = $("#id_language_id").val();
+    var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+    $.ajax({
+        type: 'POST',
+        url: '/jarvis/get_filtered_user/',
+        data: {
+            'gender_id': gender_id,
+            'language_id':language_id,
+            'csrfmiddlewaretoken':csrfmiddlewaretoken
+        },
+        success: function (data) {
+            // the next thing you want to do 
+            var $user_id = $('#id_user_id');
+            $user_id.empty();
+            filtered_user = data.filtered_user
+            $user_id.append('<option>User Name --- VB Count</option>');
+            for (var i = 0; i < filtered_user.length; i++) {
+                $user_id.append('<option value=' + filtered_user[i][0] + '>' + filtered_user[i][1]+' --- (' +filtered_user[i][2] + ')</option>');
+            }
+
+            // //manually trigger a change event for the contry so that the change handler will get triggered
+            // $country.change();
+        }
+    });
     });
 });
 </script>
