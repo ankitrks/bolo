@@ -155,8 +155,8 @@ status_options = (
 
 class PushNotification(RecordTimeStamp):
 
-    title = models.CharField(_('title'),max_length=100,null=True,blank=True)
-    description = models.CharField(_('description'),max_length=100,null=True,blank=True)
+    title = models.CharField(_('title'),max_length=200,null=True,blank=True)
+    description = models.CharField(_('description'),max_length=500,null=True,blank=True)
     language = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='0')
     notification_type = models.CharField(choices=notification_type_options, blank = True, null = True, max_length=10, default='4')
     instance_id = models.CharField('instance_id', blank = True, null = True, max_length=40, default='')

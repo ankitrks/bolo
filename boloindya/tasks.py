@@ -40,7 +40,7 @@ def send_notifications_task(data, pushNotification):
     try:
         if schedule_status == '1':
             if datepicker:
-                pushNotification.scheduled_time = datetime.datetime.strptime(datepicker + " " + timepicker, "%m/%d/%Y %H:%M")
+                pushNotification.scheduled_time = datetime.strptime(datepicker + " " + timepicker, "%m/%d/%Y %H:%M")
             pushNotification.is_scheduled = True            
             pushNotification.save()
         else:
@@ -51,8 +51,8 @@ def send_notifications_task(data, pushNotification):
                 language_filter = { 'user__st__language': lang }
             
             if user_group == '1':
-                end_date = datetime.datetime.today()
-                start_date = end_date - datetime.timedelta(hours=3)
+                end_date = datetime.today()
+                start_date = end_date - timedelta(hours=3)
                 device = FCMDevice.objects.filter(user__isnull=True, created_at__range=(start_date, end_date))
             
             elif user_group == '2':
@@ -71,11 +71,11 @@ def send_notifications_task(data, pushNotification):
                     filter_list = VBseen.objects.distinct('user__pk').values_list('user__pk', flat=True)
                 
                 elif user_group == '4' or user_group == '5':
-                    hours_ago = datetime.datetime.now()
+                    hours_ago = datetime.now()
                     if user_group == '4':
-                        hours_ago -= datetime.timedelta(days=1)
+                        hours_ago -= timedelta(days=1)
                     else:
-                        hours_ago -=  datetime.timedelta(days=2)
+                        hours_ago -=  timedelta(days=2)
 
                     filter_list = UserLogStatistics.objects.filter(session_starttime__gte=hours_ago).values_list('user', flat=True)
                     filter_list = map(int , filter_list)
