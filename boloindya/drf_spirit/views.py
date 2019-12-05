@@ -417,8 +417,9 @@ def GetChallengeDetails(request):
             'en_tongue_descp':tongue.en_descpription,'hi_tongue_descp':tongue.hi_descpription,\
             'ta_tongue_descp':tongue.ta_descpription,'te_tongue_descp':tongue.te_descpription,\
             'be_descpription':tongue.be_descpription,'ka_descpription':tongue.ka_descpription,\
-            'picture':tongue.picture,'all_seen':shorcountertopic(all_seen['view_count__sum'])},\
-              status=status.HTTP_200_OK)
+            'ma_descpription':tongue.ma_descpription,'gj_descpription':tongue.gj_descpription,\
+            'mt_descpription':tongue.mt_descpription,'picture':tongue.picture,\
+            'all_seen':shorcountertopic(all_seen['view_count__sum'])},status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Invalid','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -556,6 +557,33 @@ class SearchTopic(generics.ListCreateAPIView):
             topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True, language_id=language_id)
 
         return topics
+
+class SearchHashTag(generics.ListCreateAPIView):
+    """
+    get:
+    Search By Topic.
+    term        = request.GET.get('term', '')
+    Required Parameters:
+    term---Topic Title
+
+    post:
+
+    Required Parameters:
+    term 
+    """
+
+
+    serializer_class    = TongueTwisterSerializer
+    permission_classes  = (IsOwnerOrReadOnly,)
+    pagination_class    = LimitOffsetPagination
+
+    def get_queryset(self):
+        topics      = []
+        search_term = self.request.GET.get('term')
+        if search_term:
+            hash_tags  = TongueTwister.objects.filter(hash_tag__icontains = search_term)
+
+        return hash_tags
 
 
 @api_view(['POST'])
@@ -2397,11 +2425,6 @@ def get_hash_list(request):
             videos_dict = []
             for video in videos:    
                 videos_dict.append(TopicSerializer(video).data)
-            if total_views['view_count__sum']:
-                hash_data['total_views'] = shorcountertopic(total_views['view_count__sum'])
-            else:
-                hash_data['total_views'] = 0
-            hash_data['total_videos_count'] = total_videos_count
             hash_data['videos'] = videos_dict
             hashtaglist.append(hash_data)
         return JsonResponse({'data':hashtaglist,'message':'Success'})

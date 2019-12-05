@@ -8,7 +8,7 @@ from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,c
     KYCDocumentTypeList,save_kyc_basic_info,save_kyc_documents,save_kyc_selfie,save_kyc_additional_info,save_bank_details_info,kyc_profession_status,get_kyc_status,my_app_version,\
     EncashableDetailList,get_bolo_details, get_category_detail, UserLogStatistics,GetFollowigList,GetFollowerList, get_category_with_video_bytes, get_category_detail_with_views, \
     get_category_video_bytes, get_popular_video_bytes, get_user_follow_and_like_list, get_recent_videos, get_popular_bolo, submit_user_feedback,get_ip_to_language, get_landing_page_video,\
-    mention_suggestion,hashtag_suggestion
+    mention_suggestion,hashtag_suggestion,SearchHashTag
 from rest_framework_simplejwt import views as jwt_views
 from .views import *
 
@@ -53,6 +53,7 @@ urlpatterns = [
     url(r'^get_answers/$', GetAnswers.as_view(), name='get_answers'),
     url(r'^search/', include(topicsearch_urls)),
     url(r'^search/users/', include(usersearch_urls)),
+    url(r'^search/hash_tag/'SearchHashTag.as_view(),name='search_hash_tag'),
     url(r'^create_topic', include(createtopic_urls)),
     url(r'^reply_on_topic', include(replyontopic_urls)),
     url(r'^categories/', include(category_urls)),

@@ -33,9 +33,22 @@ class CategoryLiteSerializer(ModelSerializer):
 
 
 class TongueTwisterSerializer(ModelSerializer):
+    total_videos_count = SerializerMethodField()
+    total_views = SerializerMethodField()
     class Meta:
         model = TongueTwister
         fields = '__all__'
+
+    def get_total_videos_count(self,instance):
+        return shorcountertopic(Topic.objects.filter(title__icontains='#'+str(instance.hash_tag)).count())
+
+    def get_total_views(self,instance):
+        total_views = Topic.objects.filter(title__icontains='#'+str(instance.hash_tag)).aggregate(Sum('view_count'))
+        if total_views['view_count__sum']:
+            seen_counter = shorcountertopic(total_views['view_count__sum'])
+        else:
+            seen_counter = 0
+        return shorcountertopic(seen_counter)
 
 
 class TopicSerializer(ModelSerializer):
