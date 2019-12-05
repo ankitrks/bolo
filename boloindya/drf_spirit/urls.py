@@ -53,7 +53,7 @@ urlpatterns = [
     url(r'^get_answers/$', GetAnswers.as_view(), name='get_answers'),
     url(r'^search/', include(topicsearch_urls)),
     url(r'^search/users/', include(usersearch_urls)),
-    url(r'^search/hash_tag/'SearchHashTag.as_view(),name='search_hash_tag'),
+    url(r'^search/hash_tag/',SearchHashTag.as_view(),name='search_hash_tag'),
     url(r'^create_topic', include(createtopic_urls)),
     url(r'^reply_on_topic', include(replyontopic_urls)),
     url(r'^categories/', include(category_urls)),
