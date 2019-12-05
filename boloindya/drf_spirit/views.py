@@ -774,7 +774,7 @@ def replyOnTopic(request):
 
     user_id      = request.user.id
     topic_id     = request.POST.get('topic_id', '')
-    language_id  = request.POST.get('language_id', '')
+    language_id  = request.user.st.language
     comment_html = request.POST.get('comment', '')
     mobile_no    = request.POST.get('mobile_no', '')
     thumbnail = request.POST.get('thumbnail', '')
@@ -788,7 +788,7 @@ def replyOnTopic(request):
 
     if user_id and topic_id and comment_html:
         try:
-
+            comment_html,username_list = get_mentions(comment_html)
             comment.comment       = comment_html
             comment.comment_html  = comment_html
             comment.language_id   = language_id
@@ -796,6 +796,8 @@ def replyOnTopic(request):
             comment.topic_id      = topic_id
             comment.mobile_no     = mobile_no
             comment.save()
+            if username_list:
+                send_notification_to_mentions(username_list,comment)
             topic = Topic.objects.get(pk = topic_id)
             topic.comment_count = F('comment_count')+1
             topic.last_commented = timezone.now()
@@ -814,6 +816,35 @@ def replyOnTopic(request):
             return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
     else:
         return JsonResponse({'message': 'Topic Id / User Id / Comment provided'}, status=status.HTTP_204_NO_CONTENT)
+
+def get_mentions(comment):
+    mention_tag=[mention for mention in comment.split() if mention.startswith("@")]
+    if mention_tag:
+        username_list = [each_mention.strip('@') for each_mention in mention_tag]
+        for each_mention in mention_tag:
+            comment = comment.replace(each_mention,'<a href="/timeline/?username='+each_mention.strip('@')+'">'+each_mention+'</a>')
+        return comment,username_list
+    else:
+        return comment,[]
+
+def send_notification_to_mentions(username_list,comment_obj):
+    for each_username in username_list:
+        try:
+            notify_mention = Notification.objects.create(for_user = User.objects.get(username=each_username) ,topic = comment_obj,notification_type='10',user = comment_obj.user)
+        except:
+            pass
+
+@api_view(['POST'])
+def mention_suggestion(request):
+    term = request.POST.get('term', '')
+    mention_list = []
+    all_follower_user = list(Follower.objects.filter(user_follower=request.user,user_following__username__icontains=term,is_active=True).values_list('user_following_id',flat=True))[:5]
+    other_user = list(UserProfile.objects.filter(user__username__icontains=term).values_list('user_id',flat=True).order_by('-vb_count'))[:10-len(all_follower_user)]
+    mention_list= all_follower_user + other_user
+    mention_users=User.objects.filter(pk__in=mention_list)
+    user_data = UserSerializer(mention_users,many=True).data
+    return JsonResponse({'mention_users':user_data}, status=status.HTTP_200_OK)
+
 
 @api_view(['POST'])
 def reply_delete(request):
