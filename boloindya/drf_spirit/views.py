@@ -416,7 +416,8 @@ def GetChallengeDetails(request):
         return JsonResponse({'message': 'success', 'hashtag':tongue.hash_tag,'vb_count':vb_count,\
             'en_tongue_descp':tongue.en_descpription,'hi_tongue_descp':tongue.hi_descpription,\
             'ta_tongue_descp':tongue.ta_descpription,'te_tongue_descp':tongue.te_descpription,\
-             'picture':tongue.picture,'all_seen':shorcountertopic(all_seen['view_count__sum'])},\
+            'be_descpription':tongue.be_descpription,'ka_descpription':tongue.ka_descpription,\
+            'picture':tongue.picture,'all_seen':shorcountertopic(all_seen['view_count__sum'])},\
               status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Invalid','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -875,6 +876,13 @@ def reply_delete(request):
         return JsonResponse({'message': 'Invalid Delete Request'}, status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['POST'])
+def hashtag_suggestion(request):
+    term = request.POST.get('term', '')
+    hash_tags = TongueTwister.objects.filter(hash_tag__icontains=term).order_by('-hash_counter')[:10]
+    hash_data = TongueTwisterSerializer(hash_tags,many=True).data
+    return JsonResponse({'hash_data':hash_data}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
 def createTopic(request):
 
     """
@@ -933,6 +941,18 @@ def createTopic(request):
             view_count = random.randint(1,5)
             topic.view_count = view_count
             topic.update_vb()
+            tag_set={tag.strip("#") for tag in title.split() if tag.startswith("#")}
+            if tag_set:
+                hash_tag={tag for tag in title.split() if tag.startswith("#")}
+                for each_tag in hash_tag:
+                    title = title.replace(each_tag,'<a href="/get_challenge_details/?ChallengeHash='+each_tag.strip('#')+'">'+each_tag+'</a>')
+                topic.title = title[0].upper()+title[1:]
+                for each_tag in tag_set:
+                    tag,is_created = TongueTwister.objects.get_or_create(hash_tag=each_tag)
+                    if not is_created:
+                        tag.hash_counter = F('hash_counter')+1
+                    tag.save()
+                    topic.hash_tags.add(tag)
         else:
             view_count = random.randint(10,30)
             topic.view_count = view_count
@@ -996,9 +1016,25 @@ def editTopic(request):
         topic        = Topic.objects.get(pk = topic_id)
 
         if topic.user == request.user:
-
+            tag_set={tag.strip("#") for tag in title.split() if tag.startswith("#")}
             if title:
+                if tag_set:
+                    hash_tag={tag for tag in title.split() if tag.startswith("#")}
+                    for each_tag in tag_set:
+                        title = title.replace(each_tag,'<a href="/get_challenge_details/?ChallengeHash='+each_tag.strip('#')+'">'+each_tag+'</a>')
                 topic.title = title[0].upper()+title[1:]
+            hash_tags = topic.hash_tags.all()
+            for each_hashtag in hash_tags:
+                each_hashtag.hash_counter = F('hash_counter')-1
+                each_hashtag.save()
+            topic.hash_tags.all().delete()   
+            if tag_set:
+                for each_tag in tag_set:
+                    tag, is_created = TongueTwister.objects.get_or_create(hash_tag=each_tag)
+                    if not is_created:
+                        tag.hash_counter = F('hash_counter')+1
+                    tag.save()
+                    topic.hash_tags.add(tag)
             if category_id:
                 topic.category_id = category_id
             if language_id:

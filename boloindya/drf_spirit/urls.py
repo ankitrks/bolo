@@ -8,7 +8,7 @@ from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,c
     KYCDocumentTypeList,save_kyc_basic_info,save_kyc_documents,save_kyc_selfie,save_kyc_additional_info,save_bank_details_info,kyc_profession_status,get_kyc_status,my_app_version,\
     EncashableDetailList,get_bolo_details, get_category_detail, UserLogStatistics,GetFollowigList,GetFollowerList, get_category_with_video_bytes, get_category_detail_with_views, \
     get_category_video_bytes, get_popular_video_bytes, get_user_follow_and_like_list, get_recent_videos, get_popular_bolo, submit_user_feedback,get_ip_to_language, get_landing_page_video,\
-    mention_suggestion
+    mention_suggestion,hashtag_suggestion
 from rest_framework_simplejwt import views as jwt_views
 from .views import *
 
@@ -122,6 +122,7 @@ urlpatterns = [
     url(r'^topics/', include(topic_urls)),
     url(r'^get_hash_list/$',get_hash_list,name='get_hash_list'),
     url(r'^sync/dump/',SyncDump,name='sync_dump'),
+    url(r'^hashtag_suggestion/$', hashtag_suggestion, name='hashtag_suggestion'),
     #url(r'^user/statistics/$', user_statistics, name = 'user_statistics'),          # url for dumping values in user statistics table
 
     url(r'^get_category_detail/$', get_category_detail),
