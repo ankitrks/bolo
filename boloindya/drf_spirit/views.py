@@ -75,6 +75,7 @@ class ShufflePagination(LimitOffsetPagination):
 class NotificationAPI(GenericAPIView):
     permissions_classes = (IsOwnerOrReadOnly,)
     serializer_class   = NotificationSerializer
+    # pagination_class = LimitOffsetPagination
 
     limit = 10
 
@@ -82,9 +83,9 @@ class NotificationAPI(GenericAPIView):
         # print "request user", request.user, action
 
         if action == 'get':
-            notifications = self.get_notifications(request.user.id)
+            notifications,next_offset = self.get_notifications(request.user.id)
             notification_data = self.serialize_notification(notifications)
-            return JsonResponse(notification_data, safe=False)
+            return JsonResponse({'notification_data':notification_data,'next_offset':next_offset}, safe=False)
 
         elif action == 'click':
             self.mark_notification_as_read()
@@ -97,26 +98,37 @@ class NotificationAPI(GenericAPIView):
         # last_read = get_redis(redis_keymap%(user_id))
         # notifications = Notification.get_notification(self.request.user, count = 100)
 
-        offset = self.request.data.get('offset') or 0
-        limit = self.request.data.get('limit') or self.limit
+        offset = int(self.request.data.get('offset') or 0)
+        limit = int(self.request.data.get('limit') or self.limit)
+        next_offset=''
 
         # print "offset",offset,"page_size",page_size
 
-        notifications = Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-last_modified')[offset:offset+limit]
-
+        notifications = Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-last_modified')[offset*limit:offset*limit+limit]
+        total_notification_count = Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-last_modified').count()
+        total_offset = total_notification_count/limit
+        if total_notification_count > 0 and not total_notification_count%limit:
+            total_offset = total_offset-1
         if notifications:
-            notifications.update(status = 1)
+            if total_offset > offset:
+                next_offset = offset+1
+            update_notification_ids = list(Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-last_modified').values_list('pk',flat=True))[offset*limit:offset*limit+limit]
+            print update_notification_ids
+            Notification.objects.filter(pk__in=update_notification_ids).update(status=1)
 
         result = []
         for notification in notifications:
             result.append(notification)
-        return result
+        return result,next_offset
 
 
     def serialize_notification(self, notifications):
         serialized_data =[]
         for each_noti in notifications:
-            serialized_data.append(each_noti.get_notification_json())
+            try:
+                serialized_data.append(each_noti.get_notification_json())
+            except:
+                pass
         return serialized_data
 
     
