@@ -1039,8 +1039,6 @@ def editTopic(request):
     try:
         topic_id = request.POST.get('topic_id', '')
         title        = request.POST.get('title', '')
-        category_id  = request.POST.get('category_id', '')
-        language_id  = request.POST.get('language_id', '')
         topic        = Topic.objects.get(pk = topic_id)
 
         if topic.user == request.user:
@@ -1063,10 +1061,6 @@ def editTopic(request):
                         tag.hash_counter = F('hash_counter')+1
                     tag.save()
                     topic.hash_tags.add(tag)
-            if category_id:
-                topic.category_id = category_id
-            if language_id:
-                topic.language_id = language_id
             topic.save()
 
             topic_json = TopicSerializerwithComment(topic).data
@@ -1075,6 +1069,55 @@ def editTopic(request):
             return JsonResponse({'message': 'Invalid Edit Request'}, status=status.HTTP_400_BAD_REQUEST)
     except:
         return JsonResponse({'message': 'Invalid Edit Request'}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def editComment(request):
+    """
+
+    post:
+    edit Topic.
+    comment        = request.POST.get('comment', '')
+    comment_id = request.POST.get('comment_id',None)
+
+    Required Parameters:
+    comment
+    """
+    try:
+        comment_id = request.POST.get('comment_id',None)
+        comment_text = request.POST.get('comment_text','')
+        comment = Comment.objects.get(pk=comment_id)
+        if comment.user == request.user:
+            comment_text,username_list = get_mentions(comment_text)
+            old_comment = strip_tags(comment.comment_html)
+            old_comment_text,old_username_list = get_mentions(old_comment)
+            ## add to history
+            comment.comment_html=comment_text
+            comment.comment = comment_text
+            comment.save()
+            for each_username in username_list:
+                if not each_username in old_username_list:
+                    send_notification_to_mentions([each_username],comment)
+            return JsonResponse({'message': 'Reply Updated','comment':CommentSerializer(comment).data}, status=status.HTTP_201_CREATED)    
+        else:
+            return JsonResponse({'message': 'Invalid Edit Request'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return JsonResponse({'message': 'Invalid Edit Request','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+from HTMLParser import HTMLParser
+
+class MLStripper(HTMLParser):
+    def __init__(self):
+        self.reset()
+        self.fed = []
+    def handle_data(self, d):
+        self.fed.append(d)
+    def get_data(self):
+        return ''.join(self.fed)
+
+def strip_tags(html):
+    s = MLStripper()
+    s.feed(html)
+    return s.get_data()
 
 @api_view(['POST'])
 def topic_delete(request):
