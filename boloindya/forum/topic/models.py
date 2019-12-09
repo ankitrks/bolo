@@ -469,7 +469,7 @@ class Notification(UserInfo):
             notific['marathi_title'] = str(self.user.st.name)+' has commented on video: '+self.topic.topic.title+'.'
             
             notific['notification_type'] = '2'
-            notific['instance_id'] = self.topic.topic.id
+            notific['instance_id'] = self.topic.id
             notific['read_status'] = self.status
             notific['id'] = self.id
             notific['created_at'] = shortnaturaltime(self.created_at)
@@ -486,7 +486,7 @@ class Notification(UserInfo):
             notific['gujrati_title'] = str(self.user.st.name)+' has commented on your video: '+self.topic.topic.title
             notific['marathi_title'] = str(self.user.st.name)+' has commented on your video: '+self.topic.topic.title
             notific['notification_type'] = '3'
-            notific['instance_id'] = self.topic.topic.id
+            notific['instance_id'] = self.topic.id
             notific['read_status'] = self.status
             notific['id'] = self.id
             notific['created_at'] = shortnaturaltime(self.created_at)
