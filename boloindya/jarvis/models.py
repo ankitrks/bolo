@@ -62,11 +62,17 @@ device_options = (
     ('3', "Web"),
 )
 
+import json
+from datetime import datetime
+
 class FCMDevice(AbstractDevice):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='%(app_label)s_%(class)s_user',editable=False)
     device_type = models.CharField(choices=device_options, blank = True, null = True, max_length=10, default='0')
     created_at=models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False) # auto_now will add the current time and date whenever field is saved.
     last_modified=models.DateTimeField(auto_now=True,auto_now_add=False)                     # while auto_now_add will save the date and time only when record is first created
+    is_uninstalled=models.BooleanField(default=False)
+    uninstalled_date=models.DateTimeField(auto_now=False,auto_now_add=False,blank=True,null=True)
+    uninstalled_desc=models.TextField(null=True,blank=True)
 
     def __unicode__(self):
         return str(self.user)
@@ -81,19 +87,22 @@ class FCMDevice(AbstractDevice):
                 print 'Not Exists'
                 raise Exception
             print 'Exisits'
+            desc=instance.uninstalled_desc
+                if desc:
+                    list_data = json.loads(desc)
+                    if 'uninstall' in list_data[len(list_data)-1]:
+                        list_data.append({'uninstall': datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
+                    desc=json.dumps(list_data)
             if request.user.id == None:
-                print 'AnonymousUser'
-                instance.update(is_active = True,dev_id=dev_id,device_type = request.POST.get('device_type'), reg_id=reg_id) 
+                instance.update(is_active = True,dev_id=dev_id,device_type = request.POST.get('device_type'), reg_id=reg_id, is_uninstalled=False, uninstalled_desc=desc) 
             else:
-                print 'User'
-                instance.update(user = request.user,is_active = True,name=request.user.username,dev_id=dev_id,device_type = request.POST.get('device_type'),reg_id=reg_id)
+                instance.update(user = request.user,is_active = True,name=request.user.username,dev_id=dev_id,device_type = request.POST.get('device_type'),reg_id=reg_id , is_uninstalled=False, uninstalled_desc=desc)
             return JsonResponse({"status":"Success"},safe = False)
         except Exception as e:
             if request.user.id == None:
-                print 'AnonymousUser'
-                instance = FCMDevice.objects.create(reg_id = request.POST.get('reg_id'),name='Anonymous',dev_id=request.POST.get('dev_id'),device_type = request.POST.get('device_type'))
+                instance = FCMDevice.objects.create(reg_id = request.POST.get('reg_id'),name='Anonymous',dev_id=request.POST.get('dev_id'),device_type = request.POST.get('device_type'), is_uninstalled=False)
             else:
-                instance = FCMDevice.objects.create(user = request.user,reg_id = request.POST.get('reg_id'),name=request.user.username,dev_id=request.POST.get('dev_id'),device_type = request.POST.get('device_type'))
+                instance = FCMDevice.objects.create(user = request.user,reg_id = request.POST.get('reg_id'),name=request.user.username,dev_id=request.POST.get('dev_id'),device_type = request.POST.get('device_type'), is_uninstalled=False)
             return JsonResponse({"status":"Success"},safe = False)
         # try:
         #     instance = FCMDevice.objects.filter(reg_id = reg_id)
