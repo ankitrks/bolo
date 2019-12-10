@@ -87,7 +87,7 @@ class FCMDevice(AbstractDevice):
                 print 'Not Exists'
                 raise Exception
             print 'Exisits'
-            desc=instance.uninstalled_desc
+            desc=instance[0].uninstalled_desc
             if desc:
                 list_data = json.loads(desc)
                 if 'uninstall' in list_data[len(list_data)-1]:
