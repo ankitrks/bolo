@@ -36,6 +36,8 @@ class Comment(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='st_comments',editable=False)
     topic = models.ForeignKey('forum_topic.Topic', related_name='topic_comment')
+    hash_tags = models.ManyToManyField('forum_topic.TongueTwister', verbose_name=_("hash_tags"), \
+            related_name="hash_tag_comment",blank=True)
 
     comment = models.TextField(_("comment"))
     comment_html = models.TextField(_("comment html"))
@@ -149,6 +151,8 @@ class CommentHistory(RecordTimeStamp):
     source = models.ForeignKey('forum_comment.Comment', blank = False, null = False, related_name='comment_history')
     comment = models.TextField(_("comment"))
     comment_html = models.TextField(_("comment html"))
+    hash_tags = models.ManyToManyField('forum_topic.TongueTwister', verbose_name=_("hash_tags"), \
+            related_name="hash_tag_comment_history",blank=True)
 
     def __unicode__(self):
         return str(self.comment)

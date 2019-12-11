@@ -825,6 +825,11 @@ def replyOnTopic(request):
             comment.topic_id      = topic_id
             comment.mobile_no     = mobile_no
             comment.save()
+            has_hashtag,hashtagged_title = check_hashtag(comment)
+            if has_hashtag:
+                comment.comment = hashtagged_title
+                comment.comment_html = hashtagged_title
+                comment.save()
             if username_list:
                 send_notification_to_mentions(username_list,comment)
             topic = Topic.objects.get(pk = topic_id)
@@ -845,6 +850,33 @@ def replyOnTopic(request):
             return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
     else:
         return JsonResponse({'message': 'Topic Id / User Id / Comment provided'}, status=status.HTTP_204_NO_CONTENT)
+
+def check_hashtag(comment):
+    title = comment.comment
+    tag_list=[tag.strip("#") for tag in title.split() if tag.startswith("#")]
+    if tag_list:
+        hash_tag=[tag for tag in title.split() if tag.startswith("#")]
+        for each_tag in hash_tag:
+            title = title.replace(each_tag,'<a href="/get_challenge_details/?ChallengeHash='+each_tag.strip('#')+'">'+each_tag+'</a>')
+        title = title[0].upper()+title[1:]
+        for each_tag in tag_list:
+            tag,is_created = TongueTwister.objects.get_or_create(hash_tag=each_tag)
+            if not is_created:
+                tag.hash_counter = F('hash_counter')+1
+            tag.save()
+            comment.hash_tags.add(tag)
+        return True, title
+    else:
+        return False,title
+
+def remove_old_hashtag(comment,history_comment):
+    hash_tags = comment.hash_tags.all()
+    for each_hashtag in hash_tags:
+        history_comment.hash_tags.add(each_hashtag)
+        each_hashtag.hash_counter = F('hash_counter')-1
+        comment.hash_tags.remove(each_hashtag)
+        each_hashtag.save()
+
 
 def get_mentions(comment):
     mention_tag=[mention for mention in comment.split() if mention.startswith("@")]
@@ -1102,12 +1134,18 @@ def editComment(request):
             old_comment_text,old_username_list = get_mentions(old_comment)
             if not old_comment == comment_text:
                 history_comment = CommentHistory.objects.create(source=comment,comment=comment.comment,comment_html=comment.comment_html)
+                remove_old_hashtag(comment,history_comment)
                 comment.comment_html=comment_text
                 comment.comment = comment_text
                 comment.save()
                 for each_username in username_list:
                     if not each_username in old_username_list:
                         send_notification_to_mentions([each_username],comment)
+                has_hashtag,hashtagged_title = check_hashtag(comment)
+                if has_hashtag:
+                    comment.comment = hashtagged_title
+                    comment.comment_html = hashtagged_title
+                    comment.save()
                 return JsonResponse({'message': 'Reply Updated','comment':CommentSerializer(comment).data}, status=status.HTTP_201_CREATED)
             else:
                 return JsonResponse({'message': 'No Changes made'}, status=status.HTTP_200_OK)
