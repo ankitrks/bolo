@@ -1059,11 +1059,31 @@ class TopicCommentList(generics.ListAPIView):
     serializer_class    = CommentSerializer
     queryset            = Comment.objects.all()
     permission_classes  = (IsOwnerOrReadOnly,)
+    pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
         topic_slug = self.kwargs['slug']
         topic_id = self.kwargs['topic_id']
-        return self.queryset.filter(topic_id=topic_id,is_removed = False)
+        comment_id = self.request.POST.get('comment_id',None)
+        limit = int(self.request.GET.get('limit',10))
+        if comment_id:
+            offset = int(self.request.GET.get('offset',0))
+            all_comments = list(self.queryset.filter(topic_id=topic_id,is_removed = False).order_by('-id'))
+            index_of_comment = all_comments.index(Comment.objects.get(pk=comment_id))
+            if index_of_comment:
+                index_of_comment+=1
+                comment_remainder = index_of_comment%limit
+                comment_offset = (index_of_comment/limit)*limit
+                if comment_offset and comment_remainder==0:
+                    offset = comment_offset-limit
+                else:
+                    offset = comment_offset
+            self.request.GET._mutable = True
+            self.request.GET.update({'offset':offset})
+            return self.queryset.filter(topic_id=topic_id,is_removed = False).order_by('-id')
+
+
+        return self.queryset.filter(topic_id=topic_id,is_removed = False).order_by('-id')
 
 class CategoryList(generics.ListAPIView):
     serializer_class = CategorySerializer
