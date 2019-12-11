@@ -7,7 +7,8 @@ from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,c
     vb_transcode_status,get_follow_user,upload_profile_image,get_following_list,get_follower_list,GetChallenge,GetChallengeDetails,save_android_logs,SyncDump,get_hash_list,\
     KYCDocumentTypeList,save_kyc_basic_info,save_kyc_documents,save_kyc_selfie,save_kyc_additional_info,save_bank_details_info,kyc_profession_status,get_kyc_status,my_app_version,\
     EncashableDetailList,get_bolo_details, get_category_detail, UserLogStatistics,GetFollowigList,GetFollowerList, get_category_with_video_bytes, get_category_detail_with_views, \
-    get_category_video_bytes, get_popular_video_bytes, get_user_follow_and_like_list, get_recent_videos, get_popular_bolo, submit_user_feedback,get_ip_to_language, get_landing_page_video
+    get_category_video_bytes, get_popular_video_bytes, get_user_follow_and_like_list, get_recent_videos, get_popular_bolo, submit_user_feedback,get_ip_to_language, get_landing_page_video,\
+    mention_suggestion,hashtag_suggestion,SearchHashTag,editComment
 from rest_framework_simplejwt import views as jwt_views
 from .views import *
 
@@ -52,6 +53,7 @@ urlpatterns = [
     url(r'^get_answers/$', GetAnswers.as_view(), name='get_answers'),
     url(r'^search/', include(topicsearch_urls)),
     url(r'^search/users/', include(usersearch_urls)),
+    url(r'^search/hash_tag/',SearchHashTag.as_view(),name='search_hash_tag'),
     url(r'^create_topic', include(createtopic_urls)),
     url(r'^reply_on_topic', include(replyontopic_urls)),
     url(r'^categories/', include(category_urls)),
@@ -87,6 +89,7 @@ urlpatterns = [
     url(r'^get_follower_list/$', GetFollowerList.as_view(), name='get_follower_list'),
     url(r'^shareontimeline/$', shareontimeline, name='shareontimeline'),
     url(r'^like/$', like, name='like'),
+    url(r'^mention_suggestion/$', mention_suggestion, name='mention_suggestion'),
     url(r'^get_challenge/$', GetChallenge.as_view(), name='get_challenge'),
     url(r'^get_challenge_details/$', GetChallengeDetails, name='get_challenge_details'),
     url(r'^password/set/$', password_set, name='password_set'),
@@ -98,6 +101,7 @@ urlpatterns = [
     url(r'^follow_like_list/$', follow_like_list, name='follow_like_list'),
     url(r'^reply_delete/$', reply_delete, name='reply_delete'),
     url(r'^editTopic/$', editTopic, name='editTopic'),
+    url(r'^editComment/$', editComment, name='editComment'),
     url(r'^topic_delete/$', topic_delete, name='topic_delete'),
     url(r'^notification/(?P<action>click|get)$', NotificationAPI.as_view(), name='notification'),
     url(r'^notification_topic/$', notification_topic, name='notification_topic'),
@@ -120,6 +124,7 @@ urlpatterns = [
     url(r'^topics/', include(topic_urls)),
     url(r'^get_hash_list/$',get_hash_list,name='get_hash_list'),
     url(r'^sync/dump/',SyncDump,name='sync_dump'),
+    url(r'^hashtag_suggestion/$', hashtag_suggestion, name='hashtag_suggestion'),
     #url(r'^user/statistics/$', user_statistics, name = 'user_statistics'),          # url for dumping values in user statistics table
 
     url(r'^get_category_detail/$', get_category_detail),

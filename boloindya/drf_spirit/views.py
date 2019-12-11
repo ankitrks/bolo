@@ -46,10 +46,10 @@ from .utils import get_weight, add_bolo_score, shorcountertopic, calculate_encas
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 from forum.category.models import Category
-from forum.comment.models import Comment
+from forum.comment.models import Comment,CommentHistory
 from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs
 from jarvis.models import FCMDevice,StateDistrictLanguage
-from forum.topic.models import Topic, ShareTopic, Like, SocialShare, Notification, CricketMatch, Poll, Choice, Voting, \
+from forum.topic.models import Topic,TopicHistory, ShareTopic, Like, SocialShare, Notification, CricketMatch, Poll, Choice, Voting, \
     Leaderboard, VBseen, TongueTwister
 from .serializers import *
 
@@ -428,8 +428,10 @@ def GetChallengeDetails(request):
         return JsonResponse({'message': 'success', 'hashtag':tongue.hash_tag,'vb_count':vb_count,\
             'en_tongue_descp':tongue.en_descpription,'hi_tongue_descp':tongue.hi_descpription,\
             'ta_tongue_descp':tongue.ta_descpription,'te_tongue_descp':tongue.te_descpription,\
-             'picture':tongue.picture,'all_seen':shorcountertopic(all_seen['view_count__sum'])},\
-              status=status.HTTP_200_OK)
+            'be_descpription':tongue.be_descpription,'ka_descpription':tongue.ka_descpription,\
+            'ma_descpription':tongue.ma_descpription,'gj_descpription':tongue.gj_descpription,\
+            'mt_descpription':tongue.mt_descpription,'picture':tongue.picture,\
+            'all_seen':shorcountertopic(all_seen['view_count__sum'])},status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Invalid','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -567,6 +569,33 @@ class SearchTopic(generics.ListCreateAPIView):
             topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True, language_id=language_id)
 
         return topics
+
+class SearchHashTag(generics.ListCreateAPIView):
+    """
+    get:
+    Search By Topic.
+    term        = request.GET.get('term', '')
+    Required Parameters:
+    term---Topic Title
+
+    post:
+
+    Required Parameters:
+    term 
+    """
+
+
+    serializer_class    = TongueTwisterSerializer
+    permission_classes  = (IsOwnerOrReadOnly,)
+    pagination_class    = LimitOffsetPagination
+
+    def get_queryset(self):
+        topics      = []
+        search_term = self.request.GET.get('term')
+        if search_term:
+            hash_tags  = TongueTwister.objects.filter(hash_tag__icontains = search_term)
+
+        return hash_tags
 
 
 @api_view(['POST'])
@@ -786,7 +815,7 @@ def replyOnTopic(request):
 
     user_id      = request.user.id
     topic_id     = request.POST.get('topic_id', '')
-    language_id  = request.POST.get('language_id', '')
+    language_id  = request.user.st.language
     comment_html = request.POST.get('comment', '')
     mobile_no    = request.POST.get('mobile_no', '')
     thumbnail = request.POST.get('thumbnail', '')
@@ -800,7 +829,7 @@ def replyOnTopic(request):
 
     if user_id and topic_id and comment_html:
         try:
-
+            comment_html,username_list = get_mentions(comment_html)
             comment.comment       = comment_html
             comment.comment_html  = comment_html
             comment.language_id   = language_id
@@ -808,6 +837,13 @@ def replyOnTopic(request):
             comment.topic_id      = topic_id
             comment.mobile_no     = mobile_no
             comment.save()
+            has_hashtag,hashtagged_title = check_hashtag(comment)
+            if has_hashtag:
+                comment.comment = hashtagged_title
+                comment.comment_html = hashtagged_title
+                comment.save()
+            if username_list:
+                send_notification_to_mentions(username_list,comment)
             topic = Topic.objects.get(pk = topic_id)
             topic.comment_count = F('comment_count')+1
             topic.last_commented = timezone.now()
@@ -826,6 +862,66 @@ def replyOnTopic(request):
             return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
     else:
         return JsonResponse({'message': 'Topic Id / User Id / Comment provided'}, status=status.HTTP_204_NO_CONTENT)
+
+def check_hashtag(comment):
+    title = comment.comment
+    tag_list=[tag.strip("#") for tag in title.split() if tag.startswith("#")]
+    if tag_list:
+        hash_tag=[tag for tag in title.split() if tag.startswith("#")]
+        for each_tag in hash_tag:
+            title = title.replace(each_tag,'<a href="/get_challenge_details/?ChallengeHash='+each_tag.strip('#')+'">'+each_tag+'</a>')
+        title = title[0].upper()+title[1:]
+        for each_tag in tag_list:
+            tag,is_created = TongueTwister.objects.get_or_create(hash_tag=each_tag)
+            if not is_created:
+                tag.hash_counter = F('hash_counter')+1
+            tag.save()
+            comment.hash_tags.add(tag)
+        return True, title
+    else:
+        return False,title
+
+def remove_old_hashtag(comment,history_comment):
+    hash_tags = comment.hash_tags.all()
+    for each_hashtag in hash_tags:
+        history_comment.hash_tags.add(each_hashtag)
+        each_hashtag.hash_counter = F('hash_counter')-1
+        comment.hash_tags.remove(each_hashtag)
+        each_hashtag.save()
+
+
+def get_mentions(comment):
+    mention_tag=[mention for mention in comment.split() if mention.startswith("@")]
+    if mention_tag:
+        username_list = [each_mention.strip('@') for each_mention in mention_tag]
+        for each_mention in mention_tag:
+            try:
+                user = User.objects.get(username=each_mention.strip('@'))
+                comment = comment.replace(each_mention,'<a href="/timeline/?username='+each_mention.strip('@')+'">'+each_mention+'</a>')
+            except:
+                pass
+        return comment,username_list
+    else:
+        return comment,[]
+
+def send_notification_to_mentions(username_list,comment_obj):
+    for each_username in username_list:
+        try:
+            notify_mention = Notification.objects.create(for_user = User.objects.get(username=each_username) ,topic = comment_obj,notification_type='10',user = comment_obj.user)
+        except:
+            pass
+
+@api_view(['POST'])
+def mention_suggestion(request):
+    term = request.POST.get('term', '')
+    mention_list = []
+    all_follower_user = list(Follower.objects.filter(user_follower=request.user,user_following__username__icontains=term,is_active=True).values_list('user_following_id',flat=True))[:5]
+    other_user = list(UserProfile.objects.filter(user__username__icontains=term).values_list('user_id',flat=True).order_by('-vb_count'))[:10-len(all_follower_user)]
+    mention_list= all_follower_user + other_user
+    mention_users=User.objects.filter(pk__in=mention_list)
+    user_data = UserSerializer(mention_users,many=True).data
+    return JsonResponse({'mention_users':user_data}, status=status.HTTP_200_OK)
+
 
 @api_view(['POST'])
 def reply_delete(request):
@@ -854,6 +950,13 @@ def reply_delete(request):
             return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
     else:
         return JsonResponse({'message': 'Invalid Delete Request'}, status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['POST'])
+def hashtag_suggestion(request):
+    term = request.POST.get('term', '')
+    hash_tags = TongueTwister.objects.filter(hash_tag__icontains=term).order_by('-hash_counter')[:10]
+    hash_data = TongueTwisterSerializer(hash_tags,many=True).data
+    return JsonResponse({'hash_data':hash_data}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def createTopic(request):
@@ -914,6 +1017,18 @@ def createTopic(request):
             view_count = random.randint(1,5)
             topic.view_count = view_count
             topic.update_vb()
+            tag_list=[tag.strip("#") for tag in title.split() if tag.startswith("#")]
+            if tag_list:
+                hash_tag=[tag for tag in title.split() if tag.startswith("#")]
+                for each_tag in hash_tag:
+                    title = title.replace(each_tag,'<a href="/get_challenge_details/?ChallengeHash='+each_tag.strip('#')+'">'+each_tag+'</a>')
+                topic.title = title[0].upper()+title[1:]
+                for each_tag in tag_list:
+                    tag,is_created = TongueTwister.objects.get_or_create(hash_tag=each_tag)
+                    if not is_created:
+                        tag.hash_counter = F('hash_counter')+1
+                    tag.save()
+                    topic.hash_tags.add(tag)
         else:
             view_count = random.randint(10,30)
             topic.view_count = view_count
@@ -972,26 +1087,100 @@ def editTopic(request):
     try:
         topic_id = request.POST.get('topic_id', '')
         title        = request.POST.get('title', '')
-        category_id  = request.POST.get('category_id', '')
-        language_id  = request.POST.get('language_id', '')
         topic        = Topic.objects.get(pk = topic_id)
 
         if topic.user == request.user:
-
+            tag_list=[tag.strip("#") for tag in title.split() if tag.startswith("#")]
             if title:
-                topic.title = title[0].upper()+title[1:]
-            if category_id:
-                topic.category_id = category_id
-            if language_id:
-                topic.language_id = language_id
-            topic.save()
+                if tag_list:
+                    hash_tag={tag for tag in title.split() if tag.startswith("#")}
+                    for each_tag in hash_tag:
+                        title = title.replace(each_tag,'<a href="/get_challenge_details/?ChallengeHash='+each_tag.strip('#')+'">'+each_tag+'</a>')
+                new_title = title[0].upper()+title[1:]
+            if not new_title == topic.title:
+                history_topic = TopicHistory.objects.create(source=topic,title=topic.title)
+                hash_tags = topic.hash_tags.all()
+                for each_hashtag in hash_tags:
+                    history_topic.hash_tags.add(each_hashtag)
+                    each_hashtag.hash_counter = F('hash_counter')-1
+                    topic.hash_tags.remove(each_hashtag)
+                    each_hashtag.save()
+                topic.title = new_title
+                if tag_list:
+                    for each_tag in tag_list:
+                        tag, is_created = TongueTwister.objects.get_or_create(hash_tag=each_tag)
+                        if not is_created:
+                            tag.hash_counter = F('hash_counter')+1
+                        tag.save()
+                        topic.hash_tags.add(tag)
+                topic.save()
 
-            topic_json = TopicSerializerwithComment(topic).data
-            return JsonResponse({'message': 'Topic Edited','topic':topic_json}, status=status.HTTP_201_CREATED)
+                topic_json = TopicSerializerwithComment(topic).data
+                return JsonResponse({'message': 'Topic Edited','topic':topic_json}, status=status.HTTP_201_CREATED)
+            else:
+                return JsonResponse({'message': 'No Changes made'}, status=status.HTTP_200_OK)
         else:
             return JsonResponse({'message': 'Invalid Edit Request'}, status=status.HTTP_400_BAD_REQUEST)
-    except:
+    except Exception as e:
         return JsonResponse({'message': 'Invalid Edit Request'}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def editComment(request):
+    """
+
+    post:
+    edit Topic.
+    comment        = request.POST.get('comment', '')
+    comment_id = request.POST.get('comment_id',None)
+
+    Required Parameters:
+    comment
+    """
+    try:
+        comment_id = request.POST.get('comment_id',None)
+        comment_text = request.POST.get('comment_text','')
+        comment = Comment.objects.get(pk=comment_id)
+        if comment.user == request.user:
+            comment_text,username_list = get_mentions(comment_text)
+            old_comment = strip_tags(comment.comment_html)
+            old_comment_text,old_username_list = get_mentions(old_comment)
+            if not old_comment == comment_text:
+                history_comment = CommentHistory.objects.create(source=comment,comment=comment.comment,comment_html=comment.comment_html)
+                remove_old_hashtag(comment,history_comment)
+                comment.comment_html=comment_text
+                comment.comment = comment_text
+                comment.save()
+                for each_username in username_list:
+                    if not each_username in old_username_list:
+                        send_notification_to_mentions([each_username],comment)
+                has_hashtag,hashtagged_title = check_hashtag(comment)
+                if has_hashtag:
+                    comment.comment = hashtagged_title
+                    comment.comment_html = hashtagged_title
+                    comment.save()
+                return JsonResponse({'message': 'Reply Updated','comment':CommentSerializer(comment).data}, status=status.HTTP_201_CREATED)
+            else:
+                return JsonResponse({'message': 'No Changes made'}, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'message': 'Invalid Edit Request'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return JsonResponse({'message': 'Invalid Edit Request','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+from HTMLParser import HTMLParser
+
+class MLStripper(HTMLParser):
+    def __init__(self):
+        self.reset()
+        self.fed = []
+    def handle_data(self, d):
+        self.fed.append(d)
+    def get_data(self):
+        return ''.join(self.fed)
+
+def strip_tags(html):
+    s = MLStripper()
+    s.feed(html)
+    return s.get_data()
 
 @api_view(['POST'])
 def topic_delete(request):
@@ -1013,7 +1202,6 @@ def topic_delete(request):
     topic_id     = request.POST.get('topic_id', '')
 
     topic = Topic.objects.get(pk= topic_id)
-    print topic.user, request.user
 
     if topic.user == request.user:
         try:
@@ -2362,11 +2550,6 @@ def get_hash_list(request):
             videos_dict = []
             for video in videos:    
                 videos_dict.append(TopicSerializer(video).data)
-            if total_views['view_count__sum']:
-                hash_data['total_views'] = shorcountertopic(total_views['view_count__sum'])
-            else:
-                hash_data['total_views'] = 0
-            hash_data['total_videos_count'] = total_videos_count
             hash_data['videos'] = videos_dict
             hashtaglist.append(hash_data)
         return JsonResponse({'data':hashtaglist,'message':'Success'})
