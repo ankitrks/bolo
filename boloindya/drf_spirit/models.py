@@ -382,6 +382,7 @@ class UserFeedback(models.Model):
     by_user = models.ForeignKey('auth.User', blank = True, null = True, editable = False)
     created_at = models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False)
     contact_email = models.CharField(_("contact_email"), max_length=30)
+    contact_number = models.CharField(_("contact_number"), max_length=30, default='')
     description = models.TextField(null = True, blank = True)
     feedback_image = models.CharField(_("feedback_image"), max_length=255)
 

@@ -2670,11 +2670,12 @@ def get_popular_bolo(request):
 def submit_user_feedback(request):
     try:
         contact_email = request.POST.get('contact_email', '')
+        contact_number = request.POST.get('contact_mobile', '')
         description = request.POST.get('description', '')
         feedback_image = request.POST.get('feedback_image', '')
         if request.user.id:
             user_feedback = UserFeedback(by_user=request.user, description=description, contact_email=contact_email, \
-                        feedback_image=feedback_image)
+                        feedback_image=feedback_image, contact_number=contact_number)
             user_feedback.save()
             user_feedback.send_feedback_email()
             return JsonResponse({'message': 'saved feedback'}, status=status.HTTP_200_OK)

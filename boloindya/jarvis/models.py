@@ -91,7 +91,7 @@ class FCMDevice(AbstractDevice):
             if desc:
                 list_data = json.loads(desc)
                 if 'uninstall' in list_data[len(list_data)-1]:
-                    list_data.append({'uninstall': datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
+                    list_data.append({'install': datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
                 desc=json.dumps(list_data)
             if request.user.id == None:
                 instance.update(is_active = True,dev_id=dev_id,device_type = request.POST.get('device_type'), reg_id=reg_id, is_uninstalled=False, uninstalled_desc=desc) 

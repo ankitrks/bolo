@@ -4,7 +4,7 @@ from datetime import datetime
 import json
 
 def run():
-    devices = FCMDevice.objects.filter(user__pk=39342, is_uninstalled=False)
+    devices = FCMDevice.objects.filter(user__st__is_test_user=False, is_uninstalled=False)
     for device in devices:
         t = device.send_message(data={'uninstall_tracking': 'true'})
         try:
