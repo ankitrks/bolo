@@ -1,53 +1,57 @@
  # -*- coding: utf-8 -*-
+import os
+import ast
+import time
+import json
+import boto3
+import random
+import urllib2
+import itertools
+from random import shuffle
+from collections import OrderedDict
+from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
+
 from django.http import JsonResponse
 from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.files.base import ContentFile
+from django.db.models import F,Q
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from django.db.models import Sum
+from django.http import HttpResponseRedirect
+from django.forms.models import model_to_dict
+from datetime import datetime,timedelta,date
+from django.db.models.signals import post_save
+from django.views.decorators.csrf import csrf_exempt
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from rest_framework import status
-from rest_framework.decorators import api_view
 from rest_framework import generics
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
-from django_filters.rest_framework import DjangoFilterBackend
-from django.core.files.base import ContentFile
 from rest_framework.generics import GenericAPIView
-
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
-from .models import UserJarvisDump, UserLogStatistics
+from .models import UserJarvisDump, UserLogStatistics, UserFeedback
 from .permissions import IsOwnerOrReadOnly
-from .serializers import TopicSerializer, CategorySerializer, CommentSerializer, SingUpOTPSerializer,TopicSerializerwithComment,AppVersionSerializer,UserSerializer,SingleTopicSerializerwithComment,\
-UserAnswerSerializerwithComment,CricketMatchSerializer,PollSerializer,ChoiceSerializer,VotingSerializer,LeaderboardSerializer,\
-PollSerializerwithChoice, OnlyChoiceSerializer, NotificationSerializer, UserProfileSerializer, TongueTwisterSerializer,KYCDocumnetsTypeSerializer,\
-PaymentCycleSerializer,EncashableDetailSerializer,PaymentInfoSerializer,UserKYCSerializer
-from forum.topic.models import Topic,ShareTopic,Like,SocialShare,Notification,CricketMatch,Poll,Choice,Voting,Leaderboard,VBseen,TongueTwister
+from .utils import get_weight, add_bolo_score, shorcountertopic, calculate_encashable_details, state_language, language_options
+
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 from forum.category.models import Category
-from forum.comment.models import Comment
+from forum.comment.models import Comment,CommentHistory
 from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs
-from jarvis.models import FCMDevice
-from django.db.models import F,Q
-from rest_framework_simplejwt.tokens import RefreshToken
-from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
-import boto3
-import time
-import random
-import os
-from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
-from datetime import datetime,timedelta,date
-import json
-from .utils import get_weight,add_bolo_score,shorcountertopic,calculate_encashable_details
-from django.db.models import Sum
-import itertools
-import json
-import urllib2
-from django.http import HttpResponseRedirect
-from django.forms.models import model_to_dict
-import ast
+from jarvis.models import FCMDevice,StateDistrictLanguage
+from forum.topic.models import Topic,TopicHistory, ShareTopic, Like, SocialShare, Notification, CricketMatch, Poll, Choice, Voting, \
+    Leaderboard, VBseen, TongueTwister
+from .serializers import *
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -56,9 +60,6 @@ def get_tokens_for_user(user):
         'refresh': str(refresh),
         'access': str(refresh.access_token),
     }
-from random import shuffle
-from rest_framework.response import Response
-from collections import OrderedDict
 
 class ShufflePagination(LimitOffsetPagination):
 
@@ -74,6 +75,7 @@ class ShufflePagination(LimitOffsetPagination):
 class NotificationAPI(GenericAPIView):
     permissions_classes = (IsOwnerOrReadOnly,)
     serializer_class   = NotificationSerializer
+    # pagination_class = LimitOffsetPagination
 
     limit = 10
 
@@ -81,9 +83,9 @@ class NotificationAPI(GenericAPIView):
         # print "request user", request.user, action
 
         if action == 'get':
-            notifications = self.get_notifications(request.user.id)
+            notifications,next_offset = self.get_notifications(request.user.id)
             notification_data = self.serialize_notification(notifications)
-            return JsonResponse(notification_data, safe=False)
+            return JsonResponse({'notification_data':notification_data,'next_offset':next_offset}, safe=False)
 
         elif action == 'click':
             self.mark_notification_as_read()
@@ -96,26 +98,37 @@ class NotificationAPI(GenericAPIView):
         # last_read = get_redis(redis_keymap%(user_id))
         # notifications = Notification.get_notification(self.request.user, count = 100)
 
-        offset = self.request.data.get('offset') or 0
-        limit = self.request.data.get('limit') or self.limit
+        offset = int(self.request.data.get('offset') or 0)
+        limit = int(self.request.data.get('limit') or self.limit)
+        next_offset=''
 
         # print "offset",offset,"page_size",page_size
 
-        notifications = Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-last_modified')[offset:offset+limit]
-
-        
-        Notification.objects.filter(status = 0).update(status = 1)
+        notifications = Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-last_modified')[offset*limit:offset*limit+limit]
+        total_notification_count = Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-last_modified').count()
+        total_offset = total_notification_count/limit
+        if total_notification_count > 0 and not total_notification_count%limit:
+            total_offset = total_offset-1
+        if notifications:
+            if total_offset > offset:
+                next_offset = offset+1
+            update_notification_ids = list(Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-last_modified').values_list('pk',flat=True))[offset*limit:offset*limit+limit]
+            print update_notification_ids
+            Notification.objects.filter(pk__in=update_notification_ids).update(status=1)
 
         result = []
         for notification in notifications:
             result.append(notification)
-        return result
+        return result,next_offset
 
 
     def serialize_notification(self, notifications):
         serialized_data =[]
         for each_noti in notifications:
-            serialized_data.append(each_noti.get_notification_json())
+            try:
+                serialized_data.append(each_noti.get_notification_json())
+            except:
+                pass
         return serialized_data
 
     
@@ -343,11 +356,15 @@ class VBList(generics.ListCreateAPIView):
 
                         # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,date__gte=enddate)
                     if m2mcategory__slug:
-                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-date')
-                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),date__gte=enddate).order_by('-date')
+                        # post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-date')
+                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),is_popular = True).order_by('-date')
+
+                        # post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),date__gte=enddate).order_by('-date')
+                        post2 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),is_popular=False).order_by('-date')
                     else:
-                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-view_count')
-                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),date__gte=enddate).order_by('-view_count')
+                        # post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-view_count')
+                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),is_popular = True).order_by('-view_count')
+                        post2 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),is_popular = False).order_by('-view_count')
                     if post1:
                         topics+=list(post1)
                     if post2:
@@ -359,11 +376,15 @@ class VBList(generics.ListCreateAPIView):
 
                         # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,date__gte=enddate)
                     if m2mcategory__slug:
-                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id')).exclude(id__in=all_seen_vb).order_by('-date')
-                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id')).order_by('-date')
+                        # post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id')).exclude(id__in=all_seen_vb).order_by('-date') 
+                        # post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id')).order_by('-date')
+                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),is_popular = True).order_by('-date')
+                        post2 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),is_popular = False).order_by('-date')
                     else:
-                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).exclude(id__in=all_seen_vb).order_by('-id')
-                        post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).order_by('-id')
+                        # post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).exclude(id__in=all_seen_vb).order_by('-id')
+                        # post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).order_by('-id')
+                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),is_popular = True).order_by('-id')
+                        post2 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),is_popular = False).order_by('-id')
                     if post1:
                         topics+=list(post1)
                     if post2:
@@ -407,8 +428,10 @@ def GetChallengeDetails(request):
         return JsonResponse({'message': 'success', 'hashtag':tongue.hash_tag,'vb_count':vb_count,\
             'en_tongue_descp':tongue.en_descpription,'hi_tongue_descp':tongue.hi_descpription,\
             'ta_tongue_descp':tongue.ta_descpription,'te_tongue_descp':tongue.te_descpription,\
-             'picture':tongue.picture,'all_seen':shorcountertopic(all_seen['view_count__sum'])},\
-              status=status.HTTP_200_OK)
+            'be_descpription':tongue.be_descpription,'ka_descpription':tongue.ka_descpription,\
+            'ma_descpription':tongue.ma_descpription,'gj_descpription':tongue.gj_descpription,\
+            'mt_descpription':tongue.mt_descpription,'picture':tongue.picture,\
+            'all_seen':shorcountertopic(all_seen['view_count__sum'])},status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Invalid','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -541,10 +564,38 @@ class SearchTopic(generics.ListCreateAPIView):
     def get_queryset(self):
         topics      = []
         search_term = self.request.GET.get('term')
+        language_id = self.request.GET.get('language_id', 1)
         if search_term:
-            topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True)
+            topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True, language_id=language_id)
 
         return topics
+
+class SearchHashTag(generics.ListCreateAPIView):
+    """
+    get:
+    Search By Topic.
+    term        = request.GET.get('term', '')
+    Required Parameters:
+    term---Topic Title
+
+    post:
+
+    Required Parameters:
+    term 
+    """
+
+
+    serializer_class    = TongueTwisterSerializer
+    permission_classes  = (IsOwnerOrReadOnly,)
+    pagination_class    = LimitOffsetPagination
+
+    def get_queryset(self):
+        topics      = []
+        search_term = self.request.GET.get('term')
+        if search_term:
+            hash_tags  = TongueTwister.objects.filter(hash_tag__icontains = search_term)
+
+        return hash_tags
 
 
 @api_view(['POST'])
@@ -764,7 +815,7 @@ def replyOnTopic(request):
 
     user_id      = request.user.id
     topic_id     = request.POST.get('topic_id', '')
-    language_id  = request.POST.get('language_id', '')
+    language_id  = request.user.st.language
     comment_html = request.POST.get('comment', '')
     mobile_no    = request.POST.get('mobile_no', '')
     thumbnail = request.POST.get('thumbnail', '')
@@ -778,7 +829,7 @@ def replyOnTopic(request):
 
     if user_id and topic_id and comment_html:
         try:
-
+            comment_html,username_list = get_mentions(comment_html)
             comment.comment       = comment_html
             comment.comment_html  = comment_html
             comment.language_id   = language_id
@@ -786,6 +837,13 @@ def replyOnTopic(request):
             comment.topic_id      = topic_id
             comment.mobile_no     = mobile_no
             comment.save()
+            has_hashtag,hashtagged_title = check_hashtag(comment)
+            if has_hashtag:
+                comment.comment = hashtagged_title
+                comment.comment_html = hashtagged_title
+                comment.save()
+            if username_list:
+                send_notification_to_mentions(username_list,comment)
             topic = Topic.objects.get(pk = topic_id)
             topic.comment_count = F('comment_count')+1
             topic.last_commented = timezone.now()
@@ -804,6 +862,66 @@ def replyOnTopic(request):
             return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
     else:
         return JsonResponse({'message': 'Topic Id / User Id / Comment provided'}, status=status.HTTP_204_NO_CONTENT)
+
+def check_hashtag(comment):
+    title = comment.comment
+    tag_list=[tag.strip("#") for tag in title.split() if tag.startswith("#")]
+    if tag_list:
+        hash_tag=[tag for tag in title.split() if tag.startswith("#")]
+        for each_tag in hash_tag:
+            title = title.replace(each_tag,'<a href="/get_challenge_details/?ChallengeHash='+each_tag.strip('#')+'">'+each_tag+'</a>')
+        title = title[0].upper()+title[1:]
+        for each_tag in tag_list:
+            tag,is_created = TongueTwister.objects.get_or_create(hash_tag=each_tag)
+            if not is_created:
+                tag.hash_counter = F('hash_counter')+1
+            tag.save()
+            comment.hash_tags.add(tag)
+        return True, title
+    else:
+        return False,title
+
+def remove_old_hashtag(comment,history_comment):
+    hash_tags = comment.hash_tags.all()
+    for each_hashtag in hash_tags:
+        history_comment.hash_tags.add(each_hashtag)
+        each_hashtag.hash_counter = F('hash_counter')-1
+        comment.hash_tags.remove(each_hashtag)
+        each_hashtag.save()
+
+
+def get_mentions(comment):
+    mention_tag=[mention for mention in comment.split() if mention.startswith("@")]
+    if mention_tag:
+        username_list = [each_mention.strip('@') for each_mention in mention_tag]
+        for each_mention in mention_tag:
+            try:
+                user = User.objects.get(username=each_mention.strip('@'))
+                comment = comment.replace(each_mention,'<a href="/timeline/?username='+each_mention.strip('@')+'">'+each_mention+'</a>')
+            except:
+                pass
+        return comment,username_list
+    else:
+        return comment,[]
+
+def send_notification_to_mentions(username_list,comment_obj):
+    for each_username in username_list:
+        try:
+            notify_mention = Notification.objects.create(for_user = User.objects.get(username=each_username) ,topic = comment_obj,notification_type='10',user = comment_obj.user)
+        except:
+            pass
+
+@api_view(['POST'])
+def mention_suggestion(request):
+    term = request.POST.get('term', '')
+    mention_list = []
+    all_follower_user = list(Follower.objects.filter(user_follower=request.user,user_following__username__icontains=term,is_active=True).values_list('user_following_id',flat=True))[:5]
+    other_user = list(UserProfile.objects.filter(user__username__icontains=term).values_list('user_id',flat=True).order_by('-vb_count'))[:10-len(all_follower_user)]
+    mention_list= all_follower_user + other_user
+    mention_users=User.objects.filter(pk__in=mention_list)
+    user_data = UserSerializer(mention_users,many=True).data
+    return JsonResponse({'mention_users':user_data}, status=status.HTTP_200_OK)
+
 
 @api_view(['POST'])
 def reply_delete(request):
@@ -832,6 +950,13 @@ def reply_delete(request):
             return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
     else:
         return JsonResponse({'message': 'Invalid Delete Request'}, status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['POST'])
+def hashtag_suggestion(request):
+    term = request.POST.get('term', '')
+    hash_tags = TongueTwister.objects.filter(hash_tag__icontains=term).order_by('-hash_counter')[:10]
+    hash_data = TongueTwisterSerializer(hash_tags,many=True).data
+    return JsonResponse({'hash_data':hash_data}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def createTopic(request):
@@ -880,7 +1005,7 @@ def createTopic(request):
 
     try:
 
-        topic.language_id   = language_id
+        topic.language_id   = request.user.st.language
         topic.category_id   = category_id
         topic.user_id       = user_id
         if is_vb:
@@ -892,6 +1017,18 @@ def createTopic(request):
             view_count = random.randint(1,5)
             topic.view_count = view_count
             topic.update_vb()
+            tag_list=[tag.strip("#") for tag in title.split() if tag.startswith("#")]
+            if tag_list:
+                hash_tag=[tag for tag in title.split() if tag.startswith("#")]
+                for each_tag in hash_tag:
+                    title = title.replace(each_tag,'<a href="/get_challenge_details/?ChallengeHash='+each_tag.strip('#')+'">'+each_tag+'</a>')
+                topic.title = title[0].upper()+title[1:]
+                for each_tag in tag_list:
+                    tag,is_created = TongueTwister.objects.get_or_create(hash_tag=each_tag)
+                    if not is_created:
+                        tag.hash_counter = F('hash_counter')+1
+                    tag.save()
+                    topic.hash_tags.add(tag)
         else:
             view_count = random.randint(10,30)
             topic.view_count = view_count
@@ -950,26 +1087,100 @@ def editTopic(request):
     try:
         topic_id = request.POST.get('topic_id', '')
         title        = request.POST.get('title', '')
-        category_id  = request.POST.get('category_id', '')
-        language_id  = request.POST.get('language_id', '')
         topic        = Topic.objects.get(pk = topic_id)
 
         if topic.user == request.user:
-
+            tag_list=[tag.strip("#") for tag in title.split() if tag.startswith("#")]
             if title:
-                topic.title = title[0].upper()+title[1:]
-            if category_id:
-                topic.category_id = category_id
-            if language_id:
-                topic.language_id = language_id
-            topic.save()
+                if tag_list:
+                    hash_tag={tag for tag in title.split() if tag.startswith("#")}
+                    for each_tag in hash_tag:
+                        title = title.replace(each_tag,'<a href="/get_challenge_details/?ChallengeHash='+each_tag.strip('#')+'">'+each_tag+'</a>')
+                new_title = title[0].upper()+title[1:]
+            if not new_title == topic.title:
+                history_topic = TopicHistory.objects.create(source=topic,title=topic.title)
+                hash_tags = topic.hash_tags.all()
+                for each_hashtag in hash_tags:
+                    history_topic.hash_tags.add(each_hashtag)
+                    each_hashtag.hash_counter = F('hash_counter')-1
+                    topic.hash_tags.remove(each_hashtag)
+                    each_hashtag.save()
+                topic.title = new_title
+                if tag_list:
+                    for each_tag in tag_list:
+                        tag, is_created = TongueTwister.objects.get_or_create(hash_tag=each_tag)
+                        if not is_created:
+                            tag.hash_counter = F('hash_counter')+1
+                        tag.save()
+                        topic.hash_tags.add(tag)
+                topic.save()
 
-            topic_json = TopicSerializerwithComment(topic).data
-            return JsonResponse({'message': 'Topic Edited','topic':topic_json}, status=status.HTTP_201_CREATED)
+                topic_json = TopicSerializerwithComment(topic).data
+                return JsonResponse({'message': 'Topic Edited','topic':topic_json}, status=status.HTTP_201_CREATED)
+            else:
+                return JsonResponse({'message': 'No Changes made'}, status=status.HTTP_200_OK)
         else:
             return JsonResponse({'message': 'Invalid Edit Request'}, status=status.HTTP_400_BAD_REQUEST)
-    except:
+    except Exception as e:
         return JsonResponse({'message': 'Invalid Edit Request'}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def editComment(request):
+    """
+
+    post:
+    edit Topic.
+    comment        = request.POST.get('comment', '')
+    comment_id = request.POST.get('comment_id',None)
+
+    Required Parameters:
+    comment
+    """
+    try:
+        comment_id = request.POST.get('comment_id',None)
+        comment_text = request.POST.get('comment_text','')
+        comment = Comment.objects.get(pk=comment_id)
+        if comment.user == request.user:
+            comment_text,username_list = get_mentions(comment_text)
+            old_comment = strip_tags(comment.comment_html)
+            old_comment_text,old_username_list = get_mentions(old_comment)
+            if not old_comment == comment_text:
+                history_comment = CommentHistory.objects.create(source=comment,comment=comment.comment,comment_html=comment.comment_html)
+                remove_old_hashtag(comment,history_comment)
+                comment.comment_html=comment_text
+                comment.comment = comment_text
+                comment.save()
+                for each_username in username_list:
+                    if not each_username in old_username_list:
+                        send_notification_to_mentions([each_username],comment)
+                has_hashtag,hashtagged_title = check_hashtag(comment)
+                if has_hashtag:
+                    comment.comment = hashtagged_title
+                    comment.comment_html = hashtagged_title
+                    comment.save()
+                return JsonResponse({'message': 'Reply Updated','comment':CommentSerializer(comment).data}, status=status.HTTP_201_CREATED)
+            else:
+                return JsonResponse({'message': 'No Changes made'}, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'message': 'Invalid Edit Request'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return JsonResponse({'message': 'Invalid Edit Request','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+from HTMLParser import HTMLParser
+
+class MLStripper(HTMLParser):
+    def __init__(self):
+        self.reset()
+        self.fed = []
+    def handle_data(self, d):
+        self.fed.append(d)
+    def get_data(self):
+        return ''.join(self.fed)
+
+def strip_tags(html):
+    s = MLStripper()
+    s.feed(html)
+    return s.get_data()
 
 @api_view(['POST'])
 def topic_delete(request):
@@ -991,7 +1202,6 @@ def topic_delete(request):
     topic_id     = request.POST.get('topic_id', '')
 
     topic = Topic.objects.get(pk= topic_id)
-    print topic.user, request.user
 
     if topic.user == request.user:
         try:
@@ -1037,11 +1247,31 @@ class TopicCommentList(generics.ListAPIView):
     serializer_class    = CommentSerializer
     queryset            = Comment.objects.all()
     permission_classes  = (IsOwnerOrReadOnly,)
+    pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
         topic_slug = self.kwargs['slug']
         topic_id = self.kwargs['topic_id']
-        return self.queryset.filter(topic_id=topic_id,is_removed = False)
+        comment_id = self.request.POST.get('comment_id',None)
+        limit = int(self.request.GET.get('limit',10))
+        if comment_id:
+            offset = int(self.request.GET.get('offset',0))
+            all_comments = list(self.queryset.filter(topic_id=topic_id,is_removed = False).order_by('-id'))
+            index_of_comment = all_comments.index(Comment.objects.get(pk=comment_id))
+            if index_of_comment:
+                index_of_comment+=1
+                comment_remainder = index_of_comment%limit
+                comment_offset = (index_of_comment/limit)*limit
+                if comment_offset and comment_remainder==0:
+                    offset = comment_offset-limit
+                else:
+                    offset = comment_offset
+            self.request.GET._mutable = True
+            self.request.GET.update({'offset':offset})
+            return self.queryset.filter(topic_id=topic_id,is_removed = False).order_by('-id')
+
+
+        return self.queryset.filter(topic_id=topic_id,is_removed = False).order_by('-id')
 
 class CategoryList(generics.ListAPIView):
     serializer_class = CategorySerializer
@@ -1983,9 +2213,9 @@ def get_follow_user(request):
         #    return JsonResponse({'all_follow':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
         all_user = []
         if language:
-            all_user = User.objects.filter(st__bolo_score__gte = 2000, st__language=language)
+            all_user = User.objects.filter(st__is_popular = True, st__language=language)
         else:
-            all_user = User.objects.filter(st__bolo_score__gte = 2000)
+            all_user = User.objects.filter(st__is_popular = True)
         if all_user.count():
             return JsonResponse({'all_follow':UserSerializer(all_user.order_by('?'), many= True).data}, status=status.HTTP_200_OK)
         else:
@@ -1993,11 +2223,30 @@ def get_follow_user(request):
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
+class GetFollowigList(generics.ListCreateAPIView):
+    serializer_class   = UserSerializer
+    permission_classes = (IsOwnerOrReadOnly,)
+    pagination_class    = LimitOffsetPagination
 
+    def get_queryset(self):
+        all_following_id = Follower.objects.filter(user_following_id = self.request.GET.get('user_id', ''),is_active = True).values_list('user_follower_id', flat=True)
+        all_user = User.objects.filter(pk__in = all_following_id)
+        return all_user
+
+class GetFollowerList(generics.ListCreateAPIView):
+    serializer_class   = UserSerializer
+    permission_classes = (IsOwnerOrReadOnly,)
+    pagination_class    = LimitOffsetPagination
+
+    def get_queryset(self):
+        all_follower_id = Follower.objects.filter(user_follower_id = self.request.GET.get('user_id', ''),is_active = True).values_list('user_following_id', flat=True)
+        all_user = User.objects.filter(pk__in = all_follower_id)
+        return all_user
+    
 @api_view(['POST'])
 def get_following_list(request):
     try:
-        all_following_id = Follower.objects.filter(user_following = request.POST.get('user_id', ''),is_active = True).values_list('user_follower_id', flat=True)
+        all_following_id = Follower.objects.filter(user_following_id = request.POST.get('user_id', ''),is_active = True).values_list('user_follower_id', flat=True)
         if all_following_id:
             all_user = User.objects.filter(pk__in = all_following_id)
             return JsonResponse({'result':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
@@ -2010,7 +2259,7 @@ def get_following_list(request):
 @api_view(['POST'])
 def get_follower_list(request):
     try:
-        all_follower_id = Follower.objects.filter(user_follower = request.POST.get('user_id', ''),is_active = True).values_list('user_following_id', flat=True)
+        all_follower_id = Follower.objects.filter(user_follower_id = request.POST.get('user_id', ''),is_active = True).values_list('user_following_id', flat=True)
         if all_follower_id:
             all_user = User.objects.filter(pk__in = all_follower_id)
             return JsonResponse({'result':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
@@ -2200,8 +2449,7 @@ class LeaderBoradList(generics.ListCreateAPIView):
         #     for each in leaderboard_list_2:
         #         leaderboard.append(each)
         # return leaderboard
-from django.db.models.signals import post_save
-from django.views.decorators.csrf import csrf_exempt
+
 @csrf_exempt
 def transcoder_notification(request):
     # if request.POST:
@@ -2302,11 +2550,6 @@ def get_hash_list(request):
             videos_dict = []
             for video in videos:    
                 videos_dict.append(TopicSerializer(video).data)
-            if total_views['view_count__sum']:
-                hash_data['total_views'] = shorcountertopic(total_views['view_count__sum'])
-            else:
-                hash_data['total_views'] = 0
-            hash_data['total_videos_count'] = total_videos_count
             hash_data['videos'] = videos_dict
             hashtaglist.append(hash_data)
         return JsonResponse({'data':hashtaglist,'message':'Success'})
@@ -2453,3 +2696,230 @@ def get_category_detail(request):
         return JsonResponse({'category_details': CategorySerializer(category).data}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_category_with_video_bytes(request):
+    try:
+        category=[]
+        paginator = PageNumberPagination()
+        paginator.page_size = 3
+        language_id = request.GET.get('language_id', 1)
+        popular_bolo = []
+        trending_videos = []
+        following_user = []
+        if request.user.id:
+            userprofile = UserProfile.objects.get(user = request.user)
+            category = userprofile.sub_category.all()
+        else:
+            category = Category.objects.filter(parent__isnull=False)
+        category = paginator.paginate_queryset(category, request)
+        if request.GET.get('popular_boloindyans'):
+            if language_id:
+                all_user = User.objects.filter(st__is_popular = True, st__language=language_id)
+            else:
+                all_user = User.objects.filter(st__is_popular = True)
+            if all_user.count():
+                try:
+                    paginator.page_size = 10
+                    popular_bolo = paginator.paginate_queryset(all_user, request)
+                    popular_bolo = UserSerializer(popular_bolo, many=True).data
+                except Exception as e1:
+                    popular_bolo = []
+        if request.GET.get('is_with_popular'):
+            startdate = datetime.today()
+            enddate = startdate - timedelta(days=30)
+            topics = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, is_popular=True, date__gte=enddate).order_by('-date')
+            try:
+                paginator.page_size = 10
+                topics = paginator.paginate_queryset(topics, request)
+                trending_videos = CategoryVideoByteSerializer(topics, many=True).data
+            except Exception as e1:
+                trending_videos = []
+        category_details = CategoryWithVideoSerializer(category, many=True, context={'language_id': language_id}).data
+        return JsonResponse({'category_details': category_details, 'trending_topics': trending_videos, \
+            'popular_boloindyans': popular_bolo, 'following_user': following_user}, \
+            status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def get_category_detail_with_views(request):
+    try:
+        category_id = request.POST.get('category_id', None)
+        language_id = request.POST.get('language_id', 1)
+        category = Category.objects.get(pk=category_id)
+        all_vb = Topic.objects.filter(m2mcategory=category, is_removed=False, is_vb=True, language_id=language_id)
+        vb_count = all_vb.count()
+        all_seen = category.view_count
+        return JsonResponse({'category_details': CategoryWithVideoSerializer(category, context={'language_id': language_id}).data, 'video_count': vb_count, 'all_seen':shorcountertopic(all_seen)}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+@api_view(['POST'])
+def get_category_video_bytes(request):
+     try:
+        category_id = request.POST.get('category_id', None)
+        language_id = request.POST.get('language_id', 1)
+        category = Category.objects.get(pk=category_id)
+        topics = []
+        topic = Topic.objects.filter(m2mcategory=category, is_removed=False, is_vb=True, language_id=language_id).order_by('-date')
+        topic_not_popular = topic.filter(is_popular=False)
+        topic_popular = topic.filter(is_popular=True)
+        topics.extend(topic_popular)
+        topics.extend(topic_not_popular)
+        page_size = 10
+        paginator = Paginator(topics, page_size)
+        page = request.POST.get('page', 2)
+
+        topic_page = paginator.page(page)
+        return JsonResponse({'topics': CategoryVideoByteSerializer(topic_page, many=True).data}, status=status.HTTP_200_OK)
+     except Exception as e:
+         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_popular_video_bytes(request):
+    try:
+        paginator_topics = PageNumberPagination()
+        language_id = request.GET.get('language_id', 1)
+        paginator_topics.page_size = 10
+        startdate = datetime.today()
+        enddate = startdate - timedelta(days=30)
+        topics = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, is_popular=True, \
+            date__gte=enddate).order_by('-date')
+        paginator_topics.page_size = 10
+        topics = paginator_topics.paginate_queryset(topics, request)
+        return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:' + str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def pubsub_popular(request):
+    try:
+        paginator_topics = PageNumberPagination()
+        language_id = request.GET.get('language_id', 1)
+        startdate = datetime.today()
+        enddate = startdate - timedelta(days=30)
+        topics_all = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, is_popular=True, \
+            date__gte=enddate).order_by('-date')
+        paginator_topics.page_size = 10
+        topics = paginator_topics.paginate_queryset(topics_all, request)
+        return JsonResponse({'topics': PubSubPopularSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:' + str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def get_user_follow_and_like_list(request):
+    try:
+        comment_like = Like.objects.filter(user = request.user,like = True,topic_id__isnull = True).values_list('comment_id', flat=True)
+        topic_like = Like.objects.filter(user = request.user,like = True,comment_id__isnull = True).values_list('topic_id', flat=True)
+        all_follow = Follower.objects.filter(user_follower = request.user,is_active = True).values_list('user_following_id', flat=True)
+        notification_count = Notification.objects.filter(for_user= request.user,status=0).count()
+        hashes = TongueTwister.objects.all().values_list('hash_tag', flat=True)
+        return JsonResponse({'comment_like':list(comment_like),'topic_like':list(topic_like),'all_follow':list(all_follow), \
+                             'notification_count':notification_count, 'user':UserSerializer(request.user).data, \
+                             'hashes':list(hashes)}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def get_recent_videos(request):
+    try:
+        paginator_topics = PageNumberPagination()
+        language_id = request.GET.get('language_id', 1)
+        paginator_topics.page_size = 10
+        all_seen_vb = []
+        try:
+            all_seen_vb = VBseen.objects.filter(user = request.user).values_list('topic_id',flat=True)
+        except Exception as e1:
+            all_seen_vb = []
+        topics = []
+        category = Category.objects.get(pk=58)
+        topics_not_seen = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, m2mcategory=category).exclude(id__in=all_seen_vb).order_by('-date')
+        topics_seen = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, m2mcategory=category, id__in=all_seen_vb).order_by('-date')
+        topics.extend(topics_not_seen)
+        topics.extend(topics_seen)
+        topics = paginator_topics.paginate_queryset(topics, request)
+        return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def get_popular_bolo(request):
+    try:
+        paginator = PageNumberPagination()
+        paginator.page_size = 10
+        language_id = request.GET.get('language_id', 1)
+        all_user = []
+        if language_id:
+            all_user = User.objects.filter(st__is_popular = True, st__language=language_id)
+        else:
+            all_user = User.objects.filter(st__is_popular = True)
+        if all_user.count():
+            popular_bolo = paginator.paginate_queryset(all_user, request)
+            popular_bolo = UserSerializer(popular_bolo, many=True).data
+            return JsonResponse({'results': popular_bolo}, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'results': []}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def submit_user_feedback(request):
+    try:
+        contact_email = request.POST.get('contact_email', '')
+        description = request.POST.get('description', '')
+        feedback_image = request.POST.get('feedback_image', '')
+        if request.user.id:
+            user_feedback = UserFeedback(by_user=request.user, description=description, contact_email=contact_email, \
+                        feedback_image=feedback_image)
+            user_feedback.save()
+            user_feedback.send_feedback_email()
+            return JsonResponse({'message': 'saved feedback'}, status=status.HTTP_200_OK)
+        return JsonResponse({'message': 'invalid user'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def get_landing_page_video(request):
+    try:
+        language_id = request.POST.get('language_id', 1)
+        startdate = datetime.today()
+        enddate = startdate - timedelta(days=30)
+        topics = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, is_popular=True, date__gte=enddate).order_by('-date')[0:2]
+        return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+      
+@api_view(['GET'])
+def get_ip_to_language(request):
+    try:
+        user_ip = request.GET.get('user_ip',None)
+        if user_ip:
+            url = 'http://ip-api.com/json/'+user_ip
+            response = urllib2.urlopen(url).read()
+            json_response = json.loads(response)
+            my_language,is_created = StateDistrictLanguage.objects.get_or_create(state_name=json_response['regionName'],district_name=json_response['city'])
+            if is_created:
+                if json_response['regionName'] in state_language:
+                    language_option = dict(language_options)
+                    for key,value in language_option.items():
+                        if value==state_language[json_response['regionName']]:
+                            my_language.state_language = key
+                            my_language.district_language = key
+                else:
+                    my_language.state_language = '1'
+                    my_language.district_language = '1'
+                my_language.save()
+            return JsonResponse({'language_id': my_language.district_language}, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'message': 'Error Occured: IP not in GET request',}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+

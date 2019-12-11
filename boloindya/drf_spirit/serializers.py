@@ -18,7 +18,8 @@ cloufront_url = "https://d1fa4tg1fvr6nj.cloudfront.net"
 class CategorySerializer(ModelSerializer):
     class Meta:
         model = Category
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('reindex_at', 'is_global', 'is_closed', 'is_removed', 'is_private', 'is_engagement' )
 
 class AppVersionSerializer(ModelSerializer):
     class Meta:
@@ -32,9 +33,22 @@ class CategoryLiteSerializer(ModelSerializer):
 
 
 class TongueTwisterSerializer(ModelSerializer):
+    total_videos_count = SerializerMethodField()
+    total_views = SerializerMethodField()
     class Meta:
         model = TongueTwister
         fields = '__all__'
+
+    def get_total_videos_count(self,instance):
+        return shorcountertopic(Topic.objects.filter(title__icontains='#'+str(instance.hash_tag)).count())
+
+    def get_total_views(self,instance):
+        total_views = Topic.objects.filter(title__icontains='#'+str(instance.hash_tag)).aggregate(Sum('view_count'))
+        if total_views['view_count__sum']:
+            seen_counter = shorcountertopic(total_views['view_count__sum'])
+        else:
+            seen_counter = 0
+        return shorcountertopic(seen_counter)
 
 
 class TopicSerializer(ModelSerializer):
@@ -85,7 +99,8 @@ class CommentSerializer(ModelSerializer):
     date = SerializerMethodField()
     class Meta:
         model = Comment
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('action', 'is_removed', 'is_modified', 'ip_address', 'is_media', 'is_audio', 'media_duration', 'thumbnail', )
 
     def get_user(self,instance):
         return UserSerializer(instance.user).data
@@ -93,6 +108,11 @@ class CommentSerializer(ModelSerializer):
     def get_date(self,instance):
         return shortnaturaltime(instance.date)
 
+class PubSubPopularSerializer(ModelSerializer):
+    class Meta:
+        model = Topic
+        fields = ('id', 'language_id')
+        
 class TopicSerializerwithComment(ModelSerializer):
     user = SerializerMethodField()
     category = PresentableSlugRelatedField(queryset=Category.objects.all(),
@@ -245,7 +265,7 @@ class UserProfileSerializer(ModelSerializer):
     class Meta:
         model = UserProfile
         # fields = '__all__' 
-        exclude = ('extra_data', )
+        exclude = ('extra_data', 'location', 'last_seen', 'last_ip', 'timezone', 'is_administrator', 'is_moderator', 'is_verified', 'last_post_on', 'last_post_hash', 'is_geo_location', 'lat', 'lang', 'click_id', 'click_id_response')
 
     def get_follow_count(self,instance):
         return shortcounterprofile(instance.follow_count)
@@ -264,7 +284,7 @@ class UserSerializer(ModelSerializer):
     class Meta:
         model = User
         #fields = '__all__'
-        exclude = ('password', )
+        exclude = ('password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login')
     def get_userprofile(self,instance):
         return UserProfileSerializer(UserProfile.objects.get(user=instance)).data
 
@@ -407,8 +427,105 @@ class UserWithoutUserProfileSerializer(ModelSerializer):
         model = User
         #fields = '__all__'
         exclude = ('password', )
-        
+
+class CategoryVideoByteSerializer(ModelSerializer):
+    user = SerializerMethodField()
+    view_count = SerializerMethodField()
+    likes_count = SerializerMethodField()
+    comment_count = SerializerMethodField()
+    date = SerializerMethodField()
+    video_cdn = SerializerMethodField()
+
+    class Meta:
+        model = Topic
+        #fields = '__all__'
+        exclude = ('transcode_dump','transcode_status_dump', 'is_transcoded_error', 'transcode_job_id', 'is_transcoded', 'is_removed', 'is_closed', 'is_globally_pinned', 'is_pinned', 'last_commented', 'reindex_at', 'last_active' )
+        # TODO:: refactor after deciding about globally pinned.
+        read_only_fields = ('is_pinned',)
+
+    def get_user(self,instance):
+        return UserSerializer(instance.user).data
+
+    def get_date(self,instance):
+        return shortnaturaltime(instance.date)
+
+    def get_view_count(self,instance):
+        return shorcountertopic(instance.view_count)
+
+    def get_likes_count(self,instance):
+        return shorcountertopic(instance.likes_count)
+
+    def get_comment_count(self,instance):
+        return shorcountertopic(instance.comment_count)
+
+    def get_video_cdn(self,instance):
+        if instance.question_video:
+            regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+            find_urls_in_string = re.compile(regex, re.IGNORECASE)
+            url = find_urls_in_string.search(instance.question_video)
+            return str(instance.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
+        else:
+            return ''
+
+from django.core.paginator import Paginator
+from django.db.models import Sum
+
+class CategoryWithVideoSerializer(ModelSerializer):
+    topics = SerializerMethodField()
+    total_view = SerializerMethodField()
+
+    class Meta:
+        model = Category
+        # fields = '__all__'
+        exclude = ('reindex_at', 'is_global', 'is_closed', 'is_removed', 'is_private', )
+
+    def get_total_view(self, instance):
+        return shorcountertopic(instance.view_count)
+
+    def get_topics(self,instance):
+        # return []
+        language_id = 1
+        if self.context.get("language_id"):
+            language_id =  self.context.get("language_id")
+        topics = []
+        topic = Topic.objects.filter(m2mcategory=instance, is_removed=False, is_vb=True, language_id=language_id).order_by('-date')
+        topic_not_popular = topic.filter(is_popular=False)
+        topic_popular = topic.filter(is_popular=True)
+        topics.extend(topic_popular)
+        topics.extend(topic_not_popular)
+        page_size = 10
+        paginator = Paginator(topics, page_size)
+        page = 1
+        topic_page = paginator.page(page)
+        return CategoryVideoByteSerializer(topic_page, many=True).data
+
 class VideoCompleteRateSerializer(ModelSerializer):
     class Meta:
         model = VideoCompleteRate
         fields = ('videoid','user', 'playtime', 'percentage_viewed')
+
+# searializer for serach _notification
+class CategoryWithTitleSerializer(ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ('title', 'id',)
+
+class UserWithNameSerializer(ModelSerializer):
+    user_name = SerializerMethodField()
+
+    class Meta:
+        model = UserProfile
+        fields = ('name', 'user', 'user_name',)
+
+    def get_user_name(self,instance):
+        return instance.user.username
+
+class TongueTwisterWithHashSerializer(ModelSerializer):
+    class Meta:
+        model = TongueTwister
+        fields = ('hash_tag', 'id')
+
+class TongueWithTitleSerializer(ModelSerializer):
+    class Meta:
+        model = Topic
+        fields = ('title', 'id')

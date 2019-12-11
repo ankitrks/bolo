@@ -1,0 +1,180 @@
+{% extends "jarvis/layout/base.html" %}
+{% block content %}
+<section class="content">
+<div style="text-align:center;">
+    <div class="mp4_player">
+        <video width="400" controls>
+          <source src="{{ my_video.s3_file_url }}" type="video/mp4">
+          Your browser does not support HTML5 video.
+        </video>
+    </div>
+    <div>
+        <h3>MP4 file URL</h3>
+        <p class="lead" id="mp4url">{{ my_video.s3_file_url}}</p>
+        <a href="#" data-clipboard-target="#mp4url" class="copy-text">Copy URL</a>
+    </div>
+    <div>
+        <h3>Transcoded file URL</h3>
+        <p class="lead" id="m3u8url">{{ my_video.transcoded_file_url}}</p>
+        <a href="#" data-clipboard-target="#m3u8url" class="copy-text">Copy URL</a>
+    </div>
+    <div>
+        <form id="edit_upload">
+            {% csrf_token %}
+            <input type="hidden" name="video_id" value="{{my_video.id}}">
+            {{ video_form.as_p }}
+            <p>
+                    <label for="name">Want to Change User?</label>
+                    <input type="checkbox" name="change_user" style="" id="change_user" class="change_user">
+            </p>
+            <p>
+            <label for="name">Posting User</label>
+                <select name="user_id" class="form-control" id="id_user_id" disabled>
+                    <option value="{{posted_userprofile.user_id}}" selected>{{posted_userprofile.name}} --- {{posted_userprofile.vb_count}}</option>
+                </select>
+            </p>
+            <button type="button" class="btn btn-primary save_entry" video_id="{{my_video.id}}"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Save</button>
+        </form>
+
+    </div>
+</div>
+</section>
+{% endblock content %}  
+{% block center_js %}
+<script>
+    var my_option = null;
+    var clipboard = new Clipboard('.copy-text');
+    $('.save_entry').on('click',function(){
+        var data = new FormData($('#edit_upload').get(0));
+        console.log(data);
+        $.ajax({
+            url: '/jarvis/boloindya_edit_upload/',
+            type: 'POST',
+            data: data,
+            cache: false,
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(data) {
+                if (data.message == 'fail') {
+                    alert(data.reason)
+                } else if (data.message == 'success') {
+                    var url = '/jarvis/boloindya_upload_details/?id=' + data.video_id
+                    // do your redirect
+                    window.location = url
+                }
+            },
+            error: function(data) {
+                console.log(data)
+            },
+
+        });
+    })
+    $("#change_user").click(function(){
+        var $user_id = $('#id_user_id');
+        if ($(this).is(':checked')) {
+            $("#id_user_id").prop('disabled', false);
+            my_option = $("#id_user_id").find(":selected")
+            console.log(my_option)
+            $user_id.empty();
+            var gender_id = $("#id_gender").val();
+            var language_id = $("#id_language_id").val();
+            var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+            $.ajax({
+                type: 'POST',
+                url: '/jarvis/get_filtered_user/',
+                data: {
+                    'gender_id': gender_id,
+                    'language_id':language_id,
+                    'csrfmiddlewaretoken':csrfmiddlewaretoken
+                },
+                success: function (data) {
+                    // the next thing you want to do 
+                    var $user_id = $('#id_user_id');
+                    $user_id.empty();
+                    filtered_user = data.filtered_user
+                    $user_id.append('<option>User Name --- VB Count</option>');
+                    for (var i = 0; i < filtered_user.length; i++) {
+                        $user_id.append('<option value=' + filtered_user[i][0] + '>' + filtered_user[i][1]+' --- (' +filtered_user[i][2] + ')</option>');
+                    }
+
+                    // //manually trigger a change event for the contry so that the change handler will get triggered
+                    // $country.change();
+                }
+            });
+        }else{
+            $("#id_user_id").prop('disabled', true);
+            $user_id.append(my_option)
+        }
+    });
+     $('#id_gender').change(function () {
+        if ($("#change_user").is(':checked')) {
+        var gender_id = $(this).val();
+        var language_id = $("#id_language_id").val();
+        var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+        $.ajax({
+            type: 'POST',
+            url: '/jarvis/get_filtered_user/',
+            data: {
+                'gender_id': gender_id,
+                'language_id':language_id,
+                'csrfmiddlewaretoken':csrfmiddlewaretoken
+            },
+            success: function (data) {
+                // the next thing you want to do 
+                var $user_id = $('#id_user_id');
+                $user_id.empty();
+                filtered_user = data.filtered_user
+                $user_id.append('<option>User Name --- VB Count</option>');
+                for (var i = 0; i < filtered_user.length; i++) {
+                    $user_id.append('<option value=' + filtered_user[i][0] + '>' + filtered_user[i][1]+' --- (' +filtered_user[i][2] + ')</option>');
+                }
+
+                // //manually trigger a change event for the contry so that the change handler will get triggered
+                // $country.change();
+            }
+        });
+
+    }
+    else{
+        return;
+    }
+    });
+     $('#id_language_id').change(function () {
+        if ($("#change_user").is(':checked')) {
+        var gender_id = $(this).val();
+        var language_id = $("#id_gender").val();
+        var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+        $.ajax({
+            type: 'POST',
+            url: '/jarvis/get_filtered_user/',
+            data: {
+                'gender_id': gender_id,
+                'language_id':language_id,
+                'csrfmiddlewaretoken':csrfmiddlewaretoken
+            },
+            success: function (data) {
+                // the next thing you want to do 
+                var $user_id = $('#id_user_id');
+                $user_id.empty();
+                filtered_user = data.filtered_user
+                $user_id.append('<option>User Name --- VB Count</option>');
+                for (var i = 0; i < filtered_user.length; i++) {
+                    $user_id.append('<option value=' + filtered_user[i][0] + '>' + filtered_user[i][1]+' --- (' +filtered_user[i][2] + ')</option>');
+                }
+
+                // //manually trigger a change event for the contry so that the change handler will get triggered
+                // $country.change();
+            }
+        });
+
+    }
+    else{
+        return;
+    }
+    });
+
+</script>
+
+{% endblock center_js %}      
+        

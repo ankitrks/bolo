@@ -1,6 +1,20 @@
 from django.apps import apps
-from forum.user.models import UserProfile, Weight
 
+
+language_options = (
+    ('0', "All"),
+    ('1', "English"),
+    ('2', "Hindi"),
+    ('3', "Tamil"),
+    ('4', "Telugu"),
+    ('5', "Bengali"),
+    ('6', "Kannada"),
+    ('7', "Malayalam"),
+    ('8', "Gujarati"),
+    ('9', "Marathi"),
+)
+
+state_language={'Andaman & Nicobar Islands':'Bengali','Andhra Pradesh':'Telugu','Arunachal Pradesh':'Nishi','Assam':'Assamese','Bihar':'Hindi','Chandigarh':'Hindi','Chhattisgarh':'Hindi','Dadra & Nagar Haveli':'Hindi','Daman & Diu':'Gujarati','Delhi':'Hindi','Goa':'Konkani','Gujarat':'Gujarati','Haryana':'Hindi','Himachal Pradesh':'Hindi','Jammu and Kashmir':'Kashmiri','Jharkhand':'Hindi','Karnataka':'Kannada','Kerala':'Malayalam','Lakshadweep':'Malayalam','Madhya Pradesh':'Hindi','Maharashtra':'Marathi','Manipur':'Manipuri','Meghalaya':'Kashi','Mizoram':'Mizo','Nagaland':'Naga Languages','Odisha':'Oriya','Puducherry':'Tamil','Punjab':'Punjabi','Rajasthan':'Hindi','Sikkim':'Nepali','Tamil Nadu':'Tamil','Telangana':'Telugu','Tripura':'Bengali','Uttar Pradesh':'Hindi','Uttarakhand':'Hindi','West Bengal':'Bengali'}
 
 def add_to_history(user, score, action, action_object, is_removed):
     from forum.topic.models import BoloActionHistory
@@ -12,12 +26,14 @@ def add_to_history(user, score, action, action_object, is_removed):
     history_obj.save()
 
 def get_weight_object(key):
+    from forum.user.models import Weight
     try:
         return Weight.objects.get(features = key)
     except:
         return None
 
 def get_weight(key):
+    from forum.user.models import Weight
     weights = Weight.objects.values('features','weight')
     for element in weights:
         if str(element.get('features').lower()) == str(key.lower()):
@@ -25,6 +41,7 @@ def get_weight(key):
     return 0
 
 def add_bolo_score(user_id, feature, action_object):
+    from forum.user.models import UserProfile
     score = get_weight(feature)
     userprofile = UserProfile.objects.get(user_id = user_id)
     userprofile.bolo_score+= int(score)
@@ -41,6 +58,7 @@ def add_bolo_score(user_id, feature, action_object):
                 notification_type=notification_type, user_id = user_id)
 
 def reduce_bolo_score(user_id, feature, action_object, admin_action_type=''):
+    from forum.user.models import UserProfile
     score = get_weight(feature)
     userprofile = UserProfile.objects.get(user_id = user_id)
     userprofile.bolo_score-= int(score)
@@ -139,6 +157,7 @@ def calculate_encashable_details(user):
     try:
         from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
         from forum.topic.models import BoloActionHistory
+        from forum.user.models import UserProfile, Weight
         now = datetime.now().date()
         is_in_cycle = False
         i=0

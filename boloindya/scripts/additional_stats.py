@@ -17,7 +17,6 @@ import csv
 import os
 import pandas as pd 
 
-
 import django
 os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
 sys.path.append( '/'.join(os.path.realpath(__file__).split('/')[:5]) )
@@ -99,6 +98,7 @@ def report_stats():
 	return lang_categ_dict			
 
 
+
 # function not being used
 def report_additional_stats():
 
@@ -170,6 +170,7 @@ def report_additional_stats():
 		#print('some exception' + str(e))	
 		count = 0	
 
+
 # not being used
 def write_csv():
 	print(len(complete_data))
@@ -184,14 +185,13 @@ def write_csv():
 			writer.writerow([x.encode('utf-8') for x in each_data])
 
 def dump_csv(sample_dict):
-
-
 	headers = ['Category', 'Language', 'Play Count', 'Contributers', 'Impression Count', 'Number of Videos']
 	df = pd.DataFrame(columns = ['Category', 'Language', 'Play Count', 'Contributers', 'Impression Count', 'Number of Videos'])
 	f_name = 'add_records.csv'
 
 	for(a,b), val in sample_dict.items():
 		list_print = []
+
 		list_print.append(a)
 		list_print.append(b)
 		list_print.append(val[0])

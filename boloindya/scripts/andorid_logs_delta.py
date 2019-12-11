@@ -190,7 +190,7 @@ def send_file_mail():
 	emailto = "ankit@careeranna.com"
 	filetosend = os.getcwd() + "/deltarecords.csv"
 	username = "support@careeranna.com"
-	password = "Support@3011"				# please do not use this()
+	password = "$upp0rt@30!1"				# please do not use this()
 
 	msg = MIMEMultipart()
 	msg["From"] = emailfrom

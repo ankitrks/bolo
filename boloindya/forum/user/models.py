@@ -11,6 +11,7 @@ from django.utils import timezone
 from ..core.conf import settings
 from ..core.utils.models import AutoSlugField
 from tinymce.models import HTMLField
+from drf_spirit.utils import language_options
 
 class RecordTimeStamp(models.Model):
     created_at=models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False) # auto_now will add the current time and date whenever field is saved.
@@ -18,12 +19,6 @@ class RecordTimeStamp(models.Model):
     class Meta:
         abstract = True
 
-language_options = (
-    ('1', "English"),
-    ('2', "Hindi"),
-    ('3', "Tamil"),
-    ('4', "Telgu"),
-)
 
 gender_option = (
     ('1', "Male"),
@@ -54,6 +49,8 @@ class UserProfile(models.Model):
 
     topic_count = models.PositiveIntegerField(_("topic count"), default=0)
     comment_count = models.PositiveIntegerField(_("comment count"), default=0)
+    is_popular = models.BooleanField(_('Is Popular'),default = False)
+    is_business = models.BooleanField(_('Is Business'),default = False)
 
     last_post_hash = models.CharField(_("last post hash"), max_length=32, blank=True)
     last_post_on = models.DateTimeField(_("last post on"), null=True, blank=True)

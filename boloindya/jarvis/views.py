@@ -18,7 +18,7 @@ import hashlib
 import time
 import re
 from drf_spirit.views import getVideoLength
-from drf_spirit.utils  import calculate_encashable_details
+from drf_spirit.utils  import calculate_encashable_details,language_options
 from forum.user.models import UserProfile, ReferralCode, ReferralCodeUsed, VideoCompleteRate, VideoPlaytime
 from forum.topic.models import Topic, VBseen
 from forum.category.models import Category
@@ -31,7 +31,7 @@ from forum.payment.forms import PaymentForm,PaymentCycleForm
 from django.views.generic.edit import FormView
 from datetime import datetime
 from forum.userkyc.forms import KYCBasicInfoRejectForm,KYCDocumentRejectForm,AdditionalInfoRejectForm,BankDetailRejectForm
-from .models import VideoUploadTranscode,VideoCategory, PushNotification, PushNotificationUser, language_options, user_group_options, FCMDevice, notification_type_options
+from .models import VideoUploadTranscode,VideoCategory, PushNotification, PushNotificationUser, user_group_options, FCMDevice, notification_type_options
 from drf_spirit.models import MonthlyActiveUser, HourlyActiveUser, DailyActiveUser, VideoDetails
 from forum.category.models import Category
 from django.contrib.auth.models import User
@@ -46,11 +46,13 @@ from itertools import groupby
 from django.db.models import Count
 import ast
 from drf_spirit.serializers import VideoCompleteRateSerializer
-from .forms import VideoUploadTranscodeForm
+from .forms import VideoUploadTranscodeForm,TopicUploadTranscodeForm
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
 from django.core.files.base import ContentFile
 from drf_spirit.serializers import UserWithUserSerializer
+from django.db.models import F,Q
 import traceback
+from tasks import send_notifications_task
 
 def get_bucket_details(bucket_name=None):
     bucket_credentials = {}
@@ -194,6 +196,12 @@ def uploadvideofile(request):
         .annotate(folder_count=Count('folder_to_upload')).order_by('folder_to_upload')
     return render(request,'jarvis/pages/upload_n_transcode/upload_n_transcode.html',
             {'all_category':all_category,'all_upload':all_upload})
+
+@login_required
+def boloindya_uploadvideofile(request):    
+    topic_form = TopicUploadTranscodeForm()
+    return render(request,'jarvis/pages/upload_n_transcode/boloindya_upload_transcode.html',
+            {'topic_form':topic_form})
 
 @login_required
 def video_management(request):
@@ -599,9 +607,9 @@ def upload_n_transcode(request):
 
 
             uploaded_url,transcode = upload_tos3(upload_file,upload_to_bucket,upload_folder_name)
-            thumbnail_url = get_video_thumbnail(uploaded_url,upload_to_bucket)
+            thumbnail_url = get_video_thumbnail(urlify(upload_file_name),upload_to_bucket)
             try:
-                videolength = getVideoLength(uploaded_url)
+                videolength = getVideoLength(urlify(upload_file_name))
             except:
                 videolength = ''
             print videolength
@@ -627,15 +635,141 @@ def upload_n_transcode(request):
                 my_dict['meta_title'] = meta_title
                 my_dict['meta_descp'] = meta_descp
                 my_dict['meta_keywords'] = meta_keywords
+                my_dict['uploaded_user'] = request.user
             my_upload_transcode = VideoUploadTranscode.objects.create(**my_dict)
             os.remove(urlify(upload_file_name))
             try:
                 update_careeranna_db(my_upload_transcode)
             except Exception as e:
+                return HttpResponse(json.dumps({'message':'success','file_id':my_upload_transcode.id}),content_type="application/json")
                 return HttpResponse(json.dumps({'message':'fail','reason':'Could not update careeranna db'+str(e)}),content_type="application/json")
 
     return HttpResponse(json.dumps({'message':'success','file_id':my_upload_transcode.id}),content_type="application/json")
 
+@login_required
+def boloindya_upload_n_transcode(request):
+    upload_file = request.FILES['media_file']
+    upload_to_bucket = request.POST.get('bucket_name',None)
+    upload_folder_name = request.POST.get('folder_prefix','from_upload_panel')
+    # upload_category = request.POST.get('category_choice',None)
+    # free_video = request.POST.get('free_video',None)
+    title = request.POST.get('title',None)
+    m2mcategory = request.POST.getlist('m2mcategory',None)
+    language_id = request.POST.get('language_id',None)
+    user_id = request.POST.get('user_id',None)
+
+    # print upload_file,upload_to_bucket,upload_folder_name
+    if not upload_to_bucket:
+        return HttpResponse(json.dumps({'message':'fail','reason':'bucket_missing'}),content_type="application/json")
+    if not upload_file:
+        return HttpResponse(json.dumps({'message':'fail','reason':'File Missing'}),content_type="application/json")
+    if not upload_file.name.endswith('.mp4'):
+        return HttpResponse(json.dumps({'message':'fail','reason':'This is not a mp4 file'}),content_type="application/json")
+    if not title or not m2mcategory or not user_id:
+        return HttpResponse(json.dumps({'message':'fail','reason':'Title, User or Category is missing'}),content_type="application/json")
+
+    bucket_credentials = get_bucket_details(upload_to_bucket)
+    conn = boto3.client('s3', bucket_credentials['REGION_HOST'], aws_access_key_id = bucket_credentials['AWS_ACCESS_KEY_ID'], \
+            aws_secret_access_key = bucket_credentials['AWS_SECRET_ACCESS_KEY'])
+    upload_file_name = upload_file.name.lower()
+    if upload_folder_name:
+        upload_folder_name = upload_folder_name.lower()
+        file_key_1 = urlify(upload_folder_name)+'/'+urlify(upload_file_name)
+        file_key_2 = urlify(upload_file_name)
+    else:
+        file_key_1 = urlify(upload_file_name)
+        file_key_2 = urlify(upload_file_name)
+    try:
+        conn.head_object(Bucket=upload_to_bucket, Key=file_key_1)
+        return HttpResponse(json.dumps({'message':'fail','reason':'File already exist'}),content_type="application/json")
+    except Exception as e:
+        try:
+            conn.head_object(Bucket=upload_to_bucket, Key=file_key_2)
+            return HttpResponse(json.dumps({'message':'fail','reason':'File already exist'}),content_type="application/json")
+        except Exception as e:
+            with open(urlify(upload_file_name),'wb') as f:
+                for chunk in upload_file.chunks():
+                    if chunk:
+                        f.write(chunk)
+
+
+            uploaded_url,transcode = upload_tos3(upload_file,upload_to_bucket,upload_folder_name)
+            thumbnail_url = get_video_thumbnail(urlify(upload_file_name),upload_to_bucket)
+            try:
+                videolength = getVideoLength(urlify(upload_file_name))
+            except:
+                videolength = ''
+            my_dict = {}
+            topic_dict = {}
+            my_dict['s3_file_url'] = uploaded_url
+            topic_dict['backup_url'] = uploaded_url
+            if 'job_id' in transcode:
+                my_dict['transcode_job_id'] = transcode['job_id']
+                topic_dict['transcode_job_id'] = transcode['job_id']
+            my_dict['transcode_dump'] = transcode['data_dump']
+            topic_dict['transcode_dump'] = transcode['data_dump']
+            if 'new_m3u8_url' in transcode:
+                my_dict['transcoded_file_url'] = transcode['new_m3u8_url']
+                topic_dict['question_video'] = transcode['new_m3u8_url']
+            my_dict['filename_uploaded'] = upload_file_name
+            my_dict['filename_changed'] = urlify(upload_file_name)
+            my_dict['folder_to_upload'] = upload_folder_name
+            my_dict['folder_to_upload_changed'] = urlify(upload_folder_name)
+            my_dict['uploaded_user'] = request.user
+            topic_dict['is_transcoded'] = True
+            topic_dict['question_image'] = thumbnail_url
+            my_dict['thumbnail_url'] = thumbnail_url
+            my_dict['media_duration'] = videolength
+            topic_dict['media_duration'] = videolength
+            view_count = random.randint(1,5)
+            width,height = get_video_width_height(uploaded_url)
+            topic_dict['vb_width'] = width
+            topic_dict['vb_height'] = height
+            topic_dict['title'] = title
+            topic_dict['view_count'] = view_count
+            topic_dict['is_vb'] = True
+            my_upload_transcode = VideoUploadTranscode.objects.create(**my_dict)
+            topic_dict['user_id'] = user_id
+            my_topic = Topic.objects.create(**topic_dict)
+            UserProfile.objects.filter(user_id=user_id).update(vb_count=F('vb_count')+1)
+            for each in m2mcategory:
+                my_topic.m2mcategory.add(Category.objects.get(pk=each))
+            my_upload_transcode.is_topic = True
+            my_upload_transcode.topic = my_topic
+            my_upload_transcode.save()
+
+            os.remove(urlify(upload_file_name))
+
+    return HttpResponse(json.dumps({'message':'success','file_id':my_upload_transcode.id}),content_type="application/json")
+
+def provide_view_count(view_count,topic):
+    counter =0
+    all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)
+    user_ids = list(all_test_userprofile_id)
+    user_ids = random.sample(user_ids,100)
+    while counter<view_count:
+        opt_action_user_id = random.choice(user_ids)
+        VBseen.objects.create(topic= topic,user_id =opt_action_user_id)
+        counter+=1
+
+def get_video_width_height(video_url):
+    try:
+        import subprocess
+        cmds2 = ['ffprobe','-v','error' , '-show_entries','stream=width,height','-of','csv=p=0:s=x',video_url]
+        ps2 = subprocess.Popen(cmds2, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+        (output, stderr) = ps2.communicate()
+        widthandheight = output.replace('\n','').split('x')
+        return video_width
+        video_width = widthandheight[0]
+        video_height = widthandheight[1]
+        return video_width,video_height
+    except:
+        return 0,0
+def get_filtered_user(request):
+    gender_id = request.POST.get('gender_id','1')
+    language_id = request.POST.get('language_id','1')
+    filtered_user = list(UserProfile.objects.filter(language = language_id,gender=gender_id,is_moderator=True,is_test_user=True).values_list('user_id','name','vb_count').order_by('-vb_count'))
+    return HttpResponse(json.dumps({'message':'success','filtered_user':filtered_user}),content_type="application/json")
 
 @login_required
 def upload_details(request):
@@ -645,11 +779,24 @@ def upload_details(request):
         return render(request,'jarvis/pages/upload_n_transcode/video_urls.html',{'my_video':my_video})
     return render(request,'jarvis/pages/upload_n_transcode/video_urls.html')
 
+@login_required
+def boloindya_upload_details(request):
+    file_id = request.GET.get('id',None)
+    if file_id:
+        my_video = VideoUploadTranscode.objects.get(pk=file_id)
+        return render(request,'jarvis/pages/upload_n_transcode/boloindya_video_urls.html',{'my_video':my_video})
+    return render(request,'jarvis/pages/upload_n_transcode/video_urls.html')
+
 
 @login_required
 def uploaded_list(request):
-    all_uploaded = VideoUploadTranscode.objects.filter(is_active = True)
+    all_uploaded = VideoUploadTranscode.objects.filter(is_active = True,is_topic=False).order_by('-id')
     return render(request,'jarvis/pages/upload_n_transcode/uploaded_list.html',{'all_uploaded':all_uploaded})
+
+@login_required
+def boloindya_uploaded_list(request):
+    all_uploaded = VideoUploadTranscode.objects.filter(is_active = True,is_topic = True).order_by('-id')
+    return render(request,'jarvis/pages/upload_n_transcode/boloindya_uploaded_list.html',{'all_uploaded':all_uploaded})
 
 @login_required
 def edit_upload(request):
@@ -663,7 +810,6 @@ def edit_upload(request):
             return render(request,'jarvis/pages/upload_n_transcode/edit_upload.html',{'my_video':my_video,'video_form':video_form})
         return render(request,'jarvis/pages/upload_n_transcode/edit_upload.html')
     elif request.method == 'POST':
-        print request.POST
         video_id = request.POST.get('video_id',None)
         if video_id:
             my_video = VideoUploadTranscode.objects.get(pk=video_id)
@@ -686,6 +832,43 @@ def edit_upload(request):
             return HttpResponse(json.dumps({'message':'success','video_id':my_video.id}),content_type="application/json")
         else:
 
+            return HttpResponse(json.dumps({'message':'fail','reason':'file id not found'}),content_type="application/json")
+
+@login_required
+def boloindya_edit_upload(request):
+    if request.method == 'GET':
+        file_id = request.GET.get('id',None)
+        if file_id:
+            my_video = VideoUploadTranscode.objects.get(pk=file_id)
+            topic = my_video.topic
+            my_dict = {'title':topic.title,'category':topic.category,'m2mcategory':list(topic.m2mcategory.all().values_list('id',flat=True)),'language_id':topic.language_id,'gender':topic.user.st.gender}
+            video_form = TopicUploadTranscodeForm(initial=my_dict)
+            return render(request,'jarvis/pages/upload_n_transcode/boloindya_edit_upload.html',{'my_video':my_video,'video_form':video_form,'posted_userprofile':topic.user.st})
+        return render(request,'jarvis/pages/upload_n_transcode/boloindya_edit_upload.html')
+    elif request.method == 'POST':
+        video_id = request.POST.get('video_id',None)
+        if video_id:
+            my_video = VideoUploadTranscode.objects.get(pk=video_id)
+            topic = my_video.topic
+            topic.title = request.POST.get('title','')
+            m2mcategory = request.POST.getlist('m2mcategory',None)
+            if m2mcategory:
+                all_category = topic.m2mcategory.all()
+                for each_category in all_category:
+                    topic.m2mcategory.remove(each_category)
+                for each in m2mcategory:
+                    topic.m2mcategory.add(Category.objects.get(pk=each))
+            topic.language_id = request.POST.get('language_id','1')
+            if request.POST.get('change_user',False):
+                try:
+                    UserProfile.objects.filter(user=topic.user).update(vb_count=F('vb_count')-1)
+                except:
+                    pass
+                topic.user_id = request.POST.get('user_id',topic.user.id)
+                UserProfile.objects.filter(user_id=request.POST.get('user_id',topic.user.id)).update(vb_count=F('vb_count')+1)
+            topic.save()
+            return HttpResponse(json.dumps({'message':'success','video_id':my_video.id}),content_type="application/json")
+        else:
             return HttpResponse(json.dumps({'message':'fail','reason':'file id not found'}),content_type="application/json")
 
 @login_required
@@ -712,9 +895,7 @@ def get_video_thumbnail(video_url,bucket_name):
         b = imencode('.jpg', frame)[1].tostring()
         ts = time.time()
         virtual_thumb_file = ContentFile(b, name = "img-" + str(ts).replace(".", "")  + ".jpg" )
-        print virtual_thumb_file
         url_thumbnail= upload_thumbail(virtual_thumb_file,bucket_name)
-        print url_thumbnail
         # obj.thumbnail = url_thumbnail
         # obj.media_duration = media_duration
         # obj.save()
@@ -724,10 +905,10 @@ def get_video_thumbnail(video_url,bucket_name):
 
 def upload_thumbail(virtual_thumb_file,bucket_name):
     try:
-        bucket_credentials = get_bucket_details('careeranna')
+        bucket_credentials = get_bucket_details(bucket_name)
         client = boto3.client('s3',aws_access_key_id=bucket_credentials['AWS_ACCESS_KEY_ID'],aws_secret_access_key=bucket_credentials['AWS_SECRET_ACCESS_KEY'])
         ts = time.time()
-        created_at = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+        # created_at = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
         final_filename = "img-" + str(ts).replace(".", "")  + ".jpg"
         client.put_object(Bucket=bucket_credentials['AWS_BUCKET_NAME'], Key='thumbnail/' +bucket_name+"/"+final_filename, Body=virtual_thumb_file, ACL='public-read')
         # client.resource('s3').Object(settings.BOLOINDYA_AWS_BUCKET_NAME, 'thumbnail/' + final_filename).put(Body=open(virtual_thumb_file, 'rb'))
@@ -764,8 +945,8 @@ def update_careeranna_db(uploaded_video):
     }
     reseponse_careeranna = requests.post(settings.CAREERANNA_VIDEOFILE_UPDATE_URL, data=payload, headers=headers)
     return reseponse_careeranna
-    
 
+@login_required
 def notification_panel(request):
   
     lang = request.POST.get('lang')
@@ -786,76 +967,27 @@ def notification_panel(request):
 from drf_spirit.models import UserLogStatistics
 import datetime
 
+@login_required
 def send_notification(request):
 
     pushNotification = {}
     
     if request.method == 'POST':
         
-        title = request.POST.get('title', "")
-        upper_title = request.POST.get('upper_title', "")
-        notification_type = request.POST.get('notification_type', "")
-        id = request.POST.get('id', "")
-        user_group = request.POST.get('user_group', "")
-        lang = request.POST.get('lang', "")
-        schedule_status = request.POST.get('schedule_status', "")
-        datepicker = request.POST.get('datepicker', '')
-        timepicker = request.POST.get('timepicker', '').replace(" : ", ":")
+        data = {}
 
-        pushNotification = PushNotification()
-        pushNotification.title = upper_title
-        pushNotification.description = title
-        pushNotification.language = lang
-        pushNotification.notification_type = notification_type
-        pushNotification.user_group = user_group
-        pushNotification.instance_id = id
-        pushNotification.save()
+        data['title'] = request.POST.get('title', "")
+        data['upper_title'] = request.POST.get('upper_title', "")
+        data['notification_type'] = request.POST.get('notification_type', "")
+        data['id'] = request.POST.get('id', "")
+        data['user_group'] = request.POST.get('user_group', "")
+        data['lang'] = request.POST.get('lang', "")
+        data['schedule_status'] = request.POST.get('schedule_status', "")
+        data['datepicker'] = request.POST.get('datepicker', '')
+        data['timepicker'] = request.POST.get('timepicker', '').replace(" : ", ":")
 
-        if schedule_status == '1':
-            if datepicker:
-                pushNotification.scheduled_time = datetime.datetime.strptime(datepicker + " " + timepicker, "%m/%d/%Y %H:%M")
-            pushNotification.is_scheduled = True            
-            pushNotification.save()
-        else:
+        send_notifications_task.delay(data, pushNotification)
 
-            device = ''
-
-            language_filter = {} 
-        
-            if lang != '0':
-                language_filter = { 'user__st__language': lang }
-            
-            if user_group == '1':
-                end_date = datetime.datetime.today()
-                start_date = end_date - datetime.timedelta(hours=3)
-                device = FCMDevice.objects.filter(user__isnull=True, created_at__range=(start_date, end_date))
-            
-            elif user_group == '2':
-                device = FCMDevice.objects.filter(user__isnull=True)
-            
-            else:
-                filter_list = []
-
-                if user_group == '3':
-                    filter_list = VBseen.objects.distinct('user__pk').values_list('user__pk', flat=True)
-                
-                elif user_group == '4' or user_group == '5':
-                    hours_ago = datetime.datetime.now()
-                    if user_group == '4':
-                        hours_ago -= datetime.timedelta(days=1)
-                    else:
-                        hours_ago -=  datetime.timedelta(days=2)
-
-                    filter_list = UserLogStatistics.objects.filter(session_starttime__gte=hours_ago).values_list('user', flat=True)
-                    filter_list = map(int , filter_list)
-                    
-                elif user_group == '6':
-                    filter_list = Topic.objects.filter(is_vb=True).values_list('user__pk', flat=True)
-
-                device = FCMDevice.objects.exclude(user__pk__in=filter_list).filter(**language_filter)
-
-            print(device)
-            device.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk})
         return redirect('/jarvis/notification_panel/')
 
     if request.method == 'GET':
@@ -866,7 +998,7 @@ def send_notification(request):
             print e
     return render(request,'jarvis/pages/notification/send_notification.html', { 'language_options': language_options, 'user_group_options' : user_group_options, 'notification_types': notification_type_options, 'pushNotification': pushNotification })
 
-
+@login_required
 def particular_notification(request, notification_id=None):
     pushNotification = PushNotification.objects.get(pk=notification_id)
     return render(request,'jarvis/pages/notification/particular_notification.html', {'pushNotification': pushNotification})
@@ -1277,4 +1409,33 @@ def daily_vplay_data(request):
         return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)   
 
 
-
+@api_view(['POST'])
+# view for notification search
+def search_notification(request):
+    from drf_spirit.serializers import CategoryWithTitleSerializer, CategoryVideoByteSerializer, UserWithNameSerializer, TongueTwisterWithHashSerializer
+    from forum.topic.models import TongueTwister
+    from django.db.models import Q
+    raw_data = json.loads(request.body)
+    query = raw_data['query']
+    notification_type = raw_data['notification_type']
+    data = []
+    try:
+        if notification_type == '0':
+            topics=Topic.objects.filter(is_removed=False, is_vb=True, title__icontains=query)
+            data=CategoryVideoByteSerializer(topics, many=True).data
+        elif notification_type == '1':
+            users=UserProfile.objects.filter((Q(user__username__icontains=query)|Q(name__icontains=query)|Q(mobile_no__icontains=query))&Q(is_test_user=False))
+            data=UserWithNameSerializer(users, many=True).data
+        elif notification_type == '2':
+            category=Category.objects.filter(title__icontains=query) 
+            data=CategoryWithTitleSerializer(category, many=True).data
+        elif notification_type == '3':
+            challenges=TongueTwister.objects.filter(hash_tag__icontains=query)
+            data=TongueTwisterWithHashSerializer(challenges, many=True).data
+        else:
+            data = []
+        return JsonResponse({'data': data}, status=status.HTTP_200_OK)  
+    except Exception as e:
+        print(e)
+        return JsonResponse({'data': []}, status=status.HTTP_200_OK)
+    
