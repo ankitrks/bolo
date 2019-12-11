@@ -56,7 +56,13 @@ def report_stats():
 				if(each_topic_data.language_id == '5'):
 					language_type = 'Bengali'
 				if(each_topic_data.language_id == '6'):
-					language_type = 'Kannada'		
+					language_type = 'Kannada'
+				if(each_topic_data.language_id == '7'):
+					language_type = 'Malyalam'
+				if(each_topic_data.language_id == '8'):
+					language_type = 'Gujrati'
+				if(each_topic_data.language_id == '9'):
+					language_type = 'Marathi'			
 
 			playtime_count_details = VideoPlaytime.objects.filter(videoid = videoid)
 			freq_playtime_count = len(playtime_count_details)
@@ -93,7 +99,7 @@ def report_stats():
 	return lang_categ_dict			
 
 
-
+# function not being used
 def report_additional_stats():
 
 	month_name = ['Jan', 'Feb', 'March', 'April', 'May', 'June', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
