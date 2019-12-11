@@ -83,7 +83,7 @@ class Topic(models.Model):
     hash_tags = models.ManyToManyField('forum_topic.TongueTwister', verbose_name=_("hash_tags"), \
             related_name="hash_tag_topics",blank=True)
 
-    title = models.CharField(_("title"), max_length=255, blank = True, null = True)
+    title = models.TextField(_("title"), blank = True, null = True)
     question_audio = models.CharField(_("audio title"), max_length=255, blank = True, null = True)
     question_video = models.CharField(_("video title"), max_length=255, blank = True, null = True)
     slug = AutoSlugField(populate_from="title", db_index=False, blank=True)
@@ -376,6 +376,16 @@ class Topic(models.Model):
             return format_html(str('<a href="/superman/forum_comment/comment/?topic_id='+str(self.id)+'" target="_blank">' \
                 + str(self.comment_count)+'</a>'))
         return 0
+
+class TopicHistory(RecordTimeStamp):
+    source = models.ForeignKey('forum_topic.Topic', blank = False, null = False, related_name='topic_history')
+    hash_tags = models.ManyToManyField('forum_topic.TongueTwister', verbose_name=_("hash_tags"), \
+            related_name="hash_tag_topics_history",blank=True)
+    title = models.TextField(_("title"), blank = True, null = True)
+
+    def __unicode__(self):
+        return str(self.title)
+
 
 class VBseen(UserInfo):
     topic = models.ForeignKey(Topic, related_name='vb_seen',null=True,blank=True)

@@ -14,6 +14,7 @@ from drf_spirit.utils import reduce_bolo_score
 from django.db.models import F,Q
 from forum.user.models import UserProfile
 from drf_spirit.utils import language_options
+from forum.topic.models import RecordTimeStamp
 
 # from .transcoder import transcode_media_file
 
@@ -143,3 +144,11 @@ class Comment(models.Model):
                 .filter(topic_id=topic_id)
                 .order_by('pk')
                 .last())
+
+class CommentHistory(RecordTimeStamp):
+    source = models.ForeignKey('forum_comment.Comment', blank = False, null = False, related_name='comment_history')
+    comment = models.TextField(_("comment"))
+    comment_html = models.TextField(_("comment html"))
+
+    def __unicode__(self):
+        return str(self.comment)

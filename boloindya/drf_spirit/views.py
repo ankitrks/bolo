@@ -46,10 +46,10 @@ from .utils import get_weight, add_bolo_score, shorcountertopic, calculate_encas
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 from forum.category.models import Category
-from forum.comment.models import Comment
+from forum.comment.models import Comment,CommentHistory
 from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs
 from jarvis.models import FCMDevice,StateDistrictLanguage
-from forum.topic.models import Topic, ShareTopic, Like, SocialShare, Notification, CricketMatch, Poll, Choice, Voting, \
+from forum.topic.models import Topic,TopicHistory, ShareTopic, Like, SocialShare, Notification, CricketMatch, Poll, Choice, Voting, \
     Leaderboard, VBseen, TongueTwister
 from .serializers import *
 
@@ -851,7 +851,11 @@ def get_mentions(comment):
     if mention_tag:
         username_list = [each_mention.strip('@') for each_mention in mention_tag]
         for each_mention in mention_tag:
-            comment = comment.replace(each_mention,'<a href="/timeline/?username='+each_mention.strip('@')+'">'+each_mention+'</a>')
+            try:
+                user = User.objects.get(username=each_mention.strip('@'))
+                comment = comment.replace(each_mention,'<a href="/timeline/?username='+each_mention.strip('@')+'">'+each_mention+'</a>')
+            except:
+                pass
         return comment,username_list
     else:
         return comment,[]
@@ -969,13 +973,13 @@ def createTopic(request):
             view_count = random.randint(1,5)
             topic.view_count = view_count
             topic.update_vb()
-            tag_set={tag.strip("#") for tag in title.split() if tag.startswith("#")}
-            if tag_set:
-                hash_tag={tag for tag in title.split() if tag.startswith("#")}
+            tag_list=[tag.strip("#") for tag in title.split() if tag.startswith("#")]
+            if tag_list:
+                hash_tag=[tag for tag in title.split() if tag.startswith("#")]
                 for each_tag in hash_tag:
                     title = title.replace(each_tag,'<a href="/get_challenge_details/?ChallengeHash='+each_tag.strip('#')+'">'+each_tag+'</a>')
                 topic.title = title[0].upper()+title[1:]
-                for each_tag in tag_set:
+                for each_tag in tag_list:
                     tag,is_created = TongueTwister.objects.get_or_create(hash_tag=each_tag)
                     if not is_created:
                         tag.hash_counter = F('hash_counter')+1
@@ -1042,32 +1046,38 @@ def editTopic(request):
         topic        = Topic.objects.get(pk = topic_id)
 
         if topic.user == request.user:
-            tag_set={tag.strip("#") for tag in title.split() if tag.startswith("#")}
+            tag_list=[tag.strip("#") for tag in title.split() if tag.startswith("#")]
             if title:
-                if tag_set:
+                if tag_list:
                     hash_tag={tag for tag in title.split() if tag.startswith("#")}
-                    for each_tag in tag_set:
+                    for each_tag in hash_tag:
                         title = title.replace(each_tag,'<a href="/get_challenge_details/?ChallengeHash='+each_tag.strip('#')+'">'+each_tag+'</a>')
-                topic.title = title[0].upper()+title[1:]
-            hash_tags = topic.hash_tags.all()
-            for each_hashtag in hash_tags:
-                each_hashtag.hash_counter = F('hash_counter')-1
-                each_hashtag.save()
-            topic.hash_tags.all().delete()   
-            if tag_set:
-                for each_tag in tag_set:
-                    tag, is_created = TongueTwister.objects.get_or_create(hash_tag=each_tag)
-                    if not is_created:
-                        tag.hash_counter = F('hash_counter')+1
-                    tag.save()
-                    topic.hash_tags.add(tag)
-            topic.save()
+                new_title = title[0].upper()+title[1:]
+            if not new_title == topic.title:
+                history_topic = TopicHistory.objects.create(source=topic,title=topic.title)
+                hash_tags = topic.hash_tags.all()
+                for each_hashtag in hash_tags:
+                    history_topic.hash_tags.add(each_hashtag)
+                    each_hashtag.hash_counter = F('hash_counter')-1
+                    topic.hash_tags.remove(each_hashtag)
+                    each_hashtag.save()
+                topic.title = new_title
+                if tag_list:
+                    for each_tag in tag_list:
+                        tag, is_created = TongueTwister.objects.get_or_create(hash_tag=each_tag)
+                        if not is_created:
+                            tag.hash_counter = F('hash_counter')+1
+                        tag.save()
+                        topic.hash_tags.add(tag)
+                topic.save()
 
-            topic_json = TopicSerializerwithComment(topic).data
-            return JsonResponse({'message': 'Topic Edited','topic':topic_json}, status=status.HTTP_201_CREATED)
+                topic_json = TopicSerializerwithComment(topic).data
+                return JsonResponse({'message': 'Topic Edited','topic':topic_json}, status=status.HTTP_201_CREATED)
+            else:
+                return JsonResponse({'message': 'No Changes made'}, status=status.HTTP_200_OK)
         else:
             return JsonResponse({'message': 'Invalid Edit Request'}, status=status.HTTP_400_BAD_REQUEST)
-    except:
+    except Exception as e:
         return JsonResponse({'message': 'Invalid Edit Request'}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -1090,14 +1100,17 @@ def editComment(request):
             comment_text,username_list = get_mentions(comment_text)
             old_comment = strip_tags(comment.comment_html)
             old_comment_text,old_username_list = get_mentions(old_comment)
-            ## add to history
-            comment.comment_html=comment_text
-            comment.comment = comment_text
-            comment.save()
-            for each_username in username_list:
-                if not each_username in old_username_list:
-                    send_notification_to_mentions([each_username],comment)
-            return JsonResponse({'message': 'Reply Updated','comment':CommentSerializer(comment).data}, status=status.HTTP_201_CREATED)    
+            if not old_comment == comment_text:
+                history_comment = CommentHistory.objects.create(source=comment,comment=comment.comment,comment_html=comment.comment_html)
+                comment.comment_html=comment_text
+                comment.comment = comment_text
+                comment.save()
+                for each_username in username_list:
+                    if not each_username in old_username_list:
+                        send_notification_to_mentions([each_username],comment)
+                return JsonResponse({'message': 'Reply Updated','comment':CommentSerializer(comment).data}, status=status.HTTP_201_CREATED)
+            else:
+                return JsonResponse({'message': 'No Changes made'}, status=status.HTTP_200_OK)
         else:
             return JsonResponse({'message': 'Invalid Edit Request'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
@@ -1139,7 +1152,6 @@ def topic_delete(request):
     topic_id     = request.POST.get('topic_id', '')
 
     topic = Topic.objects.get(pk= topic_id)
-    print topic.user, request.user
 
     if topic.user == request.user:
         try:
