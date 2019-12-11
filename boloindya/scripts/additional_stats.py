@@ -15,7 +15,7 @@ import sys
 import ast
 import csv
 import os
-
+import pandas as pd 
 
 import django
 os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
@@ -52,10 +52,21 @@ def report_stats():
 					language_type = 'Tamil'
 				if(each_topic_data.language_id == '4'):
 					language_type = 'Telgu'
+				if(each_topic_data.language_id == '5'):
+					language_type = 'Bengali'
+				if(each_topic_data.language_id == '6'):
+					language_type = 'Kannada'
+				if(each_topic_data.language_id == '7'):
+					language_type = 'Malyalam'
+				if(each_topic_data.language_id == '8'):
+					language_type = 'Gujrati'
+				if(each_topic_data.language_id == '9'):
+					language_type = 'Marathi'			
 
 			playtime_count_details = VideoPlaytime.objects.filter(videoid = videoid)
 			freq_playtime_count = len(playtime_count_details)
-			user_count = len(playtime_count_details)
+			user_count_details = VideoDetails.objects.filter(videoid = videoid)
+			user_count = len(user_count_details)
 			impression_details = VideoDetails.objects.filter(videoid = videoid)
 			impression_count = len(impression_details)
 
@@ -88,6 +99,7 @@ def report_stats():
 
 
 
+# function not being used
 def report_additional_stats():
 
 	month_name = ['Jan', 'Feb', 'March', 'April', 'May', 'June', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -121,6 +133,16 @@ def report_additional_stats():
 					language_type = 'Tamil'
 				if(each_topic_data.language_id == '4'):
 					language_type = 'Telgu'
+				if(each_topic_data.language_id == '5'):
+					language_type = 'Bengali'
+				if(each_topic_data.language_id == '6'):
+					language_type = 'Kannada'
+				if(each_topic_data.language_id == '7'):
+					language_type = 'Malyalam'
+				if(each_topic_data.language_id == '8'):
+					language_type = 'Gujrati'
+				if(each_topic_data.language_id == '9'):
+					language_type = 'Marathi'
 
 					
 				#print(language_type)		
@@ -148,6 +170,8 @@ def report_additional_stats():
 		#print('some exception' + str(e))	
 		count = 0	
 
+
+# not being used
 def write_csv():
 	print(len(complete_data))
 	#headers = ['USERNAME', 'VIDEOTITLE', 'PLAYER READY(MIN)', 'PLAYER READY(MAX)', 'PLAYER READY(DELTA)', 'START PLAY(MIN)', 'START PLAY(MAX)', 'START PLAY(DELTA)', 'NETWORK']
@@ -161,21 +185,29 @@ def write_csv():
 			writer.writerow([x.encode('utf-8') for x in each_data])
 
 def dump_csv(sample_dict):
-
-	headers = ['Language', 'category', 'Number of Videos', 'Play Count', 'Contributers', 'Impression Count']
+	headers = ['Category', 'Language', 'Play Count', 'Contributers', 'Impression Count', 'Number of Videos']
+	df = pd.DataFrame(columns = ['Category', 'Language', 'Play Count', 'Contributers', 'Impression Count', 'Number of Videos'])
 	f_name = 'add_records.csv'
 
 	for(a,b), val in sample_dict.items():
 		list_print = []
-		list_print.append(b)
+
 		list_print.append(a)
-		list_print.append(val[3])
+		list_print.append(b)
 		list_print.append(val[0])
 		list_print.append(val[1])
 		list_print.append(val[2])
-		print(','.join(map(str, list_print)))
+		list_print.append(val[3])
 
+		if(list_print[3] == 0):
+			list_print[3] = list_print[5]
+		if(list_print[4] == 0):
+			list_print[4] = list_print[2]	
 
+		#print(','.join(map(str, list_print)))
+		df = df.append([list_print])
+
+	df.to_csv('contributer_stats.csv')	
 
 
 def main():
