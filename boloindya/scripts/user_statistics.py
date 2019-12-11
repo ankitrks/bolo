@@ -260,7 +260,7 @@ def video_info(user_data_dump):
     
     try:
         dist_userid = user_data_dump['user_id']
-        print(dist_userid)
+        #print(dist_userid)
         if('vb_impressions' in user_data_dump):
             if(len(user_data_dump['vb_impressions']) > 0):
                 for(a,b) in user_data_dump['vb_impressions']:

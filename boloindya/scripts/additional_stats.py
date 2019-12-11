@@ -15,6 +15,7 @@ import sys
 import ast
 import csv
 import os
+import pandas as pd 
 
 
 import django
@@ -172,7 +173,9 @@ def write_csv():
 
 def dump_csv(sample_dict):
 
+
 	headers = ['Category', 'Language', 'Play Count', 'Contributers', 'Impression Count', 'Number of Videos']
+	df = pd.DataFrame(columns = ['Category', 'Language', 'Play Count', 'Contributers', 'Impression Count', 'Number of Videos'])
 	f_name = 'add_records.csv'
 
 	for(a,b), val in sample_dict.items():
@@ -189,8 +192,10 @@ def dump_csv(sample_dict):
 		if(list_print[4] == 0):
 			list_print[4] = list_print[2]	
 
-		print(','.join(map(str, list_print)))
+		#print(','.join(map(str, list_print)))
+		df = df.append([list_print])
 
+	df.to_csv('contributer_stats.csv')	
 
 
 def main():
