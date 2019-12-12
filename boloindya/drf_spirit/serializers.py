@@ -50,6 +50,11 @@ class TongueTwisterSerializer(ModelSerializer):
             seen_counter = '0'
         return seen_counter
 
+class BaseTongueTwisterSerializer(ModelSerializer):
+    class Meta:
+        model = TongueTwister
+        fields = ('id','hash_tag')
+
 
 class TopicSerializer(ModelSerializer):
     user = SerializerMethodField()

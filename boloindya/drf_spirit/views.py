@@ -943,7 +943,7 @@ def reply_delete(request):
 def hashtag_suggestion(request):
     term = request.POST.get('term', '')
     hash_tags = TongueTwister.objects.filter(hash_tag__icontains=term).order_by('-hash_counter')[:10]
-    hash_data = TongueTwisterSerializer(hash_tags,many=True).data
+    hash_data = BaseTongueTwisterSerializer(hash_tags,many=True).data
     return JsonResponse({'hash_data':hash_data}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
