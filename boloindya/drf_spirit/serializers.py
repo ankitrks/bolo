@@ -47,8 +47,8 @@ class TongueTwisterSerializer(ModelSerializer):
         if total_views['view_count__sum']:
             seen_counter = shorcountertopic(total_views['view_count__sum'])
         else:
-            seen_counter = 0
-        return shorcountertopic(seen_counter)
+            seen_counter = '0'
+        return return seen_counter
 
 
 class TopicSerializer(ModelSerializer):
