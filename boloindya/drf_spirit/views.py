@@ -903,11 +903,11 @@ def send_notification_to_mentions(username_list,comment_obj):
 def mention_suggestion(request):
     term = request.POST.get('term', '')
     mention_list = []
-    all_follower_user = list(Follower.objects.filter(user_follower=request.user,user_following__username__icontains=term,is_active=True).values_list('user_following_id',flat=True))[:5]
-    other_user = list(UserProfile.objects.filter(user__username__icontains=term).values_list('user_id',flat=True).order_by('-vb_count'))[:10-len(all_follower_user)]
+    all_follower_user = list(Follower.objects.filter((Q(user_following__username__icontains=term)|Q(user_following__st__name__icontains=term)),user_follower=request.user,is_active=True).values_list('user_following_id',flat=True))[:5]
+    other_user = list(UserProfile.objects.filter(Q(user__username__icontains=term)|Q(name__icontains=term)).values_list('user_id',flat=True).order_by('-vb_count'))[:10-len(all_follower_user)]
     mention_list= all_follower_user + other_user
     mention_users=User.objects.filter(pk__in=mention_list)
-    user_data = UserSerializer(mention_users,many=True).data
+    user_data = BasicUserSerializer(mention_users,many=True).data
     return JsonResponse({'mention_users':user_data}, status=status.HTTP_200_OK)
 
 

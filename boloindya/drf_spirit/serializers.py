@@ -288,6 +288,19 @@ class UserSerializer(ModelSerializer):
     def get_userprofile(self,instance):
         return UserProfileSerializer(UserProfile.objects.get(user=instance)).data
 
+class BasicUserSerializer(ModelSerializer):
+    name = SerializerMethodField()
+    profile_pic = SerializerMethodField()
+    class Meta:
+        model = User
+        fields = ('id', 'first_name', 'last_name','username','name','profile_pic')
+        # exclude = ('password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login')
+    def get_name(self,instance):
+        return instance.st.name
+
+    def get_profile_pic(self,instance):
+        return instance.st.profile_pic
+
 class SingUpOTPSerializer(ModelSerializer):
     class Meta:
         model = SingUpOTP
