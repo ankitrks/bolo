@@ -2,9 +2,10 @@ from jarvis.models import FCMDevice
 
 from datetime import datetime
 import json
+from django.db.models import Q
 
 def run():
-    devices = FCMDevice.objects.filter(user__st__is_test_user=False, is_uninstalled=False)
+    devices = FCMDevice.objects.filter(Q(user__st__is_test_user=False) & Q(is_uninstalled=False) |Q(user__isnull=True) & Q(is_uninstalled=False))
     for device in devices:
         t = device.send_message(data={'uninstall_tracking': 'true'})
         try:
