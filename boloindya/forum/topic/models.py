@@ -622,7 +622,7 @@ class Notification(UserInfo):
             notific['actor_profile_pic'] = ""
 
         elif self.notification_type=='10':
-            notific['title'] = str(self.user.st.name)+' has mention you in his comment: '+str(self.topic.comment_html)
+            notific['title'] = str(self.user.st.name)+' has mentioned you in his comment: '+str(self.topic.comment_html)
             notific['hindi_title'] = str(self.user.st.name)+' ने अपनी टिप्पणी में आपका उल्लेख किया है: '+str(self.topic.comment_html)
             notific['tamil_title'] = str(self.user.st.name)+' அவரது கருத்தில் உங்களைக் குறிப்பிட்டுள்ளார்: '+str(self.topic.comment_html)
             notific['telgu_title'] = str(self.user.st.name)+' తన వ్యాఖ్యలో మిమ్మల్ని ప్రస్తావించారు: '+str(self.topic.comment_html)
