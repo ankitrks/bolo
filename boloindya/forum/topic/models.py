@@ -632,8 +632,8 @@ class Notification(UserInfo):
             notific['gujrati_title'] = str(self.user.st.name)+' તમારી ટિપ્પણીમાં તમારો ઉલ્લેખ કર્યો છે: '+str(self.topic.comment_html)
             notific['marathi_title'] = str(self.user.st.name)+' त्याच्या टिप्पणी मध्ये आपला उल्लेख आहे: '+str(self.topic.comment_html)
             notific['notification_type'] = '10'
-            notific['instance_id'] = self.topic.topic.id
-            notific['topic_id'] = self.topic.id
+            notific['instance_id'] = self.topic.id
+            notific['topic_id'] = self.topic.topic.id
             notific['read_status'] = self.status
             notific['id'] = self.id
             notific['created_at'] = shortnaturaltime(self.created_at)
