@@ -405,6 +405,7 @@ class UserFeedback(models.Model):
                 data={"from": "BoloIndya Feedback <feedback@mail.careeranna.com>",
                       "to": ["anshika@careeranna.com", "varun@careeranna.com", "maaz@careeranna.com", \
                             "ankit@careeranna.com", "bhoomika@careeranna.com"],
+                      "cc":[self.contact_email],
                       "subject": "BoloIndya Feedback Received | " + self.user_name() + ' | ' + self.user_contact(),
                       "html": content_email
                 }
