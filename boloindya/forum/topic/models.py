@@ -405,6 +405,7 @@ class TongueTwister(models.Model):
     mt_descpription = models.TextField(_("Marathi Hash Tag Description"),blank = True, null = True)
     picture = models.CharField(_("Picture URL"),max_length=255, blank=True,null=True)
     hash_counter = models.PositiveIntegerField(default=1,null=True,blank=True)
+    total_views = models.PositiveIntegerField(default=0,null=True,blank=True)
     def __unicode__(self):
         return str(self.hash_tag)
 

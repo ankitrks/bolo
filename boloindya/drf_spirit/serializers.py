@@ -43,12 +43,12 @@ class TongueTwisterSerializer(ModelSerializer):
         return shorcountertopic(Topic.objects.filter(title__icontains='#'+str(instance.hash_tag)).count())
 
     def get_total_views(self,instance):
-        total_views = Topic.objects.filter(title__icontains='#'+str(instance.hash_tag)).aggregate(Sum('view_count'))
-        if total_views['view_count__sum']:
-            seen_counter = shorcountertopic(total_views['view_count__sum'])
-        else:
-            seen_counter = 0
-        return shorcountertopic(seen_counter)
+        return shorcountertopic(instance.total_views)
+
+class BaseTongueTwisterSerializer(ModelSerializer):
+    class Meta:
+        model = TongueTwister
+        fields = ('id','hash_tag')
 
 
 class TopicSerializer(ModelSerializer):
@@ -287,6 +287,19 @@ class UserSerializer(ModelSerializer):
         exclude = ('password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login')
     def get_userprofile(self,instance):
         return UserProfileSerializer(UserProfile.objects.get(user=instance)).data
+
+class BasicUserSerializer(ModelSerializer):
+    name = SerializerMethodField()
+    profile_pic = SerializerMethodField()
+    class Meta:
+        model = User
+        fields = ('id', 'first_name', 'last_name','username','name','profile_pic')
+        # exclude = ('password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login')
+    def get_name(self,instance):
+        return instance.st.name
+
+    def get_profile_pic(self,instance):
+        return instance.st.profile_pic
 
 class SingUpOTPSerializer(ModelSerializer):
     class Meta:

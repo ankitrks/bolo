@@ -50,6 +50,7 @@ class UserProfile(models.Model):
     topic_count = models.PositiveIntegerField(_("topic count"), default=0)
     comment_count = models.PositiveIntegerField(_("comment count"), default=0)
     is_popular = models.BooleanField(_('Is Popular'),default = False)
+    is_superstar = models.BooleanField(_('Is Superstar'),default = False)
     is_business = models.BooleanField(_('Is Business'),default = False)
 
     last_post_hash = models.CharField(_("last post hash"), max_length=32, blank=True)
