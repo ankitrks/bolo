@@ -7,7 +7,15 @@ function addEvents() {
     $(document).on('click', '.kyc_accept', kyc_accept);
     $(document).on('click', '.kyc_reject', kyc_reject);
     $(document).on('click', '.reject_submit', reject_submit);
+    $(document).on('click', '.accept_all', accept_all);
 }
+
+ function accept_all(){
+    $('.content').find('.kyc_accept').each(function( index ) {
+        $(this).delay(500*index).click()
+    });
+
+ }
 
 function kyc_accept() {
     var kyc_type = $(this).attr("kyc_type");

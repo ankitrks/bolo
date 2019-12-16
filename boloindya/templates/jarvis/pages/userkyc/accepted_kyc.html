@@ -7,14 +7,18 @@
         <thead>
             <tr>
                 <th>username</th>
+                <th>KYC Submitted</th>
                 <th>KYC Accepted</th>
+                <th>status</th>
             </tr>
         </thead>
         <tbody>
             {% for each_kyc in all_kyc %}
                 <tr>
-                    <td><a href="/jarvis/single_kyc/?username={{ each_kyc.user.username}}"><strong>{{ each_kyc.user.username}}</strong></a></td>
+                    <td><a href="/jarvis/single_kyc/?username={{ each_kyc.user.username}}" target="_blank"><strong>{{ each_kyc.user.username}}</strong></a></td>
+                     <td>{% if each_kyc.is_kyc_completed %}<img src="{% static 'img/green_tick.jpg' %}"  style="width:20px;">{% else %}<img src="{% static 'img/wrong.png' %}"  style="width:20px;">{% endif %}</td>
                     <td>{% if each_kyc.is_kyc_accepted %}<img src="{% static 'img/green_tick.jpg' %}" style="width:20px;">{% else %}<img src="{% static 'img/wrong.png' %}" style="width:20px;">{% endif %}</td>
+                    <td>{% if each_kyc.is_kyc_accepted %}Accepted {% elif each_kyc.is_kyc_completed and not each_kyc.is_kyc_accepted %}Submitted{% endif %}</td>
                 </tr>
             {% endfor %}
         </tbody>
