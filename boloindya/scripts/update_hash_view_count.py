@@ -13,4 +13,3 @@ def run():
             seen_counter = 0
         each_hash_tag.total_views = F('total_views')+seen_counter
         each_hash_tag.save()
-        print each_hash_tag.__dict__

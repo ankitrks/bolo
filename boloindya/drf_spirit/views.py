@@ -2792,9 +2792,10 @@ def get_user_follow_and_like_list(request):
         comment_like = Like.objects.filter(user = request.user,like = True,topic_id__isnull = True).values_list('comment_id', flat=True)
         topic_like = Like.objects.filter(user = request.user,like = True,comment_id__isnull = True).values_list('topic_id', flat=True)
         all_follow = Follower.objects.filter(user_follower = request.user,is_active = True).values_list('user_following_id', flat=True)
+        all_follower = Follower.objects.filter(user_following = request.user,is_active = True).values_list('user_follower_id', flat=True)
         notification_count = Notification.objects.filter(for_user= request.user,status=0).count()
         hashes = TongueTwister.objects.all().values_list('hash_tag', flat=True)
-        return JsonResponse({'comment_like':list(comment_like),'topic_like':list(topic_like),'all_follow':list(all_follow), \
+        return JsonResponse({'comment_like':list(comment_like),'topic_like':list(topic_like),'all_follow':list(all_follow),'all_follower':list(all_follower), \
                              'notification_count':notification_count, 'user':UserSerializer(request.user).data, \
                              'hashes':list(hashes)}, status=status.HTTP_200_OK)
     except Exception as e:
