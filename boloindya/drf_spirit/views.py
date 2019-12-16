@@ -818,6 +818,9 @@ def replyOnTopic(request):
     if user_id and topic_id and comment_html:
         try:
             comment_html,username_list = get_mentions(comment_html)
+            recent_comment = Comment.objects.filter(comment = comment_html,topic_id=topic_id,user=request.user,date__gt=datetime.now()-timedelta(minutes=5))
+            if recent_comment:
+                return JsonResponse({'message': 'Already commented same comment'}, status=status.HTTP_400_BAD_REQUEST)
             comment.comment       = comment_html
             comment.comment_html  = comment_html
             comment.language_id   = language_id
@@ -903,8 +906,12 @@ def send_notification_to_mentions(username_list,comment_obj):
 def mention_suggestion(request):
     term = request.POST.get('term', '')
     mention_list = []
-    all_follower_user = list(Follower.objects.filter((Q(user_following__username__icontains=term)|Q(user_following__st__name__icontains=term)),user_follower=request.user,is_active=True).values_list('user_following_id',flat=True))[:5]
-    other_user = list(UserProfile.objects.filter(Q(user__username__icontains=term)|Q(name__icontains=term)).values_list('user_id',flat=True).order_by('-vb_count'))[:10-len(all_follower_user)]
+    if term:
+        all_follower_user = list(Follower.objects.filter((Q(user_following__username__icontains=term)|Q(user_following__st__name__icontains=term)),user_follower=request.user,is_active=True).values_list('user_following_id',flat=True))[:5]
+        other_user = list(UserProfile.objects.filter(Q(user__username__icontains=term)|Q(name__icontains=term)).values_list('user_id',flat=True).order_by('-vb_count'))[:10-len(all_follower_user)]
+    else:
+        all_follower_user = list(Follower.objects.filter(user_follower=request.user,is_active=True).values_list('user_following_id',flat=True))[:10]
+        other_user=[]
     mention_list= all_follower_user + other_user
     mention_users=User.objects.filter(pk__in=mention_list)
     user_data = BasicUserSerializer(mention_users,many=True).data
@@ -2146,6 +2153,7 @@ def follow_like_list(request):
         comment_like = Like.objects.filter(user = request.user,like = True,topic_id__isnull = True).values_list('comment_id', flat=True)
         topic_like = Like.objects.filter(user = request.user,like = True,comment_id__isnull = True).values_list('topic_id', flat=True)
         all_follow = Follower.objects.filter(user_follower = request.user,is_active = True).values_list('user_following_id', flat=True)
+        all_follower = Follower.objects.filter(user_following = request.user,is_active = True).values_list('user_follower_id', flat=True)
         userprofile = UserProfile.objects.get(user = request.user)
         all_category_follow = userprofile.sub_category.all().values_list('id', flat=True)
         detialed_category = userprofile.sub_category.all()
@@ -2153,7 +2161,7 @@ def follow_like_list(request):
         app_version = AppVersionSerializer(app_version).data
         notification_count = Notification.objects.filter(for_user= request.user,status=0).count()
         hashes = TongueTwister.objects.all().values_list('hash_tag', flat=True)
-        return JsonResponse({'comment_like':list(comment_like),'topic_like':list(topic_like),'all_follow':list(all_follow),\
+        return JsonResponse({'comment_like':list(comment_like),'topic_like':list(topic_like),'all_follow':list(all_follow),'all_follower':list(all_follower),\
             'all_category_follow':list(all_category_follow),'app_version':app_version,\
             'notification_count':notification_count, 'is_test_user':userprofile.is_test_user,'user':UserSerializer(request.user).data,\
             'detialed_category':CategorySerializer(detialed_category,many = True).data,'hashes':list(hashes)}, status=status.HTTP_200_OK)

@@ -151,7 +151,7 @@ def shorcountertopic(counter):
     elif counter >9999:
         return str(counter/1000.0)[:5]+'K'
     else:
-        return counter
+        return str(counter)
 
 def calculate_encashable_details(user):
     try:

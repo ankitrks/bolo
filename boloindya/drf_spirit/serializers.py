@@ -43,12 +43,7 @@ class TongueTwisterSerializer(ModelSerializer):
         return shorcountertopic(Topic.objects.filter(title__icontains='#'+str(instance.hash_tag)).count())
 
     def get_total_views(self,instance):
-        total_views = Topic.objects.filter(title__icontains='#'+str(instance.hash_tag)).aggregate(Sum('view_count'))
-        if total_views['view_count__sum']:
-            seen_counter = shorcountertopic(total_views['view_count__sum'])
-        else:
-            seen_counter = '0'
-        return seen_counter
+        return shorcountertopic(instance.total_views)
 
 class BaseTongueTwisterSerializer(ModelSerializer):
     class Meta:
