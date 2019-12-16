@@ -634,17 +634,18 @@ class Notification(UserInfo):
             notific['actor_profile_pic'] = ""
 
         elif self.notification_type=='10':
-            notific['title'] = str(self.user.st.name)+' has mention you in his comment: '+self.topic.topic.title
-            notific['hindi_title'] = str(self.user.st.name)+' ने अपनी टिप्पणी में आपका उल्लेख किया है: '+self.topic.topic.title
-            notific['tamil_title'] = str(self.user.st.name)+' அவரது கருத்தில் உங்களைக் குறிப்பிட்டுள்ளார்: '+self.topic.topic.title
-            notific['telgu_title'] = str(self.user.st.name)+' తన వ్యాఖ్యలో మిమ్మల్ని ప్రస్తావించారు: '+self.topic.topic.title
-            notific['bengali_title'] = str(self.user.st.name)+' তার মন্তব্যে আপনাকে উল্লেখ করেছে: '+self.topic.topic.title
-            notific['kannada_title'] = str(self.user.st.name)+' ಅವರ ಕಾಮೆಂಟ್ನಲ್ಲಿ ನಿಮ್ಮನ್ನು ಉಲ್ಲೇಖಿಸಿದ್ದಾರೆ: '+self.topic.topic.title
-            notific['malayalam_title'] = str(self.user.st.name)+' അവന്റെ അഭിപ്രായത്തിൽ നിങ്ങളെ പരാമർശിച്ചു: '+self.topic.topic.title
-            notific['gujrati_title'] = str(self.user.st.name)+' તમારી ટિપ્પણીમાં તમારો ઉલ્લેખ કર્યો છે: '+self.topic.topic.title
-            notific['marathi_title'] = str(self.user.st.name)+' त्याच्या टिप्पणी मध्ये आपला उल्लेख आहे: '+self.topic.topic.title
+            notific['title'] = str(self.user.st.name)+' has mentioned you in his comment: '+str(self.topic.comment_html)
+            notific['hindi_title'] = str(self.user.st.name)+' ने अपनी टिप्पणी में आपका उल्लेख किया है: '+str(self.topic.comment_html)
+            notific['tamil_title'] = str(self.user.st.name)+' அவரது கருத்தில் உங்களைக் குறிப்பிட்டுள்ளார்: '+str(self.topic.comment_html)
+            notific['telgu_title'] = str(self.user.st.name)+' తన వ్యాఖ్యలో మిమ్మల్ని ప్రస్తావించారు: '+str(self.topic.comment_html)
+            notific['bengali_title'] = str(self.user.st.name)+' তার মন্তব্যে আপনাকে উল্লেখ করেছে: '+str(self.topic.comment_html)
+            notific['kannada_title'] = str(self.user.st.name)+' ಅವರ ಕಾಮೆಂಟ್ನಲ್ಲಿ ನಿಮ್ಮನ್ನು ಉಲ್ಲೇಖಿಸಿದ್ದಾರೆ: '+str(self.topic.comment_html)
+            notific['malayalam_title'] = str(self.user.st.name)+' അവന്റെ അഭിപ്രായത്തിൽ നിങ്ങളെ പരാമർശിച്ചു: '+str(self.topic.comment_html)
+            notific['gujrati_title'] = str(self.user.st.name)+' તમારી ટિપ્પણીમાં તમારો ઉલ્લેખ કર્યો છે: '+str(self.topic.comment_html)
+            notific['marathi_title'] = str(self.user.st.name)+' त्याच्या टिप्पणी मध्ये आपला उल्लेख आहे: '+str(self.topic.comment_html)
             notific['notification_type'] = '10'
-            notific['instance_id'] = self.topic.topic.id
+            notific['instance_id'] = self.topic.id
+            notific['topic_id'] = self.topic.topic.id
             notific['read_status'] = self.status
             notific['id'] = self.id
             notific['created_at'] = shortnaturaltime(self.created_at)
