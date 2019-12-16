@@ -1252,7 +1252,7 @@ class TopicCommentList(generics.ListAPIView):
     def get_queryset(self):
         topic_slug = self.kwargs['slug']
         topic_id = self.kwargs['topic_id']
-        comment_id = self.request.POST.get('comment_id',None)
+        comment_id = self.request.GET.get('comment_id',None)
         limit = int(self.request.GET.get('limit',10))
         if comment_id:
             offset = int(self.request.GET.get('offset',0))
@@ -1268,6 +1268,7 @@ class TopicCommentList(generics.ListAPIView):
                     offset = comment_offset
             self.request.GET._mutable = True
             self.request.GET.update({'offset':offset})
+            self.request.GET.update({'comment_id':''})
             return self.queryset.filter(topic_id=topic_id,is_removed = False).order_by('-id')
 
 
