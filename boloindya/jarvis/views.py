@@ -360,7 +360,7 @@ def get_pending_kyc_user_list(request):
 
 def get_accepted_kyc_user_list(request):
     if request.user.is_superuser:
-        all_kyc = UserKYC.objects.filter(is_kyc_completed=True,is_kyc_accepted=True)
+        all_kyc = UserKYC.objects.filter(is_kyc_completed=True)
         return render(request,'jarvis/pages/userkyc/accepted_kyc.html',{'all_kyc':all_kyc})
 
 def get_kyc_of_user(request):
@@ -470,24 +470,22 @@ def accept_kyc(request):
     if request.user.is_superuser or request.user.is_staff:
         kyc_type = request.GET.get('kyc_type',None)
         user_id = request.GET.get('user_id',None)
-        user_kyc = UserKYC.objects.get(user_id = user_id)
         if kyc_type == "basic_info":
-            user_kyc.is_kyc_basic_info_accepted = True
+            UserKYC.objects.filter(user_id = user_id).update(is_kyc_basic_info_accepted = True)
         elif kyc_type == "kyc_document":
-            user_kyc.is_kyc_document_info_accepted = True
+            UserKYC.objects.filter(user_id = user_id).update(is_kyc_document_info_accepted = True)
         elif kyc_type == "kyc_pan":
-            user_kyc.is_kyc_pan_info_accepted = True
+            UserKYC.objects.filter(user_id = user_id).update(is_kyc_pan_info_accepted = True)
         elif kyc_type == "kyc_profile_pic":
-            user_kyc.is_kyc_selfie_info_accepted = True
+            UserKYC.objects.filter(user_id = user_id).update(is_kyc_selfie_info_accepted = True)
         elif kyc_type == "kyc_additional_info":
-            user_kyc.is_kyc_additional_info_accepted = True
+            UserKYC.objects.filter(user_id = user_id).update(is_kyc_additional_info_accepted = True)
         elif kyc_type == "kyc_bank_details":
-            user_kyc.is_kyc_bank_details_accepted = True
-        user_kyc.save()
+            UserKYC.objects.filter(user_id = user_id).update(is_kyc_bank_details_accepted = True)
+        user_kyc = UserKYC.objects.get(user_id = user_id)
         if user_kyc.is_kyc_basic_info_accepted and user_kyc.is_kyc_document_info_accepted and user_kyc.is_kyc_selfie_info_accepted and\
         user_kyc.is_kyc_bank_details_accepted:
-            user_kyc.is_kyc_accepted = True
-            user_kyc.save()
+            UserKYC.objects.filter(user_id = user_id).update(is_kyc_accepted = True)
 
         return HttpResponse(json.dumps({'success':'success','kyc_accepted':user_kyc.is_kyc_accepted}),content_type="application/json")
 
