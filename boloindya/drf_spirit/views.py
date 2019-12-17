@@ -875,7 +875,7 @@ def check_hashtag(comment):
             title = title.replace(each_tag,'<a href="/get_challenge_details/?ChallengeHash='+each_tag.strip('#')+'">'+each_tag+'</a>')
         title = title[0].upper()+title[1:]
         for each_tag in tag_list:
-            tag,is_created = TongueTwister.objects.get_or_create(hash_tag=each_tag)
+            tag,is_created = TongueTwister.objects.get_or_create(hash_tag=each_tag.lower())
             if not is_created:
                 tag.hash_counter = F('hash_counter')+1
             tag.save()
@@ -1031,7 +1031,7 @@ def createTopic(request):
                     title = title.replace(each_tag,'<a href="/get_challenge_details/?ChallengeHash='+each_tag.strip('#')+'">'+each_tag+'</a>')
                 topic.title = title[0].upper()+title[1:]
                 for each_tag in tag_list:
-                    tag,is_created = TongueTwister.objects.get_or_create(hash_tag=each_tag)
+                    tag,is_created = TongueTwister.objects.get_or_create(hash_tag=each_tag.lower())
                     if not is_created:
                         tag.hash_counter = F('hash_counter')+1
                     tag.save()
@@ -1115,7 +1115,7 @@ def editTopic(request):
                 topic.title = new_title
                 if tag_list:
                     for each_tag in tag_list:
-                        tag, is_created = TongueTwister.objects.get_or_create(hash_tag=each_tag)
+                        tag, is_created = TongueTwister.objects.get_or_create(hash_tag=each_tag.lower())
                         if not is_created:
                             tag.hash_counter = F('hash_counter')+1
                         tag.save()
