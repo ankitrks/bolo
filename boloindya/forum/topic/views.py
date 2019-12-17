@@ -5,11 +5,10 @@ from __future__ import unicode_literals
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponsePermanentRedirect
-
+from django.utils.translation import ugettext_lazy as _
 from djconfig import config
 from django.conf import settings
 
-from django.contrib.auth.models import User
 
 from ..core.utils.paginator import paginate, yt_paginate
 from ..core.utils.ratelimit.decorators import ratelimit
@@ -27,23 +26,55 @@ import json
 from django.core.paginator import Paginator
 from forum.topic.models import Like
 from django.db.models import F,Q
-
+from django.contrib.auth.models import User
 # Required for speech to text...
 import io
 import os
 import urllib2
 import copy
+import random
+import string
 import subprocess
 from datetime import datetime
 from google.cloud import speech
 from google.cloud.speech import enums
 from google.cloud.speech import types
-
+from drf_spirit.utils import add_bolo_score
 
 from forum.user.models import UserProfile
 
+from allauth.account.adapter import DefaultAccountAdapter
+from allauth.account.adapter import get_adapter as get_account_adapter
+
+from allauth.account.utils import user_email 
+from allauth.account.models import EmailAddress
+from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
+
+
+class AutoConnectSocialAccount(DefaultSocialAccountAdapter):
+
+    def save_user(self, request, sociallogin, form=None):
+        """
+        Saves a newly signed up social login. In case of auto-signup,
+        the signup form is not available.
+        """
+        u = sociallogin.user
+        u.set_unusable_password()
+        if form:
+            get_account_adapter().save_user(request, u, form)
+        else:
+            get_account_adapter().populate_username(request, u)
+        sociallogin.save(request)
+        emailId=user_email(u)
+        try: 
+            userDetails = User.objects.get(email=emailId)
+            userprofile = UserProfile.objects.get(user = userDetails)
+            add_bolo_score(userDetails.id, 'initial_signup', userprofile)
+        except EmailAddress.DoesNotExist:
+            return u
+
 def get_current_language(request):
-    return request.COOKIES.get('language', request.GET.get('lid', 2))
+    return request.COOKIES.get('language', request.GET.get('lid', 1))
 
 def get_language_code(request):
     language_code_map = {'1' : 'en-US', '2' : 'hi', '3' : 'ta', '4' : 'te', 1 : 'en-US', 2 : 'hi', 3 : 'ta', 4 : 'te'}
@@ -342,23 +373,158 @@ def index(request):
     return render(request, 'spirit/topic/_home.html')
 
 def video_discover(request):
-    return render(request, 'spirit/topic/video_discover.html')
+    language_id=1
+    popular_bolo = []
+    userprofile = []
+    categories = []
+    trending_videos = []
+    languages_with_id=settings.LANGUAGES_WITH_ID
+    languageCode =request.LANGUAGE_CODE
+    language_id=languages_with_id[languageCode]
+    try:
+        categories = Category.objects.filter(parent__isnull=False)[:10]
+    except Exception as e1:
+        categories = []
 
-def video_details(request,username='',slug='',id=''):
-    # topics = Topic.objects.get(id = pk)
-    # try:
-    #     user_profile = UserProfile.objects.get(user = request.user)
-    # except:
-    #     user_profile = None
+        try:
+            startdate = datetime.today()
+            enddate = startdate - timedelta(days=125)
+            trending_videos = Topic.objects.filter(is_removed=False, is_vb=True, is_popular=True, language_id=language_id, \
+                    date__gte=enddate).order_by('-view_count')[:30]
+        except Exception as e1:
+            trending_videos = []
+
+    try:
+        if language_id:
+            all_user = UserProfile.objects.filter(is_popular = True, language=language_id)[:10]
+            popular_bolo=all_user
+        else:
+            all_user = UserProfile.objects.filter(is_popular = True)[:10]
+            popular_bolo=all_user
+    except Exception as e1:
+        popular_bolo = []
+
+
     context = {
-        'topic': "",
-        'is_single_topic': "",
-        'user_profile': ""
+        'popular_bolo':popular_bolo,
+        'trending_videos':trending_videos,
+        'categories':categories
     }
+    print popular_bolo.__dict__
+    return render(request, 'spirit/topic/video_discover.html', context)
+
+
+def video_details(request,username='',id=''):
+    
+    #print topics
+    #print user_profile.__dict__
+    try:
+        topics = Topic.objects.get(id = id)
+    except:
+        topics = None
+
+    try:
+        user = User.objects.get(username=username)
+        user_profile = UserProfile.objects.filter(user=user,user__is_active = True)[0]
+        
+    except:
+        user_profile = None
+    context = {
+        'topic': topics,
+        'is_single_topic': "Yes",
+        'user_profile': user_profile
+    }
+
     return render(request, 'spirit/topic/video_details.html', context)
 
+def bolo_user_details(request,username=''):
+    #username=request.GET.get('lid');
+    language_id=1
+    languages_with_id=settings.LANGUAGES_WITH_ID
+    languageCode =request.LANGUAGE_CODE
+    language_id=languages_with_id[languageCode]
+
+    popular_bolo = []
+    try:      
+        user = User.objects.get(username=username)
+        #user_profile = UserProfile.objects.get(user = user)
+        user_id=user.id
+        user_profile = UserProfile.objects.filter(user=user,user__is_active = True)[0]
+        topics = Topic.objects.filter(user_id=user_id, is_removed=False)
+        topicsByLang = Topic.objects.filter(user_id=user_id, is_removed=False,language_id=language_id)
+        try:
+            if language_id:
+                all_user = User.objects.filter(st__is_popular = True, st__language=language_id)[10]
+                popular_bolo=all_user
+            else:
+                all_user = User.objects.filter(st__is_popular = True)[10]
+                popular_bolo=all_user
+        except Exception as e1:
+            popular_bolo = []
+
+
+        context = {
+            'user_profile': user_profile,
+            'user':user,
+            'popular_bolo':popular_bolo,
+            'topics': topics,
+            'topicsCount': topicsByLang.count()
+        }
+        #print popular_bolo.__dict__
+        return render(request, 'spirit/topic/user_details.html', context)
+    except:
+        return render(request, 'spirit/topic/new_landing.html')
+       
+def get_topic_details_by_category(request,category_slug):
+    language_id=1
+    popular_bolo = []
+    category_details=""
+     
+
+    try:     
+        category = Category.objects.get(slug=category_slug)
+        #topics = Topic.objects.filter(m2mcategory=category,is_removed = False,is_vb = False)
+        all_vb = Topic.objects.filter(m2mcategory=category, is_removed=False, is_vb=True, language_id=language_id)
+        vb_count = all_vb.count()
+        all_seen = category.view_count
+        #print topics
+        #user_profile = UserProfile.objects.filter(user=user,user__is_active = True)[0]
+        #topics = Topic.objects.filter(category=category, is_removed=False)
+        try:
+            if language_id:
+                all_user = UserProfile.objects.filter(is_popular = True, language=language_id)[:10]
+                popular_bolo=all_user
+            else:
+                all_user = UserProfile.objects.filter(is_popular = True)[:10]
+                popular_bolo=all_user
+        except Exception as e1:
+            popular_bolo = []
+    
+        context = {
+            'popular_bolo':popular_bolo,
+            'category_details':category,
+            'vb_count':vb_count,
+            'all_seen':all_seen,
+            'topics':all_vb
+        }
+        #print category.__dict__
+        return render(request, 'spirit/topic/topic_details_by_category.html', context)
+    except:
+        return render(request, 'spirit/topic/new_landing.html')
+
+def search_by_term(request):
+    search_term = request.GET.get('term','')
+    context = {
+        'is_single_topic': "Yes",
+        'search_term':search_term
+    }    
+    return render(request, 'spirit/topic/search_results.html',context)
+
 def new_home(request):
-    return render(request, 'spirit/topic/new_landing.html')
+    context = {
+        'is_single_topic': "Yes",
+    }    
+    return render(request, 'spirit/topic/new_landing.html',context)
     #return render(request, 'spirit/topic/temporary_landing.html')
     # return render(request, 'spirit/topic/main_landing.html')
 
@@ -438,3 +604,16 @@ def share_user_page(request, user_id, username):
         return render(request, 'spirit/topic/particular_user.html', context)
     except:
         return render(request, 'spirit/topic/temporary_landing.html')
+
+def login_using_api(request):
+    username = request.POST.get('username', '')
+    user_id = request.POST.get('user_id', '')
+    user = User.objects.get(id=user_id)
+    password = user.password;
+    user = auth.authenticate(username=username, password=password)
+    if not request.user.is_authenticated():
+        auth.login(request, user)
+
+def testurllang(request):
+    print 'Pass';
+    pass

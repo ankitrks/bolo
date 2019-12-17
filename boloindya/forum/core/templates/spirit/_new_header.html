@@ -1,19 +1,310 @@
-{% load spirit_tags i18n %}
+{% load i18n %}
+{% load socialaccount %}
+<style type="text/css">
+.search-container .searchText {
+    border: 1px solid #ddd;
+    color: #212121;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    -o-box-shadow: none;
+    box-shadow: none;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    -o-border-radius: 3px;
+    border-radius: 3px;
+    height: 35px;
+    width: 300px;
+    padding: 10px;
+}
+.search-container{
+    margin-right: 40px;
+}
+
+._50tm {
+    width: 100%;
+}
+._4kny {
+    float: left;
+}
+._4kny ._585- {
+    margin-left: 0;
+    min-width: 350px;
+    width: 100%;
+}
+._585- {
+    background-color: #fff;
+    border: 1px solid #3b5998;
+    border-radius: 3px;
+    box-sizing: border-box;
+    height: 36px;
+    right: 34px;
+    margin-left: 30px;
+    margin-top: 0;
+    max-width: 448px;
+    overflow: hidden;
+    padding-left: 5px;
+    padding-right: 48px;
+    position: relative;
+    top: 3px;
+    width: auto;
+}
+._585- ._4w98 {
+    background: #f5f6f7;
+    border: none;
+    border-radius: 0 2px 2px 0;
+    bottom: 0;
+    cursor: pointer;
+    display: block;
+    line-height: 1;
+    padding: 0 16px;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    top: 0;
+    z-index: 1;
+}
+
+._42ft {
+    cursor: pointer;
+    display: inline-block;
+    text-decoration: none;
+    white-space: nowrap;
+}
+._4jy3, ._4jy3._42fr:active, ._4jy3._42fr._42fs {
+    line-height: 22px;
+}
+._517h, ._59pe:focus, ._59pe:hover {
+    background-color: #f5f6f7;
+    border-color: #ccd0d5;
+    color: #4b4f56;
+}
+._4jy0 {
+    transition: 200ms cubic-bezier(.08,.52,.52,1) background-color, 200ms cubic-bezier(.08,.52,.52,1) box-shadow, 200ms cubic-bezier(.08,.52,.52,1) transform;
+}
+._4jy0 {
+    border: 1px solid;
+    border-radius: 2px;
+    box-sizing: content-box;
+    font-size: 12px;
+    -webkit-font-smoothing: antialiased;
+    font-weight: bold;
+    justify-content: center;
+    padding: 0 8px;
+    position: relative;
+    text-align: center;
+    text-shadow: none;
+    vertical-align: middle;
+}
+._4jy0:before {
+    content: '';
+    display: inline-block;
+    height: 20px;
+    vertical-align: middle;
+}
+._585- ._4w98 ._585_ {
+    background-origin: content-box;
+    display: inline-block;
+    margin: -1px;
+    padding: 1px;
+    position: relative;
+    right: 0;
+    top: -1px;
+    vertical-align: middle;
+}
+
+._585_ {
+    background-image: url(/media/h35EP3v4R9x.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: 0 -949px;
+    cursor: pointer;
+    display: block;
+    height: 14px;
+    position: absolute;
+    right: 6px;
+    top: 4px;
+    width: 14px;
+    z-index: 2;
+}
+._585- ._5860, ._585- ._5860 .wrap {
+    background: transparent;
+    border: none;
+    height: 35px;
+}
+._585- ._5860, ._585- ._5861 {
+    height: 25px;
+}
+.uiTypeahead {
+    background: #fff;
+    border: solid #bdc7d8;
+    border-width: 1px 0;
+    cursor: default;
+    position: relative;
+}
+._585- ._5860, ._585- ._5860 .wrap {
+    background: transparent;
+    border: none;
+    height: 35px;
+}
+.uiTypeahead .innerWrap {
+    overflow: hidden;
+    zoom: 1;
+}
+}
+._585- ._5861 {
+    background: none;
+    color: #333;
+    cursor: text;
+    height: 35px;
+    overflow: hidden;
+    padding: 0;
+    text-indent: 2px;
+    width: inherit;
+}
+._585- ._5861, ._5861 ._586f, ._5861 ._1frb, ._5861 ._5eay {
+    border: none;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    text-overflow: ellipsis;
+}
+._5861 ._586h, ._5861 ._5eay {
+    color: #90949c;
+}
+._5861 ._5eay, ._5861 ._1frb {
+    height: 35px;
+    padding-top: 0;
+}
+
+
+._585- ._5861, ._5861 ._586f, ._5861 ._1frb, ._5861 ._5eay {
+    border: none;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    text-overflow: ellipsis;
+}
+._1frb, ._5eay {
+    background: 0;
+    border: 0;
+    box-sizing: border-box;
+    left: 3px;
+    outline: 1px solid rgba(0, 0, 0, 0);
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+._5861 ._586f, ._5861 ._586i, ._5861 ._1frb {
+    color: #1d2129;
+}
+._5861 ._586f, ._5861 ._1frb {
+    padding-left: 0;
+    padding-right: 5px;
+}
+
+._5861 ._5eay, ._5861 ._1frb {
+    height: 35px;
+    padding-top: 0;
+}
+._5861 ._586j, ._5861 ._586k, ._5861 ._586f, ._5861 ._586i, ._5861 ._5eay, ._5861 ._1frb {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    height: 35px;
+    line-height: 22px;
+    padding: 0px 0 0;
+    text-shadow: none;
+}
+._585- ._5861, ._5861 ._586f, ._5861 ._1frb, ._5861 ._5eay {
+    border: none;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    text-overflow: ellipsis;
+}
+._1frb, ._5eay {
+    background: 0;
+    border: 0;
+    box-sizing: border-box;
+    left: 3px;
+    outline: 1px solid rgba(0, 0, 0, 0);
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+@media(max-width: 991px){
+    .hideOnMobile{
+        display: none;
+    }
+
+    ._585- {
+        background-color: #fff;
+        border: 1px solid #3b5998;
+        border-radius: 3px;
+        box-sizing: border-box;
+        height: 36px;
+        right: 0px;
+        margin-left: 30px;
+        margin-top: 0;
+        max-width: 448px;
+        overflow: hidden;
+        padding-left: 5px;
+        padding-right: 48px;
+        position: relative;
+        top: -16px;
+        width: auto;
+        z-index: -9;
+    }
+
+}
+
+</style>
+
     <div id="__next">
         <div class="jsx-639186511 ">
             <div class="jsx-3563400267 header-container">
                 <div class="jsx-3563400267 header-content">
-                    <h1 class="jsx-475503780 logo-container"><a title="boloindya" class="jsx-475503780" href="https://www.boloindya.com/en">
+                    <h1 class="jsx-475503780 logo-container"><a title="boloindya" class="jsx-475503780" href="https://www.boloindya.com/">
                         <img src="/media/boloindya_logo.png" alt="boloindya" class="jsx-475503780 logo-text">
                         <strong class="jsx-475503780">boloindya</strong></a></h1>
                           <ul class="jsx-3143951235 menu-wrapper" >
-                              <li class="jsx-3143951235">
-                                  <h2 class="menu-item-link menu-item-link-active"><a href="https://www.boloindya.com/en" class="jsx-2922828392">Home</a></h2></li>
-                              <li class="jsx-3143951235">
-                                  <h2 class="menu-item-link"><a href="https://www.boloindya.com/about/" class="jsx-2922828392">About</a></h2></li>
-                               <li class="jsx-3143951235">
-                                  <h2 class="menu-item-link"><a href="https://www.boloindya.com/trending" class="jsx-2922828392">Trending</a></h2></li> 
-                              <li class="jsx-3143951235" id="boloSideMenu">
+                                <li class="hideOnMobile">
+                                    <div class="_4kny _50tm">
+                                        <div class="_585-" aria-label="Facebook" role="search" data-testid="facebar_root" id="js_19">
+                                            <form action="/{{LANGUAGE_CODE}}/search/" method="get">
+                                                <button value="1" class="_42ft _4jy0 _4w98 _4jy3 _517h _51sy _4w97" aria-label="Search" tabindex="-1" data-testid="facebar_search_button" type="submit"><i class="_585_"></i></button>
+                                                <div class="uiTypeahead _5860"  id="u_q_1">
+                                                    <div class="wrap">
+  
+                                                        <div class="innerWrap">
+                                                            <div class="_5861 navigationFocus textInput _5eaz" id="u_q_2">
+                                                                <input type="text" class="_1frb" name="term" autocomplete="off" placeholder="Search" value="{{search_term}}"  >
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+
+
+<!--                                <form action="/{{LANGUAGE_CODE}}/search/" method="GET">
+                                    <div class="search-container">
+
+                                      <input type="text" class="searchText" name="term" value="{{search_term}}" placeholder="Search..">
+
+                                      <button class="searchBox" type="button" style="display: none;">Search</button>
+                                    </div>
+                                    </form> -->
+                                </li>
+
+                                <li class="jsx-3143951235">
+                                  <h2 class="menu-item-link menu-item-link-active"><a href="https://www.boloindya.com/" class="jsx-2922828392">{% trans "Home" %}</a></h2></li>
+                                <li class="jsx-3143951235">
+                                  <h2 class="menu-item-link hideOnMobile"><a href="https://www.boloindya.com/about/" class="jsx-2922828392">{% trans "About" %}</a></h2></li>
+                                <li class="jsx-3143951235">
+                                  <h2 class="menu-item-link"><a href="/discover/" class="jsx-2922828392">{% trans "Discover" %}</a></h2>
+                                </li> 
+
+
+
+                                <li class="jsx-3143951235" id="boloSideMenu">
                                     <span class="bolo-642826668 boloSideMenuClass hamburger-menu">
                                           <span class="bolo-642826668 hamburger-menu-wrapper">
                                                 <span class="bolo-642826668"></span>
@@ -21,36 +312,78 @@
                                                 <span class="bolo-642826668"></span>
                                           </span>
                                   </span>
-                              </li>
+                                </li>
                           </ul>
                 </div>
-                <div class="jsx-461239781">
+                <!-- Mobile Search -->
+                <div class="_4kny _50tm">
+                    <div class="_585- hideOnDesktop" aria-label="Facebook" role="search" data-testid="facebar_root" id="js_19">
+                        <form action="/{{LANGUAGE_CODE}}/search/" method="get">
+                            <button value="1" class="_42ft _4jy0 _4w98 _4jy3 _517h _51sy _4w97" aria-label="Search" tabindex="-1" data-testid="facebar_search_button" type="submit"><i class="_585_"></i></button>
+                            <div class="uiTypeahead _5860"  id="u_q_1">
+                                <div class="wrap">
+
+                                    <div class="innerWrap">
+                                        <div class="_5861 navigationFocus textInput _5eaz" id="u_q_2">
+                                            <input type="text" class="_1frb" name="term" autocomplete="off" placeholder="Search" value="{{search_term}}"  >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- End Search -->
+                <div class="jsx-461239781 ">
                   <div class="jsx-461239781 drawer-mask drawer-enter-done hide"></div>
                     <div class="jsx-461239781 drawerOpenAndClose drawer-content drawer-exit drawer-exit-active">
                         <h1 class="jsx-461239781 drawer-icon">
 
                               <img src="https://www.boloindya.com/media/img/boloindya_logo.png" alt="boloindya" class="jsx-461239781 logo-text"><strong class="jsx-461239781">boloindya</strong></h1>
-                        <h2 class="to-home active"><a class="jsx-461239781" href="https://www.boloindya.com/en">Home</a></h2>
+                        <h2 class="to-home active"><a class="jsx-461239781" href="https://www.boloindya.com/en">{% trans "Home" %}</a></h2>
                         <div class="footer-content-column">
-                            <h2>Company</h2>
-                            <h3><a class="" href="https://www.boloindya.com/about/">About</a></h3>
-                            <h3><a class="" href="https://newsroom.boloindya.com/">Newsroom</a></h3>
-                            <h3><a class="" href="https://www.boloindya.com/about/contact?lang=en">Contact</a></h3></div>
+                            <h2>{% trans "Company" %}</h2>
+                            <h3><a class="" href="https://www.boloindya.com/about/">{% trans "About" %}</a></h3>
+                            <h3><a class="" href="https://newsroom.boloindya.com/">{% trans "Newsroom" %}</a></h3>
+                            <h3><a class="" href="https://www.boloindya.com/about/contact?lang=en">{% trans "Contact" %}</a></h3></div>
                         <div class="footer-content-column">
-                            <h2>Programs</h2>
-                            <h3><a class="" href="https://www.boloindya.com/forgood" target="_blank">boloindya for Good</a></h3>
-                            <h3><a class="" href="https://ads.boloindya.com/?refer=boloindya_web" target="_blank">Advertise on boloindya</a></h3></div>
+                            <h2>{% trans "Programs" %}</h2>
+                            <h3><a class="" href="https://www.boloindya.com/forgood" target="_blank">{% trans "boloindya for Good" %}</a></h3>
+                            <h3><a class="" href="https://ads.boloindya.com/?refer=boloindya_web" target="_blank">{% trans "Advertise on boloindya" %}</a></h3></div>
                         <div class="footer-content-column">
-                            <h2>Support</h2>
-                            <h3><a class="" href="https://support.boloindya.com/en">Help Center</a></h3>
-                            <h3><a class="" href="https://www.boloindya.com/en/safety">Safety Center</a></h3>
-                            <h3><a class="" href="https://support.boloindya.com/en/privacy-safety/community-policy-en">Community Guidelines</a></h3></div>
+                            <h2>{% trans "Support" %}</h2>
+                            <h3><a class="" href="https://support.boloindya.com/en">{% trans "Help Center" %}</a></h3>
+                            <h3><a class="" href="https://www.boloindya.com/en/safety">{% trans "Safety Center" %}</a></h3>
+                            <h3><a class="" href="https://support.boloindya.com/en/privacy-safety/community-policy-en">{% trans "Community Guidelines" %}</a></h3></div>
                         <div class="footer-content-column">
-                            <h2>Legal</h2>
-                            <h3><a class="" href="https://www.boloindya.com/en/terms-of-use">Terms of Service</a></h3>
-                            <h3><a class="" href="https://www.boloindya.com/en/privacy-policy">Privacy Policy</a></h3>
-                            <h3><a class="" href="https://www.boloindya.com/en/law-enforcement">Law Enforcement</a></h3>
-                            <h3><a class="" href="https://www.boloindya.com/en/copyright-policy">Copyright Policy</a></h3></div>
+                            <h2>{% trans "Legal" %}</h2>
+                            <h3><a class="" href="https://www.boloindya.com/en/terms-of-use">{% trans "Terms of Service" %}</a></h3>
+                            <h3><a class="" href="https://www.boloindya.com/en/privacy-policy">{% trans "Privacy Policy" %}</a></h3>
+                            <h3><a class="" href="https://www.boloindya.com/en/law-enforcement">{% trans "Law Enforcement" %}</a></h3>
+                            <h3><a class="" href="https://www.boloindya.com/en/copyright-policy">{% trans "Copyright Policy" %}</a></h3></div>
+                            {% if user.is_authenticated %}
+                            <p>{% trans "Welcome" %} {{ user.username }} !!!</p>
+                            <p><a href="javascript:void()" id="signOutLink">{% trans "Log out" %}</a>
+                            {% endif %}
+                            <form style='display: none;' method="post" action="{% url 'account_logout' %}">
+                              {% csrf_token %}
+                              <input type="hidden" name="next" value="{{ request.path }}"/>
+                              <button id="signOutBtn" type="submit">{% trans "Logout" %}</button>
+                            </form>
+                            <script type="text/javascript">
+                                $("#signOutLink").on('click', function() {debugger;
+                                    $('#signOutBtn').click();
+                                       var loginStatus=check_login_status();
+                                       if(loginStatus==true){
+                                            var localStorageKey='access_data';
+                                            localStorage.removeItem(localStorageKey);
+                                       }
+
+                                        
+                                });
+                            </script>
+
+
 <!--                         <div class="jsx-1724846817 jsx-1667329752 language-selection">
                             <p class="jsx-1724846817 jsx-1667329752">English</p>
                             <select class="jsx-1724846817 jsx-1667329752 language-selection-form">

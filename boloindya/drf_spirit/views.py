@@ -2567,11 +2567,14 @@ def get_category_video_bytes(request):
 
 @api_view(['GET'])
 def get_popular_video_bytes(request):
+    """
+    GET:
+    """
     try:
         paginator_topics = PageNumberPagination()
         language_id = request.GET.get('language_id', 1)
         startdate = datetime.today()
-        enddate = startdate - timedelta(days=15)
+        enddate = startdate - timedelta(days=105)
         all_seen_vb = []
         try:
             all_seen_vb = VBseen.objects.filter(user = request.user).values_list('topic_id',flat=True)
@@ -2660,3 +2663,30 @@ def submit_user_feedback(request):
         return JsonResponse({'message': 'invalid user'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def generate_login_data(request):
+    """
+    post:
+        Required Parameters
+        mobile_no = request.POST.get('id', None)
+
+    """
+    user_id = request.POST.get('user_id', None)
+    try:
+        user_id = request.POST.get('user_id', None)
+        userprofile = UserProfile.objects.filter(user__id = user_id,user__is_active = True)
+        if userprofile:
+            userprofile = userprofile[0]
+            user = userprofile.user
+            username = userprofile.slug
+            message = 'User Logged In'
+            user_tokens = get_tokens_for_user(user)
+
+            return JsonResponse({'message': message, 'username' : username, \
+                        'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Invalid User Id'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+

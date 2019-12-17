@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
-
+from django.conf.urls.i18n import i18n_patterns
 import forum.topic.views
 import forum.admin.urls
 import forum.user.urls
@@ -15,6 +15,7 @@ import forum.topic.urls
 import forum.comment.urls
 import drf_spirit.urls
 import jarvis.urls
+import allauth
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -26,7 +27,8 @@ import drf_spirit.views
 schema_view = get_swagger_view(title='BoloIndya API')
 
 patterns = [
-    url(r'^$', forum.topic.views.new_home, name='index'),
+
+    
     url(r'^match/(?P<match_id>\d+)/(?P<slug>[\w-]+)/$', forum.topic.views.share_match_page, name='share_match_page'),
     url(r'^predict/(?P<poll_id>\d+)/(?P<slug>[\w-]+)/$', forum.topic.views.share_poll_page, name='share_poll_page'),
     url(r'^user/(?P<user_id>\d+)/(?P<username>[\w-]+)/$', forum.topic.views.share_user_page, name='share_user_page'),
@@ -63,11 +65,29 @@ patterns = [
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
+
+
 urlpatterns = [
     # url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLS
     url('grappelli/', include('grappelli.urls')), # grappelli URLS
 	url(r'^superman/', include(admin.site.urls)),
+    url(r'^i18n/', include('django.conf.urls.i18n')),
     url(r'^', include(patterns, namespace='spirit', app_name='forum')),
     url(r'docs/', include_docs_urls(title='Boloindya API')),
     url(r'^tinymce/', include('tinymce.urls')),
+    url(r'^accounts/', include('allauth.urls')),
 ]
+
+urlpatterns += i18n_patterns(
+    url(r'^$', forum.topic.views.new_home, name='index'),
+    url(r'^video_details/(?P<id>\d+)/$', forum.topic.views.video_details, name='video_details'),
+    url(r'^tag/(?P<category_slug>[\w-]+)/$', forum.topic.views.get_topic_details_by_category, name='topic_details'),
+    url(r'^search/', forum.topic.views.search_by_term, name='search_by_term'),
+    url(r'^discover/$', forum.topic.views.video_discover, name='video_discover'),
+    url(r'^(?P<username>[\w-]+)/$', forum.topic.views.bolo_user_details, name='bolo_user_details'),
+    url(r'^(?P<username>[\w-]+)/(?P<id>\d+)/$', forum.topic.views.video_details, name='video_details'),
+    url(r'^test/testurllang/$', forum.topic.views.testurllang, name='testurllang'),
+    #prefix_default_language=True
+    
+)
+

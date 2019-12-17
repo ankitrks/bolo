@@ -1,0 +1,1327 @@
+
+{% extends "spirit/_new_base.html" %}
+{% load spirit_tags i18n %}
+{% load i18n %}
+{% load number_formate_change_tag %}
+{% block title %}BoloIndya{% endblock %}
+{% block content %}
+
+<!-- Social Share Code -->
+<link rel="canonical" href="" />      
+<meta property="og:url" content=""/>
+<meta property="og:type" content="website" />
+<meta property='og:title' content='' />
+<meta name="twitter:title" content="" />
+<meta name="twitter:site" content="@BoloIndya" />
+<meta name="twitter:creator" content="@BoloIndya" />
+<meta name="twitter:card" content="summary" />
+<meta property='og:description' content='Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India' />       
+<meta property='og:image' content='' />
+<link rel="image_src" href=""/>
+<!-- Social Share Code End -->
+
+
+<style type="text/css">
+    .jwplayer.jw-stretch-uniform .jw-media video {
+    object-fit: cover;
+    }
+    ._base_layout_container{
+        max-width: 86.5%;
+    }
+    ._explore_feed_wrapper{
+        margin-right: 106px;
+    }
+    #player{
+            height: 748px !important;
+    }
+    @media(max-width: 991px){
+        .footer-container{
+            display: none;
+        }
+      ._explore_feed_wrapper{
+        margin-right: 0px;
+    }  
+    }
+    .jwplayer.jw-flag-aspect-mode {
+        height: 100% !important;
+    }
+
+
+
+    .MultiCarousel { float: left; overflow: hidden; padding: 15px; width: 100%; position:relative; }
+    .MultiCarousel{ height: 320px;}
+    .MultiCarousel .MultiCarousel-inner { transition: 1s ease all; float: left; }
+    .MultiCarousel .MultiCarousel-inner .item { float: left;}
+    .MultiCarousel .MultiCarousel-inner .item > div { text-align: center; padding:10px; margin:10px; background:#f1f1f1; color:#666;}
+    .MultiCarousel .leftLst, .MultiCarousel .rightLst { position:absolute; border-radius:50%;top:calc(50% - 20px);height: 32px;width: 32px;font-size: 15px;cursor: pointer; }
+    .MultiCarousel .leftLst { left:0; }
+    .MultiCarousel .rightLst { right:0; }
+
+    .MultiCarousel .leftLst.over, .MultiCarousel .rightLst.over { pointer-events: none; background:#ccc; }
+
+._base_layout_content {
+    margin-top: 90px;
+}
+/*===========*/
+._4joc {
+    height: 43px;
+    z-index: 199;
+}
+.tinyViewport ._2yq ._5sqx._5sqx, .hasBanner._2yq ._5sqx._5sqx {
+    left: auto;
+    position: relative;
+    width: auto;
+}
+
+._2yq ._5sqx._5sqx {
+    position: fixed;
+}
+.tinyViewport ._5sqx {
+    left: 8px;
+    position: absolute;
+    width: 959px;
+}
+.tinyViewport ._5sqx, .hasBanner ._5sqx {
+    border: 1px solid;
+    border-color: #EBEDF0 #dfe0e4 #d0d1d5;
+    border-radius: 3px;
+    top: 0;
+}
+._2yq ._4-u2 {
+    border-color: transparent;
+    border-left-width: 0;
+    border-right-width: 0;
+    position: relative;
+}
+._5sqx {
+    border-left: 0;
+    border-radius: 0;
+    border-right: 0;
+    border-top: 0;
+    left: 0;
+    position: fixed;
+    top: 43px;
+    width: 100%;
+    z-index: 199;
+}
+._4-u8 {
+    background-color: #fff;
+}
+._4-u2 {
+    border: 1px solid #dddfe2;
+    border-radius: 3px;
+}
+._2yq ._5sqx._5sqx::before {
+    border-radius: 0;
+}
+._2yq ._4-u2::before {
+    border: 1px solid #dddfe2;
+    border-radius: 4px;
+    bottom: -1px;
+    content: '';
+    left: -1px;
+    pointer-events: none;
+    position: absolute;
+    right: -1px;
+    top: -1px;
+}
+.tinyViewport ._2yq ._5sqx ._5im-, .hasBanner._2yq ._5sqx ._5im-, .tinyViewport ._2xk0 ._5sqx ._5im-, .hasBanner._2xk0 ._5sqx ._5im- {
+    width: auto;
+}
+._2yq ._5sqx ._5im-, ._2xk0 ._5sqx ._5im- {
+    width: 1012px;
+}
+
+.tinyViewport ._5sqx ._5im-, .hasBanner ._5sqx ._5im- {
+    margin: 0;
+    width: auto;
+}
+._5sqx ._5im- {
+    margin: 0 auto;
+    width: 960px;
+}
+._5vx2 {
+    background-clip: padding-box;
+    box-sizing: border-box;
+}
+._zz9 ._5vx7 {
+    margin-left: -8px;
+}
+._5vx7 {
+    vertical-align: middle;
+}
+
+.clearfix {
+    zoom: 1;
+}
+._ohe {
+    float: left;
+}
+.lfloat {
+    float: left;
+}
+._43o4 {
+    margin: 0;
+    padding: 0;
+    white-space: nowrap;
+}
+._45hc, ._45hd {
+    display: inline-block;
+    list-style-type: none;
+    max-width: 100%;
+    position: relative;
+}
+._45hc a {
+    display: block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+     cursor: pointer;
+}
+
+._5vwy a {
+    color: #1d2129;
+    font-weight: 600;
+     cursor: pointer;
+}
+._5vx7 ._45hd a, ._5vwz a {
+    color: #4b4f56;
+    display: inline-block;
+    vertical-align: baseline;
+     cursor: pointer;
+}
+._468f {
+    outline: none;
+}
+._zz9 ._4jq5, ._zz9 ._5vx2 ._45hd ._45hc {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+._4jq5, ._5vx2 ._45hd ._45hc {
+    border: 0;
+    font-size: 14px;
+    line-height: 18px;
+    margin: 8px 0;
+    padding: 5px 16px 4px;
+    position: relative;
+}
+._4xjz {
+    left: 0;
+    position: absolute;
+    right: 0;
+    text-align: center;
+}
+._4xj- {
+    font-weight: normal;
+    visibility: hidden;
+}
+._5vwz ._13xf {
+    bottom: 0;
+    left: 8px;
+    position: absolute;
+    right: 8px;
+}
+._5vwy ._13xf {
+    background-color: #4267b2;
+}
+
+._5vwy ._13xf, ._5vwz:hover ._13xf {
+    display: block;
+}
+._5vwz ._13xf {
+    background-color: #edf2fa;
+    display: none;
+    height: 0;
+    padding-top: 3px;
+}
+._2yq ._5sqx._5sqx {
+    position: fixed;
+}
+
+._2yq ._4-u2 {
+    border-color: transparent;
+    border-left-width: 0;
+    border-right-width: 0;
+    position: relative;
+}
+._5sqx {
+    border-left: 0;
+    border-radius: 0;
+    border-right: 0;
+    border-top: 0;
+    left: 0;
+    position: fixed;
+    top: 80px;
+    width: 100%;
+    z-index: 199;
+}
+._4-u8 {
+    background-color: #fff;
+}
+._4-u2 {
+    border: 0px solid #dddfe2;
+    border-radius: 0px;
+}
+._5vwy ._13xf {
+    background-color: #4267b2;
+}
+
+    #infinite-list {
+        /* We need to limit the height and show a scrollbar */
+        width: 200px;
+        height: 300px;
+        overflow: auto;
+
+        /* Optional, only to check that it works with margin/padding */
+        margin: 30px;
+        padding: 20px;
+        border: 10px solid black;
+    }
+
+    /* Optional eye candy below: */
+    .sidebarLi li {
+      padding: 10px;
+      list-style-type: none;
+    }
+    .sidebarLi li:hover {
+        background: #cccccc29;
+    }
+    .count-infos {
+        font-size: 15px;
+        line-height: 18px;
+        color: rgba(235, 235, 238, 0.75);
+        margin-bottom: 12px;
+    }
+    .count-infos .number {
+        font-family: proxima-semibold, PingFangSC, sans-serif;
+        font-weight: 600;
+    }
+    .count-infos .unit:not(:last-child) {
+        margin-right: 16px;
+    }
+
+    .count-infos .unit {
+        font-family: proxima-regular, PingFangSC, sans-serif;
+        font-weight: 400;
+    }
+    .center{
+        text-align: center;
+    }
+
+    .card-footer.no-avatar.jsx-1543915374 {
+        padding-top: 67px;
+    }
+    .card-footer.jsx-1543915374 .like-icon.jsx-1543915374 {
+        margin-right: 7px;
+        vertical-align: middle;
+    }
+    .card-footer.jsx-1543915374 span.jsx-1543915374 {
+        font-family: proxima-semibold, PingFangSC, sans-serif;
+        font-weight: 600;
+        font-size: 17px;
+        line-height: 14px;
+        vertical-align: middle;
+        color: rgb(255, 255, 255);
+    }
+    .card-footer.jsx-1543915374 {
+        position: absolute;
+        width: 100%;
+        bottom: 0px;
+        height: 100px;
+        box-sizing: border-box;
+        background: linear-gradient(rgba(22, 24, 35, 0) 2.92%, rgba(22, 24, 35, 0.5) 98.99%);
+        padding: 7px 13px 17px;
+    }
+    .video-card.jsx-3077367275 {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+    video.jsx-3382097194 {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .video-card.jsx-3077367275 .video-card-mask.jsx-3077367275, .video-card.jsx-3077367275 .event-delegate-mask.jsx-3077367275, .video-card.jsx-3077367275 .play-button {
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        right: 0px;
+        bottom: 0px;
+        cursor: pointer;
+    }
+
+    .video-feed.jsx-2893588005 .video-feed-item {
+        width: 220px;
+        cursor: pointer;
+
+    }
+    @media (max-width: 991px){
+    .video-feed.jsx-2893588005 .video-feed-item {
+        width: 33%;
+        height: auto;
+        margin-right: 0px;
+        margin-bottom: 0px;
+        padding: 9px 6px 0 9px;
+    }
+
+    .share-layout {
+        margin: auto;
+        padding: 120px 0px;
+        width: 100%;
+        display: inline-block;
+    }
+    .share-layout .share-layout-aside{
+        margin-left: 32px;
+    }
+    .jsx-578937417{
+        width: 127px;
+        height: 127px;
+        flex: 0 0 138px;
+    }
+    .header-tag.jsx-874583638 .content.jsx-874583638{
+        font-size: 9px;
+    }
+    .share-header .share-info {
+        padding-top: 4px;
+        margin-left: 28px;
+        flex: 1 1 auto;
+        width: 45%;
+    }
+    .count-infos {
+        font-size: 14px;
+        line-height: 18px;
+        color: rgba(235, 235, 238, 0.75);
+        margin-bottom: 12px;
+    }
+
+    }
+    @media (max-width: 320px){
+    .share-header .share-info {
+        padding-top: 4px;
+        margin-left: 7px;
+        flex: 1 1 auto;
+        width: 45%;
+    }
+    .jsx-578937417 {
+        width: 125px;
+        height: 125px;
+        flex: 0 0 138px;
+    }
+    }
+
+
+@icon-size: 50px;
+@main-color: #e9f1f4;
+
+// STYLE TO WRAP UP THE DEMO
+.search {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translateX(-50%) translateY(-50%);
+	* {
+		outline: none;
+		box-sizing: border-box;
+	}
+}
+
+// SEARCH FIELD
+.search__wrapper {
+	position: relative;
+}
+.search__field {
+	width: @icon-size;
+	height: @icon-size;
+	color: transparent;
+	font-family: Lato, sans-serif;
+	font-size: 1.35em;
+	padding: 0.35em (@icon-size) 0.35em 0;
+	border: 1px solid transparent;
+	border-radius: 0;
+	cursor: pointer;
+	-webkit-transition: all 0.3s ease-in-out;
+	transition: all 0.3s ease-in-out;
+	&:focus {
+		border-bottom-color: #ccc;
+		width: 50vw;
+		color: #2b2b2b;
+		cursor: default;
+		~ .search__icon {
+			background-color: transparent;
+			cursor: pointer;
+			pointer-events: auto;
+		}
+	}
+}
+.search__icon {
+	position: absolute;
+	top: 0;
+	right: 0;
+	background-color: @main-color;
+	width: @icon-size;
+	height: @icon-size;
+	font-size: 1.35em;
+	text-align: center;
+	border-color: transparent;
+	border-radius: 50%;
+	pointer-events: none;
+	display: inline-block;
+	-webkit-transition: background-color 0.2s ease-in-out;
+	transition: background-color 0.2s ease-in-out;
+}
+
+// FIELD LABELING
+.search__field::-webkit-input-placeholder {
+	position: relative;
+	top: 0;
+	left: 0;
+	-webkit-transition-property: top, color;
+	transition-property: top, color;
+	-webkit-transition-duration: 0.1s;
+	transition-duration: 0.1s;
+	-webkit-transform: translateZ(0);
+	transform: translateZ(0);
+	-webkit-backface-visibility: hidden;
+	backface-visibility: hidden;
+	-webkit-perspective: 1000;
+	perspective: 1000;
+}
+.search__field:-moz-placeholder {
+	position: relative;
+	top: 0;
+	left: 0;
+	-webkit-transition-property: top, color;
+	transition-property: top, color;
+	-webkit-transition-duration: 0.1s;
+	transition-duration: 0.1s;
+	-webkit-transform: translateZ(0);
+	transform: translateZ(0);
+	-webkit-backface-visibility: hidden;
+	backface-visibility: hidden;
+	-webkit-perspective: 1000;
+	perspective: 1000;
+}
+.search__field::-moz-placeholder {
+	position: relative;
+	top: 0;
+	left: 0;
+	-webkit-transition-property: top, color;
+	transition-property: top, color;
+	-webkit-transition-duration: 0.1s;
+	transition-duration: 0.1s;
+	-webkit-transform: translateZ(0);
+	transform: translateZ(0);
+	-webkit-backface-visibility: hidden;
+	backface-visibility: hidden;
+	-webkit-perspective: 1000;
+	perspective: 1000;
+}
+.search__field:-ms-input-placeholder {
+	position: relative;
+	top: 0;
+	left: 0;
+	-webkit-transition-property: top, color;
+	transition-property: top, color;
+	-webkit-transition-duration: 0.1s;
+	transition-duration: 0.1s;
+	-webkit-transform: translateZ(0);
+	transform: translateZ(0);
+	-webkit-backface-visibility: hidden;
+	backface-visibility: hidden;
+	-webkit-perspective: 1000;
+	perspective: 1000;
+}
+.search__field::-webkit-input-placeholder[style*="hidden"] {
+	color: darken(@main-color, 30%);
+	font-size: 0.65em;
+	font-weight: normal;
+	top: -(round(@icon-size / 2.5));
+	opacity: 1;
+	visibility: visible !important;
+}
+.search__field:-moz-placeholder[style*="hidden"] {
+	color: darken(@main-color, 30%);
+	font-size: 0.65em;
+	font-weight: normal;
+	top: -(round(@icon-size / 2.5));
+	opacity: 1;
+	visibility: visible !important;
+}
+.search__field::-moz-placeholder[style*="hidden"] {
+	color: darken(@main-color, 30%);
+	font-size: 0.65em;
+	font-weight: normal;
+	top: -(round(@icon-size / 2.5));
+	opacity: 1;
+	visibility: visible !important;
+}
+.search__field:-ms-input-placeholder[style*="hidden"] {
+	color: darken(@main-color, 30%);
+	font-size: 0.65em;
+	font-weight: normal;
+	top: -(round(@icon-size / 2.5));
+	opacity: 1;
+	visibility: visible !important;
+}
+
+
+/*===========*/
+
+</style>
+
+<div class="_lwx hideOnMobile" style="position: relative; height: 43px;">
+    <div class="_4joc" id="u_fetchstream_5_0" style="width: 1012px; top: 43px; position: fixed;">
+        <div aria-label="Search results" role="banner">
+            <div class="_4-u2 _5sqx _4-u8">
+                <div class="_zz9 _5im-">
+                    <div data-testid="search_navigation_tabs" id="u_fetchstream_5_1">
+                        <div class="_5vx2 _5vx4">
+                            <div class="_5vx7 clearfix" direction="both">
+                                <div class="_ohe lfloat">
+                                    <ul class="_43o4 _4470" role="tablist" width="1010px" style="width: 1010px;">
+                                        <li data-edge="keywords_search" class=" _5vwz _5vwy _45hc _1hqh" role="presentation">
+                                            <a aria-haspopup="false" href="javascript:void(0)" role="tab" tabindex="0" class="_3m1v _468f" aria-selected="true">
+                                                <div class="_4jq5">
+                                                    <div class="_4xjz">All</div>
+                                                    <div class="_4xj-" aria-hidden="true">All</div>
+                                                </div><span class="_13xf"></span></a>
+                                        </li>
+                                        <li data-edge="keywords_blended_posts" class=" _5vwz _45hc" role="presentation">
+                                            <a onclick="getVideoSearchResult();" aria-haspopup="false" href="javascript:void(0)" role="tab" tabindex="-1" class="_3m1v _468f" aria-selected="false">
+                                                <div class="_4jq5">
+                                                    <div class="_4xjz">Videos</div>
+                                                    <div class="_4xj-" aria-hidden="true">Videos</div>
+                                                </div><span class="_13xf"></span></a>
+                                        </li>
+
+                                        <li data-edge="keywords_blended_posts" class=" _5vwz _45hc" role="presentation">
+                                            <a onclick="getCategorySearchWithVideos();" aria-haspopup="false" href="javascript:void(0)" role="tab" tabindex="-1" class="_3m1v _468f" aria-selected="false">
+                                                <div class="_4jq5">
+                                                    <div class="_4xjz">Categories</div>
+                                                    <div class="_4xj-" aria-hidden="true">Categories</div>
+                                                </div><span class="_13xf"></span></a>
+                                        </li>
+                                        <li data-edge="keywords_users" class=" _5vwz _45hc" role="presentation">
+                                            <a onclick="getCreatorsResult();" aria-haspopup="false" href="javascript:void(0)" role="tab" tabindex="-1" class="_3m1v _468f" aria-selected="false">
+                                                <div class="_4jq5">
+                                                    <div class="_4xjz">Creators</div>
+                                                    <div class="_4xj-" aria-hidden="true">Creators</div>
+                                                </div><span class="_13xf"></span></a>
+                                        </li>
+                                        <li data-edge="keywords_blended_photos" class=" _5vwz _45hc" role="presentation">
+                                            <a aria-haspopup="false" href="javascript:void(0)" role="tab" tabindex="-1" class="_3m1v _468f" aria-selected="false">
+                                                <div class="_4jq5">
+                                                    <div class="_4xjz">Hashtags</div>
+                                                    <div class="_4xj-" aria-hidden="true">Hashtags</div>
+                                                </div><span class="_13xf"></span></a>
+                                        </li>
+                                        <li data-edge="keywords_blended_videos" class="_5vwz _45hc" role="presentation">
+                                            <a aria-haspopup="false" href="javascript:void(0)" role="tab" tabindex="-1" class="_3m1v _468f" aria-selected="false">
+                                                <div class="_4jq5">
+                                                    <div class="_4xjz">Mentioned</div>
+                                                    <div class="_4xj-" aria-hidden="true">Mentioned</div>
+                                                </div><span class="_13xf"></span></a>
+                                        </li>
+
+
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="jsx-2546051494 _global_container">
+    <div class="jsx-2546051494 _base_layout_container">
+        <div class="_base_layout_content">
+            <div class="_base_layout_main">
+                <header class="jsx-2510987962 _explore_page_main_header">
+                    <div class="jsx-2510987962" style="margin-top: 30px">
+                        <h1 class="jsx-2510987962 _explore_page_main_desc">{% trans "Search :" %}<span class="jsx-2510987962 _explore_page_main_desc"> {{search_term}}</span></h1>
+                        <h2 class="jsx-2510987962 _explore_page_main_desc"></h2>
+                    </div>
+
+
+
+                    <div class="jsx-2510987962 _explore_page_main_aside">
+                        <div class="jsx-29267105 share-group">
+                            <a href="javascript:void(0);" onclick="social_share('facebook_share')" class="jsx-29267105">
+                                <span><img src="/media/facebook_mobile.svg" class="jsx-29267105"></span>
+                            </a>
+                            <a href="javascript:void(0);" onclick="social_share('twitter_share')" target="_blank" class="jsx-29267105">
+                                <span><img src="/media/twitter_mobile.svg" class="jsx-29267105"></span>
+                            </a>
+                            <a href="javascript:void(0);" onclick="social_share('whatsapp_share')"  class="jsx-29267105">
+                                <span><img src="/media/whatsapp.svg" class="jsx-29267105"></span>
+                            </a>
+                        </div>
+                    </div>
+                </header>
+                <div class="jsx-4249974497 _scroll_load_more_loading_user_right" style="text-align: center;"></div>
+
+	            <main class="share-layout-main">
+
+	                <div class="jsx-2893588005 video-feed" id="userVideosListId">
+
+	                </div>
+                    <div class="_scroll_load_more_loading_user_videos center">
+                        <div class="boloindya-loading">Loading...</div>
+                    </div>	                
+	                <input type="hidden" name="nextPageUrl" id="nextPageUrlId" value="">
+	            </main>
+                <div class="jsx-3102177358 ">
+                	
+                    <div class="jsx-3102177358  " >
+
+
+                        <ul class="jsx-3102177358 " id="creatorId">
+                        	<span id="creatorItemListId"></span>
+                        </ul>
+                        
+
+                    </div>
+                    <span class="followError"></span>
+
+                </div>
+
+                <div class="_explore_page_feed_wrapper">
+                    <div class="jsx-1289101510 _explore_feed_wrapper">
+                        <div class="">
+                            <div class="jsx-4249974497 _explore_feed_container">
+                                <div class="" id="catWithVideoId">
+
+                                </div>
+                               
+                            </div>
+                            <div class="jsx-4249974497 _scroll_load_more_loading_left"></div>
+                        </div>
+                    </div>
+                    <div class="jsx-1289101510 _explore_feed_wrapper">
+                        <div class="">
+                            <div class="jsx-4249974497 _explore_feed_container">
+                                <div class="" id="catWithVideoIdRight">
+  
+                                </div>
+                            </div>
+                            <div class="jsx-4249974497 _scroll_load_more_loading_right"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="jsx-2107295335 jsx-3197114167 to-top to-top-enter-done"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Start Comments Section -->
+{% include "spirit/_video_play_and_comments.html" %}
+
+<script type="text/javascript">
+	var searchData=window.location.search;
+
+
+
+	function creatorTemplate(each_popular_item){
+
+		var userName="";
+		if(each_popular_item.id){	
+			var firstName=each_popular_item.first_name;
+			if (firstName!=undefined && firstName.length>0){
+				userName=firstName+' '+each_popular_item.last_name;
+			}else{
+				userName=each_popular_item.username;
+			}
+		}
+
+		var userItemTemp='<li class="jsx-3102177358 _user_carousel_list-item item"><a tag="a" title="'+each_popular_item.username+'" class="jsx-3102177358" href="/'+each_popular_item.username+'/"><div class="_user_carousel_avatar round" style="background-image:url('+each_popular_item.userprofile.profile_pic+')"><img src="/media/tick_icon.svg"></div><h2 class="_user_carousel_title">'+userName+'</h2><h3 class="_user_carousel_sub-title">@'+each_popular_item.username+'</h3><p class="_user_carousel_followers">'+each_popular_item.userprofile.follower_count+'<span class="_user_carousel_followers-text"> followers</span></p></a><span class="unit"><button onclick="follow_user('+each_popular_item.id+');" class="_4jy1 _4jy4 _517h _51sy _42ft " style="float: none;" type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-'+each_popular_item.id+' followCheck sx_5da455"></i><span class="btnTextChange-'+each_popular_item.id+'">Follow</span></button></span></li>';
+		return userItemTemp;
+	}
+
+
+	//api/v1/search/users/
+
+function getCreatorsResult(){
+	
+    loaderBoloShowDynamic('_scroll_load_more_loading_user_right');
+    $("#catWithVideoIdRight").empty("");
+    $("#catWithVideoId").empty("");
+    $("#userVideosListId").empty("");
+    var platlistItems;
+
+    var listItems="";
+    var itemCount=0;
+    var language_id=1;
+    language_id=current_language_id;
+    var userVideoItems="";
+    var uri='/api/v1/search/users/'+searchData;
+    var res = encodeURI(uri);
+
+    jQuery.ajax({
+        url:res,
+        type:"GET",
+        data:{'language_id':language_id,'limit':10,'offset':0},
+        success: function(response,textStatus, xhr){
+            userVideoItems="";
+            var userItemList=response.results;
+            var itemCount=0;
+            userItemList.forEach(function(itemCreator) {itemCount++;
+                userVideoItems =creatorTemplate(itemCreator);
+                $("#creatorItemListId").append(userVideoItems);
+              
+            });
+            
+            loaderBoloHideDynamic('_scroll_load_more_loading_user_right');
+            //playListData=videoItemList;
+
+        }
+  
+    });
+}
+
+
+var topicList=[];
+function getCategorySearchWithVideos(){
+    loaderBoloShowDynamic('_scroll_load_more_loading_right');
+    loaderBoloShowDynamic('_scroll_load_more_loading_left');
+    $("#userVideosListId").empty("");
+    $("#creatorItemListId").empty("");    
+        var playListData=[]; 
+    var platlistItems;
+
+    var listItems="";
+    var itemCount=0;
+    var language_id=1;
+    var uri='/api/v1/get_category_with_video_bytes/';
+    var res = encodeURI(uri);
+    var category_with_video_list="";
+    language_id=current_language_id;
+
+    jQuery.ajax({
+        url:res,
+        type:"GET",
+
+        data:{'language_id':language_id,'is_with_popular':'True','popular_boloindyans':'True'},
+        success: function(response,textStatus, xhr){
+            populaCreatorsItems="";
+            var populaCategoriesItems="";
+            var populvideoItems="";
+            var itemCount=0;
+            var responseData=response.category_details;
+            responseData.forEach(function(itemCategory) {itemCount++;
+                populaCreatorsItems =popularSearchCategoryHeading(itemCategory);
+                populvideoItems="";
+                var topicData=itemCategory.topics;
+                populvideoItems+='<div class="_explore_feed_card">';
+                var videoItemCount=0;
+                topicData.forEach(function(itemVideoByte){videoItemCount++;
+                    if(videoItemCount<4){
+                        topicList[itemVideoByte.id]=itemVideoByte;
+                        populvideoItems +=popularSearchCategoryItem(itemVideoByte);
+                    }
+                });
+                populvideoItems+='</div>';
+                category_with_video_list='<div class="_explore_feed_item">'+populaCreatorsItems+''+populvideoItems+'</div>';
+
+                if(itemCount % 2 == 0) {
+                    loaderBoloHideDynamic('_scroll_load_more_loading_right');
+                    $("#catWithVideoIdRight").append(category_with_video_list);
+                }else{
+                     loaderBoloHideDynamic('_scroll_load_more_loading_left');
+                    $("#catWithVideoId").append(category_with_video_list);
+                }
+
+            });
+
+        },
+        error: function(jqXHR, ajaxOptions, thrownError) {
+            console.log(jqXHR);
+           loaderBoloHideDynamic('_scroll_load_more_loading_left');
+           loaderBoloHideDynamic('_scroll_load_more_loading_right');
+
+        }/*  end of error */
+
+  
+    });
+}
+
+
+function popularSearchCategoryHeading(itemCategory){
+    var popular_cat_heading_template='<div class="_explore_feed_header"><div class="jsx-2836840237 _card_header_"><a class="jsx-2836840237" href="/tag/'+itemCategory.slug+'/"><div class="jsx-2836840237 _card_header_cover" style="background-image: url('+itemCategory.category_image+');"></div></a><a title="#'+itemCategory.slug+'('+itemCategory.total_view+' views)" class="jsx-2836840237 _card_header_link" href="/tag/'+itemCategory.slug+'/"><div class="jsx-2836840237 _card_header_content"><h3 class="jsx-2836840237 _card_header_title">'+itemCategory.title+'</h3><strong class="jsx-2836840237 _card_header_subTitle">'+itemCategory.total_view+' views</strong><p class="jsx-2836840237 _card_header_desc">...</p></div></a></div></div>';
+    return popular_cat_heading_template;
+}
+
+function popularSearchCategoryItem(itemVideoByte){
+    var category_item_template='<div class="jsx-1410658769 _explore_feed_card_item" onClick="openVideoInPopup('+itemVideoByte.id+');" ><div class="jsx-1410658769 _ratio_"><div class="jsx-1410658769" style="padding-top: 148.148%;"><div class="jsx-1410658769 _ratio_wrapper"><a href="javascript:void(0)"><div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+itemVideoByte.question_image+');"><div class="jsx-3077367275 video-card default"><div class="jsx-3077367275 video-card-mask"><div class="jsx-1633345700 card-footer normal no-avatar"><div class="jsx-1633345700"><img src="" class="jsx-1633345700 like-icon"><span class="jsx-1633345700">'+itemVideoByte.likes_count+'</span></div></div></div></div></div></a></div></div></div></div>';
+    return category_item_template;
+}
+
+
+
+
+
+var playListData=[];
+var userLikeAndUnlike=[];
+//http://127.0.0.1:8000/api/v1/get_vb_list/?limit=10&offset=10&user_id=191
+
+var page = 1;
+var checkDataStatus=0;
+$(window).scroll(function() {
+    var scorh=Number($(window).scrollTop() + $(window).height());
+    console.log('Scol+he '+scorh);
+    if($(window).scrollTop() + $(window).height() >= $(document).height()-800 && $(window).scrollTop() + $(window).height()<$(document).height()) {
+        var nextPageUrl=jQuery("#nextPageUrlId").val();
+        if(undefined !==nextPageUrl && nextPageUrl!=""){
+            page++;
+            //loadMoreData(nextPageUrl);
+        }
+
+    }
+    console.log('documentHe- '+$(document).height());
+});
+
+$(document).ready(function(){
+    getVideoSearchResult(10,0);
+    //getSideBarData();
+});
+
+function getVideoSearchResult(limit,offset){
+
+    loaderBoloShowDynamic('_scroll_load_more_loading_user_videos');
+    //var user_id= $("#currentUserId").val();
+     
+    var platlistItems;
+    var language_id=current_language_id;
+    console.log('CurrentLanguageId:'+current_language_id);
+    var listItems="";
+    var itemCount=0;
+    var userVideoItems="";
+    var uri='/api/v1/search/'+searchData;
+    var res = encodeURI(uri);
+
+    jQuery.ajax({
+        url:res,
+        type:"GET",
+        data:{'limit':limit,'offset':offset,'language_id':language_id},
+        success: function(response,textStatus, xhr){
+            userVideoItems="";
+            var videoItemList=response.results;
+            jQuery("#userVideoCountId").html(response.count);
+            var itemCount=-1;
+            videoItemList.forEach(function(itemCreator) {itemCount++;
+                userVideoItems +=getVideoItem(itemCreator,itemCount);
+                $("#userVideosListId").append(userVideoItems);
+      
+            });
+            loaderBoloHideDynamic('_scroll_load_more_loading_user_videos');
+            playListData=videoItemList;
+            var nextPageData=response.next;
+            jQuery("#nextPageUrlId").val(response.next);
+            
+            $("#catWithVideoIdRight").empty("");
+            $("#catWithVideoId").empty("");
+            $("#creatorItemListId").empty("");            
+
+        }
+  
+    });
+}
+
+
+
+function loadMoreData(NextPageUrl){
+    
+    var platlistItems;
+    checkDataStatus=1;
+    var listItems="";
+    var itemCount=0;
+    var language_id=current_language_id;
+    //var uri='https://www.boloindya.com/api/v1/get_popular_video_bytes/?page=1';
+    var uri=NextPageUrl;
+    var res = encodeURI(uri);
+    $.ajax({
+            url:res,
+            data:{'language_id':language_id},
+            type: "get",
+            beforeSend: function()
+            {
+                $('.ajax-load').show();
+            }
+        })
+        .done(function(data)
+        {
+            if(data == " "){
+                $('.ajax-load').html("No more records found");
+                return;
+            }
+            checkDataStatus=0;
+            userVideoItems="";
+            var videoItemList=data.results;
+            var itemCount=-1;
+            videoItemList.forEach(function(itemCreator) {itemCount++;
+            userVideoItems +=getVideoItem(itemCreator,itemCount);
+            playListData.push(itemCreator);          
+  
+            });
+            loaderBoloHideDynamic('_scroll_load_more_loading_user_videos');
+            //playListData+=videoItemList;
+
+            $('.ajax-load').hide();
+            $("#userVideosListId").append(userVideoItems);
+            var nextPageData=data.next;
+            $("#catWithVideoIdRight").empty("");
+            $("#catWithVideoId").empty("");
+            $("#creatorItemListId").empty("");
+            //jQuery("#nextPageUrlId").val(nextPageData);
+            
+        })
+        .fail(function(jqXHR, ajaxOptions, thrownError)
+        {
+            if(jqXHR.status!=201){
+
+            }
+
+              $('.ajax-load').html("No more records found");
+        });
+	}
+
+
+
+
+
+function getVideoItem(videoItem,itemCount){
+
+    var userVideoItem = '<div class="jsx-1410658769 video-feed-item">\
+            <div class="jsx-1410658769 _ratio_">\
+                <div class="jsx-1410658769" style="padding-top: 148.438%;">\
+                    <div class="jsx-1410658769 _ratio_wrapper">\
+                        <a href="javascript:void(0)" onClick="openVideoInPopup(\''+videoItem.backup_url+'\',\''+videoItem.question_image+'\','+itemCount+');" class="jsx-2893588005 video-feed-item-wrapper">\
+                            <div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+videoItem.question_image+');">\
+                                <div class="jsx-3077367275 video-card default">\
+                                    <div class="jsx-3077367275 video-card-mask">\
+                                        <div class="jsx-1543915374 card-footer normal no-avatar">\
+                                            <div class="jsx-1543915374"><img src="/media/download.svg" class="jsx-1543915374 like-icon"><span class="jsx-1543915374">'+videoItem.likes_count+'</span></div>\
+                                        </div>\
+                                    </div>\
+                                </div>\
+                            </div>\
+                        </a>\
+                    </div>\
+                </div>\
+            </div>\
+        </div>';
+
+        return userVideoItem;
+}
+
+
+
+
+
+
+function getPopularCategory(popularCategory){
+    var popular_categories='<li class="jsx-3959364739">\
+                        <a tag="a" class="jsx-1420774184 recommend-item" href="/tag/'+popularCategory.slug+'/">\
+                            <div class="jsx-2177493926 jsx-578937417 avatar head normal" style="background-image: url('+popularCategory.category_image+'); border-radius: 2px;"></div>\
+                            <div class="jsx-1420774184 info-content">\
+                                <h4 class="jsx-1420774184">'+popularCategory.title+'</h4>\
+                                <p class="jsx-1420774184">'+popularCategory.total_view+' Views</p>\
+                            </div>\
+                            <div class="jsx-1420774184 arrow-right"></div>\
+                        </a>\
+                    </li>';
+    return popular_categories;
+}
+
+
+  var sideBarDetails="";
+  var sideBarCommentDetails="";
+
+function openVideoInPopup(file,image,indexId){
+  loaderShow();
+  var singleItemData=[];
+  $("#indexId").val(indexId);
+
+  $("#modelPopup").show();
+  var newSrc='/media/mute_icon.svg';
+  $('#mutedImageId').attr('src', newSrc);
+  $('.videoPlayButton').removeClass('_video_card_playbtn_wraaper');
+
+      var preBufferDone = false;
+      
+        playerInstance.setup({
+          file: file,
+          controls: false,
+          image:image,
+          autostart:'true',
+          mute:'false'
+      });
+      playerInstance.on('play', function() {
+            loaderHide();
+            preBufferDone = true;
+          
+      }); 
+
+    playerInstance.on('buffer', function() {
+
+      var time = 1;
+
+    });   
+
+
+     playerInstance.on('error', function(event) {
+        loaderHide();
+        var erroCode=event.code;
+
+    });
+
+    playerInstance.on('complete', function() {
+    jwplayer('player').setMute(true);
+
+    });
+
+    singleItemData=playListData[indexId];
+
+    var shareURL='/'+singleItemData.user.username+'/'+singleItemData.id+'';
+    var sideBarDetails='<div onClick="openMobileDownloadPopup();" class="jsx-2177493926 jsx-3813273378 avatar round" style="background-image: url(/media/musically_100x100.jpeg); width: 48px; height: 48px; flex: 0 0 48px;"></div><div class="jsx-949708032 boloindya-toolbar" style="margin-top: 20px;"><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-like" onClick="openMobileDownloadPopup();" style="background-image: url(/media/viewIcon.svg);"><span class="jsx-949708032">'+singleItemData.likes_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-comment" onClick="openMobileDownloadPopup();" style="background-image: url(/media/comments.svg);"><span class="jsx-949708032">'+singleItemData.comment_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-share" onclick="openShareTab()" style="background-image: url(/media/share.svg);"><span class="jsx-949708032">'+singleItemData.total_share_count+'</span></div></div>';
+    $("#topicID").val(singleItemData.id);
+    $("#currentPlayUserId").val(singleItemData.user.userprofile.id);
+    $("#topicCreatorUsername").val(singleItemData.user.username);
+    $("#shareInputbox").val(shareURL);
+    var bigCommentLikeDet='<strong>'+singleItemData.likes_count+' '+likeTrans+' · '+singleItemData.comment_count+' '+commentsTrans+'</strong>';
+    $("#sideBarId").html(sideBarDetails);
+    $("._video_card_big_meta_info_count").html(bigCommentLikeDet);
+    
+    var userprofileName=singleItemData.user.userprofile.name;
+    var userHandleName=singleItemData.user.username;
+    var videoTitle=singleItemData.title;
+    var profilePics = singleItemData.user.userprofile.profile_pic;
+    if(profilePics==''){
+       profilePics= '/media/demo_user.png';
+    }
+
+    var likeStatus="";
+
+    likeStatus="liked";
+    var likeStatusClass=jQuery("#UReactionLink").hasClass('liked');
+    if(likeStatusClass==true){
+        jQuery("#UReactionLink").removeClass('liked');
+        jQuery(".sp_ddXiTdIB8vm").addClass('sx_44a25c');
+        jQuery(".sp_ddXiTdIB8vm").removeClass('sx_44a25d');
+    }
+
+    var likedCheck=userLikeAndUnlike.topic_like;
+    if(undefined !==likedCheck && likedCheck.length>0){
+        var lStatus = likedCheck.includes(singleItemData.id);
+        if(lStatus==true){
+            likeStatus="liked";
+            var likeStatusClass=jQuery("#UReactionLink").hasClass('liked');
+            if(likeStatusClass==false){
+                jQuery("#UReactionLink").addClass('liked');
+                jQuery(".sp_ddXiTdIB8vm").removeClass('sx_44a25c');
+                jQuery(".sp_ddXiTdIB8vm").addClass('sx_44a25d');
+            }
+
+        }
+    }
+
+    //=========Check Follow User ==============
+    var loginStatus=check_login_status();
+    if(loginStatus==true){
+        var countFollowStatus=userLikeAndUnlike.all_follow;
+        if(undefined !==countFollowStatus && countFollowStatus.length>0){
+            var currentUserTopic=singleItemData.user.userprofile.id;
+            var followList=userLikeAndUnlike.all_follow;
+            followList.forEach(function(followId){
+                if(currentUserTopic==followId){
+                    followStatus=jQuery('.followStatusChangePopup').hasClass('sx_5da455');
+                    if(followStatus==true){
+                        jQuery('.followStatusChangePopup').removeClass('sx_5da455');
+                        jQuery('.followStatusChangePopup').addClass('sx_5da456');
+                        jQuery('.btnTextChangePopup').text('Followed');
+                    }else{
+                        jQuery('.followStatusChangePopup').removeClass('sx_5da456');
+                        jQuery('.followStatusChangePopup').addClass('sx_5da455');
+                        jQuery('.btnTextChangePopup').text('Follow');
+                    }
+                }
+
+            });
+        }
+    }
+    //============== End=======================
+
+
+
+   var profileURL='/'+userHandleName+'';
+    $("#profileImageUserId").css("background-image", "url(" + profilePics + ")");
+    $(".shareandliketabprofileimage").attr("src", ""+profilePics+"");
+    $(".userProfileURL").attr("href", ""+profileURL+"");
+    $("._video_card_big_user_info_nickname").html(userprofileName);
+    $("._video_card_big_user_info_handle").html(userHandleName);
+    $("._video_card_big_meta_info_title_video").html(videoTitle);
+
+    loaderBoloShow();
+    listCommentsById(singleItemData);
+  
+    var sideBarCommentDetails="";
+
+
+}
+
+function muteAndUnmutePlayer(){
+  jwplayer().setMute();
+  var muteStatus=jwplayer('player').getMute();
+  if(muteStatus==true){
+    var newSrc='/media/sound_mute.svg';
+    $('#mutedImageId').attr('src', newSrc);
+  }else{
+    var newSrc='/media/mute_icon.svg';
+    $('#mutedImageId').attr('src', newSrc);
+  }
+
+}
+
+function listCommentsById(singleTopicData){
+
+    var topicId=singleTopicData.id;
+    var topicSlug=singleTopicData.slug;
+    var listCommentItems="";
+    $(".videoCommentId").html("");
+    //================Comments List =================
+    var uri='/api/v1/topics/'+topicSlug+'/'+topicId+'/comments?limit=5&offset=1';
+    var res = encodeURI(uri);
+    $.get(res, function (data, textStatus, jqXHR) {
+        var videoCommentList=data.results;
+
+        var itemCount=0;
+        videoCommentList.forEach(function(itemVideo) {itemCount++;
+        var profileImage="";
+        var userProfile=itemVideo.user.userprofile;
+        if(userProfile.profile_pic==""){
+           profileImage='/media/demo_user.png';
+        }else{
+            profileImage=userProfile.profile_pic;
+        }
+
+        var likeStatus="";
+        
+
+        var likeStatusClass=jQuery(".likeStatusInfo").hasClass('liked');
+        if(likeStatusClass==true){
+            jQuery(".likeStatusInfo").removeClass('liked');
+        }
+
+        var countLikeStatus=userLikeAndUnlike.comment_like;
+        if(undefined !==countLikeStatus && countLikeStatus.length>0){
+            var likedCheck=userLikeAndUnlike.comment_like;
+            var lStatus = likedCheck.includes(itemVideo.id);
+            if(lStatus==true){
+                likeStatus="liked";
+            }
+        }
+
+
+
+
+        listCommentItems +='<div class="_video_card_big_comment_item_"><span class="_avatar_ _avatar_small" style="background-image: url('+profileImage+'); margin-right: 8px;"></span><div class="_video_card_big_comment_item_content"><div class="_video_card_big_comment_item_name"><a href="/'+itemVideo.user.username+'/">'+itemVideo.user.username+'</a><span class="_video_card_big_comment_item_label"> · author</span></div><div class="_video_card_big_comment_item_message">'+itemVideo.comment+'</div><div class="_video_card_big_comment_item_"><div class="_video_card_big_comment_item_content"><div class="_video_card_big_comment_item_name"><a href="/"></a><span class="_video_card_big_comment_item_label"> · author</span></div><div class="_video_card_big_comment_item_message"></div></div></div><div class="_video_card_big_comment_item_time"><span class="_6qw6" data-testid="UFI2ReactionLink/comment"><div class="_8c74 likeStatusInfo '+likeStatus+' changeLikeColor-'+itemVideo.id+' "><a aria-pressed="false" class=" _6a-y _6qw5 _77yo" data-testid="UFI2ReactionLink" onclick="likeAndUnlikeComment('+itemVideo.topic+','+itemVideo.id+');" href="javascript:void(0);" role="button" tabindex="-1">Like<span class="likedStatus-'+itemVideo.id+' hide">d</span></a> </div></span> - '+itemVideo.date+'</div></div></div>';
+
+      
+        });
+        $(".videoCommentId").append(listCommentItems);
+        var loadMoreComment='<span class="loadMoreComment"><a onclick="loadMoreComments(\''+data.next+'\');" class="" href="javascript:void(0);">Load More Comments...</a></span';
+        $(".loadMoreComments").html(loadMoreComment);
+        loaderBoloHide();
+    });
+
+//============== End ================
+}
+
+function loadMoreComments(nextPageURl){
+
+    var listCommentItems="";
+    //================Comments List =================
+    var uri=nextPageURl;
+    var res = encodeURI(uri);
+    $.get(res, function (data, textStatus, jqXHR) {
+        var videoCommentList=data.results;
+
+        var itemCount=0;
+        videoCommentList.forEach(function(itemVideo) {itemCount++;
+        var profileImage="";
+        var userProfile=itemVideo.user.userprofile;
+        if(userProfile.profile_pic==""){
+           profileImage='/media/demo_user.png';
+        }else{
+            profileImage=userProfile.profile_pic;
+        }
+
+        listCommentItems +='<div class="_video_card_big_comment_item_"><span class="_avatar_ _avatar_small" style="background-image: url('+profileImage+'); margin-right: 8px;"></span><div class="_video_card_big_comment_item_content"><div class="_video_card_big_comment_item_name"><a href="/'+itemVideo.user.username+'/">'+itemVideo.user.username+'</a><span class="_video_card_big_comment_item_label"> · author</span></div><div class="_video_card_big_comment_item_message">'+itemVideo.comment+'</div><div class="_video_card_big_comment_item_"><div class="_video_card_big_comment_item_content"><div class="_video_card_big_comment_item_name"><a href="/"></a><span class="_video_card_big_comment_item_label"> · author</span></div><div class="_video_card_big_comment_item_message"></div></div></div><div class="_video_card_big_comment_item_time"><span class="_6qw6" data-testid="UFI2ReactionLink/comment"><div class="_8c74 changeLikeColor-'+itemVideo.id+' "><a aria-pressed="false" class=" _6a-y _6qw5 _77yo" data-testid="UFI2ReactionLink" onclick="likeAndUnlikeComment('+itemVideo.topic+','+itemVideo.id+');" href="javascript:void(0);" role="button" tabindex="-1">Like<span class="likedStatus-'+itemVideo.id+' hide">d</span></a> </div></span> - '+itemVideo.date+'</div></div></div>';
+
+      
+        });
+        $(".videoCommentId").append(listCommentItems);
+        var loadMoreComment='<span class="loadMoreComment"><a class="" onclick="loadMoreComments(\''+data.next+'\');" href="javascript:void(0);">Load More Comments...</a></span';
+        $(".loadMoreComments").html(loadMoreComment);
+        loaderBoloHide();
+
+    });
+}
+
+
+function followLikeList(){
+    check_login_status();
+
+    var ge_local_data="";
+        ge_local_data = JSON.parse(localStorage.getItem("access_data"));
+    var accessToken=ge_local_data.access_token;
+    var listCommentItems="";
+
+    //================Comments List =================
+    var uri='/api/v1/follow_like_list/';
+    var res = encodeURI(uri);
+    jQuery.ajax({
+        url:res,
+        type:"POST",
+        headers: {
+          'Authorization':'Bearer '+accessToken,
+        },
+        success: function(response,textStatus, xhr){
+            userLikeAndUnlike=response;
+            var countFollowStatus=userLikeAndUnlike.all_follow;
+            if(undefined !==countFollowStatus && countFollowStatus.length>0){
+                var followList=userLikeAndUnlike.all_follow;
+                followList.forEach(function(followId){
+                    followStatus=jQuery('.followCheck').hasClass('followStatusChange-'+followId);
+                    if(followStatus==true){
+                        jQuery('.followStatusChange-'+followId).removeClass('sx_5da455');
+                        jQuery('.followStatusChange-'+followId).addClass('sx_5da456');
+                        jQuery('.btnTextChange-'+followId).text('Followed');
+                    }
+
+                });
+            }
+        }
+  
+    });
+
+}
+
+jQuery(document).ready(function(){
+    followLikeList();
+});
+
+
+
+</script>
+
+
+<!-- End Load Comments  -->
+{% endblock %}
+
+

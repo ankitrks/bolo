@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Spirit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-23 19:55+0000\n"
+"POT-Creation-Date: 2019-12-12 17:26+0530\n"
 "PO-Revision-Date: 2015-10-14 19:36+0000\n"
 "Last-Translator: Esteban M. Castro Borsani <ecastroborsani@gmail.com>\n"
 "Language-Team: German (http://www.transifex.com/spirit-project/spirit/"
@@ -15,158 +15,496 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: forms.py:26
+#: forum/topic/forms.py:35
 msgid "Category"
 msgstr "Kategorie"
 
-#: forms.py:27
+#: forum/topic/forms.py:36
 msgid "Chose a category"
 msgstr "Kategorie auswählen"
 
-#: models.py:19
+#: forum/topic/models.py:55 forum/topic/models.py:639
+msgid "Bolo Score"
+msgstr ""
+
+#: forum/topic/models.py:89 forum/topic/models.py:90
 msgid "category"
 msgstr "Kategorie"
 
-#: models.py:21
+#: forum/topic/models.py:93
 msgid "title"
 msgstr "Titel"
 
-#: models.py:23
+#: forum/topic/models.py:94
+#, fuzzy
+#| msgid "title"
+msgid "audio title"
+msgstr "Titel"
+
+#: forum/topic/models.py:95
+#, fuzzy
+#| msgid "title"
+msgid "video title"
+msgstr "Titel"
+
+#: forum/topic/models.py:97
 msgid "date"
 msgstr "Datum"
 
-#: models.py:24
+#: forum/topic/models.py:98
 msgid "last active"
 msgstr "zuletzt aktiv"
 
-#: models.py:26
+#: forum/topic/models.py:99
+msgid "reindex at"
+msgstr ""
+
+#: forum/topic/models.py:100
+msgid "language"
+msgstr ""
+
+#: forum/topic/models.py:101
+msgid "Question image"
+msgstr ""
+
+#: forum/topic/models.py:102
+msgid "Popular"
+msgstr ""
+
+#: forum/topic/models.py:105
+msgid "duration"
+msgstr ""
+
+#: forum/topic/models.py:106
+msgid "Last Commented"
+msgstr ""
+
+#: forum/topic/models.py:108
 msgid "pinned"
 msgstr "festgeheftet"
 
-#: models.py:27
+#: forum/topic/models.py:109
 msgid "globally pinned"
 msgstr ""
 
-#: models.py:28
+#: forum/topic/models.py:110
 msgid "closed"
 msgstr "geschlossen"
 
-#: models.py:31
-msgid "views count"
+#: forum/topic/models.py:111
+msgid "removed"
+msgstr ""
+
+#: forum/topic/models.py:112
+msgid "thumbnail"
+msgstr ""
+
+#: forum/topic/models.py:113
+#: forum/topic/templates/spirit/topic/new_landing.html:59
+#: forum/topic/templates/spirit/topic/new_landing.html:65
+#: forum/topic/templates/spirit/topic/new_landing.html:71
+#, fuzzy
+#| msgid "views count"
+msgid "views"
 msgstr "gelesen"
 
-#: models.py:32
+#: forum/topic/models.py:114
 msgid "comment count"
 msgstr "Kommentare"
 
-#: models.py:38
+#: forum/topic/models.py:115
+msgid "Total Share count"
+msgstr ""
+
+#: forum/topic/models.py:116
+#, fuzzy
+#| msgid "views count"
+msgid "Share count"
+msgstr "gelesen"
+
+#: forum/topic/models.py:119
+msgid "Is Video Bytes"
+msgstr ""
+
+#: forum/topic/models.py:120
+#, fuzzy
+#| msgid "views count"
+msgid "Likes count"
+msgstr "gelesen"
+
+#: forum/topic/models.py:122
+msgid "monetized"
+msgstr ""
+
+#: forum/topic/models.py:123
+msgid "vb width"
+msgstr ""
+
+#: forum/topic/models.py:124
+msgid "vb height"
+msgstr ""
+
+#: forum/topic/models.py:131
+msgid "backup url"
+msgstr ""
+
+#: forum/topic/models.py:134
+msgid "Transcode Job ID"
+msgstr ""
+
+#: forum/topic/models.py:135
+msgid "Transcode Dump"
+msgstr ""
+
+#: forum/topic/models.py:136
+msgid "Transcode Status Dump (Job Status)"
+msgstr ""
+
+#: forum/topic/models.py:138
+msgid "M3U8 Content"
+msgstr ""
+
+#: forum/topic/models.py:139
+msgid "Audio M3U8 Content"
+msgstr ""
+
+#: forum/topic/models.py:140
+msgid "Video M3U8 Content"
+msgstr ""
+
+#: forum/topic/models.py:158
 msgid "topic"
 msgstr "Thema"
 
-#: models.py:39
+#: forum/topic/models.py:159
 msgid "topics"
 msgstr "Themen"
 
-#: templates/spirit/topic/_render_list.html:37
-msgid "There are no topics here, yet"
-msgstr "Es gibt keine Themen, bis jetzt..."
+#: forum/topic/models.py:392
+msgid "Hash Tag"
+msgstr ""
 
-#: templates/spirit/topic/_top_bar.html:8
-#: templates/spirit/topic/_top_bar.html:19
-msgid "All Categories"
-msgstr "Alle Kategorien"
+#: forum/topic/models.py:393
+msgid "English Hash Tag Description"
+msgstr ""
 
-#: templates/spirit/topic/_top_bar.html:17
-msgid "All Subcategories"
-msgstr "Alle Unterkategorien"
+#: forum/topic/models.py:394
+msgid "Hindi Hash Tag Description"
+msgstr ""
 
-#: templates/spirit/topic/_top_bar.html:27
-#: templates/spirit/topic/_top_bar.html:29
-msgid "Create Topic"
-msgstr "Thema erstellen"
+#: forum/topic/models.py:395
+msgid "Tamil Hash Tag Description"
+msgstr ""
 
-#: templates/spirit/topic/active.html:5
-msgid "Latest active topics"
-msgstr "zuletzt aktive Themen"
+#: forum/topic/models.py:396
+msgid "Telgu Hash Tag Description"
+msgstr ""
 
-#: templates/spirit/topic/detail.html:10
+#: forum/topic/models.py:397
+msgid "Bengali Hash Tag Description"
+msgstr ""
+
+#: forum/topic/models.py:398
+msgid "Kannada Hash Tag Description"
+msgstr ""
+
+#: forum/topic/models.py:399
+msgid "Picture URL"
+msgstr ""
+
+#: forum/topic/models.py:434
+msgid "notification_type"
+msgstr ""
+
+#: forum/topic/models.py:618
+msgid "Match Name"
+msgstr ""
+
+#: forum/topic/models.py:619
+msgid "Team 1"
+msgstr ""
+
+#: forum/topic/models.py:620
+msgid "Team 1 Flag"
+msgstr ""
+
+#: forum/topic/models.py:621
+msgid "Team 2"
+msgstr ""
+
+#: forum/topic/models.py:622
+msgid "Team 2 Flag"
+msgstr ""
+
+#: forum/topic/models.py:623
+msgid "Match Datetime"
+msgstr ""
+
+#: forum/topic/models.py:635 forum/topic/models.py:650
+#, fuzzy
+#| msgid "title"
+msgid "Title"
+msgstr "Titel"
+
+#: forum/topic/models.py:636
+msgid "Activate DateTime"
+msgstr ""
+
+#: forum/topic/models.py:637
+msgid "Deactivate DateTime"
+msgstr ""
+
+#: forum/topic/models.py:638
+msgid "Score"
+msgstr ""
+
+#: forum/topic/models.py:651
+msgid "Option Image"
+msgstr ""
+
+#: forum/topic/models.py:673
+msgid "Total Score"
+msgstr ""
+
+#: forum/topic/models.py:674
+msgid "Total Prediction"
+msgstr ""
+
+#: forum/topic/models.py:675 forum/topic/models.py:676
+#: forum/topic/models.py:677
+msgid "Correct Prediction"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:10
 msgid "Main"
 msgstr "Main"
 
-#: templates/spirit/topic/detail.html:30 templates/spirit/topic/detail.html:32
+#: forum/topic/templates/spirit/topic/detail.html:30
+#: forum/topic/templates/spirit/topic/detail.html:32
 msgid "edit"
 msgstr "editieren"
 
-#: templates/spirit/topic/detail.html:42
+#: forum/topic/templates/spirit/topic/detail.html:42
 msgid "Select comments to move"
 msgstr "Kommentar zum verschieben auswählen"
 
-#: templates/spirit/topic/detail.html:45
+#: forum/topic/templates/spirit/topic/detail.html:45
 msgid "Undelete topic"
 msgstr "Thema wiederherstellen"
 
-#: templates/spirit/topic/detail.html:47
+#: forum/topic/templates/spirit/topic/detail.html:47
 msgid "Delete topic"
 msgstr "Thema löschen"
 
-#: templates/spirit/topic/detail.html:51
+#: forum/topic/templates/spirit/topic/detail.html:51
 msgid "Open topic"
 msgstr "Thema öffnen"
 
-#: templates/spirit/topic/detail.html:53
+#: forum/topic/templates/spirit/topic/detail.html:53
 msgid "Close topic"
 msgstr "Thema schließen"
 
-#: templates/spirit/topic/detail.html:57
+#: forum/topic/templates/spirit/topic/detail.html:57
 msgid "Unpin topic"
 msgstr "Thema loslösen"
 
-#: templates/spirit/topic/detail.html:59
+#: forum/topic/templates/spirit/topic/detail.html:59
 msgid "Pin topic"
 msgstr "Thema gefestigen"
 
-#: templates/spirit/topic/detail.html:63
+#: forum/topic/templates/spirit/topic/detail.html:63
 msgid "Unpin topic globally"
 msgstr ""
 
-#: templates/spirit/topic/detail.html:65
+#: forum/topic/templates/spirit/topic/detail.html:65
 msgid "Pin topic globally"
 msgstr ""
 
-#: templates/spirit/topic/detail.html:74
+#: forum/topic/templates/spirit/topic/detail.html:74
 msgid "Topic id"
 msgstr "Themen id"
 
-#: templates/spirit/topic/detail.html:76
+#: forum/topic/templates/spirit/topic/detail.html:76
 msgid "Move"
 msgstr "verschiebe"
 
-#: templates/spirit/topic/detail.html:90
+#: forum/topic/templates/spirit/topic/detail.html:90
 msgid "Reply"
 msgstr "Antworten"
 
-#: templates/spirit/topic/moderate.html:5
-#: templates/spirit/topic/moderate.html:9
+#: forum/topic/templates/spirit/topic/main_landing.html:216
+msgid "Get"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/moderate.html:5
+#: forum/topic/templates/spirit/topic/moderate.html:9
 msgid "Moderate topic"
 msgstr "Thema moderieren"
 
-#: templates/spirit/topic/moderate.html:14
+#: forum/topic/templates/spirit/topic/moderate.html:14
 msgid "Apply"
 msgstr "akzeptieren"
 
-#: templates/spirit/topic/publish.html:5
-#: templates/spirit/topic/publish.html:21
+#: forum/topic/templates/spirit/topic/new_landing.html:27
+msgid "Popular Videos"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/new_landing.html:54
+#, fuzzy
+#| msgid "Trending Hashtags"
+msgid "Trending Categories"
+msgstr "Treding Test"
+
+#: forum/topic/templates/spirit/topic/new_landing.html:79
+msgid "Get the App"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/publish.html:6
 msgid "Publish topic"
 msgstr "Thema veröffentlichen"
 
-#: templates/spirit/topic/publish.html:37
+#: forum/topic/templates/spirit/topic/publish.html:88
+msgid "Start discussion"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/publish.html:106
 msgid "Publish"
 msgstr "veröffentlichen"
 
-#: templates/spirit/topic/update.html:5 templates/spirit/topic/update.html:9
+#: forum/topic/templates/spirit/topic/topic_details_by_category.html:209
+#: forum/topic/templates/spirit/topic/user_details.html:205
+#, fuzzy
+#| msgid "Create Topic"
+msgid "Creators"
+msgstr "Thema erstellen"
+
+#: forum/topic/templates/spirit/topic/topic_details_by_category.html:209
+#: forum/topic/templates/spirit/topic/topic_details_by_category.html:222
+#: forum/topic/templates/spirit/topic/user_details.html:205
+#: forum/topic/templates/spirit/topic/user_details.html:215
+msgid "See All"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/topic_details_by_category.html:222
+#: forum/topic/templates/spirit/topic/user_details.html:215
+#: forum/topic/templates/spirit/topic/video_discover.html:67
+msgid "Discover"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/update.html:5
+#: forum/topic/templates/spirit/topic/update.html:9
 msgid "Update topic"
 msgstr "Thema aktualisieren"
 
-#: templates/spirit/topic/update.html:15
+#: forum/topic/templates/spirit/topic/update.html:15
 msgid "Update"
 msgstr "aktualisieren"
+
+#: forum/topic/templates/spirit/topic/user_details.html:176
+msgid "Verified account"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/user_details.html:177
+msgid "Following"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/user_details.html:177
+msgid "Followers"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/user_details.html:178
+#, fuzzy
+#| msgid "views count"
+msgid "Likes"
+msgstr "gelesen"
+
+#: forum/topic/templates/spirit/topic/video_details.html:1017
+#, fuzzy
+#| msgid "views count"
+msgid "likes"
+msgstr "gelesen"
+
+#: forum/topic/templates/spirit/topic/video_details.html:1017
+#, fuzzy
+#| msgid "comment count"
+msgid "comments"
+msgstr "Kommentare"
+
+#: forum/topic/templates/spirit/topic/video_details.html:1045
+msgid "Like"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/video_details.html:1051
+#, fuzzy
+#| msgid "comment count"
+msgid "Comment"
+msgstr "Kommentare"
+
+#: forum/topic/templates/spirit/topic/video_details.html:1099
+msgid "COPY"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/video_details.html:1108
+msgid "Trends"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/video_discover.html:68
+msgid "Be the first to watch the latest videos"
+msgstr ""
+
+#, fuzzy
+#~| msgid "Chose a category"
+#~ msgid "Choose Picture"
+#~ msgstr "Kategorie auswählen"
+
+#, fuzzy
+#~| msgid "closed"
+#~ msgid "Close"
+#~ msgstr "geschlossen"
+
+#, fuzzy
+#~| msgid "Delete topic"
+#~ msgid "Delete"
+#~ msgstr "Thema löschen"
+
+#, fuzzy
+#~| msgid "comment count"
+#~ msgid "has commented on"
+#~ msgstr "Kommentare"
+
+#, fuzzy
+#~| msgid "last active"
+#~ msgid "Last Name"
+#~ msgstr "zuletzt aktiv"
+
+#, fuzzy
+#~| msgid "Open topic"
+#~ msgid "Open Podcasts"
+#~ msgstr "Thema öffnen"
+
+#, fuzzy
+#~| msgid "views count"
+#~ msgid "Preview"
+#~ msgstr "gelesen"
+
+#, fuzzy
+#~| msgid "title"
+#~ msgid "Video Bytes"
+#~ msgstr "Titel"
+
+#, fuzzy
+#~| msgid "title"
+#~ msgid "Video Title"
+#~ msgstr "Titel"
+
+#~ msgid "There are no topics here, yet"
+#~ msgstr "Es gibt keine Themen, bis jetzt..."
+
+#~ msgid "All Categories"
+#~ msgstr "Alle Kategorien"
+
+#~ msgid "All Subcategories"
+#~ msgstr "Alle Unterkategorien"
+
+#~ msgid "Latest active topics"
+#~ msgstr "zuletzt aktive Themen"

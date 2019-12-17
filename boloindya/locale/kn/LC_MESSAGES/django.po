@@ -1,0 +1,754 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-12-12 17:26+0530\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: drf_spirit/config.py:6
+msgid "comment"
+msgstr ""
+
+#: drf_spirit/config.py:7
+msgid "topic moved"
+msgstr ""
+
+#: drf_spirit/config.py:8
+msgid "topic closed"
+msgstr ""
+
+#: drf_spirit/config.py:9
+msgid "topic unclosed"
+msgstr ""
+
+#: drf_spirit/config.py:10
+msgid "topic pinned"
+msgstr ""
+
+#: drf_spirit/config.py:11
+msgid "topic unpinned"
+msgstr ""
+
+#: drf_spirit/emails.py:19
+msgid "A new comment has been made"
+msgstr ""
+
+#: drf_spirit/models.py:9 jarvis/models.py:164
+msgid "title"
+msgstr ""
+
+#: drf_spirit/models.py:10
+msgid "OTP"
+msgstr ""
+
+#: drf_spirit/models.py:11
+msgid "Active?"
+msgstr ""
+
+#: drf_spirit/models.py:12
+msgid "Created At"
+msgstr ""
+
+#: drf_spirit/models.py:13
+msgid "Used At"
+msgstr ""
+
+#: drf_spirit/models.py:14
+msgid "is reset password?"
+msgstr ""
+
+#: drf_spirit/models.py:15
+msgid "is for change phone number?"
+msgstr ""
+
+#: drf_spirit/models.py:184
+msgid "dump"
+msgstr ""
+
+#: drf_spirit/models.py:185
+msgid "dump_type"
+msgstr ""
+
+#: drf_spirit/models.py:186
+msgid "sync_time"
+msgstr ""
+
+#: drf_spirit/models.py:187
+msgid "is_executed"
+msgstr ""
+
+#: drf_spirit/models.py:201 drf_spirit/models.py:227 drf_spirit/models.py:242
+#: drf_spirit/models.py:251 drf_spirit/models.py:258 drf_spirit/models.py:270
+#: drf_spirit/models.py:282 drf_spirit/models.py:298 drf_spirit/models.py:313
+#: drf_spirit/models.py:320
+msgid "user"
+msgstr ""
+
+#: drf_spirit/models.py:202
+msgid "phone_details"
+msgstr ""
+
+#: drf_spirit/models.py:203
+msgid "user_lang"
+msgstr ""
+
+#: drf_spirit/models.py:204
+msgid "num_profile_follow"
+msgstr ""
+
+#: drf_spirit/models.py:205
+msgid "num_profile_unfollow"
+msgstr ""
+
+#: drf_spirit/models.py:206
+msgid "num_viewed_profiles"
+msgstr ""
+
+#: drf_spirit/models.py:207
+msgid "num_profile_reported"
+msgstr ""
+
+#: drf_spirit/models.py:208
+msgid "num_viewed_following_list"
+msgstr ""
+
+#: drf_spirit/models.py:209
+msgid "num_entry_points"
+msgstr ""
+
+#: drf_spirit/models.py:210
+msgid "num_vb_commented"
+msgstr ""
+
+#: drf_spirit/models.py:211
+msgid "num_vb_liked"
+msgstr ""
+
+#: drf_spirit/models.py:212
+msgid "num_vb_shared"
+msgstr ""
+
+#: drf_spirit/models.py:213
+msgid "num_vb_unliked"
+msgstr ""
+
+#: drf_spirit/models.py:214
+msgid "num_vb_viewed"
+msgstr ""
+
+#: drf_spirit/models.py:215
+msgid "session_starttime"
+msgstr ""
+
+#: drf_spirit/models.py:228 drf_spirit/models.py:271
+msgid "profileid"
+msgstr ""
+
+#: drf_spirit/models.py:229 drf_spirit/models.py:244 drf_spirit/models.py:253
+#: drf_spirit/models.py:260 drf_spirit/models.py:272 drf_spirit/models.py:284
+#: drf_spirit/models.py:301 drf_spirit/models.py:309 drf_spirit/models.py:315
+#: drf_spirit/models.py:321
+msgid "timestamp"
+msgstr ""
+
+#: drf_spirit/models.py:230 drf_spirit/models.py:273
+msgid "relationship_type"
+msgstr ""
+
+#: drf_spirit/models.py:231
+msgid "share_medium"
+msgstr ""
+
+#: drf_spirit/models.py:243 drf_spirit/models.py:252 drf_spirit/models.py:299
+msgid "videoid"
+msgstr ""
+
+#: drf_spirit/models.py:245
+msgid "video_type"
+msgstr ""
+
+#: drf_spirit/models.py:259
+msgid "entrypoint"
+msgstr ""
+
+#: drf_spirit/models.py:283
+msgid "categoryid"
+msgstr ""
+
+#: drf_spirit/models.py:285
+msgid "category_status"
+msgstr ""
+
+#: drf_spirit/models.py:300
+msgid "share_platform"
+msgstr ""
+
+#: drf_spirit/models.py:306 drf_spirit/models.py:347
+msgid "userid"
+msgstr ""
+
+#: drf_spirit/models.py:307
+msgid "fragmentid"
+msgstr ""
+
+#: drf_spirit/models.py:308
+msgid "time_spent(ms)"
+msgstr ""
+
+#: drf_spirit/models.py:314
+msgid "searchquery"
+msgstr ""
+
+#: drf_spirit/models.py:325
+msgid "day_month"
+msgstr ""
+
+#: drf_spirit/models.py:326
+msgid "day_week"
+msgstr ""
+
+#: drf_spirit/models.py:327
+msgid "hour"
+msgstr ""
+
+#: drf_spirit/models.py:328 drf_spirit/models.py:341
+msgid "month"
+msgstr ""
+
+#: drf_spirit/models.py:329 drf_spirit/models.py:342
+msgid "year"
+msgstr ""
+
+#: drf_spirit/models.py:330 drf_spirit/models.py:336 drf_spirit/models.py:343
+msgid "frequency"
+msgstr ""
+
+#: drf_spirit/models.py:331 drf_spirit/models.py:337
+msgid "date_time_field"
+msgstr ""
+
+#: drf_spirit/models.py:335
+msgid "day_month_year"
+msgstr ""
+
+#: drf_spirit/models.py:348
+msgid "total_memory"
+msgstr ""
+
+#: drf_spirit/models.py:349
+msgid "memory_free"
+msgstr ""
+
+#: drf_spirit/models.py:350
+msgid "memory_available"
+msgstr ""
+
+#: drf_spirit/models.py:351
+msgid "swap_cached"
+msgstr ""
+
+#: drf_spirit/models.py:352
+msgid "active"
+msgstr ""
+
+#: drf_spirit/models.py:353
+msgid "inactive"
+msgstr ""
+
+#: drf_spirit/models.py:354
+msgid "unevictable"
+msgstr ""
+
+#: drf_spirit/models.py:355
+msgid "locked"
+msgstr ""
+
+#: drf_spirit/models.py:356
+msgid "swap_total"
+msgstr ""
+
+#: drf_spirit/models.py:357
+msgid "swap_free"
+msgstr ""
+
+#: drf_spirit/models.py:358
+msgid "dirty"
+msgstr ""
+
+#: drf_spirit/models.py:359
+msgid "write_back"
+msgstr ""
+
+#: drf_spirit/models.py:360
+msgid "annon_pages"
+msgstr ""
+
+#: drf_spirit/models.py:361
+msgid "mapped"
+msgstr ""
+
+#: drf_spirit/models.py:362
+msgid "shmem"
+msgstr ""
+
+#: drf_spirit/models.py:363
+msgid "slab"
+msgstr ""
+
+#: drf_spirit/models.py:364
+msgid "sreclaimable"
+msgstr ""
+
+#: drf_spirit/models.py:365
+msgid "sunreclaimable"
+msgstr ""
+
+#: drf_spirit/models.py:366
+msgid "kernelstack"
+msgstr ""
+
+#: drf_spirit/models.py:367
+msgid "pagetables"
+msgstr ""
+
+#: drf_spirit/models.py:368
+msgid "nfs_unstable"
+msgstr ""
+
+#: drf_spirit/models.py:369
+msgid "bounce"
+msgstr ""
+
+#: drf_spirit/models.py:370
+msgid "writebacktemp"
+msgstr ""
+
+#: drf_spirit/models.py:371
+msgid "commit_limit"
+msgstr ""
+
+#: drf_spirit/models.py:372
+msgid "commit_as"
+msgstr ""
+
+#: drf_spirit/models.py:373
+msgid "malloc_total"
+msgstr ""
+
+#: drf_spirit/models.py:374
+msgid "malloc_used"
+msgstr ""
+
+#: drf_spirit/models.py:375
+msgid "malloc_chunk"
+msgstr ""
+
+#: drf_spirit/models.py:381
+msgid "contact_email"
+msgstr ""
+
+#: drf_spirit/models.py:383
+msgid "feedback_image"
+msgstr ""
+
+#: forum/payment/models.py:14
+msgid "Duration Type"
+msgstr ""
+
+#: forum/payment/models.py:15
+msgid "Duration Period"
+msgstr ""
+
+#: forum/payment/models.py:16 forum/payment/models.py:26
+msgid "Duration Start Date"
+msgstr ""
+
+#: forum/payment/models.py:22
+msgid "PaymentCycle"
+msgstr ""
+
+#: forum/payment/models.py:23
+msgid "PaymentCycle's"
+msgstr ""
+
+#: forum/payment/models.py:27
+msgid "Duration End Date"
+msgstr ""
+
+#: forum/payment/models.py:28
+msgid "Bolo Scores Earned"
+msgstr ""
+
+#: forum/payment/models.py:29
+msgid "Equivalnet INR"
+msgstr ""
+
+#: forum/payment/models.py:30
+msgid "Bolo Score Details"
+msgstr ""
+
+#: forum/payment/models.py:31
+msgid "Is Encashed?"
+msgstr ""
+
+#: forum/payment/models.py:33
+msgid "Is Eligible For Encash?"
+msgstr ""
+
+#: forum/payment/models.py:34
+msgid "Is Expired?"
+msgstr ""
+
+#: forum/payment/models.py:35
+msgid "Encash Cycle"
+msgstr ""
+
+#: forum/payment/models.py:41
+msgid "EncashableDetail"
+msgstr ""
+
+#: forum/payment/models.py:42
+msgid "EncashableDetail's"
+msgstr ""
+
+#: forum/payment/models.py:52
+msgid "Transaction Method"
+msgstr ""
+
+#: forum/payment/models.py:53
+msgid "Transaction Number"
+msgstr ""
+
+#: forum/payment/models.py:59
+msgid "PaymentInfo"
+msgstr ""
+
+#: forum/payment/models.py:60
+msgid "PaymentInfo's"
+msgstr ""
+
+#: forum/userkyc/models.py:34
+msgid "UserKyc"
+msgstr ""
+
+#: forum/userkyc/models.py:35
+msgid "UserKYC's"
+msgstr ""
+
+#: forum/userkyc/models.py:45
+msgid "First Name"
+msgstr ""
+
+#: forum/userkyc/models.py:46
+msgid "Middle Name"
+msgstr ""
+
+#: forum/userkyc/models.py:47
+msgid "Last Name"
+msgstr ""
+
+#: forum/userkyc/models.py:49
+msgid "Mobile No"
+msgstr ""
+
+#: forum/userkyc/models.py:53
+msgid "Pic Selfie"
+msgstr ""
+
+#: forum/userkyc/models.py:57 forum/userkyc/models.py:89
+#: forum/userkyc/models.py:123 forum/userkyc/models.py:145
+msgid "Reject Text"
+msgstr ""
+
+#: forum/userkyc/models.py:63
+msgid "KYCbasicInfo"
+msgstr ""
+
+#: forum/userkyc/models.py:64
+msgid "KYCbasicInfo's"
+msgstr ""
+
+#: forum/userkyc/models.py:67
+msgid "Document Name"
+msgstr ""
+
+#: forum/userkyc/models.py:74
+msgid "KYCDocumentType"
+msgstr ""
+
+#: forum/userkyc/models.py:75
+msgid "KYCDocumentType's"
+msgstr ""
+
+#: forum/userkyc/models.py:85
+msgid "Document Front Url"
+msgstr ""
+
+#: forum/userkyc/models.py:86
+msgid "Document Back Url"
+msgstr ""
+
+#: forum/userkyc/models.py:95
+msgid "KYCDocument"
+msgstr ""
+
+#: forum/userkyc/models.py:96
+msgid "KYCDocument's"
+msgstr ""
+
+#: forum/userkyc/models.py:115
+msgid "Father First Name"
+msgstr ""
+
+#: forum/userkyc/models.py:116
+msgid "Father Last Name"
+msgstr ""
+
+#: forum/userkyc/models.py:117
+msgid "Mother First Name"
+msgstr ""
+
+#: forum/userkyc/models.py:118
+msgid "Mother Last Name"
+msgstr ""
+
+#: forum/userkyc/models.py:129
+msgid "AdditionalInfo"
+msgstr ""
+
+#: forum/userkyc/models.py:130
+msgid "AdditionalInfo's"
+msgstr ""
+
+#: forum/userkyc/models.py:138
+msgid "Bank Name"
+msgstr ""
+
+#: forum/userkyc/models.py:139
+msgid "Account Holder Name"
+msgstr ""
+
+#: forum/userkyc/models.py:140
+msgid "Account Number"
+msgstr ""
+
+#: forum/userkyc/models.py:141
+msgid "IFSC Code"
+msgstr ""
+
+#: forum/userkyc/models.py:142
+msgid "Paytm Mobile No"
+msgstr ""
+
+#: forum/userkyc/models.py:151
+msgid "BankDetail"
+msgstr ""
+
+#: forum/userkyc/models.py:152
+msgid "BankDetail's"
+msgstr ""
+
+#: jarvis/admin.py:57
+msgid "Message was sent."
+msgstr ""
+
+#: jarvis/admin.py:69 templates/fcm/send_message.html:5
+#: templates/fcm/send_message.html:11
+msgid "Send message"
+msgstr ""
+
+#: jarvis/models.py:16
+msgid "Category Name"
+msgstr ""
+
+#: jarvis/models.py:27
+msgid "S3 File URL"
+msgstr ""
+
+#: jarvis/models.py:29
+msgid "Transcoded File URL"
+msgstr ""
+
+#: jarvis/models.py:30
+msgid "Transcode Job ID"
+msgstr ""
+
+#: jarvis/models.py:31
+msgid "Transcode Dump"
+msgstr ""
+
+#: jarvis/models.py:32
+msgid "Filename Uploaded"
+msgstr ""
+
+#: jarvis/models.py:33 jarvis/models.py:34 jarvis/models.py:35
+msgid "Filename changed"
+msgstr ""
+
+#: jarvis/models.py:36
+msgid "Is Free Video?"
+msgstr ""
+
+#: jarvis/models.py:37
+msgid "Video Title"
+msgstr ""
+
+#: jarvis/models.py:39
+msgid "Video Description"
+msgstr ""
+
+#: jarvis/models.py:40
+msgid "Meta Title"
+msgstr ""
+
+#: jarvis/models.py:41
+msgid "Meta Description"
+msgstr ""
+
+#: jarvis/models.py:42
+msgid "Meta Keywords"
+msgstr ""
+
+#: jarvis/models.py:43
+msgid "Thumbnail URL"
+msgstr ""
+
+#: jarvis/models.py:44
+msgid "duration"
+msgstr ""
+
+#: jarvis/models.py:165
+msgid "description"
+msgstr ""
+
+#: settings.py:319
+msgid "English"
+msgstr ""
+
+#: settings.py:320
+msgid "Hindi"
+msgstr ""
+
+#: settings.py:321
+msgid "Tamil"
+msgstr ""
+
+#: settings.py:322
+msgid "Telgu"
+msgstr ""
+
+#: settings.py:323
+msgid "Bengali"
+msgstr ""
+
+#: settings.py:324
+msgid "Kannada"
+msgstr ""
+
+#: settings.py:325
+msgid "Malayalam"
+msgstr ""
+
+#: settings.py:326
+msgid "Marathi"
+msgstr ""
+
+#: templates/admin/forum_comment/comment/change_form.html:147
+#: templates/admin/forum_topic/topic/change_form.html:147
+msgid "Open All Items"
+msgstr ""
+
+#: templates/admin/forum_comment/comment/change_form.html:148
+#: templates/admin/forum_topic/topic/change_form.html:148
+msgid "Close All Items"
+msgstr ""
+
+#: templates/admin/forum_comment/comment/change_form.html:157
+#: templates/admin/forum_comment/comment/change_list.html:166
+#: templates/admin/forum_comment/comment/change_list1.html:39
+#: templates/admin/forum_topic/topic/change_form.html:157
+#: templates/admin/forum_topic/topic/change_list.html:167
+#: templates/admin/forum_user/referralcode/change_list.html:83
+msgid "Home"
+msgstr ""
+
+#: templates/admin/forum_comment/comment/change_form.html:163
+#: templates/admin/forum_topic/topic/change_form.html:163
+msgid "Add"
+msgstr ""
+
+#: templates/admin/forum_comment/comment/change_form.html:174
+#: templates/admin/forum_comment/comment/change_form.html:183
+#: templates/admin/forum_topic/topic/change_form.html:174
+#: templates/admin/forum_topic/topic/change_form.html:183
+msgid "< Back to topics"
+msgstr ""
+
+#: templates/admin/forum_comment/comment/change_form.html:176
+#: templates/admin/forum_topic/topic/change_form.html:176
+msgid "History"
+msgstr ""
+
+#: templates/admin/forum_comment/comment/change_form.html:177
+#: templates/admin/forum_topic/topic/change_form.html:177
+msgid "View on site"
+msgstr ""
+
+#: templates/admin/forum_comment/comment/change_form.html:199
+#: templates/admin/forum_comment/comment/change_list.html:247
+#: templates/admin/forum_comment/comment/change_list1.html:68
+#: templates/admin/forum_topic/topic/change_form.html:199
+#: templates/admin/forum_topic/topic/change_list.html:248
+#: templates/admin/forum_user/referralcode/change_list.html:110
+msgid "Please correct the error below."
+msgstr ""
+
+#: templates/admin/forum_comment/comment/change_form.html:199
+#: templates/admin/forum_comment/comment/change_list.html:247
+#: templates/admin/forum_comment/comment/change_list1.html:68
+#: templates/admin/forum_topic/topic/change_form.html:199
+#: templates/admin/forum_topic/topic/change_list.html:248
+#: templates/admin/forum_user/referralcode/change_list.html:110
+msgid "Please correct the errors below."
+msgstr ""
+
+#: templates/admin/forum_comment/comment/change_list.html:184
+#: templates/admin/forum_topic/topic/change_list.html:185
+#: templates/admin/forum_user/referralcode/change_list.html:101
+#, python-format
+msgid "Add %(name)s"
+msgstr ""
+
+#: templates/admin/forum_comment/comment/change_list.html:213
+#: templates/admin/forum_comment/comment/change_list1.html:79
+#: templates/admin/forum_topic/topic/change_list.html:214
+#: templates/admin/forum_user/referralcode/change_list.html:123
+msgid "Filter"
+msgstr ""
+
+#: templates/admin/forum_comment/comment/change_list.html:274
+#: templates/admin/forum_topic/topic/change_list.html:275
+msgid "Save"
+msgstr ""
+
+#: templates/admin/forum_comment/comment/change_list1.html:59
+#, python-format
+msgid "Add  %(name)s"
+msgstr ""
+
+#: templates/fcm/send_message.html:21
+msgid "Send"
+msgstr ""

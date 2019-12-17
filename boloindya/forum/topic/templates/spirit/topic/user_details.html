@@ -1,0 +1,261 @@
+{% extends "spirit/_new_base.html" %}
+{% load spirit_tags i18n %}
+{% load i18n %}
+{% load number_formate_change_tag %}
+{% block title %}BoloIndya{% endblock %}
+{% block content %}
+
+<!-- Social Share Code -->
+<link rel="canonical" href="" />      
+<meta property="og:url" content=""/>
+<meta property="og:type" content="website" />
+<meta property='og:title' content='' />
+<meta name="twitter:title" content="" />
+<meta name="twitter:site" content="@BoloIndya" />
+<meta name="twitter:creator" content="@BoloIndya" />
+<meta name="twitter:card" content="summary" />
+<meta property='og:description' content='Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India' />       
+<meta property='og:image' content='' />
+<link rel="image_src" href=""/>
+<!-- Social Share Code End -->
+
+<style type="text/css">
+    #infinite-list {
+        /* We need to limit the height and show a scrollbar */
+        width: 200px;
+        height: 300px;
+        overflow: auto;
+
+        /* Optional, only to check that it works with margin/padding */
+        margin: 30px;
+        padding: 20px;
+        border: 10px solid black;
+    }
+
+    /* Optional eye candy below: */
+    .sidebarLi li {
+      padding: 10px;
+      list-style-type: none;
+    }
+    .sidebarLi li:hover {
+        background: #cccccc29;
+    }
+    .count-infos {
+        font-size: 15px;
+        line-height: 18px;
+        color: rgba(235, 235, 238, 0.75);
+        margin-bottom: 12px;
+    }
+    .count-infos .number {
+        font-family: proxima-semibold, PingFangSC, sans-serif;
+        font-weight: 600;
+    }
+    .count-infos .unit:not(:last-child) {
+        margin-right: 16px;
+    }
+
+    .count-infos .unit {
+        font-family: proxima-regular, PingFangSC, sans-serif;
+        font-weight: 400;
+    }
+    .center{
+        text-align: center;
+    }
+
+    .card-footer.no-avatar.jsx-1543915374 {
+        padding-top: 67px;
+    }
+    .card-footer.jsx-1543915374 .like-icon.jsx-1543915374 {
+        margin-right: 7px;
+        vertical-align: middle;
+    }
+    .card-footer.jsx-1543915374 span.jsx-1543915374 {
+        font-family: proxima-semibold, PingFangSC, sans-serif;
+        font-weight: 600;
+        font-size: 17px;
+        line-height: 14px;
+        vertical-align: middle;
+        color: rgb(255, 255, 255);
+    }
+    .card-footer.jsx-1543915374 {
+        position: absolute;
+        width: 100%;
+        bottom: 0px;
+        height: 100px;
+        box-sizing: border-box;
+        background: linear-gradient(rgba(22, 24, 35, 0) 2.92%, rgba(22, 24, 35, 0.5) 98.99%);
+        padding: 7px 13px 17px;
+    }
+    .video-card.jsx-3077367275 {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+    video.jsx-3382097194 {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .video-card.jsx-3077367275 .video-card-mask.jsx-3077367275, .video-card.jsx-3077367275 .event-delegate-mask.jsx-3077367275, .video-card.jsx-3077367275 .play-button {
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        right: 0px;
+        bottom: 0px;
+        cursor: pointer;
+    }
+
+    .video-feed.jsx-2893588005 .video-feed-item {
+        width: 233px;
+        cursor: pointer;
+
+    }
+    @media (max-width: 991px){
+    .video-feed.jsx-2893588005 .video-feed-item {
+        width: 33%;
+        height: auto;
+        margin-right: 0px;
+        margin-bottom: 0px;
+        padding: 9px 6px 0 9px;
+    }
+
+    .share-layout {
+        margin: auto;
+        padding: 120px 0px;
+        width: 100%;
+        display: inline-block;
+    }
+    .share-layout .share-layout-aside{
+        margin-left: 32px;
+    }
+    .jsx-578937417{
+        width: 127px;
+        height: 127px;
+        flex: 0 0 138px;
+    }
+    .header-tag.jsx-874583638 .content.jsx-874583638{
+        font-size: 9px;
+    }
+    .share-header .share-info {
+        padding-top: 4px;
+        margin-left: 28px;
+        flex: 1 1 auto;
+        width: 45%;
+    }
+    .count-infos {
+        font-size: 14px;
+        line-height: 18px;
+        color: rgba(235, 235, 238, 0.75);
+        margin-bottom: 12px;
+    }
+
+    }
+    @media (max-width: 320px){
+    .share-header .share-info {
+        padding-top: 4px;
+        margin-left: 7px;
+        flex: 1 1 auto;
+        width: 45%;
+    }
+    .jsx-578937417 {
+        width: 125px;
+        height: 125px;
+        flex: 0 0 138px;
+    }
+    }
+
+
+/*===========*/
+
+
+</style>
+<div class="jsx-3819228898">
+
+    <input type="hidden" name="id" id="currentUserId" value="{{user.id}}">
+    <div class="jsx-606928072 share-layout">
+        <div class="share-layout-content">
+            <header class="share-layout-header bottom-line share-header">
+                <div class="jsx-2177493926 jsx-578937417 avatar round userProfilAvator" style="background-image: url({{ user_profile.profile_pic}}); "></div>
+                <div class="share-info">
+                    <h1 class="share-title"> {{ user_profile.name}}</h1>
+                    <h1 class="share-sub-title">@{{ user.username}} <span class="jsx-874583638 header-tag has-icon"><span class="jsx-874583638 check-icon" style="background-color: rgb(24, 118, 242);"></span><span class="jsx-874583638 content">{% trans "Verified account" %}</span></span></h1>
+                    <p class="count-infos"><span class="number">{{ user_profile.follow_count | shorcountertopic}}</span><span class="unit"> {% trans "Following" %}</span><span class="number"> {{ user_profile.follower_count | shorcountertopic}}</span><span class="unit"> {% trans "Followers" %} </span>
+                        <span class="number"> {{ user_profile.like_count | shorcountertopic}}</span>
+                        <span class="unit"> {% trans "Likes" %}</span><span class="number"> </span>
+                        <span class="number" id="userVideoCountId">{{topicsCount | shorcountertopic}}</span><span class="unit"> {% trans "Videos" %}</span>
+                        <span class="unit" >
+                            <button style="margin-top: -5px;" onclick="follow_user('{{user_profile.id}}');" class="_4jy1 _4jy4 _517h _51sy _42ft " type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-{{user_profile.id}} followCheck sx_5da455"></i><span class="btnTextChange-{{user_profile.id}}">{% trans "Follow" %}</span>
+                            </button>
+                        </span>
+
+                    </p>
+                    </div>
+            </header>
+            <main class="share-layout-main">
+
+                <div class="jsx-2893588005 video-feed" id="userVideosListId">
+                    <div class="_scroll_load_more_loading_user_videos center">
+                        <div class="boloindya-loading">Loading...</div>
+                    </div>
+                </div>
+                <input type="hidden" name="nextPageUrl" id="nextPageUrlId" value="">
+            </main>
+        </div>
+        <aside class="share-layout-aside ">
+            <div class="jsx-1422783265 recommend-aside">
+                <div class="jsx-29267105 share-group">
+                    <a href="javascript:void(0);" onclick="social_share_page('facebook_share','{{ request.get_full_path }}')" class="jsx-29267105">
+                        <span><img src="/media/facebook_mobile.svg" class="jsx-29267105"></span>
+                    </a>
+                    <a href="javascript:void(0);" onclick="social_share_page('twitter_share','{{ request.get_full_path }}')" target="_blank" class="jsx-29267105">
+                        <span><img src="/media/twitter_mobile.svg" class="jsx-29267105"></span>
+                    </a>
+                    <a href="javascript:void(0);" onclick="social_share_page('whatsapp_share','{{ request.get_full_path }}')"  class="jsx-29267105">
+                        <span><img src="/media/whatsapp.svg" class="jsx-29267105"></span>
+                    </a>
+
+                </div>
+                <div class="jsx-3959364739 recommend-card">
+                    <header class="jsx-3959364739">
+                        <h3 class="jsx-3959364739">{% trans "Creators" %}</h3><a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a></header>
+                    <div class="_scroll_load_more_loading_creator center">
+                        <div class="boloindya-loading">Loading...</div>
+                    </div>
+
+                    <ul class="jsx-3959364739 sidebarLi" id="creatorId">
+                    </ul>
+                </div>
+                <div class="jsx-3959364739 recommend-card">
+                    <header class="jsx-3959364739">
+                        <h3 class="jsx-3959364739">{% trans "Discover" %}</h3><a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a></header>
+                    <div class="_scroll_load_more_loading_discover center">
+                        <div class="boloindya-loading">Loading...</div>
+                    </div>
+                    <ul class="jsx-3959364739 sidebarLi" id="discoverId">
+                    </ul>
+                </div>
+            </div>
+            <div class="jsx-3336228099 download-container card">
+
+                <div class="jsx-3336228099 download-content download-link">
+                    <div class="jsx-3336228099 download-wrapper">
+                        <a href="https://app.appsflyer.com/id835599320" target="_blank" rel="nofollow" class="jsx-3336228099"><img src="//sf-tb-sg.ibytedtos.com/obj/ttfe-malisg/store-badge/apple/en.png" alt="apple-store" class="jsx-3336228099"></a>
+                        <a href="https://app.appsflyer.com/com.zhiliaoapp.musically" target="_blank" rel="nofollow" class="jsx-3336228099"><img src="//sf-tb-sg.ibytedtos.com/obj/ttfe-malisg/store-badge/google/en.png" alt="google-store" class="jsx-3336228099"></a>
+                        <a href="https://www.amazon.com/dp/B0117U0G3M/" target="_blank" rel="nofollow" class="jsx-3336228099"><img src="//sf-tb-sg.ibytedtos.com/obj/ttfe-malisg/store-badge/amazon/en.png" alt="amazon-store" class="jsx-3336228099"></a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<!-----------  User Details Script  ------------>
+<script src="/media/js/user_details.js"></script>
+<!-----------End  ------------>
+
+<!-- Start Comments Section -->
+{% include "spirit/_video_play_and_comments.html" %}
+<!-- End Load Comments  -->
+
+{% endblock %}
