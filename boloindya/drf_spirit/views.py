@@ -1264,7 +1264,11 @@ class TopicCommentList(generics.ListAPIView):
         if comment_id:
             offset = int(self.request.GET.get('offset',0))
             all_comments = list(self.queryset.filter(topic_id=topic_id,is_removed = False).order_by('-id'))
-            index_of_comment = all_comments.index(Comment.objects.get(pk=comment_id))
+            index_of_comment=0
+            try:
+                index_of_comment=all_comments.index(Comment.objects.get(pk=comment_id))
+            except:
+                index_of_comment=0
             if index_of_comment:
                 index_of_comment+=1
                 comment_remainder = index_of_comment%limit
