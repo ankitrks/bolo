@@ -171,7 +171,7 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
         if 'language_id' in form.changed_data:
             obj.language_id = form.cleaned_data['language_id']
         if 'is_pubsub_popular_push' in form.changed_data:
-            obj.is_pubsub_popular_push = True
+            obj.is_pubsub_popular_push = form.cleaned_data['is_pubsub_popular_push']
         # if 'is_popular' in form.changed_data:
         #     obj.is_popular = form.cleaned_data['is_popular']
         #     if obj.is_popular and obj.is_vb and not obj.is_removed:
