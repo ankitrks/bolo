@@ -424,14 +424,24 @@ def GetChallengeDetails(request):
         all_seen = all_vb.aggregate(Sum('view_count'))
         if not all_seen['view_count__sum']:
             all_seen['view_count__sum']=0
-        tongue = TongueTwister.objects.get(hash_tag__icontains=challengehash[1:])
-        return JsonResponse({'message': 'success', 'hashtag':tongue.hash_tag,'vb_count':vb_count,\
-            'en_tongue_descp':tongue.en_descpription,'hi_tongue_descp':tongue.hi_descpription,\
-            'ta_tongue_descp':tongue.ta_descpription,'te_tongue_descp':tongue.te_descpription,\
-            'be_descpription':tongue.be_descpription,'ka_descpription':tongue.ka_descpription,\
-            'ma_descpription':tongue.ma_descpription,'gj_descpription':tongue.gj_descpription,\
-            'mt_descpription':tongue.mt_descpription,'picture':tongue.picture,\
-            'all_seen':shorcountertopic(all_seen['view_count__sum'])},status=status.HTTP_200_OK)
+        tongue = TongueTwister.objects.filter(hash_tag__icontains=challengehash[1:]).order_by('-hash_counter')
+        if len(tongue):
+            tongue = tongue[0]
+            return JsonResponse({'message': 'success', 'hashtag':tongue.hash_tag,'vb_count':vb_count,\
+                'en_tongue_descp':tongue.en_descpription,'hi_tongue_descp':tongue.hi_descpription,\
+                'ta_tongue_descp':tongue.ta_descpription,'te_tongue_descp':tongue.te_descpription,\
+                'be_descpription':tongue.be_descpription,'ka_descpription':tongue.ka_descpription,\
+                'ma_descpription':tongue.ma_descpription,'gj_descpription':tongue.gj_descpription,\
+                'mt_descpription':tongue.mt_descpription,'picture':tongue.picture,\
+                'all_seen':shorcountertopic(all_seen['view_count__sum'])},status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'message': 'success', 'hashtag' : challengehash[1:],'vb_count':vb_count,\
+                'en_tongue_descp':'','hi_tongue_descp':'',\
+                'ta_tongue_descp':'','te_tongue_descp':'',\
+                'be_descpription':'','ka_descpription':'',\
+                'ma_descpription':'','gj_descpription':'',\
+                'mt_descpription':'','picture':'',\
+                'all_seen':shorcountertopic(all_seen['view_count__sum'])},status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Invalid','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
