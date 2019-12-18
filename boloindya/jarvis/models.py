@@ -10,7 +10,8 @@ from django.http import JsonResponse
 
 from django.db.models import Q
 
-from forum.topic.models import RecordTimeStamp
+from forum.topic.models import RecordTimeStamp,Topic
+from drf_spirit.utils import language_options
 
 class VideoCategory(models.Model):
     category_name = models.CharField(_('Category Name'),max_length=100,null=True,blank=True)
@@ -43,9 +44,12 @@ class VideoUploadTranscode(models.Model):
     thumbnail_url = models.CharField(_("Thumbnail URL"),null=True,blank=True,max_length=1000)
     media_duration = models.CharField(_("duration"), max_length=20, default='',null=True,blank=True)
     is_active = models.BooleanField(default=True)
+    is_topic = models.BooleanField(default=False)
+    topic = models.ForeignKey(Topic,null=True,blank=True)
+    uploaded_user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='%(app_label)s_%(class)s_user',editable=False)
     
     def __unicode__(self):
-        return self.filename_uploaded
+        return str(self.filename_uploaded)
 
     def save(self, *args, **kwargs):
         if self.video_title:
@@ -58,11 +62,17 @@ device_options = (
     ('3', "Web"),
 )
 
+import json
+from datetime import datetime
+
 class FCMDevice(AbstractDevice):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='%(app_label)s_%(class)s_user',editable=False)
     device_type = models.CharField(choices=device_options, blank = True, null = True, max_length=10, default='0')
     created_at=models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False) # auto_now will add the current time and date whenever field is saved.
     last_modified=models.DateTimeField(auto_now=True,auto_now_add=False)                     # while auto_now_add will save the date and time only when record is first created
+    is_uninstalled=models.BooleanField(default=False)
+    uninstalled_date=models.DateTimeField(auto_now=False,auto_now_add=False,blank=True,null=True)
+    uninstalled_desc=models.TextField(null=True,blank=True)
 
     def __unicode__(self):
         return str(self.user)
@@ -77,19 +87,22 @@ class FCMDevice(AbstractDevice):
                 print 'Not Exists'
                 raise Exception
             print 'Exisits'
+            desc=instance[0].uninstalled_desc
+            if desc:
+                list_data = json.loads(desc)
+                if 'uninstall' in list_data[len(list_data)-1]:
+                    list_data.append({'install': datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
+                desc=json.dumps(list_data)
             if request.user.id == None:
-                print 'AnonymousUser'
-                instance.update(is_active = True,dev_id=dev_id,device_type = request.POST.get('device_type'), reg_id=reg_id) 
+                instance.update(is_active = True,dev_id=dev_id,device_type = request.POST.get('device_type'), reg_id=reg_id, is_uninstalled=False, uninstalled_desc=desc) 
             else:
-                print 'User'
-                instance.update(user = request.user,is_active = True,name=request.user.username,dev_id=dev_id,device_type = request.POST.get('device_type'),reg_id=reg_id)
+                instance.update(user = request.user,is_active = True,name=request.user.username,dev_id=dev_id,device_type = request.POST.get('device_type'),reg_id=reg_id , is_uninstalled=False, uninstalled_desc=desc)
             return JsonResponse({"status":"Success"},safe = False)
         except Exception as e:
             if request.user.id == None:
-                print 'AnonymousUser'
-                instance = FCMDevice.objects.create(reg_id = request.POST.get('reg_id'),name='Anonymous',dev_id=request.POST.get('dev_id'),device_type = request.POST.get('device_type'))
+                instance = FCMDevice.objects.create(reg_id = request.POST.get('reg_id'),name='Anonymous',dev_id=request.POST.get('dev_id'),device_type = request.POST.get('device_type'), is_uninstalled=False)
             else:
-                instance = FCMDevice.objects.create(user = request.user,reg_id = request.POST.get('reg_id'),name=request.user.username,dev_id=request.POST.get('dev_id'),device_type = request.POST.get('device_type'))
+                instance = FCMDevice.objects.create(user = request.user,reg_id = request.POST.get('reg_id'),name=request.user.username,dev_id=request.POST.get('dev_id'),device_type = request.POST.get('device_type'), is_uninstalled=False)
             return JsonResponse({"status":"Success"},safe = False)
         # try:
         #     instance = FCMDevice.objects.filter(reg_id = reg_id)
@@ -124,16 +137,6 @@ class FCMDevice(AbstractDevice):
             return JsonResponse({"status":"Failed","message":"Device not found for this user"},safe = False)
 
 
-language_options = (
-    ('0', "All"),
-    ('1', "English"),
-    ('2', "Hindi"),
-    ('3', "Tamil"),
-    ('4', "Telgu"),
-    ('5', "Bengali"),
-    ('4', "Kannada"),
-
-)
 
 user_group_options = (
     ('0', "All"),
@@ -161,8 +164,8 @@ status_options = (
 
 class PushNotification(RecordTimeStamp):
 
-    title = models.CharField(_('title'),max_length=100,null=True,blank=True)
-    description = models.CharField(_('description'),max_length=100,null=True,blank=True)
+    title = models.CharField(_('title'),max_length=200,null=True,blank=True)
+    description = models.CharField(_('description'),max_length=500,null=True,blank=True)
     language = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='0')
     notification_type = models.CharField(choices=notification_type_options, blank = True, null = True, max_length=10, default='4')
     instance_id = models.CharField('instance_id', blank = True, null = True, max_length=40, default='')
@@ -178,4 +181,24 @@ class PushNotificationUser(RecordTimeStamp):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='push_notification_user',editable=False)
     push_notification_id = models.ForeignKey(PushNotification, blank = True, null = True, related_name='push_notification_id',editable=False)
     status = models.CharField(choices=status_options, blank = True, null = True, max_length=10, default='0')
+
+class StateDistrictLanguage(RecordTimeStamp):
+    state_name = models.CharField(_('State Name'),max_length=200,null=True,blank=True)
+    district_name = models.CharField(_('District Name'),max_length=200,null=True,blank=True)
+    state_language = models.CharField(choices=language_options,blank=True,null=True,max_length=10,default='1')
+    district_language = models.CharField(choices=language_options,blank=True,null=True,max_length=10,default='1')
+    response_dump = models.TextField(null=True,blank=True)
+
+    class Meta:
+        verbose_name = _("State District Language")
+        verbose_name_plural = _("State District Languages")
+
+    def __unicode__(self):
+        return str(self.district_name)+"--"+str(self.language)
+
+    def save(self, *args, **kwargs):
+        if not self.district_language:
+            self.district_language = self.state_language
+        super(StateDistrictLanguage, self).save(*args, **kwargs)
+
 

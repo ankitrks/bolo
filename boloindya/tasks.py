@@ -14,6 +14,7 @@ def send_notifications_task(data, pushNotification):
     from forum.topic.models import Topic, VBseen
     from drf_spirit.models import UserLogStatistics
     from jarvis.models import PushNotification, FCMDevice
+    from django.core.paginator import Paginator
 
     try:
         title = data.get('title', "")
@@ -40,7 +41,7 @@ def send_notifications_task(data, pushNotification):
     try:
         if schedule_status == '1':
             if datepicker:
-                pushNotification.scheduled_time = datetime.datetime.strptime(datepicker + " " + timepicker, "%m/%d/%Y %H:%M")
+                pushNotification.scheduled_time = datetime.strptime(datepicker + " " + timepicker, "%m/%d/%Y %H:%M")
             pushNotification.is_scheduled = True            
             pushNotification.save()
         else:
@@ -51,8 +52,8 @@ def send_notifications_task(data, pushNotification):
                 language_filter = { 'user__st__language': lang }
             
             if user_group == '1':
-                end_date = datetime.datetime.today()
-                start_date = end_date - datetime.timedelta(hours=3)
+                end_date = datetime.today()
+                start_date = end_date - timedelta(hours=3)
                 device = FCMDevice.objects.filter(user__isnull=True, created_at__range=(start_date, end_date))
             
             elif user_group == '2':
@@ -71,11 +72,11 @@ def send_notifications_task(data, pushNotification):
                     filter_list = VBseen.objects.distinct('user__pk').values_list('user__pk', flat=True)
                 
                 elif user_group == '4' or user_group == '5':
-                    hours_ago = datetime.datetime.now()
+                    hours_ago = datetime.now()
                     if user_group == '4':
-                        hours_ago -= datetime.timedelta(days=1)
+                        hours_ago -= timedelta(days=1)
                     else:
-                        hours_ago -=  datetime.timedelta(days=2)
+                        hours_ago -=  timedelta(days=2)
 
                     filter_list = UserLogStatistics.objects.filter(session_starttime__gte=hours_ago).values_list('user', flat=True)
                     filter_list = map(int , filter_list)
@@ -86,7 +87,10 @@ def send_notifications_task(data, pushNotification):
                 device = FCMDevice.objects.exclude(user__pk__in=filter_list).filter(**language_filter)
 
             logger.info(device)
-            device.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk})
+            device_pagination = Paginator(device, 1000)
+            for index in range(1, (device_pagination.num_pages+1)):
+                device_after_slice = device_pagination.page(index)
+                t = device_after_slice.object_list.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk})
     except Exception as e:
         logger.info(str(e))
 

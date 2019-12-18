@@ -260,6 +260,7 @@ def video_info(user_data_dump):
     
     try:
         dist_userid = user_data_dump['user_id']
+        #print(dist_userid)
         if('vb_impressions' in user_data_dump):
             if(len(user_data_dump['vb_impressions']) > 0):
                 for(a,b) in user_data_dump['vb_impressions']:
@@ -577,7 +578,6 @@ def main():
         try:
             user_data_string = user_jarvis.dump
             user_data_dump = ast.literal_eval(user_data_string)
-            
             #pass the collected user dump through a set of methods
             user_statistics(user_data_dump)
             follow_unfollow_details(user_data_dump)
@@ -590,7 +590,6 @@ def main():
             search_query(user_data_dump)
             record_session_time(user_data_dump)               #please run this before running dau and mau
             activity_time_spend(user_data_dump)
-            find_video_impressions(user_data_dump)
             unique_id = user_jarvis.pk # get primary key of the dump
             UserJarvisDump.objects.filter(pk = unique_id).update(is_executed = True, dump_type = 1)  #mark the is_executed field as true
 

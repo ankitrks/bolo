@@ -13,15 +13,12 @@ from .managers import CommentQuerySet
 from drf_spirit.utils import reduce_bolo_score
 from django.db.models import F,Q
 from forum.user.models import UserProfile
+from drf_spirit.utils import language_options
+from forum.topic.models import RecordTimeStamp
 
 # from .transcoder import transcode_media_file
 
-language_options = (
-    ('1', "English"),
-    ('2', "Hindi"),
-    ('3', "Tamil"),
-    ('4', "Telgu"),
-)
+
 
 COMMENT, MOVED, CLOSED, UNCLOSED, PINNED, UNPINNED = range(6)
 
@@ -39,6 +36,8 @@ class Comment(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='st_comments',editable=False)
     topic = models.ForeignKey('forum_topic.Topic', related_name='topic_comment')
+    hash_tags = models.ManyToManyField('forum_topic.TongueTwister', verbose_name=_("hash_tags"), \
+            related_name="hash_tag_comment",blank=True)
 
     comment = models.TextField(_("comment"))
     comment_html = models.TextField(_("comment html"))
@@ -51,7 +50,7 @@ class Comment(models.Model):
     is_media = models.BooleanField(default=False)
     is_audio = models.BooleanField(default=False)
     media_duration = models.CharField(_("duration"), max_length=20, default='',null=True,blank=True)
-    language_id = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='0')
+    language_id = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='1')
     thumbnail = models.CharField(_("thumbnail"), max_length=150, default='')
     
     # is_transcoded = models.BooleanField(default = False)
@@ -147,3 +146,13 @@ class Comment(models.Model):
                 .filter(topic_id=topic_id)
                 .order_by('pk')
                 .last())
+
+class CommentHistory(RecordTimeStamp):
+    source = models.ForeignKey('forum_comment.Comment', blank = False, null = False, related_name='comment_history')
+    comment = models.TextField(_("comment"))
+    comment_html = models.TextField(_("comment html"))
+    hash_tags = models.ManyToManyField('forum_topic.TongueTwister', verbose_name=_("hash_tags"), \
+            related_name="hash_tag_comment_history",blank=True)
+
+    def __unicode__(self):
+        return str(self.comment)

@@ -1,3 +1,4 @@
+{% load jarvis_tag %}
 <aside class="main-sidebar">
     <!-- sidebar: style can be found in sidebar.less -->
     <section class="sidebar">
@@ -14,9 +15,10 @@
       <!-- sidebar menu: : style can be found in sidebar.less -->
       <ul class="sidebar-menu" data-widget="tree">
         <li class="header">MAIN NAVIGATION</li>
+        {% if user|is_user_in_group:"moderator" %}
         <li class=" treeview">
           <a href="#">
-            <i class="fa fa-pie-chart"></i> <span>Dashboard</span>
+            <i class="fa fa-pie-chart"></i> <span>Statistics</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
@@ -39,31 +41,49 @@
           </a>
           <ul class="treeview-menu">
             <li class="{% if request.path in '/jarvis/get_accepted_kyc_user_list/'%}active{% endif %}"><a href="/jarvis/get_accepted_kyc_user_list/"><i class="fa fa-circle-o"></i>Accpeted KYC's</a></li>
-            <li class="{% if request.path in '/jarvis/get_submitted_kyc_user_list/'%}active{% endif %}"><a href="/jarvis/get_submitted_kyc_user_list/"><i class="fa fa-circle-o"></i>Submitted KYC's</a></li>
+            <!--<li class="{% if request.path in '/jarvis/get_submitted_kyc_user_list/'%}active{% endif %}"><a href="/jarvis/get_submitted_kyc_user_list/"><i class="fa fa-circle-o"></i>Submitted KYC's</a></li>
             <li class="{% if request.path in '/jarvis/get_pending_kyc_user_list/'%}active{% endif %}"><a href="/jarvis/get_pending_kyc_user_list/"><i class="fa fa-circle-o"></i>Pending KYC's</a></li>
-            <li class="{% if request.path in '/jarvis/get_kyc_user_list/'%}active{% endif %}"><a href="/jarvis/get_kyc_user_list/"><i class="fa fa-circle-o"></i> <span>All KYC</span></a></li>
+            <li class="{% if request.path in '/jarvis/get_kyc_user_list/'%}active{% endif %}"><a href="/jarvis/get_kyc_user_list/"><i class="fa fa-circle-o"></i> <span>All KYC</span></a></li>-->
             
           </ul>
         </li>
+        {% endif %}
 
 
         <!--<li class="{% if request.path in '/jarvis/get_encashable_detail/'%}active{% endif %}"><a href="/jarvis/get_encashable_detail/"><i class="fa fa-pie-chart"></i> <span>Show Encash Records</span></a></li> -->
-
+        {% if user|is_user_in_group:"moderator" or user|is_user_in_group:"video_uploader" %}
         <li class="{% if request.path in '/jarvis/uploadvideofile/,/jarvis/uploaded_list/'%}active{% endif %} treeview">
           <a href="#">
-            <i class="fa fa-dashboard"></i> <span>Video File Upload</span>
+            <i class="fa fa-dashboard"></i> <span>CAnna Video Upload</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
           </a>
           <ul class="treeview-menu">
-            <li class="{% if request.path in '/jarvis/uploadvideofile/'%}active{% endif %}"><a href="/jarvis/uploadvideofile/"><i class="fa fa-circle-o"></i> Upload N Transcode</a></li>
-            <li class="{% if request.path in '/jarvis/uploaded_list/'%}active{% endif %}"><a href="/jarvis/uploaded_list/"><i class="fa fa-share"></i> Uploaded List</a></li>
+            <li class="{% if request.path in '/jarvis/uploadvideofile/'%}active{% endif %}"><a href="/jarvis/uploadvideofile/"><i class="fa fa-circle-o"></i>CAnna Upload n Transcode</a></li>
+            <li class="{% if request.path in '/jarvis/uploaded_list/'%}active{% endif %}"><a href="/jarvis/uploaded_list/"><i class="fa fa-share"></i>CAnna Uploaded List</a></li>
           </ul>
         </li>
-        <li class="{% if request.path in '/jarvis/importcsv/'%}active{% endif %}"><a href="/jarvis/importcsv/"><i class="fa fa-th"></i> <span>Upload Instagram CSV</span></a></li>
+        <li class="{% if request.path in '/jarvis/boloindya_uploadvideofile/,/jarvis/boloindya_uploaded_list/'%}active{% endif %} treeview">
+          <a href="#">
+            <i class="fa fa-dashboard"></i> <span>Boloindya Video Upload</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li class="{% if request.path in '/jarvis/boloindya_uploadvideofile/'%}active{% endif %}"><a href="/jarvis/boloindya_uploadvideofile/"><i class="fa fa-circle-o"></i>Boloindya Upload n Transcode</a></li>
+            <li class="{% if request.path in '/jarvis/boloindya_uploaded_list/'%}active{% endif %}"><a href="/jarvis/boloindya_uploaded_list/"><i class="fa fa-share"></i>Boloindya Uploaded List</a></li>
+          </ul>
+        </li>
+        {% endif %}
+        {% if user|is_user_in_group:"moderator" %}
+        <!--<li class="{% if request.path in '/jarvis/importcsv/'%}active{% endif %}"><a href="/jarvis/importcsv/"><i class="fa fa-th"></i> <span>Upload Instagram CSV</span></a></li>-->
         <li class="{% if request.path in '/jarvis/notification_panel/'%}active{% endif %}"><a href="/jarvis/notification_panel/"><i class="fa fa-bell-o"></i> <span>Notification Panel</span></a></li>
+        {% endif %}
+        {% if user|is_user_in_group:"moderator" %}
         <li class="{% if request.path in '/jarvis/management/video/'%}active{% endif %}"><a href="/jarvis/management/video/"><i class="fa fa-edit"></i> <span>Video Management</span></a></li>
+        {% endif %}
       </ul>
 
     </section>

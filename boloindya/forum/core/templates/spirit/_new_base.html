@@ -8,6 +8,12 @@
 <!-- saved from url=(0025)https://www.boloindya.com/en -->
 <html lang="{{LANGUAGE_CODE}}" pc="yes" class="webpalpha webpanimation webplossless webp webp-alpha webp-animation webp-lossless">
 
+{% load static from staticfiles %}
+<!DOCTYPE html>
+<!-- saved from url=(0025)https://www.boloindya.com/en -->
+<html lang="en" class="webpalpha webpanimation webplossless webp webp-alpha webp-animation webp-lossless">
+
+
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
@@ -18,17 +24,16 @@
     <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1" class="next-head">
     <meta name="robots" content="index, follow" class="next-head">
 
+
     <meta name="applicable-device" content="pc,mobile" class="next-head">
     <link rel="canonical" href="https://www.boloindya.com/" class="next-head">
 
     <link rel="stylesheet" type="text/css" href="/media/css/common.css">
     <script src="//content.jwplatform.com/libraries/GpYvcHPU.js"></script>
-
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <link rel="shortcut icon" href="/media/img/favicon.ico">
-
     <title>Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India</title>
     <meta name="description" content="Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India" />
     <meta name="keywords" content="Hindi Videos, Hindi Content Platform, Local Languages Content, Love Questions, Sex Questions, Relationship Questions, Life questions, English Videos, Questions and Answers, GK Answers, Politics Discussion, Entertainment, Tamil Videos, Tamil Questions, Tamil Answers, Telugu Questions, Telugu Answers, Exams, UPSC Videos, UPSC Questions, Kannada Questions, Kannada Videos, Punjabi Videos, Punjabi Questions, Gujarati Questions, Gujarati Videos, bengali questions, bengali videos" />    
@@ -37,6 +42,7 @@
     <meta data-react-helmet="true" property="og:image" content="/media/img/favicon.ico"/>
 
     {% block head-meta %}{% endblock %}
+
 
     {% for key,value in all_languages.items %}
     {% if key == LANGUAGE_CODE %}
@@ -51,6 +57,9 @@
     var commentsTrans='{% trans "comments" %}';
     console.log(likeTrans);
 </script>
+=======
+
+>>>>>>> origin/deploy/prod
 
     <style type="text/css">
         .dropdown-item.selected {background: #1989cd !important;}
@@ -58,6 +67,7 @@
     </style>
 
     <script>
+
         var userLoginStatus='{{request.user.id}}';
 
 
@@ -117,7 +127,6 @@
 
 	</script>
 
-
     {% block head-extra %}{% endblock %}
 
     <!--[if (lt IE 9) & (!IEMobile)]>
@@ -126,6 +135,7 @@
     <![endif]-->
 
   </head>
+
 <!-- style="margin-left:-19px; margin-right: -14px;max-width:100%;" -->
   <body >
     {% include 'spirit/_new_header.html' %}

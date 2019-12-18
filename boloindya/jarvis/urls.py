@@ -18,8 +18,11 @@ urlpatterns = [
     url(r'^accept_kyc/$',views.accept_kyc, name='accept_kyc'),
     url(r'^reject_kyc/$',views.reject_kyc, name='reject_kyc'),
     url(r'^uploadvideofile/$',views.uploadvideofile,name = 'uploadvideofile'),
+    url(r'^boloindya_uploadvideofile/$',views.boloindya_uploadvideofile,name = 'boloindya_uploadvideofile'),
     url(r'^management/video/$',views.video_management,name = 'video_management'),
     url(r'^upload_n_transcode/$',views.upload_n_transcode),
+    url(r'^boloindya_upload_n_transcode/$',views.boloindya_upload_n_transcode),
+    url(r'^get_filtered_user/$',views.get_filtered_user,name = 'get_filtered_user'),
     url(r'^upload_details/$',views.upload_details),
     url(r'^uploaded_list/$',views.uploaded_list),
     url(r'^user_statistics/$', views.user_statistics),
@@ -35,9 +38,10 @@ urlpatterns = [
     #url(r'^barchart/$', views.barchart, name= 'create_barchart'),              # url for rendering the bar chart
     url(r'^edit_upload/$',views.edit_upload),
     url(r'^delete_upload/$',views.delete_upload),
-    url(r'^upload_details/$',views.upload_details),
-    url(r'^uploaded_list/$',views.uploaded_list),
+    url(r'^boloindya_upload_details/$',views.boloindya_upload_details),
+    url(r'^boloindya_uploaded_list/$',views.boloindya_uploaded_list),
     url(r'^edit_upload/$',views.edit_upload),
+    url(r'^boloindya_edit_upload/$',views.boloindya_edit_upload),
     url(r'^get_submitted_kyc_user_list/$',views.get_submitted_kyc_user_list, name='get_submitted_kyc_user_list'),
     url(r'^get_pending_kyc_user_list/$',views.get_pending_kyc_user_list, name='get_pending_kyc_user_list'),
     url(r'^get_accepted_kyc_user_list/$',views.get_accepted_kyc_user_list, name='get_accepted_kyc_user_list'),
@@ -47,4 +51,7 @@ urlpatterns = [
     url(r'^create_user_notification_delivered/$',views.create_user_notification_delivered, name='create_user_notification_delivered'),
     url(r'^open_notification_delivered/$',views.open_notification_delivered, name='open_notification_delivered'),   
     url(r'^remove_notification/$',views.remove_notification, name='remove_notification'),   
+
+    # api for notification search
+    url(r'^search_notification/$',views.search_notification, name='search_notification'),   
 ]

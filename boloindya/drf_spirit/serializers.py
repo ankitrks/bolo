@@ -18,7 +18,8 @@ cloufront_url = "https://d1fa4tg1fvr6nj.cloudfront.net"
 class CategorySerializer(ModelSerializer):
     class Meta:
         model = Category
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('reindex_at', 'is_global', 'is_closed', 'is_removed', 'is_private', 'is_engagement' )
 
 class AppVersionSerializer(ModelSerializer):
     class Meta:
@@ -32,9 +33,22 @@ class CategoryLiteSerializer(ModelSerializer):
 
 
 class TongueTwisterSerializer(ModelSerializer):
+    total_videos_count = SerializerMethodField()
+    total_views = SerializerMethodField()
     class Meta:
         model = TongueTwister
         fields = '__all__'
+
+    def get_total_videos_count(self,instance):
+        return shorcountertopic(Topic.objects.filter(title__icontains='#'+str(instance.hash_tag)).count())
+
+    def get_total_views(self,instance):
+        return shorcountertopic(instance.total_views)
+
+class BaseTongueTwisterSerializer(ModelSerializer):
+    class Meta:
+        model = TongueTwister
+        fields = ('id','hash_tag')
 
 
 class TopicSerializer(ModelSerializer):
@@ -85,7 +99,8 @@ class CommentSerializer(ModelSerializer):
     date = SerializerMethodField()
     class Meta:
         model = Comment
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('action', 'is_removed', 'is_modified', 'ip_address', 'is_media', 'is_audio', 'media_duration', 'thumbnail', )
 
     def get_user(self,instance):
         return UserSerializer(instance.user).data
@@ -93,6 +108,11 @@ class CommentSerializer(ModelSerializer):
     def get_date(self,instance):
         return shortnaturaltime(instance.date)
 
+class PubSubPopularSerializer(ModelSerializer):
+    class Meta:
+        model = Topic
+        fields = ('id', 'language_id')
+        
 class TopicSerializerwithComment(ModelSerializer):
     user = SerializerMethodField()
     category = PresentableSlugRelatedField(queryset=Category.objects.all(),
@@ -245,7 +265,7 @@ class UserProfileSerializer(ModelSerializer):
     class Meta:
         model = UserProfile
         # fields = '__all__' 
-        exclude = ('extra_data', )
+        exclude = ('extra_data', 'location', 'last_seen', 'last_ip', 'timezone', 'is_administrator', 'is_moderator', 'is_verified', 'last_post_on', 'last_post_hash', 'is_geo_location', 'lat', 'lang', 'click_id', 'click_id_response')
 
     def get_follow_count(self,instance):
         return shortcounterprofile(instance.follow_count)
@@ -264,9 +284,22 @@ class UserSerializer(ModelSerializer):
     class Meta:
         model = User
         #fields = '__all__'
-        exclude = ('password', )
+        exclude = ('password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login')
     def get_userprofile(self,instance):
         return UserProfileSerializer(UserProfile.objects.get(user=instance)).data
+
+class BasicUserSerializer(ModelSerializer):
+    name = SerializerMethodField()
+    profile_pic = SerializerMethodField()
+    class Meta:
+        model = User
+        fields = ('id', 'first_name', 'last_name','username','name','profile_pic')
+        # exclude = ('password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login')
+    def get_name(self,instance):
+        return instance.st.name
+
+    def get_profile_pic(self,instance):
+        return instance.st.profile_pic
 
 class SingUpOTPSerializer(ModelSerializer):
     class Meta:
@@ -419,7 +452,7 @@ class CategoryVideoByteSerializer(ModelSerializer):
     class Meta:
         model = Topic
         #fields = '__all__'
-        exclude = ('transcode_dump','transcode_status_dump' )
+        exclude = ('transcode_dump','transcode_status_dump', 'is_transcoded_error', 'transcode_job_id', 'is_transcoded', 'is_removed', 'is_closed', 'is_globally_pinned', 'is_pinned', 'last_commented', 'reindex_at', 'last_active' )
         # TODO:: refactor after deciding about globally pinned.
         read_only_fields = ('is_pinned',)
 
@@ -456,7 +489,8 @@ class CategoryWithVideoSerializer(ModelSerializer):
 
     class Meta:
         model = Category
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('reindex_at', 'is_global', 'is_closed', 'is_removed', 'is_private', )
 
     def get_total_view(self, instance):
         return shorcountertopic(instance.view_count)
@@ -482,3 +516,29 @@ class VideoCompleteRateSerializer(ModelSerializer):
     class Meta:
         model = VideoCompleteRate
         fields = ('videoid','user', 'playtime', 'percentage_viewed')
+
+# searializer for serach _notification
+class CategoryWithTitleSerializer(ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ('title', 'id',)
+
+class UserWithNameSerializer(ModelSerializer):
+    user_name = SerializerMethodField()
+
+    class Meta:
+        model = UserProfile
+        fields = ('name', 'user', 'user_name',)
+
+    def get_user_name(self,instance):
+        return instance.user.username
+
+class TongueTwisterWithHashSerializer(ModelSerializer):
+    class Meta:
+        model = TongueTwister
+        fields = ('hash_tag', 'id')
+
+class TongueWithTitleSerializer(ModelSerializer):
+    class Meta:
+        model = Topic
+        fields = ('title', 'id')

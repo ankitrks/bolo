@@ -6,14 +6,14 @@ from import_export.admin import ImportExportModelAdmin,ExportMixin
 from import_export import resources
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 from .models import UserFollowUnfollowDetails, UserVideoTypeDetails, VideoDetails, UserEntryPoint, UserViewedFollowersFollowing, UserInterest, VideoSharedDetails, UserSearch, UserLogStatistics
-
+from django.contrib.auth.models import User
 
 class UserProfileResource(resources.ModelResource):
 	class Meta:
 		model = UserProfile
 		skip_unchanged = True
 		report_skipped = True
-		list_filter = ('language', )
+		list_filter = ('language','is_popular','is_superstar','is_business')
 		fields = ( 'user__username', 'name', 'language', 'bolo_score', 'user__date_joined', 'follow_count', 'follower_count', \
 			'vb_count', 'answer_count', 'share_count', 'like_count')
 
@@ -33,9 +33,9 @@ admin.site.register(Weight, WeightAdmin)
 class UserProfileAdmin(ImportExportModelAdmin):
 	search_fields = ('user__username', 'name',)
 	list_display = ('user', 'name', 'language', 'bolo_score', 'follow_count', 'follower_count', 'vb_count', 'answer_count', \
-		'share_count', 'like_count', 'is_popular', 'is_business')
-	list_editable = ('is_popular', 'is_business')
-	list_filter = ('user__date_joined', ('user__date_joined', DateRangeFilter), 'language')
+		'share_count', 'like_count', 'is_popular','is_superstar', 'is_business')
+	list_editable = ('is_popular','is_superstar', 'is_business')
+	list_filter = ('user__date_joined', ('user__date_joined', DateRangeFilter), 'language','is_popular','is_superstar', 'is_business')
 	resource_class = UserProfileResource
 admin.site.register(UserProfile,UserProfileAdmin)
 
@@ -56,8 +56,12 @@ class AndroidLogsAdmin(admin.ModelAdmin):
 	search_fields = ('user', )
 
 class UserFeedbackAdmin(admin.ModelAdmin):
-	list_display = ('by_user', 'created_at', 'contact_email', 'feedback_image')
+	list_display = ('by_user', 'created_at', 'contact_email', 'feedback_image', 'user_contact')
 	search_fields = ('by_user', 'contact_email')
+
+	# def render_change_form(self, request, context, *args, **kwargs):
+	# 	context['adminform'].form.fields['by_user'].queryset = User.objects.filter(st__is_test_user = False)
+	# 	return super(UserFeedbackAdmin, self).render_change_form(request, context, *args, **kwargs)
 
 admin.site.register(AppVersion)
 admin.site.register(AndroidLogs, AndroidLogsAdmin)
