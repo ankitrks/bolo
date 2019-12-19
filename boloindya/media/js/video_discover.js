@@ -174,7 +174,7 @@ function openVideoInPopup(topicId){
 
         var likeStatus="";
 
-        likeStatus="liked";debugger;
+        likeStatus="liked";
         var likeStatusClass=jQuery("#UReactionLink").hasClass('liked');
         if(likeStatusClass==true){
             jQuery("#UReactionLink").removeClass('liked');

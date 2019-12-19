@@ -106,7 +106,7 @@
 </div>
 <script type="text/javascript">
     
-  jQuery('.backToMainLogin').on('click',function(){debugger;
+  jQuery('.backToMainLogin').on('click',function(){
     var checkMainLoginHide=$(".mainLogin").hasClass('hide');
     if(checkMainLoginHide==false){
         $(".mainLogin").removeClass('hide');
@@ -251,7 +251,7 @@ $('#phoneNo').on('change',function(evt){
 });
 
 
-$('#emailID').on('change',function(evt){debugger;
+$('#emailID').on('change',function(evt){
     var emailID = document.getElementById('emailID');
     if (emailID.value == "" || emailID.value == null) {
       //alert("Please enter your Mobile No.");
@@ -373,14 +373,14 @@ $('.single-otp-input').on('keypress',function(evt){
           
           if(next.length) {
             $(next).select();
-          } else {debugger;
+          } else {
             $('#conOTPVerify').prop('disabled', false);
             $('#conOTPVerify').removeClass('grey-btn');
             $('#some_div').hide();
 
             otp_verification();
             // if(parent.data('autosubmit')) {
-            //   parent.submit();debugger;
+            //   parent.submit();
             // }
           }
         }

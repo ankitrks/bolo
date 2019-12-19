@@ -249,7 +249,7 @@ function copyShareLinkMobile() {
       }
     
 
-    function sendOTP(){debugger;
+    function sendOTP(){
       $("#lastFourdigit").html("");
       validateNo();
       var mobileNumber = document.getElementById('phoneNo').value;
@@ -265,7 +265,7 @@ function copyShareLinkMobile() {
         url:"/api/v1/otp/send/",
         type:"POST",
         data:{'mobile_no':mobileNumber},
-        success: function(response,textStatus, xhr){debugger;
+        success: function(response,textStatus, xhr){
           console.log(textStatus);
           console.log(xhr);
           if(xhr.status==201){
@@ -313,7 +313,7 @@ function copyShareLinkMobile() {
         url:"/api/v1/otp/verify/",
         type:"POST",
         data:{'mobile_no':mobileNumber,'otp':userOTP,'is_reset_password':false,'is_for_change_phone':false},
-        success: function(response,textStatus, xhr){debugger;
+        success: function(response,textStatus, xhr){
 
           access_data = response;
           localStorage.setItem("access_data",JSON.stringify(access_data));
@@ -330,7 +330,7 @@ function copyShareLinkMobile() {
 
 
       });
-    }else{debugger;
+    }else{
       $("form#optForm")[0].reset();
       $('#conOTPVerify').prop('disabled', true);
       jQuery(".otpError").html('<span style="color:red;">Opps! Invalid OTP, Please Try again</span>').fadeOut(8000);
@@ -348,7 +348,7 @@ function loginDataByUser(){
 	        type: 'POST',
 	        url: url,
 	        data: {user_id: user_id},
-	    }).done(function(data, textStatus, jqXHR) {debugger;
+	    }).done(function(data, textStatus, jqXHR) {
 	        access_data = data;
 	        if(access_data){
           		localStorage.setItem("access_data",JSON.stringify(access_data));
@@ -358,7 +358,7 @@ function loginDataByUser(){
 }
 
 
-function follow_user(user_following_id){debugger;
+function follow_user(user_following_id){
 	var user_id = userLoginStatus;
 	var followUrl='/api/v1/follow_user/';
 	var user_following_id = user_following_id;
@@ -374,7 +374,7 @@ function follow_user(user_following_id){debugger;
               'Authorization':'Bearer '+accessToken,
             },
             data:{user_following_id:user_following_id},
-            success: function(response,textStatus, xhr){debugger;
+            success: function(response,textStatus, xhr){
  
                checkFollowStatus=jQuery('.followStatusChange-'+user_following_id).hasClass('sx_5da456');
                if(checkFollowStatus==false){
@@ -400,7 +400,7 @@ function follow_user(user_following_id){debugger;
 	}
 }
 
-function follow_user_by_popup(){debugger;
+function follow_user_by_popup(){
 	var user_following_id=$("#currentPlayUserId").val();
 	if(user_following_id==""){
 		return false;
@@ -420,7 +420,7 @@ function follow_user_by_popup(){debugger;
               'Authorization':'Bearer '+accessToken,
             },
             data:{user_following_id:user_following_id},
-            success: function(response,textStatus, xhr){debugger;
+            success: function(response,textStatus, xhr){
  
                checkFollowStatus=jQuery('.followStatusChange-'+user_following_id).hasClass('sx_5da456');
                if(checkFollowStatus==false){
@@ -447,7 +447,7 @@ function follow_user_by_popup(){debugger;
 }
 
 
-function follow_category(following_id){debugger;
+function follow_category(following_id){
 
 	var followUrl='/api/v1/follow_sub_category/';
 	var following_id = following_id;
@@ -464,7 +464,7 @@ function follow_category(following_id){debugger;
               'Authorization':'Bearer '+accessToken,
             },
             data:{sub_category_id:following_id},
-            success: function(response,textStatus, xhr){debugger;
+            success: function(response,textStatus, xhr){
  
                checkFollowStatus=jQuery('.followStatusChange-'+following_id).hasClass('sx_5da456');
                if(checkFollowStatus==false){
@@ -478,7 +478,7 @@ function follow_category(following_id){debugger;
                }
 
             },
-            error: function(jqXHR, textStatus, errorThrown){debugger;
+            error: function(jqXHR, textStatus, errorThrown){
               jQuery(".followError").html('<span style="color:red;">Please Try Again...</span>').fadeOut(8000);
               console.log(textStatus + ": " + jqXHR.status + " " + errorThrown);
             }
@@ -508,7 +508,7 @@ function follow_category(following_id){debugger;
 //         url: url,
 //         data: {language: language_code},
 //         headers: {"X-CSRFToken": getCookie('csrftoken')}
-//     }).done(function(data, textStatus, jqXHR) {debugger;
+//     }).done(function(data, textStatus, jqXHR) {
 //         reload_page();
 //     });
 // });

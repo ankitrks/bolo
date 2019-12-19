@@ -7,10 +7,13 @@ var checkDataStatus=0;
 $(window).scroll(function() {
     var scorh=Number($(window).scrollTop() + $(window).height());
     console.log('Scol+he '+scorh);
-    if($(window).scrollTop() + $(window).height() >= $(document).height()-800 && $(window).scrollTop() + $(window).height()<$(document).height()) {
-        var nextPageUrl=jQuery("#nextPageUrlId").val();debugger;
+    //if($(window).scrollTop() + $(window).height() >= $(document).height()-800 && $(window).scrollTop() + $(window).height()<$(document).height()) {
+    if($(window).scrollTop() + $(window).height() > $("#userVideosListId").height() && checkDataStatus==0){
+        
+        var nextPageUrl=jQuery("#nextPageUrlId").val();
         if(undefined !==nextPageUrl && nextPageUrl!=""){
             page++;
+            loaderBoloShowDynamic('_scroll_load_more_loading_user_videosMore');
             loadMoreData(nextPageUrl);
         }
 
@@ -37,7 +40,7 @@ function getUserVideos(limit,offset){
         url:res,
         type:"GET",
         data:{'limit':limit,'offset':offset,'user_id':user_id,'language_id':language_id},
-        success: function(response,textStatus, xhr){debugger;
+        success: function(response,textStatus, xhr){
             userVideoItems="";
             var videoItemList=response.results;
             jQuery("#userVideoCountId").html(response.count);
@@ -50,7 +53,7 @@ function getUserVideos(limit,offset){
             loaderBoloHideDynamic('_scroll_load_more_loading_user_videos');
             playListData=videoItemList;
             var nextPageData=response.next;
-            //jQuery("#nextPageUrlId").val(response.next);
+            jQuery("#nextPageUrlId").val(response.next);
             
             
 
@@ -96,21 +99,26 @@ function loadMoreData(NextPageUrl){
                 playListData.push(itemCreator);          
       
                 });
-                loaderBoloHideDynamic('_scroll_load_more_loading_user_videos');debugger;
+                loaderBoloHideDynamic('_scroll_load_more_loading_user_videosMore');
                 //playListData+=videoItemList;
 
                 $('.ajax-load').hide();
+                var nextPageData="";
                 $("#userVideosListId").append(userVideoItems);
                 var nextPageData=data.next;
-                //jQuery("#nextPageUrlId").val(nextPageData);
+                if(nextPageData!=""){
+                    jQuery("#nextPageUrlId").val(nextPageData);
+                }else{
+                   jQuery("#nextPageUrlId").val(nextPageData); 
+                }
                 
             })
             .fail(function(jqXHR, ajaxOptions, thrownError)
             {
                 if(jqXHR.status!=201){
-
+                    
                 }
-
+                loaderBoloHideDynamic('_scroll_load_more_loading_user_videosMore');
                   $('.ajax-load').html("No more records found");
             });
     }
@@ -239,7 +247,7 @@ function getPopularCategory(popularCategory){
   var sideBarDetails="";
   var sideBarCommentDetails="";
 
- function openVideoInPopup(file,image,indexId){debugger;
+ function openVideoInPopup(file,image,indexId){
   loaderShow();
   var singleItemData=[];
   $("#indexId").val(indexId);

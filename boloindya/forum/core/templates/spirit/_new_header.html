@@ -374,7 +374,7 @@
                               <button id="signOutBtn" type="submit">{% trans "Logout" %}</button>
                             </form>
                             <script type="text/javascript">
-                                $("#signOutLink").on('click', function() {debugger;
+                                $("#signOutLink").on('click', function() {
                                     $('#signOutBtn').click();
                                        var loginStatus=check_login_status();
                                        if(loginStatus==true){
