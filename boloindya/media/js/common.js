@@ -167,17 +167,33 @@ jQuery("#boloSideMenu").click(function(e){
       }
 
 });
-jQuery('body,html').click(function(e){
 
-      var checClass="";
-       checClass=jQuery(".boloSideMenuClass").hasClass('hamburger-menu-active');
+// jQuery('body,html').click(function(e){
+
+//        var checClass="";
+//        checClass=jQuery(".boloSideMenuClass").hasClass('hamburger-menu-active');
+//         if(checClass){
+//             jQuery(".boloSideMenuClass").removeClass('hamburger-menu-active');  
+//             jQuery(".drawerOpenAndClose").removeClass('drawer-enter drawer-enter-active');
+//             jQuery(".drawerOpenAndClose").addClass('drawer-exit drawer-exit-active');  
+//             jQuery(".drawer-enter-done").addClass('hide');
+//       }
+// });
+
+$('body').click(function(e) {
+    if (!$(e.target).closest('.drawerOpenAndClose').length){
+        var checClass="";
+       	checClass=jQuery(".boloSideMenuClass").hasClass('hamburger-menu-active');
         if(checClass){
             jQuery(".boloSideMenuClass").removeClass('hamburger-menu-active');  
             jQuery(".drawerOpenAndClose").removeClass('drawer-enter drawer-enter-active');
             jQuery(".drawerOpenAndClose").addClass('drawer-exit drawer-exit-active');  
             jQuery(".drawer-enter-done").addClass('hide');
-      }
+      	}	
+    }
 });
+
+
 
 $(document).ready(function() {
   loaderHide();

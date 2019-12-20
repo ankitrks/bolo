@@ -347,23 +347,24 @@
                         <div class="footer-content-column">
                             <h2>{% trans "Company" %}</h2>
                             <h3><a class="" href="https://www.boloindya.com/about/">{% trans "About" %}</a></h3>
-                            <h3><a class="" href="https://newsroom.boloindya.com/">{% trans "Newsroom" %}</a></h3>
-                            <h3><a class="" href="https://www.boloindya.com/about/contact?lang=en">{% trans "Contact" %}</a></h3></div>
-                        <div class="footer-content-column">
+                            <h3><a class="" href="https://www.boloindya.com/forgood" target="_blank">{% trans "Discover" %}</a></h3>
+                        </div>
+<!--                         <div class="footer-content-column">
                             <h2>{% trans "Programs" %}</h2>
-                            <h3><a class="" href="https://www.boloindya.com/forgood" target="_blank">{% trans "boloindya for Good" %}</a></h3>
-                            <h3><a class="" href="https://ads.boloindya.com/?refer=boloindya_web" target="_blank">{% trans "Advertise on boloindya" %}</a></h3></div>
-                        <div class="footer-content-column">
+                            <h3><a class="" href="https://ads.boloindya.com/?refer=boloindya_web" target="_blank">{% trans "Advertise on boloindya" %}</a></h3>
+                        </div> -->
+<!--                         <div class="footer-content-column">
                             <h2>{% trans "Support" %}</h2>
                             <h3><a class="" href="https://support.boloindya.com/en">{% trans "Help Center" %}</a></h3>
                             <h3><a class="" href="https://www.boloindya.com/en/safety">{% trans "Safety Center" %}</a></h3>
-                            <h3><a class="" href="https://support.boloindya.com/en/privacy-safety/community-policy-en">{% trans "Community Guidelines" %}</a></h3></div>
+                            <h3><a class="" href="https://support.boloindya.com/en/privacy-safety/community-policy-en">{% trans "Community Guidelines" %}</a></h3>
+                        </div> -->
                         <div class="footer-content-column">
                             <h2>{% trans "Legal" %}</h2>
-                            <h3><a class="" href="https://www.boloindya.com/en/terms-of-use">{% trans "Terms of Service" %}</a></h3>
-                            <h3><a class="" href="https://www.boloindya.com/en/privacy-policy">{% trans "Privacy Policy" %}</a></h3>
-                            <h3><a class="" href="https://www.boloindya.com/en/law-enforcement">{% trans "Law Enforcement" %}</a></h3>
-                            <h3><a class="" href="https://www.boloindya.com/en/copyright-policy">{% trans "Copyright Policy" %}</a></h3></div>
+                            <h3><a class="" href="https://www.boloindya.com/terms-of-service">{% trans "Terms of Service" %}</a></h3>
+                            <h3><a class="" href="https://www.boloindya.com/privacy-policy">{% trans "Privacy Policy" %}</a></h3>
+
+                        </div>
                             {% if user.is_authenticated %}
                             <p>{% trans "Welcome" %} {{ user.username }} !!!</p>
                             <p><a href="javascript:void()" id="signOutLink">{% trans "Log out" %}</a>
@@ -386,27 +387,44 @@
                                 });
                             </script>
 
-<!--                         <div class="jsx-1724846817 jsx-1667329752 language-selection">
-                            <p class="jsx-1724846817 jsx-1667329752">English</p>
-                            <select class="jsx-1724846817 jsx-1667329752 language-selection-form">
-                                <option value="id">Bahasa Indonesia</option>
-                                <option value="de">Deutsch</option>
-                                <option value="en">English</option>
-                                <option value="es">Español</option>
-                                <option value="fr">Français</option>
-                                <option value="it">Italiano</option>
-                                <option value="pl">Polski</option>
-                                <option value="pt_BR">Português</option>
-                                <option value="vi">Tiếng Việt</option>
-                                <option value="tr">Türkçe</option>
-                                <option value="ru">Русский</option>
-                                <option value="hi">हिन्दी</option>
-                                <option value="ko">한국어</option>
-                                <option value="ja">日本語</option>
-                                <option value="zh_Hant">繁體中文</option>
-                                <option value="ar">العربية</option>
-                            </select>
-                        </div> -->
+ 
+
+                        <div class="jsx-1724846817 jsx-1667329752 language-selection">
+                            {% get_current_language as LANGUAGE_CODE %}
+                            {% get_available_languages as LANGUAGES %}
+                            {% get_language_info_list for LANGUAGES as languages %}
+                            {% for language in languages %}
+                            {% if language.code == LANGUAGE_CODE %}
+                              <p class="jsx-1724846817 jsx-1667329752">{{ language.name_local }}</p>
+                            {% endif %}
+                            {% endfor %}
+
+                            <form action="{% url 'set_language' %}" method="post">
+                                {% csrf_token %}
+                                <input name="next" type="hidden" value="{{ redirect_to }}" />
+                                <select class="jsx-1724846817 jsx-1667329752 language-selection-form" name="{% trans 'language' %}"  onchange="this.form.submit()">
+
+                                    {% get_current_language as LANGUAGE_CODE %}
+                                    {% get_available_languages as LANGUAGES %}
+                                    {% get_language_info_list for LANGUAGES as languages %}
+                                    {% for language in languages %}
+
+                                        <option
+                                            value="{{ language.code }}"
+                                            {% if language.code == LANGUAGE_CODE %} selected="selected"{% endif %}
+                                            data-content='<img src="/static/img/flags/{{ language.code }}.png"></span>
+                                            <span style="display:inline-block; width:100px; padding-left: 10px; text-shadow:none">
+                                              {{ language.name_local }}
+                                              <!-- span style="color:#999;">&nbsp;[{{ language.code }}]</span -->
+                                            </span>'>
+                                            {{ language.name_local }}
+                                        </option>
+
+                                    {% endfor %}
+
+                                </select>
+                            </form>
+                        </div>  
                     </div>
                 </div>
             </div>

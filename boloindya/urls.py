@@ -35,6 +35,8 @@ patterns = [
     url(r'^video_bytes/(?P<user_id>\d+)/(?P<poll_id>\d+)/(?P<slug>[\w-]+)/$', forum.topic.views.share_vb_page, name='share_vb_page'),
 
     url(r'^about/$', forum.topic.views.get_about, name='get_about'),
+    url(r'^login/$', forum.topic.views.login, name='login'),
+    url(r'^profile/(?P<username>[\w-]+)/$', forum.topic.views.user_profile, name='user_profile'),
     url(r'^terms-of-service/$', forum.topic.views.get_termofservice, name='get_termofservice'),
     url(r'^privacy-policy/$', forum.topic.views.get_privacypolicy, name='get_privacypolicy'),
     url(r'^challenge/(?P<hashtag>[\w-]+)$', forum.topic.views.share_challenge_page, name='share_challenge_page'),

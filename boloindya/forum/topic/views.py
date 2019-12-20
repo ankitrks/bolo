@@ -529,6 +529,47 @@ def new_home(request):
     # return render(request, 'spirit/topic/new_landing.html')
     # return render(request, 'spirit/topic/main_landing.html')
 
+def login(request):
+    context = {
+        'is_single_topic': "Yes",
+    }    
+    return render(request, 'spirit/topic/_login.html',context)
+def user_profile(request,username):
+    language_id=1
+    languages_with_id=settings.LANGUAGES_WITH_ID
+    languageCode =request.LANGUAGE_CODE
+    language_id=languages_with_id[languageCode]
+
+    popular_bolo = []
+    try:      
+        user = User.objects.get(username=username)
+        #user_profile = UserProfile.objects.get(user = user)
+        user_id=user.id
+        user_profile = UserProfile.objects.filter(user=user,user__is_active = True)[0]
+        topics = Topic.objects.filter(user_id=user_id, is_removed=False)
+        topicsByLang = Topic.objects.filter(user_id=user_id, is_removed=False,language_id=language_id)
+        try:
+            if language_id:
+                all_user = User.objects.filter(st__is_popular = True, st__language=language_id)[10]
+                popular_bolo=all_user
+            else:
+                all_user = User.objects.filter(st__is_popular = True)[10]
+                popular_bolo=all_user
+        except Exception as e1:
+            popular_bolo = []
+
+
+        context = {
+            'user_profile': user_profile,
+            'user':user,
+            'popular_bolo':popular_bolo,
+            'topics': topics,
+            'topicsCount': topicsByLang.count()
+        } 
+        return render(request, 'spirit/topic/user_profile.html', context)
+    except:
+        return render(request, 'spirit/topic/new_landing.html')  
+
 def get_about(request):
     return render(request, 'spirit/topic/about.html')
 
