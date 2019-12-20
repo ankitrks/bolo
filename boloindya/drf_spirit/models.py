@@ -403,9 +403,9 @@ class UserFeedback(models.Model):
             requests.post(
                 "https://api.mailgun.net/v3/mail.careeranna.com/messages",
                 auth=("api", "d6c66f5dd85b4451bbcbd94cb7406f92-bbbc8336-97426998"),
-                data={"from": "BoloIndya Feedback <support@boloindya.com>",
-                      "to": ["anshika@careeranna.com", "varun@careeranna.com", "maaz@careeranna.com", \
-                            "ankit@careeranna.com", "bhoomika@careeranna.com"],
+                data={"from": "BoloIndya Support <support@boloindya.com>",
+                      "to": ["anshika@careeranna.com", "varun@boloindya.com", "maaz@careeranna.com", \
+                            "ankit@careeranna.com"],
                       "cc":[self.contact_email],
                       "subject": "BoloIndya Feedback Received | " + self.user_name() + ' | ' + self.user_contact(),
                       "html": content_email
