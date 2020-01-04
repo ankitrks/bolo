@@ -331,7 +331,11 @@ def transcode_media_file(prefix,input_key,file_name,bucket):
     data_dump += json.dumps(create_job_request)
     create_job_result=transcoder_client.create_job(**create_job_request)
     try:
-        m3u8_url = os.path.join('https://s3.amazonaws.com/'+bucket_credentials['AWS_BUCKET_NAME_TS']+'/', \
+        if bucket_credentials['AWS_BUCKET_NAME_TS']=='elastictranscode.videos':
+            m3u8_url = os.path.join('https://s3.amazonaws.com/'+bucket_credentials['AWS_BUCKET_NAME_TS']+'/', \
+                output_key_prefix_final, playlist_name + '.m3u8')
+        else:
+            m3u8_url = os.path.join('https://'+bucket_credentials['AWS_BUCKET_NAME_TS']+'.s3.amazonaws.com/', \
                 output_key_prefix_final, playlist_name + '.m3u8')
         job_id = create_job_result['Job']['Id']
         data_dump += 'HLS job has been created: ' + json.dumps(create_job_result)
