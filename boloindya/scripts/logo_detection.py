@@ -14,6 +14,8 @@ from ffmpy import FFmpeg
 from forum.topic.models import Topic
 from forum.user.models import UserProfile
 
+PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 # method for converting string to time
 def timetostring(t):
 	minute = 0
