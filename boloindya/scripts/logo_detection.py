@@ -11,6 +11,8 @@ from datetime import timedelta
 from google.cloud import vision
 import operator
 from ffmpy import FFmpeg
+from forum.topic.models import Topic
+from forum.user.models import UserProfile
 
 # method for converting string to time
 def timetostring(t):
