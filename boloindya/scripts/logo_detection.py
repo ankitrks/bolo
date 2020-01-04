@@ -93,3 +93,8 @@ def identify_logo():
 		return JsonResponse({'message' : str(e)})						
 
 
+def main():
+	identify_logo()
+
+def run():
+	main()	
