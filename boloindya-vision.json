@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "boloindya-vision",
+  "private_key_id": "105488fa3e7ce43b77f838ab25b16fc0eaa63078",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDTCAfChXKW9rRm\nqJD4zC9kbMPKHQacGnrDdGN+sg6amgnxHxOuA1ynwFO/TW4TCFVZjU12wvbvrH5r\nPqvMeF7WSTC8HCqUvz3KDJPtQHtwLn7I+nHqOEhzsW+00SeSpC3UGml2KHOHvw78\n3ZLKIxooPBOXKCh3kTTdU2J4D6iW8oduVo+Ep0EqpGbbg2+UqDf+bG8vrJXTIMIC\nQ+DUtAXRFpU4sYGftE2NJ9ClTEQKxIDRMq1eimAGGZ0Dv0EE+5iZYLFORnbml3jK\nfJE/cAaFC8FQQrRBqw7AIyDH5Vx9qKZ3FVGGrWHXeZd+yx8H0wnMGZU8IwKt3kSU\nt5q0IHCpAgMBAAECggEAQ44BCey1Q41jL6/LhNG8ZB4LSSKkkIlLflE+Xnr6gNRJ\n1XXY025BFXRUett7Hr2esOWyhA+ihBQIfiVYUsK/vUI9xyIPIYHc8la3bg4j1cQU\nkxrVJ6Dv1JVbCJuh2ugSwaDY3NnTLgPj9N+rU2kMQRAGR2+0EJ6buTQtw/hjRDp3\nfB5bg7eYxjSWMdJ+R/uZkTyp0pJ9dnddvjRW0UBoSXo/noRhcn+atFTHVBX7v0Mf\nhFt+RFdOePApsDSxp2I7bhrH2tNOZbLyUoLbi0Gu9mbQ1OymK7MUOlVbm1XFKITO\nwWIeVAvlp8/H92yv7xALsueTuOlk5E+dcH3YBxOd5wKBgQDrd3ueT3uP4AQDyTBL\nf3qzOnM/p93vnkSa5CU7JR0Ft7XFrkjHdzosmm3d5E0RHGmpsUHIl1/Xf9fhi1Yu\nV4EDc+oitKV1WJ9Wnsym0NHXb0kEJbf9wCJM27VBXYAXRObAElB/kh43VI7wh9KV\nqNKQgiu0EBzMxEppYA9gWUf+9wKBgQDlbw6J1AH/QUZrhdk84mYmN6GCwpaiPcHy\nFEDKCrPMLFvJykOh4gg0aWgwuCJWd7AuMGVSPEWFanuD4kxQSuvqIDH5WGYrZxBZ\nTsK/3NhsWibVD8axTbOWsmkaMTE6L+3tz3MigFKY18RFtY1Nwmca2Vi7/c5pVj1f\n+PQYl4IFXwKBgQCdj/BqeOlH1zEYj3H/sygZ8ozYFa5O/2sM8olvUGBhSRMbWopc\n3w1Qd235QyHGx2p1IKXSYmjBvUxqImDi1a8A7nnIC3WEVm8Y+V4cajNgo5kKa2r5\nI65QG9zoBncGGxcFg7vWAaKyh6S2k0x41OVBybkQ3o9G/jqE1MC1SkkA9QKBgQDA\ni6tP0DS82zMWGYZuqjG/8QAClPuFvP5/ArA83y51MuT1PGH2AZORKMTf3igzGM8q\ndEMT+LD/fpWZ4NjaqYXDPrGx6JYV5rC5wnd+PQEELcRZGpxNQEBvP9skuBPwGTk8\nUtT1J2wqCSoWtn6Xu4Z76dumKSKJFG79lBiGauAbUQKBgEKpMBx5WY2x53fLtmFp\napbTzI6GzrWEpyWn8VaGaxBGOn1Ngar1ZyIyYJcvU9cUaJnKNREt6BAKN3XxAKb+\n2oQP0OvuNeus20nuiM1/x1M4YPApkocxFaDJckQZF2scHeAoekmMUT/5Xxd4c+bP\nMBKq8VM3z6O+DwQ2N0SD5ATE\n-----END PRIVATE KEY-----\n",
+  "client_email": "boloindya-vision-creds@boloindya-vision.iam.gserviceaccount.com",
+  "client_id": "108180349118702406731",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/boloindya-vision-creds%40boloindya-vision.iam.gserviceaccount.com"
+}
