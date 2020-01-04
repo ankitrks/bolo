@@ -69,7 +69,7 @@ def identify_logo():
 			possible_plag = False
 			plag_text = ""
 			plag_source = ["TikTok", "Helo", "VigeoVideo", "MadeWithVivaVideo"]
-			for intervals in intervals:
+			for interval in intervals:
 				ff = FFmpeg(inputs = {uri: None}, outputs = {"output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
 				ff.run()
 				file_name = PROJECT_PATH + '/drf_spirit/output{}.png'.format(count)
