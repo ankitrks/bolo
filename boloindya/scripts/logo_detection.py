@@ -74,7 +74,7 @@ def identify_logo():
 			for interval in intervals:
 				ff = FFmpeg(inputs = {uri: None}, outputs = {"output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
 				ff.run()
-				file_name = PROJECT_PATH + '/drf_spirit/output{}.png'.format(count)
+				file_name = PROJECT_PATH + '/scripts/output{}.png'.format(count)
 				with io.open(file_name, 'rb') as image_file:
 					content = image_file.read()
 				image = vision.types.Image(content = content)
