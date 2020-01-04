@@ -90,7 +90,7 @@ def identify_logo():
 				#return JsonResponse({'message: Video Byte Removed'})
 
 	except Exception as e:
-		return JsonResponse({'message' : str(e)})						
+		print('' + str(e))						
 
 
 def main():
