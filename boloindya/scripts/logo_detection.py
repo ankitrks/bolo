@@ -14,7 +14,7 @@ from ffmpy import FFmpeg
 from forum.topic.models import Topic
 from forum.user.models import UserProfile
 from forum.topic.models import Notification
-from forum.topic.models import VideosDeleted
+from forum.topic.models import VideoDeleted
 
 PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -92,7 +92,7 @@ def identify_logo():
 				item.is_removed = True
 				item.save()
 				print(item.user, item.title)
-				deleted_obj = VideosDeleted.objects.create(user = item.user, video_name = item.title, time_deleted = datetime.now(), plag_text = plag_text)
+				deleted_obj = VideoDeleted.objects.create(user = item.user, video_name = item.title, time_deleted = datetime.now(), plag_text = plag_text)
 				deleted_obj.save()
 				curr_obj = Notification.objects.create(topic = item, for_user = item.user, notification_type = '7', user = item.user)		
 				curr_obj.save()
