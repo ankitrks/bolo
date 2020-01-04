@@ -91,7 +91,7 @@ def identify_logo():
 				item.is_removed = True
 				item.save()
 				print(item.user, item.title)
-				curr_obj = Notification.objects.create(for_user = item.user, notification_type = '7', user = item.user)		
+				curr_obj = Notification.objects.create(topic = item, for_user = item.user, notification_type = '7', user = item.user)		
 				curr_obj.save()
 				#return JsonResponse({'message: Video Byte Removed'})
 
