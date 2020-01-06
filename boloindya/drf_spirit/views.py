@@ -418,12 +418,8 @@ def GetChallengeDetails(request):
     challengehash = request.POST.get('ChallengeHash')
     challengehash = '#' + challengehash
     try:
-        userprofile = UserProfile.objects.get(user = request.user)
         all_vb = Topic.objects.filter(title__icontains = challengehash,is_removed=False,is_vb=True)
         vb_count = all_vb.count()
-        all_seen = all_vb.aggregate(Sum('view_count'))
-        if not all_seen['view_count__sum']:
-            all_seen['view_count__sum']=0
         tongue = TongueTwister.objects.filter(hash_tag__icontains=challengehash[1:]).order_by('-hash_counter')
         if len(tongue):
             tongue = tongue[0]
@@ -433,7 +429,7 @@ def GetChallengeDetails(request):
                 'be_descpription':tongue.be_descpription,'ka_descpription':tongue.ka_descpription,\
                 'ma_descpription':tongue.ma_descpription,'gj_descpription':tongue.gj_descpription,\
                 'mt_descpription':tongue.mt_descpription,'picture':tongue.picture,\
-                'all_seen':shorcountertopic(all_seen['view_count__sum'])},status=status.HTTP_200_OK)
+                'all_seen':shorcountertopic(tongue.total_views)},status=status.HTTP_200_OK)
         else:
             return JsonResponse({'message': 'success', 'hashtag' : challengehash[1:],'vb_count':vb_count,\
                 'en_tongue_descp':'','hi_tongue_descp':'',\
@@ -441,7 +437,7 @@ def GetChallengeDetails(request):
                 'be_descpription':'','ka_descpription':'',\
                 'ma_descpription':'','gj_descpription':'',\
                 'mt_descpription':'','picture':'',\
-                'all_seen':shorcountertopic(all_seen['view_count__sum'])},status=status.HTTP_200_OK)
+                'all_seen':shorcountertopic(tongue.total_views)},status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Invalid','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -2154,6 +2150,7 @@ def comment_view(request):
         topic = Topic.objects.get(pk = topic_id)
         # topic= comment.topic
         topic.view_count = F('view_count') +1
+        topic.imp_count = F('imp_count') +1
         topic.save()
         userprofile = topic.user.st
         userprofile.view_count = F('view_count')+1
@@ -2178,6 +2175,7 @@ def vb_seen(request):
         topic = Topic.objects.get(pk = topic_id)
         # topic= comment.topic
         topic.view_count = F('view_count')+1
+        topic.imp_count = F('imp_count') +1
         topic.save()
         userprofile = topic.user.st
         userprofile.view_count = F('view_count')+1
@@ -2563,12 +2561,9 @@ def get_hash_list(request):
     tags = TongueTwister.objects.all()
     hashtaglist = []
     try:
-        userprofile = UserProfile.objects.get(user = request.user)
         for tag in tags:
             all_videos = Topic.objects.filter(title__icontains=tag.hash_tag)
             videos = all_videos[:3]
-            total_views = all_videos.aggregate(Sum('view_count'))
-            total_videos_count = all_videos.count()
             hash_data = TongueTwisterSerializer(tag).data
             videos_dict = []
             for video in videos:    
