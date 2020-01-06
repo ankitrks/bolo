@@ -824,6 +824,173 @@ ul {
 ._video_card_big_user_info_handle{
     display: inline-block;
 }
+
+/*the container must be positioned relative:*/
+.autocomplete {
+  position: relative;
+  display: inline-block;
+  width: 100%
+}
+
+
+.autocomplete-items {
+  border: 1px solid #d4d4d4;
+  border-bottom: none;
+  position: absolute;
+  border-top: none;
+  z-index: 99;
+  /*position the autocomplete items to be the same width as the container:*/
+  top: 100%;
+  left: 0;
+  right: 0;
+}
+
+.autocomplete-items div {
+  padding: 10px;
+  cursor: pointer;
+  background-color: #fff; 
+  border-bottom: 1px solid #d4d4d4; 
+}
+
+/*when hovering an item:*/
+.autocomplete-items div:hover {
+  background-color: #e9e9e9; 
+}
+
+/*when navigating through the items using the arrow keys:*/
+.autocomplete-active {
+  background-color: DodgerBlue !important; 
+  color: #ffffff; 
+}
+.userNameMargin{
+    margin-top: 5px;
+    margin-left: 10px;
+    position: absolute;
+}
+
+
+.mentions-input-box {
+  position: relative;
+  background: #fff;
+}
+
+.mentions-input-box textarea {
+  width: 100%;
+  display: block;
+  padding: 9px;
+  border: 1px solid #dcdcdc;
+  border-radius:3px;
+  overflow: hidden;
+  background: transparent;
+  position: relative;
+  outline: 0;
+  resize: none;
+
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+.mentions-input-box .mentions-autocomplete-list {
+  display: none;
+  background: #fff;
+  border: 1px solid #b2b2b2;
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+  margin-top: -2px;
+
+  border-radius:5px;
+  border-top-right-radius:0;
+  border-top-left-radius:0;
+
+  -webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.148438);
+     -moz-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.148438);
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.148438);
+}
+
+.mentions-input-box .mentions-autocomplete-list ul {
+    margin: 0;
+    padding: 0;
+}
+
+.mentions-input-box .mentions-autocomplete-list li {
+  background-color: #fff;
+  padding: 0 5px;
+  margin: 0;
+  width: auto;
+  border-bottom: 1px solid #eee;
+  height: 26px;
+  line-height: 26px;
+  overflow: hidden;
+  cursor: pointer;
+  list-style: none;
+  white-space: nowrap;
+}
+
+.mentions-input-box .mentions-autocomplete-list li:last-child {
+  border-radius:5px;
+}
+
+.mentions-input-box .mentions-autocomplete-list li > img,
+.mentions-input-box .mentions-autocomplete-list li > div.icon {
+  width: 16px;
+  height: 16px;
+  float: left;
+  margin-top:5px;
+  margin-right: 5px;
+  -moz-background-origin:3px;
+
+  border-radius:3px;
+}
+
+.mentions-input-box .mentions-autocomplete-list li em {
+  font-weight: bold;
+  font-style: none;
+}
+
+.mentions-input-box .mentions-autocomplete-list li:hover,
+.mentions-input-box .mentions-autocomplete-list li.active {
+  background-color: #f2f2f2;
+}
+
+.mentions-input-box .mentions-autocomplete-list li b {
+  background: #ffff99;
+  font-weight: normal;
+}
+
+.mentions-input-box .mentions {
+  position: absolute;
+  left: 1px;
+  right: 0;
+  top: 1px;
+  bottom: 0;
+  padding: 9px;
+  color: #fff;
+  overflow: hidden;
+
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.mentions-input-box .mentions > div {
+  color: #fff;
+  white-space: pre-wrap;
+  width: 100%;
+}
+
+.mentions-input-box .mentions > div > strong {
+  font-weight:normal;
+  background: #d8dfea;
+}
+
+.mentions-input-box .mentions > div > strong > span {
+    color: #fff0;
+  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+}
+
+
 </style>
 
 
@@ -895,15 +1062,11 @@ ul {
                                     <div>
                                         <div class="_video_card_big_meta_info_">
 
-                                            <div class="_video_card_big_meta_info_count"><strong>507.1k {% trans "likes" %} · 2.3k {% trans "comments" %}</strong> </div>
+                                            <div class="_video_card_big_meta_info_count"><strong>507.1k {% trans "likes" %} · 2.3k {% trans "comments" %}</strong> <span><a href="#">Download</a></span> </div>
                                             <input type="hidden" name="tpoicId" id="topicID" value="" >
                                             <input type="hidden" name="topicCreatorUsername" id="topicCreatorUsername" value="" >
                                         </div>
-                <!--                         <div class="jsx-1861775669 jsx-537314381 copy-link-container">
-                                            <img src="/media/copy_link.svg" class="jsx-1861775669 jsx-537314381">
-                                            <input readonly=""  class="jsx-1861775669 jsx-537314381 " id="shareInputbox" value="https://www.boloindya.com/@karansingharoraofficial/video/6758860880575827202">
-                                            <p class="jsx-1861775669 jsx-537314381 " onclick="copyShareLink();">{% trans "COPY" %}</p>
-                                        </div> -->
+ 
                                         <div class="_6w18">
                                             <div class="_6w1g _29ak">
                                                 <span>
@@ -953,13 +1116,92 @@ ul {
                                         <hr style="margin-bottom: 10px;">
 
                                         <div class="_6w1l _6w1m _6w1o clearfix clearfix hide"  data-testid="UFI2Composer/root" id="commentInputId" direction="left">
+<style type="text/css">
+    .tags-container {
+    display: flex;
+    flex-flow: row wrap;
+    margin-bottom: 15px;
+    width: 100%;
+    min-height: 34px;
+    padding: 2px 5px;
+    font-size: 12px;
+    line-height: 1.6;
+    background-color: transparent;
+    border: 1px solid #ccc;
+    border-radius: 1px;
+    overflow: hidden;
+    word-wrap: break-word;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+.tag:first-child {
+    margin-left: 0;
+}
+.tag {
+    position: relative;
+    margin: 8px 2px 8px 0;
+    padding: 1px 15px 1px 8px;
+    font-size: inherit;
+    font-weight: 400;
+    text-align: center;
+    color: #fff;
+    background-color: #317CAF;
+    border-radius: 3px;
+    transition: background-color .3s ease;
+    cursor: default;
+}
+.tag__name {
+    margin-right: 3px;
+}
+.tag__remove {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 20px;
+    height: 100%;
+    padding: 0 5px;
+    font-size: 16px;
+    font-weight: 400;
+    transition: opacity .3s ease;
+    opacity: .5;
+    cursor: pointer;
+    border: 0;
+    background-color: transparent;
+    color: #fff;
+    line-height: 1;
+}
+input.tag-input {
+    flex: 3;
+    border: 0;
+    outline: 0;
+}
 
+
+
+
+</style>
                                             <div class="">
                                                 
-                                                <div class="comment-add">
-                                                    <input id="comment-input" autocomplete="off" maxlength="60" placeholder="Say something nice..">
-                                                    <span class="chars-counter"><span id="chars-current">0</span>/60</span>
+                                                <div class="comment-add ">
+<!--                                                     <label for="exist-values" id="listUsersId">
+                                                        <input type="hidden" id="exist-values" class="tagged form-control" data-removebtn="true" name="tag-2" value="PC,Play Station 4,New" placeholder="Add Platform">
+                                                        <div class="tags-container">
+    
+                                                            <span class="lastElement"></span>
+                                                            <input value="" class="tag-input" id="comment-input" autocomplete="off" maxlength="60" placeholder="Say something nice..">
+                                                        </div>
+                                                    </label> -->
+
+
+                                                    <textarea class='mention' id="comment-input" autocomplete="off" maxlength="60" placeholder="Say something nice.."></textarea>
+
+
+     
                                                 </div>
+
+
+
+
+                                                <span class="chars-counter"><span id="chars-current">0</span>/60</span>
                                                 <span class="commentError"></span>
                                             </div>
                                         </div>
@@ -1023,6 +1265,10 @@ ul {
         </div>
     </div>
 </div>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js' type='text/javascript'></script>
+<script src='/media/js/jquery.events.input.js' type='text/javascript'></script>
+<script src='/media/js/jquery.elastic.js' type='text/javascript'></script>
+<script src='/media/js/jquery.mentionsInput.js' type='text/javascript'></script>
 <!-----------  Comment Script  ------------>
 <script src="/media/js/comment_and_play.js"></script>
 <!-----------End  ------------>

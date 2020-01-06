@@ -175,33 +175,37 @@ video.jsx-3382097194 {
 </style>
 <div class="jsx-3819228898">
 
-    <input type="hidden" name="id" id="currentCatId" value="{{ category_details.id}}">
+
+    <input type="hidden" name="id" id="currentCatId" value="{{tongue.id}}">
+    <input type="hidden" name="hashtagId" id="hashtagId" value="{{hashtag}}">
     <div class="jsx-606928072 share-layout">
         <div class="share-layout-content">
             <header class="share-layout-header bottom-line share-header">
-                <div class="jsx-2177493926 jsx-578937417 avatar round userProfilAvator" style="background-image: url({{ category_details.category_image}}); "></div>
+                <div class="jsx-2177493926 jsx-578937417 avatar round userProfilAvator" style="background-image: url({{ tongue.picture}}); "></div>
                 <div class="share-info">
 
-                    <h1 class="share-title headingMargin"> @{{category_details.slug}}</h1> 
-                    <p class="count-infos"><span class="number"></span><span class="unit"> {{category_details.view_count | shorcountertopic}} Views</span><span class="number"> </span>
-                        <span class="unit">
-                            <button onclick="follow_category('{{category_details.id}}');" class="_4jy1 _4jy4 _517h _51sy _42ft " type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-{{category_details.id}} followCheck sx_5da455"></i><span class="btnTextChange-{{category_details.id}}">Follow</span>
+                    <h1 class="share-title headingMargin"> #{{tongue.hash_tag}}</h1> 
+                    <p class="count-infos"><span class="number"></span><span class="unit"> {{all_seen.view_count__sum | shorcountertopic}} Views</span><span class="number"> </span>
+<!--                         <span class="unit">
+                            <button onclick="follow_category('{{tongue.id}}');" class="_4jy1 _4jy4 _517h _51sy _42ft " type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-{{tongue.id}} followCheck sx_5da455"></i><span class="btnTextChange-{{tongue.id}}">Follow</span>
                             </button>
-                        </span>
+                        </span> -->
                     </p>
                     </div>
             </header>
-
+           
             <main class="share-layout-main">
 
-                <div class="jsx-2893588005 video-feed" id="categoryVideosListId">
+                <div class="jsx-2893588005 video-feed" id="hashTagVideosListId">
                     <div class="_scroll_load_more_loading_user_videos center">
-                        <div class="boloindya-loading">Loading...</div>
+                        <div class="boloindya-loading"></div>
                     </div>
                 </div>
+                <div class="_scroll_load_more_loading_user_videosMore center">
+                    <div class="boloindya-loading"></div>
+                </div>
+                <input type="hidden" name="nextPageUrl" id="nextPageUrlId" value="">
             </main>
-           
-
 
 
         </div>
@@ -256,7 +260,7 @@ video.jsx-3382097194 {
 </div>
 
 
-<script src="/media/js/topic_details.js"></script>
+<script src="/media/js/hashtag_details.js"></script>
 <!-- Start Comments Section -->
 {% include "spirit/_video_play_and_comments.html" %}
 <!-- End Load Comments  -->

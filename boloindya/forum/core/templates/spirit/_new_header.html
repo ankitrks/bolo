@@ -366,7 +366,8 @@
 
                         </div>
                             {% if user.is_authenticated %}
-                            <p>{% trans "Welcome" %} {{ user.username }} !!!</p>
+
+                            <p>{% trans "Welcome" %} <a href="/profile">{{ user.username }}</a> !!!</p>
                             <p><a href="javascript:void()" id="signOutLink">{% trans "Log out" %}</a>
                             {% endif %}
                             <form style='display: none;' method="post" action="{% url 'account_logout' %}">

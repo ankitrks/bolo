@@ -391,7 +391,7 @@ function create_comment(inputComment){
         thumbnail='/media/demo_user.png';
     }
 
-    var topicID = document.getElementById('topicID').value;
+    var topicID = document.getElementById('singleTopicId').value;
     var elem = document.getElementById('some_div');
     var data=[];
     data.push({name: 'topic_id', value: topicID});
@@ -603,4 +603,81 @@ jQuery(document).ready(function(){
     followLikeList();
 });
 
+//====================Mention and hashtag===================
+
+    $(function () {
+
+      var searchURI="";
+      var hashTagSearch="";
+      $('#comment-input').keydown(function(e){
+        console.log('keyCode:'+e.keyCode);
+        if (e.keyCode == 51) {
+          searchURI="/api/v1/mention_suggestion/";
+          hashTagSearch="";
+        }else if(e.keyCode == 50){
+          hashTagSearch=50;
+          searchURI="/api/v1/hashtag_suggestion/";
+        }
+      });
+
+      $('textarea.mention').mentionsInput({
+        onDataRequest:function (mode, query, callback) {
+            console.log(query);
+            var uri='/api/v1/mention_suggestion/';
+            var res = encodeURI(uri);
+            var valIn=document.getElementById("comment-input").value;
+            var s2 = valIn.substr(1);
+
+            var ge_local_data="";
+              ge_local_data = JSON.parse(localStorage.getItem("access_data"));
+            var accessToken=ge_local_data.access_token;
+
+            $.ajax({
+                  url:res,
+                  data:{'term':query},
+                  type:"POST",
+                  headers: {
+                    'Authorization':'Bearer '+accessToken,
+                  },
+
+                success: function (response) {
+
+                    if(hashTagSearch==50){
+                      var responseData = response.hash_data;
+                      capitals = responseData.map(function(obj) { 
+                          obj['name'] = obj.hash_tag; // Assign new key  
+                          return obj; 
+                      });
+                      responseData = _.filter(responseData, function(item) { return item.hash_tag.toLowerCase().indexOf(query.toLowerCase()) > -1 });
+                    
+                    }else{
+                      var responseData = response.mention_users;
+                      responseData = _.filter(responseData, function(item) { return item.name.toLowerCase().indexOf(query.toLowerCase()) > -1 });
+                    
+                    }
+                    callback.call(this, responseData);
+
+                }
+            });
+
+
+        }
+
+      });
+
+
+      $('.get-syntax-text').click(function() {
+        $('textarea.mention').mentionsInput('val', function(text) {
+          alert(text);
+        });
+      });
+
+      $('.get-mentions').click(function() {
+        $('textarea.mention').mentionsInput('getMentions', function(data) {
+          alert(JSON.stringify(data));
+        });
+      }) ;
+
+    });
+//=====================End mentions=========================
 

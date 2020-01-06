@@ -580,13 +580,13 @@
                             <div class="_5vx7 clearfix" direction="both">
                                 <div class="_ohe lfloat">
                                     <ul class="_43o4 _4470" role="tablist" width="1010px" style="width: 1010px;">
-                                        <li data-edge="keywords_search" class=" _5vwz _5vwy _45hc _1hqh" role="presentation">
+<!--                                         <li data-edge="keywords_search" class=" _5vwz _5vwy _45hc _1hqh" role="presentation">
                                             <a aria-haspopup="false" href="javascript:void(0)" role="tab" tabindex="0" class="_3m1v _468f" aria-selected="true">
                                                 <div class="_4jq5">
                                                     <div class="_4xjz">All</div>
                                                     <div class="_4xj-" aria-hidden="true">All</div>
                                                 </div><span class="_13xf"></span></a>
-                                        </li>
+                                        </li> -->
                                         <li data-edge="keywords_blended_posts" class=" _5vwz _45hc" role="presentation">
                                             <a onclick="getVideoSearchResult();" aria-haspopup="false" href="javascript:void(0)" role="tab" tabindex="-1" class="_3m1v _468f" aria-selected="false">
                                                 <div class="_4jq5">
@@ -610,19 +610,19 @@
                                                 </div><span class="_13xf"></span></a>
                                         </li>
                                         <li data-edge="keywords_blended_photos" class=" _5vwz _45hc" role="presentation">
-                                            <a aria-haspopup="false" href="javascript:void(0)" role="tab" tabindex="-1" class="_3m1v _468f" aria-selected="false">
+                                            <a aria-haspopup="false" onclick="getSearchHashtagSuggestion();" href="javascript:void(0)" role="tab" tabindex="-1" class="_3m1v _468f" aria-selected="false">
                                                 <div class="_4jq5">
                                                     <div class="_4xjz">Hashtags</div>
                                                     <div class="_4xj-" aria-hidden="true">Hashtags</div>
                                                 </div><span class="_13xf"></span></a>
                                         </li>
-                                        <li data-edge="keywords_blended_videos" class="_5vwz _45hc" role="presentation">
-                                            <a aria-haspopup="false" href="javascript:void(0)" role="tab" tabindex="-1" class="_3m1v _468f" aria-selected="false">
+<!--                                         <li data-edge="keywords_blended_videos" class="_5vwz _45hc" role="presentation">
+                                            <a aria-haspopup="false" onclick="getSearchMentionSuggestion();" href="javascript:void(0)" role="tab" tabindex="-1" class="_3m1v _468f" aria-selected="false">
                                                 <div class="_4jq5">
                                                     <div class="_4xjz">Mentioned</div>
                                                     <div class="_4xj-" aria-hidden="true">Mentioned</div>
                                                 </div><span class="_13xf"></span></a>
-                                        </li>
+                                        </li> -->
 
 
                                     </ul>
@@ -863,6 +863,136 @@ function popularSearchCategoryItem(itemVideoByte){
 
 
 
+function hashtagSuggestion(){
+
+}
+
+
+
+function getSearchMentionSuggestion(){
+    loaderBoloShowDynamic('_scroll_load_more_loading_right');
+    loaderBoloShowDynamic('_scroll_load_more_loading_left');
+    $("#userVideosListId").empty("");
+    $("#creatorItemListId").empty("");    
+    var playListData=[]; 
+    var platlistItems;
+    var listItems="";
+    var itemCount=0;
+    var language_id=1;
+    var uri='/api/v1/mention_suggestion/';
+    var res = encodeURI(uri);
+    var category_with_video_list="";
+    language_id=current_language_id;
+    var search_term= '{{search_term}}';
+    jQuery.ajax({
+        url:res,
+        type:"POST",
+
+        data:{'language_id':language_id,'term':search_term},
+        success: function(response,textStatus, xhr){
+            populaCreatorsItems="";
+            var popularSearchMentions="";
+            var populvideoItems="";
+            var itemCount=0;
+            var responseData=response.category_details;
+            responseData.forEach(function(itemMention) {itemCount++;
+                popularSearchMentions =popularSearchMentionHeading(itemMention);
+                populvideoItems="";
+                populvideoItems+='<div class="_explore_feed_card">';
+                mention_list='<div class="_explore_feed_item">'+popularSearchMentions+''+populvideoItems+'</div>';
+
+                if(itemCount % 2 == 0) {
+                    loaderBoloHideDynamic('_scroll_load_more_loading_right');
+                    $("#catWithVideoIdRight").append(mention_list);
+                }else{
+                     loaderBoloHideDynamic('_scroll_load_more_loading_left');
+                    $("#catWithVideoId").append(mention_list);
+                }
+
+            });
+
+        },
+        error: function(jqXHR, ajaxOptions, thrownError) {
+            console.log(jqXHR);
+           loaderBoloHideDynamic('_scroll_load_more_loading_left');
+           loaderBoloHideDynamic('_scroll_load_more_loading_right');
+
+        }/*  end of error */
+
+  
+    });
+}
+
+
+function popularSearchMentionHeading(mentionItem){
+    var popular_cat_heading_template='<div class="_explore_feed_header"><div class="jsx-2836840237 _card_header_"><a class="jsx-2836840237" href="/tag/'+mentionItem.slug+'/"><div class="jsx-2836840237 _card_header_cover" style="background-image: url('+mentionItem.category_image+');"></div></a><a title="#'+mentionItem.slug+'('+mentionItem.total_view+' views)" class="jsx-2836840237 _card_header_link" href="/tag/'+mentionItem.slug+'/"><div class="jsx-2836840237 _card_header_content"><h3 class="jsx-2836840237 _card_header_title">'+mentionItem.title+'</h3><strong class="jsx-2836840237 _card_header_subTitle">'+mentionItem.total_view+' views</strong><p class="jsx-2836840237 _card_header_desc">...</p></div></a></div></div>';
+    return mention_heading_template;
+}
+
+
+function getSearchHashtagSuggestion(){
+    loaderBoloShowDynamic('_scroll_load_more_loading_right');
+    loaderBoloShowDynamic('_scroll_load_more_loading_left');
+    $("#userVideosListId").empty("");
+    $("#creatorItemListId").empty("");    
+    var playListData=[]; 
+    var platlistItems;
+    var listItems="";
+    var itemCount=0;
+    var language_id=1;
+    var uri='/api/v1/search/hash_tag//';
+    var res = encodeURI(uri);
+    var category_with_video_list="";
+    language_id=current_language_id;
+    var search_term= '{{search_term}}';
+    jQuery.ajax({
+        url:res,
+        type:"GET",
+        data:{'language_id':language_id,'term':search_term},
+        success: function(response,textStatus, xhr){
+            populaCreatorsItems="";
+            var popularSearchMentions="";
+            var populvideoItems="";
+            var itemCount=0;
+            var responseData=response.results;
+            responseData.forEach(function(itemMention) {itemCount++;
+                popularSearchMentions =popularSearchHashtagHeading(itemMention);
+                populvideoItems="";
+                populvideoItems+='<div class="_explore_feed_card">';
+                mention_list='<div class="_explore_feed_item">'+popularSearchMentions+''+populvideoItems+'</div>';
+
+                if(itemCount % 2 == 0) {
+                    loaderBoloHideDynamic('_scroll_load_more_loading_right');
+                    $("#catWithVideoIdRight").append(mention_list);
+                }else{
+                     loaderBoloHideDynamic('_scroll_load_more_loading_left');
+                    $("#catWithVideoId").append(mention_list);
+                }
+
+            });
+
+        },
+        error: function(jqXHR, ajaxOptions, thrownError) {
+            console.log(jqXHR);
+           loaderBoloHideDynamic('_scroll_load_more_loading_left');
+           loaderBoloHideDynamic('_scroll_load_more_loading_right');
+
+        }/*  end of error */
+
+  
+    });
+}
+
+
+function popularSearchHashtagHeading(mentionItem){
+    var hashtag_heading_template='<div class="_explore_feed_header"><div class="jsx-2836840237 _card_header_"><a class="jsx-2836840237" href="/tag/'+mentionItem.hash_tag+'/"><div class="jsx-2836840237 _card_header_cover" style="background-image: url('+mentionItem.picture+');"></div></a><a title="#'+mentionItem.hash_tag+'('+mentionItem.total_views+' views)" class="jsx-2836840237 _card_header_link" href="/tag/'+mentionItem.hash_tag+'/"><div class="jsx-2836840237 _card_header_content"><h3 class="jsx-2836840237 _card_header_title">#'+mentionItem.hash_tag+'</h3><strong class="jsx-2836840237 _card_header_subTitle">'+mentionItem.total_views+' views</strong><p class="jsx-2836840237 _card_header_desc"></p></div></a></div></div>';
+    return hashtag_heading_template;
+}
+
+
+
+
+
 
 
 var playListData=[];
@@ -1087,7 +1217,7 @@ function openVideoInPopup(file,image,indexId){
 
     singleItemData=playListData[indexId];
 
-    var shareURL='/'+singleItemData.user.username+'/'+singleItemData.id+'';
+    var shareURL='https://www.boloindya.com/'+singleItemData.user.username+'/'+singleItemData.id+'';
     var sideBarDetails='<div onClick="openMobileDownloadPopup();" class="jsx-2177493926 jsx-3813273378 avatar round" style="background-image: url(/media/musically_100x100.jpeg); width: 48px; height: 48px; flex: 0 0 48px;"></div><div class="jsx-949708032 boloindya-toolbar" style="margin-top: 20px;"><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-like" onClick="openMobileDownloadPopup();" style="background-image: url(/media/viewIcon.svg);"><span class="jsx-949708032">'+singleItemData.likes_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-comment" onClick="openMobileDownloadPopup();" style="background-image: url(/media/comments.svg);"><span class="jsx-949708032">'+singleItemData.comment_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-share" onclick="openShareTab()" style="background-image: url(/media/share.svg);"><span class="jsx-949708032">'+singleItemData.total_share_count+'</span></div></div>';
     $("#topicID").val(singleItemData.id);
     $("#currentPlayUserId").val(singleItemData.user.userprofile.id);

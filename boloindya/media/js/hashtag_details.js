@@ -1,8 +1,11 @@
 
 $(document).ready(function(){
-    getCategoryVideos();
+
+    getHashtagVideos();
     getSideBarData();
 });
+
+
 
 var userLikeAndUnlike=[];
 
@@ -92,11 +95,169 @@ function getPopularCategory(popularCategory){
 }
 
 
-    var playListData=[];
-function getCategoryVideos(){
+var playListData=[];
+var userLikeAndUnlike=[];
+//http://127.0.0.1:8000/api/v1/get_vb_list/?limit=10&offset=10&user_id=191
+
+var page = 1;
+var checkDataStatus=0;
+$(window).scroll(function() {
+    var scorh=Number($(window).scrollTop() + $(window).height());
+    console.log('Scol+he '+scorh);
+    //if($(window).scrollTop() + $(window).height() >= $(document).height()-800 && $(window).scrollTop() + $(window).height()<$(document).height()) {
+    if($(window).scrollTop() + $(window).height() > $("#hashTagVideosListId").height() && checkDataStatus==0){
+        
+        var nextPageUrl=jQuery("#nextPageUrlId").val();
+        if(undefined !==nextPageUrl && nextPageUrl!=""){
+            page++;
+            loaderBoloShowDynamic('_scroll_load_more_loading_user_videosMore');
+            loadMoreData(nextPageUrl);
+        }
+
+    }
+    console.log('documentHe- '+$(document).height());
+});
+
+
+function getHashtagVideos(limit,offset){
 
     loaderBoloShowDynamic('_scroll_load_more_loading_user_videos');
-    var category_id= $("#currentCatId").val();
+    var hashtagId= $("#hashtagId").val();
+    var platlistItems;
+    var language_id=current_language_id;
+    console.log('CurrentLanguageId:'+current_language_id);
+    var listItems="";
+    var itemCount=0;
+    var userVideoItems="";
+    var uri='/api/v1/get_challenge/';
+    var res = encodeURI(uri);
+
+    jQuery.ajax({
+        url:res,
+        type:"GET",
+        data:{'challengehash':hashtagId,'language_id':language_id},
+        success: function(response,textStatus, xhr){debugger;
+            userVideoItems="";
+            var videoItemList=response.results;
+            //jQuery("#userVideoCountId").html(response.count);
+            var itemCount=-1;
+            videoItemList.forEach(function(itemCreator) {itemCount++;
+                userVideoItems =getVideoItem(itemCreator,itemCount);
+                $("#hashTagVideosListId").append(userVideoItems);
+      
+            });
+            loaderBoloHideDynamic('_scroll_load_more_loading_user_videos');
+            playListData=videoItemList;
+            var nextPageData=response.next;
+            jQuery("#nextPageUrlId").val(response.next);
+            
+            
+
+        }
+  
+    });
+}
+
+
+
+function loadMoreData(NextPageUrl){
+    var hashtagId= $("#hashtagId").val();
+    var platlistItems;
+    checkDataStatus=1;
+    var listItems="";
+    var itemCount=0;
+    var language_id=current_language_id;
+    //var uri='https://www.boloindya.com/api/v1/get_popular_video_bytes/?page=1';
+    var uri=NextPageUrl;
+    var res = encodeURI(uri);
+      $.ajax(
+            {
+                url:res,
+                data:{'language_id':language_id,'challengehash':hashtagId},
+                type: "get",
+                beforeSend: function()
+                {
+                    $('.ajax-load').show();
+                }
+            })
+            .done(function(data)
+            {
+                if(data == " "){
+                    $('.ajax-load').html("No more records found");
+                    return;
+                }
+                checkDataStatus=0;
+                userVideoItems="";
+                var videoItemList=data.results;
+                var itemCount=-1;
+                videoItemList.forEach(function(itemCreator) {itemCount++;
+                userVideoItems +=getVideoItem(itemCreator,itemCount);
+                playListData.push(itemCreator);          
+      
+                });
+                loaderBoloHideDynamic('_scroll_load_more_loading_user_videosMore');
+                //playListData+=videoItemList;
+                //hashTagVideosListId
+                $('.ajax-load').hide();
+                var nextPageData="";
+                $("#hashTagVideosListId").append(userVideoItems);
+                var nextPageData=data.next;
+                if(nextPageData!=""){
+                    jQuery("#nextPageUrlId").val(nextPageData);
+                }else{
+                   jQuery("#nextPageUrlId").val(nextPageData); 
+                }
+                
+            })
+            .fail(function(jqXHR, ajaxOptions, thrownError)
+            {
+                if(jqXHR.status!=201){
+                    
+                }
+                loaderBoloHideDynamic('_scroll_load_more_loading_user_videosMore');
+                  $('.ajax-load').html("No more records found");
+            });
+    }
+
+
+
+
+
+function getVideoItem(videoItem,itemCount){
+
+    var userVideoItem = '<div class="jsx-1410658769 video-feed-item">\
+            <div class="jsx-1410658769 _ratio_">\
+                <div class="jsx-1410658769" style="padding-top: 148.438%;">\
+                    <div class="jsx-1410658769 _ratio_wrapper">\
+                        <a href="javascript:void(0)" onClick="openVideoInPopup(\''+videoItem.backup_url+'\',\''+videoItem.question_image+'\','+itemCount+');" class="jsx-2893588005 video-feed-item-wrapper">\
+                            <div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+videoItem.question_image+');">\
+                                <div class="jsx-3077367275 video-card default">\
+                                    <div class="jsx-3077367275 video-card-mask">\
+                                        <div class="jsx-1543915374 card-footer normal no-avatar">\
+                                            <div class="jsx-1543915374"><img src="/media/download.svg" class="jsx-1543915374 like-icon"><span class="jsx-1543915374">'+videoItem.likes_count+'</span></div>\
+                                        </div>\
+                                    </div>\
+                                </div>\
+                            </div>\
+                        </a>\
+                    </div>\
+                </div>\
+            </div>\
+        </div>';
+
+        return userVideoItem;
+}
+
+
+
+
+
+
+    var playListData=[];
+function getCategoryVideos(){debugger;
+
+    loaderBoloShowDynamic('_scroll_load_more_loading_user_videos');
+    var hashtagId= $("#hashtagId").val();
      
     var platlistItems;
 
@@ -110,16 +271,16 @@ function getCategoryVideos(){
         // },
         //http://www.boloindya.com/api/v1/get_vb_list/?limit=1&offset=11
     //var uri='https://www.boloindya.com/api/v1/get_popular_video_bytes/?page=1';
-    var uri='/api/v1/get_category_detail_with_views/';
+    var uri='/api/v1/get_challenge/';
     var res = encodeURI(uri);
 
     jQuery.ajax({
         url:res,
-        type:"POST",
-        data:{'category_id':category_id,language_id:language_id},
-        success: function(response,textStatus, xhr){
+        type:"GET",
+        data:{'challengehash':hashtagId,language_id:language_id},
+        success: function(response,textStatus, xhr){debugger;
             userVideoItems="";
-            var videoItemList=response.category_details.topics;
+            var videoItemList=response.results;
             var itemCount=0;
             videoItemList.forEach(function(itemCreator) {itemCount++;
                 playListData[itemCreator.id]=itemCreator;

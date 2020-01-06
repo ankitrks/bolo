@@ -8,7 +8,7 @@ from django.http import HttpResponsePermanentRedirect
 from django.utils.translation import ugettext_lazy as _
 from djconfig import config
 from django.conf import settings
-
+from django.db.models import Sum
 
 from ..core.utils.paginator import paginate, yt_paginate
 from ..core.utils.ratelimit.decorators import ratelimit
@@ -410,7 +410,7 @@ def video_discover(request):
         'trending_videos':trending_videos,
         'categories':categories
     }
-    print popular_bolo.__dict__
+    #print popular_bolo.__dict__
     return render(request, 'spirit/topic/video_discover.html', context)
 
 
@@ -474,12 +474,85 @@ def bolo_user_details(request,username=''):
         return render(request, 'spirit/topic/user_details.html', context)
     except:
         return render(request, 'spirit/topic/new_landing.html')
+
+def user_timeline(request):
+    username=request.GET.get('username');
+    language_id=1
+    languages_with_id=settings.LANGUAGES_WITH_ID
+    languageCode =request.LANGUAGE_CODE
+    language_id=languages_with_id[languageCode]
+
+    popular_bolo = []
+    try:      
+        user = User.objects.get(username=username)
+        #user_profile = UserProfile.objects.get(user = user)
+        user_id=user.id
+        user_profile = UserProfile.objects.filter(user=user,user__is_active = True)[0]
+        topics = Topic.objects.filter(user_id=user_id, is_removed=False)
+        topicsByLang = Topic.objects.filter(user_id=user_id, is_removed=False,language_id=language_id)
+        try:
+            if language_id:
+                all_user = User.objects.filter(st__is_popular = True, st__language=language_id)[10]
+                popular_bolo=all_user
+            else:
+                all_user = User.objects.filter(st__is_popular = True)[10]
+                popular_bolo=all_user
+        except Exception as e1:
+            popular_bolo = []
+
+
+        context = {
+            'user_profile': user_profile,
+            'user':user,
+            'popular_bolo':popular_bolo,
+            'topics': topics,
+            'topicsCount': topicsByLang.count()
+        }
+        #print popular_bolo.__dict__
+        return render(request, 'spirit/topic/user_details.html', context)
+    except:
+        return render(request, 'spirit/topic/new_landing.html')
+
+
+
+def get_challenge_details(request):
+    challengeHash=request.GET.get('ChallengeHash');
+    language_id=1
+    popular_bolo = []
+    tongue=[]
+    category_details=""
+    challengehash=""
+    languages_with_id=settings.LANGUAGES_WITH_ID
+    languageCode =request.LANGUAGE_CODE
+    language_id=languages_with_id[languageCode] 
+    challengehash = '#' + challengeHash
+
+    all_vb = Topic.objects.filter(title__icontains = challengehash,is_removed=False,is_vb=True)
+    vb_count = all_vb.count()
+    all_seen = all_vb.aggregate(Sum('view_count'))
+    if not all_seen['view_count__sum']:
+        all_seen['view_count__sum']=0
+    tongue = TongueTwister.objects.filter(hash_tag__icontains=challengehash[1:]).order_by('-hash_counter')
+    if len(tongue):
+        tongue = tongue[0]
+    context = {
+        'tongue':tongue,
+        'all_seen':all_seen,
+        'vb_count':vb_count,
+        'hashtag':challengeHash,
+
+    }
+    #print TongueTwister.__dict__
+    return render(request, 'spirit/topic/topic_list_by_hashtag.html', context)
+
        
 def get_topic_details_by_category(request,category_slug):
     language_id=1
     popular_bolo = []
     category_details=""
-     
+    languages_with_id=settings.LANGUAGES_WITH_ID
+    languageCode =request.LANGUAGE_CODE
+    language_id=languages_with_id[languageCode]  
 
     try:     
         category = Category.objects.get(slug=category_slug)
@@ -512,6 +585,40 @@ def get_topic_details_by_category(request,category_slug):
     except:
         return render(request, 'spirit/topic/new_landing.html')
 
+def get_topic_list_by_hashtag(request,hashtag):
+    language_id=1
+    popular_bolo = []
+    tongue=[]
+    category_details=""
+    challengehash=""
+    languages_with_id=settings.LANGUAGES_WITH_ID
+    languageCode =request.LANGUAGE_CODE
+    language_id=languages_with_id[languageCode] 
+    challengehash = '#' + hashtag
+    print challengehash
+    try:
+        all_vb = Topic.objects.filter(title__icontains = challengehash,is_removed=False,is_vb=True)
+        vb_count = all_vb.count()
+        all_seen = all_vb.aggregate(Sum('view_count'))
+        if not all_seen['view_count__sum']:
+            all_seen['view_count__sum']=0
+        tongue = TongueTwister.objects.filter(hash_tag__icontains=challengehash[1:]).order_by('-hash_counter')
+        if len(tongue):
+            tongue = tongue[0]
+        context = {
+            'tongue':tongue,
+            'all_seen':all_seen,
+            'vb_count':vb_count,
+            'hashtag':hashtag,
+
+        }
+        #print TongueTwister.__dict__
+        return render(request, 'spirit/topic/topic_list_by_hashtag.html', context)
+    except:
+        return render(request, 'spirit/topic/new_landing.html')
+
+
+
 def search_by_term(request):
     search_term = request.GET.get('term','')
     context = {
@@ -521,7 +628,14 @@ def search_by_term(request):
     return render(request, 'spirit/topic/search_results.html',context)
 
 def new_home(request):
+    categories = []
+    try:
+        categories = Category.objects.filter(parent__isnull=False)[:5]
+    except Exception as e1:
+        categories = []
+
     context = {
+        'categories':categories,
         'is_single_topic': "Yes",
     }    
     return render(request, 'spirit/topic/new_landing.html',context)
