@@ -93,11 +93,11 @@ def identify_logo():
 				item.is_removed = True
 				item.save()
 				print(item.user, item.title)
-				deleted_obj_count = VideoDeleted.objects.filter(user = item.user, video_name = item.title, time_deleted = datetime.now(), plag_text = plag_text)
+				deleted_obj_count = VideoDeleted.objects.filter(user = item.user, video_name = item.title, time_deleted = datetime.now(), plag_text = plag_text).count()
 				if(deleted_obj_count == 0):
 					deleted_obj = VideoDeleted.objects.create(user = item.user, video_name = item.title, time_deleted = datetime.now(), plag_text = plag_text)
 					deleted_obj.save()
-					
+
 				curr_obj_count = Notification.objects.filter(topic = item, for_user = item.user, notification_type = '7', user = item.user).count()
 				if(curr_obj_count == 0):
 					curr_obj = Notification.objects.create(topic = item, for_user = item.user, notification_type = '7', user = item.user)		
