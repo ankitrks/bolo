@@ -72,7 +72,7 @@ def identify_logo():
 			count = 1
 			possible_plag = False
 			plag_text = ""
-			plag_source = ["TikTok", "Helo", "VigeoVideo", "MadeWithVivaVideo", "Tik", "Tok"]
+			plag_source = ["TikTok", "Helo", "VigeoVideo", "MadeWithVivaVideo", "Tik", "Tok", "Vivo", "ShareChat", "Nojoto", "Trell", "ROPOSO", "Like"]
 			for interval in intervals:
 				ff = FFmpeg(inputs = {uri: None}, outputs = {"output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
 				ff.run()
