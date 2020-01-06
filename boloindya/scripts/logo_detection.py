@@ -41,7 +41,7 @@ def timetostring(t):
 # method to identify plagarised logos in videos uploaded
 def identify_logo():
 
-	print("hello")
+	#print("hello")
 	try:
 		client = vision.ImageAnnotatorClient()
 		today = datetime.today()
