@@ -752,7 +752,6 @@ class Leaderboard(UserInfo):
 
 # model for recording the details of video deleted
 class VideoDeleted(models.Model):
-    
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='username_topics')
     video_name = models.TextField(_("video_name"), null = False, blank = False)
     time_deleted = models.DateTimeField(auto_now = True, auto_now_add = False, blank = False, null = False)
