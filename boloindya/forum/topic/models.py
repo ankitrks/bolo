@@ -132,6 +132,7 @@ class Topic(models.Model):
     m3u8_content = models.TextField(_("M3U8 Content"), blank = True, null = True)
     audio_m3u8_content = models.TextField(_("Audio M3U8 Content"), blank = True, null = True)
     video_m3u8_content = models.TextField(_("Video M3U8 Content"), blank = True, null = True)
+    downloaded_url = models.CharField(_("downloaded URL"), max_length=255, blank = True, null = True)
 
     objects = TopicQuerySet.as_manager()
 
