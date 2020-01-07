@@ -97,8 +97,9 @@ def identify_logo():
 					deleted_obj = VideoDeleted.objects.create(user = item.user, video_name = item.title, time_deleted = datetime.now(), plag_text = plag_text)
 					deleted_obj.save()
 
-					curr_obj = Notification.objects.create(topic = item, for_user = item.user, notification_type = '7', user = item.user)		
-					curr_obj.save()
+					Topic.delete(item)		# call the method to delete the video
+					#curr_obj = Notification.objects.create(topic = item, for_user = item.user, notification_type = '7', user = item.user)		
+					#curr_obj.save()
 				#return JsonResponse({'message: Video Byte Removed'})
 
 	except Exception as e:
