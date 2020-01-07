@@ -50,7 +50,7 @@ def identify_logo():
 			uri = item.backup_url
 			duration = item.media_duration 
 			time = duration.split(":")
-			print(time)
+			#print(time)
 			minute = int(time[0]) * 60
 			second = int(time[1])
 			total_second = minute + second
@@ -72,7 +72,11 @@ def identify_logo():
 			count = 1
 			possible_plag = False
 			plag_text = ""
-			plag_source = ["TikTok", "Helo", "VigeoVideo", "MadeWithVivaVideo", "Tik", "Tok", "Vivo", "ShareChat", "Nojoto", "Trell", "ROPOSO", "Like"]		
+			plag_source = []
+			plag_text_options = Topic.plag_text_options			# import plag list from the Topic model
+			for (a,b) in plag_text_options:
+				plag_source.append(b)
+
 			for interval in intervals:
 				ff = FFmpeg(inputs = {uri: None}, outputs = {"output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
 				ff.run()
@@ -96,7 +100,7 @@ def identify_logo():
 					item.save()
 					#deleted_obj = VideoDeleted.objects.create(user = item.user, video_name = item.title, time_deleted = datetime.now(), plag_text = plag_text)
 					#deleted_obj.save()
-					item.delete()  			# call the method to delete the video
+					Topic.delete(item)			# call the method to delete the video
 					
 					
 
