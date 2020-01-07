@@ -41,7 +41,7 @@ def timetostring(t):
 # method to identify plagarised logos in videos uploaded
 def identify_logo():
 
-	#print("hello")
+	print("hello")
 	try:
 		client = vision.ImageAnnotatorClient()
 		today = datetime.today()
@@ -49,7 +49,7 @@ def identify_logo():
 		topic_objects = Topic.objects.filter(date__gte = long_ago)
 
 		for item in topic_objects:
-			orint("c1")
+			print("c1")
 			uri = item.backup_url
 			duration = item.media_duration 
 			time = duration.split(":")
@@ -102,7 +102,7 @@ def identify_logo():
 					Topic.delete(item)		# call the method to delete the video
 					#curr_obj = Notification.objects.create(topic = item, for_user = item.user, notification_type = '7', user = item.user)		
 					#curr_obj.save()
-				#return JsonResponse({'message: Video Byte Removed'})
+					
 
 	except Exception as e:
 		print('' + str(e))						
