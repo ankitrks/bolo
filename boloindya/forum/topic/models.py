@@ -133,6 +133,25 @@ class Topic(models.Model):
     audio_m3u8_content = models.TextField(_("Audio M3U8 Content"), blank = True, null = True)
     video_m3u8_content = models.TextField(_("Video M3U8 Content"), blank = True, null = True)
 
+    plag_text_options = (
+        ('0', "TikTok"),
+        ('1', "Helo"),
+        ('2', "VigeoVideo"),
+        ('3', "MadeWithVivaVideo"),
+        ('4', "Tik"),
+        ('5', "Tok"),
+        ('6', "Vivo"),
+        ('7', "ShareChat"),
+        ('8', "Nojoto"),
+        ('9', "Trell"),
+        ('10', "ROPOSO"),
+        ('11', "Like"),
+    )
+
+    time_deleted = models.DateTimeField(auto_now = True, auto_now_add = False, blank = False, null = False)
+    #text in the video for possible plag
+    plag_text = models.CharField(choices = plag_text_options, blank = False, null = True, max_length = 10)
+
     objects = TopicQuerySet.as_manager()
 
     def __unicode__(self):
@@ -741,12 +760,12 @@ class Leaderboard(UserInfo):
         return str(self.total_score)
 
 # model for recording the details of video deleted
-class VideoDeleted(models.Model):
-    #user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='username_topics')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, editable=False)
-    video_name = models.TextField(_("video_name"), null = False, blank = False)
-    time_deleted = models.DateTimeField(auto_now = True, auto_now_add = False, blank = False, null = False)
-    plag_text = models.TextField(_("plag_text"), null = False, blank = False)
+# class VideoDeleted(models.Model):
+#     #user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='username_topics')
+#     user = models.ForeignKey(settings.AUTH_USER_MODEL, editable=False)
+#     video_name = models.TextField(_("video_name"), null = False, blank = False)
+#     time_deleted = models.DateTimeField(auto_now = True, auto_now_add = False, blank = False, null = False)
+#     plag_text = models.TextField(_("plag_text"), null = False, blank = False)
 
 
 

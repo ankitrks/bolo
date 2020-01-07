@@ -44,7 +44,8 @@ def identify_logo():
 		client = vision.ImageAnnotatorClient()
 		today = datetime.today()
 		long_ago = today + timedelta(hours = -6)			# fetch the records of last 6 hrs
-		topic_objects = Topic.objects.filter(date__gte = long_ago)
+		#topic_objects = Topic.objects.filter(date__gte = long_ago)
+		topic_objects = Topic.objects.exclude(is_removed = False).filter(is_vb = True, date__gte = long_ago)
 
 		for item in topic_objects:
 			uri = item.backup_url
@@ -72,7 +73,7 @@ def identify_logo():
 			count = 1
 			possible_plag = False
 			plag_text = ""
-			plag_source = ["TikTok", "Helo", "VigeoVideo", "MadeWithVivaVideo", "Tik", "Tok", "Vivo", "ShareChat", "Nojoto", "Trell", "ROPOSO", "Like"]
+			plag_source = ["TikTok", "Helo", "VigeoVideo", "MadeWithVivaVideo", "Tik", "Tok", "Vivo", "ShareChat", "Nojoto", "Trell", "ROPOSO", "Like"]		
 			for interval in intervals:
 				ff = FFmpeg(inputs = {uri: None}, outputs = {"output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
 				ff.run()
@@ -91,12 +92,13 @@ def identify_logo():
 			if(possible_plag == True):
 				if(item.is_removed == False):		#if the video has not been deleted
 					print(item.user, item.title)
-					deleted_obj = VideoDeleted.objects.create(user = item.user, video_name = item.title, time_deleted = datetime.now(), plag_text = plag_text)
-					deleted_obj.save()
-
-					Topic.delete(item)		# call the method to delete the video
-					#curr_obj = Notification.objects.create(topic = item, for_user = item.user, notification_type = '7', user = item.user)		
-					#curr_obj.save()
+					item.plag_text = str(plag_source.index(plag_text))
+					item.time_deleted = datetime.now()
+					item.save()
+					#deleted_obj = VideoDeleted.objects.create(user = item.user, video_name = item.title, time_deleted = datetime.now(), plag_text = plag_text)
+					#deleted_obj.save()
+					item.delete()  			# call the method to delete the video
+					
 					
 
 	except Exception as e:
