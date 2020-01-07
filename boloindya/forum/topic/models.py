@@ -105,6 +105,7 @@ class Topic(models.Model):
     is_removed = models.BooleanField(_("removed"), default=False)
     thumbnail = models.CharField(_("thumbnail"), max_length=150, blank = True, null = True, default='')
     view_count = models.PositiveIntegerField(_("views"), default=0)
+    imp_count = models.PositiveIntegerField(_("views"), default=0)
     comment_count = models.PositiveIntegerField(_("comment count"), default=0)
     total_share_count = models.PositiveIntegerField(_("Total Share count"), default=0)# self plus comment
     share_count = models.PositiveIntegerField(_("Share count"), default=0)# only topic share
@@ -132,6 +133,8 @@ class Topic(models.Model):
     m3u8_content = models.TextField(_("M3U8 Content"), blank = True, null = True)
     audio_m3u8_content = models.TextField(_("Audio M3U8 Content"), blank = True, null = True)
     video_m3u8_content = models.TextField(_("Video M3U8 Content"), blank = True, null = True)
+    downloaded_url = models.CharField(_("downloaded URL"), max_length=255, blank = True, null = True)
+
 
     objects = TopicQuerySet.as_manager()
 
