@@ -49,6 +49,7 @@ def identify_logo():
 		topic_objects = Topic.objects.filter(date__gte = long_ago)
 
 		for item in topic_objects:
+			orint("c1")
 			uri = item.backup_url
 			duration = item.media_duration 
 			time = duration.split(":")
