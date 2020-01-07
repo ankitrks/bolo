@@ -1037,6 +1037,7 @@ def createTopic(request):
             topic.view_count = view_count
             topic.update_vb()
             tag_list=title.split()
+            hash_tag = tag_list
             if tag_list:
                 for index, value in enumerate(tag_list):
                     if value.startswith("#"):
@@ -1044,7 +1045,7 @@ def createTopic(request):
                 title = " ".join(tag_list)
                 topic.title = title[0].upper()+title[1:]
                 # for each_tag in tag_list:
-                for index, value in enumerate(tag_list):
+                for index, value in enumerate(hash_tag):
                     if value.startswith("#"):
                         tag,is_created = TongueTwister.objects.get_or_create(hash_tag=value.strip('#'))
                         if not is_created:
@@ -1113,6 +1114,7 @@ def editTopic(request):
 
         if topic.user == request.user:
             tag_list=title.split()
+            hash_tag = tag_list
             if tag_list:
                 for index, value in enumerate(tag_list):
                     if value.startswith("#"):
@@ -1128,8 +1130,8 @@ def editTopic(request):
                     topic.hash_tags.remove(each_hashtag)
                     each_hashtag.save()
                 topic.title = new_title
-                if tag_list:
-                    for index, value in enumerate(tag_list):
+                if hash_tag:
+                    for index, value in enumerate(hash_tag):
                         if value.startswith("#"):
                             tag, is_created = TongueTwister.objects.get_or_create(hash_tag=value.strip("#").lower())
                             if not is_created:
