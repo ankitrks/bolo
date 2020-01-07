@@ -94,6 +94,7 @@ def identify_logo():
 
 			# if the video is plagarized, then send the notifcation to the user			
 			if(possible_plag == True):
+				print("........some video found plag.......")
 				if(item.is_removed == False):		#if the video has not been deleted
 					print(item.user, item.title)
 					item.plag_text = str(plag_source.index(plag_text))
