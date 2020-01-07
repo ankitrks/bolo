@@ -14,7 +14,6 @@ from ffmpy import FFmpeg
 from forum.topic.models import Topic
 from forum.user.models import UserProfile
 from forum.topic.models import Notification
-from forum.topic.models import VideoDeleted
 
 PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
