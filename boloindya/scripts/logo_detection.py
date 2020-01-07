@@ -76,7 +76,8 @@ def identify_logo():
 			plag_text_options = Topic.plag_text_options			# import plag list from the Topic model
 			for (a,b) in plag_text_options:
 				plag_source.append(b)
-
+				
+			print(plag_source)	
 			for interval in intervals:
 				ff = FFmpeg(inputs = {uri: None}, outputs = {"output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
 				ff.run()
