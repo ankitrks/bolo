@@ -885,7 +885,7 @@ def check_hashtag(comment):
             if value.startswith("#"):
                 has_hashtag = True
                 tag_list[index]='<a href="/get_challenge_details/?ChallengeHash='+value.strip('#')+'">'+value+'</a>'
-                tag,is_created = TongueTwister.objects.get_or_create(hash_tag=value.strip('#').lower())
+                tag,is_created = TongueTwister.objects.get_or_create(hash_tag=value.strip('#'))
                 if not is_created:
                     tag.hash_counter = F('hash_counter')+1
                 tag.save()
@@ -1046,7 +1046,7 @@ def createTopic(request):
                 # for each_tag in tag_list:
                 for index, value in enumerate(tag_list):
                     if value.startswith("#"):
-                        tag,is_created = TongueTwister.objects.get_or_create(hash_tag=value.strip('#').lower())
+                        tag,is_created = TongueTwister.objects.get_or_create(hash_tag=value.strip('#'))
                         if not is_created:
                             tag.hash_counter = F('hash_counter')+1
                         tag.save()
