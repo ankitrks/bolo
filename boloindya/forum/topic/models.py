@@ -138,15 +138,14 @@ class Topic(models.Model):
         ('0', "TikTok"),
         ('1', "Helo"),
         ('2', "VigeoVideo"),
-        ('3', "MadeWithVivaVideo"),
-        ('4', "Tik"),
-        ('5', "Tok"),
-        ('6', "Vivo"),
-        ('7', "ShareChat"),
-        ('8', "Nojoto"),
-        ('9', "Trell"),
-        ('10', "ROPOSO"),
-        ('11', "Likee"),
+        ('3', "Tik"),
+        ('4', "Tok"),
+        ('5', "Vivo"),
+        ('6', "ShareChat"),
+        ('7', "Nojoto"),
+        ('8', "Trell"),
+        ('9', "ROPOSO"),
+        ('10', "Likee"),
     )
 
     time_deleted = models.DateTimeField(auto_now = True, auto_now_add = False, blank = False, null = False)
