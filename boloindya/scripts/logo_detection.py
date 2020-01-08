@@ -94,19 +94,19 @@ def identify_logo():
 						possible_plag = True
 						plag_text = str(text.description)
 
-			print(plag_text)			
+			print(plag_text, possible_plag)			
 			# if the video is plagarized, then send the notifcation to the user			
 			if(possible_plag == True):
-				if(item.is_removed == False):		#if the video has not been deleted
-					print("........some video found plag.......")
-					print(item.user, item.title)
-					print(plag_source.index(plag_text))
-					item.plag_text = str(plag_source.index(plag_text))
-					item.time_deleted = datetime.now()
-					item.save()
-					#deleted_obj = VideoDeleted.objects.create(user = item.user, video_name = item.title, time_deleted = datetime.now(), plag_text = plag_text)
-					#deleted_obj.save()
-					Topic.delete(item)			# call the method to delete the video
+				#if the video has not been deleted
+				print("........some video found plag.......")
+				print(item.user, item.title)
+				print(plag_source.index(plag_text))
+				item.plag_text = str(plag_source.index(plag_text))
+				item.time_deleted = datetime.now()
+				item.save()
+				#deleted_obj = VideoDeleted.objects.create(user = item.user, video_name = item.title, time_deleted = datetime.now(), plag_text = plag_text)
+				#deleted_obj.save()
+				Topic.delete(item)			# call the method to delete the video
 					
 					
 
