@@ -104,15 +104,15 @@ class NotificationAPI(GenericAPIView):
 
         # print "offset",offset,"page_size",page_size
 
-        notifications = Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-last_modified')[offset*limit:offset*limit+limit]
-        total_notification_count = Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-last_modified').count()
+        notifications = Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-created_at')[offset*limit:offset*limit+limit]
+        total_notification_count = Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-created_at').count()
         total_offset = total_notification_count/limit
         if total_notification_count > 0 and not total_notification_count%limit:
             total_offset = total_offset-1
         if notifications:
             if total_offset > offset:
                 next_offset = offset+1
-            update_notification_ids = list(Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-last_modified').values_list('pk',flat=True))[offset*limit:offset*limit+limit]
+            update_notification_ids = list(Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-created_at').values_list('pk',flat=True))[offset*limit:offset*limit+limit]
             print update_notification_ids
             Notification.objects.filter(pk__in=update_notification_ids).update(status=1)
 
@@ -990,22 +990,24 @@ def replyOnTopic(request):
         return JsonResponse({'message': 'Topic Id / User Id / Comment provided'}, status=status.HTTP_204_NO_CONTENT)
 
 def check_hashtag(comment):
+    has_hashtag = False
     title = comment.comment
-    tag_list=[tag.strip("#") for tag in title.split() if tag.startswith("#")]
+    tag_list=title.split()
     if tag_list:
-        hash_tag=[tag for tag in title.split() if tag.startswith("#")]
-        for each_tag in hash_tag:
-            title = title.replace(each_tag,'<a href="/get_challenge_details/?ChallengeHash='+each_tag.strip('#')+'">'+each_tag+'</a>')
+        for index,value in enumerate(tag_list):
+            if value.startswith("#"):
+                has_hashtag = True
+                tag_list[index]='<a href="/get_challenge_details/?ChallengeHash='+value.strip('#')+'">'+value+'</a>'
+                tag,is_created = TongueTwister.objects.get_or_create(hash_tag=value.strip('#'))
+                if not is_created:
+                    tag.hash_counter = F('hash_counter')+1
+                tag.save()
+                comment.hash_tags.add(tag)
+        title=" ".join(tag_list)
         title = title[0].upper()+title[1:]
-        for each_tag in tag_list:
-            tag,is_created = TongueTwister.objects.get_or_create(hash_tag=each_tag.lower())
-            if not is_created:
-                tag.hash_counter = F('hash_counter')+1
-            tag.save()
-            comment.hash_tags.add(tag)
-        return True, title
+        return has_hashtag, title
     else:
-        return False,title
+        return has_hashtag, title
 
 def remove_old_hashtag(comment,history_comment):
     hash_tags = comment.hash_tags.all()
@@ -1147,18 +1149,22 @@ def createTopic(request):
             view_count = random.randint(1,5)
             topic.view_count = view_count
             topic.update_vb()
-            tag_list=[tag.strip("#") for tag in title.split() if tag.startswith("#")]
+            tag_list=title.split()
+            hash_tag = tag_list
             if tag_list:
-                hash_tag=[tag for tag in title.split() if tag.startswith("#")]
-                for each_tag in hash_tag:
-                    title = title.replace(each_tag,'<a href="/get_challenge_details/?ChallengeHash='+each_tag.strip('#')+'">'+each_tag+'</a>')
+                for index, value in enumerate(tag_list):
+                    if value.startswith("#"):
+                        tag_list[index]='<a href="/get_challenge_details/?ChallengeHash='+value.strip('#')+'">'+value+'</a>'
+                title = " ".join(tag_list)
                 topic.title = title[0].upper()+title[1:]
-                for each_tag in tag_list:
-                    tag,is_created = TongueTwister.objects.get_or_create(hash_tag=each_tag.lower())
-                    if not is_created:
-                        tag.hash_counter = F('hash_counter')+1
-                    tag.save()
-                    topic.hash_tags.add(tag)
+                # for each_tag in tag_list:
+                for index, value in enumerate(hash_tag):
+                    if value.startswith("#"):
+                        tag,is_created = TongueTwister.objects.get_or_create(hash_tag=value.strip('#'))
+                        if not is_created:
+                            tag.hash_counter = F('hash_counter')+1
+                        tag.save()
+                        topic.hash_tags.add(tag)
         else:
             view_count = random.randint(10,30)
             topic.view_count = view_count
@@ -1220,12 +1226,13 @@ def editTopic(request):
         topic        = Topic.objects.get(pk = topic_id)
 
         if topic.user == request.user:
-            tag_list=[tag.strip("#") for tag in title.split() if tag.startswith("#")]
-            if title:
-                if tag_list:
-                    hash_tag={tag for tag in title.split() if tag.startswith("#")}
-                    for each_tag in hash_tag:
-                        title = title.replace(each_tag,'<a href="/get_challenge_details/?ChallengeHash='+each_tag.strip('#')+'">'+each_tag+'</a>')
+            tag_list=title.split()
+            hash_tag = tag_list
+            if tag_list:
+                for index, value in enumerate(tag_list):
+                    if value.startswith("#"):
+                        tag_list[index]='<a href="/get_challenge_details/?ChallengeHash='+value.strip('#')+'">'+value+'</a>'
+                title = " ".join(tag_list)
                 new_title = title[0].upper()+title[1:]
             if not new_title == topic.title:
                 history_topic = TopicHistory.objects.create(source=topic,title=topic.title)
@@ -1236,13 +1243,14 @@ def editTopic(request):
                     topic.hash_tags.remove(each_hashtag)
                     each_hashtag.save()
                 topic.title = new_title
-                if tag_list:
-                    for each_tag in tag_list:
-                        tag, is_created = TongueTwister.objects.get_or_create(hash_tag=each_tag.lower())
-                        if not is_created:
-                            tag.hash_counter = F('hash_counter')+1
-                        tag.save()
-                        topic.hash_tags.add(tag)
+                if hash_tag:
+                    for index, value in enumerate(hash_tag):
+                        if value.startswith("#"):
+                            tag, is_created = TongueTwister.objects.get_or_create(hash_tag=value.strip("#").lower())
+                            if not is_created:
+                                tag.hash_counter = F('hash_counter')+1
+                            tag.save()
+                            topic.hash_tags.add(tag)
                 topic.save()
 
                 topic_json = TopicSerializerwithComment(topic).data
