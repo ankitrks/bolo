@@ -373,7 +373,7 @@ class VBList(generics.ListCreateAPIView):
                             excluded_list.append(each.id)
                         other_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id')).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
                         orderd_all_seen_post=[]
-                        all_seen_post = Topic.objects.filter(pk__in=all_seen_vb)
+                        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)
                         if all_seen_post:
                             for each_id in all_seen_vb:
                                 for each_vb in all_seen_post:
@@ -410,7 +410,7 @@ class VBList(generics.ListCreateAPIView):
                             excluded_list.append(each.id)
                         other_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
                         orderd_all_seen_post=[]
-                        all_seen_post = Topic.objects.filter(pk__in=all_seen_vb)
+                        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)
                         if all_seen_post:
                             for each_id in all_seen_vb:
                                 for each_vb in all_seen_post:
@@ -444,7 +444,7 @@ class VBList(generics.ListCreateAPIView):
                             excluded_list.append(each.id)
                         other_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id')).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
                         orderd_all_seen_post=[]
-                        all_seen_post = Topic.objects.filter(pk__in=all_seen_vb)
+                        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)
                         if all_seen_post:
                             for each_id in all_seen_vb:
                                 for each_vb in all_seen_post:
@@ -475,7 +475,7 @@ class VBList(generics.ListCreateAPIView):
                             excluded_list.append(each.id)
                         other_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
                         orderd_all_seen_post=[]
-                        all_seen_post = Topic.objects.filter(pk__in=all_seen_vb)
+                        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)
                         if all_seen_post:
                             for each_id in all_seen_vb:
                                 for each_vb in all_seen_post:
@@ -514,7 +514,7 @@ class GetChallenge(generics.ListCreateAPIView):
             excluded_list.append(each.id)
         other_post = Topic.objects.filter(is_removed = False,is_vb = True,title__icontains=challengehash).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
         orderd_all_seen_post=[]
-        all_seen_post = Topic.objects.filter(pk__in=all_seen_vb)
+        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)
         if all_seen_post:
             for each_id in all_seen_vb:
                 for each_vb in all_seen_post:
@@ -2874,7 +2874,7 @@ def get_category_with_video_bytes(request):
                 excluded_list.append(each.id)
             other_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,is_popular=True).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
             orderd_all_seen_post=[]
-            all_seen_post = Topic.objects.filter(pk__in=all_seen_vb)
+            all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)
             if all_seen_post:
                 for each_id in all_seen_vb:
                     for each_vb in all_seen_post:
@@ -2935,7 +2935,7 @@ def get_category_video_bytes(request):
                 excluded_list.append(each.id)
             other_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
             orderd_all_seen_post=[]
-            all_seen_post = Topic.objects.filter(pk__in=all_seen_vb)
+            all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)
             if all_seen_post:
                 for each_id in all_seen_vb:
                     for each_vb in all_seen_post:
@@ -2970,7 +2970,7 @@ def get_popular_video_bytes(request):
             excluded_list.append(each.id)
         other_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,is_popular=True).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
         orderd_all_seen_post=[]
-        all_seen_post = Topic.objects.filter(pk__in=all_seen_vb)
+        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)
         if all_seen_post:
             for each_id in all_seen_vb:
                 for each_vb in all_seen_post:
@@ -3045,7 +3045,7 @@ def get_recent_videos(request):
             excluded_list.append(each.id)
         other_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
         orderd_all_seen_post=[]
-        all_seen_post = Topic.objects.filter(pk__in=all_seen_vb)
+        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)
         if all_seen_post:
             for each_id in all_seen_vb:
                 for each_vb in all_seen_post:
