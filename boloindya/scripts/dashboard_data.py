@@ -131,18 +131,38 @@ def run():
         'metrics' : '4',
         'slab' : '2'
     }]
+
+    percent_dict = { 1 : 0.7,  2 : 0.8,  3 : 0.8,  4 : 1.1,  5 : 1.5,  6 : 1.7,  7 : 2.1,  8 : 2.4,  9 : 2.6,  10 : 2.7,  \
+        11 : 2.9,  12 : 3.1,  13 : 3.2,  14 : 3.4,  15 : 3.5,  16 : 3.6,  17 : 3.7,  18 : 3.8,  19 : 3.9,  20 : 4.1,  \
+        21 : 4.3,  22 : 4.4,  23 : 4.5,  24 : 4.6,  25 : 4.7,  26 : 4.9,  27 : 5.1,  28 : 5.2,  29 : 5.3,  30 : 5.4 }
+    
+    percent_dict_31 = { 1 : 0.3, 2 : 0.4, 3 : 0.7, 4 : 0.9, 5 : 1.1, 6 : 1.5, 7 : 1.7, 8 : 2.1, 9 : 2.4, 10 : 2.6, \
+        11 : 2.7, 12 : 2.9, 13 : 3.1, 14 : 3.2, 15 : 3.4, 16 : 3.5, 17 : 3.6, 18 : 3.7, 19 : 3.8, 20 : 3.9, 21 : 4.1, \
+        22 : 4.3, 23 : 4.4, 24 : 4.5, 25 : 4.6, 26 : 4.7, 27 : 4.9, 28 : 5.1, 29 : 5.2, 30 : 5.3, 31 : 5.4}
+    
     for each_dict in data:
         metrics = each_dict['metrics']
         slab = each_dict['slab']
         data = each_dict['data']
+        # last_value = 1
         for each_rec in data:
             rec_count = data[each_rec]
             no_of_days = monthrange(int(each_rec.split('-')[0]), int(each_rec.split('-')[1]))[1]
             final_dict = {}
-            for i in range(1, no_of_days + 1):        
-                temp_count = rec_count / no_of_days             
-                dev = temp_count - ((temp_count * round(random.uniform(0.2, 0.8), 1) ) / 100)
+            for i in range(1, no_of_days + 1):
+                temp_percent = percent_dict_31
+                if no_of_days == 30:
+                    temp_percent = percent_dict
+                # dev = last_value + ((last_value * temp_percent[i]) / 100) # rec_count
+                # last_value = int(dev)
+                # final_dict[i] = int(dev)
+                
+                dev = ((rec_count * temp_percent[i]) / 100) # rec_count
                 final_dict[i] = int(dev)
+
+                # temp_count = rec_count / no_of_days
+                # dev = temp_count - ((temp_count * round(random.uniform(0.2, 0.8), 1) ) / 100)
+                # final_dict[i] = int(dev)
 
             rem_val = rec_count - sum(final_dict.values()) 
             rem_f = rem_val - (rem_val / rec_count) * rec_count
@@ -159,9 +179,9 @@ def run():
             
             for each_data in final_dict:
                 month_date = datetime.strptime(each_rec + '-' + str(each_data), '%Y-%m-%d')
-                # day_of_month = month_date.day
-                # week_no = (day_of_month - 1) // 7 + 1
                 week_no = month_date.isocalendar()[1]
+                if week_no == 1:
+                    week_no = 52
 
                 save_obj, created = DashboardMetrics.objects.get_or_create(metrics = metrics, metrics_slab = slab, date = month_date,\
                         week_no = week_no)

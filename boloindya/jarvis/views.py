@@ -1268,7 +1268,10 @@ def statistics_all(request):
     top_data = {}
     metrics = request.GET.get('metrics', '0')
     slab = request.GET.get('slab', None)
-    data_view = request.GET.get('data_view', 'daily')
+    # data_view = request.GET.get('data_view', 'daily')
+    data_view = request.GET.get('data_view', 'weekly')
+    if data_view == 'daily':
+        data_view = 'weekly'
     start_date = request.GET.get('start_date', '2019-05-01')
     end_date = request.GET.get('end_date', '2019-12-31')
     if not start_date:
