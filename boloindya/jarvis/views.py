@@ -31,7 +31,8 @@ from forum.payment.forms import PaymentForm,PaymentCycleForm
 from django.views.generic.edit import FormView
 from datetime import datetime
 from forum.userkyc.forms import KYCBasicInfoRejectForm,KYCDocumentRejectForm,AdditionalInfoRejectForm,BankDetailRejectForm
-from .models import VideoUploadTranscode,VideoCategory, PushNotification, PushNotificationUser, user_group_options, FCMDevice, notification_type_options
+from .models import VideoUploadTranscode,VideoCategory, PushNotification, PushNotificationUser, user_group_options, \
+    FCMDevice, notification_type_options, metrics_options, DashboardMetrics, metrics_slab_options
 from drf_spirit.models import MonthlyActiveUser, HourlyActiveUser, DailyActiveUser, VideoDetails
 from forum.category.models import Category
 from django.contrib.auth.models import User
@@ -1227,11 +1228,98 @@ def get_installs_data(request):
             print(traceback.format_exc())
             return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
     else:
-        return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)            
+        return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)
 
 @login_required
 def video_statistics(request):
     return render(request,'jarvis/pages/video_statistics/video_statistics.html')
+
+month_map = {
+    "1" : "Jan 2019",
+    "2" : "Feb 2019",
+    "3" : "Mar 2019",
+    "4" : "Apr 2019",
+    "5" : "May 2019",
+    "6" : "Jun 2019",
+    "7" : "July 2019",
+    "8" : "Aug 2019",
+    "9" : "Sep 2019",
+    "10" : "Oct 2019",
+    "11" : "Nov 2019",
+    "12" : "Dec 2019",
+}
+
+def months_between(start_date, end_date):
+    from datetime import datetime,timedelta
+    start = datetime.strptime(start_date, '%Y-%m-%d')
+    end = datetime.strptime(end_date, '%Y-%m-%d')
+    months = []
+    cursor = start
+    while cursor <= end:
+        if cursor.month not in months:
+            months.append(cursor.month)
+        cursor += timedelta(weeks=1)
+    return months
+
+@login_required
+def statistics_all(request):
+    from django.db.models import Sum
+    data = {}
+    top_data = {}
+    metrics = request.GET.get('metrics', '0')
+    slab = request.GET.get('slab', None)
+    data_view = request.GET.get('data_view', 'daily')
+    start_date = request.GET.get('start_date', '2019-05-01')
+    end_date = request.GET.get('end_date', '2019-12-31')
+    if not start_date:
+        start_date = '2019-05-01'
+    if not end_date:
+        end_date = '2019-12-31'
+
+    for each_opt in metrics_options:
+        top_data[each_opt[1] + '|' + each_opt[0]] = DashboardMetrics.objects.filter(metrics = each_opt[0])\
+                .aggregate(total_count = Sum('count'))['total_count']
+        if metrics == each_opt[0]:
+            data['graph_title'] = each_opt[1]
+    data['top_data'] = top_data
+
+    graph_data = DashboardMetrics.objects.filter(Q(metrics = metrics) & Q(date__gte = start_date) & Q(date__lte = end_date))
+    if metrics in ['4', '2'] and slab:
+        if (metrics == '4' and slab in ['0', '1', '2']) or (metrics == '2' and slab in ['3', '4', '5']):
+            graph_data = graph_data.filter(metrics_slab = slab)
+    
+    if data_view == 'weekly':
+        x_axis = []
+        y_axis = []
+        week_no = sorted(list(set(list(graph_data.order_by('week_no').values_list('week_no', flat = True)))))
+        for each_week_no in week_no:
+            x_axis.append(str("week " + str(each_week_no)))
+            y_axis.append(graph_data.filter(week_no = each_week_no).aggregate(total_count = Sum('count'))['total_count'])
+
+    elif data_view == 'monthly':
+        x_axis = []
+        y_axis = []
+        month_no = months_between(start_date, end_date)
+        for each_month_no in month_no:
+            x_axis.append(str(month_map[str(each_month_no)]))
+            y_axis.append(graph_data.filter(date__month = each_month_no).aggregate(total_count = Sum('count'))['total_count'])
+    
+    else:
+        x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
+        y_axis = graph_data.values_list('count', flat = True)
+    
+    data['x_axis'] = list(x_axis)
+    data['y_axis'] = list(y_axis)
+    data['start_date'] = start_date
+    data['end_date'] = end_date
+    data['slabs'] = []
+
+    if metrics == '4':
+        data['slabs'] = [metrics_slab_options[0], metrics_slab_options[1], metrics_slab_options[2]]
+    if metrics == '2':
+        data['slabs'] = [metrics_slab_options[3], metrics_slab_options[4], metrics_slab_options[5]]
+
+    return render(request,'jarvis/pages/video_statistics/statistics_all.html', data)
 
 def get_daily_impressions_data(request):
     if request.is_ajax():
