@@ -42,7 +42,7 @@ def identify_logo():
 	try:
 		client = vision.ImageAnnotatorClient()
 		today = datetime.today()
-		long_ago = today + timedelta(hours = -6)			# fetch the records of last 6 hrs
+		long_ago = today + timedelta(hours = -24)			# fetch the records of last 6 hrs
 		#topic_objects = Topic.objects.filter(date__gte = long_ago)
 		topic_objects = Topic.objects.exclude(is_removed = False).filter(is_vb = True, date__gte = long_ago)
 
@@ -97,6 +97,7 @@ def identify_logo():
 				if(item.is_removed == False):		#if the video has not been deleted
 					print("........some video found plag.......")
 					print(item.user, item.title)
+					print(plag_source.index(plag_text))
 					item.plag_text = str(plag_source.index(plag_text))
 					item.time_deleted = datetime.now()
 					item.save()
