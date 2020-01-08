@@ -140,7 +140,7 @@ class Topic(models.Model):
     plag_text_options = (
         ('0', "TikTok"),
         ('1', "Helo"),
-        ('2', "VigeoVideo"),
+        ('2', "VigoVideo"),
         ('3', "Tik"),
         ('4', "Tok"),
         ('5', "Vivo"),
