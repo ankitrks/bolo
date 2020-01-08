@@ -39,7 +39,7 @@ def timetostring(t):
 
 # method to identify plagarised logos in videos uploaded
 def identify_logo():
-	print("hello")
+	
 	try:
 		client = vision.ImageAnnotatorClient()
 		today = datetime.today()
@@ -52,7 +52,7 @@ def identify_logo():
 			uri = item.backup_url
 			duration = item.media_duration 
 			time = duration.split(":")
-			print(time)
+			#print(time)
 			minute = int(time[0]) * 60
 			second = int(time[1])
 			total_second = minute + second
@@ -79,7 +79,7 @@ def identify_logo():
 			for (a,b) in plag_text_options:
 				plag_source.append(str(b))
 
-			print(plag_source)	
+			#print(plag_source)	
 			for interval in intervals:
 				ff = FFmpeg(inputs = {uri: None}, outputs = {"output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
 				ff.run()
