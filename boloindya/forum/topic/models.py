@@ -145,7 +145,7 @@ class Topic(models.Model):
         ('8', "Nojoto"),
         ('9', "Trell"),
         ('10', "ROPOSO"),
-        ('11', "Like"),
+        ('11', "Likee"),
     )
 
     time_deleted = models.DateTimeField(auto_now = True, auto_now_add = False, blank = False, null = False)
