@@ -2887,7 +2887,7 @@ def get_category_with_video_bytes(request):
                 trending_videos = CategoryVideoByteSerializer(topics, many=True).data
             except Exception as e1:
                 trending_videos = []
-        category_details = CategoryWithVideoSerializer(category, many=True, context={'language_id': language_id}).data
+        category_details = CategoryWithVideoSerializer(category, many=True, context={'language_id': language_id,'user_id':request.user.id}).data
         return JsonResponse({'category_details': category_details, 'trending_topics': trending_videos, \
             'popular_boloindyans': popular_bolo, 'following_user': following_user}, \
             status=status.HTTP_200_OK)
