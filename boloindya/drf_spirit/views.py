@@ -2904,7 +2904,7 @@ def get_category_detail_with_views(request):
         all_vb = Topic.objects.filter(m2mcategory=category, is_removed=False, is_vb=True, language_id=language_id)
         vb_count = all_vb.count()
         all_seen = category.view_count
-        return JsonResponse({'category_details': CategoryWithVideoSerializer(category, context={'language_id': language_id}).data, 'video_count': vb_count, 'all_seen':shorcountertopic(all_seen)}, status=status.HTTP_200_OK)
+        return JsonResponse({'category_details': CategoryWithVideoSerializer(category, context={'language_id': language_id,'user_id':request.user.id}).data, 'video_count': vb_count, 'all_seen':shorcountertopic(all_seen)}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
