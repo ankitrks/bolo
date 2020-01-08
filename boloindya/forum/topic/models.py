@@ -410,7 +410,7 @@ class TongueTwister(models.Model):
     hash_counter = models.PositiveIntegerField(default=1,null=True,blank=True)
     total_views = models.PositiveIntegerField(default=0,null=True,blank=True)
     def __unicode__(self):
-        return str(self.hash_tag)
+        return self.hash_tag
 
 class ShareTopic(UserInfo):
     topic = models.ForeignKey(Topic, related_name='share_topic_topic_share',null=True,blank=True)
