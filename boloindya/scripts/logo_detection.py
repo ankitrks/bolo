@@ -43,7 +43,7 @@ def identify_logo():
 	try:
 		client = vision.ImageAnnotatorClient()
 		today = datetime.today()
-		long_ago = today + timedelta(days = -24)			# fetch the records of last 6 hrs
+		long_ago = today + timedelta(hours =-6)			# fetch the records of last 6 hrs
 		#topic_objects = Topic.objects.filter(date__gte = long_ago)
 		topic_objects = Topic.objects.exclude(is_removed = False).filter(is_vb = True, date__gte = long_ago)
 		print(len(topic_objects))
@@ -106,9 +106,8 @@ def identify_logo():
 				item.save()
 				#deleted_obj = VideoDeleted.objects.create(user = item.user, video_name = item.title, time_deleted = datetime.now(), plag_text = plag_text)
 				#deleted_obj.save()
-				Topic.delete(item)			# call the method to delete the video
-					
-					
+				item.delete() # call the method to delete the video
+
 
 	except Exception as e:
 		print('' + str(e))						
