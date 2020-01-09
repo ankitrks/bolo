@@ -15,6 +15,7 @@ import os
 PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV = 'boloindya'#PROJECT_PATH.split(os.sep)[-1]
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = PROJECT_PATH + '/cred.json'
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = PROJECT_PATH + '/boloindya-vision.json'
 
 # warnings.simplefilter("default", RemovedInNextVersionWarning2)
 
@@ -101,6 +102,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'django.contrib.humanize',
     'rest_framework',
 
     'forum.core',

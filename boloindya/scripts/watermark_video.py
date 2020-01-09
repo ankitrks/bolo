@@ -6,9 +6,6 @@ import boto3
 from django.conf import settings
 from forum.topic.models import Topic
 
-
-
-
 def ffmpeg(*cmd):
     try:
         subprocess.check_output(['ffmpeg'] + list(cmd))
