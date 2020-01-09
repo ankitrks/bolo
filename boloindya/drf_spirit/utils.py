@@ -148,10 +148,10 @@ def shorcountertopic(counter):
     counter = int(counter)
     if counter>1000 and counter<= 9999:
         return str(counter/1000.0)[:3]+'K'
-    elif counter >9999 and counter<=99999:
+    elif counter >9999 and counter<=999999:
         return str(counter/1000.0)[:5]+'K'
-    elif counter >99999:
-        return str(counter/100000.0)[:5]+'M'
+    elif counter >999999:
+        return str(counter/1000000.0)[:5]+'M'
     else:
         return str(counter)
 
