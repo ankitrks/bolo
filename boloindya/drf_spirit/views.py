@@ -1554,10 +1554,10 @@ def get_user_bolo_info(request):
     """
     post:
         Required Parameters
-        mobile_no = request.POST.get('mobile_no', None)
-        otp = request.POST.get('otp', None)
-        request.POST.get('is_reset_password')
-        request.POST.get('is_for_change_phone')
+        start_date = request.POST.get('start_date', None)
+        end_date = request.POST.get('end_date',None)
+        month = request.POST.get('month', None)
+        year = request.POST.get('year',None)
     """
     try:
         start_date = request.POST.get('start_date', None)
