@@ -91,16 +91,16 @@
     <body>
         
         <div style="box-shadow: 0px 5px 5px #f1f1f1;position: absolute;left: 0;top: 0;padding: 15px;width: 100%;">
-            <img src="/media/img/boloindya_logo.png" class="" style="height: 45px;" alt="Bolo Indiya Logo"><br>
+            <img src="/media/img/boloindya_logo.png" class="" style="height: 45px;" alt="Bolo Indiya Logo">
+            <span style="float: right;">
+                Welcome, {{ request.user }}<br>
+                <a href="/user/logout" style="float: right;">logout</a>
+            </span><br>
         </div><br><br><br>
-        <!-- <div class="left_panel">
-        </div> -->
-        {% for each_data, each_count in top_data.items %}
-            {% with each_data|split:"|" as parts %}
-                <div class="top_box">
-                    <a href="?metrics={{ parts.1 }}" class="filter_apply"><h6 style="color: #333">{{ parts.0 }}</h6><h5 style="color: #b52828">{{ each_count|intcomma }}</h5></a>
-                </div>
-            {% endwith %}
+        {% for each_data in top_data %}
+            <div class="top_box">
+                <a href="?metrics={{ each_data.0 }}" class="filter_apply"><h6 style="color: #333">{{ each_data.1 }}</h6><h5 style="color: #b52828">{{ each_data.2|intcomma }}</h5></a>
+            </div>
         {% endfor %}
         <div class="right_panel">
             <br><br>Start date &nbsp;&nbsp; <input type="text" id="start_date" name="start_date" placeholder="Start Date" class="filter_text" value="{{ start_date }}">

@@ -1265,13 +1265,13 @@ def months_between(start_date, end_date):
 def statistics_all(request):
     from django.db.models import Sum
     data = {}
-    top_data = {}
+    top_data = []
     metrics = request.GET.get('metrics', '0')
     slab = request.GET.get('slab', None)
     # data_view = request.GET.get('data_view', 'daily')
-    data_view = request.GET.get('data_view', 'weekly')
+    data_view = request.GET.get('data_view', 'monthly')
     if data_view == 'daily':
-        data_view = 'weekly'
+        data_view = 'monthly'
     start_date = request.GET.get('start_date', '2019-05-01')
     end_date = request.GET.get('end_date', '2019-12-31')
     if not start_date:
@@ -1280,8 +1280,12 @@ def statistics_all(request):
         end_date = '2019-12-31'
 
     for each_opt in metrics_options:
-        top_data[each_opt[1] + '|' + each_opt[0]] = DashboardMetrics.objects.filter(metrics = each_opt[0])\
-                .aggregate(total_count = Sum('count'))['total_count']
+        temp_list = []
+        temp_list.append( each_opt[0] )
+        temp_list.append( each_opt[1] )
+        temp_list.append( DashboardMetrics.objects.filter(metrics = each_opt[0])\
+                .aggregate(total_count = Sum('count'))['total_count'] )
+        top_data.append( temp_list ) 
         if metrics == each_opt[0]:
             data['graph_title'] = each_opt[1]
     data['top_data'] = top_data
