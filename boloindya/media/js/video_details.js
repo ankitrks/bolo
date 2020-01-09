@@ -91,10 +91,9 @@ function VideoPlayByURL(file,image){
     });
 
     playerInstanceDe.on('complete', function() {
-        jwplayer('playerDetails').setMute(true);
-
-        playerInstanceDe.remove();
-        playerInstanceDe = null;
+        //jwplayer('playerDetails').setMute(true);
+        //playerInstanceDe.remove();
+        //playerInstanceDe = null;
     });
 
 
@@ -131,7 +130,7 @@ function VideoPlayByURLMobile(file,image){
         playerInstanceDe.setup({
           file: file,
           controls: false,
-          repeat:'true',
+          repeat:true,
           image:image,
           preload: 'metadata',
           autostart:'true',
@@ -307,13 +306,13 @@ function social_share(shareType){
     var shareURL="";
     if(shareType=='facebook_share'){
 
-        shareURL='https://www.facebook.com/sharer/sharer.php?app_id=113869198637480&u=https://www.boloindya.com/'+topicCreatorUsername+'/'+topicId+'&display=popup&sdk=joey/';
+        shareURL='https://www.facebook.com/sharer/sharer.php?app_id=113869198637480&u='+site_base_url+topicCreatorUsername+'/'+topicId+'&display=popup&sdk=joey/';
 
     }else if(shareType=='twitter_share'){
 
-        shareURL='https://twitter.com/intent/tweet?text=https://www.boloindya.com/'+topicCreatorUsername+'/'+topicId+'/&url=https://www.boloindya.com/'+topicCreatorUsername+'/'+topicId+'/'
+        shareURL='https://twitter.com/intent/tweet?text='+site_base_url+topicCreatorUsername+'/'+topicId+'/&url='+site_base_url+topicCreatorUsername+'/'+topicId+'/'
     }else if(shareType=='whatsapp_share'){
-        shareURL='https://api.whatsapp.com/send?text=https://www.boloindya.com/'+topicCreatorUsername+'/'+topicId+'/';
+        shareURL='https://api.whatsapp.com/send?text='+site_base_url+topicCreatorUsername+'/'+topicId+'/';
     }
     
 

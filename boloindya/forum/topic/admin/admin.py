@@ -7,7 +7,7 @@ from forum.topic.models import Topic, Notification, ShareTopic, CricketMatch, Po
  TongueTwister, BoloActionHistory
 from forum.category.models import Category
 from forum.topic.models import Topic, Notification, ShareTopic, CricketMatch, Poll, Choice, Voting, Leaderboard, \
-        TongueTwister, BoloActionHistory, language_options
+        TongueTwister, BoloActionHistory, language_options,JobOpening,JobRequest
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 
 class TopicResource(resources.ModelResource):
@@ -259,4 +259,6 @@ admin.site.register(Voting)
 admin.site.register(Leaderboard)
 admin.site.register(VBseen)
 admin.site.register(TongueTwister)
+admin.site.register(JobOpening)
+admin.site.register(JobRequest)
 

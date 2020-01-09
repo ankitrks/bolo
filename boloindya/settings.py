@@ -88,7 +88,9 @@ ST_TESTS_RATELIMIT_NEVER_EXPIRE = False
 ST_BASE_DIR = os.path.dirname(__file__)
 BASE_DIR = os.path.dirname(__file__)
 BASE_DIR_TRANS = os.path.dirname(os.path.dirname(__file__))
-
+BASE_URL='http://127.0.0.1:8000/'
+ABSOLUTE_URL='http://127.0.0.1:8000'
+#BASE_URL='https://www.boloindya.com/'
 #
 # Django & Spirit settings defined below...
 #
@@ -267,6 +269,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.request',
                 'context_processors.all_languages',
+                'context_processors.site_base_url',
+                'forum.topic.context_processors.site_base_url',
             ],
         },
     },
@@ -365,7 +369,7 @@ MEDIA_ROOT = os.path.join(PROJECT_PATH, ENV, 'media')
 # trailing slash.
 # Examples: "http://example.com/media/", "http://media.example.com/"
 MEDIA_URL = '/media/'
-
+MEDIA_UPLOAD_DOC_PATH = 'media/documents/'
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
@@ -403,10 +407,10 @@ SOCIALACCOUNT_STORE_TOKENS=False
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_USE_TLS = True
-EMAIL_HOST = 'mail.careeranna.com'
-EMAIL_HOST_USER = 'security@careeranna.com'
-EMAIL_HOST_PASSWORD = 'INAS!bOrtn}{'
-EMAIL_PORT = 26
+EMAIL_HOST = 'smtp.googlemail.com'
+EMAIL_HOST_USER = 'support@careeranna.com'
+EMAIL_HOST_PASSWORD = '$upp0rt@30!1'
+EMAIL_PORT = 587
 
 EMAIL_SENDER = EMAIL_HOST_USER
 EMAIL_RECEIVERS = ['ankit@careeranna.com']

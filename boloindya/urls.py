@@ -62,7 +62,11 @@ patterns = [
     url(r'fcm/', include('fcm.urls')),
     url(r'^jarvis/',include('jarvis.urls', namespace='jarvis')),
     url(r'^get-html-content-app/',forum.user.views.getpagecontent,name='get_html_content_app'),
-    url(r'^download/$',drf_spirit.views.redirect_to_store,name='download')
+    url(r'^download/$',drf_spirit.views.redirect_to_store,name='download'),
+    url(r'^careers/$',forum.topic.views.boloindya_careers,name='boloindya_careers'),
+    url(r'^careers/openings/$',forum.topic.views.boloindya_openings,name='boloindya_openings'),
+    url(r'^careers/openings/(?P<slug>[\w-]+)/$',forum.topic.views.boloindya_opening_details,name='boloindya_opening_details'),
+    url(r'^careers/application/$',forum.topic.views.job_request,name='job_request')
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
@@ -83,6 +87,7 @@ urlpatterns = [
 urlpatterns += i18n_patterns(
     url(r'^$', forum.topic.views.new_home, name='index'),
     url(r'^video_details/(?P<id>\d+)/$', forum.topic.views.video_details, name='video_details'),
+    url(r'^video/(?P<slug>[\w-]+)/$', forum.topic.views.video_details_by_slug, name='video_details_by_slug'),
     url(r'^tag/(?P<category_slug>[\w-]+)/$', forum.topic.views.get_topic_details_by_category, name='topic_details'),
     url(r'^hashtag/(?P<hashtag>[\w-]+)/$', forum.topic.views.get_topic_list_by_hashtag, name='get_topic_list_by_hashtag'),
     url(r'^search/', forum.topic.views.search_by_term, name='search_by_term'),

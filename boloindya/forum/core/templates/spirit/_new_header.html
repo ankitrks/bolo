@@ -260,7 +260,7 @@
         <div class="jsx-639186511 ">
             <div class="jsx-3563400267 header-container">
                 <div class="jsx-3563400267 header-content">
-                    <h1 class="jsx-475503780 logo-container"><a title="boloindya" class="jsx-475503780" href="https://www.boloindya.com/">
+                    <h1 class="jsx-475503780 logo-container"><a title="boloindya" class="jsx-475503780" href="{{site_base_url}}">
                         <img src="/media/boloindya_logo.png" alt="boloindya" class="jsx-475503780 logo-text">
                         <strong class="jsx-475503780">boloindya</strong></a></h1>
                           <ul class="jsx-3143951235 menu-wrapper" >
@@ -295,9 +295,9 @@
                                 </li>
 
                                 <li class="jsx-3143951235">
-                                  <h2 class="menu-item-link menu-item-link-active"><a href="https://www.boloindya.com/" class="jsx-2922828392">{% trans "Home" %}</a></h2></li>
+                                  <h2 class="menu-item-link menu-item-link-active"><a href="{{site_base_url}}" class="jsx-2922828392">{% trans "Home" %}</a></h2></li>
                                 <li class="jsx-3143951235">
-                                  <h2 class="menu-item-link hideOnMobile"><a href="https://www.boloindya.com/about/" class="jsx-2922828392">{% trans "About" %}</a></h2></li>
+                                  <h2 class="menu-item-link hideOnMobile"><a href="{{site_base_url}}about/" class="jsx-2922828392">{% trans "About" %}</a></h2></li>
                                 <li class="jsx-3143951235">
                                   <h2 class="menu-item-link"><a href="/discover/" class="jsx-2922828392">{% trans "Discover" %}</a></h2>
                                 </li> 
@@ -342,12 +342,13 @@
                     <div class="jsx-461239781 drawerOpenAndClose drawer-content drawer-exit drawer-exit-active">
                         <h1 class="jsx-461239781 drawer-icon">
 
-                              <img src="https://www.boloindya.com/media/img/boloindya_logo.png" alt="boloindya" class="jsx-461239781 logo-text"><strong class="jsx-461239781">boloindya</strong></h1>
-                        <h2 class="to-home active"><a class="jsx-461239781" href="https://www.boloindya.com/en">{% trans "Home" %}</a></h2>
+                              <img src="{{site_base_url}}media/img/boloindya_logo.png" alt="boloindya" class="jsx-461239781 logo-text"><strong class="jsx-461239781">boloindya</strong></h1>
+                        <h2 class="to-home active"><a class="jsx-461239781" href="{{site_base_url}}en">{% trans "Home" %}</a></h2>
                         <div class="footer-content-column">
                             <h2>{% trans "Company" %}</h2>
-                            <h3><a class="" href="https://www.boloindya.com/about/">{% trans "About" %}</a></h3>
-                            <h3><a class="" href="https://www.boloindya.com/forgood" target="_blank">{% trans "Discover" %}</a></h3>
+                            <h3><a class="" href="{{site_base_url}}about/">{% trans "About" %}</a></h3>
+                            <h3><a class="" href="{{site_base_url}}discover/" target="_blank">{% trans "Discover" %}</a></h3>
+                            <h3><a class="" href="/careers" target="_blank">{% trans "Careers" %}</a></h3>
                         </div>
 <!--                         <div class="footer-content-column">
                             <h2>{% trans "Programs" %}</h2>
@@ -361,8 +362,8 @@
                         </div> -->
                         <div class="footer-content-column">
                             <h2>{% trans "Legal" %}</h2>
-                            <h3><a class="" href="https://www.boloindya.com/terms-of-service">{% trans "Terms of Service" %}</a></h3>
-                            <h3><a class="" href="https://www.boloindya.com/privacy-policy">{% trans "Privacy Policy" %}</a></h3>
+                            <h3><a class="" href="{{site_base_url}}terms-of-service">{% trans "Terms of Service" %}</a></h3>
+                            <h3><a class="" href="{{site_base_url}}privacy-policy">{% trans "Privacy Policy" %}</a></h3>
 
                         </div>
                             {% if user.is_authenticated %}

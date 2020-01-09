@@ -1235,7 +1235,7 @@ $(document).ready(function() {
 
                         <div class="jsx-1861775669 jsx-537314381 copy-link-container">
                             <img src="/media/copy_link.svg" class="jsx-1861775669 jsx-537314381">
-                            <input readonly=""  class="jsx-1861775669 jsx-537314381 " id="shareInputbox" value="https://www.boloindya.com/{{ request.get_full_path }}">
+                            <input readonly=""  class="jsx-1861775669 jsx-537314381 " id="shareInputbox" value="{{site_absolute_url}}{{ request.get_full_path }}">
                             <p class="jsx-1861775669 jsx-537314381 " onclick="copyShareLink();">{% trans "COPY" %}</p>
                         </div>
                     </div>

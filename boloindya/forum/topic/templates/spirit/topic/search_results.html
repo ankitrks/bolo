@@ -940,7 +940,7 @@ function getSearchHashtagSuggestion(){
     var listItems="";
     var itemCount=0;
     var language_id=1;
-    var uri='/api/v1/search/hash_tag//';
+    var uri='/api/v1/search/hash_tag/';
     var res = encodeURI(uri);
     var category_with_video_list="";
     language_id=current_language_id;
@@ -985,7 +985,7 @@ function getSearchHashtagSuggestion(){
 
 
 function popularSearchHashtagHeading(mentionItem){
-    var hashtag_heading_template='<div class="_explore_feed_header"><div class="jsx-2836840237 _card_header_"><a class="jsx-2836840237" href="/tag/'+mentionItem.hash_tag+'/"><div class="jsx-2836840237 _card_header_cover" style="background-image: url('+mentionItem.picture+');"></div></a><a title="#'+mentionItem.hash_tag+'('+mentionItem.total_views+' views)" class="jsx-2836840237 _card_header_link" href="/tag/'+mentionItem.hash_tag+'/"><div class="jsx-2836840237 _card_header_content"><h3 class="jsx-2836840237 _card_header_title">#'+mentionItem.hash_tag+'</h3><strong class="jsx-2836840237 _card_header_subTitle">'+mentionItem.total_views+' views</strong><p class="jsx-2836840237 _card_header_desc"></p></div></a></div></div>';
+    var hashtag_heading_template='<div class="_explore_feed_header"><div class="jsx-2836840237 _card_header_"><a class="jsx-2836840237" href="/hashtag/'+mentionItem.hash_tag+'/"><div class="jsx-2836840237 _card_header_cover" style="background-image: url('+mentionItem.picture+');"></div></a><a title="#'+mentionItem.hash_tag+'('+mentionItem.total_views+' views)" class="jsx-2836840237 _card_header_link" href="/hashtag/'+mentionItem.hash_tag+'/"><div class="jsx-2836840237 _card_header_content"><h3 class="jsx-2836840237 _card_header_title">#'+mentionItem.hash_tag+'</h3><strong class="jsx-2836840237 _card_header_subTitle">'+mentionItem.total_views+' views</strong><p class="jsx-2836840237 _card_header_desc"></p></div></a></div></div>';
     return hashtag_heading_template;
 }
 

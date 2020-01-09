@@ -17,8 +17,9 @@ from ..comment.models import MOVED
 from ..comment.forms import CommentForm
 from ..comment.utils import comment_posted
 from ..comment.models import Comment
-from .models import Topic,CricketMatch,Poll,Voting,Choice,TongueTwister
+from .models import Topic,CricketMatch,Poll,Voting,Choice,TongueTwister,JobOpening
 from .forms import TopicForm
+from .forms import JobRequestForm
 from . import utils
 from django.template.loader import render_to_string
 from django.http import JsonResponse,HttpResponse
@@ -49,7 +50,12 @@ from allauth.account.adapter import get_adapter as get_account_adapter
 from allauth.account.utils import user_email 
 from allauth.account.models import EmailAddress
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
-
+from django.core.mail import send_mail
+from django.core import mail
+from django.core.mail import EmailMultiAlternatives
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from .emails import send_job_request_mail
 
 class AutoConnectSocialAccount(DefaultSocialAccountAdapter):
 
@@ -410,8 +416,11 @@ def video_discover(request):
         'trending_videos':trending_videos,
         'categories':categories
     }
-    #print popular_bolo.__dict__
-    return render(request, 'spirit/topic/video_discover.html', context)
+    video_slug = request.GET.get('video',None)
+    if(video_slug != None):
+        return redirect('/video/'+video_slug)
+    else:
+        return render(request, 'spirit/topic/video_discover.html', context)
 
 
 def video_details(request,username='',id=''):
@@ -425,6 +434,29 @@ def video_details(request,username='',id=''):
 
     try:
         user = User.objects.get(username=username)
+        user_profile = UserProfile.objects.filter(user=user,user__is_active = True)[0]
+        
+    except:
+        user_profile = None
+    context = {
+        'topic': topics,
+        'is_single_topic': "Yes",
+        'user_profile': user_profile
+    }
+
+    return render(request, 'spirit/topic/video_details.html', context)
+
+def video_details_by_slug(request,slug=''):
+    #print user_profile.__dict__
+    user_id=""
+    try:
+        topics = Topic.objects.get(slug = slug)
+        user_id = topics.user_id
+    except:
+        topics = None
+
+    try:
+        user = User.objects.get(id=user_id)
         user_profile = UserProfile.objects.filter(user=user,user__is_active = True)[0]
         
     except:
@@ -471,7 +503,12 @@ def bolo_user_details(request,username=''):
             'topicsCount': topicsByLang.count()
         }
         #print popular_bolo.__dict__
-        return render(request, 'spirit/topic/user_details.html', context)
+
+        video_slug = request.GET.get('video',None)
+        if(video_slug != None):
+            return redirect('/video/'+video_slug)
+        else:
+            return render(request, 'spirit/topic/user_details.html', context)
     except:
         return render(request, 'spirit/topic/new_landing.html')
 
@@ -513,6 +550,90 @@ def user_timeline(request):
     except:
         return render(request, 'spirit/topic/new_landing.html')
 
+def boloindya_careers(request):
+    return render(request, 'spirit/topic/boloindya_careers.html')
+
+def boloindya_openings(request):
+    job_openings = []
+    try:
+        job_openings = JobOpening.objects.filter(is_active = True)
+    except:
+        job_openings = None
+
+    context = {
+        'job_openings': job_openings,
+
+    }
+
+    return render(request, 'spirit/topic/boloindya_openings.html',context)
+
+def boloindya_opening_details(request,slug):
+    job_openings = None
+    try:
+        job_opening = JobOpening.objects.filter(is_active = True,slug=slug)
+        job_openings =job_opening[0]
+        
+    except:
+        job_openings = None
+    if request.method == 'POST':
+        details = JobRequestForm(request.POST,request.FILES)
+        if details.is_valid():
+            jobRequest=details.save()
+            emailRe='sarfarazalam115@gmail.com';
+            email = request.POST.get('email')
+            subject = 'Job Request'
+            name = request.POST.get('name')
+            mobile = request.POST.get('mobile')
+            document = request.FILES.get('document')
+            email_from = settings.EMAIL_SENDER
+            recipient_list = [emailRe]
+
+            messages=[]
+            email_body = """\
+                <html>
+                  <head></head>
+                  <body>
+                        Hello, <br><br>
+                        We have received a job request from %s. Please find the details below:<br><br>
+                        <b>Name:</b> %s <br>
+                        <b>Email:</b> %s <br>
+                        <b>Contact:</b> %s <br>
+                        Thanks,<br>
+                        Team BoloIndya
+                  </body>
+                </html>
+                """ % (name,name, email, mobile)
+            email = EmailMessage(subject,email_body,email_from,recipient_list)
+            base_dir = 'media/media/documents/'+str(document)
+            email.content_subtype = "html"
+            email.attach_file('media/media/documents/'+str(document))
+            email.send()
+            messageResponse='Request Submitted Successfully';
+            context = {
+                'job_openings': job_openings,
+                'message':messageResponse
+
+            }            
+            return render(request, 'spirit/topic/boloindya_opening_details.html',context)
+    else:
+        form = JobRequestForm()
+        context = {
+            'job_openings': job_openings,
+            'form': form
+
+        }          
+        return render(request, 'spirit/topic/boloindya_opening_details.html',context)
+
+def job_request(request):
+    if request.method == 'POST':
+        #form = JobRequestForm(request.POST)
+        details = JobRequestForm(request.POST)
+        if details.is_valid():
+            details.save()
+            return HttpResponse("data submitted successfully")
+    else:
+        form = JobRequestForm()
+    return render(request, 'spirit/topic/job_request_form.html', {'form': form})
 
 
 def get_challenge_details(request):
@@ -526,19 +647,11 @@ def get_challenge_details(request):
     languageCode =request.LANGUAGE_CODE
     language_id=languages_with_id[languageCode] 
     challengehash = '#' + challengeHash
-
-    all_vb = Topic.objects.filter(title__icontains = challengehash,is_removed=False,is_vb=True)
-    vb_count = all_vb.count()
-    all_seen = all_vb.aggregate(Sum('view_count'))
-    if not all_seen['view_count__sum']:
-        all_seen['view_count__sum']=0
     tongue = TongueTwister.objects.filter(hash_tag__icontains=challengehash[1:]).order_by('-hash_counter')
     if len(tongue):
         tongue = tongue[0]
     context = {
         'tongue':tongue,
-        'all_seen':all_seen,
-        'vb_count':vb_count,
         'hashtag':challengeHash,
 
     }
@@ -581,7 +694,11 @@ def get_topic_details_by_category(request,category_slug):
             'topics':all_vb
         }
         #print category.__dict__
-        return render(request, 'spirit/topic/topic_details_by_category.html', context)
+        video_slug = request.GET.get('video',None)
+        if(video_slug != None):
+            return redirect('/video/'+video_slug)
+        else:
+            return render(request, 'spirit/topic/topic_details_by_category.html', context)
     except:
         return render(request, 'spirit/topic/new_landing.html')
 
@@ -595,27 +712,24 @@ def get_topic_list_by_hashtag(request,hashtag):
     languageCode =request.LANGUAGE_CODE
     language_id=languages_with_id[languageCode] 
     challengehash = '#' + hashtag
-    print challengehash
     try:
-        all_vb = Topic.objects.filter(title__icontains = challengehash,is_removed=False,is_vb=True)
-        vb_count = all_vb.count()
-        all_seen = all_vb.aggregate(Sum('view_count'))
-        if not all_seen['view_count__sum']:
-            all_seen['view_count__sum']=0
+
         tongue = TongueTwister.objects.filter(hash_tag__icontains=challengehash[1:]).order_by('-hash_counter')
         if len(tongue):
             tongue = tongue[0]
         context = {
             'tongue':tongue,
-            'all_seen':all_seen,
-            'vb_count':vb_count,
             'hashtag':hashtag,
 
         }
         #print TongueTwister.__dict__
-        return render(request, 'spirit/topic/topic_list_by_hashtag.html', context)
+        video_slug = request.GET.get('video',None)
+        if(video_slug != None):
+            return redirect('/video/'+video_slug)
+        else:
+            return render(request, 'spirit/topic/topic_list_by_hashtag.html', context)
     except:
-        return render(request, 'spirit/topic/new_landing.html')
+        return render(request, 'spirit/topic/topic_list_by_hashtag.html')
 
 
 
@@ -624,7 +738,7 @@ def search_by_term(request):
     context = {
         'is_single_topic': "Yes",
         'search_term':search_term
-    }    
+    }        
     return render(request, 'spirit/topic/search_results.html',context)
 
 def new_home(request):
@@ -637,8 +751,12 @@ def new_home(request):
     context = {
         'categories':categories,
         'is_single_topic': "Yes",
-    }    
-    return render(request, 'spirit/topic/new_landing.html',context)
+    }  
+    video_slug = request.GET.get('video',None)
+    if(video_slug != None):
+        return redirect('/video/'+video_slug)
+    else:
+        return render(request, 'spirit/topic/new_landing.html',context)
     #return render(request, 'spirit/topic/temporary_landing.html')
     # return render(request, 'spirit/topic/new_landing.html')
     # return render(request, 'spirit/topic/main_landing.html')

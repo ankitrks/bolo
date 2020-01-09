@@ -1,9 +1,7 @@
 {% load spirit_tags i18n %}
 {% load i18n %}
 {% load static from staticfiles %}
-
 {% get_current_language as LANGUAGE_CODE %}
-
 <!DOCTYPE html>
 <!-- saved from url=(0025)https://www.boloindya.com/en -->
 <html lang="{{LANGUAGE_CODE}}" pc="yes" class="webpalpha webpanimation webplossless webp webp-alpha webp-animation webp-lossless">
@@ -26,7 +24,7 @@
 
 
     <meta name="applicable-device" content="pc,mobile" class="next-head">
-    <link rel="canonical" href="https://www.boloindya.com/" class="next-head">
+    <link rel="canonical" href="{{site_base_url}}" class="next-head">
 
     <link rel="stylesheet" type="text/css" href="/media/css/common.css">
     <script src="//content.jwplatform.com/libraries/GpYvcHPU.js"></script>
@@ -55,6 +53,7 @@
 <script type="text/javascript">
     var likeTrans='{% trans "likes" %}';
     var commentsTrans='{% trans "comments" %}';
+    var site_base_url='{{site_base_url}}';
     console.log(likeTrans);
 </script>
 

@@ -10,9 +10,9 @@ from django.utils import timezone
 from ..core import utils
 from ..core.utils.forms import NestedModelChoiceField
 from ..category.models import Category
-from .models import Topic
-
-
+from .models import Topic,JobRequest
+from django.core.validators import validate_email
+from django.forms import ValidationError
 class TopicForm(forms.ModelForm):
 
     topic_hash = forms.CharField(
@@ -57,3 +57,31 @@ class TopicForm(forms.ModelForm):
 
         self.instance.reindex_at = timezone.now()
         return super(TopicForm, self).save(commit)
+
+class JobRequestForm(forms.ModelForm):
+    class Meta:
+        model = JobRequest
+        fields = ('name', 'email', 'mobile', 'document')
+
+    def clean(self): 
+
+        # data from the form is fetched using super function  
+        cleaned_data = super(JobRequestForm,self).clean() 
+        # extract the username and text field from the data 
+        name = self.cleaned_data.get('name') 
+        email = self.cleaned_data.get('email') 
+  
+        # conditions to be met for the username length 
+        if not (name): 
+            raise forms.ValidationError(_("Name is required"))
+        try:
+            validate_email(email)
+            valid_email = True
+        except validate_email:
+            valid_email = False
+
+        if valid_email==False: 
+            raise forms.ValidationError(_("Email is required"))
+  
+        # return any errors if found 
+        return self.cleaned_data 

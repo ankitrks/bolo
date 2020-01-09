@@ -292,7 +292,7 @@ function getPopularCategory(popularCategory){
 
     singleItemData=playListData[indexId];
 
-    var shareURL='https://www.boloindya.com/'+singleItemData.user.username+'/'+singleItemData.id+'';
+    var shareURL=site_base_url+singleItemData.user.username+'/'+singleItemData.id+'';
     var sideBarDetails='<div onClick="openMobileDownloadPopup();" class="jsx-2177493926 jsx-3813273378 avatar round" style="background-image: url(/media/musically_100x100.jpeg); width: 48px; height: 48px; flex: 0 0 48px;"></div><div class="jsx-949708032 boloindya-toolbar" style="margin-top: 20px;"><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-like" onClick="openMobileDownloadPopup();" style="background-image: url(/media/viewIcon.svg);"><span class="jsx-949708032">'+singleItemData.likes_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-comment" onClick="openMobileDownloadPopup();" style="background-image: url(/media/comments.svg);"><span class="jsx-949708032">'+singleItemData.comment_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-share" onclick="openShareTab()" style="background-image: url(/media/share.svg);"><span class="jsx-949708032">'+singleItemData.total_share_count+'</span></div></div>';
     $("#topicID").val(singleItemData.id);
     $("#currentPlayUserId").val(singleItemData.user.userprofile.id);
@@ -375,6 +375,9 @@ function getPopularCategory(popularCategory){
     listCommentsById(singleItemData);
   
     var sideBarCommentDetails="";
+    var origin   = window.location.origin;
+    param1=singleItemData.slug;
+    history.pushState(null, null, '?video='+param1);
 
 
 }

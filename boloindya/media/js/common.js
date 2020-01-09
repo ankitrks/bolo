@@ -14,13 +14,13 @@ function social_share_page(shareType,pageName){
     var shareURL="";
     if(shareType=='facebook_share'){
 
-        shareURL='https://www.facebook.com/sharer/sharer.php?app_id=113869198637480&u=https://www.boloindya.com/'+pageName+'&display=popup&sdk=joey/';
+        shareURL='https://www.facebook.com/sharer/sharer.php?app_id=113869198637480&u='+site_base_url+pageName+'&display=popup&sdk=joey/';
 
     }else if(shareType=='twitter_share'){
 
-        shareURL='https://twitter.com/intent/tweet?text=https://www.boloindya.com/'+pageName+'&url=https://www.boloindya.com/'+topicCreatorUsername
+        shareURL='https://twitter.com/intent/tweet?text='+site_base_url+pageName+'&url='+site_base_url+topicCreatorUsername
     }else if(shareType=='whatsapp_share'){
-        shareURL='https://api.whatsapp.com/send?text=https://www.boloindya.com'+pageName;
+        shareURL='https://api.whatsapp.com/send?text='+site_base_url+pageName;
     }
     
      window.open(shareURL, '_blank');
