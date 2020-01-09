@@ -1548,6 +1548,56 @@ class SingUpOTPView(generics.CreateAPIView):
             return JsonResponse({'message': 'OTP could not be sent'}, status=status.HTTP_417_EXPECTATION_FAILED)
         return JsonResponse({'message': 'OTP sent'}, status=status.HTTP_200_OK)
 
+import calendar
+@api_view(['POST'])
+def get_user_bolo_info(request):
+    """
+    post:
+        Required Parameters
+        mobile_no = request.POST.get('mobile_no', None)
+        otp = request.POST.get('otp', None)
+        request.POST.get('is_reset_password')
+        request.POST.get('is_for_change_phone')
+    """
+    # try:
+    start_date = request.POST.get('start_date', None)
+    end_date = request.POST.get('end_date',None)
+    month = request.POST.get('month', None)
+    year = request.POST.get('year',None)
+    if start_date and end_date:
+        start_date= datetime.strptime(start_date, "%d-%m-%Y")
+        end_date = datetime.strptime(end_date+' 23:59:59', "%d-%m-%Y %H:%M:%S")
+    elif month and year:
+        days = calendar.monthrange(int(year),int(month))[1]
+        start_date = datetime.strptime('01-'+str(month)+'-'+str(year), "%d-%m-%Y")
+        end_date = datetime.strptime(str(days)+'-'+str(month)+'-'+str(year)+' 23:59:59', "%d-%m-%Y %H:%M:%S")
+    if not start_date or not end_date:
+        total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user)
+    else:
+        total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user,date__gte=start_date, date__lte=end_date)
+    total_video_count = total_video.count()
+    print total_video
+    monetised_video_count = total_video.filter(is_monetized = True).count()
+    left_for_moderation = total_video.filter(is_moderated = False).count()
+    total_view_count=0
+    total_like_count=0
+    total_comment_count = 0
+    total_share_count = 0
+    for each_vb in total_video:
+        total_view_count+=each_vb.view_count
+        total_like_count+=each_vb.likes_count
+        total_comment_count+=each_vb.comment_count
+        total_share_count+=each_vb.total_share_count
+    total_view_count = shorcountertopic(total_view_count)
+    total_comment_count = shorcountertopic(total_comment_count)
+    total_like_count = shorcountertopic(total_like_count)
+    total_share_count = shorcountertopic(total_share_count)
+    return JsonResponse({'message': 'success', 'total_video_count' : total_video_count, \
+                    'monetised_video_count':monetised_video_count, 'total_view_count':total_view_count,'total_comment_count':total_comment_count,\
+                    'total_like_count':total_like_count,'total_share_count':total_share_count,'left_for_moderation':left_for_moderation}, status=status.HTTP_200_OK)
+    # except Exception as e:
+    #     return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 @api_view(['POST'])
 def verify_otp(request):
     """
