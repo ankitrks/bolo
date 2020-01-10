@@ -50,7 +50,7 @@ function getElementsByPage(currentPage){
 
 }
 
-function VideoPlayByURL(file,image){
+function VideoPlayByURL(file,image){debugger;
   loaderShow();
   var playerInstanceDe = jwplayer("playerDetails");
   jwplayer('playerDetails').setMute(false);
@@ -65,7 +65,7 @@ function VideoPlayByURL(file,image){
           controls: false,
           repeat:'true',
           image:image,
-          preload: 'metadata',
+          preload:'metadata',
           autostart:'true',
           primary: "html5",
           mute:'false'
@@ -83,10 +83,20 @@ function VideoPlayByURL(file,image){
     });   
 
 
-    playerInstanceDe.on('error', function(event) {
+    playerInstanceDe.on('error', function(event) {debugger;
         loaderHide();
         var erroCode=event.code;
         console.log(erroCode);
+        playerInstanceDe.setup({
+          file:videoFileBackupURL,
+          controls: false,
+          repeat:true,
+          image:image,
+          preload: 'metadata',
+          autostart:'true',
+          primary: "html5",
+          mute:'false'
+        });        
 
     });
 
@@ -127,15 +137,15 @@ function VideoPlayByURLMobile(file,image){
 
       var preBufferDone = false;
       
-        playerInstanceDe.setup({
-          file: file,
-          controls: false,
-          repeat:true,
-          image:image,
-          preload: 'metadata',
-          autostart:'true',
-          primary: "html5",
-          mute:'false'
+      playerInstanceDe.setup({
+        file: file,
+        controls: false,
+        repeat:true,
+        image:image,
+        preload: 'metadata',
+        autostart:'true',
+        primary: "html5",
+        mute:'false'
       });
       playerInstanceDe.on('playerDetailsMobile', function() {
             loaderHide();
@@ -154,6 +164,16 @@ function VideoPlayByURLMobile(file,image){
         loaderHide();
         var erroCode=event.code;
         console.log(erroCode);
+        playerInstanceDe.setup({
+          file:videoFileBackupURL,
+          controls: false,
+          repeat:true,
+          image:image,
+          preload: 'metadata',
+          autostart:'true',
+          primary: "html5",
+          mute:'false'
+        });
 
     });
 
@@ -213,8 +233,8 @@ jQuery('#UCommentLink').on('click',function(){
     if(commentBoxInputStatus==true){
        var loginStatus= check_login_status();
        if(loginStatus==false){
-        if( jwplayer('player').getState() == "playing"){
-            jwplayer('player').pause();
+        if( jwplayer('playerDetails').getState() == "playing"){
+            jwplayer('playerDetails').pause();
         } 
         // if( jwplayer('playerDetails').getState() == "playing"){
         //     jwplayer('playerDetails').pause();
@@ -239,7 +259,7 @@ jQuery('#shareLinkId').on('click',function(){
 });
 
 function downloadAppLink(){
-    var appLink='';
+    var appLink='https://play.google.com/store/apps/details?id=com.boloindya.boloindya&hl=en_IN';
     window.open(appLink, '_blank');
 }
 
@@ -270,8 +290,8 @@ jQuery('#UReactionLink').on('click',function(){
     if(likeStatus==false){
        var loginStatus= check_login_status();
        if(loginStatus==false){
-        if( jwplayer('player').getState() == "playing"){
-            jwplayer('player').pause();
+        if( jwplayer('playerDetails').getState() == "playing"){
+            jwplayer('playerDetails').pause();
         }
 
         document.getElementById('openLoginPopup').click();
@@ -300,7 +320,13 @@ jQuery('#UReactionLink').on('click',function(){
 });
 
 function social_share(shareType){
-    check_login_status();
+
+    var loginStatus=check_login_status();
+    if(loginStatus==false){
+        document.getElementById('openLoginPopup').click();
+        //return false;
+    }
+
     var topicId=$("#topicID").val();
     var topicCreatorUsername=$("#topicCreatorUsername").val();
     var shareURL="";
@@ -377,7 +403,11 @@ $('#comment-input').keypress(function (e) {
 
 function create_comment(inputComment){
 
-    check_login_status();
+    var loginStatus=check_login_status();
+    if(loginStatus==false){
+        document.getElementById('openLoginPopup').click();
+        //return false;
+    }
     var ge_local_data="";
     ge_local_data = JSON.parse(localStorage.getItem("access_data"));
     var user_details=ge_local_data.user.userprofile;
@@ -558,7 +588,11 @@ function loadMoreComments(nextPageURl){
 }
 
 function followLikeList(){
-    check_login_status();
+    var loginStatus=check_login_status();
+    if(loginStatus==false){
+        document.getElementById('openLoginPopup').click();
+        //return false;
+    }
 
     var ge_local_data="";
         ge_local_data = JSON.parse(localStorage.getItem("access_data"));

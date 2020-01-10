@@ -107,12 +107,12 @@ $(document).ready(function () {
 var sideBarDetails="";
 var sideBarCommentDetails="";
 
-function openVideoInPopup(topicId){debugger;
+function openVideoInPopup(topicId){
   loaderShow();
 
   var singleItemData=topicList[topicId];
   $("#indexId").val(singleItemData.id);
-  var videoFileName=singleItemData.backup_url;
+  var videoFileName=singleItemData.video_cdn;
   var videoFileImage=singleItemData.question_image;
   $("#modelPopup").show();
 
@@ -144,6 +144,14 @@ function openVideoInPopup(topicId){debugger;
     playerInstance.on('error', function(event) {
         loaderHide();
         var erroCode=event.code;
+        playerInstance.setup({
+            file: singleItemData.backup_url,
+            controls: false,
+            image:videoFileImage,
+            autostart:'true',
+            mute:'false'
+        });
+
 
     });
 

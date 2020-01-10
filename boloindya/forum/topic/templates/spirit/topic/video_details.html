@@ -992,17 +992,21 @@
 
 
 <script type="text/javascript">
+var videoFileCDN="{{topic.video_cdn}}";
+if(videoFileCDN==""){
+    var videoFileCDN="{{topic.backup_url}}";
+}
+var videoFileBackupURL="{{topic.backup_url}}";
+var videoFileImage="{{topic.question_image}}";
+
 $(document).ready(function() {
   loaderHide();
-
-    var videoFileURL="{{topic.backup_url}}";
-    var videoFileImage="{{topic.question_image}}";
     
     if (window.matchMedia("(max-width: 991px)").matches) {
-        VideoPlayByURLMobile(videoFileURL,videoFileImage);
+        VideoPlayByURLMobile(videoFileCDN,videoFileImage);
         /* The viewport is less than, or equal to, 700 pixels wide */
     } else {
-        VideoPlayByURL(videoFileURL,videoFileImage);
+        VideoPlayByURL(videoFileCDN,videoFileImage);
       /* The viewport is greater than 700 pixels wide */
     }
     
@@ -1010,8 +1014,8 @@ $(document).ready(function() {
 </script>
 
 
-<link rel="canonical" href="{{ request.get_full_path }}" />      
-<meta property="og:url" content="{{ request.get_full_path }}"/>
+<link rel="canonical" href="{{site_absolute_url}}{{ request.get_full_path }}" />      
+<meta property="og:url" content="{{site_absolute_url}}{{ request.get_full_path }}"/>
 <meta property="og:type" content="website" />
 <meta property='og:title' content='{{topic.title}}' />
 <meta name="twitter:title" content="{{topic.title}}" />
@@ -1058,16 +1062,11 @@ $(document).ready(function() {
                            </div>
                             <div class="sidebar">
 
-                                    {% if user_profile.profile_pic|length > 1 %}
-                                       profilePics=user_profile.profile_pic
-                                    {% else %}
-                                       profilePics=/media/demo_user.png
-                                    {% endif %}
-
-    
-
-
-                                <div class="jsx-2177493926 jsx-3813273378 avatar round" style="background-image: url({{ profilePics}}); width: 48px; height: 48px; flex: 0 0 48px;"></div>
+                                <div class="jsx-2177493926 jsx-3813273378 avatar round" style="background-image: url({% if user_profile.profile_pic|length > 1 %}
+                                {{user_profile.profile_pic}}
+                            {% else %}
+                                /media/demo_user.png
+                            {% endif %}); width: 48px; height: 48px; flex: 0 0 48px;"></div>
                                 <div class="jsx-949708032 boloindya-toolbar" style="margin-top: 20px;">
                                     <div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-like" style="background-image: url(/media/viewIcon.svg);"><span class="jsx-949708032">{{topic.view_count | shorcountertopic}}</span></div>
                                     <div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-comment" style="background-image: url(/media/comments.svg);"><span class="jsx-949708032">{{topic.comment_count | shorcountertopic}}</span></div>
@@ -1075,7 +1074,7 @@ $(document).ready(function() {
                                 </div>
                             </div>
                             
-                            <div class="jsx-295561999 boloindya-bottom bottom">
+                            <div class="jsx-295561999 boloindya-bottom bottom" style="display: none;">
                                 <div class="jsx-295561999 boloindya-bottom-left">
                                     <div class="jsx-295561999 boloindya-bottom-text bottom-name">{{user_profile.user.username}}</div>
                                     <div class="jsx-295561999 music-icon"></div>
@@ -1127,7 +1126,7 @@ $(document).ready(function() {
                     <div class="jsx-1861775669 jsx-537314381 content-container border">
                         <a tag="a" class="jsx-1861775669 jsx-537314381 user-info" href="/{{user_profile.user.username}}/">
 
-                            <div style="background-image:url(                            {% if user_profile.profile_pic|length > 1 %}
+                            <div style="background-image:url({% if user_profile.profile_pic|length > 1 %}
                                 {{user_profile.profile_pic}}
                             {% else %}
                                 /media/demo_user.png

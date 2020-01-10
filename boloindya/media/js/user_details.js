@@ -282,6 +282,14 @@ function getPopularCategory(popularCategory){
      playerInstance.on('error', function(event) {
         loaderHide();
         var erroCode=event.code;
+        singleItemData=playListData[indexId];
+        playerInstance.setup({
+            file: singleItemData.backup_url,
+            controls: false,
+            image:image,
+            autostart:'true',
+            mute:'false'
+      });
 
     });
 

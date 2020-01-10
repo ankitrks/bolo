@@ -29,7 +29,7 @@
   });
 
   function downloadAppLink(){
-    var appLink='';
+    var appLink='https://play.google.com/store/apps/details?id=com.boloindya.boloindya&hl=en_IN';
     window.open(appLink, '_blank');
   }
 
@@ -117,7 +117,11 @@ $('.videoPlayButton').click(function(){
 });
 
 function social_share(shareType){
-    check_login_status();
+     var loginStatus= check_login_status();
+     if(loginStatus==false){
+        document.getElementById('openLoginPopup').click();
+     }
+
     var topicId=$("#topicID").val();
     var topicCreatorUsername=$("#topicCreatorUsername").val();
     var shareURL="";
@@ -200,7 +204,10 @@ $('#comment-input').keypress(function (e) {
 
     function create_comment(inputComment){
 
-        check_login_status();
+        var loginStatus= check_login_status();
+         if(loginStatus==false){
+            document.getElementById('openLoginPopup').click();
+         }
         var ge_local_data="";
         ge_local_data = JSON.parse(localStorage.getItem("access_data"));
         var user_details=ge_local_data.user.userprofile;
@@ -691,6 +698,11 @@ var countries=[];
       }) ;
 
     });
+
+function removeDataFromURL(){
+  return true;
+}
+
 //=====================End mentions=========================
 
 

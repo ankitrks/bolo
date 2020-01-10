@@ -1496,7 +1496,8 @@
 
 @media screen and (max-width: 400px) {
   .video-wall {
-    width: 300px;
+    width: 100%;
+    margin: 10px: 
   }
   .thumb,
   .thumb.large {
@@ -2562,8 +2563,9 @@
 @media (max-width: 991px){
 
 ._video_feed_item{
-    width: 47% !important;
-    margin: 0 8px 6px 0;
+    width: 33.33% !important;
+    margin: auto;
+    padding: 5px;
 }
 }
 

@@ -199,6 +199,14 @@ function getVideoItem(videoItem,itemCount){
     playerInstance.on('error', function(event) {
         loaderHide();
         var erroCode=event.code;
+        playerInstance.setup({
+            file: singleItemData.backup_url,
+            controls: false,
+            image:image,
+            autostart:'true',
+            mute:'false'
+        });
+
 
     });
 

@@ -62,7 +62,7 @@
                 $("#playlist").append(listItems);
             })
             .fail(function(jqXHR, ajaxOptions, thrownError)
-            {debugger;
+            {
                 if(jqXHR.status!=201){
 
                 }
@@ -91,7 +91,7 @@ $(window).scroll(function () {
 
         var uri='/api/v1/get_popular_video_bytes/?page=1&language_id='+language_id;
         var res = encodeURI(uri);
-        $.get(res, function (data, textStatus, jqXHR) {debugger;
+        $.get(res, function (data, textStatus, jqXHR) {
             var topicVideoList=data.topics;
             playListData=topicVideoList;
             var itemCount=-1;
@@ -143,13 +143,13 @@ $(window).scroll(function () {
 
         var preBufferDone = false;
           
-            playerInstance.setup({
+        playerInstance.setup({
               file: file,
               controls: false,
               image:image,
               autostart:'true',
               mute:'false'
-          });
+        });
         playerInstance.on('play', function() {
                 loaderHide();
                 preBufferDone = true;
@@ -166,6 +166,14 @@ $(window).scroll(function () {
         playerInstance.on('error', function(event) {
             loaderHide();
             var erroCode=event.code;
+            singleItemData=playListData[indexId];
+            playerInstance.setup({
+                  file: singleItemData.backup_url,
+                  controls: false,
+                  image:image,
+                  autostart:'true',
+                  mute:'false'
+            });
 
         });
 
@@ -310,7 +318,7 @@ $(window).scroll(function () {
                     jQuery(".likeStatusInfo").removeClass('liked');
                 }
 
-                if(undefined != userLikeAndUnlike.comment_like){debugger;
+                if(undefined != userLikeAndUnlike.comment_like){
                     var countLikeStatus=userLikeAndUnlike.comment_like.length;
                     if(countLikeStatus>0){
                         var likedCheck=userLikeAndUnlike.comment_like;
