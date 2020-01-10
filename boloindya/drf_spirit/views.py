@@ -2869,7 +2869,7 @@ def get_category_with_video_bytes(request):
                 except Exception as e1:
                     popular_bolo = []
         if request.GET.get('is_with_popular'):
-            all_seen_vb = VBseen.objects.filter(user = request.user).distinct('topic_id').values_list('topic_id',flat=True)
+            all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id).distinct('topic_id').values_list('topic_id',flat=True)
             excluded_list =[]
             superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
             for each in superstar_post:
@@ -2925,7 +2925,7 @@ def get_category_video_bytes(request):
         language_id = request.POST.get('language_id', 1)
         category = Category.objects.get(pk=category_id)
         topics = []
-        all_seen_vb = VBseen.objects.filter(user = request.user).distinct('topic_id').values_list('topic_id',flat=True)
+        all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id).distinct('topic_id').values_list('topic_id',flat=True)
         post_till = datetime.now() - timedelta(days=30)
         if category:
             excluded_list =[]
@@ -2965,7 +2965,7 @@ def get_popular_video_bytes(request):
         paginator_topics = PageNumberPagination()
         language_id = request.GET.get('language_id', 1)
         paginator_topics.page_size = 10
-        all_seen_vb = VBseen.objects.filter(user = request.user).distinct('topic_id').values_list('topic_id',flat=True)
+        all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id).distinct('topic_id').values_list('topic_id',flat=True)
         excluded_list =[]
         superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
         for each in superstar_post:
@@ -3037,7 +3037,7 @@ def get_recent_videos(request):
         topics = []
         post_till = datetime.now() - timedelta(days=30)
         category = Category.objects.filter(parent__isnull=True).first()
-        all_seen_vb = VBseen.objects.filter(user = request.user).distinct('topic_id').values_list('topic_id',flat=True)
+        all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id).distinct('topic_id').values_list('topic_id',flat=True)
         excluded_list =[]
         superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
         for each in superstar_post:
