@@ -111,9 +111,9 @@ body {
 
 .btn-main {
     max-width: 100%;
+    width: 150px;
     background: #1a1a1a;
     color: #fff;
-    width: 140px;
     font-size: 20px;
     font-weight: 700;
     border-radius: 1px;
@@ -617,7 +617,7 @@ img {
 }
 .career-details-outer-container {
     background-color: #1b1b1b;
-    margin-top: 60px;
+    margin-top: 80px;
 }
 .career-details-outer-container .inner-container .sticky-heading {
     position: -webkit-sticky;
@@ -721,6 +721,7 @@ img {
     background-color: #fff;
     padding: 24px;
     font-size: 16px;
+    margin-bottom: 20px;
 }
 .career-details-outer-container .inner-container .row-2 .description {
     color: #fff;
@@ -767,6 +768,7 @@ img {
     padding: 10px;
 }
 }
+
 .applicationForm{
     margin: auto;width: 50%
 }
@@ -791,89 +793,81 @@ img {
     margin-left:122px; 
 }                    
 #id_document{
-    margin-left:94px; 
+    margin-left:104px; 
+}
+input[type=text], input[type=email], input[type=number], input[type=password]{
+        height: 15px !important;
+    padding: 10px;
+}
+textarea{
+    border: 1px solid #ddd;
+    color: #212121;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    -o-box-shadow: none;
+    box-shadow: none;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -o-border-radius: 5px;
+    border-radius: 5px;
+    height: 60px;
 }
 
 </style>
-
+{{job_openings}}
 <div class="container-fluid career-details-outer-container ng-scope">
     <div class="container inner-container ">
-        <div class="sticky-heading paddingOnMobile">
-            <div class="row">
-                <div class="col-md-9 col-sm-8 row-1">
-                    <h3 class="job-title">
-                        {% if job_openings is not None %} 
-                        {{job_openings.title}}
-                        {% endif%}
-                    </h3> 
-                </div>
-                <div class="col-md-3 col-sm-4 row-1">
-                    <a href="javascript: scrollToForm();">
-                        <div class="apply-now" > Apply Now </div>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="row paddingOnMobile">
-            <div class="col-md-6 col-sm-5 row-2 banner-image-container"> <img class="img-responsive banner-image" src="/media/img/sr-business-product-analyst.40785dac.svg"> </div>
-            <div class="col-md-6 col-sm-7 row-2">
-                <h3 class="tagline" style="color: #00b2ff">Who believes that “Har sikke ke do pehlu hote hei”</h3>
-                <p class="description"> Data, data everywhere
-                    <br> But it’s your analytical mind we seek.
-                    <br> Be it business, be it product,
-                    <br> You solve it all with your reporting techniques!
-                    <br> You straighten out complex problems by taking a lead,
-                    <br> Your queries always save us in the hour of need! </p>
-            </div>
-            <div class="col-md-12 col-sm-12">
-                <div class="card"> <b>Required Details</b>
-                    <p>
-                        {%  if job_openings != None %} 
-                        {{job_openings.description}}
-                        {% endif%}
-                    </p> 
-                </div>
 
-            </div>
-            
+        <div class="row paddingOnMobile">            
             <br>
             <div id="formId"></div>
             <div class="col-md-12 col-sm-12">
 
                 <div class="card applicationForm"> 
-                  <h2>Job Application</h2>
-                  {% if message %}
-                   <span style="color: green"> {{message}}</span>
-                   {% endif %}
-                    <form method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        {{ form.non_field_errors }}
+                  <h2>Need Help</h2>
+                    {% if message %}
+                        <p style="margin-top: 60px;margin-bottom: 60px;"> <span style="color: green;">{{message}}</span></p>
+                    {% else %} 
+                        <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="field">
+                                    <label for="id_name">Username:</label>
+                                    
+                                    <input type="text" placeholder="Username" name="name" id="id_name" maxlength="255">
+                                    
 
-                        {% for field in form.hidden_fields %}
-                            {{ field.errors }}
-                            {{ field }}
-                        {% endfor %}
+                                </div>
+                            
+                                <div class="field">
+                                    <label for="id_email">Email:</label>
+                                    
+                                    <input type="text" placeholder="Email" name="email" id="id_email" maxlength="255">
+                                    
 
-                        {% for field in form.visible_fields %}
-                            <div class="field">
-                                {{ field.label_tag }}
-                                {{ field.errors }}
-                                {{ field }}
-                                {{ field.help_text }}
+                                </div>
+                            
+                                <div class="field">
+                                    <label for="id_mobile">Mobile:</label>
+                                    
+                                    <input type="text" placeholder="Mobile" name="mobile" id="id_mobile" maxlength="255">
+                                    
 
-                            </div>
-                        {% endfor %}
-                        {% if form.visible_fields %}
-                         <p style="text-align: center;"><button class="btn btn-main" type="submit">Send</button></p>
+                                </div>
+                            
+                                <div class="field">
+                                    <label for="id_document">Message:</label>
+                                    
+                                    <textarea name="document" id="id_document" placeholder="Message"></textarea>
+                                    
 
-                        {% endif %}
-                    </form>
+                                </div>
+                            
+                            <p style="text-align: center;"><button class="btn btn-main" type="submit">Send</button></p>
+                            
+                            
+                        </form>
+                    {% endif %}
 
-<!--                <form method="post">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    <button type="submit">Send</button>
-                  </form> -->
                 </div>
             </div>
             <br>
@@ -916,7 +910,7 @@ $('#id_mobile').on('change',function(evt){
     return true;
 });
 
-$('#id_email').on('change',function(evt){
+$('#id_email').on('change',function(evt){debugger;
     var emailID = document.getElementById('id_email');
     if (emailID.value == "" || emailID.value == null) {
       //alert("Please enter your Mobile No.");

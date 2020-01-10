@@ -66,7 +66,8 @@ patterns = [
     url(r'^careers/$',forum.topic.views.boloindya_careers,name='boloindya_careers'),
     url(r'^careers/openings/$',forum.topic.views.boloindya_openings,name='boloindya_openings'),
     url(r'^careers/openings/(?P<slug>[\w-]+)/$',forum.topic.views.boloindya_opening_details,name='boloindya_opening_details'),
-    url(r'^careers/application/$',forum.topic.views.job_request,name='job_request')
+    url(r'^careers/application/$',forum.topic.views.job_request,name='job_request'),
+    url(r'^help_support/$',forum.topic.views.help_support,name='help_support')
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

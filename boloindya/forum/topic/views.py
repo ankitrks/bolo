@@ -569,17 +569,21 @@ def boloindya_openings(request):
 
 def boloindya_opening_details(request,slug):
     job_openings = None
+    job_id=""
     try:
         job_opening = JobOpening.objects.filter(is_active = True,slug=slug)
         job_openings =job_opening[0]
+        job_id = job_openings.id
         
     except:
         job_openings = None
     if request.method == 'POST':
         details = JobRequestForm(request.POST,request.FILES)
         if details.is_valid():
+            #print details
             jobRequest=details.save()
             emailRe='sarfarazalam115@gmail.com';
+            #emailRe='sarfaraz@careeranna.com,varun@boloindya.com,ankit@careeranna.com';
             email = request.POST.get('email')
             subject = 'Job Request'
             name = request.POST.get('name')
@@ -587,6 +591,9 @@ def boloindya_opening_details(request,slug):
             document = request.FILES.get('document')
             email_from = settings.EMAIL_SENDER
             recipient_list = [emailRe]
+            job_profile=""
+            if job_openings is not None:
+                job_profile =job_openings.title
 
             messages=[]
             email_body = """\
@@ -595,6 +602,7 @@ def boloindya_opening_details(request,slug):
                   <body>
                         Hello, <br><br>
                         We have received a job request from %s. Please find the details below:<br><br>
+                        <b>Job for :</b> %s <br>
                         <b>Name:</b> %s <br>
                         <b>Email:</b> %s <br>
                         <b>Contact:</b> %s <br>
@@ -602,7 +610,7 @@ def boloindya_opening_details(request,slug):
                         Team BoloIndya
                   </body>
                 </html>
-                """ % (name,name, email, mobile)
+                """ % (name,job_profile,name, email, mobile)
             email = EmailMessage(subject,email_body,email_from,recipient_list)
             base_dir = 'media/media/documents/'+str(document)
             email.content_subtype = "html"
@@ -616,7 +624,8 @@ def boloindya_opening_details(request,slug):
             }            
             return render(request, 'spirit/topic/boloindya_opening_details.html',context)
     else:
-        form = JobRequestForm()
+        initial={'jobOpening_id': job_id}
+        form = JobRequestForm(initial)
         context = {
             'job_openings': job_openings,
             'form': form
@@ -634,6 +643,52 @@ def job_request(request):
     else:
         form = JobRequestForm()
     return render(request, 'spirit/topic/job_request_form.html', {'form': form})
+
+
+def help_support(request):
+    messageResponse=None
+    if request.method == 'POST':
+        emailRe='sarfarazalam115@gmail.com';
+        #emailRe='sarfaraz@careeranna.com,varun@boloindya.com,ankit@careeranna.com';
+        email = request.POST.get('email')
+        subject = 'Help Request'
+        name = request.POST.get('name')
+        mobile = request.POST.get('mobile')
+        queryRe = request.POST.get('document')
+        email_from = settings.EMAIL_SENDER
+        recipient_list = [emailRe]
+
+        messages=[]
+        email_body = """\
+            <html>
+              <head></head>
+              <body>
+                    Hello, <br><br>
+                    We have received a job request from %s. Please find the details below:<br><br>
+                    <b>Name:</b> %s <br>
+                    <b>Email:</b> %s <br>
+                    <b>Contact:</b> %s <br>
+                    <p> %s </p>
+                    Thanks,<br>
+                    Team BoloIndya
+              </body>
+            </html>
+            """ % (name,name, email, mobile,queryRe)
+        email = EmailMessage(subject,email_body,email_from,recipient_list)
+        email.content_subtype = "html"
+        email.send()
+        messageResponse='Request Submitted Successfully';
+        context = {
+            'message':messageResponse
+
+        }            
+        return render(request, 'spirit/topic/help_support.html',context)
+    else:
+        context = {
+            'message': messageResponse
+
+        }          
+        return render(request, 'spirit/topic/help_support.html',context)
 
 
 def get_challenge_details(request):

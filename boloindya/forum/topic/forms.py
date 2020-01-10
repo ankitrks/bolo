@@ -59,9 +59,18 @@ class TopicForm(forms.ModelForm):
         return super(TopicForm, self).save(commit)
 
 class JobRequestForm(forms.ModelForm):
+    initialVal=""
     class Meta:
         model = JobRequest
         fields = ('name', 'email', 'mobile', 'document')
+
+    def __init__(self, *args, **kwargs):
+        super(JobRequestForm, self).__init__(*args, **kwargs)
+        initialVal=self.instance.jobOpening_id
+    jobOpening_id = forms.CharField(
+        max_length=32,
+        widget=forms.HiddenInput,
+        required=False,initial=initialVal)
 
     def clean(self): 
 
@@ -85,3 +94,4 @@ class JobRequestForm(forms.ModelForm):
   
         # return any errors if found 
         return self.cleaned_data 
+        
