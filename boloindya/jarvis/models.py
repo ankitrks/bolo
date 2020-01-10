@@ -147,6 +147,7 @@ user_group_options = (
     ('5', "Signed up but no opening of app since 72 hours "),
     ('6', "Never created a video"),
     ('7', "Test User"),
+    ('8', "Particular User")
 )
 
 notification_type_options = (
@@ -199,6 +200,7 @@ class PushNotification(RecordTimeStamp):
     language = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='0')
     notification_type = models.CharField(choices=notification_type_options, blank = True, null = True, max_length=10, default='4')
     instance_id = models.CharField('instance_id', blank = True, null = True, max_length=40, default='')
+    category = models.ForeignKey('forum_category.Category', verbose_name=_("category"), related_name="category_notification",null=True,blank=True)
     user_group = models.CharField(choices=user_group_options, blank = True, null = True, max_length=10, default='0')
     scheduled_time = models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False)
     is_scheduled = models.BooleanField(default=False)

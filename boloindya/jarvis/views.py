@@ -961,7 +961,7 @@ def notification_panel(request):
     filters = {'language': lang, 'notification_type': notification_type, 'user_group': user_group, 'is_scheduled': scheduled_status, 'title__icontains': title}
 
     pushNotifications = PushNotification.objects.filter(*[Q(**{k: v}) for k, v in filters.items() if v], is_removed=False).order_by('-created_at')
-
+    
     return render(request,'jarvis/pages/notification/index.html', {'pushNotifications': pushNotifications, \
         'language_options': language_options, 'notification_types': notification_type_options, \
             'user_group_options': user_group_options, 'language': lang, 'notification_type': notification_type, \
@@ -995,11 +995,13 @@ def send_notification(request):
 
     if request.method == 'GET':
         id = request.GET.get('id', None)
-        try:
+        try:    
             pushNotification = PushNotification.objects.get(pk=id)
         except Exception as e:
             print e
-    return render(request,'jarvis/pages/notification/send_notification.html', { 'language_options': language_options, 'user_group_options' : user_group_options, 'notification_types': notification_type_options, 'pushNotification': pushNotification })
+        categories = Category.objects.filter(parent__isnull=False)
+
+    return render(request,'jarvis/pages/notification/send_notification.html', { 'language_options': language_options, 'user_group_options' : user_group_options, 'notification_types': notification_type_options, 'pushNotification': pushNotification, 'categories': categories})
 
 @login_required
 def particular_notification(request, notification_id=None):

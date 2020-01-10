@@ -119,7 +119,15 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-6" style="padding: 0px;">
+             <div class="col-md-6" style="padding: 0px;">
+                <select name="category" id="category">
+                    <option value="Select Category" disabled selected>Select Category</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" >{{ category.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6" style="padding: 0px;margin-top:10px;">
                 <select name="notification_type" id="notification_type" onchange="clearResponse()">
                     <option value="Notification Type" disabled selected>Notification Type</option>
                     {% for notification_type in notification_types %}
@@ -127,8 +135,7 @@
                     {% endfor %}
                 </select>
             </div>
-        </div>
-        <div class="form_group">
+            <div class="col-md-6" style="padding: 0px;margin-top:10px;">
             <select name="user_group" id="user_group">
                 <option value="User Group" disabled selected>User Group</option>
                 {% for user_group_option in user_group_options %}
@@ -136,6 +143,15 @@
                 {% endfor %}
             </select>
         </div>
+        </div>
+        <div class="form_group">
+            <input type="file" name="image" id="image" accept='image/*'>
+        </div> 
+        <div class="form_group">
+            <input type="text" name="particular_user_id" placeholder="Username" value="" id="particular_user_id" style="display:none;">
+            <ul id="response_particular_user_id" style="display:none;">
+            </ul>
+        </div>    
         <div class="form_group">
             <input type="text" name="id" placeholder="Id/Hash" value="{{ pushNotification.instance_id }}" id="search_id">
             <ul id="response">
@@ -211,6 +227,56 @@
                 $('#response').empty();
             }
         })
+        $('#particular_user_id').keyup(function(){
+            var query = $('#particular_user_id').val();
+            
+            if (query.length > 2 && loading == 0) {
+                loading = 1;
+                $('#response_particular_user_id').empty();
+                $('#response_particular_user_id').append('<li id="loading">Loading ...</li>');
+                $.ajax({
+                    url: '/jarvis/search_notification/',
+                    method: 'POST',
+                    data: JSON.stringify({
+                        'query': query,
+                        'notification_type': '1'
+
+                    }),
+                    dataType: "json",
+                    contentType: 'application/json',
+                    success: function(data) {
+                        console.log(data)
+                        loading = 0;
+                        $('#loading').hide();
+                        $('#response_particular_user_id').empty();
+                        if (data.data.length == 0) {
+                            $('#response_particular_user_id').append('<li id="no_result">No results found ...</li>');
+                        }
+                        for(var i=0;i<data.data.length;i++) {
+                            if (data.data[i].name == '') {
+                                $('#response_particular_user_id').append('<li onclick="addIdToFieldUser('+data.data[i].user+')">'+data.data[i].user_name+'</li>');
+                            } else {
+                                $('#response_particular_user_id').append('<li onclick="addIdToFieldUser('+data.data[i].user+')">'+data.data[i].name+'</li>');
+                            }
+                        }
+                    }
+                })
+            } else {
+                $('#response_particular_user_id').empty();
+            }
+        })
+        $("#user_group").change(function () {
+            var end = this.value;
+            if (end == '8') {
+                console.log($("#particular_user_id"));
+                $("#particular_user_id").show();
+                $('#response_particular_user_id').show();
+            } else {
+                $("#particular_user_id").val('');
+                $("#particular_user_id").hide();
+                $('#response_particular_user_id').hide();
+            }
+    });
     })
     $(function() {
         $("#datepicker").datepicker({ minDate: 0});
@@ -295,6 +361,12 @@
     function addIdToField(id) {
         clearResponse();
         $('#search_id').val(String(id));
+    }
+
+    function addIdToFieldUser(id) {
+        $('#particular_user_id').val('');
+        $('#response_particular_user_id').empty();
+        $('#particular_user_id').val(String(id));
     }
 
     function clearResponse() {
