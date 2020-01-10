@@ -141,6 +141,7 @@ class Topic(models.Model):
     def has_answers(self):
         return self.topic_comment.all().count()
     def get_video_comments(self):
+
         return self.topic_comment.filter(is_media = True, is_audio = False)
     def get_audio_comments(self):
         return self.topic_comment.filter(is_media = True, is_audio = True)
