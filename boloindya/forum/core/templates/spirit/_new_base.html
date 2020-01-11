@@ -130,8 +130,17 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.6/html5shiv.min.js"></script>
     <![endif]-->
 
+  </head>
 
-<!-- The core Firebase JS SDK is always required and must be listed first -->
+<!-- style="margin-left:-19px; margin-right: -14px;max-width:100%;" -->
+  <body >
+    {% include 'spirit/_new_header.html' %}
+    {% render_messages messages %}
+    {% block content %}{% endblock %}
+    {% include 'spirit/_login_popup.html' %}
+    {% include 'spirit/_new_footer.html' %}
+
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
 <script src="https://www.gstatic.com/firebasejs/7.6.2/firebase-app.js"></script>
 <!-- TODO: Add SDKs for Firebase products that you want to use
      https://firebase.google.com/docs/web/setup#available-libraries -->
@@ -152,17 +161,6 @@
   firebase.initializeApp(firebaseConfig);
   firebase.analytics();
 </script>
-
-
-  </head>
-
-<!-- style="margin-left:-19px; margin-right: -14px;max-width:100%;" -->
-  <body >
-    {% include 'spirit/_new_header.html' %}
-    {% render_messages messages %}
-    {% block content %}{% endblock %}
-    {% include 'spirit/_login_popup.html' %}
-    {% include 'spirit/_new_footer.html' %}
 
   </body>
 
