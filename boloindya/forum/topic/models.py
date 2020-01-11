@@ -163,6 +163,7 @@ class Topic(models.Model):
     def has_answers(self):
         return self.topic_comment.all().count()
     def get_video_comments(self):
+
         return self.topic_comment.filter(is_media = True, is_audio = False)
     def get_audio_comments(self):
         return self.topic_comment.filter(is_media = True, is_audio = True)
@@ -431,6 +432,26 @@ class TongueTwister(models.Model):
     def __unicode__(self):
         return self.hash_tag
 
+class JobOpening(models.Model):
+    title = models.CharField(_("Job Title"),max_length=255, blank = True, null = True)
+    slug = AutoSlugField(populate_from="title", db_index=False, blank=True)
+    tag_line = models.CharField(_("Tag line"),max_length=255, blank = True, null = True)
+    description = models.TextField(_("Job Description"), blank= True, null = True)
+    job_location = models.CharField(_("Job Location"),max_length=255, blank = True, null = True)
+    is_active = models.BooleanField(_("Active Status"),default=True)
+    def __unicode__(self):
+        return str(self.title)
+
+class JobRequest(RecordTimeStamp):
+    jobOpening = models.ForeignKey(JobOpening, related_name='job_opening',blank = True, null = True)
+    name = models.CharField(_("Username"), blank = True,max_length=255, null = True)
+    email = models.CharField(_("Email"), blank = True,max_length=255, null = True)
+    mobile = models.CharField(_("Mobile"), blank = True,max_length=255, null = True)
+    document = models.FileField(upload_to=settings.MEDIA_UPLOAD_DOC_PATH,blank = True, null = True)
+
+    def __unicode__(self):
+        return str(self.name)
+        
 class ShareTopic(UserInfo):
     topic = models.ForeignKey(Topic, related_name='share_topic_topic_share',null=True,blank=True)
     comment = models.ForeignKey('forum_comment.Comment',related_name='share_topic_topic_comment',null=True,blank=True)

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Spirit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-23 19:55+0000\n"
+"POT-Creation-Date: 2019-12-12 17:26+0530\n"
 "PO-Revision-Date: 2015-07-25 18:00+0000\n"
 "Last-Translator: Esteban M. Castro Borsani <ecastroborsani@gmail.com>\n"
 "Language-Team: Spirit\n"
@@ -12,34 +12,34 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: forms.py:30
+#: forum/comment/like/forms.py:30
 msgid "This like already exists"
 msgstr "like existiert bereits"
 
-#: models.py:22
+#: forum/comment/like/models.py:23
 msgid "like"
 msgstr "like"
 
-#: models.py:23
+#: forum/comment/like/models.py:24
 msgid "likes"
 msgstr "likes"
 
-#: templates/spirit/comment/like/create.html:5
-#: templates/spirit/comment/like/create.html:14
+#: forum/comment/like/templates/spirit/comment/like/create.html:5
+#: forum/comment/like/templates/spirit/comment/like/create.html:14
 msgid "Like"
 msgstr "Like"
 
-#: templates/spirit/comment/like/create.html:9
+#: forum/comment/like/templates/spirit/comment/like/create.html:9
 #, python-format
 msgid "Like %(username)s's comment"
 msgstr "Like %(username)ss Kommentar"
 
-#: templates/spirit/comment/like/delete.html:5
-#: templates/spirit/comment/like/delete.html:13
+#: forum/comment/like/templates/spirit/comment/like/delete.html:5
+#: forum/comment/like/templates/spirit/comment/like/delete.html:13
 msgid "Remove like"
 msgstr "like entfernen"
 
-#: templates/spirit/comment/like/delete.html:9
+#: forum/comment/like/templates/spirit/comment/like/delete.html:9
 #, python-format
 msgid "Remove %(username)s's comment like"
 msgstr "Entferne %(username)ss Kommentarlike"

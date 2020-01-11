@@ -1,0 +1,467 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-12-12 17:26+0530\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: forum/user/forms.py:35
+msgid "The email is taken."
+msgstr ""
+
+#: forum/user/forms.py:45 forum/user/forms.py:50
+#: forum/user/templates/spirit/user/profile_update.html:12
+msgid "Email"
+msgstr ""
+
+#: forum/user/forms.py:51
+#: forum/user/templates/spirit/user/profile_update.html:15
+msgid "Password"
+msgstr ""
+
+#: forum/user/forms.py:61
+msgid "The provided password is incorrect."
+msgstr ""
+
+#: forum/user/forms.py:75
+msgid "Time zone"
+msgstr ""
+
+#: forum/user/forms.py:84
+#, python-format
+msgid "Current time is: %(date)s %(time)s"
+msgstr ""
+
+#: forum/user/models.py:43 forum/user/models.py:159
+msgid "profile"
+msgstr ""
+
+#: forum/user/models.py:46
+msgid "location"
+msgstr ""
+
+#: forum/user/models.py:47
+msgid "last seen"
+msgstr ""
+
+#: forum/user/models.py:48
+msgid "last ip"
+msgstr ""
+
+#: forum/user/models.py:49
+msgid "time zone"
+msgstr ""
+
+#: forum/user/models.py:50
+msgid "expert status"
+msgstr ""
+
+#: forum/user/models.py:51
+msgid "administrator status"
+msgstr ""
+
+#: forum/user/models.py:52
+msgid "moderator status"
+msgstr ""
+
+#: forum/user/models.py:53
+msgid "verified"
+msgstr ""
+
+#: forum/user/models.py:54
+msgid ""
+"Designates whether the user has verified his account by email or by other "
+"means. Un-select this to let the user activate his account."
+msgstr ""
+
+#: forum/user/models.py:58
+msgid "topic count"
+msgstr ""
+
+#: forum/user/models.py:59
+msgid "comment count"
+msgstr ""
+
+#: forum/user/models.py:60
+msgid "Is Popular"
+msgstr ""
+
+#: forum/user/models.py:61
+msgid "Is Business"
+msgstr ""
+
+#: forum/user/models.py:63
+msgid "last post hash"
+msgstr ""
+
+#: forum/user/models.py:64
+msgid "last post on"
+msgstr ""
+
+#: forum/user/models.py:66
+msgid "Profile Pic"
+msgstr ""
+
+#: forum/user/models.py:67 forum/user/models.py:192
+msgid "Name"
+msgstr ""
+
+#: forum/user/models.py:68
+msgid "Bio"
+msgstr ""
+
+#: forum/user/models.py:69
+msgid "Date of Birth"
+msgstr ""
+
+#: forum/user/models.py:71
+msgid "About"
+msgstr ""
+
+#: forum/user/models.py:73
+msgid "Sub Category"
+msgstr ""
+
+#: forum/user/models.py:76
+msgid "Social Identifier"
+msgstr ""
+
+#: forum/user/models.py:77
+msgid "Mobile No"
+msgstr ""
+
+#: forum/user/models.py:89
+msgid "Latitude"
+msgstr ""
+
+#: forum/user/models.py:90
+msgid "Langitude"
+msgstr ""
+
+#: forum/user/models.py:93
+msgid "LinkedIn URL"
+msgstr ""
+
+#: forum/user/models.py:94
+msgid "Twitter ID"
+msgstr ""
+
+#: forum/user/models.py:95
+msgid "Instagram ID"
+msgstr ""
+
+#: forum/user/models.py:97 forum/user/models.py:246
+msgid "Click Id"
+msgstr ""
+
+#: forum/user/models.py:98
+msgid "Click Id Response"
+msgstr ""
+
+#: forum/user/models.py:104
+msgid "forum profile"
+msgstr ""
+
+#: forum/user/models.py:105
+msgid "forum profiles"
+msgstr ""
+
+#: forum/user/models.py:152
+msgid "Minimum Bolo Score For Monetize/Bolo Score Equivalent Money"
+msgstr ""
+
+#: forum/user/models.py:153
+msgid "Bolo Equivalent Money in INR"
+msgstr ""
+
+#: forum/user/models.py:160
+msgid "Android Logs"
+msgstr ""
+
+#: forum/user/models.py:161
+msgid "Log Type"
+msgstr ""
+
+#: forum/user/models.py:169 forum/user/models.py:177 forum/user/models.py:187
+msgid "user"
+msgstr ""
+
+#: forum/user/models.py:170 forum/user/models.py:178
+msgid "videoid"
+msgstr ""
+
+#: forum/user/models.py:171 forum/user/models.py:180
+msgid "playtime"
+msgstr ""
+
+#: forum/user/models.py:172 forum/user/models.py:182
+msgid "timestamp"
+msgstr ""
+
+#: forum/user/models.py:179
+msgid "duration"
+msgstr ""
+
+#: forum/user/models.py:181
+msgid "percentage_viewed"
+msgstr ""
+
+#: forum/user/models.py:188
+msgid "totaltime"
+msgstr ""
+
+#: forum/user/models.py:193
+msgid "Version"
+msgstr ""
+
+#: forum/user/models.py:194
+msgid "Version To be Pushed"
+msgstr ""
+
+#: forum/user/models.py:196
+msgid "Changes Title"
+msgstr ""
+
+#: forum/user/models.py:197
+msgid "Changes"
+msgstr ""
+
+#: forum/user/models.py:207
+msgid "Page Name"
+msgstr ""
+
+#: forum/user/models.py:208
+msgid "Page Description"
+msgstr ""
+
+#: forum/user/models.py:214
+msgid "Ref Code"
+msgstr ""
+
+#: forum/user/models.py:216
+msgid "Purpose"
+msgstr ""
+
+#: forum/user/models.py:217
+msgid "Playstore URL"
+msgstr ""
+
+#: forum/user/models.py:218
+msgid "live"
+msgstr ""
+
+#: forum/user/models.py:247
+msgid "PID"
+msgstr ""
+
+#: forum/user/models.py:248
+msgid "Referral Dump"
+msgstr ""
+
+#: forum/user/models.py:249
+msgid "android_id"
+msgstr ""
+
+#: forum/user/templates/spirit/user/_profile.html:12
+msgid "Joined at"
+msgstr ""
+
+#: forum/user/templates/spirit/user/_profile.html:16
+msgid "Seen"
+msgstr ""
+
+#: forum/user/templates/spirit/user/_profile.html:22
+msgid "Last IP"
+msgstr ""
+
+#: forum/user/templates/spirit/user/_profile.html:31
+#: forum/user/templates/spirit/user/profile_update.html:5
+#: forum/user/templates/spirit/user/profile_update.html:9
+msgid "Preferences"
+msgstr ""
+
+#: forum/user/templates/spirit/user/_profile.html:35
+msgid "Private Message"
+msgstr ""
+
+#: forum/user/templates/spirit/user/_profile.html:41
+msgid "Edit user"
+msgstr ""
+
+#: forum/user/templates/spirit/user/_profile.html:46
+msgid "Comments"
+msgstr ""
+
+#: forum/user/templates/spirit/user/_profile.html:47
+#: forum/user/templates/spirit/user/menu.html:15
+msgid "Topics"
+msgstr ""
+
+#: forum/user/templates/spirit/user/_profile.html:48
+msgid "Likes"
+msgstr ""
+
+#: forum/user/templates/spirit/user/_render_comments_list.html:72
+msgid "There are no comments here, yet"
+msgstr ""
+
+#: forum/user/templates/spirit/user/_user_profile_comments.html:5
+#: forum/user/templates/spirit/user/profile_comments.html:5
+msgid "comments"
+msgstr ""
+
+#: forum/user/templates/spirit/user/activation_email.html:2
+#, python-format
+msgid "You're receiving this email because you registered at %(site_name)s."
+msgstr ""
+
+#: forum/user/templates/spirit/user/activation_email.html:4
+msgid "Please go to the following link to activate your account:"
+msgstr ""
+
+#: forum/user/templates/spirit/user/activation_email.html:8
+#: forum/user/templates/spirit/user/email_change_email.html:8
+msgid "Thanks for using our site!"
+msgstr ""
+
+#: forum/user/templates/spirit/user/email_change_email.html:2
+#, python-format
+msgid ""
+"You're receiving this because you changed your user email at %(site_name)s."
+msgstr ""
+
+#: forum/user/templates/spirit/user/email_change_email.html:4
+msgid "Please go to the following link to confirm your email change:"
+msgstr ""
+
+#: forum/user/templates/spirit/user/menu.html:7
+msgid "User menu"
+msgstr ""
+
+#: forum/user/templates/spirit/user/menu.html:11
+msgid "Menu"
+msgstr ""
+
+#: forum/user/templates/spirit/user/menu.html:14
+msgid "Profile"
+msgstr ""
+
+#: forum/user/templates/spirit/user/menu.html:16
+msgid "Unread topics"
+msgstr ""
+
+#: forum/user/templates/spirit/user/menu.html:17
+msgid "Private topics"
+msgstr ""
+
+#: forum/user/templates/spirit/user/menu.html:20
+msgid "Admin"
+msgstr ""
+
+#: forum/user/templates/spirit/user/menu.html:23
+msgid "Log out"
+msgstr ""
+
+#: forum/user/templates/spirit/user/notification_email.html:2
+#, python-format
+msgid "You have a new notification at %(site_name)s."
+msgstr ""
+
+#: forum/user/templates/spirit/user/notification_email.html:4
+msgid "Please go to the following link to read the comment:"
+msgstr ""
+
+#: forum/user/templates/spirit/user/notification_email.html:8
+msgid ""
+"If you don't want to keep receiving notifications, you can deactivate them "
+"on your profile preferences."
+msgstr ""
+
+#: forum/user/templates/spirit/user/profile_email_change.html:5
+#: forum/user/templates/spirit/user/profile_email_change.html:9
+#: forum/user/tests.py:451 forum/user/tests.py:765 forum/user/utils/email.py:86
+msgid "Email change"
+msgstr ""
+
+#: forum/user/templates/spirit/user/profile_email_change.html:15
+msgid "Change my email"
+msgstr ""
+
+#: forum/user/templates/spirit/user/profile_likes.html:5
+msgid "likes"
+msgstr ""
+
+#: forum/user/templates/spirit/user/profile_password_change.html:5
+#: forum/user/templates/spirit/user/profile_password_change.html:9
+msgid "Password change"
+msgstr ""
+
+#: forum/user/templates/spirit/user/profile_password_change.html:15
+msgid "Change my password"
+msgstr ""
+
+#: forum/user/templates/spirit/user/profile_topics.html:5
+msgid "topics"
+msgstr ""
+
+#: forum/user/templates/spirit/user/profile_update.html:16
+msgid "Change password"
+msgstr ""
+
+#: forum/user/templates/spirit/user/profile_update.html:18
+msgid "Avatar"
+msgstr ""
+
+#: forum/user/templates/spirit/user/profile_update.html:19
+msgid "Change avatar"
+msgstr ""
+
+#: forum/user/templates/spirit/user/profile_update.html:20
+msgid "Go to gravatar.com and use your current email to change it"
+msgstr ""
+
+#: forum/user/templates/spirit/user/profile_update.html:28
+msgid "Save"
+msgstr ""
+
+#: forum/user/tests.py:729 forum/user/utils/email.py:70
+msgid "User activation"
+msgstr ""
+
+#: forum/user/utils/email.py:95
+#, python-format
+msgid "New notification: %(topic_name)s"
+msgstr ""
+
+#: forum/user/views.py:40
+msgid "Your profile has been updated!"
+msgstr ""
+
+#: forum/user/views.py:62
+msgid "Your password has been changed!"
+msgstr ""
+
+#: forum/user/views.py:79
+msgid "We have sent you an email so you can confirm the change!"
+msgstr ""
+
+#: forum/user/views.py:101
+msgid "Your email has been changed!"
+msgstr ""
+
+#: forum/user/views.py:104
+msgid "Sorry, we were not able to change your email."
+msgstr ""

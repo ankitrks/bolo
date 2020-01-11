@@ -3012,10 +3012,14 @@ def get_category_video_bytes(request):
 
 @api_view(['GET'])
 def get_popular_video_bytes(request):
+    """
+    GET:
+    """
     try:
         paginator_topics = PageNumberPagination()
         language_id = request.GET.get('language_id', 1)
         paginator_topics.page_size = 10
+        
         all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id).distinct('topic_id').values_list('topic_id',flat=True)
         excluded_list =[]
         superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
@@ -3035,9 +3039,8 @@ def get_popular_video_bytes(request):
                 for each_vb in all_seen_post:
                     if each_vb.id == each_id:
                         orderd_all_seen_post.append(each_vb)
+        
         topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
-
-        paginator_topics.page_size = 10
         topics = paginator_topics.paginate_queryset(topics, request)
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
     except Exception as e:
@@ -3154,6 +3157,31 @@ def submit_user_feedback(request):
         return JsonResponse({'message': 'invalid user'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def generate_login_data(request):
+    """
+    post:
+        Required Parameters
+        mobile_no = request.POST.get('id', None)
+
+    """
+    user_id = request.POST.get('user_id', None)
+    try:
+        user_id = request.POST.get('user_id', None)
+        userprofile = UserProfile.objects.filter(user__id = user_id,user__is_active = True)
+        if userprofile:
+            userprofile = userprofile[0]
+            user = userprofile.user
+            username = userprofile.slug
+            message = 'User Logged In'
+            user_tokens = get_tokens_for_user(user)
+
+            return JsonResponse({'message': message, 'username' : username, \
+                        'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Invalid User Id'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(['POST'])

@@ -27,6 +27,7 @@ urlpatterns = [
     url(r'^(?P<pk>\d+)/(?P<slug>[\w-]+)/$', views.detail, name='detail'),
 
     url(r'^active/$', views.index_active, name='index-active'),
+    url(r'^login_using_api/$', views.login_using_api, name='login-using-api'),
     url(r'^recent/$', views.recent_topics, name='recent_topics'),
     url(r'^comment_likes/$', views.comment_likes, name='comment_likes'),
 

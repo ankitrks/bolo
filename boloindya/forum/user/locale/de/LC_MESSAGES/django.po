@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Spirit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-23 19:55+0000\n"
+"POT-Creation-Date: 2019-12-12 17:26+0530\n"
 "PO-Revision-Date: 2015-10-14 19:35+0000\n"
 "Last-Translator: Esteban M. Castro Borsani <ecastroborsani@gmail.com>\n"
 "Language-Team: German (http://www.transifex.com/spirit-project/spirit/"
@@ -15,147 +15,341 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: forms.py:33
+#: forum/user/forms.py:35
 msgid "The email is taken."
 msgstr ""
 
-#: forms.py:43 forms.py:48 templates/spirit/user/profile_update.html:12
+#: forum/user/forms.py:45 forum/user/forms.py:50
+#: forum/user/templates/spirit/user/profile_update.html:12
 msgid "Email"
 msgstr "E-Mail"
 
-#: forms.py:49 templates/spirit/user/profile_update.html:15
+#: forum/user/forms.py:51
+#: forum/user/templates/spirit/user/profile_update.html:15
 msgid "Password"
 msgstr "Passwort"
 
-#: forms.py:59
+#: forum/user/forms.py:61
 msgid "The provided password is incorrect."
 msgstr ""
 
-#: forms.py:80
+#: forum/user/forms.py:75
+#, fuzzy
+#| msgid "time zone"
+msgid "Time zone"
+msgstr "Zeitzone"
+
+#: forum/user/forms.py:84
 #, python-format
 msgid "Current time is: %(date)s %(time)s"
 msgstr "Aktuelle Zeit: %(date)s %(time)s"
 
-#: models.py:16
+#: forum/user/models.py:43 forum/user/models.py:159
 msgid "profile"
 msgstr ""
 
-#: models.py:19
+#: forum/user/models.py:46
 msgid "location"
 msgstr "Ort"
 
-#: models.py:20
+#: forum/user/models.py:47
 msgid "last seen"
 msgstr "zuletzt gesehen"
 
-#: models.py:21
+#: forum/user/models.py:48
 msgid "last ip"
 msgstr "letzte ip"
 
-#: models.py:22
+#: forum/user/models.py:49
 msgid "time zone"
 msgstr "Zeitzone"
 
-#: models.py:23
+#: forum/user/models.py:50
+#, fuzzy
+#| msgid "moderator status"
+msgid "expert status"
+msgstr "Moderator Status"
+
+#: forum/user/models.py:51
 msgid "administrator status"
 msgstr "Administrator Status"
 
-#: models.py:24
+#: forum/user/models.py:52
 msgid "moderator status"
 msgstr "Moderator Status"
 
-#: models.py:25
+#: forum/user/models.py:53
 msgid "verified"
 msgstr ""
 
-#: models.py:26
+#: forum/user/models.py:54
 msgid ""
 "Designates whether the user has verified his account by email or by other "
 "means. Un-select this to let the user activate his account."
 msgstr ""
 
-#: models.py:30
+#: forum/user/models.py:58
 msgid "topic count"
 msgstr "Themen"
 
-#: models.py:31
+#: forum/user/models.py:59
 msgid "comment count"
 msgstr "Kommentare"
 
-#: models.py:34
+#: forum/user/models.py:60
+msgid "Is Popular"
+msgstr ""
+
+#: forum/user/models.py:61
+msgid "Is Business"
+msgstr ""
+
+#: forum/user/models.py:63
+msgid "last post hash"
+msgstr ""
+
+#: forum/user/models.py:64
+#, fuzzy
+#| msgid "last seen"
+msgid "last post on"
+msgstr "zuletzt gesehen"
+
+#: forum/user/models.py:66
+#, fuzzy
+#| msgid "Profile"
+msgid "Profile Pic"
+msgstr "Profil"
+
+#: forum/user/models.py:67 forum/user/models.py:192
+msgid "Name"
+msgstr ""
+
+#: forum/user/models.py:68
+msgid "Bio"
+msgstr ""
+
+#: forum/user/models.py:69
+msgid "Date of Birth"
+msgstr ""
+
+#: forum/user/models.py:71
+msgid "About"
+msgstr ""
+
+#: forum/user/models.py:73
+msgid "Sub Category"
+msgstr ""
+
+#: forum/user/models.py:76
+msgid "Social Identifier"
+msgstr ""
+
+#: forum/user/models.py:77
+msgid "Mobile No"
+msgstr ""
+
+#: forum/user/models.py:89
+msgid "Latitude"
+msgstr ""
+
+#: forum/user/models.py:90
+msgid "Langitude"
+msgstr ""
+
+#: forum/user/models.py:93
+msgid "LinkedIn URL"
+msgstr ""
+
+#: forum/user/models.py:94
+msgid "Twitter ID"
+msgstr ""
+
+#: forum/user/models.py:95
+msgid "Instagram ID"
+msgstr ""
+
+#: forum/user/models.py:97 forum/user/models.py:246
+msgid "Click Id"
+msgstr ""
+
+#: forum/user/models.py:98
+msgid "Click Id Response"
+msgstr ""
+
+#: forum/user/models.py:104
 msgid "forum profile"
 msgstr ""
 
-#: models.py:35
+#: forum/user/models.py:105
 msgid "forum profiles"
 msgstr ""
 
-#: models.py:56
+#: forum/user/models.py:152
+msgid "Minimum Bolo Score For Monetize/Bolo Score Equivalent Money"
+msgstr ""
+
+#: forum/user/models.py:153
+msgid "Bolo Equivalent Money in INR"
+msgstr ""
+
+#: forum/user/models.py:160
+msgid "Android Logs"
+msgstr ""
+
+#: forum/user/models.py:161
+msgid "Log Type"
+msgstr ""
+
+#: forum/user/models.py:169 forum/user/models.py:177 forum/user/models.py:187
 msgid "user"
 msgstr "Benutzer_in"
 
-#: models.py:57
-msgid "users"
-msgstr "Benutzer"
+#: forum/user/models.py:170 forum/user/models.py:178
+msgid "videoid"
+msgstr ""
 
-#: templates/spirit/user/_profile.html:12
+#: forum/user/models.py:171 forum/user/models.py:180
+msgid "playtime"
+msgstr ""
+
+#: forum/user/models.py:172 forum/user/models.py:182
+msgid "timestamp"
+msgstr ""
+
+#: forum/user/models.py:179
+#, fuzzy
+#| msgid "location"
+msgid "duration"
+msgstr "Ort"
+
+#: forum/user/models.py:181
+msgid "percentage_viewed"
+msgstr ""
+
+#: forum/user/models.py:188
+msgid "totaltime"
+msgstr ""
+
+#: forum/user/models.py:193
+msgid "Version"
+msgstr ""
+
+#: forum/user/models.py:194
+msgid "Version To be Pushed"
+msgstr ""
+
+#: forum/user/models.py:196
+#, fuzzy
+#| msgid "Change my email"
+msgid "Changes Title"
+msgstr "Meine E-Mailadresse ändern"
+
+#: forum/user/models.py:197
+#, fuzzy
+#| msgid "Change password"
+msgid "Changes"
+msgstr "Passwort ändern"
+
+#: forum/user/models.py:207
+msgid "Page Name"
+msgstr ""
+
+#: forum/user/models.py:208
+msgid "Page Description"
+msgstr ""
+
+#: forum/user/models.py:214
+msgid "Ref Code"
+msgstr ""
+
+#: forum/user/models.py:216
+msgid "Purpose"
+msgstr ""
+
+#: forum/user/models.py:217
+msgid "Playstore URL"
+msgstr ""
+
+#: forum/user/models.py:218
+msgid "live"
+msgstr ""
+
+#: forum/user/models.py:247
+msgid "PID"
+msgstr ""
+
+#: forum/user/models.py:248
+msgid "Referral Dump"
+msgstr ""
+
+#: forum/user/models.py:249
+msgid "android_id"
+msgstr ""
+
+#: forum/user/templates/spirit/user/_profile.html:12
 msgid "Joined at"
 msgstr "Beigetreten am"
 
-#: templates/spirit/user/_profile.html:16
+#: forum/user/templates/spirit/user/_profile.html:16
 msgid "Seen"
 msgstr "gesehen"
 
-#: templates/spirit/user/_profile.html:22
+#: forum/user/templates/spirit/user/_profile.html:22
 msgid "Last IP"
 msgstr "Letzte IP"
 
-#: templates/spirit/user/_profile.html:31
-#: templates/spirit/user/profile_update.html:5
-#: templates/spirit/user/profile_update.html:9
+#: forum/user/templates/spirit/user/_profile.html:31
+#: forum/user/templates/spirit/user/profile_update.html:5
+#: forum/user/templates/spirit/user/profile_update.html:9
 msgid "Preferences"
 msgstr "Vorlieben"
 
-#: templates/spirit/user/_profile.html:35
+#: forum/user/templates/spirit/user/_profile.html:35
 msgid "Private Message"
 msgstr "Private Nachricht"
 
-#: templates/spirit/user/_profile.html:41
+#: forum/user/templates/spirit/user/_profile.html:41
 msgid "Edit user"
 msgstr "Benutzer editieren"
 
-#: templates/spirit/user/_profile.html:46
+#: forum/user/templates/spirit/user/_profile.html:46
 msgid "Comments"
 msgstr "Kommentare"
 
-#: templates/spirit/user/_profile.html:47 templates/spirit/user/menu.html:15
+#: forum/user/templates/spirit/user/_profile.html:47
+#: forum/user/templates/spirit/user/menu.html:15
 msgid "Topics"
 msgstr "Themen"
 
-#: templates/spirit/user/_profile.html:48
+#: forum/user/templates/spirit/user/_profile.html:48
 msgid "Likes"
 msgstr "Likes"
 
-#: templates/spirit/user/_render_comments_list.html:36
+#: forum/user/templates/spirit/user/_render_comments_list.html:72
 msgid "There are no comments here, yet"
 msgstr "Es gibt noch keine Kommentare, bis jetzt"
 
-#: templates/spirit/user/activation_email.html:2
+#: forum/user/templates/spirit/user/_user_profile_comments.html:5
+#: forum/user/templates/spirit/user/profile_comments.html:5
+msgid "comments"
+msgstr "Kommentare"
+
+#: forum/user/templates/spirit/user/activation_email.html:2
 #, python-format
 msgid "You're receiving this email because you registered at %(site_name)s."
 msgstr ""
 "Du erhältst diese E-Mail da du dich auf %(site_name)s registriert hast "
 
-#: templates/spirit/user/activation_email.html:4
+#: forum/user/templates/spirit/user/activation_email.html:4
 msgid "Please go to the following link to activate your account:"
 msgstr "Bitte klicke auf den folgenden Link, um deinen Zugang zu aktivieren:"
 
-#: templates/spirit/user/activation_email.html:8
-#: templates/spirit/user/email_change_email.html:8
+#: forum/user/templates/spirit/user/activation_email.html:8
+#: forum/user/templates/spirit/user/email_change_email.html:8
 msgid "Thanks for using our site!"
 msgstr "Danke für das Benutzen unserer Website!"
 
-#: templates/spirit/user/email_change_email.html:2
+#: forum/user/templates/spirit/user/email_change_email.html:2
 #, python-format
 msgid ""
 "You're receiving this because you changed your user email at %(site_name)s."
@@ -163,50 +357,50 @@ msgstr ""
 "Du erhältst diese E-Mail, da du deine E-Mailadresse auf %(site_name)s "
 "geändert hast."
 
-#: templates/spirit/user/email_change_email.html:4
+#: forum/user/templates/spirit/user/email_change_email.html:4
 msgid "Please go to the following link to confirm your email change:"
 msgstr ""
 "Bitte klicke auf den folgenden Link um die Änderung deiner E-Mailadresse zu "
 "bestätigen:"
 
-#: templates/spirit/user/menu.html:7
+#: forum/user/templates/spirit/user/menu.html:7
 msgid "User menu"
 msgstr "Benutzer_innen Menü"
 
-#: templates/spirit/user/menu.html:11
+#: forum/user/templates/spirit/user/menu.html:11
 msgid "Menu"
 msgstr "Menü"
 
-#: templates/spirit/user/menu.html:14
+#: forum/user/templates/spirit/user/menu.html:14
 msgid "Profile"
 msgstr "Profil"
 
-#: templates/spirit/user/menu.html:16
+#: forum/user/templates/spirit/user/menu.html:16
 msgid "Unread topics"
 msgstr "ungelesen Themen"
 
-#: templates/spirit/user/menu.html:17
+#: forum/user/templates/spirit/user/menu.html:17
 msgid "Private topics"
 msgstr "private Themen"
 
-#: templates/spirit/user/menu.html:20
+#: forum/user/templates/spirit/user/menu.html:20
 msgid "Admin"
 msgstr "Admin"
 
-#: templates/spirit/user/menu.html:23
+#: forum/user/templates/spirit/user/menu.html:23
 msgid "Log out"
 msgstr "abmelden"
 
-#: templates/spirit/user/notification_email.html:2
+#: forum/user/templates/spirit/user/notification_email.html:2
 #, python-format
 msgid "You have a new notification at %(site_name)s."
 msgstr "Du hast eine neue Benachrichtigung bei %(site_name)s."
 
-#: templates/spirit/user/notification_email.html:4
+#: forum/user/templates/spirit/user/notification_email.html:4
 msgid "Please go to the following link to read the comment:"
 msgstr "Bitte klicke auf den folgenden Link um den Kommentar zu lesen:"
 
-#: templates/spirit/user/notification_email.html:8
+#: forum/user/templates/spirit/user/notification_email.html:8
 msgid ""
 "If you don't want to keep receiving notifications, you can deactivate them "
 "on your profile preferences."
@@ -214,83 +408,82 @@ msgstr ""
 "Falls du keine weiteren Benachrichtigungen erhalten möchtest, deaktiviere "
 "diese bitte in deinen Profileinstellungen."
 
-#: templates/spirit/user/profile_comments.html:5
-msgid "comments"
-msgstr "Kommentare"
-
-#: templates/spirit/user/profile_email_change.html:5
-#: templates/spirit/user/profile_email_change.html:9 tests.py:435 tests.py:694
-#: utils/email.py:58
+#: forum/user/templates/spirit/user/profile_email_change.html:5
+#: forum/user/templates/spirit/user/profile_email_change.html:9
+#: forum/user/tests.py:451 forum/user/tests.py:765 forum/user/utils/email.py:86
 msgid "Email change"
 msgstr "E-Mailadresse ändern"
 
-#: templates/spirit/user/profile_email_change.html:15
+#: forum/user/templates/spirit/user/profile_email_change.html:15
 msgid "Change my email"
 msgstr "Meine E-Mailadresse ändern"
 
-#: templates/spirit/user/profile_likes.html:5
+#: forum/user/templates/spirit/user/profile_likes.html:5
 msgid "likes"
 msgstr "likes"
 
-#: templates/spirit/user/profile_password_change.html:5
-#: templates/spirit/user/profile_password_change.html:9
+#: forum/user/templates/spirit/user/profile_password_change.html:5
+#: forum/user/templates/spirit/user/profile_password_change.html:9
 msgid "Password change"
 msgstr "Passwort ändern"
 
-#: templates/spirit/user/profile_password_change.html:15
+#: forum/user/templates/spirit/user/profile_password_change.html:15
 msgid "Change my password"
 msgstr "Mein Passwort ändern"
 
-#: templates/spirit/user/profile_topics.html:5
+#: forum/user/templates/spirit/user/profile_topics.html:5
 msgid "topics"
 msgstr "Themen"
 
-#: templates/spirit/user/profile_update.html:16
+#: forum/user/templates/spirit/user/profile_update.html:16
 msgid "Change password"
 msgstr "Passwort ändern"
 
-#: templates/spirit/user/profile_update.html:18
+#: forum/user/templates/spirit/user/profile_update.html:18
 msgid "Avatar"
 msgstr "Avatar"
 
-#: templates/spirit/user/profile_update.html:19
+#: forum/user/templates/spirit/user/profile_update.html:19
 msgid "Change avatar"
 msgstr "Avatar ändern"
 
-#: templates/spirit/user/profile_update.html:20
+#: forum/user/templates/spirit/user/profile_update.html:20
 msgid "Go to gravatar.com and use your current email to change it"
 msgstr ""
 
-#: templates/spirit/user/profile_update.html:28
+#: forum/user/templates/spirit/user/profile_update.html:28
 msgid "Save"
 msgstr "speichern"
 
-#: tests.py:658 utils/email.py:50
+#: forum/user/tests.py:729 forum/user/utils/email.py:70
 msgid "User activation"
 msgstr "Benutzer_innen-Aktivierung"
 
-#: utils/email.py:67
+#: forum/user/utils/email.py:95
 #, python-format
 msgid "New notification: %(topic_name)s"
 msgstr "Neue Benachrichtigung: %(topic_name)s"
 
-#: views.py:35
+#: forum/user/views.py:40
 msgid "Your profile has been updated!"
 msgstr "Dein Profil wurde aktualisiert!"
 
-#: views.py:57
+#: forum/user/views.py:62
 msgid "Your password has been changed!"
 msgstr "Dein Passwort wurde geändert!"
 
-#: views.py:74
+#: forum/user/views.py:79
 msgid "We have sent you an email so you can confirm the change!"
 msgstr ""
 "Wir haben Dir eine E-Mail gesandt, nun kannst du die Änderungen bestätigen!"
 
-#: views.py:96
+#: forum/user/views.py:101
 msgid "Your email has been changed!"
 msgstr "Deine E-Mailadresse wurde geändert!"
 
-#: views.py:99
+#: forum/user/views.py:104
 msgid "Sorry, we were not able to change your email."
 msgstr ""
+
+#~ msgid "users"
+#~ msgstr "Benutzer"

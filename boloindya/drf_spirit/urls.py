@@ -7,7 +7,7 @@ from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,c
     vb_transcode_status,get_follow_user,upload_profile_image,get_following_list,get_follower_list,GetChallenge,GetChallengeDetails,save_android_logs,SyncDump,get_hash_list,\
     KYCDocumentTypeList,save_kyc_basic_info,save_kyc_documents,save_kyc_selfie,save_kyc_additional_info,save_bank_details_info,kyc_profession_status,get_kyc_status,my_app_version,\
     EncashableDetailList,get_bolo_details, get_category_detail, UserLogStatistics,GetFollowigList,GetFollowerList, get_category_with_video_bytes, get_category_detail_with_views, \
-    get_category_video_bytes, get_popular_video_bytes, get_user_follow_and_like_list, get_recent_videos, get_popular_bolo, submit_user_feedback,get_ip_to_language, get_landing_page_video,\
+    get_category_video_bytes, get_popular_video_bytes, get_user_follow_and_like_list, get_recent_videos, get_popular_bolo, submit_user_feedback,generate_login_data,get_ip_to_language, get_landing_page_video,\
     mention_suggestion,hashtag_suggestion,SearchHashTag,editComment,get_user_bolo_info
 from rest_framework_simplejwt import views as jwt_views
 from .views import *
@@ -70,6 +70,7 @@ urlpatterns = [
 
     # Get Params could be ?is_reset_password=1 OR ?is_for_change_phone=1
     url(r'^otp/verify/$', verify_otp, name='token_obtain_pair'),
+    url(r'^user/user_data/$', generate_login_data, name='generate_login_data'),
 
     url(r'^save_kyc_basic_info/$', save_kyc_basic_info, name='save_kyc_basic_info'),
     url(r'^save_kyc_documents/$', save_kyc_documents, name='save_kyc_documents'),

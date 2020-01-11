@@ -1,0 +1,1269 @@
+{% extends "spirit/_new_base.html" %}
+{% load spirit_tags i18n %}
+{% load i18n %}
+{% load number_formate_change_tag %}
+{% block title %}BoloIndya{% endblock %}
+{% block content %}
+<style type="text/css">
+    .jwplayer.jw-stretch-uniform .jw-media video {
+    object-fit: cover;
+}
+#player{
+        height: 748px !important;
+}
+@media(max-width: 991px){
+    .footer-container{
+        display: none;
+    }
+}
+.jwplayer.jw-flag-aspect-mode {
+    height: 100% !important;
+}
+.player .sidebar {
+    position: absolute;
+    width: 48px;
+    height: 300px;
+    right: 10px;
+    bottom: 70px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    -webkit-box-align: center;
+    align-items: center;
+}
+.avatar.round.jsx-2177493926 {
+    border-radius: 999px;
+}
+
+.avatar.jsx-3813273378 {
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(255, 255, 255);
+    border-image: initial;
+}
+
+.avatar.jsx-2177493926 {
+    box-sizing: border-box;
+    position: relative;
+    border-radius: 2px;
+    overflow: hidden;
+    background: center center / cover no-repeat;
+}
+.boloindya-toolbar {
+    position: relative;
+    z-index: 1000;
+    color: rgb(255, 255, 255);
+}
+.boloindya-bottom {
+    color: rgb(255, 255, 255);
+}
+
+.bottom {
+    position: absolute;
+    bottom: 0px;
+    width: 100vw;
+    background-image: linear-gradient(transparent, rgba(0, 0, 0, 0.5));
+    padding-bottom: 12px;
+    height: 180px;
+    display: flex;
+    -webkit-box-pack: justify;
+    justify-content: space-between;
+    font-size: 14px;
+    align-items: flex-end;
+    padding-left: 10px;
+    padding-right: 10px;
+    z-index: 10;
+}
+.boloindya-player-icon {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    left: 0px;
+    z-index: 3;
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+}
+.boloindya-toolbar-section {
+    background-size: 40px 40px;
+    width: 40px;
+    height: 56px;
+    position: relative;
+    margin-bottom: 15px;
+    padding-top: 40px;
+    text-align: center;
+    background-repeat: no-repeat;
+    background-position: center top;
+}
+
+@media(max-width: 991px){
+    .player .sidebar {
+        position: sticky;
+        width: 48px;
+        height: 300px;
+        right: 10px;
+        float: right;
+        bottom: 70px;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        -webkit-box-align: center;
+        align-items: center;
+    }
+    .boloindya-toolbar-section {
+        background-size: 40px 40px;
+        width: 40px;
+        height: 22px;
+        position: relative;
+        margin-bottom: 15px;
+        padding-top: 39px;
+        text-align: center;
+        background-repeat: no-repeat;
+        background-position: center top;
+    }
+
+    .music-item.play, .album-item.play {
+    animation-play-state: running;
+        animation: 3s linear 0s infinite normal none running rowleft-109;
+
+    }
+    .music-box {
+        padding-right: 20px;
+    }
+    .music-item {
+        margin-left: 6px;
+        display: flex;
+        width: max-content;
+    }
+    .container{
+        z-index: 9999;
+    }
+    .boloindya-bottom-right img {
+    width: 27px;
+    height: 27px;
+    border-radius: 50%;
+}
+.boloindya-bottom-left {
+    max-width: 274px;
+    overflow: hidden;
+}
+.boloindya-bottom .bottom-name {
+    font-weight: 600;
+    font-size: 17px;
+}
+.boloindya-bottom .bottom-desc {
+    font-size: 15px;
+    line-height: 1.2;
+    word-break: break-all;
+}
+
+.boloindya-bottom-text {
+    margin-bottom: 8px;
+}
+.boloindya-bottom-right {
+    width: 48px;
+    height: 48px;
+    background-size: 100% 100%;
+    display: flex;
+    -webkit-box-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    align-items: center;
+    background-repeat: no-repeat;
+}
+.music-item.play, .album-item.play {
+    animation-play-state: running;
+}
+
+.boloindya-bottom-right {
+    width: 48px;
+    height: 48px;
+    margin-right: 20px;
+    background-size: 100% 100%;
+    display: flex;
+    -webkit-box-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    align-items: center;
+    background-repeat: no-repeat;
+}
+
+.album-item {
+    animation: 8s linear 0s infinite normal none running rotate;
+}
+
+}
+
+    ._6w18 {
+        display: flex;
+        margin: 0 12px;
+        padding: 4px 0;
+    }
+    ._6w1g {
+        min-width: 29px;
+        order: 2;
+    }
+
+    ._29ak {
+        padding-left: 3px;
+    }
+    ._6w1h {
+        display: flex;
+        flex-direction: row;
+        flex-grow: 1;
+        order: 1;
+    }
+    ._18vi {
+        align-items: center;
+        display: flex;
+        flex: 1 0;
+        justify-content: center;
+    }
+    ._18vi {
+        align-items: center;
+        display: flex;
+        flex: 1 0;
+        justify-content: center;
+    }
+    ._18vi+._18vi::before {
+        content: '\20\a0\20';
+    }
+    ._18vj._18vj {
+        align-items: center;
+        color: #606770;
+        display: flex;
+        flex: 1 0;
+        font-weight: 600;
+        height: 32px;
+        justify-content: center;
+        line-height: 14px;
+        padding: 0 2px;
+        position: relative;
+        text-decoration: none;
+        transition: 400ms cubic-bezier(.08,.52,.52,1) transform;
+    }
+
+    ._666h {
+        cursor: pointer;
+    }
+    ._42ft {
+        cursor: pointer;
+        display: inline-block;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+    ._18vk::before {
+        content: '';
+        display: inline-block;
+        height: 18px;
+        margin: 0 6px -3px 0;
+        min-width: 18px;
+        position: relative;
+        top: -2px;
+        width: 18px;
+    }
+
+    ._666h::before {
+        background-image: url(/media/CQy3OlLfs65.png);
+        background-repeat: no-repeat;
+        background-size: auto;
+        background-position: 0 -156px;
+    }
+    ._18vj::after {
+        bottom: -5px;
+        content: '';
+        display: block;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: -5px;
+    }
+    ._18vi {
+        align-items: center;
+        display: flex;
+        flex: 1 0;
+        justify-content: center;
+    }
+    ._18vi+._18vi::before {
+        content: '\20\a0\20';
+    }
+    ._1j6m {
+        display: flex;
+        flex: 1 0;
+        justify-content: center;
+    }
+    ._18vj._18vj {
+        align-items: center;
+        color: #606770;
+        display: flex;
+        flex: 1 0;
+        font-weight: 600;
+        height: 32px;
+        justify-content: center;
+        line-height: 14px;
+        padding: 0 2px;
+        position: relative;
+        text-decoration: none;
+        transition: 400ms cubic-bezier(.08,.52,.52,1) transform;
+    }
+
+    ._1j6m ._2nj7 {
+        align-items: center;
+        display: flex;
+        text-decoration: inherit;
+        width: 100%;
+    }
+    ._18vk::before {
+        content: '';
+        display: inline-block;
+        height: 18px;
+        margin: 0 6px -3px 0;
+        min-width: 18px;
+        position: relative;
+        top: -2px;
+        width: 18px;
+    }
+
+    ._2nj7::before {
+        background-image: url(/media/CQy3OlLfs65.png);
+        background-repeat: no-repeat;
+        background-size: auto;
+        background-position: -19px -175px;
+    }
+    ._18vj::after {
+        bottom: -5px;
+        content: '';
+        display: block;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: -5px;
+    }
+    ._18vi {
+        align-items: center;
+        display: flex;
+        flex: 1 0;
+        justify-content: center;
+    }
+    ._666k {
+        position: relative;
+        width: 100%;
+    }
+    ._8c74 {
+        position: relative;
+    }
+    ._18vj._18vj {
+        align-items: center;
+        color: #606770;
+        display: flex;
+        flex: 1 0;
+        font-weight: 600;
+        height: 32px;
+        justify-content: center;
+        line-height: 14px;
+        padding: 0 2px;
+        position: relative;
+        text-decoration: none;
+        transition: 400ms cubic-bezier(.08,.52,.52,1) transform;
+    }
+    .sp_ddXiTdIB8vm.sx_44a25c {
+        width: 18px;
+        height: 18px;
+        background-position: -38px -422px;
+    }
+    .sp_ddXiTdIB8vm.sx_44a25d {
+        width: 18px;
+        height: 18px;
+        background-position: 1px -422px;
+    }
+
+    i.img {
+        -ms-high-contrast-adjust: none;
+    }
+    ._6rk2 {
+        display: inline-block;
+        margin-right: 6px;
+    }
+
+
+    .sp_ddXiTdIB8vm {
+        background-image: url(/media/iJGOBKN9vqK.png);
+        background-size: auto;
+        background-repeat: no-repeat;
+        display: inline-block;
+        height: 20px;
+        width: 20px;
+    }
+    ._18vj::after {
+        bottom: -5px;
+        content: '';
+        display: block;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: -5px;
+    }
+    ._6w1g {
+        min-width: 29px;
+        order: 2;
+    }
+    ._29ak {
+        padding-left: 3px;
+    }
+    ._2agf._4o_4 {
+        display: inline-flex;
+    }
+
+    ._29ak a {
+        align-items: center;
+        border: none;
+        display: flex;
+        height: 32px;
+    }
+    ._4jy3, ._4jy3._42fr:active, ._4jy3._42fr._42fs {
+        line-height: 22px;
+    }
+    ._59pe, form.async_saving ._59pe, a.async_saving._59pe, ._59pe._42fr {
+        background: none;
+        border-color: transparent;
+    }
+    ._517h, ._59pe:focus, ._59pe:hover {
+        background-color: #f5f6f7;
+        border-color: #ccd0d5;
+        color: #4b4f56;
+    }
+    ._4jy0 {
+        transition: 200ms cubic-bezier(.08,.52,.52,1) background-color, 200ms cubic-bezier(.08,.52,.52,1) box-shadow, 200ms cubic-bezier(.08,.52,.52,1) transform;
+    }
+    ._4jy0 {
+        border: 1px solid;
+        border-radius: 2px;
+        box-sizing: content-box;
+        font-size: 12px;
+        -webkit-font-smoothing: antialiased;
+        font-weight: bold;
+        justify-content: center;
+        padding: 0 8px;
+        position: relative;
+        text-align: center;
+        text-shadow: none;
+        vertical-align: middle;
+    }
+    ._2agf {
+        word-wrap: normal;
+    }
+    ._42ft {
+        cursor: pointer;
+        display: inline-block;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+    ._4jy0:before {
+        content: '';
+        display: inline-block;
+        height: 20px;
+        vertical-align: middle;
+    }
+    ._3-8_ {
+        margin-right: 4px;
+    }
+    ._605a ._6vg {
+        border-radius: 50%;
+        overflow: hidden;
+    }
+    ._4jy0 .img {
+        bottom: 1px;
+        position: relative;
+        vertical-align: middle;
+    }
+    ._3vum {
+        align-items: center;
+        border-bottom: 1px solid #dadde1;
+        color: #606770;
+        display: flex;
+        line-height: 20px;
+        margin: 10px 12px 0 12px;
+        padding: 0 0 10px 0;
+    }
+    ._6w1l._6w1o {
+        padding: 8px 12px 4px 12px;
+    }
+    ._6w1l._6w1m {
+        padding: 2px 12px 8px 12px;
+    }
+
+    ._6w1l {
+        padding: 4px 12px;
+    }
+    .clearfix {
+        zoom: 1;
+    }
+    .lfloat {
+        float: left;
+    }
+    ._3mf5 {
+        border-radius: 50%;
+        display: block;
+        margin-right: 6px;
+        position: relative;
+    }
+    ._3mf1 {
+        height: 32px;
+        width: 32px;
+    }
+
+    ._3me- {
+        border-radius: 50%;
+        display: block;
+        overflow: hidden;
+    }
+    ._3mf5::after {
+        border: 1px solid rgba(0, 0, 0, .1);
+        border-radius: 50%;
+        bottom: 0;
+        content: '';
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+    ._42ef {
+        overflow: hidden;
+    }
+    ._17pg {
+        flex-grow: 1;
+    }
+    ._1rwk {
+        flex-grow: 1;
+    }
+    ._129h {
+        background-color: #f2f3f5;
+        border: 1px solid #ccd0d5;
+        border-radius: 16px;
+        display: flex;
+        justify-content: flex-end;
+    }
+    ._4w79 {
+        cursor: text;
+        flex: 1 1 auto;
+        line-height: 16px;
+        overflow: hidden;
+        padding: 8px 12px;
+    }
+    ._7c_r {
+        color: #8d949e;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    ._5rp7 {
+        position: relative;
+    }
+    ._5rp7, ._5rpb, ._5rpu {
+        height: inherit;
+        text-align: initial;
+    }
+    ._3d2q ._1p1t {
+        color: #8d949e;
+    }
+    ._7c_r ._1p1t {
+        width: 100%;
+    }
+    ._1p1t {
+        color: #90949c;
+        position: absolute;
+        z-index: 1;
+    }
+    ._7c_r ._1p1v {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap !important;
+    }
+    ._5rpb {
+        background-color: rgba(255, 255, 255, 0);
+        border-left: .1px solid transparent;
+        position: relative;
+        z-index: 1;
+    }
+    ._5rp7, ._5rpb, ._5rpu {
+        height: inherit;
+        text-align: initial;
+    }
+    ._3d2q ._5rpu {
+        background-color: transparent;
+        border: 0;
+        resize: none;
+        word-break: break-word;
+    }
+    ._5rpu[contenteditable="true"] {
+        -webkit-user-modify: read-write-plaintext-only;
+    }
+    ._5rp7, ._5rpb, ._5rpu {
+        height: inherit;
+
+    }
+    ._1mj {
+        direction: ltr;
+        text-align: left;
+    }
+
+    ._1mf {
+        position: relative;
+        white-space: pre-wrap;
+    }
+    ._1mj {
+        direction: ltr;
+        text-align: left;
+    }
+    ._1mj {
+        direction: ltr;
+        text-align: left;
+    }
+    ._4w79 {
+        cursor: text;
+        flex: 1 1 auto;
+        line-height: 16px;
+        overflow: hidden;
+        padding: 8px 12px;
+    }
+
+    ._7c_r {
+        color: #8d949e;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    ._18vj._18vj:hover{
+        background: #e9ebee;
+    }
+        
+    .sbutton {
+    position: relative;
+
+    }
+    .sbutton:hover{
+        background: #e9ebee;
+    }
+
+    .smenu {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      left: -20px;
+      margin: 0;
+      opacity: 0;
+      padding: 0;
+      position: absolute;
+      top: 0px;
+      -webkit-transition: opacity 0.2s ease-in-out, top 0.2s ease-in-out;
+      -moz-transition: opacity 0.2s ease-in-out, top 0.2s ease-in-out;
+      transition: opacity 0.2s ease-in-out, top 0.2s ease-in-out;
+    }
+
+    .smenu:after {
+      background-color: #FFF;
+    border-top: 1px solid #CCC;
+    border-left: 1px solid #CCC;
+    top: -7px;
+    content: '';
+    display: inline-block;
+    height: 10px;
+    left: 50px;
+    position: absolute;
+    width: 10px;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg)
+    }
+
+    .smenu li {
+      border-bottom: 1px solid #ccc;
+      list-style-type: none;
+      margin: 0;
+      padding: 7px;
+      width: 100px;
+    }
+
+    .smenu li:hover {
+      background-color: #fafafa;
+    }
+
+    .smenu .facebook:hover {
+    background-color: #4C66A4;
+    color: #FFF !important;
+    }
+
+    .smenu .twitter:hover {
+    background-color: #019AD2;
+    color: #FFF !important;
+    }
+
+    .smenu .googleplus:hover {
+    background-color: #D73D32;
+    color: #FFF !important;
+    }
+
+    .smenu li:last-child {
+      border-bottom: none;
+    }
+
+    .smenu li a {
+      color: #E04006;
+      text-decoration: none;
+    }
+
+    .smenu li:hover a {
+      color:#fff !important;
+    }
+
+    .smenu.share {
+      opacity: 1;
+      top: 45px;
+    }
+    .comment_block .create_new_comment {
+    width: 100%;
+    padding: 20px 0;
+    }
+    .user_avatar {
+        width: 65px;
+        height: 65px;
+        display: inline-block;
+        vertical-align: middle;
+    }
+    .comment_block .create_new_comment .input_comment {
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 10px;
+        width: calc(100% - 75px);
+    }
+    .comment_block .create_new_comment .input_comment input[type="text"] {
+        width: 100%;
+        font-family: "Lato", sans-serif;
+        font-weight: 300;
+        font-size: 1.3rem;
+        padding: 10px;
+        border: none;
+        border-bottom: 2px solid #f2f2f2;
+    }
+    .user_avatar img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+    }
+    *, ::before, ::after {
+
+        margin: 0;
+        padding: 0;
+        -webkit-box-sizing: border-box;
+        transition: all 0.2s ease;
+
+    }
+    .comment-add input {
+        display: block;
+        border: 1px solid #ccc;
+        padding: 10px;
+        width: calc(100% - 0px);
+        outline: 0;
+        background-color: #fafafa;
+        border-radius: 3px;
+    }
+    .comment-add {
+        display: block;
+        margin-bottom: 20px;
+        margin-top: 10px;
+    }
+    .chars-counter {
+        font-size: 12px;
+        color: #aaa;
+    }
+    hr {
+        border: none;
+        border-top: 1px dotted #aaa;
+    }
+    #commentInputId .hide{
+    transition-property: all;
+    transition-duration: 1s;
+    }
+    .liked{
+        color: rgb(32, 120, 244) !important;
+    }
+
+    ._6coi {
+        color: #90949c;
+        display: inline-block;
+        font-size: 12px;
+        line-height: 12px;
+    }
+    ._6qw9 {
+        margin-bottom: 3px;
+        margin-left: 10px;
+        min-height: 15px;
+        padding-top: 3px;
+    }
+    ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+    }
+    ._6coj {
+        display: inline-block;
+    }
+    #facebook ._-kb span {
+        font-family: inherit;
+    }
+    ._6qw6 {
+        display: inline-block;
+        position: relative;
+    }
+
+    #facebook ._-kb div {
+        font-family: inherit;
+    }
+    ._8c74 {
+        position: relative;
+    }
+    ._77yo::before {
+        bottom: 0;
+        content: '';
+        display: block;
+        left: -6px;
+        position: absolute;
+        right: -6px;
+        top: -4px;
+    }
+    #facebook ._-kb div {
+        font-family: inherit;
+    }
+    #facebook .accessible_elem {
+        clip: rect(1px, 1px, 1px, 1px);
+        height: 1px;
+        overflow: hidden;
+        position: absolute;
+        white-space: nowrap;
+        width: 1px;
+    }
+
+    ._2r6l {
+        left: 0;
+        position: absolute;
+        top: 0;
+    }
+    ._8c74 a {
+        color: #385898;
+        cursor: pointer;
+        text-decoration: none;
+    }
+    .liked a {
+        color: rgb(32, 120, 244) !important;
+    }
+    ._video_card_big_comment_item_name a{
+        color: #000;
+    }
+    .share-layout{
+        padding: 40px 20px;
+    }
+
+    .mentions-input-box {
+      position: relative;
+      background: #fff;
+    }
+
+    .mentions-input-box textarea {
+      width: 100%;
+      display: block;
+      padding: 9px;
+      border: 1px solid #dcdcdc;
+      border-radius:3px;
+      overflow: hidden;
+      background: transparent;
+      position: relative;
+      outline: 0;
+      resize: none;
+
+      -webkit-box-sizing: border-box;
+         -moz-box-sizing: border-box;
+              box-sizing: border-box;
+    }
+
+    .mentions-input-box .mentions-autocomplete-list {
+      display: none;
+      background: #fff;
+      border: 1px solid #b2b2b2;
+      position: absolute;
+      left: 0;
+      right: 0;
+      z-index: 10000;
+      margin-top: -2px;
+
+      border-radius:5px;
+      border-top-right-radius:0;
+      border-top-left-radius:0;
+
+      -webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.148438);
+         -moz-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.148438);
+              box-shadow: 0 2px 5px rgba(0, 0, 0, 0.148438);
+    }
+
+    .mentions-input-box .mentions-autocomplete-list ul {
+        margin: 0;
+        padding: 0;
+    }
+
+    .mentions-input-box .mentions-autocomplete-list li {
+      background-color: #fff;
+      padding: 0 5px;
+      margin: 0;
+      width: auto;
+      border-bottom: 1px solid #eee;
+      height: 26px;
+      line-height: 26px;
+      overflow: hidden;
+      cursor: pointer;
+      list-style: none;
+      white-space: nowrap;
+    }
+
+    .mentions-input-box .mentions-autocomplete-list li:last-child {
+      border-radius:5px;
+    }
+
+    .mentions-input-box .mentions-autocomplete-list li > img,
+    .mentions-input-box .mentions-autocomplete-list li > div.icon {
+      width: 16px;
+      height: 16px;
+      float: left;
+      margin-top:5px;
+      margin-right: 5px;
+      -moz-background-origin:3px;
+
+      border-radius:3px;
+    }
+
+    .mentions-input-box .mentions-autocomplete-list li em {
+      font-weight: bold;
+      font-style: none;
+    }
+
+    .mentions-input-box .mentions-autocomplete-list li:hover,
+    .mentions-input-box .mentions-autocomplete-list li.active {
+      background-color: #f2f2f2;
+    }
+
+    .mentions-input-box .mentions-autocomplete-list li b {
+      background: #ffff99;
+      font-weight: normal;
+    }
+
+    .mentions-input-box .mentions {
+      position: absolute;
+      left: 1px;
+      right: 0;
+      top: 1px;
+      bottom: 0;
+      padding: 9px;
+      color: #fff;
+      overflow: hidden;
+
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .mentions-input-box .mentions > div {
+      color: #fff;
+      white-space: pre-wrap;
+      width: 100%;
+    }
+
+    .mentions-input-box .mentions > div > strong {
+      font-weight:normal;
+      background: #d8dfea;
+    }
+
+    .mentions-input-box .mentions > div > strong > span {
+        color: #fff0;
+      filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    }
+
+
+</style>
+
+
+
+<script type="text/javascript">
+var videoFileCDN="{{topic.video_cdn}}";
+if(videoFileCDN==""){
+    var videoFileCDN="{{topic.backup_url}}";
+}
+var videoFileBackupURL="{{topic.backup_url}}";
+var videoFileImage="{{topic.question_image}}";
+
+$(document).ready(function() {
+  loaderHide();
+    
+    if (window.matchMedia("(max-width: 991px)").matches) {
+        VideoPlayByURLMobile(videoFileCDN,videoFileImage);
+        /* The viewport is less than, or equal to, 700 pixels wide */
+    } else {
+        VideoPlayByURL(videoFileCDN,videoFileImage);
+      /* The viewport is greater than 700 pixels wide */
+    }
+    
+});
+</script>
+
+
+<link rel="canonical" href="{{site_absolute_url}}{{ request.get_full_path }}" />      
+<meta property="og:url" content="{{site_absolute_url}}{{ request.get_full_path }}"/>
+<meta property="og:type" content="website" />
+<meta property='og:title' content='{{topic.title}}' />
+<meta name="twitter:title" content="{{topic.title}}" />
+<meta name="twitter:site" content="@BoloIndya" />
+<meta name="twitter:creator" content="@BoloIndya" />
+<meta name="twitter:card" content="summary" />
+<meta property='og:description' content='{{topic.title}} Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India' />       
+<meta property='og:image' content='{{topic.question_image}}' />
+<link rel="image_src" href="{{topic.question_image}}"/>
+
+<input type="hidden" name="singleTopicId" id="singleTopicId" value="{{topic.id}}">
+<input type="hidden" name="topicSlug" id="singleTopicSlug" value="{{topic.slug}}">
+<div class="jsx-639186511 page-with-header main-body">
+
+    <div class="jsx-1270455008 container hideOnDesktop" >
+        <div style="height:calc(100% - 49px)" class="jsx-1270455008 main jsx-342698747 ">
+            <div class="jsx-3164575034 home">
+
+                <div class="jsx-3164575034 loading">
+                    <div class="jsx-4077079786 boloindya-loading"></div>
+                </div>
+                <div class="swiper-container swiper-container-initialized swiper-container-vertical swiper-container-ios">
+                    <div class="swiper-wrapper" style="transform: translate3d(0px, 0px, 0px);">
+                        <div data-index="0" class="swiper-slide player swiper-slide-active" style="height: 618px;">
+                            <div style="position: relative; width: 100vw; height: 618px;">
+
+                            <div class="jsx-3077367275 video-card default">
+                               <div class="LoaderBalls">
+                                    <div class="LoaderBalls__item"></div>
+                                    <div class="LoaderBalls__item"></div>
+                                    <div class="LoaderBalls__item"></div>
+                                </div>
+                                <div id="jwBoxPlayAndStop" style="height: 100%">
+                                    <div id="playerDetailsMobile"></div>
+                                </div>
+
+                                <div class="jsx-3077367275 video-card-mask"></div>
+                                <div class="jsx-4030482358 theme videoPlayButtonDetails"></div>
+                                <span class="jsx-3077367275 event-delegate-mask event-delegate-maskMob"></span>
+
+                                <span class="_video_card_"></span><img onclick="muteAndUnmutePlayerDet('playerDetailsMobile');" class="jsx-3077367275 mute-icon" id="mutedImageIdDe"  src="/media/mute_icon.svg">
+                            </div>
+
+                           </div>
+                            <div class="sidebar">
+
+                                <div class="jsx-2177493926 jsx-3813273378 avatar round" style="background-image: url({% if user_profile.profile_pic|length > 1 %}
+                                {{user_profile.profile_pic}}
+                            {% else %}
+                                /media/demo_user.png
+                            {% endif %}); width: 48px; height: 48px; flex: 0 0 48px;"></div>
+                                <div class="jsx-949708032 boloindya-toolbar" style="margin-top: 20px;">
+                                    <div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-like" style="background-image: url(/media/viewIcon.svg);"><span class="jsx-949708032">{{topic.view_count | shorcountertopic}}</span></div>
+                                    <div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-comment" style="background-image: url(/media/comments.svg);"><span class="jsx-949708032">{{topic.comment_count | shorcountertopic}}</span></div>
+                                    <div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-share" style="background-image: url(/media/share.svg);"><span class="jsx-949708032">{{topic.share_count | shorcountertopic}}</span></div>
+                                </div>
+                            </div>
+                            
+                            <div class="jsx-295561999 boloindya-bottom bottom" style="display: none;">
+                                <div class="jsx-295561999 boloindya-bottom-left">
+                                    <div class="jsx-295561999 boloindya-bottom-text bottom-name">{{user_profile.user.username}}</div>
+                                    <div class="jsx-295561999 music-icon"></div>
+                                </div>
+                                <div class="jsx-295561999 boloindya-bottom-right album-item play" style="background-image: url(/media/Userplay.svg);"><img src="/media/1647897074966561.jpeg" class="jsx-295561999"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>
+                </div>
+
+            </div>
+        </div>
+        <div class="jsx-1270455008 footer1">
+            <a href="/"><div class="jsx-1270455008" style="background-image: url(/media/footerIcon1.svg);"></div></a>
+            <a href="/{{LANGUAGE_CODE}}/discover/">
+            <div class="jsx-1270455008" style="background-image: url(/media/footerIcon2.svg);"></div></a>
+            <div class="jsx-1270455008 " onclick="openMobileDownloadPopup();" style="background-image: url(/media/footer_icon3.svg);"></div>
+            <div class="jsx-1270455008" onclick="openMobileDownloadPopup();" style="background-image: url(/media/footerIcon4.svg);"></div>
+            <div class="jsx-1270455008" onclick="openMobileDownloadPopup();"  style="background-image: url(/media/footerIcon5.svg);"></div>
+        </div>
+    </div>
+
+
+    <div class="jsx-606928072 share-layout hideonMobile" >
+        <div class="share-layout-content">
+            <main class="share-layout-main">
+                <div class="jsx-1861775669 jsx-537314381 video-card-big">
+                    <div class="jsx-1861775669 jsx-537314381 video-card-container">
+                        <div style="border-radius: 8px; background-image: url();" class="jsx-1464109409 image-card">
+                            <div class="jsx-3077367275 video-card default">
+                               <div class="LoaderBalls">
+                                    <div class="LoaderBalls__item"></div>
+                                    <div class="LoaderBalls__item"></div>
+                                    <div class="LoaderBalls__item"></div>
+                                </div>
+                                <div id="jwBoxPlayAndStop" style="height: 100%">
+                                    <div id="playerDetails"></div>
+                                </div>
+
+                                <div class="jsx-3077367275 video-card-mask"></div>
+                                <div class="jsx-4030482358 theme videoPlayButtonDetails"></div>
+                                <span class="jsx-3077367275 event-delegate-mask event-delegate-maskDesk"></span>
+
+                                <span class="_video_card_"></span><img onclick="muteAndUnmutePlayerDet('playerDetails');" class="jsx-3077367275 mute-icon" id="mutedImageIdDe"  src="/media/mute_icon.svg">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="jsx-1861775669 jsx-537314381 content-container border">
+                        <a tag="a" class="jsx-1861775669 jsx-537314381 user-info" href="/{{user_profile.user.username}}/">
+
+                            <div style="background-image:url({% if user_profile.profile_pic|length > 1 %}
+                                {{user_profile.profile_pic}}
+                            {% else %}
+                                /media/demo_user.png
+                            {% endif %});border-radius:;width:64px;height:64px;flex:0 0 64px;" class="jsx-2177493926 jsx-578937417 avatar round"></div>
+                            <div class="jsx-1861775669 jsx-537314381 user-info-content">
+                                <h2 class="jsx-1861775669 jsx-537314381">
+                                    {% if user_profile.first_name|length > 1 %}
+                                       {{user_profile.first_nam}} {{user_profile.last_name}}
+                                    {% else %}
+                                       {{user_profile.user.username}}
+                                    {% endif %}
+                                </h2>
+                                <p class="jsx-1861775669 jsx-537314381">
+                                    <!-- -->{{user_profile.user.username}}</p>
+                            </div>
+                        </a>
+                        <span class="unit" style="display: inline-block;position: relative;top: -56px;">
+                            <button onclick="follow_user('{{user_profile.id}}');" style="float: right;" class="_4jy1 _4jy4 _517h _51sy _42ft " type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-{{user_profile.id}} followCheck sx_5da455"></i><span class="btnTextChange-{{user_profile.id}}">Follow</span>
+                            </button>
+                        </span>
+                        <div class="_comments_ _comments_top _video_card_big_comments">
+                            <div class="_comments_comments_tunnel">
+                                <div class="_comments_comments_scroll comment_block">
+                                    <div>
+                                        <div class="_video_card_big_meta_info_">
+
+                                            <div class="_video_card_big_meta_info_count"><strong>{{topic.likes_count | shorcountertopic}} {% trans "likes" %} · {{topic.comment_count | shorcountertopic}} {% trans "comments" %}</strong></div>
+                                            <input type="hidden" name="tpoicId" id="topicID" value="" >
+                                            <input type="hidden" name="topicCreatorUsername" id="topicCreatorUsername" value="" >
+                                        </div>
+                                        <div class="_6w18">
+                                            <div class="_6w1g _29ak">
+                                                <span>
+                                                    <a type="button" class="_55pi _2agf _4o_4 _4jy0 _4jy3 _517h _51sy _59pe _42ft" aria-haspopup="true" role="button" href="#" style="max-width: 200px;">
+                                                        <span alt="" class="_-xe _3-8_">
+                                                            <span>
+                                                                <img class="_6vg img shareandliketabprofileimage" height="16" src="/media/demo_user.png" width="16" alt="">
+                                                            </span>
+                                                        </span>
+                                                        <span class="accessible_elem">
+                                                            <span class="_55pe"></span>
+                                                        </span>
+                                                        <span alt="" class="_4o_3">
+                                                            <i alt="" class="img sp_RCsy6AO3-Ti sx_3f01bd"></i>
+                                                        </span>
+                                                    </a>
+                                                </span>
+                                            </div>
+                                            <div class="_6w1h">
+                                                <span class="_18vi">
+                                                    <div class="_666k" data-testid="UFI2ReactionLink/actionLink">
+                                                        <div class="_8c74">
+                                                            <a aria-pressed="false" class=" _6a-y _3l2t  _18vj" data-testid="UReactionLink" href="javascript:void(0)" id="UReactionLink" role="button" tabindex="0">
+
+                                                                <i alt="" class="_6rk2 img sp_ddXiTdIB8vm sx_44a25c"></i>{% trans "Like" %}
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </span>
+                                                <span class="_18vi">
+                                                    <a class=" _666h  _18vj _18vk _42ft" role="button" tabindex="0" testid="UFI2CommentLink" title="Leave a comment" id="UCommentLink" href="javascript:void(0)">{% trans "Comment" %}
+                                                    </a>
+                                                </span>
+                                                <span class="_18vi sbutton">
+                                                    <span class="_1j6m">
+                                                        <a class=" _2nj7  _18vj _18vk "  href="javascript:void(0)" id="shareLinkId" role="button" tabindex="0" title="Send this to friends or post it on your Timeline.">Share
+                                                        </a>
+                                                    </span>
+                                                      <ul class='smenu'>
+                                                            <li class="facebook"><a href="javascript:void(0);" onclick="social_share('facebook_share')">Facebook</a></li>
+                                                            <li class="twitter"><a href="javascript:void(0);" onclick="social_share('twitter_share')">Twitter</a></li>
+                                                            <li class="googleplus" onclick="social_share('whatsapp_share')"><a href="javascript:void(0);">whatsapp</a></li>
+                                                      </ul>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <hr style="margin-bottom: 10px;">
+
+                                        <div class="_6w1l _6w1m _6w1o clearfix clearfix hide"  data-testid="UFI2Composer/root" id="commentInputId" direction="left">
+
+                                            <div class="">
+                                                
+                                                <div class="comment-add">
+                                                    <textarea class='mention' id="comment-input" autocomplete="off" maxlength="60" placeholder="Say something nice.."></textarea>
+                                                    <span class="chars-counter"><span id="chars-current">0</span>/60</span>
+                                                </div>
+                                                <span class="commentError"></span>
+                                            </div>
+                                        </div>
+                                        <div class="_scroll_load_more_loading_comment">
+                                            <div class="boloindya-loading"></div>
+                                        </div>
+                                        <span class="commentErrorStatus"></span>
+                                        <div id="currentCommentId"></div>
+                                        <div class="videoCommentId"></div>
+                                        <div class="loadMoreComments"></div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>                    
+
+                        <!-- <p class="jsx-1861775669 jsx-537314381 download-hint"><a href="#">Get the app</a> to see comments and join the conversation!</p> -->
+
+                        <div class="jsx-1861775669 jsx-537314381 copy-link-container">
+                            <img src="/media/copy_link.svg" class="jsx-1861775669 jsx-537314381">
+                            <input readonly=""  class="jsx-1861775669 jsx-537314381 " id="shareInputbox" value="{{site_absolute_url}}{{ request.get_full_path }}">
+                            <p class="jsx-1861775669 jsx-537314381 " onclick="copyShareLink();">{% trans "COPY" %}</p>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+        <aside class="share-layout-aside">
+            <div class="jsx-2573841504 recommend-container">
+                <h3 class="jsx-2573841504">{% trans "Trends" %}</h3>
+                <div class="jsx-2573841504 recommend-video-container">
+                    <div class="_scroll_load_more_loading_user_videos center">
+                            <div class="boloindya-loading">Loading...</div>
+                    </div>
+                    <ul class="jsx-2573841504" id="playlist">
+                    </ul>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js' type='text/javascript'></script>
+<script src='/media/js/jquery.events.input.js' type='text/javascript'></script>
+<script src='/media/js/jquery.elastic.js' type='text/javascript'></script>
+<script src='/media/js/jquery.mentionsInput.js' type='text/javascript'></script>
+<!-----------  Login Popup Script  ------------>
+<script src="/media/js/video_details.js"></script>
+<!-----------End  ------------>
+
+
+{% endblock %}
