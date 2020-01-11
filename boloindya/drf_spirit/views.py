@@ -2847,10 +2847,11 @@ def get_category_with_video_bytes(request):
         paginator = PageNumberPagination()
         paginator.page_size = 3
         language_id = request.GET.get('language_id', 1)
+        is_discover = request.GET.get('is_discover', False)
         popular_bolo = []
         trending_videos = []
         following_user = []
-        if request.user.id:
+        if request.user.id and not is_discover:
             userprofile = UserProfile.objects.get(user = request.user)
             category = userprofile.sub_category.all()
         else:
