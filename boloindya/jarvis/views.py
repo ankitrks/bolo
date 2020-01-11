@@ -17,6 +17,7 @@ import os
 import hashlib
 import time
 import re
+from django.db.models import Q
 from drf_spirit.views import getVideoLength
 from drf_spirit.utils  import calculate_encashable_details,language_options
 from forum.user.models import UserProfile, ReferralCode, ReferralCodeUsed, VideoCompleteRate, VideoPlaytime
@@ -730,6 +731,7 @@ def boloindya_upload_n_transcode(request):
             topic_dict['vb_height'] = height
             topic_dict['title'] = title
             topic_dict['view_count'] = view_count
+	    topic_dict['language_id'] = language_id
             topic_dict['is_vb'] = True
             my_upload_transcode = VideoUploadTranscode.objects.create(**my_dict)
             topic_dict['user_id'] = user_id

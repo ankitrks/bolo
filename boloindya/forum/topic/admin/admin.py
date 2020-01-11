@@ -25,6 +25,7 @@ class TopicChangeListForm(forms.ModelForm):
     title = forms.CharField(required = True)
     language_id = forms.ChoiceField(choices = language_options,required = True)
     is_pubsub_popular_push = forms.BooleanField(required = False)
+    is_moderated = forms.BooleanField(required = False)
     # is_popular = forms.BooleanField(required = False)
 
 from django.contrib.admin.views.main import ChangeList
@@ -50,9 +51,9 @@ class TopicChangeList(ChangeList):
         #     list_per_page, list_max_show_all, list_editable, model_admin)
 
         self.list_display = ('action_checkbox', 'id', 'title', 'name', 'duration', 'language_id', 'view_count',\
-            'comments', 'is_monetized', 'is_removed', 'is_pubsub_popular_push', 'date', 'm2mcategory') #is_popular
+            'comments', 'is_moderated', 'is_monetized', 'is_removed', 'is_pubsub_popular_push', 'date', 'm2mcategory') #is_popular
         self.list_display_links = ['id']
-        self.list_editable = ('title', 'language_id', 'm2mcategory', 'is_pubsub_popular_push')
+        self.list_editable = ('title', 'language_id', 'm2mcategory', 'is_pubsub_popular_push', 'is_moderated')
 
         self.model = model
         self.opts = model._meta
@@ -93,11 +94,11 @@ class TopicChangeList(ChangeList):
             title = ugettext('Select %s to change')
         self.title = title % force_text(self.opts.verbose_name)
         self.pk_attname = self.lookup_opts.pk.attname
-        
+
 class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExportModelAdmin" NOT "admin.ModelAdmin"
     ordering = ['is_vb', '-id']
     search_fields = ('title', 'user__username', 'user__st__name', )
-    list_filter = (('date', DateRangeFilter), 'language_id', 'm2mcategory', 'is_monetized', 'is_removed','is_popular' )
+    list_filter = (('date', DateRangeFilter), 'language_id', 'm2mcategory', 'is_moderated', 'is_monetized', 'is_removed','is_popular' )
     filter_horizontal = ('m2mcategory', )
 
     fieldsets = (
@@ -116,7 +117,7 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
                         'transcode_dump', 'transcode_status_dump', 'm3u8_content', 'audio_m3u8_content', 'video_m3u8_content'),
         }),
         ('Others', {
-            'fields': (('plag_text', 'time_deleted'),
+            'fields': (('plag_text', 'time_deleted')),
         }),
     )
 
@@ -175,6 +176,8 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
             obj.language_id = form.cleaned_data['language_id']
         if 'is_pubsub_popular_push' in form.changed_data:
             obj.is_pubsub_popular_push = form.cleaned_data['is_pubsub_popular_push']
+        if 'is_moderated' in form.changed_data:
+            obj.is_moderated = form.cleaned_data['is_moderated']
         # if 'is_popular' in form.changed_data:
         #     obj.is_popular = form.cleaned_data['is_popular']
         #     if obj.is_popular and obj.is_vb and not obj.is_removed:

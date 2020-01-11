@@ -177,7 +177,7 @@ def write_csv():
 	#headers = ['USERNAME', 'VIDEOTITLE', 'PLAYER READY(MIN)', 'PLAYER READY(MAX)', 'PLAYER READY(DELTA)', 'START PLAY(MIN)', 'START PLAY(MAX)', 'START PLAY(DELTA)', 'NETWORK']
 	#headers = ['User', 'Video title', 'Player Ready', 'Play Time', 'Network']
 	headers = ['Userid', 'VideoTitle', 'Playtime', 'Language', 'Video category', 'Month']
-        f_name = 'add_records.csv'
+        f_name = '/var/live_code/add_records.csv'
 	with open(f_name, 'w') as f:
 		writer = csv.writer(f)
 		writer.writerow(headers)

@@ -113,7 +113,7 @@ class NotificationAPI(GenericAPIView):
             if total_offset > offset:
                 next_offset = offset+1
             update_notification_ids = list(Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-created_at').values_list('pk',flat=True))[offset*limit:offset*limit+limit]
-            print update_notification_ids
+            #print update_notification_ids
             Notification.objects.filter(pk__in=update_notification_ids).update(status=1)
 
         result = []
@@ -1635,6 +1635,8 @@ def verify_otp(request):
             otp_obj.is_active = False
             otp_obj.used_at = timezone.now()
             if not is_reset_password and not is_for_change_phone:
+		if mobile_no in ['7726080653']:
+                    return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
                 userprofile = UserProfile.objects.filter(mobile_no = mobile_no,user__is_active = True)
                 if userprofile:
                     userprofile = userprofile[0]
@@ -2442,7 +2444,7 @@ class GetFollowerList(generics.ListCreateAPIView):
 @api_view(['POST'])
 def get_following_list(request):
     try:
-        all_following_id = Follower.objects.filter(user_following_id = request.POST.get('user_id', ''),is_active = True).values_list('user_follower_id', flat=True)
+        all_following_id = Follower.objects.filter(user_following_id = request.POST.get('user_id', ''),is_active = True).values_list('user_follower_id', flat=True)[:50]
         if all_following_id:
             all_user = User.objects.filter(pk__in = all_following_id)
             return JsonResponse({'result':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
@@ -2455,7 +2457,7 @@ def get_following_list(request):
 @api_view(['POST'])
 def get_follower_list(request):
     try:
-        all_follower_id = Follower.objects.filter(user_follower_id = request.POST.get('user_id', ''),is_active = True).values_list('user_following_id', flat=True)
+        all_follower_id = Follower.objects.filter(user_follower_id = request.POST.get('user_id', ''),is_active = True).values_list('user_following_id', flat=True)[:50]
         if all_follower_id:
             all_user = User.objects.filter(pk__in = all_follower_id)
             return JsonResponse({'result':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
