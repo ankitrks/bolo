@@ -162,8 +162,38 @@ status_options = (
     ('1', "Opened"),
 )
 
-class PushNotification(RecordTimeStamp):
+metrics_options = (
+    ('0', "Video Created"),
+    ('1', "Video Views"),
+    ('2', "Bolo Actions"),
+    ('3', "Video Shares"),
+    ('4', "Video Creators"),
+)
 
+metrics_slab_options = (
+    ('0', "5 to 24"),
+    ('1', "25 to 59"),
+    ('2', "60 or more"),
+    ('3', "Likes"),
+    ('4', "Comments"),
+    ('5', "Shares"),
+)
+
+
+class DashboardMetrics(RecordTimeStamp):
+    metrics = models.CharField(choices = metrics_options, blank = True, null = True, max_length = 10, default = '0')
+    metrics_slab = models.CharField(choices = metrics_slab_options, blank = True, null = True, max_length = 10, default = None)
+    date = models.DateTimeField(auto_now = False, auto_now_add = False, blank = False, null = False)
+    week_no = models.PositiveIntegerField(null = True, blank = True, default = 0)
+    count = models.PositiveIntegerField(null = True, blank = True, default = 0)
+
+    class Meta:
+        ordering = ['date']
+        
+    def __unicode__(self):
+        return str(self.id)
+
+class PushNotification(RecordTimeStamp):
     title = models.CharField(_('title'),max_length=200,null=True,blank=True)
     description = models.CharField(_('description'),max_length=500,null=True,blank=True)
     language = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='0')

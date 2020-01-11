@@ -393,19 +393,20 @@ class UserFeedback(models.Model):
                 We have received a feedback from %s. Please find the details below:<br><br>
                 <b>Name:</b> %s <br>
                 <b>Feedback:</b> %s <br>
-                <b>Contact:</b> %s <br>
+                <b>Contact Email:</b> %s <br>
+                <b>Contact Number:</b> %s <br>
                 <b>Image:</b><br>
                 <img src="%s"> <br><br>
                 Thanks,<br>
                 Team BoloIndya
                 """ %(self.user_name(), self.user_name(), self.description, \
-                        self.user_contact(), self.feedback_image)
+                        self.contact_email, self.contact_number, self.feedback_image)
             requests.post(
                 "https://api.mailgun.net/v3/mail.careeranna.com/messages",
                 auth=("api", "d6c66f5dd85b4451bbcbd94cb7406f92-bbbc8336-97426998"),
-                data={"from": "BoloIndya Feedback <support@boloindya.com>",
-                      "to": ["anshika@careeranna.com", "varun@careeranna.com", "maaz@careeranna.com", \
-                            "ankit@careeranna.com", "bhoomika@careeranna.com"],
+                data={"from": "BoloIndya Support <support@boloindya.com>",
+                      "to": ["anshika@careeranna.com", "support@boloindya.com", "maaz@careeranna.com", \
+                            "ankit@careeranna.com", "gitesh@careeranna.com", "tanmai@boloindya.com"],
                       "cc":[self.contact_email],
                       "subject": "BoloIndya Feedback Received | " + self.user_name() + ' | ' + self.user_contact(),
                       "html": content_email

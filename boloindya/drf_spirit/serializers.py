@@ -1,7 +1,7 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
 from .fields import UserReadOnlyField
-from forum.topic.models import Topic,CricketMatch,Poll,Choice,Voting,Leaderboard, Notification, TongueTwister,BoloActionHistory
+from forum.topic.models import Topic,CricketMatch,Poll,Choice,Voting,Leaderboard, Notification, TongueTwister,BoloActionHistory,VBseen
 from django.contrib.auth.models import User
 from forum.category.models import Category
 from forum.comment.models import Comment
@@ -13,6 +13,7 @@ from django.conf import settings
 import re
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
+from datetime import datetime,timedelta,date
 
 cloufront_url = "https://d1fa4tg1fvr6nj.cloudfront.net"
 class CategorySerializer(ModelSerializer):
@@ -500,12 +501,33 @@ class CategoryWithVideoSerializer(ModelSerializer):
         language_id = 1
         if self.context.get("language_id"):
             language_id =  self.context.get("language_id")
+        if self.context.get("user_id"):
+            user_id =  self.context.get("user_id")
         topics = []
-        topic = Topic.objects.filter(m2mcategory=instance, is_removed=False, is_vb=True, language_id=language_id).order_by('-date')
-        topic_not_popular = topic.filter(is_popular=False)
-        topic_popular = topic.filter(is_popular=True)
-        topics.extend(topic_popular)
-        topics.extend(topic_not_popular)
+        all_seen_vb = VBseen.objects.filter(user_id = user_id, topic__language_id=language_id).distinct('topic_id').values_list('topic_id',flat=True)
+        post_till = datetime.now() - timedelta(days=30)
+        excluded_list =[]
+        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=instance,language_id = language_id,user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        for each in superstar_post:
+            excluded_list.append(each.id)
+        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=instance,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        for each in popular_user_post:
+            excluded_list.append(each.id)
+        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=instance,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        for each in popular_post:
+            excluded_list.append(each.id)
+        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=instance,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=False, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        for each in normal_user_post:
+            excluded_list.append(each.id)
+        other_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=instance,language_id = language_id).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
+        orderd_all_seen_post=[]
+        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)
+        if all_seen_post:
+            for each_id in all_seen_vb:
+                for each_vb in all_seen_post:
+                    if each_vb.id == each_id:
+                        orderd_all_seen_post.append(each_vb)
+        topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
         page_size = 10
         paginator = Paginator(topics, page_size)
         page = 1

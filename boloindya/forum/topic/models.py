@@ -105,6 +105,7 @@ class Topic(models.Model):
     is_removed = models.BooleanField(_("removed"), default=False)
     thumbnail = models.CharField(_("thumbnail"), max_length=150, blank = True, null = True, default='')
     view_count = models.PositiveIntegerField(_("views"), default=0)
+    imp_count = models.PositiveIntegerField(_("views"), default=0)
     comment_count = models.PositiveIntegerField(_("comment count"), default=0)
     total_share_count = models.PositiveIntegerField(_("Total Share count"), default=0)# self plus comment
     share_count = models.PositiveIntegerField(_("Share count"), default=0)# only topic share
@@ -114,6 +115,7 @@ class Topic(models.Model):
     likes_count = models.PositiveIntegerField(_("Likes count"), default=0)
 
     is_monetized = models.BooleanField(_("monetized"), default=False)
+    is_moderated = models.BooleanField(_("moderated"), default=False)
     vb_width = models.PositiveIntegerField(_("vb width"), default=0)
     vb_height = models.PositiveIntegerField(_("vb height"), default=0)
 
@@ -132,6 +134,26 @@ class Topic(models.Model):
     m3u8_content = models.TextField(_("M3U8 Content"), blank = True, null = True)
     audio_m3u8_content = models.TextField(_("Audio M3U8 Content"), blank = True, null = True)
     video_m3u8_content = models.TextField(_("Video M3U8 Content"), blank = True, null = True)
+    downloaded_url = models.CharField(_("downloaded URL"), max_length=255, blank = True, null = True)
+
+
+    plag_text_options = (
+        ('0', "TikTok"),
+        ('1', "Helo"),
+        ('2', "Vigo"),
+        ('3', "Tik"),
+        ('4', "Tok"),
+        ('5', "Vivo"),
+        ('6', "ShareChat"),
+        ('7', "Nojoto"),
+        ('8', "Trell"),
+        ('9', "ROPOSO"),
+        ('10', "Likee"),
+    )
+
+    time_deleted = models.DateTimeField(blank = True, null = True)
+    #text in the video for possible plag
+    plag_text = models.CharField(choices = plag_text_options, blank = True, null = True, max_length = 10)
 
     objects = TopicQuerySet.as_manager()
 
@@ -408,7 +430,7 @@ class TongueTwister(models.Model):
     hash_counter = models.PositiveIntegerField(default=1,null=True,blank=True)
     total_views = models.PositiveIntegerField(default=0,null=True,blank=True)
     def __unicode__(self):
-        return str(self.hash_tag)
+        return self.hash_tag
 
 class JobOpening(models.Model):
     title = models.CharField(_("Job Title"),max_length=255, blank = True, null = True)
@@ -474,16 +496,23 @@ class Notification(UserInfo):
 
     def get_notification_json(self):
         notific ={}
+        try:
+            if self.user.st.name:
+                name = self.user.st.name
+            else:
+                name = self.user.username
+        except:
+            name=''
         if self.notification_type=='1':
-            notific['title'] = str(self.user.st.name)+' has posted a video: '+self.topic.title+'. Would you like to comment?'
-            notific['hindi_title'] = str(self.user.st.name)+' ने एक वीडियो पोस्ट किया है: '+self.topic.title+'. क्या आप टिपण्णी करना चाहेंगे?'
-            notific['tamil_title'] = str(self.user.st.name)+' ஒரு வீடியோவை வெளியிட்டுள்ளது: '+self.topic.title+' நீங்கள் கருத்து தெரிவிக்க விரும்புகிறீர்களா?'
-            notific['telgu_title'] = str(self.user.st.name)+' ఒక వీడియోను పోస్ట్ చేసింది: '+self.topic.title+'. మీరు వ్యాఖ్యానించాలనుకుంటున్నారా?'
-            notific['bengali_title'] = str(self.user.st.name)+' একটি ভিডিও পোস্ট করেছে: '+self.topic.title+'. আপনি মন্তব্য করতে চান?'
-            notific['kannada_title'] = str(self.user.st.name)+' ವೀಡಿಯೊವನ್ನು ಪೋಸ್ಟ್ ಮಾಡಿದೆ: '+self.topic.title+'. ನೀವು ಕಾಮೆಂಟ್ ಮಾಡಲು ಬಯಸುವಿರಾ?'
-            notific['malayalam_title'] = str(self.user.st.name)+' ഒരു വീഡിയോ പോസ്റ്റുചെയ്‌തു: '+self.topic.title+'. അഭിപ്രായമിടാൻ നിങ്ങൾ ആഗ്രഹിക്കുന്നുണ്ടോ?'
-            notific['gujrati_title'] = str(self.user.st.name)+' વિડિઓ પોસ્ટ કરી છે: '+self.topic.title+'. તમે ટિપ્પણી કરવા માંગો છો?'
-            notific['marathi_title'] = str(self.user.st.name)+' एक व्हिडिओ पोस्ट केला आहे: '+self.topic.title+'. आपण टिप्पणी देऊ इच्छिता?'
+            notific['title'] = str(name)+' has posted a video: '+self.topic.title+'. Would you like to comment?'
+            notific['hindi_title'] = str(name)+' ने एक वीडियो पोस्ट किया है: '+self.topic.title+'. क्या आप टिपण्णी करना चाहेंगे?'
+            notific['tamil_title'] = str(name)+' ஒரு வீடியோவை வெளியிட்டுள்ளது: '+self.topic.title+' நீங்கள் கருத்து தெரிவிக்க விரும்புகிறீர்களா?'
+            notific['telgu_title'] = str(name)+' ఒక వీడియోను పోస్ట్ చేసింది: '+self.topic.title+'. మీరు వ్యాఖ్యానించాలనుకుంటున్నారా?'
+            notific['bengali_title'] = str(name)+' একটি ভিডিও পোস্ট করেছে: '+self.topic.title+'. আপনি মন্তব্য করতে চান?'
+            notific['kannada_title'] = str(name)+' ವೀಡಿಯೊವನ್ನು ಪೋಸ್ಟ್ ಮಾಡಿದೆ: '+self.topic.title+'. ನೀವು ಕಾಮೆಂಟ್ ಮಾಡಲು ಬಯಸುವಿರಾ?'
+            notific['malayalam_title'] = str(name)+' ഒരു വീഡിയോ പോസ്റ്റുചെയ്‌തു: '+self.topic.title+'. അഭിപ്രായമിടാൻ നിങ്ങൾ ആഗ്രഹിക്കുന്നുണ്ടോ?'
+            notific['gujrati_title'] = str(name)+' વિડિઓ પોસ્ટ કરી છે: '+self.topic.title+'. તમે ટિપ્પણી કરવા માંગો છો?'
+            notific['marathi_title'] = str(name)+' एक व्हिडिओ पोस्ट केला आहे: '+self.topic.title+'. आपण टिप्पणी देऊ इच्छिता?'
             
             notific['notification_type'] = '1'
             notific['instance_id'] = self.topic.id
@@ -493,15 +522,15 @@ class Notification(UserInfo):
             notific['actor_profile_pic'] = self.user.st.profile_pic
 
         elif self.notification_type=='2':
-            notific['title'] = str(self.user.st.name)+' has commented on video: '+self.topic.topic.title+'.'
-            notific['hindi_title'] = str(self.user.st.name)+' ने वीडियो पर टिप्पणी की है: '+self.topic.topic.title
-            notific['tamil_title'] = str(self.user.st.name)+' வீடியோவில் கருத்து தெரிவித்துள்ளது: '+self.topic.topic.title
-            notific['telgu_title'] = str(self.user.st.name)+' వీడియోపై వ్యాఖ్యానించారు: '+self.topic.topic.title
-            notific['bengali_title'] = str(self.user.st.name)+' ভিডিওতে মন্তব্য করেছে: '+self.topic.topic.title+'.'
-            notific['kannada_title'] = str(self.user.st.name)+' ವೀಡಿಯೊದಲ್ಲಿ ಕಾಮೆಂಟ್ ಮಾಡಿದ್ದಾರೆ: '+self.topic.topic.title+'.'
-            notific['malayalam_title'] = str(self.user.st.name)+' വീഡിയോയിൽ അഭിപ്രായമിട്ടു: '+self.topic.topic.title+'.'
-            notific['gujrati_title'] = str(self.user.st.name)+' વિડિઓ પર ટિપ્પણી કરી છે: '+self.topic.topic.title+'.'
-            notific['marathi_title'] = str(self.user.st.name)+' व्हिडिओवर टिप्पणी दिली आहे: '+self.topic.topic.title+'.'
+            notific['title'] = str(name)+' has commented on video: '+self.topic.topic.title+'.'
+            notific['hindi_title'] = str(name)+' ने वीडियो पर टिप्पणी की है: '+self.topic.topic.title
+            notific['tamil_title'] = str(name)+' வீடியோவில் கருத்து தெரிவித்துள்ளது: '+self.topic.topic.title
+            notific['telgu_title'] = str(name)+' వీడియోపై వ్యాఖ్యానించారు: '+self.topic.topic.title
+            notific['bengali_title'] = str(name)+' ভিডিওতে মন্তব্য করেছে: '+self.topic.topic.title+'.'
+            notific['kannada_title'] = str(name)+' ವೀಡಿಯೊದಲ್ಲಿ ಕಾಮೆಂಟ್ ಮಾಡಿದ್ದಾರೆ: '+self.topic.topic.title+'.'
+            notific['malayalam_title'] = str(name)+' വീഡിയോയിൽ അഭിപ്രായമിട്ടു: '+self.topic.topic.title+'.'
+            notific['gujrati_title'] = str(name)+' વિડિઓ પર ટિપ્પણી કરી છે: '+self.topic.topic.title+'.'
+            notific['marathi_title'] = str(name)+' व्हिडिओवर टिप्पणी दिली आहे: '+self.topic.topic.title+'.'
             
             notific['notification_type'] = '2'
             notific['instance_id'] = self.topic.id
@@ -512,15 +541,15 @@ class Notification(UserInfo):
             notific['actor_profile_pic'] = self.user.st.profile_pic 
 
         elif self.notification_type=='3':
-            notific['title'] = str(self.user.st.name)+' has commented on your video: '+self.topic.topic.title
-            notific['hindi_title'] = str(self.user.st.name)+' ने आपके वीडियो पर टिप्पणी की है: '+self.topic.topic.title
-            notific['tamil_title'] = str(self.user.st.name)+' உங்கள் வீடியோவில் கருத்து தெரிவித்துள்ளது: '+self.topic.topic.title
-            notific['telgu_title'] = str(self.user.st.name)+' మీ వీడియోపై వ్యాఖ్యానించారు: '+self.topic.topic.title
-            notific['bengali_title'] = str(self.user.st.name)+' আপনার ভিডিওতে মন্তব্য করেছে: '+self.topic.topic.title
-            notific['kannada_title'] = str(self.user.st.name)+' ನಿಮ್ಮ ವೀಡಿಯೊದಲ್ಲಿ ಕಾಮೆಂಟ್ ಮಾಡಿದ್ದಾರೆ: '+self.topic.topic.title
-            notific['malayalam_title'] = str(self.user.st.name)+' നിങ്ങളുടെ വീഡിയോയിൽ അഭിപ്രായമിട്ടു: '+self.topic.topic.title
-            notific['gujrati_title'] = str(self.user.st.name)+' તમારી વિડિઓ પર ટિપ્પણી કરી છે: '+self.topic.topic.title
-            notific['marathi_title'] = str(self.user.st.name)+' आपल्या व्हिडिओवर टिप्पणी दिली आहे: '+self.topic.topic.title
+            notific['title'] = str(name)+' has commented on your video: '+self.topic.topic.title
+            notific['hindi_title'] = str(name)+' ने आपके वीडियो पर टिप्पणी की है: '+self.topic.topic.title
+            notific['tamil_title'] = str(name)+' உங்கள் வீடியோவில் கருத்து தெரிவித்துள்ளது: '+self.topic.topic.title
+            notific['telgu_title'] = str(name)+' మీ వీడియోపై వ్యాఖ్యానించారు: '+self.topic.topic.title
+            notific['bengali_title'] = str(name)+' আপনার ভিডিওতে মন্তব্য করেছে: '+self.topic.topic.title
+            notific['kannada_title'] = str(name)+' ನಿಮ್ಮ ವೀಡಿಯೊದಲ್ಲಿ ಕಾಮೆಂಟ್ ಮಾಡಿದ್ದಾರೆ: '+self.topic.topic.title
+            notific['malayalam_title'] = str(name)+' നിങ്ങളുടെ വീഡിയോയിൽ അഭിപ്രായമിട്ടു: '+self.topic.topic.title
+            notific['gujrati_title'] = str(name)+' તમારી વિડિઓ પર ટિપ્પણી કરી છે: '+self.topic.topic.title
+            notific['marathi_title'] = str(name)+' आपल्या व्हिडिओवर टिप्पणी दिली आहे: '+self.topic.topic.title
             notific['notification_type'] = '3'
             notific['instance_id'] = self.topic.id
             notific['topic_id'] = self.topic.topic.id
@@ -530,15 +559,15 @@ class Notification(UserInfo):
             notific['actor_profile_pic'] = self.user.st.profile_pic 
 
         elif self.notification_type=='4':
-            notific['title'] = str(self.user.st.name)+' followed you'
-            notific['hindi_title'] = str(self.user.st.name)+' ने आपको फॉलो किया'
-            notific['tamil_title'] = str(self.user.st.name)+' பாலோ செய்துள்ளார்'
-            notific['telgu_title'] = str(self.user.st.name)+' మీరు అనుసరించారు'
-            notific['bengali_title'] = str(self.user.st.name)+' তোমাকে অনুসরণ করেছিল'
-            notific['kannada_title'] = str(self.user.st.name)+' ನಿಮ್ಮನ್ನು ಹಿಂಬಾಲಿಸಿದರು'
-            notific['malayalam_title'] = str(self.user.st.name)+' നിങ്ങളെ പിന്തുടർന്നു'
-            notific['gujrati_title'] = str(self.user.st.name)+' તમારી પાછળ'
-            notific['marathi_title'] = str(self.user.st.name)+' आपण अनुसरण'
+            notific['title'] = str(name)+' followed you'
+            notific['hindi_title'] = str(name)+' ने आपको फॉलो किया'
+            notific['tamil_title'] = str(name)+' பாலோ செய்துள்ளார்'
+            notific['telgu_title'] = str(name)+' మీరు అనుసరించారు'
+            notific['bengali_title'] = str(name)+' তোমাকে অনুসরণ করেছিল'
+            notific['kannada_title'] = str(name)+' ನಿಮ್ಮನ್ನು ಹಿಂಬಾಲಿಸಿದರು'
+            notific['malayalam_title'] = str(name)+' നിങ്ങളെ പിന്തുടർന്നു'
+            notific['gujrati_title'] = str(name)+' તમારી પાછળ'
+            notific['marathi_title'] = str(name)+' आपण अनुसरण'
             notific['notification_type'] = '4'
             notific['instance_id'] = self.user.id
             notific['read_status'] = self.status
@@ -547,15 +576,15 @@ class Notification(UserInfo):
             notific['actor_profile_pic'] = self.user.st.profile_pic 
 
         elif self.notification_type=='5':
-            notific['title'] = str(self.user.st.name)+' liked your video'
-            notific['hindi_title'] = str(self.user.st.name)+' को आपका वीडियो पसंद आया'
-            notific['tamil_title'] = str(self.user.st.name)+' உங்கள் வீடியோவை விரும்பியது'
-            notific['telgu_title'] = str(self.user.st.name)+' మీ వీడియోను ఇష్టపడ్డారు'
-            notific['bengali_title'] = str(self.user.st.name)+' আপনার ভিডিও পছন্দ হয়েছে'
-            notific['kannada_title'] = str(self.user.st.name)+' ನಿಮ್ಮ ವೀಡಿಯೊ ಇಷ್ಟವಾಯಿತು'
-            notific['malayalam_title'] = str(self.user.st.name)+' നിങ്ങളുടെ വീഡിയോ ഇഷ്‌ടപ്പെട്ടു'
-            notific['gujrati_title'] = str(self.user.st.name)+' તમારી વિડિઓ ગમી'
-            notific['marathi_title'] = str(self.user.st.name)+' आपला व्हिडिओ आवडला'
+            notific['title'] = str(name)+' liked your video'
+            notific['hindi_title'] = str(name)+' को आपका वीडियो पसंद आया'
+            notific['tamil_title'] = str(name)+' உங்கள் வீடியோவை விரும்பியது'
+            notific['telgu_title'] = str(name)+' మీ వీడియోను ఇష్టపడ్డారు'
+            notific['bengali_title'] = str(name)+' আপনার ভিডিও পছন্দ হয়েছে'
+            notific['kannada_title'] = str(name)+' ನಿಮ್ಮ ವೀಡಿಯೊ ಇಷ್ಟವಾಯಿತು'
+            notific['malayalam_title'] = str(name)+' നിങ്ങളുടെ വീഡിയോ ഇഷ്‌ടപ്പെട്ടു'
+            notific['gujrati_title'] = str(name)+' તમારી વિડિઓ ગમી'
+            notific['marathi_title'] = str(name)+' आपला व्हिडिओ आवडला'
             notific['notification_type'] = '5'
             if self.topic:
                 if self.topic.comment:
@@ -656,15 +685,15 @@ class Notification(UserInfo):
             notific['actor_profile_pic'] = ""
 
         elif self.notification_type=='10':
-            notific['title'] = str(self.user.st.name)+' has mentioned you in his comment: '+str(self.topic.comment_html)
-            notific['hindi_title'] = str(self.user.st.name)+' ने अपनी टिप्पणी में आपका उल्लेख किया है: '+str(self.topic.comment_html)
-            notific['tamil_title'] = str(self.user.st.name)+' அவரது கருத்தில் உங்களைக் குறிப்பிட்டுள்ளார்: '+str(self.topic.comment_html)
-            notific['telgu_title'] = str(self.user.st.name)+' తన వ్యాఖ్యలో మిమ్మల్ని ప్రస్తావించారు: '+str(self.topic.comment_html)
-            notific['bengali_title'] = str(self.user.st.name)+' তার মন্তব্যে আপনাকে উল্লেখ করেছে: '+str(self.topic.comment_html)
-            notific['kannada_title'] = str(self.user.st.name)+' ಅವರ ಕಾಮೆಂಟ್ನಲ್ಲಿ ನಿಮ್ಮನ್ನು ಉಲ್ಲೇಖಿಸಿದ್ದಾರೆ: '+str(self.topic.comment_html)
-            notific['malayalam_title'] = str(self.user.st.name)+' അവന്റെ അഭിപ്രായത്തിൽ നിങ്ങളെ പരാമർശിച്ചു: '+str(self.topic.comment_html)
-            notific['gujrati_title'] = str(self.user.st.name)+' તમારી ટિપ્પણીમાં તમારો ઉલ્લેખ કર્યો છે: '+str(self.topic.comment_html)
-            notific['marathi_title'] = str(self.user.st.name)+' त्याच्या टिप्पणी मध्ये आपला उल्लेख आहे: '+str(self.topic.comment_html)
+            notific['title'] = str(name)+' has mentioned you in his comment: '+str(self.topic.comment_html)
+            notific['hindi_title'] = str(name)+' ने अपनी टिप्पणी में आपका उल्लेख किया है: '+str(self.topic.comment_html)
+            notific['tamil_title'] = str(name)+' அவரது கருத்தில் உங்களைக் குறிப்பிட்டுள்ளார்: '+str(self.topic.comment_html)
+            notific['telgu_title'] = str(name)+' తన వ్యాఖ్యలో మిమ్మల్ని ప్రస్తావించారు: '+str(self.topic.comment_html)
+            notific['bengali_title'] = str(name)+' তার মন্তব্যে আপনাকে উল্লেখ করেছে: '+str(self.topic.comment_html)
+            notific['kannada_title'] = str(name)+' ಅವರ ಕಾಮೆಂಟ್ನಲ್ಲಿ ನಿಮ್ಮನ್ನು ಉಲ್ಲೇಖಿಸಿದ್ದಾರೆ: '+str(self.topic.comment_html)
+            notific['malayalam_title'] = str(name)+' അവന്റെ അഭിപ്രായത്തിൽ നിങ്ങളെ പരാമർശിച്ചു: '+str(self.topic.comment_html)
+            notific['gujrati_title'] = str(name)+' તમારી ટિપ્પણીમાં તમારો ઉલ્લેખ કર્યો છે: '+str(self.topic.comment_html)
+            notific['marathi_title'] = str(name)+' त्याच्या टिप्पणी मध्ये आपला उल्लेख आहे: '+str(self.topic.comment_html)
             notific['notification_type'] = '10'
             notific['instance_id'] = self.topic.id
             notific['topic_id'] = self.topic.topic.id
@@ -761,6 +790,13 @@ class Leaderboard(UserInfo):
     def __unicode__(self):
         return str(self.total_score)
 
+# model for recording the details of video deleted
+# class VideoDeleted(models.Model):
+#     #user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='username_topics')
+#     user = models.ForeignKey(settings.AUTH_USER_MODEL, editable=False)
+#     video_name = models.TextField(_("video_name"), null = False, blank = False)
+#     time_deleted = models.DateTimeField(auto_now = True, auto_now_add = False, blank = False, null = False)
+#     plag_text = models.TextField(_("plag_text"), null = False, blank = False)
 
 
 

@@ -321,6 +321,7 @@ def get_topics_feed(request):
 
 
 def ques_ans_index(request, category_id = None, cat_slug = ''):
+    return HttpResponsePermanentRedirect('/analytics/')
     page = 1
     topics = []
     lid = get_current_language(request)

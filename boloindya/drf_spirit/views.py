@@ -104,15 +104,15 @@ class NotificationAPI(GenericAPIView):
 
         # print "offset",offset,"page_size",page_size
 
-        notifications = Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-last_modified')[offset*limit:offset*limit+limit]
-        total_notification_count = Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-last_modified').count()
+        notifications = Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-created_at')[offset*limit:offset*limit+limit]
+        total_notification_count = Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-created_at').count()
         total_offset = total_notification_count/limit
         if total_notification_count > 0 and not total_notification_count%limit:
             total_offset = total_offset-1
         if notifications:
             if total_offset > offset:
                 next_offset = offset+1
-            update_notification_ids = list(Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-last_modified').values_list('pk',flat=True))[offset*limit:offset*limit+limit]
+            update_notification_ids = list(Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-created_at').values_list('pk',flat=True))[offset*limit:offset*limit+limit]
             print update_notification_ids
             Notification.objects.filter(pk__in=update_notification_ids).update(status=1)
 
@@ -295,7 +295,7 @@ class Usertimeline(generics.ListCreateAPIView):
 class VBList(generics.ListCreateAPIView):
     serializer_class   = TopicSerializerwithComment
     permission_classes = (IsOwnerOrReadOnly,)
-    pagination_class   = ShufflePagination
+    pagination_class   = LimitOffsetPagination
 
 
     """
@@ -340,7 +340,7 @@ class VBList(generics.ListCreateAPIView):
                 sort_recent = True
             if 'is_popular' in search_term:
                 popular_post = True
-
+            post_till = datetime.now() - timedelta(days=30)
             if filter_dic:
                 if is_user_timeline:
                     filter_dic['is_removed'] = False
@@ -349,7 +349,7 @@ class VBList(generics.ListCreateAPIView):
                     topics=sorted(itertools.chain(post),key=lambda x: x.date, reverse=True)
                 elif popular_post:
                     topics = []
-                    all_seen_vb = VBseen.objects.filter(user = self.request.user).values_list('topic_id',flat=True)
+                    all_seen_vb = VBseen.objects.filter(user = self.request.user).distinct('topic_id').values_list('topic_id',flat=True)
                     startdate = datetime.today()
                     enddate = startdate - timedelta(days=15)
                     # if 'language_id' in search_term:
@@ -357,38 +357,131 @@ class VBList(generics.ListCreateAPIView):
                         # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,date__gte=enddate)
                     if m2mcategory__slug:
                         # post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-date')
-                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),is_popular = True).order_by('-date')
+                        # post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),is_popular = True).order_by('-date')
+                        excluded_list =[]
+                        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        for each in superstar_post:
+                            excluded_list.append(each.id)
+                        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        for each in popular_user_post:
+                            excluded_list.append(each.id)
+                        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=False,is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        for each in popular_post:
+                            excluded_list.append(each.id)
+                        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=False,is_popular=False, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        for each in normal_user_post:
+                            excluded_list.append(each.id)
+                        other_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id')).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
+                        orderd_all_seen_post=[]
+                        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)
+                        if all_seen_post:
+                            for each_id in all_seen_vb:
+                                for each_vb in all_seen_post:
+                                    if each_vb.id == each_id:
+                                        orderd_all_seen_post.append(each_vb)
+                        # print "####",superstar_post,popular_user_post,popular_post,normal_user_post,other_post,orderd_all_seen_post,"####"
+                        topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
+
+
+
 
                         # post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),date__gte=enddate).order_by('-date')
-                        post2 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),is_popular=False).order_by('-date')
+                        # post2 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),is_popular=False).order_by('-date')
                     else:
                         # post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-view_count')
-                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),is_popular = True).order_by('-view_count')
-                        post2 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),is_popular = False).order_by('-view_count')
-                    if post1:
-                        topics+=list(post1)
-                    if post2:
-                        topics+=list(post2)
+                    #     post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),is_popular = True).order_by('-view_count')
+                    #     post2 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),is_popular = False).order_by('-view_count')
+                    # if post1:
+                    #     topics+=list(post1)
+                    # if post2:
+                    #     topics+=list(post2)
+                        excluded_list =[]
+                        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        for each in superstar_post:
+                            excluded_list.append(each.id)
+                        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        for each in popular_user_post:
+                            excluded_list.append(each.id)
+                        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=False,is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        for each in popular_post:
+                            excluded_list.append(each.id)
+                        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=False,is_popular=False, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        for each in normal_user_post:
+                            excluded_list.append(each.id)
+                        other_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
+                        orderd_all_seen_post=[]
+                        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)
+                        if all_seen_post:
+                            for each_id in all_seen_vb:
+                                for each_vb in all_seen_post:
+                                    if each_vb.id == each_id:
+                                        orderd_all_seen_post.append(each_vb)
+                        # print "####",superstar_post,popular_user_post,popular_post,normal_user_post,other_post,orderd_all_seen_post,"####",all_seen_vb
+                        topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
                 else:
                     topics = []
-                    all_seen_vb = VBseen.objects.filter(user = self.request.user).values_list('topic_id',flat=True)
+                    all_seen_vb = VBseen.objects.filter(user = self.request.user).distinct('topic_id').values_list('topic_id',flat=True)
                     # if 'language_id' in search_term:
 
                         # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,date__gte=enddate)
                     if m2mcategory__slug:
                         # post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id')).exclude(id__in=all_seen_vb).order_by('-date') 
                         # post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id')).order_by('-date')
-                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),is_popular = True).order_by('-date')
-                        post2 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),is_popular = False).order_by('-date')
+                        # post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),is_popular = True).order_by('-date')
+                        # post2 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),is_popular = False).order_by('-date')
+                        excluded_list =[]
+                        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        for each in superstar_post:
+                            excluded_list.append(each.id)
+                        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        for each in popular_user_post:
+                            excluded_list.append(each.id)
+                        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=False,is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        for each in popular_post:
+                            excluded_list.append(each.id)
+                        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=False,is_popular=False, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        for each in normal_user_post:
+                            excluded_list.append(each.id)
+                        other_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id')).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
+                        orderd_all_seen_post=[]
+                        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)
+                        if all_seen_post:
+                            for each_id in all_seen_vb:
+                                for each_vb in all_seen_post:
+                                    if each_vb.id == each_id:
+                                        orderd_all_seen_post.append(each_vb)
+                        topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
                     else:
                         # post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).exclude(id__in=all_seen_vb).order_by('-id')
                         # post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).order_by('-id')
-                        post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),is_popular = True).order_by('-id')
-                        post2 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),is_popular = False).order_by('-id')
-                    if post1:
-                        topics+=list(post1)
-                    if post2:
-                        topics+=list(post2)
+                    #     post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),is_popular = True).order_by('-id')
+                    #     post2 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),is_popular = False).order_by('-id')
+                    # if post1:
+                    #     topics+=list(post1)
+                    # if post2:
+                    #     topics+=list(post2)
+                        excluded_list =[]
+                        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        for each in superstar_post:
+                            excluded_list.append(each.id)
+                        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        for each in popular_user_post:
+                            excluded_list.append(each.id)
+                        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=False,is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        for each in popular_post:
+                            excluded_list.append(each.id)
+                        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=False,is_popular=False, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        for each in normal_user_post:
+                            excluded_list.append(each.id)
+                        other_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
+                        orderd_all_seen_post=[]
+                        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)
+                        if all_seen_post:
+                            for each_id in all_seen_vb:
+                                for each_vb in all_seen_post:
+                                    if each_vb.id == each_id:
+                                        orderd_all_seen_post.append(each_vb)
+                        topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
                     # else:
                     #     topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-id')
         else:
@@ -405,8 +498,32 @@ class GetChallenge(generics.ListCreateAPIView):
     def get_queryset(self):
         challenge_hash = self.request.GET.get('challengehash')
         challengehash = '#' + challenge_hash
-        all_videos = Topic.objects.filter(title__icontains=challengehash,is_removed=False,is_vb=True)
-        return all_videos
+        all_seen_vb = VBseen.objects.filter(user = self.request.user).distinct('topic_id').values_list('topic_id',flat=True)
+        excluded_list =[]
+        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,title__icontains=challengehash,user__st__is_superstar = True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        for each in superstar_post:
+            excluded_list.append(each.id)
+        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,title__icontains=challengehash,user__st__is_superstar = False,user__st__is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        for each in popular_user_post:
+            excluded_list.append(each.id)
+        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,title__icontains=challengehash,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        for each in popular_post:
+            excluded_list.append(each.id)
+        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,title__icontains=challengehash,user__st__is_superstar = False,user__st__is_popular=False,is_popular=False).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        for each in normal_user_post:
+            excluded_list.append(each.id)
+        other_post = Topic.objects.filter(is_removed = False,is_vb = True,title__icontains=challengehash).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
+        orderd_all_seen_post=[]
+        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)
+        if all_seen_post:
+            for each_id in all_seen_vb:
+                for each_vb in all_seen_post:
+                    if each_vb.id == each_id:
+                        orderd_all_seen_post.append(each_vb)
+        topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
+
+
+        return topics
         
 
 @api_view(['POST'])
@@ -418,12 +535,8 @@ def GetChallengeDetails(request):
     challengehash = request.POST.get('ChallengeHash')
     challengehash = '#' + challengehash
     try:
-        userprofile = UserProfile.objects.get(user = request.user)
         all_vb = Topic.objects.filter(title__icontains = challengehash,is_removed=False,is_vb=True)
         vb_count = all_vb.count()
-        all_seen = all_vb.aggregate(Sum('view_count'))
-        if not all_seen['view_count__sum']:
-            all_seen['view_count__sum']=0
         tongue = TongueTwister.objects.filter(hash_tag__icontains=challengehash[1:]).order_by('-hash_counter')
         if len(tongue):
             tongue = tongue[0]
@@ -433,7 +546,7 @@ def GetChallengeDetails(request):
                 'be_descpription':tongue.be_descpription,'ka_descpription':tongue.ka_descpription,\
                 'ma_descpription':tongue.ma_descpription,'gj_descpription':tongue.gj_descpription,\
                 'mt_descpription':tongue.mt_descpription,'picture':tongue.picture,\
-                'all_seen':shorcountertopic(all_seen['view_count__sum'])},status=status.HTTP_200_OK)
+                'all_seen':shorcountertopic(tongue.total_views)},status=status.HTTP_200_OK)
         else:
             return JsonResponse({'message': 'success', 'hashtag' : challengehash[1:],'vb_count':vb_count,\
                 'en_tongue_descp':'','hi_tongue_descp':'',\
@@ -441,7 +554,7 @@ def GetChallengeDetails(request):
                 'be_descpription':'','ka_descpription':'',\
                 'ma_descpription':'','gj_descpription':'',\
                 'mt_descpription':'','picture':'',\
-                'all_seen':shorcountertopic(all_seen['view_count__sum'])},status=status.HTTP_200_OK)
+                'all_seen':shorcountertopic(tongue.total_views)},status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Invalid','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -877,22 +990,24 @@ def replyOnTopic(request):
         return JsonResponse({'message': 'Topic Id / User Id / Comment provided'}, status=status.HTTP_204_NO_CONTENT)
 
 def check_hashtag(comment):
+    has_hashtag = False
     title = comment.comment
-    tag_list=[tag.strip("#") for tag in title.split() if tag.startswith("#")]
+    tag_list=title.split()
     if tag_list:
-        hash_tag=[tag for tag in title.split() if tag.startswith("#")]
-        for each_tag in hash_tag:
-            title = title.replace(each_tag,'<a href="/get_challenge_details/?ChallengeHash='+each_tag.strip('#')+'">'+each_tag+'</a>')
+        for index,value in enumerate(tag_list):
+            if value.startswith("#"):
+                has_hashtag = True
+                tag_list[index]='<a href="/get_challenge_details/?ChallengeHash='+value.strip('#')+'">'+value+'</a>'
+                tag,is_created = TongueTwister.objects.get_or_create(hash_tag=value.strip('#'))
+                if not is_created:
+                    tag.hash_counter = F('hash_counter')+1
+                tag.save()
+                comment.hash_tags.add(tag)
+        title=" ".join(tag_list)
         title = title[0].upper()+title[1:]
-        for each_tag in tag_list:
-            tag,is_created = TongueTwister.objects.get_or_create(hash_tag=each_tag.lower())
-            if not is_created:
-                tag.hash_counter = F('hash_counter')+1
-            tag.save()
-            comment.hash_tags.add(tag)
-        return True, title
+        return has_hashtag, title
     else:
-        return False,title
+        return has_hashtag, title
 
 def remove_old_hashtag(comment,history_comment):
     hash_tags = comment.hash_tags.all()
@@ -1034,18 +1149,22 @@ def createTopic(request):
             view_count = random.randint(1,5)
             topic.view_count = view_count
             topic.update_vb()
-            tag_list=[tag.strip("#") for tag in title.split() if tag.startswith("#")]
+            tag_list=title.split()
+            hash_tag = tag_list
             if tag_list:
-                hash_tag=[tag for tag in title.split() if tag.startswith("#")]
-                for each_tag in hash_tag:
-                    title = title.replace(each_tag,'<a href="/get_challenge_details/?ChallengeHash='+each_tag.strip('#')+'">'+each_tag+'</a>')
+                for index, value in enumerate(tag_list):
+                    if value.startswith("#"):
+                        tag_list[index]='<a href="/get_challenge_details/?ChallengeHash='+value.strip('#')+'">'+value+'</a>'
+                title = " ".join(tag_list)
                 topic.title = title[0].upper()+title[1:]
-                for each_tag in tag_list:
-                    tag,is_created = TongueTwister.objects.get_or_create(hash_tag=each_tag.lower())
-                    if not is_created:
-                        tag.hash_counter = F('hash_counter')+1
-                    tag.save()
-                    topic.hash_tags.add(tag)
+                # for each_tag in tag_list:
+                for index, value in enumerate(hash_tag):
+                    if value.startswith("#"):
+                        tag,is_created = TongueTwister.objects.get_or_create(hash_tag=value.strip('#'))
+                        if not is_created:
+                            tag.hash_counter = F('hash_counter')+1
+                        tag.save()
+                        topic.hash_tags.add(tag)
         else:
             view_count = random.randint(10,30)
             topic.view_count = view_count
@@ -1107,12 +1226,13 @@ def editTopic(request):
         topic        = Topic.objects.get(pk = topic_id)
 
         if topic.user == request.user:
-            tag_list=[tag.strip("#") for tag in title.split() if tag.startswith("#")]
-            if title:
-                if tag_list:
-                    hash_tag={tag for tag in title.split() if tag.startswith("#")}
-                    for each_tag in hash_tag:
-                        title = title.replace(each_tag,'<a href="/get_challenge_details/?ChallengeHash='+each_tag.strip('#')+'">'+each_tag+'</a>')
+            tag_list=title.split()
+            hash_tag = tag_list
+            if tag_list:
+                for index, value in enumerate(tag_list):
+                    if value.startswith("#"):
+                        tag_list[index]='<a href="/get_challenge_details/?ChallengeHash='+value.strip('#')+'">'+value+'</a>'
+                title = " ".join(tag_list)
                 new_title = title[0].upper()+title[1:]
             if not new_title == topic.title:
                 history_topic = TopicHistory.objects.create(source=topic,title=topic.title)
@@ -1123,13 +1243,14 @@ def editTopic(request):
                     topic.hash_tags.remove(each_hashtag)
                     each_hashtag.save()
                 topic.title = new_title
-                if tag_list:
-                    for each_tag in tag_list:
-                        tag, is_created = TongueTwister.objects.get_or_create(hash_tag=each_tag.lower())
-                        if not is_created:
-                            tag.hash_counter = F('hash_counter')+1
-                        tag.save()
-                        topic.hash_tags.add(tag)
+                if hash_tag:
+                    for index, value in enumerate(hash_tag):
+                        if value.startswith("#"):
+                            tag, is_created = TongueTwister.objects.get_or_create(hash_tag=value.strip("#").lower())
+                            if not is_created:
+                                tag.hash_counter = F('hash_counter')+1
+                            tag.save()
+                            topic.hash_tags.add(tag)
                 topic.save()
 
                 topic_json = TopicSerializerwithComment(topic).data
@@ -1426,6 +1547,56 @@ class SingUpOTPView(generics.CreateAPIView):
         if not response_status:
             return JsonResponse({'message': 'OTP could not be sent'}, status=status.HTTP_417_EXPECTATION_FAILED)
         return JsonResponse({'message': 'OTP sent'}, status=status.HTTP_200_OK)
+
+import calendar
+@api_view(['POST'])
+def get_user_bolo_info(request):
+    """
+    post:
+        Required Parameters
+        start_date = request.POST.get('start_date', None)
+        end_date = request.POST.get('end_date',None)
+        month = request.POST.get('month', None)
+        year = request.POST.get('year',None)
+    """
+    try:
+        start_date = request.POST.get('start_date', None)
+        end_date = request.POST.get('end_date',None)
+        month = request.POST.get('month', None)
+        year = request.POST.get('year',None)
+        if start_date and end_date:
+            start_date= datetime.strptime(start_date, "%d-%m-%Y")
+            end_date = datetime.strptime(end_date+' 23:59:59', "%d-%m-%Y %H:%M:%S")
+        elif month and year:
+            days = calendar.monthrange(int(year),int(month))[1]
+            start_date = datetime.strptime('01-'+str(month)+'-'+str(year), "%d-%m-%Y")
+            end_date = datetime.strptime(str(days)+'-'+str(month)+'-'+str(year)+' 23:59:59', "%d-%m-%Y %H:%M:%S")
+        if not start_date or not end_date:
+            total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user)
+        else:
+            total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user,date__gte=start_date, date__lte=end_date)
+        total_video_count = total_video.count()
+        print total_video
+        monetised_video_count = total_video.filter(is_monetized = True).count()
+        left_for_moderation = total_video.filter(is_moderated = False).count()
+        total_view_count=0
+        total_like_count=0
+        total_comment_count = 0
+        total_share_count = 0
+        for each_vb in total_video:
+            total_view_count+=each_vb.view_count
+            total_like_count+=each_vb.likes_count
+            total_comment_count+=each_vb.comment_count
+            total_share_count+=each_vb.total_share_count
+        total_view_count = shorcountertopic(total_view_count)
+        total_comment_count = shorcountertopic(total_comment_count)
+        total_like_count = shorcountertopic(total_like_count)
+        total_share_count = shorcountertopic(total_share_count)
+        return JsonResponse({'message': 'success', 'total_video_count' : total_video_count, \
+                        'monetised_video_count':monetised_video_count, 'total_view_count':total_view_count,'total_comment_count':total_comment_count,\
+                        'total_like_count':total_like_count,'total_share_count':total_share_count,'left_for_moderation':left_for_moderation}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def verify_otp(request):
@@ -2154,6 +2325,7 @@ def comment_view(request):
         topic = Topic.objects.get(pk = topic_id)
         # topic= comment.topic
         topic.view_count = F('view_count') +1
+        topic.imp_count = F('imp_count') +1
         topic.save()
         userprofile = topic.user.st
         userprofile.view_count = F('view_count')+1
@@ -2178,6 +2350,7 @@ def vb_seen(request):
         topic = Topic.objects.get(pk = topic_id)
         # topic= comment.topic
         topic.view_count = F('view_count')+1
+        topic.imp_count = F('imp_count') +1
         topic.save()
         userprofile = topic.user.st
         userprofile.view_count = F('view_count')+1
@@ -2563,12 +2736,9 @@ def get_hash_list(request):
     tags = TongueTwister.objects.all()
     hashtaglist = []
     try:
-        userprofile = UserProfile.objects.get(user = request.user)
         for tag in tags:
             all_videos = Topic.objects.filter(title__icontains=tag.hash_tag)
             videos = all_videos[:3]
-            total_views = all_videos.aggregate(Sum('view_count'))
-            total_videos_count = all_videos.count()
             hash_data = TongueTwisterSerializer(tag).data
             videos_dict = []
             for video in videos:    
@@ -2727,10 +2897,11 @@ def get_category_with_video_bytes(request):
         paginator = PageNumberPagination()
         paginator.page_size = 3
         language_id = request.GET.get('language_id', 1)
+        is_discover = request.GET.get('is_discover', False)
         popular_bolo = []
         trending_videos = []
         following_user = []
-        if request.user.id:
+        if request.user.id and not is_discover:
             userprofile = UserProfile.objects.get(user = request.user)
             category = userprofile.sub_category.all()
         else:
@@ -2749,16 +2920,33 @@ def get_category_with_video_bytes(request):
                 except Exception as e1:
                     popular_bolo = []
         if request.GET.get('is_with_popular'):
-            startdate = datetime.today()
-            enddate = startdate - timedelta(days=30)
-            topics = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, is_popular=True, date__gte=enddate).order_by('-date')
+            all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id).distinct('topic_id').values_list('topic_id',flat=True)
+            excluded_list =[]
+            superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+            for each in superstar_post:
+                excluded_list.append(each.id)
+            popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+            for each in popular_user_post:
+                excluded_list.append(each.id)
+            popular_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+            for each in popular_post:
+                excluded_list.append(each.id)
+            other_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,is_popular=True).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
+            orderd_all_seen_post=[]
+            all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)
+            if all_seen_post:
+                for each_id in all_seen_vb:
+                    for each_vb in all_seen_post:
+                        if each_vb.id == each_id:
+                            orderd_all_seen_post.append(each_vb)
+            topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
             try:
                 paginator.page_size = 10
                 topics = paginator.paginate_queryset(topics, request)
                 trending_videos = CategoryVideoByteSerializer(topics, many=True).data
             except Exception as e1:
                 trending_videos = []
-        category_details = CategoryWithVideoSerializer(category, many=True, context={'language_id': language_id}).data
+        category_details = CategoryWithVideoSerializer(category, many=True, context={'language_id': language_id,'user_id':request.user.id}).data
         return JsonResponse({'category_details': category_details, 'trending_topics': trending_videos, \
             'popular_boloindyans': popular_bolo, 'following_user': following_user}, \
             status=status.HTTP_200_OK)
@@ -2775,7 +2963,7 @@ def get_category_detail_with_views(request):
         all_vb = Topic.objects.filter(m2mcategory=category, is_removed=False, is_vb=True, language_id=language_id)
         vb_count = all_vb.count()
         all_seen = category.view_count
-        return JsonResponse({'category_details': CategoryWithVideoSerializer(category, context={'language_id': language_id}).data, 'video_count': vb_count, 'all_seen':shorcountertopic(all_seen)}, status=status.HTTP_200_OK)
+        return JsonResponse({'category_details': CategoryWithVideoSerializer(category, context={'language_id': language_id,'user_id':request.user.id}).data, 'video_count': vb_count, 'all_seen':shorcountertopic(all_seen)}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -2788,11 +2976,31 @@ def get_category_video_bytes(request):
         language_id = request.POST.get('language_id', 1)
         category = Category.objects.get(pk=category_id)
         topics = []
-        topic = Topic.objects.filter(m2mcategory=category, is_removed=False, is_vb=True, language_id=language_id).order_by('-date')
-        topic_not_popular = topic.filter(is_popular=False)
-        topic_popular = topic.filter(is_popular=True)
-        topics.extend(topic_popular)
-        topics.extend(topic_not_popular)
+        all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id).distinct('topic_id').values_list('topic_id',flat=True)
+        post_till = datetime.now() - timedelta(days=30)
+        if category:
+            excluded_list =[]
+            superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+            for each in superstar_post:
+                excluded_list.append(each.id)
+            popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+            for each in popular_user_post:
+                excluded_list.append(each.id)
+            popular_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+            for each in popular_post:
+                excluded_list.append(each.id)
+            normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=False, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+            for each in normal_user_post:
+                excluded_list.append(each.id)
+            other_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
+            orderd_all_seen_post=[]
+            all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)
+            if all_seen_post:
+                for each_id in all_seen_vb:
+                    for each_vb in all_seen_post:
+                        if each_vb.id == each_id:
+                            orderd_all_seen_post.append(each_vb)
+            topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
         page_size = 10
         paginator = Paginator(topics, page_size)
         page = request.POST.get('page', 2)
@@ -2811,11 +3019,28 @@ def get_popular_video_bytes(request):
         paginator_topics = PageNumberPagination()
         language_id = request.GET.get('language_id', 1)
         paginator_topics.page_size = 10
-        startdate = datetime.today()
-        enddate = startdate - timedelta(days=130)
-        topics = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, is_popular=True, \
-            date__gte=enddate).order_by('-date')
-        paginator_topics.page_size = 10
+        
+        all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id).distinct('topic_id').values_list('topic_id',flat=True)
+        excluded_list =[]
+        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        for each in superstar_post:
+            excluded_list.append(each.id)
+        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        for each in popular_user_post:
+            excluded_list.append(each.id)
+        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        for each in popular_post:
+            excluded_list.append(each.id)
+        other_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,is_popular=True).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
+        orderd_all_seen_post=[]
+        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)
+        if all_seen_post:
+            for each_id in all_seen_vb:
+                for each_vb in all_seen_post:
+                    if each_vb.id == each_id:
+                        orderd_all_seen_post.append(each_vb)
+        
+        topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
         topics = paginator_topics.paginate_queryset(topics, request)
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
     except Exception as e:
@@ -2860,15 +3085,35 @@ def get_recent_videos(request):
         paginator_topics.page_size = 10
         all_seen_vb = []
         try:
-            all_seen_vb = VBseen.objects.filter(user = request.user).values_list('topic_id',flat=True)
+            all_seen_vb = VBseen.objects.filter(user = request.user).distinct('topic_id').values_list('topic_id',flat=True)
         except Exception as e1:
             all_seen_vb = []
         topics = []
-        category = Category.objects.get(pk=58)
-        topics_not_seen = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, m2mcategory=category).exclude(id__in=all_seen_vb).order_by('-date')
-        topics_seen = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, m2mcategory=category, id__in=all_seen_vb).order_by('-date')
-        topics.extend(topics_not_seen)
-        topics.extend(topics_seen)
+        post_till = datetime.now() - timedelta(days=30)
+        category = Category.objects.filter(parent__isnull=True).first()
+        all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id).distinct('topic_id').values_list('topic_id',flat=True)
+        excluded_list =[]
+        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        for each in superstar_post:
+            excluded_list.append(each.id)
+        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        for each in popular_user_post:
+            excluded_list.append(each.id)
+        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        for each in popular_post:
+            excluded_list.append(each.id)
+        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=False, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        for each in normal_user_post:
+            excluded_list.append(each.id)
+        other_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
+        orderd_all_seen_post=[]
+        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)
+        if all_seen_post:
+            for each_id in all_seen_vb:
+                for each_vb in all_seen_post:
+                    if each_vb.id == each_id:
+                        orderd_all_seen_post.append(each_vb)
+        topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
         topics = paginator_topics.paginate_queryset(topics, request)
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
     except Exception as e:
