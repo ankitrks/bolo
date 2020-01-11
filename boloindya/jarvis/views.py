@@ -1534,3 +1534,8 @@ def search_notification(request):
         print(e)
         return JsonResponse({'data': []}, status=status.HTTP_200_OK)
     
+@api_view(['POST'])
+def upload_image_notification(requests):
+    file = requests.POST.get('query')
+    print(file)
+    return JsonResponse({'data': []}, status=status.HTTP_200_OK)
