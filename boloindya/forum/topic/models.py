@@ -150,9 +150,9 @@ class Topic(models.Model):
         ('10', "Likee"),
     )
 
-    time_deleted = models.DateTimeField(auto_now = True, auto_now_add = False, blank = False, null = False)
+    time_deleted = models.DateTimeField(blank = True, null = True)
     #text in the video for possible plag
-    plag_text = models.CharField(choices = plag_text_options, blank = False, null = True, max_length = 10)
+    plag_text = models.CharField(choices = plag_text_options, blank = True, null = True, max_length = 10)
 
     objects = TopicQuerySet.as_manager()
 
