@@ -146,10 +146,12 @@ def shortcounterprofile(counter):
 
 def shorcountertopic(counter):
     counter = int(counter)
-    if counter>1000 and counter< 9999:
+    if counter>1000 and counter<= 9999:
         return str(counter/1000.0)[:3]+'K'
-    elif counter >9999:
+    elif counter >9999 and counter<=999999:
         return str(counter/1000.0)[:5]+'K'
+    elif counter >999999:
+        return str(counter/1000000.0)[:5]+'M'
     else:
         return str(counter)
 
