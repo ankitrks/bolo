@@ -88,8 +88,10 @@ ST_TESTS_RATELIMIT_NEVER_EXPIRE = False
 ST_BASE_DIR = os.path.dirname(__file__)
 BASE_DIR = os.path.dirname(__file__)
 BASE_DIR_TRANS = os.path.dirname(os.path.dirname(__file__))
-BASE_URL='https://stage.boloindya.com/'
-ABSOLUTE_URL='https://stage.boloindya.com'
+
+BASE_URL='https://www.boloindya.com/'
+ABSOLUTE_URL='https://www.boloindya.com'
+
 #BASE_URL='https://www.boloindya.com/'
 #
 # Django & Spirit settings defined below...

@@ -263,7 +263,7 @@ function getPopularCategory(popularCategory){
           file: file,
           controls: false,
           image:image,
-          autostart:'true',
+          autostart:'viewable',
           mute:'false'
       });
       playerInstance.on('play', function() {
@@ -287,7 +287,7 @@ function getPopularCategory(popularCategory){
             file: singleItemData.backup_url,
             controls: false,
             image:image,
-            autostart:'true',
+            autostart:'viewable',
             mute:'false'
       });
 

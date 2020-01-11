@@ -147,7 +147,7 @@ $(window).scroll(function () {
               file: file,
               controls: false,
               image:image,
-              autostart:'true',
+              autostart:'viewable',
               mute:'false'
         });
         playerInstance.on('play', function() {
@@ -171,7 +171,7 @@ $(window).scroll(function () {
                   file: singleItemData.backup_url,
                   controls: false,
                   image:image,
-                  autostart:'true',
+                  autostart:'viewable',
                   mute:'false'
             });
 

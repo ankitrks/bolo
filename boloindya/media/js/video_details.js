@@ -66,7 +66,7 @@ function VideoPlayByURL(file,image){debugger;
           repeat:'true',
           image:image,
           preload:'metadata',
-          autostart:'true',
+          autostart:'viewable',
           primary: "html5",
           mute:'false'
       });
@@ -93,7 +93,7 @@ function VideoPlayByURL(file,image){debugger;
           repeat:true,
           image:image,
           preload: 'metadata',
-          autostart:'true',
+          autostart:'viewable',
           primary: "html5",
           mute:'false'
         });        
@@ -141,7 +141,7 @@ function VideoPlayByURLMobile(file,image){
         file: file,
         controls: false,
         repeat:true,
-        image:image,
+        //image:image,
         preload: 'metadata',
         autostart:'true',
         primary: "html5",
@@ -155,7 +155,7 @@ function VideoPlayByURLMobile(file,image){
 
     playerInstanceDe.on('buffer', function() {
         console.log(playerInstanceDe);
-      var time = 1;
+        var time = 1;
 
     });   
 
@@ -168,7 +168,7 @@ function VideoPlayByURLMobile(file,image){
           file:videoFileBackupURL,
           controls: false,
           repeat:true,
-          image:image,
+          //image:image,
           preload: 'metadata',
           autostart:'true',
           primary: "html5",
@@ -217,7 +217,7 @@ $('.videoPlayButtonDetails').click(function(){
 
 
 function muteAndUnmutePlayerDet(playerDetailsMobile){
-  var muteStatus=jwplayer(''+playerDetailsMobile).getMute();
+  var muteStatus=jwplayer(playerDetailsMobile).getMute();
   if(muteStatus==true){
         var newSrc='/media/sound_mute.svg';
         $('#mutedImageIdDe').attr('src', newSrc);
@@ -588,11 +588,6 @@ function loadMoreComments(nextPageURl){
 }
 
 function followLikeList(){
-    var loginStatus=check_login_status();
-    if(loginStatus==false){
-        document.getElementById('openLoginPopup').click();
-        //return false;
-    }
 
     var ge_local_data="";
         ge_local_data = JSON.parse(localStorage.getItem("access_data"));
