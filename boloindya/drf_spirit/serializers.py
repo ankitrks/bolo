@@ -504,7 +504,7 @@ class CategoryWithVideoSerializer(ModelSerializer):
         if self.context.get("user_id"):
             user_id =  self.context.get("user_id")
         topics = []
-        all_seen_vb = VBseen.objects.filter(user_id = user_id, topic__language_id=language_id).distinct('topic_id').values_list('topic_id',flat=True)
+        all_seen_vb = VBseen.objects.filter(user_id = user_id, topic__language_id=language_id, topic__m2mcategory=instance).distinct('topic_id').values_list('topic_id',flat=True)
         post_till = datetime.now() - timedelta(days=30)
         excluded_list =[]
         superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=instance,language_id = language_id,user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
