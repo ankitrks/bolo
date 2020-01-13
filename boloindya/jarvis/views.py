@@ -1275,11 +1275,11 @@ def statistics_all(request):
     if data_view == 'daily':
         data_view = 'monthly'
     start_date = request.GET.get('start_date', '2019-05-01')
-    end_date = request.GET.get('end_date', '2019-12-31')
+    end_date = request.GET.get('end_date', None)
     if not start_date:
         start_date = '2019-05-01'
     if not end_date:
-        end_date = '2019-12-31'
+        end_date = (datetime.datetime.today() - timedelta(days = 1)).strftime("%Y-%m-%d")
 
     end_date_obj = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
     if end_date_obj >= datetime.datetime.today().date():

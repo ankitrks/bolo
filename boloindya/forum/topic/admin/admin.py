@@ -53,7 +53,7 @@ class TopicChangeList(ChangeList):
         #     list_per_page, list_max_show_all, list_editable, model_admin)
 
         self.list_display = ('action_checkbox', 'id', 'title', 'name', 'duration', 'language_id', 'imp_count',\
-            'comments', 'is_moderated', 'is_monetized', 'is_removed', 'is_pubsub_popular_push', 'date', 'm2mcategory') #is_popular
+            'is_moderated', 'is_monetized', 'is_removed', 'is_pubsub_popular_push', 'date', 'm2mcategory') #is_popular
         self.list_display_links = ['id']
         self.list_editable = ('title', 'language_id', 'm2mcategory', 'is_pubsub_popular_push', 'is_monetized', 'is_removed', \
                 'is_moderated')

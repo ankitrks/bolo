@@ -10,14 +10,14 @@
     <style type="text/css">
       .controls{text-align: center;}
       input[type="submit"],input[type="reset"]{margin-top: 8px;height: 28px;}
-      #result_list{width: 100.2%;}
+      
       th, td{text-align: center !important;}
       #result_list .field-m2mcategory{display: block;max-height: 61px;overflow: auto;text-align: left !important;min-width: 150px;
         padding: 5px 2px 10px 8px;}
       #result_list ul li{list-style-type: none;}
       #result_list .field-m2mcategory input[type=checkbox]{display: inline-block;}
-      .field-title{max-width: 220px !important;text-align: left !important;width: 210px !important;}
-      .field-title input[type="text"]{max-width: 100% !important;width: 100% !important;}
+      .field-title{max-width: 100% !important;text-align: left !important;width: 100% !important;}
+      .field-title input[type="text"]{max-width: 320px !important;width: 310px !important;}
       #date-form{margin-top: 5px;padding-right: 10px;}
       #grp-content{top:0;}
       header#grp-header{display: none;}
@@ -175,12 +175,25 @@
                 jQuery('.grp-pulldown-content').find('.grp-module').appendTo("#date-form");
                 jQuery('.admindatefilter').find('.controls').insertAfter('.admindatefilter .grp-module:last');
                 jQuery('.grp-filter-choice').off('change');
-                
-                // jQuery('.grp-filter-choice').change(function(e){
-                //     alert('1');
-                // });
 
-                // field-title
+                jQuery(document).on('click', '.edit_title', function(e){
+                    e.preventDefault();
+                    jQuery(this).parents('td').find('.title_box').hide();
+                    jQuery(this).parents('td').find('input[type="text"], .close_edit_box').show();
+                });
+
+                jQuery(document).on('click', '.close_edit_box', function(e){
+                    e.preventDefault();
+                    jQuery(this).parents('td').find('.title_box').show();
+                    jQuery(this).parents('td').find('input[type="text"], .close_edit_box').hide();
+                });
+
+                jQuery.each( jQuery('.field-title'), function(i, each_field){
+                    var title = $(each_field).find('input[type="text"]').val();
+                    $(each_field).find('input[type="text"]').hide();
+                    $(each_field).append('<a href="#" class="close_edit_box" style="display:none;">close</a>');
+                    $(each_field).append('<div class="title_box">' + title + '&nbsp;&nbsp;<a href="#" class="edit_title">edit</a></div>');
+                });
             });
         })(grp.jQuery);
     </script>
