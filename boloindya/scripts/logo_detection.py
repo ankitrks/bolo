@@ -43,7 +43,7 @@ def identify_logo():
 	try:
 		client = vision.ImageAnnotatorClient()
 		today = datetime.today()
-		long_ago = today + timedelta(hours =-6)			# fetch the records of last 6 hrs
+		long_ago = today + timedelta(days = -2)			# fetch the records of last 6 hrs
 		#topic_objects = Topic.objects.filter(date__gte = long_ago)
 		topic_objects = Topic.objects.exclude(is_removed = True).filter(is_vb = True, date__gte = long_ago)
 		#print(len(topic_objects))
