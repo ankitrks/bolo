@@ -168,6 +168,9 @@ metrics_options = (
     ('2', "Bolo Actions"),
     ('3', "Video Shares"),
     ('4', "Video Creators"),
+    ('5', "No of Installs"),
+    ('6', "Monthly Active Users"),
+    ('7', "Unique Video Views"),
 )
 
 metrics_slab_options = (
@@ -177,6 +180,10 @@ metrics_slab_options = (
     ('3', "Likes"),
     ('4', "Comments"),
     ('5', "Shares"),
+    ('6', "Organic"),
+    ('7', "Paid"),
+    ('8', "Unique New"),
+
 )
 
 

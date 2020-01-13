@@ -1237,18 +1237,18 @@ def video_statistics(request):
     return render(request,'jarvis/pages/video_statistics/video_statistics.html')
 
 month_map = {
-    "1" : "Jan 2019",
-    "2" : "Feb 2019",
-    "3" : "Mar 2019",
-    "4" : "Apr 2019",
-    "5" : "May 2019",
-    "6" : "Jun 2019",
-    "7" : "July 2019",
-    "8" : "Aug 2019",
-    "9" : "Sep 2019",
-    "10" : "Oct 2019",
-    "11" : "Nov 2019",
-    "12" : "Dec 2019",
+    "1" : "Jan",
+    "2" : "Feb",
+    "3" : "Mar",
+    "4" : "Apr",
+    "5" : "May",
+    "6" : "Jun",
+    "7" : "July",
+    "8" : "Aug",
+    "9" : "Sep",
+    "10" : "Oct",
+    "11" : "Nov",
+    "12" : "Dec",
 }
 
 def months_between(start_date, end_date):
@@ -1259,7 +1259,7 @@ def months_between(start_date, end_date):
     cursor = start
     while cursor <= end:
         if cursor.month not in months:
-            months.append(cursor.month)
+            months.append([cursor.month, cursor.year])
         cursor += timedelta(weeks=1)
     return months
 
@@ -1281,20 +1281,25 @@ def statistics_all(request):
     if not end_date:
         end_date = '2019-12-31'
 
+    end_date_obj = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
+    if end_date_obj >= datetime.datetime.today().date():
+        end_date = (datetime.datetime.today() - timedelta(days = 1)).strftime("%Y-%m-%d")
+
     for each_opt in metrics_options:
         temp_list = []
         temp_list.append( each_opt[0] )
         temp_list.append( each_opt[1] )
-        temp_list.append( DashboardMetrics.objects.filter(metrics = each_opt[0])\
+        temp_list.append( DashboardMetrics.objects.exclude(date__gt = end_date).filter(metrics = each_opt[0])\
                 .aggregate(total_count = Sum('count'))['total_count'] )
         top_data.append( temp_list ) 
         if metrics == each_opt[0]:
             data['graph_title'] = each_opt[1]
     data['top_data'] = top_data
 
-    graph_data = DashboardMetrics.objects.filter(Q(metrics = metrics) & Q(date__gte = start_date) & Q(date__lte = end_date))
-    if metrics in ['4', '2'] and slab:
-        if (metrics == '4' and slab in ['0', '1', '2']) or (metrics == '2' and slab in ['3', '4', '5']):
+    graph_data = DashboardMetrics.objects.exclude(date__gt = end_date).filter(Q(metrics = metrics) & Q(date__gte = start_date) & Q(date__lte = end_date))
+    if metrics in ['4', '2', '5'] and slab:
+        if (metrics == '4' and slab in ['0', '1', '2']) or (metrics == '2' and slab in ['3', '4', '5'])\
+                 or (metrics == '5' and slab in ['6', '7', '8']):
             graph_data = graph_data.filter(metrics_slab = slab)
     
     if data_view == 'weekly':
@@ -1305,17 +1310,17 @@ def statistics_all(request):
             x_axis.append(str("week " + str(each_week_no)))
             y_axis.append(graph_data.filter(week_no = each_week_no).aggregate(total_count = Sum('count'))['total_count'])
 
-    elif data_view == 'monthly':
+    # elif data_view == 'monthly':
+    else:
         x_axis = []
         y_axis = []
         month_no = months_between(start_date, end_date)
         for each_month_no in month_no:
-            x_axis.append(str(month_map[str(each_month_no)]))
-            y_axis.append(graph_data.filter(date__month = each_month_no).aggregate(total_count = Sum('count'))['total_count'])
-    
-    else:
-        x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
-        y_axis = graph_data.values_list('count', flat = True)
+            x_axis.append(str(str(month_map[str(each_month_no[0])]) + " " + str(each_month_no[1])))
+            y_axis.append(graph_data.filter(date__month = each_month_no[0]).aggregate(total_count = Sum('count'))['total_count'])
+    # else:
+    #     x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
+    #     y_axis = graph_data.values_list('count', flat = True)
     
     data['x_axis'] = list(x_axis)
     data['y_axis'] = list(y_axis)
@@ -1327,6 +1332,8 @@ def statistics_all(request):
         data['slabs'] = [metrics_slab_options[0], metrics_slab_options[1], metrics_slab_options[2]]
     if metrics == '2':
         data['slabs'] = [metrics_slab_options[3], metrics_slab_options[4], metrics_slab_options[5]]
+    if metrics == '5':
+        data['slabs'] = [metrics_slab_options[6], metrics_slab_options[7], metrics_slab_options[8]]
 
     return render(request,'jarvis/pages/video_statistics/statistics_all.html', data)
 
