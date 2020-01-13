@@ -99,7 +99,9 @@
         </div><br><br><br>
         {% for each_data in top_data %}
             <div class="top_box">
+                <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
                 <a href="?metrics={{ each_data.0 }}" class="filter_apply"><h6 style="color: #333">{{ each_data.1 }}</h6><h5 style="color: #b52828">{{ each_data.2|intcomma }}</h5></a>
+
             </div>
         {% endfor %}
         <div class="right_panel">

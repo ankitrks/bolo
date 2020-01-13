@@ -1285,11 +1285,12 @@ def statistics_all(request):
     if end_date_obj >= datetime.datetime.today().date():
         end_date = (datetime.datetime.today() - timedelta(days = 1)).strftime("%Y-%m-%d")
 
+    top_start = (datetime.datetime.today() - timedelta(days = 30)).date()
     for each_opt in metrics_options:
         temp_list = []
         temp_list.append( each_opt[0] )
         temp_list.append( each_opt[1] )
-        temp_list.append( DashboardMetrics.objects.exclude(date__gt = end_date).filter(metrics = each_opt[0])\
+        temp_list.append( DashboardMetrics.objects.exclude(date__gt = end_date).filter(date__gte = top_start, metrics = each_opt[0])\
                 .aggregate(total_count = Sum('count'))['total_count'] )
         top_data.append( temp_list ) 
         if metrics == each_opt[0]:
