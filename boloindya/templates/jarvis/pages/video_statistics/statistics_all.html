@@ -2,6 +2,7 @@
 {% load humanize %}
 <html>
     <head>
+        <title>bolo indya | analytics</title>
         <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
         <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
@@ -19,7 +20,7 @@
             .top_box{
                 background: #f1f1f1;
                 display: inline-block;
-                width: 19.7%;
+                width: 12.25%;
                 text-align: center;
                 padding: 10px 0px;
                 padding-top: 20px;
@@ -56,7 +57,7 @@
             $( function() {
                 $( "#start_date, #end_date" ).datepicker({
                     dateFormat : 'yy-mm-dd',
-                    maxDate : 1,
+                    maxDate : -1,
                     minDate : new Date(2019, 04, 01),
                     onSelect: function(date, datepicker) {
                         var proceed = true;
@@ -89,7 +90,6 @@
         </script>
     </head>
     <body>
-        
         <div style="box-shadow: 0px 5px 5px #f1f1f1;position: absolute;left: 0;top: 0;padding: 15px;width: 100%;">
             <img src="/media/img/boloindya_logo.png" class="" style="height: 45px;" alt="Bolo Indiya Logo">
             <span style="float: right;">
@@ -114,7 +114,6 @@
                     <a href="?slab={{ each_slab.0 }}" class="filter_apply">{{ each_slab.1 }}</a>{% if not forloop.last %} &nbsp;&nbsp;|&nbsp;&nbsp;{% endif %}
                 {% endfor %}
             {% endif %}
-
             <div id="myDiv"></div>
         </div>
         <script type="text/javascript">
