@@ -115,6 +115,9 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
             'fields': ('backup_url', ('is_transcoded', 'is_transcoded_error'), 'transcode_job_id', \
                         'transcode_dump', 'transcode_status_dump', 'm3u8_content', 'audio_m3u8_content', 'video_m3u8_content'),
         }),
+        ('Others', {
+            'fields': (('plag_text', 'time_deleted'),
+        }),
     )
 
     def get_changelist(self, request, **kwargs):
