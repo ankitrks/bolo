@@ -182,7 +182,7 @@ metrics_slab_options = (
     ('5', "Shares"),
     ('6', "Organic"),
     ('7', "Paid"),
-    ('8', "Unique New"),
+    ('t', "Total"),
 
 )
 
