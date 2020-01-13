@@ -23,6 +23,7 @@
       header#grp-header{display: none;}
       table.grp-table td, table.grp-table th{font-size: 13px;}
       table.grp-table tbody tr td, table.grp-table tbody tr th{vertical-align: middle !important;}
+      .grp-pulldown-content .grp-module{margin-left: -15px;width: 113%;}
     </style>
 {% endblock %}
 
@@ -151,6 +152,35 @@
                     e.preventDefault();
                     showRelatedObjectLookupPopup(this);
                 });
+                jQuery('.field-is_monetized').find('input[type="checkbox"]:checked').parents('td').next('td.field-is_removed')
+                    .find('input[type="checkbox"]:not(:checked)').prop('disabled', 'disabled');
+                jQuery('.field-is_removed').find('input[type="checkbox"]:checked').parents('td').prev('td.field-is_monetized')
+                    .find('input[type="checkbox"]:not(:checked)').prop('disabled', 'disabled');
+
+                jQuery('.field-is_monetized input[type="checkbox"]').change(function(){
+                    var attr_disabled = false;
+                    if($(this).is(':checked')){
+                        attr_disabled = true;
+                    }
+                    $(this).parents('td').next('td.field-is_removed').find('input[type="checkbox"]:not(:checked)').prop('disabled', attr_disabled);
+                });
+                jQuery('.field-is_removed input[type="checkbox"]').change(function(){
+                    var attr_disabled = false;
+                    if($(this).is(':checked')){
+                        attr_disabled = true;
+                    }
+                    $(this).parents('td').prev('td.field-is_monetized').find('input[type="checkbox"]:not(:checked)').prop('disabled', attr_disabled);
+                });
+
+                jQuery('.grp-pulldown-content').find('.grp-module').appendTo("#date-form");
+                jQuery('.admindatefilter').find('.controls').insertAfter('.admindatefilter .grp-module:last');
+                jQuery('.grp-filter-choice').off('change');
+                
+                // jQuery('.grp-filter-choice').change(function(e){
+                //     alert('1');
+                // });
+
+                // field-title
             });
         })(grp.jQuery);
     </script>

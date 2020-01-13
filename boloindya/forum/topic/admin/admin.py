@@ -25,6 +25,8 @@ class TopicChangeListForm(forms.ModelForm):
     title = forms.CharField(required = True)
     language_id = forms.ChoiceField(choices = language_options,required = True)
     is_pubsub_popular_push = forms.BooleanField(required = False)
+    is_monetized = forms.BooleanField(required = False)
+    is_removed = forms.BooleanField(required = False)
     is_moderated = forms.BooleanField(required = False)
     # is_popular = forms.BooleanField(required = False)
 
@@ -49,7 +51,6 @@ class TopicChangeList(ChangeList):
         # super(TopicChangeList, self).__init__(request, model, list_display, list_display_links,
         #     list_filter, date_hierarchy, search_fields, list_select_related,
         #     list_per_page, list_max_show_all, list_editable, model_admin)
-
         self.list_display = ('action_checkbox', 'id', 'title', 'name', 'duration', 'language_id', 'view_count',\
             'comments', 'is_moderated', 'is_monetized', 'is_removed', 'is_pubsub_popular_push', 'date', 'm2mcategory') #is_popular
         self.list_display_links = ['id']
@@ -98,7 +99,7 @@ class TopicChangeList(ChangeList):
 class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExportModelAdmin" NOT "admin.ModelAdmin"
     ordering = ['is_vb', '-id']
     search_fields = ('title', 'user__username', 'user__st__name', )
-    list_filter = (('date', DateRangeFilter), 'language_id', 'm2mcategory', 'is_moderated', 'is_monetized', 'is_removed','is_popular' )
+    list_filter = (('date', DateRangeFilter), 'language_id', 'm2mcategory', 'is_moderated', 'is_monetized', 'is_removed', 'is_popular' )
     filter_horizontal = ('m2mcategory', )
 
     fieldsets = (
@@ -137,32 +138,32 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
     comments.short_description = "comments"
     comments.admin_order_field = 'comment_count'
 
-    actions = ['remove_selected', 'remove_from_monetization', 'restore_selected', 'add_monetization']
-    def remove_selected(self, request, queryset):
-        for each_obj in queryset:
-            if not each_obj.is_removed:
-                each_obj.delete()
-    remove_selected.short_description = "Delete selected Records!"
+    actions = [] # ['remove_selected', 'remove_from_monetization', 'restore_selected', 'add_monetization']
+    # def remove_selected(self, request, queryset):
+    #     for each_obj in queryset:
+    #         if not each_obj.is_removed:
+    #             each_obj.delete()
+    # remove_selected.short_description = "Delete selected Records!"
 
-    def remove_from_monetization(self, request, queryset):
-        for each_obj in queryset:
-            if each_obj.is_monetized:
-                each_obj.no_monetization()
-    remove_from_monetization.short_description = "Remove from Monetization!"
+    # def remove_from_monetization(self, request, queryset):
+    #     for each_obj in queryset:
+    #         if each_obj.is_monetized:
+    #             each_obj.no_monetization()
+    # remove_from_monetization.short_description = "Remove from Monetization!"
 
-    def restore_selected(self, request, queryset):
-        for each_obj in queryset:
-            if each_obj.is_removed:
-                each_obj.restore()
-    restore_selected.short_description = "Restore selected Records (No Monetization)!"
+    # def restore_selected(self, request, queryset):
+    #     for each_obj in queryset:
+    #         if each_obj.is_removed:
+    #             each_obj.restore()
+    # restore_selected.short_description = "Restore selected Records (No Monetization)!"
 
-    def add_monetization(self, request, queryset):
-        for each_obj in queryset:
-            if each_obj.is_removed:
-                each_obj.restore()
-            if not each_obj.is_monetized:
-                each_obj.add_monetization()
-    add_monetization.short_description = "Restore & Add to Monetization!"
+    # def add_monetization(self, request, queryset):
+    #     for each_obj in queryset:
+    #         if each_obj.is_removed:
+    #             each_obj.restore()
+    #         if not each_obj.is_monetized:
+    #             each_obj.add_monetization()
+    # add_monetization.short_description = "Restore & Add to Monetization!"
 
     def get_actions(self, request):
         actions = super(TopicAdmin, self).get_actions(request)
@@ -182,6 +183,27 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
         #     obj.is_popular = form.cleaned_data['is_popular']
         #     if obj.is_popular and obj.is_vb and not obj.is_removed:
         #         obj.is_pubsub_popular_push = True
+        if 'is_monetized' in form.changed_data:
+            obj.is_monetized = form.cleaned_data['is_monetized']
+            print obj.is_monetized
+            if obj.is_monetized:
+                print 'Adding to monetization...'
+                if obj.is_removed:
+                    print 'restoring record...'
+                    obj.restore()
+                print 'adding to monetization'
+                obj.add_monetization()
+            else:
+                print 'removing from monetization...'
+                obj.no_monetization()
+            print 'done'
+
+        if 'is_removed' in form.changed_data:
+            obj.is_removed = form.cleaned_data['is_removed']
+            if obj.is_removed:
+                obj.delete()
+            else:
+                obj.restore()
         obj.save()
         if 'language_id' in form.changed_data and obj.is_monetized:
             if form.initial['language_id'] == '1':
