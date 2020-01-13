@@ -98,7 +98,7 @@
             </span><br>
         </div><br><br><br>
         {% for each_data in top_data %}
-            <div class="top_box">
+            <div class="top_box" {% if metrics == each_data.0  %}style="background:bisque;"{% endif %}>
                 <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
                 <a href="?metrics={{ each_data.0 }}" class="filter_apply"><h6 style="color: #333">{{ each_data.1 }}</h6><h5 style="color: #b52828">{{ each_data.2|intcomma }}</h5></a>
 
@@ -108,12 +108,12 @@
             <br><br>Start date &nbsp;&nbsp; <input type="text" id="start_date" name="start_date" placeholder="Start Date" class="filter_text" value="{{ start_date }}">
             &nbsp;&nbsp; End date&nbsp;&nbsp;&nbsp; <input type="text" id="end_date" name="end_date" placeholder="End Date" class="filter_text" value="{{ end_date }}">&nbsp;&nbsp;&nbsp;
             <!-- <a href="?data_view=daily" class="filter_apply">daily</a> &nbsp;&nbsp;|&nbsp;&nbsp; -->
-            <a href="?data_view=weekly" class="filter_apply btn">weekly</a>
-            <a href="?data_view=monthly" class="filter_apply btn">monthly</a><br>
+            <a href="?data_view=weekly" class="filter_apply btn" {% if data_view == "weekly"  %}style="background:bisque;"{% endif %}>weekly</a>
+            <a href="?data_view=monthly" class="filter_apply btn" {% if data_view == "monthly"  %}style="background:bisque;"{% endif %}>monthly</a><br>
             {% if slabs %}
                 <br>Data Slabs&nbsp;&nbsp;
                 {% for each_slab in slabs %}
-                    <a href="?slab={{ each_slab.0 }}" class="filter_apply">{{ each_slab.1 }}</a>{% if not forloop.last %} &nbsp;&nbsp;|&nbsp;&nbsp;{% endif %}
+                    <a href="?slab={{ each_slab.0 }}" class="filter_apply" {% if slab == each_slab.0  %}style="text-decoration: underline;font-weight: bold;color: burlywood;"{% endif %}>{{ each_slab.1 }}</a>{% if not forloop.last %} &nbsp;&nbsp;|&nbsp;&nbsp;{% endif %}
                 {% endfor %}
             {% endif %}
             <div id="myDiv"></div>

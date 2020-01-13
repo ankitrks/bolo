@@ -1322,7 +1322,9 @@ def statistics_all(request):
     # else:
     #     x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
     #     y_axis = graph_data.values_list('count', flat = True)
-    
+    data['metrics'] = metrics
+    data['slab'] = slab
+    data['data_view'] = data_view
     data['x_axis'] = list(x_axis)
     data['y_axis'] = list(y_axis)
     data['start_date'] = start_date
