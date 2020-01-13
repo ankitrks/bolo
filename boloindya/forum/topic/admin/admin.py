@@ -116,7 +116,7 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
                         'transcode_dump', 'transcode_status_dump', 'm3u8_content', 'audio_m3u8_content', 'video_m3u8_content'),
         }),
         ('Others', {
-            'fields': (('plag_text', 'time_deleted'),
+            'fields': ('plag_text', 'time_deleted'),
         }),
     )
 
