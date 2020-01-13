@@ -1326,8 +1326,13 @@ def statistics_all(request):
     data['metrics'] = metrics
     data['slab'] = slab
     data['data_view'] = data_view
-    data['x_axis'] = list(x_axis)
-    data['y_axis'] = list(y_axis)
+    # data['x_axis'] = list(x_axis)
+    # data['y_axis'] = list(y_axis)
+    from collections import OrderedDict
+    chart_data = OrderedDict()
+    for i in range(len(x_axis)):
+        chart_data[x_axis[i]] = y_axis[i]
+    data['chart_data'] = [[str(data_view), str(data['graph_title'])]] + [list(ele) for ele in chart_data.items()] 
     data['start_date'] = start_date
     data['end_date'] = end_date
     data['slabs'] = []
