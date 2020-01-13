@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Spirit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-23 19:55+0000\n"
+"POT-Creation-Date: 2019-12-12 17:26+0530\n"
 "PO-Revision-Date: 2015-07-25 18:00+0000\n"
 "Last-Translator: Esteban M. Castro Borsani <ecastroborsani@gmail.com>\n"
 "Language-Team: Spirit\n"
@@ -12,48 +12,48 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: forms.py:32
+#: forum/comment/flag/forms.py:32
 msgid "This flag already exists"
 msgstr "flag existiert bereits"
 
-#: models.py:12
+#: forum/comment/flag/models.py:13
 msgid "Spam"
 msgstr "Spam"
 
-#: models.py:13
+#: forum/comment/flag/models.py:14
 msgid "Other"
 msgstr "anders"
 
-#: models.py:28
+#: forum/comment/flag/models.py:29
 msgid "comment flag"
 msgstr "Kommentar flag"
 
-#: models.py:29
+#: forum/comment/flag/models.py:30
 msgid "comments flags"
 msgstr "Kommentar flag"
 
-#: models.py:41
+#: forum/comment/flag/models.py:42
 msgid "reason"
 msgstr "Begründung"
 
-#: models.py:42
+#: forum/comment/flag/models.py:43
 msgid "body"
 msgstr "body"
 
-#: models.py:47
+#: forum/comment/flag/models.py:48
 msgid "flag"
 msgstr "flag"
 
-#: models.py:48
+#: forum/comment/flag/models.py:49
 msgid "flags"
 msgstr "flags"
 
-#: templates/spirit/comment/flag/create.html:5
-#: templates/spirit/comment/flag/create.html:14
+#: forum/comment/flag/templates/spirit/comment/flag/create.html:5
+#: forum/comment/flag/templates/spirit/comment/flag/create.html:14
 msgid "Report"
 msgstr "melden"
 
-#: templates/spirit/comment/flag/create.html:9
+#: forum/comment/flag/templates/spirit/comment/flag/create.html:9
 #, python-format
 msgid "Reporting %(username)s's comment"
 msgstr "Melde %(username)ss Kommentar"

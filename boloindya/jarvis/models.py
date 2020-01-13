@@ -224,7 +224,7 @@ class StateDistrictLanguage(RecordTimeStamp):
         verbose_name_plural = _("State District Languages")
 
     def __unicode__(self):
-        return str(self.district_name)+"--"+str(self.language)
+        return str(self.district_name)+"--"+str(self.district_language)
 
     def save(self, *args, **kwargs):
         if not self.district_language:

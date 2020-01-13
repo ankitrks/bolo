@@ -7,7 +7,7 @@ from forum.topic.models import Topic, Notification, ShareTopic, CricketMatch, Po
  TongueTwister, BoloActionHistory
 from forum.category.models import Category
 from forum.topic.models import Topic, Notification, ShareTopic, CricketMatch, Poll, Choice, Voting, Leaderboard, \
-        TongueTwister, BoloActionHistory, language_options
+        TongueTwister, BoloActionHistory, language_options,JobOpening,JobRequest
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 
 class TopicResource(resources.ModelResource):
@@ -97,7 +97,7 @@ class TopicChangeList(ChangeList):
             title = ugettext('Select %s to change')
         self.title = title % force_text(self.opts.verbose_name)
         self.pk_attname = self.lookup_opts.pk.attname
-        
+
 class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExportModelAdmin" NOT "admin.ModelAdmin"
     ordering = ['is_vb', '-id']
     search_fields = ('title', 'user__username', 'user__st__name', )
@@ -118,6 +118,9 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
             'classes': ('collapse',),
             'fields': ('backup_url', ('is_transcoded', 'is_transcoded_error'), 'transcode_job_id', \
                         'transcode_dump', 'transcode_status_dump', 'm3u8_content', 'audio_m3u8_content', 'video_m3u8_content'),
+        }),
+        ('Others', {
+            'fields': (('plag_text', 'time_deleted')),
         }),
     )
 
@@ -200,6 +203,10 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
             else:
                 obj.restore()
 
+        # if 'is_popular' in form.changed_data:
+        #     obj.is_popular = form.cleaned_data['is_popular']
+        #     if obj.is_popular and obj.is_vb and not obj.is_removed:
+        #         obj.is_pubsub_popular_push = True
         obj.save()
         if 'language_id' in form.changed_data and obj.is_monetized:
             if form.initial['language_id'] == '1':
@@ -283,4 +290,6 @@ admin.site.register(Voting)
 admin.site.register(Leaderboard)
 admin.site.register(VBseen)
 admin.site.register(TongueTwister)
+admin.site.register(JobOpening)
+admin.site.register(JobRequest)
 

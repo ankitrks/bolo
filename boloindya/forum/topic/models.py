@@ -115,7 +115,7 @@ class Topic(models.Model):
     likes_count = models.PositiveIntegerField(_("Likes count"), default=0)
 
     is_monetized = models.BooleanField(_("monetized"), default=False)
-    is_moderated = models.BooleanField(_("moderated"), default=True)
+    is_moderated = models.BooleanField(_("moderated"), default=False)
     vb_width = models.PositiveIntegerField(_("vb width"), default=0)
     vb_height = models.PositiveIntegerField(_("vb height"), default=0)
 
@@ -151,9 +151,9 @@ class Topic(models.Model):
         ('10', "Likee"),
     )
 
-    time_deleted = models.DateTimeField(auto_now = True, auto_now_add = False, blank = False, null = False)
+    time_deleted = models.DateTimeField(blank = True, null = True)
     #text in the video for possible plag
-    plag_text = models.CharField(choices = plag_text_options, blank = False, null = True, max_length = 10)
+    plag_text = models.CharField(choices = plag_text_options, blank = True, null = True, max_length = 10)
 
     objects = TopicQuerySet.as_manager()
 
@@ -163,6 +163,7 @@ class Topic(models.Model):
     def has_answers(self):
         return self.topic_comment.all().count()
     def get_video_comments(self):
+
         return self.topic_comment.filter(is_media = True, is_audio = False)
     def get_audio_comments(self):
         return self.topic_comment.filter(is_media = True, is_audio = True)
@@ -431,6 +432,26 @@ class TongueTwister(models.Model):
     def __unicode__(self):
         return self.hash_tag
 
+class JobOpening(models.Model):
+    title = models.CharField(_("Job Title"),max_length=255, blank = True, null = True)
+    slug = AutoSlugField(populate_from="title", db_index=False, blank=True)
+    tag_line = models.CharField(_("Tag line"),max_length=255, blank = True, null = True)
+    description = models.TextField(_("Job Description"), blank= True, null = True)
+    job_location = models.CharField(_("Job Location"),max_length=255, blank = True, null = True)
+    is_active = models.BooleanField(_("Active Status"),default=True)
+    def __unicode__(self):
+        return str(self.title)
+
+class JobRequest(RecordTimeStamp):
+    jobOpening = models.ForeignKey(JobOpening, related_name='job_opening',blank = True, null = True)
+    name = models.CharField(_("Username"), blank = True,max_length=255, null = True)
+    email = models.CharField(_("Email"), blank = True,max_length=255, null = True)
+    mobile = models.CharField(_("Mobile"), blank = True,max_length=255, null = True)
+    document = models.FileField(upload_to=settings.MEDIA_UPLOAD_DOC_PATH,blank = True, null = True)
+
+    def __unicode__(self):
+        return str(self.name)
+        
 class ShareTopic(UserInfo):
     topic = models.ForeignKey(Topic, related_name='share_topic_topic_share',null=True,blank=True)
     comment = models.ForeignKey('forum_comment.Comment',related_name='share_topic_topic_comment',null=True,blank=True)

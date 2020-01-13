@@ -1,3 +1,4 @@
+
 from django.contrib import admin
 from .models import SingUpOTP, UserJarvisDump, UserFeedback
 from forum.user.models import Weight,UserProfile,AppVersion, UserProfile,AndroidLogs, AppPageContent, ReferralCode, ReferralCodeUsed, VideoPlaytime, VideoCompleteRate
@@ -23,7 +24,8 @@ class SingUpOTPAdmin(admin.ModelAdmin):
 admin.site.register(SingUpOTP, SingUpOTPAdmin)
 
 class CategoryAdmin(admin.ModelAdmin):
-	list_display = ('title', 'hindi_title','tamil_title','telgu_title','bengali_title','kannada_title', )
+    list_display = ('title', 'hindi_title','tamil_title','telgu_title','bengali_title','kannada_title', 'order_no')
+    list_editable = ('order_no', )
 admin.site.register(Category, CategoryAdmin)
 
 class WeightAdmin(admin.ModelAdmin):
@@ -34,7 +36,7 @@ class UserProfileAdmin(ImportExportModelAdmin):
 	search_fields = ('user__username', 'name',)
 	list_display = ('user', 'name', 'language', 'bolo_score', 'follow_count', 'follower_count', 'vb_count', 'answer_count', \
 		'share_count', 'like_count', 'is_popular','is_superstar', 'is_business')
-	list_editable = ('is_popular','is_superstar', 'is_business')
+	list_editable = ('is_popular','is_superstar', 'is_business', 'language')
 	list_filter = ('user__date_joined', ('user__date_joined', DateRangeFilter), 'language','is_popular','is_superstar', 'is_business')
 	resource_class = UserProfileResource
 admin.site.register(UserProfile,UserProfileAdmin)
@@ -49,6 +51,7 @@ admin.site.register(ReferralCode, ReferralCodeAdmin)
 class ReferralCodeUsedAdmin(admin.ModelAdmin):
 	list_display = ('code', 'by_user', 'is_download', 'created_at', 'last_modified', 'click_id', 'pid', 'android_id')
 	search_fields = ('code__code', )
+        list_filter = ('created_at', ('created_at', DateRangeFilter), 'code')
 admin.site.register(ReferralCodeUsed, ReferralCodeUsedAdmin)
 
 class AndroidLogsAdmin(admin.ModelAdmin):

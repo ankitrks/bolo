@@ -113,7 +113,7 @@ class NotificationAPI(GenericAPIView):
             if total_offset > offset:
                 next_offset = offset+1
             update_notification_ids = list(Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-created_at').values_list('pk',flat=True))[offset*limit:offset*limit+limit]
-            print update_notification_ids
+            #print update_notification_ids
             Notification.objects.filter(pk__in=update_notification_ids).update(status=1)
 
         result = []
@@ -498,7 +498,7 @@ class GetChallenge(generics.ListCreateAPIView):
     def get_queryset(self):
         challenge_hash = self.request.GET.get('challengehash')
         challengehash = '#' + challenge_hash
-        all_seen_vb = VBseen.objects.filter(user = self.request.user).distinct('topic_id').values_list('topic_id',flat=True)
+        all_seen_vb = VBseen.objects.filter(user = self.request.user, topic__title__icontains=challengehash).distinct('topic_id').values_list('topic_id',flat=True)
         excluded_list =[]
         superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,title__icontains=challengehash,user__st__is_superstar = True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
         for each in superstar_post:
@@ -1548,6 +1548,56 @@ class SingUpOTPView(generics.CreateAPIView):
             return JsonResponse({'message': 'OTP could not be sent'}, status=status.HTTP_417_EXPECTATION_FAILED)
         return JsonResponse({'message': 'OTP sent'}, status=status.HTTP_200_OK)
 
+import calendar
+@api_view(['POST'])
+def get_user_bolo_info(request):
+    """
+    post:
+        Required Parameters
+        start_date = request.POST.get('start_date', None)
+        end_date = request.POST.get('end_date',None)
+        month = request.POST.get('month', None)
+        year = request.POST.get('year',None)
+    """
+    try:
+        start_date = request.POST.get('start_date', None)
+        end_date = request.POST.get('end_date',None)
+        month = request.POST.get('month', None)
+        year = request.POST.get('year',None)
+        if start_date and end_date:
+            start_date= datetime.strptime(start_date, "%d-%m-%Y")
+            end_date = datetime.strptime(end_date+' 23:59:59', "%d-%m-%Y %H:%M:%S")
+        elif month and year:
+            days = calendar.monthrange(int(year),int(month))[1]
+            start_date = datetime.strptime('01-'+str(month)+'-'+str(year), "%d-%m-%Y")
+            end_date = datetime.strptime(str(days)+'-'+str(month)+'-'+str(year)+' 23:59:59', "%d-%m-%Y %H:%M:%S")
+        if not start_date or not end_date:
+            total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user)
+        else:
+            total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user,date__gte=start_date, date__lte=end_date)
+        total_video_count = total_video.count()
+        print total_video
+        monetised_video_count = total_video.filter(is_monetized = True).count()
+        left_for_moderation = total_video.filter(is_moderated = False).count()
+        total_view_count=0
+        total_like_count=0
+        total_comment_count = 0
+        total_share_count = 0
+        for each_vb in total_video:
+            total_view_count+=each_vb.view_count
+            total_like_count+=each_vb.likes_count
+            total_comment_count+=each_vb.comment_count
+            total_share_count+=each_vb.total_share_count
+        total_view_count = shorcountertopic(total_view_count)
+        total_comment_count = shorcountertopic(total_comment_count)
+        total_like_count = shorcountertopic(total_like_count)
+        total_share_count = shorcountertopic(total_share_count)
+        return JsonResponse({'message': 'success', 'total_video_count' : total_video_count, \
+                        'monetised_video_count':monetised_video_count, 'total_view_count':total_view_count,'total_comment_count':total_comment_count,\
+                        'total_like_count':total_like_count,'total_share_count':total_share_count,'left_for_moderation':left_for_moderation}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 @api_view(['POST'])
 def verify_otp(request):
     """
@@ -1585,6 +1635,8 @@ def verify_otp(request):
             otp_obj.is_active = False
             otp_obj.used_at = timezone.now()
             if not is_reset_password and not is_for_change_phone:
+		if mobile_no in ['7726080653']:
+                    return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
                 userprofile = UserProfile.objects.filter(mobile_no = mobile_no,user__is_active = True)
                 if userprofile:
                     userprofile = userprofile[0]
@@ -2392,7 +2444,7 @@ class GetFollowerList(generics.ListCreateAPIView):
 @api_view(['POST'])
 def get_following_list(request):
     try:
-        all_following_id = Follower.objects.filter(user_following_id = request.POST.get('user_id', ''),is_active = True).values_list('user_follower_id', flat=True)
+        all_following_id = Follower.objects.filter(user_following_id = request.POST.get('user_id', ''),is_active = True).values_list('user_follower_id', flat=True)[:50]
         if all_following_id:
             all_user = User.objects.filter(pk__in = all_following_id)
             return JsonResponse({'result':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
@@ -2405,7 +2457,7 @@ def get_following_list(request):
 @api_view(['POST'])
 def get_follower_list(request):
     try:
-        all_follower_id = Follower.objects.filter(user_follower_id = request.POST.get('user_id', ''),is_active = True).values_list('user_following_id', flat=True)
+        all_follower_id = Follower.objects.filter(user_follower_id = request.POST.get('user_id', ''),is_active = True).values_list('user_following_id', flat=True)[:50]
         if all_follower_id:
             all_user = User.objects.filter(pk__in = all_follower_id)
             return JsonResponse({'result':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
@@ -2847,10 +2899,11 @@ def get_category_with_video_bytes(request):
         paginator = PageNumberPagination()
         paginator.page_size = 3
         language_id = request.GET.get('language_id', 1)
+        is_discover = request.GET.get('is_discover', False)
         popular_bolo = []
         trending_videos = []
         following_user = []
-        if request.user.id:
+        if request.user.id and not is_discover:
             userprofile = UserProfile.objects.get(user = request.user)
             category = userprofile.sub_category.all()
         else:
@@ -2869,7 +2922,7 @@ def get_category_with_video_bytes(request):
                 except Exception as e1:
                     popular_bolo = []
         if request.GET.get('is_with_popular'):
-            all_seen_vb = VBseen.objects.filter(user = request.user).distinct('topic_id').values_list('topic_id',flat=True)
+            all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__is_popular=True).distinct('topic_id').values_list('topic_id',flat=True)
             excluded_list =[]
             superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
             for each in superstar_post:
@@ -2925,7 +2978,7 @@ def get_category_video_bytes(request):
         language_id = request.POST.get('language_id', 1)
         category = Category.objects.get(pk=category_id)
         topics = []
-        all_seen_vb = VBseen.objects.filter(user = request.user).distinct('topic_id').values_list('topic_id',flat=True)
+        all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__m2mcategory=category).distinct('topic_id').values_list('topic_id',flat=True)
         post_till = datetime.now() - timedelta(days=30)
         if category:
             excluded_list =[]
@@ -2961,11 +3014,15 @@ def get_category_video_bytes(request):
 
 @api_view(['GET'])
 def get_popular_video_bytes(request):
+    """
+    GET:
+    """
     try:
         paginator_topics = PageNumberPagination()
         language_id = request.GET.get('language_id', 1)
         paginator_topics.page_size = 10
-        all_seen_vb = VBseen.objects.filter(user = request.user).distinct('topic_id').values_list('topic_id',flat=True)
+        
+        all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__is_popular=True).distinct('topic_id').values_list('topic_id',flat=True)
         excluded_list =[]
         superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
         for each in superstar_post:
@@ -2984,9 +3041,8 @@ def get_popular_video_bytes(request):
                 for each_vb in all_seen_post:
                     if each_vb.id == each_id:
                         orderd_all_seen_post.append(each_vb)
+        
         topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
-
-        paginator_topics.page_size = 10
         topics = paginator_topics.paginate_queryset(topics, request)
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
     except Exception as e:
@@ -3037,7 +3093,7 @@ def get_recent_videos(request):
         topics = []
         post_till = datetime.now() - timedelta(days=30)
         category = Category.objects.filter(parent__isnull=True).first()
-        all_seen_vb = VBseen.objects.filter(user = request.user).distinct('topic_id').values_list('topic_id',flat=True)
+        all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__m2mcategory=category).distinct('topic_id').values_list('topic_id',flat=True)
         excluded_list =[]
         superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
         for each in superstar_post:
@@ -3103,6 +3159,31 @@ def submit_user_feedback(request):
         return JsonResponse({'message': 'invalid user'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def generate_login_data(request):
+    """
+    post:
+        Required Parameters
+        mobile_no = request.POST.get('id', None)
+
+    """
+    user_id = request.POST.get('user_id', None)
+    try:
+        user_id = request.POST.get('user_id', None)
+        userprofile = UserProfile.objects.filter(user__id = user_id,user__is_active = True)
+        if userprofile:
+            userprofile = userprofile[0]
+            user = userprofile.user
+            username = userprofile.slug
+            message = 'User Logged In'
+            user_tokens = get_tokens_for_user(user)
+
+            return JsonResponse({'message': message, 'username' : username, \
+                        'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Invalid User Id'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(['POST'])

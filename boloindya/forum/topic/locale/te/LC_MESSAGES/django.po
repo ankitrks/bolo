@@ -1,0 +1,599 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-12-12 17:26+0530\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: forum/topic/forms.py:35
+msgid "Category"
+msgstr ""
+
+#: forum/topic/forms.py:36
+msgid "Chose a category"
+msgstr ""
+
+#: forum/topic/models.py:55 forum/topic/models.py:639
+msgid "Bolo Score"
+msgstr ""
+
+#: forum/topic/models.py:89 forum/topic/models.py:90
+msgid "category"
+msgstr ""
+
+#: forum/topic/models.py:93
+msgid "title"
+msgstr ""
+
+#: forum/topic/models.py:94
+msgid "audio title"
+msgstr ""
+
+#: forum/topic/models.py:95
+msgid "video title"
+msgstr ""
+
+#: forum/topic/models.py:97
+msgid "date"
+msgstr ""
+
+#: forum/topic/models.py:98
+msgid "last active"
+msgstr ""
+
+#: forum/topic/models.py:99
+msgid "reindex at"
+msgstr ""
+
+#: forum/topic/models.py:100
+msgid "language"
+msgstr ""
+
+#: forum/topic/models.py:101
+msgid "Question image"
+msgstr ""
+
+#: forum/topic/models.py:102
+msgid "Popular"
+msgstr ""
+
+#: forum/topic/models.py:105
+msgid "duration"
+msgstr ""
+
+#: forum/topic/models.py:106
+msgid "Last Commented"
+msgstr ""
+
+#: forum/topic/models.py:108
+msgid "pinned"
+msgstr ""
+
+#: forum/topic/models.py:109
+msgid "globally pinned"
+msgstr ""
+
+#: forum/topic/models.py:110
+msgid "closed"
+msgstr ""
+
+#: forum/topic/models.py:111
+msgid "removed"
+msgstr ""
+
+#: forum/topic/models.py:112
+msgid "thumbnail"
+msgstr ""
+
+#: forum/topic/models.py:113
+#: forum/topic/templates/spirit/topic/new_landing.html:59
+#: forum/topic/templates/spirit/topic/new_landing.html:65
+#: forum/topic/templates/spirit/topic/new_landing.html:71
+msgid "views"
+msgstr "అభిప్రాయాలు"
+
+#: forum/topic/models.py:114
+msgid "comment count"
+msgstr ""
+
+#: forum/topic/models.py:115
+msgid "Total Share count"
+msgstr ""
+
+#: forum/topic/models.py:116
+msgid "Share count"
+msgstr ""
+
+#: forum/topic/models.py:119
+msgid "Is Video Bytes"
+msgstr ""
+
+#: forum/topic/models.py:120
+msgid "Likes count"
+msgstr ""
+
+#: forum/topic/models.py:122
+msgid "monetized"
+msgstr ""
+
+#: forum/topic/models.py:123
+msgid "vb width"
+msgstr ""
+
+#: forum/topic/models.py:124
+msgid "vb height"
+msgstr ""
+
+#: forum/topic/models.py:131
+msgid "backup url"
+msgstr ""
+
+#: forum/topic/models.py:134
+msgid "Transcode Job ID"
+msgstr ""
+
+#: forum/topic/models.py:135
+msgid "Transcode Dump"
+msgstr ""
+
+#: forum/topic/models.py:136
+msgid "Transcode Status Dump (Job Status)"
+msgstr ""
+
+#: forum/topic/models.py:138
+msgid "M3U8 Content"
+msgstr ""
+
+#: forum/topic/models.py:139
+msgid "Audio M3U8 Content"
+msgstr ""
+
+#: forum/topic/models.py:140
+msgid "Video M3U8 Content"
+msgstr ""
+
+#: forum/topic/models.py:158
+msgid "topic"
+msgstr ""
+
+#: forum/topic/models.py:159
+msgid "topics"
+msgstr ""
+
+#: forum/topic/models.py:392
+msgid "Hash Tag"
+msgstr ""
+
+#: forum/topic/models.py:393
+msgid "English Hash Tag Description"
+msgstr ""
+
+#: forum/topic/models.py:394
+msgid "Hindi Hash Tag Description"
+msgstr ""
+
+#: forum/topic/models.py:395
+msgid "Tamil Hash Tag Description"
+msgstr ""
+
+#: forum/topic/models.py:396
+msgid "Telgu Hash Tag Description"
+msgstr ""
+
+#: forum/topic/models.py:397
+msgid "Bengali Hash Tag Description"
+msgstr ""
+
+#: forum/topic/models.py:398
+msgid "Kannada Hash Tag Description"
+msgstr ""
+
+#: forum/topic/models.py:399
+msgid "Picture URL"
+msgstr ""
+
+#: forum/topic/models.py:434
+msgid "notification_type"
+msgstr ""
+
+#: forum/topic/models.py:618
+msgid "Match Name"
+msgstr ""
+
+#: forum/topic/models.py:619
+msgid "Team 1"
+msgstr ""
+
+#: forum/topic/models.py:620
+msgid "Team 1 Flag"
+msgstr ""
+
+#: forum/topic/models.py:621
+msgid "Team 2"
+msgstr ""
+
+#: forum/topic/models.py:622
+msgid "Team 2 Flag"
+msgstr ""
+
+#: forum/topic/models.py:623
+msgid "Match Datetime"
+msgstr ""
+
+#: forum/topic/models.py:635 forum/topic/models.py:650
+msgid "Title"
+msgstr "శీర్షిక"
+
+#: forum/topic/models.py:636
+msgid "Activate DateTime"
+msgstr ""
+
+#: forum/topic/models.py:637
+msgid "Deactivate DateTime"
+msgstr ""
+
+#: forum/topic/models.py:638
+msgid "Score"
+msgstr ""
+
+#: forum/topic/models.py:651
+msgid "Option Image"
+msgstr ""
+
+#: forum/topic/models.py:673
+msgid "Total Score"
+msgstr ""
+
+#: forum/topic/models.py:674
+msgid "Total Prediction"
+msgstr ""
+
+#: forum/topic/models.py:675 forum/topic/models.py:676
+#: forum/topic/models.py:677
+msgid "Correct Prediction"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:10
+msgid "Main"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:30
+#: forum/topic/templates/spirit/topic/detail.html:32
+msgid "edit"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:42
+msgid "Select comments to move"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:45
+msgid "Undelete topic"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:47
+msgid "Delete topic"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:51
+msgid "Open topic"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:53
+msgid "Close topic"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:57
+msgid "Unpin topic"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:59
+msgid "Pin topic"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:63
+msgid "Unpin topic globally"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:65
+msgid "Pin topic globally"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:74
+msgid "Topic id"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:76
+msgid "Move"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:90
+msgid "Reply"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/main_landing.html:216
+msgid "Get"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/moderate.html:5
+#: forum/topic/templates/spirit/topic/moderate.html:9
+msgid "Moderate topic"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/moderate.html:14
+msgid "Apply"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/new_landing.html:27
+msgid "Popular Videos"
+msgstr "జనాదరణ పొందిన వీడియోలు"
+
+#: forum/topic/templates/spirit/topic/new_landing.html:54
+msgid "Trending Categories"
+msgstr "ట్రెండింగ్ వర్గాలు"
+
+#: forum/topic/templates/spirit/topic/new_landing.html:79
+msgid "Get the App"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/publish.html:6
+msgid "Publish topic"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/publish.html:88
+msgid "Start discussion"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/publish.html:106
+msgid "Publish"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/topic_details_by_category.html:209
+#: forum/topic/templates/spirit/topic/user_details.html:205
+msgid "Creators"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/topic_details_by_category.html:209
+#: forum/topic/templates/spirit/topic/topic_details_by_category.html:222
+#: forum/topic/templates/spirit/topic/user_details.html:205
+#: forum/topic/templates/spirit/topic/user_details.html:215
+#, fuzzy
+#| msgid "View All"
+msgid "See All"
+msgstr "చూడండి"
+
+#: forum/topic/templates/spirit/topic/topic_details_by_category.html:222
+#: forum/topic/templates/spirit/topic/user_details.html:215
+#: forum/topic/templates/spirit/topic/video_discover.html:67
+msgid "Discover"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/update.html:5
+#: forum/topic/templates/spirit/topic/update.html:9
+msgid "Update topic"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/update.html:15
+msgid "Update"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/user_details.html:176
+msgid "Verified account"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/user_details.html:177
+msgid "Following"
+msgstr "తరువాత"
+
+#: forum/topic/templates/spirit/topic/user_details.html:177
+msgid "Followers"
+msgstr "అనుచరులు"
+
+#: forum/topic/templates/spirit/topic/user_details.html:178
+msgid "Likes"
+msgstr "ఇష్టాలు"
+
+#: forum/topic/templates/spirit/topic/video_details.html:1017
+#, fuzzy
+#| msgid "like"
+msgid "likes"
+msgstr "ఇష్టాలు"
+
+#: forum/topic/templates/spirit/topic/video_details.html:1017
+msgid "comments"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/video_details.html:1045
+msgid "Like"
+msgstr "ఇష్టాలు"
+
+#: forum/topic/templates/spirit/topic/video_details.html:1051
+msgid "Comment"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/video_details.html:1099
+msgid "COPY"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/video_details.html:1108
+msgid "Trends"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/video_discover.html:68
+msgid "Be the first to watch the latest videos"
+msgstr ""
+
+#~ msgid "Account Holder Name *"
+#~ msgstr "ఖాతాదారుని పేరు"
+
+#~ msgid "Account Number *"
+#~ msgstr "ఖాతా సంఖ్య"
+
+#~ msgid "Advanced Settings"
+#~ msgstr "ఆధునిక సెట్టింగులు"
+
+#~ msgid "All"
+#~ msgstr "అన్ని"
+
+#~ msgid "Bank Name *"
+#~ msgstr "బ్యాంక్ పేరు"
+
+#~ msgid "Bio"
+#~ msgstr "బయో"
+
+#~ msgid "Bolo Actions"
+#~ msgstr "బోలో చర్యలు"
+
+#~ msgid "Cancel"
+#~ msgstr "రద్దు"
+
+#~ msgid "Close"
+#~ msgstr "సమీపంలో"
+
+#~ msgid "Continue"
+#~ msgstr "కొనసాగించు"
+
+#~ msgid "Continue with facebook"
+#~ msgstr "ఫేస్బుక్తో కొనసాగించండి"
+
+#~ msgid "Continue with Mobile Number"
+#~ msgstr "మొబైల్ నంబరుతో కొనసాగించండి"
+
+#~ msgid "Date Of Birth *"
+#~ msgstr "పుట్టిన తేది"
+
+#~ msgid "Delete"
+#~ msgstr "తొలగించు"
+
+#~ msgid "Edit Profile"
+#~ msgstr "ప్రొఫైల్ను సవరించండి"
+
+#~ msgid "Father's name"
+#~ msgstr "తండ్రి పేరు"
+
+#~ msgid "First Name *"
+#~ msgstr "మొదటి పేరు"
+
+#~ msgid "Follow"
+#~ msgstr "అనుసరించండి"
+
+#~ msgid "Follower"
+#~ msgstr "ఫాలో"
+
+#~ msgid "Image"
+#~ msgstr "చిత్రం"
+
+#~ msgid "Last Name"
+#~ msgstr "చివరి పేరు"
+
+#~ msgid "Logout"
+#~ msgstr "లాగ్అవుట్"
+
+#~ msgid "Maximum 20 words"
+#~ msgstr "గరిష్టంగా 20 పదాలు"
+
+#~ msgid "Middle Name"
+#~ msgstr "మధ్య పేరు"
+
+#~ msgid "Mother's name"
+#~ msgstr "తల్లి పేరు"
+
+#~ msgid "Name *"
+#~ msgstr "పేరు"
+
+#~ msgid "Netwok did not respond. Please try again"
+#~ msgstr "నెట్వర్క్ ప్రతిస్పందించలేదు. దయచేసి మళ్లీ ప్రయత్నించండి."
+
+#~ msgid "No"
+#~ msgstr "ఏ"
+
+#~ msgid "Notifications"
+#~ msgstr "ప్రకటనలను"
+
+#~ msgid "Phone number *"
+#~ msgstr "ఫోను నంబరు"
+
+#~ msgid "Please Select Atleast 3 Interests To Start"
+#~ msgstr "ప్రారంభించడానికి కనీసం 3 వర్గాలను ఎంచుకోండి"
+
+#~ msgid "Popular Bolo Indyans"
+#~ msgstr "ప్రముఖ Bolo Indyans"
+
+#~ msgid "Preview"
+#~ msgstr "ప్రివ్యూ"
+
+#~ msgid "Privacy Policy"
+#~ msgstr "గోప్యతా విధానం"
+
+#~ msgid "Profile"
+#~ msgstr "ప్రొఫైల్"
+
+#~ msgid "Recent"
+#~ msgstr "కొత్త"
+
+#~ msgid "Refresh"
+#~ msgstr "మళ్ళీ ప్రయత్నించు"
+
+#~ msgid "Restart"
+#~ msgstr "రీస్టార్ట్"
+
+#~ msgid "Search"
+#~ msgstr "శోధన"
+
+#~ msgid "Search by Speaking!"
+#~ msgstr "మాట్లాడటం ద్వారా కనుగొనండి"
+
+#~ msgid "Select language to start"
+#~ msgstr "దయచేసి ప్రారంభించడానికి భాషని ఎంచుకోండి"
+
+#~ msgid ""
+#~ "Select the document to upload for Picture ID and address verification:"
+#~ msgstr "ఫోటో ID మరియు చిరునామా ధృవీకరణ కోసం అప్‌లోడ్ చేయడానికి పత్రాన్ని ఎంచుకోండి"
+
+#~ msgid "Share On Whatsapp"
+#~ msgstr "వాట్సాప్ లో భాగస్వామ్యం చేయండి"
+
+#~ msgid "Star Bolo Indyans"
+#~ msgstr "స్టార్ బోలో ఇండియన్స్"
+
+#~ msgid "Start Recording"
+#~ msgstr "రికార్డింగ్ ప్రారంభించండి"
+
+#~ msgid "Stop Recording"
+#~ msgstr "రికార్డ్ చేయడాన్ని ఆపండి"
+
+#~ msgid "Submit"
+#~ msgstr "సమర్పించండి"
+
+#~ msgid "Users"
+#~ msgstr "వాడుకరి"
+
+#~ msgid "Verify"
+#~ msgstr "నిర్ధారించండి"
+
+#~ msgid "Video"
+#~ msgstr "వీడియో"
+
+#~ msgid "Video Bytes"
+#~ msgstr "వీడియో బైట్లు"
+
+#~ msgid "Waiting For Response"
+#~ msgstr "సమాధానం కోసం వేచి వున్నాను"
+
+#~ msgid "Yes"
+#~ msgstr "అవును"
+
+#~ msgid "Your Areas of Interest"
+#~ msgstr "మీ ఆసక్తి విషయాలు"
