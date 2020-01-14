@@ -416,6 +416,7 @@ function getCategoryWithVideos(){
     var listItems="";
     var itemCount=0;
     var language_id=1;
+    var page_size=10;
     var uri='/api/v1/get_category_with_video_bytes/';
     var res = encodeURI(uri);
     var category_with_video_list="";
@@ -425,7 +426,7 @@ function getCategoryWithVideos(){
         url:res,
         type:"GET",
 
-        data:{'language_id':language_id,'is_with_popular':'True','popular_boloindyans':'True'},
+        data:{'language_id':language_id,'is_with_popular':'True','popular_boloindyans':'True','page_size':page_size},
         success: function(response,textStatus, xhr){
             populaCreatorsItems="";
             var populaCategoriesItems="";
