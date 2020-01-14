@@ -2906,7 +2906,8 @@ def get_category_with_video_bytes(request):
     try:
         category=[]
         paginator = PageNumberPagination()
-        paginator.page_size = 3
+        page_size = request.GET.get('page_size', 3)
+        paginator.page_size = page_size
         language_id = request.GET.get('language_id', 1)
         is_discover = request.GET.get('is_discover', False)
         popular_bolo = []
