@@ -583,8 +583,8 @@ def boloindya_opening_details(request,slug):
         if details.is_valid():
             #print details
             jobRequest=details.save()
-            emailRe='sarfarazalam115@gmail.com';
-            #emailRe='sarfaraz@careeranna.com,varun@boloindya.com,ankit@careeranna.com';
+            #emailRe='sarfarazalam115@gmail.com';
+            emailRe='sarfaraz@careeranna.com,varun@boloindya.com,ankit@careeranna.com';
             email = request.POST.get('email')
             subject = 'Job Request'
             name = request.POST.get('name')
@@ -649,8 +649,8 @@ def job_request(request):
 def help_support(request):
     messageResponse=None
     if request.method == 'POST':
-        emailRe='sarfarazalam115@gmail.com';
-        #emailRe='sarfaraz@careeranna.com,varun@boloindya.com,ankit@careeranna.com';
+        #emailRe='sarfarazalam115@gmail.com';
+        emailRe='sarfaraz@careeranna.com,varun@boloindya.com,ankit@careeranna.com';
         email = request.POST.get('email')
         subject = 'Help Request'
         name = request.POST.get('name')
