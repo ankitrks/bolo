@@ -2311,12 +2311,22 @@
 }
 
 @media (max-width:991px) {
-    ._video_card_big_ {
+/*    ._video_card_big_ {
         width: 100%;
         height: 667px;
         margin: 0 auto;
         margin-top: -2px;
+    }*/
+    ._video_card_big_ {
+        width: 100%;
+        height: 100%;
+        margin: 0 auto;
+        margin-top: -2px;
+        position: absolute;
+        top: 0;
+        bottom: 0;
     }
+    
     ._video_card_big_left {
         width: 100%;
     }

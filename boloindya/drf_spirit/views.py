@@ -2908,6 +2908,7 @@ def get_category_with_video_bytes(request):
             category = userprofile.sub_category.all()
         else:
             category = Category.objects.filter(parent__isnull=False)
+
         category = paginator.paginate_queryset(category, request)
         if request.GET.get('popular_boloindyans'):
             if language_id:
@@ -2922,7 +2923,12 @@ def get_category_with_video_bytes(request):
                 except Exception as e1:
                     popular_bolo = []
         if request.GET.get('is_with_popular'):
-            all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__is_popular=True).distinct('topic_id').values_list('topic_id',flat=True)
+
+            all_seen_vb = []
+            try:
+                all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__is_popular=True).distinct('topic_id').values_list('topic_id',flat=True)
+            except Exception as e1:
+                all_seen_vb = [] 
             excluded_list =[]
             superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
             for each in superstar_post:
@@ -3022,7 +3028,11 @@ def get_popular_video_bytes(request):
         language_id = request.GET.get('language_id', 1)
         paginator_topics.page_size = 10
         
-        all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__is_popular=True).distinct('topic_id').values_list('topic_id',flat=True)
+        all_seen_vb = []
+        try:
+            all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__is_popular=True).distinct('topic_id').values_list('topic_id',flat=True)
+        except Exception as e1:
+            all_seen_vb = []       
         excluded_list =[]
         superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
         for each in superstar_post:

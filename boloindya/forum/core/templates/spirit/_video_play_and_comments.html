@@ -999,6 +999,16 @@ ul {
     var indexRowId=$("indexId").val();
 
 </script>
+<style type="text/css">
+    .videoCentered {
+    width: 100%;
+    object-fit: cover;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    height: 100%;
+}
+</style>
 
 {% trans "download" as Download %}
 {% trans "like" as like %}
@@ -1027,7 +1037,10 @@ ul {
                         </div>
                            <div id="jwBox" class="jwBox" style = "bottom : 15px;">
                                 <div class="video_close"></div>
-                                <div id="player" >Loading ...</div>
+                                <!-- <div id="player1" >Loading ...</div> -->
+                                <video id="player" class="videoCentered"></video>
+                                <!-- <video id="video"></video> -->
+
                             </div>
 
                         <span class="_video_card_"></span><img onclick="muteAndUnmutePlayer();" class="_video_card_mute _video_card_mute_left_top" id="mutedImageId"  src="/media/mute_icon.svg">

@@ -985,7 +985,9 @@
         color: #fff0;
       filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     }
-
+    .mobilePlayerHeight{
+        min-height: 720px;
+    }
 
 </style>
 
@@ -996,6 +998,8 @@ var videoFileCDN="{{topic.video_cdn}}";
 if(videoFileCDN==""){
     var videoFileCDN="{{topic.backup_url}}";
 }
+
+var videom3u8="{{topic.question_video}}";
 var videoFileBackupURL="{{topic.backup_url}}";
 var videoFileImage="{{topic.question_image}}";
 
@@ -1003,10 +1007,11 @@ $(document).ready(function() {
   loaderHide();
     
     if (window.matchMedia("(max-width: 991px)").matches) {
-        VideoPlayByURLMobile(videoFileCDN,videoFileImage);
+        VideoPlayByURLMobile(videom3u8,videoFileImage);
+        //VideoPlayByURLMobile(videoFileCDN,videoFileImage);
         /* The viewport is less than, or equal to, 700 pixels wide */
     } else {
-        VideoPlayByURL(videoFileCDN,videoFileImage);
+        video_play_using_video_js(videom3u8,videoFileBackupURL,videoFileImage);
       /* The viewport is greater than 700 pixels wide */
     }
     
@@ -1031,7 +1036,7 @@ $(document).ready(function() {
 <div class="jsx-639186511 page-with-header main-body">
 
     <div class="jsx-1270455008 container hideOnDesktop" >
-        <div style="height:calc(100% - 49px)" class="jsx-1270455008 main jsx-342698747 ">
+        <div style="height:calc(100% - 30px)" class="jsx-1270455008 main jsx-342698747 ">
             <div class="jsx-3164575034 home">
 
                 <div class="jsx-3164575034 loading">
@@ -1039,8 +1044,8 @@ $(document).ready(function() {
                 </div>
                 <div class="swiper-container swiper-container-initialized swiper-container-vertical swiper-container-ios">
                     <div class="swiper-wrapper" style="transform: translate3d(0px, 0px, 0px);">
-                        <div data-index="0" class="swiper-slide player swiper-slide-active" style="height: 618px;">
-                            <div style="position: relative; width: 100vw; height: 618px;">
+                        <div data-index="0" class="swiper-slide player swiper-slide-active" style="height: 100%;">
+                            <div style="position: relative; width: 100vw;height: 100% ">
 
                             <div class="jsx-3077367275 video-card default">
                                <div class="LoaderBalls">
@@ -1048,8 +1053,10 @@ $(document).ready(function() {
                                     <div class="LoaderBalls__item"></div>
                                     <div class="LoaderBalls__item"></div>
                                 </div>
+
                                 <div id="jwBoxPlayAndStop" style="height: 100%">
-                                    <div id="playerDetailsMobile"></div>
+                                    <!-- <div id="playerDetailsMobile"></div> -->
+                                    <video id="playerDetailsMobile"  class="videoCentered mobilePlayerHeight"></video>
                                 </div>
 
                                 <div class="jsx-3077367275 video-card-mask"></div>
@@ -1098,7 +1105,16 @@ $(document).ready(function() {
             <div class="jsx-1270455008" onclick="openMobileDownloadPopup();"  style="background-image: url(/media/footerIcon5.svg);"></div>
         </div>
     </div>
-
+<style type="text/css">
+    .videoCentered {
+    width: 100%;
+    object-fit: cover;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    height: 100%;
+}
+</style>
 
     <div class="jsx-606928072 share-layout hideonMobile" >
         <div class="share-layout-content">
@@ -1113,14 +1129,15 @@ $(document).ready(function() {
                                     <div class="LoaderBalls__item"></div>
                                 </div>
                                 <div id="jwBoxPlayAndStop" style="height: 100%">
-                                    <div id="playerDetails"></div>
+                                    <div id="playerDetailsI"></div>
+                                        <video id="playerDetails" class="videoCentered"></video>
                                 </div>
 
                                 <div class="jsx-3077367275 video-card-mask"></div>
                                 <div class="jsx-4030482358 theme videoPlayButtonDetails"></div>
                                 <span class="jsx-3077367275 event-delegate-mask event-delegate-maskDesk"></span>
 
-                                <span class="_video_card_"></span><img onclick="muteAndUnmutePlayerDet('playerDetails');" class="jsx-3077367275 mute-icon" id="mutedImageIdDe"  src="/media/mute_icon.svg">
+                                <span class="_video_card_"></span><img onclick="muteAndUnmutePlayerDet('playerDetails');" class="jsx-3077367275 mute-icon" id="mutedImageIdDeDesk"  src="/media/mute_icon.svg">
                             </div>
                         </div>
                     </div>
