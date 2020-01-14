@@ -3040,7 +3040,7 @@ def get_popular_video_bytes(request):
         try:
             all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__is_popular=True).distinct('topic_id').values_list('topic_id',flat=True)
         except:
-            all_seen_vb []
+            all_seen_vb = []
         excluded_list =[]
         superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
         for each in superstar_post:
