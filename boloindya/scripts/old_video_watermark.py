@@ -27,7 +27,7 @@ def upload_media(media_file,filename):
 
 def run():
     start_date = datetime(2020,01,13)
-    all_vb_list = Topic.objects.filter(is_popular=True,downloaded_url__isnull=True,date__gte=start_date).order_by('-id')
+    all_vb_list = Topic.objects.filter(is_popular=True,downloaded_url__isnull=True,date__lt=start_date).order_by('-id')
     for each_vb in all_vb_list:
         try:
             print "start time:  ",datetime.now()
