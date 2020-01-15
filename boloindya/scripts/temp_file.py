@@ -55,6 +55,8 @@ def identify_logo_text():
 	for iter_id in tid:
 		data = Topic.objects.filter(id = iter_id)
 		video_url = str(data[0].backup_url)
+		video_title = str(data[0].title)
+		user_name = str(data[0].user)
 
 		#video_url = "https://boloindyapp-prod.s3.amazonaws.com/public/video_bytes/Abhinav_bro_lucky_%F0%9F%98%8E%F0%9F%98%8E_1578057562228.mp4"
 		#video_url = video_url.encode('utf-8')
@@ -80,11 +82,11 @@ def identify_logo_text():
 			print(len(texts))
 			count+=1
 			for text in texts:
-				#print('\n"{}"'.format(text.description))
+				print('\n"{}"'.format(text.description))
 				if(text.description in plag_source):
 					print("yes")
 					print("............")
-					f.write(str(iter_id) + str(item.title) + str(item.user))
+					f.write(str(iter_id) + str(video_title) + str(user_name))
 
 	f.close()					
 
