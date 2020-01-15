@@ -57,6 +57,9 @@ def identify_logo_text():
 				print("yes")
 
 
-if __name__ == '__main__':
-
+def main():
 	identify_logo_text()
+
+
+def run():
+	main()
