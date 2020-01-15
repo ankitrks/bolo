@@ -55,7 +55,7 @@ def identify_logo_text():
 	for iter_id in tid:
 		data = Topic.objects.filter(id = iter_id)
 		video_url = str(data[0].backup_url)
-		video_title = str(data[0].title)
+		video_title = str(data[0].title).encode('utf-8')
 		user_name = str(data[0].user)
 
 		#video_url = "https://boloindyapp-prod.s3.amazonaws.com/public/video_bytes/Abhinav_bro_lucky_%F0%9F%98%8E%F0%9F%98%8E_1578057562228.mp4"
