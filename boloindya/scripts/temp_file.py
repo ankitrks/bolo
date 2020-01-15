@@ -82,8 +82,8 @@ def identify_logo_text():
 			print(len(texts))
 			count+=1
 			for text in texts:
-				print('\n"{}"'.format(text.description))
 				if(text.description in plag_source):
+					print('\n"{}"'.format(text.description))
 					print("yes")
 					print("............")
 					f.write(str(iter_id) + str(video_title) + str(user_name))
