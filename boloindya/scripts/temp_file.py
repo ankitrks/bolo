@@ -80,7 +80,7 @@ def identify_logo_text():
 				image = vision.types.Image(content = content)
 				response = client.text_detection(image = image)
 				texts = response.text_annotations
-				print(len(texts))
+				print("len of text", texts, len(texts))
 				count+=1
 				for text in texts:
 					modified_text = str(text.description)
