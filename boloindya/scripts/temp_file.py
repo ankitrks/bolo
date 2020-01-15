@@ -83,7 +83,7 @@ def identify_logo_text():
 				print(len(texts))
 				count+=1
 				for text in texts:
-					if(text.description in plag_source):
+					if((str(text.description).encode('utf-8')) in plag_source):
 						print('\n"{}"'.format(text.description))
 						print("yes")
 						print("............")
