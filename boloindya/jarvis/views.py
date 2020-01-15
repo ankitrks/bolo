@@ -1286,7 +1286,7 @@ def statistics_all(request):
         end_date = (datetime.datetime.today() - timedelta(days = 1)).strftime("%Y-%m-%d")
 
     top_start = (datetime.datetime.today() - timedelta(days = 30)).date()
-    top_end = (datetime.datetime.today() - timedelta(days = 10)).date()
+    top_end = (datetime.datetime.today() - timedelta(days = 1)).date()
     for each_opt in metrics_options:
         temp_list = []
         temp_list.append( each_opt[0] )
