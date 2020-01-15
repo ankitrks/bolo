@@ -84,6 +84,7 @@ def identify_logo_text():
 				count+=1
 				for text in texts:
 					modified_text = str(text.description)
+					print(modified_text)
 					if(modified_text in plag_source):
 						#print('\n"{}"'.format(modified_text))
 						print("yes")
