@@ -29,7 +29,6 @@ def get_redis_vb_seen(user_id):
     if not vb_seen_list:
         vb_seen_list = list(VBseen.objects.filter(user_id=user_id).distinct('topic_id').values_list('topic_id',flat=True))
         set_redis(key,vb_seen_list)
-    print vb_seen_list
     return vb_seen_list
 
 def update_redis_vb_seen(user_id,topic_id):
