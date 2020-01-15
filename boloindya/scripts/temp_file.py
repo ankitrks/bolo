@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from google.cloud import vision
 import io
 client = vision.ImageAnnotatorClient()
@@ -58,4 +60,3 @@ def identify_logo_text():
 if __name__ == '__main__':
 
 	identify_logo_text()
-	
