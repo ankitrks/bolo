@@ -83,8 +83,7 @@ def identify_logo_text():
 				print(len(texts))
 				count+=1
 				for text in texts:
-					print(text.description)
-					modified_text = str(text.description).encode('utf-8')
+					modified_text = str(text.description)
 					if(modified_text in plag_source):
 						#print('\n"{}"'.format(modified_text))
 						print("yes")
@@ -92,7 +91,8 @@ def identify_logo_text():
 						f.write(str(iter_id) + " " + str(video_title) + " " + str(video_url) + str(modified_text) + "\n")
 
 	except Exception as e:
-		print('' + str(e))				
+		print('' + str(e))
+		pass 				
 
 		f.close()					
 
