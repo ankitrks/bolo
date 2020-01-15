@@ -30,6 +30,7 @@ def detect_logos():
 def identify_logo_text():
 
 	video_url = "https://boloindyapp-prod.s3.amazonaws.com/public/video_bytes/Abhinav_bro_lucky_😎😎_1578899727365.mp4"
+	video_url = video_url.encode("utf-8")
 	t1 = '00:03'
 	t2 = '00:05'
 	t3 = '00:07'
