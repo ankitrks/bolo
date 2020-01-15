@@ -427,7 +427,7 @@ class VBList(generics.ListCreateAPIView):
                     all_seen_vb = []
                     if self.request.user:
                         all_seen_vb = get_redis_vb_seen(self.request.user.id)
-                        all_seen_vb = VBseen.objects.filter(user = self.request.user).distinct('topic_id').values_list('topic_id',flat=True)
+                        # all_seen_vb = VBseen.objects.filter(user = self.request.user).distinct('topic_id').values_list('topic_id',flat=True)
                     # if 'language_id' in search_term:
 
                         # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,date__gte=enddate)
