@@ -89,9 +89,9 @@ def identify_logo_text():
 						print("............")
 						f.write(str(iter_id) + " " + str(video_title) + " " + str(video_url) + "\n")
 
-		except Exception as e:
-			print('' + str(e))
-			pass				
+	except Exception as e:
+		print('' + str(e))
+		pass				
 
 		f.close()					
 
