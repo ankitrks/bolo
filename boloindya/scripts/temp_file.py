@@ -60,7 +60,7 @@ def identify_logo_text():
 			data = Topic.objects.filter(id = iter_id)
 			video_url = str(data[0].backup_url)
 			print("check1")
-			video_title = (str(data[0].title)).decode('utf-8')
+			video_title = (data[0].title).decode('utf-8')
 			print("check2")
 			#user_name = str((data[0].user).encode('utf-8'))
 
