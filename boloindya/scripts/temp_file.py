@@ -56,7 +56,7 @@ def identify_logo_text():
 		
 		count = 1
 		for iter_id in tid:
-			print("count.....", count)	
+			print("count.....", count, iter_id)	
 			data = Topic.objects.filter(id = iter_id)
 			video_url = str(data[0].backup_url)
 			video_title = (str(data[0].title)).decode('utf-8')
