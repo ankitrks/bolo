@@ -71,8 +71,6 @@ def identify_logo_text():
 			intervals.append(t1)
 			intervals.append(t2)
 			intervals.append(t3)
-			
-
 			count+=1
 
 			try:
