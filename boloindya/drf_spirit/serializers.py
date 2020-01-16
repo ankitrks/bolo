@@ -531,7 +531,7 @@ class CategoryWithVideoSerializer(ModelSerializer):
                     if each_vb.id == each_id:
                         orderd_all_seen_post.append(each_vb)
         topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
-        page_size = 10
+        page_size = 15
         paginator = Paginator(topics, page_size)
         page = 1
         topic_page = paginator.page(page)
