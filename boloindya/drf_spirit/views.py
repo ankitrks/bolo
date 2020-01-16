@@ -2915,6 +2915,7 @@ def get_category_with_video_bytes(request):
             category = userprofile.sub_category.all()
         else:
             category = Category.objects.filter(parent__isnull=False)
+
         category = paginator.paginate_queryset(category, request)
         if request.GET.get('popular_boloindyans'):
             if language_id:

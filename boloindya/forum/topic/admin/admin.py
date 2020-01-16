@@ -49,12 +49,11 @@ class TopicChangeList(ChangeList):
         # super(TopicChangeList, self).__init__(request, model, list_display, list_display_links,
         #     list_filter, date_hierarchy, search_fields, list_select_related,
         #     list_per_page, list_max_show_all, list_editable, model_admin)
-
         self.list_display = ('action_checkbox', 'id', 'title', 'name', 'duration', 'language_id', 'view_count',\
             'comments', 'is_moderated', 'is_monetized', 'is_removed', 'is_pubsub_popular_push', 'date', 'm2mcategory') #is_popular
         self.list_display_links = ['id']
-        self.list_editable = ('title', 'language_id', 'm2mcategory', 'is_pubsub_popular_push', 'is_moderated')
-
+        self.list_editable = ('title', 'language_id', 'm2mcategory', 'is_pubsub_popular_push', 'is_monetized', 'is_removed', \
+                'is_moderated')
         self.model = model
         self.opts = model._meta
         self.lookup_opts = self.opts

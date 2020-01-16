@@ -1,5 +1,27 @@
 {% extends "jarvis/layout/base.html" %}
 {% block content %}
+<style type="text/css">
+.loader {
+    border: 5px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 5px solid #3498db;
+    width: 40px;
+    height: 40px;
+    -webkit-animation: spin 2s linear infinite;
+    animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
 <section class="content">
 <div style="text-align:center;">
     <div class="mp4_player">
@@ -18,8 +40,14 @@
         <p class="lead" id="m3u8url">{{ my_video.transcoded_file_url}}</p>
         <a href="#" data-clipboard-target="#m3u8url" class="copy-text">Copy URL</a>
     </div>
+
+    <div class="img-preview" style="display: block;margin:20px 0px 10px 0 ">
+        <button id="rleft">Rotate</button>
+        <div id="imgPreview" style="margin-top: 10px;"><img src="{{ my_video.thumbnail_url}}" class="pic-view" width="300" height="300"/></div>
+    </div>
+
     <div>
-        <form id="edit_upload">
+        <form id="edit_upload" enctype="multipart/form-data">
             {% csrf_token %}
             <input type="hidden" name="video_id" value="{{my_video.id}}">
             {{ video_form.as_p }}
@@ -33,8 +61,12 @@
                     <option value="{{posted_userprofile.user_id}}" selected>{{posted_userprofile.name}} --- {{posted_userprofile.vb_count}}</option>
                 </select>
             </p>
+
+            <input type="text" name="rotation" id="rotation" value="0"/>
             <button type="button" class="btn btn-primary save_entry" video_id="{{my_video.id}}"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Save</button>
+            
         </form>
+        <div class="loader" style="display: none;"></div>
 
     </div>
 </div>
@@ -42,9 +74,11 @@
 {% endblock content %}  
 {% block center_js %}
 <script>
+
     var my_option = null;
     var clipboard = new Clipboard('.copy-text');
     $('.save_entry').on('click',function(){
+        $('.loader').show();
         var data = new FormData($('#edit_upload').get(0));
         console.log(data);
         $.ajax({
@@ -57,14 +91,18 @@
             contentType: false,
             success: function(data) {
                 if (data.message == 'fail') {
+                    $('.loader').hide();
                     alert(data.reason)
                 } else if (data.message == 'success') {
                     var url = '/jarvis/boloindya_upload_details/?id=' + data.video_id
                     // do your redirect
-                    window.location = url
+                    $('.loader').hide();
+                    location.reload();
+                    //window.location = url
                 }
             },
             error: function(data) {
+                $('.loader').hide();
                 console.log(data)
             },
 
@@ -173,6 +211,22 @@
         return;
     }
     });
+
+$(function() {
+    var rotation = 0;
+
+    $("#rleft").click(function() {
+        rotation = (rotation + 90) % 360;
+        $(".pic-view").css({'transform': 'rotate('+rotation+'deg)'});
+        if(rotation != 0){
+            $(".pic-view").css({'width': '300px', 'height': '300px'});
+        }else{
+            $(".pic-view").css({'width': '300px', 'height': '300px'});
+        }
+        $('#rotation').val(rotation);
+    });
+});
+
 
 </script>
 

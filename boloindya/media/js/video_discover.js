@@ -106,6 +106,53 @@ $(document).ready(function () {
 
 var sideBarDetails="";
 var sideBarCommentDetails="";
+var muteStatus=false;
+var isLoading = false;
+var hideErrorMsg = true;
+
+var retryCount=0;
+function video_play_using_video_js(url,backup_url,image) {debugger;
+    
+    var video = document.getElementById('player');
+
+      if(Hls.isSupported()) {
+        var hls = new Hls();
+        hls.loadSource(url);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED,function() {
+          loaderHide();
+          var playPromise = video.play();
+
+          if (playPromise !== undefined) {
+            playPromise.then(_ => {
+              // Automatic playback started!
+              // Show playing UI.
+              console.log('Video Eror');
+            })
+            .catch(error => {
+                console.log('Video Eror1');
+              // Auto-play was prevented
+              // Show paused UI.
+            });
+          }
+
+      });
+     }
+
+
+     // hls.js is not supported on platforms that do not have Media Source Extensions (MSE) enabled.
+     // When the browser has built-in HLS support (check using `canPlayType`), we can provide an HLS manifest (i.e. .m3u8 URL) directly to the video element through the `src` property.
+     // This is using the built-in support of the plain video element, without using hls.js.
+     // Note: it would be more normal to wait on the 'canplay' event below however on Safari (where you are most likely to find built-in HLS support) the video.src URL must be on the user-driven
+     // white-list before a 'canplay' event will be emitted; the last video event that can be reliably listened-for when the URL is not on the white-list is 'loadedmetadata'.
+      else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = backup_url;
+        video.addEventListener('loadedmetadata',function() {
+          video.play();
+          loaderHide();
+        });
+      }
+}
 
 function openVideoInPopup(topicId){
   loaderShow();
@@ -119,46 +166,50 @@ function openVideoInPopup(topicId){
   var newSrc='/media/mute_icon.svg';
   $('#mutedImageId').attr('src', newSrc);
 
-      var preBufferDone = false;
-      
-        playerInstance.setup({
-          file: videoFileName,
-          controls: false,
-          image:videoFileImage,
-          autostart:'true',
-          mute:'false'
-      });
-      playerInstance.on('play', function() {
-            loaderHide();
-            preBufferDone = true;
+    var preBufferDone = false;
+    var preBufferDone = false;
+    var video_backup="";
+    var video_backup=singleItemData.question_video;
+    //var video_backup=singleItemData.question_video;
+    video_play_using_video_js(video_backup,video_backup,videoFileImage);      
+    //     playerInstance.setup({
+    //       file: videoFileName,
+    //       controls: false,
+    //       image:videoFileImage,
+    //       autostart:'true',
+    //       mute:'false'
+    //   });
+    //   playerInstance.on('play', function() {
+    //         loaderHide();
+    //         preBufferDone = true;
           
-      }); 
+    //   }); 
 
-    playerInstance.on('buffer', function() {
+    // playerInstance.on('buffer', function() {
 
-      var time = 1;
+    //   var time = 1;
 
-    });   
-
-
-    playerInstance.on('error', function(event) {
-        loaderHide();
-        var erroCode=event.code;
-        playerInstance.setup({
-            file: singleItemData.backup_url,
-            controls: false,
-            image:videoFileImage,
-            autostart:'true',
-            mute:'false'
-        });
+    // });   
 
 
-    });
+    // playerInstance.on('error', function(event) {
+    //     loaderHide();
+    //     var erroCode=event.code;
+    //     playerInstance.setup({
+    //         file: singleItemData.backup_url,
+    //         controls: false,
+    //         image:videoFileImage,
+    //         autostart:'true',
+    //         mute:'false'
+    //     });
 
-    playerInstance.on('complete', function() {
-        jwplayer('player').setMute(true);
 
-    });
+    // });
+
+    // playerInstance.on('complete', function() {
+    //     jwplayer('player').setMute(true);
+
+    // });
 
 
     var shareURL=site_base_url+singleItemData.user.username+'/'+singleItemData.id+'';
@@ -365,6 +416,7 @@ function getCategoryWithVideos(){
     var listItems="";
     var itemCount=0;
     var language_id=1;
+    var page_size=10;
     var uri='/api/v1/get_category_with_video_bytes/';
     var res = encodeURI(uri);
     var category_with_video_list="";
@@ -374,7 +426,7 @@ function getCategoryWithVideos(){
         url:res,
         type:"GET",
 
-        data:{'language_id':language_id,'is_with_popular':'True','popular_boloindyans':'True'},
+        data:{'language_id':language_id,'is_with_popular':'True','popular_boloindyans':'True','page_size':page_size},
         success: function(response,textStatus, xhr){
             populaCreatorsItems="";
             var populaCategoriesItems="";
