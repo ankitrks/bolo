@@ -54,6 +54,7 @@ def identify_logo_text():
 
 		plag_source = ["TikTok", "Helo", "Vigo", "Tik", "Tok", "Vivo", "ShareChat", "Nojoto", "Trell", "ROPOSO", "Likee"]
 		
+		count = 1	
 		for iter_id in tid:
 			data = Topic.objects.filter(id = iter_id)
 			video_url = str(data[0].backup_url)
@@ -69,31 +70,36 @@ def identify_logo_text():
 			intervals.append(t1)
 			intervals.append(t2)
 			intervals.append(t3)
+			print("count.....", count)
 
-			count = 1
-			for interval in intervals:
-				ff = FFmpeg(inputs = {video_url: None}, outputs = {"output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
-				#print(ff.cmd)
-				ff.run()
-				file_name = PROJECT_PATH + '/scripts/output{}.png'.format(count)
-				with io.open(file_name, 'rb') as image_file:
-					content = image_file.read()
-				image = vision.types.Image(content = content)
-				response = client.text_detection(image = image)
-				texts = response.text_annotations
-				print("len of text", len(texts))
-				count+=1
-				for text in texts:
-					modified_text = (text.description)
-					if(modified_text in plag_source):
-						print(modified_text)
-						#print('\n"{}"'.format(modified_text))
-						print("yes")
-						print("............")
-						f.write(str(iter_id) + " " + str(video_title) + " " + str(video_url) + (modified_text) + "\n")
+			count+=1
 
-	except:
-		pass 				
+			try:
+				for interval in intervals:
+					ff = FFmpeg(inputs = {video_url: None}, outputs = {"output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
+					#print(ff.cmd)
+					ff.run()
+					file_name = PROJECT_PATH + '/scripts/output{}.png'.format(count)
+					with io.open(file_name, 'rb') as image_file:
+						content = image_file.read()
+					image = vision.types.Image(content = content)
+					response = client.text_detection(image = image)
+					texts = response.text_annotations
+					print("len of text", len(texts))
+				
+					for text in texts:
+						modified_text = (text.description)
+						if(modified_text in plag_source):
+							print(modified_text)
+							#print('\n"{}"'.format(modified_text))
+							print("yes")
+							print("............")
+							f.write(str(iter_id) + " " + str(video_title) + " " + str(video_url) + (modified_text) + "\n")
+			except:
+				pass				
+
+	except Exception as e:
+		print('' + str(e))  				
 
 	f.close()					
 
