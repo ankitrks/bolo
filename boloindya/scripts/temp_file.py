@@ -94,7 +94,7 @@ def identify_logo_text():
 
 	except Exception as e:
 		print('' + str(e))
-		pass 				
+		continue 				
 
 	f.close()					
 
