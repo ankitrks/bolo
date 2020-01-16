@@ -54,11 +54,12 @@ def identify_logo_text():
 
 		plag_source = ["TikTok", "Helo", "Vigo", "Tik", "Tok", "Vivo", "ShareChat", "Nojoto", "Trell", "ROPOSO", "Likee"]
 		
-		count = 1	
+		count = 1
 		for iter_id in tid:
+			print("count.....", count)	
 			data = Topic.objects.filter(id = iter_id)
 			video_url = str(data[0].backup_url)
-			video_title = str((data[0].title)).decode('utf-8')
+			video_title = (str(data[0].title)).decode('utf-8')
 			#user_name = str((data[0].user).encode('utf-8'))
 
 			#video_url = "https://boloindyapp-prod.s3.amazonaws.com/public/video_bytes/Abhinav_bro_lucky_%F0%9F%98%8E%F0%9F%98%8E_1578057562228.mp4"
@@ -70,7 +71,7 @@ def identify_logo_text():
 			intervals.append(t1)
 			intervals.append(t2)
 			intervals.append(t3)
-			print("count.....", count)
+			
 
 			count+=1
 
