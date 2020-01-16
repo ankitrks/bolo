@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('forum_topic', '0075_auto_20200107_1139'),
+        ('forum_topic', '0074_tonguetwister_total_views'),
     ]
 
     operations = [
