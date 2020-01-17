@@ -53,7 +53,7 @@ def identify_logo_text():
 	try:
 		long_ago = today + timedelta(days = -6)
 		topic_objects = Topic.objects.exclude(is_removed = True).filter(is_vb = True, date__gte = long_ago)
-			try:
+		try:
 				
 				for item in topic_objects:
 					uri = item.backup_url
@@ -98,8 +98,8 @@ def identify_logo_text():
 								f.write(str(iter_id) + " " + str(video_title) + " " + str(video_url) + (modified_text) + "\n")	
 
 
-			except:
-				pass				
+		except:
+			pass				
 
 	except Exception as e:
 		print('' + str(e))  				
