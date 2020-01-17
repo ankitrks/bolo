@@ -3015,6 +3015,8 @@ def get_category_video_bytes(request):
                             orderd_all_seen_post.append(each_vb)
             topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
         paginator = PageNumberPagination()
+        self.request.POST._mutable = True
+        self.request.POST.update({'page':request.POST.get('page', 2)})
         topics = paginator.paginate_queryset(topics, request)
         # paginator = Paginator(topics, page_size)
         # page = request.POST.get('page', 2)
