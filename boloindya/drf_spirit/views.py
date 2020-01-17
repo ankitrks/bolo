@@ -3014,15 +3014,15 @@ def get_category_video_bytes(request):
                         if each_vb.id == each_id:
                             orderd_all_seen_post.append(each_vb)
             topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
-        paginator = PageNumberPagination()
-        self.request.POST._mutable = True
-        self.request.POST.update({'page':request.POST.get('page', 2)})
-        topics = paginator.paginate_queryset(topics, request)
-        # paginator = Paginator(topics, page_size)
-        # page = request.POST.get('page', 2)
+        # paginator = PageNumberPagination()
+        # self.request.POST._mutable = True
+        # self.request.POST.update({'page':request.POST.get('page', 2)})
+        # topics = paginator.paginate_queryset(topics, request)
+        paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
+        page = request.POST.get('page', 2)
 
-        # topic_page = paginator.page(page)
-        return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
+        topic_page = paginator.page(page)
+        return JsonResponse({'topics': CategoryVideoByteSerializer(topic_page, many=True).data}, status=status.HTTP_200_OK)
      except Exception as e:
          return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
