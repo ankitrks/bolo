@@ -78,10 +78,11 @@ def identify_logo_text():
 		global_counter = 1
 		for item in topic_objects:
 			print("counter....", global_counter)
-			uri = item.backup_url
-			ur_str = uri.encode('utf-8')
+			url = item.backup_url
+			video_title = item.title
+			url_str = url.encode('utf-8')
 			test = urllib.FancyURLopener()
-			test.retrieve(ur_str, 'local_video.mp4')
+			test.retrieve(url_str, 'local_video.mp4')
 			duration = item.media_duration 
 			time = duration.split(":")
 			minute = int(time[0]) * 60
@@ -119,7 +120,7 @@ def identify_logo_text():
 							print(modified_text)
 							print("yes")
 							print("..........")
-							f.write(str(iter_id) + " " + str(video_title) + " " + str(video_url) + (modified_text) + "\n")	
+							f.write(str(video_title) + " " + str(url) + " " + (modified_text) + "\n")	
 
 
 						
