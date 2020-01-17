@@ -110,7 +110,8 @@ def identify_logo_text():
 				with io.open(file_name, 'rb') as image_file:
 					content = image_file.read()
 					image = vision.types.Image(content = content)
-					response = client.text_annotations
+					response = client.text_detection(image = image)
+					tex = response.text_annotations
 					for text in texts:
 						modified_text = text.description
 						if(modified_text in plag_source):
