@@ -119,7 +119,7 @@ def identify_logo_util():
 
 	count = 1
 	for interval in intervals:
-		ff = FFmpeg(inputs = {video_url: None}, outputs = {"output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
+		ff = FFmpeg(inputs = {video_url_unicode: None}, outputs = {"output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
 		ff.run()
 		file_name = PROJECT_PATH + '/scripts/output{}.png'.format(count)
 		with io.open(file_name, 'rb') as image_file:
