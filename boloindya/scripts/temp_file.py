@@ -53,9 +53,12 @@ def identify_logo_text():
 	try:
 		long_ago = today + timedelta(days = -6)
 		topic_objects = Topic.objects.exclude(is_removed = True).filter(is_vb = True, date__gte = long_ago)
+		print(len(topic_objects))
+		global_counter = 1
 		try:
 				
 				for item in topic_objects:
+					print("counter....", global_counter)
 					uri = item.backup_url
 					ur_str = uri.encode('utf-8')
 					test = urllib.FancyURLopener()
@@ -80,6 +83,7 @@ def identify_logo_text():
 					intervals.append(t3)
 					intervals.append(t4)
 					count = 1
+					global_counter+=1
 
 					for interval in intervals:
 						ff = FFmpeg(inputs = {'local_video.mp4': None}, outputs = {"output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
