@@ -68,6 +68,7 @@ def detect_logos():
 def identify_logo_text():
 
 	f_name = 'plag_vid_details.txt'
+	plag_source = ["TikTok", "Helo", "Vigo", "Tik", "Tok", "Vivo", "ShareChat", "Nojoto", "Trell", "ROPOSO", "Likee"]
 	f = io.open(f_name, "w", encoding="UTF-8")
 	today = datetime.today()
 	try:
