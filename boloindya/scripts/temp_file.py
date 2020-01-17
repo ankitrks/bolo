@@ -62,7 +62,7 @@ def identify_logo_text():
 			test = urllib.FancyURLopener()
 			test.retrieve(ur_str, 'local_video.mp4')
 			duration = item.duration 
-			time = item.split(":")
+			time = duration.split(":")
 			minute = int(time[0]) * 60
 			second = int(time[1])
 			total_second = minute + second
