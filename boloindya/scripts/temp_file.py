@@ -28,6 +28,26 @@ import os
 
 PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+def timetostring(t):
+	minute = 0
+	seconds = 0
+	if(t<10):
+		minute = 0
+		seconds = t 
+		return '00'+':'+'0'+ str(seconds)
+	elif(t>=60):
+		minute = '01'
+		seconds = t%60
+		if(seconds < 10):
+			seconds = '0' + str(seconds)
+		else:
+			seconds = str(seconds)
+		return minute + ':' + seconds	
+	else:
+		return '00:' + str(t)			
+
+
+
 def detect_logos():
 
 	filename = 'tik_tok.png'
