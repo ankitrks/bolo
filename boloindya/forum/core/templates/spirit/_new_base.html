@@ -52,6 +52,7 @@
     {% if key == LANGUAGE_CODE %}
         <script type="text/javascript">
             var current_language_id='{{value}}';
+            var current_language_code='{{LANGUAGE_CODE}}';
         </script>
         {% endif %}
     {% endfor %}

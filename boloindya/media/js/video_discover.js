@@ -222,7 +222,7 @@ function openVideoInPopup(topicId){
         var bigCommentLikeDet='<strong>'+singleItemData.likes_count+' likes · '+singleItemData.comment_count+' comments</strong>';
         $("#sideBarId").html(sideBarDetails);
         $("._video_card_big_meta_info_count").html(bigCommentLikeDet);
-
+        $(".video-meta-title").html(singleItemData.title);
         var userprofileName=singleItemData.user.userprofile.name;
         var userHandleName=singleItemData.user.username;
         var videoTitle=singleItemData.title;
@@ -230,6 +230,7 @@ function openVideoInPopup(topicId){
         if(profilePics==''){
            profilePics= '/media/demo_user.png';
         }
+        
 
         var likeStatus="";
 
@@ -495,12 +496,18 @@ function getCreators(popularCreators){
 
 
 function popularCategoryHeading(itemCategory){
-    var popular_cat_heading_template='<div class="_explore_feed_header"><div class="jsx-2836840237 _card_header_"><a class="jsx-2836840237" href="/tag/'+itemCategory.slug+'/"><div class="jsx-2836840237 _card_header_cover" style="background-image: url('+itemCategory.category_image+');"></div></a><a title="#'+itemCategory.slug+'('+itemCategory.total_view+' views)" class="jsx-2836840237 _card_header_link" href="/tag/'+itemCategory.slug+'/"><div class="jsx-2836840237 _card_header_content"><h3 class="jsx-2836840237 _card_header_title">'+itemCategory.title+'</h3><strong class="jsx-2836840237 _card_header_subTitle">'+itemCategory.total_view+' views</strong><p class="jsx-2836840237 _card_header_desc">...</p></div></a></div></div>';
+
+    var popular_cat_heading_template='<div class="_explore_feed_header"><div class="jsx-2836840237 _card_header_"><a class="jsx-2836840237" href="/tag/'+itemCategory.slug+'/"><div class="jsx-2836840237 _card_header_cover" style="background-image: url('+itemCategory.category_image+');"></div></a><a title="#'+itemCategory.slug+'('+itemCategory.total_view+' views)" class="jsx-2836840237 _card_header_link" href="/tag/'+itemCategory.slug+'/"><div class="jsx-2836840237 _card_header_content"><h3 class="jsx-2836840237 _card_header_title">'+itemCategory.title+'</h3><strong class="jsx-2836840237 _card_header_subTitle">'+itemCategory.total_view+' views</strong><p class="jsx-2836840237 _card_header_desc"></p></div></a></div></div>';
     return popular_cat_heading_template;
 }
 
 function popularCategoryItem(itemVideoByte){
-    var category_item_template='<div class="jsx-1410658769 _explore_feed_card_item" onClick="openVideoInPopup('+itemVideoByte.id+');" ><div class="jsx-1410658769 _ratio_"><div class="jsx-1410658769" style="padding-top: 148.148%;"><div class="jsx-1410658769 _ratio_wrapper"><a href="javascript:void(0)"><div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+itemVideoByte.question_image+');"><div class="jsx-3077367275 video-card default"><div class="jsx-3077367275 video-card-mask"><div class="jsx-1633345700 card-footer normal no-avatar"><div class="jsx-1633345700"><img src="" class="jsx-1633345700 like-icon"><span class="jsx-1633345700">'+itemVideoByte.likes_count+'</span></div></div></div></div></div></a></div></div></div></div>';
+    var content_title="";
+    var videoTitle="";
+        videoTitle=itemVideoByte.title;
+        content_title = videoTitle.substr(0, 40) + " ..."
+
+    var category_item_template='<div class="jsx-1410658769 _explore_feed_card_item" onClick="openVideoInPopup('+itemVideoByte.id+');" ><div class="jsx-1410658769 _ratio_"><div class="jsx-1410658769" style="padding-top: 148.148%;"><div class="jsx-1410658769 _ratio_wrapper"><a href="javascript:void(0)"><div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+itemVideoByte.question_image+');"><div class="jsx-3077367275 video-card default"><div class="jsx-3077367275 video-card-mask"><div class="jsx-1633345700 card-footer normal no-avatar"><div class="jsx-1633345700"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+itemVideoByte.view_count+'</span></p><span class="_video_card_footer_likes1"><img src="/media/download.svg" alt="likes"> '+itemVideoByte.likes_count+'</span></div></div></div></div></div></a></div></div></div></div>';
     return category_item_template;
 }
 

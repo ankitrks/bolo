@@ -1,4 +1,4 @@
-  
+
         html:lang(vi) body {
             font-family: auto;
         }
@@ -2664,7 +2664,9 @@
     width: 264px;
     bottom: 10px;
     overflow-y: auto;
-    overflow-x: hidden
+    overflow-x: hidden;
+    position: sticky;
+    top: 70px;
 }
 
 ._base_layout_aside_wrapper:not(:last-child) {

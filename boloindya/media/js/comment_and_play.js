@@ -724,7 +724,8 @@ var countries=[];
 
     });
 
-function removeDataFromURL(){
+function removeDataFromURL(){debugger;
+  video.src="";
   return true;
 }
 

@@ -62,7 +62,7 @@
                 </select>
             </p>
 
-            <input type="text" name="rotation" id="rotation" value="0"/>
+            <input type="hidden" name="rotation" id="rotation" value="0"/>
             <button type="button" class="btn btn-primary save_entry" video_id="{{my_video.id}}"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Save</button>
             
         </form>
@@ -226,6 +226,8 @@ $(function() {
         $('#rotation').val(rotation);
     });
 });
+
+
 
 
 </script>

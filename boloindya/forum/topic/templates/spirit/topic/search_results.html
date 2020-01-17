@@ -308,7 +308,7 @@
     }
 
     .card-footer.no-avatar.jsx-1543915374 {
-        padding-top: 67px;
+        padding-top: 24px;
     }
     .card-footer.jsx-1543915374 .like-icon.jsx-1543915374 {
         margin-right: 7px;
@@ -328,7 +328,8 @@
         bottom: 0px;
         height: 100px;
         box-sizing: border-box;
-        background: linear-gradient(rgba(22, 24, 35, 0) 2.92%, rgba(22, 24, 35, 0.5) 98.99%);
+        background: #0003;
+/*        background: linear-gradient(rgba(22, 24, 35, 0) 2.92%, rgba(22, 24, 35, 0.5) 98.99%);*/
         padding: 7px 13px 17px;
     }
     .video-card.jsx-3077367275 {
@@ -566,7 +567,90 @@
 }
 
 
+
 /*===========*/
+
+    /*===========*/
+
+.video_card_title{
+    position: inherit;
+    top: 12px;
+    font-size: 12px;
+    padding: 2px;
+    color: aliceblue;
+}
+._image_card_footer_wraaper{
+    background: #0003;
+}
+.card-footer.jsx-1633345700 {
+    background: #0003;
+    height: 80px;
+    padding: 7px 3px 0px;
+ 
+}
+.card-footer.small.jsx-1633345700 {
+    padding-top: 5px;
+}
+
+._video_card_footer_likes1{
+    position: absolute;
+    right: 16px;
+    top: -220px;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+}
+._video_card_footer_likes{
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    height: 26px;
+    padding: 4px;
+    background: #000000d9;
+    width: 100%;
+}
+._video_card_footer_ {
+    height: 80px;
+}
+
+._video_card_footer_likes12::before { 
+
+    content: '';
+    display: inline-block;
+    height: 18px;
+    margin: 0 6px -3px 0;
+    min-width: 18px;
+    position: relative;
+    top: -2px;
+    width: 18px;
+    background-image: url(/media/iJGOBKN9vqK.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: -42px -382px;
+    color: red;
+    font-weight: bold;
+}
+._video_card_footer_likes::before { 
+
+    content: '';
+    display: inline-block;
+    height: 18px;
+    margin: 0 6px -3px 0;
+    min-width: 18px;
+    position: relative;
+    top: -1px;
+    width: 18px;
+    background-image: url(/media/iJGOBKN9vqK.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: -42px -382px;
+    color: red;
+    font-weight: bold;
+}
+.active_tab{
+    background: #0003;
+}
 
 </style>
 
@@ -587,7 +671,7 @@
                                                     <div class="_4xj-" aria-hidden="true">All</div>
                                                 </div><span class="_13xf"></span></a>
                                         </li> -->
-                                        <li data-edge="keywords_blended_posts" class=" _5vwz _45hc" role="presentation">
+                                        <li data-edge="keywords_blended_posts" class=" _5vwz _45hc tabActiveStatus" role="presentation">
                                             <a onclick="getVideoSearchResult();" aria-haspopup="false" href="javascript:void(0)" role="tab" tabindex="-1" class="_3m1v _468f" aria-selected="false">
                                                 <div class="_4jq5">
                                                     <div class="_4xjz">Videos</div>
@@ -595,21 +679,21 @@
                                                 </div><span class="_13xf"></span></a>
                                         </li>
 
-                                        <li data-edge="keywords_blended_posts" class=" _5vwz _45hc" role="presentation">
+                                        <li data-edge="keywords_blended_posts" class=" _5vwz _45hc tabActiveStatus" role="presentation">
                                             <a onclick="getCategorySearchWithVideos();" aria-haspopup="false" href="javascript:void(0)" role="tab" tabindex="-1" class="_3m1v _468f" aria-selected="false">
                                                 <div class="_4jq5">
                                                     <div class="_4xjz">Categories</div>
                                                     <div class="_4xj-" aria-hidden="true">Categories</div>
                                                 </div><span class="_13xf"></span></a>
                                         </li>
-                                        <li data-edge="keywords_users" class=" _5vwz _45hc" role="presentation">
+                                        <li data-edge="keywords_users" class=" _5vwz _45hc tabActiveStatus" role="presentation">
                                             <a onclick="getCreatorsResult();" aria-haspopup="false" href="javascript:void(0)" role="tab" tabindex="-1" class="_3m1v _468f" aria-selected="false">
                                                 <div class="_4jq5">
                                                     <div class="_4xjz">Creators</div>
                                                     <div class="_4xj-" aria-hidden="true">Creators</div>
                                                 </div><span class="_13xf"></span></a>
                                         </li>
-                                        <li data-edge="keywords_blended_photos" class=" _5vwz _45hc" role="presentation">
+                                        <li data-edge="keywords_blended_photos" class=" _5vwz _45hc tabActiveStatus" role="presentation">
                                             <a aria-haspopup="false" onclick="getSearchHashtagSuggestion();" href="javascript:void(0)" role="tab" tabindex="-1" class="_3m1v _468f" aria-selected="false">
                                                 <div class="_4jq5">
                                                     <div class="_4xjz">Hashtags</div>
@@ -772,10 +856,10 @@ function getCreatorsResult(){
             var itemCount=0;
             userItemList.forEach(function(itemCreator) {itemCount++;
                 userVideoItems =creatorTemplate(itemCreator);
-                $("#creatorItemListId").append(userVideoItems);
+                
               
             });
-            
+            $("#creatorItemListId").html(userVideoItems);
             loaderBoloHideDynamic('_scroll_load_more_loading_user_right');
             //playListData=videoItemList;
 
@@ -787,10 +871,13 @@ function getCreatorsResult(){
 
 var topicList=[];
 function getCategorySearchWithVideos(){
-    loaderBoloShowDynamic('_scroll_load_more_loading_right');
-    loaderBoloShowDynamic('_scroll_load_more_loading_left');
+
     $("#userVideosListId").empty("");
     $("#creatorItemListId").empty("");    
+    $("#catWithVideoIdRight").empty("");    
+    $("#catWithVideoId").empty(""); 
+    loaderBoloShowDynamic('_scroll_load_more_loading_right');
+    loaderBoloShowDynamic('_scroll_load_more_loading_left');   
         var playListData=[]; 
     var platlistItems;
 
@@ -874,7 +961,9 @@ function getSearchMentionSuggestion(){
     loaderBoloShowDynamic('_scroll_load_more_loading_right');
     loaderBoloShowDynamic('_scroll_load_more_loading_left');
     $("#userVideosListId").empty("");
-    $("#creatorItemListId").empty("");    
+    $("#creatorItemListId").empty("");  
+    $("#catWithVideoIdRight").empty("");    
+    $("#catWithVideoId").empty("");   
     var playListData=[]; 
     var platlistItems;
     var listItems="";
@@ -901,16 +990,21 @@ function getSearchMentionSuggestion(){
                 populvideoItems="";
                 populvideoItems+='<div class="_explore_feed_card">';
                 mention_list='<div class="_explore_feed_item">'+popularSearchMentions+''+populvideoItems+'</div>';
-
+                var rightSideListData="";
+                var leftSideListData="";
                 if(itemCount % 2 == 0) {
                     loaderBoloHideDynamic('_scroll_load_more_loading_right');
-                    $("#catWithVideoIdRight").append(mention_list);
+                    rightSideListData +=mention_list;
+                    
                 }else{
                      loaderBoloHideDynamic('_scroll_load_more_loading_left');
-                    $("#catWithVideoId").append(mention_list);
+                    leftSideListData +=mention_list;
                 }
 
             });
+
+            $("#catWithVideoId").html(leftSideListData);
+            $("#catWithVideoIdRight").html(rightSideListData);
 
         },
         error: function(jqXHR, ajaxOptions, thrownError) {
@@ -930,12 +1024,14 @@ function popularSearchMentionHeading(mentionItem){
     return mention_heading_template;
 }
 
-
+var hashTagClickStatus=0;
 function getSearchHashtagSuggestion(){
     loaderBoloShowDynamic('_scroll_load_more_loading_right');
     loaderBoloShowDynamic('_scroll_load_more_loading_left');
     $("#userVideosListId").empty("");
-    $("#creatorItemListId").empty("");    
+    $("#creatorItemListId").empty("");   
+    $("#catWithVideoIdRight").empty("");    
+    $("#catWithVideoId").empty("");  
     var playListData=[]; 
     var platlistItems;
     var listItems="";
@@ -951,6 +1047,7 @@ function getSearchHashtagSuggestion(){
         type:"GET",
         data:{'language_id':language_id,'term':search_term},
         success: function(response,textStatus, xhr){
+            hashTagClickStatus=1;
             populaCreatorsItems="";
             var popularSearchMentions="";
             var populvideoItems="";
@@ -1022,7 +1119,9 @@ $(document).ready(function(){
 });
 
 function getVideoSearchResult(limit,offset){
-
+    $("#creatorItemListId").empty("");    
+    $("#catWithVideoIdRight").empty("");    
+    $("#catWithVideoId").empty(""); 
     loaderBoloShowDynamic('_scroll_load_more_loading_user_videos');
     //var user_id= $("#currentUserId").val();
      
@@ -1046,9 +1145,8 @@ function getVideoSearchResult(limit,offset){
             var itemCount=-1;
             videoItemList.forEach(function(itemCreator) {itemCount++;
                 userVideoItems +=getVideoItem(itemCreator,itemCount);
-                $("#userVideosListId").append(userVideoItems);
-      
             });
+            $("#userVideosListId").html(userVideoItems);
             loaderBoloHideDynamic('_scroll_load_more_loading_user_videos');
             playListData=videoItemList;
             var nextPageData=response.next;
@@ -1126,7 +1224,10 @@ function loadMoreData(NextPageUrl){
 
 
 function getVideoItem(videoItem,itemCount){
-
+          var content_title="";
+          var videoTitle="";
+              videoTitle=videoItem.title;
+              content_title = videoTitle.substr(0, 40) + " ..."
     var userVideoItem = '<div class="jsx-1410658769 video-feed-item">\
             <div class="jsx-1410658769 _ratio_">\
                 <div class="jsx-1410658769" style="padding-top: 148.438%;">\
@@ -1136,7 +1237,7 @@ function getVideoItem(videoItem,itemCount){
                                 <div class="jsx-3077367275 video-card default">\
                                     <div class="jsx-3077367275 video-card-mask">\
                                         <div class="jsx-1543915374 card-footer normal no-avatar">\
-                                            <div class="jsx-1543915374"><img src="/media/download.svg" class="jsx-1543915374 like-icon"><span class="jsx-1543915374">'+videoItem.likes_count+'</span></div>\
+                                            <div class="jsx-1543915374"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+videoItem.view_count+'</span></p><span class="_video_card_footer_likes1"><img src="/media/download.svg" alt="likes"> '+videoItem.likes_count+'</span></div>\
                                         </div>\
                                     </div>\
                                 </div>\
@@ -1178,7 +1279,7 @@ function getPopularCategory(popularCategory){
     var hideErrorMsg = true;
 
     var retryCount=0;
-function video_play_using_video_js(url,backup_url,image) {debugger;
+function video_play_using_video_js(url,backup_url,image) {
     
     var video = document.getElementById('player');
 
@@ -1288,7 +1389,7 @@ function openVideoInPopup(file,image,indexId){
     var bigCommentLikeDet='<strong>'+singleItemData.likes_count+' '+likeTrans+' · '+singleItemData.comment_count+' '+commentsTrans+'</strong>';
     $("#sideBarId").html(sideBarDetails);
     $("._video_card_big_meta_info_count").html(bigCommentLikeDet);
-    
+    $(".video-meta-title").html(singleItemData.title);
     var userprofileName=singleItemData.user.userprofile.name;
     var userHandleName=singleItemData.user.username;
     var videoTitle=singleItemData.title;
@@ -1508,7 +1609,17 @@ jQuery(document).ready(function(){
     followLikeList();
 });
 
-
+$(".tabActiveStatus").click(function(e) {
+    var activeStatus=$(".tabActiveStatus").hasClass('active_tab');
+    if(activeStatus){
+        $(".tabActiveStatus").removeClass('active_tab');
+    }
+    if (document.querySelector('._468f a.active') !== null) {
+    document.querySelector('._468f a.active').classList.remove('active');
+    }
+    $(this).addClass('active_tab');
+    
+});
 
 </script>
 

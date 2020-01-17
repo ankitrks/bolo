@@ -18,9 +18,8 @@ jQuery(document).ready(function(){
 
 function getElementsByPage(currentPage){
     loaderBoloShowDynamicDe('_scroll_load_more_loading_user_videos');
-        var playListData=[]; 
+    var playListData=[]; 
     var platlistItems;
-
     var listItems="";
     var itemCount=0;
 
@@ -38,8 +37,11 @@ function getElementsByPage(currentPage){
                 isPlaying='is-playing';
                 isPlayIconDis="block";
             }
-
-            listItems += '<li><a href="/'+itemVideo.user.username+'/'+itemVideo.id+'" ><div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+itemVideo.question_image+');"><div class="jsx-3077367275 video-card default"><div class="jsx-3077367275 video-card-mask"><div class="jsx-1633345700 card-footer small"><div class="jsx-2177493926 jsx-3978165476 avatar round footer-avatar" style="background-image: url('+itemVideo.question_image+'); width: 38px; height: 38px; flex: 0 0 38px;"></div><div class="jsx-1633345700"><img src="/media/download.svg" class="jsx-1633345700 like-icon"><span class="jsx-1633345700">'+itemVideo.likes_count+'</span></div></div></div></div></div></a></li>';
+          var content_title="";
+          var videoTitle="";
+              videoTitle=itemVideo.title;
+              content_title = videoTitle.substr(0, 40) + " ..."
+            listItems += '<li><a href="/'+itemVideo.user.username+'/'+itemVideo.id+'" ><div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+itemVideo.question_image+');"><div class="jsx-3077367275 video-card default"><div class="jsx-3077367275 video-card-mask"><div class="jsx-1633345700 card-footer small"><div class="jsx-1633345700"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+itemVideo.view_count+'</span></p><span class="_video_card_footer_likes1"><img src="/media/download.svg" alt="likes"> '+itemVideo.likes_count+'</span></div></div></div></div></div></a></li>';
 
         });
 
@@ -52,7 +54,7 @@ function getElementsByPage(currentPage){
 
 
 
-// function video_play_using_video_js1(file,image){debugger;
+// function video_play_using_video_js1(file,image){
 //   loaderShow();
 //   var video = document.getElementById('playerDetails');
 
@@ -74,7 +76,7 @@ function getElementsByPage(currentPage){
 //     });
 //   }
 
-//   hls.on(Hls.Events.ERROR, function (event, data) {debugger;
+//   hls.on(Hls.Events.ERROR, function (event, data) {
 
 //       if (data.fatal) {
 //         switch(data.type) {
@@ -138,7 +140,7 @@ function video_play_using_video_js(url,backup_url,image) {
             if (data.fatal) {
               switch(data.type) {
               case Hls.ErrorTypes.NETWORK_ERROR:
-              debugger;
+              
                 console.log("fatal network error encountered, try to recover");
                 if (!retrying) {
                     if(retryCount<2){
@@ -220,7 +222,7 @@ var video = document.getElementById('playerDetailsMobile');
 
 muteStatus=$("video").prop('muted', false);
 
-function muteAndUnmutePlayerDet(muteDetails){debugger;
+function muteAndUnmutePlayerDet(muteDetails){
   if(muteDetails=='playerDetailsMobile'){
 
   if($("video").prop('muted')){
@@ -257,7 +259,7 @@ function muteAndUnmutePlayerDet(muteDetails){debugger;
 }
 
 
-function VideoPlayByURL(file,image){debugger;
+function VideoPlayByURL(file,image){
   loaderShow();
   var playerInstanceDe = jwplayer("playerDetails");
   jwplayer('playerDetails').setMute(false);
@@ -290,7 +292,7 @@ function VideoPlayByURL(file,image){debugger;
     });   
 
 
-    playerInstanceDe.on('error', function(event) {debugger;
+    playerInstanceDe.on('error', function(event) {
         loaderHide();
         var erroCode=event.code;
         console.log(erroCode);
@@ -318,7 +320,7 @@ function VideoPlayByURL(file,image){debugger;
 
 $(".event-delegate-maskDesk1").click(function(){
   var plaerState=jwplayer('playerDetails').getState();
-debugger;
+
   if( jwplayer('playerDetails').getState() == "playing" || jwplayer('playerDetails').getState() == "buffering" ) {
           jwplayer('playerDetails').pause();
           $('.videoPlayButtonDetails').removeClass('play-button');
@@ -335,7 +337,7 @@ debugger;
 });
 
 
-function video_play_using_video_js_mobile(url,backup_url,image) {debugger;
+function video_play_using_video_js_mobile(url,backup_url,image) {
     
     var video = document.getElementById('playerDetailsMobile');
 
@@ -379,7 +381,7 @@ function video_play_using_video_js_mobile(url,backup_url,image) {debugger;
 }
 
 
-function VideoPlayByURLMobile(file,image){debugger;
+function VideoPlayByURLMobile(file,image){
   loaderShow();
   // var playerInstanceDe = jwplayer("playerDetailsMobile");
   // jwplayer('playerDetailsMobile').setMute(false);
@@ -970,5 +972,11 @@ jQuery(document).ready(function(){
       }) ;
 
     });
+
+function removeDataFromURL(){
+  video.src="";
+  return true;
+}
+
 //=====================End mentions=========================
 

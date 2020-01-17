@@ -22,7 +22,7 @@ $(window).scroll(function() {
 });
 
 
-function getUserVideos(limit,offset){
+function getUserVideos(limit,offset){debugger;
 
     loaderBoloShowDynamic('_scroll_load_more_loading_user_videos');
     var user_id= $("#currentUserId").val();
@@ -40,7 +40,7 @@ function getUserVideos(limit,offset){
         url:res,
         type:"GET",
         data:{'limit':limit,'offset':offset,'user_id':user_id,'language_id':language_id},
-        success: function(response,textStatus, xhr){
+        success: function(response,textStatus, xhr){debugger;
             userVideoItems="";
             var videoItemList=response.results;
             jQuery("#userVideoCountId").html(response.count);
@@ -128,7 +128,10 @@ function loadMoreData(NextPageUrl){
 
 
 function getVideoItem(videoItem,itemCount){
-
+    var content_title="";
+    var videoTitle="";
+        videoTitle=videoItem.title;
+        content_title = videoTitle.substr(0, 40) + " ...";
     var userVideoItem = '<div class="jsx-1410658769 video-feed-item">\
             <div class="jsx-1410658769 _ratio_">\
                 <div class="jsx-1410658769" style="padding-top: 148.438%;">\
@@ -138,7 +141,7 @@ function getVideoItem(videoItem,itemCount){
                                 <div class="jsx-3077367275 video-card default">\
                                     <div class="jsx-3077367275 video-card-mask">\
                                         <div class="jsx-1543915374 card-footer normal no-avatar">\
-                                            <div class="jsx-1543915374"><img src="/media/download.svg" class="jsx-1543915374 like-icon"><span class="jsx-1543915374">'+videoItem.likes_count+'</span></div>\
+                                            <div class="jsx-1543915374"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+videoItem.view_count+'</span></p><span class="_video_card_footer_likes1"><img src="/media/download.svg" alt="likes"> '+videoItem.likes_count+'</span></div>\
                                         </div>\
                                     </div>\
                                 </div>\
@@ -172,12 +175,13 @@ function getSideBarData(){
     //var uri='https://www.boloindya.com/api/v1/get_popular_video_bytes/?page=1';
     var uri='/api/v1/get_category_with_video_bytes/';
     var res = encodeURI(uri);
+    var page_size=10;
 
     jQuery.ajax({
         url:res,
         type:"GET",
 
-        data:{'language_id':language_id,'is_with_popular':'True','popular_boloindyans':'True'},
+        data:{'language_id':language_id,'is_with_popular':'True','popular_boloindyans':'True','page_size':page_size},
         success: function(response,textStatus, xhr){
             populaCreatorsItems="";
             populaCategoriesItems="";
@@ -363,6 +367,7 @@ function video_play_using_video_js(url,backup_url,image) {debugger;
     var bigCommentLikeDet='<strong>'+singleItemData.likes_count+' '+likeTrans+' · '+singleItemData.comment_count+' '+commentsTrans+'</strong>';
     $("#sideBarId").html(sideBarDetails);
     $("._video_card_big_meta_info_count").html(bigCommentLikeDet);
+    $(".video-meta-title").html(singleItemData.title);
     
     var userprofileName=singleItemData.user.userprofile.name;
     var userHandleName=singleItemData.user.username;
