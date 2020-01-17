@@ -14,6 +14,7 @@ import re
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 from datetime import datetime,timedelta,date
+from django.conf import settings
 
 cloufront_url = "https://d1fa4tg1fvr6nj.cloudfront.net"
 class CategorySerializer(ModelSerializer):
@@ -531,11 +532,11 @@ class CategoryWithVideoSerializer(ModelSerializer):
                     if each_vb.id == each_id:
                         orderd_all_seen_post.append(each_vb)
         topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
-        page_size = 15
-        paginator = Paginator(topics, page_size)
-        page = 1
-        topic_page = paginator.page(page)
-        return CategoryVideoByteSerializer(topic_page, many=True).data
+        # page_size = 15
+        # paginator = Paginator(topics, page_size)
+        # page = 1
+        # topic_page = paginator.page(page)
+        return CategoryVideoByteSerializer(topics[:settings.REST_FRAMEWORK['PAGE_SIZE']], many=True).data
 
 class VideoCompleteRateSerializer(ModelSerializer):
     class Meta:
