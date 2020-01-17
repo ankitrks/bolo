@@ -72,7 +72,7 @@ def identify_logo_text():
 			intervals.append(t1)
 			intervals.append(t2)
 			intervals.append(t3)
-			count+=1
+			#count+=1
 
 			try:
 				for interval in intervals:
@@ -105,8 +105,35 @@ def identify_logo_text():
 	f.close()					
 
 
+def identify_logo_util():
+
+	video_url = "https://boloindyapp-prod.s3.amazonaws.com/public/video_bytes/Abhinav_bro_lucky_😎😎_1578899727365.mp4"
+	video_url_unicode = unicode(video_url, "utf-8")
+	t1 = '00:03'
+	t2 = '00:05'
+	t3 = '00:07'
+	intervals = []
+	intervals.append(t1)
+	intervals.append(t2)
+	intervals.append(t3)
+
+	count = 1
+	for interval in intervals:
+		ff = FFmpeg(inputs = {video_url: None}, outputs = {"output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
+		ff.run()
+		file_name = PROJECT_PATH + '/scripts/output{}.png'.format(count)
+		with io.open(file_name, 'rb') as image_file:
+			content = image_file.read()
+		image = vision.types.Image(content = content)
+		response = client.text_detection(image = image)
+		texts = response.text_annotations
+		print(len(texts))
+
+
+
+
 def main():
-	identify_logo_text()
+	identify_logo_util()
 
 
 def run():
