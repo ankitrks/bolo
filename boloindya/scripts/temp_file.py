@@ -55,55 +55,52 @@ def identify_logo_text():
 		topic_objects = Topic.objects.exclude(is_removed = True).filter(is_vb = True, date__gte = long_ago)
 		print(len(topic_objects))
 		global_counter = 1
-		try:
-				
-				for item in topic_objects:
-					print("counter....", global_counter)
-					uri = item.backup_url
-					ur_str = uri.encode('utf-8')
-					test = urllib.FancyURLopener()
-					test.retrieve(ur_str, 'local_video..mp4')
-					duration = item.duration 
-					time = item.split(":")
-					minute = int(time[0]) * 60
-					second = int(time[1])
-					total_second = minute + second
-					t1 = int(total_second / 5)
-					t2 = t1 + t1
-					t3 = t1 + t2
-					t4 = t1 + t3
-					t5 = t1 + t4
-					t1 = '00:' + timetostring(t1)
-					t2 = '00:' + timetostring(t2)
-					t3 = '00:' + timetostring(t3)
-					t4 = '00:' + timetostring(t4)
-					intervals = []
-					intervals.append(t1)
-					intervals.append(t2)
-					intervals.append(t3)
-					intervals.append(t4)
-					count = 1
-					global_counter+=1
+		for item in topic_objects:
+			print("counter....", global_counter)
+			uri = item.backup_url
+			ur_str = uri.encode('utf-8')
+			test = urllib.FancyURLopener()
+			test.retrieve(ur_str, 'local_video.mp4')
+			duration = item.duration 
+			time = item.split(":")
+			minute = int(time[0]) * 60
+			second = int(time[1])
+			total_second = minute + second
+			t1 = int(total_second / 5)
+			t2 = t1 + t1
+			t3 = t1 + t2
+			t4 = t1 + t3
+			t5 = t1 + t4
+			t1 = '00:' + timetostring(t1)
+			t2 = '00:' + timetostring(t2)
+			t3 = '00:' + timetostring(t3)
+			t4 = '00:' + timetostring(t4)
+			intervals = []
+			intervals.append(t1)
+			intervals.append(t2)
+			intervals.append(t3)
+			intervals.append(t4)
+			count = 1
+			global_counter+=1
 
-					for interval in intervals:
-						ff = FFmpeg(inputs = {'local_video.mp4': None}, outputs = {"output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
-						ff.run()
-						file_name = PROJECT_PATH + '/scripts/output{}.png'.format(count)
-						with io.open(file_name, 'rb') as image_file:
-							content = image_file.read()
-						image = vision.types.Image(content = content)
-						response = client.text_annotations
-						for text in texts:
-							modified_text = text.description
-							if(modified_text in plag_source):
-								print(modified_text)
-								print("yes")
-								print("..........")
-								f.write(str(iter_id) + " " + str(video_title) + " " + str(video_url) + (modified_text) + "\n")	
+			for interval in intervals:
+				ff = FFmpeg(inputs = {'local_video.mp4': None}, outputs = {"output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
+				ff.run()
+				file_name = PROJECT_PATH + '/scripts/output{}.png'.format(count)
+				with io.open(file_name, 'rb') as image_file:
+					content = image_file.read()
+					image = vision.types.Image(content = content)
+					response = client.text_annotations
+					for text in texts:
+						modified_text = text.description
+						if(modified_text in plag_source):
+							print(modified_text)
+							print("yes")
+							print("..........")
+							f.write(str(iter_id) + " " + str(video_title) + " " + str(video_url) + (modified_text) + "\n")	
 
 
-		except:
-			pass				
+						
 
 	except Exception as e:
 		print('' + str(e))  				
