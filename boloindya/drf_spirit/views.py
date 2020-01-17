@@ -351,7 +351,7 @@ class VBList(generics.ListCreateAPIView):
                 elif popular_post:
                     topics = []
                     all_seen_vb = []
-                    if self.request.user:
+                    if self.request.user.is_authenticated:
                         all_seen_vb = get_redis_vb_seen(self.request.user.id)
                         # all_seen_vb = VBseen.objects.filter(user = self.request.user).distinct('topic_id').values_list('topic_id',flat=True)
                     startdate = datetime.today()
@@ -425,7 +425,7 @@ class VBList(generics.ListCreateAPIView):
                 else:
                     topics = []
                     all_seen_vb = []
-                    if self.request.user:
+                    if self.request.user.is_authenticated:
                         all_seen_vb = get_redis_vb_seen(self.request.user.id)
                         # all_seen_vb = VBseen.objects.filter(user = self.request.user).distinct('topic_id').values_list('topic_id',flat=True)
                     # if 'language_id' in search_term:
@@ -506,7 +506,7 @@ class GetChallenge(generics.ListCreateAPIView):
         challenge_hash = self.request.GET.get('challengehash')
         challengehash = '#' + challenge_hash
         all_seen_vb = []
-        if self.request.user:
+        if self.request.user.is_authenticated:
             all_seen_vb = get_redis_vb_seen(self.request.user.id)
             # all_seen_vb = VBseen.objects.filter(user = self.request.user, topic__title__icontains=challengehash).distinct('topic_id').values_list('topic_id',flat=True)
         excluded_list =[]
@@ -2937,7 +2937,7 @@ def get_category_with_video_bytes(request):
                     popular_bolo = []
         if request.GET.get('is_with_popular'):
             all_seen_vb = []
-            if request.user:
+            if request.user.is_authenticated:
                 all_seen_vb = get_redis_vb_seen(request.user.id)
                 # all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__is_popular=True).distinct('topic_id').values_list('topic_id',flat=True)
             excluded_list =[]
@@ -2996,7 +2996,7 @@ def get_category_video_bytes(request):
         category = Category.objects.get(pk=category_id)
         topics = []
         all_seen_vb = []
-        if request.user:
+        if request.user.is_authenticated:
             all_seen_vb = get_redis_vb_seen(request.user.id)
             # all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__m2mcategory=category).distinct('topic_id').values_list('topic_id',flat=True)
         post_till = datetime.now() - timedelta(days=30)
@@ -3042,7 +3042,7 @@ def get_popular_video_bytes(request):
         language_id = request.GET.get('language_id', 1)
         paginator_topics.page_size = 10
         all_seen_vb = []
-        if request.user:
+        if request.user.is_authenticated:
             all_seen_vb = get_redis_vb_seen(request.user.id)
             # all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__is_popular=True).distinct('topic_id').values_list('topic_id',flat=True)
         excluded_list =[]
@@ -3111,7 +3111,7 @@ def get_recent_videos(request):
         post_till = datetime.now() - timedelta(days=30)
         category = Category.objects.filter(parent__isnull=True).first()
         all_seen_vb = []
-        if request.user:
+        if request.user.is_authenticated:
             all_seen_vb = get_redis_vb_seen(request.user.id)
             # all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__m2mcategory=category).distinct('topic_id').values_list('topic_id',flat=True)
         excluded_list =[]
