@@ -130,6 +130,7 @@ def identify_logo_util():
 			intervals.append(t2)
 			intervals.append(t3)
 			global_counter+=1
+			count = 1
 			try:
 				for interval in intervals:
 					ff = FFmpeg(inputs = {'local_video.mp4': None}, outputs = {"output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
