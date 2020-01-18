@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Spirit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-12 17:26+0530\n"
+"POT-Creation-Date: 2020-01-18 16:08+0530\n"
 "PO-Revision-Date: 2015-10-14 19:38+0000\n"
 "Last-Translator: Esteban M. Castro Borsani <ecastroborsani@gmail.com>\n"
 "Language-Team: German (http://www.transifex.com/spirit-project/spirit/"
@@ -46,64 +46,68 @@ msgstr "Nicht unterstütztes Dateiformat. Unterstützte Formate sind %s."
 msgid "Unsupported file mime type %s. Supported types are %s."
 msgstr "Nicht unterstütztes Dateiformat. Unterstützte Formate sind %s."
 
-#: forum/comment/models.py:29 forum/comment/models.py:43
-#: forum/comment/models.py:68
+#: forum/comment/models.py:26 forum/comment/models.py:42
+#: forum/comment/models.py:67 forum/comment/models.py:152
 msgid "comment"
 msgstr "Kommentar"
 
-#: forum/comment/models.py:30
+#: forum/comment/models.py:27
 msgid "topic moved"
 msgstr "Thema verschoben"
 
-#: forum/comment/models.py:31
+#: forum/comment/models.py:28
 msgid "topic closed"
 msgstr "Thema geschlossen"
 
-#: forum/comment/models.py:32
+#: forum/comment/models.py:29
 msgid "topic unclosed"
 msgstr "Thema geöffnet"
 
-#: forum/comment/models.py:33
+#: forum/comment/models.py:30
 msgid "topic pinned"
 msgstr "Thema festheften"
 
-#: forum/comment/models.py:34
+#: forum/comment/models.py:31
 msgid "topic unpinned"
 msgstr "Thema nicht festgeheftet"
 
-#: forum/comment/models.py:44
+#: forum/comment/models.py:39 forum/comment/models.py:154
+msgid "hash_tags"
+msgstr ""
+
+#: forum/comment/models.py:43 forum/comment/models.py:153
 msgid "comment html"
 msgstr "comment html"
 
-#: forum/comment/models.py:46
+#: forum/comment/models.py:45
 msgid "action"
 msgstr "Aktion"
 
-#: forum/comment/models.py:53
+#: forum/comment/models.py:52
 #, fuzzy
 #| msgid "action"
 msgid "duration"
 msgstr "Aktion"
 
-#: forum/comment/models.py:55
+#: forum/comment/models.py:54
 msgid "thumbnail"
 msgstr ""
 
-#: forum/comment/models.py:60
+#: forum/comment/models.py:59
 msgid "modified count"
 msgstr "modifizierter Zähler"
 
-#: forum/comment/models.py:61
+#: forum/comment/models.py:60
 msgid "likes count"
 msgstr "likes count"
 
-#: forum/comment/models.py:62
+#: forum/comment/models.py:61
 #, fuzzy
 #| msgid "likes count"
 msgid "share count"
 msgstr "likes count"
 
-#: forum/comment/models.py:69
+#: forum/comment/models.py:68
 msgid "comments"
 msgstr "Kommentare"
 

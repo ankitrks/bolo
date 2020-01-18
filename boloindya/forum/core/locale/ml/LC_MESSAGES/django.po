@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-12 17:26+0530\n"
+"POT-Creation-Date: 2020-01-18 16:08+0530\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -93,7 +93,7 @@ msgid "Admin"
 msgstr ""
 
 #: forum/core/templates/spirit/_header.html:31
-#: forum/core/templates/spirit/_new_header.html:62
+#: forum/core/templates/spirit/_new_header.html:372
 msgid "Log out"
 msgstr ""
 
@@ -101,175 +101,162 @@ msgstr ""
 msgid "Log in"
 msgstr ""
 
-#: forum/core/templates/spirit/_new_base.html:50
-#: forum/core/templates/spirit/_video_play_and_comments.html:887
+#: forum/core/templates/spirit/_new_base.html:74
+#: forum/core/templates/spirit/_video_play_and_comments.html:1139
+msgid "Follow"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_base.html:75
+msgid "Followed"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_base.html:76
+#: forum/core/templates/spirit/_video_play_and_comments.html:1148
 msgid "likes"
 msgstr "ഇഷ്‌ടപ്പെടുന്നു"
 
-#: forum/core/templates/spirit/_new_base.html:51
-#: forum/core/templates/spirit/_video_play_and_comments.html:887
+#: forum/core/templates/spirit/_new_base.html:77
+#: forum/core/templates/spirit/_video_play_and_comments.html:1148
 msgid "comments"
 msgstr "അഭിപ്രായങ്ങൾ"
 
-#: forum/core/templates/spirit/_new_footer.html:17
-#: forum/core/templates/spirit/_new_header.html:41
+#: forum/core/templates/spirit/_new_footer.html:6
+#: forum/core/templates/spirit/_video_play_and_comments.html:1148
+#, fuzzy
+#| msgid "download"
+msgid "Download"
+msgstr "ഡൗൺലോഡുചെയ്യുക"
+
+#: forum/core/templates/spirit/_new_footer.html:19
+#: forum/core/templates/spirit/_new_header.html:348
 msgid "Company"
 msgstr "കമ്പനി"
 
-#: forum/core/templates/spirit/_new_footer.html:18
-msgid "Login"
-msgstr ""
-
-#: forum/core/templates/spirit/_new_footer.html:19
-#: forum/core/templates/spirit/_new_header.html:16
-#: forum/core/templates/spirit/_new_header.html:42
+#: forum/core/templates/spirit/_new_footer.html:20
+#: forum/core/templates/spirit/_new_header.html:300
+#: forum/core/templates/spirit/_new_header.html:349
 msgid "About"
 msgstr "കുറിച്ച്"
 
-#: forum/core/templates/spirit/_new_footer.html:20
-#: forum/core/templates/spirit/_new_header.html:43
-msgid "Newsroom"
-msgstr "ന്യൂസ് റൂം"
-
 #: forum/core/templates/spirit/_new_footer.html:21
-#: forum/core/templates/spirit/_new_header.html:44
-msgid "Contact"
-msgstr "ബന്ധപ്പെടുക"
+#: forum/core/templates/spirit/_new_header.html:351
+msgid "Careers"
+msgstr ""
 
-#: forum/core/templates/spirit/_new_footer.html:23
-#: forum/core/templates/spirit/_new_header.html:46
+#: forum/core/templates/spirit/_new_footer.html:24
+#: forum/core/templates/spirit/_new_header.html:354
 msgid "Programs"
 msgstr "പ്രോഗ്രാമുകൾ"
 
-#: forum/core/templates/spirit/_new_footer.html:24
-msgid "Good"
-msgstr ""
-
 #: forum/core/templates/spirit/_new_footer.html:25
-msgid "Advertise"
-msgstr ""
+#: forum/core/templates/spirit/_new_header.html:302
+#: forum/core/templates/spirit/_new_header.html:350
+msgid "Discover"
+msgstr "കണ്ടെത്തുക"
 
-#: forum/core/templates/spirit/_new_footer.html:27
-#: forum/core/templates/spirit/_new_header.html:50
+#: forum/core/templates/spirit/_new_footer.html:29
+#: forum/core/templates/spirit/_new_header.html:358
 msgid "Support"
 msgstr "പിന്തുണ"
 
-#: forum/core/templates/spirit/_new_footer.html:28
-#: forum/core/templates/spirit/_new_header.html:51
+#: forum/core/templates/spirit/_new_footer.html:30
+#: forum/core/templates/spirit/_new_header.html:359
 msgid "Help Center"
 msgstr "സഹായകേന്ദ്രം"
 
-#: forum/core/templates/spirit/_new_footer.html:29
-#: forum/core/templates/spirit/_new_header.html:52
+#: forum/core/templates/spirit/_new_footer.html:31
+#: forum/core/templates/spirit/_new_header.html:360
 msgid "Safety Center"
 msgstr "സുരക്ഷാ കേന്ദ്രം"
 
-#: forum/core/templates/spirit/_new_footer.html:30
-#: forum/core/templates/spirit/_new_header.html:53
-msgid "Community Guidelines"
-msgstr "കമ്മ്യൂണിറ്റി മാർ‌ഗ്ഗനിർ‌ദ്ദേശങ്ങൾ‌"
-
-#: forum/core/templates/spirit/_new_footer.html:32
-#: forum/core/templates/spirit/_new_header.html:55
+#: forum/core/templates/spirit/_new_footer.html:35
+#: forum/core/templates/spirit/_new_header.html:364
 msgid "Legal"
 msgstr "നിയമപരമായ"
 
-#: forum/core/templates/spirit/_new_footer.html:33
-#: forum/core/templates/spirit/_new_header.html:56
+#: forum/core/templates/spirit/_new_footer.html:36
+#: forum/core/templates/spirit/_new_header.html:365
 msgid "Terms of Service"
 msgstr "സേവന നിബന്ധനകൾ"
 
-#: forum/core/templates/spirit/_new_footer.html:34
-#: forum/core/templates/spirit/_new_header.html:57
+#: forum/core/templates/spirit/_new_footer.html:37
+#: forum/core/templates/spirit/_new_header.html:366
 msgid "Privacy Policy"
 msgstr "സ്വകാര്യതാനയം"
 
-#: forum/core/templates/spirit/_new_footer.html:35
-#: forum/core/templates/spirit/_new_header.html:58
-msgid "Law Enforcement"
-msgstr ""
-
-#: forum/core/templates/spirit/_new_footer.html:36
-#: forum/core/templates/spirit/_new_header.html:59
-msgid "Copyright Policy"
-msgstr "പകർപ്പവകാശ നയം"
-
-#: forum/core/templates/spirit/_new_footer.html:57
+#: forum/core/templates/spirit/_new_footer.html:59
+#: forum/core/templates/spirit/_new_header.html:407
 #: forum/core/templates/spirit/untitled.html:15
 msgid "language"
 msgstr ""
 
-#: forum/core/templates/spirit/_new_header.html:14
-#: forum/core/templates/spirit/_new_header.html:39
+#: forum/core/templates/spirit/_new_header.html:298
+#: forum/core/templates/spirit/_new_header.html:346
 msgid "Home"
 msgstr ""
 
-#: forum/core/templates/spirit/_new_header.html:18
-msgid "Discover"
-msgstr "കണ്ടെത്തുക"
-
-#: forum/core/templates/spirit/_new_header.html:47
-msgid "boloindya for Good"
-msgstr ""
-
-#: forum/core/templates/spirit/_new_header.html:48
+#: forum/core/templates/spirit/_new_header.html:355
 msgid "Advertise on boloindya"
 msgstr ""
 
-#: forum/core/templates/spirit/_new_header.html:61
+#: forum/core/templates/spirit/_new_header.html:361
+msgid "Community Guidelines"
+msgstr "കമ്മ്യൂണിറ്റി മാർ‌ഗ്ഗനിർ‌ദ്ദേശങ്ങൾ‌"
+
+#: forum/core/templates/spirit/_new_header.html:371
 msgid "Welcome"
 msgstr "സ്വാഗതം"
 
-#: forum/core/templates/spirit/_new_header.html:67
+#: forum/core/templates/spirit/_new_header.html:377
 msgid "Logout"
 msgstr "ലോഗൗട്ട്"
 
-#: forum/core/templates/spirit/_video_play_and_comments.html:831
+#: forum/core/templates/spirit/_video_play_and_comments.html:1082
 msgid "download"
 msgstr "ഡൗൺലോഡുചെയ്യുക"
 
-#: forum/core/templates/spirit/_video_play_and_comments.html:832
+#: forum/core/templates/spirit/_video_play_and_comments.html:1083
 msgid "like"
 msgstr "പോലെ"
 
-#: forum/core/templates/spirit/_video_play_and_comments.html:833
+#: forum/core/templates/spirit/_video_play_and_comments.html:1084
 msgid "video"
 msgstr "വീഡിയോ"
 
-#: forum/core/templates/spirit/_video_play_and_comments.html:844
+#: forum/core/templates/spirit/_video_play_and_comments.html:1096
 #, python-format
 msgid " %(Download)s the app to %(like)s this %(video)s "
 msgstr ""
 
-#: forum/core/templates/spirit/_video_play_and_comments.html:844
+#: forum/core/templates/spirit/_video_play_and_comments.html:1096
 msgid "Get"
 msgstr "നേടുക"
 
-#: forum/core/templates/spirit/_video_play_and_comments.html:915
+#: forum/core/templates/spirit/_video_play_and_comments.html:1177
 msgid "Like"
 msgstr "ഇഷ്‌ടപ്പെടുന്നു"
 
-#: forum/core/templates/spirit/_video_play_and_comments.html:921
+#: forum/core/templates/spirit/_video_play_and_comments.html:1183
 msgid "Comment"
 msgstr "അഭിപ്രായം"
 
-#: forum/core/templates/spirit/_video_play_and_comments.html:926
+#: forum/core/templates/spirit/_video_play_and_comments.html:1188
 msgid "Share"
 msgstr "പങ്കിടുക"
 
-#: forum/core/templates/spirit/_video_play_and_comments.html:966
+#: forum/core/templates/spirit/_video_play_and_comments.html:1246
 msgid "COPY"
 msgstr "കോപ്പി"
 
-#: forum/core/templates/spirit/_video_play_and_comments.html:986
+#: forum/core/templates/spirit/_video_play_and_comments.html:1267
 msgid "Share to"
 msgstr "പങ്കിടുക"
 
-#: forum/core/templates/spirit/_video_play_and_comments.html:989
+#: forum/core/templates/spirit/_video_play_and_comments.html:1270
 msgid "Copy Link"
 msgstr "ലിങ്ക് പകർത്തുക"
 
-#: forum/core/templates/spirit/_video_play_and_comments.html:1004
+#: forum/core/templates/spirit/_video_play_and_comments.html:1285
 msgid "Cancel"
 msgstr "റദ്ദാക്കുക"
 
@@ -299,3 +286,12 @@ msgstr ""
 #, python-format
 msgid "Too many submissions, wait %(time)s."
 msgstr ""
+
+#~ msgid "Newsroom"
+#~ msgstr "ന്യൂസ് റൂം"
+
+#~ msgid "Contact"
+#~ msgstr "ബന്ധപ്പെടുക"
+
+#~ msgid "Copyright Policy"
+#~ msgstr "പകർപ്പവകാശ നയം"

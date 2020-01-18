@@ -436,17 +436,22 @@ function follow_user_by_popup(){
               'Authorization':'Bearer '+accessToken,
             },
             data:{user_following_id:user_following_id},
-            success: function(response,textStatus, xhr){
+            success: function(response,textStatus, xhr){debugger;
  
                checkFollowStatus=jQuery('.followStatusChange-'+user_following_id).hasClass('sx_5da456');
                if(checkFollowStatus==false){
 	               	jQuery('.followStatusChangePopup').removeClass('sx_5da455');
 	               	jQuery('.followStatusChangePopup').addClass('sx_5da456');
-	               	jQuery('.btnTextChangePopup').text(response.message);
+                  if(response.message=='Followed'){
+                    jQuery('.btnTextChangePopup').text(followed_trans);
+                  }else{
+                    jQuery('.btnTextChangePopup').text(follow_trans);
+                  }
+	               	
                }else{
 	               	jQuery('.followStatusChangePopup').removeClass('sx_5da456');
 	               	jQuery('.followStatusChangePopup').addClass('sx_5da455');
-	               	jQuery('.btnTextChangePopup').text('Follow');
+	               	jQuery('.btnTextChangePopup').text(follow_trans);
                }
 
             },

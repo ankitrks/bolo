@@ -665,7 +665,7 @@ def help_support(request):
               <head></head>
               <body>
                     Hello, <br><br>
-                    We have received a job request from %s. Please find the details below:<br><br>
+                    We have received a help request from %s. Please find the details below:<br><br>
                     <b>Name:</b> %s <br>
                     <b>Email:</b> %s <br>
                     <b>Contact:</b> %s <br>
@@ -799,13 +799,19 @@ def search_by_term(request):
 
 def new_home(request):
     categories = []
+    hash_tags = []
     try:
-        categories = Category.objects.filter(parent__isnull=False)[:5]
+        categories = Category.objects.filter(parent__isnull=False)[:4]
     except Exception as e1:
-        categories = []
+        categories = []    
+    try:
+        hash_tags = TongueTwister.objects.order_by('-hash_counter')[:4]
+    except Exception as e1:
+        hash_tags = []
 
     context = {
         'categories':categories,
+        'hash_tags':hash_tags,
         'is_single_topic': "Yes",
     }  
     video_slug = request.GET.get('video',None)
@@ -946,4 +952,8 @@ def login_using_api(request):
 
 def testurllang(request):
     print 'Pass';
-    pass
+    languages_with_id=settings.LANGUAGES_WITH_ID
+    print languages_with_id
+    #languageCode =request.LANGUAGE_CODE
+    #language_id=languages_with_id[languageCode]
+

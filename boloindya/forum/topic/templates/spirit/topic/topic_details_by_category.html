@@ -252,9 +252,9 @@ video.jsx-3382097194 {
                 <div class="share-info">
 
                     <h1 class="share-title headingMargin"> @{{category_details.slug}}</h1> 
-                    <p class="count-infos"><span class="number"></span><span class="unit"> {{category_details.view_count | shorcountertopic}} Views</span><span class="number"> </span>
+                    <p class="count-infos"><span class="number"></span><span class="unit"> {{category_details.view_count | shorcountertopic}} {% trans "Views" %}</span><span class="number"> </span>
                         <span class="unit">
-                            <button onclick="follow_category('{{category_details.id}}');" class="_4jy1 _4jy4 _517h _51sy _42ft " type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-{{category_details.id}} followCheck sx_5da455"></i><span class="btnTextChange-{{category_details.id}}">Follow</span>
+                            <button onclick="follow_category('{{category_details.id}}');" class="_4jy1 _4jy4 _517h _51sy _42ft " type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-{{category_details.id}} followCheck sx_5da455"></i><span class="btnTextChange-{{category_details.id}}">{% trans "Follow" %}</span>
                             </button>
                         </span>
                     </p>
@@ -265,7 +265,7 @@ video.jsx-3382097194 {
 
                 <div class="jsx-2893588005 video-feed" id="categoryVideosListId">
                     <div class="_scroll_load_more_loading_user_videos center">
-                        <div class="boloindya-loading">Loading...</div>
+                        <div class="boloindya-loading"></div>
                     </div>
                 </div>
             </main>

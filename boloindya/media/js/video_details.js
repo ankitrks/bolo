@@ -878,7 +878,7 @@ function followLikeList(){
                     if(followStatus==true){
                         jQuery('.followStatusChange-'+followId).removeClass('sx_5da455');
                         jQuery('.followStatusChange-'+followId).addClass('sx_5da456');
-                        jQuery('.btnTextChange-'+followId).text('Followed');
+                        jQuery('.btnTextChange-'+followId).text(followed_trans);
                     }
 
                 });

@@ -399,11 +399,11 @@ function retryLiveStream(hls, url) {
                             if(followStatus==true){
                                 jQuery('.followStatusChangePopup').removeClass('sx_5da455');
                                 jQuery('.followStatusChangePopup').addClass('sx_5da456');
-                                jQuery('.btnTextChangePopup').text('Followed');
+                                jQuery('.btnTextChangePopup').text(followed_trans);
                             }else{
                                 jQuery('.followStatusChangePopup').removeClass('sx_5da456');
                                 jQuery('.followStatusChangePopup').addClass('sx_5da455');
-                                jQuery('.btnTextChangePopup').text('Follow');
+                                jQuery('.btnTextChangePopup').text(follow_trans);
                             }
                         }
 

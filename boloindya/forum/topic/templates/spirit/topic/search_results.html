@@ -664,14 +664,8 @@
                             <div class="_5vx7 clearfix" direction="both">
                                 <div class="_ohe lfloat">
                                     <ul class="_43o4 _4470" role="tablist" width="1010px" style="width: 1010px;">
-<!--                                         <li data-edge="keywords_search" class=" _5vwz _5vwy _45hc _1hqh" role="presentation">
-                                            <a aria-haspopup="false" href="javascript:void(0)" role="tab" tabindex="0" class="_3m1v _468f" aria-selected="true">
-                                                <div class="_4jq5">
-                                                    <div class="_4xjz">All</div>
-                                                    <div class="_4xj-" aria-hidden="true">All</div>
-                                                </div><span class="_13xf"></span></a>
-                                        </li> -->
-                                        <li data-edge="keywords_blended_posts" class=" _5vwz _45hc tabActiveStatus" role="presentation">
+
+                                        <li data-edge="keywords_blended_posts" class=" _5vwz _45hc tabActiveStatus active_tab" role="presentation">
                                             <a onclick="getVideoSearchResult();" aria-haspopup="false" href="javascript:void(0)" role="tab" tabindex="-1" class="_3m1v _468f" aria-selected="false">
                                                 <div class="_4jq5">
                                                     <div class="_4xjz">Videos</div>
@@ -700,13 +694,7 @@
                                                     <div class="_4xj-" aria-hidden="true">Hashtags</div>
                                                 </div><span class="_13xf"></span></a>
                                         </li>
-<!--                                         <li data-edge="keywords_blended_videos" class="_5vwz _45hc" role="presentation">
-                                            <a aria-haspopup="false" onclick="getSearchMentionSuggestion();" href="javascript:void(0)" role="tab" tabindex="-1" class="_3m1v _468f" aria-selected="false">
-                                                <div class="_4jq5">
-                                                    <div class="_4xjz">Mentioned</div>
-                                                    <div class="_4xj-" aria-hidden="true">Mentioned</div>
-                                                </div><span class="_13xf"></span></a>
-                                        </li> -->
+
 
 
                                     </ul>
@@ -773,7 +761,7 @@
 
                 </div>
 
-                <div class="_explore_page_feed_wrapper">
+                <div class="_explore_page_feed_wrapper" id="catSearchId">
                     <div class="jsx-1289101510 _explore_feed_wrapper">
                         <div class="">
                             <div class="jsx-4249974497 _explore_feed_container">
@@ -796,6 +784,32 @@
                         </div>
                     </div>
                 </div>
+
+
+                <div class="_explore_page_feed_wrapper" id="hashTagSearchId">
+                    <div class="jsx-1289101510 _explore_feed_wrapper">
+                        <div class="">
+                            <div class="jsx-4249974497 _explore_feed_container">
+                                <div class="" id="hashtagWithVideoId">
+
+                                </div>
+                               
+                            </div>
+                            <div class="jsx-4249974497 _scroll_load_more_loading_left"></div>
+                        </div>
+                    </div>
+                    <div class="jsx-1289101510 _explore_feed_wrapper">
+                        <div class="">
+                            <div class="jsx-4249974497 _explore_feed_container">
+                                <div class="" id="hashtagWithVideoIdRight">
+  
+                                </div>
+                            </div>
+                            <div class="jsx-4249974497 _scroll_load_more_loading_right"></div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="jsx-2107295335 jsx-3197114167 to-top to-top-enter-done"></div>
             </div>
         </div>
@@ -823,7 +837,7 @@
 			}
 		}
 
-		var userItemTemp='<li class="jsx-3102177358 _user_carousel_list-item item"><a tag="a" title="'+each_popular_item.username+'" class="jsx-3102177358" href="/'+each_popular_item.username+'/"><div class="_user_carousel_avatar round" style="background-image:url('+each_popular_item.userprofile.profile_pic+')"><img src="/media/tick_icon.svg"></div><h2 class="_user_carousel_title">'+userName+'</h2><h3 class="_user_carousel_sub-title">@'+each_popular_item.username+'</h3><p class="_user_carousel_followers">'+each_popular_item.userprofile.follower_count+'<span class="_user_carousel_followers-text"> followers</span></p></a><span class="unit"><button onclick="follow_user('+each_popular_item.id+');" class="_4jy1 _4jy4 _517h _51sy _42ft " style="float: none;" type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-'+each_popular_item.id+' followCheck sx_5da455"></i><span class="btnTextChange-'+each_popular_item.id+'">Follow</span></button></span></li>';
+		var userItemTemp='<li class="jsx-3102177358 _user_carousel_list-item item"><a tag="a" title="'+each_popular_item.username+'" class="jsx-3102177358" href="/'+each_popular_item.username+'/"><div class="_user_carousel_avatar round" style="background-image:url('+each_popular_item.userprofile.profile_pic+')"><img src="/media/tick_icon.svg"></div><h2 class="_user_carousel_title">'+userName+'</h2><h3 class="_user_carousel_sub-title">@'+each_popular_item.username+'</h3><p class="_user_carousel_followers">'+each_popular_item.userprofile.follower_count+'<span class="_user_carousel_followers-text"> followers</span></p></a><span class="unit"><button onclick="follow_user('+each_popular_item.id+');" class="_4jy1 _4jy4 _517h _51sy _42ft " style="float: none;" type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-'+each_popular_item.id+' followCheck sx_5da455"></i><span class="btnTextChange-'+each_popular_item.id+'">'+follow_trans+'</span></button></span></li>';
 		return userItemTemp;
 	}
 
@@ -831,11 +845,14 @@
 	//api/v1/search/users/
 
 function getCreatorsResult(){
-	
+	loaderBoloHideDynamic('_scroll_load_more_loading_left');
+    loaderBoloHideDynamic('_scroll_load_more_loading_right');
     loaderBoloShowDynamic('_scroll_load_more_loading_user_right');
-    $("#catWithVideoIdRight").empty("");
-    $("#catWithVideoId").empty("");
-    $("#userVideosListId").empty("");
+    $("#creatorItemListId").show();     
+    $("#userVideosListId").hide();
+    $("#catSearchId").hide();    
+    $("#hashTagSearchId").hide()
+
     var platlistItems;
 
     var listItems="";
@@ -871,11 +888,11 @@ function getCreatorsResult(){
 
 var topicList=[];
 function getCategorySearchWithVideos(){
-
-    $("#userVideosListId").empty("");
-    $("#creatorItemListId").empty("");    
-    $("#catWithVideoIdRight").empty("");    
-    $("#catWithVideoId").empty(""); 
+    $("#userVideosListId").hide();
+    $("#creatorItemListId").hide(); 
+    $("#catSearchId").show();    
+    $("#hashTagSearchId").hide()
+    loaderBoloHideDynamic('_scroll_load_more_loading_user_videos');
     loaderBoloShowDynamic('_scroll_load_more_loading_right');
     loaderBoloShowDynamic('_scroll_load_more_loading_left');   
         var playListData=[]; 
@@ -958,6 +975,7 @@ function hashtagSuggestion(){
 
 
 function getSearchMentionSuggestion(){
+    loaderBoloHideDynamic('_scroll_load_more_loading_user_videos');
     loaderBoloShowDynamic('_scroll_load_more_loading_right');
     loaderBoloShowDynamic('_scroll_load_more_loading_left');
     $("#userVideosListId").empty("");
@@ -1026,12 +1044,15 @@ function popularSearchMentionHeading(mentionItem){
 
 var hashTagClickStatus=0;
 function getSearchHashtagSuggestion(){
+    loaderBoloHideDynamic('_scroll_load_more_loading_user_videos');
     loaderBoloShowDynamic('_scroll_load_more_loading_right');
     loaderBoloShowDynamic('_scroll_load_more_loading_left');
-    $("#userVideosListId").empty("");
-    $("#creatorItemListId").empty("");   
-    $("#catWithVideoIdRight").empty("");    
-    $("#catWithVideoId").empty("");  
+    $("#userVideosListId").hide();
+    $("#creatorItemListId").hide();   
+    $("#catSearchId").hide();    
+    $("#hashTagSearchId").show()
+
+
     var playListData=[]; 
     var platlistItems;
     var listItems="";
@@ -1061,10 +1082,10 @@ function getSearchHashtagSuggestion(){
 
                 if(itemCount % 2 == 0) {
                     loaderBoloHideDynamic('_scroll_load_more_loading_right');
-                    $("#catWithVideoIdRight").append(mention_list);
+                    $("#hashtagWithVideoIdRight").append(mention_list);
                 }else{
                      loaderBoloHideDynamic('_scroll_load_more_loading_left');
-                    $("#catWithVideoId").append(mention_list);
+                    $("#hashtagWithVideoId").append(mention_list);
                 }
 
             });
@@ -1119,9 +1140,13 @@ $(document).ready(function(){
 });
 
 function getVideoSearchResult(limit,offset){
-    $("#creatorItemListId").empty("");    
-    $("#catWithVideoIdRight").empty("");    
-    $("#catWithVideoId").empty(""); 
+    $("#creatorItemListId").hide();    
+    $("#userVideosListId").show();
+    $("#catSearchId").hide();    
+    $("#hashTagSearchId").hide()
+
+    loaderBoloHideDynamic('_scroll_load_more_loading_left');
+    loaderBoloHideDynamic('_scroll_load_more_loading_right');
     loaderBoloShowDynamic('_scroll_load_more_loading_user_videos');
     //var user_id= $("#currentUserId").val();
      
@@ -1146,6 +1171,7 @@ function getVideoSearchResult(limit,offset){
             videoItemList.forEach(function(itemCreator) {itemCount++;
                 userVideoItems +=getVideoItem(itemCreator,itemCount);
             });
+
             $("#userVideosListId").html(userVideoItems);
             loaderBoloHideDynamic('_scroll_load_more_loading_user_videos');
             playListData=videoItemList;
@@ -1436,11 +1462,11 @@ function openVideoInPopup(file,image,indexId){
                     if(followStatus==true){
                         jQuery('.followStatusChangePopup').removeClass('sx_5da455');
                         jQuery('.followStatusChangePopup').addClass('sx_5da456');
-                        jQuery('.btnTextChangePopup').text('Followed');
+                        jQuery('.btnTextChangePopup').text(followed_trans);
                     }else{
                         jQuery('.followStatusChangePopup').removeClass('sx_5da456');
                         jQuery('.followStatusChangePopup').addClass('sx_5da455');
-                        jQuery('.btnTextChangePopup').text('Follow');
+                        jQuery('.btnTextChangePopup').text(follow_trans);
                     }
                 }
 
@@ -1594,7 +1620,7 @@ function followLikeList(){
                     if(followStatus==true){
                         jQuery('.followStatusChange-'+followId).removeClass('sx_5da455');
                         jQuery('.followStatusChange-'+followId).addClass('sx_5da456');
-                        jQuery('.btnTextChange-'+followId).text('Followed');
+                        jQuery('.btnTextChange-'+followId).text(followed_trans);
                     }
 
                 });

@@ -415,11 +415,11 @@ function video_play_using_video_js(url,backup_url,image) {debugger;
                     if(followStatus==true){
                         jQuery('.followStatusChangePopup').removeClass('sx_5da455');
                         jQuery('.followStatusChangePopup').addClass('sx_5da456');
-                        jQuery('.btnTextChangePopup').text('Followed');
+                        jQuery('.btnTextChangePopup').text(followed_trans);
                     }else{
                         jQuery('.followStatusChangePopup').removeClass('sx_5da456');
                         jQuery('.followStatusChangePopup').addClass('sx_5da455');
-                        jQuery('.btnTextChangePopup').text('Follow');
+                        jQuery('.btnTextChangePopup').text(follow_trans);
                     }
                 }
 
@@ -576,7 +576,7 @@ function loadMoreComments(nextPageURl){
                         if(followStatus==true){
                             jQuery('.followStatusChange-'+followId).removeClass('sx_5da455');
                             jQuery('.followStatusChange-'+followId).addClass('sx_5da456');
-                            jQuery('.btnTextChange-'+followId).text('Followed');
+                            jQuery('.btnTextChange-'+followId).text(followed_trans);
                         }
 
                     });
