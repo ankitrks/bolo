@@ -120,7 +120,7 @@ def identify_logo_text():
 							print(modified_text)
 							print("yes")
 							print("..........")
-							f.write(str(video_title) + " " + str(url) + " " + (modified_text) + "\n")	
+							f.write(video_title + " " + url_str + " " + (modified_text) + "\n")	
 
 
 						
