@@ -119,12 +119,11 @@ def identify_logo_text():
 						if(modified_text in plag_source):
 							print(modified_text)
 							print("yes")
-							print("..........")
+							print("...............")
 							f.write(video_title + " " + url_str + " " + (modified_text) + "\n")
-							item.plag_text = modified_text
-							item.time_deleted = datetime.now()
-							item.save()
-							item.delete()	
+							Topic.objects.filter(id = iter_id).update(plag_text = str(plag_source.index(modified_text)))
+							Topic.objects.filter(id = iter_id).update(time_deleted = datetime.now())
+							data[0].delete()
 
 
 						
@@ -181,7 +180,7 @@ def identify_logo_util():
 							Topic.objects.filter(id = iter_id).update(plag_text = str(plag_source.index(modified_text)))
 							Topic.objects.filter(id = iter_id).update(time_deleted = datetime.now())
 							data[0].delete()
-							
+
 
 			except:
 				pass 
