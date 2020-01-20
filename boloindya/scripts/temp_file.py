@@ -182,10 +182,8 @@ def identify_logo_util():
 							#item.save()
 							Topic.objects.filter(id = iter_id).update(plag_text = str(plag_source.index(modified_text)))
 							Topic.objects.filter(id = iter_id).update(time_deleted = datetime.now())
-							item.time_deleted = datetime.now()
-							#item.save()
-							item.delete()
-							item.save()	
+							Topic.objects.filter(id = iter_id).delete()
+							#item.save()	
 							#f.write(str(iter_id) + " " + str(video_title) + " " + str(video_url) + (modified_text) + "\n")
 
 			except:
