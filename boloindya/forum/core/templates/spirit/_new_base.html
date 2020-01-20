@@ -43,7 +43,16 @@
     <script src="https://unpkg.com/videojs-contrib-hls/dist/videojs-contrib-hls.js"></script> -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script> -->
 <!-- Or if you want a more recent canary version -->
-<script src="https://cdn.jsdelivr.net/npm/hls.js@canary"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@canary"></script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2YHY45HKGR"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-2YHY45HKGR');
+    </script>
 
     {% block head-meta %}{% endblock %}
 
@@ -145,14 +154,13 @@
     <!-- End Alexa Certify Javascript --> 
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-156245329-1"></script>
+<!-- <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156245329-1"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'UA-156245329-1');
-</script>
+</script> -->
 
   </head>
 
@@ -165,10 +173,10 @@
     {% include 'spirit/_new_footer.html' %}
 
     <!-- The core Firebase JS SDK is always required and must be listed first -->
-<script src="https://www.gstatic.com/firebasejs/7.6.2/firebase-app.js"></script>
+<!-- <script src="https://www.gstatic.com/firebasejs/7.6.2/firebase-app.js"></script> -->
 <!-- TODO: Add SDKs for Firebase products that you want to use
      https://firebase.google.com/docs/web/setup#available-libraries -->
-<script src="https://www.gstatic.com/firebasejs/7.6.2/firebase-analytics.js"></script>
+<!-- <script src="https://www.gstatic.com/firebasejs/7.6.2/firebase-analytics.js"></script>
 <script>
   // Your web app’s Firebase configuration
   var firebaseConfig = {
@@ -184,7 +192,7 @@
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
   firebase.analytics();
-</script>
+</script> -->
 
   </body>
 

@@ -1345,11 +1345,18 @@ def statistics_all(request):
     if end_date_obj >= datetime.datetime.today().date():
         end_date = (datetime.datetime.today() - timedelta(days = 1)).strftime("%Y-%m-%d")
 
+    end_date_obj = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
+    if end_date_obj >= datetime.datetime.today().date():
+        end_date = (datetime.datetime.today() - timedelta(days = 1)).strftime("%Y-%m-%d")
+
+    top_start = (datetime.datetime.today() - timedelta(days = 30)).date()
+    top_end = (datetime.datetime.today() - timedelta(days = 1)).date()
     for each_opt in metrics_options:
         temp_list = []
         temp_list.append( each_opt[0] )
         temp_list.append( each_opt[1] )
         temp_list.append( DashboardMetrics.objects.exclude(date__gt = end_date).filter(metrics = each_opt[0])\
+        temp_list.append( DashboardMetrics.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0])\
                 .aggregate(total_count = Sum('count'))['total_count'] )
         top_data.append( temp_list ) 
         if metrics == each_opt[0]:
@@ -1359,9 +1366,9 @@ def statistics_all(request):
     graph_data = DashboardMetrics.objects.exclude(date__gt = end_date).filter(Q(metrics = metrics) & Q(date__gte = start_date) & Q(date__lte = end_date))
     if metrics in ['4', '2', '5'] and slab:
         if (metrics == '4' and slab in ['0', '1', '2']) or (metrics == '2' and slab in ['3', '4', '5'])\
-                 or (metrics == '5' and slab in ['6', '7', '8']):
+                 or (metrics == '5' and slab in ['6', '7']):
             graph_data = graph_data.filter(metrics_slab = slab)
-    
+
     if data_view == 'weekly':
         x_axis = []
         y_axis = []
@@ -1381,9 +1388,16 @@ def statistics_all(request):
     # else:
     #     x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
     #     y_axis = graph_data.values_list('count', flat = True)
-    
-    data['x_axis'] = list(x_axis)
-    data['y_axis'] = list(y_axis)
+    data['metrics'] = metrics
+    data['slab'] = slab
+    data['data_view'] = data_view
+    # data['x_axis'] = list(x_axis)
+    # data['y_axis'] = list(y_axis)
+    from collections import OrderedDict
+    chart_data = OrderedDict()
+    for i in range(len(x_axis)):
+        chart_data[x_axis[i]] = y_axis[i]
+    data['chart_data'] = [[str(data_view), str(data['graph_title'])]] + [list(ele) for ele in chart_data.items()] 
     data['start_date'] = start_date
     data['end_date'] = end_date
     data['slabs'] = []

@@ -168,7 +168,7 @@ metrics_options = (
     ('2', "Bolo Actions"),
     ('3', "Video Shares"),
     ('4', "Video Creators"),
-    ('5', "No of Installs"),
+    ('5', "Number of Installs"),
     ('6', "Monthly Active Users"),
     ('7', "Unique Video Views"),
 )
@@ -183,7 +183,7 @@ metrics_slab_options = (
     ('6', "Organic"),
     ('7', "Paid"),
     ('8', "Unique New"),
-
+    ('t', "Total"),
 )
 
 
