@@ -315,22 +315,23 @@ class Topic(models.Model):
 
     def delete(self):
         print("called here")
-        if self.is_monetized:
-            if self.language_id == '1':
-                reduce_bolo_score(self.user.id, 'create_topic_en', self, 'deleted')
-            else:
-                reduce_bolo_score(self.user.id, 'create_topic', self, 'deleted')
-        else:
-            notify_owner = Notification.objects.create(for_user_id = self.user.id ,topic = self, \
-                notification_type='7', user_id = self.user.id)
-        self.is_monetized = False
-        self.is_removed = True
-        self.save()
-        userprofile = UserProfile.objects.get(user = self.user)
-        if userprofile.vb_count and self.is_vb:
-            userprofile.vb_count = F('vb_count')-1
-        userprofile.save()
-        return True
+        
+        # if self.is_monetized:
+        #     if self.language_id == '1':
+        #         reduce_bolo_score(self.user.id, 'create_topic_en', self, 'deleted')
+        #     else:
+        #         reduce_bolo_score(self.user.id, 'create_topic', self, 'deleted')
+        # else:
+        #     notify_owner = Notification.objects.create(for_user_id = self.user.id ,topic = self, \
+        #         notification_type='7', user_id = self.user.id)
+        # self.is_monetized = False
+        # self.is_removed = True
+        # self.save()
+        # userprofile = UserProfile.objects.get(user = self.user)
+        # if userprofile.vb_count and self.is_vb:
+        #     userprofile.vb_count = F('vb_count')-1
+        # userprofile.save()
+        # return True
 
     def restore(self):
         self.is_removed = False
