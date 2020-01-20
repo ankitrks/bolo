@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-18 16:08+0530\n"
+"POT-Creation-Date: 2020-01-20 11:35+0530\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -119,8 +119,8 @@ msgid "thumbnail"
 msgstr ""
 
 #: forum/topic/models.py:107 forum/topic/models.py:108
-#: forum/topic/templates/spirit/topic/new_landing.html:312
-#: forum/topic/templates/spirit/topic/new_landing.html:328
+#: forum/topic/templates/spirit/topic/new_landing.html:314
+#: forum/topic/templates/spirit/topic/new_landing.html:330
 msgid "views"
 msgstr ""
 
@@ -407,19 +407,19 @@ msgstr ""
 msgid "Apply"
 msgstr ""
 
-#: forum/topic/templates/spirit/topic/new_landing.html:274
+#: forum/topic/templates/spirit/topic/new_landing.html:275
 msgid "Popular Videos"
 msgstr ""
 
-#: forum/topic/templates/spirit/topic/new_landing.html:303
+#: forum/topic/templates/spirit/topic/new_landing.html:304
 msgid "Trending Categories"
 msgstr ""
 
-#: forum/topic/templates/spirit/topic/new_landing.html:321
+#: forum/topic/templates/spirit/topic/new_landing.html:323
 msgid "Trending Hashtags"
 msgstr ""
 
-#: forum/topic/templates/spirit/topic/new_landing.html:339
+#: forum/topic/templates/spirit/topic/new_landing.html:341
 msgid "Get the App"
 msgstr ""
 
@@ -435,7 +435,29 @@ msgstr ""
 msgid "Publish"
 msgstr ""
 
-#: forum/topic/templates/spirit/topic/search_results.html:717
+#: forum/topic/templates/spirit/topic/search_results.html:746
+#: forum/topic/templates/spirit/topic/topic_details_by_category.html:292
+#: forum/topic/templates/spirit/topic/topic_list_by_hashtag.html:227
+#: forum/topic/templates/spirit/topic/user_details.html:295
+#: forum/topic/templates/spirit/topic/user_profile.html:224
+msgid "Creators"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/search_results.html:747
+#: forum/topic/templates/spirit/topic/user_details.html:257
+#: forum/topic/templates/spirit/topic/user_profile.html:186
+msgid "Videos"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/search_results.html:748
+msgid "Categories"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/search_results.html:749
+msgid "Hashtags"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/search_results.html:814
 msgid "Search :"
 msgstr ""
 
@@ -447,13 +469,6 @@ msgstr ""
 #: forum/topic/templates/spirit/topic/user_details.html:259
 #: forum/topic/templates/spirit/topic/video_discover.html:224
 msgid "Follow"
-msgstr ""
-
-#: forum/topic/templates/spirit/topic/topic_details_by_category.html:292
-#: forum/topic/templates/spirit/topic/topic_list_by_hashtag.html:227
-#: forum/topic/templates/spirit/topic/user_details.html:295
-#: forum/topic/templates/spirit/topic/user_profile.html:224
-msgid "Creators"
 msgstr ""
 
 #: forum/topic/templates/spirit/topic/topic_details_by_category.html:292
@@ -504,11 +519,6 @@ msgstr ""
 #: forum/topic/templates/spirit/topic/user_details.html:256
 #: forum/topic/templates/spirit/topic/user_profile.html:185
 msgid "Likes"
-msgstr ""
-
-#: forum/topic/templates/spirit/topic/user_details.html:257
-#: forum/topic/templates/spirit/topic/user_profile.html:186
-msgid "Videos"
 msgstr ""
 
 #: forum/topic/templates/spirit/topic/video_details.html:1295

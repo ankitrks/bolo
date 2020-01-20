@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Spirit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-18 16:08+0530\n"
+"POT-Creation-Date: 2020-01-20 11:35+0530\n"
 "PO-Revision-Date: 2015-10-14 19:36+0000\n"
 "Last-Translator: Esteban M. Castro Borsani <ecastroborsani@gmail.com>\n"
 "Language-Team: German (http://www.transifex.com/spirit-project/spirit/"
@@ -121,8 +121,8 @@ msgid "thumbnail"
 msgstr ""
 
 #: forum/topic/models.py:107 forum/topic/models.py:108
-#: forum/topic/templates/spirit/topic/new_landing.html:312
-#: forum/topic/templates/spirit/topic/new_landing.html:328
+#: forum/topic/templates/spirit/topic/new_landing.html:314
+#: forum/topic/templates/spirit/topic/new_landing.html:330
 #, fuzzy
 #| msgid "views count"
 msgid "views"
@@ -421,23 +421,23 @@ msgstr "Thema moderieren"
 msgid "Apply"
 msgstr "akzeptieren"
 
-#: forum/topic/templates/spirit/topic/new_landing.html:274
+#: forum/topic/templates/spirit/topic/new_landing.html:275
 msgid "Popular Videos"
 msgstr ""
 
-#: forum/topic/templates/spirit/topic/new_landing.html:303
+#: forum/topic/templates/spirit/topic/new_landing.html:304
 #, fuzzy
 #| msgid "Trending Hashtags"
 msgid "Trending Categories"
 msgstr "Treding Test"
 
-#: forum/topic/templates/spirit/topic/new_landing.html:321
+#: forum/topic/templates/spirit/topic/new_landing.html:323
 #, fuzzy
 #| msgid "Trending Hashtags"
 msgid "Trending Hashtags"
 msgstr "Treding Test"
 
-#: forum/topic/templates/spirit/topic/new_landing.html:339
+#: forum/topic/templates/spirit/topic/new_landing.html:341
 msgid "Get the App"
 msgstr ""
 
@@ -453,7 +453,37 @@ msgstr ""
 msgid "Publish"
 msgstr "veröffentlichen"
 
-#: forum/topic/templates/spirit/topic/search_results.html:717
+#: forum/topic/templates/spirit/topic/search_results.html:746
+#: forum/topic/templates/spirit/topic/topic_details_by_category.html:292
+#: forum/topic/templates/spirit/topic/topic_list_by_hashtag.html:227
+#: forum/topic/templates/spirit/topic/user_details.html:295
+#: forum/topic/templates/spirit/topic/user_profile.html:224
+#, fuzzy
+#| msgid "Create Topic"
+msgid "Creators"
+msgstr "Thema erstellen"
+
+#: forum/topic/templates/spirit/topic/search_results.html:747
+#: forum/topic/templates/spirit/topic/user_details.html:257
+#: forum/topic/templates/spirit/topic/user_profile.html:186
+#, fuzzy
+#| msgid "title"
+msgid "Videos"
+msgstr "Titel"
+
+#: forum/topic/templates/spirit/topic/search_results.html:748
+#, fuzzy
+#| msgid "All Categories"
+msgid "Categories"
+msgstr "Alle Kategorien"
+
+#: forum/topic/templates/spirit/topic/search_results.html:749
+#, fuzzy
+#| msgid "Trending Hashtags"
+msgid "Hashtags"
+msgstr "Treding Test"
+
+#: forum/topic/templates/spirit/topic/search_results.html:814
 msgid "Search :"
 msgstr ""
 
@@ -468,15 +498,6 @@ msgstr "gelesen"
 #: forum/topic/templates/spirit/topic/video_discover.html:224
 msgid "Follow"
 msgstr ""
-
-#: forum/topic/templates/spirit/topic/topic_details_by_category.html:292
-#: forum/topic/templates/spirit/topic/topic_list_by_hashtag.html:227
-#: forum/topic/templates/spirit/topic/user_details.html:295
-#: forum/topic/templates/spirit/topic/user_profile.html:224
-#, fuzzy
-#| msgid "Create Topic"
-msgid "Creators"
-msgstr "Thema erstellen"
 
 #: forum/topic/templates/spirit/topic/topic_details_by_category.html:292
 #: forum/topic/templates/spirit/topic/topic_details_by_category.html:305
@@ -529,13 +550,6 @@ msgstr ""
 #| msgid "views count"
 msgid "Likes"
 msgstr "gelesen"
-
-#: forum/topic/templates/spirit/topic/user_details.html:257
-#: forum/topic/templates/spirit/topic/user_profile.html:186
-#, fuzzy
-#| msgid "title"
-msgid "Videos"
-msgstr "Titel"
 
 #: forum/topic/templates/spirit/topic/video_details.html:1295
 #, fuzzy
@@ -614,9 +628,6 @@ msgstr ""
 
 #~ msgid "There are no topics here, yet"
 #~ msgstr "Es gibt keine Themen, bis jetzt..."
-
-#~ msgid "All Categories"
-#~ msgstr "Alle Kategorien"
 
 #~ msgid "All Subcategories"
 #~ msgstr "Alle Unterkategorien"

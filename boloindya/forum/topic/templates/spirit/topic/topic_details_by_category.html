@@ -91,6 +91,7 @@
     position: relative;
     width: 100%;
     height: 100%;
+    border: 1px solid #ffffff59;
 }
 video.jsx-3382097194 {
     display: block;
@@ -250,8 +251,8 @@ video.jsx-3382097194 {
             <header class="share-layout-header bottom-line share-header">
                 <div class="jsx-2177493926 jsx-578937417 avatar round userProfilAvator" style="background-image: url({{ category_details.category_image}}); "></div>
                 <div class="share-info">
-
-                    <h1 class="share-title headingMargin"> @{{category_details.slug}}</h1> 
+                    <h1 class="share-title headingMargin">{% category_title_by_language category_details LANGUAGE_CODE|language_name %}</h1>
+                    <!-- <h5 class="share-title headingMargin"> @{{category_details.slug}}</h5> --> 
                     <p class="count-infos"><span class="number"></span><span class="unit"> {{category_details.view_count | shorcountertopic}} {% trans "Views" %}</span><span class="number"> </span>
                         <span class="unit">
                             <button onclick="follow_category('{{category_details.id}}');" class="_4jy1 _4jy4 _517h _51sy _42ft " type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-{{category_details.id}} followCheck sx_5da455"></i><span class="btnTextChange-{{category_details.id}}">{% trans "Follow" %}</span>

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-18 16:08+0530\n"
+"POT-Creation-Date: 2020-01-20 11:35+0530\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -119,6 +119,10 @@ msgstr "லைக்ஸ்"
 #: forum/core/templates/spirit/_video_play_and_comments.html:1148
 msgid "comments"
 msgstr "கருத்துகள்"
+
+#: forum/core/templates/spirit/_new_base.html:78
+msgid "Followers"
+msgstr ""
 
 #: forum/core/templates/spirit/_new_footer.html:6
 #: forum/core/templates/spirit/_video_play_and_comments.html:1148

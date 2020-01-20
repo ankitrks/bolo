@@ -484,7 +484,8 @@ function follow_category(following_id){
             headers: {
               'Authorization':'Bearer '+accessToken,
             },
-            data:{sub_category_id:following_id},
+            data:{'sub_category_id':following_id},
+            dataType:'json',
             success: function(response,textStatus, xhr){
  
                checkFollowStatus=jQuery('.followStatusChange-'+following_id).hasClass('sx_5da456');

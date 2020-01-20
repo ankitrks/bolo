@@ -85,11 +85,19 @@ function getCreators(popularCreators){
 
 
 function getPopularCategory(popularCategory){
+    var category_title;
+    currentLanguageName=current_language_name.toLowerCase();
+    if(currentLanguageName!='english'){
+        category_title=currentLanguageName+'_title';
+    }else{
+        category_title='title';
+    }
+
     var popular_categories='<li class="jsx-3959364739">\
                         <a tag="a" class="jsx-1420774184 recommend-item" href="/tag/'+popularCategory.slug+'/">\
                             <div class="jsx-2177493926 jsx-578937417 avatar head normal" style="background-image: url('+popularCategory.category_image+'); border-radius: 2px;"></div>\
                             <div class="jsx-1420774184 info-content">\
-                                <h4 class="jsx-1420774184">'+popularCategory.title+'</h4>\
+                                <h4 class="jsx-1420774184">'+popularCategory[category_title]+'</h4>\
                                 <p class="jsx-1420774184">'+popularCategory.total_view+' Views</p>\
                             </div>\
                             <div class="jsx-1420774184 arrow-right"></div>\
@@ -177,7 +185,7 @@ function getVideoItem(videoItem,itemCount){
     var hideErrorMsg = true;
 
     var retryCount=0;
-function video_play_using_video_js(url,backup_url,image) {debugger;
+function video_play_using_video_js(url,backup_url,image) {
     
     var video = document.getElementById('player');
 
@@ -277,16 +285,24 @@ function video_play_using_video_js(url,backup_url,image) {debugger;
     // });
 
 
-    var shareURL=site_base_url+singleItemData.user.username+'/'+singleItemData.id+'';
+    var shareURL=site_base_url+singleItemData.slug+'/'+singleItemData.id+'';
 
     var sideBarDetails='<div onClick="openMobileDownloadPopup();" class="jsx-2177493926 jsx-3813273378 avatar round" style="background-image: url(/media/musically_100x100.jpeg); width: 48px; height: 48px; flex: 0 0 48px;"></div><div class="jsx-949708032 boloindya-toolbar" style="margin-top: 20px;"><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-like" onClick="openMobileDownloadPopup();" style="background-image: url(/media/viewIcon.svg);"><span class="jsx-949708032">'+singleItemData.likes_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-comment" onClick="openMobileDownloadPopup();" style="background-image: url(/media/comments.svg);"><span class="jsx-949708032">'+singleItemData.comment_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-share" onclick="openShareTab()" style="background-image: url(/media/share.svg);"><span class="jsx-949708032">'+singleItemData.total_share_count+'</span></div></div>';
         $("#topicID").val(singleItemData.id);
         $("#topicCreatorUsername").val(singleItemData.user.username);
         $("#shareInputbox").val(shareURL);
-        var bigCommentLikeDet='<strong>'+singleItemData.likes_count+' '+likeTrans+' · '+singleItemData.comment_count+' '+commentsTrans+'</strong>';
+        var bigCommentLikeDet='<strong><span id="likeCountId">'+singleItemData.likes_count+'</span> '+likeTrans+' · <span id="commentCountId">'+singleItemData.comment_count+'</span> '+commentsTrans+'</strong>';
         $("#sideBarId").html(sideBarDetails);
         $("._video_card_big_meta_info_count").html(bigCommentLikeDet);
         $(".video-meta-title").html(singleItemData.title);
+
+        //===================== Comment and Like count ===============
+
+        $("#totalLikeCount").val(singleItemData.likes_count);
+        $("#totalCommentCount").val(singleItemData.comment_count);
+
+        //===================Comment and Like Count end =============
+
 
         var userprofileName=singleItemData.user.userprofile.name;
         var userHandleName=singleItemData.user.username;
@@ -336,19 +352,32 @@ function video_play_using_video_js(url,backup_url,image) {debugger;
         var sideBarCommentDetails="";
         var origin   = window.location.origin;
         param1=singleItemData.slug;
-        history.pushState(null, null, '?video='+param1);
+        param2=singleItemData.id;
+        history.pushState(null, null, '?video='+param1+'/'+param2);
  }
 
  function muteAndUnmutePlayer(){
-  jwplayer().setMute();
-  var muteStatus=jwplayer('player').getMute();
-  if(muteStatus==true){
-    var newSrc='/media/sound_mute.svg';
-    $('#mutedImageId').attr('src', newSrc);
-  }else{
-    var newSrc='/media/mute_icon.svg';
-    $('#mutedImageId').attr('src', newSrc);
-  }
+  // jwplayer().setMute();
+  // var muteStatus=jwplayer('player').getMute();
+  // if(muteStatus==true){
+  //   var newSrc='/media/sound_mute.svg';
+  //   $('#mutedImageId').attr('src', newSrc);
+  // }else{
+  //   var newSrc='/media/mute_icon.svg';
+  //   $('#mutedImageId').attr('src', newSrc);
+  // }
+
+    if($("video").prop('muted')){
+
+      $("video").prop('muted', false);
+      var newSrc='/media/mute_icon.svg';
+      $('#mutedImageId').attr('src', newSrc);
+    }else{
+        $("video").prop('muted', true);
+        var newSrc='/media/sound_mute.svg';
+        $('#mutedImageId').attr('src', newSrc);
+    }
+
 
 }
 
@@ -357,6 +386,9 @@ function listCommentsById(singleTopicData){
     var topicId=singleTopicData.id;
     var topicSlug=singleTopicData.slug;
     var listCommentItems="";
+
+
+
     $(".videoCommentId").html("");
     //================Comments List =================
     var uri='/api/v1/topics/'+topicSlug+'/'+topicId+'/comments?limit=5&offset=1';
@@ -407,11 +439,17 @@ function listCommentsById(singleTopicData){
 }
 
 function loadMoreComments(nextPageURl){
-
+    loaderBoloShowDynamic('_scroll_load_more_loading_comment');
+    if(nextPageURl=='null'){
+        var loadMoreComment='<span class="loadMoreComment">No more comment</span';
+        $(".loadMoreComments").html(loadMoreComment);
+        loaderBoloHideDynamic('_scroll_load_more_loading_comment');
+        return false;
+    }
     var listCommentItems="";
     //================Comments List =================
     var uri=nextPageURl;
-    var res = encodeURI(uri);
+    var res = uri;
     $.get(res, function (data, textStatus, jqXHR) {
         var videoCommentList=data.results;
 
@@ -433,6 +471,7 @@ function loadMoreComments(nextPageURl){
         var loadMoreComment='<span class="loadMoreComment"><a class="" onclick="loadMoreComments(\''+data.next+'\');" href="javascript:void(0);">Load More Comments...</a></span';
         $(".loadMoreComments").html(loadMoreComment);
         loaderBoloHide();
+        loaderBoloHideDynamic('_scroll_load_more_loading_comment');
     });
 }
 function followLikeList(){

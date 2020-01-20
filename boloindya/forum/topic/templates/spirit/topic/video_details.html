@@ -1148,6 +1148,45 @@ $(document).ready(function() {
     line-height: 20px;
     color: #fe2c55;
 }
+
+.ytd-commentbox {
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    float: right;
+    -ms-flex-direction: row;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+}
+.ytd-button-renderer {
+    vertical-align: middle;
+    white-space: nowrap;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: .007px;
+    cursor: pointer;
+
+}
+ #submit-button.ytd-commentbox {
+    background-color: #ccc;
+    color: #000;
+    padding: 5px;
+}
+#cancel-button.ytd-commentbox{
+    margin-top: -5px !important;
+}
+
+#cancel-button.ytd-commentbox, #submit-button.ytd-commentbox {
+    margin-left: 8px;
+    margin-top: -10px;
+}
+
+.ytd-button-renderer.style-primary[disabled][is-paper-button] {
+    background-color: #ccc;
+    color: #000;
+    padding: 5px;
+}
+
 </style>
 <link rel="canonical" href="{{site_absolute_url}}{{ request.get_full_path }}" />      
 <meta property="og:url" content="{{site_absolute_url}}{{ request.get_full_path }}"/>
@@ -1163,6 +1202,10 @@ $(document).ready(function() {
 
 <input type="hidden" name="singleTopicId" id="singleTopicId" value="{{topic.id}}">
 <input type="hidden" name="topicSlug" id="singleTopicSlug" value="{{topic.slug}}">
+
+<input type="hidden" name="totalLikeCount" id="totalLikeCount" value="{{topic.likes_count}}">
+<input type="hidden" name="totalCommentCount" id="totalCommentCount" value="{{topic.comment_count}}">
+
 <div class="jsx-639186511 page-with-header main-body">
 
     <div class="jsx-1270455008 container hideOnDesktop" >
@@ -1240,6 +1283,7 @@ $(document).ready(function() {
         <div class="share-layout-content">
             <main class="share-layout-main">
                 <div class="jsx-1861775669 jsx-537314381 video-card-big">
+
                     <div class="jsx-1861775669 jsx-537314381 video-card-container">
                         <div style="border-radius: 8px; background-image: url();" class="jsx-1464109409 image-card">
                             <div class="jsx-3077367275 video-card default">
@@ -1250,7 +1294,7 @@ $(document).ready(function() {
                                 </div>
                                 <div id="jwBoxPlayAndStop" style="height: 100%">
                                     <div id="playerDetailsI"></div>
-                                        <video id="playerDetails" class="videoCentered"></video>
+                                        <video id="playerDetails" preload="" class="videoCentered"></video>
                                 </div>
 
                                 <div class="jsx-3077367275 video-card-mask"></div>
@@ -1282,7 +1326,7 @@ $(document).ready(function() {
                             </div>
                         </a>
                         <span class="unit" style="display: inline-block;position: relative;top: -56px;">
-                            <button onclick="follow_user('{{user_profile.id}}');" style="float: right;" class="_4jy1 _4jy4 _517h _51sy _42ft " type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-{{user_profile.id}} followCheck sx_5da455"></i><span class="btnTextChange-{{user_profile.id}}">Follow</span>
+                            <button onclick="follow_user('{{user_profile.id}}');" style="float: right;" class="_4jy1 _4jy4 _517h _51sy _42ft " type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-{{user_profile.id}} followCheck sx_5da455"></i><span class="btnTextChange-{{user_profile.id}}">{% trans "Follow" %}</span>
                             </button>
                         </span>
                         <h1 class="jsx-191376589 jsx-861547433 jsx-3645511632 video-meta-title"><strong>{{topic.title}}</strong></h1>
@@ -1292,7 +1336,7 @@ $(document).ready(function() {
                                     <div>
                                         <div class="_video_card_big_meta_info_">
 
-                                            <div class="_video_card_big_meta_info_count"><strong>{{topic.likes_count | shorcountertopic}} {% trans "likes" %} · {{topic.comment_count | shorcountertopic}} {% trans "comments" %}</strong></div>
+                                            <div class="_video_card_big_meta_info_count"><strong><span id="likeCountId">{{topic.likes_count | shorcountertopic}}</span> {% trans "likes" %} · <span id="commentCountId">{{topic.comment_count | shorcountertopic}}</span> {% trans "comments" %}</strong></div>
                                             <input type="hidden" name="tpoicId" id="topicID" value="" >
                                             <input type="hidden" name="topicCreatorUsername" id="topicCreatorUsername" value="" >
                                         </div>
@@ -1350,8 +1394,22 @@ $(document).ready(function() {
                                                 
                                                 <div class="comment-add">
                                                     <textarea class='mention' id="comment-input" autocomplete="off" maxlength="60" placeholder="Say something nice.."></textarea>
-                                                    <span class="chars-counter"><span id="chars-current">0</span>/60</span>
+                                                    
                                                 </div>
+                                                <div id="buttons1" class="style-scope ytd-commentbox">
+                                                    <div id="cancel-button" class="style-scope ytd-commentbox style-text size-default ytd-button-renderer" >
+                                                        <a class="yt-simple-endpoint style-scope ytd-button-renderer" tabindex="-1">
+                                                            Cancel
+                                                        </a>
+                                                    </div>
+                                                    <div id="submit-button" class="style-scope ytd-commentbox style-primary size-default ytd-button-renderer" >
+                                                        <a class="yt-simple-endpoint style-scope ytd-button-renderer" tabindex="-1">
+                                                            Comment
+                                                        </a>
+                                                    </div>
+
+                                                </div>
+                                                <span class="chars-counter"><span id="chars-current">0</span>/60</span>
                                                 <span class="commentError"></span>
                                             </div>
                                         </div>
@@ -1388,7 +1446,7 @@ $(document).ready(function() {
                 <!-- <h3 class="jsx-2573841504">{% trans "Trends" %}</h3> -->
                 <div class="jsx-2573841504 recommend-video-container">
                     <div class="_scroll_load_more_loading_user_videos center">
-                            <div class="boloindya-loading">Loading...</div>
+                            <div class="boloindya-loading"></div>
                     </div>
                     <ul class="jsx-2573841504" id="playlist">
                     </ul>

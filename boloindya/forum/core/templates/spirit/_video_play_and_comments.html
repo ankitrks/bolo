@@ -1075,6 +1075,44 @@ input.tag-input {
     margin-bottom: 8px;
 }
 
+.ytd-commentbox {
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    float: right;
+    -ms-flex-direction: row;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+}
+.ytd-button-renderer {
+    vertical-align: middle;
+    white-space: nowrap;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: .007px;
+    cursor: pointer;
+
+}
+ #submit-button.ytd-commentbox {
+    background-color: #ccc;
+    color: #000;
+    padding: 5px;
+}
+#cancel-button.ytd-commentbox{
+    margin-top: -5px !important;
+}
+
+#cancel-button.ytd-commentbox, #submit-button.ytd-commentbox {
+    margin-left: 8px;
+    margin-top: -10px;
+}
+
+.ytd-button-renderer.style-primary[disabled][is-paper-button] {
+    background-color: #ccc;
+    color: #000;
+    padding: 5px;
+}
+
 
 
 </style>
@@ -1082,6 +1120,9 @@ input.tag-input {
 {% trans "download" as Download %}
 {% trans "like" as like %}
 {% trans "video" as video %}
+
+<input type="hidden" name="totalLikeCount" id="totalLikeCount" value="">
+<input type="hidden" name="totalCommentCount" id="totalCommentCount" value="">
 
 <div style="display: none" id="modelPopup">
     <input type="hideon" name="indexId" id="indexId" value="">
@@ -1204,25 +1245,26 @@ input.tag-input {
                                             <div class="">
                                                 
                                                 <div class="comment-add ">
-<!--                                                     <label for="exist-values" id="listUsersId">
-                                                        <input type="hidden" id="exist-values" class="tagged form-control" data-removebtn="true" name="tag-2" value="PC,Play Station 4,New" placeholder="Add Platform">
-                                                        <div class="tags-container">
-    
-                                                            <span class="lastElement"></span>
-                                                            <input value="" class="tag-input" id="comment-input" autocomplete="off" maxlength="60" placeholder="Say something nice..">
-                                                        </div>
-                                                    </label> -->
 
 
                                                     <textarea class='mention' id="comment-input" autocomplete="off" maxlength="60" placeholder="Say something nice.."></textarea>
 
-
      
                                                 </div>
 
+                                                <div id="buttons1" class="style-scope ytd-commentbox">
+                                                    <div id="cancel-button" class="style-scope ytd-commentbox style-text size-default ytd-button-renderer" >
+                                                        <a class="yt-simple-endpoint style-scope ytd-button-renderer" tabindex="-1">
+                                                            Cancel
+                                                        </a>
+                                                    </div>
+                                                    <div id="submit-button" class="style-scope ytd-commentbox style-primary size-default ytd-button-renderer" >
+                                                        <a class="yt-simple-endpoint style-scope ytd-button-renderer" tabindex="-1">
+                                                            Comment
+                                                        </a>
+                                                    </div>
 
-
-
+                                                </div>
                                                 <span class="chars-counter"><span id="chars-current">0</span>/60</span>
                                                 <span class="commentError"></span>
                                             </div>
@@ -1233,6 +1275,9 @@ input.tag-input {
                                         <span class="commentErrorStatus"></span>
                                         <div id="currentCommentId"></div>
                                         <div class="videoCommentId"></div>
+                                        <div class="_scroll_load_more_loading_comment">
+                                            <div class="tiktok-loading"></div>
+                                        </div>
                                         <div class="loadMoreComments"></div>
 
                                     </div>

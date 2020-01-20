@@ -212,17 +212,24 @@ function openVideoInPopup(topicId){
     // });
 
 
-    var shareURL=site_base_url+singleItemData.user.username+'/'+singleItemData.id+'';
+    var shareURL=site_base_url+singleItemData.slug+'/'+singleItemData.id+'';
 
     var sideBarDetails='<div onClick="openMobileDownloadPopup();" class="jsx-2177493926 jsx-3813273378 avatar round" style="background-image: url(/media/musically_100x100.jpeg); width: 48px; height: 48px; flex: 0 0 48px;"></div><div class="jsx-949708032 boloindya-toolbar" style="margin-top: 20px;"><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-like" onClick="openMobileDownloadPopup();" style="background-image: url(/media/viewIcon.svg);"><span class="jsx-949708032">'+singleItemData.likes_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-comment" onClick="openMobileDownloadPopup();" style="background-image: url(/media/comments.svg);"><span class="jsx-949708032">'+singleItemData.comment_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-share" onclick="openShareTab()" style="background-image: url(/media/share.svg);"><span class="jsx-949708032">'+singleItemData.total_share_count+'</span></div></div>';
         $("#topicID").val(singleItemData.id);
         $("#currentPlayUserId").val(singleItemData.user.userprofile.id);
         $("#topicCreatorUsername").val(singleItemData.user.username);
         $("#shareInputbox").val(shareURL);
-        var bigCommentLikeDet='<strong>'+singleItemData.likes_count+' likes · '+singleItemData.comment_count+' comments</strong>';
+        var bigCommentLikeDet='<strong><span id="likeCountId">'+singleItemData.likes_count+'</span> '+likeTrans+' · <span id="commentCountId">'+singleItemData.comment_count+'</span> '+commentsTrans+'</strong>';
         $("#sideBarId").html(sideBarDetails);
         $("._video_card_big_meta_info_count").html(bigCommentLikeDet);
         $(".video-meta-title").html(singleItemData.title);
+        //===================== Comment and Like count ===============
+
+        $("#totalLikeCount").val(singleItemData.likes_count);
+        $("#totalCommentCount").val(singleItemData.comment_count);
+
+        //===================Comment and Like Count end =============
+
         var userprofileName=singleItemData.user.userprofile.name;
         var userHandleName=singleItemData.user.username;
         var videoTitle=singleItemData.title;
@@ -299,7 +306,8 @@ function openVideoInPopup(topicId){
         var sideBarCommentDetails="";
         var origin   = window.location.origin;
         param1=singleItemData.slug;
-        history.pushState(null, null, '?video='+param1);
+        param2=singleItemData.id;
+        history.pushState(null, null, '?video='+param1+'/'+param2);
 
  }
 
@@ -308,15 +316,27 @@ function openVideoInPopup(topicId){
  });
 
  function muteAndUnmutePlayer(){
-  jwplayer().setMute();
-  var muteStatus=jwplayer('player').getMute();
-  if(muteStatus==true){
-    var newSrc='/media/sound_mute.svg';
-    $('#mutedImageId').attr('src', newSrc);
-  }else{
-    var newSrc='/media/mute_icon.svg';
-    $('#mutedImageId').attr('src', newSrc);
-  }
+  // jwplayer().setMute();
+  // var muteStatus=jwplayer('player').getMute();
+  // if(muteStatus==true){
+  //   var newSrc='/media/sound_mute.svg';
+  //   $('#mutedImageId').attr('src', newSrc);
+  // }else{
+  //   var newSrc='/media/mute_icon.svg';
+  //   $('#mutedImageId').attr('src', newSrc);
+  // }
+
+    if($("video").prop('muted')){
+
+      $("video").prop('muted', false);
+      var newSrc='/media/mute_icon.svg';
+      $('#mutedImageId').attr('src', newSrc);
+    }else{
+        $("video").prop('muted', true);
+        var newSrc='/media/sound_mute.svg';
+        $('#mutedImageId').attr('src', newSrc);
+    }
+
 
 }
 
@@ -373,7 +393,13 @@ function listCommentsById(singleTopicData){
 }
 
 function loadMoreComments(nextPageURl){
-
+    loaderBoloShowDynamic('_scroll_load_more_loading_comment');
+    if(nextPageURl=='null'){
+        var loadMoreComment='<span class="loadMoreComment">No more comment</span';
+        $(".loadMoreComments").html(loadMoreComment);
+        loaderBoloHideDynamic('_scroll_load_more_loading_comment');
+        return false;
+    }
     var listCommentItems="";
     //================Comments List =================
     var uri=nextPageURl;
@@ -399,6 +425,7 @@ function loadMoreComments(nextPageURl){
         var loadMoreComment='<span class="loadMoreComment"><a class="" onclick="loadMoreComments(\''+data.next+'\');" href="javascript:void(0);">Load More Comments...</a></span';
         $(".loadMoreComments").html(loadMoreComment);
         loaderBoloHide();
+        loaderBoloHideDynamic('_scroll_load_more_loading_comment');
     });
 }
 
@@ -497,7 +524,15 @@ function getCreators(popularCreators){
 
 function popularCategoryHeading(itemCategory){
 
-    var popular_cat_heading_template='<div class="_explore_feed_header"><div class="jsx-2836840237 _card_header_"><a class="jsx-2836840237" href="/tag/'+itemCategory.slug+'/"><div class="jsx-2836840237 _card_header_cover" style="background-image: url('+itemCategory.category_image+');"></div></a><a title="#'+itemCategory.slug+'('+itemCategory.total_view+' views)" class="jsx-2836840237 _card_header_link" href="/tag/'+itemCategory.slug+'/"><div class="jsx-2836840237 _card_header_content"><h3 class="jsx-2836840237 _card_header_title">'+itemCategory.title+'</h3><strong class="jsx-2836840237 _card_header_subTitle">'+itemCategory.total_view+' views</strong><p class="jsx-2836840237 _card_header_desc"></p></div></a></div></div>';
+    var category_title;
+    currentLanguageName=current_language_name.toLowerCase();
+    if(currentLanguageName!='english'){
+        category_title=currentLanguageName+'_title';
+    }else{
+        category_title='title';
+    }
+
+    var popular_cat_heading_template='<div class="_explore_feed_header"><div class="jsx-2836840237 _card_header_"><a class="jsx-2836840237" href="/tag/'+itemCategory.slug+'/"><div class="jsx-2836840237 _card_header_cover" style="background-image: url('+itemCategory.category_image+');"></div></a><a title="#'+itemCategory.slug+'('+itemCategory.total_view+' views)" class="jsx-2836840237 _card_header_link" href="/tag/'+itemCategory.slug+'/"><div class="jsx-2836840237 _card_header_content"><h3 class="jsx-2836840237 _card_header_title">'+itemCategory[category_title]+'</h3><strong class="jsx-2836840237 _card_header_subTitle">'+itemCategory.total_view+' views</strong><p class="jsx-2836840237 _card_header_desc"></p></div></a></div></div>';
     return popular_cat_heading_template;
 }
 

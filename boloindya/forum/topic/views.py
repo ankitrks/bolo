@@ -447,11 +447,15 @@ def video_details(request,username='',id=''):
 
     return render(request, 'spirit/topic/video_details.html', context)
 
-def video_details_by_slug(request,slug=''):
+def video_details_by_slug(request,slug='',id=''):
     #print user_profile.__dict__
+    #print 'videoId_'+id
     user_id=""
     try:
-        topics = Topic.objects.get(slug = slug)
+        if id != '':
+            topics = Topic.objects.get(id = id)
+        else:
+            topics = Topic.objects.get(slug = slug)         
         user_id = topics.user_id
     except:
         topics = None
@@ -794,7 +798,12 @@ def search_by_term(request):
     context = {
         'is_single_topic': "Yes",
         'search_term':search_term
-    }        
+    } 
+
+    video_slug = request.GET.get('video',None)
+    if(video_slug != None):
+        return redirect('/video/'+video_slug)
+
     return render(request, 'spirit/topic/search_results.html',context)
 
 def new_home(request):
