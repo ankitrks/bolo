@@ -182,7 +182,7 @@ def identify_logo_util():
 							#item.save()
 							Topic.objects.filter(id = iter_id).update(plag_text = str(plag_source.index(modified_text)))
 							Topic.objects.filter(id = iter_id).update(time_deleted = datetime.now())
-							#data.delete
+							data[0].delete()
 							#t = Topic.objects.filter(id = iter_id)
 							#t.delete()
 							#item.save()	
