@@ -52,7 +52,7 @@ class TopicChangeList(ChangeList):
         self.list_display = ('action_checkbox', 'id', 'title', 'name', 'duration', 'language_id', 'view_count',\
             'comments', 'is_monetized', 'is_removed', 'is_pubsub_popular_push', 'date', 'm2mcategory') #is_popular
         self.list_display_links = ['id']
-        self.list_editable = ('title', 'language_id', 'm2mcategory', 'is_pubsub_popular_push')
+        self.list_editable = ('title', 'language_id', 'm2mcategory', 'is_pubsub_popular_push', 'time_deleted')
 
         self.model = model
         self.opts = model._meta
