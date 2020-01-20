@@ -50,9 +50,9 @@ class TopicChangeList(ChangeList):
         #     list_per_page, list_max_show_all, list_editable, model_admin)
 
         self.list_display = ('action_checkbox', 'id', 'title', 'name', 'duration', 'language_id', 'view_count',\
-            'comments', 'is_monetized', 'is_removed', 'is_pubsub_popular_push', 'date', 'm2mcategory') #is_popular
+            'comments', 'is_monetized', 'is_removed', 'is_pubsub_popular_push', 'date', 'm2mcategory', 'time_deleted', 'plag_text') #is_popular
         self.list_display_links = ['id']
-        self.list_editable = ('title', 'language_id', 'm2mcategory', 'is_pubsub_popular_push', 'time_deleted')
+        self.list_editable = ('title', 'language_id', 'm2mcategory', 'is_pubsub_popular_push')
 
         self.model = model
         self.opts = model._meta
@@ -114,9 +114,6 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
             'classes': ('collapse',),
             'fields': ('backup_url', ('is_transcoded', 'is_transcoded_error'), 'transcode_job_id', \
                         'transcode_dump', 'transcode_status_dump', 'm3u8_content', 'audio_m3u8_content', 'video_m3u8_content'),
-        }),
-        ('Others', {
-            'fields': ('plag_text', 'time_deleted'),
         }),
     )
 
