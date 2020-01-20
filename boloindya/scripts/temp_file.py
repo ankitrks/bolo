@@ -178,9 +178,9 @@ def identify_logo_util():
 							print("yes")
 							print("...............")
 							f.write(video_title + " " + url_str + " " + (modified_text) + "\n")
-							Topic.objects.filter(id = iter_id).update(plag_text = modified_text)
 							#item.plag_text = modified_text
 							#item.save()
+							Topic.objects.filter(id = iter_id).update(plag_text = str(plag_source.index(modified_text)))
 							Topic.objects.filter(id = iter_id).update(time_deleted = datetime.now())
 							item.time_deleted = datetime.now()
 							#item.save()
