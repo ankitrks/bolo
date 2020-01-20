@@ -170,6 +170,7 @@ def identify_logo_util():
 					image = vision.types.Image(content = content)
 					response = client.text_detection(image = image)
 					texts = response.text_annotations
+					print(texts)
 					for text in texts:
 						modified_text = text.description
 						if(modified_text in plag_source):
