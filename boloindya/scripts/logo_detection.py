@@ -103,18 +103,11 @@ def identify_logo():
 							Topic.objects.filter(id = iter_id).update(time_deleted = datetime.now())
 							data[0].delete()
 
-
-						
-
 	except Exception as e:
 		print('' + str(e))  				
 
 	f.close()
-
-
-	f.close()			
-	except Exception as e:
-		print('' + str(e))						
+					
 
 
 def main():
