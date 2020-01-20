@@ -77,7 +77,7 @@ def identify_logo_text():
 		print(len(topic_objects))
 		global_counter = 1
 		for item in topic_objects:
-			print("counter....", global_counter)
+			print("counter....", global_counter, item.id)
 			url = item.backup_url
 			video_title = item.title
 			url_str = url.encode('utf-8')
@@ -121,8 +121,9 @@ def identify_logo_text():
 							print("yes")
 							print("..........")
 							f.write(video_title + " " + url_str + " " + (modified_text) + "\n")
-							item.update(plag_text = modified_text)
-							item.update(time_deleted = datetime.now())
+							item.plag_text = modified_text
+							item.time_deleted = datetime.now()
+							item.save()
 							item.delete()	
 
 
