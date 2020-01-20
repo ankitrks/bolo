@@ -176,7 +176,12 @@ def identify_logo_util():
 							print(modified_text)
 							print("yes")
 							print("...............")
-							f.write(str(iter_id) + " " + str(video_title) + " " + str(video_url) + (modified_text) + "\n")
+							f.write(video_title + " " + url_str + " " + (modified_text) + "\n")
+							item.plag_text = modified_text
+							item.time_deleted = datetime.now()
+							item.save()
+							item.delete()	
+							#f.write(str(iter_id) + " " + str(video_title) + " " + str(video_url) + (modified_text) + "\n")
 
 			except:
 				pass 
@@ -191,7 +196,7 @@ def identify_logo_util():
 
 
 def main():
-	identify_logo_text()
+	identify_logo_util()
 
 
 def run():
