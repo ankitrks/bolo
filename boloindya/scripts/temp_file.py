@@ -72,7 +72,7 @@ def identify_logo_text():
 	f = io.open(f_name, "w", encoding="UTF-8")
 	today = datetime.today()
 	try:
-		long_ago = today + timedelta(days = -8)
+		long_ago = today + timedelta(days = -7)
 		topic_objects = Topic.objects.exclude(is_removed = True).filter(is_vb = True, date__gte = long_ago)
 		print(len(topic_objects))
 		global_counter = 1
