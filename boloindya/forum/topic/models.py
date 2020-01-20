@@ -314,8 +314,6 @@ class Topic(models.Model):
             + '/change/" target="_blank">' + self.user.username + '</a>' )
 
     def delete(self):
-        print("called here")
-        
         if self.is_monetized:
             if self.language_id == '1':
                 reduce_bolo_score(self.user.id, 'create_topic_en', self, 'deleted')
