@@ -198,7 +198,7 @@ def identify_logo_util():
 
 
 def main():
-	identify_logo_util()
+	identify_logo_text()
 
 
 def run():
