@@ -1355,7 +1355,6 @@ def statistics_all(request):
         temp_list = []
         temp_list.append( each_opt[0] )
         temp_list.append( each_opt[1] )
-        temp_list.append( DashboardMetrics.objects.exclude(date__gt = end_date).filter(metrics = each_opt[0])\
         temp_list.append( DashboardMetrics.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0])\
                 .aggregate(total_count = Sum('count'))['total_count'] )
         top_data.append( temp_list ) 
