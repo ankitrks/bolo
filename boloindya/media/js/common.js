@@ -374,7 +374,7 @@ function loginDataByUser(){
 }
 
 
-function follow_user(user_following_id){
+function follow_user(user_following_id){debugger;
 	var user_id = userLoginStatus;
 	var followUrl='/api/v1/follow_user/';
 	var user_following_id = user_following_id;
@@ -416,7 +416,51 @@ function follow_user(user_following_id){
 	}
 }
 
-function follow_user_by_popup(){
+
+function follow_user_from_user(user_following_id){
+  var user_id = userLoginStatus;
+  var followUrl='/api/v1/follow_user/';
+  var user_following_id = user_following_id;
+  var loginStatus=check_login_status();
+  if(loginStatus==true){
+    var ge_local_data="";
+        ge_local_data = JSON.parse(localStorage.getItem("access_data"));
+        var accessToken=ge_local_data.access_token;
+        jQuery.ajax({
+            url:followUrl,
+            type:"POST",
+            headers: {
+              'Authorization':'Bearer '+accessToken,
+            },
+            data:{user_following_id:user_following_id},
+            success: function(response,textStatus, xhr){
+ 
+               checkFollowStatus=jQuery('.followUserStatusChange-'+user_following_id).hasClass('sx_5da456');
+               if(checkFollowStatus==false){
+                  jQuery('.followUserStatusChange-'+user_following_id).removeClass('sx_5da455');
+                  jQuery('.followUserStatusChange-'+user_following_id).addClass('sx_5da456');
+                  jQuery('.btnTextChangeUser-'+user_following_id).text(response.message);
+               }else{
+                  jQuery('.followUserStatusChange-'+user_following_id).removeClass('sx_5da456');
+                  jQuery('.followUserStatusChange-'+user_following_id).addClass('sx_5da455');
+                  jQuery('.btnTextChangeUser-'+user_following_id).text('Follow');
+               }
+
+            },
+            error: function(jqXHR, textStatus, errorThrown){
+              jQuery(".followError").html('<span style="color:red;">Please Try Again...</span>').fadeOut(8000);
+              console.log(textStatus + ": " + jqXHR.status + " " + errorThrown);
+            }
+
+
+        });
+  }else{
+    document.getElementById('openLoginPopup').click();
+  }
+}
+
+
+function follow_user_by_popup(){debugger;
 	var user_following_id=$("#currentPlayUserId").val();
 	if(user_following_id==""){
 		return false;

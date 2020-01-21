@@ -338,8 +338,42 @@ function video_play_using_video_js(url,backup_url,image) {
         }
 
 
+        //=========Check Follow User ==============
+        var loginStatus=check_login_status();
+        if(loginStatus==true){
+            var countFollowStatus=userLikeAndUnlike.all_follow;
+            if(undefined !==countFollowStatus && countFollowStatus.length>0){
+                var currentUserTopic=singleItemData.user.userprofile.id;
+                var followList=userLikeAndUnlike.all_follow;
+                followList.forEach(function(followId){
+                    if(currentUserTopic==followId){
+                        followStatus=jQuery('.followStatusChangePopup').hasClass('sx_5da455');
+                        if(followStatus==true){
+                            jQuery('.followStatusChangePopup').removeClass('sx_5da455');
+                            jQuery('.followStatusChangePopup').addClass('sx_5da456');
+                            jQuery('.btnTextChangePopup').text(followed_trans);
+                        }else{
+                            jQuery('.followStatusChangePopup').removeClass('sx_5da456');
+                            jQuery('.followStatusChangePopup').addClass('sx_5da455');
+                            jQuery('.btnTextChangePopup').text(follow_trans);
+                        }
+                    }
+
+                });
+            }
+        }
+        //============== End=======================
+        
+
+
         var profileURL='/'+userHandleName+'/';
         $("#profileImageUserId").css("background-image", "url(" + profilePics + ")");
+
+        $("#topicID").val(singleItemData.id);
+        $("#currentPlayUserId").val(singleItemData.user.userprofile.id);
+
+        $("#topicCreatorUsername").val(singleItemData.user.username);
+
         $(".shareandliketabprofileimage").attr("src", ""+profilePics+"");
         $(".userProfileURL").attr("href", ""+profileURL+"");
         $("._video_card_big_user_info_nickname").html(userprofileName);
@@ -491,9 +525,29 @@ function followLikeList(){
         headers: {
           'Authorization':'Bearer '+accessToken,
         },
-        success: function(response,textStatus, xhr){
+        success: function(response,textStatus, xhr){debugger;
             userLikeAndUnlike=response;
         //var videoCommentList=data.results;
+        //all_category_follow
+        if(response.all_category_follow){
+            var listFollows=response.all_category_follow;
+
+            var current_categoryId=$("#currentCatId").val();
+            current_categoryId=parseInt(current_categoryId, 10);
+            var statusFollow=jQuery.inArray( current_categoryId, listFollows )
+            if(statusFollow>=0){
+                $('#followCategoryStatus-'+current_categoryId).html(followed_trans);
+                $('.followStatusChange-'+current_categoryId).removeClass('sx_5da455');
+                var checkstatusBu=$('.followStatusChange-'+current_categoryId).hasClass('sx_5da456');
+                if(!checkstatusBu){
+                    $('.followStatusChange-'+current_categoryId).addClass('sx_5da456');
+                }
+            }
+
+        }
+
+
+
         }
   
     });

@@ -629,6 +629,50 @@ function loadMoreComments(nextPageURl){
 
     }
 
+    function userFollowLikeList(){
+        check_login_status();
+
+        var ge_local_data="";
+            ge_local_data = JSON.parse(localStorage.getItem("access_data"));
+        var accessToken=ge_local_data.access_token;
+        var listCommentItems="";
+
+        //================Comments List =================
+        var uri='/api/v1/get_user_follow_and_like_list/';
+        var res = encodeURI(uri);
+        jQuery.ajax({
+            url:res,
+            type:"POST",
+            headers: {
+              'Authorization':'Bearer '+accessToken,
+            },
+            success: function(response,textStatus, xhr){debugger;
+                userLikeAndUnlike=response;
+                if(response.all_follow){
+                    var listFollows=response.all_follow;
+                    var currentUserId=$("#currentUserId").val();
+                    currentUserId=parseInt(currentUserId, 10);
+                    var statusFollow=jQuery.inArray( currentUserId, listFollows )
+                    if(statusFollow>=0){
+                        $('#followUserStatus-'+currentUserId).html(followed_trans);
+                        $('.followUserStatus-'+currentUserId).removeClass('sx_5da455');
+                        var checkstatusBu=$('.followUserStatus-'+currentUserId).hasClass('sx_5da456');
+                        if(!checkstatusBu){
+                            $('.followUserStatus-'+currentUserId).addClass('sx_5da456');
+                            jQuery('.btnTextUserChange-'+followId).text(followed_trans);
+                        }
+                    }
+
+                }
+
+            }
+      
+        });
+
+    }
+
+
 jQuery(document).ready(function(){
     followLikeList();
+    userFollowLikeList();
 });

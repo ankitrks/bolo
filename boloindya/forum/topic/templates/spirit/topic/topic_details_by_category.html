@@ -255,7 +255,9 @@ video.jsx-3382097194 {
                     <!-- <h5 class="share-title headingMargin"> @{{category_details.slug}}</h5> --> 
                     <p class="count-infos"><span class="number"></span><span class="unit"> {{category_details.view_count | shorcountertopic}} {% trans "Views" %}</span><span class="number"> </span>
                         <span class="unit">
-                            <button onclick="follow_category('{{category_details.id}}');" class="_4jy1 _4jy4 _517h _51sy _42ft " type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-{{category_details.id}} followCheck sx_5da455"></i><span class="btnTextChange-{{category_details.id}}">{% trans "Follow" %}</span>
+                            <button onclick="follow_category('{{category_details.id}}');" class="_4jy1 _4jy4 _517h _51sy _42ft " type="submit" value="1">
+                                <i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-{{category_details.id}} followCheck sx_5da455"></i>
+                                <span class="btnTextChange-{{category_details.id}}" id="followCategoryStatus-{{category_details.id}}">{% trans "Follow" %}</span>
                             </button>
                         </span>
                     </p>
