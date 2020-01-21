@@ -65,7 +65,7 @@ def identify_logo():
 		print(len(topic_objects))
 		global_counter = 1
 		for item in topic_objects:
-			#print("counter....", global_counter, item.id)
+			print("counter....", global_counter, item.id)
 			iter_id = item.id
 			url = item.backup_url
 			video_title = item.title
@@ -106,7 +106,7 @@ def identify_logo():
 					for text in texts:
 						modified_text = text.description
 						if(modified_text in plag_source):
-							f.write(iter_id + " " + video_title + " " + url_str + " " + (modified_text) + "\n")
+							f.write(video_title + " " + url_str + " " + (modified_text) + "\n")
 							Topic.objects.filter(id = iter_id).update(plag_text = str(plag_source.index(modified_text)))
 							Topic.objects.filter(id = iter_id).update(time_deleted = datetime.now())
 							data[0].delete()
@@ -120,7 +120,7 @@ def identify_logo():
 
 def main():
 	identify_logo()
-	remove_redundant_files()
+	#remove_redundant_files()
 
 def run():
 	main()	
