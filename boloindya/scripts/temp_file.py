@@ -149,7 +149,7 @@ def identify_logo_util():
 			video_url = data[0].backup_url
 			url_str = video_url.encode('utf-8')
 			test = urllib.FancyURLopener()
-			test.retrieve(url_str, '/tmp/local_video.mp4')
+			test.retrieve(url_str, 'local_video.mp4')
 			video_title = data[0].title
 			t1 = '00:03'
 			t2 = '00:05'
@@ -162,9 +162,9 @@ def identify_logo_util():
 			count = 1
 			try:
 				for interval in intervals:
-					ff = FFmpeg(inputs = {'/tmp/local_video.mp4': None}, outputs = {"output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
+					ff = FFmpeg(inputs = {'local_video.mp4': None}, outputs = {"output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
 					ff.run()
-					file_name = '/tmp/output{}.png'.format(count)
+					file_name = PROJECT_PATH '/scripts/output{}.png'.format(count)
 					with io.open(file_name, 'rb') as image_file:
 						content = image_file.read()
 					image = vision.types.Image(content = content)
