@@ -983,15 +983,104 @@ def send_notification(request):
         data['upper_title'] = request.POST.get('upper_title', "")
         data['notification_type'] = request.POST.get('notification_type', "")
         data['id'] = request.POST.get('id', "")
+        data['particular_user_id'] = request.POST.get('particular_user_id', "")
         data['user_group'] = request.POST.get('user_group', "")
         data['lang'] = request.POST.get('lang', "")
+        data['category'] = request.POST.get('category', "")
         data['schedule_status'] = request.POST.get('schedule_status', "")
         data['datepicker'] = request.POST.get('datepicker', '')
         data['timepicker'] = request.POST.get('timepicker', '').replace(" : ", ":")
+        data['image_url'] = request.POST.get('image_url', '')
 
-        send_notifications_task.delay(data, pushNotification)
+        try:
+            title = data.get('title', "")
+            upper_title = data.get('upper_title', "")
+            notification_type = data.get('notification_type', "")
+            id = data.get('id', "")
+            user_group = data.get('user_group', "")
+            lang = data.get('lang', "")
+            schedule_status = data.get('schedule_status', "")
+            datepicker = data.get('datepicker', '')
+            timepicker = data.get('timepicker', '').replace(" : ", ":")
+            image_url = data.get('image_url', '')
 
-        return redirect('/jarvis/notification_panel/')
+            pushNotification = PushNotification()
+            pushNotification.title = upper_title
+            pushNotification.description = title
+            pushNotification.language = lang
+            pushNotification.image_url = image_url
+            pushNotification.notification_type = notification_type
+            pushNotification.user_group = user_group
+            pushNotification.instance_id = id
+            pushNotification.save()
+
+            if lang != '0':
+                language_filter = { 'user__st__language': lang }
+            
+            if user_group == '1':
+                end_date = datetime.today()
+                start_date = end_date - timedelta(hours=3)
+                device = FCMDevice.objects.filter(user__isnull=True, created_at__range=(start_date, end_date), is_uninstalled=False)
+            
+            elif user_group == '2':
+                device = FCMDevice.objects.filter(user__isnull=True, is_uninstalled=False)
+            
+            elif user_group == '7':
+
+                #This list contains user IDs for test users: Gitesh, Abhishek, Varun, Maaz
+                # Anshika, Bhoomika and Akash
+                filter_list = [39342, 1465, 2801, 19, 40, 328, 23, 3142, 1494]
+                device = FCMDevice.objects.filter(user__pk__in=filter_list, is_uninstalled=False)
+            else:
+                filter_list = []
+
+                if user_group == '3':
+                    filter_list = VBseen.objects.distinct('user__pk').values_list('user__pk', flat=True)
+                
+                elif user_group == '4' or user_group == '5':
+                    hours_ago = datetime.now()
+                    if user_group == '4':
+                        hours_ago -= timedelta(days=1)
+                    else:
+                        hours_ago -=  timedelta(days=2)
+
+                    filter_list = UserLogStatistics.objects.filter(session_starttime__gte=hours_ago).values_list('user', flat=True)
+                    filter_list = map(int , filter_list)
+                    
+                elif user_group == '6':
+                    filter_list = Topic.objects.filter(is_vb=True).values_list('user__pk', flat=True)
+
+                if data.get('category', 'Select Category') not in 'Select Category':
+                    filter_list_cat=UserProfile.objects.filter(sub_category=data.get('category', None)).values_list('user__pk', flat=True)    
+                    device = FCMDevice.objects.exclude(user__pk__in=filter_list).filter(**language_filter, is_uninstalled=False)
+
+                device = FCMDevice.objects.filter(user__pk__in=filter_list, is_uninstalled=False)
+                for each in device:
+                    PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2')
+                print(device)
+                t=device.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url})
+                print(t)
+            elif user_group == '8':
+                device = FCMDevice.objects.filter(user__pk=data.get('particular_user_id', None))
+                print(device)
+                if device:
+                    user=User.objects.get(pk=data.get('particular_user_id', None))
+                    print(user)
+                    PushNotificationUser.objects.create(user=user, push_notification_id=pushNotification, status='2')
+                    t=device.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url})
+                    print(t)
+            else:
+                device = FCMDevice.objects.all()
+                for each in device:
+                    PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2')
+                print(device)
+                t=device.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url})
+                print(t)
+            return redirect('/jarvis/notification_panel/')
+        except Exception as e:
+            print(e)
+            return redirect('/jarvis/notification_panel/')
+        # send_notifications_task.delay(data, pushNotification)
 
     if request.method == 'GET':
         id = request.GET.get('id', None)
@@ -1003,10 +1092,12 @@ def send_notification(request):
 
     return render(request,'jarvis/pages/notification/send_notification.html', { 'language_options': language_options, 'user_group_options' : user_group_options, 'notification_types': notification_type_options, 'pushNotification': pushNotification, 'categories': categories})
 
+
+
 @login_required
-def particular_notification(request, notification_id=None):
+def particular_notification(request, notification_id=None, status_id=2):
     pushNotification = PushNotification.objects.get(pk=notification_id)
-    return render(request,'jarvis/pages/notification/particular_notification.html', {'pushNotification': pushNotification})
+    return render(request,'jarvis/pages/notification/particular_notification.html', {'pushNotification': pushNotification, 'status_id': status_id})
 
 from rest_framework.decorators import api_view
 
@@ -1014,11 +1105,17 @@ from rest_framework.decorators import api_view
 def create_user_notification_delivered(request):
     notification_id = request.POST.get('notification_id', "")
 
-    pushNotificationUser = PushNotificationUser()
+    pushNotification=[]
     if request.user:
-        print(request.user)
+        try:
+            pushNotificationUser = PushNotificationUser.objects.get(push_notification_id=pushNotification, user=request.user)
+        except:
+            pushNotificationUser = PushNotificationUser()
         pushNotificationUser.user = request.user
+    else:
+        pushNotificationUser = PushNotificationUser()
     pushNotification = PushNotification.objects.get(pk=notification_id)
+    pushNotificationUser.status='0'
     pushNotificationUser.push_notification_id = pushNotification
     pushNotificationUser.save()
 
@@ -1536,6 +1633,25 @@ def search_notification(request):
     
 @api_view(['POST'])
 def upload_image_notification(requests):
-    file = requests.POST.get('query')
-    print(file)
-    return JsonResponse({'data': []}, status=status.HTTP_200_OK)
+    if requests.is_ajax():
+        file=requests.FILES['file']
+        print(file)
+        data=upload_thumbail_notification(file, 'boloindyapp-prod')
+        try:
+            return JsonResponse({'data': data}, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(e)
+
+def upload_thumbail_notification(virtual_thumb_file,bucket_name):
+    try:
+        bucket_credentials = get_bucket_details(bucket_name)
+        client = boto3.client('s3',aws_access_key_id=bucket_credentials['AWS_ACCESS_KEY_ID'],aws_secret_access_key=bucket_credentials['AWS_SECRET_ACCESS_KEY'])
+        ts = time.time()
+        final_filename = "img-" + str(ts).replace(".", "")  + ".jpg"
+        client.put_object(Bucket=bucket_credentials['AWS_BUCKET_NAME'], Key='notification/'+final_filename, Body=virtual_thumb_file, ACL='public-read')
+        filepath = "https://"+bucket_credentials['AWS_BUCKET_NAME']+".s3.amazonaws.com/notification/"+final_filename
+        return filepath
+    except Exception as e:
+        print(e)
+        return None
+    

@@ -161,6 +161,7 @@ notification_type_options = (
 status_options = (
     ('0', "Not Opened"),
     ('1', "Opened"),
+    ('2', 'Sent')
 )
 
 metrics_options = (
@@ -204,6 +205,7 @@ class PushNotification(RecordTimeStamp):
     user_group = models.CharField(choices=user_group_options, blank = True, null = True, max_length=10, default='0')
     scheduled_time = models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False)
     is_scheduled = models.BooleanField(default=False)
+    image_url = models.CharField(_('image_url'),max_length=1000,null=True,blank=True)
     is_removed = models.BooleanField(default=False)
     is_executed = models.BooleanField(default=False)
     repeated_hour = models.PositiveIntegerField(null=True,blank=True,default=0)

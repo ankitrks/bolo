@@ -12,6 +12,11 @@ register = template.Library()
 def get_user_opened_notification(pushNotification):
     return len(pushNotification.push_notification_id.filter(status='1'))
 
+
+@register.simple_tag()
+def get_user_delivered_notification(pushNotification):
+    return len(pushNotification.push_notification_id.filter(status__in=['0', '1']))
+
 @register.simple_tag()
 def get_language_name(id):
     return language_options[int(id)][1]

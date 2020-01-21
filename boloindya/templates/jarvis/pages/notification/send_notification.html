@@ -151,6 +151,11 @@
             </ul>
         </div>   
         <div class="form_group">
+            <div class="alert alert-success alert-dismissible" id="success_message" role="alert" style="display: none; height: 30px;padding: 5px;">
+                <span>Uploaded Image</span>
+            </div>
+        </div>
+        <div class="form_group">
             <input type="file" name="image" id="image" accept='image/*'>
         </div>  
         <div class="form_group">
@@ -158,6 +163,7 @@
             <ul id="response">
             </ul>
         </div>    
+        <input type="text" name="image_url" value="{{pushNotification.image_url}}" hidden id="image_url">
         <input type="text" name="schedule_status" value="0" hidden id="schedule_status">
         <div class="form_group">
             <img src="https://www.careeranna.com/uploads/loading.gif" height="40" width="40" id="loader_image">
@@ -279,18 +285,23 @@
             }
         });
         $("#image").change(function() {
-            var file = $('#image');
-            file=file[0].files[0];
+            var formData = new FormData();
+            formData.append('file', document.querySelector('#image').files[0])
             $.ajax({
                     url: '/jarvis/upload_image_notification/',
                     method: 'POST',
-                    data: {'query': 'file'},
-                    dataType: "json",
-                    contentType: 'application/json',
+                    data:  formData,
+                    processData: false,
+                    contentType: false,
                     success: function(data) {
                         console.log(data)
+                        $('#success_message').show();
+                        $('#image_url').val(data.data);
+                        setTimeout(function hide() {
+                            $('#success_message').hide();
+                        }, 3000);
                     }
-                })
+            })
         })
     })
     $(function() {
@@ -332,6 +343,7 @@
     $('#notification_form').submit(function(){
         var upper_title = $('#upper_title').val()
         var title =  $('#title').val()
+        var category = $('#category').val()
         var lang =  $('#lang :selected').text()
         var notification_type = $('#notification_type :selected').text()
         var user_group = $('#user_group :selected').text()
