@@ -447,11 +447,15 @@ def video_details(request,username='',id=''):
 
     return render(request, 'spirit/topic/video_details.html', context)
 
-def video_details_by_slug(request,slug=''):
+def video_details_by_slug(request,slug='',id=''):
     #print user_profile.__dict__
+    #print 'videoId_'+id
     user_id=""
     try:
-        topics = Topic.objects.get(slug = slug)
+        if id != '':
+            topics = Topic.objects.get(id = id)
+        else:
+            topics = Topic.objects.get(slug = slug)         
         user_id = topics.user_id
     except:
         topics = None
@@ -665,7 +669,7 @@ def help_support(request):
               <head></head>
               <body>
                     Hello, <br><br>
-                    We have received a job request from %s. Please find the details below:<br><br>
+                    We have received a help request from %s. Please find the details below:<br><br>
                     <b>Name:</b> %s <br>
                     <b>Email:</b> %s <br>
                     <b>Contact:</b> %s <br>
@@ -794,18 +798,29 @@ def search_by_term(request):
     context = {
         'is_single_topic': "Yes",
         'search_term':search_term
-    }        
+    } 
+
+    video_slug = request.GET.get('video',None)
+    if(video_slug != None):
+        return redirect('/video/'+video_slug)
+
     return render(request, 'spirit/topic/search_results.html',context)
 
 def new_home(request):
     categories = []
+    hash_tags = []
     try:
-        categories = Category.objects.filter(parent__isnull=False)[:5]
+        categories = Category.objects.filter(parent__isnull=False)[:4]
     except Exception as e1:
-        categories = []
+        categories = []    
+    try:
+        hash_tags = TongueTwister.objects.order_by('-hash_counter')[:4]
+    except Exception as e1:
+        hash_tags = []
 
     context = {
         'categories':categories,
+        'hash_tags':hash_tags,
         'is_single_topic': "Yes",
     }  
     video_slug = request.GET.get('video',None)
@@ -946,4 +961,8 @@ def login_using_api(request):
 
 def testurllang(request):
     print 'Pass';
-    pass
+    languages_with_id=settings.LANGUAGES_WITH_ID
+    print languages_with_id
+    #languageCode =request.LANGUAGE_CODE
+    #language_id=languages_with_id[languageCode]
+

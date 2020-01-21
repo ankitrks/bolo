@@ -976,7 +976,7 @@ def rotateImage(virtual_thumb_file,rotationAngle):
 
     image = Image.open(lf)
     image = image.rotate(int(rotationAngle), PIL.Image.NEAREST, expand=True)
-    fileNewPath="temp/"+file_name
+    fileNewPath=settings.BASE_DIR+"/temp/"+file_name
     image.save(fileNewPath)
     image.close()
     return fileNewPath

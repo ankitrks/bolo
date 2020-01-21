@@ -989,6 +989,24 @@
         min-height: 720px;
     }
 
+    .videoCentered {
+    width: 100%;
+    object-fit: cover;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    height: 100%;
+    }
+
+    .video-meta-title.jsx-191376589 {
+        font-family: proxima-regular, PingFangSC, sans-serif;
+        font-weight: 400;
+        font-size: 16px;
+        margin-top: -24px;
+        line-height: 20px;
+        margin-bottom: 8px;
+    }
+
 </style>
 
 
@@ -1018,7 +1036,158 @@ $(document).ready(function() {
 });
 </script>
 
+<style type="text/css">
+    /*===========*/
 
+.video_card_title{
+    position: inherit;
+    top: 12px;
+    font-size: 12px;
+    padding: 2px;
+    color: aliceblue;
+}
+._image_card_footer_wraaper{
+    background: #0003;
+}
+.card-footer.jsx-1633345700 {
+    background: #0003;
+    height: 80px;
+    padding: 7px 3px 0px;
+ 
+}
+.card-footer.small.jsx-1633345700 {
+    padding-top: 5px;
+}
+
+._video_card_footer_likes1{
+    position: absolute;
+    right: 16px;
+    top: -106px;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+}
+._video_card_footer_likes{
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    height: 26px;
+    padding: 4px;
+    background: #000000d9;
+    width: 100%;
+}
+._video_card_footer_ {
+    height: 80px;
+}
+
+._video_card_footer_likes12::before { 
+
+    content: '';
+    display: inline-block;
+    height: 18px;
+    margin: 0 6px -3px 0;
+    min-width: 18px;
+    position: relative;
+    top: -2px;
+    width: 18px;
+    background-image: url(/media/iJGOBKN9vqK.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: -42px -382px;
+    color: red;
+    font-weight: bold;
+}
+._video_card_footer_likes::before { 
+
+    content: '';
+    display: inline-block;
+    height: 18px;
+    margin: 0 6px -3px 0;
+    min-width: 18px;
+    position: relative;
+    top: -1px;
+    width: 18px;
+    background-image: url(/media/iJGOBKN9vqK.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: -42px -382px;
+    color: red;
+    font-weight: bold;
+}
+.jsx-3959364739 {
+    padding: 5px 6px;
+    padding-right: 12px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+    -webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    -webkit-align-items: baseline;
+    -webkit-box-align: baseline;
+    -ms-flex-align: baseline;
+    align-items: baseline;
+}
+.jsx-3959364739  h3 {
+    font-family: "sofiapro-bold",PingFangSC,sans-serif;
+    font-weight: 700;
+    font-size: 33px;
+    line-height: 1;
+    color: #fff;
+}
+.jsx-3959364739 a {
+    font-family: "proxima-regular",PingFangSC,sans-serif;
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 20px;
+    color: #fe2c55;
+}
+
+.ytd-commentbox {
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    float: right;
+    -ms-flex-direction: row;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+}
+.ytd-button-renderer {
+    vertical-align: middle;
+    white-space: nowrap;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: .007px;
+    cursor: pointer;
+
+}
+ #submit-button.ytd-commentbox {
+    background-color: #ccc;
+    color: #000;
+    padding: 5px;
+}
+#cancel-button.ytd-commentbox{
+    margin-top: -5px !important;
+}
+
+#cancel-button.ytd-commentbox, #submit-button.ytd-commentbox {
+    margin-left: 8px;
+    margin-top: -10px;
+}
+
+.ytd-button-renderer.style-primary[disabled][is-paper-button] {
+    background-color: #ccc;
+    color: #000;
+    padding: 5px;
+}
+
+</style>
 <link rel="canonical" href="{{site_absolute_url}}{{ request.get_full_path }}" />      
 <meta property="og:url" content="{{site_absolute_url}}{{ request.get_full_path }}"/>
 <meta property="og:type" content="website" />
@@ -1033,6 +1202,10 @@ $(document).ready(function() {
 
 <input type="hidden" name="singleTopicId" id="singleTopicId" value="{{topic.id}}">
 <input type="hidden" name="topicSlug" id="singleTopicSlug" value="{{topic.slug}}">
+
+<input type="hidden" name="totalLikeCount" id="totalLikeCount" value="{{topic.likes_count}}">
+<input type="hidden" name="totalCommentCount" id="totalCommentCount" value="{{topic.comment_count}}">
+
 <div class="jsx-639186511 page-with-header main-body">
 
     <div class="jsx-1270455008 container hideOnDesktop" >
@@ -1105,21 +1278,12 @@ $(document).ready(function() {
             <div class="jsx-1270455008" onclick="openMobileDownloadPopup();"  style="background-image: url(/media/footerIcon5.svg);"></div>
         </div>
     </div>
-<style type="text/css">
-    .videoCentered {
-    width: 100%;
-    object-fit: cover;
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
-    height: 100%;
-}
-</style>
 
     <div class="jsx-606928072 share-layout hideonMobile" >
         <div class="share-layout-content">
             <main class="share-layout-main">
                 <div class="jsx-1861775669 jsx-537314381 video-card-big">
+
                     <div class="jsx-1861775669 jsx-537314381 video-card-container">
                         <div style="border-radius: 8px; background-image: url();" class="jsx-1464109409 image-card">
                             <div class="jsx-3077367275 video-card default">
@@ -1130,7 +1294,7 @@ $(document).ready(function() {
                                 </div>
                                 <div id="jwBoxPlayAndStop" style="height: 100%">
                                     <div id="playerDetailsI"></div>
-                                        <video id="playerDetails" class="videoCentered"></video>
+                                        <video id="playerDetails" preload="" class="videoCentered"></video>
                                 </div>
 
                                 <div class="jsx-3077367275 video-card-mask"></div>
@@ -1162,16 +1326,17 @@ $(document).ready(function() {
                             </div>
                         </a>
                         <span class="unit" style="display: inline-block;position: relative;top: -56px;">
-                            <button onclick="follow_user('{{user_profile.id}}');" style="float: right;" class="_4jy1 _4jy4 _517h _51sy _42ft " type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-{{user_profile.id}} followCheck sx_5da455"></i><span class="btnTextChange-{{user_profile.id}}">Follow</span>
+                            <button onclick="follow_user('{{user_profile.id}}');" style="float: right;" class="_4jy1 _4jy4 _517h _51sy _42ft " type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-{{user_profile.id}} followCheck sx_5da455"></i><span class="btnTextChange-{{user_profile.id}}">{% trans "Follow" %}</span>
                             </button>
                         </span>
+                        <h1 class="jsx-191376589 jsx-861547433 jsx-3645511632 video-meta-title"><strong>{{topic.title}}</strong></h1>
                         <div class="_comments_ _comments_top _video_card_big_comments">
                             <div class="_comments_comments_tunnel">
                                 <div class="_comments_comments_scroll comment_block">
                                     <div>
                                         <div class="_video_card_big_meta_info_">
 
-                                            <div class="_video_card_big_meta_info_count"><strong>{{topic.likes_count | shorcountertopic}} {% trans "likes" %} · {{topic.comment_count | shorcountertopic}} {% trans "comments" %}</strong></div>
+                                            <div class="_video_card_big_meta_info_count"><strong><span id="likeCountId">{{topic.likes_count | shorcountertopic}}</span> {% trans "likes" %} · <span id="commentCountId">{{topic.comment_count | shorcountertopic}}</span> {% trans "comments" %}</strong></div>
                                             <input type="hidden" name="tpoicId" id="topicID" value="" >
                                             <input type="hidden" name="topicCreatorUsername" id="topicCreatorUsername" value="" >
                                         </div>
@@ -1229,8 +1394,22 @@ $(document).ready(function() {
                                                 
                                                 <div class="comment-add">
                                                     <textarea class='mention' id="comment-input" autocomplete="off" maxlength="60" placeholder="Say something nice.."></textarea>
-                                                    <span class="chars-counter"><span id="chars-current">0</span>/60</span>
+                                                    
                                                 </div>
+                                                <div id="buttons1" class="style-scope ytd-commentbox">
+                                                    <div id="cancel-button" class="style-scope ytd-commentbox style-text size-default ytd-button-renderer" >
+                                                        <a class="yt-simple-endpoint style-scope ytd-button-renderer" tabindex="-1">
+                                                            Cancel
+                                                        </a>
+                                                    </div>
+                                                    <div id="submit-button" class="style-scope ytd-commentbox style-primary size-default ytd-button-renderer" >
+                                                        <a class="yt-simple-endpoint style-scope ytd-button-renderer" tabindex="-1">
+                                                            Comment
+                                                        </a>
+                                                    </div>
+
+                                                </div>
+                                                <span class="chars-counter"><span id="chars-current">0</span>/60</span>
                                                 <span class="commentError"></span>
                                             </div>
                                         </div>
@@ -1262,10 +1441,12 @@ $(document).ready(function() {
         </div>
         <aside class="share-layout-aside">
             <div class="jsx-2573841504 recommend-container">
-                <h3 class="jsx-2573841504">{% trans "Trends" %}</h3>
+                <header class="jsx-3959364739">
+                    <h3 class="jsx-3959364739">{% trans "Trends" %}</h3><a class="jsx-3959364739" href="/">{% trans "See All" %}</a></header>
+                <!-- <h3 class="jsx-2573841504">{% trans "Trends" %}</h3> -->
                 <div class="jsx-2573841504 recommend-video-container">
                     <div class="_scroll_load_more_loading_user_videos center">
-                            <div class="boloindya-loading">Loading...</div>
+                            <div class="boloindya-loading"></div>
                     </div>
                     <ul class="jsx-2573841504" id="playlist">
                     </ul>

@@ -15,6 +15,7 @@ language_options = (
 from django.utils import translation
 from django.conf import settings
 def all_languages(request):
+    #pass
     return {'all_languages':dict(language_options)}
 
 def current_language_id(request):
