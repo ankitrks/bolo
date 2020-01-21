@@ -35,7 +35,21 @@
     <link rel="shortcut icon" href="/media/img/favicon.ico">
     <title>Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India</title>
     <meta name="description" content="Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India" />
-    <meta name="keywords" content="Hindi Videos, Hindi Content Platform, Local Languages Content, Love Questions, Sex Questions, Relationship Questions, Life questions, English Videos, Questions and Answers, GK Answers, Politics Discussion, Entertainment, Tamil Videos, Tamil Questions, Tamil Answers, Telugu Questions, Telugu Answers, Exams, UPSC Videos, UPSC Questions, Kannada Questions, Kannada Videos, Punjabi Videos, Punjabi Questions, Gujarati Questions, Gujarati Videos, bengali questions, bengali videos" />    
+    <meta name="keywords" content="Hindi Videos, Hindi Content Platform, Local Languages Content, Love Questions, Sex Questions, Relationship Questions, Life questions, English Videos, Questions and Answers, GK Answers, Politics Discussion, Entertainment, Tamil Videos, Tamil Questions, Tamil Answers, Telugu Questions, Telugu Answers, Exams, UPSC Videos, UPSC Questions, Kannada Questions, Kannada Videos, Punjabi Videos, Punjabi Questions, Gujarati Questions, Gujarati Videos, bengali questions, bengali videos" /> 
+    {% if topic.title is not None %}
+    <link rel="canonical" href="{{site_absolute_url}}{{ request.get_full_path }}" />      
+    <meta property="og:url" content="{{site_absolute_url}}{{ request.get_full_path }}"/>
+    <meta property="og:type" content="website" />
+    <meta property='og:title' content='{{topic.title}}' />
+    <meta name="twitter:title" content="{{topic.title}}" />
+    <meta name="twitter:site" content="@BoloIndya" />
+    <meta name="twitter:creator" content="@BoloIndya" />
+    <meta name="twitter:card" content="summary" />
+    <meta property='og:description' content='{{topic.title}} Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India' />       
+    <meta property='og:image' content='{{topic.question_image}}' />
+    <link rel="image_src" href="{{topic.question_image}}"/>
+    {% endif %}
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta data-react-helmet="true" name="twitter:image" content="/media/img/favicon.ico"/>
     <meta data-react-helmet="true" property="og:image" content="/media/img/favicon.ico"/>

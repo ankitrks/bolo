@@ -167,7 +167,7 @@ $('.videoPlayButton').click(function(){debugger;
       // jwplayer('player').play(true);
 });
 
-function social_share(shareType){
+function social_share(shareType){debugger;
      var loginStatus= check_login_status();
      if(loginStatus==false){
         document.getElementById('openLoginPopup').click();
@@ -769,7 +769,12 @@ var countries=[];
 
 function removeDataFromURL(){debugger;
   window.history.back();
-  video.src="";
+  if(video.src){
+    video.src="";
+  }else{
+
+  }
+  
   return true;
 }
 

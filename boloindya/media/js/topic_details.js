@@ -509,7 +509,10 @@ function loadMoreComments(nextPageURl){
     });
 }
 function followLikeList(){
-    check_login_status();
+    var checkstatus=check_login_status();
+    if(checkstatus==false){
+        return false;
+    }
 
     var ge_local_data="";
         ge_local_data = JSON.parse(localStorage.getItem("access_data"));
