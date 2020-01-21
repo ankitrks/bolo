@@ -2,6 +2,10 @@ import boto3
 import time
 import random
 import os
+import io
+import boto3
+import time
+import random
 import os, io
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
@@ -16,6 +20,8 @@ from forum.topic.models import Topic
 from forum.user.models import UserProfile
 from forum.topic.models import Notification
 import urllib
+from shutil import copyfile
+import os
 from shutil import copyfile
 
 PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -86,6 +92,7 @@ def identify_logo():
 			t2 = '00:' + timetostring(t2)
 			t3 = '00:' + timetostring(t3)
 			t4 = '00:' + timetostring(t4)
+			t5 = '00:' + timetostring(t5)
 			intervals = []
 			intervals.append(t1)
 			intervals.append(t2)
