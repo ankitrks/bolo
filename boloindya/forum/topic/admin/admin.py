@@ -53,7 +53,7 @@ class TopicChangeList(ChangeList):
         #     list_filter, date_hierarchy, search_fields, list_select_related,
         #     list_per_page, list_max_show_all, list_editable, model_admin)
         # action_checkbox
-        self.list_display = ('id', 'vb_list', 'title', 'name', 'duration', 'language_id', 'imp_count',\
+        self.list_display = ('vb_list', 'id', 'title', 'name', 'duration', 'language_id', 'imp_count',\
             'is_moderated', 'is_monetized', 'is_removed', 'is_pubsub_popular_push', 'date', 'm2mcategory') #is_popular
         self.list_display_links = ['id']
         self.list_editable = ('title', 'language_id', 'm2mcategory', 'is_pubsub_popular_push', 'is_monetized', 'is_removed', \
@@ -136,9 +136,11 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
     duration.admin_order_field = 'media_duration'
 
     def vb_list(self, obj):
-        return '<a href="?user_id="' + str(obj.user.id) +'" target="_blank">l</a>'
+        return '<a href="?user_id=' + str(obj.user.id) +'" target="_blank" style="background-position: \
+                0 -834px;background-image: url(/static/grappelli/images/icons-small-sf6f04fa616.png);\
+                background-repeat: no-repeat;height: 20px;display: block;"></a>'
     vb_list.allow_tags = True
-    vb_list.short_description = "vb"
+    vb_list.short_description = "VB"
 
     def comments(self, obj):
         return obj.comments()
