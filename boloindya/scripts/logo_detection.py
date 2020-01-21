@@ -71,16 +71,13 @@ def identify_logo():
 	try:
 		long_ago = today + timedelta(days = -8)
 		topic_objects = Topic.objects.exclude(is_removed = True).filter(is_vb = True, date__gte = long_ago)
-		print(len(topic_objects))
 		global_counter = 1
 		for item in topic_objects:
-			print("counter....", global_counter, item.id)
 			iter_id = item.id
 			data = Topic.objects.filter(id = iter_id)
 			url = data[0].backup_url
 			video_title = data[0].title
 			url_str = url.encode('utf-8')
-			print(url_str)
 			test = urllib.FancyURLopener()
 			test.retrieve(url_str, 'local_video.mp4')
 			duration = data[0].media_duration 
@@ -104,7 +101,6 @@ def identify_logo():
 			intervals.append(t3)
 			intervals.append(t4)
 			intervals.append(t5)
-			print(intervals)
 			count = 1
 			global_counter+=1
 
@@ -134,7 +130,7 @@ def identify_logo():
 
 def main():
 	identify_logo()
-	#remove_redundant_files()
+	remove_redundant_files()
 
 def run():
 	main()	
