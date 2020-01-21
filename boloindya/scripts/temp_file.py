@@ -47,6 +47,10 @@ def timetostring(t):
 		return '00:' + str(t)			
 
 
+def remove_redundant_files():
+	os.remove('local_video.mp4')
+	os.remove('output1.png')
+
 
 def detect_logos():
 
@@ -172,7 +176,7 @@ def identify_logo_util():
 					response = client.text_detection(image = image)
 					texts = response.text_annotations
 					print("here2")
-					print(texts)
+					#print(texts)
 					for text in texts:
 						modified_text = text.description
 						if(modified_text in plag_source):
@@ -199,7 +203,8 @@ def identify_logo_util():
 
 def main():
 	identify_logo_util()
-
+	remove_redundant_files()
+	
 
 def run():
 	main()
