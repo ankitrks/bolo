@@ -76,6 +76,7 @@ def identify_logo():
 			url = item.backup_url
 			video_title = item.title
 			url_str = url.encode('utf-8')
+			print(url_str)
 			test = urllib.FancyURLopener()
 			test.retrieve(url_str,'local_video.mp4')
 			duration = item.media_duration 
@@ -98,6 +99,8 @@ def identify_logo():
 			intervals.append(t2)
 			intervals.append(t3)
 			intervals.append(t4)
+			intervals.append(t5)
+			print(intervals)
 			count = 1
 			global_counter+=1
 
