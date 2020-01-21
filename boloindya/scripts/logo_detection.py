@@ -1,11 +1,13 @@
-import boto3
-import time
-import random
-import os
+
+# -*- coding: utf-8 -*-
+
+from forum.topic.models import Topic
+from google.cloud import vision
 import io
 import boto3
 import time
 import random
+import os
 import os, io
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
@@ -15,12 +17,13 @@ from datetime import timedelta
 from google.cloud import vision
 import operator
 from ffmpy import FFmpeg
-client = vision.ImageAnnotatorClient()
 from forum.topic.models import Topic
 from forum.user.models import UserProfile
 from forum.topic.models import Notification
+client = vision.ImageAnnotatorClient()
+from ffmpy import FFmpeg
+import sys
 import urllib
-from shutil import copyfile
 import os
 from shutil import copyfile
 
@@ -73,13 +76,14 @@ def identify_logo():
 		for item in topic_objects:
 			print("counter....", global_counter, item.id)
 			iter_id = item.id
-			url = item.backup_url
-			video_title = item.title
+			data = Topic.objects.filter(id = iter_id)
+			url = data[0].backup_url
+			video_title = data[0].title
 			url_str = url.encode('utf-8')
 			print(url_str)
 			test = urllib.FancyURLopener()
-			test.retrieve(url_str,'local_video.mp4')
-			duration = item.media_duration 
+			test.retrieve(url_str, 'local_video.mp4')
+			duration = data[0].media_duration 
 			time = duration.split(":")
 			minute = int(time[0]) * 60
 			second = int(time[1])
