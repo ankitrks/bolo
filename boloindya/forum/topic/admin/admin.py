@@ -181,18 +181,12 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
             obj.is_moderated = form.cleaned_data['is_moderated']
         if 'is_monetized' in form.changed_data:
             obj.is_monetized = form.cleaned_data['is_monetized']
-            print obj.is_monetized
             if obj.is_monetized:
-                print 'Adding to monetization...'
                 if obj.is_removed:
-                    print 'restoring record...'
                     obj.restore()
-                print 'adding to monetization'
                 obj.add_monetization()
             else:
-                print 'removing from monetization...'
                 obj.no_monetization()
-            print 'done'
 
         if 'is_removed' in form.changed_data:
             obj.is_removed = form.cleaned_data['is_removed']
