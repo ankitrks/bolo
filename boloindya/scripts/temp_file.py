@@ -168,11 +168,11 @@ def identify_logo_util():
 					with io.open(file_name, 'rb') as image_file:
 						content = image_file.read()
 					image = vision.types.Image(content = content)
-					#print("here1")
+					print("here1")
 					response = client.text_detection(image = image)
 					texts = response.text_annotations
-					#print("here2")
-					#print(texts)
+					print("here2")
+					print(texts)
 					for text in texts:
 						modified_text = text.description
 						if(modified_text in plag_source):
