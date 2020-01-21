@@ -137,7 +137,6 @@ class Topic(models.Model):
     video_m3u8_content = models.TextField(_("Video M3U8 Content"), blank = True, null = True)
     downloaded_url = models.CharField(_("downloaded URL"), max_length=255, blank = True, null = True)
 
-
     plag_text_options = (
         ('0', "TikTok"),
         ('1', "Helo"),
@@ -151,29 +150,9 @@ class Topic(models.Model):
         ('9', "ROPOSO"),
         ('10', "Likee"),
     )
-
+    
     time_deleted = models.DateTimeField(blank = True, null = True)
-    #text in the video for possible plag
     plag_text = models.CharField(choices = plag_text_options, blank = True, null = True, max_length = 10)
-
-    plag_text_options = (
-        ('0', "TikTok"),
-        ('1', "Helo"),
-        ('2', "Vigo"),
-        ('3', "Tik"),
-        ('4', "Tok"),
-        ('5', "Vivo"),
-        ('6', "ShareChat"),
-        ('7', "Nojoto"),
-        ('8', "Trell"),
-        ('9', "ROPOSO"),
-        ('10', "Likee"),
-    )
-
-    time_deleted = models.DateTimeField(auto_now = True, auto_now_add = False, blank = False, null = False)
-    #text in the video for possible plag
-    plag_text = models.CharField(choices = plag_text_options, blank = False, null = True, max_length = 10)
-
     objects = TopicQuerySet.as_manager()
 
     def __unicode__(self):
