@@ -109,6 +109,7 @@ class Topic(models.Model):
     comment_count = models.PositiveIntegerField(_("comment count"), default=0)
     total_share_count = models.PositiveIntegerField(_("Total Share count"), default=0)# self plus comment
     share_count = models.PositiveIntegerField(_("Share count"), default=0)# only topic share
+    imp_count = models.PositiveIntegerField(_("views"), default=0)
     # share_user = models.ForeignKey(settings.AUTH_USER_MODEL,null=True,blank=True, related_name='share_topic_user')
     # shared_post = models.ForeignKey('self', blank = True, null = True, related_name='user_shared_post')
     is_vb = models.BooleanField(_("Is Video Bytes"), default=False)
@@ -154,6 +155,24 @@ class Topic(models.Model):
     time_deleted = models.DateTimeField(blank = True, null = True)
     #text in the video for possible plag
     plag_text = models.CharField(choices = plag_text_options, blank = True, null = True, max_length = 10)
+
+    plag_text_options = (
+        ('0', "TikTok"),
+        ('1', "Helo"),
+        ('2', "Vigo"),
+        ('3', "Tik"),
+        ('4', "Tok"),
+        ('5', "Vivo"),
+        ('6', "ShareChat"),
+        ('7', "Nojoto"),
+        ('8', "Trell"),
+        ('9', "ROPOSO"),
+        ('10', "Likee"),
+    )
+
+    time_deleted = models.DateTimeField(auto_now = True, auto_now_add = False, blank = False, null = False)
+    #text in the video for possible plag
+    plag_text = models.CharField(choices = plag_text_options, blank = False, null = True, max_length = 10)
 
     objects = TopicQuerySet.as_manager()
 
