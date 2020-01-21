@@ -24,6 +24,7 @@ from ffmpy import FFmpeg
 import sys
 import urllib
 import os
+from shutil import copyfile
 #from settings import PROJECT_PATH
 
 PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -50,6 +51,7 @@ def timetostring(t):
 def remove_redundant_files():
 	os.remove('local_video.mp4')
 	os.remove('output1.png')
+	copyfile('plag_vid_details.txt', '/tmp/plag_vid_details.txt')
 
 
 def detect_logos():
@@ -204,7 +206,7 @@ def identify_logo_util():
 def main():
 	identify_logo_util()
 	remove_redundant_files()
-	
+
 
 def run():
 	main()

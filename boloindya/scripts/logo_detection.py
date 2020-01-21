@@ -16,6 +16,7 @@ from forum.topic.models import Topic
 from forum.user.models import UserProfile
 from forum.topic.models import Notification
 import urllib
+from shutil import copyfile
 
 PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -39,6 +40,11 @@ def timetostring(t):
 		return '00:' + str(t)			
 
 
+def remove_redundant_files():
+	os.remove('local_video.mp4')
+	os.remove('output1.png')
+
+
 # method to identify plagarised logos in videos uploaded
 def identify_logo():
 	
@@ -52,7 +58,7 @@ def identify_logo():
 	f = io.open(f_name, "w", encoding="UTF-8")
 	today = datetime.today()
 	try:
-		long_ago = today + timedelta(days = -9)
+		long_ago = today + timedelta(hours=-6)
 		topic_objects = Topic.objects.exclude(is_removed = True).filter(is_vb = True, date__gte = long_ago)
 		print(len(topic_objects))
 		global_counter = 1
@@ -114,6 +120,7 @@ def identify_logo():
 
 def main():
 	identify_logo()
+	remove_redundant_files()
 
 def run():
 	main()	
