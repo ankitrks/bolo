@@ -120,7 +120,7 @@ def identify_logo():
 					for text in texts:
 						modified_text = text.description
 						if(modified_text in plag_source):
-							f.write(video_title + " " + url_str + " " + (modified_text) + "\n")
+							f.write(iter_id + video_title + " " + url_str + " " + (modified_text) + "\n")
 							Topic.objects.filter(id = iter_id).update(plag_text = str(plag_source.index(modified_text)))
 							Topic.objects.filter(id = iter_id).update(time_deleted = datetime.now())
 							data[0].delete()
