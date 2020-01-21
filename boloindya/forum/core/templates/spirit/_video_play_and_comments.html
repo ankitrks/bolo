@@ -999,124 +999,16 @@ ul {
     var indexRowId=$("indexId").val();
 
 </script>
-
-{% trans "download" as Download %}
-{% trans "like" as like %}
-{% trans "video" as video %}
-
-<div style="display: none" id="modelPopup">
-    <input type="hideon" name="indexId" id="indexId" value="">
-    <input type="hideon" name="currentPlayUserId" id="currentPlayUserId" value="">
-    <div class="_global_modal_">
-        <div class="_global_modal_mask" style="background-color: rgba(22, 22, 22, 0.9);">
-            
-        </div>
-        <div class="_global_modal_wrapper_content">
-            <div class="_global_modal_content">
-                <div class="jsx-1270455008 top-banner mobileDownPopup hide">
-                    <div class="jsx-1270455008"><p class="jsx-1270455008">Boloindya</p><p class="jsx-1270455008">{% blocktrans %} {{Download}} the app to {{like}} this {{video}} {% endblocktrans %}</p></div><div class="jsx-1270455008"><button onclick="downloadAppLink()" class="jsx-1270455008 jsx-download-app">{% trans "Get" %}</button></div>
-                </div>
-                <div class="_video_card_big_">
-
-                    <div class="_image_card_ _video_card_big_left _video_card_mute_autoshow" style="border-radius: 4px;">
-                        <div class="_video_card_play_btn_ _video_card_play_btn_light videoPlayButton"></div>
-                        <div class="LoaderBalls">
-                            <div class="LoaderBalls__item"></div>
-                            <div class="LoaderBalls__item"></div>
-                            <div class="LoaderBalls__item"></div>
-                        </div>
-                           <div id="jwBox" class="jwBox" style = "bottom : 15px;">
-                                <div class="video_close"></div>
-                                <div id="player" >Loading ...</div>
-                            </div>
-
-                        <span class="_video_card_"></span><img onclick="muteAndUnmutePlayer();" class="_video_card_mute _video_card_mute_left_top" id="mutedImageId"  src="/media/mute_icon.svg">
-                        <div class="sidebar" id="sideBarId">
-                            <div class="jsx-2177493926 jsx-3813273378 avatar round openMobileDownloadPopup" style="background-image: url(/media/musically_100x100.jpeg); width: 48px; height: 48px; flex: 0 0 48px;"></div>
-                            <div class="jsx-949708032 boloindya-toolbar" style="margin-top: 20px;">
-                                <div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-like openMobileDownloadPopup" style="background-image: url(/media/viewIcon.svg);"><span class="jsx-949708032">2.4m</span></div>
-                                <div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-comment openMobileDownloadPopup" style="background-image: url(/media/comments.svg);"><span class="jsx-949708032">14.1k</span></div>
-                                <div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-share" onclick="openShareTab()" style="background-image: url(/media/share.svg);"><span class="jsx-949708032">111.1k</span></div>
-                            </div>
-                        </div>  
-                        
-                
-                    </div>
-                    <div class="_video_card_big_right hideonMobile" >
-                        <a class="_video_card_big_user_info_ userProfileURL" href="javascript:void(0)">
-                            <span class="_avatar_ _avatar_large" id="profileImageUserId" style=" margin-right: 24px;">
-                            </span>
-                            <div class="_video_card_big_user_info_names">
-                                <h2 class="_video_card_big_user_info_nickname"></h2>
-                                <h2 class="_video_card_big_user_info_handle"></h2>
-                                
-
-                            </div>
-                        </a>
-                        <span alt="" style="display: inline-block;position: relative;top: -26px;" class="_-xe _3-8_" onclick="follow_user_by_popup()">
-                            <span class="unit _4jy1 _4jy4 _517h _51sy _42ft"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChangePopup sx_5da455"></i><span class="btnTextChangePopup"> Follow </span></span>
-                        </span> 
-                        <div class="_comments_ _comments_top _video_card_big_comments">
-                            <div class="_comments_comments_tunnel">
-                                <div class="_comments_comments_scroll comment_block">
-                                    <div>
-                                        <div class="_video_card_big_meta_info_">
-
-                                            <div class="_video_card_big_meta_info_count"><strong>507.1k {% trans "likes" %} · 2.3k {% trans "comments" %}</strong> <span><a href="#">Download</a></span> </div>
-                                            <input type="hidden" name="tpoicId" id="topicID" value="" >
-                                            <input type="hidden" name="topicCreatorUsername" id="topicCreatorUsername" value="" >
-                                        </div>
- 
-                                        <div class="_6w18">
-                                            <div class="_6w1g _29ak">
-                                                <span>
-                                                    <a type="button" class="_55pi _2agf _4o_4 _4jy0 _4jy3 _517h _51sy _59pe _42ft" aria-haspopup="true" role="button" href="#" style="max-width: 200px;">
-                                                        <span alt="" class="_-xe _3-8_">
-                                                            <span>
-                                                                <img class="_6vg img shareandliketabprofileimage" height="16" src="/media/demo_user.jpeg" width="16" alt="">
-                                                            </span>
-                                                        </span>
-                                                        <span class="accessible_elem">
-                                                            <span class="_55pe"></span>
-                                                        </span>
-                                                        <span alt="" class="_4o_3">
-                                                            <i alt="" class="img sp_RCsy6AO3-Ti sx_3f01bd"></i>
-                                                        </span>
-                                                    </a>
-                                                </span>
-                                            </div>
-                                            <div class="_6w1h">
-                                                <span class="_18vi">
-                                                    <div class="_666k" data-testid="UFI2ReactionLink/actionLink">
-                                                        <div class="_8c74">
-                                                            <a aria-pressed="false" class=" _6a-y _3l2t  _18vj" data-testid="UReactionLink" href="javascript:void(0)" id="UReactionLink" role="button" tabindex="0">
-
-                                                                <i alt="" class="_6rk2 img sp_ddXiTdIB8vm sx_44a25c"></i>{% trans "Like" %}
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </span>
-                                                <span class="_18vi">
-                                                    <a class=" _666h  _18vj _18vk _42ft" role="button" tabindex="0" testid="UFI2CommentLink" title="Leave a comment" id="UCommentLink" href="javascript:void(0)">{% trans "Comment" %}
-                                                    </a>
-                                                </span>
-                                                <span class="_18vi sbutton">
-                                                    <span class="_1j6m">
-                                                        <a class=" _2nj7  _18vj _18vk "  href="javascript:void(0)" id="shareLinkId" role="button" tabindex="0" title="Send this to friends or post it on your Timeline.">{% trans "Share" %}
-                                                        </a>
-                                                    </span>
-                                                      <ul class='smenu'>
-                                                            <li class="facebook"><a href="javascript:void(0);" onclick="social_share('facebook_share')">Facebook</a></li>
-                                                            <li class="twitter"><a href="javascript:void(0);" onclick="social_share('twitter_share')">Twitter</a></li>
-                                                            <li class="googleplus" onclick="social_share('whatsapp_share')"><a href="javascript:void(0);">whatsapp</a></li>
-                                                      </ul>
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <hr style="margin-bottom: 10px;">
-
-                                        <div class="_6w1l _6w1m _6w1o clearfix clearfix hide"  data-testid="UFI2Composer/root" id="commentInputId" direction="left">
 <style type="text/css">
+    .videoCentered {
+    width: 100%;
+    object-fit: cover;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    height: 100%;
+}
+
     .tags-container {
     display: flex;
     flex-flow: row wrap;
@@ -1175,32 +1067,204 @@ input.tag-input {
     outline: 0;
 }
 
+.video-meta-title.jsx-191376589 {
+    font-family: proxima-regular, PingFangSC, sans-serif;
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 20px;
+    margin-bottom: 8px;
+}
+
+.ytd-commentbox {
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    float: right;
+    -ms-flex-direction: row;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+}
+.ytd-button-renderer {
+    vertical-align: middle;
+    white-space: nowrap;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: .007px;
+    cursor: pointer;
+
+}
+ #submit-button.ytd-commentbox {
+    background-color: #ccc;
+    color: #000;
+    padding: 5px;
+}
+#cancel-button.ytd-commentbox{
+    margin-top: -5px !important;
+}
+
+#cancel-button.ytd-commentbox, #submit-button.ytd-commentbox {
+    margin-left: 8px;
+    margin-top: -10px;
+}
+
+.ytd-button-renderer.style-primary[disabled][is-paper-button] {
+    background-color: #ccc;
+    color: #000;
+    padding: 5px;
+}
 
 
 
 </style>
+
+{% trans "download" as Download %}
+{% trans "like" as like %}
+{% trans "video" as video %}
+
+<input type="hidden" name="totalLikeCount" id="totalLikeCount" value="">
+<input type="hidden" name="totalCommentCount" id="totalCommentCount" value="">
+
+<div style="display: none" id="modelPopup">
+    <input type="hideon" name="indexId" id="indexId" value="">
+    <input type="hideon" name="currentPlayUserId" id="currentPlayUserId" value="">
+    <div class="_global_modal_">
+        <div class="_global_modal_mask" style="background-color: rgba(22, 22, 22, 0.9);">
+            
+        </div>
+        <div class="_global_modal_wrapper_content">
+            <div class="_global_modal_content">
+                <div class="jsx-1270455008 top-banner mobileDownPopup hide">
+                    <div class="jsx-1270455008"><p class="jsx-1270455008">Boloindya</p><p class="jsx-1270455008">{% blocktrans %} {{Download}} the app to {{like}} this {{video}} {% endblocktrans %}</p></div><div class="jsx-1270455008"><button onclick="downloadAppLink()" class="jsx-1270455008 jsx-download-app">{% trans "Get" %}</button></div>
+                </div>
+                <div class="_video_card_big_">
+
+                    <div class="_image_card_ _video_card_big_left _video_card_mute_autoshow" style="border-radius: 4px;">
+                        <div class="_video_card_play_btn_ _video_card_play_btn_light videoPlayButton"></div>
+                        <div class="LoaderBalls">
+                            <div class="LoaderBalls__item"></div>
+                            <div class="LoaderBalls__item"></div>
+                            <div class="LoaderBalls__item"></div>
+                        </div>
+                           <div id="jwBox" class="jwBox" style = "bottom : 15px;">
+                                <div class="video_close"></div>
+                                <!-- <div id="player1" >Loading ...</div> -->
+                                <video id="player" class="videoCentered"></video>
+                                <!-- <video id="video"></video> -->
+
+                            </div>
+
+                        <span class="_video_card_"></span><img onclick="muteAndUnmutePlayer();" class="_video_card_mute _video_card_mute_left_top" id="mutedImageId"  src="/media/mute_icon.svg">
+                        <div class="sidebar" id="sideBarId">
+                            <div class="jsx-2177493926 jsx-3813273378 avatar round openMobileDownloadPopup" style="background-image: url(/media/musically_100x100.jpeg); width: 48px; height: 48px; flex: 0 0 48px;"></div>
+                            <div class="jsx-949708032 boloindya-toolbar" style="margin-top: 20px;">
+                                <div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-like openMobileDownloadPopup" style="background-image: url(/media/viewIcon.svg);"><span class="jsx-949708032">2.4m</span></div>
+                                <div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-comment openMobileDownloadPopup" style="background-image: url(/media/comments.svg);"><span class="jsx-949708032">14.1k</span></div>
+                                <div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-share" onclick="openShareTab()" style="background-image: url(/media/share.svg);"><span class="jsx-949708032">111.1k</span></div>
+                            </div>
+                        </div>  
+                        
+                
+                    </div>
+                    <div class="_video_card_big_right hideonMobile" >
+                        <a class="_video_card_big_user_info_ userProfileURL" href="javascript:void(0)">
+                            <span class="_avatar_ _avatar_large" id="profileImageUserId" style=" margin-right: 24px;">
+                            </span>
+                            <div class="_video_card_big_user_info_names">
+                                <h2 class="_video_card_big_user_info_nickname"></h2>
+                                <h2 class="_video_card_big_user_info_handle"></h2>
+                                
+
+                            </div>
+                        </a>
+                        <span alt="" style="display: inline-block;position: relative;top: -26px;" class="_-xe _3-8_" onclick="follow_user_by_popup()">
+                            <span class="unit _4jy1 _4jy4 _517h _51sy _42ft"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChangePopup sx_5da455"></i><span class="btnTextChangePopup"> {% trans "Follow" %} </span></span>
+                        </span> 
+                        <h1 class="jsx-191376589 jsx-861547433 jsx-3645511632 video-meta-title"><strong></strong></h1>
+                        <div class="_comments_ _comments_top _video_card_big_comments">
+                            <div class="_comments_comments_tunnel">
+                                <div class="_comments_comments_scroll comment_block">
+                                    <div>
+                                        <div class="_video_card_big_meta_info_">
+
+                                            <div class="_video_card_big_meta_info_count"><strong>507.1k {% trans "likes" %} · 2.3k {% trans "comments" %}</strong> <span><a href="#">{% trans "Download" %}</a></span> </div>
+                                            <input type="hidden" name="tpoicId" id="topicID" value="" >
+                                            <input type="hidden" name="topicCreatorUsername" id="topicCreatorUsername" value="" >
+                                        </div>
+ 
+                                        <div class="_6w18">
+                                            <div class="_6w1g _29ak">
+                                                <span>
+                                                    <a type="button" class="_55pi _2agf _4o_4 _4jy0 _4jy3 _517h _51sy _59pe _42ft" aria-haspopup="true" role="button" href="#" style="max-width: 200px;">
+                                                        <span alt="" class="_-xe _3-8_">
+                                                            <span>
+                                                                <img class="_6vg img shareandliketabprofileimage" height="16" src="/media/demo_user.jpeg" width="16" alt="">
+                                                            </span>
+                                                        </span>
+                                                        <span class="accessible_elem">
+                                                            <span class="_55pe"></span>
+                                                        </span>
+                                                        <span alt="" class="_4o_3">
+                                                            <i alt="" class="img sp_RCsy6AO3-Ti sx_3f01bd"></i>
+                                                        </span>
+                                                    </a>
+                                                </span>
+                                            </div>
+                                            <div class="_6w1h">
+                                                <span class="_18vi">
+                                                    <div class="_666k" data-testid="UFI2ReactionLink/actionLink">
+                                                        <div class="_8c74">
+                                                            <a aria-pressed="false" class=" _6a-y _3l2t  _18vj" data-testid="UReactionLink" href="javascript:void(0)" id="UReactionLink" role="button" tabindex="0">
+
+                                                                <i alt="" class="_6rk2 img sp_ddXiTdIB8vm sx_44a25c"></i>{% trans "Like" %}
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </span>
+                                                <span class="_18vi">
+                                                    <a class=" _666h  _18vj _18vk _42ft" role="button" tabindex="0" testid="UFI2CommentLink" title="Leave a comment" id="UCommentLink" href="javascript:void(0)">{% trans "Comment" %}
+                                                    </a>
+                                                </span>
+                                                <span class="_18vi sbutton">
+                                                    <span class="_1j6m">
+                                                        <a class=" _2nj7  _18vj _18vk "  href="javascript:void(0)" id="shareLinkId" role="button" tabindex="0" title="Send this to friends or post it on your Timeline.">{% trans "Share" %}
+                                                        </a>
+                                                    </span>
+                                                      <ul class='smenu'>
+                                                            <li class="facebook"><a href="javascript:void(0);" onclick="social_share('facebook_share')">Facebook</a></li>
+                                                            <li class="twitter"><a href="javascript:void(0);" onclick="social_share('twitter_share')">Twitter</a></li>
+                                                            <li class="googleplus" onclick="social_share('whatsapp_share')"><a href="javascript:void(0);">whatsapp</a></li>
+                                                      </ul>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <hr style="margin-bottom: 10px;">
+
+                                        <div class="_6w1l _6w1m _6w1o clearfix clearfix hide"  data-testid="UFI2Composer/root" id="commentInputId" direction="left">
+
+
                                             <div class="">
                                                 
                                                 <div class="comment-add ">
-<!--                                                     <label for="exist-values" id="listUsersId">
-                                                        <input type="hidden" id="exist-values" class="tagged form-control" data-removebtn="true" name="tag-2" value="PC,Play Station 4,New" placeholder="Add Platform">
-                                                        <div class="tags-container">
-    
-                                                            <span class="lastElement"></span>
-                                                            <input value="" class="tag-input" id="comment-input" autocomplete="off" maxlength="60" placeholder="Say something nice..">
-                                                        </div>
-                                                    </label> -->
 
 
                                                     <textarea class='mention' id="comment-input" autocomplete="off" maxlength="60" placeholder="Say something nice.."></textarea>
 
-
      
                                                 </div>
 
+                                                <div id="buttons1" class="style-scope ytd-commentbox">
+                                                    <div id="cancel-button" class="style-scope ytd-commentbox style-text size-default ytd-button-renderer" >
+                                                        <a class="yt-simple-endpoint style-scope ytd-button-renderer" tabindex="-1">
+                                                            Cancel
+                                                        </a>
+                                                    </div>
+                                                    <div id="submit-button" class="style-scope ytd-commentbox style-primary size-default ytd-button-renderer" >
+                                                        <a class="yt-simple-endpoint style-scope ytd-button-renderer" tabindex="-1">
+                                                            Comment
+                                                        </a>
+                                                    </div>
 
-
-
+                                                </div>
                                                 <span class="chars-counter"><span id="chars-current">0</span>/60</span>
                                                 <span class="commentError"></span>
                                             </div>
@@ -1211,6 +1275,9 @@ input.tag-input {
                                         <span class="commentErrorStatus"></span>
                                         <div id="currentCommentId"></div>
                                         <div class="videoCommentId"></div>
+                                        <div class="_scroll_load_more_loading_comment">
+                                            <div class="tiktok-loading"></div>
+                                        </div>
                                         <div class="loadMoreComments"></div>
 
                                     </div>

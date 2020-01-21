@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-import csv, io
+import csv, io,cv2
 from django.contrib import messages
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import permission_required
@@ -55,6 +55,8 @@ from drf_spirit.serializers import UserWithUserSerializer
 from django.db.models import F,Q
 import traceback
 from tasks import send_notifications_task
+from PIL import Image, ExifTags
+
 
 def get_bucket_details(bucket_name=None):
     bucket_credentials = {}
@@ -841,6 +843,7 @@ def edit_upload(request):
 
 @login_required
 def boloindya_edit_upload(request):
+    videoRotateStatus=None
     if request.method == 'GET':
         file_id = request.GET.get('id',None)
         if file_id:
@@ -853,7 +856,13 @@ def boloindya_edit_upload(request):
     elif request.method == 'POST':
         video_id = request.POST.get('video_id',None)
         if video_id:
+            bucketName='boloindyapp-prod'
             my_video = VideoUploadTranscode.objects.get(pk=video_id)
+            videoRotateStatus = request.POST.get('rotation',None)
+            if videoRotateStatus:
+                rotationAngle=request.POST.get('rotation',None)
+                thumbnailUrl=my_video.thumbnail_url
+                filepatha=upload_rotated_thumbail(thumbnailUrl,bucketName,rotationAngle);
             topic = my_video.topic
             topic.title = request.POST.get('title','')
             m2mcategory = request.POST.getlist('m2mcategory',None)
@@ -908,6 +917,7 @@ def get_video_thumbnail(video_url,bucket_name):
     else:
         return False
 
+
 def upload_thumbail(virtual_thumb_file,bucket_name):
     try:
         bucket_credentials = get_bucket_details(bucket_name)
@@ -923,6 +933,56 @@ def upload_thumbail(virtual_thumb_file,bucket_name):
         return filepath
     except:
         return None
+
+def upload_rotated_thumbail(virtual_thumb_file,bucket_name,rotationAngle):
+    try:
+
+        bucket_credentials = get_bucket_details(bucket_name)
+        client = boto3.client('s3',aws_access_key_id=bucket_credentials['AWS_ACCESS_KEY_ID'],aws_secret_access_key=bucket_credentials['AWS_SECRET_ACCESS_KEY'])
+        rotatedImagePath=rotateImage(virtual_thumb_file,rotationAngle)
+        final_filename = virtual_thumb_file.split('/')[-1]
+        response=client.put_object(Bucket=bucket_credentials['AWS_BUCKET_NAME'], Key='thumbnail/' +bucket_name+"/"+final_filename, Body=open(rotatedImagePath, 'rb'), ACL='public-read')
+        # client.resource('s3').Object(settings.BOLOINDYA_AWS_BUCKET_NAME, 'thumbnail/' + final_filename).put(Body=open(virtual_thumb_file, 'rb'))
+        filepath = "https://"+bucket_credentials['AWS_BUCKET_NAME']+".s3.amazonaws.com/thumbnail/"+bucket_name+"/"+final_filename
+        if response:
+            deleFilePath='temp/'+final_filename
+            if os.path.exists(deleFilePath):
+                os.remove(deleFilePath)
+        return final_filename
+    except:
+        return None
+
+def rotateImage(virtual_thumb_file,rotationAngle):
+    import requests
+    import tempfile
+    import PIL
+
+    request = requests.get(virtual_thumb_file, stream=True)
+
+    file_name = virtual_thumb_file.split('/')[-1]
+
+    # Create a temporary file
+    lf = tempfile.NamedTemporaryFile()
+
+    # Read the streamed image in sections
+    for block in request.iter_content(1024 * 8):
+
+        # If no more file then stop
+        if not block:
+            break
+
+        # Write image block to temporary file
+        lf.write(block)
+
+    image = Image.open(lf)
+    image = image.rotate(int(rotationAngle), PIL.Image.NEAREST, expand=True)
+    fileNewPath=settings.BASE_DIR+"/temp/"+file_name
+    image.save(fileNewPath)
+    image.close()
+    return fileNewPath
+
+
+
 
 def update_careeranna_db(uploaded_video):
     import requests
@@ -1285,11 +1345,17 @@ def statistics_all(request):
     if end_date_obj >= datetime.datetime.today().date():
         end_date = (datetime.datetime.today() - timedelta(days = 1)).strftime("%Y-%m-%d")
 
+    end_date_obj = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
+    if end_date_obj >= datetime.datetime.today().date():
+        end_date = (datetime.datetime.today() - timedelta(days = 1)).strftime("%Y-%m-%d")
+
+    top_start = (datetime.datetime.today() - timedelta(days = 30)).date()
+    top_end = (datetime.datetime.today() - timedelta(days = 1)).date()
     for each_opt in metrics_options:
         temp_list = []
         temp_list.append( each_opt[0] )
         temp_list.append( each_opt[1] )
-        temp_list.append( DashboardMetrics.objects.exclude(date__gt = end_date).filter(metrics = each_opt[0])\
+        temp_list.append( DashboardMetrics.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0])\
                 .aggregate(total_count = Sum('count'))['total_count'] )
         top_data.append( temp_list ) 
         if metrics == each_opt[0]:
@@ -1299,9 +1365,9 @@ def statistics_all(request):
     graph_data = DashboardMetrics.objects.exclude(date__gt = end_date).filter(Q(metrics = metrics) & Q(date__gte = start_date) & Q(date__lte = end_date))
     if metrics in ['4', '2', '5'] and slab:
         if (metrics == '4' and slab in ['0', '1', '2']) or (metrics == '2' and slab in ['3', '4', '5'])\
-                 or (metrics == '5' and slab in ['6', '7', '8']):
+                 or (metrics == '5' and slab in ['6', '7']):
             graph_data = graph_data.filter(metrics_slab = slab)
-    
+
     if data_view == 'weekly':
         x_axis = []
         y_axis = []
@@ -1321,9 +1387,16 @@ def statistics_all(request):
     # else:
     #     x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
     #     y_axis = graph_data.values_list('count', flat = True)
-    
-    data['x_axis'] = list(x_axis)
-    data['y_axis'] = list(y_axis)
+    data['metrics'] = metrics
+    data['slab'] = slab
+    data['data_view'] = data_view
+    # data['x_axis'] = list(x_axis)
+    # data['y_axis'] = list(y_axis)
+    from collections import OrderedDict
+    chart_data = OrderedDict()
+    for i in range(len(x_axis)):
+        chart_data[x_axis[i]] = y_axis[i]
+    data['chart_data'] = [[str(data_view), str(data['graph_title'])]] + [list(ele) for ele in chart_data.items()] 
     data['start_date'] = start_date
     data['end_date'] = end_date
     data['slabs'] = []
@@ -1545,3 +1618,4 @@ def search_notification(request):
         print(e)
         return JsonResponse({'data': []}, status=status.HTTP_200_OK)
     
+

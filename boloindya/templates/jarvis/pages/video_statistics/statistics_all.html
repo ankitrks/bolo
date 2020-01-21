@@ -5,7 +5,8 @@
         <title>bolo indya | analytics</title>
         <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-        <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+        <!-- <script src='https://cdn.plot.ly/plotly-latest.min.js'></script> -->
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
         <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
@@ -98,51 +99,70 @@
             </span><br>
         </div><br><br><br>
         {% for each_data in top_data %}
-            <div class="top_box">
+            <div class="top_box" {% if metrics == each_data.0  %}style="background:bisque;"{% endif %}>
+                <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
                 <a href="?metrics={{ each_data.0 }}" class="filter_apply"><h6 style="color: #333">{{ each_data.1 }}</h6><h5 style="color: #b52828">{{ each_data.2|intcomma }}</h5></a>
+
             </div>
         {% endfor %}
         <div class="right_panel">
             <br><br>Start date &nbsp;&nbsp; <input type="text" id="start_date" name="start_date" placeholder="Start Date" class="filter_text" value="{{ start_date }}">
             &nbsp;&nbsp; End date&nbsp;&nbsp;&nbsp; <input type="text" id="end_date" name="end_date" placeholder="End Date" class="filter_text" value="{{ end_date }}">&nbsp;&nbsp;&nbsp;
             <!-- <a href="?data_view=daily" class="filter_apply">daily</a> &nbsp;&nbsp;|&nbsp;&nbsp; -->
-            <a href="?data_view=weekly" class="filter_apply btn">weekly</a>
-            <a href="?data_view=monthly" class="filter_apply btn">monthly</a><br>
+            <a href="?data_view=weekly" class="filter_apply btn" {% if data_view == "weekly"  %}style="background:bisque;"{% endif %}>weekly</a>
+            <a href="?data_view=monthly" class="filter_apply btn" {% if data_view == "monthly"  %}style="background:bisque;"{% endif %}>monthly</a><br>
             {% if slabs %}
                 <br>Data Slabs&nbsp;&nbsp;
                 {% for each_slab in slabs %}
-                    <a href="?slab={{ each_slab.0 }}" class="filter_apply">{{ each_slab.1 }}</a>{% if not forloop.last %} &nbsp;&nbsp;|&nbsp;&nbsp;{% endif %}
+                    <a href="?slab={{ each_slab.0 }}" class="filter_apply" {% if slab == each_slab.0  %}style="text-decoration: underline;font-weight: bold;color: burlywood;"{% endif %}>{{ each_slab.1 }}</a>{% if not forloop.last %} &nbsp;&nbsp;|&nbsp;&nbsp;{% endif %}
                 {% endfor %}
             {% endif %}
-            <div id="myDiv"></div>
+            <br><div id="myDiv" style="width: 100%; height: 450px;"></div>
         </div>
         <script type="text/javascript">
-            var trace1 = {
-                x: {{ x_axis|safe }},
-                y: {{ y_axis|safe }},
-                text: {{ x_axis|safe }},
-                type: 'bar',
-                marker: {
-                    // color: '#b52828', // 'rgb(142,124,195)'
-                }
-            };
-            var data = [trace1];
-            var layout = {
-                title: "{{ graph_title }}",
-                font:{
-                    family: 'Raleway, sans-serif'
-                },
-                showlegend: false,
-                xaxis: {
-                    tickangle: -45
-                },
-                yaxis: {
-                    zeroline: false,
-                    gridwidth: 2
-                },
-                bargap :0.05
-            };
-            Plotly.newPlot('myDiv', data, layout);
+            // var trace1 = {
+            //     x: {{ x_axis|safe }},
+            //     y: {{ y_axis|safe }},
+            //     text: {{ x_axis|safe }},
+            //     type: 'bar',
+            //     marker: {
+            //         // color: '#b52828', // 'rgb(142,124,195)'
+            //     }
+            // };
+            // var data = [trace1];
+            // var layout = {
+            //     title: "{{ graph_title }}",
+            //     font:{
+            //         family: 'Raleway, sans-serif'
+            //     },
+            //     showlegend: false,
+            //     xaxis: {
+            //         tickangle: -45
+            //     },
+            //     yaxis: {
+            //         zeroline: false,
+            //         gridwidth: 2
+            //     },
+            //     bargap :0.05
+            // };
+            // Plotly.newPlot('myDiv', data, layout);
+
+            var chart_data = {{ chart_data|safe }};
+            google.charts.load('current', {'packages':['bar']});
+            google.charts.setOnLoadCallback(drawChart);
+            function drawChart() {
+                var data = google.visualization.arrayToDataTable(chart_data);
+                var options = {
+                  chart: {
+                    title: "{{ graph_title }}",
+                    // subtitle: 'Sales, Expenses, and Profit: 2014-2017',
+                  },
+                  // bars: 'horizontal' // Required for Material Bar Charts.
+                };
+
+                var chart = new google.charts.Bar(document.getElementById('myDiv'));
+                chart.draw(data, google.charts.Bar.convertOptions(options));
+            }
         </script>
     </body>
 </html>

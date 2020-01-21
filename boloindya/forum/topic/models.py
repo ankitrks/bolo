@@ -115,7 +115,7 @@ class Topic(models.Model):
     likes_count = models.PositiveIntegerField(_("Likes count"), default=0)
 
     is_monetized = models.BooleanField(_("monetized"), default=False)
-    is_moderated = models.BooleanField(_("moderated"), default=False)
+    is_moderated = models.BooleanField(_("moderated"), default=True)
     vb_width = models.PositiveIntegerField(_("vb width"), default=0)
     vb_height = models.PositiveIntegerField(_("vb height"), default=0)
 

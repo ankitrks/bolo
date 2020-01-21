@@ -296,7 +296,9 @@ def run():
             for each_data in final_dict:
                 month_date = datetime.strptime(each_rec + '-' + str(each_data), '%Y-%m-%d')
                 week_no = month_date.isocalendar()[1]
-                if week_no == 1:
+                if month_date.year == 2020:
+                    week_no += 52
+                if month_date.year == 2019 and week_no == 1:
                     week_no = 52
 
                 save_obj, created = DashboardMetrics.objects.get_or_create(metrics = metrics, metrics_slab = slab, date = month_date,\
@@ -310,3 +312,4 @@ def run():
                     # print 'Created....'
                     save_obj.count = final_count
                     save_obj.save()
+

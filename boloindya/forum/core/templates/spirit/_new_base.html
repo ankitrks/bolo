@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load static from staticfiles %}
 {% get_current_language as LANGUAGE_CODE %}
+
 <!DOCTYPE html>
 <!-- saved from url=(0025)https://www.boloindya.com/en -->
 <html lang="{{LANGUAGE_CODE}}" pc="yes" class="webpalpha webpanimation webplossless webp webp-alpha webp-animation webp-lossless">
@@ -38,6 +39,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta data-react-helmet="true" name="twitter:image" content="/media/img/favicon.ico"/>
     <meta data-react-helmet="true" property="og:image" content="/media/img/favicon.ico"/>
+<!--     <link href="https://unpkg.com/video.js/dist/video-js.css" rel="stylesheet">
+    <script src="https://unpkg.com/video.js/dist/video.js"></script>
+    <script src="https://unpkg.com/videojs-contrib-hls/dist/videojs-contrib-hls.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script> -->
+<!-- Or if you want a more recent canary version -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@canary"></script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2YHY45HKGR"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-2YHY45HKGR');
+    </script>
 
     {% block head-meta %}{% endblock %}
 
@@ -46,13 +62,29 @@
     {% if key == LANGUAGE_CODE %}
         <script type="text/javascript">
             var current_language_id='{{value}}';
+            var current_language_code='{{LANGUAGE_CODE}}';
         </script>
         {% endif %}
     {% endfor %}
 
+{% get_current_language as LANGUAGE_CODE %}
+{% get_available_languages as LANGUAGES %}
+{% get_language_info_list for LANGUAGES as languages %}
+{% for language in languages %}
+{% if language.code == LANGUAGE_CODE %}
+        <script type="text/javascript">
+            var current_language_name='{{ language.name_local }}';
+        </script>
+
+{% endif %}
+{% endfor %}
+
 <script type="text/javascript">
+    var follow_trans='{% trans "Follow" %}';
+    var followed_trans='{% trans "Followed" %}';
     var likeTrans='{% trans "likes" %}';
     var commentsTrans='{% trans "comments" %}';
+    var followers_trans='{% trans "Followers" %}';
     var site_base_url='{{site_base_url}}';
     console.log(likeTrans);
 </script>
@@ -130,6 +162,23 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.6/html5shiv.min.js"></script>
     <![endif]-->
 
+    <!-- Start Alexa Certify Javascript -->
+    <script type="text/javascript">
+    _atrk_opts = { atrk_acct:"bbs6u1DlQy20Y8", domain:"boloindya.com",dynamic: true};
+    (function() { var as = document.createElement('script'); as.type = 'text/javascript'; as.async = true; as.src = "https://certify-js.alexametrics.com/atrk.js"; var s = document.getElementsByTagName('script')[0];s.parentNode.insertBefore(as, s); })();
+    </script>
+    <noscript><img src="https://certify.alexametrics.com/atrk.gif?account=bbs6u1DlQy20Y8" style="display:none" height="1" width="1" alt="" /></noscript>
+    <!-- End Alexa Certify Javascript --> 
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<!-- <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156245329-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-156245329-1');
+</script> -->
+
   </head>
 
 <!-- style="margin-left:-19px; margin-right: -14px;max-width:100%;" -->
@@ -141,10 +190,10 @@
     {% include 'spirit/_new_footer.html' %}
 
     <!-- The core Firebase JS SDK is always required and must be listed first -->
-<script src="https://www.gstatic.com/firebasejs/7.6.2/firebase-app.js"></script>
+<!-- <script src="https://www.gstatic.com/firebasejs/7.6.2/firebase-app.js"></script> -->
 <!-- TODO: Add SDKs for Firebase products that you want to use
      https://firebase.google.com/docs/web/setup#available-libraries -->
-<script src="https://www.gstatic.com/firebasejs/7.6.2/firebase-analytics.js"></script>
+<!-- <script src="https://www.gstatic.com/firebasejs/7.6.2/firebase-analytics.js"></script>
 <script>
   // Your web app’s Firebase configuration
   var firebaseConfig = {
@@ -160,7 +209,7 @@
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
   firebase.analytics();
-</script>
+</script> -->
 
   </body>
 
