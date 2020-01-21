@@ -43,6 +43,8 @@ def timetostring(t):
 def remove_redundant_files():
 	os.remove('local_video.mp4')
 	os.remove('output1.png')
+	copyfile('plag_vid_details.txt', '/tmp/plag_vid_details.txt')
+	os.remove('plag_vid_details.txt')
 
 
 # method to identify plagarised logos in videos uploaded
@@ -103,10 +105,7 @@ def identify_logo():
 					for text in texts:
 						modified_text = text.description
 						if(modified_text in plag_source):
-							print(modified_text)
-							print("yes")
-							print("...............")
-							f.write(video_title + " " + url_str + " " + (modified_text) + "\n")
+							f.write(item.id + video_title + " " + url_str + " " + (modified_text) + "\n")
 							Topic.objects.filter(id = iter_id).update(plag_text = str(plag_source.index(modified_text)))
 							Topic.objects.filter(id = iter_id).update(time_deleted = datetime.now())
 							data[0].delete()
