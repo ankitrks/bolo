@@ -63,7 +63,8 @@ def run():
                     action_seen(seen_profile_user_id,each_seen_id)
                     check_like(each_seen_id,all_test_userprofile_id)
                     i += 1
-                except:
+                except Exception as e:
+		    print e
                     pass
         except:
             pass
@@ -106,7 +107,7 @@ def run():
             pass
 
     for each_topic_id in last_n_days_post_ids:
-        action_type =['seen','comment','like','follow','share','comment_like']
+        action_type =['comment', 'seen','comment','like', 'comment', 'follow','comment', 'share', 'comment' ,'comment_like', 'comment']
         opt_action = random.choice(action_type)
         opt_action_user_id = random.choice(user_ids)
         if opt_action =='comment':
@@ -302,7 +303,6 @@ def action_comment_like(user_id,comment):
         userprofile = get_userprofile(user_id)
         userprofile.like_count = F('like_count')+1
         userprofile.save()
-
 
 def get_topic(pk):
     return Topic.objects.get(pk=pk)

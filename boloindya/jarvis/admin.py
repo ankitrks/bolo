@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
-from .models import VideoUploadTranscode,FCMDevice, PushNotificationUser, PushNotification,StateDistrictLanguage
+from .models import VideoUploadTranscode,FCMDevice, PushNotificationUser, PushNotification, StateDistrictLanguage, DashboardMetrics
 from functools import update_wrapper
 from django.contrib import admin
 from django.shortcuts import redirect, render
@@ -72,11 +72,14 @@ class StateDistrictLanguageAdmin(admin.ModelAdmin):
     list_display = ('id','state_name','district_name','state_language','district_language')
     search_fields = ('state_name', 'district_name','state_language','district_language')
 
-
+class DashboardMetricsAdmin(admin.ModelAdmin):
+    list_display = ('id', 'metrics', 'metrics_slab', 'date', 'week_no', 'count')
+    list_editable = ('metrics', 'metrics_slab', 'date', 'week_no', 'count')
+    list_filter = ('metrics', 'metrics_slab', 'date')
 
 admin.site.unregister(FCMDevice)
 admin.site.register(FCMDevice, FCMDeviceAdmin) 
 admin.site.register(PushNotification)
 admin.site.register(PushNotificationUser)
-admin.site.register(StateDistrictLanguage,StateDistrictLanguageAdmin)
-# Register your models here.
+admin.site.register(DashboardMetrics, DashboardMetricsAdmin)
+admin.site.register(StateDistrictLanguage, StateDistrictLanguageAdmin)

@@ -15,6 +15,7 @@ from datetime import datetime,timedelta,date
 from ffmpy import FFmpeg
 from datetime import timedelta
 from google.cloud import vision
+
 import operator
 from ffmpy import FFmpeg
 from forum.topic.models import Topic
@@ -127,10 +128,9 @@ def identify_logo():
 	f.close()
 					
 
-
 def main():
 	identify_logo()
 	remove_redundant_files()
 
 def run():
-	main()	
+	main()

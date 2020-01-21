@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-import csv, io
+import csv, io,cv2
 from django.contrib import messages
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import permission_required
@@ -17,6 +17,7 @@ import os
 import hashlib
 import time
 import re
+from django.db.models import Q
 from drf_spirit.views import getVideoLength
 from drf_spirit.utils  import calculate_encashable_details,language_options
 from forum.user.models import UserProfile, ReferralCode, ReferralCodeUsed, VideoCompleteRate, VideoPlaytime
@@ -31,7 +32,8 @@ from forum.payment.forms import PaymentForm,PaymentCycleForm
 from django.views.generic.edit import FormView
 from datetime import datetime
 from forum.userkyc.forms import KYCBasicInfoRejectForm,KYCDocumentRejectForm,AdditionalInfoRejectForm,BankDetailRejectForm
-from .models import VideoUploadTranscode,VideoCategory, PushNotification, PushNotificationUser, user_group_options, FCMDevice, notification_type_options
+from .models import VideoUploadTranscode,VideoCategory, PushNotification, PushNotificationUser, user_group_options, \
+    FCMDevice, notification_type_options, metrics_options, DashboardMetrics, metrics_slab_options
 from drf_spirit.models import MonthlyActiveUser, HourlyActiveUser, DailyActiveUser, VideoDetails
 from forum.category.models import Category
 from django.contrib.auth.models import User
@@ -53,6 +55,8 @@ from drf_spirit.serializers import UserWithUserSerializer
 from django.db.models import F,Q
 import traceback
 from tasks import send_notifications_task
+from PIL import Image, ExifTags
+
 
 def get_bucket_details(bucket_name=None):
     bucket_credentials = {}
@@ -729,6 +733,7 @@ def boloindya_upload_n_transcode(request):
             topic_dict['vb_height'] = height
             topic_dict['title'] = title
             topic_dict['view_count'] = view_count
+	    topic_dict['language_id'] = language_id
             topic_dict['is_vb'] = True
             my_upload_transcode = VideoUploadTranscode.objects.create(**my_dict)
             topic_dict['user_id'] = user_id
@@ -838,6 +843,7 @@ def edit_upload(request):
 
 @login_required
 def boloindya_edit_upload(request):
+    videoRotateStatus=None
     if request.method == 'GET':
         file_id = request.GET.get('id',None)
         if file_id:
@@ -850,7 +856,13 @@ def boloindya_edit_upload(request):
     elif request.method == 'POST':
         video_id = request.POST.get('video_id',None)
         if video_id:
+            bucketName='boloindyapp-prod'
             my_video = VideoUploadTranscode.objects.get(pk=video_id)
+            videoRotateStatus = request.POST.get('rotation',None)
+            if videoRotateStatus:
+                rotationAngle=request.POST.get('rotation',None)
+                thumbnailUrl=my_video.thumbnail_url
+                filepatha=upload_rotated_thumbail(thumbnailUrl,bucketName,rotationAngle);
             topic = my_video.topic
             topic.title = request.POST.get('title','')
             m2mcategory = request.POST.getlist('m2mcategory',None)
@@ -905,6 +917,7 @@ def get_video_thumbnail(video_url,bucket_name):
     else:
         return False
 
+
 def upload_thumbail(virtual_thumb_file,bucket_name):
     try:
         bucket_credentials = get_bucket_details(bucket_name)
@@ -920,6 +933,56 @@ def upload_thumbail(virtual_thumb_file,bucket_name):
         return filepath
     except:
         return None
+
+def upload_rotated_thumbail(virtual_thumb_file,bucket_name,rotationAngle):
+    try:
+
+        bucket_credentials = get_bucket_details(bucket_name)
+        client = boto3.client('s3',aws_access_key_id=bucket_credentials['AWS_ACCESS_KEY_ID'],aws_secret_access_key=bucket_credentials['AWS_SECRET_ACCESS_KEY'])
+        rotatedImagePath=rotateImage(virtual_thumb_file,rotationAngle)
+        final_filename = virtual_thumb_file.split('/')[-1]
+        response=client.put_object(Bucket=bucket_credentials['AWS_BUCKET_NAME'], Key='thumbnail/' +bucket_name+"/"+final_filename, Body=open(rotatedImagePath, 'rb'), ACL='public-read')
+        # client.resource('s3').Object(settings.BOLOINDYA_AWS_BUCKET_NAME, 'thumbnail/' + final_filename).put(Body=open(virtual_thumb_file, 'rb'))
+        filepath = "https://"+bucket_credentials['AWS_BUCKET_NAME']+".s3.amazonaws.com/thumbnail/"+bucket_name+"/"+final_filename
+        if response:
+            deleFilePath='temp/'+final_filename
+            if os.path.exists(deleFilePath):
+                os.remove(deleFilePath)
+        return final_filename
+    except:
+        return None
+
+def rotateImage(virtual_thumb_file,rotationAngle):
+    import requests
+    import tempfile
+    import PIL
+
+    request = requests.get(virtual_thumb_file, stream=True)
+
+    file_name = virtual_thumb_file.split('/')[-1]
+
+    # Create a temporary file
+    lf = tempfile.NamedTemporaryFile()
+
+    # Read the streamed image in sections
+    for block in request.iter_content(1024 * 8):
+
+        # If no more file then stop
+        if not block:
+            break
+
+        # Write image block to temporary file
+        lf.write(block)
+
+    image = Image.open(lf)
+    image = image.rotate(int(rotationAngle), PIL.Image.NEAREST, expand=True)
+    fileNewPath=settings.BASE_DIR+"/temp/"+file_name
+    image.save(fileNewPath)
+    image.close()
+    return fileNewPath
+
+
+
 
 def update_careeranna_db(uploaded_video):
     import requests
@@ -1227,11 +1290,125 @@ def get_installs_data(request):
             print(traceback.format_exc())
             return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
     else:
-        return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)            
+        return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)
 
 @login_required
 def video_statistics(request):
     return render(request,'jarvis/pages/video_statistics/video_statistics.html')
+
+month_map = {
+    "1" : "Jan",
+    "2" : "Feb",
+    "3" : "Mar",
+    "4" : "Apr",
+    "5" : "May",
+    "6" : "Jun",
+    "7" : "July",
+    "8" : "Aug",
+    "9" : "Sep",
+    "10" : "Oct",
+    "11" : "Nov",
+    "12" : "Dec",
+}
+
+def months_between(start_date, end_date):
+    from datetime import datetime,timedelta
+    start = datetime.strptime(start_date, '%Y-%m-%d')
+    end = datetime.strptime(end_date, '%Y-%m-%d')
+    months = []
+    cursor = start
+    while cursor <= end:
+        if cursor.month not in months:
+            months.append([cursor.month, cursor.year])
+        cursor += timedelta(weeks=1)
+    return months
+
+@login_required
+def statistics_all(request):
+    from django.db.models import Sum
+    data = {}
+    top_data = []
+    metrics = request.GET.get('metrics', '0')
+    slab = request.GET.get('slab', None)
+    # data_view = request.GET.get('data_view', 'daily')
+    data_view = request.GET.get('data_view', 'monthly')
+    if data_view == 'daily':
+        data_view = 'monthly'
+    start_date = request.GET.get('start_date', '2019-05-01')
+    end_date = request.GET.get('end_date', None)
+    if not start_date:
+        start_date = '2019-05-01'
+    if not end_date:
+        end_date = (datetime.datetime.today() - timedelta(days = 1)).strftime("%Y-%m-%d")
+
+    end_date_obj = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
+    if end_date_obj >= datetime.datetime.today().date():
+        end_date = (datetime.datetime.today() - timedelta(days = 1)).strftime("%Y-%m-%d")
+
+    end_date_obj = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
+    if end_date_obj >= datetime.datetime.today().date():
+        end_date = (datetime.datetime.today() - timedelta(days = 1)).strftime("%Y-%m-%d")
+
+    top_start = (datetime.datetime.today() - timedelta(days = 30)).date()
+    top_end = (datetime.datetime.today() - timedelta(days = 1)).date()
+    for each_opt in metrics_options:
+        temp_list = []
+        temp_list.append( each_opt[0] )
+        temp_list.append( each_opt[1] )
+        temp_list.append( DashboardMetrics.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0])\
+                .aggregate(total_count = Sum('count'))['total_count'] )
+        top_data.append( temp_list ) 
+        if metrics == each_opt[0]:
+            data['graph_title'] = each_opt[1]
+    data['top_data'] = top_data
+
+    graph_data = DashboardMetrics.objects.exclude(date__gt = end_date).filter(Q(metrics = metrics) & Q(date__gte = start_date) & Q(date__lte = end_date))
+    if metrics in ['4', '2', '5'] and slab:
+        if (metrics == '4' and slab in ['0', '1', '2']) or (metrics == '2' and slab in ['3', '4', '5'])\
+                 or (metrics == '5' and slab in ['6', '7']):
+            graph_data = graph_data.filter(metrics_slab = slab)
+
+    if data_view == 'weekly':
+        x_axis = []
+        y_axis = []
+        week_no = sorted(list(set(list(graph_data.order_by('week_no').values_list('week_no', flat = True)))))
+        for each_week_no in week_no:
+            x_axis.append(str("week " + str(each_week_no)))
+            y_axis.append(graph_data.filter(week_no = each_week_no).aggregate(total_count = Sum('count'))['total_count'])
+
+    # elif data_view == 'monthly':
+    else:
+        x_axis = []
+        y_axis = []
+        month_no = months_between(start_date, end_date)
+        for each_month_no in month_no:
+            x_axis.append(str(str(month_map[str(each_month_no[0])]) + " " + str(each_month_no[1])))
+            y_axis.append(graph_data.filter(date__month = each_month_no[0]).aggregate(total_count = Sum('count'))['total_count'])
+    # else:
+    #     x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
+    #     y_axis = graph_data.values_list('count', flat = True)
+    data['metrics'] = metrics
+    data['slab'] = slab
+    data['data_view'] = data_view
+    # data['x_axis'] = list(x_axis)
+    # data['y_axis'] = list(y_axis)
+    from collections import OrderedDict
+    chart_data = OrderedDict()
+    for i in range(len(x_axis)):
+        chart_data[x_axis[i]] = y_axis[i]
+    data['chart_data'] = [[str(data_view), str(data['graph_title'])]] + [list(ele) for ele in chart_data.items()] 
+    data['start_date'] = start_date
+    data['end_date'] = end_date
+    data['slabs'] = []
+
+    if metrics == '4':
+        data['slabs'] = [metrics_slab_options[0], metrics_slab_options[1], metrics_slab_options[2]]
+    if metrics == '2':
+        data['slabs'] = [metrics_slab_options[3], metrics_slab_options[4], metrics_slab_options[5]]
+    if metrics == '5':
+        data['slabs'] = [metrics_slab_options[6], metrics_slab_options[7], metrics_slab_options[8]]
+
+    return render(request,'jarvis/pages/video_statistics/statistics_all.html', data)
 
 def get_daily_impressions_data(request):
     if request.is_ajax():
@@ -1441,3 +1618,4 @@ def search_notification(request):
         print(e)
         return JsonResponse({'data': []}, status=status.HTTP_200_OK)
     
+

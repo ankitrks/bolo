@@ -6,9 +6,6 @@ import boto3
 from django.conf import settings
 from forum.topic.models import Topic
 
-
-
-
 def ffmpeg(*cmd):
     try:
         subprocess.check_output(['ffmpeg'] + list(cmd))
@@ -29,20 +26,21 @@ def upload_media(media_file,filename):
 
 
 def run():
-    all_vb_list = Topic.objects.filter(is_popular=True,downloaded_url__isnull=True).order_by('-id')
+    start_date = datetime(2020,01,13)
+    all_vb_list = Topic.objects.filter(is_popular=True,downloaded_url__isnull=True,date__gte=start_date).order_by('-id')
     for each_vb in all_vb_list:
         try:
             print "start time:  ",datetime.now()
             filename = each_vb.backup_url.split('/')[-1]
-            cmds2 = ['ffmpeg','-i',each_vb.backup_url , '-vf',"[in]drawtext=text='Bolo Indya':x=10:y=H-th-35:fontsize=16:fontcolor=white,drawtext=text='@"+each_vb.user.username+"':x=10:y=H-th-20:fontsize=12:fontcolor=white[out]","/var/live_code/boloindya/boloindya/scripts/watermark/"+filename]
+            cmds2 = ['ffmpeg','-i',each_vb.backup_url , '-vf',"[in]drawtext=text='Bolo Indya':x=10:y=H-th-35:fontsize=16:fontcolor=white,drawtext=text='@"+each_vb.user.username+"':x=10:y=H-th-20:fontsize=12:fontcolor=white[out]",settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename]
             ps2 = subprocess.Popen(cmds2, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
             (output, stderr) = ps2.communicate()
-            downloaded_url = upload_media(open("/var/live_code/boloindya/boloindya/scripts/watermark/"+filename),filename)
+            downloaded_url = upload_media(open(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename),filename)
             if downloaded_url:
                 each_vb.downloaded_url = downloaded_url
                 each_vb.save()
-            if os.path.exists("/var/live_code/boloindya/boloindya/scripts/watermark/"+filename):
-                os.remove("/var/live_code/boloindya/boloindya/scripts/watermark/"+filename)
+            if os.path.exists(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename):
+                os.remove(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename)
             # print "bye"
             print "End time:  ",datetime.now()
         except Exception as e:

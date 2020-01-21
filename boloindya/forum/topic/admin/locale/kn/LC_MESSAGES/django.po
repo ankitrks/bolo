@@ -1,0 +1,59 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-01-20 11:35+0530\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: forum/topic/admin/admin.py:91
+#, python-format
+msgid "Select %s"
+msgstr ""
+
+#: forum/topic/admin/admin.py:93
+#, python-format
+msgid "Select %s to change"
+msgstr ""
+
+#: forum/topic/admin/templates/spirit/topic/admin/_tabs.html:4
+msgid "Deleted"
+msgstr ""
+
+#: forum/topic/admin/templates/spirit/topic/admin/_tabs.html:5
+msgid "Closed"
+msgstr ""
+
+#: forum/topic/admin/templates/spirit/topic/admin/_tabs.html:6
+msgid "Pinned"
+msgstr ""
+
+#: forum/topic/admin/templates/spirit/topic/admin/closed.html:5
+#: forum/topic/admin/templates/spirit/topic/admin/closed.html:11
+msgid "Closed topics"
+msgstr ""
+
+#: forum/topic/admin/templates/spirit/topic/admin/deleted.html:5
+msgid "Deleted Topics"
+msgstr ""
+
+#: forum/topic/admin/templates/spirit/topic/admin/deleted.html:11
+msgid "Deleted topics"
+msgstr ""
+
+#: forum/topic/admin/templates/spirit/topic/admin/pinned.html:5
+#: forum/topic/admin/templates/spirit/topic/admin/pinned.html:11
+msgid "Pinned topics"
+msgstr ""

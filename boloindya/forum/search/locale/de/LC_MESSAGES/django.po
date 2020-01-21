@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Spirit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-23 19:55+0000\n"
+"POT-Creation-Date: 2020-01-20 11:35+0530\n"
 "PO-Revision-Date: 2015-07-25 18:00+0000\n"
 "Last-Translator: Esteban M. Castro Borsani <ecastroborsani@gmail.com>\n"
 "Language-Team: Spirit\n"
@@ -12,25 +12,26 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: forms.py:23
+#: forum/search/forms.py:24
 #, python-format
 msgid "Your search must contain at least %(length)s characters."
 msgstr "Deine Suche muss zumindest %(length)s Zeichen enthalten."
 
-#: forms.py:45
+#: forum/search/forms.py:51
 msgid "Filter by"
 msgstr "sortieren nach"
 
-#: templates/spirit/search/_form.html:6 templates/spirit/search/search.html:5
-#: templates/spirit/search/search.html:10
-#: templates/spirit/search/search.html:15
+#: forum/search/templates/spirit/search/_form.html:6
+#: forum/search/templates/spirit/search/search.html:5
+#: forum/search/templates/spirit/search/search.html:10
+#: forum/search/templates/spirit/search/search.html:15
 msgid "Search"
 msgstr "Suche"
 
-#: templates/spirit/search/search.html:19
+#: forum/search/templates/spirit/search/search.html:19
 msgid "Results"
 msgstr "Ergebnisse"
 
-#: templates/spirit/search/search.html:27
+#: forum/search/templates/spirit/search/search.html:25
 msgid "There are no search results."
 msgstr "Die Suche ergab keine Ergebnisse."

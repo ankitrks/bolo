@@ -1,0 +1,279 @@
+
+{% extends "spirit/_new_base.html" %}
+{% load spirit_tags i18n %}
+{% load i18n %}
+{% load number_formate_change_tag %}
+{% block title %}BoloIndya{% endblock %}
+{% block content %}
+
+<!-- Social Share Code -->
+<link rel="canonical" href="" />      
+<meta property="og:url" content=""/>
+<meta property="og:type" content="website" />
+<meta property='og:title' content='' />
+<meta name="twitter:title" content="" />
+<meta name="twitter:site" content="@BoloIndya" />
+<meta name="twitter:creator" content="@BoloIndya" />
+<meta name="twitter:card" content="summary" />
+<meta property='og:description' content='Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India' />       
+<meta property='og:image' content='' />
+<link rel="image_src" href=""/>
+<!-- Social Share Code End -->
+
+
+<style type="text/css">
+    .jwplayer.jw-stretch-uniform .jw-media video {
+    object-fit: cover;
+    }
+    ._base_layout_container{
+        max-width: 86.5%;
+    }
+    ._explore_feed_wrapper{
+        margin-right: 106px;
+    }
+    #player{
+            height: 748px !important;
+    }
+    @media(max-width: 991px){
+        .footer-container{
+            display: none;
+        }
+      ._explore_feed_wrapper{
+        margin-right: 0px;
+    }  
+    }
+    .jwplayer.jw-flag-aspect-mode {
+        height: 100% !important;
+    }
+
+
+
+    .MultiCarousel { float: left; overflow: hidden; padding: 15px; width: 100%; position:relative; }
+    .MultiCarousel{ height: 320px;}
+    .MultiCarousel .MultiCarousel-inner { transition: 1s ease all; float: left; }
+    .MultiCarousel .MultiCarousel-inner .item { float: left;}
+    .MultiCarousel .MultiCarousel-inner .item > div { text-align: center; padding:10px; margin:10px; background:#f1f1f1; color:#666;}
+    .MultiCarousel .leftLst, .MultiCarousel .rightLst { position:absolute; border-radius:50%;top:calc(50% - 20px);height: 32px;width: 32px;font-size: 15px;cursor: pointer;background: #000 }
+    .MultiCarousel .leftLst { left:0; }
+    .MultiCarousel .rightLst { right:0; }
+
+    .MultiCarousel .leftLst.over, .MultiCarousel .rightLst.over { pointer-events: none; background:#000; }
+
+
+/*===========*/
+/*===========*/
+
+.video_card_title{
+    position: inherit;
+    top: 12px;
+    font-size: 12px;
+    padding: 2px;
+    color: aliceblue;
+}
+._image_card_footer_wraaper{
+    background: #0003;
+}
+.card-footer.jsx-1633345700 {
+    background: #0003;
+    height: 80px;
+ 
+}
+
+._video_card_footer_likes1{
+    position: absolute;
+    right: 16px;
+    top: -156px;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+}
+._video_card_footer_likes{
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    height: 26px;
+    padding: 4px;
+    background: #000000d9;
+    width: 100%;
+}
+._video_card_footer_ {
+    height: 80px;
+}
+
+._video_card_footer_likes12::before { 
+
+    content: '';
+    display: inline-block;
+    height: 18px;
+    margin: 0 6px -3px 0;
+    min-width: 18px;
+    position: relative;
+    top: -2px;
+    width: 18px;
+    background-image: url(/media/iJGOBKN9vqK.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: -42px -382px;
+    color: red;
+    font-weight: bold;
+}
+._video_card_footer_likes::before { 
+
+    content: '';
+    display: inline-block;
+    height: 18px;
+    margin: 0 6px -3px 0;
+    min-width: 18px;
+    position: relative;
+    top: -1px;
+    width: 18px;
+    background-image: url(/media/iJGOBKN9vqK.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: -42px -382px;
+    color: red;
+    font-weight: bold;
+}
+.leftLst::before { 
+
+    content: '';
+    display: inline-block;
+    height: 16px;
+    margin: 0 5px -3px 0;
+    min-width: 18px;
+    position: relative;
+    top: -1px;
+    width: 16px;
+    background-image: url(/media/iJGOBKN9vqK.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: -39px -236px;
+}
+.rightLst::before { 
+    content: '';
+    display: inline-block;
+    height: 18px;
+    margin: 0 0px -3px 0;
+    min-width: 18px;
+    position: relative;
+    top: -1px;
+    width: 18px;
+    background-image: url(/media/iJGOBKN9vqK.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: -42px -265px;
+}
+
+</style>
+
+<div class="jsx-2546051494 _global_container">
+    <div class="jsx-2546051494 _base_layout_container">
+        <div class="_base_layout_content">
+            <div class="_base_layout_main">
+                <header class="jsx-2510987962 _explore_page_main_header">
+                    <div class="jsx-2510987962">
+                        <h1 class="jsx-2510987962 _explore_page_main_title">{% trans "Discover" %}</h1>
+                        <h2 class="jsx-2510987962 _explore_page_main_desc">{% trans "Be the first to watch the latest videos" %}</h2>
+                    </div>
+
+                    <div class="jsx-2510987962 _explore_page_main_aside">
+                        <div class="jsx-29267105 share-group">
+                            <a href="javascript:void(0);" onclick="social_share_page('facebook_share','{{ request.get_full_path }}')" class="jsx-29267105">
+                                <span><img src="/media/facebook_mobile.svg" class="jsx-29267105"></span>
+                            </a>
+                            <a href="javascript:void(0);" onclick="social_share_page('twitter_share','{{ request.get_full_path }}')" target="_blank" class="jsx-29267105">
+                                <span><img src="/media/twitter_mobile.svg" class="jsx-29267105"></span>
+                            </a>
+                            <a href="javascript:void(0);" onclick="social_share_page('whatsapp_share','{{ request.get_full_path }}')"  class="jsx-29267105">
+                                <span><img src="/media/whatsapp.svg" class="jsx-29267105"></span>
+                            </a>
+                        </div>
+                    </div>
+                </header>
+                <div class="jsx-3102177358 _user_carousel_carousel-wrapper">
+
+                    <div class="jsx-3102177358 _user_carousel_carousel-container MultiCarousel" data-items="1,3,5,6" data-slide="1" id="MultiCarousel"  data-interval="1000">
+
+
+                        <ul class="jsx-3102177358 _user_carousel_carousel-list MultiCarousel-inner" id="creatorId">
+
+                            {%  for each_popular_item in popular_bolo %}
+                        
+                                    <li class="jsx-3102177358 _user_carousel_list-item item">
+                                        <a tag="a" title="Nisha Guragain(@nishaguragain)" class="jsx-3102177358" href="/{{each_popular_item.user.username}}/">
+                                            <div class="_user_carousel_avatar round" style="background-image:url({% if each_popular_item.profile_pic|length > 1 %}
+                                {{each_popular_item.profile_pic}}
+                            {% else %}
+                                /media/demo_user.png
+                            {% endif %})"><img src="/media/tick_icon.svg"></div>
+                                            <h2 class="_user_carousel_title">
+                                                {% if each_popular_item.first_name|length > 1 %}
+                                                   {{each_popular_item.first_nam}} {{each_popular_item.last_name}}
+                                                {% else %}
+                                                   {{each_popular_item.user.username}}
+                                                {% endif %}
+
+                                            </h2>
+
+                                            <h3 class="_user_carousel_sub-title">@{{each_popular_item.user.username}}</h3>
+                                            <p class="_user_carousel_followers">{{ each_popular_item.follower_count | shorcountertopic }}<span class="_user_carousel_followers-text"> {% trans  "Followers" %}</span></p>
+                                            <!-- <p class="_user_carousel_description">{{each_popular_item.bio|slice:":20"}}</p> -->
+                                        </a>
+                                        <span class="unit">
+                                            <button onclick="follow_user('{{each_popular_item.id}}');" class="_4jy1 _4jy4 _517h _51sy _42ft " style="float: none;" type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-{{each_popular_item.id}} followCheck sx_5da455"></i><span class="btnTextChange-{{each_popular_item.id}}">{% trans "Follow" %}</span>
+                                            </button>
+                                        </span>
+                                    </li>
+
+                   
+                            {% endfor %}
+
+
+
+
+                        </ul>
+                        <button class="btn btn-primary leftLst"></button>
+                        <button class="btn btn-primary rightLst"></button>
+                    </div>
+                    <span class="followError"></span>
+
+                </div>
+
+                <div class="_explore_page_feed_wrapper">
+                    <div class="jsx-1289101510 _explore_feed_wrapper">
+                        <div class="">
+                            <div class="jsx-4249974497 _explore_feed_container">
+                                <div class="" id="catWithVideoId">
+
+                                </div>
+                               
+                            </div>
+                            <div class="jsx-4249974497 _scroll_load_more_loading_left"></div>
+                        </div>
+                    </div>
+                    <div class="jsx-1289101510 _explore_feed_wrapper">
+                        <div class="">
+                            <div class="jsx-4249974497 _explore_feed_container">
+                                <div class="" id="catWithVideoIdRight">
+  
+                                </div>
+                            </div>
+                            <div class="jsx-4249974497 _scroll_load_more_loading_right"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="jsx-2107295335 jsx-3197114167 to-top to-top-enter-done"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/media/js/video_discover.js"></script>
+
+<!-- Start Comments Section -->
+{% include "spirit/_video_play_and_comments.html" %}
+<!-- End Load Comments  -->
+{% endblock %}
+
+

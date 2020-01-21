@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Spirit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-23 19:55+0000\n"
+"POT-Creation-Date: 2020-01-20 11:35+0530\n"
 "PO-Revision-Date: 2015-10-14 19:38+0000\n"
 "Last-Translator: Esteban M. Castro Borsani <ecastroborsani@gmail.com>\n"
 "Language-Team: German (http://www.transifex.com/spirit-project/spirit/"
@@ -15,222 +15,285 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: forms.py:30
+#: forum/comment/forms.py:38
+#, fuzzy
+#| msgid "comment"
+msgid "Comment"
+msgstr "Kommentar"
+
+#: forum/comment/forms.py:57
 msgid "Write comment..."
 msgstr "Kommentar schreiben..."
 
-#: forms.py:101
+#: forum/comment/forms.py:147
 #, python-format
 msgid "Unsupported file format. Supported formats are %s."
 msgstr "Nicht unterstütztes Dateiformat. Unterstützte Formate sind %s."
 
-#: models.py:20 models.py:34 models.py:49
+#: forum/comment/forms.py:174 forum/comment/forms.py:194
+msgid "The file could not be validated"
+msgstr ""
+
+#: forum/comment/forms.py:182
+#, fuzzy, python-format
+#| msgid "Unsupported file format. Supported formats are %s."
+msgid "Unsupported file extension %s. Supported extensions are %s."
+msgstr "Nicht unterstütztes Dateiformat. Unterstützte Formate sind %s."
+
+#: forum/comment/forms.py:198
+#, fuzzy, python-format
+#| msgid "Unsupported file format. Supported formats are %s."
+msgid "Unsupported file mime type %s. Supported types are %s."
+msgstr "Nicht unterstütztes Dateiformat. Unterstützte Formate sind %s."
+
+#: forum/comment/models.py:26 forum/comment/models.py:42
+#: forum/comment/models.py:67 forum/comment/models.py:152
 msgid "comment"
 msgstr "Kommentar"
 
-#: models.py:21
+#: forum/comment/models.py:27
 msgid "topic moved"
 msgstr "Thema verschoben"
 
-#: models.py:22
+#: forum/comment/models.py:28
 msgid "topic closed"
 msgstr "Thema geschlossen"
 
-#: models.py:23
+#: forum/comment/models.py:29
 msgid "topic unclosed"
 msgstr "Thema geöffnet"
 
-#: models.py:24
+#: forum/comment/models.py:30
 msgid "topic pinned"
 msgstr "Thema festheften"
 
-#: models.py:25
+#: forum/comment/models.py:31
 msgid "topic unpinned"
 msgstr "Thema nicht festgeheftet"
 
-#: models.py:35
+#: forum/comment/models.py:39 forum/comment/models.py:154
+msgid "hash_tags"
+msgstr ""
+
+#: forum/comment/models.py:43 forum/comment/models.py:153
 msgid "comment html"
 msgstr "comment html"
 
-#: models.py:36
+#: forum/comment/models.py:45
 msgid "action"
 msgstr "Aktion"
 
-#: models.py:42
+#: forum/comment/models.py:52
+#, fuzzy
+#| msgid "action"
+msgid "duration"
+msgstr "Aktion"
+
+#: forum/comment/models.py:54
+msgid "thumbnail"
+msgstr ""
+
+#: forum/comment/models.py:59
 msgid "modified count"
 msgstr "modifizierter Zähler"
 
-#: models.py:43
+#: forum/comment/models.py:60
 msgid "likes count"
 msgstr "likes count"
 
-#: models.py:50
+#: forum/comment/models.py:61
+#, fuzzy
+#| msgid "likes count"
+msgid "share count"
+msgstr "likes count"
+
+#: forum/comment/models.py:68
 msgid "comments"
 msgstr "Kommentare"
 
-#: tags.py:23
+#: forum/comment/tags.py:40
 msgid "This topic has been moved"
 msgstr "Dieses Thema wurde verschoben"
 
-#: tags.py:25
+#: forum/comment/tags.py:41
 msgid "This topic has been closed"
 msgstr "Dieses Thema wurde geschlossen"
 
-#: tags.py:27
+#: forum/comment/tags.py:42
 msgid "This topic has been unclosed"
 msgstr "Dieses Thema wurde wieder geöffnet"
 
-#: tags.py:29
+#: forum/comment/tags.py:43
 msgid "This topic has been pinned"
 msgstr "Thema wurde festgeheftet"
 
-#: tags.py:31
+#: forum/comment/tags.py:44
 msgid "This topic has been unpinned"
 msgstr "Thema wurde losgelöst"
 
-#: tags.py:33
+#: forum/comment/tags.py:49
 msgid "Unknown topic moderation action"
 msgstr "Unbekannte Themen Moderation-Aktion"
 
-#: templates/spirit/comment/_editor.html:6
-msgid "Bold"
-msgstr "fett"
-
-#: templates/spirit/comment/_editor.html:7
-msgid "Italic"
-msgstr "kursiv"
-
-#: templates/spirit/comment/_editor.html:8
-msgid "List"
-msgstr "Liste"
-
-#: templates/spirit/comment/_editor.html:9
-msgid "URL"
-msgstr "URL"
-
-#: templates/spirit/comment/_editor.html:10
-msgid "Image"
-msgstr "Bild"
-
-#: templates/spirit/comment/_editor.html:11
-msgid "Poll"
-msgstr ""
-
-#: templates/spirit/comment/_editor.html:12
-msgid "Preview"
-msgstr "Vorschau"
-
-#: templates/spirit/comment/_editor.html:32
-#, python-brace-format
-msgid "uploading {image_name}"
-msgstr "Lade {image_name} hoch"
-
-#: templates/spirit/comment/_editor.html:35
-msgid "bolded text"
-msgstr "fett gesetzter Text"
-
-#: templates/spirit/comment/_editor.html:36
-msgid "italicised text"
-msgstr "kursiv gesetzter Text"
-
-#: templates/spirit/comment/_editor.html:37
-msgid "list item"
-msgstr "Listeneintrag"
-
-#: templates/spirit/comment/_editor.html:38
-msgid "link text"
-msgstr "Verknüpfungs-Text"
-
-#: templates/spirit/comment/_editor.html:39
-msgid "link url"
-msgstr "Verknüpfungs-URL"
-
-#: templates/spirit/comment/_editor.html:40
-msgid "image text"
-msgstr "Bildtext"
-
-#: templates/spirit/comment/_editor.html:41
-msgid "image url"
-msgstr "Bild-URL"
-
-#: templates/spirit/comment/_editor.html:42
-msgid "Title"
-msgstr ""
-
-#: templates/spirit/comment/_editor.html:43
-msgid "Description"
-msgstr ""
-
-#: templates/spirit/comment/_form.html:17
-#: templates/spirit/comment/publish.html:18
-#: templates/spirit/comment/update.html:18
+#: forum/comment/templates/spirit/comment/_audio_form.html:18
+#: forum/comment/templates/spirit/comment/_form.html:18
+#: forum/comment/templates/spirit/comment/_video_form.html:18
+#: forum/comment/templates/spirit/comment/publish.html:139
+#: forum/comment/templates/spirit/comment/update.html:18
 msgid "Publish"
 msgstr "veröffentlichen"
 
-#: templates/spirit/comment/_render_list.html:47
+#: forum/comment/templates/spirit/comment/_editor.html:13
+msgid "Bold"
+msgstr "fett"
+
+#: forum/comment/templates/spirit/comment/_editor.html:14
+msgid "Italic"
+msgstr "kursiv"
+
+#: forum/comment/templates/spirit/comment/_editor.html:15
+msgid "List"
+msgstr "Liste"
+
+#: forum/comment/templates/spirit/comment/_editor.html:16
+msgid "URL"
+msgstr "URL"
+
+#: forum/comment/templates/spirit/comment/_editor.html:17
+msgid "Image"
+msgstr "Bild"
+
+#: forum/comment/templates/spirit/comment/_editor.html:19
+msgid "File"
+msgstr ""
+
+#: forum/comment/templates/spirit/comment/_editor.html:21
+msgid "Poll"
+msgstr ""
+
+#: forum/comment/templates/spirit/comment/_editor.html:22
+msgid "Preview"
+msgstr "Vorschau"
+
+#: forum/comment/templates/spirit/comment/_editor.html:44
+#: forum/comment/templates/spirit/comment/_editor.html:52
+#, fuzzy, python-brace-format
+#| msgid "uploading {image_name}"
+msgid "uploading {name}"
+msgstr "Lade {image_name} hoch"
+
+#: forum/comment/templates/spirit/comment/_editor.html:57
+msgid "bolded text"
+msgstr "fett gesetzter Text"
+
+#: forum/comment/templates/spirit/comment/_editor.html:58
+msgid "italicised text"
+msgstr "kursiv gesetzter Text"
+
+#: forum/comment/templates/spirit/comment/_editor.html:59
+msgid "list item"
+msgstr "Listeneintrag"
+
+#: forum/comment/templates/spirit/comment/_editor.html:60
+msgid "link text"
+msgstr "Verknüpfungs-Text"
+
+#: forum/comment/templates/spirit/comment/_editor.html:61
+msgid "link url"
+msgstr "Verknüpfungs-URL"
+
+#: forum/comment/templates/spirit/comment/_editor.html:62
+msgid "image text"
+msgstr "Bildtext"
+
+#: forum/comment/templates/spirit/comment/_editor.html:63
+msgid "image url"
+msgstr "Bild-URL"
+
+#: forum/comment/templates/spirit/comment/_editor.html:64
+#, fuzzy
+#| msgid "image text"
+msgid "file text"
+msgstr "Bildtext"
+
+#: forum/comment/templates/spirit/comment/_editor.html:65
+#, fuzzy
+#| msgid "image url"
+msgid "file url"
+msgstr "Bild-URL"
+
+#: forum/comment/templates/spirit/comment/_editor.html:66
+msgid "Title"
+msgstr ""
+
+#: forum/comment/templates/spirit/comment/_editor.html:67
+msgid "Description"
+msgstr ""
+
+#: forum/comment/templates/spirit/comment/_render_list.html:45
 msgid "delete"
 msgstr "löschen"
 
-#: templates/spirit/comment/_render_list.html:50
+#: forum/comment/templates/spirit/comment/_render_list.html:47
 msgid "report"
 msgstr "melden"
 
-#: templates/spirit/comment/_render_list.html:53
+#: forum/comment/templates/spirit/comment/_render_list.html:50
 msgid "share"
 msgstr "Teilen"
 
-#: templates/spirit/comment/_render_list.html:57
-#: templates/spirit/comment/_render_list.html:139
+#: forum/comment/templates/spirit/comment/_render_list.html:54
+#: forum/comment/templates/spirit/comment/_render_list.html:136
 msgid "remove like"
 msgstr "like entfernen"
 
-#: templates/spirit/comment/_render_list.html:60
-#: templates/spirit/comment/_render_list.html:138
+#: forum/comment/templates/spirit/comment/_render_list.html:57
+#: forum/comment/templates/spirit/comment/_render_list.html:135
 msgid "like"
 msgstr "like"
 
-#: templates/spirit/comment/_render_list.html:67
+#: forum/comment/templates/spirit/comment/_render_list.html:64
 msgid "edit"
 msgstr "editieren"
 
-#: templates/spirit/comment/_render_list.html:71
+#: forum/comment/templates/spirit/comment/_render_list.html:68
 msgid "quote"
 msgstr "zitieren"
 
-#: templates/spirit/comment/_render_list.html:72
+#: forum/comment/templates/spirit/comment/_render_list.html:69
 msgid "reply"
 msgstr "antworten"
 
-#: templates/spirit/comment/_render_list.html:79
+#: forum/comment/templates/spirit/comment/_render_list.html:76
 msgid "close"
 msgstr "Schließen"
 
-#: templates/spirit/comment/_render_list.html:110
+#: forum/comment/templates/spirit/comment/_render_list.html:107
 msgid "This comment was deleted"
 msgstr "Dieser Kommentar wurde entfernt"
 
-#: templates/spirit/comment/_render_list.html:118
+#: forum/comment/templates/spirit/comment/_render_list.html:115
 msgid "undelete"
 msgstr "wiederherstellen"
 
-#: templates/spirit/comment/moderate.html:5
-#: templates/spirit/comment/moderate.html:9
+#: forum/comment/templates/spirit/comment/moderate.html:5
+#: forum/comment/templates/spirit/comment/moderate.html:9
 msgid "Moderate comment"
 msgstr "Kommentar moderieren"
 
-#: templates/spirit/comment/moderate.html:14
+#: forum/comment/templates/spirit/comment/moderate.html:14
 msgid "Apply"
 msgstr "akzeptieren"
 
-#: templates/spirit/comment/publish.html:5
+#: forum/comment/templates/spirit/comment/publish.html:6
 msgid "Publish comment"
 msgstr "Kommentar veröffentlichen"
 
-#: templates/spirit/comment/publish.html:9
+#: forum/comment/templates/spirit/comment/publish.html:74
 msgid "Publishing comment on"
 msgstr "Kommentar veröffentlichen zu"
 
-#: templates/spirit/comment/update.html:5
-#: templates/spirit/comment/update.html:9
+#: forum/comment/templates/spirit/comment/update.html:5
+#: forum/comment/templates/spirit/comment/update.html:9
 msgid "Edit comment"
 msgstr "Kommentar editieren"

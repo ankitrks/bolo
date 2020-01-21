@@ -208,7 +208,7 @@ h2 {
                        }else if(audio_url!=""){
                             $("id_comment").val(audio_url);
                        }
-                    var commentVal=$("id_comment").val(); debugger;
+                    var commentVal=$("id_comment").val(); 
                     if(commentVal=="" || commentVal==undefined){
                         alert('Comment Text Required');
                         return false;
@@ -349,7 +349,7 @@ function sendVideoData(File) {
     xhr.open('POST', "https://www.careeranna.com/demo/getAudioData", true);
     xhr.onload = function (e) {
     if (xhr.readyState === 4) {
-        if (xhr.status === 200) {debugger;
+        if (xhr.status === 200) {
             console.log("success");
             console.log(xhr.responseText);
             if(audio_url!=""){
