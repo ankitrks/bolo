@@ -60,12 +60,13 @@ def identify_logo():
 	f = io.open(f_name, "w", encoding="UTF-8")
 	today = datetime.today()
 	try:
-		long_ago = today + timedelta(hours=-6)
+		long_ago = today + timedelta(days = -8)
 		topic_objects = Topic.objects.exclude(is_removed = True).filter(is_vb = True, date__gte = long_ago)
 		print(len(topic_objects))
 		global_counter = 1
 		for item in topic_objects:
-			print("counter....", global_counter, item.id)
+			#print("counter....", global_counter, item.id)
+			iter_id = item.id
 			url = item.backup_url
 			video_title = item.title
 			url_str = url.encode('utf-8')
@@ -105,7 +106,7 @@ def identify_logo():
 					for text in texts:
 						modified_text = text.description
 						if(modified_text in plag_source):
-							f.write(item.id + video_title + " " + url_str + " " + (modified_text) + "\n")
+							f.write(iter_id + " " + video_title + " " + url_str + " " + (modified_text) + "\n")
 							Topic.objects.filter(id = iter_id).update(plag_text = str(plag_source.index(modified_text)))
 							Topic.objects.filter(id = iter_id).update(time_deleted = datetime.now())
 							data[0].delete()
