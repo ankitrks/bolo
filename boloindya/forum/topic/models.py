@@ -326,18 +326,18 @@ class Topic(models.Model):
         return True
 
     def no_monetization(self):
-        if self.is_monetized:
-            self.is_monetized = False
-            self.save()
-            userprofile = UserProfile.objects.get(user = self.user)
-            userprofile.save()
-            if self.language_id == '1':
-                reduce_bolo_score(self.user.id, 'create_topic_en', self, 'no_monetize')
-            else:
-                reduce_bolo_score(self.user.id, 'create_topic', self, 'no_monetize')
-            return True
+        # if self.is_monetized:
+        self.is_monetized = False
+        self.save()
+        userprofile = UserProfile.objects.get(user = self.user)
+        userprofile.save()
+        if self.language_id == '1':
+            reduce_bolo_score(self.user.id, 'create_topic_en', self, 'no_monetize')
         else:
-            return True
+            reduce_bolo_score(self.user.id, 'create_topic', self, 'no_monetize')
+        return True
+        # else:
+        #     return True
 
     def add_monetization(self):
         self.is_removed = False

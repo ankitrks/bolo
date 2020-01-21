@@ -1,6 +1,7 @@
 # from utils import admin_all
 from forum.topic.models import *
 from django.contrib import admin
+from drf_spirit.views import check_hashtag
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
 from forum.topic.models import Topic, Notification, ShareTopic, CricketMatch, Poll, Choice, Voting, Leaderboard,\
@@ -51,7 +52,8 @@ class TopicChangeList(ChangeList):
         # super(TopicChangeList, self).__init__(request, model, list_display, list_display_links,
         #     list_filter, date_hierarchy, search_fields, list_select_related,
         #     list_per_page, list_max_show_all, list_editable, model_admin)
-        self.list_display = ('action_checkbox', 'id', 'title', 'name', 'duration', 'language_id', 'imp_count',\
+        # action_checkbox
+        self.list_display = ('id', 'vb_list', 'title', 'name', 'duration', 'language_id', 'imp_count',\
             'is_moderated', 'is_monetized', 'is_removed', 'is_pubsub_popular_push', 'date', 'm2mcategory') #is_popular
         self.list_display_links = ['id']
         self.list_editable = ('title', 'language_id', 'm2mcategory', 'is_pubsub_popular_push', 'is_monetized', 'is_removed', \
@@ -133,6 +135,11 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
     duration.short_description = "duration"
     duration.admin_order_field = 'media_duration'
 
+    def vb_list(self, obj):
+        return '<a href="?user_id="' + str(obj.user.id) +'" target="_blank">l</a>'
+    vb_list.allow_tags = True
+    vb_list.short_description = "vb"
+
     def comments(self, obj):
         return obj.comments()
     comments.short_description = "comments"
@@ -195,10 +202,16 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
             else:
                 obj.restore()
 
-        # if 'is_popular' in form.changed_data:
-        #     obj.is_popular = form.cleaned_data['is_popular']
-        #     if obj.is_popular and obj.is_vb and not obj.is_removed:
-        #         obj.is_pubsub_popular_push = True
+        if 'title' in form.changed_data:
+            tag_list = obj.title.split()
+            hash_tag = tag_list
+            if tag_list:
+                for index, value in enumerate(tag_list):
+                    if value.startswith("#"):
+                        tag_list[index]='<a href="/get_challenge_details/?ChallengeHash='+value.strip('#')+'">'+value+'</a>'
+                title = " ".join(tag_list)
+                obj.title = title[0].upper()+title[1:]
+
         obj.save()
         if 'language_id' in form.changed_data and obj.is_monetized:
             if form.initial['language_id'] == '1':

@@ -1011,9 +1011,7 @@ def check_hashtag(comment):
                 comment.hash_tags.add(tag)
         title=" ".join(tag_list)
         title = title[0].upper()+title[1:]
-        return has_hashtag, title
-    else:
-        return has_hashtag, title
+    return has_hashtag, title
 
 def remove_old_hashtag(comment,history_comment):
     hash_tags = comment.hash_tags.all()
