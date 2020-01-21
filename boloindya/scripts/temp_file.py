@@ -168,17 +168,17 @@ def identify_logo_util():
 					with io.open(file_name, 'rb') as image_file:
 						content = image_file.read()
 					image = vision.types.Image(content = content)
-					print("here1")
+					#print("here1")
 					response = client.text_detection(image = image)
 					texts = response.text_annotations
-					print("here2")
-					print(texts)
+					#print("here2")
+					#print(texts)
 					for text in texts:
 						modified_text = text.description
 						if(modified_text in plag_source):
 							print(modified_text)
-							print("yes")
-							print("...............")
+							#print("yes")
+							#print("...............")
 							f.write(video_title + " " + url_str + " " + (modified_text) + "\n")
 							Topic.objects.filter(id = iter_id).update(plag_text = str(plag_source.index(modified_text)))
 							Topic.objects.filter(id = iter_id).update(time_deleted = datetime.now())

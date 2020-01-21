@@ -62,7 +62,7 @@ def identify_logo():
 			video_title = item.title
 			url_str = url.encode('utf-8')
 			test = urllib.FancyURLopener()
-			test.retrieve(url_str, 'local_video.mp4')
+			test.retrieve(url_str, '/tmp/local_video.mp4')
 			duration = item.media_duration 
 			time = duration.split(":")
 			minute = int(time[0]) * 60
@@ -88,7 +88,7 @@ def identify_logo():
 			for interval in intervals:
 				ff = FFmpeg(inputs = {'local_video.mp4': None}, outputs = {"output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
 				ff.run()
-				file_name = PROJECT_PATH + '/scripts/output{}.png'.format(count)
+				file_name = PROJECT_PATH + '/tmp/output{}.png'.format(count)
 				with io.open(file_name, 'rb') as image_file:
 					content = image_file.read()
 					image = vision.types.Image(content = content)
