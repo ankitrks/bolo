@@ -396,11 +396,11 @@ function follow_user(user_following_id){debugger;
                if(checkFollowStatus==false){
 	               	jQuery('.followStatusChange-'+user_following_id).removeClass('sx_5da455');
 	               	jQuery('.followStatusChange-'+user_following_id).addClass('sx_5da456');
-	               	jQuery('.btnTextChange-'+user_following_id).text(response.message);
+	               	jQuery('.btnTextChange-'+user_following_id).text(followed_trans);
                }else{
 	               	jQuery('.followStatusChange-'+user_following_id).removeClass('sx_5da456');
 	               	jQuery('.followStatusChange-'+user_following_id).addClass('sx_5da455');
-	               	jQuery('.btnTextChange-'+user_following_id).text('Follow');
+	               	jQuery('.btnTextChange-'+user_following_id).text(Followed_trans);
                }
 
             },
@@ -439,11 +439,11 @@ function follow_user_from_user(user_following_id){
                if(checkFollowStatus==false){
                   jQuery('.followUserStatusChange-'+user_following_id).removeClass('sx_5da455');
                   jQuery('.followUserStatusChange-'+user_following_id).addClass('sx_5da456');
-                  jQuery('.btnTextChangeUser-'+user_following_id).text(response.message);
+                  jQuery('.btnTextChangeUser-'+user_following_id).text(followed_trans);
                }else{
                   jQuery('.followUserStatusChange-'+user_following_id).removeClass('sx_5da456');
                   jQuery('.followUserStatusChange-'+user_following_id).addClass('sx_5da455');
-                  jQuery('.btnTextChangeUser-'+user_following_id).text('Follow');
+                  jQuery('.btnTextChangeUser-'+user_following_id).text(follow_trans);
                }
 
             },
@@ -489,6 +489,8 @@ function follow_user_by_popup(){debugger;
                   if(response.message=='Followed'){
                     jQuery('.btnTextChangePopup').text(followed_trans);
                   }else{
+                    jQuery('.followStatusChangePopup').removeClass('sx_5da456');
+                    jQuery('.followStatusChangePopup').addClass('sx_5da455');                    
                     jQuery('.btnTextChangePopup').text(follow_trans);
                   }
 	               	

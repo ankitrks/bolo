@@ -650,12 +650,12 @@
       background: #fff;
       border: 1px solid #ccc;
       border-radius: 3px;
-      left: -20px;
+      left: 6px;
       margin: 0;
       opacity: 0;
       padding: 0;
       position: absolute;
-      top: 0px;
+      top: 36px;
       -webkit-transition: opacity 0.2s ease-in-out, top 0.2s ease-in-out;
       -moz-transition: opacity 0.2s ease-in-out, top 0.2s ease-in-out;
       transition: opacity 0.2s ease-in-out, top 0.2s ease-in-out;
@@ -720,7 +720,7 @@
 
     .smenu.share {
       opacity: 1;
-      top: 45px;
+      /*top: 45px;*/
     }
     .comment_block .create_new_comment {
     width: 100%;
@@ -1188,21 +1188,11 @@ $(document).ready(function() {
 }
 
 </style>
-<link rel="canonical" href="{{site_absolute_url}}{{ request.get_full_path }}" />      
-<meta property="og:url" content="{{site_absolute_url}}{{ request.get_full_path }}"/>
-<meta property="og:type" content="website" />
-<meta property='og:title' content='{{topic.title}}' />
-<meta name="twitter:title" content="{{topic.title}}" />
-<meta name="twitter:site" content="@BoloIndya" />
-<meta name="twitter:creator" content="@BoloIndya" />
-<meta name="twitter:card" content="summary" />
-<meta property='og:description' content='{{topic.title}} Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India' />       
-<meta property='og:image' content='{{topic.question_image}}' />
-<link rel="image_src" href="{{topic.question_image}}"/>
+
 
 <input type="hidden" name="singleTopicId" id="singleTopicId" value="{{topic.id}}">
 <input type="hidden" name="topicSlug" id="singleTopicSlug" value="{{topic.slug}}">
-
+<input type="hidden" name="topicID" id="topicID" value="{{topic.id}}">
 <input type="hidden" name="totalLikeCount" id="totalLikeCount" value="{{topic.likes_count}}">
 <input type="hidden" name="totalCommentCount" id="totalCommentCount" value="{{topic.comment_count}}">
 

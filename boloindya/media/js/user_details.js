@@ -592,7 +592,10 @@ function loadMoreComments(nextPageURl){
 
 
     function followLikeList(){
-        check_login_status();
+        var checkstatus=check_login_status();
+        if(checkstatus==false){
+            return false;
+        }
 
         var ge_local_data="";
             ge_local_data = JSON.parse(localStorage.getItem("access_data"));
@@ -630,8 +633,10 @@ function loadMoreComments(nextPageURl){
     }
 
     function userFollowLikeList(){
-        check_login_status();
-
+        var checkstatus=check_login_status();
+        if(checkstatus==false){
+            return false;
+        }
         var ge_local_data="";
             ge_local_data = JSON.parse(localStorage.getItem("access_data"));
         var accessToken=ge_local_data.access_token;
@@ -654,12 +659,16 @@ function loadMoreComments(nextPageURl){
                     currentUserId=parseInt(currentUserId, 10);
                     var statusFollow=jQuery.inArray( currentUserId, listFollows )
                     if(statusFollow>=0){
-                        $('#followUserStatus-'+currentUserId).html(followed_trans);
-                        $('.followUserStatus-'+currentUserId).removeClass('sx_5da455');
-                        var checkstatusBu=$('.followUserStatus-'+currentUserId).hasClass('sx_5da456');
-                        if(!checkstatusBu){
-                            $('.followUserStatus-'+currentUserId).addClass('sx_5da456');
-                            jQuery('.btnTextUserChange-'+followId).text(followed_trans);
+                        // $('.followUserStatusChange-'+currentUserId).html(followed_trans);
+                        $('.followUserStatusChange-'+currentUserId).removeClass('sx_5da455');
+                        var checkstatusBu=$('.followUserStatusChange-'+currentUserId).hasClass('sx_5da456');
+                        if(checkstatusBu){
+                            $('.followUserStatusChange-'+currentUserId).removeClass('sx_5da456');
+                            $('.followUserStatusChange-'+currentUserId).addClass('sx_5da455');
+                            jQuery('.btnTextChangeUser-'+currentUserId).text(follow_trans); 
+                        }else{
+                            $('.followUserStatusChange-'+currentUserId).addClass('sx_5da456');
+                            jQuery('.btnTextChangeUser-'+currentUserId).text(followed_trans);
                         }
                     }
 

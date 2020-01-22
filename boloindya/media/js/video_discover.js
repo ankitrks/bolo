@@ -316,15 +316,6 @@ function openVideoInPopup(topicId){
  });
 
  function muteAndUnmutePlayer(){
-  // jwplayer().setMute();
-  // var muteStatus=jwplayer('player').getMute();
-  // if(muteStatus==true){
-  //   var newSrc='/media/sound_mute.svg';
-  //   $('#mutedImageId').attr('src', newSrc);
-  // }else{
-  //   var newSrc='/media/mute_icon.svg';
-  //   $('#mutedImageId').attr('src', newSrc);
-  // }
 
     if($("video").prop('muted')){
 
@@ -546,8 +537,11 @@ function popularCategoryItem(itemVideoByte){
     return category_item_template;
 }
 
-function followLikeList(){
-    check_login_status();
+function followLikeList(){debugger;
+    var checkstatus=check_login_status();
+    if(checkstatus==false){
+        return false;
+    }
 
     var ge_local_data="";
         ge_local_data = JSON.parse(localStorage.getItem("access_data"));
