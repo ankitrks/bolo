@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('forum_topic', '0085_merge_20200111_1428'),
-        ('forum_topic', '0077_auto_20200107_1236'),
+        # ('forum_topic', '0077_auto_20200107_1236'),
     ]
 
     operations = [
