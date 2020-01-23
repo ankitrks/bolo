@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-from datetime import timedelta
+from datetime import timedelta,datetime
 
 from django.db import models
 from django.core.urlresolvers import reverse
@@ -11,7 +11,7 @@ from django.utils import timezone
 from ..core.conf import settings
 from ..core.utils.models import AutoSlugField
 from tinymce.models import HTMLField
-from drf_spirit.utils import language_options
+from drf_spirit.utils import language_options,month_choices
 
 class RecordTimeStamp(models.Model):
     created_at=models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False) # auto_now will add the current time and date whenever field is saved.
@@ -126,6 +126,30 @@ class UserProfile(models.Model):
         def __unicode__(self):
             return self.slug
 
+def current_year():
+    return datetime.now().year
+
+def previous_month():
+    if datetime.now().month ==1:
+        return 12
+    else:
+        return datetime.now().month-1
+
+class UserPay(RecordTimeStamp):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='user_pay')
+    for_year = models.PositiveIntegerField(_('year'), choices=((r,r) for r in range(2019, datetime.now().year+1)), default=current_year)
+    for_month = models.PositiveIntegerField(_('month'),choices=month_choices,default =previous_month )
+    pay_date = models.DateTimeField(_("Pay Date"), null = True, blank = False)
+    amonunt_pay = models.PositiveIntegerField(_("Amount Payed"), null = True, blank = False,default=0)
+    transaction_id = models.CharField(max_length=50,null=True,blank=True)
+    class Meta:
+        verbose_name_plural = 'User\'s Pay'
+
+    def __unicode__(self):
+        return str(self.user)
+
+
+
 class Follower(RecordTimeStamp):
     user_following = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='user_following')# User being Followed
     user_follower = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='user_follower')# User Start Following
@@ -135,7 +159,7 @@ class Follower(RecordTimeStamp):
         verbose_name_plural = 'User\'s Followers'
 
     def __unicode__(self):
-            return str(self.user_following)
+        return str(self.user_following)
 
 
 class Weight(RecordTimeStamp):

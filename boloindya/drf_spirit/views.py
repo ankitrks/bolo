@@ -47,7 +47,7 @@ from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocu
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 from forum.category.models import Category
 from forum.comment.models import Comment,CommentHistory
-from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs
+from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs,UserPay
 from jarvis.models import FCMDevice,StateDistrictLanguage
 from forum.topic.models import Topic,TopicHistory, ShareTopic, Like, SocialShare, Notification, CricketMatch, Poll, Choice, Voting, \
     Leaderboard, VBseen, TongueTwister
@@ -1568,6 +1568,7 @@ def get_user_bolo_info(request):
         end_date = request.POST.get('end_date',None)
         month = request.POST.get('month', None)
         year = request.POST.get('year',None)
+        total_earn = 0
         if start_date and end_date:
             start_date= datetime.strptime(start_date, "%d-%m-%Y")
             end_date = datetime.strptime(end_date+' 23:59:59', "%d-%m-%Y %H:%M:%S")
@@ -1577,8 +1578,14 @@ def get_user_bolo_info(request):
             end_date = datetime.strptime(str(days)+'-'+str(month)+'-'+str(year)+' 23:59:59', "%d-%m-%Y %H:%M:%S")
         if not start_date or not end_date:
             total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user)
+            all_pay = UserPay.objects.filter(user=request.user,is_active=True)
         else:
             total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user,date__gte=start_date, date__lte=end_date)
+            all_pay = UserPay.objects.filter(user=request.user,is_active=True,for_month__gte=start_date.month,for_month__lte=start_date.month,\
+                for_year__gte=start_date.year,for_year__lte=start_date.year)
+        total_earn=0
+        for each_pay in all_pay:
+            total_earn+=each_pay.amonunt_pay
         total_video_count = total_video.count()
         print total_video
         monetised_video_count = total_video.filter(is_monetized = True).count()
@@ -1598,7 +1605,7 @@ def get_user_bolo_info(request):
         total_share_count = shorcountertopic(total_share_count)
         return JsonResponse({'message': 'success', 'total_video_count' : total_video_count, \
                         'monetised_video_count':monetised_video_count, 'total_view_count':total_view_count,'total_comment_count':total_comment_count,\
-                        'total_like_count':total_like_count,'total_share_count':total_share_count,'left_for_moderation':left_for_moderation}, status=status.HTTP_200_OK)
+                        'total_like_count':total_like_count,'total_share_count':total_share_count,'left_for_moderation':left_for_moderation,'total_earn':total_earn}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
