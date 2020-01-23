@@ -238,6 +238,15 @@ function copyShareLink() {
 
 }
 
+function copyShareLinkWeb() {
+  var copyText = document.getElementById("shareInputboxWeb");
+  copyText.select();
+  copyText.setSelectionRange(0, 99999)
+  document.execCommand("copy");
+
+}
+
+
 function copyShareLinkMobile() {
   var copyText = document.getElementById("shareInputboxMobile");
   copyText.select();
@@ -514,7 +523,7 @@ function follow_user_by_popup(){debugger;
 }
 
 
-function follow_category(following_id){
+function follow_category(following_id){debugger;
 
 	var followUrl='/api/v1/follow_sub_category/';
 	var following_id = following_id;
@@ -556,6 +565,51 @@ function follow_category(following_id){
 	}else{
 		document.getElementById('openLoginPopup').click();
 	}
+}
+
+
+function follow_category_discover(following_id){debugger;
+
+  var followUrl='/api/v1/follow_sub_category/';
+  var following_id = following_id;
+  var loginStatus=check_login_status();
+  var user_id = userLoginStatus;
+  if(loginStatus==true){
+    var ge_local_data="";
+        ge_local_data = JSON.parse(localStorage.getItem("access_data"));
+        var accessToken=ge_local_data.access_token;
+        jQuery.ajax({
+            url:followUrl,
+            type:"POST",
+            headers: {
+              'Authorization':'Bearer '+accessToken,
+            },
+            data:{'sub_category_id':following_id},
+            dataType:'json',
+            success: function(response,textStatus, xhr){
+ 
+               checkFollowStatus=jQuery('.followCategoryStatus-'+following_id).hasClass('sx_5da456');
+               if(checkFollowStatus==false){
+                  jQuery('.followCategoryStatus-'+following_id).removeClass('sx_5da455');
+                  jQuery('.followCategoryStatus-'+following_id).addClass('sx_5da456');
+                  jQuery('.btnTextChangeCat-'+following_id).text(response.message);
+               }else{
+                  jQuery('.followCategoryStatus-'+following_id).removeClass('sx_5da456');
+                  jQuery('.followCategoryStatus-'+following_id).addClass('sx_5da455');
+                  jQuery('.btnTextChangeCat-'+following_id).text('Follow');
+               }
+
+            },
+            error: function(jqXHR, textStatus, errorThrown){
+              jQuery(".followError").html('<span style="color:red;">Please Try Again...</span>').fadeOut(8000);
+              console.log(textStatus + ": " + jqXHR.status + " " + errorThrown);
+            }
+
+
+        });
+  }else{
+    document.getElementById('openLoginPopup').click();
+  }
 }
 
 

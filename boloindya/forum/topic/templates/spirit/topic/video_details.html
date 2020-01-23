@@ -862,7 +862,7 @@
         color: #000;
     }
     .share-layout{
-        padding: 40px 20px;
+        padding: 20px 20px;
     }
 
     .mentions-input-box {
@@ -990,12 +990,12 @@
     }
 
     .videoCentered {
-    width: 100%;
-    object-fit: cover;
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
-    height: 100%;
+        /*width: 100%;*/
+        object-fit: cover;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+        height: 100%;
     }
 
     .video-meta-title.jsx-191376589 {
@@ -1061,9 +1061,25 @@ $(document).ready(function() {
 
 ._video_card_footer_likes1{
     position: absolute;
-    right: 16px;
-    top: -106px;
-    font-size: 16px;
+    right: 6px;
+    top: 58px;
+    bottom: -2px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+}
+._video_card_footer_likes1 img{
+    position: absolute;
+    margin-top: -1px;
+    height: 18px;
+    top: -4px;
+    left: -18px;
+    padding-top: 4px;
+}
+
+._video_card_footer_likes {
+    font-size: 11px;
     font-weight: 700;
     line-height: 1;
     color: #fff;
@@ -1102,11 +1118,11 @@ $(document).ready(function() {
 
     content: '';
     display: inline-block;
-    height: 18px;
-    margin: 0 6px -3px 0;
+    height: 14px;
+    margin: 0 6px -10px 0;
     min-width: 18px;
     position: relative;
-    top: -1px;
+    top: -2px;
     width: 18px;
     background-image: url(/media/iJGOBKN9vqK.png);
     background-repeat: no-repeat;
@@ -1315,7 +1331,7 @@ $(document).ready(function() {
                                     <!-- -->{{user_profile.user.username}}</p>
                             </div>
                         </a>
-                        <span class="unit" style="display: inline-block;position: relative;top: -56px;">
+                        <span class="unit" style="display: inline-block;position: relative;top: -49px;">
                             <button onclick="follow_user('{{user_profile.id}}');" style="float: right;" class="_4jy1 _4jy4 _517h _51sy _42ft " type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-{{user_profile.id}} followCheck sx_5da455"></i><span class="btnTextChange-{{user_profile.id}}">{% trans "Follow" %}</span>
                             </button>
                         </span>
@@ -1331,7 +1347,7 @@ $(document).ready(function() {
                                             <input type="hidden" name="topicCreatorUsername" id="topicCreatorUsername" value="" >
                                         </div>
                                         <div class="_6w18">
-                                            <div class="_6w1g _29ak">
+<!--                                             <div class="_6w1g _29ak">
                                                 <span>
                                                     <a type="button" class="_55pi _2agf _4o_4 _4jy0 _4jy3 _517h _51sy _59pe _42ft" aria-haspopup="true" role="button" href="#" style="max-width: 200px;">
                                                         <span alt="" class="_-xe _3-8_">
@@ -1347,7 +1363,7 @@ $(document).ready(function() {
                                                         </span>
                                                     </a>
                                                 </span>
-                                            </div>
+                                            </div> -->
                                             <div class="_6w1h">
                                                 <span class="_18vi">
                                                     <div class="_666k" data-testid="UFI2ReactionLink/actionLink">
@@ -1369,9 +1385,11 @@ $(document).ready(function() {
                                                         </a>
                                                     </span>
                                                       <ul class='smenu'>
+                                                            <li class="googleplus" onclick="social_share('whatsapp_share')"><a href="javascript:void(0);">whatsapp</a></li>
                                                             <li class="facebook"><a href="javascript:void(0);" onclick="social_share('facebook_share')">Facebook</a></li>
                                                             <li class="twitter"><a href="javascript:void(0);" onclick="social_share('twitter_share')">Twitter</a></li>
-                                                            <li class="googleplus" onclick="social_share('whatsapp_share')"><a href="javascript:void(0);">whatsapp</a></li>
+
+                                                            <li class="googleplus" onclick="copyShareLink();"><a href="javascript:void(0);">Copy Link</a></li>
                                                       </ul>
                                                 </span>
                                             </div>
@@ -1432,7 +1450,7 @@ $(document).ready(function() {
         <aside class="share-layout-aside">
             <div class="jsx-2573841504 recommend-container">
                 <header class="jsx-3959364739">
-                    <h3 class="jsx-3959364739">{% trans "Trends" %}</h3><a class="jsx-3959364739" href="/">{% trans "See All" %}</a></header>
+                    <h3 class="jsx-3959364739">{% trans "Trendinng" %}</h3><a class="jsx-3959364739" href="/">{% trans "See All" %}</a></header>
                 <!-- <h3 class="jsx-2573841504">{% trans "Trends" %}</h3> -->
                 <div class="jsx-2573841504 recommend-video-container">
                     <div class="_scroll_load_more_loading_user_videos center">

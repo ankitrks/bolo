@@ -308,6 +308,7 @@ function openVideoInPopup(topicId){
         param1=singleItemData.slug;
         param2=singleItemData.id;
         history.pushState(null, null, '?video='+param1+'/'+param2);
+        followLikeList();
 
  }
 
@@ -474,6 +475,8 @@ function getCategoryWithVideos(){
                      loaderBoloHideDynamic('_scroll_load_more_loading_left');
                     $("#catWithVideoId").append(category_with_video_list);
                 }
+                followLikeList();
+
 
             });
 
@@ -522,8 +525,8 @@ function popularCategoryHeading(itemCategory){
     }else{
         category_title='title';
     }
-
-    var popular_cat_heading_template='<div class="_explore_feed_header"><div class="jsx-2836840237 _card_header_"><a class="jsx-2836840237" href="/tag/'+itemCategory.slug+'/"><div class="jsx-2836840237 _card_header_cover" style="background-image: url('+itemCategory.category_image+');"></div></a><a title="#'+itemCategory.slug+'('+itemCategory.total_view+' views)" class="jsx-2836840237 _card_header_link" href="/tag/'+itemCategory.slug+'/"><div class="jsx-2836840237 _card_header_content"><h3 class="jsx-2836840237 _card_header_title">'+itemCategory[category_title]+'</h3><strong class="jsx-2836840237 _card_header_subTitle">'+itemCategory.total_view+' views</strong><p class="jsx-2836840237 _card_header_desc"></p></div></a></div></div>';
+    //follow_category
+    var popular_cat_heading_template='<div class="_explore_feed_header"><div class="jsx-2836840237 _card_header_"><a class="jsx-2836840237" href="/tag/'+itemCategory.slug+'/"><div class="jsx-2836840237 _card_header_cover" style="background-image: url('+itemCategory.category_image+');"></div></a><a title="#'+itemCategory.slug+'('+itemCategory.total_view+' views)" class="jsx-2836840237 _card_header_link" href="/tag/'+itemCategory.slug+'/"><div class="jsx-2836840237 _card_header_content"><h3 class="jsx-2836840237 _card_header_title">'+itemCategory[category_title]+'</h3><strong class="jsx-2836840237 _card_header_subTitle">'+itemCategory.total_view+' views</strong></div></a><p class="jsx-2836840237 _card_header_desc_follow"><span class="unit"><button onclick="follow_category_discover('+itemCategory.id+');" class="_4jy1 _4jy4 _517h _51sy _42ft " style="float: none;" type="button" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followCategoryStatus-'+itemCategory.id+' followCheckCat sx_5da455"></i><span class="btnTextChangeCat-'+itemCategory.id+'">'+follow_trans+'</span></button></span></p></div></div>';
     return popular_cat_heading_template;
 }
 
@@ -537,7 +540,7 @@ function popularCategoryItem(itemVideoByte){
     return category_item_template;
 }
 
-function followLikeList(){debugger;
+function followLikeList(){
     var checkstatus=check_login_status();
     if(checkstatus==false){
         return false;
@@ -557,7 +560,7 @@ function followLikeList(){debugger;
         headers: {
           'Authorization':'Bearer '+accessToken,
         },
-        success: function(response,textStatus, xhr){
+        success: function(response,textStatus, xhr){debugger;
             userLikeAndUnlike=response;
 
             var countFollowStatus=userLikeAndUnlike.all_follow;
@@ -574,6 +577,19 @@ function followLikeList(){debugger;
                 });
             }
 
+            var countFollowStatusCat=userLikeAndUnlike.all_category_follow;
+            if(undefined !==countFollowStatusCat && countFollowStatusCat.length>0){
+                var followListCat=userLikeAndUnlike.all_category_follow;
+                followListCat.forEach(function(followId){
+                    followStatusCat=jQuery('.followCheckCat').hasClass('followCategoryStatus-'+followId);
+                    if(followStatusCat==true){
+                        jQuery('.followCategoryStatus-'+followId).removeClass('sx_5da455');
+                        jQuery('.followCategoryStatus-'+followId).addClass('sx_5da456');
+                        jQuery('.btnTextChangeCat-'+followId).text(followed_trans);
+                    }
+
+                });
+            }
 
         //var videoCommentList=data.results;
         }

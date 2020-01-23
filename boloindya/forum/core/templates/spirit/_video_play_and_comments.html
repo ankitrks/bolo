@@ -1068,11 +1068,12 @@ input.tag-input {
 }
 
 .video-meta-title.jsx-191376589 {
-    font-family: proxima-regular, PingFangSC, sans-serif;
+    font-family: inherit;
     font-weight: 400;
-    font-size: 17px;
+    font-size: 16px;
     line-height: 20px;
     margin-bottom: 8px;
+    color: #161823;
 }
 
 .ytd-commentbox {
@@ -1192,7 +1193,7 @@ input.tag-input {
                                         </div>
  
                                         <div class="_6w18">
-                                            <div class="_6w1g _29ak">
+<!--                                             <div class="_6w1g _29ak">
                                                 <span>
                                                     <a type="button" class="_55pi _2agf _4o_4 _4jy0 _4jy3 _517h _51sy _59pe _42ft" aria-haspopup="true" role="button" href="#" style="max-width: 200px;">
                                                         <span alt="" class="_-xe _3-8_">
@@ -1208,7 +1209,7 @@ input.tag-input {
                                                         </span>
                                                     </a>
                                                 </span>
-                                            </div>
+                                            </div> -->
                                             <div class="_6w1h">
                                                 <span class="_18vi">
                                                     <div class="_666k" data-testid="UFI2ReactionLink/actionLink">
@@ -1229,11 +1230,12 @@ input.tag-input {
                                                         <a class=" _2nj7  _18vj _18vk "   href="javascript:void(0)" id="shareLinkId"  title="Send this to friends or post it on your Timeline.">{% trans "Share" %}
                                                         </a>
                                                     </span>
-                                                      <ul class='smenu'>
-                                                            <li class="facebook"><a href="javascript:void(0);" onclick="social_share('facebook_share')">Facebook</a></li>
-                                                            <li class="twitter"><a href="javascript:void(0);" onclick="social_share('twitter_share')">Twitter</a></li>
-                                                            <li class="googleplus" onclick="social_share('whatsapp_share')"><a href="javascript:void(0);">whatsapp</a></li>
-                                                      </ul>
+                                                    <ul class='smenu'>
+                                                        <li class="googleplus" onclick="social_share('whatsapp_share')"><a href="javascript:void(0);">whatsapp</a></li>
+                                                        <li class="facebook"><a href="javascript:void(0);" onclick="social_share('facebook_share')">Facebook</a></li>
+                                                        <li class="twitter"><a href="javascript:void(0);" onclick="social_share('twitter_share')">Twitter</a></li>
+                                                        <li class="googleplus" onclick="copyShareLink();"><a href="javascript:void(0);">Copy Link</a></li>
+                                                    </ul>
                                                 </span>
                                             </div>
                                         </div>

@@ -767,7 +767,7 @@ var countries=[];
 
     });
 
-function removeDataFromURL(){debugger;
+function removeDataFromURL(){
   window.history.back();
   if(video.src){
     video.src="";

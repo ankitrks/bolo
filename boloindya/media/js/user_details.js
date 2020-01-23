@@ -22,7 +22,7 @@ $(window).scroll(function() {
 });
 
 
-function getUserVideos(limit,offset){debugger;
+function getUserVideos(limit,offset){
 
     loaderBoloShowDynamic('_scroll_load_more_loading_user_videos');
     var user_id= $("#currentUserId").val();
@@ -40,7 +40,7 @@ function getUserVideos(limit,offset){debugger;
         url:res,
         type:"GET",
         data:{'limit':limit,'offset':offset,'user_id':user_id,'language_id':language_id},
-        success: function(response,textStatus, xhr){debugger;
+        success: function(response,textStatus, xhr){
             userVideoItems="";
             var videoItemList=response.results;
             jQuery("#userVideoCountId").html(response.count);
@@ -272,7 +272,7 @@ function getPopularCategory(popularCategory){
     var hideErrorMsg = true;
     
     var retryCount=0;
-function video_play_using_video_js(url,backup_url,image) {debugger;
+function video_play_using_video_js(url,backup_url,image) {
     
     var video = document.getElementById('player');
 
@@ -467,7 +467,7 @@ function video_play_using_video_js(url,backup_url,image) {debugger;
     param1=singleItemData.slug;
     param2=singleItemData.id;
     history.pushState(null, null, '?video='+param1+'/'+param2);
-
+    followLikeList();
 
 }
 
@@ -651,7 +651,7 @@ function loadMoreComments(nextPageURl){
             headers: {
               'Authorization':'Bearer '+accessToken,
             },
-            success: function(response,textStatus, xhr){debugger;
+            success: function(response,textStatus, xhr){
                 userLikeAndUnlike=response;
                 if(response.all_follow){
                     var listFollows=response.all_follow;

@@ -388,6 +388,7 @@ function video_play_using_video_js(url,backup_url,image) {
         param1=singleItemData.slug;
         param2=singleItemData.id;
         history.pushState(null, null, '?video='+param1+'/'+param2);
+        followLikeList();
  }
 
  function muteAndUnmutePlayer(){
@@ -528,7 +529,7 @@ function followLikeList(){
         headers: {
           'Authorization':'Bearer '+accessToken,
         },
-        success: function(response,textStatus, xhr){debugger;
+        success: function(response,textStatus, xhr){
             userLikeAndUnlike=response;
         //var videoCommentList=data.results;
         //all_category_follow
