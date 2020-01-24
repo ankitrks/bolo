@@ -6,6 +6,7 @@
 from __future__ import unicode_literals
 import os
 from collections import OrderedDict
+from django.utils.translation import ugettext_lazy as _
 
 # TODO: Remove this whole module in Spirit 0.6
 
@@ -87,7 +88,12 @@ ST_TESTS_RATELIMIT_NEVER_EXPIRE = False
 
 ST_BASE_DIR = os.path.dirname(__file__)
 BASE_DIR = os.path.dirname(__file__)
+BASE_DIR_TRANS = os.path.dirname(os.path.dirname(__file__))
 
+BASE_URL='https://www.boloindya.com/'
+ABSOLUTE_URL='https://www.boloindya.com'
+
+#BASE_URL='https://www.boloindya.com/'
 #
 # Django & Spirit settings defined below...
 #
@@ -96,12 +102,18 @@ INSTALLED_APPS = [
     # 'jet',
     'grappelli',
     'django.contrib.admin',
+
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.facebook',
     'django.contrib.humanize',
     'rest_framework',
 
@@ -143,8 +155,58 @@ INSTALLED_APPS = [
     'jarvis',
     'tinymce',
     'chartjs',
+    
     # 'forum.core.tests'
 ]
+
+SOCIALACCOUNT_PROVIDERS = {
+    'facebook': {
+    'METHOD': 'oauth2',
+    'SDK_URL': '//connect.facebook.net/{locale}/sdk.js',
+    'SCOPE': ['email', 'public_profile', 'user_friends'],
+    'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
+    'INIT_PARAMS': {'cookie': True},
+    'FIELDS': [
+        'id',
+        'email',
+        'name',
+        'first_name',
+        'last_name',
+        'verified',
+        'locale',
+        'timezone',
+        'link',
+        'gender',
+        'updated_time',
+    ],
+    'EXCHANGE_TOKEN': True,
+    'LOCALE_FUNC': lambda request: 'en_US',
+    'VERIFIED_EMAIL': False,
+    'VERSION': 'v2.12',
+    },
+     'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS =1
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 5
+ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT = 86400 # 1 day in seconds
+ACCOUNT_LOGOUT_REDIRECT_URL ='/'
+LOGIN_REDIRECT_URL = '/accounts/email/' 
+ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS=False
+SOCIALACCOUNT_ADAPTER = 'forum.topic.views.AutoConnectSocialAccount'
+#ACCOUNT_ADAPTER = 'forum.topic.views.NoNewUsersAccountAdapter'
+#ACCOUNT_ADAPTER = 'forum.topic.views.MyAccountAdapter'
+
+# redirects to /accounts/profile by default 
 
 # python manage.py createcachetable
 CACHES = {
@@ -169,6 +231,9 @@ FCM_DEVICE_MODEL = 'jarvis.FCMDevice'
 AUTHENTICATION_BACKENDS = [
     'forum.user.auth.backends.UsernameAuthBackend',
     'forum.user.auth.backends.EmailAuthBackend',
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+
 ]
 
 LOGIN_URL = 'spirit:user:auth:login'
@@ -205,8 +270,11 @@ TEMPLATES = [
                 'django.template.context_processors.media',
                 'django.template.context_processors.static',
                 'django.template.context_processors.tz',
-                'django.template.context_processors.request',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.request',
+                'context_processors.all_languages',
+                'context_processors.site_base_url',
+                'forum.topic.context_processors.site_base_url',
             ],
         },
     },
@@ -255,9 +323,53 @@ TIME_ZONE = 'Asia/Kolkata'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
+
+LANGUAGE_OPTIONS = (
+    ('1', "English", "en"),
+    ('2', "Hindi", "hi"),
+    ('3', "Tamil", "ta"),
+    ('4', "Telugu", "te"),
+    ('5', "Bengali", "bn"),
+    ('6', "Kannada", "kn"),
+    ('7', "Malayalam", "ml"),
+    # ('8', "Gujarati", "gu"),
+    ('9', "Marathi", "mr"),
+)
+
+LANGUAGES = [(each_rec[2], _(each_rec[1])) for each_rec in LANGUAGE_OPTIONS]
+
+#LANGUAGES_WITH_ID = {(each_rec[2], (each_rec[0])) for each_rec in LANGUAGE_OPTIONS}
+
+# LANGUAGES = [
+#     ('en', _('English')),
+#     ('hi', _('Hindi')),
+#     ('ta', _('Tamil')),
+#     ('te', _('Telgu')),
+#     ('bn', _('Bengali')),
+#     ('kn', _('Kannada')),
+#     ('ml', _('Malayalam')),
+#     ('mr', _('Marathi')),
+
+# ]
+#('gu', _('Gujarati')) 
+LANGUAGES_WITH_ID = {
+    'en' : '1',
+    'hi' : '2',
+    'ta' : '3',
+    'te' : '4',
+    'bn' : '5',
+    'kn' : '6',
+    'ml' : '7',
+    'gu' : '8',
+    'mr' : '9' 
+}
+
 LANGUAGE_CODE = 'en-us'
 
-SITE_ID = 1
+
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, 'locale'),
+)
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -278,7 +390,7 @@ MEDIA_ROOT = os.path.join(PROJECT_PATH, ENV, 'media')
 # trailing slash.
 # Examples: "http://example.com/media/", "http://media.example.com/"
 MEDIA_URL = '/media/'
-
+MEDIA_UPLOAD_DOC_PATH = 'media/documents/'
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
@@ -309,12 +421,17 @@ STATICFILES_FINDERS = (
    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
+SOCIALACCOUNT_QUERY_EMAIL=ACCOUNT_EMAIL_REQUIRED
+SOCIALACCOUNT_EMAIL_REQUIRED=ACCOUNT_EMAIL_REQUIRED
+SOCIALACCOUNT_STORE_TOKENS=False
+
+
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_USE_TLS = True
-EMAIL_HOST = 'mail.careeranna.com'
-EMAIL_HOST_USER = 'security@careeranna.com'
-EMAIL_HOST_PASSWORD = 'INAS!bOrtn}{'
-EMAIL_PORT = 26
+EMAIL_HOST = 'smtp.googlemail.com'
+EMAIL_HOST_USER = 'support@careeranna.com'
+EMAIL_HOST_PASSWORD = '$upp0rt@30!1'
+EMAIL_PORT = 587
 
 EMAIL_SENDER = EMAIL_HOST_USER
 EMAIL_RECEIVERS = ['ankit@careeranna.com']
@@ -330,7 +447,7 @@ import datetime
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework_simplejwt.authentication.JWTAuthentication',],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 10
+    'PAGE_SIZE': 15
 }
 # JWT_AUTH = {
 #     # how long the original token is valid for
@@ -383,3 +500,5 @@ FCM_MAX_RECIPIENTS = 1000
 PREDICTION_START_HOUR = 3
 
 CAREERANNA_VIDEOFILE_UPDATE_URL = "https://www.careeranna.com/search/insertOrUpdateFreeVideo"
+SITE_ID = 2
+

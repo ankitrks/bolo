@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Spirit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-23 19:55+0000\n"
+"POT-Creation-Date: 2020-01-20 11:35+0530\n"
 "PO-Revision-Date: 2015-07-25 18:00+0000\n"
 "Last-Translator: Esteban M. Castro Borsani <ecastroborsani@gmail.com>\n"
 "Language-Team: Spirit\n"
@@ -12,248 +12,383 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: tags/time.py:33
+#: forum/core/tags/time.py:33
 msgid "now"
 msgstr "jetzt"
 
-#: tags/time.py:37
+#: forum/core/tags/time.py:37
 #, python-format
 msgid "%(count)ss"
 msgstr "%(count)sSek."
 
-#: tags/time.py:41
+#: forum/core/tags/time.py:41
 #, python-format
 msgid "%(count)sm"
 msgstr "%(count)sMin."
 
-#: tags/time.py:44
+#: forum/core/tags/time.py:44
 #, python-format
 msgid "%(count)sh"
 msgstr "%(count)sStd."
 
-#: templates/403.html:10
+#: forum/core/templates/403.html:10
 msgid "You do not have sufficient permissions to access this page"
 msgstr "Unzureichende Rechte zum aufrufen dieser Seite"
 
-#: templates/404.html:10
+#: forum/core/templates/404.html:10
 msgid "what you are looking for is gone..."
 msgstr "was Du suchst ist nicht mehr hier..."
 
-#: templates/spirit/_base.html:33
+#: forum/core/templates/spirit/_base.html:45
+#: forum/core/templates/spirit/_base_index_user.html:40
 #, python-brace-format
 msgid "{user} has mention you on {topic}"
 msgstr "{user} erwähnte Dich in {topic}"
 
-#: templates/spirit/_base.html:34
+#: forum/core/templates/spirit/_base.html:46
+#: forum/core/templates/spirit/_base_index_user.html:41
 #, python-brace-format
 msgid "{user} has commented on {topic}"
 msgstr "{user} kommentierte {topic}"
 
-#: templates/spirit/_base.html:35
+#: forum/core/templates/spirit/_base.html:47
+#: forum/core/templates/spirit/_base_index_user.html:42
 msgid "Show all"
 msgstr "Zeige alles"
 
-#: templates/spirit/_base.html:36
+#: forum/core/templates/spirit/_base.html:48
+#: forum/core/templates/spirit/_base_index_user.html:43
 msgid "No new notifications, yet"
 msgstr "Keine neuen Benachrichtigungen, bis jetzt"
 
-#: templates/spirit/_base.html:37
+#: forum/core/templates/spirit/_base.html:49
+#: forum/core/templates/spirit/_base_index_user.html:44
 msgid "unread"
 msgstr "ungelesen"
 
-#: templates/spirit/_header.html:20
+#: forum/core/templates/spirit/_header.html:22
 msgid "Profile"
 msgstr "Profil"
 
-#: templates/spirit/_header.html:21
+#: forum/core/templates/spirit/_header.html:23
 msgid "Topics"
 msgstr "Themen"
 
-#: templates/spirit/_header.html:22
+#: forum/core/templates/spirit/_header.html:24
 msgid "Unread topics"
 msgstr "ungelesen Themen"
 
-#: templates/spirit/_header.html:23
+#: forum/core/templates/spirit/_header.html:25
 msgid "Private topics"
 msgstr "private Themen"
 
-#: templates/spirit/_header.html:26
+#: forum/core/templates/spirit/_header.html:28
 msgid "Admin"
 msgstr "Admin"
 
-#: templates/spirit/_header.html:29
+#: forum/core/templates/spirit/_header.html:31
+#: forum/core/templates/spirit/_new_header.html:372
 msgid "Log out"
 msgstr "abmelden"
 
-#: templates/spirit/_header.html:42
+#: forum/core/templates/spirit/_header.html:44
 msgid "Log in"
 msgstr "anmelden"
 
-#: templates/spirit/utils/paginator/_paginator.html:4
+#: forum/core/templates/spirit/_new_base.html:74
+#: forum/core/templates/spirit/_video_play_and_comments.html:1139
+msgid "Follow"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_base.html:75
+msgid "Followed"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_base.html:76
+#: forum/core/templates/spirit/_video_play_and_comments.html:1148
+msgid "likes"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_base.html:77
+#: forum/core/templates/spirit/_video_play_and_comments.html:1148
+msgid "comments"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_base.html:78
+msgid "Followers"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_footer.html:6
+#: forum/core/templates/spirit/_video_play_and_comments.html:1148
+msgid "Download"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_footer.html:19
+#: forum/core/templates/spirit/_new_header.html:348
+msgid "Company"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_footer.html:20
+#: forum/core/templates/spirit/_new_header.html:300
+#: forum/core/templates/spirit/_new_header.html:349
+msgid "About"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_footer.html:21
+#: forum/core/templates/spirit/_new_header.html:351
+msgid "Careers"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_footer.html:24
+#: forum/core/templates/spirit/_new_header.html:354
+msgid "Programs"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_footer.html:25
+#: forum/core/templates/spirit/_new_header.html:302
+#: forum/core/templates/spirit/_new_header.html:350
+msgid "Discover"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_footer.html:29
+#: forum/core/templates/spirit/_new_header.html:358
+msgid "Support"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_footer.html:30
+#: forum/core/templates/spirit/_new_header.html:359
+msgid "Help Center"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_footer.html:31
+#: forum/core/templates/spirit/_new_header.html:360
+msgid "Safety Center"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_footer.html:35
+#: forum/core/templates/spirit/_new_header.html:364
+msgid "Legal"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_footer.html:36
+#: forum/core/templates/spirit/_new_header.html:365
+msgid "Terms of Service"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_footer.html:37
+#: forum/core/templates/spirit/_new_header.html:366
+#, fuzzy
+#| msgid "Private topics"
+msgid "Privacy Policy"
+msgstr "private Themen"
+
+#: forum/core/templates/spirit/_new_footer.html:59
+#: forum/core/templates/spirit/_new_header.html:407
+#: forum/core/templates/spirit/untitled.html:15
+msgid "language"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_header.html:298
+#: forum/core/templates/spirit/_new_header.html:346
+msgid "Home"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_header.html:355
+msgid "Advertise on boloindya"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_header.html:361
+msgid "Community Guidelines"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_header.html:371
+msgid "Welcome"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_header.html:377
+msgid "Logout"
+msgstr ""
+
+#: forum/core/templates/spirit/_video_play_and_comments.html:1082
+msgid "download"
+msgstr ""
+
+#: forum/core/templates/spirit/_video_play_and_comments.html:1083
+msgid "like"
+msgstr ""
+
+#: forum/core/templates/spirit/_video_play_and_comments.html:1084
+msgid "video"
+msgstr ""
+
+#: forum/core/templates/spirit/_video_play_and_comments.html:1096
+#, python-format
+msgid " %(Download)s the app to %(like)s this %(video)s "
+msgstr ""
+
+#: forum/core/templates/spirit/_video_play_and_comments.html:1096
+msgid "Get"
+msgstr ""
+
+#: forum/core/templates/spirit/_video_play_and_comments.html:1177
+msgid "Like"
+msgstr ""
+
+#: forum/core/templates/spirit/_video_play_and_comments.html:1183
+msgid "Comment"
+msgstr ""
+
+#: forum/core/templates/spirit/_video_play_and_comments.html:1188
+msgid "Share"
+msgstr ""
+
+#: forum/core/templates/spirit/_video_play_and_comments.html:1246
+msgid "COPY"
+msgstr ""
+
+#: forum/core/templates/spirit/_video_play_and_comments.html:1267
+msgid "Share to"
+msgstr ""
+
+#: forum/core/templates/spirit/_video_play_and_comments.html:1270
+msgid "Copy Link"
+msgstr ""
+
+#: forum/core/templates/spirit/_video_play_and_comments.html:1285
+msgid "Cancel"
+msgstr ""
+
+#: forum/core/templates/spirit/utils/paginator/_paginator.html:4
 #, python-format
 msgid "Page %(number)s of %(num_pages)s"
 msgstr "Seite %(number)s von %(num_pages)s"
 
-#: templates/spirit/utils/paginator/_paginator.html:8
+#: forum/core/templates/spirit/utils/paginator/_paginator.html:8
 msgid "Last"
 msgstr "letzte"
 
-#: templates/spirit/utils/paginator/_paginator.html:10
+#: forum/core/templates/spirit/utils/paginator/_paginator.html:10
 msgid "First"
 msgstr "erste"
 
-#: templates/spirit/utils/paginator/_yt_paginator.html:5
+#: forum/core/templates/spirit/utils/paginator/_yt_paginator.html:5
 msgid "Page 1 of 1"
 msgstr "Seite 1 von 1"
 
-#: utils/markdown/utils/quote.py:36
+#: forum/core/utils/markdown/utils/quote.py:37
 #, python-format
 msgid "@%(username)s said:"
 msgstr ""
 
-#: utils/ratelimit/decorators.py:25
+#: forum/core/utils/ratelimit/decorators.py:27
 #, python-format
 msgid "Too many submissions, wait %(time)s."
 msgstr "Zu viele Anfragen, warte %(time)s."
 
-#: utils/timezone.py:9
-msgid "(GMT -12:00) Eniwetok, Kwajalein"
-msgstr "(GMT -12:00) Eniwetok, Kwajalein"
+#, fuzzy
+#~| msgid "Profile"
+#~ msgid "Edit Profile"
+#~ msgstr "Profil"
 
-#: utils/timezone.py:10
-msgid "(GMT -11:00) Midway Island, Samoa"
-msgstr "(GMT -11:00) Midway Island, Samoa"
+#, fuzzy
+#~| msgid "{user} has commented on {topic}"
+#~ msgid "has commented on"
+#~ msgstr "{user} kommentierte {topic}"
 
-#: utils/timezone.py:11
-msgid "(GMT -10:00) Hawaii"
-msgstr "(GMT -10:00) Hawaii"
+#, fuzzy
+#~| msgid "{user} has mention you on {topic}"
+#~ msgid "has mentioned you on"
+#~ msgstr "{user} erwähnte Dich in {topic}"
 
-#: utils/timezone.py:12
-msgid "(GMT -9:30) Marquesas Islands"
-msgstr ""
+#, fuzzy
+#~| msgid "Last"
+#~ msgid "Last Name"
+#~ msgstr "letzte"
 
-#: utils/timezone.py:13
-msgid "(GMT -9:00) Alaska"
-msgstr "(GMT -9:00) Alaska"
-
-#: utils/timezone.py:14
-msgid "(GMT -8:00) Pacific Time (US & Canada)"
-msgstr "(GMT -8:00) Pacific Time (US & Kanada)"
-
-#: utils/timezone.py:15
-msgid "(GMT -7:00) Mountain Time (US & Canada)"
-msgstr "(GMT -7:00) Mountain Time (US & Kanada)"
-
-#: utils/timezone.py:16
-msgid "(GMT -6:00) Central Time (US & Canada), Mexico City"
-msgstr "(GMT -6:00) Central Time (US & Kanada), Mexico City"
-
-#: utils/timezone.py:17
-msgid "(GMT -5:00) Eastern Time (US & Canada), Bogota, Lima"
-msgstr "(GMT -5:00) Eastern Time (US & Kanada), Bogota, Lima"
-
-#: utils/timezone.py:18
-msgid "(GMT -4:30) Venezuela"
-msgstr ""
-
-#: utils/timezone.py:19
-msgid "(GMT -4:00) Atlantic Time (Canada), Caracas, La Paz"
-msgstr "(GMT -4:00) Atlantic Time (Kanada), Caracas, La Paz"
-
-#: utils/timezone.py:20
-msgid "(GMT -3:00) Brazil, Buenos Aires, Georgetown"
-msgstr "(GMT -3:00) Brazil, Buenos Aires, Georgetown"
-
-#: utils/timezone.py:21
-msgid "(GMT -2:00) Mid-Atlantic"
-msgstr "(GMT -2:00) Mid-Atlantic"
-
-#: utils/timezone.py:22
-msgid "(GMT -1:00) Azores, Cape Verde Islands"
-msgstr "(GMT -1:00) Azores, Cape Verde Islands"
-
-#: utils/timezone.py:23
-msgid "(GMT) Western Europe Time, London, Lisbon, Casablanca"
-msgstr "(GMT) Western Europe Time, London, Lisbon, Casablanca"
-
-#: utils/timezone.py:24
-msgid "(GMT +1:00) Brussels, Copenhagen, Madrid, Paris"
-msgstr "(GMT +1:00) Berlin, Paris, Wien"
-
-#: utils/timezone.py:25
-msgid "(GMT +2:00) Kaliningrad, South Africa"
-msgstr "(GMT +2:00) Kaliningrad, South Africa"
-
-#: utils/timezone.py:26
-msgid "(GMT +3:00) Baghdad, Riyadh, Moscow, St. Petersburg"
-msgstr "(GMT +3:00) Baghdad, Riyadh, Moskau, St. Petersburg"
-
-#: utils/timezone.py:27
-msgid "(GMT +4:00) Abu Dhabi, Muscat, Baku, Tbilisi"
-msgstr "(GMT +4:00) Abu Dhabi, Muscat, Baku, Tbilisi"
-
-#: utils/timezone.py:28
-msgid "(GMT +4:30) Afghanistan"
-msgstr ""
-
-#: utils/timezone.py:29
-msgid "(GMT +5:00) Ekaterinburg, Islamabad, Karachi, Tashkent"
-msgstr "(GMT +5:00) Ekaterinburg, Islamabad, Karachi, Tashkent"
-
-#: utils/timezone.py:30
-msgid "(GMT +5:30) India, Sri Lanka"
-msgstr ""
-
-#: utils/timezone.py:31
-msgid "(GMT +5:45) Nepal"
-msgstr ""
-
-#: utils/timezone.py:32
-msgid "(GMT +6:00) Almaty, Dhaka, Colombo"
-msgstr "(GMT +6:00) Almaty, Dhaka, Colombo"
-
-#: utils/timezone.py:33
-msgid "(GMT +6:30) Cocos Islands, Myanmar"
-msgstr ""
-
-#: utils/timezone.py:34
-msgid "(GMT +7:00) Bangkok, Hanoi, Jakarta"
-msgstr "(GMT +7:00) Bangkok, Hanoi, Jakarta"
-
-#: utils/timezone.py:35
-msgid "(GMT +8:00) Beijing, Perth, Singapore, Hong Kong"
-msgstr "(GMT +8:00) Beijing, Perth, Singapore, Hong Kong"
-
-#: utils/timezone.py:36
-msgid "(GMT +8:45) Australia (Eucla)"
-msgstr ""
-
-#: utils/timezone.py:37
-msgid "(GMT +9:00) Tokyo, Seoul, Osaka, Sapporo, Yakutsk"
-msgstr "(GMT +9:00) Tokyo, Seoul, Osaka, Sapporo, Yakutsk"
-
-#: utils/timezone.py:38
-msgid "(GMT +9:30) Australia (Northern Territory)"
-msgstr ""
-
-#: utils/timezone.py:39
-msgid "(GMT +10:00) Eastern Australia, Guam, Vladivostok"
-msgstr "(GMT +10:00) Eastern Australia, Guam, Vladivostok"
-
-#: utils/timezone.py:40
-msgid "(GMT +11:00) Magadan, Solomon Islands, New Caledonia"
-msgstr "(GMT +11:00) Magadan, Solomon Islands, New Caledonia"
-
-#: utils/timezone.py:41
-msgid "(GMT +11:30) Norfolk Island"
-msgstr ""
-
-#: utils/timezone.py:42
-msgid "(GMT +12:00) Auckland, Wellington, Fiji, Kamchatka"
-msgstr "(GMT +12:00) Auckland, Wellington, Fiji, Kamchatka"
-
-#~ msgid "User activation"
+#, fuzzy
+#~| msgid "User activation"
+#~ msgid "Motivation"
 #~ msgstr "Benutzer_innen-Aktivierung"
+
+#, fuzzy
+#~| msgid "No new notifications, yet"
+#~ msgid "Notifications"
+#~ msgstr "Keine neuen Benachrichtigungen, bis jetzt"
+
+#~ msgid "(GMT -12:00) Eniwetok, Kwajalein"
+#~ msgstr "(GMT -12:00) Eniwetok, Kwajalein"
+
+#~ msgid "(GMT -11:00) Midway Island, Samoa"
+#~ msgstr "(GMT -11:00) Midway Island, Samoa"
+
+#~ msgid "(GMT -10:00) Hawaii"
+#~ msgstr "(GMT -10:00) Hawaii"
+
+#~ msgid "(GMT -9:00) Alaska"
+#~ msgstr "(GMT -9:00) Alaska"
+
+#~ msgid "(GMT -8:00) Pacific Time (US & Canada)"
+#~ msgstr "(GMT -8:00) Pacific Time (US & Kanada)"
+
+#~ msgid "(GMT -7:00) Mountain Time (US & Canada)"
+#~ msgstr "(GMT -7:00) Mountain Time (US & Kanada)"
+
+#~ msgid "(GMT -6:00) Central Time (US & Canada), Mexico City"
+#~ msgstr "(GMT -6:00) Central Time (US & Kanada), Mexico City"
+
+#~ msgid "(GMT -5:00) Eastern Time (US & Canada), Bogota, Lima"
+#~ msgstr "(GMT -5:00) Eastern Time (US & Kanada), Bogota, Lima"
+
+#~ msgid "(GMT -4:00) Atlantic Time (Canada), Caracas, La Paz"
+#~ msgstr "(GMT -4:00) Atlantic Time (Kanada), Caracas, La Paz"
+
+#~ msgid "(GMT -3:00) Brazil, Buenos Aires, Georgetown"
+#~ msgstr "(GMT -3:00) Brazil, Buenos Aires, Georgetown"
+
+#~ msgid "(GMT -2:00) Mid-Atlantic"
+#~ msgstr "(GMT -2:00) Mid-Atlantic"
+
+#~ msgid "(GMT -1:00) Azores, Cape Verde Islands"
+#~ msgstr "(GMT -1:00) Azores, Cape Verde Islands"
+
+#~ msgid "(GMT) Western Europe Time, London, Lisbon, Casablanca"
+#~ msgstr "(GMT) Western Europe Time, London, Lisbon, Casablanca"
+
+#~ msgid "(GMT +1:00) Brussels, Copenhagen, Madrid, Paris"
+#~ msgstr "(GMT +1:00) Berlin, Paris, Wien"
+
+#~ msgid "(GMT +2:00) Kaliningrad, South Africa"
+#~ msgstr "(GMT +2:00) Kaliningrad, South Africa"
+
+#~ msgid "(GMT +3:00) Baghdad, Riyadh, Moscow, St. Petersburg"
+#~ msgstr "(GMT +3:00) Baghdad, Riyadh, Moskau, St. Petersburg"
+
+#~ msgid "(GMT +4:00) Abu Dhabi, Muscat, Baku, Tbilisi"
+#~ msgstr "(GMT +4:00) Abu Dhabi, Muscat, Baku, Tbilisi"
+
+#~ msgid "(GMT +5:00) Ekaterinburg, Islamabad, Karachi, Tashkent"
+#~ msgstr "(GMT +5:00) Ekaterinburg, Islamabad, Karachi, Tashkent"
+
+#~ msgid "(GMT +6:00) Almaty, Dhaka, Colombo"
+#~ msgstr "(GMT +6:00) Almaty, Dhaka, Colombo"
+
+#~ msgid "(GMT +7:00) Bangkok, Hanoi, Jakarta"
+#~ msgstr "(GMT +7:00) Bangkok, Hanoi, Jakarta"
+
+#~ msgid "(GMT +8:00) Beijing, Perth, Singapore, Hong Kong"
+#~ msgstr "(GMT +8:00) Beijing, Perth, Singapore, Hong Kong"
+
+#~ msgid "(GMT +9:00) Tokyo, Seoul, Osaka, Sapporo, Yakutsk"
+#~ msgstr "(GMT +9:00) Tokyo, Seoul, Osaka, Sapporo, Yakutsk"
+
+#~ msgid "(GMT +10:00) Eastern Australia, Guam, Vladivostok"
+#~ msgstr "(GMT +10:00) Eastern Australia, Guam, Vladivostok"
+
+#~ msgid "(GMT +11:00) Magadan, Solomon Islands, New Caledonia"
+#~ msgstr "(GMT +11:00) Magadan, Solomon Islands, New Caledonia"
+
+#~ msgid "(GMT +12:00) Auckland, Wellington, Fiji, Kamchatka"
+#~ msgstr "(GMT +12:00) Auckland, Wellington, Fiji, Kamchatka"
 
 #~ msgid "Email change"
 #~ msgstr "E-Mailadresse ändern"

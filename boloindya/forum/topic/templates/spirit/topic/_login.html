@@ -1,0 +1,125 @@
+{% extends "spirit/_new_base.html" %}
+{% load i18n %}
+{% block title %}BoloIndya{% endblock %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="/media/css/popup.css">
+<style type="text/css">
+  .pnl-manager{position: relative;margin: 70px auto !important;}
+  ._4kny{display: none;}
+  .pnl-manager .google-btn{
+    width: 98% !important;
+    padding: 12px 3px 8px !important;
+  }
+</style>
+
+    <a class="close" href="#" style="margin-bottom: 20px;"></a>
+    <div class="content" style="min-height: 570px;background: #f5f6f7;padding:10px">
+        <div class="cd-user-modal is-visible">
+            <div class="cd-user-modal-container">
+                <div id="cd-login" class="is-selected">
+
+                  <div class="modal-base showModal">
+                      <div class="modal-body">
+                          <div class="modal-content-data">
+                              <div class="pnl-manager mainLogin">
+                                  <div class="login-container " >
+                                    <div class="back-button hide activeNumberMode">
+                                      <button type="button" class="backToMainLogin pointer"><span style='font-size:26px;'>&#8592;</span><i class="fa fa-arrow-left1"></i></button>
+                                    </div>
+                                      <div class="heading"><span class="heading-text mainLoginHeading " >Login to continue</span></div>
+                                      <div class="heading"><span class="heading-text phoneLogin hide activeNumberMode">Continue using phone</span></div>
+                                      <a href="javascript:void(0);" class="email-or-fb-signin dispMainLogin" >
+                                          <div class="email-fb-button">Have a Facebook/Email account?</div>
+                                      </a>
+                                      <div class="or-div dispMainLogin" >or</div>
+                                      <div class="phone-number-container" >
+                                          <div class="phone-input"><span class="country-code">+91</span>
+                                              <div class="form-group material-input" autocomplete="off">
+                                                  <input maxlength="100" type="text" id="phoneNo" autocomplete="off" required="" name="phoneNo" class="form-control " pattern="[0-9]*" inputmode="numeric" value=""><span class="input-label no-floating">Enter your mobile number</span>
+                                                  <div class="page-loader loader" style="display: none;"></div>
+                                                   <p class="info dispMainLogin"></p> 
+                                                  <p class="error-txt mobileErrorMsg hide activeNumberMode">Please enter your mobile number<i class="error-icon-triangle"></i></p>
+                                              </div>
+                                          </div>
+                                      <button type="button" onClick="sendOTP();" class="submit-button hide activeNumberMode pointer"> Continue <i class="fa fa-angle-right"></i> </button>
+                                      <div class="attest-message hide activeNumberMode"><span class="attest-message-text">By Proceeding you agree to the <a href="/in/terms-of-use" target="_blank" rel="noopener noreferrer"> Terms of Use</a> and <a href="/in/privacy-policy" target="_blank" rel="noopener noreferrer"> Privacy Policy</a></span></div>                        
+                                      </div>
+                                  </div>
+
+                              </div>
+
+                              <div class="pnl-manager OTP_Panel hide" >
+                                <form action="javascript:void()" id="optForm">
+                                  <div role="presentation" class="otp-container">
+                                      <div class="back-button">
+                                          <button type="button" class="backToMainLogin pointer"><span style='font-size:26px;'>&#8592;</span></button>
+                                      </div>
+
+                                      <input type="hidden" name="rowId" id="rowId" value="">  
+                                      <input type="hidden" name="userOtp" id="userOtp" value="">  
+
+                                      <div class="otp-message"><span class="initial-text">Enter the 6-digit code sent to </span><span class="phone-no">+91******<span id="lastFourdigit"></span></span></div>
+                                      <div class="otp-input digit-group" data-group-name="digits" data-autosubmit="false" autocomplete="off">
+                                          <input type="text" id="digit-1" name="digit-1" data-next="digit-2" class="single-otp-input" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" value="" />
+                                          <input type="text" id="digit-2" name="digit-2" data-next="digit-3" data-previous="digit-1" class="single-otp-input" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" value="" />
+                                          <input type="text" id="digit-3" name="digit-3" data-next="digit-4" data-previous="digit-2" class="single-otp-input" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" value="" />
+                                          <input type="text" id="digit-4" name="digit-4" data-next="digit-5" data-previous="digit-3" class="single-otp-input" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" value="" />
+                                          <input type="text" id="digit-5" name="digit-5" data-next="digit-6" data-previous="digit-4" class="single-otp-input" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" value="" />
+       
+                                          <input type="text" id="digit-6" name="digit-6" data-previous="digit-5" class="single-otp-input" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" value="" />
+                                      </div>
+                                      <div class="resend-code">
+                                          <button type="button" class="resendOTP">resend code</button>
+                                          <div id="some_div" style="font-size: 14px;color: #83817e;"></div>
+                                          <span class="otpError"></span>
+                                      </div>
+                                      <button type="button" onclick="otp_verification()"  id="conOTPVerify" class="submit-button grey-btn pointer" disabled=""> Continue &nbsp;<i class="fa fa-angle-right"></i></button>
+                                    </div>
+                                  </form>
+                              </div>
+
+                              <div class="pnl-manager loginWithFbOrEmail hide">
+                                  <div class="email-login-container">
+                                     <div class="back-button ">
+                                      <button class="backToMainLogin pointer" type="button"><span style='font-size:26px;'>&#8592;</span></button>
+                                    </div>
+                                      <div class="email-login-title" ><span class="email-login-title-text">Have a Gmail or Facebook account?</span></div>
+                                      <div class="form-wrapper">
+                                          <div class="form-group material-input" style="display: none;">
+                                              <input maxlength="100" type="text" id="emailID" autocomplete="off" required="" name="emailId" class="form-control " value=""><span class="input-label no-floating">Email</span>
+                                              <div class="page-loader loader" style="display: none;"></div>
+                                              <p class="error-txt mail_vali_error activeEmailMode hide">Please enter your email<i class="error-icon-triangle"></i></p>
+                                          </div>
+                                          <button style="display: none;" type="button" class="submit-button pointer">continue &nbsp;<i class="fa fa-angle-right"></i></button>
+                                          <div class="or-divider deActiveEmailMode"><span class="or-divider-text"></span>
+                                          </div>
+
+                                          <div class="google-btn deActiveEmailMode">
+                                              <div class="fb-wrap ">
+                                                <a id="google_login" href="/accounts/google/login?next={{ request.get_full_path }}" class="btn btn-success"><i class="google-icon"></i><span class="googleTextAlign">Continue with Google</span></a></div>
+                                          </div>
+
+                                          <div class="fb-btn deActiveEmailMode">
+                                              <div class="fb-wrap "><a href="/accounts/google/login?next={{ request.get_full_path }}"><i class="fb-icon"></i><span>login with facebook</span></a></div>
+                                          </div>
+
+                                      </div>
+                                  </div>
+                              </div>
+
+                          </div>
+                          <div class="close-btn"></div>
+                      </div>
+                  </div>
+                </div>
+            </div> 
+        </div>
+    </div>
+
+<!-----------  Login Popup Script  ------------>
+<script src="/media/js/login_popup.js"></script>
+<!-----------End  ------------>
+
+
+{% endblock %}

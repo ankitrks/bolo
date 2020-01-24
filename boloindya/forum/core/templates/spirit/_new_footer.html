@@ -1,61 +1,85 @@
+
+{% load i18n %}
 <div class="jsx-157630181 footer-container">
             <div class="jsx-1541511338 download-container">
                 <div class="jsx-1541511338 download-content download-link">
-                    <h2 class="jsx-1541511338">Download</h2>
+                    <h2 class="jsx-1541511338">{% trans "Download" %}</h2>
                     <div class="jsx-1541511338 download-wrapper">
-                        <a href="#" target="_blank" rel="nofollow"><img src="media/apple_store.png" alt="apple-store" class="jsx-1541511338"></a>
-                        <a href="#" target="_blank" rel="nofollow"><img src="media/google_store.png" alt="google-store" class="jsx-1541511338"></a>
-                        <a href="#" target="_blank" rel="nofollow"><img src="media/amazon_store.png" alt="amazon-store" class="jsx-1541511338"></a>
+<!--                         <a href="#" target="_blank" rel="nofollow"><img src="/media/apple_store.png" alt="apple-store" class="jsx-1541511338"></a> -->
+                        <a href="https://play.google.com/store/apps/details?id=com.boloindya.boloindya&hl=en_IN" target="_blank" rel="nofollow"><img src="/media/google_store.png" alt="google-store" class="jsx-1541511338"></a>
+<!--                         <a href="#" target="_blank" rel="nofollow"><img src="/media/amazon_store.png" alt="amazon-store" class="jsx-1541511338"></a> -->
+
                     </div>
                 </div>
             </div>
 
                 <div class="jsx-157630181 footer-content-wrapper">
-                    <h1 class="jsx-157630181 boloindya-logo"><div class="jsx-832362280 logo-container"><img src="" class="jsx-832362280 logo-icon"><img src="" class="jsx-832362280 logo-text"></div><strong class="jsx-157630181">boloindya</strong></h1>
+                    <h1 class="jsx-157630181 boloindya-logo"><div class="jsx-832362280 logo-container"><!-- <img src="" class="jsx-832362280 logo-icon"> --><img src="/media/boloindya_logo.png" class="jsx-832362280 logo-text"></div><strong class="jsx-157630181">boloindya</strong></h1>
+                      <div class="footer-content-column">
+                        <h2>{% trans "Company" %}</h2>
+                        <h3><a class="" href="{{site_base_url}}about/">{% trans "About" %}</a></h3>
+                        <h3><a class="" href="{{site_base_url}}careers/">{% trans "Careers" %}</a></h3>
+                      </div>
                     <div class="footer-content-column">
-                        <h2>Company</h2>
-                        <h3><a class="" href="https://www.boloindya.com/about?lang=en">About</a></h3>
-                        <h3><a class="" href="https://newsroom.boloindya.com/">Newsroom</a></h3>
-                        <h3><a class="" href="https://www.boloindya.com/about/contact?lang=en">Contact</a></h3></div>
+                        <h2>{% trans "Programs" %}</h2>
+                        <h3><a class="" href="{{site_base_url}}about/contact/">{% trans "Discover" %}</a></h3>
+
+                      </div>
                     <div class="footer-content-column">
-                        <h2>Programs</h2>
-                        <h3><a class="" href="https://www.boloindya.com/forgood" target="_blank">boloindya for Good</a></h3>
-                        <h3><a class="" href="https://ads.boloindya.com/?refer=boloindya_web" target="_blank">Advertise on boloindya</a></h3></div>
+                        <h2>{% trans "Support" %}</h2>
+                        <h3><a class="" href="{{site_base_url}}help_support">{% trans "Help Center" %}</a></h3>
+                        <!-- <h3><a class="" href="{{site_base_url}}en/safety">{% trans "Safety Center" %}</a></h3> -->
+
+                    </div>
                     <div class="footer-content-column">
-                        <h2>Support</h2>
-                        <h3><a class="" href="https://support.boloindya.com/en">Help Center</a></h3>
-                        <h3><a class="" href="https://www.boloindya.com/en/safety">Safety Center</a></h3>
-                        <h3><a class="" href="https://support.boloindya.com/en/privacy-safety/community-policy-en">Community Guidelines</a></h3></div>
-                    <div class="footer-content-column">
-                        <h2>Legal</h2>
-                        <h3><a class="" href="https://www.boloindya.com/en/terms-of-use">Terms of Service</a></h3>
-                        <h3><a class="" href="https://www.boloindya.com/en/privacy-policy">Privacy Policy</a></h3>
-                        <h3><a class="" href="https://www.boloindya.com/en/law-enforcement">Law Enforcement</a></h3>
-                        <h3><a class="" href="https://www.boloindya.com/en/copyright-policy">Copyright Policy</a></h3></div>
+                        <h2>{% trans "Legal" %}</h2>
+                        <h3><a class="" href="{{site_base_url}}terms-of-service">{% trans "Terms of Service" %}</a></h3>
+                        <h3><a class="" href="{{site_base_url}}privacy-policy">{% trans "Privacy Policy" %}</a></h3>
+                    </div>
                 </div>
                 <div class="jsx-157630181 footer-bottom-wrapper">
                     <div class="jsx-1724846817 jsx-1667329752 language-selection">
-                        <p class="jsx-1724846817 jsx-1667329752">English</p>
-                        <select class="jsx-1724846817 jsx-1667329752 language-selection-form">
-                            <option value="id">Bahasa Indonesia</option>
-                            <option value="de">Deutsch</option>
-                            <option selected="" value="en">English</option>
-                            <option value="es">Español</option>
-                            <option value="fr">Français</option>
-                            <option value="it">Italiano</option>
-                            <option value="pl">Polski</option>
-                            <option value="pt_BR">Português</option>
-                            <option value="vi">Tiếng Việt</option>
-                            <option value="tr">Türkçe</option>
-                            <option value="ru">Русский</option>
-                            <option value="hi">हिन्दी</option>
-                            <option value="ko">한국어</option>
-                            <option value="ja">日本語</option>
-                            <option value="zh_Hant">繁體中文</option>
-                            <option value="ar">العربية</option>
-                        </select>
+
+
+
+                      {% get_current_language as LANGUAGE_CODE %}
+                      {% get_available_languages as LANGUAGES %}
+                      {% get_language_info_list for LANGUAGES as languages %}
+                      {% for language in languages %}
+                        {% if language.code == LANGUAGE_CODE %}
+                          <p class="jsx-1724846817 jsx-1667329752">{{ language.name_local }}</p>
+                        {% endif %}
+                      {% endfor %}
+
+                        <li class="dropdown " id="language-switcher" style="list-style: none;position: unset;">
+                            <form action="{% url 'set_language' %}" method="post">
+                                {% csrf_token %}
+                                <input name="next" type="hidden" value="{{ redirect_to }}" />
+
+                                <select class="selectpicker jsx-1724846817 jsx-1667329752 language-selection-form " name="{% trans 'language' %}"  onchange="this.form.submit()">
+                                  {% get_current_language as LANGUAGE_CODE %}
+                                  {% get_available_languages as LANGUAGES %}
+                                  {% get_language_info_list for LANGUAGES as languages %}
+                                  {% for language in languages %}
+
+                                      <option
+                                        value="{{ language.code }}"
+                                        {% if language.code == LANGUAGE_CODE %} selected="selected"{% endif %}
+                                        data-content='<img src="/static/img/flags/{{ language.code }}.png"></span>
+                                        <span style="display:inline-block; width:100px; padding-left: 10px; text-shadow:none">
+                                          {{ language.name_local }}
+                                          <!-- span style="color:#999;">&nbsp;[{{ language.code }}]</span -->
+                                        </span>'>
+                                        {{ language.name_local }}
+                                      </option>
+
+                                  {% endfor %}
+                                </select>
+                            </form>
+                        </li>
+
                     </div>
-                    <div class="jsx-157630181 copyright">© 2019 boloindya</div>
+                    <div class="jsx-157630181 copyright">© 2020 boloindya</div>
                 </div>
             </div>
         </div>
@@ -63,596 +87,10 @@
 
 <input type="hidden" name="onLoadPlayCheck" id="onLoadPlayCheck" value="0">
 
-<script type="text/javascript">
-jQuery("#boloSideMenu").click(function(e){
-      e.stopPropagation();
 
-      var checClass="";
-       checClass=jQuery(".boloSideMenuClass").hasClass('hamburger-menu-active');
-        if(checClass){
-            jQuery(".boloSideMenuClass").removeClass('hamburger-menu-active');  
-            jQuery(".drawerOpenAndClose").removeClass('drawer-enter drawer-enter-active');
-            jQuery(".drawerOpenAndClose").addClass('drawer-exit drawer-exit-active');  
-            jQuery(".drawer-enter-done").addClass('hide');
-      }else {
-            jQuery(".boloSideMenuClass").addClass('hamburger-menu-active'); 
-            jQuery(".boloSideMenuClass").removeClass('drawer-exit drawer-exit-active');
-            jQuery(".drawerOpenAndClose").addClass('drawer-enter drawer-enter-active');
-            jQuery(".drawer-enter-done").removeClass('hide');
-      }
+<!-- End of Registration Modal -->
 
-});
-jQuery('body,html').click(function(e){
-
-      var checClass="";
-       checClass=jQuery(".boloSideMenuClass").hasClass('hamburger-menu-active');
-        if(checClass){
-            jQuery(".boloSideMenuClass").removeClass('hamburger-menu-active');  
-            jQuery(".drawerOpenAndClose").removeClass('drawer-enter drawer-enter-active');
-            jQuery(".drawerOpenAndClose").addClass('drawer-exit drawer-exit-active');  
-            jQuery(".drawer-enter-done").addClass('hide');
-      }
-});
-
-</script>
-
-
-
-
-
-<script type="text/javascript">
-  var playList=[{
-                    "feedid": "Q352cyuc1",
-                    "mediaid": "iLwfYW2S-864",
-                    "link": "https://boloindyapp-prod.s3.amazonaws.com/public/video_bytes/Mownica_Chavithini_storageemulated0MoviesB612B612_20191102_233407_441.mp4",
-                    "file": "https://boloindyapp-prod.s3.amazonaws.com/public/video_bytes/Mownica_Chavithini_storageemulated0MoviesB612B612_20191102_233407_441.mp4",
-                    "image": "https://boloindyapp-prod.s3.amazonaws.com/public/video_byte_thumbnails/Mownica_Chavithini_img1572718117611.jpg",
-                    "title": "Puzzle 02",
-                    "proImg":"https://s3.amazonaws.com/boloindya/thumbnail/img-156580517089.jpg",
-                    "totalView":"10,102",
-                    "totallikes":"1,588",
-                    "totaldislikes":"6",
-                    "new_status":"",
-                    "totallikePercentage":"100"
-                    },{
-                    "feedid": "Q352cyuc1",
-                    "mediaid": "iLwfYW2S-104",
-                    "proImg":"https://s3.amazonaws.com/boloindya/thumbnail/img-156580517089.jpg",
-                    "link": "https://d1fa4tg1fvr6nj.cloudfront.net/elastic-transcoder/output/hls/c09ccee33a9ac0d5944100481fffa1f1cf6fdc4c9bf6997128ba22299c45517a/hls_c09ccee33a9ac0d5944100481fffa1f1cf6fdc4c9bf6997128ba22299c45517a.m3u8",
-                    "file": "https://d1fa4tg1fvr6nj.cloudfront.net/elastic-transcoder/output/hls/c09ccee33a9ac0d5944100481fffa1f1cf6fdc4c9bf6997128ba22299c45517a/hls_c09ccee33a9ac0d5944100481fffa1f1cf6fdc4c9bf6997128ba22299c45517a.m3u8",
-                    "image": "https://boloindyapp-prod.s3.amazonaws.com/public/video_byte_thumbnails/Sri_Manaswini_img1572541522907.jpg",
-                    "title": "Set Theory 1 ",
-                    "totalView":"17,022",
-                    "totallikes":"1,480",
-                    "totaldislikes":"11",
-                    "new_status":"",
-                    "totallikePercentage":"99"
-                    },{
-                    "feedid": "Q352cyuc1",
-                    "mediaid": "iLwfYW2S-105",
-                    "proImg":"https://s3.amazonaws.com/boloindya/thumbnail/img-156580517089.jpg",
-                    "link": "https://d1fa4tg1fvr6nj.cloudfront.net/elastic-transcoder/output/hls/82c7c27909c50a78b23b28557b01f98424736d565f0aaa8a797419e52a9fa5f6/hls_82c7c27909c50a78b23b28557b01f98424736d565f0aaa8a797419e52a9fa5f6.m3u8",
-                    "file": "https://boloindya-et.s3.amazonaws.com/elastic-transcoder/output/hls/82c7c27909c50a78b23b28557b01f98424736d565f0aaa8a797419e52a9fa5f6/hls_82c7c27909c50a78b23b28557b01f98424736d565f0aaa8a797419e52a9fa5f6.m3u8",
-                    "image": "https://boloindyapp-prod.s3.amazonaws.com/public/video_byte_thumbnails/Sri_Manaswini_img1572709372982.jpg",
-                    "title": "Set Theory 2",
-                    "totalView":"39,281",
-                    "totallikes":"1,208",
-                    "totaldislikes":"2",
-                    "new_status":"",
-                    "totallikePercentage":"100"
-                    },{
-                    "feedid": "Q352cyuc1",
-                    "mediaid": "iLwfYW2S-106",
-                    "proImg":"https://s3.amazonaws.com/boloindya/thumbnail/img-156580517089.jpg",
-                    "link": "https://d1fa4tg1fvr6nj.cloudfront.net/elastic-transcoder/output/hls/894ab7996e666fea6c0707919a41d74d21ae1576871dfd4fbb93c69dd62bf60b/hls_894ab7996e666fea6c0707919a41d74d21ae1576871dfd4fbb93c69dd62bf60b.m3u8",
-                    "file": "https://d1fa4tg1fvr6nj.cloudfront.net/elastic-transcoder/output/hls/894ab7996e666fea6c0707919a41d74d21ae1576871dfd4fbb93c69dd62bf60b/hls_894ab7996e666fea6c0707919a41d74d21ae1576871dfd4fbb93c69dd62bf60b.m3u8",
-                    "image": "https://boloindyapp-prod.s3.amazonaws.com/public/video_byte_thumbnails/Sri_Manaswini_img1572632324983.jpg",
-                    "title": "Set Theory 3",
-                    "totalView":"15,915",
-                    "totallikes":"1,444",
-                    "totaldislikes":"9",
-                    "new_status":"",
-                    "totallikePercentage":"99"
-                    },{
-                    "feedid": "Q352cyuc1",
-                    "mediaid": "iLwfYW2S-107",
-                    "proImg":"https://s3.amazonaws.com/boloindya/thumbnail/img-156580517089.jpg",
-                    "link": "https://d1fa4tg1fvr6nj.cloudfront.net/elastic-transcoder/output/hls/57554710cae1a0ed3e39a06e2def56be82c76cd6da5f5d8fff87c351ce891a24/hls_57554710cae1a0ed3e39a06e2def56be82c76cd6da5f5d8fff87c351ce891a24.m3u8",
-                    "file": "https://d1fa4tg1fvr6nj.cloudfront.net/elastic-transcoder/output/hls/57554710cae1a0ed3e39a06e2def56be82c76cd6da5f5d8fff87c351ce891a24/hls_57554710cae1a0ed3e39a06e2def56be82c76cd6da5f5d8fff87c351ce891a24.m3u8",
-                    "image": "https://boloindyapp-prod.s3.amazonaws.com/public/video_byte_thumbnails/Sri_Manaswini_img1572710117954.jpg",
-                    "title": "Set Theory 4",
-                    "totalView":"15,889",
-                    "totallikes":"1,376",
-                    "totaldislikes":"4",
-                    "new_status":"",
-                    "totallikePercentage":"100"
-                    },{
-                    "feedid": "Q352cyuc1",
-                    "mediaid": "iLwfYW2S-108",
-                    "proImg":"https://s3.amazonaws.com/boloindya/thumbnail/img-156580517089.jpg",
-                    "link": "https://boloindya-et.s3.amazonaws.com/elastic-transcoder/output/hls/a3cff5e855772d6569c6d5b3f59cbadefcfbb0961ae79cea41cd70f1b4835bf1/hls_a3cff5e855772d6569c6d5b3f59cbadefcfbb0961ae79cea41cd70f1b4835bf1.m3u8",
-                    "file": "https://boloindya-et.s3.amazonaws.com/elastic-transcoder/output/hls/a3cff5e855772d6569c6d5b3f59cbadefcfbb0961ae79cea41cd70f1b4835bf1/hls_a3cff5e855772d6569c6d5b3f59cbadefcfbb0961ae79cea41cd70f1b4835bf1.m3u8",
-                    "image": "https://boloindyapp-prod.s3.amazonaws.com/public/video_byte_thumbnails/Sri_Manaswini_img1572628502332.jpg",
-                    "title": "Set Theory 5",
-                    "totalView":"18,524",
-                    "totallikes":"1,552",
-                    "totaldislikes":"2",
-                    "new_status":"",
-                    "totallikePercentage":"100"
-                    },{
-                    "feedid": "Q352cyuc1",
-                    "mediaid": "iLwfYW2S-507",
-                    "proImg":"https://s3.amazonaws.com/boloindya/thumbnail/img-156580517089.jpg",
-                    "link": "https://d1fa4tg1fvr6nj.cloudfront.net/elastic-transcoder/output/hls/9c81fc294bd8742a6d8fa897ad710da67c5636e70a9f81e1e02f89da9ce659a9/hls_9c81fc294bd8742a6d8fa897ad710da67c5636e70a9f81e1e02f89da9ce659a9.m3u8",
-                    "file": "https://d1fa4tg1fvr6nj.cloudfront.net/elastic-transcoder/output/hls/9c81fc294bd8742a6d8fa897ad710da67c5636e70a9f81e1e02f89da9ce659a9/hls_9c81fc294bd8742a6d8fa897ad710da67c5636e70a9f81e1e02f89da9ce659a9.m3u8",
-                    "image": "https://boloindyapp-prod.s3.amazonaws.com/public/video_byte_thumbnails/Sri_Manaswini_img1572630854258.jpg",
-                    "title": "Word List- A (1-5)",
-                    "totalView":"16,755",
-                    "totallikes":"2,746",
-                    "totaldislikes":"12",
-                    "new_status":"",
-                    "totallikePercentage":"100"
-                    },{
-                    "feedid": "Q352cyuc1",
-                    "mediaid": "iLwfYW2S-508",
-                    "proImg":"https://s3.amazonaws.com/boloindya/thumbnail/img-156580517089.jpg",
-                    "link": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/vocab1.2/hls_vocab1.2.m3u8",
-                    "file": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/vocab1.2/hls_vocab1.2.m3u8",
-                    "image": "https://careeranna.com/thumbnail/2019-01-02-25017-thumbnail.jpg",
-                    "title": "Word List A (6-10)",
-                    "totalView":"14,253",
-                    "totallikes":"2,843",
-                    "totaldislikes":"14",
-                    "new_status":"",
-                    "totallikePercentage":"100"
-                    },{
-                    "feedid": "Q352cyuc1",
-                    "mediaid": "iLwfYW2S-509",
-                    "proImg":"https://s3.amazonaws.com/boloindya/thumbnail/img-156580517089.jpg",
-                    "link": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/vocab1.3/hls_vocab1.3.m3u8",
-                    "file": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/vocab1.3/hls_vocab1.3.m3u8",
-                    "image": "https://careeranna.com/thumbnail/2019-01-02-38935-thumbnail.jpg",
-                    "title": "Word List A (11-15)",
-                    "totalView":"12,581",
-                    "totallikes":"2,815",
-                    "totaldislikes":"11",
-                    "new_status":"",
-                    "totallikePercentage":"100"
-                    },{
-                    "feedid": "Q352cyuc1",
-                    "mediaid": "iLwfYW2S-510",
-                    "proImg":"https://s3.amazonaws.com/boloindya/thumbnail/img-156580517089.jpg",
-                    "link": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/vocab_1.4/hls_vocab_1.4.m3u8",
-                    "file": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/vocab_1.4/hls_vocab_1.4.m3u8",
-                    "image": "https://careeranna.com/thumbnail/2019-01-02-13277-thumbnail.jpg",
-                    "title": "Word List A (16-20)",
-                    "totalView":"16,155",
-                    "totallikes":"2,803",
-                    "totaldislikes":"12",
-                    "new_status":"",
-                    "totallikePercentage":"100"
-                    },{
-                    "feedid": "Q352cyuc1",
-                    "mediaid": "iLwfYW2S-529",
-                    "proImg":"https://s3.amazonaws.com/boloindya/thumbnail/img-156580517089.jpg",
-                    "link": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/vocab_1.5/hls_vocab_1.5.m3u8",
-                    "file": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/vocab_1.5/hls_vocab_1.5.m3u8",
-                    "image": "https://careeranna.com/thumbnail/2019-01-03-54889-thumbnail.jpg",
-                    "title": "Word List A (21-25)",
-                    "totalView":"12,935",
-                    "totallikes":"2,282",
-                    "totaldislikes":"6",
-                    "new_status":"",
-                    "totallikePercentage":"100"
-                    },{
-                    "feedid": "Q352cyuc1",
-                    "mediaid": "iLwfYW2S-530",
-                    "proImg":"https://s3.amazonaws.com/boloindya/thumbnail/img-156580517089.jpg",
-                    "link": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/vocab_1.6/hls_vocab_1.6.m3u8",
-                    "file": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/vocab_1.6/hls_vocab_1.6.m3u8",
-                    "image": "https://careeranna.com/thumbnail/2019-01-03-7500-thumbnail.jpg",
-                    "title": "Word List A (26-30)",
-                    "totalView":"17,776",
-                    "totallikes":"2,610",
-                    "totaldislikes":"11",
-                    "new_status":"",
-                    "totallikePercentage":"100"
-                    },{
-                    "feedid": "Q352cyuc1",
-                    "mediaid": "iLwfYW2S-531",
-                    "proImg":"https://s3.amazonaws.com/boloindya/thumbnail/img-156580517089.jpg",
-                    "link": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/vocab_1.7/hls_vocab_1.7.m3u8",
-                    "file": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/vocab_1.7/hls_vocab_1.7.m3u8",
-                    "image": "https://careeranna.com/thumbnail/2019-01-03-88510-thumbnail.jpg",
-                    "title": "Word List A (31-35)",
-                    "totalView":"14,604",
-                    "totallikes":"3,123",
-                    "totaldislikes":"11",
-                    "new_status":"",
-                    "totallikePercentage":"100"
-                    },{
-                    "feedid": "Q352cyuc1",
-                    "mediaid": "iLwfYW2S-532",
-                    "proImg":"https://s3.amazonaws.com/boloindya/thumbnail/img-156580517089.jpg",
-                    "link": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/VOCAB_1.8/hls_VOCAB_1.8.m3u8",
-                    "file": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/VOCAB_1.8/hls_VOCAB_1.8.m3u8",
-                    "image": "https://careeranna.com/thumbnail/2019-01-03-12144-thumbnail.jpg",
-                    "title": "Commonly Confused Words (36-40)",
-                    "totalView":"15,319",
-                    "totallikes":"2,743",
-                    "totaldislikes":"6",
-                    "new_status":"",
-                    "totallikePercentage":"100"
-                    },{
-                    "feedid": "Q352cyuc1",
-                    "mediaid": "iLwfYW2S-533",
-                    "proImg":"https://s3.amazonaws.com/boloindya/thumbnail/img-156580517089.jpg",
-                    "link": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/vocab_2.1/hls_vocab_2.1.m3u8",
-                    "file": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/vocab_2.1/hls_vocab_2.1.m3u8",
-                    "image": "https://careeranna.com/thumbnail/2019-01-03-67305-thumbnail.jpg",
-                    "title": "Word List B (41-45)",
-                    "totalView":"16,849",
-                    "totallikes":"2,582",
-                    "totaldislikes":"10",
-                    "new_status":"",
-                    "totallikePercentage":"100"
-                    },{
-                    "feedid": "Q352cyuc1",
-                    "mediaid": "iLwfYW2S-534",
-                    "proImg":"https://s3.amazonaws.com/boloindya/thumbnail/img-156580517089.jpg",
-                    "link": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/vocab_2.2/hls_vocab_2.2.m3u8",
-                    "file": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/vocab_2.2/hls_vocab_2.2.m3u8",
-                    "image": "https://careeranna.com/thumbnail/2019-01-03-10648-thumbnail.jpg",
-                    "title": "Word List B (46-50)",
-                    "totalView":"19,412",
-                    "totallikes":"2,675",
-                    "totaldislikes":"5",
-                    "new_status":"",
-                    "totallikePercentage":"100"
-                    },{
-                    "feedid": "Q352cyuc1",
-                    "mediaid": "iLwfYW2S-535",
-                    "proImg":"https://s3.amazonaws.com/boloindya/thumbnail/img-156580517089.jpg",
-                    "link": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/vocab_2.3/hls_vocab_2.3.m3u8",
-                    "file": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/vocab_2.3/hls_vocab_2.3.m3u8",
-                    "image": "https://careeranna.com/thumbnail/2019-01-03-67417-thumbnail.jpg",
-                    "title": "Word List B (51-55)",
-                    "totalView":"14,458",
-                    "totallikes":"2,366",
-                    "totaldislikes":"4",
-                    "new_status":"",
-                    "totallikePercentage":"100"
-                    },{
-                    "feedid": "Q352cyuc1",
-                    "mediaid": "iLwfYW2S-536",
-                    "proImg":"https://s3.amazonaws.com/boloindya/thumbnail/img-156580517089.jpg",
-                    "link": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/vocab_2.4/hls_vocab_2.4.m3u8",
-                    "file": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/vocab_2.4/hls_vocab_2.4.m3u8",
-                    "image": "https://www.careeranna.com/img/be8d108f.jpg",
-                    "title": "Word List B (56-60)",
-                    "totalView":"17,948",
-                    "totallikes":"3,166",
-                    "totaldislikes":"6",
-                    "new_status":"",
-                    "totallikePercentage":"100"
-                    },{
-                    "feedid": "Q352cyuc1",
-                    "mediaid": "iLwfYW2S-537",
-                    "proImg":"https://s3.amazonaws.com/boloindya/thumbnail/img-156580517089.jpg",
-                    "link": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/vocab_2.5/hls_vocab_2.5.m3u8",
-                    "file": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/vocab_2.5/hls_vocab_2.5.m3u8",
-                    "image": "https://careeranna.com/thumbnail/2019-01-03-22962-thumbnail.jpg",
-                    "title": "Word List B (61-65)",
-                    "totalView":"14,998",
-                    "totallikes":"2,801",
-                    "totaldislikes":"13",
-                    "new_status":"",
-                    "totallikePercentage":"100"
-                    },{
-                    "feedid": "Q352cyuc1",
-                    "mediaid": "iLwfYW2S-538",
-                    "proImg":"https://s3.amazonaws.com/boloindya/thumbnail/img-156580517089.jpg",
-                    "link": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/vocab_3.1/hls_vocab_3.1.m3u8",
-                    "file": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/vocab_3.1/hls_vocab_3.1.m3u8",
-                    "image": "https://careeranna.com/thumbnail/2019-01-03-58431-thumbnail.jpg",
-                    "title": "Word List C (66-70)",
-                    "totalView":"14,487",
-                    "totallikes":"2,501",
-                    "totaldislikes":"15",
-                    "new_status":"",
-                    "totallikePercentage":"99"
-                    },{
-                    "feedid": "Q352cyuc1",
-                    "mediaid": "iLwfYW2S-539",
-                    "proImg":"https://s3.amazonaws.com/boloindya/thumbnail/img-156580517089.jpg",
-                    "link": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/vocab_3.2/hls_vocab_3.2.m3u8",
-                    "file": "https://s3.amazonaws.com/elastictranscode.videos/transcoded_new_url3/vocab_3.2/hls_vocab_3.2.m3u8",
-                    "image": "https://careeranna.com/thumbnail/2019-01-03-34666-thumbnail.jpg",
-                    "title": "Word List C (71-75)",
-                    "totalView":"11,136",
-                    "totallikes":"2,933",
-                    "totaldislikes":"9",
-                    "new_status":"",
-                    "totallikePercentage":"100"
-                    }];                              
-
-var tracks=[{"kind": "thumbnails", "file": "https://cdn.jwplayer.com/strips/QYgO4kau-120.vtt"}];
-
-var feedData={
-    "description":"MBAplaylist description.",
-    "feed_instance_id":"d6af95b2-6c0f-47dd-bd03-0a65308ac236",
-    "feedid":"Q352cyuc1",
-    "kind":"DYNAMIC",
-    "playlist":playList,
-    "tags":"comedy,trailer,absurdist,woody allen",
-    "title":"Recommended Videos",
-};
-
-</script>
-
-<script type="text/javascript">
-(function() {
-  var listItems="";
-  var itemCount=0;
-
-    playList.forEach(function(itemVideo) {itemCount++;
-      var isPlaying="";
-      var isPlayIconDis="none";
-      if(itemCount==1){
-        isPlaying='is-playing';
-        isPlayIconDis="block";
-      }
-      
-      //onClick="openVideoInPopup(\'Q352cyuc1\',\'Q352cyuc1\')"
-      listItems +='<div class="_video_feed_item"><div class="_ratio_"><div style="padding-top: 148.148%;"><div class="_ratio_wrapper"><a onClick="openVideoInPopup(\''+itemVideo.file+'\',\''+itemVideo.image+'\');"  class="js-video-link playlist-item '+isPlaying+'" data-mediaid="'+itemVideo.mediaid+'"  href="javascript:void(0);"><div class="_image_card_" style="border-radius: 4px; background-image: url('+itemVideo.image+');"><div class="_video_card_play_btn_ _video_card_play_btn_dark _image_card_playbtn_wraaper"></div><div class="_video_card_footer_ _video_card_footer_respond _image_card_footer_wraaper"><span class="_avatar_ _avatar_respond" style="background-image: url('+itemVideo.image+');"></span><span class="_video_card_footer_likes"><img src="media/download.svg" alt="likes"> 364.6k</span></div></div></a></div></div></div></div>';
-
-      // listItems +='<li><a class="js-video-link playlist-item '+isPlaying+'" href="javascript:void(0)" data-mediaid="'+itemVideo.mediaid+'"><span class="playIcon" style="display: '+isPlayIconDis+';">▶</span><div class="play_btn"><img src="'+itemVideo.image+'" alt="'+itemVideo.title+'"></div><div class="right_sec"><h5 class="video_title">'+itemVideo.title+'</h5><div class="views">'+itemVideo.totalView+' views . Likes: <span class="likRatio"> '+itemVideo.totallikes+'</span></div><div class="new_video"></div></div></a></li>';
-    });
-    $("#playlist").append(listItems);
- })();
-
-
-$("figure").mouseleave(
-  function () {
-    $(this).removeClass("hover");
-  }
-);
-                      
-</script>
-
-
-<script type="text/javascript">
-  
-
-
-
-</script>
-
-<script type="text/javascript">
-  
-
-
-</script>
-
-<script type="text/javascript">
-
-
-
-// (function() {
-//   var apiRoute = 'https://www.careeranna.com/demo/video_feedstatus/',
-//       feeds = [
-//         'Q352cyuc1',
-//         'oR7ahO0J'
-//       ],
-//       playlistsTemplate = $('#js-playlist-template').html(),
-//       playerInstance;
-
-//   var setupPlayer = function(thisFeed) {
-//     // Initialize the player
-//     console.log(thisFeed.playlist);
-//     playerInstance = jwplayer('player').setup({
-//       playlist: thisFeed.playlist,
-//       visualplaylist: true,
-//       autostart: true,
-//       aspectratio: "16:9",
-//       controls: false,
-//       mute:true,
-//       // width: '100%',
-//        height:'500px'
-//     });
-
-//     // Change the highlighted item in the playlist when the video changes
-//     playerInstance.on('playlistItem', setActiveVideo);
-
-//   };
-  
-
-//   var setActiveVideo = function(e) {
-//     var feedid = e.item.feedid,
-//         mediaid = e.item.mediaid;
-
-
-//       $('.js-video-link').removeClass('is-playing').filter(function() {
-//       return $(this).data('mediaid') === mediaid &&
-//         $(this).closest('.js-playlist').data('feedid') === feedid;
-//     }).addClass('is-playing');
-//   };
-
-//   var setActivePlaylist = function(e) {
-//     // Switch the visible playlist when its label is clicked
-//     var captured = $(this);
-//     e.preventDefault();
-
-//     if (!captured.hasClass('is-active')) {
-//       // Change the active playlist link
-//       $('.js-playlist-link').removeClass('is-active');
-//       captured.addClass('is-active');
-
-//       // Change the active visible playlist
-//       $('.js-playlist').removeClass('is-active').filter(function() {
-//         return $(this).data('feedid') === captured.data('feedid');
-//       }).addClass('is-active');
-//     }
-//   };
-
-//   var setPlayerVideo = function(e) {
-//     var captured = $(this),
-//         feedid = captured.closest('.js-playlist').data('feedid'),
-//         mediaid = captured.data('mediaid');
-//     // Gotta get the right playlist for this particular video link
-//     var currentPlaylist = feeds.filter(function(thisFeed) {
-       
-//       return thisFeed.playlist.some(function(thisVideo) {
-         
-//         return thisVideo.mediaid === mediaid && thisVideo.feedid === feedid;
-//       });
-//     }).shift().playlist;
-
-//     // Get the index of the video that matches this link's mediaid
-//     var videoIndex = currentPlaylist.findIndex(function(el) {
-//       return mediaid === el.mediaid;
-//     });
-
-//     e.preventDefault();
-
-//     // Only load this playlist if the player's current playlist is different
-//     if (currentPlaylist !== playerInstance.getPlaylist()) {
-//       playerInstance.load(currentPlaylist);
-//     }
-
-//     // Tell the player to play the video at this playlist index
-//     playerInstance.playlistItem(videoIndex);
-//     //on video change add the id for scroll effect on video
-//     $('.jwBox').attr('id','jwBox');
-
-//   };
-
-//   var renderTemplate = function() {
-//     var playlistsContainer = $('#js-playlists');
-//     //playlistsContainer.append(Handlebars.compile(playlistsTemplate)(feeds));
-//     if($("#onLoadPlayCheck").val()==1){
-//         $("#modelPopup").show();
-//         jwplayer('player').setMute(false);
-//         var newSrc='media/mute_icon.svg';
-//         $('#mutedImageId').attr('src', newSrc);
-//         $('.videoPlayButton').removeClass('_video_card_playbtn_wraaper');
-//     }
-//     $("#onLoadPlayCheck").val(1);
-//     // Create a delegate click event for playlist items
-//     playlistsContainer.on('click', '.js-video-link', setPlayerVideo);
-//     playlistsContainer.on('click', '.js-playlist-link', setActivePlaylist);
-//   };
-
-//   $.when.apply($, feeds.map(function(feedid) {
-//     // Use jQuery Deferreds to make sure all of the feeds are loaded before
-//     // rendering them or trying to initialize the player.
-//     var def = $.Deferred();
-
-//     var data={"success":"tue"};
-
-//     def.resolve(data);
-//     return def.promise();
-//   })).then(function() {
-
-//     var feedList=feedData;
-//     // replace the feeds array with all of the now-fetched feed objects
-//     feeds = $.makeArray(feedList);
-//    // var parsed = JSON.parse(arguments);
-//    // console.log(parsed);
-//    var feeds1 = $.map(arguments, function(el) { return el });
-//     feeds2 = $.makeArray(arguments);
-//     renderTemplate();
-//     setupPlayer(feeds[0]);
-//   });
-
-
-
-// })();
-
-
-$("#jwBox").click(function(){
-  var plaerState=jwplayer('player').getState();
-
-  if( jwplayer('player').getState() == "playing" || jwplayer(this).getState() == "buffering" ) {
-          jwplayer('player').pause();
-          $('.videoPlayButton').removeClass('_video_card_playbtn_wraaper');
-          $('.videoPlayButton').addClass('_video_card_playbtn_wraaper');
-          
-      }else{
-        var newSrc='media/mute_icon.svg';
-        $('#mutedImageId').attr('src', newSrc);
-        jwplayer('player').play(true);
-        jwplayer('player').setMute(false);
-        $('.videoPlayButton').removeClass('_video_card_playbtn_wraaper');
-      }
-  
-});
-
-$('.videoPlayButton').click(function(){debugger;
-      var newSrc='media/mute_icon.svg';
-      $('#mutedImageId').attr('src', newSrc);
-      $('.videoPlayButton').removeClass('_video_card_playbtn_wraaper');
-      jwplayer('player').setMute(false);
-      jwplayer('player').play(true);
-});
-
- var player;
- function openVideoInPopup(file,image){
-
-  $("#modelPopup").show();
-  jwplayer('player').setMute(false);
-  var newSrc='media/mute_icon.svg';
-  $('#mutedImageId').attr('src', newSrc);
-  $('.videoPlayButton').removeClass('_video_card_playbtn_wraaper');
-
-    if (player) {
-      player.remove();
-    }
-
-    // Chain .play() onto player setup (rather than autostart: true)
-    player = jwplayer('player').setup({
-      file: file,
-      controls: false,
-      image:image
-    }).play();
-
-    // Destroy the player and replace with thumbnail
-    player.on('complete', function() {
-    jwplayer('player').setMute(true);
-    $("#modelPopup").hide();
-      player.remove();
-      player = null;
-    });
-
-
- }
-
-
-
-
- $("._global_modal_cancel").click(function(){
-  jwplayer('player').setMute(true);
-    $("#modelPopup").hide();
-    
-        
-      //jwplayer('player') = null;
-    //$("#player").;
- });
-
-function muteAndUnmutePlayer(){
-  jwplayer().setMute();
-  var muteStatus=jwplayer('player').getMute();
-  if(muteStatus==true){
-    var newSrc='media/sound_mute.svg';
-    $('#mutedImageId').attr('src', newSrc);
-  }else{
-    var newSrc='media/mute_icon.svg';
-    $('#mutedImageId').attr('src', newSrc);
-  }
-
-}
-
-</script>
+<script src="/media/js/common.js"></script>
 
 
 

@@ -1,252 +1,65 @@
-{% extends "spirit/_index_base.html" %}
-{% load spirit_tags i18n %}
+{% extends "spirit/_new_base.html" %}
+{% load i18n %}
 {% block title %}BoloIndya{% endblock %}
 {% block content %}
 <style>
-    .upper_tab {
-            background: #f1f0f0;
-            padding: 30px 0px;
-        }
-        .get_your_bolo_app {
-            font-size: 65px;
-        }
-        .get_your_bolo_app span{
-            font-weight: 600;
-        }
-        .get_your_bolo_app img {
-            margin-left: 20px;
-        }
-        .card_profile .line{
-            height: 1px;width: 100%;background: rgba(0,0,0,0.4);margin: 15px 0px;
-        }
-        .card_profile .description {
-            font-size: 16px;
-            padding-left: 5px;
-        }
-        .card_profile .profile_name {
-            font-weight: 700;
-        }
-        .card_profile .profile_name span{
-            font-weight: 400;
-        }
-        .card_profile .about {
-            font-size: 13px;
-        }
-        .ask_question {
-            text-align: center;
-        }
-        .ask_question .row .ask_english{
-            background: white;
-            padding: 10px 29%;
-            border-radius: 4px;
-            -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.25);
-            -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.25);
-            box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.25);
-        }
-        .ask_question .row .ask_hindi{
-            background: #BB3335;
-            border-radius: 4px;
-            color: white;
-            padding: 10px 29%;
-            transition: all 0.3s ease-in-out;
-            -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.25);
-            -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.25);
-            box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.25);
-        }
-        .play_store_pic {
-            padding: 20px 0px;
-        }
-        .play_store_pic img{
-            margin-left: 40px;
-        }
-        .lower_tab {
-            padding: 30px 0px;
-        }
-        .lower_tab .container h2 {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .lower_tab .container .choose_language_tabs {
-            text-align: center;
-        }
-        .lower_tab .container .choose_language_tabs .language{
-            background: #f1f0f0;
-            margin: 1%;
-            width: 23%;
-            font-size: 20px;
-            padding: 10px 0px;
-            border-radius: 4px;
-            -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.25);
-        }
-        .lower_tab .container .choose_language_tabs .language.active{
-            background: #CB3B3D;
-            color: white;
-            font-weight: 600;
-        }
-        .lower_tab .container h4 { 
-            text-align: center;
-            margin: 20px 0px;
-        }
-        .upcoming_languages {
-            text-align: center;
-            font-size: 18px;
-        }
-        .want_to_get_updated {
-            font-size: 18px;
-            font-weight: 600;   
-            margin-top: 30px; 
-            text-align: center;
-        }
-        .want_to_get_updated span{
-            opacity: 0.7;
-        }
-        form {
-            margin-top: 20px;
-            width: 70%;
-        }
-        form select {
-            width: 100%;
-            position: absolute;
-            bottom: 0;
-        }
-        form .submit {
-            width: 30%;
-            margin-left: 35%;
-            font-size: 13px;
-        }
-        .footer {
-            background: #f1f0f0;
-            padding: 30px 0px;
-        }
-        .social-icons li {
-            background: #323F4E;
-        }
-        .social-icons li .fab{
-            color: white;
-        }
-        .subscribe_form h4{
-            opacity: 0.7;
-            font-size: 20px;
-            font-weight: 700;
-        }
-        .footer_links {
-            padding: 10px;
-        }
-        .footer_links h6 {
-            font-size: 14px;
-            text-align: left;
-        }
-        .footer_links ul {
-            padding: 0px;
-        }
-        .footer_links ul li {
-            font-size: 12px;
-            text-align: left;
-        }
-        .subscribe_form {
-            width: 100%;
-        }
-        .form_group input[type=email]{
-            width: 200px;
-            font-size: 12px;
-        } 
-        .form_group input[type=submit]{
-            font-size: 12px;
-            width: 120px;
-            margin-left: 20px;
-        } 
-        .play_store_image_footer {
-            float: right;
-        }
-        @media (max-width:650px){
-            .get_your_bolo_app {
-                font-size: 16px;
-            }
-            .get_your_bolo_app img{ 
-                width: 95px;
-                margin-left: 10px;
-            }
-            .card_profile img{
-                margin-bottom: 10px;
-            }
-            .ask_english {
-                margin-bottom: 10px;
-            }
-            .play_store_pic img{
-                margin-left: 15%;
-                margin-bottom: 10px;
-            }
-            .lower_tab .container h2 {
-                font-size: 24px;
-            }
-            .lower_tab .container .choose_language_tabs .language{
-                width: 45%;
-                margin-left: 3%;
-                margin-bottom: 15px;
-            }
-            .lower_tab .container h4 { 
-                font-size: 20px;
-                text-decoration: underline;
-            }
-            form {
-                margin-left: 0px !important;
-            }
-            form .form_group {
-                margin: 20px 0px ;
-            }
-            form .submit {
-                width: 60%;
-                margin-left: 20%;
-                font-size: 13px;
-            }
-        }
+.upper_tab {
+    background: #fff;
+    padding: 30px 0px;
+    font-family: Arial;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+    margin-bottom: 30px;
+    color: rgb(79, 82, 90);
 
-    </style>
-<div class="upper_tab" style="height:800px;">
-    <div class="container">
-        <div style="text-align:center;font-size:30px;">About Us</div>
-        <div class="row m-0">
-            <p>Bolo Indya is a Platform on the mission to empower the language internet users with knowledge - Enable them to share views, gain and share knowledge through audio and video in their local Languages.</p> 
+}
+.base-layout-container {
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 70px;
+    margin: auto;
+    background: rgb(255, 255, 255);
+}
+.base-layout-container h1:first-child {
+    font-family: sofiapro-bold, PingFangSC, sans-serif;
+    font-weight: 700;
+    font-size: 48px;
+    line-height: 1;
+    margin-bottom: 48px;
+}
+.margin_bottom_20{
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
 
-            <p>It's an audio and video platform to ask questions and connect with people who contribute unique insights and quality answers.</p>
 
-            <p>Bolo Indya enables people to select language of their choice, ask question through audio/video on any topic of interest, and get its answer through audio and video - and learn from each other - making internet world the more valuable place to spend time, promoting an eco system which encourages healthy debates to arrive at definitive answers.</p>
+</style>
+<div class="jsx-193618068 base-layout-container">
+    <div class="upper_tab" style="min-height:300px;">
+        <div class="container">
+            <div class="margin_bottom_20" style="text-align:center;font-size:30px;">About Us</div>
+            <div class="row m-0">
 
-            <p>Let us together unlock the knowledge of 100 crore Indians, bring together different perspectives, understand interest areas better and make Internet a better world to live in, without giving away our love for our native languages.</p>
-           <br>
-            Bolo Indya
+                <p>India's fastest growing app for short knowledge videos in local languages. </p><br>
+
+
+                <p>Empowering users to create two-minute videos sharing their knowledge, experience and opinions across interest areas, and taking the videos to the local language audience sharing similar interest areas. </p><br>
+
+
+                <p>While video creators may earn as well as find a way to increase social capital, consumers become the part of a strongly knit interest-driven community. 
+
+
+
+                <p>In a short span of 9 months since launch,  Bolo Indya has crossed 1 lakh Monthly Active Users with 55,000+ Daily Active Users spending more than 16 min daily on the app.</p><br>
+
+
+                <p>More than 4 lakh videos have been created on Bolo Indya till today, garnering 248 crore views and being shared 7 crore times on the platform. </p><br>
+
+
+            </div>
         </div>
     </div>
 </div>
-<div class="footer" style="">
-    <div class="container">
-        <div class="row m-o">
-            <div class="col-md-5 col-12">
-                <div class="brand_name">
-                    Bolo Indya
-                </div>
-                <div class="copy_right">
-                    © Career Anna Education Pvt. Ltd. 2019
-                </div>
-                <ul class="social-icons">
-                    <li><a href=" https://www.facebook.com/BoloIndya/"><i class="fab fa-facebook-f"></i></a></li>
-                    <li><a href="https://www.instagram.com/bolo.indya/"><i class="fab fa-instagram"></i></a></li>
-                    <li><a href="https://twitter.com/Bolo_Indya"><i class="fab fa-twitter"></i></a></li>
-                    <li><a href="https://www.youtube.com/channel/UCvj2ejaJ0VcjUoigQoW6BHg"><i class="fab fa-youtube"></i></a></li>
-                </ul>
-            </div>
-            <div class="col-md-7 col-12">
-                <div class="row" style="float:right">
-                    <div class="footer_links">
-                        <h6>SUPPORT</h6>
-                        <ul>
-                            <li><a id="ga-2dc1d0" href="/about/">About Us</a></li>
-                            <li><a id="ga-2dc1d0" href="/privacy-policy/">Privacy Policy</a></li>
-                            <li><a id="ga-2dc1d0" href="/terms-of-service/">Terms of Service</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+
     {% endblock %}

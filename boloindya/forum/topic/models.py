@@ -93,7 +93,7 @@ class Topic(models.Model):
     language_id = models.CharField(_("language"), choices=language_options, blank = True, null = True, max_length=10, default='1')
     question_image = models.TextField(_("Question image"),null=True,blank=True)
     is_popular = models.BooleanField(_("Popular"), default = False)
-    is_pubsub_popular_push = models.BooleanField(_("Popular Push"), default = False)
+    is_pubsub_popular_push = models.BooleanField(_("Popular"), default = False)
 
     is_media = models.BooleanField(default=True)
     media_duration = models.CharField(_("duration"), max_length=20, default='',null=True,blank=True)
@@ -109,12 +109,14 @@ class Topic(models.Model):
     comment_count = models.PositiveIntegerField(_("comment count"), default=0)
     total_share_count = models.PositiveIntegerField(_("Total Share count"), default=0)# self plus comment
     share_count = models.PositiveIntegerField(_("Share count"), default=0)# only topic share
+    imp_count = models.PositiveIntegerField(_("views"), default=0)
     # share_user = models.ForeignKey(settings.AUTH_USER_MODEL,null=True,blank=True, related_name='share_topic_user')
     # shared_post = models.ForeignKey('self', blank = True, null = True, related_name='user_shared_post')
     is_vb = models.BooleanField(_("Is Video Bytes"), default=False)
     likes_count = models.PositiveIntegerField(_("Likes count"), default=0)
 
     is_monetized = models.BooleanField(_("monetized"), default=False)
+    is_moderated = models.BooleanField(_("moderated"), default=False)
     vb_width = models.PositiveIntegerField(_("vb width"), default=0)
     vb_height = models.PositiveIntegerField(_("vb height"), default=0)
 
@@ -135,7 +137,6 @@ class Topic(models.Model):
     video_m3u8_content = models.TextField(_("Video M3U8 Content"), blank = True, null = True)
     downloaded_url = models.CharField(_("downloaded URL"), max_length=255, blank = True, null = True)
 
-
     plag_text_options = (
         ('0', "TikTok"),
         ('1', "Helo"),
@@ -149,11 +150,9 @@ class Topic(models.Model):
         ('9', "ROPOSO"),
         ('10', "Likee"),
     )
-
-    time_deleted = models.DateTimeField(auto_now = True, auto_now_add = False, blank = False, null = False)
-    #text in the video for possible plag
-    plag_text = models.CharField(choices = plag_text_options, blank = False, null = True, max_length = 10)
-
+    
+    time_deleted = models.DateTimeField(blank = True, null = True)
+    plag_text = models.CharField(choices = plag_text_options, blank = True, null = True, max_length = 10)
     objects = TopicQuerySet.as_manager()
 
     def __unicode__(self):
@@ -162,6 +161,7 @@ class Topic(models.Model):
     def has_answers(self):
         return self.topic_comment.all().count()
     def get_video_comments(self):
+
         return self.topic_comment.filter(is_media = True, is_audio = False)
     def get_audio_comments(self):
         return self.topic_comment.filter(is_media = True, is_audio = True)
@@ -324,18 +324,18 @@ class Topic(models.Model):
         return True
 
     def no_monetization(self):
-        if self.is_monetized:
-            self.is_monetized = False
-            self.save()
-            userprofile = UserProfile.objects.get(user = self.user)
-            userprofile.save()
-            if self.language_id == '1':
-                reduce_bolo_score(self.user.id, 'create_topic_en', self, 'no_monetize')
-            else:
-                reduce_bolo_score(self.user.id, 'create_topic', self, 'no_monetize')
-            return True
+        # if self.is_monetized:
+        self.is_monetized = False
+        self.save()
+        userprofile = UserProfile.objects.get(user = self.user)
+        userprofile.save()
+        if self.language_id == '1':
+            reduce_bolo_score(self.user.id, 'create_topic_en', self, 'no_monetize')
         else:
-            return True
+            reduce_bolo_score(self.user.id, 'create_topic', self, 'no_monetize')
+        return True
+        # else:
+        #     return True
 
     def add_monetization(self):
         self.is_removed = False
@@ -430,6 +430,26 @@ class TongueTwister(models.Model):
     def __unicode__(self):
         return self.hash_tag
 
+class JobOpening(models.Model):
+    title = models.CharField(_("Job Title"),max_length=255, blank = True, null = True)
+    slug = AutoSlugField(populate_from="title", db_index=False, blank=True)
+    tag_line = models.CharField(_("Tag line"),max_length=255, blank = True, null = True)
+    description = models.TextField(_("Job Description"), blank= True, null = True)
+    job_location = models.CharField(_("Job Location"),max_length=255, blank = True, null = True)
+    is_active = models.BooleanField(_("Active Status"),default=True)
+    def __unicode__(self):
+        return str(self.title)
+
+class JobRequest(RecordTimeStamp):
+    jobOpening = models.ForeignKey(JobOpening, related_name='job_opening',blank = True, null = True)
+    name = models.CharField(_("Username"), blank = True,max_length=255, null = True)
+    email = models.CharField(_("Email"), blank = True,max_length=255, null = True)
+    mobile = models.CharField(_("Mobile"), blank = True,max_length=255, null = True)
+    document = models.FileField(upload_to=settings.MEDIA_UPLOAD_DOC_PATH,blank = True, null = True)
+
+    def __unicode__(self):
+        return str(self.name)
+        
 class ShareTopic(UserInfo):
     topic = models.ForeignKey(Topic, related_name='share_topic_topic_share',null=True,blank=True)
     comment = models.ForeignKey('forum_comment.Comment',related_name='share_topic_topic_comment',null=True,blank=True)

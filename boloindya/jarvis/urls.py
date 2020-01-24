@@ -28,7 +28,6 @@ urlpatterns = [
     url(r'^uploaded_list/$',views.uploaded_list),
     url(r'^user_statistics/$', views.user_statistics),
     url(r'^video_statistics/$', views.video_statistics),
-    url(r'^statistics/all/$', views.statistics_all),
     url(r'^get_user_stats/$', views.get_stats_data),
     url(r'^get_hau_data/$', views.get_hau_data),
     url(r'^get_dau_data/$', views.get_dau_data),

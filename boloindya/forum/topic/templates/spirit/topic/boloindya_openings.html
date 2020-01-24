@@ -1,0 +1,416 @@
+{% extends "spirit/_new_base.html" %}
+{% load spirit_tags i18n %}
+{% load i18n %}
+{% load number_formate_change_tag %}
+{% block title %}BoloIndya{% endblock %}
+{% block content %}
+<style type="text/css">
+body {
+    font-family: HelveticaNeue-Light,helvetica neue light,helvetica neue,Helvetica,Arial,lucida grande,sans-serif;
+    font-size: 14px;
+    line-height: 1.428571429;
+    color: #666;
+}
+
+.careers #jumbotron_openings .jumbotron-img, .careers-footer #jumbotron_openings .jumbotron-img {
+    margin-top: 40px;
+}
+.container-fluid:after, .container-fluid:before, .container:after, .container:before, .row:after, .row:before {
+    display: table;
+    content: " ";
+}
+.img-responsive {
+    display: initial;
+}
+.img-responsive, .img-thumbnail {
+    height: auto;
+    max-width: 100%;
+}
+.careers #jumbotron_openings .content-top, .careers-footer #jumbotron_openings .content-top {
+    position: absolute;
+    top: 20%;
+    left: 20%;
+    color: #fff;
+}
+.careers #jumbotron_openings .content-top h1, .careers-footer #jumbotron_openings .content-top h1 {
+    font-weight: 700;
+    font-size: 40px;
+}
+.careers #jumbotron_openings .content-top p, .careers-footer #jumbotron_openings .content-top p {
+    font-weight: lighter;
+    font-size: 32px;
+}
+.jumbotron p {
+    margin-bottom: 15px;
+    font-size: 21px;
+    font-weight: 200;
+}
+.d-none-d-sm-block {
+    display: block;
+}
+.careers #jumbotron_openings .content-top p, .careers-footer #jumbotron_openings .content-top p {
+    font-weight: lighter;
+    font-size: 32px;
+}
+.jumbotron p {
+    margin-bottom: 15px;
+    font-size: 21px;
+    font-weight: 200;
+}
+@media (min-width: 768px){
+.d-block-d-sm-none {
+    display: none;
+}
+}
+.btn-group-vertical>.btn-group:after, .btn-toolbar:after, .clearfix:after, .container-fluid:after, .container:after, .dropdown-menu>li>a, .form-horizontal .form-group:after, .modal-footer:after, .modal-header:after, .navbar-collapse:after, .navbar-header:after, .navbar:after, .pager:after, .panel-body:after, .row:after {
+    clear: both;
+}
+@media screen and (min-width: 768px){
+.container {
+    max-width: 730px;
+}
+}
+@media (min-width: 1200px){
+.container {
+    width: 1170px;
+}
+}
+@media (min-width: 992px){
+.container {
+    width: 970px;
+}
+}
+
+
+@media (min-width: 768px){
+.container {
+    width: 750px;
+}
+}
+.careers .pad-top, .careers-footer .pad-top {
+    margin-top: 4em;
+}
+.row {
+    margin-right: -15px;
+    margin-left: -15px;
+}
+.careers #opening_heading, .careers-footer #opening_heading {
+    color: #121212;
+    font-size: 36px;
+    font-weight: 700;
+}
+.text-center {
+    text-align: center;
+}
+.careers .pad-top, .careers-footer .pad-top {
+    margin-top: 4em;
+}
+.careers .openings-container, .careers-footer .openings-container {
+    max-width: 1024px;
+    margin: auto;
+}
+.container-fluid {
+    margin: -15px;
+
+}
+
+.careers .openings-container .opening, .careers-footer .openings-container .opening {
+    padding: 6px 0;
+}
+@media (min-width: 992px){
+.col-md-4 {
+    width: 33.3333333333%;
+}
+}
+@media (min-width: 992px){
+.col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9 {
+    float: left;
+}
+}
+
+@media (min-width: 768px){
+.col-sm-6 {
+    width: 50%;
+}
+}
+@media (min-width: 768px){
+.col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9 {
+    float: left;
+}
+}
+.col-xs-12 {
+    width: 100%;
+}
+.col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-xs-1, .col-xs-10, .col-xs-11, .col-xs-12, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9 {
+    position: relative;
+    min-height: 1px;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+.btn-group>.btn-group, .btn-toolbar .btn, .btn-toolbar .btn-group, .btn-toolbar .input-group, .col-xs-1, .col-xs-10, .col-xs-11, .col-xs-12, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .dropdown-menu {
+    float: left;
+}
+.careers .openings-container .opening-inner, .careers-footer .openings-container .opening-inner {
+    background-color: #121212;
+    position: relative;
+    padding: 2rem 24px;
+    min-height: 290px;
+    margin: 0 6px;
+    box-shadow: 1px 1px 2px 1px rgba(0,0,0,.1), -1px 1px 2px 1px rgba(0,0,0,.1);
+    border-radius: 3px;
+}
+.careers .openings-container .heading, .careers-footer .openings-container .heading {
+    height: 84px;
+}
+.careers .openings-container .opening-tagline, .careers-footer .openings-container .opening-tagline {
+    font-size: 18px;
+    font-weight: 500;
+    height: 52px;
+}
+.careers .openings-container .opening-subtext, .careers-footer .openings-container .opening-subtext {
+    font-size: 18px;
+}
+.fa {
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+.careers .openings-container .opening-action, .careers-footer .openings-container .opening-action {
+    margin-top: 16px;
+    text-transform: uppercase;
+    font-weight: 700;
+    border: 1px solid;
+    border-radius: 8px;
+    color: #fff;
+    width: 100%;
+    padding: 12px 0px;
+}
+
+.btn {
+    display: inline-block;
+    margin-bottom: 0;
+    font-weight: 400;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    touch-action: manipulation;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid transparent;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.428571429;
+    border-radius: 4px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.careers .footer-inner, .careers-footer .footer-inner {
+    margin: 0 140px;
+}
+.careers .pad-bot, .careers-footer .pad-bot {
+    margin-bottom: 4em;
+}
+.careers .pad-top, .careers-footer .pad-top {
+    margin-top: 4em;
+}
+.careers .benefit, .careers-footer .benefit {
+    padding: 0rem;
+}
+.careers .benefit .benefit-inner, .careers-footer .benefit .benefit-inner {
+    min-height: 190px;
+    margin: auto;
+    padding: 1rem 3rem;
+    text-align: justify;
+}
+.careers .benefit .benefit-inner .img-responsive, .careers-footer .benefit .benefit-inner .img-responsive {
+    max-width: 200px;
+}
+.careers .benefit .benefit-inner h3, .careers-footer .benefit .benefit-inner h3 {
+    font-size: 24px;
+    color: #000;
+}
+.careers .benefit .benefit-inner p, .careers-footer .benefit .benefit-inner p {
+    font-size: 18px;
+    color: #000;
+}
+.careers .benefit, .careers-footer .benefit {
+    padding: 0rem;
+}
+.careers .footer-description, .careers-footer .footer-description {
+    font-weight: 700;
+    font-size: 40px;
+    color: #000;
+}
+@media (max-width: 991px){
+.container {
+     position:unset;
+
+}
+.paddingOnMobile{
+    padding: 10px;
+}
+}
+@media (max-width: 767px){
+.careers #jumbotron_openings, .careers-footer #jumbotron_openings {
+    background: linear-gradient(-275deg,#2581c4,#1e89cb);
+    text-align: left;
+    margin: 0px;
+}
+.careers #jumbotron_openings .jumbotron-img, .careers-footer #jumbotron_openings .jumbotron-img {
+    margin-top: 0;
+}
+.careers #jumbotron_openings .content-top, .careers-footer #jumbotron_openings .content-top {
+    position: absolute;
+    top: 14%;
+    left: 5%;
+    color: #fff;
+}
+
+.careers #jumbotron_openings .content-top h1, .careers-footer #jumbotron_openings .content-top h1 {
+    margin-top: 0;
+    font-weight: 700;
+    font-size: 18px!important;
+}
+.careers #jumbotron_openings .content-top p, .careers-footer #jumbotron_openings .content-top p {
+    font-weight: lighter;
+    font-size: 14px!important;
+}
+.careers #jumbotron_openings .content-top p, .careers-footer #jumbotron_openings .content-top p {
+    font-weight: lighter;
+    font-size: 14px!important;
+}
+.careers {
+    margin-top: 100px;
+}
+.careers .jumbotron-img img, .careers-footer .jumbotron-img img {
+    max-width: inherit;
+    width: 600px;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+.careers #jumbotron_openings .jumbotron-img .img-responsive, .careers-footer #jumbotron_openings .jumbotron-img .img-responsive {
+    top: 45px;
+}
+.careers .jumbotron-img, .careers-footer .jumbotron-img {
+    position: relative;
+    height: 224px;
+}
+.careers #opening_heading, .careers-footer #opening_heading {
+    font-size: 24px;
+    margin-top: 50px;
+    margin-bottom: 24px;
+}
+.marginOnMobile{
+    margin: -15px;
+}
+.container-fluid {
+    margin: 15px;
+    padding: 0;
+}
+.careers .pad-top, .careers-footer .pad-top {
+    margin-top: 0;
+}
+.careers .footer-description, .careers-footer .footer-description {
+    font-size: 20px;
+}
+.careers .footer-inner, .careers-footer .footer-inner {
+    margin: 0 1rem;
+    text-align: center;
+}
+.careers .pad-top, .careers-footer .pad-top {
+    margin-top: 0;
+}
+.careers .benefit .benefit-inner h3, .careers-footer .benefit .benefit-inner h3 {
+    font-size: 16px;
+}
+.careers .benefit .benefit-inner p, .careers-footer .benefit .benefit-inner p {
+    font-size: 12px;
+}
+.careers .openings-container .opening-inner, .careers-footer .openings-container .opening-inner {
+    min-height: 270px;
+}
+
+}
+
+
+</style>
+
+<div class="careers ng-scope" style="background: #fff">
+    <div class="container-fluid jumbotron" id="jumbotron_openings">
+        <div class="jumbotron-img"> <img class="img-responsive" src="/media/img/careers-jumbo-2.5ac28288 copy.jpg" alt=""> </div>
+        <div class="content-top">
+            <h1>BE A PART OF THE BOLOINDYA TEAM</h1>
+            <p class="d-none-d-sm-block">New Challenges. Bigger Opportunities. Lots of Fun.</p>
+            <p class="d-block-d-sm-none">New Challenges.
+                <br> Bigger Opportunities.
+                <br> Lots of Fun.</p>
+        </div>
+    </div>
+    <div class="container-fluid " >
+        <div class="row pad-top">
+            <h1 class="text-center" id="opening_heading">Current Openings</h1> </div>
+    </div>
+    <div class="pad-top"></div>
+    <div class="container-fluid openings-container">
+        {%  if job_openings != None %}
+        {% for eachOpening in job_openings %}
+
+        <div class="opening col-md-4   ng-scope" ng-repeat="position in ctrl.openPositions | orderBy" ng-if="ctrl.openPositions">
+            <div class="opening-inner">
+                <div class="opening-wrapper">
+                    <div class="heading"> <b class="opening-title ng-binding">{{eachOpening.title}}</b>
+                    <p class="opening-subtitle ng-binding"></p>
+                    </div>
+                    <p class="opening-tagline ng-binding" style="color: rgb(1, 204, 232);">{{eachOpening.tag_line}}</p>
+                    <p class="opening-subtext"> <i class="fa fa-map-marker"></i>{{eachOpening.job_location}} </p> <a class="btn opening-action" ui-sref="root.career_base.sr-business-product-analyst" href="/careers/openings/{{eachOpening.slug}}"> view details </a> </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% endif%}
+
+    </div>
+<div class="container-fluid pad-top"> <h2 class="text-center footer-description">Benefits Of Working with us</h2> </div>
+<div class="container-fluid footer-inner">
+    <div class="pad-top pad-bot">
+        <div class="col-md-4 benefit">
+            <div class="benefit-inner"> <img src="/media/img/benefit-1.0f5779a5.png" alt="" class="img-responsive">
+                <h3> <b> Challenging Projects </b> </h3>
+                <p>You will love us if you like solving challenging problems. You will be writing algorithms, system programs, GPU codes and over-optimizing optimized codes. </p>
+            </div>
+        </div>
+        <div class="col-md-4 benefit">
+            <div class="benefit-inner"> <img src="/media/img/benefit-1.0f5779a5.png" alt="" class="img-responsive">
+                <h3> <b> Entrepreneural Team </b> </h3>
+                <p>We are a small team, united together without hierarchial bottlenecks. You would be a part of all decisions and together shape the future.</p>
+            </div>
+        </div>
+        <div class="col-md-4 benefit">
+            <div class="benefit-inner"> <img src="/media/img/benefit-1.0f5779a5.png" alt="" class="img-responsive">
+                <h3> <b>Autonomy in Work</b> </h3>
+                <p>You will be owning your work. You will be monitoring your KPIs and taking data-driven decisions. You will represent Bobble at various Conferences and Events across the world.</p>
+            </div>
+        </div>
+        <div class="col-md-4 col-md-offset-2 benefit">
+            <div class="benefit-inner"> <img src="/media/img/benefit-1.0f5779a5.png" alt="" class="img-responsive">
+                <h3> <b>Learning Sessions</b> </h3>
+                <p>Learn and grow with sessions from top industry leaders share expertise, knowledge, and valuable tips</p>
+            </div>
+        </div>
+        <div class="col-md-4 benefit">
+            <div class="benefit-inner"> <img src="/media/img/benefit-1.0f5779a5.png" alt="" class="img-responsive">
+                <h3> <b>Networking events </b> </h3>
+                <p>Expand your professional circle with weekly networking events</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+{% endblock %}

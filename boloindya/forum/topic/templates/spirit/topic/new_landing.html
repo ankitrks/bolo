@@ -1,144 +1,368 @@
 {% extends "spirit/_new_base.html" %}
-{% load spirit_tags i18n %}
+{% load i18n %}
+{% load number_formate_change_tag %}
 {% block title %}BoloIndya{% endblock %}
 {% block content %}
+
+<!-- Social Share Code -->
+<link rel="canonical" href="" />      
+<meta property="og:url" content=""/>
+<meta property="og:type" content="website" />
+<meta property='og:title' content='' />
+<meta name="twitter:title" content="" />
+<meta name="twitter:site" content="@BoloIndya" />
+<meta name="twitter:creator" content="@BoloIndya" />
+<meta name="twitter:card" content="summary" />
+<meta property='og:description' content='Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India' />       
+<meta property='og:image' content='' />
+<link rel="image_src" href=""/>
+<!-- Social Share Code End -->
 <style type="text/css">
-    .jwplayer.jw-stretch-uniform .jw-media video {
-    object-fit: cover;
+/*the container must be positioned relative:*/
+.autocomplete {
+  position: relative;
+  display: inline-block;
 }
-#player{
-        height: 748px !important;
+
+
+.autocomplete-items {
+  border: 1px solid #d4d4d4;
+  border-bottom: none;
+  border-top: none;
+  z-index: 99;
+  /*position the autocomplete items to be the same width as the container:*/
+  top: 100%;
+  left: 0;
+  right: 0;
 }
-</style>
-            <div class="jsx-639186511 page-with-header main-body">
-                <div class="jsx-1929076256">
-                    <div class="jsx-1929076256 about-content">
-<!--                         <section class="jsx-1929076256 about-mobile-title">
-                            <h1 class="jsx-1929076256 hideonMobile">Our Mission</h1></section> -->
-                        <div class="jsx-1929076256 about-img">
-                            <div class="jsx-1994528170 banner-video-container">
 
-<script src="//content.jwplatform.com/libraries/SAHhwvZq.js"></script>
+.autocomplete-items div {
+  padding: 10px;
+  cursor: pointer;
+  background-color: #fff; 
+  border-bottom: 1px solid #d4d4d4; 
+}
 
-<script src="//content.jwplatform.com/libraries/SAHhwvZq.js"></script>
+/*when hovering an item:*/
+.autocomplete-items div:hover {
+  background-color: #e9e9e9; 
+}
 
-<div class="video-wall">
+/*when navigating through the items using the arrow keys:*/
+.autocomplete-active {
+  background-color: DodgerBlue !important; 
+  color: #ffffff; 
+}
+.dropdown, .dropleft, .dropright, .dropup {
+    position: relative;
+}
+
+.suggest {
+  /* position: relative; */
+  top: 7px;
+  z-index: 30;
+  text-align: left;
+}
+.dropdown-item {
+    display: block;
+    width: 100%;
+    padding: .25rem 1.5rem;
+    clear: both;
+    font-weight: 400;
+    color: #212529;
+    text-align: inherit;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
+}
+
+.suggest > .dropdown-menu {
+  margin-top: 15px;
+  position: absolute;
+}
+
+.suggest > .dropdown-menu > a.dropdown-item {
+  border-top: 1px solid #eeeeee;
+  padding: 5px 10px;
+}
+
+.suggest > .dropdown-menu > a.dropdown-item:first-child {
+  border-top: 0;
+}
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    display: none;
+    float: left;
+    min-width: 10rem;
+    padding: .5rem 0;
+    margin: .125rem 0 0;
+    font-size: 1rem;
+    color: #212529;
+    text-align: left;
+    list-style: none;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0,0,0,.15);
+    border-radius: .25rem;
+}
+.suggest > .dropdown-menu {
+    margin-top: 15px;
+    position: absolute;
+}
+.dropdown-menu.show {
+    display: block;
+}
+.dropdown-item.active, .dropdown-item:active {
+    color: #fff;
+    text-decoration: none;
+    background-color: #007bff;
+}
+.userNameMargin{
+    margin-top: 5px;
+    margin-left: 10px;
+    position: absolute;
+}
+
+/*.mentiony-container{ position:relative;height:auto; border:1px solid #cecece}
+.mentiony-container .pl0{ padding-left:0;}
+.mentiony-container .mention-input-hidden{float:left; display:inline-block; visibility:hidden; width:0;height:0; margin:0; padding:0;opacity:0;}
+
+.mentiony-container .mentiony-popover{
+    position:absolute;
+    z-index:1000;
+    top:100%; left:0; 
+    width:100%;
+    height:auto;
+    max-height:400px;
+    display:none;
+    border:1px solid #eee;
+    border-radius:4px;
+    padding:0;
+    background:#fefefe;
+    overflow: scroll;
+}
+
+.mentiony-container .mentiony-content {
+    outline: none;
+}
+
+.mentiony-list{list-style:none; width: 100%; padding:0;margin: 0;}
+.mentiony-item{border-top:1px solid #eee; height: 50px; padding: 5px 10px; cursor:pointer}
+.mentiony-item:first-child{border:none}
+.mentiony-item:hover{ background:#ededed;}
+.mentiony-item.active{ background:#ddd;}
+.mentiony-item img{ width:40px; height:40px; }
+
+.mentiony-item .title, .mentiony-item .help-block{ margin:-32px 0 10px 50px;}
+.mentiony-item .title{}
+.mentiony-item .help-block{}
+.mentiony-container .mention-area .highlight a.mentiony-link{color:white; background:#009688; padding: 1px 4px; border-radius: 3px;}
+
+*/
+
+.video_card_title{
+    position: inherit;
+    top: 12px;
+    font-size: 12px;
+    padding: 2px;
+    color: aliceblue;
+}
+._image_card_footer_wraaper{
+    background: #0003;
+}
 
 
 
+._video_card_footer_likes1{
+    position: absolute;
+    right: 16px;
+    top: -165px;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+}
+._video_card_footer_likes{
+position: absolute;
+    left: 0px;
+    bottom: 0px;
+    height: 26px;
+    padding: 4px;
+    background: #000000d9;
+    width: 100%;
+}
+._video_card_footer_ {
+    height: 80px;
+}
 
-  <div class="header-bar">Popular Videos</div>
+._video_card_footer_likes12::before { 
 
-                            <div id="js-playlists" class="playlists">
-                                <div class="playlist-switcher hideonMobile">
-                                    <h4 class="js-playlist-link playlist-link"></h4>
-                                </div>
+    content: '';
+    display: inline-block;
+    height: 18px;
+    margin: 0 6px -3px 0;
+    min-width: 18px;
+    position: relative;
+    top: -2px;
+    width: 18px;
+    background-image: url(/media/iJGOBKN9vqK.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: -42px -382px;
+    color: red;
+    font-weight: bold;
+}
+._video_card_footer_likes::before { 
 
-                                <div id="customScroll" class="js-playlist playlist-container is-active" data-feedid="Q352cyuc1">
-                                <div class="playlist _video_feed_container" id="playlist">
+    content: '';
+    display: inline-block;
+    height: 18px;
+    margin: 0 6px -3px 0;
+    min-width: 18px;
+    position: relative;
+    top: -1px;
+    width: 18px;
+    background-image: url(/media/iJGOBKN9vqK.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: -42px -382px;
+    color: red;
+    font-weight: bold;
+}
+/*._video_card_footer_likes1::before {
+    background-image: url(/media/iJGOBKN9vqK.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: 0 -156px;
+}*/
+
+.about-content .about-article h2{
+    font-family: sofiapro-bold, PingFangSC, sans-serif;
+    font-weight: 700;
+    font-size: 23px;
+    line-height: 1;
+    margin-top: 20px;
+    margin-bottom: 20px
+}
+
+._list_item_title {
+    font-size: 20px;
+}
+._list_item_description{
+    font-size: 14px;
+}
+._list_item_:not(:last-child) {
+    margin: 0 0 2px;
+}
+._base_layout_aside_wrapper:not(:last-child){
+    padding-bottom: 17px;
+    margin-bottom: 17px;
+}
+
+</style>  
+
+<div class="jsx-639186511 page-with-header main-body">
+    <div class="jsx-1929076256">
+        <div class="jsx-1929076256 about-content">
+            <div class="jsx-1929076256 about-img">
+                <div class="jsx-1994528170 banner-video-container">
+                    <div class="video-wall">
 
 
-                                </div>
-                                    <div class="_scroll_load_more_loading">
-                                    <div class="boloindya-loading"></div>
-                                </div>
-                                </div>
+                        <div class="header-bar">{% trans "Popular Videos" %}</div>
+                        <div id="js-playlists" class="playlists">
+                            <div class="playlist-switcher hideonMobile">
+                                <h4 class="js-playlist-link playlist-link"></h4>
                             </div>
 
+                            <div id="customScroll" class="js-playlist playlist-container is-active" data-feedid="Q352cyuc1">
+                            <div class="playlist _video_feed_container" id="playlist">
 
 
-
-</div>
-
-<!--                                     <div class="video-background-demo">
-                                          <div id="js-background-video-container" class="background-video-container">
-                                                <div id="js-background-video"></div>
-                                          </div>
-                                    </div>
-                                    <div class="video-background-demo">
-                                          <div id="js-background-video-container1" class="background-video-container">
-                                                <div id="js-background-video1"></div>
-
-                                          </div>
-
-                                    </div> -->
-
-
-                                <!-- <canvas width="1440" height="1280" class="jsx-1994528170"></canvas> -->
+                            </div>
+                            <div class="ajax-load text-center" style="display:none;">
+                                <p><img src="/media/loader.gif">Loading More post</p>
+                            </div>
+                            <div class="_scroll_load_more_loading">
+                                <div class="boloindya-loading">Load More Content...</div>
+                            </div>
                             </div>
                         </div>
-                        <article class="jsx-1929076256 about-article">
-                             <aside class="_base_layout_aside">
-                                <div class="_base_layout_aside_sticky" style="">
-                                    <div class="_base_layout_aside_wrapper">
-                                        <div class="_list_component_">
-                                            <h2 class="_list_component_title">Trending Hashtags</h2>
-                                            <div class="_list_component_content">
-                                                <div class="_list_item_">
-                                                    <div class="_list_item_content">
-                                                        <h3 class="_list_item_title"><a href="/tag/glowups?langCountry=en" title="glowups">#<!-- -->glowups</a></h3>
-                                                        <p class="_list_item_description">145.7m views</p>
-                                                    </div>
-                                                </div>
-                                                <div class="_list_item_">
-                                                    <div class="_list_item_content">
-                                                        <h3 class="_list_item_title"><a href="/tag/gocamping?langCountry=en" title="gocamping">#<!-- -->gocamping</a></h3>
-                                                        <p class="_list_item_description">612.1m views</p>
-                                                    </div>
-                                                </div>
-                                                <div class="_list_item_">
-                                                    <div class="_list_item_content">
-                                                        <h3 class="_list_item_title"><a href="/tag/thingsthathappened?langCountry=en" title="thingsthathappened">#<!-- -->thingsthathappened</a></h3>
-                                                        <p class="_list_item_description">1343.2m views</p>
-                                                    </div>
-                                                </div>
-                                                <div class="_list_item_">
-                                                    <div class="_list_item_content">
-                                                        <h3 class="_list_item_title"><a href="/tag/basketballchallenge?langCountry=en" title="basketballchallenge">#<!-- -->basketballchallenge</a></h3>
-                                                        <p class="_list_item_description">164.2m views</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="_base_layout_aside_wrapper">
-                                        <div class="_download_">
-                                            <h3 class="_download_title">Get the App</h3>
-                                            <div class="_download_content_wrapper">
-                                                <a rel="nofollow" target="_blank" class="_download_btn_" href="#"><img src="media/google_store.png" alt="google-store"></a>
-                                                <a rel="nofollow" target="_blank" class="_download_btn_" href="#"><img src="media/amazon_store.png" alt="amazon-store"></a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </aside>
-
-                        </article>
                     </div>
                 </div>
             </div>
 
-<div style="display: none" id="modelPopup">
-    <div class="_global_modal_">
-        <div class="_global_modal_mask" style="background-color: rgba(22, 22, 22, 0.9);"></div>
-        <div class="_global_modal_wrapper_content">
-            <div class="_global_modal_content">
-                <div class="_video_card_big_">
-                    <div class="_image_card_ _video_card_big_left _video_card_mute_autoshow" style="border-radius: 4px;">
-                        <div class="_video_card_play_btn_ _video_card_play_btn_light videoPlayButton"></div>
 
-                           <div id="jwBox" class="jwBox" style = "bottom : 15px;">
-                                <div class="video_close"></div>
-                                <div id="player" >Loading ...</div>
+            <article class="jsx-1929076256 about-article">
+                 <aside class="_base_layout_aside">
+                    <div class="_base_layout_aside_sticky" style="">
+                        <div class="_base_layout_aside_wrapper">
+                            <div class="_list_component_">
+                                <h2 class="_list_component_title">{% trans "Trending Categories" %}</h2>
+                                <div class="_list_component_content">
+                                    
+                                    {%  for each_category_item in categories %}
+                                    <div class="_list_item_">
+                                        <div class="_list_item_content">
+                                            <h3 class="_list_item_title"><a href="/tag/{{each_category_item.slug}}/" title="glowups">
+                                            
+                                            {% category_title_by_language each_category_item LANGUAGE_CODE|language_name %}
+                                            </a></h3>
+                                            <p class="_list_item_description">{{each_category_item.view_count | shorcountertopic}} {% trans "views" %}</p>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+
+                                </div>
                             </div>
 
+                            <div class="_list_component_">
+                                <h2 class="_list_component_title">{% trans "Trending Hashtags" %}</h2>
+                                <div class="_list_component_content">
+                                    
+                                    {%  for each_hashtag_item in hash_tags %}
+                                    <div class="_list_item_">
+                                        <div class="_list_item_content">
+                                            <h3 class="_list_item_title"><a href="/hashtag/{{each_hashtag_item.hash_tag}}/" title="glowups"><!-- -->#{{each_hashtag_item.hash_tag}}</a></h3>
+                                            <p class="_list_item_description">{{each_hashtag_item.total_views | shorcountertopic}} {% trans "views" %}</p>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
 
-                        <span class="_video_card_"></span><img onclick="muteAndUnmutePlayer();" class="_video_card_mute _video_card_mute_left_top" id="mutedImageId"  src="media/mute_icon.svg">
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="_base_layout_aside_wrapper">
+                            <div class="_download_">
+                                <h3 class="_download_title">{% trans "Get the App" %}</h3>
+                                <div class="_download_content_wrapper">
+                                    <a rel="nofollow" target="_blank" class="_download_btn_" href="https://play.google.com/store/apps/details?id=com.boloindya.boloindya&amp;hl=en_IN"><img src="/media/google_store.png" alt="google-store"></a>
+<!--                                     <a rel="nofollow" target="_blank" class="_download_btn_" href="#"><img src="/media/amazon_store.png" alt="amazon-store"></a> -->
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                </aside>
 
-                </div>
-            </div>
-        </div><img class="_global_modal_cancel" src="media/cancel.svg"></div>
+            </article>
+        </div>
+    </div>
 </div>
+
+
+<!-- List View Display Data -->
+<script src="/media/js/landing_script.js"></script>
+
+<!-----------End  ------------>
+
+
+<!-- Start Comments Section -->
+{% include "spirit/_video_play_and_comments.html" %}
+<!-- End Load Comments  -->
+
 
 {% endblock %}
