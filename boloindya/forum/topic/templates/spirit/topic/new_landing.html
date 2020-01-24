@@ -163,10 +163,107 @@
 
 */
 
+.video_card_title{
+    position: inherit;
+    top: 12px;
+    font-size: 12px;
+    padding: 2px;
+    color: aliceblue;
+}
+._image_card_footer_wraaper{
+    background: #0003;
+}
 
-</style>
 
-  
+
+._video_card_footer_likes1{
+    position: absolute;
+    right: 16px;
+    top: -165px;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+}
+._video_card_footer_likes{
+position: absolute;
+    left: 0px;
+    bottom: 0px;
+    height: 26px;
+    padding: 4px;
+    background: #000000d9;
+    width: 100%;
+}
+._video_card_footer_ {
+    height: 80px;
+}
+
+._video_card_footer_likes12::before { 
+
+    content: '';
+    display: inline-block;
+    height: 18px;
+    margin: 0 6px -3px 0;
+    min-width: 18px;
+    position: relative;
+    top: -2px;
+    width: 18px;
+    background-image: url(/media/iJGOBKN9vqK.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: -42px -382px;
+    color: red;
+    font-weight: bold;
+}
+._video_card_footer_likes::before { 
+
+    content: '';
+    display: inline-block;
+    height: 18px;
+    margin: 0 6px -3px 0;
+    min-width: 18px;
+    position: relative;
+    top: -1px;
+    width: 18px;
+    background-image: url(/media/iJGOBKN9vqK.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: -42px -382px;
+    color: red;
+    font-weight: bold;
+}
+/*._video_card_footer_likes1::before {
+    background-image: url(/media/iJGOBKN9vqK.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: 0 -156px;
+}*/
+
+.about-content .about-article h2{
+    font-family: sofiapro-bold, PingFangSC, sans-serif;
+    font-weight: 700;
+    font-size: 23px;
+    line-height: 1;
+    margin-top: 20px;
+    margin-bottom: 20px
+}
+
+._list_item_title {
+    font-size: 20px;
+}
+._list_item_description{
+    font-size: 14px;
+}
+._list_item_:not(:last-child) {
+    margin: 0 0 2px;
+}
+._base_layout_aside_wrapper:not(:last-child){
+    padding-bottom: 17px;
+    margin-bottom: 17px;
+}
+
+</style>  
+
 <div class="jsx-639186511 page-with-header main-body">
     <div class="jsx-1929076256">
         <div class="jsx-1929076256 about-content">
@@ -210,7 +307,10 @@
                                     {%  for each_category_item in categories %}
                                     <div class="_list_item_">
                                         <div class="_list_item_content">
-                                            <h3 class="_list_item_title"><a href="/tag/{{each_category_item.slug}}/" title="glowups"><!-- -->{{each_category_item.title}}</a></h3>
+                                            <h3 class="_list_item_title"><a href="/tag/{{each_category_item.slug}}/" title="glowups">
+                                            
+                                            {% category_title_by_language each_category_item LANGUAGE_CODE|language_name %}
+                                            </a></h3>
                                             <p class="_list_item_description">{{each_category_item.view_count | shorcountertopic}} {% trans "views" %}</p>
                                         </div>
                                     </div>
@@ -218,13 +318,30 @@
 
                                 </div>
                             </div>
+
+                            <div class="_list_component_">
+                                <h2 class="_list_component_title">{% trans "Trending Hashtags" %}</h2>
+                                <div class="_list_component_content">
+                                    
+                                    {%  for each_hashtag_item in hash_tags %}
+                                    <div class="_list_item_">
+                                        <div class="_list_item_content">
+                                            <h3 class="_list_item_title"><a href="/hashtag/{{each_hashtag_item.hash_tag}}/" title="glowups"><!-- -->#{{each_hashtag_item.hash_tag}}</a></h3>
+                                            <p class="_list_item_description">{{each_hashtag_item.total_views | shorcountertopic}} {% trans "views" %}</p>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+
+                                </div>
+                            </div>
+
                         </div>
                         <div class="_base_layout_aside_wrapper">
                             <div class="_download_">
                                 <h3 class="_download_title">{% trans "Get the App" %}</h3>
                                 <div class="_download_content_wrapper">
-                                    <a rel="nofollow" target="_blank" class="_download_btn_" href="#"><img src="/media/google_store.png" alt="google-store"></a>
-                                    <a rel="nofollow" target="_blank" class="_download_btn_" href="#"><img src="/media/amazon_store.png" alt="amazon-store"></a>
+                                    <a rel="nofollow" target="_blank" class="_download_btn_" href="https://play.google.com/store/apps/details?id=com.boloindya.boloindya&amp;hl=en_IN"><img src="/media/google_store.png" alt="google-store"></a>
+<!--                                     <a rel="nofollow" target="_blank" class="_download_btn_" href="#"><img src="/media/amazon_store.png" alt="amazon-store"></a> -->
                                 </div>
                             </div>
                         </div>

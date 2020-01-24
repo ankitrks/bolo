@@ -14,7 +14,7 @@ import re
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 from datetime import datetime,timedelta,date
-from django.conf import settings
+from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
 
 cloufront_url = "https://d1fa4tg1fvr6nj.cloudfront.net"
 class CategorySerializer(ModelSerializer):
@@ -508,7 +508,8 @@ class CategoryWithVideoSerializer(ModelSerializer):
         topics = []
         all_seen_vb = []
         if user_id:
-            all_seen_vb = VBseen.objects.filter(user_id = user_id, topic__language_id=language_id, topic__m2mcategory=instance).distinct('topic_id').values_list('topic_id',flat=True)
+            all_seen_vb = get_redis_vb_seen(user_id)
+            # all_seen_vb = VBseen.objects.filter(user_id = user_id, topic__language_id=language_id, topic__m2mcategory=instance).distinct('topic_id').values_list('topic_id',flat=True)
         post_till = datetime.now() - timedelta(days=30)
         excluded_list =[]
         superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=instance,language_id = language_id,user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
@@ -525,7 +526,7 @@ class CategoryWithVideoSerializer(ModelSerializer):
             excluded_list.append(each.id)
         other_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=instance,language_id = language_id).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
         orderd_all_seen_post=[]
-        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)
+        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb,language_id=language_id, m2mcategory=instance)
         if all_seen_post:
             for each_id in all_seen_vb:
                 for each_vb in all_seen_post:

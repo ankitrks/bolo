@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-12 17:26+0530\n"
+"POT-Creation-Date: 2020-01-20 11:35+0530\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,47 +45,59 @@ msgstr ""
 msgid "kannada_title"
 msgstr ""
 
+#: forum/category/models.py:32
+msgid "malayalam_title"
+msgstr ""
+
 #: forum/category/models.py:33
-msgid "description"
+msgid "gujrati_title"
 msgstr ""
 
-#: forum/category/models.py:34 forum/category/models.py:44
-msgid "color"
-msgstr ""
-
-#: forum/category/models.py:35
-msgid "Title color in hex format (i.e: #1aafd0)."
+#: forum/category/models.py:34
+msgid "marathi_title"
 msgstr ""
 
 #: forum/category/models.py:36
-msgid "modified at"
+msgid "description"
+msgstr ""
+
+#: forum/category/models.py:37 forum/category/models.py:47
+msgid "color"
 msgstr ""
 
 #: forum/category/models.py:38
-msgid "global"
+msgid "Title color in hex format (i.e: #1aafd0)."
 msgstr ""
 
 #: forum/category/models.py:39
+msgid "modified at"
+msgstr ""
+
+#: forum/category/models.py:41
+msgid "global"
+msgstr ""
+
+#: forum/category/models.py:42
 msgid ""
 "Designates whether the topics will bedisplayed in the all-categories list."
 msgstr ""
 
-#: forum/category/models.py:41
+#: forum/category/models.py:44
 msgid "closed"
 msgstr ""
 
-#: forum/category/models.py:42
+#: forum/category/models.py:45
 msgid "removed"
 msgstr ""
 
-#: forum/category/models.py:43
+#: forum/category/models.py:46
 msgid "private"
 msgstr ""
 
-#: forum/category/models.py:59
+#: forum/category/models.py:62
 msgid "category"
 msgstr ""
 
-#: forum/category/models.py:60
+#: forum/category/models.py:63
 msgid "categories"
 msgstr ""

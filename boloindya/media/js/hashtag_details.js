@@ -32,7 +32,6 @@ function getSideBarData(){
         success: function(response,textStatus, xhr){
             populaCreatorsItems="";
             populaCategoriesItems="";
-            getPopularCategory
 
             var popularCategoriesList=response.category_details;
             var popularCreatorsList=response.popular_boloindyans;
@@ -81,11 +80,20 @@ function getCreators(popularCreators){
 
 
 function getPopularCategory(popularCategory){
+
+    var category_title;
+    currentLanguageName=current_language_name.toLowerCase();
+    if(currentLanguageName!='english'){
+        category_title=currentLanguageName+'_title';
+    }else{
+        category_title='title';
+    }
+
     var popular_categories='<li class="jsx-3959364739">\
                         <a tag="a" class="jsx-1420774184 recommend-item" href="/tag/'+popularCategory.slug+'/">\
                             <div class="jsx-2177493926 jsx-578937417 avatar head normal" style="background-image: url('+popularCategory.category_image+'); border-radius: 2px;"></div>\
                             <div class="jsx-1420774184 info-content">\
-                                <h4 class="jsx-1420774184">'+popularCategory.title+'</h4>\
+                                <h4 class="jsx-1420774184">'+popularCategory[category_title]+'</h4>\
                                 <p class="jsx-1420774184">'+popularCategory.total_view+' Views</p>\
                             </div>\
                             <div class="jsx-1420774184 arrow-right"></div>\
@@ -103,7 +111,7 @@ var page = 1;
 var checkDataStatus=0;
 $(window).scroll(function() {
     var scorh=Number($(window).scrollTop() + $(window).height());
-    console.log('Scol+he '+scorh);
+    
     //if($(window).scrollTop() + $(window).height() >= $(document).height()-800 && $(window).scrollTop() + $(window).height()<$(document).height()) {
     if($(window).scrollTop() + $(window).height() > $("#hashTagVideosListId").height() && checkDataStatus==0){
         
@@ -115,7 +123,7 @@ $(window).scroll(function() {
         }
 
     }
-    console.log('documentHe- '+$(document).height());
+    //console.log('documentHe- '+$(document).height());
 });
 
 
@@ -125,7 +133,7 @@ function getHashtagVideos(limit,offset){
     var hashtagId= $("#hashtagId").val();
     var platlistItems;
     var language_id=current_language_id;
-    console.log('CurrentLanguageId:'+current_language_id);
+    //console.log('CurrentLanguageId:'+current_language_id);
     var listItems="";
     var itemCount=0;
     var userVideoItems="";
@@ -136,7 +144,7 @@ function getHashtagVideos(limit,offset){
         url:res,
         type:"GET",
         data:{'challengehash':hashtagId,'language_id':language_id},
-        success: function(response,textStatus, xhr){debugger;
+        success: function(response,textStatus, xhr){
             userVideoItems="";
             var videoItemList=response.results;
             //jQuery("#userVideoCountId").html(response.count);
@@ -223,38 +231,8 @@ function loadMoreData(NextPageUrl){
 
 
 
-function getVideoItem(videoItem,itemCount){
-
-    var userVideoItem = '<div class="jsx-1410658769 video-feed-item">\
-            <div class="jsx-1410658769 _ratio_">\
-                <div class="jsx-1410658769" style="padding-top: 148.438%;">\
-                    <div class="jsx-1410658769 _ratio_wrapper">\
-                        <a href="javascript:void(0)" onClick="openVideoInPopup(\''+videoItem.question_video+'\',\''+videoItem.question_image+'\','+itemCount+');" class="jsx-2893588005 video-feed-item-wrapper">\
-                            <div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+videoItem.question_image+');">\
-                                <div class="jsx-3077367275 video-card default">\
-                                    <div class="jsx-3077367275 video-card-mask">\
-                                        <div class="jsx-1543915374 card-footer normal no-avatar">\
-                                            <div class="jsx-1543915374"><img src="/media/download.svg" class="jsx-1543915374 like-icon"><span class="jsx-1543915374">'+videoItem.likes_count+'</span></div>\
-                                        </div>\
-                                    </div>\
-                                </div>\
-                            </div>\
-                        </a>\
-                    </div>\
-                </div>\
-            </div>\
-        </div>';
-
-        return userVideoItem;
-}
-
-
-
-
-
-
     var playListData=[];
-function getCategoryVideos(){debugger;
+function getCategoryVideos(){
 
     loaderBoloShowDynamic('_scroll_load_more_loading_user_videos');
     var hashtagId= $("#hashtagId").val();
@@ -278,7 +256,7 @@ function getCategoryVideos(){debugger;
         url:res,
         type:"GET",
         data:{'challengehash':hashtagId,language_id:language_id},
-        success: function(response,textStatus, xhr){debugger;
+        success: function(response,textStatus, xhr){
             userVideoItems="";
             var videoItemList=response.results;
             var itemCount=0;
@@ -297,17 +275,20 @@ function getCategoryVideos(){debugger;
 }
 
 function getVideoItem(videoItem,itemCount){
-
+    var content_title="";
+    var videoTitle="";
+        videoTitle=videoItem.title;
+        content_title = videoTitle.substr(0, 40) + " ...";
     var userVideoItem = '<div class="jsx-1410658769 video-feed-item">\
             <div class="jsx-1410658769 _ratio_">\
                 <div class="jsx-1410658769" style="padding-top: 148.438%;">\
                     <div class="jsx-1410658769 _ratio_wrapper">\
-                        <a href="javascript:void(0)" onClick="openVideoInPopup(\''+videoItem.backup_url+'\',\''+videoItem.question_image+'\','+itemCount+');" class="jsx-2893588005 video-feed-item-wrapper">\
+                        <a href="javascript:void(0)" onClick="openVideoInPopup(\''+videoItem.question_video+'\',\''+videoItem.question_image+'\','+itemCount+');" class="jsx-2893588005 video-feed-item-wrapper">\
                             <div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+videoItem.question_image+');">\
                                 <div class="jsx-3077367275 video-card default">\
                                     <div class="jsx-3077367275 video-card-mask">\
                                         <div class="jsx-1543915374 card-footer normal no-avatar">\
-                                            <div class="jsx-1543915374"><img src="/media/download.svg" class="jsx-1543915374 like-icon"><span class="jsx-1543915374">'+videoItem.likes_count+'</span></div>\
+                                            <div class="jsx-1543915374"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+videoItem.view_count+'</span></p><span class="_video_card_footer_likes1"><img src="/media/download.svg" alt="likes"> '+videoItem.likes_count+'</span></div>\
                                         </div>\
                                     </div>\
                                 </div>\
@@ -330,7 +311,7 @@ function getVideoItem(videoItem,itemCount){
     var hideErrorMsg = true;
 
     var retryCount=0;
-function video_play_using_video_js(url,backup_url,image) {debugger;
+function video_play_using_video_js(url,backup_url,image) {
     
     var video = document.getElementById('player');
 
@@ -466,6 +447,35 @@ function video_play_using_video_js(url,backup_url,image) {debugger;
             }
         }
 
+        //=========Check Follow User ==============
+        var loginStatus=check_login_status();
+        if(loginStatus==true){
+            var countFollowStatus=userLikeAndUnlike.all_follow;
+            if(undefined !==countFollowStatus && countFollowStatus.length>0){
+                var currentUserTopic=singleItemData.user.userprofile.id;
+                var followList=userLikeAndUnlike.all_follow;
+                followList.forEach(function(followId){
+                    if(currentUserTopic==followId){
+                        followStatus=jQuery('.followStatusChangePopup').hasClass('sx_5da455');
+                        if(followStatus==true){
+                            jQuery('.followStatusChangePopup').removeClass('sx_5da455');
+                            jQuery('.followStatusChangePopup').addClass('sx_5da456');
+                            jQuery('.btnTextChangePopup').text(followed_trans);
+                        }else{
+                            jQuery('.followStatusChangePopup').removeClass('sx_5da456');
+                            jQuery('.followStatusChangePopup').addClass('sx_5da455');
+                            jQuery('.btnTextChangePopup').text(follow_trans);
+                        }
+                    }
+
+                });
+            }
+        }
+        //============== End=======================
+        $("#topicID").val(singleItemData.id);
+        $("#currentPlayUserId").val(singleItemData.user.userprofile.id);
+
+        $("#topicCreatorUsername").val(singleItemData.user.username);
 
         var profileURL='/'+userHandleName+'/';
         $("#profileImageUserId").css("background-image", "url(" + profilePics + ")");
@@ -485,15 +495,26 @@ function video_play_using_video_js(url,backup_url,image) {debugger;
  }
 
  function muteAndUnmutePlayer(){
-  jwplayer().setMute();
-  var muteStatus=jwplayer('player').getMute();
-  if(muteStatus==true){
-    var newSrc='/media/sound_mute.svg';
-    $('#mutedImageId').attr('src', newSrc);
-  }else{
-    var newSrc='/media/mute_icon.svg';
-    $('#mutedImageId').attr('src', newSrc);
-  }
+  // jwplayer().setMute();
+  // var muteStatus=jwplayer('player').getMute();
+  // if(muteStatus==true){
+  //   var newSrc='/media/sound_mute.svg';
+  //   $('#mutedImageId').attr('src', newSrc);
+  // }else{
+  //   var newSrc='/media/mute_icon.svg';
+  //   $('#mutedImageId').attr('src', newSrc);
+  // }
+    if($("video").prop('muted')){
+
+      $("video").prop('muted', false);
+      var newSrc='/media/mute_icon.svg';
+      $('#mutedImageId').attr('src', newSrc);
+    }else{
+        $("video").prop('muted', true);
+        var newSrc='/media/sound_mute.svg';
+        $('#mutedImageId').attr('src', newSrc);
+    }
+  
 
 }
 
@@ -581,7 +602,10 @@ function loadMoreComments(nextPageURl){
     });
 }
 function followLikeList(){
-    check_login_status();
+    var checkstatus=check_login_status();
+    if(checkstatus==false){
+        return false;
+    }
 
     var ge_local_data="";
         ge_local_data = JSON.parse(localStorage.getItem("access_data"));
@@ -600,6 +624,7 @@ function followLikeList(){
         success: function(response,textStatus, xhr){
             userLikeAndUnlike=response;
         //var videoCommentList=data.results;
+
         }
   
     });
