@@ -94,6 +94,8 @@ def send_notifications_task(data, pushNotification):
 
                 device = FCMDevice.objects.exclude(user__pk__in=filter_list).filter(**language_filter)
 
+            pushNotification.is_executed=True
+            pushNotification.save()
             logger.info(device)
             device_pagination = Paginator(device, 1000)
             for index in range(1, (device_pagination.num_pages+1)):
