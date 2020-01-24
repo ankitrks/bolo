@@ -1087,7 +1087,7 @@ def send_notification(request):
         data['timepicker'] = request.POST.get('timepicker', '').replace(" : ", ":")
         data['image_url'] = request.POST.get('image_url', '')
         send_notifications_task.delay(data, pushNotification)
-
+        return redirect('/jarvis/notification_panel/')
     if request.method == 'GET':
         id = request.GET.get('id', None)
         try:    
