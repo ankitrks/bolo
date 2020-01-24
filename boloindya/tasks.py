@@ -60,12 +60,11 @@ def send_notifications_task(data, pushNotification):
                 end_date = datetime.today()
                 start_date = end_date - timedelta(hours=3)
                 device = FCMDevice.objects.filter(user__isnull=True, created_at__range=(start_date, end_date), is_uninstalled=False)
-            
+
             elif user_group == '2':
                 device = FCMDevice.objects.filter(user__isnull=True, is_uninstalled=False)
-            
-            elif user_group == '7':
 
+            elif user_group == '7':
                 #This list contains user IDs for test users: Gitesh, Abhishek, Varun, Maaz
                 # Anshika, Bhoomika and Akash
                 filter_list = [39342, 1465, 2801, 19, 40, 328, 23, 3142, 1494, 41]
@@ -76,9 +75,9 @@ def send_notifications_task(data, pushNotification):
                 filter_list = []
 
 
-                elif user_group == '3':
+                if user_group == '3':
                     filter_list = VBseen.objects.distinct('user__pk').values_list('user__pk', flat=True)
-                
+
                 elif user_group == '4' or user_group == '5':
                     hours_ago = datetime.now()
                     if user_group == '4':
@@ -88,7 +87,7 @@ def send_notifications_task(data, pushNotification):
 
                     filter_list = UserLogStatistics.objects.filter(session_starttime__gte=hours_ago).values_list('user', flat=True)
                     filter_list = map(int , filter_list)
-                    
+
                 elif user_group == '6':
                     filter_list = Topic.objects.filter(is_vb=True).values_list('user__pk', flat=True)
 
