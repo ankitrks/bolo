@@ -1,6 +1,7 @@
 {% extends "jarvis/layout/base.html" %}
+{% load static %}
 {% block styles %}
-<link rel="stylesheet" href="https://cdn.datatables.net/1.10.18/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="{% static 'css/dataTables.bootstrap4.min.css' %}">
 {% endblock styles%}
 {% block content %}
 <div id="user_kyc">
@@ -85,8 +86,8 @@
 </div>
 {% endblock content %}
 {% block center_js %}
-<script src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.18/js/dataTables.bootstrap4.min.js"></script>
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/dataTables.bootstrap4.min.js' %}"></script>
 <script>
 // $("#encash_details_table").DataTable();
 $(document).ready( function () {

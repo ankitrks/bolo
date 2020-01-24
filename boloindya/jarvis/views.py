@@ -19,8 +19,8 @@ import time
 import re
 from django.db.models import Q
 from drf_spirit.views import getVideoLength
-from drf_spirit.utils  import calculate_encashable_details,language_options
-from forum.user.models import UserProfile, ReferralCode, ReferralCodeUsed, VideoCompleteRate, VideoPlaytime
+from drf_spirit.utils  import calculate_encashable_details,language_options,check_or_create_user_pay
+from forum.user.models import UserProfile, ReferralCode, ReferralCodeUsed, VideoCompleteRate, VideoPlaytime,UserPay
 from forum.topic.models import Topic, VBseen
 from forum.category.models import Category
 from django.contrib.auth.models import User
@@ -48,7 +48,7 @@ from itertools import groupby
 from django.db.models import Count
 import ast
 from drf_spirit.serializers import VideoCompleteRateSerializer
-from .forms import VideoUploadTranscodeForm,TopicUploadTranscodeForm
+from .forms import VideoUploadTranscodeForm,TopicUploadTranscodeForm,UserPayForm
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
 from django.core.files.base import ContentFile
 from drf_spirit.serializers import UserWithUserSerializer
@@ -370,6 +370,39 @@ def get_accepted_kyc_user_list(request):
     if request.user.is_superuser:
         all_kyc = UserKYC.objects.filter(is_kyc_completed=True)
         return render(request,'jarvis/pages/userkyc/accepted_kyc.html',{'all_kyc':all_kyc})
+
+def get_user_pay_details(request):
+    if request.user.is_superuser:
+        return render(request,'jarvis/pages/payment/user_pay.html')
+
+def get_single_user_pay_details(request):
+    if request.user.is_superuser:
+        username = request.GET.get('username',None)
+        all_pay = UserPay.objects.filter(user__username = username).order_by('-id')
+        user = User.objects.get(username=username)
+        check_or_create_user_pay(user.id)
+        user_pay_form = UserPayForm()
+        return render(request,'jarvis/pages/payment/single_user_pay.html',{'all_pay':all_pay,'userprofile':user.st,'payment_form':user_pay_form})
+
+def add_user_pay(request):
+    if request.user.is_superuser:
+        user_pay_id = request.POST.get('user_pay_id',None)
+        amount_pay = request.POST.get('amount_pay',0)
+        transaction_id = request.POST.get('transaction_id',None)
+        if not user_pay_id:
+            return HttpResponse(json.dumps({'is_success':'fail','reason':'pay_id missing'}),content_type="application/json")
+        user_pay = UserPay.objects.get(pk=user_pay_id)
+        if not user_pay.is_evaluated:
+            return HttpResponse(json.dumps({'is_success':'fail','reason':'pay not evaluated for this month'}),content_type="application/json")
+        user_pay.amount_pay = int(amount_pay)
+        user_pay.transaction_id = transaction_id
+        user_pay.is_paid = True
+        from datetime import datetime
+        user_pay.pay_date = datetime.now()
+        user_pay.save()
+        return HttpResponse(json.dumps({'is_success':'success'}),content_type="application/json")
+
+
 
 def get_kyc_of_user(request):
     if request.user.is_superuser or request.user.is_staff:
