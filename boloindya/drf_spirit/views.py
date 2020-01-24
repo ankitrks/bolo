@@ -1743,6 +1743,7 @@ def fb_profile_settings(request):
         sub_category_prefrences = request.POST.get('categories',None) #Optional
     """
     profile_pic     = request.POST.get('profile_pic',None)
+    cover_pic       = request.POST.get('cover_pic',None)
     name            = request.POST.get('name',None)
     bio             = request.POST.get('bio',None)
     about           = request.POST.get('about',None)
@@ -1900,6 +1901,7 @@ def fb_profile_settings(request):
                     userprofile.is_dark_mode_enabled = False
                 userprofile.gender = gender
                 userprofile.profile_pic =profile_pic
+                userprofile.cover_pic=cover_pic
                 userprofile.linkedin_url = likedin_url
                 userprofile.twitter_id = twitter_id
                 userprofile.instagarm_id = instagarm_id
