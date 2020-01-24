@@ -2907,9 +2907,10 @@ def get_category_detail(request):
 def get_category_with_video_bytes(request):
     try:
         category=[]
+        paginator_category = PageNumberPagination()
         paginator = PageNumberPagination()
         page_size = request.GET.get('page_size', 3)
-        paginator.page_size = page_size
+        paginator_category.page_size = page_size
         language_id = request.GET.get('language_id', 1)
         is_discover = request.GET.get('is_discover', False)
         popular_bolo = []
@@ -2921,7 +2922,7 @@ def get_category_with_video_bytes(request):
         else:
             category = Category.objects.filter(parent__isnull=False)
 
-        category = paginator.paginate_queryset(category, request)
+        category = paginator_category.paginate_queryset(category, request)
         if request.GET.get('popular_boloindyans'):
             if language_id:
                 all_user = User.objects.filter(st__is_popular = True, st__language=language_id)
@@ -2929,7 +2930,6 @@ def get_category_with_video_bytes(request):
                 all_user = User.objects.filter(st__is_popular = True)
             if all_user.count():
                 try:
-                    paginator.page_size = 15
                     popular_bolo = paginator.paginate_queryset(all_user, request)
                     popular_bolo = UserSerializer(popular_bolo, many=True).data
                 except Exception as e1:
@@ -2959,7 +2959,6 @@ def get_category_with_video_bytes(request):
                             orderd_all_seen_post.append(each_vb)
             topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
             try:
-                paginator.page_size = 15
                 topics = paginator.paginate_queryset(topics, request)
                 trending_videos = CategoryVideoByteSerializer(topics, many=True).data
             except Exception as e1:
@@ -3022,8 +3021,11 @@ def get_category_video_bytes(request):
                         if each_vb.id == each_id:
                             orderd_all_seen_post.append(each_vb)
             topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
-        page_size = 15
-        paginator = Paginator(topics, page_size)
+        # paginator = PageNumberPagination()
+        # self.request.POST._mutable = True
+        # self.request.POST.update({'page':request.POST.get('page', 2)})
+        # topics = paginator.paginate_queryset(topics, request)
+        paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
         page = request.POST.get('page', 2)
 
         topic_page = paginator.page(page)
@@ -3039,7 +3041,6 @@ def get_popular_video_bytes(request):
     try:
         paginator_topics = PageNumberPagination()
         language_id = request.GET.get('language_id', 1)
-        paginator_topics.page_size = 15
         all_seen_vb = []
         if request.user.is_authenticated:
             all_seen_vb = get_redis_vb_seen(request.user.id)
@@ -3078,7 +3079,6 @@ def pubsub_popular(request):
         enddate = startdate - timedelta(days=30)
         topics_all = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, is_popular=True, \
             date__gte=enddate).order_by('-date')
-        paginator_topics.page_size = 15
         topics = paginator_topics.paginate_queryset(topics_all, request)
         return JsonResponse({'topics': PubSubPopularSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
     except Exception as e:
@@ -3105,7 +3105,6 @@ def get_recent_videos(request):
     try:
         paginator_topics = PageNumberPagination()
         language_id = request.GET.get('language_id', 1)
-        paginator_topics.page_size = 15
         topics = []
         post_till = datetime.now() - timedelta(days=30)
         category = Category.objects.filter(parent__isnull=True).first()
@@ -3145,7 +3144,6 @@ def get_recent_videos(request):
 def get_popular_bolo(request):
     try:
         paginator = PageNumberPagination()
-        paginator.page_size = 15
         language_id = request.GET.get('language_id', 1)
         all_user = []
         if language_id:
