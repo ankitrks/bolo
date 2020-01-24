@@ -140,8 +140,20 @@ class UserPay(RecordTimeStamp):
     for_year = models.PositiveIntegerField(_('year'), choices=((r,r) for r in range(2019, datetime.now().year+1)), default=current_year)
     for_month = models.PositiveIntegerField(_('month'),choices=month_choices,default =previous_month )
     pay_date = models.DateTimeField(_("Pay Date"), null = True, blank = False)
-    amonunt_pay = models.PositiveIntegerField(_("Amount Payed"), null = True, blank = False,default=0)
+    amount_pay = models.PositiveIntegerField(_("Amount Payed"), null = True, blank = False,default=0)
     transaction_id = models.CharField(max_length=50,null=True,blank=True)
+    total_video_created = models.PositiveIntegerField(_("Total Videos Created"), null = True, blank = False,default=0)
+    videos_in_language = models.TextField(null=True,blank=True)
+    total_monetized_video = models.PositiveIntegerField(_("Total Monetized Videos"), null = True, blank = False,default=0)
+    left_for_moderation = models.PositiveIntegerField(_("Left For Moderation"), null = True, blank = False,default=0)
+    total_like = models.PositiveIntegerField(_("Total Likes"), null = True, blank = False,default=0)
+    total_comment = models.PositiveIntegerField(_("Total Comments"), null = True, blank = False,default=0)
+    total_view = models.PositiveIntegerField(_("Total Views"), null = True, blank = False,default=0)
+    total_share = models.PositiveIntegerField(_("Total Shares"), null = True, blank = False,default=0)
+    total_bolo_score_earned = models.PositiveIntegerField(_("Total Views"), null = True, blank = False,default=0)
+    bolo_bifurcation = models.TextField(null=True,blank=True)
+    is_evaluated = models.BooleanField(default=False)
+    is_paid = models.BooleanField(default=False)
     class Meta:
         verbose_name_plural = 'User\'s Pay'
 

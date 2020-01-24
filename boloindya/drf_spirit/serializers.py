@@ -442,6 +442,18 @@ class UserWithoutUserProfileSerializer(ModelSerializer):
         #fields = '__all__'
         exclude = ('password', )
 
+class UserBaseSerializerDatatable(ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username','id')
+        # exclude = ('password', )
+
+class UserPayDatatableSerializer(ModelSerializer):
+    user = UserBaseSerializerDatatable()
+    class Meta:
+        model = UserProfile
+        fields = ('user','name','bolo_score','id')
+   
 class CategoryVideoByteSerializer(ModelSerializer):
     user = SerializerMethodField()
     view_count = SerializerMethodField()

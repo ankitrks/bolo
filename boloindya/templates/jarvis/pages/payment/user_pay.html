@@ -1,0 +1,50 @@
+{% extends "jarvis/layout/base.html" %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/dataTables.bootstrap4.min.css' %}">
+{% endblock styles%}
+{% block content %}
+<div id="user_kyc">
+        <div class="row">
+        <div class="col-xs-12 table-responsive">
+            <table class="table table-striped" id="user_pay_table">
+                <thead>
+                    <tr>
+                        <th data-data="user.username">Username</th>
+                        <th data-data="name">Name</th>
+                        <th data-data="bolo_score">Bolo Score</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+        <!-- /.col -->
+    </div>
+</div>
+{% endblock content %}
+{% block center_js %}
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/dataTables.bootstrap4.min.js' %}"></script>
+<script>
+// $("#user_pay_table").DataTable();
+$(document).ready( function () {
+  
+  var table = $('#user_pay_table').DataTable({
+        'serverSide': true,
+        'ajax': '/api/v1/get_user_pay_datatbale/?format=datatables',
+        'columns': [
+          {'data': 'user.username', 'name': 'user.username' ,"orderable": false,"searchable": false,
+                    "render": function(data,type,row,meta) { // render event defines the markup of the cell text 
+                        var a = '<strong><a href="/jarvis/get_single_user_pay_details/?username='+row.user.username+'" target="_blank">' + row.user.username +'</a></strong>'; // row object contains the row data
+                        return a;}},
+          {'data': 'name'},
+          {'data': 'bolo_score'},
+        ],
+        "order": [[ 2, "desc" ]],
+        "oLanguage": {
+            "sInfo": "Showing _START_ to _END_ of _TOTAL_ items."
+        }
+    });
+} );
+    
+</script>
+{% endblock center_js%}

@@ -1427,6 +1427,13 @@ class CategoryList(generics.ListAPIView):
     # permission_classes = (IsAuthenticated,)
     permission_classes  = (AllowAny,)
 
+
+class UserPayDatatableList(generics.ListAPIView):
+    serializer_class = UserPayDatatableSerializer
+    # queryset = User.objects.filter(is_active = True)
+    def get_queryset(self):
+        return UserProfile.objects.all().order_by('-bolo_score')
+
 class KYCDocumentTypeList(generics.ListAPIView):
     serializer_class = KYCDocumnetsTypeSerializer
     queryset = KYCDocumentType.objects.all()
@@ -1585,7 +1592,7 @@ def get_user_bolo_info(request):
                 for_year__gte=start_date.year,for_year__lte=start_date.year)
         total_earn=0
         for each_pay in all_pay:
-            total_earn+=each_pay.amonunt_pay
+            total_earn+=each_pay.amount_pay
         total_video_count = total_video.count()
         print total_video
         monetised_video_count = total_video.filter(is_monetized = True).count()
