@@ -13,7 +13,7 @@ def send_notifications_task(data, pushNotification):
     from datetime import datetime, timedelta
     from forum.topic.models import Topic, VBseen
     from drf_spirit.models import UserLogStatistics
-    from jarvis.models import PushNotification, FCMDevice
+    from jarvis.models import PushNotification, FCMDevice, PushNotificationUser
     from django.core.paginator import Paginator
 
     try:
@@ -100,7 +100,10 @@ def send_notifications_task(data, pushNotification):
             for index in range(1, (device_pagination.num_pages+1)):
                 device_after_slice = device_pagination.page(index)
                 for each in device_after_slice:
-                    PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2')
+                    try:
+                        PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2')
+                    except:
+                        pass
                 #t = device_after_slice.object_list.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk})
                 t=device_after_slice.object_list.send_message(data={})
                 logger.info(t)
