@@ -1,6 +1,7 @@
 # from utils import admin_all
 from forum.topic.models import *
 from django.contrib import admin
+from drf_spirit.views import check_hashtag
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
 from forum.topic.models import Topic, Notification, ShareTopic, CricketMatch, Poll, Choice, Voting, Leaderboard,\
@@ -51,11 +52,12 @@ class TopicChangeList(ChangeList):
         # super(TopicChangeList, self).__init__(request, model, list_display, list_display_links,
         #     list_filter, date_hierarchy, search_fields, list_select_related,
         #     list_per_page, list_max_show_all, list_editable, model_admin)
-        self.list_display = ('action_checkbox', 'id', 'title', 'name', 'duration', 'language_id', 'view_count',\
-            'comments', 'is_moderated', 'is_monetized', 'is_removed', 'is_pubsub_popular_push', 'date', 'm2mcategory') #is_popular
+        # action_checkbox
+        self.list_display = ('vb_list', 'id', 'title', 'name', 'duration', 'language_id', 'imp_count',\
+            'is_moderated', 'is_monetized', 'is_removed', 'is_pubsub_popular_push', 'date', 'm2mcategory') #is_popular
         self.list_display_links = ['id']
-        self.list_editable = ('title', 'language_id', 'm2mcategory', 'is_pubsub_popular_push', 'is_moderated')
-
+        self.list_editable = ('title', 'language_id', 'm2mcategory', 'is_pubsub_popular_push', 'is_monetized', 'is_removed', \
+                'is_moderated')
         self.model = model
         self.opts = model._meta
         self.lookup_opts = self.opts
@@ -99,7 +101,7 @@ class TopicChangeList(ChangeList):
 class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExportModelAdmin" NOT "admin.ModelAdmin"
     ordering = ['is_vb', '-id']
     search_fields = ('title', 'user__username', 'user__st__name', )
-    list_filter = (('date', DateRangeFilter), 'language_id', 'm2mcategory', 'is_moderated', 'is_monetized', 'is_removed', 'is_popular' )
+    list_filter = (('date', DateRangeFilter), 'language_id', 'm2mcategory', 'is_moderated', 'is_monetized', 'is_removed', 'is_popular')
     filter_horizontal = ('m2mcategory', )
 
     fieldsets = (
@@ -132,6 +134,13 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
         return obj.duration()
     duration.short_description = "duration"
     duration.admin_order_field = 'media_duration'
+
+    def vb_list(self, obj):
+        return '<a href="?user_id=' + str(obj.user.id) +'" target="_blank" style="background-position: \
+                0 -834px;background-image: url(/static/grappelli/images/icons-small-sf6f04fa616.png);\
+                background-repeat: no-repeat;height: 20px;display: block;"></a>'
+    vb_list.allow_tags = True
+    vb_list.short_description = "VB"
 
     def comments(self, obj):
         return obj.comments()
@@ -179,24 +188,14 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
             obj.is_pubsub_popular_push = form.cleaned_data['is_pubsub_popular_push']
         if 'is_moderated' in form.changed_data:
             obj.is_moderated = form.cleaned_data['is_moderated']
-        # if 'is_popular' in form.changed_data:
-        #     obj.is_popular = form.cleaned_data['is_popular']
-        #     if obj.is_popular and obj.is_vb and not obj.is_removed:
-        #         obj.is_pubsub_popular_push = True
         if 'is_monetized' in form.changed_data:
             obj.is_monetized = form.cleaned_data['is_monetized']
-            print obj.is_monetized
             if obj.is_monetized:
-                print 'Adding to monetization...'
                 if obj.is_removed:
-                    print 'restoring record...'
                     obj.restore()
-                print 'adding to monetization'
                 obj.add_monetization()
             else:
-                print 'removing from monetization...'
                 obj.no_monetization()
-            print 'done'
 
         if 'is_removed' in form.changed_data:
             obj.is_removed = form.cleaned_data['is_removed']
@@ -204,6 +203,17 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
                 obj.delete()
             else:
                 obj.restore()
+
+        if 'title' in form.changed_data:
+            tag_list = obj.title.split()
+            hash_tag = tag_list
+            if tag_list:
+                for index, value in enumerate(tag_list):
+                    if value.startswith("#"):
+                        tag_list[index]='<a href="/get_challenge_details/?ChallengeHash='+value.strip('#')+'">'+value+'</a>'
+                title = " ".join(tag_list)
+                obj.title = title[0].upper()+title[1:]
+
         obj.save()
         if 'language_id' in form.changed_data and obj.is_monetized:
             if form.initial['language_id'] == '1':

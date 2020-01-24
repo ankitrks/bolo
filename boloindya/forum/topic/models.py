@@ -109,6 +109,7 @@ class Topic(models.Model):
     comment_count = models.PositiveIntegerField(_("comment count"), default=0)
     total_share_count = models.PositiveIntegerField(_("Total Share count"), default=0)# self plus comment
     share_count = models.PositiveIntegerField(_("Share count"), default=0)# only topic share
+    imp_count = models.PositiveIntegerField(_("views"), default=0)
     # share_user = models.ForeignKey(settings.AUTH_USER_MODEL,null=True,blank=True, related_name='share_topic_user')
     # shared_post = models.ForeignKey('self', blank = True, null = True, related_name='user_shared_post')
     is_vb = models.BooleanField(_("Is Video Bytes"), default=False)
@@ -136,7 +137,6 @@ class Topic(models.Model):
     video_m3u8_content = models.TextField(_("Video M3U8 Content"), blank = True, null = True)
     downloaded_url = models.CharField(_("downloaded URL"), max_length=255, blank = True, null = True)
 
-
     plag_text_options = (
         ('0', "TikTok"),
         ('1', "Helo"),
@@ -150,11 +150,9 @@ class Topic(models.Model):
         ('9', "ROPOSO"),
         ('10', "Likee"),
     )
-
+    
     time_deleted = models.DateTimeField(blank = True, null = True)
-    #text in the video for possible plag
     plag_text = models.CharField(choices = plag_text_options, blank = True, null = True, max_length = 10)
-
     objects = TopicQuerySet.as_manager()
 
     def __unicode__(self):
@@ -326,18 +324,18 @@ class Topic(models.Model):
         return True
 
     def no_monetization(self):
-        if self.is_monetized:
-            self.is_monetized = False
-            self.save()
-            userprofile = UserProfile.objects.get(user = self.user)
-            userprofile.save()
-            if self.language_id == '1':
-                reduce_bolo_score(self.user.id, 'create_topic_en', self, 'no_monetize')
-            else:
-                reduce_bolo_score(self.user.id, 'create_topic', self, 'no_monetize')
-            return True
+        # if self.is_monetized:
+        self.is_monetized = False
+        self.save()
+        userprofile = UserProfile.objects.get(user = self.user)
+        userprofile.save()
+        if self.language_id == '1':
+            reduce_bolo_score(self.user.id, 'create_topic_en', self, 'no_monetize')
         else:
-            return True
+            reduce_bolo_score(self.user.id, 'create_topic', self, 'no_monetize')
+        return True
+        # else:
+        #     return True
 
     def add_monetization(self):
         self.is_removed = False

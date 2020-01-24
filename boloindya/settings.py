@@ -328,17 +328,33 @@ TIME_ZONE = 'Asia/Kolkata'
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
 
-LANGUAGES = [
-    ('en', _('English')),
-    ('hi', _('Hindi')),
-    ('ta', _('Tamil')),
-    ('te', _('Telgu')),
-    ('bn', _('Bengali')),
-    ('kn', _('Kannada')),
-    ('ml', _('Malayalam')),
-    ('mr', _('Marathi')),
+LANGUAGE_OPTIONS = (
+    ('1', "English", "en"),
+    ('2', "Hindi", "hi"),
+    ('3', "Tamil", "ta"),
+    ('4', "Telugu", "te"),
+    ('5', "Bengali", "bn"),
+    ('6', "Kannada", "kn"),
+    ('7', "Malayalam", "ml"),
+    # ('8', "Gujarati", "gu"),
+    ('9', "Marathi", "mr"),
+)
 
-]
+LANGUAGES = [(each_rec[2], _(each_rec[1])) for each_rec in LANGUAGE_OPTIONS]
+
+#LANGUAGES_WITH_ID = {(each_rec[2], (each_rec[0])) for each_rec in LANGUAGE_OPTIONS}
+
+# LANGUAGES = [
+#     ('en', _('English')),
+#     ('hi', _('Hindi')),
+#     ('ta', _('Tamil')),
+#     ('te', _('Telgu')),
+#     ('bn', _('Bengali')),
+#     ('kn', _('Kannada')),
+#     ('ml', _('Malayalam')),
+#     ('mr', _('Marathi')),
+
+# ]
 #('gu', _('Gujarati')) 
 LANGUAGES_WITH_ID = {
     'en' : '1',
@@ -353,6 +369,7 @@ LANGUAGES_WITH_ID = {
 }
 
 LANGUAGE_CODE = 'en-us'
+
 
 LOCALE_PATHS = (
     os.path.join(BASE_DIR, 'locale'),
@@ -434,7 +451,7 @@ import datetime
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework_simplejwt.authentication.JWTAuthentication',],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 10
+    'PAGE_SIZE': 15
 }
 # JWT_AUTH = {
 #     # how long the original token is valid for

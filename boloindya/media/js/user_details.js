@@ -22,7 +22,7 @@ $(window).scroll(function() {
 });
 
 
-function getUserVideos(limit,offset){
+function getUserVideos(limit,offset){debugger;
 
     loaderBoloShowDynamic('_scroll_load_more_loading_user_videos');
     var user_id= $("#currentUserId").val();
@@ -40,7 +40,7 @@ function getUserVideos(limit,offset){
         url:res,
         type:"GET",
         data:{'limit':limit,'offset':offset,'user_id':user_id,'language_id':language_id},
-        success: function(response,textStatus, xhr){
+        success: function(response,textStatus, xhr){debugger;
             userVideoItems="";
             var videoItemList=response.results;
             jQuery("#userVideoCountId").html(response.count);
@@ -128,17 +128,20 @@ function loadMoreData(NextPageUrl){
 
 
 function getVideoItem(videoItem,itemCount){
-
+    var content_title="";
+    var videoTitle="";
+        videoTitle=videoItem.title;
+        content_title = videoTitle.substr(0, 40) + " ...";
     var userVideoItem = '<div class="jsx-1410658769 video-feed-item">\
             <div class="jsx-1410658769 _ratio_">\
                 <div class="jsx-1410658769" style="padding-top: 148.438%;">\
                     <div class="jsx-1410658769 _ratio_wrapper">\
-                        <a href="javascript:void(0)" onClick="openVideoInPopup(\''+videoItem.backup_url+'\',\''+videoItem.question_image+'\','+itemCount+');" class="jsx-2893588005 video-feed-item-wrapper">\
+                        <a href="javascript:void(0)" onClick="openVideoInPopup(\''+videoItem.question_video+'\',\''+videoItem.question_image+'\','+itemCount+');" class="jsx-2893588005 video-feed-item-wrapper">\
                             <div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+videoItem.question_image+');">\
                                 <div class="jsx-3077367275 video-card default">\
                                     <div class="jsx-3077367275 video-card-mask">\
                                         <div class="jsx-1543915374 card-footer normal no-avatar">\
-                                            <div class="jsx-1543915374"><img src="/media/download.svg" class="jsx-1543915374 like-icon"><span class="jsx-1543915374">'+videoItem.likes_count+'</span></div>\
+                                            <div class="jsx-1543915374"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+videoItem.view_count+'</span></p><span class="_video_card_footer_likes1"><img src="/media/download.svg" alt="likes"> '+videoItem.likes_count+'</span></div>\
                                         </div>\
                                     </div>\
                                 </div>\
@@ -172,16 +175,17 @@ function getSideBarData(){
     //var uri='https://www.boloindya.com/api/v1/get_popular_video_bytes/?page=1';
     var uri='/api/v1/get_category_with_video_bytes/';
     var res = encodeURI(uri);
+    var page_size=10;
 
     jQuery.ajax({
         url:res,
         type:"GET",
 
-        data:{'language_id':language_id,'is_with_popular':'True','popular_boloindyans':'True'},
+        data:{'language_id':language_id,'is_with_popular':'True','popular_boloindyans':'True','page_size':page_size},
         success: function(response,textStatus, xhr){
             populaCreatorsItems="";
             populaCategoriesItems="";
-            getPopularCategory
+            //getPopularCategory
 
             var popularCategoriesList=response.category_details;
             var popularCreatorsList=response.popular_boloindyans;
@@ -214,9 +218,15 @@ function getCreators(popularCreators){
         creatorName=popularCreators.username;
     }
 
+    var profilePics = popularCreators.userprofile.profile_pic;
+    if(profilePics==''){
+       profilePics= '/media/demo_user.png';
+    }
+    
+
     var creatorTemplate='<li class="jsx-3959364739">\
                             <a tag="a" class="jsx-1420774184 recommend-item" href="/'+popularCreators.username+'/">\
-                                <div class="jsx-2177493926 jsx-578937417 avatar round head normal" style="background-image: url('+popularCreators.userprofile.profile_pic+');"></div>\
+                                <div class="jsx-2177493926 jsx-578937417 avatar round head normal" style="background-image: url('+profilePics+');"></div>\
                                 <div class="jsx-1420774184 info-content">\
                                     <h4 class="jsx-1420774184">'+creatorName+'</h4>\
                                     <p class="jsx-1420774184">@'+popularCreators.username+'</p>\
@@ -230,11 +240,20 @@ function getCreators(popularCreators){
 
 
 function getPopularCategory(popularCategory){
+
+    var category_title;
+    currentLanguageName=current_language_name.toLowerCase();
+    if(currentLanguageName!='english'){
+        category_title=currentLanguageName+'_title';
+    }else{
+        category_title='title';
+    }
+
     var popular_categories='<li class="jsx-3959364739">\
                         <a tag="a" class="jsx-1420774184 recommend-item" href="/tag/'+popularCategory.slug+'/">\
                             <div class="jsx-2177493926 jsx-578937417 avatar head normal" style="background-image: url('+popularCategory.category_image+'); border-radius: 2px;"></div>\
                             <div class="jsx-1420774184 info-content">\
-                                <h4 class="jsx-1420774184">'+popularCategory.title+'</h4>\
+                                <h4 class="jsx-1420774184">'+popularCategory[category_title]+'</h4>\
                                 <p class="jsx-1420774184">'+popularCategory.total_view+' Views</p>\
                             </div>\
                             <div class="jsx-1420774184 arrow-right"></div>\
@@ -244,12 +263,63 @@ function getPopularCategory(popularCategory){
 }
 
 
+
+
   var sideBarDetails="";
   var sideBarCommentDetails="";
+    var muteStatus=false;
+    var isLoading = false;
+    var hideErrorMsg = true;
+    
+    var retryCount=0;
+function video_play_using_video_js(url,backup_url,image) {debugger;
+    
+    var video = document.getElementById('player');
+
+      if(Hls.isSupported()) {
+        var hls = new Hls();
+        hls.loadSource(url);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED,function() {
+          loaderHide();
+          var playPromise = video.play();
+
+          if (playPromise !== undefined) {
+            playPromise.then(_ => {
+              // Automatic playback started!
+              // Show playing UI.
+              console.log('Video Eror');
+            })
+            .catch(error => {
+                console.log('Video Eror1');
+              // Auto-play was prevented
+              // Show paused UI.
+            });
+          }
+
+      });
+     }
+
+
+     // hls.js is not supported on platforms that do not have Media Source Extensions (MSE) enabled.
+     // When the browser has built-in HLS support (check using `canPlayType`), we can provide an HLS manifest (i.e. .m3u8 URL) directly to the video element through the `src` property.
+     // This is using the built-in support of the plain video element, without using hls.js.
+     // Note: it would be more normal to wait on the 'canplay' event below however on Safari (where you are most likely to find built-in HLS support) the video.src URL must be on the user-driven
+     // white-list before a 'canplay' event will be emitted; the last video event that can be reliably listened-for when the URL is not on the white-list is 'loadedmetadata'.
+      else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = backup_url;
+        video.addEventListener('loadedmetadata',function() {
+          video.play();
+          loaderHide();
+        });
+      }
+}
+
 
  function openVideoInPopup(file,image,indexId){
   loaderShow();
   var singleItemData=[];
+  
   $("#indexId").val(indexId);
 
   $("#modelPopup").show();
@@ -257,59 +327,69 @@ function getPopularCategory(popularCategory){
   $('#mutedImageId').attr('src', newSrc);
   $('.videoPlayButton').removeClass('_video_card_playbtn_wraaper');
 
-      var preBufferDone = false;
+    //   var preBufferDone = false;
       
-        playerInstance.setup({
-          file: file,
-          controls: false,
-          image:image,
-          autostart:'viewable',
-          mute:'false'
-      });
-      playerInstance.on('play', function() {
-            loaderHide();
-            preBufferDone = true;
+    //     playerInstance.setup({
+    //       file: file,
+    //       controls: false,
+    //       image:image,
+    //       autostart:'viewable',
+    //       mute:'false'
+    //   });
+    //   playerInstance.on('play', function() {
+    //         loaderHide();
+    //         preBufferDone = true;
           
-      }); 
+    //   }); 
 
-    playerInstance.on('buffer', function() {
+    // playerInstance.on('buffer', function() {
 
-      var time = 1;
+    //   var time = 1;
 
-    });   
+    // });   
 
 
-     playerInstance.on('error', function(event) {
-        loaderHide();
-        var erroCode=event.code;
-        singleItemData=playListData[indexId];
-        playerInstance.setup({
-            file: singleItemData.backup_url,
-            controls: false,
-            image:image,
-            autostart:'viewable',
-            mute:'false'
-      });
+    //  playerInstance.on('error', function(event) {
+    //     loaderHide();
+    //     var erroCode=event.code;
+    //     singleItemData=playListData[indexId];
+    //     playerInstance.setup({
+    //         file: singleItemData.backup_url,
+    //         controls: false,
+    //         image:image,
+    //         autostart:'viewable',
+    //         mute:'false'
+    //   });
 
-    });
+    // });
 
-    playerInstance.on('complete', function() {
-    jwplayer('player').setMute(true);
+    // playerInstance.on('complete', function() {
+    // jwplayer('player').setMute(true);
 
-    });
+    // });
 
     singleItemData=playListData[indexId];
+    var video_backup="";
+    var video_backup=singleItemData.question_video;
+    video_play_using_video_js(file,video_backup,image);
 
-    var shareURL=site_base_url+singleItemData.user.username+'/'+singleItemData.id+'';
+    var shareURL=site_base_url+singleItemData.slug+'/'+singleItemData.id+'';
     var sideBarDetails='<div onClick="openMobileDownloadPopup();" class="jsx-2177493926 jsx-3813273378 avatar round" style="background-image: url(/media/musically_100x100.jpeg); width: 48px; height: 48px; flex: 0 0 48px;"></div><div class="jsx-949708032 boloindya-toolbar" style="margin-top: 20px;"><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-like" onClick="openMobileDownloadPopup();" style="background-image: url(/media/viewIcon.svg);"><span class="jsx-949708032">'+singleItemData.likes_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-comment" onClick="openMobileDownloadPopup();" style="background-image: url(/media/comments.svg);"><span class="jsx-949708032">'+singleItemData.comment_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-share" onclick="openShareTab()" style="background-image: url(/media/share.svg);"><span class="jsx-949708032">'+singleItemData.total_share_count+'</span></div></div>';
     $("#topicID").val(singleItemData.id);
     $("#currentPlayUserId").val(singleItemData.user.userprofile.id);
     $("#topicCreatorUsername").val(singleItemData.user.username);
     $("#shareInputbox").val(shareURL);
-    var bigCommentLikeDet='<strong>'+singleItemData.likes_count+' '+likeTrans+' · '+singleItemData.comment_count+' '+commentsTrans+'</strong>';
+    var bigCommentLikeDet='<strong><span id="likeCountId">'+singleItemData.likes_count+'</span> '+likeTrans+' · <span id="commentCountId">'+singleItemData.comment_count+'</span> '+commentsTrans+'</strong>';
     $("#sideBarId").html(sideBarDetails);
     $("._video_card_big_meta_info_count").html(bigCommentLikeDet);
-    
+    $(".video-meta-title").html(singleItemData.title);
+
+    //===================== Comment and Like count ===============
+
+    $("#totalLikeCount").val(singleItemData.likes_count);
+    $("#totalCommentCount").val(singleItemData.comment_count);
+
+    //===================Comment and Like Count end =============
     var userprofileName=singleItemData.user.userprofile.name;
     var userHandleName=singleItemData.user.username;
     var videoTitle=singleItemData.title;
@@ -356,11 +436,11 @@ function getPopularCategory(popularCategory){
                     if(followStatus==true){
                         jQuery('.followStatusChangePopup').removeClass('sx_5da455');
                         jQuery('.followStatusChangePopup').addClass('sx_5da456');
-                        jQuery('.btnTextChangePopup').text('Followed');
+                        jQuery('.btnTextChangePopup').text(followed_trans);
                     }else{
                         jQuery('.followStatusChangePopup').removeClass('sx_5da456');
                         jQuery('.followStatusChangePopup').addClass('sx_5da455');
-                        jQuery('.btnTextChangePopup').text('Follow');
+                        jQuery('.btnTextChangePopup').text(follow_trans);
                     }
                 }
 
@@ -385,21 +465,35 @@ function getPopularCategory(popularCategory){
     var sideBarCommentDetails="";
     var origin   = window.location.origin;
     param1=singleItemData.slug;
-    history.pushState(null, null, '?video='+param1);
+    param2=singleItemData.id;
+    history.pushState(null, null, '?video='+param1+'/'+param2);
 
 
 }
 
  function muteAndUnmutePlayer(){
-  jwplayer().setMute();
-  var muteStatus=jwplayer('player').getMute();
-  if(muteStatus==true){
-    var newSrc='/media/sound_mute.svg';
-    $('#mutedImageId').attr('src', newSrc);
-  }else{
-    var newSrc='/media/mute_icon.svg';
-    $('#mutedImageId').attr('src', newSrc);
-  }
+  // jwplayer().setMute();
+  // var muteStatus=jwplayer('player').getMute();
+  // if(muteStatus==true){
+  //   var newSrc='/media/sound_mute.svg';
+  //   $('#mutedImageId').attr('src', newSrc);
+  // }else{
+  //   var newSrc='/media/mute_icon.svg';
+  //   $('#mutedImageId').attr('src', newSrc);
+  // }
+
+
+    if($("video").prop('muted')){
+
+      $("video").prop('muted', false);
+      var newSrc='/media/mute_icon.svg';
+      $('#mutedImageId').attr('src', newSrc);
+    }else{
+        $("video").prop('muted', true);
+        var newSrc='/media/sound_mute.svg';
+        $('#mutedImageId').attr('src', newSrc);
+    }
+
 
 }
 
@@ -459,11 +553,17 @@ function listCommentsById(singleTopicData){
 }
 
 function loadMoreComments(nextPageURl){
-
+    loaderBoloShowDynamic('_scroll_load_more_loading_comment');
+    if(nextPageURl=='null'){
+        var loadMoreComment='<span class="loadMoreComment">No more comment</span';
+        $(".loadMoreComments").html(loadMoreComment);
+        loaderBoloHideDynamic('_scroll_load_more_loading_comment');
+        return false;
+    }
     var listCommentItems="";
     //================Comments List =================
     var uri=nextPageURl;
-    var res = encodeURI(uri);
+    var res = uri;
     $.get(res, function (data, textStatus, jqXHR) {
         var videoCommentList=data.results;
 
@@ -485,13 +585,17 @@ function loadMoreComments(nextPageURl){
         var loadMoreComment='<span class="loadMoreComment"><a class="" onclick="loadMoreComments(\''+data.next+'\');" href="javascript:void(0);">Load More Comments...</a></span';
         $(".loadMoreComments").html(loadMoreComment);
         loaderBoloHide();
+        loaderBoloHideDynamic('_scroll_load_more_loading_comment');
 
     });
 }
 
 
     function followLikeList(){
-        check_login_status();
+        var checkstatus=check_login_status();
+        if(checkstatus==false){
+            return false;
+        }
 
         var ge_local_data="";
             ge_local_data = JSON.parse(localStorage.getItem("access_data"));
@@ -517,7 +621,7 @@ function loadMoreComments(nextPageURl){
                         if(followStatus==true){
                             jQuery('.followStatusChange-'+followId).removeClass('sx_5da455');
                             jQuery('.followStatusChange-'+followId).addClass('sx_5da456');
-                            jQuery('.btnTextChange-'+followId).text('Followed');
+                            jQuery('.btnTextChange-'+followId).text(followed_trans);
                         }
 
                     });
@@ -528,6 +632,56 @@ function loadMoreComments(nextPageURl){
 
     }
 
+    function userFollowLikeList(){
+        var checkstatus=check_login_status();
+        if(checkstatus==false){
+            return false;
+        }
+        var ge_local_data="";
+            ge_local_data = JSON.parse(localStorage.getItem("access_data"));
+        var accessToken=ge_local_data.access_token;
+        var listCommentItems="";
+
+        //================Comments List =================
+        var uri='/api/v1/get_user_follow_and_like_list/';
+        var res = encodeURI(uri);
+        jQuery.ajax({
+            url:res,
+            type:"POST",
+            headers: {
+              'Authorization':'Bearer '+accessToken,
+            },
+            success: function(response,textStatus, xhr){debugger;
+                userLikeAndUnlike=response;
+                if(response.all_follow){
+                    var listFollows=response.all_follow;
+                    var currentUserId=$("#currentUserId").val();
+                    currentUserId=parseInt(currentUserId, 10);
+                    var statusFollow=jQuery.inArray( currentUserId, listFollows )
+                    if(statusFollow>=0){
+                        // $('.followUserStatusChange-'+currentUserId).html(followed_trans);
+                        $('.followUserStatusChange-'+currentUserId).removeClass('sx_5da455');
+                        var checkstatusBu=$('.followUserStatusChange-'+currentUserId).hasClass('sx_5da456');
+                        if(checkstatusBu){
+                            $('.followUserStatusChange-'+currentUserId).removeClass('sx_5da456');
+                            $('.followUserStatusChange-'+currentUserId).addClass('sx_5da455');
+                            jQuery('.btnTextChangeUser-'+currentUserId).text(follow_trans); 
+                        }else{
+                            $('.followUserStatusChange-'+currentUserId).addClass('sx_5da456');
+                            jQuery('.btnTextChangeUser-'+currentUserId).text(followed_trans);
+                        }
+                    }
+
+                }
+
+            }
+      
+        });
+
+    }
+
+
 jQuery(document).ready(function(){
     followLikeList();
+    userFollowLikeList();
 });
