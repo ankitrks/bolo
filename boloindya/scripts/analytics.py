@@ -55,7 +55,7 @@ def like_count():
 			for val in lang_details:
 				lang_id = val.language_id 
 
-			language_str = language_map[language_id-1]	
+			language_str = language_map[lang_id-1]	
 			if((curr_month, curr_year, language_str) not in month_year_dict):
 				month_year_dict[(curr_month, curr_year, language_str)] = 1
 			else:
