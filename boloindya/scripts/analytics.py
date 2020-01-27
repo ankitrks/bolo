@@ -32,11 +32,11 @@ def convert_data_csv(month_year_dict, filename):
 	month_name = ['Jan', 'Feb', 'March', 'April', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
 	w = csv.writer(f)
 	w.writerow(['Month', 'Count'])
-	for (a,b,c) in month_year_dict.items():
+	for key, val in month_year_dict.items():
 		writer = csv.writer(f)
-		curr_name = month_name[int(a[0])-1]
-		writer.writerow([curr_name, str(b), c])
-
+		curr_name = month_name[int(key[0])-1]
+		writer.writerow([curr_name, str(key[1]), str(key[2])])
+		
 	f.close()	
 
 
