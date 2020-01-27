@@ -134,6 +134,7 @@ def lang_category_count():
 	month_year_dict = dict()
 	for item in all_data:
 		curr_videoid = item.videoid
+		print(curr_videoid)
 		curr_date = item.timestamp
 		curr_month = curr_date.month
 		curr_year = curr_date.year 
