@@ -28,6 +28,8 @@ for (a,b) in language_string:
 
 def convert_data_csv(month_year_dict, filename):
 
+	print(month_year_dict)
+	
 	f = open(filename, 'w')
 	month_name = ['Jan', 'Feb', 'March', 'April', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
 	w = csv.writer(f)
@@ -36,7 +38,7 @@ def convert_data_csv(month_year_dict, filename):
 		writer = csv.writer(f)
 		curr_name = month_name[int(key[0])-1]
 		writer.writerow([curr_name, str(key[1]), str(key[2])])
-		
+
 	f.close()	
 
 
