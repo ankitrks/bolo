@@ -153,9 +153,10 @@ def lang_category_count():
 
 
 def main():
-	like_count()
-	share_count()
-	comment_count()
+	# like_count()
+	# share_count()
+	# comment_count()
+	lang_category_count()
 
 
 def run():
