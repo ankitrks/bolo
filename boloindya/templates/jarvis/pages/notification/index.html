@@ -82,7 +82,7 @@
                 </thead>
                 <tbody>
                     {% for pushNotification in pushNotifications %}
-                        <tr>
+                        <tr style="{% if pushNotification.is_executed %} background-color: #90ee90; {% else  %} background-color: #ffffe0; {% endif %}">
                             <td>{{ forloop.counter }}</td>
                             <td>{{ pushNotification.title }}</td>
                             <td style="color: {% if pushNotification.is_scheduled %} #b52828 {% else %} #1989cd {% endif %};">{{ pushNotification.scheduled_time }}</td>
