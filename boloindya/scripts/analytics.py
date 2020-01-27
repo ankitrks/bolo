@@ -33,7 +33,7 @@ def convert_data_csv(month_year_dict, filename):
 	f = open(filename, 'w')
 	month_name = ['Jan', 'Feb', 'March', 'April', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
 	w = csv.writer(f)
-	w.writerow(['Month', 'Language', 'Count'])
+	w.writerow(['Month-Year', 'Language', 'Count'])
 	for key, val in month_year_dict.items():
 		writer = csv.writer(f)
 		curr_name = month_name[int(key[0])-1]
@@ -73,13 +73,19 @@ def share_count():
 	for item in all_data:
 		if(str(item.video_type) == 'shared'):
 			#print(item)
+			curr_videoid = item.videoid 
 			curr_date = item.timestamp
 			curr_month = curr_date.month 
 			curr_year = curr_date.year 
-			if((curr_month, curr_year) not in month_year_dict):
-				month_year_dict[(curr_month, curr_year)] = 1
+			lang_details = Topic.objects.all().filter(id = curr_videoid)
+			for val in lang_details:
+				lang_id = val.language_id 
+
+			language_str = language_map[int(lang_id)-1]	
+			if((curr_month, curr_year, language_str) not in month_year_dict):
+				month_year_dict[(curr_month, curr_year, language_str)] = 1
 			else:
-				month_year_dict[(curr_month, curr_year)]+=1
+				month_year_dict[(curr_month, curr_year, language_str)]+=1
 
 	
 	#print(month_year_dict)				
@@ -91,13 +97,19 @@ def comment_count():
 	for item in all_data:
 		if(str(item.video_type) == 'commented'):
 			#print(item)
+			curr_videoid = item.videoid 
 			curr_date = item.timestamp
 			curr_month = curr_date.month 
 			curr_year = curr_date.year 
-			if((curr_month, curr_year) not in month_year_dict):
-				month_year_dict[(curr_month, curr_year)] = 1
+			lang_details = Topic.objects.all().filter(id = curr_videoid)
+			for val in lang_details:
+				lang_id = val.language_id 
+
+			language_str = language_map[int(lang_id)-1]	
+			if((curr_month, curr_year, language_str) not in month_year_dict):
+				month_year_dict[(curr_month, curr_year, language_str)] = 1
 			else:
-				month_year_dict[(curr_month, curr_year)]+=1
+				month_year_dict[(curr_month, curr_year, language_str)]+=1
 
 	
 	#print(month_year_dict)				
@@ -105,8 +117,8 @@ def comment_count():
 
 def main():
 	like_count()
-	#share_count()
-	#comment_count()
+	share_count()
+	comment_count()
 
 
 def run():
