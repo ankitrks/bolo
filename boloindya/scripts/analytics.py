@@ -103,8 +103,8 @@ def comment_count():
 
 def main():
 	like_count()
-	share_count()
-	comment_count()
+	#share_count()
+	#comment_count()
 
 
 def run():
