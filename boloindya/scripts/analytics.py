@@ -28,7 +28,7 @@ for (a,b) in language_string:
 
 def convert_data_csv(month_year_dict, filename):
 
-	print(month_year_dict)
+	#print(month_year_dict)
 
 	f = open(filename, 'w')
 	month_name = ['Jan', 'Feb', 'March', 'April', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
@@ -41,6 +41,18 @@ def convert_data_csv(month_year_dict, filename):
 
 	f.close()	
 
+def convert_data_csv_lang_categ(month_year_dict, filename):
+
+	print(month_year_dict)
+	f = open(filename, 'w')
+	month_name = ['Jan', 'Feb', 'March', 'April', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
+	w.writerow(['Month-Year', 'Language', 'Category', 'Count'])
+	for key, val in month_year_dict.items():
+		writer = csv.writer(f)
+		curr_name = month_name[int(key[0])-1]
+		writerow.writerow([curr_name + str(key[1]), str(key[2]), str(key[3]), val])
+
+	f.close()	
 
 
 def like_count():
@@ -114,6 +126,30 @@ def comment_count():
 	
 	#print(month_year_dict)				
 	convert_data_csv(month_year_dict, 'data_commented.csv')
+
+
+def lang_category_count():
+
+	all_data = UserVideoTypeDetails.objects.all()
+	month_year_dict = dict()
+	for item in all_data:
+		curr_videoid = item.videoid
+		curr_date = item.timestamp
+		curr_month = curr_date.month
+		curr_year = curr_date.year 
+		lang_details = Topic.objects.all().filter(id = curr_videoid)
+		for val in lang_details:
+			lang_id = val.language_id
+			curr_category = val.category
+
+		language_str = language_map[int(lang_id)-1]
+		if((curr_month, curr_year, language_str, curr_category) not in month_year_dict):
+			month_year_dict[(curr_month, curr_year, language_str, curr_category)] = 1
+		else:
+			month_year_dict[(curr_month, curr_year language_str, curr_category)]+=1
+
+	convert_data_csv(month_year_dict, 'data_lang_category.csv')			 		
+
 
 def main():
 	like_count()
