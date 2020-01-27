@@ -1588,6 +1588,14 @@ def daily_vplay_data(request):
         return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)   
 
 
+#def analytics_video_views(request):
+
+
+def analytics(request):
+    return render(request, 'jarvis/pages/analytics_panel/view_analytics_data.html')
+
+
+
 @api_view(['POST'])
 # view for notification search
 def search_notification(request):
