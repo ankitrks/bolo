@@ -146,7 +146,7 @@ def lang_category_count():
 		if((curr_month, curr_year, language_str, curr_category) not in month_year_dict):
 			month_year_dict[(curr_month, curr_year, language_str, curr_category)] = 1
 		else:
-			month_year_dict[(curr_month, curr_year language_str, curr_category)]+=1
+			month_year_dict[(curr_month, curr_year, language_str, curr_category)]+=1
 
 	convert_data_csv(month_year_dict, 'data_lang_category.csv')			 		
 
