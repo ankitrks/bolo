@@ -134,7 +134,7 @@ def lang_category_count():
 	month_year_dict = dict()
 	for item in all_data:
 		curr_videoid = item.videoid
-		print(curr_videoid)
+		#print(curr_videoid)
 		curr_date = item.timestamp
 		curr_month = curr_date.month
 		curr_year = curr_date.year 
@@ -149,7 +149,7 @@ def lang_category_count():
 		else:
 			month_year_dict[(curr_month, curr_year, language_str, curr_category)]+=1
 
-	convert_data_csv(month_year_dict, 'data_lang_category.csv')			 		
+	convert_data_csv_lang_categ(month_year_dict, 'data_lang_category.csv')			 		
 
 
 def main():
