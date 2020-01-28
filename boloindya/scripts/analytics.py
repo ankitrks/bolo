@@ -51,7 +51,7 @@ def convert_data_csv_lang_categ(month_year_dict, filename):
 	for key, val in month_year_dict.items():
 		writer = csv.writer(f)
 		curr_name = month_name[int(key[0])-1]
-		writerow.writerow([curr_name + str(key[1]), str(key[2]), str(key[3]), val])
+		writer.writerow([curr_name + str(key[1]), str(key[2]), str(key[3]), val])
 
 	f.close()	
 
@@ -142,7 +142,7 @@ def lang_category_count():
 		lang_details = Topic.objects.all().filter(id = curr_videoid)
 		for val in lang_details:
 			lang_id = val.language_id
-			curr_category = val.category
+			curr_category = str(val.category)
 
 		language_str = language_map[int(lang_id)-1]
 		if((curr_month, curr_year, language_str, curr_category) not in month_year_dict):
