@@ -23,7 +23,7 @@ from jarvis.models import DashboardMetrics
 language_string = list(language_options)
 language_map = []
 for (a,b) in language_string:
-	language_map.append(b)
+	language_map.append(str(b))
 
 
 def convert_data_csv(month_year_dict, filename):
@@ -40,8 +40,11 @@ def convert_data_csv(month_year_dict, filename):
 	for key, val in month_year_dict.items():
 		month_year_list.append((key[0], key[1]))
 
+	print(month_year_list)
+		
 	for (a,b) in month_year_list:
 		display_freq = []
+		print((a,b))
 		for key, val in month_year_dict.items():
 			if(a==key[0] and b==key[1]):
 				index = language_map.index(str(key[2]))
