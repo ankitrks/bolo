@@ -28,8 +28,8 @@ for (a,b) in language_string:
 
 def convert_data_csv(month_year_dict, filename):
 
-	#print(month_year_dict)
-
+	print(month_year_dict)
+	
 	f = open(filename, 'w')
 	month_name = ['Jan', 'Feb', 'March', 'April', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
 	w = csv.writer(f)
@@ -204,10 +204,10 @@ def lang_video_count():
 
 def main():
 	like_count()
-	share_count()
-	comment_count()
-	lang_category_count()
-	lang_video_count()
+	# share_count()
+	# comment_count()
+	# lang_category_count()
+	# lang_video_count()
 
 
 def run():
