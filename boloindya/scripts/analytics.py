@@ -54,7 +54,7 @@ def convert_data_csv(month_year_dict, filename):
 
 		#print((a,b), display_freq)
 		writer = csv.writer(f)		
-		curr_name = month_name[int(a)-1] + b 
+		curr_name = month_name[int(a-1)] + "" + str(b) 
 		writer.writerow([curr_name, display_freq[0], display_freq[1], display_freq[2], display_freq[3], display_freq[4], display_freq[5], display_freq[6], display_freq[7], display_freq[8]])
 
 	# for key, val in month_year_dict.items():
