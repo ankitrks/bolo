@@ -16,9 +16,9 @@ def run():
         for each_language in language_options:
             language_specific_vb = Topic.objects.filter(m2mcategory=each_category, is_removed=False, is_vb=True,language_id=each_language[0])
             language_specific_seen = language_specific_vb.aggregate(Sum('view_count'))
+            language_specific_category, is_created = CategoryViewCounter.objects.get_or_create(category=each_category,language=each_language[0])
             if language_specific_seen.has_key('view_count__sum') and language_specific_seen['view_count__sum']:
                 # print "language_specific",each_language[1]," --> ",language_specific_seen['view_count__sum']
-                language_specific_category, is_created = CategoryViewCounter.objects.get_or_create(category=each_category,language=each_language[0])
                 language_specific_category.view_count = language_specific_seen['view_count__sum']
             else:
                 language_specific_category.view_count = 0
