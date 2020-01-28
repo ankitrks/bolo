@@ -46,6 +46,7 @@ def convert_data_csv_lang_categ(month_year_dict, filename):
 	print(month_year_dict)
 	f = open(filename, 'w')
 	month_name = ['Jan', 'Feb', 'March', 'April', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
+	w = csv.writer(f)
 	w.writerow(['Month-Year', 'Language', 'Category', 'Count'])
 	for key, val in month_year_dict.items():
 		writer = csv.writer(f)
