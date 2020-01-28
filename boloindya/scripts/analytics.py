@@ -132,7 +132,7 @@ def comment_count():
 
 	print(month_year_dict_uniq)	
 	#print(month_year_dict)				
-	#convert_data_csv(month_year_dict, 'data_commented.csv')
+	convert_data_csv(month_year_dict_uniq, 'data_commented.csv')
 
 
 # category name with total video count, language wise 
@@ -185,7 +185,7 @@ def lang_video_count():
 		month_year_dict_uniq[key] = len(set(val))
 
 	print(month_year_dict_uniq)	
-	#convert_data_csv(month_year_dict, 'data_video_lang.csv')				
+	convert_data_csv(month_year_dict_uniq, 'data_video_lang.csv')				
 
 
 def main():
@@ -193,7 +193,7 @@ def main():
 	# share_count()
 	comment_count()
 	#lang_category_count()
-	#lang_video_count()
+	lang_video_count()
 
 
 def run():
