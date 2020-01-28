@@ -53,7 +53,7 @@ class TopicChangeList(ChangeList):
         #     list_filter, date_hierarchy, search_fields, list_select_related,
         #     list_per_page, list_max_show_all, list_editable, model_admin)
         # action_checkbox
-        self.list_display = ('vb_list', 'id', 'title', 'name', 'duration', 'language_id', 'imp_count',\
+        self.list_display = ('vb_list', 'id', 'title', 'name', 'duration', 'show_thumbnail', 'language_id', 'imp_count',\
             'is_moderated', 'is_monetized', 'is_removed', 'is_pubsub_popular_push', 'date', 'm2mcategory') #is_popular
         self.list_display_links = ['id']
         self.list_editable = ('title', 'language_id', 'm2mcategory', 'is_pubsub_popular_push', 'is_monetized', 'is_removed', \
@@ -141,6 +141,14 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
                 background-repeat: no-repeat;height: 20px;display: block;"></a>'
     vb_list.allow_tags = True
     vb_list.short_description = "VB"
+    
+    def show_thumbnail(self, obj):
+        if obj.question_image:
+            return """<div style="background: url('""" + obj.question_image + """');width: 100%;
+                    height: 56px;background-size: 100%;"></div>"""
+        return '<div style="width: 30px;height: 30px;"></div>'
+    show_thumbnail.allow_tags = True
+    show_thumbnail.short_description = "IMG"
 
     def comments(self, obj):
         return obj.comments()
