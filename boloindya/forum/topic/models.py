@@ -390,6 +390,8 @@ class Topic(models.Model):
     def duration(self):
         if self.media_duration:
             return format_html('<a href="' + self.backup_url + '" target="_blank">' + self.media_duration + '</a>' )
+        elif self.backup_url:
+            return format_html('<a href="' + self.backup_url + '" target="_blank">play</a>' )
         return "00:00"
 
     def comments(self):

@@ -55,6 +55,7 @@ class UserProfile(models.Model):
 
     last_post_hash = models.CharField(_("last post hash"), max_length=32, blank=True)
     last_post_on = models.DateTimeField(_("last post on"), null=True, blank=True)
+    cover_pic = models.CharField(_("Cover Pic"), max_length=1000, blank=True)
     # new  profile fields:{maaz} #
     profile_pic = models.CharField(_("Profile Pic"), max_length=1000, blank=True)
     name = models.CharField(_("Name"), max_length=100, blank=True)
@@ -154,6 +155,7 @@ class UserPay(RecordTimeStamp):
     bolo_bifurcation = models.TextField(null=True,blank=True)
     is_evaluated = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False)
+    is_active = models.BooleanField(default = True)
     class Meta:
         verbose_name_plural = 'User\'s Pay'
 

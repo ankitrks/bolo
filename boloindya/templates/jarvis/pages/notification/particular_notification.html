@@ -32,14 +32,38 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for pushNotification in pushNotification.push_notification_id.all %}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{ pushNotification.user.username }}</td>
-                            <td>{{ pushNotification.user }}</td>
-                            <td style="color: {% if pushNotification.status == 0 %} #b52828 {% else %} #1989cd {% endif %}">{% get_notification_status pushNotification.status %}</td>
-                        </tr>
-                    {% endfor %}
+                    {% if status_id == '2' %}
+                        {% for pushNotification in pushNotification.push_notification_id.all %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ pushNotification.user.username }}</td>
+                                <td>{{ pushNotification.user }}</td>
+                                <td style="color: {% if pushNotification.status == 0 %} #b52828 {% else %} #1989cd {% endif %}">{% get_notification_status pushNotification.status %}</td>
+                            </tr>
+                        {% endfor %}    
+                    {% elif status_id == '0' %}
+                        {% for pushNotification in pushNotification.push_notification_id.all %}
+                            {% if pushNotification.status == '1' or pushNotification.status == '0' %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ pushNotification.user.username }}</td>
+                                    <td>{{ pushNotification.user }}</td>
+                                    <td style="color: {% if pushNotification.status == 0 %} #b52828 {% else %} #1989cd {% endif %}">{% get_notification_status pushNotification.status %}</td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        {% for pushNotification in pushNotification.push_notification_id.all %}
+                            {% if pushNotification.status == '1' %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ pushNotification.user.username }}</td>
+                                    <td>{{ pushNotification.user }}</td>
+                                    <td style="color: {% if pushNotification.status == 0 %} #b52828 {% else %} #1989cd {% endif %}">{% get_notification_status pushNotification.status %}</td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
                 </tbody>
             </table>
         </div>

@@ -224,6 +224,10 @@ CACHES.update({
     }
 })
 
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
+REDIS_DB = 0
+
 FCM_APIKEY = "AIzaSyBMF3hxMosSjE-95inmJTcaR-rNEWn2zpQ"
 FCM_DEVICE_MODEL = 'jarvis.FCMDevice'
 
@@ -513,4 +517,71 @@ PREDICTION_START_HOUR = 3
 
 CAREERANNA_VIDEOFILE_UPDATE_URL = "https://www.careeranna.com/search/insertOrUpdateFreeVideo"
 SITE_ID = 2
+
+
+LOG_DIRS = ['/var/log/boloindya/']
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '%(levelname)s %(asctime)s  %(message)s'
+        },
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(name)s %(filename)s %(funcName)s %(lineno)d %(message)s'
+        },
+    },
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            #'class': 'django_db_logger.db_log_handler.DatabaseLogHandler',
+            'class': 'logging.FileHandler',
+            'filename': LOG_DIRS[0] + 'debug.log' ,
+            'formatter': 'verbose'
+        },
+        'console': {
+            'level': 'INFO',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        },
+        'request_handler': {
+                'level':'INFO',
+                'class':'logging.handlers.RotatingFileHandler',
+                'filename': LOG_DIRS[0] + 'django_request.log',
+                'formatter':'verbose',
+        },
+    },
+    'loggers': {
+
+        'boloindya': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True
+        },
+
+        'django.request':{
+             'handlers':['file'],
+             'level':'INFO',
+             'propagate':True,
+        },
+
+        'logger.log': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True
+        },
+
+    },
+}
+
+import logging
+log = logging.getLogger('boloindya')
+
 
