@@ -45,7 +45,7 @@ def convert_data_csv(month_year_dict, filename):
 		for key, val in month_year_dict.items():
 			if(a==key[0] and b==key[1]):
 				index = language_map.index(str(key[2]))
-				display_freq[index] = val
+				display_freq[index-1] = val
 
 		print((a,b), display_freq)		
 
