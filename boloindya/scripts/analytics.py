@@ -122,9 +122,9 @@ def comment_count():
 
 			language_str = language_map[int(lang_id)-1]	
 			if((curr_month, curr_year, language_str) not in month_year_dict):
-				month_year_dict[(curr_month, curr_year, language_str)] = comment_count
+				month_year_dict[(curr_month, curr_year, language_str)] = curr_comment_count
 			else:
-				month_year_dict[(curr_month, curr_year, language_str)]+=comment_count
+				month_year_dict[(curr_month, curr_year, language_str)]+=curr_comment_count
 
 	
 	#print(month_year_dict)				
