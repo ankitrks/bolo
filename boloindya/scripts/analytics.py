@@ -151,7 +151,7 @@ def view_count():
 		for val in lang_details:
 			lang_id = str(val.language_id)
 
-		if(language_id.isdigit()):
+		if(lang_id.isdigit()):
 			language_str = language_map[int(lang_id)-1]
 		else:
 			language_str = lang_id	
