@@ -1591,10 +1591,18 @@ def get_user_bolo_info(request):
         if not start_date or not end_date:
             total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user)
             all_pay = UserPay.objects.filter(user=request.user,is_active=True)
+            top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user).order_by('-view_count')[:3]
+            # userprofile = UserProfile.objects.get(user=request.user)
+            # video_playtime = userprofile.total_vb_playtime    #with the utils to converts it in hour(4.3hr)
+            # spent_time = userprofile.spent_time   #with the utils to converts it in hour(4.3hr)
         else:
             total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user,date__gte=start_date, date__lte=end_date)
             all_pay = UserPay.objects.filter(user=request.user,is_active=True,for_month__gte=start_date.month,for_month__lte=start_date.month,\
                 for_year__gte=start_date.year,for_year__lte=start_date.year)
+            top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user,date__gte=start_date, date__lte=end_date).order_by('-view_count')[:3]
+            # all_spent = UserSpentTime.objects.filter(user=request.user,date__gte=start_date, date__lte=end_date)
+            # all_play = VBPlay.objects.filter(user=request.user,date__gte=start_date, date__lte=end_date)
+
         total_earn=0
         for each_pay in all_pay:
             total_earn+=each_pay.amount_pay
@@ -1615,9 +1623,12 @@ def get_user_bolo_info(request):
         total_comment_count = shorcountertopic(total_comment_count)
         total_like_count = shorcountertopic(total_like_count)
         total_share_count = shorcountertopic(total_share_count)
+        video_playtime = 0
+        spent_time = 0
         return JsonResponse({'message': 'success', 'total_video_count' : total_video_count, \
                         'monetised_video_count':monetised_video_count, 'total_view_count':total_view_count,'total_comment_count':total_comment_count,\
-                        'total_like_count':total_like_count,'total_share_count':total_share_count,'left_for_moderation':left_for_moderation,'total_earn':total_earn}, status=status.HTTP_200_OK)
+                        'total_like_count':total_like_count,'total_share_count':total_share_count,'left_for_moderation':left_for_moderation,'total_earn':total_earn,'video_playtime':video_playtime,\
+                        'spent_time':spent_time,'top_3_videos':TopicSerializer(top_3_videos,many=True).data}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
