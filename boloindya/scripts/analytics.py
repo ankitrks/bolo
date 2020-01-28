@@ -33,34 +33,34 @@ def convert_data_csv(month_year_dict, filename):
 	f = open(filename, 'w')
 	month_name = ['Jan', 'Feb', 'March', 'April', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
 	w = csv.writer(f)
-	w.writerow(['Month-Year', language_map])
-	#w.writerow(['Month-Year', 'Language', 'Count'])
+	#w.writerow(['Month-Year', language_map])
+	w.writerow(['Month-Year', 'Language', 'Count'])
 	#month_year_lang_dict = dict()
 	month_year_list = []
 	for key, val in month_year_dict.items():
 		month_year_list.append((key[0], key[1]))
 
-	month_year_list = list(set(month_year_list))
-	#print(language_map)
+	# month_year_list = list(set(month_year_list))
+	# #print(language_map)
 
-	for (a,b) in month_year_list:
-		display_freq = [0] * len(language_map)
-		for key, val in month_year_dict.items():
-			if(a==key[0] and b==key[1]):
-				#print(str(key[2]))
-				index = language_map.index(str(key[2]))
-				#print(index)
-				display_freq[index] = val
+	# for (a,b) in month_year_list:
+	# 	display_freq = [0] * len(language_map)
+	# 	for key, val in month_year_dict.items():
+	# 		if(a==key[0] and b==key[1]):
+	# 			#print(str(key[2]))
+	# 			index = language_map.index(str(key[2]))
+	# 			#print(index)
+	# 			display_freq[index] = val
 
-		#print((a,b), display_freq)
-		writer = csv.writer(f)		
-		curr_name = month_name[int(a-1)] + "" + str(b) 
-		writer.writerow([curr_name, display_freq[0], display_freq[1], display_freq[2], display_freq[3], display_freq[4], display_freq[5], display_freq[6], display_freq[7], display_freq[8]])
+	# 	#print((a,b), display_freq)
+	# 	writer = csv.writer(f)		
+	# 	curr_name = month_name[int(a-1)] + "" + str(b) 
+	# 	writer.writerow([curr_name, display_freq[0], display_freq[1], display_freq[2], display_freq[3], display_freq[4], display_freq[5], display_freq[6], display_freq[7], display_freq[8]])
 
-	# for key, val in month_year_dict.items():
-	# 	writer = csv.writer(f)
-	# 	curr_name = month_name[int(key[0])-1]
-	# 	writer.writerow([curr_name + str(key[1]), str(key[2]), val])
+	for key, val in month_year_dict.items():
+		writer = csv.writer(f)
+		curr_name = month_name[int(key[0])-1]
+		writer.writerow([curr_name + str(key[1]), str(key[2]), val])
 
 	f.close()	
 
@@ -102,7 +102,7 @@ def like_count():
 				month_year_dict[(curr_month, curr_year, language_str)].append(curr_videoid)
 
 	
-	#print(month_year_dict)
+	print(month_year_dict)
 	for key, val in month_year_dict.items():
 		month_year_dict_uniq[key] = len(set(val))
 
