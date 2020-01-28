@@ -10,6 +10,7 @@ from django.utils import timezone
 from ..core.conf import settings
 from ..core.utils.models import AutoSlugField
 from .managers import CategoryQuerySet
+from drf_spirit.utils import language_options
 
 
 class Category(models.Model):
@@ -77,3 +78,11 @@ class Category(models.Model):
             return True
         else:
             return False
+
+class CategoryViewCounter(models.Model):
+    category = models.ForeignKey('forum_category.Category', verbose_name=_("category"), related_name="category_counter",null=True,blank=True)
+    language = models.CharField(_("language"), choices=language_options, blank = True, null = True, max_length=10)
+    view_count = models.BigIntegerField(default = 0)
+    
+    def __unicode__(self):
+        return self.view_count
