@@ -142,6 +142,7 @@ def view_count():
 	all_data = VideoPlaytime.objects.all()
 	month_year_dict = dict()
 	month_year_dict_uniq = dict()
+	month_year_dict_view = dict()
 	for item in all_data:
 		curr_videoid = item.videoid
 		curr_date = item.timestamp
@@ -164,9 +165,11 @@ def view_count():
 
 	for key, val in month_year_dict.items():
 		month_year_dict_uniq[key] = len(set(val))
-
-	print(month_year_dict_uniq)	
-	
+		month_year_dict_view [key] = len(val)
+		
+	print(month_year_dict_uniq)
+	convert_data_csv(month_year_dict_view, 'data_views_total.csv')
+	convert_data_csv(month_year_dict_uniq, 'data_views_uniq.csv')
 
 
 def comment_count():
