@@ -40,14 +40,15 @@ def convert_data_csv(month_year_dict, filename):
 	for key, val in month_year_dict.items():
 		month_year_list.append((key[0], key[1]))
 
-	print(month_year_list)
-		
+	month_year_list = list(set(month_year_list))
+	print(language_map)
+
 	for (a,b) in month_year_list:
 		display_freq = []
-		print((a,b))
 		for key, val in month_year_dict.items():
 			if(a==key[0] and b==key[1]):
 				index = language_map.index(str(key[2]))
+				print(index)
 				display_freq[index-1] = val
 
 		print((a,b), display_freq)		
