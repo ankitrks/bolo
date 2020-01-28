@@ -1,7 +1,7 @@
 var playListData=[];
 var userLikeAndUnlike=[];
 //http://127.0.0.1:8000/api/v1/get_vb_list/?limit=10&offset=10&user_id=191
-
+var itemCount=0;
 var page = 1;
 var checkDataStatus=0;
 $(window).scroll(function() {
@@ -26,12 +26,9 @@ function getUserVideos(limit,offset){
 
     loaderBoloShowDynamic('_scroll_load_more_loading_user_videos');
     var user_id= $("#currentUserId").val();
-     
     var platlistItems;
     var language_id=current_language_id;
-    console.log('CurrentLanguageId:'+current_language_id);
     var listItems="";
-    var itemCount=0;
     var userVideoItems="";
     var uri='/api/v1/get_vb_list/';
     var res = encodeURI(uri);
@@ -44,14 +41,14 @@ function getUserVideos(limit,offset){
             userVideoItems="";
             var videoItemList=response.results;
             jQuery("#userVideoCountId").html(response.count);
-            var itemCount=-1;
             videoItemList.forEach(function(itemCreator) {itemCount++;
                 userVideoItems =getVideoItem(itemCreator,itemCount);
                 $("#userVideosListId").append(userVideoItems);
+                playListData.push(itemCreator);
       
             });
             loaderBoloHideDynamic('_scroll_load_more_loading_user_videos');
-            playListData=videoItemList;
+            //playListData=videoItemList;
             var nextPageData=response.next;
             jQuery("#nextPageUrlId").val(response.next);
             
@@ -62,16 +59,12 @@ function getUserVideos(limit,offset){
     });
 }
 
-
-
 function loadMoreData(NextPageUrl){
     
     var platlistItems;
     checkDataStatus=1;
     var listItems="";
-    var itemCount=0;
     var language_id=current_language_id;
-    //var uri='https://www.boloindya.com/api/v1/get_popular_video_bytes/?page=1';
     var uri=NextPageUrl;
     var res = encodeURI(uri);
       $.ajax(
@@ -93,7 +86,6 @@ function loadMoreData(NextPageUrl){
                 checkDataStatus=0;
                 userVideoItems="";
                 var videoItemList=data.results;
-                var itemCount=-1;
                 videoItemList.forEach(function(itemCreator) {itemCount++;
                 userVideoItems +=getVideoItem(itemCreator,itemCount);
                 playListData.push(itemCreator);          
@@ -130,7 +122,7 @@ function loadMoreData(NextPageUrl){
 function getVideoItem(videoItem,itemCount){
     var content_title="";
     var videoTitle="";
-        videoTitle=videoItem.title;
+        videoTitle=removeTags(videoItem.title);
         content_title = videoTitle.substr(0, 40) + " ...";
     var userVideoItem = '<div class="jsx-1410658769 video-feed-item">\
             <div class="jsx-1410658769 _ratio_">\
@@ -319,7 +311,7 @@ function video_play_using_video_js(url,backup_url,image) {
  function openVideoInPopup(file,image,indexId){
   loaderShow();
   var singleItemData=[];
-  
+  indexId=indexId-1;
   $("#indexId").val(indexId);
 
   $("#modelPopup").show();

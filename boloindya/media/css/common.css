@@ -3899,6 +3899,32 @@ video.jsx-3382097194 {
     color:#fff;
 }
 
+@media(max-width: 991px){
+._card_header_desc_follow {
+    width: 100%;
+    max-width: 303px;
+    font-size: 12px;
+    position: relative;
+    top: 32px;
+    left: -16px;
+    right: -2px;
+    font-weight: normal;
+    line-height: 15px;
+    height: 30px;
+    color: rgba(22, 24, 35, 0.5);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+    margin: 0px;
+    overflow: hidden;
+    color: #fff;
+}
+
+
+    
+}
+
 ._music_card_control {
     width: 32px;
     height: 32px;

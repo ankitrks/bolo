@@ -4,10 +4,6 @@
 {% load number_formate_change_tag %}
 {% block title %}BoloIndya{% endblock %}
 {% block content %}
-{% get_current_language as LANGUAGE_CODE %}
-{% get_available_languages as LANGUAGES %}
-{% get_language_info_list for LANGUAGES as languages %}
-
 <style type="text/css">
 body {
     font-family: HelveticaNeue-Light,helvetica neue light,helvetica neue,Helvetica,Arial,lucida grande,sans-serif;
@@ -32,7 +28,10 @@ body {
     text-align: center;
     border-bottom: 1px solid #e5e5e5;
 }
-
+.container-fluid {
+    margin: 0;
+    padding: 0;
+}
 @media screen and (min-width: 768px){
 .jumbotron {
     padding-top: 48px;
@@ -105,24 +104,6 @@ body {
     font-weight: 700;
     border-radius: 1px;
 }
-
- .btn-main {
-    margin-top: 32px;
-    padding: 14px 84px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px 0 rgba(0,0,0,.4);
-}
-
-.btn-main {
-    max-width: 100%;
-    background: #1a1a1a;
-    color: #fff;
-    width: 140px;
-    font-size: 20px;
-    font-weight: 700;
-    border-radius: 1px;
-}
-
 .jumbotron .btn {
     font-size: 21px;
     padding: 14px 24px;
@@ -160,9 +141,13 @@ body {
     padding-bottom: 120px;
 }
 
-
+.container-fluid {
+    margin: 0;
+    padding: 0;
+}
 .container, .container-fluid {
-
+    padding-right: 15px;
+    padding-left: 15px;
     margin-right: auto;
     margin-left: auto;
 }
@@ -205,7 +190,7 @@ body {
 .careers .we-believe p, .careers-footer .we-believe p {
     font-size: 20px;
 }
-.careers .together-at-bobble, .careers-footer .together-at-bobble {
+.careers .together-at-boloindya, .careers-footer .together-at-boloindya {
     background: #f2f2f2;
     text-align: center;
     padding-bottom: 64px;
@@ -215,20 +200,20 @@ body {
     margin: 0;
     padding: 0;
 }
-.careers .together-at-bobble h1, .careers-footer .together-at-bobble h1 {
+.careers .together-at-boloindya h1, .careers-footer .together-at-boloindya h1 {
     font-size: 40px;
     margin: 30px;
     color: #000;
 }
-.careers .together-at-bobble .showcase, .careers-footer .together-at-bobble .showcase {
+.careers .together-at-boloindya .showcase, .careers-footer .together-at-boloindya .showcase {
     margin: auto;
     display: flex;
     justify-content: center;
 }
-.careers .together-at-bobble .showcase .block-1, .careers .together-at-bobble .showcase .block-1-1-2, .careers .together-at-bobble .showcase .block-2, .careers-footer .together-at-bobble .showcase .block-1, .careers-footer .together-at-bobble .showcase .block-1-1-2, .careers-footer .together-at-bobble .showcase .block-2 {
+.careers .together-at-boloindya .showcase .block-1, .careers .together-at-boloindya .showcase .block-1-1-2, .careers .together-at-boloindya .showcase .block-2, .careers-footer .together-at-boloindya .showcase .block-1, .careers-footer .together-at-boloindya .showcase .block-1-1-2, .careers-footer .together-at-boloindya .showcase .block-2 {
     display: flex;
 }
-.careers .together-at-bobble .showcase img, .careers-footer .together-at-bobble .showcase img {
+.careers .together-at-boloindya .showcase img, .careers-footer .together-at-boloindya .showcase img {
     width: 100%;
     padding: 5px;
 }
@@ -486,7 +471,7 @@ img {
 .text-center {
     text-align: center;
 }
-.careers .together-at-bobble .showcase img, .careers-footer .together-at-bobble .showcase img {
+.careers .together-at-boloindya .showcase img, .careers-footer .together-at-boloindya .showcase img {
     width: 100%;
     padding: 5px;
 }
@@ -545,7 +530,7 @@ img {
 .careers .we-believe p, .careers-footer .we-believe p {
     font-size: 14px;
 }
-.careers .together-at-bobble .showcase, .careers-footer .together-at-bobble .showcase {
+.careers .together-at-boloindya .showcase, .careers-footer .together-at-boloindya .showcase {
     margin: 0 20px;
     flex-direction: column;
 }
@@ -618,382 +603,149 @@ img {
 .careers .benefit .benefit-inner p, .careers-footer .benefit .benefit-inner p {
     font-size: 12px;
 }
-}
-.career-details-outer-container {
-    background-color: #1b1b1b;
-    margin-top: 60px;
-}
-.career-details-outer-container .inner-container .sticky-heading {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 60px;
-    background-color: #1b1b1b;
-    z-index: 200;
-}
-.career-details-outer-container .inner-container {
-    max-width: 1024px;
-    padding-top: 24px;
-}
-.career-details-outer-container .inner-container .sticky-heading .row-1 {
-    padding-bottom: 16px;
-}
-.career-details-outer-container .inner-container .sticky-heading .row-1 .job-title {
-    color: #fff;
-    font-weight: 700;
-}
-.h3, h3 {
-    font-size: 24px;
-}
-.career-details-outer-container .inner-container .row-2 {
-    margin-top: 16px;
-}
-.career-details-outer-container .inner-container .banner-image-container {
-    text-align: center;
-}
-@media (min-width: 992px){
-.col-md-6 {
-    width: 50%;
-}
-
-.col-md-3 {
-    width: 25%;
-}
-.col-md-9 {
-    width: 75%;
-}
-.col-md-12{
-    width: 100%;
-}
-
-}
-.career-details-outer-container .inner-container .row-2 .banner-image {
-    height: 300px;
-}
-.img-responsive {
-    display: initial;
-}
-.img-responsive, .img-thumbnail {
-    height: auto;
-    max-width: 100%;
-}
-
-img {
-    vertical-align: middle;
-}
-.career-details-outer-container .inner-container .row-2 {
-    margin-top: 16px;
-}
-.career-details-outer-container .inner-container {
-    max-width: 1024px;
-    padding-top: 24px;
-}
-@media screen and (min-width: 768px){
-.container {
-    max-width: 730px;
-}
-}
-
-@media (min-width: 1200px){
-.container {
-    width: 1170px;
-}
-}
-.career-details-outer-container .inner-container .sticky-heading {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 80px;
-    background-color: #1b1b1b;
-    z-index: 200;
-}
-.career-details-outer-container .inner-container .sticky-heading .row-1 {
-    padding-bottom: 16px;
-}
-.career-details-outer-container .inner-container .sticky-heading .row-1 .apply-now {
-    margin-top: 16px;
-    text-transform: capitalize;
-    border: 1px solid #fff;
-    border-radius: 8px;
-    width: 90%;
-    text-align: center;
-    color: #fff;
-    padding: 8px 6px;
-}
-.career-details-outer-container .inner-container .card {
-    margin-top: 32px;
-    border-radius: 3px;
-    box-shadow: 0 2px 4px 0 rgba(0,0,0,.5);
-    background-color: #fff;
-    padding: 24px;
-    font-size: 16px;
-}
-.career-details-outer-container .inner-container .row-2 .description {
-    color: #fff;
-    font-size: 18px;
-    margin-top: 16px;
-}
-
-@media (max-width: 768px){
-.career-details-outer-container .inner-container .sticky-heading {
-    top: 100px;
-}
-.career-details-outer-container .inner-container .sticky-heading .row-1 .apply-now {
-    width: 50%;
-    margin-bottom: 24px;
-}
-.career-details-outer-container .inner-container .row-2 .banner-image {
-    height: 230px;
-}
 
 
-}
-@media (max-width: 480px){
-.career-details-outer-container .inner-container .sticky-heading {
-    top: 100px;
-    margin-top: -30px;
-}
-.career-details-outer-container .inner-container .sticky-heading .row-1 .apply-now {
-    width: 50%;
-    margin-bottom: 8px;
-    margin-top: 0;
-}
-.career-details-outer-container .inner-container .row-2 .banner-image {
-    height: 220px;
-}
-
-
-}
-@media (max-width: 991px){
-.container {
-     position:unset;
-    background-color: #1a1a1a;
-}
-.paddingOnMobile{
-    padding: 10px;
-}
-}
-.applicationForm{
-    margin: auto;width: 95%
-}
-.applicationForm .field{
-    padding: 10px;
-}
-
-.applicationForm p label{
-    padding: 0px;
-}
-.applicationForm p input{
-    padding: 0px;
-
-}
-#id_name{
-    margin-left:100px; 
-}
-#id_email{
-    margin-left:132px; 
-}
-                   
-#id_document{
-    margin-left:34px; 
-}
-
-.applicationForm input[type=text], input[type=email], input[type=number], input[type=password] {
-    margin-left: 100px !important;
-}
-.applicationForm label {
-    margin-right: 150px;
-}
-#id_mobile{
-    margin-left:33px !important; 
-} 
-#id_help_text{
-    margin-left: -26px;
-}
-.jobTitle{
-    margin-left: 40px;
-}
-
-</style>
-
-
-{% if LANGUAGE_CODE == "hi" %}
-<style type="text/css">
-    #id_email {
-    margin-left: 89px !important;
 }
 </style>
-{% endif %}
+<div class="careers ng-scope" style="background: #fff">
+<!--     <div class="container-fluid jumbotron">
+        <div class="jumbotron-img"> <img class="img-responsive" src="/media/img/careers-jumbo.24f237b0.jpeg" alt=""> </div>
+        <div class="content">
+            <h1>Making Expressive Conversations for Next Billion Users </h1> <a ui-sref="root.career_base.openings" class="btn btn-main" href="/careers/openings/">Join Our Team</a> </div>
+    </div> -->
 
-<div class="container-fluid career-details-outer-container ng-scope">
-    <div class="container inner-container ">
-        <div class="sticky-heading paddingOnMobile">
-            <div class="row">
-                <div class="col-md-9 col-sm-8 row-1">
-                    <h3 class="job-title">
-                        {% if job_openings is not None %} 
-                        {{job_openings.title}}
-                        {% endif%}
-                    </h3> 
+
+    <div class="container-fluid reviews" style="margin-top: 80px;">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="user-review">
+                    <div class="user-image"> <img src="https://s3.amazonaws.com/boloindya/thumbnail/img-15687133711.jpg" class="user-image" alt=""> </div>
+                    <div class="review-contents">
+                        <p>Working at Boloindya provides every employee with a great work-life balance. An excellent company to work for, where one can learn a multitude of things under one roof. Sky is the limit here!</p>
+                    </div>
+                    <div class="reviewer">
+                        <p class="name"> Chitra Sharma </p>
+                        <p>QA Manager</p>
+                    </div>
                 </div>
-                <div class="col-md-3 col-sm-4 row-1">
-                    <a href="javascript: scrollToForm();">
-                        <div class="apply-now" > Apply Job </div>
-                    </a>
+            </div>
+            <div class="col-md-4">
+                <div class="user-review">
+                    <div class="user-image"> <img src="https://s3.amazonaws.com/boloindya/thumbnail/img-15687133711.jpg" class="user-image" alt=""> </div>
+                    <div class="review-contents">
+                        <p>Boloindya has helped me find my potential as a creator and curator. They give a free hand to each individual to present and execute their ideas. My work has become a lot more fun at Boloindya's playground. </p>
+                    </div>
+                    <div class="reviewer">
+                        <p class="name"> Lovely Kukreja </p>
+                        <p>General Manager - Content</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="user-review">
+                    <div class="user-image"> <img src="https://s3.amazonaws.com/boloindya/thumbnail/img-15687133711.jpg" class="user-image" alt=""> </div>
+                    <div class="review-contents">
+                        <p>Working at Boloindya is like a roller coaster ride. New challenges, learnings and experiences await on each turn &amp; while working here, the feeling of designing something for next billion users of India is always motivating. </p>
+                    </div>
+                    <div class="reviewer">
+                        <p class="name">Abhik Kapoor </p>
+                        <p>Product Manager</p>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="row paddingOnMobile">
-            <div class="col-md-6 col-sm-5 row-2 banner-image-container"> <img class="img-responsive banner-image" src="/media/img/sr-business-product-analyst.40785dac.svg"> </div>
-            <div class="col-md-6 col-sm-7 row-2">
-                <h3 class="tagline" style="color: #00b2ff">Who believes that “Har sikke ke do pehlu hote hei”</h3>
-                <p class="description"> Data, data everywhere
-                    <br> But it’s your analytical mind we seek.
-                    <br> Be it business, be it product,
-                    <br> You solve it all with your reporting techniques!
-                    <br> You straighten out complex problems by taking a lead,
-                    <br> Your queries always save us in the hour of need! </p>
+        <div class="row">
+            <div class="paginate">
+                <a class="page" href="#"></a>
             </div>
-            <div class="col-md-12 col-sm-12">
-                <div class="card"> <b>Required Details</b>
-                    <p>
-                        {%  if job_openings != None %} 
-                        {{job_openings.description}}
-                        {% endif%}
-                    </p> 
-                </div>
-
-            </div>
-            
-            <br>
-            <div id="formId"></div>
-            <div class="col-md-12 col-sm-12">
-
-                <div class="card applicationForm"> 
-                  <h2 style="margin-bottom: 20px;">Apply Job</h2>
-                   <p style="margin-bottom: 20px;">Job: <span class="jobTitle">{% if job_openings is not None %} 
-                        {{job_openings.title}}
-                        {% endif%}</span><br></p>
-
-                  {% if message %}
-                   <span style="color: green"> {{message}}</span>
-
-                   {% endif %}
-                    <form method="post" id="formSubmitId" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <!-- {{ form.non_field_errors }} -->
-
-                        {% for field in form.hidden_fields %}
-                            {{ field.errors }}
-                            {{ field }}
-                        {% endfor %}
-
-                        {% for field in form.visible_fields %}
-                            <div class="field">
-                                {{ field.label_tag }}
-                                {{ field.errors }}
-                                {{ field }}
-                                {{ field.help_text }}
-
-                            </div>
-                        {% endfor %}
-                        {% if form.visible_fields %}
-                         <p style="text-align: center;" id="submitBtnId"><button class="btn submitBtn btn-main" type="submit">Apply</button></p>
-
-                        {% endif %}
-                    </form>
-
-<!--                <form method="post">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    <button type="submit">Send</button>
-                  </form> -->
-                </div>
-            </div>
-            <br>
-
         </div>
     </div>
+    <div class="container-fluid join-us">
+        <div class="pad-top col-xs-12">
+            <div class="media">
+                <div class="media-left">
+                    <a href="#"> <img src="/media/img/join-us.943cbbfe.svg" alt="join us"> </a>
+                </div>
+                <div class="media-body">
+                    <h1>Join Our Team</h1>
+                    <p>With exciting new opportunities in technology and revolutionary potential of our team, we thrive to create a smarter, Data Intelligent future. We inspire each other and aspire together to enable human expression and collective intelligence reach new heights. And celebrate all small and big wins on our way. Excited about tackling new challenges and being part of something greater? Welcome aboard!</p> <a class="btn btn-main" ui-sref="root.career_base.openings" href="/careers/openings"> See Open Positions </a> </div>
+            </div>
+        </div>
+    </div>
+<!--     <div class="container-fluid press">
+        <div class="press-inner">
+            <div class="press-column">
+                <a class="press-item" href="https://www.businesstoday.in/magazine/the-buzz/boloindya-keyboard-a-holistic-input-app/story/279501.html" target="_blank"> <img src="/media/img/life-at-boloindya-01.3bfd46d2.jpg" alt="">
+                    <div class="press-caption">
+                        <h1>boloindya Keyboard: A Holistic Input App</h1>
+                        <p>Business Today</p>
+                    </div>
+                </a>
+                <a class="press-item" href="http://www.atp.show/ash18-ashley-talks/" target="_blank"> <img src="/media/img/life-at-boloindya-01.3bfd46d2.jpg" alt=""> </a>
+            </div>
+            <div class="press-column">
+                <a class="press-item" href="https://www.forbes.com/video/5755005609001/" target="_blank"> <img src="/media/img/life-at-boloindya-01.3bfd46d2.jpg" alt="">
+                    <div class="press-caption">
+                        <h1>Ankit Prasad in Forbes 30 Under 30 Asia 2018</h1>
+                        <p>-Forbes</p>
+                    </div>
+                </a>
+                <a class="press-item" href="https://yourstory.com/2017/03/app-fridays-boloindya-keyboard/" target="_blank"> <img src="/media/img/life-at-boloindya-01.3bfd46d2.jpg" alt="">
+                    <div class="press-caption">
+                        <h1>Will GIFs be the 'go-to language' for millennials? boloindya Keyboard believes so</h1>
+                        <p>-Your Story</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div> -->
+<!--     <div class="container-fluid our-partners">
+        <div class="our-partners-inner">
+            <div class="description">
+                <h2>We Work with Top Brands</h2>
+                <p>With over 10M users, it’s not surprising that leading movie studios and sports brands partner with boloindya Keyboard. </p>
+            </div>
+            <div class="partner-image"> <img src="/media/img/our-partners-1.dbc0b7e7.png" alt=""> </div>
+        </div>
+    </div> -->
 
+<div class="careers-footer ng-scope">
+    <div class="container-fluid pad-top">
+        <h2 class="text-center footer-description">Benefits Of Working with us</h2> </div>
+    <div class="container-fluid footer-inner">
+        <div class="pad-top pad-bot">
+            <div class="col-md-4 benefit">
+                <div class="benefit-inner"> <img src="/media/img/benefit-1.0f5779a5.png" alt="" class="img-responsive">
+                    <h3> <b> Challenging Projects </b> </h3>
+                    <p>You will love us if you like solving challenging problems. You will be writing algorithms, system programs, GPU codes and over-optimizing optimized codes. </p>
+                </div>
+            </div>
+            <div class="col-md-4 benefit">
+                <div class="benefit-inner"> <img src="/media/img/benefit-1.0f5779a5.png" alt="" class="img-responsive">
+                    <h3> <b> Entrepreneural Team </b> </h3>
+                    <p>We are a small team, united together without hierarchial bottlenecks. You would be a part of all decisions and together shape the future.</p>
+                </div>
+            </div>
+            <div class="col-md-4 benefit">
+                <div class="benefit-inner"> <img src="/media/img/benefit-1.0f5779a5.png" alt="" class="img-responsive">
+                    <h3> <b>Autonomy in Work</b> </h3>
+                    <p>You will be owning your work. You will be monitoring your KPIs and taking data-driven decisions. You will represent Boloindya at various Conferences and Events across the world.</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-md-offset-2 benefit">
+                <div class="benefit-inner"> <img src="/media/img/benefit-1.0f5779a5.png" alt="" class="img-responsive">
+                    <h3> <b>Learning Sessions</b> </h3>
+                    <p>Learn and grow with sessions from top industry leaders share expertise, knowledge, and valuable tips</p>
+                </div>
+            </div>
+            <div class="col-md-4 benefit">
+                <div class="benefit-inner"> <img src="/media/img/benefit-1.0f5779a5.png" alt="" class="img-responsive">
+                    <h3> <b>Networking events </b> </h3>
+                    <p>Expand your professional circle with weekly networking events</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-<script type="text/javascript">
-function scrollToForm() {
-  document.querySelector('#formId').scrollIntoView({behavior: 'smooth'});
-}
-$(".submitBtn").click(function(event){
-    event.preventDefault();debugger;
-    var documentResume=document.getElementById('id_document').value;
-    if(documentResume==""){
-        $("#id_document").parent().after("<div class='validation' style='color:red;margin-bottom: 20px;text-align: center;'>Please Upload Resume</div>");
-        $('.validation').fadeOut(4000);
-
-        return false;
-    }else{
-        document.getElementById("formSubmitId").submit();
-        //$(".submitBtn").submit();
-    return true;
-    }
-});
-
-
-
-</script>
-
-
-
-<script type="text/javascript">
-    $('#id_mobile').on('keypress',function(evt){
-    evt = (evt) ? evt : window.event;
-    var charCode = (evt.which) ? evt.which : evt.keyCode;
-    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-        return false;
-    }
-    return true;
-});
-
-$('#id_mobile').on('change',function(evt){
-    var phoneNo = document.getElementById('id_mobile');
-    if (phoneNo.value == "" || phoneNo.value == null) {
-      //alert("Please enter your Mobile No.");
-      document.getElementById('id_mobile').focus();
-      return false;
-    }
-    if (phoneNo.value.length < 10 || phoneNo.value.length > 10) {
-        $("#id_mobile").parent().after("<div class='validation_mobile' style='color:red;margin-bottom: 20px;text-align: center;'>Mobile No. is not valid</div>");
-        $('.validation_mobile').fadeOut(3000);
-
-        document.getElementById('id_mobile').focus();
-        return false;
-    }
-    $('.validation_mobile').html("");
-    return true;
-});
-
-$('#id_email').on('change',function(evt){
-    var emailID = document.getElementById('id_email');
-    if (emailID.value == "" || emailID.value == null) {
-      //alert("Please enter your Mobile No.");
-      document.getElementById('id_email').focus();
-      return false;
-    }
-    var statusEmail="";
-    var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    if(!emailRegex.test(emailID.value)){
-      $("#id_email").focus();
-        statusEmail=false;
-    }else{
-        statusEmail=true;
-    }
-
-    if(statusEmail==false){
-        document.getElementById('id_email').focus();
-        $("#id_email").parent().after("<div class='validation' style='color:red;margin-bottom: 20px;text-align: center;'>Please enter email address</div>");
-        $('.validation').fadeOut(3000);
-      return false;
-    }    
-    $('.validation').html();
-    return true;
-});
-
-</script>
-
+</div>
 {% endblock %}

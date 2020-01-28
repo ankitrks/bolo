@@ -111,7 +111,7 @@ var isLoading = false;
 var hideErrorMsg = true;
 
 var retryCount=0;
-function video_play_using_video_js(url,backup_url,image) {debugger;
+function video_play_using_video_js(url,backup_url,image) {
     
     var video = document.getElementById('player');
 
@@ -312,7 +312,7 @@ function openVideoInPopup(topicId){
 
  }
 
- $('._global_modal_cancel').click(function(){debugger;
+ $('._global_modal_cancel').click(function(){
     //history.pushState(null, null, '?'+param1);
  });
 
@@ -475,10 +475,9 @@ function getCategoryWithVideos(){
                      loaderBoloHideDynamic('_scroll_load_more_loading_left');
                     $("#catWithVideoId").append(category_with_video_list);
                 }
-                followLikeList();
-
-
             });
+
+            followLikeList();
 
         },
         error: function(jqXHR, ajaxOptions, thrownError) {
@@ -533,7 +532,7 @@ function popularCategoryHeading(itemCategory){
 function popularCategoryItem(itemVideoByte){
     var content_title="";
     var videoTitle="";
-        videoTitle=itemVideoByte.title;
+        videoTitle=removeTags(itemVideoByte.title);
         content_title = videoTitle.substr(0, 40) + " ..."
 
     var category_item_template='<div class="jsx-1410658769 _explore_feed_card_item" onClick="openVideoInPopup('+itemVideoByte.id+');" ><div class="jsx-1410658769 _ratio_"><div class="jsx-1410658769" style="padding-top: 148.148%;"><div class="jsx-1410658769 _ratio_wrapper"><a href="javascript:void(0)"><div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+itemVideoByte.question_image+');"><div class="jsx-3077367275 video-card default"><div class="jsx-3077367275 video-card-mask"><div class="jsx-1633345700 card-footer normal no-avatar"><div class="jsx-1633345700"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+itemVideoByte.view_count+'</span></p><span class="_video_card_footer_likes1"><img src="/media/download.svg" alt="likes"> '+itemVideoByte.likes_count+'</span></div></div></div></div></div></a></div></div></div></div>';
@@ -560,7 +559,7 @@ function followLikeList(){
         headers: {
           'Authorization':'Bearer '+accessToken,
         },
-        success: function(response,textStatus, xhr){debugger;
+        success: function(response,textStatus, xhr){
             userLikeAndUnlike=response;
 
             var countFollowStatus=userLikeAndUnlike.all_follow;

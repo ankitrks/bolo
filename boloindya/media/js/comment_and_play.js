@@ -1,5 +1,5 @@
 var video = document.getElementById('player');
-  jQuery('#UCommentLink').on('click',function(){
+  jQuery('#UCommentLink').on('click',function(){debugger;
       $("#comment-input").val("");
       var commentBoxInputStatus=jQuery('#commentInputId').hasClass('hide');
       if(commentBoxInputStatus==true){
@@ -19,7 +19,8 @@ var video = document.getElementById('player');
           //     jwplayer('playerDetails').pause();
           // }
           
-          document.getElementById('openLoginPopup').click();
+          document.getElementById('gotoLoginPage').click();
+          //document.getElementById('openLoginPopup').click();
               //jQuery("#openLoginPopup").click();
          }else{
               jQuery('#commentInputId').removeClass('hide');
@@ -90,8 +91,8 @@ var video = document.getElementById('player');
             $('.videoPlayButton').removeClass('play-button');
             $('.videoPlayButton').addClass('play-button');
           }          
-          
-          document.getElementById('openLoginPopup').click();
+          document.getElementById('gotoLoginPage').click();
+          //document.getElementById('openLoginPopup').click();
          }
          var likeStatus=jQuery('.sp_ddXiTdIB8vm').hasClass('sx_44a25c');
          if(likeStatus==true){
@@ -170,7 +171,8 @@ $('.videoPlayButton').click(function(){debugger;
 function social_share(shareType){debugger;
      var loginStatus= check_login_status();
      if(loginStatus==false){
-        document.getElementById('openLoginPopup').click();
+        document.getElementById('gotoLoginPage').click();
+        //document.getElementById('openLoginPopup').click();
      }
 
     var topicId=$("#topicID").val();
@@ -267,7 +269,8 @@ $("#submit-button").click(function(){
 
         var loginStatus= check_login_status();
          if(loginStatus==false){
-            document.getElementById('openLoginPopup').click();
+            document.getElementById('gotoLoginPage').click();
+            //document.getElementById('openLoginPopup').click();
          }
         var ge_local_data="";
         ge_local_data = JSON.parse(localStorage.getItem("access_data"));

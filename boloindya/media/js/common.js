@@ -345,7 +345,14 @@ function copyShareLinkMobile() {
           jQuery('#commentInputId').removeClass('hide');
           $("form#optForm")[0].reset();
           window.location.hash = '#comment';
-           $("#modelPopup").hide();
+          var next_page_url= $('#next_page_url').val();
+          if(next_page_url!=""){
+            window.location.replace(next_page_url);
+          }else{
+            window.location='/';
+          }
+          
+           //$("#modelPopup").hide();
         },
         error: function(jqXHR, textStatus, errorThrown){
           $("form#optForm")[0].reset();
@@ -362,6 +369,30 @@ function copyShareLinkMobile() {
       return false;
     }
   }
+
+
+function loginAndGenerateAuthRequest(){
+  var user_id = userLoginStatus;
+  var ge_local_data="";
+  var loginStatus=check_login_status();
+  if(loginStatus==true && (user_id=="" || user_id=='None')){
+      ge_local_data = JSON.parse(localStorage.getItem("access_data"));
+      var accessToken=ge_local_data.access_token;
+      var userName=ge_local_data.username
+      var userId=ge_local_data.user.id;
+  var url='/login/auth_api/';
+    $.ajax({
+        type: 'POST',
+        headers: {"X-CSRFToken": getCookie('csrftoken')},
+        url: url,
+        data: {user_id: userId,'username':userName},
+    }).done(function(data, textStatus, jqXHR) {
+        access_data = data;
+    });
+  }
+
+}
+loginAndGenerateAuthRequest();
 
 
 function loginDataByUser(){
@@ -383,7 +414,7 @@ function loginDataByUser(){
 }
 
 
-function follow_user(user_following_id){debugger;
+function follow_user(user_following_id){
 	var user_id = userLoginStatus;
 	var followUrl='/api/v1/follow_user/';
 	var user_following_id = user_following_id;
@@ -421,7 +452,8 @@ function follow_user(user_following_id){debugger;
 
         });
 	}else{
-		document.getElementById('openLoginPopup').click();
+    document.getElementById('gotoLoginPage').click();
+		//document.getElementById('openLoginPopup').click();
 	}
 }
 
@@ -464,12 +496,13 @@ function follow_user_from_user(user_following_id){
 
         });
   }else{
-    document.getElementById('openLoginPopup').click();
+    document.getElementById('gotoLoginPage').click();
+    //document.getElementById('openLoginPopup').click();
   }
 }
 
 
-function follow_user_by_popup(){debugger;
+function follow_user_by_popup(){
 	var user_following_id=$("#currentPlayUserId").val();
 	if(user_following_id==""){
 		return false;
@@ -489,7 +522,7 @@ function follow_user_by_popup(){debugger;
               'Authorization':'Bearer '+accessToken,
             },
             data:{user_following_id:user_following_id},
-            success: function(response,textStatus, xhr){debugger;
+            success: function(response,textStatus, xhr){
  
                checkFollowStatus=jQuery('.followStatusChange-'+user_following_id).hasClass('sx_5da456');
                if(checkFollowStatus==false){
@@ -518,12 +551,13 @@ function follow_user_by_popup(){debugger;
 
         });
 	}else{
-		document.getElementById('openLoginPopup').click();
+    document.getElementById('gotoLoginPage').click();
+		//document.getElementById('openLoginPopup').click();
 	}
 }
 
 
-function follow_category(following_id){debugger;
+function follow_category(following_id){
 
 	var followUrl='/api/v1/follow_sub_category/';
 	var following_id = following_id;
@@ -563,12 +597,13 @@ function follow_category(following_id){debugger;
 
         });
 	}else{
-		document.getElementById('openLoginPopup').click();
+    document.getElementById('gotoLoginPage').click();
+		//document.getElementById('openLoginPopup').click();
 	}
 }
 
 
-function follow_category_discover(following_id){debugger;
+function follow_category_discover(following_id){
 
   var followUrl='/api/v1/follow_sub_category/';
   var following_id = following_id;
@@ -608,8 +643,17 @@ function follow_category_discover(following_id){debugger;
 
         });
   }else{
-    document.getElementById('openLoginPopup').click();
+    document.getElementById('gotoLoginPage').click();
+    //document.getElementById('openLoginPopup').click();
   }
+}
+
+function removeTags(str) {
+  if ((str===null) || (str===''))
+  return false;
+  else
+  str = str.toString();
+  return str.replace( /(<([^>]+)>)/ig, '');
 }
 
 

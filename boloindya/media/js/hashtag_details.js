@@ -37,9 +37,10 @@ function getSideBarData(){
             var popularCreatorsList=response.popular_boloindyans;
             popularCreatorsList.forEach(function(itemCreator) {itemCount++;
                 populaCreatorsItems +=getCreators(itemCreator);
-                $("#creatorId").append(populaCreatorsItems);
+                
                 //var videoCommentList=data.results;"total_view":"3444.K",
             });
+            $("#creatorId").append(populaCreatorsItems);
             loaderBoloHideDynamic('_scroll_load_more_loading_creator');
                 popularCategoriesList.forEach(function(itemCat) {itemCount++;
                 populaCategoriesItems +=getPopularCategory(itemCat);
@@ -269,7 +270,7 @@ function getCategoryVideos(){
 function getVideoItem(videoItem,itemCount){
     var content_title="";
     var videoTitle="";
-        videoTitle=videoItem.title;
+        videoTitle=removeTags(videoItem.title);
         content_title = videoTitle.substr(0, 40) + " ...";
     var userVideoItem = '<div class="jsx-1410658769 video-feed-item">\
             <div class="jsx-1410658769 _ratio_">\
@@ -293,7 +294,6 @@ function getVideoItem(videoItem,itemCount){
 
         return userVideoItem;
 }
-
 
   var sideBarDetails="";
   var sideBarCommentDetails="";
@@ -451,7 +451,8 @@ function video_play_using_video_js(url,backup_url,image) {
         var sideBarCommentDetails="";
         var origin   = window.location.origin;
         param1=singleItemData.slug;
-        history.pushState(null, null, '?video='+param1);
+        param2=singleItemData.id;
+        history.pushState(null, null, '?video='+param1+'/'+param2);
         followLikeList();
  }
 

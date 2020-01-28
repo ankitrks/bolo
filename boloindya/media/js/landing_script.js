@@ -5,9 +5,6 @@
     var playListData=[];
     $(window).scroll(function() {
         var scorh=Number($(window).scrollTop() + $(window).height());
-        //console.log('Scol+he '+scorh);
-        //if($(window).scrollTop() + $(window).height() >= $(document).height()-800 && $(window).scrollTop() + $(window).height()<$(document).height()) {
-           
         if($(window).scrollTop() + $(window).height() > $("#playlist").height()){
 
             if(checkDataStatus==0){
@@ -16,7 +13,6 @@
             }
 
         }
-        //console.log('documentHe- '+$(document).height());
     });
 
     function loadMoreData(page){
@@ -66,7 +62,8 @@
 
             var content_title="";
             var videoTitle="";
-                videoTitle=itemVideo.title;
+
+                videoTitle=removeTags(itemVideo.title);
                 content_title = videoTitle.substr(0, 40) + " ...";
 
             listItems +='<div class="_video_feed_item"><div class="_ratio_"><div style="padding-top: 148.148%;"><div class="_ratio_wrapper"><a onClick="openVideoInPopup(\''+itemVideo.video_cdn+'\',\''+itemVideo.question_image+'\','+totalCountVideo+');"  class="js-video-link playlist-item '+isPlaying+'" data-mediaid="'+itemVideo.id+'"  href="javascript:void(0);"><div class="_image_card_" style="border-radius: 4px; background-image: url('+itemVideo.question_image+');"><div class="_video_card_play_btn_ _video_card_play_btn_dark _image_card_playbtn_wraaper"></div><div class="_video_card_footer_ _video_card_footer_respond _image_card_footer_wraaper"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+itemVideo.likes_count+'</span></p><span class="_video_card_footer_likes1"><img src="/media/download.svg" alt="likes"> '+itemVideo.likes_count+'</span></div></div></a></div></div></div></div>';
@@ -103,7 +100,7 @@ $(window).scroll(function () {
         var listItems="";
         var itemCount=0;
 
-        var uri='/api/v1/gest_popular_video_bytes/?page=1&language_id='+language_id;
+        var uri='/api/v1/get_popular_video_bytes/?page=1&language_id='+language_id;
         var res = encodeURI(uri);
         jQuery.ajax({
             url:res,
@@ -129,7 +126,7 @@ $(window).scroll(function () {
                 }
                 var content_title="";
                 var videoTitle="";
-                    videoTitle=itemVideo.title;
+                    videoTitle=removeTags(itemVideo.title);
                     content_title = videoTitle.substr(0, 40) + " ...";
                     //<span class="_avatar_ _avatar_respond" style="background-image: url('+profilePics+');"></span>
                   listItems +='<div class="_video_feed_item"><div class="_ratio_"><div style="padding-top: 148.148%;"><div class="_ratio_wrapper"><a onClick="openVideoInPopup(\''+itemVideo.video_cdn+'\',\''+itemVideo.question_image+'\','+totalCountVideo+');"  class="js-video-link playlist-item '+isPlaying+'" data-mediaid="'+itemVideo.id+'"  href="javascript:void(0);"><div class="_image_card_" style="border-radius: 4px; background-image: url('+itemVideo.question_image+');"><div class="_video_card_play_btn_ _video_card_play_btn_dark _image_card_playbtn_wraaper"></div><div class="_video_card_footer_ _video_card_footer_respond _image_card_footer_wraaper"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+itemVideo.view_count+'</span></p><span class="_video_card_footer_likes1"><img src="/media/download.svg" alt="likes"> '+itemVideo.likes_count+'</span></div></div></a></div></div></div></div>'; 
@@ -602,6 +599,14 @@ function retryLiveStream(hls, url) {
 jQuery(document).ready(function(){
     followLikeList();
 });
+
+function removeTags(str) {
+  if ((str===null) || (str===''))
+  return false;
+  else
+  str = str.toString();
+  return str.replace( /(<([^>]+)>)/ig, '');
+}
 
 
 
