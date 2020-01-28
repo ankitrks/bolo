@@ -129,6 +129,7 @@ def comment_count():
 	convert_data_csv(month_year_dict, 'data_commented.csv')
 
 
+# category name with total video count, language wise 
 def lang_category_count():
 
 	all_data = UserVideoTypeDetails.objects.all()
@@ -151,6 +152,28 @@ def lang_category_count():
 			month_year_dict[(curr_month, curr_year, language_str, curr_category)]+=1
 
 	convert_data_csv_lang_categ(month_year_dict, 'data_lang_category.csv')			 		
+
+# videos created each month lang wise
+def lang_video_count():
+
+	all_data = UserVideoTypeDetails.objects.all()
+	month_year_dict = dict()
+	for item in all_data:
+		curr_videoid = item.videoid
+		curr_date = item.timestamp
+		curr_month = curr_date.month
+		curr_year = curr_date.year 
+		lang_details = Topic.objects.all().filter(id = curr_videoid)
+		for val in lang_details:
+			lang_id = val.language_id
+			
+		language_str = language_map[int(lang_id)-1]
+		if((curr_month, curr_year, language_str) not in month_year_dict):
+			month_year_dict[(curr_month, curr_year, language_str)] = 1
+		else:
+			month_year_dict[(curr_month, curr_year, language_str)]+=1
+
+	convert_data_csv(month_year_dict, 'data_video_lang.csv')				
 
 
 def main():
