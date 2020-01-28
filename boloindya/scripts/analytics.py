@@ -150,6 +150,8 @@ def view_count():
 		lang_details = Topic.objects.all().filter(id=curr_videoid)
 		for val in lang_details:
 			lang_id = val.language_id
+
+		print(lang_id)	
 		language_str = language_map[int(lang_id)-1]
 		if((curr_month, curr_year, language_str) not in month_year_dict):
 			month_year_dict[(curr_month, curr_year, language_str)] = []
