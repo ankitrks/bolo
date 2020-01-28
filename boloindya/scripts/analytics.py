@@ -41,19 +41,21 @@ def convert_data_csv(month_year_dict, filename):
 		month_year_list.append((key[0], key[1]))
 
 	month_year_list = list(set(month_year_list))
-	print(language_map)
+	#print(language_map)
 
 	for (a,b) in month_year_list:
 		display_freq = [0] * len(language_map)
 		for key, val in month_year_dict.items():
 			if(a==key[0] and b==key[1]):
-				print(str(key[2]))
+				#print(str(key[2]))
 				index = language_map.index(str(key[2]))
-				print(index)
+				#print(index)
 				display_freq[index] = val
 
-		print((a,b), display_freq)		
-
+		#print((a,b), display_freq)
+		writer = csv.writer(f)		
+		curr_name = month_name[int(a)-1] + b 
+		writer.writerow([curr_name, display_freq[0], display_freq[1], display_freq[2], display_freq[3], display_freq[4], display_freq[5], display_freq[6], display_freq[7], display_freq[8]])
 
 	# for key, val in month_year_dict.items():
 	# 	writer = csv.writer(f)
