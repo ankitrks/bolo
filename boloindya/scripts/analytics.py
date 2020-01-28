@@ -137,6 +137,37 @@ def share_count():
 		
 	convert_data_csv(month_year_dict_uniq, 'data_shared.csv')
 
+
+def view_count():
+	all_data = UserVideoTypeDetails.objects.all()
+	month_year_dict = dict()
+	month_year_dict_uniq = dict()
+	for item in all_data:
+		if(str(item.video_type) == 'viewed'):
+			#print(item)
+			curr_videoid = item.videoid 
+			curr_date = item.timestamp
+			curr_month = curr_date.month 
+			curr_year = curr_date.year 
+			lang_details = Topic.objects.all().filter(id = curr_videoid)
+			for val in lang_details:
+				lang_id = val.language_id 
+				curr_comment_count = val.comment_count
+
+			language_str = language_map[int(lang_id)-1]	
+			if((curr_month, curr_year, language_str) not in month_year_dict):
+				month_year_dict[(curr_month, curr_year, language_str)] = []
+			else:
+				month_year_dict[(curr_month, curr_year, language_str)].append(curr_videoid)
+
+	for key, val in month_year_dict.items():
+		month_year_dict_uniq[key] = len(set(val))
+
+	print(month_year_dict_uniq)	
+	#print(month_year_dict)				
+	convert_data_csv(month_year_dict_uniq, 'data_viewed.csv')
+
+
 def comment_count():
 	all_data = UserVideoTypeDetails.objects.all()
 	month_year_dict = dict()
@@ -227,10 +258,10 @@ def lang_video_count():
 
 def main():
 	like_count()
-	# share_count()
-	# comment_count()
-	# lang_category_count()
-	# lang_video_count()
+	share_count()
+	comment_count()
+	lang_category_count()
+	lang_video_count()
 
 
 def run():

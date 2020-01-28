@@ -127,7 +127,7 @@ def calc_playtime(unique_video_play, userid):
 			next_vid = unique_video_play[i+1][0]
 			if(curr_vid!=next_vid):
 				ref_timestamp = datetime.utcfromtimestamp((float(unique_video_play[i][1]))/ 1000).replace()
-				#print(ref_timestamp)
+				print(ref_timestamp)
 				time_diff = float(unique_video_play[i+1][1]) - float(unique_video_play[i][1])
 				#print(time_diff)
 				time_diff  = (float(time_diff) / 1000)
