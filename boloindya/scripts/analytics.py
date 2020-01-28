@@ -69,12 +69,13 @@ def like_count():
 			lang_details = Topic.objects.all().filter(id = curr_videoid)
 			for val in lang_details:
 				lang_id = val.language_id 
+				curr_like_count = val.likes_count
 
 			language_str = language_map[int(lang_id)-1]	
 			if((curr_month, curr_year, language_str) not in month_year_dict):
-				month_year_dict[(curr_month, curr_year, language_str)] = 1
+				month_year_dict[(curr_month, curr_year, language_str)] = curr_like_count
 			else:
-				month_year_dict[(curr_month, curr_year, language_str)]+=1
+				month_year_dict[(curr_month, curr_year, language_str)]+=curr_like_count
 
 	
 	#print(month_year_dict)				
@@ -177,11 +178,11 @@ def lang_video_count():
 
 
 def main():
-	# like_count()
+	like_count()
 	# share_count()
 	# comment_count()
 	#lang_category_count()
-	lang_video_count()
+	#lang_video_count()
 
 
 def run():
