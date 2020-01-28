@@ -29,15 +29,31 @@ for (a,b) in language_string:
 def convert_data_csv(month_year_dict, filename):
 
 	print(month_year_dict)
-	
+	#display_dict = dict()		# month-year --> [eng, hindi, bengali ....]
 	f = open(filename, 'w')
 	month_name = ['Jan', 'Feb', 'March', 'April', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
 	w = csv.writer(f)
-	w.writerow(['Month-Year', 'Language', 'Count'])
+	w.writerow(['Month-Year', language_map])
+	#w.writerow(['Month-Year', 'Language', 'Count'])
+	#month_year_lang_dict = dict()
+	month_year_list = []
 	for key, val in month_year_dict.items():
-		writer = csv.writer(f)
-		curr_name = month_name[int(key[0])-1]
-		writer.writerow([curr_name + str(key[1]), str(key[2]), val])
+		month_year_list.append((key[0], key[1]))
+
+	for (a,b) in month_year_list:
+		display_freq = []
+		for key, val in month_year_dict.items():
+			if(a==key[0] and b==key[1]):
+				index = language_map.index(str(key[3]))
+				display_freq[index] = val
+
+		print((a,b), display_freq)		
+
+
+	# for key, val in month_year_dict.items():
+	# 	writer = csv.writer(f)
+	# 	curr_name = month_name[int(key[0])-1]
+	# 	writer.writerow([curr_name + str(key[1]), str(key[2]), val])
 
 	f.close()	
 
