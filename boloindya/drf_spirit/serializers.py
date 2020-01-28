@@ -3,7 +3,7 @@ from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from .fields import UserReadOnlyField
 from forum.topic.models import Topic,CricketMatch,Poll,Choice,Voting,Leaderboard, Notification, TongueTwister,BoloActionHistory,VBseen
 from django.contrib.auth.models import User
-from forum.category.models import Category
+from forum.category.models import Category,CategoryViewCounter
 from forum.comment.models import Comment
 from forum.user.models import UserProfile,AppVersion, ReferralCodeUsed, VideoCompleteRate
 from .relations import PresentableSlugRelatedField
@@ -500,6 +500,7 @@ from django.db.models import Sum
 class CategoryWithVideoSerializer(ModelSerializer):
     topics = SerializerMethodField()
     total_view = SerializerMethodField()
+    current_language_view = SerializerMethodField()
 
     class Meta:
         model = Category
@@ -508,6 +509,13 @@ class CategoryWithVideoSerializer(ModelSerializer):
 
     def get_total_view(self, instance):
         return shorcountertopic(instance.view_count)
+
+    def get_current_language_view(self,instance):
+        if self.context.get("language_id"):
+            language =  self.context.get("language_id")
+            current_language_category = CategoryViewCounter.objects.get(category=instance,language=language)
+            return shorcountertopic(current_language_category.view_count)
+
 
     def get_topics(self,instance):
         # return []
