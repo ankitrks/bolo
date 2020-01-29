@@ -198,7 +198,7 @@ def comment_count():
 			curr_date = item.timestamp
 			curr_month = curr_date.month 
 			curr_year = curr_date.year 
-			lang_details = Topic.objects.all().filter(id = curr_videoid)
+			lang_details = Topic.objects.all().filter(id = curr_videoid, is_vb = True)
 			for val in lang_details:
 				lang_id = val.language_id 
 				curr_comment_count = val.comment_count
@@ -309,10 +309,10 @@ def total_view_lang_categ():
 def main():
 	# like_count()
 	# share_count()
-	# comment_count()
+	comment_count()
 	# lang_category_count()
 	# lang_video_count()
-	total_view_lang_categ()
+	#total_view_lang_categ()
 
 
 def run():
