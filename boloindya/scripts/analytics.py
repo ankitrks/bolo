@@ -281,9 +281,9 @@ def total_view_lang_categ():
 	for item in all_data:
 		curr_videoid = item.videoid
 		curr_date = item.timestamp
-		curr_month = item.month
-		curr_year = item.year
-		lang_details = Topic.objects.all().filter(id = curr_videoid)
+		curr_month = curr_date.month
+		curr_year = curr_date.year
+		lang_details = Topic.objects.all().filter(id = curr_videoid, is_vb = True)
 		for val in lang_details:
 			lang_id = val.language_id
 			curr_category = str(val.category)
