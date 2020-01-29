@@ -277,7 +277,7 @@ msgstr "यूज़र"
 
 #: forum/topic/models.py:448
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #: forum/topic/models.py:449
 msgid "Mobile"

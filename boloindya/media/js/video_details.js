@@ -39,7 +39,7 @@ function getElementsByPage(currentPage){
             }
           var content_title="";
           var videoTitle="";
-              videoTitle=itemVideo.title;
+              videoTitle=removeTags(itemVideo.title);
               content_title = videoTitle.substr(0, 40) + " ..."
             listItems += '<li><a href="/'+itemVideo.user.username+'/'+itemVideo.id+'" ><div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+itemVideo.question_image+');"><div class="jsx-3077367275 video-card default"><div class="jsx-3077367275 video-card-mask"><div class="jsx-1633345700 card-footer small"><div class="jsx-1633345700"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+itemVideo.view_count+'</span></p><span class="_video_card_footer_likes1"><img src="/media/download.svg" alt="likes"> '+itemVideo.likes_count+'</span></div></div></div></div></div></a></li>';
 
@@ -503,7 +503,8 @@ jQuery('#UCommentLink').on('click',function(){
         //     jwplayer('playerDetails').pause();
         // }
         
-        document.getElementById('openLoginPopup').click();
+        //document.getElementById('openLoginPopup').click();
+        document.getElementById('gotoLoginPage').click();
             //jQuery("#openLoginPopup").click();
        }else{
             jQuery('#commentInputId').removeClass('hide');
@@ -564,8 +565,8 @@ jQuery('#UReactionLink').on('click',function(){
         if( jwplayer('playerDetails').getState() == "playing"){
             jwplayer('playerDetails').pause();
         }
-
-        document.getElementById('openLoginPopup').click();
+        document.getElementById('gotoLoginPage').click();
+        //document.getElementById('openLoginPopup').click();
             //jQuery("#openLoginPopup").click();
        }
        var likeStatus=jQuery('.sp_ddXiTdIB8vm').hasClass('sx_44a25c');
@@ -594,7 +595,8 @@ function social_share(shareType){
 
     var loginStatus=check_login_status();
     if(loginStatus==false){
-        document.getElementById('openLoginPopup').click();
+        document.getElementById('gotoLoginPage').click();
+        //document.getElementById('openLoginPopup').click();
         //return false;
     }
 
@@ -686,7 +688,8 @@ function create_comment(inputComment){
 
     var loginStatus=check_login_status();
     if(loginStatus==false){
-        document.getElementById('openLoginPopup').click();
+      document.getElementById('gotoLoginPage').click();
+      //document.getElementById('openLoginPopup').click();
         //return false;
     }
     var ge_local_data="";

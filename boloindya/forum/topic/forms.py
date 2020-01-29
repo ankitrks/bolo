@@ -62,7 +62,7 @@ class JobRequestForm(forms.ModelForm):
     initialVal=""
     class Meta:
         model = JobRequest
-        fields = ('name', 'email', 'mobile', 'document')
+        fields = ('name', 'email', 'mobile', 'document','cover_letter','help_text')
 
     def __init__(self, *args, **kwargs):
         super(JobRequestForm, self).__init__(*args, **kwargs)

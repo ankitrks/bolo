@@ -37,16 +37,15 @@ function getSideBarData(){
             var popularCreatorsList=response.popular_boloindyans;
             popularCreatorsList.forEach(function(itemCreator) {itemCount++;
                 populaCreatorsItems +=getCreators(itemCreator);
-                $("#creatorId").append(populaCreatorsItems);
+                
                 //var videoCommentList=data.results;"total_view":"3444.K",
             });
+            $("#creatorId").append(populaCreatorsItems);
             loaderBoloHideDynamic('_scroll_load_more_loading_creator');
-    
-            popularCategoriesList.forEach(function(itemCat) {itemCount++;
+                popularCategoriesList.forEach(function(itemCat) {itemCount++;
                 populaCategoriesItems +=getPopularCategory(itemCat);
-                $("#discoverId").append(populaCategoriesItems);
-                //var videoCommentList=data.results;"total_view":"3444.K",
             });
+            $("#discoverId").append(populaCategoriesItems);
             loaderBoloHideDynamic('_scroll_load_more_loading_discover');
 
 
@@ -244,11 +243,6 @@ function getCategoryVideos(){
     var language_id=1;
     language_id=current_language_id;
     var userVideoItems="";
-        // headers: {
-        //   'Authorization':'Bearer '+accessToken,
-        // },
-        //http://www.boloindya.com/api/v1/get_vb_list/?limit=1&offset=11
-    //var uri='https://www.boloindya.com/api/v1/get_popular_video_bytes/?page=1';
     var uri='/api/v1/get_challenge/';
     var res = encodeURI(uri);
 
@@ -263,9 +257,8 @@ function getCategoryVideos(){
             videoItemList.forEach(function(itemCreator) {itemCount++;
                 playListData[itemCreator.id]=itemCreator;
                 userVideoItems +=getVideoItem(itemCreator,itemCreator.id);
-                $("#categoryVideosListId").append(userVideoItems);
-      
             });
+            $("#categoryVideosListId").append(userVideoItems);
             loaderBoloHideDynamic('_scroll_load_more_loading_user_videos');
             //playListData=videoItemList;
 
@@ -277,7 +270,7 @@ function getCategoryVideos(){
 function getVideoItem(videoItem,itemCount){
     var content_title="";
     var videoTitle="";
-        videoTitle=videoItem.title;
+        videoTitle=removeTags(videoItem.title);
         content_title = videoTitle.substr(0, 40) + " ...";
     var userVideoItem = '<div class="jsx-1410658769 video-feed-item">\
             <div class="jsx-1410658769 _ratio_">\
@@ -301,7 +294,6 @@ function getVideoItem(videoItem,itemCount){
 
         return userVideoItem;
 }
-
 
   var sideBarDetails="";
   var sideBarCommentDetails="";
@@ -371,38 +363,6 @@ function video_play_using_video_js(url,backup_url,image) {
     var video_backup=singleItemData.question_video;
     video_play_using_video_js(file,video_backup,image);
 
-      
-    //     playerInstance.setup({
-    //       file: file,
-    //       controls: false,
-    //       image:image,
-    //       autostart:'true',
-    //       mute:'false'
-    //   });
-    //   playerInstance.on('play', function() {
-    //         loaderHide();
-    //         preBufferDone = true;
-          
-    //   }); 
-
-    // playerInstance.on('buffer', function() {
-
-    //   var time = 1;
-
-    // });   
-
-
-    // playerInstance.on('error', function(event) {
-    //     loaderHide();
-    //     var erroCode=event.code;
-
-    // });
-
-    // playerInstance.on('complete', function() {
-    //     jwplayer('player').setMute(true);
-
-    // });
-
 
     var shareURL=site_base_url+singleItemData.user.username+'/'+singleItemData.id+'';
 
@@ -413,7 +373,7 @@ function video_play_using_video_js(url,backup_url,image) {
         var bigCommentLikeDet='<strong>'+singleItemData.likes_count+' '+likeTrans+' · '+singleItemData.comment_count+' '+commentsTrans+'</strong>';
         $("#sideBarId").html(sideBarDetails);
         $("._video_card_big_meta_info_count").html(bigCommentLikeDet);
-
+        $(".video-meta-title").html(singleItemData.title);
         var userprofileName=singleItemData.user.userprofile.name;
         var userHandleName=singleItemData.user.username;
         var videoTitle=singleItemData.title;
@@ -491,7 +451,9 @@ function video_play_using_video_js(url,backup_url,image) {
         var sideBarCommentDetails="";
         var origin   = window.location.origin;
         param1=singleItemData.slug;
-        history.pushState(null, null, '?video='+param1);
+        param2=singleItemData.id;
+        history.pushState(null, null, '?video='+param1+'/'+param2);
+        followLikeList();
  }
 
  function muteAndUnmutePlayer(){

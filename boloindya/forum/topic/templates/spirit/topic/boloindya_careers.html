@@ -4,748 +4,170 @@
 {% load number_formate_change_tag %}
 {% block title %}BoloIndya{% endblock %}
 {% block content %}
+
 <style type="text/css">
-body {
-    font-family: HelveticaNeue-Light,helvetica neue light,helvetica neue,Helvetica,Arial,lucida grande,sans-serif;
-    font-size: 14px;
-    line-height: 1.428571429;
-    color: #666;
-}
-
-    .careers .jumbotron, .careers-footer .jumbotron {
-    background: #bee9ff;
-    position: relative;
-    margin-top: 81px;
-}
 
 
-@media screen and (min-width: 768px){
-.jumbotron {
-    border-bottom: 0;
-}
-}
-.jumbotron {
-    text-align: center;
-    border-bottom: 1px solid #e5e5e5;
-}
-.container-fluid {
-    margin: 0;
-    padding: 0;
-}
-@media screen and (min-width: 768px){
-.jumbotron {
-    padding-top: 48px;
-    padding-bottom: 48px;
-}
-}
-.jumbotron {
-    padding-top: 30px;
-    padding-bottom: 30px;
-    margin-bottom: 30px;
-    background-color: #eee;
-}
-.jumbotron, .jumbotron .h1, .jumbotron h1 {
-    color: inherit;
-}
-.container-fluid:after, .container-fluid:before, .container:after, .container:before, .row:after, .row:before {
-    display: table;
-    content: " ";
-}
-.jumbotron {
-    text-align: center;
-    border-bottom: 1px solid #e5e5e5;
-}
-.jumbotron, .jumbotron .h1, .jumbotron h1 {
-    color: inherit;
-}
-.img-responsive {
-    display: initial;
-}
-
-.img-responsive, .img-thumbnail {
-    height: auto;
-    max-width: 100%;
-}
-.careers .jumbotron .content, .careers-footer .jumbotron .content {
-    position: absolute;
-    top: 40%;
-    left: 80px;
-    transform: translate(0,-40%);
-    color: #000;
-    font-weight: 700;
-    max-width: 40%;
-    text-align: left;
-}
-.careers .jumbotron .content h1, .careers-footer .jumbotron .content h1 {
-    font-size: 45px;
-    font-weight: 700;
-}
-
-@media screen and (min-width: 768px){
-.jumbotron .h1, .jumbotron h1 {
-    font-size: 63px;
-}
-}
-.jumbotron, .jumbotron .h1, .jumbotron h1 {
-    color: inherit;
-}
-.careers .jumbotron .content .btn-main, .careers-footer .jumbotron .content .btn-main {
-    margin-top: 32px;
-    padding: 14px 84px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px 0 rgba(0,0,0,.4);
-}
-
-.careers .btn-main, .careers-footer .btn-main {
-    max-width: 100%;
-    background: #ff9800;
-    color: #fff;
-    font-size: 20px;
-    font-weight: 700;
-    border-radius: 1px;
-}
-.jumbotron .btn {
-    font-size: 21px;
-    padding: 14px 24px;
-}
-.btn {
-    display: inline-block;
-    margin-bottom: 0;
-    font-weight: 400;
-    text-align: center;
-    white-space: nowrap;
-    vertical-align: middle;
-    touch-action: manipulation;
-    cursor: pointer;
-    background-image: none;
-    border: 1px solid transparent;
-    padding: 6px 12px;
-    font-size: 14px;
-    line-height: 1.428571429;
-    border-radius: 4px;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-.container-fluid:after, .container-fluid:before, .container:after, .container:before, .row:after, .row:before {
-    display: table;
-    content: " ";
-}
-.btn-group-vertical>.btn-group:after, .btn-toolbar:after, .clearfix:after, .container-fluid:after, .container:after, .dropdown-menu>li>a, .form-horizontal .form-group:after, .modal-footer:after, .modal-header:after, .navbar-collapse:after, .navbar-header:after, .navbar:after, .pager:after, .panel-body:after, .row:after {
+.container {
+    width: 90%;
+    max-width: 1500px;
+    margin: 0 auto;
     clear: both;
-}
-.careers .we-believe, .careers-footer .we-believe {
-    margin: 0 200px;
-    padding-top: 100px;
-    padding-bottom: 120px;
+    color: #fff;
+    position: unset;
+    background: #000;
 }
 
-.container-fluid {
-    margin: 0;
-    padding: 0;
+header .main-heading {
+    clear: both;
+    text-align: center;
+    padding: 70px 0;
 }
-.container, .container-fluid {
-    padding-right: 15px;
-    padding-left: 15px;
-    margin-right: auto;
-    margin-left: auto;
+header .main-heading h1 {
+    font-size: 48px;
+    line-height: 60px;
+    max-width: 700px;
+    text-align: center;
+    margin: 0 auto;
+    padding: 50px 0 20px;
 }
-.careers .we-believe h1, .careers-footer .we-believe h1 {
-    font-weight: 700;
-    font-size: 44px;
+
+header .main-heading p.desc {
+    font-size: 18px;
+    line-height: 25px;
+    max-width: 650px;
+    margin: 0 auto;
+    padding-bottom: 25px;
+}
+section.about-boloindya {
+    padding: 30px 0;
+    text-align: center;
+}
+
+section.about-boloindya .about-item {
     margin-bottom: 100px;
+    clear: both;
+    overflow: hidden;
 }
-.careers .we-believe h1, .careers .we-believe h2, .careers-footer .we-believe h1, .careers-footer .we-believe h2 {
-    color: #000;
-}
-
-@media (min-width: 992px){
-.col-md-4 {
-    width: 33.3333333333%;
-}
-}
-@media (min-width: 992px){
-.col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9 {
+section.about-boloindya .about-item.reverse .description {
     float: left;
 }
-}
-
-.col-xs-6 {
-    width: 50%;
-}
-.col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-xs-1, .col-xs-10, .col-xs-11, .col-xs-12, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9 {
-    position: relative;
-    min-height: 1px;
-}
-.careers .we-believe img, .careers-footer .we-believe img {
-    height: 120px;
-}
-.careers .we-believe h2, .careers-footer .we-believe h2 {
-    font-size: 30px;
-}
-.careers .we-believe h1, .careers .we-believe h2, .careers-footer .we-believe h1, .careers-footer .we-believe h2 {
-    color: #000;
-}
-.careers .we-believe p, .careers-footer .we-believe p {
-    font-size: 20px;
-}
-.careers .together-at-bobble, .careers-footer .together-at-bobble {
-    background: #f2f2f2;
-    text-align: center;
-    padding-bottom: 64px;
-    padding-top: 2rem;
-}
-.container-fluid {
-    margin: 0;
-    padding: 0;
-}
-.careers .together-at-bobble h1, .careers-footer .together-at-bobble h1 {
-    font-size: 40px;
-    margin: 30px;
-    color: #000;
-}
-.careers .together-at-bobble .showcase, .careers-footer .together-at-bobble .showcase {
-    margin: auto;
-    display: flex;
-    justify-content: center;
-}
-.careers .together-at-bobble .showcase .block-1, .careers .together-at-bobble .showcase .block-1-1-2, .careers .together-at-bobble .showcase .block-2, .careers-footer .together-at-bobble .showcase .block-1, .careers-footer .together-at-bobble .showcase .block-1-1-2, .careers-footer .together-at-bobble .showcase .block-2 {
-    display: flex;
-}
-.careers .together-at-bobble .showcase img, .careers-footer .together-at-bobble .showcase img {
-    width: 100%;
-    padding: 5px;
-}
-.careers .reviews, .careers-footer .reviews {
-    padding: 45px;
-    max-width: 1280px;
-    margin: auto;
-}
-.careers .reviews .user-review, .careers-footer .reviews .user-review {
-    position: relative;
-    padding: 15px 26px;
-    min-height: 440px;
-    max-width: 350px;
-    margin: auto;
-    border-radius: 25px;
-    box-shadow: 0 2px 4px 0 rgba(0,0,0,.4);
-}
-.careers .reviews .user-review .user-image, .careers-footer .reviews .user-review .user-image {
-    max-width: 120px;
-    margin: auto;
-}
-.careers .reviews .user-review .user-image img, .careers-footer .reviews .user-review .user-image img {
-    border-radius: 100px;
-}
-.careers .reviews .user-review .user-image, .careers-footer .reviews .user-review .user-image {
-    max-width: 120px;
-    margin: auto;
-}
-.careers .reviews .user-review .review-contents, .careers-footer .reviews .user-review .review-contents {
-    position: relative;
-    margin: 12px auto;
+section.about-boloindya .about-item .description {
+    float: right;
+    width: 48%;
+    max-width: 575px;
     font-size: 18px;
+    line-height: 25px;
+    text-align: left;
 }
-.careers .reviews .user-review .review-contents:before, .careers-footer .reviews .user-review .review-contents:before {
-    display: table;
-    content: " ";
-    position: absolute;
-    top: -50px;
-    min-height: 40px;
-    min-width: 48px;
-    background: url(/media/img/right-quote.da8afc2a.png);
-    background-size: cover;
+section.about-boloindya .about-item .description h3 {
+    font-size: 28px;
+    line-height: 34px;
+    text-align: left;
+    margin-bottom: 20px;
 }
-.careers .reviews .user-review .review-contents:after, .careers-footer .reviews .user-review .review-contents:after {
-    display: table;
-    content: " ";
-    position: absolute;
-    bottom: -40px;
-    right: 0;
-    min-height: 40px;
-    min-width: 48px;
-    background: url(/media/img/left-quote.40ce2b0a.png);
-    background-size: cover;
+section.about-boloindya .about-item .description p {
+    margin-bottom: 20px;
 }
-.careers .reviews .user-review .reviewer, .careers-footer .reviews .user-review .reviewer {
-    position: absolute;
-    bottom: 14px;
+section.about-boloindya .about-item.reverse img {
+    float: right;
 }
-.careers .reviews .user-review .reviewer .name, .careers-footer .reviews .user-review .reviewer .name {
-    color: #000;
-    margin-bottom: 0;
-    font-weight: 700;
+section.about-boloindya .about-item img {
+    float: left;
+    width: 48%;
+    max-width: 575px;
 }
-
-.careers .reviews .user-review .reviewer p, .careers-footer .reviews .user-review .reviewer p {
-    font-size: 18px;
-    margin-bottom: 4px;
-}
-.careers .reviews .user-review .reviewer p, .careers-footer .reviews .user-review .reviewer p {
-    font-size: 18px;
-    margin-bottom: 4px;
-}
-.careers .join-us, .careers-footer .join-us {
-    padding: 1rem 10rem 5rem;
-}
-.careers .pad-top, .careers-footer .pad-top {
-    margin-top: 4em;
-}
-.media:first-child {
-    margin-top: 0;
-}
-.media, .media-body {
+section.about-boloindya .about-item {
+    margin-bottom: 100px;
+    clear: both;
     overflow: hidden;
-    zoom: 1;
 }
-.media-body, .media-left, .media-right {
-    display: table-cell;
-    vertical-align: top;
-}
-
-.media-left, .media>.pull-left {
-    padding-right: 10px;
-}
-.careers .join-us .media-left img, .careers-footer .join-us .media-left img {
-    width: 500px;
-}
-.careers .join-us .media-body, .careers-footer .join-us .media-body {
-    padding-left: 45px;
-}
-.media-body, .media-left, .media-right {
-    display: table-cell;
-    vertical-align: top;
-}
-
-.media-body {
-    width: 10000px;
-}
-.media, .media-body {
-    overflow: hidden;
-    zoom: 1;
-}
-.careers .join-us .media-body h1, .careers-footer .join-us .media-body h1 {
-    color: #000;
-    font-weight: 700;
-    font-size: 40px;
-    margin-bottom: 36px;
-}
-.careers .join-us .media-body p, .careers-footer .join-us .media-body p {
-    max-width: 800px;
-    font-size: 22px;
-}
-.careers .join-us .btn-main, .careers-footer .join-us .btn-main {
-    margin-top: 3rem;
-    padding: 1rem 3rem;
-    font-size: 24px;
-}
-.careers .btn-main, .careers-footer .btn-main {
-    max-width: 100%;
-    background: #ff9800;
-    color: #fff;
-    font-size: 20px;
-    font-weight: 700;
-    border-radius: 1px;
-}
-.careers .press, .careers-footer .press {
-    padding: 64px 0;
-    background: #f2f2f2;
-}
-.careers .press .press-inner, .careers-footer .press .press-inner {
-    display: flex;
-    max-width: 900px;
-    margin: auto;
-}
-.careers .press .press-inner .press-item, .careers-footer .press .press-inner .press-item {
-    position: relative;
-    display: inline-block;
-    margin: 8px;
-}
-.careers .our-partners .our-partners-inner img, .careers .press .press-inner img, .careers-footer .our-partners .our-partners-inner img, .careers-footer .press .press-inner img {
-    max-width: 100%;
-}
-.careers .press .press-inner .press-item .press-caption, .careers-footer .press .press-inner .press-item .press-caption {
-    padding: 0 18px;
-    position: absolute;
-    width: 100%;
-    bottom: 0;
-    background-color: rgba(0,0,0,.41);
-}
-.careers .press .press-inner .press-item, .careers-footer .press .press-inner .press-item {
-    position: relative;
-    display: inline-block;
-    margin: 8px;
-}
-.careers .our-partners, .careers-footer .our-partners {
-    box-shadow: 0 2px 4px 0 rgba(0,0,0,.5);
-}
-.careers .our-partners .our-partners-inner, .careers-footer .our-partners .our-partners-inner {
-    margin: 0 200px;
-    padding: 35px 0;
-    display: flex;
-    align-items: center;
-}
-.careers .our-partners .our-partners-inner .description, .careers-footer .our-partners .our-partners-inner .description {
-    margin-right: 50px;
-}
-.careers .our-partners .our-partners-inner>*, .careers-footer .our-partners .our-partners-inner>* {
-    width: 100%;
-}
-.careers .our-partners .our-partners-inner h2, .careers-footer .our-partners .our-partners-inner h2 {
-    font-size: 40px;
-    font-weight: 700;
-    color: #000;
-}
-.careers .our-partners .our-partners-inner p, .careers-footer .our-partners .our-partners-inner p {
-    color: #616161;
-    font-size: 26px;
-}
-.careers .our-partners .our-partners-inner>*, .careers-footer .our-partners .our-partners-inner>* {
-    width: 100%;
-}
-.careers .our-partners .our-partners-inner img, .careers .press .press-inner img, .careers-footer .our-partners .our-partners-inner img, .careers-footer .press .press-inner img {
-    max-width: 100%;
-}
-.careers .pad-top, .careers-footer .pad-top {
-    margin-top: 4em;
-}
-.careers .footer-description, .careers-footer .footer-description {
-    font-weight: 700;
-    font-size: 40px;
-    color: #000;
-}
-.careers .footer-inner, .careers-footer .footer-inner {
-    margin: 0 140px;
-}
-.careers .pad-bot, .careers-footer .pad-bot {
-    margin-bottom: 4em;
-}
-.careers .pad-top, .careers-footer .pad-top {
-    margin-top: 4em;
-}
-.careers .benefit, .careers-footer .benefit {
-    padding: 0rem;
-}
-.careers .benefit .benefit-inner, .careers-footer .benefit .benefit-inner {
-    min-height: 190px;
-    margin: auto;
-    padding: 1rem 3rem;
-    text-align: justify;
-}
-.careers .benefit .benefit-inner .img-responsive, .careers-footer .benefit .benefit-inner .img-responsive {
-    max-width: 200px;
-}
-.careers .benefit .benefit-inner h3, .careers-footer .benefit .benefit-inner h3 {
-    font-size: 24px;
-    color: #000;
-}
-.careers .benefit .benefit-inner p, .careers-footer .benefit .benefit-inner p {
+section.about-boloindya .about-item .description {
+    float: right;
+    width: 48%;
+    max-width: 575px;
     font-size: 18px;
-    color: #000;
+    line-height: 25px;
+    text-align: left;
 }
-.careers .benefit, .careers-footer .benefit {
-    padding: 0rem;
+section.about-boloindya .about-item .description h3 {
+    font-size: 28px;
+    line-height: 34px;
+    text-align: left;
+    margin-bottom: 20px;
 }
-.careers .press .press-inner .press-item .press-caption, .careers-footer .press .press-inner .press-item .press-caption {
-    padding: 0 18px;
-    position: absolute;
-    width: 100%;
-    bottom: 0;
-    background-color: rgba(0,0,0,.41);
+section.about-boloindya .about-item .description.joinus p {
+    margin-bottom: 5px;
 }
-.careers .press .press-inner .press-item .press-caption h1, .careers-footer .press .press-inner .press-item .press-caption h1 {
-    color: #fff;
-    font-size: 16px;
-    font-weight: 700;
-    padding-left: 10px; 
-}
-.careers .press .press-inner .press-item .press-caption p, .careers-footer .press .press-inner .press-item .press-caption p {
-    color: #fff;
-    font-size: 14px;
-    padding-left: 10px;
-}
-img {
-    vertical-align: middle;
-}
-.text-center {
-    text-align: center;
-}
-.careers .together-at-bobble .showcase img, .careers-footer .together-at-bobble .showcase img {
-    width: 100%;
-    padding: 5px;
-}
-.careers .press .press-inner .press-item .press-caption, .careers-footer .press .press-inner .press-item .press-caption {
-    padding: 0 0px;
-    position: absolute;
-    width: 100%;
-    bottom: 0;
-    background-color: rgba(0,0,0,.41);
-}
-@media (max-width: 767px){
-.careers .jumbotron, .careers-footer .jumbotron {
-    padding-bottom: 30px;
-}
-.careers .jumbotron-img, .careers-footer .jumbotron-img {
-    position: relative;
-    height: 224px;
-}
-.careers .jumbotron-img img, .careers-footer .jumbotron-img img {
-    max-width: inherit;
-    width: 600px;
-    position: absolute;
-    right: 0;
-    top: 0;
-}
-.careers .jumbotron .content, .careers-footer .jumbotron .content {
-    position: unset;
-    top: 0;
-    left: 0;
-    transform: translate(0,0);
-    max-width: 100%;
-    text-align: center;
-}
-.careers .jumbotron .content h1, .careers-footer .jumbotron .content h1 {
+section.about-boloindya .about-item .description a.jobs {
+    padding: 15px 25px;
+    background: #106973;
+    border-radius: 4px;
     font-size: 18px;
+    color: #FBFBFD;
+    margin: 10px 0;
+    display: inline-block;
+    color: #fff;
 }
-.careers .jumbotron .content .btn-main, .careers-footer .jumbotron .content .btn-main {
-    font-size: 14px;
-    padding: 8px 24px;
-    margin-top: 20px;
-}
-.careers .we-believe, .careers-footer .we-believe {
-    margin: 0;
-    padding: 50px 0;
-}
-.careers .we-believe h1, .careers-footer .we-believe h1 {
-    font-size: 20px;
-    margin-bottom: 10px;
-}
-.careers .we-believe .belief, .careers-footer .we-believe .belief {
-    margin-top: 30px;
-}
-.careers .we-believe h2, .careers-footer .we-believe h2 {
-    font-size: 16px;
-}
-.careers .we-believe p, .careers-footer .we-believe p {
-    font-size: 14px;
-}
-.careers .together-at-bobble .showcase, .careers-footer .together-at-bobble .showcase {
-    margin: 0 20px;
-    flex-direction: column;
-}
-.careers .reviews, .careers-footer .reviews {
-    padding: 45px 15px;
-}
-.careers .join-us, .careers-footer .join-us {
-    padding: 1rem 1rem 5rem;
-}
-.careers .pad-top, .careers-footer .pad-top {
-    margin-top: 0;
-}
-.careers .join-us .media-left, .careers-footer .join-us .media-left {
-    display: none;
-}
-.careers .join-us .media-body, .careers-footer .join-us .media-body {
-    padding: 0;
-    text-align: center;
-}
-.careers .join-us .media-body h1, .careers-footer .join-us .media-body h1 {
-    font-size: 20px;
-}
-.careers .join-us .media-body p, .careers-footer .join-us .media-body p {
-    font-size: 12px;
-    line-height: 20px;
-    text-align: justify;
-}
-.careers .join-us .btn-main, .careers-footer .join-us .btn-main {
-    font-weight: 700;
-    margin-top: 3rem;
-    padding: 10px 20px;
-    font-size: 14px;
-}
-.careers .press, .careers-footer .press {
-    padding: 32px 0;
-}
-.careers .press .press-inner, .careers-footer .press .press-inner {
-    flex-direction: column;
-}
-.careers .press .press-inner .press-item img, .careers-footer .press .press-inner .press-item img {
-    box-shadow: 0 4px 11px 0 rgba(0,0,0,.5);
-}
-.careers .our-partners .our-partners-inner, .careers-footer .our-partners .our-partners-inner {
-    flex-direction: column;
-    margin: 0 25px;
-    text-align: center;
-}
-.careers .our-partners .our-partners-inner .description, .careers-footer .our-partners .our-partners-inner .description {
-    margin: 0 0 16px;
-}
-.careers .our-partners .our-partners-inner h2, .careers-footer .our-partners .our-partners-inner h2 {
-    font-size: 20px;
-}
-.careers .our-partners .our-partners-inner p, .careers-footer .our-partners .our-partners-inner p {
-    font-size: 14px;
-}
-.careers .pad-top, .careers-footer .pad-top {
-    margin-top: 0;
-}
-.careers .footer-inner, .careers-footer .footer-inner {
-    margin: 0 1rem;
-    text-align: center;
-}
-.careers .pad-top, .careers-footer .pad-top {
-    margin-top: 0;
-}
-.careers .benefit .benefit-inner h3, .careers-footer .benefit .benefit-inner h3 {
-    font-size: 16px;
-}
-.careers .benefit .benefit-inner p, .careers-footer .benefit .benefit-inner p {
-    font-size: 12px;
+
+@media(max-width: 991px){
+    section.about-boloindya .about-item img {
+        float: left;
+        width: 98%;
+        max-width: 575px;
+    }
+    section.about-boloindya .about-item .description {
+        float: right;
+        width: 98%;
+        max-width: 575px;
+        font-size: 18px;
+        line-height: 25px;
+        text-align: left;
+    }
+    .responsive{
+        width: 100%;
+    }
 }
 
 
-}
 </style>
-<div class="careers ng-scope" style="background: #fff">
-<!--     <div class="container-fluid jumbotron">
-        <div class="jumbotron-img"> <img class="img-responsive" src="/media/img/careers-jumbo.24f237b0.jpeg" alt=""> </div>
-        <div class="content">
-            <h1>Making Expressive Conversations for Next Billion Users </h1> <a ui-sref="root.career_base.openings" class="btn btn-main" href="/careers/openings/">Join Our Team</a> </div>
-    </div> -->
+<div class="careers ng-scope">
+    <header id="header">
+        <div class="container">
+            <div class="main-heading">
+                <h1>Work with us</h1>
+                <p class="desc">We’re on a mission to let people express themselves in the language they want.</p>
+                <img src="/media/team-hero.webp" class="responsive peoples" onerror="this.onerror=null; this.src='/media/team-hero.png'" alt="peoples" >
+            </div>
+        </div>
+    </header>
 
-
-    <div class="container-fluid reviews" style="margin-top: 80px;">
-        <div class="row">
-            <div class="col-md-4">
-                <div class="user-review">
-                    <div class="user-image"> <img src="https://s3.amazonaws.com/boloindya/thumbnail/img-15687133711.jpg" class="user-image" alt=""> </div>
-                    <div class="review-contents">
-                        <p>Working at Boloindya provides every employee with a great work-life balance. An excellent company to work for, where one can learn a multitude of things under one roof. Sky is the limit here!</p>
-                    </div>
-                    <div class="reviewer">
-                        <p class="name"> Chitra Sharma </p>
-                        <p>QA Manager</p>
-                    </div>
+    <section class="about-boloindya">
+        <div class="container">
+            <div class="about-item reverse">
+                <div class="description">
+                    <h3>Be yourself</h3>
+                    <p>We are a diverse team of curious and creative people who strive to help the reading and writing community of India. We love to support, critique and encourage new ideas on the table. We are very close as a team and often crossover to being called family. </p>
+                    <p>The work-life balance is essential as it enables us to truly shine at our job as well as in our lives. The working style at boloindya motivates one to strike the right balance and be surrounded by people we respect, admire and aspire to be.</p>
                 </div>
+                <img src="/media/careers-1.webp" class="responsive" onerror="this.onerror=null; this.src='/media/careers-1.png'" alt="flashback">
             </div>
-            <div class="col-md-4">
-                <div class="user-review">
-                    <div class="user-image"> <img src="https://s3.amazonaws.com/boloindya/thumbnail/img-15687133711.jpg" class="user-image" alt=""> </div>
-                    <div class="review-contents">
-                        <p>Boloindya has helped me find my potential as a creator and curator. They give a free hand to each individual to present and execute their ideas. My work has become a lot more fun at Boloindya's playground. </p>
-                    </div>
-                    <div class="reviewer">
-                        <p class="name"> Lovely Kukreja </p>
-                        <p>General Manager - Content</p>
-                    </div>
+            <div class="about-item">
+                <div class="description joinus">
+                    <h3>Join us</h3>
+                    <p>Smart - We are highly innovative and quick to learn</p>
+                    <p>Ambitious - We are committed to creating the best product and experience, we don’t settle at good.</p>
+                    <p>Transparent - We are open and free with our users and community.</p>
+                    <p>Genuine - We are sincere, reliable and focused to our users.</p>
+                    <a href="https://angel.co/company/bolo-indya/jobs" target="_blank" class="jobs" rel="noopener">See Openings</a>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="user-review">
-                    <div class="user-image"> <img src="https://s3.amazonaws.com/boloindya/thumbnail/img-15687133711.jpg" class="user-image" alt=""> </div>
-                    <div class="review-contents">
-                        <p>Working at Boloindya is like a roller coaster ride. New challenges, learnings and experiences await on each turn &amp; while working here, the feeling of designing something for next billion users of India is always motivating. </p>
-                    </div>
-                    <div class="reviewer">
-                        <p class="name">Abhik Kapoor </p>
-                        <p>Product Manager</p>
-                    </div>
-                </div>
+                <img src="/media/careers-2.webp" class="responsive" onerror="this.onerror=null; this.src='/media/careers-2.png'" alt="flashback">
             </div>
         </div>
-        <div class="row">
-            <div class="paginate">
-                <a class="page" href="#"></a>
-            </div>
-        </div>
-    </div>
-    <div class="container-fluid join-us">
-        <div class="pad-top col-xs-12">
-            <div class="media">
-                <div class="media-left">
-                    <a href="#"> <img src="/media/img/join-us.943cbbfe.svg" alt="join us"> </a>
-                </div>
-                <div class="media-body">
-                    <h1>Join Our Team</h1>
-                    <p>With exciting new opportunities in technology and revolutionary potential of our team, we thrive to create a smarter, Data Intelligent future. We inspire each other and aspire together to enable human expression and collective intelligence reach new heights. And celebrate all small and big wins on our way. Excited about tackling new challenges and being part of something greater? Welcome aboard!</p> <a class="btn btn-main" ui-sref="root.career_base.openings" href="/careers/openings"> See Open Positions </a> </div>
-            </div>
-        </div>
-    </div>
-<!--     <div class="container-fluid press">
-        <div class="press-inner">
-            <div class="press-column">
-                <a class="press-item" href="https://www.businesstoday.in/magazine/the-buzz/bobble-keyboard-a-holistic-input-app/story/279501.html" target="_blank"> <img src="/media/img/life-at-bobble-01.3bfd46d2.jpg" alt="">
-                    <div class="press-caption">
-                        <h1>Bobble Keyboard: A Holistic Input App</h1>
-                        <p>Business Today</p>
-                    </div>
-                </a>
-                <a class="press-item" href="http://www.atp.show/ash18-ashley-talks/" target="_blank"> <img src="/media/img/life-at-bobble-01.3bfd46d2.jpg" alt=""> </a>
-            </div>
-            <div class="press-column">
-                <a class="press-item" href="https://www.forbes.com/video/5755005609001/" target="_blank"> <img src="/media/img/life-at-bobble-01.3bfd46d2.jpg" alt="">
-                    <div class="press-caption">
-                        <h1>Ankit Prasad in Forbes 30 Under 30 Asia 2018</h1>
-                        <p>-Forbes</p>
-                    </div>
-                </a>
-                <a class="press-item" href="https://yourstory.com/2017/03/app-fridays-bobble-keyboard/" target="_blank"> <img src="/media/img/life-at-bobble-01.3bfd46d2.jpg" alt="">
-                    <div class="press-caption">
-                        <h1>Will GIFs be the 'go-to language' for millennials? Bobble Keyboard believes so</h1>
-                        <p>-Your Story</p>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </div> -->
-<!--     <div class="container-fluid our-partners">
-        <div class="our-partners-inner">
-            <div class="description">
-                <h2>We Work with Top Brands</h2>
-                <p>With over 10M users, it’s not surprising that leading movie studios and sports brands partner with Bobble Keyboard. </p>
-            </div>
-            <div class="partner-image"> <img src="/media/img/our-partners-1.dbc0b7e7.png" alt=""> </div>
-        </div>
-    </div> -->
-
-<div class="careers-footer ng-scope">
-    <div class="container-fluid pad-top">
-        <h2 class="text-center footer-description">Benefits Of Working with us</h2> </div>
-    <div class="container-fluid footer-inner">
-        <div class="pad-top pad-bot">
-            <div class="col-md-4 benefit">
-                <div class="benefit-inner"> <img src="/media/img/benefit-1.0f5779a5.png" alt="" class="img-responsive">
-                    <h3> <b> Challenging Projects </b> </h3>
-                    <p>You will love us if you like solving challenging problems. You will be writing algorithms, system programs, GPU codes and over-optimizing optimized codes. </p>
-                </div>
-            </div>
-            <div class="col-md-4 benefit">
-                <div class="benefit-inner"> <img src="/media/img/benefit-1.0f5779a5.png" alt="" class="img-responsive">
-                    <h3> <b> Entrepreneural Team </b> </h3>
-                    <p>We are a small team, united together without hierarchial bottlenecks. You would be a part of all decisions and together shape the future.</p>
-                </div>
-            </div>
-            <div class="col-md-4 benefit">
-                <div class="benefit-inner"> <img src="/media/img/benefit-1.0f5779a5.png" alt="" class="img-responsive">
-                    <h3> <b>Autonomy in Work</b> </h3>
-                    <p>You will be owning your work. You will be monitoring your KPIs and taking data-driven decisions. You will represent Boloindya at various Conferences and Events across the world.</p>
-                </div>
-            </div>
-            <div class="col-md-4 col-md-offset-2 benefit">
-                <div class="benefit-inner"> <img src="/media/img/benefit-1.0f5779a5.png" alt="" class="img-responsive">
-                    <h3> <b>Learning Sessions</b> </h3>
-                    <p>Learn and grow with sessions from top industry leaders share expertise, knowledge, and valuable tips</p>
-                </div>
-            </div>
-            <div class="col-md-4 benefit">
-                <div class="benefit-inner"> <img src="/media/img/benefit-1.0f5779a5.png" alt="" class="img-responsive">
-                    <h3> <b>Networking events </b> </h3>
-                    <p>Expand your professional circle with weekly networking events</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    </section>
 </div>
-</div>
+
+
+
+
 {% endblock %}

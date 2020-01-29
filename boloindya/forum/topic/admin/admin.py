@@ -296,6 +296,21 @@ class PollAdmin(admin.ModelAdmin):
             'fields': ('is_evaluated', 'is_active'),
         }),
     )
+
+class JonOpeningAdmin(admin.ModelAdmin):
+    list_display = ('title', 'expiry_date', 'publish_status')
+    def get_actions(self, request):
+        #Disable delete
+        actions = super(JonOpeningAdmin, self).get_actions(request)
+        del actions['delete_selected']
+        return actions
+    def has_delete_permission(self, request, obj=None):
+        #Disable delete
+        return False
+
+class JobRequestAdmin(admin.ModelAdmin):
+    list_display = ('name', 'email', 'mobile')
+
 admin.site.register(Poll, PollAdmin)
 
 admin.site.register(Topic, TopicAdmin)
@@ -305,6 +320,6 @@ admin.site.register(Voting)
 admin.site.register(Leaderboard)
 admin.site.register(VBseen)
 admin.site.register(TongueTwister)
-admin.site.register(JobOpening)
-admin.site.register(JobRequest)
+admin.site.register(JobOpening,JonOpeningAdmin)
+admin.site.register(JobRequest,JobRequestAdmin)
 

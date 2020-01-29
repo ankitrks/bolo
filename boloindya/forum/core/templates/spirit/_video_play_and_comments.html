@@ -9,6 +9,9 @@
     #player{
             height: 748px !important;
     }
+
+
+
     ._6w18 {
         display: flex;
         margin: 0 12px;
@@ -1068,11 +1071,12 @@ input.tag-input {
 }
 
 .video-meta-title.jsx-191376589 {
-    font-family: proxima-regular, PingFangSC, sans-serif;
+    font-family: inherit;
     font-weight: 400;
-    font-size: 17px;
+    font-size: 16px;
     line-height: 20px;
     margin-bottom: 8px;
+    color: #161823;
 }
 
 .ytd-commentbox {
@@ -1113,6 +1117,16 @@ input.tag-input {
     padding: 5px;
 }
 
+@media(max-width: 991px){
+    #player{
+        height: 94vh !important
+    }
+}
+
+.video-meta-title a{
+    color: blue;
+}
+
 
 
 </style>
@@ -1140,15 +1154,17 @@ input.tag-input {
 
                     <div class="_image_card_ _video_card_big_left _video_card_mute_autoshow" style="border-radius: 4px;">
                         <div class="_video_card_play_btn_ _video_card_play_btn_light videoPlayButton"></div>
-                        <div class="LoaderBalls">
+<!--                         <div class="LoaderBalls">
                             <div class="LoaderBalls__item"></div>
                             <div class="LoaderBalls__item"></div>
                             <div class="LoaderBalls__item"></div>
-                        </div>
+                        </div> -->
+                            <video id="player" controls="" class="videoCentered"></video>
                            <div id="jwBox" class="jwBox" style = "bottom : 15px;">
                                 <div class="video_close"></div>
+                                
                                 <!-- <div id="player1" >Loading ...</div> -->
-                                <video id="player" class="videoCentered"></video>
+                                <!-- <video id="player" class="videoCentered"></video> -->
                                 <!-- <video id="video"></video> -->
 
                             </div>
@@ -1178,7 +1194,8 @@ input.tag-input {
                         </a>
                         <span alt="" style="display: inline-block;position: relative;top: -26px;" class="_-xe _3-8_" onclick="follow_user_by_popup()">
                             <span class="unit _4jy1 _4jy4 _517h _51sy _42ft"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChangePopup sx_5da455"></i><span class="btnTextChangePopup"> {% trans "Follow" %} </span></span>
-                        </span> 
+                        </span>
+
                         <h1 class="jsx-191376589 jsx-861547433 jsx-3645511632 video-meta-title"><strong></strong></h1>
                         <div class="_comments_ _comments_top _video_card_big_comments">
                             <div class="_comments_comments_tunnel">
@@ -1192,7 +1209,7 @@ input.tag-input {
                                         </div>
  
                                         <div class="_6w18">
-                                            <div class="_6w1g _29ak">
+<!--                                             <div class="_6w1g _29ak">
                                                 <span>
                                                     <a type="button" class="_55pi _2agf _4o_4 _4jy0 _4jy3 _517h _51sy _59pe _42ft" aria-haspopup="true" role="button" href="#" style="max-width: 200px;">
                                                         <span alt="" class="_-xe _3-8_">
@@ -1208,7 +1225,7 @@ input.tag-input {
                                                         </span>
                                                     </a>
                                                 </span>
-                                            </div>
+                                            </div> -->
                                             <div class="_6w1h">
                                                 <span class="_18vi">
                                                     <div class="_666k" data-testid="UFI2ReactionLink/actionLink">
@@ -1229,11 +1246,12 @@ input.tag-input {
                                                         <a class=" _2nj7  _18vj _18vk "   href="javascript:void(0)" id="shareLinkId"  title="Send this to friends or post it on your Timeline.">{% trans "Share" %}
                                                         </a>
                                                     </span>
-                                                      <ul class='smenu'>
-                                                            <li class="facebook"><a href="javascript:void(0);" onclick="social_share('facebook_share')">Facebook</a></li>
-                                                            <li class="twitter"><a href="javascript:void(0);" onclick="social_share('twitter_share')">Twitter</a></li>
-                                                            <li class="googleplus" onclick="social_share('whatsapp_share')"><a href="javascript:void(0);">whatsapp</a></li>
-                                                      </ul>
+                                                    <ul class='smenu'>
+                                                        <li class="googleplus" onclick="social_share('whatsapp_share')"><a href="javascript:void(0);">whatsapp</a></li>
+                                                        <li class="facebook"><a href="javascript:void(0);" onclick="social_share('facebook_share')">Facebook</a></li>
+                                                        <li class="twitter"><a href="javascript:void(0);" onclick="social_share('twitter_share')">Twitter</a></li>
+                                                        <li class="googleplus" onclick="copyShareLink();"><a href="javascript:void(0);">Copy Link</a></li>
+                                                    </ul>
                                                 </span>
                                             </div>
                                         </div>
@@ -1332,6 +1350,7 @@ input.tag-input {
         </div>
     </div>
 </div>
+<a href="/login/?next={{ request.get_full_path }}" id="gotoLoginPage" ></a> 
 <script src='https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js' type='text/javascript'></script>
 <script src='/media/js/jquery.events.input.js' type='text/javascript'></script>
 <script src='/media/js/jquery.elastic.js' type='text/javascript'></script>
