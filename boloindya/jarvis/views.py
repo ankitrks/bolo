@@ -1101,9 +1101,10 @@ def send_notification(request):
 
 
 @login_required
-def particular_notification(request, notification_id=None, status_id=2):
+def particular_notification(request, notification_id=None, status_id=2, page_no=1):
     pushNotification = PushNotification.objects.get(pk=notification_id)
-    return render(request,'jarvis/pages/notification/particular_notification.html', {'pushNotification': pushNotification, 'status_id': status_id})
+    pushNotificationUser=PushNotificationUser.objects.filter(push_notification_id=pushNotification)[page_no*10:page_no*10+10]
+    return render(request,'jarvis/pages/notification/particular_notification.html', {'pushNotification': pushNotification, 'status_id': status_id, 'pushNotificationUser': pushNotificationUser})
 
 from rest_framework.decorators import api_view
 
