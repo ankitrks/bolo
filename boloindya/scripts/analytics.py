@@ -276,7 +276,7 @@ def lang_video_count():
 
 # total duration of views month wise, lang wise, cateog wise
 def total_view_lang_categ():
-	all_data = VideoPlaytime.objects().all()
+	all_data = VideoPlaytime.objects.all()
 	month_year_dict = dict()
 	for item in all_data:
 		curr_videoid = item.videoid
