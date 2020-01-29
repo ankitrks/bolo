@@ -380,7 +380,9 @@ def get_single_user_pay_details(request):
         username = request.GET.get('username',None)
         all_pay = UserPay.objects.filter(user__username = username).order_by('-id')
         user = User.objects.get(username=username)
-        check_or_create_user_pay(user.id)
+        from datetime import datetime
+        now = datetime.now()
+        check_or_create_user_pay(user.id,'01-'+str(now.month)+'-'+str(now.year))
         user_pay_form = UserPayForm()
         return render(request,'jarvis/pages/payment/single_user_pay.html',{'all_pay':all_pay,'userprofile':user.st,'payment_form':user_pay_form})
 
@@ -1101,9 +1103,20 @@ def send_notification(request):
 
 
 @login_required
-def particular_notification(request, notification_id=None, status_id=2):
+def particular_notification(request, notification_id=None, status_id=2, page_no=1):
+    import math  
     pushNotification = PushNotification.objects.get(pk=notification_id)
-    return render(request,'jarvis/pages/notification/particular_notification.html', {'pushNotification': pushNotification, 'status_id': status_id})
+    page_no=int(page_no)-1
+    has_prev=False
+    if page_no > 0:
+        has_prev=True
+    pushNotificationUser=PushNotificationUser.objects.filter(push_notification_id=pushNotification)
+    pushNotificationUserSlice=pushNotificationUser[page_no*10:page_no*10+10]
+    has_next=True
+    if ((page_no*10)+10) >= len(pushNotificationUser):
+        has_next=False
+    total_page=int(math.ceil(len(pushNotificationUser)/10))+1
+    return render(request,'jarvis/pages/notification/particular_notification.html', {'pushNotification': pushNotification, 'status_id': status_id, 'pushNotificationUser': pushNotificationUserSlice, 'page_no': page_no + 2, 'prev_page_no': page_no , 'count': len(pushNotificationUser), 'has_prev': has_prev, 'has_next': has_next, 'notification_id': notification_id, 'status_id': status_id, 'total_page': total_page, 'current_page': page_no + 1})
 
 from rest_framework.decorators import api_view
 
