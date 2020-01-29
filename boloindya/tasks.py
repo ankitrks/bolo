@@ -15,7 +15,7 @@ def send_notifications_task(data, pushNotification):
     from drf_spirit.models import UserLogStatistics
     from jarvis.models import PushNotification, FCMDevice, PushNotificationUser
     from django.core.paginator import Paginator
-
+    from forum.user.models import UserProfile
     try:
         title = data.get('title', "")
         upper_title = data.get('upper_title', "")
@@ -27,6 +27,9 @@ def send_notifications_task(data, pushNotification):
         datepicker = data.get('datepicker', '')
         timepicker = data.get('timepicker', '').replace(" : ", ":")
         image_url = data.get('image_url', '')
+        
+        if user_group == '8':
+            lang='0'
 
         pushNotification = PushNotification()
         pushNotification.title = upper_title
@@ -55,7 +58,9 @@ def send_notifications_task(data, pushNotification):
 
             if data.get('category', 'Select Category') not in 'Select Category':
                 filter_list=UserProfile.objects.filter(sub_category=data.get('category', None)).values_list('user__pk', flat=True)
-                device = FCMDevice.objects.filter(user__pk__in=filter_list, user__st__language=lang)
+                device = FCMDevice.objects.filter(user__pk__in=filter_list, user__st__language=lang, is_uninstalled=False)
+            elif user_group == '8':
+                device = FCMDevice.objects.filter(user__pk=data.get('particular_user_id', None))
             elif user_group == '1':
                 end_date = datetime.today()
                 start_date = end_date - timedelta(hours=3)
@@ -69,8 +74,8 @@ def send_notifications_task(data, pushNotification):
                 # Anshika, Bhoomika and Akash
                 filter_list = [39342, 1465, 2801, 19, 40, 328, 23, 3142, 1494, 41]
                 device = FCMDevice.objects.filter(user__pk__in=filter_list, is_uninstalled=False)
-            elif user_group == '8':
-                device = FCMDevice.objects.filter(user__pk=data.get('particular_user_id', None))
+            elif user_group == '0':
+                device = FCMDevice.objects.filter(is_uninstalled=False, user__st__language=lang)
             else:
                 filter_list = []
 
@@ -93,20 +98,24 @@ def send_notifications_task(data, pushNotification):
 
                 device = FCMDevice.objects.exclude(user__pk__in=filter_list).filter(**language_filter)
 
-            pushNotification.is_executed=True
-            pushNotification.save()
             logger.info(device)
             device_pagination = Paginator(device, 1000)
+            device_list=[]
             for index in range(1, (device_pagination.num_pages+1)):
                 device_after_slice = device_pagination.page(index)
+                logger.info(device_after_slice)
                 for each in device_after_slice:
+                    t = each.send_message(data={})
+                    device_list.append(t)
                     try:
                         PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2')
                     except:
                         pass
                 #t = device_after_slice.object_list.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk})
-                t=device_after_slice.object_list.send_message(data={})
-                logger.info(t)
+                #t = device_after_slice.object_list.send_message(data={'pupluar_data': 'true' })
+                logger.info(device_list)
+            pushNotification.is_executed=True
+            pushNotification.save()
     except Exception as e:
         logger.info(str(e))
 

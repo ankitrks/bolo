@@ -152,8 +152,11 @@
         </div>   
         <div class="form_group">
             <div class="alert alert-success alert-dismissible" id="success_message" role="alert" style="display: none; height: 30px;padding: 5px;">
-                <span>Uploaded Image</span>
+                <span>Image Uploaded</span>
             </div>
+        </div>
+        <div class="form_group" id="loading_image" style="display: none;">
+       	    Uploading Image Please Wait ...
         </div>
         <div class="form_group">
             <input type="file" name="image" id="image" accept='image/*'>
@@ -285,6 +288,7 @@
             }
         });
         $("#image").change(function() {
+            $('#loading_image').show();
             var formData = new FormData();
             formData.append('file', document.querySelector('#image').files[0])
             $.ajax({
@@ -295,6 +299,7 @@
                     contentType: false,
                     success: function(data) {
                         console.log(data)
+                        $('#loading_image').hide();
                         $('#success_message').show();
                         $('#image_url').val(data.data);
                         setTimeout(function hide() {
@@ -348,6 +353,15 @@
         var notification_type = $('#notification_type :selected').text()
         var user_group = $('#user_group :selected').text()
         id = $('#search_id').val();
+        var particular_user_id = $('#particular_user_id').val()
+
+        if (category != 'Select Category' && category != null) {
+            $('#user_group').val('0');
+            user_group='0'
+        }
+        if (particular_user_id != '') {
+            lang = '0'
+        }
 
         if (upper_title  == '') {
             $('#error_message').show()
