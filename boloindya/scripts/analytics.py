@@ -174,11 +174,11 @@ def view_count():
 		else:
 			language_str = lang_id	
 	
-		if((curr_month, curr_year, language_str) not in month_year_dict):
+		if((curr_month, curr_year, language_str, curr_category) not in month_year_dict):
 			month_year_dict[(curr_month, curr_year, language_str, curr_category)] = []
 		else:
 			month_year_dict[(curr_month, curr_year, language_str, curr_category)].append(curr_videoid)
-			
+
 	for key, val in month_year_dict.items():
 		month_year_dict_uniq[key] = len(set(val))
 		month_year_dict_view [key] = len(val)
@@ -187,7 +187,7 @@ def view_count():
 	#print(month_year_dict_uniq)
 	#convert_data_csv(month_year_dict_view, 'data_views_total.csv')
 	#convert_data_csv(month_year_dict_uniq, 'data_views_uniq.csv')
-	#convert_data_csv_lang_categ(month_year_dict_view, 'data_views_total.csv')
+	convert_data_csv_lang_categ(month_year_dict_view, 'data_views_total.csv')
 
 
 def comment_count():
