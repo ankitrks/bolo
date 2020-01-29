@@ -186,7 +186,7 @@ def view_count():
 	#print(month_year_dict_uniq)
 	#convert_data_csv(month_year_dict_view, 'data_views_total.csv')
 	#convert_data_csv(month_year_dict_uniq, 'data_views_uniq.csv')
-	convert_data_csv_lang_categ(month_year_dict, 'data_views_total.csv')
+	convert_data_csv_lang_categ(month_year_dict_view, 'data_views_total.csv')
 
 
 def comment_count():
@@ -311,11 +311,11 @@ def total_view_lang_categ():
 def main():
 	# like_count()
 	# share_count()
-	comment_count()
+	#comment_count()
 	# lang_category_count()
 	# lang_video_count()
 	view_count()
-	total_view_lang_categ()
+	#total_view_lang_categ()
 
 
 def run():
