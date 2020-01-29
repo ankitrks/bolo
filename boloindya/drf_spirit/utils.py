@@ -151,6 +151,19 @@ def shortnaturaltime(value, now_time=None):
     # For future strings, we return now
     return 'now'
 
+def short_time(value):
+    if value<60:
+        return str(value)+" seconds"
+
+    elif value>60 and value<3600:
+        minute_value = value/float(60.0)
+        rounded = round(minute_value, 1)
+        return str(rounded)+" minutes"
+    elif value>3600:
+        hour_value = value/float(3600.0)
+        rounded = round(hour_value, 2)
+        return str(rounded)+" hours"
+
 def shortcounterprofile(counter):
     counter = int(counter)
     if counter>10000 and counter< 99999:

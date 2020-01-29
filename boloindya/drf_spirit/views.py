@@ -41,7 +41,7 @@ from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
 from .models import UserJarvisDump, UserLogStatistics, UserFeedback
 from .permissions import IsOwnerOrReadOnly
-from .utils import get_weight, add_bolo_score, shorcountertopic, calculate_encashable_details, state_language, language_options
+from .utils import get_weight, add_bolo_score, shorcountertopic, calculate_encashable_details, state_language, language_options,short_time
 
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
@@ -1581,6 +1581,12 @@ def get_user_bolo_info(request):
         month = request.POST.get('month', None)
         year = request.POST.get('year',None)
         total_earn = 0
+        video_playtime = 0
+        spent_time = 0
+        total_view_count=0
+        total_like_count=0
+        total_comment_count = 0
+        total_share_count = 0
         if start_date and end_date:
             start_date= datetime.strptime(start_date, "%d-%m-%Y")
             end_date = datetime.strptime(end_date+' 23:59:59', "%d-%m-%Y %H:%M:%S")
@@ -1592,39 +1598,29 @@ def get_user_bolo_info(request):
             total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user)
             all_pay = UserPay.objects.filter(user=request.user,is_active=True)
             top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user).order_by('-view_count')[:3]
-            # userprofile = UserProfile.objects.get(user=request.user)
-            # video_playtime = userprofile.total_vb_playtime    #with the utils to converts it in hour(4.3hr)
-            # spent_time = userprofile.spent_time   #with the utils to converts it in hour(4.3hr)
         else:
             total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user,date__gte=start_date, date__lte=end_date)
             all_pay = UserPay.objects.filter(user=request.user,is_active=True,for_month__gte=start_date.month,for_month__lte=start_date.month,\
                 for_year__gte=start_date.year,for_year__lte=start_date.year)
             top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user,date__gte=start_date, date__lte=end_date).order_by('-view_count')[:3]
-            # all_spent = UserSpentTime.objects.filter(user=request.user,date__gte=start_date, date__lte=end_date)
-            # all_play = VBPlay.objects.filter(user=request.user,date__gte=start_date, date__lte=end_date)
 
-        total_earn=0
         for each_pay in all_pay:
             total_earn+=each_pay.amount_pay
         total_video_count = total_video.count()
         print total_video
         monetised_video_count = total_video.filter(is_monetized = True).count()
         left_for_moderation = total_video.filter(is_moderated = False).count()
-        total_view_count=0
-        total_like_count=0
-        total_comment_count = 0
-        total_share_count = 0
         for each_vb in total_video:
             total_view_count+=each_vb.view_count
             total_like_count+=each_vb.likes_count
             total_comment_count+=each_vb.comment_count
             total_share_count+=each_vb.total_share_count
+            video_playtime+=each_vb.vb_playtime
         total_view_count = shorcountertopic(total_view_count)
         total_comment_count = shorcountertopic(total_comment_count)
         total_like_count = shorcountertopic(total_like_count)
         total_share_count = shorcountertopic(total_share_count)
-        video_playtime = 0
-        spent_time = 0
+        video_playtime = short_time(video_playtime)
         return JsonResponse({'message': 'success', 'total_video_count' : total_video_count, \
                         'monetised_video_count':monetised_video_count, 'total_view_count':total_view_count,'total_comment_count':total_comment_count,\
                         'total_like_count':total_like_count,'total_share_count':total_share_count,'left_for_moderation':left_for_moderation,'total_earn':total_earn,'video_playtime':video_playtime,\
