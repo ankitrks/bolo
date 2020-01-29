@@ -155,6 +155,7 @@ class UserPay(RecordTimeStamp):
     bolo_bifurcation = models.TextField(null=True,blank=True)
     is_evaluated = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False)
+    is_active = models.BooleanField(default = True)
     class Meta:
         verbose_name_plural = 'User\'s Pay'
 
