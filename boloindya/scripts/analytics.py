@@ -79,6 +79,21 @@ def convert_data_csv_lang_categ(month_year_dict, filename):
 	f.close()	
 
 
+def convert_data_csv_view_count(month_year_dict, filename):
+
+	print(month_year_dict)
+	f = open(filename, 'w')
+	month_name = ['Jan', 'Feb', 'March', 'April', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
+	w = csv.writer(f)
+	w.writerow(['Month-Year', 'Language', 'Category', 'Duration(sec)'])
+	for key, val in month_year_dict.items():
+		writer = csv.writer(f)
+		curr_name = month_name[int(key[0])-1]
+		writer.writerow([curr_name + str(key[1]), str(key[2]), str(key[3]), val])
+
+	f.close()	
+
+
 def like_count():
 	all_data = UserVideoTypeDetails.objects.all()
 	month_year_dict = dict()
@@ -258,6 +273,36 @@ def lang_video_count():
 
 	print(month_year_dict_uniq)	
 	convert_data_csv(month_year_dict_uniq, 'data_video_lang.csv')				
+
+# total duration of views month wise, lang wise, cateog wise
+def total_view_lang_categ():
+	all_data = VideoPlaytime.objects().all()
+	month_year_dict = dict()
+	for item in all_data:
+		curr_videoid = item.videoid
+		curr_date = item.timestamp
+		curr_month = item.month
+		curr_year = item.year
+		lang_details = Topic.objects.all().filter(id = curr_videoid)
+		for val in lang_details:
+			lang_id = val.language_id
+			curr_category = str(val.category)
+
+		playtime = item.playtime
+		if(lang_id.isdigit()):
+			language_str = 	language_map[int(lang_id)-1]
+		else:
+			language_str = lang_id
+
+		if((curr_month, curr_year, language_str, curr_category) not in month_year_dict):
+			month_year_dict[(curr_month, curr_year, language_str, curr_category)] = 0
+		else:
+			month_year_dict[(curr_month, curr_year, language_str, curr_category)]+=playtime
+
+	print(month_year_dict)
+	convert_data_csv_view_count(month_year_dict, 'data_view_duration.csv')
+
+			
 
 
 def main():

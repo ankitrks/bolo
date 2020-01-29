@@ -237,7 +237,7 @@ def main():
 			print('Exception: 1' + str(e))
 
 
-	calculate_completetion_rate()
+	#calculate_completetion_rate()
 	#app_activity_time_spend()				#commented as of now, we will look into this later
 
 def run():
