@@ -86,9 +86,9 @@
                             <td>{{ forloop.counter }}</td>
                             <td>{{ pushNotification.title }}</td>
                             <td style="color: {% if pushNotification.is_scheduled %} #b52828 {% else %} #1989cd {% endif %};">{{ pushNotification.scheduled_time }}</td>
-                            <td><a href="/jarvis/particular_notification/{{pushNotification.pk}}/2">{{ pushNotification.push_notification_id.all.count }} </a></td>
-                            <td><a href="/jarvis/particular_notification/{{pushNotification.pk}}/0">{% get_user_delivered_notification pushNotification %} </a></td>
-                            <td><a href="/jarvis/particular_notification/{{pushNotification.pk}}/1">{% get_user_opened_notification pushNotification %} </a></td>
+                            <td><a href="/jarvis/particular_notification/{{pushNotification.pk}}/2/1">{{ pushNotification.push_notification_id.all.count }} </a></td>
+                            <td><a href="/jarvis/particular_notification/{{pushNotification.pk}}/0/1">{% get_user_delivered_notification pushNotification %} </a></td>
+                            <td><a href="/jarvis/particular_notification/{{pushNotification.pk}}/1/1">{% get_user_opened_notification pushNotification %} </a></td>
                             <td>{% get_percentage pushNotification.push_notification_id.all.count pushNotification %}</td>
                             <td>{% get_language_name pushNotification.language %}</td>
                             <td>{% get_user_group_name pushNotification.user_group %}</td>
