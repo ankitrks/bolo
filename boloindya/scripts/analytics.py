@@ -166,6 +166,7 @@ def view_count():
 		lang_details = Topic.objects.all().filter(id=curr_videoid)
 		for val in lang_details:
 			lang_id = str(val.language_id)
+			curr_category = val.category
 
 		print(lang_id)	
 		if(lang_id.isdigit()):
@@ -174,17 +175,18 @@ def view_count():
 			language_str = lang_id	
 	
 		if((curr_month, curr_year, language_str) not in month_year_dict):
-			month_year_dict[(curr_month, curr_year, language_str)] = []
+			month_year_dict[(curr_month, curr_year, language_str, curr_category)] = []
 		else:
-			month_year_dict[(curr_month, curr_year, language_str)].append(curr_videoid)
+			month_year_dict[(curr_month, curr_year, language_str, curr_category)].append(curr_videoid)
 
 	for key, val in month_year_dict.items():
 		month_year_dict_uniq[key] = len(set(val))
 		month_year_dict_view [key] = len(val)
 		
-	print(month_year_dict_uniq)
-	convert_data_csv(month_year_dict_view, 'data_views_total.csv')
-	convert_data_csv(month_year_dict_uniq, 'data_views_uniq.csv')
+	#print(month_year_dict_uniq)
+	#convert_data_csv(month_year_dict_view, 'data_views_total.csv')
+	#convert_data_csv(month_year_dict_uniq, 'data_views_uniq.csv')
+	convert_data_csv_lang_categ(month_year_dict, 'data_views_total.csv')
 
 
 def comment_count():
@@ -271,7 +273,7 @@ def lang_video_count():
 	for key, val in month_year_dict.items():
 		month_year_dict_uniq[key] = len(set(val))
 
-	print(month_year_dict_uniq)	
+	#print(month_year_dict_uniq)	
 	convert_data_csv(month_year_dict_uniq, 'data_video_lang.csv')				
 
 # total duration of views month wise, lang wise, cateog wise
@@ -300,7 +302,7 @@ def total_view_lang_categ():
 		else:
 			month_year_dict[(curr_month, curr_year, language_str, curr_category)]+=playtime
 
-	print(month_year_dict)
+	#print(month_year_dict)
 	convert_data_csv_view_count(month_year_dict, 'data_view_duration.csv')
 
 			
@@ -312,7 +314,8 @@ def main():
 	comment_count()
 	# lang_category_count()
 	# lang_video_count()
-	#total_view_lang_categ()
+	view_count()
+	total_view_lang_categ()
 
 
 def run():
