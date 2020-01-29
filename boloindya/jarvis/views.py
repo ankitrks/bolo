@@ -380,7 +380,9 @@ def get_single_user_pay_details(request):
         username = request.GET.get('username',None)
         all_pay = UserPay.objects.filter(user__username = username).order_by('-id')
         user = User.objects.get(username=username)
-        check_or_create_user_pay(user.id)
+        from datetime import datetime
+        now = datetime.now()
+        check_or_create_user_pay(user.id,'01-'+str(now.month)+'-'+str(now.year))
         user_pay_form = UserPayForm()
         return render(request,'jarvis/pages/payment/single_user_pay.html',{'all_pay':all_pay,'userprofile':user.st,'payment_form':user_pay_form})
 
