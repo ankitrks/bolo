@@ -40,23 +40,6 @@ def convert_data_csv(month_year_dict, filename):
 	for key, val in month_year_dict.items():
 		month_year_list.append((key[0], key[1]))
 
-	# month_year_list = list(set(month_year_list))
-	# #print(language_map)
-
-	# for (a,b) in month_year_list:
-	# 	display_freq = [0] * len(language_map)
-	# 	for key, val in month_year_dict.items():
-	# 		if(a==key[0] and b==key[1]):
-	# 			#print(str(key[2]))
-	# 			index = language_map.index(str(key[2]))
-	# 			#print(index)
-	# 			display_freq[index] = val
-
-	# 	#print((a,b), display_freq)
-	# 	writer = csv.writer(f)		
-	# 	curr_name = month_name[int(a-1)] + "" + str(b) 
-	# 	writer.writerow([curr_name, display_freq[0], display_freq[1], display_freq[2], display_freq[3], display_freq[4], display_freq[5], display_freq[6], display_freq[7], display_freq[8]])
-
 	for key, val in month_year_dict.items():
 		writer = csv.writer(f)
 		curr_name = month_name[int(key[0])-1]
@@ -66,7 +49,7 @@ def convert_data_csv(month_year_dict, filename):
 
 def convert_data_csv_lang_categ(month_year_dict, filename):
 
-	print(month_year_dict)
+	#print(month_year_dict)
 	f = open(filename, 'w')
 	month_name = ['Jan', 'Feb', 'March', 'April', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
 	w = csv.writer(f)
@@ -183,7 +166,7 @@ def view_count():
 		month_year_dict_uniq[key] = len(set(val))
 		month_year_dict_view [key] = len(val)
 	
-	print(month_year_dict_view)	
+	#print(month_year_dict_view)	
 	#print(month_year_dict_uniq)
 	#convert_data_csv(month_year_dict_view, 'data_views_total.csv')
 	#convert_data_csv(month_year_dict_uniq, 'data_views_uniq.csv')
@@ -307,7 +290,8 @@ def total_view_lang_categ():
 	convert_data_csv_view_count(month_year_dict, 'data_view_duration.csv')
 
 			
-
+#def signup_login():
+	
 
 def main():
 	# like_count()
