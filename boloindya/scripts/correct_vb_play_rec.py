@@ -41,6 +41,7 @@ def main():
 		tot_playtime_sec = parse_duration(tot_playtime)
 		if(curr_playtime>tot_playtime_sec):
 			print(tot_playtime_sec)
+			Topic.objects.filter(user=curr_userid, videoid=curr_videoid).update(playtime = tot_playtime_sec)
 		else:
 			print("no")	
 
