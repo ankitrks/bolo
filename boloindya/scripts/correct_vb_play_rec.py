@@ -41,6 +41,8 @@ def main():
 		tot_playtime_sec = parse_duration(tot_playtime)
 		if(curr_playtime>tot_playtime_sec):
 			print(tot_playtime_sec)
+		else:
+			print("no")	
 
 def run():
 	main()
