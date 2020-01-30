@@ -38,8 +38,8 @@ def main():
 		curr_playtime = item.playtime
 		media_details = Topic.objects.all().filter(id=curr_videoid)
 		tot_playtime = media_details[0].media_duration 
-		if(curr_playtime>tot_playtime):
-			tot_playtime_sec = parse_duration(tot_playtime)
+		tot_playtime_sec = parse_duration(tot_playtime)
+		if(curr_playtime>tot_playtime_sec):
 			print(tot_playtime_sec)
 
 def run():
