@@ -41,7 +41,7 @@ def main():
 		tot_playtime_sec = parse_duration(tot_playtime)
 		if(curr_playtime>tot_playtime_sec):
 			print(tot_playtime_sec, curr_userid, curr_videoid)
-			Topic.objects.filter(user=curr_userid, videoid=curr_videoid).update(playtime = tot_playtime_sec)
+			VideoPlaytime.objects.filter(user = curr_userid, videoid=curr_videoid).update(playtime = tot_playtime_sec)
 		else:
 			print("no")	
 
