@@ -329,9 +329,10 @@ def signup_login():
 		str_date = "" + str(user_signup_dict[curr_userid].day) + str(user_signup_dict[curr_userid].month) + str(user_signup_dict[curr_userid].year)
 		print(str_date) 
 		row_data = [curr_userid, curr_username, str_date] + list(user_lang_dict.values())
-		df = df.sort_values(by = 'Signup-Date')
-		print(df.head(100))
+		df = df.append(row_data)
 
+	df = df.sort_values(by = 'Signup-Date')
+	print(df.head(100))
 	print(count)		
 		
 
