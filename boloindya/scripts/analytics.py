@@ -313,7 +313,7 @@ def signup_login():
 		if(len(all_data)>0):	
 			for item in all_data:
 				if(item.language_id.isdigit()):
-					user_lang_dict[language_map[int(item.language_id)]]+=1
+					user_lang_dict[language_map[int(item.language_id)-1]]+=1
 				else:
 					user_lang_dict[str(item.language_id)]+=1	
 
