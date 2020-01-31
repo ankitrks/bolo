@@ -303,7 +303,7 @@ def signup_login():
 		if(user_details[0].name):
 			curr_username = user_details[0].name
 		else:
-			curr_username = user_details[0].user.curr_username 	 
+			curr_username = user_details[0].user.username 	 
 		user_signup_dict[curr_userid] = item.created_at
 
 	print(len(user_signup_dict))
