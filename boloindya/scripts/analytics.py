@@ -294,18 +294,11 @@ def total_view_lang_categ():
 
 def signup_login():
 
-	df = pd.DataFrame(columns = ['UserID'] + language_map)
+	df = pd.DataFrame(columns = ['UserID', 'UserName', 'Signup-Date'] + language_map)
 	user_signup_dict = dict()
 	signup_data = ReferralCodeUsed.objects.filter(by_user__isnull = False)
 	for item in signup_data:
 		curr_userid = item.by_user.id
-		user_details = UserProfile.objects.get(user = curr_userid)
-		if(user_details.name):
-			curr_username = user_details.name
-		else:
-			curr_username = user_details.user.username
-
-
 		user_signup_dict[curr_userid] = item.created_at
 
 	print(len(user_signup_dict))
@@ -317,16 +310,26 @@ def signup_login():
 		user_lang_dict = dict()
 		for lang in language_map:
 			user_lang_dict[lang] = 0
-
+	
 		if(len(all_data)>0):
 			count+=1	
 			for item in all_data:
 				if(item.language_id.isdigit()):
 					user_lang_dict[language_map[int(item.language_id)-1]]+=1
 				else:
-					user_lang_dict[str(item.language_id)]+=1	
+					user_lang_dict[str(item.language_id)]+=1
 
-			print(curr_userid, curr_username, user_signup_dict[curr_userid], user_lang_dict)	
+		user_details = UserProfile.objects.get(user = curr_userid)	
+		if(user_details.name):
+			curr_username = user_details.name
+		else:
+			curr_username = user_details.user.username
+
+		#print(curr_userid, curr_username, user_signup_dict[curr_userid], user_lang_dict)
+		str_date = "" + user_signup_dict[curr_userid].day + user_signup_dict[curr_userid].month + user_signup_dict[curr_userid].year 
+		row_data = [curr_userid, curr_username, str_date] + list(user_lang_dict.values())
+		df = df.sort_values(by = 'Signup-Date')
+		print(df.head(100))
 
 	print(count)		
 		
