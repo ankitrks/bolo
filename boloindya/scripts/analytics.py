@@ -299,7 +299,7 @@ def signup_login():
 	signup_data = ReferralCodeUsed.objects.filter(by_user__isnull = False)
 	for item in signup_data:
 		curr_userid = item.by_user.id
-		user_details = UserProfile.objects.get(id = curr_userid)
+		user_details = UserProfile.objects.get(user = curr_userid)
 		if(user_details.name):
 			curr_username = user_details.name
 		else:
