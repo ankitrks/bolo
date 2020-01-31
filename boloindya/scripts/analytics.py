@@ -296,7 +296,8 @@ def total_view_lang_categ():
 
 def signup_login():
 
-	df = pd.DataFrame(columns = ['UserID', 'UserName', 'Signup-Date'] + list(language_map))
+	header = ['UserID', 'UserName', 'Signup-Date'] + list(language_map)
+	df = pd.DataFrame(columns = header)
 	user_signup_dict = dict()
 	signup_data = ReferralCodeUsed.objects.filter(by_user__isnull = False)
 	for item in signup_data:
@@ -331,13 +332,14 @@ def signup_login():
 
 			#print(curr_userid, curr_username, user_signup_dict[curr_userid], user_lang_dict)
 			str_date = "" + str(user_signup_dict[curr_userid].day) + "-" + str(user_signup_dict[curr_userid].month) + "-" + str(user_signup_dict[curr_userid].year)
-			print(str_date) 
+			#print(str_date) 
 			row_data = [curr_userid, curr_username, str_date] + list(user_lang_dict.values())
+			print(row_data)
 			df = df.append(row_data, ignore_index=True)
 
-	df = df.sort_values(by = 'Signup-Date')
+	#df = df.sort_values(by = 'Signup-Date')
 	print(df.head(100))
-	df.to_csv('signup_data_creator.csv', encoding = 'utf-8')
+	#df.to_csv('signup_data_creator.csv', encoding = 'utf-8')
 	print(count)		
 		
 
