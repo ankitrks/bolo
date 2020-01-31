@@ -2,7 +2,7 @@
 This Api Response file will genrate a csv file at the same path where it runs which contains all the api name, path, time elapsed , size and status
 
 The Flow for this scripts is:
-1- Put a starting token of a test user.It will never expire as we put the expiration of a token 999 days.
+1- Put a starting token of a test user.It will never expire as we put the expiration of a token 999 days through FB_LOGIN.
 2- ALL_TEST_USER is manuly picked user which contains test user , our moderator and real user and set teh in list of dictionary with attribute they can craete the data or not, so onlyb test user can create teh data.
 3 - Now in first api hit we all the auth token for each user using the STARTING TOKEN
 4 - To perform any action on any post or comment I created the post and comments with checking whether user can craete(i.e test user)
@@ -41,16 +41,15 @@ from django.utils import timezone
 from datetime import datetime,timedelta
 import os
 
-HOST='https://www.boloindya.com'
+# HOST='https://www.boloindya.com'
 # HOST='https://stage.boloindya.com'
-# HOST="http://localhost:8000"
+HOST="http://localhost:8000"
 
 API_PREFIX="/api/v1/"
 
 BASE_URL = HOST+API_PREFIX
 
-STARTING_TOKEN='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwidXNlcl9pZCI6NTU1NSwianRpIjoiNTA2YzNiOTc1MmIwNDg2ZTg1MjFlZDcxYjIyNjZiZDkiLCJleHAiOjE2NjQ3MDM5MjV9.S1zBs2VLLIoRYd5cDfnYG84QfUlhpfE1TCQL3MoX2Vo'
-
+STARTING_TOKEN=''
 ALL_TEST_USER = [{'can_create': True, 'is_test_user': True, 'user_id': 68723},{'can_create': True, 'is_test_user': True, 'user_id': 48621},{'can_create': True, 'is_test_user': True, 'user_id': 68700},{'can_create': True, 'is_test_user': True, 'user_id': 76773},{'can_create': True, 'is_test_user': True, 'user_id': 89520},{'can_create': False, 'is_test_user': True, 'user_id': 60646},{'can_create': False, 'is_test_user': True, 'user_id': 49254},{'can_create': False, 'is_test_user': True, 'user_id': 69255},{'can_create': False, 'is_test_user': False, 'user_id': 98294},{'can_create': False, 'is_test_user': False, 'user_id': 1916},{'can_create': False, 'is_test_user': False, 'user_id': 1722},{'can_create': False, 'is_test_user': False, 'user_id': 5881},{'can_create': False, 'is_test_user': False, 'user_id': 103708}]
 CAN_CREATE_USER = []
 image_file = {'upload_file': open('SampleJPGImage_500kbmb.jpg','rb')}
@@ -74,11 +73,15 @@ def send_request_to_server(name,request_type,url,auth_token,payload=None,files=N
                     url+='&'
                 i+=1
 
+        if auth_token:
+            headers = {
+              'Authorization': 'Bearer '+str(auth_token)
+              # 'Content-Type': 'multipart/form-data; boundary=--------------------------472110220587542779261723'
+            }
+        else:
+            headers={
 
-        headers = {
-          'Authorization': 'Bearer '+str(auth_token)
-          # 'Content-Type': 'multipart/form-data; boundary=--------------------------472110220587542779261723'
-        }
+            }
         if not payload:
             payload = [
 
@@ -110,8 +113,13 @@ def send_request_to_server(name,request_type,url,auth_token,payload=None,files=N
         csv_file.write(csv_elemnt)
         return str(e),csv_elemnt
 
+#GET THE STARTING _TOKEN
+FB_LOGIN_API ={'api_path':'fb_profile_settings/','api_name':'facebook n google login and signup with profile save','request_type':'POST','data_set':{'profile_pic': 'https://bansal.ac.in/images/logo.jpg','name': 'mohammad maaz','bio': 'aise hi','about': 'kuch bhi','username': 'abhi nai pata','refrence': 'facebook','extra_data': '{"first_name": "Abu", "last_name": "Salim", "verified": true, "name": "Abu Salim", "name_format": "{first} {last}", "locale": "en_US", "gender": "male", "friends": {"paging": {"cursors": {"after": "QVFIUktQbXhYclRQdXdFOHExOWV3MFBER3JXbDVGS1BkRXFiR0xya2gtbllyX1p4Ni1CeUlrR3pvOER2Q29jSGxydmEtb1RwSUQzd0NMTTdOZAUlhaGw1X1V3", "before": "QVFIUjFpclktbkl6WkpIOC1CZAW1rWUNSSUNfRUVRdlVjMDlBNXc5bm5HZAno3MkUyXzJSTXFZAbTFkWkVhWkgyWVkyVTN4TnB4dXYyZATB0TW5GYWlZAbXJLV29B"}}, "data": [{"name": "Asif Khan", "id": "1574950535888055"}, {"name": "Mobin Akhtar", "id": "1722572427803310"}, {"name": "Shahid Raza", "id": "1669566933137506"}, {"name": "Abid Khan", "id": "1534002520049746"}], "summary": {"total_count": 1402}}, "cover": {"source": "https://scontent.xx.fbcdn.net/v/t31.0-8/s720x720/10524245_832804866801127_3411102764525325767_o.jpg?oh=d7e90798694200bfd3a5556a1bb8b022&oe=5B0C2858", "offset_x": 0, "id": "832804866801127", "offset_y": 50}, "age_range": {"min": 21}, "email": "as.azmi21@yahoo.com", "currency": {"user_currency": "INR", "currency_offset": 100, "usd_exchange": 0.015206598, "usd_exchange_inverse": 65.7609282497}, "link": "https://www.facebook.com/app_scoped_user_id/1612763608805245/", "timezone": 5.5, "updated_time": "2018-02-21T07:44:28+0000", "can_review_measurement_request": false, "id": "1612763608805245"}','activity': 'facebook_login','categories': '16,17,19','language': '1'}}
+response,csv_elemnt = send_request_to_server(FB_LOGIN_API['api_name'],FB_LOGIN_API['request_type'],FB_LOGIN_API['api_path'],None,payload=FB_LOGIN_API['data_set'])
+STARTING_TOKEN=response['access']
+
 #1 Get the login Credentials
-USER_LOGIN_API = {'api_path':'user/user_data/','api_name':'to get the token for user','request_type':'POST','data_set':[{'user_id':30315},{'user_id':40215},{'user_id':20}]}
+USER_LOGIN_API = {'api_path':'user/user_data/','api_name':'to get the token for user','request_type':'POST','data_set':ALL_TEST_USER}
 for each_user in ALL_TEST_USER:
     response,csv_elemnt = send_request_to_server(USER_LOGIN_API['api_name'],USER_LOGIN_API['request_type'],USER_LOGIN_API['api_path'],STARTING_TOKEN,payload={'user_id':str(each_user['user_id'])})
     for each in ALL_TEST_USER:
@@ -163,7 +171,7 @@ def send_file_mail(HOST):
 
     msg = MIMEMultipart()
     msg["From"] = emailfrom
-    msg["To"] = 'maaz@careeranna.com,ankit@careeranna.com,akash.g@careeranna.com,gitesh@careeranna.com,abhishek@careeranna.com'
+    msg["To"] = 'ankit@careeranna.com,maaz@careeranna.com,akash.g@careeranna.com,gitesh@careeranna.com,abhishek@careeranna.com'
     msg["Subject"] = "Bolo Indya: API Response Time and Status: " + str(datetime.now().date())+"  HOST:"+str(HOST)
     body = 'Please Find The Attachemnt. If your API is not present in the list please add them in the script api_response_time.py in scripts folder and re run.Please read the attach document before adding any api in the list.'
     body = MIMEText(body) # convert the body to a MIME compatible string
