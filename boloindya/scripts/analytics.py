@@ -301,8 +301,9 @@ def signup_login():
 		curr_userid = item.by_user.id 
 		user_signup_dict[curr_userid] = item.created_at
 
-	print(user_signup_dict)
+	print(len(user_signup_dict))
 
+	count = 0
 	for key, val in user_signup_dict.items():
 		curr_userid = key 
 		all_data = Topic.objects.all().filter(user = curr_userid)
@@ -310,7 +311,8 @@ def signup_login():
 		for lang in language_map:
 			user_lang_dict[lang] = 0
 
-		if(len(all_data)>0):	
+		if(len(all_data)>0):
+			count+=1	
 			for item in all_data:
 				if(item.language_id.isdigit()):
 					user_lang_dict[language_map[int(item.language_id)-1]]+=1
@@ -318,6 +320,8 @@ def signup_login():
 					user_lang_dict[str(item.language_id)]+=1	
 
 			print(curr_userid, user_signup_dict[curr_userid], user_lang_dict)	
+
+	print(count)		
 		
 
 def main():
