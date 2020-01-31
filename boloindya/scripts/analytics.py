@@ -307,7 +307,7 @@ def signup_login():
 		curr_userid = key 
 		all_data = Topic.objects.all().filter(user = curr_userid)
 		user_lang_dict = dict()
-		for lang in user_lang_dict:
+		for lang in language_map:
 			user_lang_dict[lang] = 0
 
 		if(len(all_data)>0):	
