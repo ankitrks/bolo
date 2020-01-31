@@ -298,7 +298,6 @@ def signup_login():
 
 	header = ['UserID', 'UserName', 'Signup-Date'] + list(language_map)
 	print(header)
-	"""
 	df = pd.DataFrame(columns = header)
 	user_signup_dict = dict()
 	signup_data = ReferralCodeUsed.objects.filter(by_user__isnull = False)
@@ -337,13 +336,13 @@ def signup_login():
 			#print(str_date) 
 			row_data = [curr_userid, curr_username, str_date] + list(user_lang_dict.values())
 			print(row_data)
-			df = df.append(row_data, ignore_index=True)
+			df = df.append(row_data)
 
 	#df = df.sort_values(by = 'Signup-Date')
 	print(df.head(100))
 	df.to_csv('signup_data_creator.csv', encoding = 'utf-8')
 	print(count)
-	"""		
+		
 		
 
 def main():
