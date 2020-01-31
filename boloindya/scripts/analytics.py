@@ -319,17 +319,17 @@ def signup_login():
 				else:
 					user_lang_dict[str(item.language_id)]+=1
 
-		user_details = UserProfile.objects.get(user = curr_userid)	
-		if(user_details.name):
-			curr_username = user_details.name
-		else:
-			curr_username = user_details.user.username
+			user_details = UserProfile.objects.get(user = curr_userid)	
+			if(user_details.name):
+				curr_username = user_details.name
+			else:
+				curr_username = user_details.user.username
 
-		#print(curr_userid, curr_username, user_signup_dict[curr_userid], user_lang_dict)
-		str_date = "" + str(user_signup_dict[curr_userid].day) + "-" + str(user_signup_dict[curr_userid].month) + "-" + str(user_signup_dict[curr_userid].year)
-		print(str_date) 
-		row_data = [curr_userid, curr_username, str_date] + list(user_lang_dict.values())
-		df = df.append(row_data)
+			#print(curr_userid, curr_username, user_signup_dict[curr_userid], user_lang_dict)
+			str_date = "" + str(user_signup_dict[curr_userid].day) + "-" + str(user_signup_dict[curr_userid].month) + "-" + str(user_signup_dict[curr_userid].year)
+			print(str_date) 
+			row_data = [curr_userid, curr_username, str_date] + list(user_lang_dict.values())
+			df = df.append(row_data)
 
 	df = df.sort_values(by = 'Signup-Date')
 	print(df.head(100))
