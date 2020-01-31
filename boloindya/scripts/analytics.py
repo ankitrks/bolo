@@ -1,5 +1,5 @@
 from forum.user.models import AndroidLogs, VideoPlaytime, VideoCompleteRate, UserAppTimeSpend, ReferralCodeUsed
-from drf_spirit.models import UserJarvisDump, UserLogStatistics, ActivityTimeSpend, VideoDetails,UserTimeRecord, UserVideoTypeDetails
+from drf_spirit.models import UserJarvisDump, UserLogStatistics, ActivityTimeSpend, VideoDetails,UserTimeRecord, UserVideoTypeDetails, UserProfile
 from forum.topic.models import Topic
 import time
 import ast 
@@ -299,7 +299,11 @@ def signup_login():
 	signup_data = ReferralCodeUsed.objects.filter(by_user__isnull = False)
 	for item in signup_data:
 		curr_userid = item.by_user.id
-		curr_username = item.by_user.name   
+		user_details = UserProfile.objects.all().filter(id = curr_userid)
+		if(user_details[0].name):
+			curr_username = user_details[0].name
+		else:
+			curr_username = user_details[0].user.curr_username 	 
 		user_signup_dict[curr_userid] = item.created_at
 
 	print(len(user_signup_dict))
