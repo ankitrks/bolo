@@ -301,8 +301,9 @@ def signup_login():
 		curr_userid = item.by_user.id 
 		user_signup_dict[curr_userid] = item.created_at
 
-	
-	for key, val in user_signup_dict:
+	print(user_signup_dict)
+
+	for key, val in user_signup_dict.items():
 		curr_userid = key 
 		all_data = Topic.objects.all().filter(user = curr_userid)
 		user_lang_dict = dict()
