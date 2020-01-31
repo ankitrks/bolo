@@ -104,6 +104,7 @@ def run():
             counter_objects_created+=len(user_want_vbseen)
             print "After: VBseen.objects.bulk_create(aList)",datetime.now()
             Topic.objects.filter(pk=each_seen_id).update(view_count = F('view_count')+number_seen)
+            UserProfile.objects.filter(user = Topic.objects.get(pk=each_seen_id).user).update(view_count = F('view_count')+number_seen)
             if user_want_vbseen:
                 # set_list1 = set(tuple(sorted(d.items())) for d in user_want_vbseen)
                 # set_list2 = set(tuple(sorted(d.items())) for d in already_vbseen)
@@ -361,7 +362,7 @@ def action_seen(user_id,topic_id):
     else:
        vbseen = VBseen.objects.create(user_id = user_id,topic_id = topic_id)
     topic.update(view_count = F('view_count')+1)
-    userprofile = get_userprofile(user_id).update(view_count = F('view_count')+1)
+    userprofile = get_userprofile(topic[0].user.id).update(view_count = F('view_count')+1)
 
 #follow
 def action_follow(test_user_id,any_user_id):

@@ -264,6 +264,7 @@ class UserProfileSerializer(ModelSerializer):
     follower_count= SerializerMethodField()
     bolo_score= SerializerMethodField()
     slug = SerializerMethodField()
+    view_count = SerializerMethodField()
     class Meta:
         model = UserProfile
         # fields = '__all__' 
@@ -280,6 +281,9 @@ class UserProfileSerializer(ModelSerializer):
 
     def get_slug(self,instance):
         return instance.user.username
+
+    def get_view_count(self,instance):
+        return shorcountertopic(instance.view_count)
 
 class UserSerializer(ModelSerializer):
     userprofile = SerializerMethodField()
@@ -426,6 +430,7 @@ class PaymentInfoSerializer(ModelSerializer):
 class UserWithUserSerializer(ModelSerializer):
     user = SerializerMethodField()
     sub_category = SerializerMethodField()
+    view_count = SerializerMethodField()
 
     class Meta:
         model = UserProfile
@@ -436,6 +441,9 @@ class UserWithUserSerializer(ModelSerializer):
     
     def get_sub_category(self,instance):
         return CategorySerializer(instance.sub_category, many=True).data
+
+    def get_view_count(self,instance):
+        return shorcountertopic(instance.view_count)
 
 class UserWithoutUserProfileSerializer(ModelSerializer):
     class Meta:

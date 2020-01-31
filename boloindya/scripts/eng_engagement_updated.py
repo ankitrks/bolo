@@ -102,6 +102,7 @@ def run():
             counter_objects_created+=len(user_want_vbseen)
             print "After: VBseen.objects.bulk_create(aList)",datetime.now()
             Topic.objects.filter(pk=each_seen_id).update(view_count = F('view_count')+number_seen)
+            UserProfile.objects.filter(user = Topic.objects.get(pk=each_seen_id).user).update(view_count = F('view_count')+number_seen)
             if user_want_vbseen:
                 print "Before: vbseen diff checker",datetime.now()
                 new_vb_seen = find_set_diff(user_want_vbseen,already_vbseen,['user_id','topic_id'])
@@ -132,7 +133,7 @@ def run():
                     print "after: bolo_score bulk",datetime.now()
                     print "before: profile updation",datetime.now()
                     bolo_increment_user_id = [x['user_id'] for x in new_vb_seen]
-                    bolo_increment_user = UserProfile.objects.filter(user_id__in = bolo_increment_user_id ).update(bolo_score =F('bolo_score')+score,view_count = F('view_count')+1)
+                    bolo_increment_user = UserProfile.objects.filter(user_id__in = bolo_increment_user_id ).update(bolo_score =F('bolo_score')+score)
                     print "after: profile updation",datetime.now()
                     aList=bolo_increment_user_id=None
             print "total created: ", counter_objects_created
@@ -429,7 +430,7 @@ def action_seen(user_id,topic_id):
     else:
        vbseen = VBseen.objects.create(user_id = user_id,topic_id = topic_id)
     topic.update(view_count = F('view_count')+1)
-    userprofile = get_userprofile(user_id).update(view_count = F('view_count')+1)
+    userprofile = get_userprofile(topic[0].user.id).update(view_count = F('view_count')+1)
 
 #follow
 def action_follow(test_user_id,any_user_id):
