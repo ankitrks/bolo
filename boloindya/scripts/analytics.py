@@ -315,7 +315,7 @@ def signup_login():
 				if(item.language_id.isdigit()):
 					user_lang_dict[language_map[int(item.language_id)]]+=1
 				else:
-					user_signup_dict[str(item.language_id)]+=1	
+					user_lang_dict[str(item.language_id)]+=1	
 
 			print(curr_userid, user_signup_dict[curr_userid], user_lang_dict)	
 		
