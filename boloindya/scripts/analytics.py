@@ -297,7 +297,7 @@ def signup_login():
 	df = pd.DataFrame(columns = ['UserID'] + language_map)
 	user_signup_dict = dict()
 	signup_data = ReferralCodeUsed.objects.filter(by_user__isnull = False)
-	for item in all_data:
+	for item in signup_data:
 		curr_userid = item[0].by_user.user_id 
 		user_signup_dict[curr_userid] = item.created_at
 
