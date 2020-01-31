@@ -339,7 +339,7 @@ def signup_login():
 
 	#df = df.sort_values(by = 'Signup-Date')
 	print(df.head(100))
-	#df.to_csv('signup_data_creator.csv', encoding = 'utf-8')
+	df.to_csv('signup_data_creator.csv', encoding = 'utf-8')
 	print(count)		
 		
 
