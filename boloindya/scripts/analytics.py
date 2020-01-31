@@ -301,9 +301,11 @@ def signup_login():
 		curr_userid = item.by_user.id
 		user_details = UserProfile.objects.all().filter(id = curr_userid)
 		if(user_details[0].name):
-			curr_username = user_details[0].name
+			curr_username = user_details.name
 		else:
-			curr_username = user_details[0].user.username 	 
+			curr_username = user_details.user.username
+
+
 		user_signup_dict[curr_userid] = item.created_at
 
 	print(len(user_signup_dict))
