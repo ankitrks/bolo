@@ -323,7 +323,7 @@ def signup_login():
 				else:
 					user_lang_dict[str(item.language_id)]+=1
 
-			print(user_lang_dict)
+			#print(user_lang_dict)
 
 			user_details = UserProfile.objects.get(user = curr_userid)	
 			if(user_details.name):
@@ -335,10 +335,11 @@ def signup_login():
 			str_date = "" + str(user_signup_dict[curr_userid].day) + "-" + str(user_signup_dict[curr_userid].month) + "-" + str(user_signup_dict[curr_userid].year)
 			#print(str_date) 
 			row_data = [curr_userid, curr_username, str_date] + list(user_lang_dict.values())
-			print(row_data)
+			#print(row_data)
 			df = df.append(row_data)
 
 	#df = df.sort_values(by = 'Signup-Date')
+	print(df.columns.values.tolist())
 	print(df.head(100))
 	df.to_csv('signup_data_creator.csv', encoding = 'utf-8')
 	print(count)
