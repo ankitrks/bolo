@@ -310,10 +310,14 @@ def signup_login():
 		for lang in user_lang_dict:
 			user_lang_dict[lang] = 0
 
-		for item in all_data:
-			user_lang_dict[language_map[item.language_id]]+=1
+		if(len(all_data)>0):	
+			for item in all_data:
+				if(item.language_id.isdigit()):
+					user_lang_dict[language_map[item.language_id]]+=1
+				else:
+					user_signup_dict[item.language_id]+=1	
 
-		print(curr_userid, user_signup_dict[curr_userid], user_lang_dict)	
+			print(curr_userid, user_signup_dict[curr_userid], user_lang_dict)	
 		
 
 def main():
