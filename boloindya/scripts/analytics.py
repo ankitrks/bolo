@@ -330,12 +330,12 @@ def signup_login():
 			#print(curr_userid, curr_username, user_signup_dict[curr_userid], user_lang_dict)
 			str_date = "" + str(user_signup_dict[curr_userid].day) + "-" + str(user_signup_dict[curr_userid].month) + "-" + str(user_signup_dict[curr_userid].year)
 			print(str_date) 
-			row_data = [curr_userid, curr_username, str_date] + list(user_lang_dict.values())
+			row_data = [curr_userid, str(curr_username), str_date] + list(user_lang_dict.values())
 			df = df.append(row_data, ignore_index=True)
 
 	df = df.sort_values(by = 'Signup-Date')
 	print(df.head(100))
-	df.to_csv('signup_data_creator.csv')
+	df.to_csv('signup_data_creator.csv', encoding = 'utf-8')
 	print(count)		
 		
 
