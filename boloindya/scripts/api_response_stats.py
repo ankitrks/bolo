@@ -17,11 +17,12 @@ Note:
 1-To add any new api that be sure will it cause creation of data or as such data which affect the real user then add them in CREATION_API so that it will be craeted for test user.
 if its only get data not real data will be affected from it the add it in GET_API known as OTHER_API
 2 - Be sure about the HOST
+3 - Also make sure that for media upload two sample video(SampleVideo_1280x720_10mb.mp4) and sample image(SampleJPGImage_500kbmb.jpg) is also stored at the same path
 
 
 Running Mode:
 activate boloindya enviroment.
-run: python api_response_stats.py (becuase it contains requests package, If its throwing error please update requests package.)
+run: python api_response_stats.py (Font, use the relative path as it have to select the file from the same folder,becuase it contains requests package, If its throwing error please update requests package.)
 """
 
 import requests
@@ -253,6 +254,7 @@ CREATE_API = [
     {'api_path':'submit_user_feedback/','api_name':'dummy_test','request_type':'POST','data_set':[{'contact_email':'contact_email','contact_number':'contact_number','description':'description','feedback_image':'feedback_image'}]},
     {'api_path':'password/set/','api_name':'to set the password (OLD API/Using Nowhere)','request_type':'POST','data_set':[{'password':'1234567890'}]},
     {'api_path':'upload_profile_image','api_name':'To Upload the Profile Image','request_type':'POST','data_set':[{'file':image_file['upload_file']}]},
+    {'api_path':'follow_sub_category/','api_name':'to follow su category','request_type':'POST','data_set':[{'sub_category_id':get_single_category()},{'sub_category_id':get_single_category()},{'sub_category_id':get_single_category()}]}
 
 ]
 
@@ -278,7 +280,6 @@ OTHER_API_LIST = [
     {'api_path':'get_kyc_status/','api_name':'to get the kyc status','request_type':'POST','data_set':None},
     {'api_path':'get_bolo_details/','api_name':'tom get the bolo details (Using Nowhere)','request_type':'POST','data_set':[{'username':'nishachar5555'}]},
     {'api_path':'get_encash_details/','api_name':'get all enchash details','request_type':'GET','data_set':[{'username':'nishachar5555'},{'username':'9795774871'}]},
-    {'api_path':'follow_sub_category/','api_name':'to follow su category','request_type':'POST','data_set':[{'sub_category_id':get_single_category()},{'sub_category_id':get_single_category()},{'sub_category_id':get_single_category()}]},
     {'api_path':'get_follow_user/','api_name':'get follow user list','request_type':'POST','data_set':[None,{'language':'1'}]},
     {'api_path':'get_following_list/','api_name':'get following list of user','request_type':'GET','data_set':[{'user_id':get_random_user()},{'user_id':get_random_user()},{'user_id':get_random_user()}]},
     {'api_path':'get_follower_list/','api_name':'get follower list of a user','request_type':'GET','data_set':[{'user_id':get_random_user()},{'user_id':get_random_user()},{'user_id':get_random_user()}]},
