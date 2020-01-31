@@ -298,7 +298,8 @@ def signup_login():
 	user_signup_dict = dict()
 	signup_data = ReferralCodeUsed.objects.filter(by_user__isnull = False)
 	for item in signup_data:
-		curr_userid = item.by_user.id 
+		curr_userid = item.by_user.id
+		curr_username = item.by_user.name   
 		user_signup_dict[curr_userid] = item.created_at
 
 	print(len(user_signup_dict))
@@ -319,7 +320,7 @@ def signup_login():
 				else:
 					user_lang_dict[str(item.language_id)]+=1	
 
-			print(curr_userid, user_signup_dict[curr_userid], user_lang_dict)	
+			print(curr_userid, curr_username, user_signup_dict[curr_userid], user_lang_dict)	
 
 	print(count)		
 		
