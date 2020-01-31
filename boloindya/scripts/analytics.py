@@ -294,7 +294,7 @@ def total_view_lang_categ():
 
 def signup_login():
 
-	df = pd.DataFrame(columns = ['UserID', 'UserName', 'Signup-Date'] + language_map)
+	df = pd.DataFrame(columns = ['UserID', 'UserName', 'Signup-Date'] + list(language_map))
 	user_signup_dict = dict()
 	signup_data = ReferralCodeUsed.objects.filter(by_user__isnull = False)
 	for item in signup_data:
@@ -319,6 +319,8 @@ def signup_login():
 				else:
 					user_lang_dict[str(item.language_id)]+=1
 
+			print(user_lang_dict)
+					
 			user_details = UserProfile.objects.get(user = curr_userid)	
 			if(user_details.name):
 				curr_username = user_details.name
