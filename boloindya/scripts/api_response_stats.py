@@ -42,9 +42,9 @@ from django.utils import timezone
 from datetime import datetime,timedelta
 import os
 
-# HOST='https://www.boloindya.com'
+HOST='https://www.boloindya.com'
 # HOST='https://stage.boloindya.com'
-HOST="http://localhost:8000"
+# HOST="http://localhost:8000"
 
 API_PREFIX="/api/v1/"
 
@@ -102,31 +102,37 @@ def send_request_to_server(name,request_type,url,auth_token,payload=None,files=N
         csv_file.write(csv_elemnt)
         print url,"     ------->   ",str(response.status_code)
         print 'time_elapsd:  =>',time_milliseconds,"        ",'Size of repsonse:   =>',size
-        try:
-            # print json.loads(response.text.encode('utf8')),csv_elemnt
-            return json.loads(response.text.encode('utf8')),csv_elemnt
-        except:
-            # print response
-            return response,csv_elemnt
+        if not response.status_code in [502,504,'502','504']:
+            try:
+                # print json.loads(response.text.encode('utf8')),csv_elemnt
+                return json.loads(response.text.encode('utf8')),csv_elemnt
+            except:
+                # print response
+                return False,csv_elemnt
+        else:
+            return False,csv_elemnt
     except Exception as e:
         print e
         csv_elemnt = str(name)+','+str(request_type)+','+str(url)+','+str(e)+','+str(e)+','+str(e)+'\n'
         csv_file.write(csv_elemnt)
-        return str(e),csv_elemnt
+        return False,csv_elemnt
 
 #GET THE STARTING _TOKEN
 FB_LOGIN_API ={'api_path':'fb_profile_settings/','api_name':'facebook n google login and signup with profile save','request_type':'POST','data_set':{'profile_pic': 'https://bansal.ac.in/images/logo.jpg','name': 'mohammad maaz','bio': 'aise hi','about': 'kuch bhi','username': 'abhi nai pata','refrence': 'facebook','extra_data': '{"first_name": "Abu", "last_name": "Salim", "verified": true, "name": "Abu Salim", "name_format": "{first} {last}", "locale": "en_US", "gender": "male", "friends": {"paging": {"cursors": {"after": "QVFIUktQbXhYclRQdXdFOHExOWV3MFBER3JXbDVGS1BkRXFiR0xya2gtbllyX1p4Ni1CeUlrR3pvOER2Q29jSGxydmEtb1RwSUQzd0NMTTdOZAUlhaGw1X1V3", "before": "QVFIUjFpclktbkl6WkpIOC1CZAW1rWUNSSUNfRUVRdlVjMDlBNXc5bm5HZAno3MkUyXzJSTXFZAbTFkWkVhWkgyWVkyVTN4TnB4dXYyZATB0TW5GYWlZAbXJLV29B"}}, "data": [{"name": "Asif Khan", "id": "1574950535888055"}, {"name": "Mobin Akhtar", "id": "1722572427803310"}, {"name": "Shahid Raza", "id": "1669566933137506"}, {"name": "Abid Khan", "id": "1534002520049746"}], "summary": {"total_count": 1402}}, "cover": {"source": "https://scontent.xx.fbcdn.net/v/t31.0-8/s720x720/10524245_832804866801127_3411102764525325767_o.jpg?oh=d7e90798694200bfd3a5556a1bb8b022&oe=5B0C2858", "offset_x": 0, "id": "832804866801127", "offset_y": 50}, "age_range": {"min": 21}, "email": "as.azmi21@yahoo.com", "currency": {"user_currency": "INR", "currency_offset": 100, "usd_exchange": 0.015206598, "usd_exchange_inverse": 65.7609282497}, "link": "https://www.facebook.com/app_scoped_user_id/1612763608805245/", "timezone": 5.5, "updated_time": "2018-02-21T07:44:28+0000", "can_review_measurement_request": false, "id": "1612763608805245"}','activity': 'facebook_login','categories': '16,17,19','language': '1'}}
 response,csv_elemnt = send_request_to_server(FB_LOGIN_API['api_name'],FB_LOGIN_API['request_type'],FB_LOGIN_API['api_path'],None,payload=FB_LOGIN_API['data_set'])
-STARTING_TOKEN=response['access']
+if response:
+    STARTING_TOKEN=response['access']
+
 
 #1 Get the login Credentials
 USER_LOGIN_API = {'api_path':'user/user_data/','api_name':'to get the token for user','request_type':'POST','data_set':ALL_TEST_USER}
 for each_user in ALL_TEST_USER:
     response,csv_elemnt = send_request_to_server(USER_LOGIN_API['api_name'],USER_LOGIN_API['request_type'],USER_LOGIN_API['api_path'],STARTING_TOKEN,payload={'user_id':str(each_user['user_id'])})
-    for each in ALL_TEST_USER:
-        if each['user_id']==each_user['user_id']:
-            each['auth_token']=response['access_token']
-    # each_user['auth_token']=response['access_token']
+    if response:
+        for each in ALL_TEST_USER:
+            if each['user_id']==each_user['user_id']:
+                each['auth_token']=response['access_token']
+        # each_user['auth_token']=response['access_token']
     csv+=csv_elemnt
 
 for each in ALL_TEST_USER:
@@ -211,7 +217,8 @@ for each_user in ALL_TEST_USER:
     if each_user['can_create']:
         response,csv_elemnt = send_request_to_server(TOPIC_CREATE_API['api_name'],TOPIC_CREATE_API['request_type'],TOPIC_CREATE_API['api_path'],each_user['auth_token'],payload=get_create_topic_data(),files=None)
         csv+=csv_elemnt
-        TOPICS.append({'id':response['topic']['id'],'slug':response['topic']['slug'],'user_id':response['topic']['user']['id']})
+        if response:
+            TOPICS.append({'id':response['topic']['id'],'slug':response['topic']['slug'],'user_id':response['topic']['user']['id']})
 
 #3 Create comments on those topics to perform actions
 for each_user in ALL_TEST_USER:
@@ -221,7 +228,8 @@ for each_user in ALL_TEST_USER:
         response,csv_elemnt = send_request_to_server(COMMENT_CREATE_API['api_name'],COMMENT_CREATE_API['request_type'],COMMENT_CREATE_API['api_path'],each_user['auth_token'],payload=payload,files=None)
         csv+=csv_elemnt
         # print response
-        COMMENT_ID.append(response['comment']['id'])
+        if response:
+            COMMENT_ID.append(response['comment']['id'])
 
 #4 upload a media 
 MEDIA_UPLOAD_API={'api_path':'upload_video_to_s3/','api_name':'upload video to s3','request_type':'POST','data_set':[{'media':video_file}]}
@@ -279,7 +287,7 @@ OTHER_API_LIST = [
     {'api_path':'otp/verify/','api_name':'To verify OTP and create user or signin','request_type':'POST','data_set':[{'mobile_no':MOBILE_NO['mobile_no'],'lanagage':1,'otp':632432}]},
     {'api_path':'get_kyc_status/','api_name':'to get the kyc status','request_type':'POST','data_set':None},
     {'api_path':'get_bolo_details/','api_name':'tom get the bolo details (Using Nowhere)','request_type':'POST','data_set':[{'username':'nishachar5555'}]},
-    {'api_path':'get_encash_details/','api_name':'get all enchash details','request_type':'GET','data_set':[{'username':'nishachar5555'},{'username':'9795774871'}]},
+    # {'api_path':'get_encash_details/','api_name':'get all enchash details','request_type':'GET','data_set':[{'username':'nishachar5555'},{'username':'9795774871'}]},
     {'api_path':'get_follow_user/','api_name':'get follow user list','request_type':'POST','data_set':[None,{'language':'1'}]},
     {'api_path':'get_following_list/','api_name':'get following list of user','request_type':'GET','data_set':[{'user_id':get_random_user()},{'user_id':get_random_user()},{'user_id':get_random_user()}]},
     {'api_path':'get_follower_list/','api_name':'get follower list of a user','request_type':'GET','data_set':[{'user_id':get_random_user()},{'user_id':get_random_user()},{'user_id':get_random_user()}]},
