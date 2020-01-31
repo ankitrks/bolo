@@ -1,5 +1,5 @@
 from forum.user.models import AndroidLogs, VideoPlaytime, VideoCompleteRate, UserAppTimeSpend
-from drf_spirit.models import UserJarvisDump, UserLogStatistics, ActivityTimeSpend, VideoDetails,UserTimeRecord, UserVideoTypeDetails 
+from drf_spirit.models import UserJarvisDump, UserLogStatistics, ActivityTimeSpend, VideoDetails,UserTimeRecord, UserVideoTypeDetails, 
 from forum.topic.models import Topic
 import time
 import ast 
@@ -11,6 +11,7 @@ from datetime import datetime
 import os 
 import csv
 import pytz 
+import pandas as pd 
 import dateutil.parser 
 local_tz = pytz.timezone("Asia/Kolkata")
 import sys
@@ -290,8 +291,29 @@ def total_view_lang_categ():
 	convert_data_csv_view_count(month_year_dict, 'data_view_duration.csv')
 
 			
-#def signup_login():
+
+def signup_login():
+
+	df = pd.DataFrame(columns = ['UserID'] + language_map)
+	user_signup_dict = dict()
+	signup_data = ReferralCodeUsed.objects.filter(by_user__isnull = False)
+	for item in all_data:
+		curr_userid = item[0].by_user.user_id 
+		user_signup_dict[curr_userid] = item.created_at
+
 	
+	for key, val in user_signup_dict:
+		curr_userid = key 
+		all_data = Topic.objects.all().filter(user = curr_userid)
+		user_lang_dict = dict()
+		for lang in user_lang_dict:
+			user_lang_dict[lang] = 0
+
+		for item in all_data:
+			user_lang_dict[language_map[item.language_id]]+=1
+
+		print(curr_userid, user_signup_dict[curr_userid], user_lang_dict)	
+		
 
 def main():
 	# like_count()
@@ -299,8 +321,9 @@ def main():
 	#comment_count()
 	# lang_category_count()
 	# lang_video_count()
-	view_count()
+	#view_count()
 	#total_view_lang_categ()
+	signup_login()
 
 
 def run():

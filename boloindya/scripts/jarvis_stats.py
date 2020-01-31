@@ -162,7 +162,6 @@ def parse_duration(time):
 	return int(time)
 
 
-
 # func responsible for finding the completetion rate of videos
 def calculate_completetion_rate():
 
