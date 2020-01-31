@@ -110,10 +110,12 @@ def run():
                 print "Before: bolo_score_processing",datetime.now()
                 score = get_weight('vb_view')
                 vb_seen_type = ContentType.objects.get(app_label='forum_topic', model='vbseen')
-                already_vbseen = list(VBseen.objects.filter(topic_id = each_seen_id,user_id__in=[d['user_id'] for d in new_vb_seen]).values('user_id','id'))
+                already_vbseen = list(VBseen.objects.filter(topic_id = each_seen_id,user_id__in=[d['user_id'] for d in new_vb_seen]).values('topic__user_id','id'))
                 for each in already_vbseen:
                     each['action_object_id'] = each['id']
+                    each['user_id'] = each['topic__user_id']
                     del each['id']
+                    del each['topic__user_id']
                 print "After: bolo_score_processing",datetime.now()
                 to_be_created_bolo = already_vbseen
                 if to_be_created_bolo:
@@ -131,8 +133,8 @@ def run():
                     counter_objects_created+=len(to_be_created_bolo)
                     print "after: bolo_score bulk",datetime.now()
                     print "before: profile updation",datetime.now()
-                    bolo_increment_user_id = [x['user_id'] for x in new_vb_seen]
-                    bolo_increment_user = UserProfile.objects.filter(user_id__in = bolo_increment_user_id ).update(bolo_score =F('bolo_score')+score,view_count = F('view_count')+1)
+                    # bolo_increment_user_id = [x['user_id'] for x in already_vbseen]
+                    bolo_increment_user = UserProfile.objects.filter(user = Topic.objects.get(pk=each_seen_id).user).update(view_count = F('view_count')+number_seen,bolo_score =F('bolo_score')+len(already_vbseen)*score)
                     print "after: profile updation",datetime.now()
                     aList=bolo_increment_user_id=None
             print "total created: ", counter_objects_created
@@ -429,7 +431,7 @@ def action_seen(user_id,topic_id):
     else:
        vbseen = VBseen.objects.create(user_id = user_id,topic_id = topic_id)
     topic.update(view_count = F('view_count')+1)
-    userprofile = get_userprofile(user_id).update(view_count = F('view_count')+1)
+    userprofile = get_userprofile(topic[0].user.id).update(view_count = F('view_count')+1)
 
 #follow
 def action_follow(test_user_id,any_user_id):
