@@ -13,13 +13,15 @@ The Flow for this scripts is:
 9 - a CSV will be genrarted at the same path
 10 - it will emailed and the remove.
 
-Note: To add any new api that be sure will it cause creation of data or as such data which affect the real user then add them in CREATION_API so that it will be craeted for test user.
+Note: 
+1-To add any new api that be sure will it cause creation of data or as such data which affect the real user then add them in CREATION_API so that it will be craeted for test user.
 if its only get data not real data will be affected from it the add it in GET_API known as OTHER_API
+2 - Be sure about the HOST
 
 
 Running Mode:
-activate boloindya enviroment
-run: python api_response_stats.py
+activate boloindya enviroment.
+run: python api_response_stats.py (becuase it contains requests package, If its throwing error please update requests package.)
 """
 
 import requests
@@ -39,8 +41,9 @@ from django.utils import timezone
 from datetime import datetime,timedelta
 import os
 
-# HOST='https://www.boloindya.com'
-HOST="http://localhost:8000"
+HOST='https://www.boloindya.com'
+# HOST='https://stage.boloindya.com'
+# HOST="http://localhost:8000"
 
 API_PREFIX="/api/v1/"
 
@@ -151,7 +154,7 @@ def random_string_generator(size=10, chars=string.ascii_uppercase + string.digit
 random_string =random_string_generator()
 
 # func for sending the csv created to the mail
-def send_file_mail():
+def send_file_mail(HOST):
     emailfrom = "support@careeranna.com"
     emailto = ['maaz@careeranna.com','ankit@careeranna.com','akash.g@careeranna.com','gitesh@careeranna.com','abhishek@careeranna.com']
     filetosend = os.getcwd() + "/api_response_time.csv"
@@ -160,8 +163,8 @@ def send_file_mail():
 
     msg = MIMEMultipart()
     msg["From"] = emailfrom
-    msg["To"] = emailto
-    msg["Subject"] = "Bolo Indya: API Response Time and Status: " + str(datetime.now().date())
+    msg["To"] = 'maaz@careeranna.com,ankit@careeranna.com,akash.g@careeranna.com,gitesh@careeranna.com,abhishek@careeranna.com'
+    msg["Subject"] = "Bolo Indya: API Response Time and Status: " + str(datetime.now().date())+"  HOST:"+str(HOST)
     body = 'Please Find The Attachemnt. If your API is not present in the list please add them in the script api_response_time.py in scripts folder and re run.Please read the attach document before adding any api in the list.'
     body = MIMEText(body) # convert the body to a MIME compatible string
     msg.attach(body)
@@ -186,7 +189,6 @@ def send_file_mail():
     server.sendmail(emailfrom, emailto, msg.as_string())
     server.quit()
     os.remove(filetosend) #can be commented if you need file locally
-send_file_mail()
 
 RANDOM_NOTIFICATION_ACTION = ['click','GET']
 AUTH_TOKEN_LIST = []
@@ -360,7 +362,7 @@ for each_user in ALL_TEST_USER:
             csv+=csv_elemnt
 
 csv_file.close()
-send_file_mail()
+send_file_mail(HOST)
 
 
 # Will change to function later by removing same code multiple time above
