@@ -55,6 +55,7 @@ def put_share_data():
 				
 	for key, val in day_month_year_dict.items():
 		week_no = key.isocalendar()[1]
+		curr_year = key.year 
 		if(curr_year == 2020):
 			week_no+=52
 		if(curr_year == 2019 and week_no == 1):
