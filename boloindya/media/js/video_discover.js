@@ -172,45 +172,6 @@ function openVideoInPopup(topicId){
     var video_backup=singleItemData.question_video;
     //var video_backup=singleItemData.question_video;
     video_play_using_video_js(video_backup,video_backup,videoFileImage);      
-    //     playerInstance.setup({
-    //       file: videoFileName,
-    //       controls: false,
-    //       image:videoFileImage,
-    //       autostart:'true',
-    //       mute:'false'
-    //   });
-    //   playerInstance.on('play', function() {
-    //         loaderHide();
-    //         preBufferDone = true;
-          
-    //   }); 
-
-    // playerInstance.on('buffer', function() {
-
-    //   var time = 1;
-
-    // });   
-
-
-    // playerInstance.on('error', function(event) {
-    //     loaderHide();
-    //     var erroCode=event.code;
-    //     playerInstance.setup({
-    //         file: singleItemData.backup_url,
-    //         controls: false,
-    //         image:videoFileImage,
-    //         autostart:'true',
-    //         mute:'false'
-    //     });
-
-
-    // });
-
-    // playerInstance.on('complete', function() {
-    //     jwplayer('player').setMute(true);
-
-    // });
-
 
     var shareURL=site_base_url+singleItemData.slug+'/'+singleItemData.id+'';
 

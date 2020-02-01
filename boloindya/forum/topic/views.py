@@ -835,6 +835,31 @@ def new_home(request):
     #return render(request, 'spirit/topic/temporary_landing.html')
     # return render(request, 'spirit/topic/new_landing.html')
     # return render(request, 'spirit/topic/main_landing.html')
+def latest_home(request):
+    categories = []
+    hash_tags = []
+    try:
+        categories = Category.objects.filter(parent__isnull=False)[:10]
+    except Exception as e1:
+        categories = []    
+    try:
+        hash_tags = TongueTwister.objects.order_by('-hash_counter')[:4]
+    except Exception as e1:
+        hash_tags = []
+
+    context = {
+        'categories':categories,
+        'hash_tags':hash_tags,
+        'is_single_topic': "Yes",
+    }  
+    video_slug = request.GET.get('video',None)
+    if(video_slug != None):
+        return redirect('/video/'+video_slug)
+    else:
+        return render(request, 'spirit/topic/_latest_home.html',context)
+    #return render(request, 'spirit/topic/temporary_landing.html')
+    # return render(request, 'spirit/topic/new_landing.html')
+    # return render(request, 'spirit/topic/main_landing.html')
 
 def login_user(request):
 

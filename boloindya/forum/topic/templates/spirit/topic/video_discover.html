@@ -262,6 +262,7 @@
                         <ul class="jsx-3102177358 _user_carousel_carousel-list MultiCarousel-inner" id="creatorId">
 
                             {%  for each_popular_item in popular_bolo %}
+                            
                         
                                     <li class="jsx-3102177358 _user_carousel_list-item item">
                                         <a tag="a" title="Nisha Guragain(@nishaguragain)" class="jsx-3102177358" href="/{{each_popular_item.user.username}}/">
@@ -269,7 +270,18 @@
                                 {{each_popular_item.profile_pic}}
                             {% else %}
                                 /media/demo_user.png
-                            {% endif %})"><img src="/media/tick_icon.svg"></div>
+                            {% endif %})">
+
+                                        {% if popular_bolo.is_business is True %}
+                                            <img src="/media/golden_tick.png">
+                                        {% elif popular_bolo.is_superstar is True %}
+                                            <img src="/media/BlueTick.png">
+                                        {% else %}
+                                            <img src="/media/tick_icon.svg">
+                                        {% endif %}
+
+                                            <!-- <img src="/media/tick_icon.svg"> -->
+                                        </div>
                                             <h2 class="_user_carousel_title">
                                                 {% if each_popular_item.name %}
                                                    {{each_popular_item.name}} <!-- {{each_popular_item.last_name}} -->
@@ -281,7 +293,7 @@
 
                                             <h3 class="_user_carousel_sub-title">@{{each_popular_item.user.username}}</h3>
                                             <p class="_user_carousel_followers">{{ each_popular_item.follower_count | shorcountertopic }}<span class="_user_carousel_followers-text"> {% trans  "Followers" %}</span></p>
-                                            <!-- <p class="_user_carousel_description">{{each_popular_item.bio|slice:":20"}}</p> -->
+                                            <!-- <p class="_user_carousel_description">{{each_popular_item.bio|slice:":20"}}</p> is_popular-->
                                         </a>
                                         <span class="unit">
                                             <button onclick="follow_user('{{each_popular_item.id}}');" class="_4jy1 _4jy4 _517h _51sy _42ft " style="float: none;" type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-{{each_popular_item.id}} followCheck sx_5da455"></i><span class="btnTextChange-{{each_popular_item.id}}">{% trans "Follow" %}</span>

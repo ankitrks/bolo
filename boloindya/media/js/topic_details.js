@@ -206,10 +206,12 @@ function getCategoryVideos(){
             var videoItemList=data.topics;
             //var videoItemList=response.category_details.topics;
             var itemCount=0;
-            var userVideoItems;
+            var userVideoItems="";
             videoItemList.forEach(function(itemCreator) {itemCount++;
-                playListData[itemCreator.id]=itemCreator;
-                userVideoItems +=getVideoItem(itemCreator,itemCreator.id);
+                if(itemCreator!=""){
+                    playListData[itemCreator.id]=itemCreator;
+                    userVideoItems +=getVideoItem(itemCreator,itemCreator.id);
+                }
             });
             $("#categoryVideosListId").append(userVideoItems);
             loaderBoloHideDynamic('_scroll_load_more_loading_user_videos');

@@ -255,6 +255,8 @@
             height: 80px;
            /* background: #ffffff;*/
             background: #000;
+            border-bottom: 1px solid rgba(34,90,89,0.2);
+
             /*box-shadow: 2px 4px 20px rgba(34, 90, 89, 0.2);*/
             z-index: 9;
         }
@@ -851,6 +853,7 @@
             -ms-flex-align: flex-start;
             align-items: flex-start;
             padding: 40px 0 0 378px;
+            border-top: 1px solid #979797;
         }
         
         .is-rtl .footer-container .footer-content-wrapper {
