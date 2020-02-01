@@ -265,6 +265,7 @@ class UserProfileSerializer(ModelSerializer):
     bolo_score= SerializerMethodField()
     slug = SerializerMethodField()
     view_count = SerializerMethodField()
+    own_vb_view_count = SerializerMethodField()
     class Meta:
         model = UserProfile
         # fields = '__all__' 
@@ -284,6 +285,9 @@ class UserProfileSerializer(ModelSerializer):
 
     def get_view_count(self,instance):
         return shorcountertopic(instance.view_count)
+
+    def get_own_vb_view_count(self,instance):
+        return shorcountertopic(instance.own_vb_view_count)
 
 class UserSerializer(ModelSerializer):
     userprofile = SerializerMethodField()
@@ -431,6 +435,7 @@ class UserWithUserSerializer(ModelSerializer):
     user = SerializerMethodField()
     sub_category = SerializerMethodField()
     view_count = SerializerMethodField()
+    own_vb_view_count = SerializerMethodField()
 
     class Meta:
         model = UserProfile
@@ -444,6 +449,9 @@ class UserWithUserSerializer(ModelSerializer):
 
     def get_view_count(self,instance):
         return shorcountertopic(instance.view_count)
+
+    def get_own_vb_view_count(self,instance):
+        return shorcountertopic(instance.own_vb_view_count)
 
 class UserWithoutUserProfileSerializer(ModelSerializer):
     class Meta:

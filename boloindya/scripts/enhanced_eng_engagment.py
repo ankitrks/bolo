@@ -157,7 +157,7 @@ def run():
                     print "after: bolo_score bulk",datetime.now()
                     print "before: profile updation",datetime.now()
                     bolo_increment_user_id = [x['user_id'] for x in new_vb_seen]
-                    bolo_increment_user = UserProfile.objects.filter(user = Topic.objects.get(pk=each_seen_id).user ).update(bolo_score =F('bolo_score')+len(already_vbseen)*score,view_count = F('view_count')+number_seen)
+                    bolo_increment_user = UserProfile.objects.filter(user = Topic.objects.get(pk=each_seen_id).user ).update(own_vb_view_count = F('own_vb_view_count')+number_seen,bolo_score =F('bolo_score')+len(already_vbseen)*score,view_count = F('view_count')+number_seen)
                     print "after: profile updation",datetime.now()
                     aList=bolo_increment_user_id=None
             print "total created: ", counter_objects_created
@@ -364,7 +364,7 @@ def action_seen(user_id,topic_id):
     else:
        vbseen = VBseen.objects.create(user_id = user_id,topic_id = topic_id)
     topic.update(view_count = F('view_count')+1)
-    userprofile = get_userprofile(topic[0].user.id).update(view_count = F('view_count')+1)
+    userprofile = get_userprofile(topic[0].user.id).update(view_count = F('view_count')+1,own_vb_view_count = F('own_vb_view_count')+1)
 
 #follow
 def action_follow(test_user_id,any_user_id):

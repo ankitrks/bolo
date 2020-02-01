@@ -1205,9 +1205,12 @@ def provide_view_count(view_count,topic):
     all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)
     user_ids = list(all_test_userprofile_id)
     user_ids = random.sample(user_ids,100)
+    userprofile = topic.user.st
     while counter<view_count:
         opt_action_user_id = random.choice(user_ids)
         vb_obj = VBseen.objects.create(topic= topic,user_id =opt_action_user_id)
+        userprofile.own_vb_view_count = F('own_vb_view_count')+1
+        userprofile.save()
         update_redis_vb_seen(opt_action_user_id,topic.id)
         counter+=1
 
@@ -2364,6 +2367,7 @@ def comment_view(request):
         topic.save()
         userprofile = topic.user.st
         userprofile.view_count = F('view_count')+1
+        userprofile.own_vb_view_count = F('own_vb_view_count') +1
         userprofile.save()
         return JsonResponse({'message': 'item viewed'}, status=status.HTTP_200_OK)
     except Exception as e:
@@ -2389,6 +2393,7 @@ def vb_seen(request):
         topic.save()
         userprofile = topic.user.st
         userprofile.view_count = F('view_count')+1
+        userprofile.own_vb_view_count = F('own_vb_view_count') +1
         userprofile.save()
         all_vb_seen = get_redis_vb_seen(request.user.id)
         # vbseen = VBseen.objects.filter(user = request.user,topic_id = topic_id)
