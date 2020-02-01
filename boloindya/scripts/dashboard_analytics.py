@@ -38,7 +38,7 @@ def put_share_data():
 	day_month_year_dict = dict()
 	all_data = UserVideoTypeDetails.objects.all()
 	for item in all_data:
-		if(str(item.videotype) == 'shared'):
+		if(str(item.video_type) == 'shared'):
 			curr_videoid = item.videoid 
 			curr_date = item.timestamp 
 			curr_month = curr_date.month 
