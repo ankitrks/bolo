@@ -120,6 +120,31 @@ def put_video_views_data():
 		metrics_slab = '6'
 		print(metrics, metrics_slab, key, week_no, len(val))
 
+def put_videos_created():
+
+	day_month_year_dict = dict()
+	all_data = Topic.objects.all()
+	for item in all_data:
+		curr_date = item.date 
+		curr_videoid = item.videoid
+		if(curr_date in day_month_year_dict):
+			day_month_year_dict[curr_date].append(curr_videoid)
+		else:
+			day_month_year_dict[curr_date] = []
+
+	
+	print(len(day_month_year_dict))
+	for key, val in day_month_year_dict.items():
+		week_no = key.isocalendar()[1]
+		curr_year = key.year 
+		if(curr_year == 2020):
+			week_no+=52
+		if(curr_year == 2019 and week_no == 1):
+			week_no = 52
+
+		metrics = '0'
+		metrics_slab = ''				
+		print(metrics, metrics_slab, key, week_no, len(val))
 
 
 
