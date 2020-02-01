@@ -157,7 +157,7 @@ def view_count():
 		# for val in lang_details:
 		# 	lang_id = str(val.language_id)
 		# 	curr_category = val.category
-		
+
 		print(lang_id)	
 		if(lang_id.isdigit()):
 			language_str = language_map[int(lang_id)-1]
@@ -361,8 +361,8 @@ def main():
 	#comment_count()
 	# lang_category_count()
 	# lang_video_count()
-	#view_count()
-	total_view_lang_categ()
+	view_count()
+	#total_view_lang_categ()
 	#signup_login()
 
 
