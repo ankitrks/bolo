@@ -74,11 +74,14 @@ def put_installs_data():
 	all_data = ReferralCodeUsed.objects.filter(by_user__isnull = True)
 	for item in all_data:
 		curr_userid = item.by_user
+		print(curr_userid)
 		curr_date = item.created_at
-		if(curr_date in user_install_dict):
-			user_install_dict[curr_date].append(curr_userid)
+
+		if(curr_date not in user_install_dict):
+			user_install_dict[curr_date] = []
 		else:
-			user_install_dict[curr_date] = []	 
+			user_install_dict[curr_date].append(curr_userid)		 
+	
 		
 	print(user_install_dict, len(user_install_dict))
 
