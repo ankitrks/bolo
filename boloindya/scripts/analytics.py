@@ -149,7 +149,7 @@ def view_count():
 		curr_date = item.timestamp
 		curr_month = curr_date.month
 		curr_year = curr_date.year 
-		lang_details = Topic.objects.all().filter(id=curr_videoid)
+		lang_details = Topic.objects.get(id=curr_videoid)
 		for val in lang_details:
 			lang_id = str(val.language_id)
 			curr_category = val.category
@@ -165,6 +165,7 @@ def view_count():
 		else:
 			month_year_dict[(curr_month, curr_year, language_str, curr_category)].append(curr_videoid)
 
+	print(month_year_dict)		
 	for key, val in month_year_dict.items():
 		month_year_dict_uniq[key] = len(set(val))
 		month_year_dict_view [key] = len(val)
