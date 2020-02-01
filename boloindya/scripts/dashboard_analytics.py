@@ -51,23 +51,25 @@ def put_share_data():
 				day_month_year_dict[curr_date].append(curr_videoid)	
 
 	
-	print(day_month_year_dict)			
+	#print(day_month_year_dict)						
 				
-	"""				
 	for key, val in day_month_year_dict.items():
-
-
-	week_no = curr_date.isocalendar()[1]
-	if(curr_year == 2020):
-		week_no+=52
-	else:
-		week_no = 52
+		week_no = key.isocalendar()[1]
+		if(curr_year == 2020):
+			week_no+=52
+		else:
+			week_no = 52
 
 				
-	metrics = '3'
-	metrics_slab = '5'
-	save_obj, created = DashboardMetrics.objects.get_or_create(metrics = metrics, metrics_slab = slab, date = month_date, week_no = week_no)
-	"""	
+		metrics = '3'
+		metrics_slab = '5'
+		print(metrics, metrics_slab, key, week_no))
+	
+		# save_obj, created = DashboardMetrics.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = month_date, week_no = week_no)
+		# if(created):
+		# 	print(metrics, metrics_slab, month_date, week_no)
+		# 	save_obj.count = val 
+		# 	save_obj.save()
 
 
 
