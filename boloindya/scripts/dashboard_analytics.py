@@ -74,9 +74,9 @@ def put_installs_data():
 	all_data = ReferralCodeUsed.objects.filter(by_user__isnull = True)
 	for item in all_data:
 		curr_userid = item.android_id
-		#print(curr_userid)
 		curr_date = item.created_at
-
+		print(curr_date, curr_userid)
+		
 		if(curr_date not in user_install_dict):
 			user_install_dict[curr_date] = []
 		else:
