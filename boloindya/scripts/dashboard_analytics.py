@@ -94,7 +94,7 @@ def put_installs_data():
 
 		metrics = '5'
 		metrics_slab = '6'
-		print(metrics, metrics_slab, key, week_no, len(val))
+		#print(metrics, metrics_slab, key, week_no, len(val))
 	
 
 def put_video_views_data():
