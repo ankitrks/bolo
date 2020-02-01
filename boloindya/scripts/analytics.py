@@ -336,9 +336,8 @@ def signup_login():
 			#print(str_date) 
 			row_data = [curr_userid, str(curr_username), str_date] + list(user_lang_dict.values())
 			print(len(row_data), row_data)
-			df2 = pd.DataFrame(row_data, columns = list(header))
 			#print(row_data)
-			df = df.append(df2, ignore_index = True)
+			df = df.append(row_data, ignore_index = True, inplace = True)
 
 	#df = df.sort_values(by = 'Signup-Date')
 	print(df.columns.values.tolist())
