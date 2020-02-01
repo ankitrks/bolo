@@ -57,13 +57,13 @@ def put_share_data():
 		week_no = key.isocalendar()[1]
 		if(curr_year == 2020):
 			week_no+=52
-		else:
+		if(curr_year == 2019 and week_no == 1):
 			week_no = 52
 
 				
 		metrics = '3'
 		metrics_slab = '5'
-		print(metrics, metrics_slab, key, week_no)
+		print(metrics, metrics_slab, key, week_no, val)
 	
 		# save_obj, created = DashboardMetrics.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = month_date, week_no = week_no)
 		# if(created):
