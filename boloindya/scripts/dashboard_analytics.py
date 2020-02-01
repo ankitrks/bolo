@@ -80,7 +80,7 @@ def put_installs_data():
 		else:
 			user_install_dict[curr_date] = []	 
 		
-	print(len(user_install_dict))
+	print(user_install_dict, len(user_install_dict))
 
 	for key, val in user_install_dict.items():
 		week_no = key.isocalendar()[1]
@@ -92,7 +92,7 @@ def put_installs_data():
 
 		metrics = '5'
 		metrics_slab = '6'
-		print(metrics, metrics_slab, key, week_no, len(val))
+		#print(metrics, metrics_slab, key, week_no, len(val))
 	
 
 def put_video_views_data():
