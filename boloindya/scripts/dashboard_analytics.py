@@ -74,7 +74,7 @@ def put_installs_data():
 	all_data = ReferralCodeUsed.objects.filter(by_user__isnull = True)
 	for item in all_data:
 		curr_userid = item.android_id
-		print(curr_userid)
+		#print(curr_userid)
 		curr_date = item.created_at
 
 		if(curr_date not in user_install_dict):
@@ -86,6 +86,7 @@ def put_installs_data():
 	#print(user_install_dict, len(user_install_dict))
 	for key, val in user_install_dict.items():
 		week_no = key.isocalendar()[1]
+		print(val)
 		curr_year = key.year 
 		if(curr_year == 2020):
 			week_no+=52
