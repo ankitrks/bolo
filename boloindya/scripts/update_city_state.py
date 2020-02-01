@@ -11,11 +11,12 @@ def run():
     i=0
     for each_log in all_logs:
         print "##############    ",i,"/",total_elements,"      ############"
-        url = 'http://ip-api.com/json/'+str(each_log.logs)
-        response = urllib2.urlopen(url).read()
-        # print response
-        json_response = json.loads(response)
         userprofile = UserProfile.objects.filter(user_id = each_log.user.id)
-        userprofile.update(state_name = json_response['regionName'],city_name = json_response['city'])
-        sleep(2)
+        if not userprofile[0].state_name or not userprofile[0].city_name:
+            url = 'http://ip-api.com/json/'+str(each_log.logs)
+            response = urllib2.urlopen(url).read()
+            json_response = json.loads(response)
+            # print json_response['city'],json_response['regionName']
+            userprofile.update(state_name = json_response['regionName'],city_name = json_response['city'])
+            sleep(2)
         i+=1
