@@ -298,7 +298,7 @@ def signup_login():
 
 	header = ['UserID', 'UserName', 'Signup-Date'] + list(language_map)
 	print(header)
-	df = pd.DataFrame(columns = header)
+	df = pd.DataFrame()
 	user_signup_dict = dict()
 	signup_data = ReferralCodeUsed.objects.filter(by_user__isnull = False)
 	for item in signup_data:
@@ -337,7 +337,7 @@ def signup_login():
 			row_data = [curr_userid, str(curr_username), str_date] + list(user_lang_dict.values())
 			print(len(row_data), row_data)
 			#print(row_data)
-			df = df.append(row_data, ignore_index = True, inplace = True)
+			df = df.append(row_data, ignore_index = True, columns = header)
 
 	#df = df.sort_values(by = 'Signup-Date')
 	print(df.columns.values.tolist())
