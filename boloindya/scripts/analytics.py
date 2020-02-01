@@ -334,10 +334,12 @@ def signup_login():
 			#print(curr_userid, curr_username, user_signup_dict[curr_userid], user_lang_dict)
 			str_date = str(user_signup_dict[curr_userid].day) + "-" + str(user_signup_dict[curr_userid].month) + "-" + str(user_signup_dict[curr_userid].year)
 			#print(str_date) 
-			row_data = [curr_userid, str(curr_username), str_date] + list(user_lang_dict.values())
+			row_data = {'UserID':curr_userid, 'UserName':curr_username, 'Signup-Date': str_date}
+			row_data.update(user_lang_dict)	
+			#row_data = [curr_userid, str(curr_username), str_date] + list(user_lang_dict.values())
 			print(len(row_data), row_data)
 			#print(row_data)
-			df = df.append(row_data, ignore_index = True, columns = header)
+			df = df.append(row_data, ignore_index = True)
 
 	#df = df.sort_values(by = 'Signup-Date')
 	print(df.columns.values.tolist())
