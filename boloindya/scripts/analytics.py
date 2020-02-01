@@ -150,9 +150,9 @@ def view_count():
 		curr_month = curr_date.month
 		curr_year = curr_date.year 
 		lang_details = Topic.objects.get(id=curr_videoid)
-		lang_id = str(val.language_id)
-		curr_category = val.category
-		
+		lang_id = str(lang_details.language_id)
+		curr_category = lang_details.category
+
 		# for val in lang_details:
 		# 	lang_id = str(val.language_id)
 		# 	curr_category = val.category
