@@ -62,11 +62,11 @@ def put_share_data():
 				
 		metrics = '3'
 		metrics_slab = '5'
-		print(metrics, metrics_slab, key, week_no, len(set(val)))
+		#print(metrics, metrics_slab, key, week_no, len(set(val)))
 	
 		save_obj, created = DashboardMetrics.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
 		if(created):
-			save_obj.count = len(set(val))
+			save_obj.count = len(val)
 			save_obj.save()
 
 
