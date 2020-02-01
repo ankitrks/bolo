@@ -76,7 +76,7 @@ def put_installs_data():
 		curr_userid = item.android_id
 		curr_date = item.created_at
 		print(curr_date, curr_userid)
-		
+
 		if(curr_date not in user_install_dict):
 			user_install_dict[curr_date] = []
 		else:
@@ -156,7 +156,9 @@ def put_videos_created():
 def main():
 
 	#put_share_data()
-	put_installs_data()
+	#put_installs_data()
+	put_videos_created()
+	put_video_views_data()
 
 def run():
 	main()	
