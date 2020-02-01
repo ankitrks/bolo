@@ -59,11 +59,8 @@ def put_share_data():
 		if(curr_year == 2019 and week_no == 1):
 			week_no = 52
 
-				
 		metrics = '3'
 		metrics_slab = '5'
-		#print(metrics, metrics_slab, key, week_no, len(set(val)))
-	
 		save_obj, created = DashboardMetrics.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
 		if(created):
 			print(metrics, metrics_slab, key, week_no, len(val))
@@ -71,12 +68,65 @@ def put_share_data():
 			save_obj.save()
 
 
+def put_installs_data():
+
+	user_install_dict = dict()
+	all_data = ReferralCodeUsed.objects.filter(by_user__isnull = True)
+	for item in all_data:
+		curr_userid = item.by_user
+		curr_date = item.created_at
+		if(curr_date in user_install_dict):
+			user_install_dict[curr_date].append(curr_userid)
+		else:
+			user_install_dict[curr_date] = []	 
+		
+	print(len(user_install_dict))
+
+	for key, val in user_install_dict.items():
+		week_no = key.isocalendar()[1]
+		curr_year = key.year 
+		if(curr_year == 2020):
+			week_no+=52
+		if(curr_year == 2019 and week_no == 1):
+			week_no = 52
+
+		metrics = '5'
+		metrics_slab = '6'
+		print(metrics, metrics_slab, key, week_no, len(val))
+	
+
+def put_video_views_data():
+
+	day_month_year_dict = dict()
+	all_data = VideoPlaytime.objects.all()
+	for item in all_data:
+		curr_videoid = item.videoid
+		curr_date = item.timestamp
+		if(curr_date in day_month_year_dict):
+			day_month_year_dict[curr_date].append(curr_videoid)
+		else:
+			day_month_year_dict[curr_date] = []
+
+	print(len(day_month_year_dict))
+	for key, val in day_month_year_dict.items():
+		week_no = key.isocalendar()[1]
+		curr_year = key.year
+		if(curr_year == 2020):
+			week_no+=52
+		if(curr_year == 2019 and week_no == 1):
+			week_no = 52
+
+		metrics = '1'
+		metrics_slab = '6'
+		print(metrics, metrics_slab, key, week_no, len(val))
+
+
 
 
 def main():
 
-	put_share_data()
-
+	#put_share_data()
+	put_installs_data()
 
 def run():
 	main()	
