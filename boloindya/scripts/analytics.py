@@ -340,10 +340,10 @@ def signup_login():
 			#print(row_data)
 			df = df.append(row_data, ignore_index = True)
 
-	df = df.sort_values(by = 'Signup-Date')
+	df = df.sort_values(by = 'Signup-Date', ascending = False)
 	print(df.columns.values.tolist())
 	print(df.head(100))
-	df.to_csv('signup_data_creator.csv', encoding = 'utf-8')
+	df.to_csv('signup_data_creator.csv', encoding = 'utf-8', index = False)
 	print(count)
 		
 		
