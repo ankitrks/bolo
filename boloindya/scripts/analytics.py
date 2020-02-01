@@ -146,6 +146,7 @@ def view_count():
 	month_year_dict_view = dict()
 	for item in all_data:
 		curr_videoid = item.videoid
+		print(curr_videoid)
 		curr_date = item.timestamp
 		curr_month = curr_date.month
 		curr_year = curr_date.year 
@@ -156,7 +157,7 @@ def view_count():
 		# for val in lang_details:
 		# 	lang_id = str(val.language_id)
 		# 	curr_category = val.category
-
+		
 		print(lang_id)	
 		if(lang_id.isdigit()):
 			language_str = language_map[int(lang_id)-1]
@@ -167,9 +168,10 @@ def view_count():
 			month_year_dict[(curr_month, curr_year, language_str, curr_category)] = []
 		else:
 			month_year_dict[(curr_month, curr_year, language_str, curr_category)].append(curr_videoid)
-
+		
 	print(month_year_dict)		
 	for key, val in month_year_dict.items():
+		print("here")
 		month_year_dict_uniq[key] = len(set(val))
 		month_year_dict_view [key] = len(val)
 	
@@ -359,8 +361,8 @@ def main():
 	#comment_count()
 	# lang_category_count()
 	# lang_video_count()
-	view_count()
-	#total_view_lang_categ()
+	#view_count()
+	total_view_lang_categ()
 	#signup_login()
 
 
