@@ -38,13 +38,13 @@ def run():
         try:
             each_seen = Topic.objects.get(pk=each_seen_id)
             if not each_seen.user.st.is_popular or each_seen.user.st.is_superstar:
-                multiplication_factor = decimal.Decimal(random.randrange(700, 910))/100
+                multiplication_factor = decimal.Decimal(random.randrange(334, 467))/100
                 print "i am superstar: ",multiplication_factor
             elif each_seen.user.st.is_popular or not each_seen.user.st.is_superstar:
-                multiplication_factor = decimal.Decimal(random.randrange(400, 610))/100
+                multiplication_factor = decimal.Decimal(random.randrange(167, 233))/100
                 print "i am popular: ",multiplication_factor
             elif not each_seen.user.st.is_popular or not each_seen.user.st.is_superstar:
-                multiplication_factor = decimal.Decimal(random.randrange(100, 210))/100
+                multiplication_factor = decimal.Decimal(random.randrange(33, 100))/100
                 print "i am normal: ",multiplication_factor
             else:
                 multiplication_factor = 1
@@ -58,32 +58,32 @@ def run():
             to_be_created_bolo=[]
             if each_seen.date +timedelta(minutes=10) > now:
                 number_seen = random.randrange(6,100)
-            elif each_seen.date +timedelta(minutes=10) < now and each_seen.date +timedelta(minutes=30) > now and each_seen.view_count < int(500*multiplication_factor):
-                number_seen = random.randrange(100,int(500*multiplication_factor)-each_seen.view_count)
-            elif each_seen.date +timedelta(minutes=30) < now and each_seen.date +timedelta(hours=2) > now and each_seen.view_count < int(1000*multiplication_factor):
+            elif each_seen.date +timedelta(minutes=10) < now and each_seen.date +timedelta(minutes=30) > now and each_seen.view_count < int(167*multiplication_factor):
+                number_seen = random.randrange(100,int(167*multiplication_factor)-each_seen.view_count)
+            elif each_seen.date +timedelta(minutes=30) < now and each_seen.date +timedelta(hours=2) > now and each_seen.view_count < int(334*multiplication_factor):
+                number_seen = random.randrange(1,int(334*multiplication_factor)-each_seen.view_count)
+            elif each_seen.date +timedelta(hours=2) < now and each_seen.date +timedelta(hours=4) > now and each_seen.view_count < int(667*multiplication_factor):
+                number_seen = random.randrange(1,int(667*multiplication_factor)-each_seen.view_count)
+            elif each_seen.date +timedelta(hours=4) < now and each_seen.date +timedelta(hours=6) > now and each_seen.view_count < int(1000*multiplication_factor):
                 number_seen = random.randrange(1,int(1000*multiplication_factor)-each_seen.view_count)
-            elif each_seen.date +timedelta(hours=2) < now and each_seen.date +timedelta(hours=4) > now and each_seen.view_count < int(2000*multiplication_factor):
+            elif each_seen.date +timedelta(hours=6) < now and each_seen.date +timedelta(hours=8) > now and each_seen.view_count < int(1167*multiplication_factor):
+                number_seen = random.randrange(1,int(1167*multiplication_factor)-each_seen.view_count)
+            elif each_seen.date +timedelta(hours=10) < now and each_seen.date +timedelta(hours=12) > now and each_seen.view_count < int(1500*multiplication_factor):
+                number_seen = random.randrange(1,int(1500*multiplication_factor)-each_seen.view_count)
+            elif each_seen.date +timedelta(hours=12) < now and each_seen.date +timedelta(hours=14) > now and each_seen.view_count < int(1667*multiplication_factor):
+                number_seen = random.randrange(1,int(1667*multiplication_factor)-each_seen.view_count)
+            elif each_seen.date +timedelta(hours=14) < now and each_seen.date +timedelta(hours=16) > now and each_seen.view_count < int(1834*multiplication_factor):
+                number_seen = random.randrange(1,int(1834*multiplication_factor)-each_seen.view_count)
+            elif each_seen.date +timedelta(hours=16) < now and each_seen.date +timedelta(hours=18) > now and each_seen.view_count < int(2000*multiplication_factor):
                 number_seen = random.randrange(1,int(2000*multiplication_factor)-each_seen.view_count)
-            elif each_seen.date +timedelta(hours=4) < now and each_seen.date +timedelta(hours=6) > now and each_seen.view_count < int(3000*multiplication_factor):
+            elif each_seen.date +timedelta(hours=18) < now and each_seen.date +timedelta(hours=19) > now and each_seen.view_count < int(2500*multiplication_factor):
+                number_seen = random.randrange(1,int(2500*multiplication_factor)-each_seen.view_count)
+            elif each_seen.date +timedelta(hours=19) < now and each_seen.date +timedelta(hours=20) > now and each_seen.view_count < int(2667*multiplication_factor):
+                number_seen = random.randrange(1,int(2667*multiplication_factor)-each_seen.view_count)
+            elif each_seen.date +timedelta(hours=20) < now and each_seen.date +timedelta(hours=21) > now and each_seen.view_count < int(2834*multiplication_factor):
+                number_seen = random.randrange(1,int(2834*multiplication_factor)-each_seen.view_count)
+            elif each_seen.date +timedelta(hours=21) < now and each_seen.view_count < int(3000*multiplication_factor):
                 number_seen = random.randrange(1,int(3000*multiplication_factor)-each_seen.view_count)
-            elif each_seen.date +timedelta(hours=6) < now and each_seen.date +timedelta(hours=8) > now and each_seen.view_count < int(3500*multiplication_factor):
-                number_seen = random.randrange(1,int(3500*multiplication_factor)-each_seen.view_count)
-            elif each_seen.date +timedelta(hours=10) < now and each_seen.date +timedelta(hours=12) > now and each_seen.view_count < int(4500*multiplication_factor):
-                number_seen = random.randrange(1,int(4500*multiplication_factor)-each_seen.view_count)
-            elif each_seen.date +timedelta(hours=12) < now and each_seen.date +timedelta(hours=14) > now and each_seen.view_count < int(5000*multiplication_factor):
-                number_seen = random.randrange(1,int(5000*multiplication_factor)-each_seen.view_count)
-            elif each_seen.date +timedelta(hours=14) < now and each_seen.date +timedelta(hours=16) > now and each_seen.view_count < int(5500*multiplication_factor):
-                number_seen = random.randrange(1,int(5500*multiplication_factor)-each_seen.view_count)
-            elif each_seen.date +timedelta(hours=16) < now and each_seen.date +timedelta(hours=18) > now and each_seen.view_count < int(6000*multiplication_factor):
-                number_seen = random.randrange(1,int(6000*multiplication_factor)-each_seen.view_count)
-            elif each_seen.date +timedelta(hours=18) < now and each_seen.date +timedelta(hours=19) > now and each_seen.view_count < int(7500*multiplication_factor):
-                number_seen = random.randrange(1,int(7500*multiplication_factor)-each_seen.view_count)
-            elif each_seen.date +timedelta(hours=19) < now and each_seen.date +timedelta(hours=20) > now and each_seen.view_count < int(8000*multiplication_factor):
-                number_seen = random.randrange(1,int(8000*multiplication_factor)-each_seen.view_count)
-            elif each_seen.date +timedelta(hours=20) < now and each_seen.date +timedelta(hours=21) > now and each_seen.view_count < int(8500*multiplication_factor):
-                number_seen = random.randrange(1,int(8500*multiplication_factor)-each_seen.view_count)
-            elif each_seen.date +timedelta(hours=21) < now and each_seen.date +timedelta(hours=24) > now and each_seen.view_count < int(9000*multiplication_factor):
-                number_seen = random.randrange(1,int(9000*multiplication_factor)-each_seen.view_count)
             else:
                 number_seen = 1
             i = 0
@@ -134,7 +134,7 @@ def run():
                     print "after: bolo_score bulk",datetime.now()
                     print "before: profile updation",datetime.now()
                     # bolo_increment_user_id = [x['user_id'] for x in already_vbseen]
-                    bolo_increment_user = UserProfile.objects.filter(user = Topic.objects.get(pk=each_seen_id).user).update(view_count = F('view_count')+number_seen,bolo_score =F('bolo_score')+len(already_vbseen)*score)
+                    bolo_increment_user = UserProfile.objects.filter(user = Topic.objects.get(pk=each_seen_id).user).update(own_vb_view_count = F('own_vb_view_count')+number_seen, view_count = F('view_count')+number_seen,bolo_score =F('bolo_score')+len(already_vbseen)*score)
                     print "after: profile updation",datetime.now()
                     aList=bolo_increment_user_id=None
             print "total created: ", counter_objects_created
@@ -161,7 +161,7 @@ def run():
         opt_action_user_id = random.choice(user_ids)
         if opt_action =='comment':
             print "before: comment creation",datetime.now()
-            action_comment(opt_action_user_id,each_topic_id)
+            # action_comment(opt_action_user_id,each_topic_id)
             print "after: comment creation",datetime.now()
         elif opt_action == 'like':
             each_topic = Topic.objects.get(pk=each_topic_id)
@@ -237,7 +237,7 @@ def check_like(topic_id,user_ids):
         print "i am non popular: ",random_counter
 
     print random_counter,"required_like"
-    if each_like.likes_count < each_like.view_count/random.randrange(10,21):
+    if each_like.likes_count < each_like.view_count:
         if each_like.date +timedelta(minutes=10) > now and random_counter > 100 and each_like.likes_count < random_counter:
             number_like = random.randrange(6,random_counter)
         elif each_like.date +timedelta(minutes=10) < now and each_like.date +timedelta(minutes=30) > now and each_like.likes_count < random_counter:
@@ -256,7 +256,7 @@ def check_like(topic_id,user_ids):
             number_like = random.randrange(1,random_counter-each_like.likes_count)
         elif each_like.date +timedelta(hours=14) < now and each_like.date +timedelta(hours=16) > now and each_like.likes_count < random_counter:
             number_like = random.randrange(1,random_counter-each_like.likes_count)
-        elif each_like.date +timedelta(hours=16) < now and each_like.date +timedelta(hours=72) > now and each_like.likes_count < random_counter:
+        elif each_like.date +timedelta(hours=16) < now and each_like.likes_count < random_counter:
             number_like = random.randrange(1,random_counter-each_like.likes_count)
         else:
             number_like = 1
@@ -326,13 +326,13 @@ def check_comment(topic_id,user_ids):
     now = datetime.now()
     topic = Topic.objects.get(pk=topic_id)
     if not topic.user.st.is_popular or topic.user.st.is_superstar:
-        multiplication_factor = decimal.Decimal(random.randrange(500, 1000))/100
+        multiplication_factor = decimal.Decimal(random.randrange(150, 250))/100
         print "i am superstar: ",multiplication_factor
     elif topic.user.st.is_popular or not topic.user.st.is_superstar:
-        multiplication_factor = decimal.Decimal(random.randrange(200, 250))/100
+        multiplication_factor = decimal.Decimal(random.randrange(50, 150))/100
         print "i am popular: ",multiplication_factor
     elif not topic.user.st.is_popular or not topic.user.st.is_superstar:
-        multiplication_factor = decimal.Decimal(random.randrange(100, 130))/100
+        multiplication_factor = decimal.Decimal(random.randrange(10, 50))/100
         print "i am normal: ",multiplication_factor
     else:
         multiplication_factor = 1
@@ -431,7 +431,7 @@ def action_seen(user_id,topic_id):
     else:
        vbseen = VBseen.objects.create(user_id = user_id,topic_id = topic_id)
     topic.update(view_count = F('view_count')+1)
-    userprofile = get_userprofile(topic[0].user.id).update(view_count = F('view_count')+1)
+    userprofile = get_userprofile(topic[0].user.id).update(view_count = F('view_count')+1,own_vb_view_count = F('own_vb_view_count')+1)
 
 #follow
 def action_follow(test_user_id,any_user_id):
