@@ -73,7 +73,7 @@ def put_installs_data():
 	user_install_dict = dict()
 	all_data = ReferralCodeUsed.objects.filter(by_user__isnull = True)
 	for item in all_data:
-		curr_userid = item.by_user
+		curr_userid = item.by_user.id
 		print(curr_userid)
 		curr_date = item.created_at
 
@@ -82,7 +82,7 @@ def put_installs_data():
 		else:
 			user_install_dict[curr_date].append(curr_userid)		 
 	
-		
+
 	print(user_install_dict, len(user_install_dict))
 
 	for key, val in user_install_dict.items():
@@ -95,7 +95,7 @@ def put_installs_data():
 
 		metrics = '5'
 		metrics_slab = '6'
-		#print(metrics, metrics_slab, key, week_no, len(val))
+		print(metrics, metrics_slab, key, week_no, len(val))
 	
 
 def put_video_views_data():
