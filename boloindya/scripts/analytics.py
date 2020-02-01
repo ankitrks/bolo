@@ -355,9 +355,9 @@ def main():
 	#comment_count()
 	# lang_category_count()
 	# lang_video_count()
-	#view_count()
+	view_count()
 	#total_view_lang_categ()
-	signup_login()
+	#signup_login()
 
 
 def run():
