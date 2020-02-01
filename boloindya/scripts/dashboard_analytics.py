@@ -105,6 +105,7 @@ def put_video_views_data():
 	all_data = VideoPlaytime.objects.all()
 	for item in all_data:
 		curr_videoid = item.videoid
+		month_date = item.timestamp.strptime(each_rec + '-' + str(each_data), '%Y-%m-%d')
 		curr_date = item.timestamp
 		if(curr_date in day_month_year_dict):
 			day_month_year_dict[curr_date].append(curr_videoid)
