@@ -130,7 +130,7 @@ def put_videos_created():
 	all_data = Topic.objects.all()
 	for item in all_data:
 		curr_date = item.date 
-		curr_videoid = item.videoid
+		curr_videoid = item.id
 		if(curr_date in day_month_year_dict):
 			day_month_year_dict[curr_date].append(curr_videoid)
 		else:
