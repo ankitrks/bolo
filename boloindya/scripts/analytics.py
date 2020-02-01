@@ -297,7 +297,7 @@ def total_view_lang_categ():
 def signup_login():
 
 	header = ['UserID', 'UserName', 'Signup-Date'] + list(language_map)
-	print(header)
+	#print(header)
 	df = pd.DataFrame()
 	user_signup_dict = dict()
 	signup_data = ReferralCodeUsed.objects.filter(by_user__isnull = False)
@@ -324,7 +324,6 @@ def signup_login():
 					user_lang_dict[str(item.language_id)]+=1
 
 			#print(user_lang_dict)
-
 			user_details = UserProfile.objects.get(user = curr_userid)	
 			if(user_details.name):
 				curr_username = user_details.name
@@ -341,7 +340,7 @@ def signup_login():
 			#print(row_data)
 			df = df.append(row_data, ignore_index = True)
 
-	#df = df.sort_values(by = 'Signup-Date')
+	df = df.sort_values(by = 'Signup-Date')
 	print(df.columns.values.tolist())
 	print(df.head(100))
 	df.to_csv('signup_data_creator.csv', encoding = 'utf-8')
