@@ -334,9 +334,9 @@ def signup_login():
 			#print(curr_userid, curr_username, user_signup_dict[curr_userid], user_lang_dict)
 			str_date = str(user_signup_dict[curr_userid].day) + "-" + str(user_signup_dict[curr_userid].month) + "-" + str(user_signup_dict[curr_userid].year)
 			#print(str_date) 
-			row_data = [curr_userid, curr_username, str_date] + list(user_lang_dict.values())
+			row_data = [curr_userid, str(curr_username), str_date] + list(user_lang_dict.values())
 			print(len(row_data), row_data)
-			df2 = pd.DataFrame(row_data, columns = header)
+			df2 = pd.DataFrame(row_data, columns = list(header))
 			#print(row_data)
 			df = df.append(df2, ignore_index = True)
 
