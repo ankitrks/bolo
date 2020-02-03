@@ -43,7 +43,7 @@ def put_share_data():
 			#print(item.timestamp) 
 			curr_month = item.timestamp.month 
 			curr_year = item.timestamp.year
-			curr_day = item,timestamp.day 
+			curr_day = item.timestamp.day 
 			curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day)
 			print(curr_date)
 
