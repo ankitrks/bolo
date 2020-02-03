@@ -78,6 +78,10 @@ def put_installs_data():
 	all_data = ReferralCodeUsed.objects.filter(by_user__isnull = True)
 	for item in all_data:
 		curr_userid = item.android_id
+		curr_month = item.created_at.month 
+		curr_year = item.created_at.year
+		curr_day = item.created_at.day 
+		curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day)
 		curr_date = item.created_at
 		print(curr_date, curr_userid)
 
@@ -171,9 +175,9 @@ def put_videos_created():
 def main():
 
 	#put_share_data()
-	#put_installs_data()
-	put_videos_created()
-	put_video_views_data()
+	put_installs_data()
+	#put_videos_created()
+	#put_video_views_data()
 
 def run():
 	main()	
