@@ -77,10 +77,10 @@ class DashboardMetricsAdmin(admin.ModelAdmin):
     list_editable = ('metrics', 'metrics_slab', 'date', 'week_no', 'count')
     list_filter = ('metrics', 'metrics_slab', 'date')
 
-class DashboardMetricsJarvisAdmin(admin.ModelAdmin)
-    list_display = ('id', 'metrics', 'metrics_slab', 'date', 'week_no', 'count')
-    list_editable = ('metrics', 'metrics_slab', 'date', 'week_no', 'count')
-    list_filter = ('metrics', 'metrics_slab', 'date')
+# class DashboardMetricsJarvisAdmin(admin.ModelAdmin)
+#     list_display = ('id', 'metrics', 'metrics_slab', 'date', 'week_no', 'count')
+#     list_editable = ('metrics', 'metrics_slab', 'date', 'week_no', 'count')
+#     list_filter = ('metrics', 'metrics_slab', 'date')
 
 
 admin.site.unregister(FCMDevice)
