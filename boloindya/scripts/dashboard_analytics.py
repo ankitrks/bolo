@@ -82,7 +82,6 @@ def put_installs_data():
 		curr_year = item.created_at.year
 		curr_day = item.created_at.day 
 		curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day)
-		curr_date = item.created_at
 		print(curr_date, curr_userid)
 
 		if(curr_date not in user_install_dict):
