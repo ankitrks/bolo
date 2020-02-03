@@ -216,13 +216,13 @@ def put_video_creators():
 			print(user_lang_dict)
 			str_date = str(user_signup_dict[curr_userid].day) + "-" + str(user_signup_dict[curr_userid].month) + "-" + str(user_signup_dict[curr_userid].year)
 			print(str_date)
-			tot_video_upload_count = 0
 
+			tot_video_upload_count = 0
 			for key_lang, val_lang in user_lang_dict.items():
 				tot_video_upload_count+=val_lang
 
 			datetime_key = val
-			print(datetime_key)
+			#print(datetime_key)
 			week_no = datetime_key.isocalendar()[1]
 			curr_year = datetime_key.year 
 			curr_month = datetime_key.month 
@@ -231,6 +231,7 @@ def put_video_creators():
 			if(curr_year == 2019 and week_no == 1):
 				week_no = 52
 
+			print(tot_video_upload_count)	
 			if(tot_video_upload_count>=60):
 				metrics = '4'
 				metrics_slab = '2'
