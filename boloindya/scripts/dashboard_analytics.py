@@ -84,10 +84,10 @@ def put_installs_data():
 		curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day)
 		#print(curr_date, curr_userid)
 
-		if(curr_date not in user_install_dict):
-			user_install_dict[curr_date] = []
+		if((curr_date in user_install_dict) and not curr_userid) :
+			user_install_dict[curr_date].append(curr_userid)
 		else:
-			user_install_dict[curr_date].append(curr_userid)		 
+			user_install_dict[curr_date] = []		 
 	
 
 	#print(user_install_dict, len(user_install_dict))
@@ -118,7 +118,7 @@ def put_video_views_data():
 		curr_day = item.timestamp.day 
 		curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day)
 
-		if(curr_date in day_month_year_dict):
+		if((curr_date in day_month_year_dict)):
 			day_month_year_dict[curr_date].append(curr_videoid)
 		else:
 			day_month_year_dict[curr_date] = []
