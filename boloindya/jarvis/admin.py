@@ -89,3 +89,6 @@ admin.site.register(PushNotification)
 admin.site.register(PushNotificationUser)
 admin.site.register(DashboardMetrics, DashboardMetricsAdmin)
 admin.site.register(StateDistrictLanguage, StateDistrictLanguageAdmin)
+admin.site.register(DashboardMetricsJarvis)
+
+
