@@ -202,7 +202,8 @@ def put_video_creators():
 		curr_userid = key
 		all_data = Topic.objects.all().filter(id = curr_userid)
 		user_lang_dict = dict()
-		for lang in language_string:
+
+		for lang in language_map:
 			user_lang_dict[lang] = 0
 
 		if(len(all_data)>0):
