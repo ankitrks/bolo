@@ -251,11 +251,11 @@ def put_video_creators():
 
 def main():
 
-	#put_share_data()
+	put_share_data()
 	#put_installs_data()
 	#put_videos_created()
 	#put_video_views_data()
-	put_video_creators()
+	#put_video_creators()
 
 def run():
 	main()	
