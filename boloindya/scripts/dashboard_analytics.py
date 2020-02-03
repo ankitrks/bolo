@@ -135,8 +135,23 @@ def put_video_views_data():
 			week_no = 52
 
 		metrics = '1'
-		metrics_slab = '6'
-		print(metrics, metrics_slab, key, week_no, len(val))
+		metrics_slab = ''
+		#print(metrics, metrics_slab, key, week_no, len(val))
+		save_obj, created = DashboardMetrics.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
+		if(created):
+			print(metrics, metrics_slab, key, week_no, len(val))
+			save_obj.count = len(val)
+			save_obj.save()
+
+		metrics_uniq = '7'
+		metrics_slab_uniq = ''	
+		save_obj_uniq, created_uniq = DashboardMetrics.objects.get_or_create(metrics = metrics_uniq, metrics_slab = metrics_slab_uniq, date = key, week_no= week_no)
+		if(created_uniq):
+			print(metrics_uniq, metrics_slab_uniq, key, week_no, len(set(val)))
+			save_obj_uniq.count = len(set(val))
+			save_obj_uniq.save()
+				
+
 
 def put_videos_created():
 
