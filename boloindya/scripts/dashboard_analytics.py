@@ -40,8 +40,7 @@ def put_share_data():
 	all_data = UserVideoTypeDetails.objects.all()
 	for item in all_data:
 		if(str(item.video_type) == 'shared'):
-			curr_videoid = item.videoid
-			#print(item.timestamp) 
+			curr_videoid = item.videoid 
 			curr_month = item.timestamp.month 
 			curr_year = item.timestamp.year
 			curr_day = item.timestamp.day 
@@ -111,8 +110,11 @@ def put_video_views_data():
 	all_data = VideoPlaytime.objects.all()
 	for item in all_data:
 		curr_videoid = item.videoid
-		month_date = item.timestamp.strptime(each_rec + '-' + str(each_data), '%Y-%m-%d')
-		curr_date = item.timestamp
+		curr_month = item.timestamp.month 
+		curr_year = item.timestamp.year
+		curr_day = item.timestamp.day 
+		curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day)
+
 		if(curr_date in day_month_year_dict):
 			day_month_year_dict[curr_date].append(curr_videoid)
 		else:
@@ -120,8 +122,9 @@ def put_video_views_data():
 
 	print(len(day_month_year_dict))
 	for key, val in day_month_year_dict.items():
-		week_no = key.isocalendar()[1]
-		curr_year = key.year
+		datetime_key = parser.parse(key)
+		week_no = datetime_key.isocalendar()[1]
+		curr_year = datetime_key.year
 		if(curr_year == 2020):
 			week_no+=52
 		if(curr_year == 2019 and week_no == 1):
@@ -136,8 +139,12 @@ def put_videos_created():
 	day_month_year_dict = dict()
 	all_data = Topic.objects.all()
 	for item in all_data:
-		curr_date = item.date 
+		curr_month = item.date.month 
+		curr_year = item.date.year
+		curr_day = item.date.day 
+		curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day)
 		curr_videoid = item.id
+
 		if(curr_date in day_month_year_dict):
 			day_month_year_dict[curr_date].append(curr_videoid)
 		else:
@@ -146,8 +153,9 @@ def put_videos_created():
 	
 	#print(len(day_month_year_dict))
 	for key, val in day_month_year_dict.items():
-		week_no = key.isocalendar()[1]
-		curr_year = key.year 
+		datetime_key = parser.parse(key)
+		week_no = datetime_key.isocalendar()[1]
+		curr_year = datetime_key.year 
 		if(curr_year == 2020):
 			week_no+=52
 		if(curr_year == 2019 and week_no == 1):
@@ -162,10 +170,10 @@ def put_videos_created():
 
 def main():
 
-	put_share_data()
+	#put_share_data()
 	#put_installs_data()
-	#put_videos_created()
-	#put_video_views_data()
+	put_videos_created()
+	put_video_views_data()
 
 def run():
 	main()	
