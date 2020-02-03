@@ -213,13 +213,16 @@ def put_video_creators():
 				else:
 					user_lang_dict[str(item.language_id)]+=1
 
-			
+			print(user_lang_dict)
 			str_date = str(user_signup_dict[curr_userid].day) + "-" + str(user_signup_dict[curr_userid].month) + "-" + str(user_signup_dict[curr_userid].year)
+			print(str_date)
 			tot_video_upload_count = 0
-			for key, val in user_lang_dict.items():
-				tot_video_upload_count+=val
 
-			datetime_key = parser.parse(val)
+			for key_lang, val_lang in user_lang_dict.items():
+				tot_video_upload_count+=val_lang
+
+			datetime_key = val
+			print(datetime_key)
 			week_no = datetime_key.isocalendar()[1]
 			curr_year = datetime_key.year 
 			curr_month = datetime_key.month 
