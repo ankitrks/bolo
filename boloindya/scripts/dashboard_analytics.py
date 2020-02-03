@@ -150,7 +150,7 @@ def put_video_views_data():
 			print(metrics_uniq, metrics_slab_uniq, key, week_no, len(set(val)))
 			save_obj_uniq.count = len(set(val))
 			save_obj_uniq.save()
-				
+
 
 
 def put_videos_created():
@@ -181,18 +181,74 @@ def put_videos_created():
 			week_no = 52
 
 		metrics = '0'
-		metrics_slab = ''	
-		if(len(val)>0):			
+		metrics_slab = ''
+		save_obj, created = DashboardMetrics.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
+		if(created):
 			print(metrics, metrics_slab, key, week_no, len(val))
+			save_obj.count = len(val)
+			save_obj.save()
+
+
+def put_video_creators():
+
+	user_signup_dict = dict()
+	signup_data = ReferralCodeUsed.objects.filter(by_user__isnull = False)
+	for item in signup_data:
+		curr_userid = item.by_user.id 
+		user_signup_dict[curr_userid] = item.created_at 
+
+	print(len(user_signup_dict))
+	for key, val in user_signup_dict.items():
+		curr_userid = key
+		all_data = Topic.objects.all().filter(id = curr_userid)
+		user_lang_dict = dict()
+		for lang in language_string:
+			user_lang_dict[lang] = 0
+
+		if(len(all_data)>0):
+			for item in all_data:
+				if(item.language_id.isdigit()):
+					user_lang_dict[language_map[int(item.language_id)-1]]+=1
+				else:
+					user_lang_dict[str(item.language_id)]+=1
+
+			
+			str_date = str(user_signup_dict[curr_userid].day) + "-" + str(user_signup_dict[curr_userid].month) + "-" + str(user_signup_dict[curr_userid].year)
+			tot_video_upload_count = 0
+			for key, val in user_lang_dict.items():
+				tot_video_upload_count+=val
+
+			week_no = val.isocalendar()[1]
+			curr_year = week_no.year 
+			curr_month = week_no.month 
+			if(curr_year == 2020):
+				week_no+=52
+			if(curr_year == 2019 and week_no == 1):
+				week_no = 52
+
+			if(tot_video_upload_count>=60):
+				metrics = '4'
+				metrics_slab = '2'
+				print(metrics, metrics_slab, str_date, week_no)
+			if(tot_video_upload_count>=25 and tot_video_upload_count<60):
+				metrics = '4'
+				metrics_slab = '1'
+				print(metrics, metrics_slab, str_date, week_no)
+			if(tot_video_upload_count>=5 and tot_video_upload_count<25):
+				metrics = '4'
+				metrics_slab  '0'
+				print(metrics, metrics_slab, str_date, week_no)
+
 
 
 
 def main():
 
 	#put_share_data()
-	put_installs_data()
+	#put_installs_data()
 	#put_videos_created()
 	#put_video_views_data()
+	put_video_creators()
 
 def run():
 	main()	
