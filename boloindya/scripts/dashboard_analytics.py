@@ -219,9 +219,10 @@ def put_video_creators():
 			for key, val in user_lang_dict.items():
 				tot_video_upload_count+=val
 
-			week_no = val.isocalendar()[1]
-			curr_year = week_no.year 
-			curr_month = week_no.month 
+			datetime_key = parser.parse(val)
+			week_no = datetime_key.isocalendar()[1]
+			curr_year = datetime_key.year 
+			curr_month = datetime_key.month 
 			if(curr_year == 2020):
 				week_no+=52
 			if(curr_year == 2019 and week_no == 1):
