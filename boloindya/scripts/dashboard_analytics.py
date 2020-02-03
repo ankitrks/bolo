@@ -84,8 +84,9 @@ def put_installs_data():
 		curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day)
 		#print(curr_date, curr_userid)
 
-		if((curr_date in user_install_dict) and not curr_userid) :
-			user_install_dict[curr_date].append(curr_userid)
+		if((curr_date in user_install_dict)):
+			if(curr_userid! = ''):
+				user_install_dict[curr_date].append(curr_userid)
 		else:
 			user_install_dict[curr_date] = []		 
 	
@@ -94,7 +95,6 @@ def put_installs_data():
 	for key, val in user_install_dict.items():
 		datetime_key = parser.parse(key)
 		week_no = datetime_key.isocalendar()[1]
-		#print(val)
 		curr_year = datetime_key.year 
 		if(curr_year == 2020):
 			week_no+=52
