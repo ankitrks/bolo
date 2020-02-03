@@ -40,11 +40,12 @@ def put_share_data():
 	for item in all_data:
 		if(str(item.video_type) == 'shared'):
 			curr_videoid = item.videoid
-			print(item.timestamp)
-			curr_date = (datetime.strptime(str(item.timestamp), '%Y-%m-%d')) 
-			curr_month = curr_date.month 
-			curr_year = curr_date.year 
-			curr_day = curr_date.day
+			#print(item.timestamp) 
+			curr_month = item.timestamp.month 
+			curr_year = item.timestamp.year
+			curr_day = item,timestamp.day 
+			curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day)
+			print(curr_date)
 
 			if(curr_date not in day_month_year_dict):
 				day_month_year_dict[curr_date] = []
