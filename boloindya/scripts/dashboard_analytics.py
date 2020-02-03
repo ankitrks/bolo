@@ -137,7 +137,7 @@ def put_video_views_data():
 		metrics = '1'
 		metrics_slab = ''
 		#print(metrics, metrics_slab, key, week_no, len(val))
-		save_obj, created = DashboardMetrics.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
+		#save_obj, created = DashboardMetrics.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
 		if(created):
 			print(metrics, metrics_slab, key, week_no, len(val))
 			save_obj.count = len(val)
@@ -145,7 +145,7 @@ def put_video_views_data():
 
 		metrics_uniq = '7'
 		metrics_slab_uniq = ''	
-		save_obj_uniq, created_uniq = DashboardMetrics.objects.get_or_create(metrics = metrics_uniq, metrics_slab = metrics_slab_uniq, date = key, week_no= week_no)
+		#save_obj_uniq, created_uniq = DashboardMetrics.objects.get_or_create(metrics = metrics_uniq, metrics_slab = metrics_slab_uniq, date = key, week_no= week_no)
 		if(created_uniq):
 			print(metrics_uniq, metrics_slab_uniq, key, week_no, len(set(val)))
 			save_obj_uniq.count = len(set(val))
@@ -182,7 +182,7 @@ def put_videos_created():
 
 		metrics = '0'
 		metrics_slab = ''
-		save_obj, created = DashboardMetrics.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
+		#save_obj, created = DashboardMetrics.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
 		if(created):
 			print(metrics, metrics_slab, key, week_no, len(val))
 			save_obj.count = len(val)
@@ -198,11 +198,13 @@ def put_video_creators():
 		user_signup_dict[curr_userid] = item.created_at 
 
 	print(len(user_signup_dict))
+
 	for key, val in user_signup_dict.items():
 		curr_userid = key
 		all_data = Topic.objects.all().filter(id = curr_userid)
-		user_lang_dict = dict()
+		print(len(all_data))
 
+		user_lang_dict = dict()
 		for lang in language_map:
 			user_lang_dict[lang] = 0
 
@@ -245,8 +247,6 @@ def put_video_creators():
 				metrics = '4'
 				metrics_slab = '0'
 				print(metrics, metrics_slab, str_date, week_no)
-
-
 
 
 def main():
