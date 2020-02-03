@@ -1445,7 +1445,7 @@ def statistics_all_jarvis(request):
         temp_list.append( each_opt[1] )
         temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0])\
                 .aggregate(total_count = Sum('count'))['total_count'] )
-        top_data.append( temp_list ) 
+        top_data.append(temp_list) 
         if metrics == each_opt[0]:
             data['graph_title'] = each_opt[1]
     data['top_data'] = top_data
@@ -1464,17 +1464,21 @@ def statistics_all_jarvis(request):
             x_axis.append(str("week " + str(each_week_no)))
             y_axis.append(graph_data.filter(week_no = each_week_no).aggregate(total_count = Sum('count'))['total_count'])
 
-    # elif data_view == 'monthly':
+    	# elif data_view == 'monthly':
     else:
         x_axis = []
         y_axis = []
         month_no = months_between(start_date, end_date)
         for each_month_no in month_no:
             x_axis.append(str(str(month_map[str(each_month_no[0])]) + " " + str(each_month_no[1])))
-            y_axis.append(graph_data.filter(date__month = each_month_no[0]).aggregate(total_count = Sum('count'))['total_count'])
+            data1=graph_data.filter(date__month = each_month_no[0]).aggregate(total_count = Sum('count'))['total_count']
+            if data1:
+                y_axis.append(data1)
+            else:
+                y_axis.append(0)
     # else:
     #     x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
-    #     y_axis = graph_data.values_list('count', flat = True)
+    # y_axis = graph_data.values_list('count', flat = True)
     data['metrics'] = metrics
     data['slab'] = slab
     data['data_view'] = data_view
