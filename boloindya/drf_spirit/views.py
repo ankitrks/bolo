@@ -900,7 +900,6 @@ def get_random_username():
         return x
 
 def check_username_valid(username):
-    pattern = re.compile(r"[a-z0-9_.-]+$")
     if re.match(r"^[a-z0-9_.-]+$", username):
         return True
     else:
@@ -1916,7 +1915,7 @@ def fb_profile_settings(request):
                 userprofile.save()
                 if username:
                     if not check_username_valid(username):
-                        return JsonResponse({'message': 'Username Invalid. It can contains only lower case letters,numbers and special character[ _ - . ]'}, status=status.HTTP_200_OK)
+                        return JsonResponse({'message': 'Username Invalid. It can contains only lower case letters,numbers and special character[ _ - .]'}, status=status.HTTP_200_OK)
                     check_username = User.objects.filter(username = username).exclude(pk =request.user.id)
                     if not check_username:
                         userprofile.slug = username

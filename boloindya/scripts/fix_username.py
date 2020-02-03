@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth.models import User
+from forum.user.models import UserProfile
 import re
 import random, string
 from datetime import datetime
@@ -11,61 +12,123 @@ def run():
     mobile_no_fixed = 0
     invalid_number = 0
     non_indian_number = 0
-    for each_user in User.objects.all():
-        if not check_username_valid(each_user.username):
-            old_username = each_user.username
-            new_username = validate_username(each_user.username)
-            print "username not valid: ",old_username,new_username
-            # each_user.username = new_username
-            # each_user.save()
+    try:
 
-        try:
-            if not each_user.username.lower() == each_user.username:
-                user = User.objects.filter(username = each_user.username.lower()).exclude(pk__in=[each_user.id])
-                if user:
+        ## this loop will check if the username is valid or not and change to valid by removing unneccsry character with _
+        for each_user in User.objects.all():
+            try:
+                user_update_obj = User.objects.filter(pk=each_user.id)
+                print check_username_valid(each_user.username),each_user.username
+                if not check_username_valid(each_user.username):
                     old_username = each_user.username
-                    new_username = change_username(old_username)
-                    print "same_username_exist: ",old_username,new_username
-                    each_user.username = new_username
-                    # each_user.save()
-                    userprofile = each_user.st
-                    userprofile.slug = new_username
-                    # userprofile.save()
+                    new_username = change_username(validate_username(each_user.username))
+                    print "username not valid: ",old_username,new_username
+                    user_update_obj.update(username = new_username)
+            except Exception as e:
+                print e
+        ## this loop will check for capital username and if already lower then validate them by removing unnecry character with _
+        for each_user in User.objects.all():
+            try:
+                user_update_obj = User.objects.filter(pk=each_user.id)
+                if not each_user.username.lower() == each_user.username:
+                    user = User.objects.filter(username = each_user.username.lower()).exclude(pk__in=[each_user.id])
+                    if user:
+                        old_username = each_user.username
+                        new_username = change_username(old_username)
+                        print "same_username_exist: ",old_username,new_username
+                        user_update_obj.update(username = new_username)
+                    else:
+                        old_username = each_user.username
+                        new_username = old_username.lower()
+                        print "capital_username exist: ".old_username,new_username
+                        user_update_obj.update(username = new_username)
+                    user_name_fixed+=1
                 else:
-                    old_username = each_user.username
-                    new_username = old_username.lower()
-                    print "capital_username exist: ".old_username,new_username
-                    each_user.username = new_username
-                    # each_user.save()
-                    userprofile = each_user.st
-                    userprofile.slug = new_username
-                    # userprofile.save()
-                user_name_fixed+=1
-            elif not each_user.username == each_user.st.slug:
-                old_slug = each_user.st.slug
-                new_slug = each_user.username
-                print "diffrent slug exist",old_slug,new_slug
-                userprofile = each_user.st
-                userprofile.slug = each_user.username
-                # userprofile.save()
-                slug_fixed+=1
-            if each_user.st and each_user.st.mobile_no:
-                if not check_mobile_valid(each_user.st.mobile_no):
-                    invalid_number+=1
-                    print "Invalid mobile no ",each_user.st.mobile_no
+                    if not check_username_valid(each_user.username) and not check_mobile_valid(each_user.username):
+                        old_username = each_user.username
+                        new_username = change_username(validate_username(each_user.username))
+                        print "lower fix: ",old_username,new_username
+                        user_update_obj.update(username = new_username)
+                        user_name_fixed+=1
+
+            except Exception as e:
+                print e
+
+        ## this loop will check if username contains mobile no if mobile no replaced with name or random string
+        for each_user in User.objects.all():
+            try:
+                user_update_obj = User.objects.filter(pk=each_user.id)
+                if check_mobile_valid(each_user.username):
+                    print each_user.username
+                    if each_user.st.name:
+                        if is_valid_indian_number(each_user.username):
+                            new_username = change_username(validate_username(each_user.st.name))
+                            print "mobile found in username", each_user.st.name,each_user.username,new_username
+                            user_update_obj.update(username = new_username)
+                        else:
+                            print "not indian number"
+                    else:
+                        new_username = get_random_username()
+                        user_update_obj.update(username = new_username)
                 else:
+                    print "not mobile_no"
+
+            except Exception as e:
+                print e
+
+        ## this will remove multiple underscore
+        for each_user in User.objects.all():
+            try:
+                user_update_obj = User.objects.filter(pk=each_user.id)
+                if each_user.username.startswith('_') or each_user.username.endswith('_'):
+                    new_username = change_username(remove_underscore(each_user.username))
+                    print "remove_underscore:   ", each_user.username, new_username
+                    user_update_obj.update(username = new_username)
+            except Exception as e:
+                print e
+
+        ## this will fix the slug
+        for each_user in User.objects.all():
+            try:
+                userprofile_update_obj = UserProfile.objects.filter(user_id=each_user.id)
+                if not each_user.username == each_user.st.slug:
+                    old_slug = each_user.st.slug
+                    new_slug = each_user.username
+                    print "diffrent slug exist",old_slug,new_slug
                     userprofile = each_user.st
-                    length_of_mobile_no = len(userprofile.mobile_no)
-                    if length_of_mobile_no>10 and length_of_mobile_no<=13:
-                        old_mobile_no = userprofile.mobile_no
-                        new_mobile_no = old_mobile_no[-10:]
-                        print old_mobile_no,new_mobile_no
-                        mobile_no_fixed+=1
-                    elif length_of_mobile_no>13:
-                        non_indian_number+=1
-                        print "non indain number: ",userprofile.mobile_no
-        except Exception as e:
-            print e
+                    userprofile_update_obj.update(slug = each_user.username)
+                    slug_fixed+=1
+            except Exception as e:
+                print e
+
+        ## this will fix the indian mobile no left other no
+        for each_user in User.objects.all():
+            try:
+                userprofile_update_obj = UserProfile.objects.filter(user_id=each_user.id)
+                if each_user.st and each_user.st.mobile_no:
+                    if not check_mobile_valid(each_user.st.mobile_no):
+                        invalid_number+=1
+                        print "Invalid mobile no ",each_user.st.mobile_no
+                    else:
+                        userprofile = each_user.st
+                        length_of_mobile_no = len(userprofile.mobile_no)
+                        if length_of_mobile_no<8:
+                            print userprofile.mobile_no
+                            print "Invalid number cant change"
+                        elif length_of_mobile_no>8 and length_of_mobile_no<=14:
+                            old_mobile_no = userprofile.mobile_no
+                            new_mobile_no = validate_indian_number(old_mobile_no,each_user.id)
+                            print "new mobile_no ",old_mobile_no,new_mobile_no
+                            if not old_mobile_no == new_mobile_no:
+                                userprofile_update_obj.update(mobile_no = new_mobile_no)
+                                mobile_no_fixed+=1
+                        elif length_of_mobile_no>14:
+                            non_indian_number+=1
+                            print "non indain number: ",userprofile.mobile_no
+            except Exception as e:
+                print e
+    except Exception as e:
+        print e
     print "user_name_fixed: ",user_name_fixed
     print 'slug_fixed: ', slug_fixed
     print 'mobile_no_fixed:',mobile_no_fixed
@@ -84,15 +147,44 @@ def check_mobile_valid(mobile_no):
     else:
         return False
 
+def validate_indian_number(mobile_no,user_id,orignal_mobile_no=None):
+    if len(mobile_no)>8 and len(mobile_no)<=14:
+        if mobile_no.startswith('091'):
+            mobile_no = validate_indian_number(mobile_no[3:],user_id,mobile_no)
+        elif mobile_no.startswith('+91'):
+            mobile_no = validate_indian_number(mobile_no[3:],user_id,mobile_no)
+        elif mobile_no.startswith('0'):
+            mobile_no = validate_indian_number(mobile_no[1:],user_id,mobile_no)
+        elif mobile_no.startswith('91') and len(mobile_no)==12:
+            mobile_no = validate_indian_number(mobile_no[2:],user_id,mobile_no)
+
+
+        does_user_exist = UserProfile.objects.filter(mobile_no=mobile_no).exclude(user_id=user_id)
+        if not does_user_exist:
+            return mobile_no
+        else:
+            return orignal_mobile_no
+    else:
+        return mobile_no
+
+def is_valid_indian_number(mobile_no):
+    if (mobile_no.startswith('0') or mobile_no.startswith('91') or mobile_no.startswith('091') or mobile_no.startswith('+91')) and len(mobile_no)>=8 and len(mobile_no)<=14:
+        return True
+    else:
+        return False
+
+
 def validate_username(username):
+    if re.sub('[^A-Za-z0-9_.-]+', '_', username) == '_':
+        return get_random_username()
     return re.sub('[^A-Za-z0-9_.-]+', '_', username)
 
  
 def change_username(old_username,i=0):
     if not i:
-        new_username = old_username.lower()+str(1)
+        new_username = old_username.lower()
     else:
-        new_username = old_username.lower()+str(i+1)
+        new_username = old_username.lower()+str(i)
     try:
         user = User.objects.get(username=new_username)
         print "i am found"
@@ -118,4 +210,11 @@ def get_random_username():
     except:
         return x
 
-
+def remove_underscore(username):
+    if username.startswith('_'):
+        username = remove_underscore(username[1:])
+    elif username.endswith('_'):
+        username = remove_underscore(username[:-1])
+    elif '__' in username:
+        username = remove_underscore(username.replace('__','_'))
+    return username
