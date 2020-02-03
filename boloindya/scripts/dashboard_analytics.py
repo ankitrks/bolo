@@ -45,24 +45,25 @@ def put_share_data():
 			curr_year = item.timestamp.year
 			curr_day = item.timestamp.day 
 			curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day)
-			print(curr_date)
+			#print(curr_date)
 
 			if(curr_date not in day_month_year_dict):
 				day_month_year_dict[curr_date] = []
 			else:
 				day_month_year_dict[curr_date].append(curr_videoid)	
 
-	#print(day_month_year_dict)						
-	# for key, val in day_month_year_dict.items():
-	# 	week_no = key.isocalendar()[1]
-	# 	curr_year = key.year 
-	# 	if(curr_year == 2020):
-	# 		week_no+=52
-	# 	if(curr_year == 2019 and week_no == 1):
-	# 		week_no = 52
+	print(day_month_year_dict)						
+	for key, val in day_month_year_dict.items():
+		week_no = key.isocalendar()[1]
+		curr_year = key.year 
+		if(curr_year == 2020):
+			week_no+=52
+		if(curr_year == 2019 and week_no == 1):
+			week_no = 52
 
-	# 	metrics = '3'
-	# 	metrics_slab = '5'
+		metrics = '3'
+		metrics_slab = '5'
+		print(metrics, metrics_slab, key, week_no, len(val))
 	# 	save_obj, created = DashboardMetrics.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
 	# 	if(created):
 	# 		print(metrics, metrics_slab, key, week_no, len(val))
