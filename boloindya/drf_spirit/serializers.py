@@ -3,7 +3,7 @@ from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from .fields import UserReadOnlyField
 from forum.topic.models import Topic,CricketMatch,Poll,Choice,Voting,Leaderboard, Notification, TongueTwister,BoloActionHistory,VBseen
 from django.contrib.auth.models import User
-from forum.category.models import Category
+from forum.category.models import Category,CategoryViewCounter
 from forum.comment.models import Comment
 from forum.user.models import UserProfile,AppVersion, ReferralCodeUsed, VideoCompleteRate
 from .relations import PresentableSlugRelatedField
@@ -264,6 +264,8 @@ class UserProfileSerializer(ModelSerializer):
     follower_count= SerializerMethodField()
     bolo_score= SerializerMethodField()
     slug = SerializerMethodField()
+    view_count = SerializerMethodField()
+    own_vb_view_count = SerializerMethodField()
     class Meta:
         model = UserProfile
         # fields = '__all__' 
@@ -280,6 +282,12 @@ class UserProfileSerializer(ModelSerializer):
 
     def get_slug(self,instance):
         return instance.user.username
+
+    def get_view_count(self,instance):
+        return shorcountertopic(instance.view_count)
+
+    def get_own_vb_view_count(self,instance):
+        return shorcountertopic(instance.own_vb_view_count)
 
 class UserSerializer(ModelSerializer):
     userprofile = SerializerMethodField()
@@ -426,6 +434,8 @@ class PaymentInfoSerializer(ModelSerializer):
 class UserWithUserSerializer(ModelSerializer):
     user = SerializerMethodField()
     sub_category = SerializerMethodField()
+    view_count = SerializerMethodField()
+    own_vb_view_count = SerializerMethodField()
 
     class Meta:
         model = UserProfile
@@ -436,6 +446,12 @@ class UserWithUserSerializer(ModelSerializer):
     
     def get_sub_category(self,instance):
         return CategorySerializer(instance.sub_category, many=True).data
+
+    def get_view_count(self,instance):
+        return shorcountertopic(instance.view_count)
+
+    def get_own_vb_view_count(self,instance):
+        return shorcountertopic(instance.own_vb_view_count)
 
 class UserWithoutUserProfileSerializer(ModelSerializer):
     class Meta:
@@ -500,6 +516,7 @@ from django.db.models import Sum
 class CategoryWithVideoSerializer(ModelSerializer):
     topics = SerializerMethodField()
     total_view = SerializerMethodField()
+    current_language_view = SerializerMethodField()
 
     class Meta:
         model = Category
@@ -508,6 +525,13 @@ class CategoryWithVideoSerializer(ModelSerializer):
 
     def get_total_view(self, instance):
         return shorcountertopic(instance.view_count)
+
+    def get_current_language_view(self,instance):
+        if self.context.get("language_id"):
+            language =  self.context.get("language_id")
+            current_language_category = CategoryViewCounter.objects.get(category=instance,language=language)
+            return shorcountertopic(current_language_category.view_count)
+
 
     def get_topics(self,instance):
         # return []

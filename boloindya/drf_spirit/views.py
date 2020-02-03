@@ -41,11 +41,11 @@ from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
 from .models import UserJarvisDump, UserLogStatistics, UserFeedback
 from .permissions import IsOwnerOrReadOnly
-from .utils import get_weight, add_bolo_score, shorcountertopic, calculate_encashable_details, state_language, language_options
+from .utils import get_weight, add_bolo_score, shorcountertopic, calculate_encashable_details, state_language, language_options,short_time
 
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
-from forum.category.models import Category
+from forum.category.models import Category,CategoryViewCounter
 from forum.comment.models import Comment,CommentHistory
 from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs,UserPay
 from jarvis.models import FCMDevice,StateDistrictLanguage
@@ -1212,9 +1212,12 @@ def provide_view_count(view_count,topic):
     all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)
     user_ids = list(all_test_userprofile_id)
     user_ids = random.sample(user_ids,100)
+    userprofile = topic.user.st
     while counter<view_count:
         opt_action_user_id = random.choice(user_ids)
         vb_obj = VBseen.objects.create(topic= topic,user_id =opt_action_user_id)
+        userprofile.own_vb_view_count = F('own_vb_view_count')+1
+        userprofile.save()
         update_redis_vb_seen(opt_action_user_id,topic.id)
         counter+=1
 
@@ -1588,6 +1591,12 @@ def get_user_bolo_info(request):
         month = request.POST.get('month', None)
         year = request.POST.get('year',None)
         total_earn = 0
+        video_playtime = 0
+        spent_time = 0
+        total_view_count=0
+        total_like_count=0
+        total_comment_count = 0
+        total_share_count = 0
         if start_date and end_date:
             start_date= datetime.strptime(start_date, "%d-%m-%Y")
             end_date = datetime.strptime(end_date+' 23:59:59', "%d-%m-%Y %H:%M:%S")
@@ -1598,33 +1607,35 @@ def get_user_bolo_info(request):
         if not start_date or not end_date:
             total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user)
             all_pay = UserPay.objects.filter(user=request.user,is_active=True)
+            top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user).order_by('-view_count')[:3]
         else:
             total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user,date__gte=start_date, date__lte=end_date)
             all_pay = UserPay.objects.filter(user=request.user,is_active=True,for_month__gte=start_date.month,for_month__lte=start_date.month,\
                 for_year__gte=start_date.year,for_year__lte=start_date.year)
-        total_earn=0
+            top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user,date__gte=start_date, date__lte=end_date).order_by('-view_count')[:3]
+
         for each_pay in all_pay:
             total_earn+=each_pay.amount_pay
         total_video_count = total_video.count()
         print total_video
         monetised_video_count = total_video.filter(is_monetized = True).count()
+        unmonetizd_video_count= total_video.filter(is_monetized = False,is_moderated = True).count()
         left_for_moderation = total_video.filter(is_moderated = False).count()
-        total_view_count=0
-        total_like_count=0
-        total_comment_count = 0
-        total_share_count = 0
         for each_vb in total_video:
             total_view_count+=each_vb.view_count
             total_like_count+=each_vb.likes_count
             total_comment_count+=each_vb.comment_count
             total_share_count+=each_vb.total_share_count
+            video_playtime+=each_vb.vb_playtime
         total_view_count = shorcountertopic(total_view_count)
         total_comment_count = shorcountertopic(total_comment_count)
         total_like_count = shorcountertopic(total_like_count)
         total_share_count = shorcountertopic(total_share_count)
+        video_playtime = short_time(video_playtime)
         return JsonResponse({'message': 'success', 'total_video_count' : total_video_count, \
                         'monetised_video_count':monetised_video_count, 'total_view_count':total_view_count,'total_comment_count':total_comment_count,\
-                        'total_like_count':total_like_count,'total_share_count':total_share_count,'left_for_moderation':left_for_moderation,'total_earn':total_earn}, status=status.HTTP_200_OK)
+                        'total_like_count':total_like_count,'total_share_count':total_share_count,'left_for_moderation':left_for_moderation,'total_earn':total_earn,'video_playtime':video_playtime,\
+                        'spent_time':spent_time,'top_3_videos':TopicSerializer(top_3_videos,many=True).data,'unmonetizd_video_count':unmonetizd_video_count}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1645,6 +1656,7 @@ def verify_otp(request):
     lat = request.POST.get('lat',None)
     lang = request.POST.get('lang',None)
     click_id = request.POST.get('click_id',None)
+    user_ip = request.POST.get('user_ip',None)
     is_reset_password = False
     is_for_change_phone = False
     all_category_follow = []
@@ -1677,6 +1689,12 @@ def verify_otp(request):
                     message = 'User created'
                     userprofile = UserProfile.objects.get(user = user)
                     userprofile.mobile_no = mobile_no
+                    if user_ip:
+                        url = 'http://ip-api.com/json/'+user_ip
+                        response = urllib2.urlopen(url).read()
+                        json_response = json.loads(response)
+                        userprofile.state_name = json_response['regionName']
+                        userprofile.city_name = json_response['city']
                     if str(is_geo_location) =="1":
                         userprofile.lat = lat
                         userprofile.lang = lang
@@ -1768,6 +1786,7 @@ def fb_profile_settings(request):
     click_id = request.POST.get('click_id',None)
     lat = request.POST.get('lat',None)
     lang = request.POST.get('lang',None)
+    user_ip = request.POST.get('user_ip',None)
     sub_category_prefrences = request.POST.get('categories',None)
     is_dark_mode_enabled = request.POST.get('is_dark_mode_enabled',None)
     try:
@@ -1803,6 +1822,12 @@ def fb_profile_settings(request):
                 userprofile.d_o_b = d_o_b
                 if not userprofile.gender and gender:
                     add_bolo_score(user.id, 'gender_added', userprofile)
+                if user_ip:
+                    url = 'http://ip-api.com/json/'+user_ip
+                    response = urllib2.urlopen(url).read()
+                    json_response = json.loads(response)
+                    userprofile.state_name = json_response['regionName']
+                    userprofile.city_name = json_response['city']
                 userprofile.gender = gender
                 userprofile.about = about
                 userprofile.refrence = refrence
@@ -1861,6 +1886,12 @@ def fb_profile_settings(request):
                 userprofile.d_o_b = d_o_b
                 if not userprofile.gender and gender:
                     add_bolo_score(user.id, 'gender_added', userprofile)
+                if user_ip:
+                    url = 'http://ip-api.com/json/'+user_ip
+                    response = urllib2.urlopen(url).read()
+                    json_response = json.loads(response)
+                    userprofile.state_name = json_response['regionName']
+                    userprofile.city_name = json_response['city']
                 userprofile.gender = gender
                 userprofile.about = about
                 userprofile.refrence = refrence
@@ -1906,6 +1937,12 @@ def fb_profile_settings(request):
                     userprofile.is_dark_mode_enabled = True
                 else:
                     userprofile.is_dark_mode_enabled = False
+                if user_ip:
+                    url = 'http://ip-api.com/json/'+user_ip
+                    response = urllib2.urlopen(url).read()
+                    json_response = json.loads(response)
+                    userprofile.state_name = json_response['regionName']
+                    userprofile.city_name = json_response['city']
                 userprofile.gender = gender
                 userprofile.profile_pic =profile_pic
                 userprofile.cover_pic=cover_pic
@@ -2367,6 +2404,7 @@ def comment_view(request):
         topic.save()
         userprofile = topic.user.st
         userprofile.view_count = F('view_count')+1
+        userprofile.own_vb_view_count = F('own_vb_view_count') +1
         userprofile.save()
         return JsonResponse({'message': 'item viewed'}, status=status.HTTP_200_OK)
     except Exception as e:
@@ -2392,6 +2430,7 @@ def vb_seen(request):
         topic.save()
         userprofile = topic.user.st
         userprofile.view_count = F('view_count')+1
+        userprofile.own_vb_view_count = F('own_vb_view_count') +1
         userprofile.save()
         all_vb_seen = get_redis_vb_seen(request.user.id)
         # vbseen = VBseen.objects.filter(user = request.user,topic_id = topic_id)
@@ -3007,7 +3046,8 @@ def get_category_detail_with_views(request):
         all_vb = Topic.objects.filter(m2mcategory=category, is_removed=False, is_vb=True, language_id=language_id)
         vb_count = all_vb.count()
         all_seen = category.view_count
-        return JsonResponse({'category_details': CategoryWithVideoSerializer(category, context={'language_id': language_id,'user_id':request.user.id}).data, 'video_count': vb_count, 'all_seen':shorcountertopic(all_seen)}, status=status.HTTP_200_OK)
+        current_language_view = CategoryViewCounter.objects.get(category=category,language=language_id).view_count
+        return JsonResponse({'category_details': CategoryWithVideoSerializer(category, context={'language_id': language_id,'user_id':request.user.id}).data, 'video_count': vb_count, 'all_seen':shorcountertopic(all_seen),'current_language_view':shorcountertopic(current_language_view)}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 

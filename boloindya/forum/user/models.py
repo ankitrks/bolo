@@ -76,7 +76,8 @@ class UserProfile(models.Model):
     share_count = models.PositiveIntegerField(null=True,blank=True,default=0)
     like_count = models.PositiveIntegerField(null=True,blank=True,default=0)
     vb_count = models.PositiveIntegerField(null=True,blank=True,default=0)
-    view_count = models.PositiveIntegerField(null=True,blank=True,default=0)
+    view_count = models.BigIntegerField(null=True,blank=True,default=0)
+    own_vb_view_count = models.BigIntegerField(null=True,blank=True,default=0)
     bolo_score = models.PositiveIntegerField(null=True,blank=True,default=0)
     encashable_bolo_score = models.PositiveIntegerField(null=True,blank=True,default=0)
     is_geo_location = models.BooleanField(default=False)
@@ -91,6 +92,10 @@ class UserProfile(models.Model):
     click_id = models.CharField(_("Click Id"), max_length=300, blank=True)
     click_id_response = models.TextField(_("Click Id Response"),null=True, blank=True)
     is_dark_mode_enabled = models.BooleanField(default=False)
+    total_vb_playtime = models.PositiveIntegerField(null=True,blank=True,default=0)
+    total_time_spent = models.PositiveIntegerField(null=True,blank=True,default=0)
+    state_name = models.CharField(_('State Name'),max_length=200,null=True,blank=True)
+    city_name = models.CharField(_('City Name'),max_length=200,null=True,blank=True)
 
     # end #
 
@@ -156,6 +161,7 @@ class UserPay(RecordTimeStamp):
     bolo_bifurcation = models.TextField(null=True,blank=True)
     is_evaluated = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False)
+    is_active = models.BooleanField(default = True)
     class Meta:
         verbose_name_plural = 'User\'s Pay'
 

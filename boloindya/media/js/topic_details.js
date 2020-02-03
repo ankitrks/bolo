@@ -4,7 +4,15 @@ $(document).ready(function(){
     getSideBarData();
 });
 
+
+
+
+
+var page = 1;
+var checkDataStatus=0;
 var userLikeAndUnlike=[];
+var totalCountVideo =0;
+var playListData=[];
 
 function getSideBarData(){
     loaderBoloShowDynamic('_scroll_load_more_loading_creator');
@@ -107,7 +115,7 @@ function getPopularCategory(popularCategory){
 }
 
 
-    var playListData=[];
+
 function getCategoryVideos(){
 
     loaderBoloShowDynamic('_scroll_load_more_loading_user_videos');
@@ -125,16 +133,18 @@ function getCategoryVideos(){
         // },
         //http://www.boloindya.com/api/v1/get_vb_list/?limit=1&offset=11
     //var uri='https://www.boloindya.com/api/v1/get_popular_video_bytes/?page=1';
-    var uri='/api/v1/get_category_detail_with_views/';
+    var uri='/api/v1/get_category_video_bytes/';
+    //var uri='/api/v1/get_category_detail_with_views/';
     var res = encodeURI(uri);
 
     jQuery.ajax({
         url:res,
         type:"POST",
-        data:{'category_id':category_id,language_id:language_id},
+        data:{'category_id':category_id,'language_id':language_id,'page':1},
         success: function(response,textStatus, xhr){
             userVideoItems="";
-            var videoItemList=response.category_details.topics;
+            var videoItemList=response.topics;
+            //var videoItemList=response.category_details.topics;
             var itemCount=0;
             videoItemList.forEach(function(itemCreator) {itemCount++;
                 playListData[itemCreator.id]=itemCreator;
@@ -149,10 +159,79 @@ function getCategoryVideos(){
     });
 }
 
+    $(window).scroll(function() {
+        var scorh=Number($(window).scrollTop() + $(window).height());
+        if($(window).scrollTop() + $(window).height() > $("#categoryVideosListId").height()){
+
+            if(checkDataStatus==0){
+                page++;
+                loadMoreData(page);
+            }
+
+        }
+    });
+
+    function loadMoreData(page){
+    
+    var platlistItems;
+    checkDataStatus=1;
+    var category_id= $("#currentCatId").val();
+
+    var listItems="";
+    var itemCount=0;
+    var language_id=current_language_id;
+    //var uri='https://www.boloindya.com/api/v1/get_popular_video_bytes/?page=1';
+    var uri='/api/v1/get_category_video_bytes/';
+    var res = encodeURI(uri);
+      $.ajax(
+            {
+                url:res,
+                data:{'category_id':category_id,'language_id':language_id,'page':page},
+                type: "POST",
+                beforeSend: function()
+                {
+                    $('.ajax-load').show();
+                }
+            })
+            .done(function(data)
+            {
+                if(data == " "){
+                    $('.ajax-load').html("No more records found");
+                    return;
+                }
+                checkDataStatus=0;
+           var topicVideoList=data.topics;
+            //playListData+=topicVideoList;
+            var itemCount=-1;
+            var videoItemList=data.topics;
+            //var videoItemList=response.category_details.topics;
+            var itemCount=0;
+            var userVideoItems;
+            videoItemList.forEach(function(itemCreator) {itemCount++;
+                playListData[itemCreator.id]=itemCreator;
+                userVideoItems +=getVideoItem(itemCreator,itemCreator.id);
+            });
+            $("#categoryVideosListId").append(userVideoItems);
+            loaderBoloHideDynamic('_scroll_load_more_loading_user_videos');
+
+            })
+            .fail(function(jqXHR, ajaxOptions, thrownError)
+            {
+                if(jqXHR.status!=201){
+
+                }
+
+                $('.ajax-load').html("No more records found");
+            });
+    }
+
+
+
+
 function getVideoItem(videoItem,itemCount){
     var content_title="";
     var videoTitle="";
-        videoTitle=videoItem.title;
+        videoTitle=removeTags(videoItem.title);
         content_title = videoTitle.substr(0, 40) + " ...";
     var userVideoItem = '<div class="jsx-1410658769 video-feed-item">\
             <div class="jsx-1410658769 _ratio_">\
@@ -388,6 +467,7 @@ function video_play_using_video_js(url,backup_url,image) {
         param1=singleItemData.slug;
         param2=singleItemData.id;
         history.pushState(null, null, '?video='+param1+'/'+param2);
+        followLikeList();
  }
 
  function muteAndUnmutePlayer(){
@@ -528,7 +608,7 @@ function followLikeList(){
         headers: {
           'Authorization':'Bearer '+accessToken,
         },
-        success: function(response,textStatus, xhr){debugger;
+        success: function(response,textStatus, xhr){
             userLikeAndUnlike=response;
         //var videoCommentList=data.results;
         //all_category_follow
