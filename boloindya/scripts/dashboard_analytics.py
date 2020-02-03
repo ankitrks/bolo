@@ -104,6 +104,7 @@ def put_installs_data():
 		metrics = '5'
 		metrics_slab = '6'
 		if(len(val)>0):
+			print(val)
 			print(metrics, metrics_slab, key, week_no, len(val))
 	
 
