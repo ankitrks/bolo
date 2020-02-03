@@ -1496,7 +1496,7 @@ def statistics_all_jarvis(request):
     if metrics == '5':
         data['slabs'] = [metrics_slab_options[6], metrics_slab_options[7], metrics_slab_options[8]]
 
-    return render(request,'jarvis/pages/video_statistics/statistics_all.html', data)
+    return render(request,'jarvis/pages/video_statistics/statistics_all_jarvis.html', data)
 
 
 def get_daily_impressions_data(request):
