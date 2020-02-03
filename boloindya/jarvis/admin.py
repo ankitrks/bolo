@@ -77,10 +77,10 @@ class DashboardMetricsAdmin(admin.ModelAdmin):
     list_editable = ('metrics', 'metrics_slab', 'date', 'week_no', 'count')
     list_filter = ('metrics', 'metrics_slab', 'date')
 
-class DashboardMetricsJarvisAdmin(admin.ModelAdmin)
-    list_display = ('id', 'metrics', 'metrics_slab', 'date', 'week_no', 'count')
-    list_editable = ('metrics', 'metrics_slab', 'date', 'week_no', 'count')
-    list_filter = ('metrics', 'metrics_slab', 'date')
+# class DashboardMetricsJarvisAdmin(admin.ModelAdmin)
+#     list_display = ('id', 'metrics', 'metrics_slab', 'date', 'week_no', 'count')
+#     list_editable = ('metrics', 'metrics_slab', 'date', 'week_no', 'count')
+#     list_filter = ('metrics', 'metrics_slab', 'date')
 
 
 admin.site.unregister(FCMDevice)
@@ -89,6 +89,6 @@ admin.site.register(PushNotification)
 admin.site.register(PushNotificationUser)
 admin.site.register(DashboardMetrics, DashboardMetricsAdmin)
 admin.site.register(StateDistrictLanguage, StateDistrictLanguageAdmin)
-admin.site.register(DashboardMetricsJarvis, DashboardMetricsJarvisAdmin)
+admin.site.register(DashboardMetricsJarvis)
 
 
