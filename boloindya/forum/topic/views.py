@@ -516,7 +516,7 @@ def bolo_user_details(request,username=''):
         else:
             return render(request, 'spirit/topic/user_details.html', context)
     except:
-        return render(request, 'spirit/topic/new_landing.html')
+        return redirect('/')
 
 def user_timeline(request):
     username=request.GET.get('username');
@@ -554,7 +554,7 @@ def user_timeline(request):
         #print popular_bolo.__dict__
         return render(request, 'spirit/topic/user_details.html', context)
     except:
-        return render(request, 'spirit/topic/new_landing.html')
+        return redirect('/')
 
 def boloindya_careers(request):
     return render(request, 'spirit/topic/boloindya_careers.html')
@@ -764,7 +764,7 @@ def get_topic_details_by_category(request,category_slug):
         else:
             return render(request, 'spirit/topic/topic_details_by_category.html', context)
     except:
-        return render(request, 'spirit/topic/new_landing.html')
+        return redirect('/')
 
 def get_topic_list_by_hashtag(request,hashtag):
     language_id=1
@@ -832,6 +832,7 @@ def new_home(request):
         return redirect('/video/'+video_slug)
     else:
         return render(request, 'spirit/topic/new_landing.html',context)
+    return redirect('/')
     #return render(request, 'spirit/topic/temporary_landing.html')
     # return render(request, 'spirit/topic/new_landing.html')
     # return render(request, 'spirit/topic/main_landing.html')
@@ -857,6 +858,7 @@ def latest_home(request):
         return redirect('/video/'+video_slug)
     else:
         return render(request, 'spirit/topic/_latest_home.html',context)
+    
     #return render(request, 'spirit/topic/temporary_landing.html')
     # return render(request, 'spirit/topic/new_landing.html')
     # return render(request, 'spirit/topic/main_landing.html')
@@ -903,7 +905,8 @@ def user_profile(request,username):
         } 
         return render(request, 'spirit/topic/user_profile.html', context)
     except:
-        return render(request, 'spirit/topic/new_landing.html')  
+        return redirect('/')
+        #return render(request, 'spirit/topic/new_landing.html')  
 
 def get_about(request):
     name = 'about_us'

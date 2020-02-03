@@ -63,9 +63,14 @@ function getCreators(popularCreators){
         creatorName=popularCreators.username;
     }
 
+    var profilePics = popularCreators.userprofile.profile_pic;
+    if(profilePics==''){
+       profilePics= '/media/demo_user.png';
+    }    
+
     var creatorTemplate='<li class="jsx-3959364739">\
                             <a tag="a" class="jsx-1420774184 recommend-item" href="/'+popularCreators.username+'/">\
-                                <div class="jsx-2177493926 jsx-578937417 avatar round head normal" style="background-image: url('+popularCreators.userprofile.profile_pic+');"></div>\
+                                <div class="jsx-2177493926 jsx-578937417 avatar round head normal" style="background-image: url('+profilePics+');"></div>\
                                 <div class="jsx-1420774184 info-content">\
                                     <h4 class="jsx-1420774184">'+creatorName+'</h4>\
                                     <p class="jsx-1420774184">@'+popularCreators.username+'</p>\
