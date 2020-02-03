@@ -7,6 +7,7 @@ import time
 import ast 
 from django.http import JsonResponse
 from drf_spirit.utils import language_options
+from dateutil import parser
 import re
 import datetime
 from datetime import datetime
@@ -54,8 +55,9 @@ def put_share_data():
 
 	print(day_month_year_dict)						
 	for key, val in day_month_year_dict.items():
-		week_no = key.isocalendar()[1]
-		curr_year = key.year 
+		datetime_key = parser.parse(key)
+		week_no = datetime_key.isocalendar()[1]
+		curr_year = datetime_key.year 
 		if(curr_year == 2020):
 			week_no+=52
 		if(curr_year == 2019 and week_no == 1):
@@ -88,9 +90,10 @@ def put_installs_data():
 
 	#print(user_install_dict, len(user_install_dict))
 	for key, val in user_install_dict.items():
-		week_no = key.isocalendar()[1]
+		datetime_key = parser.parse(key)
+		week_no = datetime_key.isocalendar()[1]
 		print(val)
-		curr_year = key.year 
+		curr_year = datetime_key.year 
 		if(curr_year == 2020):
 			week_no+=52
 		if(curr_year == 2019 and week_no == 1):
