@@ -26,7 +26,7 @@ from jarvis.models import DashboardMetrics
 from datetime import timedelta
 os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
 sys.path.append( '/'.join(os.path.realpath(__file__).split('/')[:5]) )
-from jarvis.models import DashboardMetrics
+from jarvis.models import DashboardMetrics, DashboardMetricsJarvis
 
 language_string = list(language_options)
 language_map = []
@@ -64,12 +64,12 @@ def put_share_data():
 
 		metrics = '3'
 		metrics_slab = '5'
-		print(metrics, metrics_slab, key, week_no, len(val))
-	# 	save_obj, created = DashboardMetrics.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
-	# 	if(created):
-	# 		print(metrics, metrics_slab, key, week_no, len(val))
-	# 		save_obj.count = len(val)
-	# 		save_obj.save()
+		#print(metrics, metrics_slab, key, week_no, len(val))
+		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
+		if(created):
+			print(metrics, metrics_slab, key, week_no, len(val))
+			save_obj.count = len(val)
+			save_obj.save()
 
 
 def put_installs_data():
