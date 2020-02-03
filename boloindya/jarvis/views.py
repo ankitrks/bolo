@@ -1495,6 +1495,8 @@ def statistics_all_jarvis(request):
         data['slabs'] = [metrics_slab_options[3], metrics_slab_options[4], metrics_slab_options[5]]
     if metrics == '5':
         data['slabs'] = [metrics_slab_options[6], metrics_slab_options[7], metrics_slab_options[8]]
+    if metrics == '3':
+        data['slabs'] = [metrics_slab_options[5]]    
 
     return render(request,'jarvis/pages/video_statistics/statistics_all_jarvis.html', data)
 
