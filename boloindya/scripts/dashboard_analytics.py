@@ -213,13 +213,13 @@ def put_video_creators():
 				else:
 					user_lang_dict[str(item.language_id)]+=1
 
-			print(user_lang_dict)
+			#print(user_lang_dict)
 			str_date = str(user_signup_dict[curr_userid].day) + "-" + str(user_signup_dict[curr_userid].month) + "-" + str(user_signup_dict[curr_userid].year)
-			print(str_date)
+			#print(str_date)
 
 			tot_video_upload_count = 0
 			for key_lang, val_lang in user_lang_dict.items():
-				tot_video_upload_count+=val_lang
+				tot_video_upload_count+=int(val_lang)
 
 			datetime_key = val
 			#print(datetime_key)
@@ -232,6 +232,7 @@ def put_video_creators():
 				week_no = 52
 
 			print(tot_video_upload_count)	
+
 			if(tot_video_upload_count>=60):
 				metrics = '4'
 				metrics_slab = '2'
