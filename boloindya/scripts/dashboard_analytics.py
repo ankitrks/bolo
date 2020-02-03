@@ -85,7 +85,7 @@ def put_installs_data():
 		#print(curr_date, curr_userid)
 
 		if((curr_date in user_install_dict)):
-			if(curr_userid!=''):
+			if(curr_userid!='' and curr_userid!='None'):
 				user_install_dict[curr_date].append(curr_userid)
 		else:
 			user_install_dict[curr_date] = []		 
