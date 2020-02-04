@@ -199,19 +199,16 @@ def put_video_creators():
 
 	#print(len(user_signup_dict), user_signup_dict)
 
-	
 	for key, val in user_signup_dict.items():
 		curr_userid = key
-		all_data = Topic.objects.all().filter(id = curr_userid)
+		all_data = Topic.objects.all().filter(user = curr_userid)
 		print(len(all_data))
-		print(language_map)
 
 		user_lang_dict = dict()
 		for lang in language_map:
 			user_lang_dict[lang] = 0
 
 		if(len(all_data)>0):
-
 			for val_iter in all_data:
 				if(val_iter.language_id.isdigit()):
 					user_lang_dict[language_map[int(val_iter.language_id)-1]]+=1
