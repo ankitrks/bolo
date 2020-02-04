@@ -182,11 +182,12 @@ def put_videos_created():
 
 		metrics = '0'
 		metrics_slab = ''
+		print(metrics, metrics_slab, key, week_no, len(val))
 		#save_obj, created = DashboardMetrics.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
-		if(created):
-			print(metrics, metrics_slab, key, week_no, len(val))
-			save_obj.count = len(val)
-			save_obj.save()
+		# if(created):
+		# 	print(metrics, metrics_slab, key, week_no, len(val))
+		# 	save_obj.count = len(val)
+		# 	save_obj.save()
 
 
 def put_video_creators():
@@ -223,7 +224,6 @@ def put_video_creators():
 				tot_video_upload_count+=int(val_lang)
 
 			#print(tot_video_upload_count)
-
 			datetime_key = val
 			#print(datetime_key)
 			week_no = datetime_key.isocalendar()[1]
@@ -238,6 +238,7 @@ def put_video_creators():
 				metrics = '4'
 				metrics_slab = '2'
 				print(metrics, metrics_slab, str_date, week_no, tot_video_upload_count)
+
 			if(tot_video_upload_count>=25 and tot_video_upload_count<60):
 				metrics = '4'
 				metrics_slab = '1'
@@ -252,9 +253,9 @@ def main():
 
 	#put_share_data()
 	#put_installs_data()
-	#put_videos_created()
+	put_videos_created()
 	#put_video_views_data()
-	put_video_creators()
+	#put_video_creators()
 
 def run():
 	main()	
