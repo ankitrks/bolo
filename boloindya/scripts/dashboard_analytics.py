@@ -103,7 +103,7 @@ def put_installs_data():
 
 		metrics = '5'
 		metrics_slab = '6'
-		save_obj_uniq, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no= week_no)
+		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no= week_no)
 		if(created):
 			print(metrics, metrics_slab, key, week_no, len(val))
 			save_obj.count = len(val)
