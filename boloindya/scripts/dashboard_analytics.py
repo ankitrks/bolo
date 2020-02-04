@@ -136,20 +136,21 @@ def put_video_views_data():
 
 		metrics = '1'
 		metrics_slab = ''
-		#print(metrics, metrics_slab, key, week_no, len(val))
+		print(metrics, metrics_slab, key, week_no, len(val))
 		#save_obj, created = DashboardMetrics.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
-		if(created):
-			print(metrics, metrics_slab, key, week_no, len(val))
-			save_obj.count = len(val)
-			save_obj.save()
+		# if(created):
+		# 	print(metrics, metrics_slab, key, week_no, len(val))
+		# 	save_obj.count = len(val)
+		# 	save_obj.save()
 
 		metrics_uniq = '7'
 		metrics_slab_uniq = ''	
+		print(metrics, metrics_slab, key, week_no, len(set(val)))
 		#save_obj_uniq, created_uniq = DashboardMetrics.objects.get_or_create(metrics = metrics_uniq, metrics_slab = metrics_slab_uniq, date = key, week_no= week_no)
-		if(created_uniq):
-			print(metrics_uniq, metrics_slab_uniq, key, week_no, len(set(val)))
-			save_obj_uniq.count = len(set(val))
-			save_obj_uniq.save()
+		# if(created_uniq):
+		# 	print(metrics_uniq, metrics_slab_uniq, key, week_no, len(set(val)))
+		# 	save_obj_uniq.count = len(set(val))
+		# 	save_obj_uniq.save()
 
 
 
@@ -253,8 +254,8 @@ def main():
 
 	#put_share_data()
 	#put_installs_data()
-	put_videos_created()
-	#put_video_views_data()
+	#put_videos_created()
+	put_video_views_data()
 	#put_video_creators()
 
 def run():
