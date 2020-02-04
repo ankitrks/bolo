@@ -258,7 +258,32 @@ def put_video_creators():
 		metrics = '4'
 		metrics_slab = '0'
 		print(metrics, metrics_slab, datetime_key, week_no, len(val))
-		
+
+	for key, val in slab_2_dict.items():
+		datetime_key = parser.parse(key)
+		week_no = datetime_key.isocalendar()[1]
+		curr_year = datetime_key.year 
+		if(curr_year == 2020):
+			week_no+=52
+		if(curr_year == 2019 and week_no == 1):
+			week_no = 52
+
+		metrics = '4'
+		metrics_slab = '1'
+		print(metrics, metrics_slab, datetime_key, week_no, len(val))
+
+	for key, val in slab_3_dict.items():
+		datetime_key = parser.parse(key)
+		week_no = datetime_key.isocalendar()[1]
+		curr_year = datetime_key.year 
+		if(curr_year == 2020):
+			week_no+=52
+		if(curr_year == 2019 and week_no == 1):
+			week_no = 52
+
+		metrics = '4'
+		metrics_slab = '2'
+		print(metrics, metrics_slab, datetime_key, week_no, len(val))						
 
 	
 
