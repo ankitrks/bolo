@@ -221,7 +221,7 @@ def put_video_creators():
 				else:
 					user_lang_dict[str(val_iter.language_id)]+=1	
 
-			str_date = str(user_signup_dict[curr_userid].day) + "-" + str(user_signup_dict[curr_userid].month) + "-" + str(user_signup_dict[curr_userid].year)
+			str_date = str(user_signup_dict[curr_userid].year) + "-" + str(user_signup_dict[curr_userid].month) + "-" + str(user_signup_dict[curr_userid].day)
 			#print(str_date)
 
 			tot_video_upload_count = 0
@@ -236,17 +236,21 @@ def put_video_creators():
 					slab_3_dict[str_date].append(curr_userid)
 				else:
 					slab_3_dict[str_date] = []
+					slab_3_dict.append(curr_userid)
 
 			if(tot_video_upload_count>=25 and tot_video_upload_count<60):
 				if(str_date in slab_2_dict):
 					slab_2_dict[str_date].append(curr_userid)
 				else:
 					slab_2_dict[str_date] = []
+					slab_2_dict.append(curr_userid)
+
 			if(tot_video_upload_count>=5 and tot_video_upload_count<25):
 				if(str_date in slab_1_dict):
 					slab_1_dict[str_date].append(curr_userid)
 				else:
 					slab_1_dict[str_date] = []
+					slab_1_dict.append(curr_userid)
 
 	print(slab_1_dict)
 	print("\n\n")
