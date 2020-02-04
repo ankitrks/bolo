@@ -310,7 +310,7 @@ OTHER_API_LIST = [
     {'api_path':'get_ip_to_language/','api_name':'to get language from IP','request_type':'GET','data_set':[{'user_ip':'127.0.0.1'}]},
     # {'api_path':'transcoder_notification/','api_name':'dummy_test','request_type':'POST','data_set':[]},
     {'api_path':'vb_transcode_status/','api_name':'get transcoding status of file','request_type':'POST','data_set':[{'topic_id':get_single_topic_id()}]},
-    {'api_path':'get_vb_list/','api_name':'get list of vb','request_type':'GET','data_set':[{'category':'sports','is_popular':True,'language_id':get_single_language()},{'category':'sports','language_id':get_single_language()},{'category':'sports','language_id':get_single_language()},{'user_id':get_random_user()}]},
+    {'api_path':'get_vb_list/','api_name':'get list of vb','request_type':'GET','data_set':[{'category':'sports','is_popular':True,'language_id':get_single_language()},{'category':'sports','language_id':get_single_language()},{'category':'sports','language_id':get_single_language()},{'user_id':get_random_user()},{'category':'sports','language_id':get_single_language(),'is_expand':'yes'}]},
     {'api_path':'leaderboard_view/','api_name':'to get the leader board(OLD API/Using Nowhere) ','request_type':'GET','data_set':None},
     {'api_path':'get_hash_list/','api_name':'to get the all hash tag with 3 video','request_type':'POST','data_set':None},
     {'api_path':'get_user_bolo_info/','api_name':'to get the bolo info on click bolo info ','request_type':'POST','data_set':[{'start_date':'20-08-2019','end_date':'13-01-2020'},{'month':'11','year':'2019'},None]},
@@ -322,16 +322,16 @@ OTHER_API_LIST = [
     {'api_path':'get_popular_video_bytes/','api_name':'get only popular video bytes','request_type':'GET','data_set':[{'language_id':get_single_language()},{'language_id':get_single_language()}]},
     # {'api_path':'pubsub/popular/','api_name':'dummy_test','request_type':'POST','data_set':[]},
     {'api_path':'get_user_follow_and_like_list/','api_name':'to get user folow comment and like list when aapp initalize','request_type':'POST','data_set':None},
-    {'api_path':'get_recent_videos/','api_name':'to get trending video','request_type':'GET','data_set':[{'language_id':get_single_language()},{'language_id':get_single_language()}]},
-    {'api_path':'get_landing_page_video/','api_name':'get popup video when app opens','request_type':'POST','data_set':[{'language_id':get_single_language()},{'language_id':get_single_language()}]},
-    {'api_path':'get_popular_bolo/','api_name':'get popular boloindyans list','request_type':'GET','data_set':[{'language_id':get_single_language()},{'language_id':get_single_language()}]},
-    {'api_path':'get_category_with_video_bytes/','api_name':'get homepage videos with category','request_type':'GET','data_set':[{'language_id':get_single_language(),'is_discover':True},{'language_id':get_single_language()}]},
+    {'api_path':'get_recent_videos/','api_name':'to get trending video','request_type':'GET','data_set':[{'language_id':get_single_language()},{'language_id':get_single_language()},{'language_id':get_single_language(),'is_expand':'yes'}]},
+    {'api_path':'get_landing_page_video/','api_name':'get popup video when app opens','request_type':'POST','data_set':[{'language_id':get_single_language()},{'language_id':get_single_language()},{'language_id':get_single_language(),'is_expand':'yes'}]},
+    {'api_path':'get_popular_bolo/','api_name':'get popular boloindyans list','request_type':'GET','data_set':[{'language_id':get_single_language()},{'language_id':get_single_language()},{'language_id':get_single_language(),'is_expand':'yes'}]},
+    {'api_path':'get_category_with_video_bytes/','api_name':'get homepage videos with category','request_type':'GET','data_set':[{'language_id':get_single_language(),'is_discover':True},{'language_id':get_single_language()},{'language_id':get_single_language(),'is_expand':'yes'}]},
     {'api_path':'notification/get','api_name':'get notificationo the user','request_type':'POST','data_set':None},
     # {'api_path':'notification/click','api_name':'set notifiacation as seen','request_type':'POST','data_set':None}
 ]
 
 for each_id in TOPICS:
-    OTHER_API_LIST = OTHER_API_LIST +[{'api_path':'topics/'+each_id['slug']+'/'+str(each_id['id'])+'/comments','api_name':'get tpic list  (OLD API/Using Nowhere)','request_type':'POST','data_set':None}]
+    OTHER_API_LIST = OTHER_API_LIST +[{'api_path':'topics/'+each_id['slug']+'/'+str(each_id['id'])+'/comments/','api_name':'get tpic list  (OLD API/Using Nowhere)','request_type':'POST','data_set':None}]
     OTHER_API_LIST = OTHER_API_LIST +[{'api_path':'topics/'+each_id['slug']+'','api_name':'get single topic filter by slug (OLD API/Using Nowhere)','request_type':'POST','data_set':None}]
 for each_comment_id in COMMENT_ID:
     OTHER_API_LIST = OTHER_API_LIST +[{'api_path':'comments/'+str(each_comment_id)+'','api_name':'if some one commented click on notifiction it will open to same comment','request_type':'GET','data_set':None}]

@@ -119,5 +119,33 @@ def send_notifications_task(data, pushNotification):
     except Exception as e:
         logger.info(str(e))
 
+@app.task
+def vb_create_task(topic_id):
+    from forum.topic.models import Topic
+    topic = Topic.objects.get(pk=topic_id)
+    if not topic.is_transcoded:
+        if topic.is_vb and topic.question_video:
+            data_dump, m3u8_url, job_id = transcode_media_file(topic.question_video.split('s3.amazonaws.com/')[1])
+            if m3u8_url:
+                topic.backup_url = topic.question_video
+                topic.question_video = m3u8_url
+                topic.transcode_dump = data_dump
+                topic.transcode_job_id = job_id
+                # topic.is_transcoded = True
+                topic.save()
+                topic.update_m3u8_content()
+
+@app.task
+def user_ip_to_state_task(user_id,ip):
+    from forum.user.models import UserProfile
+    import urllib2
+    import json
+    userprofile = UserProfile.objects.filter(pk=user_id)
+    url = 'http://ip-api.com/json/'+ip
+    response = urllib2.urlopen(url).read()
+    json_response = json.loads(response)
+    userprofile.update(state_name = json_response['regionName'],city_name = json_response['city'])
+
+
 if __name__ == '__main__':
     app.start()
