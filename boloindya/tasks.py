@@ -122,6 +122,7 @@ def send_notifications_task(data, pushNotification):
 @app.task
 def vb_create_task(topic_id):
     from forum.topic.models import Topic
+    from forum.topic.transcoder import transcode_media_file
     topic = Topic.objects.get(pk=topic_id)
     if not topic.is_transcoded:
         if topic.is_vb and topic.question_video:
