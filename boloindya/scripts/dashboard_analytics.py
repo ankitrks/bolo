@@ -63,7 +63,7 @@ def put_share_data():
 			week_no = 52
 
 		metrics = '3'
-		metrics_slab = '5'
+		metrics_slab = ''
 		#print(metrics, metrics_slab, key, week_no, len(val))
 		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
 		if(created):
@@ -251,11 +251,11 @@ def put_video_creators():
 
 def main():
 
-	put_share_data()
+	#put_share_data()
 	#put_installs_data()
 	#put_videos_created()
 	#put_video_views_data()
-	#put_video_creators()
+	put_video_creators()
 
 def run():
 	main()	
