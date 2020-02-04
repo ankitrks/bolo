@@ -239,16 +239,22 @@ def put_video_creators():
 			if(tot_video_upload_count>=60):
 				metrics = '4'
 				metrics_slab = '2'
-				print(metrics, metrics_slab, str_date, week_no, tot_video_upload_count)
+				print(metrics, metrics_slab, datetime_key, week_no, tot_video_upload_count)
+				# save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
+				# if(created):
+				# 	print(metrics, metrics_slab, key, week_no, len(val))
+				# 	save_obj.count = tot_video_upload_count
+				# 	save_obj.save()
 
 			if(tot_video_upload_count>=25 and tot_video_upload_count<60):
 				metrics = '4'
 				metrics_slab = '1'
-				print(metrics, metrics_slab, str_date, week_no, tot_video_upload_count)
+				print(metrics, metrics_slab, datetime_key, week_no, tot_video_upload_count)
+
 			if(tot_video_upload_count>=5 and tot_video_upload_count<25):
 				metrics = '4'
 				metrics_slab = '0'
-				print(metrics, metrics_slab, str_date, week_no, tot_video_upload_count)
+				print(metrics, metrics_slab, datetime_key, week_no, tot_video_upload_count)
 	
 
 def main():
