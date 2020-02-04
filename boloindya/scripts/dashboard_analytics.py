@@ -197,13 +197,14 @@ def put_video_creators():
 		curr_userid = item.by_user.id 
 		user_signup_dict[curr_userid] = item.created_at 
 
-	print(len(user_signup_dict), user_signup_dict)
+	#print(len(user_signup_dict), user_signup_dict)
 
-	"""
+	
 	for key, val in user_signup_dict.items():
 		curr_userid = key
 		all_data = Topic.objects.all().filter(id = curr_userid)
 		print(len(all_data))
+		print(language_map)
 
 		user_lang_dict = dict()
 		for lang in language_map:
@@ -251,7 +252,7 @@ def put_video_creators():
 				metrics = '4'
 				metrics_slab = '0'
 				print(metrics, metrics_slab, str_date, week_no)
-	"""
+	
 
 def main():
 
