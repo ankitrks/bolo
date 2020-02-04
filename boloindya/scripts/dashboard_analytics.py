@@ -201,7 +201,7 @@ def put_video_creators():
 		curr_userid = item.by_user.id 
 		user_signup_dict[curr_userid] = item.created_at 
 
-	#print(len(user_signup_dict), user_signup_dict)
+	print(len(user_signup_dict))
 	slab_1_dict = dict()
 	slab_2_dict = dict()
 	slab_3_dict = dict()
@@ -222,7 +222,8 @@ def put_video_creators():
 					user_lang_dict[str(val_iter.language_id)]+=1	
 
 			str_date = str(user_signup_dict[curr_userid].day) + "-" + str(user_signup_dict[curr_userid].month) + "-" + str(user_signup_dict[curr_userid].year)
-	
+			print(str_date)
+			
 			tot_video_upload_count = 0
 			for key_lang, val_lang in user_lang_dict.items():
 				tot_video_upload_count+=int(val_lang)
