@@ -182,12 +182,12 @@ def put_videos_created():
 
 		metrics = '0'
 		metrics_slab = ''
-		print(metrics, metrics_slab, key, week_no, len(val))
-		#save_obj, created = DashboardMetrics.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
-		# if(created):
-		# 	print(metrics, metrics_slab, key, week_no, len(val))
-		# 	save_obj.count = len(val)
-		# 	save_obj.save()
+		#print(metrics, metrics_slab, key, week_no, len(val))
+		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
+		if(created):
+			print(metrics, metrics_slab, key, week_no, len(val))
+			save_obj.count = len(val)
+			save_obj.save()
 
 
 def put_video_creators():
