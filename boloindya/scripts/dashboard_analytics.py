@@ -192,6 +192,7 @@ def put_videos_created():
 			save_obj.save()
 
 
+# number of video creators split according to date of signup and distributed into various slabs
 def put_video_creators():
 
 	user_signup_dict = dict()
@@ -201,6 +202,9 @@ def put_video_creators():
 		user_signup_dict[curr_userid] = item.created_at 
 
 	#print(len(user_signup_dict), user_signup_dict)
+	slab_1_dict = dict()
+	slab_2_dict = dict()
+	slab_3_dict = dict()
 
 	for key, val in user_signup_dict.items():
 		curr_userid = key
@@ -217,44 +221,45 @@ def put_video_creators():
 				else:
 					user_lang_dict[str(val_iter.language_id)]+=1	
 
-			#print(user_lang_dict)
 			str_date = str(user_signup_dict[curr_userid].day) + "-" + str(user_signup_dict[curr_userid].month) + "-" + str(user_signup_dict[curr_userid].year)
-			#print(str_date)
-
+	
 			tot_video_upload_count = 0
 			for key_lang, val_lang in user_lang_dict.items():
 				tot_video_upload_count+=int(val_lang)
-
-			#print(tot_video_upload_count)
-			datetime_key = val
-			#print(datetime_key)
-			week_no = datetime_key.isocalendar()[1]
-			curr_year = datetime_key.year 
-			curr_month = datetime_key.month 
-			if(curr_year == 2020):
-				week_no+=52
-			if(curr_year == 2019 and week_no == 1):
-				week_no = 52
-
+			
+			# distribute into slabs
 			if(tot_video_upload_count>=60):
-				metrics = '4'
-				metrics_slab = '2'
-				print(metrics, metrics_slab, datetime_key, week_no, tot_video_upload_count)
-				# save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
-				# if(created):
-				# 	print(metrics, metrics_slab, key, week_no, len(val))
-				# 	save_obj.count = tot_video_upload_count
-				# 	save_obj.save()
+				if(str_date in slab_3_dict):
+					slab_3_dict[str_date].append(curr_userid)
+				else:
+					slab_3_dict[str_date] = []
 
 			if(tot_video_upload_count>=25 and tot_video_upload_count<60):
-				metrics = '4'
-				metrics_slab = '1'
-				print(metrics, metrics_slab, datetime_key, week_no, tot_video_upload_count)
-
+				if(str_date in slab_2_dict):
+					slab_2_dict[str_date].append(curr_userid)
+				else:
+					slab_2_dict[str_date] = []
 			if(tot_video_upload_count>=5 and tot_video_upload_count<25):
-				metrics = '4'
-				metrics_slab = '0'
-				print(metrics, metrics_slab, datetime_key, week_no, tot_video_upload_count)
+				if(str_date in slab_1_dict):
+					slab_1_dict[str_date].append(curr_userid)
+				else:
+					slab_1_dict[str_date] = []
+
+	
+	for key, val in slab_1_dict.items():
+		datetime_key = parser.parse(key)
+		week_no = datetime_key.isocalendar()[1]
+		curr_year = datetime_key.year
+		if(curr_year == 2020):
+			week_no+=52
+		if(curr_year == 2019 and week_no == 1):
+			week_no = 52
+
+		metrics = '4'
+		metrics_slab = '0'
+		print(metrics, metrics_slab, datetime_key, week_no, len(val))
+		
+
 	
 
 def main():
