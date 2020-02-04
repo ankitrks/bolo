@@ -1536,6 +1536,20 @@ def generateOTP(n):
         OTP += digits[int(math.floor(random.random() * 10))] 
     return OTP
 
+def validate_indian_number(mobile_no):
+    if mobile_no and len(mobile_no)>8 and len(mobile_no)<=14:
+        if mobile_no.startswith('091'):
+            mobile_no = validate_indian_number(mobile_no[3:])
+        elif mobile_no.startswith('+91'):
+            mobile_no = validate_indian_number(mobile_no[3:])
+        elif mobile_no.startswith('0'):
+            mobile_no = validate_indian_number(mobile_no[1:])
+        elif mobile_no.startswith('91') and len(mobile_no)==12:
+            mobile_no = validate_indian_number(mobile_no[2:])
+        return mobile_no
+    else:
+        return mobile_no
+
 def send_sms(phone_number, otp):
     import json
     import urllib2
@@ -1559,6 +1573,7 @@ class SingUpOTPView(generics.CreateAPIView):
     """
 
     def perform_create(self, serializer):
+        serializer.validated_data['mobile_no'] = validate_indian_number(serializer.validated_data['mobile_no'])
         instance        = serializer.save()
         instance.otp    = generateOTP(6)
         response, response_status   = send_sms(instance.mobile_no, instance.otp)
@@ -1649,7 +1664,7 @@ def verify_otp(request):
         request.POST.get('is_reset_password')
         request.POST.get('is_for_change_phone')
     """
-    mobile_no = request.POST.get('mobile_no', None)
+    mobile_no = validate_indian_number(request.POST.get('mobile_no', None))
     language = request.POST.get('language',None)
     otp = request.POST.get('otp', None)
     is_geo_location = request.POST.get('is_geo_location',None)
