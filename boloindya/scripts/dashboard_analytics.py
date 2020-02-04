@@ -252,11 +252,11 @@ def put_video_creators():
 					slab_1_dict[str_date] = []
 					slab_1_dict[str_date].append(curr_userid)
 
-	print(slab_1_dict)
-	print("\n\n")
-	print(slab_2_dict)
-	print("\n\n")
-	print(slab_3_dict)				
+	# print(slab_1_dict)
+	# print("\n\n")
+	# print(slab_2_dict)
+	# print("\n\n")
+	# print(slab_3_dict)				
 					
 	for key, val in slab_1_dict.items():
 		datetime_key = parser.parse(key)
