@@ -222,13 +222,15 @@ def put_video_creators():
 					user_lang_dict[str(val_iter.language_id)]+=1	
 
 			str_date = str(user_signup_dict[curr_userid].day) + "-" + str(user_signup_dict[curr_userid].month) + "-" + str(user_signup_dict[curr_userid].year)
-			print(str_date)
-			
+			#print(str_date)
+
 			tot_video_upload_count = 0
 			for key_lang, val_lang in user_lang_dict.items():
 				tot_video_upload_count+=int(val_lang)
 			
+
 			# distribute into slabs
+			print(tot_video_upload_count)
 			if(tot_video_upload_count>=60):
 				if(str_date in slab_3_dict):
 					slab_3_dict[str_date].append(curr_userid)
@@ -246,7 +248,12 @@ def put_video_creators():
 				else:
 					slab_1_dict[str_date] = []
 
-	
+	print(slab_1_dict)
+	print("\n\n")
+	print(slab_2_dict)
+	print("\n\n")
+	print(slab_3_dict)				
+					
 	for key, val in slab_1_dict.items():
 		datetime_key = parser.parse(key)
 		week_no = datetime_key.isocalendar()[1]
