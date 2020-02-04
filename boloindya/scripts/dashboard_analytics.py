@@ -202,7 +202,6 @@ def put_video_creators():
 	for key, val in user_signup_dict.items():
 		curr_userid = key
 		all_data = Topic.objects.all().filter(user = curr_userid)
-		print(len(all_data))
 
 		user_lang_dict = dict()
 		for lang in language_map:
@@ -223,7 +222,7 @@ def put_video_creators():
 			for key_lang, val_lang in user_lang_dict.items():
 				tot_video_upload_count+=int(val_lang)
 
-			print(tot_video_upload_count)
+			#print(tot_video_upload_count)
 
 			datetime_key = val
 			#print(datetime_key)
@@ -234,8 +233,6 @@ def put_video_creators():
 				week_no+=52
 			if(curr_year == 2019 and week_no == 1):
 				week_no = 52
-
-				
 
 			if(tot_video_upload_count>=60):
 				metrics = '4'
