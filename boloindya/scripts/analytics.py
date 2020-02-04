@@ -329,13 +329,13 @@ def signup_login():
 				else:
 					user_lang_dict[str(item.language_id)]+=1
 
-			#print(user_lang_dict)
+			print(user_lang_dict)
 			user_details = UserProfile.objects.get(user = curr_userid)	
 			if(user_details.name):
 				curr_username = user_details.name
 			else:
 				curr_username = user_details.user.username
-
+	
 			#print(curr_userid, curr_username, user_signup_dict[curr_userid], user_lang_dict)
 			str_date = str(user_signup_dict[curr_userid].day) + "-" + str(user_signup_dict[curr_userid].month) + "-" + str(user_signup_dict[curr_userid].year)
 			#print(str_date) 
@@ -350,8 +350,8 @@ def signup_login():
 	df = df.sort_values(by = 'Signup-Date', ascending = False)
 	print(df.columns.values.tolist())
 	print(df.head(100))
-	df.to_csv('signup_data_creator.csv', encoding = 'utf-8', index = False)
-	print(count)
+	#df.to_csv('signup_data_creator.csv', encoding = 'utf-8', index = False)
+	#print(count)
 		
 		
 
@@ -362,7 +362,7 @@ def main():
 	# lang_category_count()
 	# lang_video_count()
 	#view_count()
-	total_view_lang_categ()
+	#total_view_lang_categ()
 	signup_login()
 
 
