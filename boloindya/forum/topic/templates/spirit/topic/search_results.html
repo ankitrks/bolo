@@ -895,6 +895,9 @@
 }
 
 }
+._card_header_cover{
+    background-image: var(--hashtag--background-image);
+}
 
 </style>
 
@@ -1101,10 +1104,19 @@
 
         var thumbnail = each_popular_item.userprofile.profile_pic;
         if(thumbnail==""){
-            thumbnail='/media/demo_user.png';
+            thumbnail='/media/user.svg';
         }
-        //<img src="/media/tick_icon.svg">
-		var userItemTemp='<li class="jsx-3102177358 _user_carousel_list-item item"><a tag="a" title="'+each_popular_item.username+'" class="jsx-3102177358" href="/'+each_popular_item.username+'/"><div class="_user_carousel_avatar round" style="background-image:url('+thumbnail+')"></div><h2 class="_user_carousel_title">'+userName+'</h2><h3 class="_user_carousel_sub-title">@'+each_popular_item.username+'</h3><p class="_user_carousel_followers">'+each_popular_item.userprofile.follower_count+'<span class="_user_carousel_followers-text"> '+followers_trans+'</span></p></a><span class="unit"><button onclick="follow_user('+each_popular_item.id+');" class="_4jy1 _4jy4 _517h _51sy _42ft " style="float: none;" type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-'+each_popular_item.id+' followCheck sx_5da455"></i><span class="btnTextChange-'+each_popular_item.id+'">'+follow_trans+'</span></button></span></li>';
+
+        var tickIcon="";
+        if (each_popular_item.userprofile.is_business==true){
+            tickIcon='/media/golden_tick.png';
+        }else if (each_popular_item.userprofile.is_superstar==true){
+            tickIcon='/media/BlueTick.png';
+        }else {
+            tickIcon='/media/tick_icon.svg';
+        }
+       
+		var userItemTemp='<li class="jsx-3102177358 _user_carousel_list-item item"><a tag="a" title="'+each_popular_item.username+'" class="jsx-3102177358" href="/'+each_popular_item.username+'/"><div class="_user_carousel_avatar round" style="background-image:url('+thumbnail+')"><img src="'+tickIcon+'"></div><h2 class="_user_carousel_title">'+userName+'</h2><h3 class="_user_carousel_sub-title">@'+each_popular_item.username+'</h3><p class="_user_carousel_followers">'+each_popular_item.userprofile.follower_count+'<span class="_user_carousel_followers-text"> '+followers_trans+'</span></p></a><span class="unit"><button onclick="follow_user('+each_popular_item.id+');" class="_4jy1 _4jy4 _517h _51sy _42ft " style="float: none;" type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-'+each_popular_item.id+' followCheck sx_5da455"></i><span class="btnTextChange-'+each_popular_item.id+'">'+follow_trans+'</span></button></span></li>';
 		return userItemTemp;
 	}
 
@@ -1376,7 +1388,7 @@ function openVideoInPopupSearch(topicId){
         var videoTitle=singleItemData.title;
         var profilePics = singleItemData.user.userprofile.profile_pic;
         if(profilePics==''){
-           profilePics= '/media/demo_user.png';
+           profilePics= '/media/user.svg';
         }
 
 
@@ -1594,16 +1606,16 @@ function getSearchHashtagSuggestion(){
 }
 
 
-function popularSearchHashtagHeading(mentionItem){debugger;
+function popularSearchHashtagHeading(mentionItem){
 
     var hasgtagDefaultImage="";
     if(mentionItem.picture=="" || mentionItem.picture==null){
-        hasgtagDefaultImage='/media/hashtag.png';
+        hasgtagDefaultImage='/media/hashtag.svg';
     }else{
        hasgtagDefaultImage = mentionItem.picture;
     }
 
-    var hashtag_heading_template='<div class="_explore_feed_header"><div class="jsx-2836840237 _card_header_"><a class="jsx-2836840237" href="/hashtag/'+mentionItem.hash_tag+'/"><div class="jsx-2836840237 _card_header_cover" style="background-image: url('+hasgtagDefaultImage+');"></div></a><a title="#'+mentionItem.hash_tag+'('+mentionItem.total_views+' views)" class="jsx-2836840237 _card_header_link" href="/hashtag/'+mentionItem.hash_tag+'/"><div class="jsx-2836840237 _card_header_content"><h3 class="jsx-2836840237 _card_header_title">#'+mentionItem.hash_tag+'</h3><strong class="jsx-2836840237 _card_header_subTitle">'+mentionItem.total_views+' views</strong><p class="jsx-2836840237 _card_header_desc"></p></div></a></div></div>';
+    var hashtag_heading_template='<div class="_explore_feed_header"><div class="jsx-2836840237 _card_header_"><a class="jsx-2836840237" href="/hashtag/'+mentionItem.hash_tag+'/"><div class="jsx-2836840237 _card_header_cover"></div></a><a title="#'+mentionItem.hash_tag+'('+mentionItem.total_views+' views)" class="jsx-2836840237 _card_header_link" href="/hashtag/'+mentionItem.hash_tag+'/"><div class="jsx-2836840237 _card_header_content"><h3 class="jsx-2836840237 _card_header_title">#'+mentionItem.hash_tag+'</h3><strong class="jsx-2836840237 _card_header_subTitle">'+mentionItem.total_views+' views</strong><p class="jsx-2836840237 _card_header_desc"></p></div></a></div></div>';
     return hashtag_heading_template;
 }
 
@@ -1949,7 +1961,7 @@ function openVideoInPopup(file,image,indexId){
     var videoTitle=singleItemData.title;
     var profilePics = singleItemData.user.userprofile.profile_pic;
     if(profilePics==''){
-       profilePics= '/media/demo_user.png';
+       profilePics= '/media/user.svg';
     }
 
     var likeStatus="";
@@ -2070,7 +2082,7 @@ function listCommentsById(singleTopicData){
         var profileImage="";
         var userProfile=itemVideo.user.userprofile;
         if(userProfile.profile_pic==""){
-           profileImage='/media/demo_user.png';
+           profileImage='/media/user.svg';
         }else{
             profileImage=userProfile.profile_pic;
         }
@@ -2128,7 +2140,7 @@ function loadMoreComments(nextPageURl){
         var profileImage="";
         var userProfile=itemVideo.user.userprofile;
         if(userProfile.profile_pic==""){
-           profileImage='/media/demo_user.png';
+           profileImage='/media/user.svg';
         }else{
             profileImage=userProfile.profile_pic;
         }

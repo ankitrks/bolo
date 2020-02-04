@@ -196,7 +196,7 @@ function openVideoInPopup(topicId){
         var videoTitle=singleItemData.title;
         var profilePics = singleItemData.user.userprofile.profile_pic;
         if(profilePics==''){
-           profilePics= '/media/demo_user.png';
+           profilePics= '/media/user.svg';
         }
 
 
@@ -310,7 +310,7 @@ function listCommentsById(singleTopicData){
         var profileImage="";
         var userProfile=itemVideo.user.userprofile;
         if(userProfile.profile_pic==""){
-           profileImage='/media/demo_user.png';
+           profileImage='/media/user.svg';
         }else{
             profileImage=userProfile.profile_pic;
         }
@@ -365,7 +365,7 @@ function loadMoreComments(nextPageURl){
         var profileImage="";
         var userProfile=itemVideo.user.userprofile;
         if(userProfile.profile_pic==""){
-           profileImage='/media/demo_user.png';
+           profileImage='/media/user.svg';
         }else{
             profileImage=userProfile.profile_pic;
         }

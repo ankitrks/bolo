@@ -269,12 +269,12 @@
                                             <div class="_user_carousel_avatar round" style="background-image:url({% if each_popular_item.profile_pic|length > 1 %}
                                 {{each_popular_item.profile_pic}}
                             {% else %}
-                                /media/demo_user.png
+                                /media/user.svg
                             {% endif %})">
 
-                                        {% if popular_bolo.is_business is True %}
+                                        {% if each_popular_item.is_business is True %}
                                             <img src="/media/golden_tick.png">
-                                        {% elif popular_bolo.is_superstar is True %}
+                                        {% elif each_popular_item.is_superstar is True %}
                                             <img src="/media/BlueTick.png">
                                         {% else %}
                                             <img src="/media/tick_icon.svg">

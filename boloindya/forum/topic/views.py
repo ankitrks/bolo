@@ -412,7 +412,6 @@ def video_discover(request):
     except Exception as e1:
         popular_bolo = []
 
-
     context = {
         'popular_bolo':popular_bolo,
         'trending_videos':trending_videos,
@@ -858,7 +857,7 @@ def latest_home(request):
         return redirect('/video/'+video_slug)
     else:
         return render(request, 'spirit/topic/_latest_home.html',context)
-    
+
     #return render(request, 'spirit/topic/temporary_landing.html')
     # return render(request, 'spirit/topic/new_landing.html')
     # return render(request, 'spirit/topic/main_landing.html')

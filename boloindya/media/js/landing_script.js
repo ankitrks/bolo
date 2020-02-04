@@ -57,7 +57,7 @@
             var profilePics = itemVideo.user.userprofile.profile_pic;
             if(profilePics==''){
                 profilePics= '/media/ic_profile_red_1.svg';
-                //profilePics= '/media/demo_user.png';
+                //profilePics= '/media/user.svg';
             }
 
             var content_title="";
@@ -122,7 +122,7 @@ $(window).scroll(function () {
 
                 var profilePics = itemVideo.user.userprofile.profile_pic;
                 if(profilePics==''){
-                    //profilePics= '/media/demo_user.png';
+                    //profilePics= '/media/user.svg';
                     profilePics= '/media/ic_profile_red_1.svg';
                 }
                 var content_title="";
@@ -330,7 +330,7 @@ function retryLiveStream(hls, url) {
             var videoTitle=singleItemData.title;
             var profilePics = singleItemData.user.userprofile.profile_pic;
             if(profilePics==''){
-               profilePics= '/media/demo_user.png';
+               profilePics= '/media/user.svg';
             }
 
 
@@ -463,7 +463,7 @@ function retryLiveStream(hls, url) {
                 var profileImage="";
                 var userProfile=itemVideo.user.userprofile;
                 if(userProfile.profile_pic==""){
-                   profileImage='/media/demo_user.png';
+                   profileImage='/media/user.svg';
                 }else{
                     profileImage=userProfile.profile_pic;
                 }
@@ -518,7 +518,7 @@ function retryLiveStream(hls, url) {
                 var profileImage="";
                 var userProfile=itemVideo.user.userprofile;
                 if(userProfile.profile_pic==""){
-                   profileImage='/media/demo_user.png';
+                   profileImage='/media/user.svg';
                 }else{
                     profileImage=userProfile.profile_pic;
                 }

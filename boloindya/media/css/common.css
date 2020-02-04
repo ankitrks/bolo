@@ -2,7 +2,7 @@
         html:lang(vi) body {
             font-family: auto;
         }
-        
+
         body {
             font-family: "sofiapro-regular", PingFangSC, sans-serif;
         }
@@ -635,7 +635,7 @@
         
         .drawer-content .language-selection {
             margin: auto;
-            margin-top: 72px;
+            margin-top: 36px;
         }
         
         @media (max-width:991px) {

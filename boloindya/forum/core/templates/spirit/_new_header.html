@@ -281,6 +281,7 @@
     border:0;
     outline:0;
     background:#fff;
+    /*box-shadow: 1px 1px 0px 0px;*/
     width:100%;
     height:42px;
     margin:0;
@@ -326,6 +327,7 @@
 
 .searchbox-open{
     width:100%;
+    border-bottom: 1px solid #ccc; 
 }
 
 .byline{
@@ -367,6 +369,7 @@
     --primary-search-height:42px;
     --primary-subheading:rgba(34, 33, 33, 0.5);
     --primary-border-bottom:1px solid rgba(63, 57, 57, 0.2);
+    --hashtag--background-image:url(/media/hashtag_black.svg);
 }
 
 [data-theme="dark"] {
@@ -382,6 +385,7 @@
     --primary-search-height:50px;
     --primary-subheading:rgba(243, 243, 243, 0.5);
     --primary-border-bottom:1px solid rgba(255, 255, 255, 0.2);
+    --hashtag--background-image:url(/media/hashtag.svg);
 }
 
 body {
@@ -393,10 +397,27 @@ body {
   margin: 0 auto;
   font-size: calc(1rem + 0.25vh);
 }
+
+html[pc="yes"] *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+html[pc="yes"] *::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(22,24,35,0.34);
+}
+html[pc="yes"] *::-webkit-scrollbar-track {
+    border-radius: 0px;
+    background-color: var(--bg-color);
+}
+
+
 .searchbox-submit, .searchbox-input{
-      border: var(--primary-search-border);
+      /*border: var(--primary-search-border);*/
     height:  var(--primary-search-height);
-    background:var(--search-primary-color);
+    background:#fff0;
+    /*border: 1px solid #000;*/
 }
 
   .main-body ,.header-container,.video-wall,.searchbox-icon,.about-content,.container, .about-article {
@@ -450,7 +471,9 @@ body {
   .jsx-3959364739 h3{
     color: var(--font-color) !important;;
   }
-
+.language-selection{
+  color: #cccccc;
+}
 
 h1 {
     color: var(--heading-color);
@@ -559,37 +582,6 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
-
-
-/*  .theme-light {
-    --color-primary: #0060df;
-    --color-secondary: #fbfbfe;
-    --color-accent: #fd6f53;
-    --font-color: #000000;
-  }
-  .theme-dark {
-    --color-primary: #17ed90;
-    --color-secondary: #243133;
-    --color-accent: #12cdea;
-    --font-color: #ffffff;
-  }
-  .main-body ,.header-container,.video-wall,body {
-
-    background: var(--color-secondary) !important;
-
-  }
-  .main-body h1 {
-    color: var(--font-color) !important;
-  }
-  .main-body button {
-    background: var(--color-primary)!important;
-
-  }
-  .main-body ._card_header_title, ._card_header_subTitle,.jsx-1929076256,.header-bar1{
-    color: var(--font-color) !important;
-  }*/
-
-
 
 
 </style>

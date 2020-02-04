@@ -701,7 +701,7 @@ function create_comment(inputComment){
     var mobile_no = user_details.mobile_no;
     var thumbnail = user_details.profile_pic;
     if(thumbnail==""){
-        thumbnail='/media/demo_user.png';
+        thumbnail='/media/user.svg';
     }
 
     var topicID = document.getElementById('singleTopicId').value;
@@ -753,7 +753,7 @@ function current_comment(videoCommentList){
     var itemVideo=videoCommentList;
     var userProfile=itemVideo.user.userprofile;
     if(userProfile.profile_pic==""){
-       profileImage='/media/demo_user.png';
+       profileImage='/media/user.svg';
     }else{
         profileImage=userProfile.profile_pic;
     }
@@ -823,7 +823,7 @@ function listCommentsById(){
         var profileImage="";
         var userProfile=itemVideo.user.userprofile;
         if(userProfile.profile_pic==""){
-           profileImage='/media/demo_user.png';
+           profileImage='/media/user.svg';
         }else{
             profileImage=userProfile.profile_pic;
         }
@@ -862,7 +862,7 @@ function loadMoreComments(nextPageURl){
         var profileImage="";
         var userProfile=itemVideo.user.userprofile;
         if(userProfile.profile_pic==""){
-           profileImage='/media/demo_user.png';
+           profileImage='/media/user.svg';
         }else{
             profileImage=userProfile.profile_pic;
         }
