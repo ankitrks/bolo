@@ -3,25 +3,26 @@
     var userLikeAndUnlike=[];
     var totalCountVideo =0;
     var playListData=[];
-    // $(window).scroll(function() {
-    //     var scorh=Number($(window).scrollTop() + $(window).height());
-    //     if($(window).scrollTop() + $(window).height() > $("#playlist").height()){
+    $(window).scroll(function() {
+        var scorh=Number($(window).scrollTop() + $(window).height());
+        if($(window).scrollTop() + $(window).height() > $("#categoryIdList").height()){
 
-    //         if(checkDataStatus==0){
-    //             page++;
-    //             loadMoreData(page);
-    //         }
+            if(checkDataStatus==0){
+                page++;
+                loaderBoloShowDynamic('_scroll_load_more_loading_right');
+                getCategoryWithVideos(page);
+            }
 
-    //     }
-    // });
+        }
+    });
 
 $(document).ready(function(){
     loadMoreData(1);
-    getCategoryWithVideos();
+    getCategoryWithVideos(1);
 });
 
 var topicList=[];
-function getCategoryWithVideos(){
+function getCategoryWithVideos(page){
     loaderBoloShowDynamic('_scroll_load_more_loading_right');
     loaderBoloShowDynamic('_scroll_load_more_loading_left');
         var playListData=[]; 
@@ -30,7 +31,8 @@ function getCategoryWithVideos(){
     var listItems="";
     var itemCount=0;
     var language_id=1;
-    var page_size=10;
+    var page_size=2;
+    var page_num=page;
     var uri='/api/v1/get_category_with_video_bytes/';
     var res = encodeURI(uri);
     var category_with_video_list="";
@@ -40,7 +42,7 @@ function getCategoryWithVideos(){
         url:res,
         type:"GET",
 
-        data:{'language_id':language_id,'is_with_popular':'True','popular_boloindyans':'True','page_size':page_size},
+        data:{'language_id':language_id,'is_with_popular':'True','popular_boloindyans':'True','page_size':page_size,'page':page_num},
         success: function(response,textStatus, xhr){
             populaCreatorsItems="";
             var populaCategoriesItems="";
