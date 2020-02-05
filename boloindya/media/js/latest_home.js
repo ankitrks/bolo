@@ -3,23 +3,123 @@
     var userLikeAndUnlike=[];
     var totalCountVideo =0;
     var playListData=[];
-    $(window).scroll(function() {
-        var scorh=Number($(window).scrollTop() + $(window).height());
-        if($(window).scrollTop() + $(window).height() > $("#playlist").height()){
+    // $(window).scroll(function() {
+    //     var scorh=Number($(window).scrollTop() + $(window).height());
+    //     if($(window).scrollTop() + $(window).height() > $("#playlist").height()){
 
-            if(checkDataStatus==0){
-                page++;
-                loadMoreData(page);
-            }
+    //         if(checkDataStatus==0){
+    //             page++;
+    //             loadMoreData(page);
+    //         }
 
-        }
+    //     }
+    // });
+
+$(document).ready(function(){
+    loadMoreData(1);
+    getCategoryWithVideos();
+});
+
+var topicList=[];
+function getCategoryWithVideos(){
+    loaderBoloShowDynamic('_scroll_load_more_loading_right');
+    loaderBoloShowDynamic('_scroll_load_more_loading_left');
+        var playListData=[]; 
+    var platlistItems;
+
+    var listItems="";
+    var itemCount=0;
+    var language_id=1;
+    var page_size=10;
+    var uri='/api/v1/get_category_with_video_bytes/';
+    var res = encodeURI(uri);
+    var category_with_video_list="";
+    language_id=current_language_id;
+
+    jQuery.ajax({
+        url:res,
+        type:"GET",
+
+        data:{'language_id':language_id,'is_with_popular':'True','popular_boloindyans':'True','page_size':page_size},
+        success: function(response,textStatus, xhr){
+            populaCreatorsItems="";
+            var populaCategoriesItems="";
+            var populvideoItems="";
+            var itemCount=0;
+            var responseData=response.category_details;
+            responseData.forEach(function(itemCategory) {itemCount++;
+                populaCreatorsItems =popularCategoryHeading(itemCategory);
+                populvideoItems="";
+                var topicData=itemCategory.topics;
+                populvideoItems+='<div class="_explore_feed_card">';
+                var videoItemCount=0;
+                topicData.forEach(function(itemVideoByte){videoItemCount++;
+                    if(videoItemCount<4){
+                        topicList[itemVideoByte.id]=itemVideoByte;
+                        populvideoItems +=popularCategoryItem(itemVideoByte);
+                    }
+                });
+                populvideoItems+='</div>';
+                category_with_video_list='<div class="_explore_feed_item">'+populaCreatorsItems+''+populvideoItems+'</div>';
+
+                if(itemCount % 2 == 0) {
+                    loaderBoloHideDynamic('_scroll_load_more_loading_right');
+                    $("#catWithVideoIdRight").append(category_with_video_list);
+                }else{
+                     loaderBoloHideDynamic('_scroll_load_more_loading_left');
+                    $("#catWithVideoId").append(category_with_video_list);
+                }
+            });
+
+            followLikeList();
+
+        },
+        error: function(jqXHR, ajaxOptions, thrownError) {
+            console.log(jqXHR);
+           loaderBoloHideDynamic('_scroll_load_more_loading_left');
+           loaderBoloHideDynamic('_scroll_load_more_loading_right');
+
+        }/*  end of error */
+
+  
     });
+}
+
+
+function popularCategoryHeading(itemCategory){
+
+    var category_title;
+    currentLanguageName=current_language_name.toLowerCase();
+    if(currentLanguageName!='english'){
+        category_title=currentLanguageName+'_title';
+    }else{
+        category_title='title';
+    }
+    //follow_category
+    var popular_cat_heading_template='<div class="_explore_feed_header"><div class="jsx-2836840237 _card_header_"><a class="jsx-2836840237" href="/tag/'+itemCategory.slug+'/"><div class="jsx-2836840237 _card_header_cover" style="background-image: url('+itemCategory.category_image+');"></div></a><a title="#'+itemCategory.slug+'('+itemCategory.total_view+' views)" class="jsx-2836840237 _card_header_link" href="/tag/'+itemCategory.slug+'/"><div class="jsx-2836840237 _card_header_content"><h3 class="jsx-2836840237 _card_header_title">'+itemCategory[category_title]+'</h3><strong class="jsx-2836840237 _card_header_subTitle">'+itemCategory.total_view+' views</strong></div></a><p class="jsx-2836840237 _card_header_desc_follow"><span class="unit"><button onclick="follow_category_discover('+itemCategory.id+');" class="_4jy1 _4jy4 _517h _51sy _42ft " style="float: none;" type="button" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followCategoryStatus-'+itemCategory.id+' followCheckCat sx_5da455"></i><span class="btnTextChangeCat-'+itemCategory.id+'">'+follow_trans+'</span></button></span></p><p class="seeAll"><a href="/tag/'+itemCategory.slug+'/">See All ></a></p></div></div>';
+    return popular_cat_heading_template;
+}
+
+function popularCategoryItem(itemVideoByte){
+    var content_title="";
+    var videoTitle="";
+        videoTitle=removeTags(itemVideoByte.title);
+        content_title = videoTitle.substr(0, 40) + " ..."
+
+    var category_item_template='<div class="jsx-1410658769 _explore_feed_card_item" onClick="openVideoInPopupCat('+itemVideoByte.id+');" ><div class="jsx-1410658769 _ratio_"><div class="jsx-1410658769" style="padding-top: 148.148%;"><div class="jsx-1410658769 _ratio_wrapper"><a href="javascript:void(0)"><div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+itemVideoByte.question_image+');"><div class="jsx-3077367275 video-card default"><div class="jsx-3077367275 video-card-mask"><div class="jsx-1633345700 card-footer normal no-avatar"><div class="jsx-1633345700"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+itemVideoByte.view_count+'</span></p><span class="_video_card_footer_likes1"><img src="/media/download.svg" alt="likes"> '+itemVideoByte.likes_count+'</span></div></div></div></div></div></a></div></div></div></div>';
+    return category_item_template;
+}
+
+
+    
+
+    var listVideoIds=[];
 
     function loadMoreData(page){
     
     var platlistItems;
     checkDataStatus=1;
-
+    var javascriptdata="<script>$('.next').on('click', function(){intslide('stop');sact('next', 0, 400);intslide('start');});</script>";
     var listItems="";
     var itemCount=0;
     var language_id=current_language_id;
@@ -38,15 +138,23 @@
             .done(function(data)
             {
                 if(data == " "){
-                    $('.ajax-load').html("");
+                    $('.ajax-load').html("No more records found");
                     return;
                 }
                 checkDataStatus=0;
            var topicVideoList=data.topics;
             //playListData+=topicVideoList;
             var itemCount=-1;
-            topicVideoList.forEach(function(itemVideo) {itemCount++;totalCountVideo++;
+            var currentStatus=0;
+
+            var sliderItemDiv="";
+            var divChangeCount=0;
+
+            sliderItemDiv +='<div id="carousel" class="owl-carousel">';
+            topicVideoList.forEach(function(itemVideo) {itemCount++;totalCountVideo++;currentStatus++;
                 //playListData+=itemVideo;
+                divChangeCount++;
+                listVideoIds.push(itemVideo.id);
                 playListData.push(itemVideo);
               var isPlaying="";
               var isPlayIconDis="none";
@@ -65,13 +173,65 @@
 
                 videoTitle=removeTags(itemVideo.title);
                 content_title = videoTitle.substr(0, 40) + " ...";
-                if(itemVideo!=""){
-                    listItems +='<div class="_video_feed_item"><div class="_ratio_"><div style="padding-top: 148.148%;"><div class="_ratio_wrapper"><a onClick="openVideoInPopup(\''+itemVideo.video_cdn+'\',\''+itemVideo.question_image+'\','+totalCountVideo+');"  class="js-video-link playlist-item '+isPlaying+'" data-mediaid="'+itemVideo.id+'"  href="javascript:void(0);"><div class="_image_card_" style="border-radius: 4px; background-image: url('+itemVideo.question_image+');"><div class="_video_card_play_btn_ _video_card_play_btn_dark _image_card_playbtn_wraaper"></div><div class="_video_card_footer_ _video_card_footer_respond _image_card_footer_wraaper"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+itemVideo.likes_count+'</span></p><span class="_video_card_footer_likes1"><img src="/media/download.svg" alt="likes"> '+itemVideo.likes_count+'</span></div></div></a></div></div></div></div>';
-                }
+            var current_slide='';
+            if(currentStatus==1){
+              current_slide='current';
+            }
+
+            listItems +='<div class="_video_feed_item1 item"><img onClick="openVideoInPopup(\''+itemVideo.video_cdn+'\',\''+itemVideo.question_image+'\','+totalCountVideo+');" class="_video_card_mute _video_card_mute_left_top" id="mutedImageId" src="/media/sound_mute.svg"><video onClick="openVideoInPopup(\''+itemVideo.video_cdn+'\',\''+itemVideo.question_image+'\','+totalCountVideo+');"   id="player-'+itemVideo.id+'" preload="auto" muted autoplay="false" poster="'+itemVideo.question_image+'" src="'+itemVideo.backup_url+'" class="videoCentered videoSliderPlay"></video></div>';
+            //listItems +='<div class="_video_feed_item1 item"><div class="_ratio_"><div style="padding-top: 148.148%;"><div class="_ratio_wrapper"><a onClick="openVideoInPopup(\''+itemVideo.video_cdn+'\',\''+itemVideo.question_image+'\','+totalCountVideo+');"  class="js-video-link playlist-item '+isPlaying+'" data-mediaid="'+itemVideo.id+'"  href="javascript:void(0);"><div class="_image_card_" style="border-radius: 4px; background-image: url('+itemVideo.question_image+');"><div class="_video_card_play_btn_ _video_card_play_btn_dark _image_card_playbtn_wraaper"></div><div class="_video_card_footer_ _video_card_footer_respond _image_card_footer_wraaper"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+itemVideo.likes_count+'</span></p><span class="_video_card_footer_likes1"><img src="/media/download.svg" alt="likes"> '+itemVideo.likes_count+'</span></div></div></a></div></div></div></div>';
+            // if(divChangeCount==4){
+
+            //   divChangeCount=0;
+            // sliderItemDiv +=listItems+'</div><div class="slideitem ">';
+            // listItems="";
+            // }
+
             });
+            
+              sliderItemDiv +=listItems+'</div><script>\
+jQuery("#carousel").owlCarousel({\
+  autoplay: true,\
+  lazyLoad: true,\
+  loop: true,\
+  dots: false,\
+  margin: 20,\
+  responsiveClass: true,\
+  autoHeight: true,\
+  autoplayHoverPause : true,\
+  autoplayTimeout: 7000,\
+  smartSpeed: 800,\
+  nav: true,\
+  responsive: {\
+    0: {\
+      items: 2\
+    },\
+    600: {\
+      items: 2\
+    },\
+    1024: {\
+      items: 4\
+    },\
+    1366: {\
+      items: 4\
+    }\
+  }\
+});\
+</script>';
+       
 
                 $('.ajax-load').hide();
-                $("#playlist").append(listItems);
+                $("#slideshow").html(sliderItemDiv);
+                // playListData.forEach(function(itemVideo){
+                //   var playerId="player-"+itemVideo.id;
+                //   var video_backup=itemVideo.question_video;
+                //   var questionImage = itemVideo.question_image;
+                //   video_play_using_video_dynamic(video_backup,video_backup,playerId);
+                // });
+                 
+                
+                
+               
             })
             .fail(function(jqXHR, ajaxOptions, thrownError)
             {
@@ -79,9 +239,156 @@
 
                 }
 
-                $('.ajax-load').html("");
+                $('.ajax-load').html("No more records found");
             });
     }
+
+
+function set_data_in_cache(popularItems) {
+  localStorage.setItem('popularItems', popularItems);
+}
+
+function get_data_from_cache() {
+  var listdata=localStorage.getItem('popularItems');
+  return listdata;
+}
+
+function set_category_data_in_cache(popularCatItems) {
+  localStorage.setItem('popularCatItems', popularCatItems);
+}
+
+function get_data_from_category_cache() {
+  var listCatData=localStorage.getItem('popularCatItems');
+  return listCatData;
+}
+
+
+
+function openVideoInPopupCat(topicId){
+  loaderShow();
+
+  var singleItemData=topicList[topicId];
+  $("#indexId").val(singleItemData.id);
+  var videoFileName=singleItemData.video_cdn;
+  var videoFileImage=singleItemData.question_image;
+  $("#modelPopup").show();
+
+  var newSrc='/media/mute_icon.svg';
+  $('#mutedImageId').attr('src', newSrc);
+
+    var preBufferDone = false;
+    var preBufferDone = false;
+    var video_backup="";
+    var video_backup=singleItemData.question_video;
+    //var video_backup=singleItemData.question_video;
+    video_play_using_video_js(video_backup,video_backup,videoFileImage);      
+
+    var shareURL=site_base_url+singleItemData.slug+'/'+singleItemData.id+'';
+
+    var sideBarDetails='<div onClick="openMobileDownloadPopup();" class="jsx-2177493926 jsx-3813273378 avatar round" style="background-image: url(/media/musically_100x100.jpeg); width: 48px; height: 48px; flex: 0 0 48px;"></div><div class="jsx-949708032 boloindya-toolbar" style="margin-top: 20px;"><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-like" onClick="openMobileDownloadPopup();" style="background-image: url(/media/viewIcon.svg);"><span class="jsx-949708032">'+singleItemData.likes_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-comment" onClick="openMobileDownloadPopup();" style="background-image: url(/media/comments.svg);"><span class="jsx-949708032">'+singleItemData.comment_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-share" onclick="openShareTab()" style="background-image: url(/media/share.svg);"><span class="jsx-949708032">'+singleItemData.total_share_count+'</span></div></div>';
+        $("#topicID").val(singleItemData.id);
+        $("#currentPlayUserId").val(singleItemData.user.userprofile.id);
+        $("#topicCreatorUsername").val(singleItemData.user.username);
+        $("#shareInputbox").val(shareURL);
+        var bigCommentLikeDet='<strong><span id="likeCountId">'+singleItemData.likes_count+'</span> '+likeTrans+' · <span id="commentCountId">'+singleItemData.comment_count+'</span> '+commentsTrans+'</strong>';
+        $("#sideBarId").html(sideBarDetails);
+        $("._video_card_big_meta_info_count").html(bigCommentLikeDet);
+        $(".video-meta-title").html(singleItemData.title);
+        //===================== Comment and Like count ===============
+
+        $("#totalLikeCount").val(singleItemData.likes_count);
+        $("#totalCommentCount").val(singleItemData.comment_count);
+
+        //===================Comment and Like Count end =============
+
+        var userprofileName=singleItemData.user.userprofile.name;
+        var userHandleName=singleItemData.user.username;
+        var videoTitle=singleItemData.title;
+        var profilePics = singleItemData.user.userprofile.profile_pic;
+        if(profilePics==''){
+           profilePics= '/media/user.svg';
+        }
+
+
+        var likeStatus="";
+
+        likeStatus="liked";
+        var likeStatusClass=jQuery("#UReactionLink").hasClass('liked');
+        if(likeStatusClass==true){
+            jQuery("#UReactionLink").removeClass('liked');
+            jQuery(".sp_ddXiTdIB8vm").addClass('sx_44a25c');
+            jQuery(".sp_ddXiTdIB8vm").removeClass('sx_44a25d');
+        }
+
+        var likedCheck=userLikeAndUnlike.topic_like;
+        if(undefined !==likedCheck && likedCheck.length>0){
+            var lStatus = likedCheck.includes(singleItemData.id);
+            if(lStatus==true){
+                likeStatus="liked";
+                var likeStatusClass=jQuery("#UReactionLink").hasClass('liked');
+                if(likeStatusClass==false){
+                    jQuery("#UReactionLink").addClass('liked');
+                    jQuery(".sp_ddXiTdIB8vm").removeClass('sx_44a25c');
+                    jQuery(".sp_ddXiTdIB8vm").addClass('sx_44a25d');
+                }
+
+            }
+        }
+
+        //=========Check Follow User ==============
+        var loginStatus=check_login_status();
+        if(loginStatus==true){
+            var countFollowStatus=userLikeAndUnlike.all_follow;
+            if(undefined !==countFollowStatus && countFollowStatus.length>0){
+                var currentUserTopic=singleItemData.user.userprofile.id;
+                var followList=userLikeAndUnlike.all_follow;
+                followList.forEach(function(followId){
+                    if(currentUserTopic==followId){
+                        followStatus=jQuery('.followStatusChangePopup').hasClass('sx_5da455');
+                        if(followStatus==true){
+                            jQuery('.followStatusChangePopup').removeClass('sx_5da455');
+                            jQuery('.followStatusChangePopup').addClass('sx_5da456');
+                            jQuery('.btnTextChangePopup').text(followed_trans);
+                        }else{
+                            jQuery('.followStatusChangePopup').removeClass('sx_5da456');
+                            jQuery('.followStatusChangePopup').addClass('sx_5da455');
+                            jQuery('.btnTextChangePopup').text(follow_trans);
+                        }
+                    }
+
+                });
+            }
+        }
+        //============== End=======================
+
+
+
+        var profileURL='/'+userHandleName+'/';
+        $("#profileImageUserId").css("background-image", "url(" + profilePics + ")");
+        $(".shareandliketabprofileimage").attr("src", ""+profilePics+"");
+        $(".userProfileURL").attr("href", ""+profileURL+"");
+        $("._video_card_big_user_info_nickname").html(userprofileName);
+        $("._video_card_big_user_info_handle").html(userHandleName);
+        $("._video_card_big_meta_info_title_video").html(videoTitle);
+
+        loaderBoloShow();
+        listCommentsById(singleItemData);
+
+        var sideBarCommentDetails="";
+        var origin   = window.location.origin;
+        param1=singleItemData.slug;
+        param2=singleItemData.id;
+        history.pushState(null, null, '?video='+param1+'/'+param2);
+        followLikeList();
+
+ }
+
+ $('._global_modal_cancel').click(function(){
+    //history.pushState(null, null, '?'+param1);
+ });
+
+
+
 
 $(window).scroll(function () {
     // End of the document reached?
@@ -95,56 +402,7 @@ $(window).scroll(function () {
 }); 
 
     var language_id=current_language_id;
-    // var playListData=[]; 
-    var platlistItems;
-    (function() {
-        var listItems="";
-        var itemCount=0;
 
-        var uri='/api/v1/get_popular_video_bytes/?page=1&language_id='+language_id;
-        var res = encodeURI(uri);
-        jQuery.ajax({
-            url:res,
-            type:"GET",
-            success: function(response,textStatus, xhr){
-                var topicVideoList=response.topics;
-                //playListData=topicVideoList;
-                var itemCount=-1;
-                topicVideoList.forEach(function(itemVideo) {itemCount++;totalCountVideo++;
-                playListData.push(itemVideo);
-                //playListData+=itemVideo;
-                  var isPlaying="";
-                  var isPlayIconDis="none";
-                  if(itemCount==1){
-                    isPlaying='is-playing';
-                    isPlayIconDis="block";
-                  }
-
-                var profilePics = itemVideo.user.userprofile.profile_pic;
-                if(profilePics==''){
-                    //profilePics= '/media/user.svg';
-                    profilePics= '/media/ic_profile_red_1.svg';
-                }
-                var content_title="";
-                var videoTitle="";
-                    videoTitle=removeTags(itemVideo.title);
-                    content_title = videoTitle.substr(0, 40) + " ...";
-                    //<span class="_avatar_ _avatar_respond" style="background-image: url('+profilePics+');"></span>
-                  listItems +='<div class="_video_feed_item"><div class="_ratio_"><div style="padding-top: 148.148%;"><div class="_ratio_wrapper"><a onClick="openVideoInPopup(\''+itemVideo.video_cdn+'\',\''+itemVideo.question_image+'\','+totalCountVideo+');"  class="js-video-link playlist-item '+isPlaying+'" data-mediaid="'+itemVideo.id+'"  href="javascript:void(0);"><div class="_image_card_" style="border-radius: 4px; background-image: url('+itemVideo.question_image+');"><div class="_video_card_play_btn_ _video_card_play_btn_dark _image_card_playbtn_wraaper"></div><div class="_video_card_footer_ _video_card_footer_respond _image_card_footer_wraaper"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+itemVideo.view_count+'</span></p><span class="_video_card_footer_likes1"><img src="/media/download.svg" alt="likes"> '+itemVideo.likes_count+'</span></div></div></a></div></div></div></div>'; 
-
-                });
-                $("#playlist").append(listItems);
-                $("_scroll_load_more_loading").append(listItems);
-                checkDataStatus=0;
-            },
-            error: function(jqXHR, textStatus, errorThrown){
-              console.log(textStatus + ": " + jqXHR.status + " " + errorThrown);
-            }
-
-
-        });
-
-    })();
 
 
         // error: function(jqXHR, textStatus, errorThrown){
@@ -180,11 +438,6 @@ function video_play_using_video_js(url,backup_url,image) {
           loaderHide();
       });
      }
-     // hls.js is not supported on platforms that do not have Media Source Extensions (MSE) enabled.
-     // When the browser has built-in HLS support (check using `canPlayType`), we can provide an HLS manifest (i.e. .m3u8 URL) directly to the video element through the `src` property.
-     // This is using the built-in support of the plain video element, without using hls.js.
-     // Note: it would be more normal to wait on the 'canplay' event below however on Safari (where you are most likely to find built-in HLS support) the video.src URL must be on the user-driven
-     // white-list before a 'canplay' event will be emitted; the last video event that can be reliably listened-for when the URL is not on the white-list is 'loadedmetadata'.
       else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         video.src = backup_url;
         video.addEventListener('loadedmetadata',function() {
@@ -194,88 +447,33 @@ function video_play_using_video_js(url,backup_url,image) {
       }
 
 
-  //   video.src="";
-  //   const config = {
-  //       autoStartLoad: true,
-  //       maxBufferSize: 1 * 1000 * 1000,
-  //       manifestLoadingMaxRetry: 300000,
-  //       manifestLoadingMaxRetryTimeout: 1000,
-  //       levelLoadingMaxRetry: 300000,
-  //       levelLoadingMaxRetryTimeout: 1000,
-  //       fragLoadingMaxRetry: 300000,
-  //       fragLoadingMaxRetryTimeout: 1000
-  //   }
-
-    
-
-  //   var hls = new Hls();
-
-  //   if(Hls.isSupported()) {
-  //       let retrying = false;
-        
-  //       video.onplaying = () => {
-  //           isLoading = false;
-  //           hideErrorMsg = false;
-  //           //clearInterval(retry);
-  //           retrying = false;
-
-  //       }
-        
-  //       hls.loadSource(url);
-  //       hls.attachMedia(video);
-  //       hls.on(Hls.Events.MANIFEST_PARSED,function() {
-  //       playPromise= video.play();
-
-  //       if (playPromise !== undefined) {
-  //           playPromise.then(_ => {
-  //           })
-  //           .catch(error => {
-  //               console.log(error);
-
-  //           });
-  //       }
-
-  //           loaderHide();
-  //       });
-    
-  //       hls.on(Hls.Events.ERROR, function (event, data) {
-  //           if (!hideErrorMsg) {
-  //               isLoading = true;
-  //               hideErrorMsg = true;
-  //           }
-  //           if (data.fatal) {
-  //             switch(data.type) {
-  //             case Hls.ErrorTypes.NETWORK_ERROR:
-              
-  //               console.log("fatal network error encountered, try to recover");
-  //               if (!retrying) {
-  //                   if(retryCount<2){
-  //                     retryLiveStream(hls,backup_url);
-  //                   }
-                    
-  //               }
-  //               break;
-  //             case Hls.ErrorTypes.MEDIA_ERROR:
-  //               console.log("fatal media error encountered, try to recover");
-  //               if (!retrying) {
-  //                   if(retryCount<3){
-  //                     retryLiveStream(hls,backup_url);
-  //                   }
-                    
-  //               }
-  //               hls.recoverMediaError();
-  //               break;
-  //             }
-  //           }
-  //       });
-  //   }else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-  //   video.src = file;
-  //   video.addEventListener('loadedmetadata',function() {
-  //     video.play();
-  //     loaderHide();
-  //   });
-  // }
 }
+
+
+function video_play_using_video_dynamic(url,backup_url,playerId) {
+    
+    var videoPla = document.getElementById(playerId);
+
+      if(Hls.isSupported()) {
+        var hls = new Hls();
+        hls.loadSource(url);
+        hls.attachMedia(videoPla);
+        hls.on(Hls.Events.MANIFEST_PARSED,function() {
+          video.play();
+          loaderHide();
+      });
+     }
+      else if (videoPla.canPlayType('application/vnd.apple.mpegurl')) {
+        videoPla.src = backup_url;
+        videoPla.addEventListener('loadedmetadata',function() {
+          videoPla.play();
+          loaderHide();
+        });
+      }
+
+
+}
+
 
 function retryLiveStream(hls, url) {
     retrying = true;
@@ -287,7 +485,7 @@ function retryLiveStream(hls, url) {
 
 
 
-    function openVideoInPopup(file,image,indexId){debugger;
+    function openVideoInPopup(file,image,indexId){
         loaderShow();
         var singleItemData=[];
         indexId=indexId-1;
@@ -304,6 +502,10 @@ function retryLiveStream(hls, url) {
         var video_backup=singleItemData.question_video;
 
         video_play_using_video_js(file,video_backup,image);
+
+        //$('.videoSliderPlay')
+        muteAllPlayingVideo();
+        unmutePlayingVideo();
           
         var shareURL=site_base_url+singleItemData.slug+'/'+singleItemData.id+'';
         var sideBarDetails='<div onClick="openMobileDownloadPopup();" class="jsx-2177493926 jsx-3813273378 avatar round" style="background-image: url(/media/musically_100x100.jpeg); width: 48px; height: 48px; flex: 0 0 48px;"></div><div class="jsx-949708032 boloindya-toolbar" style="margin-top: 20px;"><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-like" onClick="openMobileDownloadPopup();" style="background-image: url(/media/viewIcon.svg);"><span class="jsx-949708032">'+singleItemData.likes_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-comment" onClick="openMobileDownloadPopup();" style="background-image: url(/media/comments.svg);"><span class="jsx-949708032">'+singleItemData.comment_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-share" onclick="openShareTab()" style="background-image: url(/media/share.svg);"><span class="jsx-949708032">'+singleItemData.total_share_count+'</span></div></div>';
@@ -409,6 +611,55 @@ function retryLiveStream(hls, url) {
 
     }
 
+    function muteAllPlayingVideo(){
+        $("video").prop('muted', true);
+        var newSrc='/media/sound_mute.svg';
+        $('#mutedImageId').attr('src', newSrc);
+        // if($("video").prop('muted')){
+
+        //   $("video").prop('muted', false);
+        //   var newSrc='/media/mute_icon.svg';
+        //   $('#mutedImageId').attr('src', newSrc);
+        // }else{
+        //     $("video").prop('muted', true);
+        //     var newSrc='/media/sound_mute.svg';
+        //     $('#mutedImageId').attr('src', newSrc);
+        // }
+    }
+    function unmutePlayingVideo(){
+
+        if($("#player").prop('muted')){
+
+          $("#player").prop('muted', false);
+          var newSrc='/media/mute_icon.svg';
+          $('#mutedImageId').attr('src', newSrc);
+        }else{
+            $("#player").prop('muted', true);
+            var newSrc='/media/sound_mute.svg';
+            $('#mutedImageId').attr('src', newSrc);
+        }
+    }
+
+    function muteAndUnmutePlayerSlider(id){
+    var videoP = document.getElementById('player-'+id);
+      videoP.muted = true;
+
+
+      // var mutestatus=$("#player-"+id).prop('muted');
+
+      //   if($("#player-"+id).prop('muted')){
+
+      //     $("#player-"+id).prop('muted', false);
+      //     var newSrc='/media/mute_icon.svg';
+      //     $('#mutedImageId').attr('src', newSrc);
+      //   }else{
+      //       $("#player-"+id).prop('muted', true);
+      //       var newSrc='/media/sound_mute.svg';
+      //       $('#mutedImageId').attr('src', newSrc);
+      //   }
+    }
+
+
     function muteAndUnmutePlayer(){
         // jwplayer().setMute();
         // var muteStatus=jwplayer('player').getMute();
@@ -431,6 +682,11 @@ function retryLiveStream(hls, url) {
             $('#mutedImageId').attr('src', newSrc);
         }
     }
+
+    function pouseAllVideo(){
+
+    }
+
 
     function checkPlayStatus(video){
       if(video.paused) {

@@ -320,7 +320,7 @@
           if (item.profile_pic) {
             elmIcon = $(settings.templates.autocompleteListItemAvatar({ avatar : item.profile_pic }));
           } else {
-            userProfileImage='/media/demo_user.png';
+            userProfileImage='/media/user.svg';
             elmIcon = $(settings.templates.autocompleteListItemIcon({ icon : item.icon }));
           }
           elmIcon.prependTo(elmListItem);
