@@ -29,6 +29,17 @@ import urllib
 import os
 from shutil import copyfile
 
+import smtplib
+import mimetypes
+from email.mime.multipart import MIMEMultipart
+from email import encoders
+from email.message import Message
+from email.mime.audio import MIMEAudio
+from email.mime.base import MIMEBase
+from email.mime.image import MIMEImage
+from email.mime.text import MIMEText
+from django.utils import timezone
+
 PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # method for converting string to time
@@ -100,7 +111,6 @@ def identify_logo():
 	plag_text_options = Topic.plag_text_options
 	for (a,b) in plag_text_options:
 		plag_source.append(str(b))
-
 
 	f_name = settings.BASE_DIR + '/temp/plag_vid_details.txt'
 	f = io.open(f_name, "w", encoding="UTF-8")
