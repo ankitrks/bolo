@@ -51,6 +51,41 @@ def timetostring(t):
 		return '00:' + str(t)			
 
 
+def send_email():
+	emailfrom = "support@careeranna.com"
+	emailto = "akash.g@careeranna.com"
+	filetosend = "this is sample mail"
+	username = "support@careeranna.com"
+	password = "$upp0rt@30!1"
+
+	msg = MIMEMultipart()
+	msg["From"] = emailfrom
+	msg["To"] = emailto
+	msg["Subject"] = "Exception occured while running script Logo Detection" + str(datetime.now().date())
+	msg.preamble = ""
+
+	ctype, encoding = mimetypes.guess_type(filetosend)
+	if(ctype is None or encoding is not None):
+		ctype = "application/octet-stream"
+
+	maintype, subtype = ctype.split("/", 1)
+	fp = open(filetosend, "rb")
+	#attachment = MIMEBase(maintype, subtype)
+	#attachment.set_payload(fp.read())
+	fp.close()
+	encoders.encode_base64(attachment)
+	#attachment.add_header("Content-Disposition", "attachment", filename = 'buffering-report-boloindya-' + str(datetime.now().date()))
+	#msg.attach(attachment)
+
+	server = smtplib.SMTP("smtp.gmail.com:587")
+	server.starttls()
+	server.login(username, password)
+	server.sendmail(emailfrom, [emailto, 'akash.g@careeranna.com'], msg.as_string())
+	server.quit()
+	
+
+
+
 def remove_redundant_files():
 	os.remove(settings.BASE_DIR + '/temp/local_video.mp4')
 	os.remove(settings.BASE_DIR + '/temp/output1.png')
@@ -133,7 +168,8 @@ def identify_logo():
 					
 
 def main():
-	identify_logo()
+	send_email()
+	#identify_logo()
 	#remove_redundant_files()
 
 def run():
