@@ -33,7 +33,7 @@ from django.views.generic.edit import FormView
 from datetime import datetime
 from forum.userkyc.forms import KYCBasicInfoRejectForm,KYCDocumentRejectForm,AdditionalInfoRejectForm,BankDetailRejectForm
 from .models import VideoUploadTranscode,VideoCategory, PushNotification, PushNotificationUser, user_group_options, \
-    FCMDevice, notification_type_options, metrics_options, DashboardMetrics, metrics_slab_options
+    FCMDevice, notification_type_options, metrics_options, DashboardMetrics, DashboardMetricsJarvis, metrics_slab_options
 from drf_spirit.models import MonthlyActiveUser, HourlyActiveUser, DailyActiveUser, VideoDetails
 from forum.category.models import Category
 from django.contrib.auth.models import User
@@ -1466,6 +1466,99 @@ def statistics_all(request):
 
     return render(request,'jarvis/pages/video_statistics/statistics_all.html', data)
 
+
+@login_required
+def statistics_all_jarvis(request):
+    from django.db.models import Sum
+    data = {}
+    top_data = []
+    metrics = request.GET.get('metrics', '0')
+    slab = request.GET.get('slab', None)
+    # data_view = request.GET.get('data_view', 'daily')
+    data_view = request.GET.get('data_view', 'monthly')
+    if data_view == 'daily':
+        data_view = 'monthly'
+    start_date = request.GET.get('start_date', '2019-05-01')
+    end_date = request.GET.get('end_date', None)
+    if not start_date:
+        start_date = '2019-05-01'
+    if not end_date:
+        end_date = (datetime.datetime.today() - timedelta(days = 1)).strftime("%Y-%m-%d")
+
+    end_date_obj = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
+    if end_date_obj >= datetime.datetime.today().date():
+        end_date = (datetime.datetime.today() - timedelta(days = 1)).strftime("%Y-%m-%d")
+
+    end_date_obj = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
+    if end_date_obj >= datetime.datetime.today().date():
+        end_date = (datetime.datetime.today() - timedelta(days = 1)).strftime("%Y-%m-%d")
+
+    top_start = (datetime.datetime.today() - timedelta(days = 30)).date()
+    top_end = (datetime.datetime.today() - timedelta(days = 1)).date()
+    for each_opt in metrics_options:
+        temp_list = []
+        temp_list.append( each_opt[0] )
+        temp_list.append( each_opt[1] )
+        temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0])\
+                .aggregate(total_count = Sum('count'))['total_count'] )
+        top_data.append(temp_list) 
+        if metrics == each_opt[0]:
+            data['graph_title'] = each_opt[1]
+    data['top_data'] = top_data
+
+    graph_data = DashboardMetricsJarvis.objects.exclude(date__gt = end_date).filter(Q(metrics = metrics) & Q(date__gte = start_date) & Q(date__lte = end_date))
+    if metrics in ['4', '2', '5'] and slab:
+        if (metrics == '4' and slab in ['0', '1', '2']) or (metrics == '2' and slab in ['3', '4', '5'])\
+                 or (metrics == '5' and slab in ['6', '7']):
+            graph_data = graph_data.filter(metrics_slab = slab)
+
+    if data_view == 'weekly':
+        x_axis = []
+        y_axis = []
+        week_no = sorted(list(set(list(graph_data.order_by('week_no').values_list('week_no', flat = True)))))
+        for each_week_no in week_no:
+            x_axis.append(str("week " + str(each_week_no)))
+            y_axis.append(graph_data.filter(week_no = each_week_no).aggregate(total_count = Sum('count'))['total_count'])
+
+    	# elif data_view == 'monthly':
+    else:
+        x_axis = []
+        y_axis = []
+        month_no = months_between(start_date, end_date)
+        for each_month_no in month_no:
+            x_axis.append(str(str(month_map[str(each_month_no[0])]) + " " + str(each_month_no[1])))
+            data1=graph_data.filter(date__month = each_month_no[0]).aggregate(total_count = Sum('count'))['total_count']
+            if data1:
+                y_axis.append(data1)
+            else:
+                y_axis.append(0)
+    # else:
+    #     x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
+    # y_axis = graph_data.values_list('count', flat = True)
+    data['metrics'] = metrics
+    data['slab'] = slab
+    data['data_view'] = data_view
+    # data['x_axis'] = list(x_axis)
+    # data['y_axis'] = list(y_axis)
+    from collections import OrderedDict
+    chart_data = OrderedDict()
+    for i in range(len(x_axis)):
+        chart_data[x_axis[i]] = y_axis[i]
+    data['chart_data'] = [[str(data_view), str(data['graph_title'])]] + [list(ele) for ele in chart_data.items()] 
+    data['start_date'] = start_date
+    data['end_date'] = end_date
+    data['slabs'] = []
+
+    if metrics == '4':
+        data['slabs'] = [metrics_slab_options[0], metrics_slab_options[1], metrics_slab_options[2]]
+    if metrics == '2':
+        data['slabs'] = [metrics_slab_options[3], metrics_slab_options[4], metrics_slab_options[5]]
+    if metrics == '5':
+        data['slabs'] = [metrics_slab_options[6], metrics_slab_options[7], metrics_slab_options[8]]    
+
+    return render(request,'jarvis/pages/video_statistics/statistics_all_jarvis.html', data)
+
+
 def get_daily_impressions_data(request):
     if request.is_ajax():
         raw_data = json.loads(request.body)            
@@ -1642,6 +1735,14 @@ def daily_vplay_data(request):
             return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
     else:
         return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)   
+
+
+#def analytics_video_views(request):
+
+
+def analytics(request):
+    return render(request, 'jarvis/pages/analytics_panel/view_analytics_data.html')
+
 
 
 @api_view(['POST'])

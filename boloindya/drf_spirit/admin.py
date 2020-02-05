@@ -1,7 +1,7 @@
 
 from django.contrib import admin
 from .models import SingUpOTP, UserJarvisDump, UserFeedback
-from forum.user.models import Weight,UserProfile,AppVersion, UserProfile,AndroidLogs, AppPageContent, ReferralCode, ReferralCodeUsed, VideoPlaytime, VideoCompleteRate
+from forum.user.models import Weight,UserProfile,AppVersion, UserProfile,AndroidLogs, AppPageContent, ReferralCode, ReferralCodeUsed, VideoPlaytime, VideoCompleteRate, UserAppTimeSpend
 from forum.category.models import Category,CategoryViewCounter
 from import_export.admin import ImportExportModelAdmin,ExportMixin
 from import_export import resources
@@ -85,4 +85,5 @@ admin.site.register(UserSearch)
 admin.site.register(UserLogStatistics)
 admin.site.register(VideoPlaytime)
 admin.site.register(VideoCompleteRate)
+admin.site.register(UserAppTimeSpend)
 
