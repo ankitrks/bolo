@@ -4,6 +4,7 @@ from datetime import datetime
 
 
 language_options = (
+    ('0', 'All'),
     ('1', "English"),
     ('2', "Hindi"),
     ('3', "Tamil"),

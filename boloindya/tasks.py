@@ -58,7 +58,10 @@ def send_notifications_task(data, pushNotification):
 
             if data.get('category', 'Select Category') not in 'Select Category':
                 filter_list=UserProfile.objects.filter(sub_category=data.get('category', None)).values_list('user__pk', flat=True)
-                device = FCMDevice.objects.filter(user__pk__in=filter_list, user__st__language=lang, is_uninstalled=False)
+                if lang != '0':
+                    device = FCMDevice.objects.filter(user__pk__in=filter_list, user__st__language=lang, is_uninstalled=False)
+                else:
+                    device = FCMDevice.objects.filter(user__pk__in=filter_list, is_uninstalled=False)
             elif user_group == '8':
                 device = FCMDevice.objects.filter(user__pk=data.get('particular_user_id', None))
             elif user_group == '1':
@@ -75,10 +78,12 @@ def send_notifications_task(data, pushNotification):
                 filter_list = [39342, 1465, 2801, 19, 40, 328, 23, 3142, 1494, 41]
                 device = FCMDevice.objects.filter(user__pk__in=filter_list, is_uninstalled=False)
             elif user_group == '0':
-                device = FCMDevice.objects.filter(is_uninstalled=False, user__st__language=lang)
+                if lang != '0':
+                    device = FCMDevice.objects.filter(is_uninstalled=False, user__st__language=lang)
+                else:
+                    device = FCMDevice.objects.filter(is_uninstalled=False)
             else:
                 filter_list = []
-
 
                 if user_group == '3':
                     filter_list = VBseen.objects.distinct('user__pk').values_list('user__pk', flat=True)
@@ -111,7 +116,7 @@ def send_notifications_task(data, pushNotification):
                         PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2')
                     except:
                         pass
-                #t = device_after_slice.object_list.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk})
+                t = device_after_slice.object_list.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk})
                 #t = device_after_slice.object_list.send_message(data={'pupluar_data': 'true' })
                 logger.info(device_list)
             pushNotification.is_executed=True
