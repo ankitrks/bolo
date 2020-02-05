@@ -110,12 +110,12 @@ def send_notifications_task(data, pushNotification):
                 device_after_slice = device_pagination.page(index)
                 logger.info(device_after_slice)
                 for each in device_after_slice:
-                    device_list.append(t)
                     try:
                         PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2')
                     except:
                         pass
                     t = each.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk})
+                    device_list.append(t)
                 #t = device_after_slice.object_list.send_message(data={'pupluar_data': 'true' })
                 logger.info(device_list)
             pushNotification.is_executed=True
