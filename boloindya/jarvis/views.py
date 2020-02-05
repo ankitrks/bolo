@@ -1127,17 +1127,14 @@ def create_user_notification_delivered(request):
     pushNotification=PushNotification.objects.get(pk=notification_id)
     if request.user:
         try:
-            pushNotificationUser = PushNotificationUser.objects.get(push_notification_id=pushNotification, user=request.user)
+            pushNotificationUser = PushNotificationUser.objects.filter(push_notification_id=pushNotification, user=request.user)
         except:
             pushNotificationUser = PushNotificationUser()
         pushNotificationUser.user = request.user
     else:
         pushNotificationUser = PushNotificationUser()
     pushNotification = PushNotification.objects.get(pk=notification_id)
-    pushNotificationUser.status='0'
-    pushNotificationUser.push_notification_id = pushNotification
-    pushNotificationUser.save()
-
+    pushNotificationUser.update(status='0', push_notification_id = pushNotification)
     return JsonResponse({"status":"Success"})
 
 @api_view(['POST'])
@@ -1146,8 +1143,8 @@ def open_notification_delivered(request):
         notification_id = request.POST.get('notification_id', "")
         pushNotification = PushNotification.objects.get(pk=notification_id)
         if request.user:
-            pushNotificationUser = PushNotificationUser.objects.get(push_notification_id=pushNotification, user=request.user)
-            pushNotificationUser.status = '1'
+            pushNotificationUser = PushNotificationUser.objects.filter(push_notification_id=pushNotification, user=request.user)
+            pushNotificationUser.update(status='1')
             pushNotificationUser.save()
         return JsonResponse({"status":"Success"})
     except Exception as e:
