@@ -66,6 +66,7 @@
                     {% endif %}
                 </tbody>
             </table>
+            {% if has_prev %}<a href="https://stage.boloindya.com/jarvis/particular_notification/{{notification_id}}/{{status_id}}/{{ prev_page_no }}" >Prev</a>{% endif %} {{ current_page }} of {{ total_page }} pages {% if has_next %}<a href="https://stage.boloindya.com/jarvis/particular_notification/{{notification_id}}/{{status_id}}/{{ page_no }}" >Next</a>{% endif %}
         </div>
     </div>
 {% endblock content %} 

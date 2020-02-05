@@ -1590,10 +1590,10 @@ def get_user_bolo_info(request):
             end_date = datetime.strptime(str(days)+'-'+str(month)+'-'+str(year)+' 23:59:59', "%d-%m-%Y %H:%M:%S")
         if not start_date or not end_date:
             total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user)
-            all_pay = UserPay.objects.filter(user=request.user)
+            all_pay = UserPay.objects.filter(user=request.user,is_active=True)
         else:
             total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user,date__gte=start_date, date__lte=end_date)
-            all_pay = UserPay.objects.filter(user=request.user,for_month__gte=start_date.month,for_month__lte=start_date.month,\
+            all_pay = UserPay.objects.filter(user=request.user,is_active=True,for_month__gte=start_date.month,for_month__lte=start_date.month,\
                 for_year__gte=start_date.year,for_year__lte=start_date.year)
         total_earn=0
         for each_pay in all_pay:

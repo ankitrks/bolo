@@ -1102,9 +1102,19 @@ def send_notification(request):
 
 @login_required
 def particular_notification(request, notification_id=None, status_id=2, page_no=1):
+    import math  
     pushNotification = PushNotification.objects.get(pk=notification_id)
-    pushNotificationUser=PushNotificationUser.objects.filter(push_notification_id=pushNotification)[page_no*10:page_no*10+10]
-    return render(request,'jarvis/pages/notification/particular_notification.html', {'pushNotification': pushNotification, 'status_id': status_id, 'pushNotificationUser': pushNotificationUser})
+    page_no=int(page_no)-1
+    has_prev=False
+    if page_no > 0:
+        has_prev=True
+    pushNotificationUser=PushNotificationUser.objects.filter(push_notification_id=pushNotification)
+    pushNotificationUserSlice=pushNotificationUser[page_no*10:page_no*10+10]
+    has_next=True
+    if ((page_no*10)+10) >= len(pushNotificationUser):
+        has_next=False
+    total_page=int(math.ceil(len(pushNotificationUser)/10))+1
+    return render(request,'jarvis/pages/notification/particular_notification.html', {'pushNotification': pushNotification, 'status_id': status_id, 'pushNotificationUser': pushNotificationUserSlice, 'page_no': page_no + 2, 'prev_page_no': page_no , 'count': len(pushNotificationUser), 'has_prev': has_prev, 'has_next': has_next, 'notification_id': notification_id, 'status_id': status_id, 'total_page': total_page, 'current_page': page_no + 1})
 
 from rest_framework.decorators import api_view
 
