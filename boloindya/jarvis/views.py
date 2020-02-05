@@ -1124,7 +1124,7 @@ from rest_framework.decorators import api_view
 def create_user_notification_delivered(request):
     notification_id = request.POST.get('notification_id', "")
 
-    pushNotification=[]
+    pushNotification=PushNotification.objects.get(pk=notification_id)
     if request.user:
         try:
             pushNotificationUser = PushNotificationUser.objects.get(push_notification_id=pushNotification, user=request.user)
@@ -1142,16 +1142,16 @@ def create_user_notification_delivered(request):
 
 @api_view(['POST'])
 def open_notification_delivered(request):
-    notification_id = request.POST.get('notification_id', "")
-
-    pushNotification = PushNotification.objects.get(pk=notification_id)
-    if request.user:
-        pushNotificationUser = PushNotificationUser.objects.get(push_notification_id=pushNotification, user=request.user)
-        pushNotificationUser.status = '1'
-        pushNotificationUser.save()
-
-    return JsonResponse({"status":"Success"})
-
+    try:
+        notification_id = request.POST.get('notification_id', "")
+        pushNotification = PushNotification.objects.get(pk=notification_id)
+        if request.user:
+            pushNotificationUser = PushNotificationUser.objects.get(push_notification_id=pushNotification, user=request.user)
+            pushNotificationUser.status = '1'
+            pushNotificationUser.save()
+        return JsonResponse({"status":"Success"})
+    except Exception as e:
+        return JsonResponse({"status":str(e)})
 
 def remove_notification(request):
     id = request.GET.get('id', None)

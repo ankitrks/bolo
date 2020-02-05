@@ -27,6 +27,7 @@ def send_notifications_task(data, pushNotification):
         datepicker = data.get('datepicker', '')
         timepicker = data.get('timepicker', '').replace(" : ", ":")
         image_url = data.get('image_url', '')
+        particular_user_id=data.get('particular_user_id', None)
         
         if user_group == '8':
             lang='0'
@@ -39,6 +40,8 @@ def send_notifications_task(data, pushNotification):
         pushNotification.notification_type = notification_type
         pushNotification.user_group = user_group
         pushNotification.instance_id = id
+        if particular_user_id:
+            pushNotification.particular_user_id=particular_user_id
         pushNotification.save()
     except Exception as e:
         logger.info(str(e))    
@@ -114,7 +117,7 @@ def send_notifications_task(data, pushNotification):
                         PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2')
                     except:
                         pass
-                    t = each.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk})
+                    t = each.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url})
                     device_list.append(t)
                 #t = device_after_slice.object_list.send_message(data={'pupluar_data': 'true' })
                 logger.info(device_list)
