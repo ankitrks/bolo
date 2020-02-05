@@ -6,7 +6,7 @@ $(document).ready(function(){
 });
 
 
-
+var totalCountVideo =0;
 var userLikeAndUnlike=[];
 
 function getSideBarData(){
@@ -109,7 +109,6 @@ function getPopularCategory(popularCategory){
 
 var playListData=[];
 var userLikeAndUnlike=[];
-//http://127.0.0.1:8000/api/v1/get_vb_list/?limit=10&offset=10&user_id=191
 
 var page = 1;
 var checkDataStatus=0;
@@ -153,13 +152,14 @@ function getHashtagVideos(limit,offset){
             var videoItemList=response.results;
             //jQuery("#userVideoCountId").html(response.count);
             var itemCount=-1;
-            videoItemList.forEach(function(itemCreator) {itemCount++;
-                userVideoItems =getVideoItem(itemCreator,itemCount);
+            videoItemList.forEach(function(itemCreator) {itemCount++;totalCountVideo++;
+                playListData.push(itemCreator);
+                userVideoItems =getVideoItem(itemCreator,totalCountVideo);
                 $("#hashTagVideosListId").append(userVideoItems);
       
             });
             loaderBoloHideDynamic('_scroll_load_more_loading_user_videos');
-            playListData=videoItemList;
+            //playListData=videoItemList;
             var nextPageData=response.next;
             jQuery("#nextPageUrlId").val(response.next);
             
@@ -202,8 +202,8 @@ function loadMoreData(NextPageUrl){
                 userVideoItems="";
                 var videoItemList=data.results;
                 var itemCount=-1;
-                videoItemList.forEach(function(itemCreator) {itemCount++;
-                userVideoItems +=getVideoItem(itemCreator,itemCount);
+                videoItemList.forEach(function(itemCreator) {itemCount++;totalCountVideo++;
+                userVideoItems +=getVideoItem(itemCreator,totalCountVideo);
                 playListData.push(itemCreator);          
       
                 });
@@ -235,7 +235,7 @@ function loadMoreData(NextPageUrl){
 
 
 
-    var playListData=[];
+    //var playListData=[];
 function getCategoryVideos(){
 
     loaderBoloShowDynamic('_scroll_load_more_loading_user_videos');
@@ -352,9 +352,10 @@ function video_play_using_video_js(url,backup_url,image) {
 }
 
 
- function openVideoInPopup(file,image,indexId){
+ function openVideoInPopup(file,image,indexId){debugger;
   loaderShow();
   var singleItemData=[];
+    indexId=indexId-1;
     $("#indexId").val(indexId);
     singleItemData=playListData[indexId];
   $("#modelPopup").show();
