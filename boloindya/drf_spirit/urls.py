@@ -92,6 +92,7 @@ urlpatterns = [
     url(r'^like/$', like, name='like'),
     url(r'^mention_suggestion/$', mention_suggestion, name='mention_suggestion'),
     url(r'^get_challenge/$', GetChallenge.as_view(), name='get_challenge'),
+    url(r'^get_user_pay_datatbale/$', UserPayDatatableList.as_view(), name='get_user_pay_datatbale'),
     url(r'^get_challenge_details/$', GetChallengeDetails, name='get_challenge_details'),
     url(r'^password/set/$', password_set, name='password_set'),
     url(r'^get_profile/$', GetProfile.as_view(), name='get_profile'),

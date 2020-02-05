@@ -1,4 +1,6 @@
 from django.apps import apps
+import calendar
+from datetime import datetime
 
 
 language_options = (
@@ -11,6 +13,21 @@ language_options = (
     ('7', "Malayalam"),
     ('8', "Gujarati"),
     ('9', "Marathi"),
+)
+
+month_choices=(
+    (1, "January"),
+    (2, "Feburary"),
+    (3, "Macrh"),
+    (4, "April"),
+    (5, "May"),
+    (6, "June"),
+    (7, "July"),
+    (8, "August"),
+    (9, "September"),
+    (10, "October"),
+    (11, "November"),
+    (12, "December"),
 )
 
 state_language={'Andaman & Nicobar Islands':'Bengali','Andhra Pradesh':'Telugu','Arunachal Pradesh':'Nishi','Assam':'Assamese','Bihar':'Hindi','Chandigarh':'Hindi','Chhattisgarh':'Hindi','Dadra & Nagar Haveli':'Hindi','Daman & Diu':'Gujarati','Delhi':'Hindi','Goa':'Konkani','Gujarat':'Gujarati','Haryana':'Hindi','Himachal Pradesh':'Hindi','Jammu and Kashmir':'Kashmiri','Jharkhand':'Hindi','Karnataka':'Kannada','Kerala':'Malayalam','Lakshadweep':'Malayalam','Madhya Pradesh':'Hindi','Maharashtra':'Marathi','Manipur':'Manipuri','Meghalaya':'Kashi','Mizoram':'Mizo','Nagaland':'Naga Languages','Odisha':'Oriya','Puducherry':'Tamil','Punjab':'Punjabi','Rajasthan':'Hindi','Sikkim':'Nepali','Tamil Nadu':'Tamil','Telangana':'Telugu','Tripura':'Bengali','Uttar Pradesh':'Hindi','Uttarakhand':'Hindi','West Bengal':'Bengali'}
@@ -134,6 +151,19 @@ def shortnaturaltime(value, now_time=None):
     # For future strings, we return now
     return 'now'
 
+def short_time(value):
+    if value<60:
+        return str(value)+" seconds"
+
+    elif value>60 and value<3600:
+        minute_value = value/float(60.0)
+        rounded = round(minute_value, 1)
+        return str(rounded)+" minutes"
+    elif value>3600:
+        hour_value = value/float(3600.0)
+        rounded = round(hour_value, 2)
+        return str(rounded)+" hours"
+
 def shortcounterprofile(counter):
     counter = int(counter)
     if counter>10000 and counter< 99999:
@@ -234,7 +264,76 @@ def calculate_encashable_details(user):
 
 
 
-
+def check_or_create_user_pay(user_id,start_date='01-04-2019'):
+    from forum.topic.models import BoloActionHistory,Topic
+    from forum.user.models import UserPay,Weight
+    from django.contrib.auth.models import User
+    user = User.objects.get(pk=user_id)
+    start_date = datetime.strptime(start_date, "%d-%m-%Y")
+    days = calendar.monthrange(int(start_date.year),int(start_date.month))[1]
+    end_date = datetime.strptime(str(days)+'-'+str(start_date.month)+'-'+str(start_date.year)+' 23:59:59', "%d-%m-%Y %H:%M:%S")
+    current_datetime = datetime.now()
+    user_pay = UserPay.objects.filter(user=user,for_month=start_date.month)
+    print "tIme Duration:",str(start_date),"----",str(end_date)
+    # is_evaluated = True if user_pay and user_pay[0].is_evaluated else False
+    language_bifurcation = []
+    bolo_bifurcation = []
+    total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=user,date__gte=start_date, date__lte=end_date)
+    total_video_count = total_video.count()
+    if total_video_count>0:
+        bolo_action_history = BoloActionHistory.objects.filter(user=user,created_at__gte=start_date,created_at__lte=end_date,is_removed=False)
+        monetised_video_count = total_video.filter(is_monetized = True).count()
+        left_for_moderation = total_video.filter(is_moderated = False).count()
+        total_view_count=0
+        total_like_count=0
+        total_comment_count = 0
+        total_share_count = 0
+        for each_vb in total_video:
+            total_view_count+=each_vb.view_count
+            total_like_count+=each_vb.likes_count
+            total_comment_count+=each_vb.comment_count
+            total_share_count+=each_vb.total_share_count
+        total_bolo_score=0
+        for each_bolo in bolo_action_history:
+            total_bolo_score+=each_bolo.score
+        print 'total_video',total_video_count
+        user_pay,is_created = UserPay.objects.get_or_create(user_id = user_id,for_year=start_date.year,for_month=start_date.month)
+        # if not user_pay.is_evaluated:
+        user_pay.total_video_created=total_video_count
+        user_pay.total_monetized_video=monetised_video_count
+        user_pay.left_for_moderation=left_for_moderation
+        user_pay.total_like=total_like_count
+        user_pay.total_comment=total_comment_count
+        user_pay.total_view=total_view_count
+        user_pay.total_share=total_share_count
+        user_pay.total_bolo_score_earned=total_bolo_score
+        # user_pay = UserPay.objects.create(user_id = user_id,for_year=start_date.year,for_month=start_date.month,total_video_created=total_video_count,total_monetized_video=monetised_video_count,\
+        #     left_for_moderation=left_for_moderation,total_like=total_like_count,total_comment=total_comment_count,total_view=total_view_count,\
+        #     total_share=total_share_count,total_bolo_score_earned=total_bolo_score)
+        for each_language in language_options:
+            lang_count = total_video.filter(language_id=each_language[0]).count()
+            language_bifurcation.append({'language':each_language[1],'video_count':lang_count})
+        for each_weight in Weight.objects.all():
+            if each_weight.weight>0:
+                single_action_bolo = bolo_action_history.filter(action=each_weight)
+                total_single_action_score=0
+                for each_action in single_action_bolo:
+                    total_single_action_score+=each_action.score
+                bolo_bifurcation.append({'feature':each_weight.features,'bolo_score':total_single_action_score})
+        user_pay.videos_in_language = str(language_bifurcation)
+        user_pay.bolo_bifurcation = str(bolo_bifurcation)
+        # if current_datetime > end_date:
+        #     user_pay.is_evaluated=True
+        user_pay.save()
+        # print user_pay.__dict__
+    if current_datetime > end_date:
+        if end_date.month==12:
+            year = str(end_date.year+1)
+            check_or_create_user_pay(user_id,'01-01-'+year)
+        else:
+            month = str(end_date.month+1)
+            check_or_create_user_pay(user_id,'01-'+month+'-'+str(end_date.year))
+    return True
 
 
 
