@@ -3,18 +3,104 @@
 {% block title %}BoloIndya{% endblock %}
 {% block content %}
 
-<link rel="stylesheet" type="text/css" href="/media/css/popup.css">
+<link rel="stylesheet" type="text/css" href="/media/css/main_login.css">
 <style type="text/css">
   .pnl-manager{position: relative;margin: 70px auto !important;}
   ._4kny{display: none;}
   .pnl-manager .google-btn{
-    width: 98% !important;
-    padding: 12px 3px 8px !important;
+    width: 99% !important;
+    border: 0px solid #ccc !important;
+    padding: 0px 0px 0px !important;
+
   }
+  .pnl-manager .fb-btn {
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    -o-border-radius: 3px;
+    border-radius: 3px;
+    background: #3f51b5;
+    border: none;
+    position: relative;
+    background-image: linear-gradient(99deg,#586cdf,#3f51b5);
+    width: 98% !important;
+    padding: 7px 3px 0px !important;
+    margin-top: 0;
+    cursor: pointer;
+    box-shadow: 0 2px 2px 0 rgba(41,48,59,.24), 0 0 2px 0 rgba(41,48,59,.12);
+}
+.googleTextAlign {
+    position: relative;
+    top: 0px !important;
+    color: #29303b;
+}
+.pnl-manager .google-btn .fb-wrap .google-icon {
+    top: 15px;
+    left: 75px;
+    position: absolute;
+}
+.form-group .error-txt, .form-group .info{
+      padding: 1px 14px 0 13px !important;
+}
+.login-container {
+  background: #000;
+  padding: 15px 15px 50px 15px;
+  margin-top: 50px;
+  border-radius: 4px;
+
+}
+
+.login-container .phone-number-container .phone-input .material-input .form-control, .login-container .phone-number-container .phone-input .material-input .input-label {
+    padding-left: 0px;
+    width: 86% !important;
+}
+#optForm{
+  background: #fff;
+  padding: 15px;
+}
+
+@media(max-width: 991px){
+  .pnl-manager .google-btn .fb-wrap .google-icon {
+    top: 15px;
+    left: 60px;
+    position: absolute;
+
+}
+}
+.omb_hrOr {
+    background-color: #cdcdcd;
+    height: 1px;
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+}
+.omb_spanOr {
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: 15em;
+    margin-left: -1.5em;
+    background-color: #000;
+    width: 3em;
+    text-align: center;
+}
+input[type=text], input[type=email], input[type=number], input[type=password]{
+  color: rgb(158, 158, 158) !important;
+}
+.login-container .heading{
+      margin-top: 35px !important;
+}
+.login-container .heading .heading-text{
+  color: #fff !important;
+}
+@media(max-width: 991px){
+.omb_spanOr {
+    top: 15.0em;
+}
+}
+
 </style>
 
     <a class="close" href="#" style="margin-bottom: 20px;"></a>
-    <div class="content" style="min-height: 570px;background: #f5f6f7;padding:10px">
+    <div class="content" style="min-height: 570px;background: #000;padding:10px">
         <div class="cd-user-modal is-visible">
             <div class="cd-user-modal-container">
                 <div id="cd-login" class="is-selected">
@@ -29,12 +115,10 @@
                                     </div>
                                       <div class="heading"><span class="heading-text mainLoginHeading " >Login to continue</span></div>
                                       <div class="heading"><span class="heading-text phoneLogin hide activeNumberMode">Continue using phone</span></div>
-                                      <a href="javascript:void(0);" class="email-or-fb-signin dispMainLogin" >
-                                          <div class="email-fb-button">Have a Facebook/Email account?</div>
-                                      </a>
-                                      <div class="or-div dispMainLogin" >or</div>
+
                                       <div class="phone-number-container" >
-                                          <div class="phone-input"><span class="country-code">+91</span>
+                                          <div class="phone-input">
+                                            <span class="country-code">+91</span>
                                               <div class="form-group material-input" autocomplete="off">
                                                   <input maxlength="100" type="text" id="phoneNo" autocomplete="off" required="" name="phoneNo" class="form-control " pattern="[0-9]*" inputmode="numeric" value=""><span class="input-label no-floating">Enter your mobile number</span>
                                                   <div class="page-loader loader" style="display: none;"></div>
@@ -42,9 +126,24 @@
                                                   <p class="error-txt mobileErrorMsg hide activeNumberMode">Please enter your mobile number<i class="error-icon-triangle"></i></p>
                                               </div>
                                           </div>
-                                      <button type="button" onClick="sendOTP();" class="submit-button hide activeNumberMode pointer"> Continue <i class="fa fa-angle-right"></i> </button>
-                                      <div class="attest-message hide activeNumberMode"><span class="attest-message-text">By Proceeding you agree to the <a href="/in/terms-of-use" target="_blank" rel="noopener noreferrer"> Terms of Use</a> and <a href="/in/privacy-policy" target="_blank" rel="noopener noreferrer"> Privacy Policy</a></span></div>                        
+                                          <button type="button" onClick="sendOTP();" class="submit-button hide activeNumberMode pointer"> Continue <i class="fa fa-angle-right"></i> </button>
+                                          <div class="attest-message hide activeNumberMode"><span class="attest-message-text">By Proceeding you agree to the <a href="/in/terms-of-use" target="_blank" rel="noopener noreferrer"> Terms of Use</a> and <a href="/in/privacy-policy" target="_blank" rel="noopener noreferrer"> Privacy Policy</a></span></div>                        
                                       </div>
+                                      <hr class="omb_loginOr">
+                                      <div class="or-div dispMainLogin omb_spanOr" >or</div>
+                                      <span  class="email-or-fb-signin dispMainLogin" >
+                                          <div class="google-btn deActiveEmailMode">
+                                              <div class="fb-wrap ">
+                                                <a id="google_login" href="/accounts/google/login?next={{next_page_url}}" class="btn btn-success"><i class="google-icon"></i><span class="googleTextAlign">Continue with Google</span></a>
+                                              </div>
+                                          </div>
+
+                                          <div class="fb-btn deActiveEmailMode">
+                                              <div class="fb-wrap "><a href="/accounts/facebook/login?next={{ next_page_url }}"><i class="fb-icon"></i><span>login with facebook</span></a></div>
+                                          </div>
+                                      </span>
+                                      
+
                                   </div>
 
                               </div>
@@ -59,7 +158,7 @@
                                       <input type="hidden" name="rowId" id="rowId" value="">  
                                       <input type="hidden" name="userOtp" id="userOtp" value="">  
 
-                                      <div class="otp-message"><span class="initial-text">Enter the 4-digit code sent to </span><span class="phone-no">+91******<span id="lastFourdigit"></span></span></div>
+                                      <div class="otp-message"><span class="initial-text">Enter the 6-digit code sent to </span><span class="phone-no">+91******<span id="lastFourdigit"></span></span></div>
                                       <div class="otp-input digit-group" data-group-name="digits" data-autosubmit="false" autocomplete="off">
                                           <input type="text" id="digit-1" name="digit-1" data-next="digit-2" class="single-otp-input" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" value="" />
                                           <input type="text" id="digit-2" name="digit-2" data-next="digit-3" data-previous="digit-1" class="single-otp-input" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" value="" />
@@ -79,7 +178,7 @@
                                   </form>
                               </div>
 
-                              <div class="pnl-manager loginWithFbOrEmail hide">
+<!--                               <div class="pnl-manager loginWithFbOrEmail hide">
                                   <div class="email-login-container">
                                      <div class="back-button ">
                                       <button class="backToMainLogin pointer" type="button"><span style='font-size:26px;'>&#8592;</span></button>
@@ -97,16 +196,16 @@
 
                                           <div class="google-btn deActiveEmailMode">
                                               <div class="fb-wrap ">
-                                                <a id="google_login" href="/accounts/google/login?next={{ request.get_full_path }}" class="btn btn-success"><i class="google-icon"></i><span class="googleTextAlign">Continue with Google</span></a></div>
+                                                <a id="google_login" href="/accounts/google/login/" class="btn btn-success"><i class="google-icon"></i><span class="googleTextAlign">Continue with Google</span></a></div>
                                           </div>
 
                                           <div class="fb-btn deActiveEmailMode">
-                                              <div class="fb-wrap "><a href="/accounts/google/login?next={{ request.get_full_path }}"><i class="fb-icon"></i><span>login with facebook</span></a></div>
+                                              <div class="fb-wrap "><a href="/accounts/facebook/login/"><i class="fb-icon"></i><span>login with facebook</span></a></div>
                                           </div>
 
                                       </div>
                                   </div>
-                              </div>
+                              </div> -->
 
                           </div>
                           <div class="close-btn"></div>
@@ -116,7 +215,7 @@
             </div> 
         </div>
     </div>
-
+<input type="hidden" name="next_page_url" id="next_page_url" value="{{ next_page_url }}">
 <!-----------  Login Popup Script  ------------>
 <script src="/media/js/login_popup.js"></script>
 <!-----------End  ------------>

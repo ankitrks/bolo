@@ -89,7 +89,7 @@ def action_seen(user_id,topic_id):
     else:
        vbseen = VBseen.objects.create(user_id = user_id,topic_id = topic_id)
     topic.update(view_count = F('view_count')+1)
-    userprofile = get_userprofile(user_id).update(view_count = F('view_count')+1)
+    userprofile = get_userprofile(topic[0].user.id).update(view_count = F('view_count')+1,own_vb_view_count = F('own_vb_view_count')+1)
 
 #follow
 def action_follow(test_user_id,any_user_id):

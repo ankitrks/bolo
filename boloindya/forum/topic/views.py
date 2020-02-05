@@ -27,6 +27,7 @@ import json
 from django.core.paginator import Paginator
 from forum.topic.models import Like
 from django.db.models import F,Q
+from django.contrib.auth import authenticate,login
 from django.contrib.auth.models import User
 # Required for speech to text...
 import io
@@ -42,7 +43,7 @@ from google.cloud.speech import enums
 from google.cloud.speech import types
 from drf_spirit.utils import add_bolo_score
 
-from forum.user.models import UserProfile
+from forum.user.models import UserProfile,AppPageContent
 
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.account.adapter import get_adapter as get_account_adapter
@@ -447,11 +448,15 @@ def video_details(request,username='',id=''):
 
     return render(request, 'spirit/topic/video_details.html', context)
 
-def video_details_by_slug(request,slug=''):
+def video_details_by_slug(request,slug='',id=''):
     #print user_profile.__dict__
+    #print 'videoId_'+id
     user_id=""
     try:
-        topics = Topic.objects.get(slug = slug)
+        if id != '':
+            topics = Topic.objects.get(id = id)
+        else:
+            topics = Topic.objects.get(slug = slug)         
         user_id = topics.user_id
     except:
         topics = None
@@ -554,10 +559,13 @@ def user_timeline(request):
 def boloindya_careers(request):
     return render(request, 'spirit/topic/boloindya_careers.html')
 
+def boloindya_team_details(request):
+    return render(request, 'spirit/topic/boloindya_team.html')
+
 def boloindya_openings(request):
     job_openings = []
     try:
-        job_openings = JobOpening.objects.filter(is_active = True)
+        job_openings = JobOpening.objects.filter(publish_status = 1,expiry_date__gte = datetime.now())
     except:
         job_openings = None
 
@@ -572,7 +580,8 @@ def boloindya_opening_details(request,slug):
     job_openings = None
     job_id=""
     try:
-        job_opening = JobOpening.objects.filter(is_active = True,slug=slug)
+        
+        job_opening = JobOpening.objects.filter(publish_status = True, expiry_date__gte = datetime.now(), slug=slug)
         job_openings =job_opening[0]
         job_id = job_openings.id
         
@@ -581,7 +590,6 @@ def boloindya_opening_details(request,slug):
     if request.method == 'POST':
         details = JobRequestForm(request.POST,request.FILES)
         if details.is_valid():
-            #print details
             jobRequest=details.save()
             #emailRe='sarfarazalam115@gmail.com';
             emailRe='sarfaraz@careeranna.com,varun@boloindya.com,ankit@careeranna.com';
@@ -665,7 +673,7 @@ def help_support(request):
               <head></head>
               <body>
                     Hello, <br><br>
-                    We have received a job request from %s. Please find the details below:<br><br>
+                    We have received a help request from %s. Please find the details below:<br><br>
                     <b>Name:</b> %s <br>
                     <b>Email:</b> %s <br>
                     <b>Contact:</b> %s <br>
@@ -794,18 +802,29 @@ def search_by_term(request):
     context = {
         'is_single_topic': "Yes",
         'search_term':search_term
-    }        
+    } 
+
+    video_slug = request.GET.get('video',None)
+    if(video_slug != None):
+        return redirect('/video/'+video_slug)
+
     return render(request, 'spirit/topic/search_results.html',context)
 
 def new_home(request):
     categories = []
+    hash_tags = []
     try:
-        categories = Category.objects.filter(parent__isnull=False)[:5]
+        categories = Category.objects.filter(parent__isnull=False)[:4]
     except Exception as e1:
-        categories = []
+        categories = []    
+    try:
+        hash_tags = TongueTwister.objects.order_by('-hash_counter')[:4]
+    except Exception as e1:
+        hash_tags = []
 
     context = {
         'categories':categories,
+        'hash_tags':hash_tags,
         'is_single_topic': "Yes",
     }  
     video_slug = request.GET.get('video',None)
@@ -817,9 +836,12 @@ def new_home(request):
     # return render(request, 'spirit/topic/new_landing.html')
     # return render(request, 'spirit/topic/main_landing.html')
 
-def login(request):
+def login_user(request):
+
+    nextURL = request.GET.get('next',None)
     context = {
         'is_single_topic': "Yes",
+        'next_page_url':nextURL
     }    
     return render(request, 'spirit/topic/_login.html',context)
 def user_profile(request,username):
@@ -859,13 +881,54 @@ def user_profile(request,username):
         return render(request, 'spirit/topic/new_landing.html')  
 
 def get_about(request):
-    return render(request, 'spirit/topic/about.html')
+    name = 'about_us'
+    about_us_page_object = None
+    try:
+        about_us_page_object = AppPageContent.objects.filter(page_name = name)[0]
+    except:
+        about_us_page_object = None
+    context = {
+        'about_us': about_us_page_object
+    }
+    return render(request, 'spirit/topic/about.html',context)
 
 def get_termofservice(request):
-    return render(request, 'spirit/topic/termsofservice.html')
+    name = 'terms_and_condition'
+    terms_and_condition = None
+    try:
+        terms_and_condition = AppPageContent.objects.filter(page_name = name)[0]
+    except:
+        terms_and_condition = None
+    context = {
+        'terms_and_condition': terms_and_condition
+    }
+    return render(request, 'spirit/topic/termsofservice.html',context)
 
 def get_privacypolicy(request):
-    return render(request, 'spirit/topic/privacypolicy.html')
+    name = 'privacy_poilcy'
+    privacy_poilcy = None
+    try:
+        privacy_poilcy = AppPageContent.objects.filter(page_name = name)[0]
+    except:
+        privacy_poilcy = None
+    context = {
+        'privacy_policy': privacy_poilcy
+    }
+    
+    return render(request, 'spirit/topic/privacypolicy.html',context)
+
+def get_bolo_action(request):
+    name = 'bolo_action'
+    bolo_action = None
+    try:
+        bolo_action = AppPageContent.objects.filter(page_name = name)[0]
+    except:
+        bolo_action = None
+    context = {
+        'bolo_action': bolo_action
+    }
+    
+    return render(request, 'spirit/topic/bolo_action.html',context)
 
 def robotstext(request):
     return render(request, 'spirit/topic/robots.txt') 
@@ -939,11 +1002,17 @@ def login_using_api(request):
     username = request.POST.get('username', '')
     user_id = request.POST.get('user_id', '')
     user = User.objects.get(id=user_id)
-    password = user.password;
-    user = auth.authenticate(username=username, password=password)
-    if not request.user.is_authenticated():
-        auth.login(request, user)
+    if user:
+        login(request, user,backend='django.contrib.auth.backends.ModelBackend')
+        return HttpResponse(json.dumps({'success':'Success'}),content_type="application/json")
+    return HttpResponse(json.dumps({'success':'Fail'}),content_type="application/json")
+
+        
 
 def testurllang(request):
     print 'Pass';
-    pass
+    languages_with_id=settings.LANGUAGES_WITH_ID
+    print languages_with_id
+    #languageCode =request.LANGUAGE_CODE
+    #language_id=languages_with_id[languageCode]
+

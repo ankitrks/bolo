@@ -63,7 +63,7 @@
 }
 
 .card-footer.no-avatar.jsx-1543915374 {
-    padding-top: 67px;
+    padding-top: 22px;
 }
 .card-footer.jsx-1543915374 .like-icon.jsx-1543915374 {
     margin-right: 7px;
@@ -83,13 +83,15 @@
     bottom: 0px;
     height: 100px;
     box-sizing: border-box;
-    background: linear-gradient(rgba(22, 24, 35, 0) 2.92%, rgba(22, 24, 35, 0.5) 98.99%);
-    padding: 7px 13px 17px;
+    background: #0003;
+/*    background: linear-gradient(rgba(22, 24, 35, 0) 2.92%, rgba(22, 24, 35, 0.5) 98.99%);*/
+    padding: 7px;
 }
 .video-card.jsx-3077367275 {
     position: relative;
     width: 100%;
     height: 100%;
+    border: 1px solid #ffffff59;
 }
 video.jsx-3382097194 {
     display: block;
@@ -117,7 +119,7 @@ video.jsx-3382097194 {
     height: auto;
     margin-right: 0px;
     margin-bottom: 0px;
-    padding: 9px 6px 0 9px;
+    padding: 0px 3px 12px 5px;
 }
 
 .share-layout {
@@ -170,7 +172,152 @@ video.jsx-3382097194 {
 
 /*===========*/
 
+.video_card_title{
+    position: inherit;
+    top: 12px;
+    font-size: 14px;
+    padding: 2px;
+    color: aliceblue;
+}
+._image_card_footer_wraaper{
+    background: #0003;
+}
 
+
+
+._video_card_footer_likes1{
+    position: absolute;
+    right: 6px;
+    top: 78px;
+    bottom: -2px;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+}
+
+._video_card_footer_likes1 img{
+    position: absolute;
+    margin-top: -1px;
+    height: 18px;
+    top: -2px;
+    left: -18px;
+    padding-top: 4px;
+}
+
+._video_card_footer_likes{
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    height: 26px;
+    padding: 4px;
+    background: #000000d9;
+    width: 100%;
+}
+._video_card_footer_ {
+    height: 80px;
+}
+
+._video_card_footer_likes12::before { 
+
+    content: '';
+    display: inline-block;
+    height: 18px;
+    margin: 0 6px -3px 0;
+    min-width: 18px;
+    position: relative;
+    top: -2px;
+    width: 18px;
+    background-image: url(/media/iJGOBKN9vqK.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: -42px -382px;
+    color: red;
+    font-weight: bold;
+}
+._video_card_footer_likes::before { 
+
+    content: '';
+    display: inline-block;
+    height: 18px;
+    margin: 0 6px -3px 0;
+    min-width: 18px;
+    position: relative;
+    top: -1px;
+    width: 18px;
+    background-image: url(/media/iJGOBKN9vqK.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: -42px -382px;
+    color: red;
+    font-weight: bold;
+}
+
+@media(max-width: 991px){
+._video_card_footer_likes1{
+    position: absolute;
+    right: 7px;
+    top: 78px;
+    bottom: -2px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+}
+._video_card_footer_likes1 img{
+    position: absolute;
+    margin-top: -1px;
+    height: 15px;
+    top: -3px;
+    left: -14px;
+    padding-top: 4px;
+}
+
+._video_card_footer_likes::before {
+    margin: 0 2px -3px 0;
+    top: -3px;
+}
+._video_card_footer_likes {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    font-size: 11px !important;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+}
+.video_card_title {
+    position: inherit;
+    top: 11px;
+    font-size: 12px;
+    padding: 2px;
+    color: aliceblue;
+}
+
+._4jy1 {
+    border: 0px solid #2d2b2bdb !important;
+    /* border-radius: 2px; */
+    box-sizing: content-box;
+    font-size: 12px;
+    -webkit-font-smoothing: antialiased;
+    font-weight: bold;
+    justify-content: center;
+    padding: 0 8px;
+    right: -24px;
+    top: -19px;
+    position: relative;
+    text-align: center;
+    /* background: #000 !important; */
+    /* color: #ccc !important; */
+    text-shadow: none;
+    vertical-align: middle;
+    font-weight: bold;
+    color: #ffffff !important;
+    border-radius: 4px;
+    background-image: linear-gradient(120deg, #f7415f, #ca3b3d);
+}
+
+}
 
 </style>
 <div class="jsx-3819228898">
@@ -181,11 +328,13 @@ video.jsx-3382097194 {
             <header class="share-layout-header bottom-line share-header">
                 <div class="jsx-2177493926 jsx-578937417 avatar round userProfilAvator" style="background-image: url({{ category_details.category_image}}); "></div>
                 <div class="share-info">
-
-                    <h1 class="share-title headingMargin"> @{{category_details.slug}}</h1> 
-                    <p class="count-infos"><span class="number"></span><span class="unit"> {{category_details.view_count | shorcountertopic}} Views</span><span class="number"> </span>
+                    <h1 class="share-title headingMargin">{% category_title_by_language category_details LANGUAGE_CODE|language_name %}</h1>
+                    <!-- <h5 class="share-title headingMargin"> @{{category_details.slug}}</h5> --> 
+                    <p class="count-infos"><span class="number"></span><span class="unit"> {{category_details.view_count | shorcountertopic}} {% trans "Views" %}</span><span class="number"> </span>
                         <span class="unit">
-                            <button onclick="follow_category('{{category_details.id}}');" class="_4jy1 _4jy4 _517h _51sy _42ft " type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-{{category_details.id}} followCheck sx_5da455"></i><span class="btnTextChange-{{category_details.id}}">Follow</span>
+                            <button onclick="follow_category('{{category_details.id}}');" class="_4jy1 _4jy4 _517h _51sy _42ft " type="submit" value="1">
+                                <i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-{{category_details.id}} followCheck sx_5da455"></i>
+                                <span class="btnTextChange-{{category_details.id}}" id="followCategoryStatus-{{category_details.id}}">{% trans "Follow" %}</span>
                             </button>
                         </span>
                     </p>
@@ -196,7 +345,7 @@ video.jsx-3382097194 {
 
                 <div class="jsx-2893588005 video-feed" id="categoryVideosListId">
                     <div class="_scroll_load_more_loading_user_videos center">
-                        <div class="boloindya-loading">Loading...</div>
+                        <div class="boloindya-loading"></div>
                     </div>
                 </div>
             </main>
@@ -244,10 +393,12 @@ video.jsx-3382097194 {
             <div class="jsx-3336228099 download-container card">
 
                 <div class="jsx-3336228099 download-content download-link">
+                    <h3 class="_download_title">{% trans "Get the App" %}</h3>
                     <div class="jsx-3336228099 download-wrapper">
-                        <a href="https://app.appsflyer.com/id835599320" target="_blank" rel="nofollow" class="jsx-3336228099"><img src="//sf-tb-sg.ibytedtos.com/obj/ttfe-malisg/store-badge/apple/en.png" alt="apple-store" class="jsx-3336228099"></a>
-                        <a href="https://app.appsflyer.com/com.zhiliaoapp.musically" target="_blank" rel="nofollow" class="jsx-3336228099"><img src="//sf-tb-sg.ibytedtos.com/obj/ttfe-malisg/store-badge/google/en.png" alt="google-store" class="jsx-3336228099"></a>
-                        <a href="https://www.amazon.com/dp/B0117U0G3M/" target="_blank" rel="nofollow" class="jsx-3336228099"><img src="//sf-tb-sg.ibytedtos.com/obj/ttfe-malisg/store-badge/amazon/en.png" alt="amazon-store" class="jsx-3336228099"></a>
+
+<!--                         <a href="https://app.appsflyer.com/id835599320" target="_blank" rel="nofollow" class="jsx-3336228099"><img src="//sf-tb-sg.ibytedtos.com/obj/ttfe-malisg/store-badge/apple/en.png" alt="apple-store" class="jsx-3336228099"></a> -->
+                        <a href="https://play.google.com/store/apps/details?id=com.boloindya.boloindya&hl=en_IN" target="_blank" rel="nofollow" class="jsx-3336228099"><img src="//sf-tb-sg.ibytedtos.com/obj/ttfe-malisg/store-badge/google/en.png" alt="google-store" class="jsx-3336228099"></a>
+<!--                         <a href="https://www.amazon.com/dp/B0117U0G3M/" target="_blank" rel="nofollow" class="jsx-3336228099"><img src="//sf-tb-sg.ibytedtos.com/obj/ttfe-malisg/store-badge/amazon/en.png" alt="amazon-store" class="jsx-3336228099"></a> -->
                     </div>
                 </div>
             </div>

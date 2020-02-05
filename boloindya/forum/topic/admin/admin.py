@@ -1,6 +1,7 @@
 # from utils import admin_all
 from forum.topic.models import *
 from django.contrib import admin
+from drf_spirit.views import check_hashtag
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
 from forum.topic.models import Topic, Notification, ShareTopic, CricketMatch, Poll, Choice, Voting, Leaderboard,\
@@ -25,6 +26,8 @@ class TopicChangeListForm(forms.ModelForm):
     title = forms.CharField(required = True)
     language_id = forms.ChoiceField(choices = language_options,required = True)
     is_pubsub_popular_push = forms.BooleanField(required = False)
+    is_monetized = forms.BooleanField(required = False)
+    is_removed = forms.BooleanField(required = False)
     is_moderated = forms.BooleanField(required = False)
     # is_popular = forms.BooleanField(required = False)
 
@@ -49,8 +52,9 @@ class TopicChangeList(ChangeList):
         # super(TopicChangeList, self).__init__(request, model, list_display, list_display_links,
         #     list_filter, date_hierarchy, search_fields, list_select_related,
         #     list_per_page, list_max_show_all, list_editable, model_admin)
-        self.list_display = ('action_checkbox', 'id', 'title', 'name', 'duration', 'language_id', 'view_count',\
-            'comments', 'is_moderated', 'is_monetized', 'is_removed', 'is_pubsub_popular_push', 'date', 'm2mcategory') #is_popular
+        # action_checkbox
+        self.list_display = ('vb_list', 'id', 'title', 'name', 'duration', 'show_thumbnail', 'language_id', 'imp_count',\
+            'is_moderated', 'is_monetized', 'is_removed', 'is_pubsub_popular_push', 'date', 'm2mcategory') #is_popular
         self.list_display_links = ['id']
         self.list_editable = ('title', 'language_id', 'm2mcategory', 'is_pubsub_popular_push', 'is_monetized', 'is_removed', \
                 'is_moderated')
@@ -97,7 +101,7 @@ class TopicChangeList(ChangeList):
 class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExportModelAdmin" NOT "admin.ModelAdmin"
     ordering = ['is_vb', '-id']
     search_fields = ('title', 'user__username', 'user__st__name', )
-    list_filter = (('date', DateRangeFilter), 'language_id', 'm2mcategory', 'is_moderated', 'is_monetized', 'is_removed','is_popular' )
+    list_filter = (('date', DateRangeFilter), 'language_id', 'm2mcategory', 'is_moderated', 'is_monetized', 'is_removed', 'is_popular')
     filter_horizontal = ('m2mcategory', )
 
     fieldsets = (
@@ -131,37 +135,52 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
     duration.short_description = "duration"
     duration.admin_order_field = 'media_duration'
 
+    def vb_list(self, obj):
+        return '<a href="?user_id=' + str(obj.user.id) +'" target="_blank" style="background-position: \
+                0 -834px;background-image: url(/static/grappelli/images/icons-small-sf6f04fa616.png);\
+                background-repeat: no-repeat;height: 20px;display: block;"></a>'
+    vb_list.allow_tags = True
+    vb_list.short_description = "VB"
+    
+    def show_thumbnail(self, obj):
+        if obj.question_image:
+            return """<div style="background: url('""" + obj.question_image + """');width: 100%;
+                    height: 56px;background-size: 100%;"></div>"""
+        return '<div style="width: 30px;height: 30px;"></div>'
+    show_thumbnail.allow_tags = True
+    show_thumbnail.short_description = "IMG"
+
     def comments(self, obj):
         return obj.comments()
     comments.short_description = "comments"
     comments.admin_order_field = 'comment_count'
 
-    actions = ['remove_selected', 'remove_from_monetization', 'restore_selected', 'add_monetization']
-    def remove_selected(self, request, queryset):
-        for each_obj in queryset:
-            if not each_obj.is_removed:
-                each_obj.delete()
-    remove_selected.short_description = "Delete selected Records!"
+    actions = [] # ['remove_selected', 'remove_from_monetization', 'restore_selected', 'add_monetization']
+    # def remove_selected(self, request, queryset):
+    #     for each_obj in queryset:
+    #         if not each_obj.is_removed:
+    #             each_obj.delete()
+    # remove_selected.short_description = "Delete selected Records!"
 
-    def remove_from_monetization(self, request, queryset):
-        for each_obj in queryset:
-            if each_obj.is_monetized:
-                each_obj.no_monetization()
-    remove_from_monetization.short_description = "Remove from Monetization!"
+    # def remove_from_monetization(self, request, queryset):
+    #     for each_obj in queryset:
+    #         if each_obj.is_monetized:
+    #             each_obj.no_monetization()
+    # remove_from_monetization.short_description = "Remove from Monetization!"
 
-    def restore_selected(self, request, queryset):
-        for each_obj in queryset:
-            if each_obj.is_removed:
-                each_obj.restore()
-    restore_selected.short_description = "Restore selected Records (No Monetization)!"
+    # def restore_selected(self, request, queryset):
+    #     for each_obj in queryset:
+    #         if each_obj.is_removed:
+    #             each_obj.restore()
+    # restore_selected.short_description = "Restore selected Records (No Monetization)!"
 
-    def add_monetization(self, request, queryset):
-        for each_obj in queryset:
-            if each_obj.is_removed:
-                each_obj.restore()
-            if not each_obj.is_monetized:
-                each_obj.add_monetization()
-    add_monetization.short_description = "Restore & Add to Monetization!"
+    # def add_monetization(self, request, queryset):
+    #     for each_obj in queryset:
+    #         if each_obj.is_removed:
+    #             each_obj.restore()
+    #         if not each_obj.is_monetized:
+    #             each_obj.add_monetization()
+    # add_monetization.short_description = "Restore & Add to Monetization!"
 
     def get_actions(self, request):
         actions = super(TopicAdmin, self).get_actions(request)
@@ -177,10 +196,32 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
             obj.is_pubsub_popular_push = form.cleaned_data['is_pubsub_popular_push']
         if 'is_moderated' in form.changed_data:
             obj.is_moderated = form.cleaned_data['is_moderated']
-        # if 'is_popular' in form.changed_data:
-        #     obj.is_popular = form.cleaned_data['is_popular']
-        #     if obj.is_popular and obj.is_vb and not obj.is_removed:
-        #         obj.is_pubsub_popular_push = True
+        if 'is_monetized' in form.changed_data:
+            obj.is_monetized = form.cleaned_data['is_monetized']
+            if obj.is_monetized:
+                if obj.is_removed:
+                    obj.restore()
+                obj.add_monetization()
+            else:
+                obj.no_monetization()
+
+        if 'is_removed' in form.changed_data:
+            obj.is_removed = form.cleaned_data['is_removed']
+            if obj.is_removed:
+                obj.delete()
+            else:
+                obj.restore()
+
+        if 'title' in form.changed_data:
+            tag_list = obj.title.split()
+            hash_tag = tag_list
+            if tag_list:
+                for index, value in enumerate(tag_list):
+                    if value.startswith("#"):
+                        tag_list[index]='<a href="/get_challenge_details/?ChallengeHash='+value.strip('#')+'">'+value+'</a>'
+                title = " ".join(tag_list)
+                obj.title = title[0].upper()+title[1:]
+
         obj.save()
         if 'language_id' in form.changed_data and obj.is_monetized:
             if form.initial['language_id'] == '1':
@@ -255,6 +296,21 @@ class PollAdmin(admin.ModelAdmin):
             'fields': ('is_evaluated', 'is_active'),
         }),
     )
+
+class JonOpeningAdmin(admin.ModelAdmin):
+    list_display = ('title', 'expiry_date', 'publish_status')
+    def get_actions(self, request):
+        #Disable delete
+        actions = super(JonOpeningAdmin, self).get_actions(request)
+        del actions['delete_selected']
+        return actions
+    def has_delete_permission(self, request, obj=None):
+        #Disable delete
+        return False
+
+class JobRequestAdmin(admin.ModelAdmin):
+    list_display = ('name', 'email', 'mobile')
+
 admin.site.register(Poll, PollAdmin)
 
 admin.site.register(Topic, TopicAdmin)
@@ -264,6 +320,6 @@ admin.site.register(Voting)
 admin.site.register(Leaderboard)
 admin.site.register(VBseen)
 admin.site.register(TongueTwister)
-admin.site.register(JobOpening)
-admin.site.register(JobRequest)
+admin.site.register(JobOpening,JonOpeningAdmin)
+admin.site.register(JobRequest,JobRequestAdmin)
 

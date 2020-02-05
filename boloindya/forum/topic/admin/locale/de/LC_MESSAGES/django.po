@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Spirit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-12 17:26+0530\n"
+"POT-Creation-Date: 2020-01-20 11:35+0530\n"
 "PO-Revision-Date: 2015-10-14 19:37+0000\n"
 "Last-Translator: Esteban M. Castro Borsani <ecastroborsani@gmail.com>\n"
 "Language-Team: German (http://www.transifex.com/spirit-project/spirit/"
@@ -15,12 +15,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: forum/topic/admin/admin.py:90
+#: forum/topic/admin/admin.py:91
 #, python-format
 msgid "Select %s"
 msgstr ""
 
-#: forum/topic/admin/admin.py:92
+#: forum/topic/admin/admin.py:93
 #, python-format
 msgid "Select %s to change"
 msgstr ""

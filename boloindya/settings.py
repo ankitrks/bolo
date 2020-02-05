@@ -224,6 +224,10 @@ CACHES.update({
     }
 })
 
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
+REDIS_DB = 0
+
 FCM_APIKEY = "AIzaSyBMF3hxMosSjE-95inmJTcaR-rNEWn2zpQ"
 FCM_DEVICE_MODEL = 'jarvis.FCMDevice'
 
@@ -327,17 +331,33 @@ TIME_ZONE = 'Asia/Kolkata'
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
 
-LANGUAGES = [
-    ('en', _('English')),
-    ('hi', _('Hindi')),
-    ('ta', _('Tamil')),
-    ('te', _('Telgu')),
-    ('bn', _('Bengali')),
-    ('kn', _('Kannada')),
-    ('ml', _('Malayalam')),
-    ('mr', _('Marathi')),
+LANGUAGE_OPTIONS = (
+    ('1', "English", "en"),
+    ('2', "Hindi", "hi"),
+    ('3', "Tamil", "ta"),
+    ('4', "Telugu", "te"),
+    ('5', "Bengali", "bn"),
+    ('6', "Kannada", "kn"),
+    ('7', "Malayalam", "ml"),
+    # ('8', "Gujarati", "gu"),
+    ('9', "Marathi", "mr"),
+)
 
-]
+LANGUAGES = [(each_rec[2], _(each_rec[1])) for each_rec in LANGUAGE_OPTIONS]
+
+#LANGUAGES_WITH_ID = {(each_rec[2], (each_rec[0])) for each_rec in LANGUAGE_OPTIONS}
+
+# LANGUAGES = [
+#     ('en', _('English')),
+#     ('hi', _('Hindi')),
+#     ('ta', _('Tamil')),
+#     ('te', _('Telgu')),
+#     ('bn', _('Bengali')),
+#     ('kn', _('Kannada')),
+#     ('ml', _('Malayalam')),
+#     ('mr', _('Marathi')),
+
+# ]
 #('gu', _('Gujarati')) 
 LANGUAGES_WITH_ID = {
     'en' : '1',
@@ -352,6 +372,7 @@ LANGUAGES_WITH_ID = {
 }
 
 LANGUAGE_CODE = 'en-us'
+
 
 LOCALE_PATHS = (
     os.path.join(BASE_DIR, 'locale'),
@@ -376,7 +397,7 @@ MEDIA_ROOT = os.path.join(PROJECT_PATH, ENV, 'media')
 # trailing slash.
 # Examples: "http://example.com/media/", "http://media.example.com/"
 MEDIA_URL = '/media/'
-MEDIA_UPLOAD_DOC_PATH = 'media/documents/'
+MEDIA_UPLOAD_DOC_PATH = 'documents/'
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
@@ -430,10 +451,22 @@ TWO_FACTOR_SMS_TEMPLATE = "BoloIndyaOTP"
 
 #### Rest Framework Settings ###
 import datetime
+INSTALLED_APPS += [
+    'rest_framework_datatables',
+]
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework_simplejwt.authentication.JWTAuthentication',],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 15
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+        'rest_framework_datatables.renderers.DatatablesRenderer',
+    ),
+    'DEFAULT_FILTER_BACKENDS': (
+        'rest_framework_datatables.filters.DatatablesFilterBackend',
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework_datatables.pagination.DatatablesLimitOffsetPagination',
+    'PAGE_SIZE': 15,
 }
 # JWT_AUTH = {
 #     # how long the original token is valid for
@@ -487,4 +520,71 @@ PREDICTION_START_HOUR = 3
 
 CAREERANNA_VIDEOFILE_UPDATE_URL = "https://www.careeranna.com/search/insertOrUpdateFreeVideo"
 SITE_ID = 2
+
+
+LOG_DIRS = ['/var/log/boloindya/']
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '%(levelname)s %(asctime)s  %(message)s'
+        },
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(name)s %(filename)s %(funcName)s %(lineno)d %(message)s'
+        },
+    },
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            #'class': 'django_db_logger.db_log_handler.DatabaseLogHandler',
+            'class': 'logging.FileHandler',
+            'filename': LOG_DIRS[0] + 'debug.log' ,
+            'formatter': 'verbose'
+        },
+        'console': {
+            'level': 'INFO',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        },
+        'request_handler': {
+                'level':'INFO',
+                'class':'logging.handlers.RotatingFileHandler',
+                'filename': LOG_DIRS[0] + 'django_request.log',
+                'formatter':'verbose',
+        },
+    },
+    'loggers': {
+
+        'boloindya': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True
+        },
+
+        'django.request':{
+             'handlers':['file'],
+             'level':'INFO',
+             'propagate':True,
+        },
+
+        'logger.log': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True
+        },
+
+    },
+}
+
+import logging
+log = logging.getLogger('boloindya')
+
 

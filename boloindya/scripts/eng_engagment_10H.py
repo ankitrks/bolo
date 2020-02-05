@@ -121,7 +121,7 @@ def action_seen(user_id,topic_id):
        vbseen = VBseen.objects.create(user_id = user_id,topic_id = topic_id)
     topic.view_count = F('view_count')+1
     topic.save()
-    userprofile = get_userprofile(user_id)
+    userprofile = get_userprofile(topic.user.id)
     userprofile.view_count = F('view_count')+1
     userprofile.save()
 

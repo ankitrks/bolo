@@ -19,8 +19,8 @@ import time
 import re
 from django.db.models import Q
 from drf_spirit.views import getVideoLength
-from drf_spirit.utils  import calculate_encashable_details,language_options
-from forum.user.models import UserProfile, ReferralCode, ReferralCodeUsed, VideoCompleteRate, VideoPlaytime
+from drf_spirit.utils  import calculate_encashable_details,language_options,check_or_create_user_pay
+from forum.user.models import UserProfile, ReferralCode, ReferralCodeUsed, VideoCompleteRate, VideoPlaytime,UserPay
 from forum.topic.models import Topic, VBseen
 from forum.category.models import Category
 from django.contrib.auth.models import User
@@ -48,7 +48,7 @@ from itertools import groupby
 from django.db.models import Count
 import ast
 from drf_spirit.serializers import VideoCompleteRateSerializer
-from .forms import VideoUploadTranscodeForm,TopicUploadTranscodeForm
+from .forms import VideoUploadTranscodeForm,TopicUploadTranscodeForm,UserPayForm
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
 from django.core.files.base import ContentFile
 from drf_spirit.serializers import UserWithUserSerializer
@@ -370,6 +370,41 @@ def get_accepted_kyc_user_list(request):
     if request.user.is_superuser:
         all_kyc = UserKYC.objects.filter(is_kyc_completed=True)
         return render(request,'jarvis/pages/userkyc/accepted_kyc.html',{'all_kyc':all_kyc})
+
+def get_user_pay_details(request):
+    if request.user.is_superuser:
+        return render(request,'jarvis/pages/payment/user_pay.html')
+
+def get_single_user_pay_details(request):
+    if request.user.is_superuser:
+        username = request.GET.get('username',None)
+        all_pay = UserPay.objects.filter(user__username = username).order_by('-id')
+        user = User.objects.get(username=username)
+        from datetime import datetime
+        now = datetime.now()
+        check_or_create_user_pay(user.id,'01-'+str(now.month)+'-'+str(now.year))
+        user_pay_form = UserPayForm()
+        return render(request,'jarvis/pages/payment/single_user_pay.html',{'all_pay':all_pay,'userprofile':user.st,'payment_form':user_pay_form})
+
+def add_user_pay(request):
+    if request.user.is_superuser:
+        user_pay_id = request.POST.get('user_pay_id',None)
+        amount_pay = request.POST.get('amount_pay',0)
+        transaction_id = request.POST.get('transaction_id',None)
+        if not user_pay_id:
+            return HttpResponse(json.dumps({'is_success':'fail','reason':'pay_id missing'}),content_type="application/json")
+        user_pay = UserPay.objects.get(pk=user_pay_id)
+        if not user_pay.is_evaluated:
+            return HttpResponse(json.dumps({'is_success':'fail','reason':'pay not evaluated for this month'}),content_type="application/json")
+        user_pay.amount_pay = int(amount_pay)
+        user_pay.transaction_id = transaction_id
+        user_pay.is_paid = True
+        from datetime import datetime
+        user_pay.pay_date = datetime.now()
+        user_pay.save()
+        return HttpResponse(json.dumps({'is_success':'success'}),content_type="application/json")
+
+
 
 def get_kyc_of_user(request):
     if request.user.is_superuser or request.user.is_staff:
@@ -976,7 +1011,7 @@ def rotateImage(virtual_thumb_file,rotationAngle):
 
     image = Image.open(lf)
     image = image.rotate(int(rotationAngle), PIL.Image.NEAREST, expand=True)
-    fileNewPath="temp/"+file_name
+    fileNewPath=settings.BASE_DIR+"/temp/"+file_name
     image.save(fileNewPath)
     image.close()
     return fileNewPath
@@ -1023,7 +1058,7 @@ def notification_panel(request):
     filters = {'language': lang, 'notification_type': notification_type, 'user_group': user_group, 'is_scheduled': scheduled_status, 'title__icontains': title}
 
     pushNotifications = PushNotification.objects.filter(*[Q(**{k: v}) for k, v in filters.items() if v], is_removed=False).order_by('-created_at')
-
+    
     return render(request,'jarvis/pages/notification/index.html', {'pushNotifications': pushNotifications, \
         'language_options': language_options, 'notification_types': notification_type_options, \
             'user_group_options': user_group_options, 'language': lang, 'notification_type': notification_type, \
@@ -1045,28 +1080,43 @@ def send_notification(request):
         data['upper_title'] = request.POST.get('upper_title', "")
         data['notification_type'] = request.POST.get('notification_type', "")
         data['id'] = request.POST.get('id', "")
+        data['particular_user_id'] = request.POST.get('particular_user_id', "")
         data['user_group'] = request.POST.get('user_group', "")
         data['lang'] = request.POST.get('lang', "")
+        data['category'] = request.POST.get('category', "")
         data['schedule_status'] = request.POST.get('schedule_status', "")
         data['datepicker'] = request.POST.get('datepicker', '')
         data['timepicker'] = request.POST.get('timepicker', '').replace(" : ", ":")
-
+        data['image_url'] = request.POST.get('image_url', '')
         send_notifications_task.delay(data, pushNotification)
-
         return redirect('/jarvis/notification_panel/')
-
     if request.method == 'GET':
         id = request.GET.get('id', None)
-        try:
+        try:    
             pushNotification = PushNotification.objects.get(pk=id)
         except Exception as e:
             print e
-    return render(request,'jarvis/pages/notification/send_notification.html', { 'language_options': language_options, 'user_group_options' : user_group_options, 'notification_types': notification_type_options, 'pushNotification': pushNotification })
+        categories = Category.objects.filter(parent__isnull=False)
+
+    return render(request,'jarvis/pages/notification/send_notification.html', { 'language_options': language_options, 'user_group_options' : user_group_options, 'notification_types': notification_type_options, 'pushNotification': pushNotification, 'categories': categories})
+
+
 
 @login_required
-def particular_notification(request, notification_id=None):
+def particular_notification(request, notification_id=None, status_id=2, page_no=1):
+    import math  
     pushNotification = PushNotification.objects.get(pk=notification_id)
-    return render(request,'jarvis/pages/notification/particular_notification.html', {'pushNotification': pushNotification})
+    page_no=int(page_no)-1
+    has_prev=False
+    if page_no > 0:
+        has_prev=True
+    pushNotificationUser=PushNotificationUser.objects.filter(push_notification_id=pushNotification)
+    pushNotificationUserSlice=pushNotificationUser[page_no*10:page_no*10+10]
+    has_next=True
+    if ((page_no*10)+10) >= len(pushNotificationUser):
+        has_next=False
+    total_page=int(math.ceil(len(pushNotificationUser)/10))+1
+    return render(request,'jarvis/pages/notification/particular_notification.html', {'pushNotification': pushNotification, 'status_id': status_id, 'pushNotificationUser': pushNotificationUserSlice, 'page_no': page_no + 2, 'prev_page_no': page_no , 'count': len(pushNotificationUser), 'has_prev': has_prev, 'has_next': has_next, 'notification_id': notification_id, 'status_id': status_id, 'total_page': total_page, 'current_page': page_no + 1})
 
 from rest_framework.decorators import api_view
 
@@ -1074,11 +1124,17 @@ from rest_framework.decorators import api_view
 def create_user_notification_delivered(request):
     notification_id = request.POST.get('notification_id', "")
 
-    pushNotificationUser = PushNotificationUser()
+    pushNotification=[]
     if request.user:
-        print(request.user)
+        try:
+            pushNotificationUser = PushNotificationUser.objects.get(push_notification_id=pushNotification, user=request.user)
+        except:
+            pushNotificationUser = PushNotificationUser()
         pushNotificationUser.user = request.user
+    else:
+        pushNotificationUser = PushNotificationUser()
     pushNotification = PushNotification.objects.get(pk=notification_id)
+    pushNotificationUser.status='0'
     pushNotificationUser.push_notification_id = pushNotification
     pushNotificationUser.save()
 
@@ -1297,18 +1353,18 @@ def video_statistics(request):
     return render(request,'jarvis/pages/video_statistics/video_statistics.html')
 
 month_map = {
-    "1" : "Jan 2019",
-    "2" : "Feb 2019",
-    "3" : "Mar 2019",
-    "4" : "Apr 2019",
-    "5" : "May 2019",
-    "6" : "Jun 2019",
-    "7" : "July 2019",
-    "8" : "Aug 2019",
-    "9" : "Sep 2019",
-    "10" : "Oct 2019",
-    "11" : "Nov 2019",
-    "12" : "Dec 2019",
+    "1" : "Jan",
+    "2" : "Feb",
+    "3" : "Mar",
+    "4" : "Apr",
+    "5" : "May",
+    "6" : "Jun",
+    "7" : "July",
+    "8" : "Aug",
+    "9" : "Sep",
+    "10" : "Oct",
+    "11" : "Nov",
+    "12" : "Dec",
 }
 
 def months_between(start_date, end_date):
@@ -1319,7 +1375,7 @@ def months_between(start_date, end_date):
     cursor = start
     while cursor <= end:
         if cursor.month not in months:
-            months.append(cursor.month)
+            months.append([cursor.month, cursor.year])
         cursor += timedelta(weeks=1)
     return months
 
@@ -1335,28 +1391,39 @@ def statistics_all(request):
     if data_view == 'daily':
         data_view = 'monthly'
     start_date = request.GET.get('start_date', '2019-05-01')
-    end_date = request.GET.get('end_date', '2019-12-31')
+    end_date = request.GET.get('end_date', None)
     if not start_date:
         start_date = '2019-05-01'
     if not end_date:
-        end_date = '2019-12-31'
+        end_date = (datetime.datetime.today() - timedelta(days = 1)).strftime("%Y-%m-%d")
 
+    end_date_obj = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
+    if end_date_obj >= datetime.datetime.today().date():
+        end_date = (datetime.datetime.today() - timedelta(days = 1)).strftime("%Y-%m-%d")
+
+    end_date_obj = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
+    if end_date_obj >= datetime.datetime.today().date():
+        end_date = (datetime.datetime.today() - timedelta(days = 1)).strftime("%Y-%m-%d")
+
+    top_start = (datetime.datetime.today() - timedelta(days = 30)).date()
+    top_end = (datetime.datetime.today() - timedelta(days = 1)).date()
     for each_opt in metrics_options:
         temp_list = []
         temp_list.append( each_opt[0] )
         temp_list.append( each_opt[1] )
-        temp_list.append( DashboardMetrics.objects.filter(metrics = each_opt[0])\
+        temp_list.append( DashboardMetrics.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0])\
                 .aggregate(total_count = Sum('count'))['total_count'] )
         top_data.append( temp_list ) 
         if metrics == each_opt[0]:
             data['graph_title'] = each_opt[1]
     data['top_data'] = top_data
 
-    graph_data = DashboardMetrics.objects.filter(Q(metrics = metrics) & Q(date__gte = start_date) & Q(date__lte = end_date))
-    if metrics in ['4', '2'] and slab:
-        if (metrics == '4' and slab in ['0', '1', '2']) or (metrics == '2' and slab in ['3', '4', '5']):
+    graph_data = DashboardMetrics.objects.exclude(date__gt = end_date).filter(Q(metrics = metrics) & Q(date__gte = start_date) & Q(date__lte = end_date))
+    if metrics in ['4', '2', '5'] and slab:
+        if (metrics == '4' and slab in ['0', '1', '2']) or (metrics == '2' and slab in ['3', '4', '5'])\
+                 or (metrics == '5' and slab in ['6', '7']):
             graph_data = graph_data.filter(metrics_slab = slab)
-    
+
     if data_view == 'weekly':
         x_axis = []
         y_axis = []
@@ -1365,20 +1432,27 @@ def statistics_all(request):
             x_axis.append(str("week " + str(each_week_no)))
             y_axis.append(graph_data.filter(week_no = each_week_no).aggregate(total_count = Sum('count'))['total_count'])
 
-    elif data_view == 'monthly':
+    # elif data_view == 'monthly':
+    else:
         x_axis = []
         y_axis = []
         month_no = months_between(start_date, end_date)
         for each_month_no in month_no:
-            x_axis.append(str(month_map[str(each_month_no)]))
-            y_axis.append(graph_data.filter(date__month = each_month_no).aggregate(total_count = Sum('count'))['total_count'])
-    
-    else:
-        x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
-        y_axis = graph_data.values_list('count', flat = True)
-    
-    data['x_axis'] = list(x_axis)
-    data['y_axis'] = list(y_axis)
+            x_axis.append(str(str(month_map[str(each_month_no[0])]) + " " + str(each_month_no[1])))
+            y_axis.append(graph_data.filter(date__month = each_month_no[0]).aggregate(total_count = Sum('count'))['total_count'])
+    # else:
+    #     x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
+    #     y_axis = graph_data.values_list('count', flat = True)
+    data['metrics'] = metrics
+    data['slab'] = slab
+    data['data_view'] = data_view
+    # data['x_axis'] = list(x_axis)
+    # data['y_axis'] = list(y_axis)
+    from collections import OrderedDict
+    chart_data = OrderedDict()
+    for i in range(len(x_axis)):
+        chart_data[x_axis[i]] = y_axis[i]
+    data['chart_data'] = [[str(data_view), str(data['graph_title'])]] + [list(ele) for ele in chart_data.items()] 
     data['start_date'] = start_date
     data['end_date'] = end_date
     data['slabs'] = []
@@ -1387,6 +1461,8 @@ def statistics_all(request):
         data['slabs'] = [metrics_slab_options[0], metrics_slab_options[1], metrics_slab_options[2]]
     if metrics == '2':
         data['slabs'] = [metrics_slab_options[3], metrics_slab_options[4], metrics_slab_options[5]]
+    if metrics == '5':
+        data['slabs'] = [metrics_slab_options[6], metrics_slab_options[7], metrics_slab_options[8]]
 
     return render(request,'jarvis/pages/video_statistics/statistics_all.html', data)
 
@@ -1597,4 +1673,27 @@ def search_notification(request):
     except Exception as e:
         print(e)
         return JsonResponse({'data': []}, status=status.HTTP_200_OK)
-    
+
+@api_view(['POST'])
+def upload_image_notification(requests):
+    if requests.is_ajax():
+        file=requests.FILES['file']
+        print(file)
+        data=upload_thumbail_notification(file, 'boloindyapp-prod')
+        try:
+            return JsonResponse({'data': data}, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(e)
+
+def upload_thumbail_notification(virtual_thumb_file,bucket_name):
+    try:
+        bucket_credentials = get_bucket_details(bucket_name)
+        client = boto3.client('s3',aws_access_key_id=bucket_credentials['AWS_ACCESS_KEY_ID'],aws_secret_access_key=bucket_credentials['AWS_SECRET_ACCESS_KEY'])
+        ts = time.time()
+        final_filename = "img-" + str(ts).replace(".", "")  + ".jpg"
+        client.put_object(Bucket=bucket_credentials['AWS_BUCKET_NAME'], Key='notification/'+final_filename, Body=virtual_thumb_file, ACL='public-read')
+        filepath = "https://"+bucket_credentials['AWS_BUCKET_NAME']+".s3.amazonaws.com/notification/"+final_filename
+        return filepath
+    except Exception as e:
+        print(e)
+        return None

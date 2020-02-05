@@ -147,6 +147,7 @@ user_group_options = (
     ('5', "Signed up but no opening of app since 72 hours "),
     ('6', "Never created a video"),
     ('7', "Test User"),
+    ('8', "Particular User")
 )
 
 notification_type_options = (
@@ -160,6 +161,7 @@ notification_type_options = (
 status_options = (
     ('0', "Not Opened"),
     ('1', "Opened"),
+    ('2', 'Sent')
 )
 
 metrics_options = (
@@ -168,6 +170,9 @@ metrics_options = (
     ('2', "Bolo Actions"),
     ('3', "Video Shares"),
     ('4', "Video Creators"),
+    ('5', "Number of Installs"),
+    ('6', "Monthly Active Users"),
+    ('7', "Unique Video Views"),
 )
 
 metrics_slab_options = (
@@ -177,6 +182,9 @@ metrics_slab_options = (
     ('3', "Likes"),
     ('4', "Comments"),
     ('5', "Shares"),
+    ('6', "Organic"),
+    ('7', "Paid"),
+    ('t', "Total"),
 )
 
 
@@ -199,9 +207,11 @@ class PushNotification(RecordTimeStamp):
     language = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='0')
     notification_type = models.CharField(choices=notification_type_options, blank = True, null = True, max_length=10, default='4')
     instance_id = models.CharField('instance_id', blank = True, null = True, max_length=40, default='')
+    category = models.ForeignKey('forum_category.Category', verbose_name=_("category"), related_name="category_notification",null=True,blank=True)
     user_group = models.CharField(choices=user_group_options, blank = True, null = True, max_length=10, default='0')
     scheduled_time = models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False)
     is_scheduled = models.BooleanField(default=False)
+    image_url = models.CharField(_('image_url'),max_length=1000,null=True,blank=True)
     is_removed = models.BooleanField(default=False)
     is_executed = models.BooleanField(default=False)
     repeated_hour = models.PositiveIntegerField(null=True,blank=True,default=0)
@@ -230,5 +240,6 @@ class StateDistrictLanguage(RecordTimeStamp):
         if not self.district_language:
             self.district_language = self.state_language
         super(StateDistrictLanguage, self).save(*args, **kwargs)
+
 
 
