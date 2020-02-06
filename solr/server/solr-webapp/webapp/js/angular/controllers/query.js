@@ -43,8 +43,7 @@ solrAdminApp.controller('QueryController',
       var copy = function(params, query) {
         for (var key in query) {
           terms = query[key];
-          // Booleans have no length property - only set them if true
-          if (((typeof(terms) == typeof(true) && terms) || terms.length > 0) && key[0]!="$") {
+          if (terms.length > 0 && key[0]!="$") {
             set(key, terms);
           }
         }

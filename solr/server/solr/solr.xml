@@ -28,8 +28,6 @@
 
 <solr>
 
-  <int name="maxBooleanClauses">${solr.max.booleanClauses:1024}</int>
-  
   <solrcloud>
 
     <str name="host">${host:}</str>
@@ -50,7 +48,6 @@
     class="HttpShardHandlerFactory">
     <int name="socketTimeout">${socketTimeout:600000}</int>
     <int name="connTimeout">${connTimeout:60000}</int>
-    <str name="shardsWhitelist">${solr.shardsWhitelist:}</str>
   </shardHandlerFactory>
 
 </solr>

@@ -617,8 +617,8 @@ def upload_n_transcode(request):
         return HttpResponse(json.dumps({'message':'fail','reason':'bucket_missing'}),content_type="application/json")
     if not upload_file:
         return HttpResponse(json.dumps({'message':'fail','reason':'File Missing'}),content_type="application/json")
-    if not upload_file.name.endswith('.mp4'):
-        return HttpResponse(json.dumps({'message':'fail','reason':'This is not a mp4 file'}),content_type="application/json")
+    if not (upload_file.name.endswith('.mp4') or upload_file.name.endswith('.mov')):
+        return HttpResponse(json.dumps({'message':'fail','reason':'This is not a mp4  mov file'}),content_type="application/json")
     if free_video and (not video_title or not video_descp):
         return HttpResponse(json.dumps({'message':'fail','reason':'Title or Description is missing'}),content_type="application/json")
 

@@ -1,73 +1,64 @@
-2020-01-20 08:16:48.576 INFO  (main) [   ] o.e.j.u.log Logging initialized @18490ms to org.eclipse.jetty.util.log.Slf4jLog
-2020-01-20 08:16:48.941 WARN  (main) [   ] o.e.j.x.XmlConfiguration Deprecated method public void org.eclipse.jetty.rewrite.handler.RedirectRegexRule.setReplacement(java.lang.String) in file:///private/var/live_code/boloindya/solr/server/etc/jetty.xml
-2020-01-20 08:16:49.196 WARN  (main) [   ] o.e.j.s.AbstractConnector Ignoring deprecated socket close linger time
-2020-01-20 08:16:49.197 WARN  (main) [   ] o.e.j.x.XmlConfiguration Deprecated method public void org.eclipse.jetty.server.ServerConnector.setSoLingerTime(int) in file:///private/var/live_code/boloindya/solr/server/etc/jetty-http.xml
-2020-01-20 08:16:49.205 INFO  (main) [   ] o.e.j.s.Server jetty-9.4.19.v20190610; built: 2019-06-10T16:30:51.723Z; git: afcf563148970e98786327af5e07c261fda175d3; jvm 1.8.0_192-b12
-2020-01-20 08:16:49.265 INFO  (main) [   ] o.e.j.d.p.ScanningAppProvider Deployment monitor [file:///private/var/live_code/boloindya/solr/server/contexts/] at interval 0
-2020-01-20 08:16:50.697 INFO  (main) [   ] o.e.j.w.StandardDescriptorProcessor NO JSP Support for /solr, did not find org.apache.jasper.servlet.JspServlet
-2020-01-20 08:16:50.723 INFO  (main) [   ] o.e.j.s.session DefaultSessionIdManager workerName=node0
-2020-01-20 08:16:50.723 INFO  (main) [   ] o.e.j.s.session No SessionScavenger set, using defaults
-2020-01-20 08:16:50.747 INFO  (main) [   ] o.e.j.s.session node0 Scavenging every 660000ms
-2020-01-20 08:16:51.124 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter Using logger factory org.apache.logging.slf4j.Log4jLoggerFactory
-2020-01-20 08:16:51.136 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter  ___      _       Welcome to Apache Solr™ version 8.2.0
-2020-01-20 08:16:51.136 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter / __| ___| |_ _   Starting in standalone mode on port 8983
-2020-01-20 08:16:51.136 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter \__ \/ _ \ | '_|  Install dir: /var/live_code/boloindya/solr
-2020-01-20 08:16:51.137 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter |___/\___/_|_|    Start time: 2020-01-20T08:16:51.137Z
-2020-01-20 08:16:51.250 INFO  (main) [   ] o.a.s.c.SolrResourceLoader Using system property solr.solr.home: /var/live_code/boloindya/solr/server/solr
-2020-01-20 08:16:51.268 INFO  (main) [   ] o.a.s.c.SolrXmlConfig Loading container configuration from /var/live_code/boloindya/solr/server/solr/solr.xml
-2020-01-20 08:16:51.485 INFO  (main) [   ] o.a.s.c.SolrXmlConfig MBean server found: com.sun.jmx.mbeanserver.JmxMBeanServer@6f94fa3e, but no JMX reporters were configured - adding default JMX reporter.
-2020-01-20 08:16:52.454 INFO  (main) [   ] o.a.s.h.c.HttpShardHandlerFactory Host whitelist initialized: WhitelistHostChecker [whitelistHosts=null, whitelistHostCheckingEnabled=true]
-2020-01-20 08:16:53.070 WARN  (main) [   ] o.e.j.u.s.S.config Trusting all certificates configured for Client@a22cb6a[provider=null,keyStore=null,trustStore=null]
-2020-01-20 08:16:53.070 WARN  (main) [   ] o.e.j.u.s.S.config No Client EndPointIdentificationAlgorithm configured for Client@a22cb6a[provider=null,keyStore=null,trustStore=null]
-2020-01-20 08:16:53.499 WARN  (main) [   ] o.e.j.u.s.S.config Trusting all certificates configured for Client@3fb6cf60[provider=null,keyStore=null,trustStore=null]
-2020-01-20 08:16:53.499 WARN  (main) [   ] o.e.j.u.s.S.config No Client EndPointIdentificationAlgorithm configured for Client@3fb6cf60[provider=null,keyStore=null,trustStore=null]
-2020-01-20 08:16:58.947 INFO  (main) [   ] o.a.s.c.TransientSolrCoreCacheDefault Allocating transient cache for 2147483647 transient cores
-2020-01-20 08:16:58.952 INFO  (main) [   ] o.a.s.h.a.MetricsHistoryHandler No .system collection, keeping metrics history in memory.
-2020-01-20 08:16:59.225 INFO  (main) [   ] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.node' (registry 'solr.node') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@6f94fa3e
-2020-01-20 08:16:59.226 INFO  (main) [   ] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.jvm' (registry 'solr.jvm') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@6f94fa3e
-2020-01-20 08:16:59.252 INFO  (main) [   ] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.jetty' (registry 'solr.jetty') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@6f94fa3e
-2020-01-20 08:16:59.426 INFO  (main) [   ] o.a.s.c.CorePropertiesLocator Found 1 core definitions underneath /var/live_code/boloindya/solr/server/solr
-2020-01-20 08:16:59.427 INFO  (main) [   ] o.a.s.c.CorePropertiesLocator Cores are: [boloindya]
-2020-01-20 08:16:59.532 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.c.SolrResourceLoader [boloindya] Added 61 libs to classloader, from paths: [/var/live_code/boloindya/solr/contrib/clustering/lib, /var/live_code/boloindya/solr/contrib/extraction/lib, /var/live_code/boloindya/solr/contrib/langid/lib, /var/live_code/boloindya/solr/contrib/velocity/lib, /var/live_code/boloindya/solr/dist]
-2020-01-20 08:16:59.589 INFO  (main) [   ] o.e.j.s.h.ContextHandler Started o.e.j.w.WebAppContext@4d02f94e{/solr,file:///private/var/live_code/boloindya/solr/server/solr-webapp/webapp/,AVAILABLE}{/private/var/live_code/boloindya/solr/server/solr-webapp/webapp}
-2020-01-20 08:16:59.620 INFO  (main) [   ] o.e.j.s.AbstractConnector Started ServerConnector@131ef10{HTTP/1.1,[http/1.1, h2c]}{0.0.0.0:8983}
-2020-01-20 08:16:59.621 INFO  (main) [   ] o.e.j.s.Server Started @29539ms
-2020-01-20 08:17:00.078 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.c.SolrConfig Using Lucene MatchVersion: 8.2.0
-2020-01-20 08:17:00.520 WARN  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.s.ManagedIndexSchemaFactory The schema has been upgraded to managed, but the non-managed schema schema.xml is still loadable.  PLEASE REMOVE THIS FILE.
-2020-01-20 08:17:00.652 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.s.IndexSchema [boloindya] Schema name=default-config
-2020-01-20 08:17:02.282 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.s.IndexSchema Loaded schema default-config/1.6 with uniqueid field id
-2020-01-20 08:17:02.448 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.c.CoreContainer Creating SolrCore 'boloindya' using configuration from instancedir /var/live_code/boloindya/solr/server/solr/boloindya, trusted=true
-2020-01-20 08:17:02.481 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.core.boloindya' (registry 'solr.core.boloindya') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@6f94fa3e
-2020-01-20 08:17:02.531 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.c.SolrCore [[boloindya] ] Opening new SolrCore at [/var/live_code/boloindya/solr/server/solr/boloindya], dataDir=[/var/live_code/boloindya/solr/server/solr/boloindya/data/]
-2020-01-20 08:17:02.643 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.r.XSLTResponseWriter xsltCacheLifetimeSeconds=5
-2020-01-20 08:17:09.380 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.u.UpdateHandler Using UpdateLog implementation: org.apache.solr.update.UpdateLog
-2020-01-20 08:17:09.381 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.u.UpdateLog Initializing UpdateLog: dataDir= defaultSyncLevel=FLUSH numRecordsToKeep=100 maxNumLogsToKeep=10 numVersionBuckets=65536
-2020-01-20 08:17:09.430 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.u.CommitTracker Hard AutoCommit: if uncommitted for 15000ms; 
-2020-01-20 08:17:09.430 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.u.CommitTracker Soft AutoCommit: disabled
-2020-01-20 08:17:09.815 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.s.SolrIndexSearcher Opening [Searcher@5c1c45ec[boloindya] main]
-2020-01-20 08:17:09.843 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.r.ManagedResourceStorage File-based storage initialized to use dir: /var/live_code/boloindya/solr/server/solr/boloindya/conf
-2020-01-20 08:17:09.909 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.h.c.SpellCheckComponent Initializing spell checkers
-2020-01-20 08:17:09.925 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.s.DirectSolrSpellChecker init: {name=default,field=text,classname=solr.DirectSolrSpellChecker,distanceMeasure=internal,accuracy=0.5,maxEdits=2,minPrefix=1,maxInspections=5,minQueryLength=4,maxQueryFrequency=0.01}
-2020-01-20 08:17:09.946 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.h.ReplicationHandler Commits will be reserved for 10000ms.
-2020-01-20 08:17:10.004 INFO  (searcherExecutor-10-thread-1-processing-x:boloindya) [   x:boloindya] o.a.s.c.QuerySenderListener QuerySenderListener sending requests to Searcher@5c1c45ec[boloindya] main{ExitableDirectoryReader(UninvertingDirectoryReader(Uninverting(_2x(8.2.0):C9314:[diagnostics={os=Mac OS X, java.version=1.8.0_192, os.arch=x86_64, java.runtime.version=1.8.0_192-b12, source=merge, os.version=10.15.2, java.vendor=Oracle Corporation, java.vm.version=25.192-b12, lucene.version=8.2.0, mergeMaxNumSegments=-1, mergeFactor=10, timestamp=1579507925522}]:[attributes={Lucene50StoredFieldsFormat.mode=BEST_SPEED}]) Uninverting(_2n(8.2.0):C1000:[diagnostics={java.vendor=Oracle Corporation, os=Mac OS X, java.version=1.8.0_192, java.vm.version=25.192-b12, lucene.version=8.2.0, os.arch=x86_64, java.runtime.version=1.8.0_192-b12, source=flush, os.version=10.15.2, timestamp=1579507908655}]:[attributes={Lucene50StoredFieldsFormat.mode=BEST_SPEED}])))}
-2020-01-20 08:17:10.004 INFO  (searcherExecutor-10-thread-1-processing-x:boloindya) [   x:boloindya] o.a.s.c.QuerySenderListener QuerySenderListener done.
-2020-01-20 08:17:10.004 INFO  (searcherExecutor-10-thread-1-processing-x:boloindya) [   x:boloindya] o.a.s.h.c.SpellCheckComponent Loading spell index for spellchecker: default
-2020-01-20 08:17:10.018 INFO  (searcherExecutor-10-thread-1-processing-x:boloindya) [   x:boloindya] o.a.s.c.SolrCore [boloindya] Registered new searcher Searcher@5c1c45ec[boloindya] main{ExitableDirectoryReader(UninvertingDirectoryReader(Uninverting(_2x(8.2.0):C9314:[diagnostics={os=Mac OS X, java.version=1.8.0_192, os.arch=x86_64, java.runtime.version=1.8.0_192-b12, source=merge, os.version=10.15.2, java.vendor=Oracle Corporation, java.vm.version=25.192-b12, lucene.version=8.2.0, mergeMaxNumSegments=-1, mergeFactor=10, timestamp=1579507925522}]:[attributes={Lucene50StoredFieldsFormat.mode=BEST_SPEED}]) Uninverting(_2n(8.2.0):C1000:[diagnostics={java.vendor=Oracle Corporation, os=Mac OS X, java.version=1.8.0_192, java.vm.version=25.192-b12, lucene.version=8.2.0, os.arch=x86_64, java.runtime.version=1.8.0_192-b12, source=flush, os.version=10.15.2, timestamp=1579507908655}]:[attributes={Lucene50StoredFieldsFormat.mode=BEST_SPEED}])))}
-2020-01-20 08:17:10.343 INFO  (qtp961712517-20) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/select params={q=*beauti*&rows=10&_=1579502705833} hits=27 status=0 QTime=6725
-2020-01-20 08:17:10.420 INFO  (qtp961712517-16) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/select params={q=*beauti*&rows=10&_=1579502705833} hits=27 status=0 QTime=9
-2020-01-20 08:17:10.438 INFO  (qtp961712517-22) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/select params={q=*beauti*&rows=10&_=1579502705833} hits=27 status=0 QTime=6
-2020-01-20 08:17:10.455 INFO  (qtp961712517-20) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/select params={q=*beauti*&rows=10&_=1579502705833} hits=27 status=0 QTime=6
-2020-01-20 08:17:25.732 INFO  (qtp961712517-22) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/select params={q=beauti&rows=10&_=1579502705833} hits=0 status=0 QTime=53
-2020-01-20 08:22:51.064 INFO  (ShutdownMonitor) [   ] o.e.j.s.AbstractConnector Stopped ServerConnector@131ef10{HTTP/1.1,[http/1.1, h2c]}{0.0.0.0:8983}
-2020-01-20 08:22:51.064 INFO  (ShutdownMonitor) [   ] o.e.j.s.session node0 Stopped scavenging
-2020-01-20 08:22:51.071 INFO  (ShutdownMonitor) [   ] o.a.s.c.CoreContainer Shutting down CoreContainer instance=1344697180
-2020-01-20 08:22:51.074 INFO  (coreCloseExecutor-15-thread-1) [   x:boloindya] o.a.s.c.SolrCore [boloindya]  CLOSING SolrCore org.apache.solr.core.SolrCore@1e51fb0c
-2020-01-20 08:22:51.074 INFO  (coreCloseExecutor-15-thread-1) [   x:boloindya] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.core.boloindya, tag=1e51fb0c
-2020-01-20 08:22:51.075 INFO  (coreCloseExecutor-15-thread-1) [   x:boloindya] o.a.s.m.r.SolrJmxReporter Closing reporter [org.apache.solr.metrics.reporters.SolrJmxReporter@42957407: rootName = null, domain = solr.core.boloindya, service url = null, agent id = null] for registry solr.core.boloindya / com.codahale.metrics.MetricRegistry@306a3ee1
-2020-01-20 08:22:51.145 INFO  (ShutdownMonitor) [   ] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.node, tag=null
-2020-01-20 08:22:51.146 INFO  (ShutdownMonitor) [   ] o.a.s.m.r.SolrJmxReporter Closing reporter [org.apache.solr.metrics.reporters.SolrJmxReporter@7b139eab: rootName = null, domain = solr.node, service url = null, agent id = null] for registry solr.node / com.codahale.metrics.MetricRegistry@4e2dcf68
-2020-01-20 08:22:51.151 INFO  (ShutdownMonitor) [   ] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.jvm, tag=null
-2020-01-20 08:22:51.152 INFO  (ShutdownMonitor) [   ] o.a.s.m.r.SolrJmxReporter Closing reporter [org.apache.solr.metrics.reporters.SolrJmxReporter@1ca25c47: rootName = null, domain = solr.jvm, service url = null, agent id = null] for registry solr.jvm / com.codahale.metrics.MetricRegistry@1d249df2
-2020-01-20 08:22:51.156 INFO  (ShutdownMonitor) [   ] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.jetty, tag=null
-2020-01-20 08:22:51.156 INFO  (ShutdownMonitor) [   ] o.a.s.m.r.SolrJmxReporter Closing reporter [org.apache.solr.metrics.reporters.SolrJmxReporter@5fcacc0: rootName = null, domain = solr.jetty, service url = null, agent id = null] for registry solr.jetty / com.codahale.metrics.MetricRegistry@72858b89
-2020-01-20 08:22:51.183 INFO  (ShutdownMonitor) [   ] o.e.j.s.h.ContextHandler Stopped o.e.j.w.WebAppContext@4d02f94e{/solr,null,UNAVAILABLE}{/private/var/live_code/boloindya/solr/server/solr-webapp/webapp}
+2020-02-05 10:58:47.367 INFO  (main) [   ] o.e.j.u.log Logging initialized @6070ms to org.eclipse.jetty.util.log.Slf4jLog
+2020-02-05 10:58:47.648 INFO  (main) [   ] o.e.j.s.Server jetty-9.4.10.v20180503; built: 2018-05-03T15:56:21.710Z; git: daa59876e6f384329b122929e70a80934569428c; jvm 1.8.0_192-b12
+2020-02-05 10:58:47.690 INFO  (main) [   ] o.e.j.d.p.ScanningAppProvider Deployment monitor [file:///private/var/live_code/boloindya/solr/server/contexts/] at interval 0
+2020-02-05 10:58:48.117 INFO  (main) [   ] o.e.j.w.StandardDescriptorProcessor NO JSP Support for /solr, did not find org.apache.jasper.servlet.JspServlet
+2020-02-05 10:58:48.127 INFO  (main) [   ] o.e.j.s.session DefaultSessionIdManager workerName=node0
+2020-02-05 10:58:48.127 INFO  (main) [   ] o.e.j.s.session No SessionScavenger set, using defaults
+2020-02-05 10:58:48.129 INFO  (main) [   ] o.e.j.s.session node0 Scavenging every 660000ms
+2020-02-05 10:58:48.185 INFO  (main) [   ] o.a.s.u.c.SSLCredentialProviderFactory Processing SSL Credential Provider chain: env;sysprop
+2020-02-05 10:58:48.256 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter Using logger factory org.apache.logging.slf4j.Log4jLoggerFactory
+2020-02-05 10:58:48.266 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter  ___      _       Welcome to Apache Solr™ version 7.4.0
+2020-02-05 10:58:48.266 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter / __| ___| |_ _   Starting in standalone mode on port 8983
+2020-02-05 10:58:48.266 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter \__ \/ _ \ | '_|  Install dir: /var/live_code/boloindya/solr
+2020-02-05 10:58:48.267 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter |___/\___/_|_|    Start time: 2020-02-05T10:58:48.267Z
+2020-02-05 10:58:48.302 INFO  (main) [   ] o.a.s.c.SolrResourceLoader Using system property solr.solr.home: /var/live_code/boloindya/solr/server/solr
+2020-02-05 10:58:48.312 INFO  (main) [   ] o.a.s.c.SolrXmlConfig Loading container configuration from /var/live_code/boloindya/solr/server/solr/solr.xml
+2020-02-05 10:58:48.381 INFO  (main) [   ] o.a.s.c.SolrXmlConfig MBean server found: com.sun.jmx.mbeanserver.JmxMBeanServer@442675e1, but no JMX reporters were configured - adding default JMX reporter.
+2020-02-05 10:58:54.870 INFO  (main) [   ] o.a.s.c.TransientSolrCoreCacheDefault Allocating transient cache for 2147483647 transient cores
+2020-02-05 10:58:54.874 INFO  (main) [   ] o.a.s.h.a.MetricsHistoryHandler No .system collection, keeping metrics history in memory.
+2020-02-05 10:58:54.985 INFO  (main) [   ] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.node' (registry 'solr.node') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@442675e1
+2020-02-05 10:58:54.986 INFO  (main) [   ] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.jvm' (registry 'solr.jvm') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@442675e1
+2020-02-05 10:58:55.006 INFO  (main) [   ] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.jetty' (registry 'solr.jetty') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@442675e1
+2020-02-05 10:58:55.038 INFO  (main) [   ] o.a.s.c.CorePropertiesLocator Found 1 core definitions underneath /var/live_code/boloindya/solr/server/solr
+2020-02-05 10:58:55.039 INFO  (main) [   ] o.a.s.c.CorePropertiesLocator Cores are: [boloindya]
+2020-02-05 10:58:55.128 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.c.SolrResourceLoader [boloindya] Added 57 libs to classloader, from paths: [/var/live_code/boloindya/solr/contrib/clustering/lib, /var/live_code/boloindya/solr/contrib/extraction/lib, /var/live_code/boloindya/solr/contrib/langid/lib, /var/live_code/boloindya/solr/contrib/velocity/lib, /var/live_code/boloindya/solr/dist]
+2020-02-05 10:58:55.176 INFO  (main) [   ] o.e.j.s.h.ContextHandler Started o.e.j.w.WebAppContext@58a9760d{/solr,file:///private/var/live_code/boloindya/solr/server/solr-webapp/webapp/,AVAILABLE}{file:///private/var/live_code/boloindya/solr/server//solr-webapp/webapp}
+2020-02-05 10:58:55.224 INFO  (main) [   ] o.e.j.s.AbstractConnector Started ServerConnector@6035b93b{HTTP/1.1,[http/1.1]}{0.0.0.0:8983}
+2020-02-05 10:58:55.224 INFO  (main) [   ] o.e.j.s.Server Started @13929ms
+2020-02-05 10:58:55.392 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.c.SolrConfig Using Lucene MatchVersion: 7.4.0
+2020-02-05 10:58:55.584 WARN  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.s.ManagedIndexSchemaFactory The schema has been upgraded to managed, but the non-managed schema schema.xml is still loadable.  PLEASE REMOVE THIS FILE.
+2020-02-05 10:58:55.686 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.s.IndexSchema [boloindya] Schema name=default-config
+2020-02-05 10:58:56.680 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.s.IndexSchema Loaded schema default-config/1.6 with uniqueid field id
+2020-02-05 10:58:56.746 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.c.CoreContainer Creating SolrCore 'boloindya' using configuration from instancedir /var/live_code/boloindya/solr/server/solr/boloindya, trusted=true
+2020-02-05 10:58:56.798 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.core.boloindya' (registry 'solr.core.boloindya') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@442675e1
+2020-02-05 10:58:56.809 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.c.SolrCore solr.RecoveryStrategy.Builder
+2020-02-05 10:58:56.815 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.c.SolrCore [[boloindya] ] Opening new SolrCore at [/var/live_code/boloindya/solr/server/solr/boloindya], dataDir=[/var/live_code/boloindya/solr/server/solr/boloindya/data/]
+2020-02-05 10:58:56.870 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.r.XSLTResponseWriter xsltCacheLifetimeSeconds=5
+2020-02-05 10:59:02.540 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.u.UpdateHandler Using UpdateLog implementation: org.apache.solr.update.UpdateLog
+2020-02-05 10:59:02.542 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.u.UpdateLog Initializing UpdateLog: dataDir= defaultSyncLevel=FLUSH numRecordsToKeep=100 maxNumLogsToKeep=10 numVersionBuckets=65536
+2020-02-05 10:59:02.587 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.u.CommitTracker Hard AutoCommit: if uncommited for 15000ms; 
+2020-02-05 10:59:02.587 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.u.CommitTracker Soft AutoCommit: disabled
+2020-02-05 10:59:02.935 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.s.SolrIndexSearcher Opening [Searcher@7c389b23[boloindya] main]
+2020-02-05 10:59:02.947 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.r.ManagedResourceStorage File-based storage initialized to use dir: /var/live_code/boloindya/solr/server/solr/boloindya/conf
+2020-02-05 10:59:02.966 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.h.c.SpellCheckComponent Initializing spell checkers
+2020-02-05 10:59:02.972 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.s.DirectSolrSpellChecker init: {name=default,field=_text_,classname=solr.DirectSolrSpellChecker,distanceMeasure=internal,accuracy=0.5,maxEdits=2,minPrefix=1,maxInspections=5,minQueryLength=4,maxQueryFrequency=0.01}
+2020-02-05 10:59:02.986 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.h.ReplicationHandler Commits will be reserved for 10000ms.
+2020-02-05 10:59:02.988 INFO  (searcherExecutor-10-thread-1-processing-x:boloindya) [   x:boloindya] o.a.s.c.QuerySenderListener QuerySenderListener sending requests to Searcher@7c389b23[boloindya] main{ExitableDirectoryReader(UninvertingDirectoryReader(Uninverting(_61(7.4.0):C90934) Uninverting(_6c(7.4.0):C10000) Uninverting(_6d(7.4.0):C1000) Uninverting(_6e(7.4.0):C1000) Uninverting(_6f(7.4.0):C1000) Uninverting(_6g(7.4.0):C1000) Uninverting(_6h(7.4.0):C1000) Uninverting(_6i(7.4.0):C235)))}
+2020-02-05 10:59:02.989 INFO  (searcherExecutor-10-thread-1-processing-x:boloindya) [   x:boloindya] o.a.s.c.QuerySenderListener QuerySenderListener done.
+2020-02-05 10:59:02.989 INFO  (searcherExecutor-10-thread-1-processing-x:boloindya) [   x:boloindya] o.a.s.h.c.SpellCheckComponent Loading spell index for spellchecker: default
+2020-02-05 10:59:02.997 INFO  (searcherExecutor-10-thread-1-processing-x:boloindya) [   x:boloindya] o.a.s.c.SolrCore [boloindya] Registered new searcher Searcher@7c389b23[boloindya] main{ExitableDirectoryReader(UninvertingDirectoryReader(Uninverting(_61(7.4.0):C90934) Uninverting(_6c(7.4.0):C10000) Uninverting(_6d(7.4.0):C1000) Uninverting(_6e(7.4.0):C1000) Uninverting(_6f(7.4.0):C1000) Uninverting(_6g(7.4.0):C1000) Uninverting(_6h(7.4.0):C1000) Uninverting(_6i(7.4.0):C235)))}
+2020-02-05 10:59:04.083 INFO  (qtp952486988-18) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/select params={q=*:*&_=1580894762279} hits=106169 status=0 QTime=38
+2020-02-05 10:59:14.280 INFO  (qtp952486988-15) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/select params={q=name:maaz&_=1580894762279} hits=3 status=0 QTime=21
+2020-02-05 11:12:50.044 INFO  (ShutdownMonitor) [   ] o.e.j.s.AbstractConnector Stopped ServerConnector@6035b93b{HTTP/1.1,[http/1.1]}{0.0.0.0:8983}
+2020-02-05 11:12:50.045 INFO  (ShutdownMonitor) [   ] o.e.j.s.session node0 Stopped scavenging
+2020-02-05 11:12:50.055 INFO  (ShutdownMonitor) [   ] o.a.s.c.CoreContainer Shutting down CoreContainer instance=1096485705
+2020-02-05 11:12:50.057 INFO  (ShutdownMonitor) [   ] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.node, tag=null
+2020-02-05 11:12:50.059 INFO  (ShutdownMonitor) [   ] o.a.s.m.r.SolrJmxReporter Closing reporter [org.apache.solr.metrics.reporters.SolrJmxReporter@60957c0f: rootName = null, domain = solr.node, service url = null, agent id = null] for registry solr.node / com.codahale.metrics.MetricRegistry@4bbf40c8
+2020-02-05 11:12:50.067 INFO  (ShutdownMonitor) [   ] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.jvm, tag=null
+2020-02-05 11:12:50.068 INFO  (ShutdownMonitor) [   ] o.a.s.m.r.SolrJmxReporter Closing reporter [org.apache.solr.metrics.reporters.SolrJmxReporter@119020fb: rootName = null, domain = solr.jvm, service url = null, agent id = null] for registry solr.jvm / com.codahale.metrics.MetricRegistry@6c4f2b74
+2020-02-05 11:12:50.071 INFO  (ShutdownMonitor) [   ] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.jetty, tag=null
+2020-02-05 11:12:50.072 INFO  (ShutdownMonitor) [   ] o.a.s.m.r.SolrJmxReporter Closing reporter [org.apache.solr.metrics.reporters.SolrJmxReporter@3d9f6567: rootName = null, domain = solr.jetty, service url = null, agent id = null] for registry solr.jetty / com.codahale.metrics.MetricRegistry@5d479f35
+2020-02-05 11:12:50.076 INFO  (coreCloseExecutor-15-thread-1) [   x:boloindya] o.a.s.c.SolrCore [boloindya]  CLOSING SolrCore org.apache.solr.core.SolrCore@652c34c5
+2020-02-05 11:12:50.076 INFO  (coreCloseExecutor-15-thread-1) [   x:boloindya] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.core.boloindya, tag=652c34c5
+2020-02-05 11:12:50.077 INFO  (coreCloseExecutor-15-thread-1) [   x:boloindya] o.a.s.m.r.SolrJmxReporter Closing reporter [org.apache.solr.metrics.reporters.SolrJmxReporter@16acf5: rootName = null, domain = solr.core.boloindya, service url = null, agent id = null] for registry solr.core.boloindya / com.codahale.metrics.MetricRegistry@4444d268
+2020-02-05 11:12:50.141 INFO  (ShutdownMonitor) [   ] o.e.j.s.h.ContextHandler Stopped o.e.j.w.WebAppContext@58a9760d{/solr,null,UNAVAILABLE}{file:///private/var/live_code/boloindya/solr/server//solr-webapp/webapp}

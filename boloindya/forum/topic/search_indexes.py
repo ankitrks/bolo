@@ -52,6 +52,11 @@ class TopicIndex(indexes.SearchIndex, indexes.Indexable):
     is_removed = BooleanField()
     title = indexes.CharField(model_attr='title', indexed=True)
     slug = indexes.CharField(model_attr='slug', indexed=True)
+    language_id = indexes.CharField(model_attr='language_id', indexed=True)
+    likes_count = indexes.CharField(model_attr='likes_count', indexed=True)
+    total_share_count = indexes.CharField(model_attr='total_share_count', indexed=True)
+    view_count = indexes.CharField(model_attr='view_count', indexed=True)
+    vb_playtime = indexes.CharField(model_attr='vb_playtime', indexed=True)
     last_active = indexes.DateTimeField(model_attr='last_active', indexed=False)
 
     # Overridden

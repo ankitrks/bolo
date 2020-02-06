@@ -1,1186 +1,143 @@
-2020-01-22 05:47:09.955 INFO  (main) [   ] o.e.j.u.log Logging initialized @18068ms to org.eclipse.jetty.util.log.Slf4jLog
-2020-01-22 05:47:10.150 WARN  (main) [   ] o.e.j.x.XmlConfiguration Deprecated method public void org.eclipse.jetty.rewrite.handler.RedirectRegexRule.setReplacement(java.lang.String) in file:///private/var/live_code/boloindya/solr/server/etc/jetty.xml
-2020-01-22 05:47:10.269 WARN  (main) [   ] o.e.j.s.AbstractConnector Ignoring deprecated socket close linger time
-2020-01-22 05:47:10.270 WARN  (main) [   ] o.e.j.x.XmlConfiguration Deprecated method public void org.eclipse.jetty.server.ServerConnector.setSoLingerTime(int) in file:///private/var/live_code/boloindya/solr/server/etc/jetty-http.xml
-2020-01-22 05:47:10.278 INFO  (main) [   ] o.e.j.s.Server jetty-9.4.19.v20190610; built: 2019-06-10T16:30:51.723Z; git: afcf563148970e98786327af5e07c261fda175d3; jvm 1.8.0_192-b12
-2020-01-22 05:47:10.345 INFO  (main) [   ] o.e.j.d.p.ScanningAppProvider Deployment monitor [file:///private/var/live_code/boloindya/solr/server/contexts/] at interval 0
-2020-01-22 05:47:10.780 INFO  (main) [   ] o.e.j.w.StandardDescriptorProcessor NO JSP Support for /solr, did not find org.apache.jasper.servlet.JspServlet
-2020-01-22 05:47:10.802 INFO  (main) [   ] o.e.j.s.session DefaultSessionIdManager workerName=node0
-2020-01-22 05:47:10.802 INFO  (main) [   ] o.e.j.s.session No SessionScavenger set, using defaults
-2020-01-22 05:47:10.805 INFO  (main) [   ] o.e.j.s.session node0 Scavenging every 600000ms
-2020-01-22 05:47:11.745 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter Using logger factory org.apache.logging.slf4j.Log4jLoggerFactory
-2020-01-22 05:47:11.753 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter  ___      _       Welcome to Apache Solr™ version 8.2.0
-2020-01-22 05:47:11.753 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter / __| ___| |_ _   Starting in standalone mode on port 8983
-2020-01-22 05:47:11.753 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter \__ \/ _ \ | '_|  Install dir: /var/live_code/boloindya/solr
-2020-01-22 05:47:11.754 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter |___/\___/_|_|    Start time: 2020-01-22T05:47:11.754Z
-2020-01-22 05:47:11.945 INFO  (main) [   ] o.a.s.c.SolrResourceLoader Using system property solr.solr.home: /var/live_code/boloindya/solr/server/solr
-2020-01-22 05:47:11.957 INFO  (main) [   ] o.a.s.c.SolrXmlConfig Loading container configuration from /var/live_code/boloindya/solr/server/solr/solr.xml
-2020-01-22 05:47:12.062 INFO  (main) [   ] o.a.s.c.SolrXmlConfig MBean server found: com.sun.jmx.mbeanserver.JmxMBeanServer@6f94fa3e, but no JMX reporters were configured - adding default JMX reporter.
-2020-01-22 05:47:12.622 INFO  (main) [   ] o.a.s.h.c.HttpShardHandlerFactory Host whitelist initialized: WhitelistHostChecker [whitelistHosts=null, whitelistHostCheckingEnabled=true]
-2020-01-22 05:47:13.512 WARN  (main) [   ] o.e.j.u.s.S.config Trusting all certificates configured for Client@a22cb6a[provider=null,keyStore=null,trustStore=null]
-2020-01-22 05:47:13.512 WARN  (main) [   ] o.e.j.u.s.S.config No Client EndPointIdentificationAlgorithm configured for Client@a22cb6a[provider=null,keyStore=null,trustStore=null]
-2020-01-22 05:47:13.906 WARN  (main) [   ] o.e.j.u.s.S.config Trusting all certificates configured for Client@3fb6cf60[provider=null,keyStore=null,trustStore=null]
-2020-01-22 05:47:13.908 WARN  (main) [   ] o.e.j.u.s.S.config No Client EndPointIdentificationAlgorithm configured for Client@3fb6cf60[provider=null,keyStore=null,trustStore=null]
-2020-01-22 05:47:19.569 INFO  (main) [   ] o.a.s.c.TransientSolrCoreCacheDefault Allocating transient cache for 2147483647 transient cores
-2020-01-22 05:47:19.629 INFO  (main) [   ] o.a.s.h.a.MetricsHistoryHandler No .system collection, keeping metrics history in memory.
-2020-01-22 05:47:19.961 INFO  (main) [   ] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.node' (registry 'solr.node') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@6f94fa3e
-2020-01-22 05:47:19.961 INFO  (main) [   ] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.jvm' (registry 'solr.jvm') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@6f94fa3e
-2020-01-22 05:47:19.970 INFO  (main) [   ] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.jetty' (registry 'solr.jetty') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@6f94fa3e
-2020-01-22 05:47:20.048 INFO  (main) [   ] o.a.s.c.CorePropertiesLocator Found 1 core definitions underneath /var/live_code/boloindya/solr/server/solr
-2020-01-22 05:47:20.049 INFO  (main) [   ] o.a.s.c.CorePropertiesLocator Cores are: [boloindya]
-2020-01-22 05:47:20.146 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.c.SolrResourceLoader [boloindya] Added 60 libs to classloader, from paths: [/var/live_code/boloindya/solr/contrib/clustering/lib, /var/live_code/boloindya/solr/contrib/extraction/lib, /var/live_code/boloindya/solr/contrib/langid/lib, /var/live_code/boloindya/solr/contrib/velocity/lib, /var/live_code/boloindya/solr/dist]
-2020-01-22 05:47:20.198 INFO  (main) [   ] o.e.j.s.h.ContextHandler Started o.e.j.w.WebAppContext@4d02f94e{/solr,file:///private/var/live_code/boloindya/solr/server/solr-webapp/webapp/,AVAILABLE}{/private/var/live_code/boloindya/solr/server/solr-webapp/webapp}
-2020-01-22 05:47:20.258 INFO  (main) [   ] o.e.j.s.AbstractConnector Started ServerConnector@131ef10{HTTP/1.1,[http/1.1, h2c]}{0.0.0.0:8983}
-2020-01-22 05:47:20.258 INFO  (main) [   ] o.e.j.s.Server Started @28373ms
-2020-01-22 05:47:20.449 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.c.SolrConfig Using Lucene MatchVersion: 8.2.0
-2020-01-22 05:47:20.529 INFO  (qtp961712517-21) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/logging params={wt=json&_=1579671707874&since=0} status=0 QTime=59
-2020-01-22 05:47:20.571 INFO  (qtp961712517-21) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/logging params={wt=json&_=1579671707874&since=0} status=0 QTime=0
-2020-01-22 05:47:20.581 INFO  (qtp961712517-17) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/logging params={wt=json&_=1579671707874&since=0} status=0 QTime=0
-2020-01-22 05:47:20.587 INFO  (qtp961712517-20) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/logging params={wt=json&_=1579671707874&since=0} status=0 QTime=0
-2020-01-22 05:47:20.822 ERROR (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.c.XmlConfigFile Exception during parsing file: schema:org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.createSAXParseException(ErrorHandlerWrapper.java:203)
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.fatalError(ErrorHandlerWrapper.java:177)
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:400)
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:327)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.reportFatalError(XMLScanner.java:1472)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPIData(XMLScanner.java:746)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanPIData(XMLDocumentFragmentScannerImpl.java:1014)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPI(XMLScanner.java:714)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl$TrailingMiscDriver.next(XMLDocumentScannerImpl.java:1413)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl.next(XMLDocumentScannerImpl.java:602)
-	at com.sun.org.apache.xerces.internal.impl.XMLNSDocumentScannerImpl.next(XMLNSDocumentScannerImpl.java:112)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanDocument(XMLDocumentFragmentScannerImpl.java:505)
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:842)
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:771)
-	at com.sun.org.apache.xerces.internal.parsers.XMLParser.parse(XMLParser.java:141)
-	at com.sun.org.apache.xerces.internal.parsers.DOMParser.parse(DOMParser.java:243)
-	at com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderImpl.parse(DocumentBuilderImpl.java:339)
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:140)
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:87)
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:457)
-	at org.apache.solr.schema.IndexSchema.<init>(IndexSchema.java:176)
-	at org.apache.solr.schema.IndexSchemaFactory.create(IndexSchemaFactory.java:56)
-	at org.apache.solr.schema.IndexSchemaFactory.buildIndexSchema(IndexSchemaFactory.java:70)
-	at org.apache.solr.core.ConfigSetService.createIndexSchema(ConfigSetService.java:118)
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:91)
-	at org.apache.solr.core.CoreContainer.getConfigSet(CoreContainer.java:1294)
-	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1241)
-	at org.apache.solr.core.CoreContainer.lambda$load$13(CoreContainer.java:756)
-	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202)
-	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
-	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:209)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
-	at java.lang.Thread.run(Thread.java:748)
-
-2020-01-22 05:47:20.825 ERROR (coreContainerWorkExecutor-2-thread-1) [   ] o.a.s.c.CoreContainer Error waiting for SolrCore to be loaded on startup => org.apache.solr.common.SolrException: Unable to create core [boloindya]
-	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1266)
-org.apache.solr.common.SolrException: Unable to create core [boloindya]
-	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1266) ~[?:?]
-	at org.apache.solr.core.CoreContainer.lambda$load$13(CoreContainer.java:756) ~[?:?]
-	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202) ~[metrics-core-4.0.5.jar:4.0.5]
-	at java.util.concurrent.FutureTask.run(FutureTask.java:266) ~[?:1.8.0_192]
-	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:209) ~[?:?]
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149) ~[?:1.8.0_192]
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624) ~[?:1.8.0_192]
-	at java.lang.Thread.run(Thread.java:748) [?:1.8.0_192]
-Caused by: org.apache.solr.common.SolrException: Could not load conf for core boloindya: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:96) ~[?:?]
-	at org.apache.solr.core.CoreContainer.getConfigSet(CoreContainer.java:1294) ~[?:?]
-	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1241) ~[?:?]
-	... 7 more
-Caused by: org.apache.solr.common.SolrException: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:596) ~[?:?]
-	at org.apache.solr.schema.IndexSchema.<init>(IndexSchema.java:176) ~[?:?]
-	at org.apache.solr.schema.IndexSchemaFactory.create(IndexSchemaFactory.java:56) ~[?:?]
-	at org.apache.solr.schema.IndexSchemaFactory.buildIndexSchema(IndexSchemaFactory.java:70) ~[?:?]
-	at org.apache.solr.core.ConfigSetService.createIndexSchema(ConfigSetService.java:118) ~[?:?]
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:91) ~[?:?]
-	at org.apache.solr.core.CoreContainer.getConfigSet(CoreContainer.java:1294) ~[?:?]
-	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1241) ~[?:?]
-	... 7 more
-Caused by: org.apache.solr.common.SolrException: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:151) ~[?:?]
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:87) ~[?:?]
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:457) ~[?:?]
-	at org.apache.solr.schema.IndexSchema.<init>(IndexSchema.java:176) ~[?:?]
-	at org.apache.solr.schema.IndexSchemaFactory.create(IndexSchemaFactory.java:56) ~[?:?]
-	at org.apache.solr.schema.IndexSchemaFactory.buildIndexSchema(IndexSchemaFactory.java:70) ~[?:?]
-	at org.apache.solr.core.ConfigSetService.createIndexSchema(ConfigSetService.java:118) ~[?:?]
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:91) ~[?:?]
-	at org.apache.solr.core.CoreContainer.getConfigSet(CoreContainer.java:1294) ~[?:?]
-	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1241) ~[?:?]
-	... 7 more
-Caused by: org.xml.sax.SAXParseException: The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.createSAXParseException(ErrorHandlerWrapper.java:203) ~[?:1.8.0_192]
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.fatalError(ErrorHandlerWrapper.java:177) ~[?:1.8.0_192]
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:400) ~[?:1.8.0_192]
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:327) ~[?:1.8.0_192]
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.reportFatalError(XMLScanner.java:1472) ~[?:1.8.0_192]
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPIData(XMLScanner.java:746) ~[?:1.8.0_192]
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanPIData(XMLDocumentFragmentScannerImpl.java:1014) ~[?:1.8.0_192]
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPI(XMLScanner.java:714) ~[?:1.8.0_192]
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl$TrailingMiscDriver.next(XMLDocumentScannerImpl.java:1413) ~[?:1.8.0_192]
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl.next(XMLDocumentScannerImpl.java:602) ~[?:1.8.0_192]
-	at com.sun.org.apache.xerces.internal.impl.XMLNSDocumentScannerImpl.next(XMLNSDocumentScannerImpl.java:112) ~[?:1.8.0_192]
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanDocument(XMLDocumentFragmentScannerImpl.java:505) ~[?:1.8.0_192]
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:842) ~[?:1.8.0_192]
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:771) ~[?:1.8.0_192]
-	at com.sun.org.apache.xerces.internal.parsers.XMLParser.parse(XMLParser.java:141) ~[?:1.8.0_192]
-	at com.sun.org.apache.xerces.internal.parsers.DOMParser.parse(DOMParser.java:243) ~[?:1.8.0_192]
-	at com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderImpl.parse(DocumentBuilderImpl.java:339) ~[?:1.8.0_192]
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:140) ~[?:?]
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:87) ~[?:?]
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:457) ~[?:?]
-	at org.apache.solr.schema.IndexSchema.<init>(IndexSchema.java:176) ~[?:?]
-	at org.apache.solr.schema.IndexSchemaFactory.create(IndexSchemaFactory.java:56) ~[?:?]
-	at org.apache.solr.schema.IndexSchemaFactory.buildIndexSchema(IndexSchemaFactory.java:70) ~[?:?]
-	at org.apache.solr.core.ConfigSetService.createIndexSchema(ConfigSetService.java:118) ~[?:?]
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:91) ~[?:?]
-	at org.apache.solr.core.CoreContainer.getConfigSet(CoreContainer.java:1294) ~[?:?]
-	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1241) ~[?:?]
-	... 7 more
-2020-01-22 05:47:30.616 INFO  (qtp961712517-22) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/logging params={wt=json&_=1579671707874&since=0} status=0 QTime=0
-2020-01-22 05:47:33.175 ERROR (qtp961712517-20) [   ] o.a.s.s.HttpSolrCall null:org.apache.solr.core.SolrCoreInitializationException: SolrCore 'boloindya' is not available due to init failure: Could not load conf for core boloindya: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.CoreContainer.getCore(CoreContainer.java:1734)
-	at org.apache.solr.servlet.HttpSolrCall.init(HttpSolrCall.java:255)
-	at org.apache.solr.servlet.HttpSolrCall.call(HttpSolrCall.java:526)
-	at org.apache.solr.servlet.SolrDispatchFilter.doFilter(SolrDispatchFilter.java:423)
-	at org.apache.solr.servlet.SolrDispatchFilter.doFilter(SolrDispatchFilter.java:350)
-	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1602)
-	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:540)
-	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:146)
-	at org.eclipse.jetty.security.SecurityHandler.handle(SecurityHandler.java:548)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:257)
-	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1711)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:255)
-	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1347)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:203)
-	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:480)
-	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1678)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:201)
-	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1249)
-	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:144)
-	at org.eclipse.jetty.server.handler.ContextHandlerCollection.handle(ContextHandlerCollection.java:220)
-	at org.eclipse.jetty.server.handler.HandlerCollection.handle(HandlerCollection.java:152)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.rewrite.handler.RewriteHandler.handle(RewriteHandler.java:335)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.server.Server.handle(Server.java:505)
-	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:370)
-	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:267)
-	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:305)
-	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:103)
-	at org.eclipse.jetty.io.ChannelEndPoint$2.run(ChannelEndPoint.java:117)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.runTask(EatWhatYouKill.java:333)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.doProduce(EatWhatYouKill.java:310)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.tryProduce(EatWhatYouKill.java:168)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.run(EatWhatYouKill.java:126)
-	at org.eclipse.jetty.util.thread.ReservedThreadExecutor$ReservedThread.run(ReservedThreadExecutor.java:366)
-	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:781)
-	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:917)
-	at java.lang.Thread.run(Thread.java:748)
-Caused by: org.apache.solr.common.SolrException: Could not load conf for core boloindya: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:96)
-	at org.apache.solr.core.CoreContainer.getConfigSet(CoreContainer.java:1294)
-	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1241)
-	at org.apache.solr.core.CoreContainer.lambda$load$13(CoreContainer.java:756)
-	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202)
-	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
-	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:209)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
-	... 1 more
-Caused by: org.apache.solr.common.SolrException: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:596)
-	at org.apache.solr.schema.IndexSchema.<init>(IndexSchema.java:176)
-	at org.apache.solr.schema.IndexSchemaFactory.create(IndexSchemaFactory.java:56)
-	at org.apache.solr.schema.IndexSchemaFactory.buildIndexSchema(IndexSchemaFactory.java:70)
-	at org.apache.solr.core.ConfigSetService.createIndexSchema(ConfigSetService.java:118)
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:91)
-	... 9 more
-Caused by: org.apache.solr.common.SolrException: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:151)
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:87)
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:457)
-	... 14 more
-Caused by: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.createSAXParseException(ErrorHandlerWrapper.java:203)
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.fatalError(ErrorHandlerWrapper.java:177)
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:400)
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:327)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.reportFatalError(XMLScanner.java:1472)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPIData(XMLScanner.java:746)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanPIData(XMLDocumentFragmentScannerImpl.java:1014)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPI(XMLScanner.java:714)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl$TrailingMiscDriver.next(XMLDocumentScannerImpl.java:1413)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl.next(XMLDocumentScannerImpl.java:602)
-	at com.sun.org.apache.xerces.internal.impl.XMLNSDocumentScannerImpl.next(XMLNSDocumentScannerImpl.java:112)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanDocument(XMLDocumentFragmentScannerImpl.java:505)
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:842)
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:771)
-	at com.sun.org.apache.xerces.internal.parsers.XMLParser.parse(XMLParser.java:141)
-	at com.sun.org.apache.xerces.internal.parsers.DOMParser.parse(DOMParser.java:243)
-	at com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderImpl.parse(DocumentBuilderImpl.java:339)
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:140)
-	... 16 more
-
-2020-01-22 05:47:33.943 ERROR (qtp961712517-22) [   ] o.a.s.s.HttpSolrCall null:org.apache.solr.core.SolrCoreInitializationException: SolrCore 'boloindya' is not available due to init failure: Could not load conf for core boloindya: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.CoreContainer.getCore(CoreContainer.java:1734)
-	at org.apache.solr.servlet.HttpSolrCall.init(HttpSolrCall.java:255)
-	at org.apache.solr.servlet.HttpSolrCall.call(HttpSolrCall.java:526)
-	at org.apache.solr.servlet.SolrDispatchFilter.doFilter(SolrDispatchFilter.java:423)
-	at org.apache.solr.servlet.SolrDispatchFilter.doFilter(SolrDispatchFilter.java:350)
-	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1602)
-	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:540)
-	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:146)
-	at org.eclipse.jetty.security.SecurityHandler.handle(SecurityHandler.java:548)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:257)
-	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1711)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:255)
-	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1347)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:203)
-	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:480)
-	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1678)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:201)
-	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1249)
-	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:144)
-	at org.eclipse.jetty.server.handler.ContextHandlerCollection.handle(ContextHandlerCollection.java:220)
-	at org.eclipse.jetty.server.handler.HandlerCollection.handle(HandlerCollection.java:152)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.rewrite.handler.RewriteHandler.handle(RewriteHandler.java:335)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.server.Server.handle(Server.java:505)
-	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:370)
-	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:267)
-	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:305)
-	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:103)
-	at org.eclipse.jetty.io.ChannelEndPoint$2.run(ChannelEndPoint.java:117)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.runTask(EatWhatYouKill.java:333)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.doProduce(EatWhatYouKill.java:310)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.tryProduce(EatWhatYouKill.java:168)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.run(EatWhatYouKill.java:126)
-	at org.eclipse.jetty.util.thread.ReservedThreadExecutor$ReservedThread.run(ReservedThreadExecutor.java:366)
-	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:781)
-	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:917)
-	at java.lang.Thread.run(Thread.java:748)
-Caused by: org.apache.solr.common.SolrException: Could not load conf for core boloindya: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:96)
-	at org.apache.solr.core.CoreContainer.getConfigSet(CoreContainer.java:1294)
-	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1241)
-	at org.apache.solr.core.CoreContainer.lambda$load$13(CoreContainer.java:756)
-	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202)
-	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
-	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:209)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
-	... 1 more
-Caused by: org.apache.solr.common.SolrException: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:596)
-	at org.apache.solr.schema.IndexSchema.<init>(IndexSchema.java:176)
-	at org.apache.solr.schema.IndexSchemaFactory.create(IndexSchemaFactory.java:56)
-	at org.apache.solr.schema.IndexSchemaFactory.buildIndexSchema(IndexSchemaFactory.java:70)
-	at org.apache.solr.core.ConfigSetService.createIndexSchema(ConfigSetService.java:118)
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:91)
-	... 9 more
-Caused by: org.apache.solr.common.SolrException: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:151)
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:87)
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:457)
-	... 14 more
-Caused by: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.createSAXParseException(ErrorHandlerWrapper.java:203)
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.fatalError(ErrorHandlerWrapper.java:177)
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:400)
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:327)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.reportFatalError(XMLScanner.java:1472)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPIData(XMLScanner.java:746)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanPIData(XMLDocumentFragmentScannerImpl.java:1014)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPI(XMLScanner.java:714)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl$TrailingMiscDriver.next(XMLDocumentScannerImpl.java:1413)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl.next(XMLDocumentScannerImpl.java:602)
-	at com.sun.org.apache.xerces.internal.impl.XMLNSDocumentScannerImpl.next(XMLNSDocumentScannerImpl.java:112)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanDocument(XMLDocumentFragmentScannerImpl.java:505)
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:842)
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:771)
-	at com.sun.org.apache.xerces.internal.parsers.XMLParser.parse(XMLParser.java:141)
-	at com.sun.org.apache.xerces.internal.parsers.DOMParser.parse(DOMParser.java:243)
-	at com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderImpl.parse(DocumentBuilderImpl.java:339)
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:140)
-	... 16 more
-
-2020-01-22 05:47:34.686 ERROR (qtp961712517-20) [   ] o.a.s.s.HttpSolrCall null:org.apache.solr.core.SolrCoreInitializationException: SolrCore 'boloindya' is not available due to init failure: Could not load conf for core boloindya: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.CoreContainer.getCore(CoreContainer.java:1734)
-	at org.apache.solr.servlet.HttpSolrCall.init(HttpSolrCall.java:255)
-	at org.apache.solr.servlet.HttpSolrCall.call(HttpSolrCall.java:526)
-	at org.apache.solr.servlet.SolrDispatchFilter.doFilter(SolrDispatchFilter.java:423)
-	at org.apache.solr.servlet.SolrDispatchFilter.doFilter(SolrDispatchFilter.java:350)
-	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1602)
-	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:540)
-	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:146)
-	at org.eclipse.jetty.security.SecurityHandler.handle(SecurityHandler.java:548)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:257)
-	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1711)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:255)
-	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1347)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:203)
-	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:480)
-	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1678)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:201)
-	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1249)
-	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:144)
-	at org.eclipse.jetty.server.handler.ContextHandlerCollection.handle(ContextHandlerCollection.java:220)
-	at org.eclipse.jetty.server.handler.HandlerCollection.handle(HandlerCollection.java:152)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.rewrite.handler.RewriteHandler.handle(RewriteHandler.java:335)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.server.Server.handle(Server.java:505)
-	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:370)
-	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:267)
-	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:305)
-	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:103)
-	at org.eclipse.jetty.io.ChannelEndPoint$2.run(ChannelEndPoint.java:117)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.runTask(EatWhatYouKill.java:333)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.doProduce(EatWhatYouKill.java:310)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.tryProduce(EatWhatYouKill.java:168)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.run(EatWhatYouKill.java:126)
-	at org.eclipse.jetty.util.thread.ReservedThreadExecutor$ReservedThread.run(ReservedThreadExecutor.java:366)
-	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:781)
-	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:917)
-	at java.lang.Thread.run(Thread.java:748)
-Caused by: org.apache.solr.common.SolrException: Could not load conf for core boloindya: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:96)
-	at org.apache.solr.core.CoreContainer.getConfigSet(CoreContainer.java:1294)
-	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1241)
-	at org.apache.solr.core.CoreContainer.lambda$load$13(CoreContainer.java:756)
-	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202)
-	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
-	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:209)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
-	... 1 more
-Caused by: org.apache.solr.common.SolrException: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:596)
-	at org.apache.solr.schema.IndexSchema.<init>(IndexSchema.java:176)
-	at org.apache.solr.schema.IndexSchemaFactory.create(IndexSchemaFactory.java:56)
-	at org.apache.solr.schema.IndexSchemaFactory.buildIndexSchema(IndexSchemaFactory.java:70)
-	at org.apache.solr.core.ConfigSetService.createIndexSchema(ConfigSetService.java:118)
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:91)
-	... 9 more
-Caused by: org.apache.solr.common.SolrException: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:151)
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:87)
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:457)
-	... 14 more
-Caused by: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.createSAXParseException(ErrorHandlerWrapper.java:203)
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.fatalError(ErrorHandlerWrapper.java:177)
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:400)
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:327)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.reportFatalError(XMLScanner.java:1472)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPIData(XMLScanner.java:746)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanPIData(XMLDocumentFragmentScannerImpl.java:1014)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPI(XMLScanner.java:714)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl$TrailingMiscDriver.next(XMLDocumentScannerImpl.java:1413)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl.next(XMLDocumentScannerImpl.java:602)
-	at com.sun.org.apache.xerces.internal.impl.XMLNSDocumentScannerImpl.next(XMLNSDocumentScannerImpl.java:112)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanDocument(XMLDocumentFragmentScannerImpl.java:505)
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:842)
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:771)
-	at com.sun.org.apache.xerces.internal.parsers.XMLParser.parse(XMLParser.java:141)
-	at com.sun.org.apache.xerces.internal.parsers.DOMParser.parse(DOMParser.java:243)
-	at com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderImpl.parse(DocumentBuilderImpl.java:339)
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:140)
-	... 16 more
-
-2020-01-22 05:47:35.547 ERROR (qtp961712517-22) [   ] o.a.s.s.HttpSolrCall null:org.apache.solr.core.SolrCoreInitializationException: SolrCore 'boloindya' is not available due to init failure: Could not load conf for core boloindya: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.CoreContainer.getCore(CoreContainer.java:1734)
-	at org.apache.solr.servlet.HttpSolrCall.init(HttpSolrCall.java:255)
-	at org.apache.solr.servlet.HttpSolrCall.call(HttpSolrCall.java:526)
-	at org.apache.solr.servlet.SolrDispatchFilter.doFilter(SolrDispatchFilter.java:423)
-	at org.apache.solr.servlet.SolrDispatchFilter.doFilter(SolrDispatchFilter.java:350)
-	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1602)
-	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:540)
-	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:146)
-	at org.eclipse.jetty.security.SecurityHandler.handle(SecurityHandler.java:548)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:257)
-	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1711)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:255)
-	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1347)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:203)
-	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:480)
-	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1678)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:201)
-	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1249)
-	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:144)
-	at org.eclipse.jetty.server.handler.ContextHandlerCollection.handle(ContextHandlerCollection.java:220)
-	at org.eclipse.jetty.server.handler.HandlerCollection.handle(HandlerCollection.java:152)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.rewrite.handler.RewriteHandler.handle(RewriteHandler.java:335)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.server.Server.handle(Server.java:505)
-	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:370)
-	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:267)
-	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:305)
-	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:103)
-	at org.eclipse.jetty.io.ChannelEndPoint$2.run(ChannelEndPoint.java:117)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.runTask(EatWhatYouKill.java:333)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.doProduce(EatWhatYouKill.java:310)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.tryProduce(EatWhatYouKill.java:168)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.run(EatWhatYouKill.java:126)
-	at org.eclipse.jetty.util.thread.ReservedThreadExecutor$ReservedThread.run(ReservedThreadExecutor.java:366)
-	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:781)
-	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:917)
-	at java.lang.Thread.run(Thread.java:748)
-Caused by: org.apache.solr.common.SolrException: Could not load conf for core boloindya: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:96)
-	at org.apache.solr.core.CoreContainer.getConfigSet(CoreContainer.java:1294)
-	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1241)
-	at org.apache.solr.core.CoreContainer.lambda$load$13(CoreContainer.java:756)
-	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202)
-	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
-	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:209)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
-	... 1 more
-Caused by: org.apache.solr.common.SolrException: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:596)
-	at org.apache.solr.schema.IndexSchema.<init>(IndexSchema.java:176)
-	at org.apache.solr.schema.IndexSchemaFactory.create(IndexSchemaFactory.java:56)
-	at org.apache.solr.schema.IndexSchemaFactory.buildIndexSchema(IndexSchemaFactory.java:70)
-	at org.apache.solr.core.ConfigSetService.createIndexSchema(ConfigSetService.java:118)
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:91)
-	... 9 more
-Caused by: org.apache.solr.common.SolrException: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:151)
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:87)
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:457)
-	... 14 more
-Caused by: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.createSAXParseException(ErrorHandlerWrapper.java:203)
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.fatalError(ErrorHandlerWrapper.java:177)
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:400)
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:327)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.reportFatalError(XMLScanner.java:1472)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPIData(XMLScanner.java:746)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanPIData(XMLDocumentFragmentScannerImpl.java:1014)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPI(XMLScanner.java:714)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl$TrailingMiscDriver.next(XMLDocumentScannerImpl.java:1413)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl.next(XMLDocumentScannerImpl.java:602)
-	at com.sun.org.apache.xerces.internal.impl.XMLNSDocumentScannerImpl.next(XMLNSDocumentScannerImpl.java:112)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanDocument(XMLDocumentFragmentScannerImpl.java:505)
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:842)
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:771)
-	at com.sun.org.apache.xerces.internal.parsers.XMLParser.parse(XMLParser.java:141)
-	at com.sun.org.apache.xerces.internal.parsers.DOMParser.parse(DOMParser.java:243)
-	at com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderImpl.parse(DocumentBuilderImpl.java:339)
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:140)
-	... 16 more
-
-2020-01-22 05:47:36.341 ERROR (qtp961712517-20) [   ] o.a.s.s.HttpSolrCall null:org.apache.solr.core.SolrCoreInitializationException: SolrCore 'boloindya' is not available due to init failure: Could not load conf for core boloindya: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.CoreContainer.getCore(CoreContainer.java:1734)
-	at org.apache.solr.servlet.HttpSolrCall.init(HttpSolrCall.java:255)
-	at org.apache.solr.servlet.HttpSolrCall.call(HttpSolrCall.java:526)
-	at org.apache.solr.servlet.SolrDispatchFilter.doFilter(SolrDispatchFilter.java:423)
-	at org.apache.solr.servlet.SolrDispatchFilter.doFilter(SolrDispatchFilter.java:350)
-	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1602)
-	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:540)
-	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:146)
-	at org.eclipse.jetty.security.SecurityHandler.handle(SecurityHandler.java:548)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:257)
-	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1711)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:255)
-	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1347)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:203)
-	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:480)
-	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1678)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:201)
-	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1249)
-	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:144)
-	at org.eclipse.jetty.server.handler.ContextHandlerCollection.handle(ContextHandlerCollection.java:220)
-	at org.eclipse.jetty.server.handler.HandlerCollection.handle(HandlerCollection.java:152)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.rewrite.handler.RewriteHandler.handle(RewriteHandler.java:335)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.server.Server.handle(Server.java:505)
-	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:370)
-	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:267)
-	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:305)
-	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:103)
-	at org.eclipse.jetty.io.ChannelEndPoint$2.run(ChannelEndPoint.java:117)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.runTask(EatWhatYouKill.java:333)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.doProduce(EatWhatYouKill.java:310)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.tryProduce(EatWhatYouKill.java:168)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.run(EatWhatYouKill.java:126)
-	at org.eclipse.jetty.util.thread.ReservedThreadExecutor$ReservedThread.run(ReservedThreadExecutor.java:366)
-	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:781)
-	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:917)
-	at java.lang.Thread.run(Thread.java:748)
-Caused by: org.apache.solr.common.SolrException: Could not load conf for core boloindya: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:96)
-	at org.apache.solr.core.CoreContainer.getConfigSet(CoreContainer.java:1294)
-	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1241)
-	at org.apache.solr.core.CoreContainer.lambda$load$13(CoreContainer.java:756)
-	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202)
-	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
-	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:209)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
-	... 1 more
-Caused by: org.apache.solr.common.SolrException: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:596)
-	at org.apache.solr.schema.IndexSchema.<init>(IndexSchema.java:176)
-	at org.apache.solr.schema.IndexSchemaFactory.create(IndexSchemaFactory.java:56)
-	at org.apache.solr.schema.IndexSchemaFactory.buildIndexSchema(IndexSchemaFactory.java:70)
-	at org.apache.solr.core.ConfigSetService.createIndexSchema(ConfigSetService.java:118)
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:91)
-	... 9 more
-Caused by: org.apache.solr.common.SolrException: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:151)
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:87)
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:457)
-	... 14 more
-Caused by: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.createSAXParseException(ErrorHandlerWrapper.java:203)
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.fatalError(ErrorHandlerWrapper.java:177)
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:400)
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:327)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.reportFatalError(XMLScanner.java:1472)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPIData(XMLScanner.java:746)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanPIData(XMLDocumentFragmentScannerImpl.java:1014)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPI(XMLScanner.java:714)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl$TrailingMiscDriver.next(XMLDocumentScannerImpl.java:1413)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl.next(XMLDocumentScannerImpl.java:602)
-	at com.sun.org.apache.xerces.internal.impl.XMLNSDocumentScannerImpl.next(XMLNSDocumentScannerImpl.java:112)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanDocument(XMLDocumentFragmentScannerImpl.java:505)
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:842)
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:771)
-	at com.sun.org.apache.xerces.internal.parsers.XMLParser.parse(XMLParser.java:141)
-	at com.sun.org.apache.xerces.internal.parsers.DOMParser.parse(DOMParser.java:243)
-	at com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderImpl.parse(DocumentBuilderImpl.java:339)
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:140)
-	... 16 more
-
-2020-01-22 05:47:37.210 ERROR (qtp961712517-22) [   ] o.a.s.s.HttpSolrCall null:org.apache.solr.core.SolrCoreInitializationException: SolrCore 'boloindya' is not available due to init failure: Could not load conf for core boloindya: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.CoreContainer.getCore(CoreContainer.java:1734)
-	at org.apache.solr.servlet.HttpSolrCall.init(HttpSolrCall.java:255)
-	at org.apache.solr.servlet.HttpSolrCall.call(HttpSolrCall.java:526)
-	at org.apache.solr.servlet.SolrDispatchFilter.doFilter(SolrDispatchFilter.java:423)
-	at org.apache.solr.servlet.SolrDispatchFilter.doFilter(SolrDispatchFilter.java:350)
-	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1602)
-	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:540)
-	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:146)
-	at org.eclipse.jetty.security.SecurityHandler.handle(SecurityHandler.java:548)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:257)
-	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1711)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:255)
-	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1347)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:203)
-	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:480)
-	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1678)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:201)
-	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1249)
-	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:144)
-	at org.eclipse.jetty.server.handler.ContextHandlerCollection.handle(ContextHandlerCollection.java:220)
-	at org.eclipse.jetty.server.handler.HandlerCollection.handle(HandlerCollection.java:152)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.rewrite.handler.RewriteHandler.handle(RewriteHandler.java:335)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.server.Server.handle(Server.java:505)
-	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:370)
-	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:267)
-	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:305)
-	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:103)
-	at org.eclipse.jetty.io.ChannelEndPoint$2.run(ChannelEndPoint.java:117)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.runTask(EatWhatYouKill.java:333)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.doProduce(EatWhatYouKill.java:310)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.tryProduce(EatWhatYouKill.java:168)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.run(EatWhatYouKill.java:126)
-	at org.eclipse.jetty.util.thread.ReservedThreadExecutor$ReservedThread.run(ReservedThreadExecutor.java:366)
-	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:781)
-	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:917)
-	at java.lang.Thread.run(Thread.java:748)
-Caused by: org.apache.solr.common.SolrException: Could not load conf for core boloindya: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:96)
-	at org.apache.solr.core.CoreContainer.getConfigSet(CoreContainer.java:1294)
-	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1241)
-	at org.apache.solr.core.CoreContainer.lambda$load$13(CoreContainer.java:756)
-	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202)
-	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
-	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:209)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
-	... 1 more
-Caused by: org.apache.solr.common.SolrException: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:596)
-	at org.apache.solr.schema.IndexSchema.<init>(IndexSchema.java:176)
-	at org.apache.solr.schema.IndexSchemaFactory.create(IndexSchemaFactory.java:56)
-	at org.apache.solr.schema.IndexSchemaFactory.buildIndexSchema(IndexSchemaFactory.java:70)
-	at org.apache.solr.core.ConfigSetService.createIndexSchema(ConfigSetService.java:118)
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:91)
-	... 9 more
-Caused by: org.apache.solr.common.SolrException: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:151)
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:87)
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:457)
-	... 14 more
-Caused by: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.createSAXParseException(ErrorHandlerWrapper.java:203)
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.fatalError(ErrorHandlerWrapper.java:177)
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:400)
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:327)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.reportFatalError(XMLScanner.java:1472)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPIData(XMLScanner.java:746)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanPIData(XMLDocumentFragmentScannerImpl.java:1014)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPI(XMLScanner.java:714)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl$TrailingMiscDriver.next(XMLDocumentScannerImpl.java:1413)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl.next(XMLDocumentScannerImpl.java:602)
-	at com.sun.org.apache.xerces.internal.impl.XMLNSDocumentScannerImpl.next(XMLNSDocumentScannerImpl.java:112)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanDocument(XMLDocumentFragmentScannerImpl.java:505)
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:842)
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:771)
-	at com.sun.org.apache.xerces.internal.parsers.XMLParser.parse(XMLParser.java:141)
-	at com.sun.org.apache.xerces.internal.parsers.DOMParser.parse(DOMParser.java:243)
-	at com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderImpl.parse(DocumentBuilderImpl.java:339)
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:140)
-	... 16 more
-
-2020-01-22 05:47:38.066 ERROR (qtp961712517-20) [   ] o.a.s.s.HttpSolrCall null:org.apache.solr.core.SolrCoreInitializationException: SolrCore 'boloindya' is not available due to init failure: Could not load conf for core boloindya: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.CoreContainer.getCore(CoreContainer.java:1734)
-	at org.apache.solr.servlet.HttpSolrCall.init(HttpSolrCall.java:255)
-	at org.apache.solr.servlet.HttpSolrCall.call(HttpSolrCall.java:526)
-	at org.apache.solr.servlet.SolrDispatchFilter.doFilter(SolrDispatchFilter.java:423)
-	at org.apache.solr.servlet.SolrDispatchFilter.doFilter(SolrDispatchFilter.java:350)
-	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1602)
-	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:540)
-	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:146)
-	at org.eclipse.jetty.security.SecurityHandler.handle(SecurityHandler.java:548)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:257)
-	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1711)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:255)
-	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1347)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:203)
-	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:480)
-	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1678)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:201)
-	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1249)
-	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:144)
-	at org.eclipse.jetty.server.handler.ContextHandlerCollection.handle(ContextHandlerCollection.java:220)
-	at org.eclipse.jetty.server.handler.HandlerCollection.handle(HandlerCollection.java:152)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.rewrite.handler.RewriteHandler.handle(RewriteHandler.java:335)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.server.Server.handle(Server.java:505)
-	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:370)
-	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:267)
-	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:305)
-	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:103)
-	at org.eclipse.jetty.io.ChannelEndPoint$2.run(ChannelEndPoint.java:117)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.runTask(EatWhatYouKill.java:333)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.doProduce(EatWhatYouKill.java:310)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.tryProduce(EatWhatYouKill.java:168)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.run(EatWhatYouKill.java:126)
-	at org.eclipse.jetty.util.thread.ReservedThreadExecutor$ReservedThread.run(ReservedThreadExecutor.java:366)
-	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:781)
-	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:917)
-	at java.lang.Thread.run(Thread.java:748)
-Caused by: org.apache.solr.common.SolrException: Could not load conf for core boloindya: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:96)
-	at org.apache.solr.core.CoreContainer.getConfigSet(CoreContainer.java:1294)
-	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1241)
-	at org.apache.solr.core.CoreContainer.lambda$load$13(CoreContainer.java:756)
-	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202)
-	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
-	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:209)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
-	... 1 more
-Caused by: org.apache.solr.common.SolrException: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:596)
-	at org.apache.solr.schema.IndexSchema.<init>(IndexSchema.java:176)
-	at org.apache.solr.schema.IndexSchemaFactory.create(IndexSchemaFactory.java:56)
-	at org.apache.solr.schema.IndexSchemaFactory.buildIndexSchema(IndexSchemaFactory.java:70)
-	at org.apache.solr.core.ConfigSetService.createIndexSchema(ConfigSetService.java:118)
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:91)
-	... 9 more
-Caused by: org.apache.solr.common.SolrException: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:151)
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:87)
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:457)
-	... 14 more
-Caused by: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.createSAXParseException(ErrorHandlerWrapper.java:203)
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.fatalError(ErrorHandlerWrapper.java:177)
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:400)
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:327)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.reportFatalError(XMLScanner.java:1472)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPIData(XMLScanner.java:746)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanPIData(XMLDocumentFragmentScannerImpl.java:1014)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPI(XMLScanner.java:714)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl$TrailingMiscDriver.next(XMLDocumentScannerImpl.java:1413)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl.next(XMLDocumentScannerImpl.java:602)
-	at com.sun.org.apache.xerces.internal.impl.XMLNSDocumentScannerImpl.next(XMLNSDocumentScannerImpl.java:112)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanDocument(XMLDocumentFragmentScannerImpl.java:505)
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:842)
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:771)
-	at com.sun.org.apache.xerces.internal.parsers.XMLParser.parse(XMLParser.java:141)
-	at com.sun.org.apache.xerces.internal.parsers.DOMParser.parse(DOMParser.java:243)
-	at com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderImpl.parse(DocumentBuilderImpl.java:339)
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:140)
-	... 16 more
-
-2020-01-22 05:47:38.969 ERROR (qtp961712517-22) [   ] o.a.s.s.HttpSolrCall null:org.apache.solr.core.SolrCoreInitializationException: SolrCore 'boloindya' is not available due to init failure: Could not load conf for core boloindya: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.CoreContainer.getCore(CoreContainer.java:1734)
-	at org.apache.solr.servlet.HttpSolrCall.init(HttpSolrCall.java:255)
-	at org.apache.solr.servlet.HttpSolrCall.call(HttpSolrCall.java:526)
-	at org.apache.solr.servlet.SolrDispatchFilter.doFilter(SolrDispatchFilter.java:423)
-	at org.apache.solr.servlet.SolrDispatchFilter.doFilter(SolrDispatchFilter.java:350)
-	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1602)
-	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:540)
-	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:146)
-	at org.eclipse.jetty.security.SecurityHandler.handle(SecurityHandler.java:548)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:257)
-	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1711)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:255)
-	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1347)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:203)
-	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:480)
-	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1678)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:201)
-	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1249)
-	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:144)
-	at org.eclipse.jetty.server.handler.ContextHandlerCollection.handle(ContextHandlerCollection.java:220)
-	at org.eclipse.jetty.server.handler.HandlerCollection.handle(HandlerCollection.java:152)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.rewrite.handler.RewriteHandler.handle(RewriteHandler.java:335)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.server.Server.handle(Server.java:505)
-	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:370)
-	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:267)
-	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:305)
-	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:103)
-	at org.eclipse.jetty.io.ChannelEndPoint$2.run(ChannelEndPoint.java:117)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.runTask(EatWhatYouKill.java:333)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.doProduce(EatWhatYouKill.java:310)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.tryProduce(EatWhatYouKill.java:168)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.run(EatWhatYouKill.java:126)
-	at org.eclipse.jetty.util.thread.ReservedThreadExecutor$ReservedThread.run(ReservedThreadExecutor.java:366)
-	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:781)
-	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:917)
-	at java.lang.Thread.run(Thread.java:748)
-Caused by: org.apache.solr.common.SolrException: Could not load conf for core boloindya: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:96)
-	at org.apache.solr.core.CoreContainer.getConfigSet(CoreContainer.java:1294)
-	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1241)
-	at org.apache.solr.core.CoreContainer.lambda$load$13(CoreContainer.java:756)
-	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202)
-	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
-	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:209)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
-	... 1 more
-Caused by: org.apache.solr.common.SolrException: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:596)
-	at org.apache.solr.schema.IndexSchema.<init>(IndexSchema.java:176)
-	at org.apache.solr.schema.IndexSchemaFactory.create(IndexSchemaFactory.java:56)
-	at org.apache.solr.schema.IndexSchemaFactory.buildIndexSchema(IndexSchemaFactory.java:70)
-	at org.apache.solr.core.ConfigSetService.createIndexSchema(ConfigSetService.java:118)
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:91)
-	... 9 more
-Caused by: org.apache.solr.common.SolrException: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:151)
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:87)
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:457)
-	... 14 more
-Caused by: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.createSAXParseException(ErrorHandlerWrapper.java:203)
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.fatalError(ErrorHandlerWrapper.java:177)
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:400)
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:327)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.reportFatalError(XMLScanner.java:1472)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPIData(XMLScanner.java:746)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanPIData(XMLDocumentFragmentScannerImpl.java:1014)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPI(XMLScanner.java:714)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl$TrailingMiscDriver.next(XMLDocumentScannerImpl.java:1413)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl.next(XMLDocumentScannerImpl.java:602)
-	at com.sun.org.apache.xerces.internal.impl.XMLNSDocumentScannerImpl.next(XMLNSDocumentScannerImpl.java:112)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanDocument(XMLDocumentFragmentScannerImpl.java:505)
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:842)
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:771)
-	at com.sun.org.apache.xerces.internal.parsers.XMLParser.parse(XMLParser.java:141)
-	at com.sun.org.apache.xerces.internal.parsers.DOMParser.parse(DOMParser.java:243)
-	at com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderImpl.parse(DocumentBuilderImpl.java:339)
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:140)
-	... 16 more
-
-2020-01-22 05:47:39.758 ERROR (qtp961712517-20) [   ] o.a.s.s.HttpSolrCall null:org.apache.solr.core.SolrCoreInitializationException: SolrCore 'boloindya' is not available due to init failure: Could not load conf for core boloindya: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.CoreContainer.getCore(CoreContainer.java:1734)
-	at org.apache.solr.servlet.HttpSolrCall.init(HttpSolrCall.java:255)
-	at org.apache.solr.servlet.HttpSolrCall.call(HttpSolrCall.java:526)
-	at org.apache.solr.servlet.SolrDispatchFilter.doFilter(SolrDispatchFilter.java:423)
-	at org.apache.solr.servlet.SolrDispatchFilter.doFilter(SolrDispatchFilter.java:350)
-	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1602)
-	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:540)
-	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:146)
-	at org.eclipse.jetty.security.SecurityHandler.handle(SecurityHandler.java:548)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:257)
-	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1711)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:255)
-	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1347)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:203)
-	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:480)
-	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1678)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:201)
-	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1249)
-	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:144)
-	at org.eclipse.jetty.server.handler.ContextHandlerCollection.handle(ContextHandlerCollection.java:220)
-	at org.eclipse.jetty.server.handler.HandlerCollection.handle(HandlerCollection.java:152)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.rewrite.handler.RewriteHandler.handle(RewriteHandler.java:335)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.server.Server.handle(Server.java:505)
-	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:370)
-	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:267)
-	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:305)
-	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:103)
-	at org.eclipse.jetty.io.ChannelEndPoint$2.run(ChannelEndPoint.java:117)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.runTask(EatWhatYouKill.java:333)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.doProduce(EatWhatYouKill.java:310)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.tryProduce(EatWhatYouKill.java:168)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.run(EatWhatYouKill.java:126)
-	at org.eclipse.jetty.util.thread.ReservedThreadExecutor$ReservedThread.run(ReservedThreadExecutor.java:366)
-	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:781)
-	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:917)
-	at java.lang.Thread.run(Thread.java:748)
-Caused by: org.apache.solr.common.SolrException: Could not load conf for core boloindya: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:96)
-	at org.apache.solr.core.CoreContainer.getConfigSet(CoreContainer.java:1294)
-	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1241)
-	at org.apache.solr.core.CoreContainer.lambda$load$13(CoreContainer.java:756)
-	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202)
-	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
-	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:209)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
-	... 1 more
-Caused by: org.apache.solr.common.SolrException: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:596)
-	at org.apache.solr.schema.IndexSchema.<init>(IndexSchema.java:176)
-	at org.apache.solr.schema.IndexSchemaFactory.create(IndexSchemaFactory.java:56)
-	at org.apache.solr.schema.IndexSchemaFactory.buildIndexSchema(IndexSchemaFactory.java:70)
-	at org.apache.solr.core.ConfigSetService.createIndexSchema(ConfigSetService.java:118)
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:91)
-	... 9 more
-Caused by: org.apache.solr.common.SolrException: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:151)
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:87)
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:457)
-	... 14 more
-Caused by: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.createSAXParseException(ErrorHandlerWrapper.java:203)
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.fatalError(ErrorHandlerWrapper.java:177)
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:400)
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:327)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.reportFatalError(XMLScanner.java:1472)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPIData(XMLScanner.java:746)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanPIData(XMLDocumentFragmentScannerImpl.java:1014)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPI(XMLScanner.java:714)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl$TrailingMiscDriver.next(XMLDocumentScannerImpl.java:1413)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl.next(XMLDocumentScannerImpl.java:602)
-	at com.sun.org.apache.xerces.internal.impl.XMLNSDocumentScannerImpl.next(XMLNSDocumentScannerImpl.java:112)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanDocument(XMLDocumentFragmentScannerImpl.java:505)
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:842)
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:771)
-	at com.sun.org.apache.xerces.internal.parsers.XMLParser.parse(XMLParser.java:141)
-	at com.sun.org.apache.xerces.internal.parsers.DOMParser.parse(DOMParser.java:243)
-	at com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderImpl.parse(DocumentBuilderImpl.java:339)
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:140)
-	... 16 more
-
-2020-01-22 05:47:40.588 ERROR (qtp961712517-22) [   ] o.a.s.s.HttpSolrCall null:org.apache.solr.core.SolrCoreInitializationException: SolrCore 'boloindya' is not available due to init failure: Could not load conf for core boloindya: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.CoreContainer.getCore(CoreContainer.java:1734)
-	at org.apache.solr.servlet.HttpSolrCall.init(HttpSolrCall.java:255)
-	at org.apache.solr.servlet.HttpSolrCall.call(HttpSolrCall.java:526)
-	at org.apache.solr.servlet.SolrDispatchFilter.doFilter(SolrDispatchFilter.java:423)
-	at org.apache.solr.servlet.SolrDispatchFilter.doFilter(SolrDispatchFilter.java:350)
-	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1602)
-	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:540)
-	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:146)
-	at org.eclipse.jetty.security.SecurityHandler.handle(SecurityHandler.java:548)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:257)
-	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1711)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:255)
-	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1347)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:203)
-	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:480)
-	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1678)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:201)
-	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1249)
-	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:144)
-	at org.eclipse.jetty.server.handler.ContextHandlerCollection.handle(ContextHandlerCollection.java:220)
-	at org.eclipse.jetty.server.handler.HandlerCollection.handle(HandlerCollection.java:152)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.rewrite.handler.RewriteHandler.handle(RewriteHandler.java:335)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.server.Server.handle(Server.java:505)
-	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:370)
-	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:267)
-	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:305)
-	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:103)
-	at org.eclipse.jetty.io.ChannelEndPoint$2.run(ChannelEndPoint.java:117)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.runTask(EatWhatYouKill.java:333)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.doProduce(EatWhatYouKill.java:310)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.tryProduce(EatWhatYouKill.java:168)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.run(EatWhatYouKill.java:126)
-	at org.eclipse.jetty.util.thread.ReservedThreadExecutor$ReservedThread.run(ReservedThreadExecutor.java:366)
-	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:781)
-	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:917)
-	at java.lang.Thread.run(Thread.java:748)
-Caused by: org.apache.solr.common.SolrException: Could not load conf for core boloindya: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:96)
-	at org.apache.solr.core.CoreContainer.getConfigSet(CoreContainer.java:1294)
-	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1241)
-	at org.apache.solr.core.CoreContainer.lambda$load$13(CoreContainer.java:756)
-	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202)
-	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
-	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:209)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
-	... 1 more
-Caused by: org.apache.solr.common.SolrException: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:596)
-	at org.apache.solr.schema.IndexSchema.<init>(IndexSchema.java:176)
-	at org.apache.solr.schema.IndexSchemaFactory.create(IndexSchemaFactory.java:56)
-	at org.apache.solr.schema.IndexSchemaFactory.buildIndexSchema(IndexSchemaFactory.java:70)
-	at org.apache.solr.core.ConfigSetService.createIndexSchema(ConfigSetService.java:118)
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:91)
-	... 9 more
-Caused by: org.apache.solr.common.SolrException: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:151)
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:87)
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:457)
-	... 14 more
-Caused by: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.createSAXParseException(ErrorHandlerWrapper.java:203)
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.fatalError(ErrorHandlerWrapper.java:177)
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:400)
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:327)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.reportFatalError(XMLScanner.java:1472)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPIData(XMLScanner.java:746)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanPIData(XMLDocumentFragmentScannerImpl.java:1014)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPI(XMLScanner.java:714)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl$TrailingMiscDriver.next(XMLDocumentScannerImpl.java:1413)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl.next(XMLDocumentScannerImpl.java:602)
-	at com.sun.org.apache.xerces.internal.impl.XMLNSDocumentScannerImpl.next(XMLNSDocumentScannerImpl.java:112)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanDocument(XMLDocumentFragmentScannerImpl.java:505)
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:842)
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:771)
-	at com.sun.org.apache.xerces.internal.parsers.XMLParser.parse(XMLParser.java:141)
-	at com.sun.org.apache.xerces.internal.parsers.DOMParser.parse(DOMParser.java:243)
-	at com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderImpl.parse(DocumentBuilderImpl.java:339)
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:140)
-	... 16 more
-
-2020-01-22 05:47:40.629 INFO  (qtp961712517-17) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/logging params={wt=json&_=1579671707874&since=0} status=0 QTime=0
-2020-01-22 05:47:41.491 ERROR (qtp961712517-20) [   ] o.a.s.s.HttpSolrCall null:org.apache.solr.core.SolrCoreInitializationException: SolrCore 'boloindya' is not available due to init failure: Could not load conf for core boloindya: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.CoreContainer.getCore(CoreContainer.java:1734)
-	at org.apache.solr.servlet.HttpSolrCall.init(HttpSolrCall.java:255)
-	at org.apache.solr.servlet.HttpSolrCall.call(HttpSolrCall.java:526)
-	at org.apache.solr.servlet.SolrDispatchFilter.doFilter(SolrDispatchFilter.java:423)
-	at org.apache.solr.servlet.SolrDispatchFilter.doFilter(SolrDispatchFilter.java:350)
-	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1602)
-	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:540)
-	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:146)
-	at org.eclipse.jetty.security.SecurityHandler.handle(SecurityHandler.java:548)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:257)
-	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1711)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:255)
-	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1347)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:203)
-	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:480)
-	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1678)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:201)
-	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1249)
-	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:144)
-	at org.eclipse.jetty.server.handler.ContextHandlerCollection.handle(ContextHandlerCollection.java:220)
-	at org.eclipse.jetty.server.handler.HandlerCollection.handle(HandlerCollection.java:152)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.rewrite.handler.RewriteHandler.handle(RewriteHandler.java:335)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.server.Server.handle(Server.java:505)
-	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:370)
-	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:267)
-	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:305)
-	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:103)
-	at org.eclipse.jetty.io.ChannelEndPoint$2.run(ChannelEndPoint.java:117)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.runTask(EatWhatYouKill.java:333)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.doProduce(EatWhatYouKill.java:310)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.tryProduce(EatWhatYouKill.java:168)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.run(EatWhatYouKill.java:126)
-	at org.eclipse.jetty.util.thread.ReservedThreadExecutor$ReservedThread.run(ReservedThreadExecutor.java:366)
-	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:781)
-	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:917)
-	at java.lang.Thread.run(Thread.java:748)
-Caused by: org.apache.solr.common.SolrException: Could not load conf for core boloindya: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:96)
-	at org.apache.solr.core.CoreContainer.getConfigSet(CoreContainer.java:1294)
-	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1241)
-	at org.apache.solr.core.CoreContainer.lambda$load$13(CoreContainer.java:756)
-	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202)
-	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
-	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:209)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
-	... 1 more
-Caused by: org.apache.solr.common.SolrException: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:596)
-	at org.apache.solr.schema.IndexSchema.<init>(IndexSchema.java:176)
-	at org.apache.solr.schema.IndexSchemaFactory.create(IndexSchemaFactory.java:56)
-	at org.apache.solr.schema.IndexSchemaFactory.buildIndexSchema(IndexSchemaFactory.java:70)
-	at org.apache.solr.core.ConfigSetService.createIndexSchema(ConfigSetService.java:118)
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:91)
-	... 9 more
-Caused by: org.apache.solr.common.SolrException: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:151)
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:87)
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:457)
-	... 14 more
-Caused by: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.createSAXParseException(ErrorHandlerWrapper.java:203)
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.fatalError(ErrorHandlerWrapper.java:177)
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:400)
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:327)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.reportFatalError(XMLScanner.java:1472)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPIData(XMLScanner.java:746)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanPIData(XMLDocumentFragmentScannerImpl.java:1014)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPI(XMLScanner.java:714)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl$TrailingMiscDriver.next(XMLDocumentScannerImpl.java:1413)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl.next(XMLDocumentScannerImpl.java:602)
-	at com.sun.org.apache.xerces.internal.impl.XMLNSDocumentScannerImpl.next(XMLNSDocumentScannerImpl.java:112)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanDocument(XMLDocumentFragmentScannerImpl.java:505)
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:842)
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:771)
-	at com.sun.org.apache.xerces.internal.parsers.XMLParser.parse(XMLParser.java:141)
-	at com.sun.org.apache.xerces.internal.parsers.DOMParser.parse(DOMParser.java:243)
-	at com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderImpl.parse(DocumentBuilderImpl.java:339)
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:140)
-	... 16 more
-
-2020-01-22 05:47:41.800 ERROR (qtp961712517-22) [   ] o.a.s.s.HttpSolrCall null:org.apache.solr.core.SolrCoreInitializationException: SolrCore 'boloindya' is not available due to init failure: Could not load conf for core boloindya: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.CoreContainer.getCore(CoreContainer.java:1734)
-	at org.apache.solr.servlet.HttpSolrCall.init(HttpSolrCall.java:255)
-	at org.apache.solr.servlet.HttpSolrCall.call(HttpSolrCall.java:526)
-	at org.apache.solr.servlet.SolrDispatchFilter.doFilter(SolrDispatchFilter.java:423)
-	at org.apache.solr.servlet.SolrDispatchFilter.doFilter(SolrDispatchFilter.java:350)
-	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1602)
-	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:540)
-	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:146)
-	at org.eclipse.jetty.security.SecurityHandler.handle(SecurityHandler.java:548)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:257)
-	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1711)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:255)
-	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1347)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:203)
-	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:480)
-	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1678)
-	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:201)
-	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1249)
-	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:144)
-	at org.eclipse.jetty.server.handler.ContextHandlerCollection.handle(ContextHandlerCollection.java:220)
-	at org.eclipse.jetty.server.handler.HandlerCollection.handle(HandlerCollection.java:152)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.rewrite.handler.RewriteHandler.handle(RewriteHandler.java:335)
-	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
-	at org.eclipse.jetty.server.Server.handle(Server.java:505)
-	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:370)
-	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:267)
-	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:305)
-	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:103)
-	at org.eclipse.jetty.io.ChannelEndPoint$2.run(ChannelEndPoint.java:117)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.runTask(EatWhatYouKill.java:333)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.doProduce(EatWhatYouKill.java:310)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.tryProduce(EatWhatYouKill.java:168)
-	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.run(EatWhatYouKill.java:126)
-	at org.eclipse.jetty.util.thread.ReservedThreadExecutor$ReservedThread.run(ReservedThreadExecutor.java:366)
-	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:781)
-	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:917)
-	at java.lang.Thread.run(Thread.java:748)
-Caused by: org.apache.solr.common.SolrException: Could not load conf for core boloindya: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:96)
-	at org.apache.solr.core.CoreContainer.getConfigSet(CoreContainer.java:1294)
-	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1241)
-	at org.apache.solr.core.CoreContainer.lambda$load$13(CoreContainer.java:756)
-	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202)
-	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
-	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:209)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
-	... 1 more
-Caused by: org.apache.solr.common.SolrException: Can't load schema /var/live_code/boloindya/solr/server/solr/boloindya/conf/schema.xml: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:596)
-	at org.apache.solr.schema.IndexSchema.<init>(IndexSchema.java:176)
-	at org.apache.solr.schema.IndexSchemaFactory.create(IndexSchemaFactory.java:56)
-	at org.apache.solr.schema.IndexSchemaFactory.buildIndexSchema(IndexSchemaFactory.java:70)
-	at org.apache.solr.core.ConfigSetService.createIndexSchema(ConfigSetService.java:118)
-	at org.apache.solr.core.ConfigSetService.getConfig(ConfigSetService.java:91)
-	... 9 more
-Caused by: org.apache.solr.common.SolrException: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:151)
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:87)
-	at org.apache.solr.schema.IndexSchema.readSchema(IndexSchema.java:457)
-	... 14 more
-Caused by: org.xml.sax.SAXParseException; systemId: solrres:/schema.xml; lineNumber: 1065; columnNumber: 6; The processing instruction target matching "[xX][mM][lL]" is not allowed.
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.createSAXParseException(ErrorHandlerWrapper.java:203)
-	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.fatalError(ErrorHandlerWrapper.java:177)
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:400)
-	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:327)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.reportFatalError(XMLScanner.java:1472)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPIData(XMLScanner.java:746)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanPIData(XMLDocumentFragmentScannerImpl.java:1014)
-	at com.sun.org.apache.xerces.internal.impl.XMLScanner.scanPI(XMLScanner.java:714)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl$TrailingMiscDriver.next(XMLDocumentScannerImpl.java:1413)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl.next(XMLDocumentScannerImpl.java:602)
-	at com.sun.org.apache.xerces.internal.impl.XMLNSDocumentScannerImpl.next(XMLNSDocumentScannerImpl.java:112)
-	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanDocument(XMLDocumentFragmentScannerImpl.java:505)
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:842)
-	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:771)
-	at com.sun.org.apache.xerces.internal.parsers.XMLParser.parse(XMLParser.java:141)
-	at com.sun.org.apache.xerces.internal.parsers.DOMParser.parse(DOMParser.java:243)
-	at com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderImpl.parse(DocumentBuilderImpl.java:339)
-	at org.apache.solr.core.XmlConfigFile.<init>(XmlConfigFile.java:140)
-	... 16 more
-
-2020-01-22 05:47:50.659 INFO  (qtp961712517-22) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/logging params={wt=json&_=1579671707874&since=0} status=0 QTime=0
-2020-01-22 05:48:01.453 INFO  (qtp961712517-20) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/logging params={wt=json&_=1579671707874&since=0} status=0 QTime=0
-2020-01-22 05:48:11.592 INFO  (qtp961712517-22) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/logging params={wt=json&_=1579671707874&since=0} status=0 QTime=0
-2020-01-22 05:48:21.589 INFO  (qtp961712517-20) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/logging params={wt=json&_=1579671707874&since=0} status=0 QTime=0
-2020-01-22 05:48:31.613 INFO  (qtp961712517-22) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/logging params={wt=json&_=1579671707874&since=0} status=0 QTime=0
-2020-01-22 05:48:42.601 INFO  (qtp961712517-20) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/logging params={wt=json&_=1579671707874&since=0} status=0 QTime=0
-2020-01-22 05:48:52.595 INFO  (qtp961712517-22) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/logging params={wt=json&_=1579671707874&since=0} status=0 QTime=0
-2020-01-22 05:49:03.637 INFO  (qtp961712517-20) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/logging params={wt=json&_=1579671707874&since=0} status=0 QTime=0
-2020-01-22 05:49:14.597 INFO  (qtp961712517-22) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/logging params={wt=json&_=1579671707874&since=0} status=0 QTime=0
-2020-01-22 05:49:25.597 INFO  (qtp961712517-20) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/logging params={wt=json&_=1579671707874&since=0} status=0 QTime=0
-2020-01-22 05:49:36.272 INFO  (qtp961712517-22) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/logging params={wt=json&_=1579671707874&since=0} status=0 QTime=0
-2020-01-22 05:49:46.404 INFO  (qtp961712517-20) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/logging params={wt=json&_=1579671707874&since=0} status=0 QTime=0
-2020-01-22 05:49:49.358 INFO  (ShutdownMonitor) [   ] o.e.j.s.AbstractConnector Stopped ServerConnector@131ef10{HTTP/1.1,[http/1.1, h2c]}{0.0.0.0:8983}
-2020-01-22 05:49:49.358 INFO  (ShutdownMonitor) [   ] o.e.j.s.session node0 Stopped scavenging
-2020-01-22 05:49:49.362 INFO  (ShutdownMonitor) [   ] o.a.s.c.CoreContainer Shutting down CoreContainer instance=1344697180
-2020-01-22 05:49:49.369 INFO  (ShutdownMonitor) [   ] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.node, tag=null
-2020-01-22 05:49:49.372 INFO  (ShutdownMonitor) [   ] o.a.s.m.r.SolrJmxReporter Closing reporter [org.apache.solr.metrics.reporters.SolrJmxReporter@7b139eab: rootName = null, domain = solr.node, service url = null, agent id = null] for registry solr.node / com.codahale.metrics.MetricRegistry@4353b712
-2020-01-22 05:49:49.392 INFO  (ShutdownMonitor) [   ] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.jvm, tag=null
-2020-01-22 05:49:49.392 INFO  (ShutdownMonitor) [   ] o.a.s.m.r.SolrJmxReporter Closing reporter [org.apache.solr.metrics.reporters.SolrJmxReporter@1ca25c47: rootName = null, domain = solr.jvm, service url = null, agent id = null] for registry solr.jvm / com.codahale.metrics.MetricRegistry@4d1e6572
-2020-01-22 05:49:49.395 INFO  (ShutdownMonitor) [   ] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.jetty, tag=null
-2020-01-22 05:49:49.395 INFO  (ShutdownMonitor) [   ] o.a.s.m.r.SolrJmxReporter Closing reporter [org.apache.solr.metrics.reporters.SolrJmxReporter@5fcacc0: rootName = null, domain = solr.jetty, service url = null, agent id = null] for registry solr.jetty / com.codahale.metrics.MetricRegistry@34c4e433
-2020-01-22 05:49:49.409 INFO  (ShutdownMonitor) [   ] o.e.j.s.h.ContextHandler Stopped o.e.j.w.WebAppContext@4d02f94e{/solr,null,UNAVAILABLE}{/private/var/live_code/boloindya/solr/server/solr-webapp/webapp}
+2020-02-05 11:27:21.311 INFO  (main) [   ] o.e.j.u.log Logging initialized @6114ms to org.eclipse.jetty.util.log.Slf4jLog
+2020-02-05 11:27:21.613 INFO  (main) [   ] o.e.j.s.Server jetty-9.4.10.v20180503; built: 2018-05-03T15:56:21.710Z; git: daa59876e6f384329b122929e70a80934569428c; jvm 1.8.0_192-b12
+2020-02-05 11:27:21.656 INFO  (main) [   ] o.e.j.d.p.ScanningAppProvider Deployment monitor [file:///private/var/live_code/boloindya/solr/server/contexts/] at interval 0
+2020-02-05 11:27:22.047 INFO  (main) [   ] o.e.j.w.StandardDescriptorProcessor NO JSP Support for /solr, did not find org.apache.jasper.servlet.JspServlet
+2020-02-05 11:27:22.061 INFO  (main) [   ] o.e.j.s.session DefaultSessionIdManager workerName=node0
+2020-02-05 11:27:22.061 INFO  (main) [   ] o.e.j.s.session No SessionScavenger set, using defaults
+2020-02-05 11:27:22.063 INFO  (main) [   ] o.e.j.s.session node0 Scavenging every 660000ms
+2020-02-05 11:27:22.124 INFO  (main) [   ] o.a.s.u.c.SSLCredentialProviderFactory Processing SSL Credential Provider chain: env;sysprop
+2020-02-05 11:27:22.195 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter Using logger factory org.apache.logging.slf4j.Log4jLoggerFactory
+2020-02-05 11:27:22.201 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter  ___      _       Welcome to Apache Solr™ version 7.4.0
+2020-02-05 11:27:22.202 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter / __| ___| |_ _   Starting in standalone mode on port 8983
+2020-02-05 11:27:22.202 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter \__ \/ _ \ | '_|  Install dir: /var/live_code/boloindya/solr
+2020-02-05 11:27:22.202 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter |___/\___/_|_|    Start time: 2020-02-05T11:27:22.202Z
+2020-02-05 11:27:22.228 INFO  (main) [   ] o.a.s.c.SolrResourceLoader Using system property solr.solr.home: /var/live_code/boloindya/solr/server/solr
+2020-02-05 11:27:22.238 INFO  (main) [   ] o.a.s.c.SolrXmlConfig Loading container configuration from /var/live_code/boloindya/solr/server/solr/solr.xml
+2020-02-05 11:27:22.310 INFO  (main) [   ] o.a.s.c.SolrXmlConfig MBean server found: com.sun.jmx.mbeanserver.JmxMBeanServer@442675e1, but no JMX reporters were configured - adding default JMX reporter.
+2020-02-05 11:27:28.857 INFO  (main) [   ] o.a.s.c.TransientSolrCoreCacheDefault Allocating transient cache for 2147483647 transient cores
+2020-02-05 11:27:28.875 INFO  (main) [   ] o.a.s.h.a.MetricsHistoryHandler No .system collection, keeping metrics history in memory.
+2020-02-05 11:27:29.068 INFO  (main) [   ] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.node' (registry 'solr.node') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@442675e1
+2020-02-05 11:27:29.069 INFO  (main) [   ] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.jvm' (registry 'solr.jvm') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@442675e1
+2020-02-05 11:27:29.080 INFO  (main) [   ] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.jetty' (registry 'solr.jetty') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@442675e1
+2020-02-05 11:27:29.108 INFO  (main) [   ] o.a.s.c.CorePropertiesLocator Found 1 core definitions underneath /var/live_code/boloindya/solr/server/solr
+2020-02-05 11:27:29.109 INFO  (main) [   ] o.a.s.c.CorePropertiesLocator Cores are: [boloindya]
+2020-02-05 11:27:29.232 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.c.SolrResourceLoader [boloindya] Added 57 libs to classloader, from paths: [/var/live_code/boloindya/solr/contrib/clustering/lib, /var/live_code/boloindya/solr/contrib/extraction/lib, /var/live_code/boloindya/solr/contrib/langid/lib, /var/live_code/boloindya/solr/contrib/velocity/lib, /var/live_code/boloindya/solr/dist]
+2020-02-05 11:27:29.253 INFO  (main) [   ] o.e.j.s.h.ContextHandler Started o.e.j.w.WebAppContext@58a9760d{/solr,file:///private/var/live_code/boloindya/solr/server/solr-webapp/webapp/,AVAILABLE}{file:///private/var/live_code/boloindya/solr/server//solr-webapp/webapp}
+2020-02-05 11:27:29.281 INFO  (main) [   ] o.e.j.s.AbstractConnector Started ServerConnector@b50249f{HTTP/1.1,[http/1.1]}{0.0.0.0:8983}
+2020-02-05 11:27:29.282 INFO  (main) [   ] o.e.j.s.Server Started @14088ms
+2020-02-05 11:27:29.512 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.c.SolrConfig Using Lucene MatchVersion: 7.4.0
+2020-02-05 11:27:29.770 WARN  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.s.ManagedIndexSchemaFactory The schema has been upgraded to managed, but the non-managed schema schema.xml is still loadable.  PLEASE REMOVE THIS FILE.
+2020-02-05 11:27:29.890 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.s.IndexSchema [boloindya] Schema name=default-config
+2020-02-05 11:27:31.002 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.s.IndexSchema Loaded schema default-config/1.6 with uniqueid field id
+2020-02-05 11:27:31.066 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.c.CoreContainer Creating SolrCore 'boloindya' using configuration from instancedir /var/live_code/boloindya/solr/server/solr/boloindya, trusted=true
+2020-02-05 11:27:31.122 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.core.boloindya' (registry 'solr.core.boloindya') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@442675e1
+2020-02-05 11:27:31.197 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.c.SolrCore solr.RecoveryStrategy.Builder
+2020-02-05 11:27:31.210 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.c.SolrCore [[boloindya] ] Opening new SolrCore at [/var/live_code/boloindya/solr/server/solr/boloindya], dataDir=[/var/live_code/boloindya/solr/server/solr/boloindya/data/]
+2020-02-05 11:27:31.281 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.r.XSLTResponseWriter xsltCacheLifetimeSeconds=5
+2020-02-05 11:27:37.035 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.u.UpdateHandler Using UpdateLog implementation: org.apache.solr.update.UpdateLog
+2020-02-05 11:27:37.035 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.u.UpdateLog Initializing UpdateLog: dataDir= defaultSyncLevel=FLUSH numRecordsToKeep=100 maxNumLogsToKeep=10 numVersionBuckets=65536
+2020-02-05 11:27:37.072 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.u.CommitTracker Hard AutoCommit: if uncommited for 15000ms; 
+2020-02-05 11:27:37.072 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.u.CommitTracker Soft AutoCommit: disabled
+2020-02-05 11:27:37.425 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.s.SolrIndexSearcher Opening [Searcher@14997cb9[boloindya] main]
+2020-02-05 11:27:37.439 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.r.ManagedResourceStorage File-based storage initialized to use dir: /var/live_code/boloindya/solr/server/solr/boloindya/conf
+2020-02-05 11:27:37.470 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.h.c.SpellCheckComponent Initializing spell checkers
+2020-02-05 11:27:37.476 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.s.DirectSolrSpellChecker init: {name=default,field=_text_,classname=solr.DirectSolrSpellChecker,distanceMeasure=internal,accuracy=0.5,maxEdits=2,minPrefix=1,maxInspections=20,minQueryLength=4,maxQueryFrequency=0.01}
+2020-02-05 11:27:37.482 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.h.c.SuggestComponent Initializing SuggestComponent
+2020-02-05 11:27:37.485 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.s.s.SolrSuggester init: {name=default,lookupImpl=FuzzyLookupFactory,dictionaryImpl=DocumentDictionaryFactory,field=name,weightField=name,suggestAnalyzerFieldType=string}
+2020-02-05 11:27:37.503 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.s.s.SolrSuggester Dictionary loaded with params: {name=default,lookupImpl=FuzzyLookupFactory,dictionaryImpl=DocumentDictionaryFactory,field=name,weightField=name,suggestAnalyzerFieldType=string}
+2020-02-05 11:27:37.504 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.h.c.SuggestComponent Registering searcher listener for suggester: default - SuggesterListener [core=org.apache.solr.core.SolrCore@316ae63c, suggester=SolrSuggester [ name=default, sourceLocation=null, storeDir=, lookupImpl=FuzzyLookupFactory, dictionaryImpl=DocumentDictionaryFactory, sizeInBytes=0 ], buildOnCommit=false, buildOnOptimize=false, buildOnStartup=true, isCoreReload=false]
+2020-02-05 11:27:37.515 INFO  (coreLoadExecutor-9-thread-1) [   x:boloindya] o.a.s.h.ReplicationHandler Commits will be reserved for 10000ms.
+2020-02-05 11:27:37.519 INFO  (searcherExecutor-10-thread-1-processing-x:boloindya) [   x:boloindya] o.a.s.c.QuerySenderListener QuerySenderListener sending requests to Searcher@14997cb9[boloindya] main{ExitableDirectoryReader(UninvertingDirectoryReader(Uninverting(_61(7.4.0):C90934) Uninverting(_6c(7.4.0):C10000) Uninverting(_6d(7.4.0):C1000) Uninverting(_6e(7.4.0):C1000) Uninverting(_6f(7.4.0):C1000) Uninverting(_6g(7.4.0):C1000) Uninverting(_6h(7.4.0):C1000) Uninverting(_6i(7.4.0):C235)))}
+2020-02-05 11:27:37.519 INFO  (searcherExecutor-10-thread-1-processing-x:boloindya) [   x:boloindya] o.a.s.c.QuerySenderListener QuerySenderListener done.
+2020-02-05 11:27:37.520 INFO  (searcherExecutor-10-thread-1-processing-x:boloindya) [   x:boloindya] o.a.s.h.c.SpellCheckComponent Loading spell index for spellchecker: default
+2020-02-05 11:27:37.520 INFO  (searcherExecutor-10-thread-1-processing-x:boloindya) [   x:boloindya] o.a.s.h.c.SpellCheckComponent Loading spell index for spellchecker: wordbreak
+2020-02-05 11:27:37.520 INFO  (searcherExecutor-10-thread-1-processing-x:boloindya) [   x:boloindya] o.a.s.h.c.SuggestComponent buildOnStartup: default
+2020-02-05 11:27:37.520 INFO  (searcherExecutor-10-thread-1-processing-x:boloindya) [   x:boloindya] o.a.s.s.s.SolrSuggester SolrSuggester.build(default)
+2020-02-05 11:27:41.809 INFO  (searcherExecutor-10-thread-1-processing-x:boloindya) [   x:boloindya] o.a.s.c.SolrCore [boloindya] Registered new searcher Searcher@14997cb9[boloindya] main{ExitableDirectoryReader(UninvertingDirectoryReader(Uninverting(_61(7.4.0):C90934) Uninverting(_6c(7.4.0):C10000) Uninverting(_6d(7.4.0):C1000) Uninverting(_6e(7.4.0):C1000) Uninverting(_6f(7.4.0):C1000) Uninverting(_6g(7.4.0):C1000) Uninverting(_6h(7.4.0):C1000) Uninverting(_6i(7.4.0):C235)))}
+2020-02-05 11:27:41.998 INFO  (qtp952486988-19) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/browse params={q=maaz} hits=6 status=0 QTime=7902
+2020-02-05 11:27:41.999 INFO  (qtp952486988-19) [   x:boloindya] o.a.s.c.PluginBag Going to create a new queryResponseWriter with {type = queryResponseWriter,name = velocity,class = solr.VelocityResponseWriter,attributes = {startup=lazy, name=velocity, class=solr.VelocityResponseWriter},args = {template.base.dir=,solr.resource.loader.enabled=true,params.resource.loader.enabled=false}} 
+2020-02-05 11:28:12.121 INFO  (qtp952486988-14) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/cores params={indexInfo=false&wt=json&_=1580902091639} status=0 QTime=2
+2020-02-05 11:28:12.169 INFO  (qtp952486988-20) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/system params={wt=json&_=1580902091640} status=0 QTime=48
+2020-02-05 11:29:09.054 INFO  (qtp952486988-16) [   x:boloindya] o.a.s.c.PluginBag Going to create a new requestHandler with {type = requestHandler,name = /spell,class = solr.SearchHandler,attributes = {startup=lazy, name=/spell, class=solr.SearchHandler},args = {defaults={spellcheck.dictionary=default,spellcheck=on,spellcheck.extendedResults=true,spellcheck.count=10,spellcheck.alternativeTermCount=5,spellcheck.maxResultsForSuggest=5,spellcheck.collate=true,spellcheck.collateExtendedResults=true,spellcheck.maxCollationTries=10,spellcheck.maxCollations=5,df=_text_},last-components=[spellcheck]}} 
+2020-02-05 11:29:09.068 INFO  (qtp952486988-16) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/spell params={q=*:*&_=1580902092058} hits=106169 status=0 QTime=13
+2020-02-05 11:29:21.922 INFO  (qtp952486988-20) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/spell params={q=maa&_=1580902092058} hits=0 status=0 QTime=12
+2020-02-05 11:29:25.927 INFO  (qtp952486988-17) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/spell params={q=maaz&_=1580902092058} hits=0 status=0 QTime=3
+2020-02-05 11:29:29.372 INFO  (qtp952486988-20) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/spell params={q=maar&_=1580902092058} hits=0 status=0 QTime=1
+2020-02-05 11:29:35.175 INFO  (qtp952486988-17) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/spell params={q=maan&_=1580902092058} hits=0 status=0 QTime=1
+2020-02-05 11:29:47.746 INFO  (qtp952486988-20) [   x:boloindya] o.a.s.c.PluginBag Going to create a new requestHandler with {type = requestHandler,name = /suggest,class = solr.SearchHandler,attributes = {startup=lazy, name=/suggest, class=solr.SearchHandler},args = {defaults={suggest=true,suggest.count=10},components=[suggest]}} 
+2020-02-05 11:29:47.748 INFO  (qtp952486988-20) [   x:boloindya] o.a.s.h.c.SuggestComponent SuggestComponent prepare with : q=maan&suggest.count=10&suggest=true&_=1580902092058
+2020-02-05 11:29:47.749 INFO  (qtp952486988-20) [   x:boloindya] o.a.s.h.c.SuggestComponent SuggestComponent process with : q=maan&suggest.count=10&suggest=true&_=1580902092058
+2020-02-05 11:29:47.767 INFO  (qtp952486988-20) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/suggest params={q=maan&_=1580902092058} status=0 QTime=20
+2020-02-05 11:30:00.918 INFO  (qtp952486988-17) [   x:boloindya] o.a.s.h.c.SuggestComponent SuggestComponent prepare with : q=maadhuri+rai&suggest.count=10&suggest=true&_=1580902092058
+2020-02-05 11:30:00.921 INFO  (qtp952486988-17) [   x:boloindya] o.a.s.h.c.SuggestComponent SuggestComponent process with : q=maadhuri+rai&suggest.count=10&suggest=true&_=1580902092058
+2020-02-05 11:30:00.925 INFO  (qtp952486988-17) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/suggest params={q=maadhuri+rai&_=1580902092058} status=0 QTime=7
+2020-02-05 11:30:13.136 INFO  (qtp952486988-17) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/browse params={q=maadhuri+rai&_=1580902092058} hits=80 status=0 QTime=49
+2020-02-05 11:30:18.022 INFO  (qtp952486988-19) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/browse params={q=maadhuri+rai} hits=80 status=0 QTime=29
+2020-02-05 11:40:55.390 INFO  (qtp952486988-22) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/select params={q=maaz&df=text&fl=*+score&start=0&fq=django_ct:(forum_user.userprofile)&rows=10&wt=json} hits=3 status=0 QTime=29
+2020-02-05 11:40:58.516 INFO  (qtp952486988-17) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/select params={q=maaz&df=text&fl=*+score&start=0&fq=django_ct:(forum_user.userprofile)&rows=10&wt=json} hits=3 status=0 QTime=0
+2020-02-05 11:41:23.879 INFO  (qtp952486988-16) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/select params={q=maaz&df=text&fl=*+score&start=0&fq=django_ct:(forum_user.userprofile)&rows=10&wt=json} hits=3 status=0 QTime=0
+2020-02-05 11:41:23.890 INFO  (qtp952486988-17) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/select params={q=maaz&df=text&fl=*+score&start=0&fq=django_ct:(forum_user.userprofile)&rows=10&wt=json} hits=3 status=0 QTime=1
+2020-02-05 11:42:48.461 INFO  (qtp952486988-16) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/select params={q=maaz&df=text&fl=*+score&start=0&fq=django_ct:(forum_user.userprofile)&rows=1&wt=json} hits=3 status=0 QTime=1
+2020-02-05 11:42:48.468 INFO  (qtp952486988-14) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/select params={q=maaz&df=text&fl=*+score&start=0&fq=django_ct:(forum_user.userprofile)&rows=10&wt=json} hits=3 status=0 QTime=0
+2020-02-05 11:43:14.807 INFO  (qtp952486988-16) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/select params={q=maaz&df=text&fl=*+score&start=0&fq=django_ct:(forum_topic.topic+OR+forum_user.userprofile)&rows=1&wt=json} hits=6 status=0 QTime=18
+2020-02-05 11:43:14.813 INFO  (qtp952486988-14) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/select params={q=maaz&df=text&fl=*+score&start=0&fq=django_ct:(forum_topic.topic+OR+forum_user.userprofile)&rows=10&wt=json} hits=6 status=0 QTime=0
+2020-02-05 11:43:36.665 INFO  (qtp952486988-16) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/select params={q=maaz&df=text&fl=*+score&start=0&fq=django_ct:(forum_topic.topic+OR+forum_user.userprofile)&rows=10&wt=json} hits=6 status=0 QTime=1
+2020-02-05 11:43:48.339 INFO  (qtp952486988-14) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/select params={q=maaz&df=text&fl=*+score&start=0&fq=django_ct:(forum_topic.topic+OR+forum_user.userprofile)&rows=10&wt=json} hits=6 status=0 QTime=1
+2020-02-05 11:43:48.349 INFO  (qtp952486988-16) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/select params={q=maaz&df=text&fl=*+score&start=0&fq=django_ct:(forum_topic.topic+OR+forum_user.userprofile)&rows=10&wt=json} hits=6 status=0 QTime=1
+2020-02-05 11:44:51.375 INFO  (qtp952486988-16) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/select params={q=(maaz)&df=text&fl=*+score&start=0&fq=django_ct:(forum_topic.topic+OR+forum_user.userprofile)&wt=json} hits=6 status=0 QTime=1
+2020-02-05 11:46:54.350 INFO  (qtp952486988-20) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/cores params={indexInfo=false&wt=json&_=1580902091639} status=0 QTime=0
+2020-02-05 11:46:54.357 INFO  (qtp952486988-20) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/logging params={wt=json&_=1580903214318&since=0} status=0 QTime=2
+2020-02-05 11:46:54.405 INFO  (qtp952486988-14) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/system params={wt=json&_=1580902091640} status=0 QTime=54
+2020-02-05 11:46:57.247 INFO  (qtp952486988-14) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/cores params={indexInfo=false&wt=json&_=1580902091639} status=0 QTime=0
+2020-02-05 11:46:57.256 INFO  (qtp952486988-18) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/logging params={wt=json&_=1580903214318} status=0 QTime=9
+2020-02-05 11:46:57.308 INFO  (qtp952486988-19) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/system params={wt=json&_=1580902091640} status=0 QTime=61
+2020-02-05 11:47:23.463 INFO  (qtp952486988-13) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/cores params={indexInfo=false&wt=json&_=1580902091639} status=0 QTime=0
+2020-02-05 11:47:23.488 INFO  (qtp952486988-18) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/cores params={wt=json&_=1580902091639} status=0 QTime=10
+2020-02-05 11:47:23.508 INFO  (qtp952486988-19) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/system params={wt=json&_=1580902091640} status=0 QTime=42
+2020-02-05 11:47:23.604 INFO  (qtp952486988-13) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/cores params={indexInfo=false&wt=json&_=1580902091639} status=0 QTime=0
+2020-02-05 11:47:23.628 INFO  (qtp952486988-13) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/cores params={wt=json&_=1580902091639} status=0 QTime=5
+2020-02-05 11:47:23.644 INFO  (qtp952486988-19) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/system params={wt=json&_=1580902091640} status=0 QTime=33
+2020-02-05 11:47:25.764 INFO  (qtp952486988-19) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/cores params={indexInfo=false&wt=json&_=1580902091639} status=0 QTime=0
+2020-02-05 11:47:25.771 INFO  (qtp952486988-17) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/properties params={wt=json&_=1580903245748} status=0 QTime=1
+2020-02-05 11:47:25.811 INFO  (qtp952486988-13) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/system params={wt=json&_=1580902091640} status=0 QTime=45
+2020-02-05 11:47:27.444 INFO  (qtp952486988-19) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/cores params={indexInfo=false&wt=json&_=1580902091639} status=0 QTime=0
+2020-02-05 11:47:27.462 INFO  (qtp952486988-18) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/admin/luke params={numTerms=0&show=index&wt=json&_=1580903247430} status=0 QTime=1
+2020-02-05 11:47:27.478 INFO  (qtp952486988-17) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/replication params={wt=json&command=details&_=1580903247430} status=0 QTime=5
+2020-02-05 11:47:27.490 INFO  (qtp952486988-13) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/system params={wt=json&_=1580902091640} status=0 QTime=40
+2020-02-05 11:47:27.510 INFO  (qtp952486988-19) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/admin/ping params={action=status&wt=json&_=1580902091640&ts=1580902091640} status=503 QTime=1
+2020-02-05 11:47:27.538 INFO  (qtp952486988-18) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/admin/system params={wt=json&_=1580903247430} status=0 QTime=44
+2020-02-05 11:47:34.264 INFO  (qtp952486988-18) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/cores params={indexInfo=false&wt=json&_=1580902091639} status=0 QTime=0
+2020-02-05 11:47:34.290 INFO  (qtp952486988-18) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/admin/luke params={show=schema&wt=json&_=1580903247430} status=0 QTime=12
+2020-02-05 11:47:34.330 INFO  (qtp952486988-17) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/system params={wt=json&_=1580902091640} status=0 QTime=66
+2020-02-05 11:47:39.690 INFO  (qtp952486988-14) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/admin/ping params={wt=json&_=1580902091640&ts=1580902091640} hits=106169 status=0 QTime=3
+2020-02-05 11:47:39.691 INFO  (qtp952486988-14) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/admin/ping params={wt=json&_=1580902091640&ts=1580902091640} status=0 QTime=4
+2020-02-05 11:47:40.860 INFO  (qtp952486988-17) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/admin/ping params={wt=json&_=1580902091640&ts=1580902091640} hits=106169 status=0 QTime=0
+2020-02-05 11:47:40.861 INFO  (qtp952486988-17) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/admin/ping params={wt=json&_=1580902091640&ts=1580902091640} status=0 QTime=1
+2020-02-05 11:47:41.569 INFO  (qtp952486988-14) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/admin/ping params={wt=json&_=1580902091640&ts=1580902091640} hits=106169 status=0 QTime=0
+2020-02-05 11:47:41.570 INFO  (qtp952486988-14) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/admin/ping params={wt=json&_=1580902091640&ts=1580902091640} status=0 QTime=0
+2020-02-05 11:47:43.152 INFO  (qtp952486988-14) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/cores params={indexInfo=false&wt=json&_=1580902091639} status=0 QTime=0
+2020-02-05 11:47:43.204 INFO  (qtp952486988-19) [   ] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/system params={wt=json&_=1580902091640} status=0 QTime=50
+2020-02-05 11:47:43.235 INFO  (qtp952486988-18) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/admin/mbeans params={stats=true&wt=json&_=1580903263109} status=0 QTime=67
+2020-02-05 11:48:28.735 INFO  (qtp952486988-18) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/admin/mbeans params={stats=true&wt=xml&_=1580903263109} status=0 QTime=13
+2020-02-05 12:18:27.480 INFO  (qtp952486988-21) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/browse params={q=maadhuri+rai&start=10} hits=80 status=0 QTime=23
+2020-02-05 12:18:37.251 INFO  (qtp952486988-13) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/browse params={q=maadhuri+rai&start=20} hits=80 status=0 QTime=35
+2020-02-05 12:18:42.956 INFO  (qtp952486988-17) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/browse params={q=maadhuri+rai&start=30} hits=80 status=0 QTime=15
+2020-02-05 12:18:46.841 INFO  (qtp952486988-13) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/browse params={q=maadhuri+rai&start=40} hits=80 status=0 QTime=22
+2020-02-05 12:18:50.406 INFO  (qtp952486988-17) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/browse params={q=maadhuri+rai&start=50} hits=80 status=0 QTime=16
+2020-02-05 12:18:56.037 INFO  (qtp952486988-13) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/browse params={q=maadhuri+rai&start=60} hits=80 status=0 QTime=22
+2020-02-05 12:19:05.514 INFO  (qtp952486988-17) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/browse params={q=maadhuri+rai&start=70} hits=80 status=0 QTime=41
+2020-02-06 06:20:19.443 INFO  (qtp952486988-16) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/select params={q=NOT+((thisshouldnotmatchanythingintheindex))&df=text&fl=*+score&start=0&fq=django_ct:(forum_user.userprofile+OR+forum_topic.topic)&rows=1&wt=json} hits=106169 status=0 QTime=68
+2020-02-06 06:20:47.350 INFO  (qtp952486988-17) [   x:boloindya] o.a.s.c.S.Request [boloindya]  webapp=/solr path=/select params={q=NOT+(text:(thisshouldnotmatchanythingintheindex))&df=text&fl=*+score&start=0&fq=django_ct:(forum_user.userprofile+OR+forum_topic.topic)&rows=1&wt=json} hits=106169 status=0 QTime=1
+2020-02-06 06:22:32.584 INFO  (ShutdownMonitor) [   ] o.e.j.s.AbstractConnector Stopped ServerConnector@b50249f{HTTP/1.1,[http/1.1]}{0.0.0.0:8983}
+2020-02-06 06:22:32.587 INFO  (ShutdownMonitor) [   ] o.e.j.s.session node0 Stopped scavenging
+2020-02-06 06:22:32.622 INFO  (ShutdownMonitor) [   ] o.a.s.c.CoreContainer Shutting down CoreContainer instance=1096485705
+2020-02-06 06:22:32.624 INFO  (ShutdownMonitor) [   ] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.node, tag=null
+2020-02-06 06:22:32.625 INFO  (ShutdownMonitor) [   ] o.a.s.m.r.SolrJmxReporter Closing reporter [org.apache.solr.metrics.reporters.SolrJmxReporter@60957c0f: rootName = null, domain = solr.node, service url = null, agent id = null] for registry solr.node / com.codahale.metrics.MetricRegistry@50568e44
+2020-02-06 06:22:32.634 INFO  (ShutdownMonitor) [   ] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.jvm, tag=null
+2020-02-06 06:22:32.636 INFO  (ShutdownMonitor) [   ] o.a.s.m.r.SolrJmxReporter Closing reporter [org.apache.solr.metrics.reporters.SolrJmxReporter@119020fb: rootName = null, domain = solr.jvm, service url = null, agent id = null] for registry solr.jvm / com.codahale.metrics.MetricRegistry@39104468
+2020-02-06 06:22:32.642 INFO  (ShutdownMonitor) [   ] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.jetty, tag=null
+2020-02-06 06:22:32.644 INFO  (ShutdownMonitor) [   ] o.a.s.m.r.SolrJmxReporter Closing reporter [org.apache.solr.metrics.reporters.SolrJmxReporter@3d9f6567: rootName = null, domain = solr.jetty, service url = null, agent id = null] for registry solr.jetty / com.codahale.metrics.MetricRegistry@5d50d9a0
+2020-02-06 06:22:32.658 INFO  (coreCloseExecutor-16-thread-1) [   x:boloindya] o.a.s.c.SolrCore [boloindya]  CLOSING SolrCore org.apache.solr.core.SolrCore@316ae63c
+2020-02-06 06:22:32.659 INFO  (coreCloseExecutor-16-thread-1) [   x:boloindya] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.core.boloindya, tag=316ae63c
+2020-02-06 06:22:32.659 INFO  (coreCloseExecutor-16-thread-1) [   x:boloindya] o.a.s.m.r.SolrJmxReporter Closing reporter [org.apache.solr.metrics.reporters.SolrJmxReporter@10dd9757: rootName = null, domain = solr.core.boloindya, service url = null, agent id = null] for registry solr.core.boloindya / com.codahale.metrics.MetricRegistry@2639d5b2
+2020-02-06 06:22:32.778 INFO  (ShutdownMonitor) [   ] o.e.j.s.h.ContextHandler Stopped o.e.j.w.WebAppContext@58a9760d{/solr,null,UNAVAILABLE}{file:///private/var/live_code/boloindya/solr/server//solr-webapp/webapp}

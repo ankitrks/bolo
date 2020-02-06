@@ -81,15 +81,41 @@
     <field name="django_ct" type="string" indexed="true" stored="true" multiValued="false"/>
     <field name="django_id" type="string" indexed="true" stored="true" multiValued="false"/>
     
+    <field name="name" type="text_en" indexed="true" stored="true" multiValued="false" />
+    
+    <field name="language" type="text_en" indexed="true" stored="true" multiValued="false" />
+    
     <field name="text" type="text_en" indexed="true" stored="true" multiValued="false" />
     
-    <field name="is_removed" type="boolean" indexed="true" stored="true" multiValued="false" />
+    <field name="follow_count" type="text_en" indexed="true" stored="true" multiValued="false" />
+    
+    <field name="vb_count" type="text_en" indexed="true" stored="true" multiValued="false" />
+    
+    <field name="own_vb_view_count" type="text_en" indexed="true" stored="true" multiValued="false" />
+    
+    <field name="user" type="text_en" indexed="true" stored="true" multiValued="false" />
+    
+    <field name="is_test_user" type="boolean" indexed="true" stored="true" multiValued="false" />
+    
+    <field name="follower_count" type="text_en" indexed="true" stored="true" multiValued="false" />
     
     <field name="slug" type="text_en" indexed="true" stored="true" multiValued="false" />
+    
+    <field name="view_count" type="text_en" indexed="true" stored="true" multiValued="false" />
     
     <field name="last_active" type="date" indexed="false" stored="true" multiValued="false" />
     
     <field name="title" type="text_en" indexed="true" stored="true" multiValued="false" />
+    
+    <field name="language_id" type="text_en" indexed="true" stored="true" multiValued="false" />
+    
+    <field name="vb_playtime" type="text_en" indexed="true" stored="true" multiValued="false" />
+    
+    <field name="is_removed" type="boolean" indexed="true" stored="true" multiValued="false" />
+    
+    <field name="total_share_count" type="text_en" indexed="true" stored="true" multiValued="false" />
+    
+    <field name="likes_count" type="text_en" indexed="true" stored="true" multiValued="false" />
     
     <uniqueKey>id</uniqueKey>
 
