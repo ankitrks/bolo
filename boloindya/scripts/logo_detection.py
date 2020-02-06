@@ -89,7 +89,7 @@ def identify_logo():
 		for item in topic_objects:
 			iter_id = item.id
 			data = Topic.objects.filter(id = iter_id)
-			#print(data[0].id)
+			print(data[0].id)
 			url = data[0].backup_url
 			video_title = data[0].title
 			url_str = url.encode('utf-8')
@@ -131,7 +131,7 @@ def identify_logo():
 					for text in texts:
 						modified_text = text.description
 						if(modified_text in plag_source):
-							f.write(iter_id + " " + data[0].id + " " + video_title + " " + url_str + " " + (modified_text) + "\n")
+							f.write(iter_id + " " + str(data[0].id) + " " + video_title + " " + url_str + " " + (modified_text) + "\n")
 							# Topic.objects.filter(id = iter_id).update(plag_text = str(plag_source.index(modified_text)))
 							# Topic.objects.filter(id = iter_id).update(time_deleted = datetime.now())
 							# data[0].delete()
