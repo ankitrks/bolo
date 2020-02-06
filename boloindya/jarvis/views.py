@@ -353,30 +353,30 @@ def uploaddata(request):
     return HttpResponse()
 
 def get_kyc_user_list(request):
-    if request.user.is_superuser:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
         all_kyc = UserKYC.objects.all()
         return render(request,'jarvis/pages/userkyc/user_kyc_list.html',{'all_kyc':all_kyc})
 def get_submitted_kyc_user_list(request):
-    if request.user.is_superuser:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
         all_kyc = UserKYC.objects.filter(is_kyc_completed=True,is_kyc_accepted=False)
         return render(request,'jarvis/pages/userkyc/submitted_kyc.html',{'all_kyc':all_kyc})
 
 def get_pending_kyc_user_list(request):
-    if request.user.is_superuser:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
         all_kyc = UserKYC.objects.filter(is_kyc_completed=False,is_kyc_accepted=False)
         return render(request,'jarvis/pages/userkyc/pending_kyc.html',{'all_kyc':all_kyc})
 
 def get_accepted_kyc_user_list(request):
-    if request.user.is_superuser:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
         all_kyc = UserKYC.objects.filter(is_kyc_completed=True)
         return render(request,'jarvis/pages/userkyc/accepted_kyc.html',{'all_kyc':all_kyc})
 
 def get_user_pay_details(request):
-    if request.user.is_superuser:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
         return render(request,'jarvis/pages/payment/user_pay.html')
 
 def get_single_user_pay_details(request):
-    if request.user.is_superuser:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
         username = request.GET.get('username',None)
         all_pay = UserPay.objects.filter(user__username = username).order_by('-id')
         user = User.objects.get(username=username)
@@ -403,11 +403,13 @@ def add_user_pay(request):
         user_pay.pay_date = datetime.now()
         user_pay.save()
         return HttpResponse(json.dumps({'is_success':'success'}),content_type="application/json")
+    else:
+        return HttpResponse(json.dumps({'is_success':'fail','message':'not authorised'}),content_type="application/json")
 
 
 
 def get_kyc_of_user(request):
-    if request.user.is_superuser or request.user.is_staff:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)) or request.user.is_staff:
         username = request.GET.get('username',None)
         kyc_user = User.objects.get(username=username)
         kyc_details = UserKYC.objects.get(user=kyc_user)
@@ -442,7 +444,7 @@ def SecretFileView(request):
 
 def get_encashable_detail(request):
     to_be_calculated = request.GET.get("calculate",None)
-    if request.user.is_superuser or request.user.is_staff:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)) or request.user.is_staff:
         if to_be_calculated:
             for each_user in User.objects.all():
                 calculate_encashable_details(each_user)
@@ -452,13 +454,13 @@ def get_encashable_detail(request):
     return render(request,'jarvis/pages/payment/encashable_detail.html',{'all_encash_details':all_encash_details,'payement_cycle_form':payement_cycle_form})
 
 def calculate_encashable_detail(request):
-    if request.user.is_superuser or request.user.is_staff:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)) or request.user.is_staff:
         for each_user in User.objects.all():
             calculate_encashable_details(each_user)
     return HttpResponse(json.dumps({'success':'success'}),content_type="application/json")
 
 def get_single_encash_detail(request):
-    if request.user.is_superuser or request.user.is_staff:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)) or request.user.is_staff:
         username = request.GET.get('username',None)
         user = User.objects.get(username=username)
         calculate_encashable_details(user)
@@ -499,7 +501,7 @@ class PaymentCycleView(FormView):
     template_name='jarvis/pages/payment/invoice_error.html'
 
     def form_valid(self,form,**kwargs):
-        if self.request.user.is_superuser or self.request.user.is_staff:
+        if self.request.user.is_superuser or 'moderator' in list(self.request.user.groups.all().values_list('name',flat=True)) or self.request.user.is_staff:
             pay_cycle = PaymentCycle.objects.all().update(**form.cleaned_data)
             for each_user in User.objects.all():
                 calculate_encashable_details(each_user)
@@ -510,7 +512,7 @@ class PaymentCycleView(FormView):
 
 
 def accept_kyc(request):
-    if request.user.is_superuser or request.user.is_staff:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)) or request.user.is_staff:
         kyc_type = request.GET.get('kyc_type',None)
         user_id = request.GET.get('user_id',None)
         if kyc_type == "basic_info":
@@ -529,11 +531,12 @@ def accept_kyc(request):
         if user_kyc.is_kyc_basic_info_accepted and user_kyc.is_kyc_document_info_accepted and user_kyc.is_kyc_selfie_info_accepted and\
         user_kyc.is_kyc_bank_details_accepted:
             UserKYC.objects.filter(user_id = user_id).update(is_kyc_accepted = True)
+        user_kyc = UserKYC.objects.get(user_id = user_id)
 
         return HttpResponse(json.dumps({'success':'success','kyc_accepted':user_kyc.is_kyc_accepted}),content_type="application/json")
 
 def reject_kyc(request):
-    if request.user.is_superuser or request.user.is_staff:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)) or request.user.is_staff:
         kyc_type = request.GET.get('kyc_type',None)
         kyc_id = request.GET.get('kyc_id',None)
         kyc_reject_reason = request.GET.get('kyc_reject_reason',None)
