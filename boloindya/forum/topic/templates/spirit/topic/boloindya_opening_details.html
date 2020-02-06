@@ -4,6 +4,10 @@
 {% load number_formate_change_tag %}
 {% block title %}BoloIndya{% endblock %}
 {% block content %}
+{% get_current_language as LANGUAGE_CODE %}
+{% get_available_languages as LANGUAGES %}
+{% get_language_info_list for LANGUAGES as languages %}
+
 <style type="text/css">
 body {
     font-family: HelveticaNeue-Light,helvetica neue light,helvetica neue,Helvetica,Arial,lucida grande,sans-serif;
@@ -768,7 +772,7 @@ img {
 }
 }
 .applicationForm{
-    margin: auto;width: 50%
+    margin: auto;width: 95%
 }
 .applicationForm .field{
     padding: 10px;
@@ -787,14 +791,37 @@ img {
 #id_email{
     margin-left:132px; 
 }
-#id_mobile{
-    margin-left:122px; 
-}                    
+                   
 #id_document{
-    margin-left:94px; 
+    margin-left:34px; 
+}
+
+.applicationForm input[type=text], input[type=email], input[type=number], input[type=password] {
+    margin-left: 100px !important;
+}
+.applicationForm label {
+    margin-right: 150px;
+}
+#id_mobile{
+    margin-left:33px !important; 
+} 
+#id_help_text{
+    margin-left: -26px;
+}
+.jobTitle{
+    margin-left: 40px;
 }
 
 </style>
+
+
+{% if LANGUAGE_CODE == "hi" %}
+<style type="text/css">
+    #id_email {
+    margin-left: 89px !important;
+}
+</style>
+{% endif %}
 
 <div class="container-fluid career-details-outer-container ng-scope">
     <div class="container inner-container ">
@@ -809,7 +836,7 @@ img {
                 </div>
                 <div class="col-md-3 col-sm-4 row-1">
                     <a href="javascript: scrollToForm();">
-                        <div class="apply-now" > Apply Now </div>
+                        <div class="apply-now" > Apply Job </div>
                     </a>
                 </div>
             </div>
@@ -841,13 +868,18 @@ img {
             <div class="col-md-12 col-sm-12">
 
                 <div class="card applicationForm"> 
-                  <h2>Job Application</h2>
+                  <h2 style="margin-bottom: 20px;">Apply Job</h2>
+                   <p style="margin-bottom: 20px;">Job: <span class="jobTitle">{% if job_openings is not None %} 
+                        {{job_openings.title}}
+                        {% endif%}</span><br></p>
+
                   {% if message %}
                    <span style="color: green"> {{message}}</span>
+
                    {% endif %}
-                    <form method="post" enctype="multipart/form-data">
+                    <form method="post" id="formSubmitId" enctype="multipart/form-data">
                         {% csrf_token %}
-                        {{ form.non_field_errors }}
+                        <!-- {{ form.non_field_errors }} -->
 
                         {% for field in form.hidden_fields %}
                             {{ field.errors }}
@@ -864,7 +896,7 @@ img {
                             </div>
                         {% endfor %}
                         {% if form.visible_fields %}
-                         <p style="text-align: center;"><button class="btn btn-main" type="submit">Send</button></p>
+                         <p style="text-align: center;" id="submitBtnId"><button class="btn submitBtn btn-main" type="submit">Apply</button></p>
 
                         {% endif %}
                     </form>
@@ -887,7 +919,27 @@ img {
 function scrollToForm() {
   document.querySelector('#formId').scrollIntoView({behavior: 'smooth'});
 }
+$(".submitBtn").click(function(event){
+    event.preventDefault();debugger;
+    var documentResume=document.getElementById('id_document').value;
+    if(documentResume==""){
+        $("#id_document").parent().after("<div class='validation' style='color:red;margin-bottom: 20px;text-align: center;'>Please Upload Resume</div>");
+        $('.validation').fadeOut(4000);
+
+        return false;
+    }else{
+        document.getElementById("formSubmitId").submit();
+        //$(".submitBtn").submit();
+    return true;
+    }
+});
+
+
+
 </script>
+
+
+
 <script type="text/javascript">
     $('#id_mobile').on('keypress',function(evt){
     evt = (evt) ? evt : window.event;

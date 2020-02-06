@@ -1,4 +1,4 @@
-jQuery('.backToMainLogin').on('click',function(){debugger;
+jQuery('.backToMainLogin').on('click',function(){
     var checkMainLoginHide=$(".mainLogin").hasClass('hide');
     if(checkMainLoginHide==false){
         $(".mainLogin").removeClass('hide');
@@ -47,9 +47,9 @@ jQuery('.email-or-fb-signin').on('click',function(){
     if(otpPanelStatus==false){
         $(".OTP_Panel").addClass('hide');
     }
-    if(mainLoginStatus==false){
-        $(".mainLogin").addClass('hide');
-    }
+    // if(mainLoginStatus==false){
+    //     $(".mainLogin").addClass('hide');
+    // }
       
 });
 
@@ -134,7 +134,7 @@ $('#phoneNo').on('change',function(evt){
     return true;
 });
 
-$('#emailID').on('change',function(evt){debugger;
+$('#emailID').on('change',function(evt){
     var emailID = document.getElementById('emailID');
     if (emailID.value == "" || emailID.value == null) {
       //alert("Please enter your Mobile No.");
@@ -257,7 +257,7 @@ $('.single-otp-input').on('keypress',function(evt){
             $('#conOTPVerify').removeClass('grey-btn');
             $('#some_div').hide();
             // if(parent.data('autosubmit')) {
-            //   parent.submit();debugger;
+            //   parent.submit();
             // }
           }
         }

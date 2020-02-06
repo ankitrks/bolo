@@ -35,10 +35,11 @@ patterns = [
     url(r'^video_bytes/(?P<user_id>\d+)/(?P<poll_id>\d+)/(?P<slug>[\w-]+)/$', forum.topic.views.share_vb_page, name='share_vb_page'),
 
     url(r'^about/$', forum.topic.views.get_about, name='get_about'),
-    url(r'^login/$', forum.topic.views.login, name='login'),
+    url(r'^login/$', forum.topic.views.login_user, name='login'),
     url(r'^profile/(?P<username>[\w-]+)/$', forum.topic.views.user_profile, name='user_profile'),
     url(r'^terms-of-service/$', forum.topic.views.get_termofservice, name='get_termofservice'),
     url(r'^privacy-policy/$', forum.topic.views.get_privacypolicy, name='get_privacypolicy'),
+    url(r'^bolo-action/$', forum.topic.views.get_bolo_action, name='get_bolo_action'),
     url(r'^challenge/(?P<hashtag>[\w-]+)$', forum.topic.views.share_challenge_page, name='share_challenge_page'),
     url(r'^robots.txt$', forum.topic.views.robotstext, name='roboxt'),
     url(r'^sitemap.xml$', forum.topic.views.sitemapxml, name='sitemap'),
@@ -69,6 +70,8 @@ patterns = [
     url(r'^careers/openings/$',forum.topic.views.boloindya_openings,name='boloindya_openings'),
     url(r'^careers/openings/(?P<slug>[\w-]+)/$',forum.topic.views.boloindya_opening_details,name='boloindya_opening_details'),
     url(r'^careers/application/$',forum.topic.views.job_request,name='job_request'),
+    url(r'^team/$',forum.topic.views.boloindya_team_details,name='boloindya_team_details'),
+    url(r'^login/auth_api/$',forum.topic.views.login_using_api,name='login_using_api'),
     url(r'^help_support/$',forum.topic.views.help_support,name='help_support')
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

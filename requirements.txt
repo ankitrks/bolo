@@ -37,6 +37,7 @@ django-tinymce==2.8.0
 djangorestframework==3.9.2
 djangorestframework-filters==0.9.0
 djangorestframework-simplejwt==3.3
+djangorestframework-datatables==0.5.1
 docutils==0.14
 enum34==1.1.6
 et-xmlfile==1.0.1

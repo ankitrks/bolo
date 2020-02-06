@@ -3,6 +3,7 @@ from boto.s3.connection import S3Connection
 from django.conf import settings
 import json
 from urlparse import urlparse
+from drf_spirit.utils import shorcountertopic
 
 register = template.Library()
 
@@ -26,6 +27,17 @@ def get_safe_url(path,user):
 
 @register.filter(name = "convert_string_to_json")
 def convert_string_to_json(value):
-    value= value.replace("u'",'"')
-    value= value.replace("'",'"')
-    return json.loads(value)
+    if value:
+        value= value.replace("u'",'"')
+        value= value.replace("'",'"')
+        return json.loads(value)
+    return value
+
+@register.filter(name = "convert_string_to_list_dict")
+def convert_string_to_list_dict(string):
+    string = convert_string_to_json(string)
+    return string
+    
+@register.filter(name = "short_counter_tag")
+def short_counter_tag(value):
+    return shorcountertopic(value)

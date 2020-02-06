@@ -2,7 +2,7 @@
 from django.contrib import admin
 from .models import SingUpOTP, UserJarvisDump, UserFeedback
 from forum.user.models import Weight,UserProfile,AppVersion, UserProfile,AndroidLogs, AppPageContent, ReferralCode, ReferralCodeUsed, VideoPlaytime, VideoCompleteRate, UserAppTimeSpend
-from forum.category.models import Category
+from forum.category.models import Category,CategoryViewCounter
 from import_export.admin import ImportExportModelAdmin,ExportMixin
 from import_export import resources
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
@@ -67,6 +67,7 @@ class UserFeedbackAdmin(admin.ModelAdmin):
 	# 	return super(UserFeedbackAdmin, self).render_change_form(request, context, *args, **kwargs)
 
 admin.site.register(AppVersion)
+admin.site.register(CategoryViewCounter)
 admin.site.register(AndroidLogs, AndroidLogsAdmin)
 admin.site.register(AppPageContent)
 

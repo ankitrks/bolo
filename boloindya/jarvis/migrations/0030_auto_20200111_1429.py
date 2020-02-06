@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('jarvis', '0029_dashboardmetrics'),
+        ('jarvis', '0030_auto_20200109_1200'),
     ]
 
     operations = [
