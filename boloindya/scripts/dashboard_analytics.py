@@ -2,7 +2,7 @@
 
 from forum.user.models import AndroidLogs, VideoPlaytime, VideoCompleteRate, UserAppTimeSpend, ReferralCodeUsed, UserProfile
 from drf_spirit.models import UserJarvisDump, UserLogStatistics, ActivityTimeSpend, VideoDetails,UserTimeRecord, UserVideoTypeDetails
-from forum.topic.models import Topic
+from forum.topic.models import Topic, BoloActionHistory
 import time
 import ast 
 from django.http import JsonResponse
@@ -136,14 +136,13 @@ def put_video_views_data():
 		if(curr_year == 2019 and week_no == 1):
 			week_no = 52
 
-		#metrics = '1'
-		#metrics_slab = ''
-		#print(metrics, metrics_slab, key, week_no, len(val))
-		# save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
-		# if(created):
-		# 	print(metrics, metrics_slab, key, week_no, len(val))
-		# 	save_obj.count = len(val)
-		# 	save_obj.save()
+		metrics = '1'
+		metrics_slab = ''
+		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
+		if(created):
+			print(metrics, metrics_slab, key, week_no, len(val))
+			save_obj.count = len(val)
+			save_obj.save()
 
 		metrics_uniq = '7'
 		metrics_slab_uniq = ''	
@@ -269,7 +268,13 @@ def put_video_creators():
 
 		metrics = '4'
 		metrics_slab = '0'
-		print(metrics, metrics_slab, datetime_key, week_no, len(val))
+		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
+		if(created):
+			print(metrics, metrics_slab, datetime_key, week_no, len(val))
+			save_obj.count = len(val)
+			save_obj.save()
+
+
 
 	for key, val in slab_2_dict.items():
 		datetime_key = parser.parse(key)
@@ -282,7 +287,11 @@ def put_video_creators():
 
 		metrics = '4'
 		metrics_slab = '1'
-		print(metrics, metrics_slab, datetime_key, week_no, len(val))
+		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
+		if(created):
+			print(metrics, metrics_slab, datetime_key, week_no, len(val))
+			save_obj.count = len(val)
+			save_obj.save()
 
 	for key, val in slab_3_dict.items():
 		datetime_key = parser.parse(key)
@@ -295,12 +304,19 @@ def put_video_creators():
 
 		metrics = '4'
 		metrics_slab = '2'
-		print(metrics, metrics_slab, datetime_key, week_no, len(val))						
+		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
+		if(created):
+			print(metrics, metrics_slab, datetime_key, week_no, len(val))
+			save_obj.count = len(val)
+			save_obj.save()
+						
 
 # put bolo action scores distributed by various types
 # def put_bolo_score_records():
 
-# 	all_data = 
+# 	all_data = BoloActionHistory.objects.all()
+# 	for item in all_data:
+
 
 
 
