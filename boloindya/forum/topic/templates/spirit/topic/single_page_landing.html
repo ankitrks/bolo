@@ -1026,6 +1026,30 @@ h1 { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 24p
 
 }
 
+._social_h::before {
+    content: '';
+    display: inline-block;
+    height: 18px;
+    margin: 0 6px -3px 0;
+    min-width: 18px;
+    position: relative;
+    top: -2px;
+    width: 18px;
+    background-image: url(/media/social_share_image.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: 0 -156px;
+
+}
+.socialImageSize{
+    height: 45px;
+}
+.paddingSocialShare{
+    padding: 5px;
+}
+
+
+
 </style>
         <a href="https://play.google.com/store/apps/details?id=com.boloindya.boloindya&hl=en_IN">
             <div class="jsx-639186511 page-with-header main-body">
@@ -1044,6 +1068,7 @@ h1 { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 24p
                                         <div class="header-bar1" style="text-align: center;padding: 20px;">
                                             <img class="download_height" src="/media/playstore.png">
                                         </div>
+
                                         <div class="">
                                             <div class="leftImage" >
                                                 <img class="sideImageHeight" src="/media/boy.png">
@@ -1061,7 +1086,26 @@ h1 { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 24p
                 </div>
             </div>
         </a>
-        
+            <div>
+
+                <p style="text-align: center;margin-top: 10px;">
+                    <a target="_blank" href="https://www.facebook.com/BoloIndya/">
+                        <span class="paddingSocialShare"><img class="socialImageSize" src="/media/facebook_share.png"></span>
+                    </a>
+                    <a target="_blank" href="https://twitter.com/bolo_indya?lang=en">
+                        <span class="paddingSocialShare"><img class="socialImageSize" src="/media/twitter.png"></span>
+                    </a>
+                    <a target="_blank" href="https://www.instagram.com/bolo.indya/">
+                        <span class="paddingSocialShare"><img class="socialImageSize" src="/media/instagram.png"></span>
+                    </a>
+                    <a target="_blank" href="https://www.linkedin.com/company/bolo-indya">
+                        <span class="paddingSocialShare"><img class="socialImageSize" src="/media/linkedin.png"></span>
+                    </a>                   
+                     <a target="_blank" href="https://www.youtube.com/channel/UCnff4_ED-2busb80cAEOz8w">
+                        <span class="paddingSocialShare"><img class="socialImageSize" src="/media/Youtube.png"></span>
+                    </a>
+                </p>
+            </div>
         </div>
     </div>
 
