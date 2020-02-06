@@ -181,7 +181,7 @@ function loadMoreData(NextPageUrl){
     var language_id=current_language_id;
     //var uri='https://www.boloindya.com/api/v1/get_popular_video_bytes/?page=1';
     var uri=NextPageUrl;
-    var res = encodeURI(uri);
+    var res = uri;
       $.ajax(
             {
                 url:res,

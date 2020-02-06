@@ -835,7 +835,7 @@ def new_home(request):
     #return render(request, 'spirit/topic/temporary_landing.html')
     # return render(request, 'spirit/topic/new_landing.html')
     # return render(request, 'spirit/topic/main_landing.html')
-def latest_home(request):
+def old_home(request):
     categories = []
     hash_tags = []
     try:
@@ -858,9 +858,15 @@ def latest_home(request):
     else:
         return render(request, 'spirit/topic/_latest_home.html',context)
 
+
     #return render(request, 'spirit/topic/temporary_landing.html')
     # return render(request, 'spirit/topic/new_landing.html')
     # return render(request, 'spirit/topic/main_landing.html')
+
+
+def latest_home(request):
+    return render(request, 'spirit/topic/single_page_landing.html')
+
 
 def login_user(request):
 
