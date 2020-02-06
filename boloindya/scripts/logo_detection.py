@@ -137,7 +137,7 @@ def identify_logo():
 							# data[0].delete()
 
 	except Exception as e:
-		print(e)
+		print('' + str(e))
 		pass 
 		#print('' + str(e))  				
 
