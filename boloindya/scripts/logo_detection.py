@@ -62,40 +62,6 @@ def timetostring(t):
 		return '00:' + str(t)			
 
 
-def send_email():
-	emailfrom = "support@careeranna.com"
-	emailto = "akash.g@careeranna.com"
-	text_to_send = ""
-	filetosend = "this is sample mail"
-	username = "support@careeranna.com"
-	password = "$upp0rt@30!1"
-
-	msg = MIMEMultipart()
-	msg["From"] = emailfrom
-	msg["To"] = emailto
-	msg["Subject"] = "Exception occured while running script Logo Detection" + str(datetime.now().date())
-	msg.preamble = ""
-
-	ctype, encoding = mimetypes.guess_type(filetosend)
-	if(ctype is None or encoding is not None):
-		ctype = "application/octet-stream"
-
-	maintype, subtype = ctype.split("/", 1)
-	fp = open(filetosend, "rb")
-	#attachment = MIMEBase(maintype, subtype)
-	#attachment.set_payload(fp.read())
-	fp.close()
-	encoders.encode_base64(attachment)
-	#attachment.add_header("Content-Disposition", "attachment", filename = 'buffering-report-boloindya-' + str(datetime.now().date()))
-	#msg.attach(attachment)
-
-	server = smtplib.SMTP("smtp.gmail.com:587")
-	server.starttls()
-	server.login(username, password)
-	server.sendmail(emailfrom, [emailto, 'akash.g@careeranna.com'], msg.as_string())
-	server.quit()
-	
-
 
 def remove_redundant_files():
 	os.remove(settings.BASE_DIR + '/temp/local_video.mp4')
@@ -116,13 +82,14 @@ def identify_logo():
 	f = io.open(f_name, "w", encoding="UTF-8")
 	today = datetime.today()
 	try:
-		long_ago = today + timedelta(hours = -6)
-		topic_objects = Topic.objects.exclude(is_removed = True).filter(is_vb = True, date__gte = long_ago)
+		#long_ago = today + timedelta(hours = -6)
+		#topic_objects = Topic.objects.exclude(is_removed = True).filter(is_vb = True, date__gte = long_ago)
+		topic_objects = Topic.objects.filter(is_removed=False, id__gt = 19417)
 		global_counter = 1
 		for item in topic_objects:
 			iter_id = item.id
 			data = Topic.objects.filter(id = iter_id)
-			print(data[0].id)
+			#print(data[0].id)
 			url = data[0].backup_url
 			video_title = data[0].title
 			url_str = url.encode('utf-8')
@@ -136,19 +103,19 @@ def identify_logo():
 			t1 = int(total_second / 5)
 			t2 = t1 + t1
 			t3 = t1 + t2
-			t4 = t1 + t3
-			t5 = t1 + t4
+			#t4 = t1 + t3
+			#t5 = t1 + t4
 			t1 = '00:' + timetostring(t1)
 			t2 = '00:' + timetostring(t2)
 			t3 = '00:' + timetostring(t3)
-			t4 = '00:' + timetostring(t4)
-			t5 = '00:' + timetostring(t5)
+			#t4 = '00:' + timetostring(t4)
+			#t5 = '00:' + timetostring(t5)
 			intervals = []
 			intervals.append(t1)
 			intervals.append(t2)
 			intervals.append(t3)
-			intervals.append(t4)
-			intervals.append(t5)
+			#intervals.append(t4)
+			#intervals.append(t5)
 			count = 1
 			global_counter+=1
 
@@ -164,10 +131,10 @@ def identify_logo():
 					for text in texts:
 						modified_text = text.description
 						if(modified_text in plag_source):
-							f.write(iter_id + video_title + " " + url_str + " " + (modified_text) + "\n")
-							Topic.objects.filter(id = iter_id).update(plag_text = str(plag_source.index(modified_text)))
-							Topic.objects.filter(id = iter_id).update(time_deleted = datetime.now())
-							data[0].delete()
+							f.write(iter_id + " " + data[0].id + " " + video_title + " " + url_str + " " + (modified_text) + "\n")
+							# Topic.objects.filter(id = iter_id).update(plag_text = str(plag_source.index(modified_text)))
+							# Topic.objects.filter(id = iter_id).update(time_deleted = datetime.now())
+							# data[0].delete()
 
 	except Exception as e:
 		print(e)
@@ -178,7 +145,6 @@ def identify_logo():
 					
 
 def main():
-	send_email()
 	#identify_logo()
 	#remove_redundant_files()
 
