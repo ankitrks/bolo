@@ -65,6 +65,7 @@ def timetostring(t):
 def send_email():
 	emailfrom = "support@careeranna.com"
 	emailto = "akash.g@careeranna.com"
+	text_to_send = ""
 	filetosend = "this is sample mail"
 	username = "support@careeranna.com"
 	password = "$upp0rt@30!1"
@@ -96,7 +97,6 @@ def send_email():
 	
 
 
-
 def remove_redundant_files():
 	os.remove(settings.BASE_DIR + '/temp/local_video.mp4')
 	os.remove(settings.BASE_DIR + '/temp/output1.png')
@@ -116,7 +116,7 @@ def identify_logo():
 	f = io.open(f_name, "w", encoding="UTF-8")
 	today = datetime.today()
 	try:
-		long_ago = today + timedelta(days = -8)
+		long_ago = today + timedelta(hours = -6)
 		topic_objects = Topic.objects.exclude(is_removed = True).filter(is_vb = True, date__gte = long_ago)
 		global_counter = 1
 		for item in topic_objects:
