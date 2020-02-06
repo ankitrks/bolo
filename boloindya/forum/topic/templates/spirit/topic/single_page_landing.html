@@ -998,6 +998,30 @@ h1 { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 24p
 .download_height{
     height: 80px;
 }
+.socialImageSize{
+    height: 45px;
+}
+.paddingSocialShare{
+    padding: 5px;
+}
+._social_h::before {
+    content: '';
+    display: inline-block;
+    height: 18px;
+    margin: 0 6px -3px 0;
+    min-width: 18px;
+    position: relative;
+    top: -2px;
+    width: 18px;
+    background-image: url(/media/social_share_image.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: 0 -156px;
+
+}
+.socialShareP{
+    margin-top: 10px;
+}
 @media(max-width: 991px){
     .page-with-header {
         padding-top: 0px;
@@ -1024,29 +1048,14 @@ h1 { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 24p
         height: 50px;
     }
 
-}
-
-._social_h::before {
-    content: '';
-    display: inline-block;
-    height: 18px;
-    margin: 0 6px -3px 0;
-    min-width: 18px;
-    position: relative;
-    top: -2px;
-    width: 18px;
-    background-image: url(/media/social_share_image.png);
-    background-repeat: no-repeat;
-    background-size: auto;
-    background-position: 0 -156px;
+    .socialImageSize {
+        height: 25px;
+    }
 
 }
-.socialImageSize{
-    height: 45px;
-}
-.paddingSocialShare{
-    padding: 5px;
-}
+
+
+
 
 
 
@@ -1088,7 +1097,7 @@ h1 { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 24p
         </a>
             <div>
 
-                <p style="text-align: center;margin-top: 10px;">
+                <p class="socialShareP" style="text-align: center;">
                     <a target="_blank" href="https://www.facebook.com/BoloIndya/">
                         <span class="paddingSocialShare"><img class="socialImageSize" src="/media/facebook_share.png"></span>
                     </a>
