@@ -145,7 +145,7 @@ def identify_logo():
 					
 
 def main():
-	#identify_logo()
+	identify_logo()
 	#remove_redundant_files()
 
 def run():
