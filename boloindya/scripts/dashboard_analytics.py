@@ -297,15 +297,21 @@ def put_video_creators():
 		metrics_slab = '2'
 		print(metrics, metrics_slab, datetime_key, week_no, len(val))						
 
-	
+# put bolo action scores distributed by various types
+# def put_bolo_score_records():
+
+# 	all_data = 
+
+
 
 def main():
 
-	put_share_data()
-	put_installs_data()
-	#put_videos_created()
-	#put_video_views_data()
-	#put_video_creators()
+	#put_share_data()
+	#put_installs_data()
+	put_videos_created()
+	put_video_views_data()
+	put_video_creators()
+
 
 def run():
 	main()	
