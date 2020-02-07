@@ -6,8 +6,6 @@
     var playListData=[];
     $(window).scroll(function() {
         var scorh=Number($(window).scrollTop() + $(window).height());
-        console.log(scorh);
-        console.log('contentHeight'+Number($("#categoryIdList").height()+540));
         if($(window).scrollTop() + $(window).height() > Number($("#categoryIdList").height()+540)){
 
             if(checkDataStatusCat==0){
@@ -20,7 +18,7 @@
     });
 
 $(document).ready(function(){
-    loadMoreData(1);
+    //loadMoreData(1);
     getCategoryWithVideos(1);
 });
 
