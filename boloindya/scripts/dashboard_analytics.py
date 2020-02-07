@@ -317,15 +317,15 @@ def put_video_creators():
 def put_dau_data():
 
 	today = datetime.today()
-	start_date = today + timedelta(month = -5)	
+	start_date = today + timedelta(days = -180)	
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
 		print(dt)
 		curr_day = dt.day 
 		curr_month = dt.month 
 		curr_year = dt.year 
-		t1 = ReferralCodeUsed.objects.filter(created_at_day= curr_day, created_atmonth= curr_month, created_at_year= curr_year).count()
-		t2 = AndroidLogs.objects.filter(created_at_day= curr_day, created_atmonth= curr_month, created_at_year= curr_year).distinct('user').count()
+		t1 = ReferralCodeUsed.objects.filter(created_at__day= curr_day, created_at__month= curr_month, created_at__year= curr_year).count()
+		t2 = AndroidLogs.objects.filter(created_at__day= curr_day, created_at__month= curr_month, created_at__year= curr_year).distinct('user').count()
 		print(curr_day, curr_month, curr_year, t1+t2)
 
 
