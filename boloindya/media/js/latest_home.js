@@ -1,13 +1,16 @@
     var page = 1;
-    var checkDataStatus=0;
+    var checkDataStatus=1;
+    var checkDataStatusCat=1;
     var userLikeAndUnlike=[];
     var totalCountVideo =0;
     var playListData=[];
     $(window).scroll(function() {
         var scorh=Number($(window).scrollTop() + $(window).height());
-        if($(window).scrollTop() + $(window).height() > $("#categoryIdList").height()){
+        console.log(scorh);
+        console.log('contentHeight'+Number($("#categoryIdList").height()+540));
+        if($(window).scrollTop() + $(window).height() > Number($("#categoryIdList").height()+540)){
 
-            if(checkDataStatus==0){
+            if(checkDataStatusCat==0){
                 page++;
                 loaderBoloShowDynamic('_scroll_load_more_loading_right');
                 getCategoryWithVideos(page);
@@ -23,11 +26,11 @@ $(document).ready(function(){
 
 var topicList=[];
 function getCategoryWithVideos(page){
-    loaderBoloShowDynamic('_scroll_load_more_loading_right');
+    //loaderBoloShowDynamic('_scroll_load_more_loading_right');
     loaderBoloShowDynamic('_scroll_load_more_loading_left');
         var playListData=[]; 
     var platlistItems;
-
+    checkDataStatusCat=1;
     var listItems="";
     var itemCount=0;
     var language_id=1;
@@ -72,8 +75,12 @@ function getCategoryWithVideos(page){
                     $("#catWithVideoId").append(category_with_video_list);
                 }
             });
+            checkDataStatusCat=0;
+            if(page==1){
+              followLikeList();
+            }
 
-            followLikeList();
+            updateFollowStatus();
 
         },
         error: function(jqXHR, ajaxOptions, thrownError) {
@@ -262,6 +269,37 @@ function set_category_data_in_cache(popularCatItems) {
 function get_data_from_category_cache() {
   var listCatData=localStorage.getItem('popularCatItems');
   return listCatData;
+}
+
+function updateFollowStatus(response){
+
+            var countFollowStatus=userLikeAndUnlike.all_follow;
+            if(undefined !==countFollowStatus && countFollowStatus.length>0){
+                var followList=userLikeAndUnlike.all_follow;
+                followList.forEach(function(followId){
+                    followStatus=jQuery('.followCheck').hasClass('followStatusChange-'+followId);
+                    if(followStatus==true){
+                        jQuery('.followStatusChange-'+followId).removeClass('sx_5da455');
+                        jQuery('.followStatusChange-'+followId).addClass('sx_5da456');
+                        jQuery('.btnTextChange-'+followId).text(followed_trans);
+                    }
+
+                });
+            }
+
+            var countFollowStatusCat=userLikeAndUnlike.all_category_follow;
+            if(undefined !==countFollowStatusCat && countFollowStatusCat.length>0){
+                var followListCat=userLikeAndUnlike.all_category_follow;
+                followListCat.forEach(function(followId){
+                    followStatusCat=jQuery('.followCheckCat').hasClass('followCategoryStatus-'+followId);
+                    if(followStatusCat==true){
+                        jQuery('.followCategoryStatus-'+followId).removeClass('sx_5da455');
+                        jQuery('.followCategoryStatus-'+followId).addClass('sx_5da456');
+                        jQuery('.btnTextChangeCat-'+followId).text(followed_trans);
+                    }
+
+                });
+            }
 }
 
 
@@ -856,7 +894,7 @@ function retryLiveStream(hls, url) {
     }
 
 jQuery(document).ready(function(){
-    followLikeList();
+    //followLikeList();
 });
 
 function removeTags(str) {
