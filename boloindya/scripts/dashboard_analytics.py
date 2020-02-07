@@ -328,7 +328,8 @@ def put_video_creators_analytics():
 	for item in all_data:
 		user_vb_count = item['vb_count']
 		user_id = item['user']
-		date_joined = item.user.date_joined
+		user_details = UserProfile.objects.get(user = user_id)
+		date_joined = user_details.user.date_joined
 		curr_year = date_joined.year 
 		curr_month = date_joined.month 
 		curr_day = date_joined.day
