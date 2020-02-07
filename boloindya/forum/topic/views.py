@@ -17,7 +17,7 @@ from ..comment.models import MOVED
 from ..comment.forms import CommentForm
 from ..comment.utils import comment_posted
 from ..comment.models import Comment
-from .models import Topic,CricketMatch,Poll,Voting,Choice,TongueTwister,JobOpening
+from .models import Topic,CricketMatch,Poll,Voting,Choice,TongueTwister,JobOpening,VBseen
 from .forms import TopicForm
 from .forms import JobRequestForm
 from . import utils
@@ -854,31 +854,32 @@ def old_home(request):
     languageCode =request.LANGUAGE_CODE
     language_id=languages_with_id[languageCode]
 
-   
-    all_seen_vb = []
-    if request.user.is_authenticated:
-        all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__is_popular=True).distinct('topic_id').values_list('topic_id',flat=True)[:15]
-    excluded_list =[]
-    superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')[:15]
-    for each in superstar_post:
-        excluded_list.append(each.id)
-    popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')[:10]
-    for each in popular_user_post:
-        excluded_list.append(each.id)
-    popular_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')[:2]
-    for each in popular_post:
-        excluded_list.append(each.id)
-    other_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,is_popular=True).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')[:2]
-    orderd_all_seen_post=[]
-    all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)[:5]
-    if all_seen_post:
-        for each_id in all_seen_vb:
-            for each_vb in all_seen_post:
-                if each_vb.id == each_id:
-                    orderd_all_seen_post.append(each_vb)
+    try:
+        all_seen_vb = []
+        if request.user.is_authenticated:
+            all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__is_popular=True).distinct('topic_id').values_list('topic_id',flat=True)[:15]
+        excluded_list =[]
+        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')[:15]
+        for each in superstar_post:
+            excluded_list.append(each.id)
+        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')[:10]
+        for each in popular_user_post:
+            excluded_list.append(each.id)
+        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')[:2]
+        for each in popular_post:
+            excluded_list.append(each.id)
+        other_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,is_popular=True).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')[:2]
+        orderd_all_seen_post=[]
+        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)[:5]
+        if all_seen_post:
+            for each_id in all_seen_vb:
+                for each_vb in all_seen_post:
+                    if each_vb.id == each_id:
+                        orderd_all_seen_post.append(each_vb)
 
-    topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
-
+        topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
+    except Exception as e1:
+        topics = []
 
 
     try:
