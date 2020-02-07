@@ -296,8 +296,34 @@ def put_video_creators():
 		metrics = '4'
 		metrics_slab = '2'
 		print(metrics, metrics_slab, datetime_key, week_no, len(val))						
+		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
+		if(created):
+			print(metrics, metrics_slab, datetime_key, week_no, len(val))
+			save_obj.count = len(val)
+			save_obj.save()
+						
 
-	
+def put_dau_data():
+
+	today = datetime.today()
+	start_date = today + timedelta(days=-180)	
+	end_date = today
+	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
+		print(dt)
+		curr_day = dt.day 
+		curr_month = dt.month 
+		curr_year = dt.year 
+		t1 = ReferralCodeUsed.objects.filter(created_at_day= curr_day, created_atmonth= curr_month, created_at_year= curr_year).count()
+		t2 = AndroidLogs.objects.filter(created_at_day= curr_day, created_atmonth= curr_month, created_at_year= curr_year).distinct('user').count()
+		print(curr_day, curr_month, curr_year, t1+t2)
+
+
+# put bolo action scores distributed by various types
+# def put_bolo_score_records():
+
+# 	all_data = BoloActionHistory.objects.all()
+# 	for item in all_data:
+
 
 def main():
 
