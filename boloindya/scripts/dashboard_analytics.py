@@ -50,6 +50,7 @@ def put_share_data():
 
 			if(curr_date not in day_month_year_dict):
 				day_month_year_dict[curr_date] = []
+				day_month_year_dict[curr_date].append(curr_videoid)
 			else:
 				day_month_year_dict[curr_date].append(curr_videoid)	
 
@@ -105,11 +106,15 @@ def put_installs_data():
 
 		metrics = '5'
 		metrics_slab = '6'
-		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no= week_no)
-		if(created):
-			print(metrics, metrics_slab, key, week_no, len(val))
-			save_obj.count = len(val)
-			save_obj.save()
+		save_obj = DashboardMetricsJarvis.get(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
+		save_obj.count = len(val)
+		save_obj.save()
+
+		# save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no= week_no)
+		# if(created):
+		# 	print(metrics, metrics_slab, key, week_no, len(val))
+		# 	save_obj.count = len(val)
+		# 	save_obj.save()
 	
 
 def put_video_views_data():
@@ -187,11 +192,15 @@ def put_videos_created():
 		metrics = '0'
 		metrics_slab = ''
 		#print(metrics, metrics_slab, key, week_no, len(val))
-		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
-		if(created):
-			print(metrics, metrics_slab, key, week_no, len(val))
-			save_obj.count = len(val)
-			save_obj.save()
+		save_obj = DashboardMetricsJarvis.objects.get(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
+		save_obj.count = len(val)
+		save_obj.save()
+
+		# save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
+		# if(created):
+		# 	print(metrics, metrics_slab, key, week_no, len(val))
+		# 	save_obj.count = len(val)
+		# 	save_obj.save()
 
 
 # number of video creators split according to date of signup and distributed into various slabs
@@ -253,12 +262,6 @@ def put_video_creators():
 				else:
 					slab_1_dict[str_date] = []
 					slab_1_dict[str_date].append(curr_userid)
-
-	# print(slab_1_dict)
-	# print("\n\n")
-	# print(slab_2_dict)
-	# print("\n\n")
-	# print(slab_3_dict)				
 					
 	for key, val in slab_1_dict.items():
 		datetime_key = parser.parse(key)
@@ -314,6 +317,18 @@ def put_video_creators():
 			save_obj.save()
 						
 
+def put_video_creators_analytics():
+
+	today = datetime.today()
+	start_date = today + timedelta(days = -180)
+	end_date = today
+	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = today):
+		curr_day = dt.day 
+		curr_month = dt.month
+		curr_year = dt.year 
+
+
+
 def put_dau_data():
 
 	today = datetime.today()
@@ -324,16 +339,27 @@ def put_dau_data():
 		curr_day = dt.day 
 		curr_month = dt.month 
 		curr_year = dt.year 
+
 		t1 = ReferralCodeUsed.objects.filter(created_at__day= curr_day, created_at__month= curr_month, created_at__year= curr_year).count()
 		t2 = AndroidLogs.objects.filter(created_at__day= curr_day, created_at__month= curr_month, created_at__year= curr_year).distinct('user').count()
-		print(curr_day, curr_month, curr_year, t1+t2)
+		tot_count = t1 + t2
+		week_no = dt.isocalendar()[1]
+		if(curr_year == 2019):
+			week_no+=52
+		if(curr_year == 2019 and week_no == 1):
+			week_no = 52
 
+		str_curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day)	
+		metrics = '6'
+		metrics_slab = ''
+		save_obj = DashboardMetricsJarvis.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date, week_no = week_no)
+		if(created):
+			print(curr_day, curr_month, curr_year, t1+t2)
+			save_obj.count = tot_count
+			save_obj.save()
 
-# put bolo action scores distributed by various types
-# def put_bolo_score_records():
+		
 
-# 	all_data = BoloActionHistory.objects.all()
-# 	for item in all_data:
 
 
 
@@ -342,7 +368,7 @@ def main():
 
 	#put_share_data()
 	#put_installs_data()
-	# put_videos_created()
+	#put_videos_created()
 	# put_video_views_data()
 	# put_video_creators()
 	put_dau_data()
