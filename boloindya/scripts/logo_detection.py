@@ -16,6 +16,7 @@ from ffmpy import FFmpeg
 from datetime import timedelta
 from google.cloud import vision
 
+from django.conf import settings
 import operator
 from ffmpy import FFmpeg
 from forum.topic.models import Topic
@@ -62,10 +63,8 @@ def timetostring(t):
 
 
 def remove_redundant_files():
-	os.remove('local_video.mp4')
-	os.remove('output1.png')
-	copyfile('plag_vid_details.txt', '/tmp/plag_vid_details.txt')
-	os.remove('plag_vid_details.txt')
+	os.remove(settings.BASE_DIR + '/temp/local_video.mp4')
+	os.remove(settings.BASE_DIR + '/temp/output1.png')
 
 
 # method to identify plagarised logos in videos uploaded
@@ -75,7 +74,6 @@ def identify_logo():
 	plag_text_options = Topic.plag_text_options
 	for (a,b) in plag_text_options:
 		plag_source.append(str(b))
-
 
 	f_name = settings.BASE_DIR + '/temp/plag_vid_details.txt'
 	f = io.open(f_name, "w", encoding="UTF-8")
@@ -118,9 +116,9 @@ def identify_logo():
 			global_counter+=1
 
 			for interval in intervals:
-				ff = FFmpeg(inputs = {'local_video.mp4': None}, outputs = {"output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
+				ff = FFmpeg(inputs = {settings.BASE_DIR + '/temp/local_video.mp4': None}, outputs = {settings.BASE_DIR + "/temp/output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
 				ff.run()
-				file_name = PROJECT_PATH + '/scripts/output{}.png'.format(count)
+				file_name = settings.BASE_DIR + '/temp/output{}.png'.format(count)
 				with io.open(file_name, 'rb') as image_file:
 					content = image_file.read()
 					image = vision.types.Image(content = content)
@@ -129,7 +127,7 @@ def identify_logo():
 					for text in texts:
 						modified_text = text.description
 						if(modified_text in plag_source):
-							f.write(str(iter_id) + " " + video_title + " " + url_str + " " + (modified_text) + "\n")
+							f.write(iter_id + " " + video_title + " " + url_str + " " + (modified_text) + "\n")
 							# Topic.objects.filter(id = iter_id).update(plag_text = str(plag_source.index(modified_text)))
 							# Topic.objects.filter(id = iter_id).update(time_deleted = datetime.now())
 							# data[0].delete()
