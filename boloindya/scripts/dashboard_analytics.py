@@ -3,10 +3,12 @@
 from forum.user.models import AndroidLogs, VideoPlaytime, VideoCompleteRate, UserAppTimeSpend, ReferralCodeUsed, UserProfile
 from drf_spirit.models import UserJarvisDump, UserLogStatistics, ActivityTimeSpend, VideoDetails,UserTimeRecord, UserVideoTypeDetails
 from forum.topic.models import Topic, BoloActionHistory
+from django.db.models import Count
 import time
 import ast 
 from django.http import JsonResponse
 from drf_spirit.utils import language_options
+
 from dateutil import parser
 import re
 import datetime
