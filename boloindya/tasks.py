@@ -15,7 +15,7 @@ def send_notifications_task(data, pushNotification):
     from drf_spirit.models import UserLogStatistics
     from jarvis.models import PushNotification, FCMDevice, PushNotificationUser
     from django.core.paginator import Paginator
-    from forum.user.models import UserProfile
+    from forum.user.models import UserProfile, AndroidLogs
     try:
         title = data.get('title', "")
         upper_title = data.get('upper_title', "")
@@ -90,7 +90,14 @@ def send_notifications_task(data, pushNotification):
 
                 if user_group == '3':
                     filter_list = VBseen.objects.distinct('user__pk').values_list('user__pk', flat=True)
-
+                elif user_group == '9':
+                    hours_ago = datetime.datetime.now()-datetime.timedelta(days=int(data.get('days_ago', "1")))
+                    filter_list=Topic.objects.filter(is_vb=True, date__gt=hours_ago).order_by('-user__pk').distinct('user').values_list('user__pk', flat=True)
+                    print(filter_list)
+                elif user_group == '10':
+                    hours_ago = datetime.datetime.now()-datetime.timedelta(days=int(data.get('days_ago', "1")))
+                    filter_list=AndroidLogs.objects.filter(created_at__gt=hours_ago).order_by('-user__pk').distinct('user').values_list('user__pk', flat=True)
+                    print(filter_list)
                 elif user_group == '4' or user_group == '5':
                     hours_ago = datetime.now()
                     if user_group == '4':
@@ -117,7 +124,8 @@ def send_notifications_task(data, pushNotification):
                         PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2')
                     except:
                         pass
-                    t = each.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url})
+                    t = each.send_message(data={})
+                    #t = each.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url})
                     device_list.append(t)
                 #t = device_after_slice.object_list.send_message(data={'pupluar_data': 'true' })
                 logger.info(device_list)

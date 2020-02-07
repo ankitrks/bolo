@@ -147,7 +147,9 @@ user_group_options = (
     ('5', "Signed up but no opening of app since 72 hours "),
     ('6', "Never created a video"),
     ('7', "Test User"),
-    ('8', "Particular User")
+    ('8', "Particular User"),
+    ('9', 'Creators'),
+    ('10', 'Active Users')
 )
 
 notification_type_options = (
@@ -229,6 +231,7 @@ class PushNotification(RecordTimeStamp):
     image_url = models.CharField(_('image_url'),max_length=1000,null=True,blank=True)
     is_removed = models.BooleanField(default=False)
     is_executed = models.BooleanField(default=False)
+    days_ago = models.PositiveIntegerField(null=True,blank=True,default=0)
     particular_user_id=models.CharField(_('particular_user_id'),max_length=20,null=True,blank=True)
     repeated_hour = models.PositiveIntegerField(null=True,blank=True,default=0)
     
