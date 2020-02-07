@@ -10,7 +10,8 @@ from drf_spirit.utils import language_options
 from dateutil import parser
 import re
 import datetime
-from datetime import datetime
+from dateutil import rrule
+from datetime import datetime, timedelta
 import os 
 import csv
 import pytz 
@@ -88,7 +89,8 @@ def put_installs_data():
 			if(curr_userid!='' and curr_userid!='None'):
 				user_install_dict[curr_date].append(curr_userid)
 		else:
-			user_install_dict[curr_date] = []		 
+			user_install_dict[curr_date] = []
+			user_install_dict[curr_date].append(curr_userid)		 
 	
 
 	#print(user_install_dict, len(user_install_dict))
@@ -169,6 +171,7 @@ def put_videos_created():
 			day_month_year_dict[curr_date].append(curr_videoid)
 		else:
 			day_month_year_dict[curr_date] = []
+			day_month_year_dict.append(curr_videoid)
 
 	
 	#print(len(day_month_year_dict))
@@ -311,6 +314,21 @@ def put_video_creators():
 			save_obj.save()
 						
 
+def put_dau_data():
+
+	today = datetime.today()
+	start_date = today + timedelta(month = -5)	
+	end_date = today
+	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
+		print(dt)
+		curr_day = dt.day 
+		curr_month = dt.month 
+		curr_year = dt.year 
+		t1 = ReferralCodeUsed.objects.filter(created_at_day= curr_day, created_atmonth= curr_month, created_at_year= curr_year).count()
+		t2 = AndroidLogs.objects.filter(created_at_day= curr_day, created_atmonth= curr_month, created_at_year= curr_year).distinct('user').count()
+		print(curr_day, curr_month, curr_year, t1+t2)
+
+
 # put bolo action scores distributed by various types
 # def put_bolo_score_records():
 
@@ -324,9 +342,10 @@ def main():
 
 	#put_share_data()
 	#put_installs_data()
-	put_videos_created()
-	put_video_views_data()
-	put_video_creators()
+	# put_videos_created()
+	# put_video_views_data()
+	# put_video_creators()
+	put_dau_data()
 
 
 def run():
