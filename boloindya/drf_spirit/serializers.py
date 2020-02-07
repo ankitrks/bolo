@@ -3,7 +3,7 @@ from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from .fields import UserReadOnlyField
 from forum.topic.models import Topic,CricketMatch,Poll,Choice,Voting,Leaderboard, Notification, TongueTwister,BoloActionHistory,VBseen
 from django.contrib.auth.models import User
-from forum.category.models import Category
+from forum.category.models import Category,CategoryViewCounter
 from forum.comment.models import Comment
 from forum.user.models import UserProfile,AppVersion, ReferralCodeUsed, VideoCompleteRate
 from .relations import PresentableSlugRelatedField
@@ -14,6 +14,7 @@ import re
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 from datetime import datetime,timedelta,date
+from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
 
 cloufront_url = "https://d1fa4tg1fvr6nj.cloudfront.net"
 class CategorySerializer(ModelSerializer):
@@ -62,6 +63,16 @@ class TopicSerializer(ModelSerializer):
     date = SerializerMethodField()
     video_cdn = SerializerMethodField()
     m2mcategory = SerializerMethodField()
+
+    def __init__(self, *args, **kwargs):
+        super(TopicSerializer, self).__init__(*args, **kwargs)
+        if not self.context['is_expand']:
+            remove_list = ['m3u8_content','audio_m3u8_content','video_m3u8_content']
+        else:
+            remove_list = []
+        if remove_list:
+            for field in remove_list:
+                self.fields.pop(field)
 
     class Meta:
         model = Topic
@@ -129,6 +140,16 @@ class TopicSerializerwithComment(ModelSerializer):
     m2mcategory = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
 
+    def __init__(self, *args, **kwargs):
+        super(TopicSerializerwithComment, self).__init__(*args, **kwargs)
+        if not self.context['is_expand']:
+            remove_list = ['m3u8_content','audio_m3u8_content','video_m3u8_content']
+        else:
+            remove_list = []
+        if remove_list:
+            for field in remove_list:
+                self.fields.pop(field)
+
     class Meta:
         model = Topic
         # fields = '__all__'
@@ -192,6 +213,16 @@ class SingleTopicSerializerwithComment(ModelSerializer):
     m2mcategory = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
 
+    def __init__(self, *args, **kwargs):
+        super(SingleTopicSerializerwithComment, self).__init__(*args, **kwargs)
+        if not self.context['is_expand']:
+            remove_list = ['m3u8_content','audio_m3u8_content','video_m3u8_content']
+        else:
+            remove_list = []
+        if remove_list:
+            for field in remove_list:
+                self.fields.pop(field)
+
     class Meta:
         model = Topic
         # fields = '__all__'
@@ -233,6 +264,16 @@ class UserAnswerSerializerwithComment(ModelSerializer):
     date = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
 
+    def __init__(self, *args, **kwargs):
+        super(UserAnswerSerializerwithComment, self).__init__(*args, **kwargs)
+        if not self.context['is_expand']:
+            remove_list = ['m3u8_content','audio_m3u8_content','video_m3u8_content']
+        else:
+            remove_list = []
+        if remove_list:
+            for field in remove_list:
+                self.fields.pop(field)
+
     class Meta:
         model = Topic
         # fields = '__all__'
@@ -263,6 +304,8 @@ class UserProfileSerializer(ModelSerializer):
     follower_count= SerializerMethodField()
     bolo_score= SerializerMethodField()
     slug = SerializerMethodField()
+    view_count = SerializerMethodField()
+    own_vb_view_count = SerializerMethodField()
     class Meta:
         model = UserProfile
         # fields = '__all__' 
@@ -279,6 +322,12 @@ class UserProfileSerializer(ModelSerializer):
 
     def get_slug(self,instance):
         return instance.user.username
+
+    def get_view_count(self,instance):
+        return shorcountertopic(instance.view_count)
+
+    def get_own_vb_view_count(self,instance):
+        return shorcountertopic(instance.own_vb_view_count)
 
 class UserSerializer(ModelSerializer):
     userprofile = SerializerMethodField()
@@ -425,6 +474,8 @@ class PaymentInfoSerializer(ModelSerializer):
 class UserWithUserSerializer(ModelSerializer):
     user = SerializerMethodField()
     sub_category = SerializerMethodField()
+    view_count = SerializerMethodField()
+    own_vb_view_count = SerializerMethodField()
 
     class Meta:
         model = UserProfile
@@ -436,12 +487,30 @@ class UserWithUserSerializer(ModelSerializer):
     def get_sub_category(self,instance):
         return CategorySerializer(instance.sub_category, many=True).data
 
+    def get_view_count(self,instance):
+        return shorcountertopic(instance.view_count)
+
+    def get_own_vb_view_count(self,instance):
+        return shorcountertopic(instance.own_vb_view_count)
+
 class UserWithoutUserProfileSerializer(ModelSerializer):
     class Meta:
         model = User
         #fields = '__all__'
         exclude = ('password', )
 
+class UserBaseSerializerDatatable(ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username','id')
+        # exclude = ('password', )
+
+class UserPayDatatableSerializer(ModelSerializer):
+    user = UserBaseSerializerDatatable()
+    class Meta:
+        model = UserProfile
+        fields = ('user','name','bolo_score','id')
+   
 class CategoryVideoByteSerializer(ModelSerializer):
     user = SerializerMethodField()
     view_count = SerializerMethodField()
@@ -449,6 +518,16 @@ class CategoryVideoByteSerializer(ModelSerializer):
     comment_count = SerializerMethodField()
     date = SerializerMethodField()
     video_cdn = SerializerMethodField()
+
+    def __init__(self, *args, **kwargs):
+        super(CategoryVideoByteSerializer, self).__init__(*args, **kwargs)
+        if not self.context['is_expand']:
+            remove_list = ['m3u8_content','audio_m3u8_content','video_m3u8_content']
+        else:
+            remove_list = []
+        if remove_list:
+            for field in remove_list:
+                self.fields.pop(field)
 
     class Meta:
         model = Topic
@@ -487,6 +566,7 @@ from django.db.models import Sum
 class CategoryWithVideoSerializer(ModelSerializer):
     topics = SerializerMethodField()
     total_view = SerializerMethodField()
+    current_language_view = SerializerMethodField()
 
     class Meta:
         model = Category
@@ -495,6 +575,13 @@ class CategoryWithVideoSerializer(ModelSerializer):
 
     def get_total_view(self, instance):
         return shorcountertopic(instance.view_count)
+
+    def get_current_language_view(self,instance):
+        if self.context.get("language_id"):
+            language =  self.context.get("language_id")
+            current_language_category = CategoryViewCounter.objects.get(category=instance,language=language)
+            return shorcountertopic(current_language_category.view_count)
+
 
     def get_topics(self,instance):
         # return []
@@ -507,7 +594,8 @@ class CategoryWithVideoSerializer(ModelSerializer):
         topics = []
         all_seen_vb = []
         if user_id:
-            all_seen_vb = VBseen.objects.filter(user_id = user_id, topic__language_id=language_id, topic__m2mcategory=instance).distinct('topic_id').values_list('topic_id',flat=True)
+            all_seen_vb = get_redis_vb_seen(user_id)
+            # all_seen_vb = VBseen.objects.filter(user_id = user_id, topic__language_id=language_id, topic__m2mcategory=instance).distinct('topic_id').values_list('topic_id',flat=True)
         post_till = datetime.now() - timedelta(days=30)
         excluded_list =[]
         superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=instance,language_id = language_id,user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
@@ -524,18 +612,18 @@ class CategoryWithVideoSerializer(ModelSerializer):
             excluded_list.append(each.id)
         other_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=instance,language_id = language_id).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
         orderd_all_seen_post=[]
-        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)
+        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb,language_id=language_id, m2mcategory=instance)
         if all_seen_post:
             for each_id in all_seen_vb:
                 for each_vb in all_seen_post:
                     if each_vb.id == each_id:
                         orderd_all_seen_post.append(each_vb)
         topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
-        page_size = 15
-        paginator = Paginator(topics, page_size)
-        page = 1
-        topic_page = paginator.page(page)
-        return CategoryVideoByteSerializer(topic_page, many=True).data
+        # page_size = 15
+        # paginator = Paginator(topics, page_size)
+        # page = 1
+        # topic_page = paginator.page(page)
+        return CategoryVideoByteSerializer(topics[:settings.REST_FRAMEWORK['PAGE_SIZE']], many=True,context={'is_expand':self.context.get("is_expand",False)}).data
 
 class VideoCompleteRateSerializer(ModelSerializer):
     class Meta:

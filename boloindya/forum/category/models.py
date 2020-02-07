@@ -10,6 +10,7 @@ from django.utils import timezone
 from ..core.conf import settings
 from ..core.utils.models import AutoSlugField
 from .managers import CategoryQuerySet
+from drf_spirit.utils import language_options
 
 
 class Category(models.Model):
@@ -44,7 +45,8 @@ class Category(models.Model):
     is_closed = models.BooleanField(_("closed"), default=False)
     is_removed = models.BooleanField(_("removed"), default=False)
     is_private = models.BooleanField(_("private"), default=False)
-    category_image = models.CharField(_("color"), max_length=150, blank=True)
+    category_image = models.CharField(_("Category Image URL"), max_length=150, blank=True)
+    dark_category_image = models.CharField(_("Dark Category Image URL"), max_length=150, blank=True)
     order_no = models.IntegerField(default = 0)
     view_count = models.BigIntegerField(default = 0)
     is_engagement = models.BooleanField(default=False)
@@ -76,3 +78,14 @@ class Category(models.Model):
             return True
         else:
             return False
+
+class CategoryViewCounter(models.Model):
+    category = models.ForeignKey('forum_category.Category', verbose_name=_("category"), related_name="category_counter",null=True,blank=True)
+    language = models.CharField(_("language"), choices=language_options, blank = True, null = True, max_length=10)
+    view_count = models.BigIntegerField(default = 0)
+
+    class Meta:
+        ordering = ['language']
+    
+    def __unicode__(self):
+        return str(self.category)+"---"+str(self.get_language_display())

@@ -104,6 +104,7 @@ def run():
             counter_objects_created+=len(user_want_vbseen)
             print "After: VBseen.objects.bulk_create(aList)",datetime.now()
             Topic.objects.filter(pk=each_seen_id).update(view_count = F('view_count')+number_seen)
+            # UserProfile.objects.filter(user = Topic.objects.get(pk=each_seen_id).user).update(view_count = F('view_count')+number_seen)
             if user_want_vbseen:
                 # set_list1 = set(tuple(sorted(d.items())) for d in user_want_vbseen)
                 # set_list2 = set(tuple(sorted(d.items())) for d in already_vbseen)
@@ -119,12 +120,14 @@ def run():
                 print "Before: bolo_score_processing",datetime.now()
                 score = get_weight('vb_view')
                 vb_seen_type = ContentType.objects.get(app_label='forum_topic', model='vbseen')
-                already_vbseen = list(VBseen.objects.filter(topic_id = each_seen_id,user_id__in=[d['user_id'] for d in new_vb_seen]).values('user_id','id'))
+                already_vbseen = list(VBseen.objects.filter(topic_id = each_seen_id,user_id__in=[d['user_id'] for d in new_vb_seen]).values('topic__user_id','id'))
                 # filter_bolo_vbseen = [d['id'] for d in already_vbseen]
                 # bolo_history = list(BoloActionHistory.objects.filter(action_object_type = vb_seen_type,action_object_id__in=filter_bolo_vbseen).values('user_id','action_object_id').distinct('action_object_id'))
                 for each in already_vbseen:
+                    each['user_id'] = each['topic__user_id']
                     each['action_object_id'] = each['id']
                     del each['id']
+                    del each['topic__user_id']
                 print "After: bolo_score_processing",datetime.now()
                 # set_list3 = set(tuple(sorted(d.items())) for d in already_vbseen)
                 # set_list4 = set(tuple(sorted(d.items())) for d in bolo_history)
@@ -154,7 +157,7 @@ def run():
                     print "after: bolo_score bulk",datetime.now()
                     print "before: profile updation",datetime.now()
                     bolo_increment_user_id = [x['user_id'] for x in new_vb_seen]
-                    bolo_increment_user = UserProfile.objects.filter(user_id__in = bolo_increment_user_id ).update(bolo_score =F('bolo_score')+score,view_count = F('view_count')+1)
+                    bolo_increment_user = UserProfile.objects.filter(user = Topic.objects.get(pk=each_seen_id).user ).update(own_vb_view_count = F('own_vb_view_count')+number_seen,bolo_score =F('bolo_score')+len(already_vbseen)*score,view_count = F('view_count')+number_seen)
                     print "after: profile updation",datetime.now()
                     aList=bolo_increment_user_id=None
             print "total created: ", counter_objects_created
@@ -361,7 +364,7 @@ def action_seen(user_id,topic_id):
     else:
        vbseen = VBseen.objects.create(user_id = user_id,topic_id = topic_id)
     topic.update(view_count = F('view_count')+1)
-    userprofile = get_userprofile(user_id).update(view_count = F('view_count')+1)
+    userprofile = get_userprofile(topic[0].user.id).update(view_count = F('view_count')+1,own_vb_view_count = F('own_vb_view_count')+1)
 
 #follow
 def action_follow(test_user_id,any_user_id):

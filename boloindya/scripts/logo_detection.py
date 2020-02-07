@@ -16,7 +16,6 @@ from ffmpy import FFmpeg
 from datetime import timedelta
 from google.cloud import vision
 
-from django.conf import settings
 import operator
 from ffmpy import FFmpeg
 from forum.topic.models import Topic
@@ -62,12 +61,11 @@ def timetostring(t):
 		return '00:' + str(t)			
 
 
-
 def remove_redundant_files():
-	os.remove(settings.BASE_DIR + '/temp/local_video.mp4')
-	os.remove(settings.BASE_DIR + '/temp/output1.png')
-	#copyfile('plag_vid_details.txt', '/temp/plag_vid_details.txt')
-	#os.remove('plag_vid_details.txt')
+	os.remove('local_video.mp4')
+	os.remove('output1.png')
+	copyfile('plag_vid_details.txt', '/tmp/plag_vid_details.txt')
+	os.remove('plag_vid_details.txt')
 
 
 # method to identify plagarised logos in videos uploaded
@@ -77,6 +75,7 @@ def identify_logo():
 	plag_text_options = Topic.plag_text_options
 	for (a,b) in plag_text_options:
 		plag_source.append(str(b))
+
 
 	f_name = settings.BASE_DIR + '/temp/plag_vid_details.txt'
 	f = io.open(f_name, "w", encoding="UTF-8")
@@ -89,12 +88,11 @@ def identify_logo():
 		for item in topic_objects:
 			iter_id = item.id
 			data = Topic.objects.filter(id = iter_id)
-			print(data[0].id)
 			url = data[0].backup_url
 			video_title = data[0].title
 			url_str = url.encode('utf-8')
 			test = urllib.FancyURLopener()
-			test.retrieve(url_str, settings.BASE_DIR + '/temp/local_video.mp4')
+			test.retrieve(url_str, 'local_video.mp4')
 			duration = data[0].media_duration 
 			time = duration.split(":")
 			minute = int(time[0]) * 60
@@ -120,9 +118,9 @@ def identify_logo():
 			global_counter+=1
 
 			for interval in intervals:
-				ff = FFmpeg(inputs = {settings.BASE_DIR + '/temp/local_video.mp4': None}, outputs = {settings.BASE_DIR + "/temp/output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
+				ff = FFmpeg(inputs = {'local_video.mp4': None}, outputs = {"output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
 				ff.run()
-				file_name = settings.BASE_DIR + '/temp/output{}.png'.format(count)
+				file_name = PROJECT_PATH + '/scripts/output{}.png'.format(count)
 				with io.open(file_name, 'rb') as image_file:
 					content = image_file.read()
 					image = vision.types.Image(content = content)
@@ -140,7 +138,6 @@ def identify_logo():
 		print('' + str(e))
 		pass 
 		#print('' + str(e))  				
-
 	f.close()
 					
 
@@ -148,5 +145,7 @@ def main():
 	identify_logo()
 	#remove_redundant_files()
 
+
 def run():
 	main()
+

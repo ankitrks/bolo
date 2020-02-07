@@ -19,8 +19,8 @@ import time
 import re
 from django.db.models import Q
 from drf_spirit.views import getVideoLength
-from drf_spirit.utils  import calculate_encashable_details,language_options
-from forum.user.models import UserProfile, ReferralCode, ReferralCodeUsed, VideoCompleteRate, VideoPlaytime
+from drf_spirit.utils  import calculate_encashable_details,language_options,check_or_create_user_pay
+from forum.user.models import UserProfile, ReferralCode, ReferralCodeUsed, VideoCompleteRate, VideoPlaytime,UserPay
 from forum.topic.models import Topic, VBseen
 from forum.category.models import Category
 from django.contrib.auth.models import User
@@ -33,7 +33,7 @@ from django.views.generic.edit import FormView
 from datetime import datetime
 from forum.userkyc.forms import KYCBasicInfoRejectForm,KYCDocumentRejectForm,AdditionalInfoRejectForm,BankDetailRejectForm
 from .models import VideoUploadTranscode,VideoCategory, PushNotification, PushNotificationUser, user_group_options, \
-    FCMDevice, notification_type_options, metrics_options, DashboardMetrics, metrics_slab_options
+    FCMDevice, notification_type_options, metrics_options, DashboardMetrics, DashboardMetricsJarvis, metrics_slab_options
 from drf_spirit.models import MonthlyActiveUser, HourlyActiveUser, DailyActiveUser, VideoDetails
 from forum.category.models import Category
 from django.contrib.auth.models import User
@@ -48,7 +48,7 @@ from itertools import groupby
 from django.db.models import Count
 import ast
 from drf_spirit.serializers import VideoCompleteRateSerializer
-from .forms import VideoUploadTranscodeForm,TopicUploadTranscodeForm
+from .forms import VideoUploadTranscodeForm,TopicUploadTranscodeForm,UserPayForm
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
 from django.core.files.base import ContentFile
 from drf_spirit.serializers import UserWithUserSerializer
@@ -353,26 +353,63 @@ def uploaddata(request):
     return HttpResponse()
 
 def get_kyc_user_list(request):
-    if request.user.is_superuser:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
         all_kyc = UserKYC.objects.all()
         return render(request,'jarvis/pages/userkyc/user_kyc_list.html',{'all_kyc':all_kyc})
 def get_submitted_kyc_user_list(request):
-    if request.user.is_superuser:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
         all_kyc = UserKYC.objects.filter(is_kyc_completed=True,is_kyc_accepted=False)
         return render(request,'jarvis/pages/userkyc/submitted_kyc.html',{'all_kyc':all_kyc})
 
 def get_pending_kyc_user_list(request):
-    if request.user.is_superuser:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
         all_kyc = UserKYC.objects.filter(is_kyc_completed=False,is_kyc_accepted=False)
         return render(request,'jarvis/pages/userkyc/pending_kyc.html',{'all_kyc':all_kyc})
 
 def get_accepted_kyc_user_list(request):
-    if request.user.is_superuser:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
         all_kyc = UserKYC.objects.filter(is_kyc_completed=True)
         return render(request,'jarvis/pages/userkyc/accepted_kyc.html',{'all_kyc':all_kyc})
 
+def get_user_pay_details(request):
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
+        return render(request,'jarvis/pages/payment/user_pay.html')
+
+def get_single_user_pay_details(request):
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
+        username = request.GET.get('username',None)
+        all_pay = UserPay.objects.filter(user__username = username).order_by('-id')
+        user = User.objects.get(username=username)
+        from datetime import datetime
+        now = datetime.now()
+        check_or_create_user_pay(user.id,'01-'+str(now.month)+'-'+str(now.year))
+        user_pay_form = UserPayForm()
+        return render(request,'jarvis/pages/payment/single_user_pay.html',{'all_pay':all_pay,'userprofile':user.st,'payment_form':user_pay_form})
+
+def add_user_pay(request):
+    if request.user.is_superuser:
+        user_pay_id = request.POST.get('user_pay_id',None)
+        amount_pay = request.POST.get('amount_pay',0)
+        transaction_id = request.POST.get('transaction_id',None)
+        if not user_pay_id:
+            return HttpResponse(json.dumps({'is_success':'fail','reason':'pay_id missing'}),content_type="application/json")
+        user_pay = UserPay.objects.get(pk=user_pay_id)
+        if not user_pay.is_evaluated:
+            return HttpResponse(json.dumps({'is_success':'fail','reason':'pay not evaluated for this month'}),content_type="application/json")
+        user_pay.amount_pay = int(amount_pay)
+        user_pay.transaction_id = transaction_id
+        user_pay.is_paid = True
+        from datetime import datetime
+        user_pay.pay_date = datetime.now()
+        user_pay.save()
+        return HttpResponse(json.dumps({'is_success':'success'}),content_type="application/json")
+    else:
+        return HttpResponse(json.dumps({'is_success':'fail','message':'not authorised'}),content_type="application/json")
+
+
+
 def get_kyc_of_user(request):
-    if request.user.is_superuser or request.user.is_staff:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)) or request.user.is_staff:
         username = request.GET.get('username',None)
         kyc_user = User.objects.get(username=username)
         kyc_details = UserKYC.objects.get(user=kyc_user)
@@ -407,7 +444,7 @@ def SecretFileView(request):
 
 def get_encashable_detail(request):
     to_be_calculated = request.GET.get("calculate",None)
-    if request.user.is_superuser or request.user.is_staff:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)) or request.user.is_staff:
         if to_be_calculated:
             for each_user in User.objects.all():
                 calculate_encashable_details(each_user)
@@ -417,13 +454,13 @@ def get_encashable_detail(request):
     return render(request,'jarvis/pages/payment/encashable_detail.html',{'all_encash_details':all_encash_details,'payement_cycle_form':payement_cycle_form})
 
 def calculate_encashable_detail(request):
-    if request.user.is_superuser or request.user.is_staff:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)) or request.user.is_staff:
         for each_user in User.objects.all():
             calculate_encashable_details(each_user)
     return HttpResponse(json.dumps({'success':'success'}),content_type="application/json")
 
 def get_single_encash_detail(request):
-    if request.user.is_superuser or request.user.is_staff:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)) or request.user.is_staff:
         username = request.GET.get('username',None)
         user = User.objects.get(username=username)
         calculate_encashable_details(user)
@@ -464,7 +501,7 @@ class PaymentCycleView(FormView):
     template_name='jarvis/pages/payment/invoice_error.html'
 
     def form_valid(self,form,**kwargs):
-        if self.request.user.is_superuser or self.request.user.is_staff:
+        if self.request.user.is_superuser or 'moderator' in list(self.request.user.groups.all().values_list('name',flat=True)) or self.request.user.is_staff:
             pay_cycle = PaymentCycle.objects.all().update(**form.cleaned_data)
             for each_user in User.objects.all():
                 calculate_encashable_details(each_user)
@@ -475,7 +512,7 @@ class PaymentCycleView(FormView):
 
 
 def accept_kyc(request):
-    if request.user.is_superuser or request.user.is_staff:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)) or request.user.is_staff:
         kyc_type = request.GET.get('kyc_type',None)
         user_id = request.GET.get('user_id',None)
         if kyc_type == "basic_info":
@@ -494,11 +531,12 @@ def accept_kyc(request):
         if user_kyc.is_kyc_basic_info_accepted and user_kyc.is_kyc_document_info_accepted and user_kyc.is_kyc_selfie_info_accepted and\
         user_kyc.is_kyc_bank_details_accepted:
             UserKYC.objects.filter(user_id = user_id).update(is_kyc_accepted = True)
+        user_kyc = UserKYC.objects.get(user_id = user_id)
 
         return HttpResponse(json.dumps({'success':'success','kyc_accepted':user_kyc.is_kyc_accepted}),content_type="application/json")
 
 def reject_kyc(request):
-    if request.user.is_superuser or request.user.is_staff:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)) or request.user.is_staff:
         kyc_type = request.GET.get('kyc_type',None)
         kyc_id = request.GET.get('kyc_id',None)
         kyc_reject_reason = request.GET.get('kyc_reject_reason',None)
@@ -1023,7 +1061,7 @@ def notification_panel(request):
     filters = {'language': lang, 'notification_type': notification_type, 'user_group': user_group, 'is_scheduled': scheduled_status, 'title__icontains': title}
 
     pushNotifications = PushNotification.objects.filter(*[Q(**{k: v}) for k, v in filters.items() if v], is_removed=False).order_by('-created_at')
-
+    
     return render(request,'jarvis/pages/notification/index.html', {'pushNotifications': pushNotifications, \
         'language_options': language_options, 'notification_types': notification_type_options, \
             'user_group_options': user_group_options, 'language': lang, 'notification_type': notification_type, \
@@ -1045,28 +1083,43 @@ def send_notification(request):
         data['upper_title'] = request.POST.get('upper_title', "")
         data['notification_type'] = request.POST.get('notification_type', "")
         data['id'] = request.POST.get('id', "")
+        data['particular_user_id'] = request.POST.get('particular_user_id', "")
         data['user_group'] = request.POST.get('user_group', "")
         data['lang'] = request.POST.get('lang', "")
+        data['category'] = request.POST.get('category', "")
         data['schedule_status'] = request.POST.get('schedule_status', "")
         data['datepicker'] = request.POST.get('datepicker', '')
         data['timepicker'] = request.POST.get('timepicker', '').replace(" : ", ":")
-
+        data['image_url'] = request.POST.get('image_url', '')
         send_notifications_task.delay(data, pushNotification)
-
         return redirect('/jarvis/notification_panel/')
-
     if request.method == 'GET':
         id = request.GET.get('id', None)
-        try:
+        try:    
             pushNotification = PushNotification.objects.get(pk=id)
         except Exception as e:
             print e
-    return render(request,'jarvis/pages/notification/send_notification.html', { 'language_options': language_options, 'user_group_options' : user_group_options, 'notification_types': notification_type_options, 'pushNotification': pushNotification })
+        categories = Category.objects.filter(parent__isnull=False)
+
+    return render(request,'jarvis/pages/notification/send_notification.html', { 'language_options': language_options, 'user_group_options' : user_group_options, 'notification_types': notification_type_options, 'pushNotification': pushNotification, 'categories': categories})
+
+
 
 @login_required
-def particular_notification(request, notification_id=None):
+def particular_notification(request, notification_id=None, status_id=2, page_no=1):
+    import math  
     pushNotification = PushNotification.objects.get(pk=notification_id)
-    return render(request,'jarvis/pages/notification/particular_notification.html', {'pushNotification': pushNotification})
+    page_no=int(page_no)-1
+    has_prev=False
+    if page_no > 0:
+        has_prev=True
+    pushNotificationUser=PushNotificationUser.objects.filter(push_notification_id=pushNotification)
+    pushNotificationUserSlice=pushNotificationUser[page_no*10:page_no*10+10]
+    has_next=True
+    if ((page_no*10)+10) >= len(pushNotificationUser):
+        has_next=False
+    total_page=int(math.ceil(len(pushNotificationUser)/10))+1
+    return render(request,'jarvis/pages/notification/particular_notification.html', {'pushNotification': pushNotification, 'status_id': status_id, 'pushNotificationUser': pushNotificationUserSlice, 'page_no': page_no + 2, 'prev_page_no': page_no , 'count': len(pushNotificationUser), 'has_prev': has_prev, 'has_next': has_next, 'notification_id': notification_id, 'status_id': status_id, 'total_page': total_page, 'current_page': page_no + 1})
 
 from rest_framework.decorators import api_view
 
@@ -1074,28 +1127,31 @@ from rest_framework.decorators import api_view
 def create_user_notification_delivered(request):
     notification_id = request.POST.get('notification_id', "")
 
-    pushNotificationUser = PushNotificationUser()
+    pushNotification=PushNotification.objects.get(pk=notification_id)
     if request.user:
-        print(request.user)
+        try:
+            pushNotificationUser = PushNotificationUser.objects.filter(push_notification_id=pushNotification, user=request.user)
+        except:
+            pushNotificationUser = PushNotificationUser()
         pushNotificationUser.user = request.user
+    else:
+        pushNotificationUser = PushNotificationUser()
     pushNotification = PushNotification.objects.get(pk=notification_id)
-    pushNotificationUser.push_notification_id = pushNotification
-    pushNotificationUser.save()
-
+    pushNotificationUser.update(status='0', push_notification_id = pushNotification)
     return JsonResponse({"status":"Success"})
 
 @api_view(['POST'])
 def open_notification_delivered(request):
-    notification_id = request.POST.get('notification_id', "")
-
-    pushNotification = PushNotification.objects.get(pk=notification_id)
-    if request.user:
-        pushNotificationUser = PushNotificationUser.objects.get(push_notification_id=pushNotification, user=request.user)
-        pushNotificationUser.status = '1'
-        pushNotificationUser.save()
-
-    return JsonResponse({"status":"Success"})
-
+    try:
+        notification_id = request.POST.get('notification_id', "")
+        pushNotification = PushNotification.objects.get(pk=notification_id)
+        if request.user:
+            pushNotificationUser = PushNotificationUser.objects.filter(push_notification_id=pushNotification, user=request.user)
+            pushNotificationUser.update(status='1')
+            pushNotificationUser.save()
+        return JsonResponse({"status":"Success"})
+    except Exception as e:
+        return JsonResponse({"status":str(e)})
 
 def remove_notification(request):
     id = request.GET.get('id', None)
@@ -1410,6 +1466,99 @@ def statistics_all(request):
 
     return render(request,'jarvis/pages/video_statistics/statistics_all.html', data)
 
+
+@login_required
+def statistics_all_jarvis(request):
+    from django.db.models import Sum
+    data = {}
+    top_data = []
+    metrics = request.GET.get('metrics', '0')
+    slab = request.GET.get('slab', None)
+    # data_view = request.GET.get('data_view', 'daily')
+    data_view = request.GET.get('data_view', 'monthly')
+    if data_view == 'daily':
+        data_view = 'monthly'
+    start_date = request.GET.get('start_date', '2019-05-01')
+    end_date = request.GET.get('end_date', None)
+    if not start_date:
+        start_date = '2019-05-01'
+    if not end_date:
+        end_date = (datetime.datetime.today() - timedelta(days = 1)).strftime("%Y-%m-%d")
+
+    end_date_obj = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
+    if end_date_obj >= datetime.datetime.today().date():
+        end_date = (datetime.datetime.today() - timedelta(days = 1)).strftime("%Y-%m-%d")
+
+    end_date_obj = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
+    if end_date_obj >= datetime.datetime.today().date():
+        end_date = (datetime.datetime.today() - timedelta(days = 1)).strftime("%Y-%m-%d")
+
+    top_start = (datetime.datetime.today() - timedelta(days = 30)).date()
+    top_end = (datetime.datetime.today() - timedelta(days = 1)).date()
+    for each_opt in metrics_options:
+        temp_list = []
+        temp_list.append( each_opt[0] )
+        temp_list.append( each_opt[1] )
+        temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0])\
+                .aggregate(total_count = Sum('count'))['total_count'] )
+        top_data.append(temp_list) 
+        if metrics == each_opt[0]:
+            data['graph_title'] = each_opt[1]
+    data['top_data'] = top_data
+
+    graph_data = DashboardMetricsJarvis.objects.exclude(date__gt = end_date).filter(Q(metrics = metrics) & Q(date__gte = start_date) & Q(date__lte = end_date))
+    if metrics in ['4', '2', '5'] and slab:
+        if (metrics == '4' and slab in ['0', '1', '2']) or (metrics == '2' and slab in ['3', '4', '5'])\
+                 or (metrics == '5' and slab in ['6', '7']):
+            graph_data = graph_data.filter(metrics_slab = slab)
+
+    if data_view == 'weekly':
+        x_axis = []
+        y_axis = []
+        week_no = sorted(list(set(list(graph_data.order_by('week_no').values_list('week_no', flat = True)))))
+        for each_week_no in week_no:
+            x_axis.append(str("week " + str(each_week_no)))
+            y_axis.append(graph_data.filter(week_no = each_week_no).aggregate(total_count = Sum('count'))['total_count'])
+
+    	# elif data_view == 'monthly':
+    else:
+        x_axis = []
+        y_axis = []
+        month_no = months_between(start_date, end_date)
+        for each_month_no in month_no:
+            x_axis.append(str(str(month_map[str(each_month_no[0])]) + " " + str(each_month_no[1])))
+            data1=graph_data.filter(date__month = each_month_no[0]).aggregate(total_count = Sum('count'))['total_count']
+            if data1:
+                y_axis.append(data1)
+            else:
+                y_axis.append(0)
+    # else:
+    #     x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
+    # y_axis = graph_data.values_list('count', flat = True)
+    data['metrics'] = metrics
+    data['slab'] = slab
+    data['data_view'] = data_view
+    # data['x_axis'] = list(x_axis)
+    # data['y_axis'] = list(y_axis)
+    from collections import OrderedDict
+    chart_data = OrderedDict()
+    for i in range(len(x_axis)):
+        chart_data[x_axis[i]] = y_axis[i]
+    data['chart_data'] = [[str(data_view), str(data['graph_title'])]] + [list(ele) for ele in chart_data.items()] 
+    data['start_date'] = start_date
+    data['end_date'] = end_date
+    data['slabs'] = []
+
+    if metrics == '4':
+        data['slabs'] = [metrics_slab_options[0], metrics_slab_options[1], metrics_slab_options[2]]
+    if metrics == '2':
+        data['slabs'] = [metrics_slab_options[3], metrics_slab_options[4], metrics_slab_options[5]]
+    if metrics == '5':
+        data['slabs'] = [metrics_slab_options[6], metrics_slab_options[7], metrics_slab_options[8]]    
+
+    return render(request,'jarvis/pages/video_statistics/statistics_all_jarvis.html', data)
+
+
 def get_daily_impressions_data(request):
     if request.is_ajax():
         raw_data = json.loads(request.body)            
@@ -1588,6 +1737,14 @@ def daily_vplay_data(request):
         return JsonResponse({'error':'not ajax'}, status=status.HTTP_200_OK)   
 
 
+#def analytics_video_views(request):
+
+
+def analytics(request):
+    return render(request, 'jarvis/pages/analytics_panel/view_analytics_data.html')
+
+
+
 @api_view(['POST'])
 # view for notification search
 def search_notification(request):
@@ -1617,5 +1774,27 @@ def search_notification(request):
     except Exception as e:
         print(e)
         return JsonResponse({'data': []}, status=status.HTTP_200_OK)
-    
 
+@api_view(['POST'])
+def upload_image_notification(requests):
+    if requests.is_ajax():
+        file=requests.FILES['file']
+        print(file)
+        data=upload_thumbail_notification(file, 'boloindyapp-prod')
+        try:
+            return JsonResponse({'data': data}, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(e)
+
+def upload_thumbail_notification(virtual_thumb_file,bucket_name):
+    try:
+        bucket_credentials = get_bucket_details(bucket_name)
+        client = boto3.client('s3',aws_access_key_id=bucket_credentials['AWS_ACCESS_KEY_ID'],aws_secret_access_key=bucket_credentials['AWS_SECRET_ACCESS_KEY'])
+        ts = time.time()
+        final_filename = "img-" + str(ts).replace(".", "")  + ".jpg"
+        client.put_object(Bucket=bucket_credentials['AWS_BUCKET_NAME'], Key='notification/'+final_filename, Body=virtual_thumb_file, ACL='public-read')
+        filepath = "https://"+bucket_credentials['AWS_BUCKET_NAME']+".s3.amazonaws.com/notification/"+final_filename
+        return filepath
+    except Exception as e:
+        print(e)
+        return None

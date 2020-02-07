@@ -147,6 +147,7 @@ user_group_options = (
     ('5', "Signed up but no opening of app since 72 hours "),
     ('6', "Never created a video"),
     ('7', "Test User"),
+    ('8', "Particular User")
 )
 
 notification_type_options = (
@@ -160,6 +161,7 @@ notification_type_options = (
 status_options = (
     ('0', "Not Opened"),
     ('1', "Opened"),
+    ('2', 'Sent')
 )
 
 metrics_options = (
@@ -199,17 +201,35 @@ class DashboardMetrics(RecordTimeStamp):
     def __unicode__(self):
         return str(self.id)
 
+class DashboardMetricsJarvis(RecordTimeStamp):
+    metrics = models.CharField(choices = metrics_options, blank = True, null = True, max_length = 10, default = '0')
+    metrics_slab = models.CharField(choices = metrics_slab_options, blank = True, null = True, max_length = 10, default = None)
+    date = models.DateTimeField(auto_now = False, auto_now_add = False, blank = False, null = False)
+    week_no = models.PositiveIntegerField(null = True, blank = True, default = 0)
+    count = models.PositiveIntegerField(null = True, blank = True, default = 0)
+
+    class Meta:
+        ordering = ['date']
+        
+    def __unicode__(self):
+        return str(self.id)
+
+
+
 class PushNotification(RecordTimeStamp):
     title = models.CharField(_('title'),max_length=200,null=True,blank=True)
     description = models.CharField(_('description'),max_length=500,null=True,blank=True)
     language = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='0')
     notification_type = models.CharField(choices=notification_type_options, blank = True, null = True, max_length=10, default='4')
     instance_id = models.CharField('instance_id', blank = True, null = True, max_length=40, default='')
+    category = models.ForeignKey('forum_category.Category', verbose_name=_("category"), related_name="category_notification",null=True,blank=True)
     user_group = models.CharField(choices=user_group_options, blank = True, null = True, max_length=10, default='0')
     scheduled_time = models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False)
     is_scheduled = models.BooleanField(default=False)
+    image_url = models.CharField(_('image_url'),max_length=1000,null=True,blank=True)
     is_removed = models.BooleanField(default=False)
     is_executed = models.BooleanField(default=False)
+    particular_user_id=models.CharField(_('particular_user_id'),max_length=20,null=True,blank=True)
     repeated_hour = models.PositiveIntegerField(null=True,blank=True,default=0)
     
 class PushNotificationUser(RecordTimeStamp):

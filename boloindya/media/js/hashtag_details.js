@@ -6,7 +6,7 @@ $(document).ready(function(){
 });
 
 
-
+var totalCountVideo =0;
 var userLikeAndUnlike=[];
 
 function getSideBarData(){
@@ -32,22 +32,20 @@ function getSideBarData(){
         success: function(response,textStatus, xhr){
             populaCreatorsItems="";
             populaCategoriesItems="";
-            getPopularCategory
 
             var popularCategoriesList=response.category_details;
             var popularCreatorsList=response.popular_boloindyans;
             popularCreatorsList.forEach(function(itemCreator) {itemCount++;
                 populaCreatorsItems +=getCreators(itemCreator);
-                $("#creatorId").append(populaCreatorsItems);
+                
                 //var videoCommentList=data.results;"total_view":"3444.K",
             });
+            $("#creatorId").append(populaCreatorsItems);
             loaderBoloHideDynamic('_scroll_load_more_loading_creator');
-    
-            popularCategoriesList.forEach(function(itemCat) {itemCount++;
+                popularCategoriesList.forEach(function(itemCat) {itemCount++;
                 populaCategoriesItems +=getPopularCategory(itemCat);
-                $("#discoverId").append(populaCategoriesItems);
-                //var videoCommentList=data.results;"total_view":"3444.K",
             });
+            $("#discoverId").append(populaCategoriesItems);
             loaderBoloHideDynamic('_scroll_load_more_loading_discover');
 
 
@@ -65,9 +63,14 @@ function getCreators(popularCreators){
         creatorName=popularCreators.username;
     }
 
+    var profilePics = popularCreators.userprofile.profile_pic;
+    if(profilePics==''){
+       profilePics= '/media/user.svg';
+    }    
+
     var creatorTemplate='<li class="jsx-3959364739">\
                             <a tag="a" class="jsx-1420774184 recommend-item" href="/'+popularCreators.username+'/">\
-                                <div class="jsx-2177493926 jsx-578937417 avatar round head normal" style="background-image: url('+popularCreators.userprofile.profile_pic+');"></div>\
+                                <div class="jsx-2177493926 jsx-578937417 avatar round head normal" style="background-image: url('+profilePics+');"></div>\
                                 <div class="jsx-1420774184 info-content">\
                                     <h4 class="jsx-1420774184">'+creatorName+'</h4>\
                                     <p class="jsx-1420774184">@'+popularCreators.username+'</p>\
@@ -81,11 +84,20 @@ function getCreators(popularCreators){
 
 
 function getPopularCategory(popularCategory){
+
+    var category_title;
+    currentLanguageName=current_language_name.toLowerCase();
+    if(currentLanguageName!='english'){
+        category_title=currentLanguageName+'_title';
+    }else{
+        category_title='title';
+    }
+
     var popular_categories='<li class="jsx-3959364739">\
                         <a tag="a" class="jsx-1420774184 recommend-item" href="/tag/'+popularCategory.slug+'/">\
                             <div class="jsx-2177493926 jsx-578937417 avatar head normal" style="background-image: url('+popularCategory.category_image+'); border-radius: 2px;"></div>\
                             <div class="jsx-1420774184 info-content">\
-                                <h4 class="jsx-1420774184">'+popularCategory.title+'</h4>\
+                                <h4 class="jsx-1420774184">'+popularCategory[category_title]+'</h4>\
                                 <p class="jsx-1420774184">'+popularCategory.total_view+' Views</p>\
                             </div>\
                             <div class="jsx-1420774184 arrow-right"></div>\
@@ -97,13 +109,12 @@ function getPopularCategory(popularCategory){
 
 var playListData=[];
 var userLikeAndUnlike=[];
-//http://127.0.0.1:8000/api/v1/get_vb_list/?limit=10&offset=10&user_id=191
 
 var page = 1;
 var checkDataStatus=0;
 $(window).scroll(function() {
     var scorh=Number($(window).scrollTop() + $(window).height());
-    console.log('Scol+he '+scorh);
+    
     //if($(window).scrollTop() + $(window).height() >= $(document).height()-800 && $(window).scrollTop() + $(window).height()<$(document).height()) {
     if($(window).scrollTop() + $(window).height() > $("#hashTagVideosListId").height() && checkDataStatus==0){
         
@@ -115,7 +126,7 @@ $(window).scroll(function() {
         }
 
     }
-    console.log('documentHe- '+$(document).height());
+    //console.log('documentHe- '+$(document).height());
 });
 
 
@@ -125,7 +136,7 @@ function getHashtagVideos(limit,offset){
     var hashtagId= $("#hashtagId").val();
     var platlistItems;
     var language_id=current_language_id;
-    console.log('CurrentLanguageId:'+current_language_id);
+    //console.log('CurrentLanguageId:'+current_language_id);
     var listItems="";
     var itemCount=0;
     var userVideoItems="";
@@ -136,18 +147,19 @@ function getHashtagVideos(limit,offset){
         url:res,
         type:"GET",
         data:{'challengehash':hashtagId,'language_id':language_id},
-        success: function(response,textStatus, xhr){debugger;
+        success: function(response,textStatus, xhr){
             userVideoItems="";
             var videoItemList=response.results;
             //jQuery("#userVideoCountId").html(response.count);
             var itemCount=-1;
-            videoItemList.forEach(function(itemCreator) {itemCount++;
-                userVideoItems =getVideoItem(itemCreator,itemCount);
+            videoItemList.forEach(function(itemCreator) {itemCount++;totalCountVideo++;
+                playListData.push(itemCreator);
+                userVideoItems =getVideoItem(itemCreator,totalCountVideo);
                 $("#hashTagVideosListId").append(userVideoItems);
       
             });
             loaderBoloHideDynamic('_scroll_load_more_loading_user_videos');
-            playListData=videoItemList;
+            //playListData=videoItemList;
             var nextPageData=response.next;
             jQuery("#nextPageUrlId").val(response.next);
             
@@ -169,7 +181,7 @@ function loadMoreData(NextPageUrl){
     var language_id=current_language_id;
     //var uri='https://www.boloindya.com/api/v1/get_popular_video_bytes/?page=1';
     var uri=NextPageUrl;
-    var res = encodeURI(uri);
+    var res = uri;
       $.ajax(
             {
                 url:res,
@@ -190,8 +202,8 @@ function loadMoreData(NextPageUrl){
                 userVideoItems="";
                 var videoItemList=data.results;
                 var itemCount=-1;
-                videoItemList.forEach(function(itemCreator) {itemCount++;
-                userVideoItems +=getVideoItem(itemCreator,itemCount);
+                videoItemList.forEach(function(itemCreator) {itemCount++;totalCountVideo++;
+                userVideoItems +=getVideoItem(itemCreator,totalCountVideo);
                 playListData.push(itemCreator);          
       
                 });
@@ -223,38 +235,8 @@ function loadMoreData(NextPageUrl){
 
 
 
-function getVideoItem(videoItem,itemCount){
-
-    var userVideoItem = '<div class="jsx-1410658769 video-feed-item">\
-            <div class="jsx-1410658769 _ratio_">\
-                <div class="jsx-1410658769" style="padding-top: 148.438%;">\
-                    <div class="jsx-1410658769 _ratio_wrapper">\
-                        <a href="javascript:void(0)" onClick="openVideoInPopup(\''+videoItem.question_video+'\',\''+videoItem.question_image+'\','+itemCount+');" class="jsx-2893588005 video-feed-item-wrapper">\
-                            <div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+videoItem.question_image+');">\
-                                <div class="jsx-3077367275 video-card default">\
-                                    <div class="jsx-3077367275 video-card-mask">\
-                                        <div class="jsx-1543915374 card-footer normal no-avatar">\
-                                            <div class="jsx-1543915374"><img src="/media/download.svg" class="jsx-1543915374 like-icon"><span class="jsx-1543915374">'+videoItem.likes_count+'</span></div>\
-                                        </div>\
-                                    </div>\
-                                </div>\
-                            </div>\
-                        </a>\
-                    </div>\
-                </div>\
-            </div>\
-        </div>';
-
-        return userVideoItem;
-}
-
-
-
-
-
-
-    var playListData=[];
-function getCategoryVideos(){debugger;
+    //var playListData=[];
+function getCategoryVideos(){
 
     loaderBoloShowDynamic('_scroll_load_more_loading_user_videos');
     var hashtagId= $("#hashtagId").val();
@@ -266,11 +248,6 @@ function getCategoryVideos(){debugger;
     var language_id=1;
     language_id=current_language_id;
     var userVideoItems="";
-        // headers: {
-        //   'Authorization':'Bearer '+accessToken,
-        // },
-        //http://www.boloindya.com/api/v1/get_vb_list/?limit=1&offset=11
-    //var uri='https://www.boloindya.com/api/v1/get_popular_video_bytes/?page=1';
     var uri='/api/v1/get_challenge/';
     var res = encodeURI(uri);
 
@@ -278,16 +255,15 @@ function getCategoryVideos(){debugger;
         url:res,
         type:"GET",
         data:{'challengehash':hashtagId,language_id:language_id},
-        success: function(response,textStatus, xhr){debugger;
+        success: function(response,textStatus, xhr){
             userVideoItems="";
             var videoItemList=response.results;
             var itemCount=0;
             videoItemList.forEach(function(itemCreator) {itemCount++;
                 playListData[itemCreator.id]=itemCreator;
                 userVideoItems +=getVideoItem(itemCreator,itemCreator.id);
-                $("#categoryVideosListId").append(userVideoItems);
-      
             });
+            $("#categoryVideosListId").append(userVideoItems);
             loaderBoloHideDynamic('_scroll_load_more_loading_user_videos');
             //playListData=videoItemList;
 
@@ -297,17 +273,20 @@ function getCategoryVideos(){debugger;
 }
 
 function getVideoItem(videoItem,itemCount){
-
+    var content_title="";
+    var videoTitle="";
+        videoTitle=removeTags(videoItem.title);
+        content_title = videoTitle.substr(0, 40) + " ...";
     var userVideoItem = '<div class="jsx-1410658769 video-feed-item">\
             <div class="jsx-1410658769 _ratio_">\
                 <div class="jsx-1410658769" style="padding-top: 148.438%;">\
                     <div class="jsx-1410658769 _ratio_wrapper">\
-                        <a href="javascript:void(0)" onClick="openVideoInPopup(\''+videoItem.backup_url+'\',\''+videoItem.question_image+'\','+itemCount+');" class="jsx-2893588005 video-feed-item-wrapper">\
+                        <a href="javascript:void(0)" onClick="openVideoInPopup(\''+videoItem.question_video+'\',\''+videoItem.question_image+'\','+itemCount+');" class="jsx-2893588005 video-feed-item-wrapper">\
                             <div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+videoItem.question_image+');">\
                                 <div class="jsx-3077367275 video-card default">\
                                     <div class="jsx-3077367275 video-card-mask">\
                                         <div class="jsx-1543915374 card-footer normal no-avatar">\
-                                            <div class="jsx-1543915374"><img src="/media/download.svg" class="jsx-1543915374 like-icon"><span class="jsx-1543915374">'+videoItem.likes_count+'</span></div>\
+                                            <div class="jsx-1543915374"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+videoItem.view_count+'</span></p><span class="_video_card_footer_likes1"><img src="/media/download.svg" alt="likes"> '+videoItem.likes_count+'</span></div>\
                                         </div>\
                                     </div>\
                                 </div>\
@@ -321,7 +300,6 @@ function getVideoItem(videoItem,itemCount){
         return userVideoItem;
 }
 
-
   var sideBarDetails="";
   var sideBarCommentDetails="";
 
@@ -330,7 +308,7 @@ function getVideoItem(videoItem,itemCount){
     var hideErrorMsg = true;
 
     var retryCount=0;
-function video_play_using_video_js(url,backup_url,image) {debugger;
+function video_play_using_video_js(url,backup_url,image) {
     
     var video = document.getElementById('player');
 
@@ -374,9 +352,10 @@ function video_play_using_video_js(url,backup_url,image) {debugger;
 }
 
 
- function openVideoInPopup(file,image,indexId){
+ function openVideoInPopup(file,image,indexId){debugger;
   loaderShow();
   var singleItemData=[];
+    indexId=indexId-1;
     $("#indexId").val(indexId);
     singleItemData=playListData[indexId];
   $("#modelPopup").show();
@@ -390,38 +369,6 @@ function video_play_using_video_js(url,backup_url,image) {debugger;
     var video_backup=singleItemData.question_video;
     video_play_using_video_js(file,video_backup,image);
 
-      
-    //     playerInstance.setup({
-    //       file: file,
-    //       controls: false,
-    //       image:image,
-    //       autostart:'true',
-    //       mute:'false'
-    //   });
-    //   playerInstance.on('play', function() {
-    //         loaderHide();
-    //         preBufferDone = true;
-          
-    //   }); 
-
-    // playerInstance.on('buffer', function() {
-
-    //   var time = 1;
-
-    // });   
-
-
-    // playerInstance.on('error', function(event) {
-    //     loaderHide();
-    //     var erroCode=event.code;
-
-    // });
-
-    // playerInstance.on('complete', function() {
-    //     jwplayer('player').setMute(true);
-
-    // });
-
 
     var shareURL=site_base_url+singleItemData.user.username+'/'+singleItemData.id+'';
 
@@ -432,13 +379,13 @@ function video_play_using_video_js(url,backup_url,image) {debugger;
         var bigCommentLikeDet='<strong>'+singleItemData.likes_count+' '+likeTrans+' · '+singleItemData.comment_count+' '+commentsTrans+'</strong>';
         $("#sideBarId").html(sideBarDetails);
         $("._video_card_big_meta_info_count").html(bigCommentLikeDet);
-
+        $(".video-meta-title").html(singleItemData.title);
         var userprofileName=singleItemData.user.userprofile.name;
         var userHandleName=singleItemData.user.username;
         var videoTitle=singleItemData.title;
         var profilePics = singleItemData.user.userprofile.profile_pic;
         if(profilePics==''){
-           profilePics= '/media/demo_user.png';
+           profilePics= '/media/user.svg';
         }
 
         var likeStatus="";
@@ -466,6 +413,35 @@ function video_play_using_video_js(url,backup_url,image) {debugger;
             }
         }
 
+        //=========Check Follow User ==============
+        var loginStatus=check_login_status();
+        if(loginStatus==true){
+            var countFollowStatus=userLikeAndUnlike.all_follow;
+            if(undefined !==countFollowStatus && countFollowStatus.length>0){
+                var currentUserTopic=singleItemData.user.userprofile.id;
+                var followList=userLikeAndUnlike.all_follow;
+                followList.forEach(function(followId){
+                    if(currentUserTopic==followId){
+                        followStatus=jQuery('.followStatusChangePopup').hasClass('sx_5da455');
+                        if(followStatus==true){
+                            jQuery('.followStatusChangePopup').removeClass('sx_5da455');
+                            jQuery('.followStatusChangePopup').addClass('sx_5da456');
+                            jQuery('.btnTextChangePopup').text(followed_trans);
+                        }else{
+                            jQuery('.followStatusChangePopup').removeClass('sx_5da456');
+                            jQuery('.followStatusChangePopup').addClass('sx_5da455');
+                            jQuery('.btnTextChangePopup').text(follow_trans);
+                        }
+                    }
+
+                });
+            }
+        }
+        //============== End=======================
+        $("#topicID").val(singleItemData.id);
+        $("#currentPlayUserId").val(singleItemData.user.userprofile.id);
+
+        $("#topicCreatorUsername").val(singleItemData.user.username);
 
         var profileURL='/'+userHandleName+'/';
         $("#profileImageUserId").css("background-image", "url(" + profilePics + ")");
@@ -481,7 +457,9 @@ function video_play_using_video_js(url,backup_url,image) {debugger;
         var sideBarCommentDetails="";
         var origin   = window.location.origin;
         param1=singleItemData.slug;
-        history.pushState(null, null, '?video='+param1);
+        param2=singleItemData.id;
+        history.pushState(null, null, '?video='+param1+'/'+param2);
+        followLikeList();
  }
 
  function muteAndUnmutePlayer(){
@@ -525,7 +503,7 @@ function listCommentsById(singleTopicData){
         var profileImage="";
         var userProfile=itemVideo.user.userprofile;
         if(userProfile.profile_pic==""){
-           profileImage='/media/demo_user.png';
+           profileImage='/media/user.svg';
         }else{
             profileImage=userProfile.profile_pic;
         }
@@ -576,7 +554,7 @@ function loadMoreComments(nextPageURl){
         var profileImage="";
         var userProfile=itemVideo.user.userprofile;
         if(userProfile.profile_pic==""){
-           profileImage='/media/demo_user.png';
+           profileImage='/media/user.svg';
         }else{
             profileImage=userProfile.profile_pic;
         }
@@ -592,7 +570,10 @@ function loadMoreComments(nextPageURl){
     });
 }
 function followLikeList(){
-    check_login_status();
+    var checkstatus=check_login_status();
+    if(checkstatus==false){
+        return false;
+    }
 
     var ge_local_data="";
         ge_local_data = JSON.parse(localStorage.getItem("access_data"));
@@ -611,6 +592,7 @@ function followLikeList(){
         success: function(response,textStatus, xhr){
             userLikeAndUnlike=response;
         //var videoCommentList=data.results;
+
         }
   
     });

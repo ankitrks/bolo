@@ -165,8 +165,9 @@
 
 .video_card_title{
     position: inherit;
-    top: 12px;
-    font-size: 12px;
+    top: 2px;
+    left: 2px;
+    font-size: 14px;
     padding: 2px;
     color: aliceblue;
 }
@@ -178,15 +179,62 @@
 
 ._video_card_footer_likes1{
     position: absolute;
-    right: 16px;
-    top: -165px;
-    font-size: 16px;
+    right: 6px;
+    top: 58px;
+    bottom: -2px;
+    font-size: 15px;
     font-weight: 700;
     line-height: 1;
     color: #fff;
 }
+._video_card_footer_likes1 img{
+    position: absolute;
+    margin-top: -1px;
+    height: 18px;
+    top: -2px;
+    left: -18px;
+    padding-top: 4px;
+}
+
+@media(max-width: 991px){
+._video_card_footer_likes1{
+    position: absolute;
+    right: 7px;
+    top: 58px;
+    bottom: -2px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+}
+._video_card_footer_likes1 img{
+    position: absolute;
+    margin-top: -1px;
+    height: 15px;
+    top: -3px;
+    left: -14px;
+    padding-top: 4px;
+}
+
+._video_card_footer_likes::before {
+    margin: 0 2px -3px 0;
+    top: -3px;
+}
+._video_card_footer_likes {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    font-size: 11px !important;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+}
+
+}
+
+
 ._video_card_footer_likes{
-position: absolute;
+    position: absolute;
     left: 0px;
     bottom: 0px;
     height: 26px;
@@ -270,8 +318,6 @@ position: absolute;
             <div class="jsx-1929076256 about-img">
                 <div class="jsx-1994528170 banner-video-container">
                     <div class="video-wall">
-
-
                         <div class="header-bar">{% trans "Popular Videos" %}</div>
                         <div id="js-playlists" class="playlists">
                             <div class="playlist-switcher hideonMobile">
@@ -280,14 +326,12 @@ position: absolute;
 
                             <div id="customScroll" class="js-playlist playlist-container is-active" data-feedid="Q352cyuc1">
                             <div class="playlist _video_feed_container" id="playlist">
-
-
                             </div>
                             <div class="ajax-load text-center" style="display:none;">
-                                <p><img src="/media/loader.gif">Loading More post</p>
+                                <p><img src="/media/loader.gif"></p>
                             </div>
                             <div class="_scroll_load_more_loading">
-                                <div class="boloindya-loading">Load More Content...</div>
+                                <div class="boloindya-loading"></div>
                             </div>
                             </div>
                         </div>

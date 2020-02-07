@@ -11,8 +11,11 @@ function addEvents() {
 }
 
  function accept_all(){
+    var i=1;
     $('.content').find('.kyc_accept').each(function( index ) {
-        $(this).delay(500*index).click()
+        var self=this;
+        setTimeout(function() {$(self).click()},1000*i);
+        i++;
     });
 
  }

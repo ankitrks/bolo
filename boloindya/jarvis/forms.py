@@ -2,6 +2,7 @@ from .models import *
 from django.forms import ModelForm, HiddenInput, FileInput,CharField
 from django import forms
 from forum.topic.models import Topic
+from forum.user.models import UserPay
 
 class VideoUploadTranscodeForm(ModelForm):
     class Meta():
@@ -27,5 +28,16 @@ class TopicUploadTranscodeForm(ModelForm):
 
     def __init__(self,*args,**kwargs):
         super(TopicUploadTranscodeForm,self).__init__(*args,**kwargs)
+        for field in self: 
+            field.field.widget.attrs['class'] = 'form-control'
+
+class UserPayForm(ModelForm):
+    class Meta():
+        model = UserPay
+        fields = '__all__'
+        fields = ['for_year','for_month','amount_pay','transaction_id']
+        
+    def __init__(self,*args,**kwargs):
+        super(UserPayForm,self).__init__(*args,**kwargs)
         for field in self: 
             field.field.widget.attrs['class'] = 'form-control'

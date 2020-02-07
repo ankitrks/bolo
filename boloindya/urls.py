@@ -28,17 +28,18 @@ schema_view = get_swagger_view(title='BoloIndya API')
 
 patterns = [
 
-    
+    url(r'^analytics_jarvis/$', jarvis.views.statistics_all_jarvis),
     url(r'^match/(?P<match_id>\d+)/(?P<slug>[\w-]+)/$', forum.topic.views.share_match_page, name='share_match_page'),
     url(r'^predict/(?P<poll_id>\d+)/(?P<slug>[\w-]+)/$', forum.topic.views.share_poll_page, name='share_poll_page'),
     url(r'^user/(?P<user_id>\d+)/(?P<username>[\w-]+)/$', forum.topic.views.share_user_page, name='share_user_page'),
     url(r'^video_bytes/(?P<user_id>\d+)/(?P<poll_id>\d+)/(?P<slug>[\w-]+)/$', forum.topic.views.share_vb_page, name='share_vb_page'),
 
     url(r'^about/$', forum.topic.views.get_about, name='get_about'),
-    url(r'^login/$', forum.topic.views.login, name='login'),
+    url(r'^login/$', forum.topic.views.login_user, name='login'),
     url(r'^profile/(?P<username>[\w-]+)/$', forum.topic.views.user_profile, name='user_profile'),
     url(r'^terms-of-service/$', forum.topic.views.get_termofservice, name='get_termofservice'),
     url(r'^privacy-policy/$', forum.topic.views.get_privacypolicy, name='get_privacypolicy'),
+    url(r'^bolo-action/$', forum.topic.views.get_bolo_action, name='get_bolo_action'),
     url(r'^challenge/(?P<hashtag>[\w-]+)$', forum.topic.views.share_challenge_page, name='share_challenge_page'),
     url(r'^robots.txt$', forum.topic.views.robotstext, name='roboxt'),
     url(r'^sitemap.xml$', forum.topic.views.sitemapxml, name='sitemap'),
@@ -50,6 +51,7 @@ patterns = [
     url(r'^referral-code/validate/$', forum.user.views.referral_code_validate, name='referral_code_validate'),
     url(r'^referral-code/update/$', forum.user.views.referral_code_update, name='referral_code_update'),
     url(r'^analytics/$', jarvis.views.statistics_all),
+    
 
     url(r'^ajax/pageno/$', forum.topic.views.get_topics_feed, name='ajax_lazy_topic_fetch'),
     url(r'^st/admin/', include(forum.admin.urls, namespace='admin')),
@@ -68,6 +70,8 @@ patterns = [
     url(r'^careers/openings/$',forum.topic.views.boloindya_openings,name='boloindya_openings'),
     url(r'^careers/openings/(?P<slug>[\w-]+)/$',forum.topic.views.boloindya_opening_details,name='boloindya_opening_details'),
     url(r'^careers/application/$',forum.topic.views.job_request,name='job_request'),
+    url(r'^team/$',forum.topic.views.boloindya_team_details,name='boloindya_team_details'),
+    url(r'^login/auth_api/$',forum.topic.views.login_using_api,name='login_using_api'),
     url(r'^help_support/$',forum.topic.views.help_support,name='help_support')
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
@@ -87,7 +91,9 @@ urlpatterns = [
 ]
 
 urlpatterns += i18n_patterns(
-    url(r'^$', forum.topic.views.new_home, name='index'),
+    url(r'^$', forum.topic.views.latest_home, name='index'),
+    url(r'^home/$', forum.topic.views.old_home, name='old_home'),
+    url(r'^trending/$', forum.topic.views.new_home, name='new_home'),
     url(r'^video_details/(?P<id>\d+)/$', forum.topic.views.video_details, name='video_details'),
     url(r'^video/(?P<slug>[\w-]+)/(?P<id>\d+)/$', forum.topic.views.video_details_by_slug, name='video_details_by_slug'),
     url(r'^tag/(?P<category_slug>[\w-]+)/$', forum.topic.views.get_topic_details_by_category, name='topic_details'),

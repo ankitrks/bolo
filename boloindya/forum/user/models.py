@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-from datetime import timedelta
+from datetime import timedelta,datetime
 
 from django.db import models
 from django.core.urlresolvers import reverse
@@ -11,7 +11,7 @@ from django.utils import timezone
 from ..core.conf import settings
 from ..core.utils.models import AutoSlugField
 from tinymce.models import HTMLField
-from drf_spirit.utils import language_options
+from drf_spirit.utils import language_options,month_choices
 
 class RecordTimeStamp(models.Model):
     created_at=models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False) # auto_now will add the current time and date whenever field is saved.
@@ -55,6 +55,7 @@ class UserProfile(models.Model):
 
     last_post_hash = models.CharField(_("last post hash"), max_length=32, blank=True)
     last_post_on = models.DateTimeField(_("last post on"), null=True, blank=True)
+    cover_pic = models.CharField(_("Cover Pic"), max_length=1000, blank=True)
     # new  profile fields:{maaz} #
     profile_pic = models.CharField(_("Profile Pic"), max_length=1000, blank=True)
     name = models.CharField(_("Name"), max_length=100, blank=True)
@@ -75,7 +76,8 @@ class UserProfile(models.Model):
     share_count = models.PositiveIntegerField(null=True,blank=True,default=0)
     like_count = models.PositiveIntegerField(null=True,blank=True,default=0)
     vb_count = models.PositiveIntegerField(null=True,blank=True,default=0)
-    view_count = models.PositiveIntegerField(null=True,blank=True,default=0)
+    view_count = models.BigIntegerField(null=True,blank=True,default=0)
+    own_vb_view_count = models.BigIntegerField(null=True,blank=True,default=0)
     bolo_score = models.PositiveIntegerField(null=True,blank=True,default=0)
     encashable_bolo_score = models.PositiveIntegerField(null=True,blank=True,default=0)
     is_geo_location = models.BooleanField(default=False)
@@ -90,6 +92,10 @@ class UserProfile(models.Model):
     click_id = models.CharField(_("Click Id"), max_length=300, blank=True)
     click_id_response = models.TextField(_("Click Id Response"),null=True, blank=True)
     is_dark_mode_enabled = models.BooleanField(default=False)
+    total_vb_playtime = models.PositiveIntegerField(null=True,blank=True,default=0)
+    total_time_spent = models.PositiveIntegerField(null=True,blank=True,default=0)
+    state_name = models.CharField(_('State Name'),max_length=200,null=True,blank=True)
+    city_name = models.CharField(_('City Name'),max_length=200,null=True,blank=True)
 
     # end #
 
@@ -126,6 +132,43 @@ class UserProfile(models.Model):
         def __unicode__(self):
             return self.slug
 
+def current_year():
+    return datetime.now().year
+
+def previous_month():
+    if datetime.now().month ==1:
+        return 12
+    else:
+        return datetime.now().month-1
+
+class UserPay(RecordTimeStamp):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='user_pay')
+    for_year = models.PositiveIntegerField(_('year'), choices=((r,r) for r in range(2019, datetime.now().year+1)), default=current_year)
+    for_month = models.PositiveIntegerField(_('month'),choices=month_choices,default =previous_month )
+    pay_date = models.DateTimeField(_("Pay Date"), null = True, blank = False)
+    amount_pay = models.PositiveIntegerField(_("Amount Payed"), null = True, blank = False,default=0)
+    transaction_id = models.CharField(max_length=50,null=True,blank=True)
+    total_video_created = models.PositiveIntegerField(_("Total Videos Created"), null = True, blank = False,default=0)
+    videos_in_language = models.TextField(null=True,blank=True)
+    total_monetized_video = models.PositiveIntegerField(_("Total Monetized Videos"), null = True, blank = False,default=0)
+    left_for_moderation = models.PositiveIntegerField(_("Left For Moderation"), null = True, blank = False,default=0)
+    total_like = models.PositiveIntegerField(_("Total Likes"), null = True, blank = False,default=0)
+    total_comment = models.PositiveIntegerField(_("Total Comments"), null = True, blank = False,default=0)
+    total_view = models.PositiveIntegerField(_("Total Views"), null = True, blank = False,default=0)
+    total_share = models.PositiveIntegerField(_("Total Shares"), null = True, blank = False,default=0)
+    total_bolo_score_earned = models.PositiveIntegerField(_("Total Views"), null = True, blank = False,default=0)
+    bolo_bifurcation = models.TextField(null=True,blank=True)
+    is_evaluated = models.BooleanField(default=False)
+    is_paid = models.BooleanField(default=False)
+    is_active = models.BooleanField(default = True)
+    class Meta:
+        verbose_name_plural = 'User\'s Pay'
+
+    def __unicode__(self):
+        return str(self.user)
+
+
+
 class Follower(RecordTimeStamp):
     user_following = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='user_following')# User being Followed
     user_follower = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='user_follower')# User Start Following
@@ -135,7 +178,7 @@ class Follower(RecordTimeStamp):
         verbose_name_plural = 'User\'s Followers'
 
     def __unicode__(self):
-            return str(self.user_following)
+        return str(self.user_following)
 
 
 class Weight(RecordTimeStamp):
@@ -161,24 +204,27 @@ class VideoPlaytime(models.Model):
 
     user = models.CharField(_("user"), null = True, blank = True, max_length = 250, db_index = True)
     videoid = models.CharField(_("videoid"), null = True, blank = True, max_length = 250, db_index = True)
-    playtime = models.PositiveIntegerField(_("playtime"), default=0, editable = False)
+    playtime = models.PositiveIntegerField(_("playtime"), default=0)
     timestamp = models.DateTimeField(_("timestamp"), null = True, blank = False)
+    # created_at = models.DateTimeField(_("created_at"), null = True, blank = False)
 
 # class recording the fraction of videos played
 class VideoCompleteRate(models.Model):
 
     user = models.CharField(_("user"), null = True, blank = False, max_length = 250, db_index = True)
     videoid = models.CharField(_("videoid"), null = True, blank = False, max_length = 250, db_index = True)
-    duration = models.PositiveIntegerField(_("duration"), default = 0, editable = False)
-    playtime = models.PositiveIntegerField(_("playtime"), default = 0, editable = False)
+    duration = models.PositiveIntegerField(_("duration"), default = 0)
+    playtime = models.PositiveIntegerField(_("playtime"), default = 0)
     percentage_viewed = models.DecimalField(_("percentage_viewed"), max_digits = 5, decimal_places = 2)
     timestamp = models.DateTimeField(_("timestamp"), null = True, blank = False)
+    # created_at = models.DateTimeField(_("created_at"), null = True, blank = False)
 
 # class storing the total time spend by the user on the app
 class UserAppTimeSpend(models.Model):
 
     user = models.CharField(_("user"), null = True, blank = False, max_length = 250, db_index = True)
     total_time = models.DecimalField(_("totaltime"), max_digits = 5, decimal_places = 2)
+    reference_time = models.DateTimeField(_("reference_time"), null = True, blank = False)
 
 
 class AppVersion(RecordTimeStamp):

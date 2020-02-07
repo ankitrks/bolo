@@ -363,7 +363,7 @@
         height: auto;
         margin-right: 0px;
         margin-bottom: 0px;
-        padding: 9px 6px 0 9px;
+        padding: 9px 1px 0 5px;
     }
 
     .share-layout {
@@ -412,10 +412,7 @@
     }
 
 
-@icon-size: 50px;
-@main-color: #e9f1f4;
 
-// STYLE TO WRAP UP THE DEMO
 .search {
 	position: absolute;
 	top: 50%;
@@ -427,7 +424,7 @@
 	}
 }
 
-// SEARCH FIELD
+
 .search__wrapper {
 	position: relative;
 }
@@ -472,7 +469,7 @@
 	transition: background-color 0.2s ease-in-out;
 }
 
-// FIELD LABELING
+
 .search__field::-webkit-input-placeholder {
 	position: relative;
 	top: 0;
@@ -575,7 +572,7 @@
 .video_card_title{
     position: inherit;
     top: 12px;
-    font-size: 12px;
+    font-size: 14px;
     padding: 2px;
     color: aliceblue;
 }
@@ -594,13 +591,53 @@
 
 ._video_card_footer_likes1{
     position: absolute;
+    right: 6px;
+    top: 58px;
+    bottom: -2px;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+}
+._video_card_footer_likes1 img{
+    position: absolute;
+    margin-top: -1px;
+    height: 18px;
+    top: -2px;
+    left: -18px;
+    padding-top: 4px;
+}
+/*._video_card_footer_likes2{
+    position: absolute;
     right: 16px;
     top: -220px;
     font-size: 16px;
     font-weight: 700;
     line-height: 1;
     color: #fff;
+}*/
+._video_card_footer_likes2{
+    position: absolute;
+    right: 6px;
+    top: 78px;
+    bottom: -2px;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
 }
+
+._video_card_footer_likes2 img{
+    position: absolute;
+    margin-top: -1px;
+    height: 18px;
+    top: -2px;
+    left: -18px;
+    padding-top: 4px;
+}
+
+
+
 ._video_card_footer_likes{
     position: absolute;
     left: 0px;
@@ -735,13 +772,140 @@
 .mt-36, .mv-36 {
     margin-top: 36px;
 }
+
+@media(max-width: 991px){
+    ._user_carousel_list-item {
+
+    width: 100% !important;
+    height: 300px;
+
+}
+.HomePage__Programs__filter{
+    font-size: 12px;
+}
+
+.HomePage__Programs__filter__sticky.active {
+    position: fixed;
+    top: 103px;
+    z-index: 90;
+    left: 2%;
+    margin-left: 0px;
+}
+.HomePage__Programs__filter__sticky {
+    width: 96%;
+    border-radius: 8px;
+    -webkit-box-shadow: 0 13px 38px 0 rgba(45,31,80,0.27);
+    box-shadow: 0 13px 38px 0 rgba(45,31,80,0.27);
+    background-color: #ffffff;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    margin: 0 auto;
+    padding: 4px;
+    height: 40px;
+    -webkit-transition: visibility 0.3s, opacity 0.3s ease;
+    transition: visibility 0.3s, opacity 0.3s ease;
+    opacity: 1;
+}
+
+}
+.video_card_title1 {
+    position: inherit;
+    top: 11px;
+    font-size: 12px;
+    padding: 2px;
+    color: aliceblue;
+}
+@media(max-width: 991px){
+._video_card_footer_likes2{
+    position: absolute;
+    right: 7px;
+    top: 78px;
+    bottom: -2px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+}
+._video_card_footer_likes2 img{
+    position: absolute;
+    margin-top: -1px;
+    height: 15px;
+    top: -3px;
+    left: -14px;
+    padding-top: 4px;
+}
+
+._video_card_footer_likes1{
+    position: absolute;
+    right: 7px;
+    top: 60px;
+    bottom: -2px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+}
+._video_card_footer_likes1 img{
+    position: absolute;
+    margin-top: -1px;
+    height: 15px;
+    top: -3px;
+    left: -14px;
+    padding-top: 4px;
+}
+
+._video_card_footer_likes::before {
+    margin: 0 2px -3px 0;
+    top: -3px;
+}
+._video_card_footer_likes {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    font-size: 11px !important;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+}
+.video_card_title {
+    position: inherit;
+    top: 11px;
+    font-size: 12px;
+    padding: 2px;
+    color: aliceblue;
+}
+.video_card_title1 {
+    position: absolute;
+    top: 5px;
+    font-size: 12px;
+    padding: 2px;
+    color: aliceblue;
+}
+
+._base_layout_container {
+    max-width: 96.5%;
+}
+._explore_feed_card_item {
+    width: 33.33%;
+    margin: 0px 6px 12px 0px;
+}
+
+}
+._card_header_cover{
+    background-image: var(--hashtag--background-image);
+}
+
 </style>
 
 <!-- end -->
 
 
 
-<section id="home-page-programs" devicetype="desktop" class="HomePage__Programs mt-36 pb-96 hideOnMobile">
+<section id="home-page-programs" devicetype="desktop" class="HomePage__Programs mt-36 pb-96 ">
     <div class="active HomePage__Programs__filter__sticky">
         <div class="HomePage__Programs__filter HomePage__Programs__filter__all tabActiveStatus active" onclick="getCreatorsResult();">{% trans "Creators" %}</div>
         <div class="HomePage__Programs__filter HomePage__Programs__filter__data tabActiveStatus" onclick="getVideoSearchResult();">{% trans "Videos" %}</div>
@@ -839,7 +1003,7 @@
 
 	                </div>
                     <div class="_scroll_load_more_loading_user_videos center">
-                        <div class="boloindya-loading">Loading...</div>
+                        <div class="boloindya-loading"></div>
                     </div>	                
 	                <input type="hidden" name="nextPageUrl" id="nextPageUrlId" value="">
 	            </main>
@@ -940,10 +1104,19 @@
 
         var thumbnail = each_popular_item.userprofile.profile_pic;
         if(thumbnail==""){
-            thumbnail='/media/demo_user.png';
+            thumbnail='/media/user.svg';
         }
 
-		var userItemTemp='<li class="jsx-3102177358 _user_carousel_list-item item"><a tag="a" title="'+each_popular_item.username+'" class="jsx-3102177358" href="/'+each_popular_item.username+'/"><div class="_user_carousel_avatar round" style="background-image:url('+thumbnail+')"><img src="/media/tick_icon.svg"></div><h2 class="_user_carousel_title">'+userName+'</h2><h3 class="_user_carousel_sub-title">@'+each_popular_item.username+'</h3><p class="_user_carousel_followers">'+each_popular_item.userprofile.follower_count+'<span class="_user_carousel_followers-text"> '+followers_trans+'</span></p></a><span class="unit"><button onclick="follow_user('+each_popular_item.id+');" class="_4jy1 _4jy4 _517h _51sy _42ft " style="float: none;" type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-'+each_popular_item.id+' followCheck sx_5da455"></i><span class="btnTextChange-'+each_popular_item.id+'">'+follow_trans+'</span></button></span></li>';
+        var tickIcon="";
+        if (each_popular_item.userprofile.is_business==true){
+            tickIcon='/media/golden_tick.png';
+        }else if (each_popular_item.userprofile.is_superstar==true){
+            tickIcon='/media/BlueTick.png';
+        }else {
+            tickIcon='/media/tick_icon.svg';
+        }
+       
+		var userItemTemp='<li class="jsx-3102177358 _user_carousel_list-item item"><a tag="a" title="'+each_popular_item.username+'" class="jsx-3102177358" href="/'+each_popular_item.username+'/"><div class="_user_carousel_avatar round" style="background-image:url('+thumbnail+')"><img src="'+tickIcon+'"></div><h2 class="_user_carousel_title">'+userName+'</h2><h3 class="_user_carousel_sub-title">@'+each_popular_item.username+'</h3><p class="_user_carousel_followers">'+each_popular_item.userprofile.follower_count+'<span class="_user_carousel_followers-text"> '+followers_trans+'</span></p></a><span class="unit"><button onclick="follow_user('+each_popular_item.id+');" class="_4jy1 _4jy4 _517h _51sy _42ft " style="float: none;" type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-'+each_popular_item.id+' followCheck sx_5da455"></i><span class="btnTextChange-'+each_popular_item.id+'">'+follow_trans+'</span></button></span></li>';
 		return userItemTemp;
 	}
 
@@ -997,6 +1170,7 @@ function getCreatorsResult(){
             $("#creatorItemListId").html(userVideoItems);
             loaderBoloHideDynamic('_scroll_load_more_loading_user_right');
             //playListData=videoItemList;
+            followLikeList();
 
         }
   
@@ -1009,13 +1183,17 @@ function getCategorySearchWithVideos(){
     if(currentCategoryActiveStatus==1){
         return false;
     } 
-
+    $("#catWithVideoIdRight").empty("");    
+    $("#catWithVideoId").empty(""); 
+    $("#userVideosListId").empty(""); 
+    $("#catWithVideoIdRight").empty();
+    $("#catWithVideoId").empty();
     $("#userVideosListId").hide();
     $("#creatorItemListId").hide(); 
     $("#catSearchId").show();    
     $("#hashTagSearchId").hide()
     loaderBoloHideDynamic('_scroll_load_more_loading_user_videos');
-    loaderBoloShowDynamic('_scroll_load_more_loading_right');
+    //loaderBoloShowDynamic('_scroll_load_more_loading_right');
     loaderBoloShowDynamic('_scroll_load_more_loading_left');  
 
     var playListData=[]; 
@@ -1063,6 +1241,7 @@ function getCategorySearchWithVideos(){
                      loaderBoloHideDynamic('_scroll_load_more_loading_left');
                     $("#catWithVideoId").append(category_with_video_list);
                 }
+                followLikeList();
 
                 currentCreatorActiveStatus=0;
                 currentCategoryActiveStatus=1;
@@ -1094,12 +1273,30 @@ function popularSearchCategoryHeading(itemCategory){
         category_title='title';
     }
 
-    var popular_cat_heading_template='<div class="_explore_feed_header"><div class="jsx-2836840237 _card_header_"><a class="jsx-2836840237" href="/tag/'+itemCategory.slug+'/"><div class="jsx-2836840237 _card_header_cover" style="background-image: url('+itemCategory.category_image+');"></div></a><a title="#'+itemCategory.slug+'('+itemCategory.total_view+' views)" class="jsx-2836840237 _card_header_link" href="/tag/'+itemCategory.slug+'/"><div class="jsx-2836840237 _card_header_content"><h3 class="jsx-2836840237 _card_header_title">'+itemCategory[category_title]+'</h3><strong class="jsx-2836840237 _card_header_subTitle">'+itemCategory.total_view+' views</strong><p class="jsx-2836840237 _card_header_desc"></p></div></a></div></div>';
+    var popular_cat_heading_template='<div class="_explore_feed_header"><div class="jsx-2836840237 _card_header_"><a class="jsx-2836840237" href="/tag/'+itemCategory.slug+'/"><div class="jsx-2836840237 _card_header_cover" style="background-image: url('+itemCategory.category_image+');"></div></a><a title="#'+itemCategory.slug+'('+itemCategory.total_view+' views)" class="jsx-2836840237 _card_header_link" href="/tag/'+itemCategory.slug+'/"><div class="jsx-2836840237 _card_header_content"><h3 class="jsx-2836840237 _card_header_title">'+itemCategory[category_title]+'</h3><strong class="jsx-2836840237 _card_header_subTitle">'+itemCategory.total_view+' views</strong><p class="jsx-2836840237 _card_header_desc"></p></div></a><p class="jsx-2836840237 _card_header_desc_follow"><span class="unit"><button onclick="follow_category_discover('+itemCategory.id+');" class="_4jy1 _4jy4 _517h _51sy _42ft " style="float: none;" type="button" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followCategoryStatus-'+itemCategory.id+' followCheckCat sx_5da455"></i><span class="btnTextChangeCat-'+itemCategory.id+'">'+follow_trans+'</span></button></span></p></div></div>';
     return popular_cat_heading_template;
 }
 
-function popularSearchCategoryItem(itemVideoByte){
+function popularSearchCategoryItem1(itemVideoByte){
+
+    var content_title="";
+    var videoTitle="";
+        videoTitle=removeTags(itemVideoByte.title);
+        content_title = videoTitle.substr(0, 40) + " ..."
+
+
     var category_item_template='<div class="jsx-1410658769 _explore_feed_card_item" onClick="openVideoInPopup('+itemVideoByte.id+');" ><div class="jsx-1410658769 _ratio_"><div class="jsx-1410658769" style="padding-top: 148.148%;"><div class="jsx-1410658769 _ratio_wrapper"><a href="javascript:void(0)"><div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+itemVideoByte.question_image+');"><div class="jsx-3077367275 video-card default"><div class="jsx-3077367275 video-card-mask"><div class="jsx-1633345700 card-footer normal no-avatar"><div class="jsx-1633345700"><img src="" class="jsx-1633345700 like-icon"><span class="jsx-1633345700">'+itemVideoByte.likes_count+'</span></div></div></div></div></div></a></div></div></div></div>';
+    return category_item_template;
+}
+
+function popularSearchCategoryItem(itemVideoByte){
+    var content_title="";
+    var videoTitle="";
+        videoTitle=removeTags(itemVideoByte.title);
+        content_title = videoTitle.substr(0, 40) + " ..."
+        var itemCount=0;
+
+    var category_item_template='<div class="jsx-1410658769 _explore_feed_card_item" onClick="openVideoInPopupSearch('+itemVideoByte.id+');" ><div class="jsx-1410658769 _ratio_"><div class="jsx-1410658769" style="padding-top: 148.148%;"><div class="jsx-1410658769 _ratio_wrapper"><a href="javascript:void(0)"><div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+itemVideoByte.question_image+');"><div class="jsx-3077367275 video-card default"><div class="jsx-3077367275 video-card-mask"><div class="jsx-1633345700 card-footer normal no-avatar"><div class="jsx-1633345700"><p class="video_card_title1">'+content_title+'</p><p><span class="_video_card_footer_likes">'+itemVideoByte.view_count+'</span></p><span class="_video_card_footer_likes1"><img src="/media/download.svg" alt="likes"> '+itemVideoByte.likes_count+'</span></div></div></div></div></div></a></div></div></div></div>';
     return category_item_template;
 }
 
@@ -1109,6 +1306,163 @@ function hashtagSuggestion(){
 
 }
 
+
+function openVideoInPopupSearch(topicId){
+  loaderShow();
+
+  var singleItemData=topicList[topicId];
+  $("#indexId").val(singleItemData.id);
+  var videoFileName=singleItemData.video_cdn;
+  var videoFileImage=singleItemData.question_image;
+  $("#modelPopup").show();
+
+  var newSrc='/media/mute_icon.svg';
+  $('#mutedImageId').attr('src', newSrc);
+
+    var preBufferDone = false;
+    var preBufferDone = false;
+    var video_backup="";
+    var video_backup=singleItemData.question_video;
+    //var video_backup=singleItemData.question_video;
+    video_play_using_video_js(video_backup,video_backup,videoFileImage);      
+    //     playerInstance.setup({
+    //       file: videoFileName,
+    //       controls: false,
+    //       image:videoFileImage,
+    //       autostart:'true',
+    //       mute:'false'
+    //   });
+    //   playerInstance.on('play', function() {
+    //         loaderHide();
+    //         preBufferDone = true;
+          
+    //   }); 
+
+    // playerInstance.on('buffer', function() {
+
+    //   var time = 1;
+
+    // });   
+
+
+    // playerInstance.on('error', function(event) {
+    //     loaderHide();
+    //     var erroCode=event.code;
+    //     playerInstance.setup({
+    //         file: singleItemData.backup_url,
+    //         controls: false,
+    //         image:videoFileImage,
+    //         autostart:'true',
+    //         mute:'false'
+    //     });
+
+
+    // });
+
+    // playerInstance.on('complete', function() {
+    //     jwplayer('player').setMute(true);
+
+    // });
+
+
+    var shareURL=site_base_url+singleItemData.slug+'/'+singleItemData.id+'';
+
+    var sideBarDetails='<div onClick="openMobileDownloadPopup();" class="jsx-2177493926 jsx-3813273378 avatar round" style="background-image: url(/media/musically_100x100.jpeg); width: 48px; height: 48px; flex: 0 0 48px;"></div><div class="jsx-949708032 boloindya-toolbar" style="margin-top: 20px;"><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-like" onClick="openMobileDownloadPopup();" style="background-image: url(/media/viewIcon.svg);"><span class="jsx-949708032">'+singleItemData.likes_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-comment" onClick="openMobileDownloadPopup();" style="background-image: url(/media/comments.svg);"><span class="jsx-949708032">'+singleItemData.comment_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-share" onclick="openShareTab()" style="background-image: url(/media/share.svg);"><span class="jsx-949708032">'+singleItemData.total_share_count+'</span></div></div>';
+        $("#topicID").val(singleItemData.id);
+        $("#currentPlayUserId").val(singleItemData.user.userprofile.id);
+        $("#topicCreatorUsername").val(singleItemData.user.username);
+        $("#shareInputbox").val(shareURL);
+        var bigCommentLikeDet='<strong><span id="likeCountId">'+singleItemData.likes_count+'</span> '+likeTrans+' · <span id="commentCountId">'+singleItemData.comment_count+'</span> '+commentsTrans+'</strong>';
+        $("#sideBarId").html(sideBarDetails);
+        $("._video_card_big_meta_info_count").html(bigCommentLikeDet);
+        $(".video-meta-title").html(singleItemData.title);
+        //===================== Comment and Like count ===============
+
+        $("#totalLikeCount").val(singleItemData.likes_count);
+        $("#totalCommentCount").val(singleItemData.comment_count);
+
+        //===================Comment and Like Count end =============
+
+        var userprofileName=singleItemData.user.userprofile.name;
+        var userHandleName=singleItemData.user.username;
+        var videoTitle=singleItemData.title;
+        var profilePics = singleItemData.user.userprofile.profile_pic;
+        if(profilePics==''){
+           profilePics= '/media/user.svg';
+        }
+
+
+        var likeStatus="";
+
+        likeStatus="liked";
+        var likeStatusClass=jQuery("#UReactionLink").hasClass('liked');
+        if(likeStatusClass==true){
+            jQuery("#UReactionLink").removeClass('liked');
+            jQuery(".sp_ddXiTdIB8vm").addClass('sx_44a25c');
+            jQuery(".sp_ddXiTdIB8vm").removeClass('sx_44a25d');
+        }
+
+        var likedCheck=userLikeAndUnlike.topic_like;
+        if(undefined !==likedCheck && likedCheck.length>0){
+            var lStatus = likedCheck.includes(singleItemData.id);
+            if(lStatus==true){
+                likeStatus="liked";
+                var likeStatusClass=jQuery("#UReactionLink").hasClass('liked');
+                if(likeStatusClass==false){
+                    jQuery("#UReactionLink").addClass('liked');
+                    jQuery(".sp_ddXiTdIB8vm").removeClass('sx_44a25c');
+                    jQuery(".sp_ddXiTdIB8vm").addClass('sx_44a25d');
+                }
+
+            }
+        }
+
+        //=========Check Follow User ==============
+        var loginStatus=check_login_status();
+        if(loginStatus==true){
+            var countFollowStatus=userLikeAndUnlike.all_follow;
+            if(undefined !==countFollowStatus && countFollowStatus.length>0){
+                var currentUserTopic=singleItemData.user.userprofile.id;
+                var followList=userLikeAndUnlike.all_follow;
+                followList.forEach(function(followId){
+                    if(currentUserTopic==followId){
+                        followStatus=jQuery('.followStatusChangePopup').hasClass('sx_5da455');
+                        if(followStatus==true){
+                            jQuery('.followStatusChangePopup').removeClass('sx_5da455');
+                            jQuery('.followStatusChangePopup').addClass('sx_5da456');
+                            jQuery('.btnTextChangePopup').text(followed_trans);
+                        }else{
+                            jQuery('.followStatusChangePopup').removeClass('sx_5da456');
+                            jQuery('.followStatusChangePopup').addClass('sx_5da455');
+                            jQuery('.btnTextChangePopup').text(follow_trans);
+                        }
+                    }
+
+                });
+            }
+        }
+        //============== End=======================
+
+
+
+        var profileURL='/'+userHandleName+'/';
+        $("#profileImageUserId").css("background-image", "url(" + profilePics + ")");
+        $(".shareandliketabprofileimage").attr("src", ""+profilePics+"");
+        $(".userProfileURL").attr("href", ""+profileURL+"");
+        $("._video_card_big_user_info_nickname").html(userprofileName);
+        $("._video_card_big_user_info_handle").html(userHandleName);
+        $("._video_card_big_meta_info_title_video").html(videoTitle);
+
+        loaderBoloShow();
+        listCommentsById(singleItemData);
+
+        var sideBarCommentDetails="";
+        var origin   = window.location.origin;
+        param1=singleItemData.slug;
+        param2=singleItemData.id;
+        history.pushState(null, null, '?video='+param1+'/'+param2);
+
+ }
 
 
 function getSearchMentionSuggestion(){
@@ -1184,7 +1538,9 @@ function getSearchHashtagSuggestion(){
     if(currentHashTagActiveStatus==1){
         return false;
     }
-
+    $("#catWithVideoIdRight").empty("");    
+    $("#catWithVideoId").empty(""); 
+    $("#userVideosListId").empty(""); 
     loaderBoloHideDynamic('_scroll_load_more_loading_user_videos');
     loaderBoloShowDynamic('_scroll_load_more_loading_right');
     loaderBoloShowDynamic('_scroll_load_more_loading_left');
@@ -1251,7 +1607,15 @@ function getSearchHashtagSuggestion(){
 
 
 function popularSearchHashtagHeading(mentionItem){
-    var hashtag_heading_template='<div class="_explore_feed_header"><div class="jsx-2836840237 _card_header_"><a class="jsx-2836840237" href="/hashtag/'+mentionItem.hash_tag+'/"><div class="jsx-2836840237 _card_header_cover" style="background-image: url('+mentionItem.picture+');"></div></a><a title="#'+mentionItem.hash_tag+'('+mentionItem.total_views+' views)" class="jsx-2836840237 _card_header_link" href="/hashtag/'+mentionItem.hash_tag+'/"><div class="jsx-2836840237 _card_header_content"><h3 class="jsx-2836840237 _card_header_title">#'+mentionItem.hash_tag+'</h3><strong class="jsx-2836840237 _card_header_subTitle">'+mentionItem.total_views+' views</strong><p class="jsx-2836840237 _card_header_desc"></p></div></a></div></div>';
+
+    var hasgtagDefaultImage="";
+    if(mentionItem.picture=="" || mentionItem.picture==null){
+        hasgtagDefaultImage='/media/hashtag.svg';
+    }else{
+       hasgtagDefaultImage = mentionItem.picture;
+    }
+
+    var hashtag_heading_template='<div class="_explore_feed_header"><div class="jsx-2836840237 _card_header_"><a class="jsx-2836840237" href="/hashtag/'+mentionItem.hash_tag+'/"><div class="jsx-2836840237 _card_header_cover"></div></a><a title="#'+mentionItem.hash_tag+'('+mentionItem.total_views+' views)" class="jsx-2836840237 _card_header_link" href="/hashtag/'+mentionItem.hash_tag+'/"><div class="jsx-2836840237 _card_header_content"><h3 class="jsx-2836840237 _card_header_title">#'+mentionItem.hash_tag+'</h3><strong class="jsx-2836840237 _card_header_subTitle">'+mentionItem.total_views+' views</strong><p class="jsx-2836840237 _card_header_desc"></p></div></a></div></div>';
     return hashtag_heading_template;
 }
 
@@ -1291,7 +1655,8 @@ function getVideoSearchResult(limit,offset){
     if(currentVideosActiveStatus==1){
         return false;
     }
-
+    $("#catWithVideoIdRight").empty("");    
+    $("#catWithVideoId").empty(""); 
     $("#creatorItemListId").hide();    
     $("#userVideosListId").show();
     $("#catSearchId").hide();    
@@ -1408,7 +1773,7 @@ function loadMoreData(NextPageUrl){
 function getVideoItem(videoItem,itemCount){
           var content_title="";
           var videoTitle="";
-              videoTitle=videoItem.title;
+              videoTitle=removeTags(videoItem.title);
               content_title = videoTitle.substr(0, 40) + " ..."
     var userVideoItem = '<div class="jsx-1410658769 video-feed-item">\
             <div class="jsx-1410658769 _ratio_">\
@@ -1419,7 +1784,7 @@ function getVideoItem(videoItem,itemCount){
                                 <div class="jsx-3077367275 video-card default">\
                                     <div class="jsx-3077367275 video-card-mask">\
                                         <div class="jsx-1543915374 card-footer normal no-avatar">\
-                                            <div class="jsx-1543915374"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+videoItem.view_count+'</span></p><span class="_video_card_footer_likes1"><img src="/media/download.svg" alt="likes"> '+videoItem.likes_count+'</span></div>\
+                                            <div class="jsx-1543915374"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+videoItem.view_count+'</span></p><span class="_video_card_footer_likes2"><img src="/media/download.svg" alt="likes"> '+videoItem.likes_count+'</span></div>\
                                         </div>\
                                     </div>\
                                 </div>\
@@ -1596,7 +1961,7 @@ function openVideoInPopup(file,image,indexId){
     var videoTitle=singleItemData.title;
     var profilePics = singleItemData.user.userprofile.profile_pic;
     if(profilePics==''){
-       profilePics= '/media/demo_user.png';
+       profilePics= '/media/user.svg';
     }
 
     var likeStatus="";
@@ -1669,6 +2034,7 @@ function openVideoInPopup(file,image,indexId){
     param1=singleItemData.slug;
     param2=singleItemData.id;
     history.pushState(null, null, '?video='+param1+'/'+param2);
+    followLikeList();
 
 
 }
@@ -1716,7 +2082,7 @@ function listCommentsById(singleTopicData){
         var profileImage="";
         var userProfile=itemVideo.user.userprofile;
         if(userProfile.profile_pic==""){
-           profileImage='/media/demo_user.png';
+           profileImage='/media/user.svg';
         }else{
             profileImage=userProfile.profile_pic;
         }
@@ -1774,7 +2140,7 @@ function loadMoreComments(nextPageURl){
         var profileImage="";
         var userProfile=itemVideo.user.userprofile;
         if(userProfile.profile_pic==""){
-           profileImage='/media/demo_user.png';
+           profileImage='/media/user.svg';
         }else{
             profileImage=userProfile.profile_pic;
         }
@@ -1794,7 +2160,10 @@ function loadMoreComments(nextPageURl){
 
 
 function followLikeList(){
-    check_login_status();
+    var checkstatus=check_login_status();
+    if(checkstatus==false){
+        return false;
+    }
 
     var ge_local_data="";
         ge_local_data = JSON.parse(localStorage.getItem("access_data"));
@@ -1825,6 +2194,23 @@ function followLikeList(){
 
                 });
             }
+
+            var countFollowStatusCat=userLikeAndUnlike.all_category_follow;
+            if(undefined !==countFollowStatusCat && countFollowStatusCat.length>0){
+                var followStatusCat=false;
+                var followListCat=userLikeAndUnlike.all_category_follow;
+                followListCat.forEach(function(followId){
+                    
+                    followStatusCat=jQuery('.followCheckCat').hasClass('followCategoryStatus-'+followId);
+                    if(followStatusCat==true){
+                        jQuery('.followCategoryStatus-'+followId).removeClass('sx_5da455');
+                        jQuery('.followCategoryStatus-'+followId).addClass('sx_5da456');
+                        jQuery('.btnTextChangeCat-'+followId).text(followed_trans);
+                    }
+
+                });
+            }
+
         }
   
     });

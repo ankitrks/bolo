@@ -1,5 +1,5 @@
 var video = document.getElementById('player');
-  jQuery('#UCommentLink').on('click',function(){
+  jQuery('#UCommentLink').on('click',function(){debugger;
       $("#comment-input").val("");
       var commentBoxInputStatus=jQuery('#commentInputId').hasClass('hide');
       if(commentBoxInputStatus==true){
@@ -19,7 +19,8 @@ var video = document.getElementById('player');
           //     jwplayer('playerDetails').pause();
           // }
           
-          document.getElementById('openLoginPopup').click();
+          document.getElementById('gotoLoginPage').click();
+          //document.getElementById('openLoginPopup').click();
               //jQuery("#openLoginPopup").click();
          }else{
               jQuery('#commentInputId').removeClass('hide');
@@ -90,8 +91,8 @@ var video = document.getElementById('player');
             $('.videoPlayButton').removeClass('play-button');
             $('.videoPlayButton').addClass('play-button');
           }          
-          
-          document.getElementById('openLoginPopup').click();
+          document.getElementById('gotoLoginPage').click();
+          //document.getElementById('openLoginPopup').click();
          }
          var likeStatus=jQuery('.sp_ddXiTdIB8vm').hasClass('sx_44a25c');
          if(likeStatus==true){
@@ -167,10 +168,11 @@ $('.videoPlayButton').click(function(){debugger;
       // jwplayer('player').play(true);
 });
 
-function social_share(shareType){
+function social_share(shareType){debugger;
      var loginStatus= check_login_status();
      if(loginStatus==false){
-        document.getElementById('openLoginPopup').click();
+        document.getElementById('gotoLoginPage').click();
+        //document.getElementById('openLoginPopup').click();
      }
 
     var topicId=$("#topicID").val();
@@ -267,7 +269,8 @@ $("#submit-button").click(function(){
 
         var loginStatus= check_login_status();
          if(loginStatus==false){
-            document.getElementById('openLoginPopup').click();
+            document.getElementById('gotoLoginPage').click();
+            //document.getElementById('openLoginPopup').click();
          }
         var ge_local_data="";
         ge_local_data = JSON.parse(localStorage.getItem("access_data"));
@@ -278,7 +281,7 @@ $("#submit-button").click(function(){
         var mobile_no = user_details.mobile_no;
         var thumbnail = user_details.profile_pic;
         if(thumbnail==""){
-            thumbnail='/media/demo_user.png';
+            thumbnail='/media/user.svg';
         }
 
         var topicID = document.getElementById('topicID').value;
@@ -332,7 +335,7 @@ $("#submit-button").click(function(){
         var itemVideo=videoCommentList;
         var userProfile=itemVideo.user.userprofile;
         if(userProfile.profile_pic==""){
-           profileImage='/media/demo_user.png';
+           profileImage='/media/user.svg';
         }else{
             profileImage=userProfile.profile_pic;
         }
@@ -456,7 +459,7 @@ function autocomplete(inp, arr) {
           if(eachItems.profile_pic!=""){
             userProfileImage=eachItems.profile_pic;
           }else{
-            userProfileImage='/media/demo_user.png';
+            userProfileImage='/media/user.svg';
           }
 
           b.innerHTML += '<img class="_avatar_ _avatar_small" height="100"  src="' + userProfileImage + '" />';
@@ -767,9 +770,14 @@ var countries=[];
 
     });
 
-function removeDataFromURL(){debugger;
+function removeDataFromURL(){
   window.history.back();
-  video.src="";
+  if(video.src){
+    video.src="";
+  }else{
+
+  }
+  
   return true;
 }
 
