@@ -281,7 +281,6 @@ def put_video_creators():
 			save_obj.save()
 
 
-
 	for key, val in slab_2_dict.items():
 		datetime_key = parser.parse(key)
 		week_no = datetime_key.isocalendar()[1]
@@ -319,13 +318,88 @@ def put_video_creators():
 
 def put_video_creators_analytics():
 
-	today = datetime.today()
-	start_date = today + timedelta(days = -180)
-	end_date = today
-	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = today):
-		curr_day = dt.day 
-		curr_month = dt.month
-		curr_year = dt.year 
+	slab_1_dict = dict()
+	slab_2_dict = dict()
+	slab_3_dict = dict()
+
+	all_data = Topic.objects.filter(is_vb=True).values('user').annotate(vb_count=Count('pk')).order_by('-vb_count')
+	for item in all_data:
+		user_vb_count = item['vb_count']
+		user_id = item['user']
+		date_joined = item.user.date_joined
+		curr_year = date_joined.year 
+		curr_month = date_joined.month 
+		curr_day = date_joined.day
+		str_date = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day) 
+		if(user_vb_count>=60):
+			if(str_date in slab_3_dict):
+				slab_3_dict[str_date].append(user_id)
+			else:
+				slab_3_dict[str_date] = []
+				slab_3_dict[str_date].append(user_id)
+		if(user_vb_count>=25 and user_vb_count<=59):
+			if(str_date in slab_2_dict):
+				slab_2_dict[str_date].append(user_id)
+			else:
+				slab_2_dict[start_date] = []
+				slab_2_dict[start_date].append(user_id)
+		if(user_vb_count>5 and user_vb_count>=24):
+			if(str_date in slab_1_dict):
+				slab_1_dict[str_date].append(user_id)
+			else:
+				slab_1_dict[str_date] = []
+				slab_1_dict[str_date].append(user_id)
+
+
+	for key, val in slab_1_dict.items():
+		datetime_key = parser.parse(key)
+		week_no = datetime_key.isocalendar()[1]
+		curr_year = datetime_key.year
+		if(curr_year == 2020):
+			week_no+=52
+		if(curr_year == 2019 and week_no == 1):
+			week_no = 52
+
+		metrics = '4'
+		metrics_slab = '0'
+		#save_obj= DashboardMetricsJarvis.objects.get(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
+		print(metrics, metrics_slab, datetime_key, week_no, len(val))
+		#save_obj.count = len(val)
+		#save_obj.save()
+
+
+	for key, val in slab_2_dict.items():
+		datetime_key = parser.parse(key)
+		week_no = datetime_key.isocalendar()[1]
+		curr_year = datetime_key.year 
+		if(curr_year == 2020):
+			week_no+=52
+		if(curr_year == 2019 and week_no == 1):
+			week_no = 52
+
+		metrics = '4'
+		metrics_slab = '1'
+
+		#save_obj = DashboardMetricsJarvis.objects.get(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
+		print(metrics, metrics_slab, datetime_key, week_no, len(val))
+		#save_obj.count = len(val)
+		#save_obj.save()
+
+	for key, val in slab_3_dict.items():
+		datetime_key = parser.parse(key)
+		week_no = datetime_key.isocalendar()[1]
+		curr_year = datetime_key.year 
+		if(curr_year == 2020):
+			week_no+=52
+		if(curr_year == 2019 and week_no == 1):
+			week_no = 52
+
+		metrics = '4'
+		metrics_slab = '2'
+		#save_obj= DashboardMetricsJarvis.objects.get(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
+		print(metrics, metrics_slab, datetime_key, week_no, len(val))
+		#save_obj.count = len(val)
+		#save_obj.save()			
 
 
 
@@ -359,11 +433,6 @@ def put_dau_data():
 			save_obj.save()
 
 		
-
-
-
-
-
 def main():
 
 	#put_share_data()
@@ -371,7 +440,8 @@ def main():
 	#put_videos_created()
 	# put_video_views_data()
 	# put_video_creators()
-	put_dau_data()
+	#put_dau_data()
+	put_video_creators_analytics()
 
 
 def run():
