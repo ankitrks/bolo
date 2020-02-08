@@ -165,7 +165,7 @@ def put_video_views_data():
 def put_video_views_analytics():
 
 	today = datetime.now()
-	start_date = today + timedelta(days = -180)	
+	start_date = today + timedelta(days = -240)	
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
 
@@ -193,14 +193,16 @@ def put_video_views_analytics():
 		metrics = '1'
 		metrics_slab = ''
 		print(metrics, metrics_slab, str_date, week_no, len(user_view_dict))
-
-		# save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_date, week_no = week_no)
-		# if(created):
-		# 	print(metrics, metrics_slab, str_date, week_no, )
+		save_obj= DashboardMetricsJarvis.objects.get(metrics = metrics, metrics_slab = metrics_slab, date = str_date, week_no = week_no)
+		save_obj.count = len(user_view_dict)
+		save_obj.save()
 
 		metrics = '7'
 		metrics_slab = ''
 		print(metrics, metrics_slab, str_date, week_no, len(set(user_view_dict)))
+		save_obj= DashboardMetricsJarvis.objects.get(metrics = metrics, metrics_slab = metrics_slab, date = str_date, week_no = week_no)
+		save_obj.count = len(set(user_view_dict))
+		save_obj.save()
 
 
 
@@ -410,10 +412,11 @@ def put_video_creators_analytics():
 
 		metrics = '4'
 		metrics_slab = '0'
-		#save_obj= DashboardMetricsJarvis.objects.get(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
+
+		save_obj= DashboardMetricsJarvis.objects.get(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
 		print(metrics, metrics_slab, datetime_key, week_no, len(val))
-		#save_obj.count = len(val)
-		#save_obj.save()
+		save_obj.count = len(val)
+		save_obj.save()
 
 
 	for key, val in slab_2_dict.items():
@@ -428,10 +431,10 @@ def put_video_creators_analytics():
 		metrics = '4'
 		metrics_slab = '1'
 
-		#save_obj = DashboardMetricsJarvis.objects.get(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
+		save_obj = DashboardMetricsJarvis.objects.get(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
 		print(metrics, metrics_slab, datetime_key, week_no, len(val))
-		#save_obj.count = len(val)
-		#save_obj.save()
+		save_obj.count = len(val)
+		save_obj.save()
 
 	for key, val in slab_3_dict.items():
 		datetime_key = parser.parse(key)
@@ -444,10 +447,10 @@ def put_video_creators_analytics():
 
 		metrics = '4'
 		metrics_slab = '2'
-		#save_obj= DashboardMetricsJarvis.objects.get(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
+		save_obj= DashboardMetricsJarvis.objects.get(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
 		print(metrics, metrics_slab, datetime_key, week_no, len(val))
-		#save_obj.count = len(val)
-		#save_obj.save()			
+		save_obj.count = len(val)
+		save_obj.save()			
 
 
 
@@ -489,9 +492,9 @@ def main():
 	#put_videos_created()
 	# put_video_views_data()
 	# put_video_creators()
-	put_dau_data()
-	#put_video_creators_analytics()
-	#put_video_views_analytics()
+	#put_dau_data()
+	put_video_creators_analytics()
+	put_video_views_analytics()
 
 
 def run():
