@@ -456,6 +456,7 @@ def put_video_creators_analytics():
 			save_obj.count = len(val)
 			save_obj.save()
 		else:
+			print(metrics, metrics_slab, datetime_key, week_no, len(val))
 			save_obj.count = len(val)
 			save_obj.save()
 
@@ -477,6 +478,7 @@ def put_video_creators_analytics():
 			save_obj.count = len(val)
 			save_obj.save()	
 		else:
+			print(metrics, metrics_slab, datetime_key, week_no, len(val))
 			save_obj.count = len(val)
 			save_obj.save()			
 
@@ -521,8 +523,8 @@ def main():
 	# put_video_views_data()
 	# put_video_creators()
 	#put_dau_data()
-	#put_video_creators_analytics()
-	put_video_views_analytics()
+	put_video_creators_analytics()
+	#put_video_views_analytics()
 
 
 def run():
