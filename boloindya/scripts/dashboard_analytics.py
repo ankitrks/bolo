@@ -413,10 +413,14 @@ def put_video_creators_analytics():
 		metrics = '4'
 		metrics_slab = '0'
 
-		save_obj= DashboardMetricsJarvis.objects.get(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
-		print(metrics, metrics_slab, datetime_key, week_no, len(val))
-		save_obj.count = len(val)
-		save_obj.save()
+		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
+		if(created):
+			print(metrics, metrics_slab, datetime_key, week_no, len(val))
+			save_obj.count = len(val)
+			save_obj.save()
+		else:
+			save_obj.count = len(val)
+			save_obj.save()	
 
 
 	for key, val in slab_2_dict.items():
@@ -431,10 +435,15 @@ def put_video_creators_analytics():
 		metrics = '4'
 		metrics_slab = '1'
 
-		save_obj = DashboardMetricsJarvis.objects.get(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
-		print(metrics, metrics_slab, datetime_key, week_no, len(val))
-		save_obj.count = len(val)
-		save_obj.save()
+		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
+		if(created):
+			print(metrics, metrics_slab, datetime_key, week_no, len(val))
+			save_obj.count = len(val)
+			save_obj.save()
+		else:
+			save_obj.count = len(val)
+			save_obj.save()
+
 
 	for key, val in slab_3_dict.items():
 		datetime_key = parser.parse(key)
@@ -447,10 +456,14 @@ def put_video_creators_analytics():
 
 		metrics = '4'
 		metrics_slab = '2'
-		save_obj= DashboardMetricsJarvis.objects.get(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
-		print(metrics, metrics_slab, datetime_key, week_no, len(val))
-		save_obj.count = len(val)
-		save_obj.save()			
+		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
+		if(created):
+			print(metrics, metrics_slab, datetime_key, week_no, len(val))
+			save_obj.count = len(val)
+			save_obj.save()	
+		else:
+			save_obj.count = len(val)
+			save_obj.save()			
 
 
 
@@ -494,7 +507,7 @@ def main():
 	# put_video_creators()
 	#put_dau_data()
 	put_video_creators_analytics()
-	put_video_views_analytics()
+	#put_video_views_analytics()
 
 
 def run():
