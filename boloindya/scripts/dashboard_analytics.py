@@ -8,7 +8,7 @@ import time
 import ast 
 from django.http import JsonResponse
 from drf_spirit.utils import language_options
-
+import ast 
 from dateutil import parser
 import re
 import datetime
@@ -69,11 +69,12 @@ def put_share_data():
 		metrics = '3'
 		metrics_slab = ''
 		#print(metrics, metrics_slab, key, week_no, len(val))
-		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
-		if(created):
-			print(metrics, metrics_slab, key, week_no, len(val))
-			save_obj.count = len(val)
-			save_obj.save()
+
+
+		save_obj = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
+		print(metrics, metrics_slab, key, week_no, len(val))
+		save_obj.count = len(val)
+		save_obj.save()
 
 
 def put_installs_data():
@@ -160,6 +161,48 @@ def put_video_views_data():
 			print(metrics_uniq, metrics_slab_uniq, key, week_no, len(set(val)))
 			save_obj_uniq.count = len(set(val))
 			save_obj_uniq.save()
+
+def put_video_views_analytics():
+
+	today = datetime.now()
+	start_date = today + timedelta(days = -180)	
+	end_date = today
+	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
+
+		curr_day = dt.day 
+		curr_month = dt.month 
+		curr_year = dt.year
+		all_data = AndroidLogs.objects.filter(log_type = 'click2play', created_at__day= curr_day, created_at__month= curr_month, created_at__year= curr_year)
+		user_view_dict = []
+		for item in all_data:
+			log_data = ast.literal_eval(item.logs)
+			for each in log_data:
+				if(each['state']=='StartPlaying'):
+					user_view_dict.append(each['video_byte_id'])
+
+		print(dt, len(user_view_dict),len(set(user_view_dict)))
+		week_no = dt.isocalendar()[1]
+		curr_year = dt.year 
+		str_date = str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day)
+		if(curr_year == 2020):
+			week_no+=52
+		if(curr_year == 2019 and week_no == 1):
+			week_no = 52		
+
+			
+		metrics = '1'
+		metrics_slab = ''
+		print(metrics, metrics_slab, str_date, week_no, len(user_view_dict))
+
+		# save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_date, week_no = week_no)
+		# if(created):
+		# 	print(metrics, metrics_slab, str_date, week_no, )
+
+		metrics = '7'
+		metrics_slab = ''
+		print(metrics, metrics_slab, str_date, week_no, len(set(user_view_dict)))
+
+
 
 
 
@@ -414,7 +457,7 @@ def put_dau_data():
 	start_date = today + timedelta(days = -180)	
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
-		print(dt)
+		#print(dt)
 		curr_day = dt.day 
 		curr_month = dt.month 
 		curr_year = dt.year 
@@ -423,7 +466,7 @@ def put_dau_data():
 		t2 = AndroidLogs.objects.filter(created_at__day= curr_day, created_at__month= curr_month, created_at__year= curr_year).distinct('user').count()
 		tot_count = t1 + t2
 		week_no = dt.isocalendar()[1]
-		if(curr_year == 2019):
+		if(curr_year == 2020):
 			week_no+=52
 		if(curr_year == 2019 and week_no == 1):
 			week_no = 52
@@ -431,6 +474,7 @@ def put_dau_data():
 		str_curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day)	
 		metrics = '6'
 		metrics_slab = ''
+		#print(metrics, metrics_slab, str_curr_date, week_no, t1+t2)
 		save_obj = DashboardMetricsJarvis.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date, week_no = week_no)
 		if(created):
 			print(curr_day, curr_month, curr_year, t1+t2)
@@ -440,13 +484,14 @@ def put_dau_data():
 		
 def main():
 
-	#put_share_data()
-	#put_installs_data()
+	put_share_data()
+	put_installs_data()
 	#put_videos_created()
 	# put_video_views_data()
 	# put_video_creators()
-	#put_dau_data()
-	put_video_creators_analytics()
+	put_dau_data()
+	#put_video_creators_analytics()
+	#put_video_views_analytics()
 
 
 def run():
