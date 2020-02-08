@@ -70,7 +70,6 @@ def put_share_data():
 		metrics_slab = ''
 		#print(metrics, metrics_slab, key, week_no, len(val))
 
-
 		save_obj = DashboardMetricsJarvis.objects.get(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
 		print(metrics, metrics_slab, key, week_no, len(val))
 		save_obj.count = len(val)
@@ -389,7 +388,7 @@ def put_video_creators_analytics():
 	for item in all_data:
 		user_vb_count = int(item['vb_count'])
 		user_id = item['user']
-		user_details = UserProfile.objects.get(user = user_id)
+		user_details = UserProfile.objects.get(user = us er_id)
 		date_joined = user_details.user.date_joined
 		curr_year = date_joined.year 
 		curr_month = date_joined.month 
