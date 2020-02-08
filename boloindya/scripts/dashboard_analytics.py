@@ -175,10 +175,13 @@ def put_video_views_analytics():
 		all_data = AndroidLogs.objects.filter(log_type = 'click2play', created_at__day= curr_day, created_at__month= curr_month, created_at__year= curr_year)
 		user_view_dict = []
 		for item in all_data:
-			log_data = ast.literal_eval(item.logs)
-			for each in log_data:
-				if(each['state']=='StartPlaying'):
-					user_view_dict.append(each['video_byte_id'])
+			try:
+				log_data = ast.literal_eval(item.logs)
+				for each in log_data:
+					if(each['state']=='StartPlaying'):
+						user_view_dict.append(each['video_byte_id'])
+			except Exception as e:
+				pass			
 
 		#print(dt, len(user_view_dict),len(set(user_view_dict)))
 		week_no = dt.isocalendar()[1]
@@ -194,7 +197,7 @@ def put_video_views_analytics():
 		metrics_slab = ''
 		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_date, week_no = week_no)
 		if(created):
-			print(metrics, metrics_slab, str_date, week_no, len(set(user_view_dict)))
+			print(metrics, metrics_slab, str_date, week_no, len(user_view_dict))
 			save_obj.count = len(user_view_dict)
 			save_obj.save()
 		else:
