@@ -475,7 +475,7 @@ def put_dau_data():
 		metrics = '6'
 		metrics_slab = ''
 		#print(metrics, metrics_slab, str_curr_date, week_no, t1+t2)
-		save_obj = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date, week_no = week_no)
+		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date, week_no = week_no)
 		if(created):
 			print(curr_day, curr_month, curr_year, t1+t2)
 			save_obj.count = tot_count
@@ -484,8 +484,8 @@ def put_dau_data():
 		
 def main():
 
-	put_share_data()
-	put_installs_data()
+	#put_share_data()
+	#put_installs_data()
 	#put_videos_created()
 	# put_video_views_data()
 	# put_video_creators()
