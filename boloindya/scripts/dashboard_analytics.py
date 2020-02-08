@@ -165,7 +165,7 @@ def put_video_views_data():
 def put_video_views_analytics():
 
 	today = datetime.now()
-	start_date = today + timedelta(days = -240)	
+	start_date = today + timedelta(days = -180)	
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
 
@@ -205,7 +205,7 @@ def put_video_views_analytics():
 		metrics = '7'
 		metrics_slab = ''
 		
-		save_obj= DashboardMetricsJarvis.objects.get(metrics = metrics, metrics_slab = metrics_slab, date = str_date, week_no = week_no)
+		save_obj= DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_date, week_no = week_no)
 		if(created):
 			print(metrics, metrics_slab, str_date, week_no, len(set(user_view_dict)))
 			save_obj.count = len(set(user_view_dict))
