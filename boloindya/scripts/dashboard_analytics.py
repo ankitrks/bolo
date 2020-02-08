@@ -165,7 +165,7 @@ def put_video_views_data():
 def put_video_views_analytics():
 
 	today = datetime.now()
-	start_date = today + timedelta(days = -180)	
+	start_date = today + timedelta(days = -150)	
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
 
@@ -178,12 +178,13 @@ def put_video_views_analytics():
 			try:
 				log_data = ast.literal_eval(item.logs)
 				for each in log_data:
-					if(each['state']=='StartPlaying'):
+					curr_state = each['state']
+					if('StartPlaying' in curr_state):
 						user_view_dict.append(each['video_byte_id'])
 			except Exception as e:
 				pass			
 
-		#print(dt, len(user_view_dict),len(set(user_view_dict)))
+		print(dt, len(user_view_dict),len(user_view_dict))
 		week_no = dt.isocalendar()[1]
 		curr_year = dt.year 
 		str_date = str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day)
@@ -201,7 +202,7 @@ def put_video_views_analytics():
 			save_obj.count = len(user_view_dict)
 			save_obj.save()
 		else:
-			print(metrics, metrics_slab, str_date, week_no, len(set(user_view_dict)))
+			print(metrics, metrics_slab, str_date, week_no, len(user_view_dict))
 			save_obj.count = len(user_view_dict)
 			save_obj.save()	
 
@@ -213,7 +214,8 @@ def put_video_views_analytics():
 			print(metrics, metrics_slab, str_date, week_no, len(set(user_view_dict)))
 			save_obj.count = len(set(user_view_dict))
 			save_obj.save()
-		else:	
+		else:
+			print(metrics, metrics_slab, str_date, week_no, len(set(user_view_dict)))	
 			save_obj.count = len(set(user_view_dict))
 			save_obj.save()
 
