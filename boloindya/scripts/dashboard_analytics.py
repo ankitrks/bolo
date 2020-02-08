@@ -180,7 +180,7 @@ def put_video_views_analytics():
 				if(each['state']=='StartPlaying'):
 					user_view_dict.append(each['video_byte_id'])
 
-		print(dt, len(user_view_dict),len(set(user_view_dict)))
+		#print(dt, len(user_view_dict),len(set(user_view_dict)))
 		week_no = dt.isocalendar()[1]
 		curr_year = dt.year 
 		str_date = str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day)
@@ -205,7 +205,7 @@ def put_video_views_analytics():
 		metrics = '7'
 		metrics_slab = ''
 		
-		save_obj= DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_date, week_no = week_no)
+		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_date, week_no = week_no)
 		if(created):
 			print(metrics, metrics_slab, str_date, week_no, len(set(user_view_dict)))
 			save_obj.count = len(set(user_view_dict))
