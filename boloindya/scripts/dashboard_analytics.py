@@ -325,8 +325,9 @@ def put_video_creators_analytics():
 	slab_3_dict = dict()
 
 	all_data = Topic.objects.filter(is_vb=True).values('user').annotate(vb_count=Count('pk')).order_by('-vb_count')
+	print(len(all_data))
 	for item in all_data:
-		user_vb_count = item['vb_count']
+		user_vb_count = int(item['vb_count'])
 		user_id = item['user']
 		user_details = UserProfile.objects.get(user = user_id)
 		date_joined = user_details.user.date_joined
@@ -346,14 +347,15 @@ def put_video_creators_analytics():
 			else:
 				slab_2_dict[str_date] = []
 				slab_2_dict[str_date].append(user_id)
-		if(user_vb_count>5 and user_vb_count>=24):
+		if(user_vb_count>5 and user_vb_count<=24):
 			if(str_date in slab_1_dict):
 				slab_1_dict[str_date].append(user_id)
 			else:
 				slab_1_dict[str_date] = []
 				slab_1_dict[str_date].append(user_id)
 
-
+	print(len(slab_1_dict), len(slab_2_dict), len(slab_3_dict))
+				
 	for key, val in slab_1_dict.items():
 		datetime_key = parser.parse(key)
 		week_no = datetime_key.isocalendar()[1]
