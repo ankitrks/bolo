@@ -344,8 +344,8 @@ def put_video_creators_analytics():
 			if(str_date in slab_2_dict):
 				slab_2_dict[str_date].append(user_id)
 			else:
-				slab_2_dict[start_date] = []
-				slab_2_dict[start_date].append(user_id)
+				slab_2_dict[str_date] = []
+				slab_2_dict[str_date].append(user_id)
 		if(user_vb_count>5 and user_vb_count>=24):
 			if(str_date in slab_1_dict):
 				slab_1_dict[str_date].append(user_id)
