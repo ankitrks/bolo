@@ -56,7 +56,7 @@ def put_share_data():
 			else:
 				day_month_year_dict[curr_date].append(curr_videoid)	
 
-	print(day_month_year_dict)						
+	#print(day_month_year_dict)						
 	for key, val in day_month_year_dict.items():
 		datetime_key = parser.parse(key)
 		week_no = datetime_key.isocalendar()[1]
@@ -71,7 +71,7 @@ def put_share_data():
 		#print(metrics, metrics_slab, key, week_no, len(val))
 
 
-		save_obj = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
+		save_obj = DashboardMetricsJarvis.objects.get(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
 		print(metrics, metrics_slab, key, week_no, len(val))
 		save_obj.count = len(val)
 		save_obj.save()
