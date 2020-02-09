@@ -3,12 +3,11 @@
 
 from forum.topic.models import Topic
 from google.cloud import vision
-import io
 import boto3
 import time
 import random
 import os
-import os, io
+import io
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from datetime import datetime,timedelta,date
@@ -16,6 +15,7 @@ from ffmpy import FFmpeg
 from datetime import timedelta
 from google.cloud import vision
 
+from django.conf import settings
 import operator
 from ffmpy import FFmpeg
 from forum.topic.models import Topic
@@ -24,11 +24,42 @@ from forum.topic.models import Notification
 client = vision.ImageAnnotatorClient()
 from ffmpy import FFmpeg
 import sys
-import urllib
-import os
+import urllib 
 from shutil import copyfile
 
-PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+import smtplib
+import mimetypes
+from email.mime.multipart import MIMEMultipart
+from email import encoders
+from email.message import Message
+from email.mime.audio import MIMEAudio
+from email.mime.base import MIMEBase
+from email.mime.image import MIMEImage
+from email.mime.text import MIMEText
+from django.utils import timezone
+
+#PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+f_name = settings.BASE_DIR + '/temp/plag_vid_details.txt'
+prev_vbid_completed = settings.BASE_DIR + '/temp/prev_id.txt'
+
+# check the prev id till which the code ran
+def check_prev_id():
+	
+	if(os.path.exists(prev_vbid_completed)):
+		f = open(prev_vbid_completed, "r")
+		f.seek(0)
+		prev_id = f.read()
+		if(isinstance(prev_id, int)):
+			print(prev_id)
+			return prev_id
+		else:
+			print("here")
+			return -1	
+	else:
+		print("hre2")
+		return -1	
+
 
 # method for converting string to time
 def timetostring(t):
@@ -51,10 +82,8 @@ def timetostring(t):
 
 
 def remove_redundant_files():
-	os.remove('local_video.mp4')
-	os.remove('output1.png')
-	copyfile('plag_vid_details.txt', '/tmp/plag_vid_details.txt')
-	os.remove('plag_vid_details.txt')
+	os.remove(settings.BASE_DIR + '/temp/local_video.mp4')
+	os.remove(settings.BASE_DIR + '/temp/output1.png')
 
 
 # method to identify plagarised logos in videos uploaded
@@ -65,13 +94,22 @@ def identify_logo():
 	for (a,b) in plag_text_options:
 		plag_source.append(str(b))
 
+	
 
-	f_name = 'plag_vid_details.txt'
 	f = io.open(f_name, "w", encoding="UTF-8")
+	g = open(prev_vbid_completed, "w")
+
 	today = datetime.today()
 	try:
-		long_ago = today + timedelta(days = -8)
-		topic_objects = Topic.objects.exclude(is_removed = True).filter(is_vb = True, date__gte = long_ago)
+		#long_ago = today + timedelta(hours = -6)
+		#topic_objects = Topic.objects.exclude(is_removed = True).filter(is_vb = True, date__gte = long_ago)
+
+		prev_id = check_prev_id()
+		if(prev_id == -1):
+			topic_objects = Topic.objects.filter(is_removed=False, id__gt = 19417)
+		else:
+			topic_objects = Topic.objects.filter(is_removed = False, id__gt = prev_id)
+
 		global_counter = 1
 		for item in topic_objects:
 			iter_id = item.id
@@ -80,7 +118,7 @@ def identify_logo():
 			video_title = data[0].title
 			url_str = url.encode('utf-8')
 			test = urllib.FancyURLopener()
-			test.retrieve(url_str, 'local_video.mp4')
+			test.retrieve(url_str, settings.BASE_DIR + '/temp/local_video.mp4')
 			duration = data[0].media_duration 
 			time = duration.split(":")
 			minute = int(time[0]) * 60
@@ -89,48 +127,47 @@ def identify_logo():
 			t1 = int(total_second / 5)
 			t2 = t1 + t1
 			t3 = t1 + t2
-			t4 = t1 + t3
-			t5 = t1 + t4
 			t1 = '00:' + timetostring(t1)
 			t2 = '00:' + timetostring(t2)
 			t3 = '00:' + timetostring(t3)
-			t4 = '00:' + timetostring(t4)
-			t5 = '00:' + timetostring(t5)
 			intervals = []
 			intervals.append(t1)
 			intervals.append(t2)
 			intervals.append(t3)
-			intervals.append(t4)
-			intervals.append(t5)
 			count = 1
 			global_counter+=1
+			print(iter_id)
+			g.seek(0)
+			g.write(iter_id)
 
-			for interval in intervals:
-				ff = FFmpeg(inputs = {'local_video.mp4': None}, outputs = {"output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
-				ff.run()
-				file_name = PROJECT_PATH + '/scripts/output{}.png'.format(count)
-				with io.open(file_name, 'rb') as image_file:
-					content = image_file.read()
-					image = vision.types.Image(content = content)
-					response = client.text_detection(image = image)
-					texts = response.text_annotations
-					for text in texts:
-						modified_text = text.description
-						if(modified_text in plag_source):
-							f.write(iter_id + video_title + " " + url_str + " " + (modified_text) + "\n")
-							Topic.objects.filter(id = iter_id).update(plag_text = str(plag_source.index(modified_text)))
-							Topic.objects.filter(id = iter_id).update(time_deleted = datetime.now())
-							data[0].delete()
+			# for interval in intervals:
+			# 	ff = FFmpeg(inputs = {settings.BASE_DIR + '/temp/local_video.mp4': None}, outputs = {settings.BASE_DIR + "/temp/output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
+			# 	ff.run()
+			# 	file_name = settings.BASE_DIR + '/temp/output{}.png'.format(count)
+			# 	with io.open(file_name, 'rb') as image_file:
+			# 		content = image_file.read()
+			# 		image = vision.types.Image(content = content)
+			# 		response = client.text_detection(image = image)
+			# 		texts = response.text_annotations
+			# 		for text in texts:
+			# 			modified_text = text.description
+			# 			if(modified_text in plag_source):
+			# 				f.write(str(iter_id) + " " + video_title + " " + url_str + " " + (modified_text) + "\n")
+			# 				# Topic.objects.filter(id = iter_id).update(plag_text = str(plag_source.index(modified_text)))
+			# 				# Topic.objects.filter(id = iter_id).update(time_deleted = datetime.now())
+			# 				# data[0].delete()
 
 	except Exception as e:
-		print('' + str(e))  				
-
+		print('' + str(e))
+		pass 
+		#print('' + str(e))  				
 	f.close()
 					
 
 def main():
 	identify_logo()
-	remove_redundant_files()
+	#remove_redundant_files()
+
 
 def run():
 	main()
