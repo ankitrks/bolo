@@ -138,7 +138,7 @@ def identify_logo():
 			global_counter+=1
 			print(iter_id)
 			g.seek(0)
-			g.write(iter_id)
+			g.write(str(iter_id))
 
 			# for interval in intervals:
 			# 	ff = FFmpeg(inputs = {settings.BASE_DIR + '/temp/local_video.mp4': None}, outputs = {settings.BASE_DIR + "/temp/output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
