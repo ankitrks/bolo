@@ -186,7 +186,7 @@ def put_video_views_analytics():
 			except Exception as e:
 				pass			
 
-		print(dt, len(user_view_dict),len(user_view_dict))
+		#print(dt, len(user_view_dict),len(user_view_dict))
 		week_no = dt.isocalendar()[1]
 		curr_year = dt.year 
 		str_date = str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day)
@@ -235,6 +235,7 @@ def put_videos_created():
 		curr_day = item.date.day 
 		curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day)
 		curr_videoid = item.id
+		print(curr_videoid)
 
 		if(curr_date in day_month_year_dict):
 			day_month_year_dict[curr_date].append(curr_videoid)
@@ -534,10 +535,10 @@ def main():
 
 	#put_share_data()
 	#put_installs_data()
-	#put_videos_created()
-	put_dau_data()
-	put_video_creators_analytics()
-	put_video_views_analytics()
+	#put_dau_data()
+	#put_video_creators_analytics()
+	#put_video_views_analytics()
+	put_videos_created()
 
 
 
