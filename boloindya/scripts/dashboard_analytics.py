@@ -92,8 +92,7 @@ def put_installs_data():
 		#print(curr_date, curr_userid)
 
 		if((curr_date in user_install_dict)):
-			if(curr_userid!='' and curr_userid!='None'):
-				user_install_dict[curr_date].append(curr_userid)
+			user_install_dict[curr_date].append(curr_userid)
 		else:
 			user_install_dict[curr_date] = []
 			user_install_dict[curr_date].append(curr_userid)		 
@@ -534,30 +533,112 @@ def put_dau_data():
 		curr_day = dt.day 
 		curr_month = dt.month 
 		curr_year = dt.year 
+		str_curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day)
 
-		t1 = ReferralCodeUsed.objects.filter(created_at__day= curr_day, created_at__month= curr_month, created_at__year= curr_year).count()
-		t2 = AndroidLogs.objects.filter(created_at__day= curr_day, created_at__month= curr_month, created_at__year= curr_year).distinct('user').count()
-		tot_count = t1 + t2
+		tot_data = ReferralCodeUsed.objects.filter(created_at__contains = str_curr_date, by_user__isnull = True)
+		install_data = ReferralCodeUsed.objects.filter(created_at__contains = str_curr_date, by_user__isnull = False)
+		excluded_data = tot_data.exclude(android_id__in = install_data.values_list('android_id', flat = True))
+		#print(len(excluded_data))
+		excluded_data_list = excluded_data.values_list('by_user', flat = True)
+		android_data = AndroidLogs.objects.filter(created_at__contains = str_curr_date)
+		temp_data = android_data.exclude(user__in = install_data.values_list('by_user', flat = True))
+		dau_count = temp_data.distinct('user').count()
+		#print("date, count", dt, temp_data.distinct('user').count())
+
 		week_no = dt.isocalendar()[1]
 		if(curr_year == 2020):
 			week_no+=52
 		if(curr_year == 2019 and week_no == 1):
 			week_no = 52
 
-		str_curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day)	
 		metrics = '6'
 		metrics_slab = ''
-		#print(metrics, metrics_slab, str_curr_date, week_no, t1+t2)
+		print(metrics, metrics_slab, str_curr_date, week_no, dau_count)
 
-		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date, week_no = week_no)
-		if(created):
-			print(metrics, metrics_slab, str_curr_date, week_no, tot_count)
-			save_obj.count = tot_count
-			save_obj.save()
-		else:
-			print(metrics, metrics_slab, str_curr_date, week_no, tot_count)
-			save_obj.count = tot_count
-			save_obj.save()	
+		# t1 = ReferralCodeUsed.objects.filter(created_at__day= curr_day, created_at__month= curr_month, created_at__year= curr_year).count()
+		# t2 = AndroidLogs.objects.filter(created_at__day= curr_day, created_at__month= curr_month, created_at__year= curr_year).distinct('user').count()
+		# tot_count = t1 + t2
+
+
+		# str_curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day)	
+		# metrics = '6'
+		# metrics_slab = ''
+		# #print(metrics, metrics_slab, str_curr_date, week_no, t1+t2)
+
+		# save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date, week_no = week_no)
+		# if(created):
+		# 	print(metrics, metrics_slab, str_curr_date, week_no, tot_count)
+		# 	save_obj.count = tot_count
+		# 	save_obj.save()
+		# else:
+		# 	print(metrics, metrics_slab, str_curr_date, week_no, tot_count)
+		# 	save_obj.count = tot_count
+		# 	save_obj.save()	
+
+
+# put daily combo view of (user, vid) to be put in daily records
+def put_uniq_views_analytics():
+
+	today = datetime.now()
+	start_date = today + timedelta(days = -150)	
+	end_date = today
+	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
+		print(dt)
+		str_date = str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day)
+		all_data = AndroidLogs.objects.filter(log_type = 'click2play', created_at__day = dt.day, created_at__month = dt.month, created_at__year = dt.year)
+		print("len of logs", len(all_data))
+		user_vid_mapping = dict()				# dict storing (user, vid) mapping for the day 
+		for item in all_data:
+			try:
+				log_data = ast.literal_eval(item.logs)
+				curr_userid = item.user_id 
+				for each in log_data:
+					curr_state = each['state']
+					if('StartPlaying' in curr_state):
+						if(curr_userid in user_vid_mapping):
+							user_vid_mapping[curr_userid].append(each['video_byte_id'])
+						else:
+							user_vid_mapping[curr_userid] = []
+							user_vid_mapping[curr_userid].append(each['video_byte_id'])					
+
+			except Exception as e:
+				pass
+
+		tot_uniq_uvb_view_count = 0		
+		for key, val in user_vid_mapping.items():
+			tot_uniq_uvb_view_count+=len(set(val))
+
+		week_no = dt.isocalendar()[1]
+		curr_year = dt.year 
+		str_date = str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day)
+		if(curr_year == 2020):
+			week_no+=52
+		if(curr_year == 2019 and week_no == 1):
+			week_no = 52
+
+		
+		metrics = '7'
+		metrics_slab = ''
+		print(metrics, metrics_slab, str_date, week_no, tot_uniq_uvb_view_count)	
+
+		# save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_date, week_no = week_no)
+		# if(created):
+		# 	print(metrics, metrics_slab, str_date, week_no, len(set(user_view_dict)))
+		# 	save_obj.count = len(set(user_view_dict))
+		# 	save_obj.save()
+		# else:
+		# 	print(metrics, metrics_slab, str_date, week_no, len(set(user_view_dict)))	
+		# 	save_obj.count = len(set(user_view_dict))
+		# 	save_obj.save()	
+
+					
+
+			
+
+		
+
+
+
 
 # def put_bolo_action_data():
 
@@ -575,10 +656,11 @@ def main():
 
 	#put_share_data()
 	#put_installs_data()
-	#put_dau_data()
-	put_video_creators_analytics()
+	put_dau_data()
+	#put_video_creators_analytics()
 	#put_video_views_analytics()
 	#put_videos_created()
+	put_uniq_views_analytics()
 
 	
 
