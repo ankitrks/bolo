@@ -109,6 +109,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'haystack',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -298,15 +299,16 @@ TEMPLATES[0]['OPTIONS']['context_processors'] += [
 
 # django-haystack
 
-INSTALLED_APPS += [
-    'haystack',
-]
+# INSTALLED_APPS += [
+    
+# ]
 
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
         'URL': 'http://127.0.0.1:8983/solr/boloindya',                 # Assuming you created a core named 'boloindya'
-        # 'ADMIN_URL': 'http://127.0.0.1:8983/solr/admin/cores'
+        'ADMIN_URL': 'http://127.0.0.1:8983/solr/admin/cores',
+        'INCLUDE_SPELLING': True,
         # # ...or for multicore...
         # # 'URL': 'http://127.0.0.1:8983/solr/mysite',
     },

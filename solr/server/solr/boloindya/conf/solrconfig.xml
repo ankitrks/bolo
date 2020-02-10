@@ -705,6 +705,16 @@
         title^8.0
       </str>
       <str name="mlt.fl">text,name,id,title</str>
+      <str name="spellcheck.dictionary">default</str>
+      <str name="spellcheck">on</str>
+      <str name="spellcheck.extendedResults">true</str>
+      <str name="spellcheck.count">10</str>
+      <str name="spellcheck.alternativeTermCount">5</str>
+      <str name="spellcheck.maxResultsForSuggest">5</str>
+      <str name="spellcheck.collate">true</str>
+      <str name="spellcheck.collateExtendedResults">true</str>
+      <str name="spellcheck.maxCollationTries">10</str>
+      <str name="spellcheck.maxCollations">5</str>
       <int name="mlt.count">3</int>
       <int name="rows">10</int>
       <!-- Default search field
@@ -714,6 +724,9 @@
          <str name="wt">xml</str> 
         -->
     </lst>
+    <arr name="last-components">
+      <str>spellcheck</str>
+    </arr>
 
     <!-- In addition to defaults, "appends" params can be specified
          to identify values which should be appended to the list of
@@ -730,10 +743,10 @@
       -->
     <!--
        <lst name="appends">
-         <str name="fq">is_removed:false</str>
+         <str name="fq">inStock:true</str>
        </lst>
-       -->
-      
+      -->
+
     <!-- "invariants" are a way of letting the Solr maintainer lock down
          the options available to Solr clients.  Any params values
          specified here are used regardless of what values may be specified
@@ -793,7 +806,7 @@
     <lst name="defaults">
       <str name="echoParams">explicit</str>
       <str name="qf">
-         text^1.0 name^8.0 user_name^10.0
+         text^1.0 name^8.0 user^10.0
          title^5.0
       </str>
       <!-- minimum percentage of optional clauses specified in qf that must match -->
@@ -805,19 +818,20 @@
         text^0.5 name^8.0 id^10.0
         title^8.0
       </str>
-      <str name="mlt.fl">text,name,id,title,user</str>
+      <str name="mlt.fl">text,name,id,title</str>
       <int name="mlt.count">3</int>
 
       <!-- Faceting defaults -->
       <str name="facet">on</str>
  
       <str name="facet.missing">true</str>
+      <str name="facet.field">model</str> 
       <str name="facet.mincount">1</str>
  
  
       <!-- Highlighting defaults -->
        <str name="hl">on</str>
-       <str name="hl.fl">user features title name</str>
+       <str name="hl.fl">content features title name</str>
        <str name="hl.preserveMulti">true</str>
        <str name="hl.encoder">html</str>
        <str name="hl.simple.pre">&lt;b&gt;</str>
@@ -826,16 +840,29 @@
        <str name="f.title.hl.alternateField">title</str>
        <str name="f.name.hl.fragsize">0</str>
        <str name="f.name.hl.alternateField">name</str>
-       <str name="f.user.hl.snippets">3</str>
-       <str name="f.user.hl.fragsize">200</str>
-       <str name="f.user.hl.alternateField">user</str>
-       <str name="f.user.hl.maxAlternateFieldLength">750</str>
+       <str name="f.content.hl.snippets">3</str>
+       <str name="f.content.hl.fragsize">200</str>
+       <str name="f.content.hl.alternateField">content</str>
+       <str name="f.content.hl.maxAlternateFieldLength">750</str>
+       <str name="spellcheck.dictionary">default</str>
+       <str name="spellcheck">on</str>
+       <str name="spellcheck.extendedResults">true</str>
+       <str name="spellcheck.count">10</str>
+       <str name="spellcheck.alternativeTermCount">5</str>
+       <str name="spellcheck.maxResultsForSuggest">5</str>
+       <str name="spellcheck.collate">true</str>
+       <str name="spellcheck.collateExtendedResults">true</str>
+       <str name="spellcheck.maxCollationTries">10</str>
+       <str name="spellcheck.maxCollations">5</str>
     </lst>
+    <arr name="last-components">
+      <str>spellcheck</str>
+    </arr>
   </requestHandler>
 
   <initParams path="/update/**,/query,/select,/tvrh,/elevate,/spell,/browse">
     <lst name="defaults">
-      <str name="df">_text_</str>
+      <str name="df">text</str>
     </lst>
   </initParams>
 
@@ -850,7 +877,7 @@
     <lst name="defaults">
       <str name="lowernames">true</str>
       <str name="fmap.meta">ignored_</str>
-      <str name="fmap.content">_text_</str>
+      <str name="fmap.content">text</str>
     </lst>
   </requestHandler>
 
@@ -915,7 +942,7 @@
     <!-- a spellchecker built from a field of the main index -->
     <lst name="spellchecker">
       <str name="name">default</str>
-      <str name="field">_text_</str>
+      <str name="field">text</str>
       <str name="classname">solr.DirectSolrSpellChecker</str>
       <!-- the spellcheck distance measure used, the default is the internal levenshtein -->
       <str name="distanceMeasure">internal</str>
@@ -972,9 +999,9 @@
       <str name="spellcheck.dictionary">default</str>
       <str name="spellcheck">on</str>
       <str name="spellcheck.extendedResults">true</str>
-      <str name="spellcheck.count">20</str>
-      <str name="spellcheck.alternativeTermCount">10</str>
-      <str name="spellcheck.maxResultsForSuggest">10</str>
+      <str name="spellcheck.count">10</str>
+      <str name="spellcheck.alternativeTermCount">5</str>
+      <str name="spellcheck.maxResultsForSuggest">5</str>
       <str name="spellcheck.collate">true</str>
       <str name="spellcheck.collateExtendedResults">true</str>
       <str name="spellcheck.maxCollationTries">10</str>

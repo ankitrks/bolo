@@ -35,7 +35,7 @@
        that you fully re-index after changing this setting as it can
        affect both how text is indexed and queried.
   -->
-  <luceneMatchVersion>8.2.0</luceneMatchVersion>
+  <luceneMatchVersion>7.4.0</luceneMatchVersion>
 
   <!-- <lib/> directives can be used to instruct Solr to load any Jars
        identified and use them to resolve any "plugins" specified in
@@ -83,8 +83,6 @@
 
   <lib dir="${solr.install.dir:../../../..}/contrib/velocity/lib" regex=".*\.jar" />
   <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-velocity-\d.*\.jar" />
-  <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-ltr-\d.*\.jar" />
-
   <!-- an exact 'path' can be used instead of a 'dir' to specify a
        specific jar file.  This will cause a serious error to be logged
        if it can't be loaded.
@@ -162,15 +160,6 @@
          Lucene will flush based on whichever limit is hit first.  -->
     <!-- <ramBufferSizeMB>100</ramBufferSizeMB> -->
     <!-- <maxBufferedDocs>1000</maxBufferedDocs> -->
-
-    <!-- Expert: ramPerThreadHardLimitMB sets the maximum amount of RAM that can be consumed
-         per thread before they are flushed. When limit is exceeded, this triggers a forced
-         flush even if ramBufferSizeMB has not been exceeded.
-         This is a safety limit to prevent Lucene's DocumentsWriterPerThread from address space
-         exhaustion due to its internal 32 bit signed integer based memory addressing.
-         The specified value should be greater than 0 and less than 2048MB. When not specified,
-         Solr uses Lucene's default value 1945. -->
-    <!-- <ramPerThreadHardLimitMB>1945</ramPerThreadHardLimitMB> -->
 
     <!-- Expert: Merge Policy
          The Merge Policy in Lucene controls how merging of segments is done.
@@ -378,17 +367,12 @@
        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
   <query>
 
-    <!-- Maximum number of clauses allowed when parsing a boolean query string.
-         
-         This limit only impacts boolean queries specified by a user as part of a query string,
-         and provides per-collection controls on how complex user specified boolean queries can
-         be.  Query strings that specify more clauses then this will result in an error.
-         
-         If this per-collection limit is greater then the global `maxBooleanClauses` limit
-         specified in `solr.xml`, it will have no effect, as that setting also limits the size
-         of user specified boolean queries.
+    <!-- Maximum number of clauses in each BooleanQuery,  an exception
+         is thrown if exceeded.  It is safe to increase or remove this setting,
+         since it is purely an arbitrary limit to try and catch user errors where
+         large boolean queries may not be the best implementation choice.
       -->
-    <maxBooleanClauses>${solr.max.booleanClauses:1024}</maxBooleanClauses>
+    <maxBooleanClauses>1024</maxBooleanClauses>
 
     <!-- Solr Internal Query Caches
 
@@ -708,14 +692,42 @@
       -->
     <lst name="defaults">
       <str name="echoParams">explicit</str>
+      <str name="qf">
+         text^1.0 name^8.0 user^10.0
+         title^5.0
+      </str>
+      <str name="mm">1</str>
+      <str name="q.alt">*:*</str>
+      <str name="fl">*,score</str>
+ 
+      <str name="mlt.qf">
+        text^0.5 name^8.0 id^10.0
+        title^8.0
+      </str>
+      <str name="mlt.fl">text,name,id,title</str>
+      <str name="spellcheck.dictionary">default</str>
+      <str name="spellcheck">on</str>
+      <str name="spellcheck.extendedResults">true</str>
+      <str name="spellcheck.count">10</str>
+      <str name="spellcheck.alternativeTermCount">5</str>
+      <str name="spellcheck.maxResultsForSuggest">5</str>
+      <str name="spellcheck.collate">true</str>
+      <str name="spellcheck.collateExtendedResults">true</str>
+      <str name="spellcheck.maxCollationTries">10</str>
+      <str name="spellcheck.maxCollations">5</str>
+      <int name="mlt.count">3</int>
       <int name="rows">10</int>
-      <!-- Default search field -->
+      <!-- Default search field
          <str name="df">text</str> 
-       
+        -->
       <!-- Change from JSON to XML format (the default prior to Solr 7.0)
          <str name="wt">xml</str> 
         -->
     </lst>
+    <arr name="last-components">
+      <str>spellcheck</str>
+    </arr>
+
     <!-- In addition to defaults, "appends" params can be specified
          to identify values which should be appended to the list of
          multi-val params from the query (or the existing "defaults").
@@ -734,6 +746,7 @@
          <str name="fq">inStock:true</str>
        </lst>
       -->
+
     <!-- "invariants" are a way of letting the Solr maintainer lock down
          the options available to Solr clients.  Any params values
          specified here are used regardless of what values may be specified
@@ -792,7 +805,59 @@
   <requestHandler name="/browse" class="solr.SearchHandler" useParams="query,facets,velocity,browse">
     <lst name="defaults">
       <str name="echoParams">explicit</str>
+      <str name="qf">
+         text^1.0 name^8.0 user^10.0
+         title^5.0
+      </str>
+      <!-- minimum percentage of optional clauses specified in qf that must match -->
+      <str name="mm">1</str>
+      <str name="q.alt">*:*</str>
+      <str name="fl">*,score</str>
+ 
+      <str name="mlt.qf">
+        text^0.5 name^8.0 id^10.0
+        title^8.0
+      </str>
+      <str name="mlt.fl">text,name,id,title</str>
+      <int name="mlt.count">3</int>
+
+      <!-- Faceting defaults -->
+      <str name="facet">on</str>
+ 
+      <str name="facet.missing">true</str>
+      <str name="facet.field">model</str> 
+      <str name="facet.mincount">1</str>
+ 
+ 
+      <!-- Highlighting defaults -->
+       <str name="hl">on</str>
+       <str name="hl.fl">content features title name</str>
+       <str name="hl.preserveMulti">true</str>
+       <str name="hl.encoder">html</str>
+       <str name="hl.simple.pre">&lt;b&gt;</str>
+       <str name="hl.simple.post">&lt;/b&gt;</str>
+       <str name="f.title.hl.fragsize">0</str>
+       <str name="f.title.hl.alternateField">title</str>
+       <str name="f.name.hl.fragsize">0</str>
+       <str name="f.name.hl.alternateField">name</str>
+       <str name="f.content.hl.snippets">3</str>
+       <str name="f.content.hl.fragsize">200</str>
+       <str name="f.content.hl.alternateField">content</str>
+       <str name="f.content.hl.maxAlternateFieldLength">750</str>
+       <str name="spellcheck.dictionary">default</str>
+       <str name="spellcheck">on</str>
+       <str name="spellcheck.extendedResults">true</str>
+       <str name="spellcheck.count">10</str>
+       <str name="spellcheck.alternativeTermCount">5</str>
+       <str name="spellcheck.maxResultsForSuggest">5</str>
+       <str name="spellcheck.collate">true</str>
+       <str name="spellcheck.collateExtendedResults">true</str>
+       <str name="spellcheck.maxCollationTries">10</str>
+       <str name="spellcheck.maxCollations">5</str>
     </lst>
+    <arr name="last-components">
+      <str>spellcheck</str>
+    </arr>
   </requestHandler>
 
   <initParams path="/update/**,/query,/select,/tvrh,/elevate,/spell,/browse">
@@ -811,6 +876,7 @@
                   class="solr.extraction.ExtractingRequestHandler" >
     <lst name="defaults">
       <str name="lowernames">true</str>
+      <str name="fmap.meta">ignored_</str>
       <str name="fmap.content">text</str>
     </lst>
   </requestHandler>
@@ -887,7 +953,7 @@
       <!-- the minimum shared prefix when enumerating terms -->
       <int name="minPrefix">1</int>
       <!-- maximum number of inspections per result. -->
-      <int name="maxInspections">5</int>
+      <int name="maxInspections">20</int>
       <!-- minimum length of a query term to be considered for correction -->
       <int name="minQueryLength">4</int>
       <!-- maximum threshold of documents a query term can appear to be considered for correction -->
@@ -898,7 +964,7 @@
     </lst>
 
     <!-- a spellchecker that can break or combine words.  See "/spell" handler below for usage -->
-    <!--
+    
     <lst name="spellchecker">
       <str name="name">wordbreak</str>
       <str name="classname">solr.WordBreakSolrSpellChecker</str>
@@ -906,8 +972,9 @@
       <str name="combineWords">true</str>
       <str name="breakWords">true</str>
       <int name="maxChanges">10</int>
+      <int name="minBreakLength">3</int>
     </lst>
-    -->
+    
   </searchComponent>
 
   <!-- A request handler for demonstrating the spellcheck component.
@@ -942,6 +1009,27 @@
     </lst>
     <arr name="last-components">
       <str>spellcheck</str>
+    </arr>
+  </requestHandler>
+  <searchComponent name="suggest" class="solr.SuggestComponent">
+    <lst name="suggester">
+      <str name="name">default</str>
+      <str name="lookupImpl">FuzzyLookupFactory</str>
+      <str name="dictionaryImpl">DocumentDictionaryFactory</str>
+      <str name="field">name</str>
+      <str name="weightField">name</str>
+      <str name="suggestAnalyzerFieldType">string</str>
+    </lst>
+  </searchComponent>
+
+  <requestHandler name="/suggest" class="solr.SearchHandler" startup="lazy">
+    <lst name="defaults">
+      <str name="suggest">true</str>
+      <str name="suggest.count">10</str>
+ 
+    </lst>
+    <arr name="components">
+      <str>suggest</str>
     </arr>
   </requestHandler>
 
@@ -1154,13 +1242,23 @@
   <updateProcessor class="solr.ParseDoubleFieldUpdateProcessorFactory" name="parse-double"/>
   <updateProcessor class="solr.ParseDateFieldUpdateProcessorFactory" name="parse-date">
     <arr name="format">
-      <str>yyyy-MM-dd['T'[HH:mm[:ss[.SSS]][z</str>
-      <str>yyyy-MM-dd['T'[HH:mm[:ss[,SSS]][z</str>
-      <str>yyyy-MM-dd HH:mm[:ss[.SSS]][z</str>
-      <str>yyyy-MM-dd HH:mm[:ss[,SSS]][z</str>
-      <str>[EEE, ]dd MMM yyyy HH:mm[:ss] z</str>
-      <str>EEEE, dd-MMM-yy HH:mm:ss z</str>
-      <str>EEE MMM ppd HH:mm:ss [z ]yyyy</str>
+      <str>yyyy-MM-dd'T'HH:mm:ss.SSSZ</str>
+      <str>yyyy-MM-dd'T'HH:mm:ss,SSSZ</str>
+      <str>yyyy-MM-dd'T'HH:mm:ss.SSS</str>
+      <str>yyyy-MM-dd'T'HH:mm:ss,SSS</str>
+      <str>yyyy-MM-dd'T'HH:mm:ssZ</str>
+      <str>yyyy-MM-dd'T'HH:mm:ss</str>
+      <str>yyyy-MM-dd'T'HH:mmZ</str>
+      <str>yyyy-MM-dd'T'HH:mm</str>
+      <str>yyyy-MM-dd HH:mm:ss.SSSZ</str>
+      <str>yyyy-MM-dd HH:mm:ss,SSSZ</str>
+      <str>yyyy-MM-dd HH:mm:ss.SSS</str>
+      <str>yyyy-MM-dd HH:mm:ss,SSS</str>
+      <str>yyyy-MM-dd HH:mm:ssZ</str>
+      <str>yyyy-MM-dd HH:mm:ss</str>
+      <str>yyyy-MM-dd HH:mmZ</str>
+      <str>yyyy-MM-dd HH:mm</str>
+      <str>yyyy-MM-dd</str>
     </arr>
   </updateProcessor>
   <updateProcessor class="solr.AddSchemaFieldsUpdateProcessorFactory" name="add-schema-fields">

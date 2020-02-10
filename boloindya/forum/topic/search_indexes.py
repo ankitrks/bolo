@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 from django.db.models import Q
 from haystack import indexes
-from .models import Topic
+from .models import Topic,TongueTwister
 
 
 # class TopicIndex(indexes.SearchIndex, indexes.Indexable):
@@ -50,13 +50,13 @@ class TopicIndex(indexes.SearchIndex, indexes.Indexable):
 
     text = indexes.CharField(document=True, use_template=True )
     is_removed = BooleanField()
-    title = indexes.CharField(model_attr='title', indexed=True)
-    slug = indexes.CharField(model_attr='slug', indexed=True)
+    title = indexes.EdgeNgramField(model_attr='title', indexed=True)
+    slug = indexes.EdgeNgramField(model_attr='slug', indexed=True)
     language_id = indexes.CharField(model_attr='language_id', indexed=True)
-    likes_count = indexes.CharField(model_attr='likes_count', indexed=True)
-    total_share_count = indexes.CharField(model_attr='total_share_count', indexed=True)
-    view_count = indexes.CharField(model_attr='view_count', indexed=True)
-    vb_playtime = indexes.CharField(model_attr='vb_playtime', indexed=True)
+    likes_count = indexes.IntegerField(model_attr='likes_count', indexed=True)
+    total_share_count = indexes.IntegerField(model_attr='total_share_count', indexed=True)
+    view_count = indexes.IntegerField(model_attr='view_count', indexed=True)
+    vb_playtime = indexes.IntegerField(model_attr='vb_playtime', indexed=True)
     last_active = indexes.DateTimeField(model_attr='last_active', indexed=False)
 
     # Overridden
@@ -98,3 +98,15 @@ class TopicIndex(indexes.SearchIndex, indexes.Indexable):
         :return: whether the topic is removed or not
         """
         return (obj.is_removed)
+
+class TongueTwisterIndex(indexes.SearchIndex, indexes.Indexable):
+    text = indexes.CharField(document=True, use_template=True )
+    hash_tag = indexes.EdgeNgramField(model_attr='hash_tag', indexed=True)
+    hash_counter = indexes.IntegerField(model_attr='hash_counter', indexed=True)
+    total_views = indexes.IntegerField(model_attr='total_views', indexed=True)
+
+    def get_model(self):
+        return TongueTwister
+
+    def index_queryset(self, using=None):
+        return (self.get_model().objects.all())

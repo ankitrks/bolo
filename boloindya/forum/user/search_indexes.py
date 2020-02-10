@@ -50,13 +50,13 @@ class UserProfileIndex(indexes.SearchIndex, indexes.Indexable):
 
     text = indexes.CharField(document=True, use_template=True )
     is_test_user = BooleanField()
-    name = indexes.CharField(model_attr='name', indexed=True)
-    slug = indexes.CharField(model_attr='slug', indexed=True)
-    user = indexes.CharField(model_attr='user', indexed=True)
-    vb_count = indexes.CharField(model_attr='vb_count', indexed=True)
-    own_vb_view_count = indexes.CharField(model_attr='own_vb_view_count', indexed=True)
-    follow_count = indexes.CharField(model_attr='follow_count', indexed=True)
-    follower_count = indexes.CharField(model_attr='follower_count', indexed=True)
+    name = indexes.EdgeNgramField(model_attr='name', indexed=True)
+    slug = indexes.EdgeNgramField(model_attr='slug', indexed=True)
+    user = indexes.EdgeNgramField(model_attr='user', indexed=True)
+    vb_count = indexes.IntegerField(model_attr='vb_count', indexed=True)
+    own_vb_view_count = indexes.IntegerField(model_attr='own_vb_view_count', indexed=True)
+    follow_count = indexes.IntegerField(model_attr='follow_count', indexed=True)
+    follower_count = indexes.IntegerField(model_attr='follower_count', indexed=True)
     language = indexes.CharField(model_attr='language', indexed=True)
 
     # Overridden
