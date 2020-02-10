@@ -389,6 +389,7 @@ def put_video_creators():
 
 def put_video_creators_analytics():
 
+	slab_0_dict = dict()
 	slab_1_dict = dict()
 	slab_2_dict = dict()
 	slab_3_dict = dict()
@@ -416,15 +417,44 @@ def put_video_creators_analytics():
 			else:
 				slab_2_dict[str_date] = []
 				slab_2_dict[str_date].append(user_id)
-		if(user_vb_count>5 and user_vb_count<=24):
+		if(user_vb_count>=5 and user_vb_count<=24):
 			if(str_date in slab_1_dict):
 				slab_1_dict[str_date].append(user_id)
 			else:
 				slab_1_dict[str_date] = []
 				slab_1_dict[str_date].append(user_id)
+		if(user_vb_count>1 and user_vb_count<5):
+			if(str_date in slab_0_dict):
+				slab_0_dict[str_date].append(user_id)
+			else:
+				slab_0_dict[str_date] = []
+				slab_0_dict[str_date].append(user_id)	
 
-	print(len(slab_1_dict), len(slab_2_dict), len(slab_3_dict))
-				
+
+	print(len(slab_1_dict), len(slab_2_dict), len(slab_3_dict), len(slab_0_dict))
+	
+	for key, val in slab_0_dict.items():
+		datetime_key = parser.parse(key)
+		week_no = datetime_key.isocalendar()[1]
+		curr_year = datetime_key.year 
+		if(curr_year == 2020):
+			week_no+=52
+		if(curr_year == 2019 and week_no == 1):
+			week_no = 52
+
+		metrics = '4'
+		metrics_slab = ''
+		save_obj, created = DashboardMetricsJarvis.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
+		if(created):
+			print(metrics, metrics_slab, datetime_key, week_no, len(val))
+			save_obj.count = len(val)
+			save_obj.save()
+		else:
+			print(metrics, metrics_slab, datetime_key, week_no, len(val))
+			save_obj.count = len(val)
+			save_obj.save()	
+
+
 	for key, val in slab_1_dict.items():
 		datetime_key = parser.parse(key)
 		week_no = datetime_key.isocalendar()[1]
@@ -529,16 +559,26 @@ def put_dau_data():
 			save_obj.count = tot_count
 			save_obj.save()	
 
+def put_bolo_action_data():
+
+	like_dict = dict()
+	share_dict = dict()
+	comments_dict dict()
+
+	all_data = BoloActionHistory.objects.all().exclude(user__st__is_test_user=True)
+	for item in all_data:
+		curr_action_type = item.
+
 		
 def main():
 
 
-	put_share_data()
-	put_installs_data()
-	put_dau_data()
+	#put_share_data()
+	#put_installs_data()
+	#put_dau_data()
 	put_video_creators_analytics()
-	put_video_views_analytics()
-	put_videos_created()
+	#put_video_views_analytics()
+	#put_videos_created()
 
 	
 
