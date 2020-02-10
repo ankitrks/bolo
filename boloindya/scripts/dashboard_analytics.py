@@ -533,14 +533,14 @@ def put_dau_data():
 def main():
 
 
-	#put_share_data()
-	#put_installs_data()
-	#put_dau_data()
-	#put_video_creators_analytics()
-	#put_video_views_analytics()
+	put_share_data()
+	put_installs_data()
+	put_dau_data()
+	put_video_creators_analytics()
+	put_video_views_analytics()
 	put_videos_created()
 
-
+	
 
 def run():
 	main()	
