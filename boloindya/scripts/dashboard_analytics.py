@@ -534,7 +534,7 @@ def main():
 
 	#put_share_data()
 	#put_installs_data()
-	put_videos_created()
+	#put_videos_created()
 	put_dau_data()
 	put_video_creators_analytics()
 	put_video_views_analytics()
