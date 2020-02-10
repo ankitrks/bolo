@@ -263,6 +263,15 @@ def put_videos_created():
 		else:
 			save_obj.count = len(val)
 			save_obj.save()
+<<<<<<< HEAD
+
+		# save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
+		# if(created):
+		# 	print(metrics, metrics_slab, key, week_no, len(val))
+		# 	save_obj.count = len(val)
+		# 	save_obj.save()
+=======
+>>>>>>> 57dcfd0432fc71e5ee0052171de88ab99043f3a7
 
 
 # number of video creators split according to date of signup and distributed into various slabs
@@ -522,12 +531,23 @@ def put_dau_data():
 		
 def main():
 
+<<<<<<< HEAD
+	#put_share_data()
+	#put_installs_data()
+	put_videos_created()
+	# put_video_views_data()
+	# put_video_creators()
+	#put_dau_data()
+	#put_video_creators_analytics()
+	#put_video_views_analytics()
+=======
 	put_share_data()
 	put_installs_data()
 	put_videos_created()
 	put_dau_data()
 	put_video_creators_analytics()
 	put_video_views_analytics()
+>>>>>>> 57dcfd0432fc71e5ee0052171de88ab99043f3a7
 
 
 def run():
