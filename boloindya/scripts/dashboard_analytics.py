@@ -68,7 +68,7 @@ def put_share_data():
 
 		metrics = '3'
 		metrics_slab = ''
-		save_obj, created = DashboardMetricsJarvis.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key week_no = week_no)
+		save_obj, created = DashboardMetricsJarvis.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
 		if(created):
 			print(metrics, metrics_slab, week_no, len(val))
 			save_obj.count = len(val)
