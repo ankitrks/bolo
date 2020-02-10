@@ -145,6 +145,9 @@
             </select>
         </div>
         </div>
+         <div class="form_group">
+            <input type="text" name="days_ago" placeholder="Days Ago" value="{{ pushNotification.days_ago }}" id="days_ago" style="{% if pushNotification.days_ago  %}display:block;{% else %}display:none;{% endif %}">
+        </div> 
         <div class="form_group">
             <input type="text" name="particular_user_id" placeholder="Username" value="{{ pushNotification.particular_user_id }}" id="particular_user_id" style="{% if pushNotification.particular_user_id  %}display:block;{% else %}display:none;{% endif %}">
             <ul id="response_particular_user_id" style="display:none;">
@@ -281,7 +284,16 @@
                 console.log($("#particular_user_id"));
                 $("#particular_user_id").show();
                 $('#response_particular_user_id').show();
+                $("#days_ago").hide();
+                $("#days_ago").val('');
+            } else if (end == '9' || end == '10') {
+                console.log($("#days_ago"));
+                $("#days_ago").show();
+                $("#particular_user_id").hide();
+                $('#response_particular_user_id').hide();
             } else {
+                $("#days_ago").hide();
+                $("#days_ago").val('');
                 $("#particular_user_id").val('');
                 $("#particular_user_id").hide();
                 $('#response_particular_user_id').hide();
@@ -355,13 +367,14 @@
         id = $('#search_id').val();
         var particular_user_id = $('#particular_user_id').val()
 
-        if (category != 'Select Category' && category != null) {
-            $('#user_group').val('0');
-            user_group='0'
-        }
         if (particular_user_id != '') {
-            lang = '0'
+	    $('#lang').val('0');
+            lang = '0';
         }
+	if (((user_group == 'Installed but did not sign up till 3 hours') || (user_group == 'Installed and never signed up')) && lang == 'Select Language') {
+            $('#lang').val('0');
+            lang = '0';
+	}
 
         if (upper_title  == '') {
             $('#error_message').show()
