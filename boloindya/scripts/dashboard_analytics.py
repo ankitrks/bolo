@@ -444,7 +444,7 @@ def put_video_creators_analytics():
 
 		metrics = '4'
 		metrics_slab = ''
-		save_obj, created = DashboardMetricsJarvis.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
+		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
 		if(created):
 			print(metrics, metrics_slab, datetime_key, week_no, len(val))
 			save_obj.count = len(val)
