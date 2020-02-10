@@ -68,7 +68,7 @@ def put_share_data():
 
 		metrics = '3'
 		metrics_slab = ''
-		save_obj, created = DashboardMetricsJarvis.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
+		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
 		if(created):
 			print(metrics, metrics_slab, week_no, len(val))
 			save_obj.count = len(val)
@@ -111,7 +111,7 @@ def put_installs_data():
 
 		metrics = '5'
 		metrics_slab = '6'
-		save_obj, created = DashboardMetricsJarvis.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
+		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
 		if(created):
 			print(metrics, metrics_slab, key, week_no)
 			save_obj.count = len(val)
@@ -515,6 +515,7 @@ def put_dau_data():
 		metrics = '6'
 		metrics_slab = ''
 		#print(metrics, metrics_slab, str_curr_date, week_no, t1+t2)
+
 		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date, week_no = week_no)
 		if(created):
 			print(metrics, metrics_slab, str_curr_date, week_no, tot_count)
