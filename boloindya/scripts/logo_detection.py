@@ -43,6 +43,9 @@ from django.utils import timezone
 f_name = settings.BASE_DIR + '/temp/plag_vid_details.txt'
 prev_vbid_completed = settings.BASE_DIR + '/temp/prev_id.txt'
 
+f = io.open(f_name, "w", encoding="UTF-8")
+
+
 # check the prev id till which the code ran
 def check_prev_id():
 	
@@ -50,14 +53,13 @@ def check_prev_id():
 		f = open(prev_vbid_completed, "r")
 		f.seek(0)
 		prev_id = f.read()
-		if(isinstance(prev_id, int)):
-			print(prev_id)
-			return prev_id
+		if(prev_id!=''):
+			prev_id_int = int(prev_id, 10)
+			if(isinstance(prev_id_int, int)):
+				return prev_id_int
 		else:
-			print("here")
 			return -1	
 	else:
-		print("hre2")
 		return -1	
 
 
@@ -96,9 +98,6 @@ def identify_logo():
 
 	
 
-	f = io.open(f_name, "w", encoding="UTF-8")
-	g = open(prev_vbid_completed, "w")
-
 	today = datetime.today()
 	try:
 		#long_ago = today + timedelta(hours = -6)
@@ -136,26 +135,29 @@ def identify_logo():
 			intervals.append(t3)
 			count = 1
 			global_counter+=1
+
+			for interval in intervals:
+				ff = FFmpeg(inputs = {settings.BASE_DIR + '/temp/local_video.mp4': None}, outputs = {settings.BASE_DIR + "/temp/output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
+				ff.run()
+				file_name = settings.BASE_DIR + '/temp/output{}.png'.format(count)
+				with io.open(file_name, 'rb') as image_file:
+					content = image_file.read()
+					image = vision.types.Image(content = content)
+					response = client.text_detection(image = image)
+					texts = response.text_annotations
+					for text in texts:
+						modified_text = text.description
+						if(modified_text in plag_source):
+							f.write(str(iter_id) + " " + video_title + " " + url_str + " " + (modified_text) + "\n")
+							# Topic.objects.filter(id = iter_id).update(plag_text = str(plag_source.index(modified_text)))
+							# Topic.objects.filter(id = iter_id).update(time_deleted = datetime.now())
+							# data[0].delete()
+
 			print(iter_id)
+			g = open(prev_vbid_completed, "w")
 			g.seek(0)
 			g.write(str(iter_id))
-
-			# for interval in intervals:
-			# 	ff = FFmpeg(inputs = {settings.BASE_DIR + '/temp/local_video.mp4': None}, outputs = {settings.BASE_DIR + "/temp/output{}.png".format(count): ['-y', '-ss', interval, '-vframes', '1']})
-			# 	ff.run()
-			# 	file_name = settings.BASE_DIR + '/temp/output{}.png'.format(count)
-			# 	with io.open(file_name, 'rb') as image_file:
-			# 		content = image_file.read()
-			# 		image = vision.types.Image(content = content)
-			# 		response = client.text_detection(image = image)
-			# 		texts = response.text_annotations
-			# 		for text in texts:
-			# 			modified_text = text.description
-			# 			if(modified_text in plag_source):
-			# 				f.write(str(iter_id) + " " + video_title + " " + url_str + " " + (modified_text) + "\n")
-			# 				# Topic.objects.filter(id = iter_id).update(plag_text = str(plag_source.index(modified_text)))
-			# 				# Topic.objects.filter(id = iter_id).update(time_deleted = datetime.now())
-			# 				# data[0].delete()
+			g.close()				
 
 	except Exception as e:
 		print('' + str(e))
