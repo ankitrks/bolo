@@ -701,7 +701,7 @@
       <str name="fl">*,score</str>
  
       <str name="mlt.qf">
-        text^0.5 name^8.0 id^10.0
+        text^0.5 name^8.0 user^10.0
         title^8.0
       </str>
       <str name="mlt.fl">text,name,id,title</str>
@@ -815,7 +815,7 @@
       <str name="fl">*,score</str>
  
       <str name="mlt.qf">
-        text^0.5 name^8.0 id^10.0
+        text^0.5 name^8.0 user^10.0
         title^8.0
       </str>
       <str name="mlt.fl">text,name,id,title</str>
@@ -947,7 +947,7 @@
       <!-- the spellcheck distance measure used, the default is the internal levenshtein -->
       <str name="distanceMeasure">internal</str>
       <!-- minimum accuracy needed to be considered a valid spellcheck suggestion -->
-      <float name="accuracy">0.5</float>
+      <float name="accuracy">0.1</float>
       <!-- the maximum #edits we consider when enumerating terms: can be 1 or 2 -->
       <int name="maxEdits">2</int>
       <!-- the minimum shared prefix when enumerating terms -->

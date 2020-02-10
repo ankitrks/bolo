@@ -83,14 +83,14 @@ class Topic(models.Model):
     hash_tags = models.ManyToManyField('forum_topic.TongueTwister', verbose_name=_("hash_tags"), \
             related_name="hash_tag_topics",blank=True)
 
-    title = models.TextField(_("title"), blank = True, null = True)
+    title = models.TextField(_("title"), blank = True, null = True,db_index=True)
     question_audio = models.CharField(_("audio title"), max_length=255, blank = True, null = True)
     question_video = models.CharField(_("video title"), max_length=255, blank = True, null = True)
-    slug = AutoSlugField(populate_from="title", db_index=False, blank=True)
+    slug = AutoSlugField(populate_from="title", db_index=True, blank=True)
     date = models.DateTimeField(_("date"), default=timezone.now)
     last_active = models.DateTimeField(_("last active"), default=timezone.now)
     reindex_at = models.DateTimeField(_("reindex at"), default=timezone.now)
-    language_id = models.CharField(_("language"), choices=language_options, blank = True, null = True, max_length=10, default='1')
+    language_id = models.CharField(_("language"), choices=language_options, blank = True, null = True, max_length=10, default='1',db_index=True)
     question_image = models.TextField(_("Question image"),null=True,blank=True)
     is_popular = models.BooleanField(_("Popular"), default = False)
     is_pubsub_popular_push = models.BooleanField(_("Popular"), default = False)
@@ -104,16 +104,16 @@ class Topic(models.Model):
     is_closed = models.BooleanField(_("closed"), default=False)
     is_removed = models.BooleanField(_("removed"), default=False)
     thumbnail = models.CharField(_("thumbnail"), max_length=150, blank = True, null = True, default='')
-    view_count = models.PositiveIntegerField(_("views"), default=0)
-    imp_count = models.PositiveIntegerField(_("views"), default=0)
-    comment_count = models.PositiveIntegerField(_("comment count"), default=0)
-    total_share_count = models.PositiveIntegerField(_("Total Share count"), default=0)# self plus comment
-    share_count = models.PositiveIntegerField(_("Share count"), default=0)# only topic share
-    imp_count = models.PositiveIntegerField(_("views"), default=0)
+    view_count = models.PositiveIntegerField(_("views"), default=0,db_index=True)
+    imp_count = models.PositiveIntegerField(_("views"), default=0,db_index=True)
+    comment_count = models.PositiveIntegerField(_("comment count"), default=0,db_index=True)
+    total_share_count = models.PositiveIntegerField(_("Total Share count"), default=0,db_index=True)# self plus comment
+    share_count = models.PositiveIntegerField(_("Share count"), default=0,db_index=True)# only topic share
+    imp_count = models.PositiveIntegerField(_("views"), default=0,db_index=True)
     # share_user = models.ForeignKey(settings.AUTH_USER_MODEL,null=True,blank=True, related_name='share_topic_user')
     # shared_post = models.ForeignKey('self', blank = True, null = True, related_name='user_shared_post')
     is_vb = models.BooleanField(_("Is Video Bytes"), default=False)
-    likes_count = models.PositiveIntegerField(_("Likes count"), default=0)
+    likes_count = models.PositiveIntegerField(_("Likes count"), default=0,db_index=True)
 
     is_monetized = models.BooleanField(_("monetized"), default=False)
     is_moderated = models.BooleanField(_("moderated"), default=False)
@@ -136,7 +136,7 @@ class Topic(models.Model):
     audio_m3u8_content = models.TextField(_("Audio M3U8 Content"), blank = True, null = True)
     video_m3u8_content = models.TextField(_("Video M3U8 Content"), blank = True, null = True)
     downloaded_url = models.CharField(_("downloaded URL"), max_length=255, blank = True, null = True)
-    vb_playtime = models.PositiveIntegerField(null=True,blank=True,default=0)
+    vb_playtime = models.PositiveIntegerField(null=True,blank=True,default=0,db_index=True)
 
     plag_text_options = (
         ('0', "TikTok"),
@@ -417,7 +417,7 @@ class VBseen(UserInfo):
         return unicode(str(self.topic if self.topic else 'VB'), 'utf-8')
 
 class TongueTwister(models.Model):
-    hash_tag = models.CharField(_("Hash Tag"), max_length=255, blank = True, null = True)
+    hash_tag = models.CharField(_("Hash Tag"), max_length=255, blank = True, null = True,db_index=True)
     en_descpription = models.TextField(_("English Hash Tag Description"),blank = True, null = True)
     hi_descpription = models.TextField(_("Hindi Hash Tag Description"),blank = True, null = True)
     ta_descpription = models.TextField(_("Tamil Hash Tag Description"),blank = True, null = True)
@@ -428,8 +428,8 @@ class TongueTwister(models.Model):
     gj_descpription = models.TextField(_("Gujrati Hash Tag Description"),blank = True, null = True)
     mt_descpription = models.TextField(_("Marathi Hash Tag Description"),blank = True, null = True)
     picture = models.CharField(_("Picture URL"),max_length=255, blank=True,null=True)
-    hash_counter = models.PositiveIntegerField(default=1,null=True,blank=True)
-    total_views = models.PositiveIntegerField(default=0,null=True,blank=True)
+    hash_counter = models.PositiveIntegerField(default=1,null=True,blank=True,db_index=True)
+    total_views = models.PositiveIntegerField(default=0,null=True,blank=True,db_index=True)
     def __unicode__(self):
         return self.hash_tag
 

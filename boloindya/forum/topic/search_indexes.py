@@ -65,7 +65,7 @@ class TopicIndex(indexes.SearchIndex, indexes.Indexable):
 
     # Overridden
     def index_queryset(self, using=None):
-        return (self.get_model().objects.all())
+        return (self.get_model().objects.filter(is_vb=True))
 
     # Overridden
     def build_queryset(self, using=None, start_date=None, end_date=None):

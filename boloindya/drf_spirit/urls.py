@@ -8,7 +8,7 @@ from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,c
     KYCDocumentTypeList,save_kyc_basic_info,save_kyc_documents,save_kyc_selfie,save_kyc_additional_info,save_bank_details_info,kyc_profession_status,get_kyc_status,my_app_version,\
     EncashableDetailList,get_bolo_details, get_category_detail, UserLogStatistics,GetFollowigList,GetFollowerList, get_category_with_video_bytes, get_category_detail_with_views, \
     get_category_video_bytes, get_popular_video_bytes, get_user_follow_and_like_list, get_recent_videos, get_popular_bolo, submit_user_feedback,generate_login_data,get_ip_to_language, get_landing_page_video,\
-    mention_suggestion,hashtag_suggestion,SearchHashTag,editComment,get_user_bolo_info
+    mention_suggestion,hashtag_suggestion,SearchHashTag,editComment,get_user_bolo_info,get_search_suggestion
 from rest_framework_simplejwt import views as jwt_views
 from .views import *
 
@@ -83,6 +83,7 @@ urlpatterns = [
 
 
     url(r'^fb_profile_settings/$', fb_profile_settings, name='fb_profile_settings'),
+    url(r'^get_search_suggestion/$', get_search_suggestion, name='get_search_suggestion'),
     url(r'^follow_user/$', follow_user, name='follow_user'),
     url(r'^follow_sub_category/$', follow_sub_category, name='follow_sub_category'),
     url(r'^get_follow_user/$', get_follow_user, name='get_follow_user'),
