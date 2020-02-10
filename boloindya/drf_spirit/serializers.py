@@ -64,6 +64,16 @@ class TopicSerializer(ModelSerializer):
     video_cdn = SerializerMethodField()
     m2mcategory = SerializerMethodField()
 
+    def __init__(self, *args, **kwargs):
+        super(TopicSerializer, self).__init__(*args, **kwargs)
+        if not self.context['is_expand']:
+            remove_list = ['m3u8_content','audio_m3u8_content','video_m3u8_content']
+        else:
+            remove_list = []
+        if remove_list:
+            for field in remove_list:
+                self.fields.pop(field)
+
     class Meta:
         model = Topic
         #fields = '__all__'
@@ -130,6 +140,16 @@ class TopicSerializerwithComment(ModelSerializer):
     m2mcategory = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
 
+    def __init__(self, *args, **kwargs):
+        super(TopicSerializerwithComment, self).__init__(*args, **kwargs)
+        if not self.context['is_expand']:
+            remove_list = ['m3u8_content','audio_m3u8_content','video_m3u8_content']
+        else:
+            remove_list = []
+        if remove_list:
+            for field in remove_list:
+                self.fields.pop(field)
+
     class Meta:
         model = Topic
         # fields = '__all__'
@@ -193,6 +213,16 @@ class SingleTopicSerializerwithComment(ModelSerializer):
     m2mcategory = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
 
+    def __init__(self, *args, **kwargs):
+        super(SingleTopicSerializerwithComment, self).__init__(*args, **kwargs)
+        if not self.context['is_expand']:
+            remove_list = ['m3u8_content','audio_m3u8_content','video_m3u8_content']
+        else:
+            remove_list = []
+        if remove_list:
+            for field in remove_list:
+                self.fields.pop(field)
+
     class Meta:
         model = Topic
         # fields = '__all__'
@@ -233,6 +263,16 @@ class UserAnswerSerializerwithComment(ModelSerializer):
     text_comments = SerializerMethodField()
     date = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
+
+    def __init__(self, *args, **kwargs):
+        super(UserAnswerSerializerwithComment, self).__init__(*args, **kwargs)
+        if not self.context['is_expand']:
+            remove_list = ['m3u8_content','audio_m3u8_content','video_m3u8_content']
+        else:
+            remove_list = []
+        if remove_list:
+            for field in remove_list:
+                self.fields.pop(field)
 
     class Meta:
         model = Topic
@@ -479,6 +519,16 @@ class CategoryVideoByteSerializer(ModelSerializer):
     date = SerializerMethodField()
     video_cdn = SerializerMethodField()
 
+    def __init__(self, *args, **kwargs):
+        super(CategoryVideoByteSerializer, self).__init__(*args, **kwargs)
+        if not self.context['is_expand']:
+            remove_list = ['m3u8_content','audio_m3u8_content','video_m3u8_content']
+        else:
+            remove_list = []
+        if remove_list:
+            for field in remove_list:
+                self.fields.pop(field)
+
     class Meta:
         model = Topic
         #fields = '__all__'
@@ -573,7 +623,7 @@ class CategoryWithVideoSerializer(ModelSerializer):
         # paginator = Paginator(topics, page_size)
         # page = 1
         # topic_page = paginator.page(page)
-        return CategoryVideoByteSerializer(topics[:settings.REST_FRAMEWORK['PAGE_SIZE']], many=True).data
+        return CategoryVideoByteSerializer(topics[:settings.REST_FRAMEWORK['PAGE_SIZE']], many=True,context={'is_expand':self.context.get("is_expand",False)}).data
 
 class VideoCompleteRateSerializer(ModelSerializer):
     class Meta:

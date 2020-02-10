@@ -1,0 +1,414 @@
+{% extends "jarvis/layout/base.html" %}
+
+{% block styles %}
+<style>
+    #overlay {
+        position: fixed;
+        /* Sit on top of the page content */
+        display: none;
+        /* Hidden by default */
+        width: 100%;
+        /* Full width (cover the whole page) */
+        height: 100%;
+        /* Full height (cover the whole page) */
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        /* Black background with opacity */
+        z-index: 2;
+        /* Specify a stack order in case you're using a different order for other elements */
+        cursor: pointer;
+        /* Add a pointer on hover */
+    }
+
+    .percentcomplete {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        color: white;
+        transform: translate(-50%, -50%);
+    }
+</style>
+{% endblock styles %}
+
+
+{% block content %}
+{% load staticfiles %}
+
+<section>
+    <div style="text-align: center;">
+        <h1>Analytics Panel Jarvis</h1>
+    </div>
+
+    <!-- Daily active users template -->
+    <div class="row">
+        <div style="text-align: center;" class="col-6 col-xl-6 col-md-6 col-sm-12">
+            <h2>Videos Created</h2>
+            <span>From:</span><input type="text" id="dp_impr_from" readonly="readonly">
+            <span>To:</span><input type="text" id="dp_impr_to" readonly="readonly">
+            <div class = "form-group">
+                <label>View Option</label>
+                <select class = "form-control">
+                <option>monthly</option>
+                <option>weekly</option>
+            </select>
+            </div>   
+            <button onclick="impr_click_ok()" type="button" id="filter_date_btn">Ok</button>
+            <canvas id="chart_impr"></canvas>
+        </div>
+
+        <div class="col-6 col-xl-6 col-md-6 col-sm-12">
+            <h2>Top 10 Videos (By Impressions)</h2>
+            <span>Select day:</span><input type="text" id="dp_top_impr" readonly="readonly">
+            <button onclick="top_impr_click_ok()" type="button" id="filter_day_btn">Ok</button>
+            <!-- <canvas id="chart_top_impr_vids"></canvas> -->
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                            <th>Impressions</th>
+                            <th>Video Name</th>
+                            <th>User name</th>
+                    </tr>
+                </thead>
+
+                <tbody id="top_impr_table">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div style="text-align: center;" class="col-6 col-xl-6 col-md-6 col-sm-12">
+            <h2>Video Plays </h2>
+            <span>From:</span><input type="text" id="dp_play_week_from" readonly="readonly">
+            <span>To:</span><input type="text" id="dp_play_week_to" readonly="readonly">
+            <button onclick="weekly_vplays_ok()" type="button" id="filter_date_btn">Ok</button>
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                            <th>Day</th>
+                            <th>Total Video Plays</th>
+                            <th>Total Duration of Videos Watched</th>
+                    </tr>
+                </thead>
+
+                <tbody id="weekly_vplays_table">
+                </tbody>
+            </table>
+        </div>
+        
+        <div style="text-align: center;" class="col-6 col-xl-6 col-md-6 col-sm-12">
+            <h2>Unique Video Plays (Day wise breakdown)</h2>
+            <span>Day: </span><input type="text" id="dp_daily_vplays" readonly="readonly">
+            <button onclick="daily_vplays_ok()" type="button" id="filter_date_btn">Ok</button>
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                            <th>Video</th>
+                            <th>Watched By</th>
+                            <th>Duration Played</th>
+                            <th>Completion Rate</th>
+                    </tr>
+                </thead>
+
+                <tbody id="daily_vplays_table">
+                </tbody>
+            </table>
+        </div>        
+        
+    </div>
+
+    <!-- jQuery 3 -->
+    <script src="/media/js/jquery-3.3.1.min.js"></script>
+
+    <!-- Bootstrap 3.3.7 -->
+    <script src="/media/js/bootstrap.min.js"></script>
+
+    <!-- ChartJS -->
+    <script type="text/javascript" src="{% static 'js/Chart.min.js' %}"></script>
+
+    <script type="text/javascript">
+        var chart_impr_ctx = document.getElementById('chart_impr').getContext('2d');
+
+        var chart_impr, chart_top_impr_vids;
+
+        //***** CHART SETTING FUNCTIONS ******
+
+        function setImpressionsChart(data) {
+            if (chart_impr != undefined && chart_impr != null) {
+                chart_impr.destroy();
+            }
+
+            console.log(data)
+            //******** Setting DAU Chart
+            chart_impr = new Chart(chart_impr_ctx, {
+                type: 'line',
+
+                data: {
+                    labels: data.impr_labels,
+                    datasets: [{
+                        label: 'Video Impressions',
+                        fill: false,
+                        borderColor: 'rgb(213, 56, 255)',
+                        data: data.impr_freq
+                    }]
+                },
+
+                options: {}
+            });
+        }
+
+        function setTopImpVideosChart(data) {
+            $("#top_impr_table tr").remove(); 
+
+            console.log(data);
+
+            for(item in data.vid_all_info){
+                var top_impr_table = document.getElementById('top_impr_table');
+                var newRow = top_impr_table.insertRow(-1);
+                var cell_impr = newRow.insertCell(0);
+                var cell_vid_name = newRow.insertCell(1);
+                var cell_user_name=newRow.insertCell(2);
+
+                cell_impr.innerHTML = data.vid_all_info[item]['impressions'];
+                cell_vid_name.innerHTML = data.vid_all_info[item]['title'];
+                cell_user_name.innerHTML = data.vid_all_info[item]['user__username'];
+            }
+        }
+
+        function setWeeklyVPlayTable(data) {
+            $("#weekly_vplays_table tr").remove(); 
+
+            console.log(data.weekly_data);
+
+            for(item in data.weekly_data){
+                var weekly_vplays_table = document.getElementById('weekly_vplays_table');
+                var newRow = weekly_vplays_table.insertRow(-1);
+                var cell_day = newRow.insertCell(0);
+                var cell_total_plays = newRow.insertCell(1);
+                var cell_total_duration=newRow.insertCell(2);
+
+                var time_to_show = convertSecondsToMinsHrs(data.weekly_data[item]['total_playtime'])
+
+                cell_day.innerHTML = data.weekly_data[item]['date'];
+                cell_total_plays.innerHTML = data.weekly_data[item]['total_plays'];
+                cell_total_duration.innerHTML = time_to_show;
+            }
+        }
+
+        function setDailyVPlayTable(data) {
+            $("#daily_vplays_table tr").remove(); 
+
+            console.log("****"+data.daily_data);
+
+            for(item in data.daily_data){
+                var weekly_vplays_table = document.getElementById('daily_vplays_table');
+                var newRow = weekly_vplays_table.insertRow(-1);
+                var cell_video_name = newRow.insertCell(0);
+                var cell_watched_by = newRow.insertCell(1);
+                var cell_duration=newRow.insertCell(2);
+                var cell_completion_rate=newRow.insertCell(3);
+                var time_to_show = convertSecondsToMinsHrs(data.daily_data[item]['playtime']);
+                
+                // console.log("*"+data.daily_data[item]['title']);
+                
+                cell_video_name.innerHTML = data.daily_data[item]['title'];
+                cell_watched_by.innerHTML = data.daily_data[item]['user'];
+                cell_duration.innerHTML = time_to_show;
+                cell_completion_rate.innerHTML = data.daily_data[item]['percentage_viewed']+"%";
+            }
+        }
+
+        function convertSecondsToMinsHrs(timeInSeconds){
+            // Convert the seconds time to minutes and hour
+            var playtime = timeInSeconds
+            var mins = 0, hours = 0, seconds = playtime;
+
+            if(seconds > 59){
+                mins = Math.floor(playtime / 60);
+                seconds = seconds % 60;
+            }
+            if(mins > 59){
+                hours = Math.floor(mins / 60);
+                mins = mins % 60;
+            }
+            
+            var final_time = seconds +" secs";
+            if(mins > 0){
+                final_time = mins +" mins "+final_time;
+            }
+            if(hours > 0){
+                final_time = hours +" hrs "+final_time;
+            }
+            return final_time;
+        }
+
+        //****** DATA FETCHING FUNCTIONS
+
+        var impr_from, impr_to, top_impr_date, play_week_from, play_week_to, daily_plays_day;
+        $(function () {
+            impr_from = $("#dp_impr_from")
+                .datepicker({
+                    format: 'dd-mm-yyyy'
+                });
+            impr_to = $("#dp_impr_to")
+                .datepicker({
+                    format: 'dd-mm-yyyy'
+                });
+            top_impr_date = $("#dp_top_impr")
+                .datepicker({
+                    format: 'dd-mm-yyyy'
+                });
+            play_week_from = $("#dp_play_week_from")
+                .datepicker({
+                    format: 'dd-mm-yyyy'
+                });
+            play_week_to = $("#dp_play_week_to")
+                .datepicker({
+                    format: 'dd-mm-yyyy'
+                });   
+            daily_plays_day = $("#dp_daily_vplays")
+                .datepicker({
+                    format: 'dd-mm-yyyy'
+                });       
+        });
+
+        function getCookie(c_name) {
+            if (document.cookie.length > 0) {
+                c_start = document.cookie.indexOf(c_name + "=");
+                if (c_start != -1) {
+                    c_start = c_start + c_name.length + 1;
+                    c_end = document.cookie.indexOf(";", c_start);
+                    if (c_end == -1) c_end = document.cookie.length;
+                    return unescape(document.cookie.substring(c_start, c_end));
+                }
+            }
+            return "";
+        }
+
+        function impr_click_ok() {
+            console.log(impr_from.val() + " " + impr_to.val())
+
+            $.ajax({
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken")
+                },
+                url: "/jarvis/get_impr_data/",
+                type: "POST",
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    'impr_from': impr_from.val(),
+                    'impr_to': impr_to.val()
+                }),
+                success: function (data) {
+                    setImpressionsChart(data)
+                }
+            });
+        }
+
+        function top_impr_click_ok() {
+            console.log(top_impr_date.val());
+
+            $.ajax({
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken")
+                },
+                url: "/jarvis/get_top_impr/",
+                type: "POST",
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    'date': top_impr_date.val()
+                }),
+                success: function (data) {
+                    setTopImpVideosChart(data)
+                }
+            });
+        }
+
+        function weekly_vplays_ok(){
+            console.log(play_week_from+" "+play_week_to);
+
+            $.ajax({
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken")
+                },
+                url: "/jarvis/get_weekly_vplay_data/",
+                type: "POST",
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    'week_begin': play_week_from.val(),
+                    'week_end': play_week_to.val()
+                }),
+                success: function (data) {
+                    setWeeklyVPlayTable(data)
+                }
+            });            
+        }
+
+        function daily_vplays_ok(){
+            console.log();
+
+            $.ajax({
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken")
+                },
+                url: "/jarvis/get_daily_vplay_data/",
+                type: "POST",
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    'date': daily_plays_day.val(),
+                }),
+                success: function (data) {
+                    setDailyVPlayTable(data)
+                }
+            });            
+        }
+        
+        function getTodayAndWeekAgo(){
+            var today = new Date();
+            var sevenDaysAgo = new Date(today.getTime() - (10*24*60*60*1000));
+
+            var today_dd = today.getDate();
+            var today_mm = today.getMonth() + 1; //January is 0!
+            var today_yyyy = today.getFullYear();
+
+            var sda_dd = sevenDaysAgo.getDate();
+            var sda_mm = sevenDaysAgo.getMonth() + 1; //January is 0!
+            var sda_yyyy = sevenDaysAgo.getFullYear();
+
+            var today_string = today_dd + '-' + today_mm + '-' + today_yyyy;
+            var sda_string = sda_dd + '-' + sda_mm + '-' + sda_yyyy;
+
+            console.log("dates: "+today_string+" "+sda_string);
+
+            return [today_string, sda_string];
+        }
+
+        $( document ).ready(function() {
+            // Show the default graph of past 1 week
+
+            var dates = getTodayAndWeekAgo();
+
+            //Set daily impressions chart with past 7 days data
+            $('#dp_impr_to').val(dates[0]);
+            $('#dp_impr_from').val(dates[1]);
+
+            //Set top impressions table
+            $('#dp_top_impr').val(dates[1]);
+
+            //Set video plays table
+            $('#dp_play_week_from').val(dates[1]);
+            $('#dp_play_week_to').val(dates[0]);
+
+            impr_click_ok();
+            top_impr_click_ok();
+            weekly_vplays_ok();
+
+        });
+
+    </script>
+
+</section>
+{% endblock content %}

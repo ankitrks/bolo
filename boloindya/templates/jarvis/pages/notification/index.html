@@ -90,7 +90,7 @@
                             <td><a href="/jarvis/particular_notification/{{pushNotification.pk}}/0/1">{% get_user_delivered_notification pushNotification %} </a></td>
                             <td><a href="/jarvis/particular_notification/{{pushNotification.pk}}/1/1">{% get_user_opened_notification pushNotification %} </a></td>
                             <td>{% get_percentage pushNotification.push_notification_id.all.count pushNotification %}</td>
-                            <td>{% get_language_name pushNotification.language %}</td>
+                            <td>{{ pushNotification.get_language_display }}</td>
                             <td>{% get_user_group_name pushNotification.user_group %}</td>
                             <td>{% if pushNotification.is_scheduled %}<a href="/jarvis/send_notification/?id={{pushNotification.pk}}" class="btn btn-primary operation"><i class="fa fa-pencil" aria-hidden="true"></i></a> <a class="btn btn-danger operation" href="/jarvis/remove_notification/?id={{pushNotification.pk}}"><i class="fa fa-times" aria-hidden="true"></i></a>{% else %}<a class="btn btn-success operation" href="/jarvis/send_notification/?id={{pushNotification.pk}}"><i class="fa fa-repeat" aria-hidden="true"></i></a><a class="btn btn-danger operation" href="/jarvis/remove_notification/?id={{pushNotification.pk}}"><i class="fa fa-trash" aria-hidden="true"></i></a>{% endif %}</td>
                         </tr>

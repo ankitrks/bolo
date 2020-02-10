@@ -53,6 +53,7 @@ from forum.topic.models import Topic,TopicHistory, ShareTopic, Like, SocialShare
     Leaderboard, VBseen, TongueTwister
 from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
 from .serializers import *
+from tasks import vb_create_task,user_ip_to_state_task
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -144,6 +145,14 @@ class TopicList(generics.ListCreateAPIView):
     filter_backends     = (DjangoFilterBackend,)
     filter_class        = TopicFilter
     permission_classes  = (IsAuthenticatedOrReadOnly,)
+
+    def get_serializer_context(self):
+        """
+        Extra context provided to the serializer class.
+        """
+        return {
+            'is_expand': self.request.GET.get('is_expand',False),
+        }
     
 
     def get_queryset(self):
@@ -191,7 +200,14 @@ class Usertimeline(generics.ListCreateAPIView):
 
     Required Parameters:
     title and category_id 
-    """  
+    """
+    def get_serializer_context(self):
+        """
+        Extra context provided to the serializer class.
+        """
+        return {
+            'is_expand': self.request.GET.get('is_expand',False),
+        }
 
 
     def get_queryset(self):
@@ -312,6 +328,13 @@ class VBList(generics.ListCreateAPIView):
     Required Parameters:
     title and category_id 
     """ 
+    def get_serializer_context(self):
+        """
+        Extra context provided to the serializer class.
+        """
+        return {
+            'is_expand': self.request.GET.get('is_expand',False),
+        }
 
 
     def get_queryset(self):
@@ -502,6 +525,14 @@ class GetChallenge(generics.ListCreateAPIView):
     permission_classes = (IsOwnerOrReadOnly,)
     pagination_class = ShufflePagination 
 
+    def get_serializer_context(self):
+        """
+        Extra context provided to the serializer class.
+        """
+        return {
+            'is_expand': self.request.GET.get('is_expand',False),
+        }
+
     def get_queryset(self):
         challenge_hash = self.request.GET.get('challengehash')
         challengehash = '#' + challenge_hash
@@ -576,7 +607,14 @@ class GetTopic(generics.ListCreateAPIView):
     """
     post:
     topic_id =self.request.POST.get('topic_id','')
-    """ 
+    """
+    def get_serializer_context(self):
+        """
+        Extra context provided to the serializer class.
+        """
+        return {
+            'is_expand': self.request.GET.get('is_expand',False),
+        }
 
     def get_queryset(self):
         topic_id =self.request.GET.get('topic_id','')
@@ -591,6 +629,13 @@ class GetQuestion(generics.ListCreateAPIView):
     """
     post:
     """
+    def get_serializer_context(self):
+        """
+        Extra context provided to the serializer class.
+        """
+        return {
+            'is_expand': self.request.GET.get('is_expand',False),
+        }
     
 
     def get_queryset(self):
@@ -612,6 +657,7 @@ class GetAnswers(generics.ListCreateAPIView):
         """
         return {
             'user_id': self.request.GET.get('user_id',''),
+            'is_expand': self.request.GET.get('is_expand',False),
         } 
 
     def get_queryset(self):
@@ -630,6 +676,13 @@ class GetHomeAnswer(generics.ListCreateAPIView):
     """
     post:
     """ 
+    def get_serializer_context(self):
+        """
+        Extra context provided to the serializer class.
+        """
+        return {
+            'is_expand': self.request.GET.get('is_expand',False),
+        }
      
     def get_queryset(self):
         language_id = self.request.GET.get('language_id','')
@@ -693,6 +746,14 @@ class SearchTopic(generics.ListCreateAPIView):
 
     serializer_class    = TopicSerializerwithComment
     permission_classes  = (IsOwnerOrReadOnly,)
+
+    def get_serializer_context(self):
+        """
+        Extra context provided to the serializer class.
+        """
+        return {
+            'is_expand': self.request.GET.get('is_expand',False),
+        }
 
     def get_queryset(self):
         topics      = []
@@ -1156,7 +1217,9 @@ def createTopic(request):
             topic.vb_height = vb_height
             view_count = random.randint(1,5)
             topic.view_count = view_count
-            topic.update_vb()
+            topic.save()
+            vb_create_task.delay(topic.id)
+            # topic.update_vb()
             tag_list=title.split()
             hash_tag = tag_list
             if tag_list:
@@ -1187,14 +1250,14 @@ def createTopic(request):
             userprofile.question_count = F('question_count')+1
             userprofile.save()
             add_bolo_score(request.user.id,'create_topic', topic)
-            topic_json = TopicSerializerwithComment(topic).data
+            topic_json = TopicSerializerwithComment(topic, context={'is_expand': request.GET.get('is_expand',False)}).data
             message = 'Topic Created'
         else:
             userprofile = UserProfile.objects.get(user = request.user)
             userprofile.vb_count = F('vb_count')+1
             userprofile.save()
             # add_bolo_score(request.user.id, 'create_topic', topic)
-            topic_json = TopicSerializerwithComment(topic).data
+            topic_json = TopicSerializerwithComment(topic, context={'is_expand': request.GET.get('is_expand',False)}).data
             message = 'Video Byte Created'
         return JsonResponse({'message': message,'topic':topic_json}, status=status.HTTP_201_CREATED)
     except User.DoesNotExist:
@@ -1265,7 +1328,7 @@ def editTopic(request):
                             topic.hash_tags.add(tag)
                 topic.save()
 
-                topic_json = TopicSerializerwithComment(topic).data
+                topic_json = TopicSerializerwithComment(topic, context={'is_expand': request.GET.get('is_expand',False)}).data
                 return JsonResponse({'message': 'Topic Edited','topic':topic_json}, status=status.HTTP_201_CREATED)
             else:
                 return JsonResponse({'message': 'No Changes made'}, status=status.HTTP_200_OK)
@@ -1380,7 +1443,7 @@ def notification_topic(request):
     try:
         topic_id = request.GET.get('topic_id', '')
         topic        = Topic.objects.get(pk = topic_id)
-        topic_json = TopicSerializerwithComment(topic).data
+        topic_json = TopicSerializerwithComment(topic, context={'is_expand': request.GET.get('is_expand',False)}).data
         print topic_json
         return JsonResponse({'result':[topic_json]}, status=status.HTTP_201_CREATED)   
     except:
@@ -1392,6 +1455,14 @@ class TopicDetails(generics.RetrieveUpdateDestroyAPIView):
     queryset            = Topic.objects.all()
     permission_classes  = (IsOwnerOrReadOnly,)
     lookup_field        = 'slug'
+
+    def get_serializer_context(self):
+        """
+        Extra context provided to the serializer class.
+        """
+        return {
+            'is_expand': self.request.GET.get('is_expand',False),
+        }
 
 class TopicCommentList(generics.ListAPIView):
     serializer_class    = CommentSerializer
@@ -1628,7 +1699,7 @@ def get_user_bolo_info(request):
         return JsonResponse({'message': 'success', 'total_video_count' : total_video_count, \
                         'monetised_video_count':monetised_video_count, 'total_view_count':total_view_count,'total_comment_count':total_comment_count,\
                         'total_like_count':total_like_count,'total_share_count':total_share_count,'left_for_moderation':left_for_moderation,'total_earn':total_earn,'video_playtime':video_playtime,\
-                        'spent_time':spent_time,'top_3_videos':TopicSerializer(top_3_videos,many=True).data,'unmonetizd_video_count':unmonetizd_video_count}, status=status.HTTP_200_OK)
+                        'spent_time':spent_time,'top_3_videos':TopicSerializer(top_3_videos,many=True, context={'is_expand': request.GET.get('is_expand',False)}).data,'unmonetizd_video_count':unmonetizd_video_count}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1683,11 +1754,12 @@ def verify_otp(request):
                     userprofile = UserProfile.objects.get(user = user)
                     userprofile.mobile_no = mobile_no
                     if user_ip:
-                        url = 'http://ip-api.com/json/'+user_ip
-                        response = urllib2.urlopen(url).read()
-                        json_response = json.loads(response)
-                        userprofile.state_name = json_response['regionName']
-                        userprofile.city_name = json_response['city']
+                        user_ip_to_state_task.delay(user.id,user_ip)
+                        # url = 'http://ip-api.com/json/'+user_ip
+                        # response = urllib2.urlopen(url).read()
+                        # json_response = json.loads(response)
+                        # userprofile.state_name = json_response['regionName']
+                        # userprofile.city_name = json_response['city']
                     if str(is_geo_location) =="1":
                         userprofile.lat = lat
                         userprofile.lang = lang
@@ -1816,11 +1888,12 @@ def fb_profile_settings(request):
                 if not userprofile.gender and gender:
                     add_bolo_score(user.id, 'gender_added', userprofile)
                 if user_ip:
-                    url = 'http://ip-api.com/json/'+user_ip
-                    response = urllib2.urlopen(url).read()
-                    json_response = json.loads(response)
-                    userprofile.state_name = json_response['regionName']
-                    userprofile.city_name = json_response['city']
+                    user_ip_to_state_task.delay(user.id,user_ip)
+                    # url = 'http://ip-api.com/json/'+user_ip
+                    # response = urllib2.urlopen(url).read()
+                    # json_response = json.loads(response)
+                    # userprofile.state_name = json_response['regionName']
+                    # userprofile.city_name = json_response['city']
                 userprofile.gender = gender
                 userprofile.about = about
                 userprofile.refrence = refrence
@@ -1880,11 +1953,12 @@ def fb_profile_settings(request):
                 if not userprofile.gender and gender:
                     add_bolo_score(user.id, 'gender_added', userprofile)
                 if user_ip:
-                    url = 'http://ip-api.com/json/'+user_ip
-                    response = urllib2.urlopen(url).read()
-                    json_response = json.loads(response)
-                    userprofile.state_name = json_response['regionName']
-                    userprofile.city_name = json_response['city']
+                    user_ip_to_state_task.delay(user.id,user_ip)
+                    # url = 'http://ip-api.com/json/'+user_ip
+                    # response = urllib2.urlopen(url).read()
+                    # json_response = json.loads(response)
+                    # userprofile.state_name = json_response['regionName']
+                    # userprofile.city_name = json_response['city']
                 userprofile.gender = gender
                 userprofile.about = about
                 userprofile.refrence = refrence
@@ -1931,11 +2005,12 @@ def fb_profile_settings(request):
                 else:
                     userprofile.is_dark_mode_enabled = False
                 if user_ip:
-                    url = 'http://ip-api.com/json/'+user_ip
-                    response = urllib2.urlopen(url).read()
-                    json_response = json.loads(response)
-                    userprofile.state_name = json_response['regionName']
-                    userprofile.city_name = json_response['city']
+                    user_ip_to_state_task.delay(request.user.id,user_ip)
+                    # url = 'http://ip-api.com/json/'+user_ip
+                    # response = urllib2.urlopen(url).read()
+                    # json_response = json.loads(response)
+                    # userprofile.state_name = json_response['regionName']
+                    # userprofile.city_name = json_response['city']
                 userprofile.gender = gender
                 userprofile.profile_pic =profile_pic
                 userprofile.cover_pic=cover_pic
@@ -2810,7 +2885,7 @@ def get_hash_list(request):
             hash_data = TongueTwisterSerializer(tag).data
             videos_dict = []
             for video in videos:    
-                videos_dict.append(TopicSerializer(video).data)
+                videos_dict.append(TopicSerializer(video, context={'is_expand': request.GET.get('is_expand',False)}).data)
             hash_data['videos'] = videos_dict
             hashtaglist.append(hash_data)
         return JsonResponse({'data':hashtaglist,'message':'Success'})
@@ -3015,10 +3090,10 @@ def get_category_with_video_bytes(request):
             topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
             try:
                 topics = paginator.paginate_queryset(topics, request)
-                trending_videos = CategoryVideoByteSerializer(topics, many=True).data
+                trending_videos = CategoryVideoByteSerializer(topics, many=True, context={'is_expand': request.GET.get('is_expand',False)}).data
             except Exception as e1:
                 trending_videos = []
-        category_details = CategoryWithVideoSerializer(category, many=True, context={'language_id': language_id,'user_id':request.user.id}).data
+        category_details = CategoryWithVideoSerializer(category, many=True, context={'language_id': language_id,'user_id':request.user.id,'is_expand': request.GET.get('is_expand',False)}).data
         return JsonResponse({'category_details': category_details, 'trending_topics': trending_videos, \
             'popular_boloindyans': popular_bolo, 'following_user': following_user}, \
             status=status.HTTP_200_OK)
@@ -3036,7 +3111,7 @@ def get_category_detail_with_views(request):
         vb_count = all_vb.count()
         all_seen = category.view_count
         current_language_view = CategoryViewCounter.objects.get(category=category,language=language_id).view_count
-        return JsonResponse({'category_details': CategoryWithVideoSerializer(category, context={'language_id': language_id,'user_id':request.user.id}).data, 'video_count': vb_count, 'all_seen':shorcountertopic(all_seen),'current_language_view':shorcountertopic(current_language_view)}, status=status.HTTP_200_OK)
+        return JsonResponse({'category_details': CategoryWithVideoSerializer(category, context={'language_id': language_id,'user_id':request.user.id,'is_expand': request.GET.get('is_expand',False)}).data, 'video_count': vb_count, 'all_seen':shorcountertopic(all_seen),'current_language_view':shorcountertopic(current_language_view)}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -3085,7 +3160,7 @@ def get_category_video_bytes(request):
         page = request.POST.get('page', 2)
 
         topic_page = paginator.page(page)
-        return JsonResponse({'topics': CategoryVideoByteSerializer(topic_page, many=True).data}, status=status.HTTP_200_OK)
+        return JsonResponse({'topics': CategoryVideoByteSerializer(topic_page, many=True, context={'is_expand': request.GET.get('is_expand',False)}).data}, status=status.HTTP_200_OK)
      except Exception as e:
          return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -3122,7 +3197,7 @@ def get_popular_video_bytes(request):
         
         topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
         topics = paginator_topics.paginate_queryset(topics, request)
-        return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
+        return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True, context={'is_expand': request.GET.get('is_expand',False)}).data}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:' + str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -3191,7 +3266,7 @@ def get_recent_videos(request):
                         orderd_all_seen_post.append(each_vb)
         topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
         topics = paginator_topics.paginate_queryset(topics, request)
-        return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
+        return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True, context={'is_expand': request.GET.get('is_expand',False)}).data}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -3266,7 +3341,7 @@ def get_landing_page_video(request):
         startdate = datetime.today()
         enddate = startdate - timedelta(days=30)
         topics = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, is_popular=True, date__gte=enddate).order_by('-date')[0:2]
-        return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
+        return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True, context={'is_expand': request.GET.get('is_expand',False)}).data}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
       

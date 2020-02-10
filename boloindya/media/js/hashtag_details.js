@@ -6,7 +6,7 @@ $(document).ready(function(){
 });
 
 
-
+var totalCountVideo =0;
 var userLikeAndUnlike=[];
 
 function getSideBarData(){
@@ -63,9 +63,14 @@ function getCreators(popularCreators){
         creatorName=popularCreators.username;
     }
 
+    var profilePics = popularCreators.userprofile.profile_pic;
+    if(profilePics==''){
+       profilePics= '/media/user.svg';
+    }    
+
     var creatorTemplate='<li class="jsx-3959364739">\
                             <a tag="a" class="jsx-1420774184 recommend-item" href="/'+popularCreators.username+'/">\
-                                <div class="jsx-2177493926 jsx-578937417 avatar round head normal" style="background-image: url('+popularCreators.userprofile.profile_pic+');"></div>\
+                                <div class="jsx-2177493926 jsx-578937417 avatar round head normal" style="background-image: url('+profilePics+');"></div>\
                                 <div class="jsx-1420774184 info-content">\
                                     <h4 class="jsx-1420774184">'+creatorName+'</h4>\
                                     <p class="jsx-1420774184">@'+popularCreators.username+'</p>\
@@ -104,7 +109,6 @@ function getPopularCategory(popularCategory){
 
 var playListData=[];
 var userLikeAndUnlike=[];
-//http://127.0.0.1:8000/api/v1/get_vb_list/?limit=10&offset=10&user_id=191
 
 var page = 1;
 var checkDataStatus=0;
@@ -148,13 +152,14 @@ function getHashtagVideos(limit,offset){
             var videoItemList=response.results;
             //jQuery("#userVideoCountId").html(response.count);
             var itemCount=-1;
-            videoItemList.forEach(function(itemCreator) {itemCount++;
-                userVideoItems =getVideoItem(itemCreator,itemCount);
+            videoItemList.forEach(function(itemCreator) {itemCount++;totalCountVideo++;
+                playListData.push(itemCreator);
+                userVideoItems =getVideoItem(itemCreator,totalCountVideo);
                 $("#hashTagVideosListId").append(userVideoItems);
       
             });
             loaderBoloHideDynamic('_scroll_load_more_loading_user_videos');
-            playListData=videoItemList;
+            //playListData=videoItemList;
             var nextPageData=response.next;
             jQuery("#nextPageUrlId").val(response.next);
             
@@ -197,8 +202,8 @@ function loadMoreData(NextPageUrl){
                 userVideoItems="";
                 var videoItemList=data.results;
                 var itemCount=-1;
-                videoItemList.forEach(function(itemCreator) {itemCount++;
-                userVideoItems +=getVideoItem(itemCreator,itemCount);
+                videoItemList.forEach(function(itemCreator) {itemCount++;totalCountVideo++;
+                userVideoItems +=getVideoItem(itemCreator,totalCountVideo);
                 playListData.push(itemCreator);          
       
                 });
@@ -230,7 +235,7 @@ function loadMoreData(NextPageUrl){
 
 
 
-    var playListData=[];
+    //var playListData=[];
 function getCategoryVideos(){
 
     loaderBoloShowDynamic('_scroll_load_more_loading_user_videos');
@@ -347,9 +352,10 @@ function video_play_using_video_js(url,backup_url,image) {
 }
 
 
- function openVideoInPopup(file,image,indexId){
+ function openVideoInPopup(file,image,indexId){debugger;
   loaderShow();
   var singleItemData=[];
+    indexId=indexId-1;
     $("#indexId").val(indexId);
     singleItemData=playListData[indexId];
   $("#modelPopup").show();
@@ -379,7 +385,7 @@ function video_play_using_video_js(url,backup_url,image) {
         var videoTitle=singleItemData.title;
         var profilePics = singleItemData.user.userprofile.profile_pic;
         if(profilePics==''){
-           profilePics= '/media/demo_user.png';
+           profilePics= '/media/user.svg';
         }
 
         var likeStatus="";
@@ -497,7 +503,7 @@ function listCommentsById(singleTopicData){
         var profileImage="";
         var userProfile=itemVideo.user.userprofile;
         if(userProfile.profile_pic==""){
-           profileImage='/media/demo_user.png';
+           profileImage='/media/user.svg';
         }else{
             profileImage=userProfile.profile_pic;
         }
@@ -548,7 +554,7 @@ function loadMoreComments(nextPageURl){
         var profileImage="";
         var userProfile=itemVideo.user.userprofile;
         if(userProfile.profile_pic==""){
-           profileImage='/media/demo_user.png';
+           profileImage='/media/user.svg';
         }else{
             profileImage=userProfile.profile_pic;
         }

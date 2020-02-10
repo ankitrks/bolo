@@ -254,19 +254,396 @@
 
 }
 
+
+
+
+
+
+.searchbox{
+    position:relative;
+    min-width:50px;
+    width:0%;
+    top: 4px;
+    height:50px;
+    float:right;
+    overflow:hidden;
+    right: 10px;
+    -webkit-transition: width 0.3s;
+    -moz-transition: width 0.3s;
+    -ms-transition: width 0.3s;
+    -o-transition: width 0.3s;
+    transition: width 0.3s;
+}
+
+.searchbox-input{
+    top:0;
+    right:0;
+    border:0;
+    outline:0;
+    background:#fff;
+    /*box-shadow: 1px 1px 0px 0px;*/
+    width:100%;
+    height:42px;
+    margin:0;
+    padding:0px 55px 0px 20px;
+    font-size:20px;
+    color:red;
+}
+.searchbox-input::-webkit-input-placeholder {
+    color: #d74b4b;
+}
+.searchbox-input:-moz-placeholder {
+    color: #d74b4b;
+}
+.searchbox-input::-moz-placeholder {
+    color: #d74b4b;
+}
+.searchbox-input:-ms-input-placeholder {
+    color: #d74b4b;
+}
+
+.searchbox-icon,
+.searchbox-submit{
+    width:50px;
+    height:50px;
+    display:block;
+    position:absolute;
+    top:0;
+    font-family:verdana;
+    font-size:22px;
+    right:0;
+    padding:0;
+    margin:0;
+    border:0;
+    outline:0;
+    line-height:50px;
+    text-align:center;
+    cursor:pointer;
+    color:#fff;
+    background:#000000;
+}
+
+
+
+.searchbox-open{
+    width:100%;
+    border-bottom: 1px solid #ccc; 
+}
+
+.byline{
+  position:absolute;
+  top:150px;
+  left:30%;
+  text-align:center;
+  font-size:18px;
+}
+.byline a{
+  text-decoration:none;
+  color: #d74b4b;
+}
+.searchbox-icon::before {
+        display: inline-block;
+    height: 18px;
+    margin: 0 6px -3px 0;
+    min-width: 18px;
+    position: relative;
+    top: -2px;
+    width: 18px;
+    content: '';
+    background-image: url(/media/h35EP3v4R9x.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: 0 -963px;
+}
+
+ :root {
+    --primary-color: #000;
+    --secondary-color: #ffff;
+    --font-color: #000;
+    --bg-color: #fff;
+    --search-primary-color:#fff;
+    --primary-link-color:#e53d51;
+    --heading-color: #000;
+    --background-position:0 -947px;
+    --primary-search-border:1px solid #ccc;
+    --primary-search-height:42px;
+    --primary-subheading:rgba(34, 33, 33, 0.5);
+    --primary-border-bottom:1px solid rgba(63, 57, 57, 0.2);
+    --hashtag--background-image:url(/media/hashtag_black.svg);
+}
+
+[data-theme="dark"] {
+    --primary-color: #fff;
+    --secondary-color: #000;
+    --font-color: #fff;
+    --bg-color: #000;
+    --heading-color: #fff;
+    --primary-link-color:#e53d51;
+    --background-position:0 -963px;
+    --search-primary-color:#fff;
+    --primary-search-border:0;
+    --primary-search-height:50px;
+    --primary-subheading:rgba(243, 243, 243, 0.5);
+    --primary-border-bottom:1px solid rgba(255, 255, 255, 0.2);
+    --hashtag--background-image:url(/media/hashtag.svg);
+}
+
+body {
+/*  font-family: "Lato", sans-serif;*/
+  background-color: var(--bg-color);
+  background: var(--bg-color);
+  color: var(--font-color);
+  max-width: 100%;
+  margin: 0 auto;
+  font-size: calc(1rem + 0.25vh);
+}
+
+html[pc="yes"] *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+html[pc="yes"] *::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(22,24,35,0.34);
+}
+html[pc="yes"] *::-webkit-scrollbar-track {
+    border-radius: 0px;
+    background-color: var(--bg-color);
+}
+
+
+.searchbox-submit, .searchbox-input{
+      /*border: var(--primary-search-border);*/
+    height:  var(--primary-search-height);
+    background:#fff0;
+    /*border: 1px solid #000;*/
+}
+
+  .main-body ,.header-container,.video-wall,.searchbox-icon,.about-content,.container, .about-article {
+
+    background: var(--secondary-color) !important;
+
+  }
+  .main-body h1 {
+    color: var(--font-color) !important;
+  }
+/*  .main-body  {
+    background: var(--primary-color)!important;
+
+  }*/
+  .searchbox-icon::before {
+    background-position: var(--background-position);
+    
+  }
+  ._explore_feed_item{
+    border-bottom: var(--primary-border-bottom); 
+  }
+
+  .main-body ._card_header_title,.container, ._card_header_subTitle,.jsx-1929076256,.header-bar1,.recommend-card.jsx-3959364739 header.jsx-3959364739 h3.jsx-3959364739,.recommend-item .info-content.jsx-1420774184 h4.jsx-1420774184,._explore_page_main_title,._card_header_title, ._list_item_title a{
+    color: var(--font-color) !important;
+  }
+  .about-content .about-article h2,._download_title,.header-bar{
+    color: var(--font-color);
+  }
+  .count-infos .unit{
+    color: var(--font-color);
+  } 
+   .count-infos .number{
+    color: var(--font-color);
+  }
+  .drawer-content h2:not(.to-home){
+    color: #000;
+  }
+  .bottomHeaing h2{
+    color: #fff;
+    margin-top: 30px;
+  }
+
+  .header-bar{
+    background-color:var(--secondary-color);
+  }
+  .recommend-item .info-content.jsx-1420774184 p.jsx-1420774184,._list_item_description{
+    color: var(--primary-subheading);
+  }
+
+
+  .jsx-3959364739 h3{
+    color: var(--font-color) !important;;
+  }
+.language-selection{
+  color: #cccccc;
+}
+
+h1 {
+    color: var(--heading-color);
+    /*font-family: "Sansita One", serif;*/
+    font-size: 2rem;
+    margin-bottom: 1vh;
+}
+
+p {
+  font-size: 1.1rem;
+  /*line-height: 1.6rem;*/
+}
+
+a {
+  color: var(--primary-link-color);
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+  font-weight: bold;
+  &:hover, &:focus {
+      border-bottom: 3px solid currentColor;
+  }
+}
+._list_component_ a{
+  color: var(--primary-link-color);
+}
+
+
+section {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.post-meta {
+  font-size: 1rem;
+  font-style: italic;
+  display: block;
+  margin-bottom: 4vh;
+  color: var(--secondary-color);
+}
+
+nav {
+  display: flex;
+  justify-content: flex-end;
+  padding: 20px 0;
+}
+
+/*slider switch css */
+.theme-switch-wrapper {
+  display: inherit;
+  align-items: center;
+  margin-top: 10px;
+  
+  em {
+    margin-left: 10px;
+    font-size: 1rem;
+  }
+}
+.theme-switch {
+  display: inline-block;
+  height: 34px;
+  position: relative;
+  width: 60px;
+}
+
+.theme-switch input {
+  display:none;
+}
+
+.slider {
+  background-color: #ccc;
+  bottom: 0;
+  cursor: pointer;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transition: .4s;
+}
+
+.slider:before {
+  background-color: #fff;
+  bottom: 4px;
+  content: "";
+  height: 26px;
+  left: 4px;
+  position: absolute;
+  transition: .4s;
+  width: 26px;
+}
+.welBtn{
+  color: #000;
+}
+
+input:checked + .slider {
+  background-color: #66bb6a;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+
 </style>
+<script type="text/javascript">
+      $(document).ready(function(){
+            var submitIcon = $('.searchbox-icon');
+            var inputBox = $('.searchbox-input');
+            var searchBox = $('.searchbox');
+            var isOpen = false;
+            submitIcon.click(function(){
+                if(isOpen == false){
+                    searchBox.addClass('searchbox-open');
+                    inputBox.focus();
+                    isOpen = true;
+                } else {
+                    searchBox.removeClass('searchbox-open');
+                    inputBox.focusout();
+                    isOpen = false;
+                }
+            });  
+             submitIcon.mouseup(function(){
+                    return false;
+                });
+            searchBox.mouseup(function(){
+                    return false;
+                });
+            $(document).mouseup(function(){
+                    if(isOpen == true){
+                        $('.searchbox-icon').css('display','block');
+                        submitIcon.click();
+                    }
+                });
+        });
+            function buttonUp(){
+                var inputVal = $('.searchbox-input').val();
+                inputVal = $.trim(inputVal).length;
+                if( inputVal !== 0){
+                    $('.searchbox-icon').css('display','none');
+                } else {
+                    $('.searchbox-input').val('');
+                    $('.searchbox-icon').css('display','block');
+                }
+            }
+</script>
 
     <div id="__next">
         <div class="jsx-639186511 ">
             <div class="jsx-3563400267 header-container">
                 <div class="jsx-3563400267 header-content">
                     <h1 class="jsx-475503780 logo-container"><a title="boloindya" class="jsx-475503780" href="{{site_base_url}}">
-                        <img src="/media/boloindya_logo.png" alt="boloindya" class="jsx-475503780 logo-text">
+                        <img id="boloindyaLogoId" src="/media/boloindya_logo.png" alt="boloindya" class="jsx-475503780 logo-text">
                         <strong class="jsx-475503780">boloindya</strong></a></h1>
                           <ul class="jsx-3143951235 menu-wrapper" >
                                 <li class="hideOnMobile">
                                     <div class="_4kny _50tm">
-                                        <div class="_585-" aria-label="Facebook" role="search" data-testid="facebar_root" id="js_19">
+    <form class="searchbox" action="/{{LANGUAGE_CODE}}/search/" method="get">
+        <input type="search" placeholder="Search......" value="{{search_term}}"  autocomplete="off" name="term" class="searchbox-input" onkeyup="buttonUp();" required>
+        <input type="submit" class="searchbox-submit" value="">
+        <span class="searchbox-icon"></span>
+    </form>
+
+<!--                                         <div class="_585-" aria-label="Facebook" role="search" data-testid="facebar_root" id="js_19">
                                             <form action="/{{LANGUAGE_CODE}}/search/" method="get">
                                                 <button value="1" class="_42ft _4jy0 _4w98 _4jy3 _517h _51sy _4w97" aria-label="Search" tabindex="-1" data-testid="facebar_search_button" type="submit"><i class="_585_"></i></button>
                                                 <div class="uiTypeahead _5860"  id="u_q_1">
@@ -280,7 +657,7 @@
                                                     </div>
                                                 </div>
                                             </form>
-                                        </div>
+                                        </div> -->
                                     </div>
 
 
@@ -294,16 +671,16 @@
                                     </form> -->
                                 </li>
 
-                                <li class="jsx-3143951235">
+<!--                                 <li class="jsx-3143951235">
                                   <h2 class="menu-item-link menu-item-link-active"><a href="{{site_base_url}}" class="jsx-2922828392">{% trans "Home" %}</a></h2></li>
                                 <li class="jsx-3143951235">
-                                  <h2 class="menu-item-link hideOnMobile"><a href="{{site_base_url}}about/" class="jsx-2922828392">{% trans "About" %}</a></h2></li>
-                                <li class="jsx-3143951235">
+                                  <h2 class="menu-item-link hideOnMobile"><a href="{{site_base_url}}about/" class="jsx-2922828392">{% trans "About" %}</a></h2></li> -->
+<!--                                 <li class="jsx-3143951235">
                                   <h2 class="menu-item-link"><a href="/discover/" class="jsx-2922828392">{% trans "Discover" %}</a></h2>
-                                </li> 
-
-
-
+                                </li>  -->
+                                <li class="jsx-3143951235" style="">
+                                  <h2 class="menu-item-link" style="margin-top: 25px;"><a href="https://play.google.com/store/apps/details?id=com.boloindya.boloindya&amp;hl=en_IN" target="_blank" rel="nofollow" class="jsx-3336228099"><img style="height: 30px;" src="//sf-tb-sg.ibytedtos.com/obj/ttfe-malisg/store-badge/google/en.png" alt="google-store" class="jsx-3336228099"></a></h2>
+                                </li>
                                 <li class="jsx-3143951235" id="boloSideMenu">
 
                                     <span class="bolo-642826668 boloSideMenuClass hamburger-menu">
@@ -341,13 +718,15 @@
                   <div class="jsx-461239781 drawer-mask drawer-enter-done hide"></div>
                     <div class="jsx-461239781 drawerOpenAndClose drawer-content drawer-exit drawer-exit-active">
                         <h1 class="jsx-461239781 drawer-icon">
+                              
+                              <img id="boloindyaLogo" src="/media/boloindya_logo.png" alt="boloindya" class="jsx-461239781 logo-text"><strong class="jsx-461239781">boloindya</strong></h1>
 
-                              <img src="{{site_base_url}}media/img/boloindya_logo.png" alt="boloindya" class="jsx-461239781 logo-text"><strong class="jsx-461239781">boloindya</strong></h1>
                         <h2 class="to-home active"><a class="jsx-461239781" href="{{site_base_url}}en">{% trans "Home" %}</a></h2>
                         <div class="footer-content-column">
                             <h2>{% trans "Company" %}</h2>
                             <h3><a class="" href="{{site_base_url}}about/">{% trans "About" %}</a></h3>
                             <h3><a class="" href="{{site_base_url}}discover/" target="_blank">{% trans "Discover" %}</a></h3>
+                            <h3><a class="" href="{{site_base_url}}trending/" target="_blank">{% trans "Trending" %}</a></h3>
 <!--                             <h3><a class="" href="/careers" target="_blank">{% trans "Careers" %}</a></h3> -->
                         </div>
 <!--                         <div class="footer-content-column">
@@ -360,6 +739,8 @@
                             <h3><a class="" href="https://www.boloindya.com/en/safety">{% trans "Safety Center" %}</a></h3>
                             <h3><a class="" href="https://support.boloindya.com/en/privacy-safety/community-policy-en">{% trans "Community Guidelines" %}</a></h3>
                         </div> -->
+
+
                         <div class="footer-content-column">
                             <h2>{% trans "Legal" %}</h2>
                             <h3><a class="" href="{{site_base_url}}terms-of-service">{% trans "Terms of Service" %}</a></h3>
@@ -369,7 +750,7 @@
                         </div>
                             {% if user.is_authenticated %}
 
-                            <p>{% trans "Welcome" %} <a href="/profile">{{ user.username }}</a> !!!</p>
+                            <p class="welBtn">{% trans "Welcome" %} <a href="/profile">{{ user.username }}</a> !!!</p>
                             <p><a href="javascript:void()" id="signOutLink">{% trans "Log out" %}</a>
                             {% endif %}
                             <form style='display: none;' method="post" action="{% url 'account_logout' %}">
@@ -391,7 +772,13 @@
                             </script>
 
  
-
+                          <div class="theme-switch-wrapper">
+                            <label class="theme-switch" for="checkbox">
+                              <input type="checkbox" id="checkbox" />
+                              <div class="slider round"></div>
+                            </label>
+                              <!-- <em>Enable Dark Mode!</em> -->
+                          </div>
                         <div class="jsx-1724846817 jsx-1667329752 language-selection">
                             {% get_current_language as LANGUAGE_CODE %}
                             {% get_available_languages as LANGUAGES %}
@@ -427,7 +814,52 @@
 
                                 </select>
                             </form>
-                        </div>  
+                        </div> 
+
+
                     </div>
                 </div>
             </div>
+
+
+<script>
+
+const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
+const currentTheme = localStorage.getItem('theme');
+
+if (currentTheme) {
+    document.documentElement.setAttribute('data-theme', currentTheme);
+  
+    if (currentTheme === 'dark') {
+        toggleSwitch.checked = true;
+    }
+}
+
+function switchTheme(e) {
+    if (e.target.checked) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+
+    }
+    else {
+      document.documentElement.setAttribute('data-theme', 'light');
+      localStorage.setItem('theme', 'light');
+  
+    }    
+}
+function switchLogo(){debugger;
+  var currentTheme1 = localStorage.getItem('theme');
+    if (currentTheme1 == 'dark') {
+        var logoDark='/media/img/boloindya_logo.png';
+        
+        $("#boloindyaLogoId").attr('src',logoDark);
+
+    } else {
+        var logoLight='/media/bolo-Indya164x101.png';
+        $("#boloindyaLogoId").attr('src',logoLight);
+    }
+}
+
+toggleSwitch.addEventListener('change', switchTheme, false);
+
+</script>

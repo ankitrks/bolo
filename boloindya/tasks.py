@@ -27,6 +27,7 @@ def send_notifications_task(data, pushNotification):
         datepicker = data.get('datepicker', '')
         timepicker = data.get('timepicker', '').replace(" : ", ":")
         image_url = data.get('image_url', '')
+        particular_user_id=data.get('particular_user_id', None)
         
         if user_group == '8':
             lang='0'
@@ -39,6 +40,8 @@ def send_notifications_task(data, pushNotification):
         pushNotification.notification_type = notification_type
         pushNotification.user_group = user_group
         pushNotification.instance_id = id
+        if particular_user_id:
+            pushNotification.particular_user_id=particular_user_id
         pushNotification.save()
     except Exception as e:
         logger.info(str(e))    
@@ -58,7 +61,10 @@ def send_notifications_task(data, pushNotification):
 
             if data.get('category', 'Select Category') not in 'Select Category':
                 filter_list=UserProfile.objects.filter(sub_category=data.get('category', None)).values_list('user__pk', flat=True)
-                device = FCMDevice.objects.filter(user__pk__in=filter_list, user__st__language=lang, is_uninstalled=False)
+                if lang != '0':
+                    device = FCMDevice.objects.filter(user__pk__in=filter_list, user__st__language=lang, is_uninstalled=False)
+                else:
+                    device = FCMDevice.objects.filter(user__pk__in=filter_list, is_uninstalled=False)
             elif user_group == '8':
                 device = FCMDevice.objects.filter(user__pk=data.get('particular_user_id', None))
             elif user_group == '1':
@@ -75,10 +81,12 @@ def send_notifications_task(data, pushNotification):
                 filter_list = [39342, 1465, 2801, 19, 40, 328, 23, 3142, 1494, 41]
                 device = FCMDevice.objects.filter(user__pk__in=filter_list, is_uninstalled=False)
             elif user_group == '0':
-                device = FCMDevice.objects.filter(is_uninstalled=False, user__st__language=lang)
+                if lang != '0':
+                    device = FCMDevice.objects.filter(is_uninstalled=False, user__st__language=lang)
+                else:
+                    device = FCMDevice.objects.filter(is_uninstalled=False)
             else:
                 filter_list = []
-
 
                 if user_group == '3':
                     filter_list = VBseen.objects.distinct('user__pk').values_list('user__pk', flat=True)
@@ -105,19 +113,47 @@ def send_notifications_task(data, pushNotification):
                 device_after_slice = device_pagination.page(index)
                 logger.info(device_after_slice)
                 for each in device_after_slice:
-                    t = each.send_message(data={})
-                    device_list.append(t)
                     try:
                         PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2')
                     except:
                         pass
-                #t = device_after_slice.object_list.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk})
+                    t = each.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url})
+                    device_list.append(t)
                 #t = device_after_slice.object_list.send_message(data={'pupluar_data': 'true' })
                 logger.info(device_list)
             pushNotification.is_executed=True
             pushNotification.save()
     except Exception as e:
         logger.info(str(e))
+
+@app.task
+def vb_create_task(topic_id):
+    from forum.topic.models import Topic
+    from forum.topic.transcoder import transcode_media_file
+    topic = Topic.objects.get(pk=topic_id)
+    if not topic.is_transcoded:
+        if topic.is_vb and topic.question_video:
+            data_dump, m3u8_url, job_id = transcode_media_file(topic.question_video.split('s3.amazonaws.com/')[1])
+            if m3u8_url:
+                topic.backup_url = topic.question_video
+                topic.question_video = m3u8_url
+                topic.transcode_dump = data_dump
+                topic.transcode_job_id = job_id
+                # topic.is_transcoded = True
+                topic.save()
+                topic.update_m3u8_content()
+
+@app.task
+def user_ip_to_state_task(user_id,ip):
+    from forum.user.models import UserProfile
+    import urllib2
+    import json
+    userprofile = UserProfile.objects.filter(pk=user_id)
+    url = 'http://ip-api.com/json/'+ip
+    response = urllib2.urlopen(url).read()
+    json_response = json.loads(response)
+    userprofile.update(state_name = json_response['regionName'],city_name = json_response['city'])
+
 
 if __name__ == '__main__':
     app.start()
