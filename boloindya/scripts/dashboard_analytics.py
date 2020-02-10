@@ -559,15 +559,15 @@ def put_dau_data():
 			save_obj.count = tot_count
 			save_obj.save()	
 
-def put_bolo_action_data():
+# def put_bolo_action_data():
 
-	like_dict = dict()
-	share_dict = dict()
-	comments_dict dict()
+# 	like_dict = dict()
+# 	share_dict = dict()
+# 	comments_dict = dict()
 
-	all_data = BoloActionHistory.objects.all().exclude(user__st__is_test_user=True)
-	for item in all_data:
-		curr_action_type = item.
+# 	all_data = BoloActionHistory.objects.all().exclude(user__st__is_test_user=True)
+# 	for item in all_data:
+# 		curr_action_type = item.
 
 		
 def main():
