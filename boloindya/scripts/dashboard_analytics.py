@@ -238,7 +238,7 @@ def put_videos_created():
 			day_month_year_dict[curr_date].append(curr_videoid)
 		else:
 			day_month_year_dict[curr_date] = []
-			day_month_year_dict.append(curr_videoid)
+			day_month_year_dict[curr_date].append(curr_videoid)
 
 	
 	#print(len(day_month_year_dict))
@@ -254,9 +254,13 @@ def put_videos_created():
 		metrics = '0'
 		metrics_slab = ''
 		#print(metrics, metrics_slab, key, week_no, len(val))
-		save_obj = DashboardMetricsJarvis.objects.get(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
-		save_obj.count = len(val)
-		save_obj.save()
+		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
+		if(created):
+			save_obj.count = len(val)
+			save_obj.save()
+		else:
+			save_obj.count = len(val)
+			save_obj.save()
 
 		# save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
 		# if(created):
@@ -519,11 +523,11 @@ def main():
 
 	#put_share_data()
 	#put_installs_data()
-	#put_videos_created()
+	put_videos_created()
 	# put_video_views_data()
 	# put_video_creators()
 	#put_dau_data()
-	put_video_creators_analytics()
+	#put_video_creators_analytics()
 	#put_video_views_analytics()
 
 
