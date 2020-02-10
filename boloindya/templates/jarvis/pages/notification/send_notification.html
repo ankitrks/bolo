@@ -368,8 +368,13 @@
         var particular_user_id = $('#particular_user_id').val()
 
         if (particular_user_id != '') {
-            lang = '0'
+	    $('#lang').val('0');
+            lang = '0';
         }
+	if (((user_group == 'Installed but did not sign up till 3 hours') || (user_group == 'Installed and never signed up')) && lang == 'Select Language') {
+            $('#lang').val('0');
+            lang = '0';
+	}
 
         if (upper_title  == '') {
             $('#error_message').show()

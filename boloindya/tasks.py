@@ -37,11 +37,13 @@ def send_notifications_task(data, pushNotification):
         pushNotification.notification_type = notification_type
         pushNotification.user_group = user_group
         pushNotification.instance_id = id
-        pushNotification.days_ago=data.get('days_ago', '1')
+        if data.get('days_ago', '1'):
+            pushNotification.days_ago=data.get('days_ago', '1')
         if particular_user_id:
             pushNotification.particular_user_id=particular_user_id
         pushNotification.save()
     except Exception as e:
+        print(e)
         logger.info(str(e))
 
     try:
@@ -71,7 +73,7 @@ def send_notifications_task(data, pushNotification):
             elif user_group == '7':
                 #This list contains user IDs for test users: Gitesh, Abhishek, Varun, Maaz
                 # Anshika, Bhoomika and Akash
-                filter_list = [39342, 1465, 2801, 19, 40, 328, 23, 3142, 1494, 41]
+                filter_list = [39342, 1465, 2801, 19, 40, 328, 23, 3142, 1494, 41, 1491]
                 language_filter['user__pk__in']=filter_list
             elif user_group == '9':
                 hours_ago = datetime.now()-timedelta(days=int(data.get('days_ago', "1")))
@@ -105,19 +107,17 @@ def send_notifications_task(data, pushNotification):
             print(device)
             device_pagination = Paginator(device, 1000)
             device_list=[]
-            #for index in range(1, (device_pagination.num_pages+1)):
-                #device_after_slice = device_pagination.page(index)
-                #logger.info(device_after_slice)
-                #for each in device_after_slice:
-                    #try:
-                        #PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2')
-                    #except:
-                        #pass
-                    #t = each.send_message(data={})
+            for index in range(1, (device_pagination.num_pages+1)):
+                device_after_slice = device_pagination.page(index)
+                logger.info(device_after_slice)
+                for each in device_after_slice:
+                    try:
+                        PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2')
+                    except:
+                        pass
+                    t = each.send_message(data={})
                     #t = each.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url})
-                    #device_list.append(t)
-                #t = device_after_slice.object_list.send_message(data={'pupluar_data': 'true' })
-                #logger.info(device_list)
+                logger.info(device_list)
             pushNotification.is_executed=True
             pushNotification.save()
     except Exception as e:

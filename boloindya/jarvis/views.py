@@ -1061,7 +1061,7 @@ def notification_panel(request):
     filters = {'language': lang, 'notification_type': notification_type, 'user_group': user_group, 'is_scheduled': scheduled_status, 'title__icontains': title}
 
     pushNotifications = PushNotification.objects.filter(*[Q(**{k: v}) for k, v in filters.items() if v], is_removed=False).order_by('-created_at')
-    
+
     return render(request,'jarvis/pages/notification/index.html', {'pushNotifications': pushNotifications, \
         'language_options': language_options, 'notification_types': notification_type_options, \
             'user_group_options': user_group_options, 'language': lang, 'notification_type': notification_type, \
@@ -1074,9 +1074,8 @@ import datetime
 def send_notification(request):
 
     pushNotification = {}
-    
+
     if request.method == 'POST':
-        
         data = {}
 
         data['title'] = request.POST.get('title', "")
@@ -1091,8 +1090,8 @@ def send_notification(request):
         data['datepicker'] = request.POST.get('datepicker', '')
         data['timepicker'] = request.POST.get('timepicker', '').replace(" : ", ":")
         data['image_url'] = request.POST.get('image_url', '')
-        data['days_ago'] = request.POST.get('days_ago', '')
-        
+        data['days_ago'] = request.POST.get('days_ago', '1')
+
         send_notifications_task.delay(data, pushNotification)
         return redirect('/jarvis/notification_panel/')
     if request.method == 'GET':
