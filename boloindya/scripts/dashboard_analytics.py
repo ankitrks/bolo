@@ -68,13 +68,15 @@ def put_share_data():
 
 		metrics = '3'
 		metrics_slab = ''
-		#print(metrics, metrics_slab, key, week_no, len(val))
-
-
-		save_obj = DashboardMetricsJarvis.objects.get(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
-		print(metrics, metrics_slab, key, week_no, len(val))
-		save_obj.count = len(val)
-		save_obj.save()
+		save_obj, created = DashboardMetricsJarvis.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key week_no = week_no)
+		if(created):
+			print(metrics, metrics_slab, week_no, len(val))
+			save_obj.count = len(val)
+			save_obj.save()
+		else:
+			print(metrics, metrics_slab, week_no, len(val))
+			save_obj.count = len(val)
+			save_obj.save()	
 
 
 def put_installs_data():
@@ -109,15 +111,15 @@ def put_installs_data():
 
 		metrics = '5'
 		metrics_slab = '6'
-		save_obj = DashboardMetricsJarvis.objects.get(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
-		save_obj.count = len(val)
-		save_obj.save()
-
-		# save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no= week_no)
-		# if(created):
-		# 	print(metrics, metrics_slab, key, week_no, len(val))
-		# 	save_obj.count = len(val)
-		# 	save_obj.save()
+		save_obj, created = DashboardMetricsJarvis.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
+		if(created):
+			print(metrics, metrics_slab, key, week_no)
+			save_obj.count = len(val)
+			save_obj.save()
+		else:
+			print(metrics, metrics_slab, key, week_no)
+			save_obj.count = len(val)
+			save_obj.save()	
 	
 
 def put_video_views_data():
@@ -261,12 +263,15 @@ def put_videos_created():
 		else:
 			save_obj.count = len(val)
 			save_obj.save()
+<<<<<<< HEAD
 
 		# save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
 		# if(created):
 		# 	print(metrics, metrics_slab, key, week_no, len(val))
 		# 	save_obj.count = len(val)
 		# 	save_obj.save()
+=======
+>>>>>>> 57dcfd0432fc71e5ee0052171de88ab99043f3a7
 
 
 # number of video creators split according to date of signup and distributed into various slabs
@@ -393,7 +398,7 @@ def put_video_creators_analytics():
 	for item in all_data:
 		user_vb_count = int(item['vb_count'])
 		user_id = item['user']
-		user_details = UserProfile.objects.get(user = user_id)
+		user_details = UserProfile.objects.get(user = us er_id)
 		date_joined = user_details.user.date_joined
 		curr_year = date_joined.year 
 		curr_month = date_joined.month 
@@ -438,6 +443,7 @@ def put_video_creators_analytics():
 			save_obj.count = len(val)
 			save_obj.save()
 		else:
+			print(metrics, metrics_slab, datetime_key, week_no, len(val))
 			save_obj.count = len(val)
 			save_obj.save()	
 
@@ -514,13 +520,18 @@ def put_dau_data():
 		#print(metrics, metrics_slab, str_curr_date, week_no, t1+t2)
 		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date, week_no = week_no)
 		if(created):
-			print(curr_day, curr_month, curr_year, t1+t2)
+			print(metrics, metrics_slab, str_curr_date, week_no, tot_count)
 			save_obj.count = tot_count
 			save_obj.save()
+		else:
+			print(metrics, metrics_slab, str_curr_date, week_no, tot_count)
+			save_obj.count = tot_count
+			save_obj.save()	
 
 		
 def main():
 
+<<<<<<< HEAD
 	#put_share_data()
 	#put_installs_data()
 	put_videos_created()
@@ -529,6 +540,14 @@ def main():
 	#put_dau_data()
 	#put_video_creators_analytics()
 	#put_video_views_analytics()
+=======
+	put_share_data()
+	put_installs_data()
+	put_videos_created()
+	put_dau_data()
+	put_video_creators_analytics()
+	put_video_views_analytics()
+>>>>>>> 57dcfd0432fc71e5ee0052171de88ab99043f3a7
 
 
 def run():
