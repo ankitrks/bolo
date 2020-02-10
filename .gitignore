@@ -55,6 +55,8 @@ settings_local.py
 manage_local.py
 db.sqlite3
 static/
+solr/server/logs/
+solr/server/solr/boloindya/data/
 
 # Flask stuff:
 instance/
