@@ -585,7 +585,7 @@ def put_uniq_views_analytics():
 	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
 		print(dt)
 		str_date = str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day)
-		all_data = AndroidLogs.objects.filter(log_type = 'click2play', created_at__day = dt.day, created_at__month = dt.month, created_at__year = dt.year)
+		all_data = AndroidLogs.objects.filter(log_type = 'click2play', created_at__contains = str_date)
 		print("len of logs", len(all_data))
 		user_vid_mapping = dict()				# dict storing (user, vid) mapping for the day 
 		for item in all_data:
