@@ -558,22 +558,17 @@ def put_dau_data():
 		# t1 = ReferralCodeUsed.objects.filter(created_at__day= curr_day, created_at__month= curr_month, created_at__year= curr_year).count()
 		# t2 = AndroidLogs.objects.filter(created_at__day= curr_day, created_at__month= curr_month, created_at__year= curr_year).distinct('user').count()
 		# tot_count = t1 + t2
+		
 
-
-		# str_curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day)	
-		# metrics = '6'
-		# metrics_slab = ''
-		# #print(metrics, metrics_slab, str_curr_date, week_no, t1+t2)
-
-		# save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date, week_no = week_no)
-		# if(created):
-		# 	print(metrics, metrics_slab, str_curr_date, week_no, tot_count)
-		# 	save_obj.count = tot_count
-		# 	save_obj.save()
-		# else:
-		# 	print(metrics, metrics_slab, str_curr_date, week_no, tot_count)
-		# 	save_obj.count = tot_count
-		# 	save_obj.save()	
+		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date, week_no = week_no)
+		if(created):
+			print(metrics, metrics_slab, str_curr_date, week_no, tot_count)
+			save_obj.count = dau_count
+			save_obj.save()
+		else:
+			print(metrics, metrics_slab, str_curr_date, week_no, tot_count)
+			save_obj.count = dau_count
+			save_obj.save()	
 
 
 # put daily combo view of (user, vid) to be put in daily records
@@ -583,7 +578,7 @@ def put_uniq_views_analytics():
 	start_date = today + timedelta(days = -150)	
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
-		print(dt)
+		#print(dt)
 		str_date = str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day)
 		all_data = AndroidLogs.objects.filter(log_type = 'click2play', created_at__contains = str_date)
 		print("len of logs", len(all_data))
@@ -621,15 +616,15 @@ def put_uniq_views_analytics():
 		metrics_slab = ''
 		print(metrics, metrics_slab, str_date, week_no, tot_uniq_uvb_view_count)	
 
-		# save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_date, week_no = week_no)
-		# if(created):
-		# 	print(metrics, metrics_slab, str_date, week_no, len(set(user_view_dict)))
-		# 	save_obj.count = len(set(user_view_dict))
-		# 	save_obj.save()
-		# else:
-		# 	print(metrics, metrics_slab, str_date, week_no, len(set(user_view_dict)))	
-		# 	save_obj.count = len(set(user_view_dict))
-		# 	save_obj.save()	
+		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_date, week_no = week_no)
+		if(created):
+			print(metrics, metrics_slab, str_date, week_no, tot_uniq_uvb_view_count)
+			save_obj.count = tot_uniq_uvb_view_count
+			save_obj.save()
+		else:
+			print(metrics, metrics_slab, str_date, week_no, tot_uniq_uvb_view_count)	
+			save_obj.count = tot_uniq_uvb_view_count
+			save_obj.save()	
 
 					
 
