@@ -1508,7 +1508,7 @@ def statistics_all_jarvis(request):
 
     graph_data = DashboardMetricsJarvis.objects.exclude(date__gt = end_date).filter(Q(metrics = metrics) & Q(date__gte = start_date) & Q(date__lte = end_date))
     if metrics in ['4', '2', '5'] and slab:
-        if (metrics == '4' and slab in ['0', '1', '2']) or (metrics == '2' and slab in ['3', '4', '5'])\
+        if (metrics == '4' and slab in ['0', '1', '2', '']) or (metrics == '2' and slab in ['3', '4', '5'])\
                  or (metrics == '5' and slab in ['6', '7']):
             graph_data = graph_data.filter(metrics_slab = slab)
 
