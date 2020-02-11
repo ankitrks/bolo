@@ -134,7 +134,7 @@ def calc_playtime(unique_video_play, userid):
 				time_video_played = time_diff
 				#print(time_video_played)
 				#time_video_played = float(float(unique_video_play[i+1][1]) - float(unique_video_play[i][1])) /1000
-				media_details = Topic.objects.all().filter(id=curr_videoid)
+				media_details = Topic.objects.all().filter(id = curr_vid)
 				tot_playtime = media_details[0].media_duration
 				tot_playtime_sec = parse_duration(tot_playtime)
 
