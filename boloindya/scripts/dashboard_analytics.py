@@ -564,11 +564,11 @@ def put_dau_data():
 		
 		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date, week_no = week_no)
 		if(created):
-			print(metrics, metrics_slab, str_curr_date, week_no, tot_count)
+			print(metrics, metrics_slab, str_curr_date, week_no, dau_count)
 			save_obj.count = dau_count
 			save_obj.save()
 		else:
-			print(metrics, metrics_slab, str_curr_date, week_no, tot_count)
+			print(metrics, metrics_slab, str_curr_date, week_no, dau_count)
 			save_obj.count = dau_count
 			save_obj.save()	
 
