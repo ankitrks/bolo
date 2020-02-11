@@ -422,7 +422,7 @@ def put_video_creators_analytics():
 			else:
 				slab_1_dict[str_date] = []
 				slab_1_dict[str_date].append(user_id)
-		if(user_vb_count>1 and user_vb_count<5):
+		if(user_vb_count>0 and user_vb_count<5):
 			if(str_date in slab_0_dict):
 				slab_0_dict[str_date].append(user_id)
 			else:
@@ -559,7 +559,6 @@ def put_dau_data():
 		# t2 = AndroidLogs.objects.filter(created_at__day= curr_day, created_at__month= curr_month, created_at__year= curr_year).distinct('user').count()
 		# tot_count = t1 + t2
 		
-
 		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date, week_no = week_no)
 		if(created):
 			print(metrics, metrics_slab, str_curr_date, week_no, tot_count)
@@ -629,12 +628,6 @@ def put_uniq_views_analytics():
 					
 
 			
-
-		
-
-
-
-
 # def put_bolo_action_data():
 
 # 	like_dict = dict()
@@ -650,9 +643,9 @@ def main():
 
 
 	#put_share_data()
-	#put_installs_data()
+	put_installs_data()
 	put_dau_data()
-	#put_video_creators_analytics()
+	put_video_creators_analytics()
 	#put_video_views_analytics()
 	#put_videos_created()
 	put_uniq_views_analytics()
