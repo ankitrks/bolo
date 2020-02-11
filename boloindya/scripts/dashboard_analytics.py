@@ -535,6 +535,7 @@ def put_dau_data():
 		curr_year = dt.year 
 		str_curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day)
 
+
 		tot_data = ReferralCodeUsed.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year, by_user__isnull = True)
 		install_data = ReferralCodeUsed.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year, by_user__isnull = False)
 		#tot_data = ReferralCodeUsed.objects.filter(created_at__contains = str_curr_date, by_user__isnull = True)
@@ -545,8 +546,9 @@ def put_dau_data():
 		android_data = AndroidLogs.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year)
 
 		temp_data = android_data.exclude(user__in = install_data.values_list('by_user', flat = True))
-		dau_count = temp_data.distinct('user').count()
-		#print("date, count", dt, temp_data.distinct('user').count())
+		dau_count = temp_data.distinct('user').count() + tot_data.count()
+		print("date, count", dt, dau_count)
+
 
 		week_no = dt.isocalendar()[1]
 		if(curr_year == 2020):
@@ -558,7 +560,7 @@ def put_dau_data():
 		metrics_slab = ''
 		print(metrics, metrics_slab, str_curr_date, week_no, dau_count)
 
-		# t1 = ReferralCodeUsed.objects.filter(created_at__day= curr_day, created_at__month= curr_month, created_at__year= curr_year).count()
+		# t1 = ReferralCodeUsed.objects.filter(created_at__day= curr_day, created_at__month= curr_month, created_at__year= curr_year, by_user__isnull = True).count()
 		# t2 = AndroidLogs.objects.filter(created_at__day= curr_day, created_at__month= curr_month, created_at__year= curr_year).distinct('user').count()
 		# tot_count = t1 + t2
 		
@@ -654,7 +656,7 @@ def main():
 	#put_video_creators_analytics()
 	#put_video_views_analytics()
 	#put_videos_created()
-	put_uniq_views_analytics()
+	#put_uniq_views_analytics()
 
 	
 
