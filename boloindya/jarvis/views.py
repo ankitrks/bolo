@@ -1114,7 +1114,7 @@ def particular_notification(request, notification_id=None, status_id=2, page_no=
     has_prev=False
     if page_no > 0:
         has_prev=True
-    pushNotificationUser=PushNotificationUser.objects.filter(push_notification_id=pushNotification)
+    pushNotificationUser=PushNotificationUser.objects.filter(push_notification_id=pushNotification, status=status_id)
     pushNotificationUserSlice=pushNotificationUser[page_no*10:page_no*10+10]
     has_next=True
     if ((page_no*10)+10) >= len(pushNotificationUser):
@@ -1749,32 +1749,52 @@ def analytics(request):
 @api_view(['POST'])
 # view for notification search
 def search_notification(request):
-    from drf_spirit.serializers import CategoryWithTitleSerializer, CategoryVideoByteSerializer, UserWithNameSerializer, TongueTwisterWithHashSerializer
+    from drf_spirit.serializers import CategoryWithTitleSerializer, CategoryVideoByteSerializer, UserWithNameSerializer, TongueTwisterWithHashSerializer, TongueWithTitleSerializer
     from forum.topic.models import TongueTwister
     from django.db.models import Q
     raw_data = json.loads(request.body)
     query = raw_data['query']
     notification_type = raw_data['notification_type']
+    page=0
+    try:
+        page=int(raw_data['page'])
+    except:
+        page=0
     data = []
     try:
         if notification_type == '0':
-            topics=Topic.objects.filter(is_removed=False, is_vb=True, title__icontains=query)
-            data=CategoryVideoByteSerializer(topics, many=True).data
+            topics=[]
+            try:
+                int(query)
+                topics=Topic.objects.filter(Q(is_removed=False, is_vb=True, title__istartswith=query)|Q(pk=query)).order_by('title').distinct('pk')
+            except:
+                topics=Topic.objects.filter(is_removed=False, is_vb=True, title__istartswith=query).order_by('title')
+            data=TongueWithTitleSerializer(topics[page*100:(page*100)+100], many=True).data
         elif notification_type == '1':
-            users=UserProfile.objects.filter((Q(user__username__icontains=query)|Q(name__icontains=query)|Q(mobile_no__icontains=query))&Q(is_test_user=False))
+            users=[]
+            try:
+                int(query)
+                users=UserProfile.objects.filter((Q(user__username__istartswith=query)|Q(name__istartswith=query)|Q(mobile_no__istartswith=query)|Q(user__pk=query))&Q(is_test_user=False)).order_by('pk').distinct('pk')
+            except:
+                users=UserProfile.objects.filter((Q(user__username__istartswith=query)|Q(name__istartswith=query)|Q(mobile_no__istartswith=query))&Q(is_test_user=False)).order_by('pk').distinct('pk')
             data=UserWithNameSerializer(users, many=True).data
         elif notification_type == '2':
-            category=Category.objects.filter(title__icontains=query) 
+            category=[]
+            try:
+                int(query)
+                category=Category.objects.filter(Q(title__istartswith=query)|Q(pk=query))
+            except:
+                category=Category.objects.filter(title__istartswith=query)
             data=CategoryWithTitleSerializer(category, many=True).data
         elif notification_type == '3':
-            challenges=TongueTwister.objects.filter(hash_tag__icontains=query)
+            challenges=TongueTwister.objects.filter(hash_tag__istartswith=query.replace("#", ""))
             data=TongueTwisterWithHashSerializer(challenges, many=True).data
         else:
             data = []
         return JsonResponse({'data': data}, status=status.HTTP_200_OK)  
     except Exception as e:
         print(e)
-        return JsonResponse({'data': []}, status=status.HTTP_200_OK)
+        return JsonResponse({'data': [], 'error': str(e)}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def upload_image_notification(requests):

@@ -31,6 +31,9 @@ def send_notifications_task(data, pushNotification):
         particular_user_id=data.get('particular_user_id', None)
         category=data.get('category', '')
 
+        if notification_type == '3':
+            id=id.replace('#', '')
+
         pushNotification = PushNotification()
         pushNotification.title = upper_title
         pushNotification.description = title
@@ -124,8 +127,8 @@ def send_notifications_task(data, pushNotification):
                         PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2', device=each)
                     except:
                         pass
-                    #t = each.send_message(data={})
-                    t = each.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url})
+                    t = each.send_message(data={})
+                    #t = each.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url})
                 logger.info(device_list)
             pushNotification.is_executed=True
             pushNotification.save()
