@@ -623,7 +623,7 @@ class CategoryWithVideoSerializer(ModelSerializer):
         # paginator = Paginator(topics, page_size)
         # page = 1
         # topic_page = paginator.page(page)
-        return CategoryVideoByteSerializer(topics[:settings.REST_FRAMEWORK['PAGE_SIZE']], many=True,context={'is_expand':self.context.get("is_expand",False)}).data
+        return CategoryVideoByteSerializer(topics[:settings.REST_FRAMEWORK['PAGE_SIZE']], many=True,context={'is_expand':self.context.get("is_expand",True)}).data
 
 class VideoCompleteRateSerializer(ModelSerializer):
     class Meta:
