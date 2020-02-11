@@ -54,6 +54,7 @@ from forum.topic.models import Topic,TopicHistory, ShareTopic, Like, SocialShare
 from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
 from .serializers import *
 from tasks import vb_create_task,user_ip_to_state_task
+import copy
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -1221,7 +1222,7 @@ def createTopic(request):
             vb_create_task.delay(topic.id)
             # topic.update_vb()
             tag_list=title.split()
-            hash_tag = tag_list
+            hash_tag = copy.deepcopy(tag_list)
             if tag_list:
                 for index, value in enumerate(tag_list):
                     if value.startswith("#"):
@@ -1302,7 +1303,7 @@ def editTopic(request):
 
         if topic.user == request.user:
             tag_list=title.split()
-            hash_tag = tag_list
+            hash_tag = copy.deepcopy(tag_list)
             if tag_list:
                 for index, value in enumerate(tag_list):
                     if value.startswith("#"):
