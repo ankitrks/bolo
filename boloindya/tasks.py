@@ -29,7 +29,7 @@ def send_notifications_task(data, pushNotification):
         timepicker = data.get('timepicker', '').replace(" : ", ":")
         image_url = data.get('image_url', '')
         particular_user_id=data.get('particular_user_id', None)
-        category=data.get('category', 'Select Category')
+        category=data.get('category', '')
 
         pushNotification = PushNotification()
         pushNotification.title = upper_title
@@ -59,7 +59,7 @@ def send_notifications_task(data, pushNotification):
             exclude_filter = {}
             if lang != '0':
                 language_filter = { 'user__st__language': lang, 'is_uninstalled': False}
-            if category not in 'Select Category':
+            if category:
                 try:
                     pushNotification.category=Category.objects.get(pk=category)
                     pushNotification.save()
