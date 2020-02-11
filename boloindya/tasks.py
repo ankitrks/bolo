@@ -67,17 +67,21 @@ def send_notifications_task(data, pushNotification):
                     logger.info(str(e))
                 language_filter['user__st__sub_category']=data.get('category', None)
             if user_group == '8':
+                language_filter = {'is_uninstalled': False}
                 language_filter['user__pk']=data.get('particular_user_id', None)
             elif user_group == '1':
                 end_date = datetime.today()
                 start_date = end_date - timedelta(hours=3)
+                language_filter = {'is_uninstalled': False}
                 language_filter['user__isnull']=True
                 language_filter['created_at__range']=(start_date, end_date)
             elif user_group == '2':
+                language_filter = {'is_uninstalled': False}
                 language_filter['user__isnull']=True
             elif user_group == '7':
                 #This list contains user IDs for test users: Gitesh, Abhishek, Varun, Maaz
                 # Anshika, Bhoomika and Akash
+                language_filter = {'is_uninstalled': False}
                 filter_list = [39342, 1465, 2801, 19, 40, 328, 23, 3142, 1494, 41, 1491]
                 language_filter['user__pk__in']=filter_list
             elif user_group == '9':
