@@ -12,6 +12,7 @@ def send_notifications_task(data, pushNotification):
     #Import files for notification
     from datetime import datetime, timedelta
     from forum.topic.models import Topic, VBseen
+    from forum.category.models import Category
     from drf_spirit.models import UserLogStatistics
     from jarvis.models import PushNotification, FCMDevice, PushNotificationUser
     from django.core.paginator import Paginator
@@ -28,6 +29,7 @@ def send_notifications_task(data, pushNotification):
         timepicker = data.get('timepicker', '').replace(" : ", ":")
         image_url = data.get('image_url', '')
         particular_user_id=data.get('particular_user_id', None)
+        category=data.get('category', '')
 
         pushNotification = PushNotification()
         pushNotification.title = upper_title
@@ -43,7 +45,6 @@ def send_notifications_task(data, pushNotification):
             pushNotification.particular_user_id=particular_user_id
         pushNotification.save()
     except Exception as e:
-        print(e)
         logger.info(str(e))
 
     try:
@@ -58,21 +59,29 @@ def send_notifications_task(data, pushNotification):
             exclude_filter = {}
             if lang != '0':
                 language_filter = { 'user__st__language': lang, 'is_uninstalled': False}
-
-            if data.get('category', 'Select Category') not in 'Select Category':
+            if category:
+                try:
+                    pushNotification.category=Category.objects.get(pk=category)
+                    pushNotification.save()
+                except Exception as e:
+                    logger.info(str(e))
                 language_filter['user__st__sub_category']=data.get('category', None)
             if user_group == '8':
+                language_filter = {'is_uninstalled': False}
                 language_filter['user__pk']=data.get('particular_user_id', None)
             elif user_group == '1':
                 end_date = datetime.today()
                 start_date = end_date - timedelta(hours=3)
+                language_filter = {'is_uninstalled': False}
                 language_filter['user__isnull']=True
                 language_filter['created_at__range']=(start_date, end_date)
             elif user_group == '2':
+                language_filter = {'is_uninstalled': False}
                 language_filter['user__isnull']=True
             elif user_group == '7':
                 #This list contains user IDs for test users: Gitesh, Abhishek, Varun, Maaz
                 # Anshika, Bhoomika and Akash
+                language_filter = {'is_uninstalled': False}
                 filter_list = [39342, 1465, 2801, 19, 40, 328, 23, 3142, 1494, 41, 1491]
                 language_filter['user__pk__in']=filter_list
             elif user_group == '9':
@@ -112,11 +121,11 @@ def send_notifications_task(data, pushNotification):
                 logger.info(device_after_slice)
                 for each in device_after_slice:
                     try:
-                        PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2')
+                        PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2', device=each)
                     except:
                         pass
-                    t = each.send_message(data={})
-                    #t = each.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url})
+                    #t = each.send_message(data={})
+                    t = each.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url})
                 logger.info(device_list)
             pushNotification.is_executed=True
             pushNotification.save()
