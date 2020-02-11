@@ -36,7 +36,7 @@
                         {% for pushNotification in pushNotificationUser %}
                             <tr>
                                 <td>{{ forloop.counter }}</td>
-                                <td>{{ pushNotification.user.username }}</td>
+                                <td>{% if pushNotification.user %}{{ pushNotification.user.username }}{% else %}{{ pushNotification.device.dev_id }}{% endif %}</td>
                                 <td>{{ pushNotification.user }}</td>
                                 <td style="color: {% if pushNotification.status == 0 %} #b52828 {% else %} #1989cd {% endif %}">{% get_notification_status pushNotification.status %}</td>
                             </tr>
@@ -46,7 +46,7 @@
                             {% if pushNotification.status == '1' or pushNotification.status == '0' %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td>{{ pushNotification.user.username }}</td>
+                                    <td>{% if pushNotification.user %}{{ pushNotification.user.username }}{% else %}{{ pushNotification.device.dev_id }}{% endif %}</td>
                                     <td>{{ pushNotification.user }}</td>
                                     <td style="color: {% if pushNotification.status == 0 %} #b52828 {% else %} #1989cd {% endif %}">{% get_notification_status pushNotification.status %}</td>
                                 </tr>
@@ -57,7 +57,7 @@
                             {% if pushNotification.status == '1' %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td>{{ pushNotification.user.username }}</td>
+                                    <td>{% if pushNotification.user %}{{ pushNotification.user.username }}{% else %}{{ pushNotification.device.dev_id }}{% endif %}</td>
                                     <td>{{ pushNotification.user }}</td>
                                     <td style="color: {% if pushNotification.status == 0 %} #b52828 {% else %} #1989cd {% endif %}">{% get_notification_status pushNotification.status %}</td>
                                 </tr>
@@ -66,7 +66,7 @@
                     {% endif %}
                 </tbody>
             </table>
-            {% if has_prev %}<a href="https://stage.boloindya.com/jarvis/particular_notification/{{notification_id}}/{{status_id}}/{{ prev_page_no }}" >Prev</a>{% endif %} {{ current_page }} of {{ total_page }} pages {% if has_next %}<a href="https://stage.boloindya.com/jarvis/particular_notification/{{notification_id}}/{{status_id}}/{{ page_no }}" >Next</a>{% endif %}
+            {% if has_prev %}<a href="/jarvis/particular_notification/{{notification_id}}/{{status_id}}/{{ prev_page_no }}" >Prev</a>{% endif %} {{ current_page }} of {{ total_page }} pages {% if has_next %}<a href="/jarvis/particular_notification/{{notification_id}}/{{status_id}}/{{ page_no }}" >Next</a>{% endif %}
         </div>
     </div>
 {% endblock content %} 

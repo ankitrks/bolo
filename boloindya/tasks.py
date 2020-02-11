@@ -12,6 +12,7 @@ def send_notifications_task(data, pushNotification):
     #Import files for notification
     from datetime import datetime, timedelta
     from forum.topic.models import Topic, VBseen
+    from forum.category.models import Category
     from drf_spirit.models import UserLogStatistics
     from jarvis.models import PushNotification, FCMDevice, PushNotificationUser
     from django.core.paginator import Paginator
@@ -28,6 +29,7 @@ def send_notifications_task(data, pushNotification):
         timepicker = data.get('timepicker', '').replace(" : ", ":")
         image_url = data.get('image_url', '')
         particular_user_id=data.get('particular_user_id', None)
+        category=data.get('category', 'Select Category')
 
         pushNotification = PushNotification()
         pushNotification.title = upper_title
@@ -43,7 +45,6 @@ def send_notifications_task(data, pushNotification):
             pushNotification.particular_user_id=particular_user_id
         pushNotification.save()
     except Exception as e:
-        print(e)
         logger.info(str(e))
 
     try:
@@ -58,8 +59,12 @@ def send_notifications_task(data, pushNotification):
             exclude_filter = {}
             if lang != '0':
                 language_filter = { 'user__st__language': lang, 'is_uninstalled': False}
-
-            if data.get('category', 'Select Category') not in 'Select Category':
+            if category not in 'Select Category':
+                try:
+                    pushNotification.category=Category.objects.get(pk=category)
+                    pushNotification.save()
+                except Exception as e:
+                    logger.info(str(e))
                 language_filter['user__st__sub_category']=data.get('category', None)
             if user_group == '8':
                 language_filter['user__pk']=data.get('particular_user_id', None)
@@ -112,11 +117,11 @@ def send_notifications_task(data, pushNotification):
                 logger.info(device_after_slice)
                 for each in device_after_slice:
                     try:
-                        PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2')
+                        PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2', device=each)
                     except:
                         pass
-                    t = each.send_message(data={})
-                    #t = each.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url})
+                    #t = each.send_message(data={})
+                    t = each.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url})
                 logger.info(device_list)
             pushNotification.is_executed=True
             pushNotification.save()

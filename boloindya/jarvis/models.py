@@ -234,10 +234,11 @@ class PushNotification(RecordTimeStamp):
     days_ago = models.PositiveIntegerField(null=True,blank=True,default=0)
     particular_user_id=models.CharField(_('particular_user_id'),max_length=20,null=True,blank=True)
     repeated_hour = models.PositiveIntegerField(null=True,blank=True,default=0)
-    
+
 class PushNotificationUser(RecordTimeStamp):
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='push_notification_user',editable=False)
+    user=models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='push_notification_user',editable=False)
+    device=models.ForeignKey(FCMDevice, blank = True, null = True, related_name='push_notification_device',editable=False)
     push_notification_id = models.ForeignKey(PushNotification, blank = True, null = True, related_name='push_notification_id',editable=False)
     status = models.CharField(choices=status_options, blank = True, null = True, max_length=10, default='0')
 
