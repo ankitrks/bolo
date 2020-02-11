@@ -535,12 +535,15 @@ def put_dau_data():
 		curr_year = dt.year 
 		str_curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day)
 
-		tot_data = ReferralCodeUsed.objects.filter(created_at__contains = str_curr_date, by_user__isnull = True)
-		install_data = ReferralCodeUsed.objects.filter(created_at__contains = str_curr_date, by_user__isnull = False)
+		tot_data = ReferralCodeUsed.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year, by_user__isnull = True)
+		install_data = ReferralCodeUsed.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year, by_user__isnull = False)
+		#tot_data = ReferralCodeUsed.objects.filter(created_at__contains = str_curr_date, by_user__isnull = True)
+		#install_data = ReferralCodeUsed.objects.filter(created_at__contains = str_curr_date, by_user__isnull = False)
 		excluded_data = tot_data.exclude(android_id__in = install_data.values_list('android_id', flat = True))
 		#print(len(excluded_data))
 		excluded_data_list = excluded_data.values_list('by_user', flat = True)
-		android_data = AndroidLogs.objects.filter(created_at__contains = str_curr_date)
+		android_data = AndroidLogs.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year)
+
 		temp_data = android_data.exclude(user__in = install_data.values_list('by_user', flat = True))
 		dau_count = temp_data.distinct('user').count()
 		#print("date, count", dt, temp_data.distinct('user').count())
@@ -578,8 +581,11 @@ def put_uniq_views_analytics():
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
 		#print(dt)
+		curr_day = dt.day 
+		curr_month = dt.month 
+		curr_year = dt.year 
 		str_date = str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day)
-		all_data = AndroidLogs.objects.filter(log_type = 'click2play', created_at__contains = str_date)
+		all_data = AndroidLogs.objects.filter(log_type = 'click2play', created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year)
 		print("len of logs", len(all_data))
 		user_vid_mapping = dict()				# dict storing (user, vid) mapping for the day 
 		for item in all_data:
@@ -643,9 +649,9 @@ def main():
 
 
 	#put_share_data()
-	put_installs_data()
+	#put_installs_data()
 	put_dau_data()
-	put_video_creators_analytics()
+	#put_video_creators_analytics()
 	#put_video_views_analytics()
 	#put_videos_created()
 	put_uniq_views_analytics()
