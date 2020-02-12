@@ -538,7 +538,7 @@ def put_dau_data():
 
 		null_data = ReferralCodeUsed.objects.filter((Q(android_id=None) | Q(android_id = '')) &  Q(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year))
 		all_data = ReferralCodeUsed.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year)
-		not_null_data = all_data.exclude((Q(android_id=None) | Q(android_id = '')) &  Q(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year))
+		not_null_data = all_data.exclude((Q(android_id=None) | Q(android_id = '')))
 		id_list_1 = not_null_data.values_list('by_user', flat = True)
 		id_list_2 = AndroidLogs.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_day).distinct('user')
 		id_list_1_set = set(id_list_1)
