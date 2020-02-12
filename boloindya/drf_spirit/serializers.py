@@ -616,7 +616,7 @@ class CategoryWithVideoSerializer(ModelSerializer):
         if all_seen_post:
             for each_id in all_seen_vb:
                 for each_vb in all_seen_post:
-                    if each_vb.id == int(each_id):
+                    if each_vb.id == each_id:
                         orderd_all_seen_post.append(each_vb)
         topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
         # page_size = 15

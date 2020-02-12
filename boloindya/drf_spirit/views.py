@@ -405,7 +405,7 @@ class VBList(generics.ListCreateAPIView):
                         if all_seen_post:
                             for each_id in all_seen_vb:
                                 for each_vb in all_seen_post:
-                                    if each_vb.id == int(each_id):
+                                    if each_vb.id == each_id:
                                         orderd_all_seen_post.append(each_vb)
                         # print "####",superstar_post,popular_user_post,popular_post,normal_user_post,other_post,orderd_all_seen_post,"####"
                         topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
@@ -442,7 +442,7 @@ class VBList(generics.ListCreateAPIView):
                         if all_seen_post:
                             for each_id in all_seen_vb:
                                 for each_vb in all_seen_post:
-                                    if each_vb.id == int(each_id):
+                                    if each_vb.id == each_id:
                                         orderd_all_seen_post.append(each_vb)
                         # print "####",superstar_post,popular_user_post,popular_post,normal_user_post,other_post,orderd_all_seen_post,"####",all_seen_vb
                         topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
@@ -479,7 +479,7 @@ class VBList(generics.ListCreateAPIView):
                         if all_seen_post:
                             for each_id in all_seen_vb:
                                 for each_vb in all_seen_post:
-                                    if each_vb.id == int(each_id):
+                                    if each_vb.id == each_id:
                                         orderd_all_seen_post.append(each_vb)
                         topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
                     else:
@@ -510,7 +510,7 @@ class VBList(generics.ListCreateAPIView):
                         if all_seen_post:
                             for each_id in all_seen_vb:
                                 for each_vb in all_seen_post:
-                                    if each_vb.id == int(each_id):
+                                    if each_vb.id == each_id:
                                         orderd_all_seen_post.append(each_vb)
                         topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
                     # else:
@@ -560,7 +560,7 @@ class GetChallenge(generics.ListCreateAPIView):
         if all_seen_post:
             for each_id in all_seen_vb:
                 for each_vb in all_seen_post:
-                    if each_vb.id == int(each_id):
+                    if each_vb.id == each_id:
                         orderd_all_seen_post.append(each_vb)
         topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
 
@@ -3086,7 +3086,7 @@ def get_category_with_video_bytes(request):
             if all_seen_post:
                 for each_id in all_seen_vb:
                     for each_vb in all_seen_post:
-                        if each_vb.id == int(each_id):
+                        if each_vb.id == each_id:
                             orderd_all_seen_post.append(each_vb)
             topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
             try:
@@ -3150,7 +3150,7 @@ def get_category_video_bytes(request):
             if all_seen_post:
                 for each_id in all_seen_vb:
                     for each_vb in all_seen_post:
-                        if each_vb.id == int(each_id):
+                        if each_vb.id == each_id:
                             orderd_all_seen_post.append(each_vb)
             topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
         # paginator = PageNumberPagination()
@@ -3193,7 +3193,7 @@ def get_popular_video_bytes(request):
         if all_seen_post:
             for each_id in all_seen_vb:
                 for each_vb in all_seen_post:
-                    if each_vb.id == int(each_id):
+                    if each_vb.id == each_id:
                         orderd_all_seen_post.append(each_vb)
         
         topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
@@ -3263,7 +3263,7 @@ def get_recent_videos(request):
         if all_seen_post:
             for each_id in all_seen_vb:
                 for each_vb in all_seen_post:
-                    if each_vb.id == int(each_id):
+                    if each_vb.id == each_id:
                         orderd_all_seen_post.append(each_vb)
         topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
         topics = paginator_topics.paginate_queryset(topics, request)
