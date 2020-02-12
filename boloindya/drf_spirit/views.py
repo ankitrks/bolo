@@ -891,6 +891,7 @@ class SearchUser(BoloIndyaGenericAPIView):
         search_term = self.request.GET.get('term')
         page = request.GET.get('page',1)
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
+        users = []
         if search_term:
             print search_term
             sqs = SearchQuerySet().models(UserProfile).raw_search(search_term)
