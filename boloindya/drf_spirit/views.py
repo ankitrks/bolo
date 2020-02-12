@@ -908,7 +908,7 @@ class SearchUser(BoloIndyaGenericAPIView):
             # users = User.objects.filter( Q(username__icontains = search_term) | Q(st__name__icontains = search_term) | Q(first_name__icontains = search_term) | \
             #        Q(last_name__icontains = search_term) )
             next_page_number = page+1 if page_size*page<len(sqs) else ''
-            response ={"count":len(sqs),"results":UserSerializer(users,many=True).data,"next_page_number":next_page_number} 
+            response ={"count":len(sqs),"results":UserSerializer(User.objects.filter(st__in=users),many=True).data,"next_page_number":next_page_number} 
         return JsonResponse(response, safe = False)
 
 
