@@ -3,6 +3,7 @@
 from forum.user.models import AndroidLogs, VideoPlaytime, VideoCompleteRate, UserAppTimeSpend, ReferralCodeUsed, UserProfile
 from drf_spirit.models import UserJarvisDump, UserLogStatistics, ActivityTimeSpend, VideoDetails,UserTimeRecord, UserVideoTypeDetails
 from forum.topic.models import Topic, BoloActionHistory
+from jarvis.models import FCMDevice
 from django.db.models import Count
 import time
 import ast 
@@ -80,7 +81,7 @@ def put_share_data():
 			save_obj.save()	
 
 
-def put_installs_data():
+def  put_installs_data():
 
 	user_install_dict = dict()
 	all_data = ReferralCodeUsed.objects.filter(by_user__isnull = True)
@@ -538,15 +539,20 @@ def put_dau_data():
 
 		null_data = ReferralCodeUsed.objects.filter((Q(android_id=None) | Q(android_id = '')) &  Q(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year))
 		all_data = ReferralCodeUsed.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year)
-		not_null_data = all_data.exclude((Q(android_id=None) | Q(android_id = '')))
-		id_list_1 = not_null_data.values_list('by_user', flat = True)
-		id_list_2 = AndroidLogs.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_day).distinct('user')
-		id_list_1_set = set(id_list_1)
-		id_list_2_set = set(id_list_2)
-		id_list_common = id_list_1_set.intersection(id_list_2_set)
-		print(dt, len(id_list_common) + null_data.count())
-		dau_count = len(id_list_common) + null_data.count()
+		user_null_data = all_data.exclude((Q(android_id=None) | Q(android_id = '')) & Q(by_user__isnull=False)).values_list('android_id', flat=True).order_by('android_id').distinct('android_id')
+		# not_null_data = all_data.exclude((Q(android_id=None) | Q(android_id = '')) & Q(android_id__in=user_null_data))
+		# id_list_1 = not_null_data.values_list('by_user', flat = True)
+		id_list_2 = AndroidLogs.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_day).order_by('user').distinct('user').values_list('user__pk', flat=True)
+		id_list_3 = FCMDevice.objects.filter(user__pk__in = id_list_2).values_list('dev_id', flat = True)
+		dau_count = null_data.count() + id_list_3.count() + user_null_data.count() + id_list_2.count()
+		print(null_data.count() + id_list_3.count() + id_list_2.count() + user_null_data.count())
 
+
+		#print(id_list_1.count(), id_list_2.count())
+		#id_list_concat = list(id_list_1) + list(id_list_2)
+
+		#print(dt, len(set(id_list_concat)) + null_data.count())
+		
 		# tot_data = ReferralCodeUsed.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year, by_user__isnull = True)
 		# install_data = ReferralCodeUsed.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year, by_user__isnull = False)
 		# #tot_data = ReferralCodeUsed.objects.filter(created_at__contains = str_curr_date, by_user__isnull = True)
@@ -575,22 +581,22 @@ def put_dau_data():
 		# t2 = AndroidLogs.objects.filter(created_at__day= curr_day, created_at__month= curr_month, created_at__year= curr_year).distinct('user').count()
 		# tot_count = t1 + t2
 		
-		# save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date, week_no = week_no)
-		# if(created):
-		# 	print(metrics, metrics_slab, str_curr_date, week_no, dau_count)
-		# 	save_obj.count = dau_count
-		# 	save_obj.save()
-		# else:
-		# 	print(metrics, metrics_slab, str_curr_date, week_no, dau_count)
-		# 	save_obj.count = dau_count
-		# 	save_obj.save()	           
+		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date, week_no = week_no)
+		if(created):
+			print(metrics, metrics_slab, str_curr_date, week_no, dau_count)
+			save_obj.count = dau_count
+			save_obj.save()
+		else:
+			print(metrics, metrics_slab, str_curr_date, week_no, dau_count)
+			save_obj.count = dau_count
+			save_obj.save()	           
 
 
 # put daily combo view of (user, vid) to be put in daily records
 def put_uniq_views_analytics():
 
 	today = datetime.now()
-	start_date = today + timedelta(days = -150)	
+	start_date = today + timedelta(days = -180)	
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
 		#print(dt)
@@ -660,14 +666,13 @@ def put_uniq_views_analytics():
 		
 def main():
 
-
-	#put_share_data()
-	#put_installs_data()
+	# put_share_data()
+	# put_installs_data()
 	put_dau_data()
-	#put_video_creators_analytics()
-	#put_video_views_analytics()
-	#put_videos_created()
-	#put_uniq_views_analytics()
+	# put_video_creators_analytics()
+	# put_video_views_analytics()
+	# put_videos_created()
+	# put_uniq_views_analytics()
 
 	
 
