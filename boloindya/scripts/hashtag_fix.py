@@ -8,18 +8,18 @@ from HTMLParser import HTMLParser
 
 def run():
 
-    class MLStripper(HTMLParser):                                      
-        def __init__(self):                    
-            self.reset()                                             
-            self.fed = []                     
-        def handle_data(self, d):      
-            self.fed.append(d)        
-        def get_data(self):         
-            return ''.join(self.fed)                                                           
-                                                             
-    def strip_tags(html):                                      
-        s = MLStripper()                                         
-        s.feed(html)                                           
+    class MLStripper(HTMLParser):
+        def __init__(self):
+            self.reset()
+            self.fed = []
+        def handle_data(self, d):
+            self.fed.append(d)
+        def get_data(self):
+            return ''.join(self.fed)
+
+    def strip_tags(html):
+        s = MLStripper()
+        s.feed(html)
         return s.get_data()
 
     def find(string, char):
@@ -53,23 +53,41 @@ def run():
         return string
 
     TongueTwister.objects.all().update(hash_counter=0)
+    topic_remove = 0
+    all_topic = Topic.objects.exclude(hash_tags=None)
+    for each_topic in all_topic:
+        print "#######################topic_remove   ",topic_remove,"/",len(all_topic),"      ##########################"
+        topic_remove+=1
+        if each_topic.hash_tags.all():
+            for each_tag in each_topic.hash_tags.all():
+                    each_topic.hash_tags.remove(each_tag)
+    comment_remove = 0
+    all_comment = Comment.objects.exclude(hash_tags=None)
+    for each_comment in all_comment:
+        print "#######################comment_remove   ",comment_remove,"/",len(all_comment),"      ##########################"
+        comment_remove+=1
+        if each_comment.hash_tags.all():
+            for each_tag in each_comment.hash_tags.all():
+                    each_comment.hash_tags.remove(each_tag)
+
 
     post_counter = 0
-    all_topics = Topic.objects.all()
+    all_topics = Topic.objects.filter(title__icontains="#")
     for each_topic in all_topics:
-        print "#######################   ",post_counter,"/",len(all_topics),"      ##########################"
+        print "#######################post_counter   ",post_counter,"/",len(all_topics),"      ##########################"
         # print each_topic.title   
-        # print check_space_before_hash(strip_tags(each_topic.title))                                                                                                              
+        # print check_space_before_hash(strip_tags(each_topic.title))
         title = check_space_before_hash(strip_tags(each_topic.title))
         Topic.objects.filter(pk=each_topic.id).update(title=title)
         post_counter+=1
 
     comment_counter = 0
-    all_comments = Comment.objects.all()
+    all_comments = Comment.objects.filter(Q(comment__icontains="#")|Q(comment_html__icontains="#")|Q(comment__icontains="@")|Q(comment_html__icontains="@"))
+
     for each_comment in all_comments:
         # print each_comment.comment_html
         # print check_space_before_hash(strip_tags(each_comment.comment_html))
-        print "#######################   ",comment_counter,"/",len(all_comments),"      ##########################"
+        print "#######################all_comments   ",comment_counter,"/",len(all_comments),"      ##########################"
         comment_html = check_space_before_hash(strip_tags(each_comment.comment_html))
         comment = check_space_before_hash(strip_tags(each_comment.comment_html))
         Comment.objects.filter(pk=each_comment.id).update(comment_html=comment_html,comment=comment)
@@ -78,7 +96,7 @@ def run():
     topic_hash_tag_counter = 0
     all_topics = Topic.objects.filter(title__icontains="#")
     for each_topic in all_topics:
-        print "#######################   ",topic_hash_tag_counter,"/",len(all_topics),"      ##########################"
+        print "#######################topic_hash_tag_counter   ",topic_hash_tag_counter,"/",len(all_topics),"      ##########################"
         topic_hash_tag_counter+=1
         try:
             title = each_topic.title
@@ -101,11 +119,11 @@ def run():
             
 
 
-    all_comment = Comment.objects.filter(comment__icontains="#",comment_html__icontains="#")
+    all_comment = Comment.objects.filter(Q(comment__icontains="#")|Q(comment_html__icontains="#"))
     regex = r"#\w+"
     comment_hash_tag_counter = 0
     for each_comment in all_comment:
-        print "#######################   ",comment_hash_tag_counter,"/",len(all_comment),"      ##########################"
+        print "#######################comment_hash_tag_counter   ",comment_hash_tag_counter,"/",len(all_comment),"      ##########################"
         comment_hash_tag_counter+=1
         try:
             comment = each_comment.comment
@@ -126,10 +144,10 @@ def run():
         except Exception as e:
             print e
 
-    all_comments = Comment.objects.filter(comment__icontains="@",comment_html__icontains="@")
+    all_comments = Comment.objects.filter(Q(comment__icontains="@")|Q(comment_html__icontains="@"))
     comment_mention_counter = 0
     for each_comment in all_comments:
-        print "#######################   ",comment_mention_counter,"/",len(all_comments),"      ##########################"
+        print "#######################comment_mention_counter   ",comment_mention_counter,"/",len(all_comments),"      ##########################"
         comment_mention_counter+=1
         comment =each_comment.comment
         try:
