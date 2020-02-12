@@ -19,6 +19,7 @@ import csv
 import pytz 
 import pandas as pd 
 import dateutil.parser 
+from django.db.models import Q
 local_tz = pytz.timezone("Asia/Kolkata")
 import sys
 import django
@@ -535,19 +536,29 @@ def put_dau_data():
 		curr_year = dt.year 
 		str_curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day)
 
+		null_data = ReferralCodeUsed.objects.filter((Q(android_id=None) | Q(android_id = '')) &  Q(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year))
+		all_data = ReferralCodeUsed.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year)
+		not_null_data = all_data.exclude((Q(android_id=None) | Q(android_id = '')) &  Q(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year))
+		id_list_1 = not_null_data.values_list('by_user', flat = True)
+		id_list_2 = AndroidLogs.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_day).distinct('user')
+		id_list_1_set = set(id_list_1)
+		id_list_2_set = set(id_list_2)
+		id_list_common = id_list_1_set.intersection(id_list_2_set)
+		print(dt, len(id_list_common) + null_data.count())
+		dau_count = len(id_list_common) + null_data.count()
 
-		tot_data = ReferralCodeUsed.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year, by_user__isnull = True)
-		install_data = ReferralCodeUsed.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year, by_user__isnull = False)
-		#tot_data = ReferralCodeUsed.objects.filter(created_at__contains = str_curr_date, by_user__isnull = True)
-		#install_data = ReferralCodeUsed.objects.filter(created_at__contains = str_curr_date, by_user__isnull = False)
-		excluded_data = tot_data.exclude(android_id__in = install_data.values_list('android_id', flat = True))
-		#print(len(excluded_data))
-		excluded_data_list = excluded_data.values_list('by_user', flat = True)
-		android_data = AndroidLogs.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year)
+		# tot_data = ReferralCodeUsed.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year, by_user__isnull = True)
+		# install_data = ReferralCodeUsed.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year, by_user__isnull = False)
+		# #tot_data = ReferralCodeUsed.objects.filter(created_at__contains = str_curr_date, by_user__isnull = True)
+		# #install_data = ReferralCodeUsed.objects.filter(created_at__contains = str_curr_date, by_user__isnull = False)
+		# excluded_data = tot_data.exclude(android_id__in = install_data.values_list('android_id', flat = True))
+		# #print(len(excluded_data))
+		# excluded_data_list = excluded_data.values_list('by_user', flat = True)
+		# android_data = AndroidLogs.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year)
 
-		temp_data = android_data.exclude(user__in = install_data.values_list('by_user', flat = True))
-		dau_count = temp_data.distinct('user').count() + tot_data.count()
-		print("date, count", dt, dau_count)
+		# temp_data = android_data.exclude(user__in = install_data.values_list('by_user', flat = True))
+		# dau_count = temp_data.distinct('user').count() + tot_data.count()
+		# print("date, count", dt, dau_count)
 
 
 		week_no = dt.isocalendar()[1]
@@ -564,15 +575,15 @@ def put_dau_data():
 		# t2 = AndroidLogs.objects.filter(created_at__day= curr_day, created_at__month= curr_month, created_at__year= curr_year).distinct('user').count()
 		# tot_count = t1 + t2
 		
-		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date, week_no = week_no)
-		if(created):
-			print(metrics, metrics_slab, str_curr_date, week_no, dau_count)
-			save_obj.count = dau_count
-			save_obj.save()
-		else:
-			print(metrics, metrics_slab, str_curr_date, week_no, dau_count)
-			save_obj.count = dau_count
-			save_obj.save()	
+		# save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date, week_no = week_no)
+		# if(created):
+		# 	print(metrics, metrics_slab, str_curr_date, week_no, dau_count)
+		# 	save_obj.count = dau_count
+		# 	save_obj.save()
+		# else:
+		# 	print(metrics, metrics_slab, str_curr_date, week_no, dau_count)
+		# 	save_obj.count = dau_count
+		# 	save_obj.save()	           
 
 
 # put daily combo view of (user, vid) to be put in daily records
