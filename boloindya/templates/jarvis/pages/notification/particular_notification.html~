@@ -1,0 +1,89 @@
+{% extends "jarvis/layout/base.html" %}
+{% load push_notification_tag %}
+{% block content %}
+<style>
+    .filter_notification {
+        padding: 10px;
+    }
+    #search_title_input {
+        margin-left: 10px;
+        margin-right: 10px;
+        width: 400px;
+    }
+    .operation {
+        margin-left: 5px;
+        margin-right: 5px;
+    }
+    #box {
+        background: white;
+        font-size: 1.6rem;
+        padding: 20px;
+    }
+</style>
+    <div class="row" style="padding: 10px;">
+        <div class="col-md-12 filter_notification">
+            <a href="/jarvis/send_notification/" class="btn btn-primary">Create New</a>
+            <input type="text" placeholder="Search Title" class="btn" id="search_title_input"/>
+            <button class="btn btn-info">Export CSV</button>
+        </div>
+        <div class="col-md-12" id="box">
+            <strong>Notification Title : </strong> {{ pushNotification.title }} &nbsp; <strong>Created At : </strong> {{ pushNotification.created_at|date:"M d, Y H:i" }}  &nbsp; 
+            <strong>Language : </strong>{{ pushNotification.get_language_display }} &nbsp; <strong>Category : </strong>{% if pushNotification.category %}{{ pushNotification.category }}{% else %}All{% endif %} <br/>
+            <strong>Notification Description : </strong> {{ pushNotification.description }} <br/>
+            <strong>User Group : </strong> {{ pushNotification.get_user_group_display }} {% if pushNotification.days_ago  %} - {{ pushNotification.days_ago }} days ago {% endif %}
+            <strong>Notification Type : </strong> {{ pushNotification.get_notification_type_display }} - {{ pushNotification.instance_id }} <br/>
+            {% if pushNotification.image_url %}<strong>Notification Image : </strong><img src="{{ pushNotification.image_url }}" height="200" width="200"/>{% endif %}
+        </div>
+        <div class="col-xs-12 table-responsive ">
+            <table class="table table-bordered table-striped nowrap" id="notification_table">
+                <thead>
+                    <tr>
+                        <th>S No.</th>
+                        <th>Username</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if status_id == '2' %}
+                        {% for pushNotification in pushNotificationUser %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{% if pushNotification.user %}{{ pushNotification.user.username }}{% else %}{{ pushNotification.device.dev_id }}{% endif %}</td>
+                                <td>{{ pushNotification.user }}</td>
+                                <td style="color: {% if pushNotification.status == 0 %} #b52828 {% else %} #1989cd {% endif %}">{% get_notification_status pushNotification.status %}</td>
+                            </tr>
+                        {% endfor %}    
+                    {% elif status_id == '0' %}
+                        {% for pushNotification in pushNotificationUser %}
+                            {% if pushNotification.status == '1' or pushNotification.status == '0' %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{% if pushNotification.user %}{{ pushNotification.user.username }}{% else %}{{ pushNotification.device.dev_id }}{% endif %}</td>
+                                    <td>{{ pushNotification.user }}</td>
+                                    <td style="color: {% if pushNotification.status == 0 %} #b52828 {% else %} #1989cd {% endif %}">{% get_notification_status pushNotification.status %}</td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        {% for pushNotification in pushNotificationUser %}
+                            {% if pushNotification.status == '1' %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{% if pushNotification.user %}{{ pushNotification.user.username }}{% else %}{{ pushNotification.device.dev_id }}{% endif %}</td>
+                                    <td>{{ pushNotification.user }}</td>
+                                    <td style="color: {% if pushNotification.status == 0 %} #b52828 {% else %} #1989cd {% endif %}">{% get_notification_status pushNotification.status %}</td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+            {% if has_prev %}<a href="/jarvis/particular_notification/{{notification_id}}/{{status_id}}/{{ prev_page_no }}" >Prev</a>{% endif %} {{ current_page }} of {{ total_page }} pages {% if has_next %}<a href="/jarvis/particular_notification/{{notification_id}}/{{status_id}}/{{ page_no }}" >Next</a>{% endif %}
+        </div>
+    </div>
+{% endblock content %} 
+{% block center_js %}
+<script>
+</script>
+{% endblock center_js%}

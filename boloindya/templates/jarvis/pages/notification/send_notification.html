@@ -300,6 +300,20 @@
                 $('#response_particular_user_id').hide();
             }
         });
+        $("#notification_type").change(function () {
+            var end = this.value;
+            if (end == '0') {
+                $('#search_id').attr("placeholder", "Enter Video Byte Title / Video Byte Id");
+            } else if (end == '1') {
+                $('#search_id').attr("placeholder", "Enter Username / Mobile No / Name / User Id");
+            } else if (end == '2' ){
+                $('#search_id').attr("placeholder", "Enter Category Name / Category Id");
+            } else if (end == '3' ){
+                $('#search_id').attr("placeholder", "Enter Hashtag");
+            } else {
+                $('#search_id').attr("placeholder", "Enter Playstore url in case of sending app update.");
+            }
+        });
         $("#image").change(function() {
             $('#loading_image').show();
             var formData = new FormData();

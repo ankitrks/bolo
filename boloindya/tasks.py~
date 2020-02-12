@@ -127,9 +127,8 @@ def send_notifications_task(data, pushNotification):
                         PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2', device=each)
                     except:
                         pass
-                    t = each.send_message(data={})
-                    print(t)
-                    #t = each.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url})
+                    #t = each.send_message(data={})
+                    t = each.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url})
                 logger.info(device_list)
             pushNotification.is_executed=True
             pushNotification.save()
