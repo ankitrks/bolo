@@ -47,7 +47,7 @@ from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocu
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 from forum.category.models import Category,CategoryViewCounter
 from forum.comment.models import Comment,CommentHistory
-from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs,UserPay
+from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs,UserPay,VideoPlaytime
 from jarvis.models import FCMDevice,StateDistrictLanguage
 from forum.topic.models import Topic,TopicHistory, ShareTopic, Like, SocialShare, Notification, CricketMatch, Poll, Choice, Voting, \
     Leaderboard, VBseen, TongueTwister
@@ -1671,13 +1671,21 @@ def get_user_bolo_info(request):
             end_date = datetime.strptime(str(days)+'-'+str(month)+'-'+str(year)+' 23:59:59', "%d-%m-%Y %H:%M:%S")
         if not start_date or not end_date:
             total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user)
+            total_video_id = list(Topic.objects.filter(is_vb = True,is_removed=False,user=request.user).values_list('pk',flat=True))
             all_pay = UserPay.objects.filter(user=request.user,is_active=True)
             top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user).order_by('-view_count')[:3]
+            all_play_time = VideoPlaytime.objects.filter(videoid__in = total_video_id).aggregate(Sum('playtime'))
+            if all_play_time.has_key('playtime__sum') and all_play_time['playtime__sum']:
+                video_playtime = all_play_time['playtime__sum']
         else:
             total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user,date__gte=start_date, date__lte=end_date)
+            total_video_id = list(Topic.objects.filter(is_vb = True,is_removed=False,user=request.user,date__gte=start_date, date__lte=end_date).values_list('pk',flat=True))
             all_pay = UserPay.objects.filter(user=request.user,is_active=True,for_month__gte=start_date.month,for_month__lte=start_date.month,\
                 for_year__gte=start_date.year,for_year__lte=start_date.year)
             top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user,date__gte=start_date, date__lte=end_date).order_by('-view_count')[:3]
+            all_play_time = VideoPlaytime.objects.filter(videoid__in = total_video_id).aggregate(Sum('playtime'))
+            if all_play_time.has_key('playtime__sum') and all_play_time['playtime__sum']:
+                video_playtime = all_play_time['playtime__sum']
 
         for each_pay in all_pay:
             total_earn+=each_pay.amount_pay
