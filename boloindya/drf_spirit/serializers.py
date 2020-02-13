@@ -64,6 +64,16 @@ class TopicSerializer(ModelSerializer):
     video_cdn = SerializerMethodField()
     m2mcategory = SerializerMethodField()
 
+    def __init__(self, *args, **kwargs):
+        super(TopicSerializer, self).__init__(*args, **kwargs)
+        if not self.context['is_expand']:
+            remove_list = ['m3u8_content','audio_m3u8_content','video_m3u8_content']
+        else:
+            remove_list = []
+        if remove_list:
+            for field in remove_list:
+                self.fields.pop(field)
+
     class Meta:
         model = Topic
         #fields = '__all__'
@@ -130,6 +140,16 @@ class TopicSerializerwithComment(ModelSerializer):
     m2mcategory = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
 
+    def __init__(self, *args, **kwargs):
+        super(TopicSerializerwithComment, self).__init__(*args, **kwargs)
+        if not self.context['is_expand']:
+            remove_list = ['m3u8_content','audio_m3u8_content','video_m3u8_content']
+        else:
+            remove_list = []
+        if remove_list:
+            for field in remove_list:
+                self.fields.pop(field)
+
     class Meta:
         model = Topic
         # fields = '__all__'
@@ -193,6 +213,16 @@ class SingleTopicSerializerwithComment(ModelSerializer):
     m2mcategory = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
 
+    def __init__(self, *args, **kwargs):
+        super(SingleTopicSerializerwithComment, self).__init__(*args, **kwargs)
+        if not self.context['is_expand']:
+            remove_list = ['m3u8_content','audio_m3u8_content','video_m3u8_content']
+        else:
+            remove_list = []
+        if remove_list:
+            for field in remove_list:
+                self.fields.pop(field)
+
     class Meta:
         model = Topic
         # fields = '__all__'
@@ -233,6 +263,16 @@ class UserAnswerSerializerwithComment(ModelSerializer):
     text_comments = SerializerMethodField()
     date = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
+
+    def __init__(self, *args, **kwargs):
+        super(UserAnswerSerializerwithComment, self).__init__(*args, **kwargs)
+        if not self.context['is_expand']:
+            remove_list = ['m3u8_content','audio_m3u8_content','video_m3u8_content']
+        else:
+            remove_list = []
+        if remove_list:
+            for field in remove_list:
+                self.fields.pop(field)
 
     class Meta:
         model = Topic
@@ -479,6 +519,16 @@ class CategoryVideoByteSerializer(ModelSerializer):
     date = SerializerMethodField()
     video_cdn = SerializerMethodField()
 
+    def __init__(self, *args, **kwargs):
+        super(CategoryVideoByteSerializer, self).__init__(*args, **kwargs)
+        if not self.context['is_expand']:
+            remove_list = ['m3u8_content','audio_m3u8_content','video_m3u8_content']
+        else:
+            remove_list = []
+        if remove_list:
+            for field in remove_list:
+                self.fields.pop(field)
+
     class Meta:
         model = Topic
         #fields = '__all__'
@@ -548,16 +598,24 @@ class CategoryWithVideoSerializer(ModelSerializer):
             # all_seen_vb = VBseen.objects.filter(user_id = user_id, topic__language_id=language_id, topic__m2mcategory=instance).distinct('topic_id').values_list('topic_id',flat=True)
         post_till = datetime.now() - timedelta(days=30)
         excluded_list =[]
-        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=instance,language_id = language_id,user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=instance,language_id = language_id,user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if superstar_post:
+            superstar_post = sorted(superstar_post, key=lambda x: x.date, reverse=True)
         for each in superstar_post:
             excluded_list.append(each.id)
-        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=instance,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=instance,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if popular_user_post:
+            popular_user_post = sorted(popular_user_post, key=lambda x: x.date, reverse=True)
         for each in popular_user_post:
             excluded_list.append(each.id)
-        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=instance,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=instance,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if popular_post:
+            popular_post = sorted(popular_post, key=lambda x: x.date, reverse=True)
         for each in popular_post:
             excluded_list.append(each.id)
-        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=instance,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=False, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=instance,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=False, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if normal_user_post:
+            normal_user_post = sorted(normal_user_post, key=lambda x: x.date, reverse=True)
         for each in normal_user_post:
             excluded_list.append(each.id)
         other_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=instance,language_id = language_id).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
@@ -573,7 +631,7 @@ class CategoryWithVideoSerializer(ModelSerializer):
         # paginator = Paginator(topics, page_size)
         # page = 1
         # topic_page = paginator.page(page)
-        return CategoryVideoByteSerializer(topics[:settings.REST_FRAMEWORK['PAGE_SIZE']], many=True).data
+        return CategoryVideoByteSerializer(topics[:settings.REST_FRAMEWORK['PAGE_SIZE']], many=True,context={'is_expand':self.context.get("is_expand",True)}).data
 
 class VideoCompleteRateSerializer(ModelSerializer):
     class Meta:

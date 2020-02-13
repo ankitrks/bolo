@@ -2,6 +2,7 @@ from django import template
 
 from django.conf import settings
 import json
+import re
 from django.template.defaultfilters import stringfilter
 
 register = template.Library()
@@ -28,3 +29,16 @@ def category_title_by_language(categoryObj,language):
         field_name = language.lower() + '_title'
     return getattr(categoryObj, field_name)
 	#return categoryObj.titleName
+
+@register.filter
+@stringfilter
+def get_video_cdn(question_video):
+    if question_video:
+        regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+        find_urls_in_string = re.compile(regex, re.IGNORECASE)
+        url = find_urls_in_string.search(question_video)
+        return str(question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
+    else:
+        return ''
+
+

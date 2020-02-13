@@ -281,7 +281,7 @@ $("#submit-button").click(function(){
         var mobile_no = user_details.mobile_no;
         var thumbnail = user_details.profile_pic;
         if(thumbnail==""){
-            thumbnail='/media/demo_user.png';
+            thumbnail='/media/user.svg';
         }
 
         var topicID = document.getElementById('topicID').value;
@@ -335,7 +335,7 @@ $("#submit-button").click(function(){
         var itemVideo=videoCommentList;
         var userProfile=itemVideo.user.userprofile;
         if(userProfile.profile_pic==""){
-           profileImage='/media/demo_user.png';
+           profileImage='/media/user.svg';
         }else{
             profileImage=userProfile.profile_pic;
         }
@@ -459,7 +459,7 @@ function autocomplete(inp, arr) {
           if(eachItems.profile_pic!=""){
             userProfileImage=eachItems.profile_pic;
           }else{
-            userProfileImage='/media/demo_user.png';
+            userProfileImage='/media/user.svg';
           }
 
           b.innerHTML += '<img class="_avatar_ _avatar_small" height="100"  src="' + userProfileImage + '" />';

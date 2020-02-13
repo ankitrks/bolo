@@ -147,7 +147,9 @@ user_group_options = (
     ('5', "Signed up but no opening of app since 72 hours "),
     ('6', "Never created a video"),
     ('7', "Test User"),
-    ('8', "Particular User")
+    ('8', "Particular User"),
+    ('9', 'Creators'),
+    ('10', 'Active Users')
 )
 
 notification_type_options = (
@@ -201,6 +203,21 @@ class DashboardMetrics(RecordTimeStamp):
     def __unicode__(self):
         return str(self.id)
 
+class DashboardMetricsJarvis(RecordTimeStamp):
+    metrics = models.CharField(choices = metrics_options, blank = True, null = True, max_length = 10, default = '0')
+    metrics_slab = models.CharField(choices = metrics_slab_options, blank = True, null = True, max_length = 10, default = None)
+    date = models.DateTimeField(auto_now = False, auto_now_add = False, blank = False, null = False)
+    week_no = models.PositiveIntegerField(null = True, blank = True, default = 0)
+    count = models.PositiveIntegerField(null = True, blank = True, default = 0)
+
+    class Meta:
+        ordering = ['date']
+        
+    def __unicode__(self):
+        return str(self.id)
+
+
+
 class PushNotification(RecordTimeStamp):
     title = models.CharField(_('title'),max_length=200,null=True,blank=True)
     description = models.CharField(_('description'),max_length=500,null=True,blank=True)
@@ -214,11 +231,14 @@ class PushNotification(RecordTimeStamp):
     image_url = models.CharField(_('image_url'),max_length=1000,null=True,blank=True)
     is_removed = models.BooleanField(default=False)
     is_executed = models.BooleanField(default=False)
+    days_ago = models.PositiveIntegerField(null=True,blank=True,default=0)
+    particular_user_id=models.CharField(_('particular_user_id'),max_length=20,null=True,blank=True)
     repeated_hour = models.PositiveIntegerField(null=True,blank=True,default=0)
-    
+
 class PushNotificationUser(RecordTimeStamp):
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='push_notification_user',editable=False)
+    user=models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='push_notification_user',editable=False)
+    device=models.ForeignKey(FCMDevice, blank = True, null = True, related_name='push_notification_device',editable=False)
     push_notification_id = models.ForeignKey(PushNotification, blank = True, null = True, related_name='push_notification_id',editable=False)
     status = models.CharField(choices=status_options, blank = True, null = True, max_length=10, default='0')
 

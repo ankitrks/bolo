@@ -38,7 +38,7 @@
             .done(function(data)
             {
                 if(data == " "){
-                    $('.ajax-load').html("No more records found");
+                    $('.ajax-load').html("");
                     return;
                 }
                 checkDataStatus=0;
@@ -57,7 +57,7 @@
             var profilePics = itemVideo.user.userprofile.profile_pic;
             if(profilePics==''){
                 profilePics= '/media/ic_profile_red_1.svg';
-                //profilePics= '/media/demo_user.png';
+                //profilePics= '/media/user.svg';
             }
 
             var content_title="";
@@ -65,8 +65,9 @@
 
                 videoTitle=removeTags(itemVideo.title);
                 content_title = videoTitle.substr(0, 40) + " ...";
-
-            listItems +='<div class="_video_feed_item"><div class="_ratio_"><div style="padding-top: 148.148%;"><div class="_ratio_wrapper"><a onClick="openVideoInPopup(\''+itemVideo.video_cdn+'\',\''+itemVideo.question_image+'\','+totalCountVideo+');"  class="js-video-link playlist-item '+isPlaying+'" data-mediaid="'+itemVideo.id+'"  href="javascript:void(0);"><div class="_image_card_" style="border-radius: 4px; background-image: url('+itemVideo.question_image+');"><div class="_video_card_play_btn_ _video_card_play_btn_dark _image_card_playbtn_wraaper"></div><div class="_video_card_footer_ _video_card_footer_respond _image_card_footer_wraaper"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+itemVideo.likes_count+'</span></p><span class="_video_card_footer_likes1"><img src="/media/download.svg" alt="likes"> '+itemVideo.likes_count+'</span></div></div></a></div></div></div></div>';
+                if(itemVideo!=""){
+                    listItems +='<div class="_video_feed_item"><div class="_ratio_"><div style="padding-top: 148.148%;"><div class="_ratio_wrapper"><a onClick="openVideoInPopup(\''+itemVideo.video_cdn+'\',\''+itemVideo.question_image+'\','+totalCountVideo+');"  class="js-video-link playlist-item '+isPlaying+'" data-mediaid="'+itemVideo.id+'"  href="javascript:void(0);"><div class="_image_card_" style="border-radius: 4px; background-image: url('+itemVideo.question_image+');"><div class="_video_card_play_btn_ _video_card_play_btn_dark _image_card_playbtn_wraaper"></div><div class="_video_card_footer_ _video_card_footer_respond _image_card_footer_wraaper"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+itemVideo.likes_count+'</span></p><span class="_video_card_footer_likes1"><img src="/media/download.svg" alt="likes"> '+itemVideo.likes_count+'</span></div></div></a></div></div></div></div>';
+                }
             });
 
                 $('.ajax-load').hide();
@@ -78,7 +79,7 @@
 
                 }
 
-                $('.ajax-load').html("No more records found");
+                $('.ajax-load').html("");
             });
     }
 
@@ -121,7 +122,7 @@ $(window).scroll(function () {
 
                 var profilePics = itemVideo.user.userprofile.profile_pic;
                 if(profilePics==''){
-                    //profilePics= '/media/demo_user.png';
+                    //profilePics= '/media/user.svg';
                     profilePics= '/media/ic_profile_red_1.svg';
                 }
                 var content_title="";
@@ -329,7 +330,7 @@ function retryLiveStream(hls, url) {
             var videoTitle=singleItemData.title;
             var profilePics = singleItemData.user.userprofile.profile_pic;
             if(profilePics==''){
-               profilePics= '/media/demo_user.png';
+               profilePics= '/media/user.svg';
             }
 
 
@@ -462,7 +463,7 @@ function retryLiveStream(hls, url) {
                 var profileImage="";
                 var userProfile=itemVideo.user.userprofile;
                 if(userProfile.profile_pic==""){
-                   profileImage='/media/demo_user.png';
+                   profileImage='/media/user.svg';
                 }else{
                     profileImage=userProfile.profile_pic;
                 }
@@ -517,7 +518,7 @@ function retryLiveStream(hls, url) {
                 var profileImage="";
                 var userProfile=itemVideo.user.userprofile;
                 if(userProfile.profile_pic==""){
-                   profileImage='/media/demo_user.png';
+                   profileImage='/media/user.svg';
                 }else{
                     profileImage=userProfile.profile_pic;
                 }

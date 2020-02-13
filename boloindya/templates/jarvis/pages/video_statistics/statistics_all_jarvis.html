@@ -1,0 +1,168 @@
+{% load jarvis_tag %}
+{% load humanize %}
+<html>
+    <head>
+        <title>bolo indya | analytics</title>
+        <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <!-- <script src='https://cdn.plot.ly/plotly-latest.min.js'></script> -->
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+        <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+
+        <style type="text/css">
+            body{
+                font-family: 'Roboto', sans-serif;
+                font-size: 14px;
+                padding: 20px;
+            }
+            a:hover{text-decoration: none;}
+            .top_box{
+                background: #f1f1f1;
+                display: inline-block;
+                width: 12.25%;
+                text-align: center;
+                padding: 10px 0px;
+                padding-top: 20px;
+                margin-top: 10px;
+                border-radius: 5px;
+            }
+            .btn{
+                background: #f1f1f1;
+                display: inline-block;
+                width: 10%;
+                text-align: center;
+                padding: 3px 0px 2px 0px;
+                border-radius: 5px;
+                font-size: 14px;
+            }
+            .left_panel{}
+            .right_panel{width:90%;margin-left: 5%;}
+        </style>
+        <script>
+            function process_filter(f_val){
+                var qs = window.location.search.replace('?', '');
+                var qs_list = qs.split('&');
+                var param_name = f_val.split('=')[0];
+                var found_param = false;
+                for(i=0; i < qs_list.length; i++ ){
+                    if( qs_list[i].split('=')[0] == param_name ){
+                        found_param = true;
+                        qs_list[i] = qs_list[i].split('=')[0] + '=' + f_val.split('=')[1]
+                    }
+                }
+                if(!found_param){ qs_list.push( f_val ); }
+                window.location.href = window.location.pathname + '?' + qs_list.join('&');
+            }
+            $( function() {
+                $( "#start_date, #end_date" ).datepicker({
+                    dateFormat : 'yy-mm-dd',
+                    maxDate : -1,
+                    minDate : new Date(2019, 04, 01),
+                    onSelect: function(date, datepicker) {
+                        var proceed = true;
+                        if(datepicker.id == 'end_date'){
+                            if( !$('#start_date').val() ){
+                                alert("Please select the start date first.");
+                                $('#start_date, #end_date').val('');
+                                proceed = false;
+                            }
+                        }
+                        if( $('#start_date').val() && $('#end_date').val() ){
+                            var sdate = new Date($('#start_date').val());
+                            var edate = new Date($('#end_date').val());
+                            if( edate <= sdate ){
+                                alert("End date should be greater than Start date.");
+                                $('#start_date, #end_date').val('');
+                                proceed = false;
+                            }
+                        }
+                        if( proceed ){
+                            process_filter( datepicker.id + '=' + $('#' + datepicker.id).val() );
+                        }
+                    },
+                });
+                $('.filter_apply').click(function(e){
+                    e.preventDefault();
+                    process_filter( $(this).attr('href').replace('?', '') );
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div style="box-shadow: 0px 5px 5px #f1f1f1;position: absolute;left: 0;top: 0;padding: 15px;width: 100%;">
+            <img src="/media/img/boloindya_logo.png" class="" style="height: 45px;" alt="Bolo Indiya Logo">
+            <span style="float: right;">
+                Welcome, {{ request.user }}<br>
+                <a href="/user/logout" style="float: right;">logout</a>
+            </span><br>
+        </div><br><br><br>
+        {% for each_data in top_data %}
+            <div class="top_box" {% if metrics == each_data.0  %}style="background:bisque;"{% endif %}>
+                <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
+                <a href="?metrics={{ each_data.0 }}" class="filter_apply"><h6 style="color: #333">{{ each_data.1 }}</h6><h5 style="color: #b52828">{{ each_data.2|intcomma }}</h5></a>
+
+            </div>
+        {% endfor %}
+        <div class="right_panel">
+            <br><br>Start date &nbsp;&nbsp; <input type="text" id="start_date" name="start_date" placeholder="Start Date" class="filter_text" value="{{ start_date }}">
+            &nbsp;&nbsp; End date&nbsp;&nbsp;&nbsp; <input type="text" id="end_date" name="end_date" placeholder="End Date" class="filter_text" value="{{ end_date }}">&nbsp;&nbsp;&nbsp;
+            <!-- <a href="?data_view=daily" class="filter_apply">daily</a> &nbsp;&nbsp;|&nbsp;&nbsp; -->
+            <a href="?data_view=weekly" class="filter_apply btn" {% if data_view == "weekly"  %}style="background:bisque;"{% endif %}>weekly</a>
+            <a href="?data_view=monthly" class="filter_apply btn" {% if data_view == "monthly"  %}style="background:bisque;"{% endif %}>monthly</a><br>
+            {% if slabs %}
+                <br>Data Slabs&nbsp;&nbsp;
+                {% for each_slab in slabs %}
+                    <a href="?slab={{ each_slab.0 }}" class="filter_apply" {% if slab == each_slab.0  %}style="text-decoration: underline;font-weight: bold;color: burlywood;"{% endif %}>{{ each_slab.1 }}</a>{% if not forloop.last %} &nbsp;&nbsp;|&nbsp;&nbsp;{% endif %}
+                {% endfor %}
+            {% endif %}
+            <br><div id="myDiv" style="width: 100%; height: 450px;"></div>
+        </div>
+        <script type="text/javascript">
+            // var trace1 = {
+            //     x: {{ x_axis|safe }},
+            //     y: {{ y_axis|safe }},
+            //     text: {{ x_axis|safe }},
+            //     type: 'bar',
+            //     marker: {
+            //         // color: '#b52828', // 'rgb(142,124,195)'
+            //     }
+            // };
+            // var data = [trace1];
+            // var layout = {
+            //     title: "{{ graph_title }}",
+            //     font:{
+            //         family: 'Raleway, sans-serif'
+            //     },
+            //     showlegend: false,
+            //     xaxis: {
+            //         tickangle: -45
+            //     },
+            //     yaxis: {
+            //         zeroline: false,
+            //         gridwidth: 2
+            //     },
+            //     bargap :0.05
+            // };
+            // Plotly.newPlot('myDiv', data, layout);
+
+            var chart_data = {{ chart_data|safe }};
+            google.charts.load('current', {'packages':['bar']});
+            google.charts.setOnLoadCallback(drawChart);
+            function drawChart() {
+                var data = google.visualization.arrayToDataTable(chart_data);
+                var options = {
+                  chart: {
+                    title: "{{ graph_title }}",
+                    // subtitle: 'Sales, Expenses, and Profit: 2014-2017',
+                  },
+                  // bars: 'horizontal' // Required for Material Bar Charts.
+                };
+
+                var chart = new google.charts.Bar(document.getElementById('myDiv'));
+                chart.draw(data, google.charts.Bar.convertOptions(options));
+            }
+        </script>
+    </body>
+</html>
