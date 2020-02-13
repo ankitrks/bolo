@@ -73,7 +73,7 @@ def record_duration_play(log_text_dump, userid):
 			curr_state = record_i.get('state')
 			curr_videoid = int(record_i.get('video_byte_id'))
 			#print(curr_videoid, curr_state, processed_stamp)
-			if(curr_state == 'StartPlayingcdn'):
+			if('StartPlaying' in curr_state):
 				(vid, timestamp) = (curr_videoid, processed_stamp)
 				unique_video_play.append((vid, timestamp))
 
@@ -134,11 +134,28 @@ def calc_playtime(unique_video_play, userid):
 				time_video_played = time_diff
 				#print(time_video_played)
 				#time_video_played = float(float(unique_video_play[i+1][1]) - float(unique_video_play[i][1])) /1000
+				media_details = Topic.objects.all().filter(id = curr_vid)
+				tot_playtime = media_details[0].media_duration
+				tot_playtime_sec = parse_duration(tot_playtime)
+
 				if(time_video_played<0):
 					time_video_played = 0
-				#print(curr_vid, time_video_played)
-				user_data_obj = VideoPlaytime(user = userid, videoid = curr_vid, playtime = time_video_played, timestamp = ref_timestamp)
-				user_data_obj.save()
+
+				if(time_video_played>tot_playtime_sec):
+					time_video_played = tot_playtime_sec
+
+				user_data_obj, created = VideoPlaytime.objects.get_or_create(user = userid, videoid = curr_vid, timestamp = ref_timestamp)
+				if(created):
+					print(userid, curr_vid, ref_timestamp, time_video_played)
+					user_data_obj.playtime = time_video_played
+					user_data_obj.save()
+				else:
+					print(userid, curr_vid, ref_timestamp, time_video_played)
+					user_data_obj.playtime = time_video_played
+					user_data_obj.save()
+
+				# user_data_obj = VideoPlaytime(user = userid, videoid = curr_vid, playtime = time_video_played, timestamp = ref_timestamp)
+				# user_data_obj.save()
 
 	except Exception as e:
 		print('Exception playtime' + str(e))
@@ -220,7 +237,7 @@ def app_activity_time_spend():
 
 
 def main():
-	android_logs = AndroidLogs.objects.filter(log_type = 'click2play')
+	android_logs = AndroidLogs.objects.filter(log_type = 'click2play', created_at__gt = '2020-01-31')
 	for each_log in android_logs:
 		try:
 			each_android_log_dump = ast.literal_eval(each_log.logs)

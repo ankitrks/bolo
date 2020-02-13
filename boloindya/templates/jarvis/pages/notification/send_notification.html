@@ -122,7 +122,8 @@
             </div>
              <div class="col-md-6" style="padding: 0px;">
                 <select name="category" id="category">
-                    <option value="Select Category" disabled selected>Select Category</option>
+                    <option value="" disabled selected>Select Category</option>
+                    <option value="">All</option>
                     {% for category in categories %}
                         <option value="{{ category.id }}" >{{ category.title }}</option>
                     {% endfor %}
@@ -297,6 +298,20 @@
                 $("#particular_user_id").val('');
                 $("#particular_user_id").hide();
                 $('#response_particular_user_id').hide();
+            }
+        });
+        $("#notification_type").change(function () {
+            var end = this.value;
+            if (end == '0') {
+                $('#search_id').attr("placeholder", "Enter Video Byte Title / Video Byte Id");
+            } else if (end == '1') {
+                $('#search_id').attr("placeholder", "Enter Username / Mobile No / Name / User Id");
+            } else if (end == '2' ){
+                $('#search_id').attr("placeholder", "Enter Category Name / Category Id");
+            } else if (end == '3' ){
+                $('#search_id').attr("placeholder", "Enter Hashtag");
+            } else {
+                $('#search_id').attr("placeholder", "Enter Playstore url in case of sending app update.");
             }
         });
         $("#image").change(function() {

@@ -30,9 +30,9 @@
             <strong>Notification Title : </strong> {{ pushNotification.title }} &nbsp; <strong>Created At : </strong> {{ pushNotification.created_at|date:"M d, Y H:i" }}  &nbsp; 
             <strong>Language : </strong>{{ pushNotification.get_language_display }} &nbsp; <strong>Category : </strong>{% if pushNotification.category %}{{ pushNotification.category }}{% else %}All{% endif %} <br/>
             <strong>Notification Description : </strong> {{ pushNotification.description }} <br/>
-            <strong>User Group : </strong> {{ pushNotification.get_user_group_display }} {% if pushNotification.days_ago  %} - {{ pushNotification.days_ago }} days ago {% endif %} &nbsp;
-            <strong>Notification Type : </strong> {{ pushNotification.get_notification_type_display }} - {{ pushNotification.instance_id }} &nbsp;
-            {% if pushNotification.image_url %}<strong>Notification Image : </strong><img src="{{ pushNotification.image_url }}" height="50" width="50"/>{% endif %}
+            <strong>User Group : </strong> {{ pushNotification.get_user_group_display }} {% if pushNotification.days_ago  %} - {{ pushNotification.days_ago }} days ago {% endif %}
+            <strong>Notification Type : </strong> {{ pushNotification.get_notification_type_display }} - {{ pushNotification.instance_id }} <br/>
+            {% if pushNotification.image_url %}<strong>Notification Image : </strong><img src="{{ pushNotification.image_url }}" height="200" width="200"/>{% endif %}
         </div>
         <div class="col-xs-12 table-responsive ">
             <table class="table table-bordered table-striped nowrap" id="notification_table">
