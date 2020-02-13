@@ -106,8 +106,7 @@ def send_notifications_task(data, pushNotification):
                     hours_ago -= timedelta(days=1)
                 else:
                     hours_ago -=  timedelta(days=2)
-                filter_list = UserLogStatistics.objects.filter(session_starttime__gte=hours_ago).values_list('user', flat=True)
-                filter_list = map(int , filter_list)
+                filter_list=AndroidLogs.objects.filter(created_at__gt=hours_ago).order_by('-user__pk').distinct('user').values_list('user__pk', flat=True)
                 exclude_filter={'user__pk__in': filter_list}
             elif user_group == '6':
                 filter_list = Topic.objects.filter(is_vb=True).values_list('user__pk', flat=True)
@@ -124,11 +123,16 @@ def send_notifications_task(data, pushNotification):
                 logger.info(device_after_slice)
                 for each in device_after_slice:
                     try:
-                        PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2', device=each)
+                        t = each.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url}, time_to_live=6000)
+                        id=t[1]['results'][0]['message_id']
+                        try:
+                            PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2', device=each)
+                        except:
+                            pass
                     except:
                         pass
-                    t = each.send_message(data={})
-                    print(t)
+                    #t = each.send_message(data={})
+                    #print(t)
                     #t = each.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url})
                 logger.info(device_list)
             pushNotification.is_executed=True
