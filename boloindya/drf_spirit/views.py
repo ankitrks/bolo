@@ -387,16 +387,24 @@ class VBList(generics.ListCreateAPIView):
                         # post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-date')
                         # post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),is_popular = True).order_by('-date')
                         excluded_list =[]
-                        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+                        if superstar_post:
+                            superstar_post = sorted(superstar_post, key=lambda x: x.date, reverse=True)
                         for each in superstar_post:
                             excluded_list.append(each.id)
-                        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+                        if popular_user_post:
+                            popular_user_post = sorted(popular_user_post, key=lambda x: x.date, reverse=True)
                         for each in popular_user_post:
                             excluded_list.append(each.id)
-                        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=False,is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=False,is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+                        if popular_post:
+                            popular_post = sorted(popular_post, key=lambda x: x.date, reverse=True)
                         for each in popular_post:
                             excluded_list.append(each.id)
-                        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=False,is_popular=False, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=False,is_popular=False, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+                        if normal_user_post:
+                            normal_user_post = sorted(normal_user_post, key=lambda x: x.date, reverse=True)
                         for each in normal_user_post:
                             excluded_list.append(each.id)
                         other_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id')).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
@@ -424,16 +432,24 @@ class VBList(generics.ListCreateAPIView):
                     # if post2:
                     #     topics+=list(post2)
                         excluded_list =[]
-                        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+                        if superstar_post:
+                            superstar_post = sorted(superstar_post, key=lambda x: x.date, reverse=True)
                         for each in superstar_post:
                             excluded_list.append(each.id)
-                        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+                        if popular_user_post:
+                            popular_user_post = sorted(popular_user_post, key=lambda x: x.date, reverse=True)
                         for each in popular_user_post:
                             excluded_list.append(each.id)
-                        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=False,is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=False,is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+                        if popular_post:
+                            popular_post = sorted(popular_post, key=lambda x: x.date, reverse=True)
                         for each in popular_post:
                             excluded_list.append(each.id)
-                        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=False,is_popular=False, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=False,is_popular=False, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+                        if normal_user_post:
+                            normal_user_post = sorted(normal_user_post, key=lambda x: x.date, reverse=True)
                         for each in normal_user_post:
                             excluded_list.append(each.id)
                         other_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
@@ -461,16 +477,24 @@ class VBList(generics.ListCreateAPIView):
                         # post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),is_popular = True).order_by('-date')
                         # post2 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),is_popular = False).order_by('-date')
                         excluded_list =[]
-                        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+                        if superstar_post:
+                            superstar_post = sorted(superstar_post, key=lambda x: x.date, reverse=True)
                         for each in superstar_post:
                             excluded_list.append(each.id)
-                        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+                        if popular_user_post:
+                            popular_user_post = sorted(popular_user_post, key=lambda x: x.date, reverse=True)
                         for each in popular_user_post:
                             excluded_list.append(each.id)
-                        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=False,is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=False,is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+                        if popular_post:
+                            popular_post = sorted(popular_post, key=lambda x: x.date, reverse=True)
                         for each in popular_post:
                             excluded_list.append(each.id)
-                        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=False,is_popular=False, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=False,is_popular=False, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+                        if normal_user_post:
+                            normal_user_post = sorted(normal_user_post, key=lambda x: x.date, reverse=True)
                         for each in normal_user_post:
                             excluded_list.append(each.id)
                         other_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id')).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
@@ -492,16 +516,24 @@ class VBList(generics.ListCreateAPIView):
                     # if post2:
                     #     topics+=list(post2)
                         excluded_list =[]
-                        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+                        if superstar_post:
+                            superstar_post = sorted(superstar_post, key=lambda x: x.date, reverse=True)
                         for each in superstar_post:
                             excluded_list.append(each.id)
-                        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+                        if popular_user_post:
+                            popular_user_post = sorted(popular_user_post, key=lambda x: x.date, reverse=True)
                         for each in popular_user_post:
                             excluded_list.append(each.id)
-                        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=False,is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=False,is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+                        if popular_post:
+                            popular_post = sorted(popular_post, key=lambda x: x.date, reverse=True)
                         for each in popular_post:
                             excluded_list.append(each.id)
-                        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=False,is_popular=False, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+                        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),user__st__is_superstar = False,user__st__is_popular=False,is_popular=False, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+                        if normal_user_post:
+                            normal_user_post = sorted(normal_user_post, key=lambda x: x.date, reverse=True)
                         for each in normal_user_post:
                             excluded_list.append(each.id)
                         other_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
@@ -542,16 +574,24 @@ class GetChallenge(generics.ListCreateAPIView):
             all_seen_vb = get_redis_vb_seen(self.request.user.id)
             # all_seen_vb = VBseen.objects.filter(user = self.request.user, topic__title__icontains=challengehash).distinct('topic_id').values_list('topic_id',flat=True)
         excluded_list =[]
-        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,title__icontains=challengehash,user__st__is_superstar = True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,title__icontains=challengehash,user__st__is_superstar = True).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if superstar_post:
+            superstar_post = sorted(superstar_post, key=lambda x: x.date, reverse=True)
         for each in superstar_post:
             excluded_list.append(each.id)
-        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,title__icontains=challengehash,user__st__is_superstar = False,user__st__is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,title__icontains=challengehash,user__st__is_superstar = False,user__st__is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if popular_user_post:
+            popular_user_post = sorted(popular_user_post, key=lambda x: x.date, reverse=True)
         for each in popular_user_post:
             excluded_list.append(each.id)
-        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,title__icontains=challengehash,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,title__icontains=challengehash,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if popular_post:
+            popular_post = sorted(popular_post, key=lambda x: x.date, reverse=True)
         for each in popular_post:
             excluded_list.append(each.id)
-        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,title__icontains=challengehash,user__st__is_superstar = False,user__st__is_popular=False,is_popular=False).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,title__icontains=challengehash,user__st__is_superstar = False,user__st__is_popular=False,is_popular=False).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if normal_user_post:
+            normal_user_post = sorted(normal_user_post, key=lambda x: x.date, reverse=True)
         for each in normal_user_post:
             excluded_list.append(each.id)
         other_post = Topic.objects.filter(is_removed = False,is_vb = True,title__icontains=challengehash).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
@@ -3079,13 +3119,19 @@ def get_category_with_video_bytes(request):
                 all_seen_vb = get_redis_vb_seen(request.user.id)
                 # all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__is_popular=True).distinct('topic_id').values_list('topic_id',flat=True)
             excluded_list =[]
-            superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+            superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id')
+            if superstar_post:
+                superstar_post = sorted(superstar_post, key=lambda x: x.date, reverse=True)
             for each in superstar_post:
                 excluded_list.append(each.id)
-            popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+            popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id')
+            if popular_user_post:
+                popular_user_post = sorted(popular_user_post, key=lambda x: x.date, reverse=True)
             for each in popular_user_post:
                 excluded_list.append(each.id)
-            popular_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+            popular_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id')
+            if popular_post:
+                popular_post = sorted(popular_post, key=lambda x: x.date, reverse=True)
             for each in popular_post:
                 excluded_list.append(each.id)
             other_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,is_popular=True).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
@@ -3140,16 +3186,24 @@ def get_category_video_bytes(request):
         post_till = datetime.now() - timedelta(days=30)
         if category:
             excluded_list =[]
-            superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+            superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+            if superstar_post:
+                superstar_post = sorted(superstar_post, key=lambda x: x.date, reverse=True)
             for each in superstar_post:
                 excluded_list.append(each.id)
-            popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+            popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+            if popular_user_post:
+                popular_user_post = sorted(popular_user_post, key=lambda x: x.date, reverse=True)
             for each in popular_user_post:
                 excluded_list.append(each.id)
-            popular_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+            popular_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+            if popular_post:
+                popular_post = sorted(popular_post, key=lambda x: x.date, reverse=True)
             for each in popular_post:
                 excluded_list.append(each.id)
-            normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=False, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+            normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=False, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+            if normal_user_post:
+                normal_user_post = sorted(normal_user_post, key=lambda x: x.date, reverse=True)
             for each in normal_user_post:
                 excluded_list.append(each.id)
             other_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
@@ -3187,16 +3241,24 @@ def get_popular_video_bytes(request):
             all_seen_vb = get_redis_vb_seen(request.user.id)
             # all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__is_popular=True).distinct('topic_id').values_list('topic_id',flat=True)
         excluded_list =[]
-        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = True,is_popular=True,date__gte = post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = True,is_popular=True,date__gte = post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if superstar_post:
+            superstar_post = sorted(superstar_post, key=lambda x: x.date, reverse=True)
         for each in superstar_post:
             excluded_list.append(each.id)
-        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=True,is_popular=True,date__gte = post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=True,is_popular=True,date__gte = post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if popular_user_post:
+            popular_user_post = sorted(popular_user_post, key=lambda x: x.date, reverse=True)
         for each in popular_user_post:
             excluded_list.append(each.id)
-        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True,date__gte = post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True,date__gte = post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if popular_post:
+            popular_post = sorted(popular_post, key=lambda x: x.date, reverse=True)
         for each in popular_post:
             excluded_list.append(each.id)
-        other_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,is_popular=True,date__gte = post_till).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
+        other_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,is_popular=True,date__gte = post_till).exclude(pk__in=list(all_seen_vb)+list(excluded_list))
+        if other_post:
+            other_post = sorted(other_post, key=lambda x: x.date, reverse=True)
         orderd_all_seen_post=[]
         all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb, language_id=language_id, is_popular=True,date__gte = post_till)
         if all_seen_post:
@@ -3254,16 +3316,24 @@ def get_recent_videos(request):
             all_seen_vb = get_redis_vb_seen(request.user.id)
             # all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__m2mcategory=category).distinct('topic_id').values_list('topic_id',flat=True)
         excluded_list =[]
-        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if superstar_post:
+            superstar_post = sorted(superstar_post, key=lambda x: x.date, reverse=True)
         for each in superstar_post:
             excluded_list.append(each.id)
-        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if popular_user_post:
+            popular_user_post = sorted(popular_user_post, key=lambda x: x.date, reverse=True)
         for each in popular_user_post:
             excluded_list.append(each.id)
-        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if popular_post:
+            popular_post = sorted(popular_post, key=lambda x: x.date, reverse=True)
         for each in popular_post:
             excluded_list.append(each.id)
-        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=False, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')
+        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=False, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if normal_user_post:
+            normal_user_post = sorted(normal_user_post, key=lambda x: x.date, reverse=True)
         for each in normal_user_post:
             excluded_list.append(each.id)
         other_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')

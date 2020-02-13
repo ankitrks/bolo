@@ -170,7 +170,6 @@ class Topic(models.Model):
         return self.topic_comment.filter(is_media = False)
 
     class Meta:
-        ordering = ['-comment_count', '-total_share_count']
         verbose_name = _("topic")
         verbose_name_plural = _("topics")
 
