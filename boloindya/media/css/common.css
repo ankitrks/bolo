@@ -4,7 +4,7 @@
         }
 
         body {
-            font-family: "sofiapro-regular", PingFangSC, sans-serif;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
         }
         
         a {
@@ -14,7 +14,7 @@
         
         body {
             -webkit-tap-highlight-color: transparent;
-            font-family: "sofiapro-regular", PingFangSC, sans-serif;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             margin: 0;
             padding: 0;
             background: #000000;
@@ -101,7 +101,7 @@
           text-align: center;
       }   
       .home-container .sub-slogan {
-          font-family: "sofiapro-medium",PingFangSC,sans-serif;
+          font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
           font-weight: 500;
           font-size: 24px;
           line-height: 32px;
@@ -126,7 +126,7 @@
       }
 
       .home-container .slogan {
-          font-family: "sofiapro-bold",PingFangSC,sans-serif;
+          font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
           font-weight: 700;
           font-size: 72px;
           line-height: 1;
@@ -330,7 +330,7 @@
         }
         
         .logo-container .logo-text {
-            width: 159px;
+            width: 220px;
             margin-left: 4px;
             position: relative;
             top: 6px;
@@ -379,7 +379,7 @@
         }
 
         .menu-item-link {
-            font-family: "sofiapro-medium", PingFangSC, sans-serif;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             font-weight: 500;
             font-size: 14px;
             line-height: 28px;
@@ -592,7 +592,7 @@
         }
         
         .drawer-content h2:not(.to-home) {
-            font-family: "sofiapro-bold", PingFangSC, sans-serif;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             font-weight: 700;
         }
         
@@ -601,7 +601,7 @@
         }
         
         .drawer-content h3 {
-            font-family: "sofiapro-medium", PingFangSC, sans-serif;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             font-weight: 500;
         }
         
@@ -914,11 +914,11 @@
         }
         
         .footer-container .footer-content-wrapper .footer-content-column h2 {
-            font-family: "sofiapro-medium", PingFangSC, sans-serif;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             font-weight: 500;
             font-size: 14px;
             line-height: 28px;
-            font-family: "sofiapro-bold", PingFangSC, sans-serif;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             font-weight: 700;
         }
         
@@ -927,7 +927,7 @@
         }
         
         .footer-container .footer-content-wrapper .footer-content-column h3 {
-            font-family: "sofiapro-medium", PingFangSC, sans-serif;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             font-weight: 500;
             font-size: 14px;
             line-height: 28px;
@@ -962,7 +962,7 @@
         }
         
         .footer-container .footer-bottom-wrapper .copyright {
-            font-family: "sofiapro-medium", PingFangSC, sans-serif;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             font-weight: 500;
             font-size: 14px;
             line-height: 28px;
@@ -1248,7 +1248,7 @@
     color: rgb(79, 83, 90);
 }
 .about-content .about-article .text-body {
-    font-family: proxima-regular, PingFangSC, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 400;
     font-size: 18px;
     line-height: 24px;
@@ -1305,14 +1305,14 @@
     display: none;
 }
 .about-content .about-article .subtitle {
-    font-family: proxima-regular, PingFangSC, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 400;
     font-size: 16px;
     line-height: 24px;
     color: rgb(22, 24, 35);
 }
 .about-content .about-article .text-body {
-    font-family: proxima-regular, PingFangSC, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
@@ -1325,7 +1325,7 @@
 }
 
 .video-wall {
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: 500;
   display: flex;
   margin: 0 auto;
@@ -1532,7 +1532,7 @@
     font-size: 14px;
     font-weight: bold;
     vertical-align: 2px;
-    font-family: 'Roboto',sans-serif;}
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif}
 .social-network #viewsCount{color:grey;font-size:18px;font-weight:normal;vertical-align:0px;}   
 .comment_sec{display: none;}
 .addCommentInput{resize: none;}
@@ -1787,7 +1787,7 @@
     text-align: center;
     z-index: 111;
     font-size: 16px;
-    font-family: sofiapro-regular
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif
 }
 
 ._video_card_mask_ p {
@@ -1815,7 +1815,7 @@
 
 ._video_card_mask_ ._video_card_mask_link {
     color: #face15;
-    font-family: proxima-regular;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 16px;
     line-height: 17px;
     position: absolute;
@@ -1825,7 +1825,7 @@
 
 @media (max-width:767px) {
     ._video_card_mask_ {
-        font-family: proxima-regular
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
     ._video_card_mask_._video_card_mask_m {
         background: #f2f2f2
@@ -2690,7 +2690,7 @@
     justify-content: space-between;
 }
 ._explore_page_main_desc {
-    font-family: "proxima-regular",PingFangSC,sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 400;
     font-size: 18px;
     line-height: 24px;
@@ -2792,7 +2792,7 @@
     line-height: 24px;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-family: proxima-semibold, PingFangSC, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 600;
     margin: 12px auto 0px;
     color: #fff;
@@ -2809,7 +2809,7 @@
 ._user_carousel_followers {
     font-size: 17px;
     line-height: 20px;
-    font-family: proxima-semibold, PingFangSC, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 600;
     color: rgba(255, 255, 255, 0.87);
     margin: 14px auto;
@@ -3362,14 +3362,14 @@
     align-items: baseline;
 }
 .recommend-card.jsx-3959364739 header.jsx-3959364739 h3.jsx-3959364739 {
-    font-family: "sofiapro-bold",PingFangSC,sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 700;
     font-size: 33px;
     line-height: 1;
     color: #fff;
 }
 .recommend-card.jsx-3959364739 header.jsx-3959364739 a {
-    font-family: "proxima-regular",PingFangSC,sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 400;
     font-size: 17px;
     line-height: 20px;
@@ -3429,7 +3429,7 @@ li {
     border-radius: 2px;
 }
 .copy-link-container.jsx-1861775669 input.jsx-1861775669 {
-    font-family: proxima-regular, PingFangSC, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 400;
     font-size: 15px;
     color: rgb(22, 24, 35);
@@ -3442,7 +3442,7 @@ li {
 }
 .copy-link-container.jsx-1861775669 p.jsx-1861775669 {
     margin-left: 20px;
-    font-family: proxima-semibold, PingFangSC, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 600;
     font-size: 15px;
     color: rgb(254, 44, 85);
@@ -3491,7 +3491,7 @@ body .share-layout .share-layout-aside {
     vertical-align: middle;
 }
 .card-footer.jsx-1633345700 span.jsx-1633345700 {
-    font-family: proxima-semibold, PingFangSC, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 600;
     font-size: 17px;
     line-height: 14px;
@@ -3526,7 +3526,7 @@ body .share-layout .share-layout-aside {
     padding-top: 24px;
 }
 .recommend-container h3 {
-    font-family: "sofiapro-bold",PingFangSC,sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 700;
     font-size: 33px;
     line-height: 1;
@@ -3604,7 +3604,7 @@ body .share-layout .share-layout-aside {
     background-size: cover;
 }
 .card-footer.jsx-1633345700 span.jsx-1633345700 {
-    font-family: proxima-semibold, PingFangSC, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 600;
     font-size: 17px;
     line-height: 14px;
@@ -3721,7 +3721,7 @@ video.jsx-3382097194 {
     border: none;
 }
 .recommend-item .info-content.jsx-1420774184 h4.jsx-1420774184 {
-    font-family: proxima-semibold, PingFangSC, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 600;
     font-size: 17px;
     line-height: 20px;
@@ -3729,7 +3729,7 @@ video.jsx-3382097194 {
     color: #fff;
 }
 .recommend-item .info-content.jsx-1420774184 p.jsx-1420774184 {
-    font-family: proxima-regular, PingFangSC, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 400;
     font-size: 14px;
     line-height: 17px;
@@ -3778,7 +3778,7 @@ video.jsx-3382097194 {
     background: #fff;
 }
 .header-tag.jsx-874583638 .content.jsx-874583638 {
-    font-family: proxima-semibold, PingFangSC, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 600;
     font-size: 13px;
     line-height: 28px;
@@ -3843,7 +3843,7 @@ video.jsx-3382097194 {
     max-width: 375px;
     font-size: 24px;
     line-height: 1.2;
-    font-family: sofiapro-bold, PingFangSC, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 700;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -4080,7 +4080,7 @@ video.jsx-3382097194 {
     flex: 1 1 auto;
 }
 .share-header .share-sub-title {
-    font-family: proxima-regular, PingFangSC, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 400;
     font-size: 18px;
     line-height: 24px;
@@ -4093,7 +4093,7 @@ video.jsx-3382097194 {
     margin-bottom: 12px;
 }
 .share-header .share-desc {
-    font-family: proxima-regular, PingFangSC, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 400;
     font-size: 15px;
     line-height: 18px;
@@ -4103,14 +4103,14 @@ video.jsx-3382097194 {
     margin-left: 18px;
 }
 .video-card-big.jsx-1861775669 .content-container.jsx-1861775669 .user-info .user-info-content.jsx-1861775669 h2.jsx-1861775669 {
-    font-family: "proxima-semibold",PingFangSC,sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 600;
     font-size: 20px;
     line-height: 24px;
     margin-bottom: 4px;
 }
 .video-card-big.jsx-1861775669 .content-container.jsx-1861775669 .user-info .user-info-content.jsx-1861775669 p.jsx-1861775669 {
-    font-family: "proxima-regular",PingFangSC,sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 400;
     font-size: 15px;
     line-height: 18px;
@@ -4168,7 +4168,7 @@ video.jsx-3382097194 {
 }
 
 .video-card-big.jsx-1861775669 .content-container.jsx-1861775669 .video-meta-info.jsx-1861775669 .video-meta-title.jsx-1861775669 {
-    font-family: "proxima-regular",PingFangSC,sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 400;
     font-size: 17px;
     line-height: 20px;
@@ -4199,7 +4199,7 @@ strong {
     right: 0;
     background-color: #fff;
     color: #000;
-    font-family: "proxima-regular",PingFangSC,sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 400;
 }
 .home {
@@ -4288,7 +4288,7 @@ strong {
 }
 
 ._explore_page_main_title {
-    font-family: "sofiapro-bold",PingFangSC,sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 700;
     font-size: 37px;
     line-height: 1;
@@ -4316,7 +4316,7 @@ strong {
     line-height: 44px;
     font-size: 17px;
     height: 44px;
-    font-family: "proxima-semibold",PingFangSC,sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 600;
 }
 .user-page .profile {
@@ -4650,7 +4650,7 @@ strong {
     font-weight: bold;
     color: #ffffff !important;
     border-radius: 4px;
-    background-image: linear-gradient(120deg, #f7415f, #ca3b3d);
+    background-image: linear-gradient(120deg, #b62927, #b62927);
 
 }
 ._4jy1:before {
