@@ -26,7 +26,7 @@ def upload_media(media_file,filename):
 
 
 def run():
-    start_date = datetime(2020,02,10)
+    start_date = datetime(2020,02,14)
     all_vb_list = Topic.objects.filter(is_vb=True,date__lt = start_date,has_downloaded_url = False).order_by('-id')
     counter=0
     for each_vb in all_vb_list:
@@ -38,7 +38,7 @@ def run():
             cmd = ['ffmpeg','-i', each_vb.backup_url, '-vf',"[in]scale=540:-1,drawtext=text='@"+each_vb.user.username+"':x=10:y=H-th-20:fontsize=16:fontcolor=white[out]",settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename_temp]
             ps = subprocess.Popen(cmd, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
             (output, stderr) = ps.communicate()
-            cmd = 'ffmpeg -i '+settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename_temp+' -ignore_loop 0 -i '+settings.PROJECT_PATH+"/boloindya/scripts/boloindya_transparent.gif"+' -filter_complex "[1:v]format=yuva444p,scale=120:120,setsar=1,rotate=0:c=white@0:ow=rotw(0):oh=roth(0) [rotate];[0:v][rotate] overlay=10:(main_h-overlay_h+5):shortest=1" -codec:a copy -y '+settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename
+            cmd = 'ffmpeg -i '+settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename_temp+' -ignore_loop 0 -i '+settings.PROJECT_PATH+"/boloindya/media/img/boloindya_white.gif"+' -filter_complex "[1:v]format=yuva444p,scale=120:120,setsar=1,rotate=0:c=white@0:ow=rotw(0):oh=roth(0) [rotate];[0:v][rotate] overlay=10:(main_h-overlay_h+5):shortest=1" -codec:a copy -y '+settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename
             subprocess.call(cmd,shell=True)
             downloaded_url = upload_media(open(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename),filename)
             if downloaded_url:

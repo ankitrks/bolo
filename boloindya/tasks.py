@@ -180,21 +180,25 @@ def create_downloaded_url(topic_id):
     from django.conf import settings
     from forum.topic.models import Topic
     video_byte = Topic.objects.get(pk=topic_id)
-    # try:
-    print "start time:  ",datetime.now(),video_byte.backup_url
-    filename = video_byte.backup_url.split('/')[-1]
-    cmd = ['ffmpeg','-i',video_byte.backup_url , '-vf',"[in]scale=540:-1,drawtext=text='Bolo Indya':x=10:y=H-th-35:fontsize=20:fontcolor=white,drawtext=text='@"+video_byte.user.username+"':x=10:y=H-th-20:fontsize=16:fontcolor=white[out]",settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename]
-    ps = subprocess.Popen(cmd, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-    (output, stderr) = ps.communicate()
-    downloaded_url = upload_media(open(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename),filename)
-    if downloaded_url:
-        Topic.object.filter(pk=video_byte.id).update(downloaded_url = downloaded_url,has_downloaded_url = True)
-    if os.path.exists(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename):
-        os.remove(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename)
-    print "bye"
-    print "End time:  ",datetime.now()
-    # except Exception as e:
-    #     print e
+    try:
+        print "start time:  ",datetime.now()
+        filename_temp = "temp_"+video_byte.backup_url.split('/')[-1]
+        filename = video_byte.backup_url.split('/')[-1]
+        cmd = ['ffmpeg','-i', video_byte.backup_url, '-vf',"[in]scale=540:-1,drawtext=text='@"+video_byte.user.username+"':x=10:y=H-th-20:fontsize=16:fontcolor=white[out]",settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename_temp]
+        ps = subprocess.Popen(cmd, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+        (output, stderr) = ps.communicate()
+        cmd = 'ffmpeg -i '+settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename_temp+' -ignore_loop 0 -i '+settings.PROJECT_PATH+"/boloindya/media/img/boloindya_white.gif"+' -filter_complex "[1:v]format=yuva444p,scale=120:120,setsar=1,rotate=0:c=white@0:ow=rotw(0):oh=roth(0) [rotate];[0:v][rotate] overlay=10:(main_h-overlay_h+5):shortest=1" -codec:a copy -y '+settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename
+        subprocess.call(cmd,shell=True)
+        downloaded_url = upload_media(open(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename),filename)
+        if downloaded_url:
+            Topic.object.filter(pk=video_byte.id).update(downloaded_url = downloaded_url,has_downloaded_url = True)
+        if os.path.exists(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename):
+            os.remove(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename_temp)
+            os.remove(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename)
+        print "bye"
+        print "End time:  ",datetime.now()
+    except Exception as e:
+        print e
 
 if __name__ == '__main__':
     app.start()
