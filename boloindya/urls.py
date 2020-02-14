@@ -93,6 +93,7 @@ urlpatterns = [
 
 urlpatterns += i18n_patterns(
     url(r'^$', forum.topic.views.latest_home, name='index'),
+    url(r'^home/$', forum.topic.views.old_home, name='old_home'),
     url(r'^trending/$', forum.topic.views.new_home, name='new_home'),
     url(r'^video_details/(?P<id>\d+)/$', forum.topic.views.video_details, name='video_details'),
     url(r'^video/(?P<slug>[\w-]+)/(?P<id>\d+)/$', forum.topic.views.video_details_by_slug, name='video_details_by_slug'),

@@ -353,30 +353,30 @@ def uploaddata(request):
     return HttpResponse()
 
 def get_kyc_user_list(request):
-    if request.user.is_superuser:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
         all_kyc = UserKYC.objects.all()
         return render(request,'jarvis/pages/userkyc/user_kyc_list.html',{'all_kyc':all_kyc})
 def get_submitted_kyc_user_list(request):
-    if request.user.is_superuser:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
         all_kyc = UserKYC.objects.filter(is_kyc_completed=True,is_kyc_accepted=False)
         return render(request,'jarvis/pages/userkyc/submitted_kyc.html',{'all_kyc':all_kyc})
 
 def get_pending_kyc_user_list(request):
-    if request.user.is_superuser:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
         all_kyc = UserKYC.objects.filter(is_kyc_completed=False,is_kyc_accepted=False)
         return render(request,'jarvis/pages/userkyc/pending_kyc.html',{'all_kyc':all_kyc})
 
 def get_accepted_kyc_user_list(request):
-    if request.user.is_superuser:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
         all_kyc = UserKYC.objects.filter(is_kyc_completed=True)
         return render(request,'jarvis/pages/userkyc/accepted_kyc.html',{'all_kyc':all_kyc})
 
 def get_user_pay_details(request):
-    if request.user.is_superuser:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
         return render(request,'jarvis/pages/payment/user_pay.html')
 
 def get_single_user_pay_details(request):
-    if request.user.is_superuser:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
         username = request.GET.get('username',None)
         all_pay = UserPay.objects.filter(user__username = username).order_by('-id')
         user = User.objects.get(username=username)
@@ -403,11 +403,13 @@ def add_user_pay(request):
         user_pay.pay_date = datetime.now()
         user_pay.save()
         return HttpResponse(json.dumps({'is_success':'success'}),content_type="application/json")
+    else:
+        return HttpResponse(json.dumps({'is_success':'fail','message':'not authorised'}),content_type="application/json")
 
 
 
 def get_kyc_of_user(request):
-    if request.user.is_superuser or request.user.is_staff:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)) or request.user.is_staff:
         username = request.GET.get('username',None)
         kyc_user = User.objects.get(username=username)
         kyc_details = UserKYC.objects.get(user=kyc_user)
@@ -442,7 +444,7 @@ def SecretFileView(request):
 
 def get_encashable_detail(request):
     to_be_calculated = request.GET.get("calculate",None)
-    if request.user.is_superuser or request.user.is_staff:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)) or request.user.is_staff:
         if to_be_calculated:
             for each_user in User.objects.all():
                 calculate_encashable_details(each_user)
@@ -452,13 +454,13 @@ def get_encashable_detail(request):
     return render(request,'jarvis/pages/payment/encashable_detail.html',{'all_encash_details':all_encash_details,'payement_cycle_form':payement_cycle_form})
 
 def calculate_encashable_detail(request):
-    if request.user.is_superuser or request.user.is_staff:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)) or request.user.is_staff:
         for each_user in User.objects.all():
             calculate_encashable_details(each_user)
     return HttpResponse(json.dumps({'success':'success'}),content_type="application/json")
 
 def get_single_encash_detail(request):
-    if request.user.is_superuser or request.user.is_staff:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)) or request.user.is_staff:
         username = request.GET.get('username',None)
         user = User.objects.get(username=username)
         calculate_encashable_details(user)
@@ -499,7 +501,7 @@ class PaymentCycleView(FormView):
     template_name='jarvis/pages/payment/invoice_error.html'
 
     def form_valid(self,form,**kwargs):
-        if self.request.user.is_superuser or self.request.user.is_staff:
+        if self.request.user.is_superuser or 'moderator' in list(self.request.user.groups.all().values_list('name',flat=True)) or self.request.user.is_staff:
             pay_cycle = PaymentCycle.objects.all().update(**form.cleaned_data)
             for each_user in User.objects.all():
                 calculate_encashable_details(each_user)
@@ -510,7 +512,7 @@ class PaymentCycleView(FormView):
 
 
 def accept_kyc(request):
-    if request.user.is_superuser or request.user.is_staff:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)) or request.user.is_staff:
         kyc_type = request.GET.get('kyc_type',None)
         user_id = request.GET.get('user_id',None)
         if kyc_type == "basic_info":
@@ -529,11 +531,12 @@ def accept_kyc(request):
         if user_kyc.is_kyc_basic_info_accepted and user_kyc.is_kyc_document_info_accepted and user_kyc.is_kyc_selfie_info_accepted and\
         user_kyc.is_kyc_bank_details_accepted:
             UserKYC.objects.filter(user_id = user_id).update(is_kyc_accepted = True)
+        user_kyc = UserKYC.objects.get(user_id = user_id)
 
         return HttpResponse(json.dumps({'success':'success','kyc_accepted':user_kyc.is_kyc_accepted}),content_type="application/json")
 
 def reject_kyc(request):
-    if request.user.is_superuser or request.user.is_staff:
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)) or request.user.is_staff:
         kyc_type = request.GET.get('kyc_type',None)
         kyc_id = request.GET.get('kyc_id',None)
         kyc_reject_reason = request.GET.get('kyc_reject_reason',None)
@@ -1058,7 +1061,7 @@ def notification_panel(request):
     filters = {'language': lang, 'notification_type': notification_type, 'user_group': user_group, 'is_scheduled': scheduled_status, 'title__icontains': title}
 
     pushNotifications = PushNotification.objects.filter(*[Q(**{k: v}) for k, v in filters.items() if v], is_removed=False).order_by('-created_at')
-    
+
     return render(request,'jarvis/pages/notification/index.html', {'pushNotifications': pushNotifications, \
         'language_options': language_options, 'notification_types': notification_type_options, \
             'user_group_options': user_group_options, 'language': lang, 'notification_type': notification_type, \
@@ -1071,9 +1074,8 @@ import datetime
 def send_notification(request):
 
     pushNotification = {}
-    
+
     if request.method == 'POST':
-        
         data = {}
 
         data['title'] = request.POST.get('title', "")
@@ -1088,6 +1090,8 @@ def send_notification(request):
         data['datepicker'] = request.POST.get('datepicker', '')
         data['timepicker'] = request.POST.get('timepicker', '').replace(" : ", ":")
         data['image_url'] = request.POST.get('image_url', '')
+        data['days_ago'] = request.POST.get('days_ago', '1')
+
         send_notifications_task.delay(data, pushNotification)
         return redirect('/jarvis/notification_panel/')
     if request.method == 'GET':
@@ -1110,7 +1114,7 @@ def particular_notification(request, notification_id=None, status_id=2, page_no=
     has_prev=False
     if page_no > 0:
         has_prev=True
-    pushNotificationUser=PushNotificationUser.objects.filter(push_notification_id=pushNotification)
+    pushNotificationUser=PushNotificationUser.objects.filter(push_notification_id=pushNotification, status=status_id)
     pushNotificationUserSlice=pushNotificationUser[page_no*10:page_no*10+10]
     has_next=True
     if ((page_no*10)+10) >= len(pushNotificationUser):
@@ -1745,32 +1749,52 @@ def analytics(request):
 @api_view(['POST'])
 # view for notification search
 def search_notification(request):
-    from drf_spirit.serializers import CategoryWithTitleSerializer, CategoryVideoByteSerializer, UserWithNameSerializer, TongueTwisterWithHashSerializer
+    from drf_spirit.serializers import CategoryWithTitleSerializer, CategoryVideoByteSerializer, UserWithNameSerializer, TongueTwisterWithHashSerializer, TongueWithTitleSerializer
     from forum.topic.models import TongueTwister
     from django.db.models import Q
     raw_data = json.loads(request.body)
     query = raw_data['query']
     notification_type = raw_data['notification_type']
+    page=0
+    try:
+        page=int(raw_data['page'])
+    except:
+        page=0
     data = []
     try:
         if notification_type == '0':
-            topics=Topic.objects.filter(is_removed=False, is_vb=True, title__icontains=query)
-            data=CategoryVideoByteSerializer(topics, many=True).data
+            topics=[]
+            try:
+                int(query)
+                topics=Topic.objects.filter(Q(is_removed=False, is_vb=True, title__istartswith=query)|Q(pk=query)).order_by('title')
+            except:
+                topics=Topic.objects.filter(is_removed=False, is_vb=True, title__istartswith=query).order_by('title')
+            data=TongueWithTitleSerializer(topics[page*100:(page*100)+100], many=True).data
         elif notification_type == '1':
-            users=UserProfile.objects.filter((Q(user__username__icontains=query)|Q(name__icontains=query)|Q(mobile_no__icontains=query))&Q(is_test_user=False))
+            users=[]
+            try:
+                int(query)
+                users=UserProfile.objects.filter((Q(user__username__istartswith=query)|Q(name__istartswith=query)|Q(mobile_no__istartswith=query)|Q(user__pk=query))&Q(is_test_user=False)).order_by('pk').distinct('pk')
+            except:
+                users=UserProfile.objects.filter((Q(user__username__istartswith=query)|Q(name__istartswith=query)|Q(mobile_no__istartswith=query))&Q(is_test_user=False)).order_by('pk').distinct('pk')
             data=UserWithNameSerializer(users, many=True).data
         elif notification_type == '2':
-            category=Category.objects.filter(title__icontains=query) 
+            category=[]
+            try:
+                int(query)
+                category=Category.objects.filter(Q(title__istartswith=query)|Q(pk=query))
+            except:
+                category=Category.objects.filter(title__istartswith=query)
             data=CategoryWithTitleSerializer(category, many=True).data
         elif notification_type == '3':
-            challenges=TongueTwister.objects.filter(hash_tag__icontains=query)
+            challenges=TongueTwister.objects.filter(hash_tag__istartswith=query.replace("#", ""))
             data=TongueTwisterWithHashSerializer(challenges, many=True).data
         else:
             data = []
         return JsonResponse({'data': data}, status=status.HTTP_200_OK)  
     except Exception as e:
         print(e)
-        return JsonResponse({'data': []}, status=status.HTTP_200_OK)
+        return JsonResponse({'data': [], 'error': str(e)}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def upload_image_notification(requests):

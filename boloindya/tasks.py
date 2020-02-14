@@ -12,25 +12,27 @@ def send_notifications_task(data, pushNotification):
     #Import files for notification
     from datetime import datetime, timedelta
     from forum.topic.models import Topic, VBseen
+    from forum.category.models import Category
     from drf_spirit.models import UserLogStatistics
     from jarvis.models import PushNotification, FCMDevice, PushNotificationUser
     from django.core.paginator import Paginator
-    from forum.user.models import UserProfile
+    from forum.user.models import UserProfile, AndroidLogs
     try:
         title = data.get('title', "")
         upper_title = data.get('upper_title', "")
         notification_type = data.get('notification_type', "")
-        id = data.get('id', "")
+        instance_id = data.get('id', "")
         user_group = data.get('user_group', "")
-        lang = data.get('lang', "")
+        lang = data.get('lang', "0")
         schedule_status = data.get('schedule_status', "")
         datepicker = data.get('datepicker', '')
         timepicker = data.get('timepicker', '').replace(" : ", ":")
         image_url = data.get('image_url', '')
         particular_user_id=data.get('particular_user_id', None)
-        
-        if user_group == '8':
-            lang='0'
+        category=data.get('category', '')
+
+        if notification_type == '3':
+            instance_id=instance_id.replace('#', '')
 
         pushNotification = PushNotification()
         pushNotification.title = upper_title
@@ -39,74 +41,81 @@ def send_notifications_task(data, pushNotification):
         pushNotification.image_url = image_url
         pushNotification.notification_type = notification_type
         pushNotification.user_group = user_group
-        pushNotification.instance_id = id
+        pushNotification.instance_id = instance_id
+        if data.get('days_ago', '1'):
+            pushNotification.days_ago=data.get('days_ago', '1')
         if particular_user_id:
             pushNotification.particular_user_id=particular_user_id
         pushNotification.save()
     except Exception as e:
-        logger.info(str(e))    
+        logger.info(str(e))
 
     try:
         if schedule_status == '1':
             if datepicker:
                 pushNotification.scheduled_time = datetime.strptime(datepicker + " " + timepicker, "%m/%d/%Y %H:%M")
-            pushNotification.is_scheduled = True            
+            pushNotification.is_scheduled = True
             pushNotification.save()
         else:
             device = ''
-            language_filter = {} 
-
+            language_filter = {'is_uninstalled': False}
+            exclude_filter = {}
             if lang != '0':
-                language_filter = { 'user__st__language': lang, 'is_uninstalled': False }
-
-            if data.get('category', 'Select Category') not in 'Select Category':
-                filter_list=UserProfile.objects.filter(sub_category=data.get('category', None)).values_list('user__pk', flat=True)
-                if lang != '0':
-                    device = FCMDevice.objects.filter(user__pk__in=filter_list, user__st__language=lang, is_uninstalled=False)
-                else:
-                    device = FCMDevice.objects.filter(user__pk__in=filter_list, is_uninstalled=False)
-            elif user_group == '8':
-                device = FCMDevice.objects.filter(user__pk=data.get('particular_user_id', None))
+                language_filter = { 'user__st__language': lang, 'is_uninstalled': False}
+            if category:
+                try:
+                    pushNotification.category=Category.objects.get(pk=category)
+                    pushNotification.save()
+                except Exception as e:
+                    logger.info(str(e))
+                language_filter['user__st__sub_category']=data.get('category', None)
+            if user_group == '8':
+                language_filter = {'is_uninstalled': False}
+                language_filter['user__pk']=data.get('particular_user_id', None)
             elif user_group == '1':
                 end_date = datetime.today()
                 start_date = end_date - timedelta(hours=3)
-                device = FCMDevice.objects.filter(user__isnull=True, created_at__range=(start_date, end_date), is_uninstalled=False)
-
+                language_filter = {'is_uninstalled': False}
+                language_filter['user__isnull']=True
+                language_filter['created_at__range']=(start_date, end_date)
             elif user_group == '2':
-                device = FCMDevice.objects.filter(user__isnull=True, is_uninstalled=False)
-
+                language_filter = {'is_uninstalled': False}
+                language_filter['user__isnull']=True
             elif user_group == '7':
                 #This list contains user IDs for test users: Gitesh, Abhishek, Varun, Maaz
                 # Anshika, Bhoomika and Akash
-                filter_list = [39342, 1465, 2801, 19, 40, 328, 23, 3142, 1494, 41]
-                device = FCMDevice.objects.filter(user__pk__in=filter_list, is_uninstalled=False)
-            elif user_group == '0':
-                if lang != '0':
-                    device = FCMDevice.objects.filter(is_uninstalled=False, user__st__language=lang)
+                language_filter = {'is_uninstalled': False}
+                filter_list = [39342, 1465, 2801, 19, 40, 328, 23, 3142, 1494, 41, 1491]
+                language_filter['user__pk__in']=filter_list
+            elif user_group == '9':
+                hours_ago = datetime.now()-timedelta(days=int(data.get('days_ago', "1")))
+                filter_list=Topic.objects.filter(is_vb=True, date__gt=hours_ago).order_by('-user__pk').distinct('user').values_list('user__pk', flat=True)
+                print(filter_list)
+                language_filter['user__pk__in']=filter_list
+            elif user_group == '10':
+                hours_ago = datetime.now()-timedelta(days=int(data.get('days_ago', "1")))
+                filter_list=AndroidLogs.objects.filter(created_at__gt=hours_ago).order_by('-user__pk').distinct('user').values_list('user__pk', flat=True)
+                print(filter_list)
+                language_filter['user__pk__in']=filter_list
+            elif user_group == '3':
+                filter_list = VBseen.objects.distinct('user__pk').values_list('user__pk', flat=True)
+                exclude_filter={'user__pk__in': filter_list}
+            elif user_group == '4' or user_group == '5':
+                hours_ago = datetime.now()
+                if user_group == '4':
+                    hours_ago -= timedelta(days=1)
                 else:
-                    device = FCMDevice.objects.filter(is_uninstalled=False)
-            else:
-                filter_list = []
-
-                if user_group == '3':
-                    filter_list = VBseen.objects.distinct('user__pk').values_list('user__pk', flat=True)
-
-                elif user_group == '4' or user_group == '5':
-                    hours_ago = datetime.now()
-                    if user_group == '4':
-                        hours_ago -= timedelta(days=1)
-                    else:
-                        hours_ago -=  timedelta(days=2)
-
-                    filter_list = UserLogStatistics.objects.filter(session_starttime__gte=hours_ago).values_list('user', flat=True)
-                    filter_list = map(int , filter_list)
-
-                elif user_group == '6':
-                    filter_list = Topic.objects.filter(is_vb=True).values_list('user__pk', flat=True)
-
-                device = FCMDevice.objects.exclude(user__pk__in=filter_list).filter(**language_filter)
-
+                    hours_ago -=  timedelta(days=2)
+                filter_list=AndroidLogs.objects.filter(created_at__gt=hours_ago).order_by('-user__pk').distinct('user').values_list('user__pk', flat=True)
+                exclude_filter={'user__pk__in': filter_list}
+            elif user_group == '6':
+                filter_list = Topic.objects.filter(is_vb=True).values_list('user__pk', flat=True)
+                exclude_filter={'user__pk__in': filter_list}
+            print(exclude_filter)
+            print(language_filter)
+            device = FCMDevice.objects.exclude(**exclude_filter).filter(**language_filter)
             logger.info(device)
+            print(device)
             device_pagination = Paginator(device, 1000)
             device_list=[]
             for index in range(1, (device_pagination.num_pages+1)):
@@ -114,12 +123,17 @@ def send_notifications_task(data, pushNotification):
                 logger.info(device_after_slice)
                 for each in device_after_slice:
                     try:
-                        PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2')
+                        t = each.send_message(data={"title": title, "id": instance_id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url}, time_to_live=6000)
+                        response=t[1]['results'][0]['message_id']
+                        try:
+                            PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2', device=each)
+                        except:
+                            pass
                     except:
                         pass
-                    t = each.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url})
-                    device_list.append(t)
-                #t = device_after_slice.object_list.send_message(data={'pupluar_data': 'true' })
+                    #t = each.send_message(data={})
+                    #print(t)
+                    #t = each.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url})
                 logger.info(device_list)
             pushNotification.is_executed=True
             pushNotification.save()
@@ -142,6 +156,7 @@ def vb_create_task(topic_id):
                 # topic.is_transcoded = True
                 topic.save()
                 topic.update_m3u8_content()
+                create_downloaded_url(topic_id)
 
 @app.task
 def user_ip_to_state_task(user_id,ip):
@@ -154,6 +169,53 @@ def user_ip_to_state_task(user_id,ip):
     json_response = json.loads(response)
     userprofile.update(state_name = json_response['regionName'],city_name = json_response['city'])
 
+
+def ffmpeg(*cmd):
+    try:
+        subprocess.check_output(['ffmpeg'] + list(cmd))
+    except subprocess.CalledProcessError:
+        return False
+    return True
+
+def upload_media(media_file,filename):
+    try:
+        client = boto3.client('s3',aws_access_key_id = settings.BOLOINDYA_AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY)
+        filenameNext= str(filename).split('.')
+        final_filename = str(filenameNext[0])+"."+str(filenameNext[1])
+        client.put_object(Bucket=settings.BOLOINDYA_AWS_BUCKET_NAME, Key='watermark/' + final_filename, Body=media_file,ACL='public-read')
+        filepath = "https://s3.amazonaws.com/"+settings.BOLOINDYA_AWS_BUCKET_NAME+"/watermark/"+final_filename
+        return filepath
+    except:
+        return None
+
+def create_downloaded_url(topic_id):
+    import subprocess
+    import os.path
+    from datetime import datetime
+    import os
+    import boto3
+    from django.conf import settings
+    from forum.topic.models import Topic
+    video_byte = Topic.objects.get(pk=topic_id)
+    try:
+        print "start time:  ",datetime.now()
+        filename_temp = "temp_"+video_byte.backup_url.split('/')[-1]
+        filename = video_byte.backup_url.split('/')[-1]
+        cmd = ['ffmpeg','-i', video_byte.backup_url, '-vf',"[in]scale=540:-1,drawtext=text='@"+video_byte.user.username+"':x=10:y=H-th-20:fontsize=16:fontcolor=white[out]",settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename_temp]
+        ps = subprocess.Popen(cmd, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+        (output, stderr) = ps.communicate()
+        cmd = 'ffmpeg -i '+settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename_temp+' -ignore_loop 0 -i '+settings.PROJECT_PATH+"/boloindya/media/img/boloindya_white.gif"+' -filter_complex "[1:v]format=yuva444p,scale=120:120,setsar=1,rotate=0:c=white@0:ow=rotw(0):oh=roth(0) [rotate];[0:v][rotate] overlay=10:(main_h-overlay_h+5):shortest=1" -codec:a copy -y '+settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename
+        subprocess.call(cmd,shell=True)
+        downloaded_url = upload_media(open(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename),filename)
+        if downloaded_url:
+            Topic.object.filter(pk=video_byte.id).update(downloaded_url = downloaded_url,has_downloaded_url = True)
+        if os.path.exists(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename):
+            os.remove(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename_temp)
+            os.remove(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename)
+        print "bye"
+        print "End time:  ",datetime.now()
+    except Exception as e:
+        print e
 
 if __name__ == '__main__':
     app.start()

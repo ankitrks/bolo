@@ -137,7 +137,8 @@ class Topic(models.Model):
     video_m3u8_content = models.TextField(_("Video M3U8 Content"), blank = True, null = True)
     downloaded_url = models.CharField(_("downloaded URL"), max_length=255, blank = True, null = True)
     vb_playtime = models.PositiveIntegerField(null=True,blank=True,default=0,db_index=True)
-
+    has_downloaded_url = models.BooleanField(default = False)
+    
     plag_text_options = (
         ('0', "TikTok"),
         ('1', "Helo"),
@@ -170,7 +171,6 @@ class Topic(models.Model):
         return self.topic_comment.filter(is_media = False)
 
     class Meta:
-        ordering = ['-comment_count', '-total_share_count']
         verbose_name = _("topic")
         verbose_name_plural = _("topics")
 
@@ -431,7 +431,10 @@ class TongueTwister(models.Model):
     hash_counter = models.PositiveIntegerField(default=1,null=True,blank=True,db_index=True)
     total_views = models.PositiveIntegerField(default=0,null=True,blank=True,db_index=True)
     def __unicode__(self):
-        return self.hash_tag
+        if self.hash_tag:
+            return self.hash_tag
+        else:
+            return "None"
 
 publish_options = (
     ('0', "Unpublish"),

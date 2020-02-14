@@ -247,7 +247,7 @@ class BoloActionHistoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'score', 'action', 'action_object', 'is_removed')
     # list_filter = ('user__st__name', )
     search_fields = ('user__username', 'user__st__name')
-admin.site.register(BoloActionHistory, BoloActionHistoryAdmin)
+# admin.site.register(BoloActionHistory, BoloActionHistoryAdmin)
 
 class NotificationAdmin(admin.ModelAdmin):
     list_display = ('id', 'for_user', 'user', 'notification_type')
@@ -318,7 +318,7 @@ admin.site.register(Notification,NotificationAdmin)
 admin.site.register(ShareTopic,ShareTopicAdmin)
 admin.site.register(Voting)
 admin.site.register(Leaderboard)
-admin.site.register(VBseen)
+# admin.site.register(VBseen)
 admin.site.register(TongueTwister)
 admin.site.register(JobOpening,JonOpeningAdmin)
 admin.site.register(JobRequest,JobRequestAdmin)
