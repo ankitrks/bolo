@@ -8,7 +8,7 @@ from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,c
     KYCDocumentTypeList,save_kyc_basic_info,save_kyc_documents,save_kyc_selfie,save_kyc_additional_info,save_bank_details_info,kyc_profession_status,get_kyc_status,my_app_version,\
     EncashableDetailList,get_bolo_details, get_category_detail, UserLogStatistics,GetFollowigList,GetFollowerList, get_category_with_video_bytes, get_category_detail_with_views, \
     get_category_video_bytes, get_popular_video_bytes, get_user_follow_and_like_list, get_recent_videos, get_popular_bolo, submit_user_feedback,generate_login_data,get_ip_to_language, get_landing_page_video,\
-    mention_suggestion,hashtag_suggestion,SearchHashTag,editComment,get_user_bolo_info,get_search_suggestion
+    mention_suggestion,hashtag_suggestion,SearchHashTag,editComment,get_user_bolo_info,get_search_suggestion,SolrSearchTopic,SolrSearchHashTag,SolrSearchUser,solr_hashtag_suggestion,SolrSearchTop
 from rest_framework_simplejwt import views as jwt_views
 from .views import *
 
@@ -52,8 +52,12 @@ urlpatterns = [
     url(r'^get_home_answer/$', GetHomeAnswer.as_view(), name='get_home_answer'),
     url(r'^get_answers/$', GetAnswers.as_view(), name='get_answers'),
     url(r'^search/', include(topicsearch_urls)),
+    url(r'^solr/search/$', SolrSearchTopic.as_view(), name='solr-search-topic'),
     url(r'^search/users/', include(usersearch_urls)),
+    url(r'^solr/search/users/$', SolrSearchUser.as_view(), name='solr-search-user'),
     url(r'^search/hash_tag/',SearchHashTag.as_view(),name='search_hash_tag'),
+    url(r'^solr/search/hash_tag/$',SolrSearchHashTag.as_view(),name='solr-search_hash_tag'),
+    url(r'^solr/search/top/$',SolrSearchTop.as_view(),name='solr-search-top'),
     url(r'^create_topic', include(createtopic_urls)),
     url(r'^reply_on_topic', include(replyontopic_urls)),
     url(r'^categories/', include(category_urls)),
@@ -129,6 +133,7 @@ urlpatterns = [
     url(r'^get_user_bolo_info/$',get_user_bolo_info,name='get_user_bolo_info'),
     url(r'^sync/dump/',SyncDump,name='sync_dump'),
     url(r'^hashtag_suggestion/$', hashtag_suggestion, name='hashtag_suggestion'),
+    url(r'^solr/hashtag_suggestion/$', solr_hashtag_suggestion, name='solr_hashtag_suggestion'),
     #url(r'^user/statistics/$', user_statistics, name = 'user_statistics'),          # url for dumping values in user statistics table
 
     url(r'^get_category_detail/$', get_category_detail),

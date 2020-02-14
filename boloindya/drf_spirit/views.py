@@ -739,16 +739,17 @@ class BoloIndyaGenericAPIView(GenericAPIView):
         new_request = super(BoloIndyaGenericAPIView, self).initialize_request(request, *args, **kwargs)
         return new_request
 
-class SearchTopic(BoloIndyaGenericAPIView):
+class SolrSearchTop(BoloIndyaGenericAPIView):
     def get(self, request):
         topics      = []
         search_term = self.request.GET.get('term')
         language_id = self.request.GET.get('language_id', 1)
         page = request.GET.get('page',1)
-        page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
+        page_size = self.request.GET.get('page_size',5)
         is_expand=self.request.GET.get('is_expand',False),
+        response ={}
         if search_term:
-            print search_term
+            topics =[]
             sqs = SearchQuerySet().models(Topic).raw_search(search_term).filter(is_removed = False, language_id=language_id)
             if not sqs:
                 suggested_word = SearchQuerySet().models(Topic).auto_query(search_term).spelling_suggestion()
@@ -758,60 +759,23 @@ class SearchTopic(BoloIndyaGenericAPIView):
             if not sqs:
                 sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(is_removed = False, language_id=language_id)
             if sqs:
-                result_page = get_paginated_data(sqs, page_size, page)
-                print result_page[0].object_list
+                result_page = get_paginated_data(sqs, int(page_size), int(page))
                 topics = solr_object_to_db_object(result_page[0].object_list)
-            # topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True, language_id=language_id)
-            next_page_number = page+1 if page_size*page<len(sqs) else ''
-            response ={"count":len(sqs),"results":TopicSerializerwithComment(topics,many=True,context={'is_expand':is_expand}).data,"next_page_number":next_page_number} 
-        return JsonResponse(response, safe = False)
-
-
-# class SearchTopic(generics.ListCreateAPIView):
-#     """
-#     get:
-#     Search By Topic.
-#     term        = request.GET.get('term', '')
-#     Required Parameters:
-#     term---Topic Title
-
-#     post:
-
-#     Required Parameters:
-#     title and category_id 
-#     """
-
-
-#     serializer_class    = TopicSerializerwithComment
-#     permission_classes  = (IsOwnerOrReadOnly,)
-
-#     def get_serializer_context(self):
-#         """
-#         Extra context provided to the serializer class.
-#         """
-#         return {
-#             'is_expand': self.request.GET.get('is_expand',False),
-#         }
-
-#     def get_queryset(self):
-#         topics      = []
-#         search_term = self.request.GET.get('term')
-#         language_id = self.request.GET.get('language_id', 1)
-#         if search_term:
-#             topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True, language_id=language_id)
-
-#         return topics
-
-
-
-class SearchHashTag(BoloIndyaGenericAPIView):
-    def get(self, request):
-        hash_tags      = []
-        search_term = self.request.GET.get('term')
-        page = request.GET.get('page',1)
-        page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
-        if search_term:
-            print search_term
+            response["top_vb"]=TopicSerializerwithComment(topics,many=True,context={'is_expand':is_expand}).data
+            users  =[]
+            sqs = SearchQuerySet().models(UserProfile).raw_search(search_term)
+            if not sqs:
+                suggested_word = SearchQuerySet().models(UserProfile).auto_query(search_term).spelling_suggestion()
+                print suggested_word
+                if suggested_word:
+                    sqs = SearchQuerySet().models(UserProfile).raw_search(suggested_word)
+            if not sqs:
+                sqs = SearchQuerySet().models(UserProfile).autocomplete(**{'text':search_term})
+            if sqs:
+                result_page = get_paginated_data(sqs, int(page_size), int(page))
+                users = solr_object_to_db_object(result_page[0].object_list)
+            response["top_user"]=UserSerializer(User.objects.filter(st__in=users),many=True).data
+            hash_tags  =[]
             sqs = SearchQuerySet().models(TongueTwister).raw_search(search_term)
             if not sqs:
                 suggested_word = SearchQuerySet().models(TongueTwister).auto_query(search_term).spelling_suggestion()
@@ -821,7 +785,91 @@ class SearchHashTag(BoloIndyaGenericAPIView):
             if not sqs:
                 sqs = SearchQuerySet().models(TongueTwister).autocomplete(**{'text':search_term})
             if sqs:
-                result_page = get_paginated_data(sqs, page_size, page)
+                result_page = get_paginated_data(sqs, int(page_size), int(page))
+                hash_tags = solr_object_to_db_object(result_page[0].object_list)
+            response["top_hash_tag"] = TongueTwisterSerializer(hash_tags,many=True).data
+        return JsonResponse(response, safe = False)
+
+
+class SolrSearchTopic(BoloIndyaGenericAPIView):
+    def get(self, request):
+        topics      = []
+        search_term = self.request.GET.get('term')
+        language_id = self.request.GET.get('language_id', 1)
+        page = request.GET.get('page',1)
+        page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
+        is_expand=self.request.GET.get('is_expand',False),
+        if search_term:
+            sqs = SearchQuerySet().models(Topic).raw_search(search_term).filter(is_removed = False, language_id=language_id)
+            if not sqs:
+                suggested_word = SearchQuerySet().models(Topic).auto_query(search_term).spelling_suggestion()
+                if suggested_word:
+                    sqs = SearchQuerySet().models(Topic).raw_search(suggested_word).filter(is_removed = False, language_id=language_id)
+            if not sqs:
+                sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(is_removed = False, language_id=language_id)
+            if sqs:
+                result_page = get_paginated_data(sqs, int(page_size), int(page))
+                print result_page[0].object_list
+                topics = solr_object_to_db_object(result_page[0].object_list)
+            # topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True, language_id=language_id)
+            next_page_number = page+1 if page_size*page<len(sqs) else ''
+            response ={"count":len(sqs),"results":TopicSerializerwithComment(topics,many=True,context={'is_expand':is_expand}).data,"next_page_number":next_page_number} 
+        return JsonResponse(response, safe = False)
+
+
+class SearchTopic(generics.ListCreateAPIView):
+    """
+    get:
+    Search By Topic.
+    term        = request.GET.get('term', '')
+    Required Parameters:
+    term---Topic Title
+
+    post:
+
+    Required Parameters:
+    title and category_id 
+    """
+
+
+    serializer_class    = TopicSerializerwithComment
+    permission_classes  = (IsOwnerOrReadOnly,)
+
+    def get_serializer_context(self):
+        """
+        Extra context provided to the serializer class.
+        """
+        return {
+            'is_expand': self.request.GET.get('is_expand',False),
+        }
+
+    def get_queryset(self):
+        topics      = []
+        search_term = self.request.GET.get('term')
+        language_id = self.request.GET.get('language_id', 1)
+        if search_term:
+            topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True, language_id=language_id)
+
+        return topics
+
+
+
+class SolrSearchHashTag(BoloIndyaGenericAPIView):
+    def get(self, request):
+        hash_tags      = []
+        search_term = self.request.GET.get('term')
+        page = request.GET.get('page',1)
+        page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
+        if search_term:
+            sqs = SearchQuerySet().models(TongueTwister).raw_search(search_term)
+            if not sqs:
+                suggested_word = SearchQuerySet().models(TongueTwister).auto_query(search_term).spelling_suggestion()
+                if suggested_word:
+                    sqs = SearchQuerySet().models(TongueTwister).raw_search(suggested_word)
+            if not sqs:
+                sqs = SearchQuerySet().models(TongueTwister).autocomplete(**{'text':search_term})
+            if sqs:
+                result_page = get_paginated_data(sqs, int(page_size), int(page))
                 print result_page[0].object_list
                 hash_tags = solr_object_to_db_object(result_page[0].object_list)
             # hash_tags  = TongueTwister.objects.filter(hash_tag__icontains = search_term)
@@ -830,32 +878,32 @@ class SearchHashTag(BoloIndyaGenericAPIView):
         return JsonResponse(response, safe = False)
 
 
-# class SearchHashTag(generics.ListCreateAPIView):
-#     """
-#     get:
-#     Search By Topic.
-#     term        = request.GET.get('term', '')
-#     Required Parameters:
-#     term---Topic Title
+class SearchHashTag(generics.ListCreateAPIView):
+    """
+    get:
+    Search By Topic.
+    term        = request.GET.get('term', '')
+    Required Parameters:
+    term---Topic Title
 
-#     post:
+    post:
 
-#     Required Parameters:
-#     term 
-#     """
+    Required Parameters:
+    term 
+    """
 
 
-#     serializer_class    = TongueTwisterSerializer
-#     permission_classes  = (IsOwnerOrReadOnly,)
-#     pagination_class    = LimitOffsetPagination
+    serializer_class    = TongueTwisterSerializer
+    permission_classes  = (IsOwnerOrReadOnly,)
+    pagination_class    = LimitOffsetPagination
 
-#     def get_queryset(self):
-#         hash_tags      = []
-#         search_term = self.request.GET.get('term')
-#         if search_term:
-#             hash_tags  = TongueTwister.objects.filter(hash_tag__icontains = search_term)
+    def get_queryset(self):
+        hash_tags      = []
+        search_term = self.request.GET.get('term')
+        if search_term:
+            hash_tags  = TongueTwister.objects.filter(hash_tag__icontains = search_term)
 
-#         return hash_tags
+        return hash_tags
 
 
 @api_view(['POST'])
@@ -885,7 +933,7 @@ def GetUserProfile(request):
 
 
 
-class SearchUser(BoloIndyaGenericAPIView):
+class SolrSearchUser(BoloIndyaGenericAPIView):
     def get(self, request):
         topics      = []
         search_term = self.request.GET.get('term')
@@ -897,13 +945,12 @@ class SearchUser(BoloIndyaGenericAPIView):
             sqs = SearchQuerySet().models(UserProfile).raw_search(search_term)
             if not sqs:
                 suggested_word = SearchQuerySet().models(UserProfile).auto_query(search_term).spelling_suggestion()
-                print suggested_word
                 if suggested_word:
                     sqs = SearchQuerySet().models(UserProfile).raw_search(suggested_word)
             if not sqs:
                 sqs = SearchQuerySet().models(UserProfile).autocomplete(**{'text':search_term})
             if sqs:
-                result_page = get_paginated_data(sqs, page_size, page)
+                result_page = get_paginated_data(sqs, int(page_size), int(page))
                 print result_page[0].object_list
                 users = solr_object_to_db_object(result_page[0].object_list)
             # users = User.objects.filter( Q(username__icontains = search_term) | Q(st__name__icontains = search_term) | Q(first_name__icontains = search_term) | \
@@ -913,36 +960,36 @@ class SearchUser(BoloIndyaGenericAPIView):
         return JsonResponse(response, safe = False)
 
 
-# class SearchUser(generics.ListCreateAPIView):
+class SearchUser(generics.ListCreateAPIView):
 
-#     """
-#     get:
-#     Search By User.
-#     term        = request.GET.get('term', '')
-#     Required Parameters:
-#     term--- Username and First Name
+    """
+    get:
+    Search By User.
+    term        = request.GET.get('term', '')
+    Required Parameters:
+    term--- Username and First Name
 
-#     post: 
+    post: 
 
 
-#     Required Parameters:
-#     title and category_id 
-#     """
+    Required Parameters:
+    title and category_id 
+    """
 
-#     serializer_class    = UserSerializer
-#     permission_classes  = (IsOwnerOrReadOnly,)
+    serializer_class    = UserSerializer
+    permission_classes  = (IsOwnerOrReadOnly,)
 
-#     def get_queryset(self):
-#         users       = []
-#         search_term = self.request.GET.get('term')
-#         if search_term:
-#             name_list = search_term.split()
-#             users = User.objects.filter( Q(username__icontains = search_term) | Q(st__name__icontains = search_term) | Q(first_name__icontains = search_term) | \
-#                     Q(last_name__icontains = search_term) )
-#             #user_ids = UserProfile.objects.filter(reduce(lambda x, y: x | y, [Q(name__icontains=word) for word in name_list])).values_list('user_id',flat=True)
-#             #users = User.objects.filter(Q(username__icontains = search_term)|Q(reduce(lambda x, y: x | y, [Q(username__icontains=word) \
-#             #    for word in name_list]))|Q(first_name__icontains = search_term)|Q(last_name__icontains = search_term)|Q(id__in = user_ids)).order_by('-st__question_count')
-#         return users
+    def get_queryset(self):
+        users       = []
+        search_term = self.request.GET.get('term')
+        if search_term:
+            name_list = search_term.split()
+            users = User.objects.filter( Q(username__icontains = search_term) | Q(st__name__icontains = search_term) | Q(first_name__icontains = search_term) | \
+                    Q(last_name__icontains = search_term) )
+            #user_ids = UserProfile.objects.filter(reduce(lambda x, y: x | y, [Q(name__icontains=word) for word in name_list])).values_list('user_id',flat=True)
+            #users = User.objects.filter(Q(username__icontains = search_term)|Q(reduce(lambda x, y: x | y, [Q(username__icontains=word) \
+            #    for word in name_list]))|Q(first_name__icontains = search_term)|Q(last_name__icontains = search_term)|Q(id__in = user_ids)).order_by('-st__question_count')
+        return users
 
 def get_search_suggestion(request):
     term = request.GET.get('term',None)
@@ -1279,6 +1326,19 @@ def reply_delete(request):
 
 @api_view(['POST'])
 def hashtag_suggestion(request):
+    term = request.POST.get('term', '')
+    hash_tags = []
+    # if term:
+    #     sqs = SearchQuerySet().models(TongueTwister).autocomplete(**{'text':term})[:10]
+    #     if sqs:
+    #         hash_tags = solr_object_to_db_object(sqs)
+    if term:
+        hash_tags = TongueTwister.objects.filter(hash_tag__icontains=term).order_by('-hash_counter')[:10]
+    hash_data = BaseTongueTwisterSerializer(hash_tags,many=True).data
+    return JsonResponse({'hash_data':hash_data}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def solr_hashtag_suggestion(request):
     term = request.POST.get('term', '')
     hash_tags = []
     if term:
