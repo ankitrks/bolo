@@ -744,7 +744,7 @@ class SolrSearchTop(BoloIndyaGenericAPIView):
         topics      = []
         search_term = self.request.GET.get('term')
         language_id = self.request.GET.get('language_id', 1)
-        page = request.GET.get('page',1)
+        page = int(request.GET.get('page',1))
         page_size = self.request.GET.get('page_size',5)
         is_expand=self.request.GET.get('is_expand',False),
         response ={}
@@ -796,7 +796,7 @@ class SolrSearchTopic(BoloIndyaGenericAPIView):
         topics      = []
         search_term = self.request.GET.get('term')
         language_id = self.request.GET.get('language_id', 1)
-        page = request.GET.get('page',1)
+        page = int(request.GET.get('page',1))
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
         is_expand=self.request.GET.get('is_expand',False),
         if search_term:
@@ -858,7 +858,7 @@ class SolrSearchHashTag(BoloIndyaGenericAPIView):
     def get(self, request):
         hash_tags      = []
         search_term = self.request.GET.get('term')
-        page = request.GET.get('page',1)
+        page = int(request.GET.get('page',1))
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
         if search_term:
             sqs = SearchQuerySet().models(TongueTwister).raw_search(search_term)
@@ -937,7 +937,7 @@ class SolrSearchUser(BoloIndyaGenericAPIView):
     def get(self, request):
         topics      = []
         search_term = self.request.GET.get('term')
-        page = request.GET.get('page',1)
+        page = int(request.GET.get('page',1))
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
         users = []
         if search_term:
