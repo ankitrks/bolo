@@ -21,7 +21,7 @@ def send_notifications_task(data, pushNotification):
         title = data.get('title', "")
         upper_title = data.get('upper_title', "")
         notification_type = data.get('notification_type', "")
-        id = data.get('id', "")
+        instance_id = data.get('id', "")
         user_group = data.get('user_group', "")
         lang = data.get('lang', "0")
         schedule_status = data.get('schedule_status', "")
@@ -32,7 +32,7 @@ def send_notifications_task(data, pushNotification):
         category=data.get('category', '')
 
         if notification_type == '3':
-            id=id.replace('#', '')
+            instance_id=instance_id.replace('#', '')
 
         pushNotification = PushNotification()
         pushNotification.title = upper_title
@@ -41,7 +41,7 @@ def send_notifications_task(data, pushNotification):
         pushNotification.image_url = image_url
         pushNotification.notification_type = notification_type
         pushNotification.user_group = user_group
-        pushNotification.instance_id = id
+        pushNotification.instance_id = instance_id
         if data.get('days_ago', '1'):
             pushNotification.days_ago=data.get('days_ago', '1')
         if particular_user_id:
@@ -123,8 +123,8 @@ def send_notifications_task(data, pushNotification):
                 logger.info(device_after_slice)
                 for each in device_after_slice:
                     try:
-                        t = each.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url}, time_to_live=6000)
-                        id=t[1]['results'][0]['message_id']
+                        t = each.send_message(data={"title": title, "id": instance_id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url}, time_to_live=6000)
+                        response=t[1]['results'][0]['message_id']
                         try:
                             PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2', device=each)
                         except:
