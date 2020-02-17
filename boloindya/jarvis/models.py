@@ -173,8 +173,9 @@ metrics_options = (
     ('3', "Video Shares"),
     ('4', "Video Creators"),
     ('5', "Number of Installs"),
-    ('6', "Monthly Active Users"),
+    ('6', "Daily Active Users"),
     ('7', "Unique Video Views"),
+    ('8', "Monthly Active Users"),
 )
 
 metrics_slab_options = (

@@ -108,9 +108,18 @@
         <div class="right_panel">
             <br><br>Start date &nbsp;&nbsp; <input type="text" id="start_date" name="start_date" placeholder="Start Date" class="filter_text" value="{{ start_date }}">
             &nbsp;&nbsp; End date&nbsp;&nbsp;&nbsp; <input type="text" id="end_date" name="end_date" placeholder="End Date" class="filter_text" value="{{ end_date }}">&nbsp;&nbsp;&nbsp;
+
+
             <!-- <a href="?data_view=daily" class="filter_apply">daily</a> &nbsp;&nbsp;|&nbsp;&nbsp; -->
-            <a href="?data_view=weekly" class="filter_apply btn" {% if data_view == "weekly"  %}style="background:bisque;"{% endif %}>weekly</a>
-            <a href="?data_view=monthly" class="filter_apply btn" {% if data_view == "monthly"  %}style="background:bisque;"{% endif %}>monthly</a><br>
+            <!--<a href="?data_view=weekly" class="filter_apply btn" {% if data_view == "weekly"  %}style="background:bisque;"{% endif %}>weekly</a> -->
+            <!--<a href="?data_view=monthly" class="filter_apply btn" {% if data_view == "monthly"  %}style="background:bisque;"{% endif %}>monthly</a><br> -->
+            
+            <a href="?data_view=daily" class="filter_apply btn" {% if data_view == "daily" %}style="background:bisque;"{% endif %}>daily</a>
+            <a href="?data_view=weekly" class="filter_apply btn" style={% if metrics == "6"  %}display:none;{% endif %}>weekly</a>
+            <a href="?data_view=monthly" class="filter_apply btn" style={% if metrics == "6" %}display:none;{% endif %}>monthly</a>
+
+
+
             {% if slabs %}
                 <br>Data Slabs&nbsp;&nbsp;
                 {% for each_slab in slabs %}
