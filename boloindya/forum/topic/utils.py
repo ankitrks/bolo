@@ -36,7 +36,7 @@ def update_redis_vb_seen(user_id,topic_id):
     vb_seen_list = get_redis(key)
     if not vb_seen_list:
         vb_seen_list = list(VBseen.objects.filter(user_id=user_id).distinct('topic_id').values_list('topic_id',flat=True))
-    if topic_id not in vb_seen_list:
+    if int(topic_id) not in vb_seen_list:
         vb_seen_list.append(int(topic_id))
     set_redis(key,vb_seen_list)
 

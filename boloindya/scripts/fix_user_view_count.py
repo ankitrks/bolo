@@ -6,20 +6,15 @@ from django.contrib.contenttypes.models import ContentType
 
 def run():
     view_counter = 0
-    # all_userprofile = UserProfile.objects.filter(vb_count__gt=0).order_by('-vb_count')
-    # total_user = len(all_userprofile)
-    # exclude_user = []
     all_topic= Topic.objects.filter(is_vb=True).distinct('user').order_by('user')
     total_topic = len(all_topic)
-    # gc.enable()
     for each_topic in all_topic:
         print "#######################   ",view_counter,"/",total_topic,"      ##########################"
-        # exclude_user.append(each_topic.user)
         userprofile = UserProfile.objects.filter(user = each_topic.user)
-        all_vb = Topic.objects.filter(user=each_topic.user, is_vb=True)
+        all_vb = Topic.objects.filter(user=each_topic.user, is_vb=True,is_removed = False)
         all_seen = all_vb.aggregate(Sum('view_count'))
         if all_seen.has_key('view_count__sum') and all_seen['view_count__sum']:
-            # print 'overall:',all_seen['view_count__sum']
+            print 'overall:',all_seen['view_count__sum']
             userprofile.update(own_vb_view_count = all_seen['view_count__sum'],view_count = all_seen['view_count__sum'])
         else:
             userprofile.update(own_vb_view_count = 0,view_count = 0)
