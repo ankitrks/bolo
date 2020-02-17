@@ -55,11 +55,11 @@ def estimate_playdiff(time_sec, datetime_unix):
 def dump_vbrecords(userid, curr_videoid, ref_timestamp, actual_playtime):
 	user_data_obj, created = VideoPlaytime.objects.get_or_create(user = userid, videoid = curr_videoid, timestamp = ref_timestamp)
 	if(created):
-		#print(userid, curr_videoid, ref_timestamp, actual_playtime)
+		print(userid, curr_videoid, ref_timestamp, actual_playtime)
 		user_data_obj.playtime = actual_playtime
 		user_data_obj.save()
 	else:
-		#print(userid, curr_videoid, ref_timestamp, actual_playtime)
+		print(userid, curr_videoid, ref_timestamp, actual_playtime)
 		user_data_obj.playtime = actual_playtime
 		user_data_obj.save()
 
