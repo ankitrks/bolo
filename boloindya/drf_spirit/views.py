@@ -1929,7 +1929,6 @@ def get_user_bolo_info(request):
             total_like_count+=each_vb.likes_count
             total_comment_count+=each_vb.comment_count
             total_share_count+=each_vb.total_share_count
-            video_playtime+=each_vb.vb_playtime
         total_view_count = shorcountertopic(total_view_count)
         total_comment_count = shorcountertopic(total_comment_count)
         total_like_count = shorcountertopic(total_like_count)
