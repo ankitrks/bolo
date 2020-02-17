@@ -42,11 +42,19 @@ def run():
             subprocess.call(cmd,shell=True)
             downloaded_url = upload_media(open(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename),filename)
             if downloaded_url:
-                Topic.object.filter(pk=each_vb.id).update(downloaded_url = downloaded_url,has_downloaded_url = True)
+                Topic.objects.filter(pk=each_vb.id).update(downloaded_url = downloaded_url,has_downloaded_url = True)
             if os.path.exists(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename):
                 os.remove(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename_temp)
                 os.remove(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename)
             print "bye"
             print "End time:  ",datetime.now()
         except Exception as e:
+            try:
+                os.remove(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename_temp)
+            except:
+                pass
+            try:
+                os.remove(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename)
+            except:
+                pass
             print e
