@@ -106,10 +106,12 @@
         <h2>App Push Notification</h2>
         <h4 style="text-align: center;">Enter id in case of Video Byte, User, Category, hash in case of hashtag, for Announcements leave blank</h4>
         <div class="form_group">
-            <input type="text" name="upper_title" id="upper_title" placeholder="Notification Title" value="{{pushNotification.title}}" maxlength="200">
+            <input type="text" name="upper_title" id="upper_title" placeholder="Notification Title" value="{{pushNotification.title}}" maxlength="50">
+            <div style="text-align: right;"><span id="count_upper_title">0</span>/50</div>
         </div>
         <div class="form_group">
-            <input type="text" name="title" id="title" placeholder="Notification Text" value="{{pushNotification.description}}" maxlength="500">
+            <input type="text" name="title" id="title" placeholder="Notification Text" value="{{pushNotification.description}}" maxlength="120">
+            <div style="text-align: right;"><span id="count_title">0</span>/120</div>
         </div>
         <div class="form_group row">
             <div class="col-md-6" style="padding: 0px;">
@@ -241,6 +243,14 @@
                 $('#response').empty();
             }
         })
+        $('#upper_title').keyup(function(){
+            var length = $('#upper_title').val().length;
+            $('#count_upper_title').text(length);
+        });
+        $('#title').keyup(function(){
+            var length = $('#title').val().length;
+            $('#count_title').text(length);
+        });
         $('#particular_user_id').keyup(function(){
             var query = $('#particular_user_id').val();
             

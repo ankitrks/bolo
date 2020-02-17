@@ -23,7 +23,7 @@
     <div class="row" style="padding: 10px;">
         <div class="col-md-12 filter_notification">
             <a href="/jarvis/send_notification/" class="btn btn-primary">Create New</a>
-            <input type="text" placeholder="Search Title" class="btn" id="search_title_input"/>
+            <input type="text" placeholder="Search User" id="search_user" class="btn" />
             <button class="btn btn-info">Export CSV</button>
         </div>
         <div class="col-md-12" id="box">
@@ -84,6 +84,32 @@
     </div>
 {% endblock content %} 
 {% block center_js %}
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/wickedpicker@0.4.1/dist/wickedpicker.min.js"></script>
 <script>
+    $(document).ready(function() {
+        $('#search_user').keyup(function(){
+            var query = $('#search_user').val();
+            $.ajax({
+                    url: '/jarvis/search_notification_users/',
+                    method: 'POST',
+                    data: JSON.stringify({
+                        'query': query,
+                        'notification_id': '{{notification_id}}',
+                        'status_id': '{{status_id}}'
+                    }),
+                    dataType: "json",
+                    contentType: 'application/json',
+                    success: function(data) {
+                        console.log(data)
+                        $('table tbody').empty();
+                        for(var i=0;i<data.data.length;i++) {
+                            $('table tbody').append('<tr><td>'+i+'</td><td>'+data.data[i].user.username+'</td><td>'+data.data[i].user.first_name+'</td><td></td></tr>')
+                        }
+                    }
+                })
+        });
+    });
 </script>
 {% endblock center_js%}

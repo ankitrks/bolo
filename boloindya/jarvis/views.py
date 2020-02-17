@@ -1797,6 +1797,24 @@ def search_notification(request):
         return JsonResponse({'data': [], 'error': str(e)}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
+def search_notification_users(request):
+    from drf_spirit.serializers import PushNotificationUserSerializer
+    data = []
+    try:
+        raw_data = json.loads(request.body)
+        query = raw_data['query']
+        notification_id = raw_data['notification_id']
+        status_id = raw_data['status_id']
+        pushNotification = PushNotification.objects.get(pk=notification_id)
+        pushNotificationUser=PushNotificationUser.objects.filter(push_notification_id=pushNotification, status=status_id, user__username__istartswith=query)
+        print(pushNotificationUser)
+        return JsonResponse({'data': PushNotificationUserSerializer(pushNotificationUser, many=True).data}, status=status.HTTP_200_OK)  
+    except Exception as e:
+        print(e)
+        return JsonResponse({'data': [], 'error': str(e)}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
 def upload_image_notification(requests):
     if requests.is_ajax():
         file=requests.FILES['file']
