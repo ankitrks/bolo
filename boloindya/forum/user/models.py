@@ -195,6 +195,7 @@ class AndroidLogs(RecordTimeStamp):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("profile"), related_name='st_logs',editable=False)
     logs = models.TextField(_("Android Logs"),null=True, blank=True)
     log_type = models.CharField(_("Log Type"),null=True,blank=True,max_length=255)
+    is_executed = models.BooleanField(_("is_executed"), default=False)
 
     def __unicode__(self):
         return str(self.user)
