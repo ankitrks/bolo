@@ -1164,13 +1164,20 @@ def get_random_username():
         month = '0'+str(month)
     else:
         month = str(month)
-    x = 'BI'+year+month+''.join(random.choice(string.digits) for _ in range(4))
+    x = 'bi'+year+month+''.join(random.choice(string.digits) for _ in range(4))
+    x = x.lower()
     # x = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
     try:
         user = User.objects.get(username=x)
         get_random_username()
     except:
         return x
+
+def check_username_valid(username):
+    if re.match(r"^[a-z0-9_.-]+$", username):
+        return True
+    else:
+        return False
 
 
 @api_view(['POST'])
@@ -1831,6 +1838,20 @@ def generateOTP(n):
         OTP += digits[int(math.floor(random.random() * 10))] 
     return OTP
 
+def validate_indian_number(mobile_no):
+    if mobile_no and len(mobile_no)>8 and len(mobile_no)<=14:
+        if mobile_no.startswith('091'):
+            mobile_no = validate_indian_number(mobile_no[3:])
+        elif mobile_no.startswith('+91'):
+            mobile_no = validate_indian_number(mobile_no[3:])
+        elif mobile_no.startswith('0'):
+            mobile_no = validate_indian_number(mobile_no[1:])
+        elif mobile_no.startswith('91') and len(mobile_no)==12:
+            mobile_no = validate_indian_number(mobile_no[2:])
+        return mobile_no
+    else:
+        return mobile_no
+
 def send_sms(phone_number, otp):
     import json
     import urllib2
@@ -1854,6 +1875,7 @@ class SingUpOTPView(generics.CreateAPIView):
     """
 
     def perform_create(self, serializer):
+        serializer.validated_data['mobile_no'] = validate_indian_number(serializer.validated_data['mobile_no'])
         instance        = serializer.save()
         instance.otp    = generateOTP(6)
         response, response_status   = send_sms(instance.mobile_no, instance.otp)
@@ -1952,7 +1974,7 @@ def verify_otp(request):
         request.POST.get('is_reset_password')
         request.POST.get('is_for_change_phone')
     """
-    mobile_no = request.POST.get('mobile_no', None)
+    mobile_no = validate_indian_number(request.POST.get('mobile_no', None))
     language = request.POST.get('language',None)
     otp = request.POST.get('otp', None)
     is_geo_location = request.POST.get('is_geo_location',None)
@@ -2110,7 +2132,7 @@ def fb_profile_settings(request):
                 user_exists,num_user = check_user(extra_data['first_name'],extra_data['last_name'])
                 #username = generate_username(extra_data['first_name'],extra_data['last_name'],num_user) if user_exists else str(str(extra_data['first_name'])+str(extra_data['last_name']))
                 username = get_random_username()
-                user = User.objects.create(username = username.lower())
+                user = User.objects.create(username = username)
                 userprofile = UserProfile.objects.get(user = user)
                 is_created = True
 
@@ -2173,7 +2195,7 @@ def fb_profile_settings(request):
                 # user_exists,num_user = check_user(extra_data['first_name'],extra_data['last_name'])
                 #username = generate_username(extra_data['first_name'],extra_data['last_name'],num_user) if user_exists else str(str(extra_data['first_name'])+str(extra_data['last_name']))
                 username = get_random_username()
-                user = User.objects.create(username = username.lower())
+                user = User.objects.create(username = username)
                 userprofile = UserProfile.objects.get(user = user)
                 is_created = True
 
@@ -2258,10 +2280,14 @@ def fb_profile_settings(request):
                 userprofile.instagarm_id = instagarm_id
                 userprofile.save()
                 if username:
+                    if not check_username_valid(username):
+                        return JsonResponse({'message': 'Username Invalid. It can contains only lower case letters,numbers and special character[ _ - .]'}, status=status.HTTP_200_OK)
                     check_username = User.objects.filter(username = username).exclude(pk =request.user.id)
                     if not check_username:
+                        userprofile.slug = username
                         user = userprofile.user
                         user.username = username
+                        userprofile.save()
                         user.save()
                     else:
                         return JsonResponse({'message': 'Username already exist'}, status=status.HTTP_200_OK)

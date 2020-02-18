@@ -33,8 +33,7 @@ refrence_options = (
 
 class UserProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, verbose_name=_("profile"), related_name='st', editable=False)
-
-    slug = AutoSlugField(populate_from="user.username", db_index=True, blank=True)
+    slug = models.CharField(_("slug"), max_length=100, db_index=True, blank=True)
     location = models.CharField(_("location"), max_length=75, blank=True)
     last_seen = models.DateTimeField(_("last seen"), auto_now=True)
     last_ip = models.GenericIPAddressField(_("last ip"), blank=True, null=True)
@@ -129,8 +128,9 @@ class UserProfile(models.Model):
                     .update(
                         last_post_hash=post_hash,
                         last_post_on=timezone.now()))
-        def __unicode__(self):
-            return self.slug
+        
+    def __unicode__(self):
+        return self.slug
 
 def current_year():
     return datetime.now().year

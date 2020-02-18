@@ -15,9 +15,8 @@ def update_or_create_user_profile(sender, instance, created, **kwargs):
     user = instance
 
     if created:
-        UserProfile.objects.create(user=user)
+        UserProfile.objects.create(user=user,slug=user.username)
         UserKYC.objects.create(user=user)
-
     else:
         user.st.save()
 
