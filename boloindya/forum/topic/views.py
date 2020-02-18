@@ -80,7 +80,7 @@ class AutoConnectSocialAccount(DefaultSocialAccountAdapter):
             add_bolo_score(userDetails.id, 'initial_signup', userprofile)
             userprofile = UserProfile.objects.get(user = userDetails)
             if str(userprofile.language):
-                default_follow = deafult_boloindya_follow(user,str(userprofile.language))
+                default_follow = deafult_boloindya_follow(userDetails,str(userprofile.language))
         except EmailAddress.DoesNotExist:
             return u
 
