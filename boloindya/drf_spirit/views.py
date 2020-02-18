@@ -2008,8 +2008,8 @@ def verify_otp(request):
                         response = urllib2.urlopen(click_url).read()
                         userprofile.click_id_response = str(response)
                     userprofile.save()
-                    # if str(language):
-                    #     default_follow = deafult_boloindya_follow(user,str(language))
+                    if str(language):
+                        default_follow = deafult_boloindya_follow(user,str(language))
                     add_bolo_score(user.id, 'initial_signup', userprofile)
                 user_tokens = get_tokens_for_user(user)
                 otp_obj.for_user = user
@@ -2153,8 +2153,8 @@ def fb_profile_settings(request):
                     response = urllib2.urlopen(click_url).read()
                     userprofile.click_id_response = str(response)
                 userprofile.save()
-                # if str(language):
-                #     default_follow = deafult_boloindya_follow(user,str(language))
+                if str(language):
+                    default_follow = deafult_boloindya_follow(user,str(language))
                 userprofile.language = str(language)
                 userprofile.save()
                 user.save()
@@ -2218,8 +2218,8 @@ def fb_profile_settings(request):
                     response = urllib2.urlopen(click_url).read()
                     userprofile.click_id_response = str(response)
                 userprofile.save()
-                # if str(language):
-                #     default_follow = deafult_boloindya_follow(user,str(language))
+                if str(language):
+                    default_follow = deafult_boloindya_follow(user,str(language))
                 userprofile.language = str(language)
                 userprofile.save()
                 user.save()
@@ -2284,7 +2284,7 @@ def fb_profile_settings(request):
                             if not str(each_category.id) in sub_category_prefrences:
                                 userprofile.sub_category.remove(each_category)
                 if language:
-                    # default_follow = deafult_boloindya_follow(request.user,str(language))
+                    default_follow = deafult_boloindya_follow(request.user,str(language))
                     userprofile.language = str(language)
                     userprofile.save()
                 return JsonResponse({'message': 'Settings Chnaged'}, status=status.HTTP_200_OK)
@@ -2851,13 +2851,13 @@ def get_follower_list(request):
 def deafult_boloindya_follow(user,language):
     try:
         if language == '2':
-            bolo_indya_user = User.objects.get(username = 'boloindya_hi')
+            bolo_indya_user = User.objects.get(username = 'boloindya_hindi')
         elif language == '3':
-            bolo_indya_user = User.objects.get(username = 'boloindya_ta')
+            bolo_indya_user = User.objects.get(username = 'boloindya_tamil')
         elif language == '4':
-            bolo_indya_user = User.objects.get(username = 'boloindya_te')
+            bolo_indya_user = User.objects.get(username = 'boloindya_telgu')
         else:
-            bolo_indya_user = User.objects.get(username = 'boloindya_en')
+            bolo_indya_user = User.objects.get(username = 'boloindya')
         follow,is_created = Follower.objects.get_or_create(user_follower = user,user_following=bolo_indya_user)
         if is_created:
             add_bolo_score(user.id, 'follow', follow)
@@ -2867,6 +2867,9 @@ def deafult_boloindya_follow(user,language):
             userprofile.save()
             bolo_indya_profile.follower_count = F('follower_count') + 1
             bolo_indya_profile.save()
+        if not follow.is_active:
+            follow.is_active = True
+            follow.save()
         return True
     except:
         return False
