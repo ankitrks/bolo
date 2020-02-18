@@ -9,7 +9,7 @@
 </script>
 
 <!-- Social Share Code -->
-<link rel="canonical" href="" />      
+     
 <meta property="og:url" content=""/>
 <meta property="og:type" content="website" />
 <meta property='og:title' content='' />
@@ -301,7 +301,7 @@
 }
 
 .about-content .about-article h2{
-    font-family: sofiapro-bold, PingFangSC, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 700;
     font-size: 23px;
     line-height: 1;
@@ -473,7 +473,7 @@
 }
 .header-bar1{
     color: #fff;
-    font-family: sofiapro-bold, PingFangSC, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 700;
     font-size: 23px;
     line-height: 1;
@@ -502,7 +502,7 @@
 
 .header-bar1 {
     color: #fff;
-    font-family: sofiapro-bold, PingFangSC, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 700;
     font-size: 14px;
     line-height: 1.5rem;
@@ -565,7 +565,7 @@
     margin-top: 19px;
 }
 .seeAll a{
-   color:#e53d51;
+   color:#b62927;
 }
 ._card_header_title{
     width:calc(100% - 0em);
@@ -721,7 +721,7 @@
     font-weight: bold;
 }
 .slogan{
-    font-family: "sofiapro-bold",PingFangSC,sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 700;
     font-size: 40px;
     margin-top: 30px;
@@ -729,7 +729,7 @@
     text-align: center;
 }
 .BoloIndyaSupport[data-v-6da28080] {
-    background-image: linear-gradient(106deg, #f53941, #ff6e6a);
+    background-image: linear-gradient(106deg, #b62927, #b62927);
     height: 140px;
     padding: 2px;
     -webkit-box-shadow: 0 2px 15px 0 rgba(250,87,88,0.52);
@@ -757,7 +757,7 @@
     padding: 10px;
     border-radius: 4px;
     background-color: #ffffff;
-    color: #ef403d;
+    color: #b62927;
     font-size: 14px;
     font-weight: bold;
     line-height: 1.07;
@@ -781,7 +781,16 @@
     font-size: 18px;
 }
 }
+.mainColor{
+    color: #b62927;
+}
 </style>
+
+<script type="text/javascript">
+    
+    var sliderTopicListVideos='{{topics}}';
+</script>
+
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
@@ -793,18 +802,22 @@
                 <div class="jsx-1994528170 banner-video-container">
                     <div class="video-wall" style="min-height: 540px;">
                         <h2 class="slogan">Short Knowledge Videos</h2>
-                        <div class="header-bar1" style="text-align: center;padding: 20px;">Watch and Create in Your Language</div>
+                        <div class="header-bar1" style="text-align: center;padding: 20px;"><span class="mainColor">Watch</span> and <span class="mainColor">Create</span> in Your Language</div>
                             <div class="owl-slider" id="slideshow">
                                 <div id="carousel" class="owl-carousel">
-
+                                    
                                     {% for itemVideo in topics %}
+                                    
 
                                     <div class="_video_feed_item1 item">
-                                        <img onClick="openVideoInPopup('{{itemVideo.video_cdn}},'{{itemVideo.question_image}},'{{totalCountVideo}}');" class="_video_card_mute _video_card_mute_left_top" id="mutedImageId" src="/media/sound_mute.svg">
-                                        <video onClick="openVideoInPopup('{{itemVideo.video_cdn}},'{{itemVideo.question_image}},'{{totalCountVideo}}');"   id="player-{{itemVideo.id}}" preload="auto" muted autoplay="false" poster="{{itemVideo.question_image}}" class="videoCentered videoSliderPlay">
-                                            <source src="{{itemVideo.question_video | get_video_cdn}}" type="application/x-mpegURL">
-                                            <source src="{{itemVideo.backup_url}}" type="video/mp4">
-                                        </video>
+                                        <img onClick="openVideoInPopupSlider('{{itemVideo.id}}','{{itemVideo.question_video | get_video_cdn}}','{{itemVideo.backup_url}}','{{itemVideo.question_image}}');" class="_video_card_mute _video_card_mute_left_top muteSrcId_{{itemVideo.id}}" id="mutedImageId" src="/media/sound_mute.svg">
+                                        <span id="video_play_item_{{itemVideo.id}}">
+                                            <video onClick="openVideoInPopupSlider('{{itemVideo.id}}','{{itemVideo.question_video | get_video_cdn}}','{{itemVideo.backup_url}}','{{itemVideo.question_image}}');"   id="player-{{itemVideo.id}}" preload="auto" muted autoplay="false" poster="{{itemVideo.question_image}}" class="videoCentered videoSliderPlay">
+                                                <source src="{{itemVideo.question_video | get_video_cdn}}" type="application/x-mpegURL">
+                                                <source src="{{itemVideo.backup_url}}" type="video/mp4">
+                                            </video>   
+                                        </span>
+
                                     </div>
                                     {% endfor %}
                                 </div>
@@ -854,7 +867,7 @@
     <section currentprofession="default" devicetype="desktop" class="BoloIndyaSupport" data-v-6da28080="">
         <div class="jsx-1929076256 about-img1 bottomHeaing" style="text-align: center;">
             <h2 style="margin-bottom: 20px;">Earn As You Share Your Knowledge</h2>
-            <a class="data-v-6da28080" target="_blank" href="/bolo-action">Read The Earning Tearms</a>
+            <a class="data-v-6da28080" target="_blank" href="/bolo-action">Read Earning Terms</a>
 
         </div>
     </section>
@@ -895,10 +908,12 @@
             items: 2
           },
           1024: {
-            items: 4
+            items: 4,
+            slideBy: 4,
           },
           1366: {
-            items: 4
+            items: 4,
+            slideBy: 4,
           }
         }
       });

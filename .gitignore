@@ -49,12 +49,14 @@ coverage.xml
 *.pot
 
 # Django stuff:
+solr/server/logs/
 *.log
 local_settings.py
 settings_local.py
 manage_local.py
 db.sqlite3
 static/
+solr/server/solr/boloindya/data/
 
 # Flask stuff:
 instance/

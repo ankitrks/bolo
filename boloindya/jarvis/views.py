@@ -620,8 +620,8 @@ def upload_n_transcode(request):
         return HttpResponse(json.dumps({'message':'fail','reason':'bucket_missing'}),content_type="application/json")
     if not upload_file:
         return HttpResponse(json.dumps({'message':'fail','reason':'File Missing'}),content_type="application/json")
-    if not upload_file.name.endswith('.mp4'):
-        return HttpResponse(json.dumps({'message':'fail','reason':'This is not a mp4 file'}),content_type="application/json")
+    if not (upload_file.name.endswith('.mp4') or upload_file.name.endswith('.mov')):
+        return HttpResponse(json.dumps({'message':'fail','reason':'This is not a mp4  mov file'}),content_type="application/json")
     if free_video and (not video_title or not video_descp):
         return HttpResponse(json.dumps({'message':'fail','reason':'Title or Description is missing'}),content_type="application/json")
 
@@ -1475,10 +1475,20 @@ def statistics_all_jarvis(request):
     top_data = []
     metrics = request.GET.get('metrics', '0')
     slab = request.GET.get('slab', None)
-    # data_view = request.GET.get('data_view', 'daily')
-    data_view = request.GET.get('data_view', 'monthly')
-    if data_view == 'daily':
+
+    if metrics == '6':
+        data_view = 'daily'
+
+    elif metrics == '8':
         data_view = 'monthly'
+
+    else:        
+        data_view = request.GET.get('data_view', 'daily')
+        data_view = request.GET.get('data_view', 'monthly')
+
+    # if data_view == 'daily':
+    #     data_view = 'monthly'
+
     start_date = request.GET.get('start_date', '2019-05-01')
     end_date = request.GET.get('end_date', None)
     if not start_date:
@@ -1522,7 +1532,7 @@ def statistics_all_jarvis(request):
             y_axis.append(graph_data.filter(week_no = each_week_no).aggregate(total_count = Sum('count'))['total_count'])
 
     	# elif data_view == 'monthly':
-    else:
+    elif data_view == 'monthly':
         x_axis = []
         y_axis = []
         month_no = months_between(start_date, end_date)
@@ -1533,9 +1543,10 @@ def statistics_all_jarvis(request):
                 y_axis.append(data1)
             else:
                 y_axis.append(0)
-    # else:
-    #     x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
-    # y_axis = graph_data.values_list('count', flat = True)
+    else:
+        x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
+        y_axis = graph_data.values_list('count', flat = True)
+
     data['metrics'] = metrics
     data['slab'] = slab
     data['data_view'] = data_view

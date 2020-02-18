@@ -337,6 +337,30 @@ def check_or_create_user_pay(user_id,start_date='01-04-2019'):
     return True
 
 
+def solr_object_to_db_object(sqs):
+    result = []
+    if len(sqs) != 0:
+        for each in sqs:
+            result.append(each.object)
+    return result
 
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 
+def get_paginated_data(data_list,page_size,page=None, offset = None):
+    if not page:
+        page = 1
+
+    if offset:
+        data_list = data_list[offset:]
+
+    paginator = Paginator(data_list,page_size)
+    # set_redis('paginator',paginator)
+    try:
+        paginated_data = paginator.page(page)
+    except PageNotAnInteger:# If page is not an integer, deliver first page.
+        paginated_data = paginator.page(1)
+    except EmptyPage:       # If page is out of range (e.g. 9999), deliver last page of results.
+        paginated_data = []
+
+    return paginated_data,paginator.num_pages
 

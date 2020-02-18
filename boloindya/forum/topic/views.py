@@ -57,6 +57,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from .emails import send_job_request_mail
+from drf_spirit.views import deafult_boloindya_follow
 
 class AutoConnectSocialAccount(DefaultSocialAccountAdapter):
 
@@ -77,6 +78,9 @@ class AutoConnectSocialAccount(DefaultSocialAccountAdapter):
             userDetails = User.objects.get(email=emailId)
             userprofile = UserProfile.objects.get(user = userDetails)
             add_bolo_score(userDetails.id, 'initial_signup', userprofile)
+            userprofile = UserProfile.objects.get(user = userDetails)
+            if str(userprofile.language):
+                default_follow = deafult_boloindya_follow(userDetails,str(userprofile.language))
         except EmailAddress.DoesNotExist:
             return u
 
