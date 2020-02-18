@@ -41,6 +41,9 @@
                         <th>S No.</th>
                         <th>Username</th>
                         <th>Name</th>
+                        <th>Android Version</th>
+                        <th>Model</th>
+                        <th>Manufacture</th>
                         <th>Status</th>
                     </tr>
                 </thead>
@@ -50,6 +53,9 @@
                             <td>{{ forloop.counter }}</td>
                             <td>{% if pushNotification.user %}{{ pushNotification.user.username }}{% else %}{{ pushNotification.device.dev_id }}{% endif %}</td>
                             <td>{{ pushNotification.user }}</td>
+                            <td>{{ pushNotification.device.device_model }}</td>
+                            <td>{{ pushNotification.device.current_version }}</td>
+                            <td>{{ pushNotification.device.manufacturer }}</td>
                             <td style="color: {% if pushNotification.status == 0 %} #b52828 {% else %} #1989cd {% endif %}">{% get_notification_status pushNotification.status %}</td>
                         </tr>
                     {% endfor %}  

@@ -521,7 +521,7 @@ FCM_MAX_RECIPIENTS = 1000
 PREDICTION_START_HOUR = 3
 
 CAREERANNA_VIDEOFILE_UPDATE_URL = "https://www.careeranna.com/search/insertOrUpdateFreeVideo"
-SITE_ID = 2
+SITE_ID = 1
 
 
 LOG_DIRS = ['/var/log/boloindya/']

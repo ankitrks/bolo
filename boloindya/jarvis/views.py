@@ -1109,17 +1109,17 @@ def send_notification(request):
 @login_required
 def particular_notification(request, notification_id=None, status_id=2, page_no=1):
     import math  
+    from django.db.models import Q
     pushNotification = PushNotification.objects.get(pk=notification_id)
-    status_id=int(status_id)
     page_no=int(page_no)-1
     has_prev=False
     if page_no > 0:
         has_prev=True
     pushNotificationUser=PushNotificationUser.objects.filter(push_notification_id=pushNotification)
-    if (status_id == 1):
-        pushNotificationUser.filter(status=status_id)
-    elif (status_id == 0):
-        pushNotificationUser.filter(status__pk__in=['0', '1'])
+    if (status_id == '1'):
+        pushNotificationUser=pushNotificationUser.filter(status='1')
+    elif (status_id == '0'):
+        pushNotificationUser=pushNotificationUser.filter(Q(status='0')|Q(status='1'))
     pushNotificationUserSlice=pushNotificationUser[page_no*10:page_no*10+10]
     has_next=True
     if ((page_no*10)+10) >= len(pushNotificationUser):
