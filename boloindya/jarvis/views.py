@@ -1475,8 +1475,16 @@ def statistics_all_jarvis(request):
     top_data = []
     metrics = request.GET.get('metrics', '0')
     slab = request.GET.get('slab', None)
-    data_view = request.GET.get('data_view', 'daily')
-    data_view = request.GET.get('data_view', 'monthly')
+
+    if metrics == '6':
+        data_view = 'daily'
+
+    if metrics == '8':
+        data_view = 'monthly'
+
+    else:        
+        data_view = request.GET.get('data_view', 'daily')
+        data_view = request.GET.get('data_view', 'monthly')
 
     # if data_view == 'daily':
     #     data_view = 'monthly'

@@ -41,8 +41,11 @@ for (a,b) in language_string:
 
 def put_share_data():
 
+	today = datetime.now()
+	start_date = today + timedelta(days = -7)
+
 	day_month_year_dict = dict()
-	all_data = UserVideoTypeDetails.objects.all()
+	all_data = UserVideoTypeDetails.objects.filter(timestamp__gt = start_date)
 	for item in all_data:
 		if(str(item.video_type) == 'shared'):
 			curr_videoid = item.videoid 
@@ -83,8 +86,11 @@ def put_share_data():
 
 def  put_installs_data():
 
+	today = datetime.now()
+	start_date = today + timedelta(days = -7)
+
 	user_install_dict = dict()
-	all_data = ReferralCodeUsed.objects.filter(by_user__isnull = True)
+	all_data = ReferralCodeUsed.objects.filter(by_user__isnull = True, created_at__gt = start_date)
 	for item in all_data:
 		curr_userid = str(item.android_id)
 		curr_month = item.created_at.month 
@@ -125,8 +131,11 @@ def  put_installs_data():
 
 def put_video_views_data():
 
+	today = datetime.now()
+	start_date = today + timedelta(days = -7)
+
 	day_month_year_dict = dict()
-	all_data = VideoPlaytime.objects.all()
+	all_data = VideoPlaytime.objects.filter(timestamp__gt = start_date)
 	for item in all_data:
 		curr_videoid = item.videoid
 		curr_month = item.timestamp.month 
@@ -168,7 +177,7 @@ def put_video_views_data():
 def put_video_views_analytics():
 
 	today = datetime.now()
-	start_date = today + timedelta(days = -150)	
+	start_date = today + timedelta(days = -7)	
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
 
@@ -228,8 +237,11 @@ def put_video_views_analytics():
 
 def put_videos_created():
 
+	today = datetime.now()
+	start_date = today + timedelta(days = -7)
+
 	day_month_year_dict = dict()
-	all_data = Topic.objects.all()
+	all_data = Topic.objects.filter(date__gt = start_date)
 	for item in all_data:
 		curr_month = item.date.month 
 		curr_year = item.date.year
@@ -278,8 +290,11 @@ def put_videos_created():
 # number of video creators split according to date of signup and distributed into various slabs
 def put_video_creators():
 
+	today = datetime.now()
+	start_date = today + timedelta(days = -7)
+
 	user_signup_dict = dict()
-	signup_data = ReferralCodeUsed.objects.filter(by_user__isnull = False)
+	signup_data = ReferralCodeUsed.objects.filter(by_user__isnull = False, created_at__gt = start_date)
 	for item in signup_data:
 		curr_userid = item.by_user.id 
 		user_signup_dict[curr_userid] = item.created_at 
@@ -390,12 +405,15 @@ def put_video_creators():
 
 def put_video_creators_analytics():
 
+	today = datetime.now()
+	start_date = today + timedelta(days = -7)
+
 	slab_0_dict = dict()
 	slab_1_dict = dict()
 	slab_2_dict = dict()
 	slab_3_dict = dict()
 
-	all_data = Topic.objects.filter(is_vb=True).values('user').annotate(vb_count=Count('pk')).order_by('-vb_count')
+	all_data = Topic.objects.filter(is_vb=True, date__gt = start_date).values('user').annotate(vb_count=Count('pk')).order_by('-vb_count')
 	print(len(all_data))
 	for item in all_data:
 		user_vb_count = int(item['vb_count'])
@@ -527,7 +545,7 @@ def put_video_creators_analytics():
 def put_dau_data():
 
 	today = datetime.today()
-	start_date = today + timedelta(days = -5)	
+	start_date = today + timedelta(days = -7)	
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
 		#print(dt)
@@ -631,7 +649,7 @@ def put_mau_data():
 def put_uniq_views_analytics():
 
 	today = datetime.now()
-	start_date = today + timedelta(days = -180)	
+	start_date = today + timedelta(days = -7)	
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
 		#print(dt)
@@ -698,14 +716,14 @@ def put_uniq_views_analytics():
 		
 def main():
 
-	# put_share_data()
-	# put_installs_data()
+	put_share_data()
+	put_installs_data()
 	put_dau_data()
 	put_mau_data()
-	# put_video_creators_analytics()
-	# put_video_views_analytics()
-	# put_videos_created()
-	# put_uniq_views_analytics()
+	put_video_creators_analytics()
+	put_video_views_analytics()
+	put_videos_created()
+	put_uniq_views_analytics()
 
 	
 

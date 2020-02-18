@@ -14,14 +14,14 @@
         <style type="text/css">
             body{
                 font-family: 'Roboto', sans-serif;
-                font-size: 14px;
+                font-size: 12px;
                 padding: 20px;
             }
             a:hover{text-decoration: none;}
             .top_box{
                 background: #f1f1f1;
                 display: inline-block;
-                width: 12.25%;
+                width: 10.85%;
                 text-align: center;
                 padding: 10px 0px;
                 padding-top: 20px;
@@ -114,11 +114,10 @@
             <!--<a href="?data_view=weekly" class="filter_apply btn" {% if data_view == "weekly"  %}style="background:bisque;"{% endif %}>weekly</a> -->
             <!--<a href="?data_view=monthly" class="filter_apply btn" {% if data_view == "monthly"  %}style="background:bisque;"{% endif %}>monthly</a><br> -->
             
-            <a href="?data_view=daily" class="filter_apply btn" {% if data_view == "daily" %}style="background:bisque;"{% endif %}>daily</a>
-            <a href="?data_view=weekly" class="filter_apply btn" style={% if metrics == "6"  %}display:none;{% endif %}>weekly</a>
-            <a href="?data_view=monthly" class="filter_apply btn" style={% if metrics == "6" %}display:none;{% endif %}>monthly</a>
-
-
+            <a href="?data_view=daily" class="filter_apply btn" style={% if metrics == "8"  or metrics == "6" %}display:none;{% endif %}>daily</a>
+            <a href="?data_view=weekly" class="filter_apply btn" style={% if metrics == "6"  or  metrics == "8" %}display:none;{% endif %}>weekly</a>
+            <a href="?data_view=monthly" class="filter_apply btn" style={% if metrics == "6" or metrics == "8" %}display:none;{% endif %}>monthly</a>
+            
 
             {% if slabs %}
                 <br>Data Slabs&nbsp;&nbsp;
