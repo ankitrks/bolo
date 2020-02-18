@@ -1479,7 +1479,7 @@ def statistics_all_jarvis(request):
     if metrics == '6':
         data_view = 'daily'
 
-    if metrics == '8':
+    elif metrics == '8':
         data_view = 'monthly'
 
     else:        

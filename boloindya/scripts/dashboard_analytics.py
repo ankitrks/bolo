@@ -615,11 +615,11 @@ def put_mau_data():
 	today = datetime.today()
 	start_date = today + timedelta(days = -180)	
 	end_date = today
-	for dt in rrule.rrule(rrule.MONTHLY, dtstart= start_date, until= today):
+	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
 		curr_month = dt.month
 		curr_year = dt.year
 		curr_day = dt.day 
-		str_curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day)
+		str_curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(01)
 		null_data = ReferralCodeUsed.objects.filter((Q(android_id=None) | Q(android_id = '')) &  Q(created_at__month = curr_month, created_at__year = curr_year))
 		all_data = ReferralCodeUsed.objects.filter(created_at__month = curr_month, created_at__year = curr_year)
 		user_null_data = all_data.exclude(Q(android_id=None) | Q(android_id = '')).values_list('android_id', flat=True)
@@ -629,7 +629,7 @@ def put_mau_data():
 		id_list_3 = FCMDevice.objects.filter(user__pk__in = id_list_2).values_list('dev_id', flat = True)
 		clist = set(list(id_list_3) + list(user_null_data))
 		mau_count = len(clist) + null_data.count()
-		#print(dt, mau_count)
+		#print(str_curr_date, mau_count)
 
 		metrics = '8'
 		metrics_slab = ''
@@ -716,14 +716,14 @@ def put_uniq_views_analytics():
 		
 def main():
 
-	put_share_data()
-	put_installs_data()
-	put_dau_data()
+	#put_share_data()
+	#put_installs_data()
+	#put_dau_data()
 	put_mau_data()
-	put_video_creators_analytics()
-	put_video_views_analytics()
-	put_videos_created()
-	put_uniq_views_analytics()
+	#put_video_creators_analytics()
+	#put_video_views_analytics()
+	#put_videos_created()
+	#put_uniq_views_analytics()
 
 	
 
