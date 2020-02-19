@@ -171,7 +171,7 @@ metrics_options = (
     ('1', "Video Views"),
     ('2', "Bolo Actions"),
     ('3', "Video Shares"),
-    ('4', "Video Creators"),
+    ('4', "New Video Creators"),
     ('5', "Number of Installs"),
     ('6', "DAU"),
     ('7', "Unique Video Views"),
