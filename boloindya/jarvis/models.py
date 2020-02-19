@@ -78,6 +78,7 @@ class FCMDevice(AbstractDevice):
     manufacturer = models.CharField(blank = True, null = True, max_length=10, default='')
     start_time = models.DateTimeField(auto_now=False,auto_now_add=False,blank=True,null=True)
     end_time = models.DateTimeField(auto_now=False,auto_now_add=False,blank=True,null=True)
+    current_activity=models.CharField(blank = True, null = True, max_length=100, default='')
 
     def __unicode__(self):
         return str(self.user)

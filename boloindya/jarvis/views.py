@@ -1847,12 +1847,14 @@ def upload_thumbail_notification(virtual_thumb_file,bucket_name):
 def update_user_time(requests):
     dev_id=requests.POST.get('dev_id', None)
     is_start=requests.POST.get('is_start', '0')
+    current_activity=requests.POST.get('current_activity', '')
     try:
         device=FCMDevice.objects.get(dev_id=dev_id)
         if is_start == '0': 
             device.start_time=datetime.datetime.now()
-        else:git add 
+        else:
             device.end_time=datetime.datetime.now()
+        device.current_activity=current_activity
         device.save()
         return JsonResponse({'message': 'Updated'}, status=status.HTTP_200_OK)
     except Exception as e: 
