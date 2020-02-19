@@ -98,13 +98,61 @@
                 <a href="/user/logout" style="float: right;">logout</a>
             </span><br>
         </div><br><br><br>
-        {% for each_data in top_data %}
+
+
+        <!-- {% for each_data in top_data %}
             <div class="top_box" {% if metrics == each_data.0  %}style="background:bisque;"{% endif %}>
                 <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
                 <a href="?metrics={{ each_data.0 }}" class="filter_apply"><h6 style="color: #333">{{ each_data.1 }}</h6><h5 style="color: #b52828">{{ each_data.2|intcomma }}</h5></a>
 
             </div>
-        {% endfor %}
+        {% endfor %} -->
+
+        <div class ="top_box" {% if metrics == top_data.0.0 %} style = "background: bisque;"{%endif %}>
+        <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
+        <a href="?metrics={{ top_data.0.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.0.1 }}</h6><h5 style="color: #b52828">{{ top_data.0.2|intcomma }}</h5></a>
+        </div>
+
+        <div class ="top_box" {% if metrics == top_data.1.0 %} style = "background: bisque;"{%endif %}>
+        <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
+        <a href="?metrics={{ top_data.1.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.1.1 }}</h6><h5 style="color: #b52828">{{ top_data.1.2|intcomma }}</h5></a>
+        </div>
+
+        <div class ="top_box" {% if metrics == top_data.7.0 %} style = "background: bisque;"{%endif %}>
+        <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
+        <a href="?metrics={{ top_data.7.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.7.1 }}</h6><h5 style="color: #b52828">{{ top_data.7.2|intcomma }}</h5></a>
+        </div>
+
+        <div class ="top_box" {% if metrics == top_data.3.0 %} style = "background: bisque;"{%endif %}>
+        <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
+        <a href="?metrics={{ top_data.3.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.3.1 }}</h6><h5 style="color: #b52828">{{ top_data.3.2|intcomma }}</h5></a>
+        </div>
+
+        <div class ="top_box" {% if metrics == top_data.4.0 %} style = "background: bisque;"{%endif %}>
+        <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
+        <a href="?metrics={{ top_data.4.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.4.1 }}</h6><h5 style="color: #b52828">{{ top_data.4.2|intcomma }}</h5></a>
+        </div>
+
+        <div class ="top_box" {% if metrics == top_data.5.0 %} style = "background: bisque;"{%endif %}>
+        <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
+        <a href="?metrics={{ top_data.5.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.5.1 }}</h6><h5 style="color: #b52828">{{ top_data.5.2|intcomma }}</h5></a>
+        </div>
+
+        <div class ="top_box" {% if metrics == top_data.6.0 %} style = "background: bisque;"{%endif %}>
+        <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* avg 30 days</i></span>
+        <a href="?metrics={{ top_data.6.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.6.1 }}</h6><h5 style="color: #b52828">{{ top_data.6.2|intcomma|floatformat:0}}</h5></a>
+        </div>
+
+        <div class ="top_box" {% if metrics == top_data.8.0 %} style = "background: bisque;"{%endif %}>
+        <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
+        <a href="?metrics={{ top_data.8.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.8.1 }}</h6><h5 style="color: #b52828">{{ top_data.8.2|intcomma }}</h5></a>
+        </div>
+
+         <div class ="top_box" {% if metrics == top_data.2.0 %} style = "background: bisque;"{%endif %}>
+        <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
+        <a href="?metrics={{ top_data.2.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.2.1 }}</h6><h5 style="color: #b52828">{{ top_data.2.2|intcomma }}</h5></a>
+        </div>
+
         <div class="right_panel">
             <br><br>Start date &nbsp;&nbsp; <input type="text" id="start_date" name="start_date" placeholder="Start Date" class="filter_text" value="{{ start_date }}">
             &nbsp;&nbsp; End date&nbsp;&nbsp;&nbsp; <input type="text" id="end_date" name="end_date" placeholder="End Date" class="filter_text" value="{{ end_date }}">&nbsp;&nbsp;&nbsp;
