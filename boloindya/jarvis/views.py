@@ -1850,10 +1850,10 @@ def update_user_time(requests):
     try:
         device=FCMDevice.objects.get(dev_id=dev_id)
         if is_start == '0': 
-            device.start_time=datetime.now()
+            device.start_time=datetime.datetime.now()
         else:
-            device.end_time=datetime.now()
+            device.end_time=datetime.datetime.now()
         device.save()
         return JsonResponse({'message': 'Updated'}, status=status.HTTP_200_OK)
     except Exception as e: 
-        return JsonResponse({'message': 'Not Updated'}, status=status.HTTP_200_OK)
+        return JsonResponse({'message': 'Not Updated', 'error': str(e)}, status=status.HTTP_200_OK)
