@@ -27,7 +27,7 @@ def upload_media(media_file,filename):
 
 def run():
     start_date = datetime(2020,02,14)
-    all_vb_list = Topic.objects.filter(is_vb=True,date__lt = start_date,has_downloaded_url = False).order_by('-id')
+    all_vb_list = Topic.objects.filter(is_vb=True,date__lt = start_date,has_downloaded_url = False,is_removed=False).order_by('-id')
     counter=0
     for each_vb in all_vb_list:
         try:
