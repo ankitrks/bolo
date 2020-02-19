@@ -1845,8 +1845,8 @@ def upload_thumbail_notification(virtual_thumb_file,bucket_name):
 
 @api_view(['POST'])
 def update_user_time(requests):
-    dev_id=request.POST.get('dev_id', None)
-    is_start=request.POST.get('is_start', '0')
+    dev_id=requests.POST.get('dev_id', None)
+    is_start=requests.POST.get('is_start', '0')
     try:
         device=FCMDevice.objects.get(dev_id=dev_id)
         if is_start == '0': 
