@@ -1851,7 +1851,7 @@ def update_user_time(requests):
         device=FCMDevice.objects.get(dev_id=dev_id)
         if is_start == '0': 
             device.start_time=datetime.datetime.now()
-        else:
+        else:git add 
             device.end_time=datetime.datetime.now()
         device.save()
         return JsonResponse({'message': 'Updated'}, status=status.HTTP_200_OK)
