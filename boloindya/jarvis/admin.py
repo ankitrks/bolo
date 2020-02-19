@@ -17,7 +17,7 @@ from fcm.utils import get_device_model
 admin.site.register(VideoUploadTranscode)
 
 class FCMDeviceAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'dev_id', 'reg_id', 'user', 'device_type', 'device_model', 'current_version', 'manufacturer')
+    list_display = ('id', 'name', 'dev_id', 'start_time', 'end_time', 'current_activity', 'user', 'device_type', 'device_model', 'current_version', 'manufacturer')
     # list_filter = ('user__st__name', )
     search_fields = ('user__username', 'user__st__name')
     list_filter = ['is_active']

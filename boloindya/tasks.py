@@ -126,7 +126,7 @@ def send_notifications_task(data, pushNotification):
                         t = each.send_message(data={"title": title, "id": instance_id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url}, time_to_live=6000)
                         response=t[1]['results'][0]['message_id']
                         try:
-                            PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2', device=each)
+                            PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2', device=each, response_dump=t)
                         except:
                             pass
                     except:
