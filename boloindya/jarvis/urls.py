@@ -64,4 +64,6 @@ urlpatterns = [
     url(r'^analytics/$', views.analytics),  
 
     url(r'^upload_image_notification/$',views.upload_image_notification, name='search_notification'),  
+
+    url(r'^update_user_time/$',views.update_user_time, name='update_user_time'),
 ]

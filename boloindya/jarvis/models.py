@@ -76,6 +76,8 @@ class FCMDevice(AbstractDevice):
     device_model = models.CharField(blank = True, null = True, max_length=10, default='')
     current_version = models.CharField(blank = True, null = True, max_length=10, default='')
     manufacturer = models.CharField(blank = True, null = True, max_length=10, default='')
+    start_time = models.DateTimeField(auto_now=False,auto_now_add=False,blank=True,null=True)
+    end_time = models.DateTimeField(auto_now=False,auto_now_add=False,blank=True,null=True)
 
     def __unicode__(self):
         return str(self.user)
@@ -247,6 +249,7 @@ class PushNotificationUser(RecordTimeStamp):
     device=models.ForeignKey(FCMDevice, blank = True, null = True, related_name='push_notification_device',editable=False)
     push_notification_id = models.ForeignKey(PushNotification, blank = True, null = True, related_name='push_notification_id',editable=False)
     status = models.CharField(choices=status_options, blank = True, null = True, max_length=10, default='0')
+    response_dump = models.TextField(null=True,blank=True)
 
 class StateDistrictLanguage(RecordTimeStamp):
     state_name = models.CharField(_('State Name'),max_length=200,null=True,blank=True)
