@@ -1853,7 +1853,13 @@ def update_user_time(requests):
         if is_start == '0': 
             device.start_time=datetime.datetime.now()
         else:
-            device.end_time=datetime.datetime.now()
+            try:
+                delta=datetime.datetime.now()-device.start_time
+                if delta.seconds > 36000:
+                    device.start_time=datetime.datetime.now()
+            except:
+                pass
+        device.end_time=datetime.datetime.now()
         device.current_activity=current_activity
         device.save()
         return JsonResponse({'message': 'Updated'}, status=status.HTTP_200_OK)
