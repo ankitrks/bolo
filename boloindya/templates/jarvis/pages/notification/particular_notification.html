@@ -87,7 +87,7 @@
                         console.log(data)
                         $('table tbody').empty();
                         for(var i=0;i<data.data.length;i++) {
-                            $('table tbody').append('<tr><td>'+i+'</td><td>'+data.data[i].user.username+'</td><td>'+data.data[i].user.first_name+'</td><td></td></tr>')
+                            $('table tbody').append('<tr><td>'+i+'</td><td>'+data.data[i].user.username+'</td><td>'+data.data[i].user.first_name+'</td><td>'+data.data[i].device.device_model+'</td><td>'+data.data[i].device.current_version+'</td><td>'+data.data[i].device.manufacturer+'</td><td></td></tr>')
                         }
                     }
                 })

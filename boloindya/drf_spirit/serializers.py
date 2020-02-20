@@ -15,7 +15,7 @@ from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocu
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 from datetime import datetime,timedelta,date
 from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
-from jarvis.models import PushNotificationUser
+from jarvis.models import PushNotificationUser, FCMDevice
 
 cloufront_url = "https://d1fa4tg1fvr6nj.cloudfront.net"
 class CategorySerializer(ModelSerializer):
@@ -670,9 +670,16 @@ class UserOnlySerializer(ModelSerializer):
         model = User
         #fields = '__all__'
         exclude = ('password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login')
-    
+
+class FCMDeviceSerializer(ModelSerializer):
+
+    class Meta:
+        model = FCMDevice
+        fields = '__all__'
+
 class PushNotificationUserSerializer(ModelSerializer):
     user = SerializerMethodField()
+    device = FCMDeviceSerializer()
 
     class Meta:
         model = PushNotificationUser
@@ -680,3 +687,4 @@ class PushNotificationUserSerializer(ModelSerializer):
 
     def get_user(self,instance):
         return UserOnlySerializer(instance.user).data
+

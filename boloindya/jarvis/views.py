@@ -1811,8 +1811,7 @@ def search_notification_users(request):
         notification_id = raw_data['notification_id']
         status_id = raw_data['status_id']
         pushNotification = PushNotification.objects.get(pk=notification_id)
-        pushNotificationUser=PushNotificationUser.objects.filter(push_notification_id=pushNotification, status=status_id, user__username__istartswith=query)
-        print(pushNotificationUser)
+        pushNotificationUser=PushNotificationUser.objects.filter(push_notification_id=pushNotification, user__username__istartswith=query)
         return JsonResponse({'data': PushNotificationUserSerializer(pushNotificationUser, many=True).data}, status=status.HTTP_200_OK)  
     except Exception as e:
         print(e)
