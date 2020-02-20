@@ -911,7 +911,15 @@ def old_home(request):
 
 
 def latest_home(request):
-    return render(request, 'spirit/topic/single_page_landing.html')
+    utmURL = ''
+    currentQueryString=request.GET.get('utm_source',None)
+    if(currentQueryString != None):
+        utmURL = '&referrer=web&utm_source='+currentQueryString+'&utm_medium=cpc&anid=admob'
+    context = {
+        'utm_url':utmURL
+    } 
+
+    return render(request, 'spirit/topic/single_page_landing.html',context)
 
 
 def login_user(request):
