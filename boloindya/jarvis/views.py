@@ -33,7 +33,7 @@ from django.views.generic.edit import FormView
 from datetime import datetime
 from forum.userkyc.forms import KYCBasicInfoRejectForm,KYCDocumentRejectForm,AdditionalInfoRejectForm,BankDetailRejectForm
 from .models import VideoUploadTranscode,VideoCategory, PushNotification, PushNotificationUser, user_group_options, \
-    FCMDevice, notification_type_options, metrics_options, DashboardMetrics, DashboardMetricsJarvis, metrics_slab_options
+    FCMDevice, notification_type_options, metrics_options, DashboardMetrics, DashboardMetricsJarvis, metrics_slab_options, metrics_language_options
 from drf_spirit.models import MonthlyActiveUser, HourlyActiveUser, DailyActiveUser, VideoDetails
 from forum.category.models import Category
 from django.contrib.auth.models import User
@@ -1471,10 +1471,14 @@ def statistics_all(request):
 @login_required
 def statistics_all_jarvis(request):
     from django.db.models import Sum
+    from django.db.models import Avg
+
     data = {}
     top_data = []
     metrics = request.GET.get('metrics', '0')
     slab = request.GET.get('slab', None)
+    language_filter = request.GET.get('language_filter', None)
+
 
     if metrics == '6':
         data_view = 'daily'
@@ -1506,6 +1510,7 @@ def statistics_all_jarvis(request):
 
     top_start = (datetime.datetime.today() - timedelta(days = 30)).date()
     top_end = (datetime.datetime.today() - timedelta(days = 1)).date()
+
     for each_opt in metrics_options:
         temp_list = []
         temp_list.append( each_opt[0] )
@@ -1518,7 +1523,7 @@ def statistics_all_jarvis(request):
             temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0])\
                 .aggregate(total_count = Sum('count'))['total_count'] )
         
-                    
+
         top_data.append(temp_list) 
         if metrics == each_opt[0]:
             data['graph_title'] = each_opt[1]
@@ -1529,6 +1534,9 @@ def statistics_all_jarvis(request):
         if (metrics == '4' and slab in ['0', '1', '2']) or (metrics == '2' and slab in ['3', '4', '5'])\
                  or (metrics == '5' and slab in ['6', '7']):
             graph_data = graph_data.filter(metrics_slab = slab)
+
+    if(metrics == '9'):
+        graph_data = graph_data.filter(metrics_language_options = language_filter)    
 
     if data_view == 'weekly':
         x_axis = []
@@ -1557,6 +1565,8 @@ def statistics_all_jarvis(request):
     data['metrics'] = metrics
     data['slab'] = slab
     data['data_view'] = data_view
+    data['language_filter'] = language_filter
+
     # data['x_axis'] = list(x_axis)
     # data['y_axis'] = list(y_axis)
     from collections import OrderedDict
@@ -1567,13 +1577,17 @@ def statistics_all_jarvis(request):
     data['start_date'] = start_date
     data['end_date'] = end_date
     data['slabs'] = []
+    data['language_filter'] = []
 
     if metrics == '4':
         data['slabs'] = [metrics_slab_options[0], metrics_slab_options[1], metrics_slab_options[2]]
     if metrics == '2':
         data['slabs'] = [metrics_slab_options[3], metrics_slab_options[4], metrics_slab_options[5]]
     if metrics == '5':
-        data['slabs'] = [metrics_slab_options[6], metrics_slab_options[7], metrics_slab_options[8]]    
+        data['slabs'] = [metrics_slab_options[6], metrics_slab_options[7], metrics_slab_options[8]]
+    if metrics == '9':
+        data['language_filter'] = metrics_language_options 
+          
 
     return render(request,'jarvis/pages/video_statistics/statistics_all_jarvis.html', data)
 

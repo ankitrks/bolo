@@ -176,6 +176,7 @@ metrics_options = (
     ('6', "DAU"),
     ('7', "Unique Video Views"),
     ('8', "MAU"),
+    ('9', 'Total Video Creators'),
 )
 
 metrics_slab_options = (
@@ -190,6 +191,7 @@ metrics_slab_options = (
     ('t', "Total"),
 )
 
+metrics_language_options = language_options
 
 class DashboardMetrics(RecordTimeStamp):
     metrics = models.CharField(choices = metrics_options, blank = True, null = True, max_length = 10, default = '0')
@@ -204,8 +206,11 @@ class DashboardMetrics(RecordTimeStamp):
     def __unicode__(self):
         return str(self.id)
 
+
+# new field added and diff from DashBoardMetrics model
 class DashboardMetricsJarvis(RecordTimeStamp):
     metrics = models.CharField(choices = metrics_options, blank = True, null = True, max_length = 10, default = '0')
+    metrics_language_options = models.CharField(choices = language_options, blank = True, null = True, max_length = 10, default = '0')
     metrics_slab = models.CharField(choices = metrics_slab_options, blank = True, null = True, max_length = 10, default = None)
     date = models.DateTimeField(auto_now = False, auto_now_add = False, blank = False, null = False)
     week_no = models.PositiveIntegerField(null = True, blank = True, default = 0)

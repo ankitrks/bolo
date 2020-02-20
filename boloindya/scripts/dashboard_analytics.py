@@ -28,6 +28,9 @@ import random
 from datetime import datetime
 from calendar import monthrange
 from jarvis.models import DashboardMetrics
+from drf_spirit.utils import language_options
+
+
 from datetime import timedelta
 os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
 sys.path.append( '/'.join(os.path.realpath(__file__).split('/')[:5]) )
@@ -702,28 +705,75 @@ def put_uniq_views_analytics():
 			print(metrics, metrics_slab, str_date, week_no, tot_uniq_uvb_view_count)	
 			save_obj.count = tot_uniq_uvb_view_count
 			save_obj.save()	
+
 								
-# def put_bolo_action_data():
+def put_total_video_creators():
 
-# 	like_dict = dict()
-# 	share_dict = dict()
-# 	comments_dict = dict()
 
-# 	all_data = BoloActionHistory.objects.all().exclude(user__st__is_test_user=True)
-# 	for item in all_data:
-# 		curr_action_type = item.
+	today = datetime.now()
+	start_date = today + timedelta(days = -150)
+	end_date = today
+	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = today):
+		language_dict = dict()
+		for item in language_options:
+			language_dict[item[0]] = 0
+
+		curr_day = dt.day 
+		curr_month = dt.month 
+		curr_year = dt.year
+		str_date = str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day)
+		all_data = Topic.objects.filter(is_vb = True, date__day = curr_day, date__month = curr_month, date__year = curr_year).values('user', 'pk', 'language_id').order_by('user') 
+		#print(len(all_data))
+		for item in all_data:
+			video_id = str(item['pk'])
+			language_id = str(item['language_id'])
+			userid = str(item['user'])
+			if(language_id in language_map):
+				language_id = str(language_map.index(language_id))
+				language_dict[language_id]+=1
+			else:
+				language_dict[language_id]+=1	
+
+		#print(language_dict)
+		datetime_key = parser.parse(str_date)
+		week_no = datetime_key.isocalendar()[1]
+		curr_year = datetime_key.year 
+		if(curr_year == 2020):
+			week_no+=52
+		if(curr_year == 2019 and week_no == 1):
+			week_no = 52
+
+		metrics = '9'
+		metrics_slab = ''
+
+		for each in language_dict.items():
+			save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_date, week_no = week_no, metrics_language_options = str(each[0]))
+			if(created):
+				print(metrics, metrics_slab, str_date, week_no, str(each[0]), each[1])
+				save_obj.count = each[1]
+				save_obj.save()	
+			else:
+				print(metrics, metrics_slab, datetime_key, week_no, str(each[0]), each[1])
+				save_obj.count = each[1]
+				save_obj.save()	
+
+
+			#print(metrics, metrics_slab, str_date, week_no, each[0],each[1])
+
+
 
 		
 def main():
 
-	put_share_data()
-	put_installs_data()
-	put_dau_data()
-	put_mau_data()
-	put_video_creators_analytics()
-	put_video_views_analytics()
-	put_videos_created()
-	put_uniq_views_analytics()
+	# put_share_data()
+	# put_installs_data()
+	# put_dau_data()
+	# put_mau_data()
+	# put_video_creators_analytics()
+	# put_video_views_analytics()
+	# put_videos_created()
+	# put_uniq_views_analytics()
+	put_total_video_creators()
 
 	
 

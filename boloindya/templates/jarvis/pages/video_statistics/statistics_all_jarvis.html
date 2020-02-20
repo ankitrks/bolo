@@ -139,7 +139,7 @@
         </div>
 
         <div class ="top_box" {% if metrics == top_data.6.0 %} style = "background: bisque;"{%endif %}>
-        <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* avg 30 days</i></span>
+        <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* [Avg]</i></span>
         <a href="?metrics={{ top_data.6.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.6.1 }}</h6><h5 style="color: #b52828">{{ top_data.6.2|intcomma|floatformat:0}}</h5></a>
         </div>
 
@@ -148,10 +148,16 @@
         <a href="?metrics={{ top_data.8.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.8.1 }}</h6><h5 style="color: #b52828">{{ top_data.8.2|intcomma }}</h5></a>
         </div>
 
-         <div class ="top_box" {% if metrics == top_data.2.0 %} style = "background: bisque;"{%endif %}>
+        <div class ="top_box" {% if metrics == top_data.2.0 %} style = "background: bisque;"{%endif %}>
         <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
         <a href="?metrics={{ top_data.2.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.2.1 }}</h6><h5 style="color: #b52828">{{ top_data.2.2|intcomma }}</h5></a>
         </div>
+
+        <div class ="top_box" {% if metrics == top_data.9.0 %} style = "background: bisque;"{%endif %}>
+        <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
+        <a href="?metrics={{ top_data.9.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.9.1 }}</h6><h5 style="color: #b52828">{{ top_data.9.2|intcomma }}</h5></a>
+        </div>
+
 
         <div class="right_panel">
             <br><br>Start date &nbsp;&nbsp; <input type="text" id="start_date" name="start_date" placeholder="Start Date" class="filter_text" value="{{ start_date }}">
@@ -173,6 +179,15 @@
                     <a href="?slab={{ each_slab.0 }}" class="filter_apply" {% if slab == each_slab.0  %}style="text-decoration: underline;font-weight: bold;color: burlywood;"{% endif %}>{{ each_slab.1 }}</a>{% if not forloop.last %} &nbsp;&nbsp;|&nbsp;&nbsp;{% endif %}
                 {% endfor %}
             {% endif %}
+
+
+            {% if language_filter %}
+                <br> Language&nbsp;&nbsp;
+                {% for each_language in language_filter %}
+                    <a href="?language_filter={{ each_language.0 }}" class="filter_apply" {% if language == each_language.0  %}style="text-decoration: underline;font-weight: bold;color: burlywood;"{% endif %}>{{ each_language.1 }}</a>{% if not forloop.last %} &nbsp;&nbsp;|&nbsp;&nbsp;{% endif %}
+                {% endfor %}
+            {% endif %}
+
             <br><div id="myDiv" style="width: 100%; height: 450px;"></div>
         </div>
         <script type="text/javascript">
