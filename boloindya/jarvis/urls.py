@@ -58,9 +58,12 @@ urlpatterns = [
 
     # api for notification search
     url(r'^search_notification/$',views.search_notification, name='search_notification'),
+    url(r'^search_notification_users/$',views.search_notification_users, name='search_notification_users'),
 
     # url for rendering analytics panel
     url(r'^analytics/$', views.analytics),  
 
     url(r'^upload_image_notification/$',views.upload_image_notification, name='search_notification'),  
+
+    url(r'^update_user_time/$',views.update_user_time, name='update_user_time'),
 ]

@@ -123,10 +123,10 @@ def send_notifications_task(data, pushNotification):
                 logger.info(device_after_slice)
                 for each in device_after_slice:
                     try:
-                        t = each.send_message(data={"title": title, "id": instance_id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url}, time_to_live=6000)
+                        t = each.send_message(data={"title": title, "id": instance_id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url}, time_to_live=604800)
                         response=t[1]['results'][0]['message_id']
                         try:
-                            PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2', device=each)
+                            PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2', device=each, response_dump=t)
                         except:
                             pass
                     except:

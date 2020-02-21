@@ -1109,12 +1109,17 @@ def send_notification(request):
 @login_required
 def particular_notification(request, notification_id=None, status_id=2, page_no=1):
     import math  
+    from django.db.models import Q
     pushNotification = PushNotification.objects.get(pk=notification_id)
     page_no=int(page_no)-1
     has_prev=False
     if page_no > 0:
         has_prev=True
-    pushNotificationUser=PushNotificationUser.objects.filter(push_notification_id=pushNotification, status=status_id)
+    pushNotificationUser=PushNotificationUser.objects.filter(push_notification_id=pushNotification)
+    if (status_id == '1'):
+        pushNotificationUser=pushNotificationUser.filter(status='1')
+    elif (status_id == '0'):
+        pushNotificationUser=pushNotificationUser.filter(Q(status='0')|Q(status='1'))
     pushNotificationUserSlice=pushNotificationUser[page_no*10:page_no*10+10]
     has_next=True
     if ((page_no*10)+10) >= len(pushNotificationUser):
@@ -1815,6 +1820,23 @@ def search_notification(request):
         return JsonResponse({'data': [], 'error': str(e)}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
+def search_notification_users(request):
+    from drf_spirit.serializers import PushNotificationUserSerializer
+    data = []
+    try:
+        raw_data = json.loads(request.body)
+        query = raw_data['query']
+        notification_id = raw_data['notification_id']
+        status_id = raw_data['status_id']
+        pushNotification = PushNotification.objects.get(pk=notification_id)
+        pushNotificationUser=PushNotificationUser.objects.filter(push_notification_id=pushNotification, user__username__istartswith=query)
+        return JsonResponse({'data': PushNotificationUserSerializer(pushNotificationUser, many=True).data}, status=status.HTTP_200_OK)  
+    except Exception as e:
+        print(e)
+        return JsonResponse({'data': [], 'error': str(e)}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
 def upload_image_notification(requests):
     if requests.is_ajax():
         file=requests.FILES['file']
@@ -1837,3 +1859,26 @@ def upload_thumbail_notification(virtual_thumb_file,bucket_name):
     except Exception as e:
         print(e)
         return None
+
+@api_view(['POST'])
+def update_user_time(requests):
+    dev_id=requests.POST.get('dev_id', None)
+    is_start=requests.POST.get('is_start', '0')
+    current_activity=requests.POST.get('current_activity', '')
+    try:
+        device=FCMDevice.objects.get(dev_id=dev_id)
+        if is_start == '0': 
+            device.start_time=datetime.datetime.now()
+        else:
+            try:
+                delta=datetime.datetime.now()-device.start_time
+                if delta.seconds > 36000:
+                    device.start_time=datetime.datetime.now()
+            except:
+                pass
+        device.end_time=datetime.datetime.now()
+        device.current_activity=current_activity
+        device.save()
+        return JsonResponse({'message': 'Updated'}, status=status.HTTP_200_OK)
+    except Exception as e: 
+        return JsonResponse({'message': 'Not Updated', 'error': str(e)}, status=status.HTTP_200_OK)
