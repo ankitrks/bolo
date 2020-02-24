@@ -184,9 +184,19 @@
             {% if language_filter %}
                 <br> Language&nbsp;&nbsp;
                 {% for each_language in language_filter %}
-                    <a href="?language_filter={{ each_language.0 }}" class="filter_apply" {% if language == each_language.0  %}style="text-decoration: underline;font-weight: bold;color: burlywood;"{% endif %}>{{ each_language.1 }}</a>{% if not forloop.last %} &nbsp;&nbsp;|&nbsp;&nbsp;{% endif %}
+                    <a href="?language_choice={{ each_language.0 }}" class="filter_apply" {% if language_choice == each_language.0  %}style="text-decoration: underline;font-weight: bold;color: burlywood;"{% endif %}>{{ each_language.1 }}</a>{% if not forloop.last %} &nbsp;&nbsp;|&nbsp;&nbsp;{% endif %}
                 {% endfor %}
             {% endif %}
+
+
+            {% if category_filter %}
+                <br> Category&nbsp;&nbsp;
+                {% for each_cat in category_filter%}
+                    <a href="?category_choice={{ each_cat.0 }}" class="filter_apply" {% if category_choice == each_cat.0  %}style="text-decoration: underline;font-weight: bold;color: burlywood;"{% endif %}>{{ each_cat.1 }}</a>{% if not forloop.last %} &nbsp;&nbsp;|&nbsp;&nbsp;{% endif %}
+                {% endfor %}
+            {% endif %}
+
+
 
             <br><div id="myDiv" style="width: 100%; height: 450px;"></div>
         </div>

@@ -7,6 +7,7 @@ from django.conf import settings
 from django.template.defaultfilters import slugify
 from fcm.models import AbstractDevice
 from django.http import JsonResponse
+from forum.category.models import Category
 
 from django.db.models import Q
 
@@ -194,6 +195,15 @@ metrics_slab_options = (
 
 metrics_language_options = language_options
 
+all_category_list = Category.objects.all()
+category_slab_options = []
+
+for item in all_category_list:
+    category_slab_options.append((str(item.pk), str(item.title)))
+
+category_slab_options = tuple(category_slab_options)
+
+
 class DashboardMetrics(RecordTimeStamp):
     metrics = models.CharField(choices = metrics_options, blank = True, null = True, max_length = 10, default = '0')
     metrics_slab = models.CharField(choices = metrics_slab_options, blank = True, null = True, max_length = 10, default = None)
@@ -212,6 +222,7 @@ class DashboardMetrics(RecordTimeStamp):
 class DashboardMetricsJarvis(RecordTimeStamp):
     metrics = models.CharField(choices = metrics_options, blank = True, null = True, max_length = 10, default = '0')
     metrics_language_options = models.CharField(choices = language_options, blank = True, null = True, max_length = 10, default = '0')
+    category_slab_options = models.CharField(choices = category_slab_options, blank = True, null = True, max_length = 10, default = '0')
     metrics_slab = models.CharField(choices = metrics_slab_options, blank = True, null = True, max_length = 10, default = None)
     date = models.DateTimeField(auto_now = False, auto_now_add = False, blank = False, null = False)
     week_no = models.PositiveIntegerField(null = True, blank = True, default = 0)
