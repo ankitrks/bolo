@@ -56,7 +56,7 @@ from django.db.models import F,Q
 import traceback
 from tasks import send_notifications_task
 from PIL import Image, ExifTags
-
+from drf_spirit.utils import language_options
 
 def get_bucket_details(bucket_name=None):
     bucket_credentials = {}
@@ -1473,11 +1473,15 @@ def statistics_all_jarvis(request):
     from django.db.models import Sum
     from django.db.models import Avg
 
+    language_index_list = []
+    for each in language_options:
+        language_index_list.append(each[0])
+
     data = {}
     top_data = []
     metrics = request.GET.get('metrics', '0')
     slab = request.GET.get('slab', None)
-    language_filter = request.GET.get('language_filter', None)
+    language_filter = request.GET.get('language_filter', '0')
 
 
     if metrics == '6':
@@ -1519,6 +1523,11 @@ def statistics_all_jarvis(request):
         if(each_opt[0] == '6'):
             temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0])\
                 .aggregate(total_count = Avg('count'))['total_count'] )
+
+        if(each_opt[0] == '4'):
+            temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0], metrics_slab__in = ['0', '1', '2'])\
+                .aggregate(total_count = Sum('count'))['total_count'] )
+            
         else:
             temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0])\
                 .aggregate(total_count = Sum('count'))['total_count'] )
@@ -1530,10 +1539,16 @@ def statistics_all_jarvis(request):
     data['top_data'] = top_data
 
     graph_data = DashboardMetricsJarvis.objects.exclude(date__gt = end_date).filter(Q(metrics = metrics) & Q(date__gte = start_date) & Q(date__lte = end_date))
-    if metrics in ['4', '2', '5'] and slab:
+
+    if(metrics == '4' and (slab in ['0', '1', '2']) and language_filter in language_index_list):
+        print("coming here ....")
+        graph_data = graph_data.filter(Q(metrics_language_options = language_filter) & Q(metrics_slab = slab))
+
+    if metrics in ['2', '5'] and slab:
         if (metrics == '4' and slab in ['0', '1', '2']) or (metrics == '2' and slab in ['3', '4', '5'])\
-                 or (metrics == '5' and slab in ['6', '7']):
-            graph_data = graph_data.filter(metrics_slab = slab)
+                or (metrics == '5' and slab in ['6', '7']):
+                    print("or else coming here....") 
+                    graph_data = graph_data.filter(metrics_slab = slab)
 
     if(metrics == '9'):
         graph_data = graph_data.filter(metrics_language_options = language_filter)    
@@ -1581,6 +1596,8 @@ def statistics_all_jarvis(request):
 
     if metrics == '4':
         data['slabs'] = [metrics_slab_options[0], metrics_slab_options[1], metrics_slab_options[2]]
+        data['language_filter'] = metrics_language_options
+
     if metrics == '2':
         data['slabs'] = [metrics_slab_options[3], metrics_slab_options[4], metrics_slab_options[5]]
     if metrics == '5':
