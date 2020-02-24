@@ -27,7 +27,7 @@ def run():
     topic_ids = Topic.objects.filter(is_vb=True,is_removed=False).values_list('id', flat=True)
     topic_ids = list(topic_ids)
     actionable_ids = random.sample(topic_ids,250)
-    last_n_days_post_ids = Topic.objects.filter(is_vb=True,is_removed=False,date__gte=now-timedelta(days=50)).order_by('-date').values_list('id',flat=True)
+    last_n_days_post_ids = Topic.objects.filter(is_vb=True,is_removed=False,date__gte=now-timedelta(days=24)).order_by('-date').values_list('id',flat=True)
     last_n_days_post_ids = list(last_n_days_post_ids)
 
     post_counter = 0
