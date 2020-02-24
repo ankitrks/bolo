@@ -512,6 +512,28 @@ def put_video_creators_analytics_lang():
 				else:
 					print(metrics, metrics_slab, datetime_key, week_no, 1)
 					save_obj_all.count = F('count') + 1
+					save_obj_all.save()
+
+			if(tot_vb_count<5):
+				metrics_slab = '9'
+				save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no, metrics_language_options = language_id)
+				if(created):
+					print(metrics, metrics_slab, datetime_key, week_no, 1)
+					save_obj.count = 1
+					save_obj.save()
+				else:
+					print(metrics, metrics_slab, datetime_key, week_no, 1)
+					save_obj.count = F('count') + 1
+					save_obj.save()
+
+				save_obj_all, created_all = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no, metrics_language_options = '0')
+				if(created_all):
+					print(metrics, metrics_slab, datetime_key, week_no, 1)
+					save_obj_all.count = 1
+					save_obj_all.save()
+				else:
+					print(metrics, metrics_slab, datetime_key, week_no, 1)
+					save_obj_all.count = F('count') + 1
 					save_obj_all.save()			
 
 

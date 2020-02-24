@@ -189,6 +189,7 @@ metrics_slab_options = (
     ('6', "Organic"),
     ('7', "Paid"),
     ('t', "Total"),
+    ('9', 'Less than 5'),
 )
 
 metrics_language_options = language_options

@@ -1540,7 +1540,7 @@ def statistics_all_jarvis(request):
 
     graph_data = DashboardMetricsJarvis.objects.exclude(date__gt = end_date).filter(Q(metrics = metrics) & Q(date__gte = start_date) & Q(date__lte = end_date))
 
-    if(metrics == '4' and (slab in ['0', '1', '2']) and language_filter in language_index_list):
+    if(metrics == '4' and (slab in ['0', '1', '2', '9']) and language_filter in language_index_list):
         print("coming here ....")
         graph_data = graph_data.filter(Q(metrics_language_options = language_filter) & Q(metrics_slab = slab))
 
@@ -1595,7 +1595,7 @@ def statistics_all_jarvis(request):
     data['language_filter'] = []
 
     if metrics == '4':
-        data['slabs'] = [metrics_slab_options[0], metrics_slab_options[1], metrics_slab_options[2]]
+        data['slabs'] = [metrics_slab_options[0], metrics_slab_options[1], metrics_slab_options[2], metrics_slab_options[9]]
         data['language_filter'] = metrics_language_options
 
     if metrics == '2':
