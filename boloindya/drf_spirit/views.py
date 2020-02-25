@@ -3065,8 +3065,8 @@ def transcoder_notification(request):
     # f.write(jobId)
     # f.write(status)
     # f.close()
+    topic = Topic.objects.get(is_vb = True, is_transcoded = False, transcode_job_id = jobId)
     if status == 'COMPLETED':
-        topic = Topic.objects.get(is_vb = True, is_transcoded = False, transcode_job_id = jobId)
         topic.is_transcoded = True
     else:
         topic.is_transcoded_error = True
