@@ -416,7 +416,7 @@ def put_video_creators_analytics_lang():
 
 	today = datetime.now()
 	metrics = '4'
-	start_date = today + timedelta(days = -150)
+	start_date = today + timedelta(days = -180)
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = end_date):
 		curr_day = dt.day 
@@ -846,7 +846,7 @@ def put_total_video_creators():
 
 
 	today = datetime.now()
-	start_date = today + timedelta(days = -150)
+	start_date = today + timedelta(days = -180)
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = today):
 		language_dict = dict()
@@ -906,27 +906,13 @@ def put_total_video_creators():
 				save_obj_all.count = F('count') + 1
 				save_obj_all.save()
 
-			# for each in language_dict.items():
-			# 	save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_date, week_no = week_no, metrics_language_options = str(each[0]))
-			# 	if(created):
-			# 		print(metrics, metrics_slab, str_date, week_no, str(each[0]), each[1])
-			# 		save_obj.count = each[1]
-			# 		save_obj.save()	
-			# 	else:
-			# 		print(metrics, metrics_slab, datetime_key, week_no, str(each[0]), each[1])
-			# 		save_obj.count = each[1]
-			# 		save_obj.save()	
-
-
-
-
 		
 def main():
 
-	# put_share_data()
-	# put_installs_data()
-	# put_dau_data()
-	# put_mau_data()
+	#put_share_data()
+	#put_installs_data()
+	#put_dau_data()
+	#put_mau_data()
 	#put_video_creators_analytics()
 	# put_video_views_analytics()
 	# put_videos_created()

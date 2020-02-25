@@ -1540,7 +1540,7 @@ def statistics_all_jarvis(request):
                 .aggregate(total_count = Avg('count'))['total_count'] )
 
         if(each_opt[0] == '4'):
-            temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0], metrics_slab__in = ['0', '1', '2'])\
+            temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0], metrics_slab__in = ['0', '1', '2', '9'])\
                 .aggregate(total_count = Sum('count'))['total_count'] )
             
         else:
@@ -1561,7 +1561,7 @@ def statistics_all_jarvis(request):
         graph_data = graph_data.filter(Q(metrics_language_options = language_choice) & Q(metrics_slab = slab) & Q(category_slab_options = category_choice))
 
     if metrics in ['2', '5'] and slab:
-        if (metrics == '4' and slab in ['0', '1', '2']) or (metrics == '2' and slab in ['3', '4', '5'])\
+        if (metrics == '2' and slab in ['3', '4', '5'])\
                 or (metrics == '5' and slab in ['6', '7']):
                     print("or else coming here....") 
                     graph_data = graph_data.filter(metrics_slab = slab)
