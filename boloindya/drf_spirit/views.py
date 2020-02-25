@@ -1927,9 +1927,7 @@ def get_user_bolo_info(request):
             total_video_id = list(total_video.values_list('pk',flat=True))
             all_pay = UserPay.objects.filter(user=request.user,is_active=True)
             top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user).order_by('-view_count')[:3]
-            all_play_time = VideoPlaytime.objects.filter(videoid__in = total_video_id).aggregate(Sum('playtime'))
-            if all_play_time.has_key('playtime__sum') and all_play_time['playtime__sum']:
-                video_playtime = all_play_time['playtime__sum']
+            video_playtime = user.st.total_vb_playtime
         else:
             total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user,date__gte=start_date, date__lte=end_date)
             #total_video_id = list(Topic.objects.filter(is_vb = True,user=request.user).values_list('pk',flat=True))
