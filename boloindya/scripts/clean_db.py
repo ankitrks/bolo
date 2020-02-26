@@ -42,6 +42,11 @@ def run():
     print "before: Notification delete for test_user",datetime.now()
     Notification.objects.filter(for_user_id__in=all_user_id).delete()
     print "after: Notification delete for test_user",datetime.now()
+    print "before: BoloActionHistory delete object of test_user",datetime.now()
+    BoloActionHistory.objects.filter(user_id__in=all_user_id).delete()
+    print "after: BoloActionHistory delete object of test_user",datetime.now()
+
+
     print "before: BoloActionHistory delete object no exist",datetime.now()
     for each_bolo in BoloActionHistory.objects.all():
         if not each_bolo.action_object:
@@ -49,6 +54,6 @@ def run():
             each_bolo.delete()
     print "after: BoloActionHistory delete object no exist",datetime.now()
 
-    for each_user in User.objects.all():
+    for each_user in User.objects.filter(st__is_test_user=False):
         get_redis_vb_seen(each_user.id)
 

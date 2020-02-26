@@ -99,7 +99,7 @@ def action_follow(test_user_id,any_user_id):
     userprofile = get_userprofile(test_user_id)
     followed_user = get_userprofile(any_user_id)
     if is_created:
-        add_bolo_score(test_user_id, 'follow', userprofile[0])
+        # add_bolo_score(test_user_id, 'follow', userprofile[0])
         add_bolo_score(any_user_id, 'followed', followed_user[0])
         userprofile.update(follow_count = F('follow_count')+1)
         followed_user.update(follower_count = F('follower_count')+1)
@@ -110,28 +110,28 @@ def action_share(user_id, topic_id):
     userprofile = get_userprofile(user_id)
     topic = get_topic(topic_id)
     if share_on == 'facebook_share':
-        shared = SocialShare.objects.create(topic = topic[0],user_id = user_id,share_type = '0')
+        # shared = SocialShare.objects.create(topic = topic[0],user_id = user_id,share_type = '0')
         topic.update(facebook_share_count = F('facebook_share_count')+1 )  
         topic.update(total_share_count = F('total_share_count')+1)
-        add_bolo_score(user_id, 'facebook_share', topic[0])
+        # add_bolo_score(user_id, 'facebook_share', topic[0])
         userprofile.update(share_count = F('share_count')+1)
     elif share_on == 'whatsapp_share':
-        shared = SocialShare.objects.create(topic = topic[0],user_id = user_id,share_type = '1')
+        # shared = SocialShare.objects.create(topic = topic[0],user_id = user_id,share_type = '1')
         topic.update(whatsapp_share_count = F('whatsapp_share_count')+1)
         topic.update(total_share_count = F('total_share_count')+1)
-        add_bolo_score(user_id, 'whatsapp_share', topic[0])
+        # add_bolo_score(user_id, 'whatsapp_share', topic[0])
         userprofile.update(share_count = F('share_count')+1)
     elif share_on == 'linkedin_share':
-        shared = SocialShare.objects.create(topic = topic[0],user_id = user_id,share_type = '2')
+        # shared = SocialShare.objects.create(topic = topic[0],user_id = user_id,share_type = '2')
         topic.update(linkedin_share_count = F('linkedin_share_count')+1)
         topic.update(total_share_count = F('total_share_count')+1)
-        add_bolo_score(user_id, 'linkedin_share', topic[0])
+        # add_bolo_score(user_id, 'linkedin_share', topic[0])
         userprofile.update(share_count = F('share_count')+1)
     elif share_on == 'twitter_share':
-        shared = SocialShare.objects.create(topic = topic[0],user_id = user_id,share_type = '3')
+        # shared = SocialShare.objects.create(topic = topic[0],user_id = user_id,share_type = '3')
         topic.update(twitter_share_count = F('twitter_share_count')+1)
         topic.update(total_share_count = F('total_share_count')+1)
-        add_bolo_score(user_id, 'twitter_share', topic[0])
+        # add_bolo_score(user_id, 'twitter_share', topic[0])
         userprofile.update(share_count = F('share_count')+1)
 
 #comment like
