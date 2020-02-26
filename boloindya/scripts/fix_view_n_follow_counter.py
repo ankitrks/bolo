@@ -4,14 +4,14 @@ from django.db.models import Sum
 from django.contrib.contenttypes.models import ContentType
 
 def run():
-    view_counter = 0
-    all_topic= Topic.objects.filter(is_vb=True).order_by('-id')
-    total_topic = len(all_topic)
-    for each_topic in all_topic:
-        print "#######################   ",view_counter,"/",total_topic,"      ##########################"
-        seen_count = VBseen.objects.filter(topic = each_topic).count()
-        Topic.objects.filter(pk=each_topic.id).update(view_count = seen_count)
-        view_counter+=1
+    # view_counter = 0
+    # all_topic= Topic.objects.filter(is_vb=True).order_by('-id')
+    # total_topic = len(all_topic)
+    # for each_topic in all_topic:
+    #     print "#######################   ",view_counter,"/",total_topic,"      ##########################"
+    #     seen_count = VBseen.objects.filter(topic = each_topic).count()
+    #     Topic.objects.filter(pk=each_topic.id).update(view_count = seen_count)
+    #     view_counter+=1
 
     follow_counter = 0
     all_user= UserProfile.objects.all().order_by('-follower_count')

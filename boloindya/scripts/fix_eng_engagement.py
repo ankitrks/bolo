@@ -193,17 +193,18 @@ def get_weight(key):
 
 def add_bolo_score(user_id, feature, action_object):
     score = get_weight(feature)
-    userprofile = UserProfile.objects.get(user_id = user_id)
-    userprofile.bolo_score+= int(score)
-    userprofile.save()
-    weight_obj = get_weight_object(feature)
-    if weight_obj:
-        add_to_history(userprofile.user, score, get_weight_object(feature), action_object, False)
-    if feature in ['create_topic','create_topic_en']:
-        from forum.topic.models import Notification
-        notification_type = '8'
-        notify_owner = Notification.objects.create(for_user_id = user_id ,topic = action_object, \
-                notification_type=notification_type, user_id = user_id)
+    if score > 0:
+        userprofile = UserProfile.objects.get(user_id = user_id)
+        userprofile.bolo_score+= int(score)
+        userprofile.save()
+        weight_obj = get_weight_object(feature)
+        if weight_obj:
+            add_to_history(userprofile.user, score, get_weight_object(feature), action_object, False)
+        if feature in ['create_topic','create_topic_en']:
+            from forum.topic.models import Notification
+            notification_type = '8'
+            notify_owner = Notification.objects.create(for_user_id = user_id ,topic = action_object, \
+                    notification_type=notification_type, user_id = user_id)
 
 def get_list_dict_diff(list1,list2):
     final_list=[]
