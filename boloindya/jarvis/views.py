@@ -1540,7 +1540,11 @@ def statistics_all_jarvis(request):
                 .aggregate(total_count = Avg('count'))['total_count'] )
 
         if(each_opt[0] == '4'):
-            temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0], metrics_slab__in = ['0', '1', '2', '9'])\
+            temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0], metrics_slab__in = ['0', '1', '2', '9'], metrics_language_options = '0')\
+                .aggregate(total_count = Sum('count'))['total_count'] )
+
+        if(each_opt[0] == '9'):
+            temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0], metrics_language_options = '0')\
                 .aggregate(total_count = Sum('count'))['total_count'] )
             
         else:
