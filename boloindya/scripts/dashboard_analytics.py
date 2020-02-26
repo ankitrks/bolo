@@ -906,6 +906,92 @@ def put_total_video_creators():
 				save_obj_all.count = F('count') + 1
 				save_obj_all.save()
 
+
+def put_install_signup_conversion():
+
+	today = datetime.now()
+	start_date = today + timedelta(days = -180)
+	end_date = today
+	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = today):
+		curr_day = dt.day 
+		curr_month = dt.month
+		curr_year = dt.year
+		install_data = ReferralCodeUsed.objects.filter(by_user__isnull=False, created_at__day=curr_day, created_at__month = curr_month, created_at__year=curr_year).values_list('android_id', flat=True)
+		signup_data = ReferralCodeUsed.objects.filter(by_user__isnull = False, created_at__day=curr_day, created_at__month = curr_month, created_at__year=curr_year).values_list('android_id', flat=True)
+		install_signup = list(set(install_data) & set(signup_data))
+		tot_count = len(install_signup)
+		metrics = '10'
+		metrics_slab = ''
+		str_date = str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day)
+		datetime_key = parser.parse(str_date)
+		week_no = datetime_key.isocalendar()[1]
+		curr_year_dt = datetime_key.year 
+		if(curr_year_dt == 2020):
+			week_no+=52
+		if(curr_year_dt == 2019 and week_no == 1):
+			week_no = 52
+
+		#print(metrics, metrics_slab, str_date, week_no, tot_count)	
+		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_date, week_no = week_no)
+		if(created):
+			print(metrics, metrics_slab, week_no, tot_count)
+			save_obj.count = tot_count
+			save_obj.save()
+		else:
+			print(metrics, metrics_slab, week_no, tot_count)
+			save_obj.count = F('count') + tot_count
+			save_obj.save()
+
+def put_ratio_sessions_users():
+
+	metrics = '11'
+	metrics_slab = ''
+
+	today = datetime.now()
+	start_date = today + timedelta(days = -180)
+	end_date = today 
+	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = today):
+		curr_day = dt.day 
+		curr_month = dt.month
+		curr_year = dt.year
+		tot_session_records = 0
+		tot_user_list = []
+		str_date = str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day)
+		datetime_key = parser.parse(str_date)
+		week_no = datetime_key.isocalendar()[1]
+		curr_year_dt = datetime_key.year 
+		if(curr_year_dt == 2020):
+			week_no+=52
+		if(curr_year_dt == 2019 and week_no == 1):
+			week_no = 52
+
+		all_traction_data = UserJarvisDump.objects.filter(sync_time__day = curr_day, sync_time__month = curr_month, sync_time__year = curr_year, dump_type = 1)
+		for user_jarvis in all_traction_data:
+			user_data_string = user_jarvis.dump
+			user_data_dump = ast.literal_eval(user_data_string)
+			if('user_id' in user_data_dump):
+				userid = user_data_dump['user_id']
+				tot_user_list.append(userid)
+
+			if('session_start_time' in user_data_dump):
+				tot_session_records+=1
+			
+		tot_user_set = set(tot_user_list)
+		tot_user_set_count = float(len(tot_user_set))
+		if(tot_user_set_count>0):
+			session_user_ratio = float(float(tot_session_records)/float(tot_user_set_count))
+			#print(dt, session_user_ratio)
+			save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_date, week_no = week_no)
+			if(created):
+				print(metrics, metrics_slab, week_no, session_user_ratio)
+				save_obj.count = session_user_ratio
+				save_obj.save()
+			else:
+				print(metrics, metrics_slab, week_no, session_user_ratio)
+				save_obj.count = F('count') + session_user_ratio
+				save_obj.save()
+					
+
 		
 def main():
 
@@ -919,7 +1005,7 @@ def main():
 	# put_uniq_views_analytics()
 	put_total_video_creators()
 	put_video_creators_analytics_lang()
-
+	put_install_signup_conversion()
 	
 
 def run():

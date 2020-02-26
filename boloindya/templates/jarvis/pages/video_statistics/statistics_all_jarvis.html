@@ -21,7 +21,7 @@
             .top_box{
                 background: #f1f1f1;
                 display: inline-block;
-                width: 10.85%;
+                width: 10.82%;
                 text-align: center;
                 padding: 10px 0px;
                 padding-top: 20px;
@@ -157,6 +157,12 @@
         <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
         <a href="?metrics={{ top_data.9.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.9.1 }}</h6><h5 style="color: #b52828">{{ top_data.9.2|intcomma }}</h5></a>
         </div>
+
+        <div class ="top_box" {% if metrics == top_data.10.0 %} style = "background: bisque;"{%endif %}>
+        <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
+        <a href="?metrics={{ top_data.10.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.10.1 }}</h6><h5 style="color: #b52828">{{ top_data.10.2|intcomma }}</h4></a>
+        </div>
+
 
 
         <div class="right_panel">
