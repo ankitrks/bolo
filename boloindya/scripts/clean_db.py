@@ -43,7 +43,7 @@ def run():
     Notification.objects.filter(for_user_id__in=all_user_id).delete()
     print "after: Notification delete for test_user",datetime.now()
     print "before: BoloActionHistory delete object of test_user",datetime.now()
-    BoloActionHistory.objects.filter(user_id__in=all_user_id).delete()
+    BoloActionHistory.objects.filter(user_id__in=all_user_id,score=0).delete()
     print "after: BoloActionHistory delete object of test_user",datetime.now()
 
 
