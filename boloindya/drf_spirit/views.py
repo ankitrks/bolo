@@ -1502,18 +1502,11 @@ def createTopic(request):
         return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
 def provide_view_count(view_count,topic):
-    counter =0
-    all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)
-    user_ids = list(all_test_userprofile_id)
-    user_ids = random.sample(user_ids,100)
-    userprofile = topic.user.st
-    while counter<view_count:
-        opt_action_user_id = random.choice(user_ids)
-        vb_obj = VBseen.objects.create(topic= topic,user_id =opt_action_user_id)
-        userprofile.own_vb_view_count = F('own_vb_view_count')+1
-        userprofile.save()
-        update_redis_vb_seen(opt_action_user_id,topic.id)
-        counter+=1
+    all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)[:view_count]
+    for each_user_id in all_test_userprofile_id:
+        vb_obj = VBseen.objects.create(topic= topic,user_id =each_user_id)
+        UserProfile.objects.filter(user=topic.user).update(view_count=F(view_count)+1,own_vb_view_count = F('own_vb_view_count')+1)
+        update_redis_vb_seen(each_user_id,topic.id)
 
 @api_view(['POST'])
 def editTopic(request):
