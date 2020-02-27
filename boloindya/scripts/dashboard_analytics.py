@@ -48,8 +48,11 @@ def print_dict(curr_dict):
 
 def put_share_data():
 
+	metrics = '3'
+	metrics_slab = ''
+
 	today = datetime.now()
-	start_date = today + timedelta(days = -1)
+	start_date = today + timedelta(days = -5)
 
 	day_month_year_dict = dict()
 	all_data = UserVideoTypeDetails.objects.filter(timestamp__gt = start_date)
@@ -78,8 +81,7 @@ def put_share_data():
 		if(curr_year == 2019 and week_no == 1):
 			week_no = 52
 
-		metrics = '3'
-		metrics_slab = ''
+		
 		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
 		if(created):
 			print(metrics, metrics_slab, week_no, len(val))
@@ -91,10 +93,10 @@ def put_share_data():
 			save_obj.save()	
 
 
-def  put_installs_data():
+def put_installs_data():
 
 	today = datetime.now()
-	start_date = today + timedelta(days = -1)
+	start_date = today + timedelta(days = -2)
 
 	user_install_dict = dict()
 	all_data = ReferralCodeUsed.objects.filter(by_user__isnull = True, created_at__gt = start_date)
@@ -135,11 +137,11 @@ def  put_installs_data():
 			save_obj.count = len(val)
 			save_obj.save()	
 	
-
+# this function is also not being used, please do not call it anywhere
 def put_video_views_data():
 
 	today = datetime.now()
-	start_date = today + timedelta(days = -1)
+	start_date = today + timedelta(days = -2)
 
 	day_month_year_dict = dict()
 	all_data = VideoPlaytime.objects.filter(timestamp__gt = start_date)
@@ -184,7 +186,7 @@ def put_video_views_data():
 def put_video_views_analytics():
 
 	today = datetime.now()
-	start_date = today + timedelta(days = -1)	
+	start_date = today + timedelta(days = -2)	
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
 
@@ -225,27 +227,12 @@ def put_video_views_analytics():
 			save_obj.count = len(user_view_dict)
 			save_obj.save()	
 
-		metrics = '7'
-		metrics_slab = ''
-		
-		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_date, week_no = week_no)
-		if(created):
-			print(metrics, metrics_slab, str_date, week_no, len(set(user_view_dict)))
-			save_obj.count = len(set(user_view_dict))
-			save_obj.save()
-		else:
-			print(metrics, metrics_slab, str_date, week_no, len(set(user_view_dict)))	
-			save_obj.count = len(set(user_view_dict))
-			save_obj.save()
-
-
-
 
 
 def put_videos_created():
 
 	today = datetime.now()
-	start_date = today + timedelta(days = -1)
+	start_date = today + timedelta(days = -2)
 
 	day_month_year_dict = dict()
 	all_data = Topic.objects.filter(date__gt = start_date)
@@ -416,7 +403,7 @@ def put_video_creators_analytics_lang():
 
 	today = datetime.now()
 	metrics = '4'
-	start_date = today + timedelta(days = -180)
+	start_date = today + timedelta(days = -1)
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = end_date):
 		curr_day = dt.day 
@@ -537,7 +524,7 @@ def put_video_creators_analytics_lang():
 					save_obj_all.save()			
 
 
-
+# this function is not being used anymore, please do not edit this function and call it anywhere
 def put_video_creators_analytics():
 
 	today = datetime.now()
@@ -683,7 +670,7 @@ def put_video_creators_analytics():
 def put_dau_data():
 
 	today = datetime.today()
-	start_date = today + timedelta(days = -1)	
+	start_date = today + timedelta(days = -2)	
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
 		#print(dt)
@@ -787,7 +774,7 @@ def put_mau_data():
 def put_uniq_views_analytics():
 
 	today = datetime.now()
-	start_date = today + timedelta(days = -1)	
+	start_date = today + timedelta(days = -2)	
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
 		#print(dt)
@@ -846,7 +833,7 @@ def put_total_video_creators():
 
 
 	today = datetime.now()
-	start_date = today + timedelta(days = -180)
+	start_date = today + timedelta(days = -1)
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = today):
 		language_dict = dict()
@@ -910,7 +897,7 @@ def put_total_video_creators():
 def put_install_signup_conversion():
 
 	today = datetime.now()
-	start_date = today + timedelta(days = -180)
+	start_date = today + timedelta(days = -1)
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = today):
 		curr_day = dt.day 
@@ -939,9 +926,10 @@ def put_install_signup_conversion():
 			save_obj.save()
 		else:
 			print(metrics, metrics_slab, week_no, tot_count)
-			save_obj.count = F('count') + tot_count
+			save_obj.count = tot_count
 			save_obj.save()
 
+# this method is also not being used anywhere, do not call
 def put_ratio_sessions_users():
 
 	metrics = '11'
@@ -1036,7 +1024,7 @@ def put_uninstall_data():
 				save_obj.save()
 			else:
 				print(metrics, metrics_slab, datetime_key, week_no, val)
-				save_obj.count = F('count') + val
+				save_obj.count = val
 				save_obj.save()
 
 
@@ -1046,17 +1034,16 @@ def put_uninstall_data():
 		
 def main():
 
-	#put_share_data()
-	#put_installs_data()
-	#put_dau_data()
-	#put_mau_data()
-	#put_video_creators_analytics()
-	# put_video_views_analytics()
-	# put_videos_created()
-	# put_uniq_views_analytics()
+	put_share_data()
+	put_installs_data()
+	put_dau_data()
+	put_mau_data()
+	put_video_views_analytics()
+	put_videos_created()
+	put_uniq_views_analytics()
 	#put_total_video_creators()
 	#put_video_creators_analytics_lang()
-	#put_install_signup_conversion()
+	put_install_signup_conversion()
 	put_uninstall_data()
 	
 
