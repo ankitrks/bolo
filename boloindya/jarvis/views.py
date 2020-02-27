@@ -1647,7 +1647,7 @@ def statistics_all_jarvis(request):
             x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
             y_axis = graph_data.values_list('count', flat = True)
         else:
-            day_data = graph_data.extra({"day": "date_trunc('day', date)"}).values("day").order_by().annotate(count=Sum("count"))
+            day_data = graph_data.extra({"day": "date_trunc('day', date)"}).values("day").order_by('day').annotate(count=Sum("count"))
             x_axis = []
             y_axis = []
             for item in day_data:
