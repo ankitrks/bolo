@@ -7,14 +7,6 @@ import re
 
 
 def check_file_name_validation(filename,username):
-    print username
-    import time
-    epoch_time = int(round(time.time() * 1000))
-    file_name_words = filename.split('_')
-    file_extension = file_name_words[-1].split('.')[-1]
-    # print 'old_file_name:  ', filename
-    # print 'new_file_name:   ',username+'_'+str(epoch_time)+'.'+file_extension.lower()
-    return username+'_'+str(epoch_time)+'.'+file_extension
     if check_filename_valid(filename):
         return filename
     else:
