@@ -58,7 +58,9 @@ from tasks import send_notifications_task
 from PIL import Image, ExifTags
 from drf_spirit.utils import language_options
 from .models import category_slab_options
-
+from django.db.models.functions import TruncMonth
+from django.db.models.functions import TruncDay
+from django.db.models import Count
 
 def get_bucket_details(bucket_name=None):
     bucket_credentials = {}
@@ -1505,6 +1507,12 @@ def statistics_all_jarvis(request):
     elif metrics == '8':
         data_view = 'monthly'
 
+    elif metrics == '11':
+        data_view = request.GET.get('data_view', 'daily')
+        data_view = request.GET.get('data_view', 'monthly')
+        data_view = request.GET.get('data_view', 'hourly')
+
+
     else:        
         data_view = request.GET.get('data_view', 'daily')
         data_view = request.GET.get('data_view', 'monthly')
@@ -1563,6 +1571,7 @@ def statistics_all_jarvis(request):
     if(metrics == '4' and (slab in ['0', '1', '2', '9']) and (language_choice in language_index_list) and (category_choice in category_index_list)):
         print("coming here ....")
         graph_data = graph_data.filter(Q(metrics_language_options = language_choice) & Q(metrics_slab = slab) & Q(category_slab_options = category_choice))
+        print(graph_data.count())
 
     if metrics in ['2', '5'] and slab:
         if (metrics == '2' and slab in ['3', '4', '5'])\
@@ -1594,9 +1603,37 @@ def statistics_all_jarvis(request):
                 y_axis.append(data1)
             else:
                 y_axis.append(0)
-    else:
-        x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
+
+    elif(data_view == 'hourly' and metrics == '11'):
+        print("hr is working fine... ")
+        #x_axis = [str(x.date.strftime("%d-%b-%Y:%H")) for x in graph_data]
+        x_axis = []
+        for x in graph_data:
+            curr_day = "" + str(x.date.strftime("%d-%b-%Y:%H")) + ":00-hr"
+            curr_day = str(curr_day)
+            x_axis.append(curr_day)
+
+        #print(x_axis)    
         y_axis = graph_data.values_list('count', flat = True)
+
+    else:
+        # this is the case where data_view == 'daily'
+        # we need to handle cases were metric is 11
+
+        if(metrics!='11'):
+            x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
+            y_axis = graph_data.values_list('count', flat = True)
+        else:
+            day_data = graph_data.extra({"day": "date_trunc('day', date)"}).values("day").order_by().annotate(count=Sum("count"))
+            x_axis = []
+            y_axis = []
+            for item in day_data:
+                x_axis.append(item['day'].strftime("%d-%b-%Y"))
+                y_axis.append(item['count'])
+
+
+
+                
 
     data['metrics'] = metrics
     data['slab'] = slab

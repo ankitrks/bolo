@@ -992,6 +992,57 @@ def put_ratio_sessions_users():
 				save_obj.save()
 					
 
+
+def put_uninstall_data():
+
+	metrics = '11'
+	metrics_slab = ''
+
+	today = datetime.now()
+	start_date = today + timedelta(days=-150)
+	end_date = today
+	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = today):
+		curr_day = dt.day
+		curr_month = dt.month 
+		curr_year = dt.year
+		hour_dict = dict()
+		tot_records = FCMDevice.objects.filter(device_type='1', is_uninstalled=True, uninstalled_date__day=curr_day, uninstalled_date__month = curr_month, uninstalled_date__year = curr_year).values('dev_id', 'uninstalled_date').order_by('uninstalled_date')
+		for each in tot_records:
+			if(each['uninstalled_date'].hour<10):
+				str_date_hr = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day) + "-" + "0" + str(each['uninstalled_date'].hour)
+			else:
+				str_date_hr = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day) + "-" + str(each['uninstalled_date'].hour)	
+
+			if(str_date_hr in hour_dict):
+				hour_dict[str_date_hr]+=1
+			else:
+				hour_dict[str_date_hr]=0
+				hour_dict[str_date_hr]+=1
+
+		for key, val in hour_dict.items():
+			#print(key, val)
+			datetime_key = parser.parse(key)
+			week_no = datetime_key.isocalendar()[1]
+			curr_year = datetime_key.year 
+			if(curr_year == 2020):
+				week_no+=52
+			if(curr_year == 2019 and week_no == 1):
+				week_no = 52
+
+			save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
+			if(created):
+				print(metrics, metrics_slab, datetime_key, week_no, val)
+				save_obj.count = val
+				save_obj.save()
+			else:
+				print(metrics, metrics_slab, datetime_key, week_no, val)
+				save_obj.count = F('count') + val
+				save_obj.save()
+
+
+
+
+
 		
 def main():
 
@@ -1003,9 +1054,10 @@ def main():
 	# put_video_views_analytics()
 	# put_videos_created()
 	# put_uniq_views_analytics()
-	put_total_video_creators()
-	put_video_creators_analytics_lang()
-	put_install_signup_conversion()
+	#put_total_video_creators()
+	#put_video_creators_analytics_lang()
+	#put_install_signup_conversion()
+	put_uninstall_data()
 	
 
 def run():
