@@ -1135,7 +1135,7 @@ def create_user_notification_delivered(request):
         notification_id = request.POST.get('notification_id', "")
         dev_id = request.POST.get('dev_id', "")
         pushNotification = PushNotification.objects.get(pk=notification_id)
-        if request.user:
+        if request.user.pk:
             pushNotificationUser = PushNotificationUser.objects.filter(push_notification_id=pushNotification, user=request.user)
             pushNotificationUser.update(status='0')
         else:
@@ -1151,7 +1151,7 @@ def open_notification_delivered(request):
         notification_id = request.POST.get('notification_id', "")
         dev_id = request.POST.get('dev_id', "")
         pushNotification = PushNotification.objects.get(pk=notification_id)
-        if request.user:
+        if request.user.pk:
             pushNotificationUser = PushNotificationUser.objects.filter(push_notification_id=pushNotification, user=request.user)
             pushNotificationUser.update(status='1')
         else:
