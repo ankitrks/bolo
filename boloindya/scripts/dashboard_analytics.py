@@ -52,7 +52,7 @@ def put_share_data():
 	metrics_slab = ''
 
 	today = datetime.now()
-	start_date = today + timedelta(days = -5)
+	start_date = today + timedelta(days = -1)
 
 	day_month_year_dict = dict()
 	all_data = UserVideoTypeDetails.objects.filter(timestamp__gt = start_date)
@@ -186,7 +186,7 @@ def put_video_views_data():
 def put_video_views_analytics():
 
 	today = datetime.now()
-	start_date = today + timedelta(days = -2)	
+	start_date = today + timedelta(days = -1)	
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
 
@@ -232,7 +232,7 @@ def put_video_views_analytics():
 def put_videos_created():
 
 	today = datetime.now()
-	start_date = today + timedelta(days = -2)
+	start_date = today + timedelta(days = -1)
 
 	day_month_year_dict = dict()
 	all_data = Topic.objects.filter(date__gt = start_date)
@@ -987,9 +987,9 @@ def put_uninstall_data():
 	metrics_slab = ''
 
 	today = datetime.now()
-	start_date = today + timedelta(days=-150)
+	start_date = today + timedelta(days = -1)
 	end_date = today
-	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = today):
+	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = end_date):
 		curr_day = dt.day
 		curr_month = dt.month 
 		curr_year = dt.year
@@ -1041,8 +1041,8 @@ def main():
 	put_video_views_analytics()
 	put_videos_created()
 	put_uniq_views_analytics()
-	#put_total_video_creators()
-	#put_video_creators_analytics_lang()
+	put_total_video_creators()
+	put_video_creators_analytics_lang()
 	put_install_signup_conversion()
 	put_uninstall_data()
 	
