@@ -126,6 +126,7 @@ class Topic(models.Model):
     twitter_share_count = models.PositiveIntegerField(null=True,blank=True,default=0)
 
     backup_url = models.TextField(_("backup url"), blank = True)
+    old_backup_url = models.TextField(_("old_backup url"), blank = True)
     is_transcoded = models.BooleanField(default = False)
     is_transcoded_error = models.BooleanField(default = False)
     transcode_job_id = models.TextField(_("Transcode Job ID"), blank = True)
