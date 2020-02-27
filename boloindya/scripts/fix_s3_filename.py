@@ -29,7 +29,7 @@ def rename_s3_file(old_key,new_key):
     session = boto3.Session(aws_access_key_id=settings.BOLOINDYA_AWS_ACCESS_KEY_ID,     aws_secret_access_key=settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY)
     s3 = session.resource('s3')
     s3.Object(settings.BOLOINDYA_AWS_BUCKET_NAME, new_key).copy_from(CopySource=old_key)
-    # s3.Object(settings.BOLOINDYA_AWS_BUCKET_NAME, old_key).delete()
+    s3.Object(settings.BOLOINDYA_AWS_BUCKET_NAME, old_key).delete()
 
 def run():
     for each_topic in Topic.objects.filter(is_vb=True).order_by('-id')[:1]:
