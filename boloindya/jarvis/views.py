@@ -1131,30 +1131,32 @@ from rest_framework.decorators import api_view
 
 @api_view(['POST'])
 def create_user_notification_delivered(request):
-    notification_id = request.POST.get('notification_id', "")
-
-    pushNotification=PushNotification.objects.get(pk=notification_id)
-    if request.user:
-        try:
+    try:
+        notification_id = request.POST.get('notification_id', "")
+        dev_id = request.POST.get('dev_id', "")
+        pushNotification = PushNotification.objects.get(pk=notification_id)
+        if request.user:
             pushNotificationUser = PushNotificationUser.objects.filter(push_notification_id=pushNotification, user=request.user)
-        except:
-            pushNotificationUser = PushNotificationUser()
-        pushNotificationUser.user = request.user
-    else:
-        pushNotificationUser = PushNotificationUser()
-    pushNotification = PushNotification.objects.get(pk=notification_id)
-    pushNotificationUser.update(status='0', push_notification_id = pushNotification)
-    return JsonResponse({"status":"Success"})
+            pushNotificationUser.update(status='0')
+        else:
+            pushNotificationUser = PushNotificationUser.objects.filter(push_notification_id=pushNotification, device__dev_id=dev_id)
+            pushNotificationUser.update(status='0')
+        return JsonResponse({"status":"Success"})
+    except Exception as e:
+        return JsonResponse({"status":str(e)})
 
 @api_view(['POST'])
 def open_notification_delivered(request):
     try:
         notification_id = request.POST.get('notification_id', "")
+        dev_id = request.POST.get('dev_id', "")
         pushNotification = PushNotification.objects.get(pk=notification_id)
         if request.user:
             pushNotificationUser = PushNotificationUser.objects.filter(push_notification_id=pushNotification, user=request.user)
             pushNotificationUser.update(status='1')
-            pushNotificationUser.save()
+        else:
+            pushNotificationUser = PushNotificationUser.objects.filter(push_notification_id=pushNotification, device__dev_id=dev_id)
+            pushNotificationUser.update(status='1')
         return JsonResponse({"status":"Success"})
     except Exception as e:
         return JsonResponse({"status":str(e)})

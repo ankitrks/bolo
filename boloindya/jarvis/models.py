@@ -167,6 +167,7 @@ notification_type_options = (
     ('2', "category"),
     ('3', "hashtag"),
     ('4', "Announcements"),
+    ('5', "Camera"),
 )
 
 status_options = (
