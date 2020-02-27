@@ -187,7 +187,8 @@ metrics_options = (
     ('7', "Unique Video Views"),
     ('8', "MAU"),
     ('9', 'Total Video Creators'),
-    ('10','Install-Signup Map'),
+    ('10', 'Install-Signup Map'),
+    ('11', 'Uninstalls'),
 )
 
 metrics_slab_options = (

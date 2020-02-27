@@ -139,7 +139,7 @@
         </div>
 
         <div class ="top_box" {% if metrics == top_data.6.0 %} style = "background: bisque;"{%endif %}>
-        <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* [Avg]</i></span>
+        <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* [Avg] last 30 days</i></span>
         <a href="?metrics={{ top_data.6.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.6.1 }}</h6><h5 style="color: #b52828">{{ top_data.6.2|intcomma|floatformat:0}}</h5></a>
         </div>
 
@@ -148,10 +148,10 @@
         <a href="?metrics={{ top_data.8.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.8.1 }}</h6><h5 style="color: #b52828">{{ top_data.8.2|intcomma }}</h5></a>
         </div>
 
-        <div class ="top_box" {% if metrics == top_data.2.0 %} style = "background: bisque;"{%endif %}>
+       <!--  <div class ="top_box" {% if metrics == top_data.2.0 %} style = "background: bisque;"{%endif %}>
         <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
         <a href="?metrics={{ top_data.2.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.2.1 }}</h6><h5 style="color: #b52828">{{ top_data.2.2|intcomma }}</h5></a>
-        </div>
+        </div> -->
 
         <div class ="top_box" {% if metrics == top_data.9.0 %} style = "background: bisque;"{%endif %}>
         <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
@@ -163,6 +163,10 @@
         <a href="?metrics={{ top_data.10.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.10.1 }}</h6><h5 style="color: #b52828">{{ top_data.10.2|intcomma }}</h4></a>
         </div>
 
+        <div class ="top_box" {% if metrics == top_data.11.0 %} style = "background: bisque;"{%endif %}>
+        <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
+        <a href="?metrics={{ top_data.11.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.11.1 }}</h6><h5 style="color: #b52828">{{ top_data.11.2|intcomma }}</h4></a>
+        </div>
 
 
         <div class="right_panel">
@@ -177,6 +181,7 @@
             <a href="?data_view=daily" class="filter_apply btn" style={% if metrics == "8"  or metrics == "6" %}display:none;{% endif %}>daily</a>
             <a href="?data_view=weekly" class="filter_apply btn" style={% if metrics == "6"  or  metrics == "8" %}display:none;{% endif %}>weekly</a>
             <a href="?data_view=monthly" class="filter_apply btn" style={% if metrics == "6" or metrics == "8" %}display:none;{% endif %}>monthly</a>
+            <a href="?data_view=hourly" class="filter_apply btn" style ={% if metrics != "11"  %}display:none;{% endif %}>hourly</a><br>
             
 
             {% if slabs %}
