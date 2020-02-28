@@ -1122,14 +1122,15 @@ def send_notification(request):
             pushNotification = PushNotification.objects.get(pk=id)
         except Exception as e:
             print e
-        categories = Category.objects.filter(parent__isnull=False)
+        categories=FCMDevice.objects.filter(is_uninstalled=False, user__isnull=False, user__st__sub_category__isnull=False).values('user__st__sub_category__pk', 'user__st__sub_category__title').annotate(Count('pk'))
+        language_option=FCMDevice.objects.filter(is_uninstalled=False, user__isnull=False).values('user__st__language').annotate(Count('pk'))
 
-    return render(request,'jarvis/pages/notification/send_notification.html', { 'language_options': language_options, 'user_group_options' : user_group_options, 'notification_types': notification_type_options, 'pushNotification': pushNotification, 'categories': categories})
+    return render(request,'jarvis/pages/notification/send_notification.html', { 'language_options': language_option, 'user_group_options' : user_group_options, 'notification_types': notification_type_options, 'pushNotification': pushNotification, 'categories': categories})
 
 
 
 @login_required
-def particular_notification(request, notification_id=None, status_id=2, page_no=1):
+def particular_notification(request, notification_id=None, status_id=2, page_no=1, is_uninstalled=0):
     import math  
     from django.db.models import Q
     pushNotification = PushNotification.objects.get(pk=notification_id)
@@ -1142,41 +1143,46 @@ def particular_notification(request, notification_id=None, status_id=2, page_no=
         pushNotificationUser=pushNotificationUser.filter(status='1')
     elif (status_id == '0'):
         pushNotificationUser=pushNotificationUser.filter(Q(status='0')|Q(status='1'))
+    if int(is_uninstalled) == 1:
+        diff=pushNotification.scheduled_time+timedelta(hours=7)
+        pushNotificationUser=pushNotificationUser.filter(device__is_uninstalled=True, device__uninstalled_date__gte=pushNotification.scheduled_time, device__uninstalled_date__lt=diff)
     pushNotificationUserSlice=pushNotificationUser[page_no*10:page_no*10+10]
     has_next=True
     if ((page_no*10)+10) >= len(pushNotificationUser):
         has_next=False
     total_page=int(math.ceil(len(pushNotificationUser)/10))+1
-    return render(request,'jarvis/pages/notification/particular_notification.html', {'pushNotification': pushNotification, 'status_id': status_id, 'pushNotificationUser': pushNotificationUserSlice, 'page_no': page_no + 2, 'prev_page_no': page_no , 'count': len(pushNotificationUser), 'has_prev': has_prev, 'has_next': has_next, 'notification_id': notification_id, 'status_id': status_id, 'total_page': total_page, 'current_page': page_no + 1})
+    return render(request,'jarvis/pages/notification/particular_notification.html', {'pushNotification': pushNotification, 'status_id': status_id, 'pushNotificationUser': pushNotificationUserSlice, 'page_no': page_no + 2, 'prev_page_no': page_no , 'count': len(pushNotificationUser), 'has_prev': has_prev, 'has_next': has_next, 'notification_id': notification_id, 'status_id': status_id, 'total_page': total_page, 'current_page': page_no + 1, 'is_uninstalled': is_uninstalled})
 
 from rest_framework.decorators import api_view
 
 @api_view(['POST'])
 def create_user_notification_delivered(request):
-    notification_id = request.POST.get('notification_id', "")
-
-    pushNotification=PushNotification.objects.get(pk=notification_id)
-    if request.user:
-        try:
+    try:
+        notification_id = request.POST.get('notification_id', "")
+        dev_id = request.POST.get('dev_id', "")
+        pushNotification = PushNotification.objects.get(pk=notification_id)
+        if request.user.pk:
             pushNotificationUser = PushNotificationUser.objects.filter(push_notification_id=pushNotification, user=request.user)
-        except:
-            pushNotificationUser = PushNotificationUser()
-        pushNotificationUser.user = request.user
-    else:
-        pushNotificationUser = PushNotificationUser()
-    pushNotification = PushNotification.objects.get(pk=notification_id)
-    pushNotificationUser.update(status='0', push_notification_id = pushNotification)
-    return JsonResponse({"status":"Success"})
+            pushNotificationUser.update(status='0')
+        else:
+            pushNotificationUser = PushNotificationUser.objects.filter(push_notification_id=pushNotification, device__dev_id=dev_id)
+            pushNotificationUser.update(status='0')
+        return JsonResponse({"status":"Success"})
+    except Exception as e:
+        return JsonResponse({"status":str(e)})
 
 @api_view(['POST'])
 def open_notification_delivered(request):
     try:
         notification_id = request.POST.get('notification_id', "")
+        dev_id = request.POST.get('dev_id', "")
         pushNotification = PushNotification.objects.get(pk=notification_id)
-        if request.user:
+        if request.user.pk:
             pushNotificationUser = PushNotificationUser.objects.filter(push_notification_id=pushNotification, user=request.user)
             pushNotificationUser.update(status='1')
-            pushNotificationUser.save()
+        else:
+            pushNotificationUser = PushNotificationUser.objects.filter(push_notification_id=pushNotification, device__dev_id=dev_id)
+            pushNotificationUser.update(status='1')
         return JsonResponse({"status":"Success"})
     except Exception as e:
         return JsonResponse({"status":str(e)})

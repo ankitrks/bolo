@@ -168,6 +168,7 @@ notification_type_options = (
     ('2', "category"),
     ('3', "hashtag"),
     ('4', "Announcements"),
+    ('5', "Create Video Byte"),
 )
 
 status_options = (

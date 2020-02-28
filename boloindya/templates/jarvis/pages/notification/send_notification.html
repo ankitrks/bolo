@@ -83,6 +83,14 @@
         cursor: pointer;
         border-bottom: 1px solid black;
     }
+    #response li:hover{
+        background: #1989CD;
+        color: white;
+    }
+    #response_particular_user_id li:hover{
+        background: #1989CD;
+        color: white;
+    }
     /* ::-webkit-scrollbar {
         -webkit-appearance: none;
          width: 2px;
@@ -118,17 +126,18 @@
             <div class="col-md-6" style="padding: 0px;">
                 <div>Select Language</div>
                 <select name="lang" id="lang">
+                    <option value="all" value="0">All</option>
                     {% for lang in language_options %}
-                        <option value="{{ lang.0 }}" {% if pushNotification.language == lang.0 %}selected="selected"{% endif %}>{{ lang.1 }}</option>
+                        <option value="{{ lang.user__st__language }}" {% if pushNotification.language == lang.user__st__language %}selected="selected"{% endif %}>{% get_language_name lang.user__st__language %} - {{ lang.pk__count }}</option>
                     {% endfor %}
                 </select>
             </div>
              <div class="col-md-6" style="padding: 0px;">
                  <div>Select Category</div>
-                <select name="category" id="category">
+                <select name="category" id="category" >
                     <option value="">All</option>
                     {% for category in categories %}
-                        <option value="{{ category.id }}" >{{ category.title }}</option>
+                        <option value="{{ category.user__st__sub_category__pk }}" >{{ category.user__st__sub_category__title }} - {{ category.pk__count }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -156,6 +165,7 @@
             <input type="text" name="particular_user_id" placeholder="Username" value="{{ pushNotification.particular_user_id }}" id="particular_user_id" style="{% if pushNotification.particular_user_id  %}display:block;{% else %}display:none;{% endif %}">
             <ul id="response_particular_user_id" style="display:none;">
             </ul>
+            <div id="user_name"></div>
         </div>   
         <div class="form_group">
             <div class="alert alert-success alert-dismissible" id="success_message" role="alert" style="display: none; height: 30px;padding: 5px;">
@@ -173,6 +183,7 @@
             <input type="text" name="id" placeholder="Id/Hash" value="{{ pushNotification.instance_id }}" id="search_id">
             <ul id="response">
             </ul>
+            <div id="video_user"></div>
         </div>    
         <input type="text" name="image_url" value="{{pushNotification.image_url}}" hidden id="image_url">
         <input type="text" name="schedule_status" value="0" hidden id="schedule_status">
@@ -228,12 +239,12 @@
                         }
                         for(var i=0;i<data.data.length;i++) {
                             if(notification_type == '2' || notification_type == '0') {
-                                $('#response').append('<li onclick="addIdToField('+data.data[i].id+')">'+data.data[i].title+'</li>');
+                                $('#response').append('<li onclick="addIdToField('+data.data[i].id+', \''+data.data[i].title.replace(/<(.|\n)*?>/g, '')+'\')">'+data.data[i].title+'</li>');
                             } else if(notification_type == '1') {
                                 if (data.data[i].name == '') {
-                                    $('#response').append('<li onclick="addIdToField('+data.data[i].user+')">'+data.data[i].user_name+'</li>');
+                                    $('#response').append('<li onclick="addIdToField('+data.data[i].user+', \'User Name - '+data.data[i].user_name+'\')">'+data.data[i].user_name+'</li>');
                                 } else {
-                                    $('#response').append('<li onclick="addIdToField('+data.data[i].user+')">'+data.data[i].name+'</li>');
+                                    $('#response').append('<li onclick="addIdToField('+data.data[i].user+', \'User Name - '+data.data[i].name+'\')">'+data.data[i].name+'</li>');
                                 }
                             } else if(notification_type == '3') {
                                 $('#response').append('<li onclick="addIdToField(\''+data.data[i].hash_tag+'\')">'+data.data[i].hash_tag+'</li>');
@@ -280,9 +291,9 @@
                         }
                         for(var i=0;i<data.data.length;i++) {
                             if (data.data[i].name == '') {
-                                $('#response_particular_user_id').append('<li onclick="addIdToFieldUser('+data.data[i].user+')">'+data.data[i].user_name+'</li>');
+                                $('#response_particular_user_id').append('<li onclick="addIdToFieldUser('+data.data[i].user+', \''+data.data[i].user_name+'\')">'+data.data[i].user_name+'</li>');
                             } else {
-                                $('#response_particular_user_id').append('<li onclick="addIdToFieldUser('+data.data[i].user+')">'+data.data[i].name+'</li>');
+                                $('#response_particular_user_id').append('<li onclick="addIdToFieldUser('+data.data[i].user+', \''+data.data[i].name+'\')">'+data.data[i].name+'</li>');
                             }
                         }
                     }
@@ -297,6 +308,7 @@
                 console.log($("#particular_user_id"));
                 $("#particular_user_id").show();
                 $('#response_particular_user_id').show();
+                $('#user_name').show();
                 $("#days_ago").hide();
                 $("#days_ago").val('');
             } else if (end == '9' || end == '10') {
@@ -304,26 +316,33 @@
                 $("#days_ago").show();
                 $("#particular_user_id").hide();
                 $('#response_particular_user_id').hide();
+                $('#user_name').hide();
             } else {
                 $("#days_ago").hide();
                 $("#days_ago").val('');
                 $("#particular_user_id").val('');
                 $("#particular_user_id").hide();
                 $('#response_particular_user_id').hide();
+                $('#user_name').hide();
             }
         });
         $("#notification_type").change(function () {
             var end = this.value;
             if (end == '0') {
                 $('#search_id').attr("placeholder", "Enter Video Byte Title / Video Byte Id");
+                $('#video_user').text('');
             } else if (end == '1') {
                 $('#search_id').attr("placeholder", "Enter Username / Mobile No / Name / User Id");
+                $('#video_user').text('');
             } else if (end == '2' ){
                 $('#search_id').attr("placeholder", "Enter Category Name / Category Id");
+                $('#video_user').text('');
             } else if (end == '3' ){
                 $('#search_id').attr("placeholder", "Enter Hashtag");
+                $('#video_user').text('');
             } else {
                 $('#search_id').attr("placeholder", "Enter Playstore url in case of sending app update.");
+                $('#video_user').text('');
             }
         });
         $("#image").change(function() {
@@ -387,6 +406,8 @@
     }
 
     $('#notification_form').submit(function(){
+
+        $('#error_message').hide()
         var upper_title = $('#upper_title').val()
         var title =  $('#title').val()
         var category = $('#category').val()
@@ -397,14 +418,17 @@
         var particular_user_id = $('#particular_user_id').val()
 
         if (particular_user_id != '') {
-	    $('#lang').val('0');
+	        $('#lang').val('0');
             lang = '0';
         }
-	if (((user_group == 'Installed but did not sign up till 3 hours') || (user_group == 'Installed and never signed up')) && lang == 'Select Language') {
+
+        console.log(id)
+
+    	if (((user_group == 'Installed but did not sign up till 3 hours') || (user_group == 'Installed and never signed up')) && lang == 'Select Language') {
             $('#lang').val('0');
             lang = '0';
-	}
-
+    	}
+ 
         if (upper_title  == '') {
             $('#error_message').show()
             $('#message').text('Please Enter Title')
@@ -413,25 +437,13 @@
             $('#error_message').show()
             $('#message').text('Please Enter Description')
             return false;
-        } else if (lang  == 'Select Language') {
-            $('#error_message').show()
-            $('#message').text('Please Select Language')
-            return false;
-        } else if (notification_type  == 'Notification Type') {
-            $('#error_message').show()
-            $('#message').text('Please Select Notification Type')
-            return false;
-        } else if (user_group  == 'User Group') {
-            $('#error_message').show();
-            $('#message').text('Please Select User Group');
-            return false;
         } else if (notification_type != 'Announcements') {
             if (id == '') {
                 $('#error_message').show();
                 $('#message').text('Please Enter Id / Hash');
                 return false;
             }
-            if (notification_type != 'hashtag') {
+            if (notification_type != 'hashtag' && notification_type != 'Create Video Byte') {
                 if (isNaN(id)) {
                     $('#error_message').show();
                     $('#message').text('Please Enter Id');
@@ -439,17 +451,28 @@
                 }
             }
         }
+
     });
 
-    function addIdToField(id) {
+    function addIdToField(id, title) {
         clearResponse();
         $('#search_id').val(String(id));
+        var notification_type = $('#notification_type').val();
+        if(notification_type == '2') {
+            $('#video_user').text('Category Title - ' +title);   
+        } else if(notification_type == '0'){
+            $('#video_user').text('Video Title - ' +title);   
+        } else {
+            $('#video_user').text(title);   
+        }
     }
 
-    function addIdToFieldUser(id) {
+    function addIdToFieldUser(id, title) {
         $('#particular_user_id').val('');
         $('#response_particular_user_id').empty();
         $('#particular_user_id').val(String(id));
+        console.log(title)
+        $('#user_name').text('User Name - ' + title);
     }
 
     function clearResponse() {

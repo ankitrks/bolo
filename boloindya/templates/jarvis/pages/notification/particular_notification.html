@@ -41,6 +41,8 @@
                         <th>S No.</th>
                         <th>Username</th>
                         <th>Name</th>
+                        <th>Uninstalled</th>
+                        <th>Last Active</th>
                         <th>Android Version</th>
                         <th>Model</th>
                         <th>Manufacture</th>
@@ -53,15 +55,17 @@
                             <td>{{ forloop.counter }}</td>
                             <td>{% if pushNotification.user %}{{ pushNotification.user.username }}{% else %}{{ pushNotification.device.dev_id }}{% endif %}</td>
                             <td>{{ pushNotification.user }}</td>
+                            <td>{{ pushNotification.device.is_uninstalled }}</td>
+                            <td>{{ pushNotification.device.end_time }}</td>
                             <td>{{ pushNotification.device.device_model }}</td>
                             <td>{{ pushNotification.device.current_version }}</td>
                             <td>{{ pushNotification.device.manufacturer }}</td>
-                            <td style="color: {% if pushNotification.status == 0 %} #b52828 {% else %} #1989cd {% endif %}">{% get_notification_status pushNotification.status %}</td>
+                            <td>{% get_notification_status pushNotification.status %}</td>
                         </tr>
                     {% endfor %}  
                 </tbody>
             </table>
-            {% if has_prev %}<a href="/jarvis/particular_notification/{{notification_id}}/{{status_id}}/{{ prev_page_no }}" >Prev</a>{% endif %} {{ current_page }} of {{ total_page }} pages {% if has_next %}<a href="/jarvis/particular_notification/{{notification_id}}/{{status_id}}/{{ page_no }}" >Next</a>{% endif %}
+            {% if has_prev %}<a href="/jarvis/particular_notification/{{notification_id}}/{{status_id}}/{{ prev_page_no }}/{{is_uninstalled}}" >Prev</a>{% endif %} {{ current_page }} of {{ total_page }} pages {% if has_next %}<a href="/jarvis/particular_notification/{{notification_id}}/{{status_id}}/{{ page_no }}/{{is_uninstalled}}" >Next</a>{% endif %}
         </div>
     </div>
 {% endblock content %} 
@@ -87,11 +91,20 @@
                         console.log(data)
                         $('table tbody').empty();
                         for(var i=0;i<data.data.length;i++) {
-                            $('table tbody').append('<tr><td>'+i+'</td><td>'+data.data[i].user.username+'</td><td>'+data.data[i].user.first_name+'</td><td>'+data.data[i].device.device_model+'</td><td>'+data.data[i].device.current_version+'</td><td>'+data.data[i].device.manufacturer+'</td><td></td></tr>')
+                            $('table tbody').append('<tr><td>'+i+'</td><td>'+data.data[i].user.username+'</td><td>'+data.data[i].user.first_name+'</td><td>'+data.data[i].device.is_uninstalled+'</td><td>'+data.data[i].device.uninstalled_date+'</td><td>'+data.data[i].device.device_model+'</td><td>'+data.data[i].device.current_version+'</td><td>'+data.data[i].device.manufacturer+'</td><td>'+get_status(data.data[i].status)+'</td></tr>')
                         }
                     }
                 })
         });
     });
+
+    function get_status(id) {
+        if (id == 0) {
+            return 'Opened';
+        } else if (id == 1) { 
+            return 'Not Opened';
+        }
+        return Sent; 
+    }
 </script>
 {% endblock center_js%}

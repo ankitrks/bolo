@@ -83,9 +83,9 @@
                     {% for pushNotification in pushNotifications %}
                         <tr style="{% if pushNotification.is_executed %} background-color: #90ee90; {% else  %} background-color: #ffffe0; {% endif %}">
                             <td>{{ forloop.counter }}</td>
-                            <td><a href="/jarvis/particular_notification/{{pushNotification.pk}}/2/1">{{ pushNotification.title }}</a></td>
+                            <td><a href="/jarvis/particular_notification/{{pushNotification.pk}}/2/1/0">{{ pushNotification.title }}</a></td>
                             <td style="color: {% if pushNotification.is_scheduled %} #b52828 {% else %} #1989cd {% endif %};">{{ pushNotification.scheduled_time|date:"M d, Y" }} <br/> {{ pushNotification.scheduled_time|date:"H:i" }} </td>
-                            <td><a href="/jarvis/particular_notification/{{pushNotification.pk}}/2/1">{{ pushNotification.push_notification_id.all.count }} </a> / <a href="/jarvis/particular_notification/{{pushNotification.pk}}/0/1">{% get_user_delivered_notification pushNotification %} </a> / <a href="/jarvis/particular_notification/{{pushNotification.pk}}/1/1">{% get_user_opened_notification pushNotification %} </a></td>
+                            <td><a href="/jarvis/particular_notification/{{pushNotification.pk}}/2/1/0">{{ pushNotification.push_notification_id.all.count }} </a> / <a href="/jarvis/particular_notification/{{pushNotification.pk}}/0/1/0">{% get_user_delivered_notification pushNotification %} </a> / <a href="/jarvis/particular_notification/{{pushNotification.pk}}/1/1/0">{% get_user_opened_notification pushNotification %} </a></td>
                             <td>{% get_percentage pushNotification.push_notification_id.all.count pushNotification %}</td>
                             <td>{{ pushNotification.get_language_display }}</td>
                             <td>{% get_user_group_name pushNotification.user_group %}{% if pushNotification.days_ago %}<br/>{{ pushNotification.days_ago }} days ago{% endif %}</td>
