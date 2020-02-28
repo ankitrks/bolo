@@ -1120,9 +1120,9 @@ def particular_notification(request, notification_id=None, status_id=2, page_no=
         pushNotificationUser=pushNotificationUser.filter(status='1')
     elif (status_id == '0'):
         pushNotificationUser=pushNotificationUser.filter(Q(status='0')|Q(status='1'))
-    if is_uninstalled == '1':
+    if int(is_uninstalled) == 1:
         diff=pushNotification.scheduled_time+timedelta(hours=7)
-        pushNotificationUser.filter(device__is_uninstalled=True, device__uninstalled_date__gte=pushNotification.scheduled_time, device__uninstalled_date__lt=diff)
+        pushNotificationUser=pushNotificationUser.filter(device__is_uninstalled=True, device__uninstalled_date__gte=pushNotification.scheduled_time, device__uninstalled_date__lt=diff)
     pushNotificationUserSlice=pushNotificationUser[page_no*10:page_no*10+10]
     has_next=True
     if ((page_no*10)+10) >= len(pushNotificationUser):
