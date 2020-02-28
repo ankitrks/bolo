@@ -56,7 +56,7 @@
                             <td>{{ pushNotification.device.device_model }}</td>
                             <td>{{ pushNotification.device.current_version }}</td>
                             <td>{{ pushNotification.device.manufacturer }}</td>
-                            <td style="color: {% if pushNotification.status == 0 %} #b52828 {% else %} #1989cd {% endif %}">{% get_notification_status pushNotification.status %}</td>
+                            <td>{% get_notification_status pushNotification.status %}</td>
                         </tr>
                     {% endfor %}  
                 </tbody>
@@ -87,11 +87,20 @@
                         console.log(data)
                         $('table tbody').empty();
                         for(var i=0;i<data.data.length;i++) {
-                            $('table tbody').append('<tr><td>'+i+'</td><td>'+data.data[i].user.username+'</td><td>'+data.data[i].user.first_name+'</td><td>'+data.data[i].device.device_model+'</td><td>'+data.data[i].device.current_version+'</td><td>'+data.data[i].device.manufacturer+'</td><td></td></tr>')
+                            $('table tbody').append('<tr><td>'+i+'</td><td>'+data.data[i].user.username+'</td><td>'+data.data[i].user.first_name+'</td><td>'+data.data[i].device.device_model+'</td><td>'+data.data[i].device.current_version+'</td><td>'+data.data[i].device.manufacturer+'</td><td>'+get_status(data.data[i].status)+'</td></tr>')
                         }
                     }
                 })
         });
     });
+
+    function get_status(id) {
+        if (id == 0) {
+            return 'Opened';
+        } else if (id == 1) { 
+            return 'Not Opened';
+        }
+        return Sent; 
+    }
 </script>
 {% endblock center_js%}
