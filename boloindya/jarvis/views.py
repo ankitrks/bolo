@@ -1122,7 +1122,7 @@ def send_notification(request):
             pushNotification = PushNotification.objects.get(pk=id)
         except Exception as e:
             print e
-        categories = Category.objects.filter(parent__isnull=False)
+        categories=FCMDevice.objects.filter(is_uninstalled=False, user__isnull=False).values_list('user__st__sub_category__pk', 'user__st__sub_category__title').annotate(Count('pk'))
 
     return render(request,'jarvis/pages/notification/send_notification.html', { 'language_options': language_options, 'user_group_options' : user_group_options, 'notification_types': notification_type_options, 'pushNotification': pushNotification, 'categories': categories})
 
