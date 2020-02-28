@@ -57,10 +57,20 @@ import traceback
 from tasks import send_notifications_task
 from PIL import Image, ExifTags
 from drf_spirit.utils import language_options
-from .models import category_slab_options
+#from .models import category_slab_options
 from django.db.models.functions import TruncMonth
 from django.db.models.functions import TruncDay
 from django.db.models import Count
+from forum.category.models import Category
+
+all_category_list = Category.objects.all()
+category_slab_options = []
+
+for item in all_category_list:
+    category_slab_options.append((str(item.pk), str(item.title)))
+
+category_slab_options = tuple(category_slab_options)
+
 
 def get_bucket_details(bucket_name=None):
     bucket_credentials = {}
@@ -1512,10 +1522,9 @@ def statistics_all_jarvis(request):
 
     #print(category_slab_options)
 
-    category_index_list = []
-    for each in category_slab_options:
-        category_index_list.append(each[0])
-
+    # category_index_list = []
+    # for each in category_slab_options:
+    #     category_index_list.append(each[0])
     #print(category_index_list)
 
 
@@ -1525,6 +1534,7 @@ def statistics_all_jarvis(request):
     slab = request.GET.get('slab', None)
     language_choice = request.GET.get('language_choice', None)
     category_choice = request.GET.get('category_choice', None)
+    category_choice = int(category_choice)
 
     #language_filter = request.GET.get('language_filter', '0')
     #category_filter = request.GET.get('category_filter', '0')
@@ -1597,9 +1607,9 @@ def statistics_all_jarvis(request):
     graph_data = DashboardMetricsJarvis.objects.exclude(date__gt = end_date).filter(Q(metrics = metrics) & Q(date__gte = start_date) & Q(date__lte = end_date))
 
 
-    if(metrics == '4' and (slab in ['0', '1', '2', '9']) and (language_choice in language_index_list) and (category_choice in category_index_list)):
+    if(metrics == '4' and (slab in ['0', '1', '2', '9']) and (language_choice in language_index_list) and (category_choice)):
         print("coming here ....")
-        graph_data = graph_data.filter(Q(metrics_language_options = language_choice) & Q(metrics_slab = slab) & Q(category_slab_options = category_choice))
+        graph_data = graph_data.filter(Q(metrics_language_options = language_choice) & Q(metrics_slab = slab) & Q(category_id = category_choice))
         print(graph_data.count())
 
     if metrics in ['2', '5'] and slab:
@@ -1610,7 +1620,7 @@ def statistics_all_jarvis(request):
 
     if(metrics == '9'):
         print("coming for me....")
-        graph_data = graph_data.filter(Q(metrics_language_options = language_choice) & Q(category_slab_options = category_choice))    
+        graph_data = graph_data.filter(Q(metrics_language_options = language_choice) & Q(category_id = category_choice))    
 
     if data_view == 'weekly':
         x_axis = []
