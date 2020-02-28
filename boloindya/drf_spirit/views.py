@@ -1502,18 +1502,11 @@ def createTopic(request):
         return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
 def provide_view_count(view_count,topic):
-    counter =0
-    all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)
-    user_ids = list(all_test_userprofile_id)
-    user_ids = random.sample(user_ids,100)
-    userprofile = topic.user.st
-    while counter<view_count:
-        opt_action_user_id = random.choice(user_ids)
-        vb_obj = VBseen.objects.create(topic= topic,user_id =opt_action_user_id)
-        userprofile.own_vb_view_count = F('own_vb_view_count')+1
-        userprofile.save()
-        update_redis_vb_seen(opt_action_user_id,topic.id)
-        counter+=1
+    all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)[:view_count]
+    for each_user_id in all_test_userprofile_id:
+        vb_obj = VBseen.objects.create(topic= topic,user_id =each_user_id)
+        UserProfile.objects.filter(user=topic.user).update(view_count=F(view_count)+1,own_vb_view_count = F('own_vb_view_count')+1)
+        update_redis_vb_seen(each_user_id,topic.id)
 
 @api_view(['POST'])
 def editTopic(request):
@@ -1927,13 +1920,11 @@ def get_user_bolo_info(request):
             total_video_id = list(total_video.values_list('pk',flat=True))
             all_pay = UserPay.objects.filter(user=request.user,is_active=True)
             top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user).order_by('-view_count')[:3]
-            all_play_time = VideoPlaytime.objects.filter(videoid__in = total_video_id).aggregate(Sum('playtime'))
-            if all_play_time.has_key('playtime__sum') and all_play_time['playtime__sum']:
-                video_playtime = all_play_time['playtime__sum']
+            video_playtime = user.st.total_vb_playtime
         else:
             total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user,date__gte=start_date, date__lte=end_date)
-            #total_video_id = list(Topic.objects.filter(is_vb = True,user=request.user).values_list('pk',flat=True))
-            total_video_id = list(total_video.values_list('pk',flat=True))
+            total_video_id = list(Topic.objects.filter(is_vb = True,user=request.user,is_removed=False).values_list('pk',flat=True))
+            # total_video_id = list(total_video.values_list('pk',flat=True))
             all_pay = UserPay.objects.filter(user=request.user,is_active=True,for_month__gte=start_date.month,for_month__lte=start_date.month,\
                 for_year__gte=start_date.year,for_year__lte=start_date.year)
             top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user,date__gte=start_date, date__lte=end_date).order_by('-view_count')[:3]
@@ -3067,8 +3058,8 @@ def transcoder_notification(request):
     # f.write(jobId)
     # f.write(status)
     # f.close()
+    topic = Topic.objects.get(is_vb = True, is_transcoded = False, transcode_job_id = jobId)
     if status == 'COMPLETED':
-        topic = Topic.objects.get(is_vb = True, is_transcoded = False, transcode_job_id = jobId)
         topic.is_transcoded = True
     else:
         topic.is_transcoded_error = True

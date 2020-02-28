@@ -21,6 +21,7 @@ import pytz
 import pandas as pd 
 import dateutil.parser 
 from django.db.models import Q
+from django.db.models import Count, F, Value
 local_tz = pytz.timezone("Asia/Kolkata")
 import sys
 import django
@@ -28,6 +29,9 @@ import random
 from datetime import datetime
 from calendar import monthrange
 from jarvis.models import DashboardMetrics
+from drf_spirit.utils import language_options
+
+
 from datetime import timedelta
 os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
 sys.path.append( '/'.join(os.path.realpath(__file__).split('/')[:5]) )
@@ -38,8 +42,14 @@ language_map = []
 for (a,b) in language_string:
 	language_map.append(str(b))
 
+def print_dict(curr_dict):
+	for key, val in curr_dict.items():
+		print("key+val:", key, val)
 
 def put_share_data():
+
+	metrics = '3'
+	metrics_slab = ''
 
 	today = datetime.now()
 	start_date = today + timedelta(days = -1)
@@ -71,8 +81,7 @@ def put_share_data():
 		if(curr_year == 2019 and week_no == 1):
 			week_no = 52
 
-		metrics = '3'
-		metrics_slab = ''
+		
 		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
 		if(created):
 			print(metrics, metrics_slab, week_no, len(val))
@@ -84,10 +93,10 @@ def put_share_data():
 			save_obj.save()	
 
 
-def  put_installs_data():
+def put_installs_data():
 
 	today = datetime.now()
-	start_date = today + timedelta(days = -1)
+	start_date = today + timedelta(days = -2)
 
 	user_install_dict = dict()
 	all_data = ReferralCodeUsed.objects.filter(by_user__isnull = True, created_at__gt = start_date)
@@ -128,11 +137,11 @@ def  put_installs_data():
 			save_obj.count = len(val)
 			save_obj.save()	
 	
-
+# this function is also not being used, please do not call it anywhere
 def put_video_views_data():
 
 	today = datetime.now()
-	start_date = today + timedelta(days = -1)
+	start_date = today + timedelta(days = -2)
 
 	day_month_year_dict = dict()
 	all_data = VideoPlaytime.objects.filter(timestamp__gt = start_date)
@@ -217,21 +226,6 @@ def put_video_views_analytics():
 			print(metrics, metrics_slab, str_date, week_no, len(user_view_dict))
 			save_obj.count = len(user_view_dict)
 			save_obj.save()	
-
-		metrics = '7'
-		metrics_slab = ''
-		
-		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_date, week_no = week_no)
-		if(created):
-			print(metrics, metrics_slab, str_date, week_no, len(set(user_view_dict)))
-			save_obj.count = len(set(user_view_dict))
-			save_obj.save()
-		else:
-			print(metrics, metrics_slab, str_date, week_no, len(set(user_view_dict)))	
-			save_obj.count = len(set(user_view_dict))
-			save_obj.save()
-
-
 
 
 
@@ -403,10 +397,138 @@ def put_video_creators():
 			save_obj.save()
 						
 
+# put new video creators with lang filter
+def put_video_creators_analytics_lang():
+
+
+	today = datetime.now()
+	metrics = '4'
+	start_date = today + timedelta(days = -1)
+	end_date = today
+	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = end_date):
+		curr_day = dt.day 
+		curr_month = dt.month
+		curr_year = dt.year
+		all_data = Topic.objects.filter(is_vb=True, date__day = curr_day, date__month = curr_month, date__year = curr_year).values('user', 'language_id', 'm2mcategory').annotate(vb_count=Count('pk', 'language_id')).order_by('-vb_count', 'language_id')
+		#print(len(all_data))
+
+		for item in all_data:
+			userid = str(item['user'])
+			language_id = str(item['language_id'])
+			if(language_id in language_map):
+				language_id = str(language_map.index(language_id))
+
+			user_details = UserProfile.objects.get(user = userid)
+			date_joined = user_details.user.date_joined
+			category_id = str(item['m2mcategory']) 
+			tot_vb_count = int(item['vb_count'])
+			#print(tot_vb_count)
+			#print(date_joined)
+			str_date = str(date_joined.year) + "-" + str(date_joined.month) + "-" + str(date_joined.day)
+			datetime_key = parser.parse(str_date)
+			week_no = datetime_key.isocalendar()[1]
+			curr_year_dt = datetime_key.year 
+			if(curr_year_dt == 2020):
+				week_no+=52
+			if(curr_year_dt == 2019 and week_no == 1):
+				week_no = 52
+
+			#print(metrics, datetime_key, week_no, category_id, language_id)
+				
+			if(tot_vb_count>=60):
+				metrics_slab = '2'
+				save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no, metrics_language_options = language_id, category_slab_options = category_id)
+				if(created):
+					print(metrics, metrics_slab, datetime_key, week_no, 1)
+					save_obj.count = 1
+					save_obj.save()
+				else:
+					print(metrics, metrics_slab, datetime_key, week_no, 1)
+					save_obj.count = F('count') + 1
+					save_obj.save()
+
+				save_obj_all, created_all = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no, metrics_language_options = '0', category_slab_options = category_id)
+				if(created_all):
+					print(metrics, metrics_slab, datetime_key, week_no, 1)
+					save_obj_all.count = 1
+					save_obj_all.save()
+				else:
+					print(metrics, metrics_slab, datetime_key, week_no, 1)
+					save_obj_all.count = F('count') + 1
+					save_obj_all.save()		
+
+			if(tot_vb_count>=25 and tot_vb_count<=59):
+				metrics_slab = '1'
+				save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no, metrics_language_options = language_id, category_slab_options = category_id)
+				if(created):
+					print(metrics, metrics_slab, datetime_key, week_no, 1)
+					save_obj.count = 1
+					save_obj.save()
+				else:
+					print(metrics, metrics_slab, datetime_key, week_no, 1)
+					save_obj.count = F('count') + 1
+					save_obj.save()
+
+				save_obj_all, created_all = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no, metrics_language_options = '0', category_slab_options = category_id)
+				if(created_all):
+					print(metrics, metrics_slab, datetime_key, week_no, 1)
+					save_obj_all.count = 1
+					save_obj_all.save()
+				else:
+					print(metrics, metrics_slab, datetime_key, week_no, 1)
+					save_obj_all.count = F('count') + 1
+					save_obj_all.save()			
+
+			if(tot_vb_count>=5 and tot_vb_count<25):
+				metrics_slab = '0'
+				save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no, metrics_language_options = language_id, category_slab_options = category_id)
+				if(created):
+					print(metrics, metrics_slab, datetime_key, week_no, 1)
+					save_obj.count = 1
+					save_obj.save()
+				else:
+					print(metrics, metrics_slab, datetime_key, week_no, 1)
+					save_obj.count = F('count') + 1
+					save_obj.save()
+
+				save_obj_all, created_all = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no, metrics_language_options = '0', category_slab_options = category_id)
+				if(created_all):
+					print(metrics, metrics_slab, datetime_key, week_no, 1)
+					save_obj_all.count = 1
+					save_obj_all.save()
+				else:
+					print(metrics, metrics_slab, datetime_key, week_no, 1)
+					save_obj_all.count = F('count') + 1
+					save_obj_all.save()
+
+			if(tot_vb_count<5):
+				metrics_slab = '9'
+				save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no, metrics_language_options = language_id, category_slab_options = category_id)
+				if(created):
+					print(metrics, metrics_slab, datetime_key, week_no, 1)
+					save_obj.count = 1
+					save_obj.save()
+				else:
+					print(metrics, metrics_slab, datetime_key, week_no, 1)
+					save_obj.count = F('count') + 1
+					save_obj.save()
+
+				save_obj_all, created_all = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no, metrics_language_options = '0', category_slab_options = category_id)
+				if(created_all):
+					print(metrics, metrics_slab, datetime_key, week_no, 1)
+					save_obj_all.count = 1
+					save_obj_all.save()
+				else:
+					print(metrics, metrics_slab, datetime_key, week_no, 1)
+					save_obj_all.count = F('count') + 1
+					save_obj_all.save()			
+
+
+# this function is not being used anymore, please do not edit this function and call it anywhere
 def put_video_creators_analytics():
 
 	today = datetime.now()
-	start_date = today + timedelta(days = -1)
+	start_date = today + timedelta(days = -150)
 
 	slab_0_dict = dict()
 	slab_1_dict = dict()
@@ -463,6 +585,7 @@ def put_video_creators_analytics():
 
 		metrics = '4'
 		metrics_slab = ''
+
 		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
 		if(created):
 			print(metrics, metrics_slab, datetime_key, week_no, len(val))
@@ -485,7 +608,7 @@ def put_video_creators_analytics():
 
 		metrics = '4'
 		metrics_slab = '0'
-
+		
 		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
 		if(created):
 			print(metrics, metrics_slab, datetime_key, week_no, len(val))
@@ -508,6 +631,7 @@ def put_video_creators_analytics():
 
 		metrics = '4'
 		metrics_slab = '1'
+		
 
 		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
 		if(created):
@@ -531,6 +655,7 @@ def put_video_creators_analytics():
 
 		metrics = '4'
 		metrics_slab = '2'
+		
 		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
 		if(created):
 			print(metrics, metrics_slab, datetime_key, week_no, len(val))
@@ -545,7 +670,7 @@ def put_video_creators_analytics():
 def put_dau_data():
 
 	today = datetime.today()
-	start_date = today + timedelta(days = -1)	
+	start_date = today + timedelta(days = -2)	
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
 		#print(dt)
@@ -649,7 +774,7 @@ def put_mau_data():
 def put_uniq_views_analytics():
 
 	today = datetime.now()
-	start_date = today + timedelta(days = -1)	
+	start_date = today + timedelta(days = -2)	
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
 		#print(dt)
@@ -702,16 +827,209 @@ def put_uniq_views_analytics():
 			print(metrics, metrics_slab, str_date, week_no, tot_uniq_uvb_view_count)	
 			save_obj.count = tot_uniq_uvb_view_count
 			save_obj.save()	
+
 								
-# def put_bolo_action_data():
+def put_total_video_creators():
 
-# 	like_dict = dict()
-# 	share_dict = dict()
-# 	comments_dict = dict()
 
-# 	all_data = BoloActionHistory.objects.all().exclude(user__st__is_test_user=True)
-# 	for item in all_data:
-# 		curr_action_type = item.
+	today = datetime.now()
+	start_date = today + timedelta(days = -1)
+	end_date = today
+	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = today):
+		language_dict = dict()
+		for item in language_options:
+			language_dict[item[0]] = 0
+
+		curr_day = dt.day 
+		curr_month = dt.month 
+		curr_year = dt.year
+		str_date = str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day)
+		all_data = Topic.objects.filter(is_vb = True, date__day = curr_day, date__month = curr_month, date__year = curr_year).values('user', 'pk', 'language_id', 'm2mcategory').order_by('user') 
+		#print(len(all_data))
+		for item in all_data:
+			video_id = str(item['pk'])
+			language_id = str(item['language_id'])
+			userid = str(item['user'])
+			category_id = str(item['m2mcategory'])
+
+			if(language_id in language_map):
+				language_id = str(language_map.index(language_id))
+				language_dict[language_id]+=1
+				language_dict['0']+=1
+			else:
+				language_dict[language_id]+=1
+				language_dict['0']+=1
+
+
+			#print(language_dict)
+			datetime_key = parser.parse(str_date)
+			week_no = datetime_key.isocalendar()[1]
+			curr_year_dt = datetime_key.year 
+			if(curr_year_dt == 2020):
+				week_no+=52
+			if(curr_year_dt == 2019 and week_no == 1):
+				week_no = 52
+
+			metrics = '9'
+			metrics_slab = ''
+
+			save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_date, week_no = week_no, metrics_language_options = language_id, category_slab_options = category_id)
+			if(created):
+				print(metrics, metrics_slab, str_date, week_no, language_id, category_id)
+				save_obj.count = 1
+				save_obj.save()
+			else:
+				print(metrics, metrics_slab, str_date, week_no, language_id, category_id)
+				save_obj.count = F('count') + 1
+				save_obj.save()
+
+			save_obj_all, created_all = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_date, week_no = week_no, metrics_language_options = '0', category_slab_options = category_id)
+			if(created_all):
+				print(metrics, metrics_slab, str_date, week_no, language_id, category_id)
+				save_obj_all.count = 1
+				save_obj_all.save()
+			else:
+				print(metrics, metrics_slab, str_date, week_no, language_id, category_id)
+				save_obj_all.count = F('count') + 1
+				save_obj_all.save()
+
+
+def put_install_signup_conversion():
+
+	today = datetime.now()
+	start_date = today + timedelta(days = -1)
+	end_date = today
+	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = today):
+		curr_day = dt.day 
+		curr_month = dt.month
+		curr_year = dt.year
+		install_data = ReferralCodeUsed.objects.filter(by_user__isnull=False, created_at__day=curr_day, created_at__month = curr_month, created_at__year=curr_year).values_list('android_id', flat=True)
+		signup_data = ReferralCodeUsed.objects.filter(by_user__isnull = False, created_at__day=curr_day, created_at__month = curr_month, created_at__year=curr_year).values_list('android_id', flat=True)
+		install_signup = list(set(install_data) & set(signup_data))
+		tot_count = len(install_signup)
+		metrics = '10'
+		metrics_slab = ''
+		str_date = str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day)
+		datetime_key = parser.parse(str_date)
+		week_no = datetime_key.isocalendar()[1]
+		curr_year_dt = datetime_key.year 
+		if(curr_year_dt == 2020):
+			week_no+=52
+		if(curr_year_dt == 2019 and week_no == 1):
+			week_no = 52
+
+		#print(metrics, metrics_slab, str_date, week_no, tot_count)	
+		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_date, week_no = week_no)
+		if(created):
+			print(metrics, metrics_slab, week_no, tot_count)
+			save_obj.count = tot_count
+			save_obj.save()
+		else:
+			print(metrics, metrics_slab, week_no, tot_count)
+			save_obj.count = tot_count
+			save_obj.save()
+
+# this method is also not being used anywhere, do not call
+def put_ratio_sessions_users():
+
+	metrics = '11'
+	metrics_slab = ''
+
+	today = datetime.now()
+	start_date = today + timedelta(days = -180)
+	end_date = today 
+	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = today):
+		curr_day = dt.day 
+		curr_month = dt.month
+		curr_year = dt.year
+		tot_session_records = 0
+		tot_user_list = []
+		str_date = str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day)
+		datetime_key = parser.parse(str_date)
+		week_no = datetime_key.isocalendar()[1]
+		curr_year_dt = datetime_key.year 
+		if(curr_year_dt == 2020):
+			week_no+=52
+		if(curr_year_dt == 2019 and week_no == 1):
+			week_no = 52
+
+		all_traction_data = UserJarvisDump.objects.filter(sync_time__day = curr_day, sync_time__month = curr_month, sync_time__year = curr_year, dump_type = 1)
+		for user_jarvis in all_traction_data:
+			user_data_string = user_jarvis.dump
+			user_data_dump = ast.literal_eval(user_data_string)
+			if('user_id' in user_data_dump):
+				userid = user_data_dump['user_id']
+				tot_user_list.append(userid)
+
+			if('session_start_time' in user_data_dump):
+				tot_session_records+=1
+			
+		tot_user_set = set(tot_user_list)
+		tot_user_set_count = float(len(tot_user_set))
+		if(tot_user_set_count>0):
+			session_user_ratio = float(float(tot_session_records)/float(tot_user_set_count))
+			#print(dt, session_user_ratio)
+			save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_date, week_no = week_no)
+			if(created):
+				print(metrics, metrics_slab, week_no, session_user_ratio)
+				save_obj.count = session_user_ratio
+				save_obj.save()
+			else:
+				print(metrics, metrics_slab, week_no, session_user_ratio)
+				save_obj.count = F('count') + session_user_ratio
+				save_obj.save()
+					
+
+
+def put_uninstall_data():
+
+	metrics = '11'
+	metrics_slab = ''
+
+	today = datetime.now()
+	start_date = today + timedelta(days = -1)
+	end_date = today
+	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = end_date):
+		curr_day = dt.day
+		curr_month = dt.month 
+		curr_year = dt.year
+		hour_dict = dict()
+		tot_records = FCMDevice.objects.filter(device_type='1', is_uninstalled=True, uninstalled_date__day=curr_day, uninstalled_date__month = curr_month, uninstalled_date__year = curr_year).values('dev_id', 'uninstalled_date').order_by('uninstalled_date')
+		for each in tot_records:
+			if(each['uninstalled_date'].hour<10):
+				str_date_hr = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day) + "-" + "0" + str(each['uninstalled_date'].hour)
+			else:
+				str_date_hr = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day) + "-" + str(each['uninstalled_date'].hour)	
+
+			if(str_date_hr in hour_dict):
+				hour_dict[str_date_hr]+=1
+			else:
+				hour_dict[str_date_hr]=0
+				hour_dict[str_date_hr]+=1
+
+		for key, val in hour_dict.items():
+			#print(key, val)
+			datetime_key = parser.parse(key)
+			week_no = datetime_key.isocalendar()[1]
+			curr_year = datetime_key.year 
+			if(curr_year == 2020):
+				week_no+=52
+			if(curr_year == 2019 and week_no == 1):
+				week_no = 52
+
+			save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
+			if(created):
+				print(metrics, metrics_slab, datetime_key, week_no, val)
+				save_obj.count = val
+				save_obj.save()
+			else:
+				print(metrics, metrics_slab, datetime_key, week_no, val)
+				save_obj.count = val
+				save_obj.save()
+
+
+
+
 
 		
 def main():
@@ -720,11 +1038,13 @@ def main():
 	put_installs_data()
 	put_dau_data()
 	put_mau_data()
-	put_video_creators_analytics()
 	put_video_views_analytics()
 	put_videos_created()
 	put_uniq_views_analytics()
-
+	put_total_video_creators()
+	put_video_creators_analytics_lang()
+	put_install_signup_conversion()
+	put_uninstall_data()
 	
 
 def run():

@@ -33,7 +33,7 @@ from django.views.generic.edit import FormView
 from datetime import datetime
 from forum.userkyc.forms import KYCBasicInfoRejectForm,KYCDocumentRejectForm,AdditionalInfoRejectForm,BankDetailRejectForm
 from .models import VideoUploadTranscode,VideoCategory, PushNotification, PushNotificationUser, user_group_options, \
-    FCMDevice, notification_type_options, metrics_options, DashboardMetrics, DashboardMetricsJarvis, metrics_slab_options
+    FCMDevice, notification_type_options, metrics_options, DashboardMetrics, DashboardMetricsJarvis, metrics_slab_options, metrics_language_options
 from drf_spirit.models import MonthlyActiveUser, HourlyActiveUser, DailyActiveUser, VideoDetails
 from forum.category.models import Category
 from django.contrib.auth.models import User
@@ -56,7 +56,11 @@ from django.db.models import F,Q
 import traceback
 from tasks import send_notifications_task
 from PIL import Image, ExifTags
-
+from drf_spirit.utils import language_options
+from .models import category_slab_options
+from django.db.models.functions import TruncMonth
+from django.db.models.functions import TruncDay
+from django.db.models import Count
 
 def get_bucket_details(bucket_name=None):
     bucket_credentials = {}
@@ -597,6 +601,24 @@ def urlify(s):
     s = re.sub(r"&", 'and', s)
     return s
 
+def check_file_name_validation(filename,username):
+    if check_filename_valid(filename):
+        return filename
+    else:
+        import time
+        epoch_time = int(round(time.time() * 1000))
+        file_name_words = filename.split('_')
+        file_extension = file_name_words[-1].split('.')[-1]
+        return username+'_'+str(epoch_time)+'.'+file_extension
+
+
+def check_filename_valid(filename):
+    if re.match(r"^[A-Za-z0-9_.-]+(:?\.mp4|\.mov|\.3gp)+$", filename):
+        return True
+    else:
+        return False
+
+
 @login_required
 def upload_n_transcode(request):
     upload_file = request.FILES['media_file']
@@ -715,7 +737,7 @@ def boloindya_upload_n_transcode(request):
     bucket_credentials = get_bucket_details(upload_to_bucket)
     conn = boto3.client('s3', bucket_credentials['REGION_HOST'], aws_access_key_id = bucket_credentials['AWS_ACCESS_KEY_ID'], \
             aws_secret_access_key = bucket_credentials['AWS_SECRET_ACCESS_KEY'])
-    upload_file_name = upload_file.name.lower()
+    upload_file_name = check_file_name_validation(upload_file.name.lower(),User.objects.get(pk=user_id).username)
     if upload_folder_name:
         upload_folder_name = upload_folder_name.lower()
         file_key_1 = urlify(upload_folder_name)+'/'+urlify(upload_file_name)
@@ -1481,16 +1503,43 @@ def statistics_all(request):
 @login_required
 def statistics_all_jarvis(request):
     from django.db.models import Sum
+    from django.db.models import Avg
+
+    language_index_list = []
+    for each in language_options:
+        language_index_list.append(each[0])
+
+    #print(category_slab_options)
+
+    category_index_list = []
+    for each in category_slab_options:
+        category_index_list.append(each[0])
+
+    #print(category_index_list)
+
+
     data = {}
     top_data = []
     metrics = request.GET.get('metrics', '0')
     slab = request.GET.get('slab', None)
+    language_choice = request.GET.get('language_choice', None)
+    category_choice = request.GET.get('category_choice', None)
+
+    #language_filter = request.GET.get('language_filter', '0')
+    #category_filter = request.GET.get('category_filter', '0')
+    #print(category_filter)
 
     if metrics == '6':
         data_view = 'daily'
 
     elif metrics == '8':
         data_view = 'monthly'
+
+    elif metrics == '11':
+        data_view = request.GET.get('data_view', 'daily')
+        data_view = request.GET.get('data_view', 'monthly')
+        data_view = request.GET.get('data_view', 'hourly')
+
 
     else:        
         data_view = request.GET.get('data_view', 'daily')
@@ -1516,6 +1565,7 @@ def statistics_all_jarvis(request):
 
     top_start = (datetime.datetime.today() - timedelta(days = 30)).date()
     top_end = (datetime.datetime.today() - timedelta(days = 1)).date()
+
     for each_opt in metrics_options:
         temp_list = []
         temp_list.append( each_opt[0] )
@@ -1524,21 +1574,42 @@ def statistics_all_jarvis(request):
         if(each_opt[0] == '6'):
             temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0])\
                 .aggregate(total_count = Avg('count'))['total_count'] )
+
+        if(each_opt[0] == '4'):
+            temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0], metrics_slab__in = ['0', '1', '2', '9'], metrics_language_options = '0')\
+                .aggregate(total_count = Sum('count'))['total_count'] )
+
+        if(each_opt[0] == '9'):
+            temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0], metrics_language_options = '0')\
+                .aggregate(total_count = Sum('count'))['total_count'] )
+            
         else:
             temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0])\
                 .aggregate(total_count = Sum('count'))['total_count'] )
         
-                    
+
         top_data.append(temp_list) 
         if metrics == each_opt[0]:
             data['graph_title'] = each_opt[1]
     data['top_data'] = top_data
 
     graph_data = DashboardMetricsJarvis.objects.exclude(date__gt = end_date).filter(Q(metrics = metrics) & Q(date__gte = start_date) & Q(date__lte = end_date))
-    if metrics in ['4', '2', '5'] and slab:
-        if (metrics == '4' and slab in ['0', '1', '2']) or (metrics == '2' and slab in ['3', '4', '5'])\
-                 or (metrics == '5' and slab in ['6', '7']):
-            graph_data = graph_data.filter(metrics_slab = slab)
+
+
+    if(metrics == '4' and (slab in ['0', '1', '2', '9']) and (language_choice in language_index_list) and (category_choice in category_index_list)):
+        print("coming here ....")
+        graph_data = graph_data.filter(Q(metrics_language_options = language_choice) & Q(metrics_slab = slab) & Q(category_slab_options = category_choice))
+        print(graph_data.count())
+
+    if metrics in ['2', '5'] and slab:
+        if (metrics == '2' and slab in ['3', '4', '5'])\
+                or (metrics == '5' and slab in ['6', '7']):
+                    print("or else coming here....") 
+                    graph_data = graph_data.filter(metrics_slab = slab)
+
+    if(metrics == '9'):
+        print("coming for me....")
+        graph_data = graph_data.filter(Q(metrics_language_options = language_choice) & Q(category_slab_options = category_choice))    
 
     if data_view == 'weekly':
         x_axis = []
@@ -1560,13 +1631,47 @@ def statistics_all_jarvis(request):
                 y_axis.append(data1)
             else:
                 y_axis.append(0)
-    else:
-        x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
+
+    elif(data_view == 'hourly' and metrics == '11'):
+        print("hr is working fine... ")
+        #x_axis = [str(x.date.strftime("%d-%b-%Y:%H")) for x in graph_data]
+        x_axis = []
+        for x in graph_data:
+            curr_day = "" + str(x.date.strftime("%d-%b-%Y:%H")) + ":00-hr"
+            curr_day = str(curr_day)
+            x_axis.append(curr_day)
+
+        #print(x_axis)    
         y_axis = graph_data.values_list('count', flat = True)
+
+    else:
+        # this is the case where data_view == 'daily'
+        # we need to handle cases were metric is 11
+
+        if(metrics!='11'):
+            x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
+            y_axis = graph_data.values_list('count', flat = True)
+        else:
+            day_data = graph_data.extra({"day": "date_trunc('day', date)"}).values("day").order_by('day').annotate(count=Sum("count"))
+            x_axis = []
+            y_axis = []
+            for item in day_data:
+                x_axis.append(item['day'].strftime("%d-%b-%Y"))
+                y_axis.append(item['count'])
+
+
+
+                
 
     data['metrics'] = metrics
     data['slab'] = slab
     data['data_view'] = data_view
+    data['language_choice'] = language_choice
+    data['category_choice'] = category_choice
+
+    #data['language_filter'] = language_filter
+    #data['category_filter'] = category_slab_options
+
     # data['x_axis'] = list(x_axis)
     # data['y_axis'] = list(y_axis)
     from collections import OrderedDict
@@ -1577,13 +1682,22 @@ def statistics_all_jarvis(request):
     data['start_date'] = start_date
     data['end_date'] = end_date
     data['slabs'] = []
+    data['language_filter'] = []
+    data['category_filter'] = []
 
     if metrics == '4':
-        data['slabs'] = [metrics_slab_options[0], metrics_slab_options[1], metrics_slab_options[2]]
+        data['slabs'] = [metrics_slab_options[0], metrics_slab_options[1], metrics_slab_options[2], metrics_slab_options[9]]
+        data['language_filter'] = metrics_language_options
+        data['category_filter'] = category_slab_options
+
     if metrics == '2':
         data['slabs'] = [metrics_slab_options[3], metrics_slab_options[4], metrics_slab_options[5]]
     if metrics == '5':
-        data['slabs'] = [metrics_slab_options[6], metrics_slab_options[7], metrics_slab_options[8]]    
+        data['slabs'] = [metrics_slab_options[6], metrics_slab_options[7], metrics_slab_options[8]]
+    if metrics == '9':
+        data['language_filter'] = metrics_language_options 
+        data['category_filter'] = category_slab_options
+          
 
     return render(request,'jarvis/pages/video_statistics/statistics_all_jarvis.html', data)
 

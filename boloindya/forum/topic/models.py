@@ -126,6 +126,7 @@ class Topic(models.Model):
     twitter_share_count = models.PositiveIntegerField(null=True,blank=True,default=0)
 
     backup_url = models.TextField(_("backup url"), blank = True)
+    old_backup_url = models.TextField(_("old_backup url"), blank = True)
     is_transcoded = models.BooleanField(default = False)
     is_transcoded_error = models.BooleanField(default = False)
     transcode_job_id = models.TextField(_("Transcode Job ID"), blank = True)
@@ -573,7 +574,7 @@ class Notification(UserInfo):
         elif self.notification_type=='4':
             notific['title'] = str(name)+' followed you'
             notific['hindi_title'] = str(name)+' ने आपको फॉलो किया'
-            notific['tamil_title'] = str(name)+' பாலோ செய்துள்ளார்'
+            notific['tamil_title'] = str(name)+' ஃபாலோ செய்துள்ளார்'
             notific['telgu_title'] = str(name)+' మీరు అనుసరించారు'
             notific['bengali_title'] = str(name)+' তোমাকে অনুসরণ করেছিল'
             notific['kannada_title'] = str(name)+' ನಿಮ್ಮನ್ನು ಹಿಂಬಾಲಿಸಿದರು'
@@ -590,7 +591,7 @@ class Notification(UserInfo):
         elif self.notification_type=='5':
             notific['title'] = str(name)+' liked your video'
             notific['hindi_title'] = str(name)+' को आपका वीडियो पसंद आया'
-            notific['tamil_title'] = str(name)+' உங்கள் வீடியோவை விரும்பியது'
+            notific['tamil_title'] = str(name)+' உங்கள் வீடியொவை விரும்பியுள்ளார்'
             notific['telgu_title'] = str(name)+' మీ వీడియోను ఇష్టపడ్డారు'
             notific['bengali_title'] = str(name)+' আপনার ভিডিও পছন্দ হয়েছে'
             notific['kannada_title'] = str(name)+' ನಿಮ್ಮ ವೀಡಿಯೊ ಇಷ್ಟವಾಯಿತು'
