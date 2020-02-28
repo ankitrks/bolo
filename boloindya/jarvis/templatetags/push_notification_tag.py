@@ -63,6 +63,6 @@ def get_language_count(id):
 
 @register.simple_tag()
 def get_uninstall_users(pushNotification):
-    diff=pushNotification.scheduled_time-timedelta(hours=7)
+    diff=pushNotification.scheduled_time+timedelta(hours=7)
     return len(pushNotification.push_notification_id.filter(status__in=['0', '1'], device__is_uninstalled=True, device__uninstalled_date__gte=pushNotification.scheduled_time, device__uninstalled_date__lt=diff))
 
