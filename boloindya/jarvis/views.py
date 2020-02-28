@@ -601,6 +601,24 @@ def urlify(s):
     s = re.sub(r"&", 'and', s)
     return s
 
+def check_file_name_validation(filename,username):
+    if check_filename_valid(filename):
+        return filename
+    else:
+        import time
+        epoch_time = int(round(time.time() * 1000))
+        file_name_words = filename.split('_')
+        file_extension = file_name_words[-1].split('.')[-1]
+        return username+'_'+str(epoch_time)+'.'+file_extension
+
+
+def check_filename_valid(filename):
+    if re.match(r"^[A-Za-z0-9_.-]+(:?\.mp4|\.mov|\.3gp)+$", filename):
+        return True
+    else:
+        return False
+
+
 @login_required
 def upload_n_transcode(request):
     upload_file = request.FILES['media_file']
@@ -719,7 +737,7 @@ def boloindya_upload_n_transcode(request):
     bucket_credentials = get_bucket_details(upload_to_bucket)
     conn = boto3.client('s3', bucket_credentials['REGION_HOST'], aws_access_key_id = bucket_credentials['AWS_ACCESS_KEY_ID'], \
             aws_secret_access_key = bucket_credentials['AWS_SECRET_ACCESS_KEY'])
-    upload_file_name = upload_file.name.lower()
+    upload_file_name = check_file_name_validation(upload_file.name.lower(),User.objects.get(pk=user_id).username)
     if upload_folder_name:
         upload_folder_name = upload_folder_name.lower()
         file_key_1 = urlify(upload_folder_name)+'/'+urlify(upload_file_name)

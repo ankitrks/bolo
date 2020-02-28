@@ -24,6 +24,25 @@ def upload_media(media_file,filename):
     except:
         return None
 
+def check_file_name_validation(filename,username):
+    if check_filename_valid(filename):
+        return filename
+    else:
+        import time
+        epoch_time = int(round(time.time() * 1000))
+        file_name_words = filename.split('_')
+        file_extension = file_name_words[-1].split('.')[-1]
+        print 'old_file_name:  ', filename
+        print topic.has_downloaded_url, '---- ', topic.downloaded_url
+        print 'new_file_name:   ',username+'_'+str(epoch_time)+'.'+file_extension.lower()
+        return username+'_'+str(epoch_time)+'.'+file_extension
+
+
+def check_filename_valid(filename):
+    if re.match(r"^[A-Za-z0-9_.-]+(:?\.mp4|\.mov|\.3gp)+$", filename):
+        return True
+    else:
+        return False
 
 def run():
     start_date = datetime(2020,02,14)
@@ -33,8 +52,9 @@ def run():
         try:
             counter+=1
             print "start time:  ",datetime.now()
-            filename_temp = str(counter)+"_"+each_vb.backup_url.split('/')[-1]
-            filename = each_vb.backup_url.split('/')[-1]
+            valid_file_name = check_file_name_validation(each_vb.backup_url.split('/')[-1],each_vb.user.username)
+            filename_temp = str(counter)+"_"+valid_file_name
+            filename = valid_file_name
             cmd = ['ffmpeg','-i', each_vb.backup_url, '-vf',"[in]scale=540:-1,drawtext=text='@"+each_vb.user.username+"':x=10:y=H-th-20:fontsize=18:fontcolor=white[out]",settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename_temp]
             ps = subprocess.Popen(cmd, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
             (output, stderr) = ps.communicate()
