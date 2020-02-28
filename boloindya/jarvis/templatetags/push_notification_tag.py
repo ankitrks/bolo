@@ -3,6 +3,7 @@ from boto.s3.connection import S3Connection
 from django.conf import settings
 from jarvis.models import language_options, user_group_options, status_options
 from drf_spirit.utils  import language_options
+from forum.user.models import UserProfile
 
 from django.utils.safestring import mark_safe
 
@@ -47,3 +48,7 @@ def get_percentage(total, num):
     if total == 0:
         return 100
     return str(get_user_opened_notification(num)*100/total)+" %"
+
+@register.simple_tag()
+def get_category_count(id):
+    return UserProfile.objects.filter(sub_category=id).count()

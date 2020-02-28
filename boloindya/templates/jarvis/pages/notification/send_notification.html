@@ -136,7 +136,7 @@
                 <select name="category" id="category" >
                     <option value="">All</option>
                     {% for category in categories %}
-                        <option value="{{ category.id }}" >{{ category.title }}</option>
+                        <option value="{{ category.id }}" >{{ category.title }} - {% get_category_count category %}</option>
                     {% endfor %}
                 </select>
             </div>
