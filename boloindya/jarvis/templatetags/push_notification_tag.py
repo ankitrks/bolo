@@ -51,4 +51,4 @@ def get_percentage(total, num):
 
 @register.simple_tag()
 def get_category_count(id):
-    return UserProfile.objects.filter(sub_category=id).count()
+    return FCMDevice.objects.filter(user__st__sub_category=id, is_uninstalled=False).count()
