@@ -99,6 +99,11 @@ class NotificationAPI(GenericAPIView):
             return JsonResponse({
                     'status': "SUCCESS"
                 })
+        elif action == 'mark_all_read':
+            self.mark_all_read()
+            return JsonResponse({
+                    'status': "SUCCESS"
+                })
 
     def get_notifications(self, user_id):
         user_id = self.request.user.id
@@ -144,6 +149,8 @@ class NotificationAPI(GenericAPIView):
         notification.status = 2
         notification.save()
 
+    def mark_all_read(self):
+        Notification.objects.filter(for_user=self.request.user).update(status=2)
 
 class TopicList(generics.ListCreateAPIView):
     serializer_class    = TopicSerializer
@@ -3661,4 +3668,18 @@ def get_ip_to_language(request):
             return JsonResponse({'message': 'Error Occured: IP not in GET request',}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def set_user_email(request):
+    try:
+        email = request.POST.get('email',None)
+        if email:
+            user = request.user
+            user.email = email
+            user.save()
+            return JsonResponse({'success': 'email saved'}, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'message': 'Email not found'}, status=status.HTTP_400_BAD_REQUEST)
+    except:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
 
