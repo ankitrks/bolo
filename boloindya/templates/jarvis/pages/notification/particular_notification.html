@@ -65,7 +65,7 @@
                     {% endfor %}  
                 </tbody>
             </table>
-            {% if has_prev %}<a href="/jarvis/particular_notification/{{notification_id}}/{{status_id}}/{{ prev_page_no }}" >Prev</a>{% endif %} {{ current_page }} of {{ total_page }} pages {% if has_next %}<a href="/jarvis/particular_notification/{{notification_id}}/{{status_id}}/{{ page_no }}" >Next</a>{% endif %}
+            {% if has_prev %}<a href="/jarvis/particular_notification/{{notification_id}}/{{status_id}}/{{ prev_page_no }}/{{is_uninstalled}}" >Prev</a>{% endif %} {{ current_page }} of {{ total_page }} pages {% if has_next %}<a href="/jarvis/particular_notification/{{notification_id}}/{{status_id}}/{{ page_no }}/{{is_uninstalled}}" >Next</a>{% endif %}
         </div>
     </div>
 {% endblock content %} 

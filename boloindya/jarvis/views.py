@@ -1107,7 +1107,7 @@ def send_notification(request):
 
 
 @login_required
-def particular_notification(request, notification_id=None, status_id=2, page_no=1):
+def particular_notification(request, notification_id=None, status_id=2, page_no=1, is_uninstalled=0):
     import math  
     from django.db.models import Q
     pushNotification = PushNotification.objects.get(pk=notification_id)
@@ -1120,12 +1120,15 @@ def particular_notification(request, notification_id=None, status_id=2, page_no=
         pushNotificationUser=pushNotificationUser.filter(status='1')
     elif (status_id == '0'):
         pushNotificationUser=pushNotificationUser.filter(Q(status='0')|Q(status='1'))
+    if is_uninstalled == '1':
+        diff=pushNotification.scheduled_time+timedelta(hours=7)
+        pushNotificationUser.filter(device__is_uninstalled=True, device__uninstalled_date__gte=pushNotification.scheduled_time, device__uninstalled_date__lt=diff)
     pushNotificationUserSlice=pushNotificationUser[page_no*10:page_no*10+10]
     has_next=True
     if ((page_no*10)+10) >= len(pushNotificationUser):
         has_next=False
     total_page=int(math.ceil(len(pushNotificationUser)/10))+1
-    return render(request,'jarvis/pages/notification/particular_notification.html', {'pushNotification': pushNotification, 'status_id': status_id, 'pushNotificationUser': pushNotificationUserSlice, 'page_no': page_no + 2, 'prev_page_no': page_no , 'count': len(pushNotificationUser), 'has_prev': has_prev, 'has_next': has_next, 'notification_id': notification_id, 'status_id': status_id, 'total_page': total_page, 'current_page': page_no + 1})
+    return render(request,'jarvis/pages/notification/particular_notification.html', {'pushNotification': pushNotification, 'status_id': status_id, 'pushNotificationUser': pushNotificationUserSlice, 'page_no': page_no + 2, 'prev_page_no': page_no , 'count': len(pushNotificationUser), 'has_prev': has_prev, 'has_next': has_next, 'notification_id': notification_id, 'status_id': status_id, 'total_page': total_page, 'current_page': page_no + 1, 'is_uninstalled': is_uninstalled})
 
 from rest_framework.decorators import api_view
 
