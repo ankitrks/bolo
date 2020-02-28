@@ -56,7 +56,7 @@
                             <td>{% if pushNotification.user %}{{ pushNotification.user.username }}{% else %}{{ pushNotification.device.dev_id }}{% endif %}</td>
                             <td>{{ pushNotification.user }}</td>
                             <td>{{ pushNotification.device.is_uninstalled }}</td>
-                            <td>{{ pushNotification.device.uninstalled_date }}</td>
+                            <td>{{ pushNotification.device.end_time }}</td>
                             <td>{{ pushNotification.device.device_model }}</td>
                             <td>{{ pushNotification.device.current_version }}</td>
                             <td>{{ pushNotification.device.manufacturer }}</td>
