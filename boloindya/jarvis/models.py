@@ -207,6 +207,13 @@ metrics_slab_options = (
 
 metrics_language_options = language_options
 
+# all_category_list = Category.objects.all()
+# category_slab_options = []
+
+# for item in all_category_list:
+#     category_slab_options.append((str(item.pk), str(item.title)))
+
+# category_slab_options = tuple(category_slab_options)
 
 
 class DashboardMetrics(RecordTimeStamp):
