@@ -442,7 +442,7 @@
                 $('#message').text('Please Enter Id / Hash');
                 return false;
             }
-            if (notification_type != 'hashtag' || notification_type != 'Create Video Byte') {
+            if (notification_type != 'hashtag' && notification_type != 'Create Video Byte') {
                 if (isNaN(id)) {
                     $('#error_message').show();
                     $('#message').text('Please Enter Id');
