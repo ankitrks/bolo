@@ -6,6 +6,7 @@ from drf_spirit.utils  import language_options
 from forum.user.models import UserProfile
 
 from django.utils.safestring import mark_safe
+from datetime import datetime, timedelta
 
 register = template.Library()
 
@@ -59,3 +60,9 @@ def get_language_count(id):
         return FCMDevice.objects.filter(is_uninstalled=False).count()
     else:     
         return FCMDevice.objects.filter(user__st__language=id, is_uninstalled=False).count()
+
+@register.simple_tag()
+def get_uninstall_users(id):
+    diff=pushNotification.scheduled_time-timedelta(hours=7)
+    return len(pushNotification.push_notification_id.filter(status__in=['0', '1'], device__is_uninstalled=True, device__uninstalled_date__gte=pushNotification.scheduled_time, device__uninstalled_date__lt=diff))
+
