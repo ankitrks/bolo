@@ -52,3 +52,10 @@ def get_percentage(total, num):
 @register.simple_tag()
 def get_category_count(id):
     return FCMDevice.objects.filter(user__st__sub_category=id, is_uninstalled=False).count()
+
+@register.simple_tag()
+def get_language_count(id):
+    if id == '0':
+        return FCMDevice.objects.filter(is_uninstalled=False).count()
+    else:     
+        return FCMDevice.objects.filter(user__st__language=id, is_uninstalled=False).count()

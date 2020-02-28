@@ -127,7 +127,7 @@
                 <div>Select Language</div>
                 <select name="lang" id="lang">
                     {% for lang in language_options %}
-                        <option value="{{ lang.0 }}" {% if pushNotification.language == lang.0 %}selected="selected"{% endif %}>{{ lang.1 }}</option>
+                        <option value="{{ lang.0 }}" {% if pushNotification.language == lang.0 %}selected="selected"{% endif %}>{{ lang.1 }} - {% get_language_count lang.0 %} </option>
                     {% endfor %}
                 </select>
             </div>
