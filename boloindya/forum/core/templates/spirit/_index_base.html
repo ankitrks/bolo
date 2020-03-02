@@ -14,8 +14,11 @@
     <meta name="description" content="Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India" />
     <meta name="keywords" content="Hindi Videos, Hindi Content Platform, Local Languages Content, Love Questions, Sex Questions, Relationship Questions, Life questions, English Videos, Questions and Answers, GK Answers, Politics Discussion, Entertainment, Tamil Videos, Tamil Questions, Tamil Answers, Telugu Questions, Telugu Answers, Exams, UPSC Videos, UPSC Questions, Kannada Questions, Kannada Videos, Punjabi Videos, Punjabi Questions, Gujarati Questions, Gujarati Videos, bengali questions, bengali videos" />    
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {% if topic.title is not None %}
     <meta data-react-helmet="true" name="twitter:image" content="https://www.boloindya.com/media/img/favicon.ico"/>
     <meta data-react-helmet="true" property="og:image" content="https://www.boloindya.com/media/img/favicon.ico"/>
+    {% endif %}
 
     {% block head-meta %}{% endblock %}
 

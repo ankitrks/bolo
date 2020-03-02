@@ -40,19 +40,21 @@
     <link rel="canonical" href="{{site_absolute_url}}{{ request.get_full_path }}" />      
     <meta property="og:url" content="{{site_absolute_url}}{{ request.get_full_path }}"/>
     <meta property="og:type" content="website" />
-    <meta property='og:title' content='{{topic.title}}' />
-    <meta name="twitter:title" content="{{topic.title}}" />
+    <meta property='og:title' content='{{topic.title|striptags|safe}}' />
+    <meta name="twitter:title" content="{{topic.title|striptags|safe}}" />
     <meta name="twitter:site" content="@BoloIndya" />
     <meta name="twitter:creator" content="@BoloIndya" />
     <meta name="twitter:card" content="summary" />
-    <meta property='og:description' content='{{topic.title}} Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India' />       
+    <meta property='og:description' content='{{topic.title|striptags|safe}} Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India' />       
     <meta property='og:image' content='{{topic.question_image}}' />
     <link rel="image_src" href="{{topic.question_image}}"/>
     {% endif %}
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% if topic.title is not None %}
     <meta data-react-helmet="true" name="twitter:image" content="/media/img/favicon.ico"/>
     <meta data-react-helmet="true" property="og:image" content="/media/img/favicon.ico"/>
+    {% endif %}
 <!--     <link href="https://unpkg.com/video.js/dist/video-js.css" rel="stylesheet">
     <script src="https://unpkg.com/video.js/dist/video.js"></script>
     <script src="https://unpkg.com/videojs-contrib-hls/dist/videojs-contrib-hls.js"></script> -->
