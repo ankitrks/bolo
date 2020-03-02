@@ -40,12 +40,12 @@
     <link rel="canonical" href="{{site_absolute_url}}{{ request.get_full_path }}" />      
     <meta property="og:url" content="{{site_absolute_url}}{{ request.get_full_path }}"/>
     <meta property="og:type" content="website" />
-    <meta property='og:title' content='{{topic.title}}' />
-    <meta name="twitter:title" content="{{topic.title}}" />
+    <meta property='og:title' content='{{topic.title|striptags|safe}}' />
+    <meta name="twitter:title" content="{{topic.title|striptags|safe}}" />
     <meta name="twitter:site" content="@BoloIndya" />
     <meta name="twitter:creator" content="@BoloIndya" />
     <meta name="twitter:card" content="summary" />
-    <meta property='og:description' content='{{topic.title}} Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India' />       
+    <meta property='og:description' content='{{topic.title|striptags|safe}} Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India' />       
     <meta property='og:image' content='{{topic.question_image}}' />
     <link rel="image_src" href="{{topic.question_image}}"/>
     {% endif %}
