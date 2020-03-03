@@ -27,7 +27,7 @@ def run():
     all_vb_seen_id = list(VBseen.objects.all().values_list('id',flat=True))
     print "after: get vb seen id",datetime.now()
     print "before: BoloActionHistory delete object no exist",datetime.now()
-    BoloActionHistory.objects.filter(action_object_type=vb_seen_type).exclude(action_object_type=vb_seen_type,action_object_id__in=all_vb_seen_id).delete()
+    BoloActionHistory.objects.filter(action_object_type=vb_seen_type,score=0).exclude(action_object_type=vb_seen_type,action_object_id__in=all_vb_seen_id).delete()
     print "after: BoloActionHistory delete object no exist",datetime.now()
     print "before: SocialShare of test_user",datetime.now()
     SocialShare.objects.filter(user_id__in=all_user_id).delete()
@@ -37,7 +37,7 @@ def run():
     print "after: get vb SocialShare id",datetime.now()
     print "before: BoloActionHistory delete object no exist",datetime.now()
     vb_share_type = ContentType.objects.get(app_label='forum_topic', model='socialshare')
-    BoloActionHistory.objects.filter(action_object_type=vb_share_type).exclude(action_object_type=vb_share_type,action_object_id__in=all_vb_social_share_id).delete()
+    BoloActionHistory.objects.filter(action_object_type=vb_share_type,score=0).exclude(action_object_type=vb_share_type,action_object_id__in=all_vb_social_share_id).delete()
     print "after: BoloActionHistory delete object no exist",datetime.now()
     print "before: Notification delete for test_user",datetime.now()
     Notification.objects.filter(for_user_id__in=all_user_id).delete()
@@ -48,10 +48,10 @@ def run():
 
 
     print "before: BoloActionHistory delete object no exist",datetime.now()
-    for each_bolo in BoloActionHistory.objects.all():
-        if not each_bolo.action_object:
-            print each_bolo.action_object_type,'--',each_bolo.action_object_id
-            each_bolo.delete()
+    # for each_bolo in BoloActionHistory.objects.all():
+    #     if not each_bolo.action_object and each_bolo.score=0:
+    #         print each_bolo.action_object_type,'--',each_bolo.action_object_id
+    #         each_bolo.delete()
     print "after: BoloActionHistory delete object no exist",datetime.now()
 
     for each_user in User.objects.filter(st__is_test_user=False):
