@@ -10,15 +10,16 @@ from forum.topic.utils import get_redis_vb_seen
 def run():
     groups = list(Group.objects.all().values_list('name',flat=True))
     exclude_user_id = list(User.objects.filter(Q(groups__name__in=groups)|Q(is_superuser=True)|Q(is_staff=True)).values_list('id',flat=True))
-    user_counter = 1
+    psot_counter = 1
     print exclude_user_id
     all_user_id = list(UserProfile.objects.filter(is_test_user=True).exclude(user_id__in=exclude_user_id).values_list('user_id',flat=True))
-    for each_user_id in all_user_id:
+    all_topic = Topic.objects.all().order_by('-id')
+    for each_topic in all_topic:
         print "before: vbseen delete",datetime.now()
-        print "#######################   ",user_counter,"/",len(all_user_id),"      ##########################"
-        VBseen.objects.filter(user_id=each_user_id).delete()
+        print "#######################   ",psot_counter,"/",len(all_topic),"      ##########################"
+        VBseen.objects.filter(user__st__is_test_user=True,topic_id=each_topic.id).exclude(user_id__in=exclude_user_id).delete()
         print "after: vbseen delete",datetime.now()
-        user_counter+=1
+        psot_counter+=1
     vb_seen_type = ContentType.objects.get(app_label='forum_topic', model='vbseen')
     print "before: BoloActionHistory delete 0 score",datetime.now()
     BoloActionHistory.objects.filter(score=0).delete()
