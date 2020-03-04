@@ -54,6 +54,7 @@ from jarvis.models import FCMDevice,StateDistrictLanguage
 from forum.topic.models import Topic,TopicHistory, ShareTopic, Like, SocialShare, Notification, CricketMatch, Poll, Choice, Voting, \
     Leaderboard, VBseen, TongueTwister
 from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
+from forum.user.utils import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
 from .serializers import *
 from tasks import vb_create_task,user_ip_to_state_task
 from haystack.query import SearchQuerySet, SQ                                      
@@ -260,7 +261,8 @@ class Usertimeline(generics.ListCreateAPIView):
                             post.append(each_post)
                     topics=sorted(itertools.chain(post),key=lambda x: x.date, reverse=True)
                 else:
-                    all_follower = Follower.objects.filter(user_follower = self.request.user).values_list('user_following_id',flat=True)
+                    # all_follower = Follower.objects.filter(user_follower = self.request.user).values_list('user_following_id',flat=True)
+                    all_follower = get_redis_following(self.request.user.id)
                     category_follow = UserProfile.objects.get(user= self.request.user).sub_category.all().values_list('id',flat = True)
                     # all_follower = [1,2,3,5]
                     # category_follow = [57,58,59,60,61,62,63]
@@ -304,7 +306,8 @@ class Usertimeline(generics.ListCreateAPIView):
                         topics = topics+list(post2)
 
         else:
-            all_follower = Follower.objects.filter(user_follower = self.request.user).values_list('user_following_id',flat=True)
+            # all_follower = Follower.objects.filter(user_follower = self.request.user).values_list('user_following_id',flat=True)
+            all_follower = get_redis_following(self.request.user.id)
             category_follow = UserProfile.objects.get(user= self.request.user).sub_category.all().values_list('id',flat = True)
             post=[]
             topics=[]
@@ -1340,10 +1343,11 @@ def mention_suggestion(request):
     term = request.POST.get('term', '')
     mention_list = []
     if term:
-        all_follower_user = list(Follower.objects.filter((Q(user_following__username__icontains=term)|Q(user_following__st__name__icontains=term)),user_follower=request.user,is_active=True).values_list('user_following_id',flat=True))[:5]
+        all_follower_user = list(Follower.objects.filter((Q(user_following__username__icontains=term)|Q(user_following__st__name__icontains=term)),user_follower=request.user,is_active=True).values_list('user_following_id',flat=True))[:5]  #need to replace with redis
         other_user = list(UserProfile.objects.filter(Q(user__username__icontains=term)|Q(name__icontains=term)).values_list('user_id',flat=True).order_by('-vb_count'))[:10-len(all_follower_user)]
     else:
-        all_follower_user = list(Follower.objects.filter(user_follower=request.user,is_active=True).values_list('user_following_id',flat=True))[:10]
+        # all_follower_user = list(Follower.objects.filter(user_follower=request.user,is_active=True).values_list('user_following_id',flat=True))[:10]
+        all_follower_user = get_redis_following(request.user.id)[:10]
         other_user=[]
     mention_list= all_follower_user + other_user
     mention_users=User.objects.filter(pk__in=mention_list)
@@ -2560,6 +2564,8 @@ def follow_user(request):
             userprofile.save()
             followed_user.follower_count = F('follower_count')+1
             followed_user.save()
+            update_redis_following(request.user.id,int(user_following_id),True)
+            update_redis_follower(int(user_following_id),request.user.id,True)
             return JsonResponse({'message': 'Followed'}, status=status.HTTP_200_OK)
         else:
             if follow.is_active:
@@ -2569,6 +2575,8 @@ def follow_user(request):
                 followed_user.follower_count = F('follower_count')-1
                 userprofile.save()
                 followed_user.save()
+                update_redis_following(request.user.id,int(user_following_id),False)
+                update_redis_follower(int(user_following_id),request.user.id,False)
                 return JsonResponse({'message': 'Unfollowed'}, status=status.HTTP_200_OK)
             else:
                 follow.is_active = True
@@ -2577,6 +2585,8 @@ def follow_user(request):
                 follow.save()
                 followed_user.save()
                 userprofile.save()
+                update_redis_following(request.user.id,int(user_following_id),True)
+                update_redis_follower(int(user_following_id),request.user.id,True)
                 return JsonResponse({'message': 'Followed'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
@@ -2791,8 +2801,10 @@ def follow_like_list(request):
     try:
         comment_like = Like.objects.filter(user = request.user,like = True,topic_id__isnull = True).values_list('comment_id', flat=True)
         topic_like = Like.objects.filter(user = request.user,like = True,comment_id__isnull = True).values_list('topic_id', flat=True)
-        all_follow = Follower.objects.filter(user_follower = request.user,is_active = True).values_list('user_following_id', flat=True)
-        all_follower = Follower.objects.filter(user_following = request.user,is_active = True).values_list('user_follower_id', flat=True)
+        # all_follow = Follower.objects.filter(user_follower = request.user,is_active = True).values_list('user_following_id', flat=True)
+        all_follow = get_redis_following(request.user.id)
+        # all_follower = Follower.objects.filter(user_following = request.user,is_active = True).values_list('user_follower_id', flat=True)
+        all_follower = get_redis_follower(request.user.id)
         userprofile = UserProfile.objects.get(user = request.user)
         all_category_follow = userprofile.sub_category.all().values_list('id', flat=True)
         detialed_category = userprofile.sub_category.all()
@@ -2844,7 +2856,8 @@ class GetFollowigList(generics.ListCreateAPIView):
     pagination_class    = LimitOffsetPagination
 
     def get_queryset(self):
-        all_following_id = Follower.objects.filter(user_following_id = self.request.GET.get('user_id', ''),is_active = True).values_list('user_follower_id', flat=True)
+        # all_following_id = Follower.objects.filter(user_following_id = self.request.GET.get('user_id', ''),is_active = True).values_list('user_follower_id', flat=True)
+        all_following_id = get_redis_follower(self.request.user.id)
         all_user = User.objects.filter(pk__in = all_following_id)
         return all_user
 
@@ -2854,14 +2867,16 @@ class GetFollowerList(generics.ListCreateAPIView):
     pagination_class    = LimitOffsetPagination
 
     def get_queryset(self):
-        all_follower_id = Follower.objects.filter(user_follower_id = self.request.GET.get('user_id', ''),is_active = True).values_list('user_following_id', flat=True)
+        # all_follower_id = Follower.objects.filter(user_follower_id = self.request.GET.get('user_id', ''),is_active = True).values_list('user_following_id', flat=True)
+        all_follower_id = get_redis_following(self.request.user.id)
         all_user = User.objects.filter(pk__in = all_follower_id)
         return all_user
     
 @api_view(['POST'])
 def get_following_list(request):
     try:
-        all_following_id = Follower.objects.filter(user_following_id = request.POST.get('user_id', ''),is_active = True).values_list('user_follower_id', flat=True)[:50]
+        # all_following_id = Follower.objects.filter(user_following_id = request.POST.get('user_id', ''),is_active = True).values_list('user_follower_id', flat=True)[:50]
+        all_following_id = get_redis_follower(self.request.user.id)
         if all_following_id:
             all_user = User.objects.filter(pk__in = all_following_id)
             return JsonResponse({'result':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
@@ -2874,7 +2889,8 @@ def get_following_list(request):
 @api_view(['POST'])
 def get_follower_list(request):
     try:
-        all_follower_id = Follower.objects.filter(user_follower_id = request.POST.get('user_id', ''),is_active = True).values_list('user_following_id', flat=True)[:50]
+        # all_follower_id = Follower.objects.filter(user_follower_id = request.POST.get('user_id', ''),is_active = True).values_list('user_following_id', flat=True)[:50]
+        all_follower_id = get_redis_following(self.request.user.id)
         if all_follower_id:
             all_user = User.objects.filter(pk__in = all_follower_id)
             return JsonResponse({'result':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
@@ -2904,9 +2920,13 @@ def deafult_boloindya_follow(user,language):
             userprofile.save()
             bolo_indya_profile.follower_count = F('follower_count') + 1
             bolo_indya_profile.save()
+            update_redis_following(user.id,int(bolo_indya_user.id),True)
+            update_redis_follower(int(bolo_indya_user.id),user.id,True)
         if not follow.is_active:
             follow.is_active = True
             follow.save()
+            update_redis_following(user.id,int(bolo_indya_user.id),True)
+            update_redis_follower(int(bolo_indya_user.id),user.id,True)
         return True
     except:
         return False
@@ -3522,8 +3542,10 @@ def get_user_follow_and_like_list(request):
     try:
         comment_like = Like.objects.filter(user = request.user,like = True,topic_id__isnull = True).values_list('comment_id', flat=True)
         topic_like = Like.objects.filter(user = request.user,like = True,comment_id__isnull = True).values_list('topic_id', flat=True)
-        all_follow = Follower.objects.filter(user_follower = request.user,is_active = True).values_list('user_following_id', flat=True)
-        all_follower = Follower.objects.filter(user_following = request.user,is_active = True).values_list('user_follower_id', flat=True)
+        # all_follow = Follower.objects.filter(user_follower = request.user,is_active = True).values_list('user_following_id', flat=True)
+        all_follow = get_redis_following(request.user.id)
+        # all_follower = Follower.objects.filter(user_following = request.user,is_active = True).values_list('user_follower_id', flat=True)
+        all_follower = get_redis_follower(request.user.id)
         notification_count = Notification.objects.filter(for_user= request.user,status=0).count()
         hashes = TongueTwister.objects.all().values_list('hash_tag', flat=True)
         return JsonResponse({'comment_like':list(comment_like),'topic_like':list(topic_like),'all_follow':list(all_follow),'all_follower':list(all_follower), \
