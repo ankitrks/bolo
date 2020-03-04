@@ -16,7 +16,7 @@ def check_file_name_validation(filename,username):
         file_extension = file_name_words[-1].split('.')[-1]
         # print 'old_file_name:  ', filename
         # print 'new_file_name:   ',username+'_'+str(epoch_time)+'.'+file_extension.lower()
-        return username+'_'+str(epoch_time)+'.'+file_extension
+        return username+'_'+str(epoch_time)+'.'+file_extension.lower()
 
 
 def check_filename_valid(filename):
