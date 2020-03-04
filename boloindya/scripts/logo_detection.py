@@ -43,7 +43,7 @@ from django.utils import timezone
 f_name = settings.BASE_DIR + '/temp/plag_vid_details.txt'
 prev_vbid_completed = settings.BASE_DIR + '/temp/prev_id.txt'
 
-f = io.open(f_name, "w", encoding="UTF-8")
+f = io.open(f_name, "a", encoding="UTF-8")
 
 
 # check the prev id till which the code ran
@@ -149,9 +149,9 @@ def identify_logo():
 						modified_text = text.description
 						if(modified_text in plag_source):
 							f.write(str(iter_id) + " " + video_title + " " + url_str + " " + (modified_text) + "\n")
-							# Topic.objects.filter(id = iter_id).update(plag_text = str(plag_source.index(modified_text)))
-							# Topic.objects.filter(id = iter_id).update(time_deleted = datetime.now())
-							# data[0].delete()
+							Topic.objects.filter(id = iter_id).update(plag_text = str(plag_source.index(modified_text)))
+							Topic.objects.filter(id = iter_id).update(time_deleted = datetime.now())
+							data[0].delete()
 
 			print(iter_id)
 			g = open(prev_vbid_completed, "w")
