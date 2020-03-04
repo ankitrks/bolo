@@ -126,7 +126,7 @@ class NotificationAPI(GenericAPIView):
                 next_offset = offset+1
             update_notification_ids = list(Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-created_at').values_list('pk',flat=True))[offset*limit:offset*limit+limit]
             #print update_notification_ids
-            Notification.objects.filter(pk__in=update_notification_ids).update(status=1)
+            Notification.objects.filter(pk__in=update_notification_ids).exclude(status=2).update(status=1)
 
         result = []
         for notification in notifications:
@@ -1237,7 +1237,7 @@ def replyOnTopic(request):
     user_id      = request.user.id
     topic_id     = request.POST.get('topic_id', '')
     language_id  = request.user.st.language
-    comment_html = request.POST.get('comment', '')
+    comment_html = request.POST.get('comment', '').strip()
     mobile_no    = request.POST.get('mobile_no', '')
     thumbnail = request.POST.get('thumbnail', '')
     media_duration = request.POST.get('media_duration', '')
@@ -1254,8 +1254,8 @@ def replyOnTopic(request):
             recent_comment = Comment.objects.filter(comment = comment_html,topic_id=topic_id,user=request.user,date__gt=datetime.now()-timedelta(minutes=5))
             if recent_comment:
                 return JsonResponse({'message': 'Already commented same comment'}, status=status.HTTP_400_BAD_REQUEST)
-            comment.comment       = comment_html
-            comment.comment_html  = comment_html
+            comment.comment       = comment_html.strip()
+            comment.comment_html  = comment_html.strip()
             comment.language_id   = language_id
             comment.user_id       = user_id
             comment.topic_id      = topic_id
@@ -1263,8 +1263,8 @@ def replyOnTopic(request):
             comment.save()
             has_hashtag,hashtagged_title = check_hashtag(comment)
             if has_hashtag:
-                comment.comment = hashtagged_title
-                comment.comment_html = hashtagged_title
+                comment.comment = hashtagged_title.strip()
+                comment.comment_html = hashtagged_title.strip()
                 comment.save()
             if username_list:
                 send_notification_to_mentions(username_list,comment)
@@ -1427,7 +1427,7 @@ def createTopic(request):
 
     topic        = Topic()
     user_id      = request.user.id
-    title        = request.POST.get('title', '')
+    title        = request.POST.get('title', '').strip()
     language_id  = request.POST.get('language_id', '')
     category_id  = request.POST.get('category_id', '')
     media_duration  = request.POST.get('media_duration', '')
@@ -1439,7 +1439,7 @@ def createTopic(request):
     # print media_file
 
     if title:
-        topic.title          = title[0].upper()+title[1:]
+        topic.title          = (title[0].upper()+title[1:]).strip()
     if request.POST.get('question_audio'):
         topic.question_audio = request.POST.get('question_audio')
     if request.POST.get('question_video'):
@@ -1478,8 +1478,8 @@ def createTopic(request):
                 for index, value in enumerate(tag_list):
                     if value.startswith("#"):
                         tag_list[index]='<a href="/get_challenge_details/?ChallengeHash='+value.strip('#')+'">'+value+'</a>'
-                title = " ".join(tag_list)
-                topic.title = title[0].upper()+title[1:]
+                title = " ".join(tag_list).strip()
+                topic.title = (title[0].upper()+title[1:]).strip()
                 # for each_tag in tag_list:
                 for index, value in enumerate(hash_tag):
                     if value.startswith("#"):
@@ -1542,7 +1542,7 @@ def editTopic(request):
     """
     try:
         topic_id = request.POST.get('topic_id', '')
-        title        = request.POST.get('title', '')
+        title        = request.POST.get('title', '').strip()
         topic        = Topic.objects.get(pk = topic_id)
 
         if topic.user == request.user:
@@ -1553,7 +1553,7 @@ def editTopic(request):
                     if value.startswith("#"):
                         tag_list[index]='<a href="/get_challenge_details/?ChallengeHash='+value.strip('#')+'">'+value+'</a>'
                 title = " ".join(tag_list)
-                new_title = title[0].upper()+title[1:]
+                new_title = (title[0].upper()+title[1:]).strip()
             if not new_title == topic.title:
                 history_topic = TopicHistory.objects.create(source=topic,title=topic.title)
                 hash_tags = topic.hash_tags.all()
@@ -1562,7 +1562,7 @@ def editTopic(request):
                     each_hashtag.hash_counter = F('hash_counter')-1
                     topic.hash_tags.remove(each_hashtag)
                     each_hashtag.save()
-                topic.title = new_title
+                topic.title = new_title.strip()
                 if hash_tag:
                     for index, value in enumerate(hash_tag):
                         if value.startswith("#"):
@@ -1596,7 +1596,7 @@ def editComment(request):
     """
     try:
         comment_id = request.POST.get('comment_id',None)
-        comment_text = request.POST.get('comment_text','')
+        comment_text = request.POST.get('comment_text','').strip()
         comment = Comment.objects.get(pk=comment_id)
         if comment.user == request.user:
             comment_text,username_list = get_mentions(comment_text)
@@ -1613,8 +1613,8 @@ def editComment(request):
                         send_notification_to_mentions([each_username],comment)
                 has_hashtag,hashtagged_title = check_hashtag(comment)
                 if has_hashtag:
-                    comment.comment = hashtagged_title
-                    comment.comment_html = hashtagged_title
+                    comment.comment = hashtagged_title.strip()
+                    comment.comment_html = hashtagged_title.strip()
                     comment.save()
                 return JsonResponse({'message': 'Reply Updated','comment':CommentSerializer(comment).data}, status=status.HTTP_201_CREATED)
             else:
