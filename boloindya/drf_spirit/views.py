@@ -1447,6 +1447,13 @@ def createTopic(request):
     if request.POST.get('question_image'):
         topic.question_image = request.POST.get('question_image')
 
+    if request.POST.get('question_video') and not request.user.st.is_test_user:
+        question_video = request.POST.get('question_video')
+        already_exist_topic = Topic.objects.filter(Q(question_video=question_video)|Q(backup_url=question_video))
+        if already_exist_topic:
+            topic_json = TopicSerializerwithComment(already_exist_topic[0], context={'is_expand': request.GET.get('is_expand',True)}).data
+            return JsonResponse({'message': 'Video Byte Created','topic':topic_json}, status=status.HTTP_201_CREATED)
+
 
 
     try:
@@ -1653,15 +1660,20 @@ def topic_delete(request):
     topic_id     = request.POST.get('topic_id', '')
 
     topic = Topic.objects.get(pk= topic_id)
+    now = datetime.now()
+    allowed_date = datetime.strptime('01-'+str(now.month)+'-'+str(now.year)+' 00:00:00', "%d-%m-%Y %H:%M:%S")
 
-    if topic.user == request.user:
-        try:
-            topic.delete()
-            return JsonResponse({'message': 'Topic Deleted'}, status=status.HTTP_201_CREATED)
-        except:
-            return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+    if allowed_date <= topic.date:
+        if topic.user == request.user:
+            try:
+                topic.delete()
+                return JsonResponse({'message': 'Topic Deleted'}, status=status.HTTP_201_CREATED)
+            except:
+                return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return JsonResponse({'message': 'Invalid Delete Request'}, status=status.HTTP_204_NO_CONTENT)
     else:
-        return JsonResponse({'message': 'Invalid Delete Request'}, status=status.HTTP_204_NO_CONTENT)
+        return JsonResponse({'message': 'can not delete old videos'}, status=status.HTTP_204_NO_CONTENT)
 
 # @api_view(['POST'])
 def notification_topic(request):
