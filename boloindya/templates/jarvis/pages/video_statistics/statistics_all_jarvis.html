@@ -181,10 +181,87 @@
             <a href="?data_view=daily" class="filter_apply btn" style={% if metrics == "8"  or metrics == "6" %}display:none;{% endif %}>daily</a>
             <a href="?data_view=weekly" class="filter_apply btn" style={% if metrics == "6"  or  metrics == "8" %}display:none;{% endif %}>weekly</a>
             <a href="?data_view=monthly" class="filter_apply btn" style={% if metrics == "6" or metrics == "8" %}display:none;{% endif %}>monthly</a>
-            <a href="?data_view=hourly" class="filter_apply btn" style ={% if metrics != "11"  %}display:none;{% endif %}>hourly</a><br>
-            
+            <a href="?data_view=hourly" class="filter_apply btn" style ={% if metrics != "11"  %}display:none;{% endif %}>hourly</a>
+                
+            <div class ="filter_apply btn"style = "background: bisque;">
+            <span style="color: black;font-size: 10px;float: center;margin: -13px 6px 1px 0px;"><b>Daily View Sum</b></span>   
+            <h8 style="color: #333">{{ graph_data_sum }}</h8>
+            </div>
 
-            {% if slabs %}
+            <div class ="filter_apply btn"style = "background: bisque;">
+            <span style="color: black;font-size: 10px;float: center;margin: -13px 6px 1px 0px;"><b>Daily View Avg</b></span>   
+            <h8 style="color: #333">{{ graph_data_avg | floatformat:2}}</h8>
+            </div>
+
+
+            <br>
+
+            <!-- {% if language_filter %}
+                <div class="row" style="padding: 10px;">
+                     <div class="col-md-12">
+                        <select name="lang" id = "lang_filter_1" onchange="GetSelectedLangValue()">
+                            <option value="" ><b>Select Language</b></option>
+                            {% for lang in language_filter %}
+                                <option value="{{ lang.0 }}" {% if language_choice == lang.0 %}selected="selected"{% endif %}>{{ lang.1 }}</option>
+                            {% endfor %}
+                        </select>   
+                    </div>
+                </div>
+            {% endif %}   -->      
+
+            <br>
+
+            <div class="row">
+                {% if language_filter %}
+                        <div class="col-sm-3">
+                            <div ><b>Select Language</b></div>
+                            <select name="lang" id = "lang_filter_1" onchange="GetSelectedLangValue()">
+                                {% for lang in language_filter %}
+                                    <option value="{{ lang.0 }}" {% if language_choice == lang.0 %}selected="selected"{% endif %}>{{ lang.1 }}</option>
+                                {% endfor %}
+                            </select>   
+                        </div>
+                {% endif %}
+
+                {% if category_filter %}
+                        <div class="col-sm-3">
+                            <div><b>Select Category</b></div>
+                            <select name = "categ" id = "categ_filter_1" onchange="GetSelectedCategValue()">
+                                {% for each_cat in category_filter %}
+                                    <option value = "{{ each_cat.0}}" {% if category_choice|stringformat:"i" == each_cat.0 %}selected="selected"{% endif %}>{{ each_cat.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                {% endif %}
+
+                {% if slabs %}
+                        <div class="col-sm-3">
+                            <div><b>Select Slab</b></div>
+                            <select name ="slab" id = "slab_filter_1" onchange="GetSelectedSlabValue()">
+                                {% for each_slab in slabs%}
+                                    <option value = "{{ each_slab.0}}" {% if slab == each_slab.0 %}selected="selected"{% endif %}>{{ each_slab.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                {% endif %}
+
+            </div>
+
+            <!-- {% if category_filter %}
+                <div class ="col" style="padding: 10px;">
+                    <div class="col-mod-12">
+                        <select name = "categ" id = "categ_filter_1" onchange="GetSelectedCategValue()">
+                            <option value =""><b>Select Category</b></option>
+                                {% for categ in category_filter %}
+                                    <option value = "{{ categ.0}}" {% if category_choice == categ.0 %}selected="selected"{% endif %}>{{ categ.1 }}</option>
+                                {% endfor %}    
+                        </select>
+                    </div>
+                </div>      
+            {% endif %} -->
+
+
+            <!-- {% if slabs %}
                 <br>Data Slabs&nbsp;&nbsp;
                 {% for each_slab in slabs %}
                     <a href="?slab={{ each_slab.0 }}" class="filter_apply" {% if slab == each_slab.0  %}style="text-decoration: underline;font-weight: bold;color: burlywood;"{% endif %}>{{ each_slab.1 }}</a>{% if not forloop.last %} &nbsp;&nbsp;|&nbsp;&nbsp;{% endif %}
@@ -205,9 +282,9 @@
                 {% for each_cat in category_filter%}
                     <a href="?category_choice={{ each_cat.0 }}" class="filter_apply" {% if category_choice == each_cat.0  %}style="text-decoration: underline;font-weight: bold;color: burlywood;"{% endif %}>{{ each_cat.1 }}</a>{% if not forloop.last %} &nbsp;&nbsp;|&nbsp;&nbsp;{% endif %}
                 {% endfor %}
-            {% endif %}
+            {% endif %} -->
 
-
+            
 
             <br><div id="myDiv" style="width: 100%; height: 450px;"></div>
         </div>
@@ -255,6 +332,68 @@
                 var chart = new google.charts.Bar(document.getElementById('myDiv'));
                 chart.draw(data, google.charts.Bar.convertOptions(options));
             }
+        </script>
+
+        <script type="text/javascript">
+
+            function GetSelectedLangValue(lang_filter_1){
+                var lang_selected = $('#lang_filter_1 :selected').val()
+                console.log("?language_choice=" + lang_selected);
+                if (window.location.href.indexOf('language_choice') != -1) {
+                    urls = window.location.href.split("&");
+                    build = urls[0] + "&";
+                    for (var i = 1; i <= urls.length - 1; i++) {
+                        if (urls[i].indexOf("language_choice") != -1) {
+                            build += "language_choice=" + lang_selected + "&";
+                        } else {
+                            build += urls[i] + "&";
+                        }
+                    }
+                    window.location.href =  build.substring(0, build.length - 1);
+                    // window.location.href = window.location.href + "&language_choice=" + lang_selected;
+                } else {
+                    window.location.href = window.location.href + "&language_choice=" + lang_selected;
+                }
+            }
+
+            function GetSelectedCategValue(categ_filter_1){
+                var categ_selected = $('#categ_filter_1 :selected').val()
+                console.log("?category_choice=" + categ_selected);
+                if(window.location.href.indexOf('category_choice') != -1){
+                    urls = window.location.href.split("&");
+                    build = urls[0] + "&";
+                    for(var i = 1; i<= urls.length - 1 ; i++){
+                        if(urls[i].indexOf("category_choice") !=-1){
+                            build += "category_choice=" + categ_selected + "&";
+                        } else {
+                            build +=urls[i] + "&";
+                        }
+                    }
+                    window.location.href = build.substring(0, build.length - 1);
+                } else {
+                    window.location.href = window.location.href + "&category_choice=" + categ_selected;
+                }
+            }
+
+            function GetSelectedSlabValue(slab_filter_1){
+                var slab_selected = $('#slab_filter_1 :selected').val()
+                console.log("?slab=" + slab_selected);
+                if(window.location.href.indexOf('slab') !=-1){
+                    urls = window.location.href.split("&");
+                    build = urls[0] + "&";
+                    for(var i = 1; i<=urls.length - 1; i++){
+                        if(urls[i].indexOf("slab") !=-1){
+                            build += "slab=" + slab_selected + "&";
+                        } else {
+                            build += urls[i] + "&";
+                        }
+                    }
+                    window.location.href = build.substring(0, build.length-1);
+                } else {
+                    window.location.href = window.location.href + "&slab=" + slab_selected;
+                }
+            }
+
         </script>
     </body>
 </html>

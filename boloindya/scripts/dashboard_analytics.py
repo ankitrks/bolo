@@ -719,10 +719,6 @@ def put_dau_data():
 		metrics = '6'
 		metrics_slab = ''
 		print(metrics, metrics_slab, str_curr_date, week_no, dau_count)
-
-		# t1 = ReferralCodeUsed.objects.filter(created_at__day= curr_day, created_at__month= curr_month, created_at__year= curr_year, by_user__isnull = True).count()
-		# t2 = AndroidLogs.objects.filter(created_at__day= curr_day, created_at__month= curr_month, created_at__year= curr_year).distinct('user').count()
-		# tot_count = t1 + t2
 		
 		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date, week_no = week_no)
 		if(created):
@@ -767,7 +763,6 @@ def put_mau_data():
 			print(metrics, metrics_slab, str_curr_date, mau_count)
 			save_obj.count = mau_count
 			save_obj.save()	   
-
 
 
 # put daily combo view of (user, vid) to be put in daily records
