@@ -13,7 +13,7 @@ import copy
 import pandas as pd
 import gc
 import decimal
-from forum.user.utils import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
+from forum.user.utils.redis_utils import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
 
 def run():
     counter_objects_created=0

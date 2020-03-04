@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
 from redis_utils import *
-from .models import Follower
+from forum.user.models import Follower
 
 
 def get_redis_follower(user_id):
@@ -12,6 +11,7 @@ def get_redis_follower(user_id):
         follower_list = list(Follower.objects.filter(user_following_id=user_id,is_active=True).distinct('user_follower_id').values_list('user_follower_id',flat=True))
         set_redis(key,follower_list)
     return follower_list
+
 
 def update_redis_follower(user_id,user_follower_id,append):
     key = 'follower:'+str(user_id)

@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, date
 from drf_spirit.utils import add_bolo_score
 from forum.comment.models import Comment
 import gc
-from forum.user.utils import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
+from forum.user.utils.redis_utils import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
 
 def run():
     print "Start Time Eng_Engagment Random: ",datetime.now()

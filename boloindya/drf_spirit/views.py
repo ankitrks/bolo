@@ -54,7 +54,7 @@ from jarvis.models import FCMDevice,StateDistrictLanguage
 from forum.topic.models import Topic,TopicHistory, ShareTopic, Like, SocialShare, Notification, CricketMatch, Poll, Choice, Voting, \
     Leaderboard, VBseen, TongueTwister
 from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
-from forum.user.utils import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
+from forum.user.utils.redis_utils import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
 from .serializers import *
 from tasks import vb_create_task,user_ip_to_state_task
 from haystack.query import SearchQuerySet, SQ                                      
