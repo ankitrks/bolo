@@ -265,6 +265,9 @@
                     e.preventDefault();
                     jQuery(this).parents('td').find('.title_box').hide();
                     jQuery(this).parents('td').find('input[type="text"], .close_edit_box').show();
+                    var text_field = jQuery(this).parents('td').find('input[type="text"]');
+                    var title = $(text_field).val();
+                    $(text_field).val( title.replace( /(<([^>]+)>)/ig, '') );
                 });
 
                 jQuery(document).on('click', '.close_edit_box', function(e){
@@ -278,7 +281,7 @@
                     $(each_field).find('input[type="text"]').hide();
                     $(each_field).append('<a href="#" class="close_edit_box" style="display:none;">close</a>');
                     $(each_field).append('<div class="title_box">' + title + '&nbsp;&nbsp;<a href="#" class="edit_title">edit</a></div>');
-                    $(each_field).find('input[type="text"]').val( title.replace( /(<([^>]+)>)/ig, '') );
+                    // $(each_field).find('input[type="text"]').val( title.replace( /(<([^>]+)>)/ig, '') );
                 });
             });
         })(grp.jQuery);
