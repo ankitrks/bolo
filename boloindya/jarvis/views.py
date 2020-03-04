@@ -62,6 +62,8 @@ from django.db.models.functions import TruncMonth
 from django.db.models.functions import TruncDay
 from django.db.models import Count
 from forum.category.models import Category
+from datetime import datetime
+
 
 
 def get_bucket_details(bucket_name=None):
@@ -1520,24 +1522,27 @@ def statistics_all_jarvis(request):
         language_index_list.append(each[0])
 
     #print(category_slab_options)
-
     # category_index_list = []
     # for each in category_slab_options:
     #     category_index_list.append(each[0])
     #print(category_index_list)
 
-
     data = {}
     top_data = []
     metrics = request.GET.get('metrics', '0')
-    slab = request.GET.get('slab', None)
-    language_choice = request.GET.get('language_choice', None)
-    category_choice = request.GET.get('category_choice', None)
-    category_choice = int(category_choice)
+    slab = request.GET.get('slab', '9')
+    language_choice = request.GET.get('language_choice', '0')
+    #print(slab, language_choice)
 
-    #language_filter = request.GET.get('language_filter', '0')
-    #category_filter = request.GET.get('category_filter', '0')
-    #print(category_filter)
+    # category_choice = request.GET.get('category_choice', None)
+    # if(category_choice == None or category_choice == ''):
+    #     category_choice = 58
+    # else:
+    #     category_choice = int(category_choice)    
+    # print(category_choice)
+
+    category_choice = request.GET.get('category_choice', '58')      
+    category_choice = int(category_choice)
 
     if metrics == '6':
         data_view = 'daily'
@@ -1558,7 +1563,8 @@ def statistics_all_jarvis(request):
     # if data_view == 'daily':
     #     data_view = 'monthly'
 
-    start_date = request.GET.get('start_date', '2019-05-01')
+    last_30_dt = (datetime.datetime.today() + timedelta(days=-30)).strftime("%Y-%m-%d")  # start date would be of last 30 days
+    start_date = request.GET.get('start_date', last_30_dt)
     end_date = request.GET.get('end_date', None)
     if not start_date:
         start_date = '2019-05-01'
@@ -1605,11 +1611,18 @@ def statistics_all_jarvis(request):
 
     graph_data = DashboardMetricsJarvis.objects.exclude(date__gt = end_date).filter(Q(metrics = metrics) & Q(date__gte = start_date) & Q(date__lte = end_date))
 
+    # display the sum and avg of all the values in the daily view at the panel
+    graph_data_sum = DashboardMetricsJarvis.objects.exclude(date__gt = end_date).filter(Q(metrics = metrics) & Q(date__gte = start_date) & Q(date__lte = end_date)).aggregate(total_count = Sum('count'))['total_count']
+    graph_data_avg = DashboardMetricsJarvis.objects.exclude(date__gt = end_date).filter(Q(metrics = metrics) & Q(date__gte = start_date) & Q(date__lte = end_date)).aggregate(total_count = Avg('count'))['total_count']      
+
+    data['graph_data_sum'] = graph_data_sum
+    data['graph_data_avg'] = graph_data_avg
+    
 
     if(metrics == '4' and (slab in ['0', '1', '2', '9']) and (language_choice in language_index_list) and (category_choice)):
         print("coming here ....")
         graph_data = graph_data.filter(Q(metrics_language_options = language_choice) & Q(metrics_slab = slab) & Q(category_id = category_choice))
-        print(graph_data.count())
+        #print(graph_data.count())
 
     if metrics in ['2', '5'] and slab:
         if (metrics == '2' and slab in ['3', '4', '5'])\
@@ -1617,7 +1630,7 @@ def statistics_all_jarvis(request):
                     print("or else coming here....") 
                     graph_data = graph_data.filter(metrics_slab = slab)
 
-    if(metrics == '9'):
+    if(metrics == '9' and (category_choice)):
         print("coming for me....")
         graph_data = graph_data.filter(Q(metrics_language_options = language_choice) & Q(category_id = category_choice))    
 
