@@ -7,6 +7,7 @@ from datetime import datetime, timedelta, date
 from drf_spirit.utils import add_bolo_score
 from forum.comment.models import Comment
 import gc
+from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
 
 def run():
     print "Start Time Eng_Engagment Random: ",datetime.now()
@@ -103,6 +104,8 @@ def action_follow(test_user_id,any_user_id):
         add_bolo_score(any_user_id, 'followed', followed_user[0])
         userprofile.update(follow_count = F('follow_count')+1)
         followed_user.update(follower_count = F('follower_count')+1)
+        update_redis_following(test_user_id,any_user_id,True)
+        update_redis_follower(any_user_id,test_user_id,True)
 #share
 def action_share(user_id, topic_id):
     share_type =['facebook_share','whatsapp_share','linkedin_share','twitter_share']
