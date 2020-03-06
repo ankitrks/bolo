@@ -154,6 +154,7 @@ class Topic(models.Model):
         ('10', "Likee"),
     )
     
+    is_logo_checked = models.BooleanField(_("Is Logo Checked"), default=False)
     time_deleted = models.DateTimeField(blank = True, null = True)
     plag_text = models.CharField(choices = plag_text_options, blank = True, null = True, max_length = 10)
     objects = TopicQuerySet.as_manager()
