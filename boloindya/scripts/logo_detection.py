@@ -114,7 +114,7 @@ def identify_logo():
 		long_ago = today + timedelta(days =-2)
 		#topic_objects = Topic.objects.exclude(is_removed = True).filter(is_vb = True, date__gte = long_ago)
 
-		unseen_data=Topic.objects.filter(is_vb = True, is_logo_checked = False, date__gte = long_ago)
+		unseen_data=Topic.objects.filter(is_vb = True, is_logo_checked = False)
 		global_counter = 1
 		for item in unseen_data:
 			iter_id = item.id
@@ -162,23 +162,6 @@ def identify_logo():
 								Topic.objects.filter(id = iter_id).update(time_deleted = datetime.now())
 								Topic.objects.filter(id = iter_id)[0].delete()
 								break
-
-
-							# content = image_file.read()
-							# image = vision.types.Image(content = content)
-							# response = client.text_detection(image = image)
-							# texts = response.text_annotations
-							# print("Bool plag field: ", is_plag_vid)
-							# for text in texts:
-							# 	modified_text = text.description
-							# 	print(modified_text)
-							# 	if((modified_text in plag_source) and (is_plag_vid == False)):
-							# 		f.write(str(iter_id) + " " + video_title + " " + url_str + " " + (modified_text) + "\n")
-							# 		Topic.objects.filter(id = iter_id).update(plag_text = str(plag_source.index(modified_text)))
-							# 		Topic.objects.filter(id = iter_id).update(time_deleted = datetime.now())
-							# 		is_plag_vid = True
-							# 		data[0].delete()
-							# 		break
 
 
 				print(iter_id)
