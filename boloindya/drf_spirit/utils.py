@@ -14,6 +14,9 @@ language_options = (
     ('7', "Malayalam"),
     ('8', "Gujarati"),
     ('9', "Marathi"),
+    ('10', "Punjabi"),
+    ('11', "Odia"),
+
 )
 
 month_choices=(
