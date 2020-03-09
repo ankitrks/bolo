@@ -63,14 +63,6 @@ from django.db.models.functions import TruncDay
 from django.db.models import Count
 from forum.category.models import Category
 
-all_category_list = Category.objects.all()
-category_slab_options = []
-
-for item in all_category_list:
-    category_slab_options.append((str(item.pk), str(item.title)))
-
-category_slab_options = tuple(category_slab_options)
-
 
 def get_bucket_details(bucket_name=None):
     bucket_credentials = {}
@@ -1515,6 +1507,13 @@ def statistics_all(request):
 def statistics_all_jarvis(request):
     from django.db.models import Sum
     from django.db.models import Avg
+    all_category_list = Category.objects.all()
+    category_slab_options = []
+
+    for item in all_category_list:
+        category_slab_options.append((str(item.pk), str(item.title)))
+
+    category_slab_options = tuple(category_slab_options)
 
     language_index_list = []
     for each in language_options:
