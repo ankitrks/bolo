@@ -631,11 +631,11 @@ def GetChallengeDetails(request):
     challengehash = request.POST.get('ChallengeHash')
     challengehash = '#' + challengehash
     try:
-        all_vb = Topic.objects.filter(title__icontains = challengehash,is_removed=False,is_vb=True)
+        hash_tag = TongueTwister.objects.get(hash_tag=request.POST.get('ChallengeHash'))
+        all_vb = Topic.objects.filter(hash_tags=hash_tag,is_removed=False,is_vb=True)
         vb_count = all_vb.count()
-        tongue = TongueTwister.objects.filter(hash_tag__icontains=challengehash[1:]).order_by('-hash_counter')
         if len(tongue):
-            tongue = tongue[0]
+            tongue = hash_tag
             return JsonResponse({'message': 'success', 'hashtag':tongue.hash_tag,'vb_count':vb_count,\
                 'en_tongue_descp':tongue.en_descpription,'hi_tongue_descp':tongue.hi_descpription,\
                 'ta_tongue_descp':tongue.ta_descpription,'te_tongue_descp':tongue.te_descpription,\
@@ -827,12 +827,12 @@ class SolrSearchTop(BoloIndyaGenericAPIView):
                 users = solr_object_to_db_object(result_page[0].object_list)
             response["top_user"]=UserSerializer(User.objects.filter(st__in=users),many=True).data
             hash_tags  =[]
-            sqs = SearchQuerySet().models(TongueTwister).raw_search(search_term)
+            sqs = SearchQuerySet().models(TongueTwister).raw_search('hash_tag:'+search_term)
             if not sqs:
                 suggested_word = SearchQuerySet().models(TongueTwister).auto_query(search_term).spelling_suggestion()
                 print suggested_word
                 if suggested_word:
-                    sqs = SearchQuerySet().models(TongueTwister).raw_search(suggested_word)
+                    sqs = SearchQuerySet().models(TongueTwister).raw_search('hash_tag:'+suggested_word)
             if not sqs:
                 sqs = SearchQuerySet().models(TongueTwister).autocomplete(**{'text':search_term})
             if sqs:
@@ -912,11 +912,11 @@ class SolrSearchHashTag(BoloIndyaGenericAPIView):
         page = int(request.GET.get('page',1))
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
         if search_term:
-            sqs = SearchQuerySet().models(TongueTwister).raw_search(search_term)
+            sqs = SearchQuerySet().models(TongueTwister).raw_search('hash_tag:'+search_term)
             if not sqs:
                 suggested_word = SearchQuerySet().models(TongueTwister).auto_query(search_term).spelling_suggestion()
                 if suggested_word:
-                    sqs = SearchQuerySet().models(TongueTwister).raw_search(suggested_word)
+                    sqs = SearchQuerySet().models(TongueTwister).raw_search('hash_tag:'+suggested_word)
             if not sqs:
                 sqs = SearchQuerySet().models(TongueTwister).autocomplete(**{'text':search_term})
             if sqs:
