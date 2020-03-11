@@ -631,11 +631,11 @@ def GetChallengeDetails(request):
     challengehash = request.POST.get('ChallengeHash')
     challengehash = '#' + challengehash
     try:
-        all_vb = Topic.objects.filter(title__icontains = challengehash,is_removed=False,is_vb=True)
+        hash_tag = TongueTwister.objects.get(hash_tag=request.POST.get('ChallengeHash'))
+        all_vb = Topic.objects.filter(hash_tags=hash_tag,is_removed=False,is_vb=True)
         vb_count = all_vb.count()
-        tongue = TongueTwister.objects.filter(hash_tag__icontains=challengehash[1:]).order_by('-hash_counter')
         if len(tongue):
-            tongue = tongue[0]
+            tongue = hash_tag
             return JsonResponse({'message': 'success', 'hashtag':tongue.hash_tag,'vb_count':vb_count,\
                 'en_tongue_descp':tongue.en_descpription,'hi_tongue_descp':tongue.hi_descpription,\
                 'ta_tongue_descp':tongue.ta_descpription,'te_tongue_descp':tongue.te_descpription,\
