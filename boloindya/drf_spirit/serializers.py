@@ -43,7 +43,7 @@ class TongueTwisterSerializer(ModelSerializer):
         fields = '__all__'
 
     def get_total_videos_count(self,instance):
-        return shorcountertopic(Topic.objects.filter(title__icontains='#'+str(instance.hash_tag)).count())
+        return shorcountertopic(Topic.objects.filter(hash_tags=instance,is_vb=True,is_removed=False).count())
 
     def get_total_views(self,instance):
         return shorcountertopic(instance.total_views)
