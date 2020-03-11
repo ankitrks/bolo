@@ -827,12 +827,12 @@ class SolrSearchTop(BoloIndyaGenericAPIView):
                 users = solr_object_to_db_object(result_page[0].object_list)
             response["top_user"]=UserSerializer(User.objects.filter(st__in=users),many=True).data
             hash_tags  =[]
-            sqs = SearchQuerySet().models(TongueTwister).raw_search(search_term)
+            sqs = SearchQuerySet().models(TongueTwister).raw_search('hash_tag:'+search_term)
             if not sqs:
                 suggested_word = SearchQuerySet().models(TongueTwister).auto_query(search_term).spelling_suggestion()
                 print suggested_word
                 if suggested_word:
-                    sqs = SearchQuerySet().models(TongueTwister).raw_search(suggested_word)
+                    sqs = SearchQuerySet().models(TongueTwister).raw_search('hash_tag:'+suggested_word)
             if not sqs:
                 sqs = SearchQuerySet().models(TongueTwister).autocomplete(**{'text':search_term})
             if sqs:
@@ -912,11 +912,11 @@ class SolrSearchHashTag(BoloIndyaGenericAPIView):
         page = int(request.GET.get('page',1))
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
         if search_term:
-            sqs = SearchQuerySet().models(TongueTwister).raw_search(search_term)
+            sqs = SearchQuerySet().models(TongueTwister).raw_search('hash_tag:'+search_term)
             if not sqs:
                 suggested_word = SearchQuerySet().models(TongueTwister).auto_query(search_term).spelling_suggestion()
                 if suggested_word:
-                    sqs = SearchQuerySet().models(TongueTwister).raw_search(suggested_word)
+                    sqs = SearchQuerySet().models(TongueTwister).raw_search('hash_tag:'+suggested_word)
             if not sqs:
                 sqs = SearchQuerySet().models(TongueTwister).autocomplete(**{'text':search_term})
             if sqs:
