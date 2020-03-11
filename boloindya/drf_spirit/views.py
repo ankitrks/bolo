@@ -634,7 +634,7 @@ def GetChallengeDetails(request):
         hash_tag = TongueTwister.objects.get(hash_tag=request.POST.get('ChallengeHash'))
         all_vb = Topic.objects.filter(hash_tags=hash_tag,is_removed=False,is_vb=True)
         vb_count = all_vb.count()
-        if len(tongue):
+        if len(hash_tag):
             tongue = hash_tag
             return JsonResponse({'message': 'success', 'hashtag':tongue.hash_tag,'vb_count':vb_count,\
                 'en_tongue_descp':tongue.en_descpription,'hi_tongue_descp':tongue.hi_descpription,\
