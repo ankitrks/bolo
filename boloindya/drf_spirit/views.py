@@ -631,10 +631,10 @@ def GetChallengeDetails(request):
     challengehash = request.POST.get('ChallengeHash')
     challengehash = '#' + challengehash
     try:
-        hash_tag = TongueTwister.objects.get(hash_tag=request.POST.get('ChallengeHash'))
+        hash_tag = TongueTwister.objects.get(hash_tag__iexact=request.POST.get('ChallengeHash'))
         all_vb = Topic.objects.filter(hash_tags=hash_tag,is_removed=False,is_vb=True)
         vb_count = all_vb.count()
-        if len(hash_tag):
+        if hash_tag:
             tongue = hash_tag
             return JsonResponse({'message': 'success', 'hashtag':tongue.hash_tag,'vb_count':vb_count,\
                 'en_tongue_descp':tongue.en_descpription,'hi_tongue_descp':tongue.hi_descpription,\
@@ -1252,6 +1252,7 @@ def replyOnTopic(request):
         comment.is_audio = request.POST.get('is_audio')
 
     if user_id and topic_id and comment_html:
+        comment_html = check_space_before_hash(comment_html)
         try:
             comment_html,username_list = get_mentions(comment_html)
             recent_comment = Comment.objects.filter(comment = comment_html,topic_id=topic_id,user=request.user,date__gt=datetime.now()-timedelta(minutes=5))
@@ -1293,13 +1294,19 @@ def replyOnTopic(request):
 def check_hashtag(comment):
     has_hashtag = False
     title = comment.comment
-    tag_list=title.split()
+    tag_list=check_space_before_hash(title).split()
     if tag_list:
         for index,value in enumerate(tag_list):
             if value.startswith("#"):
                 has_hashtag = True
                 tag_list[index]='<a href="/get_challenge_details/?ChallengeHash='+value.strip('#')+'">'+value+'</a>'
-                tag,is_created = TongueTwister.objects.get_or_create(hash_tag=value.strip('#'))
+                # tag,is_created = TongueTwister.objects.get_or_create(hash_tag__iexact=value.strip('#'))
+                try:
+                    tag = TongueTwister.objects.get(hash_tag__iexact=value.strip('#'))
+                    is_created = False
+                except:
+                    tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
+                    is_created = True
                 if not is_created:
                     tag.hash_counter = F('hash_counter')+1
                 tag.save()
@@ -1408,6 +1415,36 @@ def solr_hashtag_suggestion(request):
     hash_data = BaseTongueTwisterSerializer(hash_tags,many=True).data
     return JsonResponse({'hash_data':hash_data}, status=status.HTTP_200_OK)
 
+def find(string, char):
+    return [i for i, ltr in enumerate(string) if ltr == char]
+
+def check_space_before_mention(string):
+    if "@" in string:
+        indexes =find(string,"@")
+        final_indexes=[]
+        for each_index in indexes:
+            if not string[each_index-1].isspace() and each_index:
+                final_indexes.append(each_index)
+
+        if final_indexes:
+            string = string[:final_indexes[0]]+" "+string[final_indexes[0]:]
+            string=check_space_before_mention(string)
+    return string.strip()
+
+def check_space_before_hash(string):
+    if "#" in string:
+        indexes =find(string,"#")
+        final_indexes=[]
+        for each_index in indexes:
+            if not string[each_index-1].isspace() and each_index:
+                final_indexes.append(each_index)
+
+        if final_indexes:
+            string = string[:final_indexes[0]]+" "+string[final_indexes[0]:]
+            string=check_space_before_hash(string)
+        string = check_space_before_mention(string)
+    return string.strip()
+
 @api_view(['POST'])
 def createTopic(request):
 
@@ -1476,7 +1513,7 @@ def createTopic(request):
             topic.save()
             vb_create_task.delay(topic.id)
             # topic.update_vb()
-            tag_list=title.split()
+            tag_list=check_space_before_hash(title).split()
             hash_tag = copy.deepcopy(tag_list)
             if tag_list:
                 for index, value in enumerate(tag_list):
@@ -1487,7 +1524,13 @@ def createTopic(request):
                 # for each_tag in tag_list:
                 for index, value in enumerate(hash_tag):
                     if value.startswith("#"):
-                        tag,is_created = TongueTwister.objects.get_or_create(hash_tag=value.strip('#'))
+                        # tag,is_created = TongueTwister.objects.get_or_create(hash_tag__iexact=value.strip('#'))
+                        try:
+                            tag = TongueTwister.objects.get(hash_tag__iexact=value.strip('#'))
+                            is_created = False
+                        except:
+                            tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
+                            is_created = True
                         if not is_created:
                             tag.hash_counter = F('hash_counter')+1
                         tag.save()
@@ -1550,7 +1593,7 @@ def editTopic(request):
         topic        = Topic.objects.get(pk = topic_id)
 
         if topic.user == request.user:
-            tag_list=title.split()
+            tag_list=check_space_before_hash(title).split()
             hash_tag = copy.deepcopy(tag_list)
             if tag_list:
                 for index, value in enumerate(tag_list):
@@ -1570,7 +1613,13 @@ def editTopic(request):
                 if hash_tag:
                     for index, value in enumerate(hash_tag):
                         if value.startswith("#"):
-                            tag, is_created = TongueTwister.objects.get_or_create(hash_tag=value.strip("#").lower())
+                            # tag, is_created = TongueTwister.objects.get_or_create(hash_tag__iexact=value.strip("#"))
+                            try:
+                                tag = TongueTwister.objects.get(hash_tag__iexact=value.strip('#'))
+                                is_created = False
+                            except:
+                                tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
+                                is_created = True
                             if not is_created:
                                 tag.hash_counter = F('hash_counter')+1
                             tag.save()
