@@ -37,7 +37,7 @@ def run():
                 string = string[:final_indexes[0]]+" "+string[final_indexes[0]:]
                 string=check_space_before_hash(string)
             string = check_space_before_mention(string)
-        return string
+        return string.strip()
 
     def check_space_before_mention(string):
         if "@" in string:
@@ -50,9 +50,9 @@ def run():
             if final_indexes:
                 string = string[:final_indexes[0]]+" "+string[final_indexes[0]:]
                 string=check_space_before_mention(string)
-        return string
+        return string.strip()
 
-    TongueTwister.objects.all().update(hash_counter=0)
+    TongueTwister.objects.all().delete()
     topic_remove = 0
     all_topic = Topic.objects.exclude(hash_tags=None)
     for each_topic in all_topic:
@@ -106,7 +106,12 @@ def run():
                 for index, value in enumerate(hash_tag):
                     if value.startswith("#"):
                         hash_tag[index]='<a href="/get_challenge_details/?ChallengeHash='+value.strip('#')+'">'+value+'</a>'
-                        tag,is_created = TongueTwister.objects.get_or_create(hash_tag=value.strip('#'))
+                        try:
+                            tag = TongueTwister.objects.get(hash_tag__iexact=value.strip('#'))
+                            is_created = False
+                        except:
+                            tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
+                            is_created = True
                         if not is_created:
                             tag.hash_counter = F('hash_counter')+1
                         tag.save()
@@ -133,7 +138,12 @@ def run():
                 for index, value in enumerate(hash_tag):
                     if value.startswith("#"):
                         hash_tag[index]='<a href="/get_challenge_details/?ChallengeHash='+value.strip('#')+'">'+value+'</a>'
-                        tag,is_created = TongueTwister.objects.get_or_create(hash_tag=value.strip('#'))
+                        try:
+                            tag = TongueTwister.objects.get(hash_tag__iexact=value.strip('#'))
+                            is_created = False
+                        except:
+                            tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
+                            is_created = True
                         if not is_created:
                             tag.hash_counter = F('hash_counter')+1
                         tag.save()
