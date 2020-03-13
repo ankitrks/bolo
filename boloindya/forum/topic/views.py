@@ -746,7 +746,7 @@ def get_challenge_details(request):
     languageCode =request.LANGUAGE_CODE
     language_id=languages_with_id[languageCode] 
     challengehash = '#' + challengeHash
-    tongue = TongueTwister.objects.filter(hash_tag__icontains=challengehash[1:]).order_by('-hash_counter')
+    tongue = TongueTwister.objects.filter(hash_tag__iexact=challengehash[1:]).order_by('-hash_counter')
     if len(tongue):
         tongue = tongue[0]
     context = {

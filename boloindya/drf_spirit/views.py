@@ -583,34 +583,35 @@ class GetChallenge(generics.ListCreateAPIView):
     def get_queryset(self):
         challenge_hash = self.request.GET.get('challengehash')
         challengehash = '#' + challenge_hash
+        hash_tag = TongueTwister.objects.get(hash_tag__iexact=challengehash[1:])
         all_seen_vb = []
         if self.request.user.is_authenticated:
             all_seen_vb = get_redis_vb_seen(self.request.user.id)
             # all_seen_vb = VBseen.objects.filter(user = self.request.user, topic__title__icontains=challengehash).distinct('topic_id').values_list('topic_id',flat=True)
         excluded_list =[]
-        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,title__icontains=challengehash,user__st__is_superstar = True).exclude(pk__in=all_seen_vb).distinct('user_id')
+        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,user__st__is_superstar = True).exclude(pk__in=all_seen_vb).distinct('user_id')
         if superstar_post:
             superstar_post = sorted(superstar_post, key=lambda x: x.date, reverse=True)
         for each in superstar_post:
             excluded_list.append(each.id)
-        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,title__icontains=challengehash,user__st__is_superstar = False,user__st__is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id')
+        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,user__st__is_superstar = False,user__st__is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id')
         if popular_user_post:
             popular_user_post = sorted(popular_user_post, key=lambda x: x.date, reverse=True)
         for each in popular_user_post:
             excluded_list.append(each.id)
-        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,title__icontains=challengehash,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id')
+        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id')
         if popular_post:
             popular_post = sorted(popular_post, key=lambda x: x.date, reverse=True)
         for each in popular_post:
             excluded_list.append(each.id)
-        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,title__icontains=challengehash,user__st__is_superstar = False,user__st__is_popular=False,is_popular=False).exclude(pk__in=all_seen_vb).distinct('user_id')
+        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,user__st__is_superstar = False,user__st__is_popular=False,is_popular=False).exclude(pk__in=all_seen_vb).distinct('user_id')
         if normal_user_post:
             normal_user_post = sorted(normal_user_post, key=lambda x: x.date, reverse=True)
         for each in normal_user_post:
             excluded_list.append(each.id)
-        other_post = Topic.objects.filter(is_removed = False,is_vb = True,title__icontains=challengehash).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
+        other_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
         orderd_all_seen_post=[]
-        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb, title__icontains=challengehash)
+        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb, hash_tags=hash_tag)
         if all_seen_post:
             for each_id in all_seen_vb:
                 for each_vb in all_seen_post:
