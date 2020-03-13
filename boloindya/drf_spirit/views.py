@@ -1493,7 +1493,7 @@ def createTopic(request):
         already_exist_topic = Topic.objects.filter(Q(question_video=question_video)|Q(backup_url=question_video))
         if already_exist_topic:
             topic_json = TopicSerializerwithComment(already_exist_topic[0], context={'is_expand': request.GET.get('is_expand',True)}).data
-            return JsonResponse({'message': 'Video Byte Created already Processing','topic':topic_json}, status=status.HTTP_201_CREATED)
+            return JsonResponse({'message': 'Video Byte Created','topic':topic_json}, status=status.HTTP_201_CREATED)
 
 
 
