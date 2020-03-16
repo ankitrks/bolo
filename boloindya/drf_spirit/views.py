@@ -3198,12 +3198,11 @@ def get_cloudfront_url(instance):
 def SyncDump(request):
     if request.user:
         if request.method == "POST":
-            user = request.user
-            dump = str(request.POST.get('dump'))
-            dump_type = request.POST.get('dump_type')
-
             #Storing the dump in database
             try:
+                user = request.user
+                dump = request.POST.get('dump')
+                dump_type = request.POST.get('dump_type')
                 stored_data = UserJarvisDump(user=user, dump=dump, dump_type=dump_type)
                 stored_data.save()
                 return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)    
