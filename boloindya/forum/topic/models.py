@@ -487,7 +487,7 @@ share_type_options = (
     ('0', "facebook"),
     ('1', "whatsapp"),
     ('2', "linkedin"),
-    ('2', "twitter"),
+    ('3', "twitter"),
 )
 class SocialShare(UserInfo):
     share_type = models.CharField(choices=share_type_options, blank = True, null = True, max_length=10)
