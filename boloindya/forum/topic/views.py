@@ -786,7 +786,7 @@ def get_topic_list_by_hashtag(request,hashtag):
     challengehash = '#' + hashtag
     try:
 
-        tongue = TongueTwister.objects.filter(hash_tag__icontains=challengehash[1:]).order_by('-hash_counter')
+        tongue = TongueTwister.objects.filter(hash_tag__iexact=challengehash[1:]).order_by('-hash_counter')
         if len(tongue):
             tongue = tongue[0]
         context = {
