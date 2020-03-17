@@ -2907,7 +2907,9 @@ class GetFollowigList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         # all_following_id = Follower.objects.filter(user_following_id = self.request.GET.get('user_id', ''),is_active = True).values_list('user_follower_id', flat=True)
-        all_following_id = get_redis_follower(self.request.user.id)
+        all_following_id = None
+        if self.request.GET.get('user_id', None):
+            all_following_id = get_redis_follower(self.request.GET.get('user_id', None))
         all_user = User.objects.filter(pk__in = all_following_id)
         return all_user
 
@@ -2918,7 +2920,9 @@ class GetFollowerList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         # all_follower_id = Follower.objects.filter(user_follower_id = self.request.GET.get('user_id', ''),is_active = True).values_list('user_following_id', flat=True)
-        all_follower_id = get_redis_following(self.request.user.id)
+        all_follower_id = None
+        if self.request.GET.get('user_id', None):
+            all_follower_id = get_redis_following(self.request.GET.get('user_id', None))
         all_user = User.objects.filter(pk__in = all_follower_id)
         return all_user
     
@@ -2926,7 +2930,9 @@ class GetFollowerList(generics.ListCreateAPIView):
 def get_following_list(request):
     try:
         # all_following_id = Follower.objects.filter(user_following_id = request.POST.get('user_id', ''),is_active = True).values_list('user_follower_id', flat=True)[:50]
-        all_following_id = get_redis_follower(self.request.user.id)
+        all_following_id = None
+        if request.POST.get('user_id', None):
+            all_following_id = get_redis_follower(request.POST.get('user_id', None))
         if all_following_id:
             all_user = User.objects.filter(pk__in = all_following_id)
             return JsonResponse({'result':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
@@ -2940,7 +2946,9 @@ def get_following_list(request):
 def get_follower_list(request):
     try:
         # all_follower_id = Follower.objects.filter(user_follower_id = request.POST.get('user_id', ''),is_active = True).values_list('user_following_id', flat=True)[:50]
-        all_follower_id = get_redis_following(self.request.user.id)
+        all_follower_id = None
+        if request.POST.get('user_id', None):
+            all_follower_id = get_redis_following(request.POST.get('user_id', None))
         if all_follower_id:
             all_user = User.objects.filter(pk__in = all_follower_id)
             return JsonResponse({'result':UserSerializer(all_user,many= True).data}, status=status.HTTP_200_OK)
