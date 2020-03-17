@@ -483,6 +483,33 @@ def video_details_by_slug(request,slug='',id=''):
 
     return render(request, 'spirit/topic/video_details.html', context)
 
+def explore_video_details_by_slug(request,slug='',id=''):
+    #print user_profile.__dict__
+    #print 'videoId_'+id
+    user_id=""
+    try:
+        if id != '':
+            topics = Topic.objects.get(id = id)
+        else:
+            topics = Topic.objects.get(slug = slug)         
+        user_id = topics.user_id
+    except:
+        topics = None
+
+    try:
+        user = User.objects.get(id=user_id)
+        user_profile = UserProfile.objects.filter(user=user,user__is_active = True)[0]
+        
+    except:
+        user_profile = None
+    context = {
+        'topic': topics,
+        'is_single_topic': "Yes",
+        'user_profile': user_profile
+    }
+
+    return render(request, 'spirit/topic/explore_video_details.html', context)
+
 def bolo_user_details(request,username=''):
     #username=request.GET.get('lid');
     language_id=1
@@ -907,6 +934,66 @@ def old_home(request):
     #return render(request, 'spirit/topic/temporary_landing.html')
     # return render(request, 'spirit/topic/new_landing.html')
     # return render(request, 'spirit/topic/main_landing.html')
+
+def boloindya_feed(request):
+    categories = []
+    hash_tags = []
+    topics = []
+    try:
+        categories = Category.objects.filter(parent__isnull=False)[:10]
+    except Exception as e1:
+        categories = []   
+    language_id = request.GET.get('language_id', 1)
+
+    languages_with_id=settings.LANGUAGES_WITH_ID
+    languageCode =request.LANGUAGE_CODE
+    language_id=languages_with_id[languageCode]
+
+    try:
+        all_seen_vb = []
+        if request.user.is_authenticated:
+            all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__is_popular=True).distinct('topic_id').values_list('topic_id',flat=True)[:15]
+        excluded_list =[]
+        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')[:15]
+        for each in superstar_post:
+            excluded_list.append(each.id)
+        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')[:10]
+        for each in popular_user_post:
+            excluded_list.append(each.id)
+        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')[:2]
+        for each in popular_post:
+            excluded_list.append(each.id)
+        other_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,is_popular=True).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')[:2]
+        orderd_all_seen_post=[]
+        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)[:5]
+        if all_seen_post:
+            for each_id in all_seen_vb:
+                for each_vb in all_seen_post:
+                    if each_vb.id == each_id:
+                        orderd_all_seen_post.append(each_vb)
+
+        topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
+    except Exception as e1:
+        topics = []
+
+
+    try:
+        hash_tags = TongueTwister.objects.order_by('-hash_counter')[:4]
+    except Exception as e1:
+        hash_tags = []
+
+    context = {
+        'categories':categories,
+        'hash_tags':hash_tags,
+        'topics':topics,
+        'is_single_topic': "Yes",
+    }  
+    video_slug = request.GET.get('video',None)
+    if(video_slug != None):
+        return redirect('/video/'+video_slug)
+    else:
+        return render(request, 'spirit/topic/boloindya_feed.html',context)
+
 
 
 
