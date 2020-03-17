@@ -95,6 +95,8 @@ class UserProfile(models.Model):
     total_time_spent = models.PositiveIntegerField(null=True,blank=True,default=0,db_index=True)
     state_name = models.CharField(_('State Name'),max_length=200,null=True,blank=True)
     city_name = models.CharField(_('City Name'),max_length=200,null=True,blank=True)
+    android_did = models.CharField(_('android_did'),max_length=200,null=True,blank=True)
+    is_guest_user = models.BooleanField(default=False)
 
     # end #
 
