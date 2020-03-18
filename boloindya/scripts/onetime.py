@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+# this is a one-time script for recording and updating the fields and values in DashBoardMetricsJarvis table
+# Not intended to be run as a cron script at all.
+
 from forum.user.models import AndroidLogs, VideoPlaytime, VideoCompleteRate, UserAppTimeSpend, ReferralCodeUsed, UserProfile
 from drf_spirit.models import UserJarvisDump, UserLogStatistics, ActivityTimeSpend, VideoDetails,UserTimeRecord, UserVideoTypeDetails
 from forum.topic.models import Topic, BoloActionHistory
@@ -45,16 +48,27 @@ for (a,b) in language_string:
 def put_hau_data():
 
 	today = datetime.now()
-	start_date = today + timedelta(days=-180)
+	start_date = today + timedelta(days=-150)
 	end_date = today
-	for dt in rrule(rrule.DAILY, dtstart= start_date, until= today):
+	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= end_date):
 		curr_day = dt.day 
 		curr_month = dt.month 
 		curr_year = dt.year 
 		str_curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day)
+		for curr_hour in range(0, 23):
+			null_data = ReferralCodeUsed.objects.filter((Q(android_id=None) | Q(android_id = '')) &  Q(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year, created_at__hour = curr_hour))
+			all_data = ReferralCodeUsed.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year, created_at__hour = curr_hour)
+			user_null_data = all_data.exclude(Q(android_id=None) | Q(android_id = '')).values_list('android_id', flat=True)
+			id_list_2 = AndroidLogs.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year, created_at__hour = curr_hour).values_list('user__pk', flat=True)
+			id_list_3 = FCMDevice.objects.filter(user__pk__in = id_list_2).values_list('dev_id', flat = True)
+			clist = set(list(id_list_3) + list(user_null_data))
+			hau_count = len(clist) + null_data.count()
+			print(dt, curr_hour, hau_count)
 
 
+def main():
+	put_hau_data()
 
-
-
+def run():
+	main()
 

@@ -190,6 +190,7 @@ metrics_options = (
     ('9', 'Total Video Creators'),
     ('10', 'Install-Signup Map'),
     ('11', 'Uninstalls'),
+    ('12', 'PlayTime'),
 )
 
 metrics_slab_options = (

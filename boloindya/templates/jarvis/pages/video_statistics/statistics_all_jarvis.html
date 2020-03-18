@@ -168,6 +168,10 @@
         <a href="?metrics={{ top_data.11.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.11.1 }}</h6><h5 style="color: #b52828">{{ top_data.11.2|intcomma }}</h4></a>
         </div>
 
+        <div class="top_box" {% if metrics == top_data.12.0 %} style = "background: bisque;"{%endif %}>
+        <span style ="color: grey; font-size: 8px; float: right;margin: -16px 7px 0px 0px;"></span>
+        <a href="?metrics={{ top_data.12.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.12.1 }}</h6><h5 style="color: #b52828">{{ top_data.12.2|intcomma }}</h4></a>
+        </div>    
 
         <div class="right_panel">
             <br><br>Start date &nbsp;&nbsp; <input type="text" id="start_date" name="start_date" placeholder="Start Date" class="filter_text" value="{{ start_date }}">
@@ -178,21 +182,37 @@
             <!--<a href="?data_view=weekly" class="filter_apply btn" {% if data_view == "weekly"  %}style="background:bisque;"{% endif %}>weekly</a> -->
             <!--<a href="?data_view=monthly" class="filter_apply btn" {% if data_view == "monthly"  %}style="background:bisque;"{% endif %}>monthly</a><br> -->
             
-            <a href="?data_view=daily" class="filter_apply btn" style={% if metrics == "8"  or metrics == "6" %}display:none;{% endif %}>daily</a>
-            <a href="?data_view=weekly" class="filter_apply btn" style={% if metrics == "6"  or  metrics == "8" %}display:none;{% endif %}>weekly</a>
-            <a href="?data_view=monthly" class="filter_apply btn" style={% if metrics == "6" or metrics == "8" %}display:none;{% endif %}>monthly</a>
+            <a href="?data_view=daily" class="filter_apply btn" style={% if metrics == "8"  or metrics == "6" or metrics == "12" %}display:none;{% endif %}>daily</a>
+            <a href="?data_view=weekly" class="filter_apply btn" style={% if metrics == "6"  or  metrics == "8" or metrics == "12" %}display:none;{% endif %}>weekly</a>
+            <a href="?data_view=monthly" class="filter_apply btn" style={% if metrics == "6" or metrics == "8" or metrics == "12" %}display:none;{% endif %}>monthly</a>
             <a href="?data_view=hourly" class="filter_apply btn" style ={% if metrics != "11"  %}display:none;{% endif %}>hourly</a>
-                
-            <div class ="filter_apply btn"style = "background: bisque;">
-            <span style="color: black;font-size: 10px;float: center;margin: -13px 6px 1px 0px;"><b>Daily View Sum</b></span>   
+            
+
+            {% if metrics != "12" %}
+            <div class ="filter_apply btn" style = "background: bisque;">
+            <span style="color: black;font-size: 11px;float: center;margin: -13px 6px 1px 0px;"><b>Sum</b></span>   
             <h8 style="color: #333">{{ graph_data_sum }}</h8>
             </div>
+            {% endif %}
 
-            <div class ="filter_apply btn"style = "background: bisque;">
-            <span style="color: black;font-size: 10px;float: center;margin: -13px 6px 1px 0px;"><b>Daily View Avg</b></span>   
+            {% if metrics != "12" %}
+            <div class ="filter_apply btn" style = "background: bisque;">
+            <span style="color: black;font-size: 11px;float: center;margin: -13px 6px 1px 0px;"><b>Avg</b></span>   
             <h8 style="color: #333">{{ graph_data_avg | floatformat:2}}</h8>
             </div>
+            {% endif %}
 
+            {% if metrics != "12" %}
+            <div class="filter_apply btn" style = "background: bisque;">
+            <button onclick="orderDownload()"> Download </button>
+            </div>
+            {% endif %}
+
+            {% if metrics == "12" %}
+            <div class="filter_apply btn" style="background: bisque;">
+            <button onclick="GetPlayData()"> Fetch</button>    
+            </div>
+            {% endif %}
 
             <br>
 
@@ -247,6 +267,29 @@
 
             </div>
 
+            <br>
+            <br>
+            {% if metrics == '12' %}
+            <div style="text-align: center;" class="col-6 col-xl-6 col-md-6 col-sm-12">
+                <h4>Top Videos Viewed </h4>
+                <table class="table table-striped table-bordered" align="center">
+                    <thead>
+                        <tr>
+                            <th>UserName</th>
+                            <th>Title</th>
+                            <th>VideoID</th>
+                            <th>PlayTime</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="playtime_table">
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+            
+
+
             <!-- {% if category_filter %}
                 <div class ="col" style="padding: 10px;">
                     <div class="col-mod-12">
@@ -286,8 +329,13 @@
 
             
 
-            <br><div id="myDiv" style="width: 100%; height: 450px;"></div>
+        <br><div id="myDiv" style="width: 100%; height: 450px;"></div>
         </div>
+
+
+
+
+
         <script type="text/javascript">
             // var trace1 = {
             //     x: {{ x_axis|safe }},
@@ -319,8 +367,15 @@
             var chart_data = {{ chart_data|safe }};
             google.charts.load('current', {'packages':['bar']});
             google.charts.setOnLoadCallback(drawChart);
+
+            var metrics_sel = "{{metrics}}"
+            console.log(metrics_sel);
+
+
             function drawChart() {
+                console.log(chart_data);
                 var data = google.visualization.arrayToDataTable(chart_data);
+                console.log(data);
                 var options = {
                   chart: {
                     title: "{{ graph_title }}",
@@ -330,9 +385,14 @@
                 };
 
                 var chart = new google.charts.Bar(document.getElementById('myDiv'));
-                chart.draw(data, google.charts.Bar.convertOptions(options));
+                if(metrics_sel!=12){
+                    chart.draw(data, google.charts.Bar.convertOptions(options));
+                }
+                
             }
         </script>
+
+        
 
         <script type="text/javascript">
 
@@ -392,6 +452,141 @@
                 } else {
                     window.location.href = window.location.href + "&slab=" + slab_selected;
                 }
+            }
+
+
+            function orderDownload(){
+                var metrics_sel = "{{metrics}}"
+                var categ_sel = "{{category_choice}}"
+                var lang_sel = "{{language_choice}}"
+                var slab_sel = "{{slab}}"
+                var view_sel = "{{ data_view }}"
+                var sdate = "{{start_date}}"
+                var edate = "{{end_date}}"
+
+                // var sdate = new Date($('#start_date').val());
+                // var edate = new Date($('#end_date').val());
+            
+                $.ajax({
+                    url: "/jarvis/analytics_jarvis/get_csvdata/",
+                    dataType: 'json',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        'metrics_sel': metrics_sel,
+                        'categ_sel': categ_sel,
+                        'lang_sel': lang_sel,
+                        'slab_sel': slab_sel,
+                        'view_sel': view_sel,
+                        'sdate': sdate,
+                        'edate': edate
+                    }),
+                    success: function (data){
+                        //console.log(data);
+                        var parsed_data = jQuery.parseJSON(data)
+                        var data_to_print = '';
+                        var items = parsed_data 
+                        for(var i=0;i<items.length;i++){
+                            data_to_print+=items[i][0] + ',' + items[i][1] + '\r\n';
+
+                        }
+                        console.log(data_to_print);
+                        download(data_to_print, 'download_' + view_sel +'.csv',  '.csv'); 
+
+                    }
+                });
+
+            }
+            function download(data, filename, type){
+                console.log("coming here...");
+                var file = new Blob([data], {type: type});
+                if(window.navigator.msSaveOrOpenBlob){
+                    window.navigator.msSaveOrOpenBlob(file, filename);
+                }else{
+                    var a = document.createElement("a");
+                    url = URL.createObjectURL(file);
+                    a.href = url;
+                    a.download  = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    setTimeout(function(){
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(url);
+                    }, 0);
+                    setTimeout(function(){
+                        window.location.reload();
+                    }, 2000);
+                }
+            }
+
+            function convertSecondsToMinsHrs(timeInSeconds){
+                // Convert the seconds time to minutes and hour
+                var playtime = timeInSeconds
+                var mins = 0, hours = 0, seconds = playtime;
+
+                if(seconds > 59){
+                    mins = Math.floor(playtime / 60);
+                    seconds = seconds % 60;
+                }
+                if(mins > 59){
+                    hours = Math.floor(mins / 60);
+                    mins = mins % 60;
+                }
+                
+                var final_time = seconds +" secs";
+                if(mins > 0){
+                    final_time = mins +" mins "+final_time;
+                }
+                if(hours > 0){
+                    final_time = hours +" hrs "+final_time;
+                }
+                return final_time;
+            }
+
+
+            function GetPlayData(){
+                console.log("get play data is working fine....");
+                var categ_sel = "{{category_choice}}"
+                var lang_sel = "{{language_choice}}"
+                var sdate = "{{start_date}}"
+                var edate = "{{end_date}}"
+
+                $.ajax({
+                    url: "/jarvis/analytics_jarvis/get_playdata/",
+                    dataType: 'json',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        'categ_sel': categ_sel,
+                        'lang_sel': lang_sel,
+                        'sdate': sdate,
+                        'edate': edate
+                    }),
+                    success: function (data){
+                        console.log("callback working fine as well......");
+                        console.log(data.play_data);
+
+                        // $("#playtime_table tr").remove();
+
+                        for(item in data.play_data){
+                            var playtime_table = document.getElementById('playtime_table');
+                            var newrow = playtime_table.insertRow(-1);
+                            var cell_username = newrow.insertCell(0);
+                            var cell_title = newrow.insertCell(1);
+                            var cell_videoid = newrow.insertCell(2);
+                            var cell_playtime = newrow.insertCell(3);
+
+
+                            var playtime_display = convertSecondsToMinsHrs(data.play_data[item]['tot_playtime']);
+                            cell_username.innerHTML = data.play_data[item]['username'];
+                            cell_title.innerHTML = data.play_data[item]['topic_title'];
+                            cell_videoid.innerHTML = data.play_data[item]['videoid'];
+                            cell_playtime.innerHTML = playtime_display;
+                        }    
+
+                    }
+                });
+
             }
 
         </script>
