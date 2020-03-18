@@ -2047,6 +2047,7 @@ def verify_otp(request):
     lang = request.POST.get('lang',None)
     click_id = request.POST.get('click_id',None)
     user_ip = request.POST.get('user_ip',None)
+    android_did = request.POST.get('android_did',None)
     is_reset_password = False
     is_for_change_phone = False
     all_category_follow = []
@@ -2069,7 +2070,7 @@ def verify_otp(request):
             if not is_reset_password and not is_for_change_phone:
 		if mobile_no in ['7726080653']:
                     return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
-                userprofile = UserProfile.objects.filter(mobile_no = mobile_no,user__is_active = True)
+                userprofile = UserProfile.objects.filter(Q(mobile_no = mobile_no)|Q(android_did=android_did),user__is_active = True)
                 if userprofile:
                     userprofile = userprofile[0]
                     user = userprofile.user
@@ -2079,6 +2080,7 @@ def verify_otp(request):
                     message = 'User created'
                     userprofile = UserProfile.objects.get(user = user)
                     userprofile.mobile_no = mobile_no
+                    userprofile.android_did = android_did
                     if user_ip:
                         user_ip_to_state_task.delay(user.id,user_ip)
                         # url = 'http://ip-api.com/json/'+user_ip
@@ -2098,6 +2100,9 @@ def verify_otp(request):
                     if str(language):
                         default_follow = deafult_boloindya_follow(user,str(language))
                     add_bolo_score(user.id, 'initial_signup', userprofile)
+                if userprofile.is_guest_user:
+                    userprofile.is_guest_user = False
+                    userprofile.save()
                 user_tokens = get_tokens_for_user(user)
                 otp_obj.for_user = user
                 otp_obj.save()
@@ -2190,7 +2195,7 @@ def fb_profile_settings(request):
     try:
         if activity == 'facebook_login' and refrence == 'facebook':
             try:
-                userprofile = UserProfile.objects.get(social_identifier = extra_data['id'],user__is_active = True)
+                userprofile = UserProfile.objects.get(Q(social_identifier = extra_data['id'])|Q(android_did=android_did),user__is_active = True)
                 user=userprofile.user
                 is_created=False
             except Exception as e:
@@ -2201,6 +2206,9 @@ def fb_profile_settings(request):
                 user = User.objects.create(username = username)
                 userprofile = UserProfile.objects.get(user = user)
                 is_created = True
+            if userprofile.is_guest_user:
+                userprofile.is_guest_user = False
+                userprofile.save()
 
             if is_created:
                 add_bolo_score(user.id, 'initial_signup', userprofile)
@@ -2230,6 +2238,7 @@ def fb_profile_settings(request):
                 userprofile.linkedin_url = likedin_url
                 userprofile.twitter_id = twitter_id
                 userprofile.instagarm_id = instagarm_id
+                userprofile.android_did = android_did
 
                 # userprofile.follow_count += 1
                 if str(is_geo_location) =="1":
@@ -2253,7 +2262,7 @@ def fb_profile_settings(request):
                 return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
         elif activity == 'google_login' and refrence == 'google':
             try:
-                userprofile = UserProfile.objects.get(social_identifier = extra_data['google_id'],user__is_active = True)
+                userprofile = UserProfile.objects.get(Q(social_identifier = extra_data['google_id'])|Q(android_did=android_did),user__is_active = True)
                 user=userprofile.user
                 is_created=False
             except Exception as e:
@@ -2264,6 +2273,9 @@ def fb_profile_settings(request):
                 user = User.objects.create(username = username)
                 userprofile = UserProfile.objects.get(user = user)
                 is_created = True
+            if userprofile.is_guest_user:
+                userprofile.is_guest_user = False
+                userprofile.save()
 
             if is_created:
                 add_bolo_score(user.id, 'initial_signup', userprofile)
@@ -2295,6 +2307,7 @@ def fb_profile_settings(request):
                 userprofile.linkedin_url = likedin_url
                 userprofile.twitter_id = twitter_id
                 userprofile.instagarm_id = instagarm_id
+                userprofile.android_did = android_did
 
                 # userprofile.follow_count += 1
                 if str(is_geo_location) =="1":
@@ -2392,8 +2405,10 @@ def fb_profile_settings(request):
                 username = get_random_username()
                 user = User.objects.create(username = username)
                 userprofile = UserProfile.objects.get(user = user)
-                userprofile.is_guest_user = True
                 is_created = True
+            if not userprofile.is_guest_user:
+                userprofile.is_guest_user = True
+                userprofile.save()
 
             if is_created:
                 add_bolo_score(user.id, 'initial_signup', userprofile)
@@ -2407,6 +2422,7 @@ def fb_profile_settings(request):
                     click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
                     response = urllib2.urlopen(click_url).read()
                     userprofile.click_id_response = str(response)
+                userprofile.android_did = android_did
                 userprofile.save()
                 if str(language):
                     default_follow = deafult_boloindya_follow(user,str(language))
