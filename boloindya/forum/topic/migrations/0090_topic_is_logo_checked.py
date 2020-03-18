@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('forum_topic', '0089_topic_old_backup_url'),
+        ('forum_topic', '0090_auto_20200308_2003'),
     ]
 
     operations = [

@@ -252,7 +252,7 @@ class AppPageContent(RecordTimeStamp):
 
 class ReferralCode(RecordTimeStamp):
     code = models.CharField(_("Ref Code"), max_length=20, blank=True)
-    for_user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = False, null = False)
+    for_user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, editable = False)
     purpose = models.CharField(_("Purpose"), max_length=50, blank=True)
     campaign_url = models.CharField(_("Playstore URL"), max_length=350, blank=True, null = True, editable = False)
     is_active = models.BooleanField(_("live"), default = True)
@@ -261,16 +261,16 @@ class ReferralCode(RecordTimeStamp):
         return str(self.code)
 
     def save(self, *args, **kwargs):
-        self.campaign_url = 'https://play.google.com/store/apps/details?id=com.boloindya.boloindya&referrer=utm_source%3D' + self.code + '%26utm_medium%3Dcpc%26anid%3Dadmob'
+        self.campaign_url = 'https://play.google.com/store/apps/details?id=com.boloindya.boloindya&referrer=' + self.code + '&utm_source=' + self.code + '&utm_medium=cpc&anid=admob'
         super(ReferralCode, self).save(*args, **kwargs)
 
     def playstore_url(self):
-        return '<b>playstore URL - </b> https://play.google.com/store/apps/details?id=com.boloindya.boloindya&referrer=utm_source%3D' + self.code + '%26utm_medium%3Dcpc%26anid%3Dadmob'
+        return '<b>playstore URL - </b> https://play.google.com/store/apps/details?id=com.boloindya.boloindya&referrer=' + self.code + '&utm_source=' + self.code + '&utm_medium=cpc&anid=admob'
     playstore_url.allow_tags = True
 
     def no_playstore_url(self):
         return '<b>non playstore url - </b> https://www.boloindya.com/download/?id=com.boloindya.boloindya&\
-                    referrer=utm_source%3D' + self.code + '%26utm_medium%3Dcpc%26anid%3Dadmob'
+                    referrer=' + self.code + '&utm_source=' + self.code + '&utm_medium=cpc&anid=admob'
     no_playstore_url.allow_tags = True
 
     def downloads(self):
