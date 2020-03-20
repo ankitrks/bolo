@@ -2073,10 +2073,10 @@ def verify_otp(request):
                 if userprofile:
                     userprofile = userprofile[0]
                     user = userprofile.user
-                    message = 'User Logged In'
+                    message = 'Yay, lets get started'
                 else:
                     user = User.objects.create(username = get_random_username())
-                    message = 'User created'
+                    message = 'Yay, lets get started'
                     userprofile = UserProfile.objects.get(user = user)
                     userprofile.mobile_no = mobile_no
                     if user_ip:
@@ -2246,10 +2246,10 @@ def fb_profile_settings(request):
                 userprofile.save()
                 user.save()
                 user_tokens = get_tokens_for_user(user)
-                return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'Yay, lets get started', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
             else:
                 user_tokens = get_tokens_for_user(user)
-                return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'Yay, lets get started', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
         elif activity == 'google_login' and refrence == 'google':
             try:
                 userprofile = UserProfile.objects.get(social_identifier = extra_data['google_id'],user__is_active = True)
@@ -2311,10 +2311,10 @@ def fb_profile_settings(request):
                 userprofile.save()
                 user.save()
                 user_tokens = get_tokens_for_user(user)
-                return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'Yay, lets get started', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
             else:
                 user_tokens = get_tokens_for_user(user)
-                return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'Yay, lets get started', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
         elif activity == 'profile_save':
             try:
                 userprofile = UserProfile.objects.get(user = request.user)
@@ -3728,7 +3728,7 @@ def generate_login_data(request):
                 userprofile = userprofile[0]
                 user = userprofile.user
                 username = userprofile.slug
-                message = 'User Logged In'
+                message = 'Yay, lets get started'
                 user_tokens = get_tokens_for_user(user)
 
                 return JsonResponse({'message': message, 'username' : username, \
