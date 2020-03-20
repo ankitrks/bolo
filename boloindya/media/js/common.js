@@ -256,6 +256,23 @@ function copyShareLinkMobile() {
 
 }
 
+function copyShareLinkMobileLink() {debugger;
+  //var copyText = $("#shareInputboxMobileSingle").val();
+
+  chckHideClass =$("#shareInputboxMobileSingle").hasClass('hide');
+  if(chckHideClass){
+    $("#shareInputboxMobileSingle").removeClass('hide');
+    var copyText = document.getElementById("shareInputboxMobileSingle");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999)
+    document.execCommand("copy");
+    //$("#shareInputboxMobileSingle").addClass('hide');
+  }
+  
+  jQuery('.linkCopies').html('<span style="color:green">Link Copied...</span>').fadeOut(2000);
+
+}
+
 
     function openMobileDownloadPopup(){
         $('.mobileDownPopup').toggleClass('hide');

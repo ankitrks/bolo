@@ -1025,7 +1025,7 @@
 
 
 <script type="text/javascript">
-var videoFileCDN="{{topic.video_cdn}}";
+var videoFileCDN="{{topic.question_video | get_video_cdn}}";
 if(videoFileCDN==""){
     var videoFileCDN="{{topic.backup_url}}";
 }
@@ -1551,6 +1551,7 @@ content: '';
 <input type="hidden" name="topicID" id="topicID" value="{{topic.id}}">
 <input type="hidden" name="totalLikeCount" id="totalLikeCount" value="{{topic.likes_count}}">
 <input type="hidden" name="totalCommentCount" id="totalCommentCount" value="{{topic.comment_count}}">
+<input type="hidden" name="postTitle" id="postTitleId" value="{{topic.title | striptags}}">
 
 <div class="jsx-639186511 page-with-header main-body">
 
@@ -1642,7 +1643,7 @@ content: '';
     <div class="title">{{topic.title|safe}}</div>
     <div style="text-align: center;" class="jsx-3077367275 video-card">
       <div style=" position: relative; background-color: rgb(0, 0, 0);object-fit: cover;">
-      <video id="player-{{topic.id}}"  preload="auto" data-setup='{ "aspectRatio":"640:267", "playbackRates": [1, 1.5, 2] }' poster="{{topic.question_image}}" class="videoCentered videoSliderPlay" preload="metadata"  width="212" height="160">
+      <video id="player-{{topic.id}}"  preload="auto" data-setup='{ "aspectRatio":"640:267", "playbackRates": [1, 1.5, 2] }' poster="{{topic.question_image}}" class="videoCentered videoSliderPlay " preload="metadata"  width="212" height="160">
     </video>
       <div class="jsx-3077367275 video-card-mask"></div>
       <div class="jsx-4030482358 theme playButtonStatus videoPlayButtonDetails-{{topic.id}} play-button"></div>
@@ -1657,8 +1658,8 @@ content: '';
               <span class="_18vi">
                     <div class="_666k" data-testid="UFI2ReactionLink/actionLink">
                     <div class="_8c74">
-                    <a aria-pressed="false" class=" _6a-y _3l2t  _18vj" data-testid="UReactionLink" href="javascript:void(0)" id="UReactionLink" role="button" tabindex="0">
-                    <i alt="" class="_6rk2 img sp_ddXiTdIB8vm sx_44a25c"></i>Like</a>
+                    <a aria-pressed="false" class=" _6a-y _3l2t  _18vj" data-testid="UReactionLink" href="javascript:void(0)" id="UReactionLink-{{topic.id}}" role="button" tabindex="0">
+                    <i alt="" class="_6rk2 img sp_ddXiTdIB8vm {{topic.id}} sx_44a25c"></i>Like</a>
                     </div>
                     </div>
                 </span>
@@ -1736,10 +1737,12 @@ content: '';
     <div class="jsx-2679382212 outshare mask share-transiton-enter-done">
         <div class="jsx-2679382212 outsharepanel">
             <div class="jsx-2679382212 title">{% trans "Share to" %}</div>
-            <div class="jsx-2679382212 icontainer">
+            <div class="jsx-2679382212 icontainer" style="text-align: center;">
                 <div class="platwrap" >
-                    <div onclick="copyShareLinkMobile();" class="platicon i-copylink" style="background-image: url(/media/copy.svg);"></div><span>{% trans "Copy Link" %}</span>
-                    <input readonly=""  class="jsx-1861775669 jsx-537314381 hide" id="shareInputboxMobile" value="https://www.boloindya.com/@karansingharoraofficial/video/6758860880575827202">
+                    <div onclick="copyShareLinkMobileLink();" class="platicon i-copylink" style="background-image: url(/media/copy.svg);"></div><span>{% trans "Copy Link" %}</span>
+
+
+
                 </div>
 
                 <div class="platwrap" onclick="social_share('facebook_share')">
@@ -1766,6 +1769,6 @@ content: '';
 <!-----------  Login Popup Script  ------------>
 <script src="/media/js/explore_details.js"></script>
 <!-----------End  ------------>
-
+<input  type="text"   class="jsx-1861775669 jsx-537314381 hide" id="shareInputboxMobileSingle" value="{{site_base_url}}{{topic.slug}}/{{topic.id}}">
 
 {% endblock %}

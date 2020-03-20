@@ -93,8 +93,8 @@
                                               <span class="_18vi">\
                                       <div class="_666k" data-testid="UFI2ReactionLink/actionLink">\
                                       <div class="_8c74">\
-                                      <a aria-pressed="false" class=" _6a-y _3l2t  _18vj" data-testid="UReactionLink" href="javascript:void(0)" id="UReactionLink" role="button" tabindex="0">\
-                                      <i alt="" class="_6rk2 img sp_ddXiTdIB8vm sx_44a25c"></i>Like</a>\
+                                      <a aria-pressed="false" class=" _6a-y _3l2t  _18vj" data-testid="UReactionLink-'+itemVideo.id+'" href="javascript:void(0)" id="UReactionLink-'+itemVideo.id+'" onclick="likeUnlikeFeed('+itemVideo.id+');" role="button" tabindex="0">\
+                                      <i alt="" class="_6rk2 img sp_ddXiTdIB8vm sx_44a25c '+itemVideo.id+'"></i>Like</a>\
                                       </div>\
                                       </div>\
                                       </span>\
@@ -218,8 +218,8 @@ function loaderBoloHide(){
                                               <span class="_18vi">\
                                       <div class="_666k" data-testid="UFI2ReactionLink/actionLink">\
                                       <div class="_8c74">\
-                                      <a aria-pressed="false" class=" _6a-y _3l2t  _18vj" data-testid="UReactionLink" href="javascript:void(0)" id="UReactionLink" role="button" tabindex="0">\
-                                      <i alt="" class="_6rk2 img sp_ddXiTdIB8vm sx_44a25c"></i>Like</a>\
+                                      <a aria-pressed="false" class=" _6a-y _3l2t  _18vj" data-testid="UReactionLink-'+itemVideo.id+'" href="javascript:void(0)" id="UReactionLink-'+itemVideo.id+'" onclick="likeUnlikeFeed('+itemVideo.id+');" role="button" tabindex="0">\
+                                      <i alt="" class="_6rk2 img sp_ddXiTdIB8vm sx_44a25c '+itemVideo.id+'"></i>Like</a>\
                                       </div>\
                                       </div>\
                                       </span>\
@@ -289,8 +289,6 @@ function delegateClick(videoPlayerId,video_backup_url,video_cdn_url){
     var newSrc='/media/mute_icon.svg';
     $('#mutedImageId').attr('src', newSrc);
     $(btnPlayerId).removeClass('play-button');
-    //video.setAttribute('controls','true');
-    //video.play();
 
       if(Hls.isSupported()) {
         var hls = new Hls();
@@ -301,11 +299,6 @@ function delegateClick(videoPlayerId,video_backup_url,video_cdn_url){
           loaderHide();
       });
      }
-     // hls.js is not supported on platforms that do not have Media Source Extensions (MSE) enabled.
-     // When the browser has built-in HLS support (check using `canPlayType`), we can provide an HLS manifest (i.e. .m3u8 URL) directly to the video element through the `src` property.
-     // This is using the built-in support of the plain video element, without using hls.js.
-     // Note: it would be more normal to wait on the 'canplay' event below however on Safari (where you are most likely to find built-in HLS support) the video.src URL must be on the user-driven
-     // white-list before a 'canplay' event will be emitted; the last video event that can be reliably listened-for when the URL is not on the white-list is 'loadedmetadata'.
       else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         video.src = backup_url;
         video.addEventListener('loadedmetadata',function() {
@@ -851,6 +844,145 @@ jQuery(document).ready(function(){
 
   
 // });
+
+function likeUnlikeFeed(topicId){
+    var likeStatus=jQuery('#UReactionLink-'+topicId).hasClass('liked');
+    if(likeStatus==false){
+       var loginStatus= check_login_status();
+       if(loginStatus==false){
+        document.getElementById('gotoLoginPage').click();
+       }
+       var likeStatus=jQuery('.'+topicId).hasClass('sx_44a25c');
+       if(likeStatus==true){
+            jQuery('.'+topicId).removeClass('sx_44a25c');
+            jQuery('.'+topicId).addClass('sx_44a25d');
+       }
+
+        jQuery('#UReactionLink-'+topicId).addClass('liked');
+        updateUserLikeStatus(topicId);
+    }else{
+       jQuery('#UReactionLink-'+topicId).removeClass('hide');
+       updateUserLikeStatus(topicId);
+       var likeStatus=jQuery('.'+topicId).hasClass('sx_44a25d');
+       if(likeStatus==true){
+            jQuery('.'+topicId).removeClass('sx_44a25d');
+            jQuery('.'+topicId).addClass('sx_44a25c');
+            jQuery('#UReactionLink-'+topicId).removeClass('liked');
+       }
+
+    }
+}
+
+
+
+// jQuery('#UReactionLink').on('click',function(){debugger;
+//     var likeStatus=jQuery('#UReactionLink').hasClass('liked');
+//     if(likeStatus==false){
+//        var loginStatus= check_login_status();
+//        if(loginStatus==false){
+//         document.getElementById('gotoLoginPage').click();
+
+//        }
+//        var likeStatus=jQuery('.sp_ddXiTdIB8vm').hasClass('sx_44a25c');
+//        if(likeStatus==true){
+//             jQuery('.sp_ddXiTdIB8vm').removeClass('sx_44a25c');
+//             jQuery('.sp_ddXiTdIB8vm').addClass('sx_44a25d');
+//        }
+
+//         jQuery('#UReactionLink').addClass('liked');
+//         updateUserLikeStatus();
+//     }else{
+//        jQuery('#UReactionLink').removeClass('hide');
+//        updateUserLikeStatus();
+//        var likeStatus=jQuery('.sp_ddXiTdIB8vm').hasClass('sx_44a25d');
+//        if(likeStatus==true){
+//             jQuery('.sp_ddXiTdIB8vm').removeClass('sx_44a25d');
+//             jQuery('.sp_ddXiTdIB8vm').addClass('sx_44a25c');
+//             jQuery('#UReactionLink').removeClass('liked');
+//        }
+
+//     }
+    
+// });
+
+  function updateUserLikeStatus(topic_id){
+
+      var ge_local_data="";
+          ge_local_data = JSON.parse(localStorage.getItem("access_data"));
+      var accessToken=ge_local_data.access_token;
+      var listCommentItems="";
+      //================Comments List =================
+      var uri='/api/v1/like/';
+      var res = encodeURI(uri);
+      jQuery.ajax({
+          url:res,
+          type:"POST",
+          headers: {
+            'Authorization':'Bearer '+accessToken,
+          },
+          data:{topic_id:topic_id},
+          success: function(response,textStatus, xhr){
+              console.log(response);
+          },
+          error: function(jqXHR, textStatus, errorThrown){
+              console.log(textStatus + ": " + jqXHR.status + " " + errorThrown);
+          }
+
+    
+      });
+
+
+  } 
+
+function social_share(shareType){
+
+    var loginStatus=check_login_status();
+    if(loginStatus==false){
+        document.getElementById('gotoLoginPage').click();
+        //document.getElementById('openLoginPopup').click();
+        //return false;
+    }
+
+    var topicId=$("#topicID").val();
+    var topicCreatorUsername=$("#topicCreatorUsername").val();
+    var shareURL="";
+    if(shareType=='facebook_share'){
+
+        shareURL='https://www.facebook.com/sharer/sharer.php?app_id=113869198637480&u='+site_base_url+topicCreatorUsername+'/'+topicId+'&display=popup&sdk=joey/';
+
+    }else if(shareType=='twitter_share'){
+
+        shareURL='https://twitter.com/intent/tweet?text='+site_base_url+topicCreatorUsername+'/'+topicId+'/&url='+site_base_url+topicCreatorUsername+'/'+topicId+'/'
+    }else if(shareType=='whatsapp_share'){
+        shareURL='https://api.whatsapp.com/send?text='+site_base_url+topicCreatorUsername+'/'+topicId+'/';
+    }
+    
+
+    var ge_local_data="";
+        ge_local_data = JSON.parse(localStorage.getItem("access_data"));
+    var accessToken=ge_local_data.access_token;
+
+    jQuery.ajax({
+        url:'/api/v1/shareontimeline/',
+        type:"POST",
+        headers: {
+          'Authorization':'Bearer '+accessToken,
+        },
+        data:{topic_id:topicId,share_on:shareType},
+        success: function(response,textStatus, xhr){
+            window.open(shareURL, '_blank');
+            $('.smenu').toggleClass('share');
+
+        },
+        error: function(jqXHR, textStatus, errorThrown){
+          //$("form#optForm")[0].reset();
+          jQuery(".commentErrorStatus").html('<span style="color:red;">Please Try Again...</span>').fadeOut(8000);
+          console.log(textStatus + ": " + jqXHR.status + " " + errorThrown);
+        }
+
+
+    });
+} 
 
 
 function removeTags(str) {
