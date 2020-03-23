@@ -3148,28 +3148,33 @@ class LeaderBoradList(generics.ListCreateAPIView):
 
 @csrf_exempt
 def transcoder_notification(request):
-    # if request.POST:
-    jobId = json.loads(json.loads(request.body)['Message'])['jobId']
-    status = json.loads(json.loads(request.body)['Message'])['state']
-    # f =open('maz.txt','a')
-    # f.write(jobId)
-    # f.write(status)
-    # f.close()
-    topic = Topic.objects.get(is_vb = True, is_transcoded = False, transcode_job_id = jobId)
-    if status == 'COMPLETED':
-        topic.is_transcoded = True
-    else:
-        topic.is_transcoded_error = True
-    topic.transcode_status_dump = json.dumps(request.body)
-    topic.save()
-    if topic.is_transcoded:
-        notify_owner = Notification.objects.create(for_user = topic.user ,topic = topic,notification_type='6',user = topic.user)
-        # post_save.send(Topic, instance=topic, created=False)
-        # send notification to user table for success
-    else:
-        pass
-        # send notification to user table for error
-    return JsonResponse({'post' : 'post'})
+    try:
+        # if request.POST:
+        jobId = json.loads(json.loads(request.body)['Message'])['jobId']
+        status = json.loads(json.loads(request.body)['Message'])['state']
+        # f =open('maz.txt','a')
+        # f.write(jobId)
+        # f.write(status)
+        # f.close()
+        topic = Topic.objects.get(is_vb = True, is_transcoded = False, transcode_job_id = jobId)
+        if status == 'COMPLETED':
+            topic.is_transcoded = True
+            topic.is_transcoded_error = False
+        else:
+            topic.is_transcoded_error = True
+            topic.is_transcoded = False
+        topic.transcode_status_dump = json.dumps(request.body)
+        topic.save()
+        if topic.is_transcoded:
+            notify_owner = Notification.objects.create(for_user = topic.user ,topic = topic,notification_type='6',user = topic.user)
+            # post_save.send(Topic, instance=topic, created=False)
+            # send notification to user table for success
+        else:
+            pass
+            # send notification to user table for error
+        return JsonResponse({'post' : 'post'})
+    except:
+        return JsonResponse({'post' : 'post'})
 
 @api_view(['POST'])
 def vb_transcode_status(request):
