@@ -2861,11 +2861,11 @@ def follow_like_list(request):
         app_version = AppVersion.objects.get(app_name = 'android')
         app_version = AppVersionSerializer(app_version).data
         notification_count = Notification.objects.filter(for_user= request.user,status=0).count()
-        hashes = TongueTwister.objects.all().values_list('hash_tag', flat=True)
+        block_hashes = TongueTwister.objects.filter(is_blocked=True).values_list('hash_tag', flat=True)
         return JsonResponse({'comment_like':list(comment_like),'topic_like':list(topic_like),'all_follow':list(all_follow),'all_follower':list(all_follower),\
             'all_category_follow':list(all_category_follow),'app_version':app_version,\
             'notification_count':notification_count, 'is_test_user':userprofile.is_test_user,'user':UserSerializer(request.user).data,\
-            'detialed_category':CategorySerializer(detialed_category,many = True).data,'hashes':list(hashes)}, status=status.HTTP_200_OK)
+            'detialed_category':CategorySerializer(detialed_category,many = True).data,'block_hashes':list(block_hashes)}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -3604,10 +3604,10 @@ def get_user_follow_and_like_list(request):
         # all_follower = Follower.objects.filter(user_following = request.user,is_active = True).values_list('user_follower_id', flat=True)
         all_follower = get_redis_follower(request.user.id)
         notification_count = Notification.objects.filter(for_user= request.user,status=0).count()
-        hashes = TongueTwister.objects.all().values_list('hash_tag', flat=True)
+        block_hashes = TongueTwister.objects.filter(is_blocked=True).values_list('hash_tag', flat=True)
         return JsonResponse({'comment_like':list(comment_like),'topic_like':list(topic_like),'all_follow':list(all_follow),'all_follower':list(all_follower), \
                              'notification_count':notification_count, 'user':UserSerializer(request.user).data, \
-                             'hashes':list(hashes)}, status=status.HTTP_200_OK)
+                             'block_hashes':list(block_hashes)}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 

@@ -434,6 +434,7 @@ class TongueTwister(models.Model):
     picture = models.CharField(_("Picture URL"),max_length=255, blank=True,null=True)
     hash_counter = models.PositiveIntegerField(default=1,null=True,blank=True,db_index=True)
     total_views = models.PositiveIntegerField(default=0,null=True,blank=True,db_index=True)
+    is_blocked = models.BooleanField(default=False)
     def __unicode__(self):
         if self.hash_tag:
             return self.hash_tag

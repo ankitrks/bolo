@@ -311,6 +311,10 @@ class JonOpeningAdmin(admin.ModelAdmin):
 class JobRequestAdmin(admin.ModelAdmin):
     list_display = ('name', 'email', 'mobile')
 
+class TongueTwisterAdmin(admin.ModelAdmin):
+    list_display = ('hash_tag','is_blocked',)
+    search_fields = ('hash_tag',)
+
 admin.site.register(Poll, PollAdmin)
 
 admin.site.register(Topic, TopicAdmin)
@@ -319,7 +323,7 @@ admin.site.register(ShareTopic,ShareTopicAdmin)
 admin.site.register(Voting)
 admin.site.register(Leaderboard)
 # admin.site.register(VBseen)
-admin.site.register(TongueTwister)
+admin.site.register(TongueTwister,TongueTwisterAdmin)
 admin.site.register(JobOpening,JonOpeningAdmin)
 admin.site.register(JobRequest,JobRequestAdmin)
 
