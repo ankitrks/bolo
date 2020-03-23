@@ -3158,8 +3158,10 @@ def transcoder_notification(request):
     topic = Topic.objects.get(is_vb = True, is_transcoded = False, transcode_job_id = jobId)
     if status == 'COMPLETED':
         topic.is_transcoded = True
+        topic.is_transcoded_error = False
     else:
         topic.is_transcoded_error = True
+        topic.is_transcoded = False
     topic.transcode_status_dump = json.dumps(request.body)
     topic.save()
     if topic.is_transcoded:
