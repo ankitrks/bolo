@@ -1101,7 +1101,7 @@ function removeDataFromURL(){
 }
 
 
-function delegateClick(videoPlayerId,video_backup_url,video_cdn_url){
+function delegateClick(videoPlayerId,video_backup_url,video_cdn_url){debugger;
 
   var playerId="player-"+videoPlayerId;
   var playerId1="#player-"+videoPlayerId;
@@ -1111,22 +1111,11 @@ function delegateClick(videoPlayerId,video_backup_url,video_cdn_url){
     //openFullscreen(video);
 
     if(video.paused) {
-      $(".videoSliderPlay").each(function() {
-          $(this).get(0).pause();
-      });
-      $(".playButtonStatus").each(function() {
-        var checkPlayButtonStatus= $(this).hasClass('play-button');
-        if(!checkPlayButtonStatus){
-            $(this).addClass('play-button');
-        }
-      });
 
+      var newSrc='/media/mute_icon.svg';
+      $('#mutedImageId').attr('src', newSrc);
+      $(btnPlayerId).removeClass('play-button');
 
-    var newSrc='/media/mute_icon.svg';
-    $('#mutedImageId').attr('src', newSrc);
-    $(btnPlayerId).removeClass('play-button');
-    //video.setAttribute('controls','true');
-    //video.play();
 
       if(Hls.isSupported()) {
         var hls = new Hls();
@@ -1154,17 +1143,16 @@ function delegateClick(videoPlayerId,video_backup_url,video_cdn_url){
 
   } else {
     
-    $(".videoSliderPlay").each(function() {
-          $(this).get(0).pause();         
-    });
+
     video.pause();
+    video.src="";
     var checkPlayButtonStatus= $('.playButtonStatus').hasClass('play-button');
     if(!checkPlayButtonStatus){
       $('.playButtonStatus').addClass('play-button');
     }
-    video.removeAttribute('controls','true');
-    $(btnPlayerId).removeClass('play-button');
-    $(btnPlayerId).addClass('play-button');
+    
+    //$(btnPlayerId).removeClass('play-button');
+    //$(btnPlayerId).addClass('play-button');
   }
 }
 //=====================End mentions=========================

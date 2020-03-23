@@ -1038,11 +1038,11 @@ $(document).ready(function() {
   loaderHide();
     
     if (window.matchMedia("(max-width: 991px)").matches) {
-        VideoPlayByURLMobile(videom3u8,videoFileImage);
+        //VideoPlayByURLMobile(videom3u8,videoFileImage);
         //VideoPlayByURLMobile(videoFileCDN,videoFileImage);
         /* The viewport is less than, or equal to, 700 pixels wide */
     } else {
-        video_play_using_video_js(videom3u8,videoFileBackupURL,videoFileImage);
+       // video_play_using_video_js(videom3u8,videoFileBackupURL,videoFileImage);
       /* The viewport is greater than 700 pixels wide */
     }
     
@@ -1522,6 +1522,7 @@ content: '';
     flex: 0 0 445px;
 }
 .videoCentered{
+        width: 100%;
         object-fit: contain !important;
         height: -webkit-fill-available !important;
 }
@@ -1647,7 +1648,7 @@ content: '';
     </video>
       <div class="jsx-3077367275 video-card-mask"></div>
       <div class="jsx-4030482358 theme playButtonStatus videoPlayButtonDetails-{{topic.id}} play-button"></div>
-      <span class="jsx-3077367275 event-delegate-mask event-delegate-maskDesk" onclick="delegateClick('{{topic.id}}','{{topic.backup_url | safe}}','{{topic.video_cdn}}')"></span>
+      <span class="jsx-3077367275 event-delegate-mask event-delegate-maskDesk" onclick="delegateClick('{{topic.id}}','{{topic.backup_url | safe}}','{{topic.question_video | get_video_cdn}}')"></span>
       </div>
       <img onclick="muteAndUnmutePlayerFeed('{{topic.id}}');" class="jsx-3077367275 mute-icon {{topic.id}}" id="mutedImageIdDeDesk" src="/media/mute_icon.svg">
     </div>

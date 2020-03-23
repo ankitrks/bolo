@@ -906,7 +906,7 @@ function retryLiveStream(hls, url) {
     }
 
 jQuery(document).ready(function(){
-    //followLikeList();
+    followLikeList();
 });
 
 function removeTags(str) {

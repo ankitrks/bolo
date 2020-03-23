@@ -93,13 +93,13 @@
                                               <span class="_18vi">\
                                       <div class="_666k" data-testid="UFI2ReactionLink/actionLink">\
                                       <div class="_8c74">\
-                                      <a aria-pressed="false" class=" _6a-y _3l2t  _18vj" data-testid="UReactionLink-'+itemVideo.id+'" href="javascript:void(0)" id="UReactionLink-'+itemVideo.id+'" onclick="likeUnlikeFeed('+itemVideo.id+');" role="button" tabindex="0">\
+                                      <a aria-pressed="false" class=" _6a-y _3l2t  _18vj '+itemVideo.id+'" data-testid="UReactionLink-'+itemVideo.id+'" href="javascript:void(0)" id="UReactionLink-'+itemVideo.id+'" onclick="likeUnlikeFeed('+itemVideo.id+');" role="button" tabindex="0">\
                                       <i alt="" class="_6rk2 img sp_ddXiTdIB8vm sx_44a25c '+itemVideo.id+'"></i>Like</a>\
                                       </div>\
                                       </div>\
                                       </span>\
                                       <span class="_18vi">\
-                                      <a class=" _666h  _18vj _18vk _42ft" role="button" tabindex="0" testid="UFI2CommentLink" title="Leave a comment" id="UCommentLink" href="/explore/'+itemVideo.slug+'/'+itemVideo.id+'">Comment</a>\
+                                      <a class=" _666h  _18vj _18vk _42ft " role="button" tabindex="0" testid="UFI2CommentLink" title="Leave a comment" id="UCommentLink" href="/explore/'+itemVideo.slug+'/'+itemVideo.id+'">Comment</a>\
                                       </span>\
                                       <span class="_18vi sbutton">\
                                       <span class="_1j6m">\
@@ -218,7 +218,7 @@ function loaderBoloHide(){
                                               <span class="_18vi">\
                                       <div class="_666k" data-testid="UFI2ReactionLink/actionLink">\
                                       <div class="_8c74">\
-                                      <a aria-pressed="false" class=" _6a-y _3l2t  _18vj" data-testid="UReactionLink-'+itemVideo.id+'" href="javascript:void(0)" id="UReactionLink-'+itemVideo.id+'" onclick="likeUnlikeFeed('+itemVideo.id+');" role="button" tabindex="0">\
+                                      <a aria-pressed="false" class=" _6a-y _3l2t  _18vj '+itemVideo.id+'" data-testid="UReactionLink-'+itemVideo.id+'" href="javascript:void(0)" id="UReactionLink-'+itemVideo.id+'" onclick="likeUnlikeFeed('+itemVideo.id+');" role="button" tabindex="0">\
                                       <i alt="" class="_6rk2 img sp_ddXiTdIB8vm sx_44a25c '+itemVideo.id+'"></i>Like</a>\
                                       </div>\
                                       </div>\
@@ -240,6 +240,22 @@ function loaderBoloHide(){
                 $(".feedlist-container").append(listItems);
                 //$("_scroll_load_more_loading").append(listItems);
                 checkDataStatus=0;
+
+                var topicLIkes=userLikeAndUnlike.topic_like;
+                  topicLIkes.forEach(function(topicLikeId){debugger;
+                    if(topicLikeId){
+                      var topicId=topicLikeId;
+                      var likeStatus=jQuery('.'+topicId).hasClass('sx_44a25c');
+                      if(likeStatus==true){
+                          jQuery('.'+topicId).removeClass('sx_44a25c');
+                          jQuery('.'+topicId).addClass('sx_44a25d');
+                      }
+
+                      jQuery('#UReactionLink-'+topicId).addClass('liked');
+                    }
+
+                  });
+                
             },
             error: function(jqXHR, textStatus, errorThrown){
               console.log(textStatus + ": " + jqXHR.status + " " + errorThrown);
@@ -796,9 +812,50 @@ function retryLiveStream(hls, url) {
             headers: {
               'Authorization':'Bearer '+accessToken,
             },
-            success: function(response,textStatus, xhr){
+            success: function(response,textStatus, xhr){debugger;
                 userLikeAndUnlike=response;
-            //var videoCommentList=data.results;
+                var topicLIkes=userLikeAndUnlike.topic_like;
+                  topicLIkes.forEach(function(topicLikeId){debugger;
+                    if(topicLikeId){
+                      var topicId=topicLikeId;
+                      var likeStatus=jQuery('.'+topicId).hasClass('sx_44a25c');
+                      if(likeStatus==true){
+                          jQuery('.'+topicId).removeClass('sx_44a25c');
+                          jQuery('.'+topicId).addClass('sx_44a25d');
+                      }
+
+                      jQuery('#UReactionLink-'+topicId).addClass('liked');
+                    }
+
+                  });
+
+
+              var countFollowStatus=userLikeAndUnlike.all_follow;
+              if(undefined !==countFollowStatus && countFollowStatus.length>0){
+                  var followList=userLikeAndUnlike.all_follow;
+                  followList.forEach(function(followId){
+                      followStatus=jQuery('.followCheck').hasClass('followStatusChange-'+followId);
+                      if(followStatus==true){
+                          jQuery('.followStatusChange-'+followId).removeClass('sx_5da455');
+                          jQuery('.followStatusChange-'+followId).addClass('sx_5da456');
+                          jQuery('.btnTextChange-'+followId).text(followed_trans);
+                      }
+
+                    if(response.message=='liked'){
+                        jQuery('.changeLikeColor-'+commentId).removeClass('liked');
+                        jQuery('.likedStatus-'+commentId).removeClass('hide');
+                        jQuery('.changeLikeColor-'+commentId).addClass('liked');
+
+
+                    }else if(response.message=='unliked'){
+                        jQuery('.changeLikeColor-'+commentId).removeClass('liked');
+                        jQuery('.likedStatus-'+commentId).removeClass('hide');
+                        jQuery('.likedStatus-'+commentId).addClass('hide');
+                    }
+
+
+                  });
+              }
             }
       
         });
