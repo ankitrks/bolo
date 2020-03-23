@@ -261,16 +261,15 @@ class ReferralCode(RecordTimeStamp):
         return str(self.code)
 
     def save(self, *args, **kwargs):
-        self.campaign_url = 'https://play.google.com/store/apps/details?id=com.boloindya.boloindya&referrer=' + self.code + '&utm_source=' + self.code + '&utm_medium=cpc&anid=admob'
+        self.campaign_url = 'https://play.google.com/store/apps/details?id=com.boloindya.boloindya&referrer=utm_source%3D' + self.code + '%26utm_medium%3D' + self.code + '%26utm_content%3Dvaun%26utm_campaign%3Dcpc%26anid%3Dadmob'
         super(ReferralCode, self).save(*args, **kwargs)
 
     def playstore_url(self):
-        return '<b>playstore URL - </b> https://play.google.com/store/apps/details?id=com.boloindya.boloindya&referrer=' + self.code + '&utm_source=' + self.code + '&utm_medium=cpc&anid=admob'
+        return '<b>playstore URL - </b> https://play.google.com/store/apps/details?id=com.boloindya.boloindya&referrer=utm_source%3D' + self.code + '%26utm_medium%3D' + self.code + '%26utm_content%3Dvaun%26utm_campaign%3Dcpc%26anid%3Dadmob'
     playstore_url.allow_tags = True
 
     def no_playstore_url(self):
-        return '<b>non playstore url - </b> https://www.boloindya.com/download/?id=com.boloindya.boloindya&\
-                    referrer=' + self.code + '&utm_source=' + self.code + '&utm_medium=cpc&anid=admob'
+        return '<b>non playstore url - </b> https://www.boloindya.com/download/?id=com.boloindya.boloindya&referrer=utm_source%3D' + self.code + '%26utm_medium%3D' + self.code + '%26utm_content%3Dvaun%26utm_campaign%3Dcpc%26anid%3Dadmob'
     no_playstore_url.allow_tags = True
 
     def downloads(self):
