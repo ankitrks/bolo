@@ -62,6 +62,8 @@ from django.db.models.functions import TruncMonth
 from django.db.models.functions import TruncDay
 from django.db.models import Count
 from forum.category.models import Category
+from datetime import datetime
+
 
 
 def get_bucket_details(bucket_name=None):
@@ -1520,24 +1522,27 @@ def statistics_all_jarvis(request):
         language_index_list.append(each[0])
 
     #print(category_slab_options)
-
     # category_index_list = []
     # for each in category_slab_options:
     #     category_index_list.append(each[0])
     #print(category_index_list)
 
-
     data = {}
     top_data = []
     metrics = request.GET.get('metrics', '0')
-    slab = request.GET.get('slab', None)
-    language_choice = request.GET.get('language_choice', None)
-    category_choice = request.GET.get('category_choice', None)
-    category_choice = int(category_choice)
+    slab = request.GET.get('slab', '9')
+    language_choice = request.GET.get('language_choice', '0')
 
-    #language_filter = request.GET.get('language_filter', '0')
-    #category_filter = request.GET.get('category_filter', '0')
-    #print(category_filter)
+    # category_choice = request.GET.get('category_choice', None)
+    # if(category_choice == None or category_choice == ''):
+    #     category_choice = 58
+    # else:
+    #     category_choice = int(category_choice)    
+    # print(category_choice)
+
+    category_choice = request.GET.get('category_choice', '58')      
+    category_choice = int(category_choice)
+    print("slab, language_choice, category_choice", slab, language_choice, category_choice)
 
     if metrics == '6':
         data_view = 'daily'
@@ -1558,7 +1563,8 @@ def statistics_all_jarvis(request):
     # if data_view == 'daily':
     #     data_view = 'monthly'
 
-    start_date = request.GET.get('start_date', '2019-05-01')
+    last_30_dt = (datetime.datetime.today() + timedelta(days=-30)).strftime("%Y-%m-%d")  # start date would be of last 30 days
+    start_date = request.GET.get('start_date', last_30_dt)
     end_date = request.GET.get('end_date', None)
     if not start_date:
         start_date = '2019-05-01'
@@ -1605,21 +1611,28 @@ def statistics_all_jarvis(request):
 
     graph_data = DashboardMetricsJarvis.objects.exclude(date__gt = end_date).filter(Q(metrics = metrics) & Q(date__gte = start_date) & Q(date__lte = end_date))
 
+    # display the sum and avg of all the values in the panel display
+    graph_data_sum = DashboardMetricsJarvis.objects.exclude(date__gt = end_date).filter(Q(metrics = metrics) & Q(date__gte = start_date) & Q(date__lte = end_date))
+    graph_data_avg = DashboardMetricsJarvis.objects.exclude(date__gt = end_date).filter(Q(metrics = metrics) & Q(date__gte = start_date) & Q(date__lte = end_date))      
+    
 
     if(metrics == '4' and (slab in ['0', '1', '2', '9']) and (language_choice in language_index_list) and (category_choice)):
         print("coming here ....")
         graph_data = graph_data.filter(Q(metrics_language_options = language_choice) & Q(metrics_slab = slab) & Q(category_id = category_choice))
-        print(graph_data.count())
+
+        #print(graph_data.count())
 
     if metrics in ['2', '5'] and slab:
         if (metrics == '2' and slab in ['3', '4', '5'])\
                 or (metrics == '5' and slab in ['6', '7']):
                     print("or else coming here....") 
                     graph_data = graph_data.filter(metrics_slab = slab)
+                    
 
-    if(metrics == '9'):
+    if(metrics == '9' and (category_choice)):
         print("coming for me....")
-        graph_data = graph_data.filter(Q(metrics_language_options = language_choice) & Q(category_id = category_choice))    
+        graph_data = graph_data.filter(Q(metrics_language_options = language_choice) & Q(category_id = category_choice))
+        
 
     if data_view == 'weekly':
         x_axis = []
@@ -1671,7 +1684,8 @@ def statistics_all_jarvis(request):
 
 
 
-                
+    # data['graph_data_sum'] = graph_data_sum
+    # data['graph_data_avg'] = graph_data_avg
 
     data['metrics'] = metrics
     data['slab'] = slab
@@ -1688,12 +1702,27 @@ def statistics_all_jarvis(request):
     chart_data = OrderedDict()
     for i in range(len(x_axis)):
         chart_data[x_axis[i]] = y_axis[i]
-    data['chart_data'] = [[str(data_view), str(data['graph_title'])]] + [list(ele) for ele in chart_data.items()] 
+
+    #print(chart_data)
+    tot_elements_sum=sum(chart_data.values())
+    tot_elements_count = len(chart_data)
+    if(tot_elements_count!=0):
+        tot_elements_avg = float(float(tot_elements_sum)/float(tot_elements_count))
+    if(tot_elements_count==0):
+        tot_elements_avg=0    
+    #print(tot_elements_sum, tot_elements_count)
+    data['graph_data_sum'] = str(tot_elements_sum)
+    data['graph_data_avg'] = str(tot_elements_avg)
+
+
+    data['chart_data'] = [[str(data_view), str(data['graph_title'])]] + [list(ele) for ele in chart_data.items()]
+
     data['start_date'] = start_date
     data['end_date'] = end_date
     data['slabs'] = []
     data['language_filter'] = []
     data['category_filter'] = []
+
 
     if metrics == '4':
         data['slabs'] = [metrics_slab_options[0], metrics_slab_options[1], metrics_slab_options[2], metrics_slab_options[9]]
@@ -1707,9 +1736,202 @@ def statistics_all_jarvis(request):
     if metrics == '9':
         data['language_filter'] = metrics_language_options 
         data['category_filter'] = category_slab_options
+    if metrics == '12':
+        data['language_filter'] = metrics_language_options
+        data['category_filter'] = category_slab_options    
           
-
+    #print(data)    
     return render(request,'jarvis/pages/video_statistics/statistics_all_jarvis.html', data)
+
+
+@api_view(['POST'])
+def get_playdata(request):
+
+    from django.db.models import Sum
+    from django.db.models import Avg
+
+    language_index_list = []
+    language_map = []
+    language_string = list(language_options)
+    for each in language_options:
+        language_index_list.append(each[0])
+        language_map.append(str(each[1]))
+
+    counter=0    
+    play_data=[]        # list to be displayed at the front end
+
+    if request.is_ajax():
+        raw_data = json.loads(request.body)
+        try:
+            print(raw_data)
+            categ_sel = raw_data['categ_sel']
+            lang_sel = raw_data['lang_sel']
+            sdate = raw_data['sdate']
+            edate = raw_data['edate']
+
+            sdate = sdate + " 00:00:00"
+            edate = edate + " 00:00:00"
+
+            sdate = datetime.datetime.strptime(sdate,"%Y-%m-%d %H:%M:%S").date()
+            edate = datetime.datetime.strptime(edate,"%Y-%m-%d %H:%M:%S").date()
+            all_video_data = VideoPlaytime.objects.filter(timestamp__gte=sdate, timestamp__lte=edate).values('videoid').annotate(tot_playtime=Sum('playtime')).order_by( '-tot_playtime', 'videoid')
+            #print(sdate, edate, len(all_video_data))
+
+            for item in all_video_data:
+                curr_id = item['videoid']
+                tot_playtime = item['tot_playtime']
+                topic_data = Topic.objects.filter(id=curr_id)
+                language_id = (topic_data[0].language_id)
+                topic_uploaded_by = str(topic_data[0].user)
+                topic_title = (topic_data[0].title)
+
+                if(language_id in language_map):
+                    language_id = str(language_map.index(language_id))
+
+                m2mcategory_list=topic_data[0].m2mcategory.all()
+                categ_id_list = []
+                for each_categ in m2mcategory_list:
+                    categ_id_list.append(str(each_categ.id))
+
+                #print(language_id, categ_id_list)    
+                    
+                if((lang_sel==language_id) and (categ_sel in categ_id_list)):           # topic belongs to required filter
+                    data_row={}
+                    data_row['videoid']=curr_id
+                    data_row['username']=topic_uploaded_by
+                    data_row['topic_title'] = topic_title
+                    data_row['tot_playtime'] = tot_playtime
+                    #print(data_row)
+                    play_data.append(data_row)
+                    counter+=1
+                    if(counter==10):
+                        break
+
+            print(play_data)        
+            return JsonResponse({'play_data': play_data}, status=status.HTTP_200_OK, safe=False)         
+
+
+        except Exception as e:
+            print(traceback.format_exc())
+            return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
+
+    return JsonResponse({'message': 'data found'}, status=status.HTTP_200_OK)        
+
+
+
+
+
+
+@api_view(['POST'])
+def get_csv_data(request):
+
+    from django.db.models import Sum
+    from django.db.models import Avg
+    from django.core import serializers
+    import json
+
+    language_index_list = []
+    for each in language_options:
+        language_index_list.append(each[0])
+
+
+    if request.is_ajax():
+        raw_data = json.loads(request.body)
+        try:
+            print(raw_data)
+            metrics_sel = raw_data['metrics_sel']
+            categ_sel = raw_data['categ_sel']
+            slab_sel = raw_data['slab_sel']
+            sdate = raw_data['sdate']
+            edate = raw_data['edate']
+            view_sel = raw_data['view_sel']
+            lang_sel = raw_data['lang_sel']
+
+            graph_data = DashboardMetricsJarvis.objects.exclude(date__gt = edate).filter(Q(metrics = metrics_sel) & Q(date__gte = sdate) & Q(date__lte = edate))
+
+            if(metrics_sel == '4' and (slab_sel in ['0', '1', '2', '9']) and (lang_sel in language_index_list) and (categ_sel)):
+                print("api p1 working fine...")
+                graph_data = graph_data.filter(Q(metrics_language_options = lang_sel) & Q(metrics_slab = slab_sel) & Q(category_id = categ_sel))
+            #print(graph_data.count())
+
+            if metrics_sel in ['2', '5'] and slab_sel:
+                if (metrics_sel == '2' and slab_sel in ['3', '4', '5'])\
+                        or (metrics_sel == '5' and slab_sel in ['6', '7']):
+                            print("api p2 working fine......") 
+                            graph_data = graph_data.filter(metrics_slab = slab_sel)
+
+                    
+
+            if(metrics_sel == '9' and (categ_sel)):
+                print("api p3 working fine....")
+                graph_data = graph_data.filter(Q(metrics_language_options = lang_sel) & Q(category_id = categ_sel))
+
+            if view_sel == 'weekly':
+                x_axis = []
+                y_axis = []
+                week_no = sorted(list(set(list(graph_data.order_by('week_no').values_list('week_no', flat = True)))))
+                for each_week_no in week_no:
+                    x_axis.append(str("week " + str(each_week_no)))
+                    y_axis.append(graph_data.filter(week_no = each_week_no).aggregate(total_count = Sum('count'))['total_count'])
+
+            # elif data_view == 'monthly':
+            elif view_sel == 'monthly':
+                x_axis = []
+                y_axis = []
+                month_no = months_between(sdate, edate)
+                for each_month_no in month_no:
+                    x_axis.append(str(str(month_map[str(each_month_no[0])]) + " " + str(each_month_no[1])))
+                    data1=graph_data.filter(date__month = each_month_no[0]).aggregate(total_count = Sum('count'))['total_count']
+                    if data1:
+                        y_axis.append(data1)
+                    else:
+                        y_axis.append(0)
+
+            elif(view_sel == 'hourly' and metrics_sel == '11'):
+                print("hr is working fine... ")
+                #x_axis = [str(x.date.strftime("%d-%b-%Y:%H")) for x in graph_data]
+                x_axis = []
+                for x in graph_data:
+                    curr_day = "" + str(x.date.strftime("%d-%b-%Y:%H")) + ":00-hr"
+                    curr_day = str(curr_day)
+                    x_axis.append(curr_day)
+
+                #print(x_axis)    
+                y_axis = graph_data.values_list('count', flat = True)
+
+            else:
+                # this is the case where data_view == 'daily'
+                # we need to handle cases were metric is 11
+
+                if(metrics_sel!='11'):
+                    x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
+                    y_axis = graph_data.values_list('count', flat = True)
+                else:
+                    day_data = graph_data.extra({"day": "date_trunc('day', date)"}).values("day").order_by('day').annotate(count=Sum("count"))
+                    x_axis = []
+                    y_axis = []
+                    for item in day_data:
+                        x_axis.append(item['day'].strftime("%d-%b-%Y"))
+                        y_axis.append(item['count'])
+
+            from collections import OrderedDict
+            chart_data = OrderedDict()
+            for i in range(len(x_axis)):
+                chart_data[x_axis[i]] = y_axis[i]
+
+            data_display = [[str(view_sel).upper(), "Frequency"]] + [list(ele) for ele in chart_data.items()]
+            json_dumps_data=json.dumps(data_display)
+
+            #print(json_dumps_data)
+
+            return JsonResponse(json_dumps_data, status = status.HTTP_200_OK, safe=False)
+
+            #return JsonResponse({'message': 'data found'}, status=status.HTTP_200_OK) 
+        except Exception as e:
+            print(traceback.format_exc())
+            return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
+
+    return JsonResponse({'message': 'data found'}, status=status.HTTP_200_OK) 
 
 
 def get_daily_impressions_data(request):
