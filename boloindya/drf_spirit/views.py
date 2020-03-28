@@ -3821,6 +3821,8 @@ def update_mobile_no(request):
         if mobile_no:
             if not request.user.st.mobile_no:
                 UserProfile.objects.filter(user=request.user).update(mobile_no=mobile_no)
+                userprofile = request.user.st
+                add_bolo_score(request.user.id, 'mobile_no_added', userprofile)
                 return JsonResponse({'user':UserSerializer(request.user).data}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 return JsonResponse({'message': 'Mobile No Already Exist in Profile',}, status=status.HTTP_400_BAD_REQUEST)
