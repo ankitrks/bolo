@@ -256,6 +256,7 @@ class ReferralCode(RecordTimeStamp):
     purpose = models.CharField(_("Purpose"), max_length=50, blank=True)
     campaign_url = models.CharField(_("Playstore URL"), max_length=350, blank=True, null = True, editable = False)
     is_active = models.BooleanField(_("live"), default = True)
+    is_refer_earn_code = models.BooleanField(_("Is Refer Earn Code?"), default = False)
 
     def __unicode__(self):
         return str(self.code)
@@ -289,6 +290,24 @@ class ReferralCodeUsed(RecordTimeStamp):
 
     def __unicode__(self):
         return str(self.code)
+
+class UserPhoneBook(RecordTimeStamp):
+    user =  models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("User"), related_name='phonebook',editable=False)
+    contact = models.ManyToManyField('forum_user.Contact', verbose_name=_("Contact"),related_name='%(app_label)s_%(class)s_contact')
+
+    def __unicode__(self):
+        return self.user
+
+class Contact(RecordTimeStamp):
+    contact_name = models.CharField(_("Contact Name"), max_length=100, blank=True, null = True)
+    contact_number = models.CharField(_("Contact Number"), max_length=50, blank=True, null = True)
+    contact_email = models.CharField(_("Contact Email"), max_length=200, blank=True, null = True)
+    is_user_registered = models.BooleanField(default=False)
+    user =  models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("User"),editable=False,null=True,blank=True)
+
+    def __unicode__(self):
+        return self.contact_name
+
 
 
 

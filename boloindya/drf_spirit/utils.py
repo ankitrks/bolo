@@ -368,3 +368,18 @@ def get_paginated_data(data_list,page_size,page=None, offset = None):
 
     return paginated_data,paginator.num_pages
 
+import random
+
+def random_string(length=10):
+    valid_letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
+    return ''.join((random.choice(valid_letters) for i in xrange(length)))
+
+def generate_refer_earn_code():
+    from forum.user.models import ReferralCode
+    my_code = random_string()
+    referal_code = ReferralCode.objects.filter(code__iexact=my_code)
+    if referal_code:
+        my_code = generate_refer_earn_code()
+    return my_code
+
+

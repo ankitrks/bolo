@@ -49,14 +49,14 @@ from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocu
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 from forum.category.models import Category,CategoryViewCounter
 from forum.comment.models import Comment,CommentHistory
-from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs,UserPay,VideoPlaytime
+from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs,UserPay,VideoPlaytime,UserPhoneBook,Contact,ReferralCode
 from jarvis.models import FCMDevice,StateDistrictLanguage
 from forum.topic.models import Topic,TopicHistory, ShareTopic, Like, SocialShare, Notification, CricketMatch, Poll, Choice, Voting, \
     Leaderboard, VBseen, TongueTwister
 from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
 from .serializers import *
-from tasks import vb_create_task,user_ip_to_state_task
+from tasks import vb_create_task,user_ip_to_state_task,sync_contacts_with_user
 from haystack.query import SearchQuerySet, SQ                                      
 # from haystack.inputs import Raw, AutoQuery
 # from haystack.utils import Highlighter
@@ -2079,6 +2079,7 @@ def verify_otp(request):
                     message = 'User created'
                     userprofile = UserProfile.objects.get(user = user)
                     userprofile.mobile_no = mobile_no
+                    Contact.objects.filter(contact_number=mobile_no).update(is_user_registered=True,user=user)
                     if user_ip:
                         user_ip_to_state_task.delay(user.id,user_ip)
                         # url = 'http://ip-api.com/json/'+user_ip
@@ -3795,4 +3796,67 @@ def set_user_email(request):
             return JsonResponse({'message': 'Email not found'}, status=status.HTTP_400_BAD_REQUEST)
     except:
         return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def store_phone_book(request):
+    try:
+        phone_book = request.POST.get('phone_book',None)
+        if phone_book and request.user:
+            phone_book = json.loads(phone_book)
+            user_phonebook, is_created = UserPhoneBook.objects.get_or_create(user=request.user)
+            for each_contact in phone_book:
+                single_conatct, is_craeted = Contact.objects.get_or_create(contact_name=each_contact['name'],contact_number=validate_indian_number(each_contact['phone_no']))
+                user_phonebook.contact.add(single_conatct)
+            sync_contacts_with_user.delay(request.user.id)
+            return JsonResponse({'success': 'phonebook stored'}, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'message': 'Error Occured: phonebook empty not User not found',}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def update_mobile_no(request):
+    try:
+        mobile_no = request.POST.get('mobile_no',None)
+        if mobile_no:
+            if not request.user.st.mobile_no:
+                UserProfile.objects.filter(user=request.user).update(mobile_no=mobile_no)
+                return JsonResponse({'user':UserSerializer(request.user).data}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return JsonResponse({'message': 'Mobile No Already Exist in Profile',}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return JsonResponse({'message': 'Error Occured: mobile_no empty',}, status=status.HTTP_400_BAD_REQUEST)
+
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def get_refer_earn_data(request):
+    try:
+        user_phonebook,is_created = UserPhoneBook.objects.get_or_create(user=request.user)
+        invite_users = user_phonebook.contact.filter(is_user_registered=False)
+        # all_follower = get_redis_following(request.user.id)
+        registerd_user = user_phonebook.contact.filter(is_user_registered=True)#.exclude(user_id__in=all_follower)
+        invite_users_data = ContactSerializer(invite_users, many=True).data
+        registerd_user_data = ContactSerializer(registerd_user, many=True).data
+        try:
+            user_refer_url = ReferralCode.objects.get(for_user= request.user,is_refer_earn_code=True,purpose='refer_n_earn').campaign_url
+        except:
+            from drf_spirit.utils import generate_refer_earn_code
+            user_refer_url = ReferralCode.objects.create(for_user=request.user,code=generate_refer_earn_code(),purpose='refer_n_earn',is_refer_earn_code=True).campaign_url
+        return JsonResponse({'registerd_user':registerd_user_data,'invite_user':invite_users_data,'user_refer_url':user_refer_url}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def get_refer_earn_url(request):
+    try:
+        user_refer_url = ReferralCode.objects.get(for_user= request.user,is_refer_earn_code=True,purpose='refer_n_earn').campaign_url
+    except:
+        from drf_spirit.utils import generate_refer_earn_code
+        user_refer_url = ReferralCode.objects.create(for_user=request.user,code=generate_refer_earn_code(),purpose='refer_n_earn',is_refer_earn_code=True)
+    return JsonResponse({'user_refer_url':user_refer_url}, status=status.HTTP_200_OK)
+
+
+
 

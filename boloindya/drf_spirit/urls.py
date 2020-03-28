@@ -9,7 +9,7 @@ from .views import TopicList, TopicDetails,SearchTopic,SearchUser,replyOnTopic,c
     EncashableDetailList,get_bolo_details, get_category_detail, UserLogStatistics,GetFollowigList,GetFollowerList, get_category_with_video_bytes, get_category_detail_with_views, \
     get_category_video_bytes, get_popular_video_bytes, get_user_follow_and_like_list, get_recent_videos, get_popular_bolo, submit_user_feedback,generate_login_data,get_ip_to_language, get_landing_page_video,\
     mention_suggestion,hashtag_suggestion,SearchHashTag,editComment,get_user_bolo_info,get_search_suggestion,SolrSearchTopic,SolrSearchHashTag,SolrSearchUser,solr_hashtag_suggestion,SolrSearchTop,set_user_email,\
-    get_auth_login_as_user_id
+    get_auth_login_as_user_id,store_phone_book
 
 from rest_framework_simplejwt import views as jwt_views
 from .views import *
@@ -136,6 +136,10 @@ urlpatterns = [
     url(r'^get_user_bolo_info/$',get_user_bolo_info,name='get_user_bolo_info'),
     url(r'^sync/dump/',SyncDump,name='sync_dump'),
     url(r'^hashtag_suggestion/$', hashtag_suggestion, name='hashtag_suggestion'),
+    url(r'^store_phone_book/$', store_phone_book, name='store_phone_book'),
+    url(r'^update_mobile_no/$', update_mobile_no, name='update_mobile_no'),
+    url(r'^get_refer_earn_data/$', get_refer_earn_data, name='get_refer_earn_data'),
+    url(r'^get_refer_earn_url/$', get_refer_earn_url, name='get_refer_earn_url'),
     url(r'^solr/hashtag_suggestion/$', solr_hashtag_suggestion, name='solr_hashtag_suggestion'),
     #url(r'^user/statistics/$', user_statistics, name = 'user_statistics'),          # url for dumping values in user statistics table
 

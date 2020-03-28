@@ -5,6 +5,9 @@ from forum.user.models import Follower
 
 
 def get_redis_follower(user_id):
+    '''
+    It will provede the list of all the user id of users who followed ther user i.e user_id  <--(follow)-- other_user
+    '''
     key = 'follower:'+str(user_id)
     follower_list = get_redis(key)
     if not follower_list:
@@ -28,6 +31,9 @@ def update_redis_follower(user_id,user_follower_id,append):
 
 
 def get_redis_following(user_id):
+    '''
+    It will provede the list of all the user id of users whom are followed by user i.e user_id --(follow)--> other_user
+    '''
     key = 'following:'+str(user_id)
     following_list = get_redis(key)
     if not following_list:
