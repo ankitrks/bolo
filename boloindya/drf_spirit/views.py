@@ -2067,7 +2067,7 @@ def verify_otp(request):
             otp_obj.is_active = False
             otp_obj.used_at = timezone.now()
             if not is_reset_password and not is_for_change_phone:
-		if mobile_no in ['7726080653']:
+                if mobile_no in ['7726080653']:
                     return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
                 userprofile = UserProfile.objects.filter(mobile_no = mobile_no,user__is_active = True)
                 if userprofile:
@@ -3819,18 +3819,41 @@ def update_mobile_no(request):
     try:
         mobile_no = request.POST.get('mobile_no',None)
         if mobile_no:
-            if not request.user.st.mobile_no:
-                UserProfile.objects.filter(user=request.user).update(mobile_no=mobile_no)
-                userprofile = request.user.st
-                add_bolo_score(request.user.id, 'mobile_no_added', userprofile)
-                return JsonResponse({'user':UserSerializer(request.user).data}, status=status.HTTP_400_BAD_REQUEST)
+            instance = SingUpOTP.objects.create(mobile_no=validate_indian_number(mobile_no),otp=generateOTP(6))
+            response, response_status = send_sms(instance.mobile_no, instance.otp)
+            if not response_status:
+                instance.is_active=False
+                instance.save()
+                return JsonResponse({'message': 'Error Occured: sms Api not working'}, status=status.HTTP_400_BAD_REQUEST)
             else:
-                return JsonResponse({'message': 'Mobile No Already Exist in Profile',}, status=status.HTTP_400_BAD_REQUEST)
+                return JsonResponse({'message':'otp send'}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return JsonResponse({'message': 'Error Occured: mobile_no empty',}, status=status.HTTP_400_BAD_REQUEST)
-
+            return JsonResponse({'message': 'Error Occured: mobile_no empty'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def verify_otp_and_update_profile(request):
+    try:
+        mobile_no = validate_indian_number(request.POST.get('mobile_no',None))
+        otp = request.POST.get('otp',None)
+        otp_obj = SingUpOTP.objects.filter(mobile_no=mobile_no,otp=otp,is_active=True).order_by('-id')
+        if otp_obj:
+            otp_obj=otp_obj[0]
+            otp_obj.is_active = False
+            otp_obj.used_at = timezone.now()
+            otp_obj.for_user = request.user
+            otp_obj.save()
+            UserProfile.objects.filter(user=request.user).update(mobile_no=mobile_no)
+            userprofile=request.user.st
+            add_bolo_score(request.user.id, 'mobile_no_added', userprofile)
+            return JsonResponse({'message':'Mobile No updated','user':UserSerializer(request.user).data}, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 @api_view(['POST'])
 def get_refer_earn_data(request):
@@ -3858,6 +3881,21 @@ def get_refer_earn_url(request):
         from drf_spirit.utils import generate_refer_earn_code
         user_refer_url = ReferralCode.objects.create(for_user=request.user,code=generate_refer_earn_code(),purpose='refer_n_earn',is_refer_earn_code=True).campaign_url
     return JsonResponse({'user_refer_url':user_refer_url}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def update_mobile_invited(request):
+    try:
+        user_phonebook,is_created = UserPhoneBook.objects.get_or_create(user=request.user)
+        contact_id = request.POST.get('contact_id',None)
+        if contact_id:
+            invite_users = user_phonebook.contact.filter(pk=contact_id).update(is_invited=True,invited_on=datetime.now())
+            return JsonResponse({'message':'invited'}, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'message': 'conatct_id not found'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 

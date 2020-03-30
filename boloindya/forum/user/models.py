@@ -304,6 +304,8 @@ class Contact(RecordTimeStamp):
     contact_email = models.CharField(_("Contact Email"), max_length=200, blank=True, null = True)
     is_user_registered = models.BooleanField(default=False)
     user =  models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("User"),editable=False,null=True,blank=True)
+    is_invited = models.BooleanField(default=False)
+    invited_on = models.DateTimeField(null=True,blank=True)
 
     def __unicode__(self):
         return self.contact_name
