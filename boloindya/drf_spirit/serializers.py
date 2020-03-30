@@ -689,8 +689,12 @@ class PushNotificationUserSerializer(ModelSerializer):
         return UserOnlySerializer(instance.user).data
 
 class ContactSerializer(ModelSerializer):
+    user = SerializerMethodField()
 
     class Meta:
         model = Contact
         fields = '__all__'
+
+    def get_user(self,instance):
+        return UserSerializer(instance.user).data
 
