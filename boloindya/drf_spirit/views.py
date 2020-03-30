@@ -3856,7 +3856,7 @@ def get_refer_earn_url(request):
         user_refer_url = ReferralCode.objects.get(for_user= request.user,is_refer_earn_code=True,purpose='refer_n_earn').campaign_url
     except:
         from drf_spirit.utils import generate_refer_earn_code
-        user_refer_url = ReferralCode.objects.create(for_user=request.user,code=generate_refer_earn_code(),purpose='refer_n_earn',is_refer_earn_code=True)
+        user_refer_url = ReferralCode.objects.create(for_user=request.user,code=generate_refer_earn_code(),purpose='refer_n_earn',is_refer_earn_code=True).campaign_url
     return JsonResponse({'user_refer_url':user_refer_url}, status=status.HTTP_200_OK)
 
 

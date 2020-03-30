@@ -225,6 +225,7 @@ def create_downloaded_url(topic_id):
             pass
         print e
 
+@app.task
 def sync_contacts_with_user(user_id):
     from forum.user.models import UserProfile,UserPhoneBook,Contact
     user_phonebook = UserPhoneBook.objects.get(user_id=user_id)
