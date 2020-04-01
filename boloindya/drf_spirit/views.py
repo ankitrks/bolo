@@ -3826,7 +3826,7 @@ def update_mobile_no(request):
                 instance.save()
                 return JsonResponse({'message': 'Error Occured: sms Api not working'}, status=status.HTTP_400_BAD_REQUEST)
             else:
-                return JsonResponse({'message':'otp send'}, status=status.HTTP_400_BAD_REQUEST)
+                return JsonResponse({'message':'otp send'}, status=status.HTTP_200_OK)
         else:
             return JsonResponse({'message': 'Error Occured: mobile_no empty'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
