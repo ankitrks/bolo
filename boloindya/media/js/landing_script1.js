@@ -242,7 +242,7 @@ function loaderBoloHide(){
                 checkDataStatus=0;
 
                 var topicLIkes=userLikeAndUnlike.topic_like;
-                  topicLIkes.forEach(function(topicLikeId){debugger;
+                  topicLIkes.forEach(function(topicLikeId){
                     if(topicLikeId){
                       var topicId=topicLikeId;
                       var likeStatus=jQuery('.'+topicId).hasClass('sx_44a25c');
@@ -255,7 +255,7 @@ function loaderBoloHide(){
                     }
 
                   });
-                
+
             },
             error: function(jqXHR, textStatus, errorThrown){
               console.log(textStatus + ": " + jqXHR.status + " " + errorThrown);
@@ -489,7 +489,7 @@ function retryLiveStream(hls, url) {
 
 
 
-    function openVideoInPopup(file,image,indexId){debugger;
+    function openVideoInPopup(file,image,indexId){
         loaderShow();
         var singleItemData=[];
         indexId=indexId-1;
@@ -634,7 +634,7 @@ function retryLiveStream(hls, url) {
         }
     }
 
-    function muteAndUnmutePlayerFeed(videoPlayerId){debugger;
+    function muteAndUnmutePlayerFeed(videoPlayerId){
 
   var playerId="player-"+videoPlayerId;
   var playerId1="#player-"+videoPlayerId;
@@ -812,10 +812,10 @@ function retryLiveStream(hls, url) {
             headers: {
               'Authorization':'Bearer '+accessToken,
             },
-            success: function(response,textStatus, xhr){debugger;
+            success: function(response,textStatus, xhr){
                 userLikeAndUnlike=response;
                 var topicLIkes=userLikeAndUnlike.topic_like;
-                  topicLIkes.forEach(function(topicLikeId){debugger;
+                  topicLIkes.forEach(function(topicLikeId){
                     if(topicLikeId){
                       var topicId=topicLikeId;
                       var likeStatus=jQuery('.'+topicId).hasClass('sx_44a25c');
@@ -932,7 +932,7 @@ function likeUnlikeFeed(topicId){
 
 
 
-// jQuery('#UReactionLink').on('click',function(){debugger;
+// jQuery('#UReactionLink').on('click',function(){
 //     var likeStatus=jQuery('#UReactionLink').hasClass('liked');
 //     if(likeStatus==false){
 //        var loginStatus= check_login_status();

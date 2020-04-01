@@ -155,11 +155,15 @@ jQuery("#boloSideMenu").click(function(e){
       var checClass="";
        checClass=jQuery(".boloSideMenuClass").hasClass('hamburger-menu-active');
         if(checClass){
+            jQuery("#subHeader").removeClass('zindexChange');
             jQuery(".boloSideMenuClass").removeClass('hamburger-menu-active');  
             jQuery(".drawerOpenAndClose").removeClass('drawer-enter drawer-enter-active');
             jQuery(".drawerOpenAndClose").addClass('drawer-exit drawer-exit-active');  
             jQuery(".drawer-enter-done").addClass('hide');
       }else {
+            jQuery("#subHeader").removeClass('zindexChange');
+            jQuery("#subHeader").addClass('zindexChange');
+            
             jQuery(".boloSideMenuClass").addClass('hamburger-menu-active'); 
             jQuery(".boloSideMenuClass").removeClass('drawer-exit drawer-exit-active');
             jQuery(".drawerOpenAndClose").addClass('drawer-enter drawer-enter-active');

@@ -358,6 +358,7 @@
 }
 
  :root {
+    --primary-bg-color:#FFFFF0;
     --primary-color: #000;
     --secondary-color: #ffff;
     --font-color: #000;
@@ -374,6 +375,7 @@
 }
 
 [data-theme="dark"] {
+    --primary-bg-color:#000;
     --primary-color: #fff;
     --secondary-color: #000;
     --font-color: #fff;
@@ -401,8 +403,8 @@
 
 body {
 /*  font-family: "Lato", sans-serif;*/
-  background-color: var(--bg-color);
-  background: var(--bg-color);
+  background-color: var(--primary-bg-color);
+  background: var(--primary-bg-color);
   color: var(--font-color);
   max-width: 100%;
   margin: 0 auto;
@@ -433,7 +435,7 @@ html[pc="yes"] *::-webkit-scrollbar-track {
 
   .main-body ,.header-container,.video-wall,.searchbox-icon,.about-content,.container, .about-article {
 
-    background: var(--secondary-color) !important;
+    background: var(--primary-bg-color) !important;
 
   }
   .main-body h1 {
@@ -749,6 +751,7 @@ input#search-bar:focus:-ms-placeholder {
 }
 }
 
+
 </style>
 
     <div id="__next">
@@ -987,10 +990,11 @@ input#search-bar:focus:-ms-placeholder {
     width: 100%!important;
     position: fixed;
     top: 76px;
-    z-index: 9999;
+    z-index: 9;
     -webkit-box-shadow: 0 -5px 20px 0 hsla(0,0%,50%,.85);
     box-shadow: 0 1px 3px 0 hsla(0,0%,50%,.85);
 }
+
 ._2qRoq {
     padding-right: 10px;
     padding-left: 10px;
