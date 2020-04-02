@@ -12,6 +12,7 @@ from ..core.conf import settings
 from ..core.utils.models import AutoSlugField
 from tinymce.models import HTMLField
 from drf_spirit.utils import language_options,month_choices
+from django.db.models import F,Q
 
 class RecordTimeStamp(models.Model):
     created_at=models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False) # auto_now will add the current time and date whenever field is saved.
@@ -31,7 +32,53 @@ refrence_options = (
     ('1', "facebook"),
 )
 
-class UserProfile(models.Model):
+from django.forms.models import model_to_dict
+
+
+class ModelDiffMixin(object):
+    """
+    A model mixin that tracks model fields' values and provide some useful api
+    to know what fields have been changed.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(ModelDiffMixin, self).__init__(*args, **kwargs)
+        self.__initial = self._dict
+
+    @property
+    def diff(self):
+        d1 = self.__initial
+        d2 = self._dict
+        diffs = [(k, (v, d2[k])) for k, v in d1.items() if v != d2[k]]
+        return dict(diffs)
+
+    @property
+    def has_changed(self):
+        return bool(self.diff)
+
+    @property
+    def changed_fields(self):
+        return self.diff.keys()
+
+    def get_field_diff(self, field_name):
+        """
+        Returns a diff for field if it's changed and None otherwise.
+        """
+        return self.diff.get(field_name, None)
+
+    def save(self, *args, **kwargs):
+        """
+        Saves model and set initial state.
+        """
+        super(ModelDiffMixin, self).save(*args, **kwargs)
+        self.__initial = self._dict
+
+    @property
+    def _dict(self):
+        return model_to_dict(self, fields=[field.name for field in
+                             self._meta.fields])
+
+class UserProfile(models.Model,ModelDiffMixin):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, verbose_name=_("profile"), related_name='st', editable=False)
     slug = models.CharField(_("slug"), max_length=100, db_index=True, blank=True)
     location = models.CharField(_("location"), max_length=75, blank=True)
@@ -110,6 +157,19 @@ class UserProfile(models.Model):
             self.is_moderator = True
 
         super(UserProfile, self).save(*args, **kwargs)
+        if self.has_changed and ('is_popular' in self.changed_fields or 'is_superstar' in self.changed_fields):
+            from drf_spirit.utils import add_bolo_score,reduce_bolo_score
+            if 'is_popular' in self.changed_fields:
+                if self.get_field_diff('is_popular')[1]:
+                    add_bolo_score(self.user_id,'is_popular',self)
+                else:
+                    reduce_bolo_score(self.user_id,'is_popular',self)
+            if 'is_superstar' in self.changed_fields:
+                if self.get_field_diff('is_superstar')[1]:
+                    add_bolo_score(self.user_id,'is_superstar',self)
+                else:
+                    reduce_bolo_score(self.user_id,'is_superstar',self)
+
 
     def get_absolute_url(self):
         return reverse('spirit:user:detail', kwargs={'pk': self.user.pk, 'slug': self.slug})
