@@ -56,12 +56,20 @@ def run():
     print "after: BoloActionHistory delete object no exist",datetime.now()
 
     print "before: BoloActionHistory clean duplicate",datetime.now()
-    for each_bolo in BoloActionHistory.objects.all().order_by('-id'):
-        all_bolo_actions = BoloActionHistory.objects.filter(user=each_bolo.user,action_object_type=each_bolo.action_object_type, action_object_id = each_bolo.action_object_id, action = each_bolo.action ).exclude(pk=each_bolo.id)
-        if all_bolo_actions:
-            print each_bolo.id,'--->',all_bolo_actions.values_list('pk',flat=True)
-            print all_bolo_actions.delete()
+    total_item_to_delete = 0
+    default_batch_size = 10000
+    j=0
+    no_of_elemnts = BoloActionHistory.objects.all().count()
+    while(j*default_batch_size<no_of_elemnts):
+        for each_bolo in BoloActionHistory.objects.all().order_by('-id')[j*default_batch_size:default_batch_size*(j+1)+1]:
+            j+=1
+            all_bolo_actions = BoloActionHistory.objects.filter(user=each_bolo.user,action_object_type=each_bolo.action_object_type, action_object_id = each_bolo.action_object_id, action = each_bolo.action ).exclude(pk=each_bolo.id)
+            if all_bolo_actions:
+                total_item_to_delete+=len(all_bolo_actions)
+                print total_item_to_delete
+                print all_bolo_actions.delete()
     print "after: BoloActionHistory clean duplicate",datetime.now()
+    print total_item_to_delete
 
 
     for each_user in User.objects.filter(st__is_test_user=False):
