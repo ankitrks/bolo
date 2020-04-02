@@ -1,7 +1,7 @@
 
 from django.contrib import admin
 from .models import SingUpOTP, UserJarvisDump, UserFeedback
-from forum.user.models import Weight,UserProfile,AppVersion, UserProfile,AndroidLogs, AppPageContent, ReferralCode, ReferralCodeUsed, VideoPlaytime, VideoCompleteRate, UserAppTimeSpend
+from forum.user.models import Weight,UserProfile,AppVersion, UserProfile,AndroidLogs, AppPageContent, ReferralCode, ReferralCodeUsed, VideoPlaytime, VideoCompleteRate, UserAppTimeSpend,UserPhoneBook,Contact
 from forum.category.models import Category,CategoryViewCounter
 from import_export.admin import ImportExportModelAdmin,ExportMixin
 from import_export import resources
@@ -43,8 +43,8 @@ admin.site.register(UserProfile,UserProfileAdmin)
 
 class ReferralCodeAdmin(admin.ModelAdmin):
 	change_list_template = "admin/forum_user/referralcode/change_list.html"
-	list_display = ('code', 'purpose', 'is_active', 'downloads', 'signup', 'playstore_url', 'no_playstore_url', 'created_at')
-	list_filter = ('code', 'is_active')
+	list_display = ('for_user','code', 'purpose', 'is_active', 'downloads', 'signup', 'playstore_url', 'no_playstore_url', 'created_at')
+	list_filter = ('code', 'is_active','is_refer_earn_code')
 	search_fields = ('code', )
 admin.site.register(ReferralCode, ReferralCodeAdmin)
 
@@ -86,4 +86,6 @@ admin.site.register(UserLogStatistics)
 admin.site.register(VideoPlaytime)
 admin.site.register(VideoCompleteRate)
 admin.site.register(UserAppTimeSpend)
+admin.site.register(UserPhoneBook)
+admin.site.register(Contact)
 

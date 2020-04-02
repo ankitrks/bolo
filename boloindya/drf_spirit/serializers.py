@@ -5,7 +5,7 @@ from forum.topic.models import Topic,CricketMatch,Poll,Choice,Voting,Leaderboard
 from django.contrib.auth.models import User
 from forum.category.models import Category,CategoryViewCounter
 from forum.comment.models import Comment
-from forum.user.models import UserProfile,AppVersion, ReferralCodeUsed, VideoCompleteRate
+from forum.user.models import UserProfile,AppVersion, ReferralCodeUsed, VideoCompleteRate,Contact
 from .relations import PresentableSlugRelatedField
 from .models import SingUpOTP
 from .utils import shortnaturaltime,shortcounterprofile,shorcountertopic
@@ -687,4 +687,14 @@ class PushNotificationUserSerializer(ModelSerializer):
 
     def get_user(self,instance):
         return UserOnlySerializer(instance.user).data
+
+class ContactSerializer(ModelSerializer):
+    user = SerializerMethodField()
+
+    class Meta:
+        model = Contact
+        fields = '__all__'
+
+    def get_user(self,instance):
+        return UserSerializer(instance.user).data
 
