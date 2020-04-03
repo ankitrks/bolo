@@ -3865,7 +3865,7 @@ def verify_otp_and_update_paytm_number(request):
             otp_obj.used_at = timezone.now()
             otp_obj.for_user = request.user
             otp_obj.save()
-            UserProfile.objects.filter(user=request.user).update(paytm_number=paytm_number)
+            UserProfile.objects.filter(user=request.user).update(paytm_number=mobile_no)
             # add_bolo_score(request.user.id, 'mobile_no_added', userprofile)
             return JsonResponse({'message':'Mobile No updated','user':UserSerializer(request.user).data}, status=status.HTTP_200_OK)
         else:
@@ -3885,9 +3885,9 @@ def userprofile_update_paytm_number(request):
 def get_refer_earn_data(request):
     try:
         user_phonebook,is_created = UserPhoneBook.objects.get_or_create(user=request.user)
-        invite_users = user_phonebook.contact.filter(is_user_registered=False)
+        invite_users = user_phonebook.contact.filter(is_user_registered=False).order_by('contact_name')
         # all_follower = get_redis_following(request.user.id)
-        registerd_user = user_phonebook.contact.filter(is_user_registered=True)#.exclude(user_id__in=all_follower)
+        registerd_user = user_phonebook.contact.filter(is_user_registered=True).order_by('contact_name')#.exclude(user_id__in=all_follower)
         paginator_invite_user = PageNumberPagination()
         invite_users = paginator_invite_user.paginate_queryset(invite_users, request)
         invite_users_data = ContactSerializer(invite_users, many=True).data
