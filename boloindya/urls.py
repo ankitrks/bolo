@@ -67,6 +67,7 @@ patterns = [
     url(r'^jarvis/',include('jarvis.urls', namespace='jarvis')),
     url(r'^get-html-content-app/',forum.user.views.getpagecontent,name='get_html_content_app'),
     url(r'^download/$',drf_spirit.views.redirect_to_store,name='download'),
+    url(r'^invite/(?P<slug>[\w-]+)/(?P<user_id>\d+)/$', forum.user.views.referral_link, name='invite'),
     url(r'^careers/$',forum.topic.views.boloindya_careers,name='boloindya_careers'),
     url(r'^careers/openings/$',forum.topic.views.boloindya_openings,name='boloindya_openings'),
     url(r'^careers/openings/(?P<slug>[\w-]+)/$',forum.topic.views.boloindya_opening_details,name='boloindya_opening_details'),

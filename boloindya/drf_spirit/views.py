@@ -3853,6 +3853,26 @@ def verify_otp_and_update_profile(request):
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+def verify_otp_and_update_paytm_number(request):
+    try:
+        mobile_no = validate_indian_number(request.POST.get('mobile_no',None))
+        otp = request.POST.get('otp',None)
+        otp_obj = SingUpOTP.objects.filter(mobile_no=mobile_no,otp=otp,is_active=True).order_by('-id')
+        if otp_obj:
+            otp_obj=otp_obj[0]
+            otp_obj.is_active = False
+            otp_obj.used_at = timezone.now()
+            otp_obj.for_user = request.user
+            otp_obj.save()
+            UserProfile.objects.filter(user=request.user).update(paytm_number=paytm_number)
+            # add_bolo_score(request.user.id, 'mobile_no_added', userprofile)
+            return JsonResponse({'message':'Mobile No updated','user':UserSerializer(request.user).data}, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(['POST'])
@@ -3862,13 +3882,15 @@ def get_refer_earn_data(request):
         invite_users = user_phonebook.contact.filter(is_user_registered=False)
         # all_follower = get_redis_following(request.user.id)
         registerd_user = user_phonebook.contact.filter(is_user_registered=True)#.exclude(user_id__in=all_follower)
+        paginator_invite_user = PageNumberPagination()
+        invite_users = paginator_invite_user.paginate_queryset(invite_users, request)
         invite_users_data = ContactSerializer(invite_users, many=True).data
         registerd_user_data = ContactSerializer(registerd_user, many=True).data
         try:
-            user_refer_url = ReferralCode.objects.get(for_user= request.user,is_refer_earn_code=True,purpose='refer_n_earn').campaign_url
+            user_refer_url = ReferralCode.objects.get(for_user= request.user,is_refer_earn_code=True,purpose='refer_n_earn').referral_url()
         except:
             from drf_spirit.utils import generate_refer_earn_code
-            user_refer_url = ReferralCode.objects.create(for_user=request.user,code=generate_refer_earn_code(),purpose='refer_n_earn',is_refer_earn_code=True).campaign_url
+            user_refer_url = ReferralCode.objects.create(for_user=request.user,code=generate_refer_earn_code(),purpose='refer_n_earn',is_refer_earn_code=True).referral_url()
         return JsonResponse({'registerd_user':registerd_user_data,'invite_user':invite_users_data,'user_refer_url':user_refer_url}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
@@ -3876,10 +3898,10 @@ def get_refer_earn_data(request):
 @api_view(['POST'])
 def get_refer_earn_url(request):
     try:
-        user_refer_url = ReferralCode.objects.get(for_user= request.user,is_refer_earn_code=True,purpose='refer_n_earn').campaign_url
+        user_refer_url = ReferralCode.objects.get(for_user= request.user,is_refer_earn_code=True,purpose='refer_n_earn').referral_url()
     except:
         from drf_spirit.utils import generate_refer_earn_code
-        user_refer_url = ReferralCode.objects.create(for_user=request.user,code=generate_refer_earn_code(),purpose='refer_n_earn',is_refer_earn_code=True).campaign_url
+        user_refer_url = ReferralCode.objects.create(for_user=request.user,code=generate_refer_earn_code(),purpose='refer_n_earn',is_refer_earn_code=True).referral_url()
     return JsonResponse({'user_refer_url':user_refer_url}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])

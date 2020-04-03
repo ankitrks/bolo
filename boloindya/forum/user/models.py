@@ -95,6 +95,7 @@ class UserProfile(models.Model):
     total_time_spent = models.PositiveIntegerField(null=True,blank=True,default=0,db_index=True)
     state_name = models.CharField(_('State Name'),max_length=200,null=True,blank=True)
     city_name = models.CharField(_('City Name'),max_length=200,null=True,blank=True)
+    paytm_number = models.CharField(_("Mobile No"), max_length=100, blank = True, null = True)
 
     # end #
 
@@ -278,6 +279,9 @@ class ReferralCode(RecordTimeStamp):
 
     def signup(self):
         return ReferralCodeUsed.objects.filter(code = self, is_download = True, by_user__isnull = False).count()
+
+    def referral_url(self):
+        return 'https://www.boloindya.com/invite/'+self.for_user.username+'/'+str(self.for_user.id)+'/'
 
 class ReferralCodeUsed(RecordTimeStamp):
     code = models.ForeignKey(ReferralCode, blank=False, null = False)

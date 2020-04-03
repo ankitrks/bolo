@@ -130,6 +130,7 @@ urlpatterns = [
     url(r'^get_refer_earn_data/$', get_refer_earn_data, name='get_refer_earn_data'),
     url(r'^get_refer_earn_url/$', get_refer_earn_url, name='get_refer_earn_url'),
     url(r'^verify_otp_and_update_profile/$', verify_otp_and_update_profile, name='verify_otp_and_update_profile'),
+    url(r'^verify_otp_and_update_paytm_number/$', verify_otp_and_update_paytm_number, name='verify_otp_and_update_paytm_number'),
     url(r'^update_mobile_invited/$', update_mobile_invited, name='update_mobile_invited'),
     url(r'^solr/hashtag_suggestion/$', solr_hashtag_suggestion, name='solr_hashtag_suggestion'),
     #url(r'^user/statistics/$', user_statistics, name = 'user_statistics'),          # url for dumping values in user statistics table
