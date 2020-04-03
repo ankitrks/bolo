@@ -238,4 +238,14 @@ def getpagecontent(request):
         return JsonResponse({'message' : 'success','description' : app_page_object.page_description})
     except Exception as e:
         return JsonResponse({'message' : 'fail','error':str(e)})
+
+@csrf_exempt
+def referral_link(request,slug,user_id):
+    if user_id:
+        referral_code  =ReferralCode.objects.get(for_user_id=user_id,purpose='refer_n_earn',is_refer_earn_code=True)
+        context={'referral_code':referral_code,'userprofile':referral_code.for_user.st,'user':referral_code.for_user}
+        return render(request, 'spirit/user/_referral_redirect.html', context)
+    else:
+        return HttpResponseRedirect('https://play.google.com/store/apps/details?id=com.boloindya.boloindya')
+
     

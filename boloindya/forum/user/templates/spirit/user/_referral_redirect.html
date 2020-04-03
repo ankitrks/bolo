@@ -1,0 +1,77 @@
+{% load spirit_tags i18n %}
+{% load static from staticfiles %}
+<!doctype html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="google" content="notranslate">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1" class="next-head">
+    <meta name="robots" content="index, follow" class="next-head">
+
+
+    <meta name="applicable-device" content="pc,mobile" class="next-head">
+    <link rel="canonical" href="{{site_base_url}}" class="next-head">
+
+    <link rel="stylesheet" type="text/css" href="/media/css/common.css">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>{{userprofile.name}} has invited you to join BoloIndya</title>
+    <meta name="description" content="Join {{userprofile.name}} with a million people to discover Knoweledge Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India" />
+    <meta name="description" content="Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India" />
+    <meta name="keywords" content="Hindi Videos, Hindi Content Platform, Local Languages Content, Love Questions, Sex Questions, Relationship Questions, Life questions, English Videos, Questions and Answers, GK Answers, Politics Discussion, Entertainment, Tamil Videos, Tamil Questions, Tamil Answers, Telugu Questions, Telugu Answers, Exams, UPSC Videos, UPSC Questions, Kannada Questions, Kannada Videos, Punjabi Videos, Punjabi Questions, Gujarati Questions, Gujarati Videos, bengali questions, bengali videos" /> 
+    <link rel="canonical" href="{{site_absolute_url}}{{ request.get_full_path }}" />      
+    <link rel="image_src" href="{{topic.question_image}}"/>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta data-react-helmet="true" name="twitter:image" content="/media/img/favicon.ico"/>
+    <meta data-react-helmet="true" property="og:image" content="/media/img/favicon.ico"/>
+
+    <!-- Schema.org markup for Google+ -->
+    <meta itemprop="name" content="{{userprofile.name}} has invited you to join BoloIndya">
+    <meta itemprop="description" content="Join {{userprofile.name}} with a million people to discover Knoweledge Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India">
+    <meta itemprop="image" content="{% if userprofile.profile_pic %}{{ userprofile.profile_pic }}{% else %}https://www.boloindya.com/media/img/favicon.ico{% endif %}">
+
+    <!-- Twitter Card data -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BoloIndya">
+    <meta name="twitter:title" content="{{userprofile.name}} has invited you to join BoloIndya">
+    <meta name="twitter:description" content="Join {{userprofile.name}} with a million people to discover Knoweledge Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India">
+    <meta name="twitter:creator" content="@BoloIndya">
+    <!-- Twitter summary card with large image must be at least 280x150px -->
+    <meta name="twitter:image:src" content="{% if userprofile.profile_pic %}{{ userprofile.profile_pic }}{% else %}https://www.boloindya.com/media/img/favicon.ico{% endif %}">
+
+    <!-- Open Graph data -->
+    <meta property="og:title" content="{{userprofile.name}} has invited you to join BoloIndya" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="{{site_absolute_url}}{{ request.get_full_path }}" />
+    <meta property="og:image" content="{% if userprofile.profile_pic %}{{ userprofile.profile_pic }}{% else %}https://www.boloindya.com/media/img/favicon.ico{% endif %}" />
+    <meta property="og:description" content="Join {{userprofile.name}} with a million people to discover Knoweledge Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India" />
+    <meta property="og:site_name" content="BoloIndya" />
+    <meta property="article:tag" content="Hindi Videos, Hindi Content Platform, Local Languages Content, Love Questions, Sex Questions, Relationship Questions, Life questions, English Videos, Questions and Answers, GK Answers, Politics Discussion, Entertainment, Tamil Videos, Tamil Questions, Tamil Answers, Telugu Questions, Telugu Answers, Exams, UPSC Videos, UPSC Questions, Kannada Questions, Kannada Videos, Punjabi Videos, Punjabi Questions, Gujarati Questions, Gujarati Videos, bengali questions, bengali videos" />
+    {% block head-extra %}{% endblock %}
+
+    <!--[if (lt IE 9) & (!IEMobile)]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/selectivizr/1.0.2/selectivizr-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.6/html5shiv.min.js"></script>
+    <![endif]-->
+    <script type = "text/javascript">
+         <!--
+            function Redirect() {
+               window.location = "{{ referral_code.campaign_url }}";
+            }            
+            Redirect()
+         //-->
+      </script>
+
+  </head>
+
+  <body style="margin-left:0px; margin-right: 0px;max-width:100%;">
+
+  </body>
+
+</html>
