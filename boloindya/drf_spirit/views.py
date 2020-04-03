@@ -3873,7 +3873,13 @@ def verify_otp_and_update_paytm_number(request):
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
 
-
+@api_view(['POST'])
+def userprofile_update_paytm_number(request):
+    try:
+        UserProfile.objects.filter(user=request.user).update(paytm_number=request.user.st.mobile_no)
+        return JsonResponse({'message':'Success','user':UserSerializer(request.user).data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def get_refer_earn_data(request):
