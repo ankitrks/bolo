@@ -62,7 +62,7 @@
     <script type = "text/javascript">
          <!--
             function Redirect() {
-               window.location = "{{ referral_code.campaign_url }}";
+               window.location = "{{ referral_code.campaign_url|safe }}";
             }            
             Redirect()
          //-->
