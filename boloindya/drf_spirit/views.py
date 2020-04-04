@@ -3889,6 +3889,8 @@ def get_refer_earn_data(request):
         # all_follower = get_redis_following(request.user.id)
         registerd_user = user_phonebook.contact.filter(is_user_registered=True).order_by('contact_name')#.exclude(user_id__in=all_follower)
         paginator_invite_user = PageNumberPagination()
+        page_size = request.GET.get('page_size', 100)
+        paginator_invite_user.page_size = page_size
         invite_users = paginator_invite_user.paginate_queryset(invite_users, request)
         invite_users_data = ContactSerializer(invite_users, many=True).data
         registerd_user_data = ContactSerializer(registerd_user, many=True).data
