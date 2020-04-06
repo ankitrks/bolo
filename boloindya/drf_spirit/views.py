@@ -1941,18 +1941,29 @@ class SingUpOTPView(generics.CreateAPIView):
     """
 
     def perform_create(self, serializer):
-        serializer.validated_data['mobile_no'] = validate_indian_number(serializer.validated_data['mobile_no'])
-        instance        = serializer.save()
-        instance.otp    = generateOTP(6)
-        response, response_status   = send_sms(instance.mobile_no, instance.otp)
-        instance.api_response_dump  = response
+        old_otp = SingUpOTP.objects.filter(mobile_no=validate_indian_number(serializer.validated_data['mobile_no']).strip(),created_at__gte=datetime.now()-timedelta(hours=2)).order_by('-id')
+        if old_otp:
+            instance=old_otp[0]
+            response, response_status   = send_sms(instance.mobile_no, instance.otp)
+            instance.api_response_dump  = response
+            instance.save()
+        else:
+            serializer.validated_data['mobile_no'] = validate_indian_number(serializer.validated_data['mobile_no']).strip()
+            instance        = serializer.save()
+            instance.otp    = generateOTP(6)
+            instance.save()
+            response, response_status   = send_sms(instance.mobile_no, instance.otp)
+            instance.api_response_dump  = response
+            instance.save()
+        # response, response_status   = send_sms(instance.mobile_no, instance.otp)
+        # instance.api_response_dump  = response
         if self.request.POST.get('is_reset_password') and self.request.POST.get('is_reset_password') == '1':
             instance.is_reset_password = True
         if self.request.POST.get('is_for_change_phone') and self.request.POST.get('is_for_change_phone') == '1':
             instance.is_for_change_phone = True
-        if not response_status:
-            instance.is_active = False
-        instance.save()
+        # if not response_status:
+        #     instance.is_active = False
+        # instance.save()
         if not response_status:
             return JsonResponse({'message': 'OTP could not be sent'}, status=status.HTTP_417_EXPECTATION_FAILED)
         return JsonResponse({'message': 'OTP sent'}, status=status.HTTP_200_OK)
@@ -2039,7 +2050,7 @@ def verify_otp(request):
         request.POST.get('is_reset_password')
         request.POST.get('is_for_change_phone')
     """
-    mobile_no = validate_indian_number(request.POST.get('mobile_no', None))
+    mobile_no = validate_indian_number(request.POST.get('mobile_no', None)).strip()
     language = request.POST.get('language',None)
     otp = request.POST.get('otp', None)
     is_geo_location = request.POST.get('is_geo_location',None)
@@ -2057,16 +2068,19 @@ def verify_otp(request):
 
     if mobile_no and otp:
         try:
-            exclude_dict = {'is_active' : True, 'is_reset_password' : is_reset_password,"mobile_no":mobile_no, "otp":otp}
+            # exclude_dict = {'is_active' : True, 'is_reset_password' : is_reset_password,"mobile_no":mobile_no, "otp":otp}
+            exclude_dict = {'is_reset_password' : is_reset_password,"mobile_no":mobile_no, "otp":otp,"created_at__gte":datetime.now()-timedelta(hours=2)}
             if is_for_change_phone:
-                exclude_dict = {'is_active' : True, 'is_for_change_phone' : is_for_change_phone,"mobile_no":mobile_no, "otp":otp}
+                # exclude_dict = {'is_active' : True, 'is_for_change_phone' : is_for_change_phone,"mobile_no":mobile_no, "otp":otp}
+                exclude_dict = {'is_for_change_phone' : is_for_change_phone,"mobile_no":mobile_no, "otp":otp,"created_at__gte":datetime.now()-timedelta(hours=2)}
 
             otp_obj = SingUpOTP.objects.filter(**exclude_dict).order_by('-id')
-            if otp_obj:
-                otp_obj=otp_obj[0]
-            otp_obj.is_active = False
-            otp_obj.used_at = timezone.now()
-            if not is_reset_password and not is_for_change_phone:
+            # if otp_obj:
+            #     otp_obj=otp_obj[0]
+            # otp_obj.is_active = False
+            # otp_obj.used_at = timezone.now()
+            otp_obj.update(used_at = timezone.now())
+            if not is_reset_password and not is_for_change_phone and otp_obj:
                 if mobile_no in ['7726080653']:
                     return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
                 userprofile = UserProfile.objects.filter(mobile_no = mobile_no,user__is_active = True)
@@ -2100,8 +2114,9 @@ def verify_otp(request):
                         default_follow = deafult_boloindya_follow(user,str(language))
                     add_bolo_score(user.id, 'initial_signup', userprofile)
                 user_tokens = get_tokens_for_user(user)
-                otp_obj.for_user = user
-                otp_obj.save()
+                otp_obj.update(for_user = user)
+                # otp_obj.for_user = user
+                # otp_obj.save()
                 return JsonResponse({'message': message, 'username' : mobile_no, \
                         'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
             otp_obj.save()
