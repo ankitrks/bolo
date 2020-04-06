@@ -357,6 +357,7 @@
 }
 
  :root {
+    --primary-bg-color:#FFFFF0;
     --primary-color: #000;
     --secondary-color: #ffff;
     --font-color: #000;
@@ -373,6 +374,7 @@
 }
 
 [data-theme="dark"] {
+    --primary-bg-color:#000;
     --primary-color: #fff;
     --secondary-color: #000;
     --font-color: #fff;
@@ -396,6 +398,9 @@ body {
   max-width: 100%;
   margin: 0 auto;
   font-size: calc(1rem + 0.25vh);
+}
+.menu-item-link a{
+  color: var(--primary-color)
 }
 
 html[pc="yes"] *::-webkit-scrollbar {
@@ -422,7 +427,7 @@ html[pc="yes"] *::-webkit-scrollbar-track {
 
   .main-body ,.header-container,.video-wall,.searchbox-icon,.about-content,.container, .about-article {
 
-    background: var(--secondary-color) !important;
+    background: var(--primary-bg-color) !important;
 
   }
   .main-body h1 {
@@ -456,7 +461,7 @@ html[pc="yes"] *::-webkit-scrollbar-track {
     color: #000;
   }
   .bottomHeaing h2{
-    color: #fff;
+    color: var(--font-color);
     margin-top: 30px;
   }
 
@@ -582,6 +587,63 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+}
+.watchNow{
+  background: #fe2c55;
+    height: 44px;
+    line-height: 44px;
+    padding: 0 10px;
+    min-width: 65px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-align-items: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    border-radius: 2px;
+}
+.menu-wrapper.jsx-3143951235 .watchNow{
+    background: #b62927;
+    height: 44px;
+    line-height: 44px;
+    padding: 0 10px;
+    min-width: 65px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-align-items: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    border-radius: 2px;
+    color: #fff;
+}
+.watchNow::before {
+  content: '';
+  display: inline-block;
+  height: 20px;
+  margin: 0 6px -3px -8px;
+  min-width: 20px;
+  position: relative;
+  top: -2px;
+  width: 18px;
+  background-image: url(/media/iJGOBKN9vqK.png);
+  background-repeat: no-repeat;
+  background-size: auto;
+  background-position: -39px -358px;
+}
+
 
 
 </style>
@@ -631,17 +693,17 @@ input:checked + .slider:before {
         <div class="jsx-639186511 ">
             <div class="jsx-3563400267 header-container">
                 <div class="jsx-3563400267 header-content">
-                  <h3 class="jsx-475503780 logo-container">
+<!--                   <h3 class="jsx-475503780 logo-container">
                     <a href="">Signup</a>
-                  </h3>
-<!--                     <h1 class="jsx-475503780 logo-container">
+                  </h3> -->
+                    <h1 class="jsx-475503780 logo-container">
                       <a title="boloindya" class="jsx-475503780" href="{{site_base_url}}">
-                        <img id="boloindyaLogoId" src="/media/boloindya_new_logo_main.png" alt="boloindya" class="jsx-475503780 logo-text">
+                        <img id="boloindyaLogoId" src="/media/boloindya_new_logo.png" alt="boloindya" class="jsx-475503780 logo-text">
                         <strong class="jsx-475503780">boloindya</strong>
                       </a>
-                    </h1> -->
+                    </h1>
                           <ul class="jsx-3143951235 menu-wrapper" >
-                                <li class="hideOnMobile">
+<!--                                 <li class="hideOnMobile">
                                     <div class="_4kny _50tm">
                                     <form class="searchbox" action="/{{LANGUAGE_CODE}}/search/" method="get">
                                         <input type="search" placeholder="Search......" value="{{search_term}}"  autocomplete="off" name="term" class="searchbox-input" onkeyup="buttonUp();" required>
@@ -649,44 +711,26 @@ input:checked + .slider:before {
                                         <span class="searchbox-icon"></span>
                                     </form>
 
-<!--                                         <div class="_585-" aria-label="Facebook" role="search" data-testid="facebar_root" id="js_19">
-                                            <form action="/{{LANGUAGE_CODE}}/search/" method="get">
-                                                <button value="1" class="_42ft _4jy0 _4w98 _4jy3 _517h _51sy _4w97" aria-label="Search" tabindex="-1" data-testid="facebar_search_button" type="submit"><i class="_585_"></i></button>
-                                                <div class="uiTypeahead _5860"  id="u_q_1">
-                                                    <div class="wrap">
-  
-                                                        <div class="innerWrap">
-                                                            <div class="_5861 navigationFocus textInput _5eaz" id="u_q_2">
-                                                                <input type="text" class="_1frb" name="term" autocomplete="off" placeholder="Search" value="{{search_term}}"  >
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        </div> -->
                                     </div>
+                                </li> -->
 
-
-<!--                                <form action="/{{LANGUAGE_CODE}}/search/" method="GET">
-                                    <div class="search-container">
-
-                                      <input type="text" class="searchText" name="term" value="{{search_term}}" placeholder="Search..">
-
-                                      <button class="searchBox" type="button" style="display: none;">Search</button>
-                                    </div>
-                                    </form> -->
-                                </li>
-
-<!--                                 <li class="jsx-3143951235">
+                                <li class="jsx-3143951235">
                                   <h2 class="menu-item-link menu-item-link-active"><a href="{{site_base_url}}" class="jsx-2922828392">{% trans "Home" %}</a></h2></li>
                                 <li class="jsx-3143951235">
-                                  <h2 class="menu-item-link hideOnMobile"><a href="{{site_base_url}}about/" class="jsx-2922828392">{% trans "About" %}</a></h2></li> -->
-<!--                                 <li class="jsx-3143951235">
-                                  <h2 class="menu-item-link"><a href="/discover/" class="jsx-2922828392">{% trans "Discover" %}</a></h2>
-                                </li>  -->
-<!--                                 <li class="jsx-3143951235" style="">
-                                  <h2 class="menu-item-link" style="margin-top: 25px;"><a href="https://play.google.com/store/apps/details?id=com.boloindya.boloindya&amp;hl=en_IN" target="_blank" rel="nofollow" class="jsx-3336228099"><img style="height: 30px;" src="//sf-tb-sg.ibytedtos.com/obj/ttfe-malisg/store-badge/google/en.png" alt="google-store" class="jsx-3336228099"></a></h2>
-                                </li> -->
+                                  <h2 class="menu-item-link hideOnMobile"><a href="{{site_base_url}}about/" class="jsx-2922828392">{% trans "About" %}</a></h2></li>
+                                <li class="jsx-3143951235">
+                                  <h2 class="menu-item-link hideOnMobile"><a href="{{site_base_url}}about/" class="jsx-2922828392">{% trans "Team" %}</a></h2></li>
+
+                                <li class="jsx-3143951235">
+                                  <h2 class="menu-item-link hideOnMobile"><a href="{{site_base_url}}about/" class="jsx-2922828392">{% trans "Careers" %}</a></h2></li>
+                                <li class="jsx-3143951235">
+                                  <h2 class="menu-item-link hideOnMobile"><a href="/login/" class="jsx-2922828392">{% trans "Signin" %}</a></h2></li>
+
+
+                                <li class="jsx-3143951235">
+                                  <h2 class="menu-item-link "><a href="/discover/" class="jsx-2922828392 watchNow">{% trans "Watch now" %}</a></h2>
+                                </li> 
+
                                 <li class="jsx-3143951235" id="boloSideMenu">
 
                                     <span class="bolo-642826668 boloSideMenuClass hamburger-menu">

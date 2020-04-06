@@ -592,7 +592,7 @@ def user_timeline(request):
         return redirect('/')
 
 def boloindya_careers(request):
-    return render(request, 'spirit/topic/boloindya_careers.html')
+    return render(request, 'spirit/topic/boloindya_career_old.html')
 
 def boloindya_team_details(request):
     return render(request, 'spirit/topic/boloindya_team.html')

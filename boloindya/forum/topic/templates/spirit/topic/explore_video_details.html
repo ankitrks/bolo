@@ -1546,6 +1546,20 @@ content: '';
 ._video_card_big_comment_item_time{
     border-bottom: 1px solid #ccc;
 }
+@media(max-width: 991px){
+    .feedlist-item{
+        margin-top: 81px;
+    }
+
+.videoCentered {
+    height: fit-content !important;
+        
+}
+.video-card{
+    min-height: 300px;
+}
+
+}
 </style>
 <input type="hidden" name="singleTopicId" id="singleTopicId" value="{{topic.id}}">
 <input type="hidden" name="topicSlug" id="singleTopicSlug" value="{{topic.slug}}">
@@ -1555,77 +1569,8 @@ content: '';
 <input type="hidden" name="postTitle" id="postTitleId" value="{{topic.title | striptags}}">
 
 <div class="jsx-639186511 page-with-header main-body">
-
-    <div class="jsx-1270455008 container hideOnDesktop" >
-        <div style="height:calc(100% - 30px)" class="jsx-1270455008 main jsx-342698747 ">
-            <div class="jsx-3164575034 home">
-                <div class="jsx-1270455008 top-banner mobileDownPopup hide">
-                    <div class="jsx-1270455008"><p class="jsx-1270455008">Boloindya</p><p class="jsx-1270455008">{% blocktrans %} {{Download}} the app to {{like}} this {{video}} {% endblocktrans %}</p></div><div class="jsx-1270455008"><button onclick="downloadAppLink()" class="jsx-1270455008 jsx-download-app">{% trans "Get" %}</button></div>
-                </div>
-                <div class="jsx-3164575034 loading">
-                    <div class="jsx-4077079786 boloindya-loading"></div>
-                </div>
-                <div class="swiper-container swiper-container-initialized swiper-container-vertical swiper-container-ios">
-                    <div class="swiper-wrapper" style="transform: translate3d(0px, 0px, 0px);">
-                        <div data-index="0" class="swiper-slide player swiper-slide-active" style="height: 100%;">
-                            <div style="position: relative; width: 100vw;height: 100% ">
-
-                            <div class="jsx-3077367275 video-card default">
-
-                                <div id="jwBoxPlayAndStop" style="height: 100%">
-                                    <!-- <div id="playerDetailsMobile"></div> -->
-                                    <video id="playerDetailsMobile" class="videoCentered mobilePlayerHeight" disableremoteplayback></video>
-                                </div>
-
-                                <div class="jsx-3077367275 video-card-mask"></div>
-                                <div class="jsx-4030482358 theme videoPlayButtonDetails"></div>
-                                <span class="jsx-3077367275 event-delegate-mask event-delegate-maskMob"></span>
-
-                                <span class="_video_card_"></span><img onclick="muteAndUnmutePlayerDet('playerDetailsMobile');" class="jsx-3077367275 mute-icon" id="mutedImageIdDe"  src="/media/mute_icon.svg">
-                            </div>
-
-                           </div>
-                            <div class="sidebar">
-
-                                <div class="jsx-2177493926 jsx-3813273378 avatar round" style="background-image: url({% if user_profile.profile_pic|length > 1 %}
-                                {{user_profile.profile_pic}}
-                            {% else %}
-                                /media/user.svg
-                            {% endif %}); width: 48px; height: 48px; flex: 0 0 48px;"></div>
-                                <div class="jsx-949708032 boloindya-toolbar" style="margin-top: 20px;">
-                                    <div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-like " onclick="openMobileDownloadPopup();" style="background-image: url(/media/viewIcon.svg);"><span class="jsx-949708032">{{topic.view_count | shorcountertopic}}</span></div>
-                                    <div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-comment" onclick="openMobileDownloadPopup();" style="background-image: url(/media/comments.svg);"><span class="jsx-949708032">{{topic.comment_count | shorcountertopic}}</span></div>
-                                    <div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-share " onclick="openShareTab()" style="background-image: url(/media/share.svg);"><span class="jsx-949708032">{{topic.share_count | shorcountertopic}}</span></div>
-                                </div>
-                            </div>
-                            
-                            <div class="jsx-295561999 boloindya-bottom bottom" style="display: none;">
-                                <div class="jsx-295561999 boloindya-bottom-left">
-                                    <div class="jsx-295561999 boloindya-bottom-text bottom-name">{{user_profile.user.username}}</div>
-                                    <div class="jsx-295561999 music-icon"></div>
-                                </div>
-                                <div class="jsx-295561999 boloindya-bottom-right album-item play" style="background-image: url(/media/Userplay.svg);"><img src="/media/1647897074966561.jpeg" class="jsx-295561999"></div>
-                            </div>
-                        </div>
-
-                    </div>
-                    <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>
-                </div>
-
-            </div>
-        </div>
-        <div class="jsx-1270455008 footer1">
-            <a href="/"><div class="jsx-1270455008" style="background-image: url(/media/footerIcon1.svg);"></div></a>
-            <a href="/{{LANGUAGE_CODE}}/discover/">
-            <div class="jsx-1270455008" style="background-image: url(/media/footerIcon2.svg);"></div></a>
-            <div class="jsx-1270455008 " onclick="openMobileDownloadPopup();" style="background-image: url(/media/footer_icon3.svg);"></div>
-            <div class="jsx-1270455008" onclick="openMobileDownloadPopup();" style="background-image: url(/media/footerIcon4.svg);"></div>
-            <div class="jsx-1270455008" onclick="openMobileDownloadPopup();"  style="background-image: url(/media/footerIcon5.svg);"></div>
-        </div>
-    </div>
-
 <main class="feedlist-container" id="playlist" style="min-height: 400px;">
-    
+
 <div class="feedlist-item">
     <header class="user-info"><img src="{% if user_profile.profile_pic|length > 1 %}
                                 {{user_profile.profile_pic}}
@@ -1637,9 +1582,13 @@ content: '';
                                        {{user_profile.name}}
                                     {% else %}
                                        {{user_profile.user.username}}
-                                    {% endif %}</div>
-          <div class="description"></div>
+                                    {% endif %}     </div>
+
+          <div class="description">
+<!--               <div class=""><svg viewBox="0 0 24 24" class="Fill(cc)"><path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20v-2z"></path></svg></div> -->
+          </div>
       </div>
+
     </header>
     <div class="title">{{topic.title|safe}}</div>
     <div style="text-align: center;" class="jsx-3077367275 video-card">
