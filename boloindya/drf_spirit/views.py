@@ -3821,7 +3821,7 @@ def store_phone_book(request):
             user_phonebook, is_created = UserPhoneBook.objects.get_or_create(user=request.user)
             all_user_contact = list(user_phonebook.contact.all().values('contact_name','contact_number'))
             for each_contact in phone_book:
-                temp ={'contact_name':each_contact['name'],'contact_number':each_contact['phone_no']}
+                temp ={'contact_name':each_contact['name'],'contact_number':validate_indian_number(each_contact['phone_no'])}
                 if not temp in all_user_contact:
                     single_conatct = Contact.objects.create(contact_name=each_contact['name'],contact_number=validate_indian_number(each_contact['phone_no']))
                     user_phonebook.contact.add(single_conatct)
