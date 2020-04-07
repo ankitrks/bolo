@@ -3837,14 +3837,18 @@ def update_mobile_no(request):
     try:
         mobile_no = request.POST.get('mobile_no',None)
         if mobile_no:
-            instance = SingUpOTP.objects.create(mobile_no=validate_indian_number(mobile_no),otp=generateOTP(6))
-            response, response_status = send_sms(instance.mobile_no, instance.otp)
-            if not response_status:
-                instance.is_active=False
-                instance.save()
-                return JsonResponse({'message': 'Error Occured: sms Api not working'}, status=status.HTTP_400_BAD_REQUEST)
-            else:
+            old_otp = SingUpOTP.objects.filter(mobile_no=validate_indian_number(mobile_no).strip(),created_at__gte=datetime.now()-timedelta(minutes=5)).order_by('-id')
+            if old_otp:
                 return JsonResponse({'message':'otp send'}, status=status.HTTP_200_OK)
+            else:
+                instance = SingUpOTP.objects.create(mobile_no=validate_indian_number(mobile_no).strip(),otp=generateOTP(6))
+                response, response_status = send_sms(instance.mobile_no, instance.otp)
+                if not response_status:
+                    instance.is_active=False
+                    instance.save()
+                    return JsonResponse({'message': 'Error Occured: sms Api not working'}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    return JsonResponse({'message':'otp send'}, status=status.HTTP_200_OK)
         else:
             return JsonResponse({'message': 'Error Occured: mobile_no empty'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
