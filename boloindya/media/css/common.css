@@ -521,13 +521,18 @@
             bottom: 0;
             width: 376px;
             text-align: center;
-            background-color: #ffffff;
+            background-color: #fffff0;
+            /*background-color: #ffffff;*/
             padding: 87px 0;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             box-sizing: border-box;
             line-height: 32px;
             z-index: 9;
+        }
+
+        .zindexChange{
+          z-index: 0 !important;
         }
         
         .is-rtl .drawer-content {
@@ -4680,4 +4685,7 @@ strong {
     display: inline-block;
     height: 16px;
     width: 16px;
+}
+.feedlist-item .user-info .name{
+  font-weight: 600;
 }

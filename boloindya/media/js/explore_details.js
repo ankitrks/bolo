@@ -13,7 +13,7 @@ function loaderBoloHideDynamicDe(classLoader){
 
 jQuery(document).ready(function(){
     listCommentsById();
-    getElementsByPage(1);
+    //getElementsByPage(1);
 });
 
 function getElementsByPage(currentPage){
@@ -97,7 +97,10 @@ function getElementsByPage(currentPage){
 // }
 var isLoading = false;
 var hideErrorMsg = true;
-var video = document.getElementById('playerDetails');
+
+
+var singleTopicId = $("#singleTopicId").val();
+var video = document.getElementById('player-'+singleTopicId);
 var retryCount=0;
 
 const config = {
@@ -487,18 +490,18 @@ function VideoPlayByURLMobile(file,image){
 
 jQuery('#UCommentLink').on('click',function(){
     var commentBoxInputStatus=jQuery('#commentInputId').hasClass('hide');
+    var singleTopicId = $("#singleTopicId").val();
+    var videoId = "player-"+singleTopicId;
+    var video = document.getElementById('videoId');
     if(commentBoxInputStatus==true){
       $("#comment-input").val("");
        var loginStatus= check_login_status();
        if(loginStatus==false){
-        if( jwplayer('playerDetails').getState() == "playing"){
-            jwplayer('playerDetails').pause();
-        } 
-        if(!video.paused) {
-          video.pause();
-          $('.videoPlayButtonDetails').removeClass('play-button');
-          $('.videoPlayButtonDetails').addClass('play-button');
-        }
+        // if(!video.paused) {
+        //   video.pause();
+        //   $('.videoPlayButtonDetails').removeClass('play-button');
+        //   $('.videoPlayButtonDetails').addClass('play-button');
+        // }
         // if( jwplayer('playerDetails').getState() == "playing"){
         //     jwplayer('playerDetails').pause();
         // }
@@ -557,14 +560,15 @@ function scrollDownOrUp(id){
     }, 1000);
 
 }
-jQuery('#UReactionLink').on('click',function(){
+jQuery('#UReactionLink').on('click',function(){debugger;
     var likeStatus=jQuery('#UReactionLink').hasClass('liked');
+    var singleTopicId = $("#singleTopicId").val();
     if(likeStatus==false){
        var loginStatus= check_login_status();
        if(loginStatus==false){
-        if( jwplayer('playerDetails').getState() == "playing"){
-            jwplayer('playerDetails').pause();
-        }
+        // if( jwplayer('playerDetails').getState() == "playing"){
+        //     jwplayer('playerDetails').pause();
+        // }
         document.getElementById('gotoLoginPage').click();
         //document.getElementById('openLoginPopup').click();
             //jQuery("#openLoginPopup").click();
@@ -576,10 +580,10 @@ jQuery('#UReactionLink').on('click',function(){
        }
 
         jQuery('#UReactionLink').addClass('liked');
-        updateUserLikeStatus();
+        updateUserLikeStatus(singleTopicId);
     }else{
        jQuery('#UReactionLink').removeClass('hide');
-       updateUserLikeStatus();
+       updateUserLikeStatus(singleTopicId);
        var likeStatus=jQuery('.sp_ddXiTdIB8vm').hasClass('sx_44a25d');
        if(likeStatus==true){
             jQuery('.sp_ddXiTdIB8vm').removeClass('sx_44a25d');
@@ -602,16 +606,18 @@ function social_share(shareType){
 
     var topicId=$("#topicID").val();
     var topicCreatorUsername=$("#topicCreatorUsername").val();
+    var topicSlug=$("#singleTopicSlug").val();
+    var postTitle=$("#postTitleId").val();
     var shareURL="";
     if(shareType=='facebook_share'){
 
-        shareURL='https://www.facebook.com/sharer/sharer.php?app_id=113869198637480&u='+site_base_url+topicCreatorUsername+'/'+topicId+'&display=popup&sdk=joey/';
+        shareURL='https://www.facebook.com/sharer/sharer.php?app_id=113869198637480&u='+site_base_url+topicSlug+'/'+topicId+'&display=popup&sdk=joey/';
 
     }else if(shareType=='twitter_share'){
 
-        shareURL='https://twitter.com/intent/tweet?text='+site_base_url+topicCreatorUsername+'/'+topicId+'/&url='+site_base_url+topicCreatorUsername+'/'+topicId+'/'
+        shareURL='https://twitter.com/intent/tweet?text=Boloindya &url='+site_base_url+topicSlug+'/'+topicId+'/'
     }else if(shareType=='whatsapp_share'){
-        shareURL='https://api.whatsapp.com/send?text='+site_base_url+topicCreatorUsername+'/'+topicId+'/';
+        shareURL='https://api.whatsapp.com/send?text='+site_base_url+topicSlug+'/'+topicId+'/';
     }
     
 
@@ -646,7 +652,13 @@ $(document).ready(function() {
 
   $("#comment-input").on('keydown keyup', function() {
     var comment_len = $(this).val().length;
-    
+    if(comment_len>0){
+      $("#submit-button.ytd-commentbox").css("background-color", "#b62927");
+      $(".ytd-button-renderer").css("color", "#e1d8d8");
+    }else{
+      $("#submit-button.ytd-commentbox").css("background-color");
+      $(".ytd-button-renderer").css("color");
+    }
     $("#chars-current").html(comment_len);
     
     if(comment_len == 60)
@@ -799,9 +811,64 @@ function likeAndUnlikeComment(commentId){
     });
 } 
 
-  function updateUserLikeStatus(){
-    return false;
-  }  
+  function updateUserLikeStatus(topic_id){
+
+      var ge_local_data="";
+          ge_local_data = JSON.parse(localStorage.getItem("access_data"));
+      var accessToken=ge_local_data.access_token;
+      var listCommentItems="";
+      //================Comments List =================
+      var uri='/api/v1/like/';
+      var res = encodeURI(uri);
+      jQuery.ajax({
+          url:res,
+          type:"POST",
+          headers: {
+            'Authorization':'Bearer '+accessToken,
+          },
+          data:{topic_id:topic_id},
+          success: function(response,textStatus, xhr){
+              console.log(response);
+          },
+          error: function(jqXHR, textStatus, errorThrown){
+              console.log(textStatus + ": " + jqXHR.status + " " + errorThrown);
+          }
+
+    
+      });
+
+
+  }
+
+function likeUnlikeFeed(topicId){
+    var likeStatus=jQuery('#UReactionLink-'+topicId).hasClass('liked');
+    if(likeStatus==false){
+       var loginStatus= check_login_status();
+       if(loginStatus==false){
+        document.getElementById('gotoLoginPage').click();
+       }
+       var likeStatus=jQuery('.'+topicId).hasClass('sx_44a25c');
+       if(likeStatus==true){
+            jQuery('.'+topicId).removeClass('sx_44a25c');
+            jQuery('.'+topicId).addClass('sx_44a25d');
+       }
+
+        jQuery('#UReactionLink-'+topicId).addClass('liked');
+        updateUserLikeStatus(topicId);
+    }else{
+       jQuery('#UReactionLink-'+topicId).removeClass('hide');
+       updateUserLikeStatus(topicId);
+       var likeStatus=jQuery('.'+topicId).hasClass('sx_44a25d');
+       if(likeStatus==true){
+            jQuery('.'+topicId).removeClass('sx_44a25d');
+            jQuery('.'+topicId).addClass('sx_44a25c');
+            jQuery('#UReactionLink-'+topicId).removeClass('liked');
+       }
+
+    }
+}
+
+
 
 
 function listCommentsById(){
@@ -903,6 +970,18 @@ function followLikeList(){
             var countFollowStatus=userLikeAndUnlike.all_follow;
             if(undefined !==countFollowStatus && countFollowStatus.length>0){
                 var followList=userLikeAndUnlike.all_follow;
+                var topicId=jQuery("#singleTopicId").val();
+                if(followList.indexOf(topicId)){
+                    var likeStatus=jQuery('.'+topicId).hasClass('sx_44a25c');
+                    if(likeStatus==true){
+                        jQuery('.'+topicId).removeClass('sx_44a25c');
+                        jQuery('.'+topicId).addClass('sx_44a25d');
+                    }
+
+                    jQuery('#UReactionLink-'+topicId).addClass('liked');
+                }
+
+
                 followList.forEach(function(followId){
                     followStatus=jQuery('.followCheck').hasClass('followStatusChange-'+followId);
                     if(followStatus==true){
@@ -910,6 +989,19 @@ function followLikeList(){
                         jQuery('.followStatusChange-'+followId).addClass('sx_5da456');
                         jQuery('.btnTextChange-'+followId).text(followed_trans);
                     }
+
+                  if(response.message=='liked'){
+                      jQuery('.changeLikeColor-'+commentId).removeClass('liked');
+                      jQuery('.likedStatus-'+commentId).removeClass('hide');
+                      jQuery('.changeLikeColor-'+commentId).addClass('liked');
+
+
+                  }else if(response.message=='unliked'){
+                      jQuery('.changeLikeColor-'+commentId).removeClass('liked');
+                      jQuery('.likedStatus-'+commentId).removeClass('hide');
+                      jQuery('.likedStatus-'+commentId).addClass('hide');
+                  }
+
 
                 });
             }
@@ -1008,5 +1100,60 @@ function removeDataFromURL(){
   return true;
 }
 
+
+function delegateClick(videoPlayerId,video_backup_url,video_cdn_url){debugger;
+
+  var playerId="player-"+videoPlayerId;
+  var playerId1="#player-"+videoPlayerId;
+  var btnPlayerId = '.videoPlayButtonDetails-'+videoPlayerId;
+  var video = document.getElementById(playerId);
+
+    //openFullscreen(video);
+
+    if(video.paused) {
+
+      var newSrc='/media/mute_icon.svg';
+      $('#mutedImageId').attr('src', newSrc);
+      $(btnPlayerId).removeClass('play-button');
+
+
+      if(Hls.isSupported()) {
+        var hls = new Hls();
+        hls.loadSource(video_cdn_url);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED,function() {
+          video.play();
+          loaderHide();
+      });
+     }
+     // hls.js is not supported on platforms that do not have Media Source Extensions (MSE) enabled.
+     // When the browser has built-in HLS support (check using `canPlayType`), we can provide an HLS manifest (i.e. .m3u8 URL) directly to the video element through the `src` property.
+     // This is using the built-in support of the plain video element, without using hls.js.
+     // Note: it would be more normal to wait on the 'canplay' event below however on Safari (where you are most likely to find built-in HLS support) the video.src URL must be on the user-driven
+     // white-list before a 'canplay' event will be emitted; the last video event that can be reliably listened-for when the URL is not on the white-list is 'loadedmetadata'.
+      else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = backup_url;
+        video.addEventListener('loadedmetadata',function() {
+          video.play();
+          loaderHide();
+        });
+      }
+
+
+
+  } else {
+    
+
+    video.pause();
+    video.src="";
+    var checkPlayButtonStatus= $('.playButtonStatus').hasClass('play-button');
+    if(!checkPlayButtonStatus){
+      $('.playButtonStatus').addClass('play-button');
+    }
+    
+    //$(btnPlayerId).removeClass('play-button');
+    //$(btnPlayerId).addClass('play-button');
+  }
+}
 //=====================End mentions=========================
 

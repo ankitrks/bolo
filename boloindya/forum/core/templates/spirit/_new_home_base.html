@@ -1,0 +1,232 @@
+{% load spirit_tags i18n %}
+{% load i18n %}
+{% load static from staticfiles %}
+{% get_current_language as LANGUAGE_CODE %}
+
+<!DOCTYPE html>
+<!-- saved from url=(0025)https://www.boloindya.com/en -->
+<html lang="{{LANGUAGE_CODE}}" pc="yes" class="  webpalpha webpanimation webplossless webp  webp-alpha webp-animation webp-lossless webpalpha webpanimation webplossless webp webp-alpha webp-animation webp-lossless  webpalpha webpanimation webplossless webp webp-alpha webp-animation webp-lossless">
+
+{% load static from staticfiles %}
+<!DOCTYPE html>
+<!-- saved from url=(0025)https://www.boloindya.com/en -->
+<html lang="en" class="webpalpha webpanimation webplossless webp webp-alpha webp-animation webp-lossless">
+
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="google" content="notranslate">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1" class="next-head">
+    <meta name="robots" content="index, follow" class="next-head">
+
+
+    <meta name="applicable-device" content="pc,mobile" class="next-head">
+    <link rel="canonical" href="{{site_base_url}}" class="next-head">
+
+    <link rel="stylesheet" type="text/css" href="/media/css/common.css">
+    <script src="//content.jwplatform.com/libraries/GpYvcHPU.js"></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <link rel="shortcut icon" href="/media/img/favicon.ico">
+    <title>Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India</title>
+    <meta name="description" content="Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India" />
+    <meta name="keywords" content="Hindi Videos, Hindi Content Platform, Local Languages Content, Love Questions, Sex Questions, Relationship Questions, Life questions, English Videos, Questions and Answers, GK Answers, Politics Discussion, Entertainment, Tamil Videos, Tamil Questions, Tamil Answers, Telugu Questions, Telugu Answers, Exams, UPSC Videos, UPSC Questions, Kannada Questions, Kannada Videos, Punjabi Videos, Punjabi Questions, Gujarati Questions, Gujarati Videos, bengali questions, bengali videos" /> 
+    {% if topic.title is not None %}
+    <link rel="canonical" href="{{site_absolute_url}}{{ request.get_full_path }}" />      
+    <meta property="og:url" content="{{site_absolute_url}}{{ request.get_full_path }}"/>
+    <meta property="og:type" content="website" />
+    <meta property='og:title' content='{{topic.title|striptags|safe}}' />
+    <meta name="twitter:title" content="{{topic.title|striptags|safe}}" />
+    <meta name="twitter:site" content="@BoloIndya" />
+    <meta name="twitter:creator" content="@BoloIndya" />
+    <meta name="twitter:card" content="summary" />
+    <meta property='og:description' content='{{topic.title|striptags|safe}} Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India' />       
+    <meta property='og:image' content='{{topic.question_image}}' />
+    <link rel="image_src" href="{{topic.question_image}}"/>
+    {% endif %}
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% if topic.title is not None %}
+    <meta data-react-helmet="true" name="twitter:image" content="/media/img/favicon.ico"/>
+    <meta data-react-helmet="true" property="og:image" content="/media/img/favicon.ico"/>
+    {% endif %}
+<!--     <link href="https://unpkg.com/video.js/dist/video-js.css" rel="stylesheet">
+    <script src="https://unpkg.com/video.js/dist/video.js"></script>
+    <script src="https://unpkg.com/videojs-contrib-hls/dist/videojs-contrib-hls.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script> -->
+<!-- Or if you want a more recent canary version -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@canary"></script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2YHY45HKGR"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-2YHY45HKGR');
+    </script>
+
+    {% block head-meta %}{% endblock %}
+
+
+    {% for key,value in all_languages.items %}
+    {% if key == LANGUAGE_CODE %}
+        <script type="text/javascript">
+            var current_language_id='{{value}}';
+            var current_language_code='{{LANGUAGE_CODE}}';
+        </script>
+        {% endif %}
+    {% endfor %}
+
+{% get_current_language as LANGUAGE_CODE %}
+{% get_available_languages as LANGUAGES %}
+{% get_language_info_list for LANGUAGES as languages %}
+{% for language in languages %}
+{% if language.code == LANGUAGE_CODE %}
+        <script type="text/javascript">
+            var current_language_name='{{ language.name_local }}';
+        </script>
+
+{% endif %}
+{% endfor %}
+
+<script type="text/javascript">
+    var follow_trans='{% trans "Follow" %}';
+    var followed_trans='{% trans "Followed" %}';
+    var likeTrans='{% trans "likes" %}';
+    var commentsTrans='{% trans "comments" %}';
+    var followers_trans='{% trans "Followers" %}';
+    var site_base_url='{{site_base_url}}';
+    console.log(likeTrans);
+</script>
+
+    <style type="text/css">
+        .dropdown-item.selected {background: #1989cd !important;}
+        .navbar .navbar-nav li .sub-menu{z-index: 100 !important;}
+    </style>
+
+    <script>
+
+        var userLoginStatus='{{request.user.id}}';
+
+
+        function getCookie(cname) {
+            var name = cname + "=";
+            var decodedCookie = decodeURIComponent(document.cookie);
+            var ca = decodedCookie.split(';');
+            for(var i = 0; i <ca.length; i++) {
+              var c = ca[i];
+              while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+              }
+              if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+              }
+            }
+            return "";
+        }
+
+        function clearCookie(cname) {
+            var mydate = new Date();
+            mydate.setTime(mydate.getTime() - 1);
+            document.cookie = cname + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        }
+
+    	$( document ).ready(function() {
+            $('.perform_search').click(function(){
+                window.location = '/topic/search/?q=' + $('[name="search"]').val();
+            });
+            $('[name="search"]').keypress(function (e) {
+                var key = e.which;
+                if(key == 13){
+                    $('.perform_search').click();
+                    return false;  
+                }
+            });
+            $('.change_language[lcode="' + getCookie("language") +'"]').addClass('selected');
+            $('.lang_link').html($('.change_language[lcode="' + getCookie("language") +'"]').text() + '<small style="color:lightgrey">&nbsp;&nbsp;[change]</small>');
+            $('.change_language').click(function(e){
+                e.preventDefault();
+                clearCookie("language");
+                var lcode = $(this).attr('lcode');
+                document.cookie = "language=" + lcode + "; expires=Fri, 31 Dec 2025 00:00:00 UTC; path=/;";
+                window.location = $(this).attr('href');
+            });
+    	});
+
+        function check_login_status(){
+            var access_data="";
+            access_data = JSON.parse(localStorage.getItem("access_data"));
+            if (!access_data){
+              return false; 
+            } else {
+              return true;
+            }
+        }
+
+	</script>
+
+    {% block head-extra %}{% endblock %}
+
+    <!--[if (lt IE 9) & (!IEMobile)]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/selectivizr/1.0.2/selectivizr-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.6/html5shiv.min.js"></script>
+    <![endif]-->
+
+    <!-- Start Alexa Certify Javascript -->
+    <script type="text/javascript">
+    _atrk_opts = { atrk_acct:"bbs6u1DlQy20Y8", domain:"boloindya.com",dynamic: true};
+    (function() { var as = document.createElement('script'); as.type = 'text/javascript'; as.async = true; as.src = "https://certify-js.alexametrics.com/atrk.js"; var s = document.getElementsByTagName('script')[0];s.parentNode.insertBefore(as, s); })();
+    </script>
+    <noscript><img src="https://certify.alexametrics.com/atrk.gif?account=bbs6u1DlQy20Y8" style="display:none" height="1" width="1" alt="" /></noscript>
+    <!-- End Alexa Certify Javascript --> 
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-156245329-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-156245329-1');
+</script>
+
+  </head>
+
+<!-- style="margin-left:-19px; margin-right: -14px;max-width:100%;" -->
+  <body >
+    {% include 'spirit/_new_home_header.html' %}
+    {% render_messages messages %}
+    {% block content %}{% endblock %}
+    {% include 'spirit/_login_popup.html' %}
+    {% include 'spirit/_new_footer.html' %}
+
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+<!-- <script src="https://www.gstatic.com/firebasejs/7.6.2/firebase-app.js"></script> -->
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+<!-- <script src="https://www.gstatic.com/firebasejs/7.6.2/firebase-analytics.js"></script>
+<script>
+  // Your web app’s Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyAyag83CraVwZCekCUFAb2USNKYJjX2rzo",
+    authDomain: "boloindya-1ec98.firebaseapp.com",
+    databaseURL: "https://boloindya-1ec98.firebaseio.com",
+    projectId: "boloindya-1ec98",
+    storageBucket: "boloindya-1ec98.appspot.com",
+    messagingSenderId: "581293693346",
+    appId: "1:581293693346:web:8e4cd989e09d034509fafb",
+    measurementId: "G-6Z5180JN8W"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  firebase.analytics();
+</script> -->
+
+  </body>
+
+</html>

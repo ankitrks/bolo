@@ -1,0 +1,873 @@
+{% extends "spirit/_new_base.html" %}
+{% load i18n %}
+{% load number_formate_change_tag %}
+{% block title %}BoloIndya{% endblock %}
+{% block content %}
+
+<!-- Social Share Code -->
+<link rel="canonical" href="" />      
+<meta property="og:url" content=""/>
+<meta property="og:type" content="website" />
+<meta property='og:title' content='' />
+<meta name="twitter:title" content="" />
+<meta name="twitter:site" content="@BoloIndya" />
+<meta name="twitter:creator" content="@BoloIndya" />
+<meta name="twitter:card" content="summary" />
+<meta property='og:description' content='Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India' />       
+<meta property='og:image' content='' />
+<link rel="image_src" href=""/>
+<!-- Social Share Code End -->
+<style type="text/css">
+/*the container must be positioned relative:*/
+.autocomplete {
+  position: relative;
+  display: inline-block;
+}
+
+
+.autocomplete-items {
+  border: 1px solid #d4d4d4;
+  border-bottom: none;
+  border-top: none;
+  z-index: 99;
+  /*position the autocomplete items to be the same width as the container:*/
+  top: 100%;
+  left: 0;
+  right: 0;
+}
+
+.autocomplete-items div {
+  padding: 10px;
+  cursor: pointer;
+  background-color: #fff; 
+  border-bottom: 1px solid #d4d4d4; 
+}
+
+/*when hovering an item:*/
+.autocomplete-items div:hover {
+  background-color: #e9e9e9; 
+}
+
+/*when navigating through the items using the arrow keys:*/
+.autocomplete-active {
+  background-color: DodgerBlue !important; 
+  color: #ffffff; 
+}
+.dropdown, .dropleft, .dropright, .dropup {
+    position: relative;
+}
+
+.suggest {
+  /* position: relative; */
+  top: 7px;
+  z-index: 30;
+  text-align: left;
+}
+.dropdown-item {
+    display: block;
+    width: 100%;
+    padding: .25rem 1.5rem;
+    clear: both;
+    font-weight: 400;
+    color: #212529;
+    text-align: inherit;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
+}
+
+.suggest > .dropdown-menu {
+  margin-top: 15px;
+  position: absolute;
+}
+
+.suggest > .dropdown-menu > a.dropdown-item {
+  border-top: 1px solid #eeeeee;
+  padding: 5px 10px;
+}
+
+.suggest > .dropdown-menu > a.dropdown-item:first-child {
+  border-top: 0;
+}
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    display: none;
+    float: left;
+    min-width: 10rem;
+    padding: .5rem 0;
+    margin: .125rem 0 0;
+    font-size: 1rem;
+    color: #212529;
+    text-align: left;
+    list-style: none;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0,0,0,.15);
+    border-radius: .25rem;
+}
+.suggest > .dropdown-menu {
+    margin-top: 15px;
+    position: absolute;
+}
+.dropdown-menu.show {
+    display: block;
+}
+.dropdown-item.active, .dropdown-item:active {
+    color: #fff;
+    text-decoration: none;
+    background-color: #007bff;
+}
+.userNameMargin{
+    margin-top: 5px;
+    margin-left: 10px;
+    position: absolute;
+}
+
+/*.mentiony-container{ position:relative;height:auto; border:1px solid #cecece}
+.mentiony-container .pl0{ padding-left:0;}
+.mentiony-container .mention-input-hidden{float:left; display:inline-block; visibility:hidden; width:0;height:0; margin:0; padding:0;opacity:0;}
+
+.mentiony-container .mentiony-popover{
+    position:absolute;
+    z-index:1000;
+    top:100%; left:0; 
+    width:100%;
+    height:auto;
+    max-height:400px;
+    display:none;
+    border:1px solid #eee;
+    border-radius:4px;
+    padding:0;
+    background:#fefefe;
+    overflow: scroll;
+}
+
+.mentiony-container .mentiony-content {
+    outline: none;
+}
+
+.mentiony-list{list-style:none; width: 100%; padding:0;margin: 0;}
+.mentiony-item{border-top:1px solid #eee; height: 50px; padding: 5px 10px; cursor:pointer}
+.mentiony-item:first-child{border:none}
+.mentiony-item:hover{ background:#ededed;}
+.mentiony-item.active{ background:#ddd;}
+.mentiony-item img{ width:40px; height:40px; }
+
+.mentiony-item .title, .mentiony-item .help-block{ margin:-32px 0 10px 50px;}
+.mentiony-item .title{}
+.mentiony-item .help-block{}
+.mentiony-container .mention-area .highlight a.mentiony-link{color:white; background:#009688; padding: 1px 4px; border-radius: 3px;}
+
+*/
+
+.video_card_title{
+    position: inherit;
+    top: 2px;
+    left: 2px;
+    font-size: 14px;
+    padding: 2px;
+    color: aliceblue;
+}
+._image_card_footer_wraaper{
+    background: #0003;
+}
+
+
+
+._video_card_footer_likes1{
+    position: absolute;
+    right: 6px;
+    top: 58px;
+    bottom: -2px;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+}
+._video_card_footer_likes1 img{
+    position: absolute;
+    margin-top: -1px;
+    height: 18px;
+    top: -2px;
+    left: -18px;
+    padding-top: 4px;
+}
+
+@media(max-width: 991px){
+._video_card_footer_likes1{
+    position: absolute;
+    right: 7px;
+    top: 58px;
+    bottom: -2px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+}
+._video_card_footer_likes1 img{
+    position: absolute;
+    margin-top: -1px;
+    height: 15px;
+    top: -3px;
+    left: -14px;
+    padding-top: 4px;
+}
+
+._video_card_footer_likes::before {
+    margin: 0 2px -3px 0;
+    top: -3px;
+}
+._video_card_footer_likes {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    font-size: 11px !important;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+}
+
+}
+
+
+._video_card_footer_likes{
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    height: 26px;
+    padding: 4px;
+    background: #000000d9;
+    width: 100%;
+}
+._video_card_footer_ {
+    height: 80px;
+}
+
+._video_card_footer_likes12::before { 
+
+    content: '';
+    display: inline-block;
+    height: 18px;
+    margin: 0 6px -3px 0;
+    min-width: 18px;
+    position: relative;
+    top: -2px;
+    width: 18px;
+    background-image: url(/media/iJGOBKN9vqK.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: -42px -382px;
+    color: red;
+    font-weight: bold;
+}
+._video_card_footer_likes::before { 
+
+    content: '';
+    display: inline-block;
+    height: 18px;
+    margin: 0 6px -3px 0;
+    min-width: 18px;
+    position: relative;
+    top: -1px;
+    width: 18px;
+    background-image: url(/media/iJGOBKN9vqK.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: -42px -382px;
+    color: red;
+    font-weight: bold;
+}
+/*._video_card_footer_likes1::before {
+    background-image: url(/media/iJGOBKN9vqK.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: 0 -156px;
+}*/
+
+.about-content .about-article h2{
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 700;
+    font-size: 23px;
+    line-height: 1;
+    margin-top: 20px;
+    margin-bottom: 20px
+}
+
+._list_item_title {
+    font-size: 20px;
+}
+._list_item_description{
+    font-size: 14px;
+}
+._list_item_:not(:last-child) {
+    margin: 0 0 2px;
+}
+._base_layout_aside_wrapper:not(:last-child){
+    padding-bottom: 17px;
+    margin-bottom: 17px;
+}
+
+</style>  
+
+
+    
+
+<div class="_1RNJh" id="subHeader">
+    <div class="_2qRoq">
+        <div class="_2WfMm">
+            <nav>
+                <ul>
+
+                {%  for each_category_item in categories %}
+
+                    <li  id="" style="padding-top:.5em;padding-bottom:.5em;cursor:pointer"><a href="/tag/{{each_category_item.slug}}/" class="_3gKV2">{% category_title_by_language each_category_item LANGUAGE_CODE|language_name %}</a></li>
+
+                {% endfor %}
+
+
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+
+
+
+<style type="text/css">
+  .feedlist-container{
+    width: 600px;
+    margin:auto;
+    margin-top: 135px;
+  }  
+.feedlist-item {
+    margin-bottom: 8px;
+    background-color: #fff;
+    padding-top: 12px;
+    border-bottom: 2px solid #ccc;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,.24), 0 0 2px 0 rgba(0,0,0,.12);    
+}
+.feedlist-item .user-info {
+    margin: 0 16px 12px 16px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+}
+.feedlist-item .user-info .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+.feedlist-item .user-info .name {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 16px;
+    color: #32373A;
+    letter-spacing: 0;
+}
+.feedlist-item .user-info .description {
+    font-size: 12px;
+    line-height: 14px;
+    color: #959EA4;
+    letter-spacing: 0;
+}
+.feedlist-item .title {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    padding: 0 16px 8px 16px;
+    font-size: 16px;
+    color: #141900;
+    letter-spacing: 0;
+    font-weight: 400;
+}
+.feedlist-item .statistics-info {
+    text-align: right;
+    font-size: 12px;
+    color: #32373A;
+    /*height: 40px;*/
+    line-height: 40px;
+    padding-right: 0px;
+}
+._666k {
+    position: relative;
+    width: 100%;
+    align-items: center;
+    /* display: flex; */
+    flex: 1 0;
+    justify-content: center;
+}
+
+.feedlist-item .statistics-info .digg::before {
+content: '';
+    display: inline-block;
+    height: 18px;
+    margin: 0 6px -3px 0;
+    min-width: 18px;
+    position: relative;
+    top: -1px;
+    width: 18px;
+    background-image: url(/media/black_icons.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: -42px -382px;
+    color: red;
+    font-weight: bold;
+}
+/*.feedlist-item .statistics-info span::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    margin-right: 6px;
+    vertical-align: middle;
+    position: relative;
+    top: -2px;
+}*/
+.feedlist-item .statistics-info span {
+    margin-left: 0px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+.feedlist-item .statistics-info .digg{
+    float: left;
+    padding-left: 10px;
+    color: var(--font-color);
+}
+.feedlist-item .statistics-info .comment{
+    padding-right: 10px;
+    color: var(--font-color);
+}
+.feedlist-item .statistics-info .comment::before {
+    background-image: url(/media/download_black.svg);
+}
+.feedlist-item .statistics-info span::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    margin-right: 6px;
+    vertical-align: middle;
+    position: relative;
+    top: -2px;
+}
+._video_feed_item {
+    width: 100%;
+    /* width: 216px; */
+    margin: 0 24px 24px 0;
+    float: initial;
+    border: 1px solid #ffffff59;
+    border-radius: 5px;
+}
+.videoH{
+    height: 300px;
+}
+._video_card_big_comments{
+    min-height: 100px;
+}
+
+.video-card-big.jsx-1861775669 .content-container.jsx-1861775669{
+    width: 100%;
+}
+.video-card-big.jsx-1861775669 .content-container.jsx-1861775669 {
+    padding: 24px 68px;
+    /* -webkit-flex: 0 0 445px; */
+    -ms-flex: 0 0 445px;
+    flex: 0 0 445px;
+}
+.videoCentered{
+        object-fit: contain !important;
+        height: -webkit-fill-available !important;
+}
+
+.title a{
+    color: rgba(3, 3, 3, 0.9);
+    line-height: 1.8rem;
+    font-weight: 400;
+}
+</style>
+
+
+<style type="text/css">
+    .cGcGK {
+    float: left;
+    margin-right: 28px;
+    max-width: 614px;
+    width: 100%;
+}
+.video-card.jsx-3077367275 .video-card-mask.jsx-3077367275, .video-card.jsx-3077367275 .event-delegate-mask.jsx-3077367275, .video-card.jsx-3077367275 .play-button {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+   /* z-index: 999;*/
+}
+
+.video-card.jsx-3077367275 .video-card-mask.jsx-3077367275, .video-card.jsx-3077367275 .event-delegate-mask.jsx-3077367275, .video-card.jsx-3077367275 .play-button {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+._video_card_{
+    left: 0;
+    cursor: pointer;
+}
+
+video {
+  width: 100%;
+  background-color: black;
+}
+div.video-controls {
+  display: flex;
+  width: 100%;
+  height: 100px;
+  color: white;
+  background-color: #111;
+  font-family: arial;
+}
+div.video-controls .playback-duration {
+  vertical-align: middle;
+  display: block;
+  margin: auto;
+  padding-right: 20px;
+}
+div.video-controls .flex {
+  display: flex;
+  flex: 1;
+}
+div.video-controls button.material-icons {
+  background-color: #111;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 30px;
+  height: 100%;
+  min-width: 60px;
+}
+div.video-controls .progress-bar-parent {
+  flex-direction: column;
+  justify-content: center;
+}
+div.video-controls .progress-bar-parent .progress-bar-background {
+  height: 12.5px;
+  background-color: black;
+  border-radius: 12.5px;
+  cursor: pointer;
+}
+div.video-controls .progress-bar-parent .progress-bar-background .progress-bar {
+  width: 0%;
+  height: 100%;
+  background-color: white;
+  border-radius: 12.5px;
+  transition: 750ms;
+}
+
+
+
+
+@media(max-width: 991px){
+    .feedlist-container {
+        width: 100%;
+        margin: auto;
+        margin-top: 115px;
+    }
+._1RNJh {
+
+    top: 115px;
+    position: relative;
+
+}
+
+}
+@media (max-width: 991px){
+    .header-container .header-content {
+        margin-top: -22px;
+        padding: 13px 19px;
+    }
+    .header-container{
+        height: 105px;
+    }
+}
+</style>
+
+<style type="text/css">
+    .bottombanner-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 48px;
+    background-color: #fff;
+    z-index: 200;
+    -webkit-box-shadow: 0 -1px 3px 0 rgba(0,0,0,.2), 0 -2px 2px 0 rgba(0,0,0,.12), 0 0 2px 0 rgba(0,0,0,.14);
+    box-shadow: 0 -1px 3px 0 rgba(0,0,0,.2), 0 -2px 2px 0 rgba(0,0,0,.12), 0 0 2px 0 rgba(0,0,0,.14);
+}
+.bottombanner-container a {
+    display: inline-block;
+    width: 24.6%;
+    height: 100%;
+    position: relative;
+}
+.bottombanner-container a img {
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+@media(max-width: 991px){
+    .bottombanner-container a {
+    display: inline-block;
+    width: 23.6%;
+    height: 100%;
+    position: relative;
+}
+}
+.bottom_banner_active{
+    background-color: rgb(223, 223, 223);
+}
+
+.sbutton {
+    padding-right: 22px;
+
+}
+.mask .outsharepanel {
+    text-align: center;
+}
+
+/*.video-card.jsx-3077367275{
+    height: 300px;
+}*/
+
+.hamburger-menu{
+    z-index: 9999
+}
+
+</style>
+
+<main class="feedlist-container" id="playlist" style="min-height: 400px;">
+
+<!--     <div class="_scroll_load_more_loading">
+        <div class="boloindya-loading"></div>
+    </div> -->
+
+<!--         <div class="share-layout-content" style="margin-top: 100px;">
+            <main class="share-layout-main">
+                <div class="jsx-1861775669 jsx-537314381 video-card-big">
+
+
+                    <div class="jsx-1861775669 jsx-537314381 content-container border">
+                        <a tag="a" class="jsx-1861775669 jsx-537314381 user-info" href="/bi19124048/">
+
+                            <div style="background-image:url(
+                                    https://lh3.googleusercontent.com/a-/AAuE7mD_HhzzDJKy9UyZfjeBqJq5RNb4gHnqJ-qQgKuW=s96-c
+                                );border-radius:;width:64px;height:64px;flex:0 0 64px;" class="jsx-2177493926 jsx-578937417 avatar round">
+                                    
+                            </div>
+                            <div class="jsx-1861775669 jsx-537314381 user-info-content">
+                                <h2 class="jsx-1861775669 jsx-537314381">bi19124048</h2>
+                                <p class="jsx-1861775669 jsx-537314381">bi19124048</p>
+                            </div>
+                        </a>
+                        <span class="unit" style="display: inline-block;position: relative;top: -49px;">
+                                <button onclick="follow_user('71199');" style="float: right;" class="_4jy1 _4jy4 _517h _51sy _42ft " type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-71199 followCheck sx_5da455"></i><span class="btnTextChange-71199">Follow</span>
+                                </button>
+                        </span>
+                        <h1 class="jsx-191376589 jsx-861547433 jsx-3645511632 video-meta-title"><strong>Sports @Cricket : IPL News: Kolkata Knight Riders</strong></h1>
+
+                        <div class="jsx-1861775669 jsx-537314381 video-card-container">
+                            <div style="border-radius: 8px; background-image: url();" class="jsx-1464109409 image-card">
+                                <div class="jsx-3077367275 video-card default">
+
+                                    <div id="jwBoxPlayAndStop" style="height: 100%">
+                                        <div id="playerDetailsI"></div>
+                                        <video id="playerDetails" controls="" height="200" preload="" class="videoCentered">
+                                            <source src="https://boloindyapp-prod.s3.amazonaws.com/public/video_bytes/Sandeep_1577114842173.mp4" type="video/mp4">
+                                            <source src="https://boloindyapp-prod.s3.amazonaws.com/public/video_byte_thumbnails/Sandeep_1577114842173.jpeg" type="video/ogg">
+
+                                        </video>
+                                    </div>
+
+                                    <div class="jsx-3077367275 video-card-mask"></div>
+                                    <div class="jsx-4030482358 theme videoPlayButtonDetails"></div>
+                                    <span class="jsx-3077367275 event-delegate-mask event-delegate-maskDesk"></span>
+
+                                    <span class="_video_card_"></span><img onclick="muteAndUnmutePlayerDet('playerDetails');" class="jsx-3077367275 mute-icon" id="mutedImageIdDeDesk" src="/media/mute_icon.svg">
+                                </div>
+
+
+                            </div>
+                        </div>
+                        <div class="statistics-info">
+                            <span class="digg">188.3K</span>
+                            <span class="comment">3.6K</span>
+                            <hr style="margin-bottom: 10px;">
+                            <div class="_6w18">
+
+                                <div class="_6w1h">
+                                    <span class="_18vi">
+                                        <div class="_666k" data-testid="UFI2ReactionLink/actionLink">
+                                            <div class="_8c74">
+                                                <a aria-pressed="false" class=" _6a-y _3l2t  _18vj" data-testid="UReactionLink" href="javascript:void(0)" id="UReactionLink" role="button" tabindex="0">
+
+                                                    <i alt="" class="_6rk2 img sp_ddXiTdIB8vm sx_44a25c"></i>Like
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </span>
+                                    <span class="_18vi">
+                                        <a class=" _666h  _18vj _18vk _42ft" role="button" tabindex="0" testid="UFI2CommentLink" title="Leave a comment" id="UCommentLink" href="javascript:void(0)">Comment
+                                        </a>
+                                    </span>
+                                    <span class="_18vi sbutton">
+                                        <span class="_1j6m">
+                                            <a class=" _2nj7  _18vj _18vk " href="javascript:void(0)" id="shareLinkId" role="button" tabindex="0" title="Send this to friends or post it on your Timeline.">Share
+                                            </a>
+                                        </span>
+                                        <ul class="smenu">
+                                            <li class="googleplus" onclick="social_share('whatsapp_share')"><a href="javascript:void(0);">whatsapp</a></li>
+                                            <li class="facebook"><a href="javascript:void(0);" onclick="social_share('facebook_share')">Facebook</a></li>
+                                            <li class="twitter"><a href="javascript:void(0);" onclick="social_share('twitter_share')">Twitter</a></li>
+
+                                            <li class="googleplus" onclick="copyShareLink();"><a href="javascript:void(0);">Copy Link</a></li>
+                                        </ul>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+
+
+                </div>
+
+            </main>
+        </div> -->
+<div class="ajax-load text-center" style="display:none;">
+    <p><img src="/media/loader.gif"></p>
+</div>
+</main>
+
+
+<div class="jsx-639186511 page-with-header main-body">
+    <div class="jsx-1929076256">
+        <div class="jsx-1929076256 about-content">
+<!--             <div class="jsx-1929076256 about-img">
+                <div class="jsx-1994528170 banner-video-container">
+                    <div class="video-wall">
+                        <div class="header-bar">{% trans "Popular Videos" %}</div>
+                        <div id="js-playlists" class="playlists">
+                            <div class="playlist-switcher hideonMobile">
+                                <h4 class="js-playlist-link playlist-link"></h4>
+                            </div>
+
+                            <div id="customScroll" class="js-playlist playlist-container is-active" data-feedid="Q352cyuc1">
+                            <div class="playlist _video_feed_container" id="playlist">
+                            </div>
+                            <div class="ajax-load text-center" style="display:none;">
+                                <p><img src="/media/loader.gif"></p>
+                            </div>
+                            <div class="_scroll_load_more_loading">
+                                <div class="boloindya-loading"></div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+
+
+<!--             <article class="jsx-1929076256 about-article">
+                 <aside class="_base_layout_aside">
+                    <div class="_base_layout_aside_sticky" style="">
+                        <div class="_base_layout_aside_wrapper">
+                            <div class="_list_component_">
+                                <h2 class="_list_component_title">{% trans "Trending Categories" %}</h2>
+                                <div class="_list_component_content">
+                                    
+                                    {%  for each_category_item in categories %}
+                                    <div class="_list_item_">
+                                        <div class="_list_item_content">
+                                            <h3 class="_list_item_title"><a href="/tag/{{each_category_item.slug}}/" title="glowups">
+                                            
+                                            {% category_title_by_language each_category_item LANGUAGE_CODE|language_name %}
+                                            </a></h3>
+                                            <p class="_list_item_description">{{each_category_item.view_count | shorcountertopic}} {% trans "views" %}</p>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+
+                                </div>
+                            </div>
+
+                            <div class="_list_component_">
+                                <h2 class="_list_component_title">{% trans "Trending Hashtags" %}</h2>
+                                <div class="_list_component_content">
+                                    
+                                    {%  for each_hashtag_item in hash_tags %}
+                                    <div class="_list_item_">
+                                        <div class="_list_item_content">
+                                            <h3 class="_list_item_title"><a href="/hashtag/{{each_hashtag_item.hash_tag}}/" title="glowups">#{{each_hashtag_item.hash_tag}}</a></h3>
+                                            <p class="_list_item_description">{{each_hashtag_item.total_views | shorcountertopic}} {% trans "views" %}</p>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="_base_layout_aside_wrapper">
+                            <div class="_download_">
+                                <h3 class="_download_title">{% trans "Get the App" %}</h3>
+                                <div class="_download_content_wrapper">
+                                    <a rel="nofollow" target="_blank" class="_download_btn_" href="https://play.google.com/store/apps/details?id=com.boloindya.boloindya&amp;hl=en_IN"><img src="/media/google_store.png" alt="google-store"></a>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+            </article> -->
+        </div>
+    </div>
+</div>
+<div class="bottombanner-container" style="display: none;">
+    <a class="bottom_banner_active" href="/feed/"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAAZlBMVEUAAAA3P0AzNzsyODszNzozNzsyNzozNzo8PEszNzsyNzozODpAQEBOZmYzODsyNzo0OTw0Nzs1ODw0Ozs3Nz03Oz84Pj4zODoyODsyNzozODszOTszNzszODo0OTs1ODtAQEAyNzpbvmFTAAAAIXRSTlMAHOe3ppP17Qjdv3YMA/vKXkpBNi4iFNKtopiHhm1sUhAGSVekAAAAuUlEQVRIx+2U1w6DMAwAY8hgb+ge/v+frIAiSguJI1XqEPeaOymKrbCVAbiEp/xK1ssttkgBJD0SOCDPsdnPfXwgrQx6w3FKcvB0fqbwBb9Y1GsXZ9k1s3ocSlxAZTN+laKGoH7SvWOCWmQ4eeHCRyObchzVHkmI6H6dAIkE/UwEkhFd4NADpwvQgl8KXADXKgDGgBiMB2vw+aAdnPVqfNm2vjWw/wQ4PeBdAIrqK2B9wR3SfTiw/+AGViGxzjYDagkAAAAASUVORK5CYII=" alt="home"></a>
+    <a href="/search/?term"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAAh1BMVEUAAAA0ODsyNzo7P0AzNzo4PT8zODozODsyODs+QkIyNzsyNzsyODoyODs0OTw6PDwzNzozODsyODozODszNzs2OT46PT1FRUUyNzsyODozODsyODozODszODs0Nzs0NzozOTw2OTwyNzozODsyODszODs0ODsyNzsyNzozOTszNzszODsyNzrUKSeNAAAALHRSTlMAV/kR/BX3cmYI1cu7sz8a7ciol28fDQTl3KSPi31gXEoow5ODa1Px0VDZne/cGXsAAAGQSURBVEjH7ZXZcqMwEEVB2IDDYgyO8YLBu+Pk/P/3jTSZSYGQlOQ1lfOmrr6SepO8X/4S5H50Wfr56kvez9FJ8I5Il/PP3OeVoE/YTJ3++xDJZFHu9rsyQXGP7O6rDEnaBf/W0/aEZDuz3f4JWOQD2+EFSObm/ZX/RbfWZ7WL8YwMQt9gjwVsTfEC0t+kAK7jfIbqPmbOUAS6sYKFZ6F+hUbPkIDcs3GDUDsigtSzk0A7tJygcwiWkA37UzAJXB0J4aAWuQrZxQaO/bUPpVOQwkGLeecUvEHcX19g7xSctWIvPzthC923Ysi0GHJInIK1lqWVANfwHqEYpa11V7ocWU7uusXjcThY/X0o9Clt4KW2vSYbQ5mmdzjbi3Aft2YExNaZvpn3ESZFN4HKMzBLgF2t378CxLP5IVaK18fA9lijeDJXdVYiSaL5x8u/QZJOLArJtUCxSavqLXvffP3wfIciaEL6FI3Mp0shJW0m/ntnraqvrhhTHw/XuLv1+1kqxp0wRlPk3ne4reUv8VP4A7HSNWh9oVLDAAAAAElFTkSuQmCC" alt="home"></a>
+    <a href="/"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAAOVBMVEUAAAA0ODwyNzozOjo5PT0yODwyODszODsyODoyODszODsyODo0ODs1OT08PDw/Pz8zNzsyODoyNzrKPyShAAAAEnRSTlMAf9olG2zz8ry2m2VOPxEMwsAii7qxAAAAzElEQVRIx+SQzQ6DIBAGcfkHEZ33f9imPRgkKvHWtHNik51dvlU/hrFRHB1OojXn7YlL0okye27ws+qwACHrqjqqzgHAdvMBKeqCIsBhh/GwLuqSZQXf5kggXX9nCKRmAVDULQUwbeKgBoQ2d4Q8EjLEvRDQI0GD7IWDOhIquL0A+nki/U7gRphg+iNBT2822D4PPRSEA/JYePylL7jSa4NWA/bkTXIGIjmLklwIkFzMkFyQkVpUklwYk1rcU1ahEK6yKKsUCVe7wwsAAJ+RH0Flpx4yAAAAAElFTkSuQmCC" alt="home"></a>
+    <a href="/"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAAVFBMVEUAAAA0ODw8Pz8yNzo5PT0yODwzODs1OjwyODoyODszODsyODoyNzozODozODsyODs1OT0zODozODozNzszODszODozNzw0OTwzQED///8zODoyNzq1TPkZAAAAG3RSTlMAgA7aG2xPJGXz8ry2s5tbP/bNwqqMc1kUAdICWFX7AAABA0lEQVRIx+2U2W6DMBBFiQ2xWcwWtuT8/39WQkowVHhQ/VCp6nmyR3OxZ7jj5J8fkmaVznNdZem19JoP9QXJvcCjuEv5GUBpjVLGlgCZ8H1At+9dq4HgGWkBD7Xt1QOKUB01aOUHlIY6cADQ7kMtkIYqLo+xMlR3BfYYs1CdCjSYY8yAPhXkoI4xBXmsQL5SbNFyWyN/nGyNSPPJ9o4bIHlE4x4B+Zn5Xcw83U6YZvO9OT1B+n27lEPE+Q54AZ0bbyeMrgNem8IBw5IEWAbA+QayiYD1bNXDkIgM0H+mtltkwdK9J35ebyfjYF4XE4xXBCNM66KBRsjd5z2b5inkbnl/gi8yTSDnAdT4QwAAAABJRU5ErkJggg==" alt="home"></a>
+</div>
+
+<!-- List View Display Data -->
+<script src="/media/js/landing_script1.js"></script>
+
+<!-----------End  ------------>
+
+
+<!-- Start Comments Section -->
+{% include "spirit/_video_play_and_comments.html" %}
+<!-- End Load Comments  -->
+
+
+{% endblock %}

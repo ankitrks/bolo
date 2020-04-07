@@ -155,11 +155,15 @@ jQuery("#boloSideMenu").click(function(e){
       var checClass="";
        checClass=jQuery(".boloSideMenuClass").hasClass('hamburger-menu-active');
         if(checClass){
+            jQuery("#subHeader").removeClass('zindexChange');
             jQuery(".boloSideMenuClass").removeClass('hamburger-menu-active');  
             jQuery(".drawerOpenAndClose").removeClass('drawer-enter drawer-enter-active');
             jQuery(".drawerOpenAndClose").addClass('drawer-exit drawer-exit-active');  
             jQuery(".drawer-enter-done").addClass('hide');
       }else {
+            jQuery("#subHeader").removeClass('zindexChange');
+            jQuery("#subHeader").addClass('zindexChange');
+            
             jQuery(".boloSideMenuClass").addClass('hamburger-menu-active'); 
             jQuery(".boloSideMenuClass").removeClass('drawer-exit drawer-exit-active');
             jQuery(".drawerOpenAndClose").addClass('drawer-enter drawer-enter-active');
@@ -252,6 +256,23 @@ function copyShareLinkMobile() {
   copyText.select();
   copyText.setSelectionRange(0, 99999)
   document.execCommand("copy");
+  jQuery('.linkCopies').html('<span style="color:green">Link Copied...</span>').fadeOut(2000);
+
+}
+
+function copyShareLinkMobileLink() {debugger;
+  //var copyText = $("#shareInputboxMobileSingle").val();
+
+  chckHideClass =$("#shareInputboxMobileSingle").hasClass('hide');
+  if(chckHideClass){
+    $("#shareInputboxMobileSingle").removeClass('hide');
+    var copyText = document.getElementById("shareInputboxMobileSingle");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999)
+    document.execCommand("copy");
+    //$("#shareInputboxMobileSingle").addClass('hide');
+  }
+  
   jQuery('.linkCopies').html('<span style="color:green">Link Copied...</span>').fadeOut(2000);
 
 }
