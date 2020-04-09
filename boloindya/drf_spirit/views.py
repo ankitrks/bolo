@@ -2083,9 +2083,14 @@ def verify_otp(request):
             if not is_reset_password and not is_for_change_phone and otp_obj:
                 if mobile_no in ['7726080653']:
                     return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
-                userprofile = UserProfile.objects.filter(mobile_no = mobile_no,user__is_active = True)
+                try:
+                    userprofile = UserProfile.objects.get(mobile_no = mobile_no,user__is_active = True)
+                except:
+                    try:
+                        userprofile = UserProfile.objects.get(mobile_no = mobile_no,social_identifier='',user__is_active = True)
+                    except:
+                        userprofile = None
                 if userprofile:
-                    userprofile = userprofile[0]
                     user = userprofile.user
                     message = 'User Logged In'
                 else:
