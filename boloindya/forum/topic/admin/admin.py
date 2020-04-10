@@ -10,6 +10,7 @@ from forum.category.models import Category
 from forum.topic.models import Topic, Notification, ShareTopic, CricketMatch, Poll, Choice, Voting, Leaderboard, \
         TongueTwister, BoloActionHistory, language_options,JobOpening,JobRequest
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
+from datetime import datetime,timedelta
 
 class TopicResource(resources.ModelResource):
     class Meta:
@@ -29,6 +30,8 @@ class TopicChangeListForm(forms.ModelForm):
     is_monetized = forms.BooleanField(required = False)
     is_removed = forms.BooleanField(required = False)
     is_moderated = forms.BooleanField(required = False)
+    is_boosted = forms.BooleanField(required = False)
+    boosted_till = forms.IntegerField(required = False)
     # is_popular = forms.BooleanField(required = False)
 
 from django.contrib.admin.views.main import ChangeList
@@ -54,10 +57,10 @@ class TopicChangeList(ChangeList):
         #     list_per_page, list_max_show_all, list_editable, model_admin)
         # action_checkbox
         self.list_display = ('vb_list', 'id', 'title', 'name', 'duration', 'show_thumbnail', 'language_id', 'imp_count',\
-            'is_moderated', 'is_monetized', 'is_removed', 'is_pubsub_popular_push', 'date', 'm2mcategory') #is_popular
+            'is_moderated', 'is_monetized', 'is_removed', 'is_pubsub_popular_push', 'date', 'm2mcategory','is_boosted','boosted_till') #is_popular
         self.list_display_links = ['id']
         self.list_editable = ('title', 'language_id', 'm2mcategory', 'is_pubsub_popular_push', 'is_monetized', 'is_removed', \
-                'is_moderated')
+                'is_moderated','is_boosted','boosted_till')
         self.model = model
         self.opts = model._meta
         self.lookup_opts = self.opts
@@ -101,7 +104,7 @@ class TopicChangeList(ChangeList):
 class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExportModelAdmin" NOT "admin.ModelAdmin"
     ordering = ['is_vb', '-id']
     search_fields = ('title', 'user__username', 'user__st__name', )
-    list_filter = (('date', DateRangeFilter), 'language_id', 'm2mcategory', 'is_moderated', 'is_monetized', 'is_removed', 'is_popular')
+    list_filter = (('date', DateRangeFilter), 'language_id', 'm2mcategory', 'is_moderated', 'is_monetized', 'is_removed', 'is_popular','is_boosted')
     filter_horizontal = ('m2mcategory', )
 
     fieldsets = (
@@ -109,7 +112,7 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
             'fields': ('title', 'm2mcategory')
         }),
         ('VB Details', {
-            'fields': ('language_id', 'media_duration','is_pubsub_popular_push'),
+            'fields': ('language_id', 'media_duration','is_pubsub_popular_push','is_boosted','boosted_till'),
         }),
         ('Counts', {
             'fields': (('view_count', 'comment_count'), ('total_share_count', 'share_count'), 'likes_count'),
@@ -211,6 +214,14 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
                 obj.delete()
             else:
                 obj.restore()
+        if 'is_boosted' in form.changed_data and 'boosted_till' in form.changed_data:
+            obj.is_boosted = form.cleaned_data['is_boosted']
+            if obj.is_boosted:
+                obj.boosted_till = form.cleaned_data['boosted_till']
+                obj.boosted_start_time = datetime.now()
+                obj.boosted_end_time = datetime.now()+timedelta(hours=obj.boosted_till)
+
+
 
         if 'title' in form.changed_data:
             tag_list = obj.title.split()
