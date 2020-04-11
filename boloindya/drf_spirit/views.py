@@ -57,7 +57,8 @@ from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
 from .serializers import *
 from tasks import vb_create_task,user_ip_to_state_task,sync_contacts_with_user
-from haystack.query import SearchQuerySet, SQ                                      
+from haystack.query import SearchQuerySet, SQ
+from django.core.exceptions import MultipleObjectsReturned                                  
 # from haystack.inputs import Raw, AutoQuery
 # from haystack.utils import Highlighter
 
@@ -2083,13 +2084,18 @@ def verify_otp(request):
                 if mobile_no in ['7726080653']:
                     return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
                 try:
-                    userprofile = UserProfile.objects.get(mobile_no = mobile_no,user__is_active = True)
+                    userprofile = UserProfile.objects.get(mobile_no = mobile_no)
                 except:
                     try:
                         userprofile = UserProfile.objects.get(mobile_no = mobile_no,social_identifier='',user__is_active = True)
+                    except MultipleObjectsReturned:
+                        userprofile = UserProfile.objects.filter(mobile_no = mobile_no,social_identifier='',user__is_active = True).order_by('id')[0]
+                        is_created=False
                     except:
                         userprofile = None
                 if userprofile:
+                    if not userprofile.user.is_active:
+                        return JsonResponse({'message': 'You are permanently banned by admin'}, status=status.HTTP_400_BAD_REQUEST)
                     user = userprofile.user
                     message = 'User Logged In'
                 else:
@@ -2209,7 +2215,11 @@ def fb_profile_settings(request):
     try:
         if activity == 'facebook_login' and refrence == 'facebook':
             try:
-                userprofile = UserProfile.objects.get(social_identifier = extra_data['id'],user__is_active = True)
+                userprofile = UserProfile.objects.get(social_identifier = extra_data['id'])
+                user=userprofile.user
+                is_created=False
+            except MultipleObjectsReturned:
+                userprofile = UserProfile.objects.filter(social_identifier = extra_data['id']).order_by('id')[0]
                 user=userprofile.user
                 is_created=False
             except Exception as e:
@@ -2220,6 +2230,9 @@ def fb_profile_settings(request):
                 user = User.objects.create(username = username)
                 userprofile = UserProfile.objects.get(user = user)
                 is_created = True
+
+            if not userprofile.user.is_active:
+                return JsonResponse({'message': 'You are permanently banned by admin'}, status=status.HTTP_400_BAD_REQUEST)
 
             if is_created:
                 add_bolo_score(user.id, 'initial_signup', userprofile)
@@ -2272,9 +2285,13 @@ def fb_profile_settings(request):
                 return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
         elif activity == 'google_login' and refrence == 'google':
             try:
-                userprofile = UserProfile.objects.get(social_identifier = extra_data['google_id'],user__is_active = True)
+                userprofile = UserProfile.objects.get(social_identifier = extra_data['google_id'])
                 user=userprofile.user
                 is_created=False
+            except MultipleObjectsReturned:
+                userprofile = UserProfile.objects.filter(social_identifier = extra_data['id']).order_by('id')[0]
+                user=userprofile.user
+                is_created = False
             except Exception as e:
                 print e
                 # user_exists,num_user = check_user(extra_data['first_name'],extra_data['last_name'])
@@ -2283,6 +2300,8 @@ def fb_profile_settings(request):
                 user = User.objects.create(username = username)
                 userprofile = UserProfile.objects.get(user = user)
                 is_created = True
+            if not userprofile.user.is_active:
+                return JsonResponse({'message': 'You are permanently banned by admin'}, status=status.HTTP_400_BAD_REQUEST)
 
             if is_created:
                 add_bolo_score(user.id, 'initial_signup', userprofile)
