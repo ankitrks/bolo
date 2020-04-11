@@ -43,7 +43,7 @@ from .models import SingUpOTP
 from .models import UserJarvisDump, UserLogStatistics, UserFeedback
 from .permissions import IsOwnerOrReadOnly
 from .utils import get_weight, add_bolo_score, shorcountertopic, calculate_encashable_details, state_language, language_options,short_time,\
-    solr_object_to_db_object,get_paginated_data
+    solr_object_to_db_object,get_paginated_data ,shortcounterprofile
 
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
@@ -2004,7 +2004,7 @@ def get_user_bolo_info(request):
             total_video_id = list(total_video.values_list('pk',flat=True))
             all_pay = UserPay.objects.filter(user=request.user,is_active=True)
             top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user).order_by('-view_count')[:3]
-            video_playtime = user.st.total_vb_playtime
+            video_playtime = request.user.st.total_vb_playtime
         else:
             total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user,date__gte=start_date, date__lte=end_date)
             total_video_id = list(Topic.objects.filter(is_vb = True,user=request.user,is_removed=False).values_list('pk',flat=True))
@@ -2019,7 +2019,6 @@ def get_user_bolo_info(request):
         for each_pay in all_pay:
             total_earn+=each_pay.amount_pay
         total_video_count = total_video.count()
-        print total_video
         monetised_video_count = total_video.filter(is_monetized = True).count()
         unmonetizd_video_count= total_video.filter(is_monetized = False,is_moderated = True).count()
         left_for_moderation = total_video.filter(is_moderated = False).count()
@@ -2036,7 +2035,7 @@ def get_user_bolo_info(request):
         return JsonResponse({'message': 'success', 'total_video_count' : total_video_count, \
                         'monetised_video_count':monetised_video_count, 'total_view_count':total_view_count,'total_comment_count':total_comment_count,\
                         'total_like_count':total_like_count,'total_share_count':total_share_count,'left_for_moderation':left_for_moderation,'total_earn':total_earn,'video_playtime':video_playtime,\
-                        'spent_time':spent_time,'top_3_videos':TopicSerializer(top_3_videos,many=True, context={'is_expand': request.GET.get('is_expand',True)}).data,'unmonetizd_video_count':unmonetizd_video_count}, status=status.HTTP_200_OK)
+                        'spent_time':spent_time,'top_3_videos':TopicSerializer(top_3_videos,many=True, context={'is_expand': request.GET.get('is_expand',True)}).data,'unmonetizd_video_count':unmonetizd_video_count,'bolo_score':shortcounterprofile(request.user.st.bolo_score)}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
