@@ -2089,7 +2089,7 @@ def verify_otp(request):
                     try:
                         userprofile = UserProfile.objects.get(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no)
                     except MultipleObjectsReturned:
-                        userprofile = UserProfile.objects.filter(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no).order_by('id')[0]
+                        userprofile = UserProfile.objects.filter(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no).order_by('id')[-1]
                         is_created=False
                     except:
                         userprofile = None
@@ -2219,7 +2219,7 @@ def fb_profile_settings(request):
                 user=userprofile.user
                 is_created=False
             except MultipleObjectsReturned:
-                userprofile = UserProfile.objects.filter(social_identifier = extra_data['id']).order_by('id')[0]
+                userprofile = UserProfile.objects.filter(social_identifier = extra_data['id']).order_by('id')[-1]
                 user=userprofile.user
                 is_created=False
             except Exception as e:
@@ -2289,7 +2289,7 @@ def fb_profile_settings(request):
                 user=userprofile.user
                 is_created=False
             except MultipleObjectsReturned:
-                userprofile = UserProfile.objects.filter(social_identifier = extra_data['id']).order_by('id')[0]
+                userprofile = UserProfile.objects.filter(social_identifier = extra_data['id']).order_by('id')[-1]
                 user=userprofile.user
                 is_created = False
             except Exception as e:
