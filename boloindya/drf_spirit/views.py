@@ -2087,9 +2087,9 @@ def verify_otp(request):
                     userprofile = UserProfile.objects.get(mobile_no = mobile_no)
                 except:
                     try:
-                        userprofile = UserProfile.objects.get(mobile_no = mobile_no,social_identifier='',user__is_active = True)
+                        userprofile = UserProfile.objects.get(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no)
                     except MultipleObjectsReturned:
-                        userprofile = UserProfile.objects.filter(mobile_no = mobile_no,social_identifier='',user__is_active = True).order_by('id')[0]
+                        userprofile = UserProfile.objects.filter(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no).order_by('id')[0]
                         is_created=False
                     except:
                         userprofile = None
