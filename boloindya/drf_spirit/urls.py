@@ -151,4 +151,5 @@ urlpatterns = [
     url(r'^get_category_with_video_bytes/$', get_category_with_video_bytes),
 
     url(r'^submit_user_feedback/$', submit_user_feedback),
+    url(r'^save_banner_response/$', save_banner_response),
 ]

@@ -295,4 +295,13 @@ class StateDistrictLanguage(RecordTimeStamp):
         super(StateDistrictLanguage, self).save(*args, **kwargs)
 
 
+class BannerUser(RecordTimeStamp):
+
+    user=models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='banner_user',editable=False)
+    hash_tag = models.CharField(_('hash_tag'),max_length=1000,null=True,blank=True)
+    response_type = models.CharField(_("Response Type"),null=True,blank=True,max_length=255)
+
+
+
+
 
