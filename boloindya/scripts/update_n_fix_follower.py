@@ -30,7 +30,8 @@ def run():
             while(follower_counter):
                 opt_action_user_id = random.choice(user_ids)
                 status = action_follow(opt_action_user_id,each_real_user.user.id)
-                follower_counter-=1
+                if status:
+                    follower_counter-=1
 
 #follow
 def action_follow(test_user_id,any_user_id):
