@@ -1,4 +1,5 @@
 from forum.user.models import ReferralCode, ReferralCodeUsed
+from datetime import datetime, timedelta
 
 def run():
     for each_rec in ReferralCode.objects.filter(id__in = \
