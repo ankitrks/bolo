@@ -698,3 +698,17 @@ class ContactSerializer(ModelSerializer):
     def get_user(self,instance):
         return UserSerializer(instance.user).data
 
+class ReferralCodeUsedStatSerializer(ModelSerializer):
+    user = SerializerMethodField()
+    date_joined = SerializerMethodField()
+
+    class Meta:
+        model = ReferralCodeUsed
+        fields = ('user', 'date_joined')
+
+    def get_user(self,instance):
+        return UserSerializer(instance.by_user).data
+
+    def get_date_joined(self,instance):
+        return instance.by_user.date_joined.strftime("%d-%m-%Y %H:%M:%S")
+
