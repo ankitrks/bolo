@@ -94,33 +94,60 @@ class UserProfileAdmin(ImportExportModelAdmin):
     resource_class = UserProfileResource
 admin.site.register(UserProfile,UserProfileAdmin)
 
+from django.db.models import Count, Q
 class ReferralCodeAdmin(admin.ModelAdmin):
     change_list_template = "admin/forum_user/referralcode/change_list.html"
-    list_display = ('for_user','code', 'purpose', 'is_active', 'get_downloads', 'get_signup', 'playstore_url', 'no_playstore_url', 'created_at')
+    list_display = ('for_user', 'get_paytm_number', 'code', 'purpose', 'is_active', 'get_downloads', 'get_signup', 'playstore_url', \
+            'no_playstore_url', 'created_at')
     list_filter = ('code', 'is_active','is_refer_earn_code')
     search_fields = ('code', 'for_user__username', 'for_user__email', 'for_user__st__name', 'for_user__st__mobile_no', 'for_user__st__paytm_number')
 
+    def get_queryset(self, request):
+        queryset = super(ReferralCodeAdmin, self).get_queryset(request)
+        queryset = queryset.annotate(
+            _get_downloads = Count("referralcodeused", filter = Q(is_download = True, by_user__isnull = True), distinct=True),
+            _get_signup = Count("referralcodeused", filter = Q(is_download = True, by_user__isnull = False), distinct=True),
+        )
+        return queryset
+
+    def get_paytm_number(self, obj):
+        return obj.for_user.st.paytm_number
+    get_paytm_number.short_description = 'Paytm Number'
+
     def get_downloads(self, obj):
+        # return str(obj.downloads())
         return '<a href="/superman/forum_user/referralcodeused/?code__id__exact=' + str(obj.id) + '&by_user__isnull=1" target="_blank">\
         ' + str(obj.downloads()) + '</a>'
     get_downloads.short_description = 'Downloads'
     get_downloads.allow_tags = True
+    get_downloads.admin_order_field = '_get_downloads'
 
     def get_signup(self, obj):
         return '<a href="/superman/forum_user/referralcodeused/?code__id__exact=' + str(obj.id) + '&by_user__isnull=0" target="_blank">\
         ' + str(obj.signup()) + '</a>'
     get_signup.short_description = 'Signup'
     get_signup.allow_tags = True
+    get_signup.admin_order_field = '_get_signup'
 
 admin.site.register(ReferralCode, ReferralCodeAdmin)
 
 class ReferralCodeUsedAdmin(admin.ModelAdmin):
     list_display = ('code', 'get_user', 'get_install_time', 'get_signup_time', 'get_last_active_time', 'android_id')
     search_fields = ('code__code', )
-    list_filter = ('created_at', ('created_at', DateRangeFilter), 'code')
+    list_filter = ('created_at', ('created_at', DateRangeFilter), ) # 'code'
+
+    def get_queryset(self, request):
+        qs = super(ReferralCodeUsedAdmin, self).get_queryset(request)
+        if request.GET.get('by_user__isnull') and request.GET.get('by_user__isnull') == '0':
+            qs = qs.order_by('by_user').distinct('by_user')
+        if request.GET.get('by_user__isnull') and request.GET.get('by_user__isnull') == '1':
+            qs = qs.order_by('android_id').distinct('android_id')
+        return qs
 
     def get_user(self, obj):
-        return obj.by_user.username
+        if obj.by_user:
+            return obj.by_user.username
+        return '-'
     get_user.short_description = 'User'
     
     def get_install_time(self, obj):
@@ -134,7 +161,9 @@ class ReferralCodeUsedAdmin(admin.ModelAdmin):
     get_install_time.short_description = 'install'
 
     def get_signup_time(self, obj):
-        return obj.by_user.date_joined
+        if obj.by_user:
+            return obj.by_user.date_joined
+        return '-'
     get_signup_time.short_description = 'signup'
 
     def get_last_active_time(self, obj):
