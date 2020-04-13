@@ -8,6 +8,8 @@ from import_export import resources
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 from .models import UserFollowUnfollowDetails, UserVideoTypeDetails, VideoDetails, UserEntryPoint, UserViewedFollowersFollowing, UserInterest, VideoSharedDetails, UserSearch, UserLogStatistics
 from django.contrib.auth.models import User
+# from django.db.models import Count, Q
+from forum.topic.models import VBseen
 
 class UserProfileResource(resources.ModelResource):
     class Meta:
@@ -94,7 +96,6 @@ class UserProfileAdmin(ImportExportModelAdmin):
     resource_class = UserProfileResource
 admin.site.register(UserProfile,UserProfileAdmin)
 
-from django.db.models import Count, Q
 class ReferralCodeAdmin(admin.ModelAdmin):
     change_list_template = "admin/forum_user/referralcode/change_list.html"
     list_display = ('for_user', 'get_paytm_number', 'code', 'purpose', 'is_active', 'get_downloads', 'get_signup', 'playstore_url', \
@@ -102,13 +103,16 @@ class ReferralCodeAdmin(admin.ModelAdmin):
     list_filter = ('code', 'is_active','is_refer_earn_code')
     search_fields = ('code', 'for_user__username', 'for_user__email', 'for_user__st__name', 'for_user__st__mobile_no', 'for_user__st__paytm_number')
 
-    def get_queryset(self, request):
-        queryset = super(ReferralCodeAdmin, self).get_queryset(request)
-        queryset = queryset.annotate(
-            _get_downloads = Count("referralcodeused", filter = Q(is_download = True, by_user__isnull = True), distinct=True),
-            _get_signup = Count("referralcodeused", filter = Q(is_download = True, by_user__isnull = False), distinct=True),
-        )
-        return queryset
+    # def get_queryset(self, request):
+    #     queryset = super(ReferralCodeAdmin, self).get_queryset(request)
+    #     queryset = queryset.annotate(
+    #         _get_downloads = Count("referralcodeused", filter = (Q(is_download = True, by_user__isnull = True)).values_list('android_id'), distinct=True),
+    #         _get_signup = Count("referralcodeused", filter = (Q(is_download = True, by_user__isnull = False)).values_list('by_user'), distinct=True),
+    #     )
+    #     return queryset
+
+    def get_ordering(self, request):
+        return ('-signup_count', )
 
     def get_paytm_number(self, obj):
         if obj.for_user:
@@ -119,22 +123,22 @@ class ReferralCodeAdmin(admin.ModelAdmin):
     def get_downloads(self, obj):
         # return str(obj.downloads())
         return '<a href="/superman/forum_user/referralcodeused/?code__id__exact=' + str(obj.id) + '&by_user__isnull=1" target="_blank">\
-        ' + str(obj.downloads()) + '</a>'
+        ' + str(obj.download_count) + '</a>'
     get_downloads.short_description = 'Downloads'
     get_downloads.allow_tags = True
-    get_downloads.admin_order_field = '_get_downloads'
+    get_downloads.admin_order_field = 'download_count'
 
     def get_signup(self, obj):
         return '<a href="/superman/forum_user/referralcodeused/?code__id__exact=' + str(obj.id) + '&by_user__isnull=0" target="_blank">\
-        ' + str(obj.signup()) + '</a>'
+        ' + str(obj.signup_count) + '</a>'
     get_signup.short_description = 'Signup'
     get_signup.allow_tags = True
-    get_signup.admin_order_field = '_get_signup'
+    get_signup.admin_order_field = 'signup_count'
 
 admin.site.register(ReferralCode, ReferralCodeAdmin)
 
 class ReferralCodeUsedAdmin(admin.ModelAdmin):
-    list_display = ('code', 'get_user', 'get_install_time', 'get_signup_time', 'get_last_active_time', 'android_id')
+    list_display = ('code', 'get_user', 'get_user_name', 'get_phone', 'get_install_time', 'get_signup_time', 'get_last_active_time', 'android_id')
     search_fields = ('code__code', )
     list_filter = ('created_at', ('created_at', DateRangeFilter), ) # 'code'
 
@@ -151,6 +155,18 @@ class ReferralCodeUsedAdmin(admin.ModelAdmin):
             return obj.by_user.username
         return '-'
     get_user.short_description = 'User'
+
+    def get_user_name(self, obj):
+        if obj.by_user:
+            return obj.by_user.st.name
+        return '-'
+    get_user_name.short_description = 'Name'
+
+    def get_phone(self, obj):
+        if obj.by_user:
+            return obj.by_user.st.mobile_no
+        return '-'
+    get_phone.short_description = 'phone no'
     
     def get_install_time(self, obj):
         try:
@@ -170,8 +186,13 @@ class ReferralCodeUsedAdmin(admin.ModelAdmin):
 
     def get_last_active_time(self, obj):
         try:
-            last_active = AndroidLogs.objects.filter(user = obj.by_user).order_by('-last_modified').first().last_modified
-            return last_active
+            last_active = AndroidLogs.objects.filter(user = obj.by_user).order_by('-last_modified').first()
+            if last_active:
+                return last_active.last_modified
+            else:
+                last_active = VBseen.objects.filter(user = obj.by_user).order_by('-last_modified').first()
+                if last_active:
+                    return '~ ' + last_active.last_modified.strftime('%b %d, %Y, %I:%M %p')
         except:
             return '-'
     get_last_active_time.short_description = 'last active'

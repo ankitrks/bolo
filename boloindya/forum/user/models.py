@@ -318,6 +318,8 @@ class ReferralCode(RecordTimeStamp):
     campaign_url = models.CharField(_("Playstore URL"), max_length=350, blank=True, null = True, editable = False)
     is_active = models.BooleanField(_("live"), default = True)
     is_refer_earn_code = models.BooleanField(_("Is Refer Earn Code?"), default = False)
+    download_count = models.PositiveIntegerField(_("ownload count"), default=0)
+    signup_count = models.PositiveIntegerField(_("signup count"), default=0)
 
     def __unicode__(self):
         return str(self.code)
