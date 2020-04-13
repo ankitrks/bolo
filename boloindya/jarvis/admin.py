@@ -82,6 +82,9 @@ class DashboardMetricsAdmin(admin.ModelAdmin):
 #     list_editable = ('metrics', 'metrics_slab', 'date', 'week_no', 'count')
 #     list_filter = ('metrics', 'metrics_slab', 'date')
 
+class BannerUserAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'hash_tag', 'response_type')
+
 
 admin.site.unregister(FCMDevice)
 admin.site.register(FCMDevice, FCMDeviceAdmin) 
@@ -90,5 +93,5 @@ admin.site.register(PushNotificationUser)
 admin.site.register(DashboardMetrics, DashboardMetricsAdmin)
 admin.site.register(StateDistrictLanguage, StateDistrictLanguageAdmin)
 admin.site.register(DashboardMetricsJarvis)
-admin.site.register(BannerUser)
+admin.site.register(BannerUser, BannerUserAdmin)
 
