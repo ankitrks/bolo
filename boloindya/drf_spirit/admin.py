@@ -111,7 +111,9 @@ class ReferralCodeAdmin(admin.ModelAdmin):
         return queryset
 
     def get_paytm_number(self, obj):
-        return obj.for_user.st.paytm_number
+        if obj.for_user:
+            return obj.for_user.st.paytm_number
+        return '-'
     get_paytm_number.short_description = 'Paytm Number'
 
     def get_downloads(self, obj):
