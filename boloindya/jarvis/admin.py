@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
-from .models import VideoUploadTranscode,FCMDevice, PushNotificationUser, PushNotification, StateDistrictLanguage, DashboardMetrics, DashboardMetricsJarvis
+from .models import VideoUploadTranscode,FCMDevice, PushNotificationUser, PushNotification, StateDistrictLanguage, DashboardMetrics, DashboardMetricsJarvis, BannerUser
 from functools import update_wrapper
 from django.contrib import admin
 from django.shortcuts import redirect, render
@@ -90,5 +90,5 @@ admin.site.register(PushNotificationUser)
 admin.site.register(DashboardMetrics, DashboardMetricsAdmin)
 admin.site.register(StateDistrictLanguage, StateDistrictLanguageAdmin)
 admin.site.register(DashboardMetricsJarvis)
-
+admin.site.register(BannerUser)
 
