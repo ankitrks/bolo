@@ -71,7 +71,7 @@ def send_file_mail(file_name):
     msg = MIMEMultipart()
     msg["From"] = emailfrom
     msg["To"] = emailto
-    msg["Subject"] = "Refer N Earn Stats: " + str(datetime.now().date())
+    msg["Subject"] = "Refer N Earn Stats: " + str((datetime.now()-timedelta(days=1)).date().strftime("%d-%m-%Y"))
     msg.preamble = ""
 
     ctype, encoding = mimetypes.guess_type(filetosend)
