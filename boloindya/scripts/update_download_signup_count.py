@@ -1,4 +1,4 @@
-from forum.user.models import ReferralCode
+from forum.user.models import ReferralCode, ReferralCodeUsed
 
 def run():
     for each_rec in ReferralCode.objects.filter(id__in = \
