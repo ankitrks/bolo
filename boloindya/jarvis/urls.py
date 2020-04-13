@@ -22,6 +22,8 @@ urlpatterns = [
     url(r'^uploadvideofile/$',views.uploadvideofile,name = 'uploadvideofile'),
     url(r'^boloindya_uploadvideofile/$',views.boloindya_uploadvideofile,name = 'boloindya_uploadvideofile'),
     url(r'^management/video/$',views.video_management,name = 'video_management'),
+    url(r'^management/user/$',views.user_management,name = 'user_management'),
+    url(r'^referral/$',views.referral,name = 'referral'),
     url(r'^upload_n_transcode/$',views.upload_n_transcode),
     url(r'^boloindya_upload_n_transcode/$',views.boloindya_upload_n_transcode),
     url(r'^get_filtered_user/$',views.get_filtered_user,name = 'get_filtered_user'),

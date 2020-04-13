@@ -8,9 +8,6 @@
     {{ block.super }}
     {{ media.css }}
     <style type="text/css">
-         #created-at-form{margin-top: 5px;padding-right: 10px;}
-         .controls{text-align: center;}
-         .controls input{height: 25px;margin-top: 10px;}
          header#grp-header{display: none;}
          #grp-content{top:0;}
     </style>
@@ -23,12 +20,6 @@
     {% if cl.formset or action_form %}
         {% url 'admin:jsi18n' as jsi18nurl %}
         <script type="text/javascript" src="{{ jsi18nurl|default:'../../jsi18n/'}}"></script>
-        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script type="text/javascript">
-      $(document).ready(function(){
-        grappelli.initDateAndTimePicker();
-      });
-    </script>
     {% endif %}
     {% if action_form %}
         <script type="text/javascript" charset="utf-8">
@@ -136,33 +127,6 @@
     {% endif %}
     <script type="text/javascript" charset="utf-8">
         (function($) {
-            var getUrlParameter = function getUrlParameter(sParam) {
-                var sPageURL = decodeURIComponent(window.location.search.substring(1)),
-                sURLVariables = sPageURL.split('&'), sParameterName, i;
-                for (i = 0; i < sURLVariables.length; i++) {
-                    sParameterName = sURLVariables[i].split('=');
-                    if (sParameterName[0] === sParam) {
-                        return sParameterName[1] === undefined ? true : sParameterName[1];
-                    }
-                }
-            };
-            function arr_diff (a1, a2) {
-                var a = [], diff = [];
-                for (var i = 0; i < a1.length; i++) {
-                    a[a1[i]] = true;
-                }
-                for (var i = 0; i < a2.length; i++) {
-                    if (a[a2[i]]) {
-                        delete a[a2[i]];
-                    } else {
-                        a[a2[i]] = true;
-                    }
-                }
-                for (var k in a) {
-                    diff.push(k);
-                }
-                return diff;
-            }
             $(document).ready(function() {
                 grappelli.initSearchbar();
                 grappelli.initFilter();
@@ -173,106 +137,6 @@
                 $('.related-lookup').on("click", function(e) {
                     e.preventDefault();
                     showRelatedObjectLookupPopup(this);
-                });
-                jQuery('.field-is_monetized').find('input[type="checkbox"]:checked').parents('td').next('td.field-is_removed')
-                    .find('input[type="checkbox"]:not(:checked)').prop('disabled', 'disabled');
-                jQuery('.field-is_removed').find('input[type="checkbox"]:checked').parents('td').prev('td.field-is_monetized')
-                    .find('input[type="checkbox"]:not(:checked)').prop('disabled', 'disabled');
-
-                jQuery('.field-is_monetized input[type="checkbox"]').change(function(){
-                    var attr_disabled = false;
-                    if($(this).is(':checked')){
-                        attr_disabled = true;
-                    }
-                    $(this).parents('td').next('td.field-is_removed').find('input[type="checkbox"]:not(:checked)').prop('disabled', attr_disabled);
-                });
-                jQuery('.field-is_removed input[type="checkbox"]').change(function(){
-                    var attr_disabled = false;
-                    if($(this).is(':checked')){
-                        attr_disabled = true;
-                    }
-                    $(this).parents('td').prev('td.field-is_monetized').find('input[type="checkbox"]:not(:checked)').prop('disabled', attr_disabled);
-                });
-
-                jQuery('.grp-pulldown-content').find('.grp-module').appendTo("#date-form");
-                jQuery('.admindatefilter').find('.controls').insertAfter('.admindatefilter .grp-module:last');
-                jQuery('.grp-filter-choice').off('change');
-                jQuery('#date-form').find('input[type="submit"]').prop("onclick", null).off("click");
-                jQuery('#date-form').find('input[type="reset"]').prop("onclick", null).off("click");
-
-                jQuery(document).on('click', '#date-form input[type="reset"]', function(e){
-                    window.location = window.location.pathname;
-                });
-
-                jQuery.each( jQuery('#date-form .grp-filter-choice'), function(i, each_select){
-                    var first_opt = $(each_select).find('option:eq(0)').val().replace(/\?/gi, '').split('&');
-                    var second_opt = $(each_select).find('option:eq(1)').val().replace(/\?/gi, '').split('&');
-                    var diff_var = arr_diff(first_opt, second_opt);
-                    if( diff_var.length ){
-                        $(each_select).attr('fid', diff_var[0].split('=')[0]);
-                    }
-                });
-
-                jQuery(document).on('submit', '#date-form', function(e){
-                    e.preventDefault();
-                    var temp_qs = jQuery(this).serialize();
-                    var filter_all = [];
-                    jQuery.each( jQuery('#date-form .grp-filter-choice').find('option:selected'), function(i, each_opt){
-                        if( $(each_opt).text().toLowerCase() == 'all' ){
-                            var fid = $(each_opt).parents('.grp-filter-choice').attr('fid');
-                            if( getUrlParameter(fid) ){
-                                filter_all.push( fid );
-                            }
-                        }
-                        temp_qs += $(each_opt).val();
-                    });
-                    temp_qs = temp_qs.replace(/\?/gi, '&').split('&');
-                    var qs_dict = {};
-                    for( i = 0; i < temp_qs.length; i++){
-                        var tkey = temp_qs[i].split('=')[0];
-                        var tval = temp_qs[i].split('=')[1];
-                        if( jQuery.inArray(tkey, filter_all) == -1 && tval ){
-                            if( !(tkey in qs_dict) ){
-                                qs_dict[tkey] = tval;
-                            }
-                            else{
-                                var url_val = getUrlParameter(tkey);
-                                if( url_val != tval ){
-                                    qs_dict[tkey] = tval;
-                                }
-                            }
-                        }
-                    }
-                    if( !$('#id_date__gte').val() ){ delete qs_dict['date__gte']; }
-                    if( !$('#id_date__lte').val() ){ delete qs_dict['date__lte']; }
-                    var final_qs = '?';
-                    for(key in qs_dict){
-                        final_qs += key + '=' + qs_dict[key] + '&';
-                    }
-                    window.location = window.location.pathname + final_qs;
-                });
-                
-                jQuery(document).on('click', '.edit_title', function(e){
-                    e.preventDefault();
-                    jQuery(this).parents('td').find('.title_box').hide();
-                    jQuery(this).parents('td').find('input[type="text"], .close_edit_box').show();
-                    var text_field = jQuery(this).parents('td').find('input[type="text"]');
-                    var title = $(text_field).val();
-                    $(text_field).val( title.replace( /(<([^>]+)>)/ig, '') );
-                });
-
-                jQuery(document).on('click', '.close_edit_box', function(e){
-                    e.preventDefault();
-                    jQuery(this).parents('td').find('.title_box').show();
-                    jQuery(this).parents('td').find('input[type="text"], .close_edit_box').hide();
-                });
-
-                jQuery.each( jQuery('.field-title'), function(i, each_field){
-                    var title = $(each_field).find('input[type="text"]').val();
-                    $(each_field).find('input[type="text"]').hide();
-                    $(each_field).append('<a href="#" class="close_edit_box" style="display:none;">close</a>');
-                    $(each_field).append('<div class="title_box">' + title + '&nbsp;&nbsp;<a href="#" class="edit_title">edit</a></div>');
-                    // $(each_field).find('input[type="text"]').val( title.replace( /(<([^>]+)>)/ig, '') );
                 });
             });
         })(grp.jQuery);
@@ -308,8 +172,6 @@
                 <li><a href="{% add_preserved_filters add_url is_popup to_field %}" class="grp-add-link grp-state-focus">{% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}</a></li>
             {% endif %}
         {% endblock %}
-        <li><a href="#" class="grp-add-link grp-state-focus exp_col_icon expand_rows"> + show all urls</a></li>
-        <li><a href="#" class="grp-add-link grp-state-focus exp_col_icon collapse_rows" style="display: none;">  - hide all urls</a></li>
     </ul>
 {% endblock %}
 
@@ -386,7 +248,7 @@
         <!-- PAGINATION BOTTOM -->
         {% if not cl.result_count == 0 %}
             {% block pagination_bottom %}
-                <div class="grp-module" style="margin-bottom: 32px;">
+                <div class="grp-module">
                     <div class="grp-row">{% pagination cl %}</div>
                 </div>
             {% endblock %}
