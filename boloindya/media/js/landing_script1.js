@@ -242,6 +242,7 @@ function loaderBoloHide(){
                 checkDataStatus=0;
 
                 var topicLIkes=userLikeAndUnlike.topic_like;
+                if(topicLIkes){
                   topicLIkes.forEach(function(topicLikeId){
                     if(topicLikeId){
                       var topicId=topicLikeId;
@@ -255,6 +256,7 @@ function loaderBoloHide(){
                     }
 
                   });
+                }
 
             },
             error: function(jqXHR, textStatus, errorThrown){
@@ -1040,6 +1042,136 @@ function social_share(shareType){
 
     });
 } 
+
+jQuery(document).ready(function(){
+    getElementsByPageSideBar(1);
+    getSideBarData();
+});
+
+function getElementsByPageSideBar(currentPage){
+    loaderBoloShowDynamicDe('_scroll_load_more_loading_user_videos');
+    var playListData=[]; 
+    var platlistItems;
+    var listItems="";
+    var itemCount=0;
+
+
+    var uri='/api/v1/get_popular_video_bytes/?page='+currentPage;
+    var res = encodeURI(uri);
+    $.get(res, function (data, textStatus, jqXHR) {
+        var topicVideoList=data.topics;
+        playListData=topicVideoList;
+        var itemCount=-1;
+        topicVideoList.forEach(function(itemVideo) {itemCount++;
+          var isPlaying="";
+          var isPlayIconDis="none";
+          if(itemCount==1){
+                isPlaying='is-playing';
+                isPlayIconDis="block";
+            }
+          var content_title="";
+          var videoTitle="";
+              videoTitle=removeTags(itemVideo.title);
+              content_title = videoTitle.substr(0, 40) + " ..."
+            listItems += '<li><a href="/explore/'+itemVideo.slug+'/'+itemVideo.id+'" ><div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+itemVideo.question_image+');"><div class="jsx-3077367275 video-card default"><div class="jsx-3077367275 video-card-mask"><div class="jsx-1633345700 card-footer small"><div class="jsx-1633345700"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+itemVideo.view_count+'</span></p><span class="_video_card_footer_likes1"><img src="/media/download.svg" alt="likes"> '+itemVideo.likes_count+'</span></div></div></div></div></div></a></li>';
+
+        });
+
+        $("#playlistTrending").append(listItems);
+        loaderBoloHideDynamicDe('_scroll_load_more_loading_user_videos');
+
+    });
+
+}
+function loaderBoloShowDynamicDe(classLoader){
+    var boloLoader='<img src="/media/loader.gif">';
+        $('.'+classLoader).html(boloLoader);
+
+}
+
+function loaderBoloHideDynamicDe(classLoader){
+    var boloLoader='';
+    $('.'+classLoader).html(boloLoader);
+    
+}
+
+function getSideBarData(){
+    loaderBoloShowDynamic('_scroll_load_more_loading_creator');
+    // loaderBoloShowDynamic('_scroll_load_more_loading_discover');
+
+    var listItems="";
+    var itemCount=0;
+    var language_id=1;
+    language_id=current_language_id;
+        // headers: {
+        //   'Authorization':'Bearer '+accessToken,
+        // },
+    //var uri='https://www.boloindya.com/api/v1/get_popular_video_bytes/?page=1';
+    var uri='/api/v1/get_category_with_video_bytes/';
+    var res = encodeURI(uri);
+    var page_size=10;
+    jQuery.ajax({
+        url:res,
+        type:"GET",
+
+        data:{'language_id':language_id,'is_with_popular':'True','popular_boloindyans':'True','page_size':page_size},
+        success: function(response,textStatus, xhr){
+            populaCreatorsItems="";
+            populaCategoriesItems="";
+            getPopularCategory="";
+
+            var popularCategoriesList=response.category_details;
+            var popularCreatorsList=response.popular_boloindyans;
+            popularCreatorsList.forEach(function(itemCreator) {itemCount++;
+                populaCreatorsItems +=getCreators(itemCreator);
+                
+                //var videoCommentList=data.results;"total_view":"3444.K",
+            });
+            $("#creatorId").append(populaCreatorsItems);
+            loaderBoloHideDynamic('_scroll_load_more_loading_creator');
+    
+            // $("#discoverId").append(populaCategoriesItems);
+            // loaderBoloHideDynamic('_scroll_load_more_loading_discover');
+
+
+        }
+  
+    });
+}
+
+function popularBoloIndyan(popularBoloIndyans){
+  var popularBolo = popularBoloIndyans;
+  console.log(popularBolo);
+}
+
+
+
+function getCreators(popularCreators){
+    var creatorName="";
+    var profilePics="";
+    if(popularCreators.first_name!=''){
+        creatorName=popularCreators.first_name+' '+popularCreators.last_name;
+    }else{
+        creatorName=popularCreators.username;
+    }
+    profilePics=popularCreators.userprofile.profile_pic;
+    if(popularCreators.userprofile.profile_pic==""){
+        profilePics='/media/user.svg';
+    }
+
+    var creatorTemplate='<li class="jsx-3959364739">\
+                            <a tag="a" class="jsx-1420774184 recommend-item" href="/'+popularCreators.username+'/">\
+                                <div class="jsx-2177493926 jsx-578937417 avatar round head normal" style="background-image: url('+profilePics+');"></div>\
+                                <div class="jsx-1420774184 info-content">\
+                                    <h4 class="jsx-1420774184">'+creatorName+'</h4>\
+                                    <p class="jsx-1420774184">@'+popularCreators.username+'</p>\
+                                </div>\
+                                <div class="jsx-1420774184 arrow-right"></div>\
+                            </a>\
+                        </li>';
+    return creatorTemplate;
+
+}
 
 
 function removeTags(str) {

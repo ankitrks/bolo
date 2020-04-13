@@ -718,6 +718,15 @@ input#search-bar:focus:-ms-placeholder {
 .language-selection p{
   font-size: 12px;
 }
+.languageAndText{
+  display: flex;
+  margin-right: 10px;
+  font-size: 24px;
+}
+.languageAndText .language-selection{
+  margin-left: 10px !important;
+}
+
 @media(max-width: 991px){
   .logo-container .logo-text {
     width: 123px;
@@ -752,6 +761,7 @@ input#search-bar:focus:-ms-placeholder {
 }
 
 
+
 </style>
 
     <div id="__next">
@@ -759,48 +769,54 @@ input#search-bar:focus:-ms-placeholder {
             <div class="jsx-3563400267 header-container">
                 <div class="jsx-3563400267 header-content">
 
-<!--                         <div class="jsx-1724846817 jsx-1667329752 language-selection">
-                            {% get_current_language as LANGUAGE_CODE %}
-                            {% get_available_languages as LANGUAGES %}
-                            {% get_language_info_list for LANGUAGES as languages %}
-                            {% for language in languages %}
-                            {% if language.code == LANGUAGE_CODE %}
-                              <p class="jsx-1724846817 jsx-1667329752">{{ language.name_local }}</p>
-                            {% endif %}
-                            {% endfor %}
-
-                            <form action="{% url 'set_language' %}" method="post">
-                                {% csrf_token %}
-                                <input name="next" type="hidden" value="{{ redirect_to }}" />
-                                <select class="jsx-1724846817 jsx-1667329752 language-selection-form" name="{% trans 'language' %}"  onchange="this.form.submit()">
-
-                                    {% get_current_language as LANGUAGE_CODE %}
-                                    {% get_available_languages as LANGUAGES %}
-                                    {% get_language_info_list for LANGUAGES as languages %}
-                                    {% for language in languages %}
-
-                                        <option
-                                            value="{{ language.code }}"
-                                            {% if language.code == LANGUAGE_CODE %} selected="selected"{% endif %}
-                                            data-content='<img src="/static/img/flags/{{ language.code }}.png"></span>
-                                            <span style="display:inline-block; width:100px; padding-left: 10px; text-shadow:none">
-                                              {{ language.name_local }}
-                                            </span>'>
-                                            {{ language.name_local }}
-                                        </option>
-
-                                    {% endfor %}
-
-                                </select>
-                            </form>
-                        </div>  -->
-
                     <h1 class="jsx-475503780 logo-container"><a title="boloindya" class="jsx-475503780" href="{{site_base_url}}">
                         <img id="boloindyaLogoId" src="/media/boloindya_new_logo_main.png" alt="boloindya" class="jsx-475503780 logo-text">
                         <strong class="jsx-475503780">boloindya</strong></a>
                     </h1>
 
                           <ul class="jsx-3143951235 menu-wrapper" >
+
+                                <li class="jsx-3143951235">
+                                  <span class="languageAndText">I would love to watch in
+                                    <div class="jsx-1724846817 jsx-1667329752 language-selection">
+
+                                        {% get_current_language as LANGUAGE_CODE %}
+                                        {% get_available_languages as LANGUAGES %}
+                                        {% get_language_info_list for LANGUAGES as languages %}
+                                        {% for language in languages %}
+                                        {% if language.code == LANGUAGE_CODE %}
+                                          <p class="jsx-1724846817 jsx-1667329752">{{ language.name_local }}</p>
+                                        {% endif %}
+                                        {% endfor %}
+
+                                        <form action="{% url 'set_language' %}" method="post">
+                                            {% csrf_token %}
+                                            <input name="next" type="hidden" value="{{ redirect_to }}" />
+                                            <select class="jsx-1724846817 jsx-1667329752 language-selection-form" name="{% trans 'language' %}"  onchange="this.form.submit()">
+
+                                                {% get_current_language as LANGUAGE_CODE %}
+                                                {% get_available_languages as LANGUAGES %}
+                                                {% get_language_info_list for LANGUAGES as languages %}
+                                                {% for language in languages %}
+
+                                                    <option
+                                                        value="{{ language.code }}"
+                                                        {% if language.code == LANGUAGE_CODE %} selected="selected"{% endif %}
+                                                        data-content='<img src="/static/img/flags/{{ language.code }}.png"></span>
+                                                        <span style="display:inline-block; width:100px; padding-left: 10px; text-shadow:none">
+                                                          {{ language.name_local }}
+                                                        </span>'>
+                                                        {{ language.name_local }}
+                                                    </option>
+
+                                                {% endfor %}
+
+                                            </select>
+                                        </form>
+                                    </div>
+                                  </span> 
+                                </li>
+
                                 <li class="hideOnMobile">
                                     <div class="_4kny _50tm">
 <!--                                       <form class="searchbox" action="/{{LANGUAGE_CODE}}/search/" method="get">
@@ -829,6 +845,9 @@ input#search-bar:focus:-ms-placeholder {
 <!--                                 <li class="jsx-3143951235">
                                   <h2 class="menu-item-link menu-item-link-active"><a href="{{site_base_url}}" class="jsx-2922828392">{% trans "Home" %}</a></h2>
                                 </li> -->
+
+
+
                                 <li class="jsx-3143951235">
                                   <h2 class="menu-item-link"><a href="/discover/" class="jsx-2922828392">{% trans "Signin" %}</a></h2>
                                 </li>

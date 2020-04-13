@@ -939,8 +939,10 @@ def boloindya_feed(request):
     categories = []
     hash_tags = []
     topics = []
+    popular_bolo=[]
+    language_id=0
     try:
-        categories = Category.objects.filter(parent__isnull=False)[:10]
+        categories = Category.objects.filter(parent__isnull=False)[:20]
     except Exception as e1:
         categories = []   
     language_id = request.GET.get('language_id', 1)
@@ -976,16 +978,28 @@ def boloindya_feed(request):
     except Exception as e1:
         topics = []
 
+    try:
+        if language_id:
+            all_user = UserProfile.objects.filter(is_popular = True, language=language_id)[:10]
+            popular_bolo=all_user
+        else:
+            all_user = UserProfile.objects.filter(is_popular = True)[:10]
+            popular_bolo=all_user
+    except Exception as e1:
+        popular_bolo = []
 
     try:
-        hash_tags = TongueTwister.objects.order_by('-hash_counter')[:4]
+        hash_tags = TongueTwister.objects.order_by('-hash_counter')[:10]
     except Exception as e1:
         hash_tags = []
+    print popular_bolo.__dict__
 
+ 
     context = {
         'categories':categories,
         'hash_tags':hash_tags,
         'topics':topics,
+        'popular_bolo':popular_bolo,
         'is_single_topic': "Yes",
     }  
     video_slug = request.GET.get('video',None)

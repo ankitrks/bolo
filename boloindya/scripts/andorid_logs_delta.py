@@ -92,7 +92,7 @@ def extract_time_delta(log_text_dump, userid):
 			data_iter.append(round_delta1)
 			data_iter.append(round_delta2)
 			data_iter.append(net_info)
-			#print(data_iter)	
+			print(data_iter)	
 			print(','.join(map(str,data_iter)))
 			complete_data.append(data_iter)
 			"""
@@ -105,47 +105,55 @@ def extract_time_delta(log_text_dump, userid):
 			"""
 
 # func for extractning the time the video takes to run(this one is used)
+
 def extract_minmax_delta(log_text_dump, userid):
-
+	#print userid
+	#print log_text_dump
 	uniq_video_records = {}
-	for i in range(0, len(log_text_dump)):
-		record_i = log_text_dump[i]
-		#print(record_i)
-		curr_stamp = int(record_i['miliseconds'])
-		curr_state = record_i.get('state')
-		net_details = record_i.get('net_speed')
-		curr_videoid = int(record_i.get('video_byte_id'))
+	countLogLenghth=len(log_text_dump)
+	for j in range(countLogLenghth):
+		record_j = log_text_dump[j]
+		#print record_j
+		curr_stamp = record_j['miliseconds']
+		curr_state = record_j['state']
+		net_details = record_j['net_speed']
+		curr_videoid = record_j['video_byte_id']
 
-		if(curr_videoid in uniq_video_records):
-			uniq_video_records[curr_videoid][curr_state].append(curr_stamp)
-		else:
-			video_triple = {}
-			video_triple['ClickOnPlay'] = []
-			video_triple['PlayerReady'] = []
-			video_triple['StartPlaying'] = []
-			video_triple[curr_state].append(curr_stamp)
-			uniq_video_records[curr_videoid] = video_triple
+		video_triple = {}
+		video_triple['ClickOnPlay'] = []
+		video_triple['PlayerReady'] = []
+		video_triple['StartPlayingcache'] = []
+		video_triple['StartPlaying'] = []
+		video_triple[curr_state]=curr_stamp
+		uniq_video_records[curr_videoid] = video_triple
 
-	#print(uniq_video_records)
+
 	for key, val in uniq_video_records.items():
 		v_id = key
-		v_triplet = val 
-		if(len(v_triplet['ClickOnPlay'])>0 and len(v_triplet['PlayerReady'])>0 and len(v_triplet['StartPlaying'])> 0):
-
+		print(video_triple)
+		v_triplet = val
+		if(len(v_triplet['TimePlayed'])>0):
+			#print 'asfsdfsfsdf'
 			#print(v_triplet['ClickOnPlay'], v_triplet['PlayerReady'], v_triplet['StartPlaying'], type(v_triplet['ClickOnPlay'][0]))
 			click_list_sorted = sorted(v_triplet['ClickOnPlay'])
-			player_list_sorted = sorted(v_triplet['PlayerReady'])
-			start_list_sorted = sorted(v_triplet['StartPlaying'])
+			total_time_played = sorted(v_triplet['TimePlayed'])
 
+			player_list_sorted = sorted(v_triplet['PlayerReady'])
+
+			start_list_sorted = sorted(v_triplet['StartPlaying'])
+			print 'asfsdfsfsdf'
+			print(click_list_sorted)
 			#print(click_list_sorted, player_list_sorted, start_list_sorted, type(click_list_sorted))
 			mintime_player_ready  = (player_list_sorted[0] - click_list_sorted[0]) / 1000
+			print(mintime_player_ready)
 			maxtime_player_ready = (player_list_sorted[len(player_list_sorted)-1] - click_list_sorted[0]) / 1000
 			mintime_start = (start_list_sorted[0] - click_list_sorted[0]) / 1000
 			maxtime_start = (start_list_sorted[len(start_list_sorted)-1] - click_list_sorted[0]) / 1000
 			delta_player_ready = maxtime_player_ready - mintime_player_ready
 			delta_start = maxtime_start - mintime_start
-
+			print 'asfsdfsfsdf'
 			#print(mintime_player_ready, maxtime_player_ready, mintime_start, maxtime_start)
+			#print 'cdddd'+mintime_player_ready 
 			user_details = UserProfile.objects.get(user = userid)
 			if(user_details.name):
 				str_username = user_details.name
@@ -167,13 +175,16 @@ def extract_minmax_delta(log_text_dump, userid):
 			#data_iter.append(delta_start)
 			data_iter.append(net_details)
 			data_iter = [str(i) for i in data_iter]
-			#print(','.join(map(str,data_iter)))
-			#print(data_iter)
+			print(','.join(map(str,data_iter)))
+			print(data_iter)
+			print 'dsfsssssssssssssssss'
 			if(len(data_iter)>0):
 				complete_data.append(data_iter)
+			print 'Complete'+complete_data
 		
 # func for writing data into csv
 def write_csv():
+	#print 22222222
 	print(len(complete_data))
 	#headers = ['USERNAME', 'VIDEOTITLE', 'PLAYER READY(MIN)', 'PLAYER READY(MAX)', 'PLAYER READY(DELTA)', 'START PLAY(MIN)', 'START PLAY(MAX)', 'START PLAY(DELTA)', 'NETWORK']
 	headers = ['User', 'Video title', 'Player Ready', 'Play Time', 'Network']
@@ -187,7 +198,7 @@ def write_csv():
 # func for sending the csv created to the mail
 def send_file_mail():
 	emailfrom = "support@careeranna.com"
-	emailto = "ankit@careeranna.com"
+	emailto = "sarfaraz@careeranna.com"
 	filetosend = os.getcwd() + "/deltarecords.csv"
 	username = "support@careeranna.com"
 	password = "$upp0rt@30!1"				# please do not use this()
@@ -214,7 +225,7 @@ def send_file_mail():
 	server = smtplib.SMTP("smtp.gmail.com:587")
 	server.starttls()
 	server.login(username, password)
-	server.sendmail(emailfrom, [emailto, 'akash.g@careeranna.com', 'varun@careeranna.com'], msg.as_string())
+	#server.sendmail(emailfrom, [emailto], msg.as_string())
 	server.quit()
 
 
@@ -225,9 +236,11 @@ def main():
 	some_day_last_week = timezone.now().date() - timedelta(days=7)
 	monday_of_last_week = some_day_last_week - timedelta(days = (some_day_last_week.isocalendar()[2] - 1))
 	monday_of_this_week = monday_of_last_week + timedelta(days = 7)
-
+	print monday_of_last_week
+	print monday_of_this_week
 	# fetch recrods bw last monday and monday of this week
 	android_logs = AndroidLogs.objects.filter(created_at__gte = monday_of_last_week, created_at__lte = monday_of_this_week)
+	print android_logs.count()
 	for each_android in android_logs:
 		try:
 			each_android_dump = ast.literal_eval(each_android.logs)
@@ -248,4 +261,3 @@ def main():
 
 def run():
 	main()
-

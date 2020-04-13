@@ -310,6 +310,49 @@
     margin-bottom: 17px;
 }
 
+
+.horizontal-scroll {
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox */
+}
+.horizontal-scroll::-webkit-scrollbar { 
+    display: none;  /* Safari and Chrome */
+}
+
+.horizontal-scroll {
+  overflow: hidden;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  white-space: nowrap;
+
+}
+.item {
+
+  display: inline-block;
+  text-align: center;
+
+
+}
+.horizontal-scroll ::-webkit-scrollbar { 
+    display: none;  /* Safari and Chrome */
+}
+.horizontal-scroll:hover {
+  -webkit-overflow-scrolling: touch;
+}
+.horizontal-scroll:hover {
+  &::-webkit-scrollbar {
+    display: block;
+  }
+}
+
+@media (max-width: 991px){
+.about-content .about-img {
+    width: 100% !important;
+    margin-top: 32px;
+    padding: 0 0 0 0%;
+    flex: 0 0 auto;
+}
+}
 </style>  
 
 
@@ -319,13 +362,14 @@
     <div class="_2qRoq">
         <div class="_2WfMm">
             <nav>
-                <ul>
+                <ul class="horizontal-scroll">
 
                 {%  for each_category_item in categories %}
 
-                    <li  id="" style="padding-top:.5em;padding-bottom:.5em;cursor:pointer"><a href="/tag/{{each_category_item.slug}}/" class="_3gKV2">{% category_title_by_language each_category_item LANGUAGE_CODE|language_name %}</a></li>
+                    <li  class="item" id="" style="padding-top:.5em;padding-bottom:.5em;cursor:pointer"><a href="/tag/{{each_category_item.slug}}/" class="_3gKV2">{% category_title_by_language each_category_item LANGUAGE_CODE|language_name %}</a></li>
 
                 {% endfor %}
+                <li></li>
 
 
                 </ul>
@@ -341,7 +385,7 @@
   .feedlist-container{
     width: 600px;
     margin:auto;
-    margin-top: 135px;
+    margin-top: 70px;
   }  
 .feedlist-item {
     margin-bottom: 8px;
@@ -659,148 +703,83 @@ div.video-controls .progress-bar-parent .progress-bar-background .progress-bar {
 .hamburger-menu{
     z-index: 9999
 }
+.about-content .about-article{
+    width: 25%;
+    padding: 0px 2% 0 34px;
+}
+.about-content .about-img {
+    position: relative;
+    width: 50%;
+    padding: 0 0 0 0%;
+}
+._base_layout_aside, ._base_layout_aside_sticky{
+    width: 100%;
+}
+.jsx-3959364739 a {
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 20px;
+    color: #fe2c55;
+    /*float: right;*/
+    margin-right: 10px;
+    margin-top: 8px;
+}
+.jsx-3959364739 h3 {
+    display: inline-block;
+}
+.recommend-container ul li{
+    width: 128px;
+    height: 155px;
+}
+.recommend-container ul{
+    height: 480px;
+    margin:2px;
+}
+.recommend-card.jsx-3959364739{
+    height: 298px;
+}
+.recommend-card.jsx-3959364739 ul.jsx-3959364739{
+    height: 215px;
+}
+.recommend-card.jsx-3959364739 ul.jsx-3959364739 li.jsx-3959364739+li.jsx-3959364739{
+    margin-top: 10px;
+}
+#creatorId2{
+    height: 150px;
+}
+
 
 </style>
 
-<main class="feedlist-container" id="playlist" style="min-height: 400px;">
-
-<!--     <div class="_scroll_load_more_loading">
-        <div class="boloindya-loading"></div>
-    </div> -->
-
-<!--         <div class="share-layout-content" style="margin-top: 100px;">
-            <main class="share-layout-main">
-                <div class="jsx-1861775669 jsx-537314381 video-card-big">
-
-
-                    <div class="jsx-1861775669 jsx-537314381 content-container border">
-                        <a tag="a" class="jsx-1861775669 jsx-537314381 user-info" href="/bi19124048/">
-
-                            <div style="background-image:url(
-                                    https://lh3.googleusercontent.com/a-/AAuE7mD_HhzzDJKy9UyZfjeBqJq5RNb4gHnqJ-qQgKuW=s96-c
-                                );border-radius:;width:64px;height:64px;flex:0 0 64px;" class="jsx-2177493926 jsx-578937417 avatar round">
-                                    
-                            </div>
-                            <div class="jsx-1861775669 jsx-537314381 user-info-content">
-                                <h2 class="jsx-1861775669 jsx-537314381">bi19124048</h2>
-                                <p class="jsx-1861775669 jsx-537314381">bi19124048</p>
-                            </div>
-                        </a>
-                        <span class="unit" style="display: inline-block;position: relative;top: -49px;">
-                                <button onclick="follow_user('71199');" style="float: right;" class="_4jy1 _4jy4 _517h _51sy _42ft " type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-71199 followCheck sx_5da455"></i><span class="btnTextChange-71199">Follow</span>
-                                </button>
-                        </span>
-                        <h1 class="jsx-191376589 jsx-861547433 jsx-3645511632 video-meta-title"><strong>Sports @Cricket : IPL News: Kolkata Knight Riders</strong></h1>
-
-                        <div class="jsx-1861775669 jsx-537314381 video-card-container">
-                            <div style="border-radius: 8px; background-image: url();" class="jsx-1464109409 image-card">
-                                <div class="jsx-3077367275 video-card default">
-
-                                    <div id="jwBoxPlayAndStop" style="height: 100%">
-                                        <div id="playerDetailsI"></div>
-                                        <video id="playerDetails" controls="" height="200" preload="" class="videoCentered">
-                                            <source src="https://boloindyapp-prod.s3.amazonaws.com/public/video_bytes/Sandeep_1577114842173.mp4" type="video/mp4">
-                                            <source src="https://boloindyapp-prod.s3.amazonaws.com/public/video_byte_thumbnails/Sandeep_1577114842173.jpeg" type="video/ogg">
-
-                                        </video>
-                                    </div>
-
-                                    <div class="jsx-3077367275 video-card-mask"></div>
-                                    <div class="jsx-4030482358 theme videoPlayButtonDetails"></div>
-                                    <span class="jsx-3077367275 event-delegate-mask event-delegate-maskDesk"></span>
-
-                                    <span class="_video_card_"></span><img onclick="muteAndUnmutePlayerDet('playerDetails');" class="jsx-3077367275 mute-icon" id="mutedImageIdDeDesk" src="/media/mute_icon.svg">
-                                </div>
-
-
-                            </div>
-                        </div>
-                        <div class="statistics-info">
-                            <span class="digg">188.3K</span>
-                            <span class="comment">3.6K</span>
-                            <hr style="margin-bottom: 10px;">
-                            <div class="_6w18">
-
-                                <div class="_6w1h">
-                                    <span class="_18vi">
-                                        <div class="_666k" data-testid="UFI2ReactionLink/actionLink">
-                                            <div class="_8c74">
-                                                <a aria-pressed="false" class=" _6a-y _3l2t  _18vj" data-testid="UReactionLink" href="javascript:void(0)" id="UReactionLink" role="button" tabindex="0">
-
-                                                    <i alt="" class="_6rk2 img sp_ddXiTdIB8vm sx_44a25c"></i>Like
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </span>
-                                    <span class="_18vi">
-                                        <a class=" _666h  _18vj _18vk _42ft" role="button" tabindex="0" testid="UFI2CommentLink" title="Leave a comment" id="UCommentLink" href="javascript:void(0)">Comment
-                                        </a>
-                                    </span>
-                                    <span class="_18vi sbutton">
-                                        <span class="_1j6m">
-                                            <a class=" _2nj7  _18vj _18vk " href="javascript:void(0)" id="shareLinkId" role="button" tabindex="0" title="Send this to friends or post it on your Timeline.">Share
-                                            </a>
-                                        </span>
-                                        <ul class="smenu">
-                                            <li class="googleplus" onclick="social_share('whatsapp_share')"><a href="javascript:void(0);">whatsapp</a></li>
-                                            <li class="facebook"><a href="javascript:void(0);" onclick="social_share('facebook_share')">Facebook</a></li>
-                                            <li class="twitter"><a href="javascript:void(0);" onclick="social_share('twitter_share')">Twitter</a></li>
-
-                                            <li class="googleplus" onclick="copyShareLink();"><a href="javascript:void(0);">Copy Link</a></li>
-                                        </ul>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-
-
-
-
-                </div>
-
-            </main>
-        </div> -->
-<div class="ajax-load text-center" style="display:none;">
-    <p><img src="/media/loader.gif"></p>
-</div>
-</main>
-
+{{popularBolo}}
+{%  for each_popular_item in popularBolo %}
+        {{each_popular_item}}
+{% endfor %}
 
 <div class="jsx-639186511 page-with-header main-body">
     <div class="jsx-1929076256">
         <div class="jsx-1929076256 about-content">
-<!--             <div class="jsx-1929076256 about-img">
-                <div class="jsx-1994528170 banner-video-container">
-                    <div class="video-wall">
-                        <div class="header-bar">{% trans "Popular Videos" %}</div>
-                        <div id="js-playlists" class="playlists">
-                            <div class="playlist-switcher hideonMobile">
-                                <h4 class="js-playlist-link playlist-link"></h4>
-                            </div>
-
-                            <div id="customScroll" class="js-playlist playlist-container is-active" data-feedid="Q352cyuc1">
-                            <div class="playlist _video_feed_container" id="playlist">
-                            </div>
-                            <div class="ajax-load text-center" style="display:none;">
-                                <p><img src="/media/loader.gif"></p>
-                            </div>
-                            <div class="_scroll_load_more_loading">
-                                <div class="boloindya-loading"></div>
-                            </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
-
-
-<!--             <article class="jsx-1929076256 about-article">
+            <article class="jsx-1929076256 about-article">
                  <aside class="_base_layout_aside">
                     <div class="_base_layout_aside_sticky" style="">
                         <div class="_base_layout_aside_wrapper">
-                            <div class="_list_component_">
+
+        <aside class="share-layout-aside" style="margin-top: 70px;">
+            <div class="jsx-2573841504 recommend-container">
+                <header class="jsx-3959364739">
+                    <h3 class="jsx-3959364739">{% trans "Trendinng" %}</h3><a class="jsx-3959364739" href="/">{% trans "See All" %}</a></header>
+                <!-- <h3 class="jsx-2573841504">{% trans "Trends" %}</h3> -->
+                <div class="jsx-2573841504 recommend-video-container">
+                    <div class="_scroll_load_more_loading_user_videos center">
+                            <div class="boloindya-loading"></div>
+                    </div>
+                    <ul class="jsx-2573841504" id="playlistTrending">
+                    </ul>
+                </div>
+            </div>
+        </aside>
+
+<!--                             <div class="_list_component_">
                                 <h2 class="_list_component_title">{% trans "Trending Categories" %}</h2>
                                 <div class="_list_component_content">
                                     
@@ -817,9 +796,9 @@ div.video-controls .progress-bar-parent .progress-bar-background .progress-bar {
                                     {% endfor %}
 
                                 </div>
-                            </div>
+                            </div> -->
 
-                            <div class="_list_component_">
+<!--                             <div class="_list_component_">
                                 <h2 class="_list_component_title">{% trans "Trending Hashtags" %}</h2>
                                 <div class="_list_component_content">
                                     
@@ -833,10 +812,10 @@ div.video-controls .progress-bar-parent .progress-bar-background .progress-bar {
                                     {% endfor %}
 
                                 </div>
-                            </div>
+                            </div> -->
 
                         </div>
-                        <div class="_base_layout_aside_wrapper">
+<!--                         <div class="_base_layout_aside_wrapper">
                             <div class="_download_">
                                 <h3 class="_download_title">{% trans "Get the App" %}</h3>
                                 <div class="_download_content_wrapper">
@@ -844,11 +823,154 @@ div.video-controls .progress-bar-parent .progress-bar-background .progress-bar {
 
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </aside>
 
-            </article> -->
+            </article>
+
+            <div class="jsx-1929076256 about-img">
+                <div class="jsx-1994528170 banner-video-container">
+                    <div class="video-wall">
+                        <!-- <div class="header-bar">{% trans "Popular Videos" %}</div> -->
+                        <div id="js-playlists" class="playlists">
+                            <div class="playlist-switcher hideonMobile">
+                                <h4 class="js-playlist-link playlist-link"></h4>
+                            </div>
+
+                                <main class="feedlist-container" id="playlist" style="min-height: 400px;">
+
+
+                                <div class="ajax-load text-center" style="display:none;">
+                                    <p><img src="/media/loader.gif"></p>
+                                </div>
+                                </main>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <article class="jsx-1929076256 about-article">
+                 <aside class="_base_layout_aside">
+                    <div class="_base_layout_aside_sticky" style="">
+                        <div class="_base_layout_aside_wrapper">
+
+                            <div class="jsx-3959364739 recommend-card" style="margin-top: 70px;">
+                                <header class="jsx-3959364739">
+                                    <h3 class="jsx-3959364739">{% trans "Creators" %}</h3><!-- <a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a> --></header>
+<!--                                 <div class="_scroll_load_more_loading_creator center">
+                                    <div class="boloindya-loading">Loading...</div>
+                                </div> -->
+
+                                <ul class="jsx-3959364739 sidebarLi" id="creatorId1">
+
+
+
+
+                                    {% for each_popular_item in popular_bolo %}
+                                   
+
+                                        <li class="jsx-3959364739">
+                                            <a tag="a" class="jsx-1420774184 recommend-item" href="/{{each_popular_item.user.username}}/">
+                                                <div class="jsx-2177493926 jsx-578937417 avatar round head normal" style="background-image: url({% if each_popular_item.profile_pic|length > 1 %}
+                                    {{each_popular_item.profile_pic}}
+                                {% else %}
+                                    /media/user.svg
+                                {% endif %});"></div>
+                                                <div class="jsx-1420774184 info-content">
+                                                    <h4 class="jsx-1420774184">                                               {% if each_popular_item.name %}
+                                                       {{each_popular_item.name}} <!-- {{each_popular_item.last_name}} -->
+                                                    {% else %}
+                                                       {{each_popular_item.user.username}}
+                                                    {% endif %}</h4>
+                                                    <p class="jsx-1420774184">@{{each_popular_item.user.username}}</p>
+                                                </div>
+                                                <div class="jsx-1420774184 arrow-right"></div>
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+
+                                </ul>
+                            </div>
+                            <div class="jsx-3959364739 recommend-card" style="margin-top: 10px;height: 250px;">
+                                <header class="jsx-3959364739">
+                                    <h3 class="jsx-3959364739">{% trans "Creators" %}</h3><!-- <a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a> --></header>
+<!--                                 <div class="_scroll_load_more_loading_creator center">
+                                    <div class="boloindya-loading">Loading...</div>
+                                </div> -->
+
+                                <ul class="jsx-3959364739 sidebarLi" id="creatorId2">
+
+
+
+
+                                    {%  for each_hashtag_item in hash_tags %}
+                                
+                                        <li class="jsx-3959364739">
+                                            <a tag="a" class="jsx-1420774184 recommend-item" href="/hashtag/{{each_hashtag_item.hash_tag}}/">
+                                                <div class="jsx-1420774184 info-content">
+                                                    <h4 class="jsx-1420774184">#{{each_hashtag_item.hash_tag}}</h4>
+                                                    <p class="jsx-1420774184">{{each_hashtag_item.total_views | shorcountertopic}} {% trans "views" %}</p>
+                                                </div>
+                                                <div class="jsx-1420774184 arrow-right"></div>
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+
+                                </ul>
+                            </div>
+
+
+<!--                             <div class="_list_component_">
+                                <h2 class="_list_component_title">{% trans "Trending Categories" %}</h2>
+                                <div class="_list_component_content">
+                                    
+                                    {%  for each_category_item in categories %}
+                                    <div class="_list_item_">
+                                        <div class="_list_item_content">
+                                            <h3 class="_list_item_title"><a href="/tag/{{each_category_item.slug}}/" title="glowups">
+                                            
+                                            {% category_title_by_language each_category_item LANGUAGE_CODE|language_name %}
+                                            </a></h3>
+                                            <p class="_list_item_description">{{each_category_item.view_count | shorcountertopic}} {% trans "views" %}</p>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+
+                                </div>
+                            </div> -->
+
+<!--                             <div class="_list_component_">
+                                <h2 class="_list_component_title">{% trans "Trending Hashtags" %}</h2>
+                                <div class="_list_component_content">
+                                    
+                                    {%  for each_hashtag_item in hash_tags %}
+                                    <div class="_list_item_">
+                                        <div class="_list_item_content">
+                                            <h3 class="_list_item_title"><a href="/hashtag/{{each_hashtag_item.hash_tag}}/" title="glowups">#{{each_hashtag_item.hash_tag}}</a></h3>
+                                            <p class="_list_item_description">{{each_hashtag_item.total_views | shorcountertopic}} {% trans "views" %}</p>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+
+                                </div>
+                            </div> -->
+
+                        </div>
+<!--                         <div class="_base_layout_aside_wrapper">
+                            <div class="_download_">
+                                <h3 class="_download_title">{% trans "Get the App" %}</h3>
+                                <div class="_download_content_wrapper">
+                                    <a rel="nofollow" target="_blank" class="_download_btn_" href="https://play.google.com/store/apps/details?id=com.boloindya.boloindya&amp;hl=en_IN"><img src="/media/google_store.png" alt="google-store"></a>
+
+                                </div>
+                            </div>
+                        </div> -->
+                    </div>
+                </aside>
+
+            </article>
         </div>
     </div>
 </div>

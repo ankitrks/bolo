@@ -420,6 +420,7 @@ function loginDataByUser(){
 	var url='/api/v1/user/user_data/';
 	var user_id = userLoginStatus;
 	var loginStatus=check_login_status();
+  
 	if(loginStatus==false && user_id!="" && user_id!='None'){
 	    $.ajax({
 	        type: 'POST',
