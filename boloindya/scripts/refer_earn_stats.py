@@ -21,7 +21,7 @@ def run():
     for each_refercode in ReferralCode.objects.filter(is_refer_earn_code=True,purpose='refer_n_earn'):
         if each_refercode.signup():
             my_csv+=get_refer_earn(each_refercode,str((datetime.now()-timedelta(days=1)).date().strftime("%d-%m-%Y")))
-    file = open("refer_earn_"+str(datetime.now().date())+".csv","w")
+    file = open("refer_earn_"+str((datetime.now()-timedelta(days=1)).date().strftime("%d-%m-%Y"))+".csv","w")
     file.write(my_csv)
     file.close()
     send_file_mail("refer_earn_"+str((datetime.now()-timedelta(days=1)).date().strftime("%d-%m-%Y"))+".csv")
@@ -84,7 +84,7 @@ def send_file_mail(file_name):
     attachment.set_payload(fp.read())
     fp.close()
     encoders.encode_base64(attachment)
-    attachment.add_header("Content-Disposition", "attachment", filename = 'Refer N Earn Stats - ' + str(datetime.now().date()))
+    attachment.add_header("Content-Disposition", "attachment", filename = 'Refer N Earn Stats - ' + str((datetime.now()-timedelta(days=1)).date().strftime("%d-%m-%Y")))
     msg.attach(attachment)
 
     server = smtplib.SMTP("smtp.gmail.com:587")
