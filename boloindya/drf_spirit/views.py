@@ -2095,7 +2095,7 @@ def verify_otp(request):
                         userprofile = None
                 if userprofile:
                     if not userprofile.user.is_active:
-                        return JsonResponse({'message': 'You are permanently banned by admin'}, status=status.HTTP_400_BAD_REQUEST)
+                        return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
                     user = userprofile.user
                     message = 'User Logged In'
                 else:
@@ -2232,7 +2232,7 @@ def fb_profile_settings(request):
                 is_created = True
 
             if not userprofile.user.is_active:
-                return JsonResponse({'message': 'You are permanently banned by admin'}, status=status.HTTP_400_BAD_REQUEST)
+                return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
 
             if is_created:
                 add_bolo_score(user.id, 'initial_signup', userprofile)
@@ -2301,7 +2301,7 @@ def fb_profile_settings(request):
                 userprofile = UserProfile.objects.get(user = user)
                 is_created = True
             if not userprofile.user.is_active:
-                return JsonResponse({'message': 'You are permanently banned by admin'}, status=status.HTTP_400_BAD_REQUEST)
+                return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
 
             if is_created:
                 add_bolo_score(user.id, 'initial_signup', userprofile)

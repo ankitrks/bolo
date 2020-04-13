@@ -147,8 +147,8 @@ class UserProfile(models.Model,ModelDiffMixin):
     # end #
 
     class Meta:
-        verbose_name = _("forum profile")
-        verbose_name_plural = _("forum profiles")
+        verbose_name = _("user profile")
+        verbose_name_plural = _("user profiles")
 
     def save(self, *args, **kwargs):
         if self.user.is_superuser:
@@ -335,17 +335,17 @@ class ReferralCode(RecordTimeStamp):
     no_playstore_url.allow_tags = True
 
     def downloads(self):
-        return ReferralCodeUsed.objects.filter(code = self, is_download = True, by_user__isnull = True).count()
+        return ReferralCodeUsed.objects.filter(code = self, is_download = True, by_user__isnull = True).distinct('android_id').count()
 
     def signup(self):
-        return ReferralCodeUsed.objects.filter(code = self, is_download = True, by_user__isnull = False).count()
+        return ReferralCodeUsed.objects.filter(code = self, is_download = True, by_user__isnull = False).distinct('by_user').count()
 
     def referral_url(self):
         return 'https://www.boloindya.com/invite/'+self.for_user.username+'/'+str(self.for_user.id)+'/'
 
 class ReferralCodeUsed(RecordTimeStamp):
     code = models.ForeignKey(ReferralCode, blank=False, null = False)
-    by_user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True)
+    by_user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True )
     is_download = models.BooleanField(default = True)
     click_id = models.CharField(_("Click Id"), max_length=255, blank=True)
     pid = models.CharField(_("PID"), max_length=255, blank=True)
