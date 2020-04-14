@@ -2089,13 +2089,13 @@ def verify_otp(request):
                     try:
                         userprofile = UserProfile.objects.get(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no)
                     except MultipleObjectsReturned:
-                        userprofile = UserProfile.objects.filter(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no).order_by('id')[-1]
+                        userprofile = UserProfile.objects.filter(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no).order_by('id').last()
                         is_created=False
                     except:
                         userprofile = None
                 if userprofile:
                     if not userprofile.user.is_active:
-                        return JsonResponse({'message': 'You are permanently banned by admin'}, status=status.HTTP_400_BAD_REQUEST)
+                        return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
                     user = userprofile.user
                     message = 'User Logged In'
                 else:
@@ -2219,7 +2219,7 @@ def fb_profile_settings(request):
                 user=userprofile.user
                 is_created=False
             except MultipleObjectsReturned:
-                userprofile = UserProfile.objects.filter(social_identifier = extra_data['id']).order_by('id')[-1]
+                userprofile = UserProfile.objects.filter(social_identifier = extra_data['id']).order_by('id').last()
                 user=userprofile.user
                 is_created=False
             except Exception as e:
@@ -2232,7 +2232,7 @@ def fb_profile_settings(request):
                 is_created = True
 
             if not userprofile.user.is_active:
-                return JsonResponse({'message': 'You are permanently banned by admin'}, status=status.HTTP_400_BAD_REQUEST)
+                return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
 
             if is_created:
                 add_bolo_score(user.id, 'initial_signup', userprofile)
@@ -2289,7 +2289,7 @@ def fb_profile_settings(request):
                 user=userprofile.user
                 is_created=False
             except MultipleObjectsReturned:
-                userprofile = UserProfile.objects.filter(social_identifier = extra_data['id']).order_by('id')[-1]
+                userprofile = UserProfile.objects.filter(social_identifier = extra_data['id']).order_by('id').last()
                 user=userprofile.user
                 is_created = False
             except Exception as e:
@@ -2301,7 +2301,7 @@ def fb_profile_settings(request):
                 userprofile = UserProfile.objects.get(user = user)
                 is_created = True
             if not userprofile.user.is_active:
-                return JsonResponse({'message': 'You are permanently banned by admin'}, status=status.HTTP_400_BAD_REQUEST)
+                return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
 
             if is_created:
                 add_bolo_score(user.id, 'initial_signup', userprofile)
@@ -3967,6 +3967,34 @@ def update_mobile_invited(request):
             return JsonResponse({'message':'invited'}, status=status.HTTP_200_OK)
         else:
             return JsonResponse({'message': 'conatct_id not found'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def get_refer_earn_stat(request):
+    try:
+        page = int(request.GET.get('page',1))
+        page_size = request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
+        try:
+            referalcode = ReferralCode.objects.get(for_user=request.user,is_refer_earn_code=True,purpose='refer_n_earn')
+        except MultipleObjectsReturned:
+            referalcode = ReferralCode.objects.get(for_user=request.user,is_refer_earn_code=True,purpose='refer_n_earn')[0]
+        except ReferralCode.DoesNotExist:
+            referalcode = ReferralCode.objects.get_or_create(for_user=request.user,code=generate_refer_earn_code(),is_refer_earn_code=True,purpose='refer_n_earn')
+        except Exception as e:
+            return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+        downloaded =ReferralCodeUsed.objects.filter(code = referalcode, is_download = True, by_user__isnull = True).distinct('android_id')
+        signedup = ReferralCodeUsed.objects.filter(code = referalcode, is_download = True, by_user__isnull = False).distinct('android_id')
+        download_count = downloaded.count()
+        signedup_count = signedup.count()
+        signedup_users = list(ReferralCodeUsed.objects.filter(code = referalcode, is_download = True, by_user__isnull = False).distinct('android_id'))
+        signedup_users.sort(key=lambda x: x.created_at, reverse=True)
+        result_page = get_paginated_data(signedup_users, int(page_size), int(page))
+        if result_page[1]<int(page):
+            return JsonResponse({'message': 'No page exist'}, status=status.HTTP_400_BAD_REQUEST)
+        print result_page[1]
+        return JsonResponse({'message': 'success','download_count':download_count,'signedup_count':signedup_count,'users':ReferralCodeUsedStatSerializer(result_page[0].object_list,many=True).data,'total_page':result_page[1]}, status=status.HTTP_200_OK)
+
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
 

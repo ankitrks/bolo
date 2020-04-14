@@ -88,6 +88,12 @@
         {% if user|is_user_in_group:"moderator" %}
         <li class="{% if request.path in '/jarvis/get_user_pay_details/'%}active{% endif %}"><a href="/jarvis/get_user_pay_details/"><i class="fa fa-money"></i> <span>User Payment</span></a></li>
         {% endif %}
+        {% if user|is_user_in_group:"moderator" %}
+        <li class="{% if request.path in '/jarvis/management/user/'%}active{% endif %}"><a href="/jarvis/management/user/"><i class="fa fa-users"></i> <span>User Management</span></a></li>
+        {% endif %}
+        {% if user|is_user_in_group:"moderator" %}
+        <li class="{% if request.path in '/jarvis/referral/'%}active{% endif %}"><a href="/jarvis/referral/"><i class="fa fa-envelope"></i> <span>Referrals</span></a></li>
+        {% endif %}
       </ul>
 
     </section>

@@ -1,0 +1,58 @@
+{% extends "jarvis/layout/base.html" %}
+{% load jarvis_tag %}
+{% block content %} 
+	<style type="text/css">
+		.parent_block{display: inline-block;width: 23%;border: 1px dashed #333;vertical-align: middle;height: 150px;padding: 10px;margin: 10px;border-radius: 5px;background: white;}
+		.parent_header{text-align: center;margin-bottom: 20px;}
+		.parent_header i{font-size: 25px;}
+		.parent_header span{font-size: 20px;}
+		.align_center{text-align: center;padding-top: 50px;}
+	</style>
+	<div style="width: 80%;margin: auto;padding-top: 50px;">
+		{% if user|is_user_in_group:"moderator" %}
+		    <div class="parent_block parent_header align_center"><a href="/jarvis/notification_panel/"><i class="fa fa-bell-o"></i><br><span>Notification Panel</span></a></div>
+		    <div class="parent_block parent_header align_center"><a href="/jarvis/management/video/"><i class="fa fa-edit"></i><br><span>Video Management</span></a></div>
+		    <div class="parent_block parent_header align_center"><a href="/jarvis/management/user/"><i class="fa fa-users"></i><br><span>User Management</span></a></div>
+		    <div class="parent_block parent_header align_center"><a href="/jarvis/get_user_pay_details/"><i class="fa fa-money"></i><br><span>User Payment</span></a></div>
+		    <div class="parent_block parent_header align_center"><a href="/jarvis/referral/"><i class="fa fa-envelope"></i><br><span>Referrals</span></a></div>
+		    <div class="parent_block parent_header align_center"><a href="/jarvis/get_accepted_kyc_user_list/"><i class="fa fa-book"></i><br><span>Accpeted KYC's</span></a></div>
+		{% endif %}
+		{% if user|is_user_in_group:"moderator" %}
+		    <!-- <div class="parent_block">
+		      <div class="parent_header"><i class="fa fa-pie-chart"></i> <span>Statistics</span></div>
+		      <div>
+		        <div><a href="/jarvis/user_statistics/"><i class="fa fa-angle-right pull-left"></i> <span>User Statistics</span></a></div>
+		        <div><a href="/jarvis/video_statistics/"><i class="fa fa-angle-right pull-left"></i> <span>Video Statistics</span></a></div>
+		        <div><a href="/jarvis/statistics/all/"><i class="fa fa-angle-right pull-left"></i> <span>Overall</span></a></div>
+		      </div>
+		    </div> -->
+		    <div class="parent_block parent_header align_center"><a href="/analytics_jarvis/"><i class="fa fa-pie-chart"></i><br><span>Analytics</span></a></div>
+		{% endif %}
+
+		{% if user|is_user_in_group:"moderator" or user|is_user_in_group:"video_uploader" %}
+			<br>
+		    <div class="parent_block">
+		      <div class="parent_header"><i class="fa fa-dashboard"></i> <span>CAnna Video Upload</span></div>
+		      <div>
+		        <div><a href="/jarvis/uploadvideofile/"><i class="fa fa-circle-o"></i> CAnna Upload n Transcode</a></div><br>
+		        <div><a href="/jarvis/uploaded_list/"><i class="fa fa-share"></i> CAnna Uploaded List</a></div>
+		      </div>
+		    </div>
+		    <div class="parent_block">
+		      <div class="parent_header"><i class="fa fa-dashboard"></i> <span>Boloindya Video Upload</span></div>
+		      <div>
+		        <div><a href="/jarvis/boloindya_uploadvideofile/"><i class="fa fa-circle-o"></i> Boloindya Upload n Transcode</a></div><br>
+		        <div><a href="/jarvis/boloindya_uploaded_list/"><i class="fa fa-share"></i> Boloindya Uploaded List</a></div>
+		      </div>
+		    </div>
+		{% endif %}
+	</div>
+{% endblock content %}
+
+{% block center_js %}
+	<script>
+		jQuery(document).ready(function(){
+			$('.sidebar-toggle').click();
+		});
+	</script>
+{% endblock center_js %}

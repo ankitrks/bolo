@@ -8,15 +8,11 @@
     {{ block.super }}
     {{ media.css }}
     <style type="text/css">
-        #result_list tbody tr{height: auto;}
-        .column-playstore_url, .column-no_playstore_url{visibility:hidden;position: absolute;top: 175px;left: 0;width: 125px;}
-        .column-no_playstore_url{top: 207px;}
-        .field-playstore_url, .field-no_playstore_url{position: absolute;margin-top: 40px;left: 10px;border-top: 1px solid #eee;visibility:hidden;}
-        .field-no_playstore_url{margin-top: 70px;border-bottom: none;border-top: none;}
-        .field-downloads, .field-signup, .column-downloads, .column-signup, .field-is_active, .column-is_active, .field-purpose, .column-purpose{text-align: center;}
-        header#grp-header{display: none;}
-        #grp-content{top:0;}
-        /*.exp_col_icon{position: absolute;top: px;left: 62%;}*/
+         #created-at-form{margin-top: 5px;padding-right: 10px;}
+         .controls{text-align: center;}
+         .controls input{height: 25px;margin-top: 10px;}
+         header#grp-header{display: none;}
+         #grp-content{top:0;}
     </style>
 {% endblock %}
 
@@ -30,43 +26,7 @@
         <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script type="text/javascript">
       $(document).ready(function(){
-
-        $('#result_list thead tr').append('<th style="text-align:center;"> action </th>')
-        $('#result_list tbody tr').append('<td style="text-align:center;"><a href="#" class="expand_row"> + show urls</a><a href="#" class="collapse_row" style="display:none;"> - hide urls</a></td>')
-
-        $('.expand_row').click(function(e) {
-          e.preventDefault();
-          var parent_tr = $(this).parents('tr');
-          $(this).hide();
-          $(parent_tr).find('.collapse_row').show();
-          $(parent_tr).css('height', '103px');
-          $(parent_tr).find('.field-playstore_url, .field-no_playstore_url').css('visibility', 'visible');
-        });
-        $('.collapse_row').click(function(e) {
-          e.preventDefault();
-          var parent_tr = $(this).parents('tr');
-          $(this).hide();
-          $(parent_tr).find('.expand_row').show();
-          $(parent_tr).css('height', 'auto');
-          $(parent_tr).find('.field-playstore_url, .field-no_playstore_url').css('visibility', 'hidden');
-        });
-
-        $('.expand_rows').click(function(e) {
-          e.preventDefault();
-          $(this).hide();
-          $('.expand_row').hide();
-          $('.collapse_row, .collapse_rows').show();
-          $('#result_list tbody tr').css('height', '103px');
-          $('.field-playstore_url, .field-no_playstore_url').css('visibility', 'visible');
-        });
-        $('.collapse_rows').click(function(e) {
-          e.preventDefault();
-          $(this).hide();
-          $('.collapse_row').hide();
-          $('.expand_row, .expand_rows').show();
-          $('#result_list tbody tr').css('height', 'auto');
-          $('.field-playstore_url, .field-no_playstore_url').css('visibility', 'hidden');
-        });
+        grappelli.initDateAndTimePicker();
       });
     </script>
     {% endif %}

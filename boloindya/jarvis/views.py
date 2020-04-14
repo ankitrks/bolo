@@ -175,7 +175,7 @@ def geturl(request):
 
 @login_required
 def home(request):
-    return render(request,'jarvis/layout/base.html')
+    return render(request,'jarvis/layout/home.html')
 
 @login_required
 def importcsv(request):
@@ -218,6 +218,14 @@ def boloindya_uploadvideofile(request):
 @login_required
 def video_management(request):
     return render(request,'admin/jarvis/video_management.html',{})
+
+@login_required
+def user_management(request):
+    return render(request,'admin/jarvis/user_management.html',{})
+
+@login_required
+def referral(request):
+    return render(request,'admin/jarvis/referral.html',{})
 
 def getcsvdata(request):
     data = []
