@@ -801,6 +801,58 @@ def get_topic_details_by_category(request,category_slug):
     except:
         return redirect('/')
 
+def get_feed_list_by_category(request,category_slug):
+    language_id=1
+    popular_bolo = []
+    category_details=""
+    categories=[]
+    languages_with_id=settings.LANGUAGES_WITH_ID
+    languageCode =request.LANGUAGE_CODE
+    language_id=languages_with_id[languageCode]  
+    try:
+        categories = Category.objects.filter(parent__isnull=False)[:20]
+    except Exception as e1:
+        categories = [] 
+    try:     
+        category = Category.objects.get(slug=category_slug)
+        #topics = Topic.objects.filter(m2mcategory=category,is_removed = False,is_vb = False)
+        all_vb = Topic.objects.filter(m2mcategory=category, is_removed=False, is_vb=True, language_id=language_id)
+        vb_count = all_vb.count()
+        all_seen = category.view_count
+        #print topics
+        #user_profile = UserProfile.objects.filter(user=user,user__is_active = True)[0]
+        #topics = Topic.objects.filter(category=category, is_removed=False)
+        try:
+            if language_id:
+                all_user = UserProfile.objects.filter(is_popular = True, language=language_id)[:10]
+                popular_bolo=all_user
+            else:
+                all_user = UserProfile.objects.filter(is_popular = True)[:10]
+                popular_bolo=all_user
+        except Exception as e1:
+            popular_bolo = []
+        try:
+            hash_tags = TongueTwister.objects.order_by('-hash_counter')[:10]
+        except Exception as e1:
+            hash_tags = []
+        context = {
+            'popular_bolo':popular_bolo,
+            'category_details':category,
+            'categories':categories,
+            'vb_count':vb_count,
+            'hash_tags':hash_tags,
+            'all_seen':all_seen,
+            'topics':all_vb
+        }
+        #print category.__dict__
+        video_slug = request.GET.get('video',None)
+        if(video_slug != None):
+            return redirect('/video/'+video_slug)
+        else:
+            return render(request, 'spirit/topic/feed_list_by_categories.html', context)
+    except:
+        return render(request, 'spirit/topic/feed_list_by_categories.html', context)
+
 def get_topic_list_by_hashtag(request,hashtag):
     language_id=1
     popular_bolo = []
