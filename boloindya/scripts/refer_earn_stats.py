@@ -36,7 +36,7 @@ def get_refer_earn(each_refercode,start_date='09-04-2020'):
 
 
     downloaded =ReferralCodeUsed.objects.filter(code = each_refercode, is_download = True, by_user__isnull = True,created_at__gte=start_date,created_at__lte=end_date).distinct('android_id')
-    signedup = ReferralCodeUsed.objects.filter(code = each_refercode, is_download = True, by_user__isnull = False,created_at__gte=start_date,created_at__lte=end_date).distinct('android_id')
+    signedup = ReferralCodeUsed.objects.filter(code = each_refercode, is_download = True, by_user__isnull = False,created_at__gte=start_date,created_at__lte=end_date).distinct('by_user_id')
     download_count = downloaded.count()
     signedup_count = signedup.count()
     signned_in_user = ''
