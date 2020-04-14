@@ -4002,7 +4002,7 @@ def get_refer_earn_stat(request):
 @api_view(['POST'])
 def save_banner_response(request):
     try:
-        term = request.POST.get('hash_tag', None)
+        term = request.POST.get('term', None)
         response_type = request.POST.get('response_type', None)
         if hash_tag:
             bannerUser=BannerUser.objects.create(user = request.user, term=term, response_type=response_type)
