@@ -1105,6 +1105,7 @@ function delegateClick(videoPlayerId,video_backup_url,video_cdn_url){debugger;
 
   var playerId="player-"+videoPlayerId;
   var playerId1="#player-"+videoPlayerId;
+  var backup_url=video_backup_url;
   var btnPlayerId = '.videoPlayButtonDetails-'+videoPlayerId;
   var video = document.getElementById(playerId);
 
@@ -1125,7 +1126,36 @@ function delegateClick(videoPlayerId,video_backup_url,video_cdn_url){debugger;
           video.play();
           loaderHide();
       });
+
+      hls.on(Hls.Events.ERROR, function (event, data) {
+        if (data.fatal) {
+          switch(data.type) {
+          case Hls.ErrorTypes.NETWORK_ERROR:
+          // try to recover network error
+            console.log("fatal network error encountered, try to recover");
+            hls.startLoad();
+            video.src = backup_url;
+            video.addEventListener('loadedmetadata',function() {
+              video.play();
+              loaderHide();
+            });
+
+            break;
+          case Hls.ErrorTypes.MEDIA_ERROR:
+            console.log("fatal media error encountered, try to recover");
+            hls.recoverMediaError();
+            break;
+          default:
+          // cannot recover
+            hls.destroy();
+            break;
+          }
+        }
+      });
+
      }
+
+
      // hls.js is not supported on platforms that do not have Media Source Extensions (MSE) enabled.
      // When the browser has built-in HLS support (check using `canPlayType`), we can provide an HLS manifest (i.e. .m3u8 URL) directly to the video element through the `src` property.
      // This is using the built-in support of the plain video element, without using hls.js.

@@ -286,6 +286,7 @@ $(".videoSliderPlay").click(function(){
 function delegateClick(videoPlayerId,video_backup_url,video_cdn_url){
 
   var playerId="player-"+videoPlayerId;
+  var backup_url=video_backup_url;
   var playerId1="#player-"+videoPlayerId;
   var btnPlayerId = '.videoPlayButtonDetails-'+videoPlayerId;
   var video = document.getElementById(playerId);
@@ -316,6 +317,33 @@ function delegateClick(videoPlayerId,video_backup_url,video_cdn_url){
           video.play();
           loaderHide();
       });
+
+      hls.on(Hls.Events.ERROR, function (event, data) {
+        if (data.fatal) {
+          switch(data.type) {
+          case Hls.ErrorTypes.NETWORK_ERROR:
+          // try to recover network error
+            console.log("fatal network error encountered, try to recover");
+            hls.startLoad();
+            video.src = backup_url;
+            video.addEventListener('loadedmetadata',function() {
+              video.play();
+              loaderHide();
+            });
+
+            break;
+          case Hls.ErrorTypes.MEDIA_ERROR:
+            console.log("fatal media error encountered, try to recover");
+            hls.recoverMediaError();
+            break;
+          default:
+          // cannot recover
+            hls.destroy();
+            break;
+          }
+        }
+      });
+
      }
       else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         video.src = backup_url;
