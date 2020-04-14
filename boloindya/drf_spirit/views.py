@@ -3617,8 +3617,12 @@ def get_popular_video_bytes(request):
                 for each_vb in all_seen_post:
                     if each_vb.id == each_id:
                         orderd_all_seen_post.append(each_vb)
-        
-        topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
+        ''' Manual added post'''
+
+        manual_added_post = Topic.objects.filter(pk=43351)
+        topics=list(manual_added_post)+list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
+        ''' Uncomment below line to remove maula added post'''
+        # topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
         topics = paginator_topics.paginate_queryset(topics, request)
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True, context={'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
     except Exception as e:
