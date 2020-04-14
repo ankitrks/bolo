@@ -83,7 +83,7 @@ class DashboardMetricsAdmin(admin.ModelAdmin):
 #     list_filter = ('metrics', 'metrics_slab', 'date')
 
 class BannerUserAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'hash_tag', 'response_type')
+    list_display = ('id', 'user', 'term', 'response_type')
 
 
 admin.site.unregister(FCMDevice)

@@ -4002,10 +4002,10 @@ def get_refer_earn_stat(request):
 @api_view(['POST'])
 def save_banner_response(request):
     try:
-        hash_tag = request.POST.get('hash_tag', None)
+        term = request.POST.get('hash_tag', None)
         response_type = request.POST.get('response_type', None)
         if hash_tag:
-            bannerUser=BannerUser.objects.create(user = request.user, hash_tag=hash_tag, response_type=response_type)
+            bannerUser=BannerUser.objects.create(user = request.user, term=term, response_type=response_type)
             return JsonResponse({'message': 'Data Created'}, status=status.HTTP_200_OK)
         return JsonResponse({'message': 'No Data'}, status=status.HTTP_200_OK)
     except Exception as e:
