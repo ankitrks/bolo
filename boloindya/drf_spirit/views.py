@@ -50,7 +50,7 @@ from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 from forum.category.models import Category,CategoryViewCounter
 from forum.comment.models import Comment,CommentHistory
 from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs,UserPay,VideoPlaytime,UserPhoneBook,Contact,ReferralCode
-from jarvis.models import FCMDevice,StateDistrictLanguage
+from jarvis.models import FCMDevice,StateDistrictLanguage, BannerUser
 from forum.topic.models import Topic,TopicHistory, ShareTopic, Like, SocialShare, Notification, CricketMatch, Poll, Choice, Voting, \
     Leaderboard, VBseen, TongueTwister
 from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
@@ -4012,6 +4012,18 @@ def get_refer_earn_stat(request):
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['POST'])
+def save_banner_response(request):
+    try:
+        term = request.POST.get('term', None)
+        response_type = request.POST.get('response_type', None)
+        if hash_tag:
+            bannerUser=BannerUser.objects.create(user = request.user, term=term, response_type=response_type)
+            return JsonResponse({'message': 'Data Created'}, status=status.HTTP_200_OK)
+        return JsonResponse({'message': 'No Data'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
 
 
 

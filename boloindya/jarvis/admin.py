@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
-from .models import VideoUploadTranscode,FCMDevice, PushNotificationUser, PushNotification, StateDistrictLanguage, DashboardMetrics, DashboardMetricsJarvis
+from .models import VideoUploadTranscode,FCMDevice, PushNotificationUser, PushNotification, StateDistrictLanguage, DashboardMetrics, DashboardMetricsJarvis, BannerUser
 from functools import update_wrapper
 from django.contrib import admin
 from django.shortcuts import redirect, render
@@ -82,6 +82,9 @@ class DashboardMetricsAdmin(admin.ModelAdmin):
 #     list_editable = ('metrics', 'metrics_slab', 'date', 'week_no', 'count')
 #     list_filter = ('metrics', 'metrics_slab', 'date')
 
+class BannerUserAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'term', 'response_type')
+
 
 admin.site.unregister(FCMDevice)
 admin.site.register(FCMDevice, FCMDeviceAdmin) 
@@ -90,5 +93,5 @@ admin.site.register(PushNotificationUser)
 admin.site.register(DashboardMetrics, DashboardMetricsAdmin)
 admin.site.register(StateDistrictLanguage, StateDistrictLanguageAdmin)
 admin.site.register(DashboardMetricsJarvis)
-
+admin.site.register(BannerUser, BannerUserAdmin)
 
