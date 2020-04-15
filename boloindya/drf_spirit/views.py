@@ -4004,7 +4004,7 @@ def save_banner_response(request):
     try:
         term = request.POST.get('term', None)
         response_type = request.POST.get('response_type', None)
-        if hash_tag:
+        if term:
             bannerUser=BannerUser.objects.create(user = request.user, term=term, response_type=response_type)
             return JsonResponse({'message': 'Data Created'}, status=status.HTTP_200_OK)
         return JsonResponse({'message': 'No Data'}, status=status.HTTP_200_OK)
