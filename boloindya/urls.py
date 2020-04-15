@@ -41,6 +41,7 @@ patterns = [
     url(r'^privacy-policy/$', forum.topic.views.get_privacypolicy, name='get_privacypolicy'),
     url(r'^bolo-action/$', forum.topic.views.get_bolo_action, name='get_bolo_action'),
     url(r'^challenge/(?P<hashtag>[\w-]+)$', forum.topic.views.share_challenge_page, name='share_challenge_page'),
+    url(r'^trending/(?P<hashtag>[\w-]+)$', forum.topic.views.share_challenge_page, name='share_challenge_page'),
     url(r'^robots.txt$', forum.topic.views.robotstext, name='roboxt'),
     url(r'^sitemap.xml$', forum.topic.views.sitemapxml, name='sitemap'),
 
