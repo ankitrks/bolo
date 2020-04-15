@@ -541,17 +541,17 @@ class Notification(UserInfo):
             notific['actor_profile_pic'] = self.user.st.profile_pic
 
         elif self.notification_type=='2':
-            notific['title'] = str(name)+' has commented on video: '+self.topic.topic.title+'.'
-            notific['hindi_title'] = str(name)+' ने वीडियो पर टिप्पणी की है: '+self.topic.topic.title
-            notific['tamil_title'] = str(name)+' வீடியோவில் கருத்து தெரிவித்துள்ளது: '+self.topic.topic.title
-            notific['telgu_title'] = str(name)+' వీడియోపై వ్యాఖ్యానించారు: '+self.topic.topic.title
-            notific['bengali_title'] = str(name)+' ভিডিওতে মন্তব্য করেছে: '+self.topic.topic.title+'.'
-            notific['kannada_title'] = str(name)+' ವೀಡಿಯೊದಲ್ಲಿ ಕಾಮೆಂಟ್ ಮಾಡಿದ್ದಾರೆ: '+self.topic.topic.title+'.'
-            notific['malayalam_title'] = str(name)+' വീഡിയോയിൽ അഭിപ്രായമിട്ടു: '+self.topic.topic.title+'.'
-            notific['gujrati_title'] = str(name)+' વિડિઓ પર ટિપ્પણી કરી છે: '+self.topic.topic.title+'.'
-            notific['marathi_title'] = str(name)+' व्हिडिओवर टिप्पणी दिली आहे: '+self.topic.topic.title+'.'
-            notific['punjabi_title'] = str(name)+" ਵੀਡੀਓ 'ਤੇ ਟਿੱਪਣੀ ਕੀਤੀ ਹੈ: "+self.topic.topic.title+"."
-            notific['odia_title'] = str(name)+' ଭିଡିଓ ଉପରେ ମନ୍ତବ୍ୟ ଦେଇଛନ୍ତି |: '+self.topic.topic.title+'.'
+            notific['title'] = str(name)+' has commented on video: '+self.topic.comment+'.'
+            notific['hindi_title'] = str(name)+' ने वीडियो पर टिप्पणी की है: '+self.topic.comment
+            notific['tamil_title'] = str(name)+' வீடியோவில் கருத்து தெரிவித்துள்ளது: '+self.topic.comment
+            notific['telgu_title'] = str(name)+' వీడియోపై వ్యాఖ్యానించారు: '+self.topic.comment
+            notific['bengali_title'] = str(name)+' ভিডিওতে মন্তব্য করেছে: '+self.topic.comment+'.'
+            notific['kannada_title'] = str(name)+' ವೀಡಿಯೊದಲ್ಲಿ ಕಾಮೆಂಟ್ ಮಾಡಿದ್ದಾರೆ: '+self.topic.comment+'.'
+            notific['malayalam_title'] = str(name)+' വീഡിയോയിൽ അഭിപ്രായമിട്ടു: '+self.topic.comment+'.'
+            notific['gujrati_title'] = str(name)+' વિડિઓ પર ટિપ્પણી કરી છે: '+self.topic.comment+'.'
+            notific['marathi_title'] = str(name)+' व्हिडिओवर टिप्पणी दिली आहे: '+self.topic.comment+'.'
+            notific['punjabi_title'] = str(name)+" ਵੀਡੀਓ 'ਤੇ ਟਿੱਪਣੀ ਕੀਤੀ ਹੈ: "+self.topic.comment+"."
+            notific['odia_title'] = str(name)+' ଭିଡିଓ ଉପରେ ମନ୍ତବ୍ୟ ଦେଇଛନ୍ତି |: '+self.topic.comment+'.'
 
             
             notific['notification_type'] = '2'
@@ -563,17 +563,17 @@ class Notification(UserInfo):
             notific['actor_profile_pic'] = self.user.st.profile_pic 
 
         elif self.notification_type=='3':
-            notific['title'] = str(name)+' has commented on your video: '+self.topic.topic.title
-            notific['hindi_title'] = str(name)+' ने आपके वीडियो पर टिप्पणी की है: '+self.topic.topic.title
-            notific['tamil_title'] = str(name)+' உங்கள் வீடியோவில் கருத்து தெரிவித்துள்ளது: '+self.topic.topic.title
-            notific['telgu_title'] = str(name)+' మీ వీడియోపై వ్యాఖ్యానించారు: '+self.topic.topic.title
-            notific['bengali_title'] = str(name)+' আপনার ভিডিওতে মন্তব্য করেছে: '+self.topic.topic.title
-            notific['kannada_title'] = str(name)+' ನಿಮ್ಮ ವೀಡಿಯೊದಲ್ಲಿ ಕಾಮೆಂಟ್ ಮಾಡಿದ್ದಾರೆ: '+self.topic.topic.title
-            notific['malayalam_title'] = str(name)+' നിങ്ങളുടെ വീഡിയോയിൽ അഭിപ്രായമിട്ടു: '+self.topic.topic.title
-            notific['gujrati_title'] = str(name)+' તમારી વિડિઓ પર ટિપ્પણી કરી છે: '+self.topic.topic.title
-            notific['marathi_title'] = str(name)+' आपल्या व्हिडिओवर टिप्पणी दिली आहे: '+self.topic.topic.title
-            notific['punjabi_title'] = str(name)+" ਨੇ ਤੁਹਾਡੇ ਵੀਡੀਓ 'ਤੇ ਟਿੱਪਣੀ ਕੀਤੀ ਹੈ: "+self.topic.topic.title
-            notific['odia_title'] = str(name)+' ଆପଣଙ୍କର ଭିଡିଓ ଉପରେ ମନ୍ତବ୍ୟ ଦେଇଛନ୍ତି |: '+self.topic.topic.title
+            notific['title'] = str(name)+' has commented on your video: '+self.topic.comment
+            notific['hindi_title'] = str(name)+' ने आपके वीडियो पर टिप्पणी की है: '+self.topic.comment
+            notific['tamil_title'] = str(name)+' உங்கள் வீடியோவில் கருத்து தெரிவித்துள்ளது: '+self.topic.comment
+            notific['telgu_title'] = str(name)+' మీ వీడియోపై వ్యాఖ్యానించారు: '+self.topic.comment
+            notific['bengali_title'] = str(name)+' আপনার ভিডিওতে মন্তব্য করেছে: '+self.topic.comment
+            notific['kannada_title'] = str(name)+' ನಿಮ್ಮ ವೀಡಿಯೊದಲ್ಲಿ ಕಾಮೆಂಟ್ ಮಾಡಿದ್ದಾರೆ: '+self.topic.comment
+            notific['malayalam_title'] = str(name)+' നിങ്ങളുടെ വീഡിയോയിൽ അഭിപ്രായമിട്ടു: '+self.topic.comment
+            notific['gujrati_title'] = str(name)+' તમારી વિડિઓ પર ટિપ્પણી કરી છે: '+self.topic.comment
+            notific['marathi_title'] = str(name)+' आपल्या व्हिडिओवर टिप्पणी दिली आहे: '+self.topic.comment
+            notific['punjabi_title'] = str(name)+" ਨੇ ਤੁਹਾਡੇ ਵੀਡੀਓ 'ਤੇ ਟਿੱਪਣੀ ਕੀਤੀ ਹੈ: "+self.topic.comment
+            notific['odia_title'] = str(name)+' ଆପଣଙ୍କର ଭିଡିଓ ଉପରେ ମନ୍ତବ୍ୟ ଦେଇଛନ୍ତି |: '+self.topic.comment
             notific['notification_type'] = '3'
             notific['instance_id'] = self.topic.id
             notific['topic_id'] = self.topic.topic.id
@@ -723,17 +723,17 @@ class Notification(UserInfo):
             notific['actor_profile_pic'] = ""
 
         elif self.notification_type=='10':
-            notific['title'] = str(name)+' has mentioned you in his comment: '+str(self.topic.comment_html)
-            notific['hindi_title'] = str(name)+' ने अपनी टिप्पणी में आपका उल्लेख किया है: '+str(self.topic.comment_html)
-            notific['tamil_title'] = str(name)+' அவரது கருத்தில் உங்களைக் குறிப்பிட்டுள்ளார்: '+str(self.topic.comment_html)
-            notific['telgu_title'] = str(name)+' తన వ్యాఖ్యలో మిమ్మల్ని ప్రస్తావించారు: '+str(self.topic.comment_html)
-            notific['bengali_title'] = str(name)+' তার মন্তব্যে আপনাকে উল্লেখ করেছে: '+str(self.topic.comment_html)
-            notific['kannada_title'] = str(name)+' ಅವರ ಕಾಮೆಂಟ್ನಲ್ಲಿ ನಿಮ್ಮನ್ನು ಉಲ್ಲೇಖಿಸಿದ್ದಾರೆ: '+str(self.topic.comment_html)
-            notific['malayalam_title'] = str(name)+' അവന്റെ അഭിപ്രായത്തിൽ നിങ്ങളെ പരാമർശിച്ചു: '+str(self.topic.comment_html)
-            notific['gujrati_title'] = str(name)+' તમારી ટિપ્પણીમાં તમારો ઉલ્લેખ કર્યો છે: '+str(self.topic.comment_html)
-            notific['marathi_title'] = str(name)+' त्याच्या टिप्पणी मध्ये आपला उल्लेख आहे: '+str(self.topic.comment_html)
-            notific['punjabi_title'] = str(name)+' ਆਪਣੀ ਟਿੱਪਣੀ ਵਿਚ ਤੁਹਾਡਾ ਜ਼ਿਕਰ ਕੀਤਾ ਹੈ: '+str(self.topic.comment_html)
-            notific['odia_title'] = str(name)+' ତାଙ୍କ ମନ୍ତବ୍ୟରେ ଆପଣଙ୍କୁ ଉଲ୍ଲେଖ କରିଛନ୍ତି |: '+str(self.topic.comment_html)
+            notific['title'] = str(name)+' has mentioned you in his comment: '+self.topic.comment_html
+            notific['hindi_title'] = str(name)+' ने अपनी टिप्पणी में आपका उल्लेख किया है: '+self.topic.comment_html
+            notific['tamil_title'] = str(name)+' அவரது கருத்தில் உங்களைக் குறிப்பிட்டுள்ளார்: '+self.topic.comment_html
+            notific['telgu_title'] = str(name)+' తన వ్యాఖ్యలో మిమ్మల్ని ప్రస్తావించారు: '+self.topic.comment_html
+            notific['bengali_title'] = str(name)+' তার মন্তব্যে আপনাকে উল্লেখ করেছে: '+self.topic.comment_html
+            notific['kannada_title'] = str(name)+' ಅವರ ಕಾಮೆಂಟ್ನಲ್ಲಿ ನಿಮ್ಮನ್ನು ಉಲ್ಲೇಖಿಸಿದ್ದಾರೆ: '+self.topic.comment_html
+            notific['malayalam_title'] = str(name)+' അവന്റെ അഭിപ്രായത്തിൽ നിങ്ങളെ പരാമർശിച്ചു: '+self.topic.comment_html
+            notific['gujrati_title'] = str(name)+' તમારી ટિપ્પણીમાં તમારો ઉલ્લેખ કર્યો છે: '+self.topic.comment_html
+            notific['marathi_title'] = str(name)+' त्याच्या टिप्पणी मध्ये आपला उल्लेख आहे: '+self.topic.comment_html
+            notific['punjabi_title'] = str(name)+' ਆਪਣੀ ਟਿੱਪਣੀ ਵਿਚ ਤੁਹਾਡਾ ਜ਼ਿਕਰ ਕੀਤਾ ਹੈ: '+self.topic.comment_html
+            notific['odia_title'] = str(name)+' ତାଙ୍କ ମନ୍ତବ୍ୟରେ ଆପଣଙ୍କୁ ଉଲ୍ଲେଖ କରିଛନ୍ତି |: '+self.topic.comment_html
             notific['notification_type'] = '10'
             notific['instance_id'] = self.topic.id
             notific['topic_id'] = self.topic.topic.id

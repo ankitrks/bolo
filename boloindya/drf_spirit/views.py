@@ -803,14 +803,13 @@ class SolrSearchTop(BoloIndyaGenericAPIView):
         response ={}
         if search_term:
             topics =[]
-            sqs = SearchQuerySet().models(Topic).raw_search(search_term).filter(is_removed = False, language_id=language_id)
+            sqs = SearchQuerySet().models(Topic).raw_search(search_term).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
             if not sqs:
                 suggested_word = SearchQuerySet().models(Topic).auto_query(search_term).spelling_suggestion()
-                print suggested_word
                 if suggested_word:
-                    sqs = SearchQuerySet().models(Topic).raw_search(suggested_word).filter(is_removed = False, language_id=language_id)
+                    sqs = SearchQuerySet().models(Topic).raw_search(suggested_word).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
             if not sqs:
-                sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(is_removed = False, language_id=language_id)
+                sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
             if sqs:
                 result_page = get_paginated_data(sqs, int(page_size), int(page))
                 topics = solr_object_to_db_object(result_page[0].object_list)
@@ -853,13 +852,13 @@ class SolrSearchTopic(BoloIndyaGenericAPIView):
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
         is_expand=self.request.GET.get('is_expand',False),
         if search_term:
-            sqs = SearchQuerySet().models(Topic).raw_search(search_term).filter(is_removed = False, language_id=language_id)
+            sqs = SearchQuerySet().models(Topic).raw_search(search_term).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
             if not sqs:
                 suggested_word = SearchQuerySet().models(Topic).auto_query(search_term).spelling_suggestion()
                 if suggested_word:
-                    sqs = SearchQuerySet().models(Topic).raw_search(suggested_word).filter(is_removed = False, language_id=language_id)
+                    sqs = SearchQuerySet().models(Topic).raw_search(suggested_word).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
             if not sqs:
-                sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(is_removed = False, language_id=language_id)
+                sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
             if sqs:
                 result_page = get_paginated_data(sqs, int(page_size), int(page))
                 print result_page[0].object_list
@@ -1257,7 +1256,18 @@ def replyOnTopic(request):
         comment_html = check_space_before_hash(comment_html)
         try:
             comment_html,username_list = get_mentions(comment_html)
-            recent_comment = Comment.objects.filter(comment = comment_html,topic_id=topic_id,user=request.user,date__gt=datetime.now()-timedelta(minutes=5))
+            temp_comment = comment_html
+            tag_list=check_space_before_hash(temp_comment).split()
+            if tag_list:
+                for index,value in enumerate(tag_list):
+                    if value.startswith("#"):
+                        has_hashtag = True
+                        tag_list[index]='<a href="/get_challenge_details/?ChallengeHash='+value.strip('#')+'">'+value+'</a>'
+                temp_comment=" ".join(tag_list)
+                temp_comment = temp_comment[0].upper()+temp_comment[1:]
+            print temp_comment
+            recent_comment = Comment.objects.filter(comment = temp_comment,topic_id=topic_id,user=request.user,date__gt=datetime.now()-timedelta(minutes=5))
+            print recent_comment
             if recent_comment:
                 return JsonResponse({'message': 'Already commented same comment'}, status=status.HTTP_400_BAD_REQUEST)
             comment.comment       = comment_html.strip()
@@ -1383,7 +1393,7 @@ def reply_delete(request):
     comment_id     = request.POST.get('comment_id', '')
     comment = Comment.objects.get(pk= comment_id)
 
-    if comment.user == request.user:
+    if comment.user == request.user or commment.topic.user == request.user:
         try:
             comment.delete()
             return JsonResponse({'message': 'Comment Deleted'}, status=status.HTTP_201_CREATED)
