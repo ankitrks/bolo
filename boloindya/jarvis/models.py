@@ -301,6 +301,13 @@ class BannerUser(RecordTimeStamp):
     term = models.CharField(_('term'),max_length=1000,null=True,blank=True)
     response_type = models.CharField(_("Response Type"),null=True,blank=True,max_length=255)
 
+    class Meta:
+        verbose_name = _("Banner User")
+        verbose_name_plural = _("Banner Users")
+
+    def __unicode__(self):
+        return self.term
+
 
 
 
