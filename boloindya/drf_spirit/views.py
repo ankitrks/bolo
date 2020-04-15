@@ -1393,7 +1393,7 @@ def reply_delete(request):
     comment_id     = request.POST.get('comment_id', '')
     comment = Comment.objects.get(pk= comment_id)
 
-    if comment.user == request.user or commment.topic.user == request.user:
+    if comment.user == request.user or comment.topic.user == request.user:
         try:
             comment.delete()
             return JsonResponse({'message': 'Comment Deleted'}, status=status.HTTP_201_CREATED)
