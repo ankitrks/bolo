@@ -294,7 +294,7 @@ body {
     padding: 1rem 10rem 5rem;
 }
 .careers .pad-top, .careers-footer .pad-top {
-    margin-top: 4em;
+    margin-top: 1em;
 }
 .media:first-child {
     margin-top: 0;
@@ -412,7 +412,7 @@ body {
     max-width: 100%;
 }
 .careers .pad-top, .careers-footer .pad-top {
-    margin-top: 4em;
+    margin-top: 1em;
 }
 .careers .footer-description, .careers-footer .footer-description {
     font-weight: 700;
@@ -426,7 +426,7 @@ body {
     margin-bottom: 4em;
 }
 .careers .pad-top, .careers-footer .pad-top {
-    margin-top: 4em;
+    margin-top: 1em;
 }
 .careers .benefit, .careers-footer .benefit {
     padding: 0rem;
@@ -644,7 +644,7 @@ img {
 
 .productStats {
     position: relative;
-    background: #b62927;
+    background: #fff;
     padding: 25px 0 28px;
     width: 100%;
 }
@@ -683,6 +683,23 @@ img {
 text-align: center;
     padding: 10px;
 }
+.careers .what-we-want{
+    padding: 1rem 6rem 1rem;
+}
+
+@media (min-width: 992px){
+    .col-md-4 {
+        width: 33.3333333333%;
+    }
+}
+@media (min-width: 992px){
+    .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9 {
+        float: left;
+    }
+}
+.col-xs-6 {
+    width: 50%;
+}
 </style>
 <div class="careers ng-scope" style="background: #fff;" >
     <div class="container-fluid jumbotron" style="min-height: 120px;">
@@ -694,7 +711,7 @@ text-align: center;
     </div>
 
 
-<div class="container-fluid together-boloindya">
+<div class="container-fluid together-boloindya" style="display: none;">
     <!-- <h1>Together At Boloindya</h1> -->
     <div class="showcase">
         <div class="block-1">
@@ -716,55 +733,216 @@ text-align: center;
     </div>
 </div>
 
- <h1 class="whatDoWeWant">What do we want?</h1>
-<div class="jsx-1929076256 about-content">
-        <div class="productStats">
-            <div class="home_container_inner">
-                <ul class="productStats_wrap">
-                    <li class="productStats_statItem">
-                        <div class="productStats_statContent">
-                            <p class="productStats_number">
-                                Hustle
-                            </p>
-                        </div>
+
+<style type="text/css">
+    .wrapper[_ngcontent-iridium-us-c26] {
+    background-size: cover;
+    background-position: left bottom;
+}
+.contain {
+    max-width: 77.75rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 48px;
+    padding-bottom: 48px;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+@media screen and (min-width: 48rem){
+.contain--xsmall {
+    padding-top: 48px;
+    padding-bottom: 48px;
+}
+}
+.contain--xsmall {
+    padding-top: 48px;
+    padding-bottom: 48px;
+    margin: 0 auto;
+}
+
+@media screen and (min-width: 73.75rem){
+.contain {
+    padding-left: 0;
+    padding-right: 0;
+}
+}
+@media screen and (min-width: 48rem){
+.contain {
+    padding-left: 24px;
+    padding-right: 24px;
+}
+}
+@media screen and (min-width: 30rem){
+.contain {
+    padding-left: 15.84px;
+    padding-right: 15.84px;
+}
+}
+@media screen and (min-width: 48rem){
+.contain {
+    padding-top: 30px;
+    padding-bottom: 11px;
+}
+}
+@media screen and (min-width: 48rem){
+
+.benefit-cards[_ngcontent-iridium-us-c22] h2[_ngcontent-iridium-us-c22] {
+    font-size: 2rem;
+}
+}
+.benefit-cards[_ngcontent-iridium-us-c22] h2[_ngcontent-iridium-us-c22] {
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+    color: #000;
+}
+.benefit-cards[_ngcontent-iridium-us-c22] ul[_ngcontent-iridium-us-c22] {
+    list-style: none;
+    padding: 0;
+    display: block;
+    display: -webkit-box;
+    display: flex;
+    flex-wrap: wrap;
+    -webkit-box-pack: left;
+    justify-content: left;
+}
+
+@media(max-width: 991px){
+    .benefit-cards[_ngcontent-iridium-us-c22] ul[_ngcontent-iridium-us-c22] {
+        display: block;
+    }
+}
+
+.border-blue-boloindya[_ngcontent-iridium-us-c29] {
+    border-top: 3px solid #b62927;
+}
+
+@media screen and (min-width: 73.75rem){
+
+.card[_ngcontent-iridium-us-c29] {
+    height: 18.75rem;
+    width: 17.75rem;
+    margin: 0 10px 15px 0;
+}
+}
+.card[_ngcontent-iridium-us-c29] {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 4px 0 rgba(17, 22, 26, 0.16), 0 2px 4px 0 rgba(17, 22, 26, 0.08), 0 4px 8px 0 rgba(17, 22, 26, 0.08);
+    display: inline-block;
+    height: 18.75rem;
+    width: 18.75rem;
+    text-align: center;
+}
+
+.card-container[_ngcontent-iridium-us-c29] {
+    cursor: default;
+    display: inline-block;
+    -webkit-perspective: 1000px;
+    perspective: 1000px;
+    position: relative;
+}
+.img_position[_ngcontent-iridium-us-c29] {
+    width: 300px;
+    height: 220px;
+    position: relative;
+    overflow: hidden;
+    margin: 0px auto 1rem;
+    border-radius: 3px;
+}
+.card__title[_ngcontent-iridium-us-c29] {
+    margin-top: -1rem;
+    font-weight: bold;
+    font-size: 1.325rem;
+    color: #000;
+}
+.h2_title{
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+    color: #000;
+}
+@media(max-width: 991px){
+.benefit-card{
+    margin-bottom: 10px;
+}
+
+.careers .join-us .media-body p, .careers-footer .join-us .media-body p {
+    text-align: center;
+}
+}
+
+</style>
+
+<section _ngcontent-iridium-us-c22="" class="benefit-cards ng-star-inserted" id="benefit-cards">
+    <div _ngcontent-iridium-us-c22="" id="benefit-cards-anchor" style="position: relative; top: -50px; left: 0"></div>
+    <!---->
+    <!---->
+    <ir-container _ngcontent-iridium-us-c22="" _nghost-iridium-us-c26="" class="ng-star-inserted">
+        <!---->
+        <!---->
+        <div _ngcontent-iridium-us-c26="" class="wrapper ng-star-inserted">
+            <!---->
+            <div _ngcontent-iridium-us-c26="" class="contain contain--xsmall ng-star-inserted">
+                <h2 _ngcontent-iridium-us-c22="" class="text-center bold">What do we want?</h2>
+
+                <ul _ngcontent-iridium-us-c22="">
+                    <!---->
+                    <li _ngcontent-iridium-us-c22=""  class="text-center benefit-card ng-star-inserted">
+                        <ir-benefit-card _ngcontent-iridium-us-c22="" _nghost-iridium-us-c29="">
+                            <div _ngcontent-iridium-us-c29="" class="card card-container card-- border-blue-boloindya"><img _ngcontent-iridium-us-c29="" class="img_position" src="/media/hustle.jpg">
+                                <h3 _ngcontent-iridium-us-c29="" class="card__title mb-1">Hustle</h3>
+                                <!---->
+                            </div>
+                        </ir-benefit-card>
+                    </li>                    
+                    <li _ngcontent-iridium-us-c22="" class="text-center benefit-card ng-star-inserted">
+                        <ir-benefit-card _ngcontent-iridium-us-c22="" _nghost-iridium-us-c29="">
+                            <div _ngcontent-iridium-us-c29="" class="card card-container card-- border-blue-boloindya"><img _ngcontent-iridium-us-c29="" class="img_position" src="/media/new-ideas.jpg">
+                                <h3 _ngcontent-iridium-us-c29="" class="card__title mb-1">New Ideas</h3>
+                                <!---->
+
+                            </div>
+                        </ir-benefit-card>
+                    </li>                    <li _ngcontent-iridium-us-c22="" class="text-center benefit-card ng-star-inserted">
+                        <ir-benefit-card _ngcontent-iridium-us-c22="" _nghost-iridium-us-c29="">
+                            <div _ngcontent-iridium-us-c29="" class="card card-container card-- border-blue-boloindya"><img _ngcontent-iridium-us-c29="" class="img_position" src="/media/user-satisfaction.jpg">
+                                <h3 _ngcontent-iridium-us-c29="" class="card__title mb-1">User Satisfaction</h3>
+                                <!---->
+                            </div>
+                        </ir-benefit-card>
+                    </li>                    <li _ngcontent-iridium-us-c22="" class="text-center benefit-card ng-star-inserted">
+                        <ir-benefit-card _ngcontent-iridium-us-c22="" _nghost-iridium-us-c29="">
+                            <div _ngcontent-iridium-us-c29="" class="card card-container card-- border-blue-boloindya"><img _ngcontent-iridium-us-c29="" class="img_position" src="/media/positivity.jpg">
+                                <h3 _ngcontent-iridium-us-c29="" class="card__title mb-1">Positivity</h3>
+                                <!---->
+
+                            </div>
+                        </ir-benefit-card>
                     </li>
-                    <li class="productStats_statItem">
-                        <div class="productStats_statContent">
-                            <p class="productStats_number">
-                                New Ideas
-                            </p>
-                        </div>
-                    </li>
-                    <li class="productStats_statItem">
-                        <div class="productStats_statContent">
-                            <p class="productStats_number">
-                                User Satisfaction
-                            </p>
-                        </div>
-                    </li>
-                    <li class="productStats_statItem">
-                        <div class="productStats_statContent">
-                            <p class="productStats_number">
-                                Positivity
-                            </p>
-                        </div>
-                    </li>
+                    
                 </ul>
             </div>
         </div>
-    </div>
+        <!---->
+        <!---->
+        <!---->
+        <!---->
+    </ir-container>
+</section>
+
+
 
     <div class="container-fluid join-us">
         <div class="pad-top col-xs-12">
             <div class="media">
-                <div class="media-left">
+<!--                 <div class="media-left">
                     <a href="#"> <img src="/media/img/join-us.943cbbfe.svg" alt="join us"> </a>
-                </div>
-                <div class="media-body">
+                </div> -->
+                <div class="media-body" style="text-align: center;">
 
-                    <h1>When do we want?</h1>
+                    <h2 class="h2_title">When do we want?</h2>
                     <h2>Now !</h2>
-                    <p>Join Us to Build for next 50 crore Indians</p> <a class="btn btn-main" ui-sref="root.career_base.openings" href="/careers/openings"> See Open Positions </a> </div>
+                    <p style="max-width: 100%">Join Us to Build for next 50 crore Indians</p> <a class="btn btn-main" ui-sref="root.career_base.openings" href="/careers/openings"> See Open Positions </a> </div>
             </div>
         </div>
     </div>

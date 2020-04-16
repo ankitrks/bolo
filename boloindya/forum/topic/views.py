@@ -1032,16 +1032,16 @@ def boloindya_feed(request):
 
     try:
         if language_id:
-            all_user = UserProfile.objects.filter(is_popular = True, language=language_id)[:10]
+            all_user = UserProfile.objects.filter(is_popular = True, language=language_id)[:20]
             popular_bolo=all_user
         else:
-            all_user = UserProfile.objects.filter(is_popular = True)[:10]
+            all_user = UserProfile.objects.filter(is_popular = True)[:20]
             popular_bolo=all_user
     except Exception as e1:
         popular_bolo = []
 
     try:
-        hash_tags = TongueTwister.objects.order_by('-hash_counter')[:10]
+        hash_tags = TongueTwister.objects.order_by('-hash_counter')[:20]
     except Exception as e1:
         hash_tags = []
     print popular_bolo.__dict__

@@ -309,15 +309,49 @@
     padding-bottom: 17px;
     margin-bottom: 17px;
 }
-
-
 .horizontal-scroll {
-    -ms-overflow-style: none;  /* Internet Explorer 10+ */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;  
+    scrollbar-width: none; 
 }
 .horizontal-scroll::-webkit-scrollbar { 
-    display: none;  /* Safari and Chrome */
+    display: none;  
 }
+
+.horizontal-scroll:hover::-webkit-scrollbar{
+    width: 8px;
+    height: 8px;
+}
+
+.horizontal-scroll:hover::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(22,24,35,0.34);
+
+}
+.horizontal-scroll:hover::-webkit-scrollbar-track {
+    border-radius: 0px;
+    background-color: var(--bg-color);
+
+}
+.horizontal-scroll:hover {
+    -ms-overflow-style: block;  
+    scrollbar-width: block; 
+}
+.horizontal-scroll:hover::-webkit-scrollbar { 
+    display: block;  
+}
+
+._2WfMm nav ul li{
+    margin-bottom: 4px;
+}
+
+
+/*.recommend-card {
+    -ms-overflow-style: block;  
+    scrollbar-width: block; 
+}
+.recommend-card::-webkit-scrollbar { 
+    display: block;  
+}*/
 
 .horizontal-scroll {
   overflow: hidden;

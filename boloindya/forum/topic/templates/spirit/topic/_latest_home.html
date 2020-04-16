@@ -944,6 +944,122 @@
 
 </style>
 
+<style type="text/css">
+    .TransitionCardNew {
+    background: #FFFFFF;
+    -webkit-box-shadow: 0px 0px 64px rgba(0,0,0,0.07);
+    box-shadow: 0px 0px 64px rgba(0,0,0,0.07);
+    border-radius: 8px;
+    width: 270px;
+    padding: 20px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    text-align: center;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+}
+
+.TransitionCardNew__profileIcon {
+    height: 106px;
+    width: 106px;
+    border-radius: 50%;
+    border: 3px solid #1F70C1;
+}
+.TransitionCardNew__profileIcon__icon {
+    border: 3px solid white;
+    height: 100%;
+    border-radius: 50%;
+}
+.TransitionCardNew__name {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 14px;
+    color: #E92E3D;
+    margin-top: 14px;
+}
+.TransitionCardNew__bio {
+    margin-top: 10px;
+    color: #000;
+    line-height: 1.5rem;
+    text-align: initial;
+    font-size: 14px;
+}
+.TransitionCardNew__bottom {
+    background: linear-gradient(180.27deg, #F8F8F8 4.01%, rgba(248,248,248,0) 80.93%);
+    border-radius: 6px;
+    margin-top: 20px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    width: 100%;
+}
+.TransitionCardNew img {
+    max-width: 100%;
+    width: 100%;
+}
+.carousel__wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    transition-property: -webkit-transform;
+    -webkit-transition-property: -webkit-transform;
+    transition-property: transform;
+    transition-property: transform, -webkit-transform;
+    -webkit-box-sizing: content-box;
+    box-sizing: content-box;
+    -webkit-transition: background-color 0.25s linear, color 0.05s linear, opacity 0.25s linear, visibility 0.25s linear, -webkit-filter 0.25s linear, -webkit-transform 0.25s linear;
+    transition: background-color 0.25s linear, color 0.05s linear, opacity 0.25s linear, visibility 0.25s linear, -webkit-filter 0.25s linear, -webkit-transform 0.25s linear;
+    transition: background-color 0.25s linear, color 0.05s linear, opacity 0.25s linear, filter 0.25s linear, visibility 0.25s linear, transform 0.25s linear;
+    transition: background-color 0.25s linear, color 0.05s linear, opacity 0.25s linear, filter 0.25s linear, visibility 0.25s linear, transform 0.25s linear, -webkit-filter 0.25s linear, -webkit-transform 0.25s linear;
+}
+
+.about-content .about-img1-review {
+    position: relative;
+    width: 90%;
+    padding: 0 0 0 10%;
+    display: flex;
+    margin-bottom: 20px;
+}
+.oneItemSize{
+    width: 270px; margin-right: 20px;
+}
+@media(max-width: 991px){
+    .about-content .about-img1-review {
+        position: relative;
+        width: 100%;
+        padding: 0 0 0 0;
+        display: block;
+        margin-bottom: 20px;
+    }
+    .oneItemSize{
+        width: 100%; margin-right: 20px;
+    }
+
+
+
+}
+
+</style>
+
 <script type="text/javascript">
     
     var sliderTopicListVideos='{{topics}}';
@@ -1051,119 +1167,6 @@
 
         </div>
 
-<style type="text/css">
-    .TransitionCardNew {
-    background: #FFFFFF;
-    -webkit-box-shadow: 0px 0px 64px rgba(0,0,0,0.07);
-    box-shadow: 0px 0px 64px rgba(0,0,0,0.07);
-    border-radius: 8px;
-    width: 270px;
-    padding: 20px;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-    -ms-flex-direction: column;
-    flex-direction: column;
-    -webkit-box-align: center;
-    -ms-flex-align: center;
-    align-items: center;
-    text-align: center;
-    -ms-flex-negative: 0;
-    flex-shrink: 0;
-}
-
-.TransitionCardNew__profileIcon {
-    height: 106px;
-    width: 106px;
-    border-radius: 50%;
-    border: 3px solid #1F70C1;
-}
-.TransitionCardNew__profileIcon__icon {
-    border: 3px solid white;
-    height: 100%;
-    border-radius: 50%;
-}
-.TransitionCardNew__name {
-    font-weight: 600;
-    font-size: 14px;
-    line-height: 14px;
-    color: #E92E3D;
-    margin-top: 14px;
-}
-.TransitionCardNew__bio {
-    margin-top: 10px;
-    color: #969696;
-    font-size: 14px;
-}
-.TransitionCardNew__bottom {
-    background: linear-gradient(180.27deg, #F8F8F8 4.01%, rgba(248,248,248,0) 80.93%);
-    border-radius: 6px;
-    margin-top: 20px;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-    -ms-flex-direction: column;
-    flex-direction: column;
-    -webkit-box-align: center;
-    -ms-flex-align: center;
-    align-items: center;
-    width: 100%;
-}
-.TransitionCardNew img {
-    max-width: 100%;
-    width: 100%;
-}
-.carousel__wrapper {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    transition-property: -webkit-transform;
-    -webkit-transition-property: -webkit-transform;
-    transition-property: transform;
-    transition-property: transform, -webkit-transform;
-    -webkit-box-sizing: content-box;
-    box-sizing: content-box;
-    -webkit-transition: background-color 0.25s linear, color 0.05s linear, opacity 0.25s linear, visibility 0.25s linear, -webkit-filter 0.25s linear, -webkit-transform 0.25s linear;
-    transition: background-color 0.25s linear, color 0.05s linear, opacity 0.25s linear, visibility 0.25s linear, -webkit-filter 0.25s linear, -webkit-transform 0.25s linear;
-    transition: background-color 0.25s linear, color 0.05s linear, opacity 0.25s linear, filter 0.25s linear, visibility 0.25s linear, transform 0.25s linear;
-    transition: background-color 0.25s linear, color 0.05s linear, opacity 0.25s linear, filter 0.25s linear, visibility 0.25s linear, transform 0.25s linear, -webkit-filter 0.25s linear, -webkit-transform 0.25s linear;
-}
-
-.about-content .about-img1-review {
-    position: relative;
-    width: 90%;
-    padding: 0 0 0 10%;
-    display: flex;
-    margin-bottom: 20px;
-}
-.oneItemSize{
-    width: 230px; margin-right: 20px;
-}
-@media(max-width: 991px){
-    .about-content .about-img1-review {
-        position: relative;
-        width: 100%;
-        padding: 0 0 0 0;
-        display: block;
-        margin-bottom: 20px;
-    }
-    .oneItemSize{
-        width: 100%; margin-right: 20px;
-    }
-
-
-
-}
-
-</style>
 <hr>
 <h2 style="margin-bottom: 20px;" class="slogan">We love our users  <span style="">&</span> So do they !</h2>
         <div class="jsx-1929076256 about-content ">
@@ -1171,52 +1174,28 @@
             <div class="jsx-1929076256 about-img1-review bottomHeaing " style="text-align: center;">
                 
                 <section class="TransitionCardNew carousel__slide PlacementSupport__carousel__card swiper-slide-active oneItemSize">
-                    <div class="TransitionCardNew__profileIcon"><img src="/media/user.svg" class="TransitionCardNew__profileIcon__icon"></div>
-                    <p class="TransitionCardNew__name">Arunima M</p>
-                    <p class="TransitionCardNew__bio">Lead consultant,IT</p>
-                    <div class="TransitionCardNew__bottom">
-                        <svg width="10" height="6" xmlns="http://www.w3.org/2000/svg" class="TransitionCardNew__bottom__arrow">
-                            <path d="M9 1L5 5 1 1" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
-                        </svg>
-                        <div class="TransitionCardNew__bottom__orgIcon brand-icon-stopper brand-icon-retina brand-icon-retina_JP_morgan-40px"></div>
-                        <!-- <p class="TransitionCardNew__bottom__transitionBio">Associate/AVP</p> -->
-                    </div>
+                    <div class="TransitionCardNew__profileIcon"><img src="/media/Review1.jpg" class="TransitionCardNew__profileIcon__icon"></div>
+                    <p class="TransitionCardNew__name">Oye friend</p>
+                    <p class="TransitionCardNew__bio">Excellent App ! Its has Quality. This App is really wonderful, i get lot of Information, Knowledge, Tips. Very decent application. Its a like our friends explaining new things with Love. Now a Youth going wrong way by wasting time in making stupid videos like Tik-Tok Apps. </p>
+
                 </section>
                 <section class="TransitionCardNew carousel__slide PlacementSupport__carousel__card swiper-slide-active oneItemSize" >
-                    <div class="TransitionCardNew__profileIcon"><img src="/media/user.svg" class="TransitionCardNew__profileIcon__icon"></div>
-                    <p class="TransitionCardNew__name">Arunima M</p>
-                    <p class="TransitionCardNew__bio">Lead consultant,IT</p>
-                    <div class="TransitionCardNew__bottom">
-                        <svg width="10" height="6" xmlns="http://www.w3.org/2000/svg" class="TransitionCardNew__bottom__arrow">
-                            <path d="M9 1L5 5 1 1" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
-                        </svg>
-                        <div class="TransitionCardNew__bottom__orgIcon brand-icon-stopper brand-icon-retina brand-icon-retina_JP_morgan-40px"></div>
-                        <!-- <p class="TransitionCardNew__bottom__transitionBio">Associate/AVP</p> -->
-                    </div>
+                    <div class="TransitionCardNew__profileIcon"><img src="/media/Review2.jpg" class="TransitionCardNew__profileIcon__icon"></div>
+                    <p class="TransitionCardNew__name">Mounica Monu</p>
+                    <p class="TransitionCardNew__bio">Excellent app that helped me a lot to share my knowledge and earn money. I personally request everyone to use this application to share your knowledge and also to learn new things from others. This application acts as a wonderful platform for earning money and also in gaining and sharing of knowledge</p>
+
                 </section>
                 <section class="TransitionCardNew carousel__slide PlacementSupport__carousel__card swiper-slide-active oneItemSize" >
-                    <div class="TransitionCardNew__profileIcon"><img src="/media/user.svg" class="TransitionCardNew__profileIcon__icon"></div>
-                    <p class="TransitionCardNew__name">Arunima M</p>
-                    <p class="TransitionCardNew__bio">Lead consultant,IT</p>
-                    <div class="TransitionCardNew__bottom">
-                        <svg width="10" height="6" xmlns="http://www.w3.org/2000/svg" class="TransitionCardNew__bottom__arrow">
-                            <path d="M9 1L5 5 1 1" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
-                        </svg>
-                        <div class="TransitionCardNew__bottom__orgIcon brand-icon-stopper brand-icon-retina brand-icon-retina_JP_morgan-40px"></div>
-                        <!-- <p class="TransitionCardNew__bottom__transitionBio">Associate/AVP</p> -->
-                    </div>
+                    <div class="TransitionCardNew__profileIcon"><img src="/media/Review3.jpg" class="TransitionCardNew__profileIcon__icon"></div>
+                    <p class="TransitionCardNew__name">Ushi style</p>
+                    <p class="TransitionCardNew__bio">Very nice app for making videos in hindi....it is very unique app that promote our mother tongue thanks alot for making this app😍.This App will make India Proud. Gives amazing opportunity of Earning Money by making videos & Also Referring Friends. Just Received my first Payment from the Admin directly.</p>
+
                 </section>
                 <section class="TransitionCardNew carousel__slide PlacementSupport__carousel__card swiper-slide-active oneItemSize" >
-                    <div class="TransitionCardNew__profileIcon"><img src="/media/user.svg" class="TransitionCardNew__profileIcon__icon"></div>
-                    <p class="TransitionCardNew__name">Arunima M</p>
-                    <p class="TransitionCardNew__bio">Lead consultant,IT</p>
-                    <div class="TransitionCardNew__bottom">
-                        <svg width="10" height="6" xmlns="http://www.w3.org/2000/svg" class="TransitionCardNew__bottom__arrow">
-                            <path d="M9 1L5 5 1 1" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
-                        </svg>
-                        <div class="TransitionCardNew__bottom__orgIcon brand-icon-stopper brand-icon-retina brand-icon-retina_JP_morgan-40px"></div>
-                        <!-- <p class="TransitionCardNew__bottom__transitionBio">Associate/AVP</p> -->
-                    </div>
+                    <div class="TransitionCardNew__profileIcon"><img src="/media/Review5.jpg" class="TransitionCardNew__profileIcon__icon"></div>
+                    <p class="TransitionCardNew__name">Rahul Srivastava</p>
+                    <p class="TransitionCardNew__bio">Awesome experience learned many things here an shared bit of my knowledge also I am very happy to be a part of this team and they do handle it very carefully and clear all the queries within no time. They encourage each and every individual and support them by giving good advices</p>
+
                 </section>
 
 
