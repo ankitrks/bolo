@@ -578,8 +578,8 @@
 
 
                             var playtime_display = convertSecondsToMinsHrs(data.play_data[item]['tot_playtime']);
-                            cell_username.innerHTML = data.play_data[item]['username'];
-                            cell_title.innerHTML = data.play_data[item]['topic_title'];
+                            cell_username.innerHTML = data.play_data[item]['video__user__username'];
+                            cell_title.innerHTML = data.play_data[item]['video__title'];
                             cell_videoid.innerHTML = data.play_data[item]['videoid'];
                             cell_playtime.innerHTML = playtime_display;
                         }    
