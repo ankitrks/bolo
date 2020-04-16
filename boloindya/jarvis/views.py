@@ -1756,22 +1756,10 @@ def statistics_all_jarvis(request):
 def get_playdata(request):
 
     from django.db.models import Sum
-    from django.db.models import Avg
-
-    language_index_list = []
-    language_map = []
-    language_string = list(language_options)
-    for each in language_options:
-        language_index_list.append(each[0])
-        language_map.append(str(each[1]))
-
-    counter=0    
-    play_data=[]        # list to be displayed at the front end
 
     if request.is_ajax():
         raw_data = json.loads(request.body)
         try:
-            print(raw_data)
             categ_sel = raw_data['categ_sel']
             lang_sel = raw_data['lang_sel']
             sdate = raw_data['sdate']
@@ -1783,23 +1771,12 @@ def get_playdata(request):
             sdate = datetime.datetime.strptime(sdate,"%Y-%m-%d %H:%M:%S").date()
             edate = datetime.datetime.strptime(edate,"%Y-%m-%d %H:%M:%S").date()
 
-            categ_required = Category.objects.get(id=categ_sel)
-
             all_video_data = VideoPlaytime.objects.filter(timestamp__gte=sdate, timestamp__lte=edate,\
-                video__m2mcategory=categ_required, video__language_id=lang_sel)\
+                video__m2mcategory__id=categ_sel, video__language_id=lang_sel)\
                 .values('videoid', 'video__title', 'video__user__username').annotate(tot_playtime=Sum('playtime'))\
                 .order_by( '-tot_playtime', 'videoid')[:10]
 
-            for vid_obj in all_video_data:
-                data_row={}
-                data_row['videoid']=vid_obj['videoid']
-                data_row['username']=vid_obj['video__user__username']
-                data_row['topic_title'] = vid_obj['video__title']
-                data_row['tot_playtime'] = vid_obj['tot_playtime']
-                play_data.append(data_row)    
-
-            return JsonResponse({'play_data': play_data}, status=status.HTTP_200_OK, safe=False)         
-
+            return JsonResponse({'play_data': list(all_video_data)}, status=status.HTTP_200_OK, safe=False)         
 
         except Exception as e:
             print(traceback.format_exc())
