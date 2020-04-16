@@ -263,12 +263,14 @@ class AndroidLogs(RecordTimeStamp):
 
 # class recording the playime for videos
 class VideoPlaytime(models.Model):
+    from forum.topic.models import Topic    
 
     user = models.CharField(_("user"), null = True, blank = True, max_length = 250, db_index = True)
     videoid = models.CharField(_("videoid"), null = True, blank = True, max_length = 250, db_index = True)
     playtime = models.PositiveIntegerField(_("playtime"), default=0)
     timestamp = models.DateTimeField(_("timestamp"), null = True, blank = False)
     # created_at = models.DateTimeField(_("created_at"), null = True, blank = False)
+    video = models.ForeignKey(Topic, null=True, blank=True)
 
 # class recording the fraction of videos played
 class VideoCompleteRate(models.Model):

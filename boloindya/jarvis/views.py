@@ -1782,40 +1782,22 @@ def get_playdata(request):
 
             sdate = datetime.datetime.strptime(sdate,"%Y-%m-%d %H:%M:%S").date()
             edate = datetime.datetime.strptime(edate,"%Y-%m-%d %H:%M:%S").date()
-            all_video_data = VideoPlaytime.objects.filter(timestamp__gte=sdate, timestamp__lte=edate).values('videoid').annotate(tot_playtime=Sum('playtime')).order_by( '-tot_playtime', 'videoid')
-            #print(sdate, edate, len(all_video_data))
 
-            for item in all_video_data:
-                curr_id = item['videoid']
-                tot_playtime = item['tot_playtime']
-                topic_data = Topic.objects.filter(id=curr_id)
-                language_id = (topic_data[0].language_id)
-                topic_uploaded_by = str(topic_data[0].user)
-                topic_title = (topic_data[0].title)
+            categ_required = Category.objects.get(id=categ_sel)
 
-                if(language_id in language_map):
-                    language_id = str(language_map.index(language_id))
+            all_video_data = VideoPlaytime.objects.filter(timestamp__gte=sdate, timestamp__lte=edate,\
+                video__m2mcategory=categ_required, video__language_id=lang_sel)\
+                .values('videoid', 'video__title', 'video__user__username').annotate(tot_playtime=Sum('playtime'))\
+                .order_by( '-tot_playtime', 'videoid')[:10]
 
-                m2mcategory_list=topic_data[0].m2mcategory.all()
-                categ_id_list = []
-                for each_categ in m2mcategory_list:
-                    categ_id_list.append(str(each_categ.id))
+            for vid_obj in all_video_data:
+                data_row={}
+                data_row['videoid']=vid_obj['videoid']
+                data_row['username']=vid_obj['video__user__username']
+                data_row['topic_title'] = vid_obj['video__title']
+                data_row['tot_playtime'] = vid_obj['tot_playtime']
+                play_data.append(data_row)    
 
-                #print(language_id, categ_id_list)    
-                    
-                if((lang_sel==language_id) and (categ_sel in categ_id_list)):           # topic belongs to required filter
-                    data_row={}
-                    data_row['videoid']=curr_id
-                    data_row['username']=topic_uploaded_by
-                    data_row['topic_title'] = topic_title
-                    data_row['tot_playtime'] = tot_playtime
-                    #print(data_row)
-                    play_data.append(data_row)
-                    counter+=1
-                    if(counter==10):
-                        break
-
-            print(play_data)        
             return JsonResponse({'play_data': play_data}, status=status.HTTP_200_OK, safe=False)         
 
 
