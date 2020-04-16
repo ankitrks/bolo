@@ -1,0 +1,165 @@
+
+{% load i18n %}
+
+<style type="text/css">
+  .socialImageSize{
+    height: 45px;
+}
+.paddingSocialShare{
+    padding: 5px;
+}
+._social_h::before {
+    content: '';
+    display: inline-block;
+    height: 18px;
+    margin: 0 6px -3px 0;
+    min-width: 18px;
+    position: relative;
+    top: -2px;
+    width: 18px;
+    background-image: url(/media/social_share_image.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: 0 -156px;
+
+}
+.socialShareP{
+    margin-top: 10px;
+}
+@media(max-width: 991px){
+    .page-with-header {
+        padding-top: 0px;
+    }
+    .sideImageHeight{
+        height: 200px;
+    }
+
+    .leftImage {
+        display: inline-block;
+        float: left;
+        position: absolute;
+        left: 9px;
+        top: 280px;
+    }
+    .rightImage{
+        display: inline-block;
+        float: right;
+        position: absolute;
+        right: 4px;
+        top: 280px;
+    }
+    .download_height{
+        height: 50px;
+    }
+
+    .socialImageSize {
+        height: 25px;
+    }
+
+}
+
+</style>
+<div class="jsx-157630181 footer-container">
+
+
+                <div class="jsx-157630181 footer-content-wrapper">
+                    <h1 class="jsx-157630181 boloindya-logo"><div class="jsx-832362280 logo-container"><!-- <img src="" class="jsx-832362280 logo-icon"> --><img src="/media/boloindya_new_logo.png" class="jsx-832362280 logo-text"></div><strong class="jsx-157630181">boloindya</strong></h1>
+                      <div class="footer-content-column">
+                        <h2>{% trans "Company" %}</h2>
+                        <h3><a class="" href="{{site_base_url}}about/">{% trans "About" %}</a></h3>
+<!--                         <h3><a class="" href="{{site_base_url}}careers/">{% trans "Careers" %}</a></h3>
+                        <h3><a class="" href="{{site_base_url}}team/">{% trans "Team" %}</a></h3> -->
+                      </div>
+                    <div class="footer-content-column">
+                        <h2>{% trans "Programs" %}</h2>
+                        <h3><a class="" href="{{site_base_url}}about/contact/">{% trans "Discover" %}</a></h3>
+
+                      </div>
+                    <div class="footer-content-column">
+                        <h2>{% trans "Support" %}</h2>
+                        <h3><a class="" href="{{site_base_url}}help_support">{% trans "Help Center" %}</a></h3>
+                        <h3><a class="" href="{{site_base_url}}bolo-action">{% trans "Bolo Action" %}</a></h3>
+                        <!-- <h3><a class="" href="{{site_base_url}}en/safety">{% trans "Safety Center" %}</a></h3> -->
+
+                    </div>
+                    <div class="footer-content-column">
+                        <h2>{% trans "Legal" %}</h2>
+                        <h3><a class="" href="{{site_base_url}}terms-of-service">{% trans "Terms of Service" %}</a></h3>
+                        <h3><a class="" href="{{site_base_url}}privacy-policy">{% trans "Privacy Policy" %}</a></h3>
+                    </div>
+                </div>
+                <div class="jsx-157630181 footer-bottom-wrapper">
+                    <div class="jsx-1724846817 jsx-1667329752 language-selection">
+
+
+
+                      {% get_current_language as LANGUAGE_CODE %}
+                      {% get_available_languages as LANGUAGES %}
+                      {% get_language_info_list for LANGUAGES as languages %}
+                      {% for language in languages %}
+                        {% if language.code == LANGUAGE_CODE %}
+                          <p class="jsx-1724846817 jsx-1667329752">{{ language.name_local }}</p>
+                        {% endif %}
+                      {% endfor %}
+
+                        <li class="dropdown " id="language-switcher" style="list-style: none;position: unset;">
+                            <form action="{% url 'set_language' %}" method="post">
+                                {% csrf_token %}
+                                <input name="next" type="hidden" value="{{ redirect_to }}" />
+
+                                <select class="selectpicker jsx-1724846817 jsx-1667329752 language-selection-form " name="{% trans 'language' %}"  onchange="this.form.submit()">
+                                  {% get_current_language as LANGUAGE_CODE %}
+                                  {% get_available_languages as LANGUAGES %}
+                                  {% get_language_info_list for LANGUAGES as languages %}
+                                  {% for language in languages %}
+
+                                      <option
+                                        value="{{ language.code }}"
+                                        {% if language.code == LANGUAGE_CODE %} selected="selected"{% endif %}
+                                        data-content='<img src="/static/img/flags/{{ language.code }}.png"></span>
+                                        <span style="display:inline-block; width:100px; padding-left: 10px; text-shadow:none">
+                                          {{ language.name_local }}
+                                          <!-- span style="color:#999;">&nbsp;[{{ language.code }}]</span -->
+                                        </span>'>
+                                        {{ language.name_local }}
+                                      </option>
+
+                                  {% endfor %}
+                                </select>
+                            </form>
+                        </li>
+
+                    </div>
+<!--                     <p class="socialShareP" style="text-align: center;">
+                    <a target="_blank" href="https://www.facebook.com/BoloIndya/">
+                        <span class="paddingSocialShare"><img class="socialImageSize" src="/media/facebook_share.png"></span>
+                    </a>
+                    <a target="_blank" href="https://twitter.com/bolo_indya?lang=en">
+                        <span class="paddingSocialShare"><img class="socialImageSize" src="/media/twitter.png"></span>
+                    </a>
+                    <a target="_blank" href="https://www.instagram.com/bolo.indya/">
+                        <span class="paddingSocialShare"><img class="socialImageSize" src="/media/instagram.png"></span>
+                    </a>
+                    <a target="_blank" href="https://www.linkedin.com/company/bolo-indya">
+                        <span class="paddingSocialShare"><img class="socialImageSize" src="/media/linkedin.png"></span>
+                    </a>                   
+                     <a target="_blank" href="https://www.youtube.com/channel/UCcS07H-zu67HcM7fmDBoF-g">
+                        <span class="paddingSocialShare"><img class="socialImageSize" src="/media/Youtube.png"></span>
+                    </a>
+                </p> -->
+                    <div class="jsx-157630181 copyright">© 2020 boloindya</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<input type="hidden" name="onLoadPlayCheck" id="onLoadPlayCheck" value="0">
+
+
+<!-- End of Registration Modal -->
+
+<script src="/media/js/common.js"></script>
+
+
+
+
