@@ -22,9 +22,18 @@ from datetime import datetime,timedelta
 
 from .transcoder import transcode_media_file
 from django.utils.html import format_html
+from django.db.models.query import QuerySet
+from django.dispatch import Signal
 
+post_update = Signal()
+
+class LastModifiedQueryset(models.query.QuerySet):
+    def update(self, *args, **kwargs):
+        kwargs['last_modified'] = datetime.now()
+        return super(LastModifiedQueryset,self).update(*args, **kwargs)
 
 class RecordTimeStamp(models.Model):
+    objects = LastModifiedQueryset.as_manager()
     created_at=models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False) # auto_now will add the current time and date whenever field is saved.
     last_modified=models.DateTimeField(auto_now=True,auto_now_add=False)                     # while auto_now_add will save the date and time only when record is first created
     class Meta:
@@ -164,7 +173,6 @@ class Topic(RecordTimeStamp):
     is_logo_checked = models.BooleanField(_("Is Logo Checked"), default=False)
     time_deleted = models.DateTimeField(blank = True, null = True)
     plag_text = models.CharField(choices = plag_text_options, blank = True, null = True, max_length = 10)
-    objects = TopicQuerySet.as_manager()
 
     def __unicode__(self):
         return self.title
@@ -413,13 +421,13 @@ class Topic(RecordTimeStamp):
     def calculate_vb_score(self):
         from .utils import get_ranking_feature_weight
         score=0
-        if self.user.is_business:
+        if self.user.st.is_business:
             score += get_ranking_feature_weight('business_account')
-        if self.user.is_superstar:
+        if self.user.st.is_superstar:
             score += get_ranking_feature_weight('user_superstar')
-        if self.user.is_popular:
+        if self.user.st.is_popular:
             score += get_ranking_feature_weight('user_popular')
-        if not self.user.is_superstar and not self.user.is_popular:
+        if not self.user.st.is_superstar and not self.user.st.is_popular:
             score += get_ranking_feature_weight('user_normal')
 
         if self.is_boosted and self.boosted_end_time>=datetime.now():
@@ -431,7 +439,7 @@ class Topic(RecordTimeStamp):
         score += get_ranking_feature_weight('topic_play')*self.imp_count
         score += get_ranking_feature_weight('topic_like')*self.topic_like_count
         score += get_ranking_feature_weight('topic_share')*self.topic_share_count
-        Topic.objects.get(pk=self.id).update(vb_score = score)
+        Topic.objects.filter(pk=self.id).update(vb_score = score)
         return score
 
 

@@ -3634,6 +3634,27 @@ def get_category_video_bytes(request):
      except Exception as e:
          return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+def new_algo_get_category_video_bytes(request):
+     try:
+        category_id = request.POST.get('category_id', None)
+        language_id = request.POST.get('language_id', 1)
+        category = Category.objects.get(pk=category_id)
+        topics = []
+        all_seen_vb = []
+        if request.user.is_authenticated:
+            all_seen_vb = get_redis_vb_seen(request.user.id)
+        non_seen_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id).exclude(pk__in=all_seen_vb).order_by('-vb_score','-date')
+        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb, language_id=language_id, m2mcategory=category)
+        topics=list(non_seen_post)+list(all_seen_post)
+        paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
+        page = request.POST.get('page', 2)
+
+        topic_page = paginator.page(page)
+        return JsonResponse({'topics': CategoryVideoByteSerializer(topic_page, many=True, context={'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
+     except Exception as e:
+         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+
 @api_view(['GET'])
 def get_popular_video_bytes(request):
     """

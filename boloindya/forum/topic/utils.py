@@ -41,6 +41,6 @@ def update_redis_vb_seen(user_id,topic_id):
     set_redis(key,vb_seen_list)
 
 def get_ranking_feature_weight(feature):
-    ranking_feature = RankingWeight.objects.get_or_create(feature=feature)
+    ranking_feature, is_created = RankingWeight.objects.get_or_create(features=feature)
     return ranking_feature.weight
 

@@ -141,6 +141,7 @@ urlpatterns = [
     url(r'^set_user_email/$', set_user_email,name='set_user_email'),
     url(r'^get_category_detail_with_views/$', get_category_detail_with_views),
     url(r'^get_category_video_bytes/$', get_category_video_bytes),
+    url(r'^new_algo_get_category_video_bytes/$', new_algo_get_category_video_bytes),
     url(r'^get_popular_video_bytes/$', get_popular_video_bytes),
     url(r'^pubsub/popular/$', pubsub_popular),
     url(r'^get_user_follow_and_like_list/$', get_user_follow_and_like_list),

@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q, Prefetch
 
 from ..comment.bookmark.models import CommentBookmark
+from datetime import datetime
 
 
 class TopicQuerySet(models.QuerySet):
@@ -69,3 +70,7 @@ class TopicQuerySet(models.QuerySet):
             return get_object_or_404(self.public(), pk=pk)
         else:
             return get_object_or_404(self.visible().opened(), pk=pk, user=user)
+
+    def update(self, *args, **kwargs):
+        kwargs['last_modified']=datetime.now()
+        super(TopicQuerySet,self).update(*args, **kwargs)

@@ -8,7 +8,7 @@ from forum.topic.models import Topic, Notification, ShareTopic, CricketMatch, Po
  TongueTwister, BoloActionHistory
 from forum.category.models import Category
 from forum.topic.models import Topic, Notification, ShareTopic, CricketMatch, Poll, Choice, Voting, Leaderboard, \
-        TongueTwister, BoloActionHistory, language_options,JobOpening,JobRequest
+        TongueTwister, BoloActionHistory, language_options,JobOpening,JobRequest,RankingWeight
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 from datetime import datetime,timedelta
 
@@ -326,6 +326,11 @@ class TongueTwisterAdmin(admin.ModelAdmin):
     list_display = ('hash_tag','is_blocked',)
     search_fields = ('hash_tag',)
 
+class RankingWeightAdmin(admin.ModelAdmin):
+    list_display = ('features','weight',)
+    search_fields = ('features',)
+
+admin.site.register(RankingWeight,RankingWeightAdmin)
 admin.site.register(Poll, PollAdmin)
 
 admin.site.register(Topic, TopicAdmin)
