@@ -402,6 +402,11 @@ class VBList(generics.ListCreateAPIView):
                         # post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),date__gte=enddate).exclude(id__in=all_seen_vb).order_by('-date')
                         # post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),is_popular = True).order_by('-date')
                         excluded_list =[]
+                        boosted_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),is_boosted = True,boosted_end_time__gte=datetime.now(), date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+                        if boosted_post:
+                            boosted_post = sorted(boosted_post, key=lambda x: x.date, reverse=True)
+                        for each in boosted_post:
+                            excluded_list.append(each.id)
                         superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
                         if superstar_post:
                             superstar_post = sorted(superstar_post, key=lambda x: x.date, reverse=True)
@@ -431,7 +436,7 @@ class VBList(generics.ListCreateAPIView):
                                     if each_vb.id == each_id:
                                         orderd_all_seen_post.append(each_vb)
                         # print "####",superstar_post,popular_user_post,popular_post,normal_user_post,other_post,orderd_all_seen_post,"####"
-                        topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
+                        topics=+list(boosted_post)+list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
 
 
 
@@ -447,6 +452,11 @@ class VBList(generics.ListCreateAPIView):
                     # if post2:
                     #     topics+=list(post2)
                         excluded_list =[]
+                        boosted_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),is_boosted = True,boosted_end_time__gte=datetime.now(), date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+                        if boosted_post:
+                            boosted_post = sorted(boosted_post, key=lambda x: x.date, reverse=True)
+                        for each in boosted_post:
+                            excluded_list.append(each.id)
                         superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
                         if superstar_post:
                             superstar_post = sorted(superstar_post, key=lambda x: x.date, reverse=True)
@@ -476,7 +486,7 @@ class VBList(generics.ListCreateAPIView):
                                     if each_vb.id == each_id:
                                         orderd_all_seen_post.append(each_vb)
                         # print "####",superstar_post,popular_user_post,popular_post,normal_user_post,other_post,orderd_all_seen_post,"####",all_seen_vb
-                        topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
+                        topics=list(boosted_post)+list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
                 else:
                     topics = []
                     all_seen_vb = []
@@ -492,6 +502,11 @@ class VBList(generics.ListCreateAPIView):
                         # post1 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),is_popular = True).order_by('-date')
                         # post2 = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),is_popular = False).order_by('-date')
                         excluded_list =[]
+                        boosted_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),is_boosted=True,boosted_end_time__gte=datetime.now(), date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+                        if boosted_post:
+                            boosted_post = sorted(boosted_post, key=lambda x: x.date, reverse=True)
+                        for each in boosted_post:
+                            excluded_list.append(each.id)
                         superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory__slug=m2mcategory__slug,language_id = self.request.GET.get('language_id'),user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
                         if superstar_post:
                             superstar_post = sorted(superstar_post, key=lambda x: x.date, reverse=True)
@@ -520,7 +535,7 @@ class VBList(generics.ListCreateAPIView):
                                 for each_vb in all_seen_post:
                                     if each_vb.id == each_id:
                                         orderd_all_seen_post.append(each_vb)
-                        topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
+                        topics=list(boosted_post)+list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
                     else:
                         # post1 = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).exclude(id__in=all_seen_vb).order_by('-id')
                         # post2 = Topic.objects.filter(id__in=all_seen_vb,is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id')).order_by('-id')
@@ -531,6 +546,11 @@ class VBList(generics.ListCreateAPIView):
                     # if post2:
                     #     topics+=list(post2)
                         excluded_list =[]
+                        boosted_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),is_boosted=True,boosted_end_time__gte=datetime.now(), date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+                        if boosted_post:
+                            boosted_post = sorted(boosted_post, key=lambda x: x.date, reverse=True)
+                        for each in boosted_post:
+                            excluded_list.append(each.id)
                         superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = self.request.GET.get('language_id'),user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
                         if superstar_post:
                             superstar_post = sorted(superstar_post, key=lambda x: x.date, reverse=True)
@@ -559,7 +579,7 @@ class VBList(generics.ListCreateAPIView):
                                 for each_vb in all_seen_post:
                                     if each_vb.id == each_id:
                                         orderd_all_seen_post.append(each_vb)
-                        topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
+                        topics=list(boosted_post)+list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
                     # else:
                     #     topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-id')
         else:
@@ -590,6 +610,11 @@ class GetChallenge(generics.ListCreateAPIView):
             all_seen_vb = get_redis_vb_seen(self.request.user.id)
             # all_seen_vb = VBseen.objects.filter(user = self.request.user, topic__title__icontains=challengehash).distinct('topic_id').values_list('topic_id',flat=True)
         excluded_list =[]
+        boosted_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,is_boosted=True,boosted_end_time__gte=datetime.now()).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if boosted_post:
+            boosted_post = sorted(boosted_post, key=lambda x: x.date, reverse=True)
+        for each in boosted_post:
+            excluded_list.append(each.id)
         superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,user__st__is_superstar = True).exclude(pk__in=all_seen_vb).distinct('user_id')
         if superstar_post:
             superstar_post = sorted(superstar_post, key=lambda x: x.date, reverse=True)
@@ -618,7 +643,7 @@ class GetChallenge(generics.ListCreateAPIView):
                 for each_vb in all_seen_post:
                     if each_vb.id == each_id:
                         orderd_all_seen_post.append(each_vb)
-        topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
+        topics=list(boosted_post)+list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
 
 
         return topics
@@ -3491,6 +3516,11 @@ def get_category_with_video_bytes(request):
                 all_seen_vb = get_redis_vb_seen(request.user.id)
                 # all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__is_popular=True).distinct('topic_id').values_list('topic_id',flat=True)
             excluded_list =[]
+            boosted_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,is_boosted=True,boosted_end_time__gte=datetime.now(),is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id')
+            if boosted_post:
+                boosted_post = sorted(boosted_post, key=lambda x: x.date, reverse=True)
+            for each in boosted_post:
+                excluded_list.append(each.id)
             superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id')
             if superstar_post:
                 superstar_post = sorted(superstar_post, key=lambda x: x.date, reverse=True)
@@ -3514,7 +3544,7 @@ def get_category_with_video_bytes(request):
                     for each_vb in all_seen_post:
                         if each_vb.id == each_id:
                             orderd_all_seen_post.append(each_vb)
-            topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
+            topics=list(boosted_post)+list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
             try:
                 topics = paginator.paginate_queryset(topics, request)
                 trending_videos = CategoryVideoByteSerializer(topics, many=True, context={'is_expand': request.GET.get('is_expand',True)}).data
@@ -3558,6 +3588,11 @@ def get_category_video_bytes(request):
         post_till = datetime.now() - timedelta(days=30)
         if category:
             excluded_list =[]
+            boosted_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,is_boosted=True,boosted_end_time__gte=datetime.now(), date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+            if boosted_post:
+                boosted_post = sorted(boosted_post, key=lambda x: x.date, reverse=True)
+            for each in boosted_post:
+                excluded_list.append(each.id)
             superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
             if superstar_post:
                 superstar_post = sorted(superstar_post, key=lambda x: x.date, reverse=True)
@@ -3586,7 +3621,7 @@ def get_category_video_bytes(request):
                     for each_vb in all_seen_post:
                         if each_vb.id == each_id:
                             orderd_all_seen_post.append(each_vb)
-            topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
+            topics=list(boosted_post)+list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
         # paginator = PageNumberPagination()
         # self.request.POST._mutable = True
         # self.request.POST.update({'page':request.POST.get('page', 2)})
@@ -3613,6 +3648,11 @@ def get_popular_video_bytes(request):
             all_seen_vb = get_redis_vb_seen(request.user.id)
             # all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__is_popular=True).distinct('topic_id').values_list('topic_id',flat=True)
         excluded_list =[]
+        boosted_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,is_boosted=True,boosted_end_time__gte=datetime.now(),is_popular=True,date__gte = post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if boosted_post:
+            boosted_post = sorted(boosted_post, key=lambda x: x.date, reverse=True)
+        for each in boosted_post:
+            excluded_list.append(each.id)
         superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = True,is_popular=True,date__gte = post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
         if superstar_post:
             superstar_post = sorted(superstar_post, key=lambda x: x.date, reverse=True)
@@ -3638,12 +3678,13 @@ def get_popular_video_bytes(request):
                 for each_vb in all_seen_post:
                     if each_vb.id == each_id:
                         orderd_all_seen_post.append(each_vb)
+        
         ''' Manual added post'''
-
         manual_added_post = Topic.objects.filter(pk=43351)
-        topics=list(manual_added_post)+list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
-        ''' Uncomment below line to remove maula added post'''
-        # topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
+        topics=list(manual_added_post)+list(boosted_post)+list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
+        
+        ''' Uncomment below line to remove manual added post'''
+        # topics=list(boosted_post)+list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
         topics = paginator_topics.paginate_queryset(topics, request)
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True, context={'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
     except Exception as e:
@@ -3694,6 +3735,11 @@ def get_recent_videos(request):
             all_seen_vb = get_redis_vb_seen(request.user.id)
             # all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__m2mcategory=category).distinct('topic_id').values_list('topic_id',flat=True)
         excluded_list =[]
+        boosted_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,is_boosted=True,boosted_end_time__gte=datetime.now(), date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if boosted_post:
+            boosted_post = sorted(boosted_post, key=lambda x: x.date, reverse=True)
+        for each in boosted_post:
+            excluded_list.append(each.id)
         superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,m2mcategory=category,language_id = language_id,user__st__is_superstar = True, date__gte=post_till).exclude(pk__in=all_seen_vb).distinct('user_id')
         if superstar_post:
             superstar_post = sorted(superstar_post, key=lambda x: x.date, reverse=True)
@@ -3722,7 +3768,7 @@ def get_recent_videos(request):
                 for each_vb in all_seen_post:
                     if each_vb.id == each_id:
                         orderd_all_seen_post.append(each_vb)
-        topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
+        topics=list(boosted_post)+list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
         topics = paginator_topics.paginate_queryset(topics, request)
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True, context={'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
     except Exception as e:
