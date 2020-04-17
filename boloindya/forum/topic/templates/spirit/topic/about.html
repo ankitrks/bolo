@@ -6,7 +6,6 @@
 .upper_tab {
     background: var(--primary-bg-color) !important;
     padding: 30px 0px;
-    font-family: Arial;
     font-weight: 400;
     font-size: 16px;
     line-height: 24px;
@@ -22,7 +21,6 @@
     background: rgb(255, 255, 255);
 }
 .base-layout-container h1:first-child {
-    font-family: sofiapro-bold, PingFangSC, sans-serif;
     font-weight: 700;
     font-size: 48px;
     line-height: 1;
@@ -41,7 +39,7 @@
     width: 100%;
 }
 .home_container_inner {
-    max-width: 1180px;
+    max-width: 100%;
     margin: 0 auto;
 }
 .productStats_statItem, .productStats_wrap {
@@ -72,25 +70,45 @@
     width: 25%;
 }
 
-</style>
-    <div style="padding: 30px;background: var(--primary-bg-color) !important">
-        <div class="margin_bottom_20" style="text-align:center;font-size:30px;margin-top: 100px;"><h2>About Us</h2>
-        </div>
-        <div class="jsx-1929076256 about-content " style="background: var(--primary-bg-color) !important">
+.mainDiv{
+    background: var(--primary-bg-color) !important;
+    width: 100%;
+}
+.subDivHeading{
+    text-align:center;font-size:30px;margin-top: 100px;
+}
+.backColor{
+    background: var(--primary-bg-color) !important
+}
+@media(max-width: 991px){
+    .productStats_statItem, .productStats_wrap {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: block;
+        width: 85%;
+        margin-top: 10px;
+    }
+    .hideOnMobile{
+        display: none;
+    }
+}
 
-            <div class="jsx-1929076256 about-img1  " style="text-align: center;">
+</style>
+    <div class="mainDiv upper_tab">
+        <div class="margin_bottom_20 subDivHeading" style=""><h2>About Us</h2>
+        </div>
+        <div class="jsx-1929076256 about-content backColor" style="">
+
+            <div class="jsx-1929076256 about-img1 hideOnMobile " style="text-align: center;">
 
                 <div class="leftImage">
                     <img class="sideImageHeight" src="/media/boy.png">
                 </div>
-
- 
-
             </div>
             <div class="jsx-1929076256 about-img1  " >
                 {{about_us.page_description | safe}}
             </div>
-            <div class="jsx-1929076256 about-img1  " style="text-align: center;">
+            <div class="jsx-1929076256 about-img1  hideOnMobile" style="text-align: center;">
                 <div class="rightImage">
                     <img class="sideImageHeight" src="/media/girl.png">
                 </div>
@@ -151,5 +169,6 @@
             </div>
         </div>
     </div>
+
 
     {% endblock %}

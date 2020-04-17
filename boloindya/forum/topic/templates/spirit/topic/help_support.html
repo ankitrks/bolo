@@ -1,16 +1,11 @@
-{% extends "spirit/_new_base.html" %}
+{% extends "spirit/_new_home_base.html" %}
 {% load spirit_tags i18n %}
 {% load i18n %}
 {% load number_formate_change_tag %}
 {% block title %}BoloIndya{% endblock %}
 {% block content %}
 <style type="text/css">
-body {
-    font-family: HelveticaNeue-Light,helvetica neue light,helvetica neue,Helvetica,Arial,lucida grande,sans-serif;
-    font-size: 14px;
-    line-height: 1.428571429;
-    color: #666;
-}
+
 
     .careers .jumbotron, .careers-footer .jumbotron {
     background: #bee9ff;
@@ -616,7 +611,7 @@ img {
 }
 }
 .career-details-outer-container {
-    background-color: #1b1b1b;
+    background-color: #fffef0;
     margin-top: 80px;
 }
 .career-details-outer-container .inner-container .sticky-heading {
@@ -767,6 +762,17 @@ img {
 .paddingOnMobile{
     padding: 10px;
 }
+.career-details-outer-container .inner-container .card {
+    margin-top: 32px;
+    border-radius: 3px;
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,.5);
+    background-color: #fff;
+    padding: 0 0 24px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
 }
 
 .applicationForm{
@@ -824,7 +830,7 @@ textarea{
             <div class="col-md-12 col-sm-12">
 
                 <div class="card applicationForm"> 
-                  <h2>Need Help</h2>
+                  <h2 style="padding-left: 10px;">Need Help</h2>
                     {% if message %}
                         <p style="margin-top: 60px;margin-bottom: 60px;"> <span style="color: green;">{{message}}</span></p>
                     {% else %} 
