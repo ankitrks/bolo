@@ -13,6 +13,7 @@ from ..core.utils.models import AutoSlugField
 from tinymce.models import HTMLField
 from drf_spirit.utils import language_options,month_choices
 from django.db.models import F,Q
+from diff_model import ModelDiffMixin
 
 class RecordTimeStamp(models.Model):
     created_at=models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False) # auto_now will add the current time and date whenever field is saved.
@@ -32,51 +33,7 @@ refrence_options = (
     ('1', "facebook"),
 )
 
-from django.forms.models import model_to_dict
 
-
-class ModelDiffMixin(object):
-    """
-    A model mixin that tracks model fields' values and provide some useful api
-    to know what fields have been changed.
-    """
-
-    def __init__(self, *args, **kwargs):
-        super(ModelDiffMixin, self).__init__(*args, **kwargs)
-        self.__initial = self._dict
-
-    @property
-    def diff(self):
-        d1 = self.__initial
-        d2 = self._dict
-        diffs = [(k, (v, d2[k])) for k, v in d1.items() if v != d2[k]]
-        return dict(diffs)
-
-    @property
-    def has_changed(self):
-        return bool(self.diff)
-
-    @property
-    def changed_fields(self):
-        return self.diff.keys()
-
-    def get_field_diff(self, field_name):
-        """
-        Returns a diff for field if it's changed and None otherwise.
-        """
-        return self.diff.get(field_name, None)
-
-    def save(self, *args, **kwargs):
-        """
-        Saves model and set initial state.
-        """
-        super(ModelDiffMixin, self).save(*args, **kwargs)
-        self.__initial = self._dict
-
-    @property
-    def _dict(self):
-        return model_to_dict(self, fields=[field.name for field in
-                             self._meta.fields])
 
 class UserProfile(models.Model,ModelDiffMixin):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, verbose_name=_("profile"), related_name='st', editable=False)

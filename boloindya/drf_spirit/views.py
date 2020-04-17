@@ -2732,6 +2732,8 @@ def like(request):
             acted_obj = Comment.objects.get(pk = comment_id)
         if is_created:
             acted_obj.likes_count = F('likes_count')+1
+            if topic_id:
+                acted_obj.topic_like_count = F('topic_like_count')+1
             acted_obj.save()
             add_bolo_score(request.user.id, 'liked', acted_obj)
             userprofile.like_count = F('like_count')+1
@@ -2742,6 +2744,8 @@ def like(request):
                 liked.like = False
                 liked.save()
                 acted_obj.likes_count = F('likes_count')-1
+                if topic_id:
+                    acted_obj.topic_like_count = F('topic_like_count')-1
                 acted_obj.save()
                 userprofile.like_count = F('like_count')-1
                 userprofile.save()
@@ -2750,6 +2754,8 @@ def like(request):
                 liked.like = True
                 liked.save()
                 acted_obj.likes_count = F('likes_count')+1
+                if topic_id:
+                    acted_obj.topic_like_count = F('topic_like_count')+1
                 acted_obj.save()
                 userprofile.like_count = F('like_count')+1
                 userprofile.save()
@@ -2776,6 +2782,7 @@ def shareontimeline(request):
             topic = Topic.objects.get(pk = topic_id)
             topic.share_count = F('share_count')+1
             topic.total_share_count = F('total_share_count')+1
+            topic.topic_share_count = F('topic_share_count')+1
             topic.save()
             userprofile.share_count = F('share_count')+1
             userprofile.save()
@@ -2788,6 +2795,7 @@ def shareontimeline(request):
             topic = Topic.objects.get(pk = topic_id)
             topic.facebook_share_count = F('facebook_share_count')+1    
             topic.total_share_count = F('total_share_count')+1
+            topic.topic_share_count = F('topic_share_count')+1
             topic.save()
             add_bolo_score(request.user.id, 'facebook_share', topic)
             userprofile.share_count = F('share_count')+1
@@ -2801,6 +2809,7 @@ def shareontimeline(request):
             topic = Topic.objects.get(pk = topic_id)
             topic.whatsapp_share_count = F('whatsapp_share_count')+1
             topic.total_share_count = F('total_share_count')+1
+            topic.topic_share_count = F('topic_share_count')+1
             topic.save()
             add_bolo_score(request.user.id, 'whatsapp_share', topic)
             userprofile.share_count = F('share_count')+1
@@ -2814,6 +2823,7 @@ def shareontimeline(request):
             topic = Topic.objects.get(pk = topic_id)
             topic.linkedin_share_count = F('linkedin_share_count')+1
             topic.total_share_count = F('total_share_count')+1
+            topic.topic_share_count = F('topic_share_count')+1
             topic.save()
             add_bolo_score(request.user.id, 'linkedin_share', topic)
             userprofile.share_count = F('share_count')+1
@@ -2827,6 +2837,7 @@ def shareontimeline(request):
             topic = Topic.objects.get(pk = topic_id)
             topic.twitter_share_count = F('twitter_share_count')+1
             topic.total_share_count = F('total_share_count')+1
+            topic.topic_share_count = F('topic_share_count')+1
             topic.save()
             add_bolo_score(request.user.id, 'twitter_share', topic)
             userprofile.share_count = F('share_count')+1

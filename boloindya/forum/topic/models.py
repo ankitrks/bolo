@@ -64,7 +64,7 @@ class BoloActionHistory(RecordTimeStamp):
         return format_html('<a href="/superman/forum_user/userprofile/' + str(self.user.st.id) \
             + '/change/" target="_blank">' + self.user.username + '</a>' )
 
-class Topic(models.Model):
+class Topic(RecordTimeStamp):
     """
     Topic model
 
@@ -110,6 +110,8 @@ class Topic(models.Model):
     total_share_count = models.PositiveIntegerField(_("Total Share count"), default=0,db_index=True)# self plus comment
     share_count = models.PositiveIntegerField(_("Share count"), default=0,db_index=True)# only topic share
     imp_count = models.PositiveIntegerField(_("views"), default=0,db_index=True)
+    topic_like_count = models.PositiveIntegerField(_("Topic Like"), default=0,db_index=True)
+    topic_share_count = models.PositiveIntegerField(_("Topic Share"), default=0,db_index=True)
     # share_user = models.ForeignKey(settings.AUTH_USER_MODEL,null=True,blank=True, related_name='share_topic_user')
     # shared_post = models.ForeignKey('self', blank = True, null = True, related_name='user_shared_post')
     is_vb = models.BooleanField(_("Is Video Bytes"), default=False)
@@ -139,6 +141,7 @@ class Topic(models.Model):
     downloaded_url = models.CharField(_("downloaded URL"), max_length=255, blank = True, null = True)
     vb_playtime = models.PositiveIntegerField(null=True,blank=True,default=0,db_index=True)
     has_downloaded_url = models.BooleanField(default = False)
+    vb_score = models.FloatField(_("VB Score"),null=True,blank=True,default=0,db_index=True)
     
     plag_text_options = (
         ('0', "TikTok"),
@@ -402,6 +405,40 @@ class Topic(models.Model):
             return format_html(str('<a href="/superman/forum_comment/comment/?topic_id='+str(self.id)+'" target="_blank">' \
                 + str(self.comment_count)+'</a>'))
         return 0
+
+    def calculate_vb_score(self):
+        from .utils import get_ranking_feature_weight
+        score=0
+        if self.user.is_business:
+            score += get_ranking_feature_weight('business_account')
+        if self.user.is_superstar:
+            score += get_ranking_feature_weight('user_superstar')
+        if self.user.is_popular:
+            score += get_ranking_feature_weight('user_popular')
+        if not self.user.is_superstar and not self.user.is_popular:
+            score += get_ranking_feature_weight('user_normal')
+
+        if self.is_boosted and self.boosted_end_time>=datetime.now():
+            score += get_ranking_feature_weight('post_superboost')
+        if self.is_popular:
+            score += get_ranking_feature_weight('post_popular')
+        if not self.is_boosted and self.is_popular:
+            score += get_ranking_feature_weight('post_normal')
+        score += get_ranking_feature_weight('topic_play')*self.imp_count
+        score += get_ranking_feature_weight('topic_like')*self.topic_like_count
+        score += get_ranking_feature_weight('topic_share')*self.topic_share_count
+        Topic.objects.get(pk=self.id).update(vb_score = score)
+        return score
+
+
+
+
+class RankingWeight(RecordTimeStamp):
+    features=models.CharField(max_length=20)
+    weight= models.FloatField(default=0,null=True)
+
+    def __unicode__(self):
+        return self.features
 
 class TopicHistory(RecordTimeStamp):
     source = models.ForeignKey('forum_topic.Topic', blank = False, null = False, related_name='topic_history')
