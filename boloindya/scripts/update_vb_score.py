@@ -5,8 +5,12 @@ from django.apps import apps
 from forum.user.models import UserProfile, Weight
 
 def run():
-    now = datetime.now()    
-    last_modified_post = Topic.objects.filter(is_vb=True,is_removed=False,last_modified__gt=now-timedelta(minutes=15)).order_by('-date')
+    now = datetime.now()
+    all_post = False
+    if all_post:
+        last_modified_post   Topic.objects.filter(is_vb=True).order_by('-date')
+    else:
+        last_modified_post = Topic.objects.filter(is_vb=True,is_removed=False,last_modified__gt=now-timedelta(minutes=15)).order_by('-date')
     total_elements = len(last_modified_post)
     counter=1
     for each_post in last_modified_post:
