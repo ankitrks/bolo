@@ -35,7 +35,7 @@ class WeightAdmin(admin.ModelAdmin):
 admin.site.register(Weight, WeightAdmin)
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'get_name', 'is_active', 'get_language', 'get_bolo_score', 'get_follow_count', \
+    list_display = ('username', 'date_joined', 'email', 'get_name', 'is_active', 'get_language', 'get_bolo_score', 'get_follow_count', \
         'get_vb_count', 'get_is_popular', 'get_is_superstar', 'get_is_business')
     list_editable = ('is_active', )
     list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
