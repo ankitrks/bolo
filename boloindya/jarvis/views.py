@@ -1762,19 +1762,8 @@ def get_total_playtime(request):
     if request.is_ajax():
         raw_data = json.loads(request.body)
         try:
-            categ_sel = raw_data['categ_sel']
-            lang_sel = raw_data['lang_sel']
-            sdate = raw_data['sdate']
-            edate = raw_data['edate']
-
-            sdate = sdate + " 00:00:00"
-            edate = edate + " 00:00:00"
-
-            sdate = datetime.datetime.strptime(sdate,"%Y-%m-%d %H:%M:%S").date()
-            edate = datetime.datetime.strptime(edate,"%Y-%m-%d %H:%M:%S").date()
-
-            total_playtime = VideoPlaytime.objects.filter(timestamp__gte=sdate, timestamp__lte=edate,\
-                video__m2mcategory__id=categ_sel, video__language_id=lang_sel)\
+            total_playtime = VideoPlaytime.objects.filter(timestamp__gte = raw_data['sdate'] + ' 00:00:00', timestamp__lte = raw_data['edate'] + ' 23:59:59',\
+                video__m2mcategory__id = raw_data['categ_sel'], video__language_id = raw_data['lang_sel'])\
                 .aggregate(Sum('playtime'))['playtime__sum']
 
             return JsonResponse({"total_playtime": total_playtime}, status=status.HTTP_200_OK, safe=False)         
