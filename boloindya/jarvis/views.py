@@ -1091,15 +1091,19 @@ def notification_panel(request):
     user_group = request.POST.get('user_group')
     scheduled_status = request.POST.get('scheduled_status')
     title = request.POST.get('title', '')
+    page_no = request.GET.get('page_no', '1')
 
     filters = {'language': lang, 'notification_type': notification_type, 'user_group': user_group, 'is_scheduled': scheduled_status, 'title__icontains': title}
 
     pushNotifications = PushNotification.objects.filter(*[Q(**{k: v}) for k, v in filters.items() if v], is_removed=False).order_by('-created_at')
 
-    return render(request,'jarvis/pages/notification/index.html', {'pushNotifications': pushNotifications, \
+    total_page = pushNotifications.count()/10
+    page = int(page_no) - 1
+
+    return render(request,'jarvis/pages/notification/index.html', {'pushNotifications': pushNotifications[page*10:page*10+10], \
         'language_options': language_options, 'notification_types': notification_type_options, \
             'user_group_options': user_group_options, 'language': lang, 'notification_type': notification_type, \
-                'user_group': user_group, 'scheduled_status': scheduled_status, 'title': title})
+                'user_group': user_group, 'scheduled_status': scheduled_status, 'title': title, 'page_no': page_no, 'total_page': total_page})
 
 from drf_spirit.models import UserLogStatistics
 import datetime
@@ -1110,23 +1114,43 @@ def send_notification(request):
     pushNotification = {}
 
     if request.method == 'POST':
-        data = {}
+    
+        title = request.POST.get('title', "")
+        upper_title = request.POST.get('upper_title', "")
+        language_ids = request.POST.get('language_ids', "")
+        user_group_ids = request.POST.get('user_group_ids', "")
+        notification_type = request.POST.get('notification_type', "")
+        particular_user_id = request.POST.get('particular_user_id', "")
+        category_ids = request.POST.get('category_ids', "")
+        schedule_status= request.POST.get('schedule_status', "")
+        datepicker = request.POST.get('datepicker', '')
+        timepicker = request.POST.get('timepicker', '').replace(" : ", ":")
+        image_url = request.POST.get('image_url', '')
+        days_ago = request.POST.get('days_ago', '1')
+        
+        lang_array = language_ids.split(',')
+        user_array = user_group_ids.split(',')
 
-        data['title'] = request.POST.get('title', "")
-        data['upper_title'] = request.POST.get('upper_title', "")
-        data['notification_type'] = request.POST.get('notification_type', "")
-        data['id'] = request.POST.get('id', "")
-        data['particular_user_id'] = request.POST.get('particular_user_id', "")
-        data['user_group'] = request.POST.get('user_group', "")
-        data['lang'] = request.POST.get('lang', "")
-        data['category'] = request.POST.get('category', "")
-        data['schedule_status'] = request.POST.get('schedule_status', "")
-        data['datepicker'] = request.POST.get('datepicker', '')
-        data['timepicker'] = request.POST.get('timepicker', '').replace(" : ", ":")
-        data['image_url'] = request.POST.get('image_url', '')
-        data['days_ago'] = request.POST.get('days_ago', '1')
+        for lang in lang_array:
+            for user_group in user_array:
+                data = {}
 
-        send_notifications_task.delay(data, pushNotification)
+                data['title'] = title
+                data['upper_title'] = upper_title
+                data['notification_type'] = notification_type
+                data['id'] = request.POST.get('id', "")
+                data['particular_user_id'] = particular_user_id
+                data['user_group'] = user_group
+                data['lang'] = lang
+                data['category_ids'] = category_ids
+                data['schedule_status'] = schedule_status
+                data['datepicker'] = datepicker
+                data['timepicker'] = timepicker
+                data['image_url'] = image_url
+                data['days_ago'] = days_ago
+        
+                send_notifications_task.delay(data, pushNotification)
+
         return redirect('/jarvis/notification_panel/')
     if request.method == 'GET':
         id = request.GET.get('id', None)
@@ -1134,10 +1158,11 @@ def send_notification(request):
             pushNotification = PushNotification.objects.get(pk=id)
         except Exception as e:
             print e
-        categories=FCMDevice.objects.filter(is_uninstalled=False, user__isnull=False, user__st__sub_category__isnull=False).values('user__st__sub_category__pk', 'user__st__sub_category__title').annotate(Count('pk'))
-        language_option=FCMDevice.objects.filter(is_uninstalled=False, user__isnull=False).values('user__st__language').annotate(Count('pk'))
+        # categories=FCMDevice.objects.filter(is_uninstalled=False, user__isnull=False, user__st__sub_category__isnull=False).values('user__st__sub_category__pk', 'user__st__sub_category__title').annotate(Count('pk'))
+        # language_option=FCMDevice.objects.filter(is_uninstalled=False, user__isnull=False).values('user__st__language').annotate(Count('pk'))
+        categories = Category.objects.filter(parent__isnull=False)
 
-    return render(request,'jarvis/pages/notification/send_notification.html', { 'language_options': language_option, 'user_group_options' : user_group_options, 'notification_types': notification_type_options, 'pushNotification': pushNotification, 'categories': categories})
+    return render(request,'jarvis/pages/notification/send_notification.html', { 'language_options': language_options, 'user_group_options' : user_group_options, 'notification_types': notification_type_options, 'pushNotification': pushNotification, 'categories': categories})
 
 
 

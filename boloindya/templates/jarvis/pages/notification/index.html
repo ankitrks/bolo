@@ -95,12 +95,14 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <div>
+                {% if page_no != '1' %}<a href="/jarvis/notification_panel/?page_no=1" >First</a> <a href="/jarvis/notification_panel/?page_no={{page_no|add:-1}}" >Prev</a>{% endif %} {{ page_no }} of {{ total_page }} pages {% if page_no|add:0 != total_page %}<a href="/jarvis/notification_panel/?page_no={{page_no|add:1}}" >Next</a> <a href="/jarvis/notification_panel/?page_no={{total_page}}" >Last</a>{% endif %}
+            </div>
         </div>
     </div>
 {% endblock content %} 
 {% block center_js %}
 <script>
-    $('#notification_table').DataTable();
     $(document).ready(function() {
     $('.search_title_input').keydown(function(event) {
         if (event.keyCode == 13) {

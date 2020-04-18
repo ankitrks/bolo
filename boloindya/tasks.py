@@ -29,7 +29,8 @@ def send_notifications_task(data, pushNotification):
         timepicker = data.get('timepicker', '').replace(" : ", ":")
         image_url = data.get('image_url', '')
         particular_user_id=data.get('particular_user_id', None)
-        category=data.get('category', '')
+        category_ids=data.get('category_ids', '')
+
 
         if notification_type == '3':
             instance_id=instance_id.replace('#', '')
@@ -62,9 +63,10 @@ def send_notifications_task(data, pushNotification):
             exclude_filter = {}
             if lang != '0':
                 language_filter = { 'user__st__language': lang, 'is_uninstalled': False}
-            if category:
+            if category_ids:
+                category_array=category_ids.split(',')
                 try:
-                    pushNotification.category=Category.objects.get(pk=category)
+                    pushNotification.m2mcategory=Category.objects.filter(pk__in=category_array)
                     pushNotification.save()
                 except Exception as e:
                     logger.info(str(e))
@@ -118,23 +120,23 @@ def send_notifications_task(data, pushNotification):
             print(device)
             device_pagination = Paginator(device, 1000)
             device_list=[]
-            for index in range(1, (device_pagination.num_pages+1)):
-                device_after_slice = device_pagination.page(index)
-                logger.info(device_after_slice)
-                for each in device_after_slice:
-                    try:
-                        t = each.send_message(data={"title": title, "id": instance_id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url}, time_to_live=604800)
-                        response=t[1]['results'][0]['message_id']
-                        try:
-                            PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2', device=each, response_dump=t)
-                        except:
-                            pass
-                    except:
-                        pass
+            # for index in range(1, (device_pagination.num_pages+1)):
+            #     device_after_slice = device_pagination.page(index)
+            #     logger.info(device_after_slice)
+            #     for each in device_after_slice:
+            #         try:
+            #             t = each.send_message(data={"title": title, "id": instance_id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url}, time_to_live=604800)
+            #             response=t[1]['results'][0]['message_id']
+            #             try:
+            #                 PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2', device=each, response_dump=t)
+            #             except:
+            #                 pass
+            #         except:
+            #             pass
                     #t = each.send_message(data={})
                     #print(t)
                     #t = each.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url})
-                logger.info(device_list)
+                # logger.info(device_list)
             pushNotification.is_executed=True
             pushNotification.save()
     except Exception as e:
