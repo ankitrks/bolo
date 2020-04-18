@@ -27,9 +27,12 @@ from email.mime.base import MIMEBase
 from email.mime.image import MIMEImage
 from email.mime.text import MIMEText
 from django.utils import timezone
+import math
+
 
 # global list recording the data accessed from the logs
 complete_data = []
+NUMBER_OF_DAYS=1
 
 
 # func for extracting time the video takes to run(currently not used)
@@ -92,7 +95,7 @@ def extract_time_delta(log_text_dump, userid):
 			data_iter.append(round_delta1)
 			data_iter.append(round_delta2)
 			data_iter.append(net_info)
-			#print(data_iter)	
+			print(data_iter)	
 			print(','.join(map(str,data_iter)))
 			complete_data.append(data_iter)
 			"""
@@ -105,78 +108,96 @@ def extract_time_delta(log_text_dump, userid):
 			"""
 
 # func for extractning the time the video takes to run(this one is used)
+
 def extract_minmax_delta(log_text_dump, userid):
-
+	import datetime
 	uniq_video_records = {}
-	for i in range(0, len(log_text_dump)):
-		record_i = log_text_dump[i]
-		#print(record_i)
-		curr_stamp = int(record_i['miliseconds'])
-		curr_state = record_i.get('state')
-		net_details = record_i.get('net_speed')
-		curr_videoid = int(record_i.get('video_byte_id'))
+	net_details=[]
+	countLogLenghth=len(log_text_dump)
+	for j in range(countLogLenghth):
+		record_j = log_text_dump[j]
+		curr_stamp = record_j['miliseconds']
+		curr_state = record_j['state']
+		net_details = record_j['net_speed']
+		curr_videoid = record_j['video_byte_id']
+		device_model = record_j['device_model']
+		manufacturer = record_j['manufacturer']
 
-		if(curr_videoid in uniq_video_records):
-			uniq_video_records[curr_videoid][curr_state].append(curr_stamp)
-		else:
-			video_triple = {}
-			video_triple['ClickOnPlay'] = []
-			video_triple['PlayerReady'] = []
-			video_triple['StartPlaying'] = []
-			video_triple[curr_state].append(curr_stamp)
-			uniq_video_records[curr_videoid] = video_triple
+		video_triple = {}
 
-	#print(uniq_video_records)
-	for key, val in uniq_video_records.items():
-		v_id = key
-		v_triplet = val 
-		if(len(v_triplet['ClickOnPlay'])>0 and len(v_triplet['PlayerReady'])>0 and len(v_triplet['StartPlaying'])> 0):
+		video_triple['ClickOnPlay'] = []
+		video_triple['PlayerReady'] = []
+		video_triple['StartPlayingcache'] = []
+		video_triple['StartPlaying'] = []
+		video_triple['StartPlayingcdn'] = []
+		video_triple[curr_state]=curr_stamp
+		video_triple['video_byte_id']=curr_videoid
+		uniq_video_records[j] = video_triple 
+		#print(uniq_video_records)
+	for key,val in uniq_video_records.items():
+		v_id = val['video_byte_id']
+		v_triplet = val
+		if(len(val)>0):
+			total_time_played=0
+			player_list_sorted=0
+			StartPlayingcache=0
+			StartPlayingCDN=0
+			start_list_sorted=0
+			click_list_sorted=0
+			if 'ClickOnPlay' in v_triplet:
+				if(len(v_triplet['ClickOnPlay'])>0):
+					clickOnTime=v_triplet['ClickOnPlay'];
+					milliseconds = int(clickOnTime)/1000.0
+					click_list_sorted = datetime.datetime.fromtimestamp(milliseconds).strftime('%Y-%m-%d %H:%M:%S')
 
-			#print(v_triplet['ClickOnPlay'], v_triplet['PlayerReady'], v_triplet['StartPlaying'], type(v_triplet['ClickOnPlay'][0]))
-			click_list_sorted = sorted(v_triplet['ClickOnPlay'])
-			player_list_sorted = sorted(v_triplet['PlayerReady'])
-			start_list_sorted = sorted(v_triplet['StartPlaying'])
-
-			#print(click_list_sorted, player_list_sorted, start_list_sorted, type(click_list_sorted))
-			mintime_player_ready  = (player_list_sorted[0] - click_list_sorted[0]) / 1000
-			maxtime_player_ready = (player_list_sorted[len(player_list_sorted)-1] - click_list_sorted[0]) / 1000
-			mintime_start = (start_list_sorted[0] - click_list_sorted[0]) / 1000
-			maxtime_start = (start_list_sorted[len(start_list_sorted)-1] - click_list_sorted[0]) / 1000
-			delta_player_ready = maxtime_player_ready - mintime_player_ready
-			delta_start = maxtime_start - mintime_start
-
-			#print(mintime_player_ready, maxtime_player_ready, mintime_start, maxtime_start)
+			if 'TimePlayed' in v_triplet:
+				if(len(v_triplet['TimePlayed'])>0):
+					total_time_played = v_triplet['TimePlayed']
+			if 'PlayerReady' in v_triplet:
+				if(len(v_triplet['PlayerReady'])>0):
+					player_list_sorted = v_triplet['PlayerReady']
+			if 'StartPlayingcdn' in v_triplet:
+				if(len(v_triplet['StartPlayingcdn'])>0):
+					StartPlayingCDN = v_triplet['StartPlayingcdn']
+			if 'StartPlayingcache' in v_triplet:
+				if(len(v_triplet['StartPlayingcache'])>0):
+					StartPlayingcache = v_triplet['StartPlayingcache']
+			if 'StartPlaying' in v_triplet:
+				if(len(v_triplet['StartPlaying'])>0):
+					start_list_sorted = v_triplet['StartPlaying']
 			user_details = UserProfile.objects.get(user = userid)
 			if(user_details.name):
 				str_username = user_details.name
 			else:
 				str_username = user_details.user.username 	
-				
-			video_details = Topic.objects.get(pk = v_id)
-			str_videotitle = video_details.title
-			str_videotitle = str_videotitle.replace(',', '')
+			str_videotitle=""
+			try:	
+				video_details = Topic.objects.get(pk = v_id)
+				str_videotitle = video_details.title
+				str_videotitle = str_videotitle.replace(',', '')
+			except Exception as e1:
+				video_details=[]
 
+			
 			data_iter = []
 			data_iter.append(str_username)
 			data_iter.append(str_videotitle)
-			data_iter.append(mintime_player_ready)
-			#data_iter.append(maxtime_player_ready)
-			#data_iter.append(delta_player_ready)
-			data_iter.append(mintime_start)
-			#data_iter.append(maxtime_start)
-			#data_iter.append(delta_start)
+			data_iter.append(player_list_sorted)
+			data_iter.append(total_time_played)
+			data_iter.append(StartPlayingCDN)
+			data_iter.append(StartPlayingcache)
+			data_iter.append(start_list_sorted)
 			data_iter.append(net_details)
+			data_iter.append(device_model)
+			data_iter.append(manufacturer)
+			data_iter.append(click_list_sorted)
 			data_iter = [str(i) for i in data_iter]
-			#print(','.join(map(str,data_iter)))
-			#print(data_iter)
 			if(len(data_iter)>0):
 				complete_data.append(data_iter)
 		
 # func for writing data into csv
 def write_csv():
-	print(len(complete_data))
-	#headers = ['USERNAME', 'VIDEOTITLE', 'PLAYER READY(MIN)', 'PLAYER READY(MAX)', 'PLAYER READY(DELTA)', 'START PLAY(MIN)', 'START PLAY(MAX)', 'START PLAY(DELTA)', 'NETWORK']
-	headers = ['User', 'Video title', 'Player Ready', 'Play Time', 'Network']
+	headers = ['User', 'Video title', 'Player Ready', 'Time Played','StartPlayingcdn','StartPlayingcache','StartPlaying', 'Network','Device Model','Manufacturer','Play Date Time']
         f_name = 'deltarecords.csv'
 	with open(f_name, 'w') as f:
 		writer = csv.writer(f)
@@ -184,10 +205,12 @@ def write_csv():
 		for each_data in complete_data:
 			writer.writerow([x.encode('utf-8') for x in each_data])
 
+
+
 # func for sending the csv created to the mail
 def send_file_mail():
 	emailfrom = "support@careeranna.com"
-	emailto = "ankit@careeranna.com"
+	emailto = "sarfaraz@careeranna.com"
 	filetosend = os.getcwd() + "/deltarecords.csv"
 	username = "support@careeranna.com"
 	password = "$upp0rt@30!1"				# please do not use this()
@@ -214,20 +237,29 @@ def send_file_mail():
 	server = smtplib.SMTP("smtp.gmail.com:587")
 	server.starttls()
 	server.login(username, password)
-	server.sendmail(emailfrom, [emailto, 'akash.g@careeranna.com', 'varun@careeranna.com'], msg.as_string())
+	#server.sendmail(emailfrom, [emailto], msg.as_string())
+	server.sendmail(emailfrom, [emailto,'ankit@careeranna.com,varun@careeranna.com,gitesh@careeranna.com,maaz@careeranna.com'], msg.as_string())
 	server.quit()
-
 
 def main():
 
 	written_records= []
 	curr_dttime = datetime.now()
-	some_day_last_week = timezone.now().date() - timedelta(days=7)
-	monday_of_last_week = some_day_last_week - timedelta(days = (some_day_last_week.isocalendar()[2] - 1))
-	monday_of_this_week = monday_of_last_week + timedelta(days = 7)
-
+	if NUMBER_OF_DAYS <7:
+		monday_of_last_week = timezone.now().date() - timedelta(days=NUMBER_OF_DAYS)
+		monday_of_this_week = timezone.now().date()
+	else:
+		some_day_last_week = timezone.now().date() - timedelta(days=NUMBER_OF_DAYS)
+		monday_of_last_week = some_day_last_week - timedelta(days = (some_day_last_week.isocalendar()[2] - 1))
+		monday_of_this_week = monday_of_last_week + timedelta(days = NUMBER_OF_DAYS)
 	# fetch recrods bw last monday and monday of this week
+
+
+	#print some_day_last_week
+	#print monday_of_last_week
+	#print monday_of_this_week
 	android_logs = AndroidLogs.objects.filter(created_at__gte = monday_of_last_week, created_at__lte = monday_of_this_week)
+
 	for each_android in android_logs:
 		try:
 			each_android_dump = ast.literal_eval(each_android.logs)
@@ -248,4 +280,3 @@ def main():
 
 def run():
 	main()
-
