@@ -144,7 +144,7 @@ def calc_playtime(unique_video_play, userid):
 				if(time_video_played>tot_playtime_sec):
 					time_video_played = tot_playtime_sec
 
-				user_data_obj, created = VideoPlaytime.objects.get_or_create(user = userid, videoid = curr_vid, timestamp = ref_timestamp)
+				user_data_obj, created = VideoPlaytime.objects.get_or_create(user = userid, videoid = curr_vid, timestamp = ref_timestamp, video_id=curr_vid)
 				if(created):
 					print(userid, curr_vid, ref_timestamp, time_video_played)
 					user_data_obj.playtime = time_video_played

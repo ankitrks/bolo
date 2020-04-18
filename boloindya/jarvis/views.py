@@ -1599,13 +1599,17 @@ def statistics_all_jarvis(request):
             temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0])\
                 .aggregate(total_count = Avg('count'))['total_count'] )
 
-        if(each_opt[0] == '4'):
+        elif(each_opt[0] == '4'):
             temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0], metrics_slab__in = ['0', '1', '2', '9'], metrics_language_options = '0')\
                 .aggregate(total_count = Sum('count'))['total_count'] )
 
-        if(each_opt[0] == '9'):
+        elif(each_opt[0] == '9'):
             temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0], metrics_language_options = '0')\
                 .aggregate(total_count = Sum('count'))['total_count'] )
+
+        elif(each_opt[0] == '12'):
+            temp_list.append(  VideoPlaytime.objects.filter(timestamp__gte=top_start, timestamp__lte=top_end)\
+                .aggregate(Sum('playtime'))['playtime__sum'])        
             
         else:
             temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0])\
@@ -1748,9 +1752,38 @@ def statistics_all_jarvis(request):
         data['language_filter'] = metrics_language_options
         data['category_filter'] = category_slab_options    
           
-    #print(data)    
+    print(data)    
     return render(request,'jarvis/pages/video_statistics/statistics_all_jarvis.html', data)
 
+@api_view(['POST'])
+def get_total_playtime(request):
+    from django.db.models import Sum
+
+    if request.is_ajax():
+        raw_data = json.loads(request.body)
+        try:
+            categ_sel = raw_data['categ_sel']
+            lang_sel = raw_data['lang_sel']
+            sdate = raw_data['sdate']
+            edate = raw_data['edate']
+
+            sdate = sdate + " 00:00:00"
+            edate = edate + " 00:00:00"
+
+            sdate = datetime.datetime.strptime(sdate,"%Y-%m-%d %H:%M:%S").date()
+            edate = datetime.datetime.strptime(edate,"%Y-%m-%d %H:%M:%S").date()
+
+            total_playtime = VideoPlaytime.objects.filter(timestamp__gte=sdate, timestamp__lte=edate,\
+                video__m2mcategory__id=categ_sel, video__language_id=lang_sel)\
+                .aggregate(Sum('playtime'))['playtime__sum']
+
+            return JsonResponse({"total_playtime": total_playtime}, status=status.HTTP_200_OK, safe=False)         
+
+        except Exception as e:
+            print(traceback.format_exc())
+            return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
+
+    return JsonResponse({'message': 'data found'}, status=status.HTTP_200_OK)  
 
 @api_view(['POST'])
 def get_playdata(request):
