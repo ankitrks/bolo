@@ -295,17 +295,23 @@ class ReferralCode(RecordTimeStamp):
         return '<b>non playstore url - </b> https://www.boloindya.com/download/?id=com.boloindya.boloindya&referrer=utm_source%3D' + self.code + '%26utm_medium%3D' + self.code + '%26utm_content%3Dvaun%26utm_campaign%3Dcpc%26anid%3Dadmob'
     no_playstore_url.allow_tags = True
 
+    def downloads_list(self):
+        return ReferralCodeUsed.objects.filter(code = self, is_download = True, by_user__isnull = True)
+
+    def signup_list(self):
+        return ReferralCodeUsed.objects.filter(code = self, is_download = True, by_user__isnull = False)
+
     def downloads(self):
-        return ReferralCodeUsed.objects.filter(code = self, is_download = True, by_user__isnull = True).distinct('android_id').count()
+        return self.downloads_list().distinct('android_id').count()
 
     def signup(self):
-        return ReferralCodeUsed.objects.filter(code = self, is_download = True, by_user__isnull = False).distinct('by_user').count()
+        return self.signup_list().distinct('by_user').count()
 
     def referral_url(self):
         return 'https://www.boloindya.com/invite/'+self.for_user.username+'/'+str(self.for_user.id)+'/'
 
 class ReferralCodeUsed(RecordTimeStamp):
-    code = models.ForeignKey(ReferralCode, blank=False, null = False)
+    code = models.ForeignKey(ReferralCode, blank=False, null = False, related_name = 'refcode')
     by_user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True )
     is_download = models.BooleanField(default = True)
     click_id = models.CharField(_("Click Id"), max_length=255, blank=True)

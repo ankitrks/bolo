@@ -100,8 +100,12 @@ class ReferralCodeAdmin(admin.ModelAdmin):
     change_list_template = "admin/forum_user/referralcode/change_list.html"
     list_display = ('for_user', 'get_paytm_number', 'code', 'purpose', 'is_active', 'get_downloads', 'get_signup', 'playstore_url', \
             'no_playstore_url', 'created_at')
-    list_filter = ('code', 'is_active','is_refer_earn_code')
+    list_filter = ('code', 'is_active', 'is_refer_earn_code', ('refcode__created_at', DateRangeFilter) )
     search_fields = ('code', 'for_user__username', 'for_user__email', 'for_user__st__name', 'for_user__st__mobile_no', 'for_user__st__paytm_number')
+
+    def changelist_view(self, request, *args, **kwargs):
+        self.request = request
+        return super(ReferralCodeAdmin, self).changelist_view(request, *args, **kwargs)
 
     # def get_queryset(self, request):
     #     queryset = super(ReferralCodeAdmin, self).get_queryset(request)
@@ -121,16 +125,39 @@ class ReferralCodeAdmin(admin.ModelAdmin):
     get_paytm_number.short_description = 'Paytm Number'
 
     def get_downloads(self, obj):
-        # return str(obj.downloads())
-        return '<a href="/superman/forum_user/referralcodeused/?code__id__exact=' + str(obj.id) + '&by_user__isnull=1" target="_blank">\
-        ' + str(obj.download_count) + '</a>'
+        if self.request.GET.get('refcode__created_at__gte') or self.request.GET.get('refcode__created_at__lte'):
+            fdict = {}
+            getstr=[]
+            if self.request.GET.get('refcode__created_at__gte'):
+                fdict['created_at__gte'] = self.request.GET.get('refcode__created_at__gte')
+                getstr.append('created_at__gte=' + self.request.GET.get('refcode__created_at__gte'))
+            if self.request.GET.get('refcode__created_at__lte'):
+                fdict['created_at__lt'] = self.request.GET.get('refcode__created_at__lte')
+                getstr.append('created_at__lt=' + self.request.GET.get('refcode__created_at__lte'))
+            return '<a href="/superman/forum_user/referralcodeused/?code__id__exact=' + str(obj.id) + '&by_user__isnull=1&' + '&'.join(getstr) \
+                + '" target="_blank">' + str(obj.downloads_list().filter(**fdict).distinct('android_id').count()) + '</a>'
+        else:
+            return '<a href="/superman/forum_user/referralcodeused/?code__id__exact=' + str(obj.id) + '&by_user__isnull=1" target="_blank">\
+                ' + str(obj.download_count) + '</a>'
     get_downloads.short_description = 'Downloads'
     get_downloads.allow_tags = True
     get_downloads.admin_order_field = 'download_count'
 
     def get_signup(self, obj):
-        return '<a href="/superman/forum_user/referralcodeused/?code__id__exact=' + str(obj.id) + '&by_user__isnull=0" target="_blank">\
-        ' + str(obj.signup_count) + '</a>'
+        if self.request.GET.get('refcode__created_at__gte') or self.request.GET.get('refcode__created_at__lte'):
+            fdict = {}
+            getstr=[]
+            if self.request.GET.get('refcode__created_at__gte'):
+                fdict['created_at__gte'] = self.request.GET.get('refcode__created_at__gte')
+                getstr.append('created_at__gte=' + self.request.GET.get('refcode__created_at__gte'))
+            if self.request.GET.get('refcode__created_at__lte'):
+                fdict['created_at__lt'] = self.request.GET.get('refcode__created_at__lte')
+                getstr.append('created_at__lt=' + self.request.GET.get('refcode__created_at__lte'))
+            return '<a href="/superman/forum_user/referralcodeused/?code__id__exact=' + str(obj.id) + '&by_user__isnull=0&' + '&'.join(getstr) \
+                + '" target="_blank">' + str(obj.signup_list().filter(**fdict).distinct('by_user').count()) + '</a>'
+        else:
+            return '<a href="/superman/forum_user/referralcodeused/?code__id__exact=' + str(obj.id) + '&by_user__isnull=0" target="_blank">\
+                ' + str(obj.signup_count) + '</a>'
     get_signup.short_description = 'Signup'
     get_signup.allow_tags = True
     get_signup.admin_order_field = 'signup_count'
