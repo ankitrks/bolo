@@ -56,6 +56,7 @@ class TopicChangeList(ChangeList):
         #     list_filter, date_hierarchy, search_fields, list_select_related,
         #     list_per_page, list_max_show_all, list_editable, model_admin)
         # action_checkbox
+
         self.list_display = ('vb_list', 'id', 'title', 'vb_score', 'name', 'duration', 'show_thumbnail', 'language_id', 'imp_count',\
             'is_moderated', 'is_monetized', 'is_removed', 'is_pubsub_popular_push', 'is_boosted', 'boosted_till', 'date', 'm2mcategory') #is_popular
         self.list_display_links = ['id']
@@ -102,7 +103,8 @@ class TopicChangeList(ChangeList):
         self.pk_attname = self.lookup_opts.pk.attname
 
 class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExportModelAdmin" NOT "admin.ModelAdmin"
-    ordering = ['is_vb', '-id']
+    # ordering = ['is_vb', '-id']
+    ordering = ('-id',)
     search_fields = ('title', 'user__username', 'user__st__name', )
     list_filter = (('date', DateRangeFilter), 'language_id', 'm2mcategory', 'is_moderated', 'is_monetized', 'is_removed', 'is_popular', 'is_boosted')
     filter_horizontal = ('m2mcategory', )
