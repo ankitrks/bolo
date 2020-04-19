@@ -150,9 +150,9 @@ class Topic(RecordTimeStamp):
     downloaded_url = models.CharField(_("downloaded URL"), max_length=255, blank = True, null = True)
     vb_playtime = models.PositiveIntegerField(null=True,blank=True,default=0,db_index=True)
     has_downloaded_url = models.BooleanField(default = False)
-    vb_score = models.FloatField(_("VB Score"),null=True,blank=True,default=0,db_index=True)
-    is_boosted = models.BooleanField(default = False)
-    boosted_till = models.PositiveIntegerField(_("Boosted Till(Hrs)"),null=True,blank=True,default=0)
+    vb_score = models.FloatField(_("Score"),null=True,blank=True,default=0,db_index=True)
+    is_boosted = models.BooleanField(_("boost"), default = False)
+    boosted_till = models.PositiveIntegerField(_("boost hrs"),null=True,blank=True,default=0)
     boosted_start_time = models.DateTimeField(null=True,blank=True)
     boosted_end_time = models.DateTimeField(null=True,blank=True)
     

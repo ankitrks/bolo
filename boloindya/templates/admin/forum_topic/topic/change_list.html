@@ -12,7 +12,7 @@
       input[type="submit"],input[type="reset"]{margin-top: 8px;height: 28px;}
       
       th, td{text-align: center !important;}
-      #result_list .field-m2mcategory{display: block;max-height: 61px;overflow: auto;text-align: left !important;min-width: 150px;
+      #result_list .field-m2mcategory{display: block;max-height: 65px;overflow: auto;text-align: left !important;min-width: 150px;
         padding: 5px 2px 10px 8px;}
       #result_list ul li{list-style-type: none;}
       #result_list .field-m2mcategory input[type=checkbox]{display: inline-block;}
@@ -21,13 +21,15 @@
       #date-form{margin-top: 5px;padding-right: 10px;}
       #grp-content{top:0;}
       header#grp-header{display: none;}
-      table.grp-table td, table.grp-table th{font-size: 13px;}
+      table.grp-table td, table.grp-table th{font-size: 12px;}
       table.grp-table tbody tr td, table.grp-table tbody tr th{vertical-align: middle !important;}
       .grp-pulldown-content .grp-module{margin-left: -15px;width: 113%;}
       .close_edit_box{margin-top: 10px;float: right;}
       #id_date__lte{margin-bottom: 6px;}
-      .link_vb_list{}
+      .field-boosted_till input[type="text"]{width: 50px !important;}
       .field-show_thumbnail{padding:0px !important;}
+      .field-date{min-width: 100px !important;max-width: 100px !important;}
+      .field-language_id select{min-width: 90px !important;width: 90px !important;}
     </style>
 {% endblock %}
 
@@ -175,6 +177,7 @@
             $(document).ready(function() {
                 grappelli.initSearchbar();
                 grappelli.initFilter();
+                $('.field-date').removeClass('nowrap');
                 $('.add-another').on("click", function(e) {
                     e.preventDefault();
                     showAddAnotherPopup(this);
