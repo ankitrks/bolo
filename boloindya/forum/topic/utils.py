@@ -6,7 +6,7 @@ from ..comment.bookmark.models import CommentBookmark
 from .notification.models import TopicNotification
 from .unread.models import TopicUnread
 from redis_utils import *
-from .models import VBseen
+from .models import VBseen,RankingWeight
 
 
 def topic_viewed(request, topic):
@@ -40,4 +40,7 @@ def update_redis_vb_seen(user_id,topic_id):
         vb_seen_list.append(int(topic_id))
     set_redis(key,vb_seen_list)
 
+def get_ranking_feature_weight(feature):
+    ranking_feature, is_created = RankingWeight.objects.get_or_create(features=feature)
+    return ranking_feature.weight
 
