@@ -314,6 +314,8 @@ class UserCountNotification(RecordTimeStamp):
     language = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='0')
     user_group = models.CharField(choices=user_group_options, blank = True, null = True, max_length=10, default='0')
     category = models.ForeignKey('forum_category.Category', verbose_name=_("category"), related_name="user_count_notification_category",null=True,blank=True)
+    no_of_user = models.PositiveIntegerField(null=True,blank=True,default=0)
+    fcm_users = models.TextField(null=True) 
     
 
 

@@ -33,7 +33,7 @@ from django.views.generic.edit import FormView
 from datetime import datetime
 from forum.userkyc.forms import KYCBasicInfoRejectForm,KYCDocumentRejectForm,AdditionalInfoRejectForm,BankDetailRejectForm
 from .models import VideoUploadTranscode,VideoCategory, PushNotification, PushNotificationUser, user_group_options, \
-    FCMDevice, notification_type_options, metrics_options, DashboardMetrics, DashboardMetricsJarvis, metrics_slab_options, metrics_language_options
+    FCMDevice, notification_type_options, metrics_options, DashboardMetrics, DashboardMetricsJarvis, metrics_slab_options, metrics_language_options, UserCountNotification
 from drf_spirit.models import MonthlyActiveUser, HourlyActiveUser, DailyActiveUser, VideoDetails
 from forum.category.models import Category
 from django.contrib.auth.models import User
@@ -1131,8 +1131,8 @@ def send_notification(request):
         lang_array = language_ids.split(',')
         user_array = user_group_ids.split(',')
 
-        for lang in lang_array:
-            for user_group in user_array:
+        for user_group in user_array:
+            if user_group == '1' or user_group == '2' or user_group == '7' or user_group == '8':
                 data = {}
 
                 data['title'] = title
@@ -1141,15 +1141,36 @@ def send_notification(request):
                 data['id'] = request.POST.get('id', "")
                 data['particular_user_id'] = particular_user_id
                 data['user_group'] = user_group
-                data['lang'] = lang
+                data['lang'] = '0'
                 data['category_ids'] = category_ids
                 data['schedule_status'] = schedule_status
                 data['datepicker'] = datepicker
                 data['timepicker'] = timepicker
                 data['image_url'] = image_url
                 data['days_ago'] = days_ago
-        
-                send_notifications_task.delay(data, pushNotification)
+                        
+                # send_notifications_task.delay(data, pushNotification)
+                print(data)
+            else:
+                for lang in lang_array:
+                    data = {}
+
+                    data['title'] = title
+                    data['upper_title'] = upper_title
+                    data['notification_type'] = notification_type
+                    data['id'] = request.POST.get('id', "")
+                    data['particular_user_id'] = particular_user_id
+                    data['user_group'] = user_group
+                    data['lang'] = lang
+                    data['category_ids'] = category_ids
+                    data['schedule_status'] = schedule_status
+                    data['datepicker'] = datepicker
+                    data['timepicker'] = timepicker
+                    data['image_url'] = image_url
+                    data['days_ago'] = days_ago
+                            
+                    # send_notifications_task.delay(data, pushNotification)
+                    print(data)
 
         return redirect('/jarvis/notification_panel/')
     if request.method == 'GET':
@@ -2225,3 +2246,83 @@ def update_user_time(requests):
         return JsonResponse({'message': 'Updated'}, status=status.HTTP_200_OK)
     except Exception as e: 
         return JsonResponse({'message': 'Not Updated', 'error': str(e)}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def get_count_notification(requests):
+    from django.db.models import Sum
+    import json
+    try:
+        raw_data = json.loads(requests.body)
+        
+        language_ids = raw_data['lang_ids']
+        cat_ids = raw_data['cat_ids']
+        user_group_ids = raw_data['user_groups']
+
+        print(language_ids, cat_ids, user_group_ids)
+
+        count = 0
+        
+        lang_array = language_ids.split(',')
+        cat_array = cat_ids.split(',')
+        user_groups = user_group_ids.split(',')
+
+        if language_ids == '' and cat_ids == '' and user_group_ids == '':
+            count += UserCountNotification.objects.filter(language='0', user_group='0', category__isnull=True).aggregate(Sum('no_of_user'))['no_of_user__sum']
+        elif user_group_ids == '' and language_ids == '':
+            list_ids=[]
+            for each in cat_array:
+                print(each)
+                device=UserCountNotification.objects.get(category__pk=each, language='0')
+                list_ids=list_ids+json.loads(device.fcm_users)
+            count += len(set(list_ids))
+        elif cat_ids == '' and user_group_ids == '':
+            count += UserCountNotification.objects.filter(language__in=lang_array, category__isnull=True, user_group='0').aggregate(Sum('no_of_user'))['no_of_user__sum']
+        elif cat_ids == '' and language_ids == '':
+            for each_group in user_groups:
+                if each_group == '2':
+                    count += UserCountNotification.objects.filter(language='0', user_group='2', category__isnull=True).aggregate(Sum('no_of_user'))['no_of_user__sum']
+                elif each_group == '6':
+                    try:
+                        device=UserCountNotification.objects.get(user_group=each_group, language='0')
+                        list_ids=list_ids+json.loads(device.fcm_users)
+                    except:
+                        pass
+                elif each_group == '8':
+                    count += 1
+        elif user_group_ids == '':
+            list_ids=[]
+            for each_lang in lang_array:
+                for each in cat_array:
+                    print(each)
+                    device=UserCountNotification.objects.get(category__pk=each, language=each_lang)
+                    list_ids=list_ids+json.loads(device.fcm_users)
+            count += len(set(list_ids))
+        else:    
+            list_ids=[]
+            for each_lang in lang_array:
+                for each in cat_array:
+                    print(each)
+                    try:
+                        device=UserCountNotification.objects.get(category__pk=each, language=each_lang)
+                        list_ids=list_ids+json.loads(device.fcm_users)
+                    except:
+                        pass
+            for each_group in user_groups:
+                if each_group == '2':
+                    count += UserCountNotification.objects.filter(language='0', user_group='2', category__isnull=True).aggregate(Sum('no_of_user'))['no_of_user__sum']
+                elif each_group == '6':
+                    for each_lang in lang_array:
+                        try:
+                            device=UserCountNotification.objects.get(user_group=each_group, language=each_lang)
+                            list_ids=list_ids+json.loads(device.fcm_users)
+                        except:
+                            pass
+                elif each_group == '8':
+                    count += 1
+            count += len(set(list_ids))
+            print(lang_array, cat_array, user_groups)
+        return JsonResponse({'message': 'Found', 'count': count}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Not Found', 'err': str(e)}, status=status.HTTP_200_OK)
+
+

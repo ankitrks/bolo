@@ -164,6 +164,7 @@
                     {% endfor %}
                 </div>
             </div>
+            <h5 id='count'></h5>
             <div class="col-md-6" style="padding: 0px;margin-top:10px;">
                 <div>Select Notification Type</div>
                 <select name="notification_type" id="notification_type" onchange="clearResponse()">
@@ -384,6 +385,43 @@
                     }
             })
         })
+        $("input[type='checkbox']").click(function() {
+
+            lang_check = $('.lang_check:checked');
+            user_check = $('.user_check:checked');
+            cat_check = $('.cat_check:checked');
+
+            var lang_ids = '';
+            var cat_ids = '';
+            var user_groups = '';
+            
+            if (lang_check.length > 0 && $(lang_check[0]).val() != '0') {
+                lang_ids = get_ids_from_array(lang_check);
+            }
+            if (user_check.length > 0 && $(user_check[0]).val() != '0') {
+                user_groups = get_ids_from_array(user_check);
+            }
+            if (cat_check.length > 0 && $(cat_check[0]).val() != '0') {
+                cat_ids = get_ids_from_array(cat_check);
+            }
+            
+            $.ajax({
+                    url: '/jarvis/get_count_notification/',
+                    method: 'POST',
+                    data: JSON.stringify({
+                        'lang_ids': lang_ids,
+                        'cat_ids': cat_ids,
+                        'user_groups': user_groups
+
+                    }),
+                    dataType: "json",
+                    contentType: 'application/json',
+                    success: function(data) {
+                        console.log(data)
+                        $('#count').text('Count : ' + data.count)
+                    }
+                })
+        });
     })
     $(function() {
         $("#datepicker").datepicker({ minDate: 0});
