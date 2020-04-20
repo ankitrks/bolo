@@ -11,6 +11,48 @@ from django.contrib.auth.models import User
 # from django.db.models import Count, Q
 from forum.topic.models import VBseen
 
+import datetime
+import pytz
+from django.utils import timezone
+from django.contrib.admin.filters import DateFieldListFilter
+from django.utils.translation import gettext_lazy as _
+class CustomDateTimeFilter(DateFieldListFilter):
+    def __init__(self, *args, **kwargs):
+        super(CustomDateTimeFilter, self).__init__(*args, **kwargs)
+        now = timezone.now()
+        if timezone.is_aware(now):
+            now = timezone.localtime(now)
+        today = now.date()
+        yesterday = today - datetime.timedelta(days=1)
+        if today.month == 12:
+            next_month = today.replace(year=today.year + 1, month=1, day=1)
+        else:
+            next_month = today.replace(month=today.month + 1, day=1)
+        
+        self.links = (
+            (_('Any date'), {}),
+            (_('Today'), {
+                self.lookup_kwarg_since: str(datetime.datetime.strptime((today.strftime('%b %d, %Y') + ' 00:00:00'), '%b %d, %Y %H:%M:%S')),
+                self.lookup_kwarg_until: str(datetime.datetime.strptime((today.strftime('%b %d, %Y') + ' 23:59:59'), '%b %d, %Y %H:%M:%S')),
+            }),
+            (_('Yesterday'), {
+                self.lookup_kwarg_since: str(datetime.datetime.strptime((yesterday.strftime('%b %d, %Y') + ' 00:00:00'), '%b %d, %Y %H:%M:%S')),
+                self.lookup_kwarg_until: str(datetime.datetime.strptime((yesterday.strftime('%b %d, %Y') + ' 23:59:59'), '%b %d, %Y %H:%M:%S')),
+            }),
+            (_('Past 3 days'), {
+                self.lookup_kwarg_since: str(today - datetime.timedelta(days=3)),
+                self.lookup_kwarg_until: str(today),
+            }),
+            (_('Past 7 days'), {
+                self.lookup_kwarg_since: str(today - datetime.timedelta(days=7)),
+                self.lookup_kwarg_until: str(today),
+            }),
+            (_('This month'), {
+                self.lookup_kwarg_since: str(today.replace(day=1)),
+                self.lookup_kwarg_until: str(next_month),
+            }),
+        )
+
 class UserProfileResource(resources.ModelResource):
     class Meta:
         model = UserProfile
@@ -35,7 +77,7 @@ class WeightAdmin(admin.ModelAdmin):
 admin.site.register(Weight, WeightAdmin)
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'get_name', 'is_active', 'get_language', 'get_bolo_score', 'get_follow_count', \
+    list_display = ('username', 'date_joined', 'email', 'get_name', 'is_active', 'get_language', 'get_bolo_score', 'get_follow_count', \
         'get_vb_count', 'get_is_popular', 'get_is_superstar', 'get_is_business')
     list_editable = ('is_active', )
     list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
@@ -100,8 +142,12 @@ class ReferralCodeAdmin(admin.ModelAdmin):
     change_list_template = "admin/forum_user/referralcode/change_list.html"
     list_display = ('for_user', 'get_paytm_number', 'code', 'purpose', 'is_active', 'get_downloads', 'get_signup', 'playstore_url', \
             'no_playstore_url', 'created_at')
-    list_filter = ('code', 'is_active','is_refer_earn_code')
+    list_filter = ('code', 'is_active', 'is_refer_earn_code', ('refcode__created_at', CustomDateTimeFilter), ('refcode__created_at', DateRangeFilter) )
     search_fields = ('code', 'for_user__username', 'for_user__email', 'for_user__st__name', 'for_user__st__mobile_no', 'for_user__st__paytm_number')
+
+    def changelist_view(self, request, *args, **kwargs):
+        self.request = request
+        return super(ReferralCodeAdmin, self).changelist_view(request, *args, **kwargs)
 
     # def get_queryset(self, request):
     #     queryset = super(ReferralCodeAdmin, self).get_queryset(request)
@@ -121,16 +167,47 @@ class ReferralCodeAdmin(admin.ModelAdmin):
     get_paytm_number.short_description = 'Paytm Number'
 
     def get_downloads(self, obj):
-        # return str(obj.downloads())
-        return '<a href="/superman/forum_user/referralcodeused/?code__id__exact=' + str(obj.id) + '&by_user__isnull=1" target="_blank">\
-        ' + str(obj.download_count) + '</a>'
+        if self.request.GET.get('refcode__created_at__gte') or self.request.GET.get('refcode__created_at__lte') \
+                or self.request.GET.get('refcode__created_at__lt'):
+            fdict = {}
+            getstr=[]
+            if self.request.GET.get('refcode__created_at__gte'):
+                fdict['created_at__gte'] = self.request.GET.get('refcode__created_at__gte')
+                getstr.append('created_at__gte=' + self.request.GET.get('refcode__created_at__gte'))
+            if self.request.GET.get('refcode__created_at__lte'):
+                fdict['created_at__lt'] = self.request.GET.get('refcode__created_at__lte')
+                getstr.append('created_at__lt=' + self.request.GET.get('refcode__created_at__lte'))
+            if self.request.GET.get('refcode__created_at__lt'):
+                fdict['created_at__lt'] = self.request.GET.get('refcode__created_at__lt')
+                getstr.append('created_at__lt=' + self.request.GET.get('refcode__created_at__lt'))
+            return '<a href="/superman/forum_user/referralcodeused/?code__id__exact=' + str(obj.id) + '&by_user__isnull=1&' + '&'.join(getstr) \
+                + '" target="_blank">' + str(obj.downloads_list().filter(**fdict).distinct('android_id').count()) + '</a>'
+        else:
+            return '<a href="/superman/forum_user/referralcodeused/?code__id__exact=' + str(obj.id) + '&by_user__isnull=1" target="_blank">\
+                ' + str(obj.download_count) + '</a>'
     get_downloads.short_description = 'Downloads'
     get_downloads.allow_tags = True
     get_downloads.admin_order_field = 'download_count'
 
     def get_signup(self, obj):
-        return '<a href="/superman/forum_user/referralcodeused/?code__id__exact=' + str(obj.id) + '&by_user__isnull=0" target="_blank">\
-        ' + str(obj.signup_count) + '</a>'
+        if self.request.GET.get('refcode__created_at__gte') or self.request.GET.get('refcode__created_at__lte')\
+                or self.request.GET.get('refcode__created_at__lte'):
+            fdict = {}
+            getstr=[]
+            if self.request.GET.get('refcode__created_at__gte'):
+                fdict['created_at__gte'] = self.request.GET.get('refcode__created_at__gte')
+                getstr.append('created_at__gte=' + self.request.GET.get('refcode__created_at__gte'))
+            if self.request.GET.get('refcode__created_at__lte'):
+                fdict['created_at__lt'] = self.request.GET.get('refcode__created_at__lte')
+                getstr.append('created_at__lt=' + self.request.GET.get('refcode__created_at__lte'))
+            if self.request.GET.get('refcode__created_at__lt'):
+                fdict['created_at__lt'] = self.request.GET.get('refcode__created_at__lt')
+                getstr.append('created_at__lt=' + self.request.GET.get('refcode__created_at__lt'))
+            return '<a href="/superman/forum_user/referralcodeused/?code__id__exact=' + str(obj.id) + '&by_user__isnull=0&' + '&'.join(getstr) \
+                + '" target="_blank">' + str(obj.signup_list().filter(**fdict).distinct('by_user').count()) + '</a>'
+        else:
+            return '<a href="/superman/forum_user/referralcodeused/?code__id__exact=' + str(obj.id) + '&by_user__isnull=0" target="_blank">\
+                ' + str(obj.signup_count) + '</a>'
     get_signup.short_description = 'Signup'
     get_signup.allow_tags = True
     get_signup.admin_order_field = 'signup_count'
@@ -138,7 +215,8 @@ class ReferralCodeAdmin(admin.ModelAdmin):
 admin.site.register(ReferralCode, ReferralCodeAdmin)
 
 class ReferralCodeUsedAdmin(admin.ModelAdmin):
-    list_display = ('code', 'get_user', 'get_user_name', 'get_phone', 'get_install_time', 'get_signup_time', 'get_last_active_time', 'android_id')
+    list_display = ('code', 'get_user', 'get_user_name', 'get_phone', 'get_install_time', 'get_signup_time', 'get_last_active_time',\
+        'android_id', 'created_at')
     search_fields = ('code__code', )
     list_filter = ('created_at', ('created_at', DateRangeFilter), ) # 'code'
 

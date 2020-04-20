@@ -64,8 +64,6 @@ from django.db.models import Count
 from forum.category.models import Category
 from datetime import datetime
 
-
-
 def get_bucket_details(bucket_name=None):
     bucket_credentials = {}
     if bucket_name == 'boloindyapp-prod':
@@ -102,9 +100,6 @@ def get_bucket_details(bucket_name=None):
         bucket_credentials['AWS_BUCKET_NAME_TS'] = settings.BOLOINDYA_AWS_BUCKET_NAME_TS
     bucket_credentials['REGION_HOST'] = settings.REGION_HOST
     return bucket_credentials
-
-
-
 
 def upload_tos3(file_name,bucket,folder_name=None):
 
@@ -171,7 +166,6 @@ def geturl(request):
             return HttpResponse(json.dumps({'message':'success','url':request.POST.get('url',None)}),content_type="application/json")
     except Exception as e:
         return HttpResponse(json.dumps({'message':'fail','url':request.POST.get('url',None),'fail_message':str(e)}),content_type="application/json")
-    
 
 @login_required
 def home(request):
@@ -245,9 +239,6 @@ def getcsvdata(request):
                 data.append(fields)
                 #video_url = geturl(fields[1])
         return HttpResponse(json.dumps(data),content_type="application/json")
-
-
-
 
 # AWS_ACCESS_KEY_ID = 'AKIAZNK4CM5CW4W4VWP7'
 # AWS_SECRET_ACCESS_KEY = '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'
@@ -1570,6 +1561,7 @@ def statistics_all_jarvis(request):
         category_slab_options.append((str(item.pk), str(item.title)))
 
     category_slab_options = tuple(category_slab_options)
+    print("category slabs = "+str(category_slab_options))
 
     language_index_list = []
     for each in language_options:
@@ -1594,8 +1586,8 @@ def statistics_all_jarvis(request):
     #     category_choice = int(category_choice)    
     # print(category_choice)
 
-    category_choice = request.GET.get('category_choice', '58')      
-    category_choice = int(category_choice)
+    category_choice = request.GET.get('category_choice', '')
+
     print("slab, language_choice, category_choice", slab, language_choice, category_choice)
 
     if metrics == '6':
@@ -1608,8 +1600,6 @@ def statistics_all_jarvis(request):
         data_view = request.GET.get('data_view', 'daily')
         data_view = request.GET.get('data_view', 'monthly')
         data_view = request.GET.get('data_view', 'hourly')
-
-
     else:        
         data_view = request.GET.get('data_view', 'daily')
         data_view = request.GET.get('data_view', 'monthly')
@@ -1645,13 +1635,17 @@ def statistics_all_jarvis(request):
             temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0])\
                 .aggregate(total_count = Avg('count'))['total_count'] )
 
-        if(each_opt[0] == '4'):
+        elif(each_opt[0] == '4'):
             temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0], metrics_slab__in = ['0', '1', '2', '9'], metrics_language_options = '0')\
                 .aggregate(total_count = Sum('count'))['total_count'] )
 
-        if(each_opt[0] == '9'):
+        elif(each_opt[0] == '9'):
             temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0], metrics_language_options = '0')\
                 .aggregate(total_count = Sum('count'))['total_count'] )
+
+        elif(each_opt[0] == '12'):
+            temp_list.append(  VideoPlaytime.objects.filter(timestamp__gte=top_start, timestamp__lte=top_end)\
+                .aggregate(Sum('playtime'))['playtime__sum'])        
             
         else:
             temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0])\
@@ -1667,26 +1661,26 @@ def statistics_all_jarvis(request):
 
     # display the sum and avg of all the values in the panel display
     graph_data_sum = DashboardMetricsJarvis.objects.exclude(date__gt = end_date).filter(Q(metrics = metrics) & Q(date__gte = start_date) & Q(date__lte = end_date))
-    graph_data_avg = DashboardMetricsJarvis.objects.exclude(date__gt = end_date).filter(Q(metrics = metrics) & Q(date__gte = start_date) & Q(date__lte = end_date))      
-    
-
-    if(metrics == '4' and (slab in ['0', '1', '2', '9']) and (language_choice in language_index_list) and (category_choice)):
-        print("coming here ....")
-        graph_data = graph_data.filter(Q(metrics_language_options = language_choice) & Q(metrics_slab = slab) & Q(category_id = category_choice))
-
-        #print(graph_data.count())
-
+    graph_data_avg = DashboardMetricsJarvis.objects.exclude(date__gt = end_date).filter(Q(metrics = metrics) & Q(date__gte = start_date) & Q(date__lte = end_date))
+    if metrics == '4':
+        if slab in ['0', '1', '2', '9']:
+            graph_data = graph_data.filter(metrics_slab = slab)
+        if language_choice in language_index_list:
+            graph_data = graph_data.filter(metrics_language_options = language_choice)
+        if category_choice:
+            graph_data = graph_data.filter(category_id = category_choice)
+	
     if metrics in ['2', '5'] and slab:
         if (metrics == '2' and slab in ['3', '4', '5'])\
                 or (metrics == '5' and slab in ['6', '7']):
                     print("or else coming here....") 
                     graph_data = graph_data.filter(metrics_slab = slab)
-                    
 
-    if(metrics == '9' and (category_choice)):
-        print("coming for me....")
-        graph_data = graph_data.filter(Q(metrics_language_options = language_choice) & Q(category_id = category_choice))
-        
+    if metrics == '9':
+        if language_choice in language_index_list:
+            graph_data = graph_data.filter(metrics_language_options = language_choice) 
+        if category_choice:
+            graph_data = graph_data.filter(category_id = category_choice)    
 
     if data_view == 'weekly':
         x_axis = []
@@ -1724,7 +1718,6 @@ def statistics_all_jarvis(request):
     else:
         # this is the case where data_view == 'daily'
         # we need to handle cases were metric is 11
-
         if(metrics!='11'):
             x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
             y_axis = graph_data.values_list('count', flat = True)
@@ -1735,12 +1728,8 @@ def statistics_all_jarvis(request):
             for item in day_data:
                 x_axis.append(item['day'].strftime("%d-%b-%Y"))
                 y_axis.append(item['count'])
-
-
-
     # data['graph_data_sum'] = graph_data_sum
     # data['graph_data_avg'] = graph_data_avg
-
     data['metrics'] = metrics
     data['slab'] = slab
     data['data_view'] = data_view
@@ -1767,22 +1756,16 @@ def statistics_all_jarvis(request):
     #print(tot_elements_sum, tot_elements_count)
     data['graph_data_sum'] = str(tot_elements_sum)
     data['graph_data_avg'] = str(tot_elements_avg)
-
-
     data['chart_data'] = [[str(data_view), str(data['graph_title'])]] + [list(ele) for ele in chart_data.items()]
-
     data['start_date'] = start_date
     data['end_date'] = end_date
     data['slabs'] = []
     data['language_filter'] = []
     data['category_filter'] = []
-
-
     if metrics == '4':
         data['slabs'] = [metrics_slab_options[0], metrics_slab_options[1], metrics_slab_options[2], metrics_slab_options[9]]
         data['language_filter'] = metrics_language_options
         data['category_filter'] = category_slab_options
-
     if metrics == '2':
         data['slabs'] = [metrics_slab_options[3], metrics_slab_options[4], metrics_slab_options[5]]
     if metrics == '5':
@@ -1794,60 +1777,57 @@ def statistics_all_jarvis(request):
         data['language_filter'] = metrics_language_options
         data['category_filter'] = category_slab_options    
           
-    #print(data)    
     return render(request,'jarvis/pages/video_statistics/statistics_all_jarvis.html', data)
 
-
 @api_view(['POST'])
-def get_playdata(request):
-
+def get_total_playtime(request):
     from django.db.models import Sum
 
     if request.is_ajax():
         raw_data = json.loads(request.body)
         try:
-            categ_sel = raw_data['categ_sel']
-            lang_sel = raw_data['lang_sel']
-            sdate = raw_data['sdate']
-            edate = raw_data['edate']
-
-            sdate = sdate + " 00:00:00"
-            edate = edate + " 00:00:00"
-
-            sdate = datetime.datetime.strptime(sdate,"%Y-%m-%d %H:%M:%S").date()
-            edate = datetime.datetime.strptime(edate,"%Y-%m-%d %H:%M:%S").date()
-
-            all_video_data = VideoPlaytime.objects.filter(timestamp__gte=sdate, timestamp__lte=edate,\
-                video__m2mcategory__id=categ_sel, video__language_id=lang_sel)\
-                .values('videoid', 'video__title', 'video__user__username').annotate(tot_playtime=Sum('playtime'))\
-                .order_by( '-tot_playtime', 'videoid')[:10]
-
-            return JsonResponse({'play_data': list(all_video_data)}, status=status.HTTP_200_OK, safe=False)         
-
+            filter_dict = {}
+            filter_keys = {'sdate' : 'timestamp__gte', 'edate' : 'timestamp__lte', 'categ_sel' : 'video__m2mcategory__id', 'lang_sel' : 'video__language_id'}
+            for each_key in filter_keys:
+                if raw_data.has_key(each_key) and raw_data[each_key]:
+                    filter_dict[filter_keys[each_key]] = raw_data[each_key]
+            total_playtime = VideoPlaytime.objects.filter(**filter_dict).aggregate(Sum('playtime'))['playtime__sum']
+            return JsonResponse({"total_playtime": total_playtime}, status=status.HTTP_200_OK, safe=False)         
         except Exception as e:
             print(traceback.format_exc())
             return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
+    return JsonResponse({'message': 'data found'}, status=status.HTTP_200_OK)  
 
+@api_view(['POST'])
+def get_playdata(request):
+    from django.db.models import Sum
+    if request.is_ajax():
+        raw_data = json.loads(request.body)
+        try:
+            filter_dict = {}
+            filter_keys = {'sdate' : 'timestamp__gte', 'edate' : 'timestamp__lte', 'categ_sel' : 'video__m2mcategory__id', 'lang_sel' : 'video__language_id'}
+            for each_key in filter_keys:
+                if raw_data.has_key(each_key) and raw_data[each_key]:
+                    filter_dict[filter_keys[each_key]] = raw_data[each_key]
+
+            all_video_data = VideoPlaytime.objects.filter(**filter_dict)\
+                .values('videoid', 'video__title', 'video__user__username').annotate(tot_playtime=Sum('playtime'))\
+                .order_by( '-tot_playtime', 'videoid')[:10]
+            return JsonResponse({'play_data': list(all_video_data)}, status=status.HTTP_200_OK, safe=False)         
+        except Exception as e:
+            print(traceback.format_exc())
+            return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
     return JsonResponse({'message': 'data found'}, status=status.HTTP_200_OK)        
-
-
-
-
-
 
 @api_view(['POST'])
 def get_csv_data(request):
-
     from django.db.models import Sum
     from django.db.models import Avg
     from django.core import serializers
     import json
-
     language_index_list = []
     for each in language_options:
         language_index_list.append(each[0])
-
-
     if request.is_ajax():
         raw_data = json.loads(request.body)
         try:
@@ -1943,9 +1923,7 @@ def get_csv_data(request):
         except Exception as e:
             print(traceback.format_exc())
             return JsonResponse({'error':str(e)}, status=status.HTTP_200_OK)
-
     return JsonResponse({'message': 'data found'}, status=status.HTTP_200_OK) 
-
 
 def get_daily_impressions_data(request):
     if request.is_ajax():
@@ -1953,9 +1931,7 @@ def get_daily_impressions_data(request):
         try:
             impr_begin = raw_data['impr_from']
             impr_end = raw_data['impr_to']
-
-            print("impr_begin and end = "+impr_begin+", "+impr_end)
-
+            # print("impr_begin and end = "+impr_begin+", "+impr_end)
             begin_time = impr_begin + " 00:00:00"
             end_time = impr_end + " 00:00:00"
 
@@ -2062,7 +2038,7 @@ def weekly_vplay_data(request):
 
                 weekly_vplay_data.append(this_date_data)
 
-            print(weekly_vplay_data)
+            # print(weekly_vplay_data)
 
             return JsonResponse({'weekly_data': weekly_vplay_data}, status=status.HTTP_200_OK) 
         except Exception as e:
@@ -2108,14 +2084,11 @@ def daily_vplay_data(request):
             
             # print("vid titles : "+str(vid_titles))
             # print("vid info: "+str(vid_list))
-            print(vid_list)
+            # print(vid_list)
             vid_list_uniq = []
-
             for item in vid_list:
                 if(item not in vid_list_uniq):
                     vid_list_uniq.append(item)
-
-
             return JsonResponse({'daily_data': vid_list_uniq}, status=status.HTTP_200_OK)
 
         except Exception as e:
@@ -2126,12 +2099,8 @@ def daily_vplay_data(request):
 
 
 #def analytics_video_views(request):
-
-
 def analytics(request):
     return render(request, 'jarvis/pages/analytics_panel/view_analytics_data.html')
-
-
 
 @api_view(['POST'])
 # view for notification search

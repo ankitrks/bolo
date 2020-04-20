@@ -42,9 +42,9 @@ from django.utils import timezone
 from datetime import datetime,timedelta
 import os
 
-HOST='https://www.boloindya.com'
+# HOST='https://www.boloindya.com'
 # HOST='https://stage.boloindya.com'
-# HOST="http://localhost:8000"
+HOST="http://localhost:8000"
 
 API_PREFIX="/api/v1/"
 
@@ -231,11 +231,11 @@ for each_user in ALL_TEST_USER:
         if response:
             COMMENT_ID.append(response['comment']['id'])
 
-#4 upload a media 
-MEDIA_UPLOAD_API={'api_path':'upload_video_to_s3/','api_name':'upload video to s3','request_type':'POST','data_set':[{'media':video_file}]}
-for each_user in ALL_TEST_USER[:1]:
-    response,csv_elemnt = send_request_to_server(MEDIA_UPLOAD_API['api_name'],MEDIA_UPLOAD_API['request_type'],MEDIA_UPLOAD_API['api_path'],each_user['auth_token'],payload=None,files={'media':video_file['upload_file']})
-    csv+=csv_elemnt
+# #4 upload a media 
+# MEDIA_UPLOAD_API={'api_path':'upload_video_to_s3/','api_name':'upload video to s3','request_type':'POST','data_set':[{'media':video_file}]}
+# for each_user in ALL_TEST_USER[:1]:
+#     response,csv_elemnt = send_request_to_server(MEDIA_UPLOAD_API['api_name'],MEDIA_UPLOAD_API['request_type'],MEDIA_UPLOAD_API['api_path'],each_user['auth_token'],payload=None,files={'media':video_file['upload_file']})
+#     csv+=csv_elemnt
 
 CREATE_API = [
     # {'api_path':'create_topic','api_name':'For Creating Video Bytes','request_type':'POST','data_set':create_topic_data},

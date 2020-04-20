@@ -4,7 +4,6 @@ from datetime import datetime
 
 
 language_options = (
-    ('0', 'All'),
     ('1', "English"),
     ('2', "Hindi"),
     ('3', "Tamil"),
@@ -383,5 +382,23 @@ def generate_refer_earn_code():
     if referal_code:
         my_code = generate_refer_earn_code()
     return my_code
+
+def get_ranked_topics(user_id,filter_dict,exclude_dict,sort_by='-vb_score'):
+    from forum.topic.models import Topic
+    from forum.topic.utils import get_redis_vb_seen
+    topics = []
+    all_seen_vb = []
+    if user_id:
+        all_seen_vb = get_redis_vb_seen(user_id)
+    non_seen_post = Topic.objects.filter(**filter_dict).exclude(pk__in=all_seen_vb).exclude(**exclude_dict).order_by(sort_by)
+    all_seen_post = Topic.objects.filter(**filter_dict).filter(pk__in=all_seen_vb)
+    orderd_all_seen_post=[]
+    if all_seen_post:
+        for each_id in all_seen_vb:
+            for each_vb in all_seen_post:
+                if each_vb.id == each_id:
+                    orderd_all_seen_post.append(each_vb)
+    topics = list(non_seen_post)+list(orderd_all_seen_post)
+    return topics
 
 

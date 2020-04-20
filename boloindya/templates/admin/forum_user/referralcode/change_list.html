@@ -16,6 +16,9 @@
         .field-downloads, .field-signup, .column-downloads, .column-signup, .field-is_active, .column-is_active, .field-purpose, .column-purpose{text-align: center;}
         header#grp-header{display: none;}
         #grp-content{top:0;}
+        #created-at-form{margin-top: 5px;padding-right: 10px;}
+        .controls{text-align: center;}
+        .controls input{height: 25px;margin-top: 10px;}
         /*.exp_col_icon{position: absolute;top: px;left: 62%;}*/
     </style>
 {% endblock %}
@@ -30,7 +33,7 @@
         <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script type="text/javascript">
       $(document).ready(function(){
-
+        grappelli.initDateAndTimePicker();
         $('#result_list thead tr').append('<th style="text-align:center;"> action </th>')
         $('#result_list tbody tr').append('<td style="text-align:center;"><a href="#" class="expand_row"> + show urls</a><a href="#" class="collapse_row" style="display:none;"> - hide urls</a></td>')
 
@@ -206,6 +209,8 @@
             $(document).ready(function() {
                 grappelli.initSearchbar();
                 grappelli.initFilter();
+                $('.grp-filter').find('h3').first().html('Date used');
+                $('.grp-filter').find('.grp-module').last().find('label').first().html('Date used');
                 $('.add-another').on("click", function(e) {
                     e.preventDefault();
                     showAddAnotherPopup(this);

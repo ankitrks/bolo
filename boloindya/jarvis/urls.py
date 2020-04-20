@@ -65,7 +65,8 @@ urlpatterns = [
     # url for rendering analytics panel
     url(r'^analytics/$', views.analytics),
     url(r'^analytics_jarvis/get_csvdata/$', views.get_csv_data),
-    url(r'^analytics_jarvis/get_playdata/$', views.get_playdata),  
+    url(r'^analytics_jarvis/get_playdata/$', views.get_playdata), 
+    url(r'^analytics_jarvis/get_totalplaytime/$', views.get_total_playtime),  
 
     url(r'^upload_image_notification/$',views.upload_image_notification, name='search_notification'),  
     url(r'^get_count_notification/$',views.get_count_notification, name='get_count_notification'),  
