@@ -2227,8 +2227,6 @@ def get_count_notification(requests):
         cat_ids = raw_data['cat_ids']
         user_group_ids = raw_data['user_groups']
 
-        print(language_ids, cat_ids, user_group_ids)
-
         count = 0
         
         lang_array = language_ids.split(',')
@@ -2240,29 +2238,29 @@ def get_count_notification(requests):
         elif user_group_ids == '' and language_ids == '':
             list_ids=[]
             for each in cat_array:
-                print(each)
                 device=UserCountNotification.objects.get(category__pk=each, language='0')
                 list_ids=list_ids+json.loads(device.fcm_users)
             count += len(set(list_ids))
         elif cat_ids == '' and user_group_ids == '':
             count += UserCountNotification.objects.filter(language__in=lang_array, category__isnull=True, user_group='0').aggregate(Sum('no_of_user'))['no_of_user__sum']
         elif cat_ids == '' and language_ids == '':
+            list_ids=[]
             for each_group in user_groups:
                 if each_group == '2':
                     count += UserCountNotification.objects.filter(language='0', user_group='2', category__isnull=True).aggregate(Sum('no_of_user'))['no_of_user__sum']
-                elif each_group == '6':
+                elif each_group == '6' or each_group == '3':
                     try:
                         device=UserCountNotification.objects.get(user_group=each_group, language='0')
                         list_ids=list_ids+json.loads(device.fcm_users)
-                    except:
+                    except Exception as e:
                         pass
                 elif each_group == '8':
                     count += 1
+            count += len(set(list_ids))
         elif user_group_ids == '':
             list_ids=[]
             for each_lang in lang_array:
                 for each in cat_array:
-                    print(each)
                     device=UserCountNotification.objects.get(category__pk=each, language=each_lang)
                     list_ids=list_ids+json.loads(device.fcm_users)
             count += len(set(list_ids))
@@ -2270,7 +2268,6 @@ def get_count_notification(requests):
             list_ids=[]
             for each_lang in lang_array:
                 for each in cat_array:
-                    print(each)
                     try:
                         device=UserCountNotification.objects.get(category__pk=each, language=each_lang)
                         list_ids=list_ids+json.loads(device.fcm_users)
@@ -2279,7 +2276,7 @@ def get_count_notification(requests):
             for each_group in user_groups:
                 if each_group == '2':
                     count += UserCountNotification.objects.filter(language='0', user_group='2', category__isnull=True).aggregate(Sum('no_of_user'))['no_of_user__sum']
-                elif each_group == '6':
+                elif each_group == '6' or each_group == '3':
                     for each_lang in lang_array:
                         try:
                             device=UserCountNotification.objects.get(user_group=each_group, language=each_lang)
@@ -2289,9 +2286,8 @@ def get_count_notification(requests):
                 elif each_group == '8':
                     count += 1
             count += len(set(list_ids))
-            print(lang_array, cat_array, user_groups)
         return JsonResponse({'message': 'Found', 'count': count}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Not Found', 'err': str(e)}, status=status.HTTP_200_OK)
+        return JsonResponse({'message': 'Not Found', 'err': str(e), 'count': 0}, status=status.HTTP_200_OK)
 
 

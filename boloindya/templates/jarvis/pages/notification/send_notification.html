@@ -257,15 +257,15 @@
                         }
                         for(var i=0;i<data.data.length;i++) {
                             if(notification_type == '2' || notification_type == '0') {
-                                $('#response').append('<li onclick="addIdToField('+data.data[i].id+', \''+data.data[i].title.replace(/<(.|\n)*?>/g, '')+'\')">'+data.data[i].title+'</li>');
+                                $('#response').append('<li onclick="addIdToField('+data.data[i].id+', this)">'+data.data[i].title+'</li>');
                             } else if(notification_type == '1') {
                                 if (data.data[i].name == '') {
-                                    $('#response').append('<li onclick="addIdToField('+data.data[i].user+', \'User Name - '+data.data[i].user_name+'\')">'+data.data[i].user_name+'</li>');
+                                    $('#response').append('<li onclick="addIdToField('+data.data[i].user+', this)">'+data.data[i].user_name+'</li>');
                                 } else {
-                                    $('#response').append('<li onclick="addIdToField('+data.data[i].user+', \'User Name - '+data.data[i].name+'\')">'+data.data[i].name+'</li>');
+                                    $('#response').append('<li onclick="addIdToField('+data.data[i].user+', this)">'+data.data[i].name+'</li>');
                                 }
                             } else if(notification_type == '3') {
-                                $('#response').append('<li onclick="addIdToField(\''+data.data[i].hash_tag+'\')">'+data.data[i].hash_tag+'</li>');
+                                $('#response').append('<li onclick="addIdToField(\''+data.data[i].hash_tag+'\', this)">'+data.data[i].hash_tag+'</li>');
                             } 
                         }
                     }
@@ -525,11 +525,13 @@
         $('#search_id').val(String(id));
         var notification_type = $('#notification_type').val();
         if(notification_type == '2') {
-            $('#video_user').text('Category Title - ' +title);   
+            $('#video_user').text('Category Title - ' +title.innerHTML);   
         } else if(notification_type == '0'){
-            $('#video_user').text('Video Title - ' +title);   
+            $('#video_user').text('Video Title - ' +title.innerHTML);   
+        } else if(notification_type == '0'){ 
+            $('#video_user').text('User Name - ' +title.innerHTML);
         } else {
-            $('#video_user').text(title);   
+            $('#video_user').text('Hash Tag - ' +title.innerHTML);   
         }
     }
 
