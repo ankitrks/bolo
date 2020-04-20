@@ -1,6 +1,7 @@
 from django.apps import apps
 import calendar
 from datetime import datetime
+from django.conf import settings
 
 
 language_options = (
@@ -383,22 +384,51 @@ def generate_refer_earn_code():
         my_code = generate_refer_earn_code()
     return my_code
 
-def get_ranked_topics(user_id,filter_dict,exclude_dict,sort_by='-vb_score'):
+def get_ranked_topics(user_id,page,filter_dict,exclude_dict,sort_by='-vb_score'):
     from forum.topic.models import Topic
     from forum.topic.utils import get_redis_vb_seen
+    #print "######### page   ", page,"       ##############"
+    page_size = settings.REST_FRAMEWORK['PAGE_SIZE']
+    filter_dict['is_removed']=False
+    filter_dict['is_vb']=True
     topics = []
     all_seen_vb = []
     if user_id:
         all_seen_vb = get_redis_vb_seen(user_id)
-    non_seen_post = Topic.objects.filter(**filter_dict).exclude(pk__in=all_seen_vb).exclude(**exclude_dict).order_by(sort_by)
-    all_seen_post = Topic.objects.filter(**filter_dict).filter(pk__in=all_seen_vb)
-    orderd_all_seen_post=[]
-    if all_seen_post:
-        for each_id in all_seen_vb:
-            for each_vb in all_seen_post:
-                if each_vb.id == each_id:
-                    orderd_all_seen_post.append(each_vb)
-    topics = list(non_seen_post)+list(orderd_all_seen_post)
+    non_seen_post_count = Topic.objects.filter(**filter_dict).exclude(pk__in=all_seen_vb).exclude(**exclude_dict).count()
+    if sort_by == '-date':
+        non_seen_post = list(Topic.objects.filter(**filter_dict).exclude(pk__in=all_seen_vb).exclude(**exclude_dict).order_by('-date'))[page*page_size:page_size*(page+3)+1]
+    else:
+        non_seen_post = list(Topic.objects.filter(**filter_dict).exclude(pk__in=all_seen_vb).exclude(**exclude_dict).order_by('-vb_score'))[page*page_size:page_size*(page+3)+1]
+    new_order_list=[]
+    while(len(non_seen_post)):
+        i=0
+        j=0
+        temp_order_list =[]
+        user_ids_list = []
+        for i in range(0,settings.REST_FRAMEWORK['PAGE_SIZE']):
+            if non_seen_post and not non_seen_post[j] in new_order_list and not non_seen_post[j].user_id in user_ids_list:
+                temp_order_list.append(non_seen_post[j])
+                user_ids_list.append(non_seen_post[j].user_id)
+                non_seen_post.remove(non_seen_post[j])
+                i+=1
+                j=0
+            else:
+                if len(non_seen_post)>j+1:
+                    j+=1
+        new_order_list+=temp_order_list
+    non_seen_post = new_order_list
+    all_seen_post = []
+    if not page*page_size < non_seen_post_count:
+        all_seen_page = int((page*page_size - non_seen_post_count)/page_size)
+        all_seen_post = Topic.objects.filter(**filter_dict).filter(pk__in=all_seen_vb)[all_seen_page*page_size:page_size*(all_seen_page+1)+1]
+    # orderd_all_seen_post=[]
+    # if all_seen_post:
+    #     for each_id in all_seen_vb:
+    #         for each_vb in all_seen_post:
+    #             if each_vb.id == each_id:
+    #                 orderd_all_seen_post.append(each_vb)
+    topics = list(non_seen_post)+list(all_seen_post)
     return topics
 
 

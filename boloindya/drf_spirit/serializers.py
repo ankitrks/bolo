@@ -588,13 +588,16 @@ class CategoryWithVideoSerializer(ModelSerializer):
         # return []
         language_id = 1
         user_id  = None
+        page = 0
         if self.context.get("language_id"):
             language_id =  self.context.get("language_id")
         if self.context.get("user_id"):
             user_id =  self.context.get("user_id")
+        if self.context.get("page"):
+            page =  int(self.context.get("page"))
         topics = []
         all_seen_vb = []
-        topics = get_ranked_topics(user_id,{'is_removed':False,'is_vb':True,'m2mcategory':instance,'language_id':language_id},{})
+        topics = get_ranked_topics(user_id,page,{'m2mcategory':instance,'language_id':language_id},{})
         # if user_id:
         #     all_seen_vb = get_redis_vb_seen(user_id)
         #     # all_seen_vb = VBseen.objects.filter(user_id = user_id, topic__language_id=language_id, topic__m2mcategory=instance).distinct('topic_id').values_list('topic_id',flat=True)
