@@ -2248,7 +2248,7 @@ def get_count_notification(requests):
             for each_group in user_groups:
                 if each_group == '2':
                     count += UserCountNotification.objects.filter(language='0', user_group='2', category__isnull=True).aggregate(Sum('no_of_user'))['no_of_user__sum']
-                elif each_group == '6' or each_group == '3':
+                elif each_group == '6' or each_group == '3' or each_group == '4' or each_group == '5':
                     try:
                         device=UserCountNotification.objects.get(user_group=each_group, language='0')
                         list_ids=list_ids+json.loads(device.fcm_users)
@@ -2276,7 +2276,7 @@ def get_count_notification(requests):
             for each_group in user_groups:
                 if each_group == '2':
                     count += UserCountNotification.objects.filter(language='0', user_group='2', category__isnull=True).aggregate(Sum('no_of_user'))['no_of_user__sum']
-                elif each_group == '6' or each_group == '3':
+                elif each_group == '6' or each_group == '3' or each_group == '4' or each_group == '5':
                     for each_lang in lang_array:
                         try:
                             device=UserCountNotification.objects.get(user_group=each_group, language=each_lang)
