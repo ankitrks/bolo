@@ -118,15 +118,15 @@ class NotificationAPI(GenericAPIView):
 
         # print "offset",offset,"page_size",page_size
 
-        notifications = Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-created_at')[offset*limit:offset*limit+limit]
+        notifications = Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-created_at')[offset:offset+limit]
         total_notification_count = Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-created_at').count()
         total_offset = total_notification_count/limit
         if total_notification_count > 0 and not total_notification_count%limit:
             total_offset = total_offset-1
         if notifications:
             if total_offset > offset:
-                next_offset = offset+1
-            update_notification_ids = list(Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-created_at').values_list('pk',flat=True))[offset*limit:offset*limit+limit]
+                next_offset = offset+limit
+            update_notification_ids = list(Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-created_at').values_list('pk',flat=True))[offset:offset+limit]
             #print update_notification_ids
             Notification.objects.filter(pk__in=update_notification_ids).exclude(status=2).update(status=1)
 
@@ -585,95 +585,99 @@ class OldAlgoVBList(generics.ListCreateAPIView):
         else:
             topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-id')
         return topics
-class VBList(generics.ListCreateAPIView):
-    serializer_class   = TopicSerializerwithComment
-    permission_classes = (IsOwnerOrReadOnly,)
-    pagination_class   = LimitOffsetPagination
 
-
-    """
-    get:
-    Search By Topic Title,Audio,Video...
-    term        = request.GET.get('term', '')
-    Required Parameters:
-    term---Topic Title
-
-    post:
-
-
-    Required Parameters:
-    title and category_id 
-    """ 
-    def get_serializer_context(self):
-        """
-        Extra context provided to the serializer class.
-        """
-        return {
-            'is_expand': self.request.GET.get('is_expand',True),
-        }
-
-
-    def get_queryset(self):
-        topics = []
-        is_user_timeline = False
-        search_term = self.request.GET.keys()
-        filter_dic = {}
-        sort_recent = False
-        category__slug = False
-        m2mcategory__slug = False
-        popular_post = False
-        if search_term:
-            for term_key in search_term:
-                if term_key not in ['limit','offset','order_by','is_popular']:
-                    if term_key:
-                        value = self.request.GET.get(term_key)
-                        filter_dic[term_key]=value
-                        if term_key =='user_id':
-                            is_user_timeline = True
-                            self.pagination_class = LimitOffsetPagination
-                        if term_key =='category':
-                            m2mcategory__slug = self.request.GET.get(term_key)
-            filter_dic['is_vb'] = True
-            if 'order_by' in search_term:
-                sort_recent = True
-            if 'is_popular' in search_term:
-                popular_post = True
-            post_till = datetime.now() - timedelta(days=30)
-            if filter_dic:
-                if is_user_timeline:
-                    filter_dic['is_removed'] = False
-                    topics = Topic.objects.filter(**filter_dic)
-                    post = topics
-                    topics=sorted(itertools.chain(post),key=lambda x: x.date, reverse=True)
-                elif popular_post:
-                    topics = []
-                    all_seen_vb = []
-                    if m2mcategory__slug:
-                        if self.request.user.is_authenticated:
-                            topics = get_ranked_topics(self.request.user.id,{'is_removed' : False,'is_vb' : True,'m2mcategory__slug':m2mcategory__slug,'is_popular':True,'language_id' : self.request.GET.get('language_id')},{})
-                        else:
-                            topics = get_ranked_topics(False,{'is_removed' : False,'is_vb' : True,'m2mcategory__slug':m2mcategory__slug,'is_popular':True,'language_id' : self.request.GET.get('language_id')},{})
+@api_view(['GET'])
+def VBList(request):
+    topics = []
+    is_user_timeline = False
+    search_term = request.GET.keys()
+    filter_dic = {}
+    sort_recent = False
+    category__slug = False
+    m2mcategory__slug = False
+    popular_post = False
+    if int(request.GET.get('offset') or 0):
+        page_no = int(int(request.GET.get('offset') or 0)/settings.REST_FRAMEWORK['PAGE_SIZE'])
+    else:
+        page_no = 0
+    if search_term:
+        for term_key in search_term:
+            if term_key not in ['limit','offset','order_by','is_popular']:
+                if term_key:
+                    value = request.GET.get(term_key)
+                    filter_dic[term_key]=value
+                    if term_key =='user_id':
+                        is_user_timeline = True
+                        pagination_class = LimitOffsetPagination
+                    if term_key =='category':
+                        m2mcategory__slug = request.GET.get(term_key)
+        filter_dic['is_vb'] = True
+        if 'order_by' in search_term:
+            sort_recent = True
+        if 'is_popular' in search_term:
+            popular_post = True
+        post_till = datetime.now() - timedelta(days=30)
+        if filter_dic:
+            if is_user_timeline:
+                filter_dic['is_removed'] = False
+                topics = Topic.objects.filter(**filter_dic)
+                post = topics
+                topics=sorted(itertools.chain(post),key=lambda x: x.date, reverse=True)
+            elif popular_post:
+                topics = []
+                all_seen_vb = []
+                if m2mcategory__slug:
+                    if request.user.is_authenticated:
+                        topics = get_ranked_topics(request.user.id,page_no,{'m2mcategory__slug':m2mcategory__slug,'is_popular':True,'language_id' : request.GET.get('language_id')},{})
                     else:
-                        if self.request.user.is_authenticated:
-                            topics = get_ranked_topics(self.request.user.id,{'is_removed' : False,'is_vb' : True,'is_popular':True,'language_id' : self.request.GET.get('language_id')},{})
-                        else:
-                            topics = get_ranked_topics(False,{'is_removed' : False,'is_vb' : True,'is_popular':True,'language_id' : self.request.GET.get('language_id')},{})
+                        topics = get_ranked_topics(False,page_no,{'m2mcategory__slug':m2mcategory__slug,'is_popular':True,'language_id' : request.GET.get('language_id')},{})
                 else:
-                    topics = []
-                    if m2mcategory__slug:
-                        if self.request.user.is_authenticated:
-                            topics = get_ranked_topics(self.request.user.id,{'is_removed' : False,'is_vb' : True,'m2mcategory__slug':m2mcategory__slug,'language_id' : self.request.GET.get('language_id')},{})
-                        else:
-                            topics = get_ranked_topics(False,{'is_removed' : False,'is_vb' : True,'m2mcategory__slug':m2mcategory__slug,'language_id' : self.request.GET.get('language_id')},{})
+                    if request.user.is_authenticated:
+                        topics = get_ranked_topics(request.user.id,page_no,{'is_popular':True,'language_id' : request.GET.get('language_id')},{})
                     else:
-                        if self.request.user.is_authenticated:
-                            topics = get_ranked_topics(self.request.user.id,{'is_removed' : False,'is_vb' : True,'language_id' : self.request.GET.get('language_id')},{})
-                        else:
-                            topics = get_ranked_topics(False,{'is_removed' : False,'is_vb' : True,'language_id' : self.request.GET.get('language_id')},{})
-        else:
-            topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-id')
-        return topics
+                        topics = get_ranked_topics(False,page_no,{'is_popular':True,'language_id' : request.GET.get('language_id')},{})
+            else:
+                topics = []
+                if m2mcategory__slug:
+                    if request.user.is_authenticated:
+                        topics = get_ranked_topics(request.user.id,page_no,{'m2mcategory__slug':m2mcategory__slug,'language_id' : request.GET.get('language_id')},{})
+                    else:
+                        topics = get_ranked_topics(False,page_no,{'m2mcategory__slug':m2mcategory__slug,'language_id' : request.GET.get('language_id')},{})
+                else:
+                    if request.user.is_authenticated:
+                        topics = get_ranked_topics(request.user.id,page_no,{'language_id' : request.GET.get('language_id')},{})
+                    else:
+                        topics = get_ranked_topics(False,page_no,{'language_id' : request.GET.get('language_id')},{})
+    else:
+        topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-id')
+    total_objects = len(topics)
+    paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
+    topics = paginator.page(1)
+    if paginator.num_pages>1:
+        next_url = replace_query_param(request.build_absolute_uri(),'offset',int(request.GET.get('offset') or 0)+int(request.GET.get('limit') or settings.REST_FRAMEWORK['PAGE_SIZE']))
+    else:
+        next_url = ''
+    if int(request.GET.get('offset') or 0):
+        previous_url = replace_query_param(request.build_absolute_uri(),'offset',int(request.GET.get('offset') or 0) - int(request.GET.get('limit') or settings.REST_FRAMEWORK['PAGE_SIZE']))
+    else:
+        previous_url =''
+    return JsonResponse({"results":TopicSerializerwithComment(topics,context={'is_expand':request.GET.get('is_expand',True)},many=True).data,"next":next_url,"previous":previous_url,"count":total_objects})
 
+def replace_query_param(url, key, val):
+    try:
+        from urllib import parse as urlparse
+    except ImportError:
+        import urlparse
+    from django.http import QueryDict
+    """
+    Given a URL and a key/val pair, set or replace an item in the query
+    parameters of the URL, and return the new URL.
+    """
+    (scheme, netloc, path, query, fragment) = urlparse.urlsplit(url)
+    query_dict = QueryDict(query).copy()
+    query_dict[key] = val
+    query = query_dict.urlencode()
+    return urlparse.urlunsplit((scheme, netloc, path, query, fragment))
 
 
 class OldAlgoGetChallenge(generics.ListCreateAPIView):
@@ -736,30 +740,33 @@ class OldAlgoGetChallenge(generics.ListCreateAPIView):
 
         return topics
 
-class GetChallenge(generics.ListCreateAPIView):
-    serializer_class = TopicSerializerwithComment
-    permission_classes = (IsOwnerOrReadOnly,)
-    pagination_class = ShufflePagination 
+def GetChallenge(request):
+    challenge_hash = request.GET.get('challengehash')
+    challengehash = '#' + challenge_hash
+    hash_tag = TongueTwister.objects.get(hash_tag__iexact=challengehash[1:])
+    all_seen_vb = []
+    topics =[]
+    if int(request.GET.get('offset') or 0):
+        page_no = int(int(request.GET.get('offset') or 0)/settings.REST_FRAMEWORK['PAGE_SIZE'])
+    else:
+        page_no = 0
+    if request.user.is_authenticated:
+        topics = get_ranked_topics(request.user.id,page_no,{'hash_tags':hash_tag},{})
+    else:
+        topics = get_ranked_topics(False,page_no,{'hash_tags':hash_tag},{})
+    total_objects = len(topics)
+    paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
+    topics = paginator.page(1)
+    if paginator.num_pages>1:
+        next_url = replace_query_param(request.build_absolute_uri(),'offset',int(request.GET.get('offset') or 0)+int(request.GET.get('limit') or settings.REST_FRAMEWORK['PAGE_SIZE']))
+    else:
+        next_url = ''
+    if int(request.GET.get('offset') or 0):
+        previous_url = replace_query_param(request.build_absolute_uri(),'offset',int(request.GET.get('offset') or 0) - int(request.GET.get('limit') or settings.REST_FRAMEWORK['PAGE_SIZE']))
+    else:
+        previous_url =''
+    return JsonResponse({"results":TopicSerializerwithComment(topics,context={'is_expand':request.GET.get('is_expand',True)},many=True).data,"next":next_url,"previous":previous_url,"count":total_objects})
 
-    def get_serializer_context(self):
-        """
-        Extra context provided to the serializer class.
-        """
-        return {
-            'is_expand': self.request.GET.get('is_expand',True),
-        }
-
-    def get_queryset(self):
-        challenge_hash = self.request.GET.get('challengehash')
-        challengehash = '#' + challenge_hash
-        hash_tag = TongueTwister.objects.get(hash_tag__iexact=challengehash[1:])
-        all_seen_vb = []
-        topics =[]
-        if self.request.user.is_authenticated:
-            topics = get_ranked_topics(self.request.user.id,{'is_removed' : False,'is_vb' : True,'hash_tags':hash_tag},{})
-        else:
-            topics = get_ranked_topics(False,{'is_removed' : False,'is_vb' : True,'hash_tags':hash_tag},{})
-        return topics
         
 
 @api_view(['POST'])
@@ -3703,15 +3710,16 @@ def get_category_with_video_bytes(request):
                     popular_bolo = []
         if request.GET.get('is_with_popular'):
             if request.user.is_authenticated:
-                topics = get_ranked_topics(request.user.id,{'is_removed':False,'is_vb':True,'language_id':language_id,'is_popular':True},{})
+                topics = get_ranked_topics(request.user.id,int(request.GET.get('page',0)),{'language_id':language_id,'is_popular':True},{})
             else:
-                topics = get_ranked_topics(False,{'is_removed':False,'is_vb':True,'language_id':language_id,'is_popular':True},{})
+                topics = get_ranked_topics(False,int(request.GET.get('page',0)),{'language_id':language_id,'is_popular':True},{})
             try:
-                topics = paginator.paginate_queryset(topics, request)
+                paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
+                topics = paginator.page(1)
                 trending_videos = CategoryVideoByteSerializer(topics, many=True, context={'is_expand': request.GET.get('is_expand',True)}).data
             except Exception as e1:
                 trending_videos = []
-        category_details = CategoryWithVideoSerializer(category, many=True, context={'language_id': language_id,'user_id':request.user.id,'is_expand': request.GET.get('is_expand',True)}).data
+        category_details = CategoryWithVideoSerializer(category, many=True, context={'language_id': language_id,'user_id':request.user.id,'is_expand': request.GET.get('is_expand',True),'page':'0'}).data
         return JsonResponse({'category_details': category_details, 'trending_topics': trending_videos, \
             'popular_boloindyans': popular_bolo, 'following_user': following_user}, \
             status=status.HTTP_200_OK)
@@ -3742,7 +3750,7 @@ def get_category_detail_with_views(request):
         vb_count = Topic.objects.filter(m2mcategory=category, is_removed=False, is_vb=True, language_id=language_id).count()
         all_seen = category.view_count
         current_language_view = CategoryViewCounter.objects.get(category=category,language=language_id).view_count
-        return JsonResponse({'category_details': CategoryWithVideoSerializer(category, context={'language_id': language_id,'user_id':request.user.id,'is_expand': request.GET.get('is_expand',True)}).data, 'video_count': vb_count, 'all_seen':shorcountertopic(all_seen),'current_language_view':shorcountertopic(current_language_view)}, status=status.HTTP_200_OK)
+        return JsonResponse({'category_details': CategoryWithVideoSerializer(category, context={'language_id': language_id,'user_id':request.user.id,'is_expand': request.GET.get('is_expand',True),'page':int(request.GET.get('page','0'))}).data, 'video_count': vb_count, 'all_seen':shorcountertopic(all_seen),'current_language_view':shorcountertopic(current_language_view)}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -3814,15 +3822,14 @@ def get_category_video_bytes(request):
         category_id = request.POST.get('category_id', None)
         language_id = request.POST.get('language_id', 1)
         category = Category.objects.get(pk=category_id)
+        print request.POST.get('page', 2)
         topics = []
         if request.user.is_authenticated:
-            topics = get_ranked_topics(request.user.id,{'is_removed':False,'is_vb':True,'m2mcategory':category,'language_id':language_id},{})
+            topics = get_ranked_topics(request.user.id,int(request.POST.get('page', 1)),{'m2mcategory':category,'language_id':language_id},{})
         else:
-            topics = get_ranked_topics(False,{'is_removed':False,'is_vb':True,'m2mcategory':category,'language_id':language_id},{})
+            topics = get_ranked_topics(False,int(request.POST.get('page', 1)),{'m2mcategory':category,'language_id':language_id},{})
         paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
-        page = request.POST.get('page', 2)
-
-        topic_page = paginator.page(page)
+        topic_page = paginator.page(1)
         return JsonResponse({'topics': CategoryVideoByteSerializer(topic_page, many=True, context={'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
@@ -3894,9 +3901,9 @@ def get_popular_video_bytes(request):
         all_seen_vb = []
         post_till = datetime.now() - timedelta(days=90)
         if request.user.is_authenticated:
-            topics = get_ranked_topics(request.user.id,{'is_removed': False,'is_vb': True,'language_id': language_id,'is_popular':True},{})
+            topics = get_ranked_topics(request.user.id,int(request.GET.get('page', 0)),{'language_id': language_id,'is_popular':True},{})
         else:
-            topics = get_ranked_topics(False,{'is_removed': False,'is_vb': True,'language_id': language_id,'is_popular':True},{})
+            topics = get_ranked_topics(False,int(request.GET.get('page', 0)),{'language_id': language_id,'is_popular':True},{})
         
         ''' Manual added post'''
         manual_added_post = Topic.objects.filter(pk=43351)
@@ -3904,7 +3911,8 @@ def get_popular_video_bytes(request):
 
         ''' Uncomment below line to remove manual added post'''
         # topics=list(boosted_post)+list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
-        topics = paginator_topics.paginate_queryset(topics, request)
+        paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
+        topics = paginator.page(1)
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True, context={'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:' + str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -4003,11 +4011,12 @@ def get_recent_videos(request):
         category = Category.objects.filter(parent__isnull=True).first()
         all_seen_vb = []
         if request.user.is_authenticated:
-            topics = get_ranked_topics(request.user.id,{'is_removed' : False,'is_vb' : True,'m2mcategory':category,'language_id' : language_id},{},'-date')
+            topics = get_ranked_topics(request.user.id,int(request.GET.get('page',0)),{'m2mcategory':category,'language_id' : language_id},{},'-date')
         else:
-            topics = get_ranked_topics(False,{'is_removed' : False,'is_vb' : True,'m2mcategory':category,'language_id' : language_id},{},'-date')
+            topics = get_ranked_topics(False,int(request.GET.get('page',0)),{'m2mcategory':category,'language_id' : language_id},{},'-date')
 
-        topics = paginator_topics.paginate_queryset(topics, request)
+        paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
+        topics = paginator.page(1)
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True, context={'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
