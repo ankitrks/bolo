@@ -11,6 +11,48 @@ from django.contrib.auth.models import User
 # from django.db.models import Count, Q
 from forum.topic.models import VBseen
 
+import datetime
+import pytz
+from django.utils import timezone
+from django.contrib.admin.filters import DateFieldListFilter
+from django.utils.translation import gettext_lazy as _
+class CustomDateTimeFilter(DateFieldListFilter):
+    def __init__(self, *args, **kwargs):
+        super(CustomDateTimeFilter, self).__init__(*args, **kwargs)
+        now = timezone.now()
+        if timezone.is_aware(now):
+            now = timezone.localtime(now)
+        today = now.date()
+        yesterday = today - datetime.timedelta(days=1)
+        if today.month == 12:
+            next_month = today.replace(year=today.year + 1, month=1, day=1)
+        else:
+            next_month = today.replace(month=today.month + 1, day=1)
+        
+        self.links = (
+            (_('Any date'), {}),
+            (_('Today'), {
+                self.lookup_kwarg_since: str(datetime.datetime.strptime((today.strftime('%b %d, %Y') + ' 00:00:00'), '%b %d, %Y %H:%M:%S')),
+                self.lookup_kwarg_until: str(datetime.datetime.strptime((today.strftime('%b %d, %Y') + ' 23:59:59'), '%b %d, %Y %H:%M:%S')),
+            }),
+            (_('Yesterday'), {
+                self.lookup_kwarg_since: str(datetime.datetime.strptime((yesterday.strftime('%b %d, %Y') + ' 00:00:00'), '%b %d, %Y %H:%M:%S')),
+                self.lookup_kwarg_until: str(datetime.datetime.strptime((yesterday.strftime('%b %d, %Y') + ' 23:59:59'), '%b %d, %Y %H:%M:%S')),
+            }),
+            (_('Past 3 days'), {
+                self.lookup_kwarg_since: str(today - datetime.timedelta(days=3)),
+                self.lookup_kwarg_until: str(today),
+            }),
+            (_('Past 7 days'), {
+                self.lookup_kwarg_since: str(today - datetime.timedelta(days=7)),
+                self.lookup_kwarg_until: str(today),
+            }),
+            (_('This month'), {
+                self.lookup_kwarg_since: str(today.replace(day=1)),
+                self.lookup_kwarg_until: str(next_month),
+            }),
+        )
+
 class UserProfileResource(resources.ModelResource):
     class Meta:
         model = UserProfile
@@ -100,7 +142,7 @@ class ReferralCodeAdmin(admin.ModelAdmin):
     change_list_template = "admin/forum_user/referralcode/change_list.html"
     list_display = ('for_user', 'get_paytm_number', 'code', 'purpose', 'is_active', 'get_downloads', 'get_signup', 'playstore_url', \
             'no_playstore_url', 'created_at')
-    list_filter = ('code', 'is_active', 'is_refer_earn_code', ('refcode__created_at', DateRangeFilter) )
+    list_filter = ('code', 'is_active', 'is_refer_earn_code', ('refcode__created_at', CustomDateTimeFilter), ('refcode__created_at', DateRangeFilter) )
     search_fields = ('code', 'for_user__username', 'for_user__email', 'for_user__st__name', 'for_user__st__mobile_no', 'for_user__st__paytm_number')
 
     def changelist_view(self, request, *args, **kwargs):

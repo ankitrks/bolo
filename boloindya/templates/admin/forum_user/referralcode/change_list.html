@@ -210,6 +210,7 @@
                 grappelli.initSearchbar();
                 grappelli.initFilter();
                 $('.grp-filter').find('h3').first().html('Date used');
+                $('.grp-filter').find('.grp-module').last().find('label').first().html('Date used');
                 $('.add-another').on("click", function(e) {
                     e.preventDefault();
                     showAddAnotherPopup(this);
