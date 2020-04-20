@@ -140,7 +140,7 @@
 
         <div class ="top_box" {% if metrics == top_data.6.0 %} style = "background: bisque;"{%endif %}>
         <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* [Avg] last 30 days</i></span>
-        <a href="?metrics={{ top_data.6.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.6.1 }}</h6><h5 style="color: #b52828">{{ top_data.6.2|intcomma|floatformat:0}}</h5></a>
+        <a href="?metrics={{ top_data.6.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.6.1 }}</h6><h5 style="color: #b52828">{{ top_data.6.2|floatformat:"0"|intcomma}}</h5></a>
         </div>
 
         <div class ="top_box" {% if metrics == top_data.8.0 %} style = "background: bisque;"{%endif %}>
@@ -167,10 +167,10 @@
         <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
         <a href="?metrics={{ top_data.11.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.11.1 }}</h6><h5 style="color: #b52828">{{ top_data.11.2|intcomma }}</h4></a>
         </div>
-
+        
         <div class="top_box" {% if metrics == top_data.12.0 %} style = "background: bisque;"{%endif %}>
-        <span style ="color: grey; font-size: 8px; float: right;margin: -16px 7px 0px 0px;"></span>
-        <a href="?metrics={{ top_data.12.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.12.1 }}</h6><h5 style="color: #b52828">{{ top_data.12.2|intcomma }}</h4></a>
+        <span style ="color: grey; font-size: 8px; float: right;margin: -16px 7px 0px 0px;">* total of last 30 days</span>
+        <a href="?metrics={{ top_data.12.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.12.1 }}</h6><h5 id="playtime_last_30" style="color: #b52828"></h4></a>
         </div>    
 
         <div class="right_panel">
@@ -210,7 +210,13 @@
 
             {% if metrics == "12" %}
             <div class="filter_apply btn" style="background: bisque;">
-            <button onclick="GetPlayData()"> Fetch</button>    
+            <button onclick="GetPlayData()"> Top 10 Videos</button>    
+            </div>
+            {% endif %}
+
+            {% if metrics == "12" %}
+            <div class="filter_apply btn" style="background: bisque;">
+            <button onclick="GetTotalPlaytime()">Total Playtime</button>    
             </div>
             {% endif %}
 
@@ -236,6 +242,7 @@
                         <div class="col-sm-3">
                             <div ><b>Select Language</b></div>
                             <select name="lang" id = "lang_filter_1" onchange="GetSelectedLangValue()">
+                                <option value="">All</option>
                                 {% for lang in language_filter %}
                                     <option value="{{ lang.0 }}" {% if language_choice == lang.0 %}selected="selected"{% endif %}>{{ lang.1 }}</option>
                                 {% endfor %}
@@ -247,8 +254,9 @@
                         <div class="col-sm-3">
                             <div><b>Select Category</b></div>
                             <select name = "categ" id = "categ_filter_1" onchange="GetSelectedCategValue()">
+                                <option value="">All</option>
                                 {% for each_cat in category_filter %}
-                                    <option value = "{{ each_cat.0}}" {% if category_choice|stringformat:"i" == each_cat.0 %}selected="selected"{% endif %}>{{ each_cat.1 }}</option>
+                                    <option value = "{{ each_cat.0}}" {% if category_choice == each_cat.0 %}selected="selected"{% endif %}>{{ each_cat.1 }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -271,6 +279,9 @@
             <br>
             {% if metrics == '12' %}
             <div style="text-align: center;" class="col-6 col-xl-6 col-md-6 col-sm-12">
+
+                <h4 id="total_playtime_text"></h4>
+
                 <h4>Top Videos Viewed </h4>
                 <table class="table table-striped table-bordered" align="center">
                     <thead>
@@ -409,6 +420,7 @@
                             build += urls[i] + "&";
                         }
                     }
+                    console.log(build);
                     window.location.href =  build.substring(0, build.length - 1);
                     // window.location.href = window.location.href + "&language_choice=" + lang_selected;
                 } else {
@@ -429,6 +441,7 @@
                             build +=urls[i] + "&";
                         }
                     }
+                    console.log(build);
                     window.location.href = build.substring(0, build.length - 1);
                 } else {
                     window.location.href = window.location.href + "&category_choice=" + categ_selected;
@@ -545,7 +558,6 @@
 
 
             function GetPlayData(){
-                console.log("get play data is working fine....");
                 var categ_sel = "{{category_choice}}"
                 var lang_sel = "{{language_choice}}"
                 var sdate = "{{start_date}}"
@@ -589,6 +601,41 @@
 
             }
 
+            function GetTotalPlaytime(){
+                var categ_sel = "{{category_choice}}"
+                var lang_sel = "{{language_choice}}"
+                var sdate = "{{start_date}}"
+                var edate = "{{end_date}}"
+
+                $.ajax({
+                    url: "/jarvis/analytics_jarvis/get_totalplaytime/",
+                    dataType: 'json',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        'categ_sel': categ_sel,
+                        'lang_sel': lang_sel,
+                        'sdate': sdate,
+                        'edate': edate
+                    }),
+                    success: function (data){
+                        console.log("Total playtime");
+                        console.log(data.total_playtime);
+
+                        var tot_playtime_text = document.getElementById('total_playtime_text');
+                        tot_playtime_text.innerHTML = "Total Playtime: "+convertSecondsToMinsHrs(data.total_playtime);
+                    }
+                });
+
+            }
+
         </script>
+
+        <script type="text/javascript">
+            // a = convertSecondsToMinsHrs({{ top_data.12.2 }});
+            // var playtime_tab = document.getElementById('playtime_last_30');
+            // playtime_tab.innerHTML = a;
+        </script>
+
     </body>
 </html>
