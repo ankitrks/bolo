@@ -1744,7 +1744,13 @@ def get_total_playtime(request):
             filter_keys = {'sdate' : 'timestamp__gte', 'edate' : 'timestamp__lte', 'categ_sel' : 'video__m2mcategory__id', 'lang_sel' : 'video__language_id'}
             for each_key in filter_keys:
                 if raw_data.has_key(each_key) and raw_data[each_key]:
-                    filter_dict[filter_keys[each_key]] = raw_data[each_key]
+                    get_value = raw_data[each_key]
+                    if each_key == 'sdate':
+                        get_value = get_value + ' 00:00:00'
+                    if each_key == 'edate':
+                        get_value = get_value + ' 23:59:59'
+                    if each_key != 'lang_sel' or (each_key == 'lang_sel' and raw_data[each_key] != '0'):
+                        filter_dict[filter_keys[each_key]] = get_value
             total_playtime = VideoPlaytime.objects.filter(**filter_dict).aggregate(Sum('playtime'))['playtime__sum']
             return JsonResponse({"total_playtime": total_playtime}, status=status.HTTP_200_OK, safe=False)         
         except Exception as e:
@@ -1762,7 +1768,13 @@ def get_playdata(request):
             filter_keys = {'sdate' : 'timestamp__gte', 'edate' : 'timestamp__lte', 'categ_sel' : 'video__m2mcategory__id', 'lang_sel' : 'video__language_id'}
             for each_key in filter_keys:
                 if raw_data.has_key(each_key) and raw_data[each_key]:
-                    filter_dict[filter_keys[each_key]] = raw_data[each_key]
+                    get_value = raw_data[each_key]
+                    if each_key == 'sdate':
+                        get_value = get_value + ' 00:00:00'
+                    if each_key == 'edate':
+                        get_value = get_value + ' 23:59:59'
+                    if each_key != 'lang_sel' or (each_key == 'lang_sel' and raw_data[each_key] != '0'):
+                        filter_dict[filter_keys[each_key]] = get_value
 
             all_video_data = VideoPlaytime.objects.filter(**filter_dict)\
                 .values('videoid', 'video__title', 'video__user__username').annotate(tot_playtime=Sum('playtime'))\

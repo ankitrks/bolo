@@ -3,8 +3,8 @@ import calendar
 from datetime import datetime
 from django.conf import settings
 
-
 language_options = (
+    ('0', "All"),
     ('1', "English"),
     ('2', "Hindi"),
     ('3', "Tamil"),
