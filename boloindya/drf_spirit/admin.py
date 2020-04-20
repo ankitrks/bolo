@@ -167,7 +167,8 @@ class ReferralCodeAdmin(admin.ModelAdmin):
     get_paytm_number.short_description = 'Paytm Number'
 
     def get_downloads(self, obj):
-        if self.request.GET.get('refcode__created_at__gte') or self.request.GET.get('refcode__created_at__lte'):
+        if self.request.GET.get('refcode__created_at__gte') or self.request.GET.get('refcode__created_at__lte') \
+                or self.request.GET.get('refcode__created_at__lt'):
             fdict = {}
             getstr=[]
             if self.request.GET.get('refcode__created_at__gte'):
@@ -176,6 +177,9 @@ class ReferralCodeAdmin(admin.ModelAdmin):
             if self.request.GET.get('refcode__created_at__lte'):
                 fdict['created_at__lt'] = self.request.GET.get('refcode__created_at__lte')
                 getstr.append('created_at__lt=' + self.request.GET.get('refcode__created_at__lte'))
+            if self.request.GET.get('refcode__created_at__lt'):
+                fdict['created_at__lt'] = self.request.GET.get('refcode__created_at__lt')
+                getstr.append('created_at__lt=' + self.request.GET.get('refcode__created_at__lt'))
             return '<a href="/superman/forum_user/referralcodeused/?code__id__exact=' + str(obj.id) + '&by_user__isnull=1&' + '&'.join(getstr) \
                 + '" target="_blank">' + str(obj.downloads_list().filter(**fdict).distinct('android_id').count()) + '</a>'
         else:
@@ -186,7 +190,8 @@ class ReferralCodeAdmin(admin.ModelAdmin):
     get_downloads.admin_order_field = 'download_count'
 
     def get_signup(self, obj):
-        if self.request.GET.get('refcode__created_at__gte') or self.request.GET.get('refcode__created_at__lte'):
+        if self.request.GET.get('refcode__created_at__gte') or self.request.GET.get('refcode__created_at__lte')\
+                or self.request.GET.get('refcode__created_at__lte'):
             fdict = {}
             getstr=[]
             if self.request.GET.get('refcode__created_at__gte'):
@@ -195,6 +200,9 @@ class ReferralCodeAdmin(admin.ModelAdmin):
             if self.request.GET.get('refcode__created_at__lte'):
                 fdict['created_at__lt'] = self.request.GET.get('refcode__created_at__lte')
                 getstr.append('created_at__lt=' + self.request.GET.get('refcode__created_at__lte'))
+            if self.request.GET.get('refcode__created_at__lt'):
+                fdict['created_at__lt'] = self.request.GET.get('refcode__created_at__lt')
+                getstr.append('created_at__lt=' + self.request.GET.get('refcode__created_at__lt'))
             return '<a href="/superman/forum_user/referralcodeused/?code__id__exact=' + str(obj.id) + '&by_user__isnull=0&' + '&'.join(getstr) \
                 + '" target="_blank">' + str(obj.signup_list().filter(**fdict).distinct('by_user').count()) + '</a>'
         else:
