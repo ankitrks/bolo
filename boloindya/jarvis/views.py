@@ -1549,7 +1549,7 @@ def statistics_all_jarvis(request):
     #     category_choice = int(category_choice)    
     # print(category_choice)
 
-    category_choice = request.GET.get('category_choice', '58')
+    category_choice = request.GET.get('category_choice', '')
 
     print("slab, language_choice, category_choice", slab, language_choice, category_choice)
 
