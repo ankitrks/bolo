@@ -1629,10 +1629,6 @@ def statistics_all_jarvis(request):
     graph_data_avg = DashboardMetricsJarvis.objects.exclude(date__gt = end_date).filter(Q(metrics = metrics) & Q(date__gte = start_date) & Q(date__lte = end_date))      
     
 
-    if(metrics == '4' and (slab in ['0', '1', '2', '9']) and (language_choice in language_index_list) and (category_choice)):
-        print("coming here ....")
-        graph_data = graph_data.filter(Q(metrics_language_options = language_choice) & Q(metrics_slab = slab) & Q(category_id = category_choice))
-
     if metrics == '4':
         if slab in ['0', '1', '2', '9']:
             graph_data = graph_data.filter(metrics_slab = slab)
@@ -1649,16 +1645,10 @@ def statistics_all_jarvis(request):
                     graph_data = graph_data.filter(metrics_slab = slab)
                     
 
-    # if(metrics == '9' and (category_choice)):
-    #     print("coming for me....")
-    #     graph_data = graph_data.filter(Q(metrics_language_options = language_choice) & Q(category_id = category_choice))
-
     if metrics == '9':
         if language_choice in language_index_list:
-            print("lang= "+str(language_choice))
             graph_data = graph_data.filter(metrics_language_options = language_choice) 
         if category_choice:
-            print("categ= "+str(category_choice))
             graph_data = graph_data.filter(category_id = category_choice)    
 
     if data_view == 'weekly':
@@ -1782,7 +1772,6 @@ def get_total_playtime(request):
                 if raw_data.has_key(each_key) and raw_data[each_key]:
                     filter_dict[filter_keys[each_key]] = raw_data[each_key]
 
-            print(filter_dict)
 
             total_playtime = VideoPlaytime.objects.filter(**filter_dict).aggregate(Sum('playtime'))['playtime__sum']
 
@@ -1802,19 +1791,13 @@ def get_playdata(request):
     if request.is_ajax():
         raw_data = json.loads(request.body)
         try:
-            categ_sel = raw_data['categ_sel']
-            lang_sel = raw_data['lang_sel']
-            sdate = raw_data['sdate']
-            edate = raw_data['edate']
+            filter_dict = {}
+            filter_keys = {'sdate' : 'timestamp__gte', 'edate' : 'timestamp__lte', 'categ_sel' : 'video__m2mcategory__id', 'lang_sel' : 'video__language_id'}
+            for each_key in filter_keys:
+                if raw_data.has_key(each_key) and raw_data[each_key]:
+                    filter_dict[filter_keys[each_key]] = raw_data[each_key]
 
-            sdate = sdate + " 00:00:00"
-            edate = edate + " 00:00:00"
-
-            sdate = datetime.datetime.strptime(sdate,"%Y-%m-%d %H:%M:%S").date()
-            edate = datetime.datetime.strptime(edate,"%Y-%m-%d %H:%M:%S").date()
-
-            all_video_data = VideoPlaytime.objects.filter(timestamp__gte=sdate, timestamp__lte=edate,\
-                video__m2mcategory__id=categ_sel, video__language_id=lang_sel)\
+            all_video_data = VideoPlaytime.objects.filter(**filter_dict)\
                 .values('videoid', 'video__title', 'video__user__username').annotate(tot_playtime=Sum('playtime'))\
                 .order_by( '-tot_playtime', 'videoid')[:10]
 
