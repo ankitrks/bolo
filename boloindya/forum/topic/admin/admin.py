@@ -105,6 +105,7 @@ class TopicChangeList(ChangeList):
 class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExportModelAdmin" NOT "admin.ModelAdmin"
     # ordering = ['is_vb', '-id']
     ordering = ('-id',)
+    list_per_page = 50
     search_fields = ('title', 'user__username', 'user__st__name', )
     list_filter = (('date', DateRangeFilter), 'language_id', 'm2mcategory', 'is_moderated', 'is_monetized', 'is_removed', 'is_popular', 'is_boosted')
     filter_horizontal = ('m2mcategory', )
@@ -216,14 +217,13 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
                 obj.delete()
             else:
                 obj.restore()
+        
         if 'is_boosted' in form.changed_data and 'boosted_till' in form.changed_data:
             obj.is_boosted = form.cleaned_data['is_boosted']
             if obj.is_boosted:
                 obj.boosted_till = form.cleaned_data['boosted_till']
                 obj.boosted_start_time = datetime.now()
                 obj.boosted_end_time = datetime.now()+timedelta(hours=obj.boosted_till)
-
-
 
         if 'title' in form.changed_data:
             tag_list = obj.title.split()

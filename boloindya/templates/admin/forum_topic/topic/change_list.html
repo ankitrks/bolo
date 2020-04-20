@@ -16,7 +16,7 @@
         padding: 5px 2px 10px 8px;}
       #result_list ul li{list-style-type: none;}
       #result_list .field-m2mcategory input[type=checkbox]{display: inline-block;}
-      .field-title{max-width: 160px !important;text-align: left !important;width: 100% !important;}
+      .field-title{max-width: 360px !important;text-align: left !important;width: 100% !important;}
       .field-title input[type="text"]{max-width: 320px !important;width: 310px !important;}
       #date-form{margin-top: 5px;padding-right: 10px;}
       #grp-content{top:0;}
@@ -31,6 +31,7 @@
       .field-date{min-width: 100px !important;max-width: 100px !important;}
       .field-language_id select{min-width: 90px !important;width: 90px !important;}
       .field-vb_score{width: 40px !important;max-width: 40px !important;padding: 5px !important;}
+      .title_box{word-break: break-all;}
     </style>
 {% endblock %}
 
@@ -179,6 +180,7 @@
                 grappelli.initSearchbar();
                 grappelli.initFilter();
                 $('.field-date').removeClass('nowrap');
+
                 $('.add-another').on("click", function(e) {
                     e.preventDefault();
                     showAddAnotherPopup(this);
@@ -287,6 +289,13 @@
                     $(each_field).append('<div class="title_box">' + title + '&nbsp;&nbsp;<a href="#" class="edit_title">edit</a></div>');
                     // $(each_field).find('input[type="text"]').val( title.replace( /(<([^>]+)>)/ig, '') );
                 });
+
+                jQuery.each( jQuery('.field-m2mcategory'), function(i, each_element){
+                    var tr_height = jQuery(this).parents('tr').height();
+                    console.log(tr_height);
+                    jQuery(each_element).css('max-height', tr_height + 'px');
+                });
+
             });
         })(grp.jQuery);
     </script>
