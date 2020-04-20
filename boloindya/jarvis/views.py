@@ -1524,6 +1524,7 @@ def statistics_all_jarvis(request):
         category_slab_options.append((str(item.pk), str(item.title)))
 
     category_slab_options = tuple(category_slab_options)
+    print("category slabs = "+str(category_slab_options))
 
     language_index_list = []
     for each in language_options:
@@ -1548,8 +1549,8 @@ def statistics_all_jarvis(request):
     #     category_choice = int(category_choice)    
     # print(category_choice)
 
-    category_choice = request.GET.get('category_choice', '58')      
-    category_choice = int(category_choice)
+    category_choice = request.GET.get('category_choice', '58')
+
     print("slab, language_choice, category_choice", slab, language_choice, category_choice)
 
     if metrics == '6':
@@ -1632,7 +1633,14 @@ def statistics_all_jarvis(request):
         print("coming here ....")
         graph_data = graph_data.filter(Q(metrics_language_options = language_choice) & Q(metrics_slab = slab) & Q(category_id = category_choice))
 
-        #print(graph_data.count())
+    if metrics == '4':
+        if slab in ['0', '1', '2', '9']:
+            graph_data = graph_data.filter(metrics_slab = slab)
+        if language_choice in language_index_list:
+            graph_data = graph_data.filter(metrics_language_options = language_choice)
+        if category_choice:
+            graph_data = graph_data.filter(category_id = category_choice)
+
 
     if metrics in ['2', '5'] and slab:
         if (metrics == '2' and slab in ['3', '4', '5'])\
@@ -1641,10 +1649,17 @@ def statistics_all_jarvis(request):
                     graph_data = graph_data.filter(metrics_slab = slab)
                     
 
-    if(metrics == '9' and (category_choice)):
-        print("coming for me....")
-        graph_data = graph_data.filter(Q(metrics_language_options = language_choice) & Q(category_id = category_choice))
-        
+    # if(metrics == '9' and (category_choice)):
+    #     print("coming for me....")
+    #     graph_data = graph_data.filter(Q(metrics_language_options = language_choice) & Q(category_id = category_choice))
+
+    if metrics == '9':
+        if language_choice in language_index_list:
+            print("lang= "+str(language_choice))
+            graph_data = graph_data.filter(metrics_language_options = language_choice) 
+        if category_choice:
+            print("categ= "+str(category_choice))
+            graph_data = graph_data.filter(category_id = category_choice)    
 
     if data_view == 'weekly':
         x_axis = []
@@ -1752,7 +1767,6 @@ def statistics_all_jarvis(request):
         data['language_filter'] = metrics_language_options
         data['category_filter'] = category_slab_options    
           
-    print(data)    
     return render(request,'jarvis/pages/video_statistics/statistics_all_jarvis.html', data)
 
 @api_view(['POST'])
@@ -1762,9 +1776,15 @@ def get_total_playtime(request):
     if request.is_ajax():
         raw_data = json.loads(request.body)
         try:
-            total_playtime = VideoPlaytime.objects.filter(timestamp__gte = raw_data['sdate'] + ' 00:00:00', timestamp__lte = raw_data['edate'] + ' 23:59:59',\
-                video__m2mcategory__id = raw_data['categ_sel'], video__language_id = raw_data['lang_sel'])\
-                .aggregate(Sum('playtime'))['playtime__sum']
+            filter_dict = {}
+            filter_keys = {'sdate' : 'timestamp__gte', 'edate' : 'timestamp__lte', 'categ_sel' : 'video__m2mcategory__id', 'lang_sel' : 'video__language_id'}
+            for each_key in filter_keys:
+                if raw_data.has_key(each_key) and raw_data[each_key]:
+                    filter_dict[filter_keys[each_key]] = raw_data[each_key]
+
+            print(filter_dict)
+
+            total_playtime = VideoPlaytime.objects.filter(**filter_dict).aggregate(Sum('playtime'))['playtime__sum']
 
             return JsonResponse({"total_playtime": total_playtime}, status=status.HTTP_200_OK, safe=False)         
 

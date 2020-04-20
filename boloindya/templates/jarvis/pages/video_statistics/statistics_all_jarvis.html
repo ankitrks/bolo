@@ -242,6 +242,7 @@
                         <div class="col-sm-3">
                             <div ><b>Select Language</b></div>
                             <select name="lang" id = "lang_filter_1" onchange="GetSelectedLangValue()">
+                                <option value="">All</option>
                                 {% for lang in language_filter %}
                                     <option value="{{ lang.0 }}" {% if language_choice == lang.0 %}selected="selected"{% endif %}>{{ lang.1 }}</option>
                                 {% endfor %}
@@ -253,8 +254,9 @@
                         <div class="col-sm-3">
                             <div><b>Select Category</b></div>
                             <select name = "categ" id = "categ_filter_1" onchange="GetSelectedCategValue()">
+                                <option value="">All</option>
                                 {% for each_cat in category_filter %}
-                                    <option value = "{{ each_cat.0}}" {% if category_choice|stringformat:"i" == each_cat.0 %}selected="selected"{% endif %}>{{ each_cat.1 }}</option>
+                                    <option value = "{{ each_cat.0}}" {% if category_choice == each_cat.0 %}selected="selected"{% endif %}>{{ each_cat.1 }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -418,6 +420,7 @@
                             build += urls[i] + "&";
                         }
                     }
+                    console.log(build);
                     window.location.href =  build.substring(0, build.length - 1);
                     // window.location.href = window.location.href + "&language_choice=" + lang_selected;
                 } else {
@@ -438,6 +441,7 @@
                             build +=urls[i] + "&";
                         }
                     }
+                    console.log(build);
                     window.location.href = build.substring(0, build.length - 1);
                 } else {
                     window.location.href = window.location.href + "&category_choice=" + categ_selected;
@@ -628,9 +632,9 @@
         </script>
 
         <script type="text/javascript">
-            a = convertSecondsToMinsHrs({{ top_data.12.2 }});
-            var playtime_tab = document.getElementById('playtime_last_30');
-            playtime_tab.innerHTML = a;
+            // a = convertSecondsToMinsHrs({{ top_data.12.2 }});
+            // var playtime_tab = document.getElementById('playtime_last_30');
+            // playtime_tab.innerHTML = a;
         </script>
 
     </body>

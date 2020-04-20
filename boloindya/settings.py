@@ -526,7 +526,7 @@ CAREERANNA_VIDEOFILE_UPDATE_URL = "https://www.careeranna.com/search/insertOrUpd
 SITE_ID = 1
 
 
-LOG_DIRS = ['/var/log/boloindya/']
+LOG_DIRS = ['/Users/apple/var/log/boloindya/']
 
 LOGGING = {
     'version': 1,
