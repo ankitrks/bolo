@@ -215,7 +215,8 @@ class ReferralCodeAdmin(admin.ModelAdmin):
 admin.site.register(ReferralCode, ReferralCodeAdmin)
 
 class ReferralCodeUsedAdmin(admin.ModelAdmin):
-    list_display = ('code', 'get_user', 'get_user_name', 'get_phone', 'get_install_time', 'get_signup_time', 'get_last_active_time', 'android_id')
+    list_display = ('code', 'get_user', 'get_user_name', 'get_phone', 'get_install_time', 'get_signup_time', 'get_last_active_time',\
+        'android_id', 'created_at')
     search_fields = ('code__code', )
     list_filter = ('created_at', ('created_at', DateRangeFilter), ) # 'code'
 
