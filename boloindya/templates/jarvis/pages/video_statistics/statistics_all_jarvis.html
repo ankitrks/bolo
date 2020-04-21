@@ -72,7 +72,7 @@
                         if( $('#start_date').val() && $('#end_date').val() ){
                             var sdate = new Date($('#start_date').val());
                             var edate = new Date($('#end_date').val());
-                            if( edate <= sdate ){
+                            if( edate < sdate ){
                                 alert("End date should be greater than Start date.");
                                 $('#start_date, #end_date').val('');
                                 proceed = false;
@@ -168,7 +168,7 @@
         <a href="?metrics={{ top_data.11.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.11.1 }}</h6><h5 style="color: #b52828">{{ top_data.11.2|intcomma }}</h4></a>
         </div>
         
-        <div class="top_box" {% if metrics == top_data.12.0 %} style = "background: bisque;"{%endif %}>
+        <div class="top_box" {% if metrics == top_data.12.0 %} style = "background: bisque;width: 21.8%;"{% else %}style = "width: 21.8%;"{%endif %}>
         <span style ="color: grey; font-size: 8px; float: right;margin: -16px 7px 0px 0px;">* total of last 30 days</span>
         <a href="?metrics={{ top_data.12.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.12.1 }}</h6><h5 id="playtime_last_30" style="color: #b52828"></h4></a>
         </div>    
@@ -242,9 +242,12 @@
                         <div class="col-sm-3">
                             <div ><b>Select Language</b></div>
                             <select name="lang" id = "lang_filter_1" onchange="GetSelectedLangValue()">
-                                <option value="">All</option>
+                                <option value="" selected>All</option>
                                 {% for lang in language_filter %}
-                                    <option value="{{ lang.0 }}" {% if language_choice == lang.0 %}selected="selected"{% endif %}>{{ lang.1 }}</option>
+                                    {% if lang.0 == '0' %}
+                                    {% else %}
+                                        <option value="{{ lang.0 }}" {% if language_choice == lang.0 %}selected="selected"{% endif %}>{{ lang.1 }}</option>
+                                    {% endif %}
                                 {% endfor %}
                             </select>   
                         </div>
@@ -632,9 +635,9 @@
         </script>
 
         <script type="text/javascript">
-            // a = convertSecondsToMinsHrs({{ top_data.12.2 }});
-            // var playtime_tab = document.getElementById('playtime_last_30');
-            // playtime_tab.innerHTML = a;
+            a = convertSecondsToMinsHrs({{ top_data.12.2 }});
+            var playtime_tab = document.getElementById('playtime_last_30');
+            playtime_tab.innerHTML = a;
         </script>
 
     </body>
