@@ -29,7 +29,8 @@ def send_notifications_task(data, pushNotification):
         timepicker = data.get('timepicker', '').replace(" : ", ":")
         image_url = data.get('image_url', '')
         particular_user_id=data.get('particular_user_id', None)
-        category=data.get('category', '')
+        category_ids=data.get('category_ids', '')
+
 
         if notification_type == '3':
             instance_id=instance_id.replace('#', '')
@@ -62,9 +63,10 @@ def send_notifications_task(data, pushNotification):
             exclude_filter = {}
             if lang != '0':
                 language_filter = { 'user__st__language': lang, 'is_uninstalled': False}
-            if category:
+            if category_ids:
+                category_array=category_ids.split(',')
                 try:
-                    pushNotification.category=Category.objects.get(pk=category)
+                    pushNotification.m2mcategory=Category.objects.filter(pk__in=category_array)
                     pushNotification.save()
                 except Exception as e:
                     logger.info(str(e))

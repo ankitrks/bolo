@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
-from .models import VideoUploadTranscode,FCMDevice, PushNotificationUser, PushNotification, StateDistrictLanguage, DashboardMetrics, DashboardMetricsJarvis, BannerUser
+from .models import VideoUploadTranscode,FCMDevice, PushNotificationUser, PushNotification, StateDistrictLanguage, DashboardMetrics, DashboardMetricsJarvis, BannerUser, UserCountNotification
 from functools import update_wrapper
 from django.contrib import admin
 from django.shortcuts import redirect, render
@@ -86,6 +86,10 @@ class BannerUserAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'term', 'response_type')
 
 
+class UserCountNotificationAdmin(admin.ModelAdmin):
+    list_display = ('id', 'language', 'category', 'user_group', 'no_of_user')
+    list_filter = ('category', )
+
 admin.site.unregister(FCMDevice)
 admin.site.register(FCMDevice, FCMDeviceAdmin) 
 admin.site.register(PushNotification)
@@ -94,4 +98,5 @@ admin.site.register(DashboardMetrics, DashboardMetricsAdmin)
 admin.site.register(StateDistrictLanguage, StateDistrictLanguageAdmin)
 admin.site.register(DashboardMetricsJarvis)
 admin.site.register(BannerUser, BannerUserAdmin)
+admin.site.register(UserCountNotification, UserCountNotificationAdmin)
 

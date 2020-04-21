@@ -257,6 +257,7 @@ class PushNotification(RecordTimeStamp):
     notification_type = models.CharField(choices=notification_type_options, blank = True, null = True, max_length=10, default='4')
     instance_id = models.CharField('instance_id', blank = True, null = True, max_length=40, default='')
     category = models.ForeignKey('forum_category.Category', verbose_name=_("category"), related_name="category_notification",null=True,blank=True)
+    m2mcategory = models.ManyToManyField('forum_category.Category', verbose_name=_("category"), related_name="m2mcategories_notification",blank=True)
     user_group = models.CharField(choices=user_group_options, blank = True, null = True, max_length=10, default='0')
     scheduled_time = models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False)
     is_scheduled = models.BooleanField(default=False)
@@ -308,7 +309,18 @@ class BannerUser(RecordTimeStamp):
     def __unicode__(self):
         return self.term
 
+class UserCountNotification(RecordTimeStamp):
 
+    language = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='0')
+    user_group = models.CharField(choices=user_group_options, blank = True, null = True, max_length=10, default='0')
+    category = models.ForeignKey('forum_category.Category', verbose_name=_("category"), related_name="user_count_notification_category",null=True,blank=True)
+    no_of_user = models.PositiveIntegerField(null=True,blank=True,default=0)
+    fcm_users = models.TextField(null=True) 
+
+    class Meta:
+        verbose_name = _("UserCountNotification")
+        verbose_name_plural = _("UserCountNotifications")
+    
 
 
 

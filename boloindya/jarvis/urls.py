@@ -69,6 +69,7 @@ urlpatterns = [
     url(r'^analytics_jarvis/get_totalplaytime/$', views.get_total_playtime),  
 
     url(r'^upload_image_notification/$',views.upload_image_notification, name='search_notification'),  
+    url(r'^get_count_notification/$',views.get_count_notification, name='get_count_notification'),  
 
     url(r'^update_user_time/$',views.update_user_time, name='update_user_time'),
 ]
