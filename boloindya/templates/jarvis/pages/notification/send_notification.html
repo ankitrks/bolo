@@ -484,28 +484,28 @@
         }
 
 
-        // if (upper_title  == '') {
-        //     $('#error_message').show()
-        //     $('#message').text('Please Enter Title')
-        //      return false;
-        // } else if (title  =='') {
-        //     $('#error_message').show()
-        //     $('#message').text('Please Enter Description')
-        //     return false;
-        // }  else if (notification_type != 'Announcements') {
-        //     if (id == '') {
-        //         $('#error_message').show();
-        //         $('#message').text('Please Enter Id / Hash');
-        //         return false;
-        //     }
-        //     if (notification_type != 'hashtag' && notification_type != 'Create Video Byte') {
-        //         if (isNaN(id)) {
-        //             $('#error_message').show();
-        //             $('#message').text('Please Enter Id');
-        //             return false;
-        //         }
-        //     }
-        // }
+        if (upper_title  == '') {
+            $('#error_message').show()
+            $('#message').text('Please Enter Title')
+             return false;
+        } else if (title  =='') {
+            $('#error_message').show()
+            $('#message').text('Please Enter Description')
+            return false;
+        }  else if (notification_type != 'Announcements') {
+            if (id == '') {
+                $('#error_message').show();
+                $('#message').text('Please Enter Id / Hash');
+                return false;
+            }
+            if (notification_type != 'hashtag' && notification_type != 'Create Video Byte') {
+                if (isNaN(id)) {
+                    $('#error_message').show();
+                    $('#message').text('Please Enter Id');
+                    return false;
+                }
+            }
+        }
 
     });
 
