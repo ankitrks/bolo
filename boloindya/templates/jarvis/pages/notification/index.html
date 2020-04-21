@@ -89,7 +89,7 @@
                             <td>{% get_percentage pushNotification.push_notification_id.all.count pushNotification %}</td>
                             <td>{{ pushNotification.get_language_display }}</td>
                             <td>{% get_user_group_name pushNotification.user_group %}{% if pushNotification.days_ago %}<br/>{{ pushNotification.days_ago }} days ago{% endif %}</td>
-                            <td>{% if pushNotification.category %}{{ pushNotification.category.title }}{% else %}All{% endif %}</td>
+                            <td>{% if pushNotification.category %}{{ pushNotification.category.title }}{% elif pushNotification.m2mcategory.all %}{% for each_cat in pushNotification.m2mcategory.all %}{{ each_cat.title }}<br/>{% endfor %}{% else %}All{% endif %}</td>
                             <td>{% if pushNotification.is_scheduled %}<a href="/jarvis/send_notification/?id={{pushNotification.pk}}" class="btn btn-primary operation"><i class="fa fa-pencil" aria-hidden="true"></i></a> <a class="btn btn-danger operation" href="/jarvis/remove_notification/?id={{pushNotification.pk}}"><i class="fa fa-times" aria-hidden="true"></i></a>{% else %}<a class="btn btn-success operation" href="/jarvis/send_notification/?id={{pushNotification.pk}}"><i class="fa fa-repeat" aria-hidden="true"></i></a><a class="btn btn-danger operation" href="/jarvis/remove_notification/?id={{pushNotification.pk}}"><i class="fa fa-trash" aria-hidden="true"></i></a>{% endif %}</td>
                         </tr>
                     {% endfor %}
