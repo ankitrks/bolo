@@ -1141,7 +1141,6 @@ def send_notification(request):
                 data['days_ago'] = days_ago
                         
                 send_notifications_task.delay(data, pushNotification)
-                print(data)
             else:
                 for lang in lang_array:
                     data = {}
@@ -1161,7 +1160,6 @@ def send_notification(request):
                     data['days_ago'] = days_ago
                             
                     send_notifications_task.delay(data, pushNotification)
-                    print(data)
 
         return redirect('/jarvis/notification_panel/')
     if request.method == 'GET':
