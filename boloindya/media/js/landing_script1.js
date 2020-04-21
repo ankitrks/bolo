@@ -69,14 +69,19 @@
                 if(itemVideo!=""){
                   //listItems +='<div class="_video_feed_item"><div class="_ratio_"><div style="padding-top: 148.148%;"><div class="_ratio_wrapper"><a onClick="openVideoInPopup(\''+itemVideo.video_cdn+'\',\''+itemVideo.question_image+'\','+totalCountVideo+');"  class="js-video-link playlist-item '+isPlaying+'" data-mediaid="'+itemVideo.id+'"  href="javascript:void(0);"><div class="_image_card_" style="border-radius: 4px; background-image: url('+itemVideo.question_image+');"><div class="_video_card_play_btn_ _video_card_play_btn_dark _image_card_playbtn_wraaper"></div><div class="_video_card_footer_ _video_card_footer_respond _image_card_footer_wraaper"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+itemVideo.likes_count+'</span></p><span class="_video_card_footer_likes1"><img src="/media/download.svg" alt="likes"> '+itemVideo.likes_count+'</span></div></div></a></div></div></div></div>';
                       listItems +='<div class="feedlist-item">\
-                                      <header class="user-info"><img src="'+profilePics+'" class="avatar" alt="Khushi Kumari">\
+                                      <header class="user-info"><img src="'+profilePics+'" class="avatar" alt="'+itemVideo.user.userprofile.name+'">\
                                           <div>\
-                                              <div class="name">'+itemVideo.user.userprofile.name+'</div>\
+                                              <div class="name"><a href="/'+itemVideo.user.username+'/">'+itemVideo.user.userprofile.name+'</a></div>\
                                               <div class="description"></div>\
                                           </div>\
                                       </header>\
                                       <div class="title">'+itemVideo.title+'</div>\
                                       <div style="text-align: center;" class="jsx-3077367275 video-card">\
+                                        <div class="LoaderBalls hide" id="loader-'+itemVideo.id+'">\
+                                            <div class="LoaderBalls__item"></div>\
+                                            <div class="LoaderBalls__item"></div>\
+                                            <div class="LoaderBalls__item"></div>\
+                                        </div>\
                                           <div style=" position: relative; background-color: rgb(0, 0, 0);object-fit: cover;">\
                                           <video id="player-'+itemVideo.id+'"  preload="auto" data-setup=\'{ "aspectRatio":"640:267", "playbackRates": [1, 1.5, 2] }\' poster="'+itemVideo.question_image+'" class="videoCentered videoSliderPlay" preload="metadata"  width="212" height="160">\
                                         </video>\
@@ -196,12 +201,17 @@ function loaderBoloHide(){
                       listItems +='<div class="feedlist-item">\
                                       <header class="user-info"><img src="'+profilePics+'" class="avatar" alt="Khushi Kumari">\
                                           <div>\
-                                              <div class="name">'+itemVideo.user.userprofile.name+'</div>\
+                                              <div class="name"><a href="/'+itemVideo.user.username+'/">'+itemVideo.user.userprofile.name+'</a></div>\
                                               <div class="description"></div>\
                                           </div>\
                                       </header>\
                                       <div class="title">'+itemVideo.title+'</div>\
                                       <div style="text-align: center;" class="jsx-3077367275 video-card">\
+                                        <div class="LoaderBalls hide" id="loader-'+itemVideo.id+'">\
+                                            <div class="LoaderBalls__item"></div>\
+                                            <div class="LoaderBalls__item"></div>\
+                                            <div class="LoaderBalls__item"></div>\
+                                        </div>\
                                           <div style=" position: relative; background-color: rgb(0, 0, 0);object-fit: cover;">\
                                           <video id="player-'+itemVideo.id+'"  preload="auto" data-setup=\'{ "aspectRatio":"640:267", "playbackRates": [1, 1.5, 2] }\' poster="'+itemVideo.question_image+'" class="videoCentered videoSliderPlay" preload="metadata"  width="212" height="160">\
                                         </video>\
@@ -290,10 +300,11 @@ function delegateClick(videoPlayerId,video_backup_url,video_cdn_url){
   var playerId1="#player-"+videoPlayerId;
   var btnPlayerId = '.videoPlayButtonDetails-'+videoPlayerId;
   var video = document.getElementById(playerId);
-
+  videoLoaderShow(videoPlayerId);
     //openFullscreen(video);
 
     if(video.paused) {
+
       $(".videoSliderPlay").each(function() {
           $(this).get(0).pause();
       });
@@ -315,6 +326,7 @@ function delegateClick(videoPlayerId,video_backup_url,video_cdn_url){
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED,function() {
           video.play();
+          videoLoaderHide(videoPlayerId);
           loaderHide();
       });
 
@@ -329,12 +341,14 @@ function delegateClick(videoPlayerId,video_backup_url,video_cdn_url){
             video.addEventListener('loadedmetadata',function() {
               video.play();
               loaderHide();
+              videoLoaderHide(videoPlayerId);
             });
 
             break;
           case Hls.ErrorTypes.MEDIA_ERROR:
             console.log("fatal media error encountered, try to recover");
             hls.recoverMediaError();
+            videoLoaderShow(videoPlayerId);
             break;
           default:
           // cannot recover
@@ -350,9 +364,9 @@ function delegateClick(videoPlayerId,video_backup_url,video_cdn_url){
         video.addEventListener('loadedmetadata',function() {
           video.play();
           loaderHide();
+          videoLoaderHide(videoPlayerId);
         });
       }
-
 
 
   } else {
@@ -368,6 +382,7 @@ function delegateClick(videoPlayerId,video_backup_url,video_cdn_url){
     video.removeAttribute('controls','true');
     $(btnPlayerId).removeClass('play-button');
     $(btnPlayerId).addClass('play-button');
+    videoLoaderHide(videoPlayerId);
   }
 }
 
@@ -1201,6 +1216,23 @@ function getCreators(popularCreators){
 
 }
 
+
+function videoLoaderShow(videoId){
+  var videoLoaderId="#loader-"+videoId;
+  if($(videoLoaderId).hasClass('hide')){
+    $(videoLoaderId).removeClass('hide')
+  }
+  //$("#loader-"+videoId).show();
+}
+
+function videoLoaderHide(videoId){
+    var videoLoaderId="#loader-"+videoId;
+    if($(videoLoaderId).hasClass('hide')){
+      //$(videoLoaderId).removeClass('hide')
+    }else{
+      $(videoLoaderId).addClass('hide')
+    }
+}
 
 function removeTags(str) {
   if ((str===null) || (str===''))
