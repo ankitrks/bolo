@@ -1140,7 +1140,7 @@ def send_notification(request):
                 data['image_url'] = image_url
                 data['days_ago'] = days_ago
                         
-                # send_notifications_task.delay(data, pushNotification)
+                send_notifications_task.delay(data, pushNotification)
                 print(data)
             else:
                 for lang in lang_array:
@@ -1160,7 +1160,7 @@ def send_notification(request):
                     data['image_url'] = image_url
                     data['days_ago'] = days_ago
                             
-                    # send_notifications_task.delay(data, pushNotification)
+                    send_notifications_task.delay(data, pushNotification)
                     print(data)
 
         return redirect('/jarvis/notification_panel/')
