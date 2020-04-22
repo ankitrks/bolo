@@ -387,7 +387,8 @@ def generate_refer_earn_code():
 def get_ranked_topics(user_id,page,filter_dict,exclude_dict,sort_by='-vb_score'):
     from forum.topic.models import Topic
     from forum.topic.utils import get_redis_vb_seen
-    #print "######### page   ", page,"       ##############"
+    if not page:
+        page = 1
     page_size = settings.REST_FRAMEWORK['PAGE_SIZE']
     filter_dict['is_removed']=False
     filter_dict['is_vb']=True
@@ -398,10 +399,10 @@ def get_ranked_topics(user_id,page,filter_dict,exclude_dict,sort_by='-vb_score')
     if user_id:
         all_seen_vb = get_redis_vb_seen(user_id)
     
-    raw_query = Topic.objects.filter(**filter_dict).exclude(pk__in=all_seen_vb).exclude(**exclude_dict).query.__str__()
-    raw_query += 'AND ' + str(page) + ' = (SELECT COUNT(DISTINCT vb_score) FROM forum_topic_topic S1 WHERE "forum_topic_topic".vb_score <= S1.vb_score AND \
+    raw_query = Topic.objects.filter(**filter_dict).exclude(pk__in=all_seen_vb).exclude(**exclude_dict).query.__str__().split('ORDER BY')[0]
+    raw_query += ' AND ' + str(page) + ' = (SELECT COUNT(DISTINCT vb_score) FROM forum_topic_topic S1 WHERE "forum_topic_topic".vb_score <= S1.vb_score AND \
             S1.user_id = "forum_topic_topic".user_id) order by "forum_topic_topic".' + sort_by.replace('-', '') + ' desc \
-            limit ' + str(page_size)
+            limit ' + str(page_size * 2)
     non_seen_post = list( Topic.objects.raw(raw_query) )
     non_seen_post_count = len(non_seen_post)
 
