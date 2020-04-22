@@ -352,20 +352,32 @@ function video_play_using_video_js_mobile(url,backup_url,image) {
           loaderHide();
           var playPromise = video.play();
 
-          if (playPromise !== undefined) {
-            playPromise.then(_ => {
-              // Automatic playback started!
-              // Show playing UI.
-              console.log('Video Eror');
-            })
-            .catch(error => {
-                console.log('Video Eror1');
-              // Auto-play was prevented
-              // Show paused UI.
-            });
-          }
-
       });
+
+      hls.on(Hls.Events.ERROR, function (event, data) {
+        if (data.fatal) {
+          switch(data.type) {
+          case Hls.ErrorTypes.NETWORK_ERROR:
+            console.log("fatal network error encountered, try to recover");
+            hls.startLoad();
+            video.src = backup_url;
+            video.addEventListener('loadedmetadata',function() {
+              video.play();
+            });
+
+            break;
+          case Hls.ErrorTypes.MEDIA_ERROR:
+            console.log("fatal media error encountered, try to recover");
+            hls.recoverMediaError();
+            break;
+          default:
+            hls.destroy();
+            break;
+          }
+        }
+      });
+
+
      }
 
 
@@ -384,7 +396,7 @@ function video_play_using_video_js_mobile(url,backup_url,image) {
 }
 
 
-function VideoPlayByURLMobile(file,image){
+function VideoPlayByURLMobile(file,backupURL,image){
   loaderShow();
   // var playerInstanceDe = jwplayer("playerDetailsMobile");
   // jwplayer('playerDetailsMobile').setMute(false);
@@ -394,7 +406,7 @@ function VideoPlayByURLMobile(file,image){
 
     $('.videoPlayButton').removeClass('_video_card_playbtn_wraaper');
     var preBufferDone = false;
-    video_play_using_video_js_mobile(file,file,image);
+    video_play_using_video_js_mobile(file,backupURL,image);
     $('.videoPlayButtonDetails').removeClass('play-button');
       
     //   playerInstanceDe.setup({
