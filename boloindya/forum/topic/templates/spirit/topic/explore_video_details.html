@@ -1552,7 +1552,7 @@ content: '';
     }
 
 .videoCentered {
-    height: fit-content !important;
+    margin-top: -38px;
         
 }
 .video-card{
@@ -1567,6 +1567,27 @@ content: '';
 #playlist{
     display: none;
 }
+.footer1{
+    padding: 10px 16px;
+}
+
+
+.boloindya-bottom .bottom-desc {
+    font-size: 15px;
+    line-height: 1.2;
+    word-break: break-all;
+    color: #ffffffad !important;
+}
+.player-header img {
+    position: absolute;
+    right: 10px;
+    top: 7px;
+    width: 9px;
+    z-index: 9999999;
+}
+::-webkit-scrollbar { 
+    display: none;  /* Safari and Chrome */
+}
 
 }
 </style>
@@ -1580,10 +1601,12 @@ content: '';
 <div class="jsx-639186511 page-with-header main-body">
     <div class="jsx-1270455008 container hideOnDesktop" >
         <div style="height:calc(100% - 30px)" class="jsx-1270455008 main jsx-342698747 ">
+
             <div class="jsx-3164575034 home">
                 <div class="jsx-1270455008 top-banner mobileDownPopup hide">
                     <div class="jsx-1270455008"><p class="jsx-1270455008">Boloindya</p><p class="jsx-1270455008">{% blocktrans %} {{Download}} the app to {{like}} this {{video}} {% endblocktrans %}</p></div><div class="jsx-1270455008"><button onclick="downloadAppLink()" class="jsx-1270455008 jsx-download-app">{% trans "Get" %}</button></div>
                 </div>
+                <div class="player-header"><img src="/media/back-icon-w.svg" onclick="goBack()" alt=""></div>
                 <div class="jsx-3164575034 loading">
                     <div class="jsx-4077079786 boloindya-loading"></div>
                 </div>
@@ -1601,11 +1624,12 @@ content: '';
 
                                 <div id="jwBoxPlayAndStop" style="height: 100%">
                                     <!-- <div id="playerDetailsMobile"></div> -->
-                                    <video id="playerDetailsMobile"  class="videoCentered mobilePlayerHeight"></video>
+                                    <video id="playerDetailsMobile"  autoplay="" class="videoCentered mobilePlayerHeight"></video>
+
                                 </div>
 
                                 <div class="jsx-3077367275 video-card-mask"></div>
-                                <div class="jsx-4030482358 theme videoPlayButtonDetails"></div>
+                                <div class="jsx-4030482358 theme videoPlayButtonDetails play-button"></div>
                                 <span class="jsx-3077367275 event-delegate-mask event-delegate-maskMob"></span>
 
                                 <span class="_video_card_"></span><img onclick="muteAndUnmutePlayerDet('playerDetailsMobile');" class="jsx-3077367275 mute-icon" id="mutedImageIdDe"  src="/media/mute_icon.svg">
@@ -1613,25 +1637,30 @@ content: '';
 
                            </div>
                             <div class="sidebar">
-
+                                <a href="/{{user_profile.user.username}}">
                                 <div class="jsx-2177493926 jsx-3813273378 avatar round" style="background-image: url({% if user_profile.profile_pic|length > 1 %}
                                 {{user_profile.profile_pic}}
                             {% else %}
                                 /media/user.svg
                             {% endif %}); width: 48px; height: 48px; flex: 0 0 48px;"></div>
+                            </a>
                                 <div class="jsx-949708032 boloindya-toolbar" style="margin-top: 20px;">
                                     <div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-like " onclick="openMobileDownloadPopup();" style="background-image: url(/media/viewIcon.svg);"><span class="jsx-949708032">{{topic.view_count | shorcountertopic}}</span></div>
                                     <div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-comment" onclick="openMobileDownloadPopup();" style="background-image: url(/media/comments.png);"><span class="jsx-949708032">{{topic.comment_count | shorcountertopic}}</span></div>
                                     <div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-share " onclick="openShareTab()" style="background-image: url(/media/share.png);"><span class="jsx-949708032">{{topic.share_count | shorcountertopic}}</span></div>
                                 </div>
                             </div>
+
                             
-                            <div class="jsx-295561999 boloindya-bottom bottom" style="display: none;">
+                            <div class="jsx-295561999 boloindya-bottom bottom" style="">
                                 <div class="jsx-295561999 boloindya-bottom-left">
-                                    <div class="jsx-295561999 boloindya-bottom-text bottom-name">{{user_profile.user.username}}</div>
-                                    <div class="jsx-295561999 music-icon"></div>
+                                    <div class="jsx-295561999 boloindya-bottom-text bottom-name">{{user_profile.user.username}}
+                                        <h1 class="jsx-1161499050 jsx-1238389090 boloindya-bottom-text bottom-desc">{{topic.title|safe}} </h1>
+                                    </div>
+                                    <!-- <div class="jsx-295561999 music-icon"></div> -->
                                 </div>
-                                <div class="jsx-295561999 boloindya-bottom-right album-item play" style="background-image: url(/media/Userplay.svg);"><img src="/media/1647897074966561.jpeg" class="jsx-295561999"></div>
+
+<!--                                 <div class="jsx-295561999 boloindya-bottom-right album-item play" style="background-image: url(/media/Userplay.svg);"><img src="/media/1647897074966561.jpeg" class="jsx-295561999"></div> -->
                             </div>
                         </div>
 
@@ -1803,6 +1832,10 @@ content: '';
 <script src="/media/js/explore_details.js"></script>
 <!-----------End  ------------>
 <input  type="text"   class="jsx-1861775669 jsx-537314381 hide" id="shareInputboxMobileSingle" value="{{site_base_url}}{{topic.slug}}/{{topic.id}}">
-
+<script>
+function goBack() {
+  window.history.back();
+}
+</script>
 
 {% endblock %}

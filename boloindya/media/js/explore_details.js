@@ -409,53 +409,6 @@ function VideoPlayByURLMobile(file,backupURL,image){
     video_play_using_video_js_mobile(file,backupURL,image);
     $('.videoPlayButtonDetails').removeClass('play-button');
       
-    //   playerInstanceDe.setup({
-    //     file: file,
-    //     controls: false,
-    //     repeat:true,
-    //     //image:image,
-    //     preload: 'metadata',
-    //     autostart:'true',
-    //     primary: "html5",
-    //     mute:'false'
-    //   });
-    //   playerInstanceDe.on('playerDetailsMobile', function() {
-    //         loaderHide();
-    //         preBufferDone = true;
-          
-    //   }); 
-
-    // playerInstanceDe.on('buffer', function() {
-    //     console.log(playerInstanceDe);
-    //     var time = 1;
-
-    // });   
-
-
-    //  playerInstanceDe.on('error', function(event) {
-    //     loaderHide();
-    //     var erroCode=event.code;
-    //     console.log(erroCode);
-    //     playerInstanceDe.setup({
-    //       file:videoFileBackupURL,
-    //       controls: false,
-    //       repeat:true,
-    //       //image:image,
-    //       preload: 'metadata',
-    //       autostart:'true',
-    //       primary: "html5",
-    //       mute:'false'
-    //     });
-
-    // });
-
-    // playerInstanceDe.on('complete', function() {
-    // jwplayer('playerDetailsMobile').setMute(true);
-
-    //   playerInstanceDe.remove();
-    //   playerInstanceDe = null;
-    // });
-
 
  }
 
