@@ -1,5 +1,5 @@
 var video = document.getElementById('player');
-  jQuery('#UCommentLink').on('click',function(){debugger;
+  jQuery('#UCommentLink').on('click',function(){
       $("#comment-input").val("");
       var commentBoxInputStatus=jQuery('#commentInputId').hasClass('hide');
       if(commentBoxInputStatus==true){

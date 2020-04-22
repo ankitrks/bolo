@@ -1039,10 +1039,10 @@ $(document).ready(function() {
     
     if (window.matchMedia("(max-width: 991px)").matches) {
         //VideoPlayByURLMobile(videom3u8,videoFileImage);
-        VideoPlayByURLMobile(videoFileCDN,videoFileImage);
+        VideoPlayByURLMobile(videoFileCDN,videoFileBackupURL,videoFileImage);
         /* The viewport is less than, or equal to, 700 pixels wide */
     } else {
-        video_play_using_video_js(videom3u8,videoFileBackupURL,videoFileImage);
+        video_play_using_video_js(videoFileCDN,videoFileBackupURL,videoFileImage);
       /* The viewport is greater than 700 pixels wide */
     }
     
@@ -1564,6 +1564,9 @@ content: '';
     margin: auto;
     margin-top: 20px;
 }
+#playlist{
+    display: none;
+}
 
 }
 </style>
@@ -1598,7 +1601,7 @@ content: '';
 
                                 <div id="jwBoxPlayAndStop" style="height: 100%">
                                     <!-- <div id="playerDetailsMobile"></div> -->
-                                    <video id="playerDetailsMobile" controls="" class="videoCentered mobilePlayerHeight"></video>
+                                    <video id="playerDetailsMobile"  class="videoCentered mobilePlayerHeight"></video>
                                 </div>
 
                                 <div class="jsx-3077367275 video-card-mask"></div>
@@ -1665,7 +1668,7 @@ content: '';
                                     {% endif %}     </div>
 
           <div class="description">
-<!--               <div class=""><svg viewBox="0 0 24 24" class="Fill(cc)"><path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20v-2z"></path></svg></div> -->
+            <!--<div class=""><svg viewBox="0 0 24 24" class="Fill(cc)"><path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20v-2z"></path></svg></div> -->
           </div>
       </div>
 
@@ -1705,53 +1708,53 @@ content: '';
             </div>
         </div>
 
-                        <div class="_comments_ _comments_top _video_card_big_comments">
-                            <div class="_comments_comments_tunnel">
-                                <div class="_comments_comments_scroll comment_block">
-                                    <div>
-                                             <input type="hidden" name="tpoicId" id="topicID" value="" >
-                                            <input type="hidden" name="topicCreatorUsername" id="topicCreatorUsername" value="" >
+        <div class="_comments_ _comments_top _video_card_big_comments">
+            <div class="_comments_comments_tunnel">
+                <div class="_comments_comments_scroll comment_block">
+                    <div>
+                             <input type="hidden" name="tpoicId" id="topicID" value="" >
+                            <input type="hidden" name="topicCreatorUsername" id="topicCreatorUsername" value="" >
 
-                                        <hr style="margin-bottom: 10px;">
+                        <hr style="margin-bottom: 10px;">
 
-                                        <div class="_6w1l _6w1m _6w1o clearfix clearfix hide"  data-testid="UFI2Composer/root" id="commentInputId" direction="left">
+                        <div class="_6w1l _6w1m _6w1o clearfix clearfix hide"  data-testid="UFI2Composer/root" id="commentInputId" direction="left">
 
-                                            <div class="">
-                                                
-                                                <div class="comment-add">
-                                                    <textarea class='mention' id="comment-input" autocomplete="off" maxlength="60" placeholder="Say something nice.."></textarea>
-                                                    
-                                                </div>
-                                                <div id="buttons1" class="style-scope ytd-commentbox">
-                                                    <div id="cancel-button" class="style-scope ytd-commentbox style-text size-default ytd-button-renderer" >
-                                                        <a class="yt-simple-endpoint style-scope ytd-button-renderer" tabindex="-1">
-                                                            Cancel
-                                                        </a>
-                                                    </div>
-                                                    <div id="submit-button" class="style-scope ytd-commentbox style-primary size-default ytd-button-renderer" >
-                                                        <a class="yt-simple-endpoint style-scope ytd-button-renderer" tabindex="-1">
-                                                            Comment
-                                                        </a>
-                                                    </div>
-
-                                                </div>
-                                                <span class="chars-counter"><span id="chars-current">0</span>/60</span>
-                                                <span class="commentError"></span>
-                                            </div>
-                                        </div>
-                                        <div class="_scroll_load_more_loading_comment">
-                                            <div class="boloindya-loading"></div>
-                                        </div>
-                                        <span class="commentErrorStatus"></span>
-                                        <div id="currentCommentId"></div>
-                                        <div class="videoCommentId"></div>
-                                        <div class="loadMoreComments"></div>
-
-                                    </div>
+                            <div class="">
+                                
+                                <div class="comment-add">
+                                    <textarea class='mention' id="comment-input" autocomplete="off" maxlength="60" placeholder="Say something nice.."></textarea>
+                                    
                                 </div>
-                            </div>
+                                <div id="buttons1" class="style-scope ytd-commentbox">
+                                    <div id="cancel-button" class="style-scope ytd-commentbox style-text size-default ytd-button-renderer" >
+                                        <a class="yt-simple-endpoint style-scope ytd-button-renderer" tabindex="-1">
+                                            Cancel
+                                        </a>
+                                    </div>
+                                    <div id="submit-button" class="style-scope ytd-commentbox style-primary size-default ytd-button-renderer" >
+                                        <a class="yt-simple-endpoint style-scope ytd-button-renderer" tabindex="-1">
+                                            Comment
+                                        </a>
+                                    </div>
 
-                        </div>  
+                                </div>
+                                <span class="chars-counter"><span id="chars-current">0</span>/60</span>
+                                <span class="commentError"></span>
+                            </div>
+                        </div>
+                        <div class="_scroll_load_more_loading_comment">
+                            <div class="boloindya-loading"></div>
+                        </div>
+                        <span class="commentErrorStatus"></span>
+                        <div id="currentCommentId"></div>
+                        <div class="videoCommentId"></div>
+                        <div class="loadMoreComments"></div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>  
 
 
     </div>
