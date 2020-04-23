@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Spirit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-20 11:35+0530\n"
+"POT-Creation-Date: 2020-04-23 13:36+0530\n"
 "PO-Revision-Date: 2015-10-14 19:36+0000\n"
 "Last-Translator: Esteban M. Castro Borsani <ecastroborsani@gmail.com>\n"
 "Language-Team: German (http://www.transifex.com/spirit-project/spirit/"
@@ -15,99 +15,125 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: forum/category/models.py:24
+#: forum/category/models.py:25
 msgid "category parent"
 msgstr "übergeordnete Kategorie (parent)"
 
-#: forum/category/models.py:26
-msgid "title"
-msgstr "Titel"
-
 #: forum/category/models.py:27
-#, fuzzy
-#| msgid "title"
-msgid "hindi_title"
+msgid "title"
 msgstr "Titel"
 
 #: forum/category/models.py:28
 #, fuzzy
 #| msgid "title"
-msgid "tamil_title"
+msgid "hindi_title"
 msgstr "Titel"
 
 #: forum/category/models.py:29
 #, fuzzy
 #| msgid "title"
-msgid "telgu_title"
+msgid "tamil_title"
 msgstr "Titel"
 
 #: forum/category/models.py:30
+#, fuzzy
+#| msgid "title"
+msgid "telgu_title"
+msgstr "Titel"
+
+#: forum/category/models.py:31
 msgid "bengali_title"
 msgstr ""
 
-#: forum/category/models.py:31
+#: forum/category/models.py:32
 msgid "kannada_title"
 msgstr ""
 
-#: forum/category/models.py:32
+#: forum/category/models.py:33
 #, fuzzy
 #| msgid "title"
 msgid "malayalam_title"
 msgstr "Titel"
 
-#: forum/category/models.py:33
+#: forum/category/models.py:34
 #, fuzzy
 #| msgid "title"
 msgid "gujrati_title"
 msgstr "Titel"
 
-#: forum/category/models.py:34
+#: forum/category/models.py:35
 #, fuzzy
 #| msgid "title"
 msgid "marathi_title"
 msgstr "Titel"
 
 #: forum/category/models.py:36
+#, fuzzy
+#| msgid "title"
+msgid "punjabi_title"
+msgstr "Titel"
+
+#: forum/category/models.py:37
+#, fuzzy
+#| msgid "title"
+msgid "odia_title"
+msgstr "Titel"
+
+#: forum/category/models.py:39
 msgid "description"
 msgstr "Beschreibung"
 
-#: forum/category/models.py:37 forum/category/models.py:47
+#: forum/category/models.py:40
 msgid "color"
 msgstr ""
 
-#: forum/category/models.py:38
+#: forum/category/models.py:41
 msgid "Title color in hex format (i.e: #1aafd0)."
 msgstr ""
 
-#: forum/category/models.py:39
+#: forum/category/models.py:42
 msgid "modified at"
 msgstr ""
 
-#: forum/category/models.py:41
+#: forum/category/models.py:44
 msgid "global"
 msgstr ""
 
-#: forum/category/models.py:42
+#: forum/category/models.py:45
 msgid ""
 "Designates whether the topics will bedisplayed in the all-categories list."
 msgstr ""
 
-#: forum/category/models.py:44
+#: forum/category/models.py:47
 msgid "closed"
 msgstr "geschlossen"
 
-#: forum/category/models.py:45
+#: forum/category/models.py:48
 msgid "removed"
 msgstr "entfernt"
 
-#: forum/category/models.py:46
+#: forum/category/models.py:49
 msgid "private"
 msgstr "privat"
 
-#: forum/category/models.py:62
+#: forum/category/models.py:50
+#, fuzzy
+#| msgid "category parent"
+msgid "Category Image URL"
+msgstr "übergeordnete Kategorie (parent)"
+
+#: forum/category/models.py:51
+msgid "Dark Category Image URL"
+msgstr ""
+
+#: forum/category/models.py:66 forum/category/models.py:85
 msgid "category"
 msgstr "Kategorie"
 
-#: forum/category/models.py:63
+#: forum/category/models.py:67
 msgid "categories"
 msgstr "Kategorien"
+
+#: forum/category/models.py:86
+msgid "language"
+msgstr ""

@@ -799,6 +799,9 @@ div.video-controls .progress-bar-parent .progress-bar-background .progress-bar {
     position: absolute;
 
 }
+.recommend-item .arrow-right.jsx-1420774184::after,.recommend-item .arrow-right.jsx-1420774184::before{
+    background: #211e1e;
+}
 
 
 </style>
@@ -896,7 +899,12 @@ div.video-controls .progress-bar-parent .progress-bar-background .progress-bar {
                                 <div class="ajax-load text-center" style="display:none;">
                                     <p><img src="/media/loader.gif"></p>
                                 </div>
+
                                 </main>
+                               <!--  <div class="_scroll_load_more_loading_creator center">
+                                    <div class="boloindya-loading"></div>
+                                </div> -->
+                                <div style="margin-bottom: 100px;"></div>
                         </div>
                     </div>
                 </div>
@@ -937,9 +945,14 @@ div.video-controls .progress-bar-parent .progress-bar-background .progress-bar {
                                                        {{each_popular_item.user.username}}
                                                     {% endif %}</h4>
                                                     <p class="jsx-1420774184">@{{each_popular_item.user.username}}</p>
+
                                                 </div>
                                                 <div class="jsx-1420774184 arrow-right"></div>
                                             </a>
+                                            <span class="unit" style="position: inherit;padding: 1px 59px;">
+                                            <button onclick="follow_user('{{each_popular_item.id}}');" class="_4jy1 _4jy4 _517h _51sy _42ft " style="float: none;" type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-{{each_popular_item.id}} followCheck sx_5da455"></i><span class="btnTextChange-{{each_popular_item.id}}">{% trans "Follow" %}</span>
+                                            </button>
+                                        </span>
                                         </li>
                                     {% endfor %}
 
@@ -1042,6 +1055,6 @@ div.video-controls .progress-bar-parent .progress-bar-background .progress-bar {
 <!-- Start Comments Section -->
 {% include "spirit/_video_play_and_comments.html" %}
 <!-- End Load Comments  -->
-
+<a href="/login/?next={{ request.get_full_path }}" id="gotoLoginPage" ></a> 
 
 {% endblock %}

@@ -194,87 +194,7 @@ function video_play_using_video_js(url,backup_url,image) {
       }
 
 
-  //   video.src="";
-  //   const config = {
-  //       autoStartLoad: true,
-  //       maxBufferSize: 1 * 1000 * 1000,
-  //       manifestLoadingMaxRetry: 300000,
-  //       manifestLoadingMaxRetryTimeout: 1000,
-  //       levelLoadingMaxRetry: 300000,
-  //       levelLoadingMaxRetryTimeout: 1000,
-  //       fragLoadingMaxRetry: 300000,
-  //       fragLoadingMaxRetryTimeout: 1000
-  //   }
 
-    
-
-  //   var hls = new Hls();
-
-  //   if(Hls.isSupported()) {
-  //       let retrying = false;
-        
-  //       video.onplaying = () => {
-  //           isLoading = false;
-  //           hideErrorMsg = false;
-  //           //clearInterval(retry);
-  //           retrying = false;
-
-  //       }
-        
-  //       hls.loadSource(url);
-  //       hls.attachMedia(video);
-  //       hls.on(Hls.Events.MANIFEST_PARSED,function() {
-  //       playPromise= video.play();
-
-  //       if (playPromise !== undefined) {
-  //           playPromise.then(_ => {
-  //           })
-  //           .catch(error => {
-  //               console.log(error);
-
-  //           });
-  //       }
-
-  //           loaderHide();
-  //       });
-    
-  //       hls.on(Hls.Events.ERROR, function (event, data) {
-  //           if (!hideErrorMsg) {
-  //               isLoading = true;
-  //               hideErrorMsg = true;
-  //           }
-  //           if (data.fatal) {
-  //             switch(data.type) {
-  //             case Hls.ErrorTypes.NETWORK_ERROR:
-              
-  //               console.log("fatal network error encountered, try to recover");
-  //               if (!retrying) {
-  //                   if(retryCount<2){
-  //                     retryLiveStream(hls,backup_url);
-  //                   }
-                    
-  //               }
-  //               break;
-  //             case Hls.ErrorTypes.MEDIA_ERROR:
-  //               console.log("fatal media error encountered, try to recover");
-  //               if (!retrying) {
-  //                   if(retryCount<3){
-  //                     retryLiveStream(hls,backup_url);
-  //                   }
-                    
-  //               }
-  //               hls.recoverMediaError();
-  //               break;
-  //             }
-  //           }
-  //       });
-  //   }else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-  //   video.src = file;
-  //   video.addEventListener('loadedmetadata',function() {
-  //     video.play();
-  //     loaderHide();
-  //   });
-  // }
 }
 
 function retryLiveStream(hls, url) {
@@ -294,7 +214,7 @@ function retryLiveStream(hls, url) {
         $("#indexId").val(indexId);
 
         $("#modelPopup").show();
-        jwplayer('player').setMute(false);
+        //jwplayer('player').setMute(false);
         var newSrc='/media/mute_icon.svg';
         $('#mutedImageId').attr('src', newSrc);
         $('.videoPlayButton').removeClass('_video_card_playbtn_wraaper');

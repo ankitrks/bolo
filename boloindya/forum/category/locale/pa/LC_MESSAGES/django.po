@@ -1,0 +1,124 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-04-23 14:14+0530\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: forum/category/models.py:25
+msgid "category parent"
+msgstr ""
+
+#: forum/category/models.py:27
+msgid "title"
+msgstr ""
+
+#: forum/category/models.py:28
+msgid "hindi_title"
+msgstr ""
+
+#: forum/category/models.py:29
+msgid "tamil_title"
+msgstr ""
+
+#: forum/category/models.py:30
+msgid "telgu_title"
+msgstr ""
+
+#: forum/category/models.py:31
+msgid "bengali_title"
+msgstr ""
+
+#: forum/category/models.py:32
+msgid "kannada_title"
+msgstr ""
+
+#: forum/category/models.py:33
+msgid "malayalam_title"
+msgstr ""
+
+#: forum/category/models.py:34
+msgid "gujrati_title"
+msgstr ""
+
+#: forum/category/models.py:35
+msgid "marathi_title"
+msgstr ""
+
+#: forum/category/models.py:36
+msgid "punjabi_title"
+msgstr ""
+
+#: forum/category/models.py:37
+msgid "odia_title"
+msgstr ""
+
+#: forum/category/models.py:39
+msgid "description"
+msgstr ""
+
+#: forum/category/models.py:40
+msgid "color"
+msgstr ""
+
+#: forum/category/models.py:41
+msgid "Title color in hex format (i.e: #1aafd0)."
+msgstr ""
+
+#: forum/category/models.py:42
+msgid "modified at"
+msgstr ""
+
+#: forum/category/models.py:44
+msgid "global"
+msgstr ""
+
+#: forum/category/models.py:45
+msgid ""
+"Designates whether the topics will bedisplayed in the all-categories list."
+msgstr ""
+
+#: forum/category/models.py:47
+msgid "closed"
+msgstr ""
+
+#: forum/category/models.py:48
+msgid "removed"
+msgstr ""
+
+#: forum/category/models.py:49
+msgid "private"
+msgstr ""
+
+#: forum/category/models.py:50
+msgid "Category Image URL"
+msgstr ""
+
+#: forum/category/models.py:51
+msgid "Dark Category Image URL"
+msgstr ""
+
+#: forum/category/models.py:66 forum/category/models.py:85
+msgid "category"
+msgstr ""
+
+#: forum/category/models.py:67
+msgid "categories"
+msgstr ""
+
+#: forum/category/models.py:86
+msgid "language"
+msgstr ""

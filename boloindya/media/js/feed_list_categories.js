@@ -80,7 +80,7 @@
                                       <div class="title">'+itemVideo.title+'</div>\
                                       <div style="text-align: center;" class="jsx-3077367275 video-card">\
                                           <div style=" position: relative; background-color: rgb(0, 0, 0);object-fit: cover;">\
-                                          <video id="player-'+itemVideo.id+'" controls preload="auto" data-setup=\'{ "aspectRatio":"640:267", "playbackRates": [1, 1.5, 2] }\' poster="'+itemVideo.question_image+'" class="videoCentered videoSliderPlay" preload="metadata"  width="212" height="160">\
+                                          <video id="player-'+itemVideo.id+'" controls preload="auto"  poster="'+itemVideo.question_image+'" class="videoCentered videoSliderPlay" preload="metadata"  width="212" height="160">\
                                         </video>\
                                           <div class="jsx-3077367275 video-card-mask"></div>\
                                           <div class="jsx-4030482358 theme playButtonStatus videoPlayButtonDetails-'+itemVideo.id+' play-button"></div>\
@@ -206,7 +206,7 @@ function loaderBoloHide(){
                                       <div class="title">'+itemVideo.title+'</div>\
                                       <div style="text-align: center;" class="jsx-3077367275 video-card">\
                                           <div style=" position: relative; background-color: rgb(0, 0, 0);object-fit: cover;">\
-                                          <video id="player-'+itemVideo.id+'" controls  preload="auto" data-setup=\'{ "aspectRatio":"640:267", "playbackRates": [1, 1.5, 2] }\' poster="'+itemVideo.question_image+'" class="videoCentered videoSliderPlay" preload="metadata"  width="212" height="160">\
+                                          <video id="player-'+itemVideo.id+'" controls  preload="auto"  poster="'+itemVideo.question_image+'" class="videoCentered videoSliderPlay" preload="metadata"  width="212" height="160">\
                                         </video>\
                                           <div class="jsx-3077367275 video-card-mask"></div>\
                                           <div class="jsx-4030482358 theme playButtonStatus videoPlayButtonDetails-'+itemVideo.id+'"></div>\

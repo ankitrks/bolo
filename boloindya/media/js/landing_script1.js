@@ -5,7 +5,10 @@
     var playListData=[];
     $(window).scroll(function() {
         var scorh=Number($(window).scrollTop() + $(window).height());
-        if($(window).scrollTop() + $(window).height() > $("#playlist").height()){
+        var coshh=(Number($("#playlist").height())-1400);
+        console.log(scorh);
+        console.log(coshh);
+        if($(window).scrollTop() + $(window).height() > $("#playlist").height()-1400){
 
             if(checkDataStatus==0){
                 page++;
@@ -1202,6 +1205,8 @@ function getCreators(popularCreators){
         profilePics='/media/user.svg';
     }
 
+
+
     var creatorTemplate='<li class="jsx-3959364739">\
                             <a tag="a" class="jsx-1420774184 recommend-item" href="/'+popularCreators.username+'/">\
                                 <div class="jsx-2177493926 jsx-578937417 avatar round head normal" style="background-image: url('+profilePics+');"></div>\
@@ -1209,7 +1214,10 @@ function getCreators(popularCreators){
                                     <h4 class="jsx-1420774184">'+creatorName+'</h4>\
                                     <p class="jsx-1420774184">@'+popularCreators.username+'</p>\
                                 </div>\
-                                <div class="jsx-1420774184 arrow-right"></div>\
+                                <div class="jsx-1420774184 arrow-right"><span class="unit " >\
+                            <button style="margin-top: -5px;" onclick="follow_user_from_user('+popularCreators.id+');" class="_4jy1 _4jy4 _517h _51sy _42ft " type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followUserStatusChange-'+popularCreators.id+' followCheck sx_5da455"></i><span class="btnTextChangeUser-'+popularCreators.id+'">Follow</span>\
+                            </button>\
+                        </span></div>\
                             </a>\
                         </li>';
     return creatorTemplate;

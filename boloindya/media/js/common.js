@@ -228,7 +228,7 @@ function loaderBoloHide(){
 //==============Global Popup Close=============
 
  $("._global_modal_cancel").click(function(){
-  jwplayer('player').setMute(true);
+  //jwplayer('player').setMute(true);
     $("#modelPopup").hide();
  });
  //=================End=======================
@@ -480,7 +480,7 @@ function follow_user(user_following_id){
 }
 
 
-function follow_user_from_user(user_following_id){
+function follow_user_from_user(user_following_id){debugger;
   var user_id = userLoginStatus;
   var followUrl='/api/v1/follow_user/';
   var user_following_id = user_following_id;
