@@ -86,7 +86,7 @@
                                           <video id="player-'+itemVideo.id+'" controls  preload="auto"  poster="'+itemVideo.question_image+'" class="videoCentered videoSliderPlay" preload="metadata"  width="212" height="160">\
                                         </video>\
                                           <div class="jsx-3077367275 video-card-mask"></div>\
-                                          <div class="jsx-4030482358 theme playButtonStatus videoPlayButtonDetails-'+itemVideo.id+' play-button"></div>\
+                                          <div class="jsx-4030482358 theme playButtonStatus videoPlayButtonDetails-'+itemVideo.id+' "></div>\
                                           <span class="jsx-3077367275 event-delegate-mask event-delegate-maskDesk" onclick="delegateClick('+itemVideo.id+',\''+itemVideo.backup_url+'\',\''+itemVideo.video_cdn+'\')"></span>\
                                           </div>\
                                           <img onclick="muteAndUnmutePlayerFeed('+itemVideo.id+');" class="jsx-3077367275 mute-icon '+itemVideo.id+'" id="mutedImageIdDeDesk" src="/media/mute_icon.svg">\
@@ -216,7 +216,7 @@ function loaderBoloHide(){
                                           <video id="player-'+itemVideo.id+'" controls  preload="auto"  poster="'+itemVideo.question_image+'" class="videoCentered videoSliderPlay" preload="metadata"  width="212" height="160">\
                                         </video>\
                                           <div class="jsx-3077367275 video-card-mask"></div>\
-                                          <div class="jsx-4030482358 theme playButtonStatus videoPlayButtonDetails-'+itemVideo.id+' play-button"></div>\
+                                          <div class="jsx-4030482358 theme playButtonStatus videoPlayButtonDetails-'+itemVideo.id+' "></div>\
                                           <span class="jsx-3077367275 event-delegate-mask event-delegate-maskDesk" onclick="delegateClick('+itemVideo.id+',\''+itemVideo.backup_url+'\',\''+itemVideo.video_cdn+'\')"></span>\
                                           </div>\
                                           <img onclick="muteAndUnmutePlayerFeed('+itemVideo.id+');" class="jsx-3077367275 mute-icon '+itemVideo.id+'" id="mutedImageIdDeDesk" src="/media/mute_icon.svg">\
@@ -311,7 +311,7 @@ function delegateClick(videoPlayerId,video_backup_url,video_cdn_url){
       $(".playButtonStatus").each(function() {
         var checkPlayButtonStatus= $(this).hasClass('play-button');
         if(!checkPlayButtonStatus){
-            $(this).addClass('play-button');
+            //$(this).addClass('play-button');
         }
       });
 
@@ -379,9 +379,9 @@ function delegateClick(videoPlayerId,video_backup_url,video_cdn_url){
     if(!checkPlayButtonStatus){
       $('.playButtonStatus').addClass('play-button');
     }
-    video.removeAttribute('controls','true');
+    //video.removeAttribute('controls','true');
     $(btnPlayerId).removeClass('play-button');
-    $(btnPlayerId).addClass('play-button');
+    //$(btnPlayerId).addClass('play-button');
     videoLoaderHide(videoPlayerId);
   }
 }
