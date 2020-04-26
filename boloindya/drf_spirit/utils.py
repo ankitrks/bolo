@@ -384,7 +384,7 @@ def generate_refer_earn_code():
         my_code = generate_refer_earn_code()
     return my_code
 
-def get_ranked_topics(user_id,page,filter_dict,exclude_dict,sort_by='-vb_score'):
+def get_ranked_topics(user_id,page,filter_dict,exclude_dict,sort_by='-vb_score',q_filter=None):
     from forum.topic.models import Topic
     from forum.topic.utils import get_redis_vb_seen
     #print "######### page   ", page,"       ##############"
@@ -395,11 +395,18 @@ def get_ranked_topics(user_id,page,filter_dict,exclude_dict,sort_by='-vb_score')
     all_seen_vb = []
     if user_id:
         all_seen_vb = get_redis_vb_seen(user_id)
-    non_seen_post_count = Topic.objects.filter(**filter_dict).exclude(pk__in=all_seen_vb).exclude(**exclude_dict).count()
-    if sort_by == '-date':
-        non_seen_post = list(Topic.objects.filter(**filter_dict).exclude(pk__in=all_seen_vb).exclude(**exclude_dict).order_by('-date'))[page*page_size:page_size*(page+3)+1]
+    if q_filter:
+        non_seen_post_count = Topic.objects.filter(**filter_dict).filter(q_filter).exclude(pk__in=all_seen_vb).exclude(**exclude_dict).count()
+        if sort_by == '-date':
+            non_seen_post = list(Topic.objects.filter(**filter_dict).filter(q_filter).exclude(pk__in=all_seen_vb).exclude(**exclude_dict).order_by('-date'))[page*page_size:page_size*(page+3)+1]
+        else:
+            non_seen_post = list(Topic.objects.filter(**filter_dict).filter(q_filter).exclude(pk__in=all_seen_vb).exclude(**exclude_dict).order_by('-vb_score'))[page*page_size:page_size*(page+3)+1]
     else:
-        non_seen_post = list(Topic.objects.filter(**filter_dict).exclude(pk__in=all_seen_vb).exclude(**exclude_dict).order_by('-vb_score'))[page*page_size:page_size*(page+3)+1]
+        non_seen_post_count = Topic.objects.filter(**filter_dict).exclude(pk__in=all_seen_vb).exclude(**exclude_dict).count()
+        if sort_by == '-date':
+            non_seen_post = list(Topic.objects.filter(**filter_dict).exclude(pk__in=all_seen_vb).exclude(**exclude_dict).order_by('-date'))[page*page_size:page_size*(page+3)+1]
+        else:
+            non_seen_post = list(Topic.objects.filter(**filter_dict).exclude(pk__in=all_seen_vb).exclude(**exclude_dict).order_by('-vb_score'))[page*page_size:page_size*(page+3)+1]
     new_order_list=[]
     while(len(non_seen_post)):
         i=0

@@ -1048,6 +1048,11 @@ def rotateImage(virtual_thumb_file,rotationAngle):
 
 
 def update_careeranna_db(uploaded_video):
+    cdn_url = uploaded_video.transcoded_file_url
+    regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+    find_urls_in_string = re.compile(regex, re.IGNORECASE)
+    url = find_urls_in_string.search(uploaded_video.transcoded_file_url)
+    cdn_url = str(uploaded_video.transcoded_file_url.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
     import requests
     headers = {'X-API-TOKEN': 'your_token_here'}
     if uploaded_video.is_active:
@@ -1067,6 +1072,7 @@ def update_careeranna_db(uploaded_video):
         'meta_keywords' : uploaded_video.meta_keywords,
         'video_url' : uploaded_video.transcoded_file_url,
         'backup_url' : uploaded_video.s3_file_url,
+        'cdn_url' : cdn_url,
         'status' : status,
         'duration' : uploaded_video.media_duration
 
