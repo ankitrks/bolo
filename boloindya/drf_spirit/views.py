@@ -852,6 +852,92 @@ def GetPopularHashTag(request):
     return JsonResponse({"results":TopicSerializerwithComment(topics,context={'is_expand':request.GET.get('is_expand',True)},many=True).data,"next":next_url,"previous":previous_url,"count":total_objects})
 
 
+class OldAlgoGetFollowPost(generics.ListCreateAPIView):
+    serializer_class = TopicSerializerwithComment
+    permission_classes = (IsOwnerOrReadOnly,)
+    pagination_class = ShufflePagination 
+
+    def get_serializer_context(self):
+        """
+        Extra context provided to the serializer class.
+        """
+        return {
+            'is_expand': self.request.GET.get('is_expand',True),
+        }
+
+    def get_queryset(self):
+        all_follower = get_redis_following(self.request.user.id)
+        category_follow = list(UserProfile.objects.get(user= self.request.user).sub_category.all())
+        print category_follow
+        all_seen_vb = []
+        if self.request.user.is_authenticated:
+            all_seen_vb = get_redis_vb_seen(self.request.user.id)
+            # all_seen_vb = VBseen.objects.filter(user = self.request.user, topic__title__icontains=challengehash).distinct('topic_id').values_list('topic_id',flat=True)
+        excluded_list =[]
+        boosted_post = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory__in = category_follow),is_removed = False,is_vb = True,).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if boosted_post:
+            boosted_post = sorted(boosted_post, key=lambda x: x.vb_score, reverse=True)
+        for each in boosted_post:
+            excluded_list.append(each.id)
+        superstar_post = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory__in = category_follow),is_removed = False,is_vb = True,user__st__is_superstar = True).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if superstar_post:
+            superstar_post = sorted(superstar_post, key=lambda x: x.vb_score, reverse=True)
+        for each in superstar_post:
+            excluded_list.append(each.id)
+        popular_user_post = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory__in = category_follow),is_removed = False,is_vb = True,user__st__is_superstar = False,user__st__is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if popular_user_post:
+            popular_user_post = sorted(popular_user_post, key=lambda x: x.vb_score, reverse=True)
+        for each in popular_user_post:
+            excluded_list.append(each.id)
+        popular_post = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory__in = category_follow),is_removed = False,is_vb = True,user__st__is_superstar = False,user__st__is_popular=False).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if popular_post:
+            popular_post = sorted(popular_post, key=lambda x: x.vb_score, reverse=True)
+        for each in popular_post:
+            excluded_list.append(each.id)
+        other_post = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory__in = category_follow),is_removed = False,is_vb = True).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
+        orderd_all_seen_post=[]
+        all_seen_post = Topic.objects.filter(is_removed = False,is_vb=True,pk__in=all_seen_vb)
+        if all_seen_post:
+            for each_id in all_seen_vb:
+                for each_vb in all_seen_post:
+                    if each_vb.id == each_id:
+                        orderd_all_seen_post.append(each_vb)
+        topics=list(boosted_post)+list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
+
+
+        return topics
+
+@api_view(['GET'])
+def GetFollowPost(request):
+    all_follower = get_redis_following(request.user.id)
+    category_follow = UserProfile.objects.get(user= request.user).sub_category.all()
+    all_seen_vb = []
+    topics =[]
+    if int(request.GET.get('offset') or 0):
+        page_no = int(int(request.GET.get('offset') or 0)/settings.REST_FRAMEWORK['PAGE_SIZE'])
+    else:
+        page_no = 0
+    q_objects = Q()
+    q_objects |= Q(user_id__in=all_follower)
+    q_objects |= Q(m2mcategory__in = category_follow)
+    if request.user.is_authenticated:
+        topics = get_ranked_topics(request.user.id,page_no,{},{},'-vb_score',q_objects)
+    else:
+        topics = get_ranked_topics(False,page_no,{},{},'-vb_score',q_objects)
+    total_objects = len(topics)
+    paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
+    topics = paginator.page(1)
+    if paginator.num_pages>1:
+        next_url = replace_query_param(request.build_absolute_uri(),'offset',int(request.GET.get('offset') or 0)+int(request.GET.get('limit') or settings.REST_FRAMEWORK['PAGE_SIZE']))
+    else:
+        next_url = ''
+    if int(request.GET.get('offset') or 0):
+        previous_url = replace_query_param(request.build_absolute_uri(),'offset',int(request.GET.get('offset') or 0) - int(request.GET.get('limit') or settings.REST_FRAMEWORK['PAGE_SIZE']))
+    else:
+        previous_url =''
+    return JsonResponse({"results":TopicSerializerwithComment(topics,context={'is_expand':request.GET.get('is_expand',True)},many=True).data,"next":next_url,"previous":previous_url,"count":total_objects})
+
+
         
 
 @api_view(['POST'])
