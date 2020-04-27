@@ -695,6 +695,10 @@ class OldAlgoGetChallenge(generics.ListCreateAPIView):
 
     def get_queryset(self):
         challenge_hash = self.request.GET.get('challengehash')
+        language_id = self.request.GET.get('language_id')
+        language_filter = {}
+        if language_id:
+            language_filter['language_id']=language_id
         challengehash = '#' + challenge_hash
         hash_tag = TongueTwister.objects.get(hash_tag__iexact=challengehash[1:])
         all_seen_vb = []
@@ -702,34 +706,34 @@ class OldAlgoGetChallenge(generics.ListCreateAPIView):
             all_seen_vb = get_redis_vb_seen(self.request.user.id)
             # all_seen_vb = VBseen.objects.filter(user = self.request.user, topic__title__icontains=challengehash).distinct('topic_id').values_list('topic_id',flat=True)
         excluded_list =[]
-        boosted_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,is_boosted=True,boosted_end_time__gte=datetime.now()).exclude(pk__in=all_seen_vb).distinct('user_id')
+        boosted_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,is_boosted=True,boosted_end_time__gte=datetime.now()).filter(**language_filter).exclude(pk__in=all_seen_vb).distinct('user_id')
         if boosted_post:
             boosted_post = sorted(boosted_post, key=lambda x: x.date, reverse=True)
         for each in boosted_post:
             excluded_list.append(each.id)
-        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,user__st__is_superstar = True).exclude(pk__in=all_seen_vb).distinct('user_id')
+        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,user__st__is_superstar = True).filter(**language_filter).exclude(pk__in=all_seen_vb).distinct('user_id')
         if superstar_post:
             superstar_post = sorted(superstar_post, key=lambda x: x.date, reverse=True)
         for each in superstar_post:
             excluded_list.append(each.id)
-        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,user__st__is_superstar = False,user__st__is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id')
+        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,user__st__is_superstar = False,user__st__is_popular=True).filter(**language_filter).exclude(pk__in=all_seen_vb).distinct('user_id')
         if popular_user_post:
             popular_user_post = sorted(popular_user_post, key=lambda x: x.date, reverse=True)
         for each in popular_user_post:
             excluded_list.append(each.id)
-        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id')
+        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True).filter(**language_filter).exclude(pk__in=all_seen_vb).distinct('user_id')
         if popular_post:
             popular_post = sorted(popular_post, key=lambda x: x.date, reverse=True)
         for each in popular_post:
             excluded_list.append(each.id)
-        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,user__st__is_superstar = False,user__st__is_popular=False,is_popular=False).exclude(pk__in=all_seen_vb).distinct('user_id')
+        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,user__st__is_superstar = False,user__st__is_popular=False,is_popular=False).filter(**language_filter).exclude(pk__in=all_seen_vb).distinct('user_id')
         if normal_user_post:
             normal_user_post = sorted(normal_user_post, key=lambda x: x.date, reverse=True)
         for each in normal_user_post:
             excluded_list.append(each.id)
-        other_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
+        other_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag).filter(**language_filter).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
         orderd_all_seen_post=[]
-        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb, hash_tags=hash_tag)
+        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb, hash_tags=hash_tag).filter(**language_filter)
         if all_seen_post:
             for each_id in all_seen_vb:
                 for each_vb in all_seen_post:
@@ -743,6 +747,7 @@ class OldAlgoGetChallenge(generics.ListCreateAPIView):
 @api_view(['GET'])
 def GetChallenge(request):
     challenge_hash = request.GET.get('challengehash')
+    language_id = request.GET.get('language_id')
     challengehash = '#' + challenge_hash
     hash_tag = TongueTwister.objects.get(hash_tag__iexact=challengehash[1:])
     all_seen_vb = []
@@ -751,10 +756,13 @@ def GetChallenge(request):
         page_no = int(int(request.GET.get('offset') or 0)/settings.REST_FRAMEWORK['PAGE_SIZE'])
     else:
         page_no = 0
+    filter_dict = {'hash_tags':hash_tag}
+    if language_id:
+        filter_dict['language_id']=language_id
     if request.user.is_authenticated:
-        topics = get_ranked_topics(request.user.id,page_no,{'hash_tags':hash_tag},{})
+        topics = get_ranked_topics(request.user.id,page_no,filter_dict,{})
     else:
-        topics = get_ranked_topics(False,page_no,{'hash_tags':hash_tag},{})
+        topics = get_ranked_topics(False,page_no,filter_dict,{})
     total_objects = len(topics)
     paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
     topics = paginator.page(1)
@@ -768,10 +776,14 @@ def GetChallenge(request):
         previous_url =''
     return JsonResponse({"results":TopicSerializerwithComment(topics,context={'is_expand':request.GET.get('is_expand',True)},many=True).data,"next":next_url,"previous":previous_url,"count":total_objects})
 
+class SmallSetPagination(PageNumberPagination):
+    page_size = 3
+    page_size_query_param = 'page_size'
+
 class OldAlgoGetPopularHashTag(generics.ListCreateAPIView):
-    serializer_class = TopicSerializerwithComment
+    serializer_class = TongueTwisterWithVideoByteSerializer
     permission_classes = (IsOwnerOrReadOnly,)
-    pagination_class = ShufflePagination 
+    pagination_class = SmallSetPagination 
 
     def get_serializer_context(self):
         """
@@ -779,78 +791,32 @@ class OldAlgoGetPopularHashTag(generics.ListCreateAPIView):
         """
         return {
             'is_expand': self.request.GET.get('is_expand',True),
+            'language_id': self.request.GET.get('language_id',None),
+            'user_id': self.request.user.id
         }
 
     def get_queryset(self):
-        challenge_hash = self.request.GET.get('challengehash')
-        challengehash = '#' + challenge_hash
-        hash_tag = TongueTwister.objects.get(hash_tag__iexact=challengehash[1:])
-        all_seen_vb = []
-        if self.request.user.is_authenticated:
-            all_seen_vb = get_redis_vb_seen(self.request.user.id)
-            # all_seen_vb = VBseen.objects.filter(user = self.request.user, topic__title__icontains=challengehash).distinct('topic_id').values_list('topic_id',flat=True)
-        excluded_list =[]
-        boosted_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,is_boosted=True,boosted_end_time__gte=datetime.now()).exclude(pk__in=all_seen_vb).distinct('user_id')
-        if boosted_post:
-            boosted_post = sorted(boosted_post, key=lambda x: x.date, reverse=True)
-        for each in boosted_post:
-            excluded_list.append(each.id)
-        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,is_popular=True,hash_tags=hash_tag,user__st__is_superstar = True).exclude(pk__in=all_seen_vb).distinct('user_id')
-        if superstar_post:
-            superstar_post = sorted(superstar_post, key=lambda x: x.date, reverse=True)
-        for each in superstar_post:
-            excluded_list.append(each.id)
-        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,is_popular=True,hash_tags=hash_tag,user__st__is_superstar = False,user__st__is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id')
-        if popular_user_post:
-            popular_user_post = sorted(popular_user_post, key=lambda x: x.date, reverse=True)
-        for each in popular_user_post:
-            excluded_list.append(each.id)
-        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,is_popular=True,hash_tags=hash_tag,user__st__is_superstar = False,user__st__is_popular=False).exclude(pk__in=all_seen_vb).distinct('user_id')
-        if popular_post:
-            popular_post = sorted(popular_post, key=lambda x: x.date, reverse=True)
-        for each in popular_post:
-            excluded_list.append(each.id)
-        other_post = Topic.objects.filter(is_removed = False,is_vb = True,is_popular=True,hash_tags=hash_tag).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
-        orderd_all_seen_post=[]
-        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb, hash_tags=hash_tag)
-        if all_seen_post:
-            for each_id in all_seen_vb:
-                for each_vb in all_seen_post:
-                    if each_vb.id == each_id:
-                        orderd_all_seen_post.append(each_vb)
-        topics=list(boosted_post)+list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
+        hash_tags = TongueTwister.objects.all().order_by('-is_popular','-popular_date','-hash_counter')
+        return hash_tags
 
+class GetPopularHashTag(generics.ListCreateAPIView):
+    serializer_class = TongueTwisterWithVideoByteSerializer
+    permission_classes = (IsOwnerOrReadOnly,)
+    pagination_class = SmallSetPagination 
 
-        return topics
+    def get_serializer_context(self):
+        """
+        Extra context provided to the serializer class.
+        """
+        return {
+            'is_expand': self.request.GET.get('is_expand',True),
+            'language_id': self.request.GET.get('language_id',None),
+            'user_id': self.request.user.id
+        }
 
-@api_view(['GET'])
-def GetPopularHashTag(request):
-    challenge_hash = request.GET.get('challengehash')
-    challengehash = '#' + challenge_hash
-    hash_tag = TongueTwister.objects.get(hash_tag__iexact=challengehash[1:])
-    all_seen_vb = []
-    topics =[]
-    if int(request.GET.get('offset') or 0):
-        page_no = int(int(request.GET.get('offset') or 0)/settings.REST_FRAMEWORK['PAGE_SIZE'])
-    else:
-        page_no = 0
-    if request.user.is_authenticated:
-        topics = get_ranked_topics(request.user.id,page_no,{'hash_tags':hash_tag,'is_popular':True},{})
-    else:
-        topics = get_ranked_topics(False,page_no,{'hash_tags':hash_tag,'is_popular':True},{})
-    total_objects = len(topics)
-    paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
-    topics = paginator.page(1)
-    if paginator.num_pages>1:
-        next_url = replace_query_param(request.build_absolute_uri(),'offset',int(request.GET.get('offset') or 0)+int(request.GET.get('limit') or settings.REST_FRAMEWORK['PAGE_SIZE']))
-    else:
-        next_url = ''
-    if int(request.GET.get('offset') or 0):
-        previous_url = replace_query_param(request.build_absolute_uri(),'offset',int(request.GET.get('offset') or 0) - int(request.GET.get('limit') or settings.REST_FRAMEWORK['PAGE_SIZE']))
-    else:
-        previous_url =''
-    return JsonResponse({"results":TopicSerializerwithComment(topics,context={'is_expand':request.GET.get('is_expand',True)},many=True).data,"next":next_url,"previous":previous_url,"count":total_objects})
-
+    def get_queryset(self):
+        hash_tags = TongueTwister.objects.all().order_by('-is_popular','-popular_date','-hash_counter')
+        return hash_tags
 
 class OldAlgoGetFollowPost(generics.ListCreateAPIView):
     serializer_class = TopicSerializerwithComment

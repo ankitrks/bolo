@@ -484,11 +484,19 @@ class TongueTwister(models.Model):
     hash_counter = models.PositiveIntegerField(default=1,null=True,blank=True,db_index=True)
     total_views = models.PositiveIntegerField(default=0,null=True,blank=True,db_index=True)
     is_blocked = models.BooleanField(default=False)
+    is_popular = models.BooleanField(default=False)
+    popular_date = models.DateTimeField(_("Popular Date"),null=True,blank=True)
+
     def __unicode__(self):
         if self.hash_tag:
             return self.hash_tag
         else:
             return "None"
+
+    def save(self,*args, **kwargs):
+        if self.is_popular:
+            self.popular_date = datetime.now()
+        super(TongueTwister, self).save(*args, **kwargs)
 
 publish_options = (
     ('0', "Unpublish"),
