@@ -387,7 +387,7 @@ def generate_refer_earn_code():
 def get_ranked_topics(user_id,page,filter_dict,exclude_dict,sort_by='-vb_score',q_filter=None):
     from forum.topic.models import Topic
     from forum.topic.utils import get_redis_vb_seen
-    #print "######### page   ", page,"       ##############"
+    print "######### page   ", page,"       ##############"
     page_size = settings.REST_FRAMEWORK['PAGE_SIZE']
     filter_dict['is_removed']=False
     filter_dict['is_vb']=True
