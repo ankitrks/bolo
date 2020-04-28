@@ -927,6 +927,7 @@ def old_home(request):
     categories = []
     hash_tags = []
     topics = []
+    all_slider_topic = []
     try:
         categories = Category.objects.filter(parent__isnull=False)[:10]
     except Exception as e1:
@@ -964,6 +965,11 @@ def old_home(request):
     except Exception as e1:
         topics = []
 
+    topicsIds =[16092,25156,26248,23820,3449,4196,4218,17534,12569,12498,9681,9419,9384,8034,8024,26835,24352,14942]
+    try:
+        all_slider_topic = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=topicsIds)[:16]
+    except Exception as e1:
+        all_slider_topic = []
 
     try:
         hash_tags = TongueTwister.objects.order_by('-hash_counter')[:4]
@@ -974,6 +980,7 @@ def old_home(request):
         'categories':categories,
         'hash_tags':hash_tags,
         'topics':topics,
+        'sliderVideos':all_slider_topic,
         'is_single_topic': "Yes",
     }  
     video_slug = request.GET.get('video',None)
