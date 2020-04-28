@@ -1358,7 +1358,7 @@ function getCreatorsResult(){
             currentVideosActiveStatus=0;
             currentHashTagActiveStatus=0;
             currentAllctiveStatus=0;
-            var nextPageData=userItemList.next_page_number;
+            var nextPageData=response.next_page_number;
             jQuery("#nextPageUrlUserId").val(nextPageData);
 
             $("#creatorItemListId").html(userVideoItems);
@@ -1809,7 +1809,7 @@ function getSearchHashtagSuggestion(){
                     currentVideosActiveStatus=0;
                     currentHashTagActiveStatus=1;
                     currentAllctiveStatus=0;
-                    var nextPageData=data.next_page_number;
+                    var nextPageData=response.next_page_number;
                     jQuery("#nextPageUrlHashId").val(nextPageData);
 
 
@@ -1947,7 +1947,7 @@ var page = 1;
 var checkDataStatus=0;
 $(window).scroll(function() {
     var scorh=Number($(window).scrollTop() + $(window).height());
-    console.log('Scol+he '+scorh);
+    //console.log('Scol+he '+scorh);
     // if($(window).scrollTop() + $(window).height() >= $(document).height()-800 && $(window).scrollTop() + $(window).height()<$(document).height()) {
     //     var nextPageUrl=jQuery("#nextPageUrlId").val();
     //     if(undefined !==nextPageUrl && nextPageUrl!=""){
@@ -1979,8 +1979,8 @@ $(document).ready(function(){
 $(window).scroll(function() {
     var scorh=Number($(window).scrollTop() + $(window).height());
     var coshh=(Number($("#playlist").height())-1400);
-    console.log(scorh);
-    console.log(coshh);
+    //console.log(scorh);
+    //console.log(coshh);
     var nextPageUrl=jQuery("#nextPageUrlId").val();
     if($(window).scrollTop() + $(window).height() > $("#userVideosListId").height()-800){
 
@@ -2055,7 +2055,7 @@ function getVideoSearchResult(limit,offset){
             $("#userVideosListId").html(userVideoItems);
             loaderBoloHideDynamic('_scroll_load_more_loading_user_videos');
             playListData=videoItemList;
-            var nextPageData=response.next;
+            var nextPageData=response.next_page_number;
             jQuery("#nextPageUrlId").val(response.next_page_number);
             
             $("#catWithVideoIdRight").empty("");
