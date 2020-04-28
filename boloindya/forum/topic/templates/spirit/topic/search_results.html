@@ -1826,14 +1826,12 @@ function getVideoSearchResult(limit,offset){
 
     var userVideoItems="";
     //var uri='/api/v1/search/'+searchData;
-    //var res = encodeURI(uri);
+    var res = '/api/v1/solr/search/';
     
-    var res = 'http://localhost:8080/careeranna/search/videoSearchList';
-
     jQuery.ajax({
         url:res,
         type:"GET",
-        data:{'page':1,'language_id':language_id},
+        data:{'page':1,'language_id':language_id,'term':searchData},
         success: function(response,textStatus, xhr){
             userVideoItems="";
             var responseData=JSON.parse(response);
