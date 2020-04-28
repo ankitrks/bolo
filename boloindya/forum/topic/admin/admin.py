@@ -61,7 +61,7 @@ class TopicChangeList(ChangeList):
             'is_moderated', 'is_monetized', 'is_removed', 'is_pubsub_popular_push', 'is_boosted', 'boosted_till', 'date', 'm2mcategory') #is_popular
         self.list_display_links = ['id']
         self.list_editable = ('title', 'language_id', 'm2mcategory', 'is_pubsub_popular_push', 'is_monetized', 'is_removed', \
-                'is_moderated','is_boosted','boosted_till')
+                'is_moderated', 'is_boosted', 'boosted_till')
         self.model = model
         self.opts = model._meta
         self.lookup_opts = self.opts
@@ -107,7 +107,7 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
     ordering = ('-id',)
     list_per_page = 50
     search_fields = ('title', 'user__username', 'user__st__name', )
-    list_filter = (('date', DateRangeFilter), 'language_id', 'm2mcategory', 'is_moderated', 'is_monetized', 'is_removed', 'is_popular', 'is_boosted')
+    list_filter = (('date', DateRangeFilter), 'language_id', 'm2mcategory', 'is_moderated', 'is_monetized', 'is_removed', 'is_popular', 'is_boosted') #'user__st__gender'
     filter_horizontal = ('m2mcategory', )
 
     fieldsets = (
@@ -122,7 +122,7 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
         }),
         ('Transcode Options', {
             'classes': ('collapse',),
-            'fields': ('backup_url', ('is_transcoded', 'is_transcoded_error'), 'transcode_job_id', \
+            'fields': ('question_video','backup_url','old_backup_url', ('is_transcoded', 'is_transcoded_error'), 'transcode_job_id', \
                         'transcode_dump', 'transcode_status_dump', 'm3u8_content', 'audio_m3u8_content', 'video_m3u8_content'),
         }),
         ('Others', {

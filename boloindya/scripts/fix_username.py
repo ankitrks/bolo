@@ -157,7 +157,7 @@ def run():
                         elif length_of_mobile_no>8 and length_of_mobile_no<=14:
                             old_mobile_no = userprofile.mobile_no
                             new_mobile_no = validate_indian_number(old_mobile_no,each_user.id)
-                            print "new mobile_no ",old_mobile_no,new_mobile_no
+                            #print "new mobile_no ",old_mobile_no,new_mobile_no
                             if not old_mobile_no == new_mobile_no:
                                 userprofile_update_obj.update(mobile_no = new_mobile_no)
                                 mobile_no_fixed+=1

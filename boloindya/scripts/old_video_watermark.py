@@ -5,6 +5,7 @@ import os
 import boto3
 from django.conf import settings
 from forum.topic.models import Topic
+import re
 
 def ffmpeg(*cmd):
     try:
@@ -33,7 +34,7 @@ def check_file_name_validation(filename,username):
         file_name_words = filename.split('_')
         file_extension = file_name_words[-1].split('.')[-1]
         print 'old_file_name:  ', filename
-        print topic.has_downloaded_url, '---- ', topic.downloaded_url
+        #print topic.has_downloaded_url, '---- ', topic.downloaded_url
         print 'new_file_name:   ',username+'_'+str(epoch_time)+'.'+file_extension.lower()
         return username+'_'+str(epoch_time)+'.'+file_extension
 

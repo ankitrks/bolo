@@ -5,7 +5,7 @@ from datetime import datetime
 
 def run():
     #only testing for march
-    all_objects = VideoPlaytime.objects.all()
+    all_objects = VideoPlaytime.objects.filter(video__isnull = True)
 
     for obj in all_objects:
         try:

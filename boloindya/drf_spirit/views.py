@@ -1275,14 +1275,14 @@ class SolrSearchUser(BoloIndyaGenericAPIView):
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
         users = []
         if search_term:
-            print search_term
-            sqs = SearchQuerySet().models(UserProfile).raw_search(search_term)
+            #print search_term
+            sqs = SearchQuerySet().models(UserProfile).raw_search(search_term).order_by('-follower_count')
             if not sqs:
                 suggested_word = SearchQuerySet().models(UserProfile).auto_query(search_term).spelling_suggestion()
                 if suggested_word:
-                    sqs = SearchQuerySet().models(UserProfile).raw_search(suggested_word)
+                    sqs = SearchQuerySet().models(UserProfile).raw_search(suggested_word).order_by('-follower_count')
             if not sqs:
-                sqs = SearchQuerySet().models(UserProfile).autocomplete(**{'text':search_term})
+                sqs = SearchQuerySet().models(UserProfile).autocomplete(**{'text':search_term}).order_by('-follower_count')
             if sqs:
                 result_page = get_paginated_data(sqs, int(page_size), int(page))
                 print result_page[0].object_list
@@ -1457,14 +1457,15 @@ def get_random_username():
         month = '0'+str(month)
     else:
         month = str(month)
-    x = 'bi'+year+month+''.join(random.choice(string.digits) for _ in range(4))
+    x = 'bi'+year+month+''.join(random.choice(string.digits) for _ in range(7))
     x = x.lower()
     # x = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
     try:
         user = User.objects.get(username=x)
-        get_random_username()
+        x = get_random_username()
     except:
         return x
+    return x
 
 def check_username_valid(username):
     if re.match(r"^[a-z0-9_.-]+$", username):
@@ -1826,8 +1827,11 @@ def createTopic(request):
                             tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
                             is_created = True
                         if not is_created:
-                            tag.hash_counter = F('hash_counter')+1
-                        tag.save()
+                            try:
+                                tag.hash_counter = F('hash_counter')+1
+                                tag.save()
+                            except:
+                                pass
                         topic.hash_tags.add(tag)
         else:
             view_count = random.randint(10,30)
@@ -2424,7 +2428,7 @@ def verify_otp(request):
             otp_obj.save()
             return JsonResponse({'message': 'OTP Validated', 'username' : mobile_no}, status=status.HTTP_200_OK)
         except Exception as e:
-            return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'message': 'Invalid Mobile No / OTP'+str(e)}, status=status.HTTP_400_BAD_REQUEST)
     else:
         return JsonResponse({'message': 'No Mobile No / OTP provided'}, status=status.HTTP_204_NO_CONTENT)
 
@@ -4017,11 +4021,11 @@ def old_algo_get_popular_video_bytes(request):
                         orderd_all_seen_post.append(each_vb)
         
         ''' Manual added post'''
-        manual_added_post = Topic.objects.filter(pk=43351)
+        manual_added_post = Topic.objects.filter(pk=52538)
         topics=list(manual_added_post)+list(boosted_post)+list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
         
         ''' Uncomment below line to remove manual added post'''
-        # topics=list(boosted_post)+list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
+        #topics=list(boosted_post)+list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
         topics = paginator_topics.paginate_queryset(topics, request)
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True, context={'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
     except Exception as e:
@@ -4043,7 +4047,7 @@ def get_popular_video_bytes(request):
             topics = get_ranked_topics(False,int(request.GET.get('page', 0)),{'language_id': language_id,'is_popular':True},{})
         
         ''' Manual added post'''
-        manual_added_post = Topic.objects.filter(pk=43351)
+        manual_added_post = Topic.objects.filter(pk=47688)
         topics=list(manual_added_post)+list(topics)
 
         ''' Uncomment below line to remove manual added post'''

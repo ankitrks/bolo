@@ -11,7 +11,7 @@ def run():
     total_count = len(all_profile)
     counter = 1
     for each_profile in all_profile:
-        print "###################",counter," / ",total_count,"#################",created_counter
+        #print "###################",counter," / ",total_count,"#################",created_counter
         counter+=1
         referral_obj,is_created = ReferralCode.objects.get_or_create(for_user=each_profile.user,purpose='refer_n_earn',is_refer_earn_code=True)
         if is_created:

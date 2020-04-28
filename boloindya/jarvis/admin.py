@@ -96,7 +96,12 @@ admin.site.register(PushNotification)
 admin.site.register(PushNotificationUser)
 admin.site.register(DashboardMetrics, DashboardMetricsAdmin)
 admin.site.register(StateDistrictLanguage, StateDistrictLanguageAdmin)
-admin.site.register(DashboardMetricsJarvis)
+#admin.site.register(DashboardMetricsJarvis)
 admin.site.register(BannerUser, BannerUserAdmin)
 admin.site.register(UserCountNotification, UserCountNotificationAdmin)
 
+class DashboardMetricsJarvisAdmin(admin.ModelAdmin):
+    list_display = ('id', 'metrics', 'metrics_slab', 'date', 'week_no', 'count')
+    list_editable = ('metrics', 'metrics_slab', 'date', 'week_no', 'count')
+    list_filter = ('metrics', 'metrics_slab', 'date')
+admin.site.register(DashboardMetricsJarvis, DashboardMetricsJarvisAdmin)

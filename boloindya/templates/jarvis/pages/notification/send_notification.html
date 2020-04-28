@@ -527,7 +527,7 @@
         if(notification_type == '2') {
             $('#video_user').text('Category Title - ' +title.innerHTML);   
         } else if(notification_type == '0'){
-            $('#video_user').text('Video Title - ' +title.innerHTML);   
+            $('#video_user').text('Video Title - ' +$(title).text());   
         } else if(notification_type == '0'){ 
             $('#video_user').text('User Name - ' +title.innerHTML);
         } else {

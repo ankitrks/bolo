@@ -53,6 +53,13 @@ def send_notifications_task(data, pushNotification):
 
     try:
         if schedule_status == '1':
+            try:
+                if category_ids:
+                    category_array=category_ids.split(',')
+                    pushNotification.m2mcategory.set(Category.objects.filter(pk__in=category_array))
+                    pushNotification.save()
+            except Exception as e:
+                logger.info(str(e))
             if datepicker:
                 pushNotification.scheduled_time = datetime.strptime(datepicker + " " + timepicker, "%m/%d/%Y %H:%M")
             pushNotification.is_scheduled = True
@@ -66,7 +73,7 @@ def send_notifications_task(data, pushNotification):
             if category_ids:
                 category_array=category_ids.split(',')
                 try:
-                    pushNotification.m2mcategory=Category.objects.filter(pk__in=category_array)
+                    pushNotification.m2mcategory.set(Category.objects.filter(pk__in=category_array))
                     pushNotification.save()
                 except Exception as e:
                     logger.info(str(e))
@@ -158,7 +165,7 @@ def vb_create_task(topic_id):
                 # topic.is_transcoded = True
                 topic.save()
                 topic.update_m3u8_content()
-                create_downloaded_url(topic_id)
+                #create_downloaded_url(topic_id)
 
 @app.task
 def user_ip_to_state_task(user_id,ip):
