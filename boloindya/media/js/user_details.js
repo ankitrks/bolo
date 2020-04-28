@@ -6,7 +6,7 @@ var page = 1;
 var checkDataStatus=0;
 $(window).scroll(function() {
     var scorh=Number($(window).scrollTop() + $(window).height());
-    console.log('Scol+he '+scorh);
+    //console.log('Scol+he '+scorh);
     //if($(window).scrollTop() + $(window).height() >= $(document).height()-800 && $(window).scrollTop() + $(window).height()<$(document).height()) {
     if($(window).scrollTop() + $(window).height() > $("#userVideosListId").height() && checkDataStatus==0){
         
@@ -18,7 +18,7 @@ $(window).scroll(function() {
         }
 
     }
-    console.log('documentHe- '+$(document).height());
+    //console.log('documentHe- '+$(document).height());
 });
 
 
@@ -120,6 +120,8 @@ function loadMoreData(NextPageUrl){
 
 
 function getVideoItem(videoItem,itemCount){
+    //<a href="/explore/'+itemVideo.slug+'/'+itemVideo.id+'" onClick="openVideoInPopup(\''+videoItem.question_video+'\',\''+videoItem.question_image+'\','+itemCount+');" class="jsx-2893588005 video-feed-item-wrapper">\
+
     var content_title="";
     var videoTitle="";
         videoTitle=removeTags(videoItem.title);
@@ -128,7 +130,7 @@ function getVideoItem(videoItem,itemCount){
             <div class="jsx-1410658769 _ratio_">\
                 <div class="jsx-1410658769" style="padding-top: 148.438%;">\
                     <div class="jsx-1410658769 _ratio_wrapper">\
-                        <a href="javascript:void(0)" onClick="openVideoInPopup(\''+videoItem.question_video+'\',\''+videoItem.question_image+'\','+itemCount+');" class="jsx-2893588005 video-feed-item-wrapper">\
+                        <a href="/explore/'+videoItem.slug+'/'+videoItem.id+'"  class="jsx-2893588005 video-feed-item-wrapper">\
                             <div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+videoItem.question_image+');">\
                                 <div class="jsx-3077367275 video-card default">\
                                     <div class="jsx-3077367275 video-card-mask">\
@@ -361,12 +363,18 @@ function video_play_using_video_js(url,backup_url,image) {
     // });
 
     singleItemData=playListData[indexId];
+    console.log(singleItemData);
     var video_backup="";
     var video_backup=singleItemData.question_video;
     video_play_using_video_js(file,video_backup,image);
 
+    var profilePics = singleItemData.user.userprofile.profile_pic;
+    if(profilePics==''){
+       profilePics= '/media/user.svg';
+    }
+
     var shareURL=site_base_url+singleItemData.slug+'/'+singleItemData.id+'';
-    var sideBarDetails='<div onClick="openMobileDownloadPopup();" class="jsx-2177493926 jsx-3813273378 avatar round" style="background-image: url(/media/musically_100x100.jpeg); width: 48px; height: 48px; flex: 0 0 48px;"></div><div class="jsx-949708032 boloindya-toolbar" style="margin-top: 20px;"><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-like" onClick="openMobileDownloadPopup();" style="background-image: url(/media/viewIcon.svg);"><span class="jsx-949708032">'+singleItemData.likes_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-comment" onClick="openMobileDownloadPopup();" style="background-image: url(/media/comments.svg);"><span class="jsx-949708032">'+singleItemData.comment_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-share" onclick="openShareTab()" style="background-image: url(/media/share.svg);"><span class="jsx-949708032">'+singleItemData.total_share_count+'</span></div></div>';
+    var sideBarDetails='<div onClick="openMobileDownloadPopup();" class="jsx-2177493926 jsx-3813273378 avatar round" style="background-image: url('+profilePics+'); width: 48px; height: 48px; flex: 0 0 48px;"></div><div class="jsx-949708032 boloindya-toolbar" style="margin-top: 20px;"><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-like" onClick="openMobileDownloadPopup();" style="background-image: url(/media/viewIcon.svg);"><span class="jsx-949708032">'+singleItemData.likes_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-comment" onClick="openMobileDownloadPopup();" style="background-image: url(/media/comments.png);"><span class="jsx-949708032">'+singleItemData.comment_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-share" onclick="openShareTab()" style="background-image: url(/media/share.png);"><span class="jsx-949708032">'+singleItemData.total_share_count+'</span></div></div>';
     $("#topicID").val(singleItemData.id);
     $("#currentPlayUserId").val(singleItemData.user.userprofile.id);
     $("#topicCreatorUsername").val(singleItemData.user.username);
@@ -385,10 +393,7 @@ function video_play_using_video_js(url,backup_url,image) {
     var userprofileName=singleItemData.user.userprofile.name;
     var userHandleName=singleItemData.user.username;
     var videoTitle=singleItemData.title;
-    var profilePics = singleItemData.user.userprofile.profile_pic;
-    if(profilePics==''){
-       profilePics= '/media/user.svg';
-    }
+
 
     var likeStatus="";
 

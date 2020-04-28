@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Spirit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-20 11:35+0530\n"
+"POT-Creation-Date: 2020-04-28 09:33+0530\n"
 "PO-Revision-Date: 2015-10-14 19:35+0000\n"
 "Last-Translator: Esteban M. Castro Borsani <ecastroborsani@gmail.com>\n"
 "Language-Team: German (http://www.transifex.com/spirit-project/spirit/"
@@ -44,250 +44,352 @@ msgstr "Zeitzone"
 msgid "Current time is: %(date)s %(time)s"
 msgstr "Aktuelle Zeit: %(date)s %(time)s"
 
-#: forum/user/models.py:35 forum/user/models.py:152
+#: forum/user/models.py:82 forum/user/models.py:256
 msgid "profile"
 msgstr ""
 
-#: forum/user/models.py:38
+#: forum/user/models.py:83
+msgid "slug"
+msgstr ""
+
+#: forum/user/models.py:84
 msgid "location"
 msgstr "Ort"
 
-#: forum/user/models.py:39
+#: forum/user/models.py:85
 msgid "last seen"
 msgstr "zuletzt gesehen"
 
-#: forum/user/models.py:40
+#: forum/user/models.py:86
 msgid "last ip"
 msgstr "letzte ip"
 
-#: forum/user/models.py:41
+#: forum/user/models.py:87
 msgid "time zone"
 msgstr "Zeitzone"
 
-#: forum/user/models.py:42
+#: forum/user/models.py:88
 #, fuzzy
 #| msgid "moderator status"
 msgid "expert status"
 msgstr "Moderator Status"
 
-#: forum/user/models.py:43
+#: forum/user/models.py:89
 msgid "administrator status"
 msgstr "Administrator Status"
 
-#: forum/user/models.py:44
+#: forum/user/models.py:90
 msgid "moderator status"
 msgstr "Moderator Status"
 
-#: forum/user/models.py:45
+#: forum/user/models.py:91
 msgid "verified"
 msgstr ""
 
-#: forum/user/models.py:46
+#: forum/user/models.py:92
 msgid ""
 "Designates whether the user has verified his account by email or by other "
 "means. Un-select this to let the user activate his account."
 msgstr ""
 
-#: forum/user/models.py:50
+#: forum/user/models.py:96
 msgid "topic count"
 msgstr "Themen"
 
-#: forum/user/models.py:51
+#: forum/user/models.py:97
 msgid "comment count"
 msgstr "Kommentare"
 
-#: forum/user/models.py:52
+#: forum/user/models.py:98
 msgid "Is Popular"
 msgstr ""
 
-#: forum/user/models.py:53
+#: forum/user/models.py:99
 msgid "Is Superstar"
 msgstr ""
 
-#: forum/user/models.py:54
+#: forum/user/models.py:100
 msgid "Is Business"
 msgstr ""
 
-#: forum/user/models.py:56
+#: forum/user/models.py:102
 msgid "last post hash"
 msgstr ""
 
-#: forum/user/models.py:57
+#: forum/user/models.py:103
 #, fuzzy
 #| msgid "last seen"
 msgid "last post on"
 msgstr "zuletzt gesehen"
 
-#: forum/user/models.py:59
+#: forum/user/models.py:104
+#, fuzzy
+#| msgid "Profile"
+msgid "Cover Pic"
+msgstr "Profil"
+
+#: forum/user/models.py:106
 #, fuzzy
 #| msgid "Profile"
 msgid "Profile Pic"
 msgstr "Profil"
 
-#: forum/user/models.py:60 forum/user/models.py:185
+#: forum/user/models.py:107 forum/user/models.py:293
 msgid "Name"
 msgstr ""
 
-#: forum/user/models.py:61
+#: forum/user/models.py:108
 msgid "Bio"
 msgstr ""
 
-#: forum/user/models.py:62
+#: forum/user/models.py:109
 msgid "Date of Birth"
 msgstr ""
 
-#: forum/user/models.py:64
+#: forum/user/models.py:111
 msgid "About"
 msgstr ""
 
-#: forum/user/models.py:66
+#: forum/user/models.py:113
 msgid "Sub Category"
 msgstr ""
 
-#: forum/user/models.py:69
+#: forum/user/models.py:116
 msgid "Social Identifier"
 msgstr ""
 
-#: forum/user/models.py:70
+#: forum/user/models.py:117 forum/user/models.py:145
 msgid "Mobile No"
 msgstr ""
 
-#: forum/user/models.py:82
+#: forum/user/models.py:130
 msgid "Latitude"
 msgstr ""
 
-#: forum/user/models.py:83
+#: forum/user/models.py:131
 msgid "Langitude"
 msgstr ""
 
-#: forum/user/models.py:86
+#: forum/user/models.py:134
 msgid "LinkedIn URL"
 msgstr ""
 
-#: forum/user/models.py:87
+#: forum/user/models.py:135
 msgid "Twitter ID"
 msgstr ""
 
-#: forum/user/models.py:88
+#: forum/user/models.py:136
 msgid "Instagram ID"
 msgstr ""
 
-#: forum/user/models.py:90 forum/user/models.py:239
+#: forum/user/models.py:138 forum/user/models.py:350
 msgid "Click Id"
 msgstr ""
 
-#: forum/user/models.py:91
+#: forum/user/models.py:139
 msgid "Click Id Response"
 msgstr ""
 
-#: forum/user/models.py:97
+#: forum/user/models.py:143
+msgid "State Name"
+msgstr ""
+
+#: forum/user/models.py:144
+msgid "City Name"
+msgstr ""
+
+#: forum/user/models.py:150
 msgid "forum profile"
 msgstr ""
 
-#: forum/user/models.py:98
+#: forum/user/models.py:151
 msgid "forum profiles"
 msgstr ""
 
-#: forum/user/models.py:145
+#: forum/user/models.py:207
+msgid "year"
+msgstr ""
+
+#: forum/user/models.py:208
+msgid "month"
+msgstr ""
+
+#: forum/user/models.py:209
+msgid "Pay Date"
+msgstr ""
+
+#: forum/user/models.py:210
+msgid "Amount Payed"
+msgstr ""
+
+#: forum/user/models.py:212
+msgid "Total Videos Created"
+msgstr ""
+
+#: forum/user/models.py:214
+msgid "Total Monetized Videos"
+msgstr ""
+
+#: forum/user/models.py:215
+msgid "Left For Moderation"
+msgstr ""
+
+#: forum/user/models.py:216
+#, fuzzy
+#| msgid "Likes"
+msgid "Total Likes"
+msgstr "Likes"
+
+#: forum/user/models.py:217
+#, fuzzy
+#| msgid "Comments"
+msgid "Total Comments"
+msgstr "Kommentare"
+
+#: forum/user/models.py:218 forum/user/models.py:220
+msgid "Total Views"
+msgstr ""
+
+#: forum/user/models.py:219
+msgid "Total Shares"
+msgstr ""
+
+#: forum/user/models.py:249
 msgid "Minimum Bolo Score For Monetize/Bolo Score Equivalent Money"
 msgstr ""
 
-#: forum/user/models.py:146
+#: forum/user/models.py:250
 msgid "Bolo Equivalent Money in INR"
 msgstr ""
 
-#: forum/user/models.py:153
+#: forum/user/models.py:257
 msgid "Android Logs"
 msgstr ""
 
-#: forum/user/models.py:154
+#: forum/user/models.py:258
 msgid "Log Type"
 msgstr ""
 
-#: forum/user/models.py:162 forum/user/models.py:170 forum/user/models.py:180
+#: forum/user/models.py:259
+msgid "is_executed"
+msgstr ""
+
+#: forum/user/models.py:267 forum/user/models.py:276 forum/user/models.py:287
 msgid "user"
 msgstr "Benutzer_in"
 
-#: forum/user/models.py:163 forum/user/models.py:171
+#: forum/user/models.py:268 forum/user/models.py:277
 msgid "videoid"
 msgstr ""
 
-#: forum/user/models.py:164 forum/user/models.py:173
+#: forum/user/models.py:269 forum/user/models.py:279
 msgid "playtime"
 msgstr ""
 
-#: forum/user/models.py:165 forum/user/models.py:175
+#: forum/user/models.py:270 forum/user/models.py:281
 msgid "timestamp"
 msgstr ""
 
-#: forum/user/models.py:172
+#: forum/user/models.py:278
 #, fuzzy
 #| msgid "location"
 msgid "duration"
 msgstr "Ort"
 
-#: forum/user/models.py:174
+#: forum/user/models.py:280
 msgid "percentage_viewed"
 msgstr ""
 
-#: forum/user/models.py:181
+#: forum/user/models.py:288
 msgid "totaltime"
 msgstr ""
 
-#: forum/user/models.py:186
+#: forum/user/models.py:289
+#, fuzzy
+#| msgid "Preferences"
+msgid "reference_time"
+msgstr "Vorlieben"
+
+#: forum/user/models.py:294
 msgid "Version"
 msgstr ""
 
-#: forum/user/models.py:187
+#: forum/user/models.py:295
 msgid "Version To be Pushed"
 msgstr ""
 
-#: forum/user/models.py:189
+#: forum/user/models.py:297
 #, fuzzy
 #| msgid "Change my email"
 msgid "Changes Title"
 msgstr "Meine E-Mailadresse ändern"
 
-#: forum/user/models.py:190
+#: forum/user/models.py:298
 #, fuzzy
 #| msgid "Change password"
 msgid "Changes"
 msgstr "Passwort ändern"
 
-#: forum/user/models.py:200
+#: forum/user/models.py:308
 msgid "Page Name"
 msgstr ""
 
-#: forum/user/models.py:201
+#: forum/user/models.py:309
 msgid "Page Description"
 msgstr ""
 
-#: forum/user/models.py:207
+#: forum/user/models.py:315
 msgid "Ref Code"
 msgstr ""
 
-#: forum/user/models.py:209
+#: forum/user/models.py:317
 msgid "Purpose"
 msgstr ""
 
-#: forum/user/models.py:210
+#: forum/user/models.py:318
 msgid "Playstore URL"
 msgstr ""
 
-#: forum/user/models.py:211
+#: forum/user/models.py:319
 msgid "live"
 msgstr ""
 
-#: forum/user/models.py:240
+#: forum/user/models.py:320
+msgid "Is Refer Earn Code?"
+msgstr ""
+
+#: forum/user/models.py:351
 msgid "PID"
 msgstr ""
 
-#: forum/user/models.py:241
+#: forum/user/models.py:352
 msgid "Referral Dump"
 msgstr ""
 
-#: forum/user/models.py:242
+#: forum/user/models.py:353
 msgid "android_id"
+msgstr ""
+
+#: forum/user/models.py:359 forum/user/models.py:370
+#, fuzzy
+#| msgid "User menu"
+msgid "User"
+msgstr "Benutzer_innen Menü"
+
+#: forum/user/models.py:360
+msgid "Contact"
+msgstr ""
+
+#: forum/user/models.py:366
+msgid "Contact Name"
+msgstr ""
+
+#: forum/user/models.py:367
+msgid "Contact Number"
+msgstr ""
+
+#: forum/user/models.py:368
+msgid "Contact Email"
 msgstr ""
 
 #: forum/user/templates/spirit/user/_profile.html:12

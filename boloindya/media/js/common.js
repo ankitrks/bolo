@@ -155,11 +155,15 @@ jQuery("#boloSideMenu").click(function(e){
       var checClass="";
        checClass=jQuery(".boloSideMenuClass").hasClass('hamburger-menu-active');
         if(checClass){
+            jQuery("#subHeader").removeClass('zindexChange');
             jQuery(".boloSideMenuClass").removeClass('hamburger-menu-active');  
             jQuery(".drawerOpenAndClose").removeClass('drawer-enter drawer-enter-active');
             jQuery(".drawerOpenAndClose").addClass('drawer-exit drawer-exit-active');  
             jQuery(".drawer-enter-done").addClass('hide');
       }else {
+            jQuery("#subHeader").removeClass('zindexChange');
+            jQuery("#subHeader").addClass('zindexChange');
+            
             jQuery(".boloSideMenuClass").addClass('hamburger-menu-active'); 
             jQuery(".boloSideMenuClass").removeClass('drawer-exit drawer-exit-active');
             jQuery(".drawerOpenAndClose").addClass('drawer-enter drawer-enter-active');
@@ -224,7 +228,7 @@ function loaderBoloHide(){
 //==============Global Popup Close=============
 
  $("._global_modal_cancel").click(function(){
-  jwplayer('player').setMute(true);
+  //jwplayer('player').setMute(true);
     $("#modelPopup").hide();
  });
  //=================End=======================
@@ -252,6 +256,23 @@ function copyShareLinkMobile() {
   copyText.select();
   copyText.setSelectionRange(0, 99999)
   document.execCommand("copy");
+  jQuery('.linkCopies').html('<span style="color:green">Link Copied...</span>').fadeOut(2000);
+
+}
+
+function copyShareLinkMobileLink() {debugger;
+  //var copyText = $("#shareInputboxMobileSingle").val();
+
+  chckHideClass =$("#shareInputboxMobileSingle").hasClass('hide');
+  if(chckHideClass){
+    $("#shareInputboxMobileSingle").removeClass('hide');
+    var copyText = document.getElementById("shareInputboxMobileSingle");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999)
+    document.execCommand("copy");
+    //$("#shareInputboxMobileSingle").addClass('hide');
+  }
+  
   jQuery('.linkCopies').html('<span style="color:green">Link Copied...</span>').fadeOut(2000);
 
 }
@@ -399,6 +420,7 @@ function loginDataByUser(){
 	var url='/api/v1/user/user_data/';
 	var user_id = userLoginStatus;
 	var loginStatus=check_login_status();
+  
 	if(loginStatus==false && user_id!="" && user_id!='None'){
 	    $.ajax({
 	        type: 'POST',
@@ -458,7 +480,7 @@ function follow_user(user_following_id){
 }
 
 
-function follow_user_from_user(user_following_id){
+function follow_user_from_user(user_following_id){debugger;
   var user_id = userLoginStatus;
   var followUrl='/api/v1/follow_user/';
   var user_following_id = user_following_id;

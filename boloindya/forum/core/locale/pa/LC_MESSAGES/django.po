@@ -1,0 +1,362 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-04-28 09:33+0530\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: forum/core/tags/time.py:33
+msgid "now"
+msgstr ""
+
+#: forum/core/tags/time.py:37
+#, python-format
+msgid "%(count)ss"
+msgstr ""
+
+#: forum/core/tags/time.py:41
+#, python-format
+msgid "%(count)sm"
+msgstr ""
+
+#: forum/core/tags/time.py:44
+#, python-format
+msgid "%(count)sh"
+msgstr ""
+
+#: forum/core/templates/403.html:10
+msgid "You do not have sufficient permissions to access this page"
+msgstr ""
+
+#: forum/core/templates/404.html:10
+msgid "what you are looking for is gone..."
+msgstr ""
+
+#: forum/core/templates/spirit/_base.html:45
+#: forum/core/templates/spirit/_base_index_user.html:40
+#, python-brace-format
+msgid "{user} has mention you on {topic}"
+msgstr ""
+
+#: forum/core/templates/spirit/_base.html:46
+#: forum/core/templates/spirit/_base_index_user.html:41
+#, python-brace-format
+msgid "{user} has commented on {topic}"
+msgstr ""
+
+#: forum/core/templates/spirit/_base.html:47
+#: forum/core/templates/spirit/_base_index_user.html:42
+msgid "Show all"
+msgstr ""
+
+#: forum/core/templates/spirit/_base.html:48
+#: forum/core/templates/spirit/_base_index_user.html:43
+msgid "No new notifications, yet"
+msgstr ""
+
+#: forum/core/templates/spirit/_base.html:49
+#: forum/core/templates/spirit/_base_index_user.html:44
+msgid "unread"
+msgstr ""
+
+#: forum/core/templates/spirit/_header.html:22
+msgid "Profile"
+msgstr "ਪ੍ਰੋਫਾਈਲ"
+
+#: forum/core/templates/spirit/_header.html:23
+msgid "Topics"
+msgstr ""
+
+#: forum/core/templates/spirit/_header.html:24
+msgid "Unread topics"
+msgstr ""
+
+#: forum/core/templates/spirit/_header.html:25
+msgid "Private topics"
+msgstr ""
+
+#: forum/core/templates/spirit/_header.html:28
+msgid "Admin"
+msgstr ""
+
+#: forum/core/templates/spirit/_header.html:31
+#: forum/core/templates/spirit/_new_header.html:936
+#: forum/core/templates/spirit/_new_home_header.html:814
+msgid "Log out"
+msgstr ""
+
+#: forum/core/templates/spirit/_header.html:44
+msgid "Log in"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_base.html:100
+#: forum/core/templates/spirit/_new_home_base.html:101
+#: forum/core/templates/spirit/_video_play_and_comments.html:1196
+msgid "Follow"
+msgstr "ਫ਼ੋੱਲੋ"
+
+#: forum/core/templates/spirit/_new_base.html:101
+#: forum/core/templates/spirit/_new_home_base.html:102
+msgid "Followed"
+msgstr "ਦੇ ਬਾਅਦ"
+
+#: forum/core/templates/spirit/_new_base.html:102
+#: forum/core/templates/spirit/_new_home_base.html:103
+#: forum/core/templates/spirit/_video_play_and_comments.html:1206
+msgid "likes"
+msgstr "ਲੀਕੇਜ਼"
+
+#: forum/core/templates/spirit/_new_base.html:103
+#: forum/core/templates/spirit/_new_home_base.html:104
+#: forum/core/templates/spirit/_video_play_and_comments.html:1206
+msgid "comments"
+msgstr "ਕਮੇੰਟ੍ਸ"
+
+#: forum/core/templates/spirit/_new_base.html:104
+#: forum/core/templates/spirit/_video_play_and_comments.html:1241
+msgid "Comment"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_base.html:105
+msgid "Shares"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_base.html:106
+#: forum/core/templates/spirit/_video_play_and_comments.html:1235
+msgid "Like"
+msgstr "ਲਿਖੇ"
+
+#: forum/core/templates/spirit/_new_base.html:107
+#: forum/core/templates/spirit/_new_home_base.html:105
+msgid "Followers"
+msgstr "ਫੋਲੋਵੇਰਸ"
+
+#: forum/core/templates/spirit/_new_footer.html:68
+#: forum/core/templates/spirit/_new_header.html:908
+#: forum/core/templates/spirit/_new_home_footer.html:68
+#: forum/core/templates/spirit/_new_home_header.html:786
+msgid "Company"
+msgstr "ਕੰਪਨੀ"
+
+#: forum/core/templates/spirit/_new_footer.html:69
+#: forum/core/templates/spirit/_new_header.html:859
+#: forum/core/templates/spirit/_new_header.html:909
+#: forum/core/templates/spirit/_new_home_footer.html:69
+#: forum/core/templates/spirit/_new_home_header.html:730
+#: forum/core/templates/spirit/_new_home_header.html:787
+msgid "About"
+msgstr "ਬਾਰੇ"
+
+#: forum/core/templates/spirit/_new_footer.html:70
+#: forum/core/templates/spirit/_new_header.html:912
+#: forum/core/templates/spirit/_new_home_footer.html:70
+#: forum/core/templates/spirit/_new_home_header.html:735
+#: forum/core/templates/spirit/_new_home_header.html:790
+msgid "Careers"
+msgstr "ਕਰੀਅਰ"
+
+#: forum/core/templates/spirit/_new_footer.html:71
+#: forum/core/templates/spirit/_new_home_footer.html:71
+#: forum/core/templates/spirit/_new_home_header.html:732
+msgid "Team"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_footer.html:74
+#: forum/core/templates/spirit/_new_header.html:915
+#: forum/core/templates/spirit/_new_home_footer.html:74
+#: forum/core/templates/spirit/_new_home_header.html:793
+msgid "Programs"
+msgstr "ਪ੍ਰੋਗਰਾਮ"
+
+#: forum/core/templates/spirit/_new_footer.html:75
+#: forum/core/templates/spirit/_new_header.html:861
+#: forum/core/templates/spirit/_new_header.html:910
+#: forum/core/templates/spirit/_new_home_footer.html:75
+#: forum/core/templates/spirit/_new_home_header.html:788
+msgid "Discover"
+msgstr "ਡਿਸਕੋਵਰ"
+
+#: forum/core/templates/spirit/_new_footer.html:79
+#: forum/core/templates/spirit/_new_header.html:919
+#: forum/core/templates/spirit/_new_home_footer.html:79
+#: forum/core/templates/spirit/_new_home_header.html:797
+msgid "Support"
+msgstr "ਸਹਾਇਤਾ"
+
+#: forum/core/templates/spirit/_new_footer.html:80
+#: forum/core/templates/spirit/_new_header.html:920
+#: forum/core/templates/spirit/_new_home_footer.html:80
+#: forum/core/templates/spirit/_new_home_header.html:798
+msgid "Help Center"
+msgstr "ਸਹਾਇਤਾ ਕੇਂਦਰ"
+
+#: forum/core/templates/spirit/_new_footer.html:81
+#: forum/core/templates/spirit/_new_header.html:930
+#: forum/core/templates/spirit/_new_home_footer.html:81
+#: forum/core/templates/spirit/_new_home_header.html:808
+msgid "Bolo Action"
+msgstr "ਬੋਲੋ ਅਕਸ਼ਨਸ"
+
+#: forum/core/templates/spirit/_new_footer.html:82
+#: forum/core/templates/spirit/_new_header.html:921
+#: forum/core/templates/spirit/_new_home_footer.html:82
+#: forum/core/templates/spirit/_new_home_header.html:799
+msgid "Safety Center"
+msgstr "ਸੁਰੱਖਿਆ ਕੇਂਦਰ"
+
+#: forum/core/templates/spirit/_new_footer.html:86
+#: forum/core/templates/spirit/_new_header.html:927
+#: forum/core/templates/spirit/_new_home_footer.html:86
+#: forum/core/templates/spirit/_new_home_header.html:805
+msgid "Legal"
+msgstr "ਕਾਨੂੰਨੀ"
+
+#: forum/core/templates/spirit/_new_footer.html:87
+#: forum/core/templates/spirit/_new_header.html:928
+#: forum/core/templates/spirit/_new_home_footer.html:87
+#: forum/core/templates/spirit/_new_home_header.html:806
+msgid "Terms of Service"
+msgstr "ਸੇਵਾ ਦੀਆਂ ਸ਼ਰਤਾਂ"
+
+#: forum/core/templates/spirit/_new_footer.html:88
+#: forum/core/templates/spirit/_new_header.html:929
+#: forum/core/templates/spirit/_new_home_footer.html:88
+#: forum/core/templates/spirit/_new_home_header.html:807
+msgid "Privacy Policy"
+msgstr "ਪਰਾਈਵੇਟ ਨੀਤੀ"
+
+#: forum/core/templates/spirit/_new_footer.html:110
+#: forum/core/templates/spirit/_new_header.html:795
+#: forum/core/templates/spirit/_new_header.html:977
+#: forum/core/templates/spirit/_new_home_footer.html:110
+#: forum/core/templates/spirit/_new_home_header.html:855
+#: forum/core/templates/spirit/untitled.html:15
+msgid "language"
+msgstr "ਭਾਸ਼ਾ"
+
+#: forum/core/templates/spirit/_new_header.html:846
+#: forum/core/templates/spirit/_new_header.html:857
+#: forum/core/templates/spirit/_new_header.html:906
+#: forum/core/templates/spirit/_new_home_header.html:728
+#: forum/core/templates/spirit/_new_home_header.html:784
+msgid "Home"
+msgstr "ਘਰ"
+
+#: forum/core/templates/spirit/_new_header.html:852
+#: forum/core/templates/spirit/_new_home_header.html:737
+msgid "Signin"
+msgstr "ਸਾਈਨ - ਇਨ"
+
+#: forum/core/templates/spirit/_new_header.html:911
+#: forum/core/templates/spirit/_new_home_header.html:789
+msgid "Trending"
+msgstr "ਤਰੇਂਡਿੰਗ"
+
+#: forum/core/templates/spirit/_new_header.html:916
+#: forum/core/templates/spirit/_new_home_header.html:794
+msgid "Advertise on boloindya"
+msgstr "ਬੋਲੋਇੰਡਿਆ 'ਤੇ ਇਸ਼ਤਿਹਾਰ ਦਿਓ"
+
+#: forum/core/templates/spirit/_new_header.html:922
+#: forum/core/templates/spirit/_new_home_header.html:800
+msgid "Community Guidelines"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_header.html:935
+#: forum/core/templates/spirit/_new_home_header.html:813
+msgid "Welcome"
+msgstr "ਸਵਾਗਤ ਹੈ"
+
+#: forum/core/templates/spirit/_new_header.html:941
+#: forum/core/templates/spirit/_new_home_header.html:819
+msgid "Logout"
+msgstr "ਲਾਗਆਉਟ"
+
+#: forum/core/templates/spirit/_new_home_header.html:741
+msgid "Watch now"
+msgstr ""
+
+#: forum/core/templates/spirit/_video_play_and_comments.html:1134
+msgid "download"
+msgstr ""
+
+#: forum/core/templates/spirit/_video_play_and_comments.html:1135
+msgid "like"
+msgstr "ਲਿਖੇ"
+
+#: forum/core/templates/spirit/_video_play_and_comments.html:1136
+msgid "video"
+msgstr "ਵੀਡੀਓ"
+
+#: forum/core/templates/spirit/_video_play_and_comments.html:1151
+#, python-format
+msgid " %(Download)s the app to %(like)s this %(video)s "
+msgstr ""
+
+#: forum/core/templates/spirit/_video_play_and_comments.html:1151
+msgid "Get"
+msgstr ""
+
+#: forum/core/templates/spirit/_video_play_and_comments.html:1206
+msgid "Download"
+msgstr ""
+
+#: forum/core/templates/spirit/_video_play_and_comments.html:1246
+msgid "Share"
+msgstr ""
+
+#: forum/core/templates/spirit/_video_play_and_comments.html:1309
+msgid "COPY"
+msgstr "ਸਾਂਝਾ"
+
+#: forum/core/templates/spirit/_video_play_and_comments.html:1330
+msgid "Share to"
+msgstr ""
+
+#: forum/core/templates/spirit/_video_play_and_comments.html:1333
+msgid "Copy Link"
+msgstr ""
+
+#: forum/core/templates/spirit/_video_play_and_comments.html:1348
+msgid "Cancel"
+msgstr "ਰੱਦ ਕਰੋ"
+
+#: forum/core/templates/spirit/utils/paginator/_paginator.html:4
+#, python-format
+msgid "Page %(number)s of %(num_pages)s"
+msgstr ""
+
+#: forum/core/templates/spirit/utils/paginator/_paginator.html:8
+msgid "Last"
+msgstr ""
+
+#: forum/core/templates/spirit/utils/paginator/_paginator.html:10
+msgid "First"
+msgstr ""
+
+#: forum/core/templates/spirit/utils/paginator/_yt_paginator.html:5
+msgid "Page 1 of 1"
+msgstr ""
+
+#: forum/core/utils/markdown/utils/quote.py:37
+#, python-format
+msgid "@%(username)s said:"
+msgstr ""
+
+#: forum/core/utils/ratelimit/decorators.py:27
+#, python-format
+msgid "Too many submissions, wait %(time)s."
+msgstr ""

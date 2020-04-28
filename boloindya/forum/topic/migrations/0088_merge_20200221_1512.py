@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('forum_topic', '0087_auto_20200218_1459'),
+        #('forum_topic', '0087_auto_20200218_1459'),
         ('forum_topic', '0087_auto_20200218_0134'),
     ]
 
