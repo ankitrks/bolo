@@ -594,7 +594,7 @@ def VBList(request):
     filter_dic = {}
     is_expand = request.GET.get('is_expand',True)
     topic_filters = {'language_id' : request.GET.get('language_id')}
-    topics_exclude = {'vb_score__gte' : self.context.get('vb_score', None)}
+    topics_exclude = {'vb_score__gte' : request.GET.get('vb_score', None)}
 
     search_term = request.GET.keys()
     m2mcategory__slug = request.GET.get('category', False)
@@ -717,7 +717,7 @@ def GetChallenge(request):
     hash_tag = TongueTwister.objects.get(hash_tag__iexact=challengehash[1:])
     req_user = True if request.user.is_authenticated else False
     topic_filters = {'language_id' : request.GET.get('language_id', 2), 'hash_tags' : hash_tag}
-    topics_exclude = {'vb_score__gte' : self.context.get('vb_score', None)}
+    topics_exclude = {'vb_score__gte' : request.GET.get('vb_score', None)}
     if int(request.GET.get('offset') or 0):
         page_no = int(int(request.GET.get('offset') or 0) / settings.REST_FRAMEWORK['PAGE_SIZE'])
     topics = get_ranked_topics(req_user, page_no, topic_filters, topics_exclude)
@@ -3891,10 +3891,10 @@ def get_category_video_bytes(request):
     try:
         topics = []
         page_no = int(request.POST.get('page', 1))
-        is_expand = request.GET.get('is_expand', True)
+        is_expand = request.POST.get('is_expand', True)
         req_user = True if request.user.is_authenticated else False
-        topic_filters = {'language_id' : request.GET.get('language_id', 2), 'm2mcategory_id' : request.POST.get('category_id', 0)}
-        topics_exclude = {'vb_score__gte' : self.context.get('vb_score', None)}
+        topic_filters = {'language_id' : request.POST.get('language_id', 2), 'm2mcategory_id' : request.POST.get('category_id', 0)}
+        topics_exclude = {'vb_score__gte' : request.POST.get('vb_score', None)}
         topics = get_ranked_topics(req_user, page_no, topic_filters, topics_exclude)
         return JsonResponse({'topics' : CategoryVideoByteSerializer(topic_page, many = True, context = {'is_expand': is_expand}).data}, \
             status=status.HTTP_200_OK)
@@ -3966,7 +3966,7 @@ def get_popular_video_bytes(request):
         is_expand = request.GET.get('is_expand', True)
         req_user = True if request.user.is_authenticated else False
         topic_filters = {'language_id' : request.GET.get('language_id', 2), 'is_popular' : True}
-        topics_exclude = {'vb_score__gte' : self.context.get('vb_score', None)}
+        topics_exclude = {'vb_score__gte' : request.GET.get('vb_score', None)}
         topics = get_ranked_topics(req_user, page_no, topic_filters, topics_exclude)
         ''' Manual added post'''
         manual_added_post = Topic.objects.filter(pk = 43351)
@@ -4072,7 +4072,7 @@ def get_recent_videos(request):
         req_user = True if request.user.is_authenticated else False
         category = Category.objects.filter(parent__isnull = True).first()
         topic_filters = {'language_id' : request.GET.get('language_id', 2), 'm2mcategory' : category}
-        topics_exclude = {'vb_score__gte' : self.context.get('vb_score', None)}
+        topics_exclude = {'vb_score__gte' : request.GET.get('vb_score', None)}
         topics = get_ranked_topics(req_user, page_no, topic_filters, topics_exclude, sort_by)
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many = True, context = {'is_expand' : is_expand}).data}, \
             status=status.HTTP_200_OK)
