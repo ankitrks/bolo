@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Spirit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-23 13:36+0530\n"
+"POT-Creation-Date: 2020-04-28 09:33+0530\n"
 "PO-Revision-Date: 2015-07-25 18:00+0000\n"
 "Last-Translator: Esteban M. Castro Borsani <ecastroborsani@gmail.com>\n"
 "Language-Team: Spirit\n"
@@ -97,30 +97,44 @@ msgid "Log in"
 msgstr "anmelden"
 
 #: forum/core/templates/spirit/_new_base.html:100
-#: forum/core/templates/spirit/_new_home_base.html:99
+#: forum/core/templates/spirit/_new_home_base.html:101
 #: forum/core/templates/spirit/_video_play_and_comments.html:1196
 msgid "Follow"
 msgstr ""
 
 #: forum/core/templates/spirit/_new_base.html:101
-#: forum/core/templates/spirit/_new_home_base.html:100
+#: forum/core/templates/spirit/_new_home_base.html:102
 msgid "Followed"
 msgstr ""
 
 #: forum/core/templates/spirit/_new_base.html:102
-#: forum/core/templates/spirit/_new_home_base.html:101
+#: forum/core/templates/spirit/_new_home_base.html:103
 #: forum/core/templates/spirit/_video_play_and_comments.html:1206
 msgid "likes"
 msgstr ""
 
 #: forum/core/templates/spirit/_new_base.html:103
-#: forum/core/templates/spirit/_new_home_base.html:102
+#: forum/core/templates/spirit/_new_home_base.html:104
 #: forum/core/templates/spirit/_video_play_and_comments.html:1206
 msgid "comments"
 msgstr ""
 
 #: forum/core/templates/spirit/_new_base.html:104
-#: forum/core/templates/spirit/_new_home_base.html:103
+#: forum/core/templates/spirit/_video_play_and_comments.html:1241
+msgid "Comment"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_base.html:105
+msgid "Shares"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_base.html:106
+#: forum/core/templates/spirit/_video_play_and_comments.html:1235
+msgid "Like"
+msgstr ""
+
+#: forum/core/templates/spirit/_new_base.html:107
+#: forum/core/templates/spirit/_new_home_base.html:105
 msgid "Followers"
 msgstr ""
 
@@ -294,14 +308,6 @@ msgstr ""
 
 #: forum/core/templates/spirit/_video_play_and_comments.html:1206
 msgid "Download"
-msgstr ""
-
-#: forum/core/templates/spirit/_video_play_and_comments.html:1235
-msgid "Like"
-msgstr ""
-
-#: forum/core/templates/spirit/_video_play_and_comments.html:1241
-msgid "Comment"
 msgstr ""
 
 #: forum/core/templates/spirit/_video_play_and_comments.html:1246

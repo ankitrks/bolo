@@ -160,6 +160,18 @@
 
 <script src="/media/js/common.js"></script>
 
-
-
+<script type="text/javascript">
+    $(function(){
+    // this will get the full URL at the address bar
+    var url = window.location.href; 
+    // passes on every "a" tag 
+    $(".menu-item-link").removeClass('menu-item-link-active');
+    $("#sub-header a").each(function() {
+            // checks if its the same on the address bar
+        if(url == (this.href)) { 
+            $(this).closest("h2").addClass("menu-item-link-active");
+        }
+    });
+});
+</script>
 

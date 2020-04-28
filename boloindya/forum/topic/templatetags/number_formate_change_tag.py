@@ -27,6 +27,10 @@ def category_title_by_language(categoryObj,language):
         field_name = 'title'
     else:
         field_name = language.lower() + '_title'
+
+    if language == 'Oriya':
+        field_name = language.lower() + '_title'
+
     return getattr(categoryObj, field_name)
 	#return categoryObj.titleName
 

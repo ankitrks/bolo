@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Spirit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-23 13:36+0530\n"
+"POT-Creation-Date: 2020-04-28 09:33+0530\n"
 "PO-Revision-Date: 2015-10-14 19:36+0000\n"
 "Last-Translator: Esteban M. Castro Borsani <ecastroborsani@gmail.com>\n"
 "Language-Team: German (http://www.transifex.com/spirit-project/spirit/"
@@ -118,16 +118,16 @@ msgstr ""
 
 #: forum/topic/models.py:107 forum/topic/models.py:108
 #: forum/topic/models.py:112
-#: forum/topic/templates/spirit/topic/boloindya_feed.html:845
-#: forum/topic/templates/spirit/topic/boloindya_feed.html:861
-#: forum/topic/templates/spirit/topic/boloindya_feed.html:966
-#: forum/topic/templates/spirit/topic/boloindya_feed.html:988
-#: forum/topic/templates/spirit/topic/boloindya_feed.html:1004
-#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:805
-#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:821
-#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:926
-#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:948
-#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:964
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:848
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:864
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:979
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:1001
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:1017
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:811
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:827
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:936
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:958
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:974
 #: forum/topic/templates/spirit/topic/new_landing.html:361
 #: forum/topic/templates/spirit/topic/new_landing.html:377
 #, fuzzy
@@ -393,20 +393,19 @@ msgstr ""
 msgid "Correct Prediction"
 msgstr ""
 
-#: forum/topic/templates/spirit/topic/boloindya_feed.html:822
-#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:782
-#: forum/topic/templates/spirit/topic/video_details.html:1618
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:825
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:788
 #, fuzzy
 #| msgid "Trending Hashtags"
-msgid "Trendinng"
+msgid "Trending"
 msgstr "Treding Test"
 
-#: forum/topic/templates/spirit/topic/boloindya_feed.html:822
-#: forum/topic/templates/spirit/topic/boloindya_feed.html:913
-#: forum/topic/templates/spirit/topic/boloindya_feed.html:950
-#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:782
-#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:873
-#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:910
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:825
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:921
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:963
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:788
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:879
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:920
 #: forum/topic/templates/spirit/topic/topic_details_by_category.html:375
 #: forum/topic/templates/spirit/topic/topic_details_by_category.html:388
 #: forum/topic/templates/spirit/topic/topic_list_by_hashtag.html:384
@@ -419,36 +418,36 @@ msgstr "Treding Test"
 msgid "See All"
 msgstr ""
 
-#: forum/topic/templates/spirit/topic/boloindya_feed.html:823
-#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:783
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:826
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:789
 #: forum/topic/templates/spirit/topic/video_details.html:1619
 msgid "Trends"
 msgstr ""
 
-#: forum/topic/templates/spirit/topic/boloindya_feed.html:835
-#: forum/topic/templates/spirit/topic/boloindya_feed.html:978
-#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:795
-#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:938
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:838
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:991
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:801
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:948
 #: forum/topic/templates/spirit/topic/new_landing.html:351
 #, fuzzy
 #| msgid "Trending Hashtags"
 msgid "Trending Categories"
 msgstr "Treding Test"
 
-#: forum/topic/templates/spirit/topic/boloindya_feed.html:854
-#: forum/topic/templates/spirit/topic/boloindya_feed.html:997
-#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:814
-#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:957
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:857
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:1010
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:820
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:967
 #: forum/topic/templates/spirit/topic/new_landing.html:370
 #, fuzzy
 #| msgid "Trending Hashtags"
 msgid "Trending Hashtags"
 msgstr "Treding Test"
 
-#: forum/topic/templates/spirit/topic/boloindya_feed.html:872
-#: forum/topic/templates/spirit/topic/boloindya_feed.html:1015
-#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:832
-#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:975
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:875
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:1028
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:838
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:985
 #: forum/topic/templates/spirit/topic/new_landing.html:388
 #: forum/topic/templates/spirit/topic/topic_details_by_category.html:399
 #: forum/topic/templates/spirit/topic/topic_list_by_hashtag.html:408
@@ -456,25 +455,28 @@ msgstr "Treding Test"
 msgid "Get the App"
 msgstr ""
 
-#: forum/topic/templates/spirit/topic/boloindya_feed.html:887
-#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:847
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:890
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:853
 #: forum/topic/templates/spirit/topic/new_landing.html:324
 msgid "Popular Videos"
 msgstr ""
 
-#: forum/topic/templates/spirit/topic/boloindya_feed.html:913
-#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:873
-#: forum/topic/templates/spirit/topic/search_results.html:910
-#: forum/topic/templates/spirit/topic/topic_details_by_category.html:375
-#: forum/topic/templates/spirit/topic/topic_list_by_hashtag.html:384
-#: forum/topic/templates/spirit/topic/user_details.html:562
-#: forum/topic/templates/spirit/topic/user_profile.html:224
-#, fuzzy
-#| msgid "Create Topic"
-msgid "Creators"
-msgstr "Thema erstellen"
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:921
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:879
+#: forum/topic/templates/spirit/topic/search_results.html:958
+msgid "Users"
+msgstr ""
 
-#: forum/topic/templates/spirit/topic/boloindya_feed.html:950
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:953
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:910
+#: forum/topic/templates/spirit/topic/topic_details_by_category.html:340
+#: forum/topic/templates/spirit/topic/user_details.html:526
+#: forum/topic/templates/spirit/topic/video_details.html:1500
+#: forum/topic/templates/spirit/topic/video_discover.html:299
+msgid "Follow"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:963
 #, fuzzy
 #| msgid "Trending Hashtags"
 msgid "Hashtag Challeges"
@@ -549,6 +551,24 @@ msgstr ""
 msgid "Get"
 msgstr ""
 
+#: forum/topic/templates/spirit/topic/explore_video_details.html:1728
+#: forum/topic/templates/spirit/topic/video_details.html:1538
+msgid "Like"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/explore_video_details.html:1733
+#: forum/topic/templates/spirit/topic/video_details.html:1544
+#, fuzzy
+#| msgid "comment count"
+msgid "Comment"
+msgstr "Kommentare"
+
+#: forum/topic/templates/spirit/topic/explore_video_details.html:1737
+#, fuzzy
+#| msgid "views count"
+msgid "Share"
+msgstr "gelesen"
+
 #: forum/topic/templates/spirit/topic/explore_video_details.html:1805
 #: forum/topic/templates/spirit/topic/video_details.html:1635
 #, fuzzy
@@ -566,7 +586,7 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:910
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:920
 #, fuzzy
 #| msgid "Trending Hashtags"
 msgid "Hashtag Challenges"
@@ -589,7 +609,11 @@ msgstr "Thema veröffentlichen"
 msgid "Start discussion"
 msgstr ""
 
-#: forum/topic/templates/spirit/topic/search_results.html:911
+#: forum/topic/templates/spirit/topic/search_results.html:955
+msgid "All"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/search_results.html:956
 #: forum/topic/templates/spirit/topic/user_details.html:524
 #: forum/topic/templates/spirit/topic/user_profile.html:186
 #, fuzzy
@@ -597,19 +621,19 @@ msgstr ""
 msgid "Videos"
 msgstr "Titel"
 
-#: forum/topic/templates/spirit/topic/search_results.html:912
+#: forum/topic/templates/spirit/topic/search_results.html:961
 #, fuzzy
 #| msgid "All Categories"
 msgid "Categories"
 msgstr "Alle Kategorien"
 
-#: forum/topic/templates/spirit/topic/search_results.html:913
+#: forum/topic/templates/spirit/topic/search_results.html:962
 #, fuzzy
 #| msgid "Trending Hashtags"
 msgid "Hashtags"
 msgstr "Treding Test"
 
-#: forum/topic/templates/spirit/topic/search_results.html:978
+#: forum/topic/templates/spirit/topic/search_results.html:975
 msgid "Search :"
 msgstr ""
 
@@ -619,12 +643,14 @@ msgstr ""
 msgid "Views"
 msgstr "gelesen"
 
-#: forum/topic/templates/spirit/topic/topic_details_by_category.html:340
-#: forum/topic/templates/spirit/topic/user_details.html:526
-#: forum/topic/templates/spirit/topic/video_details.html:1500
-#: forum/topic/templates/spirit/topic/video_discover.html:299
-msgid "Follow"
-msgstr ""
+#: forum/topic/templates/spirit/topic/topic_details_by_category.html:375
+#: forum/topic/templates/spirit/topic/topic_list_by_hashtag.html:384
+#: forum/topic/templates/spirit/topic/user_details.html:562
+#: forum/topic/templates/spirit/topic/user_profile.html:224
+#, fuzzy
+#| msgid "Create Topic"
+msgid "Creators"
+msgstr "Thema erstellen"
 
 #: forum/topic/templates/spirit/topic/topic_details_by_category.html:388
 #: forum/topic/templates/spirit/topic/topic_list_by_hashtag.html:397
@@ -677,19 +703,15 @@ msgstr "gelesen"
 msgid "comments"
 msgstr "Kommentare"
 
-#: forum/topic/templates/spirit/topic/video_details.html:1538
-msgid "Like"
-msgstr ""
-
-#: forum/topic/templates/spirit/topic/video_details.html:1544
-#, fuzzy
-#| msgid "comment count"
-msgid "Comment"
-msgstr "Kommentare"
-
 #: forum/topic/templates/spirit/topic/video_details.html:1608
 msgid "COPY"
 msgstr ""
+
+#: forum/topic/templates/spirit/topic/video_details.html:1618
+#, fuzzy
+#| msgid "Trending Hashtags"
+msgid "Trendinng"
+msgstr "Treding Test"
 
 #: forum/topic/templates/spirit/topic/video_discover.html:240
 msgid "Be the first to watch the latest videos"

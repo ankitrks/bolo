@@ -96,16 +96,16 @@
                                       <div class="_666k" data-testid="UFI2ReactionLink/actionLink">\
                                       <div class="_8c74">\
                                       <a aria-pressed="false" class=" _6a-y _3l2t  _18vj '+itemVideo.id+'" data-testid="UReactionLink-'+itemVideo.id+'" href="javascript:void(0)" id="UReactionLink-'+itemVideo.id+'" onclick="likeUnlikeFeed('+itemVideo.id+');" role="button" tabindex="0">\
-                                      <i alt="" class="_6rk2 img sp_ddXiTdIB8vm sx_44a25c '+itemVideo.id+'"></i>Like</a>\
+                                      <i alt="" class="_6rk2 img sp_ddXiTdIB8vm sx_44a25c '+itemVideo.id+'"></i>'+likeTrans+'</a>\
                                       </div>\
                                       </div>\
                                       </span>\
                                       <span class="_18vi">\
-                                      <a class=" _666h  _18vj _18vk _42ft " role="button" tabindex="0" testid="UFI2CommentLink" title="Leave a comment" id="UCommentLink" href="/explore/'+itemVideo.slug+'/'+itemVideo.id+'">Comment</a>\
+                                      <a class=" _666h  _18vj _18vk _42ft " role="button" tabindex="0" testid="UFI2CommentLink" title="Leave a comment" id="UCommentLink" href="/explore/'+itemVideo.slug+'/'+itemVideo.id+'">'+commentTrans+'</a>\
                                       </span>\
                                       <span class="_18vi sbutton">\
                                       <span class="_1j6m">\
-                                      <a class=" _2nj7  _18vj _18vk " href="javascript:void(0)" id="shareLinkId" role="button" tabindex="0" title="Send this to friends or post it on your Timeline." onclick="openShareTab()">Share</a>\
+                                      <a class=" _2nj7  _18vj _18vk " href="javascript:void(0)" id="shareLinkId" role="button" tabindex="0" title="Send this to friends or post it on your Timeline." onclick="openShareTab()">'+shresTrans+'</a>\
                                       </span>\
                                               </span>\
                                           </div>\
@@ -222,16 +222,16 @@ function loaderBoloHide(){
                                       <div class="_666k" data-testid="UFI2ReactionLink/actionLink">\
                                       <div class="_8c74">\
                                       <a aria-pressed="false" class=" _6a-y _3l2t  _18vj '+itemVideo.id+'" data-testid="UReactionLink-'+itemVideo.id+'" href="javascript:void(0)" id="UReactionLink-'+itemVideo.id+'" onclick="likeUnlikeFeed('+itemVideo.id+');" role="button" tabindex="0">\
-                                      <i alt="" class="_6rk2 img sp_ddXiTdIB8vm sx_44a25c '+itemVideo.id+'"></i>Like</a>\
+                                      <i alt="" class="_6rk2 img sp_ddXiTdIB8vm sx_44a25c '+itemVideo.id+'"></i>'+likeTrans+'</a>\
                                       </div>\
                                       </div>\
                                       </span>\
                                       <span class="_18vi">\
-                                      <a class=" _666h  _18vj _18vk _42ft" role="button" tabindex="0" testid="UFI2CommentLink" title="Leave a comment" id="UCommentLink" href="/explore/'+itemVideo.slug+'/'+itemVideo.id+'">Comment</a>\
+                                      <a class=" _666h  _18vj _18vk _42ft" role="button" tabindex="0" testid="UFI2CommentLink" title="Leave a comment" id="UCommentLink" href="/explore/'+itemVideo.slug+'/'+itemVideo.id+'">'+commentTrans+'</a>\
                                       </span>\
                                       <span class="_18vi sbutton">\
                                       <span class="_1j6m">\
-                                      <a class=" _2nj7  _18vj _18vk " href="javascript:void(0)" id="shareLinkId" role="button" tabindex="0" title="Send this to friends or post it on your Timeline." onclick="openShareTab()">Share</a>\
+                                      <a class=" _2nj7  _18vj _18vk " href="javascript:void(0)" id="shareLinkId" role="button" tabindex="0" title="Send this to friends or post it on your Timeline." onclick="openShareTab()">'+shresTrans+'</a>\
                                       </span>\
                                               </span>\
                                           </div>\

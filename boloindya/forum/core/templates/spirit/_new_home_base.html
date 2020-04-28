@@ -83,6 +83,8 @@
         {% endif %}
     {% endfor %}
 
+    
+
 {% get_current_language as LANGUAGE_CODE %}
 {% get_available_languages as LANGUAGES %}
 {% get_language_info_list for LANGUAGES as languages %}
@@ -103,6 +105,7 @@
     var followers_trans='{% trans "Followers" %}';
     var site_base_url='{{site_base_url}}';
     console.log(likeTrans);
+
 </script>
 
     <style type="text/css">

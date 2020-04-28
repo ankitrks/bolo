@@ -743,6 +743,12 @@ div.video-controls .progress-bar-parent .progress-bar-background .progress-bar {
     background-position: -41px -202px;
 
 }*/
+.link-active{
+    color: var(--primary-link-color);
+    text-decoration: none;
+    border-bottom: 3px solid #b62927b5;
+    font-weight: bold;
+}
 
 </style> 
 
@@ -755,7 +761,7 @@ div.video-controls .progress-bar-parent .progress-bar-background .progress-bar {
 
                 {%  for each_category_item in categories %}
 
-                    <li  class="item {{each_category_item.slug}}  category_details "  id="" style="padding-top:.5em;padding-bottom:.5em;cursor:pointer"><a href="/tag/{{each_category_item.slug}}/" class="_3gKV2">{% category_title_by_language each_category_item LANGUAGE_CODE|language_name %}</a></li>
+                    <li  class="item {{each_category_item.slug}}  category_details "  id="" style="padding-top:.5em;padding-bottom:.5em;cursor:pointer"><a href="/{{LANGUAGE_CODE}}/tag/{{each_category_item.slug}}/" class="_3gKV2">{% category_title_by_language each_category_item LANGUAGE_CODE|language_name %}</a></li>
 
                 {% endfor %}
                 <li></li>
@@ -779,7 +785,7 @@ div.video-controls .progress-bar-parent .progress-bar-background .progress-bar {
         <aside class="share-layout-aside" style="margin-top: 70px;">
             <div class="jsx-2573841504 recommend-container">
                 <header class="jsx-3959364739">
-                    <h3 class="jsx-3959364739">{% trans "Trendinng" %}</h3><a class="jsx-3959364739" href="/trending/">{% trans "See All" %}</a></header>
+                    <h3 class="jsx-3959364739">{% trans "Trending" %}</h3><a class="jsx-3959364739" href="/trending/">{% trans "See All" %}</a></header>
                 <!-- <h3 class="jsx-2573841504">{% trans "Trends" %}</h3> -->
                 <div class="jsx-2573841504 recommend-video-container">
                     <div class="_scroll_load_more_loading_user_videos center">
@@ -870,7 +876,7 @@ div.video-controls .progress-bar-parent .progress-bar-background .progress-bar {
 
                             <div class="jsx-3959364739 recommend-card" style="margin-top: 70px;">
                                 <header class="jsx-3959364739">
-                                    <h3 class="jsx-3959364739">{% trans "Creators" %}</h3><!-- <a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a> --></header>
+                                    <h3 class="jsx-3959364739">{% trans "Users" %}</h3><!-- <a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a> --></header>
 <!--                                 <div class="_scroll_load_more_loading_creator center">
                                     <div class="boloindya-loading">Loading...</div>
                                 </div> -->
@@ -1007,5 +1013,21 @@ div.video-controls .progress-bar-parent .progress-bar-background .progress-bar {
 {% include "spirit/_video_play_and_comments.html" %}
 <!-- End Load Comments  -->
 
-
+<script type="text/javascript">
+    $(function(){
+    // this will get the full URL at the address bar
+    var url = window.location.href; 
+    console.log(url);
+    // passes on every "a" tag 
+    $(".category_details").removeClass('link-active');
+    $("#scrollID a").each(function() {
+            // checks if its the same on the address bar
+            console.log(this.href);
+        if(url == (this.href)) { 
+            console.log('q');
+            $(this).closest("li").addClass("link-active");
+        }
+    });
+});
+</script>
 {% endblock %}
