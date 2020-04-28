@@ -1333,7 +1333,7 @@ function getCreatorsResult(){
     var language_id=1;
     language_id=current_language_id;
     var userVideoItems="";
-    var res='/api/v1/solr/search/users/?term='+searchData;
+    var res='/api/v1/solr/search/users/'+searchData;
     //var res = encodeURI(uri);
     jQuery.ajax({
         url:res,
@@ -1378,7 +1378,7 @@ function loadMoreCreatorData(NextPageUrl){
     //var uri='https://www.boloindya.com/api/v1/get_popular_video_bytes/?page=1';
     var uri=NextPageUrl;
     //var res = encodeURI(uri);
-    var res = '/api/v1/solr/search/?term='+searchData;
+    var res = '/api/v1/solr/search/'+searchData;
     $.ajax({
             url:res,
             data:{'language_id':language_id,'page':NextPageUrl},
@@ -1839,7 +1839,7 @@ function loadMoreDataHash(NextPageUrl){
     //var uri='https://www.boloindya.com/api/v1/get_popular_video_bytes/?page=1';
     var uri=NextPageUrl;
     //var res = encodeURI(uri);
-    var res='/api/v1/solr/search/hash_tag/?term='+searchData;
+    var res='/api/v1/solr/search/hash_tag/'+searchData;
     $.ajax({
             url:res,
             data:{'language_id':language_id,'page':NextPageUrl},
@@ -1996,12 +1996,12 @@ function getVideoSearchResult(limit,offset){
 
     var userVideoItems="";
     //var uri='/api/v1/search/'+searchData;
-    var res = '/api/v1/solr/search/';
+    var res = '/api/v1/solr/search/'+searchData;
     
     jQuery.ajax({
         url:res,
         type:"GET",
-        data:{'page':1,'language_id':language_id,'term':searchData},
+        data:{'page':1,'language_id':language_id},
         success: function(response,textStatus, xhr){
             userVideoItems="";
             var videoItemList=response.results;
@@ -2042,10 +2042,10 @@ function loadMoreData(NextPageUrl){
     //var uri='https://www.boloindya.com/api/v1/get_popular_video_bytes/?page=1';
     var uri=NextPageUrl;
     //var res = encodeURI(uri);
-    var res = '/api/v1/solr/search/';
+    var res = '/api/v1/solr/search/'+searchData;
     $.ajax({
             url:res,
-            data:{'language_id':language_id,'page':NextPageUrl,'term':searchData},
+            data:{'language_id':language_id,'page':NextPageUrl},
             type: "get",
             beforeSend: function()
             {
