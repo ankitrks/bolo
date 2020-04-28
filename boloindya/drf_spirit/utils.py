@@ -384,7 +384,7 @@ def generate_refer_earn_code():
         my_code = generate_refer_earn_code()
     return my_code
 
-def get_ranked_topics(user_id,page,filter_dict,exclude_dict,sort_by='-vb_score'):
+def get_ranked_topics(user_id,page, filter_dict, exclude_dict, sort_by='-vb_score'):
     from forum.topic.models import Topic
     from forum.topic.utils import get_redis_vb_seen
     if not page:

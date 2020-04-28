@@ -94,9 +94,7 @@ class FCMDevice(AbstractDevice):
         try:
             instance = FCMDevice.objects.filter(Q(reg_id = reg_id) | Q(dev_id = dev_id))
             if not len(instance):
-                print 'Not Exists'
                 raise Exception
-            print 'Exisits'
             desc=instance[0].uninstalled_desc
             if desc:
                 list_data = json.loads(desc)
