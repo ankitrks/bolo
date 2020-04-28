@@ -378,14 +378,12 @@ class GetPopularHashTag(generics.ListCreateAPIView):
 def GetFollowPost(request):
     topics =[]
     all_seen_vb = []
-    page_no = 1
+    page_no = request.GET.get('offset', 1)
     q_objects = Q()
     is_expand = request.GET.get('is_expand', True)
     req_user = True if request.user.is_authenticated else False
     q_objects |= Q(user_id__in = get_redis_following(request.user.id))
     q_objects |= Q(m2mcategory__in = UserProfile.objects.get(user= request.user).sub_category.all())
-    if int(request.GET.get('offset') or 0):
-        page_no = int(int(request.GET.get('offset') or 0)/settings.REST_FRAMEWORK['PAGE_SIZE'])
     topics = get_ranked_topics(req_user, page_no, {}, {}, '-vb_score', q_objects)
     return JsonResponse({'results' : TopicSerializerwithComment(topics, context = {'is_expand' : is_expand}, many=True).data})
 
