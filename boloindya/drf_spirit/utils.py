@@ -398,23 +398,30 @@ def get_ranked_topics(user_id, page, filter_dict, exclude_dict, sort_by = '-vb_s
 
     if exclude_dict.has_key('vb_score__gte') and not exclude_dict['vb_score__gte']:
         del exclude_dict['vb_score__gte']
+    if filter_dict.has_key('vb_score') and not filter_dict['vb_score']:
+        del filter_dict['vb_score']
+    if filter_dict.has_key('language_id') and not filter_dict['language_id']:
+        del filter_dict['language_id']
 
-    if filter_dict.has_key('language_id'):
+    if filter_dict.has_key('language_id') and filter_dict['language_id']:
         filter_dict['language_id'] = "'" + str(filter_dict['language_id']) + "'" # need to send language id AS '2' and not 2 (explicitly typecast).
+
     if user_id:
         all_seen_vb = get_redis_vb_seen(user_id)
         exclude_dict['pk__in'] = all_seen_vb
+
     queryset = Topic.objects.filter(**filter_dict).exclude(**exclude_dict)
     if q_filter:
         queryset = queryset.filter(q_filter)
 
     raw_query = queryset.query.__str__().split('ORDER BY')[0]
-    raw_query += ' AND ' + str(page) + ' = (SELECT COUNT(DISTINCT vb_score) FROM forum_topic_topic S1 WHERE "forum_topic_topic".vb_score <= S1.vb_score AND \
-            S1.user_id = "forum_topic_topic".user_id) order by "forum_topic_topic".' + sort_by.replace('-', '') + ' desc \
-            limit ' + str(page_size)
+    if not filter_dict.has_key('user_id'):
+        raw_query += ' AND ' + str(page) + ' = (SELECT COUNT(DISTINCT vb_score) FROM forum_topic_topic S1 WHERE "forum_topic_topic".vb_score <= S1.vb_score AND \
+            S1.user_id = "forum_topic_topic".user_id) '
+    raw_query += 'order by "forum_topic_topic".' + sort_by.replace('-', '') + ' desc limit ' + str(page_size)
+
     non_seen_post = list( Topic.objects.raw(raw_query) )
     non_seen_post_count = len(non_seen_post)
-
     if not non_seen_post_count < page_size:
         all_seen_page = int((int(page)*page_size - non_seen_post_count)/page_size)
         all_seen_post = Topic.objects.filter(**filter_dict).filter(pk__in=all_seen_vb)[all_seen_page*page_size:page_size*(all_seen_page+1)+1]
