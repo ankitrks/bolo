@@ -384,29 +384,37 @@ def generate_refer_earn_code():
         my_code = generate_refer_earn_code()
     return my_code
 
-def get_ranked_topics(user_id,page, filter_dict, exclude_dict, sort_by='-vb_score'):
+def get_ranked_topics(user_id, page, filter_dict, exclude_dict, sort_by = '-vb_score', q_filter = None):
     from forum.topic.models import Topic
     from forum.topic.utils import get_redis_vb_seen
     if not page:
         page = 1
+    all_seen_post = []
+    topics = []
+    all_seen_vb = []
     page_size = settings.REST_FRAMEWORK['PAGE_SIZE']
     filter_dict['is_removed']=False
     filter_dict['is_vb']=True
+    
+    if exclude_dict.has_key('vb_score__gte') and not exclude_dict['vb_score__gte']:
+        del exclude_dict['vb_score__gte']
+    
     if filter_dict.has_key('language_id'):
         filter_dict['language_id'] = "'" + filter_dict['language_id'] + "'" # need to send language id AS '2' and not 2 (explicitly typecast).
-    topics = []
-    all_seen_vb = []
     if user_id:
         all_seen_vb = get_redis_vb_seen(user_id)
-    
-    raw_query = Topic.objects.filter(**filter_dict).exclude(pk__in=all_seen_vb).exclude(**exclude_dict).query.__str__().split('ORDER BY')[0]
+        exclude_dict['pk__in'] = all_seen_vb
+    queryset = Topic.objects.filter(**filter_dict).exclude(**exclude_dict)
+    if q_filter:
+        queryset = queryset.filter(q_filter)
+
+    raw_query = queryset.query.__str__().split('ORDER BY')[0]
     raw_query += ' AND ' + str(page) + ' = (SELECT COUNT(DISTINCT vb_score) FROM forum_topic_topic S1 WHERE "forum_topic_topic".vb_score <= S1.vb_score AND \
             S1.user_id = "forum_topic_topic".user_id) order by "forum_topic_topic".' + sort_by.replace('-', '') + ' desc \
-            limit ' + str(page_size * 2)
+            limit ' + str(page_size)
     non_seen_post = list( Topic.objects.raw(raw_query) )
     non_seen_post_count = len(non_seen_post)
-
-    all_seen_post = []
+    
     if not page*page_size < non_seen_post_count:
         all_seen_page = int((page*page_size - non_seen_post_count)/page_size)
         all_seen_post = Topic.objects.filter(**filter_dict).filter(pk__in=all_seen_vb)[all_seen_page*page_size:page_size*(all_seen_page+1)+1]
