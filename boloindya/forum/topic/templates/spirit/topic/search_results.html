@@ -1138,6 +1138,9 @@
     var currentVideosActiveStatus=0;
     var currentHashTagActiveStatus=0;
     var currentAllctiveStatus=0;
+    var checkDataVideoStatus=0;
+    var checkDataHashStatus=0;
+    var checkDataUserStatus=0;
 
 
 	function creatorTemplate(each_popular_item){
@@ -1768,10 +1771,11 @@ function getSearchHashtagSuggestion(){
     var listItems="";
     var itemCount=0;
     var language_id=1;
-    var res='/api/v1/solr/search/hash_tag/?term='+search_term;
+    
     var category_with_video_list="";
     language_id=current_language_id;
     var search_term= '{{search_term}}';
+    var res='/api/v1/solr/search/hash_tag/?term='+search_term;
     jQuery.ajax({
         url:res,
         type:"GET",
@@ -1830,9 +1834,9 @@ function getSearchHashtagSuggestion(){
 }
 
 function loadMoreDataHash(NextPageUrl){
-    
+
     var platlistItems;
-    checkDataStatus=1;
+    checkDataHashStatus=1;
     var listItems="";
     var itemCount=0;
     var language_id=current_language_id;
@@ -1855,7 +1859,7 @@ function loadMoreDataHash(NextPageUrl){
                 $('.ajax-load').html("No more records found");
                 return;
             }
-            checkDataStatus=0;
+            checkDataHashStatus=0;
             userVideoItems="";
             var videoItemList=data.results;
             var itemCount=-1;
@@ -1944,24 +1948,24 @@ var checkDataStatus=0;
 $(window).scroll(function() {
     var scorh=Number($(window).scrollTop() + $(window).height());
     console.log('Scol+he '+scorh);
-    if($(window).scrollTop() + $(window).height() >= $(document).height()-800 && $(window).scrollTop() + $(window).height()<$(document).height()) {
-        var nextPageUrl=jQuery("#nextPageUrlId").val();
-        if(undefined !==nextPageUrl && nextPageUrl!=""){
-            page++;
-            loadMoreData(nextPageUrl);
-        }        
+    // if($(window).scrollTop() + $(window).height() >= $(document).height()-800 && $(window).scrollTop() + $(window).height()<$(document).height()) {
+    //     var nextPageUrl=jQuery("#nextPageUrlId").val();
+    //     if(undefined !==nextPageUrl && nextPageUrl!=""){
+    //         page++;
+    //         loadMoreData(nextPageUrl);
+    //     }        
 
-        var nextPageUrlHash=jQuery("#nextPageUrlHashId").val();
-        if(undefined !==nextPageUrlHash && nextPageUrlHash!="" && nextPageUrlHash>0){
-            loadMoreDataHash(nextPageUrl);
-        }        
+    //     var nextPageUrlHash=jQuery("#nextPageUrlHashId").val();
+    //     if(undefined !==nextPageUrlHash && nextPageUrlHash!="" && nextPageUrlHash>0){
+    //         loadMoreDataHash(nextPageUrl);
+    //     }        
 
-        var nextPageUrlUser=jQuery("#nextPageUrlUserId").val();
-        if(undefined !==nextPageUrlUser && nextPageUrlUser!="" && nextPageUrlUser>0){
-            loadMoreCreatorData(nextPageUrlUser);
-        }
+    //     var nextPageUrlUser=jQuery("#nextPageUrlUserId").val();
+    //     if(undefined !==nextPageUrlUser && nextPageUrlUser!="" && nextPageUrlUser>0){
+    //         loadMoreCreatorData(nextPageUrlUser);
+    //     }
 
-    }
+    // }
     console.log('documentHe- '+$(document).height());
 });
 
@@ -1970,6 +1974,43 @@ $(document).ready(function(){
     //getVideoSearchResult(10,0);
     //getSideBarData();
 });
+
+
+$(window).scroll(function() {
+    var scorh=Number($(window).scrollTop() + $(window).height());
+    var coshh=(Number($("#playlist").height())-1400);
+    console.log(scorh);
+    console.log(coshh);
+    var nextPageUrl=jQuery("#nextPageUrlId").val();
+    if($(window).scrollTop() + $(window).height() > $("#userVideosListId").height()-800){
+
+        if(checkDataVideoStatus==0 && undefined !==nextPageUrl && nextPageUrl!="" && nextPageUrl>0 ){
+            loadMoreData(nextPageUrl);
+        }
+
+    }
+
+    var nextPageUrlUser=jQuery("#nextPageUrlUserId").val();
+    if($(window).scrollTop() + $(window).height() > $("#creatorItemListId").height()-800){
+
+        if(checkDataUserStatus==0 && undefined !==nextPageUrlUser && nextPageUrlUser!="" && nextPageUrlUser>0 ){
+            loadMoreCreatorData(nextPageUrl);
+        }
+
+    }
+
+    var nextPageUrlHash=jQuery("#nextPageUrlHashId").val();
+    if($(window).scrollTop() + $(window).height() > $("#hashTagSearchId").height()-800){
+
+        if(checkDataHashStatus==0 && undefined !==nextPageUrlHash && nextPageUrlHash!="" && nextPageUrlHash>0 ){
+            loadMoreDataHash(nextPageUrlHash);
+        }
+
+    }
+
+
+});
+
 
 function getVideoSearchResult(limit,offset){
     if(currentVideosActiveStatus==1){
@@ -2035,7 +2076,7 @@ function getVideoSearchResult(limit,offset){
 function loadMoreData(NextPageUrl){
     
     var platlistItems;
-    checkDataStatus=1;
+    checkDataVideoStatus=1;
     var listItems="";
     var itemCount=0;
     var language_id=current_language_id;
@@ -2058,7 +2099,7 @@ function loadMoreData(NextPageUrl){
                 $('.ajax-load').html("No more records found");
                 return;
             }
-            checkDataStatus=0;
+            checkDataVideoStatus=0;
             userVideoItems="";
             var videoItemList=data.results;
             var itemCount=-1;
