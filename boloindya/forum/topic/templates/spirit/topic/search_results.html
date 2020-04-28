@@ -1333,12 +1333,12 @@ function getCreatorsResult(){
     var language_id=1;
     language_id=current_language_id;
     var userVideoItems="";
-    var res='/api/v1/solr/search/users/?term'+searchData;
+    var res='/api/v1/solr/search/users/?term='+searchData;
     //var res = encodeURI(uri);
     jQuery.ajax({
         url:res,
         type:"GET",
-        data:{'language_id':language_id,'page':1,term:searchData},
+        data:{'language_id':language_id,'page':1},
         success: function(response,textStatus, xhr){
             userVideoItems="";
             //var responseData1=JSON.parse(response);
@@ -1378,10 +1378,10 @@ function loadMoreCreatorData(NextPageUrl){
     //var uri='https://www.boloindya.com/api/v1/get_popular_video_bytes/?page=1';
     var uri=NextPageUrl;
     //var res = encodeURI(uri);
-    var res = '/api/v1/solr/search/';
+    var res = '/api/v1/solr/search/?term='+searchData;
     $.ajax({
             url:res,
-            data:{'language_id':language_id,'page':NextPageUrl,'term':searchData},
+            data:{'language_id':language_id,'page':NextPageUrl},
             type: "get",
             beforeSend: function()
             {
@@ -1768,14 +1768,14 @@ function getSearchHashtagSuggestion(){
     var listItems="";
     var itemCount=0;
     var language_id=1;
-    var res='/api/v1/solr/search/hash_tag/';
+    var res='/api/v1/solr/search/hash_tag/?term='+search_term;
     var category_with_video_list="";
     language_id=current_language_id;
     var search_term= '{{search_term}}';
     jQuery.ajax({
         url:res,
         type:"GET",
-        data:{'language_id':language_id,'term':search_term,page:1},
+        data:{'language_id':language_id,page:1},
         success: function(response,textStatus, xhr){
             hashTagClickStatus=1;
             populaCreatorsItems="";
@@ -1839,10 +1839,10 @@ function loadMoreDataHash(NextPageUrl){
     //var uri='https://www.boloindya.com/api/v1/get_popular_video_bytes/?page=1';
     var uri=NextPageUrl;
     //var res = encodeURI(uri);
-    var res='/api/v1/solr/search/hash_tag/';
+    var res='/api/v1/solr/search/hash_tag/?term='+searchData;
     $.ajax({
             url:res,
-            data:{'language_id':language_id,'page':NextPageUrl,'term':searchData},
+            data:{'language_id':language_id,'page':NextPageUrl},
             type: "get",
             beforeSend: function()
             {
