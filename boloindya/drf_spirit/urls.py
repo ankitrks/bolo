@@ -151,8 +151,8 @@ urlpatterns = [
     url(r'^get_category_video_bytes/$', get_category_video_bytes),
     url(r'^get_popular_video_bytes/$', get_popular_video_bytes),
     url(r'^get_recent_videos/$', get_recent_videos),
+    
     # url(r'^get_category_with_video_bytes/$', get_category_with_video_bytes),
-
     # url(r'^old_algo_get_challenge/$', OldAlgoGetChallenge.as_view(), name='old_algo_get_challenge'),
     # url(r'^old_algo_get_popular_hash_tag/$', OldAlgoGetPopularHashTag.as_view(), name='old_algo_get_popular_hash_tag'),
     # url(r'^old_algo_get_follow_post/$', OldAlgoGetFollowPost.as_view(), name='old_algo_get_follow_post'),
@@ -162,6 +162,4 @@ urlpatterns = [
     # url(r'^old_algo_get_popular_video_bytes/$', old_algo_get_popular_video_bytes),
     # url(r'^old_algo_get_recent_videos/$', old_algo_get_recent_videos),
     # url(r'^old_algo_get_category_with_video_bytes/$', old_algo_get_category_with_video_bytes),
-
-    
 ]
