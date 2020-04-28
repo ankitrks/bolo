@@ -110,3 +110,6 @@ enpy/
 # mypy
 .mypy_cache/
 .DS_Store
+
+#extras
+boloindya/scripts/watermark/
