@@ -400,7 +400,7 @@ def get_ranked_topics(user_id, page, filter_dict, exclude_dict, sort_by = '-vb_s
         del exclude_dict['vb_score__gte']
 
     if filter_dict.has_key('language_id'):
-        filter_dict['language_id'] = "'" + filter_dict['language_id'] + "'" # need to send language id AS '2' and not 2 (explicitly typecast).
+        filter_dict['language_id'] = "'" + str(filter_dict['language_id']) + "'" # need to send language id AS '2' and not 2 (explicitly typecast).
     if user_id:
         all_seen_vb = get_redis_vb_seen(user_id)
         exclude_dict['pk__in'] = all_seen_vb
@@ -415,8 +415,8 @@ def get_ranked_topics(user_id, page, filter_dict, exclude_dict, sort_by = '-vb_s
     non_seen_post = list( Topic.objects.raw(raw_query) )
     non_seen_post_count = len(non_seen_post)
 
-    if not page*page_size < non_seen_post_count:
-        all_seen_page = int((page*page_size - non_seen_post_count)/page_size)
+    if not non_seen_post_count < page_size:
+        all_seen_page = int((int(page)*page_size - non_seen_post_count)/page_size)
         all_seen_post = Topic.objects.filter(**filter_dict).filter(pk__in=all_seen_vb)[all_seen_page*page_size:page_size*(all_seen_page+1)+1]
     topics = non_seen_post + list(all_seen_post)
     return topics

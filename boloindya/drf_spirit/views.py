@@ -3099,19 +3099,16 @@ def get_category_video_bytes(request):
         page_no = int(request.POST.get('page', 1))
         is_expand = request.POST.get('is_expand', True)
         req_user = True if request.user.is_authenticated else False
-        topic_filters = {'language_id' : request.POST.get('language_id', 2), 'm2mcategory_id' : request.POST.get('category_id', 0)}
+        topic_filters = {'language_id' : request.POST.get('language_id', 2), 'm2mcategory__id' : request.POST.get('category_id', 0)}
         topics_exclude = {'vb_score__gte' : request.POST.get('vb_score', None)}
         topics = get_ranked_topics(req_user, page_no, topic_filters, topics_exclude)
-        return JsonResponse({'topics' : CategoryVideoByteSerializer(topic_page, many = True, context = {'is_expand': is_expand}).data}, \
+        return JsonResponse({'topics' : CategoryVideoByteSerializer(topics, many = True, context = {'is_expand': is_expand}).data}, \
             status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def get_popular_video_bytes(request):
-    """
-    GET:
-    """
     try:
         all_seen_vb = []
         page_no = int(request.GET.get('page', 1))
