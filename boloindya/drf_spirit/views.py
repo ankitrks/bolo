@@ -1853,6 +1853,14 @@ def createTopic(request):
             userprofile = UserProfile.objects.get(user = request.user)
             userprofile.vb_count = F('vb_count')+1
             userprofile.save()
+            try:
+                all_follower_list = Follower.objects.filter(user_following = topic.user).values_list('user_follower_id',flat=True)
+                for each in all_follower_list:
+                    notify = Notification.objects.create(for_user_id = each,topic = topic,notification_type='1',user = topic.user)
+                topic.calculate_vb_score()
+            except Exception as e:
+                pass
+
             # add_bolo_score(request.user.id, 'create_topic', topic)
             topic_json = TopicSerializerwithComment(topic, context={'is_expand': request.GET.get('is_expand',True)}).data
             message = 'Video Byte Created'

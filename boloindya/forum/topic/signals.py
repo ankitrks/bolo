@@ -9,14 +9,15 @@ post_update = Signal()
 
 @receiver(post_save, sender=Topic)
 def save_topic(sender, instance,created, **kwargs):
-    try:
-        if created and not instance.is_vb:
-            all_follower_list = Follower.objects.filter(user_following = instance.user).values_list('user_follower_id',flat=True)
-            for each in all_follower_list:
-                notify = Notification.objects.create(for_user_id = each,topic = instance,notification_type='1',user = instance.user)
-        instance.calculate_vb_score()
-    except Exception as e:
-        pass
+    pass
+    # try:
+    #     if created and not instance.is_vb:
+    #         all_follower_list = Follower.objects.filter(user_following = instance.user).values_list('user_follower_id',flat=True)
+    #         for each in all_follower_list:
+    #             notify = Notification.objects.create(for_user_id = each,topic = instance,notification_type='1',user = instance.user)
+    #     instance.calculate_vb_score()
+    # except Exception as e:
+    #     pass
 
 @receiver(post_save, sender=Comment)
 def save_comment(sender, instance,created, **kwargs):
