@@ -3984,7 +3984,7 @@ def old_algo_get_popular_video_bytes(request):
         paginator_topics = PageNumberPagination()
         language_id = request.GET.get('language_id', 1)
         all_seen_vb = []
-        post_till = datetime.now() - timedelta(days=90)
+        post_till = datetime.now() - timedelta(days=190)
         if request.user.is_authenticated:
             all_seen_vb = get_redis_vb_seen(request.user.id)
             # all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__is_popular=True).distinct('topic_id').values_list('topic_id',flat=True)

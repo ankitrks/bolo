@@ -273,6 +273,7 @@ function getCategoryVideos(){
 }
 
 function getVideoItem(videoItem,itemCount){
+    //<a href="javascript:void(0)" onClick="openVideoInPopup(\''+videoItem.question_video+'\',\''+videoItem.question_image+'\','+itemCount+');" class="jsx-2893588005 video-feed-item-wrapper">\
     var content_title="";
     var videoTitle="";
         videoTitle=removeTags(videoItem.title);
@@ -281,7 +282,7 @@ function getVideoItem(videoItem,itemCount){
             <div class="jsx-1410658769 _ratio_">\
                 <div class="jsx-1410658769" style="padding-top: 148.438%;">\
                     <div class="jsx-1410658769 _ratio_wrapper">\
-                        <a href="javascript:void(0)" onClick="openVideoInPopup(\''+videoItem.question_video+'\',\''+videoItem.question_image+'\','+itemCount+');" class="jsx-2893588005 video-feed-item-wrapper">\
+                        <a href="/explore/'+videoItem.slug+'/'+videoItem.id+'"  class="jsx-2893588005 video-feed-item-wrapper">\
                             <div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+videoItem.question_image+');">\
                                 <div class="jsx-3077367275 video-card default">\
                                     <div class="jsx-3077367275 video-card-mask">\

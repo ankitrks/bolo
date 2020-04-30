@@ -521,13 +521,18 @@
             bottom: 0;
             width: 376px;
             text-align: center;
-            background-color: #ffffff;
+            background-color: #fffff0;
+            /*background-color: #ffffff;*/
             padding: 87px 0;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             box-sizing: border-box;
             line-height: 32px;
             z-index: 9;
+        }
+
+        .zindexChange{
+          z-index: 0 !important;
         }
         
         .is-rtl .drawer-content {
@@ -3794,6 +3799,76 @@ video.jsx-3382097194 {
     position: relative;
     border-radius: 10px;
 }
+.header-tag.jsx-874583638 .check-icon-business.jsx-874583638 {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 6px;
+    position: relative;
+    border-radius: 10px;
+}
+.header-tag.jsx-874583638 .check-icon-superstar.jsx-874583638 {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 6px;
+    position: relative;
+    border-radius: 10px;
+}
+.header-tag.jsx-874583638 .check-icon-business.jsx-874583638::before {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    left: 4px;
+    top: 6px;
+    background: url('/media/golden_tick.png') center center / contain no-repeat transparent;
+}
+
+.header-tag.jsx-874583638 .check-icon-superstar.jsx-874583638::before {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    left: 4px;
+    top: 6px;
+    background: url('/media/BlueTick.png') center center / contain no-repeat transparent;
+}
+
+.header-tag.jsx-874583638 .check-icon.jsx-874583638::before {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    left: 4px;
+    top: 6px;
+    background: url('/media/tick_icon.svg') center center / contain no-repeat transparent;
+}
+
+@media(max-width: 991px){
+
+.header-tag.jsx-874583638 .check-icon-business.jsx-874583638::before {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 8px;
+    left: 4px;
+    top: 6px;
+    background: url('/media/golden_tick.png') center center / contain no-repeat transparent;
+}
+
+.header-tag.jsx-874583638 .check-icon-superstar.jsx-874583638::before {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 8px;
+    left: 4px;
+    top: 6px;
+    background: url('/media/BlueTick.png') center center / contain no-repeat transparent;
+}
+
 .header-tag.jsx-874583638 .check-icon.jsx-874583638::before {
     content: "";
     position: absolute;
@@ -3801,11 +3876,22 @@ video.jsx-3382097194 {
     height: 8px;
     left: 4px;
     top: 6px;
-    background: url('/media/checkIcon.svg') center center / contain no-repeat transparent;
+    background: url('/media/tick_icon.svg') center center / contain no-repeat transparent;
 }
+.jsx-949708032{
+    font-size: 13px;
+}
+
+
+}
+
+
 .header-tag.has-icon.jsx-874583638 {
-    padding-left: 4px;
+    padding-left: 0px;
 }
+
+
+
 ._explore_page_feed_wrapper {
     min-width: 1153px;
     display: flex;
@@ -4680,4 +4766,7 @@ strong {
     display: inline-block;
     height: 16px;
     width: 16px;
+}
+.feedlist-item .user-info .name{
+  font-weight: 600;
 }

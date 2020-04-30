@@ -123,7 +123,7 @@
 
     .share-layout {
         margin: auto;
-        padding: 120px 0px;
+        padding: 30px 0px;
         width: 100%;
         display: inline-block;
     }
@@ -131,9 +131,7 @@
         margin-left: 32px;
     }
     .jsx-578937417{
-        width: 127px;
-        height: 127px;
-        flex: 0 0 138px;
+        flex: 0 0 80px;
     }
     .header-tag.jsx-874583638 .content.jsx-874583638{
         font-size: 9px;
@@ -301,27 +299,230 @@
 .header-tag.jsx-874583638{
     margin-left: 0px;
 }
+.share-layout .share-layout-aside{
+    width: 98%;
+    margin-left: 4px;
+}
 
 
 }
+.header {
+    position: relative;
+    color: #161823;
+    background-color: #fff;
+    text-align: center;
+    font-weight: bold;
+    line-height: 44px;
+    font-size: 17px;
+    height: 90px;
+    font-family: "proxima-semibold",PingFangSC,sans-serif;
+    font-weight: 600;
+    z-index: 999;
+}
+.header-left {
+    left: 16px;
+    top: 8px;
+}
+.header-back {
+    position: absolute;
+    width: 12px;
+    height: 21.33333px;
+}
+.header-right {
+    right: 16px;
+    top: 10px;
+}
+.header-icon {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+}
+.header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(22,24,35,0.2);
+    height: 1px;
+    -webkit-transform: scaleY(0.5);
+    -ms-transform: scaleY(0.5);
+    transform: scaleY(0.5);
+}
+.hideOnDesktop{
+    display: none;
+}
+.share-header .share-sub-title{
+    color: #6b6565;
+    font-size: 13px;
+}
+
+@media(max-width: 991px){
+.user-page .profile {
+    padding: 16px 0;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-align-items: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+}
+.user-page .profile-avatar {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 12px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+.user-page .profile h1 {
+    color: #161823;
+    font-size: 15px;
+    line-height: 18px;
+    margin-bottom: 0px;
+    text-align: center;
+}
+.share-header .share-sub-title{
+    text-align: center !important;
+}
+.user-page .profile ul {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    padding: 0 0px;
+    width: 100%;
+}
+.user-page .profile-text {
+    text-align: center;
+    margin-top: 16px;
+    padding: 0 46px;
+    color: rgba(22,24,35,0.5);
+    font-size: 14px;
+    font-weight: 400;
+}
+.user-page .profile ul li {
+    width: 24%;
+    position: relative;
+    display: inline-block;
+}
+.user-page .profile ul li strong:first-child, .user-page .profile ul li span:first-child {
+    color: #161823;
+}
+.user-page .profile ul li strong, .user-page .profile ul li span {
+    display: block;
+    text-align: center;
+    color: rgba(22,24,35,0.5);
+}
+.user-page .profile ul li::after {
+    position: absolute;
+    content: '';
+    background: rgba(22,24,35,0.12);
+    width: 1px;
+    height: 16px;
+    -webkit-transform: translateY(-50%) scaleX(0.5);
+    -ms-transform: translateY(-50%) scaleX(0.5);
+    transform: translateY(-50%) scaleX(0.5);
+    right: 0;
+    top: 50%;
+}
+.share-header .share-info {
+    padding-top: 4px;
+    margin-left: 0px;
+    flex: 1 1 auto;
+    width: 100%;
+
+}
+
+.hideOnMobile{
+    display: none;
+}
+.user-page .profile div {
+    margin-top: -46px;
+    padding: 0 0px;
+    color: rgba(22,24,35,0.5);
+    font-size: 14px;
+}
+.backgroundData{
+
+}
+.paddingTop{
+    padding-top: 60px;
+    padding-left: 37px;
+}
+.mobileUseProIcon::before {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 8px;
+    left: 4px;
+    top: 6px;
+    background: url(/media/checkIcon.svg) center center / contain no-repeat transparent;
+}
+.recommend-card.jsx-3959364739{
+    margin-top: 15px;
+}
+
+.userProfilAvator {
+    border: 3px solid #fff !important;
+}
+::-webkit-scrollbar { 
+    display: none;  /* Safari and Chrome */
+}
+
+}
+
 
 </style>
-<div class="jsx-3819228898">
 
+
+<div class="jsx-3819228898">
+<header class="jsx-3732044518 header hideOnDesktop">
+    <div class="header-back header-left"><img src="/media/back-icon.svg" onclick="goBack()"></div>
+    <h3 class="jsx-3732044518 header-center" style="padding-top: 20px;">{{ user_profile.name}}</h3>
+    <div class="header-icon header-right"><img src="/media/share_img.svg" onclick="openShareTab()"></div>
+</header>
     <input type="hidden" name="id" id="currentUserId" value="{{user.id}}">
     <!-- <input type="hidden" name="id" id="currentUserId" value="{{user_profile.id}}"> -->
-    <div class="jsx-606928072 share-layout">
+    <div class="jsx-606928072 user-page share-layout">
         <div class="share-layout-content">
-            <header class="share-layout-header bottom-line share-header">
-                <div class="jsx-2177493926 jsx-578937417 avatar round userProfilAvator" style="background-image: url({{ user_profile.profile_pic}}); "></div>
+            <header class="share-layout-header bottom-line share-header profile">
+                <div class="backgroundData hideOnDesktop" style="background-image: linear-gradient(to bottom, rgba(245, 246, 252, 0.52), rgba(184, 43, 41)), url({{ user_profile.cover_pic}});height: 150px;width: 100%; ">
+
+
+                </div>
+                <div class="jsx-2177493926 jsx-578937417 avatar round userProfilAvator" style="background-image: url({% if user_profile.profile_pic|length > 1 %}
+                                {{user_profile.profile_pic}}
+                            {% else %}
+                                /media/user.svg
+                            {% endif %}); "></div>
                 <div class="share-info">
-                    <h1 class="share-title"> {{ user_profile.name}}</h1>
-                    <h1 class="share-sub-title">@{{ user.username}} <span class="jsx-874583638 header-tag has-icon"><span class="jsx-874583638 check-icon" style="background-color: rgb(24, 118, 242);"></span><span class="jsx-874583638 content">{% trans "Verified account" %}</span></span></h1>
-                    <p class="count-infos"><span class="number">{{ user_profile.follow_count | shorcountertopic}}</span><span class="unit"> {% trans "Following" %}</span><span class="number"> {{ user_profile.follower_count | shorcountertopic}}</span><span class="unit"> {% trans "Followers" %} </span>
+                    <h1 class="share-title  paddingTop"> {{ user_profile.name}}<span class="jsx-874583638 header-tag has-icon"><span class="jsx-874583638 {% if user_profile.is_business is True %}
+   check-icon-business
+{% elif user_profile.is_superstar is True %}
+   check-icon-superstar
+{% else %}
+    check-icon
+{% endif %} " ></span></span></h1>
+                    <h3 class="share-sub-title ">{{ user_profile.bio}}</h3>
+
+                    <ul class="jsx-1061034316 hideOnDesktop">
+                        <li class="jsx-1061034316"><strong title="Videos" class="jsx-1061034316">{{topicsCount | shorcountertopic}}</strong><span class="jsx-1061034316">Videos</span></li>                        
+                        <li class="jsx-1061034316"><strong title="Following" class="jsx-1061034316">{{ user_profile.follow_count | shorcountertopic}}</strong><span class="jsx-1061034316">Following</span></li>
+                        <li class="jsx-1061034316"><strong title="Followers" class="jsx-1061034316">{{ user_profile.follower_count | shorcountertopic}}</strong><span class="jsx-1061034316">Followers</span></li>
+                        <li class="jsx-1061034316"><strong title="Likes" class="jsx-1061034316">{{ user_profile.like_count | shorcountertopic}}</strong><span class="jsx-1061034316">Likes</span></li>
+
+                    </ul>
+
+                    <p class="count-infos hideOnMobile"><span class="number">{{ user_profile.follow_count | shorcountertopic}}</span><span class="unit"> {% trans "Following" %}</span><span class="number"> {{ user_profile.follower_count | shorcountertopic}}</span><span class="unit"> {% trans "Followers" %} </span>
                         <span class="number"> {{ user_profile.like_count | shorcountertopic}}</span>
                         <span class="unit"> {% trans "Likes" %}</span><span class="number"> </span>
                         <span class="number" id="userVideoCountId">{{topicsCount | shorcountertopic}}</span><span class="unit"> {% trans "Videos" %}</span>
-                        <span class="unit" >
+                        <span class="unit " >
                             <button style="margin-top: -5px;" onclick="follow_user_from_user('{{user_profile.id}}');" class="_4jy1 _4jy4 _517h _51sy _42ft " type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followUserStatusChange-{{user_profile.id}} followCheck sx_5da455"></i><span class="btnTextChangeUser-{{user_profile.id}}">{% trans "Follow" %}</span>
                             </button>
                         </span>
@@ -344,7 +545,7 @@
         </div>
         <aside class="share-layout-aside ">
             <div class="jsx-1422783265 recommend-aside">
-                <div class="jsx-29267105 share-group">
+                <div class="jsx-29267105 share-group hideOnMobile">
                     <a href="javascript:void(0);" onclick="social_share_page('facebook_share','{{ request.get_full_path }}')" class="jsx-29267105">
                         <span><img src="/media/facebook_mobile.svg" class="jsx-29267105"></span>
                     </a>
@@ -394,6 +595,12 @@
 <!-----------  User Details Script  ------------>
 <script src="/media/js/user_details.js"></script>
 <!-----------End  ------------>
+
+<script>
+function goBack() {
+  window.history.back();
+}
+</script>
 
 <!-- Start Comments Section -->
 {% include "spirit/_video_play_and_comments.html" %}
