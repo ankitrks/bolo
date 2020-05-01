@@ -1594,6 +1594,28 @@ content: '';
 }
 
 }
+.main-body{
+    background: rgb(245, 245, 245) !important;
+}
+
+@media (max-width: 991px){
+.footer1 {
+    width: 100%;
+    position: absolute;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    background-color: #000;
+    height: 60px;
+    padding: 0 16px;
+    bottom: 0px;
+}
+}
 </style>
 <input type="hidden" name="singleTopicId" id="singleTopicId" value="{{topic.id}}">
 <input type="hidden" name="topicSlug" id="singleTopicSlug" value="{{topic.slug}}">
@@ -1633,7 +1655,7 @@ content: '';
                                 </div>
 
                                 <div class="jsx-3077367275 video-card-mask"></div>
-                                <div class="jsx-4030482358 theme videoPlayButtonDetails play-button"></div>
+                                <div class="jsx-4030482358 theme videoPlayButtonDetails"></div>
                                 <span class="jsx-3077367275 event-delegate-mask event-delegate-maskMob"></span>
 
                                 <span class="_video_card_"></span><img onclick="muteAndUnmutePlayerDet('playerDetailsMobile');" class="jsx-3077367275 mute-icon" id="mutedImageIdDe"  src="/media/mute_icon.svg">
@@ -1712,7 +1734,7 @@ content: '';
       <video id="player-{{topic.id}}"  preload="auto" data-setup='{ "aspectRatio":"640:267", "playbackRates": [1, 1.5, 2] }' poster="{{topic.question_image}}" class="videoCentered videoSliderPlay " preload="metadata"  width="212" height="160">
     </video>
       <div class="jsx-3077367275 video-card-mask"></div>
-      <div class="jsx-4030482358 theme playButtonStatus videoPlayButtonDetails-{{topic.id}} play-button"></div>
+      <div class="jsx-4030482358 theme playButtonStatus videoPlayButtonDetails-{{topic.id}} "></div>
       <span class="jsx-3077367275 event-delegate-mask event-delegate-maskDesk" onclick="delegateClick('{{topic.id}}','{{topic.backup_url | safe}}','{{topic.question_video | get_video_cdn}}')"></span>
       </div>
       <img onclick="muteAndUnmutePlayerFeed('{{topic.id}}');" class="jsx-3077367275 mute-icon {{topic.id}}" id="mutedImageIdDeDesk" src="/media/mute_icon.svg">

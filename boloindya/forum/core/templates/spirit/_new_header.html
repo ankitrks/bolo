@@ -848,9 +848,7 @@ input#search-bar:focus:-ms-placeholder {
 
 
 
-                                <li class="jsx-3143951235">
-                                  <h2 class="menu-item-link"><a href="/login/" class="jsx-2922828392">{% trans "Signin" %}</a></h2>
-                                </li>
+
 
 
 <!--                                 <li class="jsx-3143951235">
@@ -862,7 +860,9 @@ input#search-bar:focus:-ms-placeholder {
                                 </li>  -->
 <!--                                 <li class="jsx-3143951235" style="">
                                   <h2 class="menu-item-link" style="margin-top: 25px;"><a href="https://play.google.com/store/apps/details?id=com.boloindya.boloindya&amp;hl=en_IN" target="_blank" rel="nofollow" class="jsx-3336228099"><img style="height: 30px;" src="//sf-tb-sg.ibytedtos.com/obj/ttfe-malisg/store-badge/google/en.png" alt="google-store" class="jsx-3336228099"></a></h2>
-                                </li> -->
+                                </li> -->                                
+
+                                {% if user.is_authenticated %}
                                 <li class="jsx-3143951235" id="boloSideMenu">
 
                                     <span class="bolo-642826668 boloSideMenuClass hamburger-menu">
@@ -874,10 +874,15 @@ input#search-bar:focus:-ms-placeholder {
                                   </span>
 
                                 </li>
+                                {% else %}
+                                <li class="jsx-3143951235">
+                                  <h2 class="menu-item-link"><a href="/login/" class="jsx-2922828392">{% trans "Signin" %}</a></h2>
+                                </li>
+                                {% endif %}
                           </ul>
                 </div>
                 <!-- Mobile Search -->
-                <div class="_4kny _50tm">
+                <div class="_4kny _50tm" id="searchToggle">
                     <div class="_585- hideOnDesktop" aria-label="Facebook" role="search" data-testid="facebar_root" id="js_19">
                         <form action="/{{LANGUAGE_CODE}}/search/" method="get">
                             <button value="1" class="_42ft _4jy0 _4w98 _4jy3 _517h _51sy _4w97" aria-label="Search" tabindex="-1" data-testid="facebar_search_button" type="submit"><i class="_585_"></i></button>
@@ -954,13 +959,13 @@ input#search-bar:focus:-ms-placeholder {
                             </script>
 
  
-                          <div class="theme-switch-wrapper">
+<!--                           <div class="theme-switch-wrapper">
                             <label class="theme-switch" for="checkbox">
                               <input type="checkbox" id="checkbox" />
                               <div class="slider round"></div>
                             </label>
-                              <!-- <em>Enable Dark Mode!</em> -->
-                          </div>
+                           
+                          </div> -->
                         <div class="jsx-1724846817 jsx-1667329752 language-selection">
                             {% get_current_language as LANGUAGE_CODE %}
                             {% get_available_languages as LANGUAGES %}
@@ -1064,42 +1069,42 @@ input#search-bar:focus:-ms-placeholder {
 
 <script>
 
-const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
-const currentTheme = localStorage.getItem('theme');
+// const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
+// const currentTheme = localStorage.getItem('theme');
 
-if (currentTheme) {
-    document.documentElement.setAttribute('data-theme', currentTheme);
+// if (currentTheme) {
+//     document.documentElement.setAttribute('data-theme', currentTheme);
   
-    if (currentTheme === 'dark') {
-        toggleSwitch.checked = true;
-    }
-}
+//     if (currentTheme === 'dark') {
+//         toggleSwitch.checked = true;
+//     }
+// }
 
-function switchTheme(e) {
-    if (e.target.checked) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        localStorage.setItem('theme', 'dark');
+// function switchTheme(e) {
+//     if (e.target.checked) {
+//         document.documentElement.setAttribute('data-theme', 'dark');
+//         localStorage.setItem('theme', 'dark');
 
-    }
-    else {
-      document.documentElement.setAttribute('data-theme', 'light');
-      localStorage.setItem('theme', 'light');
+//     }
+//     else {
+//       document.documentElement.setAttribute('data-theme', 'light');
+//       localStorage.setItem('theme', 'light');
   
-    }    
-}
-function switchLogo(){debugger;
-  var currentTheme1 = localStorage.getItem('theme');
-    if (currentTheme1 == 'dark') {
-        var logoDark='/media/img/boloindya_logo.png';
+//     }    
+// }
+// function switchLogo(){debugger;
+//   var currentTheme1 = localStorage.getItem('theme');
+//     if (currentTheme1 == 'dark') {
+//         var logoDark='/media/img/boloindya_logo.png';
         
-        $("#boloindyaLogoId").attr('src',logoDark);
+//         $("#boloindyaLogoId").attr('src',logoDark);
 
-    } else {
-        var logoLight='/media/bolo-Indya164x101.png';
-        $("#boloindyaLogoId").attr('src',logoLight);
-    }
-}
+//     } else {
+//         var logoLight='/media/bolo-Indya164x101.png';
+//         $("#boloindyaLogoId").attr('src',logoLight);
+//     }
+// }
 
-toggleSwitch.addEventListener('change', switchTheme, false);
+// toggleSwitch.addEventListener('change', switchTheme, false);
 
 </script>

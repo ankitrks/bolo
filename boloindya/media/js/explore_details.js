@@ -52,49 +52,6 @@ function getElementsByPage(currentPage){
 
 }
 
-
-
-// function video_play_using_video_js1(file,image){
-//   loaderShow();
-//   var video = document.getElementById('playerDetails');
-
-//   var hls = new Hls();
-//   if(Hls.isSupported()) {
-    
-//     hls.loadSource(file);
-//     hls.attachMedia(video);
-//     hls.on(Hls.Events.MANIFEST_PARSED,function() {
-//       video.play();
-//       loaderHide();
-//   });
-//  }
-//   else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-//     video.src = file;
-//     video.addEventListener('loadedmetadata',function() {
-//       video.play();
-//       loaderHide();
-//     });
-//   }
-
-//   hls.on(Hls.Events.ERROR, function (event, data) {
-
-//       if (data.fatal) {
-//         switch(data.type) {
-//         case Hls.ErrorTypes.NETWORK_ERROR:
-//           console.log("fatal network error encountered, try to recover");
-//           if (!retrying) {
-//               retry;
-//           }
-//           break;
-//         case Hls.ErrorTypes.MEDIA_ERROR:
-//           console.log("fatal media error encountered, try to recover");
-//           hls.recoverMediaError();
-//           break;
-//         }
-//       }
-//   });
-
-// }
 var isLoading = false;
 var hideErrorMsg = true;
 
@@ -115,59 +72,91 @@ const config = {
 }
 var muteStatus=false;
 
-var hls = new Hls(config);
+var hls = new Hls();
 
-function video_play_using_video_js(url,backup_url,image) {
-    if(Hls.isSupported()) {
-        let retrying = false;
-        
-        video.onplaying = () => {
-            isLoading = false;
-            hideErrorMsg = false;
-            //clearInterval(retry);
-            retrying = false;
-
-        }
-        
+function video_play_using_video_js1(url,backup_url,image) {debugger;
+    var video = document.getElementById('player-'+singleTopicId);
+    url="";
+      if(Hls.isSupported()) {
+        var hls = new Hls();
         hls.loadSource(url);
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED,function() {
-            video.play();
+          video.play();
+          loaderHide();
+      });
+     }
+     // hls.js is not supported on platforms that do not have Media Source Extensions (MSE) enabled.
+     // When the browser has built-in HLS support (check using `canPlayType`), we can provide an HLS manifest (i.e. .m3u8 URL) directly to the video element through the `src` property.
+     // This is using the built-in support of the plain video element, without using hls.js.
+     // Note: it would be more normal to wait on the 'canplay' event below however on Safari (where you are most likely to find built-in HLS support) the video.src URL must be on the user-driven
+     // white-list before a 'canplay' event will be emitted; the last video event that can be reliably listened-for when the URL is not on the white-list is 'loadedmetadata'.
+      else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = backup_url;
+        video.addEventListener('loadedmetadata',function() {
+          video.play();
+          loaderHide();
         });
-    
-        hls.on(Hls.Events.ERROR, function (event, data) {
-            if (!hideErrorMsg) {
-                isLoading = true;
-                hideErrorMsg = true;
-            }
-            if (data.fatal) {
-              switch(data.type) {
-              case Hls.ErrorTypes.NETWORK_ERROR:
-              
-                console.log("fatal network error encountered, try to recover");
-                if (!retrying) {
-                    if(retryCount<2){
-                      retryLiveStream(hls,url);
-                    }
-                    
-                }
-                break;
-              case Hls.ErrorTypes.MEDIA_ERROR:
-                console.log("fatal media error encountered, try to recover");
-                hls.recoverMediaError();
-                break;
-              }
-            }
-        });
-    }else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-    video.src = file;
-    video.addEventListener('loadedmetadata',function() {
-      video.play();
-      loaderHide();
-    });
-  }
+      }
+      video.on("waiting", function ()
+      {
+          this.addClass("vjs-custom-waiting");
+      });
+      video.on("playing", function ()
+      {
+          this.removeClass("vjs-custom-waiting");
+      });
+
   checkPlayStatus(video);
 }
+
+function video_play_using_video_js(url,backup_url,image){
+  
+    if(Hls.isSupported()) {
+    var video = document.getElementById('player-'+singleTopicId);
+    var hls = new Hls({
+        debug: true
+    });
+
+    hls.loadSource(url);
+    hls.attachMedia(video);
+    hls.on(Hls.Events.MEDIA_ATTACHED, function() {
+      video.muted = true;
+      video.play();
+  });
+
+
+ }else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+    video.src = url;
+    video.addEventListener('canplay',function() {
+      video.play();
+    });
+  }
+  hls.on(Hls.Events.ERROR, function (event, data) {
+    if (data.fatal) {
+      switch(data.type) {
+      case Hls.ErrorTypes.NETWORK_ERROR:
+        console.log("fatal network error encountered, try to recover");
+        hls.startLoad();
+        video.src = backup_url;
+        video.addEventListener('loadedmetadata',function() {
+          video.play();
+        });
+
+        break;
+      case Hls.ErrorTypes.MEDIA_ERROR:
+        console.log("fatal media error encountered, try to recover");
+        hls.recoverMediaError();
+        break;
+      default:
+        hls.destroy();
+        break;
+      }
+    }
+  });
+
+}
+
 
 function retryLiveStream(hls, url) {
     retrying = true;
@@ -343,9 +332,9 @@ $(".event-delegate-maskDesk1").click(function(){
 function video_play_using_video_js_mobile(url,backup_url,image) {
     
     var video = document.getElementById('playerDetailsMobile');
-
+      var hls = new Hls();
       if(Hls.isSupported()) {
-        var hls = new Hls();
+        
         hls.loadSource(url);
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED,function() {
@@ -353,6 +342,14 @@ function video_play_using_video_js_mobile(url,backup_url,image) {
           var playPromise = video.play();
 
       });
+     }
+      else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = url;
+        video.addEventListener('loadedmetadata',function() {
+          video.play();
+          loaderHide();
+        });
+      }
 
       hls.on(Hls.Events.ERROR, function (event, data) {
         if (data.fatal) {
@@ -376,23 +373,6 @@ function video_play_using_video_js_mobile(url,backup_url,image) {
           }
         }
       });
-
-
-     }
-
-
-     // hls.js is not supported on platforms that do not have Media Source Extensions (MSE) enabled.
-     // When the browser has built-in HLS support (check using `canPlayType`), we can provide an HLS manifest (i.e. .m3u8 URL) directly to the video element through the `src` property.
-     // This is using the built-in support of the plain video element, without using hls.js.
-     // Note: it would be more normal to wait on the 'canplay' event below however on Safari (where you are most likely to find built-in HLS support) the video.src URL must be on the user-driven
-     // white-list before a 'canplay' event will be emitted; the last video event that can be reliably listened-for when the URL is not on the white-list is 'loadedmetadata'.
-      else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = backup_url;
-        video.addEventListener('loadedmetadata',function() {
-          video.play();
-          loaderHide();
-        });
-      }
 }
 
 

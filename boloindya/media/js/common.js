@@ -160,10 +160,11 @@ jQuery("#boloSideMenu").click(function(e){
             jQuery(".drawerOpenAndClose").removeClass('drawer-enter drawer-enter-active');
             jQuery(".drawerOpenAndClose").addClass('drawer-exit drawer-exit-active');  
             jQuery(".drawer-enter-done").addClass('hide');
+            $("#searchToggle").show();
       }else {
             jQuery("#subHeader").removeClass('zindexChange');
             jQuery("#subHeader").addClass('zindexChange');
-            
+            $("#searchToggle").hide();
             jQuery(".boloSideMenuClass").addClass('hamburger-menu-active'); 
             jQuery(".boloSideMenuClass").removeClass('drawer-exit drawer-exit-active');
             jQuery(".drawerOpenAndClose").addClass('drawer-enter drawer-enter-active');
