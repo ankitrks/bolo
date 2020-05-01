@@ -1232,7 +1232,7 @@
     -webkit-box-pack: center;
     justify-content: center;
     box-sizing: border-box;
-    background: #000;
+    background: rgb(245, 245, 245);
     padding: 0px 10% 0 34px;
     width: 40%;
 }

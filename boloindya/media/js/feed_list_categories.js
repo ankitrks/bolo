@@ -73,7 +73,7 @@
                       listItems +='<div class="feedlist-item">\
                                       <header class="user-info"><img src="'+profilePics+'" class="avatar" alt="Khushi Kumari">\
                                           <div>\
-                                              <div class="name">'+itemVideo.user.userprofile.name+'</div>\
+                                              <div class="name"><a href="/'+itemVideo.user.username+'/">'+itemVideo.user.userprofile.name+'</a></div>\
                                               <div class="description"></div>\
                                           </div>\
                                       </header>\
@@ -199,7 +199,7 @@ function loaderBoloHide(){
                       listItems +='<div class="feedlist-item">\
                                       <header class="user-info"><img src="'+profilePics+'" class="avatar" alt="Khushi Kumari">\
                                           <div>\
-                                              <div class="name">'+itemVideo.user.userprofile.name+'</div>\
+                                              <div class="name"><a href="/'+itemVideo.user.username+'/">'+itemVideo.user.userprofile.name+'</a></div>\
                                               <div class="description"></div>\
                                           </div>\
                                       </header>\
@@ -1086,9 +1086,9 @@ function getElementsByPageSideBar(currentPage){
     var platlistItems;
     var listItems="";
     var itemCount=0;
+    var language_id=current_language_id;
 
-
-    var uri='/api/v1/get_popular_video_bytes/?page='+currentPage;
+    var uri='/api/v1/get_popular_video_bytes/?page='+currentPage+'&language_id='+language_id;
     var res = encodeURI(uri);
     $.get(res, function (data, textStatus, jqXHR) {
         var topicVideoList=data.topics;

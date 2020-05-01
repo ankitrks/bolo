@@ -1101,9 +1101,9 @@ function getElementsByPageSideBar(currentPage){
     var platlistItems;
     var listItems="";
     var itemCount=0;
+    var language_id=current_language_id;
 
-
-    var uri='/api/v1/get_popular_video_bytes/?page='+currentPage;
+    var uri='/api/v1/get_popular_video_bytes/?page='+currentPage+'&language_id='+language_id;
     var res = encodeURI(uri);
     $.get(res, function (data, textStatus, jqXHR) {
         var topicVideoList=data.topics;

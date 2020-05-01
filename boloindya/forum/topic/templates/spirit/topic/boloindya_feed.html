@@ -387,6 +387,21 @@
     flex: 0 0 auto;
 }
 }
+
+.banner-video-container .video-wall{
+   background: rgb(245, 245, 245) !important; 
+}
+
+.feedlist-item .title a{
+    color:var(--primary-link-color);
+}
+
+.link-active {
+    color: var(--primary-link-color);
+    text-decoration: none;
+    border-bottom: 3px solid #b62927b5;
+    font-weight: bold;
+}
 </style>  
 
 
@@ -397,7 +412,9 @@
         <div class="_2WfMm">
             <nav>
                 <ul class="horizontal-scroll">
-
+                    <li class="item link-active"  id="" style="padding-top:.5em;padding-bottom:.5em;cursor:pointer"><a href="javascript:void(0)" class="_3gKV2">{% trans "Popular" %}</a>
+                    </li>
+                
                 {%  for each_category_item in categories %}
 
                     <li  class="item" id="" style="padding-top:.5em;padding-bottom:.5em;cursor:pointer"><a href="/tag/{{each_category_item.slug}}/" class="_3gKV2">{% category_title_by_language each_category_item LANGUAGE_CODE|language_name %}</a></li>
@@ -774,8 +791,12 @@ div.video-controls .progress-bar-parent .progress-bar-background .progress-bar {
     height: 480px;
     margin:2px;
 }
+.recommend-container {
+    background: #fff;
+}
 .recommend-card.jsx-3959364739{
     height: 298px;
+    background: #fff;
 }
 .recommend-card.jsx-3959364739 ul.jsx-3959364739{
     height: 215px;
@@ -803,6 +824,9 @@ div.video-controls .progress-bar-parent .progress-bar-background .progress-bar {
     background: #211e1e;
 }
 
+.recommend-card.jsx-3959364739 header.jsx-3959364739 h3.jsx-3959364739{
+    font-size: 31px;
+}
 
 </style>
 
@@ -918,7 +942,7 @@ div.video-controls .progress-bar-parent .progress-bar-background .progress-bar {
 
                             <div class="jsx-3959364739 recommend-card" style="margin-top: 70px;">
                                 <header class="jsx-3959364739">
-                                    <h3 class="jsx-3959364739">{% trans "Users" %}</h3><!-- <a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a> --></header>
+                                    <h3 class="jsx-3959364739">{% trans "Suggested Users" %}</h3><!-- <a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a> --></header>
 <!--                                 <div class="_scroll_load_more_loading_creator center">
                                     <div class="boloindya-loading">Loading...</div>
                                 </div> -->
@@ -960,7 +984,7 @@ div.video-controls .progress-bar-parent .progress-bar-background .progress-bar {
                             </div>
                             <div class="jsx-3959364739 recommend-card" style="margin-top: 10px;height: 250px;">
                                 <header class="jsx-3959364739">
-                                    <h3 style="font-size: 24px;" class="jsx-3959364739">{% trans "Hashtag Challeges" %}</h3><!-- <a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a> --></header>
+                                    <h3 style="font-size: 24px;" class="jsx-3959364739">{% trans "Trending Hashtags" %}</h3><!-- <a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a> --></header>
 <!--                                 <div class="_scroll_load_more_loading_creator center">
                                     <div class="boloindya-loading">Loading...</div>
                                 </div> -->
