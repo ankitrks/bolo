@@ -597,6 +597,9 @@ def boloindya_careers(request):
 def boloindya_team_details(request):
     return render(request, 'spirit/topic/boloindya_team.html')
 
+def upload_video_boloindya(request):
+    return render(request, 'spirit/topic/upload_videos.html')
+
 def boloindya_openings(request):
     job_openings = []
     try:
