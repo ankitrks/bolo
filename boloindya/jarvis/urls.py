@@ -50,6 +50,7 @@ urlpatterns = [
     url(r'^get_single_user_pay_details/$',views.get_single_user_pay_details, name='get_single_user_pay_details'),
     url(r'^get_pending_kyc_user_list/$',views.get_pending_kyc_user_list, name='get_pending_kyc_user_list'),
     url(r'^get_accepted_kyc_user_list/$',views.get_accepted_kyc_user_list, name='get_accepted_kyc_user_list'),
+    url(r'^approve_all_completd_kyc/$',views.approve_all_completd_kyc, name='approve_all_completd_kyc'),
     url(r'^notification_panel/$',views.notification_panel, name='notification_panel'),
     url(r'^particular_notification/(?P<notification_id>\d+)/(?P<status_id>\d+)/(?P<page_no>\d+)/(?P<is_uninstalled>\d+)$',views.particular_notification, name='particular_notification'),
     url(r'^add_user_pay/$',views.add_user_pay, name='add_user_pay'),

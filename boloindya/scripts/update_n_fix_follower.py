@@ -10,8 +10,9 @@ from django.db.models import F,Q
 from forum.user.utils.follow_redis import update_redis_follower,update_redis_following
 
 def run():
-    all_real_user_userprofile = UserProfile.objects.filter(is_test_user=False).filter(Q(follower_count__gt=0)|Q(follow_count__gt=0)).order_by('-follower_count','-follow_count')
+    all_real_user_userprofile = UserProfile.objects.filter(is_test_user=False).order_by('-follower_count','-follow_count')
     counter = 0
+    my_counter = 1
     max_user_required = 10000
     all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)
     user_ids = list(all_test_userprofile_id)
@@ -24,7 +25,6 @@ def run():
         real_follow_count = Follower.objects.filter(user_follower_id=each_real_user.user.id,is_active=True).count()
         counter+=1
         if follower_counter>real_follower_count:
-            print "follower_counter: ",follower_counter,"\n","real_follower_count: ",real_follower_count,"\n","follow_count: ",follow_count,"\n","real_follow_count: ",real_follow_count,"\n"
             follower_counter = follower_counter-real_follower_count
             print follower_counter
             while(follower_counter):
@@ -32,7 +32,15 @@ def run():
                 status = action_follow(opt_action_user_id,each_real_user.user.id)
                 if status:
                     follower_counter-=1
-
+        if not follow_count == real_follow_count:
+            UserProfile.objects.filter(pk=each_real_user.id).update(follow_count=real_follow_count)
+        if not follow_count == real_follow_count  or not follower_counter == real_follower_count:
+            follower_count = Follower.objects.filter(user_following_id=each_real_user.user.id,is_active=True).count()
+            follow_count = Follower.objects.filter(user_follower_id=each_real_user.user.id,is_active=True).count()
+            UserProfile.objects.filter(pk=each_real_user.id).update(follower_count = follower_count,follow_count=follow_count)
+            print my_counter
+            print "follower_counter: ",follower_counter,"\n","real_follower_count: ",real_follower_count,"\n","follow_count: ",follow_count,"\n","real_follow_count: ",real_follow_count,"\n"
+            my_counter+=1
 #follow
 def action_follow(test_user_id,any_user_id):
     follow,is_created = Follower.objects.get_or_create(user_follower_id = test_user_id,user_following_id=any_user_id)

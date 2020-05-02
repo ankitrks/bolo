@@ -381,6 +381,12 @@ def get_accepted_kyc_user_list(request):
 def get_user_pay_details(request):
     if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
         return render(request,'jarvis/pages/payment/user_pay.html')
+def approve_all_completd_kyc(request):
+    try:
+        UserKYC.objects.filter(is_kyc_completed=True,is_kyc_accepted=False).update(is_kyc_accepted = True,is_kyc_basic_info_accepted = True,is_kyc_document_info_accepted = True,is_kyc_pan_info_accepted = True,is_kyc_selfie_info_accepted = True,is_kyc_additional_info_accepted = True,is_kyc_bank_details_accepted = True)
+        return HttpResponse(json.dumps({'success':'success'}),content_type="application/json")
+    except Exception as e:
+        return HttpResponse(json.dumps({'error':str(e)}),content_type="application/json")
 
 def get_single_user_pay_details(request):
     if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
