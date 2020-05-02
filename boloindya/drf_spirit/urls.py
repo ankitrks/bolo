@@ -166,4 +166,5 @@ urlpatterns = [
     url(r'^save_banner_response/$', save_banner_response),
 
     url(r'^get_hash_discover/$', get_hash_discover),
+    url(r'^get_hash_discover_topics/$', get_hash_discover_topics),
 ]
