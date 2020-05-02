@@ -52,7 +52,7 @@ from forum.comment.models import Comment,CommentHistory
 from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs,UserPay,VideoPlaytime,UserPhoneBook,Contact,ReferralCode
 from jarvis.models import FCMDevice,StateDistrictLanguage, BannerUser
 from forum.topic.models import Topic,TopicHistory, ShareTopic, Like, SocialShare, Notification, CricketMatch, Poll, Choice, Voting, \
-    Leaderboard, VBseen, TongueTwister
+    Leaderboard, VBseen, TongueTwister, TongueTwisterCounter
 from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
 from .serializers import *
@@ -4471,7 +4471,8 @@ def get_hash_discover(request):
     try:
         page = int(request.GET.get('page',1))
         page_size = request.GET.get('page_size', 10)
-        hash_tags = TongueTwister.objects.all().order_by('-is_popular','-popular_date','-hash_counter')
+        language_id = request.GET.get('language_id','2')
+        hash_tags = TongueTwisterCounter.objects.filter(language_id=language_id).order_by('-tongue_twister__is_popular','-tongue_twister__popular_date','-hash_counter')
         result_page = get_paginated_data(hash_tags, int(page_size), int(page))
         if result_page[1]<int(page):
             return JsonResponse({'message': 'No page exist'}, status=status.HTTP_400_BAD_REQUEST)
