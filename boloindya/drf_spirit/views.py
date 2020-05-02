@@ -4484,7 +4484,7 @@ def get_hash_discover_topics(request):
     try:
         ids = request.GET.get('ids',None)
         hash_tags = TongueTwister.objects.filter(pk__in=ids.split(','))
-        return JsonResponse({'message': 'success', 'results':TongueTwisterWithOnlyVideoByteSerializer(hash_tags,many=True).data}, status=status.HTTP_200_OK)
+        return JsonResponse({'message': 'success', 'results':TongueTwisterWithOnlyVideoByteSerializer(hash_tags, context={'language_id': request.GET.get('language_id','2')}, many=True).data}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
 
