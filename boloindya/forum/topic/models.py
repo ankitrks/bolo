@@ -906,7 +906,7 @@ class TongueTwisterCounter(RecordTimeStamp):
         verbose_name_plural = _("TongueTwisterCounters")
 
     def __unicode__(self):
-        return self.hash_tag
+        return self.tongue_twister.hash_tag
 
 
 
