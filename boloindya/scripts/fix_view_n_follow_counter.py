@@ -1,4 +1,4 @@
-from forum.user.models import UserProfile
+from forum.user.models import UserProfile, Follower
 from forum.topic.models import Topic,VBseen,BoloActionHistory
 from django.db.models import Sum
 from django.contrib.contenttypes.models import ContentType
