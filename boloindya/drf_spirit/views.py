@@ -4482,7 +4482,7 @@ def get_hash_discover(request):
 @api_view(['GET'])
 def get_hash_discover_topics(request):
     try:
-        ids = int(request.GET.get('ids',None))
+        ids = request.GET.get('ids',None)
         hash_tags = TongueTwister.objects.filter(pk__in=ids.split(','))
         return JsonResponse({'message': 'success', 'results':TongueTwisterWithOnlyVideoByteSerializer(hash_tags,many=True).data}, status=status.HTTP_200_OK)
     except Exception as e:
