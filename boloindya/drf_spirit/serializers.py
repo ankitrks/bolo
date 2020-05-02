@@ -868,9 +868,16 @@ class TongueTwisterWithOnlyVideoByteSerializer(ModelSerializer):
         topic_page = paginator.page(page)
         return CategoryVideoByteSerializer(topics[:settings.REST_FRAMEWORK['PAGE_SIZE']], many=True,context={'is_expand':self.context.get("is_expand",True)}).data
 
+class TongueTwisterWithoutViewsSerializer(ModelSerializer):
+
+    class Meta:
+        model = TongueTwister
+        fields = '__all__'
+
 class TongueTwisterCounterSerializer(ModelSerializer):
     total_videos_count = SerializerMethodField()
     total_views = SerializerMethodField()
+    tongue_twister = TongueTwisterWithoutViewsSerializer()
     class Meta:
         model = TongueTwister
         fields = '__all__'
