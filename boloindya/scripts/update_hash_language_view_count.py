@@ -46,6 +46,5 @@ def run():
                     tongue.hash_counter=language_filter.count()
                     tongue.language_id=each
                     tongue.total_views = seen_counter
-                    tongue.save()      tongue.language_id='0'
-            tongue.total_views = seen_counter
+                    tongue.save()     
 
