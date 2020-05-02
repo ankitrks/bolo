@@ -6,7 +6,11 @@ from drf_spirit.utils import language_options
 
 def run():
     all_hash_tag = TongueTwister.objects.all()
+    count = all_hash_tag.count()
+    i=0
     for each_hash_tag in all_hash_tag:
+        print(str(i) + '==========' + str(count))
+        i+=1
         all_topic = Topic.objects.filter(hash_tags = each_hash_tag)
         total_views = all_topic.aggregate(Sum('view_count'))
         if total_views['view_count__sum']:
