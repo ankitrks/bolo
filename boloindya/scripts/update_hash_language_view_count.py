@@ -30,7 +30,6 @@ def run():
         for each in language_options:
             if each[0] != '0':
                 language_filter=all_topic.filter(language_id=each[0])
-                print(each[0], language_filter.count())
                 total_views = language_filter.filter().aggregate(Sum('view_count'))
                 if total_views['view_count__sum']:
                     seen_counter = total_views['view_count__sum']
