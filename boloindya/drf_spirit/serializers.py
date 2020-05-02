@@ -879,7 +879,7 @@ class TongueTwisterCounterSerializer(ModelSerializer):
     total_views = SerializerMethodField()
     tongue_twister = TongueTwisterWithoutViewsSerializer()
     class Meta:
-        model = TongueTwister
+        model = TongueTwisterCounter
         fields = '__all__'
 
     def get_total_videos_count(self,instance):
