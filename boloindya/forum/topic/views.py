@@ -1068,7 +1068,8 @@ def boloindya_feed(request):
     if(video_slug != None):
         return redirect('/video/'+video_slug)
     else:
-        return render(request, 'spirit/topic/boloindya_feed.html',context)
+        #return render(request, 'spirit/topic/boloindya_feed.html',context)
+        return render(request, 'spirit/topic/trending_feed.html',context)
 
 
 

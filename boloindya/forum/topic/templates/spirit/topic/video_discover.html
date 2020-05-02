@@ -345,7 +345,15 @@
 </div>
 
 <script src="/media/js/video_discover.js"></script>
+<script type="text/javascript">
+    $(function(){
+    var url = window.location.href; 
 
+    $(".top_menu_details").removeClass('menu-item-link-active');
+    $(".discoverMenu").addClass('menu-item-link-active');
+ 
+});
+</script>
 <!-- Start Comments Section -->
 {% include "spirit/_video_play_and_comments.html" %}
 <!-- End Load Comments  -->

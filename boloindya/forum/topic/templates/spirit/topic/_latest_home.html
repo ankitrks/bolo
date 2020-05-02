@@ -27,6 +27,9 @@
   position: relative;
   display: inline-block;
 }
+#loginURLId{
+    display: none !important;
+}
 
 
 .autocomplete-items {
@@ -301,7 +304,7 @@
 }
 
 .about-content .about-article h2{
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: Roboto, sans-serif;
     font-weight: 700;
     font-size: 23px;
     line-height: 1;
@@ -473,7 +476,7 @@
 }
 .header-bar1{
     color: #fff;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: Roboto, sans-serif;
     font-weight: 700;
     font-size: 23px;
     line-height: 1;
@@ -502,7 +505,7 @@
 
 .header-bar1 {
     color: #fff;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: Roboto, sans-serif;
     font-weight: 700;
     font-size: 14px;
     line-height: 1.5rem;
@@ -721,7 +724,7 @@
     font-weight: bold;
 }
 .slogan{
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: Roboto, sans-serif;
     font-weight: 700;
     font-size: 40px;
     margin-top: 30px;
@@ -766,6 +769,10 @@
    margin-bottom: 20px;
    color: #fff; 
 }
+.bottomHeaing h2 {
+margin-bottom: 23px;
+margin-top: 38px;
+}
 @media(max-width: 991px){
 .slogan{
     margin-top: 80px;
@@ -774,7 +781,8 @@
 
 .bottomHeaing h2 {
     color: var(--primary-color);
-    margin-top: 30px;
+    margin-top: 38px;
+    margin-bottom: 23px;
     font-size: 18px;
 }
 .headingJoin{
@@ -811,7 +819,7 @@
     height: 100%;
 }
 .download_height{
-    height: 46px;
+    height: 50px;
 }
 .socialImageSize{
     height: 45px;
@@ -1081,7 +1089,19 @@
                         <h2 style="margin-bottom: 20px;"  class="slogan">Short <span style="color: #b62927">Videos</span> You <span style="color: #b62927">Love</span></h2>
 
                     <div id="typed-strings" style="display: none;">
-                        <p>Join the Bolo Indya Tribe to watch and create insightful videos in your own language.</p>
+                        <p>Watch and Create Value Adding Videos in Hindi</p>
+                        <p>Watch and Create Value Adding Videos in Tamil</p>
+                        <p>Watch and Create Value Adding Videos in Telugu</p>
+                        <p>Watch and Create Value Adding Videos in Bangla</p>
+                        <p>Watch and Create Value Adding Videos in Kannada</p>
+                        <p>Watch and Create Value Adding Videos in Gujarati</p>
+                        <p>Watch and Create Value Adding Videos in Marathi</p>
+                        <p>Watch and Create Value Adding Videos in Punjabi</p>
+                        <p>Watch and Create Value Adding Videos in Malayalam</p>
+                        <p>Watch and Create Value Adding Videos in Odia</p>
+                        <p>Watch and Create Value Adding Videos in English</p>
+                        <p>Watch and Create Value Adding Videos in 11&nbsp;Indian&nbsp;languages</p>
+
                     </div>
                     <h2 class="header-bar1" style="text-align: center;padding: 20px;">
                         <span id="typed"></span>
@@ -1121,23 +1141,124 @@
         </div>
     </section> -->
 
+    <style type="text/css">
+        .download-sms * {
+    outline: none;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+.download-container .download-content .download-wrapper {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+    -webkit-align-items: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+}
+.download-sms form {
+    position: relative;
+    height: 43px;
+    -webkit-align-items: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #8A8B91;
+    border-right: none;
+    border-radius: 2px;
+    font-size: 0px;
+    display: -webkit-inline-box;
+    display: -webkit-inline-flex;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+
+}
+.download-sms .select {
+    width: 72px;
+    color: #8A8B91;
+    text-align: center;
+    cursor: pointer;
+}
+.download-sms input {
+    height: 30px;
+    background: none;
+    border: none;
+}
+
+.download-sms form>* {
+    font-size: 18px;
+}
+.download-sms .select+img {
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    margin-right: 10px;
+}
+.download-sms .phone-input {
+    width: 290px;
+    border-left: 1px solid #DCDCDE;
+    text-indent: 20px;
+}
+.download-sms input {
+    height: 30px;
+    background: none;
+    border: none;
+}
+.download-sms button {
+    padding: 0px 14px;
+    height: 43px;
+    line-height: 43px;
+    outline: none;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    cursor: pointer;
+    background-color: #b62927;
+    color: #ffffff;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-left: 0;
+    margin-right: 0px;
+}
+    </style>
+
         <div class="jsx-1929076256 about-content">
 
+            <div class="jsx-1929076256 about-img3 bottomHeaing" style="text-align: center;">
+                <h2 >Text Yourself a Link to Download Bolo Indya</h2>
+<div class="jsx-1830994819 form-wrap download-content download-sms">
+    <form class="jsx-1830994819 download-wrapper" action="javascript:void()">
+        <input value="IN+91" readonly="" class="jsx-1830994819 select">
+        <input placeholder="Phone number" id="phone_sms_id" value="" pattern="[1-9]{1}[0-9]{9}" class="jsx-1830994819 phone-input">
+        <button type="button" class="jsx-1830994819" onclick="send_download_link();">Send</button>
+        <span id="error_message"></span>
+    </form>
+</div>
+
+<!--                 <a href="/bolo-action/" class="w-btn has-red-grad">Read Earning Terms</a>
+ -->
+            </div>
             <div class="jsx-1929076256 about-img2 ">
                 <a href="https://play.google.com/store/apps/details?id=com.boloindya.boloindya&hl=en_IN">
                     <div class="header-bar1" style="text-align: center;padding: 20px;">
                         <h3 class="" style="margin:0 0 20px 0; font-size: 26px;text-align: center;">Download the App</h3>
-                        <img class="download_height" src="/media/playstore.png">
+                        <img class="download_height" src="/media/google_store.png">
                     </div>
                 </a>
             </div>
-            <div class="jsx-1929076256 about-img3 bottomHeaing" style="text-align: center;">
-<!--                 <h2 >Earn Money as You Express Yourself</h2>
-                <a href="/bolo-action/" class="w-btn has-red-grad">Read Earning Terms</a>
- -->
-            </div>
+
             <div class="jsx-1929076256 about-img2">
-                <h3 class="" style="margin: 41px -1px -14px -35px;font-size: 26px;text-align: center;">Follow us On</h3>
+                <h3 class="" style="margin: 41px -1px -14px -35px;font-size: 26px;text-align: center;">Follow us</h3>
                 <div class="" id="" style="display: inline-block;margin: 22px auto;">
                     <div class="jsx-1289101510 _explore_feed_wrapper">
                         <div class="">
@@ -1178,9 +1299,9 @@
             <div class="jsx-1929076256 about-img1-review bottomHeaing " style="text-align: center;">
                 
                 <section class="TransitionCardNew carousel__slide PlacementSupport__carousel__card swiper-slide-active oneItemSize">
-                    <div class="TransitionCardNew__profileIcon"><img src="/media/Review1.jpg" class="TransitionCardNew__profileIcon__icon"></div>
-                    <p class="TransitionCardNew__name">Aman Bhatia</p>
-                    <p class="TransitionCardNew__bio">Excellent App ! Its has Quality. This App is really wonderful, i get lot of Information, Knowledge, Tips. Very decent application. Its a like our friends explaining new things with Love. Now a Youth going wrong way by wasting time in making stupid videos like Tik-Tok Apps. </p>
+                    <div class="TransitionCardNew__profileIcon"><img src="/media/review1.png" class="TransitionCardNew__profileIcon__icon"></div>
+                    <p class="TransitionCardNew__name">Ishan Yadav</p>
+                    <p class="TransitionCardNew__bio">Bolo Indya is an Application which has the conviction of being a long term platform for Knowledge and Creativity sharing. Its basically Irrfan Khan in the generation of Dhinchak Pooja. And not just as a Creator, but as a viewer also I enjoy learning as much as I love creating. An App both for the kitchen and for the soul.</p>
 
                 </section>
                 <section class="TransitionCardNew carousel__slide PlacementSupport__carousel__card swiper-slide-active oneItemSize" >
@@ -1190,17 +1311,18 @@
 
                 </section>
                 <section class="TransitionCardNew carousel__slide PlacementSupport__carousel__card swiper-slide-active oneItemSize" >
+                    <div class="TransitionCardNew__profileIcon"><img src="/media/review5.jpg" class="TransitionCardNew__profileIcon__icon"></div>
+                    <p class="TransitionCardNew__name">Rahul Srivastava</p>
+                    <p class="TransitionCardNew__bio">Awesome experience learned many things here an shared bit of my knowledge also I am very happy to be a part of this team and they do handle it very carefully and clear all the queries within no time. They encourage each and every individual and support them by giving good advices</p>
+
+                </section>                
+                <section class="TransitionCardNew carousel__slide PlacementSupport__carousel__card swiper-slide-active oneItemSize" >
                     <div class="TransitionCardNew__profileIcon"><img src="/media/review3.jpg" class="TransitionCardNew__profileIcon__icon"></div>
                     <p class="TransitionCardNew__name">Ushi style</p>
                     <p class="TransitionCardNew__bio">Very nice app for making videos in hindi....it is very unique app that promote our mother tongue thanks alot for making this app😍.This App will make India Proud. Gives amazing opportunity of Earning Money by making videos & Also Referring Friends. Just Received my first Payment from the Admin directly.</p>
 
                 </section>
-                <section class="TransitionCardNew carousel__slide PlacementSupport__carousel__card swiper-slide-active oneItemSize" >
-                    <div class="TransitionCardNew__profileIcon"><img src="/media/review5.jpg" class="TransitionCardNew__profileIcon__icon"></div>
-                    <p class="TransitionCardNew__name">Rahul Srivastava</p>
-                    <p class="TransitionCardNew__bio">Awesome experience learned many things here an shared bit of my knowledge also I am very happy to be a part of this team and they do handle it very carefully and clear all the queries within no time. They encourage each and every individual and support them by giving good advices</p>
 
-                </section>
 
 
 
@@ -1319,6 +1441,43 @@ $(function() {
 <!-- Start Comments Section -->
 {% include "spirit/_video_play_and_comments.html" %}
 <!-- End Load Comments  -->
+<script type="text/javascript">
+$('#phone_sms_id').on('keypress',function(evt){
+    var phoneNo = document.getElementById('phone_sms_id').value;debugger;
+    if(phoneNo.length>10){
+        return false;
+    }
+    evt = (evt) ? evt : window.event;
+    var charCode = (evt.which) ? evt.which : evt.keyCode;
+    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+        return false;
+    }
+    return true;
+});
 
+var sendStatus=0;
+function send_download_link(){
+    if(sendStatus==0){
+        var phoneNo = document.getElementById('phone_sms_id').value
+        var uri='/api/v1/send_link_to_user/';
+        var res = encodeURI(uri);
+        jQuery.ajax({
+            url:res,
+            data:{'phone':phoneNo},
+            type:"POST",
+            success: function(response,textStatus, xhr){
+                sendStatus=1;
+                $("#error_message").html('<span style="color:green">Download Link Successfully send to your number</span>');
+            }
+      
+        });
+    }else{
+        $("#error_message").html('<span style="color:red">Kindly check your message box</span>');
+    }
+
+
+}
+
+</script>
 
 {% endblock %}

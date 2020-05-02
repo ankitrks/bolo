@@ -441,10 +441,10 @@ html[pc="yes"] *::-webkit-scrollbar-track {
   .main-body h1 {
     color: var(--font-color) !important;
   }
-  .main-body  {
+/*  .main-body  {
     background: var(--primary-color)!important;
 
-  }
+  }*/
   .searchbox-icon::before {
     background-position: var(--background-position);
     
@@ -595,7 +595,26 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
-
+.menu-item-link1 a {
+    outline: none;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    cursor: pointer;
+    background-color: #b62927;
+    color: #ffffff;
+    font-family: Roboto,sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 48px;
+    text-align: center;
+    -webkit-flex: 0 0 164px;
+    -ms-flex: 0 0 164px;
+    flex: 0 0 164px;
+    width: 164px;
+    display: block;
+    margin-left: 35px;
+    box-sizing: border-box;
+}
 
 </style>
 <script type="text/javascript">
@@ -760,8 +779,162 @@ input#search-bar:focus:-ms-placeholder {
 }
 }
 
+.menu-item-link.jsx-1572239188 a, .menu-item-link.jsx-1572239188 div {
+    -webkit-text-decoration: none;
+    text-decoration: none;
+    background-color: transparent;
+    position: relative;
+    display: inline-block;
+    height: 70px;
+}
 
+.buttonSearch {
+  display: inline-block;
+  margin: 4px 2px;
+  background-color: #fff;
+  font-size: 14px;
 
+  padding-left: 32px;
+  padding-right: 32px;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  color: #b62927;
+  text-decoration: none;
+  cursor: pointer;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.buttonSearch:hover {
+  transition-duration: 0.4s;
+  -moz-transition-duration: 0.4s;
+  -webkit-transition-duration: 0.4s;
+  -o-transition-duration: 0.4s;
+  background-color: white;
+  color: black;
+}
+
+.search-container {
+  position: relative;
+  display: inline-block;
+  margin: 4px 2px;
+  height: 40px;
+  width: 40px;
+  vertical-align: bottom;
+}
+
+.mglass {
+  display: inline-block;
+  pointer-events: none;
+  -webkit-transform: rotate(-45deg);
+  -moz-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+}
+
+.searchbutton {
+  position: absolute;
+  font-size: 22px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.search:focus + .searchbutton {
+  transition-duration: 0.4s;
+  -moz-transition-duration: 0.4s;
+  -webkit-transition-duration: 0.4s;
+  -o-transition-duration: 0.4s;
+  background-color: white;
+  color: black;
+}
+
+.search {
+  position: absolute;
+  left: 49px; /* Button width-1px (Not 50px/100% because that will sometimes show a 1px line between the search box and button) */
+  border-radius: 4px;
+  background-color: white;
+  outline: none;
+  border: none;
+  padding: 0;
+  width: 0;
+  height: 100%;
+  z-index: 10;
+  transition-duration: 0.4s;
+  -moz-transition-duration: 0.4s;
+  -webkit-transition-duration: 0.4s;
+  -o-transition-duration: 0.4s;
+}
+
+.search:focus {
+  border: 1px solid #ccc;
+  /*border-right:none;*/
+  width: 363px; /* Bar width+1px */
+  padding: 0 16px 0 0;
+}
+
+.expandright {
+  left: auto;
+  right: 49px; /* Button width-1px */
+}
+
+.expandright:focus {
+  padding: 0 0 0 16px;
+  right: 12px;
+
+}
+
+.jsx-2347012111.discoverandtrending {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+    list-style: none;
+    -webkit-align-items: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+}
+.menu-item-link.menu-item-link-active.jsx-1572239188 {
+    color: #121212;
+    -webkit-transform: none;
+    -ms-transform: none;
+    transform: none;
+}
+
+.menu-item-link.jsx-1572239188 {
+  
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 70px;
+    cursor: pointer;
+    color: rgba(18,18,18,0.75);
+    -webkit-transition: all 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
+    -webkit-transform: scale(0.75);
+    -ms-transform: scale(0.75);
+    transform: scale(0.75);
+}
+.menu-item-link.jsx-1572239188 a, .menu-item-link.jsx-1572239188 div {
+    -webkit-text-decoration: none;
+    text-decoration: none;
+    background-color: transparent;
+    position: relative;
+    display: inline-block;
+    height: 55px;
+}
+.menu-wrapper.jsx-2347012111>li.jsx-2347012111+li.jsx-2347012111 {
+    margin-left: 32px;
+}
 </style>
 
     <div id="__next">
@@ -774,9 +947,15 @@ input#search-bar:focus:-ms-placeholder {
                         <strong class="jsx-475503780">boloindya</strong></a>
                     </h1>
 
+                        <ul class="jsx-2347012111 menu-wrapper discoverandtrending" id="menuTrId">
+                            <li class="jsx-2347012111 visible">
+                                <h2 class="jsx-1572239188 trendingMenu top_menu_details menu-item-link "><a class="jsx-1572239188" href="/{{LANGUAGE_CODE}}/feed/">Trending</a></h2></li>
+                            <li class="jsx-2347012111 ">
+                                <h2 class="jsx-1572239188 discoverMenu top_menu_details menu-item-link"><a class="jsx-1572239188" href="/{{LANGUAGE_CODE}}/discover/">Discover</a></h2></li>
+                        </ul>
                           <ul class="jsx-3143951235 menu-wrapper" >
 
-                                <li class="jsx-3143951235">
+<!--                                 <li class="jsx-3143951235">
                                   <span class="languageAndText">I would love to watch in
                                     <div class="jsx-1724846817 jsx-1667329752 language-selection">
 
@@ -815,7 +994,11 @@ input#search-bar:focus:-ms-placeholder {
                                         </form>
                                     </div>
                                   </span> 
-                                </li>
+                                </li> -->
+
+
+
+ 
 
                                 <li class="hideOnMobile">
                                     <div class="_4kny _50tm">
@@ -824,10 +1007,18 @@ input#search-bar:focus:-ms-placeholder {
                                           <input type="submit" class="searchbox-submit" value="">
                                           <span class="searchbox-icon"></span>
                                       </form> -->
-<form class="search-container1" action="/{{LANGUAGE_CODE}}/search/" method="get">
+<!-- <form class="search-container1" action="/{{LANGUAGE_CODE}}/search/" method="get">
     <input type="text" id="search-bar" autocomplete="off" name="term" value="{{search_term}}" onkeyup="buttonUp();" placeholder="What are you looking for?">
     <span class="search-icon"><i class="_18vk"></i></span>
-</form>
+</form> -->
+
+<div class="search-container">
+  <form action="/{{LANGUAGE_CODE}}/search/" method="get">
+    <input class="search expandright"  value="{{search_term}}"  id="searchright" type="search" name="term" placeholder="Search">
+    <label class="buttonSearch searchbutton" for="searchright"><span class="mglass">&#9906;</span></label>
+  </form>
+</div>
+
 
 
                                     </div>
@@ -876,7 +1067,7 @@ input#search-bar:focus:-ms-placeholder {
                                 </li>
                                 {% else %}
                                 <li class="jsx-3143951235">
-                                  <h2 class="menu-item-link"><a href="/login/" class="jsx-2922828392">{% trans "Signin" %}</a></h2>
+                                  <h2 class="menu-item-link1"><a href="/login/" class="jsx-2922828399">{% trans "Signin" %}</a></h2>
                                 </li>
                                 {% endif %}
                           </ul>
@@ -1013,7 +1204,7 @@ input#search-bar:focus:-ms-placeholder {
     background: #fff;
     width: 100%!important;
     position: fixed;
-    top: 76px;
+    top: 60px;
     z-index: 9;
     -webkit-box-shadow: 0 -5px 20px 0 hsla(0,0%,50%,.85);
     box-shadow: 0 1px 3px 0 hsla(0,0%,50%,.85);
@@ -1108,3 +1299,4 @@ input#search-bar:focus:-ms-placeholder {
 // toggleSwitch.addEventListener('change', switchTheme, false);
 
 </script>
+

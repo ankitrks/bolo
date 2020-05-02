@@ -643,6 +643,30 @@ input:checked + .slider:before {
   background-size: auto;
   background-position: -39px -358px;
 }
+
+.menu-item-link1 a {
+    outline: none;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    cursor: pointer;
+    background-color: #b62927;
+    color: #ffffff;
+    font-family: Roboto,sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 48px;
+    text-align: center;
+    -webkit-flex: 0 0 164px;
+    -ms-flex: 0 0 164px;
+    flex: 0 0 164px;
+    width: 164px;
+    display: block;
+    margin-left: 35px;
+    box-sizing: border-box;
+}
+.menu-item-link {
+    margin-top: 14px;
+}
 @media(max-width: 991px){
   #boloindyaLogoId {
     width: 140px;
@@ -761,10 +785,10 @@ input:checked + .slider:before {
 
                                   </li>
                                 {% else %}
-                                <li class="jsx-3143951235">
+<!--                                 <li class="jsx-3143951235" id="loginURLId">
                                   <h2 class="menu-item-link hideOnMobile"><a href="/login/" class="jsx-2922828392">{% trans "Signin" %}</a>
                                   </h2>
-                                </li>
+                                </li> -->
                                 {% endif %}
                           </ul>
                 </div>
