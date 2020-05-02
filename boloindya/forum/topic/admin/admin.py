@@ -347,6 +347,6 @@ admin.site.register(Leaderboard)
 admin.site.register(TongueTwister,TongueTwisterAdmin)
 admin.site.register(JobOpening,JonOpeningAdmin)
 admin.site.register(JobRequest,JobRequestAdmin)
-admin.site.register(TongueTwisterCounter)
+admin.site.register(TongueTwisterCounter, TongueTwisterCounterAdmin)
 
 
