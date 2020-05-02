@@ -164,4 +164,6 @@ urlpatterns = [
 
     url(r'^submit_user_feedback/$', submit_user_feedback),
     url(r'^save_banner_response/$', save_banner_response),
+
+    url(r'^get_hash_discover/$', get_hash_discover),
 ]

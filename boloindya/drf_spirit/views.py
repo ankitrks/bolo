@@ -4466,6 +4466,18 @@ def save_banner_response(request):
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+def get_hash_discover(request):
+    try:
+        page = int(request.GET.get('page',1))
+        page_size = request.GET.get('page_size', 5)
+        hash_tags = TongueTwister.objects.all().order_by('-is_popular','-popular_date','-hash_counter')
+        result_page = get_paginated_data(hash_tags, int(page_size), int(page))
+        if result_page[1]<int(page):
+            return JsonResponse({'message': 'No page exist'}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({'message': 'success', 'results':TongueTwisterSerializer(result_page[0].object_list,many=True).data,'total_page':result_page[1]}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
