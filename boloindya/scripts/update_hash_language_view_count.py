@@ -28,15 +28,15 @@ def run():
             tongue.hash_counter=all_topic.count()
             tongue.save()
         for each in language_options:
-            if each != '0':
-                language_filter=all_topic.filter(language_id=each)
+            if each[0] != '0':
+                language_filter=all_topic.filter(language_id=each[0])
                 total_views = language_filter.filter().aggregate(Sum('view_count'))
                 if total_views['view_count__sum']:
                     seen_counter = total_views['view_count__sum']
                 else:
                     seen_counter = 0
                 try:
-                    tongue=TongueTwisterCounter.objects.get(tongue_twister=each_hash_tag, language_id=each)
+                    tongue=TongueTwisterCounter.objects.get(tongue_twister=each_hash_tag, language_id=each[0])
                     tongue.hash_counter=language_filter.count()
                     tongue.total_views = seen_counter
                     tongue.save()
@@ -44,7 +44,7 @@ def run():
                     tongue=TongueTwisterCounter()
                     tongue.tongue_twister=each_hash_tag
                     tongue.hash_counter=language_filter.count()
-                    tongue.language_id=each
+                    tongue.language_id=each[0]
                     tongue.total_views = seen_counter
                     tongue.save()     
 
