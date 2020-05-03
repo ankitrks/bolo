@@ -3555,11 +3555,17 @@ def SyncDump(request):
         if request.method == "POST":
             #Storing the dump in database
             try:
-                user = request.user
-                dump = request.POST.get('dump')
-                dump_type = request.POST.get('dump_type')
-                stored_data = UserJarvisDump(user=user, dump=dump, dump_type=dump_type)
-                stored_data.save()
+                if request.user.id == None:
+                    dump = request.POST.get('dump')
+                    dump_type = request.POST.get('dump_type')
+                    stored_data = UserJarvisDump(dump=dump, dump_type=dump_type, android_id=request.POST.get('android_id',''))
+                    stored_data.save()
+                else:
+                    user = request.user
+                    dump = request.POST.get('dump')
+                    dump_type = request.POST.get('dump_type')
+                    stored_data = UserJarvisDump(user=user, dump=dump, dump_type=dump_type, android_id=request.POST.get('android_id',''))
+                    stored_data.save()
                 return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)    
             except Exception as e:
                 return JsonResponse({'message' : 'fail','error':str(e)})
