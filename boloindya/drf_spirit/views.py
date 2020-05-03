@@ -3570,9 +3570,10 @@ def SyncDump(request):
 def save_android_logs(request):
     try:
         if request.user:
-            AndroidLogs.objects.create(user=request.user,logs=request.POST.get('error_log', ''),log_type = request.POST.get('log_type',None))
+            AndroidLogs.objects.create(user=request.user,logs=request.POST.get('error_log', ''),log_type = request.POST.get('log_type',None), android_id=request.POST.get('android_id',''))
             return JsonResponse({'messgae' : 'success'})
         else:
+            AndroidLogs.objects.create(logs=request.POST.get('error_log', ''),log_type = request.POST.get('log_type',None), android_id=request.POST.get('android_id',''))
             return JsonResponse({'messgae' : 'user_missing'})
     except Exception as e:
         return JsonResponse({'message' : 'fail','error':str(e)})
