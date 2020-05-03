@@ -3569,7 +3569,7 @@ def SyncDump(request):
 @api_view(['POST'])
 def save_android_logs(request):
     try:
-        if request.user:
+        if request.user.pk:
             AndroidLogs.objects.create(user=request.user,logs=request.POST.get('error_log', ''),log_type = request.POST.get('log_type',None), android_id=request.POST.get('android_id',''))
             return JsonResponse({'messgae' : 'success'})
         else:
