@@ -706,34 +706,34 @@ class OldAlgoGetChallenge(generics.ListCreateAPIView):
             all_seen_vb = get_redis_vb_seen(self.request.user.id)
             # all_seen_vb = VBseen.objects.filter(user = self.request.user, topic__title__icontains=challengehash).distinct('topic_id').values_list('topic_id',flat=True)
         excluded_list =[]
-        boosted_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,is_boosted=True,boosted_end_time__gte=datetime.now()).filter(**language_filter).exclude(pk__in=all_seen_vb).distinct('user_id')
+        boosted_post = Topic.objects.filter(language_id=language_id, is_removed = False,is_vb = True,hash_tags=hash_tag,is_boosted=True,boosted_end_time__gte=datetime.now()).filter(**language_filter).exclude(pk__in=all_seen_vb).distinct('user_id')
         if boosted_post:
             boosted_post = sorted(boosted_post, key=lambda x: x.date, reverse=True)
         for each in boosted_post:
             excluded_list.append(each.id)
-        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,user__st__is_superstar = True).filter(**language_filter).exclude(pk__in=all_seen_vb).distinct('user_id')
+        superstar_post = Topic.objects.filter(language_id=language_id, is_removed = False,is_vb = True,hash_tags=hash_tag,user__st__is_superstar = True).filter(**language_filter).exclude(pk__in=all_seen_vb).distinct('user_id')
         if superstar_post:
             superstar_post = sorted(superstar_post, key=lambda x: x.date, reverse=True)
         for each in superstar_post:
             excluded_list.append(each.id)
-        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,user__st__is_superstar = False,user__st__is_popular=True).filter(**language_filter).exclude(pk__in=all_seen_vb).distinct('user_id')
+        popular_user_post = Topic.objects.filter(language_id=language_id, is_removed = False,is_vb = True,hash_tags=hash_tag,user__st__is_superstar = False,user__st__is_popular=True).filter(**language_filter).exclude(pk__in=all_seen_vb).distinct('user_id')
         if popular_user_post:
             popular_user_post = sorted(popular_user_post, key=lambda x: x.date, reverse=True)
         for each in popular_user_post:
             excluded_list.append(each.id)
-        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True).filter(**language_filter).exclude(pk__in=all_seen_vb).distinct('user_id')
+        popular_post = Topic.objects.filter(language_id=language_id, is_removed = False,is_vb = True,hash_tags=hash_tag,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True).filter(**language_filter).exclude(pk__in=all_seen_vb).distinct('user_id')
         if popular_post:
             popular_post = sorted(popular_post, key=lambda x: x.date, reverse=True)
         for each in popular_post:
             excluded_list.append(each.id)
-        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,user__st__is_superstar = False,user__st__is_popular=False,is_popular=False).filter(**language_filter).exclude(pk__in=all_seen_vb).distinct('user_id')
+        normal_user_post = Topic.objects.filter(language_id=language_id, is_removed = False,is_vb = True,hash_tags=hash_tag,user__st__is_superstar = False,user__st__is_popular=False,is_popular=False).filter(**language_filter).exclude(pk__in=all_seen_vb).distinct('user_id')
         if normal_user_post:
             normal_user_post = sorted(normal_user_post, key=lambda x: x.date, reverse=True)
         for each in normal_user_post:
             excluded_list.append(each.id)
-        other_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag).filter(**language_filter).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
+        other_post = Topic.objects.filter(language_id=language_id, is_removed = False,is_vb = True,hash_tags=hash_tag).filter(**language_filter).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
         orderd_all_seen_post=[]
-        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb, hash_tags=hash_tag).filter(**language_filter)
+        all_seen_post = Topic.objects.filter(language_id=language_id, is_removed=False,is_vb=True,pk__in=all_seen_vb, hash_tags=hash_tag).filter(**language_filter)
         if all_seen_post:
             for each_id in all_seen_vb:
                 for each_vb in all_seen_post:
@@ -913,11 +913,13 @@ def GetChallengeDetails(request):
     user_id = request.POST.get('user_id', '')
     """ 
     challengehash = request.POST.get('ChallengeHash')
+    language_id = request.POST.get('language_id', '2')
     challengehash = '#' + challengehash
     try:
         hash_tag = TongueTwister.objects.get(hash_tag__iexact=request.POST.get('ChallengeHash'))
-        all_vb = Topic.objects.filter(hash_tags=hash_tag,is_removed=False,is_vb=True)
-        vb_count = all_vb.count()
+        hash_tag_counter=TongueTwisterCounter.objects.get(tongue_twister=tongue_twister, language_id=language_id)
+        #all_vb = Topic.objects.filter(hash_tags=hash_tag,is_removed=False,is_vb=True)
+        vb_count = hash_tag_counter.hash_counter
         if hash_tag:
             tongue = hash_tag
             return JsonResponse({'message': 'success', 'hashtag':tongue.hash_tag,'vb_count':vb_count,\
@@ -926,7 +928,7 @@ def GetChallengeDetails(request):
                 'be_descpription':tongue.be_descpription,'ka_descpription':tongue.ka_descpription,\
                 'ma_descpription':tongue.ma_descpription,'gj_descpription':tongue.gj_descpription,\
                 'mt_descpription':tongue.mt_descpription,'picture':tongue.picture,\
-                'all_seen':shorcountertopic(tongue.total_views)},status=status.HTTP_200_OK)
+                'all_seen':shorcountertopic(hash_tag_counter.total_views)},status=status.HTTP_200_OK)
         else:
             return JsonResponse({'message': 'success', 'hashtag' : challengehash[1:],'vb_count':vb_count,\
                 'en_tongue_descp':'','hi_tongue_descp':'',\
@@ -934,7 +936,7 @@ def GetChallengeDetails(request):
                 'be_descpription':'','ka_descpription':'',\
                 'ma_descpription':'','gj_descpription':'',\
                 'mt_descpription':'','picture':'',\
-                'all_seen':shorcountertopic(tongue.total_views)},status=status.HTTP_200_OK)
+                'all_seen':shorcountertopic(hash_tag_counter.total_views)},status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Invalid','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
