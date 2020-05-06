@@ -498,6 +498,18 @@ class TongueTwister(models.Model):
             self.popular_date = datetime.now()
         super(TongueTwister, self).save(*args, **kwargs)
 
+class HashtagViewCounter(models.Model):
+    hashtag = models.ForeignKey('forum_topic.TongueTwister', verbose_name=_("HashTag"), related_name="hash_tag_counter",null=True,blank=True)
+    language = models.CharField(_("language"), choices=language_options, blank = True, null = True, max_length=10)
+    view_count = models.BigIntegerField(default = 0)
+    video_count = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['language']
+    
+    def __unicode__(self):
+        return str(self.hashtag)+"---"+str(self.get_language_display())
+
 publish_options = (
     ('0', "Unpublish"),
     ('1', "Publish")
