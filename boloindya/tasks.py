@@ -239,8 +239,51 @@ def sync_contacts_with_user(user_id):
         for each_userprofile in all_userprofile:
             Contact.objects.filter(contact_number=each_userprofile.mobile_no).update(is_user_registered=True,user=each_userprofile.user)
 
+@app.task
+def cache_follow_post(user_id):
+    from forum.topic.utils import update_redis_follow_paginated_data
+    update_redis_follow_paginated_data(user_id)
 
+@app.task
+def cache_popular_post(user_id,language_id):
+    from forum.topic.utils import update_popular_paginated_data
+    update_popular_paginated_data(user_id,language_id)
 
+@app.task
+def create_topic_notification(created,instance_id):
+    from forum.topic.models import Topic,Notification
+    from forum.user.models import Follower
+    from forum.user.utils.follow_redis import get_redis_following
+    try:
+        instance = Topic.objects.get(pk=instance_id)
+        if created:
+            # all_follower_list = Follower.objects.filter(user_following = instance.user).values_list('user_follower_id',flat=True)
+            all_follower_list = get_redis_following(instance.user.id)
+            for each in all_follower_list:
+                notify = Notification.objects.create(for_user_id = each,topic = instance,notification_type='1',user = instance.user)
+        instance.calculate_vb_score()
+    except Exception as e:
+        print e
+        pass
+
+@app.task
+def create_comment_notification(created,instance_id):
+    from forum.topic.models import Notification
+    from forum.comment.models import Comment
+    from forum.user.models import Follower
+    from forum.user.utils.follow_redis import get_redis_following
+    try:
+        instance = Comment.objects.get(pk=instance_id)
+        if created and not instance.is_vb:
+            # all_follower_list = Follower.objects.filter(user_following = instance.user).values_list('user_follower_id',flat=True)
+            all_follower_list = get_redis_following(instance.user.id)
+            for each in all_follower_list:
+                if not str(each) == str(instance.topic.user.id):
+                    notify = Notification.objects.create(for_user_id = each,topic = instance,notification_type='2',user = instance.user)
+            notify_owner = Notification.objects.create(for_user = instance.topic.user ,topic = instance,notification_type='3',user = instance.user)
+    except Exception as e:
+        print e
+        pass
 
 if __name__ == '__main__':
     app.start()
