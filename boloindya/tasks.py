@@ -3,7 +3,6 @@ from celery_boloindya import app
 from celery.utils.log import get_task_logger
 from django.core.mail import send_mail
 import os
-from forum.topic.utils import update_redis_follow_paginated_data
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 logger = get_task_logger(__name__)
@@ -242,6 +241,7 @@ def sync_contacts_with_user(user_id):
 
 @app.task
 def cache_follow_post(user_id):
+    from forum.topic.utils import update_redis_follow_paginated_data
     update_redis_follow_paginated_data(user_id)
 
 @app.task
