@@ -2500,6 +2500,7 @@ def fb_profile_settings(request):
     user_ip = request.POST.get('user_ip',None)
     sub_category_prefrences = request.POST.get('categories',None)
     is_dark_mode_enabled = request.POST.get('is_dark_mode_enabled',None)
+    android_did = request.POST.get('android_did',None)
     try:
         sub_category_prefrences = sub_category_prefrences.split(',')
     except:
@@ -2714,6 +2715,45 @@ def fb_profile_settings(request):
                 return JsonResponse({'message': 'Settings Chnaged'}, status=status.HTTP_200_OK)
             except Exception as e:
                 return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+        elif activity == 'android_login':
+            try:
+                userprofile = UserProfile.objects.get(android_did = android_did,user__is_active = True)
+                user=userprofile.user
+                is_created=False
+            except Exception as e:
+                print e
+                username = get_random_username()
+                user = User.objects.create(username = username)
+                userprofile = UserProfile.objects.get(user = user)
+                is_created = True
+            if not userprofile.is_guest_user:
+                userprofile.is_guest_user = True
+                userprofile.save()
+
+            if is_created:
+                add_bolo_score(user.id, 'initial_signup', userprofile)
+                if user_ip:
+                    user_ip_to_state_task.delay(user.id,user_ip)
+                if str(is_geo_location) =="1":
+                    userprofile.lat = lat
+                    userprofile.lang = lang
+                if click_id:
+                    userprofile.click_id = click_id
+                    click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
+                    response = urllib2.urlopen(click_url).read()
+                    userprofile.click_id_response = str(response)
+                userprofile.save()
+                if str(language):
+                    default_follow = deafult_boloindya_follow(user,str(language))
+                userprofile.language = str(language)
+                userprofile.save()
+                user.save()
+                user_tokens = get_tokens_for_user(user)
+                return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+            else:
+                user_tokens = get_tokens_for_user(user)
+                return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
