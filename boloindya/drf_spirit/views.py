@@ -2713,7 +2713,8 @@ def fb_profile_settings(request):
             if not userprofile.is_guest_user:
                 userprofile.is_guest_user = True
                 userprofile.save()
-
+            cache_follow_post.delay(user.id)
+            cache_popular_post.delay(user.id,language)
             if is_created:
                 add_bolo_score(user.id, 'initial_signup', userprofile)
                 if user_ip:
