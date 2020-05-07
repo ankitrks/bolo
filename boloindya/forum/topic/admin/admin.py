@@ -5,7 +5,7 @@ from drf_spirit.views import check_hashtag
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
 from forum.topic.models import Topic, Notification, ShareTopic, CricketMatch, Poll, Choice, Voting, Leaderboard,\
- TongueTwister, BoloActionHistory
+ TongueTwister, BoloActionHistory, TongueTwisterCounter
 from forum.category.models import Category
 from forum.topic.models import Topic, Notification, ShareTopic, CricketMatch, Poll, Choice, Voting, Leaderboard, \
         TongueTwister, BoloActionHistory, language_options,JobOpening,JobRequest,RankingWeight
@@ -332,6 +332,9 @@ class RankingWeightAdmin(admin.ModelAdmin):
     list_display = ('features','weight',)
     search_fields = ('features',)
 
+class TongueTwisterCounterAdmin(admin.ModelAdmin):
+    list_display = ('tongue_twister','language_id', 'hash_counter', 'total_views')
+
 admin.site.register(RankingWeight,RankingWeightAdmin)
 admin.site.register(Poll, PollAdmin)
 
@@ -344,4 +347,6 @@ admin.site.register(Leaderboard)
 admin.site.register(TongueTwister,TongueTwisterAdmin)
 admin.site.register(JobOpening,JonOpeningAdmin)
 admin.site.register(JobRequest,JobRequestAdmin)
+admin.site.register(TongueTwisterCounter, TongueTwisterCounterAdmin)
+
 

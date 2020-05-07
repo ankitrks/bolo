@@ -1,7 +1,7 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
 from .fields import UserReadOnlyField
-from forum.topic.models import Topic,CricketMatch,Poll,Choice,Voting,Leaderboard, Notification, TongueTwister,BoloActionHistory,VBseen
+from forum.topic.models import Topic,CricketMatch,Poll,Choice,Voting,Leaderboard, Notification, TongueTwister,BoloActionHistory,VBseen, TongueTwisterCounter
 from django.contrib.auth.models import User
 from forum.category.models import Category,CategoryViewCounter
 from forum.comment.models import Comment
@@ -839,4 +839,92 @@ class ReferralCodeUsedStatSerializer(ModelSerializer):
 
     def get_date_joined(self,instance):
         return instance.by_user.date_joined.strftime("%d-%m-%Y %H:%M:%S")
+
+class TongueTwisterWithOnlyVideoByteSerializer(ModelSerializer):
+    topics = SerializerMethodField()
+    class Meta:
+        model = TongueTwister
+        fields = ('topics', 'id')
+
+    def get_topics(self,instance):
+        language_id = None
+        user_id  = None
+        page = 0
+        if self.context.get("language_id"):
+            language_id =  self.context.get("language_id")
+        if self.context.get("user_id"):
+            user_id =  self.context.get("user_id")
+        if self.context.get("page"):
+            page =  int(self.context.get("page"))
+        topics = []
+        all_seen_vb = []
+        # filter_dict = {'hash_tags':instance}
+        # if language_id:
+        #     filter_dict['language_id'] = language_id
+        # print filter_dict
+        # topics = get_ranked_topics(user_id,page,filter_dict,{})
+        # print {'hash_tags':instance,'language_id':language_id}
+        if user_id:
+            all_seen_vb = get_redis_vb_seen(user_id)
+            # all_seen_vb = VBseen.objects.filter(user = self.request.user, topic__title__icontains=challengehash).distinct('topic_id').values_list('topic_id',flat=True)
+        excluded_list =[]
+        boosted_post = Topic.objects.filter(is_removed = False,is_vb = True, language_id = language_id, hash_tags=instance,is_boosted=True,boosted_end_time__gte=datetime.now()).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if boosted_post:
+            boosted_post = sorted(boosted_post, key=lambda x: x.date, reverse=True)
+        for each in boosted_post:
+            excluded_list.append(each.id)
+        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True, language_id = language_id, hash_tags=instance,user__st__is_superstar = True).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if superstar_post:
+            superstar_post = sorted(superstar_post, key=lambda x: x.date, reverse=True)
+        for each in superstar_post:
+            excluded_list.append(each.id)
+        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True, language_id = language_id, hash_tags=instance,user__st__is_superstar = False,user__st__is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if popular_user_post:
+            popular_user_post = sorted(popular_user_post, key=lambda x: x.date, reverse=True)
+        for each in popular_user_post:
+            excluded_list.append(each.id)
+        popular_post = Topic.objects.filter(is_removed = False,is_vb = True, language_id = language_id, hash_tags=instance,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if popular_post:
+            popular_post = sorted(popular_post, key=lambda x: x.date, reverse=True)
+        for each in popular_post:
+            excluded_list.append(each.id)
+        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True, language_id = language_id, hash_tags=instance,user__st__is_superstar = False,user__st__is_popular=False,is_popular=False).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if normal_user_post:
+            normal_user_post = sorted(normal_user_post, key=lambda x: x.date, reverse=True)
+        for each in normal_user_post:
+            excluded_list.append(each.id)
+        other_post = Topic.objects.filter(is_removed = False,is_vb = True, language_id = language_id, hash_tags=instance).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
+        orderd_all_seen_post=[]
+        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb, hash_tags=instance)
+        if all_seen_post:
+            for each_id in all_seen_vb:
+                for each_vb in all_seen_post:
+                    if each_vb.id == each_id:
+                        orderd_all_seen_post.append(each_vb)
+        topics=list(boosted_post)+list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
+        page_size = 15
+        paginator = Paginator(topics, page_size)
+        page = 1
+        topic_page = paginator.page(page)
+        return CategoryVideoByteSerializer(topics[:settings.REST_FRAMEWORK['PAGE_SIZE']], many=True,context={'is_expand':self.context.get("is_expand",True)}).data
+
+class TongueTwisterWithoutViewsSerializer(ModelSerializer):
+
+    class Meta:
+        model = TongueTwister
+        fields = '__all__'
+
+class TongueTwisterCounterSerializer(ModelSerializer):
+    total_videos_count = SerializerMethodField()
+    total_views = SerializerMethodField()
+    tongue_twister = TongueTwisterWithoutViewsSerializer()
+    class Meta:
+        model = TongueTwisterCounter
+        fields = '__all__'
+
+    def get_total_videos_count(self,instance):
+        return shorcountertopic(instance.hash_counter)
+
+    def get_total_views(self,instance):
+        return shorcountertopic(instance.total_views)
 

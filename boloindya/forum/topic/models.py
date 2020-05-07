@@ -907,5 +907,19 @@ class Leaderboard(UserInfo):
 #     time_deleted = models.DateTimeField(auto_now = True, auto_now_add = False, blank = False, null = False)
 #     plag_text = models.TextField(_("plag_text"), null = False, blank = False)
 
+class TongueTwisterCounter(RecordTimeStamp):
+    tongue_twister = models.ForeignKey(TongueTwister, related_name='tongue_twister_counter',null=True,blank=True)
+    hash_counter = models.PositiveIntegerField(default=1,null=True,blank=True,db_index=True)
+    total_views = models.PositiveIntegerField(default=0,null=True,blank=True,db_index=True)
+    language_id = models.CharField(_("language"), choices=language_options, blank = True, null = True, max_length=10, default='1',db_index=True)
+    
+    class Meta:
+        verbose_name = _("TongueTwisterCounter")
+        verbose_name_plural = _("TongueTwisterCounters")
+
+    def __unicode__(self):
+        return self.tongue_twister.hash_tag
+
+
 
 

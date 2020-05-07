@@ -1,4 +1,4 @@
-# from django.urls import path
+# from django.urls import pat
 from django.conf.urls import include, url
 from rest_framework_simplejwt import views as jwt_views
 from .views import *
@@ -165,5 +165,6 @@ urlpatterns = [
     url(r'^submit_user_feedback/$', submit_user_feedback),
     url(r'^save_banner_response/$', save_banner_response),
     url(r'^cache_user_data/$', cache_user_data,name='cache_user_data'),
-
+    url(r'^get_hash_discover/$', get_hash_discover),
+    url(r'^get_hash_discover_topics/$', get_hash_discover_topics),
 ]
