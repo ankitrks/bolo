@@ -640,7 +640,9 @@ function retryLiveStream(hls, url) {
             
            // document.getElementById('profileImageUserId').style.background = 'url('+profilePics+')';
            var profileURL='/'+userHandleName+'/';
+           
             $("#profileImageUserId").css("background-image", "url(" + profilePics + ")");
+            //$("#profileImageUserId").css("background-image", "url(" + profilePics + ")");
             $(".shareandliketabprofileimage").attr("src", ""+profilePics+"");
             $(".userProfileURL").attr("href", ""+profileURL+"");
             $("._video_card_big_user_info_nickname").html(userprofileName);

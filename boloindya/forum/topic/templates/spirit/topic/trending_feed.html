@@ -288,7 +288,7 @@
 }*/
 
 .about-content .about-article h2{
-    font-family: sofiapro-bold, PingFangSC, sans-serif;
+
     font-weight: 700;
     font-size: 23px;
     line-height: 1;
@@ -315,6 +315,37 @@
 .header-bar {
     padding: 34px 20px;
 }
+.recommend-aside .share-group.jsx-885361899 {
+    text-align: left !important;
+    font-size: 0;
+}
+.trending-header h1{
+    font-size: 3rem;
+    margin-bottom: 14px;
+}
+.about-content{
+    padding-top: 18px;
+}
+.share-group.jsx-3852217983 a.jsx-3852217983 {
+    width: 32px;
+    height: 32px;
+    margin-top: 5px;
+}
+
+.share-group.jsx-885361899 a.jsx-885361899 {
+    display: inline-block;
+}
+.share-group.jsx-2412776336 a.jsx-2412776336+a.jsx-2412776336 {
+    margin-left: 12px;
+}
+.trending-header h2 {
+
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 24px;
+    color: rgb(138, 139, 145);
+}
+
 </style>  
 
 <div class="jsx-639186511 page-with-header main-body">
@@ -323,7 +354,10 @@
             <div class="jsx-1929076256 about-img">
                 <div class="jsx-1994528170 banner-video-container">
                     <div class="video-wall">
-                        <div class="header-bar">{% trans "Popular Videos" %}</div>
+                        <header class="jsx-209879639 share-layout-header trending-header"><h1 class="jsx-822049009">{% trans "Trending" %}</h1>
+                            <!-- <h2 class="jsx-822049009">Watch the latest videos from our community</h2> -->
+                        </header>
+                        <!-- <div class="header-bar"></div> -->
                         <div id="js-playlists" class="playlists">
                             <div class="playlist-switcher hideonMobile">
                                 <h4 class="js-playlist-link playlist-link"></h4>
@@ -347,10 +381,22 @@
 
             <article class="jsx-1929076256 about-article">
                  <aside class="_base_layout_aside">
-                    <div class="_base_layout_aside_sticky" style="">
-                        <div class="_base_layout_aside_wrapper">
-
-                            <div class="jsx-3959364739 recommend-card" style="margin-top: 70px;">
+                    <div class="_base_layout_aside_sticky " style="">
+                        <div class="_base_layout_aside_wrapper recommend-aside">
+                        <div class="jsx-885361899 jsx-3852217983  jsx-2412776336 share-group">
+                            <a href="javascript:void(0)" onclick="social_share_page('facebook_share','{{ request.get_full_path }}')" target="_blank" class="jsx-885361899 jsx-3852217983 jsx-2412776336">
+                                <span><img src="/media/facebook_mobile.svg" class="jsx-885361899 jsx-3852217983 jsx-2412776336"></span>
+                            </a>
+                            <a href="javascript:void(0);" onclick="social_share_page('twitter_share','{{ request.get_full_path }}')" class="jsx-885361899 jsx-3852217983 jsx-2412776336">
+                                <span><img src="/media/twitter_mobile.svg" class="jsx-885361899 jsx-3852217983 jsx-2412776336">
+                                </span>
+                            </a>
+                            <a href="javascript:void(0);" onclick="social_share_page('whatsapp_share','{{ request.get_full_path }}')" class="jsx-885361899 jsx-3852217983 jsx-2412776336">
+                                <span><img src="/media/whatsapp.svg" class="jsx-885361899 jsx-3852217983 jsx-2412776336">
+                                </span>
+                            </a>
+                        </div>
+                            <div class="jsx-3959364739 recommend-card" style="margin-top: 36px;">
                                 <header class="jsx-3959364739">
                                     <h3 class="jsx-3959364739">{% trans "Suggested Users" %}</h3><!-- <a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a> --></header>
 <!--                                 <div class="_scroll_load_more_loading_creator center">
@@ -391,11 +437,7 @@
                             </div>
                             <div class="jsx-3959364739 recommend-card" style="margin-top: 10px;">
                                 <header class="jsx-3959364739">
-                                    <h3 style="font-size: 24px;" class="jsx-3959364739">{% trans "Trending Hashtags" %}</h3><!-- <a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a> --></header>
-<!--                                 <div class="_scroll_load_more_loading_creator center">
-                                    <div class="boloindya-loading">Loading...</div>
-                                </div> -->
-
+                                    <h3 style="font-size: 24px;" class="jsx-3959364739">{% trans "Trending Hashtags" %}</h3><a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a></header>
                                 <ul class="jsx-3959364739 sidebarLi" id="creatorId2">
 
 
@@ -419,15 +461,15 @@
 
 
                         </div>
-                        <div class="_base_layout_aside_wrapper">
+<!--                         <div class="_base_layout_aside_wrapper">
                             <div class="_download_">
                                 <h3 class="_download_title">{% trans "Get the App" %}</h3>
                                 <div class="_download_content_wrapper">
                                     <a rel="nofollow" target="_blank" class="_download_btn_" href="https://play.google.com/store/apps/details?id=com.boloindya.boloindya&amp;hl=en_IN"><img src="/media/google_store.png" alt="google-store"></a>
-<!--                                     <a rel="nofollow" target="_blank" class="_download_btn_" href="#"><img src="/media/amazon_store.png" alt="amazon-store"></a> -->
+
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </aside>
 
@@ -441,10 +483,21 @@
 <script src="/media/js/landing_script.js"></script>
 
 <!-----------End  ------------>
+<script type="text/javascript">
+    $(function(){
+    var url = window.location.href; 
 
+    $(".top_menu_details").removeClass('menu-item-link-active');
+    $(".trendingMenu").addClass('menu-item-link-active');
+ 
+});
+
+
+
+</script>
 
 <!-- Start Comments Section -->
-{% include "spirit/_video_play_and_comments.html" %}
+{% include "spirit/topic/trending_play_and_comment.html" %}
 <!-- End Load Comments  -->
 
 

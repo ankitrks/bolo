@@ -20,6 +20,9 @@
 <!-- Social Share Code End -->
 
 <style type="text/css">
+
+
+
     #infinite-list {
   /* We need to limit the height and show a scrollbar */
   width: 200px;
@@ -85,12 +88,13 @@
     box-sizing: border-box;
     background: #0003;
 /*    background: linear-gradient(rgba(22, 24, 35, 0) 2.92%, rgba(22, 24, 35, 0.5) 98.99%);*/
-    padding: 7px 7px 7px;
+    padding: 7px;
 }
 .video-card.jsx-3077367275 {
     position: relative;
     width: 100%;
     height: 100%;
+    border: 1px solid #ffffff59;
 }
 video.jsx-3382097194 {
     display: block;
@@ -118,7 +122,7 @@ video.jsx-3382097194 {
     height: auto;
     margin-right: 0px;
     margin-bottom: 0px;
-    padding: 9px 6px 0 9px;
+    padding: 0px 3px 12px 5px;
 }
 
 .share-layout {
@@ -203,6 +207,7 @@ video.jsx-3382097194 {
     left: -18px;
     padding-top: 4px;
 }
+
 ._video_card_footer_likes{
     position: absolute;
     left: 0px;
@@ -249,12 +254,6 @@ video.jsx-3382097194 {
     background-position: -42px -382px;
     color: red;
     font-weight: bold;
-}
-/*.smenu.share{
-   margin-top: 50px; 
-}*/
-.smenu li{
-    margin: 7px;
 }
 
 @media(max-width: 991px){
@@ -322,47 +321,53 @@ video.jsx-3382097194 {
 }
 
 }
-.userProfilAvator{
-    background-image: var(--hashtag--background-image) !important;
+.backButton{
+    margin-top: -26px;
 }
+@media(max-width: 991px){
+    .backButton{
+        display: none;
+    }
+}
+
 </style>
 <div class="jsx-3819228898">
 
+    <input type="hidden" name="id" id="currentCatId" value="{{ category_details.id}}">
+    <input type="hidden" name="previousVideoId" id="previousVideoId" value="">
+    <input type="hidden" name="nextVideoId" id="nextVideoId" value="">
 
-    <input type="hidden" name="id" id="currentCatId" value="{{tongue.id}}">
-    <input type="hidden" name="hashtagId" id="hashtagId" value="{{hashtag}}">
+
+
     <div class="jsx-606928072 share-layout">
         <div class="share-layout-content">
             <header class="share-layout-header bottom-line share-header">
-                <div class="jsx-2177493926 jsx-578937417 avatar round userProfilAvator" style="background-image: url({% if tongue.picture|length > 1 %}
-                                       {{ tongue.picture}}
-                                    {% else %}
-                                       '/media/hashtag.png'
-                                    {% endif %}); "></div>
+                <div class="header-back header-left backButton"><a href="/discover/"><img src="/media/back-button.svg"></a></div>
+                <div class="jsx-2177493926 jsx-578937417 avatar round userProfilAvator" style="background-image: url({{ category_details.category_image}}); "></div>
                 <div class="share-info">
-
-                    <h1 class="share-title headingMargin"> #{{tongue.hash_tag}}</h1> 
-                    <p class="count-infos"><span class="number"></span><span class="unit"> {{tongue.total_views | shorcountertopic}} Views</span><span class="number"> </span>
-<!--                         <span class="unit">
-                            <button onclick="follow_category('{{tongue.id}}');" class="_4jy1 _4jy4 _517h _51sy _42ft " type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-{{tongue.id}} followCheck sx_5da455"></i><span class="btnTextChange-{{tongue.id}}">Follow</span>
+                    <h1 class="share-title headingMargin">{% category_title_by_language category_details LANGUAGE_CODE|language_name %}</h1>
+                    <!-- <h5 class="share-title headingMargin"> @{{category_details.slug}}</h5> --> 
+                    <p class="count-infos"><span class="number"></span><span class="unit"> {{category_details.view_count | shorcountertopic}} {% trans "Views" %}</span><span class="number"> </span>
+                        <span class="unit">
+                            <button onclick="follow_category('{{category_details.id}}');" class="_4jy1 _4jy4 _517h _51sy _42ft " type="submit" value="1">
+                                <i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-{{category_details.id}} followCheck sx_5da455"></i>
+                                <span class="btnTextChange-{{category_details.id}}" id="followCategoryStatus-{{category_details.id}}">{% trans "Follow" %}</span>
                             </button>
-                        </span> -->
+                        </span>
                     </p>
                     </div>
             </header>
-           
+
             <main class="share-layout-main">
 
-                <div class="jsx-2893588005 video-feed" id="hashTagVideosListId">
+                <div class="jsx-2893588005 video-feed" id="categoryVideosListId">
                     <div class="_scroll_load_more_loading_user_videos center">
                         <div class="boloindya-loading"></div>
                     </div>
                 </div>
-                <div class="_scroll_load_more_loading_user_videosMore center">
-                    <div class="boloindya-loading"></div>
-                </div>
-                <input type="hidden" name="nextPageUrl" id="nextPageUrlId" value="">
             </main>
+           
+
 
 
         </div>
@@ -380,19 +385,82 @@ video.jsx-3382097194 {
 
                 </div>
                 <div class="jsx-3959364739 recommend-card">
-                    <header class="jsx-3959364739">
-                        <h3 class="jsx-3959364739">{% trans "Creators" %}</h3><a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a></header>
+<!--                     <header class="jsx-3959364739">
+                        <h3 class="jsx-3959364739">{% trans "Suggested Users" %}</h3><a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a></header>
                     <div class="_scroll_load_more_loading_creator center">
                         <div class="boloindya-loading">Loading...</div>
                     </div>
 
-                    <ul class="jsx-3959364739 sidebarLi" id="creatorId">
+                    <ul class="jsx-3959364739 sidebarLi" id="creatorId11">
 
 
 
-                    </ul>
+                    </ul> -->
+
+                                <header class="jsx-3959364739">
+                                    <h3 class="jsx-3959364739">{% trans "Suggested Users" %}</h3><!-- <a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a> --></header>
+<!--                                 <div class="_scroll_load_more_loading_creator center">
+                                    <div class="boloindya-loading">Loading...</div>
+                                </div> -->
+
+                                <ul class="jsx-3959364739 sidebarLi" id="creatorId1">
+
+
+
+
+                                    {% for each_popular_item in popular_bolo %}
+                                   
+
+                                        <li class="jsx-3959364739">
+                                            <a tag="a" class="jsx-1420774184 recommend-item" href="/{{each_popular_item.user.username}}/">
+                                                <div class="jsx-2177493926 jsx-578937417 avatar round head normal" style="background-image: url({% if each_popular_item.profile_pic|length > 1 %}
+                                    {{each_popular_item.profile_pic}}
+                                {% else %}
+                                    /media/user.svg
+                                {% endif %});"></div>
+                                                <div class="jsx-1420774184 info-content">
+                                                    <h4 class="jsx-1420774184">                                               {% if each_popular_item.name %}
+                                                       {{each_popular_item.name}} <!-- {{each_popular_item.last_name}} -->
+                                                    {% else %}
+                                                       {{each_popular_item.user.username}}
+                                                    {% endif %}</h4>
+                                                    <p class="jsx-1420774184">@{{each_popular_item.user.username}}</p>
+
+                                                </div>
+                                                <div class="jsx-1420774184 arrow-right"></div>
+                                            </a>
+
+                                        </li>
+                                    {% endfor %}
+
+                                </ul>
+
                 </div>
-                <div class="jsx-3959364739 recommend-card">
+                            <div class="jsx-3959364739 recommend-card" style="margin-top: 10px;">
+                                <header class="jsx-3959364739">
+                                    <h3 style="font-size: 24px;" class="jsx-3959364739">{% trans "Trending Hashtags" %}</h3><a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a></header>
+                                <ul class="jsx-3959364739 sidebarLi" id="creatorId2">
+
+
+
+
+                                    {%  for each_hashtag_item in hash_tags %}
+                                
+                                        <li class="jsx-3959364739">
+                                            <a tag="a" class="jsx-1420774184 recommend-item" href="/hashtag/{{each_hashtag_item.hash_tag}}/">
+                                                <div class="jsx-1420774184 info-content">
+                                                    <h4 class="jsx-1420774184">#{{each_hashtag_item.hash_tag}}</h4>
+                                                    <p class="jsx-1420774184">{{each_hashtag_item.total_views | shorcountertopic}} {% trans "views" %}</p>
+                                                </div>
+                                                <div class="jsx-1420774184 arrow-right"></div>
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+
+                                </ul>
+                            </div>
+
+<!--                 <div class="jsx-3959364739 recommend-card">
                     <header class="jsx-3959364739">
                         <h3 class="jsx-3959364739">{% trans "Discover" %}</h3><a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a></header>
                     <div class="_scroll_load_more_loading_discover center">
@@ -400,13 +468,14 @@ video.jsx-3382097194 {
                     </div>
                     <ul class="jsx-3959364739 sidebarLi" id="discoverId">
                     </ul>
-                </div>
+                </div> -->
             </div>
             <div class="jsx-3336228099 download-container card">
 
                 <div class="jsx-3336228099 download-content download-link">
                     <h3 class="_download_title">{% trans "Get the App" %}</h3>
                     <div class="jsx-3336228099 download-wrapper">
+
 <!--                         <a href="https://app.appsflyer.com/id835599320" target="_blank" rel="nofollow" class="jsx-3336228099"><img src="//sf-tb-sg.ibytedtos.com/obj/ttfe-malisg/store-badge/apple/en.png" alt="apple-store" class="jsx-3336228099"></a> -->
                         <a href="https://play.google.com/store/apps/details?id=com.boloindya.boloindya&hl=en_IN" target="_blank" rel="nofollow" class="jsx-3336228099"><img src="//sf-tb-sg.ibytedtos.com/obj/ttfe-malisg/store-badge/google/en.png" alt="google-store" class="jsx-3336228099"></a>
 <!--                         <a href="https://www.amazon.com/dp/B0117U0G3M/" target="_blank" rel="nofollow" class="jsx-3336228099"><img src="//sf-tb-sg.ibytedtos.com/obj/ttfe-malisg/store-badge/amazon/en.png" alt="amazon-store" class="jsx-3336228099"></a> -->
@@ -418,7 +487,7 @@ video.jsx-3382097194 {
 </div>
 
 
-<script src="/media/js/hashtag_trending.js"></script>
+<script src="/media/js/video_discover_category.js"></script>
 <!-- Start Comments Section -->
 {% include "spirit/topic/trending_play_and_comment.html" %}
 <!-- End Load Comments  -->

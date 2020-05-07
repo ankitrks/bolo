@@ -294,7 +294,6 @@ function delegateClick(videoPlayerId,video_backup_url,video_cdn_url){
   var btnPlayerId = '.videoPlayButtonDetails-'+videoPlayerId;
   var video = document.getElementById(playerId);
 
-    //openFullscreen(video);
 
     if(video.paused) {
       $(".videoSliderPlay").each(function() {

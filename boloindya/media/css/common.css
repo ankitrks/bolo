@@ -252,7 +252,7 @@
             left: 0;
             top: 0;
             right: 0;
-            height: 60px;
+            height: 70px;
            /* background: #ffffff;*/
             background: #000;
             border-bottom: 1px solid rgba(34,90,89,0.2);
@@ -521,7 +521,7 @@
             bottom: 0;
             width: 376px;
             text-align: center;
-            background-color: #fffff0;
+            background-color: #ffffff;
             /*background-color: #ffffff;*/
             padding: 87px 0;
             overflow-y: auto;
@@ -2661,7 +2661,7 @@
     display: -webkit-box;
     display: -ms-flexbox;
    /* display: flex;*/
-    margin-top: 54px
+    margin-top: 34px
 }
 
 ._base_layout_main {

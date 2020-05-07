@@ -1,201 +1,53 @@
-var playListData=[];
-var userLikeAndUnlike=[];
-var current_video_play_index=0;
-var totalDataCount=0;
-var itemCount=0;
-var page = 1;
-var checkDataStatus=0;
-$(window).scroll(function() {
-    var scorh=Number($(window).scrollTop() + $(window).height());
-    //console.log('Scol+he '+scorh);
-    //if($(window).scrollTop() + $(window).height() >= $(document).height()-800 && $(window).scrollTop() + $(window).height()<$(document).height()) {
-    if($(window).scrollTop() + $(window).height() > $("#userVideosListId").height() && checkDataStatus==0){
-        
-        var nextPageUrl=jQuery("#nextPageUrlId").val();
-        if(undefined !==nextPageUrl && nextPageUrl!=""){
-            page++;
-            loaderBoloShowDynamic('_scroll_load_more_loading_user_videosMore');
-            loadMoreData(nextPageUrl);
-        }
-
-    }
-    //console.log('documentHe- '+$(document).height());
-});
-
-
-function getUserVideos(limit,offset){
-
-    loaderBoloShowDynamic('_scroll_load_more_loading_user_videos');
-    var user_id= $("#currentUserId").val();
-    var platlistItems;
-    var language_id=current_language_id;
-    var listItems="";
-    var userVideoItems="";
-    var uri='/api/v1/get_vb_list/';
-    var res = encodeURI(uri);
-
-    jQuery.ajax({
-        url:res,
-        type:"GET",
-        data:{'limit':limit,'offset':offset,'user_id':user_id,'language_id':language_id},
-        success: function(response,textStatus, xhr){
-            userVideoItems="";
-            var videoItemList=response.results;
-            jQuery("#userVideoCountId").html(response.count);
-            videoItemList.forEach(function(itemCreator) {itemCount++;
-                userVideoItems =getVideoItem(itemCreator,itemCount);
-                $("#userVideosListId").append(userVideoItems);
-                playListData.push(itemCreator);
-      
-            });
-            loaderBoloHideDynamic('_scroll_load_more_loading_user_videos');
-            //playListData=videoItemList;
-            var nextPageData=response.next;
-            jQuery("#nextPageUrlId").val(response.next);
-            
-            
-
-        }
-  
-    });
-}
-
-function loadMoreData(NextPageUrl){
-    
-    var platlistItems;
-    checkDataStatus=1;
-    var listItems="";
-    var language_id=current_language_id;
-    var uri=NextPageUrl;
-    var res = encodeURI(uri);
-      $.ajax(
-            {
-                url:res,
-                data:{'language_id':language_id},
-                type: "get",
-                beforeSend: function()
-                {
-                    $('.ajax-load').show();
-                }
-            })
-            .done(function(data)
-            {
-                if(data == " "){
-                    $('.ajax-load').html("No more records found");
-                    return;
-                }
-                checkDataStatus=0;
-                userVideoItems="";
-                var videoItemList=data.results;
-                videoItemList.forEach(function(itemCreator) {itemCount++;
-                userVideoItems +=getVideoItem(itemCreator,itemCount);
-                playListData.push(itemCreator);          
-      
-                });
-                loaderBoloHideDynamic('_scroll_load_more_loading_user_videosMore');
-                //playListData+=videoItemList;
-
-                $('.ajax-load').hide();
-                var nextPageData="";
-                $("#userVideosListId").append(userVideoItems);
-                var nextPageData=data.next;
-                if(nextPageData!=""){
-                    jQuery("#nextPageUrlId").val(nextPageData);
-                }else{
-                   jQuery("#nextPageUrlId").val(nextPageData); 
-                }
-                
-            })
-            .fail(function(jqXHR, ajaxOptions, thrownError)
-            {
-                if(jqXHR.status!=201){
-                    
-                }
-                loaderBoloHideDynamic('_scroll_load_more_loading_user_videosMore');
-                  $('.ajax-load').html("No more records found");
-            });
-    }
-
-
-
-
-
-function getVideoItem(videoItem,itemCount){
-    //<a href="/explore/'+itemVideo.slug+'/'+itemVideo.id+'" onClick="openVideoInPopup(\''+videoItem.question_video+'\',\''+videoItem.question_image+'\','+itemCount+');" class="jsx-2893588005 video-feed-item-wrapper">\
-
-    var content_title="";
-    var videoTitle="";
-        videoTitle=removeTags(videoItem.title);
-        content_title = videoTitle.substr(0, 40) + " ...";
-    var userVideoItem = '<div class="jsx-1410658769 video-feed-item">\
-            <div class="jsx-1410658769 _ratio_">\
-                <div class="jsx-1410658769" style="padding-top: 148.438%;">\
-                    <div class="jsx-1410658769 _ratio_wrapper">\
-                        <a href="javascript:void(0)" onClick="openVideoInPopup(\''+videoItem.question_video+'\',\''+videoItem.question_image+'\','+itemCount+');"  class="jsx-2893588005 video-feed-item-wrapper">\
-                            <div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+videoItem.question_image+');">\
-                                <div class="jsx-3077367275 video-card default">\
-                                    <div class="jsx-3077367275 video-card-mask">\
-                                        <div class="jsx-1543915374 card-footer normal no-avatar">\
-                                            <div class="jsx-1543915374"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+videoItem.view_count+'</span></p><span class="_video_card_footer_likes1"><img src="/media/download.svg" alt="likes"> '+videoItem.likes_count+'</span></div>\
-                                        </div>\
-                                    </div>\
-                                </div>\
-                            </div>\
-                        </a>\
-                    </div>\
-                </div>\
-            </div>\
-        </div>';
-
-        return userVideoItem;
-}
 
 $(document).ready(function(){
-    getUserVideos(10,0);
+
+    getHashtagVideos();
     getSideBarData();
 });
 
 
+var totalCountVideo =0;
+var userLikeAndUnlike=[];
+var current_video_play_index=0;
+var totalDataCount=0;
+
 function getSideBarData(){
     loaderBoloShowDynamic('_scroll_load_more_loading_creator');
     loaderBoloShowDynamic('_scroll_load_more_loading_discover');
-    var playListData=[]; 
-    var platlistItems;
+
     var listItems="";
     var itemCount=0;
     var language_id=1;
+    language_id=current_language_id;
         // headers: {
         //   'Authorization':'Bearer '+accessToken,
         // },
     //var uri='https://www.boloindya.com/api/v1/get_popular_video_bytes/?page=1';
     var uri='/api/v1/get_category_with_video_bytes/';
     var res = encodeURI(uri);
-    var page_size=10;
 
     jQuery.ajax({
         url:res,
         type:"GET",
 
-        data:{'language_id':language_id,'is_with_popular':'True','popular_boloindyans':'True','page_size':page_size},
+        data:{'language_id':language_id,'is_with_popular':'True','popular_boloindyans':'True'},
         success: function(response,textStatus, xhr){
             populaCreatorsItems="";
             populaCategoriesItems="";
-            //getPopularCategory
 
             var popularCategoriesList=response.category_details;
             var popularCreatorsList=response.popular_boloindyans;
             popularCreatorsList.forEach(function(itemCreator) {itemCount++;
-                populaCreatorsItems =getCreators(itemCreator);
-                $("#creatorId").append(populaCreatorsItems);
+                populaCreatorsItems +=getCreators(itemCreator);
+                
                 //var videoCommentList=data.results;"total_view":"3444.K",
             });
+            $("#creatorId").append(populaCreatorsItems);
             loaderBoloHideDynamic('_scroll_load_more_loading_creator');
-    
-            popularCategoriesList.forEach(function(itemCat) {itemCount++;
-                populaCategoriesItems =getPopularCategory(itemCat);
-                $("#discoverId").append(populaCategoriesItems);
-                //var videoCommentList=data.results;"total_view":"3444.K",
+                popularCategoriesList.forEach(function(itemCat) {itemCount++;
+                populaCategoriesItems +=getPopularCategory(itemCat);
             });
+            $("#discoverId").append(populaCategoriesItems);
             loaderBoloHideDynamic('_scroll_load_more_loading_discover');
 
 
@@ -216,8 +68,7 @@ function getCreators(popularCreators){
     var profilePics = popularCreators.userprofile.profile_pic;
     if(profilePics==''){
        profilePics= '/media/user.svg';
-    }
-    
+    }    
 
     var creatorTemplate='<li class="jsx-3959364739">\
                             <a tag="a" class="jsx-1420774184 recommend-item" href="/'+popularCreators.username+'/">\
@@ -258,15 +109,209 @@ function getPopularCategory(popularCategory){
 }
 
 
+var playListData=[];
+var userLikeAndUnlike=[];
 
+var page = 1;
+var checkDataStatus=0;
+$(window).scroll(function() {
+    var scorh=Number($(window).scrollTop() + $(window).height());
+    
+    //if($(window).scrollTop() + $(window).height() >= $(document).height()-800 && $(window).scrollTop() + $(window).height()<$(document).height()) {
+    if($(window).scrollTop() + $(window).height() > $("#hashTagVideosListId").height() && checkDataStatus==0){
+        
+        var nextPageUrl=jQuery("#nextPageUrlId").val();
+        if(undefined !==nextPageUrl && nextPageUrl!=""){
+            page++;
+            loaderBoloShowDynamic('_scroll_load_more_loading_user_videosMore');
+            loadMoreData(nextPageUrl);
+        }
+
+    }
+    //console.log('documentHe- '+$(document).height());
+});
+
+
+function getHashtagVideos(limit,offset){
+
+    loaderBoloShowDynamic('_scroll_load_more_loading_user_videos');
+    var hashtagId= $("#hashtagId").val();
+    var platlistItems;
+    var language_id=current_language_id;
+    //console.log('CurrentLanguageId:'+current_language_id);
+    var listItems="";
+    var itemCount=0;
+    var userVideoItems="";
+    var uri='/api/v1/get_challenge/';
+    var res = encodeURI(uri);
+
+    jQuery.ajax({
+        url:res,
+        type:"GET",
+        data:{'challengehash':hashtagId,'language_id':language_id},
+        success: function(response,textStatus, xhr){
+            userVideoItems="";
+            var videoItemList=response.results;
+            //jQuery("#userVideoCountId").html(response.count);
+            var itemCount=-1;
+            videoItemList.forEach(function(itemCreator) {itemCount++;totalCountVideo++;
+                playListData.push(itemCreator);
+                userVideoItems =getVideoItem(itemCreator,totalCountVideo);
+                $("#hashTagVideosListId").append(userVideoItems);
+      
+            });
+            loaderBoloHideDynamic('_scroll_load_more_loading_user_videos');
+            //playListData=videoItemList;
+            var nextPageData=response.next;
+            jQuery("#nextPageUrlId").val(response.next);
+            
+            
+
+        }
+  
+    });
+}
+
+
+
+function loadMoreData(NextPageUrl){
+    var hashtagId= $("#hashtagId").val();
+    var platlistItems;
+    checkDataStatus=1;
+    var listItems="";
+    var itemCount=0;
+    var language_id=current_language_id;
+    //var uri='https://www.boloindya.com/api/v1/get_popular_video_bytes/?page=1';
+    var uri=NextPageUrl;
+    var res = uri;
+      $.ajax(
+            {
+                url:res,
+                data:{'language_id':language_id,'challengehash':hashtagId},
+                type: "get",
+                beforeSend: function()
+                {
+                    $('.ajax-load').show();
+                }
+            })
+            .done(function(data)
+            {
+                if(data == " "){
+                    $('.ajax-load').html("No more records found");
+                    return;
+                }
+                checkDataStatus=0;
+                userVideoItems="";
+                var videoItemList=data.results;
+                var itemCount=-1;
+                videoItemList.forEach(function(itemCreator) {itemCount++;totalCountVideo++;
+                userVideoItems +=getVideoItem(itemCreator,totalCountVideo);
+                playListData.push(itemCreator);          
+      
+                });
+                loaderBoloHideDynamic('_scroll_load_more_loading_user_videosMore');
+                //playListData+=videoItemList;
+                //hashTagVideosListId
+                $('.ajax-load').hide();
+                var nextPageData="";
+                $("#hashTagVideosListId").append(userVideoItems);
+                var nextPageData=data.next;
+                if(nextPageData!=""){
+                    jQuery("#nextPageUrlId").val(nextPageData);
+                }else{
+                   jQuery("#nextPageUrlId").val(nextPageData); 
+                }
+                
+            })
+            .fail(function(jqXHR, ajaxOptions, thrownError)
+            {
+                if(jqXHR.status!=201){
+                    
+                }
+                loaderBoloHideDynamic('_scroll_load_more_loading_user_videosMore');
+                  $('.ajax-load').html("No more records found");
+            });
+    }
+
+
+
+
+
+    //var playListData=[];
+function getCategoryVideos(){
+
+    loaderBoloShowDynamic('_scroll_load_more_loading_user_videos');
+    var hashtagId= $("#hashtagId").val();
+     
+    var platlistItems;
+
+    var listItems="";
+    var itemCount=0;
+    var language_id=1;
+    language_id=current_language_id;
+    var userVideoItems="";
+    var uri='/api/v1/get_challenge/';
+    var res = encodeURI(uri);
+
+    jQuery.ajax({
+        url:res,
+        type:"GET",
+        data:{'challengehash':hashtagId,language_id:language_id},
+        success: function(response,textStatus, xhr){
+            userVideoItems="";
+            var videoItemList=response.results;
+            var itemCount=0;
+            videoItemList.forEach(function(itemCreator) {itemCount++;
+                playListData[itemCreator.id]=itemCreator;
+                userVideoItems +=getVideoItem(itemCreator,itemCreator.id);
+            });
+            $("#categoryVideosListId").append(userVideoItems);
+            loaderBoloHideDynamic('_scroll_load_more_loading_user_videos');
+            //playListData=videoItemList;
+
+        }
+  
+    });
+}
+
+function getVideoItem(videoItem,itemCount){
+    //<a href="javascript:void(0)" onClick="openVideoInPopup(\''+videoItem.question_video+'\',\''+videoItem.question_image+'\','+itemCount+');" class="jsx-2893588005 video-feed-item-wrapper">\
+    var content_title="";
+    var videoTitle="";
+        videoTitle=removeTags(videoItem.title);
+        content_title = videoTitle.substr(0, 40) + " ...";
+    var userVideoItem = '<div class="jsx-1410658769 video-feed-item">\
+            <div class="jsx-1410658769 _ratio_">\
+                <div class="jsx-1410658769" style="padding-top: 148.438%;">\
+                    <div class="jsx-1410658769 _ratio_wrapper">\
+                        <a href="/explore/'+videoItem.slug+'/'+videoItem.id+'"  class="jsx-2893588005 video-feed-item-wrapper">\
+                            <div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+videoItem.question_image+');">\
+                                <div class="jsx-3077367275 video-card default">\
+                                    <div class="jsx-3077367275 video-card-mask">\
+                                        <div class="jsx-1543915374 card-footer normal no-avatar">\
+                                            <div class="jsx-1543915374"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+videoItem.view_count+'</span></p><span class="_video_card_footer_likes1"><img src="/media/download.svg" alt="likes"> '+videoItem.likes_count+'</span></div>\
+                                        </div>\
+                                    </div>\
+                                </div>\
+                            </div>\
+                        </a>\
+                    </div>\
+                </div>\
+            </div>\
+        </div>';
+
+        return userVideoItem;
+}
 
   var sideBarDetails="";
   var sideBarCommentDetails="";
+
     var muteStatus=false;
     var isLoading = false;
     var hideErrorMsg = true;
-    
+
     var retryCount=0;
+
 function video_play_using_video_js(url,backup_url,image) {
     
     var video = document.getElementById('player');
@@ -607,27 +652,26 @@ function nextVideoPlay(){debugger;
 
 }
 
+
+
  function openVideoInPopup(file,image,indexId){debugger;
   loaderShow();
   var singleItemData=[];
-  indexId=indexId-1;
-  $("#indexId").val(indexId);
-  current_video_play_index=indexId;
+    indexId=indexId-1;
+    $("#indexId").val(indexId);
+    current_video_play_index=indexId;
+     $('.videoPlayButton').removeClass('play-button');
+    singleItemData=playListData[indexId];
   $("#modelPopup").show();
   var newSrc='/media/mute_icon.svg';
   $('#mutedImageId').attr('src', newSrc);
   $('.videoPlayButton').removeClass('_video_card_playbtn_wraaper');
-  $('.videoPlayButton').removeClass('play-button');
-    singleItemData=playListData[indexId];
-    console.log(singleItemData);
+
+
+    var preBufferDone = false;
     var video_backup="";
     var video_backup=singleItemData.question_video;
     video_play_using_video_js(file,video_backup,image);
-
-    var profilePics = singleItemData.user.userprofile.profile_pic;
-    if(profilePics==''){
-       profilePics= '/media/user.svg';
-    }
 
     $('.backgroundImg').css("background-image", "url(" + image + ")");
     if(current_video_play_index>0){
@@ -643,110 +687,111 @@ function nextVideoPlay(){debugger;
         $('.arrow-right').addClass('hide');
     }
 
-    var shareURL=site_base_url+singleItemData.slug+'/'+singleItemData.id+'';
-    var sideBarDetails='<div onClick="openMobileDownloadPopup();" class="jsx-2177493926 jsx-3813273378 avatar round" style="background-image: url('+profilePics+'); width: 48px; height: 48px; flex: 0 0 48px;"></div><div class="jsx-949708032 boloindya-toolbar" style="margin-top: 20px;"><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-like" onClick="openMobileDownloadPopup();" style="background-image: url(/media/viewIcon.svg);"><span class="jsx-949708032">'+singleItemData.likes_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-comment" onClick="openMobileDownloadPopup();" style="background-image: url(/media/comments.png);"><span class="jsx-949708032">'+singleItemData.comment_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-share" onclick="openShareTab()" style="background-image: url(/media/share.png);"><span class="jsx-949708032">'+singleItemData.total_share_count+'</span></div></div>';
-    $("#topicID").val(singleItemData.id);
-    $("#currentPlayUserId").val(singleItemData.user.userprofile.id);
-    $("#topicCreatorUsername").val(singleItemData.user.username);
-    $("#shareInputbox").val(shareURL);
-    var bigCommentLikeDet='<strong><span id="likeCountId">'+singleItemData.likes_count+'</span> '+likeTrans+' · <span id="commentCountId">'+singleItemData.comment_count+'</span> '+commentsTrans+'</strong>';
-    $("#sideBarId").html(sideBarDetails);
-    $("._video_card_big_meta_info_count").html(bigCommentLikeDet);
-    $(".video-meta-title").html(singleItemData.title);
 
-    $(".like-text").html(singleItemData.likes_count);
-    $(".comment-text").html(singleItemData.comment_count);
+    var shareURL=site_base_url+singleItemData.user.username+'/'+singleItemData.id+'';
 
-    //===================== Comment and Like count ===============
+    var sideBarDetails='<div onClick="openMobileDownloadPopup();" class="jsx-2177493926 jsx-3813273378 avatar round" style="background-image: url(/media/musically_100x100.jpeg); width: 48px; height: 48px; flex: 0 0 48px;"></div><div class="jsx-949708032 boloindya-toolbar" style="margin-top: 20px;"><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-like" onClick="openMobileDownloadPopup();" style="background-image: url(/media/viewIcon.svg);"><span class="jsx-949708032">'+singleItemData.likes_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-comment" onClick="openMobileDownloadPopup();" style="background-image: url(/media/comments.svg);"><span class="jsx-949708032">'+singleItemData.comment_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-share" onclick="openShareTab()" style="background-image: url(/media/share.svg);"><span class="jsx-949708032">'+singleItemData.total_share_count+'</span></div></div>';
+        $("#topicID").val(singleItemData.id);
+        $("#topicCreatorUsername").val(singleItemData.user.username);
+        $("#shareInputbox").val(shareURL);
+        var bigCommentLikeDet='<strong>'+singleItemData.likes_count+' '+likeTrans+' · '+singleItemData.comment_count+' '+commentsTrans+'</strong>';
+        $("#sideBarId").html(sideBarDetails);
+        $("._video_card_big_meta_info_count").html(bigCommentLikeDet);
+        $(".video-meta-title").html(singleItemData.title);
 
-    $("#totalLikeCount").val(singleItemData.likes_count);
-    $("#totalCommentCount").val(singleItemData.comment_count);
+        $(".like-text").html(singleItemData.likes_count);
+        $(".comment-text").html(singleItemData.comment_count);
 
-    //===================Comment and Like Count end =============
-    var userprofileName=singleItemData.user.userprofile.name;
-    var userHandleName=singleItemData.user.username;
-    var videoTitle=singleItemData.title;
+        $("#totalLikeCount").val(singleItemData.likes_count);
+        $("#totalCommentCount").val(singleItemData.comment_count);       
 
-
-    var likeStatus="";
-
-    likeStatus="liked";
-    var likeStatusClass=jQuery("#UReactionLink").hasClass('liked');
-    if(likeStatusClass==true){
-        jQuery("#UReactionLink").removeClass('liked');
-        jQuery(".sp_ddXiTdIB8vm").addClass('sx_44a25c');
-        jQuery(".sp_ddXiTdIB8vm").removeClass('sx_44a25d');
-    }
-
-    var likedCheck=userLikeAndUnlike.topic_like;
-    if(undefined !==likedCheck && likedCheck.length>0){
-        var lStatus = likedCheck.includes(singleItemData.id);
-        if(lStatus==true){
-            likeStatus="liked";
-            var likeStatusClass=jQuery("#UReactionLink").hasClass('liked');
-            if(likeStatusClass==false){
-                jQuery("#UReactionLink").addClass('liked');
-                jQuery(".sp_ddXiTdIB8vm").removeClass('sx_44a25c');
-                jQuery(".sp_ddXiTdIB8vm").addClass('sx_44a25d');
-            }
-
+        var userprofileName=singleItemData.user.userprofile.name;
+        var userHandleName=singleItemData.user.username;
+        var videoTitle=singleItemData.title;
+        var profilePics = singleItemData.user.userprofile.profile_pic;
+        if(profilePics==''){
+           profilePics= '/media/user.svg';
         }
-    }
 
-    //=========Check Follow User ==============
-    var loginStatus=check_login_status();
-    if(loginStatus==true){
-        var countFollowStatus=userLikeAndUnlike.all_follow;
-        if(undefined !==countFollowStatus && countFollowStatus.length>0){
-            var currentUserTopic=singleItemData.user.userprofile.id;
-            var followList=userLikeAndUnlike.all_follow;
-            followList.forEach(function(followId){
-                if(currentUserTopic==followId){
-                    followStatus=jQuery('.followStatusChangePopup').hasClass('sx_5da455');
-                    if(followStatus==true){
-                        jQuery('.followStatusChangePopup').removeClass('sx_5da455');
-                        jQuery('.followStatusChangePopup').addClass('sx_5da456');
-                        jQuery('.btnTextChangePopup').text(followed_trans);
-                    }else{
-                        jQuery('.followStatusChangePopup').removeClass('sx_5da456');
-                        jQuery('.followStatusChangePopup').addClass('sx_5da455');
-                        jQuery('.btnTextChangePopup').text(follow_trans);
-                    }
+        var likeStatus="";
+
+        likeStatus="liked";
+        var likeStatusClass=jQuery("#UReactionLink").hasClass('liked');
+        if(likeStatusClass==true){
+            jQuery("#UReactionLink").removeClass('liked');
+            jQuery(".sp_ddXiTdIB8vm").addClass('sx_44a25c');
+            jQuery(".sp_ddXiTdIB8vm").removeClass('sx_44a25d');
+        }
+
+        var likedCheck=userLikeAndUnlike.topic_like;
+        if(undefined !==likedCheck && likedCheck.length>0){
+            var lStatus = likedCheck.includes(singleItemData.id);
+            if(lStatus==true){
+                likeStatus="liked";
+                var likeStatusClass=jQuery("#UReactionLink").hasClass('liked');
+                if(likeStatusClass==false){
+                    jQuery("#UReactionLink").addClass('liked');
+                    jQuery(".sp_ddXiTdIB8vm").removeClass('sx_44a25c');
+                    jQuery(".sp_ddXiTdIB8vm").addClass('sx_44a25d');
                 }
 
-            });
+            }
         }
-    }
-    //============== End=======================
 
+        //=========Check Follow User ==============
+        var loginStatus=check_login_status();
+        if(loginStatus==true){
+            var countFollowStatus=userLikeAndUnlike.all_follow;
+            if(undefined !==countFollowStatus && countFollowStatus.length>0){
+                var currentUserTopic=singleItemData.user.userprofile.id;
+                var followList=userLikeAndUnlike.all_follow;
+                followList.forEach(function(followId){
+                    if(currentUserTopic==followId){
+                        followStatus=jQuery('.followStatusChangePopup').hasClass('sx_5da455');
+                        if(followStatus==true){
+                            jQuery('.followStatusChangePopup').removeClass('sx_5da455');
+                            jQuery('.followStatusChangePopup').addClass('sx_5da456');
+                            jQuery('.btnTextChangePopup').text(followed_trans);
+                        }else{
+                            jQuery('.followStatusChangePopup').removeClass('sx_5da456');
+                            jQuery('.followStatusChangePopup').addClass('sx_5da455');
+                            jQuery('.btnTextChangePopup').text(follow_trans);
+                        }
+                    }
 
+                });
+            }
+        }
+        //============== End=======================
+        $("#topicID").val(singleItemData.id);
+        $("#currentPlayUserId").val(singleItemData.user.userprofile.id);
 
-   var profileURL='/'+userHandleName+'';
-    $("#profileImageUserId1").attr("src", profilePics);
-    $("#profileImageUserId").css("background-image", "url(" + profilePics + ")");
-    $(".shareandliketabprofileimage").attr("src", ""+profilePics+"");
-    $(".userProfileURL").attr("href", ""+profileURL+"");
-    $(".user-username").html(userprofileName);
+        $("#topicCreatorUsername").val(singleItemData.user.username);
 
-    $("#profileImageUserId").css("background-image", "url(" + profilePics + ")");
-    $(".shareandliketabprofileimage").attr("src", ""+profilePics+"");
-    $(".userProfileURL").attr("href", ""+profileURL+"");
-    $("._video_card_big_user_info_nickname").html(userprofileName);
-    $("._video_card_big_user_info_handle").html(userHandleName);
-    $("._video_card_big_meta_info_title_video").html(videoTitle);
+        var profileURL='/'+userHandleName+'/';
+        $("#profileImageUserId1").attr("src", profilePics);
+        $("#profileImageUserId").css("background-image", "url(" + profilePics + ")");
+        $(".shareandliketabprofileimage").attr("src", ""+profilePics+"");
+        $(".userProfileURL").attr("href", ""+profileURL+"");
+        $(".user-username").html(userprofileName);
 
-    loaderBoloShow();
-    listCommentsById(singleItemData);
-  
-    var sideBarCommentDetails="";
-    var origin   = window.location.origin;
-    param1=singleItemData.slug;
-    param2=singleItemData.id;
-    history.pushState(null, null, '?video='+param1+'/'+param2);
-    followLikeList();
+        $("#profileImageUserId").css("background-image", "url(" + profilePics + ")");
+        $(".shareandliketabprofileimage").attr("src", ""+profilePics+"");
+        $(".userProfileURL").attr("href", ""+profileURL+"");
+        $("._video_card_big_user_info_nickname").html(userprofileName);
+        $("._video_card_big_user_info_handle").html(userHandleName);
+        $("._video_card_big_meta_info_title_video").html(videoTitle);
 
-}
+        loaderBoloShow();
+        listCommentsById(singleItemData);
 
+        var sideBarCommentDetails="";
+        var origin   = window.location.origin;
+        param1=singleItemData.slug;
+        param2=singleItemData.id;
+        history.pushState(null, null, '?video='+param1+'/'+param2);
+        followLikeList();
+ }
 
     function delegetPlayStatus() {
         var video = document.getElementById('player');
@@ -784,10 +829,16 @@ function muteAndUnmutePlayer1(){
     }
 }
 
-
-
  function muteAndUnmutePlayer(){
-
+  // jwplayer().setMute();
+  // var muteStatus=jwplayer('player').getMute();
+  // if(muteStatus==true){
+  //   var newSrc='/media/sound_mute.svg';
+  //   $('#mutedImageId').attr('src', newSrc);
+  // }else{
+  //   var newSrc='/media/mute_icon.svg';
+  //   $('#mutedImageId').attr('src', newSrc);
+  // }
     if($("video").prop('muted')){
 
       $("video").prop('muted', false);
@@ -798,7 +849,7 @@ function muteAndUnmutePlayer1(){
         var newSrc='/media/sound_mute.svg';
         $('#mutedImageId').attr('src', newSrc);
     }
-
+  
 
 }
 
@@ -833,6 +884,7 @@ function listCommentsById(singleTopicData){
         }
 
         var countLikeStatus=userLikeAndUnlike.comment_like;
+
         if(undefined !==countLikeStatus && countLikeStatus.length>0){
             var likedCheck=userLikeAndUnlike.comment_like;
             var lStatus = likedCheck.includes(itemVideo.id);
@@ -842,9 +894,7 @@ function listCommentsById(singleTopicData){
         }
 
 
-
-
-        listCommentItems +='<div class="_video_card_big_comment_item_"><span class="_avatar_ _avatar_small" style="background-image: url('+profileImage+'); margin-right: 8px;"></span><div class="_video_card_big_comment_item_content"><div class="_video_card_big_comment_item_name"><a href="/'+itemVideo.user.username+'/">'+itemVideo.user.username+'</a><span class="_video_card_big_comment_item_label"> · author</span></div><div class="_video_card_big_comment_item_message">'+itemVideo.comment+'</div><div class="_video_card_big_comment_item_"><div class="_video_card_big_comment_item_content"><div class="_video_card_big_comment_item_name"><a href="/"></a><span class="_video_card_big_comment_item_label"> · author</span></div><div class="_video_card_big_comment_item_message"></div></div></div><div class="_video_card_big_comment_item_time"><span class="_6qw6" data-testid="UFI2ReactionLink/comment"><div class="_8c74 likeStatusInfo '+likeStatus+' changeLikeColor-'+itemVideo.id+' "><a aria-pressed="false" class=" _6a-y _6qw5 _77yo" data-testid="UFI2ReactionLink" onclick="likeAndUnlikeComment('+itemVideo.topic+','+itemVideo.id+');" href="javascript:void(0);" role="button" tabindex="-1">Like<span class="likedStatus-'+itemVideo.id+' hide">d</span></a> </div></span> - '+itemVideo.date+'</div></div></div>';
+        listCommentItems +='<div class="_video_card_big_comment_item_"><span class="_avatar_ _avatar_small" style="background-image: url('+profileImage+'); margin-right: 8px;"></span><div class="_video_card_big_comment_item_content"><div class="_video_card_big_comment_item_name"><a href="/'+itemVideo.user.username+'/">'+itemVideo.user.username+'</a><span class="_video_card_big_comment_item_label"> · author</span></div><div class="_video_card_big_comment_item_message">'+itemVideo.comment+'</div><div class="_video_card_big_comment_item_"><div class="_video_card_big_comment_item_content"><div class="_video_card_big_comment_item_name"><a href="/"></a><span class="_video_card_big_comment_item_label"> · author</span></div><div class="_video_card_big_comment_item_message"></div></div></div><div class="_video_card_big_comment_item_time"><span class="_6qw6" data-testid="UFI2ReactionLink/comment"><div class="_8c74 likeStatusInfo '+likeStatus+' changeLikeColor-'+itemVideo.id+' "><a aria-pressed="false" class=" _6a-y _6qw5 _77yo" data-testid="UFI2ReactionLink" onclick="likeAndUnlikeComment('+itemVideo.id+');" href="javascript:void(0);" role="button" tabindex="-1">Like<span class="likedStatus-'+itemVideo.id+' hide">d</span></a> </div></span> - '+itemVideo.date+'</div></div></div>';
 
       
         });
@@ -852,23 +902,17 @@ function listCommentsById(singleTopicData){
         var loadMoreComment='<span class="loadMoreComment"><a onclick="loadMoreComments(\''+data.next+'\');" class="" href="javascript:void(0);">Load More Comments...</a></span';
         $(".loadMoreComments").html(loadMoreComment);
         loaderBoloHide();
+
     });
 
-//============== End ================
 }
 
 function loadMoreComments(nextPageURl){
-    loaderBoloShowDynamic('_scroll_load_more_loading_comment');
-    if(nextPageURl=='null'){
-        var loadMoreComment='<span class="loadMoreComment">No more comment</span';
-        $(".loadMoreComments").html(loadMoreComment);
-        loaderBoloHideDynamic('_scroll_load_more_loading_comment');
-        return false;
-    }
+
     var listCommentItems="";
     //================Comments List =================
     var uri=nextPageURl;
-    var res = uri;
+    var res = encodeURI(uri);
     $.get(res, function (data, textStatus, jqXHR) {
         var videoCommentList=data.results;
 
@@ -882,7 +926,7 @@ function loadMoreComments(nextPageURl){
             profileImage=userProfile.profile_pic;
         }
 
-        listCommentItems +='<div class="_video_card_big_comment_item_"><span class="_avatar_ _avatar_small" style="background-image: url('+profileImage+'); margin-right: 8px;"></span><div class="_video_card_big_comment_item_content"><div class="_video_card_big_comment_item_name"><a href="/'+itemVideo.user.username+'/">'+itemVideo.user.username+'</a><span class="_video_card_big_comment_item_label"> · author</span></div><div class="_video_card_big_comment_item_message">'+itemVideo.comment+'</div><div class="_video_card_big_comment_item_"><div class="_video_card_big_comment_item_content"><div class="_video_card_big_comment_item_name"><a href="/"></a><span class="_video_card_big_comment_item_label"> · author</span></div><div class="_video_card_big_comment_item_message"></div></div></div><div class="_video_card_big_comment_item_time"><span class="_6qw6" data-testid="UFI2ReactionLink/comment"><div class="_8c74 changeLikeColor-'+itemVideo.id+' "><a aria-pressed="false" class=" _6a-y _6qw5 _77yo" data-testid="UFI2ReactionLink" onclick="likeAndUnlikeComment('+itemVideo.topic+','+itemVideo.id+');" href="javascript:void(0);" role="button" tabindex="-1">Like<span class="likedStatus-'+itemVideo.id+' hide">d</span></a> </div></span> - '+itemVideo.date+'</div></div></div>';
+        listCommentItems +='<div class="_video_card_big_comment_item_"><span class="_avatar_ _avatar_small" style="background-image: url('+profileImage+'); margin-right: 8px;"></span><div class="_video_card_big_comment_item_content"><div class="_video_card_big_comment_item_name"><a href="/'+itemVideo.user.username+'/">'+itemVideo.user.username+'</a><span class="_video_card_big_comment_item_label"> · author</span></div><div class="_video_card_big_comment_item_message">'+itemVideo.comment+'</div><div class="_video_card_big_comment_item_"><div class="_video_card_big_comment_item_content"><div class="_video_card_big_comment_item_name"><a href="/"></a><span class="_video_card_big_comment_item_label"> · author</span></div><div class="_video_card_big_comment_item_message"></div></div></div><div class="_video_card_big_comment_item_time"><span class="_6qw6" data-testid="UFI2ReactionLink/comment"><div class="_8c74 changeLikeColor-'+itemVideo.id+' "><a aria-pressed="false" class=" _6a-y _6qw5 _77yo" data-testid="UFI2ReactionLink" onclick="likeAndUnlikeComment('+itemVideo.id+');" href="javascript:void(0);" role="button" tabindex="-1">Like<span class="likedStatus-'+itemVideo.id+' hide">d</span></a> </div></span> - '+itemVideo.date+'</div></div></div>';
 
       
         });
@@ -890,103 +934,41 @@ function loadMoreComments(nextPageURl){
         var loadMoreComment='<span class="loadMoreComment"><a class="" onclick="loadMoreComments(\''+data.next+'\');" href="javascript:void(0);">Load More Comments...</a></span';
         $(".loadMoreComments").html(loadMoreComment);
         loaderBoloHide();
-        loaderBoloHideDynamic('_scroll_load_more_loading_comment');
-
     });
 }
-
-
-    function followLikeList(){
-        var checkstatus=check_login_status();
-        if(checkstatus==false){
-            return false;
-        }
-
-        var ge_local_data="";
-            ge_local_data = JSON.parse(localStorage.getItem("access_data"));
-        var accessToken=ge_local_data.access_token;
-        var listCommentItems="";
-
-        //================Comments List =================
-        var uri='/api/v1/follow_like_list/';
-        var res = encodeURI(uri);
-        jQuery.ajax({
-            url:res,
-            type:"POST",
-            headers: {
-              'Authorization':'Bearer '+accessToken,
-            },
-            success: function(response,textStatus, xhr){
-                userLikeAndUnlike=response;
-                var countFollowStatus=userLikeAndUnlike.all_follow;
-                if(undefined !==countFollowStatus && countFollowStatus.length>0){
-                    var followList=userLikeAndUnlike.all_follow;
-                    followList.forEach(function(followId){
-                        followStatus=jQuery('.followCheck').hasClass('followStatusChange-'+followId);
-                        if(followStatus==true){
-                            jQuery('.followStatusChange-'+followId).removeClass('sx_5da455');
-                            jQuery('.followStatusChange-'+followId).addClass('sx_5da456');
-                            jQuery('.btnTextChange-'+followId).text(followed_trans);
-                        }
-
-                    });
-                }
-            }
-      
-        });
-
+function followLikeList(){
+    var checkstatus=check_login_status();
+    if(checkstatus==false){
+        return false;
     }
 
-    function userFollowLikeList(){
-        var checkstatus=check_login_status();
-        if(checkstatus==false){
-            return false;
+    var ge_local_data="";
+        ge_local_data = JSON.parse(localStorage.getItem("access_data"));
+    var accessToken=ge_local_data.access_token;
+    var listCommentItems="";
+
+    //================Comments List =================
+    var uri='/api/v1/follow_like_list/';
+    var res = encodeURI(uri);
+    jQuery.ajax({
+        url:res,
+        type:"POST",
+        headers: {
+          'Authorization':'Bearer '+accessToken,
+        },
+        success: function(response,textStatus, xhr){
+            userLikeAndUnlike=response;
+        //var videoCommentList=data.results;
+
         }
-        var ge_local_data="";
-            ge_local_data = JSON.parse(localStorage.getItem("access_data"));
-        var accessToken=ge_local_data.access_token;
-        var listCommentItems="";
+  
+    });
 
-        //================Comments List =================
-        var uri='/api/v1/get_user_follow_and_like_list/';
-        var res = encodeURI(uri);
-        jQuery.ajax({
-            url:res,
-            type:"POST",
-            headers: {
-              'Authorization':'Bearer '+accessToken,
-            },
-            success: function(response,textStatus, xhr){
-                userLikeAndUnlike=response;
-                if(response.all_follow){
-                    var listFollows=response.all_follow;
-                    var currentUserId=$("#currentUserId").val();
-                    currentUserId=parseInt(currentUserId, 10);
-                    var statusFollow=jQuery.inArray( currentUserId, listFollows )
-                    if(statusFollow>=0){
-                        // $('.followUserStatusChange-'+currentUserId).html(followed_trans);
-                        $('.followUserStatusChange-'+currentUserId).removeClass('sx_5da455');
-                        var checkstatusBu=$('.followUserStatusChange-'+currentUserId).hasClass('sx_5da456');
-                        if(checkstatusBu){
-                            $('.followUserStatusChange-'+currentUserId).removeClass('sx_5da456');
-                            $('.followUserStatusChange-'+currentUserId).addClass('sx_5da455');
-                            jQuery('.btnTextChangeUser-'+currentUserId).text(follow_trans); 
-                        }else{
-                            $('.followUserStatusChange-'+currentUserId).addClass('sx_5da456');
-                            jQuery('.btnTextChangeUser-'+currentUserId).text(followed_trans);
-                        }
-                    }
-
-                }
-
-            }
-      
-        });
-
-    }
-
+}
 
 jQuery(document).ready(function(){
     followLikeList();
-    userFollowLikeList();
 });
+
+
+

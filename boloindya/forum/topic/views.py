@@ -399,7 +399,7 @@ def video_discover(request):
     languageCode =request.LANGUAGE_CODE
     language_id=languages_with_id[languageCode]
     try:
-        categories = Category.objects.filter(parent__isnull=False)[:10]
+        categories = Category.objects.filter(parent__isnull=False)[:20]
     except Exception as e1:
         categories = []
 
@@ -430,7 +430,8 @@ def video_discover(request):
     if(video_slug != None):
         return redirect('/video/'+video_slug)
     else:
-        return render(request, 'spirit/topic/video_discover.html', context)
+        return render(request, 'spirit/topic/video_discover_hashtag.html', context)
+        #return render(request, 'spirit/topic/video_discover.html', context)
 
 
 def video_details(request,username='',id=''):
@@ -852,9 +853,11 @@ def get_feed_list_by_category(request,category_slug):
         if(video_slug != None):
             return redirect('/video/'+video_slug)
         else:
-            return render(request, 'spirit/topic/feed_list_by_categories.html', context)
+            #return render(request, 'spirit/topic/feed_list_by_categories.html', context)
+            return render(request, 'spirit/topic/video_discover_by_category.html', context)
     except:
-        return render(request, 'spirit/topic/feed_list_by_categories.html', context)
+        return render(request, 'spirit/topic/video_discover_by_category.html', context)
+        #return render(request, 'spirit/topic/feed_list_by_categories.html', context)
 
 def get_topic_list_by_hashtag(request,hashtag):
     language_id=1

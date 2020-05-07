@@ -295,8 +295,8 @@ function copyShareLinkMobileLink() {debugger;
         }
       }
     
-
-    function sendOTP(){
+//,csrfmiddlewaretoken:getCookie('csrftoken')
+    function sendOTP(){debugger;
       $("#lastFourdigit").html("");
       validateNo();
       var mobileNumber = document.getElementById('phoneNo').value;
@@ -307,7 +307,7 @@ function copyShareLinkMobileLink() {debugger;
       var otpDetailsList=[];
       otpDetailsList.push({name: 'mobile_no', value: mobileNumber});
       console.log(otpDetailsList);
-
+      //headers: {"X-CSRFToken": getCookie('csrftoken')},
       jQuery.ajax({
         url:"/api/v1/otp/send/",
         type:"POST",
@@ -345,6 +345,7 @@ function copyShareLinkMobileLink() {debugger;
       console.log(data);
       var userOtp = document.getElementById('userOtp');
       console.log(data);
+      //headers: {"X-CSRFToken": getCookie('csrftoken')},
       var otpConcat="";
       for(var otpCount=1;otpCount<7;otpCount++){
        var otpData= jQuery('input[name="digit-'+otpCount+'"]').val();
@@ -358,8 +359,9 @@ function copyShareLinkMobileLink() {debugger;
       userOTP=otpConcat;      
       jQuery.ajax({
         url:"/api/v1/otp/verify/",
+        
         type:"POST",
-        data:{'mobile_no':mobileNumber,'otp':userOTP,'is_reset_password':false,'is_for_change_phone':false},
+        data:{'mobile_no':mobileNumber,'otp':userOTP,'is_reset_password':false,'is_for_change_phone':false,csrfmiddlewaretoken:getCookie('csrftoken')},
         success: function(response,textStatus, xhr){
 
           access_data = response;
