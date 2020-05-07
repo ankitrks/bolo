@@ -235,11 +235,12 @@ function loaderBoloHide(){
  //=================End=======================
 
 
-function copyShareLink() {
+function copyShareLink() {debugger;
   var copyText = document.getElementById("shareInputbox");
   copyText.select();
   copyText.setSelectionRange(0, 99999)
   document.execCommand("copy");
+  jQuery('.linkCopies1').append('<span style="color:green">Link Copied...</span>').fadeOut(2000);
 
 }
 

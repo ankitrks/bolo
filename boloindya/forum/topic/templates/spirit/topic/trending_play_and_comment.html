@@ -1627,6 +1627,10 @@ h1.video-meta-title.jsx-1305565323 {
 .mute-icon.muted.jsx-2126139261 {
     background-image: url('/media/volum_mute.svg');
 }
+.dspHide{
+    color: #fff;
+    border: 1px solid #fff;
+}
 </style>
 
 {% trans "download" as Download %}
@@ -1724,7 +1728,9 @@ h1.video-meta-title.jsx-1305565323 {
 
 
                         <a href="#" onclick="copyShareLink();" class="jsx-885361899 jsx-3852217983 jsx-2933355696"><span><img src="/media/copy_url_link.svg" class="jsx-885361899 jsx-3852217983 jsx-2933355696"></span></a>
+
                     </div>
+                    <span class="linkCopies1"></span>
                 </div>
             </div>
             <div class="jsx-1870413825 comment-container">
@@ -1796,6 +1802,7 @@ h1.video-meta-title.jsx-1305565323 {
                     <button type="button" class="jsx-1138200114 button">Log in</button>
 
                 </div> -->
+
             </div>
         </div>
     </div>
@@ -1859,6 +1866,7 @@ h1.video-meta-title.jsx-1305565323 {
         </div>
     </div>
 </div>
+<input readonly=""  class="jsx-1861775669 jsx-537314381 dspHide" id="shareInputbox" value="">
 <a href="/login/?next={{ request.get_full_path }}" id="gotoLoginPage" ></a> 
 <script src='https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js' type='text/javascript'></script>
 <script src='/media/js/jquery.events.input.js' type='text/javascript'></script>
