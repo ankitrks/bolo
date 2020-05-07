@@ -158,12 +158,12 @@ class TopicSerializer(ModelSerializer):
     class Meta:
         model = Topic
         #fields = '__all__'
-        exclude = ('transcode_dump','transcode_status_dump' )
+        exclude = ('boosted_till','boosted_start_time','boosted_end_time','is_logo_checked','time_deleted','plag_text','vb_playtime','is_moderated','is_monetized','is_vb','is_popular','is_pubsub_popular_push','is_media','created_at','last_modified','m2mcategory','is_globally_pinned','is_closed','is_pinned','last_commented','reindex_at','is_transcoded','is_transcoded_error','vb_playtime','transcode_dump','transcode_status_dump' )
         # TODO:: refactor after deciding about globally pinned.
         read_only_fields = ('is_pinned',)
 
     def get_user(self,instance):
-        return UserSerializer(instance.user).data
+        return ShortUserSerializer(instance.user).data
 
     def get_date(self,instance):
         return shortnaturaltime(instance.date)
@@ -218,7 +218,7 @@ class TopicSerializerwithComment(ModelSerializer):
     text_comments = SerializerMethodField()
     date = SerializerMethodField()
     video_cdn = SerializerMethodField()
-    m2mcategory = SerializerMethodField()
+    # m2mcategory = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
 
     def __init__(self, *args, **kwargs):
@@ -234,9 +234,8 @@ class TopicSerializerwithComment(ModelSerializer):
     class Meta:
         model = Topic
         # fields = '__all__'
-        exclude = ('transcode_dump', 'transcode_status_dump')
+        exclude = ('transcode_dump', 'transcode_status_dump','boosted_till','boosted_start_time','boosted_end_time','is_logo_checked','time_deleted','plag_text','vb_playtime','is_moderated','is_monetized','is_vb','is_popular','is_pubsub_popular_push','is_media','created_at','last_modified','m2mcategory','is_globally_pinned','is_closed','is_pinned','last_commented','reindex_at','is_transcoded','is_transcoded_error','vb_playtime')
         # TODO:: refactor after deciding about globally pinned.
-        read_only_fields = ('is_pinned',)
 
     def get_video_comments(self,instance):
         return []
@@ -257,7 +256,7 @@ class TopicSerializerwithComment(ModelSerializer):
         # else:
         # return CommentSerializer(instance.topic_comment.filter(is_media = False, is_removed = False) ,many=True).data
     def get_user(self,instance):
-        return UserSerializer(instance.user).data
+        return ShortUserSerializer(instance.user).data
 
     def get_date(self,instance):
         return shortnaturaltime(instance.date)
@@ -268,8 +267,8 @@ class TopicSerializerwithComment(ModelSerializer):
     def get_comment_count(self,instance):
         return shorcountertopic(instance.comment_count)
 
-    def get_m2mcategory(self,instance):
-        return CategoryLiteSerializer(instance.m2mcategory.all(),many=True).data
+    # def get_m2mcategory(self,instance):
+    #     return CategoryLiteSerializer(instance.m2mcategory.all(),many=True).data
 
     def get_video_cdn(self,instance):
         if instance.question_video:
@@ -291,7 +290,7 @@ class SingleTopicSerializerwithComment(ModelSerializer):
     audio_comments = SerializerMethodField()
     text_comments = SerializerMethodField()
     date = SerializerMethodField()
-    m2mcategory = SerializerMethodField()
+    # m2mcategory = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
 
     def __init__(self, *args, **kwargs):
@@ -307,7 +306,7 @@ class SingleTopicSerializerwithComment(ModelSerializer):
     class Meta:
         model = Topic
         # fields = '__all__'
-        exclude = ('transcode_dump', 'transcode_status_dump' )
+        exclude = ('transcode_dump', 'transcode_status_dump','boosted_till','boosted_start_time','boosted_end_time','is_logo_checked','time_deleted','plag_text','vb_playtime','is_moderated','is_monetized','is_vb','is_popular','is_pubsub_popular_push','is_media','created_at','last_modified','m2mcategory','is_globally_pinned','is_closed','is_pinned','last_commented','reindex_at','is_transcoded','is_transcoded_error','vb_playtime' )
         # TODO:: refactor after deciding about globally pinned.
         read_only_fields = ('is_pinned',)
 
@@ -318,7 +317,7 @@ class SingleTopicSerializerwithComment(ModelSerializer):
     def get_text_comments(self,instance):
         return CommentSerializer(instance.topic_comment.filter(is_media = False, is_removed = False) ,many=True).data
     def get_user(self,instance):
-        return UserSerializer(instance.user).data
+        return ShortUserSerializer(instance.user).data
 
     def get_date(self,instance):
         return shortnaturaltime(instance.date)
@@ -326,8 +325,8 @@ class SingleTopicSerializerwithComment(ModelSerializer):
     def get_view_count(self,instance):
         return shorcountertopic(instance.view_count)
         
-    def get_m2mcategory(self,instance):
-        return CategoryLiteSerializer(instance.m2mcategory.all(),many=True).data
+    # def get_m2mcategory(self,instance):
+    #     return CategoryLiteSerializer(instance.m2mcategory.all(),many=True).data
 
     def get_comment_count(self,instance):
         return shorcountertopic(instance.comment_count)
@@ -358,7 +357,7 @@ class UserAnswerSerializerwithComment(ModelSerializer):
     class Meta:
         model = Topic
         # fields = '__all__'
-        exclude = ('transcode_dump', 'transcode_status_dump' )
+        exclude = ('transcode_dump', 'transcode_status_dump','boosted_till','boosted_start_time','boosted_end_time','is_logo_checked','time_deleted','plag_text','vb_playtime','is_moderated','is_monetized','is_vb','is_popular','is_pubsub_popular_push','is_media','created_at','last_modified','m2mcategory','is_globally_pinned','is_closed','is_pinned','last_commented','reindex_at','is_transcoded','is_transcoded_error','vb_playtime' )
         # TODO:: refactor after deciding about globally pinned.
         read_only_fields = ('is_pinned',)
 
@@ -369,7 +368,7 @@ class UserAnswerSerializerwithComment(ModelSerializer):
     def get_text_comments(self,instance):
         return CommentSerializer(instance.topic_comment.filter(is_media = False, is_removed = False,user_id = self.context['user_id']) ,many=True).data
     def get_user(self,instance):
-        return UserSerializer(instance.user).data
+        return ShortUserSerializer(instance.user).data
 
     def get_date(self,instance):
         return shortnaturaltime(instance.date)
@@ -409,6 +408,45 @@ class UserProfileSerializer(ModelSerializer):
 
     def get_own_vb_view_count(self,instance):
         return shorcountertopic(instance.own_vb_view_count)
+
+class ShortUserProfileSerializer(ModelSerializer):
+    follow_count= SerializerMethodField()
+    follower_count= SerializerMethodField()
+    bolo_score= SerializerMethodField()
+    slug = SerializerMethodField()
+    view_count = SerializerMethodField()
+    # own_vb_view_count = SerializerMethodField()
+    class Meta:
+        model = UserProfile
+        # fields = '__all__' 
+        exclude = ('social_identifier','question_count','linkedin_url','instagarm_id','twitter_id','own_vb_view_count','topic_count','comment_count','refrence','mobile_no','encashable_bolo_score','total_time_spent','total_vb_playtime','is_dark_mode_enabled','paytm_number','state_name','city_name','extra_data', 'location', 'last_seen', 'last_ip', 'timezone', 'is_administrator', 'is_moderator', 'is_verified', 'last_post_on', 'last_post_hash', 'is_geo_location', 'lat', 'lang', 'click_id', 'click_id_response','gender','about','language','answer_count','share_count','like_count','vb_count','is_test_user','user')
+
+    def get_follow_count(self,instance):
+        return shortcounterprofile(instance.follow_count)
+
+    def get_follower_count(self,instance):
+        return shortcounterprofile(instance.follower_count)
+
+    def get_bolo_score(self,instance):
+        return shortcounterprofile(instance.bolo_score)
+
+    def get_slug(self,instance):
+        return instance.user.username
+
+    def get_view_count(self,instance):
+        return shorcountertopic(instance.view_count)
+
+    # def get_own_vb_view_count(self,instance):
+    #     return shorcountertopic(instance.own_vb_view_count)
+
+class ShortUserSerializer(ModelSerializer):
+    userprofile = SerializerMethodField()
+    class Meta:
+        model = User
+        #fields = '__all__'
+        exclude = ('first_name','last_name','email','password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login')
+    def get_userprofile(self,instance):
+        return ShortUserProfileSerializer(UserProfile.objects.get(user=instance)).data
 
 class UserSerializer(ModelSerializer):
     userprofile = SerializerMethodField()
@@ -618,7 +656,7 @@ class CategoryVideoByteSerializer(ModelSerializer):
         read_only_fields = ('is_pinned',)
 
     def get_user(self,instance):
-        return UserSerializer(instance.user).data
+        return ShortUserSerializer(instance.user).data
 
     def get_date(self,instance):
         return shortnaturaltime(instance.date)

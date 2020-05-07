@@ -56,7 +56,7 @@ from forum.topic.models import Topic,TopicHistory, ShareTopic, Like, SocialShare
 from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
 from .serializers import *
-from tasks import vb_create_task,user_ip_to_state_task,sync_contacts_with_user
+from tasks import vb_create_task,user_ip_to_state_task,sync_contacts_with_user,cache_follow_post,cache_popular_post
 from haystack.query import SearchQuerySet, SQ
 from django.core.exceptions import MultipleObjectsReturned
 from forum.topic.utils import get_redis_category_paginated_data,get_redis_hashtag_paginated_data,get_redis_language_paginated_data,get_redis_follow_paginated_data, get_popular_paginated_data
@@ -2316,7 +2316,7 @@ def verify_otp(request):
         request.POST.get('is_for_change_phone')
     """
     mobile_no = validate_indian_number(request.POST.get('mobile_no', None)).strip()
-    language = request.POST.get('language',None)
+    language = request.POST.get('language','1')
     otp = request.POST.get('otp', None)
     is_geo_location = request.POST.get('is_geo_location',None)
     lat = request.POST.get('lat',None)
@@ -2392,6 +2392,8 @@ def verify_otp(request):
                 otp_obj.update(for_user = user)
                 # otp_obj.for_user = user
                 # otp_obj.save()
+                cache_follow_post.delay(user.id)
+                cache_popular_post.delay(user.id,language)
                 return JsonResponse({'message': message, 'username' : mobile_no, \
                         'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
             otp_obj.save()
@@ -2434,6 +2436,12 @@ class GetProfile(generics.ListAPIView):
         return [user]
 
 @api_view(['POST'])
+def cache_user_data(request):
+    cache_follow_post.delay(request.user.id)
+    cache_popular_post.delay(request.user.id,request.user.st.language)
+    return JsonResponse({'message': 'Data Cached'}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
 def fb_profile_settings(request):
     """
     post:
@@ -2458,7 +2466,7 @@ def fb_profile_settings(request):
     refrence        = request.POST.get('refrence',None)
     extra_data      = request.POST.get('extra_data',None)
     activity        = request.POST.get('activity',None)
-    language        = request.POST.get('language',None)
+    language        = request.POST.get('language','1')
     is_geo_location = request.POST.get('is_geo_location',None)
     likedin_url = request.POST.get('likedin_url',None)
     instagarm_id = request.POST.get('instagarm_id',None)
@@ -2498,7 +2506,8 @@ def fb_profile_settings(request):
 
             if not userprofile.user.is_active:
                 return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
-
+            cache_follow_post.delay(user.id)
+            cache_popular_post.delay(user.id,language)
             if is_created:
                 add_bolo_score(user.id, 'initial_signup', userprofile)
                 user.first_name = extra_data['first_name']
@@ -2567,7 +2576,8 @@ def fb_profile_settings(request):
                 is_created = True
             if not userprofile.user.is_active:
                 return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
-
+            cache_follow_post.delay(user.id)
+            cache_popular_post.delay(user.id,language)
             if is_created:
                 add_bolo_score(user.id, 'initial_signup', userprofile)
                 # user.first_name = extra_data['first_name']
@@ -2681,6 +2691,7 @@ def fb_profile_settings(request):
                 if language:
                     default_follow = deafult_boloindya_follow(request.user,str(language))
                     userprofile.language = str(language)
+                    cache_popular_post.delay(request.user.id,language)
                     userprofile.save()
                 return JsonResponse({'message': 'Settings Chnaged'}, status=status.HTTP_200_OK)
             except Exception as e:
@@ -3177,6 +3188,8 @@ def follow_like_list(request):
         app_version = AppVersionSerializer(app_version).data
         notification_count = Notification.objects.filter(for_user= request.user,status=0).count()
         block_hashes = TongueTwister.objects.filter(is_blocked=True).values_list('hash_tag', flat=True)
+        cache_follow_post.delay(request.user.id)
+        cache_popular_post.delay(request.user.id,request.user.st.language)
         return JsonResponse({'comment_like':list(comment_like),'topic_like':list(topic_like),'all_follow':list(all_follow),'all_follower':list(all_follower),\
             'all_category_follow':list(all_category_follow),'app_version':app_version,\
             'notification_count':notification_count, 'is_test_user':userprofile.is_test_user,'user':UserSerializer(request.user).data,\
