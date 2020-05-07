@@ -9,7 +9,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('forum_topic', '0095_auto_20200427_1406'),
+        ('forum_topic', '0096_hashtagviewcounter'),
     ]
 
     operations = [
