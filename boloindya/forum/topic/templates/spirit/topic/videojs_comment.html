@@ -1637,6 +1637,15 @@ h1.video-meta-title.jsx-1305565323 {
 {% trans "like" as like %}
 {% trans "video" as video %}
 
+
+</head>
+
+<body>
+
+
+  <script src="https://vjs.zencdn.net/7.7.6/video.js"></script>
+
+
 <input type="hidden" name="totalLikeCount" id="totalLikeCount" value="">
 <input type="hidden" name="totalCommentCount" id="totalCommentCount" value="">
 
@@ -1661,7 +1670,9 @@ h1.video-meta-title.jsx-1305565323 {
             <img src="" class="jsx-2126139261">
         </div>
         <div class="jsx-2656360626 video-card-browse backgroundImg"  >
-            <video id="player" playsinline="" loop="" src="" preload="metadata" class="jsx-3382097194 horizontal video-player"></video>
+<!--             <video id="player" playsinline="" loop="" src="" preload="metadata" class="jsx-3382097194 horizontal video-player"></video> -->
+<video controls preload="auto" poster="" data-setup="{}" id="player" class="video-js vjs-default-skin jsx-3382097194 horizontal video-player"></video>
+
             <div class="jsx-3529817232  play-button theme videoPlayButton" style="background-size: 100px;"></div>
             <span class="jsx-2656360626 event-delegate-mask" onclick="delegetPlayStatus()" ></span>
         </div>
@@ -1728,7 +1739,6 @@ h1.video-meta-title.jsx-1305565323 {
 
 
                         <a href="#" onclick="copyShareLink();" class="jsx-885361899 jsx-3852217983 jsx-2933355696"><span><img src="/media/copy_url_link.svg" class="jsx-885361899 jsx-3852217983 jsx-2933355696"></span></a>
-                        
 
                     </div>
                     <span class="linkCopies1"></span>
