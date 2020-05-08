@@ -130,7 +130,7 @@ var video = document.getElementById('player');
       
   });
 
-// $("#jwBox").click(function(){debugger;
+// $("#jwBox").click(function(){
 
 //   console.log(video.paused);
 //   if(video.paused) {
@@ -159,14 +159,14 @@ var video = document.getElementById('player');
   
 //});
 
-// $('.videoPlayButton').click(function(){debugger;
+// $('.videoPlayButton').click(function(){
 //       var newSrc='/media/mute_icon.svg';
 //       $('#mutedImageId').attr('src', newSrc);
 //       $('.videoPlayButton').removeClass('_video_card_playbtn_wraaper');
 //       video.play();
 // });
 
-function social_share(shareType){debugger;
+function social_share(shareType){
      var loginStatus= check_login_status();
      if(loginStatus==false){
         document.getElementById('gotoLoginPage').click();
@@ -724,7 +724,7 @@ var countries=[];
                     'Authorization':'Bearer '+accessToken,
                   },
 
-                success: function (response) {debugger;
+                success: function (response) {
                     if(hashTagSearch==51){
                       var responseData = response.hash_data;
                       capitals = responseData.map(function(obj) { 
@@ -768,7 +768,7 @@ var countries=[];
 
     });
 
-function removeDataFromURL(){debugger;
+function removeDataFromURL(){
   //window.history.back();
   var uri = window.location.href.toString();
   if (uri.indexOf("?") > 0) {

@@ -361,7 +361,7 @@ function retryLiveStream(hls, url) {
 
     }
 
-    function nextVideoPlay(){debugger;
+    function nextVideoPlay(){
         loaderShow();
         var singleItemData=[];
 
@@ -511,7 +511,7 @@ function retryLiveStream(hls, url) {
     }
 
 
-    function openVideoInPopup(file,image,indexId){debugger;
+    function openVideoInPopup(file,image,indexId){
         loaderShow();
         var singleItemData=[];
         indexId=indexId-1;
