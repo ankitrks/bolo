@@ -4538,3 +4538,12 @@ def get_hash_discover_topics(request):
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+def get_m3u8_of_ids(request):
+    try:
+        ids = request.GET.get('ids',None)
+        topics=Topic.objects.filter(pk__in=ids.split(','))
+        return JsonResponse({'message': 'success', 'results':TopicsWithOnlyContent(topics, many=True).data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+
