@@ -30,6 +30,7 @@ from datetime import datetime
 from calendar import monthrange
 from jarvis.models import DashboardMetrics
 from drf_spirit.utils import language_options
+from django.db.models.functions import TruncDate
 
 
 from datetime import timedelta
@@ -94,48 +95,45 @@ def put_share_data():
 
 
 def put_installs_data():
+	end_time = 	datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+	start_time = end_time + timedelta(days=-1)
 
-	today = datetime.now()
-	start_date = today + timedelta(days = -2)
+	#Calculate number of installs which have empty or None android_id
+	empty_android_id_counts = ReferralCodeUsed.objects.filter(Q(created_at__gte=start_date, created_at__lte=end_date) & (Q(android_id='') | Q(android_id=None)))\
+		.annotate(date=TruncDate('created_at'))\
+		.values('date').order_by('date')\
+		.annotate(total=Count('id'))
 
-	user_install_dict = dict()
-	all_data = ReferralCodeUsed.objects.filter(by_user__isnull = True, created_at__gt = start_date)
-	for item in all_data:
-		curr_userid = str(item.android_id)
-		curr_month = item.created_at.month 
-		curr_year = item.created_at.year
-		curr_day = item.created_at.day 
-		curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day)
-		#print(curr_date, curr_userid)
+	#Calculate number of distinct non-empty android_id on a particular day
+	non_empty_counts = ReferralCodeUsed.objects.filter(created_at__gte=start_date, created_at__lte=end_date)\
+		.annotate(date=TruncDate('created_at'))\
+		.values('date')\
+		.order_by('date')\
+		.annotate(total=Count('android_id', distinct=True))
 
-		if((curr_date in user_install_dict)):
-			user_install_dict[curr_date].append(curr_userid)
-		else:
-			user_install_dict[curr_date] = []
-			user_install_dict[curr_date].append(curr_userid)		 
 	
+	dict_empty_id_count = {}
+	for each_day in empty_android_id_counts:
+		dict_empty_id_count[each_day.get('date')] = each_day.get('total')
+			
 
-	#print(user_install_dict, len(user_install_dict))
-	for key, val in user_install_dict.items():
-		datetime_key = parser.parse(key)
-		week_no = datetime_key.isocalendar()[1]
-		curr_year = datetime_key.year 
+	#Sum up the count for installs having empty and non-empty ids
+	total_install_count = {}
+	for each_day in non_empty_counts:
+		total_install_count[each_day.get('date')] = each_day.get('total')
+		empty_id_count = dict_empty_id_count.get(each_day.get('date'))
+		if empty_id_count:
+			total_install_count[each_day.get('date')] += empty_id_count
+
+	for current_day in total_install_count:
+		week_no = current_day.isocalendar()[1]
+		curr_year = current_day.year 
 		if(curr_year == 2020):
 			week_no+=52
 		if(curr_year == 2019 and week_no == 1):
 			week_no = 52
 
-		metrics = '5'
-		metrics_slab = '6'
-		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
-		if(created):
-			print(metrics, metrics_slab, key, week_no)
-			save_obj.count = len(val)
-			save_obj.save()
-		else:
-			print(metrics, metrics_slab, key, week_no)
-			save_obj.count = len(val)
-			save_obj.save()	
+		DashboardMetricsJarvis.objects.get_or_create(metrics = '5', metrics_slab = '6', date = current_day, week_no = week_no, count=total_install_count[current_day])
 	
 # this function is also not being used, please do not call it anywhere
 def put_video_views_data():
