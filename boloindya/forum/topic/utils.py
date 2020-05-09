@@ -93,6 +93,7 @@ def update_redis_category_paginated_data(language_id, category_id):
     page = 1
     final_data = {}
     exclude_ids = []
+    key = None
     topics_df = pd.DataFrame.from_records(Topic.objects.filter(is_removed = False, is_vb = True, m2mcategory__id = category_id, \
             language_id = language_id).order_by('-vb_score').values('id', 'user_id', 'vb_score'))
     if topics_df.empty:
@@ -133,9 +134,11 @@ def update_redis_category_paginated_data(language_id, category_id):
                 page = None
         key = 'cat:'+str(category_id)+':lang:'+str(language_id)
         set_redis(key,final_data)
-        return final_data
+    if key:
+        return get_redis(key)
+    return final_data
 
-## For vb_score sorted filter in single langugae ##
+## For vb_score sorted filter in single language ##
 
 def get_redis_language_paginated_data(language_id,page_no):
     if not page_no:
@@ -176,6 +179,7 @@ def update_redis_language_paginated_data(language_id):
     page = 1
     final_data = {}
     exclude_ids = []
+    key = None
     topics_df = pd.DataFrame.from_records(Topic.objects.filter(is_removed = False, is_vb = True, \
             language_id = language_id).order_by('-vb_score').values('id', 'user_id', 'vb_score'))
     if topics_df.empty:
@@ -216,7 +220,9 @@ def update_redis_language_paginated_data(language_id):
                 page = None
         key = 'lang:'+str(language_id)
         set_redis(key,final_data)
-        return final_data
+    if key:
+        return get_redis(key)
+    return final_data
 
 ## For vb_score sorted filter in single hashtag ##
 
@@ -260,6 +266,7 @@ def update_redis_hashtag_paginated_data(language_id,extra_filter):
     list_page = 0
     final_data = {}
     paginated_data = []
+    key = None
     from forum.topic.models import HashtagViewCounter
     hash_df = pd.DataFrame.from_records(HashtagViewCounter.objects.filter(language=language_id).filter(**extra_filter)\
             .order_by('-hashtag__is_popular', '-hashtag__popular_date', '-view_count').values('hashtag__id', 'video_count'))
@@ -326,6 +333,8 @@ def update_redis_hashtag_paginated_data(language_id,extra_filter):
                     # print final_data
                     key = 'hashtag:'+str(each_rec)+':lang:'+str(language_id)
                     set_redis(key,final_data)
+    if key:
+        return get_redis(key)
     return final_data
 
 def get_redis_follow_paginated_data(user_id,page_no):
@@ -350,7 +359,7 @@ def get_redis_follow_paginated_data(user_id,page_no):
             last_page_data = paginated_data[str(last_page_no)]
             all_follower = get_redis_following(user_id)
             category_follow = UserProfile.objects.get(user_id= user_id).sub_category.all().values_list('pk',flat=True)
-            topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory__id__in = category_follow),is_vb=True,is_removed=False).exclude(id__in = last_page_data['id_list']).filter(vb_score__lte = last_page_data['scores'][-1])
+            topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory__id__in = category_follow,language_id=UserProfile.objects.get(user_id= user_id).language),is_vb=True,is_removed=False).exclude(id__in = last_page_data['id_list']).filter(vb_score__lte = last_page_data['scores'][-1])
             new_page = page_no - last_page_no #(191-190)
             paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
             db_topics = list(paginator.page(new_page))
@@ -358,7 +367,7 @@ def get_redis_follow_paginated_data(user_id,page_no):
                 db_topics += list(paginator.page(new_page+1))
         topics = list(Topic.objects.filter(pk__in=topic_ids,is_removed=False))+db_topics
     else:
-        topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory__id__in = category_follow),is_vb=True,is_removed=False).order_by('-vb_score')
+        topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory__id__in = category_follow,language_id=UserProfile.objects.get(user_id= user_id).language),is_vb=True,is_removed=False).order_by('-vb_score')
     return topics
 
 def update_redis_follow_paginated_data(user_id):
@@ -370,9 +379,10 @@ def update_redis_follow_paginated_data(user_id):
     page = 1
     final_data = {}
     exclude_ids = []
+    key = None
     all_follower = get_redis_following(user_id)
     category_follow = UserProfile.objects.get(user_id= user_id).sub_category.all().values_list('pk',flat=True)
-    topics_df = pd.DataFrame.from_records(Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory__id__in = category_follow),is_removed = False, is_vb = True).order_by('-vb_score').values('id', 'user_id', 'vb_score'))
+    topics_df = pd.DataFrame.from_records(Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory__id__in = category_follow,language_id=UserProfile.objects.get(user_id= user_id).language),is_removed = False, is_vb = True).order_by('-vb_score').values('id', 'user_id', 'vb_score'))
     if topics_df.empty:
         final_data[page] = []
     else:
@@ -415,6 +425,8 @@ def update_redis_follow_paginated_data(user_id):
         # print final_data
         key = 'follow_post:'+str(user_id)
         set_redis(key,final_data)
+    if key:
+        return get_redis(key)
     return final_data
 
 def get_popular_paginated_data(user_id,language_id,page_no):
@@ -485,7 +497,7 @@ def update_popular_paginated_data(user_id,language_id):
     # print final_data
     set_redis(key,final_data)
     print "######## end", datetime.now()
-    return final_data
+    return get_redis(key)
 
 
 
