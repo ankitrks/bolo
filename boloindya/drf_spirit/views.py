@@ -52,7 +52,7 @@ from forum.comment.models import Comment,CommentHistory
 from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs,UserPay,VideoPlaytime,UserPhoneBook,Contact,ReferralCode
 from jarvis.models import FCMDevice,StateDistrictLanguage, BannerUser
 from forum.topic.models import Topic,TopicHistory, ShareTopic, Like, SocialShare, Notification, CricketMatch, Poll, Choice, Voting, \
-    Leaderboard, VBseen, TongueTwister
+    Leaderboard, VBseen, TongueTwister,HashtagViewCounter
 from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
 from .serializers import *
@@ -888,11 +888,12 @@ def GetChallengeDetails(request):
     user_id = request.POST.get('user_id', '')
     """ 
     challengehash = request.POST.get('ChallengeHash')
+    language_id = request.POST.get('language_id', '2')
     challengehash = '#' + challengehash
     try:
         hash_tag = TongueTwister.objects.get(hash_tag__iexact=request.POST.get('ChallengeHash'))
-        all_vb = Topic.objects.filter(hash_tags=hash_tag,is_removed=False,is_vb=True)
-        vb_count = all_vb.count()
+        hash_tag_counter,is_created = HashtagViewCounter.objects.get_or_create(hashtag=hash_tag,language=language_id)
+        vb_count = hash_tag_counter.video_count
         if hash_tag:
             tongue = hash_tag
             return JsonResponse({'message': 'success', 'hashtag':tongue.hash_tag,'vb_count':vb_count,\
@@ -903,13 +904,13 @@ def GetChallengeDetails(request):
                 'mt_descpription':tongue.mt_descpription,'picture':tongue.picture,\
                 'all_seen':shorcountertopic(tongue.total_views)},status=status.HTTP_200_OK)
         else:
-            return JsonResponse({'message': 'success', 'hashtag' : challengehash[1:],'vb_count':vb_count,\
+            return JsonResponse({'message': 'success', 'hashtag' : challengehash[1:],'vb_count':'0',\
                 'en_tongue_descp':'','hi_tongue_descp':'',\
                 'ta_tongue_descp':'','te_tongue_descp':'',\
                 'be_descpription':'','ka_descpription':'',\
                 'ma_descpription':'','gj_descpription':'',\
                 'mt_descpription':'','picture':'',\
-                'all_seen':shorcountertopic(tongue.total_views)},status=status.HTTP_200_OK)
+                'all_seen':'0'},status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Invalid','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
