@@ -892,7 +892,7 @@ def GetChallengeDetails(request):
     challengehash = '#' + challengehash
     try:
         hash_tag = TongueTwister.objects.get(hash_tag__iexact=request.POST.get('ChallengeHash'))
-        hash_tag_counter=TongueTwisterCounter.objects.get(tongue_twister=tongue_twister, language_id=language_id)
+        hash_tag_counter=TongueTwisterCounter.objects.get(tongue_twister = hash_tag, language_id = language_id)
         #all_vb = Topic.objects.filter(hash_tags=hash_tag,is_removed=False,is_vb=True)
         vb_count = hash_tag_counter.hash_counter
         if hash_tag:
