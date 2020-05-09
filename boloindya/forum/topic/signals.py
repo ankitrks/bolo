@@ -1,10 +1,10 @@
 from django.contrib.auth.models import User
-from forum.topic.models import Topic,Notification,Like
+from forum.topic.models import Topic,Notification,Like,TongueTwister
 from forum.comment.models import Comment
 from forum.user.models import Follower
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from tasks import create_topic_notification,create_comment_notification
+from tasks import create_topic_notification,create_comment_notification,create_hash_view_count
 from django.dispatch import Signal
 post_update = Signal()
 
@@ -20,6 +20,13 @@ def save_topic(sender, instance,created, **kwargs):
 def save_comment(sender, instance,created, **kwargs):
     try:
         create_comment_notification(created,instance.id)
+    except Exception as e:
+        pass
+
+@receiver(post_save, sender=TongueTwister)
+def save_comment(sender, instance,created, **kwargs):
+    try:
+        create_hash_view_count(created,instance.id)
     except Exception as e:
         pass
 
