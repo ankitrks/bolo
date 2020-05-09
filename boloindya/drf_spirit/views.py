@@ -4547,3 +4547,17 @@ def get_m3u8_of_ids(request):
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+def upload_video_to_s3_for_app(request):
+    media_file = request.FILES['media']
+    if media_file:
+        media_url = upload_media(media_file)
+        path = default_storage.save(media_file.name, ContentFile(media_file.read()))
+        with default_storage.open(media_file.name, 'wb+') as destination:
+            for chunk in media_file.chunks():
+                destination.write(chunk)
+        tmp_file = os.path.join(settings.MEDIA_ROOT, path)
+        os.remove(tmp_file)
+        return JsonResponse({'status': 'success','body':media_url}, status=status.HTTP_201_CREATED)
+    else:
+        return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
