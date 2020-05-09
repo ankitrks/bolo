@@ -235,7 +235,7 @@ function loaderBoloHide(){
  //=================End=======================
 
 
-function copyShareLink() {debugger;
+function copyShareLink() {
   var copyText = document.getElementById("shareInputbox");
   copyText.select();
   copyText.setSelectionRange(0, 99999)
@@ -262,7 +262,7 @@ function copyShareLinkMobile() {
 
 }
 
-function copyShareLinkMobileLink() {debugger;
+function copyShareLinkMobileLink() {
   //var copyText = $("#shareInputboxMobileSingle").val();
 
   chckHideClass =$("#shareInputboxMobileSingle").hasClass('hide');
@@ -297,7 +297,8 @@ function copyShareLinkMobileLink() {debugger;
       }
     
 //,csrfmiddlewaretoken:getCookie('csrftoken')
-    function sendOTP(){debugger;
+    function sendOTP(){
+      dispOTPPanel();
       $("#lastFourdigit").html("");
       validateNo();
       var mobileNumber = document.getElementById('phoneNo').value;
@@ -484,7 +485,7 @@ function follow_user(user_following_id){
 }
 
 
-function follow_user_from_user(user_following_id){debugger;
+function follow_user_from_user(user_following_id){
   var user_id = userLoginStatus;
   var followUrl='/api/v1/follow_user/';
   var user_following_id = user_following_id;

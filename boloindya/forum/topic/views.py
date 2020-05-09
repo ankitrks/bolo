@@ -58,6 +58,7 @@ from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from .emails import send_job_request_mail
 from drf_spirit.views import deafult_boloindya_follow
+from drf_spirit.views import deafult_boloindya_follow
 
 class AutoConnectSocialAccount(DefaultSocialAccountAdapter):
 
@@ -76,6 +77,9 @@ class AutoConnectSocialAccount(DefaultSocialAccountAdapter):
         emailId=user_email(u)
         try: 
             userDetails = User.objects.get(email=emailId)
+            userToken=get_tokens_for_user(userDetails)
+            print(userToken)
+
             userprofile = UserProfile.objects.get(user = userDetails)
             add_bolo_score(userDetails.id, 'initial_signup', userprofile)
             userprofile = UserProfile.objects.get(user = userDetails)
@@ -86,7 +90,10 @@ class AutoConnectSocialAccount(DefaultSocialAccountAdapter):
 
 class MyAccountAdapter(DefaultAccountAdapter):
     def get_login_redirect_url(self, request):
-        return redirect(request.next)
+        #path = "/accounts/{username}/"
+        
+        return path.format(request.next)
+        #return redirect(request.next)
 
 
 def get_current_language(request):
@@ -1241,6 +1248,9 @@ def latest_home(request):
 def login_user(request):
 
     nextURL = request.GET.get('next',None)
+    if nextURL == None:
+        nextURL= '/feed/'
+
     context = {
         'is_single_topic': "Yes",
         'next_page_url':nextURL
