@@ -928,3 +928,9 @@ class TongueTwisterCounterSerializer(ModelSerializer):
     def get_total_views(self,instance):
         return shorcountertopic(instance.total_views)
 
+class TopicsWithOnlyContent(ModelSerializer):
+
+    class Meta:
+        model = Topic
+        fields = ('m3u8_content', 'id', 'audio_m3u8_content', 'video_m3u8_content', 'question_video')
+
