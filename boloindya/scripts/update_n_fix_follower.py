@@ -42,6 +42,7 @@ def action_follow(test_user_id,any_user_id):
     if is_created:
         update_redis_follower(any_user_id,test_user_id,True)
         update_redis_following(test_user_id,any_user_id,True)
+        return True
 
 def get_topic(pk):
     return Topic.objects.get(pk=pk)
