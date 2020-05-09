@@ -32,16 +32,15 @@ def run():
                 status = action_follow(opt_action_user_id,each_real_user.user.id)
                 if status:
                     follower_counter-=1
+        if not follow_count == real_follow_count:
+            UserProfile.objects.get(pk=each_real_user.id).update(follow_count=real_follow_count)
 
 #follow
 def action_follow(test_user_id,any_user_id):
-    follow,is_created = Follower.objects.get_or_create(user_follower_id = test_user_id,user_following_id=any_user_id)
+    follow,is_created = Follower.objects.get_or_create(user_follower_id = any_user_id,user_following_id=test_user_id)
     if is_created:
-        update_redis_following(test_user_id,int(any_user_id),True)
-        update_redis_follower(int(any_user_id),test_user_id,True)
-        return True
-    else:
-        return False
+        update_redis_following(any_user_id,test_user_id,True)
+        update_redis_follower(test_user_id,any_user_id,True)
 
 def get_topic(pk):
     return Topic.objects.get(pk=pk)
