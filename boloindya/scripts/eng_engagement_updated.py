@@ -388,7 +388,7 @@ def action_seen(user_id,topic_id):
 
 #follow
 def action_follow(test_user_id,any_user_id):
-    follow,is_created = Follower.objects.get_or_create(user_follower_id = any_user_id,user_following_id=test_user_id)
+    follow,is_created = Follower.objects.get_or_create(user_follower_id = test_user_id,user_following_id=any_user_id)
     userprofile = get_userprofile(test_user_id)
     followed_user = get_userprofile(any_user_id)
     if is_created:
@@ -396,8 +396,8 @@ def action_follow(test_user_id,any_user_id):
         add_bolo_score(any_user_id, 'followed', followed_user[0])
         userprofile.update(follow_count = F('follow_count')+1)
         followed_user.update(follower_count = F('follower_count')+1)
-        update_redis_following(any_user_id,test_user_id,True)
-        update_redis_follower(test_user_id,any_user_id,True)
+        update_redis_following(test_user_id,any_user_id,True)
+        update_redis_follower(any_user_id,test_user_id,True)
 
 #share
 def action_share(user_id, topic_id):
