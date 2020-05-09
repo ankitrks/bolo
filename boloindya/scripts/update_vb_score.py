@@ -59,6 +59,6 @@ def run():
             print 'Runtime: Language ' + str(each_language[1]) + ' is ' + str(end - start)
             print "\n\n\n\n"
     print 'Runtime Language Total is ' + str(datetime.now() - start_total)
-    print 'total script run time',+ str(datetime.now() - now)
+    print 'total script run time :', str(datetime.now() - now)
 
 

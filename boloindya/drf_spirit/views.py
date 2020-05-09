@@ -749,9 +749,7 @@ def GetChallenge(request):
         previous_url = replace_query_param(request.build_absolute_uri(),'offset',int(request.GET.get('offset') or 0) - int(request.GET.get('limit') or settings.REST_FRAMEWORK['PAGE_SIZE']))
     else:
         previous_url =''
-    print datetime.now()
     my_data = TopicSerializerwithComment(topics,context={'is_expand':request.GET.get('is_expand',True)},many=True).data
-    print datetime.now()
 
     return JsonResponse({"results":my_data,"next":next_url,"previous":previous_url,"count":total_objects})
 
@@ -794,7 +792,12 @@ class GetPopularHashTag(generics.ListCreateAPIView):
         }
 
     def get_queryset(self):
-        hash_tags = TongueTwister.objects.all().order_by('-is_popular','-popular_date','-hash_counter')
+        hashtag_ids = self.request.GET.get('hashtag_ids',None)
+        try:
+            hashtag_ids = hashtag_ids.split(',')
+        except:
+            hashtag_ids = []
+        hash_tags = TongueTwister.objects.filter(pk__in=hashtag_ids).order_by('-is_popular','-popular_date','-hash_counter')
         return hash_tags
 
 class OldAlgoGetFollowPost(generics.ListCreateAPIView):
@@ -813,7 +816,6 @@ class OldAlgoGetFollowPost(generics.ListCreateAPIView):
     def get_queryset(self):
         all_follower = get_redis_following(self.request.user.id)
         category_follow = list(UserProfile.objects.get(user= self.request.user).sub_category.all())
-        print category_follow
         all_seen_vb = []
         if self.request.user.is_authenticated:
             all_seen_vb = get_redis_vb_seen(self.request.user.id)
@@ -1075,7 +1077,6 @@ class SolrSearchTop(BoloIndyaGenericAPIView):
             sqs = SearchQuerySet().models(UserProfile).raw_search(search_term)
             if not sqs:
                 suggested_word = SearchQuerySet().models(UserProfile).auto_query(search_term).spelling_suggestion()
-                print suggested_word
                 if suggested_word:
                     sqs = SearchQuerySet().models(UserProfile).raw_search(suggested_word)
             if not sqs:
@@ -1088,7 +1089,6 @@ class SolrSearchTop(BoloIndyaGenericAPIView):
             sqs = SearchQuerySet().models(TongueTwister).raw_search('hash_tag:'+search_term)
             if not sqs:
                 suggested_word = SearchQuerySet().models(TongueTwister).auto_query(search_term).spelling_suggestion()
-                print suggested_word
                 if suggested_word:
                     sqs = SearchQuerySet().models(TongueTwister).raw_search('hash_tag:'+suggested_word)
             if not sqs:
@@ -1118,7 +1118,6 @@ class SolrSearchTopic(BoloIndyaGenericAPIView):
                 sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
             if sqs:
                 result_page = get_paginated_data(sqs, int(page_size), int(page))
-                print result_page[0].object_list
                 topics = solr_object_to_db_object(result_page[0].object_list)
             # topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True, language_id=language_id)
             next_page_number = page+1 if page_size*page<len(sqs) else ''
@@ -1179,7 +1178,6 @@ class SolrSearchHashTag(BoloIndyaGenericAPIView):
                 sqs = SearchQuerySet().models(TongueTwister).autocomplete(**{'text':search_term})
             if sqs:
                 result_page = get_paginated_data(sqs, int(page_size), int(page))
-                print result_page[0].object_list
                 hash_tags = solr_object_to_db_object(result_page[0].object_list)
             # hash_tags  = TongueTwister.objects.filter(hash_tag__icontains = search_term)
             next_page_number = page+1 if page_size*page<len(sqs) else ''
@@ -1227,7 +1225,6 @@ def GetUserProfile(request):
         user_id = request.POST.get('user_id','')
         if user_id:
             user = User.objects.get(id=user_id)
-            print user
         user_json = UserSerializer(user).data
         return JsonResponse({'message': 'success','result':user_json}, status=status.HTTP_200_OK)
     except:
@@ -1250,7 +1247,6 @@ class SolrSearchUser(BoloIndyaGenericAPIView):
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
         users = []
         if search_term:
-            print search_term
             sqs = SearchQuerySet().models(UserProfile).raw_search(search_term)
             if not sqs:
                 suggested_word = SearchQuerySet().models(UserProfile).auto_query(search_term).spelling_suggestion()
@@ -1260,7 +1256,6 @@ class SolrSearchUser(BoloIndyaGenericAPIView):
                 sqs = SearchQuerySet().models(UserProfile).autocomplete(**{'text':search_term})
             if sqs:
                 result_page = get_paginated_data(sqs, int(page_size), int(page))
-                print result_page[0].object_list
                 users = solr_object_to_db_object(result_page[0].object_list)
             # users = User.objects.filter( Q(username__icontains = search_term) | Q(st__name__icontains = search_term) | Q(first_name__icontains = search_term) | \
             #        Q(last_name__icontains = search_term) )
@@ -1307,10 +1302,8 @@ def get_search_suggestion(request):
         sqs1 = SearchQuerySet().models(UserProfile).autocomplete(**{'name':term}).values_list('name',flat=True)[:5]
         sqs2 = SearchQuerySet().models(Topic,TongueTwister).autocomplete(**{'text':term}).values_list('text',flat=True)[:10-len(sqs1)]
         sqs = sqs1+ sqs2
-        print sqs
         if not sqs:
             suggested_word = SearchQuerySet().auto_query(term).spelling_suggestion()
-            print suggested_word
             if suggested_word:
                 sqs1 = SearchQuerySet().models(UserProfile).autocomplete(**{'name':suggested_word}).values_list('name',flat=True)[:5]
                 sqs2 = SearchQuerySet().models(Topic,TongueTwister).autocomplete(**{'text':suggested_word}).values_list('text',flat=True)[:10-len(sqs1)]
@@ -1339,9 +1332,7 @@ def get_video_thumbnail(video_url):
         b = imencode('.jpg', frame)[1].tostring()
         ts = time.time()
         virtual_thumb_file = ContentFile(b, name = "img-" + str(ts).replace(".", "")  + ".jpg" )
-        print virtual_thumb_file
         url_thumbnail= upload_thumbail(virtual_thumb_file)
-        print url_thumbnail
         # obj.thumbnail = url_thumbnail
         # obj.media_duration = media_duration
         # obj.save()
@@ -1522,9 +1513,7 @@ def replyOnTopic(request):
                         tag_list[index]='<a href="/get_challenge_details/?ChallengeHash='+value.strip('#')+'">'+value+'</a>'
                 temp_comment=" ".join(tag_list)
                 temp_comment = temp_comment[0].upper()+temp_comment[1:]
-            print temp_comment
             recent_comment = Comment.objects.filter(comment = temp_comment,topic_id=topic_id,user=request.user,date__gt=datetime.now()-timedelta(minutes=5))
-            print recent_comment
             if recent_comment:
                 return JsonResponse({'message': 'Already commented same comment'}, status=status.HTTP_400_BAD_REQUEST)
             comment.comment       = comment_html.strip()
@@ -2016,7 +2005,6 @@ def notification_topic(request):
         topic_id = request.GET.get('topic_id', '')
         topic        = Topic.objects.get(pk = topic_id)
         topic_json = TopicSerializerwithComment(topic, context={'is_expand': request.GET.get('is_expand',True)}).data
-        print topic_json
         return JsonResponse({'result':[topic_json]}, status=status.HTTP_201_CREATED)   
     except:
         return JsonResponse({'message': 'Invalid Request'}, status=status.HTTP_400_BAD_REQUEST)
