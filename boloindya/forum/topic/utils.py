@@ -106,7 +106,7 @@ def update_redis_category_paginated_data(language_id, category_id):
             updated_df = topics_df.query('id not in [' + ','.join(exclude_ids) + ']').drop_duplicates('user_id')\
                     .nlargest(items_per_page, 'vb_score', keep='last')
             id_list = updated_df['id'].tolist()
-            if len(id_list) > min_count_per_page and page <= cache_max_pages:
+            if len(id_list) >= min_count_per_page and page <= cache_max_pages:
                 exclude_ids.extend( map(str, id_list) )
                 if id_list:
                     final_data[page] = { 'id_list' : id_list, 'scores' : updated_df['vb_score'].tolist() }
@@ -195,7 +195,7 @@ def update_redis_language_paginated_data(language_id):
             updated_df = topics_df.query('id not in [' + ','.join(exclude_ids) + ']').drop_duplicates('user_id')\
                     .nlargest(items_per_page, 'vb_score', keep='last')
             id_list = updated_df['id'].tolist()
-            if len(id_list) > min_count_per_page and page <= cache_max_pages:
+            if len(id_list) >= min_count_per_page and page <= cache_max_pages:
                 exclude_ids.extend( map(str, id_list) )
                 if id_list:
                     final_data[page] = { 'id_list' : id_list, 'scores' : updated_df['vb_score'].tolist() }
@@ -308,7 +308,7 @@ def update_redis_hashtag_paginated_data(language_id,extra_filter):
                         updated_df = topics_df.query('id not in [' + ','.join(exclude_ids) + ']').drop_duplicates('user_id')\
                                 .nlargest(items_per_page, 'vb_score', keep='last')
                         id_list = updated_df['id'].tolist()
-                        if len(id_list) > min_count_per_page and page <= cache_max_pages:
+                        if len(id_list) >= min_count_per_page and page <= cache_max_pages:
                             exclude_ids.extend( map(str, id_list) )
                             if id_list:
                                 final_data[page] = { 'id_list' : id_list, 'scores' : updated_df['vb_score'].tolist() }
@@ -402,7 +402,7 @@ def update_redis_follow_paginated_data(user_id):
             updated_df = topics_df.query('id not in [' + ','.join(exclude_ids) + ']').drop_duplicates('user_id')\
                     .nlargest(items_per_page, 'vb_score', keep='last')
             id_list = updated_df['id'].tolist()
-            if len(id_list) > min_count_per_page and page <= cache_max_pages:
+            if len(id_list) >= min_count_per_page and page <= cache_max_pages:
                 exclude_ids.extend( map(str, id_list) )
                 if id_list:
                     final_data[page] = { 'id_list' : id_list, 'scores' : updated_df['vb_score'].tolist() }
