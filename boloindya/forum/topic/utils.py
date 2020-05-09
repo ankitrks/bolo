@@ -339,7 +339,7 @@ def get_redis_follow_paginated_data(user_id,page_no):
     if not paginated_data:
         paginated_data = update_redis_follow_paginated_data(user_id)
     if paginated_data:
-        print paginated_data
+        # print paginated_data
         if str(page_no) in paginated_data.keys():
             topic_ids=paginated_data[str(page_no)]['id_list']
             page_no+=1
@@ -477,7 +477,6 @@ def update_popular_paginated_data(user_id,language_id):
     total_elemnt = len(all_id)
     while(total_elemnt>0):
         final_data[page] = { 'id_list' : all_id[old_page_size:page_size]}
-        print final_data
         page_size+=settings.REST_FRAMEWORK['PAGE_SIZE']
         page+=1
         total_elemnt-=settings.REST_FRAMEWORK['PAGE_SIZE']
