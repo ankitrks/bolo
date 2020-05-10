@@ -596,13 +596,10 @@ def VBList(request):
     category__slug = False
     m2mcategory__slug = False
     popular_post = False
-    if int(request.GET.get('offset') or 0):
-        page_no = int(int(request.GET.get('offset') or 0)/settings.REST_FRAMEWORK['PAGE_SIZE'])+1
-    else:
-        page_no = 1
+    page_no = int(request.GET.get('page'))
     if search_term:
         for term_key in search_term:
-            if term_key not in ['limit','offset','order_by','is_popular']:
+            if term_key not in ['limit','offset','order_by','is_popular', 'page']:
                 if term_key:
                     value = request.GET.get(term_key)
                     filter_dic[term_key]=value
@@ -630,15 +627,7 @@ def VBList(request):
     total_objects = len(topics)
     paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
     topics = paginator.page(1)
-    if paginator.num_pages>1:
-        next_url = replace_query_param(request.build_absolute_uri(),'offset',int(request.GET.get('offset') or 0)+int(request.GET.get('limit') or settings.REST_FRAMEWORK['PAGE_SIZE']))
-    else:
-        next_url = ''
-    if int(request.GET.get('offset') or 0):
-        previous_url = replace_query_param(request.build_absolute_uri(),'offset',int(request.GET.get('offset') or 0) - int(request.GET.get('limit') or settings.REST_FRAMEWORK['PAGE_SIZE']))
-    else:
-        previous_url =''
-    return JsonResponse({"results":TopicSerializerwithComment(topics,context={'is_expand':request.GET.get('is_expand',True)},many=True).data,"next":next_url,"previous":previous_url,"count":total_objects})
+    return JsonResponse({"results":TopicSerializerwithComment(topics,context={'is_expand':request.GET.get('is_expand',True)},many=True).data, "count":total_objects})
 
 def replace_query_param(url, key, val):
     try:
@@ -729,11 +718,7 @@ def GetChallenge(request):
     hash_tag = TongueTwister.objects.get(hash_tag__iexact=challengehash[1:])
     all_seen_vb = []
     topics =[]
-    if int(request.GET.get('offset') or 0):
-        page_no = int(int(request.GET.get('offset') or 0)/settings.REST_FRAMEWORK['PAGE_SIZE'])+1
-    else:
-        page_no = 1
-    print page_no
+    page_no = int(request.GET.get('page'))
     filter_dict = {'hash_tags':hash_tag}
     if language_id:
         filter_dict['language_id']=language_id
@@ -741,17 +726,8 @@ def GetChallenge(request):
     total_objects = len(topics)
     paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
     topics = paginator.page(1)
-    if paginator.num_pages>1:
-        next_url = replace_query_param(request.build_absolute_uri(),'offset',int(request.GET.get('offset') or 0)+int(request.GET.get('limit') or settings.REST_FRAMEWORK['PAGE_SIZE']))
-    else:
-        next_url = ''
-    if int(request.GET.get('offset') or 0):
-        previous_url = replace_query_param(request.build_absolute_uri(),'offset',int(request.GET.get('offset') or 0) - int(request.GET.get('limit') or settings.REST_FRAMEWORK['PAGE_SIZE']))
-    else:
-        previous_url =''
     my_data = TopicSerializerwithComment(topics,context={'is_expand':request.GET.get('is_expand',True)},many=True).data
-
-    return JsonResponse({"results":my_data,"next":next_url,"previous":previous_url,"count":total_objects})
+    return JsonResponse({"results":my_data, "count":total_objects})
 
 class SmallSetPagination(PageNumberPagination):
     page_size = 3
