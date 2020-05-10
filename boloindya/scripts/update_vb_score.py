@@ -7,7 +7,7 @@ from datetime import datetime
 from redis_utils import * 
 from jarvis.models import FCMDevice
 from django.conf import settings 
-from forum.topic.utils import update_redis_language_paginated_data, update_redis_hashtag_paginated_data, update_redis_category_paginated_data
+from forum.topic.utils import update_redis_hashtag_paginated_data,update_redis_paginated_data
 
 def run():
     now = datetime.now()
@@ -31,7 +31,9 @@ def run():
             start = datetime.now()
             for each_category in Category.objects.filter(parent__isnull=False):
                 inside_start = datetime.now()
-                final_data = update_redis_category_paginated_data(each_language[0],each_category.id)
+                key = 'cat:'+str(each_category.id)+':lang:'+str(each_language[0])
+                query = Topic.objects.filter(is_vb=True,is_removed=False,m2mcategory__id = each_category.id,language_id = each_language[0])
+                final_data = update_redis_paginated_data(key,query)
                 # print final_data
                 end = datetime.now()
                 print 'Runtime: Category'+str(each_category.title)+' Language ' + str(each_language[1]) + ' is ' + str(end - inside_start)
@@ -53,7 +55,10 @@ def run():
     for each_language in language_options:
         if not each_language[0] == '0':
             start = datetime.now()
-            final_data = update_redis_language_paginated_data(each_language[0])
+            key = 'lang:'+str(each_language[0])
+            query = Topic.objects.filter(is_removed=False,is_vb=True,language_id=each_language[0])
+            final_data = update_redis_paginated_data(key,query)
+            # final_data = update_redis_language_paginated_data(each_language[0])
             # print final_data
             end = datetime.now()
             print 'Runtime: Language ' + str(each_language[1]) + ' is ' + str(end - start)
