@@ -221,7 +221,6 @@ def update_redis_language_paginated_data(language_id):
     return final_data
 
 ## For vb_score sorted filter in single hashtag ##
-
 def get_redis_hashtag_paginated_data(language_id,hashtag_id,page_no):
     if not page_no:
         page_no = 1
@@ -268,7 +267,7 @@ def update_redis_hashtag_paginated_data(language_id,extra_filter):
         page_data = hash_df[(list_page*items_per_page):((list_page+1)*items_per_page)]
         item_list = page_data['hashtag__id'].tolist()
         count_list = page_data['video_count'].tolist()
-        
+
         if page_data.empty or list_page >= cache_max_pages:
             list_page = None
         else:
@@ -342,10 +341,8 @@ def get_redis_follow_paginated_data(user_id,page_no):
     if not paginated_data:
         paginated_data = update_redis_follow_paginated_data(user_id)
     if paginated_data:
-        # print paginated_data
         if str(page_no) in paginated_data.keys():
             topic_ids=paginated_data[str(page_no)]['id_list']
-            page_no+=1
         elif 'remaining' in paginated_data.keys():
             last_page_no = int(paginated_data['remaining']['last_page'])
             try:
@@ -415,14 +412,13 @@ def update_redis_follow_paginated_data(user_id):
                     final_data['remaining'] = {'remaining_count' : remaining_count, 'last_page' : page - 1}
                     page = None
                 page = None
-        # print final_data
         key = 'follow_post:'+str(user_id)
         set_redis(key,final_data)
     if key:
         return get_redis(key)
     return final_data
 
-def get_popular_paginated_data(user_id,language_id,page_no):
+def get_popular_paginated_data(user_id, language_id, page_no):
     if not page_no:
         page_no = 1
     key = 'lang:'+str(language_id)+':popular_post:'+str(user_id)
@@ -433,14 +429,14 @@ def get_popular_paginated_data(user_id,language_id,page_no):
         paginated_data = update_popular_paginated_data(user_id,language_id)
     if paginated_data:
         if str(page_no) in paginated_data.keys():
-            topic_ids=paginated_data[str(page_no)]['id_list']
+            topic_ids = paginated_data[str(page_no)]['id_list']
         topics = Topic.objects.filter(pk__in=topic_ids,is_removed=False,is_vb=True)
     else:
         topics = Topic.objects.filter(is_vb=True,is_removed=False,is_popular=True).order_by('-vb_score')
     return topics
 
 def update_popular_paginated_data(user_id,language_id):
-    print "######## start", datetime.now()
+    # print "######## start", datetime.now()
     all_id = []
     all_seen_vb = []
     final_data = {}

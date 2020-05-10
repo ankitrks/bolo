@@ -246,8 +246,7 @@ class Usertimeline(generics.ListCreateAPIView):
                 sort_recent = True
 
             if filter_dic:
-                print filter_dic
-
+                #print filter_dic
                 if is_user_timeline:
                     filter_dic['is_removed'] = False
                     topics = Topic.objects.filter(**filter_dic)
@@ -860,26 +859,12 @@ def GetFollowPost(request):
     category_follow = UserProfile.objects.get(user= request.user).sub_category.all()
     all_seen_vb = []
     topics =[]
-    if int(request.GET.get('offset') or 0):
-        page_no = int(int(request.GET.get('offset') or 0)/settings.REST_FRAMEWORK['PAGE_SIZE'])+1
-    else:
-        page_no = 1
-    topics = get_redis_follow_paginated_data(request.user.id,page_no)
+    page_no = int(request.GET.get('page', 1))
+    topics = get_redis_follow_paginated_data(request.user.id, page_no)
     total_objects = len(topics)
     paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
     topics = paginator.page(1)
-    if paginator.num_pages>1:
-        next_url = replace_query_param(request.build_absolute_uri(),'offset',int(request.GET.get('offset') or 0)+int(request.GET.get('limit') or settings.REST_FRAMEWORK['PAGE_SIZE']))
-    else:
-        next_url = ''
-    if int(request.GET.get('offset') or 0):
-        previous_url = replace_query_param(request.build_absolute_uri(),'offset',int(request.GET.get('offset') or 0) - int(request.GET.get('limit') or settings.REST_FRAMEWORK['PAGE_SIZE']))
-    else:
-        previous_url =''
-    return JsonResponse({"results":TopicSerializerwithComment(topics,context={'is_expand':request.GET.get('is_expand',True)},many=True).data,"next":next_url,"previous":previous_url,"count":total_objects})
-
-
-        
+    return JsonResponse({"results":TopicSerializerwithComment(topics,context={'is_expand':request.GET.get('is_expand',True)},many=True).data, "count":total_objects})
 
 @api_view(['POST'])
 def GetChallengeDetails(request):
@@ -3556,7 +3541,7 @@ def check_url(file_path):
         u = urllib2.urlopen(str(file_path))
         return "200"
     except Exception as e:
-        print e,file_path
+        # print e,file_path
         return "403"
 def get_cloudfront_url(instance):
     if instance.question_video:
@@ -3979,7 +3964,6 @@ def get_category_video_bytes(request):
         category_id = request.POST.get('category_id', None)
         language_id = request.POST.get('language_id', 1)
         category = Category.objects.get(pk=category_id)
-        print request.POST.get('page', 2)
         topics = []
         topics = get_redis_category_paginated_data(language_id,category.id,int(request.POST.get('page', 2)))
         paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
@@ -4049,7 +4033,8 @@ def get_popular_video_bytes(request):
     try:
         paginator_topics = PageNumberPagination()
         language_id = request.GET.get('language_id', 1)
-        topics = get_popular_paginated_data(request.user.id,language_id,int(request.GET.get('page',1)))
+        # print request.user.id, language_id, int(request.GET.get('page',1))
+        topics = get_popular_paginated_data(request.user.id, language_id, int(request.GET.get('page',1)))
         topics = paginator_topics.paginate_queryset(topics, request)
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True, context={'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
     except Exception as e:
@@ -4480,7 +4465,7 @@ def get_refer_earn_stat(request):
         result_page = get_paginated_data(signedup_users, int(page_size), int(page))
         if result_page[1]<int(page):
             return JsonResponse({'message': 'No page exist'}, status=status.HTTP_400_BAD_REQUEST)
-        print result_page[1]
+        # print result_page[1]
         return JsonResponse({'message': 'success','download_count':download_count,'signedup_count':signedup_count,'users':ReferralCodeUsedStatSerializer(result_page[0].object_list,many=True).data,'total_page':result_page[1]}, status=status.HTTP_200_OK)
 
     except Exception as e:
