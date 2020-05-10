@@ -15,7 +15,7 @@ def run():
     if all_post:
         last_modified_post = Topic.objects.filter(is_vb=True).order_by('-date')
     else:
-        last_modified_post = Topic.objects.filter(is_vb=True,is_removed=False,last_modified__gt=now-timedelta(minutes=15)).order_by('-date')
+        last_modified_post = Topic.objects.filter(is_vb=True,is_removed=False,last_modified__gt=now-timedelta(days=700)).order_by('-date')
     total_elements = len(last_modified_post)
     counter=1
     for each_post in last_modified_post:
