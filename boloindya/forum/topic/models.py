@@ -439,7 +439,10 @@ class Topic(RecordTimeStamp):
         score += get_ranking_feature_weight('topic_play')*self.imp_count
         score += get_ranking_feature_weight('topic_like')*self.topic_like_count
         score += get_ranking_feature_weight('topic_share')*self.topic_share_count
-        post_time = (datetime.now() - self.created_at).total_seconds()/3600 #in hrs
+        post_time = (datetime.now() - self.created_at).total_seconds() #in hrs
+        if post_time > 604800:
+            post_time = 604800
+        post_time = post_time/3600
         time_decay_constant = settings.TIME_DECAY_CONSTANT
         score = round(((time_decay_constant**2)/((float(post_time)**4)+(time_decay_constant**2)))*score ,5) #10^10 is multplied to normailze the decimal value
         Topic.objects.filter(pk=self.id).update(vb_score = score)

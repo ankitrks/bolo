@@ -316,5 +316,20 @@ def create_hash_view_count(create,instance_id):
     except Exception as e:
         print e
 
+@app.task
+def create_thumbnail_cloudfront(topic_id):
+    try:
+        from forum.topic.models import Topic
+        from drf_spirit.utils import get_modified_url, check_url
+        lambda_url = "http://boloindyapp-prod.s3-website-us-east-1.amazonaws.com/200x300"
+        cloundfront_url = "http://d3g5w10b1w6clr.cloudfront.net/200x300"
+        video_byte = Topic.objects.get(pk=topic_id)
+        lmabda_video_thumbnail_url = get_modified_url(video_byte.question_image,lambda_url)
+        check_url(lmabda_video_thumbnail_url)
+        lmabda_cloudfront_url = get_modified_url(video_byte.question_image,cloundfront_url)
+        check_url(lmabda_cloudfront_url)
+    except Exception as e:
+        print e
+
 if __name__ == '__main__':
     app.start()

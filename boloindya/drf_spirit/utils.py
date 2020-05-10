@@ -2,6 +2,8 @@ from django.apps import apps
 import calendar
 from datetime import datetime
 from django.conf import settings
+import urllib2
+import re
 
 language_options = (
     ('0', "All"),
@@ -417,5 +419,20 @@ def get_ranked_topics(user_id,page,filter_dict,exclude_dict,sort_by='-vb_score',
         all_seen_post = Topic.objects.filter(**filter_dict).filter(pk__in=all_seen_vb)[all_seen_page*page_size:page_size*(all_seen_page+1)+1]
     topics = non_seen_post + list(all_seen_post)
     return topics
+
+def check_url(file_path):
+    try:
+        u = urllib2.urlopen(str(file_path))
+        return "200"
+    except Exception as e:
+        print e,file_path
+        return "403"
+
+def get_modified_url(old_url,new_url_domain):
+    if old_url:
+        regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+        find_urls_in_string = re.compile(regex, re.IGNORECASE)
+        url = find_urls_in_string.search(old_url)
+        return str(old_url.replace(str(url.group()), new_url_domain))
 
 
