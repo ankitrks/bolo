@@ -67,9 +67,6 @@ def get_redis_category_paginated_data(language_id,category_id,page_no):
     if paginated_data:
         if str(page_no) in paginated_data.keys():
             topic_ids=paginated_data[str(page_no)]['id_list']
-            page_no+=1
-        if str(page_no) in paginated_data.keys():
-            topic_ids+=paginated_data[str(page_no)]['id_list']
         elif 'remaining' in paginated_data.keys():
             last_page_no = int(paginated_data['remaining']['last_page'])
             try:
@@ -80,8 +77,6 @@ def get_redis_category_paginated_data(language_id,category_id,page_no):
             new_page = page_no - last_page_no #(191-190)
             paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
             db_topics = list(paginator.page(new_page))
-            if paginator.num_pages > new_page:
-                db_topics += list(paginator.page(new_page+1))
         topics = list(Topic.objects.filter(pk__in=topic_ids,is_removed=False))+db_topics
     else:
         topics = Topic.objects.filter(is_vb=True,is_removed=False,m2mcategory__id = category_id,language_id = language_id).order_by('-vb_score')
@@ -156,9 +151,6 @@ def get_redis_language_paginated_data(language_id,page_no):
     if paginated_data:
         if str(page_no) in paginated_data.keys():
             topic_ids=paginated_data[str(page_no)]['id_list']
-            page_no+=1
-        if str(page_no) in paginated_data.keys():
-            topic_ids+=paginated_data[str(page_no)]['id_list']
         elif 'remaining' in paginated_data.keys():
             last_page_no = int(paginated_data['remaining']['last_page'])
             try:
@@ -169,8 +161,6 @@ def get_redis_language_paginated_data(language_id,page_no):
             new_page = page_no - last_page_no #(191-190)
             paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
             db_topics = list(paginator.page(new_page))
-            if paginator.num_pages > new_page:
-                db_topics += list(paginator.page(new_page+1))
         topics = list(Topic.objects.filter(pk__in=topic_ids,is_removed=False))+db_topics
     else:
         topics =  Topic.objects.filter(is_removed=False,is_vb=True,language_id=language_id).order_by('-vb_score')
@@ -245,9 +235,6 @@ def get_redis_hashtag_paginated_data(language_id,hashtag_id,page_no):
     if paginated_data:
         if str(page_no) in paginated_data.keys():
             topic_ids=paginated_data[str(page_no)]['id_list']
-            page_no+=1
-        if str(page_no) in paginated_data.keys():
-            topic_ids+=paginated_data[str(page_no)]['id_list']
         elif 'remaining' in paginated_data.keys():
             last_page_no = int(paginated_data['remaining']['last_page'])
             try:
@@ -258,8 +245,6 @@ def get_redis_hashtag_paginated_data(language_id,hashtag_id,page_no):
             new_page = page_no - last_page_no #(191-190)
             paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
             db_topics = list(paginator.page(new_page))
-            if paginator.num_pages > new_page:
-                db_topics += list(paginator.page(new_page+1))
         topics = list(Topic.objects.filter(pk__in=topic_ids,is_removed=False))+db_topics
     else:
         topics = Topic.objects.filter(is_vb=True,is_removed=False,language_id=language_id,hash_tags__id = hashtag_id).order_by('-vb_score')
@@ -361,8 +346,6 @@ def get_redis_follow_paginated_data(user_id,page_no):
         if str(page_no) in paginated_data.keys():
             topic_ids=paginated_data[str(page_no)]['id_list']
             page_no+=1
-        if str(page_no) in paginated_data.keys():
-            topic_ids+=paginated_data[str(page_no)]['id_list']
         elif 'remaining' in paginated_data.keys():
             last_page_no = int(paginated_data['remaining']['last_page'])
             try:
@@ -375,8 +358,6 @@ def get_redis_follow_paginated_data(user_id,page_no):
             new_page = page_no - last_page_no #(191-190)
             paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
             db_topics = list(paginator.page(new_page))
-            if paginator.num_pages > new_page:
-                db_topics += list(paginator.page(new_page+1))
         topics = list(Topic.objects.filter(pk__in=topic_ids,is_removed=False))+db_topics
     else:
         topics = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory__id__in = category_follow,language_id=UserProfile.objects.get(user_id= user_id).language),is_vb=True,is_removed=False).order_by('-vb_score')
@@ -453,9 +434,6 @@ def get_popular_paginated_data(user_id,language_id,page_no):
     if paginated_data:
         if str(page_no) in paginated_data.keys():
             topic_ids=paginated_data[str(page_no)]['id_list']
-            page_no+=1
-        if str(page_no) in paginated_data.keys():
-            topic_ids+=paginated_data[str(page_no)]['id_list']
         topics = Topic.objects.filter(pk__in=topic_ids,is_removed=False,is_vb=True)
     else:
         topics = Topic.objects.filter(is_vb=True,is_removed=False,is_popular=True).order_by('-vb_score')
