@@ -378,7 +378,10 @@ def VBList(request):
     paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
     if not is_user_timeline:
         page_no = 1
-    topics = paginator.page(page_no)
+    try:
+        topics = paginator.page(page_no)
+    except:
+        topics = []
     return JsonResponse({"results":TopicSerializerwithComment(topics,context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),\
 		'is_expand':request.GET.get('is_expand',True)},many=True).data,"count":total_objects})
 
