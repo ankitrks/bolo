@@ -241,13 +241,24 @@ def sync_contacts_with_user(user_id):
 
 @app.task
 def cache_follow_post(user_id):
-    from forum.topic.utils import update_redis_follow_paginated_data
-    update_redis_follow_paginated_data(user_id)
+    from forum.topic.utils import update_redis_paginated_data
+    key = 'follow_post:'+str(user_id)
+    all_follower = get_redis_following(user_id)
+    category_follow = UserProfile.objects.get(user_id = user_id).sub_category.all().values_list('pk', flat = True)
+    query = Topic.objects.filter(Q(user_id__in = all_follower)|Q(m2mcategory__id__in = category_follow, language_id = UserProfile.objects.get(user_id = user_id).language), \
+	is_vb = True, is_removed = False).order_by('-vb_score')
+    update_redis_paginated_data(key, query)
 
 @app.task
 def cache_popular_post(user_id,language_id):
-    from forum.topic.utils import update_popular_paginated_data
-    update_popular_paginated_data(user_id,language_id)
+    from forum.topic.utils import update_redis_paginated_data
+    from forum.user.utils.follow_redis import get_redis_following
+    key = 'lang:'+str(language_id)+':popular_post:'+str(user_id)
+    all_seen_vb= []
+    if user_id:
+        all_seen_vb = get_redis_vb_seen(user_id)
+    query = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, is_popular = True).exclude(pk__in = all_seen_vb).order_by('-vb_score')
+    update_redis_paginated_data(key, query)
 
 @app.task
 def create_topic_notification(created,instance_id):

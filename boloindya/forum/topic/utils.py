@@ -16,7 +16,6 @@ import pandas as pd
 from django.conf import settings
 from datetime import datetime
 
-
 def topic_viewed(request, topic):
     # Todo test detail views
     user = request.user
@@ -109,6 +108,7 @@ def get_redis_follow_paginated_data(user_id, page_no):
     return get_redis_data(key, query, page_no)
 
 def get_popular_paginated_data(user_id, language_id, page_no):
+    all_seen_vb = []
     key = 'lang:'+str(language_id)+':popular_post:'+str(user_id)
     if user_id:
         all_seen_vb = get_redis_vb_seen(user_id)
