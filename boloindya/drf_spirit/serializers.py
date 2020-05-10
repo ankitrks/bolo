@@ -124,7 +124,7 @@ class TongueTwisterWithVideoByteSerializer(ModelSerializer):
         paginator = Paginator(topics, page_size)
         page = 1
         topic_page = paginator.page(page)
-        return CategoryVideoByteSerializer(topics[:settings.REST_FRAMEWORK['PAGE_SIZE']], many=True,context={'is_expand':self.context.get("is_expand",True)}).data
+        return CategoryVideoByteSerializer(topics[:settings.REST_FRAMEWORK['PAGE_SIZE']], many=True,context={'last_updated':self.context.get("last_updated",None),'is_expand':self.context.get("is_expand",True)}).data
 
 
 
@@ -218,6 +218,9 @@ class TopicSerializerwithComment(ModelSerializer):
     text_comments = SerializerMethodField()
     date = SerializerMethodField()
     video_cdn = SerializerMethodField()
+    m3u8_content = SerializerMethodField()
+    audio_m3u8_content = SerializerMethodField()
+    video_m3u8_content = SerializerMethodField()
     # m2mcategory = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
 
@@ -227,6 +230,8 @@ class TopicSerializerwithComment(ModelSerializer):
             remove_list = ['m3u8_content','audio_m3u8_content','video_m3u8_content']
         else:
             remove_list = []
+        # print self.context['last_updated'] , instance.date > self.context['last_updated']
+        remove_list = []
         if remove_list:
             for field in remove_list:
                 self.fields.pop(field)
@@ -279,6 +284,24 @@ class TopicSerializerwithComment(ModelSerializer):
         else:
             return ''
 
+    def get_m3u8_content(self,instance):
+        if self.context['last_updated'] and instance.date > self.context['last_updated']:
+            return instance.m3u8_content
+        else:
+            return ''
+
+    def get_audio_m3u8_content(self,instance):
+        if self.context['last_updated'] and instance.date > self.context['last_updated']:
+            return instance.audio_m3u8_content
+        else:
+            return ''
+
+    def get_video_m3u8_content(self,instance):
+        if self.context['last_updated'] and instance.date > self.context['last_updated']:
+            return instance.video_m3u8_content
+        else:
+            return ''
+
 class SingleTopicSerializerwithComment(ModelSerializer):
     user = SerializerMethodField()
     category = PresentableSlugRelatedField(queryset=Category.objects.all(),
@@ -290,6 +313,9 @@ class SingleTopicSerializerwithComment(ModelSerializer):
     audio_comments = SerializerMethodField()
     text_comments = SerializerMethodField()
     date = SerializerMethodField()
+    m3u8_content = SerializerMethodField()
+    audio_m3u8_content = SerializerMethodField()
+    video_m3u8_content = SerializerMethodField()
     # m2mcategory = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
 
@@ -299,6 +325,8 @@ class SingleTopicSerializerwithComment(ModelSerializer):
             remove_list = ['m3u8_content','audio_m3u8_content','video_m3u8_content']
         else:
             remove_list = []
+        # print self.context['last_updated'] , instance.date > self.context['last_updated']
+        remove_list = []
         if remove_list:
             for field in remove_list:
                 self.fields.pop(field)
@@ -331,6 +359,24 @@ class SingleTopicSerializerwithComment(ModelSerializer):
     def get_comment_count(self,instance):
         return shorcountertopic(instance.comment_count)
 
+    def get_m3u8_content(self,instance):
+        if self.context['last_updated'] and instance.date > self.context['last_updated']:
+            return instance.m3u8_content
+        else:
+            return ''
+
+    def get_audio_m3u8_content(self,instance):
+        if self.context['last_updated'] and instance.date > self.context['last_updated']:
+            return instance.audio_m3u8_content
+        else:
+            return ''
+
+    def get_video_m3u8_content(self,instance):
+        if self.context['last_updated'] and instance.date > self.context['last_updated']:
+            return instance.video_m3u8_content
+        else:
+            return ''
+
 class UserAnswerSerializerwithComment(ModelSerializer):
     user = SerializerMethodField()
     category = PresentableSlugRelatedField(queryset=Category.objects.all(),
@@ -342,6 +388,9 @@ class UserAnswerSerializerwithComment(ModelSerializer):
     audio_comments = SerializerMethodField()
     text_comments = SerializerMethodField()
     date = SerializerMethodField()
+    m3u8_content = SerializerMethodField()
+    audio_m3u8_content = SerializerMethodField()
+    video_m3u8_content = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
 
     def __init__(self, *args, **kwargs):
@@ -350,6 +399,8 @@ class UserAnswerSerializerwithComment(ModelSerializer):
             remove_list = ['m3u8_content','audio_m3u8_content','video_m3u8_content']
         else:
             remove_list = []
+        # print self.context['last_updated'] , instance.date > self.context['last_updated']
+        remove_list = []
         if remove_list:
             for field in remove_list:
                 self.fields.pop(field)
@@ -378,6 +429,24 @@ class UserAnswerSerializerwithComment(ModelSerializer):
 
     def get_comment_count(self,instance):
         return shorcountertopic(instance.comment_count)
+
+    def get_m3u8_content(self,instance):
+        if self.context['last_updated'] and instance.date > self.context['last_updated']:
+            return instance.m3u8_content
+        else:
+            return ''
+
+    def get_audio_m3u8_content(self,instance):
+        if self.context['last_updated'] and instance.date > self.context['last_updated']:
+            return instance.audio_m3u8_content
+        else:
+            return ''
+
+    def get_video_m3u8_content(self,instance):
+        if self.context['last_updated'] and instance.date > self.context['last_updated']:
+            return instance.video_m3u8_content
+        else:
+            return ''
 
 class UserProfileSerializer(ModelSerializer):
     follow_count= SerializerMethodField()
@@ -637,6 +706,9 @@ class CategoryVideoByteSerializer(ModelSerializer):
     comment_count = SerializerMethodField()
     date = SerializerMethodField()
     video_cdn = SerializerMethodField()
+    m3u8_content = SerializerMethodField()
+    audio_m3u8_content = SerializerMethodField()
+    video_m3u8_content = SerializerMethodField()
 
     def __init__(self, *args, **kwargs):
         super(CategoryVideoByteSerializer, self).__init__(*args, **kwargs)
@@ -644,6 +716,7 @@ class CategoryVideoByteSerializer(ModelSerializer):
             remove_list = ['m3u8_content','audio_m3u8_content','video_m3u8_content']
         else:
             remove_list = []
+        remove_list= []
         if remove_list:
             for field in remove_list:
                 self.fields.pop(field)
@@ -678,6 +751,25 @@ class CategoryVideoByteSerializer(ModelSerializer):
             return str(instance.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
         else:
             return ''
+
+    def get_m3u8_content(self,instance):
+        if self.context['last_updated'] and instance.date > self.context['last_updated']:
+            return instance.m3u8_content
+        else:
+            return ''
+
+    def get_audio_m3u8_content(self,instance):
+        if self.context['last_updated'] and instance.date > self.context['last_updated']:
+            return instance.audio_m3u8_content
+        else:
+            return ''
+
+    def get_video_m3u8_content(self,instance):
+        if self.context['last_updated'] and instance.date > self.context['last_updated']:
+            return instance.video_m3u8_content
+        else:
+            return ''
+
 
 from django.core.paginator import Paginator
 from django.db.models import Sum
@@ -760,7 +852,7 @@ class CategoryWithVideoSerializer(ModelSerializer):
         # paginator = Paginator(topics, page_size)
         # page = 1
         # topic_page = paginator.page(page)
-        return CategoryVideoByteSerializer(topics[:settings.REST_FRAMEWORK['PAGE_SIZE']], many=True,context={'is_expand':self.context.get("is_expand",True)}).data
+        return CategoryVideoByteSerializer(topics[:settings.REST_FRAMEWORK['PAGE_SIZE']], many=True,context={'last_updated':self.context.get("last_updated",None),'is_expand':self.context.get("is_expand",True)}).data
 
 class VideoCompleteRateSerializer(ModelSerializer):
     class Meta:
