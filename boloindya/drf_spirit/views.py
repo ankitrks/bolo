@@ -359,7 +359,7 @@ def VBList(request):
                     if term_key =='category':
                         m2mcategory__slug = request.GET.get(term_key)
         filter_dic['is_vb'] = True
-       
+
         if filter_dic:
             if is_user_timeline:
                 filter_dic['is_removed'] = False
@@ -369,15 +369,18 @@ def VBList(request):
             else:
                 topics = []
                 if m2mcategory__slug:
-                    topics = get_redis_category_paginated_data(request.GET.get('language_id'),Category.objects.get(slug=m2mcategory__slug).id,page_no)                    
+                    topics = get_redis_category_paginated_data(request.GET.get('language_id'),Category.objects.get(slug=m2mcategory__slug).id,page_no)
                 else:
                     topics = get_redis_language_paginated_data(request.GET.get('language_id'),page_no)
     else:
         topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-id')
     total_objects = len(topics)
     paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
-    topics = paginator.page(1)
-    return JsonResponse({"results":TopicSerializerwithComment(topics,context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand':request.GET.get('is_expand',True)},many=True).data,"count":total_objects})
+    if not is_user_timeline:
+        page_no = 1
+    topics = paginator.page(page_no)
+    return JsonResponse({"results":TopicSerializerwithComment(topics,context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),\
+		'is_expand':request.GET.get('is_expand',True)},many=True).data,"count":total_objects})
 
 def replace_query_param(url, key, val):
     try:
