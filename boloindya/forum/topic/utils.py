@@ -131,7 +131,7 @@ def update_redis_paginated_data(key, query, cache_max_pages = settings.CACHE_MAX
     exclude_ids = []
     topics_df = pd.DataFrame.from_records(query.order_by('-vb_score').values('id', 'user_id', 'vb_score'))
     if topics_df.empty:
-        final_data[page] = []
+        final_data[page] = {'id_list' : [], 'scores' : []}
     else:
         while(page != None):
             updated_df = topics_df.query('id not in [' + ','.join(exclude_ids) + ']').drop_duplicates('user_id')\
