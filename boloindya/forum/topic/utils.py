@@ -62,6 +62,7 @@ def get_redis_category_paginated_data(language_id,category_id,page_no):
     topics = []
     if not page_no:
         page_no = 1
+    print page_no
     if not paginated_data:
         paginated_data = update_redis_category_paginated_data(language_id,category_id)
     if paginated_data:
@@ -475,14 +476,15 @@ def update_popular_paginated_data(user_id,language_id):
     total_elemnt = len(all_id)
     while(total_elemnt>0):
         final_data[page] = { 'id_list' : all_id[old_page_size:page_size]}
-        page_size+=settings.REST_FRAMEWORK['PAGE_SIZE']
+        old_page_size += settings.REST_FRAMEWORK['PAGE_SIZE']
+        page_size += settings.REST_FRAMEWORK['PAGE_SIZE']
         page+=1
         total_elemnt-=settings.REST_FRAMEWORK['PAGE_SIZE']
 
     key = 'lang:'+str(language_id)+':popular_post:'+str(user_id)
     # print final_data
     set_redis(key,final_data)
-    print "######## end", datetime.now()
+    # print "######## end", datetime.now()
     return get_redis(key)
 
 

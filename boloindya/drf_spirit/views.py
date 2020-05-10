@@ -733,6 +733,7 @@ def GetChallenge(request):
         page_no = int(int(request.GET.get('offset') or 0)/settings.REST_FRAMEWORK['PAGE_SIZE'])+1
     else:
         page_no = 1
+    print page_no
     filter_dict = {'hash_tags':hash_tag}
     if language_id:
         filter_dict['language_id']=language_id
@@ -4031,13 +4032,13 @@ def old_algo_get_popular_video_bytes(request):
 @api_view(['GET'])
 def get_popular_video_bytes(request):
     try:
-        paginator_topics = PageNumberPagination()
         language_id = request.GET.get('language_id', 1)
-        # print request.user.id, language_id, int(request.GET.get('page',1))
         topics = get_popular_paginated_data(request.user.id, language_id, int(request.GET.get('page',1)))
-        topics = paginator_topics.paginate_queryset(topics, request)
+        paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
+    	topics = paginator.page(1)
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True, context={'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
     except Exception as e:
+        print e
         return JsonResponse({'message': 'Error Occured:' + str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
