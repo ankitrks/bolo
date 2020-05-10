@@ -104,7 +104,8 @@ def get_redis_follow_paginated_data(user_id, page_no):
     key = 'follow_post:'+str(user_id)
     all_follower = get_redis_following(user_id)
     category_follow = UserProfile.objects.get(user_id = user_id).sub_category.all().values_list('pk', flat = True)
-    query = Topic.objects.filter(Q(user_id__in = all_follower)|Q(m2mcategory__id__in = category_follow, language_id = UserProfile.objects.get(user_id = user_id).language), is_vb = True, is_removed = False).order_by('-vb_score')
+    query = Topic.objects.filter(Q(user_id__in = all_follower)|Q(m2mcategory__id__in = category_follow, \
+        language_id = UserProfile.objects.get(user_id = user_id).language), is_vb = True, is_removed = False).order_by('-vb_score')
     return get_redis_data(key, query, page_no)
 
 def get_popular_paginated_data(user_id, language_id, page_no):
@@ -112,13 +113,14 @@ def get_popular_paginated_data(user_id, language_id, page_no):
     key = 'lang:'+str(language_id)+':popular_post:'+str(user_id)
     if user_id:
         all_seen_vb = get_redis_vb_seen(user_id)
-    query = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, is_popular = True).exclude(pk__in = all_seen_vb).order_by('-vb_score')
+    query = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, is_popular = True)\
+        .exclude(pk__in = all_seen_vb).order_by('-vb_score')
     return get_redis_data(key, query, page_no)
 
-def update_redis_paginated_data(key, query):
+def update_redis_paginated_data(key, query, cache_max_pages = settings.CACHE_MAX_PAGES_REAL_TIME):
     items_per_page = settings.REST_FRAMEWORK['PAGE_SIZE']
     min_count_per_page = settings.MIN_COUNT_PER_PAGE
-    cache_max_pages = settings.CACHE_MAX_PAGES
+    # cache_max_pages = settings.CACHE_MAX_PAGES
     extra_pages_beyond_max_pages = settings.EXTRA_PAGES_BEYOND_MAX_PAGES
     # print language_id, category_id, "############"
     page = 1
@@ -186,7 +188,8 @@ def get_redis_hashtag_paginated_data(language_id, hashtag_id, page_no):
                 last_page_data = paginated_data[str(last_page_no)]
             except:
                 last_page_data = paginated_data[last_page_no]
-            topics = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, hash_tags__id = hashtag_id).exclude(id__in = last_page_data['id_list']).filter(vb_score__lte = last_page_data['scores'][-1])
+            topics = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, \
+                    hash_tags__id = hashtag_id).exclude(id__in = last_page_data['id_list']).filter(vb_score__lte = last_page_data['scores'][-1])
             new_page = page_no - last_page_no #(191-190)
             paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
             if paginator.num_pages >= new_page:
@@ -194,7 +197,8 @@ def get_redis_hashtag_paginated_data(language_id, hashtag_id, page_no):
             else:
                 topics = []
     else:
-        topics = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, hash_tags__id = hashtag_id).order_by('-vb_score')
+        topics = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, \
+            hash_tags__id = hashtag_id).order_by('-vb_score')
         paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
         if paginator.num_pages >= page_no:
             topics = list(paginator.page(page_no))
@@ -202,9 +206,9 @@ def get_redis_hashtag_paginated_data(language_id, hashtag_id, page_no):
             topics = []
     return topics
 
-def update_redis_hashtag_paginated_data(language_id, extra_filter):
+def update_redis_hashtag_paginated_data(language_id, extra_filter, cache_max_pages = settings.CACHE_MAX_PAGES_REAL_TIME):
     items_per_page = settings.REST_FRAMEWORK['PAGE_SIZE']
-    cache_max_pages = settings.CACHE_MAX_PAGES
+    # cache_max_pages = settings.CACHE_MAX_PAGES
     min_rec_to_cache = settings.MIN_REC_TO_CACHE
     # print language_id, "############", extra_filter
     list_page = 0
