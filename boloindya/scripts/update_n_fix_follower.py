@@ -24,7 +24,7 @@ def run():
         real_follow_count = Follower.objects.filter(user_follower_id=each_real_user.user.id,is_active=True).count()
         counter+=1
         if follower_counter>real_follower_count:
-            print "follower_counter: ",follower_counter,"\n","real_follower_count: ",real_follower_count,"\n","follow_count: ",follow_count,"\n","real_follow_count: ",real_follow_count,"\n"
+            print "user_id",each_real_user.user_id,"\n","follower_counter: ",follower_counter,"\n","real_follower_count: ",real_follower_count,"\n","follow_count: ",follow_count,"\n","real_follow_count: ",real_follow_count,"\n"
             follower_counter = follower_counter-real_follower_count
             print follower_counter
             while(follower_counter):
@@ -32,16 +32,17 @@ def run():
                 status = action_follow(opt_action_user_id,each_real_user.user.id)
                 if status:
                     follower_counter-=1
+        if not follow_count == real_follow_count:
+            print "user_id",each_real_user.user_id,"\n","follower_counter: ",follower_counter,"\n","real_follower_count: ",real_follower_count,"\n","follow_count: ",follow_count,"\n","real_follow_count: ",real_follow_count,"\n"
+            UserProfile.objects.filter(pk=each_real_user.id).update(follow_count=real_follow_count)
 
 #follow
 def action_follow(test_user_id,any_user_id):
     follow,is_created = Follower.objects.get_or_create(user_follower_id = test_user_id,user_following_id=any_user_id)
     if is_created:
-        update_redis_following(test_user_id,int(any_user_id),True)
-        update_redis_follower(int(any_user_id),test_user_id,True)
+        update_redis_follower(any_user_id,test_user_id,True)
+        update_redis_following(test_user_id,any_user_id,True)
         return True
-    else:
-        return False
 
 def get_topic(pk):
     return Topic.objects.get(pk=pk)
