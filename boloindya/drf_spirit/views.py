@@ -626,7 +626,9 @@ def VBList(request):
         topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-id')
     total_objects = len(topics)
     paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
-    topics = paginator.page(1)
+    if not is_user_timeline:
+        page_no = 1
+    topics = paginator.page(page_no)
     return JsonResponse({"results":TopicSerializerwithComment(topics,context={'is_expand':request.GET.get('is_expand',True)},many=True).data, "count":total_objects})
 
 def replace_query_param(url, key, val):
