@@ -325,7 +325,9 @@ class JobRequestAdmin(admin.ModelAdmin):
     list_display = ('name', 'email', 'mobile')
 
 class TongueTwisterAdmin(admin.ModelAdmin):
-    list_display = ('hash_tag','is_blocked',)
+    list_display = ('hash_tag', 'is_blocked', 'is_popular', 'order', 'popular_date')
+    list_editable = ('is_blocked', 'is_popular', 'order', 'popular_date')
+    list_filter = ('is_blocked', 'is_popular', )
     search_fields = ('hash_tag',)
 
 class RankingWeightAdmin(admin.ModelAdmin):

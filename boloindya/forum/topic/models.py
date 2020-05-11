@@ -449,9 +449,6 @@ class Topic(RecordTimeStamp):
         Topic.objects.filter(pk=self.id).update(vb_score = score)
         return score
 
-
-
-
 class RankingWeight(RecordTimeStamp):
     features=models.CharField(max_length=20)
     weight= models.FloatField(default=0,null=True)

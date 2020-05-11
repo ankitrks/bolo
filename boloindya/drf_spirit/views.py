@@ -3831,7 +3831,7 @@ def get_hash_discover(request):
         page = int(request.GET.get('page',1))
         page_size = request.GET.get('page_size', 10)
         language_id = request.GET.get('language_id','2')
-        hash_tags = TongueTwisterCounter.objects.filter(language_id=language_id).order_by('-tongue_twister__is_popular', 'tongue_twister__order'\
+        hash_tags = TongueTwisterCounter.objects.exclude(tongue_twister__is_blocked = True).filter(language_id=language_id).order_by('-tongue_twister__is_popular', 'tongue_twister__order', \
             '-tongue_twister__popular_date','-hash_counter')
         result_page = get_paginated_data(hash_tags, int(page_size), int(page))
         if result_page[1]<int(page):
