@@ -113,7 +113,7 @@ class TopicSerializer(ModelSerializer):
     class Meta:
         model = Topic
         #fields = '__all__'
-        exclude = ('boosted_till','boosted_start_time','boosted_end_time','is_logo_checked','time_deleted','plag_text','vb_playtime','is_moderated','is_monetized','is_vb','is_popular','is_pubsub_popular_push','created_at','last_modified','m2mcategory','is_globally_pinned','is_closed','is_pinned','last_commented','reindex_at','is_transcoded','is_transcoded_error','vb_playtime','transcode_dump','transcode_status_dump' )
+        exclude = ('boosted_till','boosted_start_time','boosted_end_time','is_logo_checked','time_deleted','plag_text','vb_playtime','is_moderated','is_monetized','is_vb','is_popular','is_pubsub_popular_push','created_at','last_modified','m2mcategory','is_globally_pinned','is_closed','is_pinned','last_commented','reindex_at','is_transcoded','is_transcoded_error','transcode_dump','transcode_status_dump' )
         # TODO:: refactor after deciding about globally pinned.
         read_only_fields = ('is_pinned',)
 
