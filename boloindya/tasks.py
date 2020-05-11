@@ -323,11 +323,15 @@ def create_thumbnail_cloudfront(topic_id):
         from drf_spirit.utils import get_modified_url, check_url
         lambda_url = "http://boloindyapp-prod.s3-website-us-east-1.amazonaws.com/200x300"
         cloundfront_url = "http://d3g5w10b1w6clr.cloudfront.net/200x300"
-        video_byte = Topic.objects.get(pk=topic_id)
-        lmabda_video_thumbnail_url = get_modified_url(video_byte.question_image,lambda_url)
-        check_url(lmabda_video_thumbnail_url)
-        lmabda_cloudfront_url = get_modified_url(video_byte.question_image,cloundfront_url)
-        check_url(lmabda_cloudfront_url)
+        video_byte = Topic.objects.filter(pk=topic_id)
+        if video_byte.count() > 0:
+            thumbnail_url = video_byte[0].question_image
+            lmabda_video_thumbnail_url = get_modified_url(thumbnail_url, lambda_url)
+            response = check_url(lmabda_video_thumbnail_url)
+            if response == '200':
+                video_byte.update(is_thumbnail_resized = True)
+                lmabda_cloudfront_url = get_modified_url(thumbnail_url, cloundfront_url)
+                response = check_url(lmabda_cloudfront_url)
     except Exception as e:
         print e
 

@@ -130,6 +130,7 @@ class Topic(RecordTimeStamp):
     is_moderated = models.BooleanField(_("moderated"), default=False)
     vb_width = models.PositiveIntegerField(_("vb width"), default=0)
     vb_height = models.PositiveIntegerField(_("vb height"), default=0)
+    is_thumbnail_resized = models.BooleanField(_("Thumbnail Resizd?"), default=False)
 
     whatsapp_share_count = models.PositiveIntegerField(null=True,blank=True,default=0)
     linkedin_share_count = models.PositiveIntegerField(null=True,blank=True,default=0)
