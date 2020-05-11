@@ -493,6 +493,7 @@ class TongueTwister(models.Model):
     is_blocked = models.BooleanField(default=False)
     is_popular = models.BooleanField(default=False)
     popular_date = models.DateTimeField(_("Popular Date"),null=True,blank=True)
+    order = models.IntegerField(verbose_name=_('order'), default = 0)
 
     def __unicode__(self):
         if self.hash_tag:

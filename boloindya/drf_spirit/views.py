@@ -472,9 +472,9 @@ def GetChallengeDetails(request):
     challengehash = '#' + challengehash
     try:
         hash_tag = TongueTwister.objects.get(hash_tag__iexact=request.POST.get('ChallengeHash'))
-        hash_tag_counter=TongueTwisterCounter.objects.get(tongue_twister = hash_tag, language_id = language_id)
+        hash_tag_counter=HashtagViewCounter.objects.get(hashtag = hash_tag, language = language_id)
         #all_vb = Topic.objects.filter(hash_tags=hash_tag,is_removed=False,is_vb=True)
-        vb_count = hash_tag_counter.hash_counter
+        vb_count = hash_tag_counter.video_count
         if hash_tag:
             tongue = hash_tag
             return JsonResponse({'message': 'success', 'hashtag':tongue.hash_tag,'vb_count':vb_count,\
@@ -483,7 +483,7 @@ def GetChallengeDetails(request):
                 'be_descpription':tongue.be_descpription,'ka_descpription':tongue.ka_descpription,\
                 'ma_descpription':tongue.ma_descpription,'gj_descpription':tongue.gj_descpription,\
                 'mt_descpription':tongue.mt_descpription,'picture':tongue.picture,\
-                'all_seen':shorcountertopic(hash_tag_counter.total_views)},status=status.HTTP_200_OK)
+                'all_seen':shorcountertopic(hash_tag_counter.view_count)},status=status.HTTP_200_OK)
         else:
             return JsonResponse({'message': 'success', 'hashtag' : challengehash[1:],'vb_count':vb_count,\
                 'en_tongue_descp':'','hi_tongue_descp':'',\
@@ -491,7 +491,7 @@ def GetChallengeDetails(request):
                 'be_descpription':'','ka_descpription':'',\
                 'ma_descpription':'','gj_descpription':'',\
                 'mt_descpription':'','picture':'',\
-                'all_seen':shorcountertopic(hash_tag_counter.total_views)},status=status.HTTP_200_OK)
+                'all_seen':shorcountertopic(hash_tag_counter.view_count)},status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Invalid','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -3831,7 +3831,8 @@ def get_hash_discover(request):
         page = int(request.GET.get('page',1))
         page_size = request.GET.get('page_size', 10)
         language_id = request.GET.get('language_id','2')
-        hash_tags = TongueTwisterCounter.objects.filter(language_id=language_id).order_by('-tongue_twister__is_popular','-tongue_twister__popular_date','-hash_counter')
+        hash_tags = TongueTwisterCounter.objects.filter(language_id=language_id).order_by('-tongue_twister__is_popular', 'tongue_twister__order'\
+            '-tongue_twister__popular_date','-hash_counter')
         result_page = get_paginated_data(hash_tags, int(page_size), int(page))
         if result_page[1]<int(page):
             return JsonResponse({'message': 'No page exist'}, status=status.HTTP_400_BAD_REQUEST)
