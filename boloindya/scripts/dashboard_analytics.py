@@ -667,10 +667,10 @@ def put_video_creators_analytics():
 
 def put_dau_data():
 
-	today = datetime.today()
-	start_date = today + timedelta(days = -2)	
-	end_date = today
-	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
+	end_date = 	datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+	start_date = end_time + timedelta(days=-1)
+
+	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= end_date):
 		#print(dt)
 		curr_day = dt.day 
 		curr_month = dt.month 
@@ -731,21 +731,20 @@ def put_dau_data():
 
 def put_mau_data():
 
-	today = datetime.today()
-	start_date = today + timedelta(days = -2)	
-	end_date = today
-	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
+	end_date = 	datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+	start_date = end_time + timedelta(days=-1)
+	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= end_date):
 		curr_month = dt.month
 		curr_year = dt.year
 		curr_day = dt.day 
 		str_curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(01)
 		null_data = ReferralCodeUsed.objects.filter((Q(android_id=None) | Q(android_id = '')) &  Q(created_at__month = curr_month, created_at__year = curr_year))
 		all_data = ReferralCodeUsed.objects.filter(created_at__month = curr_month, created_at__year = curr_year)
-		user_null_data = all_data.exclude(Q(android_id=None) | Q(android_id = '')).values_list('android_id', flat=True)
+		user_null_data = all_data.exclude(Q(android_id=None) | Q(android_id = '')).values_list('android_id', flat=True).distinct()
 		# not_null_data = all_data.exclude((Q(android_id=None) | Q(android_id = '')) & Q(android_id__in=user_null_data))
 		# id_list_1 = not_null_data.values_list('by_user', flat = True)
-		id_list_2 = AndroidLogs.objects.filter(created_at__month = curr_month, created_at__year = curr_year).values_list('user__pk', flat=True)
-		id_list_3 = FCMDevice.objects.filter(user__pk__in = id_list_2).values_list('dev_id', flat = True)
+		id_list_2 = AndroidLogs.objects.filter(created_at__month = curr_month, created_at__year = curr_year).values_list('user__pk', flat=True).distinct()
+		id_list_3 = FCMDevice.objects.filter(user__pk__in = id_list_2).values_list('dev_id', flat = True).distinct()
 		clist = set(list(id_list_3) + list(user_null_data))
 		mau_count = len(clist) + null_data.count()
 		#print(str_curr_date, mau_count)
@@ -1028,17 +1027,17 @@ def put_uninstall_data():
 		
 def main():
 
-	put_share_data()
-	put_installs_data()
-	put_dau_data()
+	# put_share_data()
+	# put_installs_data()
+	# put_dau_data()
 	put_mau_data()
-	put_video_views_analytics()
-	put_videos_created()
-	put_uniq_views_analytics()
-	put_total_video_creators()
-	put_video_creators_analytics_lang()
-	put_install_signup_conversion()
-	put_uninstall_data()
+	# put_video_views_analytics()
+	# put_videos_created()
+	# put_uniq_views_analytics()
+	# put_total_video_creators()
+	# put_video_creators_analytics_lang()
+	# put_install_signup_conversion()
+	# put_uninstall_data()
 	
 
 def run():
