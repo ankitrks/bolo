@@ -98,7 +98,7 @@ class TopicSerializer(ModelSerializer):
     comment_count = SerializerMethodField()
     date = SerializerMethodField()
     video_cdn = SerializerMethodField()
-    m2mcategory = SerializerMethodField()
+    # m2mcategory = SerializerMethodField()
 
     def __init__(self, *args, **kwargs):
         super(TopicSerializer, self).__init__(*args, **kwargs)
@@ -129,8 +129,8 @@ class TopicSerializer(ModelSerializer):
     def get_comment_count(self,instance):
         return shorcountertopic(instance.comment_count)
 
-    def get_m2mcategory(self,instance):
-        return CategoryLiteSerializer(instance.m2mcategory.all(),many=True).data
+    # def get_m2mcategory(self,instance):
+    #     return CategoryLiteSerializer(instance.m2mcategory.all(),many=True).data
 
     def get_video_cdn(self,instance):
         if instance.question_video:
