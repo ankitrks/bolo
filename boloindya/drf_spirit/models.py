@@ -406,9 +406,10 @@ class UserFeedback(models.Model):
                 "https://api.mailgun.net/v3/mail.careeranna.com/messages",
                 auth=("api", "d6c66f5dd85b4451bbcbd94cb7406f92-bbbc8336-97426998"),
                 data={"from": "BoloIndya Support <support@boloindya.com>",
-                      "to": ["anshika@careeranna.com", "support@boloindya.com", "maaz@careeranna.com", \
-                            "ankit@careeranna.com", "gitesh@careeranna.com", "tanmai@boloindya.com"],
+                      "to": ["support@boloindya.com"],
                       "cc":[self.contact_email],
+                      "bcc":["anshika@careeranna.com", "maaz@careeranna.com", \
+                            "ankit@careeranna.com", "gitesh@careeranna.com", "tanmai@boloindya.com"],
                       "subject": "BoloIndya Feedback Received | " + self.user_name() + ' | ' + self.user_contact(),
                       "html": content_email
                 }

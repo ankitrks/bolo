@@ -2,6 +2,12 @@
 {% load static %}
 {% block content %}
 <section class="content">
+    <div>
+    <button class="btn btn-primary approve_kyc">Accept All Completed KYC's</button>
+</div>
+
+<br>
+
 <div id="user_kyc">
     <table class="table table-bordered table-striped" id="accepted_kyc">
         <thead>
@@ -32,5 +38,21 @@
 {% block center_js %}
 <script>
     $('#accepted_kyc').DataTable();
+    $(".approve_kyc").click(function(){
+        $.ajax({
+            url: "/jarvis/approve_all_completd_kyc/",
+            type: "GET",
+            success: function(data) {
+                toastr.info('All Accepted');
+                location.reload();
+                console.log(data)
+            },
+            error: function(data) {
+                toastr.error('Error Occured: '+data);
+                $('.close').click()
+                console.log(data)
+            }
+        });
+    });
 </script>
 {% endblock center_js %}
