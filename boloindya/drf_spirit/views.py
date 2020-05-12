@@ -1859,6 +1859,11 @@ def get_user_bolo_info(request):
             all_play_time = VideoPlaytime.objects.filter(timestamp__gte=start_date, timestamp__lte=end_date,videoid__in = total_video_id).aggregate(Sum('playtime'))
             if all_play_time.has_key('playtime__sum') and all_play_time['playtime__sum']:
                 video_playtime = all_play_time['playtime__sum']
+            exclude_video_id = total_video.values_list('pk',flat=True)
+            total_view_count += VBseen.objects.filter(created_at__gte = start_date, created_at__lte = end_date, topic__user = request.user).exclude(topic_id__in = exclude_video_id).count()
+            total_like_count += Like.objects.filter(created_at__gte = start_date, created_at__lte = end_date, topic__user = request.user).exclude(topic_id__in = exclude_video_id).count()
+            total_comment_count += Comment.objects.filter(date__gte = start_date, date__lte = end_date, topic__user = request.user).exclude(topic_id__in = exclude_video_id).count()
+            total_share_count += SocialShare.objects.filter(created_at__gte = start_date, created_at__lte = end_date, topic__user = request.user).exclude(topic_id__in = exclude_video_id).count()
 
         for each_pay in all_pay:
             total_earn+=each_pay.amount_pay
