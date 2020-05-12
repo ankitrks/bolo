@@ -1,32 +1,35 @@
 from django.contrib.auth.models import User
-from forum.topic.models import Topic,Notification,Like
+from forum.topic.models import Topic,Notification,Like,TongueTwister
 from forum.comment.models import Comment
 from forum.user.models import Follower
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from tasks import create_topic_notification, create_comment_notification, create_hash_view_count, create_thumbnail_cloudfront
 from django.dispatch import Signal
 post_update = Signal()
+from forum.user.utils.follow_redis import get_redis_following
 
 @receiver(post_save, sender=Topic)
-def save_topic(sender, instance,created, **kwargs):
+def save_topic(sender, instance, created, **kwargs):
     try:
-        if created and not instance.is_vb:
-            all_follower_list = Follower.objects.filter(user_following = instance.user).values_list('user_follower_id',flat=True)
-            for each in all_follower_list:
-                notify = Notification.objects.create(for_user_id = each,topic = instance,notification_type='1',user = instance.user)
-        instance.calculate_vb_score()
+        create_topic_notification.delay(created,instance.id)
+        if created:
+            create_thumbnail_cloudfront.delay(instance.id)
     except Exception as e:
         pass
+
 
 @receiver(post_save, sender=Comment)
 def save_comment(sender, instance,created, **kwargs):
     try:
-        if created:
-            all_follower_list = Follower.objects.filter(user_following = instance.user).values_list('user_follower_id',flat=True)
-            for each in all_follower_list:
-                if not str(each) == str(instance.topic.user.id):
-                    notify = Notification.objects.create(for_user_id = each,topic = instance,notification_type='2',user = instance.user)
-            notify_owner = Notification.objects.create(for_user = instance.topic.user ,topic = instance,notification_type='3',user = instance.user)
+        create_comment_notification(created,instance.id)
+    except Exception as e:
+        pass
+
+@receiver(post_save, sender=TongueTwister)
+def save_comment(sender, instance,created, **kwargs):
+    try:
+        create_hash_view_count(created,instance.id)
     except Exception as e:
         pass
 
@@ -38,8 +41,6 @@ def save_follow(sender, instance,created, **kwargs):
             notify = Notification.objects.create(for_user = instance.user_following,topic = instance,notification_type='4',user = instance.user_follower)
     except Exception as e:
         pass
-
-
 
 @receiver(post_save, sender=Like)
 def save_like(sender, instance,created, **kwargs):

@@ -46,7 +46,7 @@ def run():
                 multiplication_factor = decimal.Decimal(random.randrange(130, 270))/100
                 print "i am popular: ",multiplication_factor
             elif not each_seen.user.st.is_popular and not each_seen.user.st.is_superstar:
-                multiplication_factor = decimal.Decimal(random.randrange(65, 100))/100
+                multiplication_factor = decimal.Decimal(random.randrange(110, 210))/100
                 print "i am normal: ",multiplication_factor
             else:
                 multiplication_factor = 1
@@ -172,43 +172,46 @@ def check_like(topic_id,user_ids):
     new_vb_like =[]
     to_be_created_bolo=[]
     notific_dic= []
-    if each_like.user.st.is_superstar:
-        random_counter = int(each_like.view_count*(decimal.Decimal(random.randrange(1300, 2010))/100)/100)
-        print "i am superstar: ",random_counter
-    elif each_like.user.st.is_popular and not each_like.user.st.is_superstar:
-        random_counter = int(each_like.view_count*(decimal.Decimal(random.randrange(800, 1210))/100)/100)
-        print "i am popular: ",random_counter
-    elif not each_like.user.st.is_popular and not each_like.user.st.is_superstar:
-        random_counter = int(each_like.view_count*(decimal.Decimal(random.randrange(500, 710))/100)/100)
-        print "i am normal: ",random_counter
-    else:
-        random_counter = 1
-        print "i am non popular: ",random_counter
+    # if each_like.user.st.is_superstar:
+    #     random_counter = int(each_like.view_count*(decimal.Decimal(random.randrange(1300, 2010))/100)/100)
+    #     print "i am superstar: ",random_counter
+    # elif each_like.user.st.is_popular and not each_like.user.st.is_superstar:
+    #     random_counter = int(each_like.view_count*(decimal.Decimal(random.randrange(800, 1210))/100)/100)
+    #     print "i am popular: ",random_counter
+    # elif not each_like.user.st.is_popular and not each_like.user.st.is_superstar:
+    #     random_counter = int(each_like.view_count*(decimal.Decimal(random.randrange(500, 710))/100)/100)
+    #     print "i am normal: ",random_counter
+    # else:
+    #     random_counter = 1
+    #     print "i am non popular: ",random_counter
+    number_like = int(int((each_like.vb_playtime/60)/1.5)*decimal.Decimal(random.randrange(30, 50))/100)
+    print number_like,"$^#^&$&!$^!$*#$*",each_like.vb_playtime,each_like.id
 
-    print random_counter,"required_like"
-    if each_like.likes_count < each_like.view_count:
-        if each_like.date +timedelta(minutes=10) > now and random_counter > 100 and each_like.likes_count < random_counter:
-            number_like = random.randrange(6,random_counter)
-        elif each_like.date +timedelta(minutes=10) < now and each_like.date +timedelta(minutes=30) > now and each_like.likes_count < random_counter:
-            number_like = random.randrange(100,random_counter-each_like.likes_count)
-        elif each_like.date +timedelta(minutes=30) < now and each_like.date +timedelta(hours=2) > now and each_like.likes_count < random_counter:
-            number_like = random.randrange(1,random_counter-each_like.likes_count)
-        elif each_like.date +timedelta(hours=2) < now and each_like.date +timedelta(hours=4) > now and each_like.likes_count < random_counter:
-            number_like = random.randrange(1,random_counter-each_like.likes_count)
-        elif each_like.date +timedelta(hours=4) < now and each_like.date +timedelta(hours=6) > now and each_like.likes_count < random_counter:
-            number_like = random.randrange(1,random_counter-each_like.likes_count)
-        elif each_like.date +timedelta(hours=6) < now and each_like.date +timedelta(hours=8) > now and each_like.likes_count < random_counter:
-            number_like = random.randrange(1,random_counter-each_like.likes_count)
-        elif each_like.date +timedelta(hours=10) < now and each_like.date +timedelta(hours=12) > now and each_like.likes_count < random_counter:
-            number_like = random.randrange(1,random_counter-each_like.likes_count)
-        elif each_like.date +timedelta(hours=12) < now and each_like.date +timedelta(hours=14) > now and each_like.likes_count < random_counter:
-            number_like = random.randrange(1,random_counter-each_like.likes_count)
-        elif each_like.date +timedelta(hours=14) < now and each_like.date +timedelta(hours=16) > now and each_like.likes_count < random_counter:
-            number_like = random.randrange(1,random_counter-each_like.likes_count)
-        elif each_like.date +timedelta(hours=16) < now and each_like.likes_count < random_counter:
-            number_like = random.randrange(1,random_counter-each_like.likes_count)
-        else:
-            number_like = 1
+    print number_like,"required_like"
+    if number_like:
+        # if each_like.date +timedelta(minutes=10) > now and random_counter > 100 and each_like.likes_count < random_counter:
+        #     number_like = random.randrange(6,random_counter)
+        # elif each_like.date +timedelta(minutes=10) < now and each_like.date +timedelta(minutes=30) > now and each_like.likes_count < random_counter:
+        #     number_like = random.randrange(100,random_counter-each_like.likes_count)
+        # elif each_like.date +timedelta(minutes=30) < now and each_like.date +timedelta(hours=2) > now and each_like.likes_count < random_counter:
+        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
+        # elif each_like.date +timedelta(hours=2) < now and each_like.date +timedelta(hours=4) > now and each_like.likes_count < random_counter:
+        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
+        # elif each_like.date +timedelta(hours=4) < now and each_like.date +timedelta(hours=6) > now and each_like.likes_count < random_counter:
+        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
+        # elif each_like.date +timedelta(hours=6) < now and each_like.date +timedelta(hours=8) > now and each_like.likes_count < random_counter:
+        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
+        # elif each_like.date +timedelta(hours=10) < now and each_like.date +timedelta(hours=12) > now and each_like.likes_count < random_counter:
+        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
+        # elif each_like.date +timedelta(hours=12) < now and each_like.date +timedelta(hours=14) > now and each_like.likes_count < random_counter:
+        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
+        # elif each_like.date +timedelta(hours=14) < now and each_like.date +timedelta(hours=16) > now and each_like.likes_count < random_counter:
+        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
+        # elif each_like.date +timedelta(hours=16) < now and each_like.likes_count < random_counter:
+        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
+        # else:
+        #     number_like = 1
+
         i = 0
         while i < number_like:
             try:
@@ -254,15 +257,15 @@ def check_like(topic_id,user_ids):
                     print "notfic completed"
 
         share_counter = each_like.total_share_count
-        required_share = int(random_counter*(random.randrange(500, 700)/100)/100)
+        required_share = int(number_like*(random.randrange(500, 700)/100)/100)
         if each_like.user.st.is_superstar:
-            required_share = int(random_counter*(decimal.Decimal(random.randrange(1500, 2010))/100)/100)
+            required_share = int(number_like*(decimal.Decimal(random.randrange(1500, 2010))/100)/100)
             print "i am superstar: ",required_share
         elif each_like.user.st.is_popular and not each_like.user.st.is_superstar:
-            required_share = int(random_counter*(decimal.Decimal(random.randrange(700, 1010))/100)/100)
+            required_share = int(number_like*(decimal.Decimal(random.randrange(700, 1010))/100)/100)
             print "i am popular: ",required_share
         elif not each_like.user.st.is_popular and not each_like.user.st.is_superstar:
-            required_share = int(random_counter*(decimal.Decimal(random.randrange(500, 710))/100)/100)
+            required_share = int(number_like*(decimal.Decimal(random.randrange(500, 710))/100)/100)
             print "i am normal: ",required_share
         else:
             required_share = 1

@@ -239,8 +239,101 @@ def sync_contacts_with_user(user_id):
         for each_userprofile in all_userprofile:
             Contact.objects.filter(contact_number=each_userprofile.mobile_no).update(is_user_registered=True,user=each_userprofile.user)
 
+@app.task
+def cache_follow_post(user_id):
+    from forum.topic.utils import update_redis_paginated_data
+    key = 'follow_post:'+str(user_id)
+    all_follower = get_redis_following(user_id)
+    category_follow = UserProfile.objects.get(user_id = user_id).sub_category.all().values_list('pk', flat = True)
+    query = Topic.objects.filter(Q(user_id__in = all_follower)|Q(m2mcategory__id__in = category_follow, language_id = UserProfile.objects.get(user_id = user_id).language), \
+	is_vb = True, is_removed = False).order_by('-vb_score')
+    update_redis_paginated_data(key, query)
 
+@app.task
+def cache_popular_post(user_id,language_id):
+    from forum.topic.utils import update_redis_paginated_data
+    from forum.user.utils.follow_redis import get_redis_following
+    key = 'lang:'+str(language_id)+':popular_post:'+str(user_id)
+    all_seen_vb= []
+    if user_id:
+        all_seen_vb = get_redis_vb_seen(user_id)
+    query = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, is_popular = True).exclude(pk__in = all_seen_vb).order_by('-vb_score')
+    update_redis_paginated_data(key, query)
 
+@app.task
+def create_topic_notification(created,instance_id):
+    from forum.topic.models import Topic,Notification
+    from forum.user.models import Follower
+    from forum.user.utils.follow_redis import get_redis_following
+    try:
+        instance = Topic.objects.get(pk=instance_id)
+        if created:
+            # all_follower_list = Follower.objects.filter(user_following = instance.user).values_list('user_follower_id',flat=True)
+            all_follower_list = get_redis_following(instance.user.id)
+            for each in all_follower_list:
+                notify = Notification.objects.create(for_user_id = each,topic = instance,notification_type='1',user = instance.user)
+        instance.calculate_vb_score()
+    except Exception as e:
+        print e
+        pass
+
+@app.task
+def create_comment_notification(created,instance_id):
+    from forum.topic.models import Notification
+    from forum.comment.models import Comment
+    from forum.user.models import Follower
+    from forum.user.utils.follow_redis import get_redis_following
+    try:
+        instance = Comment.objects.get(pk=instance_id)
+        if created and not instance.is_vb:
+            # all_follower_list = Follower.objects.filter(user_following = instance.user).values_list('user_follower_id',flat=True)
+            all_follower_list = get_redis_following(instance.user.id)
+            for each in all_follower_list:
+                if not str(each) == str(instance.topic.user.id):
+                    notify = Notification.objects.create(for_user_id = each,topic = instance,notification_type='2',user = instance.user)
+            notify_owner = Notification.objects.create(for_user = instance.topic.user ,topic = instance,notification_type='3',user = instance.user)
+    except Exception as e:
+        print e
+        pass
+
+@app.task
+def create_hash_view_count(create,instance_id):
+    from forum.topic.models import Topic,TongueTwister,HashtagViewCounter
+    from django.db.models import Sum
+    from drf_spirit.utils import language_options
+    try:
+        for each_language in language_options:
+            language_specific_vb = Topic.objects.filter(hash_tags__id=instance_id, is_removed=False, is_vb=True,language_id=each_language[0])
+            language_specific_seen = language_specific_vb.aggregate(Sum('view_count'))
+            language_specific_hashtag, is_created = HashtagViewCounter.objects.get_or_create(hashtag_id=instance_id,language=each_language[0])
+            if language_specific_seen.has_key('view_count__sum') and language_specific_seen['view_count__sum']:
+                print "language_specific",each_language[1]," --> ",language_specific_seen['view_count__sum'],instance_id
+                language_specific_hashtag.view_count = language_specific_seen['view_count__sum']
+            else:
+                language_specific_hashtag.view_count = 0
+            language_specific_hashtag.video_count = len(language_specific_vb)
+            language_specific_hashtag.save()
+    except Exception as e:
+        print e
+
+@app.task
+def create_thumbnail_cloudfront(topic_id):
+    try:
+        from forum.topic.models import Topic
+        from drf_spirit.utils import get_modified_url, check_url
+        lambda_url = "http://boloindyapp-prod.s3-website-us-east-1.amazonaws.com/200x300"
+        cloundfront_url = "http://d3g5w10b1w6clr.cloudfront.net/200x300"
+        video_byte = Topic.objects.filter(pk=topic_id)
+        if video_byte.count() > 0:
+            thumbnail_url = video_byte[0].question_image
+            lmabda_video_thumbnail_url = get_modified_url(thumbnail_url, lambda_url)
+            response = check_url(lmabda_video_thumbnail_url)
+            if response == '200':
+                video_byte.update(is_thumbnail_resized = True)
+                lmabda_cloudfront_url = get_modified_url(thumbnail_url, cloundfront_url)
+                response = check_url(lmabda_cloudfront_url)
+    except Exception as e:
+        print e
 
 if __name__ == '__main__':
     app.start()
