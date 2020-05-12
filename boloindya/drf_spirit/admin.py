@@ -278,7 +278,7 @@ class ReferralCodeUsedAdmin(admin.ModelAdmin):
 admin.site.register(ReferralCodeUsed, ReferralCodeUsedAdmin)
 
 class AndroidLogsAdmin(admin.ModelAdmin):
-    list_display = ('user', 'created_at', 'last_modified', 'log_type',)
+    list_display = ('user', 'created_at', 'last_modified', 'log_type', 'android_id')
     search_fields = ('user', )
 
 class UserFeedbackAdmin(admin.ModelAdmin):
