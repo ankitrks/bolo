@@ -1573,7 +1573,6 @@ def statistics_all_jarvis(request):
         category_slab_options.append((str(item.pk), str(item.title)))
 
     category_slab_options = tuple(category_slab_options)
-    print("category slabs = "+str(category_slab_options))
 
     language_index_list = []
     for each in language_options:
@@ -1600,7 +1599,6 @@ def statistics_all_jarvis(request):
 
     category_choice = request.GET.get('category_choice', '')
 
-    print("slab, language_choice, category_choice", slab, language_choice, category_choice)
 
     if metrics == '6':
         data_view = 'daily'
@@ -1646,6 +1644,7 @@ def statistics_all_jarvis(request):
         if(each_opt[0] == '6'):
             temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0])\
                 .aggregate(total_count = Avg('count'))['total_count'] )
+
 
         elif(each_opt[0] == '4'):
             temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0], metrics_slab__in = ['0', '1', '2', '9'], metrics_language_options = '0')\

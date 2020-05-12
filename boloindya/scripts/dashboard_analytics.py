@@ -30,6 +30,7 @@ from datetime import datetime
 from calendar import monthrange
 from jarvis.models import DashboardMetrics
 from drf_spirit.utils import language_options
+from django.db.models.functions import TruncDate
 
 
 from datetime import timedelta
@@ -94,48 +95,45 @@ def put_share_data():
 
 
 def put_installs_data():
+	end_time = 	datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+	start_time = end_time + timedelta(days=-1)
 
-	today = datetime.now()
-	start_date = today + timedelta(days = -2)
+	#Calculate number of installs which have empty or None android_id
+	empty_android_id_counts = ReferralCodeUsed.objects.filter(Q(created_at__gte=start_date, created_at__lte=end_date) & (Q(android_id='') | Q(android_id=None)))\
+		.annotate(date=TruncDate('created_at'))\
+		.values('date').order_by('date')\
+		.annotate(total=Count('id'))
 
-	user_install_dict = dict()
-	all_data = ReferralCodeUsed.objects.filter(by_user__isnull = True, created_at__gt = start_date)
-	for item in all_data:
-		curr_userid = str(item.android_id)
-		curr_month = item.created_at.month 
-		curr_year = item.created_at.year
-		curr_day = item.created_at.day 
-		curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day)
-		#print(curr_date, curr_userid)
+	#Calculate number of distinct non-empty android_id on a particular day
+	non_empty_counts = ReferralCodeUsed.objects.filter(created_at__gte=start_date, created_at__lte=end_date)\
+		.annotate(date=TruncDate('created_at'))\
+		.values('date')\
+		.order_by('date')\
+		.annotate(total=Count('android_id', distinct=True))
 
-		if((curr_date in user_install_dict)):
-			user_install_dict[curr_date].append(curr_userid)
-		else:
-			user_install_dict[curr_date] = []
-			user_install_dict[curr_date].append(curr_userid)		 
 	
+	dict_empty_id_count = {}
+	for each_day in empty_android_id_counts:
+		dict_empty_id_count[each_day.get('date')] = each_day.get('total')
+			
 
-	#print(user_install_dict, len(user_install_dict))
-	for key, val in user_install_dict.items():
-		datetime_key = parser.parse(key)
-		week_no = datetime_key.isocalendar()[1]
-		curr_year = datetime_key.year 
+	#Sum up the count for installs having empty and non-empty ids
+	total_install_count = {}
+	for each_day in non_empty_counts:
+		total_install_count[each_day.get('date')] = each_day.get('total')
+		empty_id_count = dict_empty_id_count.get(each_day.get('date'))
+		if empty_id_count:
+			total_install_count[each_day.get('date')] += empty_id_count
+
+	for current_day in total_install_count:
+		week_no = current_day.isocalendar()[1]
+		curr_year = current_day.year 
 		if(curr_year == 2020):
 			week_no+=52
 		if(curr_year == 2019 and week_no == 1):
 			week_no = 52
 
-		metrics = '5'
-		metrics_slab = '6'
-		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
-		if(created):
-			print(metrics, metrics_slab, key, week_no)
-			save_obj.count = len(val)
-			save_obj.save()
-		else:
-			print(metrics, metrics_slab, key, week_no)
-			save_obj.count = len(val)
-			save_obj.save()	
+		DashboardMetricsJarvis.objects.get_or_create(metrics = '5', metrics_slab = '6', date = current_day, week_no = week_no, count=total_install_count[current_day])
 	
 # this function is also not being used, please do not call it anywhere
 def put_video_views_data():
@@ -669,10 +667,10 @@ def put_video_creators_analytics():
 
 def put_dau_data():
 
-	today = datetime.today()
-	start_date = today + timedelta(days = -2)	
-	end_date = today
-	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
+	end_date = 	datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+	start_date = end_time + timedelta(days=-1)
+
+	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= end_date):
 		#print(dt)
 		curr_day = dt.day 
 		curr_month = dt.month 
@@ -733,21 +731,20 @@ def put_dau_data():
 
 def put_mau_data():
 
-	today = datetime.today()
-	start_date = today + timedelta(days = -2)	
-	end_date = today
-	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
+	end_date = 	datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+	start_date = end_time + timedelta(days=-1)
+	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= end_date):
 		curr_month = dt.month
 		curr_year = dt.year
 		curr_day = dt.day 
 		str_curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(01)
 		null_data = ReferralCodeUsed.objects.filter((Q(android_id=None) | Q(android_id = '')) &  Q(created_at__month = curr_month, created_at__year = curr_year))
 		all_data = ReferralCodeUsed.objects.filter(created_at__month = curr_month, created_at__year = curr_year)
-		user_null_data = all_data.exclude(Q(android_id=None) | Q(android_id = '')).values_list('android_id', flat=True)
+		user_null_data = all_data.exclude(Q(android_id=None) | Q(android_id = '')).values_list('android_id', flat=True).distinct()
 		# not_null_data = all_data.exclude((Q(android_id=None) | Q(android_id = '')) & Q(android_id__in=user_null_data))
 		# id_list_1 = not_null_data.values_list('by_user', flat = True)
-		id_list_2 = AndroidLogs.objects.filter(created_at__month = curr_month, created_at__year = curr_year).values_list('user__pk', flat=True)
-		id_list_3 = FCMDevice.objects.filter(user__pk__in = id_list_2).values_list('dev_id', flat = True)
+		id_list_2 = AndroidLogs.objects.filter(created_at__month = curr_month, created_at__year = curr_year).values_list('user__pk', flat=True).distinct()
+		id_list_3 = FCMDevice.objects.filter(user__pk__in = id_list_2).values_list('dev_id', flat = True).distinct()
 		clist = set(list(id_list_3) + list(user_null_data))
 		mau_count = len(clist) + null_data.count()
 		#print(str_curr_date, mau_count)
@@ -1030,17 +1027,17 @@ def put_uninstall_data():
 		
 def main():
 
-	put_share_data()
-	put_installs_data()
-	put_dau_data()
+	# put_share_data()
+	# put_installs_data()
+	# put_dau_data()
 	put_mau_data()
-	put_video_views_analytics()
-	put_videos_created()
-	put_uniq_views_analytics()
-	put_total_video_creators()
-	put_video_creators_analytics_lang()
-	put_install_signup_conversion()
-	put_uninstall_data()
+	# put_video_views_analytics()
+	# put_videos_created()
+	# put_uniq_views_analytics()
+	# put_total_video_creators()
+	# put_video_creators_analytics_lang()
+	# put_install_signup_conversion()
+	# put_uninstall_data()
 	
 
 def run():
