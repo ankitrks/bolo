@@ -731,35 +731,26 @@ def put_dau_data():
 
 def put_mau_data():
 
-	end_date = 	datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
-	start_date = end_time + timedelta(days=-1)
-	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= end_date):
-		curr_month = dt.month
-		curr_year = dt.year
-		curr_day = dt.day 
-		str_curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(01)
-		null_data = ReferralCodeUsed.objects.filter((Q(android_id=None) | Q(android_id = '')) &  Q(created_at__month = curr_month, created_at__year = curr_year))
-		all_data = ReferralCodeUsed.objects.filter(created_at__month = curr_month, created_at__year = curr_year)
-		user_null_data = all_data.exclude(Q(android_id=None) | Q(android_id = '')).values_list('android_id', flat=True).distinct()
-		# not_null_data = all_data.exclude((Q(android_id=None) | Q(android_id = '')) & Q(android_id__in=user_null_data))
-		# id_list_1 = not_null_data.values_list('by_user', flat = True)
-		id_list_2 = AndroidLogs.objects.filter(created_at__month = curr_month, created_at__year = curr_year).values_list('user__pk', flat=True).distinct()
-		id_list_3 = FCMDevice.objects.filter(user__pk__in = id_list_2).values_list('dev_id', flat = True).distinct()
-		clist = set(list(id_list_3) + list(user_null_data))
-		mau_count = len(clist) + null_data.count()
-		#print(str_curr_date, mau_count)
+	dt = datetime.today() + timedelta(days=-1)
 
-		metrics = '8'
-		metrics_slab = ''
-		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date)
-		if(created):
-			print(metrics, metrics_slab, str_curr_date, mau_count)
-			save_obj.count = mau_count
-			save_obj.save()
-		else:
-			print(metrics, metrics_slab, str_curr_date, mau_count)
-			save_obj.count = mau_count
-			save_obj.save()	   
+	curr_month = dt.month
+	curr_year = dt.year
+	str_curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(01)
+	
+	null_data = ReferralCodeUsed.objects.filter((Q(android_id=None) | Q(android_id = '')) &  Q(created_at__month = curr_month, created_at__year = curr_year))
+	all_data = ReferralCodeUsed.objects.filter(created_at__month = curr_month, created_at__year = curr_year)
+	user_not_null_data = all_data.exclude(Q(android_id=None) | Q(android_id = '')).values_list('android_id', flat=True).distinct()
+
+	id_list_2 = AndroidLogs.objects.filter(created_at__month = curr_month, created_at__year = curr_year).values_list('user__pk', flat=True).distinct()
+	id_list_3 = FCMDevice.objects.filter(user__pk__in = id_list_2).values_list('dev_id', flat = True).distinct()
+	clist = set(list(id_list_3) + list(user_not_null_data))
+	mau_count = len(clist) + null_data.count()
+
+	metrics = '8'
+	metrics_slab = ''
+	save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date, count=mau_count)
+	print(metrics, metrics_slab, str_curr_date, mau_count)
+
 
 
 # put daily combo view of (user, vid) to be put in daily records

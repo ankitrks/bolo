@@ -113,6 +113,7 @@ def correct_installs_data():
 			week_no = 52
 
 		DashboardMetricsJarvis.objects.get_or_create(metrics = '5', metrics_slab = '6', date = current_day, week_no = week_no, count=total_install_count[current_day])
+		print(current_day, week_no, total_install_count[current_day])
 
 
 def main():
