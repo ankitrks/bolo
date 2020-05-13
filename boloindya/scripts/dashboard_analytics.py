@@ -95,8 +95,8 @@ def put_share_data():
 
 
 def put_installs_data():
-	end_time = 	datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
-	start_time = end_time + timedelta(days=-1)
+	end_date = 	datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+	start_date = end_date + timedelta(days=-1)
 
 	#Calculate number of installs which have empty or None android_id
 	empty_android_id_counts = ReferralCodeUsed.objects.filter(Q(created_at__gte=start_date, created_at__lte=end_date) & (Q(android_id='') | Q(android_id=None)))\
@@ -134,6 +134,7 @@ def put_installs_data():
 			week_no = 52
 
 		DashboardMetricsJarvis.objects.get_or_create(metrics = '5', metrics_slab = '6', date = current_day, week_no = week_no, count=total_install_count[current_day])
+		print('5', current_day, week_no, otal_install_count[current_day])
 	
 # this function is also not being used, please do not call it anywhere
 def put_video_views_data():
@@ -668,7 +669,7 @@ def put_video_creators_analytics():
 def put_dau_data():
 
 	end_date = 	datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
-	start_date = end_time + timedelta(days=-1)
+	start_date = end_date + timedelta(days=-1)
 
 	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= end_date):
 		#print(dt)
@@ -679,14 +680,13 @@ def put_dau_data():
 
 		null_data = ReferralCodeUsed.objects.filter((Q(android_id=None) | Q(android_id = '')) &  Q(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year))
 		all_data = ReferralCodeUsed.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year)
-		user_null_data = all_data.exclude(Q(android_id=None) | Q(android_id = '')).values_list('android_id', flat=True)
+		user_null_data = all_data.exclude(Q(android_id=None) | Q(android_id = '')).values_list('android_id', flat=True).distinct()
 		# not_null_data = all_data.exclude((Q(android_id=None) | Q(android_id = '')) & Q(android_id__in=user_null_data))
 		# id_list_1 = not_null_data.values_list('by_user', flat = True)
-		id_list_2 = AndroidLogs.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year).values_list('user__pk', flat=True)
-		id_list_3 = FCMDevice.objects.filter(user__pk__in = id_list_2).values_list('dev_id', flat = True)
+		id_list_2 = AndroidLogs.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year).values_list('user__pk', flat=True).distinct()
+		id_list_3 = FCMDevice.objects.filter(user__pk__in = id_list_2).values_list('dev_id', flat = True).distinct()
 		clist = set(list(id_list_3) + list(user_null_data))
 		dau_count = len(clist) + null_data.count()
-		print(dau_count)
 
 
 		#print(id_list_1.count(), id_list_2.count())
@@ -716,17 +716,9 @@ def put_dau_data():
 
 		metrics = '6'
 		metrics_slab = ''
-		print(metrics, metrics_slab, str_curr_date, week_no, dau_count)
 		
-		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date, week_no = week_no)
-		if(created):
-			print(metrics, metrics_slab, str_curr_date, week_no, dau_count)
-			save_obj.count = dau_count
-			save_obj.save()
-		else:
-			print(metrics, metrics_slab, str_curr_date, week_no, dau_count)
-			save_obj.count = dau_count
-			save_obj.save()	           
+		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date, week_no = week_no, count=dau_count)
+		print(metrics, str_curr_date, week_no, dau_count)
 
 
 def put_mau_data():
@@ -1018,17 +1010,17 @@ def put_uninstall_data():
 		
 def main():
 
-	# put_share_data()
-	# put_installs_data()
-	# put_dau_data()
+	put_share_data()
+	put_installs_data()
+	put_dau_data()
 	put_mau_data()
-	# put_video_views_analytics()
-	# put_videos_created()
-	# put_uniq_views_analytics()
-	# put_total_video_creators()
-	# put_video_creators_analytics_lang()
-	# put_install_signup_conversion()
-	# put_uninstall_data()
+	put_video_views_analytics()
+	put_videos_created()
+	put_uniq_views_analytics()
+	put_total_video_creators()
+	put_video_creators_analytics_lang()
+	put_install_signup_conversion()
+	put_uninstall_data()
 	
 
 def run():
