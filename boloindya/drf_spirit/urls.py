@@ -161,4 +161,5 @@ urlpatterns = [
 
     url(r'^get_m3u8_of_ids/$', get_m3u8_of_ids),
     url(r'^upload_video_to_s3_for_app/$', upload_video_to_s3_for_app),
+    url(r'^report/$', report,name='report'),
 ]
