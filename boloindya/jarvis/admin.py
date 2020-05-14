@@ -2,7 +2,8 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
-from .models import VideoUploadTranscode,FCMDevice, PushNotificationUser, PushNotification, StateDistrictLanguage, DashboardMetrics, DashboardMetricsJarvis, BannerUser, UserCountNotification
+from .models import VideoUploadTranscode,FCMDevice, PushNotificationUser, PushNotification, StateDistrictLanguage,\
+ DashboardMetrics, DashboardMetricsJarvis, BannerUser, UserCountNotification, Report
 from functools import update_wrapper
 from django.contrib import admin
 from django.shortcuts import redirect, render
@@ -90,6 +91,11 @@ class UserCountNotificationAdmin(admin.ModelAdmin):
     list_display = ('id', 'language', 'category', 'user_group', 'no_of_user')
     list_filter = ('category', )
 
+class ReportAdmin(admin.ModelAdmin):
+    list_display = ('id', 'report_type', 'reported_by', 'target_id')
+    list_filter = ('report_type', 'is_active','is_moderated')
+    search_fields = ('report_type', 'reported_by__username','target_id')
+
 admin.site.unregister(FCMDevice)
 admin.site.register(FCMDevice, FCMDeviceAdmin) 
 admin.site.register(PushNotification)
@@ -99,4 +105,5 @@ admin.site.register(StateDistrictLanguage, StateDistrictLanguageAdmin)
 admin.site.register(DashboardMetricsJarvis)
 admin.site.register(BannerUser, BannerUserAdmin)
 admin.site.register(UserCountNotification, UserCountNotificationAdmin)
+admin.site.register(Report, ReportAdmin)
 

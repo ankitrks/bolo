@@ -183,11 +183,12 @@ class UserJarvisDump(models.Model):
         ('2', 'error_logs'),
         ('3', 'hardware_info'),
     ]
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,related_name='User',editable=False, db_index = True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,related_name='User',editable=False, db_index = True, blank = True, null = True)
     dump = models.TextField(_("dump"),null=True,blank=True)
     dump_type = models.CharField(_("dump_type"),choices=DUMP_TYPE,max_length=50)
     sync_time = models.DateTimeField(_("sync_time"),auto_now=False,auto_now_add=True,blank=False,null=False)
     is_executed = models.BooleanField(_("is_executed"), default=False)
+    android_id = models.CharField(_("android_id"), max_length=100, blank=True, null = True, editable = False)
 
     def __unicode__(self):
         return "%s" % self.dump
@@ -405,9 +406,10 @@ class UserFeedback(models.Model):
                 "https://api.mailgun.net/v3/mail.careeranna.com/messages",
                 auth=("api", "d6c66f5dd85b4451bbcbd94cb7406f92-bbbc8336-97426998"),
                 data={"from": "BoloIndya Support <support@boloindya.com>",
-                      "to": ["anshika@careeranna.com", "support@boloindya.com", "maaz@careeranna.com", \
-                            "ankit@careeranna.com", "gitesh@careeranna.com", "tanmai@boloindya.com"],
+                      "to": ["support@boloindya.com"],
                       "cc":[self.contact_email],
+                      "bcc":["anshika@careeranna.com", "maaz@careeranna.com", \
+                            "ankit@careeranna.com", "gitesh@careeranna.com", "tanmai@boloindya.com"],
                       "subject": "BoloIndya Feedback Received | " + self.user_name() + ' | ' + self.user_contact(),
                       "html": content_email
                 }

@@ -30,6 +30,7 @@ from datetime import datetime
 from calendar import monthrange
 from jarvis.models import DashboardMetrics
 from drf_spirit.utils import language_options
+from django.db.models.functions import TruncDate, TruncHour
 
 
 from datetime import timedelta
@@ -51,8 +52,8 @@ def put_share_data():
 	metrics = '3'
 	metrics_slab = ''
 
-	today = datetime.now()
-	start_date = today + timedelta(days = -1)
+	today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+	start_date = today + timedelta(days = -2)
 
 	day_month_year_dict = dict()
 	all_data = UserVideoTypeDetails.objects.filter(timestamp__gt = start_date)
@@ -94,53 +95,53 @@ def put_share_data():
 
 
 def put_installs_data():
+	end_date = 	datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+	start_date = end_date + timedelta(days=-2)
 
-	today = datetime.now()
-	start_date = today + timedelta(days = -2)
+	#Calculate number of installs which have empty or None android_id
+	empty_android_id_counts = ReferralCodeUsed.objects.filter(Q(created_at__gte=start_date, created_at__lte=end_date) & (Q(android_id='') | Q(android_id=None)))\
+		.annotate(date=TruncDate('created_at'))\
+		.values('date').order_by('date')\
+		.annotate(total=Count('id'))
 
-	user_install_dict = dict()
-	all_data = ReferralCodeUsed.objects.filter(by_user__isnull = True, created_at__gt = start_date)
-	for item in all_data:
-		curr_userid = str(item.android_id)
-		curr_month = item.created_at.month 
-		curr_year = item.created_at.year
-		curr_day = item.created_at.day 
-		curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day)
-		#print(curr_date, curr_userid)
+	#Calculate number of distinct non-empty android_id on a particular day
+	non_empty_counts = ReferralCodeUsed.objects.filter(created_at__gte=start_date, created_at__lte=end_date)\
+		.annotate(date=TruncDate('created_at'))\
+		.values('date')\
+		.order_by('date')\
+		.annotate(total=Count('android_id', distinct=True))
 
-		if((curr_date in user_install_dict)):
-			user_install_dict[curr_date].append(curr_userid)
-		else:
-			user_install_dict[curr_date] = []
-			user_install_dict[curr_date].append(curr_userid)		 
 	
+	dict_empty_id_count = {}
+	for each_day in empty_android_id_counts:
+		dict_empty_id_count[each_day.get('date')] = each_day.get('total')
+			
 
-	#print(user_install_dict, len(user_install_dict))
-	for key, val in user_install_dict.items():
-		datetime_key = parser.parse(key)
-		week_no = datetime_key.isocalendar()[1]
-		curr_year = datetime_key.year 
+	#Sum up the count for installs having empty and non-empty ids
+	total_install_count = {}
+	for each_day in non_empty_counts:
+		total_install_count[each_day.get('date')] = each_day.get('total')
+		empty_id_count = dict_empty_id_count.get(each_day.get('date'))
+		if empty_id_count:
+			total_install_count[each_day.get('date')] += empty_id_count
+
+	for current_day in total_install_count:
+		week_no = current_day.isocalendar()[1]
+		curr_year = current_day.year 
 		if(curr_year == 2020):
 			week_no+=52
 		if(curr_year == 2019 and week_no == 1):
 			week_no = 52
 
-		metrics = '5'
-		metrics_slab = '6'
-		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = key, week_no = week_no)
-		if(created):
-			print(metrics, metrics_slab, key, week_no)
-			save_obj.count = len(val)
-			save_obj.save()
-		else:
-			print(metrics, metrics_slab, key, week_no)
-			save_obj.count = len(val)
-			save_obj.save()	
+		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = '5', metrics_slab = '6', date = current_day, week_no = week_no)
+		save_obj.count = total_install_count[current_day]
+		save_obj.save()
+		print('5', current_day, week_no, otal_install_count[current_day])
 	
 # this function is also not being used, please do not call it anywhere
 def put_video_views_data():
 
-	today = datetime.now()
+	today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 	start_date = today + timedelta(days = -2)
 
 	day_month_year_dict = dict()
@@ -185,8 +186,8 @@ def put_video_views_data():
 
 def put_video_views_analytics():
 
-	today = datetime.now()
-	start_date = today + timedelta(days = -1)	
+	today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+	start_date = today + timedelta(days = -2)	
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
 
@@ -231,8 +232,8 @@ def put_video_views_analytics():
 
 def put_videos_created():
 
-	today = datetime.now()
-	start_date = today + timedelta(days = -1)
+	today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+	start_date = today + timedelta(days = -2)
 
 	day_month_year_dict = dict()
 	all_data = Topic.objects.filter(date__gt = start_date)
@@ -284,8 +285,8 @@ def put_videos_created():
 # number of video creators split according to date of signup and distributed into various slabs
 def put_video_creators():
 
-	today = datetime.now()
-	start_date = today + timedelta(days = -1)
+	today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+	start_date = today + timedelta(days = -2)
 
 	user_signup_dict = dict()
 	signup_data = ReferralCodeUsed.objects.filter(by_user__isnull = False, created_at__gt = start_date)
@@ -401,9 +402,9 @@ def put_video_creators():
 def put_video_creators_analytics_lang():
 
 
-	today = datetime.now()
+	today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 	metrics = '4'
-	start_date = today + timedelta(days = -1)
+	start_date = today + timedelta(days = -2)
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = end_date):
 		curr_day = dt.day 
@@ -669,10 +670,10 @@ def put_video_creators_analytics():
 
 def put_dau_data():
 
-	today = datetime.today()
-	start_date = today + timedelta(days = -2)	
-	end_date = today
-	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
+	end_date = 	datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+	start_date = end_date + timedelta(days=-2)
+
+	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= end_date):
 		#print(dt)
 		curr_day = dt.day 
 		curr_month = dt.month 
@@ -681,34 +682,12 @@ def put_dau_data():
 
 		null_data = ReferralCodeUsed.objects.filter((Q(android_id=None) | Q(android_id = '')) &  Q(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year))
 		all_data = ReferralCodeUsed.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year)
-		user_null_data = all_data.exclude(Q(android_id=None) | Q(android_id = '')).values_list('android_id', flat=True)
-		# not_null_data = all_data.exclude((Q(android_id=None) | Q(android_id = '')) & Q(android_id__in=user_null_data))
-		# id_list_1 = not_null_data.values_list('by_user', flat = True)
-		id_list_2 = AndroidLogs.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year).values_list('user__pk', flat=True)
-		id_list_3 = FCMDevice.objects.filter(user__pk__in = id_list_2).values_list('dev_id', flat = True)
-		clist = set(list(id_list_3) + list(user_null_data))
+		user_not_null_data = all_data.exclude(Q(android_id=None) | Q(android_id = '')).values_list('android_id', flat=True).distinct()
+
+		id_list_2 = AndroidLogs.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year).values_list('user__pk', flat=True).distinct()
+		id_list_3 = FCMDevice.objects.filter(user__pk__in = id_list_2).values_list('dev_id', flat = True).distinct()
+		clist = set(list(id_list_3) + list(user_not_null_data))
 		dau_count = len(clist) + null_data.count()
-		print(dau_count)
-
-
-		#print(id_list_1.count(), id_list_2.count())
-		#id_list_concat = list(id_list_1) + list(id_list_2)
-
-		#print(dt, len(set(id_list_concat)) + null_data.count())
-
-		# tot_data = ReferralCodeUsed.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year, by_user__isnull = True)
-		# install_data = ReferralCodeUsed.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year, by_user__isnull = False)
-		# #tot_data = ReferralCodeUsed.objects.filter(created_at__contains = str_curr_date, by_user__isnull = True)
-		# #install_data = ReferralCodeUsed.objects.filter(created_at__contains = str_curr_date, by_user__isnull = False)
-		# excluded_data = tot_data.exclude(android_id__in = install_data.values_list('android_id', flat = True))
-		# #print(len(excluded_data))
-		# excluded_data_list = excluded_data.values_list('by_user', flat = True)
-		# android_data = AndroidLogs.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year)
-
-		# temp_data = android_data.exclude(user__in = install_data.values_list('by_user', flat = True))
-		# dau_count = temp_data.distinct('user').count() + tot_data.count()
-		# print("date, count", dt, dau_count)
-
 
 		week_no = dt.isocalendar()[1]
 		if(curr_year == 2020):
@@ -718,57 +697,43 @@ def put_dau_data():
 
 		metrics = '6'
 		metrics_slab = ''
-		print(metrics, metrics_slab, str_curr_date, week_no, dau_count)
 		
 		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date, week_no = week_no)
-		if(created):
-			print(metrics, metrics_slab, str_curr_date, week_no, dau_count)
-			save_obj.count = dau_count
-			save_obj.save()
-		else:
-			print(metrics, metrics_slab, str_curr_date, week_no, dau_count)
-			save_obj.count = dau_count
-			save_obj.save()	           
+		save_obj.count = dau_count
+		save_obj.save()
+		print(metrics, str_curr_date, week_no, dau_count)
 
 
 def put_mau_data():
 
-	today = datetime.today()
-	start_date = today + timedelta(days = -2)	
-	end_date = today
-	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
-		curr_month = dt.month
-		curr_year = dt.year
-		curr_day = dt.day 
-		str_curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(01)
-		null_data = ReferralCodeUsed.objects.filter((Q(android_id=None) | Q(android_id = '')) &  Q(created_at__month = curr_month, created_at__year = curr_year))
-		all_data = ReferralCodeUsed.objects.filter(created_at__month = curr_month, created_at__year = curr_year)
-		user_null_data = all_data.exclude(Q(android_id=None) | Q(android_id = '')).values_list('android_id', flat=True)
-		# not_null_data = all_data.exclude((Q(android_id=None) | Q(android_id = '')) & Q(android_id__in=user_null_data))
-		# id_list_1 = not_null_data.values_list('by_user', flat = True)
-		id_list_2 = AndroidLogs.objects.filter(created_at__month = curr_month, created_at__year = curr_year).values_list('user__pk', flat=True)
-		id_list_3 = FCMDevice.objects.filter(user__pk__in = id_list_2).values_list('dev_id', flat = True)
-		clist = set(list(id_list_3) + list(user_null_data))
-		mau_count = len(clist) + null_data.count()
-		#print(str_curr_date, mau_count)
+	dt = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=-2)
 
-		metrics = '8'
-		metrics_slab = ''
-		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date)
-		if(created):
-			print(metrics, metrics_slab, str_curr_date, mau_count)
-			save_obj.count = mau_count
-			save_obj.save()
-		else:
-			print(metrics, metrics_slab, str_curr_date, mau_count)
-			save_obj.count = mau_count
-			save_obj.save()	   
+	curr_month = dt.month
+	curr_year = dt.year
+	str_curr_date = str(curr_year) + "-" + str(curr_month) + "-" + str(01)
+	
+	null_data = ReferralCodeUsed.objects.filter((Q(android_id=None) | Q(android_id = '')) &  Q(created_at__month = curr_month, created_at__year = curr_year))
+	all_data = ReferralCodeUsed.objects.filter(created_at__month = curr_month, created_at__year = curr_year)
+	user_not_null_data = all_data.exclude(Q(android_id=None) | Q(android_id = '')).values_list('android_id', flat=True).distinct()
+
+	id_list_2 = AndroidLogs.objects.filter(created_at__month = curr_month, created_at__year = curr_year).values_list('user__pk', flat=True).distinct()
+	id_list_3 = FCMDevice.objects.filter(user__pk__in = id_list_2).values_list('dev_id', flat = True).distinct()
+	clist = set(list(id_list_3) + list(user_not_null_data))
+	mau_count = len(clist) + null_data.count()
+
+	metrics = '8'
+	metrics_slab = ''
+	save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date)
+	save_obj.count=mau_count
+	save_obj.save()
+	print(metrics, metrics_slab, str_curr_date, mau_count)
+
 
 
 # put daily combo view of (user, vid) to be put in daily records
 def put_uniq_views_analytics():
 
-	today = datetime.now()
+	today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 	start_date = today + timedelta(days = -2)	
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
@@ -827,8 +792,8 @@ def put_uniq_views_analytics():
 def put_total_video_creators():
 
 
-	today = datetime.now()
-	start_date = today + timedelta(days = -1)
+	today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+	start_date = today + timedelta(days = -2)
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = today):
 		language_dict = dict()
@@ -892,8 +857,8 @@ def put_total_video_creators():
 
 def put_install_signup_conversion():
 
-	today = datetime.now()
-	start_date = today + timedelta(days = -1)
+	today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+	start_date = today + timedelta(days = -2)
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = today):
 		curr_day = dt.day 
@@ -982,52 +947,26 @@ def put_uninstall_data():
 	metrics = '11'
 	metrics_slab = ''
 
-	today = datetime.now()
-	start_date = today + timedelta(days = -1)
-	end_date = today
-	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = end_date):
-		curr_day = dt.day
-		curr_month = dt.month 
-		curr_year = dt.year
-		hour_dict = dict()
-		tot_records = FCMDevice.objects.filter(device_type='1', is_uninstalled=True, uninstalled_date__day=curr_day, uninstalled_date__month = curr_month, uninstalled_date__year = curr_year).values('dev_id', 'uninstalled_date').order_by('uninstalled_date')
-		for each in tot_records:
-			if(each['uninstalled_date'].hour<10):
-				str_date_hr = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day) + "-" + "0" + str(each['uninstalled_date'].hour)
-			else:
-				str_date_hr = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day) + "-" + str(each['uninstalled_date'].hour)	
+	dt = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=-2)
+	start_dt = dt.replace(hour=0, minute=0, second=0)
+	end_dt = dt.replace(hour=23, minute=59, second=59)
 
-			if(str_date_hr in hour_dict):
-				hour_dict[str_date_hr]+=1
-			else:
-				hour_dict[str_date_hr]=0
-				hour_dict[str_date_hr]+=1
+	tot_records = FCMDevice.objects.filter(device_type='1', is_uninstalled=True, uninstalled_date__gte=start_dt, uninstalled_date__lte = end_dt)\
+		.annotate(at_hour=TruncHour('uninstalled_date'))\
+		.values('at_hour')\
+		.order_by('at_hour')\
+		.annotate(total=Count('id'))
 
-		for key, val in hour_dict.items():
-			#print(key, val)
-			datetime_key = parser.parse(key)
-			week_no = datetime_key.isocalendar()[1]
-			curr_year_dt = datetime_key.year 
-			if(curr_year_dt == 2020):
-				week_no+=52
-			if(curr_year_dt == 2019 and week_no == 1):
-				week_no = 52
+	week_no = dt.isocalendar()[1]
+	if(dt.year == 2020):
+		week_no+=52
+	if(dt.year == 2019 and week_no == 1):
+		week_no = 52
 
-			save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
-			if(created):
-				print(metrics, metrics_slab, datetime_key, week_no, val)
-				save_obj.count = val
-				save_obj.save()
-			else:
-				print(metrics, metrics_slab, datetime_key, week_no, val)
-				save_obj.count = val
-				save_obj.save()
+	for each_hour in tot_records:
+		DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = each_hour['at_hour'], week_no = week_no, count=each_hour['total'])
 
 
-
-
-
-		
 def main():
 
 	put_share_data()

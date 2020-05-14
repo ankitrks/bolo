@@ -321,11 +321,11 @@ HAYSTACK_CONNECTIONS = {
     },
 }
 
-#HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+HAYSTACK_SIGNAL_PROCESSOR = 'forum.search.signals.RealtimeSignalProcessor'
 
 DATABASES = {
 
-    'default': {
+   'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'boloindya',                 # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
@@ -629,4 +629,10 @@ LOGGING = {
 import logging
 log = logging.getLogger('boloindya')
 
-
+MIN_COUNT_PER_PAGE = 10
+CACHE_MAX_PAGES = 200
+CACHE_MAX_PAGES_REAL_TIME = 50
+EXTRA_PAGES_BEYOND_MAX_PAGES = 30
+MIN_REC_TO_CACHE = REST_FRAMEWORK['PAGE_SIZE'] * 3
+LAST_N_ACTIVE_DAYS = 3
+TIME_DECAY_CONSTANT = 36 # in hours

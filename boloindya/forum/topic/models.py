@@ -130,6 +130,7 @@ class Topic(RecordTimeStamp):
     is_moderated = models.BooleanField(_("moderated"), default=False)
     vb_width = models.PositiveIntegerField(_("vb width"), default=0)
     vb_height = models.PositiveIntegerField(_("vb height"), default=0)
+    is_thumbnail_resized = models.BooleanField(_("Thumbnail Resizd?"), default=False)
 
     whatsapp_share_count = models.PositiveIntegerField(null=True,blank=True,default=0)
     linkedin_share_count = models.PositiveIntegerField(null=True,blank=True,default=0)
@@ -439,11 +440,14 @@ class Topic(RecordTimeStamp):
         score += get_ranking_feature_weight('topic_play')*self.imp_count
         score += get_ranking_feature_weight('topic_like')*self.topic_like_count
         score += get_ranking_feature_weight('topic_share')*self.topic_share_count
+        post_time = (datetime.now() - self.created_at).total_seconds() #in hrs
+        if post_time > 604800:
+            post_time = 604800
+        post_time = post_time/3600
+        time_decay_constant = settings.TIME_DECAY_CONSTANT
+        score = round(((time_decay_constant**2)/((float(post_time)**4)+(time_decay_constant**2)))*score ,5) #10^10 is multplied to normailze the decimal value
         Topic.objects.filter(pk=self.id).update(vb_score = score)
         return score
-
-
-
 
 class RankingWeight(RecordTimeStamp):
     features=models.CharField(max_length=20)
@@ -486,6 +490,7 @@ class TongueTwister(models.Model):
     is_blocked = models.BooleanField(default=False)
     is_popular = models.BooleanField(default=False)
     popular_date = models.DateTimeField(_("Popular Date"),null=True,blank=True)
+    order = models.IntegerField(verbose_name=_('order'), default = 0)
 
     def __unicode__(self):
         if self.hash_tag:
@@ -497,6 +502,18 @@ class TongueTwister(models.Model):
         if self.is_popular:
             self.popular_date = datetime.now()
         super(TongueTwister, self).save(*args, **kwargs)
+
+class HashtagViewCounter(models.Model):
+    hashtag = models.ForeignKey('forum_topic.TongueTwister', verbose_name=_("HashTag"), related_name="hash_tag_counter",null=True,blank=True)
+    language = models.CharField(_("language"), choices=language_options, blank = True, null = True, max_length=10)
+    view_count = models.BigIntegerField(default = 0)
+    video_count = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['language']
+    
+    def __unicode__(self):
+        return str(self.hashtag)+"---"+str(self.get_language_display())
 
 publish_options = (
     ('0', "Unpublish"),
@@ -894,6 +911,20 @@ class Leaderboard(UserInfo):
 #     video_name = models.TextField(_("video_name"), null = False, blank = False)
 #     time_deleted = models.DateTimeField(auto_now = True, auto_now_add = False, blank = False, null = False)
 #     plag_text = models.TextField(_("plag_text"), null = False, blank = False)
+
+class TongueTwisterCounter(RecordTimeStamp):
+    tongue_twister = models.ForeignKey(TongueTwister, related_name='tongue_twister_counter',null=True,blank=True)
+    hash_counter = models.PositiveIntegerField(default=1,null=True,blank=True,db_index=True)
+    total_views = models.PositiveIntegerField(default=0,null=True,blank=True,db_index=True)
+    language_id = models.CharField(_("language"), choices=language_options, blank = True, null = True, max_length=10, default='1',db_index=True)
+    
+    class Meta:
+        verbose_name = _("TongueTwisterCounter")
+        verbose_name_plural = _("TongueTwisterCounters")
+
+    def __unicode__(self):
+        return self.tongue_twister.hash_tag
+
 
 
 
