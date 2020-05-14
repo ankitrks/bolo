@@ -12,6 +12,7 @@ from django.utils.translation import ugettext_lazy as _
 
 import warnings
 
+
 import os
 PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV = 'boloindya'#PROJECT_PATH.split(os.sep)[-1]
@@ -90,9 +91,13 @@ ST_BASE_DIR = os.path.dirname(__file__)
 BASE_DIR = os.path.dirname(__file__)
 BASE_DIR_TRANS = os.path.dirname(os.path.dirname(__file__))
 
-BASE_URL='https://www.boloindya.com/'
-ABSOLUTE_URL='https://www.boloindya.com'
+#BASE_URL='https://www.boloindya.com/'
+#ABSOLUTE_URL='https://www.boloindya.com'
 
+#BASE_URL='http://127.0.0.1:8000/'
+BASE_URL='https://stage.boloindya.com/'
+ABSOLUTE_URL='https://stage.boloindya.com'
+#ABSOLUTE_URL='https://www.boloindya.com'
 #BASE_URL='https://www.boloindya.com/'
 #
 # Django & Spirit settings defined below...
@@ -201,8 +206,10 @@ ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 5
 ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT = 86400 # 1 day in seconds
 ACCOUNT_LOGOUT_REDIRECT_URL ='/'
+ACCOUNT_USERNAME_REQUIRED = False
 LOGIN_REDIRECT_URL = '/accounts/email/' 
 ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS=False
+SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_ADAPTER = 'forum.topic.views.AutoConnectSocialAccount'
 #ACCOUNT_ADAPTER = 'forum.topic.views.NoNewUsersAccountAdapter'
 #ACCOUNT_ADAPTER = 'forum.topic.views.MyAccountAdapter'
@@ -336,6 +343,30 @@ TIME_ZONE = 'Asia/Kolkata'
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
 
+EXTRA_LANG_INFO = {
+    'or': {
+        'bidi': False, # right-to-left
+        'code': 'or',
+        'name': 'Odia',
+        'name_local': u'Odia', #unicode codepoints here
+    },
+    'gu': {
+        'bidi': False, # right-to-left
+        'code': 'gu',
+        'name': 'Gujrati',
+        'name_local': u'Gujrati', #unicode codepoints here
+    },    
+}
+
+# Add custom languages not provided by Django
+import django.conf.locale
+from django.conf import global_settings
+LANG_INFO = dict(django.conf.locale.LANG_INFO.items() + EXTRA_LANG_INFO.items())
+django.conf.locale.LANG_INFO = LANG_INFO
+
+# Languages using BiDi (right-to-left) layout
+#global_settings.LANGUAGES = global_settings.LANGUAGES + (("or",'Oriya'),)
+
 LANGUAGE_OPTIONS = (
     ('1', "English", "en"),
     ('2', "Hindi", "hi"),
@@ -344,11 +375,15 @@ LANGUAGE_OPTIONS = (
     ('5', "Bengali", "bn"),
     ('6', "Kannada", "kn"),
     ('7', "Malayalam", "ml"),
-    # ('8', "Gujarati", "gu"),
+    ('8', "Gujrati", "gu"),
     ('9', "Marathi", "mr"),
+    ('10', "Punjabi", "pa"),
+    ('11', "Odia", "or")
+
 )
 
 LANGUAGES = [(each_rec[2], _(each_rec[1])) for each_rec in LANGUAGE_OPTIONS]
+
 
 #LANGUAGES_WITH_ID = {(each_rec[2], (each_rec[0])) for each_rec in LANGUAGE_OPTIONS}
 
@@ -373,7 +408,9 @@ LANGUAGES_WITH_ID = {
     'kn' : '6',
     'ml' : '7',
     'gu' : '8',
-    'mr' : '9' 
+    'mr' : '9', 
+    'pa' : '10',
+    'or' : '11' 
 }
 
 LANGUAGE_CODE = 'en-us'

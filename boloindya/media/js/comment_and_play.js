@@ -1,19 +1,19 @@
 var video = document.getElementById('player');
-  jQuery('#UCommentLink').on('click',function(){debugger;
+  jQuery('#UCommentLink').on('click',function(){
       $("#comment-input").val("");
       var commentBoxInputStatus=jQuery('#commentInputId').hasClass('hide');
       if(commentBoxInputStatus==true){
          var loginStatus= check_login_status();
          if(loginStatus==false){
-          if( jwplayer('player').getState() == "playing"){
-              jwplayer('player').pause();
-          } 
+          // if( jwplayer('player').getState() == "playing"){
+          //     jwplayer('player').pause();
+          // } 
 
-          if(!video.paused) {
-            video.pause();
-            $('.videoPlayButton').removeClass('play-button');
-            $('.videoPlayButton').addClass('play-button');
-          }
+          // if(!video.paused) {
+          //   video.pause();
+          //   $('.videoPlayButton').removeClass('play-button');
+          //   $('.videoPlayButton').addClass('play-button');
+          // }
 
           // if( jwplayer('playerDetails').getState() == "playing"){
           //     jwplayer('playerDetails').pause();
@@ -82,9 +82,9 @@ var video = document.getElementById('player');
       if(likeStatus==false){
          var loginStatus= check_login_status();
          if(loginStatus==false){
-          if( jwplayer('player').getState() == "playing"){
-              jwplayer('player').pause();
-          }
+          // if( jwplayer('player').getState() == "playing"){
+          //     jwplayer('player').pause();
+          // }
 
           if(!video.paused) {
             video.pause();

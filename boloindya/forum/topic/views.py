@@ -58,6 +58,7 @@ from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from .emails import send_job_request_mail
 from drf_spirit.views import deafult_boloindya_follow
+from drf_spirit.views import deafult_boloindya_follow
 
 class AutoConnectSocialAccount(DefaultSocialAccountAdapter):
 
@@ -76,6 +77,9 @@ class AutoConnectSocialAccount(DefaultSocialAccountAdapter):
         emailId=user_email(u)
         try: 
             userDetails = User.objects.get(email=emailId)
+            userToken=get_tokens_for_user(userDetails)
+            print(userToken)
+
             userprofile = UserProfile.objects.get(user = userDetails)
             add_bolo_score(userDetails.id, 'initial_signup', userprofile)
             userprofile = UserProfile.objects.get(user = userDetails)
@@ -86,7 +90,10 @@ class AutoConnectSocialAccount(DefaultSocialAccountAdapter):
 
 class MyAccountAdapter(DefaultAccountAdapter):
     def get_login_redirect_url(self, request):
-        return redirect(request.next)
+        #path = "/accounts/{username}/"
+        
+        return path.format(request.next)
+        #return redirect(request.next)
 
 
 def get_current_language(request):
@@ -399,7 +406,7 @@ def video_discover(request):
     languageCode =request.LANGUAGE_CODE
     language_id=languages_with_id[languageCode]
     try:
-        categories = Category.objects.filter(parent__isnull=False)[:10]
+        categories = Category.objects.filter(parent__isnull=False)[:20]
     except Exception as e1:
         categories = []
 
@@ -430,7 +437,8 @@ def video_discover(request):
     if(video_slug != None):
         return redirect('/video/'+video_slug)
     else:
-        return render(request, 'spirit/topic/video_discover.html', context)
+        return render(request, 'spirit/topic/video_discover_hashtag.html', context)
+        #return render(request, 'spirit/topic/video_discover.html', context)
 
 
 def video_details(request,username='',id=''):
@@ -482,6 +490,33 @@ def video_details_by_slug(request,slug='',id=''):
     }
 
     return render(request, 'spirit/topic/video_details.html', context)
+
+def explore_video_details_by_slug(request,slug='',id=''):
+    #print user_profile.__dict__
+    #print 'videoId_'+id
+    user_id=""
+    try:
+        if id != '':
+            topics = Topic.objects.get(id = id)
+        else:
+            topics = Topic.objects.get(slug = slug)         
+        user_id = topics.user_id
+    except:
+        topics = None
+
+    try:
+        user = User.objects.get(id=user_id)
+        user_profile = UserProfile.objects.filter(user=user,user__is_active = True)[0]
+        
+    except:
+        user_profile = None
+    context = {
+        'topic': topics,
+        'is_single_topic': "Yes",
+        'user_profile': user_profile
+    }
+
+    return render(request, 'spirit/topic/explore_video_details.html', context)
 
 def bolo_user_details(request,username=''):
     #username=request.GET.get('lid');
@@ -565,10 +600,13 @@ def user_timeline(request):
         return redirect('/')
 
 def boloindya_careers(request):
-    return render(request, 'spirit/topic/boloindya_careers.html')
+    return render(request, 'spirit/topic/boloindya_career_old.html')
 
 def boloindya_team_details(request):
     return render(request, 'spirit/topic/boloindya_team.html')
+
+def upload_video_boloindya(request):
+    return render(request, 'spirit/topic/upload_videos.html')
 
 def boloindya_openings(request):
     job_openings = []
@@ -774,6 +812,60 @@ def get_topic_details_by_category(request,category_slug):
     except:
         return redirect('/')
 
+def get_feed_list_by_category(request,category_slug):
+    language_id=1
+    popular_bolo = []
+    category_details=""
+    categories=[]
+    languages_with_id=settings.LANGUAGES_WITH_ID
+    languageCode =request.LANGUAGE_CODE
+    language_id=languages_with_id[languageCode]  
+    try:
+        categories = Category.objects.filter(parent__isnull=False)[:20]
+    except Exception as e1:
+        categories = [] 
+    try:     
+        category = Category.objects.get(slug=category_slug)
+        #topics = Topic.objects.filter(m2mcategory=category,is_removed = False,is_vb = False)
+        all_vb = Topic.objects.filter(m2mcategory=category, is_removed=False, is_vb=True, language_id=language_id)
+        vb_count = all_vb.count()
+        all_seen = category.view_count
+        #print topics
+        #user_profile = UserProfile.objects.filter(user=user,user__is_active = True)[0]
+        #topics = Topic.objects.filter(category=category, is_removed=False)
+        try:
+            if language_id:
+                all_user = UserProfile.objects.filter(is_popular = True, language=language_id)[:10]
+                popular_bolo=all_user
+            else:
+                all_user = UserProfile.objects.filter(is_popular = True)[:10]
+                popular_bolo=all_user
+        except Exception as e1:
+            popular_bolo = []
+        try:
+            hash_tags = TongueTwister.objects.order_by('-hash_counter')[:10]
+        except Exception as e1:
+            hash_tags = []
+        context = {
+            'popular_bolo':popular_bolo,
+            'category_details':category,
+            'categories':categories,
+            'vb_count':vb_count,
+            'hash_tags':hash_tags,
+            'all_seen':all_seen,
+            'topics':all_vb
+        }
+        #print category.__dict__
+        video_slug = request.GET.get('video',None)
+        if(video_slug != None):
+            return redirect('/video/'+video_slug)
+        else:
+            #return render(request, 'spirit/topic/feed_list_by_categories.html', context)
+            return render(request, 'spirit/topic/video_discover_by_category.html', context)
+    except:
+        return render(request, 'spirit/topic/video_discover_by_category.html', context)
+        #return render(request, 'spirit/topic/feed_list_by_categories.html', context)
+
 def get_topic_list_by_hashtag(request,hashtag):
     language_id=1
     popular_bolo = []
@@ -844,10 +936,160 @@ def new_home(request):
     #return render(request, 'spirit/topic/temporary_landing.html')
     # return render(request, 'spirit/topic/new_landing.html')
     # return render(request, 'spirit/topic/main_landing.html')
+
+def trending_polyplayer(request):
+    categories = []
+    hash_tags = []
+    topics = []
+    popular_bolo=[]
+    language_id=0
+    try:
+        categories = Category.objects.filter(parent__isnull=False)[:20]
+    except Exception as e1:
+        categories = []   
+    language_id = request.GET.get('language_id', 1)
+
+    languages_with_id=settings.LANGUAGES_WITH_ID
+    languageCode =request.LANGUAGE_CODE
+    language_id=languages_with_id[languageCode]
+
+    try:
+        all_seen_vb = []
+        if request.user.is_authenticated:
+            all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__is_popular=True).distinct('topic_id').values_list('topic_id',flat=True)[:15]
+        excluded_list =[]
+        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')[:15]
+        for each in superstar_post:
+            excluded_list.append(each.id)
+        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')[:10]
+        for each in popular_user_post:
+            excluded_list.append(each.id)
+        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')[:2]
+        for each in popular_post:
+            excluded_list.append(each.id)
+        other_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,is_popular=True).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')[:2]
+        orderd_all_seen_post=[]
+        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)[:5]
+        if all_seen_post:
+            for each_id in all_seen_vb:
+                for each_vb in all_seen_post:
+                    if each_vb.id == each_id:
+                        orderd_all_seen_post.append(each_vb)
+
+        topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
+    except Exception as e1:
+        topics = []
+
+    try:
+        if language_id:
+            all_user = UserProfile.objects.filter(is_popular = True, language=language_id)[:20]
+            popular_bolo=all_user
+        else:
+            all_user = UserProfile.objects.filter(is_popular = True)[:20]
+            popular_bolo=all_user
+    except Exception as e1:
+        popular_bolo = []
+
+    try:
+        hash_tags = TongueTwister.objects.order_by('-hash_counter')[:20]
+    except Exception as e1:
+        hash_tags = []
+    print popular_bolo.__dict__
+
+ 
+    context = {
+        'categories':categories,
+        'hash_tags':hash_tags,
+        'topics':topics,
+        'popular_bolo':popular_bolo,
+        'is_single_topic': "Yes",
+    }  
+    video_slug = request.GET.get('video',None)
+    if(video_slug != None):
+        return redirect('/video/'+video_slug)
+    else:
+        return render(request, 'spirit/topic/trending_poly_player.html',context)
+
+
+def trending_videojs(request):
+    categories = []
+    hash_tags = []
+    topics = []
+    popular_bolo=[]
+    language_id=0
+    try:
+        categories = Category.objects.filter(parent__isnull=False)[:20]
+    except Exception as e1:
+        categories = []   
+    language_id = request.GET.get('language_id', 1)
+
+    languages_with_id=settings.LANGUAGES_WITH_ID
+    languageCode =request.LANGUAGE_CODE
+    language_id=languages_with_id[languageCode]
+
+    try:
+        all_seen_vb = []
+        if request.user.is_authenticated:
+            all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__is_popular=True).distinct('topic_id').values_list('topic_id',flat=True)[:15]
+        excluded_list =[]
+        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')[:15]
+        for each in superstar_post:
+            excluded_list.append(each.id)
+        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')[:10]
+        for each in popular_user_post:
+            excluded_list.append(each.id)
+        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')[:2]
+        for each in popular_post:
+            excluded_list.append(each.id)
+        other_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,is_popular=True).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')[:2]
+        orderd_all_seen_post=[]
+        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)[:5]
+        if all_seen_post:
+            for each_id in all_seen_vb:
+                for each_vb in all_seen_post:
+                    if each_vb.id == each_id:
+                        orderd_all_seen_post.append(each_vb)
+
+        topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
+    except Exception as e1:
+        topics = []
+
+    try:
+        if language_id:
+            all_user = UserProfile.objects.filter(is_popular = True, language=language_id)[:20]
+            popular_bolo=all_user
+        else:
+            all_user = UserProfile.objects.filter(is_popular = True)[:20]
+            popular_bolo=all_user
+    except Exception as e1:
+        popular_bolo = []
+
+    try:
+        hash_tags = TongueTwister.objects.order_by('-hash_counter')[:20]
+    except Exception as e1:
+        hash_tags = []
+    print popular_bolo.__dict__
+
+ 
+    context = {
+        'categories':categories,
+        'hash_tags':hash_tags,
+        'topics':topics,
+        'popular_bolo':popular_bolo,
+        'is_single_topic': "Yes",
+    }  
+    video_slug = request.GET.get('video',None)
+    if(video_slug != None):
+        return redirect('/video/'+video_slug)
+    else:
+        return render(request, 'spirit/topic/trending_videojs.html',context)
+
+
 def old_home(request):
     categories = []
     hash_tags = []
     topics = []
+    all_slider_topic = []
     try:
         categories = Category.objects.filter(parent__isnull=False)[:10]
     except Exception as e1:
@@ -885,6 +1127,11 @@ def old_home(request):
     except Exception as e1:
         topics = []
 
+    topicsIds =[16092,25156,26248,23820,3449,4196,4218,17534,12569,12498,9681,9419,9384,8034,8024,26835,24352,14942]
+    try:
+        all_slider_topic = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=topicsIds)[:16]
+    except Exception as e1:
+        all_slider_topic = []
 
     try:
         hash_tags = TongueTwister.objects.order_by('-hash_counter')[:4]
@@ -895,6 +1142,7 @@ def old_home(request):
         'categories':categories,
         'hash_tags':hash_tags,
         'topics':topics,
+        'sliderVideos':all_slider_topic,
         'is_single_topic': "Yes",
     }  
     video_slug = request.GET.get('video',None)
@@ -907,6 +1155,81 @@ def old_home(request):
     #return render(request, 'spirit/topic/temporary_landing.html')
     # return render(request, 'spirit/topic/new_landing.html')
     # return render(request, 'spirit/topic/main_landing.html')
+
+def boloindya_feed(request):
+    categories = []
+    hash_tags = []
+    topics = []
+    popular_bolo=[]
+    language_id=0
+    try:
+        categories = Category.objects.filter(parent__isnull=False)[:20]
+    except Exception as e1:
+        categories = []   
+    language_id = request.GET.get('language_id', 1)
+
+    languages_with_id=settings.LANGUAGES_WITH_ID
+    languageCode =request.LANGUAGE_CODE
+    language_id=languages_with_id[languageCode]
+
+    try:
+        all_seen_vb = []
+        if request.user.is_authenticated:
+            all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__is_popular=True).distinct('topic_id').values_list('topic_id',flat=True)[:15]
+        excluded_list =[]
+        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')[:15]
+        for each in superstar_post:
+            excluded_list.append(each.id)
+        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')[:10]
+        for each in popular_user_post:
+            excluded_list.append(each.id)
+        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')[:2]
+        for each in popular_post:
+            excluded_list.append(each.id)
+        other_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,is_popular=True).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')[:2]
+        orderd_all_seen_post=[]
+        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)[:5]
+        if all_seen_post:
+            for each_id in all_seen_vb:
+                for each_vb in all_seen_post:
+                    if each_vb.id == each_id:
+                        orderd_all_seen_post.append(each_vb)
+
+        topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
+    except Exception as e1:
+        topics = []
+
+    try:
+        if language_id:
+            all_user = UserProfile.objects.filter(is_popular = True, language=language_id)[:20]
+            popular_bolo=all_user
+        else:
+            all_user = UserProfile.objects.filter(is_popular = True)[:20]
+            popular_bolo=all_user
+    except Exception as e1:
+        popular_bolo = []
+
+    try:
+        hash_tags = TongueTwister.objects.order_by('-hash_counter')[:20]
+    except Exception as e1:
+        hash_tags = []
+    print popular_bolo.__dict__
+
+ 
+    context = {
+        'categories':categories,
+        'hash_tags':hash_tags,
+        'topics':topics,
+        'popular_bolo':popular_bolo,
+        'is_single_topic': "Yes",
+    }  
+    video_slug = request.GET.get('video',None)
+    if(video_slug != None):
+        return redirect('/video/'+video_slug)
+    else:
+        #return render(request, 'spirit/topic/boloindya_feed.html',context)
+        return render(request, 'spirit/topic/trending_feed.html',context)
+
 
 
 
@@ -925,6 +1248,9 @@ def latest_home(request):
 def login_user(request):
 
     nextURL = request.GET.get('next',None)
+    if nextURL == None:
+        nextURL= '/feed/'
+
     context = {
         'is_single_topic': "Yes",
         'next_page_url':nextURL

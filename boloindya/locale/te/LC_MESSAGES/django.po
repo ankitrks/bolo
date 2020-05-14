@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-20 11:35+0530\n"
+"POT-Creation-Date: 2020-04-28 09:33+0530\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -46,7 +46,7 @@ msgstr ""
 msgid "A new comment has been made"
 msgstr ""
 
-#: drf_spirit/models.py:12 jarvis/models.py:197
+#: drf_spirit/models.py:12 jarvis/models.py:254
 msgid "title"
 msgstr ""
 
@@ -574,83 +574,95 @@ msgstr ""
 msgid "Send message"
 msgstr ""
 
-#: jarvis/models.py:17
+#: jarvis/models.py:18
 msgid "Category Name"
 msgstr ""
 
-#: jarvis/models.py:28
+#: jarvis/models.py:29
 msgid "S3 File URL"
 msgstr ""
 
-#: jarvis/models.py:30
+#: jarvis/models.py:31
 msgid "Transcoded File URL"
 msgstr ""
 
-#: jarvis/models.py:31
+#: jarvis/models.py:32
 msgid "Transcode Job ID"
 msgstr ""
 
-#: jarvis/models.py:32
+#: jarvis/models.py:33
 msgid "Transcode Dump"
 msgstr ""
 
-#: jarvis/models.py:33
+#: jarvis/models.py:34
 msgid "Filename Uploaded"
 msgstr ""
 
-#: jarvis/models.py:34 jarvis/models.py:35 jarvis/models.py:36
+#: jarvis/models.py:35 jarvis/models.py:36 jarvis/models.py:37
 msgid "Filename changed"
 msgstr ""
 
-#: jarvis/models.py:37
+#: jarvis/models.py:38
 msgid "Is Free Video?"
 msgstr ""
 
-#: jarvis/models.py:38
+#: jarvis/models.py:39
 msgid "Video Title"
 msgstr ""
 
-#: jarvis/models.py:40
+#: jarvis/models.py:41
 msgid "Video Description"
 msgstr ""
 
-#: jarvis/models.py:41
+#: jarvis/models.py:42
 msgid "Meta Title"
 msgstr ""
 
-#: jarvis/models.py:42
+#: jarvis/models.py:43
 msgid "Meta Description"
 msgstr ""
 
-#: jarvis/models.py:43
+#: jarvis/models.py:44
 msgid "Meta Keywords"
 msgstr ""
 
-#: jarvis/models.py:44
+#: jarvis/models.py:45
 msgid "Thumbnail URL"
 msgstr ""
 
-#: jarvis/models.py:45
+#: jarvis/models.py:46
 msgid "duration"
 msgstr ""
 
-#: jarvis/models.py:198
+#: jarvis/models.py:238 jarvis/models.py:259
+msgid "category"
+msgstr ""
+
+#: jarvis/models.py:255
 msgid "description"
 msgstr ""
 
-#: jarvis/models.py:216
+#: jarvis/models.py:263
+msgid "image_url"
+msgstr ""
+
+#: jarvis/models.py:267
+msgid "particular_user_id"
+msgstr ""
+
+#: jarvis/models.py:279
 msgid "State Name"
 msgstr ""
 
-#: jarvis/models.py:217
+#: jarvis/models.py:280
 msgid "District Name"
 msgstr ""
 
-#: jarvis/models.py:223
+#: jarvis/models.py:286
 msgid "State District Language"
 msgstr ""
 
-#: jarvis/models.py:224
+#: jarvis/models.py:287
 msgid "State District Languages"
 msgstr ""
 
@@ -668,8 +680,8 @@ msgstr ""
 #: templates/admin/forum_comment/comment/change_list.html:166
 #: templates/admin/forum_comment/comment/change_list1.html:39
 #: templates/admin/forum_topic/topic/change_form.html:158
-#: templates/admin/forum_topic/topic/change_list.html:167
-#: templates/admin/forum_user/referralcode/change_list.html:83
+#: templates/admin/forum_topic/topic/change_list.html:299
+#: templates/admin/forum_user/referralcode/change_list.html:328
 msgid "Home"
 msgstr ""
 
@@ -699,8 +711,8 @@ msgstr ""
 #: templates/admin/forum_comment/comment/change_list.html:247
 #: templates/admin/forum_comment/comment/change_list1.html:68
 #: templates/admin/forum_topic/topic/change_form.html:200
-#: templates/admin/forum_topic/topic/change_list.html:248
-#: templates/admin/forum_user/referralcode/change_list.html:110
+#: templates/admin/forum_topic/topic/change_list.html:380
+#: templates/admin/forum_user/referralcode/change_list.html:411
 msgid "Please correct the error below."
 msgstr ""
 
@@ -708,27 +720,28 @@ msgstr ""
 #: templates/admin/forum_comment/comment/change_list.html:247
 #: templates/admin/forum_comment/comment/change_list1.html:68
 #: templates/admin/forum_topic/topic/change_form.html:200
-#: templates/admin/forum_topic/topic/change_list.html:248
-#: templates/admin/forum_user/referralcode/change_list.html:110
+#: templates/admin/forum_topic/topic/change_list.html:380
+#: templates/admin/forum_user/referralcode/change_list.html:411
 msgid "Please correct the errors below."
 msgstr ""
 
 #: templates/admin/forum_comment/comment/change_list.html:184
-#: templates/admin/forum_topic/topic/change_list.html:185
-#: templates/admin/forum_user/referralcode/change_list.html:101
+#: templates/admin/forum_topic/topic/change_list.html:317
+#: templates/admin/forum_user/referralcode/change_list.html:346
 #, python-format
 msgid "Add %(name)s"
 msgstr ""
 
 #: templates/admin/forum_comment/comment/change_list.html:213
 #: templates/admin/forum_comment/comment/change_list1.html:79
-#: templates/admin/forum_topic/topic/change_list.html:214
-#: templates/admin/forum_user/referralcode/change_list.html:123
+#: templates/admin/forum_topic/topic/change_list.html:346
+#: templates/admin/forum_user/referralcode/change_list.html:377
 msgid "Filter"
 msgstr ""
 
 #: templates/admin/forum_comment/comment/change_list.html:274
-#: templates/admin/forum_topic/topic/change_list.html:275
+#: templates/admin/forum_topic/topic/change_list.html:407
+#: templates/admin/forum_user/referralcode/change_list.html:438
 msgid "Save"
 msgstr ""
 

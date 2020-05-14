@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('jarvis', '0032_merge_20200127_1427'),
+        #('jarvis', '0032_merge_20200127_1427'),
         ('jarvis', '0032_auto_20200121_1303'),
     ]
 

@@ -1,15 +1,15 @@
-{% extends "spirit/_new_base.html" %}
+{% extends "spirit/_new_home_base.html" %}
 {% load i18n %}
 {% block title %}BoloIndya{% endblock %}
 {% block content %}
 <style>
     .upper_tab {
-        background: #fff;
+        /*background: #fff;*/
         padding: 30px 0px;
-        font-family: Arial;
         font-weight: 400;
         font-size: 16px;
         line-height: 24px;
+        margin-top: 30px;
         margin-bottom: 30px;
         color: rgb(79, 82, 90);
 
@@ -19,12 +19,13 @@
 .base-layout-container {
     max-width: 100%;
     box-sizing: border-box;
-    padding: 70px;
+    padding: 30px;
+    margin-top: 40px;
     margin: auto;
-    background: rgb(255, 255, 255);
+    background: var(--primary-bg-color);
 }
 .base-layout-container h1:first-child {
-    font-family: sofiapro-bold, PingFangSC, sans-serif;
+
     font-weight: 700;
     font-size: 48px;
     line-height: 1;
@@ -34,52 +35,25 @@
     margin-top: 20px;
     margin-bottom: 20px
 }
+@media(max-width: 991px){
+    .margin_bottom_20{
+        margin-top: 57px;
+    }
+}
 
 
 </style>
 <div class="jsx-193618068 base-layout-container">
     <div class="upper_tab">
-        <div class="container">
+        <div class="container1" style="width: 100%">
             <div class="margin_bottom_20" style="text-align:center;font-size:30px;">Terms of Service</div>
             <div class="row m-0">
                 {{terms_and_condition.page_description | safe}}
-<!--                 <p>The following Terms of Use apply to all users of Bolo Indya, a brand of Career Anna Education Private Limited. The terms and conditions mentioned here apply to all users of www.boloindya.com, Bolo Indya Mobile Applications and other services that may be offered by Career Anna Education Pvt Ltd (referred hereafter as “Bolo Indya,” “us”, “we” and “our”) from time to time (collectively, the “Services”). BY USING THE SERVICES, YOU AGREE TO THESE TERMS OF USE; IF YOU DO NOT AGREE TO THESE TERMS OF USE, PLEASE DO NOT USE THE SERVICES.</p>
-                <p>Bolo Indya reserves the right to change these Terms of Use from time to time at its sole discretion without notice to you. You agree to the changes to these Terms of Use by your continued use of the Services after we post notice of such changes. If you do not agree to any changes we make to the Terms of Use, you must cease use of the Services.</p>
-
-                <h3 class="margin_bottom_20">Your Use of the Services</h3>
-                <p>You may not attempt to gain unauthorized access to any systems or networks connected to the Services, by hacking, password “mining” or any other illegitimate means. You may not probe, scan or test the vulnerability of any network connected to the Services, nor breach the security or authentication measures for the Services or any network connected to the Services. You agree that you will not take any action that imposes an unreasonable or disproportionately large burden on the infrastructure of Bolo Indya’s systems or networks, or any systems or networks connected to the Services. You agree not to use any device, software or routine to interfere or attempt to interfere with the proper working of the Services or with any other person’s use of the Services.
-                You may not manipulate identifiers in order to disguise the origin of any message you send through the Services.
-                You may not pretend that you are, or that you represent, someone else, or impersonate any other individual or entity.
-                You may not use, sell or otherwise exploit the Services for any commercial purposes.
-                You may not use the Services for any purpose that is unlawful or prohibited by these Terms of Use.
-                You may not use the Services to post or transmit any content that is libelous, defamatory, false, misleading, inaccurate, unlawful, obscene, racially or ethnically offensive, or objectionable, or that you have reason to believe infringes or otherwise violates the copyright, trade secret, patent, publicity, privacy or other intellectual property or proprietary rights of any person or entity. The Content you post or transmit may not contain profanity, intense violence, nudity or sexually explicit images, hate speech, graphic depiction of sexual activity or behavior, or the depiction of illegal drug use or the abuse of alcohol, drugs, or tobacco. 
-                In the case of any violation of these Terms of Use, Bolo Indya reserves the right to 
-                1) restrict or prohibit your use of the Services, and/or 2) seek all remedies available by law and in equity for such violations.</p>
-                <h3 class="margin_bottom_20">Privacy Policy</h3>
-                <p>Bolo Indya’s Privacy Policy applies to personal information you provide in connection with the Services. By using the Services you agree to the terms of Bolo Indya’s Privacy Policy. Click Here to See it.</p>
-                <h3 class="margin_bottom_20">Content</h3>
-                <p>Bolo Indya is a user generated content platform and does not endorse any views or opinions mentioned in the content posted by users on the platform. Any legal or other action taken on any user by any 3rd party because of any posted content shall not bear any impact on Bolo Indya. In such cases, Bolo Indya will follow the law of the land and cooperate in any procedures of the law for justice to be met to involved stakeholders. 
-                Bolo Indya reserves the right to remove any published content if it is found inappropriate as per the platform guidelines.</p> 
-                <h3 class="margin_bottom_20">General Disclaimer</h3>
-                <p>BOLO INDYA SHALL NOT BE LIABLE FOR ANY INDIRECT, SPECIAL, CONSEQUENTIAL, OR INCIDENTAL DAMAGES INCLUDING, WITHOUT LIMITATION, LOST PROFITS OR REVENUES, COSTS OF REPLACEMENT GOODS, LOSS OR DAMAGE TO DATA ARISING OUT OF THE USE OR INABILITY TO USE THE SERVICES, EVEN IF BOLO INDYA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p>
-
-                <h3 class="margin_bottom_20">Indemnification</h3>
-                <p>You agree to defend, indemnify, and hold us, our affiliated companies, employees, representatives and agents harmless from all liabilities, claims, and expenses, including attorneys’ fees, that arise from your use or misuse of the Services.</p>
-
-                <h3 class="margin_bottom_20">International Use</h3>
-                <p style="display:block;width:100%;">The use of services is only prohibited for those countries where the Services are illegal as per the law of the respective country.</p>
-
-                <h3 class="margin_bottom_20">General Terms</h3>
-                <p>Bolo Indya may modify the Services or discontinue the Services at any time without notice. You agree that Bolo Indya shall not be liable to you or to any third party for any modification, suspension or discontinuance of the Services.
-                These Terms of Use and the relationship with you shall be governed by the laws of Government of India, and any dispute shall be settled in the court of law in the state of Haryana, at the court located in the city of Gurugram. 
-                The failure of Bolo Indya to exercise or enforce any right or provision of these Terms of Service shall not constitute a waiver of such right or provision. If for any reason a court finds that any provision or portion of these Terms of Use is unenforceable, the remainder of these terms will continue in force and effect.</p>
-
-                Last Updated: May 9, 2019 -->
-
 
             </div>
         </div>
     </div>
+</div>
 </div>
 
     {% endblock %}

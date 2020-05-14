@@ -1,4 +1,4 @@
-{% extends "spirit/_new_base.html" %}
+{% extends "spirit/_new_home_base.html" %}
 {% load i18n %}
 {% load number_formate_change_tag %}
 {% block title %}BoloIndya{% endblock %}
@@ -26,6 +26,9 @@
 .autocomplete {
   position: relative;
   display: inline-block;
+}
+#loginURLId{
+    display: none !important;
 }
 
 
@@ -301,7 +304,7 @@
 }
 
 .about-content .about-article h2{
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: Roboto, sans-serif;
     font-weight: 700;
     font-size: 23px;
     line-height: 1;
@@ -473,7 +476,7 @@
 }
 .header-bar1{
     color: #fff;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: Roboto, sans-serif;
     font-weight: 700;
     font-size: 23px;
     line-height: 1;
@@ -502,7 +505,7 @@
 
 .header-bar1 {
     color: #fff;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: Roboto, sans-serif;
     font-weight: 700;
     font-size: 14px;
     line-height: 1.5rem;
@@ -721,7 +724,7 @@
     font-weight: bold;
 }
 .slogan{
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: Roboto, sans-serif;
     font-weight: 700;
     font-size: 40px;
     margin-top: 30px;
@@ -766,15 +769,20 @@
    margin-bottom: 20px;
    color: #fff; 
 }
+.bottomHeaing h2 {
+margin-bottom: 23px;
+margin-top: 38px;
+}
 @media(max-width: 991px){
 .slogan{
-    margin-top: 10px;
+    margin-top: 80px;
     font-size: 24px;
 }
 
 .bottomHeaing h2 {
-    color: #fff;
-    margin-top: 30px;
+    color: var(--primary-color);
+    margin-top: 38px;
+    margin-bottom: 23px;
     font-size: 18px;
 }
 .headingJoin{
@@ -784,6 +792,280 @@
 .mainColor{
     color: #b62927;
 }
+/*.logo-container .logo-text{
+    width: 300px;
+}*/
+
+.about-img1 .language-selection {
+    color: #131212;
+    display: inline-block;
+}
+
+.leftImage{
+    display: inline-block;
+    float: left;
+    position: absolute;
+    left: 92px;
+    top: 30px;
+}
+.rightImage{
+    display: inline-block;
+    float: right;
+    position: absolute;
+    right: 92px;
+    top: 30px;
+}
+.sideImageHeight{
+    height: 100%;
+}
+.download_height{
+    height: 50px;
+}
+.socialImageSize{
+    height: 45px;
+}
+.paddingSocialShare{
+    padding: 5px;
+}
+._social_h::before {
+    content: '';
+    display: inline-block;
+    height: 18px;
+    margin: 0 6px -3px 0;
+    min-width: 18px;
+    position: relative;
+    top: -2px;
+    width: 18px;
+    background-image: url(/media/social_share_image.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: 0 -156px;
+
+}
+.socialShareP{
+    margin-top: 10px;
+}
+@media(max-width: 991px){
+    .page-with-header {
+        padding-top: 0px;
+    }
+    .sideImageHeight{
+        height: 200px;
+    }
+
+    .leftImage {
+        display: inline-block;
+        float: left;
+        position: absolute;
+        left: 9px;
+        top: 280px;
+    }
+    .rightImage{
+        display: inline-block;
+        float: right;
+        position: absolute;
+        right: 4px;
+        top: 280px;
+    }
+    .download_height{
+        height: 50px;
+    }
+
+    .socialImageSize {
+        height: 25px;
+    }
+
+}
+
+.about-content .about-img2{
+    position: relative;
+    width: 24%;
+    padding: 1% 0 0 1%;
+}
+.about-content .about-img3{
+    position: relative;
+    width: 48%;
+    padding: 1% 0 0 1%;
+}
+
+@media (max-width: 991px){
+.menu-wrapper.jsx-3143951235>li.jsx-3143951235:nth-child(2), .menu-wrapper.jsx-3143951235>li.jsx-3143951235:nth-child(1) {
+     display: block !important;
+}
+
+.about-content .about-img2{
+    position: relative;
+    width: 98%;
+    padding: 1% 0 0 1%;
+}
+.about-content .about-img3{
+    position: relative;
+    width: 98%;
+    padding: 1% 0 0 1%;
+}
+
+}
+
+
+
+
+.w-btn {
+    position: relative;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    background: #ef403d;
+    -webkit-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: -webkit-inline-box;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    padding-bottom: calc(0.375em - 1px);
+    padding-left: 0.75em;
+    padding-right: 0.75em;
+    padding-top: calc(0.375em - 1px);
+    text-align: center;
+    white-space: nowrap;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    line-height: 1.5;
+    vertical-align: top;
+}
+.w-btn.has-red-grad {
+    border-radius: 4px;
+    height: 50px;
+    background-image: -webkit-gradient(linear, right top, left top, from(#b62927), to(#d02035));
+    background-image: linear-gradient(to left, #b62927, #d02035);
+    color: #fff;
+    padding: 0 40px;
+    border: none;
+    margin-top: 20px;
+}
+
+
+</style>
+
+<style type="text/css">
+    .TransitionCardNew {
+    background: #FFFFFF;
+    -webkit-box-shadow: 0px 0px 64px rgba(0,0,0,0.07);
+    box-shadow: 0px 0px 64px rgba(0,0,0,0.07);
+    border-radius: 8px;
+    width: 270px;
+    padding: 20px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    text-align: center;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+}
+
+.TransitionCardNew__profileIcon {
+    height: 106px;
+    width: 106px;
+    border-radius: 50%;
+    border: 3px solid #1F70C1;
+}
+.TransitionCardNew__profileIcon__icon {
+    border: 3px solid white;
+    height: 100%;
+    border-radius: 50%;
+}
+.TransitionCardNew__name {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 14px;
+    color: #E92E3D;
+    margin-top: 14px;
+}
+.TransitionCardNew__bio {
+    margin-top: 10px;
+    color: #000;
+    line-height: 1.5rem;
+    text-align: initial;
+    font-size: 14px;
+}
+.TransitionCardNew__bottom {
+    background: linear-gradient(180.27deg, #F8F8F8 4.01%, rgba(248,248,248,0) 80.93%);
+    border-radius: 6px;
+    margin-top: 20px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    width: 100%;
+}
+.TransitionCardNew img {
+    max-width: 100%;
+    width: 100%;
+}
+.carousel__wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    transition-property: -webkit-transform;
+    -webkit-transition-property: -webkit-transform;
+    transition-property: transform;
+    transition-property: transform, -webkit-transform;
+    -webkit-box-sizing: content-box;
+    box-sizing: content-box;
+    -webkit-transition: background-color 0.25s linear, color 0.05s linear, opacity 0.25s linear, visibility 0.25s linear, -webkit-filter 0.25s linear, -webkit-transform 0.25s linear;
+    transition: background-color 0.25s linear, color 0.05s linear, opacity 0.25s linear, visibility 0.25s linear, -webkit-filter 0.25s linear, -webkit-transform 0.25s linear;
+    transition: background-color 0.25s linear, color 0.05s linear, opacity 0.25s linear, filter 0.25s linear, visibility 0.25s linear, transform 0.25s linear;
+    transition: background-color 0.25s linear, color 0.05s linear, opacity 0.25s linear, filter 0.25s linear, visibility 0.25s linear, transform 0.25s linear, -webkit-filter 0.25s linear, -webkit-transform 0.25s linear;
+}
+
+.about-content .about-img1-review {
+    position: relative;
+    width: 90%;
+    padding: 0 0 0 10%;
+    display: flex;
+    margin-bottom: 20px;
+}
+.oneItemSize{
+    width: 270px; margin-right: 20px;
+}
+@media(max-width: 991px){
+    .about-content .about-img1-review {
+        position: relative;
+        width: 100%;
+        padding: 0 0 0 0;
+        display: block;
+        margin-bottom: 20px;
+    }
+    .oneItemSize{
+        width: 100%; margin-right: 20px;
+    }
+
+
+
+}
+
 </style>
 
 <script type="text/javascript">
@@ -801,19 +1083,44 @@
             <div class="jsx-1929076256 about-img">
                 <div class="jsx-1994528170 banner-video-container">
                     <div class="video-wall" style="min-height: 540px;">
-                        <h2 class="slogan">Short Knowledge Videos</h2>
-                        <div class="header-bar1" style="text-align: center;padding: 20px;"><span class="mainColor">Watch</span> and <span class="mainColor">Create</span> in Your Language</div>
-                            <div class="owl-slider" id="slideshow">
+<!--                         <h1 style="margin:auto;" class="jsx-475503780 logo-container">
+                            <img id="boloindyaLogoId" src="/media/boloindya_new_logo.png" alt="boloindya" class="jsx-475503780 logo-text">
+                        </h1> -->
+                        <h2 style="margin-bottom: 20px;"  class="slogan">Short <span style="color: #b62927">Videos</span> You <span style="color: #b62927">Love</span></h2>
+
+                    <div id="typed-strings" style="display: none;">
+                        <p>Watch and Create Value Adding Videos in Hindi</p>
+                        <p>Watch and Create Value Adding Videos in Tamil</p>
+                        <p>Watch and Create Value Adding Videos in Telugu</p>
+                        <p>Watch and Create Value Adding Videos in Bangla</p>
+                        <p>Watch and Create Value Adding Videos in Kannada</p>
+                        <p>Watch and Create Value Adding Videos in Gujarati</p>
+                        <p>Watch and Create Value Adding Videos in Marathi</p>
+                        <p>Watch and Create Value Adding Videos in Punjabi</p>
+                        <p>Watch and Create Value Adding Videos in Malayalam</p>
+                        <p>Watch and Create Value Adding Videos in Odia</p>
+                        <p>Watch and Create Value Adding Videos in English</p>
+                        <p>Watch and Create Value Adding Videos in 11&nbsp;Indian&nbsp;languages</p>
+
+                    </div>
+                    <h2 class="header-bar1" style="text-align: center;padding: 20px;">
+                        <span id="typed"></span>
+                    </h2>
+
+
+<!--                         <div class="header-bar1" style="text-align: center;padding: 20px;"><span class="mainColor">Watch</span> and <span class="mainColor">Create</span> in Your Language</div> -->
+                          <div class="owl-slider" id="slideshow">
                                 <div id="carousel" class="owl-carousel">
                                     
-                                    {% for itemVideo in topics %}
+                                    {% for itemVideo in sliderVideos %}
                                     
 
                                     <div class="_video_feed_item1 item">
                                         <img onClick="openVideoInPopupSlider('{{itemVideo.id}}','{{itemVideo.question_video | get_video_cdn}}','{{itemVideo.backup_url}}','{{itemVideo.question_image}}');" class="_video_card_mute _video_card_mute_left_top muteSrcId_{{itemVideo.id}}" id="mutedImageId" src="/media/sound_mute.svg">
                                         <span id="video_play_item_{{itemVideo.id}}">
-                                            <video onClick="openVideoInPopupSlider('{{itemVideo.id}}','{{itemVideo.question_video | get_video_cdn}}','{{itemVideo.backup_url}}','{{itemVideo.question_image}}');"   id="player-{{itemVideo.id}}" preload="auto" muted autoplay="false" poster="{{itemVideo.question_image}}" class="videoCentered videoSliderPlay">
+                                            <video onClick="openVideoInPopupSlider('{{itemVideo.id}}','{{itemVideo.question_video | get_video_cdn}}','{{itemVideo.backup_url}}','{{itemVideo.question_image}}');"   id="player-{{itemVideo.id}}" preload="auto" muted autoplay poster="{{itemVideo.question_image}}" class="videoCentered videoSliderPlay">
                                                 <source src="{{itemVideo.question_video | get_video_cdn}}" type="application/x-mpegURL">
+                                                <source src="{{itemVideo.question_video}}" type="application/x-mpegURL">
                                                 <source src="{{itemVideo.backup_url}}" type="video/mp4">
                                             </video>   
                                         </span>
@@ -821,50 +1128,254 @@
                                     </div>
                                     {% endfor %}
                                 </div>
-
-
-<!--                                 <div class="ajax-load text-center" >
-                                    <p><img src="/media/loader.gif"></p>
-                                </div> -->
-                            </div>
+                            </div>  
                     </div>
                 </div>
             </div>
         </div>
 
+<!--     <section currentprofession="default" devicetype="desktop" style="margin-top: 30px;height: 92px;" class="BoloIndyaSupport" data-v-6da28080="">
+        <div class="jsx-1929076256 about-img1 bottomHeaing" style="text-align: center;">
+            <h2 >Earn Money as You Express Yourself</h2>
+
+        </div>
+    </section> -->
+
+    <style type="text/css">
+        .download-sms * {
+    outline: none;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+.download-container .download-content .download-wrapper {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+    -webkit-align-items: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+}
+.download-sms form {
+    position: relative;
+    height: 43px;
+    -webkit-align-items: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #8A8B91;
+    border-right: none;
+    border-radius: 2px;
+    font-size: 0px;
+    display: -webkit-inline-box;
+    display: -webkit-inline-flex;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+
+}
+.download-sms .select {
+    width: 72px;
+    color: #8A8B91;
+    text-align: center;
+    cursor: pointer;
+}
+.download-sms input {
+    height: 30px;
+    background: none;
+    border: none;
+}
+
+.download-sms form>* {
+    font-size: 18px;
+}
+.download-sms .select+img {
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    margin-right: 10px;
+}
+.download-sms .phone-input {
+    width: 290px;
+    border-left: 1px solid #DCDCDE;
+    text-indent: 20px;
+}
+.download-sms input {
+    height: 30px;
+    background: none;
+    border: none;
+}
+.download-sms button {
+    padding: 0px 14px;
+    height: 43px;
+    line-height: 43px;
+    outline: none;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    cursor: pointer;
+    background-color: #b62927;
+    color: #ffffff;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-left: 0;
+    margin-right: 0px;
+}
+    </style>
+
         <div class="jsx-1929076256 about-content">
-            <div class="jsx-1929076256 about-img1">
-                <h2 class="header-bar1">Most Watched Categories</h2>
-                <div class="_explore_page_feed_wrapper" id="categoryIdList">
+
+            <div class="jsx-1929076256 about-img3 bottomHeaing" style="text-align: center;">
+                <h2 >Text Yourself a Link to Download Bolo Indya</h2>
+<div class="jsx-1830994819 form-wrap download-content download-sms">
+    <form class="jsx-1830994819 download-wrapper" action="javascript:void()">
+        <input value="IN+91" readonly="" class="jsx-1830994819 select">
+        <input placeholder="Phone number" id="phone_sms_id" value="" pattern="[1-9]{1}[0-9]{9}" class="jsx-1830994819 phone-input">
+        <button type="button" class="jsx-1830994819" onclick="send_download_link();">Send</button>
+        <span id="error_message"></span>
+    </form>
+</div>
+
+<!--                 <a href="/bolo-action/" class="w-btn has-red-grad">Read Earning Terms</a>
+ -->
+            </div>
+            <div class="jsx-1929076256 about-img2 ">
+                <a href="https://play.google.com/store/apps/details?id=com.boloindya.boloindya&hl=en_IN">
+                    <div class="header-bar1" style="text-align: center;padding: 20px;">
+                        <h3 class="" style="margin:0 0 20px 0; font-size: 26px;text-align: center;">Download the App</h3>
+                        <img class="download_height" src="/media/google_store.png">
+                    </div>
+                </a>
+            </div>
+
+            <div class="jsx-1929076256 about-img2">
+                <h3 class="" style="margin: 41px -1px -14px -35px;font-size: 26px;text-align: center;">Follow us</h3>
+                <div class="" id="" style="display: inline-block;margin: 22px auto;">
                     <div class="jsx-1289101510 _explore_feed_wrapper">
                         <div class="">
-                            <div class="jsx-4249974497 _explore_feed_container">
-                                <div class="" id="catWithVideoId">
+                            <div class="jsx-42">
+                                <p class="socialShareP" style="text-align: center;">
+                                    <a target="_blank" href="https://www.facebook.com/BoloIndya/">
+                                        <span class="paddingSocialShare"><img class="socialImageSize" src="/media/facebook_share.png"></span>
+                                    </a>
+                                    <a target="_blank" href="https://twitter.com/bolo_indya?lang=en">
+                                        <span class="paddingSocialShare"><img class="socialImageSize" src="/media/twitter.png"></span>
+                                    </a>
+                                    <a target="_blank" href="https://www.instagram.com/bolo.indya/">
+                                        <span class="paddingSocialShare"><img class="socialImageSize" src="/media/instagram.png"></span>
+                                    </a>
+                                    <a target="_blank" href="https://www.linkedin.com/company/bolo-indya">
+                                        <span class="paddingSocialShare"><img class="socialImageSize" src="/media/linkedin.png"></span>
+                                    </a>                   
+                                     <a target="_blank" href="https://www.youtube.com/channel/UCcS07H-zu67HcM7fmDBoF-g">
+                                        <span class="paddingSocialShare"><img class="socialImageSize" src="/media/Youtube.png"></span>
+                                    </a>
+                                </p>
 
-                                </div>
                                
                             </div>
                             
                         </div>
                     </div>
-                    <div class="jsx-1289101510 _explore_feed_wrapper">
-                        <div class="">
-                            <div class="jsx-4249974497 _explore_feed_container">
-                                <div class="" id="catWithVideoIdRight">
-  
-                                </div>
-                            </div>
-                            <div class="jsx-4249974497 _scroll_load_more_loading_right" style="display: none;"></div>
-                        </div>
-                    </div>
-
                 </div>
-                    <div class="jsx-4249974497 _scroll_load_more_loading_left" style="text-align: center;"></div>
+
+            </div>
+
+        </div>
+
+<hr>
+<h2 style="margin-bottom: 20px;" class="slogan">We love our users  <span style="">&</span> so do they !</h2>
+        <div class="jsx-1929076256 about-content ">
+
+            <div class="jsx-1929076256 about-img1-review bottomHeaing " style="text-align: center;">
+                
+                <section class="TransitionCardNew carousel__slide PlacementSupport__carousel__card swiper-slide-active oneItemSize">
+                    <div class="TransitionCardNew__profileIcon"><img src="/media/review1.png" class="TransitionCardNew__profileIcon__icon"></div>
+                    <p class="TransitionCardNew__name">Ishan Yadav</p>
+                    <p class="TransitionCardNew__bio">Bolo Indya is an Application which has the conviction of being a long term platform for Knowledge and Creativity sharing. Its basically Irrfan Khan in the generation of Dhinchak Pooja. And not just as a Creator, but as a viewer also I enjoy learning as much as I love creating. An App both for the kitchen and for the soul.</p>
+
+                </section>
+                <section class="TransitionCardNew carousel__slide PlacementSupport__carousel__card swiper-slide-active oneItemSize" >
+                    <div class="TransitionCardNew__profileIcon"><img src="/media/review2.jpg" class="TransitionCardNew__profileIcon__icon"></div>
+                    <p class="TransitionCardNew__name">Mounica Monu</p>
+                    <p class="TransitionCardNew__bio">Excellent app that helped me a lot to share my knowledge and earn money. I personally request everyone to use this application to share your knowledge and also to learn new things from others. This application acts as a wonderful platform for earning money and also in gaining and sharing of knowledge</p>
+
+                </section>
+                <section class="TransitionCardNew carousel__slide PlacementSupport__carousel__card swiper-slide-active oneItemSize" >
+                    <div class="TransitionCardNew__profileIcon"><img src="/media/review5.jpg" class="TransitionCardNew__profileIcon__icon"></div>
+                    <p class="TransitionCardNew__name">Rahul Srivastava</p>
+                    <p class="TransitionCardNew__bio">Awesome experience learned many things here an shared bit of my knowledge also I am very happy to be a part of this team and they do handle it very carefully and clear all the queries within no time. They encourage each and every individual and support them by giving good advices</p>
+
+                </section>                
+                <section class="TransitionCardNew carousel__slide PlacementSupport__carousel__card swiper-slide-active oneItemSize" >
+                    <div class="TransitionCardNew__profileIcon"><img src="/media/review3.jpg" class="TransitionCardNew__profileIcon__icon"></div>
+                    <p class="TransitionCardNew__name">Ushi style</p>
+                    <p class="TransitionCardNew__bio">Very nice app for making videos in hindi....it is very unique app that promote our mother tongue thanks alot for making this app😍.This App will make India Proud. Gives amazing opportunity of Earning Money by making videos & Also Referring Friends. Just Received my first Payment from the Admin directly.</p>
+
+                </section>
+
+
+
+
             </div>
         </div>
+
+
+
+<!--         <div class="jsx-1929076256 about-content">
+            <div class="jsx-1929076256 about-img1">
+                <h3 class="" style="margin: 30px 1px -10px 8px;font-size: 26px;text-align: center;">Follow us On</h3>
+                <div class="_explore_page_feed_wrapper" id="" style="display: inline-block;margin: 22px auto;">
+                    <div class="jsx-1289101510 _explore_feed_wrapper">
+                        <div class="">
+                            <div class="jsx-42">
+                                <p class="socialShareP" style="text-align: center;">
+                                    <a target="_blank" href="https://www.facebook.com/BoloIndya/">
+                                        <span class="paddingSocialShare"><img class="socialImageSize" src="/media/facebook_share.png"></span>
+                                    </a>
+                                    <a target="_blank" href="https://twitter.com/bolo_indya?lang=en">
+                                        <span class="paddingSocialShare"><img class="socialImageSize" src="/media/twitter.png"></span>
+                                    </a>
+                                    <a target="_blank" href="https://www.instagram.com/bolo.indya/">
+                                        <span class="paddingSocialShare"><img class="socialImageSize" src="/media/instagram.png"></span>
+                                    </a>
+                                    <a target="_blank" href="https://www.linkedin.com/company/bolo-indya">
+                                        <span class="paddingSocialShare"><img class="socialImageSize" src="/media/linkedin.png"></span>
+                                    </a>                   
+                                     <a target="_blank" href="https://www.youtube.com/channel/UCcS07H-zu67HcM7fmDBoF-g">
+                                        <span class="paddingSocialShare"><img class="socialImageSize" src="/media/Youtube.png"></span>
+                                    </a>
+                                </p>
+
+                               
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+<div class="header-bar1" style="text-align: center;padding: 20px;">
+    <h3 class="" style="margin: 15px;font-size: 26px;text-align: center;">Download the App</h3>
+    <img class="download_height" src="/media/playstore.png">
+</div> -->
+
+
+
     </div>
     
-    <section currentprofession="default" devicetype="desktop" class="BoloIndyaSupport" data-v-6da28080="">
+<!--     <section currentprofession="default" devicetype="desktop" class="BoloIndyaSupport" data-v-6da28080="">
         <div class="jsx-1929076256 about-img1 bottomHeaing" style="text-align: center;">
             <h2 style="margin-bottom: 20px;">Earn As You Share Your Knowledge</h2>
             <a class="data-v-6da28080" target="_blank" href="/bolo-action">Read Earning Terms</a>
@@ -878,13 +1389,14 @@
                 <p style="margin-bottom: 20px;"><a class="data-v-6da28080" target="_blank" href="https://angel.co/company/bolo-indya/jobs">See Open Positions</a></p>
             </div>
         </div>
-    </section>
+    </section> -->
 
 </div>
 
 
 <!-- List View Display Data -->
 <script src="/media/js/latest_home.js"></script>
+<script src="/media/js/typed.min.js"></script>
 
 <!-----------End  ------------>
 <script>
@@ -902,13 +1414,13 @@
         nav: true,
         responsive: {
           0: {
-            items: 2
+            items: 1
           },
           600: {
-            items: 2
+            items: 1
           },
           1024: {
-            items: 4,
+            items: 2,
             slideBy: 4,
           },
           1366: {
@@ -917,11 +1429,55 @@
           }
         }
       });
+$(function() {
+    var typed = new Typed('#typed', {
+        stringsElement: '#typed-strings',
+        typeSpeed: 30,
+        backSpeed: 30
+    });
+});
 </script>
 
 <!-- Start Comments Section -->
 {% include "spirit/_video_play_and_comments.html" %}
 <!-- End Load Comments  -->
+<script type="text/javascript">
+$('#phone_sms_id').on('keypress',function(evt){
+    var phoneNo = document.getElementById('phone_sms_id').value;debugger;
+    if(phoneNo.length>10){
+        return false;
+    }
+    evt = (evt) ? evt : window.event;
+    var charCode = (evt.which) ? evt.which : evt.keyCode;
+    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+        return false;
+    }
+    return true;
+});
 
+var sendStatus=0;
+function send_download_link(){
+    if(sendStatus==0){
+        var phoneNo = document.getElementById('phone_sms_id').value
+        var uri='/api/v1/send_link_to_user/';
+        var res = encodeURI(uri);
+        jQuery.ajax({
+            url:res,
+            data:{'phone':phoneNo},
+            type:"POST",
+            success: function(response,textStatus, xhr){
+                sendStatus=1;
+                $("#error_message").html('<span style="color:green">Download Link Successfully send to your number</span>');
+            }
+      
+        });
+    }else{
+        $("#error_message").html('<span style="color:red">Kindly check your message box</span>');
+    }
+
+
+}
+
+</script>
 
 {% endblock %}

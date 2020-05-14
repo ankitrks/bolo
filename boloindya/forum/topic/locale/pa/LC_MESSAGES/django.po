@@ -1,0 +1,669 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-04-28 09:33+0530\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: forum/topic/emails.py:19 forum/topic/emails.py:32
+msgid "A new comment has been made"
+msgstr ""
+
+#: forum/topic/forms.py:35
+msgid "Category"
+msgstr ""
+
+#: forum/topic/forms.py:36
+msgid "Chose a category"
+msgstr ""
+
+#: forum/topic/forms.py:85
+msgid "Name is required"
+msgstr ""
+
+#: forum/topic/forms.py:93
+msgid "Email is required"
+msgstr ""
+
+#: forum/topic/models.py:46 forum/topic/models.py:790
+#: forum/topic/templates/spirit/topic/user_profile.html:188
+msgid "Bolo Score"
+msgstr ""
+
+#: forum/topic/models.py:80 forum/topic/models.py:81
+msgid "category"
+msgstr ""
+
+#: forum/topic/models.py:83 forum/topic/models.py:408
+msgid "hash_tags"
+msgstr ""
+
+#: forum/topic/models.py:86 forum/topic/models.py:410
+msgid "title"
+msgstr ""
+
+#: forum/topic/models.py:87
+msgid "audio title"
+msgstr ""
+
+#: forum/topic/models.py:88
+msgid "video title"
+msgstr ""
+
+#: forum/topic/models.py:90
+msgid "date"
+msgstr ""
+
+#: forum/topic/models.py:91
+msgid "last active"
+msgstr ""
+
+#: forum/topic/models.py:92
+msgid "reindex at"
+msgstr ""
+
+#: forum/topic/models.py:93
+msgid "language"
+msgstr ""
+
+#: forum/topic/models.py:94
+msgid "Question image"
+msgstr ""
+
+#: forum/topic/models.py:95 forum/topic/models.py:96
+msgid "Popular"
+msgstr ""
+
+#: forum/topic/models.py:99
+msgid "duration"
+msgstr ""
+
+#: forum/topic/models.py:100
+msgid "Last Commented"
+msgstr ""
+
+#: forum/topic/models.py:102
+msgid "pinned"
+msgstr ""
+
+#: forum/topic/models.py:103
+msgid "globally pinned"
+msgstr ""
+
+#: forum/topic/models.py:104
+msgid "closed"
+msgstr ""
+
+#: forum/topic/models.py:105
+msgid "removed"
+msgstr ""
+
+#: forum/topic/models.py:106
+msgid "thumbnail"
+msgstr ""
+
+#: forum/topic/models.py:107 forum/topic/models.py:108
+#: forum/topic/models.py:112
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:848
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:864
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:979
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:1001
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:1017
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:811
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:827
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:936
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:958
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:974
+#: forum/topic/templates/spirit/topic/new_landing.html:361
+#: forum/topic/templates/spirit/topic/new_landing.html:377
+msgid "views"
+msgstr ""
+
+#: forum/topic/models.py:109
+msgid "comment count"
+msgstr ""
+
+#: forum/topic/models.py:110
+msgid "Total Share count"
+msgstr ""
+
+#: forum/topic/models.py:111
+msgid "Share count"
+msgstr ""
+
+#: forum/topic/models.py:115
+msgid "Is Video Bytes"
+msgstr ""
+
+#: forum/topic/models.py:116
+msgid "Likes count"
+msgstr ""
+
+#: forum/topic/models.py:118
+msgid "monetized"
+msgstr ""
+
+#: forum/topic/models.py:119
+msgid "moderated"
+msgstr ""
+
+#: forum/topic/models.py:120
+msgid "vb width"
+msgstr ""
+
+#: forum/topic/models.py:121
+msgid "vb height"
+msgstr ""
+
+#: forum/topic/models.py:128
+msgid "backup url"
+msgstr ""
+
+#: forum/topic/models.py:129
+msgid "old_backup url"
+msgstr ""
+
+#: forum/topic/models.py:132
+msgid "Transcode Job ID"
+msgstr ""
+
+#: forum/topic/models.py:133
+msgid "Transcode Dump"
+msgstr ""
+
+#: forum/topic/models.py:134
+msgid "Transcode Status Dump (Job Status)"
+msgstr ""
+
+#: forum/topic/models.py:136
+msgid "M3U8 Content"
+msgstr ""
+
+#: forum/topic/models.py:137
+msgid "Audio M3U8 Content"
+msgstr ""
+
+#: forum/topic/models.py:138
+msgid "Video M3U8 Content"
+msgstr ""
+
+#: forum/topic/models.py:139
+msgid "downloaded URL"
+msgstr ""
+
+#: forum/topic/models.py:157
+msgid "Is Logo Checked"
+msgstr ""
+
+#: forum/topic/models.py:176
+msgid "topic"
+msgstr ""
+
+#: forum/topic/models.py:177
+msgid "topics"
+msgstr ""
+
+#: forum/topic/models.py:422
+msgid "Hash Tag"
+msgstr ""
+
+#: forum/topic/models.py:423
+msgid "English Hash Tag Description"
+msgstr ""
+
+#: forum/topic/models.py:424
+msgid "Hindi Hash Tag Description"
+msgstr ""
+
+#: forum/topic/models.py:425
+msgid "Tamil Hash Tag Description"
+msgstr ""
+
+#: forum/topic/models.py:426
+msgid "Telgu Hash Tag Description"
+msgstr ""
+
+#: forum/topic/models.py:427
+msgid "Bengali Hash Tag Description"
+msgstr ""
+
+#: forum/topic/models.py:428
+msgid "Kannada Hash Tag Description"
+msgstr ""
+
+#: forum/topic/models.py:429
+msgid "Malyalam Hash Tag Description"
+msgstr ""
+
+#: forum/topic/models.py:430
+msgid "Gujrati Hash Tag Description"
+msgstr ""
+
+#: forum/topic/models.py:431
+msgid "Marathi Hash Tag Description"
+msgstr ""
+
+#: forum/topic/models.py:432
+msgid "Punjabi Hash Tag Description"
+msgstr ""
+
+#: forum/topic/models.py:433
+msgid "Odia Hash Tag Description"
+msgstr ""
+
+#: forum/topic/models.py:434
+msgid "Picture URL"
+msgstr ""
+
+#: forum/topic/models.py:450
+msgid "Job Title"
+msgstr ""
+
+#: forum/topic/models.py:452
+msgid "Tag line"
+msgstr ""
+
+#: forum/topic/models.py:453
+msgid "Job Description"
+msgstr ""
+
+#: forum/topic/models.py:454
+msgid "Job Location"
+msgstr ""
+
+#: forum/topic/models.py:455
+msgid "Expiry date"
+msgstr ""
+
+#: forum/topic/models.py:456
+#: forum/topic/templates/spirit/topic/publish.html:106
+msgid "Publish"
+msgstr ""
+
+#: forum/topic/models.py:463
+msgid "Name"
+msgstr "ਨਾਮ"
+
+#: forum/topic/models.py:464
+msgid "Email"
+msgstr ""
+
+#: forum/topic/models.py:465
+msgid "Phone Number"
+msgstr ""
+
+#: forum/topic/models.py:466
+msgid "Upload resume"
+msgstr ""
+
+#: forum/topic/models.py:467
+msgid "Upload Cover Letter"
+msgstr ""
+
+#: forum/topic/models.py:468
+msgid "Help us know you better"
+msgstr ""
+
+#: forum/topic/models.py:503
+msgid "notification_type"
+msgstr ""
+
+#: forum/topic/models.py:769
+msgid "Match Name"
+msgstr ""
+
+#: forum/topic/models.py:770
+msgid "Team 1"
+msgstr ""
+
+#: forum/topic/models.py:771
+msgid "Team 1 Flag"
+msgstr ""
+
+#: forum/topic/models.py:772
+msgid "Team 2"
+msgstr ""
+
+#: forum/topic/models.py:773
+msgid "Team 2 Flag"
+msgstr ""
+
+#: forum/topic/models.py:774
+msgid "Match Datetime"
+msgstr ""
+
+#: forum/topic/models.py:786 forum/topic/models.py:801
+msgid "Title"
+msgstr "ਸਿਰਲੇਖ"
+
+#: forum/topic/models.py:787
+msgid "Activate DateTime"
+msgstr ""
+
+#: forum/topic/models.py:788
+msgid "Deactivate DateTime"
+msgstr ""
+
+#: forum/topic/models.py:789
+msgid "Score"
+msgstr ""
+
+#: forum/topic/models.py:802
+msgid "Option Image"
+msgstr ""
+
+#: forum/topic/models.py:824
+msgid "Total Score"
+msgstr ""
+
+#: forum/topic/models.py:825
+msgid "Total Prediction"
+msgstr ""
+
+#: forum/topic/models.py:826 forum/topic/models.py:827
+#: forum/topic/models.py:828
+msgid "Correct Prediction"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:825
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:788
+msgid "Trending"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:825
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:921
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:963
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:788
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:879
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:920
+#: forum/topic/templates/spirit/topic/topic_details_by_category.html:375
+#: forum/topic/templates/spirit/topic/topic_details_by_category.html:388
+#: forum/topic/templates/spirit/topic/topic_list_by_hashtag.html:384
+#: forum/topic/templates/spirit/topic/topic_list_by_hashtag.html:397
+#: forum/topic/templates/spirit/topic/user_details.html:562
+#: forum/topic/templates/spirit/topic/user_details.html:572
+#: forum/topic/templates/spirit/topic/user_profile.html:224
+#: forum/topic/templates/spirit/topic/user_profile.html:234
+#: forum/topic/templates/spirit/topic/video_details.html:1618
+msgid "See All"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:826
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:789
+#: forum/topic/templates/spirit/topic/video_details.html:1619
+msgid "Trends"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:838
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:991
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:801
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:948
+#: forum/topic/templates/spirit/topic/new_landing.html:351
+msgid "Trending Categories"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:857
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:1010
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:820
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:967
+#: forum/topic/templates/spirit/topic/new_landing.html:370
+msgid "Trending Hashtags"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:875
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:1028
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:838
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:985
+#: forum/topic/templates/spirit/topic/new_landing.html:388
+#: forum/topic/templates/spirit/topic/topic_details_by_category.html:399
+#: forum/topic/templates/spirit/topic/topic_list_by_hashtag.html:408
+#: forum/topic/templates/spirit/topic/user_details.html:583
+msgid "Get the App"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:890
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:853
+#: forum/topic/templates/spirit/topic/new_landing.html:324
+msgid "Popular Videos"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:921
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:879
+#: forum/topic/templates/spirit/topic/search_results.html:958
+msgid "Users"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:953
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:910
+#: forum/topic/templates/spirit/topic/topic_details_by_category.html:340
+#: forum/topic/templates/spirit/topic/user_details.html:526
+#: forum/topic/templates/spirit/topic/video_details.html:1500
+#: forum/topic/templates/spirit/topic/video_discover.html:299
+msgid "Follow"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/boloindya_feed.html:963
+msgid "Hashtag Challeges"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:10
+msgid "Main"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:30
+#: forum/topic/templates/spirit/topic/detail.html:32
+msgid "edit"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:42
+msgid "Select comments to move"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:45
+msgid "Undelete topic"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:47
+msgid "Delete topic"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:51
+msgid "Open topic"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:53
+msgid "Close topic"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:57
+msgid "Unpin topic"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:59
+msgid "Pin topic"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:63
+msgid "Unpin topic globally"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:65
+msgid "Pin topic globally"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:74
+msgid "Topic id"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:76
+msgid "Move"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/detail.html:90
+msgid "Reply"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/explore_video_details.html:1611
+#: forum/topic/templates/spirit/topic/video_details.html:1384
+#, python-format
+msgid " %(Download)s the app to %(like)s this %(video)s "
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/explore_video_details.html:1611
+#: forum/topic/templates/spirit/topic/main_landing.html:216
+#: forum/topic/templates/spirit/topic/video_details.html:1384
+msgid "Get"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/explore_video_details.html:1728
+#: forum/topic/templates/spirit/topic/video_details.html:1538
+msgid "Like"
+msgstr "ਲਿਖੇ"
+
+#: forum/topic/templates/spirit/topic/explore_video_details.html:1733
+#: forum/topic/templates/spirit/topic/video_details.html:1544
+msgid "Comment"
+msgstr "ਕਮੇੰਟ੍ਸ"
+
+#: forum/topic/templates/spirit/topic/explore_video_details.html:1737
+msgid "Share"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/explore_video_details.html:1805
+#: forum/topic/templates/spirit/topic/video_details.html:1635
+msgid "Share to"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/explore_video_details.html:1808
+#: forum/topic/templates/spirit/topic/video_details.html:1638
+msgid "Copy Link"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/explore_video_details.html:1825
+#: forum/topic/templates/spirit/topic/video_details.html:1653
+msgid "Cancel"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/feed_list_by_categories.html:920
+msgid "Hashtag Challenges"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/moderate.html:5
+#: forum/topic/templates/spirit/topic/moderate.html:9
+msgid "Moderate topic"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/moderate.html:14
+msgid "Apply"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/publish.html:6
+msgid "Publish topic"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/publish.html:88
+msgid "Start discussion"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/search_results.html:955
+msgid "All"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/search_results.html:956
+#: forum/topic/templates/spirit/topic/user_details.html:524
+#: forum/topic/templates/spirit/topic/user_profile.html:186
+msgid "Videos"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/search_results.html:961
+msgid "Categories"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/search_results.html:962
+msgid "Hashtags"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/search_results.html:975
+msgid "Search :"
+msgstr "ਖੋਜ"
+
+#: forum/topic/templates/spirit/topic/topic_details_by_category.html:336
+msgid "Views"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/topic_details_by_category.html:375
+#: forum/topic/templates/spirit/topic/topic_list_by_hashtag.html:384
+#: forum/topic/templates/spirit/topic/user_details.html:562
+#: forum/topic/templates/spirit/topic/user_profile.html:224
+msgid "Creators"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/topic_details_by_category.html:388
+#: forum/topic/templates/spirit/topic/topic_list_by_hashtag.html:397
+#: forum/topic/templates/spirit/topic/user_details.html:572
+#: forum/topic/templates/spirit/topic/user_profile.html:234
+#: forum/topic/templates/spirit/topic/video_discover.html:239
+msgid "Discover"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/update.html:5
+#: forum/topic/templates/spirit/topic/update.html:9
+msgid "Update topic"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/update.html:15
+msgid "Update"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/user_details.html:521
+#: forum/topic/templates/spirit/topic/user_profile.html:183
+msgid "Following"
+msgstr "ਫੋਲੋਵਿੰਗ"
+
+#: forum/topic/templates/spirit/topic/user_details.html:521
+#: forum/topic/templates/spirit/topic/user_profile.html:183
+#: forum/topic/templates/spirit/topic/video_discover.html:295
+msgid "Followers"
+msgstr "ਫੋਲੋਵੇਰਸ"
+
+#: forum/topic/templates/spirit/topic/user_details.html:523
+#: forum/topic/templates/spirit/topic/user_profile.html:185
+msgid "Likes"
+msgstr "ਲੀਕੇਜ਼"
+
+#: forum/topic/templates/spirit/topic/user_profile.html:182
+msgid "Verified account"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/video_details.html:1510
+msgid "likes"
+msgstr "ਲੀਕੇਜ਼"
+
+#: forum/topic/templates/spirit/topic/video_details.html:1510
+msgid "comments"
+msgstr "ਕਮੇੰਟ੍ਸ"
+
+#: forum/topic/templates/spirit/topic/video_details.html:1608
+msgid "COPY"
+msgstr "ਸਾਂਝਾ"
+
+#: forum/topic/templates/spirit/topic/video_details.html:1618
+msgid "Trendinng"
+msgstr ""
+
+#: forum/topic/templates/spirit/topic/video_discover.html:240
+msgid "Be the first to watch the latest videos"
+msgstr ""

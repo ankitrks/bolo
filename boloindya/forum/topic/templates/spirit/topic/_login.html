@@ -2,6 +2,9 @@
 {% load i18n %}
 {% block title %}BoloIndya{% endblock %}
 {% block content %}
+<script type="text/javascript">
+   var token = '{{csrf_token}}';
+</script>
 
 <link rel="stylesheet" type="text/css" href="/media/css/main_login.css">
 <style type="text/css">

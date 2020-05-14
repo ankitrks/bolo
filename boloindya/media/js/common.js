@@ -155,11 +155,16 @@ jQuery("#boloSideMenu").click(function(e){
       var checClass="";
        checClass=jQuery(".boloSideMenuClass").hasClass('hamburger-menu-active');
         if(checClass){
+            jQuery("#subHeader").removeClass('zindexChange');
             jQuery(".boloSideMenuClass").removeClass('hamburger-menu-active');  
             jQuery(".drawerOpenAndClose").removeClass('drawer-enter drawer-enter-active');
             jQuery(".drawerOpenAndClose").addClass('drawer-exit drawer-exit-active');  
             jQuery(".drawer-enter-done").addClass('hide');
+            $("#searchToggle").show();
       }else {
+            jQuery("#subHeader").removeClass('zindexChange');
+            jQuery("#subHeader").addClass('zindexChange');
+            $("#searchToggle").hide();
             jQuery(".boloSideMenuClass").addClass('hamburger-menu-active'); 
             jQuery(".boloSideMenuClass").removeClass('drawer-exit drawer-exit-active');
             jQuery(".drawerOpenAndClose").addClass('drawer-enter drawer-enter-active');
@@ -224,7 +229,7 @@ function loaderBoloHide(){
 //==============Global Popup Close=============
 
  $("._global_modal_cancel").click(function(){
-  jwplayer('player').setMute(true);
+  //jwplayer('player').setMute(true);
     $("#modelPopup").hide();
  });
  //=================End=======================
@@ -235,6 +240,7 @@ function copyShareLink() {
   copyText.select();
   copyText.setSelectionRange(0, 99999)
   document.execCommand("copy");
+  jQuery('.linkCopies1').append('<span style="color:green">Link Copied...</span>').fadeOut(2000);
 
 }
 
@@ -256,6 +262,23 @@ function copyShareLinkMobile() {
 
 }
 
+function copyShareLinkMobileLink() {
+  //var copyText = $("#shareInputboxMobileSingle").val();
+
+  chckHideClass =$("#shareInputboxMobileSingle").hasClass('hide');
+  if(chckHideClass){
+    $("#shareInputboxMobileSingle").removeClass('hide');
+    var copyText = document.getElementById("shareInputboxMobileSingle");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999)
+    document.execCommand("copy");
+    //$("#shareInputboxMobileSingle").addClass('hide');
+  }
+  
+  jQuery('.linkCopies').html('<span style="color:green">Link Copied...</span>').fadeOut(2000);
+
+}
+
 
     function openMobileDownloadPopup(){
         $('.mobileDownPopup').toggleClass('hide');
@@ -273,8 +296,9 @@ function copyShareLinkMobile() {
         }
       }
     
-
+//,csrfmiddlewaretoken:getCookie('csrftoken')
     function sendOTP(){
+      dispOTPPanel();
       $("#lastFourdigit").html("");
       validateNo();
       var mobileNumber = document.getElementById('phoneNo').value;
@@ -285,7 +309,7 @@ function copyShareLinkMobile() {
       var otpDetailsList=[];
       otpDetailsList.push({name: 'mobile_no', value: mobileNumber});
       console.log(otpDetailsList);
-
+      //headers: {"X-CSRFToken": getCookie('csrftoken')},
       jQuery.ajax({
         url:"/api/v1/otp/send/",
         type:"POST",
@@ -323,6 +347,7 @@ function copyShareLinkMobile() {
       console.log(data);
       var userOtp = document.getElementById('userOtp');
       console.log(data);
+      //headers: {"X-CSRFToken": getCookie('csrftoken')},
       var otpConcat="";
       for(var otpCount=1;otpCount<7;otpCount++){
        var otpData= jQuery('input[name="digit-'+otpCount+'"]').val();
@@ -336,8 +361,9 @@ function copyShareLinkMobile() {
       userOTP=otpConcat;      
       jQuery.ajax({
         url:"/api/v1/otp/verify/",
+        
         type:"POST",
-        data:{'mobile_no':mobileNumber,'otp':userOTP,'is_reset_password':false,'is_for_change_phone':false},
+        data:{'mobile_no':mobileNumber,'otp':userOTP,'is_reset_password':false,'is_for_change_phone':false,csrfmiddlewaretoken:getCookie('csrftoken')},
         success: function(response,textStatus, xhr){
 
           access_data = response;
@@ -399,6 +425,7 @@ function loginDataByUser(){
 	var url='/api/v1/user/user_data/';
 	var user_id = userLoginStatus;
 	var loginStatus=check_login_status();
+  
 	if(loginStatus==false && user_id!="" && user_id!='None'){
 	    $.ajax({
 	        type: 'POST',

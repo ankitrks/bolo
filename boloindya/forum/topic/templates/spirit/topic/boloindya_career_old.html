@@ -1,4 +1,4 @@
-{% extends "spirit/_new_base.html" %}
+{% extends "spirit/_new_home_base.html" %}
 {% load spirit_tags i18n %}
 {% load i18n %}
 {% load number_formate_change_tag %}
@@ -13,7 +13,7 @@ body {
 }
 
     .careers .jumbotron, .careers-footer .jumbotron {
-    background: #bee9ff;
+    background: var(--primary-bg-color);
     position: relative;
     margin-top: 81px;
 }
@@ -42,7 +42,7 @@ body {
     padding-top: 30px;
     padding-bottom: 30px;
     margin-bottom: 30px;
-    background-color: #eee;
+    background-color: var(--primary-bg-color);
 }
 .jumbotron, .jumbotron .h1, .jumbotron h1 {
     color: inherit;
@@ -67,15 +67,19 @@ body {
     max-width: 100%;
 }
 .careers .jumbotron .content, .careers-footer .jumbotron .content {
+        color: #000;
+    font-weight: 700;
+}
+/*.careers .jumbotron .content, .careers-footer .jumbotron .content {
     position: absolute;
     top: 40%;
     left: 80px;
     transform: translate(0,-40%);
     color: #000;
     font-weight: 700;
-    max-width: 40%;
+    max-width: 100%;
     text-align: left;
-}
+}*/
 .careers .jumbotron .content h1, .careers-footer .jumbotron .content h1 {
     font-size: 45px;
     font-weight: 700;
@@ -290,7 +294,7 @@ body {
     padding: 1rem 10rem 5rem;
 }
 .careers .pad-top, .careers-footer .pad-top {
-    margin-top: 4em;
+    margin-top: 1em;
 }
 .media:first-child {
     margin-top: 0;
@@ -408,7 +412,7 @@ body {
     max-width: 100%;
 }
 .careers .pad-top, .careers-footer .pad-top {
-    margin-top: 4em;
+    margin-top: 1em;
 }
 .careers .footer-description, .careers-footer .footer-description {
     font-weight: 700;
@@ -422,7 +426,7 @@ body {
     margin-bottom: 4em;
 }
 .careers .pad-top, .careers-footer .pad-top {
-    margin-top: 4em;
+    margin-top: 1em;
 }
 .careers .benefit, .careers-footer .benefit {
     padding: 0rem;
@@ -506,7 +510,8 @@ img {
     text-align: center;
 }
 .careers .jumbotron .content h1, .careers-footer .jumbotron .content h1 {
-    font-size: 18px;
+    font-size: 30px;
+    margin-top: 40px;
 }
 .careers .jumbotron .content .btn-main, .careers-footer .jumbotron .content .btn-main {
     font-size: 14px;
@@ -606,146 +611,341 @@ img {
 
 
 }
+.careers .together-boloindya .showcase, .careers-footer .together-boloindya .showcase {
+    margin: auto;
+    display: flex;
+    justify-content: center;
+}
+.careers .together-boloindya, .careers-footer .together-boloindya {
+    background: #f2f2f2;
+    text-align: center;
+    padding-bottom: 64px;
+    padding-top: 2rem;
+}
+.container-fluid {
+    margin: 0;
+    padding: 0;
+}
+.careers .together-boloindya h1, .careers-footer .together-boloindya h1 {
+    font-size: 40px;
+    margin: 30px;
+    color: #000;
+}
+.careers .together-boloindya .showcase .block-1, .careers .together-boloindya .showcase .block-1-1-2, .careers .together-boloindya .showcase .block-2, .careers-footer .together-boloindya .showcase .block-1, .careers-footer .together-boloindya .showcase .block-1-1-2, .careers-footer .together-boloindya .showcase .block-2 {
+    display: flex;
+}
+.careers .together-boloindya .showcase img, .careers-footer .together-boloindya .showcase img {
+    width: 100%;
+    padding: 5px;
+}
+.careers .together-boloindya .showcase img, .careers-footer .together-boloindya .showcase img {
+    width: 98%;
+    padding: 5px;
+}
+
+.productStats {
+    position: relative;
+    background: #fff;
+    padding: 25px 0 28px;
+    width: 100%;
+}
+.home_container_inner {
+    max-width: 1180px;
+    margin: 0 auto;
+}
+.productStats_statItem, .productStats_wrap {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+}
+.productStats_statContent {
+    margin-left: 16px;
+}
+.productStats_number {
+    letter-spacing: 1px;
+    color: #fff;
+    line-height: 1;
+    font-size: 28px;
+    line-height: 30px;
+    font-weight: 700;
+}
+.productStats_statDesc {
+    opacity: .9;
+    font-weight: 700;
+    font-size: 12px;
+    color: #fff;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+.productStats_statItem{
+    width: 25%;
+}
+.whatDoWeWant{
+text-align: center;
+    padding: 10px;
+}
+.careers .what-we-want{
+    padding: 1rem 6rem 1rem;
+}
+
+@media (min-width: 992px){
+    .col-md-4 {
+        width: 33.3333333333%;
+    }
+}
+@media (min-width: 992px){
+    .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9 {
+        float: left;
+    }
+}
+.col-xs-6 {
+    width: 50%;
+}
 </style>
-<div class="careers ng-scope" style="background: #fff">
-<!--     <div class="container-fluid jumbotron">
-        <div class="jumbotron-img"> <img class="img-responsive" src="/media/img/careers-jumbo.24f237b0.jpeg" alt=""> </div>
-        <div class="content">
-            <h1>Making Expressive Conversations for Next Billion Users </h1> <a ui-sref="root.career_base.openings" class="btn btn-main" href="/careers/openings/">Join Our Team</a> </div>
-    </div> -->
+<div class="careers ng-scope" style="background: #fff;" >
+    <div class="container-fluid jumbotron" style="min-height: 120px;">
 
-
-    <div class="container-fluid reviews" style="margin-top: 80px;">
-        <div class="row">
-            <div class="col-md-4">
-                <div class="user-review">
-                    <div class="user-image"> <img src="https://s3.amazonaws.com/boloindya/thumbnail/img-15687133711.jpg" class="user-image" alt=""> </div>
-                    <div class="review-contents">
-                        <p>Working at Boloindya provides every employee with a great work-life balance. An excellent company to work for, where one can learn a multitude of things under one roof. Sky is the limit here!</p>
-                    </div>
-                    <div class="reviewer">
-                        <p class="name"> Chitra Sharma </p>
-                        <p>QA Manager</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="user-review">
-                    <div class="user-image"> <img src="https://s3.amazonaws.com/boloindya/thumbnail/img-15687133711.jpg" class="user-image" alt=""> </div>
-                    <div class="review-contents">
-                        <p>Boloindya has helped me find my potential as a creator and curator. They give a free hand to each individual to present and execute their ideas. My work has become a lot more fun at Boloindya's playground. </p>
-                    </div>
-                    <div class="reviewer">
-                        <p class="name"> Lovely Kukreja </p>
-                        <p>General Manager - Content</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="user-review">
-                    <div class="user-image"> <img src="https://s3.amazonaws.com/boloindya/thumbnail/img-15687133711.jpg" class="user-image" alt=""> </div>
-                    <div class="review-contents">
-                        <p>Working at Boloindya is like a roller coaster ride. New challenges, learnings and experiences await on each turn &amp; while working here, the feeling of designing something for next billion users of India is always motivating. </p>
-                    </div>
-                    <div class="reviewer">
-                        <p class="name">Abhik Kapoor </p>
-                        <p>Product Manager</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="paginate">
-                <a class="page" href="#"></a>
-            </div>
+        <div class="content" >
+            <h1>Careers at Bolo Indya</h1> 
+            <h3>Whatever Happens at Bolo Indya stays at Bolo Indya</h3>
         </div>
     </div>
-    <div class="container-fluid join-us">
-        <div class="pad-top col-xs-12">
-            <div class="media">
-                <div class="media-left">
-                    <a href="#"> <img src="/media/img/join-us.943cbbfe.svg" alt="join us"> </a>
-                </div>
-                <div class="media-body">
-                    <h1>Join Our Team</h1>
-                    <p>With exciting new opportunities in technology and revolutionary potential of our team, we thrive to create a smarter, Data Intelligent future. We inspire each other and aspire together to enable human expression and collective intelligence reach new heights. And celebrate all small and big wins on our way. Excited about tackling new challenges and being part of something greater? Welcome aboard!</p> <a class="btn btn-main" ui-sref="root.career_base.openings" href="/careers/openings"> See Open Positions </a> </div>
-            </div>
-        </div>
-    </div>
-<!--     <div class="container-fluid press">
-        <div class="press-inner">
-            <div class="press-column">
-                <a class="press-item" href="https://www.businesstoday.in/magazine/the-buzz/boloindya-keyboard-a-holistic-input-app/story/279501.html" target="_blank"> <img src="/media/img/life-at-boloindya-01.3bfd46d2.jpg" alt="">
-                    <div class="press-caption">
-                        <h1>boloindya Keyboard: A Holistic Input App</h1>
-                        <p>Business Today</p>
-                    </div>
-                </a>
-                <a class="press-item" href="http://www.atp.show/ash18-ashley-talks/" target="_blank"> <img src="/media/img/life-at-boloindya-01.3bfd46d2.jpg" alt=""> </a>
-            </div>
-            <div class="press-column">
-                <a class="press-item" href="https://www.forbes.com/video/5755005609001/" target="_blank"> <img src="/media/img/life-at-boloindya-01.3bfd46d2.jpg" alt="">
-                    <div class="press-caption">
-                        <h1>Ankit Prasad in Forbes 30 Under 30 Asia 2018</h1>
-                        <p>-Forbes</p>
-                    </div>
-                </a>
-                <a class="press-item" href="https://yourstory.com/2017/03/app-fridays-boloindya-keyboard/" target="_blank"> <img src="/media/img/life-at-boloindya-01.3bfd46d2.jpg" alt="">
-                    <div class="press-caption">
-                        <h1>Will GIFs be the 'go-to language' for millennials? boloindya Keyboard believes so</h1>
-                        <p>-Your Story</p>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </div> -->
-<!--     <div class="container-fluid our-partners">
-        <div class="our-partners-inner">
-            <div class="description">
-                <h2>We Work with Top Brands</h2>
-                <p>With over 10M users, it’s not surprising that leading movie studios and sports brands partner with boloindya Keyboard. </p>
-            </div>
-            <div class="partner-image"> <img src="/media/img/our-partners-1.dbc0b7e7.png" alt=""> </div>
-        </div>
-    </div> -->
 
-<div class="careers-footer ng-scope">
-    <div class="container-fluid pad-top">
-        <h2 class="text-center footer-description">Benefits Of Working with us</h2> </div>
-    <div class="container-fluid footer-inner">
-        <div class="pad-top pad-bot">
-            <div class="col-md-4 benefit">
-                <div class="benefit-inner"> <img src="/media/img/benefit-1.0f5779a5.png" alt="" class="img-responsive">
-                    <h3> <b> Challenging Projects </b> </h3>
-                    <p>You will love us if you like solving challenging problems. You will be writing algorithms, system programs, GPU codes and over-optimizing optimized codes. </p>
+
+<div class="container-fluid together-boloindya" style="display: none;">
+    <!-- <h1>Together At Boloindya</h1> -->
+    <div class="showcase">
+        <div class="block-1">
+            <div class="block-1-1">
+                <div class="block-1-1-1"> <img src="/media/career_team1.jpg" alt=""> </div>
+                <div class="block-1-1-2">
+                    <div class="block-1-1-2-1"> <img src="/media/tanmai_1.jpg" alt=""> </div>
+                    <div class="block-1-1-2-2"> <img src="/media/tanmai_1.jpg" alt=""> </div>
                 </div>
             </div>
-            <div class="col-md-4 benefit">
-                <div class="benefit-inner"> <img src="/media/img/benefit-1.0f5779a5.png" alt="" class="img-responsive">
-                    <h3> <b> Entrepreneural Team </b> </h3>
-                    <p>We are a small team, united together without hierarchial bottlenecks. You would be a part of all decisions and together shape the future.</p>
-                </div>
-            </div>
-            <div class="col-md-4 benefit">
-                <div class="benefit-inner"> <img src="/media/img/benefit-1.0f5779a5.png" alt="" class="img-responsive">
-                    <h3> <b>Autonomy in Work</b> </h3>
-                    <p>You will be owning your work. You will be monitoring your KPIs and taking data-driven decisions. You will represent Boloindya at various Conferences and Events across the world.</p>
-                </div>
-            </div>
-            <div class="col-md-4 col-md-offset-2 benefit">
-                <div class="benefit-inner"> <img src="/media/img/benefit-1.0f5779a5.png" alt="" class="img-responsive">
-                    <h3> <b>Learning Sessions</b> </h3>
-                    <p>Learn and grow with sessions from top industry leaders share expertise, knowledge, and valuable tips</p>
-                </div>
-            </div>
-            <div class="col-md-4 benefit">
-                <div class="benefit-inner"> <img src="/media/img/benefit-1.0f5779a5.png" alt="" class="img-responsive">
-                    <h3> <b>Networking events </b> </h3>
-                    <p>Expand your professional circle with weekly networking events</p>
-                </div>
+            <div class="block-1-2"> <img src="/media/ca_team2.jpg" alt=""> </div>
+        </div>
+        <div class="block-2">
+            <div class="block-2-2">
+                <div class="block-2-2-1"> <img src="/media/ca_team3.jpg" alt=""> </div>
+                <div class="block-2-2-2"> <img src="/media/ca_team3a.jpg" alt=""> </div>
             </div>
         </div>
     </div>
 </div>
+
+
+<style type="text/css">
+    .wrapper[_ngcontent-iridium-us-c26] {
+    background-size: cover;
+    background-position: left bottom;
+}
+.contain {
+    max-width: 77.75rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 48px;
+    padding-bottom: 48px;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+@media screen and (min-width: 48rem){
+.contain--xsmall {
+    padding-top: 48px;
+    padding-bottom: 48px;
+}
+}
+.contain--xsmall {
+    padding-top: 48px;
+    padding-bottom: 48px;
+    margin: 0 auto;
+}
+
+@media screen and (min-width: 73.75rem){
+.contain {
+    padding-left: 0;
+    padding-right: 0;
+}
+}
+@media screen and (min-width: 48rem){
+.contain {
+    padding-left: 24px;
+    padding-right: 24px;
+}
+}
+@media screen and (min-width: 30rem){
+.contain {
+    padding-left: 15.84px;
+    padding-right: 15.84px;
+}
+}
+@media screen and (min-width: 48rem){
+.contain {
+    padding-top: 30px;
+    padding-bottom: 11px;
+}
+}
+@media screen and (min-width: 48rem){
+
+.benefit-cards[_ngcontent-iridium-us-c22] h2[_ngcontent-iridium-us-c22] {
+    font-size: 2rem;
+}
+}
+.benefit-cards[_ngcontent-iridium-us-c22] h2[_ngcontent-iridium-us-c22] {
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+    color: #000;
+}
+.benefit-cards[_ngcontent-iridium-us-c22] ul[_ngcontent-iridium-us-c22] {
+    list-style: none;
+    padding: 0;
+    display: block;
+    display: -webkit-box;
+    display: flex;
+    flex-wrap: wrap;
+    -webkit-box-pack: left;
+    justify-content: left;
+}
+
+@media(max-width: 991px){
+    .benefit-cards[_ngcontent-iridium-us-c22] ul[_ngcontent-iridium-us-c22] {
+        display: block;
+    }
+}
+
+.border-blue-boloindya[_ngcontent-iridium-us-c29] {
+    border-top: 3px solid #b62927;
+}
+
+@media screen and (min-width: 73.75rem){
+
+.card[_ngcontent-iridium-us-c29] {
+    height: 18.75rem;
+    width: 17.75rem;
+    margin: 0 10px 15px 0;
+}
+}
+.card[_ngcontent-iridium-us-c29] {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 4px 0 rgba(17, 22, 26, 0.16), 0 2px 4px 0 rgba(17, 22, 26, 0.08), 0 4px 8px 0 rgba(17, 22, 26, 0.08);
+    display: inline-block;
+    height: 18.75rem;
+    width: 18.75rem;
+    text-align: center;
+}
+
+.card-container[_ngcontent-iridium-us-c29] {
+    cursor: default;
+    display: inline-block;
+    -webkit-perspective: 1000px;
+    perspective: 1000px;
+    position: relative;
+}
+.img_position[_ngcontent-iridium-us-c29] {
+    width: 300px;
+    height: 220px;
+    position: relative;
+    overflow: hidden;
+    margin: 0px auto 1rem;
+    border-radius: 3px;
+}
+.card__title[_ngcontent-iridium-us-c29] {
+    margin-top: -1rem;
+    font-weight: bold;
+    font-size: 1.325rem;
+    color: #000;
+}
+.h2_title{
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+    color: #000;
+}
+@media(max-width: 991px){
+.benefit-card{
+    margin-bottom: 10px;
+}
+
+.careers .join-us .media-body p, .careers-footer .join-us .media-body p {
+    text-align: center;
+}
+}
+
+</style>
+
+<section _ngcontent-iridium-us-c22="" class="benefit-cards ng-star-inserted" id="benefit-cards">
+    <div _ngcontent-iridium-us-c22="" id="benefit-cards-anchor" style="position: relative; top: -50px; left: 0"></div>
+    <!---->
+    <!---->
+    <ir-container _ngcontent-iridium-us-c22="" _nghost-iridium-us-c26="" class="ng-star-inserted">
+        <!---->
+        <!---->
+        <div _ngcontent-iridium-us-c26="" class="wrapper ng-star-inserted">
+            <!---->
+            <div _ngcontent-iridium-us-c26="" class="contain contain--xsmall ng-star-inserted">
+                <h2 _ngcontent-iridium-us-c22="" class="text-center bold">What do we want?</h2>
+
+                <ul _ngcontent-iridium-us-c22="">
+                    <!---->
+                    <li _ngcontent-iridium-us-c22=""  class="text-center benefit-card ng-star-inserted">
+                        <ir-benefit-card _ngcontent-iridium-us-c22="" _nghost-iridium-us-c29="">
+                            <div _ngcontent-iridium-us-c29="" class="card card-container card-- border-blue-boloindya"><img _ngcontent-iridium-us-c29="" class="img_position" src="/media/hustle.jpg">
+                                <h3 _ngcontent-iridium-us-c29="" class="card__title mb-1">Hustle</h3>
+                                <!---->
+                            </div>
+                        </ir-benefit-card>
+                    </li>                    
+                    <li _ngcontent-iridium-us-c22="" class="text-center benefit-card ng-star-inserted">
+                        <ir-benefit-card _ngcontent-iridium-us-c22="" _nghost-iridium-us-c29="">
+                            <div _ngcontent-iridium-us-c29="" class="card card-container card-- border-blue-boloindya"><img _ngcontent-iridium-us-c29="" class="img_position" src="/media/new-ideas.jpg">
+                                <h3 _ngcontent-iridium-us-c29="" class="card__title mb-1">New Ideas</h3>
+                                <!---->
+
+                            </div>
+                        </ir-benefit-card>
+                    </li>                    <li _ngcontent-iridium-us-c22="" class="text-center benefit-card ng-star-inserted">
+                        <ir-benefit-card _ngcontent-iridium-us-c22="" _nghost-iridium-us-c29="">
+                            <div _ngcontent-iridium-us-c29="" class="card card-container card-- border-blue-boloindya"><img _ngcontent-iridium-us-c29="" class="img_position" src="/media/user-satisfaction.jpg">
+                                <h3 _ngcontent-iridium-us-c29="" class="card__title mb-1">User Satisfaction</h3>
+                                <!---->
+                            </div>
+                        </ir-benefit-card>
+                    </li>                    <li _ngcontent-iridium-us-c22="" class="text-center benefit-card ng-star-inserted">
+                        <ir-benefit-card _ngcontent-iridium-us-c22="" _nghost-iridium-us-c29="">
+                            <div _ngcontent-iridium-us-c29="" class="card card-container card-- border-blue-boloindya"><img _ngcontent-iridium-us-c29="" class="img_position" src="/media/positivity.jpg">
+                                <h3 _ngcontent-iridium-us-c29="" class="card__title mb-1">Positivity</h3>
+                                <!---->
+
+                            </div>
+                        </ir-benefit-card>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <!---->
+        <!---->
+        <!---->
+        <!---->
+    </ir-container>
+</section>
+
+
+
+    <div class="container-fluid join-us">
+        <div class="pad-top col-xs-12">
+            <div class="media">
+<!--                 <div class="media-left">
+                    <a href="#"> <img src="/media/img/join-us.943cbbfe.svg" alt="join us"> </a>
+                </div> -->
+                <div class="media-body" style="text-align: center;">
+
+                    <h2 class="h2_title">When do we want?</h2>
+                    <h2>Now !</h2>
+                    <p style="max-width: 100%">Join Us to Build for next 50 crore Indians</p> <a class="btn btn-main" ui-sref="root.career_base.openings" href="/careers/openings"> See Open Positions </a> </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200" viewBox="0 0 200 200">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#linear-gradient);
+      }
+    </style>
+    <linearGradient id="linear-gradient" x1="98.5" y1="133" x2="98.5" y2="68" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#bc1b45"/>
+      <stop offset="1" stop-color="#241162"/>
+    </linearGradient>
+  </defs>
+  <ellipse id="Ellipse_3_copy" data-name="Ellipse 3 copy" class="cls-1" cx="98.5" cy="100.5" rx="34.5" ry="32.5"/>
+  <image x="89" y="82" width="22" height="41" xlink:href="data:img/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAApCAQAAACbkRHIAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QAAKqNIzIAAAAJcEhZcwAACxIAAAsSAdLdfvwAAAAHdElNRQfkBBgNCyz42Az/AAABVklEQVQ4y+3Uu0vDUBTH8V/S1AeCVp0siKAiOLoJgv4HIqKLiODs5OAobl0ddHITnB19gYNOgpuPwU4WrDrURWyF2uTr0Ndt0jTO0nOXC+dDyIF7fkK1s8I34NUOPLNg9OWoXghJlkLLNu6ePF8XuWE4stq4jf8TdmprhH4CXU+ujEVzNKmSpJIKSgb2r0NDSmhQtmKyVbB4U06ukKt+jSjWgIvKKqe4pE51K2Phtdpno1Da1u0f6aVSYo0PouuJeXpFP/t4ETRPCgsJMcNdS+pxzRgq4y62KLbAL6yXs64ceeOch/6KyxEJE4sl3kPwPbPVFK3iAfaafvuT7Xrk1tN3mscmo10w0QzH2aTkw6+smmFuXBnlxDfaIX1hWCySM/ADcw1dH06wi1uhX+w0Uj8WU9xURjslGYUdNigCGZb9NIjFMMe4HNATxMGFzepKaZ0pH3zUv1dDLq3GMKf6AAAAAElFTkSuQmCC"/>
+</svg>
