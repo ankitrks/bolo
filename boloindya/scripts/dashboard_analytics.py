@@ -52,8 +52,8 @@ def put_share_data():
 	metrics = '3'
 	metrics_slab = ''
 
-	today = datetime.now()
-	start_date = today + timedelta(days = -1)
+	today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+	start_date = today + timedelta(days = -2)
 
 	day_month_year_dict = dict()
 	all_data = UserVideoTypeDetails.objects.filter(timestamp__gt = start_date)
@@ -96,7 +96,7 @@ def put_share_data():
 
 def put_installs_data():
 	end_date = 	datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
-	start_date = end_date + timedelta(days=-1)
+	start_date = end_date + timedelta(days=-2)
 
 	#Calculate number of installs which have empty or None android_id
 	empty_android_id_counts = ReferralCodeUsed.objects.filter(Q(created_at__gte=start_date, created_at__lte=end_date) & (Q(android_id='') | Q(android_id=None)))\
@@ -139,7 +139,7 @@ def put_installs_data():
 # this function is also not being used, please do not call it anywhere
 def put_video_views_data():
 
-	today = datetime.now()
+	today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 	start_date = today + timedelta(days = -2)
 
 	day_month_year_dict = dict()
@@ -184,8 +184,8 @@ def put_video_views_data():
 
 def put_video_views_analytics():
 
-	today = datetime.now()
-	start_date = today + timedelta(days = -1)	
+	today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+	start_date = today + timedelta(days = -2)	
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
 
@@ -230,8 +230,8 @@ def put_video_views_analytics():
 
 def put_videos_created():
 
-	today = datetime.now()
-	start_date = today + timedelta(days = -1)
+	today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+	start_date = today + timedelta(days = -2)
 
 	day_month_year_dict = dict()
 	all_data = Topic.objects.filter(date__gt = start_date)
@@ -283,8 +283,8 @@ def put_videos_created():
 # number of video creators split according to date of signup and distributed into various slabs
 def put_video_creators():
 
-	today = datetime.now()
-	start_date = today + timedelta(days = -1)
+	today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+	start_date = today + timedelta(days = -2)
 
 	user_signup_dict = dict()
 	signup_data = ReferralCodeUsed.objects.filter(by_user__isnull = False, created_at__gt = start_date)
@@ -400,9 +400,9 @@ def put_video_creators():
 def put_video_creators_analytics_lang():
 
 
-	today = datetime.now()
+	today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 	metrics = '4'
-	start_date = today + timedelta(days = -1)
+	start_date = today + timedelta(days = -2)
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = end_date):
 		curr_day = dt.day 
@@ -669,7 +669,7 @@ def put_video_creators_analytics():
 def put_dau_data():
 
 	end_date = 	datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
-	start_date = end_date + timedelta(days=-1)
+	start_date = end_date + timedelta(days=-2)
 
 	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= end_date):
 		#print(dt)
@@ -702,7 +702,7 @@ def put_dau_data():
 
 def put_mau_data():
 
-	dt = datetime.today() + timedelta(days=-1)
+	dt = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=-2)
 
 	curr_month = dt.month
 	curr_year = dt.year
@@ -727,7 +727,7 @@ def put_mau_data():
 # put daily combo view of (user, vid) to be put in daily records
 def put_uniq_views_analytics():
 
-	today = datetime.now()
+	today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 	start_date = today + timedelta(days = -2)	
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
@@ -786,8 +786,8 @@ def put_uniq_views_analytics():
 def put_total_video_creators():
 
 
-	today = datetime.now()
-	start_date = today + timedelta(days = -1)
+	today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+	start_date = today + timedelta(days = -2)
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = today):
 		language_dict = dict()
@@ -851,8 +851,8 @@ def put_total_video_creators():
 
 def put_install_signup_conversion():
 
-	today = datetime.now()
-	start_date = today + timedelta(days = -1)
+	today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+	start_date = today + timedelta(days = -2)
 	end_date = today
 	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = today):
 		curr_day = dt.day 
@@ -941,7 +941,7 @@ def put_uninstall_data():
 	metrics = '11'
 	metrics_slab = ''
 
-	dt = datetime.today() + timedelta(days=-1)
+	dt = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=-2)
 	start_dt = dt.replace(hour=0, minute=0, second=0)
 	end_dt = dt.replace(hour=23, minute=59, second=59)
 
