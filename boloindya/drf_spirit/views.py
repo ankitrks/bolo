@@ -1662,6 +1662,19 @@ class UserPayDatatableList(generics.ListAPIView):
     def get_queryset(self):
         return UserProfile.objects.all().order_by('-bolo_score')
 
+class ActiveReoprtsDatatableList(generics.ListAPIView):
+    serializer_class = ReportDatatableSerializer
+    # queryset = User.objects.filter(is_active = True)
+    def get_queryset(self):
+        filter_dict = {}
+        if self.request.GET.get('is_active',None):
+            if self.request.GET.get('is_active')=='1':
+                filter_dict = {'is_active': True}
+            elif self.request.GET.get('is_active')=='0':
+                filter_dict = {'is_active': False}
+        return Report.objects.filter(**filter_dict).order_by('-id')
+
+
 class KYCDocumentTypeList(generics.ListAPIView):
     serializer_class = KYCDocumnetsTypeSerializer
     queryset = KYCDocumentType.objects.all()

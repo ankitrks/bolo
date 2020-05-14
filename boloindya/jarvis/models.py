@@ -321,7 +321,7 @@ class UserCountNotification(RecordTimeStamp):
         verbose_name = _("UserCountNotification")
         verbose_name_plural = _("UserCountNotifications")
 
-class Report(UserInfo):
+class Report(RecordTimeStamp):
     reported_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Reported By"),related_name="reported_by", null=True,blank=True,editable=False)
     report_type = models.CharField(_("report_type"), max_length=100,null=True,blank=True)
     is_moderated = models.BooleanField(default=False)
@@ -330,7 +330,7 @@ class Report(UserInfo):
     target = GenericForeignKey('target_type', 'target_id')
     moderated_on = models.DateTimeField(blank=True,null=True)
     moderated_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Moderated By"),related_name="report_moderated_by", null=True,blank=True,editable=False)
-
+    is_active = models.BooleanField(default = True)
 
     def __unicode__(self):
         return str(self.topic)
@@ -344,12 +344,23 @@ class Report(UserInfo):
             instance = self.target
             instance.is_active = False
             instance.save()
-        Report.objects.filter(target=self.target).update(is_moderated = True, is_active=False, moderated_by = moderated_by, moderated_on = datetime.now())
+        Report.objects.filter(target_id=self.target_id, target_type_id=self.target_type_id).update(is_moderated = True, is_active=False, moderated_by = moderated_by, moderated_on = datetime.now())
         return True
 
     def seems_fine(self,moderated_by=None):
-        Report.objects.filter(target=self.target).update(is_moderated = True, is_active=False, moderated_by = moderated_by, moderated_on = datetime.now())
+        Report.objects.filter(target_id=self.target_id, target_type_id=self.target_type_id).update(is_moderated = True, is_active=False, moderated_by = moderated_by, moderated_on = datetime.now())
         return True
+
+    def unremove_video_or_unblock(self,moderated_by=None):
+        if isinstance(self.target, Topic):
+            instance = self.target
+            instance.is_removed = False
+            instance.save()
+        else:
+            instance = self.target
+            instance.is_active = True
+            instance.save()
+        Report.objects.filter(target_id=self.target_id, target_type_id=self.target_type_id).update(is_moderated = True, is_active=False, moderated_by = moderated_by, moderated_on = datetime.now())
 
 
 

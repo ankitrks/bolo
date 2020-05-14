@@ -92,6 +92,7 @@ urlpatterns = [
     url(r'^get_popular_hash_tag/$', GetPopularHashTag.as_view(), name='get_popular_hash_tag'),
     url(r'^get_follow_post/$', GetFollowPost, name='get_follow_post'),
     url(r'^get_user_pay_datatbale/$', UserPayDatatableList.as_view(), name='get_user_pay_datatbale'),
+    url(r'^get_report_datatbale/$', ActiveReoprtsDatatableList.as_view(), name='get_report_datatbale'),
     url(r'^get_challenge_details/$', GetChallengeDetails, name='get_challenge_details'),
     url(r'^password/set/$', password_set, name='password_set'),
     url(r'^get_profile/$', GetProfile.as_view(), name='get_profile'),

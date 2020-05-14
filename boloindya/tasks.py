@@ -335,5 +335,45 @@ def create_thumbnail_cloudfront(topic_id):
     except Exception as e:
         print e
 
+@app.task
+def send_report_mail(report_id):
+    from jarvis.models import Report
+    from django.contrib.auth.models import User
+    report = Report.objects.get(pk=report_id)
+    try:
+        if isintance(report.target, User):
+            user_instance = report.target
+        else:
+            user_instance = report.target.user
+        content_email = """
+            Hello, <br><br>
+            We have received a report from %s. Please find the details below:<br><br>
+            <b>Video Title(ID)/ Username (ID):</b> %s (%s) <br>
+            <b>Report Type:</b> %s <br>
+            <b>Reported By:</b> %s <br>
+            <b>Contact Number of video owner:</b> %s (%s) <br>
+            Thanks,<br>
+            Team BoloIndya
+            """ %(report.reported_by.username, report.topic,report.topic.id, report.report_type, \
+                    report.reported_by, user_instance.st.mobile_no, user_instance.email)
+        requests.post(
+            "https://api.mailgun.net/v3/mail.careeranna.com/messages",
+            auth=("api", "d6c66f5dd85b4451bbcbd94cb7406f92-bbbc8336-97426998"),
+            data={"from": "BoloIndya Support <support@boloindya.com>",
+                  "to": ["support@boloindya.com"],
+                  "cc":[self.contact_email],
+                  "bcc":["anshika@careeranna.com", "maaz@careeranna.com", \
+                        "ankit@careeranna.com", "gitesh@careeranna.com", "tanmai@boloindya.com"],
+                  "subject": "BoloIndya Report Received | " + str(report.target) + ' | ' + str(report.reported_by.username),
+                  "html": content_email
+            }
+        )
+    except:
+        pass
+    return True
+
+
+
+
 if __name__ == '__main__':
     app.start()
