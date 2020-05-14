@@ -30,7 +30,7 @@ from datetime import datetime
 from calendar import monthrange
 from jarvis.models import DashboardMetrics
 from drf_spirit.utils import language_options
-from django.db.models.functions import TruncDate
+from django.db.models.functions import TruncDate, TruncHour
 
 
 from datetime import timedelta
@@ -680,33 +680,12 @@ def put_dau_data():
 
 		null_data = ReferralCodeUsed.objects.filter((Q(android_id=None) | Q(android_id = '')) &  Q(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year))
 		all_data = ReferralCodeUsed.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year)
-		user_null_data = all_data.exclude(Q(android_id=None) | Q(android_id = '')).values_list('android_id', flat=True).distinct()
-		# not_null_data = all_data.exclude((Q(android_id=None) | Q(android_id = '')) & Q(android_id__in=user_null_data))
-		# id_list_1 = not_null_data.values_list('by_user', flat = True)
+		user_not_null_data = all_data.exclude(Q(android_id=None) | Q(android_id = '')).values_list('android_id', flat=True).distinct()
+
 		id_list_2 = AndroidLogs.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year).values_list('user__pk', flat=True).distinct()
 		id_list_3 = FCMDevice.objects.filter(user__pk__in = id_list_2).values_list('dev_id', flat = True).distinct()
-		clist = set(list(id_list_3) + list(user_null_data))
+		clist = set(list(id_list_3) + list(user_not_null_data))
 		dau_count = len(clist) + null_data.count()
-
-
-		#print(id_list_1.count(), id_list_2.count())
-		#id_list_concat = list(id_list_1) + list(id_list_2)
-
-		#print(dt, len(set(id_list_concat)) + null_data.count())
-
-		# tot_data = ReferralCodeUsed.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year, by_user__isnull = True)
-		# install_data = ReferralCodeUsed.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year, by_user__isnull = False)
-		# #tot_data = ReferralCodeUsed.objects.filter(created_at__contains = str_curr_date, by_user__isnull = True)
-		# #install_data = ReferralCodeUsed.objects.filter(created_at__contains = str_curr_date, by_user__isnull = False)
-		# excluded_data = tot_data.exclude(android_id__in = install_data.values_list('android_id', flat = True))
-		# #print(len(excluded_data))
-		# excluded_data_list = excluded_data.values_list('by_user', flat = True)
-		# android_data = AndroidLogs.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year)
-
-		# temp_data = android_data.exclude(user__in = install_data.values_list('by_user', flat = True))
-		# dau_count = temp_data.distinct('user').count() + tot_data.count()
-		# print("date, count", dt, dau_count)
-
 
 		week_no = dt.isocalendar()[1]
 		if(curr_year == 2020):
@@ -962,52 +941,26 @@ def put_uninstall_data():
 	metrics = '11'
 	metrics_slab = ''
 
-	today = datetime.now()
-	start_date = today + timedelta(days = -1)
-	end_date = today
-	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = end_date):
-		curr_day = dt.day
-		curr_month = dt.month 
-		curr_year = dt.year
-		hour_dict = dict()
-		tot_records = FCMDevice.objects.filter(device_type='1', is_uninstalled=True, uninstalled_date__day=curr_day, uninstalled_date__month = curr_month, uninstalled_date__year = curr_year).values('dev_id', 'uninstalled_date').order_by('uninstalled_date')
-		for each in tot_records:
-			if(each['uninstalled_date'].hour<10):
-				str_date_hr = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day) + "-" + "0" + str(each['uninstalled_date'].hour)
-			else:
-				str_date_hr = str(curr_year) + "-" + str(curr_month) + "-" + str(curr_day) + "-" + str(each['uninstalled_date'].hour)	
+	dt = datetime.today() + timedelta(days=-1)
+	start_dt = dt.replace(hour=0, minute=0, second=0)
+	end_dt = dt.replace(hour=23, minute=59, second=59)
 
-			if(str_date_hr in hour_dict):
-				hour_dict[str_date_hr]+=1
-			else:
-				hour_dict[str_date_hr]=0
-				hour_dict[str_date_hr]+=1
+	tot_records = FCMDevice.objects.filter(device_type='1', is_uninstalled=True, uninstalled_date__gte=start_dt, uninstalled_date__lte = end_dt)\
+		.annotate(at_hour=TruncHour('uninstalled_date'))\
+		.values('at_hour')\
+		.order_by('at_hour')\
+		.annotate(total=Count('id'))
 
-		for key, val in hour_dict.items():
-			#print(key, val)
-			datetime_key = parser.parse(key)
-			week_no = datetime_key.isocalendar()[1]
-			curr_year_dt = datetime_key.year 
-			if(curr_year_dt == 2020):
-				week_no+=52
-			if(curr_year_dt == 2019 and week_no == 1):
-				week_no = 52
+	week_no = dt.isocalendar()[1]
+	if(dt.year == 2020):
+		week_no+=52
+	if(dt.year == 2019 and week_no == 1):
+		week_no = 52
 
-			save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
-			if(created):
-				print(metrics, metrics_slab, datetime_key, week_no, val)
-				save_obj.count = val
-				save_obj.save()
-			else:
-				print(metrics, metrics_slab, datetime_key, week_no, val)
-				save_obj.count = val
-				save_obj.save()
+	for each_hour in tot_records:
+		DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = each_hour['at_hour'], week_no = week_no, count=each_hour['total'])
 
 
-
-
-
-		
 def main():
 
 	put_share_data()

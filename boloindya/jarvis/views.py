@@ -1593,11 +1593,8 @@ def statistics_all_jarvis(request):
         data_view = 'monthly'
 
     elif metrics == '11':
-        data_view = request.GET.get('data_view', 'daily')
         data_view = request.GET.get('data_view', 'monthly')
-        data_view = request.GET.get('data_view', 'hourly')
     else:        
-        data_view = request.GET.get('data_view', 'daily')
         data_view = request.GET.get('data_view', 'monthly')
 
     # if data_view == 'daily':
