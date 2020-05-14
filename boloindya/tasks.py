@@ -158,7 +158,7 @@ def vb_create_task(topic_id):
                 # topic.is_transcoded = True
                 topic.save()
                 topic.update_m3u8_content()
-                create_downloaded_url(topic_id)
+                #create_downloaded_url(topic_id)
 
 @app.task
 def user_ip_to_state_task(user_id,ip):
@@ -242,6 +242,10 @@ def sync_contacts_with_user(user_id):
 @app.task
 def cache_follow_post(user_id):
     from forum.topic.utils import update_redis_paginated_data
+    from forum.user.utils.follow_redis import get_redis_following
+    from forum.user.models import UserProfile
+    from forum.topic.models import Topic
+    from django.db.models import Q
     key = 'follow_post:'+str(user_id)
     all_follower = get_redis_following(user_id)
     category_follow = UserProfile.objects.get(user_id = user_id).sub_category.all().values_list('pk', flat = True)
@@ -251,8 +255,9 @@ def cache_follow_post(user_id):
 
 @app.task
 def cache_popular_post(user_id,language_id):
-    from forum.topic.utils import update_redis_paginated_data
+    from forum.topic.utils import update_redis_paginated_data, get_redis_vb_seen
     from forum.user.utils.follow_redis import get_redis_following
+    from forum.topic.models import Topic
     key = 'lang:'+str(language_id)+':popular_post:'+str(user_id)
     all_seen_vb= []
     if user_id:
@@ -264,12 +269,12 @@ def cache_popular_post(user_id,language_id):
 def create_topic_notification(created,instance_id):
     from forum.topic.models import Topic,Notification
     from forum.user.models import Follower
-    from forum.user.utils.follow_redis import get_redis_following
+    from forum.user.utils.follow_redis import get_redis_follower
     try:
         instance = Topic.objects.get(pk=instance_id)
         if created:
             # all_follower_list = Follower.objects.filter(user_following = instance.user).values_list('user_follower_id',flat=True)
-            all_follower_list = get_redis_following(instance.user.id)
+            all_follower_list = get_redis_follower(instance.user.id)
             for each in all_follower_list:
                 notify = Notification.objects.create(for_user_id = each,topic = instance,notification_type='1',user = instance.user)
         instance.calculate_vb_score()
@@ -282,12 +287,12 @@ def create_comment_notification(created,instance_id):
     from forum.topic.models import Notification
     from forum.comment.models import Comment
     from forum.user.models import Follower
-    from forum.user.utils.follow_redis import get_redis_following
+    from forum.user.utils.follow_redis import get_redis_follower
     try:
         instance = Comment.objects.get(pk=instance_id)
         if created and not instance.is_vb:
             # all_follower_list = Follower.objects.filter(user_following = instance.user).values_list('user_follower_id',flat=True)
-            all_follower_list = get_redis_following(instance.user.id)
+            all_follower_list = get_redis_follower(instance.user.id)
             for each in all_follower_list:
                 if not str(each) == str(instance.topic.user.id):
                     notify = Notification.objects.create(for_user_id = each,topic = instance,notification_type='2',user = instance.user)

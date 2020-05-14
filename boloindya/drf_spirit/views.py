@@ -52,7 +52,7 @@ from forum.comment.models import Comment,CommentHistory
 from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs,UserPay,VideoPlaytime,UserPhoneBook,Contact,ReferralCode
 from jarvis.models import FCMDevice,StateDistrictLanguage, BannerUser, Report
 from forum.topic.models import Topic,TopicHistory, ShareTopic, Like, SocialShare, Notification, CricketMatch, Poll, Choice, Voting, \
-    Leaderboard, VBseen, TongueTwister, TongueTwisterCounter
+    Leaderboard, VBseen, TongueTwister, HashtagViewCounter
 from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
 from .serializers import *
@@ -350,7 +350,7 @@ def VBList(request):
     page_no = int(request.GET.get('page',1))
     if search_term:
         for term_key in search_term:
-            if term_key not in ['limit','page','order_by','is_popular']:
+            if term_key not in ['limit','page','offset','order_by','is_popular']:
                 if term_key:
                     value = request.GET.get(term_key)
                     filter_dic[term_key]=value
@@ -377,6 +377,8 @@ def VBList(request):
         topics = Topic.objects.filter(is_removed = False,is_vb = True).order_by('-id')
     total_objects = len(topics)
     paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
+    if 'offset' in search_term and int(request.GET.get('offset') or 0):
+        page_no = int(int(request.GET.get('offset') or 0)/settings.REST_FRAMEWORK['PAGE_SIZE'])+1
     if not is_user_timeline:
         page_no = 1
     try:
@@ -402,9 +404,75 @@ def replace_query_param(url, key, val):
     query = query_dict.urlencode()
     return urlparse.urlunsplit((scheme, netloc, path, query, fragment))
 
+class GetChallenge(generics.ListCreateAPIView):
+    serializer_class = TopicSerializerwithComment
+    permission_classes = (IsOwnerOrReadOnly,)
+    pagination_class = ShufflePagination 
+
+    def get_serializer_context(self):
+        """
+        Extra context provided to the serializer class.
+        """
+        return {
+            'is_expand': self.request.GET.get('is_expand',True),
+            'last_updated': timestamp_to_datetime(self.request.GET.get('last_updated',None)),
+        }
+
+    def get_queryset(self):
+        challenge_hash = self.request.GET.get('challengehash')
+        language_id = self.request.GET.get('language_id')
+        language_filter = {}
+        if language_id:
+            language_filter['language_id']=language_id
+        challengehash = '#' + challenge_hash
+        hash_tag = TongueTwister.objects.get(hash_tag__iexact=challengehash[1:])
+        all_seen_vb = []
+        if self.request.user.is_authenticated:
+            all_seen_vb = get_redis_vb_seen(self.request.user.id)
+            # all_seen_vb = VBseen.objects.filter(user = self.request.user, topic__title__icontains=challengehash).distinct('topic_id').values_list('topic_id',flat=True)
+        excluded_list =[]
+        boosted_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,is_boosted=True,boosted_end_time__gte=datetime.now()).filter(**language_filter).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if boosted_post:
+            boosted_post = sorted(boosted_post, key=lambda x: x.date, reverse=True)
+        for each in boosted_post:
+            excluded_list.append(each.id)
+        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,user__st__is_superstar = True).filter(**language_filter).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if superstar_post:
+            superstar_post = sorted(superstar_post, key=lambda x: x.date, reverse=True)
+        for each in superstar_post:
+            excluded_list.append(each.id)
+        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,user__st__is_superstar = False,user__st__is_popular=True).filter(**language_filter).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if popular_user_post:
+            popular_user_post = sorted(popular_user_post, key=lambda x: x.date, reverse=True)
+        for each in popular_user_post:
+            excluded_list.append(each.id)
+        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True).filter(**language_filter).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if popular_post:
+            popular_post = sorted(popular_post, key=lambda x: x.date, reverse=True)
+        for each in popular_post:
+            excluded_list.append(each.id)
+        normal_user_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag,user__st__is_superstar = False,user__st__is_popular=False,is_popular=False).filter(**language_filter).exclude(pk__in=all_seen_vb).distinct('user_id')
+        if normal_user_post:
+            normal_user_post = sorted(normal_user_post, key=lambda x: x.date, reverse=True)
+        for each in normal_user_post:
+            excluded_list.append(each.id)
+        other_post = Topic.objects.filter(is_removed = False,is_vb = True,hash_tags=hash_tag).filter(**language_filter).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')
+        orderd_all_seen_post=[]
+        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb, hash_tags=hash_tag).filter(**language_filter)
+        if all_seen_post:
+            for each_id in all_seen_vb:
+                for each_vb in all_seen_post:
+                    if each_vb.id == each_id:
+                        orderd_all_seen_post.append(each_vb)
+        topics=list(boosted_post)+list(superstar_post)+list(popular_user_post)+list(popular_post)+list(normal_user_post)+list(other_post)+list(orderd_all_seen_post)
+
+
+        return topics
+
+
 
 @api_view(['GET'])
-def GetChallenge(request):
+def newAlgoGetChallenge(request):
     challenge_hash = request.GET.get('challengehash')
     language_id = request.GET.get('language_id')
     challengehash = '#' + challenge_hash
@@ -412,6 +480,8 @@ def GetChallenge(request):
     all_seen_vb = []
     topics =[]
     page_no = int(request.GET.get('page',1))
+    if 'offset' in request.GET.keys() and int(request.GET.get('offset') or 0):
+        page_no = int(int(request.GET.get('offset') or 0)/settings.REST_FRAMEWORK['PAGE_SIZE'])+1
     filter_dict = {'hash_tags':hash_tag}
     if language_id:
         filter_dict['language_id']=language_id
@@ -3136,6 +3206,7 @@ def transcoder_notification(request):
         else:
             topic.is_transcoded_error = True
             topic.is_transcoded = False
+        topic.update_m3u8_content()
         topic.transcode_status_dump = json.dumps(request.body)
         topic.save()
         if topic.is_transcoded:
@@ -3211,6 +3282,9 @@ def save_android_logs(request):
             return JsonResponse({'messgae' : 'success'})
         else:
             AndroidLogs.objects.create(user=request.user, logs=request.POST.get('error_log', ''),log_type = request.POST.get('log_type',None), android_id=request.POST.get('android_id',''))
+            if request.POST.get('log_type',None)=='user_ip':
+                cache_follow_post.delay(request.user.id)
+                cache_popular_post.delay(request.user.id,request.user.st.language)
             return JsonResponse({'messgae' : 'success'})
     except Exception as e:
         return JsonResponse({'message' : 'fail','error':str(e)})

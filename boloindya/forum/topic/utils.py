@@ -204,43 +204,48 @@ def get_redis_hashtag_paginated_data(language_id, hashtag_id, page_no):
             topics = list(paginator.page(page_no))
         else:
             topics = []
+    print topics,"####"
     return topics
 
 def update_redis_hashtag_paginated_data(language_id, extra_filter, cache_max_pages = settings.CACHE_MAX_PAGES_REAL_TIME):
-    items_per_page = settings.REST_FRAMEWORK['PAGE_SIZE']
-    # cache_max_pages = settings.CACHE_MAX_PAGES
-    min_rec_to_cache = settings.MIN_REC_TO_CACHE
-    # print language_id, "############", extra_filter
-    list_page = 0
-    final_data = {}
-    paginated_data = []
-    key = None
-    from forum.topic.models import HashtagViewCounter
-    hash_df = pd.DataFrame.from_records(HashtagViewCounter.objects.filter(language = language_id).filter(**extra_filter)\
-            .order_by('-hashtag__is_popular', '-hashtag__popular_date', '-view_count').values('hashtag__id', 'video_count'))
-    while(list_page != None):
-        page_data = hash_df[(list_page*items_per_page):((list_page+1)*items_per_page)]
-        item_list = page_data['hashtag__id'].tolist()
-        count_list = page_data['video_count'].tolist()
+    try:
+        items_per_page = settings.REST_FRAMEWORK['PAGE_SIZE']
+        # cache_max_pages = settings.CACHE_MAX_PAGES
+        min_rec_to_cache = settings.MIN_REC_TO_CACHE
+        # print language_id, "############", extra_filter
+        list_page = 0
+        final_data = {}
+        paginated_data = []
+        key = None
+        from forum.topic.models import HashtagViewCounter
+        hash_df = pd.DataFrame.from_records(HashtagViewCounter.objects.filter(language = language_id).filter(**extra_filter)\
+                .order_by('-hashtag__is_popular', '-hashtag__popular_date', '-view_count').values('hashtag__id', 'video_count'))
+        while(list_page != None):
+            page_data = hash_df[(list_page*items_per_page):((list_page+1)*items_per_page)]
+            item_list = page_data['hashtag__id'].tolist()
+            count_list = page_data['video_count'].tolist()
 
-        if page_data.empty or list_page >= cache_max_pages:
-            list_page = None
-        else:
-            paginated_data.append({ (list_page+1) : item_list })
-            list_page += 1
+            if page_data.empty or list_page >= cache_max_pages:
+                list_page = None
+            else:
+                paginated_data.append({ (list_page+1) : item_list })
+                list_page += 1
 
-            loop_counter = 0
-            for each_rec in item_list:
-                key = 'hashtag:'+str(each_rec)+':lang:'+str(language_id)
-                loop_counter += 1
-                if count_list[loop_counter-1] <= min_rec_to_cache:
-                    # print 'Skipping... not gte ' + str(min_rec_to_cache)
-                    continue
-                page = 1
-                final_data = {}
-                exclude_ids = []
-                query = Topic.objects.filter(is_removed = False, is_vb = True, hash_tags__id = each_rec, language_id = language_id)
-                final_data = update_redis_paginated_data(key, query)            
-    if key:
-        return get_redis(key)
-    return final_data
+                loop_counter = 0
+                for each_rec in item_list:
+                    key = 'hashtag:'+str(each_rec)+':lang:'+str(language_id)
+                    loop_counter += 1
+                    if count_list[loop_counter-1] <= min_rec_to_cache:
+                        # print 'Skipping... not gte ' + str(min_rec_to_cache)
+                        continue
+                    page = 1
+                    final_data = {}
+                    exclude_ids = []
+                    query = Topic.objects.filter(is_removed = False, is_vb = True, hash_tags__id = each_rec, language_id = language_id)
+                    final_data = update_redis_paginated_data(key, query)            
+        if key:
+            return get_redis(key)
+        return final_data
+    except:
+        return {}
+
