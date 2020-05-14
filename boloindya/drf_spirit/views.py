@@ -50,7 +50,7 @@ from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 from forum.category.models import Category,CategoryViewCounter
 from forum.comment.models import Comment,CommentHistory
 from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs,UserPay,VideoPlaytime,UserPhoneBook,Contact,ReferralCode
-from jarvis.models import FCMDevice,StateDistrictLanguage, BannerUser
+from jarvis.models import FCMDevice,StateDistrictLanguage, BannerUser, Report
 from forum.topic.models import Topic,TopicHistory, ShareTopic, Like, SocialShare, Notification, CricketMatch, Poll, Choice, Voting, \
     Leaderboard, VBseen, TongueTwister, TongueTwisterCounter
 from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
@@ -62,6 +62,7 @@ from django.core.exceptions import MultipleObjectsReturned
 from forum.topic.utils import get_redis_category_paginated_data,get_redis_hashtag_paginated_data,get_redis_language_paginated_data,get_redis_follow_paginated_data, get_popular_paginated_data
 # from haystack.inputs import Raw, AutoQuery
 # from haystack.utils import Highlighter
+from django.contrib.contenttypes.models import ContentType
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -1661,6 +1662,19 @@ class UserPayDatatableList(generics.ListAPIView):
     def get_queryset(self):
         return UserProfile.objects.all().order_by('-bolo_score')
 
+class ActiveReoprtsDatatableList(generics.ListAPIView):
+    serializer_class = ReportDatatableSerializer
+    # queryset = User.objects.filter(is_active = True)
+    def get_queryset(self):
+        filter_dict = {}
+        if self.request.GET.get('is_active',None):
+            if self.request.GET.get('is_active')=='1':
+                filter_dict = {'is_active': True}
+            elif self.request.GET.get('is_active')=='0':
+                filter_dict = {'is_active': False}
+        return Report.objects.filter(**filter_dict).order_by('-id')
+
+
 class KYCDocumentTypeList(generics.ListAPIView):
     serializer_class = KYCDocumnetsTypeSerializer
     queryset = KYCDocumentType.objects.all()
@@ -2816,12 +2830,15 @@ def follow_like_list(request):
         app_version = AppVersionSerializer(app_version).data
         notification_count = Notification.objects.filter(for_user= request.user,status=0).count()
         block_hashes = TongueTwister.objects.filter(is_blocked=True).values_list('hash_tag', flat=True)
+        reported_user = Report.objects.filter(reported_by=request.user,target_type=ContentType.objects.get(model='user')).distinct('target_id').values_list('target_id',flat=True)
+        reported_topic = Report.objects.filter(reported_by=request.user,target_type=ContentType.objects.get(model='topic')).distinct('target_id').values_list('target_id',flat=True)
         cache_follow_post.delay(request.user.id)
         cache_popular_post.delay(request.user.id,request.user.st.language)
         return JsonResponse({'comment_like':list(comment_like),'topic_like':list(topic_like),'all_follow':list(all_follow),'all_follower':list(all_follower),\
             'all_category_follow':list(all_category_follow),'app_version':app_version,\
             'notification_count':notification_count, 'is_test_user':userprofile.is_test_user,'user':UserSerializer(request.user).data,\
-            'detialed_category':CategorySerializer(detialed_category,many = True).data,'block_hashes':list(block_hashes)}, status=status.HTTP_200_OK)
+            'detialed_category':CategorySerializer(detialed_category,many = True).data,'block_hashes':list(block_hashes),\
+            'reported_user':list(reported_user),'reported_topic':list(reported_topic)},status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -3877,3 +3894,27 @@ def upload_video_to_s3_for_app(request):
         return JsonResponse({'status': 'success','body':media_url}, status=status.HTTP_201_CREATED)
     else:
         return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def report(request):
+    try:
+        if request.user.is_authenticated:
+            report_type = request.POST.get('report_type', None)
+            target_id = request.POST.get('target_id', None)
+            target_type = request.POST.get('target_type', None) # choices 'topic','user'
+            print report_type,target_type,target_id
+            try:
+                target_type = ContentType.objects.get(model=target_type)
+            except Exception as e:
+                return JsonResponse({'message': 'Target type is not topic or user','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            Report.objects.create(reported_by = request.user, report_type = report_type, target_type = target_type, target_id = target_id)
+            return JsonResponse({'status': 'success','message':'post reported'}, status=status.HTTP_201_CREATED)
+        else:
+            return JsonResponse({'message': 'User Unauthorised'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+

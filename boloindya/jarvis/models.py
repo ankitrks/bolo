@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
@@ -8,11 +7,12 @@ from django.template.defaultfilters import slugify
 from fcm.models import AbstractDevice
 from django.http import JsonResponse
 from forum.category.models import Category
-
 from django.db.models import Q
-
-from forum.topic.models import RecordTimeStamp,Topic
+from forum.topic.models import RecordTimeStamp,Topic,UserInfo
 from drf_spirit.utils import language_options
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
+from datetime import datetime
 
 class VideoCategory(models.Model):
     category_name = models.CharField(_('Category Name'),max_length=100,null=True,blank=True)
@@ -320,7 +320,47 @@ class UserCountNotification(RecordTimeStamp):
     class Meta:
         verbose_name = _("UserCountNotification")
         verbose_name_plural = _("UserCountNotifications")
-    
+
+class Report(RecordTimeStamp):
+    reported_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Reported By"),related_name="reported_by", null=True,blank=True,editable=False)
+    report_type = models.CharField(_("report_type"), max_length=100,null=True,blank=True)
+    is_moderated = models.BooleanField(default=False)
+    target_type = models.ForeignKey(ContentType, verbose_name=('target type'),null=True,blank=True)
+    target_id = models.PositiveIntegerField(('object ID'),null=True,blank=True)
+    target = GenericForeignKey('target_type', 'target_id')
+    moderated_on = models.DateTimeField(blank=True,null=True)
+    moderated_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Moderated By"),related_name="report_moderated_by", null=True,blank=True,editable=False)
+    is_active = models.BooleanField(default = True)
+
+    def __unicode__(self):
+        return str(self.topic)
+
+    def remove_post_or_block_user_temporarily(self,moderated_by=None):
+        if isinstance(self.target, Topic):
+            instance = self.target
+            instance.is_removed = True
+            instance.save()
+        else:
+            instance = self.target
+            instance.is_active = False
+            instance.save()
+        Report.objects.filter(target_id=self.target_id, target_type_id=self.target_type_id).update(is_moderated = True, is_active=False, moderated_by = moderated_by, moderated_on = datetime.now())
+        return True
+
+    def seems_fine(self,moderated_by=None):
+        Report.objects.filter(target_id=self.target_id, target_type_id=self.target_type_id).update(is_moderated = True, is_active=False, moderated_by = moderated_by, moderated_on = datetime.now())
+        return True
+
+    def unremove_video_or_unblock(self,moderated_by=None):
+        if isinstance(self.target, Topic):
+            instance = self.target
+            instance.is_removed = False
+            instance.save()
+        else:
+            instance = self.target
+            instance.is_active = True
+            instance.save()
+        Report.objects.filter(target_id=self.target_id, target_type_id=self.target_type_id).update(is_moderated = True, is_active=False, moderated_by = moderated_by, moderated_on = datetime.now())
 
 
 

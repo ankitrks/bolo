@@ -33,7 +33,8 @@ from django.views.generic.edit import FormView
 from datetime import datetime
 from forum.userkyc.forms import KYCBasicInfoRejectForm,KYCDocumentRejectForm,AdditionalInfoRejectForm,BankDetailRejectForm
 from .models import VideoUploadTranscode,VideoCategory, PushNotification, PushNotificationUser, user_group_options, \
-    FCMDevice, notification_type_options, metrics_options, DashboardMetrics, DashboardMetricsJarvis, metrics_slab_options, metrics_language_options, UserCountNotification
+    FCMDevice, notification_type_options, metrics_options, DashboardMetrics, DashboardMetricsJarvis, metrics_slab_options,\
+     metrics_language_options, UserCountNotification, Report
 from drf_spirit.models import MonthlyActiveUser, HourlyActiveUser, DailyActiveUser, VideoDetails
 from forum.category.models import Category
 from django.contrib.auth.models import User
@@ -2309,5 +2310,50 @@ def get_count_notification(requests):
         return JsonResponse({'message': 'Found', 'count': count}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Not Found', 'err': str(e), 'count': 0}, status=status.HTTP_200_OK)
+
+
+def get_active_reports(request):
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
+       return render(request,'jarvis/pages/reports/active_reports.html')
+
+def get_moderated_reports(request):
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
+       return render(request,'jarvis/pages/reports/moderated_reports.html')
+
+def remove_post_or_block_user_temporarily(request):
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
+        report_id = request.POST.get('report_id',None)
+        if report_id:
+            report = Report.objects.get(pk=report_id)
+            report.remove_post_or_block_user_temporarily(request.user)
+            return JsonResponse({'sucess':'post_removed','message':'success' }, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'error':'report_id not found','message':'fail' }, status=status.HTTP_200_OK)
+    else:
+        return JsonResponse({'error':'User Not Authorised','message':'fail' }, status=status.HTTP_200_OK)
+
+def seems_fine(request):
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
+        report_id = request.POST.get('report_id',None)
+        if report_id:
+            report = Report.objects.get(pk=report_id)
+            report.seems_fine(request.user)
+            return JsonResponse({'sucess':'post_removed','message':'success' }, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'error':'report_id not found','message':'fail' }, status=status.HTTP_200_OK)
+    else:
+        return JsonResponse({'error':'User Not Authorised','message':'fail' }, status=status.HTTP_200_OK)
+
+def unremove_video_or_unblock(request):
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
+        report_id = request.POST.get('report_id',None)
+        if report_id:
+            report = Report.objects.get(pk=report_id)
+            report.unremove_video_or_unblock(request.user)
+            return JsonResponse({'sucess':'post_removed','message':'success' }, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'error':'report_id not found','message':'fail' }, status=status.HTTP_200_OK)
+    else:
+        return JsonResponse({'error':'User Not Authorised','message':'fail' }, status=status.HTTP_200_OK)
 
 

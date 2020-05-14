@@ -15,7 +15,7 @@ from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocu
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 from datetime import datetime,timedelta,date
 from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
-from jarvis.models import PushNotificationUser, FCMDevice
+from jarvis.models import PushNotificationUser, FCMDevice, Report
 from forum.topic.utils import get_redis_category_paginated_data,get_redis_hashtag_paginated_data
 
 cloufront_url = "https://d1fa4tg1fvr6nj.cloudfront.net"
@@ -653,6 +653,24 @@ class UserPayDatatableSerializer(ModelSerializer):
     class Meta:
         model = UserProfile
         fields = ('user','name','bolo_score','id')
+
+class ReportDatatableSerializer(ModelSerializer):
+    reported_by = UserBaseSerializerDatatable()
+    target_type = SerializerMethodField()
+    video_link = SerializerMethodField()
+    class Meta:
+        model = Report
+        fields = ('id','reported_by','report_type','target_type','video_link','target_id')
+
+    def get_target_type(self, instance):
+        return str(instance.target_type.model)
+
+    def get_video_link(self,instance):
+        if isinstance(instance.target,Topic):
+            print instance.target.backup_url
+            return instance.target.backup_url
+        else:
+            return ''
    
 class CategoryVideoByteSerializer(ModelSerializer):
     user = SerializerMethodField()
