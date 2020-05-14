@@ -133,7 +133,9 @@ def put_installs_data():
 		if(curr_year == 2019 and week_no == 1):
 			week_no = 52
 
-		DashboardMetricsJarvis.objects.get_or_create(metrics = '5', metrics_slab = '6', date = current_day, week_no = week_no, count=total_install_count[current_day])
+		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = '5', metrics_slab = '6', date = current_day, week_no = week_no)
+		save_obj.count = total_install_count[current_day]
+		save_obj.save()
 		print('5', current_day, week_no, otal_install_count[current_day])
 	
 # this function is also not being used, please do not call it anywhere
@@ -696,7 +698,9 @@ def put_dau_data():
 		metrics = '6'
 		metrics_slab = ''
 		
-		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date, week_no = week_no, count=dau_count)
+		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date, week_no = week_no)
+		save_obj.count = dau_count
+		save_obj.save()
 		print(metrics, str_curr_date, week_no, dau_count)
 
 
@@ -719,7 +723,9 @@ def put_mau_data():
 
 	metrics = '8'
 	metrics_slab = ''
-	save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date, count=mau_count)
+	save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_curr_date)
+	save_obj.count=mau_count
+	save_obj.save()
 	print(metrics, metrics_slab, str_curr_date, mau_count)
 
 
