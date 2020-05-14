@@ -115,3 +115,5 @@ enpy/
 boloindya/scripts/watermark/
 boloindya/temp/*
 *.csv
+boloindya/static
+solr/*
