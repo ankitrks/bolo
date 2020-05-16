@@ -193,6 +193,16 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
         del actions['delete_selected']
         return actions
 
+    def get_search_results(self, request, queryset, search_term):
+        final_search_term = search_term.replace('h:', '').replace('n:', '')
+        queryset, use_distinct = super(TopicAdmin, self).get_search_results(request, queryset, final_search_term)
+        if search_term:
+            if search_term.startswith('h:'):
+                queryset = queryset.filter(hash_tags__hash_tag__iexact = search_term.replace('h:', ''))
+            if search_term.startswith('n:'):
+                queryset = queryset.exclude(hash_tags__hash_tag__iexact = search_term.replace('n:', ''))
+        return queryset, use_distinct
+
     def save_model(self, request, obj, form, change):
         if 'title' in form.changed_data:
             obj.title = form.cleaned_data['title']
