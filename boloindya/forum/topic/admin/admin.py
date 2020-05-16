@@ -200,7 +200,7 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
             if search_term.startswith('h:'):
                 queryset = queryset.filter(hash_tags__hash_tag__iexact = search_term.replace('h:', ''))
             if search_term.startswith('n:'):
-                queryset = queryset.exclude(hash_tags__hash_tag__iexact = search_term.replace('n:', ''))
+                queryset = queryset.filter(title__icontains = search_term.replace('n:', '')).exclude(hash_tags__hash_tag__icontains = search_term.replace('n:', ''))
         return queryset, use_distinct
 
     def save_model(self, request, obj, form, change):
