@@ -350,7 +350,7 @@ def VBList(request):
     page_no = int(request.GET.get('page',1))
     if search_term:
         for term_key in search_term:
-            if term_key not in ['limit','page','offset','order_by','is_popular']:
+            if term_key not in ['limit','page','offset','order_by','is_popular', 'vb_score']:
                 if term_key:
                     value = request.GET.get(term_key)
                     filter_dic[term_key]=value
