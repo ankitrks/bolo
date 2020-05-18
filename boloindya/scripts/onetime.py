@@ -116,9 +116,76 @@ def correct_installs_data():
 		print(current_day, week_no, total_install_count[current_day])
 
 
+def correct_views_data():
+	#Delete old data for these 2 metrices: 'Video Views' and 'Unique Video Views'
+	old_installs_data = DashboardMetricsJarvis.objects.filter(metrics__in=['1', '7'])
+	old_installs_data.delete()
+
+	'''
+	Start data calculation from the starting
+	'''	
+	from_date = datetime(2019, 5, 1)
+	to_date = datetime.today()
+	for start_of_day in rrule.rrule(rrule.DAILY, dtstart= from_date, until= to_date):
+		end_of_day = start_of_day.replace(hour=23, minute=59, second=59)
+		total_views_data = VideoPlaytime.objects.filter(timestamp__gte=start_of_day, timestamp__lte=end_of_day)
+
+		#Calculating both unique and non-unique video views
+		all_counts = total_views_data.values('video__id', 'video__m2mcategory', 'video__language_id')\
+			.annotate(unique_count=Count('user', distinct=True), non_unique_count=Count('user'))
+
+		count_dict={}
+
+		for each_vid in all_counts:
+			lang_id = each_vid['video__language_id']
+			categ_id = each_vid['video__m2mcategory']
+
+			if categ_id not in count_dict:
+				count_dict[categ_id] = {}
+			if lang_id not in count_dict[categ_id]:
+				count_dict[categ_id][lang_id]  = {'non_unique_count':0, 'unique_count':0}
+
+			count_dict[categ_id][lang_id]['non_unique_count'] += each_vid['non_unique_count']
+			count_dict[categ_id][lang_id]['unique_count'] += each_vid['unique_count']
+
+		week_no = start_of_day.isocalendar()[1]
+		curr_year = start_of_day.year 
+		str_date = str(start_of_day.year) + "-" + str(start_of_day.month) + "-" + str(start_of_day.day)
+		if(curr_year == 2020):
+			week_no+=52
+		if(curr_year == 2019 and week_no == 1):
+			week_no = 52
+
+		for each_categ in count_dict:
+			for each_lang in count_dict[each_categ]:
+				unique_count = count_dict[each_categ][each_lang]['unique_count']
+				non_unique_count = count_dict[each_categ][each_lang]['non_unique_count']
+
+				categ_id = ''
+				if each_categ:
+					categ_id = (int)(each_categ)
+
+				#Save unique count
+				save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = '7', metrics_slab = '', date = str_date, week_no = week_no)
+				save_obj.count=unique_count
+				save_obj.metrics_language_options=each_lang
+				save_obj.category_id=each_categ
+				save_obj.save()
+
+				#Save non-unique count
+				save_obj_1, created_1 = DashboardMetricsJarvis.objects.get_or_create(metrics = '1', metrics_slab = '', date = str_date, week_no = week_no)
+				save_obj_1.count=non_unique_count
+				save_obj_1.metrics_language_options=each_lang
+				save_obj_1.category_id=each_categ
+				save_obj_1.save()
+
+		print(start_of_day)
+		
+
 def main():
 	# put_hau_data()
-	correct_installs_data()
+	# correct_installs_data()
+	correct_views_data()
 
 def run():
 	main()
