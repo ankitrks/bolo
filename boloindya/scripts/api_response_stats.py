@@ -152,7 +152,7 @@ def get_single_language():
 
 TOPICS = []
 def get_create_topic_data():
-    return {'title':'testing_topic_boloindya','language_id':get_single_language(),'category_id':get_single_category(),'media_duration':'02:00','is_vb':True,'vb_width':400,'vb_height':600,'question_video':'https://boloindyapp-prod.s3.amazonaws.com/media/SampleVideo_1280x720_10mb_158038922224.mp4','question_image':'https://www.sample-videos.com/img/Sample-jpg-image-500kb.jpg'}
+    return {'title':'testing_topic_boloindya','language_id':get_single_language(),'category_id':get_single_category(),'media_duration':'02:00','is_vb':True,'vb_width':400,'vb_height':600,'question_video':'https://in-boloindya.s3.ap-south-1.amazonaws.com/media/SampleVideo_1280x720_10mb_158038922224.mp4','question_image':'https://www.sample-videos.com/img/Sample-jpg-image-500kb.jpg'}
 MOBILE_NO={'mobile_no':9795774871}
 COMMENT_ID = []
 def get_single_comment():

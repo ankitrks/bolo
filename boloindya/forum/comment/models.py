@@ -73,15 +73,6 @@ class Comment(models.Model):
         except:
             return str(self.id)
 
-    # def save(self, *args, **kwargs):
-    #     if not self.id or not self.is_transcoded:
-    #         if self.is_media and not self.is_audio:
-    #             data_dump = transcode_media_file(self.comment)
-    #             self.backup_url = self.comment
-    #             self.transcode_dump = data_dump
-    #             self.is_transcoded = True
-    #     super(Comment, self).save(*args, **kwargs)
-
     def get_absolute_url(self):
         return reverse('spirit:comment:find', kwargs={'pk': str(self.id), })
 

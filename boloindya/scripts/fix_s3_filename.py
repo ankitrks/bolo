@@ -42,8 +42,8 @@ def run():
                     new_url = '/'.join(each_topic.backup_url.split('/')[:len(each_topic.backup_url.split('/'))-1])+'/'+valid_filename
                     print 'old_url   :', each_topic.backup_url
                     print 'new_url   :', new_url
-                    old_key=settings.BOLOINDYA_AWS_BUCKET_NAME+'/'+each_topic.backup_url.split('https://boloindyapp-prod.s3.amazonaws.com/')[1]
-                    new_key=new_url.split('https://boloindyapp-prod.s3.amazonaws.com/')[1]
+                    old_key=settings.BOLOINDYA_AWS_BUCKET_NAME+'/'+each_topic.backup_url.split('https://in-boloindya.s3.ap-south-1.amazonaws.com/')[1]
+                    new_key=new_url.split('https://in-boloindya.s3.ap-south-1.amazonaws.com/')[1]
                     print 'old_key:  ',old_key
                     print 'new_key:  ',new_key
                     rename_s3_file(old_key,new_key)

@@ -67,7 +67,7 @@ from datetime import datetime
 
 def get_bucket_details(bucket_name=None):
     bucket_credentials = {}
-    if bucket_name == 'boloindyapp-prod':
+    if bucket_name == 'in-boloindya': ## TODO: Move to settings....
         bucket_credentials['AWS_ACCESS_KEY_ID'] = settings.BOLOINDYA_AWS_ACCESS_KEY_ID
         bucket_credentials['AWS_SECRET_ACCESS_KEY'] = settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY
         bucket_credentials['AWS_BUCKET_NAME'] = settings.BOLOINDYA_AWS_BUCKET_NAME
@@ -113,7 +113,7 @@ def upload_tos3(file_name,bucket,folder_name=None):
     client = boto3.client('s3',aws_access_key_id=bucket_credentials['AWS_ACCESS_KEY_ID'],aws_secret_access_key=bucket_credentials['AWS_SECRET_ACCESS_KEY'])
     transfer = S3Transfer(client)
     transfer.upload_file(urlify(file_name.name.lower()),bucket,file_key,extra_args={'ACL':'public-read'})
-    file_url = 'https://'+bucket+'.s3.amazonaws.com/%s'%(file_key)
+    file_url = 'https://'+bucket+'.s3.ap-south-1.amazonaws.com/%s'%(file_key)
     transcode = transcode_media_file(urlify(folder_name),file_key,(file_key).split('/')[-1].split('.')[0],bucket)
     return file_url,transcode
 
@@ -154,7 +154,7 @@ def geturl(request):
                 for chunk in video_file.iter_content(chunk_size = 1024*1024):
                     if chunk:
                         f.write(chunk)
-            bucket_credentials = get_bucket_details('boloindyapp-prod')
+            bucket_credentials = get_bucket_details('in-boloindya')
             uploaded_url,transcode = upload_tos3(file_name,bucket_credentials['AWS_BUCKET_NAME'],'instagram')
             thumbnail = get_video_thumbnail(file_name,bucket_credentials['AWS_BUCKET_NAME'])
             media_duration = getVideoLength(file_name)
@@ -247,25 +247,17 @@ def getcsvdata(request):
 # AWS_BUCKET_NAME_TS='elastictranscode.videos'
 # PIPELINE_ID_TS = '1545987947390-hpo4hx'
 
-def transcode_media_file(prefix,input_key,file_name,bucket):
+def transcode_media_file(prefix, input_key, file_name, bucket):
     data_dump = ''
     m3u8_url = ''
     job_id = ''
     # HLS Presets that will be used to create an adaptive bitrate playlist.
     hls_64k_audio_preset_id = '1351620000001-200071';
-    hls_0400k_preset_id     = '1351620000001-200050';
-    hls_0600k_preset_id     = '1351620000001-200040';
-    hls_1000k_preset_id     = '1351620000001-200030';
-    hls_1500k_preset_id     = '1351620000001-200020';
     hls_2000k_preset_id     = '1351620000001-200010';
 
     # HLS Segment duration that will be targeted.
-    segment_duration_audio = '10'
-    segment_duration_400 = '10'
-    segment_duration_600 = '10'
-    segment_duration_1000 = '10'
-    segment_duration_1500 = '10'
-    segment_duration_2000 = '10'
+    segment_duration_audio = '2'
+    segment_duration_2000 = '2'
 
     #All outputs will have this prefix prepended to their output key.
     if prefix:
@@ -277,8 +269,8 @@ def transcode_media_file(prefix,input_key,file_name,bucket):
     bucket_credentials = get_bucket_details(bucket)
 
     # Creating client for accessing elastic transcoder 
-    transcoder_client = boto3.client('elastictranscoder', bucket_credentials['REGION_HOST'], aws_access_key_id = bucket_credentials['ACCESS_KEY_ID_TS'], \
-            aws_secret_access_key = bucket_credentials['AWS_SECRET_ACCESS_KEY_TS'])
+    transcoder_client = boto3.client('elastictranscoder', bucket_credentials['REGION_HOST'], \
+        aws_access_key_id = bucket_credentials['ACCESS_KEY_ID_TS'], aws_secret_access_key = bucket_credentials['AWS_SECRET_ACCESS_KEY_TS'])
 
     # Setup the job input using the provided input key.
     job_input = { 'Key': input_key }
@@ -294,32 +286,12 @@ def transcode_media_file(prefix,input_key,file_name,bucket):
         'PresetId' : hls_64k_audio_preset_id,
         'SegmentDuration' : segment_duration_audio
     }
-    hls_400k = {
-        'Key' : 'hls0400k/' + output_key,
-        'PresetId' : hls_0400k_preset_id,
-        'SegmentDuration' : segment_duration_400
-    }
-    hls_600k = {
-        'Key' : 'hls0600k/' + output_key,
-        'PresetId' : hls_0600k_preset_id,
-        'SegmentDuration' : segment_duration_600
-    }
-    hls_1000k = {
-        'Key' : 'hls1000k/' + output_key,
-        'PresetId' : hls_1000k_preset_id,
-        'SegmentDuration' : segment_duration_1000
-    }
-    hls_1500k = {
-        'Key' : 'hls1500k/' + output_key,
-        'PresetId' : hls_1500k_preset_id,
-        'SegmentDuration' : segment_duration_1500
-    }
     hls_2000k = {
         'Key' : 'hls2000k/' + output_key,
         'PresetId' : hls_2000k_preset_id,
         'SegmentDuration' : segment_duration_2000
     }
-    job_outputs = [ hls_audio, hls_400k, hls_600k, hls_1000k, hls_1500k ,hls_2000k ]
+    job_outputs = [ hls_audio, hls_2000k ]
 
     playlist_name = output_key
     # Setup master playlist which can be used to play using adaptive bitrate.
@@ -344,10 +316,10 @@ def transcode_media_file(prefix,input_key,file_name,bucket):
     create_job_result=transcoder_client.create_job(**create_job_request)
     try:
         if bucket_credentials['AWS_BUCKET_NAME_TS']=='elastictranscode.videos':
-            m3u8_url = os.path.join('https://s3.amazonaws.com/'+bucket_credentials['AWS_BUCKET_NAME_TS']+'/', \
+            m3u8_url = os.path.join('https://s3.ap-south-1.amazonaws.com/'+bucket_credentials['AWS_BUCKET_NAME_TS']+'/', \
                 output_key_prefix_final, playlist_name + '.m3u8')
         else:
-            m3u8_url = os.path.join('https://'+bucket_credentials['AWS_BUCKET_NAME_TS']+'.s3.amazonaws.com/', \
+            m3u8_url = os.path.join('https://'+bucket_credentials['AWS_BUCKET_NAME_TS']+'.s3.ap-south-1.amazonaws.com/', \
                 output_key_prefix_final, playlist_name + '.m3u8')
         job_id = create_job_result['Job']['Id']
         data_dump += 'HLS job has been created: ' + json.dumps(create_job_result)
@@ -355,7 +327,6 @@ def transcode_media_file(prefix,input_key,file_name,bucket):
         data_dump += 'Exception: ' + str(e)
     # print {'new_m3u8_url':m3u8_url, 'job_id':job_id}
     return {'new_m3u8_url':m3u8_url, 'job_id':job_id,'data_dump':data_dump}
-
 
 def uploaddata(request):
     return HttpResponse()
@@ -445,7 +416,7 @@ def get_kyc_of_user(request):
 
 def SecretFileView(request):
     u = request.user
-    filepath = request.GET.get('url').split('https://'+settings.AWS_STORAGE_BUCKET_NAME+'.s3.amazonaws.com/')[0]
+    filepath = request.GET.get('url').split('https://'+settings.AWS_STORAGE_BUCKET_NAME+'.s3.ap-south-1.amazonaws.com/')[0]
     print filepath,"##################"
     if u.is_authenticated() and  u.is_staff:
         client = boto3.client('s3',aws_access_key_id = settings.AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.AWS_SECRET_ACCESS_KEY)
@@ -928,7 +899,7 @@ def boloindya_edit_upload(request):
     elif request.method == 'POST':
         video_id = request.POST.get('video_id',None)
         if video_id:
-            bucketName='boloindyapp-prod'
+            bucketName='in-boloindya'
             my_video = VideoUploadTranscode.objects.get(pk=video_id)
             videoRotateStatus = request.POST.get('rotation',None)
             if videoRotateStatus:
@@ -999,7 +970,7 @@ def upload_thumbail(virtual_thumb_file,bucket_name):
         final_filename = "img-" + str(ts).replace(".", "")  + ".jpg"
         client.put_object(Bucket=bucket_credentials['AWS_BUCKET_NAME'], Key='thumbnail/' +bucket_name+"/"+final_filename, Body=virtual_thumb_file, ACL='public-read')
         # client.resource('s3').Object(settings.BOLOINDYA_AWS_BUCKET_NAME, 'thumbnail/' + final_filename).put(Body=open(virtual_thumb_file, 'rb'))
-        filepath = "https://"+bucket_credentials['AWS_BUCKET_NAME']+".s3.amazonaws.com/thumbnail/"+bucket_name+"/"+final_filename
+        filepath = "https://"+bucket_credentials['AWS_BUCKET_NAME']+".s3.ap-south-1.amazonaws.com/thumbnail/"+bucket_name+"/"+final_filename
         # if os.path.exists(file):
         #     os.remove(file)
         return filepath
@@ -1015,7 +986,7 @@ def upload_rotated_thumbail(virtual_thumb_file,bucket_name,rotationAngle):
         final_filename = virtual_thumb_file.split('/')[-1]
         response=client.put_object(Bucket=bucket_credentials['AWS_BUCKET_NAME'], Key='thumbnail/' +bucket_name+"/"+final_filename, Body=open(rotatedImagePath, 'rb'), ACL='public-read')
         # client.resource('s3').Object(settings.BOLOINDYA_AWS_BUCKET_NAME, 'thumbnail/' + final_filename).put(Body=open(virtual_thumb_file, 'rb'))
-        filepath = "https://"+bucket_credentials['AWS_BUCKET_NAME']+".s3.amazonaws.com/thumbnail/"+bucket_name+"/"+final_filename
+        filepath = "https://"+bucket_credentials['AWS_BUCKET_NAME']+".s3.ap-south-1.amazonaws.com/thumbnail/"+bucket_name+"/"+final_filename
         if response:
             deleFilePath='temp/'+final_filename
             if os.path.exists(deleFilePath):
@@ -2195,7 +2166,7 @@ def upload_image_notification(requests):
     if requests.is_ajax():
         file=requests.FILES['file']
         print(file)
-        data=upload_thumbail_notification(file, 'boloindyapp-prod')
+        data=upload_thumbail_notification(file, 'in-boloindya')
         try:
             return JsonResponse({'data': data}, status=status.HTTP_200_OK)
         except Exception as e:
@@ -2208,7 +2179,7 @@ def upload_thumbail_notification(virtual_thumb_file,bucket_name):
         ts = time.time()
         final_filename = "img-" + str(ts).replace(".", "")  + ".jpg"
         client.put_object(Bucket=bucket_credentials['AWS_BUCKET_NAME'], Key='notification/'+final_filename, Body=virtual_thumb_file, ACL='public-read')
-        filepath = "https://"+bucket_credentials['AWS_BUCKET_NAME']+".s3.amazonaws.com/notification/"+final_filename
+        filepath = "https://"+bucket_credentials['AWS_BUCKET_NAME']+".s3.ap-south-1.amazonaws.com/notification/"+final_filename
         return filepath
     except Exception as e:
         print(e)

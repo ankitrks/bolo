@@ -530,13 +530,21 @@ SIMPLE_JWT = {
 #### S3 bucket #####
 BOLOINDYA_AWS_ACCESS_KEY_ID = 'AKIAZNK4CM5CV76OQQHQ'
 BOLOINDYA_AWS_SECRET_ACCESS_KEY = '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'
-BOLOINDYA_AWS_BUCKET_NAME = 'boloindyapp-prod'
+BOLOINDYA_AWS_BUCKET_NAME = 'in-boloindya'
 
 #### Transcoder settings #####
-BOLOINDYA_PIPELINE_ID_TS = '1545987947390-hpo4hx'
+# REGION_HOST = 'us-east-1'
+# BOLOINDYA_PIPELINE_ID_TS = '1545987947390-hpo4hx'
+# BOLOINDYA_AWS_ACCESS_KEY_ID_TS = 'AKIAZNK4CM5CW4W4VWP7'
+# BOLOINDYA_AWS_SECRET_ACCESS_KEY_TS = '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'
+# BOLOINDYA_AWS_BUCKET_NAME_TS = 'boloindya-et'
+
+#### Region Asia Settings....
+REGION_HOST = 'ap-south-1'
+BOLOINDYA_PIPELINE_ID_TS = '1589836144657-j58eor'
 BOLOINDYA_AWS_ACCESS_KEY_ID_TS = 'AKIAZNK4CM5CW4W4VWP7'
 BOLOINDYA_AWS_SECRET_ACCESS_KEY_TS = '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'
-BOLOINDYA_AWS_BUCKET_NAME_TS = 'boloindya-et'
+BOLOINDYA_AWS_BUCKET_NAME_TS = 'inboloindya-et'
 #### Transcoder settings #####
 
 #####CareerAnna ######
@@ -554,7 +562,7 @@ CAREERANNA_AWS_BUCKET_NAME_TS = 'elastictranscode.videos'
 
 # The region of your bucket, more info:
 # http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
-REGION_HOST = 'us-east-1'
+
 
 FCM_MAX_RECIPIENTS = 1000
 

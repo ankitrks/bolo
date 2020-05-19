@@ -149,7 +149,7 @@ def vb_create_task(topic_id):
     topic = Topic.objects.get(pk=topic_id)
     if not topic.is_transcoded:
         if topic.is_vb and topic.question_video:
-            data_dump, m3u8_url, job_id = transcode_media_file(topic.question_video.split('s3.amazonaws.com/')[1])
+            data_dump, m3u8_url, job_id = transcode_media_file(topic.question_video.split('s3.ap-south-1.amazonaws.com/')[1])
             if m3u8_url:
                 topic.backup_url = topic.question_video
                 topic.question_video = m3u8_url
@@ -185,7 +185,10 @@ def upload_media(media_file,filename):
         filenameNext= str(filename).split('.')
         final_filename = str(filenameNext[0])+"."+str(filenameNext[1])
         client.put_object(Bucket=settings.BOLOINDYA_AWS_BUCKET_NAME, Key='watermark/' + final_filename, Body=media_file,ACL='public-read')
-        filepath = "https://s3.amazonaws.com/"+settings.BOLOINDYA_AWS_BUCKET_NAME+"/watermark/"+final_filename
+        filepath = "https://s3.ap-south-1.amazonaws.com/"+settings.BOLOINDYA_AWS_BUCKET_NAME+"/watermark/"+final_filename
+
+        ## Move this path to settings..... 
+
         return filepath
     except:
         return None
@@ -326,7 +329,9 @@ def create_thumbnail_cloudfront(topic_id):
     try:
         from forum.topic.models import Topic
         from drf_spirit.utils import get_modified_url, check_url
-        lambda_url = "http://boloindyapp-prod.s3-website-us-east-1.amazonaws.com/200x300"
+        lambda_url = "http://in-boloindya.s3-website.ap-south-1.amazonaws.com/200x300" ## TODO: MOve to settings
+        ## TODO: It has to be a dynamic distribution (among 5 cloudfront utls).
+        ## Cloud front utls set will be different for "in-boloindya" and "in-boloindya" ## TODO: MOve to settings
         cloundfront_url = "http://d3g5w10b1w6clr.cloudfront.net/200x300"
         video_byte = Topic.objects.filter(pk=topic_id)
         if video_byte.count() > 0:

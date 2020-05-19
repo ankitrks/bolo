@@ -21,7 +21,7 @@ def upload_media(media_file,filename):
         filenameNext= str(filename).split('.')
         final_filename = str(filenameNext[0])+"."+str(filenameNext[1])
         client.put_object(Bucket=settings.BOLOINDYA_AWS_BUCKET_NAME, Key='watermark/' + final_filename, Body=media_file,ACL='public-read')
-        filepath = "https://s3.amazonaws.com/"+settings.BOLOINDYA_AWS_BUCKET_NAME+"/watermark/"+final_filename
+        filepath = "https://s3.ap-south-1.amazonaws.com/"+settings.BOLOINDYA_AWS_BUCKET_NAME+"/watermark/"+final_filename
         return filepath
     except:
         return None

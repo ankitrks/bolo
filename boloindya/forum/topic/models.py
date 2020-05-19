@@ -210,7 +210,7 @@ class Topic(RecordTimeStamp):
     def update_vb(self, *args, **kwargs):
         if not self.id or not self.is_transcoded:
             if self.is_vb and self.question_video:
-                data_dump, m3u8_url, job_id = transcode_media_file(self.question_video.split('s3.amazonaws.com/')[1])
+                data_dump, m3u8_url, job_id = transcode_media_file(self.question_video.split('s3.ap-south-1.amazonaws.com/')[1])
                 if m3u8_url:
                     self.backup_url = self.question_video
                     self.question_video = m3u8_url
@@ -221,7 +221,7 @@ class Topic(RecordTimeStamp):
                     self.update_m3u8_content()
     
     def watermark_vb(self, *args, **kwargs):
-        data_dump, m3u8_url, job_id = transcode_media_file(self.question_video.split('s3.amazonaws.com/')[1])
+        data_dump, m3u8_url, job_id = transcode_media_file(self.question_video.split('s3.ap-south-1.amazonaws.com/')[1])
         # print m3u8_url,"====>",job_id
         if m3u8_url:
             self.backup_url = self.question_video

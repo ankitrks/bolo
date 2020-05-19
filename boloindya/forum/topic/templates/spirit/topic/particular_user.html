@@ -11,10 +11,10 @@
 <meta data-react-helmet="true" name="twitter:card" content="summary"/>
 <meta data-react-helmet="true" name="twitter:site" content="{{ request.get_full_path }}"/>
 <meta data-react-helmet="true" name="twitter:title" content="Follow Experts from Your areas of interest and discuss anything you want - Video Bytes, Questions and Answers on Bolo Indya App"/>
-<meta data-react-helmet="true" name="twitter:image" content="https://boloindya.s3.amazonaws.com/share_pages/share_topic.webp"/>
+<meta data-react-helmet="true" name="twitter:image" content="https://boloindya.s3.ap-south-1.amazonaws.com/share_pages/share_topic.webp"/>
 
 <meta data-react-helmet="true" property="og:url" content="{{ request.get_full_path }}"/>
-<meta data-react-helmet="true" property="og:image" content="https://boloindya.s3.amazonaws.com/share_pages/share_topic.webp"/>
+<meta data-react-helmet="true" property="og:image" content="https://boloindya.s3.ap-south-1.amazonaws.com/share_pages/share_topic.webp"/>
 
 {% endblock %}
 {% block title %}Bolo Indya{% endblock %}
@@ -173,7 +173,7 @@
             }
             .left_main {
                 width: 67vw;
-                background-image: url("https://boloindya.s3.amazonaws.com/share_pages/share_topic.webp");
+                background-image: url("https://boloindya.s3.ap-south-1.amazonaws.com/share_pages/share_topic.webp");
                 background-repeat: no-repeat;
                 background-position: center; 
                 background-size: cover; 
@@ -231,7 +231,7 @@
     <div class="single_comment">
         <div class="row user_details mx-0">
             <div class="col-2 pl-0">
-                <img src="{% if comment.user.profile_pic %}{{ comment.user.profile_pic }} {% endif %} https://boloindya.s3.amazonaws.com/media/user.svg" alt="User Image" class="img-fluid">
+                <img src="{% if comment.user.profile_pic %}{{ comment.user.profile_pic }} {% endif %} https://boloindya.s3.ap-south-1.amazonaws.com/media/user.svg" alt="User Image" class="img-fluid">
             </div>
             <div class="col-8 px-0">
                 <div class="username">
@@ -265,7 +265,7 @@
             </div>
             <div class="col-3">
                 <div class="circle">
-                    <img src="{% if comment.user.profile_pic %}{{ comment.user.profile_pic }} {% endif %} https://boloindya.s3.amazonaws.com/media/user.svg" alt="User Image" class="img-fluid">
+                    <img src="{% if comment.user.profile_pic %}{{ comment.user.profile_pic }} {% endif %} https://boloindya.s3.ap-south-1.amazonaws.com/media/user.svg" alt="User Image" class="img-fluid">
                 </div>
             </div>
         </div>

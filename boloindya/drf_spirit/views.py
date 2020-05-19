@@ -1034,7 +1034,7 @@ def upload_thumbail(virtual_thumb_file):
         final_filename = "img-" + str(ts).replace(".", "")  + ".jpg" 
         client.put_object(Bucket=settings.BOLOINDYA_AWS_BUCKET_NAME, Key='thumbnail/' + final_filename, Body=virtual_thumb_file, ACL='public-read')
         # client.resource('s3').Object(settings.BOLOINDYA_AWS_BUCKET_NAME, 'thumbnail/' + final_filename).put(Body=open(virtual_thumb_file, 'rb'))
-        filepath = "https://s3.amazonaws.com/"+settings.BOLOINDYA_AWS_BUCKET_NAME+"/thumbnail/"+final_filename
+        filepath = "https://s3.ap-south-1.amazonaws.com/"+settings.BOLOINDYA_AWS_BUCKET_NAME+"/thumbnail/"+final_filename
         # if os.path.exists(file):
         #     os.remove(file)
         return filepath
@@ -1049,7 +1049,7 @@ def upload_media(media_file):
         filenameNext= str(media_file.name).split('.')
         final_filename = str(filenameNext[0])+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[1])
         client.put_object(Bucket=settings.BOLOINDYA_AWS_BUCKET_NAME, Key='media/' + final_filename, Body=media_file)
-        filepath = "https://s3.amazonaws.com/"+settings.BOLOINDYA_AWS_BUCKET_NAME+"/media/"+final_filename
+        filepath = "https://s3.ap-south-1.amazonaws.com/"+settings.BOLOINDYA_AWS_BUCKET_NAME+"/media/"+final_filename
         # if os.path.exists(file):
         #     os.remove(file)
         return filepath

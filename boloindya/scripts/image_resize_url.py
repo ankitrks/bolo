@@ -5,7 +5,9 @@ from forum.user.models import UserProfile
 from django.db.models import F,Q
 
 def run():
-    lambda_url = "http://boloindyapp-prod.s3-website-us-east-1.amazonaws.com/200x300"
+    lambda_url = "http://in-boloindya.s3-website.ap-south-1.amazonaws.com/200x300"
+    ## TODO: It has to be a dynamic distribution (among 5 cloudfront utls).
+    ## Cloud front utls set will be different for "in-boloindya" and "in-boloindya" ## TODO: MOve to settings
     cloundfront_url = "http://d3g5w10b1w6clr.cloudfront.net/200x300"
 
 def check_url(file_path):
