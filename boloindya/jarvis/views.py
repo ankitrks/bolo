@@ -1685,9 +1685,10 @@ def statistics_all_jarvis(request):
                     print("or else coming here....") 
                     graph_data = graph_data.filter(metrics_slab = slab)
 
-    if metrics == '9':
-        if language_choice in language_index_list:
+    if metrics in ['9','1','7']:
+        if (language_choice in language_index_list and language_choice != '0'):
             graph_data = graph_data.filter(metrics_language_options = language_choice) 
+
         if category_choice:
             graph_data = graph_data.filter(category_id = category_choice)    
 
@@ -1779,12 +1780,9 @@ def statistics_all_jarvis(request):
         data['slabs'] = [metrics_slab_options[3], metrics_slab_options[4], metrics_slab_options[5]]
     if metrics == '5':
         data['slabs'] = [metrics_slab_options[6], metrics_slab_options[7], metrics_slab_options[8]]
-    if metrics == '9':
+    if metrics in ['9', '12', '1', '7']:
         data['language_filter'] = metrics_language_options 
         data['category_filter'] = category_slab_options
-    if metrics == '12':
-        data['language_filter'] = metrics_language_options
-        data['category_filter'] = category_slab_options    
           
     return render(request,'jarvis/pages/video_statistics/statistics_all_jarvis.html', data)
 
