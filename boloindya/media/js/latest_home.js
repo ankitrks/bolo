@@ -301,13 +301,14 @@ function updateFollowStatus(response){
 }
 
 function openVideoInPopupSlider(divId,videoURL,backup_url,posterImage) {debugger;
-
+    var status=$(".videoSliderPlay").prop('muted', true);
    if($("#player-"+divId).prop('muted')){
     //mute_icon
     $("#player-"+divId).prop('muted', false);
     var newSrc='/media/mute_icon.svg';
     $('.muteSrcId_'+divId).attr('src', newSrc);
   }else{
+
       $("#player-"+divId).prop('muted', true);
       var newSrc='/media/sound_mute.svg';
       $('.muteSrcId_'+divId).attr('src', newSrc);

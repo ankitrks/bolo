@@ -381,7 +381,7 @@ video.jsx-3382097194 {
                 </div>
                 <div class="jsx-3959364739 recommend-card">
                     <header class="jsx-3959364739">
-                        <h3 class="jsx-3959364739">{% trans "Creators" %}</h3><a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a></header>
+                        <h3 class="jsx-3959364739">{% trans "Suggested Users" %}</h3><!-- <a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a> --></header>
                     <div class="_scroll_load_more_loading_creator center">
                         <div class="boloindya-loading">Loading...</div>
                     </div>
@@ -392,7 +392,29 @@ video.jsx-3382097194 {
 
                     </ul>
                 </div>
-                <div class="jsx-3959364739 recommend-card">
+
+                            <div class="jsx-3959364739 recommend-card" style="margin-top: 10px;">
+                                <header class="jsx-3959364739">
+                                    <h3 style="font-size: 24px;" class="jsx-3959364739">{% trans "Trending Hashtags" %}</h3><a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a></header>
+                                <ul class="jsx-3959364739 sidebarLi" id="creatorId2">
+
+                                    {%  for each_hashtag_item in hash_tags %}
+                                
+                                        <li class="jsx-3959364739">
+                                            <a tag="a" class="jsx-1420774184 recommend-item" href="/hashtag/{{each_hashtag_item.hash_tag}}/">
+                                                <div class="jsx-1420774184 info-content">
+                                                    <h4 class="jsx-1420774184">#{{each_hashtag_item.hash_tag}}</h4>
+                                                    <p class="jsx-1420774184">{{each_hashtag_item.total_views | shorcountertopic}} {% trans "views" %}</p>
+                                                </div>
+                                                <div class="jsx-1420774184 arrow-right"></div>
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+
+                                </ul>
+                            </div>
+
+<!--                 <div class="jsx-3959364739 recommend-card">
                     <header class="jsx-3959364739">
                         <h3 class="jsx-3959364739">{% trans "Discover" %}</h3><a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a></header>
                     <div class="_scroll_load_more_loading_discover center">
@@ -400,7 +422,7 @@ video.jsx-3382097194 {
                     </div>
                     <ul class="jsx-3959364739 sidebarLi" id="discoverId">
                     </ul>
-                </div>
+                </div> -->
             </div>
             <div class="jsx-3336228099 download-container card">
 

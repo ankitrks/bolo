@@ -435,9 +435,91 @@ function loadMoreComments(nextPageURl){
 
 $(document).ready(function(){
     getCategoryWithVideos();
+    //getHashTagList();
 });
 
 var topicList=[];
+
+function getHashTagList(){debugger;
+
+    loaderBoloShowDynamic('_scroll_load_more_loading_right');
+    loaderBoloShowDynamic('_scroll_load_more_loading_left');
+        var playListData=[]; 
+    var platlistItems;
+
+    var listItems="";
+    var itemCount=0;
+    var language_id=1;
+    var page_size=10;
+    var page=1;
+    var uri='https://www.boloindya.com/api/v1/get_hash_discover/';
+    var res = encodeURI(uri);
+    var category_with_video_list="";
+    language_id=current_language_id;
+
+    jQuery.ajax({
+        url:res,
+        type:"GET",
+        crossDomain: true,
+        data:{'language_id':language_id,'is_expand':'True','page_size':page_size,'page':page},
+        success: function(response,textStatus, xhr){debugger;
+            populaCreatorsItems="";
+            var populaCategoriesItems="";
+            var populvideoItems="";
+            var itemCount=0;
+            //var responseData=response.category_details;
+            var responseData=response.results;
+            responseData.forEach(function(itemCategory) {itemCount++;
+                populaCreatorsItems =popularCategoryHeading(itemCategory);
+                populvideoItems="";
+                var topicData=itemCategory.topics;
+                populvideoItems+='<div class="_explore_feed_card">';
+                var videoItemCount=0;
+                topicData.forEach(function(itemVideoByte){videoItemCount++;
+                    
+                    if(videoItemCount<4){
+                        videoItemCountIndex++;
+                        topicList[itemVideoByte.id]=itemVideoByte;
+                        populvideoItems +=popularCategoryItem(itemVideoByte);
+                        playlistWithIndex[videoItemCountIndex]=itemVideoByte;
+                    }
+                });
+                populvideoItems+='</div>';
+                category_with_video_list='<div class="_explore_feed_item">'+populaCreatorsItems+''+populvideoItems+'</div>';
+
+                if(itemCount % 2 == 0) {
+                    loaderBoloHideDynamic('_scroll_load_more_loading_right');
+                    $("#catWithVideoIdRight").append(category_with_video_list);
+                }else{
+                     loaderBoloHideDynamic('_scroll_load_more_loading_left');
+                    $("#catWithVideoId").append(category_with_video_list);
+                }
+
+            });
+            var nextPage= response.next;
+            if(nextPage){
+                $("#nextpageURLId").val(nextPage);
+                checkDataStatusCat=0;
+            }
+            followLikeList();
+
+        },
+        error: function(jqXHR, ajaxOptions, thrownError) {
+            console.log(jqXHR);
+           loaderBoloHideDynamic('_scroll_load_more_loading_left');
+           loaderBoloHideDynamic('_scroll_load_more_loading_right');
+
+        }/*  end of error */
+
+  
+    });
+
+
+
+
+}
+
+
 function getCategoryWithVideos(){
     loaderBoloShowDynamic('_scroll_load_more_loading_right');
     loaderBoloShowDynamic('_scroll_load_more_loading_left');

@@ -61,6 +61,8 @@ function getCreators(popularCreators){
     var creatorName="";
     if(popularCreators.first_name!=''){
         creatorName=popularCreators.first_name+' '+popularCreators.last_name;
+    }else if(popularCreators.userprofile.name!=""){
+        creatorName=popularCreators.userprofile.name;
     }else{
         creatorName=popularCreators.username;
     }
