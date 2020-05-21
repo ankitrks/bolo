@@ -1102,9 +1102,10 @@ def get_random_username():
     # x = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
     try:
         user = User.objects.get(username=x)
-        get_random_username()
+        x = get_random_username()
     except:
         return x
+    return x
 
 def check_username_valid(username):
     if re.match(r"^[a-z0-9_.-]+$", username):
