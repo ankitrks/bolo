@@ -1207,9 +1207,9 @@ margin-top: 38px;
                                     
 
                                     <div class="_video_feed_item1 item">
-                                        <img onClick="openVideoInPopupSlider('{{itemVideo.id}}','{{itemVideo.question_video | get_video_cdn}}','{{itemVideo.backup_url}}','{{itemVideo.question_image}}');" class="_video_card_mute _video_card_mute_left_top muteSrcId_{{itemVideo.id}}" id="mutedImageId" src="/media/sound_mute.svg">
+                                        <img onClick="openVideoInPopupSlider1('{{itemVideo.id}}','{{itemVideo.question_video | get_video_cdn}}','{{itemVideo.backup_url}}','{{itemVideo.question_image}}');" class="_video_card_mute _video_card_mute_left_top muteSrcId_{{itemVideo.id}}" id="mutedImageId" src="/media/sound_mute.svg">
                                         <span id="video_play_item_{{itemVideo.id}}">
-                                            <video id="player-{{itemVideo.id}}" preload="auto" muted autoplay poster="{{itemVideo.question_image}}" class="videoCentered videoSliderPlay">
+                                            <video onClick="openVideoInPopupSlider('{{itemVideo.id}}','{{itemVideo.question_video | get_video_cdn}}','{{itemVideo.backup_url}}','{{itemVideo.question_image}}');" id="player-{{itemVideo.id}}" preload="auto" muted autoplay poster="{{itemVideo.question_image}}" class="videoCentered videoSliderPlay">
                                                 <source src="{{itemVideo.question_video | get_video_cdn}}" type="application/x-mpegURL">
                                                 <source src="{{itemVideo.question_video}}" type="application/x-mpegURL">
                                                 <source src="{{itemVideo.backup_url}}" type="video/mp4">
