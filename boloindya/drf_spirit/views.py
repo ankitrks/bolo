@@ -1097,7 +1097,7 @@ def get_random_username():
         month = '0'+str(month)
     else:
         month = str(month)
-    x = 'bi'+year+month+''.join(random.choice(string.digits) for _ in range(4))
+    x = 'bi'+year+month+''.join(random.choice(string.digits) for _ in range(6))
     x = x.lower()
     # x = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
     try:
@@ -1105,7 +1105,6 @@ def get_random_username():
         x = get_random_username()
     except:
         return x
-    return x
 
 def check_username_valid(username):
     if re.match(r"^[a-z0-9_.-]+$", username):
