@@ -366,7 +366,9 @@ function listCommentsById(singleTopicData){
       
         });
         $(".videoCommentId").append(listCommentItems);
-        var loadMoreComment='<span class="loadMoreComment"><a onclick="loadMoreComments(\''+data.next+'\');" class="" href="javascript:void(0);">Load More Comments...</a></span';
+        if(data.next!="" && data.next!='null'){
+            var loadMoreComment='<span class="loadMoreComment"><a onclick="loadMoreComments(\''+data.next+'\');" class="" href="javascript:void(0);">Load More Comments...</a></span';
+        }
         $(".loadMoreComments").html(loadMoreComment);
         loaderBoloHide();
     });
@@ -403,7 +405,9 @@ function loadMoreComments(nextPageURl){
       
         });
         $(".videoCommentId").append(listCommentItems);
-        var loadMoreComment='<span class="loadMoreComment"><a class="" onclick="loadMoreComments(\''+data.next+'\');" href="javascript:void(0);">Load More Comments...</a></span';
+        if(data.next!="" && data.next!='null'){
+            var loadMoreComment='<span class="loadMoreComment"><a class="" onclick="loadMoreComments(\''+data.next+'\');" href="javascript:void(0);">Load More Comments...</a></span';
+        }
         $(".loadMoreComments").html(loadMoreComment);
         loaderBoloHide();
         loaderBoloHideDynamic('_scroll_load_more_loading_comment');
@@ -469,21 +473,33 @@ function getHashTagList(){debugger;
             var itemCount=0;
             //var responseData=response.category_details;
             var responseData=response.results;
-            responseData.forEach(function(itemCategory) {itemCount++;
+            var hashtagVideoCall=0;
+            var hashtagIds = [];
+
+            responseData.forEach(function(itemCategory) {itemCount++;hashtagVideoCall++;
                 populaCreatorsItems =popularCategoryHeading(itemCategory);
                 populvideoItems="";
-                var topicData=itemCategory.topics;
+                //var topicData=itemCategory.topics;
+                var hashTagId=itemCategory.tongue_twister.id;
+                hashtagIds.push(hashTagId);
                 populvideoItems+='<div class="_explore_feed_card">';
                 var videoItemCount=0;
-                topicData.forEach(function(itemVideoByte){videoItemCount++;
-                    
-                    if(videoItemCount<4){
-                        videoItemCountIndex++;
-                        topicList[itemVideoByte.id]=itemVideoByte;
-                        populvideoItems +=popularCategoryItem(itemVideoByte);
-                        playlistWithIndex[videoItemCountIndex]=itemVideoByte;
+                if(hashtagVideoCall==2){
+                    hashtagVideoCall=0;
+
+                    var hashtagVideoList=getHashTagVideoList(hashtagIds);debugger;
+                    if( hashtagVideoList!="" && hashtagVideoList!=undefined){
+                        hashtagVideoList.forEach(function(itemVideoByte){videoItemCount++;
+                            if(videoItemCount<4){
+                                videoItemCountIndex++;
+                                topicList[itemVideoByte.id]=itemVideoByte;
+                                populvideoItems +=popularCategoryItem(itemVideoByte);
+                                playlistWithIndex[videoItemCountIndex]=itemVideoByte;
+                            }
+                        });
                     }
-                });
+                    hashtagIds =[];
+                }
                 populvideoItems+='</div>';
                 category_with_video_list='<div class="_explore_feed_item">'+populaCreatorsItems+''+populvideoItems+'</div>';
 
@@ -509,18 +525,48 @@ function getHashTagList(){debugger;
            loaderBoloHideDynamic('_scroll_load_more_loading_left');
            loaderBoloHideDynamic('_scroll_load_more_loading_right');
 
-        }/*  end of error */
+        }
 
   
     });
 
+}
 
+function getHashTagVideoList(hashTagId){debugger;
 
+    var listItems="";
+    var itemCount=0;
+    var language_id=1;
+    var page_size=10;
+    var page=1;
+    var hashTagIds = hashTagId.join(",");
+    var uri='/api/v1/get_popular_hash_tag/?hashtag_ids='+hashTagIds;
+    var res = encodeURI(uri);
+    //var res = uri;
+    var category_with_video_list="";
+    language_id=current_language_id;
+
+    jQuery.ajax({
+        url:res,
+        type:"GET",
+        data:{'language_id':language_id},
+        success: function(response,textStatus, xhr){debugger;
+            var responseData=response.results;
+            return responseData;
+
+        },
+        error: function(jqXHR, ajaxOptions, thrownError) {debugger;
+            console.log(jqXHR);
+        }
+
+  
+    });
 
 }
 
 
-function getCategoryWithVideos(){
+
+function getCategoryWithVideos(){debugger;
     loaderBoloShowDynamic('_scroll_load_more_loading_right');
     loaderBoloShowDynamic('_scroll_load_more_loading_left');
         var playListData=[]; 
@@ -529,8 +575,10 @@ function getCategoryWithVideos(){
     var listItems="";
     var itemCount=0;
     var language_id=1;
-    var page_size=2;
-    var uri='/api/v1/get_popular_hash_tag/';
+    var page_size=10;
+    var page=1;
+    //var uri='/api/v1/get_popular_hash_tag/';
+    var uri='http://localhost:8080/careeranna/websiteapi/get_hash_discover';
     var res = encodeURI(uri);
     var category_with_video_list="";
     language_id=current_language_id;
@@ -538,30 +586,44 @@ function getCategoryWithVideos(){
     jQuery.ajax({
         url:res,
         type:"GET",
-
-        data:{'language_id':language_id,'is_with_popular':'True','popular_boloindyans':'True','page_size':page_size},
-        success: function(response,textStatus, xhr){
+        dataType:'json',
+        data:{'language_id':language_id,'is_with_popular':'True','popular_boloindyans':'True','page_size':page_size,'page':page},
+        success: function(response,textStatus, xhr){debugger;
             populaCreatorsItems="";
             var populaCategoriesItems="";
             var populvideoItems="";
             var itemCount=0;
+            var hashtagIds=[];
+            var hashtagVideoCall=0;
             //var responseData=response.category_details;
             var responseData=response.results;
-            responseData.forEach(function(itemCategory) {itemCount++;
-                populaCreatorsItems =popularCategoryHeading(itemCategory);
+            responseData.forEach(function(itemCategory) {itemCount++;hashtagVideoCall++;
+                //populaCreatorsItems =popularCategoryHeading(itemCategory);
+                populaCreatorsItems =popularHashtagHeading(itemCategory);
                 populvideoItems="";
                 var topicData=itemCategory.topics;
                 populvideoItems+='<div class="_explore_feed_card">';
                 var videoItemCount=0;
-                topicData.forEach(function(itemVideoByte){videoItemCount++;
-                    
-                    if(videoItemCount<4){
-                        videoItemCountIndex++;
-                        topicList[itemVideoByte.id]=itemVideoByte;
-                        populvideoItems +=popularCategoryItem(itemVideoByte);
-                        playlistWithIndex[videoItemCountIndex]=itemVideoByte;
+                var hashTagId=itemCategory.tongue_twister.id;
+                hashtagIds.push(hashTagId);
+
+                if(hashtagVideoCall==2){
+                    hashtagVideoCall=0;
+
+                    var hashtagVideoList=getHashTagVideoList(hashtagIds);debugger;
+                    if(!empty(hashtagVideoList)){
+                        topicData.forEach(function(itemVideoByte){videoItemCount++;
+                            
+                            if(videoItemCount<4){
+                                videoItemCountIndex++;
+                                topicList[itemVideoByte.id]=itemVideoByte;
+                                populvideoItems +=popularCategoryItem(itemVideoByte);
+                                playlistWithIndex[videoItemCountIndex]=itemVideoByte;
+                            }
+                        });
                     }
-                });
+                    hashtagIds =[];
+                }
                 populvideoItems+='</div>';
                 category_with_video_list='<div class="_explore_feed_item">'+populaCreatorsItems+''+populvideoItems+'</div>';
 
@@ -1029,6 +1091,31 @@ function muteAndUnmutePlayer1(){
         $("#mutedImageId").addClass('muted');
     }
 }
+
+//==================== Hashtag Heading ==================
+
+function popularHashtagHeading(itemCategory){debugger;
+
+    var category_title='';
+    currentLanguageName=current_language_name.toLowerCase();
+    if(currentLanguageName!='english'){
+        category_title=currentLanguageName+'_title';
+    }else{
+        category_title='title';
+    }
+    var itemHashtag=itemCategory.tongue_twister;
+    var image ='/media/hashtag_black.svg';
+    var popular_cat_heading_template='<div class="_explore_feed_header"><div class="jsx-2836840237 _card_header_"><a class="jsx-2836840237" href="/hashtag/'+itemHashtag.hash_tag+'/"><div class="jsx-2836840237 _card_header_cover" style="background-image: url('+image+');"></div></a><a title="#'+itemHashtag.hash_tag+'('+itemCategory.total_views+' views)" class="jsx-2836840237 _card_header_link" href="/hashtag/'+itemHashtag.hash_tag+'/"><div class="jsx-2836840237 _card_header_content"><h3 class="jsx-2836840237 _card_header_title">'+itemHashtag.hash_tag+'</h3><strong class="jsx-2836840237 _card_header_subTitle">'+itemCategory.total_views+' views</strong></div></a></div></div>';
+    return popular_cat_heading_template;
+}
+
+
+
+//=========================== End =======================
+
+
+
+
 
 
 
