@@ -101,9 +101,13 @@
     
     <field name="slug" type="edge_ngram" indexed="true" stored="true" multiValued="false" />
     
+    <field name="bolo_score" type="text_en" indexed="true" stored="true" multiValued="false" />
+    
     <field name="hash_tag" type="edge_ngram" indexed="true" stored="true" multiValued="false" />
     
     <field name="total_views" type="long" indexed="true" stored="true" multiValued="false" />
+    
+    <field name="suggestions" type="string" indexed="true" stored="true" multiValued="false" />
     
     <field name="hash_counter" type="long" indexed="true" stored="true" multiValued="false" />
     

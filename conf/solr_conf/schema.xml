@@ -101,9 +101,13 @@
     
     <field name="slug" type="edge_ngram" indexed="true" stored="true" multiValued="false" />
     
+    <field name="bolo_score" type="text_en" indexed="true" stored="true" multiValued="false" />
+    
     <field name="hash_tag" type="edge_ngram" indexed="true" stored="true" multiValued="false" />
     
     <field name="total_views" type="long" indexed="true" stored="true" multiValued="false" />
+    
+    <field name="suggestions" type="string" indexed="true" stored="true" multiValued="false" />
     
     <field name="hash_counter" type="long" indexed="true" stored="true" multiValued="false" />
     
@@ -129,11 +133,10 @@
     Not required if the default search field (<str name="df">text</str>) is defined for
     /select request handler in sorlconfig.xml
     -->
-    <!-- <defaultSearchField>text</defaultSearchField> -->
+    <defaultSearchField>text</defaultSearchField>
 
     <!-- SolrQueryParser configuration: defaultOperator="AND|OR" -->
-    <!-- <solrQueryParser defaultOperator="AND"/> -->
-
+    <solrQueryParser defaultOperator="AND"/>
 
     <!--
     ######################## django-haystack specifics end ########################
@@ -229,8 +232,6 @@
     <dynamicField name="*_ss" type="strings"  indexed="true"  stored="true"/>
     <dynamicField name="*_l"  type="long"   indexed="true"  stored="true"/>
     <dynamicField name="*_ls" type="longs"   indexed="true"  stored="true"/>
-    <!-- <dynamicField name="*_pl"  type="plong"   indexed="true"  stored="true"/> -->
-    <!-- <dynamicField name="*_pls" type="plongs"   indexed="true"  stored="true"/> -->
     <dynamicField name="*_t"   type="text_general" indexed="true" stored="true"/>
     <dynamicField name="*_txt" type="text_general" indexed="true" stored="true"/>
     <dynamicField name="*_b"  type="boolean" indexed="true" stored="true"/>
@@ -245,8 +246,6 @@
 
     <dynamicField name="*_dt"  type="date"    indexed="true"  stored="true"/>
     <dynamicField name="*_dts" type="date"    indexed="true"  stored="true" multiValued="true"/>
-    <!-- <dynamicField name="*_pdt"  type="pdate"    indexed="true"  stored="true"/> -->
-    <!-- <dynamicField name="*_pdts" type="pdates"    indexed="true"  stored="true" multiValued="true"/> -->
     <dynamicField name="*_p"  type="location" indexed="true" stored="true"/>
     <dynamicField name="*_srpt"  type="location_rpt" indexed="true" stored="true"/>
 
@@ -336,12 +335,6 @@
     <fieldType name="float" class="solr.TrieFloatField" docValues="true" precisionStep="0" positionIncrementGap="0"/>
     <fieldType name="long" class="solr.TrieLongField" docValues="true" precisionStep="0" positionIncrementGap="0"/>
     <fieldType name="double" class="solr.TrieDoubleField" docValues="true" precisionStep="0" positionIncrementGap="0"/>
-    <fieldType name="plong" class="solr.LongPointField" docValues="true"/>
-    <fieldType name="pdouble" class="solr.DoublePointField" docValues="true"/>
-    <fieldType name="plongs" class="solr.LongPointField" docValues="true" multiValued="true"/>
-    <fieldType name="pdoubles" class="solr.DoublePointField" docValues="true" multiValued="true"/>
-    <fieldType name="pdate" class="solr.DatePointField" docValues="true"/>
-    <fieldType name="pdates" class="solr.DatePointField" docValues="true" multiValued="true"/>
 
     <fieldType name="ints" class="solr.TrieIntField" docValues="true" precisionStep="0" positionIncrementGap="0" multiValued="true"/>
     <fieldType name="floats" class="solr.TrieFloatField" docValues="true" precisionStep="0" positionIncrementGap="0" multiValued="true"/>

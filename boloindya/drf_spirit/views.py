@@ -43,7 +43,7 @@ from .models import SingUpOTP
 from .models import UserJarvisDump, UserLogStatistics, UserFeedback
 from .permissions import IsOwnerOrReadOnly
 from .utils import get_weight, add_bolo_score, shorcountertopic, calculate_encashable_details, state_language, language_options,short_time,\
-    solr_object_to_db_object,get_paginated_data ,shortcounterprofile, get_ranked_topics
+    solr_object_to_db_object, solr_userprofile_object_to_db_object,get_paginated_data ,shortcounterprofile, get_ranked_topics
 
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
@@ -706,6 +706,22 @@ class BoloIndyaGenericAPIView(GenericAPIView):
         new_request = super(BoloIndyaGenericAPIView, self).initialize_request(request, *args, **kwargs)
         return new_request
 
+def search_break_word(term):
+    q_objects = SQ()
+    if term:
+        term_list = term.split(' ')
+        i=0
+        for i, each_term in enumerate(term_list):
+            if i==0:
+                q_objects = SQ(content=each_term)
+            else:
+                q_objects |= SQ(content=each_term)
+        return q_objects
+    else:
+        return SQ(content='')
+
+
+
 class SolrSearchTop(BoloIndyaGenericAPIView):
     def get(self, request):
         topics      = []
@@ -718,29 +734,29 @@ class SolrSearchTop(BoloIndyaGenericAPIView):
         response ={}
         if search_term:
             topics =[]
-            sqs = SearchQuerySet().models(Topic).raw_search(search_term).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
+            sqs = SearchQuerySet().models(Topic).raw_search(search_term).filter(SQ(language_id=language_id)|SQ(language_id='1')).filter(is_removed = False)
             if not sqs:
                 suggested_word = SearchQuerySet().models(Topic).auto_query(search_term).spelling_suggestion()
                 if suggested_word:
-                    sqs = SearchQuerySet().models(Topic).raw_search(suggested_word).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
+                    sqs = SearchQuerySet().models(Topic).raw_search(suggested_word).filter(SQ(language_id=language_id)|SQ(language_id='1')).filter(is_removed = False)
             if not sqs:
-                sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
+                sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(SQ(language_id=language_id)|SQ(language_id='1')).filter(is_removed = False)
             if sqs:
                 result_page = get_paginated_data(sqs, int(page_size), int(page))
                 topics = solr_object_to_db_object(result_page[0].object_list)
             response["top_vb"]=TopicSerializerwithComment(topics,many=True,context={'is_expand':is_expand,'last_updated':last_updated}).data
             users  =[]
-            sqs = SearchQuerySet().models(UserProfile).raw_search(search_term)
+            sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term))
             if not sqs:
                 suggested_word = SearchQuerySet().models(UserProfile).auto_query(search_term).spelling_suggestion()
                 if suggested_word:
-                    sqs = SearchQuerySet().models(UserProfile).raw_search(suggested_word)
+                    sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term))
             if not sqs:
                 sqs = SearchQuerySet().models(UserProfile).autocomplete(**{'text':search_term})
             if sqs:
                 result_page = get_paginated_data(sqs, int(page_size), int(page))
-                users = solr_object_to_db_object(result_page[0].object_list)
-            response["top_user"]=UserSerializer(User.objects.filter(st__in=users),many=True).data
+                users = solr_userprofile_object_to_db_object(result_page[0].object_list)
+            response["top_user"]=UserSerializer(users,many=True).data
             hash_tags  =[]
             sqs = SearchQuerySet().models(TongueTwister).raw_search('hash_tag:'+search_term)
             if not sqs:
@@ -905,20 +921,20 @@ class SolrSearchUser(BoloIndyaGenericAPIView):
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
         users = []
         if search_term:
-            sqs = SearchQuerySet().models(UserProfile).raw_search(search_term)
+            sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term))
             if not sqs:
                 suggested_word = SearchQuerySet().models(UserProfile).auto_query(search_term).spelling_suggestion()
                 if suggested_word:
-                    sqs = SearchQuerySet().models(UserProfile).raw_search(suggested_word)
+                    sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term))
             if not sqs:
                 sqs = SearchQuerySet().models(UserProfile).autocomplete(**{'text':search_term})
             if sqs:
                 result_page = get_paginated_data(sqs, int(page_size), int(page))
-                users = solr_object_to_db_object(result_page[0].object_list)
+                users = solr_userprofile_object_to_db_object(result_page[0].object_list)
             # users = User.objects.filter( Q(username__icontains = search_term) | Q(st__name__icontains = search_term) | Q(first_name__icontains = search_term) | \
             #        Q(last_name__icontains = search_term) )
             next_page_number = page+1 if page_size*page<len(sqs) else ''
-            response ={"count":len(sqs),"results":UserSerializer(User.objects.filter(st__in=users),many=True).data,"next_page_number":next_page_number} 
+            response ={"count":len(sqs),"results":UserSerializer(users,many=True).data,"next_page_number":next_page_number} 
         return JsonResponse(response, safe = False)
 
 
