@@ -486,7 +486,6 @@ function getHashTagList(){
                 var videoItemCount=0;
                 if(hashtagVideoCall==2){
                     hashtagVideoCall=0;
-
                     var hashtagVideoList=getHashTagVideoList(hashtagIds);
                     if( hashtagVideoList!="" && hashtagVideoList!=undefined){
                         hashtagVideoList.forEach(function(itemVideoByte){videoItemCount++;
@@ -578,7 +577,7 @@ function getHashTagVideoList(hashTagId){
 function getCategoryWithVideos(){
     loaderBoloShowDynamic('_scroll_load_more_loading_right');
     loaderBoloShowDynamic('_scroll_load_more_loading_left');
-        var playListData=[]; 
+    var playListData=[]; 
     var platlistItems;
 
     var listItems="";
