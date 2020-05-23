@@ -444,7 +444,7 @@ $(document).ready(function(){
 
 var topicList=[];
 
-function getHashTagList(){debugger;
+function getHashTagList(){
 
     loaderBoloShowDynamic('_scroll_load_more_loading_right');
     loaderBoloShowDynamic('_scroll_load_more_loading_left');
@@ -456,7 +456,7 @@ function getHashTagList(){debugger;
     var language_id=1;
     var page_size=10;
     var page=1;
-    var uri='https://www.boloindya.com/api/v1/get_hash_discover/';
+    var uri='/api/v1/get_hash_discover/';
     var res = encodeURI(uri);
     var category_with_video_list="";
     language_id=current_language_id;
@@ -466,7 +466,7 @@ function getHashTagList(){debugger;
         type:"GET",
         crossDomain: true,
         data:{'language_id':language_id,'is_expand':'True','page_size':page_size,'page':page},
-        success: function(response,textStatus, xhr){debugger;
+        success: function(response,textStatus, xhr){
             populaCreatorsItems="";
             var populaCategoriesItems="";
             var populvideoItems="";
@@ -487,7 +487,7 @@ function getHashTagList(){debugger;
                 if(hashtagVideoCall==2){
                     hashtagVideoCall=0;
 
-                    var hashtagVideoList=getHashTagVideoList(hashtagIds);debugger;
+                    var hashtagVideoList=getHashTagVideoList(hashtagIds);
                     if( hashtagVideoList!="" && hashtagVideoList!=undefined){
                         hashtagVideoList.forEach(function(itemVideoByte){videoItemCount++;
                             if(videoItemCount<4){
@@ -531,8 +531,8 @@ function getHashTagList(){debugger;
     });
 
 }
-
-function getHashTagVideoList(hashTagId){debugger;
+//getHashTagVideoList(233);
+function getHashTagVideoList(hashTagId){
 
     var listItems="";
     var itemCount=0;
@@ -540,33 +540,42 @@ function getHashTagVideoList(hashTagId){debugger;
     var page_size=10;
     var page=1;
     var hashTagIds = hashTagId.join(",");
-    var uri='/api/v1/get_popular_hash_tag/?hashtag_ids='+hashTagIds;
-    var res = encodeURI(uri);
-    //var res = uri;
+    //var hashTagIds='1614,1817';
+    //var uri='/api/v1/get_popular_hash_tag/?hashtag_ids='+hashTagIds;
     var category_with_video_list="";
     language_id=current_language_id;
+    var uri='/api/v1/get_popular_hash_tag/?hashtag_ids='+hashTagIds+"&language_id="+language_id;
+    var res = encodeURI(uri);
+    $.get(res, function (data, textStatus, jqXHR) {
+        var dataList=data.results;
 
-    jQuery.ajax({
-        url:res,
-        type:"GET",
-        data:{'language_id':language_id},
-        success: function(response,textStatus, xhr){debugger;
-            var responseData=response.results;
-            return responseData;
-
-        },
-        error: function(jqXHR, ajaxOptions, thrownError) {debugger;
-            console.log(jqXHR);
+        if(dataList){
+            dataList.forEach(function(itemVideoByte1){
+               var populvideoItems ="";
+               var topicListq=itemVideoByte1.topics;
+               var videoItemCount=0;
+                topicListq.forEach(function(itemVideoByte){videoItemCount++; 
+                    if(videoItemCount<4){
+                        videoItemCountIndex++;
+                        topicList[itemVideoByte.id]=itemVideoByte;
+                        populvideoItems +=popularCategoryItem(itemVideoByte);
+                        playlistWithIndex[videoItemCountIndex]=itemVideoByte;
+			if(populvideoItems!='undefined'){
+                        $("#"+itemVideoByte1.id).html(populvideoItems);
+                        //return populvideoItems;
+			}
+                    }
+                });
+            });
         }
 
-  
-    });
 
+    });
 }
 
 
 
-function getCategoryWithVideos(){debugger;
+function getCategoryWithVideos(){
     loaderBoloShowDynamic('_scroll_load_more_loading_right');
     loaderBoloShowDynamic('_scroll_load_more_loading_left');
         var playListData=[]; 
@@ -578,7 +587,7 @@ function getCategoryWithVideos(){debugger;
     var page_size=10;
     var page=1;
     //var uri='/api/v1/get_popular_hash_tag/';
-    var uri='http://localhost:8080/careeranna/websiteapi/get_hash_discover';
+    var uri='/api/v1/get_hash_discover/';
     var res = encodeURI(uri);
     var category_with_video_list="";
     language_id=current_language_id;
@@ -588,7 +597,7 @@ function getCategoryWithVideos(){debugger;
         type:"GET",
         dataType:'json',
         data:{'language_id':language_id,'is_with_popular':'True','popular_boloindyans':'True','page_size':page_size,'page':page},
-        success: function(response,textStatus, xhr){debugger;
+        success: function(response,textStatus, xhr){
             populaCreatorsItems="";
             var populaCategoriesItems="";
             var populvideoItems="";
@@ -602,26 +611,16 @@ function getCategoryWithVideos(){debugger;
                 populaCreatorsItems =popularHashtagHeading(itemCategory);
                 populvideoItems="";
                 var topicData=itemCategory.topics;
-                populvideoItems+='<div class="_explore_feed_card">';
                 var videoItemCount=0;
                 var hashTagId=itemCategory.tongue_twister.id;
                 hashtagIds.push(hashTagId);
-
+		populvideoItems+='<div class="_explore_feed_card" id="'+hashTagId+'">';
                 if(hashtagVideoCall==2){
                     hashtagVideoCall=0;
-
-                    var hashtagVideoList=getHashTagVideoList(hashtagIds);debugger;
-                    if(!empty(hashtagVideoList)){
-                        topicData.forEach(function(itemVideoByte){videoItemCount++;
-                            
-                            if(videoItemCount<4){
-                                videoItemCountIndex++;
-                                topicList[itemVideoByte.id]=itemVideoByte;
-                                populvideoItems +=popularCategoryItem(itemVideoByte);
-                                playlistWithIndex[videoItemCountIndex]=itemVideoByte;
-                            }
-                        });
-                    }
+		    var tempData =getHashTagVideoList(hashtagIds);
+		   if(tempData!=undefined){
+		     populvideoItems += getHashTagVideoList(hashtagIds);
+		   }
                     hashtagIds =[];
                 }
                 populvideoItems+='</div>';
@@ -906,7 +905,7 @@ function getCreators(popularCreators){
 
     }
 
-    function nextVideoPlay(){debugger;
+    function nextVideoPlay(){
         loaderShow();
         var singleItemData=[];
 
@@ -1094,7 +1093,7 @@ function muteAndUnmutePlayer1(){
 
 //==================== Hashtag Heading ==================
 
-function popularHashtagHeading(itemCategory){debugger;
+function popularHashtagHeading(itemCategory){
 
     var category_title='';
     currentLanguageName=current_language_name.toLowerCase();
