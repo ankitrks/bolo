@@ -58,6 +58,7 @@ class UserProfileIndex(indexes.SearchIndex, indexes.Indexable):
     follow_count = indexes.IntegerField(model_attr='follow_count', indexed=True)
     follower_count = indexes.IntegerField(model_attr='follower_count', indexed=True)
     language = indexes.CharField(model_attr='language', indexed=True)
+    bolo_score = indexes.CharField(model_attr='bolo_score', indexed=True)
 
     # Overridden
     def get_model(self):

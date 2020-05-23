@@ -352,6 +352,13 @@ def solr_object_to_db_object(sqs):
             result.append(each.object)
     return result
 
+def solr_userprofile_object_to_db_object(sqs):
+    result = []
+    if len(sqs) != 0:
+        for each in sqs:
+            result.append(each.object.user)
+    return result
+
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 
 def get_paginated_data(data_list,page_size,page=None, offset = None):

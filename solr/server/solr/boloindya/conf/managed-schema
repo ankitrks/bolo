@@ -429,6 +429,7 @@
   <fieldType name="tlongs" class="solr.TrieLongField" positionIncrementGap="0" docValues="true" multiValued="true" precisionStep="8"/>
   <field name="_root_" type="string" docValues="false" indexed="true" stored="false"/>
   <field name="_version_" type="long" indexed="true" stored="false"/>
+  <field name="bolo_score" type="text_en" multiValued="false" indexed="true" stored="true"/>
   <field name="django_ct" type="string" multiValued="false" indexed="true" stored="true"/>
   <field name="django_id" type="string" multiValued="false" indexed="true" stored="true"/>
   <field name="follow_count" type="long" multiValued="false" indexed="true" stored="true"/>
@@ -445,6 +446,7 @@
   <field name="name" type="edge_ngram" multiValued="false" indexed="true" stored="true"/>
   <field name="own_vb_view_count" type="long" multiValued="false" indexed="true" stored="true"/>
   <field name="slug" type="edge_ngram" multiValued="false" indexed="true" stored="true"/>
+  <field name="suggestions" type="string" multiValued="false" indexed="true" stored="true"/>
   <field name="text" type="text_en" multiValued="false" indexed="true" stored="true"/>
   <field name="title" type="edge_ngram" multiValued="false" indexed="true" stored="true"/>
   <field name="total_share_count" type="long" multiValued="false" indexed="true" stored="true"/>
