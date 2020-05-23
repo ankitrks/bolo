@@ -159,6 +159,7 @@ urlpatterns = [
     url(r'^cache_user_data/$', cache_user_data,name='cache_user_data'),
     url(r'^get_hash_discover/$', get_hash_discover),
     url(r'^get_hash_discover_topics/$', get_hash_discover_topics),
+    url(r'^send_sms_link/$', send_sms_link),
 
     url(r'^get_m3u8_of_ids/$', get_m3u8_of_ids),
     url(r'^upload_video_to_s3_for_app/$', upload_video_to_s3_for_app),

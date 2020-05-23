@@ -1857,6 +1857,26 @@ def send_sms(phone_number, otp):
         return response, True
     return response, False
 
+@api_view(['GET'])
+def send_sms_link(phone_number):
+    import json
+    import urllib2
+    response=""
+    try:
+        phone='9807148552';
+        currentOTP='23322';
+        TWO_FACTOR_SMS_API_KEY = "e239bb09-f16c-11e9-b828-0200cd936042";
+        templateName='BOLOIN'
+
+        sms_url         = 'https://2factor.in/API/R1/?module=PROMO_SMS&apikey='+TWO_FACTOR_SMS_API_KEY+'&to=%20'+phone+'%20&from=BOLOIN&msg=Please%20use%20below%20link%20to%20download%20bolo%20indya%20app.%20https%3A%2F%2Fbit.ly%2F2APNUpb'
+        response        = urllib2.urlopen(sms_url).read()
+        json_response   = json.loads( response )
+        if json_response.has_key('Status') and json_response['Status'] == 'Success':
+            return JsonResponse({'message': 'True'}, status=status.HTTP_200_OK)
+        return JsonResponse({'message': 'False'}, status=status.HTTP_400_BAD_REQUEST)
+    except:
+        return JsonResponse({'message': 'Invalid Request'}, status=status.HTTP_400_BAD_REQUEST)
+
 class SingUpOTPView(generics.CreateAPIView):
     permission_classes  = (AllowAny,)
     serializer_class    = SingUpOTPSerializer
