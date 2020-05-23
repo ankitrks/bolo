@@ -755,7 +755,7 @@ class SolrSearchTop(BoloIndyaGenericAPIView):
                 sqs = SearchQuerySet().models(UserProfile).autocomplete(**{'text':search_term})
             if sqs:
                 result_page = get_paginated_data(sqs, int(page_size), int(page))
-                users = solr_object_to_db_object(result_page[0].object_list)
+                users = solr_userprofile_object_to_db_object(result_page[0].object_list)
             response["top_user"]=UserSerializer(users,many=True).data
             hash_tags  =[]
             sqs = SearchQuerySet().models(TongueTwister).raw_search('hash_tag:'+search_term)
