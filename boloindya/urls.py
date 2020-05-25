@@ -75,7 +75,8 @@ patterns = [
     url(r'^careers/application/$',forum.topic.views.job_request,name='job_request'),
     url(r'^team/$',forum.topic.views.boloindya_team_details,name='boloindya_team_details'),
     url(r'^login/auth_api/$',forum.topic.views.login_using_api,name='login_using_api'),
-    url(r'^help_support/$',forum.topic.views.help_support,name='help_support')
+    url(r'^help_support/$',forum.topic.views.help_support,name='help_support'),
+    url(r'^api/v1/delete_video', forum.topic.views.delete_video, name='delete_video'),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

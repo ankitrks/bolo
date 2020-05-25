@@ -928,6 +928,8 @@ class TongueTwisterCounter(RecordTimeStamp):
     def __unicode__(self):
         return self.tongue_twister.hash_tag
 
-
+class VideoDelete(RecordTimeStamp):
+    user =  models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("User"),editable=False,null=True,blank=True)
+    video = models.ForeignKey(Topic, null=True, blank=True)
 
 

@@ -17,7 +17,7 @@ from ..comment.models import MOVED
 from ..comment.forms import CommentForm
 from ..comment.utils import comment_posted
 from ..comment.models import Comment
-from .models import Topic,CricketMatch,Poll,Voting,Choice,TongueTwister,JobOpening,VBseen
+from .models import Topic,CricketMatch,Poll,Voting,Choice,TongueTwister,JobOpening,VBseen,VideoDelete
 from .forms import TopicForm
 from .forms import JobRequestForm
 from . import utils
@@ -59,6 +59,8 @@ from django.template.loader import render_to_string
 from .emails import send_job_request_mail
 from drf_spirit.views import deafult_boloindya_follow
 from drf_spirit.views import deafult_boloindya_follow
+from rest_framework.decorators import api_view
+from rest_framework import status
 
 class AutoConnectSocialAccount(DefaultSocialAccountAdapter):
 
@@ -1429,3 +1431,31 @@ def testurllang(request):
     #languageCode =request.LANGUAGE_CODE
     #language_id=languages_with_id[languageCode]
 
+@api_view(['POST'])
+def delete_video(request):
+    try:
+        user = request.user
+        topic_id = request.POST.get('topic_id')
+
+        if user and topic_id:
+            topic = Topic.objects.get(id=topic_id)
+
+            if topic.user == user:
+                today = datetime.today()
+                curr_month_del_vids = VideoDelete.objects.filter(user=user, created_at__month=today.month, created_at__year=today.year)
+
+                if(curr_month_del_vids.count() < 3):
+                    result = topic.delete()
+                    if result:
+                        obj, created = VideoDelete.objects.get_or_create(user=user, video=topic)
+                        return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)
+
+                else:
+                    return JsonResponse({'message': 'You can only delete a maximum of 3 videos in a month.'}, status=status.HTTP_204_NO_CONTENT)
+            else:
+                return JsonResponse({'message': 'Not Authorized'}, status=status.HTTP_204_NO_CONTENT)        
+        else:        
+            return JsonResponse({'message': 'Invalid User or Video'}, status=status.HTTP_204_NO_CONTENT)        
+
+    except Exception as e:
+        return JsonResponse({'message': str(e.message)}, status=status.HTTP_400_BAD_REQUEST)
