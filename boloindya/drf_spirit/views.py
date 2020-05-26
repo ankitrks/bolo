@@ -1857,6 +1857,8 @@ def send_sms(phone_number, otp):
         return response, True
     return response, False
 
+
+#Known Issue ... Please ignore at the time of merging
 @api_view(['GET'])
 def send_sms_link(phone_number):
     import json
