@@ -871,6 +871,7 @@ def get_feed_list_by_category(request,category_slug):
 def get_topic_list_by_hashtag(request,hashtag):
     language_id=1
     popular_bolo = []
+    hash_tags = []
     tongue=[]
     category_details=""
     challengehash=""
@@ -883,9 +884,14 @@ def get_topic_list_by_hashtag(request,hashtag):
         tongue = TongueTwister.objects.filter(hash_tag__iexact=challengehash[1:]).order_by('-hash_counter')
         if len(tongue):
             tongue = tongue[0]
+        try:
+            hash_tags = TongueTwister.objects.order_by('-hash_counter')[:10]
+        except Exception as e1:
+            hash_tags = []
         context = {
             'tongue':tongue,
             'hashtag':hashtag,
+            'hash_tags':hash_tags
 
         }
         #print TongueTwister.__dict__
@@ -1129,7 +1135,8 @@ def old_home(request):
     except Exception as e1:
         topics = []
 
-    topicsIds =[16092,25156,26248,23820,3449,4196,4218,17534,12569,12498,9681,9419,9384,8034,8024,26835,24352,14942]
+    #topicsIds =[16092,25156,26248,23820,3449,4196,4218,17534,12569,12498,9681,9419,9384,8034,8024,26835,24352,14942]
+    topicsIds =[16092,25156,3449,4196,4218]
     try:
         all_slider_topic = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=topicsIds)[:16]
     except Exception as e1:

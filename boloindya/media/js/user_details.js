@@ -209,6 +209,8 @@ function getCreators(popularCreators){
     var creatorName="";
     if(popularCreators.first_name!=''){
         creatorName=popularCreators.first_name+' '+popularCreators.last_name;
+    }else if(popularCreators.userprofile.name!=""){
+        creatorName=popularCreators.userprofile.name;
     }else{
         creatorName=popularCreators.username;
     }
@@ -849,7 +851,9 @@ function listCommentsById(singleTopicData){
       
         });
         $(".videoCommentId").append(listCommentItems);
-        var loadMoreComment='<span class="loadMoreComment"><a onclick="loadMoreComments(\''+data.next+'\');" class="" href="javascript:void(0);">Load More Comments...</a></span';
+        if(data.next!="" && data.next!='null'){
+            var loadMoreComment='<span class="loadMoreComment"><a onclick="loadMoreComments(\''+data.next+'\');" class="" href="javascript:void(0);">Load More Comments...</a></span';
+        }
         $(".loadMoreComments").html(loadMoreComment);
         loaderBoloHide();
     });
@@ -887,7 +891,9 @@ function loadMoreComments(nextPageURl){
       
         });
         $(".videoCommentId").append(listCommentItems);
-        var loadMoreComment='<span class="loadMoreComment"><a class="" onclick="loadMoreComments(\''+data.next+'\');" href="javascript:void(0);">Load More Comments...</a></span';
+        if(data.next!="" && data.next!='null'){
+            var loadMoreComment='<span class="loadMoreComment"><a class="" onclick="loadMoreComments(\''+data.next+'\');" href="javascript:void(0);">Load More Comments...</a></span';
+        }
         $(".loadMoreComments").html(loadMoreComment);
         loaderBoloHide();
         loaderBoloHideDynamic('_scroll_load_more_loading_comment');
