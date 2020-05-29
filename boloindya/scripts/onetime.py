@@ -117,10 +117,6 @@ def correct_installs_data():
 
 
 def correct_views_data():
-	#Delete old data for these 2 metrices: 'Video Views' and 'Unique Video Views'
-	old_installs_data = DashboardMetricsJarvis.objects.filter(metrics__in=['1', '7'])
-	old_installs_data.delete()
-
 	'''
 	Start data calculation from the starting
 	'''	
@@ -166,17 +162,13 @@ def correct_views_data():
 					categ_id = (int)(each_categ)
 
 				#Save unique count
-				save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = '7', metrics_slab = '', date = str_date, week_no = week_no)
+				save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = '7', metrics_slab = '', date = str_date, week_no = week_no, metrics_language_options=lang, category_id=each_categ)
 				save_obj.count=unique_count
-				save_obj.metrics_language_options=each_lang
-				save_obj.category_id=each_categ
 				save_obj.save()
 
 				#Save non-unique count
-				save_obj_1, created_1 = DashboardMetricsJarvis.objects.get_or_create(metrics = '1', metrics_slab = '', date = str_date, week_no = week_no)
+				save_obj_1, created_1 = DashboardMetricsJarvis.objects.get_or_create(metrics = '1', metrics_slab = '', date = str_date, week_no = week_no, week_no = week_no, metrics_language_options=lang, category_id=each_categ)
 				save_obj_1.count=non_unique_count
-				save_obj_1.metrics_language_options=each_lang
-				save_obj_1.category_id=each_categ
 				save_obj_1.save()
 
 		print(start_of_day)

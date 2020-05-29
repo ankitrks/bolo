@@ -1728,7 +1728,7 @@ def statistics_all_jarvis(request):
     else:
         # this is the case where data_view == 'daily'
         # we need to handle cases were metric is 11
-        if(metrics!='11'):
+        if(metrics not in ['11', '1', '7']):
             x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
             y_axis = graph_data.values_list('count', flat = True)
         else:
