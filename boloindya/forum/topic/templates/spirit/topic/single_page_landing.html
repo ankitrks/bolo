@@ -1061,7 +1061,7 @@ h1 { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 24p
 
 </style>
 
-        <a href="https://play.google.com/store/apps/details?id=com.boloindya.boloindya&hl=en_IN{{utm_url}}">
+        <a href="https://play.google.com/store/apps/details?id=com.boloindya.boloindya&referrer=utm_source%3DWEBSITE%26utm_medium%3DWEBSITE%26utm_content%3DWEBSITE%26utm_campaign%3Dcpc%26anid%3Dadmob">
             <div class="jsx-639186511 page-with-header main-body">
                 <div class="jsx-1929076256">
                     <div class="jsx-1929076256 about-content">
@@ -1120,6 +1120,107 @@ h1 { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 24p
     </div>
 
 
+{% load i18n %}
+
+<style type="text/css">
+  .socialImageSize{
+    height: 45px;
+}
+.paddingSocialShare{
+    padding: 5px;
+}
+._social_h::before {
+    content: '';
+    display: inline-block;
+    height: 18px;
+    margin: 0 6px -3px 0;
+    min-width: 18px;
+    position: relative;
+    top: -2px;
+    width: 18px;
+    background-image: url(/media/social_share_image.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: 0 -156px;
+
+}
+.socialShareP{
+    margin-top: 10px;
+}
+@media(max-width: 991px){
+    .page-with-header {
+        padding-top: 0px;
+    }
+    .sideImageHeight{
+        height: 200px;
+    }
+
+    .leftImage {
+        display: inline-block;
+        float: left;
+        position: absolute;
+        left: 9px;
+        top: 280px;
+    }
+    .rightImage{
+        display: inline-block;
+        float: right;
+        position: absolute;
+        right: 4px;
+        top: 280px;
+    }
+    .download_height{
+        height: 50px;
+    }
+
+    .socialImageSize {
+        height: 25px;
+    }
+
+}
+
+</style>
+<div class="jsx-157630181 footer-container">
+
+
+                <div class="jsx-157630181 footer-content-wrapper" style="margin-top: 20px;">
+                    <h1 class="jsx-157630181 boloindya-logo"><div class="jsx-832362280 logo-container"><!-- <img src="" class="jsx-832362280 logo-icon"> -->
+                        <img src="/media/boloindya_new_logo.png" style="height: 40px;width: 150px !important" class="jsx-832362280 logo-text"></div><strong class="jsx-157630181">boloindya</strong></h1>
+                      <div class="footer-content-column">
+                        <h2>{% trans "Company" %}</h2>
+                        <h3><a class="" href="{{site_base_url}}about/">{% trans "About" %}</a></h3>
+                        <h3><a class="" href="{{site_base_url}}careers/">{% trans "Careers" %}</a></h3>
+                        <h3><a class="" href="{{site_base_url}}team/">{% trans "Team" %}</a></h3>
+                      </div>
+                    <div class="footer-content-column">
+                        <h2>{% trans "Programs" %}</h2>
+                        <h3><a class="" href="{{site_base_url}}">{% trans "Discover" %}</a></h3>
+
+                      </div>
+                    <div class="footer-content-column">
+                        <h2>{% trans "Support" %}</h2>
+                        <h3><a class="" href="{{site_base_url}}help_support">{% trans "Help Center" %}</a></h3>
+                        <h3><a class="" href="{{site_base_url}}bolo-action">{% trans "Bolo Action" %}</a></h3>
+                        <!-- <h3><a class="" href="{{site_base_url}}en/safety">{% trans "Safety Center" %}</a></h3> -->
+
+                    </div>
+                    <div class="footer-content-column">
+                        <h2>{% trans "Legal" %}</h2>
+                        <h3><a class="" href="{{site_base_url}}terms-of-service">{% trans "Terms of Service" %}</a></h3>
+                        <h3><a class="" href="{{site_base_url}}privacy-policy">{% trans "Privacy Policy" %}</a></h3>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+<input type="hidden" name="onLoadPlayCheck" id="onLoadPlayCheck" value="0">
+
+
+<!-- End of Registration Modal -->
+<!-- class="menu-item-link menu-item-link-active hideOnMobile" -->
+<script src="/media/js/common.js"></script>
   </body>
 
 </html>
