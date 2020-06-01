@@ -1127,7 +1127,6 @@ def send_notification(request):
         user_group_ids = request.POST.get('user_group_ids', "")
         notification_type = request.POST.get('notification_type', "")
         particular_user_id = request.POST.get('particular_user_id', "")
-        category_ids = request.POST.get('category_ids', "")
         schedule_status= request.POST.get('schedule_status', "")
         datepicker = request.POST.get('datepicker', '')
         timepicker = request.POST.get('timepicker', '').replace(" : ", ":")
@@ -1148,13 +1147,12 @@ def send_notification(request):
                 data['particular_user_id'] = particular_user_id
                 data['user_group'] = user_group
                 data['lang'] = '0'
-                data['category_ids'] = category_ids
                 data['schedule_status'] = schedule_status
                 data['datepicker'] = datepicker
                 data['timepicker'] = timepicker
                 data['image_url'] = image_url
                 data['days_ago'] = days_ago
-                        
+
                 send_notifications_task.delay(data, pushNotification)
             else:
                 for lang in lang_array:
@@ -1167,7 +1165,6 @@ def send_notification(request):
                     data['particular_user_id'] = particular_user_id
                     data['user_group'] = user_group
                     data['lang'] = lang
-                    data['category_ids'] = category_ids
                     data['schedule_status'] = schedule_status
                     data['datepicker'] = datepicker
                     data['timepicker'] = timepicker
@@ -1183,13 +1180,8 @@ def send_notification(request):
             pushNotification = PushNotification.objects.get(pk=id)
         except Exception as e:
             print e
-        # categories=FCMDevice.objects.filter(is_uninstalled=False, user__isnull=False, user__st__sub_category__isnull=False).values('user__st__sub_category__pk', 'user__st__sub_category__title').annotate(Count('pk'))
-        # language_option=FCMDevice.objects.filter(is_uninstalled=False, user__isnull=False).values('user__st__language').annotate(Count('pk'))
-        categories = Category.objects.filter(parent__isnull=False)
-
-    return render(request,'jarvis/pages/notification/send_notification.html', { 'language_options': language_options, 'user_group_options' : user_group_options, 'notification_types': notification_type_options, 'pushNotification': pushNotification, 'categories': categories})
-
-
+    
+    return render(request,'jarvis/pages/notification/send_notification.html', { 'language_options': language_options, 'user_group_options' : user_group_options, 'notification_types': notification_type_options, 'pushNotification': pushNotification})
 
 @login_required
 def particular_notification(request, notification_id=None, status_id=2, page_no=1, is_uninstalled=0):
@@ -1224,11 +1216,18 @@ def create_user_notification_delivered(request):
         dev_id = request.POST.get('dev_id', "")
         pushNotification = PushNotification.objects.get(pk=notification_id)
         if request.user.pk:
-            pushNotificationUser = PushNotificationUser.objects.filter(push_notification_id=pushNotification, user=request.user)
-            pushNotificationUser.update(status='0')
+            pushNotificationUser=PushNotificationUser()
+            pushNotificationUser.push_notification=pushNotification
+            pushNotificationUser.user=FCMDevice.objects.filter(user=request.user).first()
+            pushNotificationUser.user=request.user
+            pushNotificationUser.status='0'
+            pushNotificationUser.save()
         else:
-            pushNotificationUser = PushNotificationUser.objects.filter(push_notification_id=pushNotification, device__dev_id=dev_id)
-            pushNotificationUser.update(status='0')
+            pushNotificationUser=PushNotificationUser()
+            pushNotificationUser.push_notification=pushNotification
+            pushNotificationUser.device=FCMDevice.objects.get(dev_id=dev_id)
+            pushNotificationUser.status='0'
+            pushNotificationUser.save()
         return JsonResponse({"status":"Success"})
     except Exception as e:
         return JsonResponse({"status":str(e)})
@@ -1240,11 +1239,18 @@ def open_notification_delivered(request):
         dev_id = request.POST.get('dev_id', "")
         pushNotification = PushNotification.objects.get(pk=notification_id)
         if request.user.pk:
-            pushNotificationUser = PushNotificationUser.objects.filter(push_notification_id=pushNotification, user=request.user)
-            pushNotificationUser.update(status='1')
+            pushNotificationUser=PushNotificationUser()
+            pushNotificationUser.push_notification=pushNotification
+            pushNotificationUser.user=FCMDevice.objects.filter(user=request.user).first()
+            pushNotificationUser.user=request.user
+            pushNotificationUser.status='1'
+            pushNotificationUser.save()
         else:
-            pushNotificationUser = PushNotificationUser.objects.filter(push_notification_id=pushNotification, device__dev_id=dev_id)
-            pushNotificationUser.update(status='1')
+            pushNotificationUser=PushNotificationUser()
+            pushNotificationUser.push_notification=pushNotification
+            pushNotificationUser.device=FCMDevice.objects.get(dev_id=dev_id)
+            pushNotificationUser.status='1'
+            pushNotificationUser.save()
         return JsonResponse({"status":"Success"})
     except Exception as e:
         return JsonResponse({"status":str(e)})

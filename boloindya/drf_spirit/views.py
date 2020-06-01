@@ -4084,6 +4084,12 @@ def report(request):
         return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
+@api_view(['GET'])
+def get_user_details_from_topic_id(request):
+    try:
+        topic=Topic.objects.get(pk=request.GET.get('id', None))
+        return JsonResponse({"data": UserSerializer(topic.user).data })
+    except Exception as e:
+        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
