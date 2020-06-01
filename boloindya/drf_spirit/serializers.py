@@ -1,4 +1,4 @@
-from rest_framework.serializers import ModelSerializer, SerializerMethodField
+from rest_framework.serializers import ModelSerializer, SerializerMethodField, RelatedField, CharField
 
 from .fields import UserReadOnlyField
 from forum.topic.models import Topic,CricketMatch,Poll,Choice,Voting,Leaderboard, Notification, TongueTwister,BoloActionHistory,VBseen, TongueTwisterCounter
@@ -7,7 +7,7 @@ from forum.category.models import Category,CategoryViewCounter
 from forum.comment.models import Comment
 from forum.user.models import UserProfile,AppVersion, ReferralCodeUsed, VideoCompleteRate,Contact
 from .relations import PresentableSlugRelatedField
-from .models import SingUpOTP
+from .models import SingUpOTP, Campaign, Winner
 from .utils import shortnaturaltime,shortcounterprofile,shorcountertopic,get_ranked_topics
 from django.conf import settings
 import re
@@ -955,3 +955,23 @@ class TopicsWithOnlyContent(ModelSerializer):
         model = Topic
         fields = ('m3u8_content', 'id', 'audio_m3u8_content', 'video_m3u8_content', 'question_video')
 
+class WinnerSerializer(ModelSerializer):
+
+    user = SerializerMethodField()
+
+    class Meta:
+        model = Winner
+        fields = ('user', 'rank', 'extra_text', 'video')
+    
+    def get_user(self,instance):
+        return UserSerializer(instance.user).data
+
+class CampaignSerializer(ModelSerializer):
+
+    hashtag_name = CharField(source='hashtag.hash_tag', read_only=True)
+    next_campaign_name = CharField(source='next_campaign_hashtag.hash_tag', read_only=True)
+    winners = WinnerSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = Campaign
+        fields = ('banner_img_url', 'hashtag_name', 'is_active', 'active_from', 'active_till', 'is_winner_declared', 'winners', 'next_campaign_name')
