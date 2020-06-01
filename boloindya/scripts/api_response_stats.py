@@ -43,8 +43,9 @@ from datetime import datetime,timedelta
 import os
 
 # HOST='https://www.boloindya.com'
+HOST="https://engagement.boloindya.com"
 # HOST='https://stage.boloindya.com'
-HOST="http://localhost:8000"
+# HOST="http://localhost:8000"
 
 API_PREFIX="/api/v1/"
 
@@ -152,7 +153,7 @@ def get_single_language():
 
 TOPICS = []
 def get_create_topic_data():
-    return {'title':'testing_topic_boloindya','language_id':get_single_language(),'category_id':get_single_category(),'media_duration':'02:00','is_vb':True,'vb_width':400,'vb_height':600,'question_video':'https://boloindyapp-prod.s3.amazonaws.com/media/SampleVideo_1280x720_10mb_158038922224.mp4','question_image':'https://www.sample-videos.com/img/Sample-jpg-image-500kb.jpg'}
+    return {'title':'testing_topic_boloindya','ids':get_single_language(),'category_id':get_single_category(),'media_duration':'02:00','is_vb':True,'vb_width':400,'vb_height':600,'question_video':'https://boloindyapp-prod.s3.amazonaws.com/media/SampleVideo_1280x720_10mb_158038922224.mp4','question_image':'https://www.sample-videos.com/img/Sample-jpg-image-500kb.jpg'}
 MOBILE_NO={'mobile_no':9795774871}
 COMMENT_ID = []
 def get_single_comment():
@@ -270,7 +271,10 @@ OTHER_API_LIST = [
     {'api_path':'topics/','api_name':'ALL TOPIC LIST (OLD API/Using Nowhere)','request_type':'GET','data_set':[{'language_id':get_single_language()},{'category':get_single_category()},{'language_id':get_single_language(),'category':get_single_category()}]},
     {'api_path':'timeline/','api_name':'GET USERPROFILE (OLD API/Using Nowhere)','request_type':'GET','data_set':[{'user_id':get_random_user()},{'category':'sports'},{'user_id':get_random_user()},{'category':'sports'}]},
     {'api_path':'search/','api_name':'Using For Searching Topic','request_type':'GET','data_set':[{'language_id':get_single_language(),'term':'love'},{'language_id':get_single_language(),'term':'the'},{'language_id':get_single_language(),'term':'what'},{'language_id':get_single_language(),'term':'mount'}]},
+    {'api_path':'solr/search/','api_name':'Using For Searching Topic via SOLR','request_type':'GET','data_set':[{'language_id':get_single_language(),'term':'love'},{'language_id':get_single_language(),'term':'the'},{'language_id':get_single_language(),'term':'what'},{'language_id':get_single_language(),'term':'mount'}]},
     {'api_path':'search/users/','api_name':'Using For Searching User','request_type':'GET','data_set':[{'term':'nishachar'},{'term':'vk'},{'term':'subhas'},{'term':'gitesh'}]},
+    {'api_path':'solr/search/users/','api_name':'Using For Searching User via SOLR','request_type':'GET','data_set':[{'term':'nishachar'},{'term':'vk'},{'term':'subhas'},{'term':'gitesh'}]},
+    {'api_path':'solr/search/top/','api_name':'Using For Searching Top via SOLR','request_type':'GET','data_set':[{'language_id':get_single_language(),'term':'love'},{'language_id':get_single_language(),'term':'the'},{'language_id':get_single_language(),'term':'varun saxena'},{'language_id':get_single_language(),'term':'mount'}]},
     {'api_path':'comments/','api_name':'Get Comment List all (OLD API/Using Nowhere)','request_type':'GET','data_set':None},
     {'api_path':'categories/','api_name':'GET Category List','request_type':'GET','data_set':None},
     {'api_path':'get_topic/','api_name':'GET Single Topic','request_type':'GET','data_set':[{'topic_id':get_single_topic_id()},{'topic_id':get_single_topic_id()},{'topic_id':get_single_topic_id()}]},
@@ -312,9 +316,10 @@ OTHER_API_LIST = [
     {'api_path':'vb_transcode_status/','api_name':'get transcoding status of file','request_type':'POST','data_set':[{'topic_id':get_single_topic_id()}]},
     {'api_path':'get_vb_list/','api_name':'get list of vb','request_type':'GET','data_set':[{'category':'sports','is_popular':True,'language_id':get_single_language()},{'category':'sports','language_id':get_single_language()},{'category':'sports','language_id':get_single_language()},{'user_id':get_random_user()},{'category':'sports','language_id':get_single_language(),'is_expand':'yes'}]},
     {'api_path':'leaderboard_view/','api_name':'to get the leader board(OLD API/Using Nowhere) ','request_type':'GET','data_set':None},
-    {'api_path':'get_hash_list/','api_name':'to get the all hash tag with 3 video','request_type':'POST','data_set':None},
-    {'api_path':'get_user_bolo_info/','api_name':'to get the bolo info on click bolo info ','request_type':'POST','data_set':[{'start_date':'20-08-2019','end_date':'13-01-2020'},{'month':'11','year':'2019'},None]},
+    # {'api_path':'get_hash_list/','api_name':'to get the all hash tag with 3 video','request_type':'POST','data_set':None},
+    {'api_path':'get_user_bolo_info/','api_name':'to get the bolo info on click bolo info ','request_type':'POST','data_set':[{'start_date':'20-08-2019','end_date':'13-05-2020'},{'month':'11','year':'2019'},None]},
     {'api_path':'hashtag_suggestion/','api_name':'sugest hashtag','request_type':'POST','data_set':[{'term':'nishachar'},{'term':'vk'},{'term':'subhas'},{'term':'gitesh'}]},
+    {'api_path':'solr/hashtag_suggestion/','api_name':'sugest hashtag via SOLR','request_type':'POST','data_set':[{'term':'nishachar'},{'term':'vk'},{'term':'subhas'},{'term':'gitesh'}]},
     # {'api_path':'user/statistics/','api_name':'dummy_test','request_type':'POST','data_set':[]},
     {'api_path':'get_category_detail/','api_name':'get singel cateogry detail','request_type':'POST','data_set':[{'category_id':get_single_category()},{'category_id':get_single_category()}]},
     {'api_path':'get_category_detail_with_views/','api_name':'get single category page','request_type':'POST','data_set':[{'category_id':get_single_category(),'language_id':get_single_language()},{'category_id':get_single_category(),'language_id':get_single_language()}]},
@@ -327,6 +332,8 @@ OTHER_API_LIST = [
     {'api_path':'get_popular_bolo/','api_name':'get popular boloindyans list','request_type':'GET','data_set':[{'language_id':get_single_language()},{'language_id':get_single_language()},{'language_id':get_single_language(),'is_expand':'yes'}]},
     {'api_path':'get_category_with_video_bytes/','api_name':'get homepage videos with category','request_type':'GET','data_set':[{'language_id':get_single_language(),'is_discover':True},{'language_id':get_single_language()},{'language_id':get_single_language(),'is_expand':'yes'}]},
     {'api_path':'notification/get','api_name':'get notificationo the user','request_type':'POST','data_set':None},
+    {'api_path':'get_hash_discover/','api_name':'DISCOVER HASHTAG','request_type':'GET','data_set':[{'language_id':get_single_language()},{'language_id':get_single_language()},{'language_id':get_single_language(),'is_expand':'yes'}]},
+    {'api_path':'get_hash_discover_topics/','api_name':'DISCOVER HASHTAG  TOPICS','request_type':'GET','data_set':[{'ids':get_single_topic_id()},{'ids':get_single_topic_id()},{'ids':get_single_topic_id(),'is_expand':'yes'}]},
     # {'api_path':'notification/click','api_name':'set notifiacation as seen','request_type':'POST','data_set':None}
 ]
 
@@ -398,5 +405,3 @@ send_file_mail(HOST)
 #     else:
 #         response,csv_elemnt = send_request_to_server(api_dict['api_name'],api_dict['request_type'],api_dict['api_path'],user['auth_token'],payload=None,files=None)
 #         csv+=csv_elemnt
-
-

@@ -314,13 +314,13 @@ class Topic(RecordTimeStamp):
         return format_html('<a href="/superman/forum_user/userprofile/' + str(self.user.st.id) \
             + '/change/" target="_blank">' + self.user.username + '</a>' )
 
-    def delete(self):
+    def delete(self,is_user_deleted=False):
         if self.is_monetized:
             if self.language_id == '1':
                 reduce_bolo_score(self.user.id, 'create_topic_en', self, 'deleted')
             else:
                 reduce_bolo_score(self.user.id, 'create_topic', self, 'deleted')
-        else:
+        if not is_user_deleted:
             notify_owner = Notification.objects.create(for_user_id = self.user.id ,topic = self, \
                 notification_type='7', user_id = self.user.id)
         self.is_monetized = False
