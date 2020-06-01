@@ -324,7 +324,6 @@ HAYSTACK_CONNECTIONS = {
 HAYSTACK_SIGNAL_PROCESSOR = 'forum.search.signals.RealtimeSignalProcessor'
 
 DATABASES = {
-
    'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'boloindya',                 # Or path to database file if using sqlite3.
@@ -334,7 +333,6 @@ DATABASES = {
         'HOST': 'localhost',                 # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT': '5432',                      # Set to empty string for default.
     }
-    
 }
 
 SECRET_KEY = 'qh^ag%eobze^uylgvt2of3#t(3wze)2!-s=@_@zuua1$56mu41'

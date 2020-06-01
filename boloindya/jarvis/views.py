@@ -1089,8 +1089,6 @@ def update_careeranna_db(uploaded_video):
     reseponse_careeranna = requests.post(settings.CAREERANNA_VIDEOFILE_UPDATE_URL, data=payload, headers=headers)
     return reseponse_careeranna
 
-
-
 @login_required
 def notification_panel(request):
   
@@ -1218,11 +1216,18 @@ def create_user_notification_delivered(request):
         dev_id = request.POST.get('dev_id', "")
         pushNotification = PushNotification.objects.get(pk=notification_id)
         if request.user.pk:
-            pushNotificationUser = PushNotificationUser.objects.filter(push_notification_id=pushNotification, user=request.user)
-            pushNotificationUser.update(status='0')
+            pushNotificationUser=PushNotificationUser()
+            pushNotificationUser.push_notification=pushNotification
+            pushNotificationUser.user=FCMDevice.objects.filter(user=request.user).first()
+            pushNotificationUser.user=request.user
+            pushNotificationUser.status='0'
+            pushNotificationUser.save()
         else:
-            pushNotificationUser = PushNotificationUser.objects.filter(push_notification_id=pushNotification, device__dev_id=dev_id)
-            pushNotificationUser.update(status='0')
+            pushNotificationUser=PushNotificationUser()
+            pushNotificationUser.push_notification=pushNotification
+            pushNotificationUser.device=FCMDevice.objects.get(dev_id=dev_id)
+            pushNotificationUser.status='0'
+            pushNotificationUser.save()
         return JsonResponse({"status":"Success"})
     except Exception as e:
         return JsonResponse({"status":str(e)})
@@ -1234,11 +1239,18 @@ def open_notification_delivered(request):
         dev_id = request.POST.get('dev_id', "")
         pushNotification = PushNotification.objects.get(pk=notification_id)
         if request.user.pk:
-            pushNotificationUser = PushNotificationUser.objects.filter(push_notification_id=pushNotification, user=request.user)
-            pushNotificationUser.update(status='1')
+            pushNotificationUser=PushNotificationUser()
+            pushNotificationUser.push_notification=pushNotification
+            pushNotificationUser.user=FCMDevice.objects.filter(user=request.user).first()
+            pushNotificationUser.user=request.user
+            pushNotificationUser.status='1'
+            pushNotificationUser.save()
         else:
-            pushNotificationUser = PushNotificationUser.objects.filter(push_notification_id=pushNotification, device__dev_id=dev_id)
-            pushNotificationUser.update(status='1')
+            pushNotificationUser=PushNotificationUser()
+            pushNotificationUser.push_notification=pushNotification
+            pushNotificationUser.device=FCMDevice.objects.get(dev_id=dev_id)
+            pushNotificationUser.status='1'
+            pushNotificationUser.save()
         return JsonResponse({"status":"Success"})
     except Exception as e:
         return JsonResponse({"status":str(e)})
