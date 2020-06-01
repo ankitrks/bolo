@@ -40,7 +40,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
-from .models import UserJarvisDump, UserLogStatistics, UserFeedback
+from .models import UserJarvisDump, UserLogStatistics, UserFeedback, Campaign, Winner
 from .permissions import IsOwnerOrReadOnly
 from .utils import get_weight, add_bolo_score, shorcountertopic, calculate_encashable_details, state_language, language_options,short_time,\
     solr_object_to_db_object, solr_userprofile_object_to_db_object,get_paginated_data ,shortcounterprofile, get_ranked_topics
@@ -4083,6 +4083,16 @@ def report(request):
     except Exception as e:
         return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+def get_campaigns(request):
+    try:
+        today = datetime.today()
+        all_camps = Campaign.objects.filter(is_active=True, active_from__lte=today, active_till__gte=today).order_by('-active_from')
+        serializer_camp = CampaignSerializer(all_camps, many=True)
+        data = serializer_camp.data
+        return JsonResponse({'status': 'success','message':data}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def get_user_details_from_topic_id(request):
