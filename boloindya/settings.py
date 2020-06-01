@@ -325,13 +325,22 @@ HAYSTACK_SIGNAL_PROCESSOR = 'forum.search.signals.RealtimeSignalProcessor'
 
 DATABASES = {
 
-   'default': {
+   # 'default': {
+   #      'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+   #      'NAME': 'boloindya',                 # Or path to database file if using sqlite3.
+   #      # The following settings are not used with sqlite3:
+   #      'USER': 'boloindya',
+   #      'PASSWORD': 'bng321',
+   #      'HOST': 'localhost',                 # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+   #      'PORT': '5432',                      # Set to empty string for default.
+   #  }
+    'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'boloindya',                 # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
-        'USER': 'boloindya',
-        'PASSWORD': 'bng321',
-        'HOST': 'localhost',                 # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+        'USER': 'boloindya_prod',
+        'PASSWORD': 'boloadmin3011',
+        'HOST': 'boloindya-prod.cdwvsaegqvxa.ap-south-1.rds.amazonaws.com',                 # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT': '5432',                      # Set to empty string for default.
     }
 }
