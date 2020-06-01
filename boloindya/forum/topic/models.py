@@ -139,6 +139,7 @@ class Topic(RecordTimeStamp):
 
     backup_url = models.TextField(_("backup url"), blank = True)
     old_backup_url = models.TextField(_("old_backup url"), blank = True)
+    safe_backup_url = models.TextField(_("safe backup url"), blank = True)
     is_transcoded = models.BooleanField(default = False)
     is_transcoded_error = models.BooleanField(default = False)
     transcode_job_id = models.TextField(_("Transcode Job ID"), blank = True)
@@ -194,7 +195,7 @@ class Topic(RecordTimeStamp):
 
     def update_m3u8_content(self):
         try:
-            if self.question_video:
+            if self.question_video and '.m3u8' in self.question_video:
                 m3u8_url = self.question_video
                 url_split = m3u8_url.split('/')
                 audio_url = '/'.join( url_split[:-1] + ['hlsAudio'] + [url_split[-1].replace('hls_', '')] )
@@ -209,7 +210,7 @@ class Topic(RecordTimeStamp):
 
     def update_vb(self, *args, **kwargs):
         if not self.id or not self.is_transcoded:
-            if self.is_vb and self.question_video:
+            if self.is_vb and self.question_video and not '.m3u8' in self.question_video:
                 data_dump, m3u8_url, job_id = transcode_media_file(self.question_video.split('s3.amazonaws.com/')[1])
                 if m3u8_url:
                     self.backup_url = self.question_video

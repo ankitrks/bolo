@@ -1417,6 +1417,7 @@ def createTopic(request):
         topic.question_audio = request.POST.get('question_audio')
     if request.POST.get('question_video'):
         topic.question_video = request.POST.get('question_video')
+        topic.safe_backup_url = request.POST.get('question_video')
     if request.POST.get('question_image'):
         topic.question_image = request.POST.get('question_image')
 
@@ -4082,7 +4083,6 @@ def report(request):
     except Exception as e:
         return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-
 @api_view(['POST'])
 def get_campaigns(request):
     try:
@@ -4090,7 +4090,15 @@ def get_campaigns(request):
         all_camps = Campaign.objects.filter(is_active=True, active_from__lte=today, active_till__gte=today).order_by('-active_from')
         serializer_camp = CampaignSerializer(all_camps, many=True)
         data = serializer_camp.data
-        return JsonResponse({'status': 'success','message':data}, status=status.HTTP_201_CREATED)    
+        return JsonResponse({'status': 'success','message':data}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_user_details_from_topic_id(request):
+    try:
+        topic=Topic.objects.get(pk=request.GET.get('id', None))
+        return JsonResponse({"data": UserSerializer(topic.user).data })
     except Exception as e:
         return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
