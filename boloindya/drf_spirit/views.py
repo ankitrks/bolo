@@ -1417,6 +1417,7 @@ def createTopic(request):
         topic.question_audio = request.POST.get('question_audio')
     if request.POST.get('question_video'):
         topic.question_video = request.POST.get('question_video')
+        topic.safe_backup_url = request.POST.get('question_video')
     if request.POST.get('question_image'):
         topic.question_image = request.POST.get('question_image')
 
