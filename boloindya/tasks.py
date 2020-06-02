@@ -79,20 +79,33 @@ def send_notifications_task(data, pushNotification):
             if user_group == '8':
                 devices=FCMDevice.objects.filter(user__pk=data.get('particular_user_id', None), is_uninstalled=False)
                 for each in devices:
-                    fcm_message = {"message": {"token": each.reg_id ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": pushNotification.id, "image_url": image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
+                    fcm_message = {"message": {"token": each.reg_id ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": str(pushNotification.id), "image_url": image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
+                    resp = requests.post("https://fcm.googleapis.com/v1/projects/boloindya-1ec98/messages:send", data=json.dumps(fcm_message), headers=headers)
+                    logger.info((resp))
+                    logger.info((resp.text))
+                    logger.info((fcm_message))
             elif lang == '0' and user_group == '0':
-                fcm_message = {"message": {"topic": "all" ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": pushNotification.id, "image_url": image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
+                fcm_message = {"message": {"topic": "all" ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": str(pushNotification.id), "image_url": image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
             elif user_group == '2' or user_group == '1':
-                fcm_message = {"message": {"topic": "boloindya_install" ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": pushNotification.id, "image_url": image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
+                fcm_message = {"message": {"topic": "boloindya_install" ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": str(pushNotification.id), "image_url": image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
             elif user_group == '7':
-                fcm_message = {"message": {"topic": "boloindya_users_test" ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": pushNotification.id, "image_url": image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
+                devices=FCMDevice.objects.filter(user__pk__in=[19, 1492, 328, 41, 40], is_uninstalled=False)
+                for each in devices:
+                    fcm_message = {"message": {"token": each.reg_id ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": str(pushNotification.id), "image_url": image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
+                    resp = requests.post("https://fcm.googleapis.com/v1/projects/boloindya-1ec98/messages:send", data=json.dumps(fcm_message), headers=headers)
+                    logger.info((resp))
+                    logger.info((resp.text))
+                    logger.info((fcm_message))
             elif user_group == '9':
-                fcm_message = {"message": {"topic": "boloindya_users_creator" ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": pushNotification.id, "image_url": image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
+                fcm_message = {"message": {"topic": "boloindya_users_creator" ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": str(pushNotification.id), "image_url": image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
             elif lang == '0' or user_group == '4' or user_group == '5' or user_group == '6' or user_group == '10' or user_group == '3':
-                fcm_message = {"message": {"topic": "boloindya_signup" ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": pushNotification.id, "image_url": image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
+                fcm_message = {"message": {"topic": "boloindya_signup" ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": str(pushNotification.id), "image_url": image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
             elif lang != '0':
-                fcm_message = {"message": {"topic": "boloindya_language_"+lang ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": pushNotification.id, "image_url": image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
+                fcm_message = {"message": {"topic": "boloindya_language_"+lang ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": str(pushNotification.id), "image_url": image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
             resp = requests.post("https://fcm.googleapis.com/v1/projects/boloindya-1ec98/messages:send", data=json.dumps(fcm_message), headers=headers)
+            logger.info((resp))
+            logger.info((resp.text))
+            logger.info((fcm_message))
             pushNotification.is_executed=True
             pushNotification.save()
     except Exception as e:
