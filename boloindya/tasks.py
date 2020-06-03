@@ -359,8 +359,6 @@ def send_upload_video_notification(data, pushNotification):
         instance_id = data.get('id', "")
         image_url = data.get('image_url', '')
         particular_user_id=data.get('particular_user_id', None)
-
-    try:
         access =  _get_access_token()
         
         headers = {'Authorization': 'Bearer ' + access, 'Content-Type': 'application/json; UTF-8' }
