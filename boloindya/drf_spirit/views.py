@@ -1,4 +1,4 @@
- # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import os
 import ast
 import copy
@@ -405,7 +405,7 @@ def replace_query_param(url, key, val):
     query = query_dict.urlencode()
     return urlparse.urlunsplit((scheme, netloc, path, query, fragment))
 
-class GetChallenge(generics.ListCreateAPIView):
+class old_algoGetChallenge(generics.ListCreateAPIView):
     serializer_class = TopicSerializerwithComment
     permission_classes = (IsOwnerOrReadOnly,)
     pagination_class = ShufflePagination 
@@ -473,7 +473,7 @@ class GetChallenge(generics.ListCreateAPIView):
 
 
 @api_view(['GET'])
-def newAlgoGetChallenge(request):
+def GetChallenge(request):
     challenge_hash = request.GET.get('challengehash')
     language_id = request.GET.get('language_id')
     challengehash = '#' + challenge_hash
@@ -1509,7 +1509,7 @@ def createTopic(request):
         data = {}
 
         data['title'] = ' '
-        data['upper_title'] = 'Your Video has been published.'
+        data['upper_title'] = 'Your video has been published.'
         data['notification_type'] = '4'
         data['id'] = ''
         data['particular_user_id'] = request.user.id
@@ -2004,11 +2004,11 @@ def get_user_bolo_info(request):
             all_pay = UserPay.objects.filter(user=request.user,is_active=True)
             top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user).order_by('-view_count')[:3]
             video_playtime = request.user.st.total_vb_playtime
-            for each_vb in total_video:
-                total_view_count+=each_vb.view_count
-                total_like_count+=each_vb.likes_count
-                total_comment_count+=each_vb.comment_count
-                total_share_count+=each_vb.total_share_count
+            #for each_vb in total_video:
+            #    total_view_count+=each_vb.view_count
+            #    total_like_count+=each_vb.likes_count
+            #    total_comment_count+=each_vb.comment_count
+            #    total_share_count+=each_vb.total_share_count
         else:
             total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user,date__gte=start_date, date__lte=end_date)
             total_video_id = list(Topic.objects.filter(is_vb = True,user=request.user,is_removed=False).values_list('pk',flat=True))
@@ -2031,6 +2031,11 @@ def get_user_bolo_info(request):
         monetised_video_count = total_video.filter(is_monetized = True).count()
         unmonetizd_video_count= total_video.filter(is_monetized = False,is_moderated = True).count()
         left_for_moderation = total_video.filter(is_moderated = False).count()
+        for each_vb in total_video:
+            total_view_count+=each_vb.view_count
+            total_like_count+=each_vb.likes_count
+            total_comment_count+=each_vb.comment_count
+            total_share_count+=each_vb.total_share_count
         total_view_count = shorcountertopic(total_view_count)
         total_comment_count = shorcountertopic(total_comment_count)
         total_like_count = shorcountertopic(total_like_count)
@@ -2215,7 +2220,7 @@ def fb_profile_settings(request):
     twitter_id = request.POST.get('twitter_id',None)
     d_o_b = request.POST.get('d_o_b',None)
     gender = request.POST.get('gender',None)
-    click_id = request.POST.get('click_id',None)
+    click_id = None # request.POST.get('click_id',None)
     lat = request.POST.get('lat',None)
     lang = request.POST.get('lang',None)
     user_ip = request.POST.get('user_ip',None)
@@ -2945,7 +2950,6 @@ def vb_seen(request):
         userprofile.own_vb_view_count = F('own_vb_view_count') +1
         userprofile.save()
         all_vb_seen = get_redis_vb_seen(request.user.id)
-        # vbseen = VBseen.objects.filter(user = request.user,topic_id = topic_id)
         if not topic_id in all_vb_seen:
             vbseen = VBseen.objects.create(user = request.user,topic_id = topic_id)
             update_redis_vb_seen(request.user.id,topic_id)
@@ -4057,8 +4061,10 @@ def get_hash_discover(request):
         page = int(request.GET.get('page',1))
         page_size = request.GET.get('page_size', 10)
         language_id = request.GET.get('language_id','2')
-        hash_tags = TongueTwisterCounter.objects.exclude(tongue_twister__is_blocked = True).filter(language_id=language_id).order_by('-tongue_twister__is_popular', 'tongue_twister__order', \
-            '-tongue_twister__popular_date','-hash_counter')
+        #hash_tags = TongueTwisterCounter.objects.exclude(tongue_twister__is_blocked = True).filter(language_id=language_id).order_by('-tongue_twister__is_popular', 'tongue_twister__order', \
+        #    '-tongue_twister__popular_date','-hash_counter')
+        hash_tags = HashtagViewCounter.objects.exclude(hashtag__is_blocked = True).filter(language=language_id).order_by('-hashtag__is_popular', '-hashtag__order',\
+            '-hashtag__hash_counter')
         result_page = get_paginated_data(hash_tags, int(page_size), int(page))
         if result_page[1]<int(page):
             return JsonResponse({'message': 'No page exist'}, status=status.HTTP_400_BAD_REQUEST)
