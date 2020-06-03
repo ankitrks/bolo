@@ -1439,7 +1439,7 @@ def createTopic(request):
             topic_json = TopicSerializerwithComment(already_exist_topic[0], context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data
             
             ## hard coded notification for uploading video
-            database = {}
+            data = {}
 
             data['title'] = 'Uploaded Video'
             data['upper_title'] = 'Uploaded Video'
@@ -1453,7 +1453,7 @@ def createTopic(request):
             data['timepicker'] = ''
             data['image_url'] = ''
             data['days_ago'] = ''
-            
+
             send_upload_video_notification(data, {})
             return JsonResponse({'message': 'Video Byte Created','topic':topic_json}, status=status.HTTP_201_CREATED)
 
