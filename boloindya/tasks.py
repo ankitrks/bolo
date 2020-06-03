@@ -367,9 +367,9 @@ def send_upload_video_notification(data, pushNotification):
         for each in devices:
             fcm_message = {"message": {"token": each.reg_id ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": "-1", "image_url": image_url}}}
             resp = requests.post("https://fcm.googleapis.com/v1/projects/boloindya-1ec98/messages:send", data=json.dumps(fcm_message), headers=headers)
-            logger.info((resp))
-            logger.info((resp.text))
-            logger.info((fcm_message))
+            print(resp)
+            print(resp.text)
+            print(fcm_message)
         
     except Exception as e:
         logger.info(str(e))
