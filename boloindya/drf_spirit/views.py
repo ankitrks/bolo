@@ -1518,7 +1518,7 @@ def createTopic(request):
         data['image_url'] = ''
         data['days_ago'] = ''
 
-        send_upload_video_notification(data, {})
+        send_upload_video_notification.delay(data, {})
         return JsonResponse({'message': message,'topic':topic_json}, status=status.HTTP_201_CREATED)
     except User.DoesNotExist:
         return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
