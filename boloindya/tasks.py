@@ -149,15 +149,15 @@ def vb_create_task(topic_id):
     topic = Topic.objects.get(pk=topic_id)
     if not topic.is_transcoded:
         if topic.is_vb and topic.question_video:
-            data_dump, m3u8_url, job_id = transcode_media_file(topic.question_video.split('s3.amazonaws.com/')[1])
-            if m3u8_url:
-                topic.backup_url = topic.question_video
-                topic.question_video = m3u8_url
-                topic.transcode_dump = data_dump
-                topic.transcode_job_id = job_id
-                # topic.is_transcoded = True
-                topic.save()
-                topic.update_m3u8_content()
+            # data_dump, m3u8_url, job_id = transcode_media_file(topic.question_video.split('s3.amazonaws.com/')[1])
+            # if m3u8_url:
+                # topic.backup_url = topic.question_video
+                # topic.question_video = m3u8_url
+                # topic.transcode_dump = data_dump
+                # topic.transcode_job_id = job_id
+                # # topic.is_transcoded = True
+                # topic.save()
+            topic.update_m3u8_content()
                 #create_downloaded_url(topic_id)
 
 @app.task

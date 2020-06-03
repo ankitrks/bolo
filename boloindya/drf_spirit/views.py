@@ -1454,7 +1454,7 @@ def createTopic(request):
             view_count = random.randint(1,5)
             topic.view_count = view_count
             topic.save()
-            # vb_create_task.delay(topic.id)
+            vb_create_task.delay(topic.id)
             # topic.update_vb()
             tag_list=check_space_before_hash(title).split()
             hash_tag = copy.deepcopy(tag_list)
