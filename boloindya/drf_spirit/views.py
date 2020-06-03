@@ -1398,16 +1398,20 @@ def createTopic(request):
 
     """
 
-    topic        = Topic()
-    user_id      = request.user.id
-    title        = request.POST.get('title', '').strip()
-    language_id  = request.POST.get('language_id', '')
-    category_id  = request.POST.get('category_id', '')
+    topic           = Topic()
+    user_id         = request.user.id
+    title           = request.POST.get('title', '').strip()
+    language_id     = request.POST.get('language_id', '')
+    category_id     = request.POST.get('category_id', '')
     media_duration  = request.POST.get('media_duration', '')
     question_image  = request.POST.get('question_image', '')
-    is_vb = request.POST.get('is_vb',False)
-    vb_width = request.POST.get('vb_width',0)
-    vb_height = request.POST.get('vb_height',0)
+    is_vb           = request.POST.get('is_vb',False)
+    vb_width        = request.POST.get('vb_width',0)
+    vb_height       = request.POST.get('vb_height',0)
+    question_video  = request.POST.get('question_video')
+    m3u8_url        = request.POST.get('m3u8_url')
+    data_dump       = request.POST.get('data_dump')
+    job_id          = request.POST.get('job_id')
     # media_file = request.FILES.get['media']
     # print media_file
 
@@ -1415,15 +1419,21 @@ def createTopic(request):
         topic.title          = (title[0].upper()+title[1:]).strip()
     if request.POST.get('question_audio'):
         topic.question_audio = request.POST.get('question_audio')
-    if request.POST.get('question_video'):
-        topic.question_video = request.POST.get('question_video')
-        topic.safe_backup_url = request.POST.get('question_video')
+    if question_video:
+        # topic.question_video = request.POST.get('question_video')
+        topic.safe_backup_url = question_video
+        topic.backup_url      = question_video
+
+    if m3u8_url:
+        topic.question_video = m3u8_url
+        topic.transcode_dump = data_dump
+        topic.transcode_job_id = job_id
+
     if request.POST.get('question_image'):
         topic.question_image = request.POST.get('question_image')
 
-    if request.POST.get('question_video') and not request.user.st.is_test_user:
-        question_video = request.POST.get('question_video')
-        already_exist_topic = Topic.objects.filter(Q(question_video=question_video)|Q(backup_url=question_video))
+    if m3u8url and question_video and not request.user.st.is_test_user:
+        already_exist_topic = Topic.objects.filter(Q(question_video=m3u8url)|Q(backup_url=question_video))
         if already_exist_topic:
             topic_json = TopicSerializerwithComment(already_exist_topic[0], context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data
             return JsonResponse({'message': 'Video Byte Created','topic':topic_json}, status=status.HTTP_201_CREATED)
@@ -1444,7 +1454,7 @@ def createTopic(request):
             view_count = random.randint(1,5)
             topic.view_count = view_count
             topic.save()
-            vb_create_task.delay(topic.id)
+            # vb_create_task.delay(topic.id)
             # topic.update_vb()
             tag_list=check_space_before_hash(title).split()
             hash_tag = copy.deepcopy(tag_list)
