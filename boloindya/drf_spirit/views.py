@@ -1429,6 +1429,8 @@ def createTopic(request):
         topic.question_video = m3u8_url
         topic.transcode_dump = data_dump
         topic.transcode_job_id = job_id
+    else:
+        topic.question_video = request.POST.get('question_video')
 
     if request.POST.get('question_image'):
         topic.question_image = request.POST.get('question_image')
@@ -1505,8 +1507,8 @@ def createTopic(request):
         ## hard coded notification for uploading video
         data = {}
 
-        data['title'] = 'Uploaded Video'
-        data['upper_title'] = 'Uploaded Video'
+        data['title'] = 'Your Video has been published.'
+        data['upper_title'] = ' '
         data['notification_type'] = '4'
         data['id'] = ''
         data['particular_user_id'] = request.user.id
