@@ -40,7 +40,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
-from .models import UserJarvisDump, UserLogStatistics, UserFeedback
+from .models import UserJarvisDump, UserLogStatistics, UserFeedback, Campaign, Winner
 from .permissions import IsOwnerOrReadOnly
 from .utils import get_weight, add_bolo_score, shorcountertopic, calculate_encashable_details, state_language, language_options,short_time,\
     solr_object_to_db_object, solr_userprofile_object_to_db_object,get_paginated_data ,shortcounterprofile, get_ranked_topics
@@ -55,6 +55,7 @@ from forum.topic.models import Topic,TopicHistory, ShareTopic, Like, SocialShare
     Leaderboard, VBseen, TongueTwister, HashtagViewCounter
 from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
+from forum.user.utils.bolo_redis import get_bolo_info_combined
 from .serializers import *
 from tasks import vb_create_task,user_ip_to_state_task,sync_contacts_with_user,cache_follow_post,cache_popular_post
 from haystack.query import SearchQuerySet, SQ
@@ -1662,7 +1663,7 @@ def topic_delete(request):
     if allowed_date <= topic.date:
         if topic.user == request.user:
             try:
-                topic.delete()
+                topic.delete(is_user_deleted=True)
                 return JsonResponse({'message': 'Topic Deleted'}, status=status.HTTP_201_CREATED)
             except:
                 return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
@@ -1957,6 +1958,7 @@ def get_user_bolo_info(request):
         year = request.POST.get('year',None)
     """
     try:
+        # return JsonResponse({'message': 'success','data' : get_bolo_info_combined(request.user.id)}, status=status.HTTP_200_OK)
         start_date = request.POST.get('start_date', None)
         end_date = request.POST.get('end_date',None)
         month = request.POST.get('month', None)
@@ -1982,6 +1984,11 @@ def get_user_bolo_info(request):
             all_pay = UserPay.objects.filter(user=request.user,is_active=True)
             top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user).order_by('-view_count')[:3]
             video_playtime = request.user.st.total_vb_playtime
+            for each_vb in total_video:
+                total_view_count+=each_vb.view_count
+                total_like_count+=each_vb.likes_count
+                total_comment_count+=each_vb.comment_count
+                total_share_count+=each_vb.total_share_count
         else:
             total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user,date__gte=start_date, date__lte=end_date)
             total_video_id = list(Topic.objects.filter(is_vb = True,user=request.user,is_removed=False).values_list('pk',flat=True))
@@ -2004,11 +2011,6 @@ def get_user_bolo_info(request):
         monetised_video_count = total_video.filter(is_monetized = True).count()
         unmonetizd_video_count= total_video.filter(is_monetized = False,is_moderated = True).count()
         left_for_moderation = total_video.filter(is_moderated = False).count()
-        for each_vb in total_video:
-            total_view_count+=each_vb.view_count
-            total_like_count+=each_vb.likes_count
-            total_comment_count+=each_vb.comment_count
-            total_share_count+=each_vb.total_share_count
         total_view_count = shorcountertopic(total_view_count)
         total_comment_count = shorcountertopic(total_comment_count)
         total_like_count = shorcountertopic(total_like_count)
@@ -2680,6 +2682,9 @@ def follow_user(request):
     """
     user_following_id = request.POST.get('user_following_id',None)
     try:
+        if int(user_following_id) == int(request.user.id):
+            return JsonResponse({'message': 'You can not follow/unfollow your ownself'}, status=status.HTTP_400_BAD_REQUEST)
+
         follow,is_created = Follower.objects.get_or_create(user_follower = request.user,user_following_id=user_following_id)
         userprofile = UserProfile.objects.get(user = request.user)
         followed_user = UserProfile.objects.get(user_id = user_following_id)
@@ -4093,7 +4098,23 @@ def report(request):
     except Exception as e:
         return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+def get_campaigns(request):
+    try:
+        today = datetime.today()
+        all_camps = Campaign.objects.filter(is_active=True, active_from__lte=today, active_till__gte=today).order_by('-active_from')
+        serializer_camp = CampaignSerializer(all_camps, many=True)
+        data = serializer_camp.data
+        return JsonResponse({'status': 'success','message':data}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-
+@api_view(['GET'])
+def get_user_details_from_topic_id(request):
+    try:
+        topic=Topic.objects.get(pk=request.GET.get('id', None))
+        return JsonResponse({"data": UserSerializer(topic.user).data })
+    except Exception as e:
+        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 

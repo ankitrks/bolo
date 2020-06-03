@@ -1,6 +1,6 @@
 
 from django.contrib import admin
-from .models import SingUpOTP, UserJarvisDump, UserFeedback
+from .models import SingUpOTP, UserJarvisDump, UserFeedback, Campaign, Winner
 from forum.user.models import Weight,UserProfile,AppVersion, UserProfile,AndroidLogs, AppPageContent, ReferralCode, ReferralCodeUsed, VideoPlaytime, VideoCompleteRate, UserAppTimeSpend,UserPhoneBook,Contact
 from forum.category.models import Category,CategoryViewCounter
 from import_export.admin import ImportExportModelAdmin,ExportMixin
@@ -289,6 +289,13 @@ class UserFeedbackAdmin(admin.ModelAdmin):
     #     context['adminform'].form.fields['by_user'].queryset = User.objects.filter(st__is_test_user = False)
     #     return super(UserFeedbackAdmin, self).render_change_form(request, context, *args, **kwargs)
 
+class CampaignAdmin(admin.ModelAdmin):
+    list_display = ('hashtag', 'is_active', 'active_from', 'active_till', 'is_winner_declared')
+    raw_id_fields = ('hashtag', 'next_campaign_hashtag')
+
+class WinnerAdmin(admin.ModelAdmin):
+    raw_id_fields = ['user']        
+
 admin.site.register(AppVersion)
 admin.site.register(CategoryViewCounter)
 admin.site.register(AndroidLogs, AndroidLogsAdmin)
@@ -311,4 +318,6 @@ admin.site.register(VideoCompleteRate)
 admin.site.register(UserAppTimeSpend)
 admin.site.register(UserPhoneBook)
 admin.site.register(Contact)
+admin.site.register(Campaign, CampaignAdmin)
+admin.site.register(Winner, WinnerAdmin)
 

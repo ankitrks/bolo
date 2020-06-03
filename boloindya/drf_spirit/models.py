@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from forum.core.conf import settings
+from forum.topic.models import RecordTimeStamp
 
 class SingUpOTP(models.Model):
     mobile_no = models.CharField(_("title"), max_length=75)
@@ -438,4 +439,22 @@ class UserFeedback(models.Model):
             print e
             return self.by_user.username
 
+class Campaign(RecordTimeStamp):
+    banner_img_url = models.TextField(_("Banner Image URL"), blank = False, null = False)
+    hashtag = models.ForeignKey('forum_topic.TongueTwister', verbose_name=_("HashTag"), related_name="campaign_hashtag",null=False,blank=False)
+    is_active = models.BooleanField(default=True)
+    active_from = models.DateTimeField(_("Active From"), auto_now=False, blank=False, null=False)
+    active_till = models.DateTimeField(_("Active Till"), auto_now=False, blank=False, null=False)
+    is_winner_declared = models.BooleanField(default=False)
+    winners = models.ManyToManyField('Winner', verbose_name=_("winner"), \
+            related_name="m2mwinner_campaign",blank=True)
+    next_campaign_hashtag = models.ForeignKey('forum_topic.TongueTwister', verbose_name=_("NextCampaignHashTag"), related_name="campaign_next_hashtag",null=True,blank=True)        
 
+class Winner(RecordTimeStamp):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = False, null = False, related_name='winner_user')
+    rank = models.PositiveSmallIntegerField(_("Rank"), blank=False, null=False)
+    extra_text = models.TextField(_("Extra Text"), blank = True, null = True)
+    video = models.ForeignKey('forum_topic.Topic', verbose_name=_("Video"), related_name="winner_video",null=False,blank=False)
+
+    def __unicode__(self):
+       return str(self.rank) +': '+ self.user.st.name

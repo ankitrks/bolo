@@ -7,6 +7,19 @@ import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 logger = get_task_logger(__name__)
 
+from oauth2client.service_account import ServiceAccountCredentials
+
+def _get_access_token():
+  """Retrieve a valid access token that can be used to authorize requests.
+
+  :return: Access token.
+  """
+  credentials = ServiceAccountCredentials.from_json_keyfile_name(
+      'boloindya-1ec98-firebase-adminsdk-ldrqh-27bdfce28b.json', "https://www.googleapis.com/auth/firebase.messaging")
+  access_token_info = credentials.get_access_token()
+  return access_token_info.access_token
+
+
 @app.task
 def send_notifications_task(data, pushNotification):
     #Import files for notification
@@ -17,6 +30,8 @@ def send_notifications_task(data, pushNotification):
     from jarvis.models import PushNotification, FCMDevice, PushNotificationUser
     from django.core.paginator import Paginator
     from forum.user.models import UserProfile, AndroidLogs
+    import json
+    import requests
     try:
         title = data.get('title', "")
         upper_title = data.get('upper_title', "")
@@ -29,7 +44,6 @@ def send_notifications_task(data, pushNotification):
         timepicker = data.get('timepicker', '').replace(" : ", ":")
         image_url = data.get('image_url', '')
         particular_user_id=data.get('particular_user_id', None)
-        category_ids=data.get('category_ids', '')
 
 
         if notification_type == '3':
@@ -58,85 +72,40 @@ def send_notifications_task(data, pushNotification):
             pushNotification.is_scheduled = True
             pushNotification.save()
         else:
-            device = ''
-            language_filter = {'is_uninstalled': False}
-            exclude_filter = {}
-            if lang != '0':
-                language_filter = { 'user__st__language': lang, 'is_uninstalled': False}
-            if category_ids:
-                category_array=category_ids.split(',')
-                try:
-                    pushNotification.m2mcategory=Category.objects.filter(pk__in=category_array)
-                    pushNotification.save()
-                except Exception as e:
-                    logger.info(str(e))
-                language_filter['user__st__sub_category']=data.get('category', None)
+            access =  _get_access_token()
+            
+            headers = {'Authorization': 'Bearer ' + access, 'Content-Type': 'application/json; UTF-8' }
+            fcm_message={}
             if user_group == '8':
-                language_filter = {'is_uninstalled': False}
-                language_filter['user__pk']=data.get('particular_user_id', None)
-            elif user_group == '1':
-                end_date = datetime.today()
-                start_date = end_date - timedelta(hours=3)
-                language_filter = {'is_uninstalled': False}
-                language_filter['user__isnull']=True
-                language_filter['created_at__range']=(start_date, end_date)
-            elif user_group == '2':
-                language_filter = {'is_uninstalled': False}
-                language_filter['user__isnull']=True
+                devices=FCMDevice.objects.filter(user__pk=data.get('particular_user_id', None), is_uninstalled=False)
+                for each in devices:
+                    fcm_message = {"message": {"token": each.reg_id ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": str(pushNotification.id), "image_url": image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
+                    resp = requests.post("https://fcm.googleapis.com/v1/projects/boloindya-1ec98/messages:send", data=json.dumps(fcm_message), headers=headers)
+                    logger.info((resp))
+                    logger.info((resp.text))
+                    logger.info((fcm_message))
+            elif lang == '0' and user_group == '0':
+                fcm_message = {"message": {"topic": "all" ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": str(pushNotification.id), "image_url": image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
+            elif user_group == '2' or user_group == '1':
+                fcm_message = {"message": {"topic": "boloindya_install" ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": str(pushNotification.id), "image_url": image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
             elif user_group == '7':
-                #This list contains user IDs for test users: Gitesh, Abhishek, Varun, Maaz
-                # Anshika, Bhoomika and Akash
-                language_filter = {'is_uninstalled': False}
-                filter_list = [39342, 1465, 2801, 19, 40, 328, 23, 3142, 1494, 41, 1491]
-                language_filter['user__pk__in']=filter_list
+                devices=FCMDevice.objects.filter(user__pk__in=[19, 1492, 328, 41, 40], is_uninstalled=False)
+                for each in devices:
+                    fcm_message = {"message": {"token": each.reg_id ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": str(pushNotification.id), "image_url": image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
+                    resp = requests.post("https://fcm.googleapis.com/v1/projects/boloindya-1ec98/messages:send", data=json.dumps(fcm_message), headers=headers)
+                    logger.info((resp))
+                    logger.info((resp.text))
+                    logger.info((fcm_message))
             elif user_group == '9':
-                hours_ago = datetime.now()-timedelta(days=int(data.get('days_ago', "1")))
-                filter_list=Topic.objects.filter(is_vb=True, date__gt=hours_ago).order_by('-user__pk').distinct('user').values_list('user__pk', flat=True)
-                print(filter_list)
-                language_filter['user__pk__in']=filter_list
-            elif user_group == '10':
-                hours_ago = datetime.now()-timedelta(days=int(data.get('days_ago', "1")))
-                filter_list=AndroidLogs.objects.filter(created_at__gt=hours_ago).order_by('-user__pk').distinct('user').values_list('user__pk', flat=True)
-                print(filter_list)
-                language_filter['user__pk__in']=filter_list
-            elif user_group == '3':
-                filter_list = VBseen.objects.distinct('user__pk').values_list('user__pk', flat=True)
-                exclude_filter={'user__pk__in': filter_list}
-            elif user_group == '4' or user_group == '5':
-                hours_ago = datetime.now()
-                if user_group == '4':
-                    hours_ago -= timedelta(days=1)
-                else:
-                    hours_ago -=  timedelta(days=2)
-                filter_list=AndroidLogs.objects.filter(created_at__gt=hours_ago).order_by('-user__pk').distinct('user').values_list('user__pk', flat=True)
-                exclude_filter={'user__pk__in': filter_list}
-            elif user_group == '6':
-                filter_list = Topic.objects.filter(is_vb=True).values_list('user__pk', flat=True)
-                exclude_filter={'user__pk__in': filter_list}
-            print(exclude_filter)
-            print(language_filter)
-            device = FCMDevice.objects.exclude(**exclude_filter).filter(**language_filter)
-            logger.info(device)
-            print(device)
-            device_pagination = Paginator(device, 1000)
-            device_list=[]
-            for index in range(1, (device_pagination.num_pages+1)):
-                device_after_slice = device_pagination.page(index)
-                logger.info(device_after_slice)
-                for each in device_after_slice:
-                    try:
-                        t = each.send_message(data={"title": title, "id": instance_id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url}, time_to_live=604800)
-                        response=t[1]['results'][0]['message_id']
-                        try:
-                            PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2', device=each, response_dump=t)
-                        except:
-                            pass
-                    except:
-                        pass
-                    #t = each.send_message(data={})
-                    #print(t)
-                    #t = each.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url})
-                logger.info(device_list)
+                fcm_message = {"message": {"topic": "boloindya_users_creator" ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": str(pushNotification.id), "image_url": image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
+            elif lang == '0' or user_group == '4' or user_group == '5' or user_group == '6' or user_group == '10' or user_group == '3':
+                fcm_message = {"message": {"topic": "boloindya_signup" ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": str(pushNotification.id), "image_url": image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
+            elif lang != '0':
+                fcm_message = {"message": {"topic": "boloindya_language_"+lang ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": str(pushNotification.id), "image_url": image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
+            resp = requests.post("https://fcm.googleapis.com/v1/projects/boloindya-1ec98/messages:send", data=json.dumps(fcm_message), headers=headers)
+            logger.info((resp))
+            logger.info((resp.text))
+            logger.info((fcm_message))
             pushNotification.is_executed=True
             pushNotification.save()
     except Exception as e:
