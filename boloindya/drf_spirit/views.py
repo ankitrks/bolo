@@ -1432,8 +1432,8 @@ def createTopic(request):
     if request.POST.get('question_image'):
         topic.question_image = request.POST.get('question_image')
 
-    if m3u8url and question_video and not request.user.st.is_test_user:
-        already_exist_topic = Topic.objects.filter(Q(question_video=m3u8url)|Q(backup_url=question_video))
+    if m3u8_url and question_video and not request.user.st.is_test_user:
+        already_exist_topic = Topic.objects.filter(Q(question_video=m3u8_url)|Q(backup_url=question_video))
         if already_exist_topic:
             topic_json = TopicSerializerwithComment(already_exist_topic[0], context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data
             return JsonResponse({'message': 'Video Byte Created','topic':topic_json}, status=status.HTTP_201_CREATED)
