@@ -57,7 +57,7 @@ from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
 from forum.user.utils.bolo_redis import get_bolo_info_combined
 from .serializers import *
-from tasks import vb_create_task,user_ip_to_state_task,sync_contacts_with_user,cache_follow_post,cache_popular_post, send_notifications_task
+from tasks import vb_create_task,user_ip_to_state_task,sync_contacts_with_user,cache_follow_post,cache_popular_post, send_upload_video_notification
 from haystack.query import SearchQuerySet, SQ
 from django.core.exceptions import MultipleObjectsReturned
 from forum.topic.utils import get_redis_category_paginated_data,get_redis_hashtag_paginated_data,get_redis_language_paginated_data,get_redis_follow_paginated_data, get_popular_paginated_data
@@ -1439,7 +1439,7 @@ def createTopic(request):
             topic_json = TopicSerializerwithComment(already_exist_topic[0], context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data
             
             ## hard coded notification for uploading video
-            data = {}
+            database = {}
 
             data['title'] = 'Uploaded Video'
             data['upper_title'] = 'Uploaded Video'
@@ -1453,8 +1453,8 @@ def createTopic(request):
             data['timepicker'] = ''
             data['image_url'] = ''
             data['days_ago'] = ''
-
-            send_notifications_task.delay(data, {})
+            
+            send_upload_video_notification(data, {})
             return JsonResponse({'message': 'Video Byte Created','topic':topic_json}, status=status.HTTP_201_CREATED)
 
 

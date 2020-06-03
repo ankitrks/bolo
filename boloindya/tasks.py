@@ -346,6 +346,36 @@ def send_report_mail(report_id):
         pass
     return True
 
+@app.task
+def send_upload_video_notification(data, pushNotification):
+    #Import files for notification
+    from jarvis.models import FCMDevice
+    import json
+    import requests
+    try:
+        title = data.get('title', "")
+        upper_title = data.get('upper_title', "")
+        notification_type = data.get('notification_type', "")
+        instance_id = data.get('id', "")
+        image_url = data.get('image_url', '')
+        particular_user_id=data.get('particular_user_id', None)
+
+    try:
+        access =  _get_access_token()
+        
+        headers = {'Authorization': 'Bearer ' + access, 'Content-Type': 'application/json; UTF-8' }
+        fcm_message={}
+        devices=FCMDevice.objects.filter(user__pk=data.get('particular_user_id', None), is_uninstalled=False)
+        for each in devices:
+            fcm_message = {"message": {"token": each.reg_id ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": "-1", "image_url": image_url}}}
+            resp = requests.post("https://fcm.googleapis.com/v1/projects/boloindya-1ec98/messages:send", data=json.dumps(fcm_message), headers=headers)
+            logger.info((resp))
+            logger.info((resp.text))
+            logger.info((fcm_message))
+        
+    except Exception as e:
+        logger.info(str(e))
+
 
 
 
