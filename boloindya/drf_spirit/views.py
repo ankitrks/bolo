@@ -1437,24 +1437,6 @@ def createTopic(request):
         already_exist_topic = Topic.objects.filter(Q(question_video=m3u8_url)|Q(backup_url=question_video))
         if already_exist_topic:
             topic_json = TopicSerializerwithComment(already_exist_topic[0], context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data
-            
-            ## hard coded notification for uploading video
-            data = {}
-
-            data['title'] = 'Uploaded Video'
-            data['upper_title'] = 'Uploaded Video'
-            data['notification_type'] = '4'
-            data['id'] = ''
-            data['particular_user_id'] = request.user.id
-            data['user_group'] = '8'
-            data['lang'] = '0'
-            data['schedule_status'] = ''
-            data['datepicker'] = ''
-            data['timepicker'] = ''
-            data['image_url'] = ''
-            data['days_ago'] = ''
-
-            send_upload_video_notification(data, {})
             return JsonResponse({'message': 'Video Byte Created','topic':topic_json}, status=status.HTTP_201_CREATED)
 
 
@@ -1520,6 +1502,23 @@ def createTopic(request):
             # add_bolo_score(request.user.id, 'create_topic', topic)
             topic_json = TopicSerializerwithComment(topic, context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data
             message = 'Video Byte Created'
+        ## hard coded notification for uploading video
+        data = {}
+
+        data['title'] = 'Uploaded Video'
+        data['upper_title'] = 'Uploaded Video'
+        data['notification_type'] = '4'
+        data['id'] = ''
+        data['particular_user_id'] = request.user.id
+        data['user_group'] = '8'
+        data['lang'] = '0'
+        data['schedule_status'] = ''
+        data['datepicker'] = ''
+        data['timepicker'] = ''
+        data['image_url'] = ''
+        data['days_ago'] = ''
+
+        send_upload_video_notification(data, {})
         return JsonResponse({'message': message,'topic':topic_json}, status=status.HTTP_201_CREATED)
     except User.DoesNotExist:
         return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
