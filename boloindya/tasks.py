@@ -3,6 +3,7 @@ from celery_boloindya import app
 from celery.utils.log import get_task_logger
 from django.core.mail import send_mail
 import os
+from datetime import datetime, timedelta
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 logger = get_task_logger(__name__)
@@ -345,6 +346,43 @@ def send_report_mail(report_id):
     except:
         pass
     return True
+
+@app.task
+def deafult_boloindya_follow(user_id,language):
+    try:
+        from django.contrib.auth.models import User
+        from forum.user.models import Follower, UserProfile
+        from drf_spirit.utils import add_bolo_score
+        from forum.user.utils.follow_redis import update_redis_follower, update_redis_following
+
+        user = User.objects.get(pk=user_id)
+        if language == '2':
+            bolo_indya_user = User.objects.get(username = 'boloindya_hindi')
+        elif language == '3':
+            bolo_indya_user = User.objects.get(username = 'boloindya_tamil')
+        elif language == '4':
+            bolo_indya_user = User.objects.get(username = 'boloindya_telgu')
+        else:
+            bolo_indya_user = User.objects.get(username = 'boloindya')
+        follow,is_created = Follower.objects.get_or_create(user_follower = user,user_following=bolo_indya_user)
+        if is_created:
+            add_bolo_score(user.id, 'follow', follow)
+            userprofile = UserProfile.objects.get(user = user)
+            bolo_indya_profile = UserProfile.objects.get(user = bolo_indya_user)
+            userprofile.follow_count = F('follow_count') + 1
+            userprofile.save()
+            bolo_indya_profile.follower_count = F('follower_count') + 1
+            bolo_indya_profile.save()
+            update_redis_following(user.id,int(bolo_indya_user.id),True)
+            update_redis_follower(int(bolo_indya_user.id),user.id,True)
+        if not follow.is_active:
+            follow.is_active = True
+            follow.save()
+            update_redis_following(user.id,int(bolo_indya_user.id),True)
+            update_redis_follower(int(bolo_indya_user.id),user.id,True)
+        return True
+    except:
+        return False
 
 
 
