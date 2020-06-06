@@ -2,6 +2,7 @@ from __future__ import absolute_import, unicode_literals
 from celery_boloindya import app
 from celery.utils.log import get_task_logger
 from django.core.mail import send_mail
+from django.conf import settings
 import os
 from datetime import datetime, timedelta
 
@@ -16,7 +17,7 @@ def _get_access_token():
   :return: Access token.
   """
   credentials = ServiceAccountCredentials.from_json_keyfile_name(
-      'boloindya-1ec98-firebase-adminsdk-ldrqh-27bdfce28b.json', "https://www.googleapis.com/auth/firebase.messaging")
+      os.path.join(settings.BASE_DIR, 'boloindya-1ec98-firebase-adminsdk-ldrqh-27bdfce28b.json'), "https://www.googleapis.com/auth/firebase.messaging")
   access_token_info = credentials.get_access_token()
   return access_token_info.access_token
 
@@ -119,15 +120,15 @@ def vb_create_task(topic_id):
     topic = Topic.objects.get(pk=topic_id)
     if not topic.is_transcoded:
         if topic.is_vb and topic.question_video:
-            data_dump, m3u8_url, job_id = transcode_media_file(topic.question_video.split('s3.amazonaws.com/')[1])
-            if m3u8_url:
-                topic.backup_url = topic.question_video
-                topic.question_video = m3u8_url
-                topic.transcode_dump = data_dump
-                topic.transcode_job_id = job_id
-                # topic.is_transcoded = True
-                topic.save()
-                topic.update_m3u8_content()
+            # data_dump, m3u8_url, job_id = transcode_media_file(topic.question_video.split('s3.amazonaws.com/')[1])
+            # if m3u8_url:
+                # topic.backup_url = topic.question_video
+                # topic.question_video = m3u8_url
+                # topic.transcode_dump = data_dump
+                # topic.transcode_job_id = job_id
+                # # topic.is_transcoded = True
+                # topic.save()
+            topic.update_m3u8_content()
                 #create_downloaded_url(topic_id)
 
 @app.task
@@ -220,7 +221,7 @@ def cache_follow_post(user_id):
     all_follower = get_redis_following(user_id)
     category_follow = UserProfile.objects.get(user_id = user_id).sub_category.all().values_list('pk', flat = True)
     query = Topic.objects.filter(Q(user_id__in = all_follower)|Q(m2mcategory__id__in = category_follow, language_id = UserProfile.objects.get(user_id = user_id).language), \
-	is_vb = True, is_removed = False).order_by('-vb_score')
+    is_vb = True, is_removed = False).order_by('-vb_score')
     update_redis_paginated_data(key, query)
 
 @app.task
@@ -395,7 +396,33 @@ def save_click_id_response(user_profile_id):
     userprofile.update(click_id_response = str(response))
 
 
-
+@app.task
+def send_upload_video_notification(data, pushNotification):
+    #Import files for notification
+    from jarvis.models import FCMDevice
+    import json
+    import requests
+    try:
+        title = data.get('title', "")
+        upper_title = data.get('upper_title', "")
+        notification_type = data.get('notification_type', "")
+        instance_id = data.get('id', "")
+        image_url = data.get('image_url', '')
+        particular_user_id=data.get('particular_user_id', None)
+        access =  _get_access_token()
+        
+        headers = {'Authorization': 'Bearer ' + access, 'Content-Type': 'application/json; UTF-8' }
+        fcm_message={}
+        devices=FCMDevice.objects.filter(user__pk=data.get('particular_user_id', None), is_uninstalled=False)
+        for each in devices:
+            fcm_message = {"message": {"token": each.reg_id ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": "-1", "image_url": image_url}}}
+            resp = requests.post("https://fcm.googleapis.com/v1/projects/boloindya-1ec98/messages:send", data=json.dumps(fcm_message), headers=headers)
+            print(resp)
+            print(resp.text)
+            print(fcm_message)
+        
+    except Exception as e:
+        logger.info(str(e))
 
 if __name__ == '__main__':
     app.start()
