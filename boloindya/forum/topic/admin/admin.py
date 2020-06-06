@@ -248,13 +248,11 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
         obj.save()
         if 'language_id' in form.changed_data and obj.is_monetized:
             if form.initial['language_id'] == '1':
-                userprofile = UserProfile.objects.get(user = obj.user)
-                userprofile.save()
+                userprofile = UserProfile.objects.filter(user = obj.user)
                 reduce_bolo_score(obj.user.id, 'create_topic_en', obj, 'no_monetize')
                 obj.add_monetization()
             elif obj.language_id == '1':
-                userprofile = UserProfile.objects.get(user = obj.user)
-                userprofile.save()
+                userprofile = UserProfile.objects.filter(user = obj.user)
                 reduce_bolo_score(obj.user.id, 'create_topic', obj, 'no_monetize')
                 obj.add_monetization()
         super(TopicAdmin,self).save_model(request, obj, form, change)

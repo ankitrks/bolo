@@ -367,14 +367,13 @@ def ques_ans_index(request, category_id = None, cat_slug = ''):
 def comment_likes(request):
     comment_id = request.POST.get('comment_id',None)
     comment = Comment.objects.get(pk = comment_id)
-    userprofile = request.user.st
+    userprofile = UserProfile.objects.filter(user_id= request.user.id)
     liked,is_created = Like.objects.get_or_create(comment_id = comment_id,user = request.user)
     if is_created:
             comment.likes_count = F('likes_count')+1
             comment.save()
             add_bolo_score(request.user.id, 'liked', comment)
-            userprofile.like_count = F('like_count')+1
-            userprofile.save()
+            userprofile.update(like_count = F('like_count')+1)
             return HttpResponse(json.dumps({'success':'Success'}),content_type="application/json")
     else:
         if liked.like:
@@ -382,15 +381,13 @@ def comment_likes(request):
             liked.save()
             comment.likes_count = F('likes_count')-1
             comment.save()
-            userprofile.like_count = F('like_count')-1
-            userprofile.save()
+            userprofile.update(like_count = F('like_count')-1)
         else:
             liked.like = True
             liked.save()
             comment.likes_count = F('likes_count')+1
             comment.save()
-            userprofile.like_count = F('like_count')+1
-            userprofile.save()
+            userprofile.update(like_count = F('like_count')+1)
         return HttpResponse(json.dumps({'success':'Success'}),content_type="application/json")
     return HttpResponse(json.dumps({'fail':'Fail'}),content_type="application/json")
 
