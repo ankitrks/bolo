@@ -57,7 +57,7 @@ from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
 from forum.user.utils.bolo_redis import get_bolo_info_combined
 from .serializers import *
-from tasks import vb_create_task,user_ip_to_state_task,sync_contacts_with_user,cache_follow_post,cache_popular_post, deafult_boloindya_follow
+from tasks import vb_create_task,user_ip_to_state_task,sync_contacts_with_user,cache_follow_post,cache_popular_post, deafult_boloindya_follow, save_click_id_response
 from haystack.query import SearchQuerySet, SQ
 from django.core.exceptions import MultipleObjectsReturned
 from forum.topic.utils import get_redis_category_paginated_data,get_redis_hashtag_paginated_data,get_redis_language_paginated_data,get_redis_follow_paginated_data, get_popular_paginated_data
@@ -2092,10 +2092,11 @@ def verify_otp(request):
                         userprofile.lat = lat
                         userprofile.lang = lang
                     if click_id:
-                        userprofile.click_id = click_id
-                        click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
-                        response = urllib2.urlopen(click_url).read()
-                        userprofile.click_id_response = str(response)
+                        save_click_id_response.delay(userprofile.id)
+                        # userprofile.click_id = click_id
+                        # click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
+                        # response = urllib2.urlopen(click_url).read()
+                        # userprofile.click_id_response = str(response)
                     userprofile.save()
                     if str(language):
                         default_follow = deafult_boloindya_follow.delay(user.id,str(language))
@@ -2255,10 +2256,11 @@ def fb_profile_settings(request):
                     userprofile.lat = lat
                     userprofile.lang = lang
                 if click_id:
-                    userprofile.click_id = click_id
-                    click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
-                    response = urllib2.urlopen(click_url).read()
-                    userprofile.click_id_response = str(response)
+                    save_click_id_response.delay(userprofile.id)
+                    # userprofile.click_id = click_id
+                    # click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
+                    # response = urllib2.urlopen(click_url).read()
+                    # userprofile.click_id_response = str(response)
                 userprofile.save()
                 if str(language):
                     default_follow = deafult_boloindya_follow.delay(user.id,str(language))
@@ -2327,10 +2329,11 @@ def fb_profile_settings(request):
                     userprofile.lat = lat
                     userprofile.lang = lang
                 if click_id:
-                    userprofile.click_id = click_id
-                    click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
-                    response = urllib2.urlopen(click_url).read()
-                    userprofile.click_id_response = str(response)
+                    save_click_id_response.delay(userprofile.id)
+                    # userprofile.click_id = click_id
+                    # click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
+                    # response = urllib2.urlopen(click_url).read()
+                    # userprofile.click_id_response = str(response)
                 userprofile.save()
                 if str(language):
                     default_follow = deafult_boloindya_follow.delay(user.id,str(language))
@@ -2433,10 +2436,11 @@ def fb_profile_settings(request):
                     userprofile.lat = lat
                     userprofile.lang = lang
                 if click_id:
-                    userprofile.click_id = click_id
-                    click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
-                    response = urllib2.urlopen(click_url).read()
-                    userprofile.click_id_response = str(response)
+                    save_click_id_response.delay(userprofile.id)
+                    # userprofile.click_id = click_id
+                    # click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
+                    # response = urllib2.urlopen(click_url).read()
+                    # userprofile.click_id_response = str(response)
                 userprofile.save()
                 if str(language):
                     default_follow = deafult_boloindya_follow.delay(user.id,str(language))

@@ -384,6 +384,16 @@ def deafult_boloindya_follow(user_id,language):
     except:
         return False
 
+@app.task
+def save_click_id_response(user_profile_id):
+    import urllib2
+    from forum.user.models import Follower, UserProfile
+    userprofile = UserProfile.objects.filter(pk=user_profile_id)
+    userprofile[0].click_id = click_id
+    click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
+    response = urllib2.urlopen(click_url).read()
+    userprofile.update(click_id_response = str(response))
+
 
 
 
