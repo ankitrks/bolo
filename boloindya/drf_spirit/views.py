@@ -57,7 +57,7 @@ from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
 from forum.user.utils.bolo_redis import get_bolo_info_combined
 from .serializers import *
-from tasks import vb_create_task,user_ip_to_state_task,sync_contacts_with_user,cache_follow_post,cache_popular_post, send_upload_video_notification
+from tasks import vb_create_task,user_ip_to_state_task,sync_contacts_with_user,cache_follow_post,cache_popular_post, deafult_boloindya_follow, save_click_id_response, send_upload_video_notification
 from haystack.query import SearchQuerySet, SQ
 from django.core.exceptions import MultipleObjectsReturned
 from forum.topic.utils import get_redis_category_paginated_data,get_redis_hashtag_paginated_data,get_redis_language_paginated_data,get_redis_follow_paginated_data, get_popular_paginated_data
@@ -2127,13 +2127,14 @@ def verify_otp(request):
                         userprofile.lat = lat
                         userprofile.lang = lang
                     if click_id:
-                        userprofile.click_id = click_id
-                        click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
-                        response = urllib2.urlopen(click_url).read()
-                        userprofile.click_id_response = str(response)
+                        save_click_id_response.delay(userprofile.id)
+                        # userprofile.click_id = click_id
+                        # click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
+                        # response = urllib2.urlopen(click_url).read()
+                        # userprofile.click_id_response = str(response)
                     userprofile.save()
                     if str(language):
-                        default_follow = deafult_boloindya_follow(user,str(language))
+                        default_follow = deafult_boloindya_follow.delay(user.id,str(language))
                     add_bolo_score(user.id, 'initial_signup', userprofile)
                 user_tokens = get_tokens_for_user(user)
                 otp_obj.update(for_user = user)
@@ -2245,7 +2246,7 @@ def fb_profile_settings(request):
                 is_created=False
             except Exception as e:
                 print e
-                user_exists,num_user = check_user(extra_data['first_name'],extra_data['last_name'])
+                # user_exists,num_user = check_user(extra_data['first_name'],extra_data['last_name'])
                 #username = generate_username(extra_data['first_name'],extra_data['last_name'],num_user) if user_exists else str(str(extra_data['first_name'])+str(extra_data['last_name']))
                 username = get_random_username()
                 user = User.objects.create(username = username)
@@ -2290,13 +2291,14 @@ def fb_profile_settings(request):
                     userprofile.lat = lat
                     userprofile.lang = lang
                 if click_id:
-                    userprofile.click_id = click_id
-                    click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
-                    response = urllib2.urlopen(click_url).read()
-                    userprofile.click_id_response = str(response)
+                    save_click_id_response.delay(userprofile.id)
+                    # userprofile.click_id = click_id
+                    # click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
+                    # response = urllib2.urlopen(click_url).read()
+                    # userprofile.click_id_response = str(response)
                 userprofile.save()
                 if str(language):
-                    default_follow = deafult_boloindya_follow(user,str(language))
+                    default_follow = deafult_boloindya_follow.delay(user.id,str(language))
                 userprofile.language = str(language)
                 userprofile.save()
                 user.save()
@@ -2362,13 +2364,14 @@ def fb_profile_settings(request):
                     userprofile.lat = lat
                     userprofile.lang = lang
                 if click_id:
-                    userprofile.click_id = click_id
-                    click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
-                    response = urllib2.urlopen(click_url).read()
-                    userprofile.click_id_response = str(response)
+                    save_click_id_response.delay(userprofile.id)
+                    # userprofile.click_id = click_id
+                    # click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
+                    # response = urllib2.urlopen(click_url).read()
+                    # userprofile.click_id_response = str(response)
                 userprofile.save()
                 if str(language):
-                    default_follow = deafult_boloindya_follow(user,str(language))
+                    default_follow = deafult_boloindya_follow.delay(user.id,str(language))
                 userprofile.language = str(language)
                 userprofile.save()
                 user.save()
@@ -2437,7 +2440,7 @@ def fb_profile_settings(request):
                             if not str(each_category.id) in sub_category_prefrences:
                                 userprofile.sub_category.remove(each_category)
                 if language:
-                    default_follow = deafult_boloindya_follow(request.user,str(language))
+                    default_follow = deafult_boloindya_follow.delay(request.user.id,str(language))
                     userprofile.language = str(language)
                     cache_popular_post.delay(request.user.id,language)
                     userprofile.save()
@@ -2468,13 +2471,14 @@ def fb_profile_settings(request):
                     userprofile.lat = lat
                     userprofile.lang = lang
                 if click_id:
-                    userprofile.click_id = click_id
-                    click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
-                    response = urllib2.urlopen(click_url).read()
-                    userprofile.click_id_response = str(response)
+                    save_click_id_response.delay(userprofile.id)
+                    # userprofile.click_id = click_id
+                    # click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
+                    # response = urllib2.urlopen(click_url).read()
+                    # userprofile.click_id_response = str(response)
                 userprofile.save()
                 if str(language):
-                    default_follow = deafult_boloindya_follow(user,str(language))
+                    default_follow = deafult_boloindya_follow.delay(user.id,str(language))
                 userprofile.language = str(language)
                 userprofile.save()
                 user.save()
@@ -3080,35 +3084,6 @@ def get_follower_list(request):
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
 
-def deafult_boloindya_follow(user,language):
-    try:
-        if language == '2':
-            bolo_indya_user = User.objects.get(username = 'boloindya_hindi')
-        elif language == '3':
-            bolo_indya_user = User.objects.get(username = 'boloindya_tamil')
-        elif language == '4':
-            bolo_indya_user = User.objects.get(username = 'boloindya_telgu')
-        else:
-            bolo_indya_user = User.objects.get(username = 'boloindya')
-        follow,is_created = Follower.objects.get_or_create(user_follower = user,user_following=bolo_indya_user)
-        if is_created:
-            add_bolo_score(user.id, 'follow', follow)
-            userprofile = UserProfile.objects.get(user = user)
-            bolo_indya_profile = UserProfile.objects.get(user = bolo_indya_user)
-            userprofile.follow_count = F('follow_count') + 1
-            userprofile.save()
-            bolo_indya_profile.follower_count = F('follower_count') + 1
-            bolo_indya_profile.save()
-            update_redis_following(user.id,int(bolo_indya_user.id),True)
-            update_redis_follower(int(bolo_indya_user.id),user.id,True)
-        if not follow.is_active:
-            follow.is_active = True
-            follow.save()
-            update_redis_following(user.id,int(bolo_indya_user.id),True)
-            update_redis_follower(int(bolo_indya_user.id),user.id,True)
-        return True
-    except:
-        return False
 
 @api_view(['POST'])
 def get_bolo_score(request):
