@@ -99,9 +99,8 @@ class Comment(models.Model):
         topic= self.topic
         topic.comment_count = F('comment_count')-1
         topic.save()
-        userprofile = UserProfile.objects.get(user = self.user)
-        userprofile.answer_count = F('answer_count')-1
-        userprofile.save()
+        userprofile = UserProfile.objects.filter(user = self.user)
+        userprofile.update(answer_count = F('answer_count')-1)
         reduce_bolo_score(self.user.id, 'reply_on_topic', topic)
         return True
 

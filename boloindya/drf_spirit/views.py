@@ -1209,9 +1209,8 @@ def replyOnTopic(request):
             topic.comment_count = F('comment_count')+1
             topic.last_commented = timezone.now()
             topic.save()
-            userprofile = UserProfile.objects.get(user = request.user)
-            userprofile.answer_count = F('answer_count')+1
-            userprofile.save()
+            userprofile = UserProfile.objects.filter(user = request.user)
+            userprofile.update(answer_count = F('answer_count')+1)
             if thumbnail:
                 comment.thumbnail = thumbnail
             if media_duration:
@@ -1492,16 +1491,14 @@ def createTopic(request):
             pass
         topic.m2mcategory.add(Category.objects.get(pk=category_id))
         if not is_vb:
-            userprofile = UserProfile.objects.get(user = request.user)
-            userprofile.question_count = F('question_count')+1
-            userprofile.save()
+            userprofile = UserProfile.objects.filter(user = request.user)
+            userprofile.update(question_count = F('question_count')+1)
             add_bolo_score(request.user.id,'create_topic', topic)
             topic_json = TopicSerializerwithComment(topic, context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data
             message = 'Topic Created'
         else:
-            userprofile = UserProfile.objects.get(user = request.user)
-            userprofile.vb_count = F('vb_count')+1
-            userprofile.save()
+            userprofile = UserProfile.objects.filter(user = request.user)
+            userprofile.update(vb_count = F('vb_count')+1)
             # add_bolo_score(request.user.id, 'create_topic', topic)
             topic_json = TopicSerializerwithComment(topic, context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data
             message = 'Video Byte Created'
@@ -2715,15 +2712,13 @@ def follow_user(request):
             return JsonResponse({'message': 'You can not follow/unfollow your ownself'}, status=status.HTTP_400_BAD_REQUEST)
 
         follow,is_created = Follower.objects.get_or_create(user_follower = request.user,user_following_id=user_following_id)
-        userprofile = UserProfile.objects.get(user = request.user)
-        followed_user = UserProfile.objects.get(user_id = user_following_id)
+        userprofile = UserProfile.objects.filter(user = request.user)
+        followed_user = UserProfile.objects.filter(user_id = user_following_id)
         if is_created:
-            add_bolo_score(request.user.id, 'follow', userprofile)
-            add_bolo_score(user_following_id, 'followed', followed_user)
-            userprofile.follow_count = F('follow_count')+1
-            userprofile.save()
-            followed_user.follower_count = F('follower_count')+1
-            followed_user.save()
+            add_bolo_score(request.user.id, 'follow', userprofile[0])
+            add_bolo_score(user_following_id, 'followed', followed_user[0])
+            userprofile.update(follow_count = F('follow_count')+1)
+            followed_user.update(follower_count = F('follower_count')+1)
             update_redis_following(request.user.id,int(user_following_id),True)
             update_redis_follower(int(user_following_id),request.user.id,True)
             return JsonResponse({'message': 'Followed'}, status=status.HTTP_200_OK)
@@ -2731,20 +2726,16 @@ def follow_user(request):
             if follow.is_active:
                 follow.is_active = False
                 follow.save()
-                userprofile.follow_count = F('follow_count')-1
-                followed_user.follower_count = F('follower_count')-1
-                userprofile.save()
-                followed_user.save()
+                userprofile.update(follow_count = F('follow_count')-1)
+                followed_user.update(follower_count = F('follower_count')-1)
                 update_redis_following(request.user.id,int(user_following_id),False)
                 update_redis_follower(int(user_following_id),request.user.id,False)
                 return JsonResponse({'message': 'Unfollowed'}, status=status.HTTP_200_OK)
             else:
                 follow.is_active = True
-                userprofile.follow_count = F('follow_count')+1
-                followed_user.follower_count = F('follower_count')+1
+                userprofile.update(follow_count = F('follow_count')+1)
+                followed_user.update(follower_count = F('follower_count')+1)
                 follow.save()
-                followed_user.save()
-                userprofile.save()
                 update_redis_following(request.user.id,int(user_following_id),True)
                 update_redis_follower(int(user_following_id),request.user.id,True)
                 return JsonResponse({'message': 'Followed'}, status=status.HTTP_200_OK)
@@ -2783,7 +2774,7 @@ def like(request):
     """
     topic_id = request.POST.get('topic_id',None)
     comment_id = request.POST.get('comment_id',None)
-    userprofile = UserProfile.objects.get(user = request.user)
+    userprofile = UserProfile.objects.filter(user = request.user)
     try:
         if topic_id:
             liked,is_created = Like.objects.get_or_create(topic_id = topic_id,user = request.user)
@@ -2797,8 +2788,7 @@ def like(request):
                 acted_obj.topic_like_count = F('topic_like_count')+1
             acted_obj.save()
             add_bolo_score(request.user.id, 'liked', acted_obj)
-            userprofile.like_count = F('like_count')+1
-            userprofile.save()
+            userprofile.update(like_count = F('like_count')+1)
             return JsonResponse({'message': 'liked'}, status=status.HTTP_200_OK)
         else:
             if liked.like:
@@ -2808,8 +2798,7 @@ def like(request):
                 if topic_id:
                     acted_obj.topic_like_count = F('topic_like_count')-1
                 acted_obj.save()
-                userprofile.like_count = F('like_count')-1
-                userprofile.save()
+                userprofile.update(like_count = F('like_count')-1)
                 return JsonResponse({'message': 'unliked'}, status=status.HTTP_200_OK)
             else:
                 liked.like = True
@@ -2818,8 +2807,7 @@ def like(request):
                 if topic_id:
                     acted_obj.topic_like_count = F('topic_like_count')+1
                 acted_obj.save()
-                userprofile.like_count = F('like_count')+1
-                userprofile.save()
+                userprofile.update(like_count = F('like_count')+1)
                 return JsonResponse({'message': 'liked'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
@@ -2835,7 +2823,7 @@ def shareontimeline(request):
     """
     topic_id = request.POST.get('topic_id',None)
     share_on = request.POST.get('share_on',None)
-    userprofile = UserProfile.objects.get(user = request.user)
+    userprofile = UserProfile.objects.filter(user = request.user)
     if share_on == 'share_timeline':
         try:
             shared = ShareTopic.objects.create(topic_id = topic_id,user = request.user)
@@ -2845,8 +2833,7 @@ def shareontimeline(request):
             topic.total_share_count = F('total_share_count')+1
             topic.topic_share_count = F('topic_share_count')+1
             topic.save()
-            userprofile.share_count = F('share_count')+1
-            userprofile.save()
+            userprofile.update(share_count = F('share_count')+1)
             return JsonResponse({'message': 'shared'}, status=status.HTTP_200_OK)
         except Exception as e:
             return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
@@ -2859,8 +2846,7 @@ def shareontimeline(request):
             topic.topic_share_count = F('topic_share_count')+1
             topic.save()
             add_bolo_score(request.user.id, 'facebook_share', topic)
-            userprofile.share_count = F('share_count')+1
-            userprofile.save()
+            userprofile.update(share_count = F('share_count')+1)
             return JsonResponse({'message': 'fb shared'}, status=status.HTTP_200_OK)
         except Exception as e:
             return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
@@ -2873,8 +2859,7 @@ def shareontimeline(request):
             topic.topic_share_count = F('topic_share_count')+1
             topic.save()
             add_bolo_score(request.user.id, 'whatsapp_share', topic)
-            userprofile.share_count = F('share_count')+1
-            userprofile.save()
+            userprofile.update(share_count = F('share_count')+1)
             return JsonResponse({'message': 'whatsapp shared'}, status=status.HTTP_200_OK)
         except Exception as e:
             return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
@@ -2887,8 +2872,7 @@ def shareontimeline(request):
             topic.topic_share_count = F('topic_share_count')+1
             topic.save()
             add_bolo_score(request.user.id, 'linkedin_share', topic)
-            userprofile.share_count = F('share_count')+1
-            userprofile.save()
+            userprofile.update(share_count = F('share_count')+1)
             return JsonResponse({'message': 'linkedin shared'}, status=status.HTTP_200_OK)
         except Exception as e:
             return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
@@ -2901,8 +2885,7 @@ def shareontimeline(request):
             topic.topic_share_count = F('topic_share_count')+1
             topic.save()
             add_bolo_score(request.user.id, 'twitter_share', topic)
-            userprofile.share_count = F('share_count')+1
-            userprofile.save()
+            userprofile.update(share_count = F('share_count')+1)
             return JsonResponse({'message': 'twitter shared'}, status=status.HTTP_200_OK)
         except Exception as e:
             return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
@@ -2949,10 +2932,7 @@ def vb_seen(request):
         topic.view_count = F('view_count')+1
         topic.imp_count = F('imp_count') +1
         topic.save()
-        userprofile = topic.user.st
-        userprofile.view_count = F('view_count')+1
-        userprofile.own_vb_view_count = F('own_vb_view_count') +1
-        userprofile.save()
+        UserProfile.objects.filter(user_id = topic.user_id).update(view_count = F('view_count')+1,own_vb_view_count = F('own_vb_view_count') +1)
         all_vb_seen = get_redis_vb_seen(request.user.id)
         if not topic_id in all_vb_seen:
             vbseen = VBseen.objects.create(user = request.user,topic_id = topic_id)
@@ -3083,7 +3063,33 @@ def get_follower_list(request):
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
-
+def deafult_boloindya_follow(user,language):
+    try:
+        if language == '2':
+            bolo_indya_user = User.objects.get(username = 'boloindya_hindi')
+        elif language == '3':
+            bolo_indya_user = User.objects.get(username = 'boloindya_tamil')
+        elif language == '4':
+            bolo_indya_user = User.objects.get(username = 'boloindya_telgu')
+        else:
+            bolo_indya_user = User.objects.get(username = 'boloindya')
+        follow,is_created = Follower.objects.get_or_create(user_follower = user,user_following=bolo_indya_user)
+        if is_created:
+            add_bolo_score(user.id, 'follow', follow)
+            userprofile = UserProfile.objects.filter(user = user)
+            bolo_indya_profile = UserProfile.objects.filter(user = bolo_indya_user)
+            userprofile.update(follow_count = F('follow_count') + 1)
+            bolo_indya_profile.update(follower_count = F('follower_count') + 1)
+            update_redis_following(user.id,int(bolo_indya_user.id),True)
+            update_redis_follower(int(bolo_indya_user.id),user.id,True)
+        if not follow.is_active:
+            follow.is_active = True
+            follow.save()
+            update_redis_following(user.id,int(bolo_indya_user.id),True)
+            update_redis_follower(int(bolo_indya_user.id),user.id,True)
+        return True
+    except:
+        return False
 
 @api_view(['POST'])
 def get_bolo_score(request):

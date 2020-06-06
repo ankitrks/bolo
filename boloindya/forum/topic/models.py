@@ -326,19 +326,17 @@ class Topic(RecordTimeStamp):
         self.is_monetized = False
         self.is_removed = True
         self.save()
-        userprofile = UserProfile.objects.get(user = self.user)
-        if userprofile.vb_count and self.is_vb:
-            userprofile.vb_count = F('vb_count')-1
-        userprofile.save()
+        userprofile = UserProfile.objects.filter(user = self.user)
+        if userprofile[0].vb_count and self.is_vb:
+            userprofile.update(vb_count = F('vb_count')-1)
         return True
 
     def restore(self):
         self.is_removed = False
         self.save()
-        userprofile = UserProfile.objects.get(user = self.user)
+        userprofile = UserProfile.objects.filter(user = self.user)
         if self.is_vb: # userprofile.vb_count
-            userprofile.vb_count = F('vb_count')+1
-        userprofile.save()
+            userprofile.update(vb_count = F('vb_count')+1)
         # Bolo actions will be added only when the monetization is enabled
         # add_bolo_score(self.user.id, 'create_topic', self)
         return True
@@ -347,8 +345,7 @@ class Topic(RecordTimeStamp):
         # if self.is_monetized:
         self.is_monetized = False
         self.save()
-        userprofile = UserProfile.objects.get(user = self.user)
-        userprofile.save()
+        userprofile = UserProfile.objects.filter(user = self.user)
         if self.language_id == '1':
             reduce_bolo_score(self.user.id, 'create_topic_en', self, 'no_monetize')
         else:
@@ -361,8 +358,7 @@ class Topic(RecordTimeStamp):
         self.is_removed = False
         self.is_monetized = True
         self.save()
-        userprofile = UserProfile.objects.get(user = self.user)
-        userprofile.save()
+        userprofile = UserProfile.objects.filter(user = self.user)
         if self.language_id =='1':
             add_bolo_score(self.user.id, 'create_topic_en', self)
         else:

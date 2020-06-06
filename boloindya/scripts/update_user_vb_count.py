@@ -8,5 +8,4 @@ def run():
     for profile in UserProfile.objects.filter(user__id__in = today_users):
         users_count = Topic.objects.filter(is_removed = False, is_vb = True).filter(user = profile.user).count()
         if profile.vb_count != users_count:
-            profile.vb_count = users_count
-            profile.save()
+        	UserProfile.objects.filter(pk=profile.id).update(vb_count = users_count)
