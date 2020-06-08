@@ -195,7 +195,7 @@ class Topic(RecordTimeStamp):
 
     def update_m3u8_content(self):
         try:
-            if self.question_video:
+            if self.question_video and '.m3u8' in self.question_video:
                 if any(substring in self.question_video for substring in settings.AMAZON_ET_IDENTIFIER):
                     m3u8_url = self.question_video
                     url_split = m3u8_url.split('/')
@@ -207,7 +207,7 @@ class Topic(RecordTimeStamp):
                     self.video_m3u8_content = urllib2.urlopen(video_url).read()
                     self.save()
                 elif any(substring in self.question_video for substring in settings.LAMBDA_ET_IDENTIFIER):
-                    m3u8_url = self.question_video
+                    self.m3u8_content = urllib2.urlopen(self.question_video).read()
                     self.audio_m3u8_content = ""
                     self.video_m3u8_content = ""
                     self.save()
