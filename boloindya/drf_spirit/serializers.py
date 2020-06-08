@@ -1,7 +1,7 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, RelatedField, CharField
 
 from .fields import UserReadOnlyField
-from forum.topic.models import Topic,CricketMatch,Poll,Choice,Voting,Leaderboard, Notification, TongueTwister,BoloActionHistory,VBseen, TongueTwisterCounter
+from forum.topic.models import Topic,CricketMatch,Poll,Choice,Voting,Leaderboard, Notification, TongueTwister,BoloActionHistory,VBseen, TongueTwisterCounter, HashtagViewCounter
 from django.contrib.auth.models import User
 from forum.category.models import Category,CategoryViewCounter
 from forum.comment.models import Comment
@@ -938,6 +938,23 @@ class TongueTwisterWithoutViewsSerializer(ModelSerializer):
 class TongueTwisterCounterSerializer(ModelSerializer):
     total_videos_count = SerializerMethodField()
     total_views = SerializerMethodField()
+    tongue_twister = SerializerMethodField()
+
+    class Meta:
+        model = HashtagViewCounter
+        fields = '__all__'
+
+    def get_total_videos_count(self,instance):
+        return shorcountertopic(instance.video_count)
+
+    def get_total_views(self,instance):
+        return shorcountertopic(instance.view_count)
+
+    def get_tongue_twister(self,instance):
+        return TongueTwisterWithoutViewsSerializer(instance.hashtag).data 
+'''
+    total_videos_count = SerializerMethodField()
+    total_views = SerializerMethodField()
     tongue_twister = TongueTwisterWithoutViewsSerializer()
     class Meta:
         model = TongueTwisterCounter
@@ -948,6 +965,7 @@ class TongueTwisterCounterSerializer(ModelSerializer):
 
     def get_total_views(self,instance):
         return shorcountertopic(instance.total_views)
+'''
 
 class TopicsWithOnlyContent(ModelSerializer):
 
