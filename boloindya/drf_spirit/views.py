@@ -1440,11 +1440,8 @@ def createTopic(request):
         if already_exist_topic:
             topic_json = TopicSerializerwithComment(already_exist_topic[0], context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data
             return JsonResponse({'message': 'Video Byte Created','topic':topic_json}, status=status.HTTP_201_CREATED)
-
-
-
+    
     try:
-
         topic.language_id   = request.user.st.language
         topic.category_id   = category_id
         topic.user_id       = user_id
@@ -1518,6 +1515,9 @@ def createTopic(request):
         data['image_url'] = ''
         data['days_ago'] = ''
 
+        topic.update_m3u8_content()
+        notify_owner = Notification.objects.create(for_user = topic.user ,topic = topic,notification_type='6',user = topic.user)
+        
         send_upload_video_notification.delay(data, {})
         return JsonResponse({'message': message,'topic':topic_json}, status=status.HTTP_201_CREATED)
     except User.DoesNotExist:

@@ -120,6 +120,7 @@ def vb_create_task(topic_id):
     topic = Topic.objects.get(pk=topic_id)
     if not topic.is_transcoded:
         if topic.is_vb and topic.question_video:
+            topic.update_m3u8_content()
             # data_dump, m3u8_url, job_id = transcode_media_file(topic.question_video.split('s3.amazonaws.com/')[1])
             # if m3u8_url:
                 # topic.backup_url = topic.question_video
@@ -128,7 +129,6 @@ def vb_create_task(topic_id):
                 # topic.transcode_job_id = job_id
                 # # topic.is_transcoded = True
                 # topic.save()
-            topic.update_m3u8_content()
                 #create_downloaded_url(topic_id)
 
 @app.task
@@ -417,9 +417,6 @@ def send_upload_video_notification(data, pushNotification):
         for each in devices:
             fcm_message = {"message": {"token": each.reg_id ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": "-1", "image_url": image_url}}}
             resp = requests.post("https://fcm.googleapis.com/v1/projects/boloindya-1ec98/messages:send", data=json.dumps(fcm_message), headers=headers)
-            print(resp)
-            print(resp.text)
-            print(fcm_message)
         
     except Exception as e:
         logger.info(str(e))
