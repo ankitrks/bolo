@@ -196,15 +196,23 @@ class Topic(RecordTimeStamp):
     def update_m3u8_content(self):
         try:
             if self.question_video and '.m3u8' in self.question_video:
-                m3u8_url = self.question_video
-                url_split = m3u8_url.split('/')
-                audio_url = '/'.join( url_split[:-1] + ['hlsAudio'] + [url_split[-1].replace('hls_', '')] )
-                video_url = '/'.join( url_split[:-1] + ['hls1000k'] + [url_split[-1].replace('hls_', '')] )
+                if any(substring in self.question_video for substring in settings.AMAZON_ET_IDENTIFIER):
+                    m3u8_url = self.question_video
+                    url_split = m3u8_url.split('/')
+                    audio_url = '/'.join( url_split[:-1] + ['hlsAudio'] + [url_split[-1].replace('hls_', '')] )
+                    video_url = '/'.join( url_split[:-1] + ['hls1000k'] + [url_split[-1].replace('hls_', '')] )
 
-                self.m3u8_content = urllib2.urlopen(m3u8_url).read()
-                self.audio_m3u8_content = urllib2.urlopen(audio_url).read()
-                self.video_m3u8_content = urllib2.urlopen(video_url).read()
-                self.save()
+                    self.m3u8_content = urllib2.urlopen(m3u8_url).read()
+                    self.audio_m3u8_content = urllib2.urlopen(audio_url).read()
+                    self.video_m3u8_content = urllib2.urlopen(video_url).read()
+                    self.save()
+                elif any(substring in self.question_video for substring in settings.LAMBDA_ET_IDENTIFIER):
+                    self.m3u8_content = urllib2.urlopen(self.question_video).read()
+                    self.audio_m3u8_content = ""
+                    self.video_m3u8_content = ""
+                    self.save()
+                else:
+                    print("M3U8 url not correct please check")
         except:
             pass
 
