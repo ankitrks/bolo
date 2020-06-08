@@ -196,7 +196,7 @@ class Topic(RecordTimeStamp):
     def update_m3u8_content(self):
         try:
             if self.question_video:
-                if any(substring in string for substring in settings.AMAZON_ET_IDENTIFIER):
+                if any(substring in self.question_video for substring in settings.AMAZON_ET_IDENTIFIER):
                     m3u8_url = self.question_video
                     url_split = m3u8_url.split('/')
                     audio_url = '/'.join( url_split[:-1] + ['hlsAudio'] + [url_split[-1].replace('hls_', '')] )
@@ -206,15 +206,15 @@ class Topic(RecordTimeStamp):
                     self.audio_m3u8_content = urllib2.urlopen(audio_url).read()
                     self.video_m3u8_content = urllib2.urlopen(video_url).read()
                     self.save()
-                elif any(substring in string for substring in settings.LAMBDA_ET_IDENTIFIER):
+                elif any(substring in self.question_video for substring in settings.LAMBDA_ET_IDENTIFIER):
                     m3u8_url = self.question_video
                     self.audio_m3u8_content = ""
                     self.video_m3u8_content = ""
                     self.save()
                 else:
-                    raise(Exception("M3U8 url not correct please check"))
-        except Exception as e:
-            print(e)
+                    print("M3U8 url not correct please check")
+        except:
+            pass
 
     def update_vb(self, *args, **kwargs):
         if not self.id or not self.is_transcoded:
