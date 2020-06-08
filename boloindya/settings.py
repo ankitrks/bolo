@@ -536,6 +536,8 @@ BOLOINDYA_PIPELINE_ID_TS = '1545987947390-hpo4hx'
 BOLOINDYA_AWS_ACCESS_KEY_ID_TS = 'AKIAZNK4CM5CW4W4VWP7'
 BOLOINDYA_AWS_SECRET_ACCESS_KEY_TS = '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'
 BOLOINDYA_AWS_BUCKET_NAME_TS = 'boloindya-et'
+LAMBDA_ET_IDENTIFIER = ['/elastic-transcoder/lambda/et/']
+AMAZON_ET_IDENTIFIER = ['/elastic-transcoder/lambda/aws_et/']
 #### Transcoder settings #####
 
 #####CareerAnna ######
