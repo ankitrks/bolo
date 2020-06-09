@@ -2461,6 +2461,7 @@ def fb_profile_settings(request):
             cache_follow_post.delay(user.id)
             cache_popular_post.delay(user.id,language)
             if is_created:
+                userprofile.android_did = android_did
                 add_bolo_score(user.id, 'initial_signup', userprofile)
                 if user_ip:
                     user_ip_to_state_task.delay(user.id,user_ip)
