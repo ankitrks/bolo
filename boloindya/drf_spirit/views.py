@@ -3064,6 +3064,7 @@ def get_follower_list(request):
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
+''''
 def deafult_boloindya_follow(user,language):
     try:
         if language == '2':
@@ -3091,6 +3092,7 @@ def deafult_boloindya_follow(user,language):
         return True
     except:
         return False
+'''
 
 @api_view(['POST'])
 def get_bolo_score(request):
