@@ -1065,8 +1065,8 @@ def upload_media(media_file):
         created_at = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
         filenameNext= str(media_file.name).split('.')
         final_filename = str(filenameNext[0])+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[1])
-        client.put_object(Bucket=settings.BOLOINDYA_AWS_BUCKET_NAME, Key='media/' + final_filename, Body=media_file)
-        filepath = "https://s3.amazonaws.com/"+settings.BOLOINDYA_AWS_BUCKET_NAME+"/media/"+final_filename
+        client.put_object(Bucket=settings.BOLOINDYA_AWS_BUCKET_NAME, Key='media/' + final_filename, Body=media_file, ACL='public-read')
+        filepath = 'https://s3.amazonaws.com/' + settings.BOLOINDYA_AWS_BUCKET_NAME + '/media/' + final_filename
         # if os.path.exists(file):
         #     os.remove(file)
         return filepath
