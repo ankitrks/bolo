@@ -1412,6 +1412,9 @@ def createTopic(request):
     m3u8_url        = request.POST.get('m3u8_url')
     data_dump       = request.POST.get('data_dump')
     job_id          = request.POST.get('job_id')
+    category_id_m2m = request.POST.get('category_id_m2m', '')
+
+    print(category_id_m2m, type(category_id_m2m))
     # media_file = request.FILES.get['media']
     # print media_file
 
@@ -3900,6 +3903,7 @@ def update_mobile_no(request):
 def verify_otp_and_update_profile(request):
     try:
         mobile_no = validate_indian_number(request.POST.get('mobile_no',None))
+        country_code = request.POST.get('country_code', None)
         otp = request.POST.get('otp',None)
         otp_obj = SingUpOTP.objects.filter(mobile_no=mobile_no,otp=otp,is_active=True).order_by('-id')
         if otp_obj:
@@ -3908,7 +3912,7 @@ def verify_otp_and_update_profile(request):
             otp_obj.used_at = timezone.now()
             otp_obj.for_user = request.user
             otp_obj.save()
-            UserProfile.objects.filter(user=request.user).update(mobile_no=mobile_no)
+            UserProfile.objects.filter(user=request.user).update(mobile_no=mobile_no, country_code=country_code)
             userprofile=request.user.st
             add_bolo_score(request.user.id, 'mobile_no_added', userprofile)
             return JsonResponse({'message':'Mobile No updated','user':UserSerializer(request.user).data}, status=status.HTTP_200_OK)

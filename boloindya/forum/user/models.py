@@ -102,6 +102,7 @@ class UserProfile(models.Model,ModelDiffMixin):
     paytm_number = models.CharField(_("Mobile No"), max_length=100, blank = True, null = True)
     android_did = models.CharField(_('android_did'),max_length=200,null=True,blank=True)
     is_guest_user = models.BooleanField(default=False)
+    country_code = models.CharField(_("Country Phone Code"), max_length=20, blank = True, null = True)
 
     class Meta:
         verbose_name = _("user profile")
