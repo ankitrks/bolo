@@ -261,7 +261,7 @@ def create_comment_notification(created,instance_id):
     from forum.user.utils.follow_redis import get_redis_follower
     try:
         instance = Comment.objects.get(pk=instance_id)
-        if created and not instance.is_vb:
+        if created:
             # all_follower_list = Follower.objects.filter(user_following = instance.user).values_list('user_follower_id',flat=True)
             all_follower_list = get_redis_follower(instance.user.id)
             for each in all_follower_list:

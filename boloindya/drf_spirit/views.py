@@ -2445,6 +2445,8 @@ def fb_profile_settings(request):
             except Exception as e:
                 return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
         elif activity == 'android_login':
+            if not android_did:
+                return JsonResponse({'message': 'Error Occured:android_did not found',}, status=status.HTTP_400_BAD_REQUEST)
             try:
                 userprofile = UserProfile.objects.get(android_did = android_did,user__is_active = True)
                 user=userprofile.user
