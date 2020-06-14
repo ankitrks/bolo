@@ -527,6 +527,8 @@ def GetFollowPost(request):
     all_seen_vb = []
     topics =[]
     page_no = request.GET.get('page',1)
+    if int(page_no) == 1:
+        cache_follow_post(request.user.id)
     topics = get_redis_follow_paginated_data(request.user.id,page_no)
     return JsonResponse({"results":TopicSerializerwithComment(topics,context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand':request.GET.get('is_expand',True)},many=True).data})
 
@@ -2137,8 +2139,6 @@ def verify_otp(request):
                 otp_obj.update(for_user = user)
                 # otp_obj.for_user = user
                 # otp_obj.save()
-                cache_follow_post.delay(user.id)
-                cache_popular_post.delay(user.id,language)
                 return JsonResponse({'message': message, 'username' : mobile_no, \
                         'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
             otp_obj.save()
@@ -2182,8 +2182,8 @@ class GetProfile(generics.ListAPIView):
 
 @api_view(['POST'])
 def cache_user_data(request):
-    cache_follow_post.delay(request.user.id)
-    cache_popular_post.delay(request.user.id,request.user.st.language)
+    cache_follow_post(request.user.id)
+    cache_popular_post(request.user.id,request.user.st.language)
     return JsonResponse({'message': 'Data Cached'}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
@@ -2252,8 +2252,6 @@ def fb_profile_settings(request):
 
             if not userprofile.user.is_active:
                 return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
-            cache_follow_post.delay(user.id)
-            cache_popular_post.delay(user.id,language)
             if is_created:
                 add_bolo_score(user.id, 'initial_signup', userprofile)
                 user.first_name = extra_data['first_name']
@@ -2323,8 +2321,6 @@ def fb_profile_settings(request):
                 is_created = True
             if not userprofile.user.is_active:
                 return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
-            cache_follow_post.delay(user.id)
-            cache_popular_post.delay(user.id,language)
             if is_created:
                 add_bolo_score(user.id, 'initial_signup', userprofile)
                 # user.first_name = extra_data['first_name']
@@ -2439,7 +2435,6 @@ def fb_profile_settings(request):
                 if language:
                     default_follow = deafult_boloindya_follow.delay(request.user.id,str(language))
                     userprofile.language = str(language)
-                    cache_popular_post.delay(request.user.id,language)
                     userprofile.save()
                 return JsonResponse({'message': 'Settings Chnaged'}, status=status.HTTP_200_OK)
             except Exception as e:
@@ -2458,8 +2453,6 @@ def fb_profile_settings(request):
             if not userprofile.is_guest_user:
                 userprofile.is_guest_user = True
                 userprofile.save()
-            cache_follow_post.delay(user.id)
-            cache_popular_post.delay(user.id,language)
             if is_created:
                 userprofile.android_did = android_did
                 add_bolo_score(user.id, 'initial_signup', userprofile)
@@ -2965,8 +2958,6 @@ def follow_like_list(request):
         block_hashes = TongueTwister.objects.filter(is_blocked=True).values_list('hash_tag', flat=True)
         reported_user = Report.objects.filter(reported_by=request.user,target_type=ContentType.objects.get(model='user')).distinct('target_id').values_list('target_id',flat=True)
         reported_topic = Report.objects.filter(reported_by=request.user,target_type=ContentType.objects.get(model='topic')).distinct('target_id').values_list('target_id',flat=True)
-        cache_follow_post.delay(request.user.id)
-        cache_popular_post.delay(request.user.id,request.user.st.language)
         return JsonResponse({'comment_like':list(comment_like),'topic_like':list(topic_like),'all_follow':list(all_follow),'all_follower':list(all_follower),\
             'all_category_follow':list(all_category_follow),'app_version':app_version,\
             'notification_count':notification_count, 'is_test_user':userprofile.is_test_user,'user':UserSerializer(request.user).data,\
@@ -3342,9 +3333,6 @@ def save_android_logs(request):
             return JsonResponse({'messgae' : 'success'})
         else:
             AndroidLogs.objects.create(user=request.user, logs=request.POST.get('error_log', ''),log_type = request.POST.get('log_type',None), android_id=request.POST.get('android_id',''))
-            if request.POST.get('log_type',None)=='user_ip':
-                cache_follow_post.delay(request.user.id)
-                cache_popular_post.delay(request.user.id,request.user.st.language)
             return JsonResponse({'messgae' : 'success'})
     except Exception as e:
         return JsonResponse({'message' : 'fail','error':str(e)})
@@ -3640,6 +3628,8 @@ def old_algo_get_popular_video_bytes(request):
 def get_popular_video_bytes(request):
     try:
         language_id = request.GET.get('language_id', 1)
+        if int(request.GET.get('page',1)) == 1:
+            cache_popular_post(user.id,language_id)
         topics = get_popular_paginated_data(request.user.id,language_id,int(request.GET.get('page',1)))
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True, context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
     except Exception as e:
