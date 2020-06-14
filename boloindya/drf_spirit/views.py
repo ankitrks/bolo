@@ -3629,7 +3629,7 @@ def get_popular_video_bytes(request):
     try:
         language_id = request.GET.get('language_id', 1)
         if int(request.GET.get('page',1)) == 1:
-            cache_popular_post(user.id,language_id)
+            cache_popular_post(request.user.id,language_id)
         topics = get_popular_paginated_data(request.user.id,language_id,int(request.GET.get('page',1)))
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True, context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
     except Exception as e:
