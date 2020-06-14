@@ -18,7 +18,6 @@ from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
 from jarvis.models import PushNotificationUser, FCMDevice, Report
 from forum.topic.utils import get_redis_category_paginated_data,get_redis_hashtag_paginated_data
 
-cloufront_url = "https://d1fa4tg1fvr6nj.cloudfront.net"
 class CategorySerializer(ModelSerializer):
     class Meta:
         model = Category
@@ -134,10 +133,13 @@ class TopicSerializer(ModelSerializer):
 
     def get_video_cdn(self,instance):
         if instance.question_video:
+            cloufront_url = "https://d1fa4tg1fvr6nj.cloudfront.net"
+            if 'in-boloindya' in instance.question_video:
+                cloufront_url = "https://d7lk2jr51sych.cloudfront.net"
             regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
             find_urls_in_string = re.compile(regex, re.IGNORECASE)
             url = find_urls_in_string.search(instance.question_video)
-            return str(instance.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
+            return str(instance.question_video.replace(str(url.group()), cloufront_url))
         else:
             return ''
 
@@ -232,10 +234,13 @@ class TopicSerializerwithComment(ModelSerializer):
 
     def get_video_cdn(self,instance):
         if instance.question_video:
+            cloufront_url = "https://d1fa4tg1fvr6nj.cloudfront.net"
+            if 'in-boloindya' in instance.question_video:
+                cloufront_url = "https://d7lk2jr51sych.cloudfront.net"
             regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
             find_urls_in_string = re.compile(regex, re.IGNORECASE)
             url = find_urls_in_string.search(instance.question_video)
-            return str(instance.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
+            return str(instance.question_video.replace(str(url.group()), cloufront_url))
         else:
             return ''
 
@@ -718,10 +723,13 @@ class CategoryVideoByteSerializer(ModelSerializer):
 
     def get_video_cdn(self,instance):
         if instance.question_video:
+            cloufront_url = "https://d1fa4tg1fvr6nj.cloudfront.net"
+            if 'in-boloindya' in instance.question_video:
+                cloufront_url = "https://d7lk2jr51sych.cloudfront.net"
             regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
             find_urls_in_string = re.compile(regex, re.IGNORECASE)
             url = find_urls_in_string.search(instance.question_video)
-            return str(instance.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
+            return str(instance.question_video.replace(str(url.group()), cloufront_url))
         else:
             return ''
 

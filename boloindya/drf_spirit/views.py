@@ -3303,12 +3303,16 @@ def check_url(file_path):
     except Exception as e:
         # print e,file_path
         return "403"
+
 def get_cloudfront_url(instance):
     if instance.question_video:
+        cloufront_url = "https://d1fa4tg1fvr6nj.cloudfront.net"
+        if 'in-boloindya' in instance.question_video:
+            cloufront_url = "https://d7lk2jr51sych.cloudfront.net"
         regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
         find_urls_in_string = re.compile(regex, re.IGNORECASE)
         url = find_urls_in_string.search(instance.question_video)
-        return str(instance.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
+        return str(instance.question_video.replace(str(url.group()), cloufront_url))
 
 @csrf_exempt
 @api_view(['POST'])
