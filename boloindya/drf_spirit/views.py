@@ -57,7 +57,7 @@ from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
 from forum.user.utils.bolo_redis import get_bolo_info_combined
 from .serializers import *
-from tasks import vb_create_task,user_ip_to_state_task,sync_contacts_with_user,cache_follow_post,cache_popular_post, deafult_boloindya_follow, save_click_id_response, send_upload_video_notification
+from tasks import vb_create_task,user_ip_to_state_task,sync_contacts_with_user,cache_follow_post,cache_popular_post, deafult_boloindya_follow, save_click_id_response, send_upload_video_notification, profanity_check
 from haystack.query import SearchQuerySet, SQ
 from django.core.exceptions import MultipleObjectsReturned
 from forum.topic.utils import get_redis_category_paginated_data,get_redis_hashtag_paginated_data,get_redis_language_paginated_data,get_redis_follow_paginated_data, get_popular_paginated_data
@@ -1073,6 +1073,7 @@ def upload_media(media_file):
     except:
         return None
 
+
 @api_view(['POST'])
 def upload_profile_image(request):
     try:
@@ -1394,7 +1395,7 @@ def createTopic(request):
     request.POST.get('question_image')
 
     Required Parameters:
-    title and category_id 
+    title and category_id
 
     """
 
@@ -1409,9 +1410,6 @@ def createTopic(request):
     vb_width        = request.POST.get('vb_width',0)
     vb_height       = request.POST.get('vb_height',0)
     question_video  = request.POST.get('question_video')
-    m3u8_url        = request.POST.get('m3u8_url')
-    data_dump       = request.POST.get('data_dump')
-    job_id          = request.POST.get('job_id')
     # media_file = request.FILES.get['media']
     # print media_file
 
@@ -1424,19 +1422,13 @@ def createTopic(request):
         topic.safe_backup_url = question_video
         topic.backup_url      = question_video
 
-    if m3u8_url:
-        topic.question_video = m3u8_url
-        topic.transcode_dump = data_dump
-        topic.transcode_job_id = job_id
-        topic.is_transcoded = True
-    else:
-        topic.question_video = request.POST.get('question_video')
+    topic.question_video = request.POST.get('question_video')
 
     if request.POST.get('question_image'):
         topic.question_image = request.POST.get('question_image')
 
-    if m3u8_url and question_video and not request.user.st.is_test_user:
-        already_exist_topic = Topic.objects.filter(Q(question_video=m3u8_url)|Q(backup_url=question_video))
+    if question_video and not request.user.st.is_test_user:
+        already_exist_topic = Topic.objects.filter(Q(question_video=question_video)|Q(backup_url=question_video))
         if already_exist_topic:
             topic_json = TopicSerializerwithComment(already_exist_topic[0], context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data
             return JsonResponse({'message': 'Video Byte Created','topic':topic_json}, status=status.HTTP_201_CREATED)
@@ -1515,9 +1507,13 @@ def createTopic(request):
         data['image_url'] = ''
         data['days_ago'] = ''
 
-        topic.update_m3u8_content()
+        # topic.update_m3u8_content()
+
         notify_owner = Notification.objects.create(for_user = topic.user ,topic = topic,notification_type='6',user = topic.user)
         
+        #profanity check
+        profanity_check.delay(question_video, media_duration, topic, request.user)
+
         send_upload_video_notification.delay(data, {})
         return JsonResponse({'message': message,'topic':topic_json}, status=status.HTTP_201_CREATED)
     except User.DoesNotExist:
