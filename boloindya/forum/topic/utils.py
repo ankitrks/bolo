@@ -64,7 +64,7 @@ def get_redis_data(key, query, page_no):
     if paginated_data and (str(page_no) in paginated_data.keys() or 'remaining' in paginated_data.keys()):
         if str(page_no) in paginated_data.keys():
             topic_ids = paginated_data[str(page_no)]['id_list']
-            topics = Topic.objects.filter(pk__in = topic_ids, is_removed = False)
+            topics = Topic.objects.filter(pk__in = topic_ids, is_removed = False).order_by('-vb_score')
         elif 'remaining' in paginated_data.keys():
             last_page_no = int(paginated_data['remaining']['last_page'])
             try:
