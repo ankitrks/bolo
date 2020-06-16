@@ -419,6 +419,9 @@ class Topic(RecordTimeStamp):
             playback_url = self.safe_backup_url
         elif self.backup_url and '.mp4' in self.backup_url:
             playback_url = self.backup_url
+        
+        if not playback_url and self.question_video:
+            playback_url = self.question_video
 
         if self.media_duration:
             return format_html('<a href="javascript:void(0)" onclick="playvideo(\'' + playback_url + '\')">' + self.media_duration + '</a>' )
