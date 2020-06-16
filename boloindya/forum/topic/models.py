@@ -412,14 +412,17 @@ class Topic(RecordTimeStamp):
         return duration
 
     def duration(self):
-        playback_url = self.backup_url
-        if not playback_url:
+        playback_url = ''
+        if  self.question_video and '.mp4' in self.question_video:
             playback_url = self.question_video
+        elif self.safe_backup_url and '.mp4' in self.safe_backup_url:
+            playback_url = self.safe_backup_url
+        elif self.backup_url and '.mp4' in self.backup_url:
+            playback_url = self.backup_url
+
         if self.media_duration:
-            return format_html('<a href="' + playback_url + '" target="_blank">' + self.media_duration + '</a>' )
-        elif playback_url:
-            return format_html('<a href="' + playback_url + '" target="_blank">play</a>' )
-        return "00:00"
+            return format_html('<a href="#" onclick="playvideo(\'' + playback_url + '\')">' + self.media_duration + '</a>' )
+        return format_html('<a href="#" onclick="playvideo(' + playback_url + ')">play</a>' )
 
     def comments(self):
         if self.comment_count:
