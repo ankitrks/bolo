@@ -421,8 +421,8 @@ class Topic(RecordTimeStamp):
             playback_url = self.backup_url
 
         if self.media_duration:
-            return format_html('<a href="#" onclick="playvideo(\'' + playback_url + '\')">' + self.media_duration + '</a>' )
-        return format_html('<a href="#" onclick="playvideo(' + playback_url + ')">play</a>' )
+            return format_html('<a href="javascript:void(0)" onclick="playvideo(\'' + playback_url + '\')">' + self.media_duration + '</a>' )
+        return format_html('<a href="javascript:void(0)" onclick="playvideo(' + playback_url + ')">play</a>' )
 
     def comments(self):
         if self.comment_count:
