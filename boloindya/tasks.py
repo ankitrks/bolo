@@ -368,12 +368,8 @@ def deafult_boloindya_follow(user_id,language):
         follow,is_created = Follower.objects.get_or_create(user_follower = user,user_following=bolo_indya_user)
         if is_created:
             add_bolo_score(user.id, 'follow', follow)
-            userprofile = UserProfile.objects.get(user = user)
-            bolo_indya_profile = UserProfile.objects.get(user = bolo_indya_user)
-            userprofile.follow_count = F('follow_count') + 1
-            userprofile.save()
-            bolo_indya_profile.follower_count = F('follower_count') + 1
-            bolo_indya_profile.save()
+            userprofile = UserProfile.objects.filter(user = user).update(follow_count = F('follow_count') + 1)
+            bolo_indya_profile = UserProfile.objects.filter(user = bolo_indya_user).update(follower_count = F('follower_count') + 1)
             update_redis_following(user.id,int(bolo_indya_user.id),True)
             update_redis_follower(int(bolo_indya_user.id),user.id,True)
         if not follow.is_active:
