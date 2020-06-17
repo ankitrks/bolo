@@ -424,12 +424,16 @@ def send_upload_video_notification(data, pushNotification):
         logger.info(str(e))
 
 @app.task
-def profanity_check(question_video, media_duration, topic, user):
-    if topic.profnity_retry:
-        try:
+def profanity_check(question_video, media_duration, topic_id, user_id):
+    from forum.topic.models import Topic
+    from django.contrib.auth.models import User
+    try:
+        topic = Topic.objects.get(pk=topic_id)
+        user = User.objects.get(pk=user_id)
+        if topic.profnity_retry:
             print('============================')
             url = 'https://990r5nk62j.execute-api.ap-south-1.amazonaws.com/v1/create-topic-and-profanity-check'
-            input_key = question_video.split(settings.BOLOINDYA_AWS_IN_BUCKET_NAME+".s3.amazonaws.com/")[1]
+            input_key = question_video.split(".amazonaws.com/")[1]
             payload = {"input_key": input_key, "media_duration": media_duration}
             response = requests.request("POST", url, headers = {}, data = json.dumps(payload), files = [])
             topic.profnity_retry -=1
@@ -458,12 +462,11 @@ def profanity_check(question_video, media_duration, topic, user):
                 print(response.status_code)
                 print("attempting again")
                 profanity_check.delay(question_video, media_duration, topic, user)
-        except Exception as e:
-            print(str(e))
-        print('============================')
-        return True
-    else:
-        print("maximum retry attempt to check profanity please check profanity service")
+        else:
+            print("maximum retry attempt to check profanity please check profanity service")
+    except Exception as e:
+        print(str(e))
+    print('============================')
 
 if __name__ == '__main__':
     profanity_check("https://in-boloindya.s3.amazonaws.com/public/akash_u_test/distrub.mp4","02:50","","")

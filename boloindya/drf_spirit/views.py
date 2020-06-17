@@ -1512,7 +1512,7 @@ def createTopic(request):
         notify_owner = Notification.objects.create(for_user = topic.user ,topic = topic,notification_type='6',user = topic.user)
         
         #profanity check
-        profanity_check.delay(question_video, media_duration, topic, request.user)
+        profanity_check.delay(question_video, media_duration, topic.id, request.user.id)
 
         send_upload_video_notification.delay(data, {})
         return JsonResponse({'message': message,'topic':topic_json}, status=status.HTTP_201_CREATED)
