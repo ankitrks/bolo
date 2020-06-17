@@ -1053,9 +1053,6 @@ def rotateImage(virtual_thumb_file,rotationAngle):
     image.close()
     return fileNewPath
 
-
-
-
 def update_careeranna_db(uploaded_video):
     video_url = uploaded_video.transcoded_file_url
     regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'

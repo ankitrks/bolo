@@ -1067,10 +1067,8 @@ def upload_media(media_file):
         created_at = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
         filenameNext= str(media_file.name).split('.')
         final_filename = str(filenameNext[0])+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[1])
-        client.put_object(Bucket=settings.BOLOINDYA_AWS_BUCKET_NAME, Key='media/' + final_filename, Body=media_file, ACL='public-read')
-        filepath = 'https://s3.amazonaws.com/' + settings.BOLOINDYA_AWS_BUCKET_NAME + '/media/' + final_filename
-        # if os.path.exists(file):
-        #     os.remove(file)
+        client.put_object(Bucket='in-boloindya', Key='media/' + final_filename, Body=media_file, ACL='public-read')
+        filepath = 'https://s3.ap-south-1.amazonaws.com/' + 'in-boloindya' + '/media/' + final_filename
         return filepath
     except:
         return None
@@ -2113,7 +2111,8 @@ def verify_otp(request):
                     user = User.objects.create(username = get_random_username())
                     message = 'User created'
                     userprofile = UserProfile.objects.get(user = user)
-                    userprofile.mobile_no = mobile_no
+                    update_dict = {}
+                    update_dict['mobile_no'] = mobile_no
                     Contact.objects.filter(contact_number=mobile_no).update(is_user_registered=True,user=user)
                     if user_ip:
                         user_ip_to_state_task.delay(user.id,user_ip)
@@ -2123,15 +2122,15 @@ def verify_otp(request):
                         # userprofile.state_name = json_response['regionName']
                         # userprofile.city_name = json_response['city']
                     if str(is_geo_location) =="1":
-                        userprofile.lat = lat
-                        userprofile.lang = lang
+                        update_dict['lat'] = lat
+                        update_dict['lang'] = lang
                     if click_id:
                         save_click_id_response.delay(userprofile.id)
                         # userprofile.click_id = click_id
                         # click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
                         # response = urllib2.urlopen(click_url).read()
                         # userprofile.click_id_response = str(response)
-                    userprofile.save()
+                    UserProfile.objects.filter(user = user).update(**update_dict)
                     if str(language):
                         default_follow = deafult_boloindya_follow.delay(user.id,str(language))
                     add_bolo_score(user.id, 'initial_signup', userprofile)
@@ -2254,11 +2253,12 @@ def fb_profile_settings(request):
                 return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
             if is_created:
                 add_bolo_score(user.id, 'initial_signup', userprofile)
+                update_dict = {}
                 user.first_name = extra_data['first_name']
                 user.last_name = extra_data['last_name']
-                userprofile.name = extra_data['name']
-                userprofile.social_identifier = extra_data['id']
-                userprofile.bio = bio
+                update_dict['name'] = extra_data['name']
+                update_dict['social_identifier'] = extra_data['id']
+                update_dict['bio'] = bio
                 if not userprofile.d_o_b and d_o_b:
                     add_bolo_score(user.id, 'dob_added', userprofile)
                 userprofile.d_o_b = d_o_b
@@ -2271,31 +2271,30 @@ def fb_profile_settings(request):
                     # json_response = json.loads(response)
                     # userprofile.state_name = json_response['regionName']
                     # userprofile.city_name = json_response['city']
-                userprofile.gender = gender
-                userprofile.about = about
-                userprofile.refrence = refrence
-                userprofile.extra_data = extra_data
-                userprofile.user = user
-                userprofile.bolo_score += 95
-                userprofile.linkedin_url = likedin_url
-                userprofile.twitter_id = twitter_id
-                userprofile.instagarm_id = instagarm_id
+                update_dict['gender'] = gender
+                update_dict['about'] = about
+                update_dict['refrence'] = refrence
+                update_dict['extra_data'] = extra_data
+                update_dict['user'] = user
+                update_dict['bolo_score'] = 95
+                update_dict['linkedin_url'] = likedin_url
+                update_dict['twitter_id'] = twitter_id
+                update_dict['instagarm_id'] = instagarm_id
 
                 # userprofile.follow_count += 1
                 if str(is_geo_location) =="1":
-                    userprofile.lat = lat
-                    userprofile.lang = lang
+                    update_dict['lat'] = lat
+                    update_dict['lang'] = lang
                 if click_id:
                     save_click_id_response.delay(userprofile.id)
                     # userprofile.click_id = click_id
                     # click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
                     # response = urllib2.urlopen(click_url).read()
                     # userprofile.click_id_response = str(response)
-                userprofile.save()
+                update_dict['language'] = str(language)
+                UserProfile.objects.filter(user = user).update(**update_dict)
                 if str(language):
                     default_follow = deafult_boloindya_follow.delay(user.id,str(language))
-                userprofile.language = str(language)
-                userprofile.save()
                 user.save()
                 user_tokens = get_tokens_for_user(user)
                 return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
@@ -2322,14 +2321,15 @@ def fb_profile_settings(request):
             if not userprofile.user.is_active:
                 return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
             if is_created:
+                update_dict = {}
                 add_bolo_score(user.id, 'initial_signup', userprofile)
                 # user.first_name = extra_data['first_name']
                 # user.last_name = extra_data['last_name']
-                userprofile.name = extra_data['name']
-                userprofile.social_identifier = extra_data['google_id']
-                userprofile.bio = bio
+                update_dict['name'] = extra_data['name']
+                update_dict['social_identifier'] = extra_data['google_id']
+                update_dict['bio'] = bio
                 if extra_data['profile_pic']:
-                    userprofile.profile_pic = profile_pic
+                    update_dict['profile_pic'] = extra_data['profile_pic']
                 if not userprofile.d_o_b and d_o_b:
                     add_bolo_score(user.id, 'dob_added', userprofile)
                 userprofile.d_o_b = d_o_b
@@ -2342,31 +2342,31 @@ def fb_profile_settings(request):
                     # json_response = json.loads(response)
                     # userprofile.state_name = json_response['regionName']
                     # userprofile.city_name = json_response['city']
-                userprofile.gender = gender
-                userprofile.about = about
-                userprofile.refrence = refrence
-                userprofile.extra_data = extra_data
-                userprofile.user = user
-                userprofile.bolo_score += 95
-                userprofile.linkedin_url = likedin_url
-                userprofile.twitter_id = twitter_id
-                userprofile.instagarm_id = instagarm_id
+                update_dict['gender'] = gender
+                update_dict['about'] = about
+                update_dict['d_o_b'] = d_o_b
+                update_dict['refrence'] = refrence
+                update_dict['extra_data'] = extra_data
+                update_dict['user'] = user
+                update_dict['bolo_score'] = 95
+                update_dict['linkedin_url'] = likedin_url
+                update_dict['twitter_id'] = twitter_id
+                update_dict['instagarm_id'] = instagarm_id
 
                 # userprofile.follow_count += 1
                 if str(is_geo_location) =="1":
-                    userprofile.lat = lat
-                    userprofile.lang = lang
+                    update_dict['lat'] = lat
+                    update_dict['lang'] = lang
                 if click_id:
                     save_click_id_response.delay(userprofile.id)
                     # userprofile.click_id = click_id
                     # click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
                     # response = urllib2.urlopen(click_url).read()
                     # userprofile.click_id_response = str(response)
-                userprofile.save()
+                update_dict['language'] = str(language)
+                UserProfile.objects.filter(user = user).update(**update_dict)
                 if str(language):
                     default_follow = deafult_boloindya_follow.delay(user.id,str(language))
-                userprofile.language = str(language)
-                userprofile.save()
                 user.save()
                 user_tokens = get_tokens_for_user(user)
                 return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
@@ -2376,18 +2376,19 @@ def fb_profile_settings(request):
         elif activity == 'profile_save':
             try:
                 userprofile = UserProfile.objects.get(user = request.user)
-                userprofile.name= name
-                userprofile.bio = bio
-                userprofile.about = about
+                update_dict = {}
+                update_dict['name']= name
+                update_dict['bio'] = bio
+                update_dict['about'] = about
                 if not userprofile.d_o_b and d_o_b:
                     add_bolo_score(userprofile.user.id, 'dob_added', userprofile)
-                userprofile.d_o_b = d_o_b
+                update_dict['d_o_b'] = d_o_b
                 if not userprofile.gender and gender:
                     add_bolo_score(userprofile.user.id, 'gender_added', userprofile)
                 if str(is_dark_mode_enabled) == '1':
-                    userprofile.is_dark_mode_enabled = True
+                    update_dict['is_dark_mode_enabled'] = True
                 else:
-                    userprofile.is_dark_mode_enabled = False
+                    update_dict['is_dark_mode_enabled'] = False
                 if user_ip:
                     user_ip_to_state_task.delay(request.user.id,user_ip)
                     # url = 'http://ip-api.com/json/'+user_ip
@@ -2395,51 +2396,52 @@ def fb_profile_settings(request):
                     # json_response = json.loads(response)
                     # userprofile.state_name = json_response['regionName']
                     # userprofile.city_name = json_response['city']
-                userprofile.gender = gender
-                userprofile.profile_pic =profile_pic
-                userprofile.cover_pic=cover_pic
-                userprofile.linkedin_url = likedin_url
-                userprofile.twitter_id = twitter_id
-                userprofile.instagarm_id = instagarm_id
-                userprofile.save()
+                update_dict['gender'] = gender
+                update_dict['profile_pic'] =profile_pic
+                update_dict['cover_pic']=cover_pic
+                update_dict['linkedin_url'] = likedin_url
+                update_dict['twitter_id'] = twitter_id
+                update_dict['instagarm_id'] = instagarm_id
                 if username:
                     if not check_username_valid(username):
                         return JsonResponse({'message': 'Username Invalid. It can contains only lower case letters,numbers and special character[ _ - .]'}, status=status.HTTP_200_OK)
                     check_username = User.objects.filter(username = username).exclude(pk =request.user.id)
                     if not check_username:
-                        userprofile.slug = username
+                        update_dict['slug'] = username
                         user = userprofile.user
                         user.username = username
-                        userprofile.save()
                         user.save()
                     else:
                         return JsonResponse({'message': 'Username already exist'}, status=status.HTTP_200_OK)
+                UserProfile.objects.filter(user=request.user).update(**update_dict)
                 return JsonResponse({'message': 'Profile Saved'}, status=status.HTTP_200_OK)
             except Exception as e:
                 return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
         elif activity == 'settings_changed':
             try:
                 userprofile = UserProfile.objects.get(user = request.user)
-                userprofile.linkedin_url = likedin_url
-                userprofile.twitter_id = twitter_id
-                userprofile.instagarm_id = instagarm_id
+                update_dict = {}
+                update_dict['linkedin_url'] = likedin_url
+                update_dict['twitter_id'] = twitter_id
+                update_dict['instagarm_id'] = instagarm_id
                 if sub_category_prefrences:
                     for each_sub_category in sub_category_prefrences:
                         category = Category.objects.get(pk = each_sub_category)
                         userprofile.sub_category.add(category)
-                        userprofile.save()
                     if userprofile.sub_category.all():
                         for each_category in userprofile.sub_category.all():
                             if not str(each_category.id) in sub_category_prefrences:
                                 userprofile.sub_category.remove(each_category)
                 if language:
                     default_follow = deafult_boloindya_follow.delay(request.user.id,str(language))
-                    userprofile.language = str(language)
-                    userprofile.save()
+                    update_dict['language'] = str(language)
+                UserProfile.objects.filter(user=request.user).update(**update_dict)
                 return JsonResponse({'message': 'Settings Chnaged'}, status=status.HTTP_200_OK)
             except Exception as e:
                 return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
         elif activity == 'android_login':
+            if not android_did:
+                return JsonResponse({'message': 'Error Occured:android_did not found',}, status=status.HTTP_400_BAD_REQUEST)
             try:
                 userprofile = UserProfile.objects.get(android_did = android_did,user__is_active = True)
                 user=userprofile.user
@@ -2451,27 +2453,26 @@ def fb_profile_settings(request):
                 userprofile = UserProfile.objects.get(user = user)
                 is_created = True
             if not userprofile.is_guest_user:
-                userprofile.is_guest_user = True
-                userprofile.save()
+                UserProfile.objects.filter(user = user).update(is_guest_user = True)
             if is_created:
-                userprofile.android_did = android_did
+                update_dict = {}
+                update_dict['android_did'] = android_did
                 add_bolo_score(user.id, 'initial_signup', userprofile)
                 if user_ip:
                     user_ip_to_state_task.delay(user.id,user_ip)
                 if str(is_geo_location) =="1":
-                    userprofile.lat = lat
-                    userprofile.lang = lang
+                    update_dict['lat'] = lat
+                    update_dict['lang'] = lang
                 if click_id:
                     save_click_id_response.delay(userprofile.id)
                     # userprofile.click_id = click_id
                     # click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
                     # response = urllib2.urlopen(click_url).read()
                     # userprofile.click_id_response = str(response)
-                userprofile.save()
+                update_dict['language'] = str(language)
+                UserProfile.objects.filter(user = user).update(**update_dict)
                 if str(language):
-                    default_follow = deafult_boloindya_follow.delay(user.id,str(language))
-                userprofile.language = str(language)
-                userprofile.save()
+                    default_follow = deafult_boloindya_follow.delay(user.id,str(language))                
                 user.save()
                 user_tokens = get_tokens_for_user(user)
                 return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
@@ -2754,7 +2755,6 @@ def follow_sub_category(request):
             else:
                 category = Category.objects.get(pk = user_sub_category_id)
                 userprofile.sub_category.add(category)
-                userprofile.save()
                 return JsonResponse({'message': 'Followed'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
@@ -2900,10 +2900,7 @@ def comment_view(request):
         topic.view_count = F('view_count') +1
         topic.imp_count = F('imp_count') +1
         topic.save()
-        userprofile = topic.user.st
-        userprofile.view_count = F('view_count')+1
-        userprofile.own_vb_view_count = F('own_vb_view_count') +1
-        userprofile.save()
+        UserProfile.objects.filter(user_id = topic.user_id).update(view_count = F('view_count')+1,own_vb_view_count = F('own_vb_view_count') +1)
         return JsonResponse({'message': 'item viewed'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
@@ -3055,6 +3052,7 @@ def get_follower_list(request):
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
+''''
 def deafult_boloindya_follow(user,language):
     try:
         if language == '2':
@@ -3082,6 +3080,7 @@ def deafult_boloindya_follow(user,language):
         return True
     except:
         return False
+'''
 
 @api_view(['POST'])
 def get_bolo_score(request):
@@ -3294,12 +3293,16 @@ def check_url(file_path):
     except Exception as e:
         # print e,file_path
         return "403"
+
 def get_cloudfront_url(instance):
     if instance.question_video:
+        cloufront_url = "https://d1fa4tg1fvr6nj.cloudfront.net"
+        if 'in-boloindya' in instance.question_video:
+            cloufront_url = "https://d7lk2jr51sych.cloudfront.net"
         regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
         find_urls_in_string = re.compile(regex, re.IGNORECASE)
         url = find_urls_in_string.search(instance.question_video)
-        return str(instance.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
+        return str(instance.question_video.replace(str(url.group()), cloufront_url))
 
 @csrf_exempt
 @api_view(['POST'])
