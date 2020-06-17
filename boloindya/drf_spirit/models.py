@@ -457,3 +457,5 @@ class Winner(RecordTimeStamp):
 
     def __unicode__(self):
        return str(self.rank) +': '+ self.user.st.name
+
+       

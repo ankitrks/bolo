@@ -1939,14 +1939,14 @@ class SingUpOTPView(generics.CreateAPIView):
     """
 
     def perform_create(self, serializer):
-        old_otp = SingUpOTP.objects.filter(mobile_no=validate_indian_number(serializer.validated_data['mobile_no']).strip(),created_at__gte=datetime.now()-timedelta(hours=2)).order_by('-id')
+        old_otp = SingUpOTP.objects.filter(mobile_no=serializer.validated_data['mobile_no'].strip(),created_at__gte=datetime.now()-timedelta(hours=2)).order_by('-id')
         if old_otp:
             instance=old_otp[0]
             response, response_status   = send_sms(instance.mobile_no, instance.otp)
             instance.api_response_dump  = response
             instance.save()
         else:
-            serializer.validated_data['mobile_no'] = validate_indian_number(serializer.validated_data['mobile_no']).strip()
+            serializer.validated_data['mobile_no'] = serializer.validated_data['mobile_no'].strip()
             instance        = serializer.save()
             instance.otp    = generateOTP(6)
             instance.save()
@@ -2062,7 +2062,8 @@ def verify_otp(request):
         request.POST.get('is_reset_password')
         request.POST.get('is_for_change_phone')
     """
-    mobile_no = validate_indian_number(request.POST.get('mobile_no', None)).strip()
+    mobile_no = request.POST.get('mobile_no', None).strip()
+    country_code = request.POST.get('country_code', '+91').strip()
     language = request.POST.get('language','1')
     otp = request.POST.get('otp', None)
     is_geo_location = request.POST.get('is_geo_location',None)
@@ -2079,12 +2080,13 @@ def verify_otp(request):
         is_for_change_phone = True
 
     if mobile_no and otp:
+        mobile_with_country_code = str(country_code)+str(mobile_no)
         try:
             # exclude_dict = {'is_active' : True, 'is_reset_password' : is_reset_password,"mobile_no":mobile_no, "otp":otp}
-            exclude_dict = {'is_reset_password' : is_reset_password,"mobile_no":mobile_no, "otp":otp,"created_at__gte":datetime.now()-timedelta(hours=2)}
+            exclude_dict = {'is_reset_password' : is_reset_password,"mobile_no":mobile_with_country_code, "otp":otp,"created_at__gte":datetime.now()-timedelta(hours=2)}
             if is_for_change_phone:
                 # exclude_dict = {'is_active' : True, 'is_for_change_phone' : is_for_change_phone,"mobile_no":mobile_no, "otp":otp}
-                exclude_dict = {'is_for_change_phone' : is_for_change_phone,"mobile_no":mobile_no, "otp":otp,"created_at__gte":datetime.now()-timedelta(hours=2)}
+                exclude_dict = {'is_for_change_phone' : is_for_change_phone,"mobile_no":mobile_with_country_code, "otp":otp,"created_at__gte":datetime.now()-timedelta(hours=2)}
 
             otp_obj = SingUpOTP.objects.filter(**exclude_dict).order_by('-id')
             # if otp_obj:
@@ -2116,6 +2118,7 @@ def verify_otp(request):
                     userprofile = UserProfile.objects.get(user = user)
                     update_dict = {}
                     update_dict['mobile_no'] = mobile_no
+                    update_dict['country_code'] = country_code
                     Contact.objects.filter(contact_number=mobile_no).update(is_user_registered=True,user=user)
                     if user_ip:
                         user_ip_to_state_task.delay(user.id,user_ip)
@@ -3881,13 +3884,15 @@ def store_phone_book(request):
 def update_mobile_no(request):
     try:
         mobile_no = request.POST.get('mobile_no',None)
+        country_code = request.POST.get('country_code', '+91')
         if mobile_no:
-            old_otp = SingUpOTP.objects.filter(mobile_no=validate_indian_number(mobile_no).strip(),created_at__gte=datetime.now()-timedelta(minutes=5)).order_by('-id')
+            full_mobile_no = str(country_code)+str(mobile_no)
+            old_otp = SingUpOTP.objects.filter(mobile_no=full_mobile_no,created_at__gte=datetime.now()-timedelta(minutes=5)).order_by('-id')
             if old_otp:
                 return JsonResponse({'message':'otp send'}, status=status.HTTP_200_OK)
             else:
-                instance = SingUpOTP.objects.create(mobile_no=validate_indian_number(mobile_no).strip(),otp=generateOTP(6))
-                response, response_status = send_sms(instance.mobile_no, instance.otp)
+                instance = SingUpOTP.objects.create(mobile_no=full_mobile_no,otp=generateOTP(6))
+                response, response_status = send_sms(instance.full_mobile_no, instance.otp)
                 if not response_status:
                     instance.is_active=False
                     instance.save()
@@ -3903,9 +3908,10 @@ def update_mobile_no(request):
 def verify_otp_and_update_profile(request):
     try:
         mobile_no = validate_indian_number(request.POST.get('mobile_no',None))
-        country_code = request.POST.get('country_code', None)
+        country_code = request.POST.get('country_code', '+91')
+        full_mobile_no = str(country_code)+str(mobile_no)
         otp = request.POST.get('otp',None)
-        otp_obj = SingUpOTP.objects.filter(mobile_no=mobile_no,otp=otp,is_active=True).order_by('-id')
+        otp_obj = SingUpOTP.objects.filter(mobile_no=full_mobile_no,otp=otp,is_active=True).order_by('-id')
         if otp_obj:
             otp_obj=otp_obj[0]
             otp_obj.is_active = False
@@ -4122,4 +4128,22 @@ def get_user_details_from_topic_id(request):
     except Exception as e:
         return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+def get_user_last_vid_lang(request):
+    try:
+        user = request.user
 
+        if user:
+            all_vids = Topic.objects.filter(user=user).order_by('-date')
+
+            language = ''
+            if all_vids:
+                last_vid = all_vids[0]
+                language = last_vid.language_id
+
+            return JsonResponse({'language_id': language}, status=status.HTTP_200_OK)
+        else:        
+            return JsonResponse({'message': 'Invalid User'}, status=status.HTTP_204_NO_CONTENT)        
+
+    except Exception as e:
+        return JsonResponse({'message': str(e.message)}, status=status.HTTP_400_BAD_REQUEST)
