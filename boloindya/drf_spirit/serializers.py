@@ -98,6 +98,7 @@ class TopicSerializer(ModelSerializer):
     date = SerializerMethodField()
     video_cdn = SerializerMethodField()
     # m2mcategory = SerializerMethodField()
+    backup_url = SerializerMethodField()
 
     def __init__(self, *args, **kwargs):
         super(TopicSerializer, self).__init__(*args, **kwargs)
@@ -143,6 +144,11 @@ class TopicSerializer(ModelSerializer):
         else:
             return ''
 
+    def get_backup_url(self,instance):
+        if instance.question_video:
+            return instance.question_video
+        return ''
+
 class CommentSerializer(ModelSerializer):
     # user = UserReadOnlyField()
     user = SerializerMethodField()
@@ -178,6 +184,7 @@ class TopicSerializerwithComment(ModelSerializer):
     m3u8_content = SerializerMethodField()
     audio_m3u8_content = SerializerMethodField()
     video_m3u8_content = SerializerMethodField()
+    backup_url = SerializerMethodField()
     # m2mcategory = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
 
@@ -262,6 +269,11 @@ class TopicSerializerwithComment(ModelSerializer):
         else:
             return ''
 
+    def get_backup_url(self,instance):
+        if instance.question_video:
+            return instance.question_video
+        return ''
+
 class SingleTopicSerializerwithComment(ModelSerializer):
     user = SerializerMethodField()
     category = PresentableSlugRelatedField(queryset=Category.objects.all(),
@@ -276,6 +288,7 @@ class SingleTopicSerializerwithComment(ModelSerializer):
     m3u8_content = SerializerMethodField()
     audio_m3u8_content = SerializerMethodField()
     video_m3u8_content = SerializerMethodField()
+    backup_url = SerializerMethodField()
     # m2mcategory = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
 
@@ -337,6 +350,11 @@ class SingleTopicSerializerwithComment(ModelSerializer):
         else:
             return ''
 
+    def get_backup_url(self,instance):
+        if instance.question_video:
+            return instance.question_video
+        return ''
+
 class UserAnswerSerializerwithComment(ModelSerializer):
     user = SerializerMethodField()
     category = PresentableSlugRelatedField(queryset=Category.objects.all(),
@@ -351,6 +369,7 @@ class UserAnswerSerializerwithComment(ModelSerializer):
     m3u8_content = SerializerMethodField()
     audio_m3u8_content = SerializerMethodField()
     video_m3u8_content = SerializerMethodField()
+    backup_url = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
 
     def __init__(self, *args, **kwargs):
@@ -407,6 +426,11 @@ class UserAnswerSerializerwithComment(ModelSerializer):
             return instance.video_m3u8_content
         else:
             return ''
+
+    def get_backup_url(self,instance):
+        if instance.question_video:
+            return instance.question_video
+        return ''
 
 class UserProfileSerializer(ModelSerializer):
     follow_count= SerializerMethodField()
@@ -687,6 +711,7 @@ class CategoryVideoByteSerializer(ModelSerializer):
     m3u8_content = SerializerMethodField()
     audio_m3u8_content = SerializerMethodField()
     video_m3u8_content = SerializerMethodField()
+    backup_url = SerializerMethodField()
 
     def __init__(self, *args, **kwargs):
         super(CategoryVideoByteSerializer, self).__init__(*args, **kwargs)
@@ -750,6 +775,11 @@ class CategoryVideoByteSerializer(ModelSerializer):
             return instance.video_m3u8_content
         else:
             return ''
+
+    def get_backup_url(self,instance):
+        if instance.question_video:
+            return instance.question_video
+        return ''
 
 
 from django.core.paginator import Paginator
