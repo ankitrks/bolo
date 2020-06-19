@@ -40,7 +40,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
-from .models import UserJarvisDump, UserLogStatistics, UserFeedback, Campaign, Winner
+from .models import UserJarvisDump, UserLogStatistics, UserFeedback, Campaign, Winner, Country, State, City
 from .permissions import IsOwnerOrReadOnly
 from .utils import get_weight, add_bolo_score, shorcountertopic, calculate_encashable_details, state_language, language_options,short_time,\
     solr_object_to_db_object, solr_userprofile_object_to_db_object,get_paginated_data ,shortcounterprofile, get_ranked_topics
@@ -1412,9 +1412,9 @@ def createTopic(request):
     m3u8_url        = request.POST.get('m3u8_url')
     data_dump       = request.POST.get('data_dump')
     job_id          = request.POST.get('job_id')
-    category_id_m2m = request.POST.get('category_id_m2m', '')
+    categ_list      = request.POST.get('categ_list', '')
+    selected_lang   = request.POST.get('selected_language', '')
 
-    print(category_id_m2m, type(category_id_m2m))
     # media_file = request.FILES.get['media']
     # print media_file
 
@@ -1489,7 +1489,11 @@ def createTopic(request):
             provide_view_count(view_count,topic)
         except:
             pass
-        topic.m2mcategory.add(Category.objects.get(pk=category_id))
+        categories = filter(None, categ_list.split(','))
+        topic.m2mcategory.add(*categories)
+        topic.language_id = selected_lang
+        topic.location = get_location(request.POST.get('location_array', None))
+        # topic.m2mcategory.add(Category.objects.get(pk=category_id))
         if not is_vb:
             userprofile = UserProfile.objects.filter(user = request.user)
             userprofile.update(question_count = F('question_count')+1)
@@ -4139,6 +4143,7 @@ def get_user_last_vid_lang(request):
             language = ''
             if all_vids:
                 last_vid = all_vids[0]
+                print(last_vid.id)
                 language = last_vid.language_id
 
             return JsonResponse({'language_id': language}, status=status.HTTP_200_OK)
@@ -4147,3 +4152,68 @@ def get_user_last_vid_lang(request):
 
     except Exception as e:
         return JsonResponse({'message': str(e.message)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def set_location(request):
+    location_data = request.POST.get('location_array', None)
+    if location_data:
+        location_array = json.loads(location_data)
+        country_name = ''
+        state_name = ''
+        city_name = ''
+        city_id = ''
+        for obj in location_array:
+            location_obj = json.loads(obj)
+            level = location_obj.get('level')
+            name = location_obj.get('name')
+            place_id = location_obj.get('place_id')
+            if(level == 'country'):
+                country_name = name
+            elif(level == 'state'):
+                state_name = name
+            elif(level == 'city'):
+                city_name = name
+                city_id = place_id
+
+        if country_name:
+            country, created = Country.objects.get_or_create(name=country_name)
+            print(1, country, created)
+        if state_name:
+            state, created = State.objects.get_or_create(name=state_name, country=country) 
+            print(2, state, created)
+        if city_name:
+            city, created = City.objects.get_or_create(name=city_name, state=state, place_id=city_id)
+            print(4, city, created)
+    return JsonResponse({'message': 'done'}, status=status.HTTP_200_OK)        
+
+def get_location(location_data):
+    if location_data:
+        location_array = json.loads(location_data)
+        country_name = ''
+        state_name = ''
+        city_name = ''
+        city_id = ''
+        for obj in location_array:
+            location_obj = json.loads(obj)
+            level = location_obj.get('level')
+            name = location_obj.get('name')
+            place_id = location_obj.get('place_id')
+            if(level == 'country'):
+                country_name = name
+            elif(level == 'state'):
+                state_name = name
+            elif(level == 'city'):
+                city_name = name
+                city_id = place_id
+
+        if country_name:
+            country, created = Country.objects.get_or_create(name=country_name)
+            print(1, country, created)
+        if state_name:
+            state, created = State.objects.get_or_create(name=state_name, country=country) 
+            print(2, state, created)
+        if city_name:
+            city, created = City.objects.get_or_create(name=city_name, state=state, place_id=city_id)
+            print(4, city, created)
+            return city
+    return None        
