@@ -409,8 +409,7 @@ class UserFeedback(models.Model):
                 data={"from": "BoloIndya Support <support@boloindya.com>",
                       "to": ["support@boloindya.com"],
                       "cc":[self.contact_email],
-                      "bcc":["anshika@careeranna.com", "maaz@careeranna.com", \
-                            "ankit@careeranna.com", "gitesh@careeranna.com", "tanmai@boloindya.com"],
+                      "bcc":["anshika@careeranna.com", "gitesh@careeranna.com"],
                       "subject": "BoloIndya Feedback Received | " + self.user_name() + ' | ' + self.user_contact(),
                       "html": content_email
                 }
