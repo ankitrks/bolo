@@ -43,10 +43,27 @@ class TongueTwisterSerializer(ModelSerializer):
         fields = '__all__'
 
     def get_total_videos_count(self,instance):
-        return shorcountertopic(Topic.objects.filter(hash_tags=instance,is_vb=True,is_removed=False).count())
+        try:
+            if self.context.get("language_id"):
+                language_id =  self.context.get("language_id")
+                hash_tag_counter=HashtagViewCounter.objects.get(hashtag = instance, language = language_id)
+                return shorcountertopic(hash_tag_counter.video_count)
+            else:
+                return shorcountertopic(Topic.objects.filter(hash_tags=instance,is_vb=True,is_removed=False).count())
+        except Exception as e:
+            return shorcountertopic(Topic.objects.filter(hash_tags=instance,is_vb=True,is_removed=False).count())
+            # raise e
 
     def get_total_views(self,instance):
-        return shorcountertopic(instance.total_views)
+        try:
+            if self.context.get("language_id"):
+                language_id =  self.context.get("language_id")
+                hash_tag_counter=HashtagViewCounter.objects.get(hashtag = instance, language = language_id)
+                return shorcountertopic(hash_tag_counter.view_count)
+            else:
+                return shorcountertopic(instance.total_views)    
+        except Exception as e:
+            return shorcountertopic(instance.total_views)
 
 class TongueTwisterWithVideoByteSerializer(ModelSerializer):
     total_videos_count = SerializerMethodField()

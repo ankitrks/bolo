@@ -844,6 +844,7 @@ class SolrSearchHashTag(BoloIndyaGenericAPIView):
         hash_tags      = []
         search_term = self.request.GET.get('term')
         page = int(request.GET.get('page',1))
+        language_id = self.request.GET.get('language_id', 1)
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
         if search_term:
             sqs = SearchQuerySet().models(TongueTwister).raw_search('hash_tag:'+search_term)
@@ -858,7 +859,7 @@ class SolrSearchHashTag(BoloIndyaGenericAPIView):
                 hash_tags = solr_object_to_db_object(result_page[0].object_list)
             # hash_tags  = TongueTwister.objects.filter(hash_tag__icontains = search_term)
             next_page_number = page+1 if page_size*page<len(sqs) else ''
-            response ={"count":len(sqs),"results":TongueTwisterSerializer(hash_tags,many=True).data,"next_page_number":next_page_number} 
+            response ={"count":len(sqs),"results":TongueTwisterSerializer(hash_tags,many=True,context={'language_id':language_id}).data,"next_page_number":next_page_number} 
         return JsonResponse(response, safe = False)
 
 
