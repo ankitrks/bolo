@@ -1414,6 +1414,7 @@ def createTopic(request):
     job_id          = request.POST.get('job_id')
     categ_list      = request.POST.get('categ_list', '')
     selected_lang   = request.POST.get('selected_language', '')
+    location_array  = request.POST.get('location_array', None)
 
     # media_file = request.FILES.get['media']
     # print media_file
@@ -1460,6 +1461,9 @@ def createTopic(request):
             view_count = random.randint(1,5)
             topic.view_count = view_count
             topic.save()
+            categories = filter(None, categ_list.split(','))
+            topic.m2mcategory.add(*categories)
+            topic.location = get_location(location_array)
             vb_create_task.delay(topic.id)
             # topic.update_vb()
             tag_list=check_space_before_hash(title).split()
@@ -1492,9 +1496,6 @@ def createTopic(request):
             provide_view_count(view_count,topic)
         except:
             pass
-        categories = filter(None, categ_list.split(','))
-        topic.m2mcategory.add(*categories)
-        topic.location = get_location(request.POST.get('location_array', None))
         # topic.m2mcategory.add(Category.objects.get(pk=category_id))
         if not is_vb:
             userprofile = UserProfile.objects.filter(user = request.user)
@@ -4342,9 +4343,8 @@ def get_user_last_vid_lang(request):
         return JsonResponse({'message': str(e.message)}, status=status.HTTP_400_BAD_REQUEST)   
 
 def get_location(location_data):
-    print("1")
     if location_data:
-        print("2")
+        print("*****", 1)
         location_array = json.loads(location_data)
         country_name = ''
         state_name = ''
@@ -4373,4 +4373,5 @@ def get_location(location_data):
             city, created = City.objects.get_or_create(name=city_name, state=state, place_id=city_id)
             print(4, city, created)
             return city
-    return None        
+    else:
+        return None        
