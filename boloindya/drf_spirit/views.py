@@ -1445,7 +1445,10 @@ def createTopic(request):
             return JsonResponse({'message': 'Video Byte Created','topic':topic_json}, status=status.HTTP_201_CREATED)
     
     try:
-        topic.language_id   = request.user.st.language
+        if selected_lang:
+            topic.language_id   = selected_lang
+        else:
+            topic.language_id   = request.user.st.language    
         topic.category_id   = category_id
         topic.user_id       = user_id
         if is_vb:
@@ -1491,7 +1494,6 @@ def createTopic(request):
             pass
         categories = filter(None, categ_list.split(','))
         topic.m2mcategory.add(*categories)
-        topic.language_id = selected_lang
         topic.location = get_location(request.POST.get('location_array', None))
         # topic.m2mcategory.add(Category.objects.get(pk=category_id))
         if not is_vb:
@@ -1526,6 +1528,11 @@ def createTopic(request):
         notify_owner = Notification.objects.create(for_user = topic.user ,topic = topic,notification_type='6',user = topic.user)
         
         send_upload_video_notification.delay(data, {})
+        try:
+            c = topic.m2mcategory.all()
+            print(topic.location, c, topic.language_id, topic.id)
+        except Exception as e:
+            print(e)
         return JsonResponse({'message': message,'topic':topic_json}, status=status.HTTP_201_CREATED)
     except User.DoesNotExist:
         return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
@@ -1943,6 +1950,46 @@ class SingUpOTPView(generics.CreateAPIView):
     """
 
     def perform_create(self, serializer):
+        old_otp = SingUpOTP.objects.filter(mobile_no=validate_indian_number(serializer.validated_data['mobile_no']).strip(),created_at__gte=datetime.now()-timedelta(hours=2)).order_by('-id')
+        if old_otp:
+            instance=old_otp[0]
+            response, response_status   = send_sms(instance.mobile_no, instance.otp)
+            instance.api_response_dump  = response
+            instance.save()
+        else:
+            serializer.validated_data['mobile_no'] = validate_indian_number(serializer.validated_data['mobile_no']).strip()
+            instance        = serializer.save()
+            instance.otp    = generateOTP(6)
+            instance.save()
+            response, response_status   = send_sms(instance.mobile_no, instance.otp)
+            instance.api_response_dump  = response
+            instance.save()
+        # response, response_status   = send_sms(instance.mobile_no, instance.otp)
+        # instance.api_response_dump  = response
+        if self.request.POST.get('is_reset_password') and self.request.POST.get('is_reset_password') == '1':
+            instance.is_reset_password = True
+        if self.request.POST.get('is_for_change_phone') and self.request.POST.get('is_for_change_phone') == '1':
+            instance.is_for_change_phone = True
+        # if not response_status:
+        #     instance.is_active = False
+        # instance.save()
+        if not response_status:
+            return JsonResponse({'message': 'OTP could not be sent'}, status=status.HTTP_417_EXPECTATION_FAILED)
+        return JsonResponse({'message': 'OTP sent'}, status=status.HTTP_200_OK)
+
+
+class SingUpOTPCountryCodeView(generics.CreateAPIView):
+    permission_classes  = (AllowAny,)
+    serializer_class    = SingUpOTPSerializer
+
+    """
+    post:
+        Required Parameters
+        request.POST.get('is_reset_password')
+        request.POST.get('is_for_change_phone')
+    """
+
+    def perform_create(self, serializer):
         old_otp = SingUpOTP.objects.filter(mobile_no=serializer.validated_data['mobile_no'].strip(),created_at__gte=datetime.now()-timedelta(hours=2)).order_by('-id')
         if old_otp:
             instance=old_otp[0]
@@ -2058,6 +2105,104 @@ def get_user_bolo_info(request):
 
 @api_view(['POST'])
 def verify_otp(request):
+    """
+    post:
+        Required Parameters
+        mobile_no = request.POST.get('mobile_no', None)
+        otp = request.POST.get('otp', None)
+        request.POST.get('is_reset_password')
+        request.POST.get('is_for_change_phone')
+    """
+    mobile_no = validate_indian_number(request.POST.get('mobile_no', None)).strip()
+    language = request.POST.get('language','1')
+    otp = request.POST.get('otp', None)
+    is_geo_location = request.POST.get('is_geo_location',None)
+    lat = request.POST.get('lat',None)
+    lang = request.POST.get('lang',None)
+    click_id = request.POST.get('click_id',None)
+    user_ip = request.POST.get('user_ip',None)
+    is_reset_password = False
+    is_for_change_phone = False
+    all_category_follow = []
+    if request.POST.get('is_reset_password') and request.POST.get('is_reset_password') == '1':
+        is_reset_password = True # inverted because of exclude
+    if request.POST.get('is_for_change_phone') and request.POST.get('is_for_change_phone') == '1':
+        is_for_change_phone = True
+
+    if mobile_no and otp:
+        try:
+            # exclude_dict = {'is_active' : True, 'is_reset_password' : is_reset_password,"mobile_no":mobile_no, "otp":otp}
+            exclude_dict = {'is_reset_password' : is_reset_password,"mobile_no":mobile_no, "otp":otp,"created_at__gte":datetime.now()-timedelta(hours=2)}
+            if is_for_change_phone:
+                # exclude_dict = {'is_active' : True, 'is_for_change_phone' : is_for_change_phone,"mobile_no":mobile_no, "otp":otp}
+                exclude_dict = {'is_for_change_phone' : is_for_change_phone,"mobile_no":mobile_no, "otp":otp,"created_at__gte":datetime.now()-timedelta(hours=2)}
+
+            otp_obj = SingUpOTP.objects.filter(**exclude_dict).order_by('-id')
+            # if otp_obj:
+            #     otp_obj=otp_obj[0]
+            # otp_obj.is_active = False
+            # otp_obj.used_at = timezone.now()
+            otp_obj.update(used_at = timezone.now())
+            if not is_reset_password and not is_for_change_phone and otp_obj:
+                if mobile_no in ['7726080653']:
+                    return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
+                try:
+                    userprofile = UserProfile.objects.get(mobile_no = mobile_no)
+                except:
+                    try:
+                        userprofile = UserProfile.objects.get(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no)
+                    except MultipleObjectsReturned:
+                        userprofile = UserProfile.objects.filter(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no).order_by('id').last()
+                        is_created=False
+                    except:
+                        userprofile = None
+                if userprofile:
+                    if not userprofile.user.is_active:
+                        return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
+                    user = userprofile.user
+                    message = 'User Logged In'
+                else:
+                    user = User.objects.create(username = get_random_username())
+                    message = 'User created'
+                    userprofile = UserProfile.objects.get(user = user)
+                    update_dict = {}
+                    update_dict['mobile_no'] = mobile_no
+                    Contact.objects.filter(contact_number=mobile_no).update(is_user_registered=True,user=user)
+                    if user_ip:
+                        user_ip_to_state_task.delay(user.id,user_ip)
+                        # url = 'http://ip-api.com/json/'+user_ip
+                        # response = urllib2.urlopen(url).read()
+                        # json_response = json.loads(response)
+                        # userprofile.state_name = json_response['regionName']
+                        # userprofile.city_name = json_response['city']
+                    if str(is_geo_location) =="1":
+                        update_dict['lat'] = lat
+                        update_dict['lang'] = lang
+                    if click_id:
+                        save_click_id_response.delay(userprofile.id)
+                        # userprofile.click_id = click_id
+                        # click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
+                        # response = urllib2.urlopen(click_url).read()
+                        # userprofile.click_id_response = str(response)
+                    UserProfile.objects.filter(user = user).update(**update_dict)
+                    if str(language):
+                        default_follow = deafult_boloindya_follow.delay(user.id,str(language))
+                    add_bolo_score(user.id, 'initial_signup', userprofile)
+                user_tokens = get_tokens_for_user(user)
+                otp_obj.update(for_user = user)
+                # otp_obj.for_user = user
+                # otp_obj.save()
+                return JsonResponse({'message': message, 'username' : mobile_no, \
+                        'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+            otp_obj.save()
+            return JsonResponse({'message': 'OTP Validated', 'username' : mobile_no}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return JsonResponse({'message': 'No Mobile No / OTP provided'}, status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['POST'])
+def verify_otp_with_country_code(request):
     """
     post:
         Required Parameters
@@ -3888,6 +4033,49 @@ def store_phone_book(request):
 def update_mobile_no(request):
     try:
         mobile_no = request.POST.get('mobile_no',None)
+        if mobile_no:
+            old_otp = SingUpOTP.objects.filter(mobile_no=validate_indian_number(mobile_no).strip(),created_at__gte=datetime.now()-timedelta(minutes=5)).order_by('-id')
+            if old_otp:
+                return JsonResponse({'message':'otp send'}, status=status.HTTP_200_OK)
+            else:
+                instance = SingUpOTP.objects.create(mobile_no=validate_indian_number(mobile_no).strip(),otp=generateOTP(6))
+                response, response_status = send_sms(instance.mobile_no, instance.otp)
+                if not response_status:
+                    instance.is_active=False
+                    instance.save()
+                    return JsonResponse({'message': 'Error Occured: sms Api not working'}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    return JsonResponse({'message':'otp send'}, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'message': 'Error Occured: mobile_no empty'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def verify_otp_and_update_profile(request):
+    try:
+        mobile_no = validate_indian_number(request.POST.get('mobile_no',None))
+        otp = request.POST.get('otp',None)
+        otp_obj = SingUpOTP.objects.filter(mobile_no=mobile_no,otp=otp,is_active=True).order_by('-id')
+        if otp_obj:
+            otp_obj=otp_obj[0]
+            otp_obj.is_active = False
+            otp_obj.used_at = timezone.now()
+            otp_obj.for_user = request.user
+            otp_obj.save()
+            UserProfile.objects.filter(user=request.user).update(mobile_no=mobile_no)
+            userprofile=request.user.st
+            add_bolo_score(request.user.id, 'mobile_no_added', userprofile)
+            return JsonResponse({'message':'Mobile No updated','user':UserSerializer(request.user).data}, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def update_mobile_no_with_country_code(request):
+    try:
+        mobile_no = request.POST.get('mobile_no',None)
         country_code = request.POST.get('country_code', '+91')
         if mobile_no:
             full_mobile_no = str(country_code)+str(mobile_no)
@@ -3909,7 +4097,7 @@ def update_mobile_no(request):
         return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
-def verify_otp_and_update_profile(request):
+def verify_otp_and_update_profile_with_country_code(request):
     try:
         mobile_no = validate_indian_number(request.POST.get('mobile_no',None))
         country_code = request.POST.get('country_code', '+91')
@@ -4151,43 +4339,12 @@ def get_user_last_vid_lang(request):
             return JsonResponse({'message': 'Invalid User'}, status=status.HTTP_204_NO_CONTENT)        
 
     except Exception as e:
-        return JsonResponse({'message': str(e.message)}, status=status.HTTP_400_BAD_REQUEST)
-
-@api_view(['POST'])
-def set_location(request):
-    location_data = request.POST.get('location_array', None)
-    if location_data:
-        location_array = json.loads(location_data)
-        country_name = ''
-        state_name = ''
-        city_name = ''
-        city_id = ''
-        for obj in location_array:
-            location_obj = json.loads(obj)
-            level = location_obj.get('level')
-            name = location_obj.get('name')
-            place_id = location_obj.get('place_id')
-            if(level == 'country'):
-                country_name = name
-            elif(level == 'state'):
-                state_name = name
-            elif(level == 'city'):
-                city_name = name
-                city_id = place_id
-
-        if country_name:
-            country, created = Country.objects.get_or_create(name=country_name)
-            print(1, country, created)
-        if state_name:
-            state, created = State.objects.get_or_create(name=state_name, country=country) 
-            print(2, state, created)
-        if city_name:
-            city, created = City.objects.get_or_create(name=city_name, state=state, place_id=city_id)
-            print(4, city, created)
-    return JsonResponse({'message': 'done'}, status=status.HTTP_200_OK)        
+        return JsonResponse({'message': str(e.message)}, status=status.HTTP_400_BAD_REQUEST)   
 
 def get_location(location_data):
+    print("1")
     if location_data:
+        print("2")
         location_array = json.loads(location_data)
         country_name = ''
         state_name = ''
