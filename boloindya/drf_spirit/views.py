@@ -779,7 +779,7 @@ class SolrSearchTopic(BoloIndyaGenericAPIView):
     def get(self, request):
         topics      = []
         search_term = self.request.GET.get('term')
-        language_id = self.request.GET.get('language_id', 1)
+        language_id = self.request.GET.get('language_id')
         page = int(request.GET.get('page',1))
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
         is_expand=self.request.GET.get('is_expand',False)
@@ -797,7 +797,10 @@ class SolrSearchTopic(BoloIndyaGenericAPIView):
                 topics = solr_object_to_db_object(result_page[0].object_list)
             # topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True, language_id=language_id)
             next_page_number = page+1 if page_size*page<len(sqs) else ''
-            response ={"count":len(sqs),"results":TopicSerializerwithComment(topics,many=True,context={'is_expand':is_expand,'last_updated':last_updated}).data,"next_page_number":next_page_number} 
+            if language_id:
+                response ={"count":len(sqs),"results":TopicSerializerwithComment(topics,many=True,context={'is_expand':is_expand,'last_updated':last_updated}).data,"next_page_number":next_page_number} 
+            else:
+                response ={"count":len(sqs),"results":TopicSerializerwithComment(topics,many=True).data,"next_page_number":next_page_number} 
         return JsonResponse(response, safe = False)
 
 
