@@ -4085,7 +4085,7 @@ def update_mobile_no_with_country_code(request):
                 return JsonResponse({'message':'otp send'}, status=status.HTTP_200_OK)
             else:
                 instance = SingUpOTP.objects.create(mobile_no=full_mobile_no,otp=generateOTP(6))
-                response, response_status = send_sms(instance.full_mobile_no, instance.otp)
+                response, response_status = send_sms(instance.mobile_no, instance.otp)
                 if not response_status:
                     instance.is_active=False
                     instance.save()
