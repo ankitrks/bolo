@@ -8,6 +8,7 @@ import boto3
 import random
 import urllib2
 import itertools
+import requests
 from random import shuffle
 from collections import OrderedDict
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
@@ -1398,7 +1399,6 @@ def createTopic(request):
     title and category_id
 
     """
-
     topic           = Topic()
     user_id         = request.user.id
     title           = request.POST.get('title', '').strip()
@@ -1511,13 +1511,57 @@ def createTopic(request):
 
         notify_owner = Notification.objects.create(for_user = topic.user ,topic = topic,notification_type='6',user = topic.user)
         
-        #profanity check
-        profanity_check.delay(question_video, media_duration, topic.id, request.user.id)
-
-        send_upload_video_notification.delay(data, {})
+        # #profanity check
+        if not is_profane(question_video, media_duration, topic, request.user):
+            send_upload_video_notification.delay(data, {})
         return JsonResponse({'message': message,'topic':topic_json}, status=status.HTTP_201_CREATED)
     except User.DoesNotExist:
         return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+
+def is_profane(question_video, media_duration, topic, user):
+    from forum.topic.models import Topic
+    from django.contrib.auth.models import User
+    try:
+        print('============================')
+        url = 'https://990r5nk62j.execute-api.ap-south-1.amazonaws.com/v1/create-topic-and-profanity-check'
+        input_key = question_video.split(".amazonaws.com/")[1]
+        payload = {"input_key": input_key, "media_duration": media_duration}
+        response = requests.request("POST", url, headers = {}, data = json.dumps(payload), files = [],timeout=60)
+        if response.status_code == 200:
+            response = json.loads(response.text)
+            if response['is_profane']:
+                if response['is_violent']:
+                    topic.is_violent = True
+                    topic.violent_content = response['violent_content']
+                if response['is_adult']:
+                    topic.is_adult = True
+                    topic.adult_content = response['adult_content']
+
+                    #inactive user
+                    user.is_active = False
+                    user.save()
+                if response['logo_detected']:
+                    topic.logo_detected = True
+                    topic.plag_text = response['index_of_logo']
+                topic.save()
+
+                #notify user
+                topic.delete()
+
+                return True
+            else:
+                return False
+        else:
+            print(response.text)
+            print(response.status_code)
+            print("attempting again")
+            profanity_check.delay(question_video, media_duration, topic.id, user.id)
+            return False
+    except Exception as e:
+        print(str(e))
+        profanity_check.delay(question_video, media_duration, topic.id, user.id)
+        return False
+    print('============================')
 
 def provide_view_count(view_count,topic):
     all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)[:view_count]

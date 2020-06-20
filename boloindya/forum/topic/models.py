@@ -181,7 +181,6 @@ class Topic(RecordTimeStamp):
     is_adult = models.BooleanField(default=False)
     adult_content = models.PositiveIntegerField(null=True,blank=True,default=0)
     logo_detected = models.BooleanField(default=False)
-    profnity_retry = models.PositiveIntegerField(null=True,blank=True,default=2)
 
     def __unicode__(self):
         return self.title
