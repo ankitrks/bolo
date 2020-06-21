@@ -157,6 +157,7 @@ class Topic(RecordTimeStamp):
     boosted_till = models.PositiveIntegerField(_("boost hrs"),null=True,blank=True,default=0)
     boosted_start_time = models.DateTimeField(null=True,blank=True)
     boosted_end_time = models.DateTimeField(null=True,blank=True)
+    location = models.ForeignKey(to='drf_spirit.City', blank = True, null = True, related_name='topic_location')
     
     plag_text_options = (
         ('0', "TikTok"),
