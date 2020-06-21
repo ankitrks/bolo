@@ -779,7 +779,7 @@ class SolrSearchTopic(BoloIndyaGenericAPIView):
     def get(self, request):
         topics      = []
         search_term = self.request.GET.get('term')
-        language_id = self.request.GET.get('language_id', 1)
+        language_id = self.request.GET.get('language_id')
         page = int(request.GET.get('page',1))
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
         is_expand=self.request.GET.get('is_expand',False)
@@ -797,7 +797,10 @@ class SolrSearchTopic(BoloIndyaGenericAPIView):
                 topics = solr_object_to_db_object(result_page[0].object_list)
             # topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True, language_id=language_id)
             next_page_number = page+1 if page_size*page<len(sqs) else ''
-            response ={"count":len(sqs),"results":TopicSerializerwithComment(topics,many=True,context={'is_expand':is_expand,'last_updated':last_updated}).data,"next_page_number":next_page_number} 
+            if language_id:
+                response ={"count":len(sqs),"results":TopicSerializerwithComment(topics,many=True,context={'is_expand':is_expand,'last_updated':last_updated}).data,"next_page_number":next_page_number} 
+            else:
+                response ={"count":len(sqs),"results":TopicSerializerwithComment(topics,many=True).data,"next_page_number":next_page_number} 
         return JsonResponse(response, safe = False)
 
 
@@ -844,6 +847,7 @@ class SolrSearchHashTag(BoloIndyaGenericAPIView):
         hash_tags      = []
         search_term = self.request.GET.get('term')
         page = int(request.GET.get('page',1))
+        language_id = self.request.GET.get('language_id', 1)
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
         if search_term:
             sqs = SearchQuerySet().models(TongueTwister).raw_search('hash_tag:'+search_term)
@@ -858,7 +862,7 @@ class SolrSearchHashTag(BoloIndyaGenericAPIView):
                 hash_tags = solr_object_to_db_object(result_page[0].object_list)
             # hash_tags  = TongueTwister.objects.filter(hash_tag__icontains = search_term)
             next_page_number = page+1 if page_size*page<len(sqs) else ''
-            response ={"count":len(sqs),"results":TongueTwisterSerializer(hash_tags,many=True).data,"next_page_number":next_page_number} 
+            response ={"count":len(sqs),"results":TongueTwisterSerializer(hash_tags,many=True,context={'language_id':language_id}).data,"next_page_number":next_page_number} 
         return JsonResponse(response, safe = False)
 
 
@@ -1409,15 +1413,9 @@ def createTopic(request):
     vb_width        = request.POST.get('vb_width',0)
     vb_height       = request.POST.get('vb_height',0)
     question_video  = request.POST.get('question_video')
-    m3u8_url        = request.POST.get('m3u8_url')
-    data_dump       = request.POST.get('data_dump')
-    job_id          = request.POST.get('job_id')
     categ_list      = request.POST.get('categ_list', '')
     selected_lang   = request.POST.get('selected_language', '')
     location_array  = request.POST.get('location_array', None)
-
-    # media_file = request.FILES.get['media']
-    # print media_file
 
     if title:
         topic.title          = (title[0].upper()+title[1:]).strip()
@@ -1428,19 +1426,14 @@ def createTopic(request):
         topic.safe_backup_url = question_video
         topic.backup_url      = question_video
 
-    if m3u8_url:
-        topic.question_video = m3u8_url
-        topic.transcode_dump = data_dump
-        topic.transcode_job_id = job_id
-        topic.is_transcoded = True
-    else:
-        topic.question_video = request.POST.get('question_video')
+    
+    topic.question_video = request.POST.get('question_video')
 
     if request.POST.get('question_image'):
         topic.question_image = request.POST.get('question_image')
 
-    if m3u8_url and question_video and not request.user.st.is_test_user:
-        already_exist_topic = Topic.objects.filter(Q(question_video=m3u8_url)|Q(backup_url=question_video))
+    if question_video and not request.user.st.is_test_user:
+        already_exist_topic = Topic.objects.filter(Q(question_video=question_video)|Q(backup_url=question_video))
         if already_exist_topic:
             topic_json = TopicSerializerwithComment(already_exist_topic[0], context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data
             return JsonResponse({'message': 'Video Byte Created','topic':topic_json}, status=status.HTTP_201_CREATED)
@@ -1525,7 +1518,7 @@ def createTopic(request):
         data['image_url'] = ''
         data['days_ago'] = ''
 
-        topic.update_m3u8_content()
+        # topic.update_m3u8_content()
         notify_owner = Notification.objects.create(for_user = topic.user ,topic = topic,notification_type='6',user = topic.user)
         
         send_upload_video_notification.delay(data, {})
