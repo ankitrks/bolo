@@ -133,7 +133,6 @@ def extract_minmax_delta(log_text_dump, userid):
 		video_triple[curr_state]=curr_stamp
 		video_triple['video_byte_id']=curr_videoid
 		uniq_video_records[j] = video_triple 
-		#print(uniq_video_records)
 	for key,val in uniq_video_records.items():
 		v_id = val['video_byte_id']
 		v_triplet = val
@@ -194,7 +193,7 @@ def extract_minmax_delta(log_text_dump, userid):
 			data_iter = [str(i) for i in data_iter]
 			if(len(data_iter)>0):
 				complete_data.append(data_iter)
-		
+	
 # func for writing data into csv
 def write_csv():
 	headers = ['User', 'Video title', 'Player Ready', 'Time Played','StartPlayingcdn','StartPlayingcache','StartPlaying', 'Network','Device Model','Manufacturer','Play Date Time']
@@ -219,25 +218,19 @@ def send_file_mail():
 	msg["From"] = emailfrom
 	msg["To"] = emailto
 	msg["Subject"] = "Bolo Indya: Weekly users buffering report date: " + str(datetime.now().date())
-	msg.preamble = ""
-
-	ctype, encoding = mimetypes.guess_type(filetosend)
-	if(ctype is None or encoding is not None):
-		ctype = "application/octet-stream"
-
-	maintype, subtype = ctype.split("/", 1)
-	fp = open(filetosend, "rb")
-	attachment = MIMEBase(maintype, subtype)
-	attachment.set_payload(fp.read())
-	fp.close()
-	encoders.encode_base64(attachment)
-	attachment.add_header("Content-Disposition", "attachment", filename = 'buffering-report-boloindya-' + str(datetime.now().date()))
-	msg.attach(attachment)
-
+	msg.preamble = ""	
+	attachment = open(filetosend, "rb") 
+	file_stream = MIMEBase('application', 'octet-stream') 
+	body = 'PFA the file'
+	msg.attach(MIMEText(body, 'plain')) 
+	file_stream.set_payload((attachment).read()) 
+	encoders.encode_base64(file_stream) 
+	file_stream.add_header('Content-Disposition', "attachment; filename= %s" % filetosend) 
+	msg.attach(file_stream)
 	server = smtplib.SMTP("smtp.gmail.com:587")
 	server.starttls()
 	server.login(username, password)
-	server.sendmail(emailfrom, [emailto,'ankit@careeranna.com,varun@careeranna.com,gitesh@careeranna.com,maaz@careeranna.com'], msg.as_string())
+	server.sendmail(emailfrom, [emailto, 'ankit@careeranna.com', 'varun@careeranna.com', 'gitesh@careeranna.com' , 'maaz@careeranna.com', 'gaurang.s@boloindya.com', 'akash.u@boloindya.com'], msg.as_string())	
 	server.quit()
 
 def main():
@@ -254,16 +247,15 @@ def main():
 	# fetch recrods bw last monday and monday of this week
 
 
-	#print some_day_last_week
-	#print monday_of_last_week
-	#print monday_of_this_week
+	# print some_day_last_week
+	# print monday_of_last_week
+	# print monday_of_this_week
 	android_logs = AndroidLogs.objects.filter(created_at__gte = monday_of_last_week, created_at__lte = monday_of_this_week)
-
+	
 	for each_android in android_logs:
 		try:
 			each_android_dump = ast.literal_eval(each_android.logs)
 			#each_android_dump = each_android.logs
-			#print(each_android_dump, type(each_android_dump))
 			userid = each_android.user_id
 			if(type(each_android_dump).__name__ == 'list'):
 				# it is a nromal log
@@ -271,11 +263,8 @@ def main():
 				extract_minmax_delta(each_android_dump, userid)
 		except Exception as e:
 			count=0
-
 	write_csv()
 	send_file_mail()
-
-
 
 def run():
 	main()
