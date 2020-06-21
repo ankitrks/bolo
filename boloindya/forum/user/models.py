@@ -11,7 +11,7 @@ from django.utils import timezone
 from ..core.conf import settings
 from ..core.utils.models import AutoSlugField
 from tinymce.models import HTMLField
-from drf_spirit.utils import language_options,month_choices
+from drf_spirit.utils import language_options,month_choices, salary_choices
 from django.db.models import F,Q
 from diff_model import ModelDiffMixin
 
@@ -103,6 +103,7 @@ class UserProfile(models.Model,ModelDiffMixin):
     android_did = models.CharField(_('android_did'),max_length=200,null=True,blank=True)
     is_guest_user = models.BooleanField(default=False)
     country_code = models.CharField(_("Country Phone Code"), max_length=20, blank = True, null = True)
+    salary_range = models.CharField(choices=salary_choices, blank = True, null = True, max_length=10,db_index=True)
 
     class Meta:
         verbose_name = _("user profile")

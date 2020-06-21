@@ -2366,9 +2366,10 @@ def fb_profile_settings(request):
     refrence        = request.POST.get('refrence',None)
     extra_data      = request.POST.get('extra_data',None)
     activity        = request.POST.get('activity',None)
+    salary_range    = request.POST.get('salary_range',None)
     language        = request.POST.get('language','1')
     is_geo_location = request.POST.get('is_geo_location',None)
-    likedin_url = request.POST.get('likedin_url',None)
+    linkedin_url = request.POST.get('likedin_url',None)
     instagarm_id = request.POST.get('instagarm_id',None)
     twitter_id = request.POST.get('twitter_id',None)
     d_o_b = request.POST.get('d_o_b',None)
@@ -2433,7 +2434,7 @@ def fb_profile_settings(request):
                 update_dict['extra_data'] = extra_data
                 update_dict['user'] = user
                 update_dict['bolo_score'] = 95
-                update_dict['linkedin_url'] = likedin_url
+                update_dict['linkedin_url'] = linkedin_url
                 update_dict['twitter_id'] = twitter_id
                 update_dict['instagarm_id'] = instagarm_id
 
@@ -2505,9 +2506,10 @@ def fb_profile_settings(request):
                 update_dict['extra_data'] = extra_data
                 update_dict['user'] = user
                 update_dict['bolo_score'] = 95
-                update_dict['linkedin_url'] = likedin_url
+                update_dict['linkedin_url'] = linkedin_url
                 update_dict['twitter_id'] = twitter_id
                 update_dict['instagarm_id'] = instagarm_id
+                update_dict['salary_range'] = salary_range
 
                 # userprofile.follow_count += 1
                 if str(is_geo_location) =="1":
@@ -2533,9 +2535,12 @@ def fb_profile_settings(request):
             try:
                 userprofile = UserProfile.objects.get(user = request.user)
                 update_dict = {}
-                update_dict['name']= name
-                update_dict['bio'] = bio
-                update_dict['about'] = about
+                if name:
+                    update_dict['name']= name
+                if bio:
+                    update_dict['bio'] = bio
+                if about:    
+                    update_dict['about'] = about
                 if not userprofile.d_o_b and d_o_b:
                     add_bolo_score(userprofile.user.id, 'dob_added', userprofile)
                 update_dict['d_o_b'] = d_o_b
@@ -2552,12 +2557,20 @@ def fb_profile_settings(request):
                     # json_response = json.loads(response)
                     # userprofile.state_name = json_response['regionName']
                     # userprofile.city_name = json_response['city']
-                update_dict['gender'] = gender
-                update_dict['profile_pic'] =profile_pic
-                update_dict['cover_pic']=cover_pic
-                update_dict['linkedin_url'] = likedin_url
-                update_dict['twitter_id'] = twitter_id
-                update_dict['instagarm_id'] = instagarm_id
+                if gender:    
+                    update_dict['gender'] = gender
+                if profile_pic:    
+                    update_dict['profile_pic'] =profile_pic
+                if cover_pic:    
+                    update_dict['cover_pic']=cover_pic
+                if linkedin_url:    
+                    update_dict['linkedin_url'] = linkedin_url
+                if twitter_id:    
+                    update_dict['twitter_id'] = twitter_id
+                if instagarm_id:    
+                    update_dict['instagarm_id'] = instagarm_id
+                if salary_range:    
+                    update_dict['salary_range'] = salary_range
                 if username:
                     if not check_username_valid(username):
                         return JsonResponse({'message': 'Username Invalid. It can contains only lower case letters,numbers and special character[ _ - .]'}, status=status.HTTP_200_OK)
@@ -2577,7 +2590,7 @@ def fb_profile_settings(request):
             try:
                 userprofile = UserProfile.objects.get(user = request.user)
                 update_dict = {}
-                update_dict['linkedin_url'] = likedin_url
+                update_dict['linkedin_url'] = linkedin_url
                 update_dict['twitter_id'] = twitter_id
                 update_dict['instagarm_id'] = instagarm_id
                 if sub_category_prefrences:
