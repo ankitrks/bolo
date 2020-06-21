@@ -151,9 +151,9 @@ class TopicSerializer(ModelSerializer):
 
     def get_video_cdn(self,instance):
         if instance.question_video:
-            cloufront_url = "https://d1fa4tg1fvr6nj.cloudfront.net"
+            cloufront_url = settings.US_CDN_URL
             if 'in-boloindya' in instance.question_video:
-                cloufront_url = "https://d7lk2jr51sych.cloudfront.net"
+                cloufront_url = settings.IN_CDN_URL
             regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
             find_urls_in_string = re.compile(regex, re.IGNORECASE)
             url = find_urls_in_string.search(instance.question_video)
@@ -258,9 +258,9 @@ class TopicSerializerwithComment(ModelSerializer):
 
     def get_video_cdn(self,instance):
         if instance.question_video:
-            cloufront_url = "https://d1fa4tg1fvr6nj.cloudfront.net"
+            cloufront_url = settings.US_CDN_URL
             if 'in-boloindya' in instance.question_video:
-                cloufront_url = "https://d7lk2jr51sych.cloudfront.net"
+                cloufront_url = settings.IN_CDN_URL
             regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
             find_urls_in_string = re.compile(regex, re.IGNORECASE)
             url = find_urls_in_string.search(instance.question_video)
@@ -765,9 +765,9 @@ class CategoryVideoByteSerializer(ModelSerializer):
 
     def get_video_cdn(self,instance):
         if instance.question_video:
-            cloufront_url = "https://d1fa4tg1fvr6nj.cloudfront.net"
+            cloufront_url = settings.US_CDN_URL
             if 'in-boloindya' in instance.question_video:
-                cloufront_url = "https://d7lk2jr51sych.cloudfront.net"
+                cloufront_url = settings.IN_CDN_URL
             regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
             find_urls_in_string = re.compile(regex, re.IGNORECASE)
             url = find_urls_in_string.search(instance.question_video)

@@ -39,7 +39,6 @@ from drf_spirit.models import MonthlyActiveUser, HourlyActiveUser, DailyActiveUs
 from forum.category.models import Category
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.conf import settings
 from django.http import JsonResponse
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
@@ -1058,7 +1057,7 @@ def update_careeranna_db(uploaded_video):
     regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
     find_urls_in_string = re.compile(regex, re.IGNORECASE)
     url = find_urls_in_string.search(uploaded_video.transcoded_file_url)
-    video_url = str(uploaded_video.transcoded_file_url.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
+    video_url = str(uploaded_video.transcoded_file_url.replace(str(url.group()), settings.US_CDN_URL))
     import requests
     headers = {'X-API-TOKEN': 'your_token_here'}
     if uploaded_video.is_active:

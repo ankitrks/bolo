@@ -538,6 +538,13 @@ BOLOINDYA_AWS_SECRET_ACCESS_KEY_TS = 'Odl4xfZTJZM0mq89XtNXf95g2zY8NwRuhp5+zp87'
 BOLOINDYA_AWS_BUCKET_NAME_TS = 'boloindya-et'
 LAMBDA_ET_IDENTIFIER = ['/elastic-transcoder/lambda/et/']
 AMAZON_ET_IDENTIFIER = ['/elastic-transcoder/lambda/aws_et/']
+
+#### CDN Settings ######
+US_CDN_URL = "https://d1fa4tg1fvr6nj.cloudfront.net" # Amazon CloudFront US
+# IN_CDN_URL = "https://d7lk2jr51sych.cloudfront.net" # Amazon CloudFront IN
+IN_CDN_URL = "https://1070250973.rsc.cdn77.org" # CDN77 IN
+#### CDN Settings ######
+
 #### Transcoder settings #####
 
 #####CareerAnna ######
