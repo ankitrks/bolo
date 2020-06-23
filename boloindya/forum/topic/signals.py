@@ -48,9 +48,9 @@ def save_follow(sender, instance,created, **kwargs):
 def save_like(sender, instance,created, **kwargs):
     try:
         if created:
-            # if instance.comment:
+            # if instance.comment and not instance.comment.user == instance.user:
             #   notify = Notification.objects.create(for_user = instance.comment.user, topic = instance,notification_type='5',user = instance.user)
-            if instance.topic:
+            if instance.topic and not instance.topic.user == instance.user:
                 notify = Notification.objects.create(for_user = instance.topic.user, topic = instance,notification_type='5',user = instance.user)
     except Exception as e:
         pass

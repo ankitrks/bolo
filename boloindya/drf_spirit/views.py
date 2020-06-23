@@ -1207,8 +1207,8 @@ def replyOnTopic(request):
                 comment.comment = hashtagged_title.strip()
                 comment.comment_html = hashtagged_title.strip()
                 comment.save()
-            if username_list:
-                send_notification_to_mentions(username_list,comment)
+            # if username_list:
+            #     send_notification_to_mentions(username_list,comment)
             topic = Topic.objects.get(pk = topic_id)
             topic.comment_count = F('comment_count')+1
             topic.last_commented = timezone.now()
@@ -1277,7 +1277,9 @@ def get_mentions(comment):
 def send_notification_to_mentions(username_list,comment_obj):
     for each_username in username_list:
         try:
-            notify_mention = Notification.objects.create(for_user = User.objects.get(username=each_username) ,topic = comment_obj,notification_type='10',user = comment_obj.user)
+            user = User.objects.get(username=each_username)
+            if not user == comment_obj.user:
+                notify_mention = Notification.objects.create(for_user = user ,topic = comment_obj,notification_type='10',user = comment_obj.user)
         except:
             pass
 
