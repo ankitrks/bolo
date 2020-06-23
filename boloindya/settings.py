@@ -310,16 +310,14 @@ TEMPLATES[0]['OPTIONS']['context_processors'] += [
     
 # ]
 
+
 HAYSTACK_CONNECTIONS = {
-    'default': {
-        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
-        'URL': 'http://127.0.0.1:8983/solr/boloindya',                 # Assuming you created a core named 'boloindya'
-        'ADMIN_URL': 'http://127.0.0.1:8983/solr/admin/cores',
-        'INCLUDE_SPELLING': True,
-        # # ...or for multicore...
-        # # 'URL': 'http://127.0.0.1:8983/solr/mysite',
-    },
-}
+              'default': {
+                    'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+                    'URL': 'http://127.0.0.1:9200/',
+                    'INDEX_NAME': 'boloindya',
+              },
+    }
 
 HAYSTACK_SIGNAL_PROCESSOR = 'forum.search.signals.RealtimeSignalProcessor'
 
