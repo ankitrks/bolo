@@ -5,9 +5,9 @@ from django.core.mail import send_mail
 from django.conf import settings
 import os
 from datetime import datetime, timedelta
-from HTMLParser import HTMLParser
-from django.contrib.auth.models import User
-from forum.topic.models import Notification
+# from HTMLParser import HTMLParser
+# from django.contrib.auth.models import User
+# from forum.topic.models import Notification
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 logger = get_task_logger(__name__)
@@ -277,6 +277,7 @@ def create_comment_notification(created,instance_id):
         print e
         pass
 
+from HTMLParser import HTMLParser
 class MLStripper(HTMLParser):
     def __init__(self):
         self.reset()
@@ -292,6 +293,8 @@ def strip_tags(html):
     return s.get_data()
 
 def get_mentions_and_send_notification(comment_obj):
+    from django.contrib.auth.models import User
+    from forum.topic.models import Notification
     comment = strip_tags(comment_obj.comment)
     mention_tag=[mention for mention in comment.split() if mention.startswith("@")]
     user_ids = []
