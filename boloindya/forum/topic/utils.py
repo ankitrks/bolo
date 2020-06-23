@@ -35,7 +35,7 @@ def get_redis_vb_seen(user_id):
     vb_seen_list = get_redis(key)
     if not vb_seen_list:
         vb_seen_list = list(VBseen.objects.filter(user_id = user_id).distinct('topic_id').values_list('topic_id', flat = True))
-        set_redis(key, vb_seen_list)
+        set_redis(key, vb_seen_list, False)
     return vb_seen_list
 
 def update_redis_vb_seen(user_id, topic_id):
@@ -45,7 +45,7 @@ def update_redis_vb_seen(user_id, topic_id):
         vb_seen_list = list(VBseen.objects.filter(user_id = user_id).distinct('topic_id').values_list('topic_id', flat = True))
     if int(topic_id) not in vb_seen_list:
         vb_seen_list.append(int(topic_id))
-    set_redis(key, vb_seen_list)
+    set_redis(key, vb_seen_list, False)
 
 def get_ranking_feature_weight(feature):
     ranking_feature, is_created = RankingWeight.objects.get_or_create(features = feature)
@@ -163,7 +163,7 @@ def update_redis_paginated_data(key, query, cache_max_pages = settings.CACHE_MAX
                     final_data['remaining'] = {'remaining_count' : remaining_count, 'last_page' : page - 1}
                     page = None
                 page = None
-    set_redis(key, final_data)
+    set_redis(key, final_data, True)
     if key:
         return get_redis(key)
     return final_data
