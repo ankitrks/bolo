@@ -312,12 +312,12 @@ TEMPLATES[0]['OPTIONS']['context_processors'] += [
 
 
 HAYSTACK_CONNECTIONS = {
-              'default': {
-                    'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
-                    'URL': 'http://127.0.0.1:9200/',
-                    'INDEX_NAME': 'boloindya',
-              },
-    }
+      'default': {
+            'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+            'URL': 'http://127.0.0.1:9200/',
+            'INDEX_NAME': 'boloindya',
+      },
+}
 
 HAYSTACK_SIGNAL_PROCESSOR = 'forum.search.signals.RealtimeSignalProcessor'
 
@@ -540,7 +540,8 @@ AMAZON_ET_IDENTIFIER = ['/elastic-transcoder/lambda/aws_et/']
 #### CDN Settings ######
 US_CDN_URL = "https://d1fa4tg1fvr6nj.cloudfront.net" # Amazon CloudFront US
 # IN_CDN_URL = "https://d7lk2jr51sych.cloudfront.net" # Amazon CloudFront IN
-IN_CDN_URL = "https://1070250973.rsc.cdn77.org" # CDN77 IN
+# IN_CDN_URL = "https://1070250973.rsc.cdn77.org" # CDN77 IN
+IN_CDN_URL = "http://storage.boloindya.com" # Akamai CDN IN
 #### CDN Settings ######
 
 #### Transcoder settings #####
