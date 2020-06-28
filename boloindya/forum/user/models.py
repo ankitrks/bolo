@@ -346,6 +346,14 @@ class Contact(RecordTimeStamp):
     def __unicode__(self):
         return self.contact_name
 
+class DUser(models.Model):
+    name = models.CharField(_("Name"), max_length=100, blank=True, null = True)
+    gender = models.CharField(choices=gender_option, blank = True, null = True, max_length=10, default='')
+    is_used = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return self.name
+
 
 
 

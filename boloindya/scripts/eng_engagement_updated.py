@@ -14,6 +14,8 @@ import pandas as pd
 import gc
 import decimal
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
+from drf_spirit.utils import create_random_user
+
 
 def run():
     counter_objects_created=0
@@ -342,10 +344,16 @@ def check_follower(topic_id,user_ids):
         required_follower = 1
 
     follower_counter = 0
-    while(follower_counter<required_follower):
-        opt_action_user_id = random.choice(user_ids)
-        action_follow(opt_action_user_id,topic.user.id)
-        follower_counter+=1
+    all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).exclude(user_id__in=get_redis_follower(topic.user.id)).values_list('user_id',flat=True)[:required_follower]
+    if len(all_test_userprofile_id) < required_follower:
+        print 'user_created:',required_follower-len(all_test_userprofile_id)
+        create_random_user(required_follower-len(all_test_userprofile_id))
+        all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).exclude(user_id__in=get_redis_follower(topic.user.id)).values_list('user_id',flat=True)[:required_follower]
+    user_ids = list(all_test_userprofile_id)
+    for each_user_id in user_ids:
+        status = action_follow(each_user_id,topic.user.id)
+        if status:
+            follower_counter+=1
 
 #comment
 def action_comment(user_id,topic_id):
