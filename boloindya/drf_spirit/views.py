@@ -1546,7 +1546,7 @@ def invoke_watermark_service(topic, user):
         username  = user.username
         user_id = user.id
         duration = topic.media_duration
-        payload = {"input_key": input_key, "topic_id": topic_id, "username": username,"user_id":user_id,"duration":media_duration}
+        payload = {"input_key": input_key, "topic_id": topic_id, "username": username,"user_id":user_id,"duration":duration}
         response = requests.request("POST", url, headers = {}, data = json.dumps(payload), files = [],timeout=60)
         print(response)
         if response.status_code == 200:
