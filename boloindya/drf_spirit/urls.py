@@ -166,4 +166,6 @@ urlpatterns = [
     url(r'^report/$', report,name='report'),
     url(r'^get_campaigns/$', get_campaigns,name='get_campaigns'),
     url(r'^get_user_details_from_topic_id/$', get_user_details_from_topic_id,name='get_user_details_from_topic_id'),
+    url(r'^update_download_url_in_topic/',update_download_url_in_topic,name='update_download_url_in_topic'),
+    url(r'^update_profanity_details/',update_profanity_details,name='update_profanity_details')
 ]

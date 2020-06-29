@@ -58,7 +58,7 @@ from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
 from forum.user.utils.bolo_redis import get_bolo_info_combined
 from .serializers import *
-from tasks import vb_create_task,user_ip_to_state_task,sync_contacts_with_user,cache_follow_post,cache_popular_post, deafult_boloindya_follow, save_click_id_response, send_upload_video_notification, profanity_check
+from tasks import vb_create_task,user_ip_to_state_task,sync_contacts_with_user,cache_follow_post,cache_popular_post, deafult_boloindya_follow, save_click_id_response, send_upload_video_notification
 from haystack.query import SearchQuerySet, SQ
 from django.core.exceptions import MultipleObjectsReturned
 from forum.topic.utils import get_redis_category_paginated_data,get_redis_hashtag_paginated_data,get_redis_language_paginated_data,get_redis_follow_paginated_data, get_popular_paginated_data
@@ -1511,57 +1511,32 @@ def createTopic(request):
 
         notify_owner = Notification.objects.create(for_user = topic.user ,topic = topic,notification_type='6',user = topic.user)
         
-        # #profanity check
-        if not is_profane(question_video, media_duration, topic, request.user):
-            send_upload_video_notification.delay(data, {})
+        send_upload_video_notification.delay(data, {})
+        #invoke watermark
+        invoke_watermark_service(topic, request.user)
+
         return JsonResponse({'message': message,'topic':topic_json}, status=status.HTTP_201_CREATED)
     except User.DoesNotExist:
         return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
-def is_profane(question_video, media_duration, topic, user):
-    from forum.topic.models import Topic
-    from django.contrib.auth.models import User
+def invoke_watermark_service(topic, user):
     try:
-        print('============================')
-        url = 'https://990r5nk62j.execute-api.ap-south-1.amazonaws.com/v1/create-topic-and-profanity-check'
-        input_key = question_video.split(".amazonaws.com/")[1]
-        payload = {"input_key": input_key, "media_duration": media_duration}
+        url = "https://92scj7hqac.execute-api.ap-south-1.amazonaws.com/v1/invoke-watermark"
+        topic_id = topic.id
+        input_key = topic.question_video.split(".amazonaws.com/")[1]
+        username  = user.username
+        user_id = user.id
+        duration = topic.media_duration
+        payload = {"input_key": input_key, "topic_id": topic_id, "username": username,"user_id":user_id,"duration":media_duration}
         response = requests.request("POST", url, headers = {}, data = json.dumps(payload), files = [],timeout=60)
+        print(response)
         if response.status_code == 200:
-            response = json.loads(response.text)
-            if response['is_profane']:
-                if response['is_violent']:
-                    topic.is_violent = True
-                    topic.violent_content = response['violent_content']
-                if response['is_adult']:
-                    topic.is_adult = True
-                    topic.adult_content = response['adult_content']
-
-                    #inactive user
-                    user.is_active = False
-                    user.save()
-                if response['logo_detected']:
-                    topic.logo_detected = True
-                    topic.plag_text = response['index_of_logo']
-                topic.save()
-
-                #notify user
-                topic.delete()
-
-                return True
-            else:
-                return False
+            print("success")
         else:
-            print(response.text)
-            print(response.status_code)
-            print("attempting again")
-            profanity_check.delay(question_video, media_duration, topic.id, user.id)
-            return False
+            print("failure")
     except Exception as e:
-        print(str(e))
-        profanity_check.delay(question_video, media_duration, topic.id, user.id)
-        return False
-    print('============================')
+        print("Exception raised {}".format(e))
+
 
 def provide_view_count(view_count,topic):
     all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)[:view_count]
@@ -4164,5 +4139,57 @@ def get_user_details_from_topic_id(request):
         return JsonResponse({"data": UserSerializer(topic.user).data })
     except Exception as e:
         return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def update_profanity_details(request):
+    try:
+        is_adult = request.POST.get('is_adult',False)
+        is_profane = request.POST.get('is_profane',False)
+        is_violent = request.POST.get('is_violent',False)
+        topic_id = request.POST.get('topic_id',None)
+        user_id = request.POST.get('user_id',None)
+        adult_content = request.POST.get('adult_content',1)
+        violent_content = request.POST.get('violent_content',1)
+        profanity_collage_url = request.POST.get('profanity_collage_url','')
+        topic = Topic.objects.get(pk=topic_id)
+        if is_profane:
+            if is_adult:
+                user = User.objects.get(pk=user_id)
+                topic.is_adult = True
+                topic.adult_content = adult_content
+
+                #inactive userprofile
+                user.is_active = False
+                user.save()
+            if is_violent:
+                topic.is_violent = True
+                topic.violent_content = violent_content
+
+            #notify user
+            topic.delete()
+        topic.profanity_collage_url = profanity_collage_url
+        topic.save()
+        return JsonResponse({'message': "success"}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        print("==============")
+        print("update_profanity_details failed with {}".format(e))
+        return JsonResponse({'message': str(e.message)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def update_download_url_in_topic(request):
+    try:
+        topic_id = request.POST.get('topic_id', None)
+        downloaded_url = request.POST.get('download_url', None)
+        topic = Topic.objects.get(pk=topic_id)
+        topic.downloaded_url = downloaded_url
+        topic.has_downloaded_url = True
+        topic.save()
+
+        #invoke firebase notification
+
+        return JsonResponse({'message': "success"}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': str(e.message)}, status=status.HTTP_400_BAD_REQUEST) 
 
 
