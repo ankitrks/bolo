@@ -38,7 +38,7 @@ def run():
             print "before: views updation",datetime.now()
             each_seen = Topic.objects.get(pk=each_seen_id)
             if each_seen.user.st.boost_views_count:
-                multiplication_factor = decimal.Decimal(random.randrange(int(each_seen.user.st.boost_views_count/750),int(each_seen.user.st.boost_views_count/650)))
+                multiplication_factor = decimal.Decimal(random.randrange(int(each_seen.user.st.boost_views_count/850),int(each_seen.user.st.boost_views_count/750)))
                 print "i am boosted: ",multiplication_factor
             else:
                 multiplication_factor = 1
@@ -112,7 +112,7 @@ def check_like(topic_id,user_ids):
     to_be_created_bolo=[]
     notific_dic= []
     if each_like.user.st.boost_like_count:
-        multiplication_factor = decimal.Decimal(random.randrange(int(each_like.user.st.boost_like_count/250),int(each_like.user.st.boost_like_count/200)))
+        multiplication_factor = decimal.Decimal(random.randrange(int(each_like.user.st.boost_like_count/300),int(each_like.user.st.boost_like_count/250)))
         print "i am boosted: ",multiplication_factor
     else:
         multiplication_factor = 1
@@ -199,7 +199,7 @@ def check_follower(user_id):
         now = datetime.now()
         userprofile = UserProfile.objects.get(user_id = user_id)
         if userprofile.boost_follow_count:
-            multiplication_factor = decimal.Decimal(random.randrange(int(userprofile.boost_follow_count/400),int(userprofile.boost_follow_count/350)))
+            multiplication_factor = decimal.Decimal(random.randrange(int(userprofile.boost_follow_count/450),int(userprofile.boost_follow_count/400)))
             print "i am boosted: ", multiplication_factor
         else:
             multiplication_factor = 1
