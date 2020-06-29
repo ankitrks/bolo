@@ -4356,14 +4356,14 @@ def get_user_details_from_topic_id(request):
 @api_view(['POST'])
 def update_profanity_details(request):
     try:
-        is_adult = request.POST.get('is_adult',False)
-        is_profane = request.POST.get('is_profane',False)
-        is_violent = request.POST.get('is_violent',False)
-        topic_id = request.POST.get('topic_id',None)
-        user_id = request.POST.get('user_id',None)
-        adult_content = request.POST.get('adult_content',1)
-        violent_content = request.POST.get('violent_content',1)
-        profanity_collage_url = request.POST.get('profanity_collage_url','')
+        is_adult = request.data.get('is_adult',False)
+        is_profane = request.data.get('is_profane',False)
+        is_violent = request.data.get('is_violent',False)
+        topic_id = request.data.get('topic_id',None)
+        user_id = request.data.get('user_id',None)
+        adult_content = request.data.get('adult_content',1)
+        violent_content = request.data.get('violent_content',1)
+        profanity_collage_url = request.data.get('profanity_collage_url','')
         topic = Topic.objects.get(pk=topic_id)
         if is_profane:
             if is_adult:
@@ -4386,20 +4386,18 @@ def update_profanity_details(request):
 
     except Exception as e:
         print("==============")
-        print("update_profanity_details failed with {}".format(e))
+        print("update_profanity_details failed with {}".format(str(e)))
         return JsonResponse({'message': str(e.message)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def update_download_url_in_topic(request):
     try:
-        topic_id = request.POST.get('topic_id', None)
-        downloaded_url = request.POST.get('download_url', None)
+        topic_id = request.data.get('topic_id', None)
+        downloaded_url = request.data.get('download_url', None)
         topic = Topic.objects.get(pk=topic_id)
         topic.downloaded_url = downloaded_url
         topic.has_downloaded_url = True
         topic.save()
-
-        #invoke firebase notification
 
         return JsonResponse({'message': "success"}, status=status.HTTP_200_OK)
     except Exception as e:
