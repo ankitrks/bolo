@@ -4356,17 +4356,17 @@ def get_user_details_from_topic_id(request):
 @api_view(['POST'])
 def update_profanity_details(request):
     try:
-        is_adult = request.data.get('is_adult',False)
-        is_profane = request.data.get('is_profane',False)
-        is_violent = request.data.get('is_violent',False)
-        topic_id = request.data.get('topic_id',None)
-        user_id = request.data.get('user_id',None)
-        adult_content = request.data.get('adult_content',1)
-        violent_content = request.data.get('violent_content',1)
-        profanity_collage_url = request.data.get('profanity_collage_url','')
+        is_adult = request.POST.get('is_adult',0)
+        is_profane = request.POST.get('is_profane',0)
+        is_violent = request.POST.get('is_violent',0)
+        topic_id = request.POST.get('topic_id',None)
+        user_id = request.POST.get('user_id',None)
+        adult_content = request.POST.get('adult_content',1)
+        violent_content = request.POST.get('violent_content',1)
+        profanity_collage_url = request.POST.get('profanity_collage_url','')
         topic = Topic.objects.get(pk=topic_id)
-        if is_profane:
-            if is_adult:
+        if int(is_profane)==1:
+            if int(is_adult)==1:
                 user = User.objects.get(pk=user_id)
                 topic.is_adult = True
                 topic.adult_content = adult_content
@@ -4374,7 +4374,7 @@ def update_profanity_details(request):
                 #inactive userprofile
                 user.is_active = False
                 user.save()
-            if is_violent:
+            if int(is_violent)==1:
                 topic.is_violent = True
                 topic.violent_content = violent_content
 
@@ -4392,8 +4392,8 @@ def update_profanity_details(request):
 @api_view(['POST'])
 def update_download_url_in_topic(request):
     try:
-        topic_id = request.data.get('topic_id', None)
-        downloaded_url = request.data.get('download_url', None)
+        topic_id = request.POST.get('topic_id', None)
+        downloaded_url = request.POST.get('download_url', None)
         topic = Topic.objects.get(pk=topic_id)
         topic.downloaded_url = downloaded_url
         topic.has_downloaded_url = True
