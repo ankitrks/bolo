@@ -317,9 +317,12 @@ class Topic(RecordTimeStamp):
 
     def name(self):
         from django.utils.html import format_html
-        if self.user.st.name:
-            return format_html('<a href="/superman/forum_user/userprofile/' + str(self.user.st.id) \
-                + '/change/" target="_blank">' + self.user.st.name + '</a>' )
+        try:
+            if self.user.st.name:
+                return format_html('<a href="/superman/forum_user/userprofile/' + str(self.user.st.id) \
+                    + '/change/" target="_blank">' + self.user.st.name + '</a>' )
+        except:
+            pass
         return format_html('<a href="/superman/forum_user/userprofile/' + str(self.user.st.id) \
             + '/change/" target="_blank">' + self.user.username + '</a>' )
 
