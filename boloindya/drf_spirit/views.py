@@ -1539,6 +1539,7 @@ def createTopic(request):
 
 def invoke_watermark_service(topic, user):
     try:
+        print("inside invoke_watermark_service")
         url = "https://92scj7hqac.execute-api.ap-south-1.amazonaws.com/v1/invoke-watermark"
         topic_id = topic.id
         input_key = topic.question_video.split(".amazonaws.com/")[1]
@@ -1551,7 +1552,7 @@ def invoke_watermark_service(topic, user):
         if response.status_code == 200:
             print("success")
         else:
-            print("failure")
+            print("failure with response code"+str(response.status_code))
     except Exception as e:
         print("Exception raised {}".format(e))
 
