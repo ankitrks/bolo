@@ -106,6 +106,7 @@ class UserProfile(models.Model,ModelDiffMixin):
     boost_like_count = models.PositiveIntegerField(_("Boost Like"), default=0)
     boost_follow_count = models.PositiveIntegerField(_("Boost Follow"), default=0)
     boosted_time = models.DateTimeField(null=True, blank=True)
+    boost_span = models.PositiveIntegerField(_("Boost Span(Days)"), default=0)
 
     class Meta:
         verbose_name = _("user profile")

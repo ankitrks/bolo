@@ -25,7 +25,7 @@ def run():
     action_type =['comment','like','seen','follow','share','comment_like']
     opt_action = random.choice(action_type)
     now = datetime.now()
-    last_n_days_post_ids = Topic.objects.filter(is_vb=True,is_removed=False,date__gte=now-timedelta(days=3),user__st__boosted_time__isnull=False).order_by('-date').values_list('id',flat=True)
+    last_n_days_post_ids = Topic.objects.filter(is_vb=True,is_removed=False,date__gte=now-timedelta(days=1),user__st__boosted_time__isnull=False).order_by('-date').values_list('id',flat=True)
     last_n_days_post_ids = list(last_n_days_post_ids)
 
     post_counter = 0
@@ -88,12 +88,17 @@ def run():
             print "after: like creation",datetime.now()
         except Exception as e:
             print e
-        try:
+    try:
+        increase_follower = UserProfile.objects.filter(user__st__boosted_time__isnull=False).values_list('user_id',flat=True)
+        for each_user_id in increase_follower:
             print "before: follower creation",datetime.now()
-            check_follower(each_seen_id,user_ids)
+            try:
+                check_follower(each_user_id)
+            except:
+                pass
             print "after: follower creation",datetime.now()
-        except Exception as e:
-            print e
+    except Exception as e:
+        print e
             
 
 
@@ -189,41 +194,39 @@ def check_like(topic_id,user_ids):
                     print "notfic completed"
 
 
-def check_follower(topic_id,user_ids):
-    now = datetime.now()
-    topic = Topic.objects.get(pk=topic_id)
-    if topic.user.st.boost_follow_count:
-        multiplication_factor = decimal.Decimal(random.randrange(int(topic.user.st.boost_follow_count/400),int(topic.user.st.boost_follow_count/300)))
-        print "i am boosted: ", multiplication_factor
-    else:
-        multiplication_factor = 1
-
-    if topic.date +timedelta(minutes=10) > now:
-        required_follower = random.randrange(0,2)
-    elif topic.date +timedelta(minutes=10) < now and topic.date +timedelta(minutes=30) > now and topic.user.st.follower_count < int(50*multiplication_factor):
-        required_follower = random.randrange(1,int(50*multiplication_factor)-topic.user.st.follower_count)
-    elif topic.date +timedelta(minutes=30) < now and topic.date +timedelta(hours=4) > now and topic.user.st.follower_count < int(100*multiplication_factor):
-        required_follower = random.randrange(1,int(100*multiplication_factor)-topic.user.st.follower_count)
-    elif topic.date +timedelta(hours=4) < now and topic.date +timedelta(hours=8) > now and topic.user.st.follower_count < int(200*multiplication_factor):
-        required_follower = random.randrange(1,int(200*multiplication_factor)-topic.user.st.follower_count)
-    elif topic.date +timedelta(hours=8) < now and topic.date +timedelta(hours=12) > now and topic.user.st.follower_count < int(300*multiplication_factor):
-        required_follower = random.randrange(1,int(300*multiplication_factor)-topic.user.st.follower_count)
-    elif topic.date +timedelta(hours=12) < now and topic.date +timedelta(hours=23) > now and topic.user.st.follower_count < int(400*multiplication_factor):
-        required_follower = random.randrange(1,int(400*multiplication_factor)-topic.user.st.follower_count)
-    else:
-        required_follower = 1
-
-    follower_counter = 0
-    all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).exclude(user_id__in=get_redis_follower(topic.user.id)).values_list('user_id',flat=True)[:required_follower]
-    print all_test_userprofile_id,required_follower
-    if len(all_test_userprofile_id) < required_follower:
-        create_random_user(required_follower-len(all_test_userprofile_id))
-        all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).exclude(user_id__in=get_redis_follower(topic.user.id)).values_list('user_id',flat=True)[:required_follower]
-    user_ids = list(all_test_userprofile_id)
-    for each_user_id in user_ids:
-        status = action_follow(each_user_id,topic.user.id)
-        if status:
-            follower_counter+=1
+def check_follower(user_id):
+    try:
+        now = datetime.now()
+        userprofile = UserProfile.objects.get(user_id = user_id)
+        if userprofile.boost_follow_count:
+            multiplication_factor = decimal.Decimal(random.randrange(int(userprofile.boost_follow_count/400),int(userprofile.boost_follow_count/350)))
+            print "i am boosted: ", multiplication_factor
+        else:
+            multiplication_factor = 1
+        if userprofile.boost_span:
+            boost_span = userprofile.boost_span*24
+        else:
+            boost_span = 24
+        if userprofile.boosted_time + timedelta(days=userprofile.boost_span if userprofile.boost_span else 1) > datetime.now():
+            time_passed = (datetime.now() - userprofile.boosted_time).total_seconds()/3600
+            multiplication_factor = int(multiplication_factor*decimal.Decimal(time_passed)/boost_span)
+            if userprofile.follower_count < int(400*multiplication_factor):
+                required_follower = random.randrange(1,int(400*multiplication_factor)-userprofile.follower_count)
+            else:
+                required_follower = 1
+            print required_follower
+            follower_counter = 0
+            all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).exclude(user_id__in=get_redis_follower(userprofile.user.id)).values_list('user_id',flat=True)[:required_follower]
+            if len(all_test_userprofile_id) < required_follower:
+                create_random_user(required_follower-len(all_test_userprofile_id))
+                all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).exclude(user_id__in=get_redis_follower(userprofile.user.id)).values_list('user_id',flat=True)[:required_follower]
+            user_ids = list(all_test_userprofile_id)
+            for each_user_id in user_ids:
+                status = action_follow(each_user_id,userprofile.user.id)
+                if status:
+                    follower_counter+=1
+    except Exception as e:
+        print e
 
 #comment
 def action_comment(user_id,topic_id):
