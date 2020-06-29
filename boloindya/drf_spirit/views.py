@@ -41,7 +41,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
-from .models import UserJarvisDump, UserLogStatistics, UserFeedback, Campaign, Winner
+from .models import UserJarvisDump, UserLogStatistics, UserFeedback, Campaign, Winner, Country, State, City
 from .permissions import IsOwnerOrReadOnly
 from .utils import get_weight, add_bolo_score, shorcountertopic, calculate_encashable_details, state_language, language_options,short_time,\
     solr_object_to_db_object, solr_userprofile_object_to_db_object,get_paginated_data ,shortcounterprofile, get_ranked_topics
@@ -528,6 +528,8 @@ def GetFollowPost(request):
     all_seen_vb = []
     topics =[]
     page_no = request.GET.get('page',1)
+    if int(page_no) == 1:
+        cache_follow_post(request.user.id)
     topics = get_redis_follow_paginated_data(request.user.id,page_no)
     return JsonResponse({"results":TopicSerializerwithComment(topics,context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand':request.GET.get('is_expand',True)},many=True).data})
 
@@ -778,7 +780,7 @@ class SolrSearchTopic(BoloIndyaGenericAPIView):
     def get(self, request):
         topics      = []
         search_term = self.request.GET.get('term')
-        language_id = self.request.GET.get('language_id', 1)
+        language_id = self.request.GET.get('language_id')
         page = int(request.GET.get('page',1))
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
         is_expand=self.request.GET.get('is_expand',False)
@@ -796,7 +798,10 @@ class SolrSearchTopic(BoloIndyaGenericAPIView):
                 topics = solr_object_to_db_object(result_page[0].object_list)
             # topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True, language_id=language_id)
             next_page_number = page+1 if page_size*page<len(sqs) else ''
-            response ={"count":len(sqs),"results":TopicSerializerwithComment(topics,many=True,context={'is_expand':is_expand,'last_updated':last_updated}).data,"next_page_number":next_page_number} 
+            if language_id:
+                response ={"count":len(sqs),"results":TopicSerializerwithComment(topics,many=True,context={'is_expand':is_expand,'last_updated':last_updated}).data,"next_page_number":next_page_number} 
+            else:
+                response ={"count":len(sqs),"results":TopicSerializerwithComment(topics,many=True).data,"next_page_number":next_page_number} 
         return JsonResponse(response, safe = False)
 
 
@@ -843,6 +848,7 @@ class SolrSearchHashTag(BoloIndyaGenericAPIView):
         hash_tags      = []
         search_term = self.request.GET.get('term')
         page = int(request.GET.get('page',1))
+        language_id = self.request.GET.get('language_id', 1)
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
         if search_term:
             sqs = SearchQuerySet().models(TongueTwister).raw_search('hash_tag:'+search_term)
@@ -857,7 +863,7 @@ class SolrSearchHashTag(BoloIndyaGenericAPIView):
                 hash_tags = solr_object_to_db_object(result_page[0].object_list)
             # hash_tags  = TongueTwister.objects.filter(hash_tag__icontains = search_term)
             next_page_number = page+1 if page_size*page<len(sqs) else ''
-            response ={"count":len(sqs),"results":TongueTwisterSerializer(hash_tags,many=True).data,"next_page_number":next_page_number} 
+            response ={"count":len(sqs),"results":TongueTwisterSerializer(hash_tags,many=True,context={'language_id':language_id}).data,"next_page_number":next_page_number} 
         return JsonResponse(response, safe = False)
 
 
@@ -1066,10 +1072,8 @@ def upload_media(media_file):
         created_at = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
         filenameNext= str(media_file.name).split('.')
         final_filename = str(filenameNext[0])+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[1])
-        client.put_object(Bucket=settings.BOLOINDYA_AWS_BUCKET_NAME, Key='media/' + final_filename, Body=media_file, ACL='public-read')
-        filepath = 'https://s3.amazonaws.com/' + settings.BOLOINDYA_AWS_BUCKET_NAME + '/media/' + final_filename
-        # if os.path.exists(file):
-        #     os.remove(file)
+        client.put_object(Bucket='in-boloindya', Key='media/' + final_filename, Body=media_file, ACL='public-read')
+        filepath = 'https://s3.ap-south-1.amazonaws.com/' + 'in-boloindya' + '/media/' + final_filename
         return filepath
     except:
         return None
@@ -1205,8 +1209,8 @@ def replyOnTopic(request):
                 comment.comment = hashtagged_title.strip()
                 comment.comment_html = hashtagged_title.strip()
                 comment.save()
-            if username_list:
-                send_notification_to_mentions(username_list,comment)
+            # if username_list:
+            #     send_notification_to_mentions(username_list,comment)
             topic = Topic.objects.get(pk = topic_id)
             topic.comment_count = F('comment_count')+1
             topic.last_commented = timezone.now()
@@ -1275,7 +1279,9 @@ def get_mentions(comment):
 def send_notification_to_mentions(username_list,comment_obj):
     for each_username in username_list:
         try:
-            notify_mention = Notification.objects.create(for_user = User.objects.get(username=each_username) ,topic = comment_obj,notification_type='10',user = comment_obj.user)
+            user = User.objects.get(username=each_username)
+            if not user == comment_obj.user:
+                notify_mention = Notification.objects.create(for_user = user ,topic = comment_obj,notification_type='10',user = comment_obj.user)
         except:
             pass
 
@@ -1410,8 +1416,10 @@ def createTopic(request):
     vb_width        = request.POST.get('vb_width',0)
     vb_height       = request.POST.get('vb_height',0)
     question_video  = request.POST.get('question_video')
-    # media_file = request.FILES.get['media']
-    # print media_file
+    categ_list      = request.POST.get('categ_list', '')
+    selected_lang   = request.POST.get('selected_language', '')
+    location_array  = request.POST.get('location_array', None)
+
 
     if title:
         topic.title          = (title[0].upper()+title[1:]).strip()
@@ -1434,7 +1442,10 @@ def createTopic(request):
             return JsonResponse({'message': 'Video Byte Created','topic':topic_json}, status=status.HTTP_201_CREATED)
     
     try:
-        topic.language_id   = request.user.st.language
+        if selected_lang:
+            topic.language_id   = selected_lang
+        else:
+            topic.language_id   = request.user.st.language    
         topic.category_id   = category_id
         topic.user_id       = user_id
         if is_vb:
@@ -1446,6 +1457,9 @@ def createTopic(request):
             view_count = random.randint(1,5)
             topic.view_count = view_count
             topic.save()
+            categories = filter(None, categ_list.split(','))
+            topic.m2mcategory.add(*categories)
+            topic.location = get_location(location_array)
             vb_create_task.delay(topic.id)
             # topic.update_vb()
             tag_list=check_space_before_hash(title).split()
@@ -1478,7 +1492,7 @@ def createTopic(request):
             provide_view_count(view_count,topic)
         except:
             pass
-        topic.m2mcategory.add(Category.objects.get(pk=category_id))
+        # topic.m2mcategory.add(Category.objects.get(pk=category_id))
         if not is_vb:
             userprofile = UserProfile.objects.filter(user = request.user)
             userprofile.update(question_count = F('question_count')+1)
@@ -1508,13 +1522,17 @@ def createTopic(request):
         data['days_ago'] = ''
 
         # topic.update_m3u8_content()
-
         notify_owner = Notification.objects.create(for_user = topic.user ,topic = topic,notification_type='6',user = topic.user)
         
         send_upload_video_notification.delay(data, {})
         #invoke watermark
         invoke_watermark_service(topic, request.user)
 
+        try:
+            c = topic.m2mcategory.all()
+            print(topic.location, c, topic.language_id, topic.id)
+        except Exception as e:
+            print(e)
         return JsonResponse({'message': message,'topic':topic_json}, status=status.HTTP_201_CREATED)
     except User.DoesNotExist:
         return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
@@ -1978,6 +1996,46 @@ class SingUpOTPView(generics.CreateAPIView):
             return JsonResponse({'message': 'OTP could not be sent'}, status=status.HTTP_417_EXPECTATION_FAILED)
         return JsonResponse({'message': 'OTP sent'}, status=status.HTTP_200_OK)
 
+
+class SingUpOTPCountryCodeView(generics.CreateAPIView):
+    permission_classes  = (AllowAny,)
+    serializer_class    = SingUpOTPSerializer
+
+    """
+    post:
+        Required Parameters
+        request.POST.get('is_reset_password')
+        request.POST.get('is_for_change_phone')
+    """
+
+    def perform_create(self, serializer):
+        old_otp = SingUpOTP.objects.filter(mobile_no=serializer.validated_data['mobile_no'].strip(),created_at__gte=datetime.now()-timedelta(hours=2)).order_by('-id')
+        if old_otp:
+            instance=old_otp[0]
+            response, response_status   = send_sms(instance.mobile_no, instance.otp)
+            instance.api_response_dump  = response
+            instance.save()
+        else:
+            serializer.validated_data['mobile_no'] = serializer.validated_data['mobile_no'].strip()
+            instance        = serializer.save()
+            instance.otp    = generateOTP(6)
+            instance.save()
+            response, response_status   = send_sms(instance.mobile_no, instance.otp)
+            instance.api_response_dump  = response
+            instance.save()
+        # response, response_status   = send_sms(instance.mobile_no, instance.otp)
+        # instance.api_response_dump  = response
+        if self.request.POST.get('is_reset_password') and self.request.POST.get('is_reset_password') == '1':
+            instance.is_reset_password = True
+        if self.request.POST.get('is_for_change_phone') and self.request.POST.get('is_for_change_phone') == '1':
+            instance.is_for_change_phone = True
+        # if not response_status:
+        #     instance.is_active = False
+        # instance.save()
+        if not response_status:
+            return JsonResponse({'message': 'OTP could not be sent'}, status=status.HTTP_417_EXPECTATION_FAILED)
+        return JsonResponse({'message': 'OTP sent'}, status=status.HTTP_200_OK)
+
 import calendar
 @api_view(['POST'])
 def get_user_bolo_info(request):
@@ -2126,7 +2184,8 @@ def verify_otp(request):
                     user = User.objects.create(username = get_random_username())
                     message = 'User created'
                     userprofile = UserProfile.objects.get(user = user)
-                    userprofile.mobile_no = mobile_no
+                    update_dict = {}
+                    update_dict['mobile_no'] = mobile_no
                     Contact.objects.filter(contact_number=mobile_no).update(is_user_registered=True,user=user)
                     if user_ip:
                         user_ip_to_state_task.delay(user.id,user_ip)
@@ -2136,15 +2195,15 @@ def verify_otp(request):
                         # userprofile.state_name = json_response['regionName']
                         # userprofile.city_name = json_response['city']
                     if str(is_geo_location) =="1":
-                        userprofile.lat = lat
-                        userprofile.lang = lang
+                        update_dict['lat'] = lat
+                        update_dict['lang'] = lang
                     if click_id:
                         save_click_id_response.delay(userprofile.id)
                         # userprofile.click_id = click_id
                         # click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
                         # response = urllib2.urlopen(click_url).read()
                         # userprofile.click_id_response = str(response)
-                    userprofile.save()
+                    UserProfile.objects.filter(user = user).update(**update_dict)
                     if str(language):
                         default_follow = deafult_boloindya_follow.delay(user.id,str(language))
                     add_bolo_score(user.id, 'initial_signup', userprofile)
@@ -2152,8 +2211,107 @@ def verify_otp(request):
                 otp_obj.update(for_user = user)
                 # otp_obj.for_user = user
                 # otp_obj.save()
-                cache_follow_post.delay(user.id)
-                cache_popular_post.delay(user.id,language)
+                return JsonResponse({'message': message, 'username' : mobile_no, \
+                        'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+            otp_obj.save()
+            return JsonResponse({'message': 'OTP Validated', 'username' : mobile_no}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return JsonResponse({'message': 'No Mobile No / OTP provided'}, status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['POST'])
+def verify_otp_with_country_code(request):
+    """
+    post:
+        Required Parameters
+        mobile_no = request.POST.get('mobile_no', None)
+        otp = request.POST.get('otp', None)
+        request.POST.get('is_reset_password')
+        request.POST.get('is_for_change_phone')
+    """
+    mobile_no = request.POST.get('mobile_no', None).strip()
+    country_code = request.POST.get('country_code', '+91').strip()
+    language = request.POST.get('language','1')
+    otp = request.POST.get('otp', None)
+    is_geo_location = request.POST.get('is_geo_location',None)
+    lat = request.POST.get('lat',None)
+    lang = request.POST.get('lang',None)
+    click_id = request.POST.get('click_id',None)
+    user_ip = request.POST.get('user_ip',None)
+    is_reset_password = False
+    is_for_change_phone = False
+    all_category_follow = []
+    if request.POST.get('is_reset_password') and request.POST.get('is_reset_password') == '1':
+        is_reset_password = True # inverted because of exclude
+    if request.POST.get('is_for_change_phone') and request.POST.get('is_for_change_phone') == '1':
+        is_for_change_phone = True
+
+    if mobile_no and otp:
+        mobile_with_country_code = str(country_code)+str(mobile_no)
+        try:
+            # exclude_dict = {'is_active' : True, 'is_reset_password' : is_reset_password,"mobile_no":mobile_no, "otp":otp}
+            exclude_dict = {'is_reset_password' : is_reset_password,"mobile_no":mobile_with_country_code, "otp":otp,"created_at__gte":datetime.now()-timedelta(hours=2)}
+            if is_for_change_phone:
+                # exclude_dict = {'is_active' : True, 'is_for_change_phone' : is_for_change_phone,"mobile_no":mobile_no, "otp":otp}
+                exclude_dict = {'is_for_change_phone' : is_for_change_phone,"mobile_no":mobile_with_country_code, "otp":otp,"created_at__gte":datetime.now()-timedelta(hours=2)}
+
+            otp_obj = SingUpOTP.objects.filter(**exclude_dict).order_by('-id')
+            # if otp_obj:
+            #     otp_obj=otp_obj[0]
+            # otp_obj.is_active = False
+            # otp_obj.used_at = timezone.now()
+            otp_obj.update(used_at = timezone.now())
+            if not is_reset_password and not is_for_change_phone and otp_obj:
+                if mobile_no in ['7726080653']:
+                    return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
+                try:
+                    userprofile = UserProfile.objects.get(mobile_no = mobile_no)
+                except:
+                    try:
+                        userprofile = UserProfile.objects.get(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no)
+                    except MultipleObjectsReturned:
+                        userprofile = UserProfile.objects.filter(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no).order_by('id').last()
+                        is_created=False
+                    except:
+                        userprofile = None
+                if userprofile:
+                    if not userprofile.user.is_active:
+                        return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
+                    user = userprofile.user
+                    message = 'User Logged In'
+                else:
+                    user = User.objects.create(username = get_random_username())
+                    message = 'User created'
+                    userprofile = UserProfile.objects.get(user = user)
+                    update_dict = {}
+                    update_dict['mobile_no'] = mobile_no
+                    update_dict['country_code'] = country_code
+                    Contact.objects.filter(contact_number=mobile_no).update(is_user_registered=True,user=user)
+                    if user_ip:
+                        user_ip_to_state_task.delay(user.id,user_ip)
+                        # url = 'http://ip-api.com/json/'+user_ip
+                        # response = urllib2.urlopen(url).read()
+                        # json_response = json.loads(response)
+                        # userprofile.state_name = json_response['regionName']
+                        # userprofile.city_name = json_response['city']
+                    if str(is_geo_location) =="1":
+                        update_dict['lat'] = lat
+                        update_dict['lang'] = lang
+                    if click_id:
+                        save_click_id_response.delay(userprofile.id)
+                        # userprofile.click_id = click_id
+                        # click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
+                        # response = urllib2.urlopen(click_url).read()
+                        # userprofile.click_id_response = str(response)
+                    UserProfile.objects.filter(user = user).update(**update_dict)
+                    if str(language):
+                        default_follow = deafult_boloindya_follow.delay(user.id,str(language))
+                    add_bolo_score(user.id, 'initial_signup', userprofile)
+                user_tokens = get_tokens_for_user(user)
+                otp_obj.update(for_user = user)
+                # otp_obj.for_user = user
+                # otp_obj.save()
                 return JsonResponse({'message': message, 'username' : mobile_no, \
                         'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
             otp_obj.save()
@@ -2197,8 +2355,8 @@ class GetProfile(generics.ListAPIView):
 
 @api_view(['POST'])
 def cache_user_data(request):
-    cache_follow_post.delay(request.user.id)
-    cache_popular_post.delay(request.user.id,request.user.st.language)
+    cache_follow_post(request.user.id)
+    cache_popular_post(request.user.id,request.user.st.language)
     return JsonResponse({'message': 'Data Cached'}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
@@ -2226,9 +2384,10 @@ def fb_profile_settings(request):
     refrence        = request.POST.get('refrence',None)
     extra_data      = request.POST.get('extra_data',None)
     activity        = request.POST.get('activity',None)
+    salary_range    = request.POST.get('salary_range',None)
     language        = request.POST.get('language','1')
     is_geo_location = request.POST.get('is_geo_location',None)
-    likedin_url = request.POST.get('likedin_url',None)
+    linkedin_url = request.POST.get('likedin_url',None)
     instagarm_id = request.POST.get('instagarm_id',None)
     twitter_id = request.POST.get('twitter_id',None)
     d_o_b = request.POST.get('d_o_b',None)
@@ -2267,15 +2426,14 @@ def fb_profile_settings(request):
 
             if not userprofile.user.is_active:
                 return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
-            cache_follow_post.delay(user.id)
-            cache_popular_post.delay(user.id,language)
             if is_created:
                 add_bolo_score(user.id, 'initial_signup', userprofile)
+                update_dict = {}
                 user.first_name = extra_data['first_name']
                 user.last_name = extra_data['last_name']
-                userprofile.name = extra_data['name']
-                userprofile.social_identifier = extra_data['id']
-                userprofile.bio = bio
+                update_dict['name'] = extra_data['name']
+                update_dict['social_identifier'] = extra_data['id']
+                update_dict['bio'] = bio
                 if not userprofile.d_o_b and d_o_b:
                     add_bolo_score(user.id, 'dob_added', userprofile)
                 userprofile.d_o_b = d_o_b
@@ -2288,31 +2446,30 @@ def fb_profile_settings(request):
                     # json_response = json.loads(response)
                     # userprofile.state_name = json_response['regionName']
                     # userprofile.city_name = json_response['city']
-                userprofile.gender = gender
-                userprofile.about = about
-                userprofile.refrence = refrence
-                userprofile.extra_data = extra_data
-                userprofile.user = user
-                userprofile.bolo_score += 95
-                userprofile.linkedin_url = likedin_url
-                userprofile.twitter_id = twitter_id
-                userprofile.instagarm_id = instagarm_id
+                update_dict['gender'] = gender
+                update_dict['about'] = about
+                update_dict['refrence'] = refrence
+                update_dict['extra_data'] = extra_data
+                update_dict['user'] = user
+                update_dict['bolo_score'] = 95
+                update_dict['linkedin_url'] = linkedin_url
+                update_dict['twitter_id'] = twitter_id
+                update_dict['instagarm_id'] = instagarm_id
 
                 # userprofile.follow_count += 1
                 if str(is_geo_location) =="1":
-                    userprofile.lat = lat
-                    userprofile.lang = lang
+                    update_dict['lat'] = lat
+                    update_dict['lang'] = lang
                 if click_id:
                     save_click_id_response.delay(userprofile.id)
                     # userprofile.click_id = click_id
                     # click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
                     # response = urllib2.urlopen(click_url).read()
                     # userprofile.click_id_response = str(response)
-                userprofile.save()
+                update_dict['language'] = str(language)
+                UserProfile.objects.filter(user = user).update(**update_dict)
                 if str(language):
                     default_follow = deafult_boloindya_follow.delay(user.id,str(language))
-                userprofile.language = str(language)
-                userprofile.save()
                 user.save()
                 user_tokens = get_tokens_for_user(user)
                 return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
@@ -2338,17 +2495,16 @@ def fb_profile_settings(request):
                 is_created = True
             if not userprofile.user.is_active:
                 return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
-            cache_follow_post.delay(user.id)
-            cache_popular_post.delay(user.id,language)
             if is_created:
+                update_dict = {}
                 add_bolo_score(user.id, 'initial_signup', userprofile)
                 # user.first_name = extra_data['first_name']
                 # user.last_name = extra_data['last_name']
-                userprofile.name = extra_data['name']
-                userprofile.social_identifier = extra_data['google_id']
-                userprofile.bio = bio
+                update_dict['name'] = extra_data['name']
+                update_dict['social_identifier'] = extra_data['google_id']
+                update_dict['bio'] = bio
                 if extra_data['profile_pic']:
-                    userprofile.profile_pic = profile_pic
+                    update_dict['profile_pic'] = extra_data['profile_pic']
                 if not userprofile.d_o_b and d_o_b:
                     add_bolo_score(user.id, 'dob_added', userprofile)
                 userprofile.d_o_b = d_o_b
@@ -2361,31 +2517,32 @@ def fb_profile_settings(request):
                     # json_response = json.loads(response)
                     # userprofile.state_name = json_response['regionName']
                     # userprofile.city_name = json_response['city']
-                userprofile.gender = gender
-                userprofile.about = about
-                userprofile.refrence = refrence
-                userprofile.extra_data = extra_data
-                userprofile.user = user
-                userprofile.bolo_score += 95
-                userprofile.linkedin_url = likedin_url
-                userprofile.twitter_id = twitter_id
-                userprofile.instagarm_id = instagarm_id
+                update_dict['gender'] = gender
+                update_dict['about'] = about
+                update_dict['d_o_b'] = d_o_b
+                update_dict['refrence'] = refrence
+                update_dict['extra_data'] = extra_data
+                update_dict['user'] = user
+                update_dict['bolo_score'] = 95
+                update_dict['linkedin_url'] = linkedin_url
+                update_dict['twitter_id'] = twitter_id
+                update_dict['instagarm_id'] = instagarm_id
+                update_dict['salary_range'] = salary_range
 
                 # userprofile.follow_count += 1
                 if str(is_geo_location) =="1":
-                    userprofile.lat = lat
-                    userprofile.lang = lang
+                    update_dict['lat'] = lat
+                    update_dict['lang'] = lang
                 if click_id:
                     save_click_id_response.delay(userprofile.id)
                     # userprofile.click_id = click_id
                     # click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
                     # response = urllib2.urlopen(click_url).read()
                     # userprofile.click_id_response = str(response)
-                userprofile.save()
+                update_dict['language'] = str(language)
+                UserProfile.objects.filter(user = user).update(**update_dict)
                 if str(language):
                     default_follow = deafult_boloindya_follow.delay(user.id,str(language))
-                userprofile.language = str(language)
-                userprofile.save()
                 user.save()
                 user_tokens = get_tokens_for_user(user)
                 return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
@@ -2395,18 +2552,22 @@ def fb_profile_settings(request):
         elif activity == 'profile_save':
             try:
                 userprofile = UserProfile.objects.get(user = request.user)
-                userprofile.name= name
-                userprofile.bio = bio
-                userprofile.about = about
+                update_dict = {}
+                if name:
+                    update_dict['name']= name
+                if bio:
+                    update_dict['bio'] = bio
+                if about:    
+                    update_dict['about'] = about
                 if not userprofile.d_o_b and d_o_b:
                     add_bolo_score(userprofile.user.id, 'dob_added', userprofile)
-                userprofile.d_o_b = d_o_b
+                update_dict['d_o_b'] = d_o_b
                 if not userprofile.gender and gender:
                     add_bolo_score(userprofile.user.id, 'gender_added', userprofile)
                 if str(is_dark_mode_enabled) == '1':
-                    userprofile.is_dark_mode_enabled = True
+                    update_dict['is_dark_mode_enabled'] = True
                 else:
-                    userprofile.is_dark_mode_enabled = False
+                    update_dict['is_dark_mode_enabled'] = False
                 if user_ip:
                     user_ip_to_state_task.delay(request.user.id,user_ip)
                     # url = 'http://ip-api.com/json/'+user_ip
@@ -2414,52 +2575,60 @@ def fb_profile_settings(request):
                     # json_response = json.loads(response)
                     # userprofile.state_name = json_response['regionName']
                     # userprofile.city_name = json_response['city']
-                userprofile.gender = gender
-                userprofile.profile_pic =profile_pic
-                userprofile.cover_pic=cover_pic
-                userprofile.linkedin_url = likedin_url
-                userprofile.twitter_id = twitter_id
-                userprofile.instagarm_id = instagarm_id
-                userprofile.save()
+                if gender:    
+                    update_dict['gender'] = gender
+                if profile_pic:    
+                    update_dict['profile_pic'] =profile_pic
+                if cover_pic:    
+                    update_dict['cover_pic']=cover_pic
+                if linkedin_url:    
+                    update_dict['linkedin_url'] = linkedin_url
+                if twitter_id:    
+                    update_dict['twitter_id'] = twitter_id
+                if instagarm_id:    
+                    update_dict['instagarm_id'] = instagarm_id
+                if salary_range:    
+                    update_dict['salary_range'] = salary_range
                 if username:
                     if not check_username_valid(username):
                         return JsonResponse({'message': 'Username Invalid. It can contains only lower case letters,numbers and special character[ _ - .]'}, status=status.HTTP_200_OK)
                     check_username = User.objects.filter(username = username).exclude(pk =request.user.id)
                     if not check_username:
-                        userprofile.slug = username
+                        update_dict['slug'] = username
                         user = userprofile.user
                         user.username = username
-                        userprofile.save()
                         user.save()
                     else:
                         return JsonResponse({'message': 'Username already exist'}, status=status.HTTP_200_OK)
+                UserProfile.objects.filter(user=request.user).update(**update_dict)
                 return JsonResponse({'message': 'Profile Saved'}, status=status.HTTP_200_OK)
             except Exception as e:
                 return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
         elif activity == 'settings_changed':
             try:
                 userprofile = UserProfile.objects.get(user = request.user)
-                userprofile.linkedin_url = likedin_url
-                userprofile.twitter_id = twitter_id
-                userprofile.instagarm_id = instagarm_id
+                update_dict = {}
+                update_dict['linkedin_url'] = linkedin_url
+                update_dict['twitter_id'] = twitter_id
+                update_dict['instagarm_id'] = instagarm_id
                 if sub_category_prefrences:
                     for each_sub_category in sub_category_prefrences:
                         category = Category.objects.get(pk = each_sub_category)
                         userprofile.sub_category.add(category)
-                        userprofile.save()
                     if userprofile.sub_category.all():
                         for each_category in userprofile.sub_category.all():
                             if not str(each_category.id) in sub_category_prefrences:
                                 userprofile.sub_category.remove(each_category)
                 if language:
                     default_follow = deafult_boloindya_follow.delay(request.user.id,str(language))
-                    userprofile.language = str(language)
-                    cache_popular_post.delay(request.user.id,language)
-                    userprofile.save()
+                    update_dict['language'] = str(language)
+                UserProfile.objects.filter(user=request.user).update(**update_dict)
                 return JsonResponse({'message': 'Settings Chnaged'}, status=status.HTTP_200_OK)
             except Exception as e:
                 return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
         elif activity == 'android_login':
+            if not android_did:
+                return JsonResponse({'message': 'Error Occured:android_did not found',}, status=status.HTTP_400_BAD_REQUEST)
             try:
                 userprofile = UserProfile.objects.get(android_did = android_did,user__is_active = True)
                 user=userprofile.user
@@ -2471,29 +2640,26 @@ def fb_profile_settings(request):
                 userprofile = UserProfile.objects.get(user = user)
                 is_created = True
             if not userprofile.is_guest_user:
-                userprofile.is_guest_user = True
-                userprofile.save()
-            cache_follow_post.delay(user.id)
-            cache_popular_post.delay(user.id,language)
+                UserProfile.objects.filter(user = user).update(is_guest_user = True)
             if is_created:
-                userprofile.android_did = android_did
+                update_dict = {}
+                update_dict['android_did'] = android_did
                 add_bolo_score(user.id, 'initial_signup', userprofile)
                 if user_ip:
                     user_ip_to_state_task.delay(user.id,user_ip)
                 if str(is_geo_location) =="1":
-                    userprofile.lat = lat
-                    userprofile.lang = lang
+                    update_dict['lat'] = lat
+                    update_dict['lang'] = lang
                 if click_id:
                     save_click_id_response.delay(userprofile.id)
                     # userprofile.click_id = click_id
                     # click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
                     # response = urllib2.urlopen(click_url).read()
                     # userprofile.click_id_response = str(response)
-                userprofile.save()
+                update_dict['language'] = str(language)
+                UserProfile.objects.filter(user = user).update(**update_dict)
                 if str(language):
-                    default_follow = deafult_boloindya_follow.delay(user.id,str(language))
-                userprofile.language = str(language)
-                userprofile.save()
+                    default_follow = deafult_boloindya_follow.delay(user.id,str(language))                
                 user.save()
                 user_tokens = get_tokens_for_user(user)
                 return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
@@ -2776,7 +2942,6 @@ def follow_sub_category(request):
             else:
                 category = Category.objects.get(pk = user_sub_category_id)
                 userprofile.sub_category.add(category)
-                userprofile.save()
                 return JsonResponse({'message': 'Followed'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
@@ -2922,10 +3087,7 @@ def comment_view(request):
         topic.view_count = F('view_count') +1
         topic.imp_count = F('imp_count') +1
         topic.save()
-        userprofile = topic.user.st
-        userprofile.view_count = F('view_count')+1
-        userprofile.own_vb_view_count = F('own_vb_view_count') +1
-        userprofile.save()
+        UserProfile.objects.filter(user_id = topic.user_id).update(view_count = F('view_count')+1,own_vb_view_count = F('own_vb_view_count') +1)
         return JsonResponse({'message': 'item viewed'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
@@ -2980,8 +3142,6 @@ def follow_like_list(request):
         block_hashes = TongueTwister.objects.filter(is_blocked=True).values_list('hash_tag', flat=True)
         reported_user = Report.objects.filter(reported_by=request.user,target_type=ContentType.objects.get(model='user')).distinct('target_id').values_list('target_id',flat=True)
         reported_topic = Report.objects.filter(reported_by=request.user,target_type=ContentType.objects.get(model='topic')).distinct('target_id').values_list('target_id',flat=True)
-        cache_follow_post.delay(request.user.id)
-        cache_popular_post.delay(request.user.id,request.user.st.language)
         return JsonResponse({'comment_like':list(comment_like),'topic_like':list(topic_like),'all_follow':list(all_follow),'all_follower':list(all_follower),\
             'all_category_follow':list(all_category_follow),'app_version':app_version,\
             'notification_count':notification_count, 'is_test_user':userprofile.is_test_user,'user':UserSerializer(request.user).data,\
@@ -3079,6 +3239,7 @@ def get_follower_list(request):
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
+''''
 def deafult_boloindya_follow(user,language):
     try:
         if language == '2':
@@ -3106,6 +3267,7 @@ def deafult_boloindya_follow(user,language):
         return True
     except:
         return False
+'''
 
 @api_view(['POST'])
 def get_bolo_score(request):
@@ -3318,12 +3480,16 @@ def check_url(file_path):
     except Exception as e:
         # print e,file_path
         return "403"
+
 def get_cloudfront_url(instance):
     if instance.question_video:
+        cloufront_url = settings.US_CDN_URL
+        if 'in-boloindya' in instance.question_video:
+            cloufront_url = settings.IN_CDN_URL
         regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
         find_urls_in_string = re.compile(regex, re.IGNORECASE)
         url = find_urls_in_string.search(instance.question_video)
-        return str(instance.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
+        return str(instance.question_video.replace(str(url.group()), cloufront_url))
 
 @csrf_exempt
 @api_view(['POST'])
@@ -3357,9 +3523,6 @@ def save_android_logs(request):
             return JsonResponse({'messgae' : 'success'})
         else:
             AndroidLogs.objects.create(user=request.user, logs=request.POST.get('error_log', ''),log_type = request.POST.get('log_type',None), android_id=request.POST.get('android_id',''))
-            if request.POST.get('log_type',None)=='user_ip':
-                cache_follow_post.delay(request.user.id)
-                cache_popular_post.delay(request.user.id,request.user.st.language)
             return JsonResponse({'messgae' : 'success'})
     except Exception as e:
         return JsonResponse({'message' : 'fail','error':str(e)})
@@ -3655,6 +3818,8 @@ def old_algo_get_popular_video_bytes(request):
 def get_popular_video_bytes(request):
     try:
         language_id = request.GET.get('language_id', 1)
+        if int(request.GET.get('page',1)) == 1:
+            cache_popular_post(request.user.id,language_id)
         topics = get_popular_paginated_data(request.user.id,language_id,int(request.GET.get('page',1)))
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True, context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
     except Exception as e:
@@ -3940,6 +4105,53 @@ def verify_otp_and_update_profile(request):
         return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
+def update_mobile_no_with_country_code(request):
+    try:
+        mobile_no = request.POST.get('mobile_no',None)
+        country_code = request.POST.get('country_code', '+91')
+        if mobile_no:
+            full_mobile_no = str(country_code)+str(mobile_no)
+            old_otp = SingUpOTP.objects.filter(mobile_no=full_mobile_no,created_at__gte=datetime.now()-timedelta(minutes=5)).order_by('-id')
+            if old_otp:
+                return JsonResponse({'message':'otp send'}, status=status.HTTP_200_OK)
+            else:
+                instance = SingUpOTP.objects.create(mobile_no=full_mobile_no,otp=generateOTP(6))
+                response, response_status = send_sms(instance.mobile_no, instance.otp)
+                if not response_status:
+                    instance.is_active=False
+                    instance.save()
+                    return JsonResponse({'message': 'Error Occured: sms Api not working'}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    return JsonResponse({'message':'otp send'}, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'message': 'Error Occured: mobile_no empty'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def verify_otp_and_update_profile_with_country_code(request):
+    try:
+        mobile_no = validate_indian_number(request.POST.get('mobile_no',None))
+        country_code = request.POST.get('country_code', '+91')
+        full_mobile_no = str(country_code)+str(mobile_no)
+        otp = request.POST.get('otp',None)
+        otp_obj = SingUpOTP.objects.filter(mobile_no=full_mobile_no,otp=otp,is_active=True).order_by('-id')
+        if otp_obj:
+            otp_obj=otp_obj[0]
+            otp_obj.is_active = False
+            otp_obj.used_at = timezone.now()
+            otp_obj.for_user = request.user
+            otp_obj.save()
+            UserProfile.objects.filter(user=request.user).update(mobile_no=mobile_no, country_code=country_code)
+            userprofile=request.user.st
+            add_bolo_score(request.user.id, 'mobile_no_added', userprofile)
+            return JsonResponse({'message':'Mobile No updated','user':UserSerializer(request.user).data}, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
 def verify_otp_and_update_paytm_number(request):
     try:
         mobile_no = validate_indian_number(request.POST.get('mobile_no',None))
@@ -4192,4 +4404,57 @@ def update_download_url_in_topic(request):
     except Exception as e:
         return JsonResponse({'message': str(e.message)}, status=status.HTTP_400_BAD_REQUEST) 
 
+@api_view(['GET'])
+def get_user_last_vid_lang(request):
+    try:
+        user = request.user
 
+        if user:
+            all_vids = Topic.objects.filter(user=user).order_by('-date')
+
+            language = ''
+            if all_vids:
+                last_vid = all_vids[0]
+                print(last_vid.id)
+                language = last_vid.language_id
+
+            return JsonResponse({'language_id': language}, status=status.HTTP_200_OK)
+        else:        
+            return JsonResponse({'message': 'Invalid User'}, status=status.HTTP_204_NO_CONTENT)        
+
+    except Exception as e:
+        return JsonResponse({'message': str(e.message)}, status=status.HTTP_400_BAD_REQUEST)   
+
+def get_location(location_data):
+    if location_data:
+        print("*****", 1)
+        location_array = json.loads(location_data)
+        country_name = ''
+        state_name = ''
+        city_name = ''
+        city_id = ''
+        for obj in location_array:
+            location_obj = json.loads(obj)
+            level = location_obj.get('level')
+            name = location_obj.get('name')
+            place_id = location_obj.get('place_id')
+            if(level == 'country'):
+                country_name = name
+            elif(level == 'state'):
+                state_name = name
+            elif(level == 'city'):
+                city_name = name
+                city_id = place_id
+
+        if country_name:
+            country, created = Country.objects.get_or_create(name=country_name)
+            print(1, country, created)
+        if state_name:
+            state, created = State.objects.get_or_create(name=state_name, country=country) 
+            print(2, state, created)
+        if city_name:
+            city, created = City.objects.get_or_create(name=city_name, state=state, place_id=city_id)
+            print(4, city, created)
+            return city
+    else:
+        return None        

@@ -246,122 +246,6 @@ def put_videos_created():
 		# 	save_obj.save()
 
 
-# number of video creators split according to date of signup and distributed into various slabs
-def put_video_creators():
-
-	today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-	start_date = today + timedelta(days = -2)
-
-	user_signup_dict = dict()
-	signup_data = ReferralCodeUsed.objects.filter(by_user__isnull = False, created_at__gt = start_date)
-	for item in signup_data:
-		curr_userid = item.by_user.id 
-		user_signup_dict[curr_userid] = item.created_at 
-
-	print(len(user_signup_dict))
-	slab_1_dict = dict()
-	slab_2_dict = dict()
-	slab_3_dict = dict()
-
-	for key, val in user_signup_dict.items():
-		curr_userid = key
-		all_data = Topic.objects.all().filter(user = curr_userid)
-
-		user_lang_dict = dict()
-		for lang in language_map:
-			user_lang_dict[lang] = 0
-
-		if(len(all_data)>0):
-			for val_iter in all_data:
-				if(val_iter.language_id.isdigit()):
-					user_lang_dict[language_map[int(val_iter.language_id)-1]]+=1
-				else:
-					user_lang_dict[str(val_iter.language_id)]+=1	
-
-			str_date = str(user_signup_dict[curr_userid].year) + "-" + str(user_signup_dict[curr_userid].month) + "-" + str(user_signup_dict[curr_userid].day)
-			#print(str_date)
-
-			tot_video_upload_count = 0
-			for key_lang, val_lang in user_lang_dict.items():
-				tot_video_upload_count+=int(val_lang)
-			
-
-			# distribute into slabs
-			print(tot_video_upload_count)
-			if(tot_video_upload_count>=60):
-				if(str_date in slab_3_dict):
-					slab_3_dict[str_date].append(curr_userid)
-				else:
-					slab_3_dict[str_date] = []
-					slab_3_dict[str_date].append(curr_userid)
-
-			if(tot_video_upload_count>=25 and tot_video_upload_count<60):
-				if(str_date in slab_2_dict):
-					slab_2_dict[str_date].append(curr_userid)
-				else:
-					slab_2_dict[str_date] = []
-					slab_2_dict[str_date].append(curr_userid)
-
-			if(tot_video_upload_count>=5 and tot_video_upload_count<25):
-				if(str_date in slab_1_dict):
-					slab_1_dict[str_date].append(curr_userid)
-				else:
-					slab_1_dict[str_date] = []
-					slab_1_dict[str_date].append(curr_userid)
-					
-	for key, val in slab_1_dict.items():
-		datetime_key = parser.parse(key)
-		week_no = datetime_key.isocalendar()[1]
-		curr_year = datetime_key.year
-		if(curr_year == 2020):
-			week_no+=52
-		if(curr_year == 2019 and week_no == 1):
-			week_no = 52
-
-		metrics = '4'
-		metrics_slab = '0'
-		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
-		if(created):
-			print(metrics, metrics_slab, datetime_key, week_no, len(val))
-			save_obj.count = len(val)
-			save_obj.save()
-
-
-	for key, val in slab_2_dict.items():
-		datetime_key = parser.parse(key)
-		week_no = datetime_key.isocalendar()[1]
-		curr_year = datetime_key.year 
-		if(curr_year == 2020):
-			week_no+=52
-		if(curr_year == 2019 and week_no == 1):
-			week_no = 52
-
-		metrics = '4'
-		metrics_slab = '1'
-		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
-		if(created):
-			print(metrics, metrics_slab, datetime_key, week_no, len(val))
-			save_obj.count = len(val)
-			save_obj.save()
-
-	for key, val in slab_3_dict.items():
-		datetime_key = parser.parse(key)
-		week_no = datetime_key.isocalendar()[1]
-		curr_year = datetime_key.year 
-		if(curr_year == 2020):
-			week_no+=52
-		if(curr_year == 2019 and week_no == 1):
-			week_no = 52
-
-		metrics = '4'
-		metrics_slab = '2'
-		save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = datetime_key, week_no = week_no)
-		if(created):
-			print(metrics, metrics_slab, datetime_key, week_no, len(val))
-			save_obj.count = len(val)
-			save_obj.save()
-						
-
 # put new video creators with lang filter
 def put_video_creators_analytics_lang():
 
@@ -980,17 +864,13 @@ def put_views_data():
 					categ_id = (int)(each_categ)
 
 				#Save unique count
-				save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = '7', metrics_slab = '', date = str_date, week_no = week_no)
+				save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = '7', metrics_slab = '', date = str_date, week_no = week_no, metrics_language_options=each_lang, category_id=each_categ)
 				save_obj.count=unique_count
-				save_obj.metrics_language_options=each_lang
-				save_obj.category_id=each_categ
 				save_obj.save()
 
 				#Save non-unique count
-				save_obj_1, created_1 = DashboardMetricsJarvis.objects.get_or_create(metrics = '1', metrics_slab = '', date = str_date, week_no = week_no)
+				save_obj_1, created_1 = DashboardMetricsJarvis.objects.get_or_create(metrics = '1', metrics_slab = '', date = str_date, week_no = week_no, metrics_language_options=each_lang, category_id=each_categ)
 				save_obj_1.count=non_unique_count
-				save_obj_1.metrics_language_options=each_lang
-				save_obj_1.category_id=each_categ
 				save_obj_1.save()
 
 				print(vars(save_obj))
@@ -999,17 +879,17 @@ def put_views_data():
 def main():
 
 	put_share_data()
-	put_installs_data()
-	put_dau_data()
-	put_mau_data()
+	# put_installs_data()
+	# put_dau_data()
+	# put_mau_data()
 	# put_video_views_analytics()
-	put_videos_created()
+	# put_videos_created()
 	# put_uniq_views_analytics()
-	put_total_video_creators()
-	put_video_creators_analytics_lang()
-	put_install_signup_conversion()
-	put_uninstall_data()
-	put_views_data()
+	# put_total_video_creators()
+	# put_video_creators_analytics_lang()
+	# put_install_signup_conversion()
+	# put_uninstall_data()
+	# put_views_data()
 	
 
 def run():

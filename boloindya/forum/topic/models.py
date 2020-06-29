@@ -93,8 +93,8 @@ class Topic(RecordTimeStamp):
             related_name="hash_tag_topics",blank=True)
 
     title = models.TextField(_("title"), blank = True, null = True,db_index=True)
-    question_audio = models.CharField(_("audio title"), max_length=255, blank = True, null = True)
-    question_video = models.CharField(_("video title"), max_length=255, blank = True, null = True)
+    question_audio = models.CharField(_("audio title"), max_length=500, blank = True, null = True)
+    question_video = models.CharField(_("video title"), max_length=500, blank = True, null = True)
     slug = AutoSlugField(populate_from="title", db_index=True, blank=True)
     date = models.DateTimeField(_("date"), default=timezone.now)
     last_active = models.DateTimeField(_("last active"), default=timezone.now)
@@ -112,7 +112,7 @@ class Topic(RecordTimeStamp):
     is_globally_pinned = models.BooleanField(_("globally pinned"), default=False)
     is_closed = models.BooleanField(_("closed"), default=False)
     is_removed = models.BooleanField(_("removed"), default=False)
-    thumbnail = models.CharField(_("thumbnail"), max_length=150, blank = True, null = True, default='')
+    thumbnail = models.CharField(_("thumbnail"), max_length=500, blank = True, null = True, default='')
     view_count = models.PositiveIntegerField(_("views"), default=0,db_index=True)
     imp_count = models.PositiveIntegerField(_("views"), default=0,db_index=True)
     comment_count = models.PositiveIntegerField(_("comment count"), default=0,db_index=True)
@@ -149,7 +149,7 @@ class Topic(RecordTimeStamp):
     m3u8_content = models.TextField(_("M3U8 Content"), blank = True, null = True)
     audio_m3u8_content = models.TextField(_("Audio M3U8 Content"), blank = True, null = True)
     video_m3u8_content = models.TextField(_("Video M3U8 Content"), blank = True, null = True)
-    downloaded_url = models.CharField(_("downloaded URL"), max_length=255, blank = True, null = True)
+    downloaded_url = models.CharField(_("downloaded URL"), max_length=500, blank = True, null = True)
     vb_playtime = models.PositiveIntegerField(null=True,blank=True,default=0,db_index=True)
     has_downloaded_url = models.BooleanField(default = False)
     vb_score = models.FloatField(_("Score"),null=True,blank=True,default=0,db_index=True)
@@ -157,6 +157,7 @@ class Topic(RecordTimeStamp):
     boosted_till = models.PositiveIntegerField(_("boost hrs"),null=True,blank=True,default=0)
     boosted_start_time = models.DateTimeField(null=True,blank=True)
     boosted_end_time = models.DateTimeField(null=True,blank=True)
+    location = models.ForeignKey(to='drf_spirit.City', blank = True, null = True, related_name='topic_location')
     
     plag_text_options = (
         ('0', "TikTok"),
@@ -419,14 +420,20 @@ class Topic(RecordTimeStamp):
         return duration
 
     def duration(self):
-        playback_url = self.backup_url
-        if not playback_url:
+        playback_url = ''
+        if  self.question_video and '.mp4' in self.question_video:
             playback_url = self.question_video
+        elif self.safe_backup_url and '.mp4' in self.safe_backup_url:
+            playback_url = self.safe_backup_url
+        elif self.backup_url and '.mp4' in self.backup_url:
+            playback_url = self.backup_url
+        
+        if not playback_url and self.question_video:
+            playback_url = self.question_video
+
         if self.media_duration:
-            return format_html('<a href="' + playback_url + '" target="_blank">' + self.media_duration + '</a>' )
-        elif playback_url:
-            return format_html('<a href="' + playback_url + '" target="_blank">play</a>' )
-        return "00:00"
+            return format_html('<a href="javascript:void(0)" onclick="playvideo(\'' + playback_url + '\')">' + self.media_duration + '</a>' )
+        return format_html('<a href="javascript:void(0)" onclick="playvideo(' + playback_url + ')">play</a>' )
 
     def comments(self):
         if self.comment_count:

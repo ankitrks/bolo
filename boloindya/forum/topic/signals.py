@@ -22,14 +22,16 @@ def save_topic(sender, instance, created, **kwargs):
 @receiver(post_save, sender=Comment)
 def save_comment(sender, instance,created, **kwargs):
     try:
-        create_comment_notification(created,instance.id)
+        if created:
+            create_comment_notification.delay(created,instance.id)
     except Exception as e:
         pass
 
 @receiver(post_save, sender=TongueTwister)
-def save_comment(sender, instance,created, **kwargs):
+def save_hashtag(sender, instance,created, **kwargs):
     try:
-        create_hash_view_count(created,instance.id)
+        if created:
+            create_hash_view_count.delay(created,instance.id)
     except Exception as e:
         pass
 
@@ -46,9 +48,9 @@ def save_follow(sender, instance,created, **kwargs):
 def save_like(sender, instance,created, **kwargs):
     try:
         if created:
-            # if instance.comment:
+            # if instance.comment and not instance.comment.user == instance.user:
             #   notify = Notification.objects.create(for_user = instance.comment.user, topic = instance,notification_type='5',user = instance.user)
-            if instance.topic:
+            if instance.topic and not instance.topic.user == instance.user:
                 notify = Notification.objects.create(for_user = instance.topic.user, topic = instance,notification_type='5',user = instance.user)
     except Exception as e:
         pass

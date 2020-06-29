@@ -5,8 +5,10 @@ from django.core.mail import send_mail
 from django.conf import settings
 import os
 from datetime import datetime, timedelta
-import requests
-import json
+# from HTMLParser import HTMLParser
+# from django.contrib.auth.models import User
+# from forum.topic.models import Notification
+
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 logger = get_task_logger(__name__)
@@ -263,17 +265,52 @@ def create_comment_notification(created,instance_id):
     from forum.user.utils.follow_redis import get_redis_follower
     try:
         instance = Comment.objects.get(pk=instance_id)
-        if created and not instance.is_vb:
+        if created:
             # all_follower_list = Follower.objects.filter(user_following = instance.user).values_list('user_follower_id',flat=True)
             all_follower_list = get_redis_follower(instance.user.id)
-            for each in all_follower_list:
+            mentions_ids = get_mentions_and_send_notification(instance)
+            for each in [user_id for user_id in all_follower_list if user_id not in mentions_ids]:
                 if not str(each) == str(instance.topic.user.id):
                     notify = Notification.objects.create(for_user_id = each,topic = instance,notification_type='2',user = instance.user)
-            notify_owner = Notification.objects.create(for_user = instance.topic.user ,topic = instance,notification_type='3',user = instance.user)
+            if not instance.topic.user == instance.user:
+                notify_owner = Notification.objects.create(for_user = instance.topic.user ,topic = instance,notification_type='3',user = instance.user)
     except Exception as e:
         print e
         pass
 
+from HTMLParser import HTMLParser
+class MLStripper(HTMLParser):
+    def __init__(self):
+        self.reset()
+        self.fed = []
+    def handle_data(self, d):
+        self.fed.append(d)
+    def get_data(self):
+        return ''.join(self.fed)
+
+def strip_tags(html):
+    s = MLStripper()
+    s.feed(html)
+    return s.get_data()
+
+def get_mentions_and_send_notification(comment_obj):
+    from django.contrib.auth.models import User
+    from forum.topic.models import Notification
+    comment = strip_tags(comment_obj.comment)
+    mention_tag=[mention for mention in comment.split() if mention.startswith("@")]
+    user_ids = []
+    if mention_tag:
+        for each_mention in mention_tag:
+            try:
+                user = User.objects.get(username=each_mention.strip('@'))
+                user_ids.append(user.id)
+                if not user == comment_obj.user:
+                    notify_mention = Notification.objects.create(for_user = user  ,topic = comment_obj,notification_type='10',user = comment_obj.user)
+            except Exception as e:
+                print e
+                pass
+    return user_ids
+ 
 @app.task
 def create_hash_view_count(create,instance_id):
     from forum.topic.models import Topic,TongueTwister,HashtagViewCounter
@@ -370,12 +407,8 @@ def deafult_boloindya_follow(user_id,language):
         follow,is_created = Follower.objects.get_or_create(user_follower = user,user_following=bolo_indya_user)
         if is_created:
             add_bolo_score(user.id, 'follow', follow)
-            userprofile = UserProfile.objects.get(user = user)
-            bolo_indya_profile = UserProfile.objects.get(user = bolo_indya_user)
-            userprofile.follow_count = F('follow_count') + 1
-            userprofile.save()
-            bolo_indya_profile.follower_count = F('follower_count') + 1
-            bolo_indya_profile.save()
+            userprofile = UserProfile.objects.filter(user = user).update(follow_count = F('follow_count') + 1)
+            bolo_indya_profile = UserProfile.objects.filter(user = bolo_indya_user).update(follower_count = F('follower_count') + 1)
             update_redis_following(user.id,int(bolo_indya_user.id),True)
             update_redis_follower(int(bolo_indya_user.id),user.id,True)
         if not follow.is_active:

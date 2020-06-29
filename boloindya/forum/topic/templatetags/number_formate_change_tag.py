@@ -41,7 +41,7 @@ def get_video_cdn(question_video):
         regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
         find_urls_in_string = re.compile(regex, re.IGNORECASE)
         url = find_urls_in_string.search(question_video)
-        return str(question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
+        return str(question_video.replace(str(url.group()), settings.US_CDN_URL))
     else:
         return ''
 
