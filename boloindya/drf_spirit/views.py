@@ -1537,7 +1537,7 @@ def provide_view_count(view_count,topic):
     all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)[:view_count]
     for each_user_id in all_test_userprofile_id:
         vb_obj = VBseen.objects.create(topic= topic,user_id =each_user_id)
-        UserProfile.objects.filter(user=topic.user).update(view_count=F(view_count)+1,own_vb_view_count = F('own_vb_view_count')+1)
+        # UserProfile.objects.filter(user=topic.user).update(view_count=F(view_count)+1,own_vb_view_count = F('own_vb_view_count')+1)
         update_redis_vb_seen(each_user_id,topic.id)
 
 @api_view(['POST'])
@@ -3064,7 +3064,7 @@ def comment_view(request):
         topic.view_count = F('view_count') +1
         topic.imp_count = F('imp_count') +1
         topic.save()
-        UserProfile.objects.filter(user_id = topic.user_id).update(view_count = F('view_count')+1,own_vb_view_count = F('own_vb_view_count') +1)
+        # UserProfile.objects.filter(user_id = topic.user_id).update(view_count = F('view_count')+1,own_vb_view_count = F('own_vb_view_count') +1)
         return JsonResponse({'message': 'item viewed'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
@@ -3087,7 +3087,7 @@ def vb_seen(request):
         topic.view_count = F('view_count')+1
         topic.imp_count = F('imp_count') +1
         topic.save()
-        UserProfile.objects.filter(user_id = topic.user_id).update(view_count = F('view_count')+1,own_vb_view_count = F('own_vb_view_count') +1)
+        # UserProfile.objects.filter(user_id = topic.user_id).update(view_count = F('view_count')+1,own_vb_view_count = F('own_vb_view_count') +1)
         all_vb_seen = get_redis_vb_seen(request.user.id)
         if not topic_id in all_vb_seen:
             vbseen = VBseen.objects.create(user = request.user,topic_id = topic_id)
