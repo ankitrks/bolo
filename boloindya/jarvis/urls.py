@@ -78,4 +78,6 @@ urlpatterns = [
     url(r'^get_count_notification/$',views.get_count_notification, name='get_count_notification'),  
 
     url(r'^update_user_time/$',views.update_user_time, name='update_user_time'),
+    url(r'^upload_audio_file/$',views.boloindya_upload_audio_file,name = 'upload_audio_file'),
+    url(r'^upload_audio_file_to_s3/$',views.boloindya_upload_audio_file_to_s3,name = 'upload_audio_file_to_s3'),
 ]

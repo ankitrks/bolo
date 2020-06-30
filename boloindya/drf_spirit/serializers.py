@@ -7,7 +7,7 @@ from forum.category.models import Category,CategoryViewCounter
 from forum.comment.models import Comment
 from forum.user.models import UserProfile,AppVersion, ReferralCodeUsed, VideoCompleteRate,Contact
 from .relations import PresentableSlugRelatedField
-from .models import SingUpOTP, Campaign, Winner
+from .models import SingUpOTP, Campaign, Winner, MusicAlbum
 from .utils import shortnaturaltime,shortcounterprofile,shorcountertopic,get_ranked_topics
 from django.conf import settings
 import re
@@ -1048,3 +1048,8 @@ class CampaignSerializer(ModelSerializer):
     class Meta:
         model = Campaign
         fields = ('banner_img_url', 'hashtag_name', 'is_active', 'active_from', 'active_till', 'is_winner_declared', 'winners', 'next_campaign_name')
+
+class MusicAlbumSerializer(ModelSerializer):
+  class Meta:
+    model = MusicAlbum
+    fields = '__all__'

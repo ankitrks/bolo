@@ -170,4 +170,5 @@ urlpatterns = [
     url(r'^get_campaigns/$', get_campaigns,name='get_campaigns'),
     url(r'^get_user_details_from_topic_id/$', get_user_details_from_topic_id,name='get_user_details_from_topic_id'),
     url(r'^get_user_last_vid_lang/$', get_user_last_vid_lang,name='get_user_last_vid_lang'),
+    url(r'^fetch_audio_list/$', AudioFileListView.as_view(),name='fetch_audio_list'),
 ]

@@ -35,7 +35,7 @@ from forum.userkyc.forms import KYCBasicInfoRejectForm,KYCDocumentRejectForm,Add
 from .models import VideoUploadTranscode,VideoCategory, PushNotification, PushNotificationUser, user_group_options, \
     FCMDevice, notification_type_options, metrics_options, DashboardMetrics, DashboardMetricsJarvis, metrics_slab_options,\
      metrics_language_options, UserCountNotification, Report
-from drf_spirit.models import MonthlyActiveUser, HourlyActiveUser, DailyActiveUser, VideoDetails
+from drf_spirit.models import MonthlyActiveUser, HourlyActiveUser, DailyActiveUser, VideoDetails, MusicAlbum
 from forum.category.models import Category
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -48,7 +48,7 @@ from itertools import groupby
 from django.db.models import Count
 import ast
 from drf_spirit.serializers import VideoCompleteRateSerializer
-from .forms import VideoUploadTranscodeForm,TopicUploadTranscodeForm,UserPayForm
+from .forms import VideoUploadTranscodeForm,TopicUploadTranscodeForm,UserPayForm, AudioUploadForm
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
 from django.core.files.base import ContentFile
 from drf_spirit.serializers import UserWithUserSerializer
@@ -116,6 +116,20 @@ def upload_tos3(file_name,bucket,folder_name=None):
     transcode = transcode_media_file(urlify(folder_name),file_key,(file_key).split('/')[-1].split('.')[0],bucket)
     return file_url,transcode
 
+def upload_to_s3_without_transcode(file_name, bucket, folder_name=None):
+    print(file_name, bucket, folder_name)
+    print("upload_to_s3_without_transcode")
+    if folder_name:
+        folder_name = folder_name.lower()
+        file_key = urlify(folder_name)+'/'+urlify(file_name)
+    else:
+        file_key = urlify(file_name)
+    bucket_credentials = get_bucket_details(bucket)
+    client = boto3.client('s3',aws_access_key_id=bucket_credentials['AWS_ACCESS_KEY_ID'],aws_secret_access_key=bucket_credentials['AWS_SECRET_ACCESS_KEY'])
+    transfer = S3Transfer(client)
+    transfer.upload_file(urlify(file_name),bucket,file_key,extra_args={'ACL':'public-read'})
+    file_url = 'https://'+bucket+'.s3.amazonaws.com/%s'%(file_key)
+    return file_url
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
@@ -207,6 +221,12 @@ def uploadvideofile(request):
 def boloindya_uploadvideofile(request):    
     topic_form = TopicUploadTranscodeForm()
     return render(request,'jarvis/pages/upload_n_transcode/boloindya_upload_transcode.html',
+            {'topic_form':topic_form})
+
+@login_required
+def boloindya_upload_audio_file(request):    
+    topic_form = AudioUploadForm()
+    return render(request,'jarvis/pages/upload_audio/boloindya_upload_audio.html',
             {'topic_form':topic_form})
 
 @login_required
@@ -629,6 +649,40 @@ def check_filename_valid(filename):
     else:
         return False
 
+def check_audio_file_name_validation(filename,hashkey):
+    if check_audio_filename_valid(filename):
+        return filename
+    else:
+        import time
+        epoch_time = int(round(time.time() * 1000))
+        file_name_words = filename.split('_')
+        file_extension = file_name_words[-1].split('.')[-1]
+        return hashkey+'_'+str(epoch_time)+'.'+file_extension
+
+
+def check_audio_filename_valid(filename):
+    if re.match(r"^[A-Za-z0-9_.-]+(:?\.mp3)+$", filename):
+        return True
+    else:
+        return False
+
+def check_image_file_name_validation(filename,hashkey):
+    if check_image_filename_valid(filename):
+        return filename
+    else:
+        import time
+        epoch_time = int(round(time.time() * 1000))
+        file_name_words = filename.split('_')
+        file_extension = file_name_words[-1].split('.')[-1]
+        return hashkey+'_'+str(epoch_time)+'.'+file_extension
+
+
+def check_image_filename_valid(filename):
+    if re.match(r"^[A-Za-z0-9_.-]+(:?\.jpg|\.png)+$", filename):
+        return True
+    else:
+        return False
+
 
 @login_required
 def upload_n_transcode(request):
@@ -723,6 +777,74 @@ def upload_n_transcode(request):
 
     return HttpResponse(json.dumps({'message':'success','file_id':my_upload_transcode.id}),content_type="application/json")
 
+@login_required
+def boloindya_upload_audio_file_to_s3(request):
+    audio_file,image_file = request.FILES.getlist('media_file')
+    title = request.POST.get('title',None)
+    author_name = request.POST.get('author_name',None)
+    audio_upload_folder_name = request.POST.get('folder_prefix','from_upload_panel/audio')
+    image_upload_folder_name = request.POST.get('folder_prefix','from_upload_panel/audio_image')
+    upload_to_bucket = request.POST.get('bucket_name',None)
+
+    # print upload_file,upload_to_bucket,upload_folder_name
+    if not upload_to_bucket:
+        return HttpResponse(json.dumps({'message':'fail','reason':'bucket_missing'}),content_type="application/json")
+    if not audio_file:
+        return HttpResponse(json.dumps({'message':'fail','reason':'Audio File Missing'}),content_type="application/json")
+    if not image_file:
+        return HttpResponse(json.dumps({'message':'fail','reason':'Image File Missing'}),content_type="application/json")
+    if not audio_file.name.endswith('.mp3'):
+        return HttpResponse(json.dumps({'message':'fail','reason':'This is not a mp3 file'}),content_type="application/json")
+    if not image_file.name.endswith(('.jpg','.png')):
+        return HttpResponse(json.dumps({'message':'fail','reason':'This is not a jpg/png file'}),content_type="application/json")
+    if not title or not author_name:
+        return HttpResponse(json.dumps({'message':'fail','reason':'Title or Author name is missing'}),content_type="application/json")
+
+    bucket_credentials = get_bucket_details(upload_to_bucket)
+    conn = boto3.client('s3', bucket_credentials['REGION_HOST'], aws_access_key_id = bucket_credentials['AWS_ACCESS_KEY_ID'], \
+            aws_secret_access_key = bucket_credentials['AWS_SECRET_ACCESS_KEY'])
+
+
+    audio_file_name = urlify(audio_file.name.lower())
+    image_file_name = urlify(image_file.name.lower())
+    audio_output_key = hashlib.sha256(audio_file_name.encode('utf-8')).hexdigest()
+    image_output_key = hashlib.sha256(image_file_name.encode('utf-8')).hexdigest()
+    audio_file_name = check_audio_file_name_validation(audio_file_name,audio_output_key)
+    image_file_name = check_image_file_name_validation(image_file_name,image_output_key)
+
+    audio_path = audio_upload_folder_name+'/'+audio_file_name
+    image_path = image_upload_folder_name+'/'+image_file_name
+    try:
+        conn.head_object(Bucket=upload_to_bucket, Key=audio_path)
+        return HttpResponse(json.dumps({'message':'fail','reason':'Audio File already exist'}),content_type="application/json")
+    except Exception as e:
+        with open(urlify(audio_file_name),'wb') as f:
+            for chunk in audio_file.chunks():
+                if chunk:
+                    f.write(chunk)
+    try:
+        conn.head_object(Bucket=upload_to_bucket, Key=image_path)
+        return HttpResponse(json.dumps({'message':'fail','reason':'Image File already exist'}),content_type="application/json")
+    except Exception as e:
+        with open(urlify(image_file_name),'wb') as f:
+            for chunk in image_file.chunks():
+                if chunk:
+                    f.write(chunk)
+
+    uploaded_audio_url = upload_to_s3_without_transcode(audio_file_name,upload_to_bucket,audio_upload_folder_name)
+    uploaded_image_url = upload_to_s3_without_transcode(image_file_name,upload_to_bucket,image_upload_folder_name)
+    music_album_dict = {}
+    music_album_dict['title'] = title
+    music_album_dict['author_name'] = author_name
+    music_album_dict['s3_file_path'] = uploaded_audio_url
+    music_album_dict['image_path'] = uploaded_image_url
+
+    music_album_obj = MusicAlbum.objects.create(**music_album_dict)
+
+    os.remove(urlify(audio_file_name))
+    os.remove(urlify(image_file_name))
+
+    return HttpResponse(json.dumps({'message':'success','file_id':music_album_obj.id}),content_type="application/json")
 @login_required
 def boloindya_upload_n_transcode(request):
     upload_file = request.FILES['media_file']

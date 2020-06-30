@@ -477,3 +477,9 @@ class City(RecordTimeStamp):
     state = models.ForeignKey(State, blank = True, null = True, related_name='city_state')
     def __unicode__(self):
        return str(self.name)+', '+str(self.state)
+
+class MusicAlbum(models.Model):
+  title = models.CharField(_("title"),null=True,blank=True,max_length=1000)
+  s3_file_path = models.CharField(_("s3 file path"),null=True,blank=True,max_length=1000)
+  image_path = models.CharField(_("image path"),null=True,blank=True,max_length=1000)
+  author_name = models.CharField(_("author name"),null=True,blank=True,max_length=1000)
