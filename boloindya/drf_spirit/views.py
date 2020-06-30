@@ -8,6 +8,7 @@ import boto3
 import random
 import urllib2
 import itertools
+import requests
 from random import shuffle
 from collections import OrderedDict
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
@@ -1077,6 +1078,7 @@ def upload_media(media_file):
     except:
         return None
 
+
 @api_view(['POST'])
 def upload_profile_image(request):
     try:
@@ -1400,10 +1402,9 @@ def createTopic(request):
     request.POST.get('question_image')
 
     Required Parameters:
-    title and category_id 
+    title and category_id
 
     """
-
     topic           = Topic()
     user_id         = request.user.id
     title           = request.POST.get('title', '').strip()
@@ -1419,6 +1420,7 @@ def createTopic(request):
     selected_lang   = request.POST.get('selected_language', '')
     location_array  = request.POST.get('location_array', None)
 
+
     if title:
         topic.title          = (title[0].upper()+title[1:]).strip()
     if request.POST.get('question_audio'):
@@ -1428,7 +1430,6 @@ def createTopic(request):
         topic.safe_backup_url = question_video
         topic.backup_url      = question_video
 
-    
     topic.question_video = request.POST.get('question_video')
 
     if request.POST.get('question_image'):
@@ -1524,6 +1525,9 @@ def createTopic(request):
         notify_owner = Notification.objects.create(for_user = topic.user ,topic = topic,notification_type='6',user = topic.user)
         
         send_upload_video_notification.delay(data, {})
+        #invoke watermark
+        invoke_watermark_service(topic, request.user)
+
         try:
             c = topic.m2mcategory.all()
             print(topic.location, c, topic.language_id, topic.id)
@@ -1532,6 +1536,26 @@ def createTopic(request):
         return JsonResponse({'message': message,'topic':topic_json}, status=status.HTTP_201_CREATED)
     except User.DoesNotExist:
         return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+
+def invoke_watermark_service(topic, user):
+    try:
+        print("inside invoke_watermark_service")
+        url = "https://92scj7hqac.execute-api.ap-south-1.amazonaws.com/v1/invoke-watermark"
+        topic_id = topic.id
+        input_key = topic.question_video.split(".amazonaws.com/")[1]
+        username  = user.username
+        user_id = user.id
+        duration = topic.media_duration
+        payload = {"input_key": input_key, "topic_id": topic_id, "username": username,"user_id":user_id,"duration":duration}
+        response = requests.request("POST", url, headers = {}, data = json.dumps(payload), files = [],timeout=60)
+        print(response)
+        if response.status_code == 200:
+            print("success")
+        else:
+            print("failure with response code"+str(response.status_code))
+    except Exception as e:
+        print("Exception raised {}".format(e))
+
 
 def provide_view_count(view_count,topic):
     all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)[:view_count]
@@ -4328,6 +4352,56 @@ def get_user_details_from_topic_id(request):
         return JsonResponse({"data": UserSerializer(topic.user).data })
     except Exception as e:
         return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def update_profanity_details(request):
+    try:
+        is_adult = request.POST.get('is_adult',0)
+        is_profane = request.POST.get('is_profane',0)
+        is_violent = request.POST.get('is_violent',0)
+        topic_id = request.POST.get('topic_id',None)
+        user_id = request.POST.get('user_id',None)
+        adult_content = request.POST.get('adult_content',1)
+        violent_content = request.POST.get('violent_content',1)
+        profanity_collage_url = request.POST.get('profanity_collage_url','')
+        topic = Topic.objects.get(pk=topic_id)
+        if int(is_profane)==1:
+            if int(is_adult)==1:
+                user = User.objects.get(pk=user_id)
+                topic.is_adult = True
+                topic.adult_content = adult_content
+
+                #inactive userprofile
+                user.is_active = False
+                user.save()
+            if int(is_violent)==1:
+                topic.is_violent = True
+                topic.violent_content = violent_content
+
+            #notify user
+            topic.delete()
+        topic.profanity_collage_url = profanity_collage_url
+        topic.save()
+        return JsonResponse({'message': "success"}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        print("==============")
+        print("update_profanity_details failed with {}".format(str(e)))
+        return JsonResponse({'message': str(e.message)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def update_download_url_in_topic(request):
+    try:
+        topic_id = request.POST.get('topic_id', None)
+        downloaded_url = request.POST.get('download_url', None)
+        topic = Topic.objects.get(pk=topic_id)
+        topic.downloaded_url = downloaded_url
+        topic.has_downloaded_url = True
+        topic.save()
+
+        return JsonResponse({'message': "success"}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': str(e.message)}, status=status.HTTP_400_BAD_REQUEST) 
 
 @api_view(['GET'])
 def get_user_last_vid_lang(request):

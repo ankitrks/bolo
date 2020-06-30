@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 # from django.contrib.auth.models import User
 # from forum.topic.models import Notification
 
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 logger = get_task_logger(__name__)
 

@@ -177,6 +177,13 @@ class Topic(RecordTimeStamp):
     time_deleted = models.DateTimeField(blank = True, null = True)
     plag_text = models.CharField(choices = plag_text_options, blank = True, null = True, max_length = 10)
 
+    is_violent = models.BooleanField(default=False)
+    violent_content = models.PositiveIntegerField(null=True,blank=True,default=0)
+    is_adult = models.BooleanField(default=False)
+    adult_content = models.PositiveIntegerField(null=True,blank=True,default=0)
+    logo_detected = models.BooleanField(default=False)
+    profanity_collage_url = models.TextField(_("profanity collage url"), blank = True, null = True)
+
     def __unicode__(self):
         return self.title
 
