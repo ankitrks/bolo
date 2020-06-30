@@ -3,6 +3,7 @@ from django.forms import ModelForm, HiddenInput, FileInput,CharField
 from django import forms
 from forum.topic.models import Topic
 from forum.user.models import UserPay
+from drf_spirit.models import MusicAlbum
 
 class VideoUploadTranscodeForm(ModelForm):
     class Meta():
@@ -41,3 +42,8 @@ class UserPayForm(ModelForm):
         super(UserPayForm,self).__init__(*args,**kwargs)
         for field in self: 
             field.field.widget.attrs['class'] = 'form-control'
+
+class AudioUploadForm(ModelForm):
+    class Meta():
+        model = MusicAlbum
+        fields = ['title','author_name']

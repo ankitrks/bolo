@@ -4457,3 +4457,9 @@ def get_location(location_data):
             return city
     else:
         return None        
+
+class AudioFileListView(generics.ListAPIView):
+    serializer_class = MusicAlbumSerializer
+    queryset = MusicAlbum.objects.all()
+    permission_classes  = (IsAuthenticatedOrReadOnly,)
+    pagination_class = LimitOffsetPagination

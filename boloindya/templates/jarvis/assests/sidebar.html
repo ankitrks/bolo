@@ -106,6 +106,9 @@
           </ul>
         </li>
         {% endif %}
+        {% if user|is_user_in_group:"moderator" %}
+        <li class="{% if request.path in '/jarvis/upload_audio_file/'%}active{% endif %}"><a href="/jarvis/upload_audio_file/"><i class="fa fa-file-audio-o"></i> <span>Audio Management</span></a></li>
+        {% endif %}
       </ul>
 
     </section>
