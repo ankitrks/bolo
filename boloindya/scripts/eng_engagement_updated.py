@@ -484,12 +484,11 @@ def get_weight(key):
 def add_bolo_score(user_id, feature, action_object):
     score = get_weight(feature)
     if score > 0:
-        userprofile = UserProfile.objects.get(user_id = user_id)
-        userprofile.bolo_score+= int(score)
-        userprofile.save()
+        userprofile = UserProfile.objects.filter(user_id = user_id)
+        userprofile.update(bolo_score = F('bolo_score')+ int(score))
         weight_obj = get_weight_object(feature)
         if weight_obj:
-            add_to_history(userprofile.user, score, get_weight_object(feature), action_object, False)
+            add_to_history(userprofile[0].user, score, get_weight_object(feature), action_object, False)
         if feature in ['create_topic','create_topic_en']:
             from forum.topic.models import Notification
             notification_type = '8'

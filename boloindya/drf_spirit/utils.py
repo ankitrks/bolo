@@ -5,7 +5,7 @@ from django.conf import settings
 import urllib2
 import re
 import random, string
-
+from django.db.models import F,Q
 
 language_options = (
     ('0', "All"),
@@ -36,6 +36,13 @@ month_choices=(
     (10, "October"),
     (11, "November"),
     (12, "December"),
+)
+
+salary_choices = (
+    ('1', "Less than 20000"),
+    ('2', "20000 - 40000"),
+    ('3', "40000 - 60000"),
+    ('4', "Greater than 60000"),
 )
 
 state_language={'Andaman & Nicobar Islands':'Bengali','Andhra Pradesh':'Telugu','Arunachal Pradesh':'Nishi','Assam':'Assamese','Bihar':'Hindi','Chandigarh':'Hindi','Chhattisgarh':'Hindi','Dadra & Nagar Haveli':'Hindi','Daman & Diu':'Gujarati','Delhi':'Hindi','Goa':'Konkani','Gujarat':'Gujarati','Haryana':'Hindi','Himachal Pradesh':'Hindi','Jammu and Kashmir':'Kashmiri','Jharkhand':'Hindi','Karnataka':'Kannada','Kerala':'Malayalam','Lakshadweep':'Malayalam','Madhya Pradesh':'Hindi','Maharashtra':'Marathi','Manipur':'Manipuri','Meghalaya':'Kashi','Mizoram':'Mizo','Nagaland':'Naga Languages','Odisha':'Oriya','Puducherry':'Tamil','Punjab':'Punjabi','Rajasthan':'Hindi','Sikkim':'Nepali','Tamil Nadu':'Tamil','Telangana':'Telugu','Tripura':'Bengali','Uttar Pradesh':'Hindi','Uttarakhand':'Hindi','West Bengal':'Bengali'}
@@ -70,12 +77,11 @@ def add_bolo_score(user_id, feature, action_object):
     from forum.user.models import UserProfile
     score = get_weight(feature)
     if score >0:
-        userprofile = UserProfile.objects.get(user_id = user_id)
-        userprofile.bolo_score+= int(score)
-        userprofile.save()
+        userprofile = UserProfile.objects.filter(user_id = user_id)
+        userprofile.update(bolo_score = F('bolo_score')+int(score))
         weight_obj = get_weight_object(feature)
         if weight_obj:
-            add_to_history(userprofile.user, score, get_weight_object(feature), action_object, False)
+            add_to_history(userprofile[0].user, score, get_weight_object(feature), action_object, False)
         if feature in ['create_topic','create_topic_en']:
             from forum.topic.models import Notification
             notification_type = '8'
@@ -87,14 +93,14 @@ def add_bolo_score(user_id, feature, action_object):
 def reduce_bolo_score(user_id, feature, action_object, admin_action_type=''):
     from forum.user.models import UserProfile
     score = get_weight(feature)
-    userprofile = UserProfile.objects.get(user_id = user_id)
-    userprofile.bolo_score-= int(score)
-    if userprofile.bolo_score < 95:
-        userprofile.bolo_score = 95
-    userprofile.save()
+    userprofile = UserProfile.objects.filter(user_id = user_id)
+    if userprofile[0].bolo_score < 95:
+        userprofile.update(bolo_score = 95)
+    else:
+        userprofile.update(bolo_score= F('bolo_score')-int(score))
     weight_obj = get_weight_object(feature)
     if weight_obj:
-        add_to_history(userprofile.user, score, get_weight_object(feature), action_object, True)
+        add_to_history(userprofile[0].user, score, get_weight_object(feature), action_object, True)
     if feature in ['create_topic','create_topic_en']:
         from forum.topic.models import Notification
         notification_type = '7'
@@ -258,9 +264,8 @@ def calculate_encashable_details(user):
         enchashable_detail.bolo_score_details = str(bolo_details)
         for each_bolo in all_bolo_action:
             total_bolo_score_in_this_cycle += each_bolo.score
-        userprofile = UserProfile.objects.get(user = user)
-        userprofile.encashable_bolo_score = total_bolo_score_in_this_cycle
-        userprofile.save()
+        userprofile = UserProfile.objects.filter(user = user)
+        userprofile.update(encashable_bolo_score = total_bolo_score_in_this_cycle)
         all_bolo_action.update(enchashable_detail = enchashable_detail)
         enchashable_detail.bolo_score_earned = total_bolo_score_in_this_cycle
         enchashable_detail.equivalent_INR = total_money

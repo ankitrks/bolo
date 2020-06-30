@@ -93,8 +93,8 @@ class Topic(RecordTimeStamp):
             related_name="hash_tag_topics",blank=True)
 
     title = models.TextField(_("title"), blank = True, null = True,db_index=True)
-    question_audio = models.CharField(_("audio title"), max_length=255, blank = True, null = True)
-    question_video = models.CharField(_("video title"), max_length=255, blank = True, null = True)
+    question_audio = models.CharField(_("audio title"), max_length=500, blank = True, null = True)
+    question_video = models.CharField(_("video title"), max_length=500, blank = True, null = True)
     slug = AutoSlugField(populate_from="title", db_index=True, blank=True)
     date = models.DateTimeField(_("date"), default=timezone.now)
     last_active = models.DateTimeField(_("last active"), default=timezone.now)
@@ -112,7 +112,7 @@ class Topic(RecordTimeStamp):
     is_globally_pinned = models.BooleanField(_("globally pinned"), default=False)
     is_closed = models.BooleanField(_("closed"), default=False)
     is_removed = models.BooleanField(_("removed"), default=False)
-    thumbnail = models.CharField(_("thumbnail"), max_length=150, blank = True, null = True, default='')
+    thumbnail = models.CharField(_("thumbnail"), max_length=500, blank = True, null = True, default='')
     view_count = models.PositiveIntegerField(_("views"), default=0,db_index=True)
     imp_count = models.PositiveIntegerField(_("views"), default=0,db_index=True)
     comment_count = models.PositiveIntegerField(_("comment count"), default=0,db_index=True)
@@ -149,7 +149,7 @@ class Topic(RecordTimeStamp):
     m3u8_content = models.TextField(_("M3U8 Content"), blank = True, null = True)
     audio_m3u8_content = models.TextField(_("Audio M3U8 Content"), blank = True, null = True)
     video_m3u8_content = models.TextField(_("Video M3U8 Content"), blank = True, null = True)
-    downloaded_url = models.CharField(_("downloaded URL"), max_length=255, blank = True, null = True)
+    downloaded_url = models.CharField(_("downloaded URL"), max_length=500, blank = True, null = True)
     vb_playtime = models.PositiveIntegerField(null=True,blank=True,default=0,db_index=True)
     has_downloaded_url = models.BooleanField(default = False)
     vb_score = models.FloatField(_("Score"),null=True,blank=True,default=0,db_index=True)
@@ -157,6 +157,7 @@ class Topic(RecordTimeStamp):
     boosted_till = models.PositiveIntegerField(_("boost hrs"),null=True,blank=True,default=0)
     boosted_start_time = models.DateTimeField(null=True,blank=True)
     boosted_end_time = models.DateTimeField(null=True,blank=True)
+    location = models.ForeignKey(to='drf_spirit.City', blank = True, null = True, related_name='topic_location')
     
     plag_text_options = (
         ('0', "TikTok"),
@@ -196,15 +197,23 @@ class Topic(RecordTimeStamp):
     def update_m3u8_content(self):
         try:
             if self.question_video and '.m3u8' in self.question_video:
-                m3u8_url = self.question_video
-                url_split = m3u8_url.split('/')
-                audio_url = '/'.join( url_split[:-1] + ['hlsAudio'] + [url_split[-1].replace('hls_', '')] )
-                video_url = '/'.join( url_split[:-1] + ['hls1000k'] + [url_split[-1].replace('hls_', '')] )
+                if any(substring in self.question_video for substring in settings.AMAZON_ET_IDENTIFIER):
+                    m3u8_url = self.question_video
+                    url_split = m3u8_url.split('/')
+                    audio_url = '/'.join( url_split[:-1] + ['hlsAudio'] + [url_split[-1].replace('hls_', '')] )
+                    video_url = '/'.join( url_split[:-1] + ['hls1000k'] + [url_split[-1].replace('hls_', '')] )
 
-                self.m3u8_content = urllib2.urlopen(m3u8_url).read()
-                self.audio_m3u8_content = urllib2.urlopen(audio_url).read()
-                self.video_m3u8_content = urllib2.urlopen(video_url).read()
-                self.save()
+                    self.m3u8_content = urllib2.urlopen(m3u8_url).read()
+                    self.audio_m3u8_content = urllib2.urlopen(audio_url).read()
+                    self.video_m3u8_content = urllib2.urlopen(video_url).read()
+                    self.save()
+                elif any(substring in self.question_video for substring in settings.LAMBDA_ET_IDENTIFIER):
+                    self.m3u8_content = urllib2.urlopen(self.question_video).read()
+                    self.audio_m3u8_content = ""
+                    self.video_m3u8_content = ""
+                    self.save()
+                else:
+                    print("M3U8 url not correct please check")
         except:
             pass
 
@@ -308,9 +317,12 @@ class Topic(RecordTimeStamp):
 
     def name(self):
         from django.utils.html import format_html
-        if self.user.st.name:
-            return format_html('<a href="/superman/forum_user/userprofile/' + str(self.user.st.id) \
-                + '/change/" target="_blank">' + self.user.st.name + '</a>' )
+        try:
+            if self.user.st.name:
+                return format_html('<a href="/superman/forum_user/userprofile/' + str(self.user.st.id) \
+                    + '/change/" target="_blank">' + self.user.st.name + '</a>' )
+        except:
+            pass
         return format_html('<a href="/superman/forum_user/userprofile/' + str(self.user.st.id) \
             + '/change/" target="_blank">' + self.user.username + '</a>' )
 
@@ -326,19 +338,17 @@ class Topic(RecordTimeStamp):
         self.is_monetized = False
         self.is_removed = True
         self.save()
-        userprofile = UserProfile.objects.get(user = self.user)
-        if userprofile.vb_count and self.is_vb:
-            userprofile.vb_count = F('vb_count')-1
-        userprofile.save()
+        userprofile = UserProfile.objects.filter(user = self.user)
+        if userprofile[0].vb_count and self.is_vb:
+            userprofile.update(vb_count = F('vb_count')-1)
         return True
 
     def restore(self):
         self.is_removed = False
         self.save()
-        userprofile = UserProfile.objects.get(user = self.user)
+        userprofile = UserProfile.objects.filter(user = self.user)
         if self.is_vb: # userprofile.vb_count
-            userprofile.vb_count = F('vb_count')+1
-        userprofile.save()
+            userprofile.update(vb_count = F('vb_count')+1)
         # Bolo actions will be added only when the monetization is enabled
         # add_bolo_score(self.user.id, 'create_topic', self)
         return True
@@ -347,8 +357,7 @@ class Topic(RecordTimeStamp):
         # if self.is_monetized:
         self.is_monetized = False
         self.save()
-        userprofile = UserProfile.objects.get(user = self.user)
-        userprofile.save()
+        userprofile = UserProfile.objects.filter(user = self.user)
         if self.language_id == '1':
             reduce_bolo_score(self.user.id, 'create_topic_en', self, 'no_monetize')
         else:
@@ -361,8 +370,7 @@ class Topic(RecordTimeStamp):
         self.is_removed = False
         self.is_monetized = True
         self.save()
-        userprofile = UserProfile.objects.get(user = self.user)
-        userprofile.save()
+        userprofile = UserProfile.objects.filter(user = self.user)
         if self.language_id =='1':
             add_bolo_score(self.user.id, 'create_topic_en', self)
         else:
@@ -408,14 +416,20 @@ class Topic(RecordTimeStamp):
         return duration
 
     def duration(self):
-        playback_url = self.backup_url
-        if not playback_url:
+        playback_url = ''
+        if  self.question_video and '.mp4' in self.question_video:
             playback_url = self.question_video
+        elif self.safe_backup_url and '.mp4' in self.safe_backup_url:
+            playback_url = self.safe_backup_url
+        elif self.backup_url and '.mp4' in self.backup_url:
+            playback_url = self.backup_url
+        
+        if not playback_url and self.question_video:
+            playback_url = self.question_video
+
         if self.media_duration:
-            return format_html('<a href="' + playback_url + '" target="_blank">' + self.media_duration + '</a>' )
-        elif playback_url:
-            return format_html('<a href="' + playback_url + '" target="_blank">play</a>' )
-        return "00:00"
+            return format_html('<a href="javascript:void(0)" onclick="playvideo(\'' + playback_url + '\')">' + self.media_duration + '</a>' )
+        return format_html('<a href="javascript:void(0)" onclick="playvideo(' + playback_url + ')">play</a>' )
 
     def comments(self):
         if self.comment_count:

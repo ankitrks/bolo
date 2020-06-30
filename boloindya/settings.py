@@ -310,15 +310,13 @@ TEMPLATES[0]['OPTIONS']['context_processors'] += [
     
 # ]
 
+
 HAYSTACK_CONNECTIONS = {
-    'default': {
-        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
-        'URL': 'http://127.0.0.1:8983/solr/boloindya',                 # Assuming you created a core named 'boloindya'
-        'ADMIN_URL': 'http://127.0.0.1:8983/solr/admin/cores',
-        'INCLUDE_SPELLING': True,
-        # # ...or for multicore...
-        # # 'URL': 'http://127.0.0.1:8983/solr/mysite',
-    },
+      'default': {
+            'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+            'URL': 'http://127.0.0.1:9200/',
+            'INDEX_NAME': 'boloindya',
+      },
 }
 
 HAYSTACK_SIGNAL_PROCESSOR = 'forum.search.signals.RealtimeSignalProcessor'
@@ -536,12 +534,22 @@ BOLOINDYA_PIPELINE_ID_TS = '1545987947390-hpo4hx'
 BOLOINDYA_AWS_ACCESS_KEY_ID_TS = 'AKIAZNK4CM5CW4W4VWP7'
 BOLOINDYA_AWS_SECRET_ACCESS_KEY_TS = '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'
 BOLOINDYA_AWS_BUCKET_NAME_TS = 'boloindya-et'
+LAMBDA_ET_IDENTIFIER = ['/elastic-transcoder/lambda/et/']
+AMAZON_ET_IDENTIFIER = ['/elastic-transcoder/lambda/aws_et/']
+
+#### CDN Settings ######
+US_CDN_URL = "https://d1fa4tg1fvr6nj.cloudfront.net" # Amazon CloudFront US
+# IN_CDN_URL = "https://d7lk2jr51sych.cloudfront.net" # Amazon CloudFront IN
+# IN_CDN_URL = "https://1070250973.rsc.cdn77.org" # CDN77 IN
+IN_CDN_URL = "http://storage.boloindya.com" # Akamai CDN IN
+#### CDN Settings ######
+
 #### Transcoder settings #####
 
 #####CareerAnna ######
 #### S3 bucket #####
-CAREERANNA_AWS_ACCESS_KEY_ID = 'AKIAZNK4CM5CV76OQQHQ'
-CAREERANNA_AWS_SECRET_ACCESS_KEY = '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'
+CAREERANNA_AWS_ACCESS_KEY_ID = 'AKIAZNK4CM5CW4W4VWP7'
+CAREERANNA_AWS_SECRET_ACCESS_KEY = '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'
 CAREERANNA_AWS_BUCKET_NAME = 'careeranna'
 
 #### Transcoder settings #####

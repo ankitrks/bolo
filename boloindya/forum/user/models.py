@@ -11,7 +11,7 @@ from django.utils import timezone
 from ..core.conf import settings
 from ..core.utils.models import AutoSlugField
 from tinymce.models import HTMLField
-from drf_spirit.utils import language_options,month_choices
+from drf_spirit.utils import language_options,month_choices, salary_choices
 from django.db.models import F,Q
 from diff_model import ModelDiffMixin
 
@@ -107,6 +107,8 @@ class UserProfile(models.Model,ModelDiffMixin):
     boost_follow_count = models.PositiveIntegerField(_("Boost Follow"), null=True, blank=True, default=0)
     boosted_time = models.DateTimeField(null=True, blank=True)
     boost_span = models.PositiveIntegerField(_("Boost Span(Days)"), null=True, blank=True, default=0)
+    country_code = models.CharField(_("Country Phone Code"), max_length=20, blank = True, null = True)
+    salary_range = models.CharField(choices=salary_choices, blank = True, null = True, max_length=10,db_index=True)
 
     class Meta:
         verbose_name = _("user profile")

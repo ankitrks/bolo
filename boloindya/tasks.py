@@ -4,6 +4,10 @@ from celery.utils.log import get_task_logger
 from django.core.mail import send_mail
 from django.conf import settings
 import os
+from datetime import datetime, timedelta
+# from HTMLParser import HTMLParser
+# from django.contrib.auth.models import User
+# from forum.topic.models import Notification
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 logger = get_task_logger(__name__)
@@ -119,6 +123,7 @@ def vb_create_task(topic_id):
     topic = Topic.objects.get(pk=topic_id)
     if not topic.is_transcoded:
         if topic.is_vb and topic.question_video:
+            topic.update_m3u8_content()
             # data_dump, m3u8_url, job_id = transcode_media_file(topic.question_video.split('s3.amazonaws.com/')[1])
             # if m3u8_url:
                 # topic.backup_url = topic.question_video
@@ -127,7 +132,6 @@ def vb_create_task(topic_id):
                 # topic.transcode_job_id = job_id
                 # # topic.is_transcoded = True
                 # topic.save()
-            topic.update_m3u8_content()
                 #create_downloaded_url(topic_id)
 
 @app.task
@@ -260,17 +264,52 @@ def create_comment_notification(created,instance_id):
     from forum.user.utils.follow_redis import get_redis_follower
     try:
         instance = Comment.objects.get(pk=instance_id)
-        if created and not instance.is_vb:
+        if created:
             # all_follower_list = Follower.objects.filter(user_following = instance.user).values_list('user_follower_id',flat=True)
             all_follower_list = get_redis_follower(instance.user.id)
-            for each in all_follower_list:
+            mentions_ids = get_mentions_and_send_notification(instance)
+            for each in [user_id for user_id in all_follower_list if user_id not in mentions_ids]:
                 if not str(each) == str(instance.topic.user.id):
                     notify = Notification.objects.create(for_user_id = each,topic = instance,notification_type='2',user = instance.user)
-            notify_owner = Notification.objects.create(for_user = instance.topic.user ,topic = instance,notification_type='3',user = instance.user)
+            if not instance.topic.user == instance.user:
+                notify_owner = Notification.objects.create(for_user = instance.topic.user ,topic = instance,notification_type='3',user = instance.user)
     except Exception as e:
         print e
         pass
 
+from HTMLParser import HTMLParser
+class MLStripper(HTMLParser):
+    def __init__(self):
+        self.reset()
+        self.fed = []
+    def handle_data(self, d):
+        self.fed.append(d)
+    def get_data(self):
+        return ''.join(self.fed)
+
+def strip_tags(html):
+    s = MLStripper()
+    s.feed(html)
+    return s.get_data()
+
+def get_mentions_and_send_notification(comment_obj):
+    from django.contrib.auth.models import User
+    from forum.topic.models import Notification
+    comment = strip_tags(comment_obj.comment)
+    mention_tag=[mention for mention in comment.split() if mention.startswith("@")]
+    user_ids = []
+    if mention_tag:
+        for each_mention in mention_tag:
+            try:
+                user = User.objects.get(username=each_mention.strip('@'))
+                user_ids.append(user.id)
+                if not user == comment_obj.user:
+                    notify_mention = Notification.objects.create(for_user = user  ,topic = comment_obj,notification_type='10',user = comment_obj.user)
+            except Exception as e:
+                print e
+                pass
+    return user_ids
+ 
 @app.task
 def create_hash_view_count(create,instance_id):
     from forum.topic.models import Topic,TongueTwister,HashtagViewCounter
@@ -348,32 +387,48 @@ def send_report_mail(report_id):
     return True
 
 @app.task
-def send_upload_video_notification(data, pushNotification):
-    #Import files for notification
-    from jarvis.models import FCMDevice
-    import json
-    import requests
+def deafult_boloindya_follow(user_id,language):
     try:
-        title = data.get('title', "")
-        upper_title = data.get('upper_title', "")
-        notification_type = data.get('notification_type', "")
-        instance_id = data.get('id', "")
-        image_url = data.get('image_url', '')
-        particular_user_id=data.get('particular_user_id', None)
-        access =  _get_access_token()
-        
-        headers = {'Authorization': 'Bearer ' + access, 'Content-Type': 'application/json; UTF-8' }
-        fcm_message={}
-        devices=FCMDevice.objects.filter(user__pk=data.get('particular_user_id', None), is_uninstalled=False)
-        for each in devices:
-            fcm_message = {"message": {"token": each.reg_id ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": "-1", "image_url": image_url}}}
-            resp = requests.post("https://fcm.googleapis.com/v1/projects/boloindya-1ec98/messages:send", data=json.dumps(fcm_message), headers=headers)
-            print(resp)
-            print(resp.text)
-            print(fcm_message)
-        
-    except Exception as e:
-        logger.info(str(e))
+        from django.contrib.auth.models import User
+        from forum.user.models import Follower, UserProfile
+        from drf_spirit.utils import add_bolo_score
+        from forum.user.utils.follow_redis import update_redis_follower, update_redis_following
+
+        user = User.objects.get(pk=user_id)
+        if language == '2':
+            bolo_indya_user = User.objects.get(username = 'boloindya_hindi')
+        elif language == '3':
+            bolo_indya_user = User.objects.get(username = 'boloindya_tamil')
+        elif language == '4':
+            bolo_indya_user = User.objects.get(username = 'boloindya_telgu')
+        else:
+            bolo_indya_user = User.objects.get(username = 'boloindya')
+        follow,is_created = Follower.objects.get_or_create(user_follower = user,user_following=bolo_indya_user)
+        if is_created:
+            add_bolo_score(user.id, 'follow', follow)
+            userprofile = UserProfile.objects.filter(user = user).update(follow_count = F('follow_count') + 1)
+            bolo_indya_profile = UserProfile.objects.filter(user = bolo_indya_user).update(follower_count = F('follower_count') + 1)
+            update_redis_following(user.id,int(bolo_indya_user.id),True)
+            update_redis_follower(int(bolo_indya_user.id),user.id,True)
+        if not follow.is_active:
+            follow.is_active = True
+            follow.save()
+            update_redis_following(user.id,int(bolo_indya_user.id),True)
+            update_redis_follower(int(bolo_indya_user.id),user.id,True)
+        return True
+    except:
+        return False
+
+@app.task
+def save_click_id_response(user_profile_id):
+    import urllib2
+    from forum.user.models import Follower, UserProfile
+    userprofile = UserProfile.objects.filter(pk=user_profile_id)
+    userprofile[0].click_id = click_id
+    click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
+    response = urllib2.urlopen(click_url).read()
+    userprofile.update(click_id_response = str(response))
+
 
 @app.task
 def send_upload_video_notification(data, pushNotification):
@@ -396,9 +451,6 @@ def send_upload_video_notification(data, pushNotification):
         for each in devices:
             fcm_message = {"message": {"token": each.reg_id ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": "-1", "image_url": image_url}}}
             resp = requests.post("https://fcm.googleapis.com/v1/projects/boloindya-1ec98/messages:send", data=json.dumps(fcm_message), headers=headers)
-            print(resp)
-            print(resp.text)
-            print(fcm_message)
         
     except Exception as e:
         logger.info(str(e))

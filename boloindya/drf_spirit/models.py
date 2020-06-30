@@ -409,8 +409,7 @@ class UserFeedback(models.Model):
                 data={"from": "BoloIndya Support <support@boloindya.com>",
                       "to": ["support@boloindya.com"],
                       "cc":[self.contact_email],
-                      "bcc":["anshika@careeranna.com", "maaz@careeranna.com", \
-                            "ankit@careeranna.com", "gitesh@careeranna.com", "tanmai@boloindya.com"],
+                      "bcc":["anshika@careeranna.com", "gitesh@careeranna.com"],
                       "subject": "BoloIndya Feedback Received | " + self.user_name() + ' | ' + self.user_contact(),
                       "html": content_email
                 }
@@ -458,3 +457,23 @@ class Winner(RecordTimeStamp):
 
     def __unicode__(self):
        return str(self.rank) +': '+ self.user.st.name
+
+class Country(RecordTimeStamp):
+    name = models.CharField(_("country_name"), max_length=100, null=True, blank=True)
+    place_id = models.CharField(_("country_place_id"), max_length=350, null=True, blank=True)
+    def __unicode__(self):
+       return str(self.name)
+
+class State(RecordTimeStamp):
+    name = models.CharField(_("state_name"), max_length=100, null=True, blank=True)
+    place_id = models.CharField(_("state_place_id"), max_length=350, null=True, blank=True)
+    country = models.ForeignKey(Country, blank = True, null = True, related_name='state_country')
+    def __unicode__(self):
+       return str(self.name)+', '+str(self.country)
+
+class City(RecordTimeStamp):
+    name = models.CharField(_("city_name"), max_length=100, null=True, blank=True)
+    place_id = models.CharField(_("city_place_id"), max_length=350, null=True, blank=True)
+    state = models.ForeignKey(State, blank = True, null = True, related_name='city_state')
+    def __unicode__(self):
+       return str(self.name)+', '+str(self.state)
