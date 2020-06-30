@@ -2,6 +2,7 @@ import json
 import logging
 
 from django.core.serializers.json import DjangoJSONEncoder
+from django.conf import settings
 
 import connection
 
@@ -19,9 +20,12 @@ def get_redis(key):
         return None
 
 
-def set_redis(key, value, **kwargs):
+def set_redis(key, value, set_expiry=True):
     try:
-        return redis_cli.set("bi:"+key, json.dumps(value, cls=DjangoJSONEncoder), **kwargs)
+        if set_expiry:
+            return redis_cli.setex("bi:"+key, settings.REDIS_EXPIRY_TIME, json.dumps(value, cls=DjangoJSONEncoder))
+        else:
+            return redis_cli.set("bi:"+key, json.dumps(value, cls=DjangoJSONEncoder))
     except Exception as e:
         logger.exception("in set_redis " + str(e))
         return e

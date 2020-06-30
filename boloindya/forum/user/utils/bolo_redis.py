@@ -30,10 +30,10 @@ def get_current_month_bolo_info(user_id):
     bolo_info = get_redis(key)    
     if not bolo_info:
         bolo_info = get_user_bolo_info(user_id=user_id,month=datetime.now().month,year=datetime.now().year)
-        set_redis(key,bolo_info)
+        set_redis(key,bolo_info, True)
     elif datetime.strptime(bolo_info['last_updated'], '%Y-%m-%dT%H:%M:%S.%f')< datetime.now()-timedelta(minutes=n):
         bolo_info = get_user_bolo_info(user_id=user_id,month=datetime.now().month,year=datetime.now().year)
-        set_redis(key,bolo_info)
+        set_redis(key,bolo_info, True)
     return bolo_info
 
 def get_last_month_bolo_info(user_id):
@@ -47,10 +47,10 @@ def get_last_month_bolo_info(user_id):
             bolo_info = get_user_bolo_info(user_id=user_id,month=12,year=datetime.now().year-1)
         else:
             bolo_info = get_user_bolo_info(user_id=user_id,month=datetime.now().month-1,year=datetime.now().year)
-        set_redis(key,bolo_info)
+        set_redis(key,bolo_info, True)
     elif datetime.strptime(bolo_info['last_updated'], '%Y-%m-%dT%H:%M:%S.%f')< datetime.now()-timedelta(minutes=n):
         bolo_info = get_user_bolo_info(user_id=user_id,month=datetime.now().month,year=datetime.now().year)
-        set_redis(key,bolo_info)
+        set_redis(key,bolo_info, True)
     return bolo_info
 
 
@@ -62,10 +62,10 @@ def get_lifetime_bolo_info(user_id):
     bolo_info = get_redis(key)
     if not bolo_info:
         bolo_info = get_user_bolo_info(user_id=user_id,month=None,year=None)
-        set_redis(key,bolo_info)
+        set_redis(key,bolo_info, True)
     elif datetime.strptime(bolo_info['last_updated'], '%Y-%m-%dT%H:%M:%S.%f')< datetime.now()-timedelta(minutes=n):
         bolo_info = get_user_bolo_info(user_id=user_id,month=datetime.now().month,year=datetime.now().year)
-        set_redis(key,bolo_info)
+        set_redis(key,bolo_info, True)
     return bolo_info
 
 
