@@ -483,3 +483,5 @@ class MusicAlbum(models.Model):
   s3_file_path = models.CharField(_("s3 file path"),null=True,blank=True,max_length=1000)
   image_path = models.CharField(_("image path"),null=True,blank=True,max_length=1000)
   author_name = models.CharField(_("author name"),null=True,blank=True,max_length=1000)
+  def __unicode__(self):
+       return str(self.title)+', '+str(self.author_name)
