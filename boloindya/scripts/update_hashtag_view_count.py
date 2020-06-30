@@ -15,11 +15,15 @@ def run():
         for each_language in language_options:
             language_specific_vb = Topic.objects.filter(hash_tags=hash_tag, is_removed=False, is_vb=True,language_id=each_language[0])
             language_specific_seen = language_specific_vb.aggregate(Sum('view_count'))
-            language_specific_hashtag, is_created = HashtagViewCounter.objects.get_or_create(hashtag=hash_tag,language=each_language[0])
-            if language_specific_seen.has_key('view_count__sum') and language_specific_seen['view_count__sum']:
+            try:
+             language_specific_hashtag, is_created = HashtagViewCounter.objects.get_or_create(hashtag=hash_tag,language=each_language[0])
+             if language_specific_seen.has_key('view_count__sum') and language_specific_seen['view_count__sum']:
                 print "language_specific",each_language[1]," --> ",language_specific_seen['view_count__sum'],hash_tag
                 language_specific_hashtag.view_count = language_specific_seen['view_count__sum']
-            else:
+             else:
                 language_specific_hashtag.view_count = 0
-            language_specific_hashtag.video_count = len(language_specific_vb)
-            language_specific_hashtag.save()
+             language_specific_hashtag.video_count = len(language_specific_vb)
+             language_specific_hashtag.save()
+            except Exception as e:
+                print e
+                print hash_tag 
