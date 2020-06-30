@@ -102,6 +102,11 @@ class UserProfile(models.Model,ModelDiffMixin):
     paytm_number = models.CharField(_("Mobile No"), max_length=100, blank = True, null = True)
     android_did = models.CharField(_('android_did'),max_length=200,null=True,blank=True)
     is_guest_user = models.BooleanField(default=False)
+    boost_views_count = models.PositiveIntegerField(_("Boost View"), null=True, blank=True, default=0)
+    boost_like_count = models.PositiveIntegerField(_("Boost Like"), null=True, blank=True, default=0)
+    boost_follow_count = models.PositiveIntegerField(_("Boost Follow"), null=True, blank=True, default=0)
+    boosted_time = models.DateTimeField(null=True, blank=True)
+    boost_span = models.PositiveIntegerField(_("Boost Span(Hours)"), null=True, blank=True, default=0)
     country_code = models.CharField(_("Country Phone Code"), max_length=20, blank = True, null = True)
     salary_range = models.CharField(choices=salary_choices, blank = True, null = True, max_length=10,db_index=True)
 
@@ -343,6 +348,14 @@ class Contact(RecordTimeStamp):
 
     def __unicode__(self):
         return self.contact_name
+
+class DUser(models.Model):
+    name = models.CharField(_("Name"), max_length=100, blank=True, null = True)
+    gender = models.CharField(choices=gender_option, blank = True, null = True, max_length=10, default='')
+    is_used = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return self.name
 
 
 

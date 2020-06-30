@@ -16,7 +16,6 @@ import decimal
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
 from drf_spirit.utils import create_random_user
 
-
 def run():
     counter_objects_created=0
     print "Start Time Eng_Engagment: ",datetime.now()
@@ -26,10 +25,7 @@ def run():
     action_type =['comment','like','seen','follow','share','comment_like']
     opt_action = random.choice(action_type)
     now = datetime.now()
-    topic_ids = Topic.objects.filter(is_vb=True,is_removed=False).values_list('id', flat=True)
-    topic_ids = list(topic_ids)
-    actionable_ids = random.sample(topic_ids,250)
-    last_n_days_post_ids = Topic.objects.filter(is_vb=True,is_removed=False,date__gte=now-timedelta(days=3),user__st__boosted_time__isnull=True).order_by('-date').values_list('id',flat=True)
+    last_n_days_post_ids = Topic.objects.filter(is_vb=True,is_removed=False,date__gte=now-timedelta(days=1),user__st__boosted_time__isnull=False).order_by('-date').values_list('id',flat=True)
     last_n_days_post_ids = list(last_n_days_post_ids)
 
     post_counter = 0
@@ -41,18 +37,13 @@ def run():
         try:
             print "before: views updation",datetime.now()
             each_seen = Topic.objects.get(pk=each_seen_id)
-            if each_seen.user.st.is_superstar:
-                multiplication_factor = decimal.Decimal(random.randrange(390, 670))/100
-                print "i am superstar: ",multiplication_factor
-            elif each_seen.user.st.is_popular and not each_seen.user.st.is_superstar:
-                multiplication_factor = decimal.Decimal(random.randrange(130, 270))/100
-                print "i am popular: ",multiplication_factor
-            elif not each_seen.user.st.is_popular and not each_seen.user.st.is_superstar:
-                multiplication_factor = decimal.Decimal(random.randrange(110, 210))/100
-                print "i am normal: ",multiplication_factor
+            if each_seen.user.st.boost_views_count:
+                multiplication_factor = decimal.Decimal(random.randrange(int(each_seen.user.st.boost_views_count/850),int(each_seen.user.st.boost_views_count/750)))
+                print "i am boosted: ",multiplication_factor
             else:
                 multiplication_factor = 1
                 print "i am non popular: ",multiplication_factor
+            print "adab",(100*multiplication_factor)-each_seen.view_count,each_seen.view_count
             if each_seen.date +timedelta(minutes=10) > now:
                 number_seen = random.randrange(6,100)
             elif each_seen.date +timedelta(minutes=10) < now and each_seen.date +timedelta(minutes=30) > now and each_seen.view_count < int(100*multiplication_factor):
@@ -89,80 +80,26 @@ def run():
             profile_updation = UserProfile.objects.filter(user = Topic.objects.get(pk=each_seen_id).user).update(own_vb_view_count = F('own_vb_view_count')+number_seen, view_count = F('view_count')+number_seen)
             print "after: views updation",datetime.now()
             print "total created: ", number_seen
+        except Exception as e:
+            print e
+        try:
             print "before: like creation",datetime.now()
             check_like(each_seen_id,user_ids)
             print "after: like creation",datetime.now()
-            print "before: comment creation",datetime.now()
-            # check_comment(each_seen_id,user_ids)
-            print "after: comment creation",datetime.now()
-            print "before: follower creation",datetime.now()
-            check_follower(each_seen_id,user_ids)
-            print "after: follower creation",datetime.now()
         except Exception as e:
             print e
-            pass
-
-
-    test_counter=0
-    for each_topic_id in last_n_days_post_ids:
-        test_counter+=1
-        print test_counter,"/",len(last_n_days_post_ids)
-        action_type =['seen','comment','like','follow','share','comment_like']
-        opt_action = random.choice(action_type)
-        opt_action_user_id = random.choice(user_ids)
-        if opt_action =='comment':
-            print "before: comment creation",datetime.now()
-            # action_comment(opt_action_user_id,each_topic_id)
-            print "after: comment creation",datetime.now()
-        elif opt_action == 'like':
-            each_topic = Topic.objects.get(pk=each_topic_id)
-            if each_topic.likes_count<each_topic.view_count/random.randrange(10,21) and each_topic.likes_count < each_topic.view_count:
-                action_like(opt_action_user_id,each_topic_id)
-        elif opt_action == 'follow':
-            action_follow(opt_action_user_id,Topic.objects.get(pk=each_topic_id).user.id)
-        elif opt_action == 'share':
-            action_share(opt_action_user_id,each_topic_id)
-        # elif opt_action == 'comment_like':
-        #     all_comment_list_id = Comment.objects.filter(is_removed=False).values_list('user_id',flat=True)
-        #     comment_ids = list(all_comment_list_id)
-        #     comment_ids = random.sample(comment_ids,50)
-        #     all_comment = Comment.objects.filter(pk__in =comment_ids)
-        #     for each_comment in all_comment:
-        #         action_comment_like(opt_action_user_id,each_comment)
-        elif opt_action == 'seen':
-            action_seen(opt_action_user_id,each_topic_id)
-
-    print "######## start random action   ###########",datetime.now()
-    random_test_counter=0
-    for each_topic_id in actionable_ids:
-        random_test_counter+=1
-        print random_test_counter,"/",len(actionable_ids)
-        action_type =['seen','comment','like','follow','share','comment_like']
-        opt_action = random.choice(action_type)
-        opt_action_user_id = random.choice(user_ids)
-        if opt_action =='comment':
-            print "before: comment creation",datetime.now()
-            # action_comment(opt_action_user_id,each_topic_id)
-            print "after: comment creation",datetime.now()
-        elif opt_action == 'like':
-            each_topic = Topic.objects.get(pk=each_topic_id)
-            if each_topic.likes_count<each_topic.view_count/random.randrange(10,21) and each_topic.likes_count < each_topic.view_count:
-                action_like(opt_action_user_id,each_topic_id)
-        elif opt_action == 'follow':
-            action_follow(opt_action_user_id,random.choice(User.objects.all()).id)
-        elif opt_action == 'share':
-            action_share(opt_action_user_id,each_topic_id)
-        # elif opt_action == 'comment_like':
-        #     all_comment_list_id = Comment.objects.filter(is_removed=False).values_list('user_id',flat=True)
-        #     comment_ids = list(all_comment_list_id)
-        #     comment_ids = random.sample(comment_ids,50)
-        #     all_comment = Comment.objects.filter(pk__in =comment_ids)
-        #     for each_comment in all_comment:
-        #         action_comment_like(opt_action_user_id,each_comment)
-        elif opt_action == 'seen':
-            action_seen(opt_action_user_id,each_topic_id)
-
-    print "End Time Eng_Engagment: ",datetime.now()
+    try:
+        increase_follower = UserProfile.objects.filter(user__st__boosted_time__isnull=False).values_list('user_id',flat=True)
+        for each_user_id in increase_follower:
+            print "before: follower creation",datetime.now()
+            try:
+                check_follower(each_user_id)
+            except:
+                pass
+            print "after: follower creation",datetime.now()
+    except Exception as e:
+        print e
+            
 
 
 def check_like(topic_id,user_ids):
@@ -174,45 +111,43 @@ def check_like(topic_id,user_ids):
     new_vb_like =[]
     to_be_created_bolo=[]
     notific_dic= []
-    # if each_like.user.st.is_superstar:
-    #     random_counter = int(each_like.view_count*(decimal.Decimal(random.randrange(1300, 2010))/100)/100)
-    #     print "i am superstar: ",random_counter
-    # elif each_like.user.st.is_popular and not each_like.user.st.is_superstar:
-    #     random_counter = int(each_like.view_count*(decimal.Decimal(random.randrange(800, 1210))/100)/100)
-    #     print "i am popular: ",random_counter
-    # elif not each_like.user.st.is_popular and not each_like.user.st.is_superstar:
-    #     random_counter = int(each_like.view_count*(decimal.Decimal(random.randrange(500, 710))/100)/100)
-    #     print "i am normal: ",random_counter
-    # else:
-    #     random_counter = 1
-    #     print "i am non popular: ",random_counter
-    number_like = int(int((each_like.vb_playtime/60)/1.5)*decimal.Decimal(random.randrange(30, 50))/100)
-    print number_like,"$^#^&$&!$^!$*#$*",each_like.vb_playtime,each_like.id
+    if each_like.user.st.boost_like_count:
+        multiplication_factor = decimal.Decimal(random.randrange(int(each_like.user.st.boost_like_count/300),int(each_like.user.st.boost_like_count/250)))
+        print "i am boosted: ",multiplication_factor
+    else:
+        multiplication_factor = 1
 
-    print number_like,"required_like"
-    if number_like:
-        # if each_like.date +timedelta(minutes=10) > now and random_counter > 100 and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(6,random_counter)
-        # elif each_like.date +timedelta(minutes=10) < now and each_like.date +timedelta(minutes=30) > now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(100,random_counter-each_like.likes_count)
-        # elif each_like.date +timedelta(minutes=30) < now and each_like.date +timedelta(hours=2) > now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
-        # elif each_like.date +timedelta(hours=2) < now and each_like.date +timedelta(hours=4) > now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
-        # elif each_like.date +timedelta(hours=4) < now and each_like.date +timedelta(hours=6) > now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
-        # elif each_like.date +timedelta(hours=6) < now and each_like.date +timedelta(hours=8) > now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
-        # elif each_like.date +timedelta(hours=10) < now and each_like.date +timedelta(hours=12) > now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
-        # elif each_like.date +timedelta(hours=12) < now and each_like.date +timedelta(hours=14) > now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
-        # elif each_like.date +timedelta(hours=14) < now and each_like.date +timedelta(hours=16) > now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
-        # elif each_like.date +timedelta(hours=16) < now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
-        # else:
-        #     number_like = 1
+        print "hoadoaod", multiplication_factor
+    if each_like.date +timedelta(minutes=10) > now:
+        number_like = random.randrange(6,20)
+    elif each_like.date +timedelta(minutes=10) < now and each_like.date +timedelta(minutes=30) > now and each_like.likes_count < int(40*multiplication_factor):
+        number_like = random.randrange(40,int(40*multiplication_factor)-each_like.likes_count)
+    elif each_like.date +timedelta(minutes=30) < now and each_like.date +timedelta(hours=2) > now and each_like.likes_count < int(60*multiplication_factor):
+        number_like = random.randrange(1,int(60*multiplication_factor)-each_like.likes_count)
+    elif each_like.date +timedelta(hours=2) < now and each_like.date +timedelta(hours=4) > now and each_like.likes_count < int(80*multiplication_factor):
+        number_like = random.randrange(1,int(80*multiplication_factor)-each_like.likes_count)
+    elif each_like.date +timedelta(hours=4) < now and each_like.date +timedelta(hours=6) > now and each_like.likes_count < int(100*multiplication_factor):
+        number_like = random.randrange(1,int(100*multiplication_factor)-each_like.likes_count)
+    elif each_like.date +timedelta(hours=6) < now and each_like.date +timedelta(hours=8) > now and each_like.likes_count < int(120*multiplication_factor):
+        number_like = random.randrange(1,int(120*multiplication_factor)-each_like.likes_count)
+    elif each_like.date +timedelta(hours=10) < now and each_like.date +timedelta(hours=12) > now and each_like.likes_count < int(140*multiplication_factor):
+        number_like = random.randrange(1,int(140*multiplication_factor)-each_like.likes_count)
+    elif each_like.date +timedelta(hours=12) < now and each_like.date +timedelta(hours=14) > now and each_like.likes_count < int(160*multiplication_factor):
+        number_like = random.randrange(1,int(160*multiplication_factor)-each_like.likes_count)
+    elif each_like.date +timedelta(hours=14) < now and each_like.date +timedelta(hours=16) > now and each_like.likes_count < int(180*multiplication_factor):
+        number_like = random.randrange(1,int(180*multiplication_factor)-each_like.likes_count)
+    elif each_like.date +timedelta(hours=16) < now and each_like.date +timedelta(hours=18) > now and each_like.likes_count < int(200*multiplication_factor):
+        number_like = random.randrange(1,int(200*multiplication_factor)-each_like.likes_count)
+    elif each_like.date +timedelta(hours=18) < now and each_like.date +timedelta(hours=19) > now and each_like.likes_count < int(220*multiplication_factor):
+        number_like = random.randrange(1,int(220*multiplication_factor)-each_like.likes_count)
+    elif each_like.date +timedelta(hours=19) < now and each_like.date +timedelta(hours=20) > now and each_like.likes_count < int(240*multiplication_factor):
+        number_like = random.randrange(1,int(240*multiplication_factor)-each_like.likes_count)
+    elif each_like.date +timedelta(hours=20) < now and each_like.date +timedelta(hours=21) > now and each_like.likes_count < int(245*multiplication_factor):
+        number_like = random.randrange(1,int(245*multiplication_factor)-each_like.likes_count)
+    elif each_like.date +timedelta(hours=21) < now and each_like.likes_count < int(250*multiplication_factor):
+        number_like = random.randrange(1,int(250*multiplication_factor)-each_like.likes_count)
+    else:
+        number_like = 1
 
         i = 0
         while i < number_like:
@@ -258,102 +193,42 @@ def check_like(topic_id,user_ids):
                     aList=None
                     print "notfic completed"
 
-        share_counter = each_like.total_share_count
-        required_share = int(number_like*(random.randrange(500, 700)/100)/100)
-        if each_like.user.st.is_superstar:
-            required_share = int(number_like*(decimal.Decimal(random.randrange(1500, 2010))/100)/100)
-            print "i am superstar: ",required_share
-        elif each_like.user.st.is_popular and not each_like.user.st.is_superstar:
-            required_share = int(number_like*(decimal.Decimal(random.randrange(700, 1010))/100)/100)
-            print "i am popular: ",required_share
-        elif not each_like.user.st.is_popular and not each_like.user.st.is_superstar:
-            required_share = int(number_like*(decimal.Decimal(random.randrange(500, 710))/100)/100)
-            print "i am normal: ",required_share
+
+def check_follower(user_id):
+    try:
+        now = datetime.now()
+        userprofile = UserProfile.objects.get(user_id = user_id)
+        if userprofile.boost_follow_count:
+            multiplication_factor = decimal.Decimal(random.randrange(int(userprofile.boost_follow_count/450),int(userprofile.boost_follow_count/400)))
+            print "i am boosted: ", multiplication_factor
         else:
-            required_share = 1
-            print "i am non popular: ",required_share
-        while(share_counter<required_share):
-            opt_action_user_id = random.choice(user_ids)
-            action_share(opt_action_user_id,topic_id)
-            share_counter+=1
-
-def check_comment(topic_id,user_ids):
-    now = datetime.now()
-    topic = Topic.objects.get(pk=topic_id)
-    if topic.user.st.is_superstar:
-        multiplication_factor = decimal.Decimal(random.randrange(150, 250))/100
-        print "i am superstar: ",multiplication_factor
-    elif topic.user.st.is_popular and not topic.user.st.is_superstar:
-        multiplication_factor = decimal.Decimal(random.randrange(50, 150))/100
-        print "i am popular: ",multiplication_factor
-    elif not topic.user.st.is_popular and not topic.user.st.is_superstar:
-        multiplication_factor = decimal.Decimal(random.randrange(10, 50))/100
-        print "i am normal: ",multiplication_factor
-    else:
-        multiplication_factor = 1
-
-
-    if topic.date +timedelta(minutes=10) > now:
-        required_comment = random.randrange(0,2)
-    elif topic.date +timedelta(minutes=10) < now and topic.date +timedelta(minutes=30) > now and topic.comment_count < int(1*multiplication_factor):
-        required_comment = random.randrange(1,int(1*multiplication_factor)-topic.comment_count)
-    elif topic.date +timedelta(minutes=30) < now and topic.date +timedelta(hours=2) > now and topic.comment_count < int(2*multiplication_factor):
-        required_comment = random.randrange(1,int(2*multiplication_factor)-topic.comment_count)
-    elif topic.date +timedelta(hours=2) < now and topic.date +timedelta(hours=4) > now and topic.comment_count < int(3*multiplication_factor):
-        required_comment = random.randrange(1,int(3*multiplication_factor)-topic.comment_count)
-    elif topic.date +timedelta(hours=4) < now and topic.date +timedelta(hours=6) > now and topic.comment_count < int(4*multiplication_factor):
-        required_comment = random.randrange(1,int(4*multiplication_factor)-topic.comment_count)
-    elif topic.date +timedelta(hours=6) < now and topic.date +timedelta(hours=8) > now and topic.comment_count < int(5*multiplication_factor):
-        required_comment = random.randrange(1,int(5*multiplication_factor)-topic.comment_count)
-    else:
-        required_comment = 1
-    comment_counter = 0
-    # while(comment_counter<required_comment):
-    #     opt_action_user_id = random.choice(user_ids)
-    #     action_comment(opt_action_user_id,topic_id)
-    #     comment_counter+=1
-
-def check_follower(topic_id,user_ids):
-    now = datetime.now()
-    topic = Topic.objects.get(pk=topic_id)
-    if topic.user.st.is_superstar:
-        multiplication_factor = decimal.Decimal(random.randrange(2500,3000))/100
-        print "i am superstar: ",multiplication_factor
-    elif topic.user.st.is_popular and not topic.user.st.is_superstar:
-        multiplication_factor = decimal.Decimal(random.randrange(240,750))/100
-        print "i am popular: ",multiplication_factor
-    elif not topic.user.st.is_popular and not topic.user.st.is_superstar:
-        multiplication_factor = decimal.Decimal(random.randrange(100,240))/100
-        print "i am normal: ",multiplication_factor
-    else:
-        multiplication_factor = 1
-
-    if topic.date +timedelta(minutes=10) > now:
-        required_follower = random.randrange(0,2)
-    elif topic.date +timedelta(minutes=10) < now and topic.date +timedelta(minutes=30) > now and topic.user.st.follower_count < int(50*multiplication_factor):
-        required_follower = random.randrange(1,int(50*multiplication_factor)-topic.user.st.follower_count)
-    elif topic.date +timedelta(minutes=30) < now and topic.date +timedelta(hours=2) > now and topic.user.st.follower_count < int(100*multiplication_factor):
-        required_follower = random.randrange(1,int(100*multiplication_factor)-topic.user.st.follower_count)
-    elif topic.date +timedelta(hours=2) < now and topic.date +timedelta(hours=4) > now and topic.user.st.follower_count < int(200*multiplication_factor):
-        required_follower = random.randrange(1,int(200*multiplication_factor)-topic.user.st.follower_count)
-    elif topic.date +timedelta(hours=4) < now and topic.date +timedelta(hours=6) > now and topic.user.st.follower_count < int(300*multiplication_factor):
-        required_follower = random.randrange(1,int(300*multiplication_factor)-topic.user.st.follower_count)
-    elif topic.date +timedelta(hours=6) < now and topic.date +timedelta(hours=8) > now and topic.user.st.follower_count < int(400*multiplication_factor):
-        required_follower = random.randrange(1,int(400*multiplication_factor)-topic.user.st.follower_count)
-    else:
-        required_follower = 1
-
-    follower_counter = 0
-    all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).exclude(user_id__in=get_redis_follower(topic.user.id)).values_list('user_id',flat=True)[:required_follower]
-    if len(all_test_userprofile_id) < required_follower:
-        print 'user_created:',required_follower-len(all_test_userprofile_id)
-        create_random_user(required_follower-len(all_test_userprofile_id))
-        all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).exclude(user_id__in=get_redis_follower(topic.user.id)).values_list('user_id',flat=True)[:required_follower]
-    user_ids = list(all_test_userprofile_id)
-    for each_user_id in user_ids:
-        status = action_follow(each_user_id,topic.user.id)
-        if status:
-            follower_counter+=1
+            multiplication_factor = 1
+        if userprofile.boost_span:
+            boost_span = userprofile.boost_span
+        else:
+            boost_span = 24
+        if userprofile.boosted_time + timedelta(hours=userprofile.boost_span if userprofile.boost_span else 24) > datetime.now()-timedelta(hours=1):
+            time_passed = (datetime.now() - userprofile.boosted_time).total_seconds()/3600
+            if time_passed > boost_span:
+                time_passed = boost_span
+            multiplication_factor = int(multiplication_factor*decimal.Decimal(time_passed)/boost_span)
+            if userprofile.follower_count < int(400*multiplication_factor):
+                required_follower = random.randrange(1,int(400*multiplication_factor)-userprofile.follower_count)
+            else:
+                required_follower = 1
+            print required_follower
+            follower_counter = 0
+            all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).exclude(user_id__in=get_redis_follower(userprofile.user.id)).values_list('user_id',flat=True)[:required_follower]
+            if len(all_test_userprofile_id) < required_follower:
+                create_random_user(required_follower-len(all_test_userprofile_id))
+                all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).exclude(user_id__in=get_redis_follower(userprofile.user.id)).values_list('user_id',flat=True)[:required_follower]
+            user_ids = list(all_test_userprofile_id)
+            for each_user_id in user_ids:
+                status = action_follow(each_user_id,userprofile.user.id)
+                if status:
+                    follower_counter+=1
+    except Exception as e:
+        print e
 
 #comment
 def action_comment(user_id,topic_id):
@@ -406,6 +281,8 @@ def action_follow(test_user_id,any_user_id):
         followed_user.update(follower_count = F('follower_count')+1)
         update_redis_following(test_user_id,any_user_id,True)
         update_redis_follower(any_user_id,test_user_id,True)
+        return True
+    return False
 
 #share
 def action_share(user_id, topic_id):
@@ -484,11 +361,12 @@ def get_weight(key):
 def add_bolo_score(user_id, feature, action_object):
     score = get_weight(feature)
     if score > 0:
-        userprofile = UserProfile.objects.filter(user_id = user_id)
-        userprofile.update(bolo_score = F('bolo_score')+ int(score))
+        userprofile = UserProfile.objects.get(user_id = user_id)
+        userprofile.bolo_score+= int(score)
+        userprofile.save()
         weight_obj = get_weight_object(feature)
         if weight_obj:
-            add_to_history(userprofile[0].user, score, get_weight_object(feature), action_object, False)
+            add_to_history(userprofile.user, score, get_weight_object(feature), action_object, False)
         if feature in ['create_topic','create_topic_en']:
             from forum.topic.models import Notification
             notification_type = '8'
@@ -514,5 +392,3 @@ def find_set_diff(list_a, list_b, key_list):
     set_diff = pd.concat([df_a, df_b, df_b]).drop_duplicates(keep = False)
     # print(set_diff.T.to_dict().values())
     return set_diff.T.to_dict().values()
-
-

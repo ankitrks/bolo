@@ -14,6 +14,7 @@ from forum.topic.models import VBseen
 import datetime
 import pytz
 from django.utils import timezone
+from datetime import datetime
 from django.contrib.admin.filters import DateFieldListFilter
 from django.utils.translation import gettext_lazy as _
 class CustomDateTimeFilter(DateFieldListFilter):
@@ -60,7 +61,7 @@ class UserProfileResource(resources.ModelResource):
         report_skipped = True
         list_filter = ('language','is_popular','is_superstar','is_business')
         fields = ( 'user__username', 'name', 'language', 'bolo_score', 'user__date_joined', 'follow_count', 'follower_count', \
-            'vb_count', 'answer_count', 'share_count', 'like_count')
+            'vb_count', 'answer_count', 'share_count', 'like_count', 'boost_views_count', 'boost_like_count', 'boost_follow_count','boost_span')
 
 class SingUpOTPAdmin(admin.ModelAdmin):
     list_display = ('mobile_no', 'otp', 'is_active', 'created_at', 'used_at', 'is_reset_password', 'is_for_change_phone', 'for_user', )
@@ -132,10 +133,17 @@ admin.site.register(User, UserAdmin)
 class UserProfileAdmin(ImportExportModelAdmin):
     search_fields = ('user__username', 'user__email', 'name', 'mobile_no', 'paytm_number')
     list_display = ('user', 'name', 'language', 'bolo_score', 'follow_count', 'follower_count', 'vb_count', 'answer_count', \
-        'share_count', 'like_count', 'is_popular','is_superstar', 'is_business')
-    list_editable = ('is_popular','is_superstar', 'is_business', 'language')
+        'share_count', 'like_count', 'is_popular','is_superstar', 'is_business', 'boost_views_count', 'boost_like_count', 'boost_follow_count','boost_span')
+    list_editable = ('is_popular','is_superstar', 'is_business', 'language', 'boost_views_count', 'boost_like_count', 'boost_follow_count','boost_span')
     list_filter = ('user__date_joined', ('user__date_joined', DateRangeFilter), 'language','is_popular','is_superstar', 'is_business')
     resource_class = UserProfileResource
+
+    def save_model(self, request, obj, form, change): 
+        if 'boost_views_count' in form.changed_data or 'boost_like_count' in form.changed_data or 'boost_follow_count' in form.changed_data or 'boost_span' in form.changed_data:
+            obj.boosted_time = datetime.now()
+            obj.save()
+        super(UserProfileAdmin,self).save_model(request, obj, form, change)
+
 admin.site.register(UserProfile,UserProfileAdmin)
 
 class ReferralCodeAdmin(admin.ModelAdmin):
