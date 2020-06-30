@@ -106,7 +106,7 @@ class UserProfile(models.Model,ModelDiffMixin):
     boost_like_count = models.PositiveIntegerField(_("Boost Like"), null=True, blank=True, default=0)
     boost_follow_count = models.PositiveIntegerField(_("Boost Follow"), null=True, blank=True, default=0)
     boosted_time = models.DateTimeField(null=True, blank=True)
-    boost_span = models.PositiveIntegerField(_("Boost Span(Days)"), null=True, blank=True, default=0)
+    boost_span = models.PositiveIntegerField(_("Boost Span(Hours)"), null=True, blank=True, default=0)
     country_code = models.CharField(_("Country Phone Code"), max_length=20, blank = True, null = True)
     salary_range = models.CharField(choices=salary_choices, blank = True, null = True, max_length=10,db_index=True)
 
