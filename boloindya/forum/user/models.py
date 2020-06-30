@@ -102,11 +102,11 @@ class UserProfile(models.Model,ModelDiffMixin):
     paytm_number = models.CharField(_("Mobile No"), max_length=100, blank = True, null = True)
     android_did = models.CharField(_('android_did'),max_length=200,null=True,blank=True)
     is_guest_user = models.BooleanField(default=False)
-    boost_views_count = models.PositiveIntegerField(_("Boost View"), default=0)
-    boost_like_count = models.PositiveIntegerField(_("Boost Like"), default=0)
-    boost_follow_count = models.PositiveIntegerField(_("Boost Follow"), default=0)
+    boost_views_count = models.PositiveIntegerField(_("Boost View"), null=True, blank=True, default=0)
+    boost_like_count = models.PositiveIntegerField(_("Boost Like"), null=True, blank=True, default=0)
+    boost_follow_count = models.PositiveIntegerField(_("Boost Follow"), null=True, blank=True, default=0)
     boosted_time = models.DateTimeField(null=True, blank=True)
-    boost_span = models.PositiveIntegerField(_("Boost Span(Days)"), default=0)
+    boost_span = models.PositiveIntegerField(_("Boost Span(Days)"), null=True, blank=True, default=0)
 
     class Meta:
         verbose_name = _("user profile")
