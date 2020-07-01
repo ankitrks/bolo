@@ -35,6 +35,8 @@ class Category(models.Model):
     marathi_title = models.CharField(_("marathi_title"), max_length=75,null=True,blank=True)
     punjabi_title = models.CharField(_("punjabi_title"), max_length=75,null=True,blank=True)
     odia_title = models.CharField(_("odia_title"), max_length=75,null=True,blank=True)
+    bhojpuri_title = models.CharField(_("bhojpuri_title"), max_length=75,null=True,blank=True)
+    haryanvi_title = models.CharField(_("haryanvi_title"), max_length=75,null=True,blank=True)
     slug = AutoSlugField(populate_from="title", db_index=False, blank=True)
     description = models.CharField(_("description"), max_length=255, blank=True)
     color = models.CharField(_("color"), max_length=7, blank=True,
