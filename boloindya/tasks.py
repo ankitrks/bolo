@@ -207,12 +207,10 @@ def sync_contacts_with_user(user_id):
     from forum.user.models import UserProfile,UserPhoneBook,Contact
     user_phonebook = UserPhoneBook.objects.get(user_id=user_id)
     all_contact_no = list(user_phonebook.contact.all().values_list('contact_number',flat=True))
-    print all_contact_no
-    all_userprofile = UserProfile.objects.filter(mobile_no__in=all_contact_no,user__is_active=True)
-    print all_userprofile
+    all_userprofile = UserProfile.objects.filter(mobile_no__in=all_contact_no,user__is_active=True).values('mobile_no','user_id')
     if all_userprofile:
         for each_userprofile in all_userprofile:
-            Contact.objects.filter(contact_number=each_userprofile.mobile_no).update(is_user_registered=True,user=each_userprofile.user)
+            Contact.objects.filter(contact_number=each_userprofile['mobile_no']).update(is_user_registered=True,user_id=each_userprofile['user_id'])
 
 @app.task
 def cache_follow_post(user_id):
