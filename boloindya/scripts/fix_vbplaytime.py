@@ -6,7 +6,7 @@ import random
 
 def run():
     all_old_vb_playtime = VideoPlaytime.objects.filter(timestamp__lt = datetime.now()- timedelta(days=700))
-    start_date = datetime.strptime('01-'+str(datetime.now().month)+'-'+str(datetime.now().year), "%d-%m-%Y")
+    start_date = datetime.strptime('01-'+str(datetime.now().month - 1 )+'-'+str(datetime.now().year), "%d-%m-%Y")
     for each in all_old_vb_playtime:
         vb = Topic.objects.get(pk=each.videoid)
         if vb.date > start_date:
@@ -14,9 +14,6 @@ def run():
         else:
             random_time = random_datetime(start_date,datetime.now())
         VideoPlaytime.objects.filter(pk=each.id).update(timestamp = random_time)
-
-
-
 
 def random_datetime(start, end):
     """Generate a random datetime between `start` and `end`"""

@@ -6,6 +6,14 @@ def admin_all(model):
         except Exception, e:
             pass
 
+from django.conf import settings
+class DBRouter(object): 
+    def db_for_read(self, model, **hints):
+        return 'read'
+
+    def db_for_write(self, model, **hints):
+        return 'default'
+
 # import io
 # import os
 # import wget
