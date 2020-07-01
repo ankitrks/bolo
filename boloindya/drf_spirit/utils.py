@@ -20,6 +20,9 @@ language_options = (
     ('9', "Marathi"),
     ('10', "Punjabi"),
     ('11', "Odia"),
+    ('12', "Bhojpuri"),
+    ('13', "Haryanvi"),
+
 
 )
 
