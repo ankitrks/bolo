@@ -548,7 +548,7 @@ LAMBDA_ET_IDENTIFIER = ['/elastic-transcoder/lambda/et/']
 AMAZON_ET_IDENTIFIER = ['/elastic-transcoder/lambda/aws_et/']
 
 #### CDN Settings ######
-US_CDN_URL = "https://d1fa4tg1fvr6nj.cloudfront.net" # Amazon CloudFront US
+US_CDN_URL = "http://cdnus.boloindya.com" # Amazon CloudFront US
 # IN_CDN_URL = "https://d7lk2jr51sych.cloudfront.net" # Amazon CloudFront IN
 # IN_CDN_URL = "https://1070250973.rsc.cdn77.org" # CDN77 IN
 IN_CDN_URL = "http://storage.boloindya.com" # Akamai CDN IN
