@@ -24,6 +24,7 @@ from .transcoder import transcode_media_file
 from django.utils.html import format_html
 from django.db.models.query import QuerySet
 from django.dispatch import Signal
+from diff_model import ModelDiffMixin
 
 post_update = Signal()
 
@@ -73,7 +74,7 @@ class BoloActionHistory(RecordTimeStamp):
         return format_html('<a href="/superman/forum_user/userprofile/' + str(self.user.st.id) \
             + '/change/" target="_blank">' + self.user.username + '</a>' )
 
-class Topic(RecordTimeStamp):
+class Topic(RecordTimeStamp, ModelDiffMixin):
     """
     Topic model
 
@@ -473,6 +474,21 @@ class Topic(RecordTimeStamp):
         score = round(((time_decay_constant**2)/((float(post_time)**4)+(time_decay_constant**2)))*score ,5) #10^10 is multplied to normailze the decimal value
         Topic.objects.filter(pk=self.id).update(vb_score = score)
         return score
+
+    def save(self):
+        if self.pk:
+            try:
+                data = {}
+                changed_fields = self.changed_fields
+                print(changed_fields)
+                for value in changed_fields:
+                    data[value] = self.get_field_diff(value)[1]
+                print(data)
+                Topic.objects.filter(pk=self.pk).update(**data)
+            except Exception as e:
+                super(Topic , self).save()
+        else:
+            super(Topic , self).save()
 
 class RankingWeight(RecordTimeStamp):
     features=models.CharField(max_length=20)
