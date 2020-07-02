@@ -480,10 +480,8 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
             try:
                 data = {}
                 changed_fields = self.changed_fields
-                print(changed_fields)
                 for value in changed_fields:
                     data[value] = self.get_field_diff(value)[1]
-                print(data)
                 Topic.objects.filter(pk=self.pk).update(**data)
             except Exception as e:
                 super(Topic , self).save()
