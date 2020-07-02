@@ -879,17 +879,17 @@ def put_views_data():
 def main():
 
 	put_share_data()
-	# put_installs_data()
-	# put_dau_data()
-	# put_mau_data()
-	# put_video_views_analytics()
-	# put_videos_created()
-	# put_uniq_views_analytics()
-	# put_total_video_creators()
-	# put_video_creators_analytics_lang()
-	# put_install_signup_conversion()
-	# put_uninstall_data()
-	# put_views_data()
+	put_installs_data()
+	put_dau_data()
+	put_mau_data()
+	put_video_views_analytics()
+	put_videos_created()
+	put_uniq_views_analytics()
+	put_total_video_creators()
+	put_video_creators_analytics_lang()
+	put_install_signup_conversion()
+	put_uninstall_data()
+	put_views_data()
 	
 
 def run():

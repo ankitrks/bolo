@@ -6,7 +6,7 @@ from forum.category.models import Category,CategoryViewCounter
 from import_export.admin import ImportExportModelAdmin,ExportMixin
 from import_export import resources
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
-from .models import UserFollowUnfollowDetails, UserVideoTypeDetails, VideoDetails, UserEntryPoint, UserViewedFollowersFollowing, UserInterest, VideoSharedDetails, UserSearch, UserLogStatistics
+from .models import UserFollowUnfollowDetails, UserVideoTypeDetails, MusicAlbum, VideoDetails, UserEntryPoint, UserViewedFollowersFollowing, UserInterest, VideoSharedDetails, UserSearch, UserLogStatistics
 from django.contrib.auth.models import User
 # from django.db.models import Count, Q
 from forum.topic.models import VBseen
@@ -52,6 +52,12 @@ class CustomDateTimeFilter(DateFieldListFilter):
                 self.lookup_kwarg_until: str(next_month),
             }),
         )
+
+class MusicAlbumAdmin(admin.ModelAdmin):
+    list_display = ('id', 'title', 'author_name', 's3_file_path', 'image_path')
+    list_editable = ('title', 'author_name')
+    search_fields = ('title', 'author_name')
+admin.site.register(MusicAlbum, MusicAlbumAdmin)
 
 class UserProfileResource(resources.ModelResource):
     class Meta:
