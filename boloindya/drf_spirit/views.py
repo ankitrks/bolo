@@ -55,7 +55,7 @@ from jarvis.models import FCMDevice,StateDistrictLanguage, BannerUser, Report
 from forum.topic.models import Topic,TopicHistory, ShareTopic, Like, SocialShare, Notification, CricketMatch, Poll, Choice, Voting, \
     Leaderboard, VBseen, TongueTwister, HashtagViewCounter
 from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
-from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
+from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following, get_redis_android_id, set_redis_android_id
 from forum.user.utils.bolo_redis import get_bolo_info_combined
 from .serializers import *
 from tasks import vb_create_task,user_ip_to_state_task,sync_contacts_with_user,cache_follow_post,cache_popular_post, deafult_boloindya_follow, save_click_id_response, send_upload_video_notification
@@ -2629,22 +2629,29 @@ def fb_profile_settings(request):
                 return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
         elif activity == 'android_login':
             if not android_did:
-                return JsonResponse({'message': 'Error Occured:android_did not found',}, status=status.HTTP_400_BAD_REQUEST)
-            try:
-                userprofile = UserProfile.objects.get(android_did = android_did,user__is_active = True)
-                user=userprofile.user
-                is_created=False
-            except Exception as e:
-                print e
+                return JsonResponse({'message': 'Error Occured:android_did not found',}, status=status.HTTP_400_BAD_REQUEST) 
+            user_id = get_redis_android_id(android_did)
+            if user_id:
+                try:
+                    user = User.objects.get(pk = user_id,is_active = True)
+                    is_created=False
+                    userprofile = user.st
+                except Exception as e:
+                    username = get_random_username()
+                    user = User.objects.create(username = username)
+                    userprofile = user.st
+                    is_created = True
+            else:
                 username = get_random_username()
                 user = User.objects.create(username = username)
-                userprofile = UserProfile.objects.get(user = user)
+                userprofile = user.st
                 is_created = True
             if not userprofile.is_guest_user:
-                UserProfile.objects.filter(user = user).update(is_guest_user = True)
+                UserProfile.objects.filter(pk = userprofile.id).update(is_guest_user = True)
             if is_created:
                 update_dict = {}
                 update_dict['android_did'] = android_did
+                set_redis_android_id(android_did,user.id)
                 add_bolo_score(user.id, 'initial_signup', userprofile)
                 if user_ip:
                     user_ip_to_state_task.delay(user.id,user_ip)
@@ -2658,7 +2665,7 @@ def fb_profile_settings(request):
                     # response = urllib2.urlopen(click_url).read()
                     # userprofile.click_id_response = str(response)
                 update_dict['language'] = str(language)
-                UserProfile.objects.filter(user = user).update(**update_dict)
+                UserProfile.objects.filter(pk = userprofile.id).update(**update_dict)
                 if str(language):
                     default_follow = deafult_boloindya_follow.delay(user.id,str(language))                
                 user.save()
