@@ -66,3 +66,15 @@ def update_redis_following(user_id,user_following_id,append):
         if int(user_following_id) in following_list:
             following_list.remove(int(user_following_id))
     set_redis(key,following_list, False)
+
+def get_redis_android_id(android_did):
+    key = 'android_id:'+str(android_did)
+    user_id = get_redis(key)
+    print user_id
+    if user_id:
+        return user_id
+    return False
+
+def set_redis_android_id(android_did, user_id):
+    key = 'android_id:'+str(android_did)
+    set_redis(key,user_id, False)
