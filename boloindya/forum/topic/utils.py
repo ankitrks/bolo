@@ -100,12 +100,15 @@ def get_redis_language_paginated_data(language_id, page_no):
     return get_redis_data(key, query, page_no)
 
 def get_redis_follow_paginated_data(user_id, page_no):
-
+    all_seen_vb = []
     key = 'follow_post:'+str(user_id)
     all_follower = get_redis_following(user_id)
     category_follow = UserProfile.objects.get(user_id = user_id).sub_category.all().values_list('pk', flat = True)
+    if user_id:
+        all_seen_vb = get_redis_vb_seen(user_id)
     query = Topic.objects.filter(Q(user_id__in = all_follower)|Q(m2mcategory__id__in = category_follow, \
-        language_id = UserProfile.objects.get(user_id = user_id).language), is_vb = True, is_removed = False).order_by('-vb_score')
+        language_id = UserProfile.objects.get(user_id = user_id).language), is_vb = True, is_removed = False, is_popular = False)\
+        .exclude(pk__in = all_seen_vb).order_by('-id', '-vb_score')
     return get_redis_data(key, query, page_no)
 
 def get_popular_paginated_data(user_id, language_id, page_no):
@@ -114,7 +117,7 @@ def get_popular_paginated_data(user_id, language_id, page_no):
     if user_id:
         all_seen_vb = get_redis_vb_seen(user_id)
     query = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, is_popular = True)\
-        .exclude(pk__in = all_seen_vb).order_by('-vb_score')
+        .exclude(pk__in = all_seen_vb).order_by('-id', '-vb_score')
     return get_redis_data(key, query, page_no)
 
 def update_redis_paginated_data(key, query, cache_max_pages = settings.CACHE_MAX_PAGES_REAL_TIME):
