@@ -1242,7 +1242,7 @@ def check_hashtag(comment):
                 try:
                     tag = TongueTwister.objects.get(hash_tag__iexact=value.strip('#'))
                     is_created = False
-                except:
+                except TongueTwister.DoesNotExist:
                     tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
                     is_created = True
                 if not is_created:
@@ -1279,9 +1279,10 @@ def get_mentions(comment):
 def send_notification_to_mentions(username_list,comment_obj):
     for each_username in username_list:
         try:
+            topic_type = ContentType.objects.get_for_model(comment_obj)
             user = User.objects.get(username=each_username)
             if not user == comment_obj.user:
-                notify_mention = Notification.objects.create(for_user = user ,topic = comment_obj,notification_type='10',user = comment_obj.user)
+                notify_mention = Notification.objects.create(for_user_id = user.id ,topic_id = comment_obj.id, topic_type = topic_type, notification_type='10', user_id = comment_obj.user.id)
         except:
             pass
 
@@ -1477,7 +1478,7 @@ def createTopic(request):
                         try:
                             tag = TongueTwister.objects.get(hash_tag__iexact=value.strip('#'))
                             is_created = False
-                        except:
+                        except TongueTwister.DoesNotExist:
                             tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
                             is_created = True
                         if not is_created:
@@ -1522,17 +1523,18 @@ def createTopic(request):
         data['days_ago'] = ''
 
         # topic.update_m3u8_content()
-        notify_owner = Notification.objects.create(for_user = topic.user ,topic = topic,notification_type='6',user = topic.user)
+        topic_type = ContentType.objects.get_for_model(topic)
+        notify_owner = Notification.objects.create(for_user_id = topic.user.id ,topic_id = topic.id, topic_type = topic_type, notification_type='6', user_id = topic.user.id)
         
         send_upload_video_notification.delay(data, {})
         #invoke watermark
         invoke_watermark_service(topic, request.user)
 
-        try:
-            c = topic.m2mcategory.all()
-            print(topic.location, c, topic.language_id, topic.id)
-        except Exception as e:
-            print(e)
+        # try:
+        #     c = topic.m2mcategory.all()
+        #     print(topic.location, c, topic.language_id, topic.id)
+        # except Exception as e:
+        #     print(e)
         return JsonResponse({'message': message,'topic':topic_json}, status=status.HTTP_201_CREATED)
     except User.DoesNotExist:
         return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
@@ -1612,7 +1614,7 @@ def editTopic(request):
                             try:
                                 tag = TongueTwister.objects.get(hash_tag__iexact=value.strip('#'))
                                 is_created = False
-                            except:
+                            except TongueTwister.DoesNotExist:
                                 tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
                                 is_created = True
                             if not is_created:
