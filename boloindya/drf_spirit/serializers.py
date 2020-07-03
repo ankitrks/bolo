@@ -163,8 +163,15 @@ class TopicSerializer(ModelSerializer):
 
     def get_backup_url(self,instance):
         if instance.question_video:
-            return instance.question_video
-        return ''
+            cloufront_url = settings.US_CDN_URL
+            if 'in-boloindya' in instance.question_video:
+                cloufront_url = settings.IN_CDN_URL
+            regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+            find_urls_in_string = re.compile(regex, re.IGNORECASE)
+            url = find_urls_in_string.search(instance.question_video)
+            return str(instance.question_video.replace(str(url.group()), cloufront_url))
+        else:
+            return ''
 
 class CommentSerializer(ModelSerializer):
     # user = UserReadOnlyField()
@@ -288,8 +295,15 @@ class TopicSerializerwithComment(ModelSerializer):
 
     def get_backup_url(self,instance):
         if instance.question_video:
-            return instance.question_video
-        return ''
+            cloufront_url = settings.US_CDN_URL
+            if 'in-boloindya' in instance.question_video:
+                cloufront_url = settings.IN_CDN_URL
+            regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+            find_urls_in_string = re.compile(regex, re.IGNORECASE)
+            url = find_urls_in_string.search(instance.question_video)
+            return str(instance.question_video.replace(str(url.group()), cloufront_url))
+        else:
+            return ''
 
 class SingleTopicSerializerwithComment(ModelSerializer):
     user = SerializerMethodField()
@@ -795,8 +809,15 @@ class CategoryVideoByteSerializer(ModelSerializer):
 
     def get_backup_url(self,instance):
         if instance.question_video:
-            return instance.question_video
-        return ''
+            cloufront_url = settings.US_CDN_URL
+            if 'in-boloindya' in instance.question_video:
+                cloufront_url = settings.IN_CDN_URL
+            regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+            find_urls_in_string = re.compile(regex, re.IGNORECASE)
+            url = find_urls_in_string.search(instance.question_video)
+            return str(instance.question_video.replace(str(url.group()), cloufront_url))
+        else:
+            return ''
 
 
 from django.core.paginator import Paginator
