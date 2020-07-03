@@ -533,9 +533,6 @@ def GetFollowPost(request):
     topics = get_redis_follow_paginated_data(request.user.id,page_no)
     return JsonResponse({"results":TopicSerializerwithComment(topics,context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand':request.GET.get('is_expand',True)},many=True).data})
 
-
-        
-
 @api_view(['POST'])
 def GetChallengeDetails(request):
     """
