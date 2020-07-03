@@ -1240,14 +1240,12 @@ def check_hashtag(comment):
                 tag_list[index]='<a href="/get_challenge_details/?ChallengeHash='+value.strip('#')+'">'+value+'</a>'
                 # tag,is_created = TongueTwister.objects.get_or_create(hash_tag__iexact=value.strip('#'))
                 try:
-                    tag = TongueTwister.objects.get(hash_tag__iexact=value.strip('#'))
-                    is_created = False
+                    tag = TongueTwister.objects.filter(hash_tag__iexact=value.strip('#'))
+                    if tag.count():
+                        tag.update(hash_counter = F('hash_counter')+1)
+                        tag = tag[0]
                 except TongueTwister.DoesNotExist:
                     tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
-                    is_created = True
-                if not is_created:
-                    tag.hash_counter = F('hash_counter')+1
-                tag.save()
                 comment.hash_tags.add(tag)
         title=" ".join(tag_list)
         title = title[0].upper()+title[1:]
@@ -1476,14 +1474,12 @@ def createTopic(request):
                     if value.startswith("#"):
                         # tag,is_created = TongueTwister.objects.get_or_create(hash_tag__iexact=value.strip('#'))
                         try:
-                            tag = TongueTwister.objects.get(hash_tag__iexact=value.strip('#'))
-                            is_created = False
+                            tag = TongueTwister.objects.filter(hash_tag__iexact=value.strip('#'))
+                            if tag.count():
+                                tag.update(hash_counter = F('hash_counter')+1)
+                                tag = tag[0]
                         except TongueTwister.DoesNotExist:
                             tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
-                            is_created = True
-                        if not is_created:
-                            tag.hash_counter = F('hash_counter')+1
-                        tag.save()
                         topic.hash_tags.add(tag)
         else:
             view_count = random.randint(10,30)
@@ -1612,14 +1608,12 @@ def editTopic(request):
                         if value.startswith("#"):
                             # tag, is_created = TongueTwister.objects.get_or_create(hash_tag__iexact=value.strip("#"))
                             try:
-                                tag = TongueTwister.objects.get(hash_tag__iexact=value.strip('#'))
-                                is_created = False
+                                tag = TongueTwister.objects.filter(hash_tag__iexact=value.strip('#'))
+                                if tag.count():
+                                    tag.update(hash_counter = F('hash_counter')+1)
+                                    tag = tag[0]
                             except TongueTwister.DoesNotExist:
                                 tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
-                                is_created = True
-                            if not is_created:
-                                tag.hash_counter = F('hash_counter')+1
-                            tag.save()
                             topic.hash_tags.add(tag)
                 topic.save()
 
