@@ -478,7 +478,7 @@ def GetChallenge(request):
     challenge_hash = request.GET.get('challengehash')
     language_id = request.GET.get('language_id')
     challengehash = '#' + challenge_hash
-    hash_tag = TongueTwister.objects.get(hash_tag__iexact=challengehash[1:])
+    hash_tag = TongueTwister.objects.filter(hash_tag__iexact=challengehash[1:])[0]
     all_seen_vb = []
     topics =[]
     page_no = int(request.GET.get('page',1))
