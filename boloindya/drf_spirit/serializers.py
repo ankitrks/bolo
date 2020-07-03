@@ -171,7 +171,7 @@ class TopicSerializer(ModelSerializer):
             url = find_urls_in_string.search(instance.question_video)
             return str(instance.question_video.replace(str(url.group()), cloufront_url))
         else:
-            return ''
+            return instance.question_video
 
 class CommentSerializer(ModelSerializer):
     # user = UserReadOnlyField()
@@ -303,7 +303,7 @@ class TopicSerializerwithComment(ModelSerializer):
             url = find_urls_in_string.search(instance.question_video)
             return str(instance.question_video.replace(str(url.group()), cloufront_url))
         else:
-            return ''
+            return instance.question_video
 
 class SingleTopicSerializerwithComment(ModelSerializer):
     user = SerializerMethodField()
@@ -817,7 +817,7 @@ class CategoryVideoByteSerializer(ModelSerializer):
             url = find_urls_in_string.search(instance.question_video)
             return str(instance.question_video.replace(str(url.group()), cloufront_url))
         else:
-            return ''
+            return instance.question_video
 
 
 from django.core.paginator import Paginator
