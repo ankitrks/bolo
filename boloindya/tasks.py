@@ -214,16 +214,20 @@ def sync_contacts_with_user(user_id):
 
 @app.task
 def cache_follow_post(user_id):
-    from forum.topic.utils import update_redis_paginated_data
+    from forum.topic.utils import update_redis_paginated_data, get_redis_vb_seen
     from forum.user.utils.follow_redis import get_redis_following
     from forum.user.models import UserProfile
     from forum.topic.models import Topic
     from django.db.models import Q
+    all_seen_vb = []
+    if user_id:
+        all_seen_vb = get_redis_vb_seen(user_id)
     key = 'follow_post:'+str(user_id)
     all_follower = get_redis_following(user_id)
     category_follow = UserProfile.objects.get(user_id = user_id).sub_category.all().values_list('pk', flat = True)
-    query = Topic.objects.filter(Q(user_id__in = all_follower)|Q(m2mcategory__id__in = category_follow, language_id = UserProfile.objects.get(user_id = user_id).language), \
-    is_vb = True, is_removed = False, is_popular = False).order_by('-id', '-vb_score')
+    query = Topic.objects.filter(Q(user_id__in = all_follower)|Q(m2mcategory__id__in = category_follow, \
+        language_id = UserProfile.objects.get(user_id = user_id).language), is_vb = True, is_removed = False, is_popular = False)\
+        .exclude(pk__in = all_seen_vb).order_by('-id', '-vb_score')
     update_redis_paginated_data(key, query)
 
 @app.task
