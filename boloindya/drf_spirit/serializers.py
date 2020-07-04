@@ -150,27 +150,33 @@ class TopicSerializer(ModelSerializer):
     #     return CategoryLiteSerializer(instance.m2mcategory.all(),many=True).data
 
     def get_video_cdn(self,instance):
-        if instance.question_video:
-            cloufront_url = settings.US_CDN_URL
-            if 'in-boloindya' in instance.question_video:
-                cloufront_url = settings.IN_CDN_URL
-            regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
-            find_urls_in_string = re.compile(regex, re.IGNORECASE)
-            url = find_urls_in_string.search(instance.question_video)
-            return str(instance.question_video.replace(str(url.group()), cloufront_url))
-        else:
-            return ''
+        try:
+            if instance.question_video:
+                cloufront_url = settings.US_CDN_URL
+                if 'in-boloindya' in instance.question_video:
+                    cloufront_url = settings.IN_CDN_URL
+                regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+                find_urls_in_string = re.compile(regex, re.IGNORECASE)
+                url = find_urls_in_string.search(instance.question_video)
+                return str(instance.question_video.replace(str(url.group()), cloufront_url))
+            else:
+                return ''
+        except:
+            return instance.question_video
 
     def get_backup_url(self,instance):
-        if instance.question_video:
-            cloufront_url = settings.US_CDN_URL
-            if 'in-boloindya' in instance.question_video:
-                cloufront_url = settings.IN_CDN_URL
-            regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
-            find_urls_in_string = re.compile(regex, re.IGNORECASE)
-            url = find_urls_in_string.search(instance.question_video)
-            return str(instance.question_video.replace(str(url.group()), cloufront_url))
-        else:
+        try:
+            if instance.question_video:
+                cloufront_url = settings.US_CDN_URL
+                if 'in-boloindya' in instance.question_video:
+                    cloufront_url = settings.IN_CDN_URL
+                regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+                find_urls_in_string = re.compile(regex, re.IGNORECASE)
+                url = find_urls_in_string.search(instance.question_video)
+                return str(instance.question_video.replace(str(url.group()), cloufront_url))
+            else:
+                return instance.question_video
+        except:
             return instance.question_video
 
 class CommentSerializer(ModelSerializer):
@@ -264,16 +270,19 @@ class TopicSerializerwithComment(ModelSerializer):
     #     return CategoryLiteSerializer(instance.m2mcategory.all(),many=True).data
 
     def get_video_cdn(self,instance):
-        if instance.question_video:
-            cloufront_url = settings.US_CDN_URL
-            if 'in-boloindya' in instance.question_video:
-                cloufront_url = settings.IN_CDN_URL
-            regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
-            find_urls_in_string = re.compile(regex, re.IGNORECASE)
-            url = find_urls_in_string.search(instance.question_video)
-            return str(instance.question_video.replace(str(url.group()), cloufront_url))
-        else:
-            return ''
+        try:
+            if instance.question_video:
+                cloufront_url = settings.US_CDN_URL
+                if 'in-boloindya' in instance.question_video:
+                    cloufront_url = settings.IN_CDN_URL
+                regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+                find_urls_in_string = re.compile(regex, re.IGNORECASE)
+                url = find_urls_in_string.search(instance.question_video)
+                return str(instance.question_video.replace(str(url.group()), cloufront_url))
+            else:
+                return ''
+        except:
+            return instance.question_video
 
     def get_m3u8_content(self,instance):
         if self.context['last_updated'] and instance.date > self.context['last_updated']:
@@ -294,15 +303,18 @@ class TopicSerializerwithComment(ModelSerializer):
             return ''
 
     def get_backup_url(self,instance):
-        if instance.question_video:
-            cloufront_url = settings.US_CDN_URL
-            if 'in-boloindya' in instance.question_video:
-                cloufront_url = settings.IN_CDN_URL
-            regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
-            find_urls_in_string = re.compile(regex, re.IGNORECASE)
-            url = find_urls_in_string.search(instance.question_video)
-            return str(instance.question_video.replace(str(url.group()), cloufront_url))
-        else:
+        try:
+            if instance.question_video:
+                cloufront_url = settings.US_CDN_URL
+                if 'in-boloindya' in instance.question_video:
+                    cloufront_url = settings.IN_CDN_URL
+                regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+                find_urls_in_string = re.compile(regex, re.IGNORECASE)
+                url = find_urls_in_string.search(instance.question_video)
+                return str(instance.question_video.replace(str(url.group()), cloufront_url))
+            else:
+                return instance.question_video
+        except:
             return instance.question_video
 
 class SingleTopicSerializerwithComment(ModelSerializer):
@@ -778,16 +790,19 @@ class CategoryVideoByteSerializer(ModelSerializer):
         return shorcountertopic(instance.comment_count)
 
     def get_video_cdn(self,instance):
-        if instance.question_video:
-            cloufront_url = settings.US_CDN_URL
-            if 'in-boloindya' in instance.question_video:
-                cloufront_url = settings.IN_CDN_URL
-            regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
-            find_urls_in_string = re.compile(regex, re.IGNORECASE)
-            url = find_urls_in_string.search(instance.question_video)
-            return str(instance.question_video.replace(str(url.group()), cloufront_url))
-        else:
-            return ''
+        try:
+            if instance.question_video:
+                cloufront_url = settings.US_CDN_URL
+                if 'in-boloindya' in instance.question_video:
+                    cloufront_url = settings.IN_CDN_URL
+                regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+                find_urls_in_string = re.compile(regex, re.IGNORECASE)
+                url = find_urls_in_string.search(instance.question_video)
+                return str(instance.question_video.replace(str(url.group()), cloufront_url))
+            else:
+                return ''
+        except:
+            return instance.question_video
 
     def get_m3u8_content(self,instance):
         if self.context['last_updated'] and instance.date > self.context['last_updated']:
@@ -808,15 +823,18 @@ class CategoryVideoByteSerializer(ModelSerializer):
             return ''
 
     def get_backup_url(self,instance):
-        if instance.question_video:
-            cloufront_url = settings.US_CDN_URL
-            if 'in-boloindya' in instance.question_video:
-                cloufront_url = settings.IN_CDN_URL
-            regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
-            find_urls_in_string = re.compile(regex, re.IGNORECASE)
-            url = find_urls_in_string.search(instance.question_video)
-            return str(instance.question_video.replace(str(url.group()), cloufront_url))
-        else:
+        try:
+            if instance.question_video:
+                cloufront_url = settings.US_CDN_URL
+                if 'in-boloindya' in instance.question_video:
+                    cloufront_url = settings.IN_CDN_URL
+                regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+                find_urls_in_string = re.compile(regex, re.IGNORECASE)
+                url = find_urls_in_string.search(instance.question_video)
+                return str(instance.question_video.replace(str(url.group()), cloufront_url))
+            else:
+                return instance.question_video
+        except:
             return instance.question_video
 
 
