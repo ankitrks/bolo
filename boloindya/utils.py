@@ -14,6 +14,16 @@ class DBRouter(object):
     def db_for_write(self, model, **hints):
         return 'default'
 
+    def allow_relation(self, obj1, obj2, **hints):
+        """
+        Relations between objects are allowed if both objects are
+        in the primary/replica pool.
+        """
+        db_list = ('default', 'read')
+        if obj1._state.db in db_list and obj2._state.db in db_list:
+            return True
+        return None
+
 # import io
 # import os
 # import wget
