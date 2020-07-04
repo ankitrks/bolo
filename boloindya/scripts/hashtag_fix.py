@@ -115,7 +115,7 @@ def run():
                         if not is_created:
                             tag.hash_counter = F('hash_counter')+1
                         tag.save()
-                        each_topic.hash_tags.add(tag)
+                        each_topic.hash_tags.add(tag.id)
                 title = " ".join(hash_tag)
                 title = title[0].upper()+title[1:]
                 Topic.objects.filter(pk=each_topic.id).update(title = title)

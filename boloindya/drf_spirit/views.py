@@ -1464,14 +1464,13 @@ def createTopic(request):
                 for index, value in enumerate(hash_tag):
                     if value.startswith("#"):
                         # tag,is_created = TongueTwister.objects.get_or_create(hash_tag__iexact=value.strip('#'))
-                        try:
-                            tag = TongueTwister.objects.filter(hash_tag__iexact=value.strip('#'))
-                            if tag.count():
-                                tag.update(hash_counter = F('hash_counter')+1)
-                                tag = tag[0]
-                        except TongueTwister.DoesNotExist:
+                        tag = TongueTwister.objects.filter(hash_tag__iexact=value.strip('#'))
+                        if tag.count():
+                            tag.update(hash_counter = F('hash_counter')+1)
+                            tag = tag[0]
+                        else:
                             tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
-                        topic.hash_tags.add(tag)
+                        topic.hash_tags.add(tag.id)
         else:
             view_count = random.randint(10,30)
             topic.view_count = view_count
@@ -1598,14 +1597,13 @@ def editTopic(request):
                     for index, value in enumerate(hash_tag):
                         if value.startswith("#"):
                             # tag, is_created = TongueTwister.objects.get_or_create(hash_tag__iexact=value.strip("#"))
-                            try:
-                                tag = TongueTwister.objects.filter(hash_tag__iexact=value.strip('#'))
-                                if tag.count():
-                                    tag.update(hash_counter = F('hash_counter')+1)
-                                    tag = tag[0]
-                            except TongueTwister.DoesNotExist:
+                            tag = TongueTwister.objects.filter(hash_tag__iexact=value.strip('#'))
+                            if tag.count():
+                                tag.update(hash_counter = F('hash_counter')+1)
+                                tag = tag[0]
+                            else:
                                 tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
-                            topic.hash_tags.add(tag)
+                            topic.hash_tags.add(tag.id)
                 topic.save()
 
                 topic_json = TopicSerializerwithComment(topic, context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data
@@ -2022,7 +2020,7 @@ class SingUpOTPCountryCodeView(generics.CreateAPIView):
         # instance.save()
         if not response_status:
             log = str({'request':str(self.request.__dict__),'response':str(status.HTTP_417_EXPECTATION_FAILED),'messgae':'OTP could not be sent',\
-                'error':str(e)})
+                'error':'-'})
             print "Error in API  otp/send_with_country_code/ :" + log
             return JsonResponse({'message': 'OTP could not be sent'}, status=status.HTTP_417_EXPECTATION_FAILED)
         return JsonResponse({'message': 'OTP sent'}, status=status.HTTP_200_OK)
