@@ -4453,12 +4453,12 @@ def get_user_last_vid_lang(request):
 
 def get_location(location_data):
     if location_data:
-        print("*****", 1)
         location_array = json.loads(location_data)
         country_name = ''
         state_name = ''
         city_name = ''
         city_id = ''
+        state, country = None, None
         for obj in location_array:
             location_obj = json.loads(obj)
             level = location_obj.get('level')
@@ -4476,10 +4476,18 @@ def get_location(location_data):
             country, created = Country.objects.get_or_create(name=country_name)
             print(1, country, created)
         if state_name:
-            state, created = State.objects.get_or_create(name=state_name, country=country) 
+            state_data = {'name' : state_name}
+            if country:
+                state_data['country'] = country
+            state, created = State.objects.get_or_create(**state_data)
             print(2, state, created)
         if city_name:
-            city, created = City.objects.get_or_create(name=city_name, state=state, place_id=city_id)
+            city_data = {'name': city_name}
+            if state:
+                city_data['state'] = state
+            if city_id:
+                city_data['place_id'] = city_id
+            city, created = City.objects.get_or_create(**city_data)
             print(4, city, created)
             return city
     else:
