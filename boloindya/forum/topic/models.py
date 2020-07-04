@@ -511,7 +511,7 @@ class VBseen(UserInfo):
         return unicode(str(self.topic if self.topic else 'VB'), 'utf-8')
 
 class TongueTwister(models.Model):
-    hash_tag = models.CharField(_("Hash Tag"), max_length=255, blank = True, null = True,db_index=True)
+    hash_tag = models.CharField(_("Hash Tag"), max_length=255, blank = True, null = True, db_index=True, unique=True)
     en_descpription = models.TextField(_("English Hash Tag Description"),blank = True, null = True)
     hi_descpription = models.TextField(_("Hindi Hash Tag Description"),blank = True, null = True)
     ta_descpription = models.TextField(_("Tamil Hash Tag Description"),blank = True, null = True)
