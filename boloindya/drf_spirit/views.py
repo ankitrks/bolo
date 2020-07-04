@@ -4456,7 +4456,7 @@ def get_location(location_data):
             print(4, city, created)
             return city
     else:
-        return None        
+        return None
 
 class AudioFileListView(generics.ListAPIView):
     serializer_class = MusicAlbumSerializer

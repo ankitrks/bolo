@@ -58,7 +58,7 @@ from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from .emails import send_job_request_mail
 from drf_spirit.views import deafult_boloindya_follow
-from drf_spirit.views import deafult_boloindya_follow
+from drf_spirit.views import get_tokens_for_user
 from rest_framework.decorators import api_view
 from rest_framework import status
 
