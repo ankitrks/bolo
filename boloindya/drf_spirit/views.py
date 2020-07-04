@@ -2305,7 +2305,7 @@ def verify_otp_with_country_code(request):
                 # otp_obj.save()
                 return JsonResponse({'message': message, 'username' : mobile_no, \
                         'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
-            otp_obj.save()
+            # otp_obj.save()
             return JsonResponse({'message': 'OTP Validated', 'username' : mobile_no}, status=status.HTTP_200_OK)
         except Exception as e:
             return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
