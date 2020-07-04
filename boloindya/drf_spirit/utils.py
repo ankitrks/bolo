@@ -57,7 +57,7 @@ def add_to_history(user, score, action, action_object, is_removed):
         history_obj = BoloActionHistory.objects.get( user = user, action_object_type=ContentType.objects.get_for_model(action_object), action_object_id = action_object.id, action = action )
     except Exception as e:
         print e
-        history_obj = BoloActionHistory( user = user, action_object = action_object, action = action, score = score )
+        history_obj = BoloActionHistory( user = user, action_object = action_object, action_id = action.id, score = score )
     history_obj.is_removed = is_removed
     history_obj.save()
 
