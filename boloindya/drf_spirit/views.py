@@ -2027,6 +2027,9 @@ class SingUpOTPCountryCodeView(generics.CreateAPIView):
         #     instance.is_active = False
         # instance.save()
         if not response_status:
+            log = str({'request':str(self.request.__dict__),'response':str(status.HTTP_417_EXPECTATION_FAILED),'messgae':'OTP could not be sent',\
+                'error':str(e)})
+            print "Error in API  otp/send_with_country_code/ :" + log
             return JsonResponse({'message': 'OTP could not be sent'}, status=status.HTTP_417_EXPECTATION_FAILED)
         return JsonResponse({'message': 'OTP sent'}, status=status.HTTP_200_OK)
 
@@ -2419,6 +2422,9 @@ def fb_profile_settings(request):
                 is_created = True
 
             if not userprofile.user.is_active:
+                log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':'You have been banned permanently for violating terms of usage.',\
+                'error':'None'})
+                print "Error in API fb_profile_settings/ :" + log
                 return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
             if is_created:
                 add_bolo_score(user.id, 'initial_signup', userprofile)
@@ -2488,6 +2494,9 @@ def fb_profile_settings(request):
                 userprofile = UserProfile.objects.get(user = user)
                 is_created = True
             if not userprofile.user.is_active:
+                log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':'You have been banned permanently for violating terms of usage.',\
+                'error':'None'})
+                print "Error in API fb_profile_settings/ :" + log
                 return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
             if is_created:
                 update_dict = {}
@@ -2597,6 +2606,9 @@ def fb_profile_settings(request):
                 UserProfile.objects.filter(user=request.user).update(**update_dict)
                 return JsonResponse({'message': 'Profile Saved'}, status=status.HTTP_200_OK)
             except Exception as e:
+                log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':'Error Occured:'+str(e)+'',\
+                'error':str(e)})
+                print "Error in API fb_profile_settings/ :" + log
                 return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
         elif activity == 'settings_changed':
             try:
@@ -2619,6 +2631,9 @@ def fb_profile_settings(request):
                 UserProfile.objects.filter(user=request.user).update(**update_dict)
                 return JsonResponse({'message': 'Settings Chnaged'}, status=status.HTTP_200_OK)
             except Exception as e:
+                log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':'Error Occured:'+str(e)+'',\
+                'error':str(e)})
+                print "Error in API fb_profile_settings/ :" + log
                 return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
         elif activity == 'android_login':
             if not android_did:
@@ -2669,6 +2684,9 @@ def fb_profile_settings(request):
                 return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
 
     except Exception as e:
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':'Error Occured:'+str(e)+'',\
+                'error':str(e)})
+        print "Error in API fb_profile_settings/ :" + log
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
 #### KYC Views ####
@@ -2923,6 +2941,9 @@ def follow_user(request):
                 update_redis_follower(int(user_following_id),request.user.id,True)
                 return JsonResponse({'message': 'Followed'}, status=status.HTTP_200_OK)
     except Exception as e:
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':'Error Occured:'+str(e)+'',\
+                'error':str(e)})
+        print "Error in API follow_user/ :" + log
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -3122,6 +3143,9 @@ def vb_seen(request):
         return JsonResponse({'message': 'vb seen'}, status=status.HTTP_200_OK)
 
     except Exception as e:
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':'Error Occured:'+str(e)+'',\
+                'error':str(e)})
+        print "Error in API vb_seen/ :" + log
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -3149,6 +3173,9 @@ def follow_like_list(request):
             'detialed_category':CategorySerializer(detialed_category,many = True).data,'block_hashes':list(block_hashes),\
             'reported_user':list(reported_user),'reported_topic':list(reported_topic)},status=status.HTTP_200_OK)
     except Exception as e:
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':'Error Occured:'+str(e)+'',\
+                'error':str(e)})
+        print "Error in API follow_like_list/ :" + log
         return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
