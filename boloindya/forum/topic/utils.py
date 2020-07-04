@@ -54,38 +54,43 @@ def get_ranking_feature_weight(feature):
 ## for vb_score sorted video in single category and language ##
 
 def get_redis_data(key, query, page_no):
-    topic_ids = []
-    topics = []
-    if not page_no:
-        page_no = 1
-    paginated_data = get_redis(key)
-    if not paginated_data:
-        paginated_data = update_redis_paginated_data(key, query)
-    if paginated_data and (str(page_no) in paginated_data.keys() or 'remaining' in paginated_data.keys()):
-        if str(page_no) in paginated_data.keys():
-            topic_ids = paginated_data[str(page_no)]['id_list']
-            topics = Topic.objects.filter(pk__in = topic_ids, is_removed = False).order_by('-id', '-vb_score')
-        elif 'remaining' in paginated_data.keys():
-            last_page_no = int(paginated_data['remaining']['last_page'])
-            try:
-                last_page_data = paginated_data[str(last_page_no)]
-            except:
-                last_page_data = paginated_data[last_page_no]
-            topics = query.exclude(id__in = last_page_data['id_list']).filter(vb_score__lte = last_page_data['scores'][-1])
-            new_page = page_no - last_page_no #(191-190)
+    try:
+        topic_ids = []
+        topics = []
+        if not page_no:
+            page_no = 1
+        paginated_data = get_redis(key)
+        if not paginated_data:
+            paginated_data = update_redis_paginated_data(key, query)
+        if paginated_data and (str(page_no) in paginated_data.keys() or 'remaining' in paginated_data.keys()):
+            if str(page_no) in paginated_data.keys():
+                topic_ids = paginated_data[str(page_no)]['id_list']
+                topics = Topic.objects.filter(pk__in = topic_ids, is_removed = False).order_by('-id', '-vb_score')
+            elif 'remaining' in paginated_data.keys():
+                last_page_no = int(paginated_data['remaining']['last_page'])
+                try:
+                    last_page_data = paginated_data[str(last_page_no)]
+                except:
+                    last_page_data = paginated_data[last_page_no]
+                topics = query.exclude(id__in = last_page_data['id_list']).filter(vb_score__lte = last_page_data['scores'][-1])
+                new_page = page_no - last_page_no #(191-190)
+                paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
+                if paginator.num_pages >= new_page:
+                    topics = paginator.page(new_page)
+                else:
+                    topics = []
+        else:
+            topics =  query.order_by('-id', '-vb_score')
             paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
-            if paginator.num_pages >= new_page:
-                topics = paginator.page(new_page)
+            if paginator.num_pages >= page_no:
+                topics = paginator.page(page_no)
             else:
                 topics = []
-    else:
-        topics =  query.order_by('-id', '-vb_score')
-        paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
-        if paginator.num_pages >= page_no:
-            topics = paginator.page(page_no)
-        else:
-            topics = []
-    return topics
+        return topics
+    except Exception as e:
+        print "Error in get redis data:",str(e)
+        return []
+
 
 def get_redis_category_paginated_data(language_id, category_id, page_no):
     key = 'cat:'+str(category_id)+':lang:'+str(language_id)

@@ -452,16 +452,16 @@ def get_modified_url(old_url,new_url_domain):
         url = find_urls_in_string.search(old_url)
         return str(old_url.replace(str(url.group()), new_url_domain))
 
-def get_random_username(username):
-    username = username.lower()
-    random_string = ''.join(random.choice(string.digits) for _ in range(4))
-    x = username+random_string
+import random, string
+def get_random_username():
+    x = 'bi'+''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(10))
+    x = x.lower()
+    # x = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
     try:
         user = User.objects.get(username=x)
-        x = get_random_username(username)
+        return get_random_username()
     except:
-        print x
-    return x
+        return x
 
 def create_random_user(no_of_user=0):
         from forum.user.models import DUser
