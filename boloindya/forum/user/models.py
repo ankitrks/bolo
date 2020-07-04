@@ -71,7 +71,7 @@ class UserProfile(models.Model,ModelDiffMixin):
     refrence = models.CharField(choices=refrence_options, blank = True, null = True, max_length=10,default='0')
     extra_data = models.TextField(null=True,blank=True)
     social_identifier = models.CharField(_("Social Identifier"), max_length=100, blank=True)
-    mobile_no = models.CharField(_("Mobile No"), max_length=100, blank = True, null = True)
+    mobile_no = models.CharField(_("Mobile No"), max_length=100, blank = True, null = True, db_index = True)
     follow_count = models.PositiveIntegerField(null=True,blank=True,default=0,db_index=True)
     follower_count = models.PositiveIntegerField(null=True,blank=True,default=0,db_index=True)
     question_count = models.PositiveIntegerField(null=True,blank=True,default=0)

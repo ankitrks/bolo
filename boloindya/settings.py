@@ -304,13 +304,6 @@ TEMPLATES[0]['OPTIONS']['context_processors'] += [
     'djconfig.context_processors.config',
 ]
 
-# django-haystack
-
-# INSTALLED_APPS += [
-    
-# ]
-
-
 HAYSTACK_CONNECTIONS = {
       'default': {
             'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
