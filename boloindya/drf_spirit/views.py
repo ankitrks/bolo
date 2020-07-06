@@ -1098,7 +1098,7 @@ def get_random_username():
     x = x.lower()
     # x = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
     try:
-        user = User.objects.get(username=x)
+        user = User.objects.using('default').get(username=x)
         return get_random_username()
     except:
         return x
@@ -1955,7 +1955,7 @@ class SingUpOTPView(generics.CreateAPIView):
     """
 
     def perform_create(self, serializer):
-        old_otp = SingUpOTP.objects.filter(mobile_no=validate_indian_number(serializer.validated_data['mobile_no']).strip(),created_at__gte=datetime.now()-timedelta(hours=2)).order_by('-id')
+        old_otp = SingUpOTP.objects.using('default').filter(mobile_no=validate_indian_number(serializer.validated_data['mobile_no']).strip(),created_at__gte=datetime.now()-timedelta(hours=2)).order_by('-id')
         if old_otp:
             instance=old_otp[0]
             response, response_status   = send_sms(instance.mobile_no, instance.otp)
@@ -1995,7 +1995,7 @@ class SingUpOTPCountryCodeView(generics.CreateAPIView):
     """
 
     def perform_create(self, serializer):
-        old_otp = SingUpOTP.objects.filter(mobile_no=serializer.validated_data['mobile_no'].strip(),created_at__gte=datetime.now()-timedelta(hours=2)).order_by('-id')
+        old_otp = SingUpOTP.objects.using('default').filter(mobile_no=serializer.validated_data['mobile_no'].strip(),created_at__gte=datetime.now()-timedelta(hours=2)).order_by('-id')
         if old_otp:
             instance=old_otp[0]
             response, response_status   = send_sms(instance.mobile_no, instance.otp)
@@ -2145,7 +2145,7 @@ def verify_otp(request):
                 # exclude_dict = {'is_active' : True, 'is_for_change_phone' : is_for_change_phone,"mobile_no":mobile_no, "otp":otp}
                 exclude_dict = {'is_for_change_phone' : is_for_change_phone,"mobile_no":mobile_no, "otp":otp,"created_at__gte":datetime.now()-timedelta(hours=2)}
 
-            otp_obj = SingUpOTP.objects.filter(**exclude_dict).order_by('-id')
+            otp_obj = SingUpOTP.objects.using('default').filter(**exclude_dict).order_by('-id')
             # if otp_obj:
             #     otp_obj=otp_obj[0]
             # otp_obj.is_active = False
@@ -2155,12 +2155,12 @@ def verify_otp(request):
                 if mobile_no in ['7726080653']:
                     return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
                 try:
-                    userprofile = UserProfile.objects.get(mobile_no = mobile_no)
+                    userprofile = UserProfile.objects.using('default').get(mobile_no = mobile_no)
                 except:
                     try:
-                        userprofile = UserProfile.objects.get(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no)
+                        userprofile = UserProfile.objects.using('default').get(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no)
                     except MultipleObjectsReturned:
-                        userprofile = UserProfile.objects.filter(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no).order_by('id').last()
+                        userprofile = UserProfile.objects.using('default').filter(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no).order_by('id').last()
                         is_created=False
                     except:
                         userprofile = None
@@ -2170,12 +2170,12 @@ def verify_otp(request):
                     user = userprofile.user
                     message = 'User Logged In'
                 else:
-                    user = User.objects.create(username = get_random_username())
+                    user = User.objects.using('default').create(username = get_random_username())
                     message = 'User created'
-                    userprofile = UserProfile.objects.get(user = user)
+                    userprofile = UserProfile.objects.using('default').get(user = user)
                     update_dict = {}
                     update_dict['mobile_no'] = mobile_no
-                    Contact.objects.filter(contact_number=mobile_no).update(is_user_registered=True,user=user)
+                    Contact.objects.using('default').filter(contact_number=mobile_no).update(is_user_registered=True,user=user)
                     if user_ip:
                         user_ip_to_state_task.delay(user.id,user_ip)
                         # url = 'http://ip-api.com/json/'+user_ip
@@ -2192,7 +2192,7 @@ def verify_otp(request):
                         # click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
                         # response = urllib2.urlopen(click_url).read()
                         # userprofile.click_id_response = str(response)
-                    UserProfile.objects.filter(user = user).update(**update_dict)
+                    UserProfile.objects.using('default').filter(user = user).update(**update_dict)
                     if str(language):
                         default_follow = deafult_boloindya_follow.delay(user.id,str(language))
                     add_bolo_score(user.id, 'initial_signup', userprofile)
@@ -2245,7 +2245,7 @@ def verify_otp_with_country_code(request):
                 # exclude_dict = {'is_active' : True, 'is_for_change_phone' : is_for_change_phone,"mobile_no":mobile_no, "otp":otp}
                 exclude_dict = {'is_for_change_phone' : is_for_change_phone,"mobile_no":mobile_with_country_code, "otp":otp,"created_at__gte":datetime.now()-timedelta(hours=2)}
 
-            otp_obj = SingUpOTP.objects.filter(**exclude_dict).order_by('-id')
+            otp_obj = SingUpOTP.objects.using('default').filter(**exclude_dict).order_by('-id')
             # if otp_obj:
             #     otp_obj=otp_obj[0]
             # otp_obj.is_active = False
@@ -2255,12 +2255,12 @@ def verify_otp_with_country_code(request):
                 if mobile_no in ['7726080653']:
                     return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
                 try:
-                    userprofile = UserProfile.objects.get(mobile_no = mobile_no)
+                    userprofile = UserProfile.objects.using('default').get(mobile_no = mobile_no)
                 except:
                     try:
-                        userprofile = UserProfile.objects.get(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no)
+                        userprofile = UserProfile.objects.using('default').get(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no)
                     except MultipleObjectsReturned:
-                        userprofile = UserProfile.objects.filter(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no).order_by('id').last()
+                        userprofile = UserProfile.objects.using('default').filter(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no).order_by('id').last()
                         is_created=False
                     except:
                         userprofile = None
@@ -2270,13 +2270,13 @@ def verify_otp_with_country_code(request):
                     user = userprofile.user
                     message = 'User Logged In'
                 else:
-                    user = User.objects.create(username = get_random_username())
+                    user = User.objects.using('default').create(username = get_random_username())
                     message = 'User created'
-                    userprofile = UserProfile.objects.get(user = user)
+                    userprofile = UserProfile.objects.using('default').get(user = user)
                     update_dict = {}
                     update_dict['mobile_no'] = mobile_no
                     update_dict['country_code'] = country_code
-                    Contact.objects.filter(contact_number=mobile_no).update(is_user_registered=True,user=user)
+                    Contact.objects.using('default').filter(contact_number=mobile_no).update(is_user_registered=True,user=user)
                     if user_ip:
                         user_ip_to_state_task.delay(user.id,user_ip)
                         # url = 'http://ip-api.com/json/'+user_ip
@@ -2293,7 +2293,7 @@ def verify_otp_with_country_code(request):
                         # click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
                         # response = urllib2.urlopen(click_url).read()
                         # userprofile.click_id_response = str(response)
-                    UserProfile.objects.filter(user = user).update(**update_dict)
+                    UserProfile.objects.using('default').filter(user = user).update(**update_dict)
                     if str(language):
                         default_follow = deafult_boloindya_follow.delay(user.id,str(language))
                     add_bolo_score(user.id, 'initial_signup', userprofile)
@@ -2397,11 +2397,11 @@ def fb_profile_settings(request):
     try:
         if activity == 'facebook_login' and refrence == 'facebook':
             try:
-                userprofile = UserProfile.objects.get(social_identifier = extra_data['id'])
+                userprofile = UserProfile.objects.using('default').get(social_identifier = extra_data['id'])
                 user=userprofile.user
                 is_created=False
             except MultipleObjectsReturned:
-                userprofile = UserProfile.objects.filter(social_identifier = extra_data['id']).order_by('id').last()
+                userprofile = UserProfile.objects.using('default').filter(social_identifier = extra_data['id']).order_by('id').last()
                 user=userprofile.user
                 is_created=False
             except Exception as e:
@@ -2409,8 +2409,8 @@ def fb_profile_settings(request):
                 # user_exists,num_user = check_user(extra_data['first_name'],extra_data['last_name'])
                 #username = generate_username(extra_data['first_name'],extra_data['last_name'],num_user) if user_exists else str(str(extra_data['first_name'])+str(extra_data['last_name']))
                 username = get_random_username()
-                user = User.objects.create(username = username)
-                userprofile = UserProfile.objects.get(user = user)
+                user = User.objects.using('default').create(username = username)
+                userprofile = UserProfile.objects.using('default').get(user = user)
                 is_created = True
 
             if not userprofile.user.is_active:
@@ -2459,7 +2459,7 @@ def fb_profile_settings(request):
                     # response = urllib2.urlopen(click_url).read()
                     # userprofile.click_id_response = str(response)
                 update_dict['language'] = str(language)
-                UserProfile.objects.filter(user = user).update(**update_dict)
+                UserProfile.objects.using('default').filter(user = user).update(**update_dict)
                 if str(language):
                     default_follow = deafult_boloindya_follow.delay(user.id,str(language))
                 user.save()
@@ -2470,11 +2470,11 @@ def fb_profile_settings(request):
                 return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
         elif activity == 'google_login' and refrence == 'google':
             try:
-                userprofile = UserProfile.objects.get(social_identifier = extra_data['google_id'])
+                userprofile = UserProfile.objects.using('default').get(social_identifier = extra_data['google_id'])
                 user=userprofile.user
                 is_created=False
             except MultipleObjectsReturned:
-                userprofile = UserProfile.objects.filter(social_identifier = extra_data['id']).order_by('id').last()
+                userprofile = UserProfile.objects.using('default').filter(social_identifier = extra_data['google_id']).order_by('id').last()
                 user=userprofile.user
                 is_created = False
             except Exception as e:
@@ -2482,8 +2482,8 @@ def fb_profile_settings(request):
                 # user_exists,num_user = check_user(extra_data['first_name'],extra_data['last_name'])
                 #username = generate_username(extra_data['first_name'],extra_data['last_name'],num_user) if user_exists else str(str(extra_data['first_name'])+str(extra_data['last_name']))
                 username = get_random_username()
-                user = User.objects.create(username = username)
-                userprofile = UserProfile.objects.get(user = user)
+                user = User.objects.using('default').create(username = username)
+                userprofile = UserProfile.objects.using('default').get(user = user)
                 is_created = True
             if not userprofile.user.is_active:
                 log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':'You have been banned permanently for violating terms of usage.',\
@@ -2535,7 +2535,7 @@ def fb_profile_settings(request):
                     # response = urllib2.urlopen(click_url).read()
                     # userprofile.click_id_response = str(response)
                 update_dict['language'] = str(language)
-                UserProfile.objects.filter(user = user).update(**update_dict)
+                UserProfile.objects.using('default').filter(user = user).update(**update_dict)
                 if str(language):
                     default_follow = deafult_boloindya_follow.delay(user.id,str(language))
                 user.save()
@@ -2546,7 +2546,7 @@ def fb_profile_settings(request):
                 return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
         elif activity == 'profile_save':
             try:
-                userprofile = UserProfile.objects.get(user = request.user)
+                userprofile = UserProfile.objects.using('default').get(user = request.user)
                 update_dict = {}
                 if name:
                     update_dict['name']= name
@@ -2587,7 +2587,7 @@ def fb_profile_settings(request):
                 if username:
                     if not check_username_valid(username):
                         return JsonResponse({'message': 'Username Invalid. It can contains only lower case letters,numbers and special character[ _ - .]'}, status=status.HTTP_200_OK)
-                    check_username = User.objects.filter(username = username).exclude(pk =request.user.id)
+                    check_username = User.objects.using('default').filter(username = username).exclude(pk =request.user.id)
                     if not check_username:
                         update_dict['slug'] = username
                         user = userprofile.user
@@ -2595,7 +2595,7 @@ def fb_profile_settings(request):
                         user.save()
                     else:
                         return JsonResponse({'message': 'Username already exist'}, status=status.HTTP_200_OK)
-                UserProfile.objects.filter(user=request.user).update(**update_dict)
+                UserProfile.objects.using('default').filter(user=request.user).update(**update_dict)
                 return JsonResponse({'message': 'Profile Saved'}, status=status.HTTP_200_OK)
             except Exception as e:
                 log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':'Error Occured:'+str(e)+'',\
@@ -2604,14 +2604,14 @@ def fb_profile_settings(request):
                 return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
         elif activity == 'settings_changed':
             try:
-                userprofile = UserProfile.objects.get(user = request.user)
+                userprofile = UserProfile.objects.using('default').get(user = request.user)
                 update_dict = {}
                 update_dict['linkedin_url'] = linkedin_url
                 update_dict['twitter_id'] = twitter_id
                 update_dict['instagarm_id'] = instagarm_id
                 if sub_category_prefrences:
                     for each_sub_category in sub_category_prefrences:
-                        category = Category.objects.get(pk = each_sub_category)
+                        category = Category.objects.using('default').get(pk = each_sub_category)
                         userprofile.sub_category.add(category)
                     if userprofile.sub_category.all():
                         for each_category in userprofile.sub_category.all():
@@ -2620,7 +2620,7 @@ def fb_profile_settings(request):
                 if language:
                     default_follow = deafult_boloindya_follow.delay(request.user.id,str(language))
                     update_dict['language'] = str(language)
-                UserProfile.objects.filter(user=request.user).update(**update_dict)
+                UserProfile.objects.using('default').filter(user=request.user).update(**update_dict)
                 return JsonResponse({'message': 'Settings Chnaged'}, status=status.HTTP_200_OK)
             except Exception as e:
                 log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':'Error Occured:'+str(e)+'',\
@@ -2633,21 +2633,21 @@ def fb_profile_settings(request):
             user_id = get_redis_android_id(android_did)
             if user_id:
                 try:
-                    user = User.objects.get(pk = user_id,is_active = True)
+                    user = User.objects.using('default').get(pk = user_id,is_active = True)
                     is_created=False
                     userprofile = user.st
                 except Exception as e:
                     username = get_random_username()
-                    user = User.objects.create(username = username)
+                    user = User.objects.using('default').create(username = username)
                     userprofile = user.st
                     is_created = True
             else:
                 username = get_random_username()
-                user = User.objects.create(username = username)
+                user = User.objects.using('default').create(username = username)
                 userprofile = user.st
                 is_created = True
             if not userprofile.is_guest_user:
-                UserProfile.objects.filter(pk = userprofile.id).update(is_guest_user = True)
+                UserProfile.objects.using('default').filter(pk = userprofile.id).update(is_guest_user = True)
             if is_created:
                 update_dict = {}
                 update_dict['android_did'] = android_did
@@ -2665,7 +2665,7 @@ def fb_profile_settings(request):
                     # response = urllib2.urlopen(click_url).read()
                     # userprofile.click_id_response = str(response)
                 update_dict['language'] = str(language)
-                UserProfile.objects.filter(pk = userprofile.id).update(**update_dict)
+                UserProfile.objects.using('default').filter(pk = userprofile.id).update(**update_dict)
                 if str(language):
                     default_follow = deafult_boloindya_follow.delay(user.id,str(language))                
                 user.save()
