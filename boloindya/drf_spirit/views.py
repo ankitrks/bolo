@@ -109,15 +109,18 @@ class NotificationAPI(GenericAPIView):
             return JsonResponse({'notification_data':notification_data,'next_offset':next_offset}, safe=False)
 
         elif action == 'click':
-            self.mark_notification_as_read()
-            return JsonResponse({
-                    'status': "SUCCESS"
-                })
+            try:
+                self.mark_notification_as_read()
+            except:
+                pass
+            return JsonResponse({'status': "SUCCESS"})
+        
         elif action == 'mark_all_read':
-            self.mark_all_read()
-            return JsonResponse({
-                    'status': "SUCCESS"
-                })
+            try:
+                self.mark_all_read()
+            except:
+                pass
+            return JsonResponse({'status': "SUCCESS"})
 
     def get_notifications(self, user_id):
         user_id = self.request.user.id
@@ -1202,7 +1205,7 @@ def replyOnTopic(request):
                 comment.save()
             # if username_list:
             #     send_notification_to_mentions(username_list,comment)
-            topic = Topic.objects.get(pk = topic_id)
+            topic = Topic.objects.using('default').get(pk = topic_id)
             topic.comment_count = F('comment_count')+1
             topic.last_commented = timezone.now()
             topic.save()
@@ -1309,7 +1312,7 @@ def reply_delete(request):
     """
 
     comment_id     = request.POST.get('comment_id', '')
-    comment = Comment.objects.get(pk= comment_id)
+    comment = Comment.objects.using('default').get(pk= comment_id)
 
     if comment.user == request.user or comment.topic.user == request.user:
         try:
@@ -3024,7 +3027,7 @@ def shareontimeline(request):
             try:
                 shared = ShareTopic.objects.create(topic_id = topic_id,user = request.user)
                 add_bolo_score(request.user.id, 'share_timeline', liked)
-                topic = Topic.objects.get(pk = topic_id)
+                topic = Topic.objects.using('default').get(pk = topic_id)
                 topic.share_count = F('share_count')+1
                 topic.total_share_count = F('total_share_count')+1
                 topic.topic_share_count = F('topic_share_count')+1
@@ -3036,7 +3039,7 @@ def shareontimeline(request):
         elif share_on == 'facebook_share':
             try:
                 shared = SocialShare.objects.create(topic_id = topic_id,user = request.user,share_type = '0')
-                topic = Topic.objects.get(pk = topic_id)
+                topic = Topic.objects.using('default').get(pk = topic_id)
                 topic.facebook_share_count = F('facebook_share_count')+1    
                 topic.total_share_count = F('total_share_count')+1
                 topic.topic_share_count = F('topic_share_count')+1
@@ -3049,7 +3052,7 @@ def shareontimeline(request):
         elif share_on == 'whatsapp_share':
             try:
                 shared = SocialShare.objects.create(topic_id = topic_id,user = request.user,share_type = '1')
-                topic = Topic.objects.get(pk = topic_id)
+                topic = Topic.objects.using('default').get(pk = topic_id)
                 topic.whatsapp_share_count = F('whatsapp_share_count')+1
                 topic.total_share_count = F('total_share_count')+1
                 topic.topic_share_count = F('topic_share_count')+1
@@ -3062,7 +3065,7 @@ def shareontimeline(request):
         elif share_on == 'linkedin_share':
             try:
                 shared = SocialShare.objects.create(topic_id = topic_id,user = request.user,share_type = '2')
-                topic = Topic.objects.get(pk = topic_id)
+                topic = Topic.objects.using('default').get(pk = topic_id)
                 topic.linkedin_share_count = F('linkedin_share_count')+1
                 topic.total_share_count = F('total_share_count')+1
                 topic.topic_share_count = F('topic_share_count')+1
@@ -3075,7 +3078,7 @@ def shareontimeline(request):
         elif share_on == 'twitter_share':
             try:
                 shared = SocialShare.objects.create(topic_id = topic_id,user = request.user,share_type = '3')
-                topic = Topic.objects.get(pk = topic_id)
+                topic = Topic.objects.using('default').get(pk = topic_id)
                 topic.twitter_share_count = F('twitter_share_count')+1
                 topic.total_share_count = F('total_share_count')+1
                 topic.topic_share_count = F('topic_share_count')+1
@@ -3099,7 +3102,7 @@ def comment_view(request):
     try:
         # comment_list = comment_ids.split(',')
         # for each_comment_id in comment_list:
-        topic = Topic.objects.get(pk = topic_id)
+        topic = Topic.objects.using('default').get(pk = topic_id)
         # topic= comment.topic
         topic.view_count = F('view_count') +1
         topic.imp_count = F('imp_count') +1

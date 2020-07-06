@@ -92,7 +92,7 @@ class FCMDevice(AbstractDevice):
         current_version=request.POST.get('current_version', '')
         manufacturer=request.POST.get('manufacturer', '')
         try:
-            instance = FCMDevice.objects.filter(Q(reg_id = reg_id) | Q(dev_id = dev_id))
+            instance = FCMDevice.objects.using('default').filter(Q(reg_id = reg_id) | Q(dev_id = dev_id))
             if not len(instance):
                 print 'Not Exists'
                 raise Exception

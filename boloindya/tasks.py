@@ -205,12 +205,15 @@ def create_downloaded_url(topic_id):
 @app.task
 def sync_contacts_with_user(user_id):
     from forum.user.models import UserProfile,UserPhoneBook,Contact
-    user_phonebook = UserPhoneBook.objects.get(user_id=user_id)
-    all_contact_no = list(user_phonebook.contact.all().values_list('contact_number',flat=True))
-    all_userprofile = UserProfile.objects.filter(mobile_no__in=all_contact_no,user__is_active=True).values('mobile_no','user_id')
-    if all_userprofile:
-        for each_userprofile in all_userprofile:
-            Contact.objects.filter(contact_number=each_userprofile['mobile_no']).update(is_user_registered=True,user_id=each_userprofile['user_id'])
+    try:
+        user_phonebook = UserPhoneBook.objects.using('default').get(user_id=user_id)
+        all_contact_no = list(user_phonebook.contact.all().values_list('contact_number',flat=True))
+        all_userprofile = UserProfile.objects.filter(mobile_no__in=all_contact_no,user__is_active=True).values('mobile_no','user_id')
+        if all_userprofile:
+            for each_userprofile in all_userprofile:
+                Contact.objects.filter(contact_number=each_userprofile['mobile_no']).update(is_user_registered=True,user_id=each_userprofile['user_id'])
+    except:
+        pass # No phonebook exist for user
 
 @app.task
 def cache_follow_post(user_id):

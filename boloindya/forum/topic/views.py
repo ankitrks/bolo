@@ -250,7 +250,7 @@ def detail(request, pk, slug):
     return render(request, 'spirit/topic/particular_topic.html', context)
 
 def share_vb_page(request, user_id, poll_id, slug):
-    topics = Topic.objects.get(id = poll_id)
+    topics = Topic.objects.using('default').get(id = poll_id)
     try:
         user_profile = UserProfile.objects.get(user_id = user_id)
     except:
