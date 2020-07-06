@@ -4416,7 +4416,7 @@ def update_download_url_in_topic(request):
     try:
         topic_id = request.POST.get('topic_id', None)
         downloaded_url = request.POST.get('download_url', None)
-        topic = Topic.objects.get(pk=topic_id)
+        topic = Topic.objects.using('default').get(pk=topic_id)
         topic.downloaded_url = downloaded_url
         topic.has_downloaded_url = True
         topic.save()
