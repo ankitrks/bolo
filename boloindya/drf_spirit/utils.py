@@ -202,7 +202,7 @@ def shorcountertopic(counter):
     elif counter >= 999999:
         return str(int(round(counter/1000000.0, 1)) if (round(counter/1000000.0, 1)).is_integer() else (round(counter/1000000.0, 1)))+'M'
     else:
-        return counter
+        return str(counter)
 
 def calculate_encashable_details(user):
     try:
