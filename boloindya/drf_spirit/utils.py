@@ -186,8 +186,10 @@ def short_time(value):
 
 def shortcounterprofile(counter):
     counter = int(counter)
-    if counter>10000 and counter< 99999:
-        return str(counter/1000.0)[:5]+'K'
+    if counter>10000 and counter < 999999:
+        return str(int(round(counter/1000.0, 1)) if round(counter/1000.0, 1).is_integer() else round(counter/1000.0, 1))+'K'
+    elif counter >= 999999:
+        return str(int(round(counter/1000000.0, 1)) if (round(counter/1000000.0, 1)).is_integer() else (round(counter/1000000.0, 1)))+'M'
     else:
         return counter
 
@@ -195,14 +197,12 @@ def shortcounterprofile(counter):
 
 def shorcountertopic(counter):
     counter = int(counter)
-    if counter>1000 and counter<= 9999:
-        return str(counter/1000.0)[:3]+'K'
-    elif counter >9999 and counter<=999999:
-        return str(counter/1000.0)[:5]+'K'
-    elif counter >999999:
-        return str(counter/1000000.0)[:5]+'M'
+    if counter>1000 and counter < 999999:
+        return str(int(round(counter/1000.0, 1)) if round(counter/1000.0, 1).is_integer() else round(counter/1000.0, 1))+'K'
+    elif counter >= 999999:
+        return str(int(round(counter/1000000.0, 1)) if (round(counter/1000000.0, 1)).is_integer() else (round(counter/1000000.0, 1)))+'M'
     else:
-        return str(counter)
+        return counter
 
 def calculate_encashable_details(user):
     try:
