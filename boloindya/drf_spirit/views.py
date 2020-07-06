@@ -1450,7 +1450,7 @@ def createTopic(request):
             categories = filter(None, categ_list.split(','))
             topic.m2mcategory.add(*categories)
             topic.location = get_location(location_array)
-            vb_create_task.delay(topic.id)
+            # vb_create_task.delay(topic.id)
             # topic.update_vb()
             tag_list=check_space_before_hash(title).split()
             hash_tag = copy.deepcopy(tag_list)
