@@ -129,6 +129,7 @@
                 data.addColumn("string", "Week");
                 data.addColumn("number", "Count");
                 data.addColumn({type: "string", role: "tooltip", p: {html: true} });
+                data.addColumn({ role: 'style' });
                 data.addRows(chart_data)
                 console.log(chart_data)
 
@@ -136,8 +137,24 @@
                   chart: {
                     title: "{{ graph_title }}",
                   },
+                  annotations: {
+                    textStyle: {
+                      fontName: 'Times-Roman',
+                      fontSize: 18,
+                      bold: true,
+                      italic: true,
+                      // The color of the text.
+                      color: '#871b47',
+                      // The color of the text outline.
+                      auraColor: '#d799ae',
+                      // The transparency of the text.
+                      opacity: 0.8
+                    },
+                  },
                   tooltip: {isHtml: true},
                   legend: 'none',
+                  colors: ['red','green'],
+                  is3D:true,
                   // bars: 'horizontal' // Required for Material Bar Charts.
                 };
 

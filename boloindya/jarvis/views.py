@@ -1602,13 +1602,13 @@ def months_between(start_date, end_date):
 @login_required
 def statistics_all(request):
     metrics_options_live = (
-        ('3', "Video Shares (WhatsApp)"),
         ('6', "DAU"),
         ('8', "MAU"),
         ('0', "Video Created"),
         ('9', 'Total Video Creators'),
         ('12', 'PlayTime'),
-        ('13', "Video Shares (Telegram)"),
+        ('3', "WhatsApp Shares"),
+        ('13', "Telegram Shares"),
     )
 
     from django.db.models import Sum
@@ -1690,7 +1690,7 @@ def statistics_all(request):
         chart_data[x_axis[i]] = y_axis[i]
 
     # data['chart_data'] = [[str(data_view), str(data['graph_title']), str("Count")]] + \
-    data['chart_data'] = [list(ele) + [str("<div style='padding:5px;font-size:15px;'>" + str(list(ele)[0]) + "<br><br>" + "<b>Count:</b> " + str(list(ele)[1]) + "</div>")] for ele in chart_data.items()] 
+    data['chart_data'] = [list(ele) + [str("<div style='padding:5px;font-size:15px;'>" + str(list(ele)[0]) + "<br><br>" + "<b>Count:</b> " + str( '{:,d}'.format(list(ele)[1])) + "</div>"), str("color: rgb(66, 133, 244); fontName:'Times-Roman';")] for ele in chart_data.items()] 
     data['start_date'] = start_date
     data['end_date'] = end_date
     data['slabs'] = []
