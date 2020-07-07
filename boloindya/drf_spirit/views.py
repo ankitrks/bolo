@@ -713,13 +713,14 @@ class BoloIndyaGenericAPIView(GenericAPIView):
 def search_break_word(term):
     q_objects = SQ()
     if term:
-        term_list = term.split(' ')
+        term_list = term.strip().split(' ')
         i=0
         for i, each_term in enumerate(term_list):
-            if i==0:
-                q_objects = SQ(content=each_term)
-            else:
-                q_objects |= SQ(content=each_term)
+            if each_term:
+                if i==0:
+                    q_objects = SQ(content=each_term)
+                else:
+                    q_objects |= SQ(content=each_term)
         return q_objects
     else:
         return SQ(content='')
