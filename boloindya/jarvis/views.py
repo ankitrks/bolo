@@ -1646,8 +1646,8 @@ def statistics_all(request):
         temp_list.append( each_opt[1] )
         count_top = DashboardMetrics.objects.filter(date__gte = top_start, metrics = each_opt[0])\
                 .aggregate(total_count = Sum('count'))['total_count'] # .exclude(date__gt = top_end)
-        if count_top and each_opt[0] in ['6', '9']:
-            count_top = int(count_top / 4)
+        # if count_top and each_opt[0] in ['6', '9']:
+        #     count_top = int(count_top / 4)
         temp_list.append( count_top ) 
         top_data.append( temp_list ) 
         if metrics == each_opt[0]:
@@ -1680,15 +1680,19 @@ def statistics_all(request):
     else:
         x_axis = []
         y_axis = []
+        today = datetime.datetime.today()
         month_no = months_between(start_date, end_date)
         for each_month_no in month_no:
+            cal_avg = True
+            if each_month_no[0] == today.month and each_month_no[1] == today.year:
+                cal_avg = False
             x_axis.append(str(str(month_map[str(each_month_no[0])]) + " " + str(each_month_no[1])))
             counts = graph_data.filter(date__month = each_month_no[0], date__year = each_month_no[1])\
                     .aggregate(total_count = Sum('count'))['total_count']
-            if counts and metrics in ['6', '9']:
+            if cal_avg and counts and metrics in ['6', '9']:
                 counts = int(counts / 4)
             y_axis.append(counts)
-    # else:
+    # else: 
     #     x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
     #     y_axis = graph_data.values_list('count', flat = True)
     data['metrics'] = metrics
