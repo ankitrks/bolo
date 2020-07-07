@@ -1667,7 +1667,7 @@ def statistics_all(request):
         month_no = months_between(start_date, end_date)
         for each_month_no in month_no:
             x_axis.append(str(str(month_map[str(each_month_no[0])]) + " " + str(each_month_no[1])))
-            y_axis.append(graph_data.filter(date__month = each_month_no[0]).aggregate(total_count = Sum('count'))['total_count'])
+            y_axis.append(graph_data.filter(date__month = each_month_no[0], date__year = each_month_no[1]).aggregate(total_count = Sum('count'))['total_count'])
     # else:
     #     x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
     #     y_axis = graph_data.values_list('count', flat = True)

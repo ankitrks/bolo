@@ -358,6 +358,8 @@ def run():
         for each_rec in data:
             rec_count = data[each_rec]
             no_of_days = monthrange(int(each_rec.split('-')[0]), int(each_rec.split('-')[1]))[1]
+            if each_rec == "2020-07":
+                no_of_days = 6
             final_dict = {}
             for i in range(1, no_of_days + 1):
                 temp_percent = percent_dict_31
