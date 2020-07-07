@@ -1467,13 +1467,13 @@ def createTopic(request):
                 for index, value in enumerate(hash_tag):
                     if value.startswith("#"):
                         # tag,is_created = TongueTwister.objects.get_or_create(hash_tag__iexact=value.strip('#'))
-                        tag = TongueTwister.objects.filter(hash_tag__iexact=value.strip('#'))
+                        tag = TongueTwister.objects.using('default').filter(hash_tag__iexact=value.strip('#'))
                         if tag.count():
                             tag.update(hash_counter = F('hash_counter')+1)
                             tag = tag[0]
                         else:
                             tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
-                        topic.hash_tags.add(tag.id)
+                        topic.hash_tags.add(tag)
         else:
             view_count = random.randint(10,30)
             topic.view_count = view_count
