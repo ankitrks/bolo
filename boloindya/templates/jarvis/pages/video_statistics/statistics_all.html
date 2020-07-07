@@ -191,7 +191,7 @@
                 chart.draw(data, options);
             }
 
-            if(data_view != 'monthly'){
+            if(data_view == 'monthly'){
                 $.each(chart_data, function(i ,each_rec){
                     var tr_str = '<tr><td>' + (i +1) + '</td><td>' + each_rec[0] + '</td><td>' + each_rec[1] + '</td></tr>'
                     $('.graph_table').find('tbody').append(tr_str);
