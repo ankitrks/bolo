@@ -1638,14 +1638,17 @@ def statistics_all(request):
     if end_date_obj >= datetime.datetime.today().date():
         end_date = (datetime.datetime.today() - timedelta(days = 1)).strftime("%Y-%m-%d")
 
-    top_start = (datetime.datetime.today() - timedelta(days = 30)).date()
-    top_end = (datetime.datetime.today() - timedelta(days = 1)).date()
+    top_start = datetime.datetime.today().replace(day=1)
+    #top_end = (datetime.datetime.today() - timedelta(days = 1)).date()
     for each_opt in metrics_options_live:
         temp_list = []
         temp_list.append( each_opt[0] )
         temp_list.append( each_opt[1] )
-        temp_list.append( DashboardMetrics.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0])\
-                .aggregate(total_count = Sum('count'))['total_count'] )
+        count_top = DashboardMetrics.objects.filter(date__gte = top_start, metrics = each_opt[0])\
+                .aggregate(total_count = Sum('count'))['total_count'] # .exclude(date__gt = top_end)
+        if count_top and metrics in ['6', '9']:
+            count_top = int(count_top / 4)
+        temp_list.append( count_top ) 
         top_data.append( temp_list ) 
         if metrics == each_opt[0]:
             data['graph_title'] = each_opt[1]
@@ -1682,7 +1685,7 @@ def statistics_all(request):
             x_axis.append(str(str(month_map[str(each_month_no[0])]) + " " + str(each_month_no[1])))
             counts = graph_data.filter(date__month = each_month_no[0], date__year = each_month_no[1])\
                     .aggregate(total_count = Sum('count'))['total_count']
-            if metrics in ['6', '9']:
+            if counts and metrics in ['6', '9']:
                 counts = int(counts / 4)
             y_axis.append(counts)
     # else:

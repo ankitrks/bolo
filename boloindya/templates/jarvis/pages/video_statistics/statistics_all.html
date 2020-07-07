@@ -106,7 +106,7 @@
         </div><br><br><br>
         {% for each_data in top_data %}
             <div class="top_box" {% if metrics == each_data.0 %} style="background:bisque;"{% endif %}>
-                <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
+                <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* current month</i></span>
                 <a href="?metrics={{ each_data.0 }}" class="filter_apply"><h6 style="color: #333">{{ each_data.1 }}</h6><h5 style="color: #b52828">{{ each_data.2|intcomma }}</h5></a>
             </div>
         {% endfor %}
@@ -193,7 +193,7 @@
 
             if(data_view == 'monthly'){
                 $.each(chart_data, function(i ,each_rec){
-                    var tr_str = '<tr><td>' + (i +1) + '</td><td>' + each_rec[0] + '</td><td>' + each_rec[1] + '</td></tr>'
+                    var tr_str = '<tr><td>' + (i +1) + '</td><td>' + each_rec[0] + '</td><td>' + each_rec[1].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</td></tr>'
                     $('.graph_table').find('tbody').append(tr_str);
                 });
             }
