@@ -110,7 +110,7 @@ def referral_code_validate(request):
     status = 'success'
     message = 'Referral code valid!'
     try:
-        code_obj = ReferralCode.objects.exclude(is_active = False).get(code__iexact = ref_code)
+        code_obj = ReferralCode.objects.using('default').get(code__iexact = ref_code, is_active = True)
     except Exception as e:
         status = 'error'
         message = 'Invalid referral code! Please try again.'
@@ -128,9 +128,9 @@ def referral_code_update(request):
     message = 'Referral code updated!'
     try:
         created = True
-        code_obj = ReferralCode.objects.exclude(is_active = False).get(code__iexact = ref_code)
+        code_obj = ReferralCode.objects.using('default').get(code__iexact = ref_code, is_active = True)
         if user_id: # IF no user_id, means user downloaded the app (not signup)
-            used_obj, created = ReferralCodeUsed.objects.get_or_create(code = code_obj, by_user_id = user_id)
+            used_obj, created = ReferralCodeUsed.objects.using('default').get_or_create(code = code_obj, by_user_id = user_id)
         else:
             used_obj = ReferralCodeUsed.objects.create(code = code_obj)
         try:
