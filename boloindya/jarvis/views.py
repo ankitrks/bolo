@@ -1601,6 +1601,14 @@ def months_between(start_date, end_date):
 
 @login_required
 def statistics_all(request):
+    metrics_options_live = (
+        ('6', "DAU"),
+        ('8', "MAU"),
+        ('0', "Video Created"),
+        ('9', 'Total Video Creators'),
+        ('12', 'PlayTime'),
+    )
+
     from django.db.models import Sum
     data = {}
     top_data = []
@@ -1627,7 +1635,7 @@ def statistics_all(request):
 
     top_start = (datetime.datetime.today() - timedelta(days = 30)).date()
     top_end = (datetime.datetime.today() - timedelta(days = 1)).date()
-    for each_opt in metrics_options:
+    for each_opt in metrics_options_live:
         temp_list = []
         temp_list.append( each_opt[0] )
         temp_list.append( each_opt[1] )
