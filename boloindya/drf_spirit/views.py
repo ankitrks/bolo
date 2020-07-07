@@ -162,9 +162,7 @@ class NotificationAPI(GenericAPIView):
 
     
     def mark_notification_as_read(self):
-        notification = Notification.objects.get(id = self.request.data.get("id"))
-        notification.status = 2
-        notification.save()
+        notification = Notification.objects.using('default').filter(id = self.request.data.get("id")).update(status = 2)
 
     def mark_all_read(self):
         Notification.objects.filter(for_user=self.request.user).update(status=2)
