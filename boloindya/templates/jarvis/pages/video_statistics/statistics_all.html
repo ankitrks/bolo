@@ -39,6 +39,12 @@
             }
             .left_panel{}
             .right_panel{width:90%;margin-left: 5%;}
+            .graph_table{width: 40%;font-family: monospace;font-size: 13px;border-collapse: collapse;margin-left: 30%;}
+            .graph_table th, .graph_table td {border: 1px solid black;padding: 5px;text-align: center;}
+            .graph_table th{background: black;color: brown;}
+            .graph_table tr:nth-child(even) {background: burlywood;}
+            .graph_table tr:nth-child(odd) {background: #FFF}
+
         </style>
         <script>
             function process_filter(f_val){
@@ -116,11 +122,25 @@
                     <a href="?slab={{ each_slab.0 }}" class="filter_apply" {% if slab == each_slab.0  %}style="text-decoration: underline;font-weight: bold;color: burlywood;"{% endif %}>{{ each_slab.1 }}</a>{% if not forloop.last %} &nbsp;&nbsp;|&nbsp;&nbsp;{% endif %}
                 {% endfor %}
             {% endif %}
-            <br><div id="myDiv" style="width: 100%; height: 450px;"></div>
+            <br><div id="myDiv" style="width: 100%; height: 450px;"></div><br><br>
+            <div style="text-align: center;">
+                <h6>Table View</h6>
+                <table class="graph_table" cellpadding="1" cellspacing="1">
+                    <thead>
+                        <tr>
+                            <th>S. No</th>
+                            <th>Duration</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
         <script type="text/javascript">
             var chart_data = {{ chart_data|safe }};
             var metrics = "{{ metrics }}";
+            var data_view = "{{ data_view }}";
             google.charts.load('current', {'packages':['corechart']}); // 'bar / corechart'
             google.charts.setOnLoadCallback(drawChart);
             function drawChart() {
@@ -160,7 +180,7 @@
 
                 // var chart = new google.charts.Bar(document.getElementById('myDiv'));
                 // chart.draw(data, google.charts.Bar.convertOptions(options));
-                if(metrics == '6'){
+                if(data_view == 'weekly'){
                     var chart = new google.visualization.LineChart(document.getElementById('myDiv'));
                 }
                 else{
@@ -168,6 +188,12 @@
                 }
                 chart.draw(data, options);
             }
+
+            $.each(chart_data, function(i ,each_rec){
+                var tr_str = '<tr><td>' + (i +1) + '</td><td>' + each_rec[0] + '</td><td>' + each_rec[1] + '</td></tr>'
+                $('.graph_table').find('tbody').append(tr_str);
+            });
+
         </script>
     </body>
 </html>
