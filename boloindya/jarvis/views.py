@@ -1646,7 +1646,7 @@ def statistics_all(request):
         temp_list.append( each_opt[1] )
         count_top = DashboardMetrics.objects.filter(date__gte = top_start, metrics = each_opt[0])\
                 .aggregate(total_count = Sum('count'))['total_count'] # .exclude(date__gt = top_end)
-        if count_top and metrics in ['6', '9']:
+        if count_top and each_opt[0] in ['6', '9']:
             count_top = int(count_top / 4)
         temp_list.append( count_top ) 
         top_data.append( temp_list ) 
