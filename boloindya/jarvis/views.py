@@ -1612,12 +1612,15 @@ def statistics_all(request):
     from django.db.models import Sum
     data = {}
     top_data = []
-    metrics = request.GET.get('metrics', '0')
+    metrics = request.GET.get('metrics', '6')
     slab = request.GET.get('slab', None)
     # data_view = request.GET.get('data_view', 'daily')
     data_view = request.GET.get('data_view', 'monthly')
     if data_view == 'daily':
         data_view = 'monthly'
+    if metrics == '8':
+        data_view = 'monthly'
+    
     start_date = request.GET.get('start_date', '2019-05-01')
     end_date = request.GET.get('end_date', None)
     if not start_date:
@@ -1655,19 +1658,22 @@ def statistics_all(request):
     if data_view == 'weekly':
         x_axis = []
         y_axis = []
-        week_no = sorted(list(set(list(graph_data.order_by('week_no').values_list('week_no', flat = True)))))
+        week_no = sorted(list(set(list(graph_data.order_by('week_no').values_list('week_no', 'date')))))
         for each_week_no in week_no:
-            x_axis.append(str("week " + str(each_week_no)))
-            y_axis.append(graph_data.filter(week_no = each_week_no).aggregate(total_count = Sum('count'))['total_count'])
+            start_of_week = each_week_no[1] - timedelta(days=6)
+            end_of_week = each_week_no[1]
+            label = str(start_of_week.day) + " " + start_of_week.strftime("%b") + " - " + str(end_of_week.day) + " " + end_of_week.strftime('%b')
+            x_axis.append(str(label))
+            y_axis.append(graph_data.filter(week_no = each_week_no[0]).aggregate(total_count = Sum('count'))['total_count'])
 
-    # elif data_view == 'monthly':
     else:
         x_axis = []
         y_axis = []
         month_no = months_between(start_date, end_date)
         for each_month_no in month_no:
             x_axis.append(str(str(month_map[str(each_month_no[0])]) + " " + str(each_month_no[1])))
-            y_axis.append(graph_data.filter(date__month = each_month_no[0], date__year = each_month_no[1]).aggregate(total_count = Sum('count'))['total_count'])
+            y_axis.append(graph_data.filter(date__month = each_month_no[0], date__year = each_month_no[1])\
+                    .aggregate(total_count = Sum('count'))['total_count'])
     # else:
     #     x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
     #     y_axis = graph_data.values_list('count', flat = True)
@@ -1680,7 +1686,9 @@ def statistics_all(request):
     chart_data = OrderedDict()
     for i in range(len(x_axis)):
         chart_data[x_axis[i]] = y_axis[i]
-    data['chart_data'] = [[str(data_view), str(data['graph_title'])]] + [list(ele) for ele in chart_data.items()] 
+
+    # data['chart_data'] = [[str(data_view), str(data['graph_title']), str("Count")]] + \
+    data['chart_data'] = [list(ele) + [str("<div style='padding:5px;font-size:15px;'>" + str(list(ele)[0]) + "<br><br>" + "<b>Count:</b> " + str(list(ele)[1]) + "</div>")] for ele in chart_data.items()] 
     data['start_date'] = start_date
     data['end_date'] = end_date
     data['slabs'] = []

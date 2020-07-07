@@ -1,5 +1,5 @@
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 from calendar import monthrange
 from jarvis.models import DashboardMetrics
 
@@ -11,6 +11,7 @@ def run():
             "2019-07" : 11142,
             "2019-08" : 22687,
             "2019-09" : 44014,
+            
             "2019-10" : 94200,
             "2019-11" : 232780,
             "2019-12" : 374229,
@@ -32,6 +33,7 @@ def run():
             "2019-07" : 2023,
             "2019-08" : 2908,
             "2019-09" : 3296,
+            
             "2019-10" : 4800,
             "2019-11" : 15430,
             "2019-12" : 35530,
@@ -53,6 +55,7 @@ def run():
             "2019-07" : 5220,
             "2019-08" : 7923,
             "2019-09" : 8123,
+            
             "2019-10" : 15006,
             "2019-11" : 42891,
             "2019-12" : 95152,
@@ -74,6 +77,7 @@ def run():
             "2019-07" : 1309,
             "2019-08" : 2168,
             "2019-09" : 3563,
+            
             "2019-10" : 4451,
             "2019-11" : 8885,
             "2019-12" : 13413,
@@ -95,6 +99,7 @@ def run():
             "2019-07" : 8485,
             "2019-08" : 21049,
             "2019-09" : 43913,
+            
             "2019-10" : 359600,
             "2019-11" : 639200,
             "2019-12" : 954300,
@@ -365,16 +370,9 @@ def run():
                 temp_percent = percent_dict_31
                 if no_of_days == 30:
                     temp_percent = percent_dict
-                # dev = last_value + ((last_value * temp_percent[i]) / 100) # rec_count
-                # last_value = int(dev)
-                # final_dict[i] = int(dev)
                 
                 dev = ((rec_count * temp_percent[i]) / 100) # rec_count
                 final_dict[i] = int(dev)
-
-                # temp_count = rec_count / no_of_days
-                # dev = temp_count - ((temp_count * round(random.uniform(0.2, 0.8), 1) ) / 100)
-                # final_dict[i] = int(dev)
 
             rem_val = rec_count - sum(final_dict.values()) 
             try:
@@ -393,7 +391,10 @@ def run():
                 ri = random.randint(1, no_of_days)
                 final_dict[ri] = final_dict[ri] + (rec_count - sum(final_dict.values()))
             
+            final_count = 0
+            last_week_no = None
             for each_data in final_dict:
+                final_count += final_dict[each_data]
                 month_date = datetime.strptime(each_rec + '-' + str(each_data), '%Y-%m-%d')
                 week_no = month_date.isocalendar()[1]
                 if month_date.year == 2020:
@@ -401,15 +402,21 @@ def run():
                 if month_date.year == 2019 and week_no == 1:
                     week_no = 52
 
-                save_obj, created = DashboardMetrics.objects.get_or_create(metrics = metrics, metrics_slab = slab, date = month_date,\
-                        week_no = week_no)
-                if created:
-                    final_count = final_dict[each_data]
-                    if final_dict[each_data] < 0:
-                        print metrics, slab, month_date, week_no, final_dict[each_data]
-                        print '============================================='
-                        final_count = 0
-                    # print 'Created....'
-                    save_obj.count = final_count
-                    save_obj.save()
+                if not last_week_no:
+                    last_week_no = week_no
+                
+                elif last_week_no != week_no:
+                    save_obj, created = DashboardMetrics.objects.get_or_create(metrics = metrics, metrics_slab = slab, date = month_date,\
+                            week_no = week_no)
+                    if created:
+                        # final_count = final_dict[each_data]
+                        if final_dict[each_data] < 0:
+                            print metrics, slab, month_date, week_no, final_dict[each_data]
+                            print '============================================='
+                            final_count = 0
+                        # print 'Created....'
+                        save_obj.count = final_count
+                        save_obj.save()
+                    final_count = 0
+                    last_week_no = week_no
 
