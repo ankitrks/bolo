@@ -223,7 +223,7 @@ class DashboardMetrics(RecordTimeStamp):
     metrics_slab = models.CharField(choices = metrics_slab_options, blank = True, null = True, max_length = 10, default = None)
     date = models.DateTimeField(auto_now = False, auto_now_add = False, blank = False, null = False)
     week_no = models.PositiveIntegerField(null = True, blank = True, default = 0)
-    count = models.PositiveIntegerField(null = True, blank = True, default = 0)
+    count = models.BigIntegerField(null = True, blank = True, default = 0)
 
     class Meta:
         ordering = ['date']
