@@ -181,7 +181,7 @@ metrics_options = (
     ('0', "Video Created"),
     ('1', "Video Views"),
     ('2', "Bolo Actions"),
-    ('3', "Video Shares"),
+    ('3', "Video Shares (WhatsApp)"),
     ('4', "New Video Creators"),
     ('5', "Number of Installs"),
     ('6', "DAU"),
@@ -191,6 +191,7 @@ metrics_options = (
     ('10', 'Install-Signup Map'),
     ('11', 'Uninstalls'),
     ('12', 'PlayTime'),
+    ('13', "Video Shares (Telegram)"),
 )
 
 metrics_slab_options = (

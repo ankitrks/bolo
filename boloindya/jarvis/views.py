@@ -1602,11 +1602,13 @@ def months_between(start_date, end_date):
 @login_required
 def statistics_all(request):
     metrics_options_live = (
+        ('3', "Video Shares (WhatsApp)"),
         ('6', "DAU"),
         ('8', "MAU"),
         ('0', "Video Created"),
         ('9', 'Total Video Creators'),
         ('12', 'PlayTime'),
+        ('13', "Video Shares (Telegram)"),
     )
 
     from django.db.models import Sum
