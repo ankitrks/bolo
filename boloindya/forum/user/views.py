@@ -130,7 +130,7 @@ def referral_code_update(request):
         created = True
         code_obj = ReferralCode.objects.using('default').get(code__iexact = ref_code, is_active = True)
         if user_id: # IF no user_id, means user downloaded the app (not signup)
-            used_obj, created = ReferralCodeUsed.objects.get_or_create(code = code_obj, by_user_id = user_id)
+            used_obj, created = ReferralCodeUsed.objects.using('default').get_or_create(code = code_obj, by_user_id = user_id)
         else:
             used_obj = ReferralCodeUsed.objects.create(code = code_obj)
         try:
