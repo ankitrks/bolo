@@ -133,10 +133,11 @@ def referral_code_update(request):
     try:
         created = True
         code_obj_id = get_referral_code_info(ref_code)
-        if user_id: # IF no user_id, means user downloaded the app (not signup)
-            used_obj, created = ReferralCodeUsed.objects.using('default').get_or_create(code_id = code_obj_id, by_user_id = user_id)
-        else:
-            used_obj = ReferralCodeUsed.objects.create(code_id = code_obj_id)
+        # if user_id: # IF no user_id, means user downloaded the app (not signup)
+        #     used_obj, created = ReferralCodeUsed.objects.using('default').get_or_create(code_id = code_obj_id, by_user_id = user_id)
+        # else:
+        ### we are allowing duplicate values to optimize this query and duplicates values are getting deleted in refer_n_earn and update_download_signup_count scripts.
+        used_obj = ReferralCodeUsed.objects.create(code_id = code_obj_id)
         try:
             used_obj.click_id = click_id
             used_obj.pid =pid
