@@ -257,3 +257,12 @@ def update_redis_hashtag_paginated_data(language_id, extra_filter, cache_max_pag
     except:
         return {}
 
+
+def update_redis_vb_seen_entries(topic_id,user_id,created_at):
+    key = 'vb_entry:'+str(topic_id)+':'+str(user_id)
+    vb_entry_list = get_redis(key)
+    if not vb_entry_list:
+        vb_entry_list = []
+    vb_entry_list.append({'user_id':user_id,'topic_id':topic_id})
+    set_redis(key, vb_entry_list, False)
+

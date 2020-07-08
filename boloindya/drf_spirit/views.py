@@ -61,7 +61,7 @@ from .serializers import *
 from tasks import vb_create_task,user_ip_to_state_task,sync_contacts_with_user,cache_follow_post,cache_popular_post, deafult_boloindya_follow, save_click_id_response, send_upload_video_notification
 from haystack.query import SearchQuerySet, SQ
 from django.core.exceptions import MultipleObjectsReturned
-from forum.topic.utils import get_redis_category_paginated_data,get_redis_hashtag_paginated_data,get_redis_language_paginated_data,get_redis_follow_paginated_data, get_popular_paginated_data
+from forum.topic.utils import get_redis_category_paginated_data,get_redis_hashtag_paginated_data,get_redis_language_paginated_data,get_redis_follow_paginated_data, get_popular_paginated_data, update_redis_vb_seen_entries
 # from haystack.inputs import Raw, AutoQuery
 # from haystack.utils import Highlighter
 from django.contrib.contenttypes.models import ContentType
@@ -3155,11 +3155,13 @@ def comment_view(request):
     try:
         # comment_list = comment_ids.split(',')
         # for each_comment_id in comment_list:
-        topic = Topic.objects.using('default').get(pk = topic_id)
-        # topic= comment.topic
-        topic.view_count = F('view_count') +1
-        topic.imp_count = F('imp_count') +1
-        topic.save()
+        # topic = Topic.objects.using('default').get(pk = topic_id)
+        # # topic= comment.topic
+        # topic.view_count = F('view_count') +1
+        # topic.imp_count = F('imp_count') +1
+        # topic.save()
+        if topic_id and request.user.is_authenticated:
+            update_redis_vb_seen_entries(topic_id,request.user.id,datetime.now())
         # UserProfile.objects.filter(user_id = topic.user_id).update(view_count = F('view_count')+1,own_vb_view_count = F('own_vb_view_count') +1)
         return JsonResponse({'message': 'item viewed'}, status=status.HTTP_200_OK)
     except Exception as e:
@@ -3179,21 +3181,23 @@ def vb_seen(request):
     """
     #### add models for seen users
     try:
-        # comment_list = comment_ids.split(',')
-        # for each_comment_id in comment_list:
-        topic = Topic.objects.get(pk = topic_id)
-        # topic= comment.topic
-        topic.view_count = F('view_count')+1
-        topic.imp_count = F('imp_count') +1
-        topic.save()
-        # UserProfile.objects.filter(user_id = topic.user_id).update(view_count = F('view_count')+1,own_vb_view_count = F('own_vb_view_count') +1)
-        all_vb_seen = get_redis_vb_seen(request.user.id)
-        if not topic_id in all_vb_seen:
-            vbseen = VBseen.objects.create(user = request.user,topic_id = topic_id)
-            update_redis_vb_seen(request.user.id,topic_id)
-            add_bolo_score(topic.user.id, 'vb_view', vbseen)
-        else:
-            vbseen = VBseen.objects.create(user = request.user,topic_id = topic_id)
+        # # comment_list = comment_ids.split(',')
+        # # for each_comment_id in comment_list:
+        # topic = Topic.objects.get(pk = topic_id)
+        # # topic= comment.topic
+        # topic.view_count = F('view_count')+1
+        # topic.imp_count = F('imp_count') +1
+        # topic.save()
+        # # UserProfile.objects.filter(user_id = topic.user_id).update(view_count = F('view_count')+1,own_vb_view_count = F('own_vb_view_count') +1)
+        # all_vb_seen = get_redis_vb_seen(request.user.id)
+        # if not topic_id in all_vb_seen:
+        #     vbseen = VBseen.objects.create(user = request.user,topic_id = topic_id)
+        #     update_redis_vb_seen(request.user.id,topic_id)
+        #     add_bolo_score(topic.user.id, 'vb_view', vbseen)
+        # else:
+        #     vbseen = VBseen.objects.create(user = request.user,topic_id = topic_id)
+        if topic_id and request.user.is_authenticated:
+            update_redis_vb_seen_entries(topic_id,request.user.id,datetime.now())
         return JsonResponse({'message': 'vb seen'}, status=status.HTTP_200_OK)
 
     except Exception as e:
