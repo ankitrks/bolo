@@ -319,7 +319,7 @@ class ReferralCode(RecordTimeStamp):
         return 'https://www.boloindya.com/invite/'+self.for_user.username+'/'+str(self.for_user.id)+'/'
 
 class ReferralCodeUsed(RecordTimeStamp):
-    code = models.ForeignKey(ReferralCode, blank=False, null = False, related_name = 'refcode', db_index = True)
+    code = models.ForeignKey(ReferralCode, blank=False, null = False, related_name = 'refcode')
     by_user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True )
     is_download = models.BooleanField(default = True)
     click_id = models.CharField(_("Click Id"), max_length=255, blank=True)
