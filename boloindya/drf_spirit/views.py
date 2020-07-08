@@ -4012,7 +4012,7 @@ def generate_login_data(request):
         except Exception as e:
             return JsonResponse({'message': 'Invalid User Id'}, status=status.HTTP_400_BAD_REQUEST)
     else:
-        return JsonResponse({'message': 'Invalid Auth User Id'}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({'message': 'Invalid User'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
