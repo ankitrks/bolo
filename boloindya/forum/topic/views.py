@@ -1380,7 +1380,7 @@ def share_match_page(request, match_id, slug):
 
 # Share Pages Match 
 def share_challenge_page(request, hashtag):
-    challenge = TongueTwister.objects.get(hash_tag = hashtag)
+    challenge = TongueTwister.objects.using('default').get(hash_tag = hashtag)
     context = {
     'challenge': challenge,
     }
