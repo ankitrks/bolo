@@ -507,6 +507,7 @@ class TopicHistory(RecordTimeStamp):
 
 class VBseen(UserInfo):
     topic = models.ForeignKey(Topic, related_name='vb_seen',null=True,blank=True)
+    created_at=models.DateTimeField(default=datetime.now,blank=True,null=True)
     def __unicode__(self):
         return unicode(str(self.topic if self.topic else 'VB'), 'utf-8')
 
