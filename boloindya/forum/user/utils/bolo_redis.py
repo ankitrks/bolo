@@ -72,7 +72,8 @@ def get_referral_code_info(ref_code):
     referral_info = get_redis(ref_code)
     if not referral_info:
         code_obj = ReferralCode.objects.using('default').get(code__iexact = ref_code, is_active = True)
-        set_redis(ref_code, code_obj.id, False)
+        data = {"ref_code_id":code_obj.id, "is_active":code_obj.is_active}
+        set_redis(ref_code, data, False)
         return code_obj.id
     elif referral_info['is_active']:
         return referral_info['ref_code_id']
