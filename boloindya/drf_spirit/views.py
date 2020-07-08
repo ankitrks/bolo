@@ -3162,6 +3162,7 @@ def comment_view(request):
         # topic.save()
         if topic_id and request.user.is_authenticated:
             update_redis_vb_seen_entries(topic_id,request.user.id,datetime.now())
+            update_redis_vb_seen(request.user.id,topic_id)
         # UserProfile.objects.filter(user_id = topic.user_id).update(view_count = F('view_count')+1,own_vb_view_count = F('own_vb_view_count') +1)
         return JsonResponse({'message': 'item viewed'}, status=status.HTTP_200_OK)
     except Exception as e:
@@ -3198,6 +3199,7 @@ def vb_seen(request):
         #     vbseen = VBseen.objects.create(user = request.user,topic_id = topic_id)
         if topic_id and request.user.is_authenticated:
             update_redis_vb_seen_entries(topic_id,request.user.id,datetime.now())
+            update_redis_vb_seen(request.user.id,topic_id)
         return JsonResponse({'message': 'vb seen'}, status=status.HTTP_200_OK)
 
     except Exception as e:
