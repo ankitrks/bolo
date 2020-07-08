@@ -15,8 +15,9 @@ def run():
             try:
                 data = redis_cli.get(key)
                 data =  json.loads(data) if data else None
-                all_entries += data
-                all_keys.append(key)
+                if data:
+                    all_entries += data
+                    all_keys.append(key)
             except Exception as e:
                 print e
         if all_entries:
