@@ -263,6 +263,6 @@ def update_redis_vb_seen_entries(topic_id,user_id,created_at):
     vb_entry_list = get_redis(key)
     if not vb_entry_list:
         vb_entry_list = []
-    vb_entry_list.append({'user_id':user_id,'topic_id':topic_id})
+    vb_entry_list.append({'user_id':user_id,'topic_id':topic_id,'created_at':created_at})
     set_redis(key, vb_entry_list, False)
 
