@@ -479,19 +479,21 @@ def GetChallenge(request):
     challenge_hash = request.GET.get('challengehash')
     language_id = request.GET.get('language_id')
     challengehash = '#' + challenge_hash
-    hash_tag = TongueTwister.objects.filter(hash_tag__iexact=challengehash[1:])[0]
-    all_seen_vb = []
-    topics =[]
-    page_no = int(request.GET.get('page',1))
-    if 'offset' in request.GET.keys() and int(request.GET.get('offset') or 0):
-        page_no = int(int(request.GET.get('offset') or 0)/settings.REST_FRAMEWORK['PAGE_SIZE'])+1
-    filter_dict = {'hash_tags':hash_tag}
-    if language_id:
-        filter_dict['language_id']=language_id
-    topics = get_redis_hashtag_paginated_data(language_id,hash_tag.id,page_no)
-    my_data = TopicSerializerwithComment(topics,context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand':request.GET.get('is_expand',True)},many=True).data
-
-    return JsonResponse({"results":my_data})
+    hash_tag = TongueTwister.objects.filter(hash_tag__iexact=challengehash[1:])
+    if hash_tag:
+        all_seen_vb = []
+        topics =[]
+        page_no = int(request.GET.get('page',1))
+        if 'offset' in request.GET.keys() and int(request.GET.get('offset') or 0):
+            page_no = int(int(request.GET.get('offset') or 0)/settings.REST_FRAMEWORK['PAGE_SIZE'])+1
+        filter_dict = {'hash_tags':hash_tag[0]}
+        if language_id:
+            filter_dict['language_id']=language_id
+        topics = get_redis_hashtag_paginated_data(language_id,hash_tag[0].id,page_no)
+        my_data = TopicSerializerwithComment(topics,context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand':request.GET.get('is_expand',True)},many=True).data
+        return JsonResponse({"results":my_data})
+    else:
+        return JsonResponse({"results":[]})
 
 class SmallSetPagination(PageNumberPagination):
     page_size = 3
