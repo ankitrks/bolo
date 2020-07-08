@@ -279,7 +279,7 @@ class AppPageContent(RecordTimeStamp):
         return str(self.page_name)
 
 class ReferralCode(RecordTimeStamp):
-    code = models.CharField(_("Ref Code"), max_length=20, blank=True)
+    code = models.CharField(_("Ref Code"), max_length=20, blank=True, db_index = True)
     for_user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, editable = False)
     purpose = models.CharField(_("Purpose"), max_length=50, blank=True)
     campaign_url = models.CharField(_("Playstore URL"), max_length=350, blank=True, null = True, editable = False)
@@ -339,7 +339,7 @@ class UserPhoneBook(RecordTimeStamp):
 
 class Contact(RecordTimeStamp):
     contact_name = models.CharField(_("Contact Name"), max_length=100, blank=True, null = True)
-    contact_number = models.CharField(_("Contact Number"), max_length=50, blank=True, null = True)
+    contact_number = models.CharField(_("Contact Number"), max_length=50, blank=True, null = True, db_index = True)
     contact_email = models.CharField(_("Contact Email"), max_length=200, blank=True, null = True)
     is_user_registered = models.BooleanField(default=False)
     user =  models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("User"),editable=False,null=True,blank=True)
