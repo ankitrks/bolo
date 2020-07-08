@@ -24,6 +24,7 @@ from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from forum.user.models import AppPageContent, ReferralCode, ReferralCodeUsed
+from .utils.bolo_redis import get_referral_code_info
 
 User = get_user_model()
 
@@ -110,7 +111,10 @@ def referral_code_validate(request):
     status = 'success'
     message = 'Referral code valid!'
     try:
-        code_obj = ReferralCode.objects.using('default').get(code__iexact = ref_code, is_active = True)
+        code_obj_id = get_referral_code_info(ref_code)
+        if not code_obj_id:
+            status = 'error'
+            message = 'Invalid referral code! Please try again.'
     except Exception as e:
         status = 'error'
         message = 'Invalid referral code! Please try again.'
@@ -128,11 +132,11 @@ def referral_code_update(request):
     message = 'Referral code updated!'
     try:
         created = True
-        code_obj = ReferralCode.objects.using('default').get(code__iexact = ref_code, is_active = True)
+        code_obj_id = get_referral_code_info(ref_code)
         if user_id: # IF no user_id, means user downloaded the app (not signup)
-            used_obj, created = ReferralCodeUsed.objects.using('default').get_or_create(code = code_obj, by_user_id = user_id)
+            used_obj, created = ReferralCodeUsed.objects.using('default').get_or_create(code_id = code_obj_id, by_user_id = user_id)
         else:
-            used_obj = ReferralCodeUsed.objects.create(code = code_obj)
+            used_obj = ReferralCodeUsed.objects.create(code_id = code_obj_id)
         try:
             used_obj.click_id = click_id
             used_obj.pid =pid
