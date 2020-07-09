@@ -2166,7 +2166,7 @@ def verify_otp(request):
             #     otp_obj=otp_obj[0]
             # otp_obj.is_active = False
             # otp_obj.used_at = timezone.now()
-            otp_obj.update(used_at = timezone.now())
+            # otp_obj.update(used_at = timezone.now())
             if not is_reset_password and not is_for_change_phone and otp_obj:
                 if mobile_no in ['7726080653']:
                     return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
@@ -2213,12 +2213,11 @@ def verify_otp(request):
                         default_follow = deafult_boloindya_follow.delay(user.id,str(language))
                     add_bolo_score(user.id, 'initial_signup', userprofile)
                 user_tokens = get_tokens_for_user(user)
-                otp_obj.update(for_user = user)
+                # otp_obj.update(for_user = user, used_at = timezone.now())
                 # otp_obj.for_user = user
                 # otp_obj.save()
                 return JsonResponse({'message': message, 'username' : mobile_no, \
                         'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
-            otp_obj.save()
             return JsonResponse({'message': 'OTP Validated', 'username' : mobile_no}, status=status.HTTP_200_OK)
         except Exception as e:
             return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
@@ -2266,7 +2265,7 @@ def verify_otp_with_country_code(request):
             #     otp_obj=otp_obj[0]
             # otp_obj.is_active = False
             # otp_obj.used_at = timezone.now()
-            otp_obj.update(used_at = timezone.now())
+            # otp_obj.update(used_at = timezone.now())
             if not is_reset_password and not is_for_change_phone and otp_obj:
                 if mobile_no in ['7726080653']:
                     return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
@@ -2314,7 +2313,7 @@ def verify_otp_with_country_code(request):
                         default_follow = deafult_boloindya_follow.delay(user.id,str(language))
                     add_bolo_score(user.id, 'initial_signup', userprofile)
                 user_tokens = get_tokens_for_user(user)
-                otp_obj.update(for_user = user)
+                # otp_obj.update(for_user = user, used_at = timezone.now())
                 # otp_obj.for_user = user
                 # otp_obj.save()
                 return JsonResponse({'message': message, 'username' : mobile_no, \
