@@ -3598,6 +3598,7 @@ def get_cloudfront_url(instance):
 @csrf_exempt
 @api_view(['POST'])
 def SyncDump(request):
+    return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
     if request.user:
         if request.method == "POST":
             #Storing the dump in database
@@ -3624,6 +3625,7 @@ def SyncDump(request):
 
 @api_view(['POST'])
 def save_android_logs(request):
+    return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
     try:
         if request.user.id == None:
             AndroidLogs.objects.create(logs=request.POST.get('error_log', ''),log_type = request.POST.get('log_type',None), android_id=request.POST.get('android_id',''))
