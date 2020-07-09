@@ -638,7 +638,7 @@ class Notification(UserInfo):
         except:
             name=''
         if self.notification_type=='1':
-            notific['title'] = str(name)+' has posted a video_count: '+self.topic.title+'. Would you like to comment?'
+            notific['title'] = str(name)+' has posted a video: '+self.topic.title+'. Would you like to comment?'
             notific['hindi_title'] = str(name)+' ने एक वीडियो पोस्ट किया है: '+self.topic.title+'. क्या आप टिपण्णी करना चाहेंगे?'
             notific['tamil_title'] = str(name)+' ஒரு வீடியோவை வெளியிட்டுள்ளது: '+self.topic.title+' நீங்கள் கருத்து தெரிவிக்க விரும்புகிறீர்களா?'
             notific['telgu_title'] = str(name)+' ఒక వీడియోను పోస్ట్ చేసింది: '+self.topic.title+'. మీరు వ్యాఖ్యానించాలనుకుంటున్నారా?'
