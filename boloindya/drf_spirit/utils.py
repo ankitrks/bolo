@@ -6,6 +6,7 @@ import urllib2
 import re
 import random, string
 from django.db.models import F,Q
+from redis_utils import *
 
 language_options = (
     ('0', "All"),
@@ -491,4 +492,26 @@ def create_user(name,username,gender,language):
             print e
             return False
 
+def set_android_logs_info(value):
+    try:
+        key = "bi:android_logs"
+        android_data = get_redis(key)
+        if android_data:
+            android_data.append(value)
+            set_redis(key, android_data)
+        else:
+            set_redis(key, [value])
+    except Exception as e:
+        print "set_android_logs_info failed with value"+str(value)
 
+def set_sync_dump_info(value):
+    try:
+        key = "bi:sync_dump"
+        sync_dump_data = get_redis(key)
+        if sync_dump_data:
+            sync_dump_data.append(value)
+            set_redis(key, sync_dump_data)
+        else:
+            set_redis(key, [value])
+    except Exception as e:
+        print "set_sync_dump_info failed with value"+str(value)

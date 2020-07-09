@@ -44,7 +44,7 @@ from .models import SingUpOTP
 from .models import UserJarvisDump, UserLogStatistics, UserFeedback, Campaign, Winner, Country, State, City
 from .permissions import IsOwnerOrReadOnly
 from .utils import get_weight, add_bolo_score, shorcountertopic, calculate_encashable_details, state_language, language_options,short_time,\
-    solr_object_to_db_object, solr_userprofile_object_to_db_object,get_paginated_data ,shortcounterprofile, get_ranked_topics
+    solr_object_to_db_object, solr_userprofile_object_to_db_object,get_paginated_data ,shortcounterprofile, get_ranked_topics, set_android_logs_info, set_sync_dump_info
 
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
@@ -3603,17 +3603,10 @@ def SyncDump(request):
         if request.method == "POST":
             #Storing the dump in database
             try:
-                if request.user.id == None:
-                    dump = request.POST.get('dump')
-                    dump_type = request.POST.get('dump_type')
-                    stored_data = UserJarvisDump(dump=dump, dump_type=dump_type, android_id=request.POST.get('android_id',''))
-                    stored_data.save()
-                else:
-                    user = request.user
-                    dump = request.POST.get('dump')
-                    dump_type = request.POST.get('dump_type')
-                    stored_data = UserJarvisDump(user=user, dump=dump, dump_type=dump_type, android_id=request.POST.get('android_id',''))
-                    stored_data.save()
+                data = {"dump": request.POST.get('dump'), "dump_type":request.POST.get('dump_type'),"android_id":request.POST.get('android_id','')}
+                if request.user.id:
+                    data["user"] = request.user
+                set_sync_dump_info(data)
                 return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)    
             except Exception as e:
                 log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
@@ -3625,14 +3618,12 @@ def SyncDump(request):
 
 @api_view(['POST'])
 def save_android_logs(request):
-    return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
     try:
-        if request.user.id == None:
-            AndroidLogs.objects.create(logs=request.POST.get('error_log', ''),log_type = request.POST.get('log_type',None), android_id=request.POST.get('android_id',''))
-            return JsonResponse({'messgae' : 'success'})
-        else:
-            AndroidLogs.objects.create(user=request.user, logs=request.POST.get('error_log', ''),log_type = request.POST.get('log_type',None), android_id=request.POST.get('android_id',''))
-            return JsonResponse({'messgae' : 'success'})
+        data = {"logs":request.POST.get('error_log', ''), "log_type":request.POST.get('log_type',None), "android_id": request.POST.get('android_id','')}
+        if request.user.id:
+            data['user'] = request.user
+        set_android_logs_info(data)
+        return JsonResponse({'messgae' : 'success'})
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
