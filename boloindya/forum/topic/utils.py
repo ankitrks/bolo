@@ -266,3 +266,13 @@ def update_redis_vb_seen_entries(topic_id,user_id,created_at):
     vb_entry_list.append({'user_id':user_id,'topic_id':topic_id,'created_at':created_at})
     set_redis(key, vb_entry_list, False)
 
+
+def update_redis_fcm_device_entries(dev_id,data_dict):
+    key = 'fcm_device:'+str(dev_id)
+    fcm_request_list = get_redis(key)
+    if not fcm_request_list:
+        fcm_request_list = []
+    fcm_request_list.append(data_dict)
+    set_redis(key, fcm_request_list, False)
+
+

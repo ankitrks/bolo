@@ -13,6 +13,7 @@ from drf_spirit.utils import language_options
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from datetime import datetime
+from forum.topic.utils import update_redis_fcm_device_entries
 
 class VideoCategory(models.Model):
     category_name = models.CharField(_('Category Name'),max_length=100,null=True,blank=True)
@@ -91,6 +92,12 @@ class FCMDevice(AbstractDevice):
         device_model=request.POST.get('device_model', '')
         current_version=request.POST.get('current_version', '')
         manufacturer=request.POST.get('manufacturer', '')
+        data_dict = {'reg_id':reg_id, 'dev_id':dev_id,'device_model':device_model,\
+         'current_version':current_version, 'manufacturer':manufacturer, 'user_id':request.user.id,\
+         'device_type':request.POST.get('device_type',None) }
+        if dev_id:
+            update_redis_fcm_device_entries(dev_id,data_dict)
+        return JsonResponse({"status":"Success"},safe = False)
         try:
             instance = FCMDevice.objects.using('default').filter(Q(reg_id = reg_id) | Q(dev_id = dev_id))
             if not len(instance):
