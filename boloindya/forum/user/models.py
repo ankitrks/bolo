@@ -222,7 +222,7 @@ class AndroidLogs(RecordTimeStamp):
     log_type = models.CharField(_("Log Type"),null=True,blank=True,max_length=255)
     is_executed = models.BooleanField(_("is_executed"), default=False)
     android_id = models.CharField(_("android_id"), max_length=100, blank=True, null = True, editable = False)
-
+    created_at = models.DateTimeField(_("created_at"), auto_now_add = False, auto_now = False, default = datetime.now())
     def __unicode__(self):
         return str(self.user)
 

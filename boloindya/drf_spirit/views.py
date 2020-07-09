@@ -3603,7 +3603,7 @@ def SyncDump(request):
         if request.method == "POST":
             #Storing the dump in database
             try:
-                data = {"dump": request.POST.get('dump'), "dump_type":request.POST.get('dump_type'),"android_id":request.POST.get('android_id','')}
+                data = {"dump": request.POST.get('dump'), "dump_type":request.POST.get('dump_type'),"android_id":request.POST.get('android_id',''), "created_at": datetime.now()}
                 if request.user.id:
                     data["user"] = request.user
                 set_sync_dump_info(data)
@@ -3619,7 +3619,7 @@ def SyncDump(request):
 @api_view(['POST'])
 def save_android_logs(request):
     try:
-        data = {"logs":request.POST.get('error_log', ''), "log_type":request.POST.get('log_type',None), "android_id": request.POST.get('android_id','')}
+        data = {"logs":request.POST.get('error_log', ''), "log_type":request.POST.get('log_type',None), "android_id": request.POST.get('android_id',''), "created_at": datetime.now()}
         if request.user.id:
             data['user'] = request.user
         set_android_logs_info(data)
