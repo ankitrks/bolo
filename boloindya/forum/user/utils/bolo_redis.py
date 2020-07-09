@@ -69,7 +69,7 @@ def get_lifetime_bolo_info(user_id):
     return bolo_info
 
 def get_referral_code_info(ref_code):
-    key = "refcode:"+str(ref_code)
+    key = "refcode:" + str(ref_code)
     referral_info = get_redis(key)
     if not referral_info:
         code_obj = ReferralCode.objects.using('default').get(code__iexact = ref_code, is_active = True)
