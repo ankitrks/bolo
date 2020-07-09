@@ -94,7 +94,7 @@ class FCMDevice(AbstractDevice):
         manufacturer=request.POST.get('manufacturer', '')
         data_dict = {'reg_id':reg_id, 'dev_id':dev_id,'device_model':device_model,\
          'current_version':current_version, 'manufacturer':manufacturer, 'user_id':request.user.id,\
-         'device_type':request.POST.get('device_type',None) }
+         'device_type':request.POST.get('device_type',None),'created_at':datetime.now() }
         if dev_id:
             update_redis_fcm_device_entries(dev_id,data_dict)
         return JsonResponse({"status":"Success"},safe = False)
