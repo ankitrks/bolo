@@ -22,7 +22,7 @@ language_options = (
     ('11', "Odia"),
     ('12', "Bhojpuri"),
     ('13', "Haryanvi"),
-
+    ('14', "Sinhala"),
 
 )
 
