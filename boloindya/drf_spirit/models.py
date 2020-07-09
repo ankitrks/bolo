@@ -191,7 +191,7 @@ class UserJarvisDump(models.Model):
     sync_time = models.DateTimeField(_("sync_time"),auto_now=False,auto_now_add=True,blank=False,null=False)
     is_executed = models.BooleanField(_("is_executed"), default=False)
     android_id = models.CharField(_("android_id"), max_length=100, blank=True, null = True, editable = False)
-    created_at = models.DateTimeField(_("created_at"), auto_now_add = False, auto_now = False, default = datetime.now())
+    created_at = models.DateTimeField(_("created_at"), auto_now_add = False, auto_now = False, default = datetime.now)
     def __unicode__(self):
         return "%s" % self.dump
       
