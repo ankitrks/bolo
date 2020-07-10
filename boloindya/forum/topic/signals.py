@@ -9,6 +9,18 @@ from django.dispatch import Signal
 post_update = Signal()
 from forum.user.utils.follow_redis import get_redis_following
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+@receiver(post_save, sender=Topic)
+def index_post_topic(sender, instance, **kwargs):
+    instance.indexing()
+
+@receiver(post_save, sender=TongueTwister)
+def index_post_tonguetwister(sender, instance, **kwargs):
+    instance.indexing()
+
+
 @receiver(post_save, sender=Topic)
 def save_topic(sender, instance, created, **kwargs):
     try:
@@ -54,6 +66,9 @@ def save_like(sender, instance,created, **kwargs):
                 notify = Notification.objects.create(for_user = instance.topic.user, topic = instance,notification_type='5',user = instance.user)
     except Exception as e:
         pass
+
+
+
 
 # def save_vb(sender, instance,created, **kwargs):
 #   try:

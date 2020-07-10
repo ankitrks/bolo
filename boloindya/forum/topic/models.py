@@ -24,7 +24,9 @@ from .transcoder import transcode_media_file
 from django.utils.html import format_html
 from django.db.models.query import QuerySet
 from django.dispatch import Signal
-from diff_model import ModelDiffMixin
+from .search import TopicIndex, TongueTwisterIndex
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 post_update = Signal()
 
@@ -74,7 +76,7 @@ class BoloActionHistory(RecordTimeStamp):
         return format_html('<a href="/superman/forum_user/userprofile/' + str(self.user.st.id) \
             + '/change/" target="_blank">' + self.user.username + '</a>' )
 
-class Topic(RecordTimeStamp, ModelDiffMixin):
+class Topic(RecordTimeStamp):
     """
     Topic model
 
@@ -178,12 +180,16 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
     time_deleted = models.DateTimeField(blank = True, null = True)
     plag_text = models.CharField(choices = plag_text_options, blank = True, null = True, max_length = 10)
 
-    is_violent = models.BooleanField(default=False)
-    violent_content = models.PositiveIntegerField(null=True,blank=True,default=0)
-    is_adult = models.BooleanField(default=False)
-    adult_content = models.PositiveIntegerField(null=True,blank=True,default=0)
-    logo_detected = models.BooleanField(default=False)
-    profanity_collage_url = models.TextField(_("profanity collage url"), blank = True, null = True)
+    def indexing(self):
+        obj = TopicIndex(
+            meta={'id': self.id},
+            slug = self.slug,
+            title = self.title,
+            is_removed = self.is_removed,
+            language_id = self.language_id,
+        )
+        obj.save(index = 'topic-index')
+        return obj.to_dict(include_meta=True)
 
     def __unicode__(self):
         return self.title
@@ -325,12 +331,9 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
 
     def name(self):
         from django.utils.html import format_html
-        try:
-            if self.user.st.name:
-                return format_html('<a href="/superman/forum_user/userprofile/' + str(self.user.st.id) \
-                    + '/change/" target="_blank">' + self.user.st.name + '</a>' )
-        except:
-            pass
+        if self.user.st.name:
+            return format_html('<a href="/superman/forum_user/userprofile/' + str(self.user.st.id) \
+                + '/change/" target="_blank">' + self.user.st.name + '</a>' )
         return format_html('<a href="/superman/forum_user/userprofile/' + str(self.user.st.id) \
             + '/change/" target="_blank">' + self.user.username + '</a>' )
 
@@ -475,19 +478,6 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
         Topic.objects.filter(pk=self.id).update(vb_score = score)
         return score
 
-    def save(self):
-        if self.pk:
-            try:
-                data = {}
-                changed_fields = self.changed_fields
-                for value in changed_fields:
-                    data[value] = self.get_field_diff(value)[1]
-                Topic.objects.filter(pk=self.pk).update(**data)
-            except Exception as e:
-                super(Topic , self).save()
-        else:
-            super(Topic , self).save()
-
 class RankingWeight(RecordTimeStamp):
     features=models.CharField(max_length=20)
     weight= models.FloatField(default=0,null=True)
@@ -511,7 +501,7 @@ class VBseen(UserInfo):
         return unicode(str(self.topic if self.topic else 'VB'), 'utf-8')
 
 class TongueTwister(models.Model):
-    hash_tag = models.CharField(_("Hash Tag"), max_length=255, blank = True, null = True, db_index=True, unique=True)
+    hash_tag = models.CharField(_("Hash Tag"), max_length=255, blank = True, null = True,db_index=True)
     en_descpription = models.TextField(_("English Hash Tag Description"),blank = True, null = True)
     hi_descpription = models.TextField(_("Hindi Hash Tag Description"),blank = True, null = True)
     ta_descpription = models.TextField(_("Tamil Hash Tag Description"),blank = True, null = True)
@@ -523,8 +513,6 @@ class TongueTwister(models.Model):
     mt_descpription = models.TextField(_("Marathi Hash Tag Description"),blank = True, null = True)
     pb_descpription = models.TextField(_("Punjabi Hash Tag Description"),blank = True, null = True)
     od_descpription = models.TextField(_("Odia Hash Tag Description"),blank = True, null = True)
-    bj_descpription = models.TextField(_("Bhojpuri Hash Tag Description"),blank = True, null = True)
-    hy_descpription = models.TextField(_("Haryanvi Hash Tag Description"),blank = True, null = True)
     picture = models.CharField(_("Picture URL"),max_length=255, blank=True,null=True)
     hash_counter = models.PositiveIntegerField(default=1,null=True,blank=True,db_index=True)
     total_views = models.PositiveIntegerField(default=0,null=True,blank=True,db_index=True)
@@ -532,6 +520,15 @@ class TongueTwister(models.Model):
     is_popular = models.BooleanField(default=False)
     popular_date = models.DateTimeField(_("Popular Date"),null=True,blank=True)
     order = models.IntegerField(verbose_name=_('order'), default = 0)
+
+
+    def indexing(self):
+        obj = TongueTwisterIndex(
+            meta={'id': self.id},
+            hash_tag=self.hash_tag,
+        )
+        obj.save(index = 'hashtag-index')
+        return obj.to_dict(include_meta=True)
 
     def __unicode__(self):
         if self.hash_tag:
@@ -647,8 +644,6 @@ class Notification(UserInfo):
             notific['marathi_title'] = str(name)+' एक व्हिडिओ पोस्ट केला आहे: '+self.topic.title+'. आपण टिप्पणी देऊ इच्छिता?'
             notific['punjabi_title'] = str(name)+' ਨੇ ਇੱਕ ਵੀਡੀਓ ਪੋਸਟ ਕੀਤਾ ਹੈ: '+self.topic.title+'. ਕੀ ਤੁਸੀਂ ਟਿੱਪਣੀ ਕਰਨਾ ਚਾਹੋਗੇ?'
             notific['odia_title'] = str(name)+' ଏକ ଭିଡିଓ ପୋଷ୍ଟ କରିଛନ୍ତି |: '+self.topic.title+'. ଆପଣ ମନ୍ତବ୍ୟ ଦେବାକୁ ଚାହୁଁଛନ୍ତି କି?'
-            notific['bhojpuri_title'] = str(name)+' ने एक वीडियो पोस्ट किया है: '+self.topic.title+'. क्या आप टिपण्णी करना चाहेंगे?'
-            notific['haryanvi_title'] = str(name)+' ने एक वीडियो पोस्ट किया है: '+self.topic.title+'. क्या आप टिपण्णी करना चाहेंगे?'
             
             notific['notification_type'] = '1'
             notific['instance_id'] = self.topic.id
@@ -669,8 +664,6 @@ class Notification(UserInfo):
             notific['marathi_title'] = str(name)+' व्हिडिओवर टिप्पणी दिली आहे: '+self.topic.comment+'.'
             notific['punjabi_title'] = str(name)+" ਵੀਡੀਓ 'ਤੇ ਟਿੱਪਣੀ ਕੀਤੀ ਹੈ: "+self.topic.comment+"."
             notific['odia_title'] = str(name)+' ଭିଡିଓ ଉପରେ ମନ୍ତବ୍ୟ ଦେଇଛନ୍ତି |: '+self.topic.comment+'.'
-            notific['bhojpuri_title'] = str(name)+' ने वीडियो पर टिप्पणी की है: '+self.topic.comment
-            notific['haryanvi_title'] = str(name)+' ने वीडियो पर टिप्पणी की है: '+self.topic.comment
 
             
             notific['notification_type'] = '2'
@@ -693,8 +686,6 @@ class Notification(UserInfo):
             notific['marathi_title'] = str(name)+' आपल्या व्हिडिओवर टिप्पणी दिली आहे: '+self.topic.comment
             notific['punjabi_title'] = str(name)+" ਨੇ ਤੁਹਾਡੇ ਵੀਡੀਓ 'ਤੇ ਟਿੱਪਣੀ ਕੀਤੀ ਹੈ: "+self.topic.comment
             notific['odia_title'] = str(name)+' ଆପଣଙ୍କର ଭିଡିଓ ଉପରେ ମନ୍ତବ୍ୟ ଦେଇଛନ୍ତି |: '+self.topic.comment
-            notific['bhojpuri_title'] = str(name)+' ने आपके वीडियो पर टिप्पणी की है: '+self.topic.comment
-            notific['haryanvi_title'] = str(name)+' ने आपके वीडियो पर टिप्पणी की है: '+self.topic.comment
             notific['notification_type'] = '3'
             notific['instance_id'] = self.topic.id
             notific['topic_id'] = self.topic.topic.id
@@ -715,8 +706,6 @@ class Notification(UserInfo):
             notific['marathi_title'] = str(name)+' आपण अनुसरण'
             notific['punjabi_title'] = str(name)+' ਤੁਹਾਡੇ ਮਗਰ'
             notific['odia_title'] = str(name)+' ତୁମକୁ ଅନୁସରଣ କଲା'
-            notific['bhojpuri_title'] = str(name)+' ने आपको फॉलो किया'
-            notific['haryanvi_title'] = str(name)+' ने आपको फॉलो किया'
             notific['notification_type'] = '4'
             notific['instance_id'] = self.user.id
             notific['read_status'] = self.status
@@ -736,8 +725,6 @@ class Notification(UserInfo):
             notific['marathi_title'] = str(name)+' आपला व्हिडिओ आवडला'
             notific['punjabi_title'] = str(name)+' ਤੁਹਾਡੀ ਵੀਡੀਓ ਪਸੰਦ'
             notific['odia_title'] = str(name)+' ତୁମର ଭିଡିଓ ପସନ୍ଦ'
-            notific['bhojpuri_title'] = str(name)+' को आपका वीडियो पसंद आया'
-            notific['haryanvi_title'] = str(name)+' को आपका वीडियो पसंद आया'
             notific['notification_type'] = '5'
             if self.topic:
                 if self.topic.comment:
@@ -761,8 +748,6 @@ class Notification(UserInfo):
             notific['marathi_title'] = 'आपला व्हिडिओ बाइट: "' + self.topic.title + '" प्रकाशित केले गेले आहे'
             notific['punjabi_title'] = 'ਤੁਹਾਡੀ ਵੀਡੀਓ ਬਾਈਟ: "' + self.topic.title + '" ਪ੍ਰਕਾਸ਼ਤ ਕੀਤਾ ਗਿਆ ਹੈ'
             notific['odia_title'] = 'ତୁମର ଭିଡିଓ ବାଇଟ୍ : "' + self.topic.title + '" ପ୍ରକାଶିତ ହୋଇଛି |'
-            notific['bhojpuri_title'] = 'आपका वीडियो बाइट: "' + self.topic.title + '" प्रकाशित किया गया है'
-            notific['haryanvi_title'] = 'आपका वीडियो बाइट: "' + self.topic.title + '" प्रकाशित किया गया है'
             notific['notification_type'] = '6'
             if self.topic:
             	notific['instance_id'] = self.topic.id
@@ -785,8 +770,6 @@ class Notification(UserInfo):
             notific['marathi_title'] = 'आपला व्हिडिओ बाइट: "' + self.topic.title + '" हटविले गेले आहे'
             notific['punjabi_title'] = 'ਤੁਹਾਡੀ ਵੀਡੀਓ ਬਾਈਟ: "' + self.topic.title + '" ਹਟਾ ਦਿੱਤਾ ਗਿਆ ਹੈ'
             notific['odia_title'] = 'ତୁମର ଭିଡିଓ ବାଇଟ୍ : "' + self.topic.title + '" ଡିଲିଟ୍ ହୋଇଛି'
-            notific['bhojpuri_title'] = 'आपका वीडियो बाइट: "' + self.topic.title + '" हटा दिया गया है'
-            notific['haryanvi_title'] = 'आपका वीडियो बाइट: "' + self.topic.title + '" हटा दिया गया है'
             notific['notification_type'] = '7'
             notific['instance_id'] = self.topic.id
             notific['read_status'] = self.status
@@ -806,8 +789,6 @@ class Notification(UserInfo):
         #     notific['marathi_title'] = 'आपला व्हिडिओ बाइट: "' + self.topic.title + '" has been removed for payment'
         #     notific['punjabi_title'] = 'Your video byte: "' + self.topic.title + '" has been removed for payment'
         #     notific['odia_title'] = 'ତୁମର ଭିଡିଓ ବାଇଟ୍ : "' + self.topic.title + '" has been removed for payment'
-        #     notific['bhojpuri_title'] = 'आपका वीडियो बाइट: "' + self.topic.title + '" भुगतान के लिए वंचित किया गया है'
-        #     notific['haryanvi_title'] = 'आपका वीडियो बाइट: "' + self.topic.title + '" भुगतान के लिए वंचित किया गया है'
         #     notific['notification_type'] = '8'
         #     notific['instance_id'] = self.topic.id
         #     notific['read_status'] = self.status
@@ -827,8 +808,6 @@ class Notification(UserInfo):
             notific['marathi_title'] = 'आपला व्हिडिओ बाइट: "' + self.topic.title + '"  कमाईसाठी पात्र आहे. तो आपल्या पेमेंटचा एक भाग असेल.'
             notific['punjabi_title'] = 'ਤੁਹਾਡੀ ਵੀਡੀਓ ਬਾਈਟ: "' + self.topic.title + '"  ਕਮਾਈ ਲਈ ਯੋਗ ਹੈ. ਇਹ ਤੁਹਾਡੇ ਭੁਗਤਾਨ ਦਾ ਹਿੱਸਾ ਹੋਵੇਗਾ.'
             notific['odia_title'] = 'ତୁମର ଭିଡିଓ ବାଇଟ୍ : "' + self.topic.title + '"  ରୋଜଗାର ପାଇଁ ଯୋଗ୍ୟ ଅଟେ | ଏହା ତୁମର ଦେୟର ଏକ ଅଂଶ ହେବ |.'
-            notific['bhojpuri_title'] = 'आपका वीडियो बाइट: "' + self.topic.title + '" मुद्रीकरण के लिए चुना गया है। इसके लिए आपको पैसे मिलेंगे।'
-            notific['haryanvi_title'] = 'आपका वीडियो बाइट: "' + self.topic.title + '" मुद्रीकरण के लिए चुना गया है। इसके लिए आपको पैसे मिलेंगे।'
             notific['notification_type'] = '8'
             notific['instance_id'] = self.topic.id
             notific['read_status'] = self.status
@@ -848,8 +827,6 @@ class Notification(UserInfo):
             notific['marathi_title'] = 'आपला व्हिडिओ बाइट: "' + self.topic.title + '" देयकासाठी काढले गेले आहे'
             notific['punjabi_title'] = 'ਤੁਹਾਡੀ ਵੀਡੀਓ ਬਾਈਟ: "' + self.topic.title + '" ਭੁਗਤਾਨ ਲਈ ਹਟਾ ਦਿੱਤਾ ਗਿਆ ਹੈ'
             notific['odia_title'] = 'ତୁମର ଭିଡିଓ ବାଇଟ୍ : "' + self.topic.title + '" ଦେୟ ପାଇଁ ଅପସାରଣ କରାଯାଇଛି |'
-            notific['bhojpuri_title'] = 'आपका वीडियो बाइट: "' + self.topic.title + '" भुगतान के लिए वंचित किया गया है'
-            notific['haryanvi_title'] = 'आपका वीडियो बाइट: "' + self.topic.title + '" भुगतान के लिए वंचित किया गया है'
             notific['notification_type'] = '9'
             notific['instance_id'] = self.topic.id
             notific['read_status'] = self.status
@@ -869,8 +846,6 @@ class Notification(UserInfo):
             notific['marathi_title'] = str(name)+' त्याच्या टिप्पणी मध्ये आपला उल्लेख आहे: '+self.topic.comment_html
             notific['punjabi_title'] = str(name)+' ਆਪਣੀ ਟਿੱਪਣੀ ਵਿਚ ਤੁਹਾਡਾ ਜ਼ਿਕਰ ਕੀਤਾ ਹੈ: '+self.topic.comment_html
             notific['odia_title'] = str(name)+' ତାଙ୍କ ମନ୍ତବ୍ୟରେ ଆପଣଙ୍କୁ ଉଲ୍ଲେଖ କରିଛନ୍ତି |: '+self.topic.comment_html
-            notific['bhojpuri_title'] = str(name)+' ने अपनी टिप्पणी में आपका उल्लेख किया है: '+self.topic.comment_html
-            notific['haryanvi_title'] = str(name)+' ने अपनी टिप्पणी में आपका उल्लेख किया है: '+self.topic.comment_html
             notific['notification_type'] = '10'
             notific['instance_id'] = self.topic.id
             notific['topic_id'] = self.topic.topic.id
@@ -991,5 +966,3 @@ class TongueTwisterCounter(RecordTimeStamp):
 class VideoDelete(RecordTimeStamp):
     user =  models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("User"),editable=False,null=True,blank=True)
     video = models.ForeignKey(Topic, null=True, blank=True)
-
-

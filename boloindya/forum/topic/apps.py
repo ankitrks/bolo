@@ -11,3 +11,11 @@ class SpiritTopicConfig(AppConfig):
     label = 'forum_topic'
     def ready(self):
         import forum.topic.signals  # noqa
+
+
+
+# class ElasticsearchConfig(AppConfig):
+#     name = 'forum.topic'
+
+#     def ready(self):
+#         import forum.topic.signals

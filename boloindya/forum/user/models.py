@@ -14,6 +14,7 @@ from tinymce.models import HTMLField
 from drf_spirit.utils import language_options,month_choices, salary_choices
 from django.db.models import F,Q
 from diff_model import ModelDiffMixin
+from .search import UserProfileIndex
 
 class RecordTimeStamp(models.Model):
     created_at=models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False) # auto_now will add the current time and date whenever field is saved.
@@ -113,6 +114,19 @@ class UserProfile(models.Model,ModelDiffMixin):
     class Meta:
         verbose_name = _("user profile")
         verbose_name_plural = _("user profiles")
+
+    def indexing(self):
+        obj = UserProfileIndex(
+            meta={'id': self.id},
+            name=self.name,
+            is_test_user=self.is_test_user,
+            slug = self.slug,
+            # user = self.user,
+            language = self.language,
+
+        )
+        obj.save(index = 'user-index')
+        return obj.to_dict(include_meta=True)
 
     def save(self, *args, **kwargs):
         if self.user.is_superuser:

@@ -314,6 +314,8 @@ HAYSTACK_CONNECTIONS = {
 
 HAYSTACK_SIGNAL_PROCESSOR = 'forum.search.signals.RealtimeSignalProcessor'
 
+
+
 DATABASE_ROUTERS = ['utils.DBRouter']
 DATABASES = {
    'default': {
