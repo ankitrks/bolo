@@ -185,10 +185,10 @@ class UserJarvisDump(models.Model):
         ('2', 'error_logs'),
         ('3', 'hardware_info'),
     ]
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,related_name='User',editable=False, db_index = True, blank = True, null = True)
-    dump = models.TextField(_("dump"),null=True,blank=True)
-    dump_type = models.CharField(_("dump_type"),choices=DUMP_TYPE,max_length=50)
-    sync_time = models.DateTimeField(_("sync_time"),auto_now=False,auto_now_add=True,blank=False,null=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='User', editable=False, db_index = True, blank = True, null = True)
+    dump = models.TextField(_("dump"), null = True, blank = True)
+    dump_type = models.CharField(_("dump_type"), choices=DUMP_TYPE, max_length=50, blank=True, null = True)
+    sync_time = models.DateTimeField(_("sync_time"), auto_now=False, auto_now_add=True, blank=False, null=False)
     is_executed = models.BooleanField(_("is_executed"), default=False)
     android_id = models.CharField(_("android_id"), max_length=100, blank=True, null = True, editable = False)
     created_at = models.DateTimeField(_("created_at"), auto_now_add = False, auto_now = False, default = datetime.now)
