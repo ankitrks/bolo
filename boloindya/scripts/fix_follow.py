@@ -8,6 +8,7 @@ from drf_spirit.utils import add_bolo_score
 from forum.comment.models import Comment
 from django.db.models import F,Q
 from forum.user.utils.follow_redis import update_redis_follower,update_redis_following
+from forum.user.utils.bolo_redis import update_profile_counter
 
 def run():
     all_real_user_userprofile = UserProfile.objects.filter(is_test_user=False).filter(Q(follower_count__gt=0)|Q(follow_count__gt=0)).order_by('-follower_count','-follow_count')
@@ -40,8 +41,11 @@ def run():
 def action_follow(test_user_id,any_user_id):
     follow,is_created = Follower.objects.get_or_create(user_follower_id = test_user_id,user_following_id=any_user_id)
     if is_created:
+        userprofile = get_userprofile(test_user_id)
+        userprofile.update(follow_count = F('follow_count')+1)
         update_redis_follower(any_user_id,test_user_id,True)
         update_redis_following(test_user_id,any_user_id,True)
+        update_profile_counter(test_user_id,'follow_count',1, True)
         return True
 
 def get_topic(pk):
@@ -51,4 +55,4 @@ def get_user(pk):
     return User.objects.get(pk=pk)
 
 def get_userprofile(user_id):
-    return UserProfile.objects.get(user_id=user_id)
+    return UserProfile.objects.filter(user_id=user_id)

@@ -63,6 +63,7 @@ from django.db.models.functions import TruncDay
 from django.db.models import Count
 from forum.category.models import Category
 from datetime import datetime
+from forum.user.utils.bolo_redis import update_profile_counter
 
 def get_bucket_details(bucket_name=None):
     bucket_credentials = {}
@@ -944,12 +945,13 @@ def boloindya_upload_n_transcode(request):
 
 def provide_view_count(view_count,topic):
     counter =0
-    all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)
+    all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)[:200]
     user_ids = list(all_test_userprofile_id)
     user_ids = random.sample(user_ids,100)
     while counter<view_count:
         opt_action_user_id = random.choice(user_ids)
         VBseen.objects.create(topic= topic,user_id =opt_action_user_id)
+        update_profile_counter(topic.user_id,'view_count', 1, True)
         counter+=1
 
 def get_video_width_height(video_url):

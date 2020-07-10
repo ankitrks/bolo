@@ -15,6 +15,7 @@ import gc
 import decimal
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
 from drf_spirit.utils import create_random_user
+from forum.user.utils.bolo_redis import update_profile_counter
 
 def run():
     counter_objects_created=0
@@ -77,7 +78,8 @@ def run():
             i = 0
             print number_seen
             Topic.objects.filter(pk=each_seen_id).update(view_count = F('view_count')+number_seen)
-            profile_updation = UserProfile.objects.filter(user = Topic.objects.get(pk=each_seen_id).user).update(own_vb_view_count = F('own_vb_view_count')+number_seen, view_count = F('view_count')+number_seen)
+            profile_updation = UserProfile.objects.filter(user_id = Topic.objects.get(pk=each_seen_id).user_id).update(own_vb_view_count = F('own_vb_view_count')+number_seen, view_count = F('view_count')+number_seen)
+            update_profile_counter(Topic.objects.get(pk=each_seen_id).user_id,'view_count',number_seen,True)
             print "after: views updation",datetime.now()
             print "total created: ", number_seen
         except Exception as e:
@@ -281,6 +283,8 @@ def action_follow(test_user_id,any_user_id):
         followed_user.update(follower_count = F('follower_count')+1)
         update_redis_following(test_user_id,any_user_id,True)
         update_redis_follower(any_user_id,test_user_id,True)
+        update_profile_counter(followed_user.user_id,'follower_count',1, True)
+        update_profile_counter(userprofile.user_id,'follow_count',1, True)
         return True
     return False
 
