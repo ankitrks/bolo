@@ -129,11 +129,11 @@ def get_user_bolo_info(user_id,month=None,year=None):
             all_pay = UserPay.objects.filter(user=user,is_active=True)
             top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False,user=user).order_by('-view_count')[:3]
             video_playtime = user.st.total_vb_playtime
-            # for each_vb in total_video:
-            #     total_view_count+=each_vb.view_count
-            #     total_like_count+=each_vb.likes_count
-            #     total_comment_count+=each_vb.comment_count
-            #     total_share_count+=each_vb.total_share_count
+            for each_vb in total_video:
+                total_view_count+=each_vb.view_count
+                total_like_count+=each_vb.likes_count
+                total_comment_count+=each_vb.comment_count
+                total_share_count+=each_vb.total_share_count
         else:
             total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=user,date__gte=start_date, date__lte=end_date)
             total_video_id = list(Topic.objects.filter(is_vb = True,user=user,is_removed=False).values_list('pk',flat=True))
@@ -144,6 +144,14 @@ def get_user_bolo_info(user_id,month=None,year=None):
             all_play_time = VideoPlaytime.objects.filter(timestamp__gte=start_date, timestamp__lte=end_date,videoid__in = total_video_id).aggregate(Sum('playtime'))
             if all_play_time.has_key('playtime__sum') and all_play_time['playtime__sum']:
                 video_playtime = all_play_time['playtime__sum']
+
+            for each_vb in total_video:
+                total_view_count+=each_vb.view_count
+                total_like_count+=each_vb.likes_count
+                total_comment_count+=each_vb.comment_count
+                total_share_count+=each_vb.total_share_count
+            if total_video_count.count() == 0 and total_video_id:
+                total_view_count = VBseen.objects.filter(created_at__gte = start_date, created_at__lte = end_date, topic__user_id = user.id).count()
             # exclude_video_id = total_video.values_list('pk',flat=True)
             # total_view_count += VBseen.objects.filter(created_at__gte = start_date, created_at__lte = end_date, topic__user = user).exclude(topic_id__in = exclude_video_id).count()
             # total_like_count += Like.objects.filter(created_at__gte = start_date, created_at__lte = end_date, topic__user = user).exclude(topic_id__in = exclude_video_id).count()
@@ -155,12 +163,7 @@ def get_user_bolo_info(user_id,month=None,year=None):
         total_video_count = total_video.count()
         monetised_video_count = total_video.filter(is_monetized = True).count()
         unmonetizd_video_count= total_video.filter(is_monetized = False,is_moderated = True).count()
-        left_for_moderation = total_video.filter(is_moderated = False).count()
-        for each_vb in total_video:
-            total_view_count+=each_vb.view_count
-            total_like_count+=each_vb.likes_count
-            total_comment_count+=each_vb.comment_count
-            total_share_count+=each_vb.total_share_count
+        left_for_moderation = total_video.filter(is_moderated = False).count()        
         total_view_count = shorcountertopic(total_view_count)
         total_comment_count = shorcountertopic(total_comment_count)
         total_like_count = shorcountertopic(total_like_count)
