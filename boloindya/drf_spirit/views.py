@@ -2072,7 +2072,7 @@ def get_user_bolo_info(request):
             start_date = datetime.strptime('01-'+str(month)+'-'+str(year), "%d-%m-%Y")
             end_date = datetime.strptime(str(days)+'-'+str(month)+'-'+str(year)+' 23:59:59', "%d-%m-%Y %H:%M:%S")
 
-        if start_date and end_date and end_date > datetime.now():
+        if start_date and end_date and end_date > datetime.now() - timedelta(days=1):
             data = get_current_month_bolo_info(request.user.id)
             data['messgae'] = 'success'
             return JsonResponse(data, status=status.HTTP_200_OK)
