@@ -3597,11 +3597,12 @@ def get_cloudfront_url(instance):
 @csrf_exempt
 @api_view(['POST'])
 def SyncDump(request):
-    return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
     if request.user:
         if request.method == "POST":
             #Storing the dump in database
             try:
+                if not request.POST.get('dump_type'):
+                    raise Exception("dump_type missing")
                 data = {"dump": request.POST.get('dump'), "dump_type":request.POST.get('dump_type'),"android_id":request.POST.get('android_id',''), "created_at": datetime.now()}
                 if request.user.id:
                     data["user"] = request.user
