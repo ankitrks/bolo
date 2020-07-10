@@ -166,22 +166,22 @@ def get_user_bolo_info(user_id,month=None,year=None):
         total_like_count = shorcountertopic(total_like_count)
         total_share_count = shorcountertopic(total_share_count)
         video_playtime = short_time(video_playtime)
-        return {'last_updated':datetime.now(),'data':{'total_video_count' : total_video_count, \
+        return {'last_updated':datetime.now(),'total_video_count' : total_video_count, \
                         'monetised_video_count':monetised_video_count, 'total_view_count':total_view_count,'total_comment_count':total_comment_count,\
                         'total_like_count':total_like_count,'total_share_count':total_share_count,'left_for_moderation':left_for_moderation,\
                         'total_earn':total_earn,'video_playtime':video_playtime,'spent_time':spent_time,\
                         'top_3_videos':TopicSerializer(top_3_videos,many=True, \
                             context={'last_updated': None,\
                             'is_expand': True}).data,'unmonetizd_video_count':unmonetizd_video_count,\
-                        'bolo_score':shortcounterprofile(user.st.bolo_score)}}
+                        'bolo_score':shortcounterprofile(user.st.bolo_score)}
     except Exception as e:
         print e
-        return {'last_updated':datetime.now(),'data':{'total_video_count' : 0, \
+        return {'last_updated':datetime.now(),'total_video_count' : 0, \
                         'monetised_video_count':0, 'total_view_count':'0','total_comment_count':'0',\
                         'total_like_count':'0','total_share_count':'0','left_for_moderation':0,\
                         'total_earn':0,'video_playtime':'0 seconds','spent_time':'0 seconds',\
                         'top_3_videos':None,'unmonetizd_video_count':0,\
-                        'bolo_score':shortcounterprofile(0)}}
+                        'bolo_score':shortcounterprofile(0)}
 
 
 
