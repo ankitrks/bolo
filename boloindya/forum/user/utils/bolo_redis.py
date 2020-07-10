@@ -123,35 +123,23 @@ def get_user_bolo_info(user_id,month=None,year=None):
             start_date = datetime.strptime('01-'+str(month)+'-'+str(year), "%d-%m-%Y")
             end_date = datetime.strptime(str(days)+'-'+str(month)+'-'+str(year)+' 23:59:59', "%d-%m-%Y %H:%M:%S")
         if not start_date or not end_date:
-            total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=user)
-            #total_video_id = list(Topic.objects.filter(is_vb = True,user=user).values_list('pk',flat=True))
+            total_video = Topic.objects.filter(is_vb = True,is_removed=False, user_id=user.id) 
+            #total_video_id = list(Topic.objects.filter(is_vb = True, user_id=user.id) .values_list('pk',flat=True))
             total_video_id = list(total_video.values_list('pk',flat=True))
-            all_pay = UserPay.objects.filter(user=user,is_active=True)
-            top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False,user=user).order_by('-view_count')[:3]
+            all_pay = UserPay.objects.filter( user_id=user.id, is_active=True)
+            top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False, user_id=user.id) .order_by('-view_count')[:3]
             video_playtime = user.st.total_vb_playtime
-            for each_vb in total_video:
-                total_view_count+=each_vb.view_count
-                total_like_count+=each_vb.likes_count
-                total_comment_count+=each_vb.comment_count
-                total_share_count+=each_vb.total_share_count
+           
         else:
-            total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=user,date__gte=start_date, date__lte=end_date)
-            total_video_id = list(Topic.objects.filter(is_vb = True,user=user,is_removed=False).values_list('pk',flat=True))
+            total_video = Topic.objects.filter(is_vb = True,is_removed=False, user_id=user.id, date__gte=start_date, date__lte=end_date)
+            total_video_id = list(Topic.objects.filter(is_vb = True, user_id=user.id, is_removed=False).values_list('pk',flat=True))
             # total_video_id = list(total_video.values_list('pk',flat=True))
-            all_pay = UserPay.objects.filter(user=user,is_active=True,for_month__gte=start_date.month,for_month__lte=start_date.month,\
+            all_pay = UserPay.objects.filter( user_id=user.id, is_active=True,for_month__gte=start_date.month,for_month__lte=start_date.month,\
                 for_year__gte=start_date.year,for_year__lte=start_date.year)
-            top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False,user=user,date__gte=start_date, date__lte=end_date).order_by('-view_count')[:3]
+            top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False, user_id=user.id, date__gte=start_date, date__lte=end_date).order_by('-view_count')[:3]
             all_play_time = VideoPlaytime.objects.filter(timestamp__gte=start_date, timestamp__lte=end_date,videoid__in = total_video_id).aggregate(Sum('playtime'))
             if all_play_time.has_key('playtime__sum') and all_play_time['playtime__sum']:
-                video_playtime = all_play_time['playtime__sum']
-
-            for each_vb in total_video:
-                total_view_count+=each_vb.view_count
-                total_like_count+=each_vb.likes_count
-                total_comment_count+=each_vb.comment_count
-                total_share_count+=each_vb.total_share_count
-            if total_video_count.count() == 0 and total_video_id:
-                total_view_count = VBseen.objects.filter(created_at__gte = start_date, created_at__lte = end_date, topic__user_id = user.id).count()
+                video_playtime = all_play_time['playtime__sum']                
             # exclude_video_id = total_video.values_list('pk',flat=True)
             # total_view_count += VBseen.objects.filter(created_at__gte = start_date, created_at__lte = end_date, topic__user = user).exclude(topic_id__in = exclude_video_id).count()
             # total_like_count += Like.objects.filter(created_at__gte = start_date, created_at__lte = end_date, topic__user = user).exclude(topic_id__in = exclude_video_id).count()
@@ -163,8 +151,18 @@ def get_user_bolo_info(user_id,month=None,year=None):
         total_video_count = total_video.count()
         monetised_video_count = total_video.filter(is_monetized = True).count()
         unmonetizd_video_count= total_video.filter(is_monetized = False,is_moderated = True).count()
-        left_for_moderation = total_video.filter(is_moderated = False).count()        
-        total_view_count = shorcountertopic(total_view_count)
+        left_for_moderation = total_video.filter(is_moderated = False).count()
+        for each_vb in total_video:
+            total_view_count+=each_vb.view_count
+            total_like_count+=each_vb.likes_count
+            total_comment_count+=each_vb.comment_count
+            total_share_count+=each_vb.total_share_count
+
+        if total_view_count == 0 and total_video_id and start_date and end_date:
+            total_view_count = VBseen.objects.filter(created_at__gte = start_date, created_at__lte = end_date, topic_id__in = total_video_id).count()
+            total_view_count = shorcountertopic(total_view_count)
+        else:
+            total_view_count = shorcountertopic(total_view_count)
         total_comment_count = shorcountertopic(total_comment_count)
         total_like_count = shorcountertopic(total_like_count)
         total_share_count = shorcountertopic(total_share_count)
@@ -204,14 +202,23 @@ def get_userprofile_counter_inside(user_id):
     '''
     It will provide follower count, following count, views count and video count
     '''
-    is_not_calulcated = True
+    is_calulcated = False
     key = 'userprofile_counter:'+str(user_id)
     userprofile_counter = get_redis(key)
     if not userprofile_counter:
         userprofile_counter = get_profile_counter(user_id)
-        is_not_calulcated = False
+        is_calulcated = True
         set_redis(key,userprofile_counter, True)
-    return userprofile_counter, is_not_calulcated
+    return userprofile_counter, is_calulcated
+
+def set_userprofile_counter(user_id):
+    '''
+    It will provide follower count, following count, views count and video count
+    '''
+    key = 'userprofile_counter:'+str(user_id)
+    userprofile_counter = get_profile_counter(user_id)
+    set_redis(key,userprofile_counter, True)
+    return userprofile_counter
 
 def get_profile_counter(user_id):
     # calculating follower count
@@ -242,8 +249,9 @@ def get_profile_counter(user_id):
 
 def update_profile_counter(user_id, action, value, add = True):
     # action = ['follower_count','follow_count','video_count','view_count']
-    userprofile_counter, is_not_calulcated = get_userprofile_counter_inside(user_id)
-    if is_not_calulcated:
+    userprofile_counter, is_calulcated = get_userprofile_counter_inside(user_id)
+
+    if not is_calulcated and not action == 'video_count':
         if add:
             userprofile_counter[action]+=value
         else:
@@ -251,6 +259,10 @@ def update_profile_counter(user_id, action, value, add = True):
         userprofile_counter['last_updated'] = datetime.now()
         key = 'userprofile_counter:'+str(user_id)
         set_redis(key,userprofile_counter, True)
+
+    if not is_calulcated and action == 'video_count':
+        set_userprofile_counter(user_id)
+
     if action == 'video_count':
         set_current_month_bolo_info(user_id)
         set_lifetime_bolo_info(user_id)
