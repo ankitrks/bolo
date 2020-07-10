@@ -26,7 +26,7 @@ def run():
         duplicate_follow_instance = single_instance_duplicate[1:]
         Follower.objects.filter(pk__in=duplicate_follow_instance).update(is_active=False)
 
-        each_real_user = UserProfile.objects.get(user_id = each_duplicate_follower['user_follower_id'])
+        each_real_user = UserProfile.objects.get(user_id = each_duplicate_follower['user_following_id'])
         follower_counter = each_real_user.follower_count
         real_follower_count = Follower.objects.filter(user_following_id = each_real_user.user.id, is_active = True).distinct('user_follower_id').count()
         follow_count = each_real_user.follow_count
@@ -34,7 +34,7 @@ def run():
         counter+=1
         if follower_counter > real_follower_count:
             required_follower = follower_counter - real_follower_count
-            user_ids = UserProfile.objects.filter(is_test_user=True).exclude(user_id__in=get_redis_follower(each_duplicate_follower['user_follower_id'])).values_list('user_id',flat=True)[:required_follower]
+            user_ids = UserProfile.objects.filter(is_test_user=True).exclude(user_id__in=get_redis_follower(each_duplicate_follower['user_following_id'])).values_list('user_id',flat=True)[:required_follower]
             print required_follower
             while(required_follower):
                 opt_action_user_id = random.choice(user_ids)
