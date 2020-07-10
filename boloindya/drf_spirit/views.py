@@ -2073,11 +2073,17 @@ def get_user_bolo_info(request):
             end_date = datetime.strptime(str(days)+'-'+str(month)+'-'+str(year)+' 23:59:59', "%d-%m-%Y %H:%M:%S")
 
         if start_date and end_date and end_date > datetime.now():
-            return JsonResponse({'message': 'success','data' : get_current_month_bolo_info(request.user.id)}, status=status.HTTP_200_OK)
+            data = get_current_month_bolo_info(request.user.id)
+            data['messgae'] = 'success'
+            return JsonResponse(data, status=status.HTTP_200_OK)
         elif start_date and end_date and end_date < datetime.now():
-            return JsonResponse({'message': 'success','data' : get_last_month_bolo_info(request.user.id)}, status=status.HTTP_200_OK)
+            data = get_last_month_bolo_info(request.user.id)
+            data['messgae'] = 'success'
+            return JsonResponse(data, status=status.HTTP_200_OK)
         elif not start_date and not end_date:
-            return JsonResponse({'message': 'success','data' : get_lifetime_bolo_info(request.user.id)}, status=status.HTTP_200_OK)
+            data = get_lifetime_bolo_info(request.user.id)
+            data['messgae'] = 'success'
+            return JsonResponse(data, status=status.HTTP_200_OK)
         else:
             log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
