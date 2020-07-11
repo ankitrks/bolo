@@ -727,74 +727,92 @@ def search_break_word(term):
     else:
         return SQ(content='')
 
-def getTopicData(search_term, language_id, last_updated, is_expand):
+def getTopicData(obj):
     topic_ids = []
     data = []
     topic_search = MultiSearch(index='topic-index')
-    topic_search = topic_search.add(Search().filter('term', title=search_term))
-    topic_search = topic_search.add(Search().filter('term', slug=search_term))
+    topic_search = topic_search.add(Search().from_dict({"query": {"match": {"title": {"query": obj["search_term"], "fuzziness": "AUTO"}}}}))
+    topic_search = topic_search.add(Search().from_dict({"query": {"match": {"slug": {"query": obj["search_term"], "fuzziness": "AUTO"}}}}))
     responses_topic = topic_search.execute()
     for hits in responses_topic:
         result_topic = hits.to_dict()
-    topic_el = result_topic['hits']['hits']
+    topic_el = result_topic['hits']['hits'][obj["page"]:obj["page_size"]]
     if topic_el:
         for i in range(len(topic_el)):
             topic_ids.append(topic_el[i]['_id'])
-        res_topic = Topic.objects.filter(pk__in=topic_ids).filter(language_id = language_id)
+        res_topic = Topic.objects.filter(pk__in=topic_ids).filter(language_id = obj["language_id"], is_removed = False)
         # result_page = get_paginated_data(res_topic, int(page_size), int(page))
         # topics = solr_object_to_db_object(result_page[0].object_list)
-        data = TopicSerializerwithComment(res_topic,many=True,context={'is_expand':is_expand,'last_updated':last_updated}).data
+        if obj["is_top"]:
+            data = TopicSerializerwithComment(res_topic,many=True,context={'is_expand':obj["is_expand"],'last_updated':obj["last_updated"]}).data
+        else:
+            data = TopicSerializerwithComment(res_topic,many=True, context = {'is_expand': True, 'last_updated': None}).data
     return data
 
-def getHashtagData(search_term):
+def getHashtagData(obj):
     hashtag_ids = []
     data = []
     hashtag_search = MultiSearch(index='hashtag-index')
-    hashtag_search = hashtag_search.add(Search().filter('match', hash_tag=search_term))
+    # hashtag_search = hashtag_search[1:5]
+    hashtag_search = hashtag_search.add(Search().from_dict({"query": {"match": {"hash_tag": {"query": obj["search_term"], "fuzziness": "AUTO"}}}}))
     responses_hashtag = hashtag_search.execute()
     result_hashtag = responses_hashtag[0].to_dict()
-    hashtag_el = result_hashtag['hits']['hits']
+    hashtag_el = result_hashtag['hits']['hits'][obj["page"]:obj["page_size"]]
     if hashtag_el:
         for j in range(len(hashtag_el)):
             hashtag_ids.append(hashtag_el[j]['_id'])
         res_hashtag = TongueTwister.objects.filter(pk__in=hashtag_ids)
-        #hash_tags = solr_object_to_db_object(result_page[0].object_list)
-        data = TongueTwisterSerializer(res_hashtag,many=True).data
+        if obj["is_other"]:
+            data = TongueTwisterSerializer(res_hashtag,many=True,context={'language_id':obj["language_id"]}).data
+        else:
+            data = TongueTwisterSerializer(res_hashtag,many=True).data
     return data
 
-def getUserProfileData(search_term):
+def getUserProfileData(obj):
     user_ids = []
     data = []
     userprofile_search = MultiSearch(index = 'user-index')
-    userprofile_search = userprofile_search.add(Search().filter('term', name=search_term))
-    userprofile_search = userprofile_search.add(Search().filter('term', slug=search_term))
+    userprofile_search = userprofile_search.add(Search().from_dict({"query": {"match": {"name": {"query": obj["search_term"], "fuzziness": "AUTO"}}}}))
+    userprofile_search = userprofile_search.add(Search().from_dict({"query": {"match": {"slug": {"query": obj["search_term"], "fuzziness": "AUTO"}}}}))
     responses_user = userprofile_search.execute()
     result_user = responses_user[0].to_dict()
-    userprofile_el = result_user['hits']['hits']
+    userprofile_el = result_user['hits']['hits'][obj["page"]:obj["page_size"]]
     if userprofile_el:
         for k in range(len(userprofile_el)):
             user_ids.append(userprofile_el[k]['_id'])
-        res_userprofile = UserProfile.objects.filter(pk__in=user_ids)
-        data = UserProfileSerializer(res_userprofile,many=True).data
+        # res_userprofile = UserProfile.objects.filter(pk__in=user_ids)
+        res_userprofile = User.objects.filter(st__pk__in=user_ids)
+        data = UserSerializer(res_userprofile,many=True).data
     return data
 
 class SolrSearchTop(BoloIndyaGenericAPIView):
     def get(self, request):
         response = {}
+        is_top = 1
         search_term = self.request.GET.get('term')
         language_id = self.request.GET.get('language_id', 1)
         page = int(request.GET.get('page',1))
         page_size = self.request.GET.get('page_size',5)
+        page = (page-1) * page_size
+        page_size = page + page_size
         is_expand=self.request.GET.get('is_expand',False)
         last_updated=timestamp_to_datetime(self.request.GET.get('last_updated',False))
+        obj = {
+            "search_term": search_term,
+            "language_id": language_id,
+            "last_updated": last_updated,
+            "is_expand": is_expand,
+            "page": page,
+            "page_size": page_size,
+            "is_top": is_top,
+            "is_other": 0
+        }
         if search_term:
-            response['top_vb'] = getTopicData(search_term, language_id, last_updated, is_expand)
-            response['top_hash_tag'] = getHashtagData(search_term)
-            response["top_user"] = getUserProfileData(search_term)
+            # response['top_vb'] = getTopicData(search_term, language_id, last_updated, is_expand, page, page_size, is_top)
+            response['top_vb'] = getTopicData(obj)
+            response['top_hash_tag'] = getHashtagData(obj)
+            response["top_user"] = getUserProfileData(obj)
         return JsonResponse(response, safe = False)
-
-
-
 
 
 # my_query = my_query.query(Q('bool', should=
@@ -840,35 +858,75 @@ class SolrSearchTop(BoloIndyaGenericAPIView):
         #         hash_tags = solr_object_to_db_object(result_page[0].object_list)
         #     response["top_hash_tag"] = TongueTwisterSerializer(hash_tags,many=True).data
         # return JsonResponse(response, safe = False)
-
+def getNextPageNumber(sqs, page, page_size1):
+    if page_size1<len(sqs):
+        next_page_number = page+1
+    else:
+        next_page_number = ''
+    return next_page_number
 
 class SolrSearchTopic(BoloIndyaGenericAPIView):
     def get(self, request):
-        topics      = []
+        response = {}
         search_term = self.request.GET.get('term')
         language_id = self.request.GET.get('language_id')
         page = int(request.GET.get('page',1))
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
+        page_size1 = page_size
+        page = (page-1) * page_size
+        page_size = page + page_size
         is_expand=self.request.GET.get('is_expand',False)
         last_updated=timestamp_to_datetime(self.request.GET.get('last_updated',False))
+        if language_id:
+            is_top = 1
+        else:
+            is_top = 0
+            language_id = 1
+        obj = {
+            "search_term": search_term,
+            "language_id": language_id,
+            "last_updated": last_updated,
+            "is_expand": is_expand,
+            "page": page,
+            "page_size": page_size,
+            "is_top": is_top
+        }
         if search_term:
-            sqs = SearchQuerySet().models(Topic).raw_search(search_term).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
-            if not sqs:
-                suggested_word = SearchQuerySet().models(Topic).auto_query(search_term).spelling_suggestion()
-                if suggested_word:
-                    sqs = SearchQuerySet().models(Topic).raw_search(suggested_word).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
-            if not sqs:
-                sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
-            if sqs:
-                result_page = get_paginated_data(sqs, int(page_size), int(page))
-                topics = solr_object_to_db_object(result_page[0].object_list)
-            # topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True, language_id=language_id)
-            next_page_number = page+1 if page_size*page<len(sqs) else ''
-            if language_id:
-                response ={"count":len(sqs),"results":TopicSerializerwithComment(topics,many=True,context={'is_expand':is_expand,'last_updated':last_updated}).data,"next_page_number":next_page_number} 
-            else:
-                response ={"count":len(sqs),"results":TopicSerializerwithComment(topics,many=True).data,"next_page_number":next_page_number} 
+            sqs = getTopicData(obj)
+            next_page_number = getNextPageNumber(sqs, page, page_size1)
+            response = {"count": len(sqs), "results": sqs, "next_page_number": next_page_number}
         return JsonResponse(response, safe = False)
+
+
+
+
+
+        # if not language_id:
+        #     language_id = 1
+        # if search_term:
+        #     sqs = getTopicData(search_term, language_id, last_updated, is_expand, page, page_size)
+        # if language_id:
+
+
+
+
+        #     sqs = SearchQuerySet().models(Topic).raw_search(search_term).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
+        #     if not sqs:
+        #         suggested_word = SearchQuerySet().models(Topic).auto_query(search_term).spelling_suggestion()
+        #         if suggested_word:
+        #             sqs = SearchQuerySet().models(Topic).raw_search(suggested_word).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
+        #     if not sqs:
+        #         sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
+        #     if sqs:
+        #         result_page = get_paginated_data(sqs, int(page_size), int(page))
+        #         topics = solr_object_to_db_object(result_page[0].object_list)
+        #     # topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True, language_id=language_id)
+        #     next_page_number = page+1 if page_size*page<len(sqs) else ''
+        #     if language_id:
+        #         response ={"count":len(sqs),"results":TopicSerializerwithComment(topics,many=True,context={'is_expand':is_expand,'last_updated':last_updated}).data,"next_page_number":next_page_number} 
+        #     else:
+        #         response ={"count":len(sqs),"results":TopicSerializerwithComment(topics,many=True).data,"next_page_number":next_page_number} 
+        # return JsonResponse(response, safe = False)
 
 
 class SearchTopic(generics.ListCreateAPIView):
@@ -911,26 +969,45 @@ class SearchTopic(generics.ListCreateAPIView):
 
 class SolrSearchHashTag(BoloIndyaGenericAPIView):
     def get(self, request):
-        hash_tags      = []
+        response = {}
         search_term = self.request.GET.get('term')
         page = int(request.GET.get('page',1))
         language_id = self.request.GET.get('language_id', 1)
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
+        page_size1 = page_size
+        page = (page-1) * page_size
+        page_size = page + page_size
+        obj = {
+            "search_term": search_term,
+            "language_id": language_id,
+            "page": page,
+            "page_size": page_size,
+            "is_other": 1
+        }
         if search_term:
-            sqs = SearchQuerySet().models(TongueTwister).raw_search('hash_tag:'+search_term)
-            if not sqs:
-                suggested_word = SearchQuerySet().models(TongueTwister).auto_query(search_term).spelling_suggestion()
-                if suggested_word:
-                    sqs = SearchQuerySet().models(TongueTwister).raw_search('hash_tag:'+suggested_word)
-            if not sqs:
-                sqs = SearchQuerySet().models(TongueTwister).autocomplete(**{'text':search_term})
-            if sqs:
-                result_page = get_paginated_data(sqs, int(page_size), int(page))
-                hash_tags = solr_object_to_db_object(result_page[0].object_list)
-            # hash_tags  = TongueTwister.objects.filter(hash_tag__icontains = search_term)
-            next_page_number = page+1 if page_size*page<len(sqs) else ''
-            response ={"count":len(sqs),"results":TongueTwisterSerializer(hash_tags,many=True,context={'language_id':language_id}).data,"next_page_number":next_page_number} 
-        return JsonResponse(response, safe = False)
+            sqs = getHashtagData(obj)
+            next_page_number = getNextPageNumber(sqs, page, page_size1)
+            response = {"count":len(sqs), "results": sqs, "next_page_number": next_page_number}
+        return JsonResponse(response, safe = False) 
+
+
+
+
+
+            # sqs = SearchQuerySet().models(TongueTwister).raw_search('hash_tag:'+search_term)
+            # if not sqs:
+            #     suggested_word = SearchQuerySet().models(TongueTwister).auto_query(search_term).spelling_suggestion()
+            #     if suggested_word:
+            #         sqs = SearchQuerySet().models(TongueTwister).raw_search('hash_tag:'+suggested_word)
+            # if not sqs:
+            #     sqs = SearchQuerySet().models(TongueTwister).autocomplete(**{'text':search_term})
+            # if sqs:
+            #     result_page = get_paginated_data(sqs, int(page_size), int(page))
+            #     hash_tags = solr_object_to_db_object(result_page[0].object_list)
+            # # hash_tags  = TongueTwister.objects.filter(hash_tag__icontains = search_term)
+            # next_page_number = page+1 if page_size*page<len(sqs) else ''
+            # response ={"count":len(sqs),"results":TongueTwisterSerializer(hash_tags,many=True,context={'language_id':language_id}).data,"next_page_number":next_page_number} 
+        # return JsonResponse(response, safe = False)
 
 
 class SearchHashTag(generics.ListCreateAPIView):
@@ -989,27 +1066,38 @@ def GetUserProfile(request):
 
 class SolrSearchUser(BoloIndyaGenericAPIView):
     def get(self, request):
-        topics      = []
+        response = {}
         search_term = self.request.GET.get('term')
         page = int(request.GET.get('page',1))
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
-        users = []
+        page_size1 = page_size
+        page = (page-1) * page_size
+        page_size = page + page_size
+        obj = {
+            "search_term": search_term,
+            "page": page,
+            "page_size": page_size,
+        }
         if search_term:
-            sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term))
-            if not sqs:
-                suggested_word = SearchQuerySet().models(UserProfile).auto_query(search_term).spelling_suggestion()
-                if suggested_word:
-                    sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term))
-            if not sqs:
-                sqs = SearchQuerySet().models(UserProfile).autocomplete(**{'text':search_term})
-            if sqs:
-                result_page = get_paginated_data(sqs, int(page_size), int(page))
-                users = solr_userprofile_object_to_db_object(result_page[0].object_list)
-            # users = User.objects.filter( Q(username__icontains = search_term) | Q(st__name__icontains = search_term) | Q(first_name__icontains = search_term) | \
-            #        Q(last_name__icontains = search_term) )
-            next_page_number = page+1 if page_size*page<len(sqs) else ''
-            response ={"count":len(sqs),"results":UserSerializer(users,many=True).data,"next_page_number":next_page_number} 
-        return JsonResponse(response, safe = False)
+            sqs = getUserProfileData(obj)
+            next_page_number = getNextPageNumber(sqs, page, page_size1)
+            response = {"count": len(sqs), "results": sqs, "next_page_number": next_page_number} 
+            return JsonResponse(response, safe = False)
+            # sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term))
+            # if not sqs:
+            #     suggested_word = SearchQuerySet().models(UserProfile).auto_query(search_term).spelling_suggestion()
+            #     if suggested_word:
+            #         sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term))
+            # if not sqs:
+            #     sqs = SearchQuerySet().models(UserProfile).autocomplete(**{'text':search_term})
+            # if sqs:
+            #     result_page = get_paginated_data(sqs, int(page_size), int(page))
+            #     users = solr_userprofile_object_to_db_object(result_page[0].object_list)
+            # # users = User.objects.filter( Q(username__icontains = search_term) | Q(st__name__icontains = search_term) | Q(first_name__icontains = search_term) | \
+            # #        Q(last_name__icontains = search_term) )
+            # next_page_number = page+1 if page_size*page<len(sqs) else ''
+            # response ={"count":len(sqs),"results":UserSerializer(users,many=True).data,"next_page_number":next_page_number} 
+        # return JsonResponse(response, safe = False)
 
 
 class SearchUser(generics.ListCreateAPIView):

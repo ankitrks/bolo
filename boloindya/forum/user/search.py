@@ -6,7 +6,7 @@ import models as models
 connections.create_connection(hosts = ['localhost'])
 
 my_analyzer = analyzer('my_analyzer',
-    tokenizer=tokenizer('trigram', 'edge_ngram', min_gram=1, max_gram=20),
+    tokenizer=tokenizer('trigram', 'edge_ngram', min_gram=3, max_gram=20),
     filter=['lowercase']
 )
 class UserProfileIndex(Document):
