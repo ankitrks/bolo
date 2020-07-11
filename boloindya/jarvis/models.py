@@ -13,7 +13,7 @@ from drf_spirit.utils import language_options
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from datetime import datetime
-from forum.topic.utils import update_redis_fcm_device_entries
+from forum.topic.utils import update_redis_fcm_device_entries, set_redis_fcm_token
 
 class VideoCategory(models.Model):
     category_name = models.CharField(_('Category Name'),max_length=100,null=True,blank=True)
@@ -97,6 +97,8 @@ class FCMDevice(AbstractDevice):
          'device_type':request.POST.get('device_type',None),'created_at':datetime.now() }
         if dev_id:
             update_redis_fcm_device_entries(dev_id,data_dict)
+            if request.user.id:
+                set_redis_fcm_token(request.user.id,reg_id)
         return JsonResponse({"status":"Success"},safe = False)
         try:
             instance = FCMDevice.objects.using('default').filter(Q(reg_id = reg_id) | Q(dev_id = dev_id))
