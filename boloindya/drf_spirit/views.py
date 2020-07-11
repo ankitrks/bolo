@@ -3603,7 +3603,7 @@ def SyncDump(request):
             try:
                 data = {"dump": request.POST.get('dump'), "dump_type":request.POST.get('dump_type'),"android_id":request.POST.get('android_id',''), "created_at": datetime.now()}
                 if request.user.id:
-                    data["user"] = request.user
+                    data["user_id"] = request.user.id
                 set_sync_dump_info(data)
                 return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)    
             except Exception as e:
@@ -3619,7 +3619,7 @@ def save_android_logs(request):
     try:
         data = {"logs":request.POST.get('error_log', ''), "log_type":request.POST.get('log_type',None), "android_id": request.POST.get('android_id',''), "created_at": datetime.now()}
         if request.user.id:
-            data['user'] = request.user
+            data['user_id'] = request.user.id
         set_android_logs_info(data)
         return JsonResponse({'messgae' : 'success'})
     except Exception as e:
