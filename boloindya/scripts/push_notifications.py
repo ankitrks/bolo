@@ -14,9 +14,9 @@ import json
 def run():
 
     time_now = datetime.datetime.now()
-    scheduled_pushNotifications = PushNotification.objects.filter(is_scheduled=True, is_removed=False, is_executed=False, scheduled_time__lte=time_now) 
+    scheduled_pushNotifications = PushNotification.objects.filter(is_scheduled=True, is_removed=False, is_executed=False, scheduled_time__lte=time_now, scheduled_time__gte = time_now - datetime.timedelta(hours = 6))
     send_push_notification(scheduled_pushNotifications)
-    unscheduled_pushNotifications = PushNotification.objects.filter(is_scheduled=False, is_removed=False, is_executed=False, created_at__lte = time_now - datetime.timedelta(minutes=15) )
+    unscheduled_pushNotifications = PushNotification.objects.filter(is_scheduled=False, is_removed=False, is_executed=False, created_at__lte = time_now - datetime.timedelta(minutes=15), created_at__gte = time_now - datetime.timedelta(hours = 6))
     send_push_notification(unscheduled_pushNotifications)
 
 
@@ -52,11 +52,3 @@ def send_push_notification(pushNotifications):
                     pushNotification.save()
         except Exception as e:
             print e
-
-
-
-
-
-
-
-
