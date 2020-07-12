@@ -25,7 +25,7 @@ def run():
 
 def send_push_notification(pushNotifications):
     from jarvis.utils import _get_access_token
-    access =  _get_access_token()  
+    access , requset_url =  _get_access_token()  
     headers = {'Authorization': 'Bearer ' + access, 'Content-Type': 'application/json; UTF-8' }
 
     for pushNotification in pushNotifications:
@@ -34,7 +34,7 @@ def send_push_notification(pushNotifications):
                 token_list = get_token_for_user_id(pushNotification.particular_user_id)
                 for each_token in token_list:
                     fcm_message = {"message": {"token": each_token ,"data": {"title_upper": pushNotification.title, "title": pushNotification.description, "id": pushNotification.instance_id, "type": pushNotification.notification_type,"notification_id": str(pushNotification.id), "image_url": pushNotification.image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
-                    resp = requests.post("https://fcm.googleapis.com/v1/projects/boloindya-1ec98/messages:send", data=json.dumps(fcm_message), headers=headers)
+                    resp = requests.post(requset_url, data=json.dumps(fcm_message), headers=headers)
             else:
                 if pushNotification.language == '0' and pushNotification.user_group == '0':
                     fcm_message = {"message": {"topic": "all" ,"data": {"title_upper": pushNotification.title, "title": pushNotification.description, "id": pushNotification.instance_id, "type": pushNotification.notification_type,"notification_id": str(pushNotification.id), "image_url": pushNotification.image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
@@ -47,7 +47,7 @@ def send_push_notification(pushNotifications):
                 elif pushNotification.language != '0':
                     fcm_message = {"message": {"topic": "boloindya_language_"+pushNotification.language ,"data": {"title_upper": pushNotification.title, "title": pushNotification.description, "id": pushNotification.instance_id, "type": pushNotification.notification_type,"notification_id": str(pushNotification.id), "image_url": pushNotification.image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
                 if fcm_message:
-                    resp = requests.post("https://fcm.googleapis.com/v1/projects/boloindya-1ec98/messages:send", data=json.dumps(fcm_message), headers=headers)
+                    resp = requests.post(requset_url, data=json.dumps(fcm_message), headers=headers)
                     pushNotification.is_executed=True
                     pushNotification.save()
         except Exception as e:

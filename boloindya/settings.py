@@ -652,3 +652,4 @@ REDIS_EXPIRY_TIME = 1800 #In Seconds
 
 
 PUSH_NOTIFICATION_TEST_USER = [19, 20, 1492, 328, 41, 40]
+PUSH_NOTIFICATION_URL = "https://fcm.googleapis.com/v1/projects/boloindya-1ec98/messages:send"

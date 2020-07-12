@@ -1325,11 +1325,11 @@ def send_notifications_task(pushNotification_id):
     from jarvis.utils import _get_access_token
     try:
         pushNotification  = PushNotification.objects.get(pk = pushNotification_id)
-        access =  _get_access_token() 
+        access, request_url =  _get_access_token() 
         headers = {'Authorization': 'Bearer ' + access, 'Content-Type': 'application/json; UTF-8' }
         fcm_message={}
         fcm_message = {"message": {"topic": "boloindya_test" ,"data": {"title_upper": pushNotification.title, "title": pushNotification.description, "id": pushNotification.instance_id, "type": pushNotification.notification_type,"notification_id": str(pushNotification.id), "image_url": pushNotification.image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
-        resp = requests.post("https://fcm.googleapis.com/v1/projects/boloindya-1ec98/messages:send", data=json.dumps(fcm_message), headers=headers)
+        resp = requests.post(request_url, data=json.dumps(fcm_message), headers=headers)
     except Exception as e:
         print e
 
