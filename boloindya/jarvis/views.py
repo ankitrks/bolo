@@ -54,7 +54,6 @@ from django.core.files.base import ContentFile
 from drf_spirit.serializers import UserWithUserSerializer
 from django.db.models import F,Q
 import traceback
-from tasks import send_notifications_task
 from PIL import Image, ExifTags
 from drf_spirit.utils import language_options
 #from .models import category_slab_options
@@ -1280,9 +1279,8 @@ def send_notification(request):
                     if datepicker:
                         pushNotification.scheduled_time = datetime.strptime(datepicker + " " + timepicker, "%m/%d/%Y %H:%M")
                     pushNotification.is_scheduled = True
-                print pushNotification.__dict__
                 pushNotification.save()
-                send_notifications_task.delay(pushNotification.id)
+                send_notifications_task(pushNotification.id)
             else:
                 for lang in lang_array:
                     pushNotification = PushNotification()
@@ -1308,9 +1306,8 @@ def send_notification(request):
                         if datepicker:
                             pushNotification.scheduled_time = datetime.strptime(datepicker + " " + timepicker, "%m/%d/%Y %H:%M")
                         pushNotification.is_scheduled = True
-                    print pushNotification.__dict__
                     pushNotification.save()
-                    send_notifications_task.delay(pushNotification.id)
+                    send_notifications_task(pushNotification.id)
 
         return redirect('/jarvis/notification_panel/')
     if request.method == 'GET':
@@ -1321,6 +1318,21 @@ def send_notification(request):
             print e
     
     return render(request,'jarvis/pages/notification/send_notification.html', { 'language_options': language_options, 'user_group_options' : user_group_options, 'notification_types': notification_type_options, 'pushNotification': pushNotification})
+
+def send_notifications_task(pushNotification_id):
+    import json
+    import requests
+    from jarvis.utils import _get_access_token
+    try:
+        pushNotification  = PushNotification.objects.get(pk = pushNotification_id)
+        access =  _get_access_token() 
+        headers = {'Authorization': 'Bearer ' + access, 'Content-Type': 'application/json; UTF-8' }
+        fcm_message={}
+        fcm_message = {"message": {"topic": "boloindya_test" ,"data": {"title_upper": pushNotification.title, "title": pushNotification.description, "id": pushNotification.instance_id, "type": pushNotification.notification_type,"notification_id": str(pushNotification.id), "image_url": pushNotification.image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
+        resp = requests.post("https://fcm.googleapis.com/v1/projects/boloindya-1ec98/messages:send", data=json.dumps(fcm_message), headers=headers)
+    except Exception as e:
+        print e
+
 
 @login_required
 def particular_notification(request, notification_id=None, status_id=2, page_no=1, is_uninstalled=0):

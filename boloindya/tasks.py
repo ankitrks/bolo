@@ -14,25 +14,6 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 logger = get_task_logger(__name__)
 
 
-@app.task
-def send_notifications_task(pushNotification_id):
-    import json
-    import requests
-    from jarvis.utils import _get_access_token
-    from jarvis.models import PushNotification
-    try:
-        pushNotification  = PushNotification.objects.get(pk = pushNotification_id)
-        print pushNotification.__dict__
-        access =  _get_access_token() 
-        headers = {'Authorization': 'Bearer ' + access, 'Content-Type': 'application/json; UTF-8' }
-        fcm_message={}
-        fcm_message = {"message": {"topic": "boloindya_test" ,"data": {"title_upper": pushNotification.title, "title": pushNotification.description, "id": pushNotification.instance_id, "type": pushNotification.notification_type,"notification_id": str(pushNotification.id), "image_url": pushNotification.image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
-        resp = requests.post("https://fcm.googleapis.com/v1/projects/boloindya-1ec98/messages:send", data=json.dumps(fcm_message), headers=headers)
-        logger.info((resp))
-        logger.info((resp.text))
-        logger.info((fcm_message))
-    except Exception as e:
-        logger.info(str(e))
 
 @app.task
 def vb_create_task(topic_id):

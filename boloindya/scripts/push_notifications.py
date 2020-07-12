@@ -28,7 +28,6 @@ def send_push_notification(pushNotifications):
 
     for pushNotification in pushNotifications:
         try:
-
             if pushNotification.user_group == '8':
                 token_list = get_token_for_user_id(pushNotifications.particular_user_id)
                 for each_token in token_list:
