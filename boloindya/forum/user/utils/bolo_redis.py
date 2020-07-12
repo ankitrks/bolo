@@ -128,7 +128,9 @@ def get_user_bolo_info(user_id,month=None,year=None):
             total_video_id = list(total_video.values_list('pk',flat=True))
             all_pay = UserPay.objects.filter( user_id=user.id, is_active=True)
             top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False, user_id=user.id) .order_by('-view_count')[:3]
-            video_playtime = user.st.total_vb_playtime
+            all_play_time = VideoPlaytime.objects.filter(videoid__in = total_video_id).aggregate(Sum('playtime'))
+            if all_play_time.has_key('playtime__sum') and all_play_time['playtime__sum']:
+                video_playtime = all_play_time['playtime__sum']
            
         else:
             total_video = Topic.objects.filter(is_vb = True,is_removed=False, user_id=user.id, date__gte=start_date, date__lte=end_date)
@@ -243,7 +245,7 @@ def get_profile_counter(user_id):
     else:
         view_count = 0
 
-    #total videl
+    #total video
     video_count = all_vb.count()
     return {'follower_count':real_follower_count, 'follow_count': real_follow_count ,'view_count': view_count, 'video_count':video_count, 'last_updated': datetime.now()}
 
