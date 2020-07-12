@@ -4675,6 +4675,6 @@ def get_location(location_data):
 
 class AudioFileListView(generics.ListAPIView):
     serializer_class = MusicAlbumSerializer
-    queryset = MusicAlbum.objects.all()
+    queryset = MusicAlbum.objects.all().order_by('-id')
     permission_classes  = (IsAuthenticatedOrReadOnly,)
     pagination_class = LimitOffsetPagination
