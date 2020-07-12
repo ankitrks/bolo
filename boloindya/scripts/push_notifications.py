@@ -31,7 +31,7 @@ def send_push_notification(pushNotifications):
     for pushNotification in pushNotifications:
         try:
             if pushNotification.user_group == '8':
-                token_list = get_token_for_user_id(pushNotifications.particular_user_id)
+                token_list = get_token_for_user_id(pushNotification.particular_user_id)
                 for each_token in token_list:
                     fcm_message = {"message": {"token": each_token ,"data": {"title_upper": pushNotification.title, "title": pushNotification.description, "id": pushNotification.instance_id, "type": pushNotification.notification_type,"notification_id": str(pushNotification.id), "image_url": pushNotification.image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
                     resp = requests.post("https://fcm.googleapis.com/v1/projects/boloindya-1ec98/messages:send", data=json.dumps(fcm_message), headers=headers)
