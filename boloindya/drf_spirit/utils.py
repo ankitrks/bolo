@@ -179,19 +179,22 @@ def short_time(value):
 
     elif value>60 and value<3600:
         minute_value = value/float(60.0)
-        rounded = round(minute_value, 1)
+        rounded = int(round(minute_value,1)) if round(minute_value,1).is_integer() else round(minute_value,1)
         return str(rounded)+" minutes"
     elif value>3600:
         hour_value = value/float(3600.0)
-        rounded = round(hour_value, 2)
+        rounded = int(round(hour_value,1)) if round(hour_value,1).is_integer() else round(hour_value,1)
+        if rounded > 999:
+            rounded = shorcountertopic(rounded)+' hours'
+            return rounded
         return str(rounded)+" hours"
 
 def shortcounterprofile(counter):
     counter = int(counter)
     if counter>10000 and counter < 999999:
-        return str(int(round(counter/1000.0, 1)) if round(counter/1000.0, 1).is_integer() else round(counter/1000.0, 1))+'K'
+        return str(int(round(counter/1000.0, 1)) if round(counter/1000.0, 1).is_integer() else round(counter/1000.0, 1))+' K'
     elif counter >= 999999:
-        return str(int(round(counter/1000000.0, 1)) if (round(counter/1000000.0, 1)).is_integer() else (round(counter/1000000.0, 1)))+'M'
+        return str(int(round(counter/1000000.0, 1)) if (round(counter/1000000.0, 1)).is_integer() else (round(counter/1000000.0, 1)))+' M'
     else:
         return counter
 
@@ -199,10 +202,10 @@ def shortcounterprofile(counter):
 
 def shorcountertopic(counter):
     counter = int(counter)
-    if counter>1000 and counter < 999999:
-        return str(int(round(counter/1000.0, 1)) if round(counter/1000.0, 1).is_integer() else round(counter/1000.0, 1))+'K'
+    if counter >= 1000 and counter < 999999:
+        return str(int(round(counter/1000.0, 1)) if round(counter/1000.0, 1).is_integer() else round(counter/1000.0, 1))+' K'
     elif counter >= 999999:
-        return str(int(round(counter/1000000.0, 1)) if (round(counter/1000000.0, 1)).is_integer() else (round(counter/1000000.0, 1)))+'M'
+        return str(int(round(counter/1000000.0, 1)) if (round(counter/1000000.0, 1)).is_integer() else (round(counter/1000000.0, 1)))+' M'
     else:
         return str(counter)
 
