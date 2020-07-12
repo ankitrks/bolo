@@ -9,7 +9,8 @@ def run():
             try:
                 data = redis_cli.get(key)
                 data =  json.loads(data) if data else None
-                if data:
+                # print data['log_type'], len(data['log_type'])
+                if data and data.has_key('log_type') and len(data['log_type']) < 255:
                     all_entries += [data]
                     all_keys.append(key)
             except Exception as e:
