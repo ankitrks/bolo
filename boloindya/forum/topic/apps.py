@@ -12,10 +12,3 @@ class SpiritTopicConfig(AppConfig):
     def ready(self):
         import forum.topic.signals  # noqa
 
-
-
-# class ElasticsearchConfig(AppConfig):
-#     name = 'forum.topic'
-
-#     def ready(self):
-#         import forum.topic.signals

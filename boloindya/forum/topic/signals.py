@@ -9,8 +9,6 @@ from django.dispatch import Signal
 post_update = Signal()
 from forum.user.utils.follow_redis import get_redis_following
 
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 @receiver(post_save, sender=Topic)
 def index_post_topic(sender, instance, **kwargs):

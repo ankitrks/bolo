@@ -8,9 +8,14 @@ from django.contrib.auth import get_user_model
 from .models import UserProfile,ReferralCode
 from forum.userkyc.models import UserKYC
 from drf_spirit.utils import generate_refer_earn_code
+from django.dispatch import receiver
+
 
 User = get_user_model()
 
+@receiver(post_save, sender=UserProfile)
+def index_post_topic(sender, instance, **kwargs):
+    instance.indexing()
 
 def update_or_create_user_profile(sender, instance, created, **kwargs):
     user = instance
