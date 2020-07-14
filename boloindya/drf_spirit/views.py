@@ -729,28 +729,34 @@ def search_break_word(term):
         return SQ(content='')
 
 def getTopicData(obj):
-    topic_ids = []
-    data = []
-    topic_search = MultiSearch(index='topic-index')
-    topic_search = topic_search.add(Search().from_dict({"query": {"match": {"title": {"query": obj["search_term"], "fuzziness": "AUTO"}}}}))
-    topic_search = topic_search.add(Search().from_dict({"query": {"match": {"slug": {"query": obj["search_term"], "fuzziness": "AUTO"}}}}))
-    responses_topic = topic_search.execute()
-    for hits in responses_topic:
-        result_topic = hits.to_dict()
-    if "is_suggestion" in obj:
-        return result_topic['hits']['hits'][obj["page"]:obj["page_size"]]
-    topic_el = result_topic['hits']['hits'][obj["page"]:obj["page_size"]]
-    if topic_el:
-        for i in range(len(topic_el)):
-            topic_ids.append(topic_el[i]['_id'])
-        res_topic = Topic.objects.filter(pk__in=topic_ids).filter(language_id = obj["language_id"], is_removed = False)
-        # result_page = get_paginated_data(res_topic, int(page_size), int(page))
-        # topics = solr_object_to_db_object(result_page[0].object_list)
-        if obj["is_top"]:
-            data = TopicSerializerwithComment(res_topic,many=True,context={'is_expand':obj["is_expand"],'last_updated':obj["last_updated"]}).data
-        else:
-            data = TopicSerializerwithComment(res_topic,many=True, context = {'is_expand': True, 'last_updated': None}).data
-    return data
+    try:
+
+        topic_ids = []
+        data = []
+        topic_search = MultiSearch(index='topic-index')
+        topic_search = topic_search.add(Search().from_dict({"query": {"match": {"title": {"query": obj["search_term"], "fuzziness": "AUTO"}}}}))
+        topic_search = topic_search.add(Search().from_dict({"query": {"match": {"slug": {"query": obj["search_term"], "fuzziness": "AUTO"}}}}))
+        responses_topic = topic_search.execute()
+        for hits in responses_topic:
+            result_topic = hits.to_dict()
+        if "is_suggestion" in obj:
+            return result_topic['hits']['hits'][obj["page"]:obj["page_size"]]
+        topic_el = result_topic['hits']['hits'][obj["page"]:obj["page_size"]]
+        if topic_el:
+            for i in range(len(topic_el)):
+                topic_ids.append(topic_el[i]['_id'])
+            res_topic = Topic.objects.filter(pk__in=topic_ids).filter(language_id = obj["language_id"], is_removed = False)
+            # result_page = get_paginated_data(res_topic, int(page_size), int(page))
+            # topics = solr_object_to_db_object(result_page[0].object_list)
+            if obj["is_top"]:
+                data = TopicSerializerwithComment(res_topic,many=True,context={'is_expand':obj["is_expand"],'last_updated':obj["last_updated"]}).data
+            else:
+                data = TopicSerializerwithComment(res_topic,many=True, context = {'is_expand': True, 'last_updated': None}).data
+        return data
+    
+    except Exception as e:
+
+        print(e)
 
 def getHashtagData(obj):
     hashtag_ids = []
@@ -794,32 +800,38 @@ def getUserProfileData(obj):
 
 class SolrSearchTop(BoloIndyaGenericAPIView):
     def get(self, request):
-        response = {}
-        is_top = 1
-        search_term = self.request.GET.get('term')
-        language_id = self.request.GET.get('language_id', 1)
-        page = int(request.GET.get('page',1))
-        page_size = self.request.GET.get('page_size',5)
-        page = (page-1) * page_size
-        page_size = page + page_size
-        is_expand=self.request.GET.get('is_expand',False)
-        last_updated=timestamp_to_datetime(self.request.GET.get('last_updated',False))
-        obj = {
-            "search_term": search_term,
-            "language_id": language_id,
-            "last_updated": last_updated,
-            "is_expand": is_expand,
-            "page": page,
-            "page_size": page_size,
-            "is_top": is_top,
-            "is_other": 0
-        }
-        if search_term:
-            # response['top_vb'] = getTopicData(search_term, language_id, last_updated, is_expand, page, page_size, is_top)
-            response['top_vb'] = getTopicData(obj)
-            response['top_hash_tag'] = getHashtagData(obj)
-            response["top_user"] = getUserProfileData(obj)
-        return JsonResponse(response, safe = False)
+        try:
+
+            response = {}
+            is_top = 1
+            search_term = self.request.GET.get('term')
+            language_id = self.request.GET.get('language_id', 1)
+            page = int(request.GET.get('page',1))
+            page_size = self.request.GET.get('page_size',5)
+            page = (page-1) * page_size
+            page_size = page + page_size
+            is_expand=self.request.GET.get('is_expand',False)
+            last_updated=timestamp_to_datetime(self.request.GET.get('last_updated',False))
+            obj = {
+                "search_term": search_term,
+                "language_id": language_id,
+                "last_updated": last_updated,
+                "is_expand": is_expand,
+                "page": page,
+                "page_size": page_size,
+                "is_top": is_top,
+                "is_other": 0
+            }
+            if search_term:
+                # response['top_vb'] = getTopicData(search_term, language_id, last_updated, is_expand, page, page_size, is_top)
+                response['top_vb'] = getTopicData(obj)
+                response['top_hash_tag'] = getHashtagData(obj)
+                response["top_user"] = getUserProfileData(obj)
+            return JsonResponse(response, safe = False)
+        
+        except Exception as e:
+
+            print(e)
 
 
 
