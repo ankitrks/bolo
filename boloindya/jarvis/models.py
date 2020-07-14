@@ -188,7 +188,7 @@ metrics_options = (
     ('0', "Video Created"),
     ('1', "Video Views"),
     ('2', "Bolo Actions"),
-    ('3', "Video Shares (WhatsApp)"),
+    ('3', "Video Shares"),
     ('4', "New Video Creators"),
     ('5', "Number of Installs"),
     ('6', "DAU"),
