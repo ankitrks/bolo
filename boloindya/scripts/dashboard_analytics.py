@@ -104,7 +104,7 @@ def put_share_data(start_date):
 
 	day_month_year_dict = dict()
 	try:
-		all_data = UserVideoTypeDetails.objects.filter(timestamp__gt = start_date)
+		all_data = UserVideoTypeDetails.objects.filter(timestamp = start_date)
 		for item in all_data:
 			if(str(item.video_type) == 'shared'):
 				curr_videoid = item.videoid 
@@ -186,52 +186,52 @@ def put_installs_data(end_date, start_date):
 		print("Exception in Installs data", e.message)					
 						
 
-def put_video_views_analytics(today, start_date):
-	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
-		try:
-			curr_day = dt.day 
-			curr_month = dt.month 
-			curr_year = dt.year
-			all_data = AndroidLogs.objects.filter(log_type = 'click2play', created_at__day= curr_day, created_at__month= curr_month, created_at__year= curr_year)
-			user_view_dict = []
-			for item in all_data:
-				try:
-					log_data = ast.literal_eval(item.logs)
-					for each in log_data:
-						curr_state = each['state']
-						if('StartPlaying' in curr_state):
-							user_view_dict.append(each['video_byte_id'])
-				except Exception as e:
-					pass			
+# def put_video_views_analytics(today, dt):
+# 		# for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
+# 		try:
+# 			curr_day = dt.day 
+# 			curr_month = dt.month 
+# 			curr_year = dt.year
+# 			all_data = AndroidLogs.objects.filter(log_type = 'click2play', created_at__day= curr_day, created_at__month= curr_month, created_at__year= curr_year)
+# 			user_view_dict = []
+# 			for item in all_data:
+# 				try:
+# 					log_data = ast.literal_eval(item.logs)
+# 					for each in log_data:
+# 						curr_state = each['state']
+# 						if('StartPlaying' in curr_state):
+# 							user_view_dict.append(each['video_byte_id'])
+# 				except Exception as e:
+# 					pass			
 
-			week_no = dt.isocalendar()[1]
-			curr_year = dt.year 
-			str_date = str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day)
-			if(curr_year == 2020):
-				week_no+=52
-			if(curr_year == 2019 and week_no == 1):
-				week_no = 52		
+# 			week_no = dt.isocalendar()[1]
+# 			curr_year = dt.year 
+# 			str_date = str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day)
+# 			if(curr_year == 2020):
+# 				week_no+=52
+# 			if(curr_year == 2019 and week_no == 1):
+# 				week_no = 52		
 
 				
-			metrics = '1'
-			metrics_slab = ''
-			save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_date, week_no = week_no)
-			if(created):
-				print(metrics, metrics_slab, str_date, week_no, len(user_view_dict))
-				save_obj.count = len(user_view_dict)
-				save_obj.save()
-			else:
-				print(metrics, metrics_slab, str_date, week_no, len(user_view_dict))
-				save_obj.count = len(user_view_dict)
-				save_obj.save()	
+# 			metrics = '1'
+# 			metrics_slab = ''
+# 			save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_date, week_no = week_no)
+# 			if(created):
+# 				print(metrics, metrics_slab, str_date, week_no, len(user_view_dict))
+# 				save_obj.count = len(user_view_dict)
+# 				save_obj.save()
+# 			else:
+# 				print(metrics, metrics_slab, str_date, week_no, len(user_view_dict))
+# 				save_obj.count = len(user_view_dict)
+# 				save_obj.save()	
 		
-		except Exception as e:
-			print("Error in Video Views", e.message, dt)		
+# 		except Exception as e:
+# 			print("Error in Video Views", e.message, dt)		
 
 def put_videos_created(today, start_date):
 	
 	day_month_year_dict = dict()
-	all_data = Topic.objects.filter(date__gt = start_date)
+	all_data = Topic.objects.filter(date = start_date)
 	for item in all_data:
 		curr_month = item.date.month 
 		curr_year = item.date.year
@@ -271,14 +271,12 @@ def put_videos_created(today, start_date):
 			print("Error in videos created", e.message, key)			
 
 # put new video creators with lang filter
-def put_video_creators_analytics_lang(today, start_date):
-	metrics = '4'
-	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = today):
+def put_video_creators_analytics_lang(today, dt):
+		metrics = '4'
+		# for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = today):
 		try:
-			curr_day = dt.day 
-			curr_month = dt.month
-			curr_year = dt.year
-			all_data = Topic.objects.filter(is_vb=True, date__day = curr_day, date__month = curr_month, date__year = curr_year).values('user', 'language_id', 'm2mcategory').annotate(vb_count=Count('pk', 'language_id')).order_by('-vb_count', 'language_id')
+			all_data = Topic.objects.filter(is_vb=True, date = dt).values('user', 'language_id', 'm2mcategory')\
+					.annotate(vb_count=Count('pk', 'language_id')).order_by('-vb_count', 'language_id')
 
 			for item in all_data:
 				userid = str(item['user'])
@@ -392,8 +390,8 @@ def put_video_creators_analytics_lang(today, start_date):
 		except Exception as e:
 			print("Error in video creators analytics", e.message, dt)
 
-def put_dau_data(end_date, start_date):
-	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= end_date):
+def put_dau_data(end_date, dt):
+		# for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= end_date):
 		try:
 			curr_day = dt.day 
 			curr_month = dt.month 
@@ -451,71 +449,68 @@ def put_mau_data(today):
 
 
 # put daily combo view of (user, vid) to be put in daily records
-def put_uniq_views_analytics(today, start_date):
-	for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
-		curr_day = dt.day 
-		curr_month = dt.month 
-		curr_year = dt.year 
-		str_date = str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day)
-		all_data = AndroidLogs.objects.filter(log_type = 'click2play', created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year)
-		user_vid_mapping = dict()				# dict storing (user, vid) mapping for the day 
-		for item in all_data:
-			try:
-				log_data = ast.literal_eval(item.logs)
-				curr_userid = item.user_id 
-				for each in log_data:
-					curr_state = each['state']
-					if('StartPlaying' in curr_state):
-						if(curr_userid in user_vid_mapping):
-							user_vid_mapping[curr_userid].append(each['video_byte_id'])
-						else:
-							user_vid_mapping[curr_userid] = []
-							user_vid_mapping[curr_userid].append(each['video_byte_id'])					
+# def put_uniq_views_analytics(today, dt):
+# 		# for dt in rrule.rrule(rrule.DAILY, dtstart= start_date, until= today):
+# 		curr_day = dt.day 
+# 		curr_month = dt.month 
+# 		curr_year = dt.year 
+# 		str_date = str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day)
+# 		all_data = AndroidLogs.objects.filter(log_type = 'click2play', created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year)
+# 		user_vid_mapping = dict()				# dict storing (user, vid) mapping for the day 
+# 		for item in all_data:
+# 			try:
+# 				log_data = ast.literal_eval(item.logs)
+# 				curr_userid = item.user_id 
+# 				for each in log_data:
+# 					curr_state = each['state']
+# 					if('StartPlaying' in curr_state):
+# 						if(curr_userid in user_vid_mapping):
+# 							user_vid_mapping[curr_userid].append(each['video_byte_id'])
+# 						else:
+# 							user_vid_mapping[curr_userid] = []
+# 							user_vid_mapping[curr_userid].append(each['video_byte_id'])					
 
-			except Exception as e:
-				pass
+# 			except Exception as e:
+# 				pass
 
-		tot_uniq_uvb_view_count = 0		
-		for key, val in user_vid_mapping.items():
-			tot_uniq_uvb_view_count+=len(set(val))
+# 		tot_uniq_uvb_view_count = 0		
+# 		for key, val in user_vid_mapping.items():
+# 			tot_uniq_uvb_view_count+=len(set(val))
 
-		week_no = dt.isocalendar()[1]
-		curr_year = dt.year 
-		str_date = str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day)
-		if(curr_year == 2020):
-			week_no+=52
-		if(curr_year == 2019 and week_no == 1):
-			week_no = 52
+# 		week_no = dt.isocalendar()[1]
+# 		curr_year = dt.year 
+# 		str_date = str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day)
+# 		if(curr_year == 2020):
+# 			week_no+=52
+# 		if(curr_year == 2019 and week_no == 1):
+# 			week_no = 52
 
 		
-		metrics = '7'
-		metrics_slab = ''
-		print(metrics, metrics_slab, str_date, week_no, tot_uniq_uvb_view_count)
-		try:	
-			save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_date, week_no = week_no)
-			if(created):
-				print(metrics, metrics_slab, str_date, week_no, tot_uniq_uvb_view_count)
-				save_obj.count = tot_uniq_uvb_view_count
-				save_obj.save()
-			else:
-				print(metrics, metrics_slab, str_date, week_no, tot_uniq_uvb_view_count)	
-				save_obj.count = tot_uniq_uvb_view_count
-				save_obj.save()	
+# 		metrics = '7'
+# 		metrics_slab = ''
+# 		print(metrics, metrics_slab, str_date, week_no, tot_uniq_uvb_view_count)
+# 		try:	
+# 			save_obj, created = DashboardMetricsJarvis.objects.get_or_create(metrics = metrics, metrics_slab = metrics_slab, date = str_date, week_no = week_no)
+# 			if(created):
+# 				print(metrics, metrics_slab, str_date, week_no, tot_uniq_uvb_view_count)
+# 				save_obj.count = tot_uniq_uvb_view_count
+# 				save_obj.save()
+# 			else:
+# 				print(metrics, metrics_slab, str_date, week_no, tot_uniq_uvb_view_count)	
+# 				save_obj.count = tot_uniq_uvb_view_count
+# 				save_obj.save()	
 		
-		except Exception as e:
-			print("Error in unique views analytics", e.message)
+# 		except Exception as e:
+# 			print("Error in unique views analytics", e.message)
 						
-def put_total_video_creators(today, start_date):
-	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = today):
+def put_total_video_creators(today, dt):
+		# for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = today):
 		language_dict = dict()
 		for item in language_options:
 			language_dict[item[0]] = 0
 
-		curr_day = dt.day 
-		curr_month = dt.month 
-		curr_year = dt.year
 		str_date = str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day)
-		all_data = Topic.objects.filter(is_vb = True, date__day = curr_day, date__month = curr_month, date__year = curr_year).values('user', 'pk', 'language_id', 'm2mcategory').order_by('user') 
+		all_data = Topic.objects.filter(is_vb = True, date = dt).values('user', 'pk', 'language_id', 'm2mcategory').order_by('user') 
 		for item in all_data:
 			video_id = str(item['pk'])
 			language_id = str(item['language_id'])
@@ -567,13 +562,10 @@ def put_total_video_creators(today, start_date):
 				except Exception as e:
 					print("Error in total video creators", e.message)
 
-def put_install_signup_conversion(today, start_date):
-	for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = today):
-		curr_day = dt.day 
-		curr_month = dt.month
-		curr_year = dt.year
-		install_data = ReferralCodeUsed.objects.filter(by_user__isnull=False, created_at__day=curr_day, created_at__month = curr_month, created_at__year=curr_year).values_list('android_id', flat=True)
-		signup_data = ReferralCodeUsed.objects.filter(by_user__isnull = False, created_at__day=curr_day, created_at__month = curr_month, created_at__year=curr_year).values_list('android_id', flat=True)
+def put_install_signup_conversion(today, dt):
+		# for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = today):
+		install_data = ReferralCodeUsed.objects.filter(by_user__isnull = True, created_at = dt).values_list('android_id', flat=True)
+		signup_data =  ReferralCodeUsed.objects.filter(by_user__isnull = False, created_at = dt).values_list('android_id', flat=True)
 		install_signup = list(set(install_data) & set(signup_data))
 		tot_count = len(install_signup)
 		metrics = '10'
@@ -621,8 +613,8 @@ def put_uninstall_data(today, start_dt, end_dt):
 		save_obj.save()
 		print(metrics, each_hour['at_hour'], each_hour['total'])
 
-def put_views_data(to_date, from_date):
-	for start_of_day in rrule.rrule(rrule.DAILY, dtstart= from_date, until= to_date):
+def put_views_data(to_date, start_of_day):
+		# for start_of_day in rrule.rrule(rrule.DAILY, dtstart= from_date, until= to_date):
 		end_of_day = start_of_day.replace(hour=23, minute=59, second=59)
 		total_views_data = VideoPlaytime.objects.filter(timestamp__gte=start_of_day, timestamp__lte=end_of_day)
 
@@ -674,51 +666,53 @@ def put_views_data(to_date, from_date):
 					print("Error in views data", e.message)
 
 def main():
-	days_to_run = 1
-	for date in rrule.rrule(rrule.MONTHLY, dtstart = datetime.today() - timedelta(days = days_to_run), until = datetime.today()):
-		print(' - - - - - - MAU data - - - - - - - ')
-		print date
-		put_mau_data(date)
+	# Old functions
+	# put_video_views_analytics(today, sd_2days)
+	# put_uniq_views_analytics(today, sd_2days)
+	# Old functions
+	
+	# days_to_run = 405
+	# for date in rrule.rrule(rrule.MONTHLY, dtstart = datetime.today() - timedelta(days = days_to_run), until = datetime.today()):
+	# 	print(' - - - - - - MAU data - - - - - - - ')
+	# 	print date
+	# 	put_mau_data(date)
 
-	for today_with_time in rrule.rrule(rrule.DAILY, dtstart = datetime.today() - timedelta(days = days_to_run), until = datetime.today()):
-		# today_with_time = datetime.today()
-		today = today_with_time.date()
-		sd_2days = today + timedelta(days = -2)
-		sd_abs = (today_with_time + timedelta(days = -2)).replace(hour=0, minute=0, second=0)
-		ed_abs = (today_with_time + timedelta(days = -2)).replace(hour=23, minute=59, second=59)
+	# for today_with_time in rrule.rrule(rrule.DAILY, dtstart = datetime.today() - timedelta(days = days_to_run), until = datetime.today()):
+	today_with_time = datetime.today()
+	today = today_with_time.date()
+	sd_2days = today + timedelta(days = -1)
+	sd_abs = (today_with_time + timedelta(days = -1)).replace(hour=0, minute=0, second=0)
+	ed_abs = (today_with_time + timedelta(days = -1)).replace(hour=23, minute=59, second=59)
 
-		print(' - - - - - - shares data - - - - - - - ')
-		put_share_data(sd_2days)
+	print(' - - - - - - shares data - - - - - - - ')
+	put_share_data(sd_2days)
 
-		print(' - - - - - - installs data - - - - - - - ')
-		put_installs_data(today, sd_2days)
+	print(' - - - - - - installs data - - - - - - - ')
+	put_installs_data(today, sd_2days)
 
-		print(' - - - - - - video views data - - - - - - - ')
-		put_video_views_analytics(today, sd_2days)
+	print(' - - - - - - videos created data - - - - - - - ')
+	put_videos_created(today, sd_2days)
 
-		print(' - - - - - - videos created data - - - - - - - ')
-		put_videos_created(today, sd_2days)
+	print(' - - - - - - video creators analytics data - - - - - - - ')
+	put_video_creators_analytics_lang(today, sd_2days)
 
-		print(' - - - - - - video creators analytics data - - - - - - - ')
-		put_video_creators_analytics_lang(today, sd_2days)
+	print(' - - - - - - DAU data - - - - - - - ')
+	put_dau_data(today, sd_2days)
 
-		print(' - - - - - - DAU data - - - - - - - ')
-		put_dau_data(today, sd_2days)
+	print(' - - - - - - MAU data - - - - - - - ')
+	put_mau_data(date)
 
-		print(' - - - - - - unique views data - - - - - - - ')
-		put_uniq_views_analytics(today, sd_2days)
+	print(' - - - - - - total video creators data - - - - - - - ')
+	put_total_video_creators(today, sd_2days)
 
-		print(' - - - - - - total video creators data - - - - - - - ')
-		put_total_video_creators(today, sd_2days)
+	print(' - - - - - - install signup map data - - - - - - - ')
+	put_install_signup_conversion(today, sd_2days)
 
-		print(' - - - - - - install signup map data - - - - - - - ')
-		put_install_signup_conversion(today, sd_2days)
+	print(' - - - - - - uninstall data - - - - - - - ')
+	put_uninstall_data(today, sd_abs, ed_abs)
 
-		print(' - - - - - - uninstall data - - - - - - - ')
-		put_uninstall_data(today, sd_abs, ed_abs)
-
-		print(' - - - - - - shares data - - - - - - - ')
-		put_views_data(today, sd_2days)
+	print(' - - - - - - views data - - - - - - - ')
+	put_views_data(today, sd_abs)
 
 def run():
 	main()
