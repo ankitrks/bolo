@@ -23,6 +23,15 @@ sys.path.append('/var/live_code/boloindya/boloindya')
 # os.environ["DJANGO_SETTINGS_MODULE"] = ".settings"
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "boloindya.settings_local")
 
+import os
+import socket
+from django.core.wsgi import get_wsgi_application
+application = get_wsgi_application()
+if socket.gethostname() == "Staging":
+    import newrelic.agent
+    newrelic.agent.initialize("../newrelic.ini")
+    application = newrelic.agent.WSGIApplicationWrapper(application)
+
 # This application object is used by any WSGI server configured to use this
 # file. This includes Django's development server, if the WSGI_APPLICATION
 # setting points here.
