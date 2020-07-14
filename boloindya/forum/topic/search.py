@@ -32,7 +32,10 @@ class TongueTwisterIndex(Document):
 
 def bulk_indexing_topic():
     TopicIndex.init(index = 'topic-index')
-    es = Elasticsearch()
+    # es = Elasticsearch(timeout = 3000) # added the extra timeout(remove this)
+    es = Elasticsearch(timeout=3000, max_retries=10, retry_on_timeout=True) #trying this
+
+    # es.cluster.health(wait_for_status='yellow', request_timeout=1) #added the extra (remove this)
     bulk(client=es, actions=(b.indexing() for b in models.Topic.objects.all().iterator()))
 
     
