@@ -143,6 +143,8 @@ def referral_code_update(request):
             used_obj.pid =pid
             used_obj.referral_dump = referral_dump
             used_obj.android_id = android_id
+            if user_id:
+                used_obj.by_user_id = user_id
             used_obj.save()
         except Exception as e1:
             print e1

@@ -570,8 +570,8 @@ def put_total_video_creators(today, dt):
 
 def put_install_signup_conversion(today, dt):
 		# for dt in rrule.rrule(rrule.DAILY, dtstart = start_date, until = today):
-		install_data = ReferralCodeUsed.objects.filter(by_user__isnull = True, created_at = dt).values_list('android_id', flat=True)
-		signup_data =  ReferralCodeUsed.objects.filter(by_user__isnull = False, created_at = dt).values_list('android_id', flat=True)
+		install_data = ReferralCodeUsed.objects.filter(by_user__isnull = True, created_at__date = dt).values_list('android_id', flat=True)
+		signup_data =  ReferralCodeUsed.objects.filter(by_user__isnull = False, created_at__date = dt).values_list('android_id', flat=True)
 		install_signup = list(set(install_data) & set(signup_data))
 		tot_count = len(install_signup)
 		metrics = '10'
