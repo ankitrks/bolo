@@ -700,7 +700,7 @@ def main():
 	put_dau_data(today, sd_2days)
 
 	print(' - - - - - - MAU data - - - - - - - ')
-	put_mau_data(date)
+	put_mau_data(today)
 
 	print(' - - - - - - total video creators data - - - - - - - ')
 	put_total_video_creators(today, sd_2days)
