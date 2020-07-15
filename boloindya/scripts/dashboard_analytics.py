@@ -404,7 +404,9 @@ def put_dau_data(end_date, dt):
 
 			id_list_2 = AndroidLogs.objects.filter(created_at__day = curr_day, created_at__month = curr_month, created_at__year = curr_year).values_list('user__pk', flat=True).distinct()
 			id_list_3 = FCMDevice.objects.filter(user__pk__in = id_list_2).values_list('dev_id', flat = True).distinct()
-			clist = set(list(id_list_3) + list(user_not_null_data))
+			uids = VideoPlaytime.objects.filter(timestamp__date = dt).values_list('user', flat = True).distinct()
+			id_list_4 = UserProfile.objects.filter(user__pk__in = list(uids)).values_list('android_did', flat = True).distinct()
+			clist = set(list(id_list_3) + list(user_not_null_data) + list(id_list_4))
 			dau_count = len(clist) + null_data.count()
 
 			week_no = dt.isocalendar()[1]
@@ -435,7 +437,11 @@ def put_mau_data(today):
 
 		id_list_2 = AndroidLogs.objects.filter(created_at__month = curr_month, created_at__year = curr_year).values_list('user__pk', flat=True).distinct()
 		id_list_3 = FCMDevice.objects.filter(user__pk__in = id_list_2).values_list('dev_id', flat = True).distinct()
-		clist = set(list(id_list_3) + list(user_not_null_data))
+
+		uids = VideoPlaytime.objects.filter(timestamp__month = curr_month, timestamp__year = curr_year).values_list('user', flat = True).distinct()
+		id_list_4 = UserProfile.objects.filter(user__pk__in = list(uids)).values_list('android_did', flat = True).distinct()
+		clist = set(list(id_list_3) + list(user_not_null_data) + list(id_list_4))
+
 		mau_count = len(clist) + null_data.count()
 
 		metrics = '8'
