@@ -501,8 +501,5 @@ def set_android_logs_info(value):
     set_redis(key, value, False)
 
 def set_sync_dump_info(value):
-    try:
-        key = "sync_dump:" + str(int(time.time()))
-        set_redis(key, value, False)
-    except Exception as e:
-        print "set_sync_dump_info failed with value"+str(value)
+    key = "sync_dump:" + str(datetime.now()).replace(' ', '')
+    set_redis(key, value, False)
