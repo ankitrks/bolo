@@ -497,15 +497,9 @@ def create_user(name,username,gender,language):
             return False
 
 def set_android_logs_info(value):
-    try:
-        key = "android_logs:" + str(int(time.time()))
-        set_redis(key, value, False)
-    except Exception as e:
-        print "set_android_logs_info failed with value"+str(value)
+    key = "android_logs:" + str(datetime.now()).replace(' ', '')
+    set_redis(key, value, False)
 
 def set_sync_dump_info(value):
-    try:
-        key = "sync_dump:" + str(int(time.time()))
-        set_redis(key, value, False)
-    except Exception as e:
-        print "set_sync_dump_info failed with value"+str(value)
+    key = "sync_dump:" + str(datetime.now()).replace(' ', '')
+    set_redis(key, value, False)
