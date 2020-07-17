@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from django.contrib.auth.models import User
 from django.db.models import Sum
 import calendar
-from forum.user.models import ReferralCode,
+from forum.user.models import ReferralCode
 
 n = 30
 
