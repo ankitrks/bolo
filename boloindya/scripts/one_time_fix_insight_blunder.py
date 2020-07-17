@@ -19,59 +19,100 @@ import gc
 import decimal
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
 from drf_spirit.utils import create_random_user
+import json
 
 
 
 def run():
-    for each_userprofile in UserProfile.objects.all().order_by('-vb_count').values('user_id','user__username')[5:10]:
+    for each_userprofile in UserProfile.objects.all().order_by('-vb_count').values('user_id','user__username','user__date_joined')[5:10]:
         print "##################################################################"
-        start_date = '01-04-2019'
+        print each_userprofile['user__date_joined']
+        start_date = each_userprofile['user__date_joined'].date().strftime("%d-%m-%Y")
+        print start_date
         start_date = datetime.strptime(start_date, "%d-%m-%Y")
         days = calendar.monthrange(int(start_date.year),int(start_date.month))[1]
         end_date = datetime.strptime(str(days)+'-'+str(start_date.month)+'-'+str(start_date.year)+' 23:59:59', "%d-%m-%Y %H:%M:%S")
         current_datetime = datetime.now()
         while(current_datetime > start_date):
-            bolo_info=get_old_user_bolo_info(each_userprofile['user_id'],start_date.month,start_date.year)
-            print "Old Insight Data for user and month:",each_userprofile['user__username'],start_date.month, start_date.year
-            print  "Insight Data:", bolo_info
-            print
-            if start_date.month == 12:
-                start_date = datetime.strptime('01-01-'+str(start_date.year+1), "%d-%m-%Y")
-            else:
-                start_date = datetime.strptime('01-'+str(start_date.month+1)+'-'+str(start_date.year), "%d-%m-%Y")
-            days = calendar.monthrange(int(start_date.year),int(start_date.month))[1]
-            end_date = datetime.strptime(str(days)+'-'+str(start_date.month)+'-'+str(start_date.year)+' 23:59:59', "%d-%m-%Y %H:%M:%S")
+            try:
+                bolo_info=get_old_user_bolo_info(each_userprofile['user_id'],start_date.month,start_date.year)
+                print "Old Insight Data for user and month:",each_userprofile['user__username'],start_date.month, start_date.year
+                print  "Insight Data:", bolo_info
+                print
+                if start_date.month == 12:
+                    start_date = datetime.strptime('01-01-'+str(start_date.year+1), "%d-%m-%Y")
+                else:
+                    start_date = datetime.strptime('01-'+str(start_date.month+1)+'-'+str(start_date.year), "%d-%m-%Y")
+                days = calendar.monthrange(int(start_date.year),int(start_date.month))[1]
+                end_date = datetime.strptime(str(days)+'-'+str(start_date.month)+'-'+str(start_date.year)+' 23:59:59', "%d-%m-%Y %H:%M:%S")
+            except Exception as e:
+                print "Error in: get_old_user_bolo_info", e
 
-        old_lifetime_bolo_info = get_old_user_bolo_info(each_userprofile['user_id'],None,None)
-        print old_lifetime_bolo_info
+        try:
 
+            old_lifetime_bolo_info = get_old_user_bolo_info(each_userprofile['user_id'],None,None)
+            print "Old Insight Data lifetime for user:" ,each_userprofile['user__username']
+            print old_lifetime_bolo_info
+            old_profile_data = get_old_profile_counter(each_userprofile['user_id'])
+            print 'old_profile_data',old_profile_data
+        except Exception as e:
+            print "Error in: lifetime get_old_user_bolo_info, get_old_profile_counter", e
 
-
-        is_calculated = False
-        while(not is_calculated):
-            is_calculated=fix_insight_data(each_userprofile['user_id'],'01-04-2019')
+        try:
+            ### fix insight_ data
+            is_calculated = False
+            while(not is_calculated):
+                is_calculated=fix_insight_data(each_userprofile['user_id'],'01-04-2019')
+        except Exception as e:
+            print "Error in: fix_insight_data", e
 
         ### fix inactive count discripency
-        fix_active_inactive_view_discrepency(each_userprofile['user_id'])
+        try:
+            fix_active_inactive_view_discrepency(each_userprofile['user_id'])
+        except Exception as e:
+            print "Error in: fix_active_inactive_view_discrepency", e
 
 
-        start_date = '01-04-2019'
+        ###
+        try:
+            fix_follower(each_userprofile['user_id'])
+        except Exception as e:
+            print "Error in: fix_follower", e
+
+        ## update_profile counter
+        
+        set_profile_counter_data = set_profile_counter(each_userprofile['user_id'])
+        print "updated_profile data", set_profile_counter_data
+
+
+        print each_userprofile['user__date_joined']
+        start_date = each_userprofile['user__date_joined'].date().strftime("%d-%m-%Y")
         start_date = datetime.strptime(start_date, "%d-%m-%Y")
         days = calendar.monthrange(int(start_date.year),int(start_date.month))[1]
         end_date = datetime.strptime(str(days)+'-'+str(start_date.month)+'-'+str(start_date.year)+' 23:59:59', "%d-%m-%Y %H:%M:%S")
         current_datetime = datetime.now()
         while(current_datetime > start_date):
-            bolo_info = get_new_user_bolo_info(each_userprofile['user_id'],start_date.month,start_date.year)
-            print "New Insight Data for user and month:",each_userprofile['user__username'],start_date.month, start_date.year
-            print  "Insight Data:", bolo_info
-            if start_date.month == 12:
-                start_date = datetime.strptime('01-01-'+str(start_date.year+1), "%d-%m-%Y")
-            else:
-                start_date = datetime.strptime('01-'+str(start_date.month+1)+'-'+str(start_date.year), "%d-%m-%Y")
-            days = calendar.monthrange(int(start_date.year),int(start_date.month))[1]
-            end_date = datetime.strptime(str(days)+'-'+str(start_date.month)+'-'+str(start_date.year)+' 23:59:59', "%d-%m-%Y %H:%M:%S")
-        new_lifetime_bolo_info = get_new_user_bolo_info(each_userprofile['user_id'],None,None)
-        print new_lifetime_bolo_info
+            try:
+                bolo_info = get_new_user_bolo_info(each_userprofile['user_id'],start_date.month,start_date.year)
+                print "New Insight Data for user and month:",each_userprofile['user__username'],start_date.month, start_date.year
+                print  "Insight Data:", bolo_info
+                if start_date.month == 12:
+                    start_date = datetime.strptime('01-01-'+str(start_date.year+1), "%d-%m-%Y")
+                else:
+                    start_date = datetime.strptime('01-'+str(start_date.month+1)+'-'+str(start_date.year), "%d-%m-%Y")
+                days = calendar.monthrange(int(start_date.year),int(start_date.month))[1]
+                end_date = datetime.strptime(str(days)+'-'+str(start_date.month)+'-'+str(start_date.year)+' 23:59:59', "%d-%m-%Y %H:%M:%S")
+            except Exception as e:
+                print "Error in: get_new_user_bolo_info", e 
+        try:
+            new_lifetime_bolo_info = get_new_user_bolo_info(each_userprofile['user_id'],None,None)
+            print "New Insight Data lifetime for user:" ,each_userprofile['user__username']
+            print new_lifetime_bolo_info
+            new_profile_data = get_new_profile_counter(each_userprofile['user_id'])
+            print 'new_profile_data',new_profile_data
+        except Exception as e:
+            print "Error in: lifetime get_new_user_bolo_info, get_new_profile_counter", e
+
 
 def fix_active_inactive_view_discrepency(user_id):
     total_view_count_with_deletd = 0
@@ -129,7 +170,7 @@ def fix_insight_data(user_id,start_date='01-04-2019'):
         real_view_count = VBseen.objects.filter(topic_id__in = total_video.values_list('pk',flat=True)).count()
         real_view_in_that_month_count = VBseen.objects.filter(topic_id__in = total_video.values_list('pk',flat=True), created_at__gte=start_date, created_at__lte=end_date).count()
         diffrence_in_real_view_count = real_view_count - real_view_in_that_month_count
-        provide_fake_view_count(diffrence_in_real_view_count, total_video,total_video_count, start_date, end_date)
+        # provide_fake_view_count(diffrence_in_real_view_count, total_video,total_video_count, start_date, end_date)
         fake_view_count_in_db = FVBseen.objects.filter(topic_id__in = total_video.values_list('pk',flat=True), created_at__gte=start_date, created_at__lte=end_date).aggregate(Sum('view_count'))
         if fake_view_count_in_db.has_key('view_count__sum') and fake_view_count_in_db['view_count__sum']:
             fake_view_count_in_db = fake_view_count_in_db['view_count__sum']
@@ -180,24 +221,49 @@ def fix_insight_data(user_id,start_date='01-04-2019'):
     return True
 
 
-def provide_fake_view_count(count, total_video,total_video_count, start_date, end_date):
-    temp_count = count
-    reamining = int(count%total_video_count)
-    per_video_view = int(count/total_video_count)
-    for each_vb in total_video:
-        Topic.objects.filter(pk=each_vb.id).update(view_count = F('view_count')+per_video_view)
-        profile_updation = UserProfile.objects.filter(user_id = Topic.objects.get(pk=each_vb.id).user_id).update(own_vb_view_count = F('own_vb_view_count')+per_video_view, view_count = F('view_count')+per_video_view)
-        # FVBseen.objects.create(topic_id = each_vb.id,view_count =per_video_view,created_at=random_datetime(each_vb.date,end_date))
-        update_profile_counter(Topic.objects.get(pk=each_vb.id).user_id,'view_count',per_video_view,True)
-        temp_count-=per_video_view
-    if reamining:
-        Topic.objects.filter(pk=total_video[0].id).update(view_count = F('view_count')+reamining)
-        profile_updation = UserProfile.objects.filter(user_id = Topic.objects.get(pk=total_video[0].id).user_id).update(own_vb_view_count = F('own_vb_view_count')+reamining, view_count = F('view_count')+reamining)
-        # FVBseen.objects.create(topic_id = each_vb[0].id,view_count =reamining,created_at=random_datetime(each_vb.date,end_date))
-        update_profile_counter(Topic.objects.get(pk=total_video[0].id).user_id,'view_count',reamining,True)
+# def provide_fake_view_count(count, total_video,total_video_count, start_date, end_date):
+#     temp_count = count
+#     reamining = int(count%total_video_count)
+#     per_video_view = int(count/total_video_count)
+#     for each_vb in total_video:
+#         Topic.objects.filter(pk=each_vb.id).update(view_count = F('view_count')+per_video_view)
+#         profile_updation = UserProfile.objects.filter(user_id = Topic.objects.get(pk=each_vb.id).user_id).update(own_vb_view_count = F('own_vb_view_count')+per_video_view, view_count = F('view_count')+per_video_view)
+#         # FVBseen.objects.create(topic_id = each_vb.id,view_count =per_video_view,created_at=random_datetime(each_vb.date,end_date))
+#         update_profile_counter(Topic.objects.get(pk=each_vb.id).user_id,'view_count',per_video_view,True)
+#         temp_count-=per_video_view
+#     if reamining:
+#         Topic.objects.filter(pk=total_video[0].id).update(view_count = F('view_count')+reamining)
+#         profile_updation = UserProfile.objects.filter(user_id = Topic.objects.get(pk=total_video[0].id).user_id).update(own_vb_view_count = F('own_vb_view_count')+reamining, view_count = F('view_count')+reamining)
+#         # FVBseen.objects.create(topic_id = each_vb[0].id,view_count =reamining,created_at=random_datetime(each_vb.date,end_date))
+#         update_profile_counter(Topic.objects.get(pk=total_video[0].id).user_id,'view_count',reamining,True)
 
 def create_fvbseen_entry(count, total_video, start_date, end_date):
     temp_count = count
+    status = check_for_count_fix(total_video)
+    if not status:
+        return status
+
+    for each_vb in total_video:
+        print "creating fake entry"
+        real_single_topic_view = VBseen.objects.filter(topic_id = each_vb.id)
+        real_single_topic_view_count = real_single_topic_view.count()
+        if each_vb.view_count > real_single_topic_view_count:
+            fake_counts = each_vb.view_count - real_single_topic_view_count
+            print fake_counts
+            if temp_count > fake_counts:
+                FVBseen.objects.create(topic_id = each_vb.id,view_count =fake_counts,created_at=random_datetime(each_vb.date,end_date))
+                temp_count-=fake_counts
+            elif temp_count and temp_count > 0:
+                FVBseen.objects.create(topic_id = each_vb.id,view_count =temp_count,created_at=random_datetime(each_vb.date,end_date))
+                temp_count-=temp_count
+            elif temp_count == 0  or temp_count < 0:
+                break
+
+    if temp_count > 0:
+        FVBseen.objects.create(topic_id = total_video[0].id,view_count =temp_count,created_at=random_datetime(each_vb.date,end_date))
+    return True
+
+def check_for_count_fix(total_video):
     for each_vb in total_video:
         real_single_topic_view = VBseen.objects.filter(topic_id = each_vb.id)
         real_single_topic_view_count = real_single_topic_view.count()
@@ -211,18 +277,7 @@ def create_fvbseen_entry(count, total_video, start_date, end_date):
         if is_changed:
             each_vb.save()
             return False
-
-    for each_vb in total_video:
-        print "creating fake entry"
-        if each_vb.view_count > real_single_topic_view_count:
-            fake_counts = each_vb.view_count - real_single_topic_view_count
-            print fake_counts
-            FVBseen.objects.create(topic_id = each_vb.id,view_count =fake_counts,created_at=random_datetime(each_vb.date,end_date))
-            temp_count-=fake_counts
-    if temp_count > 0:
-        FVBseen.objects.create(topic_id = total_video[0].id,view_count =count,created_at=random_datetime(each_vb.date,end_date))
     return True
-
 
 def random_datetime(start, end):
     """Generate a random datetime between `start` and `end`"""
@@ -231,15 +286,20 @@ def random_datetime(start, end):
         seconds=random.randint(0, int((end - start).total_seconds())),
     )
 
+def get_old_profile_counter(user_id):
+    my_data = {}
+    userprofile = UserProfile.objects.get(user_id = user_id)
+    my_data['view_count'] = shorcountertopic(userprofile.view_count)
+    my_data['video_count'] = shortcounterprofile(userprofile.vb_count)
+    my_data['follower_count'] = shortcounterprofile(userprofile.follower_count)
+    my_data['follow_count'] = shortcounterprofile(userprofile.follow_count)
+    try:
+        insight_data = InsightDataDump.objects.get(user_id = user_id,for_month=1,for_year=1970)
+    except:
+        insight_data = InsightDataDump.objects.create(user_id = user_id,for_month=1,for_year=1970, old_insight_data = json.dumps(my_data))
+    return my_data
+
 def get_old_user_bolo_info(user_id,month=None,year=None):
-    """
-    post:
-        Required Parameters
-        start_date = request.POST.get('start_date', None)
-        end_date = request.POST.get('end_date',None)
-        month = request.POST.get('month', None)
-        year = request.POST.get('year',None)
-    """
     from drf_spirit.serializers import TopicSerializer
     try:
         start_date = None
@@ -294,7 +354,7 @@ def get_old_user_bolo_info(user_id,month=None,year=None):
         total_like_count = shorcountertopic(total_like_count)
         total_share_count = shorcountertopic(total_share_count)
         video_playtime = short_time(video_playtime)
-        data = {'last_updated':datetime.now(),'total_video_count' : total_video_count, \
+        data = {'total_video_count' : total_video_count, \
                         'monetised_video_count':monetised_video_count, 'total_view_count':total_view_count,'total_comment_count':total_comment_count,\
                         'total_like_count':total_like_count,'total_share_count':total_share_count,'left_for_moderation':left_for_moderation,\
                         'total_earn':total_earn,'video_playtime':video_playtime,'spent_time':spent_time,\
@@ -304,17 +364,17 @@ def get_old_user_bolo_info(user_id,month=None,year=None):
             try:
                 insight_data = InsightDataDump.objects.get(user_id = user_id,for_month=start_date.month,for_year=start_date.year)
             except:
-                insight_data = InsightDataDump.objects.create(user_id = user_id,for_month=start_date.month,for_year=start_date.year, old_insight_data = data)
+                insight_data = InsightDataDump.objects.create(user_id = user_id,for_month=start_date.month,for_year=start_date.year, old_insight_data = json.dumps(data))
         else:
             try:
-                insight_data = InsightDataDump.objects.get_or_create(user_id = user_id,for_month=None,for_year=None)
+                insight_data = InsightDataDump.objects.get(user_id = user_id,for_month=None,for_year=None)
             except:
-                insight_data = InsightDataDump.objects.create(user_id = user_id,for_month=start_date.month,for_year=start_date.year, old_insight_data = data)
+                insight_data = InsightDataDump.objects.create(user_id = user_id,for_month=start_date.month,for_year=start_date.year, old_insight_data = json.dumps(data))
 
         return data
     except Exception as e:
         print e
-        data = {'last_updated':datetime.now(),'total_video_count' : 0, \
+        data = {'total_video_count' : 0, \
                         'monetised_video_count':0, 'total_view_count':'0','total_comment_count':'0',\
                         'total_like_count':'0','total_share_count':'0','left_for_moderation':0,\
                         'total_earn':0,'video_playtime':'0 seconds','spent_time':'0 seconds',\
@@ -324,24 +384,61 @@ def get_old_user_bolo_info(user_id,month=None,year=None):
             try:
                 insight_data = InsightDataDump.objects.get(user_id = user_id,for_month=start_date.month,for_year=start_date.year)
             except:
-                insight_data = InsightDataDump.objects.create(user_id = user_id,for_month=start_date.month,for_year=start_date.year, old_insight_data = data)
+                insight_data = InsightDataDump.objects.create(user_id = user_id,for_month=start_date.month,for_year=start_date.year, old_insight_data = json.dumps(data))
         else:
             try:
-                insight_data = InsightDataDump.objects.get_or_create(user_id = user_id,for_month=None,for_year=None)
+                insight_data = InsightDataDump.objects.get(user_id = user_id,for_month=None,for_year=None)
             except:
-                insight_data = InsightDataDump.objects.create(user_id = user_id,for_month=start_date.month,for_year=start_date.year, old_insight_data = data)
+                insight_data = InsightDataDump.objects.create(user_id = user_id,for_month=start_date.month,for_year=start_date.year, old_insight_data = json.dumps(data))
         return data
 
 
+
+def set_profile_counter(user_id):
+    # calculating follower count
+    real_follower_count = Follower.objects.filter(user_following_id = user_id, is_active = True).distinct('user_follower_id').count()
+    redis_follower_counter = len(get_redis_follower(user_id))
+    if not real_follower_count == redis_follower_counter:
+        delete_redis('bi'+'follower:'+str(user_id))
+        get_redis_follower(user_id)
+
+    # calculating following count
+    real_follow_count = Follower.objects.filter(user_follower_id = user_id, is_active = True).distinct('user_following_id').count()
+    redis_following_counter = len(get_redis_following(user_id))
+    if not real_follow_count == redis_following_counter:
+        delete_redis('bi'+'following:'+str(user_id))
+        get_redis_follower(user_id)
+
+    # calculating view count
+    all_vb = Topic.objects.filter(user_id = user_id , is_vb = True, is_removed = False )
+    all_seen = all_vb.aggregate(Sum('view_count'))
+    if all_seen.has_key('view_count__sum') and all_seen['view_count__sum']:
+        view_count = all_seen['view_count__sum']
+    else:
+        view_count = 0
+
+    #total video
+    video_count = all_vb.count()
+    UserProfile.objects.filter(user_id = user_id).update(**{'follower_count':real_follower_count, 'follow_count': real_follow_count ,'view_count': view_count, 'vb_count':video_count})
+    return {'follower_count':real_follower_count, 'follow_count': real_follow_count ,'view_count': view_count, 'video_count':video_count, 'last_updated': datetime.now()}
+
+
+def get_new_profile_counter(user_id):
+    my_data = {}
+    userprofile = UserProfile.objects.get(user_id = user_id)
+    my_data['view_count'] = shorcountertopic(userprofile.view_count)
+    my_data['video_count'] = shortcounterprofile(userprofile.vb_count)
+    my_data['follower_count'] = shortcounterprofile(userprofile.follower_count)
+    my_data['follow_count'] = shortcounterprofile(userprofile.follow_count)
+    try:
+        insight_data = InsightDataDump.objects.get(user_id = user_id,for_month=1,for_year=1970)
+        insight_data.new_insight_data = json.dumps(my_data)
+        insight_data.save()
+    except:
+        insight_data = InsightDataDump.objects.create(user_id = user_id,for_month=1,for_year=1970, new_insight_data = json.dumps(my_data))
+    return my_data
+
 def get_new_user_bolo_info(user_id,month=None,year=None):
-    """
-    post:
-        Required Parameters
-        start_date = request.POST.get('start_date', None)
-        end_date = request.POST.get('end_date',None)
-        month = request.POST.get('month', None)
-        year = request.POST.get('year',None)
-    """
     from drf_spirit.serializers import TopicSerializer
     try:
         start_date = None
@@ -415,7 +512,7 @@ def get_new_user_bolo_info(user_id,month=None,year=None):
         total_like_count = shorcountertopic(total_like_count)
         total_share_count = shorcountertopic(total_share_count)
         video_playtime = short_time(video_playtime)
-        data = {'last_updated':datetime.now(),'total_video_count' : total_video_count, \
+        data = {'total_video_count' : total_video_count, \
                         'monetised_video_count':monetised_video_count, 'total_view_count':total_view_count,'total_comment_count':total_comment_count,\
                         'total_like_count':total_like_count,'total_share_count':total_share_count,'left_for_moderation':left_for_moderation,\
                         'total_earn':total_earn,'video_playtime':video_playtime,'spent_time':spent_time,\
@@ -423,15 +520,20 @@ def get_new_user_bolo_info(user_id,month=None,year=None):
                         'bolo_score':shortcounterprofile(user.st.bolo_score)}
         if start_date:
             insight_data, is_created = InsightDataDump.objects.get_or_create(user_id = user_id,for_month=start_date.month,for_year=start_date.year)
-            insight_data.new_insight_data = data
+            insight_data.new_insight_data = json.dumps(data)
         else:
             insight_data, is_created = InsightDataDump.objects.get_or_create(user_id = user_id,for_month=None,for_year=None)
-            insight_data.new_insight_data = data
+            insight_data.new_insight_data = json.dumps(data)
         insight_data.save()
+        if start_date and end_date:
+            if datetime.now() > end_date + timedelta(days=2) and not datetime.now().month == start_date.month:
+                insight_obj, is_created = OldMonthInsightData.objects.get_or_create(user_id = user_id , for_month = start_date.month, for_year = start_date.year)
+                insight_obj.insight_data = json.dumps(data)
+                insight_obj.save()
         return data
     except Exception as e:
         print e
-        data =  {'last_updated':datetime.now(),'total_video_count' : 0, \
+        data =  {'total_video_count' : 0, \
                         'monetised_video_count':0, 'total_view_count':'0','total_comment_count':'0',\
                         'total_like_count':'0','total_share_count':'0','left_for_moderation':0,\
                         'total_earn':0,'video_playtime':'0 seconds','spent_time':'0 seconds',\
@@ -449,15 +551,18 @@ def get_new_user_bolo_info(user_id,month=None,year=None):
 def fix_topics_other_count(all_video):
     for each_vb in all_video:
         try:
+            print "inlike"
             fix_like(each_vb)
             pass
         except Exception as e:
             print "in fix like", e
         try:
+            print "inshare"
             check_share(each_vb)
         except Exception as e:
             print "in share check", e
         try:
+            print "incomment"
             check_comment(each_vb)
         except Exception as e:
             print "in comment check", e
@@ -602,6 +707,37 @@ def action_comment(user_id,topic_id):
     # topic.update(last_commented = timezone.now())
     # # userprofile.update(answer_count = F('answer_count')+1)
     # # add_bolo_score(user_id, 'reply_on_topic', comment)
+
+def fix_follower(user_id):
+    each_real_user = UserProfile.objects.get(user_id = user_id)
+    follower_counter = each_real_user.follower_count
+    real_follower_count = Follower.objects.filter(user_following_id = each_real_user.user_id, is_active = True).count()
+    follow_count = each_real_user.follow_count
+    real_follow_count = Follower.objects.filter(user_follower_id = each_real_user.user_id, is_active = True).count()
+    if follower_counter > real_follower_count:
+        required_follower = follower_counter - real_follower_count
+        print required_follower
+        user_ids = UserProfile.objects.filter(is_test_user=True).exclude(user_id__in=get_redis_follower(each_real_user.user_id)).values_list('user_id',flat=True)[:required_follower]
+        for each_user_id in user_ids:
+            status = action_follow(each_user_id, each_real_user.user_id)
+            if status:
+                required_follower-=1
+
+    if not follow_count == real_follow_count  or not follower_counter == real_follower_count:
+        follower_count = Follower.objects.filter(user_following_id = each_real_user.user_id, is_active = True).count()
+        follow_count = Follower.objects.filter(user_follower_id = each_real_user.user_id, is_active = True).count()
+        UserProfile.objects.filter(pk=each_real_user.id).update(follower_count = follower_count,follow_count = follow_count)
+        print "follower_counter: ",follower_counter,"\n","real_follower_count: ",real_follower_count,"\n","follow_count: ",follow_count,"\n","real_follow_count: ",real_follow_count,"\n"
+#follow
+def action_follow(test_user_id,any_user_id):
+    follow,is_created = Follower.objects.get_or_create(user_follower_id = test_user_id,user_following_id=any_user_id)
+    if is_created:
+        userprofile = get_userprofile(test_user_id)
+        userprofile.update(follow_count = F('follow_count')+1)
+        update_redis_follower(any_user_id,test_user_id,True)
+        update_redis_following(test_user_id,any_user_id,True)
+        update_profile_counter(test_user_id,'follow_count',1, True)
+        return True
 
 def get_topic(pk):
     return Topic.objects.filter(pk=pk)

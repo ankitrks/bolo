@@ -193,6 +193,18 @@ class UserPay(RecordTimeStamp):
     def __unicode__(self):
         return str(self.user)
 
+
+
+class OldMonthInsightData(RecordTimeStamp):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='user_insight_data')
+    for_year = models.PositiveIntegerField(_('year'), choices=((r,r) for r in range(2019, datetime.now().year+1)), default=current_year)
+    for_month = models.PositiveIntegerField(_('month'),choices=month_choices,default =previous_month )
+    insight_data = models.TextField(null=True,blank=True)
+
+    def __unicode__(self):
+        return str(self.user)+' - '+str(self.get_for_month_display())+' - '+str(self.get_for_year_display())
+    
+
 class InsightDataDump(RecordTimeStamp):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='insight_dump')
     for_year = models.PositiveIntegerField(_('year'), choices=((r,r) for r in range(2019, datetime.now().year+1)), null=True,blank = True)

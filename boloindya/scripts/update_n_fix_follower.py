@@ -25,22 +25,21 @@ def run():
             print "##############",counter,'/',no_of_elemnts,"#################"
             counter+=1
             follower_counter = each_real_user.follower_count
-            real_follower_count = Follower.objects.filter(user_following_id = each_real_user.user.id, is_active = True).count()
+            real_follower_count = Follower.objects.filter(user_following_id = each_real_user.user_id, is_active = True).count()
             follow_count = each_real_user.follow_count
-            real_follow_count = Follower.objects.filter(user_follower_id = each_real_user.user.id, is_active = True).count()
+            real_follow_count = Follower.objects.filter(user_follower_id = each_real_user.user_id, is_active = True).count()
             if follower_counter > real_follower_count:
                 required_follower = follower_counter - real_follower_count
                 print required_follower
-                user_ids = UserProfile.objects.filter(is_test_user=True).exclude(user_id__in=get_redis_follower(each_real_user.user.id)).values_list('user_id',flat=True)[:required_follower]
-                while(required_follower):
-                    opt_action_user_id = random.choice(user_ids)
-                    status = action_follow(opt_action_user_id, each_real_user.user.id)
+                user_ids = UserProfile.objects.filter(is_test_user=True).exclude(user_id__in=get_redis_follower(each_real_user.user_id)).values_list('user_id',flat=True)[:required_follower]
+                for each_user_id in user_ids:
+                    status = action_follow(each_user_id, each_real_user.user_id)
                     if status:
                         required_follower-=1
 
             if not follow_count == real_follow_count  or not follower_counter == real_follower_count:
-                follower_count = Follower.objects.filter(user_following_id = each_real_user.user.id, is_active = True).count()
-                follow_count = Follower.objects.filter(user_follower_id = each_real_user.user.id, is_active = True).count()
+                follower_count = Follower.objects.filter(user_following_id = each_real_user.user_id, is_active = True).count()
+                follow_count = Follower.objects.filter(user_follower_id = each_real_user.user_id, is_active = True).count()
                 UserProfile.objects.filter(pk=each_real_user.id).update(follower_count = follower_count,follow_count = follow_count)
                 print my_counter
                 print "follower_counter: ",follower_counter,"\n","real_follower_count: ",real_follower_count,"\n","follow_count: ",follow_count,"\n","real_follow_count: ",real_follow_count,"\n"
