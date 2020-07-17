@@ -730,12 +730,11 @@ def search_break_word(term):
 
 def getTopicData(obj):
     try:
-
         topic_ids = []
         data = []
         topic_search = MultiSearch(index='topic-index')
-        topic_search = topic_search.add(Search().from_dict({"query": {"match": {"title": {"query": obj["search_term"], "fuzziness": "AUTO"}}}}))
-        topic_search = topic_search.add(Search().from_dict({"query": {"match": {"slug": {"query": obj["search_term"], "fuzziness": "AUTO"}}}}))
+        topic_search = topic_search.add(Search().from_dict({"query": {"match": {"title": {"query": obj["search_term"], "fuzziness": "AUTO"}}}, 'size': 40}))
+        topic_search = topic_search.add(Search().from_dict({"query": {"match": {"slug": {"query": obj["search_term"], "fuzziness": "AUTO"}}}, 'size': 40}))
         responses_topic = topic_search.execute()
         for hits in responses_topic:
             result_topic = hits.to_dict()
@@ -749,55 +748,59 @@ def getTopicData(obj):
             if obj["is_top"]:
                 data = TopicSerializerwithComment(res_topic,many=True,context={'is_expand':obj["is_expand"],'last_updated':obj["last_updated"]}).data
             else:
+                print('else')
                 data = TopicSerializerwithComment(res_topic,many=True, context = {'is_expand': True, 'last_updated': None}).data
         return data
-    
     except Exception as e:
-
         print(e)
 
 def getHashtagData(obj):
-    hashtag_ids = []
-    data = []
-    hashtag_search = MultiSearch(index='hashtag-index')
-    hashtag_search = hashtag_search.add(Search().from_dict({"query": {"match": {"hash_tag": {"query": obj["search_term"], "fuzziness": "AUTO"}}}}))
-    responses_hashtag = hashtag_search.execute()
-    result_hashtag = responses_hashtag[0].to_dict()
-    if "is_suggestion" in obj:
-        return result_hashtag['hits']['hits'][obj["page"]:obj["page_size"]]
-    hashtag_el = result_hashtag['hits']['hits'][obj["page"]:obj["page_size"]]
-    if hashtag_el:
-        for j in range(len(hashtag_el)):
-            hashtag_ids.append(hashtag_el[j]['_id'])
-        res_hashtag = TongueTwister.objects.filter(pk__in=hashtag_ids)
-        if obj["is_other"]:
-            data = TongueTwisterSerializer(res_hashtag,many=True,context={'language_id':obj["language_id"]}).data
-        else:
-            data = TongueTwisterSerializer(res_hashtag,many=True).data
-    return data
+    try:
+        hashtag_ids = []
+        data = []
+        hashtag_search = MultiSearch(index='hashtag-index')
+        hashtag_search = hashtag_search.add(Search().from_dict({"query": {"match": {"hash_tag": {"query": obj["search_term"], "fuzziness": "AUTO"}}}, "size": 40}))
+        responses_hashtag = hashtag_search.execute()
+        result_hashtag = responses_hashtag[0].to_dict()
+        if "is_suggestion" in obj:
+            return result_hashtag['hits']['hits'][obj["page"]:obj["page_size"]]
+        hashtag_el = result_hashtag['hits']['hits'][obj["page"]:obj["page_size"]]
+        if hashtag_el:
+            for j in range(len(hashtag_el)):
+                hashtag_ids.append(hashtag_el[j]['_id'])
+            res_hashtag = TongueTwister.objects.filter(pk__in=hashtag_ids)
+            if obj["is_other"]:
+                data = TongueTwisterSerializer(res_hashtag,many=True,context={'language_id':obj["language_id"]}).data
+            else:
+                data = TongueTwisterSerializer(res_hashtag,many=True).data
+        return data
+    except Exception as e:
+        print(e)
 
 def getUserProfileData(obj):
-    user_ids = []
-    data = []
-    userprofile_search = MultiSearch(index = 'user-index')
-    userprofile_search = userprofile_search.add(Search().from_dict({"query": {"match": {"name": {"query": obj["search_term"], "fuzziness": "AUTO"}}}}))
-    userprofile_search = userprofile_search.add(Search().from_dict({"query": {"match": {"slug": {"query": obj["search_term"], "fuzziness": "AUTO"}}}}))
-    responses_user = userprofile_search.execute()
-    result_user = responses_user[0].to_dict()
-    if "is_suggestion" in obj:
-        return result_user['hits']['hits'][obj["page"]:obj["page_size"]]
-    userprofile_el = result_user['hits']['hits'][obj["page"]:obj["page_size"]]
-    if userprofile_el:
-        for k in range(len(userprofile_el)):
-            user_ids.append(userprofile_el[k]['_id'])
-        res_userprofile = User.objects.filter(st__pk__in=user_ids)
-        data = UserSerializer(res_userprofile,many=True).data
-    return data
+    try:
+        user_ids = []
+        data = []
+        userprofile_search = MultiSearch(index = 'user-index')
+        userprofile_search = userprofile_search.add(Search().from_dict({"query": {"match": {"name": {"query": obj["search_term"], "fuzziness": "AUTO"}}}, "size": 40}))
+        userprofile_search = userprofile_search.add(Search().from_dict({"query": {"match": {"slug": {"query": obj["search_term"], "fuzziness": "AUTO"}}}, "size": 40}))
+        responses_user = userprofile_search.execute()
+        result_user = responses_user[0].to_dict()
+        if "is_suggestion" in obj:
+            return result_user['hits']['hits'][obj["page"]:obj["page_size"]]
+        userprofile_el = result_user['hits']['hits'][obj["page"]:obj["page_size"]]
+        if userprofile_el:
+            for k in range(len(userprofile_el)):
+                user_ids.append(userprofile_el[k]['_id'])
+            res_userprofile = User.objects.filter(st__pk__in=user_ids)
+            data = UserSerializer(res_userprofile,many=True).data
+        return data
+    except Exception as e:
+        print(e)
 
 class SolrSearchTop(BoloIndyaGenericAPIView):
     def get(self, request):
         try:
-
             response = {}
             is_top = 1
             search_term = self.request.GET.get('term')
@@ -825,47 +828,50 @@ class SolrSearchTop(BoloIndyaGenericAPIView):
             return JsonResponse(response, safe = False)
         
         except Exception as e:
-
-            print(e)
+            return JsonResponse({'message': e}, status=status.HTTP_400_BAD_REQUEST)
 
 def getNextPageNumber(sqs, page, page_size1):
-    if page_size1<len(sqs):
-        next_page_number = page+1
+    if page_size1<=len(sqs):
+        next_page_number = page + 1
     else:
         next_page_number = ''
     return next_page_number
 
 class SolrSearchTopic(BoloIndyaGenericAPIView):
     def get(self, request):
-        response = {}
-        search_term = self.request.GET.get('term')
-        language_id = self.request.GET.get('language_id')
-        page = int(request.GET.get('page',1))
-        page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
-        page_size1 = page_size
-        page = (page-1) * page_size
-        page_size = page + page_size
-        is_expand=self.request.GET.get('is_expand',False)
-        last_updated=timestamp_to_datetime(self.request.GET.get('last_updated',False))
-        if language_id:
-            is_top = 1
-        else:
-            is_top = 0
-            language_id = 1
-        obj = {
-            "search_term": search_term,
-            "language_id": language_id,
-            "last_updated": last_updated,
-            "is_expand": is_expand,
-            "page": page,
-            "page_size": page_size,
-            "is_top": is_top
-        }
-        if search_term:
-            sqs = getTopicData(obj)
-            next_page_number = getNextPageNumber(sqs, page, page_size1)
-            response = {"count": len(sqs), "results": sqs, "next_page_number": next_page_number}
-        return JsonResponse(response, safe = False)
+        try:
+            response = {}
+            search_term = self.request.GET.get('term')
+            language_id = self.request.GET.get('language_id')
+            page = int(request.GET.get('page',1))
+            page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
+            page1 = page
+            page_size1 = page_size
+            page = (page-1) * page_size
+            page_size = page + page_size
+            is_expand=self.request.GET.get('is_expand',False)
+            last_updated=timestamp_to_datetime(self.request.GET.get('last_updated',False))
+            if language_id:
+                is_top = 1
+            else:
+                is_top = 0
+                language_id = 1
+            obj = {
+                "search_term": search_term,
+                "language_id": language_id,
+                "last_updated": last_updated,
+                "is_expand": is_expand,
+                "page": page,
+                "page_size": page_size,
+                "is_top": is_top
+            }
+            if search_term:
+                sqs = getTopicData(obj)
+                next_page_number = getNextPageNumber(sqs, page1, page_size1)
+                response = {"count": len(sqs), "results": sqs, "next_page_number": next_page_number}
+            return JsonResponse(response, safe = False)
+        except Exception as e:
+            return JsonResponse({'message': e}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class SearchTopic(generics.ListCreateAPIView):
@@ -908,26 +914,30 @@ class SearchTopic(generics.ListCreateAPIView):
 
 class SolrSearchHashTag(BoloIndyaGenericAPIView):
     def get(self, request):
-        response = {}
-        search_term = self.request.GET.get('term')
-        page = int(request.GET.get('page',1))
-        language_id = self.request.GET.get('language_id', 1)
-        page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
-        page_size1 = page_size
-        page = (page-1) * page_size
-        page_size = page + page_size
-        obj = {
-            "search_term": search_term,
-            "language_id": language_id,
-            "page": page,
-            "page_size": page_size,
-            "is_other": 1
-        }
-        if search_term:
-            sqs = getHashtagData(obj)
-            next_page_number = getNextPageNumber(sqs, page, page_size1)
-            response = {"count":len(sqs), "results": sqs, "next_page_number": next_page_number}
-        return JsonResponse(response, safe = False) 
+        try:
+            response = {}
+            search_term = self.request.GET.get('term')
+            page = int(request.GET.get('page',1))
+            language_id = self.request.GET.get('language_id', 1)
+            page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
+            page1 = page
+            page_size1 = page_size
+            page = (page-1) * page_size
+            page_size = page + page_size
+            obj = {
+                "search_term": search_term,
+                "language_id": language_id,
+                "page": page,
+                "page_size": page_size,
+                "is_other": 1
+            }
+            if search_term:
+                sqs = getHashtagData(obj)
+                next_page_number = getNextPageNumber(sqs, page1, page_size1)
+                response = {"count":len(sqs), "results": sqs, "next_page_number": next_page_number}
+            return JsonResponse(response, safe = False) 
+        except Exception as e:
+            return JsonResponse({'message': e}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -987,23 +997,27 @@ def GetUserProfile(request):
 
 class SolrSearchUser(BoloIndyaGenericAPIView):
     def get(self, request):
-        response = {}
-        search_term = self.request.GET.get('term')
-        page = int(request.GET.get('page',1))
-        page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
-        page_size1 = page_size
-        page = (page-1) * page_size
-        page_size = page + page_size
-        obj = {
-            "search_term": search_term,
-            "page": page,
-            "page_size": page_size,
-        }
-        if search_term:
-            sqs = getUserProfileData(obj)
-            next_page_number = getNextPageNumber(sqs, page, page_size1)
-            response = {"count": len(sqs), "results": sqs, "next_page_number": next_page_number} 
-            return JsonResponse(response, safe = False)
+        try:
+            response = {}
+            search_term = self.request.GET.get('term')
+            page = int(request.GET.get('page',1))
+            page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
+            page1 = page
+            page_size1 = page_size
+            page = (page-1) * page_size
+            page_size = page + page_size
+            obj = {
+                "search_term": search_term,
+                "page": page,
+                "page_size": page_size,
+            }
+            if search_term:
+                sqs = getUserProfileData(obj)
+                next_page_number = getNextPageNumber(sqs, page1, page_size1)
+                response = {"count": len(sqs), "results": sqs, "next_page_number": next_page_number} 
+                return JsonResponse(response, safe = False)
+        except Exception as e:
+            return JsonResponse({'message': e}, status=status.HTTP_400_BAD_REQUEST)
 
 class SearchUser(generics.ListCreateAPIView):
 
@@ -1037,20 +1051,24 @@ class SearchUser(generics.ListCreateAPIView):
         return users
 
 def get_search_suggestion(request):
-    term = request.GET.get('term',None)
-    sqs = []
-    obj = {
-        "search_term": term,
-        "is_suggestion": 1,
-        "page":0,
-        "page_size": 5
-    }
-    if term:
-        sqs_topic = remove_change_line(getTopicData(obj), 'title')
-        sqs_user = remove_change_line(getUserProfileData(obj), 'name')
-        sqs_hashtag = remove_change_line(getHashtagData(obj), 'hash_tag') 
-        sqs = sqs_topic + sqs_user + sqs_hashtag
-        return JsonResponse({"suggestion": sqs}, safe = False)
+    try:
+        term = request.GET.get('term',None)
+        sqs = []
+        obj = {
+            "search_term": term,
+            "is_suggestion": 1,
+            "page":0,
+            "page_size": 5
+        }
+        if term:
+            sqs_topic = remove_change_line(getTopicData(obj), 'title')
+            sqs_user = remove_change_line(getUserProfileData(obj), 'name')
+            sqs_hashtag = remove_change_line(getHashtagData(obj), 'hash_tag') 
+            sqs = sqs_topic + sqs_user + sqs_hashtag
+            return JsonResponse({"suggestion": sqs}, safe = False)
+    except Exception as e:
+        return JsonResponse({'message': e}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 def remove_change_line(term_list, field):
