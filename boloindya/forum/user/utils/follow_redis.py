@@ -48,7 +48,6 @@ def get_redis_following(user_id):
         set_redis(key,following_list, False)
     len_following_list = len(following_list)
     follow_count = UserProfile.objects.using('default').get(user_id=user_id).follow_count
-    print len_following_list,follow_count
     if not follow_count == len_following_list:
         following_list = list(Follower.objects.filter(user_follower_id=user_id,is_active=True).distinct('user_following_id').values_list('user_following_id',flat=True))
         set_redis(key,following_list, False)

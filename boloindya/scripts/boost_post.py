@@ -170,38 +170,38 @@ def check_like(topic_id,user_ids):
     print number_like,"number_like"
     if user_want_like:
         score = get_weight('liked')
-        if score > 0:
-            vb_like_type = ContentType.objects.get(app_label='forum_topic', model='like')
-            new_vb_like = find_set_diff(user_want_like,already_like,['user_id','topic_id'])
-            if new_vb_like:
-                aList = [Like(**vals) for vals in new_vb_like]
-                newly_created = Like.objects.bulk_create(aList, batch_size=10000)
-                # Topic.objects.filter(pk=topic_id).update(likes_count = F('likes_count')+len(new_vb_like))
-                bolo_increment_user_id = [x['user_id'] for x in new_vb_like]
-                bolo_increment_user = UserProfile.objects.filter(user_id__in = bolo_increment_user_id ).update(bolo_score =F('bolo_score')+score,like_count = F('like_count')+1)
-                already_liked = list(Like.objects.filter(topic_id = topic_id,user_id__in=[d['user_id'] for d in new_vb_like]).values('user_id','id'))
-                for each in already_liked:
-                    each['action_object_id'] = each['id']
-                    del each['id']
-                to_be_created_bolo= already_liked
-                action = get_weight_object('liked')
-                notific_dic = copy.deepcopy(to_be_created_bolo)
+        vb_like_type = ContentType.objects.get(app_label='forum_topic', model='like')
+        new_vb_like = find_set_diff(user_want_like,already_like,['user_id','topic_id'])
+        if new_vb_like:
+            aList = [Like(**vals) for vals in new_vb_like]
+            newly_created = Like.objects.bulk_create(aList, batch_size=10000)
+            Topic.objects.filter(pk=topic_id).update(likes_count = F('likes_count')+len(new_vb_like))
+            bolo_increment_user_id = [x['user_id'] for x in new_vb_like]
+            bolo_increment_user = UserProfile.objects.filter(user_id__in = bolo_increment_user_id ).update(bolo_score =F('bolo_score')+score,like_count = F('like_count')+1)
+            already_liked = list(Like.objects.filter(topic_id = topic_id,user_id__in=[d['user_id'] for d in new_vb_like]).values('user_id','id'))
+            for each in already_liked:
+                each['action_object_id'] = each['id']
+                del each['id']
+            to_be_created_bolo= already_liked
+            action = get_weight_object('liked')
+            notific_dic = copy.deepcopy(to_be_created_bolo)
+            if score > 0:
                 for each_bolo in to_be_created_bolo:
                     each_bolo['action'] = action
                     each_bolo['score'] = score
                     each_bolo['action_object_type'] = vb_like_type
                 aList = [BoloActionHistory(**vals) for vals in to_be_created_bolo]
                 newly_bolo = BoloActionHistory.objects.bulk_create(aList, batch_size=10000)
-                for each in notific_dic:
-                    each['topic_id']=each['action_object_id']
-                    del each['action_object_id']
-                    each['topic_type']=vb_like_type
-                    each['for_user_id']=each_like.user.id
-                    each['notification_type']='5'
-                aList = [Notification(**vals) for vals in notific_dic]
-                notify = Notification.objects.bulk_create(aList)
-                aList=None
-                print "notfic completed"
+            for each in notific_dic:
+                each['topic_id']=each['action_object_id']
+                del each['action_object_id']
+                each['topic_type']=vb_like_type
+                each['for_user_id']=each_like.user.id
+                each['notification_type']='5'
+            aList = [Notification(**vals) for vals in notific_dic]
+            notify = Notification.objects.bulk_create(aList)
+            aList=None
+            print "notfic completed"
 
 
 def check_follower(user_id):
@@ -251,6 +251,7 @@ def check_follower(user_id):
             UserProfile.objects.filter(pk=userprofile.id).update(follower_count=F('follower_count')+total_created,bolo_score=F('bolo_score')+(score*total_created))
             get_redis_following(userprofile.user_id)
             get_redis_follower(userprofile.user_id)
+            update_profile_counter(userprofile.user_id,'follower_count',total_created, True)
     except Exception as e:
         print e
 

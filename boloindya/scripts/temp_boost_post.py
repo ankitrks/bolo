@@ -247,6 +247,7 @@ def check_follower(user_id):
             UserProfile.objects.filter(pk=userprofile.id).update(follower_count=F('follower_count')+total_created,bolo_score=F('bolo_score')+(score*total_created))
             get_redis_following(userprofile.user_id)
             get_redis_follower(userprofile.user_id)
+            update_profile_counter(userprofile.user_id,'follower_count',total_created, True)
     except Exception as e:
         print e
 
