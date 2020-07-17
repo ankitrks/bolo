@@ -155,6 +155,7 @@ def referral_code_update(request):
     except Exception as e:
         status = 'error'
         message = 'Invalid referral code! Please try again.'
+        return JsonResponse({'status' : status, 'message' : message, 'error': str(e)})
     return JsonResponse({'status' : status, 'message' : message})
 
 @login_required
