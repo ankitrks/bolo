@@ -746,8 +746,6 @@ def getTopicData(obj):
             for i in range(len(topic_el)):
                 topic_ids.append(topic_el[i]['_id'])
             res_topic = Topic.objects.filter(pk__in=topic_ids).filter(language_id = obj["language_id"], is_removed = False)
-            # result_page = get_paginated_data(res_topic, int(page_size), int(page))
-            # topics = solr_object_to_db_object(result_page[0].object_list)
             if obj["is_top"]:
                 data = TopicSerializerwithComment(res_topic,many=True,context={'is_expand':obj["is_expand"],'last_updated':obj["last_updated"]}).data
             else:
@@ -762,7 +760,6 @@ def getHashtagData(obj):
     hashtag_ids = []
     data = []
     hashtag_search = MultiSearch(index='hashtag-index')
-    # hashtag_search = hashtag_search[1:5]
     hashtag_search = hashtag_search.add(Search().from_dict({"query": {"match": {"hash_tag": {"query": obj["search_term"], "fuzziness": "AUTO"}}}}))
     responses_hashtag = hashtag_search.execute()
     result_hashtag = responses_hashtag[0].to_dict()
@@ -793,7 +790,6 @@ def getUserProfileData(obj):
     if userprofile_el:
         for k in range(len(userprofile_el)):
             user_ids.append(userprofile_el[k]['_id'])
-        # res_userprofile = UserProfile.objects.filter(pk__in=user_ids)
         res_userprofile = User.objects.filter(st__pk__in=user_ids)
         data = UserSerializer(res_userprofile,many=True).data
     return data
@@ -823,7 +819,6 @@ class SolrSearchTop(BoloIndyaGenericAPIView):
                 "is_other": 0
             }
             if search_term:
-                # response['top_vb'] = getTopicData(search_term, language_id, last_updated, is_expand, page, page_size, is_top)
                 response['top_vb'] = getTopicData(obj)
                 response['top_hash_tag'] = getHashtagData(obj)
                 response["top_user"] = getUserProfileData(obj)
@@ -832,8 +827,6 @@ class SolrSearchTop(BoloIndyaGenericAPIView):
         except Exception as e:
 
             print(e)
-
-
 
 def getNextPageNumber(sqs, page, page_size1):
     if page_size1<len(sqs):
@@ -1042,7 +1035,6 @@ class SearchUser(generics.ListCreateAPIView):
             #users = User.objects.filter(Q(username__icontains = search_term)|Q(reduce(lambda x, y: x | y, [Q(username__icontains=word) \
             #    for word in name_list]))|Q(first_name__icontains = search_term)|Q(last_name__icontains = search_term)|Q(id__in = user_ids)).order_by('-st__question_count')
         return users
-
 
 def get_search_suggestion(request):
     term = request.GET.get('term',None)
