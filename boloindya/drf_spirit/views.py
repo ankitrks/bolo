@@ -1562,6 +1562,7 @@ def provide_view_count(view_count,topic):
         vb_obj = VBseen.objects.create(topic= topic,user_id =each_user_id)
         # UserProfile.objects.filter(user=topic.user).update(view_count=F(view_count)+1,own_vb_view_count = F('own_vb_view_count')+1)
         update_redis_vb_seen(each_user_id,topic.id)
+    FVBseen.objects.create(topic_id = topic.id, view_count = view_count)
 
 @api_view(['POST'])
 def editTopic(request):

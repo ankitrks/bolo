@@ -186,11 +186,25 @@ class UserPay(RecordTimeStamp):
     is_evaluated = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False)
     is_active = models.BooleanField(default = True)
+
     class Meta:
         verbose_name_plural = 'User\'s Pay'
 
     def __unicode__(self):
         return str(self.user)
+
+class InsightDataDump(RecordTimeStamp):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='insight_dump')
+    for_year = models.PositiveIntegerField(_('year'), choices=((r,r) for r in range(2019, datetime.now().year+1)), null=True,blank = True)
+    for_month = models.PositiveIntegerField(_('month'),choices=month_choices,null=True,blank=True )
+    old_insight_data = models.TextField(null=True,blank=True)
+    new_insight_data = models.TextField(null=True,blank=True)
+
+    class Meta:
+        verbose_name_plural = 'InsightDataDump\'s'
+
+    def __unicode__(self):
+        return str(self.user)+' - '+str(self.get_for_month_display())+' - '+str(self.get_for_year_display())
 
 
 

@@ -83,12 +83,14 @@ def run():
             elif each_seen.date +timedelta(hours=21) < now and each_seen.view_count < int(750*multiplication_factor):
                 number_seen = random.randrange(1,int(750*multiplication_factor)-each_seen.view_count)
             else:
-                number_seen = 1
+                number_seen = 0
             i = 0
-            print number_seen
-            Topic.objects.filter(pk=each_seen_id).update(view_count = F('view_count')+number_seen)
-            profile_updation = UserProfile.objects.filter(user_id = Topic.objects.get(pk=each_seen_id).user_id).update(own_vb_view_count = F('own_vb_view_count')+number_seen, view_count = F('view_count')+number_seen)
-            update_profile_counter(Topic.objects.get(pk=each_seen_id).user_id,'view_count',number_seen,True)
+            if number_seen:
+                print number_seen
+                Topic.objects.filter(pk=each_seen_id).update(view_count = F('view_count')+number_seen)
+                FVBseen.objects.create(topic_id = each_seen_id, view_count = number_seen)
+                profile_updation = UserProfile.objects.filter(user_id = Topic.objects.get(pk=each_seen_id).user_id).update(own_vb_view_count = F('own_vb_view_count')+number_seen, view_count = F('view_count')+number_seen)
+                update_profile_counter(Topic.objects.get(pk=each_seen_id).user_id,'view_count',number_seen,True)
             print "after: views updation",datetime.now()
             print "total created: ", number_seen
             print "before: like creation",datetime.now()
@@ -105,65 +107,6 @@ def run():
             pass
 
 
-    test_counter=0
-    for each_topic_id in last_n_days_post_ids:
-        test_counter+=1
-        print test_counter,"/",len(last_n_days_post_ids)
-        action_type =['seen','comment','like','follow','share','comment_like']
-        opt_action = random.choice(action_type)
-        opt_action_user_id = random.choice(user_ids)
-        if opt_action =='comment':
-            print "before: comment creation",datetime.now()
-            # action_comment(opt_action_user_id,each_topic_id)
-            print "after: comment creation",datetime.now()
-        elif opt_action == 'like':
-            each_topic = Topic.objects.get(pk=each_topic_id)
-            if each_topic.likes_count<each_topic.view_count/random.randrange(10,21) and each_topic.likes_count < each_topic.view_count:
-                action_like(opt_action_user_id,each_topic_id)
-        elif opt_action == 'follow':
-            action_follow(opt_action_user_id,Topic.objects.get(pk=each_topic_id).user.id)
-        elif opt_action == 'share':
-            action_share(opt_action_user_id,each_topic_id)
-        # elif opt_action == 'comment_like':
-        #     all_comment_list_id = Comment.objects.filter(is_removed=False).values_list('user_id',flat=True)
-        #     comment_ids = list(all_comment_list_id)
-        #     comment_ids = random.sample(comment_ids,50)
-        #     all_comment = Comment.objects.filter(pk__in =comment_ids)
-        #     for each_comment in all_comment:
-        #         action_comment_like(opt_action_user_id,each_comment)
-        elif opt_action == 'seen':
-            action_seen(opt_action_user_id,each_topic_id)
-
-    print "######## start random action   ###########",datetime.now()
-    random_test_counter=0
-    for each_topic_id in actionable_ids:
-        random_test_counter+=1
-        print random_test_counter,"/",len(actionable_ids)
-        action_type =['seen','comment','like','follow','share','comment_like']
-        opt_action = random.choice(action_type)
-        opt_action_user_id = random.choice(user_ids)
-        if opt_action =='comment':
-            print "before: comment creation",datetime.now()
-            # action_comment(opt_action_user_id,each_topic_id)
-            print "after: comment creation",datetime.now()
-        elif opt_action == 'like':
-            each_topic = Topic.objects.get(pk=each_topic_id)
-            if each_topic.likes_count<each_topic.view_count/random.randrange(10,21) and each_topic.likes_count < each_topic.view_count:
-                action_like(opt_action_user_id,each_topic_id)
-        elif opt_action == 'follow':
-            action_follow(opt_action_user_id,random.choice(User.objects.all()).id)
-        elif opt_action == 'share':
-            action_share(opt_action_user_id,each_topic_id)
-        # elif opt_action == 'comment_like':
-        #     all_comment_list_id = Comment.objects.filter(is_removed=False).values_list('user_id',flat=True)
-        #     comment_ids = list(all_comment_list_id)
-        #     comment_ids = random.sample(comment_ids,50)
-        #     all_comment = Comment.objects.filter(pk__in =comment_ids)
-        #     for each_comment in all_comment:
-        #         action_comment_like(opt_action_user_id,each_comment)
-        elif opt_action == 'seen':
-            action_seen(opt_action_user_id,each_topic_id)
-
     print "End Time Eng_Engagment: ",datetime.now()
 
 
@@ -172,93 +115,58 @@ def check_like(topic_id,user_ids):
     now = datetime.now()
     each_like = Topic.objects.get(pk=topic_id)
     already_like = list(Like.objects.filter(topic_id = topic_id).values('user_id','topic_id'))
+    already_like_user = []
+    for each_like_dict in already_like:
+        already_like_user.append(each_like_dict['user_id'])
     user_want_like=[]
     new_vb_like =[]
     to_be_created_bolo=[]
     notific_dic= []
-    # if each_like.user.st.is_superstar:
-    #     random_counter = int(each_like.view_count*(decimal.Decimal(random.randrange(1300, 2010))/100)/100)
-    #     print "i am superstar: ",random_counter
-    # elif each_like.user.st.is_popular and not each_like.user.st.is_superstar:
-    #     random_counter = int(each_like.view_count*(decimal.Decimal(random.randrange(800, 1210))/100)/100)
-    #     print "i am popular: ",random_counter
-    # elif not each_like.user.st.is_popular and not each_like.user.st.is_superstar:
-    #     random_counter = int(each_like.view_count*(decimal.Decimal(random.randrange(500, 710))/100)/100)
-    #     print "i am normal: ",random_counter
-    # else:
-    #     random_counter = 1
-    #     print "i am non popular: ",random_counter
     number_like = int(int((each_like.vb_playtime/60)/1.5)*decimal.Decimal(random.randrange(30, 50))/100)
     print number_like,"$^#^&$&!$^!$*#$*",each_like.vb_playtime,each_like.id
 
     print number_like,"required_like"
     if number_like:
-        # if each_like.date +timedelta(minutes=10) > now and random_counter > 100 and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(6,random_counter)
-        # elif each_like.date +timedelta(minutes=10) < now and each_like.date +timedelta(minutes=30) > now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(100,random_counter-each_like.likes_count)
-        # elif each_like.date +timedelta(minutes=30) < now and each_like.date +timedelta(hours=2) > now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
-        # elif each_like.date +timedelta(hours=2) < now and each_like.date +timedelta(hours=4) > now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
-        # elif each_like.date +timedelta(hours=4) < now and each_like.date +timedelta(hours=6) > now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
-        # elif each_like.date +timedelta(hours=6) < now and each_like.date +timedelta(hours=8) > now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
-        # elif each_like.date +timedelta(hours=10) < now and each_like.date +timedelta(hours=12) > now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
-        # elif each_like.date +timedelta(hours=12) < now and each_like.date +timedelta(hours=14) > now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
-        # elif each_like.date +timedelta(hours=14) < now and each_like.date +timedelta(hours=16) > now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
-        # elif each_like.date +timedelta(hours=16) < now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
-        # else:
-        #     number_like = 1
-
         i = 0
-        while i < number_like:
-            try:
-                opt_action_user_id = random.choice(user_ids)
-                user_want_like.append({'user_id':opt_action_user_id,'topic_id':topic_id})
-                i += 1
-            except:
-                pass
+        user_ids = list(UserProfile.objects.filter(is_test_user=True).exclude(user_id__in=already_like_user).values_list('user_id',flat=True)[:number_like])
+        i = 0
+        for each_id in user_ids:
+            user_want_like.append({'user_id':each_id,'topic_id':topic_id})
         print number_like,"number_like"
         if user_want_like:
             score = get_weight('liked')
-            if score > 0:
-                vb_like_type = ContentType.objects.get(app_label='forum_topic', model='like')
-                new_vb_like = find_set_diff(user_want_like,already_like,['user_id','topic_id'])
-                if new_vb_like:
-                    aList = [Like(**vals) for vals in new_vb_like]
-                    newly_created = Like.objects.bulk_create(aList, batch_size=10000)
-                    Topic.objects.filter(pk=topic_id).update(likes_count = F('likes_count')+len(new_vb_like))
-                    bolo_increment_user_id = [x['user_id'] for x in new_vb_like]
-                    bolo_increment_user = UserProfile.objects.filter(user_id__in = bolo_increment_user_id ).update(bolo_score =F('bolo_score')+score,like_count = F('like_count')+1)
-                    already_liked = list(Like.objects.filter(topic_id = topic_id,user_id__in=[d['user_id'] for d in new_vb_like]).values('user_id','id'))
-                    for each in already_liked:
-                        each['action_object_id'] = each['id']
-                        del each['id']
-                    to_be_created_bolo= already_liked
+            vb_like_type = ContentType.objects.get(app_label='forum_topic', model='like')
+            new_vb_like = user_want_like
+            if new_vb_like:
+                aList = [Like(**vals) for vals in new_vb_like]
+                newly_created = Like.objects.bulk_create(aList, batch_size=10000)
+                Topic.objects.filter(pk=topic_id).update(likes_count = F('likes_count')+len(new_vb_like))
+                bolo_increment_user_id = [x['user_id'] for x in new_vb_like]
+                bolo_increment_user = UserProfile.objects.filter(user_id__in = bolo_increment_user_id ).update(bolo_score =F('bolo_score')+score,like_count = F('like_count')+1)
+                already_liked = list(Like.objects.filter(topic_id = topic_id,user_id__in=[d['user_id'] for d in new_vb_like]).values('user_id','id'))
+                for each in already_liked:
+                    each['action_object_id'] = each['id']
+                    del each['id']
+                to_be_created_bolo= already_liked
+                notific_dic = copy.deepcopy(to_be_created_bolo)
+                if score > 0:
                     action = get_weight_object('liked')
-                    notific_dic = copy.deepcopy(to_be_created_bolo)
                     for each_bolo in to_be_created_bolo:
                         each_bolo['action'] = action
                         each_bolo['score'] = score
                         each_bolo['action_object_type'] = vb_like_type
                     aList = [BoloActionHistory(**vals) for vals in to_be_created_bolo]
                     newly_bolo = BoloActionHistory.objects.bulk_create(aList, batch_size=10000)
-                    for each in notific_dic:
-                        each['topic_id']=each['action_object_id']
-                        del each['action_object_id']
-                        each['topic_type']=vb_like_type
-                        each['for_user_id']=each_like.user.id
-                        each['notification_type']='5'
-                    aList = [Notification(**vals) for vals in notific_dic]
-                    notify = Notification.objects.bulk_create(aList)
-                    aList=None
-                    print "notfic completed"
+                for each in notific_dic:
+                    each['topic_id']=each['action_object_id']
+                    del each['action_object_id']
+                    each['topic_type']=vb_like_type
+                    each['for_user_id']=each_like.user.id
+                    each['notification_type']='5'
+                aList = [Notification(**vals) for vals in notific_dic]
+                notify = Notification.objects.bulk_create(aList)
+                aList=None
+                print "notfic completed"
 
         share_counter = each_like.total_share_count
         required_share = int(number_like*(random.randrange(500, 700)/100)/100)

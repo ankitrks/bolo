@@ -9,7 +9,7 @@ def run():
     for each_topic in all_topic:
         print "#######################   ",view_counter,"/",total_topic,"      ##########################"
         userprofile = UserProfile.objects.filter(user = each_topic.user)
-        all_vb = Topic.objects.filter(user=each_topic.user, is_vb=True)
+        all_vb = Topic.objects.filter(user=each_topic.user, is_vb=True, is_removed = False)
         all_seen = all_vb.aggregate(Sum('view_count'))
         if all_seen.has_key('view_count__sum') and all_seen['view_count__sum']:
             print 'overall:',all_seen['view_count__sum']

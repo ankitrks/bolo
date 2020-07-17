@@ -51,8 +51,8 @@ def run():
         #     all_comment = Comment.objects.filter(pk__in =comment_ids)
         #     for each_comment in all_comment:
         #         action_comment_like(opt_action_user_id,each_comment)
-        elif opt_action == 'seen':
-            action_seen(opt_action_user_id,each_topic_id)
+        # elif opt_action == 'seen':
+        #     action_seen(opt_action_user_id,each_topic_id)
     print "End Time Eng_Engagment Rnadom: ",datetime.now()
 
 

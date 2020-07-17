@@ -508,6 +508,15 @@ class TopicHistory(RecordTimeStamp):
 class VBseen(UserInfo):
     topic = models.ForeignKey(Topic, related_name='vb_seen',null=True,blank=True)
     created_at=models.DateTimeField(default=datetime.now,blank=False,null=False)
+    
+    def __unicode__(self):
+        return unicode(str(self.topic if self.topic else 'VB'), 'utf-8')
+
+class FVBseen(RecordTimeStamp):
+    topic = models.ForeignKey(Topic, related_name='fvb_seen',null=True,blank=True)
+    created_at=models.DateTimeField(default=datetime.now,blank=False,null=False)
+    view_count = models.PositiveIntegerField(_("view_count"), default=0)
+
     def __unicode__(self):
         return unicode(str(self.topic if self.topic else 'VB'), 'utf-8')
 
@@ -596,6 +605,7 @@ class Like(UserInfo):
     comment = models.ForeignKey('forum_comment.Comment',related_name='like_topic_comment',null=True,blank=True)
     topic = models.ForeignKey(Topic, related_name='like_topic_share',null=True,blank=True)
     like = models.BooleanField(default = True)
+    created_at=models.DateTimeField(default=datetime.now,blank=False,null=False)
 
     def __unicode__(self):
         return str(self.topic if self.topic else self.comment)
