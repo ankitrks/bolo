@@ -1,0 +1,289 @@
+{% extends "jarvis/layout/base.html" %}
+{% block styles %}
+<style>
+    #overlay {
+  position: fixed; /* Sit on top of the page content */
+  display: none; /* Hidden by default */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+  z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
+}
+.percentcomplete{
+    position: absolute;
+    top: 50%;
+    left:50%;
+    color: white;
+    transform: translate(-50%,-50%);
+}
+.video_elements{
+    display: none;
+}
+.selected_image{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+ul {
+    float:left;
+    list-style: none;
+    padding: 0px;
+    border: 1px solid black;
+    margin-top: 0px;
+    width: 100%;
+    max-height: 120px;
+    display: block;
+    overflow-y: scroll;
+    background: white;
+}
+ul li {
+    padding: 2px;
+    cursor: pointer;
+    border-bottom: 1px solid black;
+}
+#response li:hover{
+    background: #1989CD;
+    color: white;
+}
+</style>
+{% endblock styles %}
+{% block content %}
+
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+
+<section class="content">
+    <form id="upload" action="" method="POST" enctype="multipart/form-data" class="form-horizontal">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Campaign Banner Image Upload:</label>
+            <div class="col-md-8">
+                <input type="file" name="media_file" id="banner" required="True" class="form-control" onchange="readURL(this);">
+            </div>
+        </div>
+
+        <div class="form-group">
+                <img id="selected_image" class="selected_image"/>
+        </div>
+
+        <div class="form_group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Set associated hashtag: </label>
+            <div class="col-md-8">
+                <input type="text" name="hashtag_name" placeholder="Search Hashtags" id="search_id">
+                <ul id="response">
+                </ul>
+            </div>
+        </div>    
+
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Active From: </label>
+            <div class="col-md-8">
+                <input type="text" id="start_date" name="start_date" placeholder="Start Date" class="filter_text">
+            </div>
+            
+        </div>
+
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Active Till: </label>
+            <div class="col-md-8">
+                <input type="text" id="end_date" name="end_date" placeholder="End Date" class="filter_text">
+            </div>
+        </div>
+
+        <div class="form-group video_elements">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Bucket</label>
+            <div class="col-md-8">
+                <select name="bucket_name" id="bucket_name" required="True" class="form-control">
+                    <option value="in-boloindya" selected>Boloindya Prod</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
+                <button type="submit" class="btn btn-primary submit_from_button"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Create Campaign </button>
+            </div>
+        </div>
+    </form>
+    <div id="overlay">
+        <div class="text"><br>
+            <br><span style="font-size:50px;" class="percentcomplete"></span></div>
+    </div>
+    <div id="csv_table">
+    </div>
+</section>
+{% endblock content %}
+{% block center_js %}
+<script>
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#selected_image')
+                    .attr('src', e.target.result)
+                    .css({
+                        'width' : '30%',
+                        'height' : '30%'
+                    })
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+var hashtag_id = -1;
+
+function upload(event) {
+
+    // Check if the date are valid
+    if( $('#start_date').val() && $('#end_date').val() ){
+    } else {
+        alert("Please enter both dates");
+        return false;
+    }
+
+    //Check if the hashtag is empty
+    if(!$('#search_id').val() || hashtag_id == -1){
+        alert("Invalid or empty hashtag");
+        return false;
+    }
+
+    if ($('.submit_from_button').hasClass("opened")) {
+        return false;
+    } else {
+        $('.submit_from_button').addClass("opened");
+        event.preventDefault();
+        $('#overlay').show();
+        var data = new FormData($('#upload').get(0));
+        var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+        var all_data = []
+
+        data.append('hashtag_id', hashtag_id);
+
+        $.ajax({
+            xhr: function() {
+                var xhr = new window.XMLHttpRequest();
+                xhr.upload.addEventListener("progress", function(evt) {
+                    if (evt.lengthComputable) {
+                        var percentComplete = evt.loaded / evt.total;
+                        console.log(percentComplete);
+                        $('.percentcomplete').text((percentComplete * 100).toPrecision(4) + ' %');
+                        if (percentComplete === 1) {
+                            $('.percentcomplete').text('Processing');
+                        }
+                    }
+                }, false);
+                xhr.addEventListener("progress", function(evt) {
+                    if (evt.lengthComputable) {
+                        var percentComplete = evt.loaded / evt.total;
+                        console.log(percentComplete);
+                        $('.percentcomplete').text((percentComplete * 100).toPrecision(4) + ' %')
+                    }
+                }, false);
+                return xhr;
+            },
+            url: '/jarvis/add_campaign/',
+            type: 'POST',
+            data: data,
+            cache: false,
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(data) {
+                $('#overlay').hide()
+                $('.submit_from_button').removeClass("opened");
+                if (data.message == 'fail') {
+                    alert(data['reason'])
+                } else if (data.message == 'success') {
+                    $('#start_date').val('')
+                    $('#end_date').val('')
+                    $('#media_file').val('')
+                    $('#selected_image').hide()
+                    alert("uploading done")
+                }
+                $('.submit_from_button').removeClass("opened");
+            },
+            error: function(data) {
+                $('#overlay').hide()
+                $('.submit_from_button').removeClass("opened");
+                console.log(data)
+                alert(data)
+                alert('Consult Tech')
+            },
+
+        });
+        return false;
+    }
+}
+
+
+$(function() {
+    $('#upload').submit(upload);
+});
+</script>
+
+<script>
+    $(function() {
+        $("#start_date").
+            datepicker({
+                format: "dd-mm-yyyy"
+            });
+    });
+    $(function() {
+        $("#end_date").
+            datepicker({
+                format: "dd-mm-yyyy"
+            });
+    });
+
+    var loading = 0;
+    $('#search_id').keyup(function(){
+            var query = $('#search_id').val();
+            
+            if (query.length > 2 && loading == 0) {
+                loading = 1;
+                $('#response').empty();
+                $('#response').append('<li id="loading">Loading ...</li>');
+                $.ajax({
+                    url: '/jarvis/search_fields_for_campaign/',
+                    method: 'POST',
+                    data: JSON.stringify({
+                        'query': query,
+                        'result_type': '0' 
+                    }),
+                    dataType: "json",
+                    contentType: 'application/json',
+                    success: function(data) {
+                        loading = 0;
+                        $('#loading').hide();
+                        $('#response').empty();
+                        if (data.data.length == 0) {
+                            $('#response').append('<li id="no_result">No results found ...</li>');
+                        }
+                        for(var i=0;i<data.data.length;i++) {
+                            $('#response').append('<li onclick="addIdToField(\''+data.data[i].hash_tag+'\', \''+data.data[i].id+'\', this)">#'+data.data[i].hash_tag+'</li>');
+                        }
+                    }
+                })
+            } else {
+                $('#response').empty();
+            }
+    })
+
+    function addIdToField(hashtag, id, title) {
+        clearResponse();
+        hashtag_id = id
+        $('#search_id').val(String(hashtag));
+    }
+
+    function clearResponse() {
+        $('#search_id').val('');
+        $('#response').empty();
+    }
+
+</script>
+
+{% endblock center_js %}

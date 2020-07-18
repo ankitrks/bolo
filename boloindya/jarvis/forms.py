@@ -3,7 +3,7 @@ from django.forms import ModelForm, HiddenInput, FileInput,CharField
 from django import forms
 from forum.topic.models import Topic
 from forum.user.models import UserPay
-from drf_spirit.models import MusicAlbum
+from drf_spirit.models import MusicAlbum, Campaign
 
 class VideoUploadTranscodeForm(ModelForm):
     class Meta():
@@ -47,3 +47,8 @@ class AudioUploadForm(ModelForm):
     class Meta():
         model = MusicAlbum
         fields = ['title','author_name', 'language_id', 'order_no']
+
+class CampaignForm(ModelForm):
+    class Meta():
+        model = Campaign
+        fields = '__all__'
