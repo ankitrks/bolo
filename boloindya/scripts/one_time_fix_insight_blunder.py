@@ -25,8 +25,8 @@ import json
 
 def run():
     counter = 0
-    user_count = UserProfile.objects.all().count()
-    for each_userprofile in UserProfile.objects.all().order_by('user__date_joined','-vb_count').values('user_id','user__username','user__date_joined'):
+    user_count = UserProfile.objects.filter(is_test_user = False).count()
+    for each_userprofile in UserProfile.objects.filter(is_test_user = False).order_by('user__date_joined','-vb_count').values('user_id','user__username','user__date_joined'):
         print "#############################",counter," / ",user_count,"#####################################"
         counter+=1
         print each_userprofile['user__date_joined']
@@ -132,7 +132,8 @@ def fix_active_inactive_view_discrepency(user_id):
         total_view_count_active = all_active_view_count['view_count__sum']
     else:
         total_view_count_active = 0
-    if total_view_count_with_deletd > total_view_count_active:
+    profile_view_count = UserProfile.objects.get(user_id = user_id).view_count
+    if total_view_count_with_deletd > total_view_count_active and not profile_view_count == total_view_count_active:
         discripency = total_view_count_with_deletd - total_view_count_active
         print "discripency",discripency
         start_date = datetime.strptime('01-'+str(datetime.now().month)+'-'+str(datetime.now().year), "%d-%m-%Y")
