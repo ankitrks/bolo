@@ -264,6 +264,7 @@ def create_fvbseen_entry(count, total_video, start_date, end_date):
     return True
 
 def check_for_count_fix(total_video):
+    is_changed = False
     for each_vb in total_video:
         real_single_topic_view = VBseen.objects.filter(topic_id = each_vb.id)
         real_single_topic_view_count = real_single_topic_view.count()
@@ -276,7 +277,8 @@ def check_for_count_fix(total_video):
             is_changed = True
         if is_changed:
             each_vb.save()
-            return False
+    if is_changed:
+        return False
     return True
 
 def random_datetime(start, end):
@@ -370,7 +372,7 @@ def get_old_user_bolo_info(user_id,month=None,year=None):
             try:
                 insight_data = InsightDataDump.objects.get(user_id = user_id,for_month=None,for_year=None)
             except:
-                insight_data = InsightDataDump.objects.create(user_id = user_id,for_month=start_date.month,for_year=start_date.year, old_insight_data = json.dumps(data))
+                insight_data = InsightDataDump.objects.create(user_id = user_id,for_month=None,for_year=None, old_insight_data = json.dumps(data))
 
         return data
     except Exception as e:
@@ -390,7 +392,7 @@ def get_old_user_bolo_info(user_id,month=None,year=None):
             try:
                 insight_data = InsightDataDump.objects.get(user_id = user_id,for_month=None,for_year=None)
             except:
-                insight_data = InsightDataDump.objects.create(user_id = user_id,for_month=start_date.month,for_year=start_date.year, old_insight_data = json.dumps(data))
+                insight_data = InsightDataDump.objects.create(user_id = user_id,for_month=None,for_year=None, old_insight_data = json.dumps(data))
         return data
 
 
@@ -726,9 +728,9 @@ def fix_follower(user_id):
                 required_follower-=1
 
     if not follow_count == real_follow_count  or not follower_counter == real_follower_count:
-        follower_count = Follower.objects.filter(user_following_id = each_real_user.user_id, is_active = True).count()
-        follow_count = Follower.objects.filter(user_follower_id = each_real_user.user_id, is_active = True).count()
-        UserProfile.objects.filter(pk=each_real_user.id).update(follower_count = follower_count,follow_count = follow_count)
+        real_follower_count = Follower.objects.filter(user_following_id = each_real_user.user_id, is_active = True).count()
+        real_follow_count = Follower.objects.filter(user_follower_id = each_real_user.user_id, is_active = True).count()
+        UserProfile.objects.filter(pk=each_real_user.id).update(follower_count = real_follower_count,follow_count = real_follow_count)
         print "follower_counter: ",follower_counter,"\n","real_follower_count: ",real_follower_count,"\n","follow_count: ",follow_count,"\n","real_follow_count: ",real_follow_count,"\n"
 #follow
 def action_follow(test_user_id,any_user_id):
