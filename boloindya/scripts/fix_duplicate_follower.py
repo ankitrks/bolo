@@ -12,12 +12,13 @@ from forum.user.utils.bolo_redis import update_profile_counter
 
 def run():
     duplicate_follower = Follower.objects.filter(is_active = True).values('user_follower_id','user_following_id').annotate(Count('id')).filter(id__count__gt=1)
-    print duplicate_follower
+    length_of_duplicate = len(duplicate_follower)
+    print "total duplicate ocurrence:",length_of_duplicate
     counter = 0
     my_counter = 1
     max_user_required = 10000
     for each_duplicate_follower in duplicate_follower:
-        print "##############",counter,'/',len(duplicate_follower),"#################"
+        print "##############",counter,'/',length_of_duplicate,"#################"
         counter+=1
         print each_duplicate_follower
         single_instance_duplicate = Follower.objects.filter(user_following_id= each_duplicate_follower['user_following_id'], user_follower_id= each_duplicate_follower['user_follower_id'],is_active = True).values_list('pk',flat=True).order_by('id')
@@ -28,9 +29,10 @@ def run():
 
         each_real_user = UserProfile.objects.get(user_id = each_duplicate_follower['user_following_id'])
         follower_counter = each_real_user.follower_count
-        real_follower_count = Follower.objects.filter(user_following_id = each_real_user.user.id, is_active = True).distinct('user_follower_id').count()
+        real_follower_count = Follower.objects.filter(user_following_id = each_real_user.user_id, is_active = True).distinct('user_follower_id').count()
         follow_count = each_real_user.follow_count
-        real_follow_count = Follower.objects.filter(user_follower_id = each_real_user.user.id, is_active = True).distinct('user_following_id').count()
+        real_follow_count = Follower.objects.filter(user_follower_id = each_real_user.user_id, is_active = True).distinct('user_following_id').count()
+        print "Old Counter:  --->","follower_counter: ",follower_counter,"\n","real_follower_count: ",real_follower_count,"\n","follow_count: ",follow_count,"\n","real_follow_count: ",real_follow_count,"\n"
         counter+=1
         if follower_counter > real_follower_count:
             required_follower = follower_counter - real_follower_count
@@ -38,17 +40,17 @@ def run():
             print required_follower
             # while(required_follower):
             #     opt_action_user_id = random.choice(user_ids)
-            #     status = action_follow(opt_action_user_id, each_real_user.user.id)
+            #     status = action_follow(opt_action_user_id, each_real_user.user_id)
             #     if status:
             #         required_follower-=1
             action_follow(each_real_user.user_id,required_follower)
 
         if not follow_count == real_follow_count  or not follower_counter == real_follower_count:
-            real_follower_count = Follower.objects.filter(user_following_id = each_real_user.user.id, is_active = True).count()
-            real_follow_count = Follower.objects.filter(user_follower_id = each_real_user.user.id, is_active = True).count()
+            real_follower_count = Follower.objects.filter(user_following_id = each_real_user.user_id, is_active = True).distinct('user_follower_id').count()
+            real_follow_count = Follower.objects.filter(user_follower_id = each_real_user.user_id, is_active = True).distinct('user_following_id').count()
             UserProfile.objects.filter(pk=each_real_user.id).update(follower_count = real_follower_count,follow_count = real_follow_count)
             print my_counter
-            print "follower_counter: ",follower_counter,"\n","real_follower_count: ",real_follower_count,"\n","follow_count: ",follow_count,"\n","real_follow_count: ",real_follow_count,"\n"
+            print "New Counter:  --->","follower_counter: ",follower_counter,"\n","real_follower_count: ",real_follower_count,"\n","follow_count: ",follow_count,"\n","real_follow_count: ",real_follow_count,"\n"
             my_counter+=1
 
 

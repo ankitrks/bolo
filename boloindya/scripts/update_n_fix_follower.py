@@ -25,9 +25,10 @@ def run():
             print "##############",counter,'/',no_of_elemnts,"#################"
             counter+=1
             follower_counter = each_real_user.follower_count
-            real_follower_count = Follower.objects.filter(user_following_id = each_real_user.user_id, is_active = True).count()
+            real_follower_count = Follower.objects.filter(user_following_id = each_real_user.user_id, is_active = True).distinct('user_follower_id').count()
             follow_count = each_real_user.follow_count
-            real_follow_count = Follower.objects.filter(user_follower_id = each_real_user.user_id, is_active = True).count()
+            real_follow_count = Follower.objects.filter(user_follower_id = each_real_user.user_id, is_active = True).distinct('user_following_id').count()
+            print "Old Counter:  --->","follower_counter: ",follower_counter,"\n","real_follower_count: ",real_follower_count,"\n","follow_count: ",follow_count,"\n","real_follow_count: ",real_follow_count,"\n"
             if follower_counter > real_follower_count:
                 required_follower = follower_counter - real_follower_count
                 print required_follower
@@ -39,11 +40,11 @@ def run():
                 action_follow(each_real_user.user_id,required_follower)
 
             if not follow_count == real_follow_count  or not follower_counter == real_follower_count:
-                real_follower_count = Follower.objects.filter(user_following_id = each_real_user.user_id, is_active = True).count()
-                real_follow_count = Follower.objects.filter(user_follower_id = each_real_user.user_id, is_active = True).count()
+                real_follower_count = Follower.objects.filter(user_following_id = each_real_user.user_id, is_active = True).distinct('user_follower_id').count()
+                real_follow_count = Follower.objects.filter(user_follower_id = each_real_user.user_id, is_active = True).distinct('user_following_id').count()
                 UserProfile.objects.filter(pk=each_real_user.id).update(follower_count = real_follower_count,follow_count = real_follow_count)
                 print my_counter
-                print "follower_counter: ",follower_counter,"\n","real_follower_count: ",real_follower_count,"\n","follow_count: ",follow_count,"\n","real_follow_count: ",real_follow_count,"\n"
+                print "New Counter:  --->","follower_counter: ",follower_counter,"\n","real_follower_count: ",real_follower_count,"\n","follow_count: ",follow_count,"\n","real_follow_count: ",real_follow_count,"\n"
                 my_counter+=1
         print "end time:", datetime.now()
 

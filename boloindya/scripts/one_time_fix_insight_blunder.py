@@ -79,6 +79,7 @@ def run():
         ###
         try:
             fix_follower(each_userprofile['user_id'])
+            # pass
         except Exception as e:
             print "Error in: fix_follower", e
 
@@ -330,7 +331,7 @@ def get_old_user_bolo_info(user_id,month=None,year=None):
             total_video_id = list(total_video.values_list('pk',flat=True))
             all_pay = UserPay.objects.filter( user_id=user.id, is_active=True)
             top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False, user_id=user.id) .order_by('-view_count')[:3]
-            all_play_time = VideoPlaytime.objects.filter(videoid__in = total_video_id).aggregate(Sum('playtime'))
+            all_play_time = VideoPlaytime.objects.filter(video_id__in = total_video_id).aggregate(Sum('playtime'))
             if all_play_time.has_key('playtime__sum') and all_play_time['playtime__sum']:
                 video_playtime = all_play_time['playtime__sum']
            
@@ -341,7 +342,7 @@ def get_old_user_bolo_info(user_id,month=None,year=None):
             all_pay = UserPay.objects.filter( user_id=user.id, is_active=True,for_month__gte=start_date.month,for_month__lte=start_date.month,\
                 for_year__gte=start_date.year,for_year__lte=start_date.year)
             top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False, user_id=user.id, date__gte=start_date, date__lte=end_date).order_by('-view_count')[:3]
-            all_play_time = VideoPlaytime.objects.filter(timestamp__gte=start_date, timestamp__lte=end_date,videoid__in = total_video_id).aggregate(Sum('playtime'))
+            all_play_time = VideoPlaytime.objects.filter(timestamp__gte=start_date, timestamp__lte=end_date,video_id__in = total_video_id).aggregate(Sum('playtime'))
             if all_play_time.has_key('playtime__sum') and all_play_time['playtime__sum']:
                 video_playtime = all_play_time['playtime__sum']                
 
@@ -472,7 +473,7 @@ def get_new_user_bolo_info(user_id,month=None,year=None):
             total_comment_count = Comment.objects.filter(topic_id__in = total_video_id, is_removed = False).count()
             all_pay = UserPay.objects.filter( user_id=user.id, is_active=True)
             top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False, user_id=user.id) .order_by('-view_count')[:3]
-            all_play_time = VideoPlaytime.objects.filter(videoid__in = total_video_id).aggregate(Sum('playtime'))
+            all_play_time = VideoPlaytime.objects.filter(video_id__in = total_video_id).aggregate(Sum('playtime'))
             if all_play_time.has_key('playtime__sum') and all_play_time['playtime__sum']:
                 video_playtime = all_play_time['playtime__sum']
 
@@ -494,7 +495,7 @@ def get_new_user_bolo_info(user_id,month=None,year=None):
             all_pay = UserPay.objects.filter( user_id=user.id, is_active=True,for_month__gte=start_date.month,for_month__lte=start_date.month,\
                 for_year__gte=start_date.year,for_year__lte=start_date.year)
             top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False, user_id=user.id, date__gte=start_date, date__lte=end_date).order_by('-view_count')[:3]
-            all_play_time = VideoPlaytime.objects.filter(timestamp__gte=start_date, timestamp__lte=end_date,videoid__in = total_video_id).aggregate(Sum('playtime'))
+            all_play_time = VideoPlaytime.objects.filter(timestamp__gte=start_date, timestamp__lte=end_date,video_id__in = total_video_id).aggregate(Sum('playtime'))
             if all_play_time.has_key('playtime__sum') and all_play_time['playtime__sum']:
                 video_playtime = all_play_time['playtime__sum'] 
 
@@ -720,33 +721,48 @@ def action_comment(user_id,topic_id):
 def fix_follower(user_id):
     each_real_user = UserProfile.objects.get(user_id = user_id)
     follower_counter = each_real_user.follower_count
-    real_follower_count = Follower.objects.filter(user_following_id = each_real_user.user_id, is_active = True).count()
+    real_follower_count = Follower.objects.filter(user_following_id = each_real_user.user_id, is_active = True).distinct('user_follower_id').count()
     follow_count = each_real_user.follow_count
-    real_follow_count = Follower.objects.filter(user_follower_id = each_real_user.user_id, is_active = True).count()
+    real_follow_count = Follower.objects.filter(user_follower_id = each_real_user.user_id, is_active = True).distinct('user_following_id').count()
     if follower_counter > real_follower_count:
         required_follower = follower_counter - real_follower_count
         print required_follower
-        user_ids = UserProfile.objects.filter(is_test_user=True).exclude(user_id__in=get_redis_follower(each_real_user.user_id)).values_list('user_id',flat=True)[:required_follower]
-        for each_user_id in user_ids:
-            status = action_follow(each_user_id, each_real_user.user_id)
-            if status:
-                required_follower-=1
-
+        # user_ids = UserProfile.objects.filter(is_test_user=True).exclude(user_id__in=get_redis_follower(each_real_user.user_id)).values_list('user_id',flat=True)[:required_follower]
+        # for each_user_id in user_ids:
+        #     status = action_follow(each_user_id, each_real_user.user_id)
+        #     if status:
+        #         required_follower-=1
+        action_follow(each_real_user.user_id,required_follower)
     if not follow_count == real_follow_count  or not follower_counter == real_follower_count:
-        real_follower_count = Follower.objects.filter(user_following_id = each_real_user.user_id, is_active = True).count()
-        real_follow_count = Follower.objects.filter(user_follower_id = each_real_user.user_id, is_active = True).count()
+        real_follower_count = Follower.objects.filter(user_following_id = each_real_user.user_id, is_active = True).distinct('user_follower_id').count()
+        real_follow_count = Follower.objects.filter(user_follower_id = each_real_user.user_id, is_active = True).distinct('user_following_id').count()
         UserProfile.objects.filter(pk=each_real_user.id).update(follower_count = real_follower_count,follow_count = real_follow_count)
         print "follower_counter: ",follower_counter,"\n","real_follower_count: ",real_follower_count,"\n","follow_count: ",follow_count,"\n","real_follow_count: ",real_follow_count,"\n"
 #follow
-def action_follow(test_user_id,any_user_id):
-    follow,is_created = Follower.objects.get_or_create(user_follower_id = test_user_id,user_following_id=any_user_id)
-    if is_created:
-        userprofile = get_userprofile(test_user_id)
-        userprofile.update(follow_count = F('follow_count')+1)
-        update_redis_follower(any_user_id,test_user_id,True)
-        update_redis_following(test_user_id,any_user_id,True)
-        update_profile_counter(test_user_id,'follow_count',1, True)
-        return True
+def action_follow(user_id,no_of_follower):
+    to_be_created_follow = []
+    user_ids = UserProfile.objects.filter(is_test_user=True).exclude(user_id__in=get_redis_follower(user_id)).values_list('user_id',flat=True)[:no_of_follower]
+    for each_user_id in user_ids:
+        my_dict={}
+        my_dict['user_follower_id'] = each_user_id
+        my_dict['user_following_id'] = user_id
+        to_be_created_follow.append(my_dict)
+    total_created=len(to_be_created_follow)
+    aList = [Follower(**vals) for vals in to_be_created_follow]
+    newly_bolo = Follower.objects.bulk_create(aList, batch_size=10000)
+    print "total created",total_created
+    get_redis_following(user_id)
+    get_redis_follower(user_id)
+
+# def action_follow(test_user_id,any_user_id):
+#     follow,is_created = Follower.objects.get_or_create(user_follower_id = test_user_id,user_following_id=any_user_id)
+#     if is_created:
+#         userprofile = get_userprofile(test_user_id)
+#         userprofile.update(follow_count = F('follow_count')+1)
+#         update_redis_follower(any_user_id,test_user_id,True)
+#         update_redis_following(test_user_id,any_user_id,True)
+#         update_profile_counter(test_user_id,'follow_count',1, True)
+#         return True
 
 def get_topic(pk):
     return Topic.objects.filter(pk=pk)

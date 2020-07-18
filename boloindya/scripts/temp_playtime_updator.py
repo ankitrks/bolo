@@ -12,7 +12,7 @@ def run():
         j+=1
         print "start time:", datetime.now()
         for each_vb in Topic.objects.filter(is_vb=True, is_removed = False).order_by('-id')[j*default_batch_size:default_batch_size*(j+1)]:
-            all_play = VideoPlaytime.objects.filter(videoid = each_vb.id)
+            all_play = VideoPlaytime.objects.filter(video_id = each_vb.id)
             all_play_time = all_play.aggregate(Sum('playtime'))
             each_vb = Topic.objects.exclude(is_removed = True).filter(pk=each_vb.id)
             if all_play_time.has_key('playtime__sum') and all_play_time['playtime__sum']:
