@@ -24,7 +24,7 @@ import json
 
 
 def run():
-    for each_userprofile in UserProfile.objects.all().order_by('-vb_count').values('user_id','user__username','user__date_joined')[5:10]:
+    for each_userprofile in UserProfile.objects.all().order_by('-vb_count').values('user_id','user__username','user__date_joined'):
         print "##################################################################"
         print each_userprofile['user__date_joined']
         start_date = each_userprofile['user__date_joined'].date().strftime("%d-%m-%Y")
@@ -139,7 +139,7 @@ def fix_active_inactive_view_discrepency(user_id):
         total_active_video = all_vb.filter(is_removed=False).count()
         total_video = all_vb.filter(is_removed=False)
         reamining = int(temp_count%total_active_video)
-        per_video_view = int(temp_count/total_active_video)
+        per_video_view = int(temp_count-reamining/total_active_video)
         for each_vb in total_video:
             Topic.objects.filter(pk=each_vb.id).update(view_count = F('view_count')+per_video_view)
             profile_updation = UserProfile.objects.filter(user_id = Topic.objects.get(pk=each_vb.id).user_id).update(own_vb_view_count = F('own_vb_view_count')+per_video_view, view_count = F('view_count')+per_video_view)
@@ -224,7 +224,7 @@ def fix_insight_data(user_id,start_date='01-04-2019'):
 # def provide_fake_view_count(count, total_video,total_video_count, start_date, end_date):
 #     temp_count = count
 #     reamining = int(count%total_video_count)
-#     per_video_view = int(count/total_video_count)
+#     per_video_view = int(count-reamining/total_video_count)
 #     for each_vb in total_video:
 #         Topic.objects.filter(pk=each_vb.id).update(view_count = F('view_count')+per_video_view)
 #         profile_updation = UserProfile.objects.filter(user_id = Topic.objects.get(pk=each_vb.id).user_id).update(own_vb_view_count = F('own_vb_view_count')+per_video_view, view_count = F('view_count')+per_video_view)
@@ -289,6 +289,7 @@ def random_datetime(start, end):
 def get_old_profile_counter(user_id):
     my_data = {}
     userprofile = UserProfile.objects.get(user_id = user_id)
+    my_data['data_type'] = 'profile_counter'
     my_data['view_count'] = shorcountertopic(userprofile.view_count)
     my_data['video_count'] = shortcounterprofile(userprofile.vb_count)
     my_data['follower_count'] = shortcounterprofile(userprofile.follower_count)
@@ -419,13 +420,14 @@ def set_profile_counter(user_id):
 
     #total video
     video_count = all_vb.count()
-    UserProfile.objects.filter(user_id = user_id).update(**{'follower_count':real_follower_count, 'follow_count': real_follow_count ,'view_count': view_count, 'vb_count':video_count})
+    UserProfile.objects.filter(user_id = user_id).update(**{'follower_count':real_follower_count, 'follow_count': real_follow_count ,'view_count': view_count, 'vb_count':video_count,'own_vb_view_count':view_count})
     return {'follower_count':real_follower_count, 'follow_count': real_follow_count ,'view_count': view_count, 'video_count':video_count, 'last_updated': datetime.now()}
 
 
 def get_new_profile_counter(user_id):
     my_data = {}
     userprofile = UserProfile.objects.get(user_id = user_id)
+    my_data['data_type'] = 'profile_counter'
     my_data['view_count'] = shorcountertopic(userprofile.view_count)
     my_data['video_count'] = shortcounterprofile(userprofile.vb_count)
     my_data['follower_count'] = shortcounterprofile(userprofile.follower_count)
