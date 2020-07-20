@@ -1,6 +1,6 @@
 from redis_utils import *
 from forum.user.models import VideoPlaytime, UserPay, OldMonthInsightData
-from forum.topic.models import Topic, VBseen, Like, SocialShare
+from forum.topic.models import Topic, VBseen, Like, SocialShare, FVBseen
 from forum.user.models import UserProfile, Follower
 from forum.comment.models import Comment
 from drf_spirit.utils import shorcountertopic, shortcounterprofile, short_time
@@ -250,15 +250,17 @@ def get_profile_counter(user_id):
         get_redis_follower(user_id)
 
     # calculating view count
-    all_vb = Topic.objects.filter(user_id = user_id , is_vb = True, is_removed = False )
-    all_seen = all_vb.aggregate(Sum('view_count'))
-    if all_seen.has_key('view_count__sum') and all_seen['view_count__sum']:
-        view_count = all_seen['view_count__sum']
+    total_video_id = list(Topic.objects.filter(is_vb = True,is_removed=False, user_id=user_id).values_list('pk',flat=True))
+    real_view_count = VBseen.objects.filter(topic_id__in = total_video_id).count()
+    fake_view_count = FVBseen.objects.filter(topic_id__in = total_video_id).aggregate(Sum('view_count'))
+    if fake_view_count.has_key('view_count__sum') and fake_view_count['view_count__sum']:
+        fake_view_count = fake_view_count['view_count__sum']
     else:
-        view_count = 0
-
+        fake_view_count = 0
+    print real_view_count, fake_view_count
+    view_count = real_view_count + fake_view_count
     #total video
-    video_count = all_vb.count()
+    video_count = len(total_video_id)
     return {'follower_count':real_follower_count, 'follow_count': real_follow_count ,'view_count': view_count, 'video_count':video_count, 'last_updated': datetime.now()}
 
 def update_profile_counter(user_id, action, value, add = True):

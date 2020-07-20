@@ -69,6 +69,9 @@ def run():
         except Exception as e:
             print "Error in: fix_insight_data", e
 
+
+        set_profile_counter_data = set_profile_counter(each_userprofile['user_id'])
+        print "updated_profile data", set_profile_counter_data
         ### fix inactive count discripency
         try:
             fix_active_inactive_view_discrepency(each_userprofile['user_id'])
@@ -419,15 +422,18 @@ def set_profile_counter(user_id):
         get_redis_follower(user_id)
 
     # calculating view count
-    all_vb = Topic.objects.filter(user_id = user_id , is_vb = True, is_removed = False )
-    all_seen = all_vb.aggregate(Sum('view_count'))
-    if all_seen.has_key('view_count__sum') and all_seen['view_count__sum']:
-        view_count = all_seen['view_count__sum']
+    total_video_id = list(Topic.objects.filter(is_vb = True,is_removed=False, user_id=user_id).values_list('pk',flat=True))
+    real_view_count = VBseen.objects.filter(topic_id__in = total_video_id).count()
+    fake_view_count = FVBseen.objects.filter(topic_id__in = total_video_id).aggregate(Sum('view_count'))
+    if fake_view_count.has_key('view_count__sum') and fake_view_count['view_count__sum']:
+        fake_view_count = fake_view_count['view_count__sum']
     else:
-        view_count = 0
+        fake_view_count = 0
+    print real_view_count, fake_view_count
+    view_count = real_view_count + fake_view_count
 
     #total video
-    video_count = all_vb.count()
+    video_count = len(total_video_id)
     UserProfile.objects.filter(user_id = user_id).update(**{'follower_count':real_follower_count, 'follow_count': real_follow_count ,'view_count': view_count, 'vb_count':video_count,'own_vb_view_count':view_count})
     return {'follower_count':real_follower_count, 'follow_count': real_follow_count ,'view_count': view_count, 'video_count':video_count, 'last_updated': datetime.now()}
 
