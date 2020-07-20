@@ -65,7 +65,7 @@ def get_redis_data(key, query, page_no):
         if paginated_data and (str(page_no) in paginated_data.keys() or 'remaining' in paginated_data.keys()):
             if str(page_no) in paginated_data.keys():
                 topic_ids = paginated_data[str(page_no)]['id_list']
-                topics = Topic.objects.filter(pk__in = topic_ids, is_removed = False).order_by('-id', '-vb_score')
+                topics = Topic.objects.filter(pk__in = topic_ids, is_removed = False).order_by('-vb_score')
             elif 'remaining' in paginated_data.keys():
                 last_page_no = int(paginated_data['remaining']['last_page'])
                 try:
@@ -80,7 +80,7 @@ def get_redis_data(key, query, page_no):
                 else:
                     topics = []
         else:
-            topics =  query.order_by('-id', '-vb_score')
+            topics =  query.order_by('-vb_score')
             paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
             if paginator.num_pages >= page_no:
                 topics = paginator.page(page_no)
@@ -94,14 +94,14 @@ def get_redis_data(key, query, page_no):
 
 def get_redis_category_paginated_data(language_id, category_id, page_no):
     key = 'cat:'+str(category_id)+':lang:'+str(language_id)
-    query = Topic.objects.filter(is_vb = True, is_removed = False, m2mcategory__id = category_id, language_id = language_id).order_by('-id', '-vb_score')
+    query = Topic.objects.filter(is_vb = True, is_removed = False, m2mcategory__id = category_id, language_id = language_id).order_by('-vb_score')
     return get_redis_data(key, query, page_no)
     
 ## For vb_score sorted filter in single language ##
 
 def get_redis_language_paginated_data(language_id, page_no):
     key = 'lang:'+str(language_id)
-    query = Topic.objects.filter(is_removed = False, is_vb = True, language_id = language_id).order_by('-id', '-vb_score')
+    query = Topic.objects.filter(is_removed = False, is_vb = True, language_id = language_id).order_by('-vb_score')
     return get_redis_data(key, query, page_no)
 
 def get_redis_follow_paginated_data(user_id, page_no):
@@ -113,7 +113,7 @@ def get_redis_follow_paginated_data(user_id, page_no):
         all_seen_vb = get_redis_vb_seen(user_id)
     query = Topic.objects.filter(Q(user_id__in = all_follower)|Q(m2mcategory__id__in = category_follow, \
         language_id = UserProfile.objects.get(user_id = user_id).language), is_vb = True, is_removed = False, is_popular = False)\
-        .exclude(pk__in = all_seen_vb).order_by('-id', '-vb_score')
+        .exclude(pk__in = all_seen_vb).order_by('-vb_score')
     return get_redis_data(key, query, page_no)
 
 def get_popular_paginated_data(user_id, language_id, page_no):
@@ -134,7 +134,7 @@ def update_redis_paginated_data(key, query, cache_max_pages = settings.CACHE_MAX
     page = 1
     final_data = {}
     exclude_ids = []
-    topics_df = pd.DataFrame.from_records(query.order_by('-id', '-vb_score').values('id', 'user_id', 'vb_score'))
+    topics_df = pd.DataFrame.from_records(query.values('id', 'user_id', 'vb_score'))
     if topics_df.empty:
         final_data[page] = {'id_list' : [], 'scores' : []}
     else:
