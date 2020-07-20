@@ -2,13 +2,14 @@
 
 from __future__ import division
 from forum.user.models import AndroidLogs
-#from forum.user.models import DeltaAndroidLogs
+# from forum.user.models import DeltaAndroidLogs
 from forum.user.models import UserProfile
 from forum.topic.models import Topic
 import time
 import datetime
 import pytz
 from datetime import datetime
+from datetime import date 
 import ast
 import csv
 import os
@@ -145,7 +146,7 @@ def extract_minmax_delta(log_text_dump, userid):
 			click_list_sorted=0
 			if 'ClickOnPlay' in v_triplet:
 				if(len(v_triplet['ClickOnPlay'])>0):
-					clickOnTime=v_triplet['ClickOnPlay'];
+					clickOnTime=v_triplet['ClickOnPlay']
 					milliseconds = int(clickOnTime)/1000.0
 					click_list_sorted = datetime.datetime.fromtimestamp(milliseconds).strftime('%Y-%m-%d %H:%M:%S')
 
@@ -230,28 +231,23 @@ def send_file_mail():
 	server = smtplib.SMTP("smtp.gmail.com:587")
 	server.starttls()
 	server.login(username, password)
-	server.sendmail(emailfrom, [emailto, 'ankit@careeranna.com', 'varun@careeranna.com', 'gitesh@careeranna.com' , 'maaz@careeranna.com', 'gaurang.s@boloindya.com', 'akash.u@boloindya.com'], msg.as_string())	
+	server.sendmail(emailfrom, [emailto, 'ankit@careeranna.com', 'varun@careeranna.com', 'gitesh@careeranna.com' , 'maaz@careeranna.com',  'gaurang.s@boloindya.com', 'akash.u@boloindya.com'], msg.as_string())	
 	server.quit()
 
 def main():
 
 	written_records= []
 	curr_dttime = datetime.now()
+
 	if NUMBER_OF_DAYS <7:
-		monday_of_last_week = timezone.now().date() - timedelta(days=NUMBER_OF_DAYS)
-		monday_of_this_week = timezone.now().date()
-	else:
-		some_day_last_week = timezone.now().date() - timedelta(days=NUMBER_OF_DAYS)
-		monday_of_last_week = some_day_last_week - timedelta(days = (some_day_last_week.isocalendar()[2] - 1))
-		monday_of_this_week = monday_of_last_week + timedelta(days = NUMBER_OF_DAYS)
-	# fetch recrods bw last monday and monday of this week
+		curr_time = date.today() 
+		yesterday = curr_time - timedelta(days = 1) 
+		print(curr_time, yesterday, 'current and yesterday')
+		# curr_time = '2020-06-20'
+		# yesterday = '2020-06-19'
 
+	android_logs = AndroidLogs.objects.filter(created_at__gte = yesterday, created_at__lte = curr_time)
 
-	# print some_day_last_week
-	# print monday_of_last_week
-	# print monday_of_this_week
-	android_logs = AndroidLogs.objects.filter(created_at__gte = monday_of_last_week, created_at__lte = monday_of_this_week)
-	
 	for each_android in android_logs:
 		try:
 			each_android_dump = ast.literal_eval(each_android.logs)
@@ -268,4 +264,3 @@ def main():
 
 def run():
 	main()
-
