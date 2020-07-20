@@ -2123,9 +2123,6 @@ def get_user_bolo_info(request):
         for each_pay in all_pay:
             total_earn+=each_pay.amount_pay
         total_video_count = total_video.count()
-        monetised_video_count = total_video.filter(is_monetized = True).count()
-        unmonetizd_video_count= total_video.filter(is_monetized = False,is_moderated = True).count()
-        left_for_moderation = total_video.filter(is_moderated = False).count()
         for each_vb in total_video:
             total_view_count+=each_vb.view_count
             total_like_count+=each_vb.likes_count
@@ -2137,12 +2134,12 @@ def get_user_bolo_info(request):
         total_share_count = shorcountertopic(total_share_count)
         video_playtime = short_time(video_playtime)
         return JsonResponse({'message': 'success', 'total_video_count' : total_video_count, \
-                        'monetised_video_count':monetised_video_count, 'total_view_count':total_view_count,'total_comment_count':total_comment_count,\
-                        'total_like_count':total_like_count,'total_share_count':total_share_count,'left_for_moderation':left_for_moderation,\
+                        'total_view_count':total_view_count,'total_comment_count':total_comment_count,\
+                        'total_like_count':total_like_count,'total_share_count':total_share_count,\
                         'total_earn':total_earn,'video_playtime':video_playtime,'spent_time':spent_time,\
                         'top_3_videos':TopicSerializer(top_3_videos,many=True, \
                             context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),\
-                            'is_expand': request.GET.get('is_expand',True)}).data,'unmonetizd_video_count':unmonetizd_video_count,\
+                            'is_expand': request.GET.get('is_expand',True)}).data,\
                         'bolo_score':shortcounterprofile(request.user.st.bolo_score)}, status=status.HTTP_200_OK)
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\

@@ -165,9 +165,6 @@ def get_user_bolo_info(user_id,month=None,year=None):
         for each_pay in all_pay:
             total_earn+=each_pay.amount_pay
         total_video_count = total_video.count()
-        monetised_video_count = total_video.filter(is_monetized = True).count()
-        unmonetizd_video_count= total_video.filter(is_monetized = False,is_moderated = True).count()
-        left_for_moderation = total_video.filter(is_moderated = False).count()
         for each_vb in total_video:
             total_share_count+=each_vb.total_share_count
 
@@ -177,10 +174,9 @@ def get_user_bolo_info(user_id,month=None,year=None):
         total_share_count = shorcountertopic(total_share_count)
         video_playtime = short_time(video_playtime)
         data = {'total_video_count' : total_video_count, \
-                        'monetised_video_count':monetised_video_count, 'total_view_count':total_view_count,'total_comment_count':total_comment_count,\
-                        'total_like_count':total_like_count,'total_share_count':total_share_count,'left_for_moderation':left_for_moderation,\
+                        'total_view_count':total_view_count,'total_comment_count':total_comment_count,\
+                        'total_like_count':total_like_count,'total_share_count':total_share_count,\
                         'total_earn':total_earn,'video_playtime':video_playtime,'spent_time':spent_time,\
-                        'unmonetizd_video_count':unmonetizd_video_count,\
                         'bolo_score':shortcounterprofile(user.st.bolo_score)}
         if start_date and end_date:
             if datetime.now() > end_date + timedelta(days=2) and not datetime.now().month == start_date.month:
@@ -192,10 +188,9 @@ def get_user_bolo_info(user_id,month=None,year=None):
     except Exception as e:
         print e
         return {'total_video_count' : 0, \
-                        'monetised_video_count':0, 'total_view_count':'0','total_comment_count':'0',\
-                        'total_like_count':'0','total_share_count':'0','left_for_moderation':0,\
+                        'total_view_count':'0','total_comment_count':'0',\
+                        'total_like_count':'0','total_share_count':'0',\
                         'total_earn':0,'video_playtime':'0 seconds','spent_time':'0 seconds',\
-                        'unmonetizd_video_count':0,\
                         'bolo_score':shortcounterprofile(0)}
 
 
