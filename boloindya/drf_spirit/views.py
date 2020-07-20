@@ -785,7 +785,7 @@ class SolrSearchTopic(BoloIndyaGenericAPIView):
         topics      = []
         search_term = self.request.GET.get('term')
         language_id = self.request.GET.get('language_id')
-        page = int(request.GET.get('page',1))
+        page = int(request.GET.get('page')) if request.GET.get('page').strip() else 1
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
         is_expand=self.request.GET.get('is_expand',False)
         last_updated=timestamp_to_datetime(self.request.GET.get('last_updated',False))
