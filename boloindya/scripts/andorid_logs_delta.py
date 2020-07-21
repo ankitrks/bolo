@@ -240,14 +240,14 @@ def main():
 	curr_dttime = datetime.now()
 
 	if NUMBER_OF_DAYS <7:
-		curr_time = date.today() 
-		yesterday = curr_time - timedelta(days = 1) 
-		print(curr_time, yesterday, 'current and yesterday')
-		# curr_time = '2020-06-20'
-		# yesterday = '2020-06-19'
-
-	android_logs = AndroidLogs.objects.filter(created_at__gte = yesterday, created_at__lte = curr_time)
-
+		# curr_time = date.today() 
+		# yesterday = curr_time - timedelta(days = 1) 
+		# print(curr_time, yesterday, 'current and yesterday')
+		today = datetime.today()
+		start_time =  (today - timedelta(days = 1)).replace(hour=0, minute=0, second=0)
+		end_time = (today - timedelta(days = 1)).replace(hour=23, minute=59, second=59)
+	
+	android_logs = AndroidLogs.objects.filter(created_at__gte = start_time, created_at__lte = end_time)
 	for each_android in android_logs:
 		try:
 			each_android_dump = ast.literal_eval(each_android.logs)
