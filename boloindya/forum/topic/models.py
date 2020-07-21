@@ -446,7 +446,7 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
         return 0
 
     def calculate_vb_score(self):
-        from .utils import get_ranking_feature_weight ,get_redis_imp_count
+        from .utils import get_ranking_feature_weight
         score=0
         if self.user.st.is_business:
             score += get_ranking_feature_weight('business_account')
@@ -463,7 +463,7 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
             score += get_ranking_feature_weight('post_popular')
         if not self.is_boosted and self.is_popular:
             score += get_ranking_feature_weight('post_normal')
-        score += get_ranking_feature_weight('topic_play')*(self.imp_count+get_redis_imp_count(self.pk))
+        score += get_ranking_feature_weight('topic_play')*self.imp_count
         score += get_ranking_feature_weight('topic_like')*self.topic_like_count
         score += get_ranking_feature_weight('topic_share')*self.topic_share_count
         post_time = (datetime.now() - self.created_at).total_seconds() #in hrs
