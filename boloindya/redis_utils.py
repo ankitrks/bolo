@@ -38,49 +38,19 @@ def delete_redis(key):
         logger.exception("Error while deleting key from redis " + str(e))
         return None
 
-#for integer
-def set_atomic_numeric_redis(key,value,set_expiry=True):
+def set_atomic_redis(key,value,set_expiry=True):
     with redis_cli.pipeline() as pipe:
         while True:
             try:
                 pipe.watch(key)
-                final_value = get_redis(key)
-                if final_value:
-                    final_value+=value
-                else:
-                    final_value = value
                 pipe.multi()
                 if set_expiry:
-                    pipe.setex("bi:"+key, settings.IMP_COUNT_REDIS_EXPIRY_TIME, json.dumps(final_value, cls=DjangoJSONEncoder))
+                    pipe.setex("bi:"+key, settings.REDIS_EXPIRY_TIME, json.dumps(value, cls=DjangoJSONEncoder))
                 else:
-                    pipe.set("bi:"+key, json.dumps(final_value, cls=DjangoJSONEncoder))
+                    pipe.set("bi:"+key, json.dumps(value, cls=DjangoJSONEncoder))
                 pipe.execute()
                 pipe.unwatch()
                 break
             except Exception as e:
                 print e
                 logger.exception("in set_atomic_redis " + str(e))
-
-#for append
-def set_atomic_list_redis(key,value,set_expiry=True):
-    with redis_cli.pipeline() as pipe:
-        while True:
-            try:
-                pipe.watch(key)
-                final_value = get_redis(key)
-                if final_value:
-                    final_value.append(value)
-                else:
-                    final_value = [value]
-                pipe.multi()
-                if set_expiry:
-                    pipe.setex("bi:"+key, settings.REDIS_EXPIRY_TIME, json.dumps(final_value, cls=DjangoJSONEncoder))
-                else:
-                    pipe.set("bi:"+key, json.dumps(new_value, cls=DjangoJSONEncoder))
-                pipe.execute()
-                pipe.unwatch()
-                break
-            except Exception as e:
-                print e
-                logger.exception("in set_atomic_redis " + str(e))
-

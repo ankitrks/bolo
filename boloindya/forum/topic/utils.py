@@ -276,18 +276,3 @@ def update_redis_fcm_device_entries(dev_id,data_dict):
     set_redis(key, fcm_request_list, False)
 
 
-
-def set_redis_imp_count(topic_id):
-    key = 'imp_count:'+str(datetime.now().date())+':'+str(topic_id)
-    set_atomic_numeric_redis(key,1,True)
-
-
-def get_redis_imp_count(topic_id):
-    key = 'imp_count:'+str(datetime.now().date())+':'+str(topic_id)
-    value = get_redis(key)
-    if value:
-        return value
-    return 0
-
-
-
