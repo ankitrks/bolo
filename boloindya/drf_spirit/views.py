@@ -54,7 +54,7 @@ from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs,UserPa
 from jarvis.models import FCMDevice,StateDistrictLanguage, BannerUser, Report
 from forum.topic.models import Topic,TopicHistory, ShareTopic, Like, SocialShare, Notification, CricketMatch, Poll, Choice, Voting, \
     Leaderboard, VBseen, TongueTwister, HashtagViewCounter
-from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
+from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen , set_redis_imp_count
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following, get_redis_android_id, set_redis_android_id
 from forum.user.utils.bolo_redis import get_bolo_info_combined
 from .serializers import *
@@ -3201,6 +3201,7 @@ def vb_seen(request):
         if topic_id and request.user.is_authenticated:
             update_redis_vb_seen_entries(topic_id,request.user.id,datetime.now())
             update_redis_vb_seen(request.user.id,topic_id)
+            set_redis_imp_count(topic_id)
         return JsonResponse({'message': 'vb seen'}, status=status.HTTP_200_OK)
 
     except Exception as e:
