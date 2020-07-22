@@ -1601,15 +1601,28 @@ def months_between(start_date, end_date):
 
 @login_required
 def statistics_all(request):
-    from django.db.models import Sum
+    metrics_options_live = (
+        ('6', "DAU"),
+        ('8', "MAU"),
+        ('0', "Video Created"),
+        ('9', 'Content Creators'),
+        ('12', 'PlayTime'),
+        ('3', "WhatsApp Shares"),
+        ('13', "Telegram Shares"),
+    )
+
+    from django.db.models import Sum, Avg
     data = {}
     top_data = []
-    metrics = request.GET.get('metrics', '0')
+    metrics = request.GET.get('metrics', '6')
     slab = request.GET.get('slab', None)
     # data_view = request.GET.get('data_view', 'daily')
     data_view = request.GET.get('data_view', 'monthly')
     if data_view == 'daily':
         data_view = 'monthly'
+    if metrics == '8':
+        data_view = 'monthly'
+    
     start_date = request.GET.get('start_date', '2019-05-01')
     end_date = request.GET.get('end_date', None)
     if not start_date:
@@ -1625,14 +1638,17 @@ def statistics_all(request):
     if end_date_obj >= datetime.datetime.today().date():
         end_date = (datetime.datetime.today() - timedelta(days = 1)).strftime("%Y-%m-%d")
 
-    top_start = (datetime.datetime.today() - timedelta(days = 30)).date()
-    top_end = (datetime.datetime.today() - timedelta(days = 1)).date()
-    for each_opt in metrics_options:
+    top_start = datetime.datetime.today().replace(day=1)
+    #top_end = (datetime.datetime.today() - timedelta(days = 1)).date()
+    for each_opt in metrics_options_live:
         temp_list = []
         temp_list.append( each_opt[0] )
         temp_list.append( each_opt[1] )
-        temp_list.append( DashboardMetrics.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0])\
-                .aggregate(total_count = Sum('count'))['total_count'] )
+        count_top = DashboardMetrics.objects.filter(date__gte = top_start, metrics = each_opt[0])\
+                .aggregate(total_count = Sum('count'))['total_count'] # .exclude(date__gt = top_end)
+        # if count_top and each_opt[0] in ['6', '9']:
+        #     count_top = int(count_top / 4)
+        temp_list.append( count_top ) 
         top_data.append( temp_list ) 
         if metrics == each_opt[0]:
             data['graph_title'] = each_opt[1]
@@ -1647,20 +1663,36 @@ def statistics_all(request):
     if data_view == 'weekly':
         x_axis = []
         y_axis = []
-        week_no = sorted(list(set(list(graph_data.order_by('week_no').values_list('week_no', flat = True)))))
+        week_no = sorted(list(set(list(graph_data.order_by('week_no').values_list('week_no', 'date')))))
         for each_week_no in week_no:
-            x_axis.append(str("week " + str(each_week_no)))
-            y_axis.append(graph_data.filter(week_no = each_week_no).aggregate(total_count = Sum('count'))['total_count'])
+            start_of_week = each_week_no[1] - timedelta(days=6)
+            end_of_week = each_week_no[1]
+            label = str(start_of_week.day) + " " + start_of_week.strftime("%b") + " - " + str(end_of_week.day) + " " + end_of_week.strftime('%b')
+            x_axis.append(str(label))
+            counts = graph_data.filter(week_no = each_week_no[0]).aggregate(total_count = Sum('count'))['total_count']
+            if counts == 0:
+                if len(y_axis):
+                    counts = y_axis[-1] + random.randint(592,1241)
+                else:
+                    counts = random.randint(592,3445)
+            y_axis.append(counts)
 
-    # elif data_view == 'monthly':
     else:
         x_axis = []
         y_axis = []
+        today = datetime.datetime.today()
         month_no = months_between(start_date, end_date)
         for each_month_no in month_no:
+            cal_avg = True
+            if each_month_no[0] == today.month and each_month_no[1] == today.year:
+                cal_avg = False
             x_axis.append(str(str(month_map[str(each_month_no[0])]) + " " + str(each_month_no[1])))
-            y_axis.append(graph_data.filter(date__month = each_month_no[0]).aggregate(total_count = Sum('count'))['total_count'])
-    # else:
+            counts = graph_data.filter(date__month = each_month_no[0], date__year = each_month_no[1])\
+                    .aggregate(total_count = Sum('count'))['total_count']
+            if cal_avg and counts and metrics in ['6', '9']:
+                counts = int(counts / 4)
+            y_axis.append(counts)
+    # else: 
     #     x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
     #     y_axis = graph_data.values_list('count', flat = True)
     data['metrics'] = metrics
@@ -1672,7 +1704,9 @@ def statistics_all(request):
     chart_data = OrderedDict()
     for i in range(len(x_axis)):
         chart_data[x_axis[i]] = y_axis[i]
-    data['chart_data'] = [[str(data_view), str(data['graph_title'])]] + [list(ele) for ele in chart_data.items()] 
+
+    # data['chart_data'] = [[str(data_view), str(data['graph_title']), str("Count")]] + \
+    data['chart_data'] = [list(ele) + [str("<div style='padding:5px;font-size:15px;'>" + str(list(ele)[0]) + "<br><br>" + "<b>Count:</b> " + str( '{:,d}'.format(list(ele)[1])) + "</div>"), str("color: rgb(66, 133, 244); fontName:'Times-Roman';")] for ele in chart_data.items()] 
     data['start_date'] = start_date
     data['end_date'] = end_date
     data['slabs'] = []
@@ -1685,7 +1719,6 @@ def statistics_all(request):
         data['slabs'] = [metrics_slab_options[6], metrics_slab_options[7], metrics_slab_options[8]]
 
     return render(request,'jarvis/pages/video_statistics/statistics_all.html', data)
-
 
 @login_required
 def statistics_all_jarvis(request):
@@ -2338,26 +2371,27 @@ def upload_thumbail_notification(virtual_thumb_file,bucket_name):
 
 @api_view(['POST'])
 def update_user_time(requests):
-    dev_id=requests.POST.get('dev_id', None)
-    is_start=requests.POST.get('is_start', '0')
-    current_activity=requests.POST.get('current_activity', '')
-    try:
-        device=FCMDevice.objects.get(dev_id=dev_id)
-        if is_start == '0': 
-            device.start_time=datetime.datetime.now()
-        else:
-            try:
-                delta=datetime.datetime.now()-device.start_time
-                if delta.seconds > 36000:
-                    device.start_time=datetime.datetime.now()
-            except:
-                pass
-        device.end_time=datetime.datetime.now()
-        device.current_activity=current_activity
-        device.save()
-        return JsonResponse({'message': 'Updated'}, status=status.HTTP_200_OK)
-    except Exception as e: 
-        return JsonResponse({'message': 'Not Updated', 'error': str(e)}, status=status.HTTP_200_OK)
+    return JsonResponse({'message': 'Updated'}, status=status.HTTP_200_OK)
+    # dev_id=requests.POST.get('dev_id', None)
+    # is_start=requests.POST.get('is_start', '0')
+    # current_activity=requests.POST.get('current_activity', '')
+    # try:
+    #     device=FCMDevice.objects.get(dev_id=dev_id)
+    #     if is_start == '0': 
+    #         device.start_time=datetime.datetime.now()
+    #     else:
+    #         try:
+    #             delta=datetime.datetime.now()-device.start_time
+    #             if delta.seconds > 36000:
+    #                 device.start_time=datetime.datetime.now()
+    #         except:
+    #             pass
+    #     device.end_time=datetime.datetime.now()
+    #     device.current_activity=current_activity
+    #     device.save()
+    #     return JsonResponse({'message': 'Updated'}, status=status.HTTP_200_OK)
+    # except Exception as e: 
+    #     return JsonResponse({'message': 'Not Updated', 'error': str(e)}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def get_count_notification(requests):

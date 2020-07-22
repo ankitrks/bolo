@@ -39,6 +39,12 @@
             }
             .left_panel{}
             .right_panel{width:90%;margin-left: 5%;}
+            .graph_table{width: 40%;font-family: monospace;font-size: 13px;border-collapse: collapse;margin-left: 30%;}
+            .graph_table th, .graph_table td {border: 1px solid black;padding: 5px;text-align: center;}
+            .graph_table th{background: rgb(66, 133, 244);;}
+            .graph_table tr:nth-child(even) {background: lightgrey;}
+            .graph_table tr:nth-child(odd) {background: #FFF}
+
         </style>
         <script>
             function process_filter(f_val){
@@ -99,17 +105,16 @@
             </span><br>
         </div><br><br><br>
         {% for each_data in top_data %}
-            <div class="top_box" {% if metrics == each_data.0  %}style="background:bisque;"{% endif %}>
-                <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
+            <div class="top_box" {% if metrics == each_data.0 %} style="background:bisque;"{% endif %}>
+                <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* current month</i></span>
                 <a href="?metrics={{ each_data.0 }}" class="filter_apply"><h6 style="color: #333">{{ each_data.1 }}</h6><h5 style="color: #b52828">{{ each_data.2|intcomma }}</h5></a>
-
             </div>
         {% endfor %}
         <div class="right_panel">
             <br><br>Start date &nbsp;&nbsp; <input type="text" id="start_date" name="start_date" placeholder="Start Date" class="filter_text" value="{{ start_date }}">
             &nbsp;&nbsp; End date&nbsp;&nbsp;&nbsp; <input type="text" id="end_date" name="end_date" placeholder="End Date" class="filter_text" value="{{ end_date }}">&nbsp;&nbsp;&nbsp;
             <!-- <a href="?data_view=daily" class="filter_apply">daily</a> &nbsp;&nbsp;|&nbsp;&nbsp; -->
-            <a href="?data_view=weekly" class="filter_apply btn" {% if data_view == "weekly"  %}style="background:bisque;"{% endif %}>weekly</a>
+            {% if metrics != '8' %}<a href="?data_view=weekly" class="filter_apply btn" {% if data_view == "weekly"  %}style="background:bisque;"{% endif %}>weekly</a>{% endif %}
             <a href="?data_view=monthly" class="filter_apply btn" {% if data_view == "monthly"  %}style="background:bisque;"{% endif %}>monthly</a><br>
             {% if slabs %}
                 <br>Data Slabs&nbsp;&nbsp;
@@ -117,52 +122,82 @@
                     <a href="?slab={{ each_slab.0 }}" class="filter_apply" {% if slab == each_slab.0  %}style="text-decoration: underline;font-weight: bold;color: burlywood;"{% endif %}>{{ each_slab.1 }}</a>{% if not forloop.last %} &nbsp;&nbsp;|&nbsp;&nbsp;{% endif %}
                 {% endfor %}
             {% endif %}
-            <br><div id="myDiv" style="width: 100%; height: 450px;"></div>
+            <br><div id="myDiv" style="width: 100%; height: 450px;"></div><br><br>
+            {% if data_view == 'monthly' %}
+                <div style="text-align: center;">
+                    <h6>Table View</h6>
+                    <table class="graph_table" cellpadding="1" cellspacing="1">
+                        <thead>
+                            <tr>
+                                <th>S. No</th>
+                                <th>Duration</th>
+                                <th>Count</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            {% endif %}
         </div>
         <script type="text/javascript">
-            // var trace1 = {
-            //     x: {{ x_axis|safe }},
-            //     y: {{ y_axis|safe }},
-            //     text: {{ x_axis|safe }},
-            //     type: 'bar',
-            //     marker: {
-            //         // color: '#b52828', // 'rgb(142,124,195)'
-            //     }
-            // };
-            // var data = [trace1];
-            // var layout = {
-            //     title: "{{ graph_title }}",
-            //     font:{
-            //         family: 'Raleway, sans-serif'
-            //     },
-            //     showlegend: false,
-            //     xaxis: {
-            //         tickangle: -45
-            //     },
-            //     yaxis: {
-            //         zeroline: false,
-            //         gridwidth: 2
-            //     },
-            //     bargap :0.05
-            // };
-            // Plotly.newPlot('myDiv', data, layout);
-
             var chart_data = {{ chart_data|safe }};
-            google.charts.load('current', {'packages':['bar']});
+            var metrics = "{{ metrics }}";
+            var data_view = "{{ data_view }}";
+            google.charts.load('current', {'packages':['corechart']}); // 'bar / corechart'
             google.charts.setOnLoadCallback(drawChart);
             function drawChart() {
-                var data = google.visualization.arrayToDataTable(chart_data);
+                // var data = google.visualization.arrayToDataTable(chart_data);
+                var data = new google.visualization.DataTable();
+                data.addColumn("string", "Week");
+                data.addColumn("number", "Count");
+                data.addColumn({type: "string", role: "tooltip", p: {html: true} });
+                data.addColumn({ role: 'style' });
+                data.addRows(chart_data)
+                console.log(chart_data)
+
                 var options = {
                   chart: {
                     title: "{{ graph_title }}",
-                    // subtitle: 'Sales, Expenses, and Profit: 2014-2017',
                   },
+                  annotations: {
+                    textStyle: {
+                      fontName: 'Times-Roman',
+                      fontSize: 18,
+                      bold: true,
+                      italic: true,
+                      // The color of the text.
+                      color: '#871b47',
+                      // The color of the text outline.
+                      auraColor: '#d799ae',
+                      // The transparency of the text.
+                      opacity: 0.8
+                    },
+                  },
+                  tooltip: {isHtml: true},
+                  legend: 'none',
+                  colors: ['red','green'],
+                  is3D:true,
                   // bars: 'horizontal' // Required for Material Bar Charts.
                 };
 
-                var chart = new google.charts.Bar(document.getElementById('myDiv'));
-                chart.draw(data, google.charts.Bar.convertOptions(options));
+                // var chart = new google.charts.Bar(document.getElementById('myDiv'));
+                // chart.draw(data, google.charts.Bar.convertOptions(options));
+                if(data_view == 'weekly'){
+                    var chart = new google.visualization.LineChart(document.getElementById('myDiv'));
+                }
+                else{
+                    var chart = new google.visualization.ColumnChart(document.getElementById('myDiv'));
+                }
+                chart.draw(data, options);
             }
+
+            if(data_view == 'monthly'){
+                $.each(chart_data, function(i ,each_rec){
+                    var tr_str = '<tr><td>' + (i +1) + '</td><td>' + each_rec[0] + '</td><td>' + each_rec[1].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</td></tr>'
+                    $('.graph_table').find('tbody').append(tr_str);
+                });
+            }
+
         </script>
     </body>
 </html>

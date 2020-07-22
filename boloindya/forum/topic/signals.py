@@ -4,7 +4,7 @@ from forum.comment.models import Comment
 from forum.user.models import Follower
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from tasks import create_topic_notification, create_comment_notification, create_hash_view_count, create_thumbnail_cloudfront
+from tasks import * # create_topic_notification, create_comment_notification, create_hash_view_count, create_thumbnail_cloudfront
 from django.dispatch import Signal
 post_update = Signal()
 from forum.user.utils.follow_redis import get_redis_following

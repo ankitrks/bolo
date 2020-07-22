@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from django.contrib.auth.models import User
 from django.db.models import Sum
 import calendar
+from forum.user.models import ReferralCode
 
 n = 30
 
@@ -68,6 +69,18 @@ def get_lifetime_bolo_info(user_id):
         set_redis(key,bolo_info, True)
     return bolo_info
 
+def get_referral_code_info(ref_code):
+    key = "refcode:" + str(ref_code)
+    referral_info = get_redis(key)
+    if not referral_info:
+        code_obj = ReferralCode.objects.using('default').get(code__iexact = ref_code, is_active = True)
+        data = {"ref_code_id":code_obj.id, "is_active":code_obj.is_active}
+        set_redis(key, data, False)
+        return code_obj.id
+    elif referral_info['is_active']:
+        return referral_info['ref_code_id']
+    else:
+        return None
 
 def get_user_bolo_info(user_id,month=None,year=None):
     """

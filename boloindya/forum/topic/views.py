@@ -57,7 +57,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from .emails import send_job_request_mail
-from drf_spirit.views import deafult_boloindya_follow
+from drf_spirit.views import * # deafult_boloindya_follow
 from drf_spirit.views import get_tokens_for_user
 from rest_framework.decorators import api_view
 from rest_framework import status
@@ -1380,7 +1380,7 @@ def share_match_page(request, match_id, slug):
 
 # Share Pages Match 
 def share_challenge_page(request, hashtag):
-    challenge = TongueTwister.objects.get(hash_tag = hashtag)
+    challenge = TongueTwister.objects.using('default').get(hash_tag = hashtag)
     context = {
     'challenge': challenge,
     }

@@ -236,7 +236,7 @@ class AndroidLogs(RecordTimeStamp):
     log_type = models.CharField(_("Log Type"),null=True,blank=True,max_length=255)
     is_executed = models.BooleanField(_("is_executed"), default=False)
     android_id = models.CharField(_("android_id"), max_length=100, blank=True, null = True, editable = False)
-
+    created_at = models.DateTimeField(_("created_at"), auto_now_add = False, auto_now = False, default = datetime.now)
     def __unicode__(self):
         return str(self.user)
 
@@ -293,7 +293,7 @@ class AppPageContent(RecordTimeStamp):
         return str(self.page_name)
 
 class ReferralCode(RecordTimeStamp):
-    code = models.CharField(_("Ref Code"), max_length=20, blank=True)
+    code = models.CharField(_("Ref Code"), max_length=20, blank=True, db_index = True)
     for_user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, editable = False)
     purpose = models.CharField(_("Purpose"), max_length=50, blank=True)
     campaign_url = models.CharField(_("Playstore URL"), max_length=350, blank=True, null = True, editable = False)
@@ -353,7 +353,7 @@ class UserPhoneBook(RecordTimeStamp):
 
 class Contact(RecordTimeStamp):
     contact_name = models.CharField(_("Contact Name"), max_length=100, blank=True, null = True)
-    contact_number = models.CharField(_("Contact Number"), max_length=50, blank=True, null = True)
+    contact_number = models.CharField(_("Contact Number"), max_length=50, blank=True, null = True, db_index = True)
     contact_email = models.CharField(_("Contact Email"), max_length=200, blank=True, null = True)
     is_user_registered = models.BooleanField(default=False)
     user =  models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("User"),editable=False,null=True,blank=True)

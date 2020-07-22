@@ -551,7 +551,8 @@ class UserSerializer(ModelSerializer):
         #fields = '__all__'
         exclude = ('password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login')
     def get_userprofile(self,instance):
-        return UserProfileSerializer(UserProfile.objects.get(user=instance)).data
+        if instance.is_authenticated():
+            return UserProfileSerializer(UserProfile.objects.get(user=instance)).data
 
 class BasicUserSerializer(ModelSerializer):
     name = SerializerMethodField()

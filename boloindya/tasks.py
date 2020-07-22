@@ -175,7 +175,7 @@ def create_downloaded_url(topic_id):
     from forum.topic.models import Topic
     video_byte = Topic.objects.get(pk=topic_id)
     try:
-        print "start time:  ",datetime.now()
+        # print "start time: ", datetime.now()
         filename_temp = "temp_"+video_byte.backup_url.split('/')[-1]
         filename = video_byte.backup_url.split('/')[-1]
         cmd = ['ffmpeg','-i', video_byte.backup_url, '-vf',"[in]scale=540:-1,drawtext=text='@"+video_byte.user.username+"':x=10:y=H-th-20:fontsize=18:fontcolor=white[out]",settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename_temp]
@@ -189,8 +189,8 @@ def create_downloaded_url(topic_id):
         if os.path.exists(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename):
             os.remove(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename_temp)
             os.remove(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename)
-        print "bye"
-        print "End time:  ",datetime.now()
+        # print "bye"
+        # print "End time:  ",datetime.now()
     except Exception as e:
         try:
             os.remove(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename_temp)
@@ -200,7 +200,7 @@ def create_downloaded_url(topic_id):
             os.remove(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename)
         except:
             pass
-        print e
+        # print e
 
 @app.task
 def sync_contacts_with_user(user_id):
@@ -260,7 +260,7 @@ def create_topic_notification(created,instance_id):
                 notify = Notification.objects.create(for_user_id = each,topic = instance,notification_type='1',user = instance.user)
         instance.calculate_vb_score()
     except Exception as e:
-        print e
+        # print e
         pass
 
 @app.task
@@ -281,7 +281,7 @@ def create_comment_notification(created,instance_id):
             if not instance.topic.user == instance.user:
                 notify_owner = Notification.objects.create(for_user = instance.topic.user ,topic = instance,notification_type='3',user = instance.user)
     except Exception as e:
-        print e
+        # print e
         pass
 
 from HTMLParser import HTMLParser
@@ -313,7 +313,7 @@ def get_mentions_and_send_notification(comment_obj):
                 if not user == comment_obj.user:
                     notify_mention = Notification.objects.create(for_user = user  ,topic = comment_obj,notification_type='10',user = comment_obj.user)
             except Exception as e:
-                print e
+                # print e
                 pass
     return user_ids
  
@@ -328,14 +328,15 @@ def create_hash_view_count(create,instance_id):
             language_specific_seen = language_specific_vb.aggregate(Sum('view_count'))
             language_specific_hashtag, is_created = HashtagViewCounter.objects.get_or_create(hashtag_id=instance_id,language=each_language[0])
             if language_specific_seen.has_key('view_count__sum') and language_specific_seen['view_count__sum']:
-                print "language_specific",each_language[1]," --> ",language_specific_seen['view_count__sum'],instance_id
+                # print "language_specific",each_language[1]," --> ",language_specific_seen['view_count__sum'],instance_id
                 language_specific_hashtag.view_count = language_specific_seen['view_count__sum']
             else:
                 language_specific_hashtag.view_count = 0
             language_specific_hashtag.video_count = len(language_specific_vb)
             language_specific_hashtag.save()
     except Exception as e:
-        print e
+        # print e
+        pass
 
 @app.task
 def create_thumbnail_cloudfront(topic_id):
@@ -354,7 +355,8 @@ def create_thumbnail_cloudfront(topic_id):
                 lmabda_cloudfront_url = get_modified_url(thumbnail_url, cloundfront_url)
                 response = check_url(lmabda_cloudfront_url)
     except Exception as e:
-        print e
+        # print e
+        pass
 
 @app.task
 def send_report_mail(report_id):
