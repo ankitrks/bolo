@@ -29,11 +29,31 @@ from email.mime.image import MIMEImage
 from email.mime.text import MIMEText
 from django.utils import timezone
 import math
+import boto3
+from django.conf import settings
+
 
 
 # global list recording the data accessed from the logs
 complete_data = []
 NUMBER_OF_DAYS=1
+
+
+def upload_media(media_file):
+    try:
+		curr_date = date.today()
+		extension = '.csv'
+		file_name = str(curr_date)+'_buffer'+extension
+		session = boto3.Session(
+			aws_access_key_id=settings.BOLOINDYA_AWS_ACCESS_KEY_ID,
+			aws_secret_access_key=settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY,
+		)
+		s3 = session.resource('s3')
+		s3.meta.client.upload_file(Filename=media_file, Bucket=settings.BOLOINDYA_AWS_IN_BUCKET_NAME, Key=file_name)
+		file_path = settings.FILE_PATH_TO_S3 + file_name
+		return file_path
+    except Exception as e:
+        return e
 
 
 # func for extracting time the video takes to run(currently not used)
@@ -215,32 +235,31 @@ def write_csv(n):
 
 
 # func for sending the csv created to the mail
-def send_file_mail():
+def send_file_mail(url):
 	emailfrom = "support@careeranna.com"
 	emailto = "sarfaraz@careeranna.com"
-	filetosend = os.getcwd() + "/deltarecords.csv"
+	# filetosend = os.getcwd() + "/deltarecords.csv"
 	username = "support@careeranna.com"
 	password = "$upp0rt@30!1"				# please do not use this()
-
 	msg = MIMEMultipart()
 	msg["From"] = emailfrom
 	msg["To"] = emailto
 	msg["Subject"] = "Bolo Indya: Weekly users buffering report date: " + str(datetime.now().date())
 	msg.preamble = ""	
-	attachment = open(filetosend, "rb") 
+	# attachment = open(filetosend, "rb") 
 	file_stream = MIMEBase('application', 'octet-stream') 
-	body = 'PFA the file'
+	body = 'Please click and download the report\n ' + url
 	msg.attach(MIMEText(body, 'plain')) 
-	file_stream.set_payload((attachment).read()) 
-	encoders.encode_base64(file_stream) 
-	file_stream.add_header('Content-Disposition', "attachment; filename= %s" % filetosend) 
-	msg.attach(file_stream)
+	# file_stream.set_payload((attachment).read()) 
+	# encoders.encode_base64(file_stream) 
+	# file_stream.add_header('Content-Disposition', "attachment; filename= %s" % filetosend) 
+	# msg.attach(file_stream)
 	server = smtplib.SMTP("smtp.gmail.com:587")
 	server.starttls()
 	server.login(username, password)
-	server.sendmail(emailfrom, [emailto,  'gaurang.s@boloindya.com'], msg.as_string())	
+	server.sendmail(emailfrom, [emailto, 'ankit@careeranna.com', 'varun@careeranna.com', 'gitesh@careeranna.com' , 'maaz@careeranna.com', 'akash.u@boloindya.com', 'gaurang.s@boloindya.com'], msg.as_string())	
 	server.quit()
-# 'ankit@careeranna.com', 'varun@careeranna.com', 'gitesh@careeranna.com' , 'maaz@careeranna.com', 'akash.u@boloindya.com'
+
 def main():
 
 	written_records= []
@@ -261,8 +280,6 @@ def main():
 	j = 0
 	total_elements = android_logs = AndroidLogs.objects.filter(created_at__gte = start_time, created_at__lte = end_time).count()
 	while((j*chunk_size) < total_elements):
-
-	
 		android_logs = AndroidLogs.objects.filter(created_at__gte = start_time, created_at__lte = end_time).order_by('-id')[(j*chunk_size):((j+1)*chunk_size)]
 		j+=1
 		print(len(android_logs))
@@ -278,7 +295,9 @@ def main():
 			except Exception as e:
 				count=0
 		write_csv(j)
-	send_file_mail()
+	filetosend = os.getcwd() + "/deltarecords.csv"
+	url = upload_media(filetosend)
+	send_file_mail(url)
 
 def run():
 	main()
