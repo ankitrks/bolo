@@ -2970,8 +2970,8 @@ def follow_user(request):
             followed_user.update(follower_count = F('follower_count')+1)
             update_redis_following(request.user.id,int(user_following_id),True)
             update_redis_follower(int(user_following_id),request.user.id,True)
-            update_profile_counter(request.user.id,'follower_count',1, True)
-            update_profile_counter(int(user_following_id),'follow_count',1, True)
+            update_profile_counter(request.user.id,'follow_count',1, True)
+            update_profile_counter(int(user_following_id),'follower_count',1, True)
             return JsonResponse({'message': 'Followed'}, status=status.HTTP_200_OK)
         else:
             if follow.is_active:
@@ -2981,8 +2981,8 @@ def follow_user(request):
                 followed_user.update(follower_count = F('follower_count')-1)
                 update_redis_following(request.user.id,int(user_following_id),False)
                 update_redis_follower(int(user_following_id),request.user.id,False)
-                update_profile_counter(request.user.id,'follower_count',1, False)
-                update_profile_counter(int(user_following_id),'follow_count',1, False)
+                update_profile_counter(request.user.id,'follow_count',1, True)
+                update_profile_counter(int(user_following_id),'follower_count',1, True)
                 return JsonResponse({'message': 'Unfollowed'}, status=status.HTTP_200_OK)
             else:
                 follow.is_active = True
@@ -2991,8 +2991,8 @@ def follow_user(request):
                 follow.save()
                 update_redis_following(request.user.id,int(user_following_id),True)
                 update_redis_follower(int(user_following_id),request.user.id,True)
-                update_profile_counter(request.user.id,'follower_count',1, True)
-                update_profile_counter(int(user_following_id),'follow_count',1, True)
+                update_profile_counter(request.user.id,'follow_count',1, True)
+                update_profile_counter(int(user_following_id),'follower_count',1, True)
                 return JsonResponse({'message': 'Followed'}, status=status.HTTP_200_OK)
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
