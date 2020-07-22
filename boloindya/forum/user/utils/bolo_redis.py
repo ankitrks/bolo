@@ -194,7 +194,19 @@ def get_user_bolo_info(user_id,month=None,year=None):
                         'bolo_score':shortcounterprofile(0)}
 
 
+def set_current_month_insight_video_info(user_id):
+    key = 'current_month_bolo_info:'+str(user_id)
+    bolo_info = get_current_month_bolo_info(user_id)
+    bolo_info['total_video_count'] = Topic.objects.filter(is_vb = True,is_removed=False, user_id=user_id,date__month=datetime.now().month).count()
+    set_redis(key,bolo_info, True)
+    return bolo_info
 
+def set_lifetime_insight_video_info(user_id):
+    key = 'lifetime_bolo_info:'+str(user_id)
+    bolo_info = get_lifetime_bolo_info(user_id)
+    bolo_info['total_video_count'] = Topic.objects.filter(is_vb = True,is_removed=False, user_id=user_id).count()
+    set_redis(key,bolo_info, True)
+    return bolo_info
 
 def get_userprofile_counter(user_id):
     '''
@@ -262,7 +274,7 @@ def update_profile_counter(user_id, action, value, add = True):
     # action = ['follower_count','follow_count','video_count','view_count']
     userprofile_counter, is_calulcated = get_userprofile_counter_inside(user_id)
 
-    if not is_calulcated and not action == 'video_count':
+    if not is_calulcated:
         if add:
             userprofile_counter[action]+=value
         else:
@@ -271,12 +283,11 @@ def update_profile_counter(user_id, action, value, add = True):
         key = 'userprofile_counter:'+str(user_id)
         set_redis(key,userprofile_counter, True)
 
-    if not is_calulcated and action == 'video_count':
-        set_userprofile_counter(user_id)
-
     if action == 'video_count':
-        set_current_month_bolo_info(user_id)
-        set_lifetime_bolo_info(user_id)
+        set_current_month_insight_video_info(user_id)
+        set_lifetime_insight_video_info(user_id)
+
+    return True
 
 
 
