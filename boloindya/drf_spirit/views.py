@@ -4614,6 +4614,7 @@ def update_profanity_details(request):
 
             #notify user
             topic.delete()
+            update_profile_counter(topic.user_id,'video_count',1, False)
         topic.profanity_collage_url = profanity_collage_url
         topic.save()
         return JsonResponse({'message': "success"}, status=status.HTTP_200_OK)
