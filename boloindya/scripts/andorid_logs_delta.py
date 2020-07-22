@@ -196,14 +196,21 @@ def extract_minmax_delta(log_text_dump, userid):
 				complete_data.append(data_iter)
 	
 # func for writing data into csv
-def write_csv():
+def write_csv(n):
 	headers = ['User', 'Video title', 'Player Ready', 'Time Played','StartPlayingcdn','StartPlayingcache','StartPlaying', 'Network','Device Model','Manufacturer','Play Date Time']
         f_name = 'deltarecords.csv'
-	with open(f_name, 'w') as f:
-		writer = csv.writer(f)
-		writer.writerow(headers)
-		for each_data in complete_data:
-			writer.writerow([x.encode('utf-8') for x in each_data])
+	if n==1:
+
+		with open(f_name, 'w') as f:
+			writer = csv.writer(f)
+			writer.writerow(headers)
+			for each_data in complete_data:
+				writer.writerow([x.encode('utf-8') for x in each_data])
+	else:
+		with open(f_name, 'a') as csvfile:  
+			csvwriter = csv.writer(csvfile)
+			for each_data in complete_data:
+				csvwriter.writerow([x.encode('utf-8') for x in each_data])
 
 
 
@@ -231,9 +238,9 @@ def send_file_mail():
 	server = smtplib.SMTP("smtp.gmail.com:587")
 	server.starttls()
 	server.login(username, password)
-	server.sendmail(emailfrom, [emailto, 'ankit@careeranna.com', 'varun@careeranna.com', 'gitesh@careeranna.com' , 'maaz@careeranna.com',  'gaurang.s@boloindya.com', 'akash.u@boloindya.com'], msg.as_string())	
+	server.sendmail(emailfrom, [emailto,  'gaurang.s@boloindya.com'], msg.as_string())	
 	server.quit()
-
+# 'ankit@careeranna.com', 'varun@careeranna.com', 'gitesh@careeranna.com' , 'maaz@careeranna.com', 'akash.u@boloindya.com'
 def main():
 
 	written_records= []
@@ -246,20 +253,31 @@ def main():
 		today = datetime.today()
 		start_time =  (today - timedelta(days = 1)).replace(hour=0, minute=0, second=0)
 		end_time = (today - timedelta(days = 1)).replace(hour=23, minute=59, second=59)
+		# start_time = '2020-06-19'
+		# end_time = '2020-06-20'
+
+		print(start_time, end_time)
+	chunk_size = 10000
+	j = 0
+	total_elements = android_logs = AndroidLogs.objects.filter(created_at__gte = start_time, created_at__lte = end_time).count()
+	while((j*chunk_size) < total_elements):
+
 	
-	android_logs = AndroidLogs.objects.filter(created_at__gte = start_time, created_at__lte = end_time)
-	for each_android in android_logs:
-		try:
-			each_android_dump = ast.literal_eval(each_android.logs)
-			#each_android_dump = each_android.logs
-			userid = each_android.user_id
-			if(type(each_android_dump).__name__ == 'list'):
-				# it is a nromal log
-				#extract_time_delta(each_android_dump, userid)
-				extract_minmax_delta(each_android_dump, userid)
-		except Exception as e:
-			count=0
-	write_csv()
+		android_logs = AndroidLogs.objects.filter(created_at__gte = start_time, created_at__lte = end_time).order_by('-id')[(j*chunk_size):((j+1)*chunk_size)]
+		j+=1
+		print(len(android_logs))
+		for each_android in android_logs:
+			try:
+				each_android_dump = ast.literal_eval(each_android.logs)
+				#each_android_dump = each_android.logs
+				userid = each_android.user_id
+				if(type(each_android_dump).__name__ == 'list'):
+					# it is a nromal log
+					#extract_time_delta(each_android_dump, userid)
+					extract_minmax_delta(each_android_dump, userid)
+			except Exception as e:
+				count=0
+		write_csv(j)
 	send_file_mail()
 
 def run():
