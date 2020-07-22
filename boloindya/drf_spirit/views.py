@@ -2981,8 +2981,8 @@ def follow_user(request):
                 followed_user.update(follower_count = F('follower_count')-1)
                 update_redis_following(request.user.id,int(user_following_id),False)
                 update_redis_follower(int(user_following_id),request.user.id,False)
-                update_profile_counter(request.user.id,'follow_count',1, True)
-                update_profile_counter(int(user_following_id),'follower_count',1, True)
+                update_profile_counter(request.user.id,'follow_count',1, False)
+                update_profile_counter(int(user_following_id),'follower_count',1, False)
                 return JsonResponse({'message': 'Unfollowed'}, status=status.HTTP_200_OK)
             else:
                 follow.is_active = True
