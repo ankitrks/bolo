@@ -275,4 +275,16 @@ def update_redis_fcm_device_entries(dev_id,data_dict):
     fcm_request_list.append(data_dict)
     set_redis(key, fcm_request_list, False)
 
+def set_redis_fcm_token(user_id,fcm_token):
+    key = 'fcm_token:'+str(user_id)
+    set_redis(key, fcm_token, False)
+
+def get_redis_fcm_token(user_id):
+    key = 'fcm_token:'+str(user_id)
+    return get_redis(key)
+
+def delete_redis_fcm_token(user_id):
+    key = 'bi:fcm_token:'+str(user_id)
+    delete_redis(key)
+
 

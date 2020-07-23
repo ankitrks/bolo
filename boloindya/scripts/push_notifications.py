@@ -6,60 +6,49 @@ import datetime
 
 from forum.topic.models import VBseen, Topic
 from jarvis.models import FCMDevice
+from django.conf import settings
+from jarvis.utils import get_token_for_user_id
+import requests
+import json
 
 def run():
 
     time_now = datetime.datetime.now()
-    pushNotifications = PushNotification.objects.filter(is_scheduled=True, is_removed=False, is_executed=False, scheduled_time__lte=time_now)
+    scheduled_pushNotifications = PushNotification.objects.filter(is_scheduled=True, is_removed=False, is_executed=False, scheduled_time__lte=time_now, scheduled_time__gte = time_now - datetime.timedelta(hours = 6))
+    send_push_notification(scheduled_pushNotifications)
+    unscheduled_pushNotifications = PushNotification.objects.filter(is_scheduled=False, is_removed=False, is_executed=False, created_at__lte = time_now - datetime.timedelta(minutes=15), created_at__gte = time_now - datetime.timedelta(hours = 6))
+    send_push_notification(unscheduled_pushNotifications)
+
+
+
+
+
+def send_push_notification(pushNotifications):
+    from jarvis.utils import _get_access_token
+    access , requset_url =  _get_access_token()  
+    headers = {'Authorization': 'Bearer ' + access, 'Content-Type': 'application/json; UTF-8' }
+
     for pushNotification in pushNotifications:
-
-        title = pushNotification.title
-        upper_title = pushNotification.description
-        notification_type = pushNotification.notification_type
-        id = pushNotification.instance_id
-        user_group = pushNotification.user_group
-        lang = pushNotification.language
-
-        device = ''
-
-        language_filter = {} 
-        
-        if lang != '0':
-            language_filter = { 'user__st__language': lang }
-        
-        if user_group == '1':
-            end_date = datetime.datetime.today()
-            start_date = end_date - datetime.timedelta(hours=3)
-            device = FCMDevice.objects.filter(user__isnull=True, created_at__range=(start_date, end_date))
-        
-        elif user_group == '2':
-            device = FCMDevice.objects.filter(user__isnull=True)
-        
-        else:
-            filter_list = []
-
-            if user_group == '3':
-                filter_list = VBseen.objects.distinct('user__pk').values_list('user__pk', flat=True)
-            elif user_group == '4' or user_group == '5':
-
-                hours_ago = datetime.datetime.now()
-                if user_group == '4':
-                    hours_ago -= datetime.timedelta(days=1)
-                else:
-                    hours_ago -=  datetime.timedelta(days=2)
-
-                filter_list = UserLogStatistics.objects.filter(session_starttime__gte=hours_ago).values_list('user', flat=True)
-                filter_list = map(int , filter_list)
-                
-            elif user_group == '6':
-                filter_list = Topic.objects.filter(is_vb=True).values_list('user__pk', flat=True)
-
-            device = FCMDevice.objects.filter(~Q(user__pk__in=filter_list)).filter(**language_filter)
-        
-         
-        pushNotification.is_scheduled = False 
-        pushNotification.is_executed = True
-        pushNotification.save()
-
-        device.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk})
-        pushNotification.is_scheduled = False
+        try:
+            if pushNotification.user_group == '8':
+                token_list = get_token_for_user_id(pushNotification.particular_user_id)
+                for each_token in token_list:
+                    fcm_message = {"message": {"token": each_token ,"data": {"title_upper": pushNotification.title, "title": pushNotification.description, "id": pushNotification.instance_id, "type": pushNotification.notification_type,"notification_id": str(pushNotification.id), "image_url": pushNotification.image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
+                    resp = requests.post(requset_url, data=json.dumps(fcm_message), headers=headers)
+            else:
+                if pushNotification.language == '0' and pushNotification.user_group == '0':
+                    fcm_message = {"message": {"topic": "all" ,"data": {"title_upper": pushNotification.title, "title": pushNotification.description, "id": pushNotification.instance_id, "type": pushNotification.notification_type,"notification_id": str(pushNotification.id), "image_url": pushNotification.image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
+                elif pushNotification.user_group == '2' or pushNotification.user_group == '1':
+                    fcm_message = {"message": {"topic": "boloindya_install" ,"data": {"title_upper": pushNotification.title, "title": pushNotification.description, "id": pushNotification.instance_id, "type": pushNotification.notification_type,"notification_id": str(pushNotification.id), "image_url": pushNotification.image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
+                elif pushNotification.user_group == '9':
+                    fcm_message = {"message": {"topic": "boloindya_users_creator" ,"data": {"title_upper": pushNotification.title, "title": pushNotification.description, "id": pushNotification.instance_id, "type": pushNotification.notification_type,"notification_id": str(pushNotification.id), "image_url": pushNotification.image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
+                elif not pushNotification.user_group == '7' and (pushNotification.language == '0' or pushNotification.user_group == '4' or pushNotification.user_group == '5' or pushNotification.user_group == '6' or pushNotification.user_group == '10' or pushNotification.user_group == '3'):
+                    fcm_message = {"message": {"topic": "boloindya_signup" ,"data": {"title_upper": pushNotification.title, "title": pushNotification.description, "id": pushNotification.instance_id, "type": pushNotification.notification_type,"notification_id": str(pushNotification.id), "image_url": pushNotification.image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
+                elif pushNotification.language != '0':
+                    fcm_message = {"message": {"topic": "boloindya_language_"+pushNotification.language ,"data": {"title_upper": pushNotification.title, "title": pushNotification.description, "id": pushNotification.instance_id, "type": pushNotification.notification_type,"notification_id": str(pushNotification.id), "image_url": pushNotification.image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
+                if fcm_message:
+                    resp = requests.post(requset_url, data=json.dumps(fcm_message), headers=headers)
+                    pushNotification.is_executed=True
+                    pushNotification.save()
+        except Exception as e:
+            print e
