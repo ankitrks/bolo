@@ -532,6 +532,7 @@ BOLOINDYA_AWS_ACCESS_KEY_ID = 'AKIAZNK4CM5CW4W4VWP7'
 BOLOINDYA_AWS_SECRET_ACCESS_KEY = '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'
 BOLOINDYA_AWS_BUCKET_NAME = 'boloindyapp-prod'
 BOLOINDYA_AWS_IN_BUCKET_NAME = 'in-boloindya'
+FILE_PATH_TO_S3 = 'https://in-boloindya.s3.ap-south-1.amazonaws.com/'
 #### Transcoder settings #####
 BOLOINDYA_PIPELINE_ID_TS = '1545987947390-hpo4hx'
 BOLOINDYA_AWS_ACCESS_KEY_ID_TS = 'AKIAZNK4CM5CW4W4VWP7'
@@ -561,6 +562,7 @@ CAREERANNA_AWS_ACCESS_KEY_ID_TS = 'AKIAZNK4CM5CW4W4VWP7'
 CAREERANNA_AWS_SECRET_ACCESS_KEY_TS = 'Odl4xfZTJZM0mq89XtNXf95g2zY8NwRuhp5+zp87'
 CAREERANNA_AWS_BUCKET_NAME_TS = 'elastictranscode.videos'
 #### Transcoder settings #####
+
 
 # The region of your bucket, more info:
 # http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
