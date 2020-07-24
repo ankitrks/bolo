@@ -53,7 +53,7 @@ from forum.comment.models import Comment,CommentHistory
 from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs,UserPay,VideoPlaytime,UserPhoneBook,Contact,ReferralCode
 from jarvis.models import FCMDevice,StateDistrictLanguage, BannerUser, Report
 from forum.topic.models import Topic,TopicHistory, ShareTopic, Like, SocialShare, Notification, CricketMatch, Poll, Choice, Voting, \
-    Leaderboard, VBseen, TongueTwister, HashtagViewCounter
+    Leaderboard, VBseen, TongueTwister, HashtagViewCounter, FVBseen
 from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following, get_redis_android_id, set_redis_android_id
 from forum.user.utils.bolo_redis import get_bolo_info_combined, get_current_month_bolo_info, get_last_month_bolo_info, get_lifetime_bolo_info , update_profile_counter
@@ -1557,12 +1557,12 @@ def invoke_watermark_service(topic, user):
 
 
 def provide_view_count(view_count,topic):
-    all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)[:view_count]
-    for each_user_id in all_test_userprofile_id:
-        vb_obj = VBseen.objects.create(topic= topic,user_id =each_user_id)
-        # UserProfile.objects.filter(user=topic.user).update(view_count=F(view_count)+1,own_vb_view_count = F('own_vb_view_count')+1)
-        update_redis_vb_seen(each_user_id,topic.id)
-    FVBseen.objects.create(topic_id = topic.id, view_count = view_count)
+    try:
+        print view_count
+        FVBseen.objects.create(topic_id = topic.id, view_count = view_count)
+        update_profile_counter(topic.user_id,'view_count',view_count, True)
+    except Exception as e:
+        print e,"view"
 
 @api_view(['POST'])
 def editTopic(request):
@@ -1710,9 +1710,10 @@ def topic_delete(request):
     topic = Topic.objects.get(pk= topic_id)
     now = datetime.now()
     allowed_date = datetime.strptime('01-'+str(now.month)+'-'+str(now.year)+' 00:00:00', "%d-%m-%Y %H:%M:%S")
-
+    print request.user
     if allowed_date <= topic.date:
-        if topic.user == request.user:
+        if topic.user == request.user and not topic.is_removed:
+
             try:
                 topic.delete(is_user_deleted=True)
                 update_profile_counter(user_id,'video_count',1, False)
@@ -4613,8 +4614,9 @@ def update_profanity_details(request):
                 topic.violent_content = violent_content
 
             #notify user
-            topic.delete()
-            update_profile_counter(topic.user_id,'video_count',1, False)
+            if not topic.is_removed:
+                topic.delete()
+                update_profile_counter(topic.user_id,'video_count',1, False)
         topic.profanity_collage_url = profanity_collage_url
         topic.save()
         return JsonResponse({'message': "success"}, status=status.HTTP_200_OK)
