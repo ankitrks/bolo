@@ -1,0 +1,106 @@
+{% load spirit_tags i18n %}
+{% load static from staticfiles %}
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <link rel="shortcut icon" href="/media/img/favicon.ico">
+
+<!--     <title>Bolo Indiya</title>
+    <meta name="description" content="{{ config.site_description }}"> -->
+    <title>Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India</title>
+    <meta name="description" content="Short Videos in Hindi, Tamil, Telugu and Other Local Languages of India" />
+    <meta name="keywords" content="Hindi Videos, Hindi Content Platform, Local Languages Content, Love Questions, Sex Questions, Relationship Questions, Life questions, English Videos, Questions and Answers, GK Answers, Politics Discussion, Entertainment, Tamil Videos, Tamil Questions, Tamil Answers, Telugu Questions, Telugu Answers, Exams, UPSC Videos, UPSC Questions, Kannada Questions, Kannada Videos, Punjabi Videos, Punjabi Questions, Gujarati Questions, Gujarati Videos, bengali questions, bengali videos" />    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {% if topic.title is not None %}
+    <meta data-react-helmet="true" name="twitter:image" content="https://www.boloindya.com/media/img/favicon.ico"/>
+    <meta data-react-helmet="true" property="og:image" content="https://www.boloindya.com/media/img/favicon.ico"/>
+    {% endif %}
+
+    {% block head-meta %}{% endblock %}
+
+    <link rel="stylesheet" href="{% static "spirit/stylesheets/main.css" %}">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" >
+    <link href="{% static "spirit/stylesheets/bootstrap.min.css" %}" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="https://owlcarousel2.github.io/OwlCarousel2/assets/owlcarousel/assets/owl.theme.default.min.css" rel="stylesheet">
+  
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/3.3.1/css/swiper.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js"></script>
+    <script src="/media/js/bootstrap.min.js"></script>
+    <script src="https://owlcarousel2.github.io/OwlCarousel2/assets/owlcarousel/owl.carousel.js"></script>
+
+    <style type="text/css">
+        .dropdown-item.selected {background: #1989cd !important;}
+        .navbar .navbar-nav li .sub-menu{z-index: 100 !important;}
+    </style>
+
+    <script>
+        function getCookie(cname) {
+            var name = cname + "=";
+            var decodedCookie = decodeURIComponent(document.cookie);
+            var ca = decodedCookie.split(';');
+            for(var i = 0; i <ca.length; i++) {
+              var c = ca[i];
+              while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+              }
+              if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+              }
+            }
+            return "";
+        }
+        function clearCookie(cname) {
+            var mydate = new Date();
+            mydate.setTime(mydate.getTime() - 1);
+            document.cookie = cname + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        }
+    	$( document ).ready(function() {
+            $('.perform_search').click(function(){
+                window.location = '/topic/search/?q=' + $('[name="search"]').val();
+            });
+            $('[name="search"]').keypress(function (e) {
+                var key = e.which;
+                if(key == 13){
+                    $('.perform_search').click();
+                    return false;  
+                }
+            });
+            $('.change_language[lcode="' + getCookie("language") +'"]').addClass('selected');
+            $('.lang_link').html($('.change_language[lcode="' + getCookie("language") +'"]').text() + '<small style="color:lightgrey">&nbsp;&nbsp;[change]</small>');
+            $('.change_language').click(function(e){
+                e.preventDefault();
+                clearCookie("language");
+                var lcode = $(this).attr('lcode');
+                document.cookie = "language=" + lcode + "; expires=Fri, 31 Dec 2025 00:00:00 UTC; path=/;";
+                window.location = $(this).attr('href');
+            });
+    	});
+
+	</script>
+
+    {% block head-extra %}{% endblock %}
+
+    <!--[if (lt IE 9) & (!IEMobile)]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/selectivizr/1.0.2/selectivizr-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.6/html5shiv.min.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body style="margin-left:0px; margin-right: 0px;max-width:100%;">
+    {% include 'spirit/_index_header.html' %}
+    {% render_messages messages %}
+    {% block content %}{% endblock %}
+    {% include 'spirit/_index_footer.html' %}
+
+  </body>
+
+</html>

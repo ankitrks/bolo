@@ -1,0 +1,64 @@
+{% load spirit_tags i18n %}
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('.perform_search').click(function(){
+            window.location = '/topic/search/?q=' + $('[name="search"]').val();
+        });
+        $('[name="search"]').keypress(function (e) {
+            var key = e.which;
+            if(key == 13){
+                $('.perform_search').click();
+                return false;  
+            }
+        });
+    });
+</script>
+<header>
+    <nav class="navbar navbar-light  navbar-expand-md">
+        <a class="navbar-brand" href="/" title="Bolo Indiya">
+            <img src="/media/img/boloindya_logo.png" class="" style="width: 172px;height: 57px;" alt="Bolo Indiya Logo" />
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+            aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <input type="text" name="search" value="" placeHolder="Search" style="height: 34px;width: 150px;font-size: 12px;margin-right: 10px;position: relative;top: -4px;">
+                    <a href="#" class="perform_search" style="color:grey;position: relative;margin-left: -39px;left: -8px;top: -2px;border-left: 1px solid #cecece;"><i class="fa fa-search"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="videoBtn"  href="/videos/" >Videos</a>
+                </li>
+                <style>
+                    .dropdown-item.selected{
+                        background: #1989cd !important;
+                    }
+                </style>
+
+                <li class="nav-item dropdown" style="margin-right: 20px;">
+                    <a href="javascript:void()" class="lang_link"><!-- Change Language --></a>
+                    <ul class="sub-menu list-unstyled">
+                        <li><a href="?language=english&lid=1" class="dropdown-item change_language" lcode="1">English</a></li>
+                        <li><a href="?language=hindi&lid=2" class="dropdown-item change_language" lcode="2">Hindi</a></li>
+                        <li><a href="?language=tamil&lid=3" class="dropdown-item change_language" lcode="3">Tamil</a></li>
+                        <li><a href="?language=telugu&lid=4" class="dropdown-item change_language" lcode="4">Telugu</a></li>
+                        <li><a href="?language=telugu&lid=5" class="dropdown-item change_language" lcode="4">Bengali</a></li>
+                        <li><a href="?language=telugu&lid=6" class="dropdown-item change_language" lcode="4">Kannada</a></li>
+                    </ul>
+                </li>
+                {% if user.username %}
+                    <li class="nav-item dropdown">
+                        <a href="" class="profile_link">{{ user.username }} </a>
+                        <ul class="sub-menu list-unstyled">
+                            <li><a href="/user/logout/" class="dropdown-item">Logout</a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li><a href="/user/login/?next=/user/login/%3Fnext%3D/st/admin/">Login</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+</header>
