@@ -732,45 +732,35 @@ input:checked + .slider:before {
         <div class="jsx-639186511 ">
             <div class="jsx-3563400267 header-container">
                 <div class="jsx-3563400267 header-content" id="sub-header">
+
+    <div class="mainHeader">
+        <section class="navbar">
+            <div class="logo">
+                <img src="/media/boloindya_new_logo.png" alt="Logo">
+            </div>
+            <nav>
+                <a href="#">Explore</a>
+                <a href="#">Sign in</a>
+                <a href="#" class="get-started-btn">Get Started</a>
+            </nav>
+        </section>
+    </div>
+
 <!--                   <h3 class="jsx-475503780 logo-container">
                     <a href="">Signup</a>
                   </h3> -->
-                    <h1 class="jsx-475503780 logo-container">
+                    <h1 class="jsx-475503780 logo-container hide">
                       <a title="boloindya" class="jsx-475503780" href="{{site_base_url}}">
                         <img id="boloindyaLogoId" src="/media/boloindya_new_logo.png" alt="boloindya" class="jsx-475503780 logo-text">
                         <strong class="jsx-475503780">boloindya</strong>
                       </a>
                     </h1>
-                          <ul class="jsx-3143951235 menu-wrapper" >
-<!--                                 <li class="hideOnMobile">
-                                    <div class="_4kny _50tm">
-                                    <form class="searchbox" action="/{{LANGUAGE_CODE}}/search/" method="get">
-                                        <input type="search" placeholder="Search......" value="{{search_term}}"  autocomplete="off" name="term" class="searchbox-input" onkeyup="buttonUp();" required>
-                                        <input type="submit" class="searchbox-submit" value="">
-                                        <span class="searchbox-icon"></span>
-                                    </form>
+                          <ul class="jsx-3143951235 menu-wrapper hide" >
 
-                                    </div>
-                                </li> -->
 
-<!--                                 <li class="jsx-3143951235">
-                                  <h2 class="menu-item-link menu-item-link-active hideOnMobile"><a href="{{site_base_url}}" class="jsx-2922828392">{% trans "Home" %}</a></h2></li>
-                                <li class="jsx-3143951235">
-                                  <h2 class="menu-item-link hideOnMobile"><a href="{{site_base_url}}about/" class="jsx-2922828392">{% trans "About" %}</a></h2></li>
-                                <li class="jsx-3143951235">
-                                  <h2 class="menu-item-link hideOnMobile"><a href="{{site_base_url}}team/" class="jsx-2922828392">{% trans "Team" %}</a></h2></li> -->
-
-                                <!-- <li class="jsx-3143951235">
-                                  <h2 class="menu-item-link hideOnMobile"><a href="{{site_base_url}}careers/" class="jsx-2922828392">{% trans "Careers" %}</a></h2></li> -->
-
-<!-- 
-                                <li class="jsx-3143951235">
-                                  <h2 class="menu-item-link hideOnMobile"><a href="/feed/" title="Upload Videos"  class="jsx-2922828392 "><img src="data:image/svg+xml,%3Csvg%20width%3D%2233%22%20height%3D%2224%22%20viewBox%3D%220%200%2033%2024%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20clip-rule%3D%22evenodd%22%20d%3D%22M23.5011%202.86364C21.5703%200.948902%2019.0317%200%2016.5%200C13.9683%200%2011.44%200.949978%209.51042%202.86364C7.47747%204.87979%206.5615%207.56981%206.66875%2010.2159C2.96281%2010.3737%200%2013.3768%200%2017.0909C0%2020.906%203.11982%2024%206.96667%2024H16.0152C16.0146%2023.9848%2016.0143%2023.9696%2016.0143%2023.9543V13.3987L13.6578%2015.4739C13.274%2015.8445%2012.6191%2015.7976%2012.2519%2015.4085C11.8712%2015.0052%2011.9423%2014.2887%2012.3291%2013.9216L16.3387%2010.2614C16.5564%2010.0511%2016.7407%209.99912%2017.0031%2010C17.2675%2010.0052%2017.5261%2010.1246%2017.6674%2010.2614L21.677%2013.9216C22.0834%2014.2956%2022.1031%2015.001%2021.7543%2015.4085C21.4054%2015.816%2020.7322%2015.8445%2020.3483%2015.4739L17.9918%2013.3987V23.9543C17.9918%2023.9696%2017.9915%2023.9848%2017.9909%2024H24.9333C29.3797%2024%2033%2020.4096%2033%2016C33%2012.0296%2030.062%208.75393%2026.2281%208.13636C25.892%206.20875%2024.9993%204.34957%2023.5011%202.86364Z%22%20fill%3D%22%23161823%22%2F%3E%3C%2Fsvg%3E"></a></h2>
-                                </li>  -->
-
-                                <li class="jsx-3143951235 mobileMenuDisp">
+<!--                                 <li class="jsx-3143951235 mobileMenuDisp hide">
                                   <h2 class="menu-item-link "><a href="/feed/" class="jsx-2922828392 watchNow">{% trans "Watch now" %}</a></h2>
-                                </li> 
+                                </li>  -->
 
                                 {% if user.is_authenticated %}
                                   <li class="jsx-3143951235" id="boloSideMenu">
@@ -785,15 +775,12 @@ input:checked + .slider:before {
 
                                   </li>
                                 {% else %}
-<!--                                 <li class="jsx-3143951235" id="loginURLId">
-                                  <h2 class="menu-item-link hideOnMobile"><a href="/login/" class="jsx-2922828392">{% trans "Signin" %}</a>
-                                  </h2>
-                                </li> -->
+
                                 {% endif %}
                           </ul>
                 </div>
                 <!-- Mobile Search -->
-                <div class="_4kny _50tm">
+                <div class="_4kny _50tm hideOnMobileSite">
                     <div class="_585- hideOnDesktop" aria-label="Facebook" role="search" data-testid="facebar_root" id="js_19">
                         <form action="/{{LANGUAGE_CODE}}/search/" method="get">
                             <button value="1" class="_42ft _4jy0 _4w98 _4jy3 _517h _51sy _4w97" aria-label="Search" tabindex="-1" data-testid="facebar_search_button" type="submit"><i class="_585_"></i></button>
