@@ -58,7 +58,7 @@ from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following, get_redis_android_id, set_redis_android_id
 from forum.user.utils.bolo_redis import get_bolo_info_combined
 from .serializers import *
-from tasks import vb_create_task,user_ip_to_state_task,sync_contacts_with_user,cache_follow_post,cache_popular_post, deafult_boloindya_follow, save_click_id_response, send_upload_video_notification
+from tasks import * # vb_create_task,user_ip_to_state_task,sync_contacts_with_user,cache_follow_post,cache_popular_post, deafult_boloindya_follow, save_click_id_response, send_upload_video_notification
 from haystack.query import SearchQuerySet, SQ
 from django.core.exceptions import MultipleObjectsReturned
 from forum.topic.utils import get_redis_category_paginated_data,get_redis_hashtag_paginated_data,get_redis_language_paginated_data,get_redis_follow_paginated_data, get_popular_paginated_data, update_redis_vb_seen_entries
@@ -785,7 +785,7 @@ class SolrSearchTopic(BoloIndyaGenericAPIView):
         topics      = []
         search_term = self.request.GET.get('term')
         language_id = self.request.GET.get('language_id')
-        page = int(request.GET.get('page',1))
+        page = int(request.GET.get('page')) if request.GET.get('page').strip() else 1
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
         is_expand=self.request.GET.get('is_expand',False)
         last_updated=timestamp_to_datetime(self.request.GET.get('last_updated',False))
@@ -3597,14 +3597,13 @@ def get_cloudfront_url(instance):
 @csrf_exempt
 @api_view(['POST'])
 def SyncDump(request):
-    return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
     if request.user:
         if request.method == "POST":
             #Storing the dump in database
             try:
                 data = {"dump": request.POST.get('dump'), "dump_type":request.POST.get('dump_type'),"android_id":request.POST.get('android_id',''), "created_at": datetime.now()}
                 if request.user.id:
-                    data["user"] = request.user
+                    data["user_id"] = request.user.id
                 set_sync_dump_info(data)
                 return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)    
             except Exception as e:
@@ -3620,7 +3619,7 @@ def save_android_logs(request):
     try:
         data = {"logs":request.POST.get('error_log', ''), "log_type":request.POST.get('log_type',None), "android_id": request.POST.get('android_id',''), "created_at": datetime.now()}
         if request.user.id:
-            data['user'] = request.user
+            data['user_id'] = request.user.id
         set_android_logs_info(data)
         return JsonResponse({'messgae' : 'success'})
     except Exception as e:
@@ -4676,6 +4675,6 @@ def get_location(location_data):
 
 class AudioFileListView(generics.ListAPIView):
     serializer_class = MusicAlbumSerializer
-    queryset = MusicAlbum.objects.all()
+    queryset = MusicAlbum.objects.all().order_by('-id')
     permission_classes  = (IsAuthenticatedOrReadOnly,)
     pagination_class = LimitOffsetPagination

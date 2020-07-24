@@ -54,7 +54,6 @@ from django.core.files.base import ContentFile
 from drf_spirit.serializers import UserWithUserSerializer
 from django.db.models import F,Q
 import traceback
-from tasks import send_notifications_task
 from PIL import Image, ExifTags
 from drf_spirit.utils import language_options
 #from .models import category_slab_options
@@ -1244,52 +1243,71 @@ def send_notification(request):
         language_ids = request.POST.get('language_ids', "")
         user_group_ids = request.POST.get('user_group_ids', "")
         notification_type = request.POST.get('notification_type', "")
-        particular_user_id = request.POST.get('particular_user_id', "")
+        particular_user_id = request.POST.get('particular_user_id', None)
         schedule_status= request.POST.get('schedule_status', "")
         datepicker = request.POST.get('datepicker', '')
         timepicker = request.POST.get('timepicker', '').replace(" : ", ":")
-        image_url = request.POST.get('image_url', '')
+        image_url = request.POST.get('image_url',None)
         days_ago = request.POST.get('days_ago', '1')
+        instance_id = request.POST.get('id', "")
         
         lang_array = language_ids.split(',')
         user_array = user_group_ids.split(',')
 
         for user_group in user_array:
             if user_group == '1' or user_group == '2' or user_group == '7' or user_group == '8':
-                data = {}
-
-                data['title'] = title
-                data['upper_title'] = upper_title
-                data['notification_type'] = notification_type
-                data['id'] = request.POST.get('id', "")
-                data['particular_user_id'] = particular_user_id
-                data['user_group'] = user_group
-                data['lang'] = '0'
-                data['schedule_status'] = schedule_status
-                data['datepicker'] = datepicker
-                data['timepicker'] = timepicker
-                data['image_url'] = image_url
-                data['days_ago'] = days_ago
-
-                send_notifications_task.delay(data, pushNotification)
+                pushNotification = PushNotification()
+                pushNotification.title = upper_title
+                pushNotification.description = title
+                pushNotification.language = '0'
+                if image_url:
+                    pushNotification.image_url = image_url
+                else:
+                    pushNotification.image_url = None
+                pushNotification.notification_type = notification_type
+                pushNotification.user_group = user_group
+                if notification_type == '3':
+                    instance_id=instance_id.replace('#', '')
+                pushNotification.instance_id = instance_id
+                if days_ago:
+                    pushNotification.days_ago = days_ago
+                else:
+                    pushNotification.days_ago = '1'
+                if particular_user_id:
+                    pushNotification.particular_user_id=particular_user_id
+                if schedule_status == '1':
+                    if datepicker:
+                        pushNotification.scheduled_time = datetime.strptime(datepicker + " " + timepicker, "%m/%d/%Y %H:%M")
+                    pushNotification.is_scheduled = True
+                pushNotification.save()
+                send_notifications_task(pushNotification.id)
             else:
                 for lang in lang_array:
-                    data = {}
-
-                    data['title'] = title
-                    data['upper_title'] = upper_title
-                    data['notification_type'] = notification_type
-                    data['id'] = request.POST.get('id', "")
-                    data['particular_user_id'] = particular_user_id
-                    data['user_group'] = user_group
-                    data['lang'] = lang
-                    data['schedule_status'] = schedule_status
-                    data['datepicker'] = datepicker
-                    data['timepicker'] = timepicker
-                    data['image_url'] = image_url
-                    data['days_ago'] = days_ago
-                            
-                    send_notifications_task.delay(data, pushNotification)
+                    pushNotification = PushNotification()
+                    pushNotification.title = upper_title
+                    pushNotification.description = title
+                    pushNotification.language = lang
+                    if image_url:
+                        pushNotification.image_url = image_url
+                    else:
+                        pushNotification.image_url = None
+                    pushNotification.notification_type = notification_type
+                    pushNotification.user_group = user_group
+                    if notification_type == '3':
+                        instance_id=instance_id.replace('#', '')
+                    pushNotification.instance_id = instance_id
+                    if days_ago:
+                        pushNotification.days_ago = days_ago
+                    else:
+                        pushNotification.days_ago = '1'
+                    if particular_user_id:
+                        pushNotification.particular_user_id=particular_user_id
+                    if schedule_status == '1':
+                        if datepicker:
+                            pushNotification.scheduled_time = datetime.strptime(datepicker + " " + timepicker, "%m/%d/%Y %H:%M")
+                        pushNotification.is_scheduled = True
+                    pushNotification.save()
+                    send_notifications_task(pushNotification.id)
 
         return redirect('/jarvis/notification_panel/')
     if request.method == 'GET':
@@ -1300,6 +1318,21 @@ def send_notification(request):
             print e
     
     return render(request,'jarvis/pages/notification/send_notification.html', { 'language_options': language_options, 'user_group_options' : user_group_options, 'notification_types': notification_type_options, 'pushNotification': pushNotification})
+
+def send_notifications_task(pushNotification_id):
+    import json
+    import requests
+    from jarvis.utils import _get_access_token
+    try:
+        pushNotification  = PushNotification.objects.get(pk = pushNotification_id)
+        access, request_url =  _get_access_token() 
+        headers = {'Authorization': 'Bearer ' + access, 'Content-Type': 'application/json; UTF-8' }
+        fcm_message={}
+        fcm_message = {"message": {"topic": "boloindya_test" ,"data": {"title_upper": pushNotification.title, "title": pushNotification.description, "id": pushNotification.instance_id, "type": pushNotification.notification_type,"notification_id": str(pushNotification.id), "image_url": pushNotification.image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
+        resp = requests.post(request_url, data=json.dumps(fcm_message), headers=headers)
+    except Exception as e:
+        print e
+
 
 @login_required
 def particular_notification(request, notification_id=None, status_id=2, page_no=1, is_uninstalled=0):
