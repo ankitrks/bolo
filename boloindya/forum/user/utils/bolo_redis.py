@@ -198,16 +198,15 @@ def set_current_month_insight_video_info(user_id, add):
     key = 'current_month_bolo_info:'+str(user_id)
     bolo_info = get_current_month_bolo_info(user_id)
     bolo_info['total_video_count'] = Topic.objects.filter(is_vb = True,is_removed=False, user_id=user_id,date__month=datetime.now().month).count()
-    if not add:
-        real_view_count = VBseen.objects.filter(topic__user_id = user_id, topic__is_removed = False, created_at__month=datetime.now().month).count()
-        fake_view_count = FVBseen.objects.filter(topic__user_id = user_id, topic__is_removed = False, created_at__month=datetime.now().month).aggregate(Sum('view_count'))
-        if fake_view_count.has_key('view_count__sum') and fake_view_count['view_count__sum']:
-            fake_view_count = fake_view_count['view_count__sum']
-        else:
-            fake_view_count = 0
-        # print real_view_count, fake_view_count
-        total_view_count = real_view_count + fake_view_count
-        bolo_info['total_view_count'] = total_view_count
+    real_view_count = VBseen.objects.filter(topic__user_id = user_id, topic__is_removed = False, created_at__month=datetime.now().month).count()
+    fake_view_count = FVBseen.objects.filter(topic__user_id = user_id, topic__is_removed = False, created_at__month=datetime.now().month).aggregate(Sum('view_count'))
+    if fake_view_count.has_key('view_count__sum') and fake_view_count['view_count__sum']:
+        fake_view_count = fake_view_count['view_count__sum']
+    else:
+        fake_view_count = 0
+    # print real_view_count, fake_view_count
+    total_view_count = real_view_count + fake_view_count
+    bolo_info['total_view_count'] = total_view_count
     set_redis(key,bolo_info, True)
     return bolo_info
 
@@ -215,24 +214,22 @@ def set_lifetime_insight_video_info(user_id, add):
     lifetime_key = 'lifetime_bolo_info:'+str(user_id)
     bolo_info = get_lifetime_bolo_info(user_id)
     bolo_info['total_video_count'] = Topic.objects.filter(is_vb = True,is_removed=False, user_id=user_id).count()
-    if not add:
-        real_view_count = VBseen.objects.filter(topic__user_id = user_id,topic__is_removed = False, ).count()
-        fake_view_count = FVBseen.objects.filter(topic__user_id = user_id, topic__is_removed = False,).aggregate(Sum('view_count'))
-        if fake_view_count.has_key('view_count__sum') and fake_view_count['view_count__sum']:
-            fake_view_count = fake_view_count['view_count__sum']
-        else:
-            fake_view_count = 0
-        # print real_view_count, fake_view_count
-        total_view_count = real_view_count + fake_view_count
-        bolo_info['total_view_count'] = total_view_count
-        userprofile_counter, is_calulcated = get_userprofile_counter_inside(user_id)
-        if not is_calulcated:
-            userprofile_counter['view_count'] = total_view_count
-            userprofile_counter['last_updated'] = datetime.now()
-            key = 'userprofile_counter:'+str(user_id)
-            set_redis(key,userprofile_counter, True)
+    real_view_count = VBseen.objects.filter(topic__user_id = user_id,topic__is_removed = False ).count()
+    fake_view_count = FVBseen.objects.filter(topic__user_id = user_id, topic__is_removed = False).aggregate(Sum('view_count'))
+    if fake_view_count.has_key('view_count__sum') and fake_view_count['view_count__sum']:
+        fake_view_count = fake_view_count['view_count__sum']
+    else:
+        fake_view_count = 0
+    # print real_view_count, fake_view_count
+    total_view_count = real_view_count + fake_view_count
+    bolo_info['total_view_count'] = total_view_count
+    userprofile_counter, is_calulcated = get_userprofile_counter_inside(user_id)
+    if not is_calulcated:
+        userprofile_counter['view_count'] = total_view_count
+        userprofile_counter['last_updated'] = datetime.now()
+        key = 'userprofile_counter:'+str(user_id)
+        set_redis(key,userprofile_counter, True)
     set_redis(lifetime_key,bolo_info, True)
-
     return bolo_info
 
 def get_userprofile_counter(user_id):
