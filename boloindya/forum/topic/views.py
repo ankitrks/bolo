@@ -1156,7 +1156,6 @@ def old_home(request):
     # return render(request, 'spirit/topic/new_landing.html')
     # return render(request, 'spirit/topic/main_landing.html')
 
-
 #====================New Home =============================
 def new_home_updated(request):
     categories = []
