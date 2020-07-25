@@ -1457,6 +1457,10 @@ def createTopic(request):
             view_count = random.randint(1,5)
             topic.view_count = view_count
             topic.save()
+            try:
+                provide_view_count(view_count,topic)
+            except:
+                pass
             update_profile_counter(user_id,'video_count',1, True)
             categories = filter(None, categ_list.split(','))
             topic.m2mcategory.add(*categories)
@@ -1486,10 +1490,6 @@ def createTopic(request):
             view_count = random.randint(10,30)
             topic.view_count = view_count
         topic.save()
-        try:
-            provide_view_count(view_count,topic)
-        except:
-            pass
         # topic.m2mcategory.add(Category.objects.get(pk=category_id))
         if not is_vb:
             userprofile = UserProfile.objects.filter(user = request.user)
