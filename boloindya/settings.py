@@ -312,6 +312,8 @@ HAYSTACK_CONNECTIONS = {
       },
 }
 
+ELASTIC_HOST = 'localhost'
+
 HAYSTACK_SIGNAL_PROCESSOR = 'forum.search.signals.RealtimeSignalProcessor'
 
 

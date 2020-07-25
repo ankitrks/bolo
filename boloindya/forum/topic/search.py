@@ -1,11 +1,12 @@
 from elasticsearch_dsl.connections import connections
+from django.conf import settings
 from elasticsearch_dsl import Document, Text, Boolean, Integer, Completion, analyzer, tokenizer
 from elasticsearch.helpers import bulk
 from elasticsearch import Elasticsearch
 import models as models
 # from .models import *
 # from .models import Topic
-connections.create_connection(hosts = ['localhost'])
+connections.create_connection(hosts = [settings.ELASTIC_HOST])
 
 
 my_analyzer = analyzer('my_analyzer',
