@@ -3,11 +3,13 @@ from redis_utils import *
 from datetime import datetime, timedelta
 from django.contrib.auth.models import User
 from django.db.models import Q
+from forum.topic.utils import delete_redis_fcm_token
 
 def run():
     try:
         all_entries = []
         all_keys = []
+        fcm_tokens_keys_to_be_deleted = []
         for key in redis_cli.keys("bi:fcm_device:*"):
             try:
                 data = redis_cli.get(key)
@@ -15,6 +17,10 @@ def run():
                 if data:
                     all_entries += data
                     all_keys.append(key)
+                    for each_data in data:
+                        if not each_data['user_id']:
+                            user_id = key.split(":")[-1]
+                            fcm_tokens_keys_to_be_deleted.append(user_id)
             except Exception as e:
                 print e
         if all_entries:
@@ -47,5 +53,7 @@ def run():
                     redis_cli.delete(each_key)
                 except Exception as e:
                     print e
+            for each_key in fcm_tokens_keys_to_be_deleted:
+                delete_redis_fcm_token(each_key)
     except Exception as e:
         print e
