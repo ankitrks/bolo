@@ -109,6 +109,7 @@ class UserProfile(models.Model,ModelDiffMixin):
     boost_span = models.PositiveIntegerField(_("Boost Span(Hours)"), null=True, blank=True, default=0)
     country_code = models.CharField(_("Country Phone Code"), max_length=20, blank = True, null = True)
     salary_range = models.CharField(choices=salary_choices, blank = True, null = True, max_length=10,db_index=True)
+    is_insight_fix = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = _("user profile")

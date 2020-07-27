@@ -25,8 +25,9 @@ import json
 
 def run():
     counter = 0
-    user_count = UserProfile.objects.filter(is_test_user = False).count()
-    for each_userprofile in UserProfile.objects.filter(is_test_user = False).order_by('user__date_joined','-vb_count').values('user_id','user__username','user__date_joined'):
+    till_date = datetime(2020,7,28)
+    user_count = UserProfile.objects.filter(Q(is_superstar = True)|Q( is_popular = True)| Q(is_business = True), is_test_user = False, is_insight_fix = False, user__date_joined__lte = till_date).count()
+    for each_userprofile in UserProfile.objects.filter(Q(is_superstar = True)|Q( is_popular = True)| Q(is_business = True), is_test_user = False, is_insight_fix = False, user__date_joined__lte = till_date).order_by('is_business','is_superstar','is_popular','user__date_joined','-vb_count').values('user_id','user__username','user__date_joined'):
         print "#############################",counter," / ",user_count,"#####################################"
         counter+=1
         print each_userprofile['user__date_joined']
@@ -119,6 +120,7 @@ def run():
             print 'new_profile_data',new_profile_data
         except Exception as e:
             print "Error in: lifetime get_new_user_bolo_info, get_new_profile_counter", e
+        UserProfile.objects.filter(user_id = each_userprofile['user_id']).update(is_insight_fix = True)
 
 
 def fix_active_inactive_view_discrepency(user_id):

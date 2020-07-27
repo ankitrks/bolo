@@ -178,12 +178,12 @@ def get_user_bolo_info(user_id,month=None,year=None):
                         'total_like_count':total_like_count,'total_share_count':total_share_count,\
                         'total_earn':total_earn,'video_playtime':video_playtime,'spent_time':spent_time,\
                         'bolo_score':shortcounterprofile(user.st.bolo_score)}
-        if start_date and end_date:
-            if datetime.now() > end_date + timedelta(days=2) and not datetime.now().month == start_date.month:
-                insight_obj, is_created = OldMonthInsightData.objects.get_or_create(user_id = user_id , for_month = start_date.month, for_year = start_date.year)
-                if is_created:
-                    insight_obj.insight_data = json.dumps(data)
-                    insight_obj.save()
+        # if start_date and end_date:
+        #     if datetime.now() > end_date + timedelta(days=2) and not datetime.now().month == start_date.month:
+        #         insight_obj, is_created = OldMonthInsightData.objects.get_or_create(user_id = user_id , for_month = start_date.month, for_year = start_date.year)
+        #         if is_created:
+        #             insight_obj.insight_data = json.dumps(data)
+        #             insight_obj.save()
         return data
     except Exception as e:
         print e
