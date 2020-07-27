@@ -172,5 +172,5 @@ urlpatterns = [
     url(r'^update_download_url_in_topic/',update_download_url_in_topic,name='update_download_url_in_topic'),
     url(r'^update_profanity_details/',update_profanity_details,name='update_profanity_details'),
     url(r'^get_user_last_vid_lang/$', get_user_last_vid_lang,name='get_user_last_vid_lang'),
-    url(r'^fetch_audio_list/$', AudioFileListView.as_view(),name='fetch_audio_list'),
+    url(r'^fetch_audio_list/$', audio_list, name='fetch_audio_list'),
 ]

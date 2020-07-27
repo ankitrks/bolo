@@ -784,8 +784,8 @@ def boloindya_upload_audio_file_to_s3(request):
     audio_upload_folder_name = request.POST.get('folder_prefix','from_upload_panel/audio')
     image_upload_folder_name = request.POST.get('folder_prefix','from_upload_panel/audio_image')
     upload_to_bucket = request.POST.get('bucket_name',None)
-
-    # print upload_file,upload_to_bucket,upload_folder_name
+    language_id = request.POST.get('language_id',None)
+    order_no = request.POST.get('order_no',None)
     if not upload_to_bucket:
         return HttpResponse(json.dumps({'message':'fail','reason':'bucket_missing'}),content_type="application/json")
     if not audio_file:
@@ -798,7 +798,10 @@ def boloindya_upload_audio_file_to_s3(request):
         return HttpResponse(json.dumps({'message':'fail','reason':'This is not a jpg/png file'}),content_type="application/json")
     if not title or not author_name:
         return HttpResponse(json.dumps({'message':'fail','reason':'Title or Author name is missing'}),content_type="application/json")
-
+    if not language_id:
+        return HttpResponse(json.dumps({'message':'fail','reason':'Language is missing'}),content_type="application/json")
+    if not order_no:
+        return HttpResponse(json.dumps({'message':'fail','reason':'Order Number is missing'}),content_type="application/json")
     bucket_credentials = get_bucket_details(upload_to_bucket)
     conn = boto3.client('s3', bucket_credentials['REGION_HOST'], aws_access_key_id = bucket_credentials['AWS_ACCESS_KEY_ID'], \
             aws_secret_access_key = bucket_credentials['AWS_SECRET_ACCESS_KEY'])
@@ -837,7 +840,8 @@ def boloindya_upload_audio_file_to_s3(request):
     music_album_dict['author_name'] = author_name
     music_album_dict['s3_file_path'] = uploaded_audio_url
     music_album_dict['image_path'] = uploaded_image_url
-
+    music_album_dict['language_id'] = language_id
+    music_album_dict['order_no'] = order_no
     music_album_obj = MusicAlbum.objects.create(**music_album_dict)
 
     os.remove(urlify(audio_file_name))
