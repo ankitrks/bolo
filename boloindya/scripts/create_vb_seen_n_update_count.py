@@ -12,7 +12,9 @@ def run():
     try:
         all_entries = []
         all_keys = []
+        # print 'Total: ', len(redis_cli.keys("bi:vb_entry:*:*"))
         for key in redis_cli.keys("bi:vb_entry:*:*"):
+            print key
             try:
                 data = redis_cli.get(key)
                 data =  json.loads(data) if data else None
@@ -25,6 +27,7 @@ def run():
             vb_entries_df = pd.DataFrame(all_entries)
             view_count = vb_entries_df['topic_id'].value_counts( ascending = True )
             aList = [VBseen(**vals) for vals in all_entries]
+            print 'Bulk Create'
             VBseen.objects.bulk_create(aList, batch_size=10000)
             for key,value in view_count.items():
                 Topic.objects.filter(pk=key).update(view_count = F('view_count') + value, imp_count = F('imp_count') + value)

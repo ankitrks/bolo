@@ -44,7 +44,7 @@ from .models import SingUpOTP
 from .models import UserJarvisDump, UserLogStatistics, UserFeedback, Campaign, Winner, Country, State, City
 from .permissions import IsOwnerOrReadOnly
 from .utils import get_weight, add_bolo_score, shorcountertopic, calculate_encashable_details, state_language, language_options,short_time,\
-    solr_object_to_db_object, solr_userprofile_object_to_db_object,get_paginated_data ,shortcounterprofile, get_ranked_topics
+    solr_object_to_db_object, solr_userprofile_object_to_db_object,get_paginated_data ,shortcounterprofile, get_ranked_topics, set_android_logs_info, set_sync_dump_info
 
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
@@ -58,7 +58,7 @@ from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following, get_redis_android_id, set_redis_android_id
 from forum.user.utils.bolo_redis import get_bolo_info_combined, get_current_month_bolo_info, get_last_month_bolo_info, get_lifetime_bolo_info , update_profile_counter
 from .serializers import *
-from tasks import vb_create_task,user_ip_to_state_task,sync_contacts_with_user,cache_follow_post,cache_popular_post, deafult_boloindya_follow, save_click_id_response, send_upload_video_notification
+from tasks import * # vb_create_task,user_ip_to_state_task,sync_contacts_with_user,cache_follow_post,cache_popular_post, deafult_boloindya_follow, save_click_id_response, send_upload_video_notification
 from haystack.query import SearchQuerySet, SQ
 from django.core.exceptions import MultipleObjectsReturned
 from forum.topic.utils import get_redis_category_paginated_data,get_redis_hashtag_paginated_data,get_redis_language_paginated_data,get_redis_follow_paginated_data, get_popular_paginated_data, update_redis_vb_seen_entries
@@ -785,7 +785,7 @@ class SolrSearchTopic(BoloIndyaGenericAPIView):
         topics      = []
         search_term = self.request.GET.get('term')
         language_id = self.request.GET.get('language_id')
-        page = int(request.GET.get('page',1))
+        page = int(request.GET.get('page')) if request.GET.get('page').strip() else 1
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
         is_expand=self.request.GET.get('is_expand',False)
         last_updated=timestamp_to_datetime(self.request.GET.get('last_updated',False))
@@ -3624,22 +3624,14 @@ def get_cloudfront_url(instance):
 @csrf_exempt
 @api_view(['POST'])
 def SyncDump(request):
-    return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
     if request.user:
         if request.method == "POST":
             #Storing the dump in database
             try:
-                if request.user.id == None:
-                    dump = request.POST.get('dump')
-                    dump_type = request.POST.get('dump_type')
-                    stored_data = UserJarvisDump(dump=dump, dump_type=dump_type, android_id=request.POST.get('android_id',''))
-                    stored_data.save()
-                else:
-                    user = request.user
-                    dump = request.POST.get('dump')
-                    dump_type = request.POST.get('dump_type')
-                    stored_data = UserJarvisDump(user=user, dump=dump, dump_type=dump_type, android_id=request.POST.get('android_id',''))
-                    stored_data.save()
+                data = {"dump": request.POST.get('dump'), "dump_type":request.POST.get('dump_type'),"android_id":request.POST.get('android_id',''), "created_at": datetime.now()}
+                if request.user.id:
+                    data["user_id"] = request.user.id
+                set_sync_dump_info(data)
                 return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)    
             except Exception as e:
                 log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
@@ -3651,14 +3643,12 @@ def SyncDump(request):
 
 @api_view(['POST'])
 def save_android_logs(request):
-    return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
     try:
-        if request.user.id == None:
-            AndroidLogs.objects.create(logs=request.POST.get('error_log', ''),log_type = request.POST.get('log_type',None), android_id=request.POST.get('android_id',''))
-            return JsonResponse({'messgae' : 'success'})
-        else:
-            AndroidLogs.objects.create(user=request.user, logs=request.POST.get('error_log', ''),log_type = request.POST.get('log_type',None), android_id=request.POST.get('android_id',''))
-            return JsonResponse({'messgae' : 'success'})
+        data = {"logs":request.POST.get('error_log', ''), "log_type":request.POST.get('log_type',None), "android_id": request.POST.get('android_id',''), "created_at": datetime.now()}
+        if request.user.id:
+            data['user_id'] = request.user.id
+        set_android_logs_info(data)
+        return JsonResponse({'messgae' : 'success'})
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
@@ -4714,6 +4704,6 @@ def get_location(location_data):
 
 class AudioFileListView(generics.ListAPIView):
     serializer_class = MusicAlbumSerializer
-    queryset = MusicAlbum.objects.all()
+    queryset = MusicAlbum.objects.all().order_by('-id')
     permission_classes  = (IsAuthenticatedOrReadOnly,)
     pagination_class = LimitOffsetPagination
