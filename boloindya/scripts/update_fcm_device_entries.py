@@ -18,7 +18,7 @@ def run():
                     all_entries += data
                     all_keys.append(key)
                     for each_data in data:
-                        if each_data['user_id']:
+                        if ('user_id' in each_data) and (each_data['user_id']):
                             fcm_tokens_keys_to_be_deleted.append(each_data['user_id'])
             except Exception as e:
                 print e
@@ -26,28 +26,40 @@ def run():
         if all_entries:
             for entry in all_entries:
                 try:
+                    reg_id = entry.get('reg_id', None)
+                    dev_id = entry.get('dev_id', None)
                     created_at = entry.get('created_at', datetime.now() - timedelta(days=1))
-                    instance = FCMDevice.objects.using('default').filter(Q(reg_id = entry['reg_id']) | Q(dev_id = entry['dev_id']))
+                    entry['created_at'] = created_at
+                    entry['is_active'] = True
+                    entry['is_uninstalled'] = False
+                    instance = FCMDevice.objects.using('default').filter(Q(reg_id = reg_id) | Q(dev_id = dev_id))
                     if not len(instance):
                         print 'Not Exists'
                         raise Exception
                     print 'Exisits'
                     desc=instance[0].uninstalled_desc
+                    entry['uninstalled_desc'] = desc
                     if desc:
                         list_data = json.loads(desc)
                         if 'uninstall' in list_data[len(list_data)-1]:
                             list_data.append({'install': datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
                         desc=json.dumps(list_data)
-                    if entry['user_id'] == None:
-                        instance.update(is_active = True,dev_id=entry['dev_id'],device_type = entry['device_type'], reg_id=entry['reg_id'], is_uninstalled=False, uninstalled_desc=desc, device_model=entry['device_model'], current_version=entry['current_version'], manufacturer=entry['manufacturer'], created_at=created_at)
+                    
+                    if ('user_id' in each_data) and (each_data['user_id']):
+                        instance.update(**entry)
                     else:
-                        instance.update(user_id = entry['user_id'],is_active = True,dev_id=entry['dev_id'],device_type = entry['device_type'],reg_id=entry['reg_id'] , is_uninstalled=False, uninstalled_desc=desc, device_model=entry['device_model'], current_version=entry['current_version'], manufacturer=entry['manufacturer'], created_at=created_at)
+                        entry.pop('user_id',None)
+                        instance.update(**entry)
                 except Exception as e:
                     print e
-                    if entry['user_id'] == None:
-                        instance = FCMDevice.objects.create(reg_id = entry['reg_id'],name='Anonymous',dev_id=entry['dev_id'],device_type = entry['device_type'], is_uninstalled=False, device_model=entry['device_model'], current_version=entry['current_version'], manufacturer=entry['manufacturer'], created_at=created_at)
+                    entry.pop('uninstalled_desc', None)
+                    entry.pop('is_active', None)
+                    if ('user_id' in each_data) and (each_data['user_id']):
+                        instance = FCMDevice.objects.create(**entry)
                     else:
-                        instance = FCMDevice.objects.create(user_id = entry['user_id'],reg_id = entry['reg_id'],dev_id=entry['dev_id'],device_type = entry['device_type'], is_uninstalled=False, device_model=entry['device_model'], current_version=entry['current_version'], manufacturer=entry['manufacturer'], created_at=created_at)
+                        entry.pop('user_id',None)
+                        entry['name'] = 'Anonymous'
+                        instance = FCMDevice.objects.create(**entry)
             for each_key in all_keys:
                 try:
                     redis_cli.delete(each_key)
