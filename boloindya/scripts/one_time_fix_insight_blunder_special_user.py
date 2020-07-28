@@ -20,6 +20,7 @@ import decimal
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
 from drf_spirit.utils import create_random_user
 import json
+from redis_utils import *
 
 
 
@@ -88,9 +89,12 @@ def run():
             print "Error in: fix_follower", e
 
         ## update_profile counter
-        
-        set_profile_counter_data = set_profile_counter(each_userprofile['user_id'])
-        print "updated_profile data", set_profile_counter_data
+
+        try:
+            set_profile_counter_data = set_profile_counter(each_userprofile['user_id'])
+            print "updated_profile data", set_profile_counter_data
+        except Exception as e:
+             print "Error in: set_profile_counter_data", e
 
 
         print each_userprofile['user__date_joined']
