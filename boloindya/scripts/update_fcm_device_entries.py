@@ -18,11 +18,11 @@ def run():
                     all_entries += data
                     all_keys.append(key)
                     for each_data in data:
-                        if not each_data['user_id']:
-                            user_id = key.split(":")[-1]
-                            fcm_tokens_keys_to_be_deleted.append(user_id)
+                        if each_data['user_id']:
+                            fcm_tokens_keys_to_be_deleted.append(each_data['user_id'])
             except Exception as e:
                 print e
+
         if all_entries:
             for entry in all_entries:
                 try:
@@ -53,7 +53,10 @@ def run():
                     redis_cli.delete(each_key)
                 except Exception as e:
                     print e
-            for each_key in fcm_tokens_keys_to_be_deleted:
-                delete_redis_fcm_token(each_key)
+            try:
+                for each_key in fcm_tokens_keys_to_be_deleted:
+                    delete_redis_fcm_token(each_key)
+            except Exception as e:
+                print e
     except Exception as e:
         print e
