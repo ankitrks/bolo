@@ -209,7 +209,7 @@ def set_current_month_insight_video_info(user_id, add):
         fake_view_count = 0
     # print real_view_count, fake_view_count
     total_view_count = real_view_count + fake_view_count
-    bolo_info['total_view_count'] = total_view_count
+    bolo_info['total_view_count'] = shorcountertopic(total_view_count)
     set_redis(key,bolo_info, True)
     return bolo_info
 
@@ -225,7 +225,7 @@ def set_lifetime_insight_video_info(user_id, add):
         fake_view_count = 0
     # print real_view_count, fake_view_count
     total_view_count = real_view_count + fake_view_count
-    bolo_info['total_view_count'] = total_view_count
+    bolo_info['total_view_count'] = shorcountertopic(total_view_count)
     userprofile_counter, is_calulcated = get_userprofile_counter_inside(user_id)
     if not is_calulcated:
         userprofile_counter['view_count'] = total_view_count

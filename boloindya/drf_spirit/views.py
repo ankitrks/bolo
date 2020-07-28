@@ -2076,15 +2076,27 @@ def get_user_bolo_info(request):
 
         if start_date and end_date and end_date > datetime.now() - timedelta(days=1):
             data = get_current_month_bolo_info(request.user.id)
-            data['messgae'] = 'success'
+            data['top_3_videos'] = []
+            data['monetised_video_count'] = 0
+            data['left_for_moderation'] = 0
+            data['unmonetizd_video_count'] = 0
+            data['message'] = 'success'
             return JsonResponse(data, status=status.HTTP_200_OK)
         elif start_date and end_date and end_date < datetime.now():
             data = get_last_month_bolo_info(request.user.id)
-            data['messgae'] = 'success'
+            data['top_3_videos'] = []
+            data['monetised_video_count'] = 0
+            data['left_for_moderation'] = 0
+            data['unmonetizd_video_count'] = 0
+            data['message'] = 'success'
             return JsonResponse(data, status=status.HTTP_200_OK)
         elif not start_date and not end_date:
             data = get_lifetime_bolo_info(request.user.id)
-            data['messgae'] = 'success'
+            data['top_3_videos'] = []
+            data['monetised_video_count'] = 0
+            data['left_for_moderation'] = 0
+            data['unmonetizd_video_count'] = 0
+            data['message'] = 'success'
             return JsonResponse(data, status=status.HTTP_200_OK)
         else:
             log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
