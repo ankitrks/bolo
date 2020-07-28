@@ -650,7 +650,7 @@ LAST_N_ACTIVE_DAYS = 3
 TIME_DECAY_CONSTANT = 36 # in hours
 
 REDIS_EXPIRY_TIME = 1800 #In Seconds half hour
-USER_DATA_REDIS_EXPIRY_TIME = 21600 #6 hrs in seconds
+USER_DATA_REDIS_EXPIRY_TIME = 43200 #12 hrs in seconds
 
 PUSH_NOTIFICATION_TEST_USER = [19, 20, 1492, 328, 41, 40]
 PUSH_NOTIFICATION_URL = "https://fcm.googleapis.com/v1/projects/boloindya-1ec98/messages:send"
