@@ -6,7 +6,7 @@ from django.db.models import Sum
 
 def run():
     for each_vb in Topic.objects.exclude(is_removed = True).filter(is_vb=True).order_by('-id'):
-        all_play = VideoPlaytime.objects.filter(videoid = each_vb.id)
+        all_play = VideoPlaytime.objects.filter(video_id = each_vb.id)
         all_play_time = all_play.aggregate(Sum('playtime'))
         each_vb = Topic.objects.exclude(is_removed = True).filter(pk=each_vb.id)
         if all_play_time.has_key('playtime__sum') and all_play_time['playtime__sum']:

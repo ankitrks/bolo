@@ -5,9 +5,13 @@ import random
 
 
 def run():
-    all_old_vb_playtime = VideoPlaytime.objects.filter(timestamp__lt = datetime.now()- timedelta(days=700))
-    start_date = datetime.strptime('01-'+str(datetime.now().month - 1 )+'-'+str(datetime.now().year), "%d-%m-%Y")
+    all_old_vb_playtime = VideoPlaytime.objects.filter(timestamp__lt = datetime(2019,4,1))
+    total_elemnts = len(all_old_vb_playtime)
+    start_date = datetime.strptime('01-'+str(datetime.now().month)+'-'+str(datetime.now().year), "%d-%m-%Y")
+    counter = 1
     for each in all_old_vb_playtime:
+        print "##########",counter," / ",total_elemnts,"#############"
+        counter+=1
         vb = Topic.objects.get(pk=each.videoid)
         if vb.date > start_date:
             random_time = random_datetime(vb.date,datetime.now())

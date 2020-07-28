@@ -109,6 +109,7 @@ class UserProfile(models.Model,ModelDiffMixin):
     boost_span = models.PositiveIntegerField(_("Boost Span(Hours)"), null=True, blank=True, default=0)
     country_code = models.CharField(_("Country Phone Code"), max_length=20, blank = True, null = True)
     salary_range = models.CharField(choices=salary_choices, blank = True, null = True, max_length=10,db_index=True)
+    is_insight_fix = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = _("user profile")
@@ -186,11 +187,37 @@ class UserPay(RecordTimeStamp):
     is_evaluated = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False)
     is_active = models.BooleanField(default = True)
+
     class Meta:
         verbose_name_plural = 'User\'s Pay'
 
     def __unicode__(self):
         return str(self.user)
+
+
+
+class OldMonthInsightData(RecordTimeStamp):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='user_insight_data')
+    for_year = models.PositiveIntegerField(_('year'), choices=((r,r) for r in range(2019, datetime.now().year+1)), default=current_year)
+    for_month = models.PositiveIntegerField(_('month'),choices=month_choices,default =previous_month )
+    insight_data = models.TextField(null=True,blank=True)
+
+    def __unicode__(self):
+        return str(self.user)+' - '+str(self.get_for_month_display())+' - '+str(self.get_for_year_display())
+    
+
+class InsightDataDump(RecordTimeStamp):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='insight_dump')
+    for_year = models.PositiveIntegerField(_('year'), choices=((r,r) for r in range(2019, datetime.now().year+1)), null=True,blank = True)
+    for_month = models.PositiveIntegerField(_('month'),choices=month_choices,null=True,blank=True )
+    old_insight_data = models.TextField(null=True,blank=True)
+    new_insight_data = models.TextField(null=True,blank=True)
+
+    class Meta:
+        verbose_name_plural = 'InsightDataDump\'s'
+
+    def __unicode__(self):
+        return str(self.user)+' - '+str(self.get_for_month_display())+' - '+str(self.get_for_year_display())
 
 
 

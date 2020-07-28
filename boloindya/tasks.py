@@ -300,6 +300,7 @@ def deafult_boloindya_follow(user_id,language):
         from forum.user.models import Follower, UserProfile
         from drf_spirit.utils import add_bolo_score
         from forum.user.utils.follow_redis import update_redis_follower, update_redis_following
+        from forum.user.utils.bolo_redis import update_profile_counter
 
         user = User.objects.get(pk=user_id)
         if language == '2':
@@ -317,11 +318,17 @@ def deafult_boloindya_follow(user_id,language):
             bolo_indya_profile = UserProfile.objects.filter(user = bolo_indya_user).update(follower_count = F('follower_count') + 1)
             update_redis_following(user.id,int(bolo_indya_user.id),True)
             update_redis_follower(int(bolo_indya_user.id),user.id,True)
+            update_profile_counter(user.id,'follower_count',1, True)
+            update_profile_counter(bolo_indya_user.id,'follow_count',1, True)
         if not follow.is_active:
             follow.is_active = True
             follow.save()
+            userprofile = UserProfile.objects.filter(user_id = user.id).update(follow_count = F('follow_count') + 1)
+            bolo_indya_profile = UserProfile.objects.filter(user_id = bolo_indya_user.id).update(follower_count = F('follower_count') + 1)
             update_redis_following(user.id,int(bolo_indya_user.id),True)
             update_redis_follower(int(bolo_indya_user.id),user.id,True)
+            update_profile_counter(user.id,'follower_count',1, True)
+            update_profile_counter(bolo_indya_user.id,'follow_count',1, True)
         return True
     except:
         return False
