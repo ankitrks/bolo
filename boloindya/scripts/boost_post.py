@@ -171,7 +171,7 @@ def check_like(topic_id,user_ids):
     if user_want_like:
         score = get_weight('liked')
         vb_like_type = ContentType.objects.get(app_label='forum_topic', model='like')
-        new_vb_like = find_set_diff(user_want_like,already_like,['user_id','topic_id'])
+        new_vb_like = user_want_like
         if new_vb_like:
             aList = [Like(**vals) for vals in new_vb_like]
             newly_created = Like.objects.bulk_create(aList, batch_size=10000)

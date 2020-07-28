@@ -73,11 +73,13 @@ def run():
             elif each_seen.date +timedelta(hours=21) < now and each_seen.view_count < int(750*multiplication_factor):
                 number_seen = random.randrange(1,int(750*multiplication_factor)-each_seen.view_count)
             else:
-                number_seen = 1
+                number_seen = 0
             i = 0
             print number_seen
-            Topic.objects.filter(pk=each_seen_id).update(view_count = F('view_count')+number_seen)
-            profile_updation = UserProfile.objects.filter(user = Topic.objects.get(pk=each_seen_id).user).update(own_vb_view_count = F('own_vb_view_count')+number_seen, view_count = F('view_count')+number_seen)
+            if number_seen:
+                Topic.objects.filter(pk=each_seen_id).update(view_count = F('view_count')+number_seen)
+                FVBseen.objects.create(topic_id = each_seen_id, view_count = number_seen)
+                profile_updation = UserProfile.objects.filter(user = Topic.objects.get(pk=each_seen_id).user).update(own_vb_view_count = F('own_vb_view_count')+number_seen, view_count = F('view_count')+number_seen)
             print "after: views updation",datetime.now()
             print "total created: ", number_seen
         except Exception as e:
