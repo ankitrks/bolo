@@ -735,13 +735,21 @@ input:checked + .slider:before {
 
     <div class="mainHeader">
         <section class="navbar">
+          <a href="/{{LANGUAGE_CODE}}/">
             <div class="logo">
                 <img src="/media/boloindya_new_logo.png" alt="Logo">
             </div>
+          </a>
             <nav>
-                <a href="#">Explore</a>
-                <a href="#">Sign in</a>
-                <a href="#" class="get-started-btn">Get Started</a>
+                <a class="jsx-475503780" href="/{{LANGUAGE_CODE}}/discover/">Explore</a>
+
+                {% if user.is_authenticated %}
+                {% else %}
+                  <a href="#">Sign in</a>
+                {% endif %}
+
+                
+                <a onclick="onClickRedirect('/{{LANGUAGE_CODE}}/discover/');" href="javascript:void(0);" class="get-started-btn">Get Started</a>
             </nav>
         </section>
     </div>
@@ -946,5 +954,12 @@ input:checked + .slider:before {
 // }
 
 // toggleSwitch.addEventListener('change', switchTheme, false);
+
+
+function onClickRedirect(pageName){
+    window.location.href = pageName;
+    return false;
+}
+
 
 </script>
