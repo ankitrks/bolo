@@ -46,4 +46,4 @@ class UserPayForm(ModelForm):
 class AudioUploadForm(ModelForm):
     class Meta():
         model = MusicAlbum
-        fields = ['title','author_name']
+        fields = ['title','author_name', 'language_id', 'order_no']

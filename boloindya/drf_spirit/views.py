@@ -9,6 +9,7 @@ import random
 import urllib2
 import itertools
 import requests
+import pandas as pd
 from random import shuffle
 from collections import OrderedDict
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
@@ -44,7 +45,8 @@ from .models import SingUpOTP
 from .models import UserJarvisDump, UserLogStatistics, UserFeedback, Campaign, Winner, Country, State, City
 from .permissions import IsOwnerOrReadOnly
 from .utils import get_weight, add_bolo_score, shorcountertopic, calculate_encashable_details, state_language, language_options,short_time,\
-    solr_object_to_db_object, solr_userprofile_object_to_db_object,get_paginated_data ,shortcounterprofile, get_ranked_topics, set_android_logs_info, set_sync_dump_info
+    solr_object_to_db_object, solr_userprofile_object_to_db_object,get_paginated_data ,shortcounterprofile, get_ranked_topics,\
+    set_android_logs_info, set_sync_dump_info, get_language_specific_audio_list, get_audio_list
 
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
@@ -4716,6 +4718,37 @@ def get_location(location_data):
 
 class AudioFileListView(generics.ListAPIView):
     serializer_class = MusicAlbumSerializer
-    queryset = MusicAlbum.objects.all().order_by('-id')
+    queryset = MusicAlbum.objects.all()
     permission_classes  = (IsAuthenticatedOrReadOnly,)
     pagination_class = LimitOffsetPagination
+
+@api_view(['GET'])
+def audio_list(request):
+    try:
+        results = []
+        page_no = request.GET.get('page_no',1)
+        language_id = request.GET.get('language_id',1)
+        language_specific_audio_list = get_language_specific_audio_list(language_id, page_no)
+        if len(language_specific_audio_list) == settings.REST_FRAMEWORK['PAGE_SIZE']:
+            return JsonResponse({'results': language_specific_audio_list, 'count': len(language_specific_audio_list)}, status=status.HTTP_200_OK)
+        total_audio_list = get_audio_list()
+        results += filter_audio_data(language_specific_audio_list, total_audio_list, language_id, page_no)
+        return JsonResponse({'results': results, 'count': len(results)}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e), 'results': []}, status=status.HTTP_400_BAD_REQUEST)
+
+def filter_audio_data(language_specific_audio_list, total_audio_list, language_id, page_no):
+    language_specific_audio_df = pd.DataFrame(language_specific_audio_list)
+    total_data_df = pd.DataFrame(total_audio_list)
+    filtered_df = total_data_df[total_data_df['language_id']!=str(language_id)]
+    final_df = pd.concat([language_specific_audio_df, filtered_df])
+    if language_specific_audio_list:
+        return final_df.head(15).to_dict('records')
+    else:
+        items_per_page = settings.REST_FRAMEWORK['PAGE_SIZE']
+        start_index = items_per_page * (int(page_no)-1)
+        language_specific_list = len(total_data_df) - len(filtered_df)
+        start_index = start_index - language_specific_list
+        end_index = start_index + items_per_page
+        return filtered_df.to_dict('records')[start_index:end_index]

@@ -9,6 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from forum.core.conf import settings
 from forum.topic.models import RecordTimeStamp
 from datetime import datetime
+from drf_spirit.utils import language_options
 
 class SingUpOTP(models.Model):
     mobile_no = models.CharField(_("title"), max_length=75)
@@ -480,9 +481,14 @@ class City(RecordTimeStamp):
        return str(self.name)+', '+str(self.state)
 
 class MusicAlbum(models.Model):
-  title = models.CharField(_("title"),null=True,blank=True,max_length=1000)
-  s3_file_path = models.CharField(_("s3 file path"),null=True,blank=True,max_length=1000)
-  image_path = models.CharField(_("image path"),null=True,blank=True,max_length=1000)
-  author_name = models.CharField(_("author name"),null=True,blank=True,max_length=1000)
-  def __unicode__(self):
+    title = models.CharField(_("title"),null=True,blank=True,max_length=1000)
+    s3_file_path = models.CharField(_("s3 file path"),null=True,blank=True,max_length=1000)
+    image_path = models.CharField(_("image path"),null=True,blank=True,max_length=1000)
+    author_name = models.CharField(_("author name"),null=True,blank=True,max_length=1000)
+    language_id = models.CharField(_("language"), choices=language_options, blank = True, null = True, max_length=10, default='1')
+    order_no = models.PositiveIntegerField(_("order_no"), default = 0)
+    last_modified = models.DateTimeField(_("last_modified"),auto_now=True, auto_now_add=False,blank=False, null=False)
+    def __unicode__(self):
        return str(self.title)+', '+str(self.author_name)
+    class Meta:
+        ordering = ['order_no']

@@ -25,7 +25,6 @@ language_options = (
     ('12', "Bhojpuri"),
     ('13', "Haryanvi"),
     ('14', "Sinhala"),
-
 )
 
 month_choices=(
@@ -503,3 +502,35 @@ def set_android_logs_info(value):
 def set_sync_dump_info(value):
     key = "sync_dump:" + str(datetime.now()).replace(' ', '')
     set_redis(key, value, False)
+
+def get_language_specific_audio_list(language_id, page_no):
+    from .models import MusicAlbum
+    from .serializers import MusicAlbumSerializer
+    from django.core.paginator import Paginator
+    key = "audio_list:lang_id:" + str(language_id) + ":page:" +str(page_no)
+    audio_list = get_redis(key)
+    if not audio_list:
+        items_per_page = settings.REST_FRAMEWORK['PAGE_SIZE']
+        query = MusicAlbum.objects.filter(language_id=language_id)
+        paginator = Paginator(query, items_per_page)
+        try:
+            music_album = paginator.page(page_no)
+        except:
+            music_album = []
+        data = json.loads(json.dumps(MusicAlbumSerializer(music_album, many=True).data))
+        set_redis(key, data, False)
+        return data
+    else:
+        return audio_list
+
+def get_audio_list():
+    try:
+        results = []
+        for key in redis_cli.keys("bi:audio_list:*"):
+            data = redis_cli.get(key)
+            data =  json.loads(data) if data else None
+            results+=data
+        return results
+    except Exception as e:
+        print e
+        return []
