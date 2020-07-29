@@ -1103,5 +1103,4 @@ class CampaignSerializer(ModelSerializer):
 class MusicAlbumSerializer(ModelSerializer):
   class Meta:
     model = MusicAlbum
-    # fields = '__all__'
-    exclude = ('last_modified', 'order_no')
+    fields = '__all__'
