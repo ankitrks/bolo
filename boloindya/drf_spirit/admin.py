@@ -54,8 +54,9 @@ class CustomDateTimeFilter(DateFieldListFilter):
         )
 
 class MusicAlbumAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'author_name', 's3_file_path', 'image_path')
-    list_editable = ('title', 'author_name')
+    list_display = ('id', 'title', 'author_name', 'language_id', 'order_no', 's3_file_path', 'image_path')
+    list_editable = ('title', 'author_name', 'language_id', 'order_no')
+    list_filter = ('language_id', )
     search_fields = ('title', 'author_name')
 admin.site.register(MusicAlbum, MusicAlbumAdmin)
 
