@@ -1,5 +1,5 @@
 
-{% extends "spirit/_new_base.html" %}
+{% extends "spirit/_new_layout_base.html" %}
 {% load spirit_tags i18n %}
 {% load i18n %}
 {% load number_formate_change_tag %}
@@ -78,7 +78,6 @@
     height: 80px;
  
 }
-
 
 ._video_card_footer_likes1{
     position: absolute;
@@ -339,104 +338,200 @@
     font-weight: bold;
 }
 
+.category-name {
+    color: #b52828;
+    padding: 25px 0;
+}
+
+.jsx-2347012111.discoverandtrending {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+    list-style: none;
+    -webkit-align-items: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+}
+.menu-item-link.menu-item-link-active.jsx-1572239188 {
+    color: #121212;
+    -webkit-transform: none;
+    -ms-transform: none;
+    transform: none;
+}
+
+.menu-item-link.jsx-1572239188 {
+  
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 70px;
+    cursor: pointer;
+    color: rgba(18,18,18,0.75);
+    -webkit-transition: all 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
+    -webkit-transform: scale(0.75);
+    -ms-transform: scale(0.75);
+    transform: scale(0.75);
+}
+.menu-item-link.jsx-1572239188 a, .menu-item-link.jsx-1572239188 div {
+    -webkit-text-decoration: none;
+    text-decoration: none;
+    background-color: transparent;
+    position: relative;
+    display: inline-block;
+    height: 55px;
+}
+.menu-wrapper.jsx-2347012111>li.jsx-2347012111+li.jsx-2347012111 {
+    margin-left: 32px;
+}
+
+.discoverAndTrending{
+    position: absolute;
+    transform: translate(0%, 0%);
+    top: 50%;
+    left: 40%;
+    width: 100%;
+}
+.discoverAnchor{
+    font-weight: 100; color: #b62827; font-size: 30px; margin: 0 15px;
+}
+.trendingAnchor{
+    font-weight: 100; color: black; font-size: 30px;  margin: 0 15px;
+}
+
+@media(max-width: 991px){
+
+.discoverAndTrending{
+    position: absolute;
+    transform: translate(-0%, -50%);
+    top: 35%;
+    left: 20%;
+    width: 100%;
+}
+.discoverAnchor{
+    font-weight: 100; color: #b62827; font-size: 20px; margin: 0 15px;
+}
+.trendingAnchor{
+    font-weight: 100; color: black; font-size: 20px;  margin: 0 15px;
+}
+}
+
+
+
 </style>
-    <input type="hidden" name="previousVideoId" id="previousVideoId" value="">
-    <input type="hidden" name="nextVideoId" id="nextVideoId" value="">
-<div class="_1RNJh" id="subHeader">
-    <div class="_2qRoq">
-        <div class="_2WfMm">
-            <nav>
-                <ul class="horizontal-scroll">
-                    <li class="item link-active"  id="" style="padding-top:.5em;padding-bottom:.5em;cursor:pointer"><a href="javascript:void(0)" class="_3gKV2">{% trans "What's Hot" %}</a>
-                    </li>
-                
-                {%  for each_category_item in categories %}
+<input type="hidden" name="previousVideoId" id="previousVideoId" value="">
+<input type="hidden" name="nextVideoId" id="nextVideoId" value="">
 
-                    <li  class="item" id="" style="padding-top:.5em;padding-bottom:.5em;cursor:pointer"><a href="/tag/{{each_category_item.slug}}/" class="_3gKV2">{% category_title_by_language each_category_item LANGUAGE_CODE|language_name %}</a></li>
-
-                {% endfor %}
-                <li></li>
-
-
-                </ul>
-            </nav>
-        </div>
-    </div>
-</div>
-
-<div class="jsx-2546051494 _global_container">
-            <div class="jsx-2546051494 _base_layout_container">
-                <div class="_base_layout_content">
-                    <div class="_base_layout_main">
-
-                        <div class="_base_layout_content">
-                            <div class="_base_layout_main">
-                                <header class="jsx-3990559340 _explore_page_main_header" style="margin-top: 30px;">
-                                    <div class="jsx-3990559340">
-                                        <h1 class="jsx-3990559340 _explore_page_main_title">What's Hot</h1>
-                                        <h2 class="jsx-3990559340 _explore_page_main_desc">Be the first to watch the latest videos</h2></div>
-                                    <div class="jsx-3990559340 _explore_page_main_aside" style="margin-top: 20px;">
-                                        <div class="jsx-885361899 jsx-3852217983 jsx-2412776336 share-group">
-                                                    <a href="javascript:void(0)" onclick="social_share_page('facebook_share','{{ request.get_full_path }}')" target="_blank" class="jsx-885361899 jsx-3852217983 jsx-2412776336">
-                                                        <span><img src="/media/facebook_mobile.svg" class="jsx-885361899 jsx-3852217983 jsx-2412776336"></span>
-                                                    </a>
-                                                    <a href="javascript:void(0);" onclick="social_share_page('twitter_share','{{ request.get_full_path }}')" class="jsx-885361899 jsx-3852217983 jsx-2412776336">
-                                                        <span><img src="/media/twitter_mobile.svg" class="jsx-885361899 jsx-3852217983 jsx-2412776336">
-                                                        </span>
-                                                    </a>
-                                                    <a href="javascript:void(0);" onclick="social_share_page('whatsapp_share','{{ request.get_full_path }}')" class="jsx-885361899 jsx-3852217983 jsx-2412776336">
-                                                        <span><img src="/media/whatsapp.svg" class="jsx-885361899 jsx-3852217983 jsx-2412776336">
-                                                        </span>
-                                                    </a>
-                                        </div>
-                                    </div>
-                                </header>
-                                <div class="_explore_page_feed_wrapper" id="categoryIdList" style="min-height: 150px;">
-                                    <div class="jsx-1289101510 _explore_feed_wrapper">
-                                        <div class="">
-                                            <div class="jsx-4249974497 _explore_feed_container">
-                                                <div class="" id="catWithVideoId">
-
-                                                </div>
-                                               
-                                            </div>
-                                            
-                                        </div>
-                                    </div>
-                                    <div class="jsx-1289101510 _explore_feed_wrapper">
-                                        <div class="">
-                                            <div class="jsx-4249974497 _explore_feed_container">
-                                                <div class="" id="catWithVideoIdRight">
-                  
-                                                </div>
-                                            </div>
-                                            <!-- <div class="jsx-4249974497 _scroll_load_more_loading_right"></div> -->
-                                        </div>
-                                    </div>
-
-                                    <input type="hidden" name="nextpageURL" id="nextpageURLId" value="">
-                                </div>
+<body style="background: #F8F8F8;">
+        <div class="_1RNJh" id="subHeader">
+                <div class="_2qRoq">
+                    <div class="_2WfMm">
+                        
+                        <div style="width: 100%; height: 75px; position: relative;" >
+                            <div class="discoverAndTrending">
+                                <span><a href="/{{LANGUAGE_CODE}}/discover/" class="discoverAnchor">Discover</a></span>
+                                <span style="height: 25px; border-left: thin solid #a2a2a2;"></span>
+                                <span><a href="/{{LANGUAGE_CODE}}/feed/" class="trendingAnchor">Trending</a></span>
                             </div>
                         </div>
-                        <div class="jsx-4249974497 _scroll_load_more_loading_left"></div>
-                        <div class="jsx-1621765621 jsx-282865838 to-top to-top-enter-done"></div>
+            
+                        <nav>
+                            <ul class="horizontal-scroll">
+                                <li class="item"  id="" style="padding-top:.5em;padding-bottom:.5em;cursor:pointer"><a href="javascript:void(0)" class="category-whats-hot">{% trans "What's Hot" %}</a>
+                                </li>
+                            
+                            {%  for each_category_item in categories %}
+            
+                                <li  class="item" id="" style="padding-top:.5em;padding-bottom:.5em;cursor:pointer"><a href="/tag/{{each_category_item.slug}}/" class="category-name">{% category_title_by_language each_category_item LANGUAGE_CODE|language_name %}</a></li>
+            
+                            {% endfor %}
+                            </ul>
+                        </nav>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
+            
+            <div class="jsx-2546051494 _global_container">
+                        <div class="jsx-2546051494 _base_layout_container">
+                            <div class="_base_layout_content">
+                                <div class="_base_layout_main">
+            
+                                    <div class="_base_layout_content">
+                                        <div class="_base_layout_main">
+                                            <!-- <header class="jsx-3990559340 _explore_page_main_header" >
+                                                <div class="jsx-3990559340">
+                                                    <h1 class="jsx-3990559340 _explore_page_main_title">What's Hot</h1>
+                                                    <h2 class="jsx-3990559340 _explore_page_main_desc">Be the first to watch the latest videos</h2></div>
+                                                <div class="jsx-3990559340 _explore_page_main_aside" style="margin-top: 20px;">
+                                                    <div class="jsx-885361899 jsx-3852217983 jsx-2412776336 share-group">
+                                                                <a href="javascript:void(0)" onclick="social_share_page('facebook_share','{{ request.get_full_path }}')" target="_blank" class="jsx-885361899 jsx-3852217983 jsx-2412776336">
+                                                                    <span><img src="/media/facebook_mobile.svg" class="jsx-885361899 jsx-3852217983 jsx-2412776336"></span>
+                                                                </a>
+                                                                <a href="javascript:void(0);" onclick="social_share_page('twitter_share','{{ request.get_full_path }}')" class="jsx-885361899 jsx-3852217983 jsx-2412776336">
+                                                                    <span><img src="/media/twitter_mobile.svg" class="jsx-885361899 jsx-3852217983 jsx-2412776336">
+                                                                    </span>
+                                                                </a>
+                                                                <a href="javascript:void(0);" onclick="social_share_page('whatsapp_share','{{ request.get_full_path }}')" class="jsx-885361899 jsx-3852217983 jsx-2412776336">
+                                                                    <span><img src="/media/whatsapp.svg" class="jsx-885361899 jsx-3852217983 jsx-2412776336">
+                                                                    </span>
+                                                                </a>
+                                                    </div>
+                                                </div>
+                                            </header> -->
+                                            <div class="_explore_page_feed_wrapper" id="categoryIdList" style="min-height: 150px;">
+                                                <div class="jsx-1289101510 _explore_feed_wrapper">
+                                                    <div class="">
+                                                        <div class="jsx-4249974497 _explore_feed_container">
+                                                            <div class="" id="catWithVideoId">
+                                                                    
+                                                            </div>
+                                                           
+                                                        </div>
+                                                        
+                                                    </div>
+                                                </div>
+                                                <div class="jsx-1289101510 _explore_feed_wrapper">
+                                                    <div class="">
+                                                        <div class="jsx-4249974497 _explore_feed_container">
+                                                            <div class="" id="catWithVideoIdRight">
+                                                                
+                                                            </div>
+                                                        </div>
+                                                        <!-- <div class="jsx-4249974497 _scroll_load_more_loading_right"></div> -->
+                                                    </div>
+                                                </div>
+            
+                                                <input type="hidden" name="nextpageURL" id="nextpageURLId" value="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="jsx-4249974497 _scroll_load_more_loading_left"></div>
+                                    <div class="jsx-1621765621 jsx-282865838 to-top to-top-enter-done"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <script src="/media/js/video_discover_hashtag.js"></script>
+            <script type="text/javascript">
+                $(function(){
+                var url = window.location.href; 
+            
+                $(".top_menu_details").removeClass('menu-item-link-active');
+                $(".discoverMenu").addClass('menu-item-link-active');
+             
+            });
+            </script>
+</body>
 
-<script src="/media/js/video_discover_hashtag.js"></script>
-<script type="text/javascript">
-    $(function(){
-    var url = window.location.href; 
-
-    $(".top_menu_details").removeClass('menu-item-link-active');
-    $(".discoverMenu").addClass('menu-item-link-active');
- 
-});
-</script>
 <!-- Start Comments Section -->
 {% include "spirit/topic/trending_play_and_comment.html" %}
 <!-- End Load Comments  -->
