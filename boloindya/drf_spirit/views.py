@@ -1,4 +1,4 @@
- # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import os
 import ast
 import copy
@@ -8,6 +8,7 @@ import boto3
 import random
 import urllib2
 import itertools
+import requests
 from random import shuffle
 from collections import OrderedDict
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
@@ -40,10 +41,10 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .filters import TopicFilter, CommentFilter
 from .models import SingUpOTP
-from .models import UserJarvisDump, UserLogStatistics, UserFeedback
+from .models import UserJarvisDump, UserLogStatistics, UserFeedback, Campaign, Winner, Country, State, City
 from .permissions import IsOwnerOrReadOnly
 from .utils import get_weight, add_bolo_score, shorcountertopic, calculate_encashable_details, state_language, language_options,short_time,\
-    solr_object_to_db_object,get_paginated_data ,shortcounterprofile, get_ranked_topics
+    solr_object_to_db_object, solr_userprofile_object_to_db_object,get_paginated_data ,shortcounterprofile, get_ranked_topics, set_android_logs_info, set_sync_dump_info
 
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
@@ -52,14 +53,15 @@ from forum.comment.models import Comment,CommentHistory
 from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs,UserPay,VideoPlaytime,UserPhoneBook,Contact,ReferralCode
 from jarvis.models import FCMDevice,StateDistrictLanguage, BannerUser, Report
 from forum.topic.models import Topic,TopicHistory, ShareTopic, Like, SocialShare, Notification, CricketMatch, Poll, Choice, Voting, \
-    Leaderboard, VBseen, TongueTwister, HashtagViewCounter
+    Leaderboard, VBseen, TongueTwister, HashtagViewCounter, FVBseen
 from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
-from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
+from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following, get_redis_android_id, set_redis_android_id
+from forum.user.utils.bolo_redis import get_bolo_info_combined, get_current_month_bolo_info, get_last_month_bolo_info, get_lifetime_bolo_info , update_profile_counter
 from .serializers import *
-from tasks import vb_create_task,user_ip_to_state_task,sync_contacts_with_user,cache_follow_post,cache_popular_post
+from tasks import * # vb_create_task,user_ip_to_state_task,sync_contacts_with_user,cache_follow_post,cache_popular_post, deafult_boloindya_follow, save_click_id_response, send_upload_video_notification
 from haystack.query import SearchQuerySet, SQ
 from django.core.exceptions import MultipleObjectsReturned
-from forum.topic.utils import get_redis_category_paginated_data,get_redis_hashtag_paginated_data,get_redis_language_paginated_data,get_redis_follow_paginated_data, get_popular_paginated_data
+from forum.topic.utils import get_redis_category_paginated_data,get_redis_hashtag_paginated_data,get_redis_language_paginated_data,get_redis_follow_paginated_data, get_popular_paginated_data, update_redis_vb_seen_entries
 # from haystack.inputs import Raw, AutoQuery
 # from haystack.utils import Highlighter
 from django.contrib.contenttypes.models import ContentType
@@ -107,15 +109,18 @@ class NotificationAPI(GenericAPIView):
             return JsonResponse({'notification_data':notification_data,'next_offset':next_offset}, safe=False)
 
         elif action == 'click':
-            self.mark_notification_as_read()
-            return JsonResponse({
-                    'status': "SUCCESS"
-                })
+            try:
+                self.mark_notification_as_read()
+            except:
+                pass
+            return JsonResponse({'status': "SUCCESS"})
+        
         elif action == 'mark_all_read':
-            self.mark_all_read()
-            return JsonResponse({
-                    'status': "SUCCESS"
-                })
+            try:
+                self.mark_all_read()
+            except:
+                pass
+            return JsonResponse({'status': "SUCCESS"})
 
     def get_notifications(self, user_id):
         user_id = self.request.user.id
@@ -157,9 +162,7 @@ class NotificationAPI(GenericAPIView):
 
     
     def mark_notification_as_read(self):
-        notification = Notification.objects.get(id = self.request.data.get("id"))
-        notification.status = 2
-        notification.save()
+        notification = Notification.objects.using('default').filter(id = self.request.data.get("id")).update(status = 2)
 
     def mark_all_read(self):
         Notification.objects.filter(for_user=self.request.user).update(status=2)
@@ -287,9 +290,9 @@ class Usertimeline(generics.ListCreateAPIView):
                         # print "a"
                         # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,date__gte=enddate)
                         if not sort_recent:
-                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,is_vb = False)
+                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory__id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,is_vb = False)
                         else:
-                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,is_vb = False).order_by('-last_commented')
+                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory__id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,is_vb = False).order_by('-last_commented')
                     elif 'category' in search_term and not 'language_id' in search_term:
                         # print "b"
                         # post1 = Topic.objects.filter(category__slug =self.request.GET.get('category'),is_removed = False,date__gte=enddate)
@@ -308,9 +311,9 @@ class Usertimeline(generics.ListCreateAPIView):
                         # print "d"
                         # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,date__gte=enddate)
                         if not sort_recent:
-                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory_id__in = category_follow),is_removed = False,is_vb = False)
+                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory__id__in = category_follow),is_removed = False,is_vb = False)
                         else:
-                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory_id__in = category_follow),is_removed = False,is_vb = False).order_by('-last_commented')
+                            post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory__id__in = category_follow),is_removed = False,is_vb = False).order_by('-last_commented')
                     # print post1,post2
                     # if post1:
                     #     topics = topics+list(post1)
@@ -327,9 +330,9 @@ class Usertimeline(generics.ListCreateAPIView):
             # enddate = startdate - timedelta(days=1)
             # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,date__gte=enddate)
             if not sort_recent:
-                post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory_id__in = category_follow),is_removed = False,is_vb = False)
+                post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory__id__in = category_follow),is_removed = False,is_vb = False)
             else:
-                post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory_id__in = category_follow),is_removed = False,is_vb = False).order_by('-last_commented')
+                post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory__id__in = category_follow),is_removed = False,is_vb = False).order_by('-last_commented')
             # if post1:
             #     topics = topics+list(post1) 
             if post2:
@@ -350,7 +353,7 @@ def VBList(request):
     page_no = int(request.GET.get('page',1))
     if search_term:
         for term_key in search_term:
-            if term_key not in ['limit','page','offset','order_by','is_popular']:
+            if term_key not in ['limit','page','offset','order_by','is_popular', 'vb_score']:
                 if term_key:
                     value = request.GET.get(term_key)
                     filter_dic[term_key]=value
@@ -404,7 +407,7 @@ def replace_query_param(url, key, val):
     query = query_dict.urlencode()
     return urlparse.urlunsplit((scheme, netloc, path, query, fragment))
 
-class GetChallenge(generics.ListCreateAPIView):
+class old_algoGetChallenge(generics.ListCreateAPIView):
     serializer_class = TopicSerializerwithComment
     permission_classes = (IsOwnerOrReadOnly,)
     pagination_class = ShufflePagination 
@@ -472,23 +475,25 @@ class GetChallenge(generics.ListCreateAPIView):
 
 
 @api_view(['GET'])
-def newAlgoGetChallenge(request):
+def GetChallenge(request):
     challenge_hash = request.GET.get('challengehash')
     language_id = request.GET.get('language_id')
     challengehash = '#' + challenge_hash
-    hash_tag = TongueTwister.objects.get(hash_tag__iexact=challengehash[1:])
-    all_seen_vb = []
-    topics =[]
-    page_no = int(request.GET.get('page',1))
-    if 'offset' in request.GET.keys() and int(request.GET.get('offset') or 0):
-        page_no = int(int(request.GET.get('offset') or 0)/settings.REST_FRAMEWORK['PAGE_SIZE'])+1
-    filter_dict = {'hash_tags':hash_tag}
-    if language_id:
-        filter_dict['language_id']=language_id
-    topics = get_redis_hashtag_paginated_data(language_id,hash_tag.id,page_no)
-    my_data = TopicSerializerwithComment(topics,context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand':request.GET.get('is_expand',True)},many=True).data
-
-    return JsonResponse({"results":my_data})
+    hash_tag = TongueTwister.objects.filter(hash_tag__iexact=challengehash[1:])
+    if hash_tag:
+        all_seen_vb = []
+        topics =[]
+        page_no = int(request.GET.get('page',1))
+        if 'offset' in request.GET.keys() and int(request.GET.get('offset') or 0):
+            page_no = int(int(request.GET.get('offset') or 0)/settings.REST_FRAMEWORK['PAGE_SIZE'])+1
+        filter_dict = {'hash_tags':hash_tag[0]}
+        if language_id:
+            filter_dict['language_id']=language_id
+        topics = get_redis_hashtag_paginated_data(language_id,hash_tag[0].id,page_no)
+        my_data = TopicSerializerwithComment(topics,context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand':request.GET.get('is_expand',True)},many=True).data
+        return JsonResponse({"results":my_data})
+    else:
+        return JsonResponse({"results":[]})
 
 class SmallSetPagination(PageNumberPagination):
     page_size = 3
@@ -526,11 +531,10 @@ def GetFollowPost(request):
     all_seen_vb = []
     topics =[]
     page_no = request.GET.get('page',1)
+    if int(page_no) == 1:
+        cache_follow_post(request.user.id)
     topics = get_redis_follow_paginated_data(request.user.id,page_no)
     return JsonResponse({"results":TopicSerializerwithComment(topics,context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand':request.GET.get('is_expand',True)},many=True).data})
-
-
-        
 
 @api_view(['POST'])
 def GetChallengeDetails(request):
@@ -564,7 +568,10 @@ def GetChallengeDetails(request):
                 'mt_descpription':'','picture':'',\
                 'all_seen':shorcountertopic(hash_tag_counter.view_count)},status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Invalid','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API GetChallengeDetails/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class GetTopic(generics.ListCreateAPIView):
@@ -706,6 +713,23 @@ class BoloIndyaGenericAPIView(GenericAPIView):
         new_request = super(BoloIndyaGenericAPIView, self).initialize_request(request, *args, **kwargs)
         return new_request
 
+def search_break_word(term):
+    q_objects = SQ()
+    if term:
+        term_list = term.strip().split(' ')
+        i=0
+        for i, each_term in enumerate(term_list):
+            if each_term:
+                if i==0:
+                    q_objects = SQ(content=each_term)
+                else:
+                    q_objects |= SQ(content=each_term)
+        return q_objects
+    else:
+        return SQ(content='')
+
+
+
 class SolrSearchTop(BoloIndyaGenericAPIView):
     def get(self, request):
         topics      = []
@@ -718,29 +742,29 @@ class SolrSearchTop(BoloIndyaGenericAPIView):
         response ={}
         if search_term:
             topics =[]
-            sqs = SearchQuerySet().models(Topic).raw_search(search_term).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
+            sqs = SearchQuerySet().models(Topic).raw_search(search_term).filter(SQ(language_id=language_id)|SQ(language_id='1')).filter(is_removed = False)
             if not sqs:
                 suggested_word = SearchQuerySet().models(Topic).auto_query(search_term).spelling_suggestion()
                 if suggested_word:
-                    sqs = SearchQuerySet().models(Topic).raw_search(suggested_word).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
+                    sqs = SearchQuerySet().models(Topic).raw_search(suggested_word).filter(SQ(language_id=language_id)|SQ(language_id='1')).filter(is_removed = False)
             if not sqs:
-                sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
+                sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(SQ(language_id=language_id)|SQ(language_id='1')).filter(is_removed = False)
             if sqs:
                 result_page = get_paginated_data(sqs, int(page_size), int(page))
                 topics = solr_object_to_db_object(result_page[0].object_list)
             response["top_vb"]=TopicSerializerwithComment(topics,many=True,context={'is_expand':is_expand,'last_updated':last_updated}).data
             users  =[]
-            sqs = SearchQuerySet().models(UserProfile).raw_search(search_term)
+            sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term))
             if not sqs:
                 suggested_word = SearchQuerySet().models(UserProfile).auto_query(search_term).spelling_suggestion()
                 if suggested_word:
-                    sqs = SearchQuerySet().models(UserProfile).raw_search(suggested_word)
+                    sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term))
             if not sqs:
                 sqs = SearchQuerySet().models(UserProfile).autocomplete(**{'text':search_term})
             if sqs:
                 result_page = get_paginated_data(sqs, int(page_size), int(page))
-                users = solr_object_to_db_object(result_page[0].object_list)
-            response["top_user"]=UserSerializer(User.objects.filter(st__in=users),many=True).data
+                users = solr_userprofile_object_to_db_object(result_page[0].object_list)
+            response["top_user"]=UserSerializer(users,many=True).data
             hash_tags  =[]
             sqs = SearchQuerySet().models(TongueTwister).raw_search('hash_tag:'+search_term)
             if not sqs:
@@ -760,8 +784,8 @@ class SolrSearchTopic(BoloIndyaGenericAPIView):
     def get(self, request):
         topics      = []
         search_term = self.request.GET.get('term')
-        language_id = self.request.GET.get('language_id', 1)
-        page = int(request.GET.get('page',1))
+        language_id = self.request.GET.get('language_id')
+        page = int(request.GET.get('page')) if request.GET.get('page').strip() else 1
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
         is_expand=self.request.GET.get('is_expand',False)
         last_updated=timestamp_to_datetime(self.request.GET.get('last_updated',False))
@@ -778,7 +802,10 @@ class SolrSearchTopic(BoloIndyaGenericAPIView):
                 topics = solr_object_to_db_object(result_page[0].object_list)
             # topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True, language_id=language_id)
             next_page_number = page+1 if page_size*page<len(sqs) else ''
-            response ={"count":len(sqs),"results":TopicSerializerwithComment(topics,many=True,context={'is_expand':is_expand,'last_updated':last_updated}).data,"next_page_number":next_page_number} 
+            if language_id:
+                response ={"count":len(sqs),"results":TopicSerializerwithComment(topics,many=True,context={'is_expand':is_expand,'last_updated':last_updated}).data,"next_page_number":next_page_number} 
+            else:
+                response ={"count":len(sqs),"results":TopicSerializerwithComment(topics,many=True).data,"next_page_number":next_page_number} 
         return JsonResponse(response, safe = False)
 
 
@@ -825,6 +852,7 @@ class SolrSearchHashTag(BoloIndyaGenericAPIView):
         hash_tags      = []
         search_term = self.request.GET.get('term')
         page = int(request.GET.get('page',1))
+        language_id = self.request.GET.get('language_id', 1)
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
         if search_term:
             sqs = SearchQuerySet().models(TongueTwister).raw_search('hash_tag:'+search_term)
@@ -839,7 +867,7 @@ class SolrSearchHashTag(BoloIndyaGenericAPIView):
                 hash_tags = solr_object_to_db_object(result_page[0].object_list)
             # hash_tags  = TongueTwister.objects.filter(hash_tag__icontains = search_term)
             next_page_number = page+1 if page_size*page<len(sqs) else ''
-            response ={"count":len(sqs),"results":TongueTwisterSerializer(hash_tags,many=True).data,"next_page_number":next_page_number} 
+            response ={"count":len(sqs),"results":TongueTwisterSerializer(hash_tags,many=True,context={'language_id':language_id}).data,"next_page_number":next_page_number} 
         return JsonResponse(response, safe = False)
 
 
@@ -905,20 +933,20 @@ class SolrSearchUser(BoloIndyaGenericAPIView):
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
         users = []
         if search_term:
-            sqs = SearchQuerySet().models(UserProfile).raw_search(search_term)
+            sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term))
             if not sqs:
                 suggested_word = SearchQuerySet().models(UserProfile).auto_query(search_term).spelling_suggestion()
                 if suggested_word:
-                    sqs = SearchQuerySet().models(UserProfile).raw_search(suggested_word)
+                    sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term))
             if not sqs:
                 sqs = SearchQuerySet().models(UserProfile).autocomplete(**{'text':search_term})
             if sqs:
                 result_page = get_paginated_data(sqs, int(page_size), int(page))
-                users = solr_object_to_db_object(result_page[0].object_list)
+                users = solr_userprofile_object_to_db_object(result_page[0].object_list)
             # users = User.objects.filter( Q(username__icontains = search_term) | Q(st__name__icontains = search_term) | Q(first_name__icontains = search_term) | \
             #        Q(last_name__icontains = search_term) )
             next_page_number = page+1 if page_size*page<len(sqs) else ''
-            response ={"count":len(sqs),"results":UserSerializer(User.objects.filter(st__in=users),many=True).data,"next_page_number":next_page_number} 
+            response ={"count":len(sqs),"results":UserSerializer(users,many=True).data,"next_page_number":next_page_number} 
         return JsonResponse(response, safe = False)
 
 
@@ -1048,13 +1076,12 @@ def upload_media(media_file):
         created_at = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
         filenameNext= str(media_file.name).split('.')
         final_filename = str(filenameNext[0])+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[1])
-        client.put_object(Bucket=settings.BOLOINDYA_AWS_BUCKET_NAME, Key='media/' + final_filename, Body=media_file)
-        filepath = "https://s3.amazonaws.com/"+settings.BOLOINDYA_AWS_BUCKET_NAME+"/media/"+final_filename
-        # if os.path.exists(file):
-        #     os.remove(file)
+        client.put_object(Bucket='in-boloindya', Key='media/' + final_filename, Body=media_file, ACL='public-read')
+        filepath = 'https://s3.ap-south-1.amazonaws.com/' + 'in-boloindya' + '/media/' + final_filename
         return filepath
     except:
         return None
+
 
 @api_view(['POST'])
 def upload_profile_image(request):
@@ -1066,7 +1093,10 @@ def upload_profile_image(request):
         else:
             return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API upload_profile_image/ :" + log
+        return JsonResponse({'message': 'Unable to upload profile image! Please try again.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -1074,21 +1104,15 @@ def upload_profile_image(request):
 
 import random, string
 def get_random_username():
-    today_datetime = datetime.now()
-    year = str(today_datetime.year%100)
-    month = today_datetime.month
-    if month <10:
-        month = '0'+str(month)
-    else:
-        month = str(month)
-    x = 'bi'+year+month+''.join(random.choice(string.digits) for _ in range(4))
+    x = 'bi'+''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(10))
     x = x.lower()
     # x = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
     try:
-        user = User.objects.get(username=x)
-        get_random_username()
+        user = User.objects.using('default').get(username=x)
+        return get_random_username()
     except:
         return x
+
 
 def check_username_valid(username):
     if re.match(r"^[a-z0-9_.-]+$", username):
@@ -1186,15 +1210,14 @@ def replyOnTopic(request):
                 comment.comment = hashtagged_title.strip()
                 comment.comment_html = hashtagged_title.strip()
                 comment.save()
-            if username_list:
-                send_notification_to_mentions(username_list,comment)
-            topic = Topic.objects.get(pk = topic_id)
+            # if username_list:
+            #     send_notification_to_mentions(username_list,comment)
+            topic = Topic.objects.using('default').get(pk = topic_id)
             topic.comment_count = F('comment_count')+1
             topic.last_commented = timezone.now()
             topic.save()
-            userprofile = UserProfile.objects.get(user = request.user)
-            userprofile.answer_count = F('answer_count')+1
-            userprofile.save()
+            userprofile = UserProfile.objects.filter(user = request.user)
+            userprofile.update(answer_count = F('answer_count')+1)
             if thumbnail:
                 comment.thumbnail = thumbnail
             if media_duration:
@@ -1218,14 +1241,12 @@ def check_hashtag(comment):
                 tag_list[index]='<a href="/get_challenge_details/?ChallengeHash='+value.strip('#')+'">'+value+'</a>'
                 # tag,is_created = TongueTwister.objects.get_or_create(hash_tag__iexact=value.strip('#'))
                 try:
-                    tag = TongueTwister.objects.get(hash_tag__iexact=value.strip('#'))
-                    is_created = False
-                except:
+                    tag = TongueTwister.objects.filter(hash_tag__iexact=value.strip('#'))
+                    if tag.count():
+                        tag.update(hash_counter = F('hash_counter')+1)
+                        tag = tag[0]
+                except TongueTwister.DoesNotExist:
                     tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
-                    is_created = True
-                if not is_created:
-                    tag.hash_counter = F('hash_counter')+1
-                tag.save()
                 comment.hash_tags.add(tag)
         title=" ".join(tag_list)
         title = title[0].upper()+title[1:]
@@ -1257,7 +1278,10 @@ def get_mentions(comment):
 def send_notification_to_mentions(username_list,comment_obj):
     for each_username in username_list:
         try:
-            notify_mention = Notification.objects.create(for_user = User.objects.get(username=each_username) ,topic = comment_obj,notification_type='10',user = comment_obj.user)
+            topic_type = ContentType.objects.get_for_model(comment_obj)
+            user = User.objects.get(username=each_username)
+            if not user == comment_obj.user:
+                notify_mention = Notification.objects.create(for_user_id = user.id ,topic_id = comment_obj.id, topic_type = topic_type, notification_type='10', user_id = comment_obj.user.id)
         except:
             pass
 
@@ -1295,7 +1319,7 @@ def reply_delete(request):
     """
 
     comment_id     = request.POST.get('comment_id', '')
-    comment = Comment.objects.get(pk= comment_id)
+    comment = Comment.objects.using('default').get(pk= comment_id)
 
     if comment.user == request.user or comment.topic.user == request.user:
         try:
@@ -1378,44 +1402,50 @@ def createTopic(request):
     request.POST.get('question_image')
 
     Required Parameters:
-    title and category_id 
+    title and category_id
 
     """
-
-    topic        = Topic()
-    user_id      = request.user.id
-    title        = request.POST.get('title', '').strip()
-    language_id  = request.POST.get('language_id', '')
-    category_id  = request.POST.get('category_id', '')
+    topic           = Topic()
+    user_id         = request.user.id
+    title           = request.POST.get('title', '').strip()
+    language_id     = request.POST.get('language_id', '')
+    category_id     = request.POST.get('category_id', '')
     media_duration  = request.POST.get('media_duration', '')
     question_image  = request.POST.get('question_image', '')
-    is_vb = request.POST.get('is_vb',False)
-    vb_width = request.POST.get('vb_width',0)
-    vb_height = request.POST.get('vb_height',0)
-    # media_file = request.FILES.get['media']
-    # print media_file
+    is_vb           = request.POST.get('is_vb',False)
+    vb_width        = request.POST.get('vb_width',0)
+    vb_height       = request.POST.get('vb_height',0)
+    question_video  = request.POST.get('question_video')
+    categ_list      = request.POST.get('categ_list', '')
+    selected_lang   = request.POST.get('selected_language', '')
+    location_array  = request.POST.get('location_array', None)
+
 
     if title:
         topic.title          = (title[0].upper()+title[1:]).strip()
     if request.POST.get('question_audio'):
         topic.question_audio = request.POST.get('question_audio')
-    if request.POST.get('question_video'):
-        topic.question_video = request.POST.get('question_video')
+    if question_video:
+        # topic.question_video = request.POST.get('question_video')
+        topic.safe_backup_url = question_video
+        topic.backup_url      = question_video
+
+    topic.question_video = request.POST.get('question_video')
+
     if request.POST.get('question_image'):
         topic.question_image = request.POST.get('question_image')
 
-    if request.POST.get('question_video') and not request.user.st.is_test_user:
-        question_video = request.POST.get('question_video')
+    if question_video and not request.user.st.is_test_user:
         already_exist_topic = Topic.objects.filter(Q(question_video=question_video)|Q(backup_url=question_video))
         if already_exist_topic:
             topic_json = TopicSerializerwithComment(already_exist_topic[0], context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data
             return JsonResponse({'message': 'Video Byte Created','topic':topic_json}, status=status.HTTP_201_CREATED)
-
-
-
+    
     try:
-
-        topic.language_id   = request.user.st.language
+        if selected_lang:
+            topic.language_id   = selected_lang
+        else:
+            topic.language_id   = request.user.st.language    
         topic.category_id   = category_id
         topic.user_id       = user_id
         if is_vb:
@@ -1427,7 +1457,15 @@ def createTopic(request):
             view_count = random.randint(1,5)
             topic.view_count = view_count
             topic.save()
-            vb_create_task.delay(topic.id)
+            try:
+                provide_view_count(view_count,topic)
+            except:
+                pass
+            update_profile_counter(user_id,'video_count',1, True)
+            categories = filter(None, categ_list.split(','))
+            topic.m2mcategory.add(*categories)
+            topic.location = get_location(location_array)
+            # vb_create_task.delay(topic.id)
             # topic.update_vb()
             tag_list=check_space_before_hash(title).split()
             hash_tag = copy.deepcopy(tag_list)
@@ -1441,49 +1479,90 @@ def createTopic(request):
                 for index, value in enumerate(hash_tag):
                     if value.startswith("#"):
                         # tag,is_created = TongueTwister.objects.get_or_create(hash_tag__iexact=value.strip('#'))
-                        try:
-                            tag = TongueTwister.objects.get(hash_tag__iexact=value.strip('#'))
-                            is_created = False
-                        except:
+                        tag = TongueTwister.objects.using('default').filter(hash_tag__iexact=value.strip('#'))
+                        if tag.count():
+                            tag.update(hash_counter = F('hash_counter')+1)
+                            tag = tag[0]
+                        else:
                             tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
-                            is_created = True
-                        if not is_created:
-                            tag.hash_counter = F('hash_counter')+1
-                        tag.save()
                         topic.hash_tags.add(tag)
         else:
             view_count = random.randint(10,30)
             topic.view_count = view_count
         topic.save()
-        try:
-            provide_view_count(view_count,topic)
-        except:
-            pass
-        topic.m2mcategory.add(Category.objects.get(pk=category_id))
+        # topic.m2mcategory.add(Category.objects.get(pk=category_id))
         if not is_vb:
-            userprofile = UserProfile.objects.get(user = request.user)
-            userprofile.question_count = F('question_count')+1
-            userprofile.save()
+            userprofile = UserProfile.objects.filter(user = request.user)
+            userprofile.update(question_count = F('question_count')+1)
             add_bolo_score(request.user.id,'create_topic', topic)
             topic_json = TopicSerializerwithComment(topic, context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data
             message = 'Topic Created'
         else:
-            userprofile = UserProfile.objects.get(user = request.user)
-            userprofile.vb_count = F('vb_count')+1
-            userprofile.save()
+            userprofile = UserProfile.objects.filter(user = request.user)
+            userprofile.update(vb_count = F('vb_count')+1)
             # add_bolo_score(request.user.id, 'create_topic', topic)
             topic_json = TopicSerializerwithComment(topic, context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data
             message = 'Video Byte Created'
+        ## hard coded notification for uploading video
+        data = {}
+
+        data['title'] = ' '
+        data['upper_title'] = 'Your video has been published.'
+        data['notification_type'] = '4'
+        data['id'] = ''
+        data['particular_user_id'] = request.user.id
+        data['user_group'] = '8'
+        data['lang'] = '0'
+        data['schedule_status'] = ''
+        data['datepicker'] = ''
+        data['timepicker'] = ''
+        data['image_url'] = ''
+        data['days_ago'] = ''
+
+        # topic.update_m3u8_content()
+        topic_type = ContentType.objects.get_for_model(topic)
+        notify_owner = Notification.objects.create(for_user_id = topic.user.id ,topic_id = topic.id, topic_type = topic_type, notification_type='6', user_id = topic.user.id)
+        
+        send_upload_video_notification.delay(data, {})
+        #invoke watermark
+        invoke_watermark_service(topic, request.user)
+
+        # try:
+        #     c = topic.m2mcategory.all()
+        #     print(topic.location, c, topic.language_id, topic.id)
+        # except Exception as e:
+        #     print(e)
         return JsonResponse({'message': message,'topic':topic_json}, status=status.HTTP_201_CREATED)
     except User.DoesNotExist:
         return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
+def invoke_watermark_service(topic, user):
+    try:
+        print("inside invoke_watermark_service")
+        url = "https://92scj7hqac.execute-api.ap-south-1.amazonaws.com/v1/invoke-watermark"
+        topic_id = topic.id
+        input_key = topic.question_video.split(".amazonaws.com/")[1]
+        username  = user.username
+        user_id = user.id
+        duration = topic.media_duration
+        payload = {"input_key": input_key, "topic_id": topic_id, "username": username,"user_id":user_id,"duration":duration}
+        response = requests.request("POST", url, headers = {}, data = json.dumps(payload), files = [],timeout=60)
+        print(response)
+        if response.status_code == 200:
+            print("success")
+        else:
+            print("failure with response code"+str(response.status_code))
+    except Exception as e:
+        print("Exception raised {}".format(e))
+
+
 def provide_view_count(view_count,topic):
-    all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)[:view_count]
-    for each_user_id in all_test_userprofile_id:
-        vb_obj = VBseen.objects.create(topic= topic,user_id =each_user_id)
-        UserProfile.objects.filter(user=topic.user).update(view_count=F(view_count)+1,own_vb_view_count = F('own_vb_view_count')+1)
-        update_redis_vb_seen(each_user_id,topic.id)
+    try:
+        print view_count
+        FVBseen.objects.create(topic_id = topic.id, view_count = view_count)
+        update_profile_counter(topic.user_id,'view_count',view_count, True)
+    except Exception as e:
+        print e,"view"
 
 @api_view(['POST'])
 def editTopic(request):
@@ -1530,16 +1609,13 @@ def editTopic(request):
                     for index, value in enumerate(hash_tag):
                         if value.startswith("#"):
                             # tag, is_created = TongueTwister.objects.get_or_create(hash_tag__iexact=value.strip("#"))
-                            try:
-                                tag = TongueTwister.objects.get(hash_tag__iexact=value.strip('#'))
-                                is_created = False
-                            except:
+                            tag = TongueTwister.objects.filter(hash_tag__iexact=value.strip('#'))
+                            if tag.count():
+                                tag.update(hash_counter = F('hash_counter')+1)
+                                tag = tag[0]
+                            else:
                                 tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
-                                is_created = True
-                            if not is_created:
-                                tag.hash_counter = F('hash_counter')+1
-                            tag.save()
-                            topic.hash_tags.add(tag)
+                            topic.hash_tags.add(tag.id)
                 topic.save()
 
                 topic_json = TopicSerializerwithComment(topic, context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data
@@ -1591,7 +1667,10 @@ def editComment(request):
         else:
             return JsonResponse({'message': 'Invalid Edit Request'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        return JsonResponse({'message': 'Invalid Edit Request','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API editComment/ :" + log
+        return JsonResponse({'message': 'Unable to edit comment! Please try again.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 from HTMLParser import HTMLParser
 
@@ -1631,11 +1710,13 @@ def topic_delete(request):
     topic = Topic.objects.get(pk= topic_id)
     now = datetime.now()
     allowed_date = datetime.strptime('01-'+str(now.month)+'-'+str(now.year)+' 00:00:00', "%d-%m-%Y %H:%M:%S")
-
+    print request.user
     if allowed_date <= topic.date:
-        if topic.user == request.user:
+        if topic.user == request.user and not topic.is_removed:
+
             try:
-                topic.delete()
+                topic.delete(is_user_deleted=True)
+                update_profile_counter(user_id,'video_count',1, False)
                 return JsonResponse({'message': 'Topic Deleted'}, status=status.HTTP_201_CREATED)
             except:
                 return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
@@ -1857,6 +1938,28 @@ def send_sms(phone_number, otp):
         return response, True
     return response, False
 
+
+#Known Issue ... Please ignore at the time of merging
+@api_view(['GET'])
+def send_sms_link(phone_number):
+    import json
+    import urllib2
+    response=""
+    try:
+        phone='9807148552';
+        currentOTP='23322';
+        TWO_FACTOR_SMS_API_KEY = "e239bb09-f16c-11e9-b828-0200cd936042";
+        templateName='BOLOIN'
+
+        sms_url         = 'https://2factor.in/API/R1/?module=PROMO_SMS&apikey='+TWO_FACTOR_SMS_API_KEY+'&to=%20'+phone+'%20&from=BOLOIN&msg=Please%20use%20below%20link%20to%20download%20bolo%20indya%20app.%20https%3A%2F%2Fbit.ly%2F2APNUpb'
+        response        = urllib2.urlopen(sms_url).read()
+        json_response   = json.loads( response )
+        if json_response.has_key('Status') and json_response['Status'] == 'Success':
+            return JsonResponse({'message': 'True'}, status=status.HTTP_200_OK)
+        return JsonResponse({'message': 'False'}, status=status.HTTP_400_BAD_REQUEST)
+    except:
+        return JsonResponse({'message': 'Invalid Request'}, status=status.HTTP_400_BAD_REQUEST)
+
 class SingUpOTPView(generics.CreateAPIView):
     permission_classes  = (AllowAny,)
     serializer_class    = SingUpOTPSerializer
@@ -1869,7 +1972,7 @@ class SingUpOTPView(generics.CreateAPIView):
     """
 
     def perform_create(self, serializer):
-        old_otp = SingUpOTP.objects.filter(mobile_no=validate_indian_number(serializer.validated_data['mobile_no']).strip(),created_at__gte=datetime.now()-timedelta(hours=2)).order_by('-id')
+        old_otp = SingUpOTP.objects.using('default').filter(mobile_no=validate_indian_number(serializer.validated_data['mobile_no']).strip(),created_at__gte=datetime.now()-timedelta(hours=2)).order_by('-id')
         if old_otp:
             instance=old_otp[0]
             response, response_status   = send_sms(instance.mobile_no, instance.otp)
@@ -1896,6 +1999,49 @@ class SingUpOTPView(generics.CreateAPIView):
             return JsonResponse({'message': 'OTP could not be sent'}, status=status.HTTP_417_EXPECTATION_FAILED)
         return JsonResponse({'message': 'OTP sent'}, status=status.HTTP_200_OK)
 
+
+class SingUpOTPCountryCodeView(generics.CreateAPIView):
+    permission_classes  = (AllowAny,)
+    serializer_class    = SingUpOTPSerializer
+
+    """
+    post:
+        Required Parameters
+        request.POST.get('is_reset_password')
+        request.POST.get('is_for_change_phone')
+    """
+
+    def perform_create(self, serializer):
+        old_otp = SingUpOTP.objects.using('default').filter(mobile_no=serializer.validated_data['mobile_no'].strip(),created_at__gte=datetime.now()-timedelta(hours=2)).order_by('-id')
+        if old_otp:
+            instance=old_otp[0]
+            response, response_status   = send_sms(instance.mobile_no, instance.otp)
+            instance.api_response_dump  = response
+            instance.save()
+        else:
+            serializer.validated_data['mobile_no'] = serializer.validated_data['mobile_no'].strip()
+            instance        = serializer.save()
+            instance.otp    = generateOTP(6)
+            instance.save()
+            response, response_status   = send_sms(instance.mobile_no, instance.otp)
+            instance.api_response_dump  = response
+            instance.save()
+        # response, response_status   = send_sms(instance.mobile_no, instance.otp)
+        # instance.api_response_dump  = response
+        if self.request.POST.get('is_reset_password') and self.request.POST.get('is_reset_password') == '1':
+            instance.is_reset_password = True
+        if self.request.POST.get('is_for_change_phone') and self.request.POST.get('is_for_change_phone') == '1':
+            instance.is_for_change_phone = True
+        # if not response_status:
+        #     instance.is_active = False
+        # instance.save()
+        if not response_status:
+            log = str({'request':str(self.request.__dict__),'response':str(status.HTTP_417_EXPECTATION_FAILED),'messgae':'OTP could not be sent',\
+                'error':'-'})
+            print "Error in API  otp/send_with_country_code/ :" + log
+            return JsonResponse({'message': 'OTP could not be sent'}, status=status.HTTP_417_EXPECTATION_FAILED)
+        return JsonResponse({'message': 'OTP sent'}, status=status.HTTP_200_OK)
+
 import calendar
 @api_view(['POST'])
 def get_user_bolo_info(request):
@@ -1908,6 +2054,7 @@ def get_user_bolo_info(request):
         year = request.POST.get('year',None)
     """
     try:
+        # return JsonResponse({'message': 'success','data' : get_bolo_info_combined(request.user.id)}, status=status.HTTP_200_OK)
         start_date = request.POST.get('start_date', None)
         end_date = request.POST.get('end_date',None)
         month = request.POST.get('month', None)
@@ -1926,6 +2073,38 @@ def get_user_bolo_info(request):
             days = calendar.monthrange(int(year),int(month))[1]
             start_date = datetime.strptime('01-'+str(month)+'-'+str(year), "%d-%m-%Y")
             end_date = datetime.strptime(str(days)+'-'+str(month)+'-'+str(year)+' 23:59:59', "%d-%m-%Y %H:%M:%S")
+
+        if start_date and end_date and end_date > datetime.now() - timedelta(days=1):
+            data = get_current_month_bolo_info(request.user.id)
+            data['top_3_videos'] = []
+            data['monetised_video_count'] = 0
+            data['left_for_moderation'] = 0
+            data['unmonetizd_video_count'] = 0
+            data['message'] = 'success'
+            return JsonResponse(data, status=status.HTTP_200_OK)
+        elif start_date and end_date and end_date < datetime.now():
+            data = get_last_month_bolo_info(request.user.id)
+            data['top_3_videos'] = []
+            data['monetised_video_count'] = 0
+            data['left_for_moderation'] = 0
+            data['unmonetizd_video_count'] = 0
+            data['message'] = 'success'
+            return JsonResponse(data, status=status.HTTP_200_OK)
+        elif not start_date and not end_date:
+            data = get_lifetime_bolo_info(request.user.id)
+            data['top_3_videos'] = []
+            data['monetised_video_count'] = 0
+            data['left_for_moderation'] = 0
+            data['unmonetizd_video_count'] = 0
+            data['message'] = 'success'
+            return JsonResponse(data, status=status.HTTP_200_OK)
+        else:
+            log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+            print "Error in API get_user_bolo_info/ :" + log
+            return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
         if not start_date or not end_date:
             total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user)
             #total_video_id = list(Topic.objects.filter(is_vb = True,user=request.user).values_list('pk',flat=True))
@@ -1933,6 +2112,11 @@ def get_user_bolo_info(request):
             all_pay = UserPay.objects.filter(user=request.user,is_active=True)
             top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user).order_by('-view_count')[:3]
             video_playtime = request.user.st.total_vb_playtime
+            #for each_vb in total_video:
+            #    total_view_count+=each_vb.view_count
+            #    total_like_count+=each_vb.likes_count
+            #    total_comment_count+=each_vb.comment_count
+            #    total_share_count+=each_vb.total_share_count
         else:
             total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user,date__gte=start_date, date__lte=end_date)
             total_video_id = list(Topic.objects.filter(is_vb = True,user=request.user,is_removed=False).values_list('pk',flat=True))
@@ -1940,21 +2124,18 @@ def get_user_bolo_info(request):
             all_pay = UserPay.objects.filter(user=request.user,is_active=True,for_month__gte=start_date.month,for_month__lte=start_date.month,\
                 for_year__gte=start_date.year,for_year__lte=start_date.year)
             top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user,date__gte=start_date, date__lte=end_date).order_by('-view_count')[:3]
-            all_play_time = VideoPlaytime.objects.filter(timestamp__gte=start_date, timestamp__lte=end_date,videoid__in = total_video_id).aggregate(Sum('playtime'))
+            all_play_time = VideoPlaytime.objects.filter(timestamp__gte=start_date, timestamp__lte=end_date,video_id__in = total_video_id).aggregate(Sum('playtime'))
             if all_play_time.has_key('playtime__sum') and all_play_time['playtime__sum']:
                 video_playtime = all_play_time['playtime__sum']
-            exclude_video_id = total_video.values_list('pk',flat=True)
-            total_view_count += VBseen.objects.filter(created_at__gte = start_date, created_at__lte = end_date, topic__user = request.user).exclude(topic_id__in = exclude_video_id).count()
-            total_like_count += Like.objects.filter(created_at__gte = start_date, created_at__lte = end_date, topic__user = request.user).exclude(topic_id__in = exclude_video_id).count()
-            total_comment_count += Comment.objects.filter(date__gte = start_date, date__lte = end_date, topic__user = request.user).exclude(topic_id__in = exclude_video_id).count()
-            total_share_count += SocialShare.objects.filter(created_at__gte = start_date, created_at__lte = end_date, topic__user = request.user).exclude(topic_id__in = exclude_video_id).count()
+            # exclude_video_id = total_video.values_list('pk',flat=True)
+            # total_view_count += VBseen.objects.filter(created_at__gte = start_date, created_at__lte = end_date, topic__user = request.user).exclude(topic_id__in = exclude_video_id).count()
+            # total_like_count += Like.objects.filter(created_at__gte = start_date, created_at__lte = end_date, topic__user = request.user).exclude(topic_id__in = exclude_video_id).count()
+            # total_comment_count += Comment.objects.filter(date__gte = start_date, date__lte = end_date, topic__user = request.user).exclude(topic_id__in = exclude_video_id).count()
+            # total_share_count += SocialShare.objects.filter(created_at__gte = start_date, created_at__lte = end_date, topic__user = request.user).exclude(topic_id__in = exclude_video_id).count()
 
         for each_pay in all_pay:
             total_earn+=each_pay.amount_pay
         total_video_count = total_video.count()
-        monetised_video_count = total_video.filter(is_monetized = True).count()
-        unmonetizd_video_count= total_video.filter(is_monetized = False,is_moderated = True).count()
-        left_for_moderation = total_video.filter(is_moderated = False).count()
         for each_vb in total_video:
             total_view_count+=each_vb.view_count
             total_like_count+=each_vb.likes_count
@@ -1966,15 +2147,18 @@ def get_user_bolo_info(request):
         total_share_count = shorcountertopic(total_share_count)
         video_playtime = short_time(video_playtime)
         return JsonResponse({'message': 'success', 'total_video_count' : total_video_count, \
-                        'monetised_video_count':monetised_video_count, 'total_view_count':total_view_count,'total_comment_count':total_comment_count,\
-                        'total_like_count':total_like_count,'total_share_count':total_share_count,'left_for_moderation':left_for_moderation,\
+                        'total_view_count':total_view_count,'total_comment_count':total_comment_count,\
+                        'total_like_count':total_like_count,'total_share_count':total_share_count,\
                         'total_earn':total_earn,'video_playtime':video_playtime,'spent_time':spent_time,\
                         'top_3_videos':TopicSerializer(top_3_videos,many=True, \
                             context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),\
-                            'is_expand': request.GET.get('is_expand',True)}).data,'unmonetizd_video_count':unmonetizd_video_count,\
+                            'is_expand': request.GET.get('is_expand',True)}).data,\
                         'bolo_score':shortcounterprofile(request.user.st.bolo_score)}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API get_user_bolo_info/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def verify_otp(request):
@@ -2010,22 +2194,22 @@ def verify_otp(request):
                 # exclude_dict = {'is_active' : True, 'is_for_change_phone' : is_for_change_phone,"mobile_no":mobile_no, "otp":otp}
                 exclude_dict = {'is_for_change_phone' : is_for_change_phone,"mobile_no":mobile_no, "otp":otp,"created_at__gte":datetime.now()-timedelta(hours=2)}
 
-            otp_obj = SingUpOTP.objects.filter(**exclude_dict).order_by('-id')
+            otp_obj = SingUpOTP.objects.using('default').filter(**exclude_dict).order_by('-id')
             # if otp_obj:
             #     otp_obj=otp_obj[0]
             # otp_obj.is_active = False
             # otp_obj.used_at = timezone.now()
-            otp_obj.update(used_at = timezone.now())
+            # otp_obj.update(used_at = timezone.now())
             if not is_reset_password and not is_for_change_phone and otp_obj:
                 if mobile_no in ['7726080653']:
                     return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
                 try:
-                    userprofile = UserProfile.objects.get(mobile_no = mobile_no)
+                    userprofile = UserProfile.objects.using('default').get(mobile_no = mobile_no)
                 except:
                     try:
-                        userprofile = UserProfile.objects.get(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no)
+                        userprofile = UserProfile.objects.using('default').get(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no)
                     except MultipleObjectsReturned:
-                        userprofile = UserProfile.objects.filter(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no).order_by('id').last()
+                        userprofile = UserProfile.objects.using('default').filter(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no).order_by('id').last()
                         is_created=False
                     except:
                         userprofile = None
@@ -2035,11 +2219,12 @@ def verify_otp(request):
                     user = userprofile.user
                     message = 'User Logged In'
                 else:
-                    user = User.objects.create(username = get_random_username())
+                    user = User.objects.using('default').create(username = get_random_username())
                     message = 'User created'
-                    userprofile = UserProfile.objects.get(user = user)
-                    userprofile.mobile_no = mobile_no
-                    Contact.objects.filter(contact_number=mobile_no).update(is_user_registered=True,user=user)
+                    userprofile = UserProfile.objects.using('default').get(user = user)
+                    update_dict = {}
+                    update_dict['mobile_no'] = mobile_no
+                    Contact.objects.using('default').filter(contact_number=mobile_no).update(is_user_registered=True,user=user)
                     if user_ip:
                         user_ip_to_state_task.delay(user.id,user_ip)
                         # url = 'http://ip-api.com/json/'+user_ip
@@ -2048,26 +2233,125 @@ def verify_otp(request):
                         # userprofile.state_name = json_response['regionName']
                         # userprofile.city_name = json_response['city']
                     if str(is_geo_location) =="1":
-                        userprofile.lat = lat
-                        userprofile.lang = lang
+                        update_dict['lat'] = lat
+                        update_dict['lang'] = lang
                     if click_id:
-                        userprofile.click_id = click_id
-                        click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
-                        response = urllib2.urlopen(click_url).read()
-                        userprofile.click_id_response = str(response)
-                    userprofile.save()
+                        save_click_id_response.delay(userprofile.id)
+                        # userprofile.click_id = click_id
+                        # click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
+                        # response = urllib2.urlopen(click_url).read()
+                        # userprofile.click_id_response = str(response)
+                    UserProfile.objects.using('default').filter(user = user).update(**update_dict)
                     if str(language):
-                        default_follow = deafult_boloindya_follow(user,str(language))
+                        default_follow = deafult_boloindya_follow.delay(user.id,str(language))
                     add_bolo_score(user.id, 'initial_signup', userprofile)
                 user_tokens = get_tokens_for_user(user)
-                otp_obj.update(for_user = user)
+                # otp_obj.update(for_user = user, used_at = timezone.now())
                 # otp_obj.for_user = user
                 # otp_obj.save()
-                cache_follow_post.delay(user.id)
-                cache_popular_post.delay(user.id,language)
                 return JsonResponse({'message': message, 'username' : mobile_no, \
                         'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
-            otp_obj.save()
+            return JsonResponse({'message': 'OTP Validated', 'username' : mobile_no}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return JsonResponse({'message': 'No Mobile No / OTP provided'}, status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['POST'])
+def verify_otp_with_country_code(request):
+    """
+    post:
+        Required Parameters
+        mobile_no = request.POST.get('mobile_no', None)
+        otp = request.POST.get('otp', None)
+        request.POST.get('is_reset_password')
+        request.POST.get('is_for_change_phone')
+    """
+    mobile_no = request.POST.get('mobile_no', None).strip()
+    country_code = request.POST.get('country_code', '+91').strip()
+    language = request.POST.get('language','1')
+    otp = request.POST.get('otp', None)
+    is_geo_location = request.POST.get('is_geo_location',None)
+    lat = request.POST.get('lat',None)
+    lang = request.POST.get('lang',None)
+    click_id = request.POST.get('click_id',None)
+    user_ip = request.POST.get('user_ip',None)
+    is_reset_password = False
+    is_for_change_phone = False
+    all_category_follow = []
+    if request.POST.get('is_reset_password') and request.POST.get('is_reset_password') == '1':
+        is_reset_password = True # inverted because of exclude
+    if request.POST.get('is_for_change_phone') and request.POST.get('is_for_change_phone') == '1':
+        is_for_change_phone = True
+
+    if mobile_no and otp:
+        mobile_with_country_code = str(country_code)+str(mobile_no)
+        try:
+            # exclude_dict = {'is_active' : True, 'is_reset_password' : is_reset_password,"mobile_no":mobile_no, "otp":otp}
+            exclude_dict = {'is_reset_password' : is_reset_password,"mobile_no":mobile_with_country_code, "otp":otp,"created_at__gte":datetime.now()-timedelta(hours=2)}
+            if is_for_change_phone:
+                # exclude_dict = {'is_active' : True, 'is_for_change_phone' : is_for_change_phone,"mobile_no":mobile_no, "otp":otp}
+                exclude_dict = {'is_for_change_phone' : is_for_change_phone,"mobile_no":mobile_with_country_code, "otp":otp,"created_at__gte":datetime.now()-timedelta(hours=2)}
+
+            otp_obj = SingUpOTP.objects.using('default').filter(**exclude_dict).order_by('-id')
+            # if otp_obj:
+            #     otp_obj=otp_obj[0]
+            # otp_obj.is_active = False
+            # otp_obj.used_at = timezone.now()
+            # otp_obj.update(used_at = timezone.now())
+            if not is_reset_password and not is_for_change_phone and otp_obj:
+                if mobile_no in ['7726080653']:
+                    return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
+                try:
+                    userprofile = UserProfile.objects.using('default').get(mobile_no = mobile_no)
+                except:
+                    try:
+                        userprofile = UserProfile.objects.using('default').get(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no)
+                    except MultipleObjectsReturned:
+                        userprofile = UserProfile.objects.using('default').filter(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no).order_by('id').last()
+                        is_created=False
+                    except:
+                        userprofile = None
+                if userprofile:
+                    if not userprofile.user.is_active:
+                        return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
+                    user = userprofile.user
+                    message = 'User Logged In'
+                else:
+                    user = User.objects.using('default').create(username = get_random_username())
+                    message = 'User created'
+                    userprofile = UserProfile.objects.using('default').get(user = user)
+                    update_dict = {}
+                    update_dict['mobile_no'] = mobile_no
+                    update_dict['country_code'] = country_code
+                    Contact.objects.using('default').filter(contact_number=mobile_no).update(is_user_registered=True,user=user)
+                    if user_ip:
+                        user_ip_to_state_task.delay(user.id,user_ip)
+                        # url = 'http://ip-api.com/json/'+user_ip
+                        # response = urllib2.urlopen(url).read()
+                        # json_response = json.loads(response)
+                        # userprofile.state_name = json_response['regionName']
+                        # userprofile.city_name = json_response['city']
+                    if str(is_geo_location) =="1":
+                        update_dict['lat'] = lat
+                        update_dict['lang'] = lang
+                    if click_id:
+                        save_click_id_response.delay(userprofile.id)
+                        # userprofile.click_id = click_id
+                        # click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
+                        # response = urllib2.urlopen(click_url).read()
+                        # userprofile.click_id_response = str(response)
+                    UserProfile.objects.using('default').filter(user = user).update(**update_dict)
+                    if str(language):
+                        default_follow = deafult_boloindya_follow.delay(user.id,str(language))
+                    add_bolo_score(user.id, 'initial_signup', userprofile)
+                user_tokens = get_tokens_for_user(user)
+                # otp_obj.update(for_user = user, used_at = timezone.now())
+                # otp_obj.for_user = user
+                # otp_obj.save()
+                return JsonResponse({'message': message, 'username' : mobile_no, \
+                        'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+            # otp_obj.save()
             return JsonResponse({'message': 'OTP Validated', 'username' : mobile_no}, status=status.HTTP_200_OK)
         except Exception as e:
             return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
@@ -2108,8 +2392,8 @@ class GetProfile(generics.ListAPIView):
 
 @api_view(['POST'])
 def cache_user_data(request):
-    cache_follow_post.delay(request.user.id)
-    cache_popular_post.delay(request.user.id,request.user.st.language)
+    cache_follow_post(request.user.id)
+    cache_popular_post(request.user.id,request.user.st.language)
     return JsonResponse({'message': 'Data Cached'}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
@@ -2137,14 +2421,15 @@ def fb_profile_settings(request):
     refrence        = request.POST.get('refrence',None)
     extra_data      = request.POST.get('extra_data',None)
     activity        = request.POST.get('activity',None)
+    salary_range    = request.POST.get('salary_range',None)
     language        = request.POST.get('language','1')
     is_geo_location = request.POST.get('is_geo_location',None)
-    likedin_url = request.POST.get('likedin_url',None)
+    linkedin_url = request.POST.get('likedin_url',None)
     instagarm_id = request.POST.get('instagarm_id',None)
     twitter_id = request.POST.get('twitter_id',None)
     d_o_b = request.POST.get('d_o_b',None)
     gender = request.POST.get('gender',None)
-    click_id = request.POST.get('click_id',None)
+    click_id = None # request.POST.get('click_id',None)
     lat = request.POST.get('lat',None)
     lang = request.POST.get('lang',None)
     user_ip = request.POST.get('user_ip',None)
@@ -2160,33 +2445,35 @@ def fb_profile_settings(request):
     try:
         if activity == 'facebook_login' and refrence == 'facebook':
             try:
-                userprofile = UserProfile.objects.get(social_identifier = extra_data['id'])
+                userprofile = UserProfile.objects.using('default').get(social_identifier = extra_data['id'])
                 user=userprofile.user
                 is_created=False
             except MultipleObjectsReturned:
-                userprofile = UserProfile.objects.filter(social_identifier = extra_data['id']).order_by('id').last()
+                userprofile = UserProfile.objects.using('default').filter(social_identifier = extra_data['id']).order_by('id').last()
                 user=userprofile.user
                 is_created=False
             except Exception as e:
                 print e
-                user_exists,num_user = check_user(extra_data['first_name'],extra_data['last_name'])
+                # user_exists,num_user = check_user(extra_data['first_name'],extra_data['last_name'])
                 #username = generate_username(extra_data['first_name'],extra_data['last_name'],num_user) if user_exists else str(str(extra_data['first_name'])+str(extra_data['last_name']))
                 username = get_random_username()
-                user = User.objects.create(username = username)
-                userprofile = UserProfile.objects.get(user = user)
+                user = User.objects.using('default').create(username = username)
+                userprofile = UserProfile.objects.using('default').get(user = user)
                 is_created = True
 
             if not userprofile.user.is_active:
+                log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':'You have been banned permanently for violating terms of usage.',\
+                'error':'None'})
+                print "Error in API fb_profile_settings/ :" + log
                 return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
-            cache_follow_post.delay(user.id)
-            cache_popular_post.delay(user.id,language)
             if is_created:
                 add_bolo_score(user.id, 'initial_signup', userprofile)
+                update_dict = {}
                 user.first_name = extra_data['first_name']
                 user.last_name = extra_data['last_name']
-                userprofile.name = extra_data['name']
-                userprofile.social_identifier = extra_data['id']
-                userprofile.bio = bio
+                update_dict['name'] = extra_data['name']
+                update_dict['social_identifier'] = extra_data['id']
+                update_dict['bio'] = bio
                 if not userprofile.d_o_b and d_o_b:
                     add_bolo_score(user.id, 'dob_added', userprofile)
                 userprofile.d_o_b = d_o_b
@@ -2199,30 +2486,30 @@ def fb_profile_settings(request):
                     # json_response = json.loads(response)
                     # userprofile.state_name = json_response['regionName']
                     # userprofile.city_name = json_response['city']
-                userprofile.gender = gender
-                userprofile.about = about
-                userprofile.refrence = refrence
-                userprofile.extra_data = extra_data
-                userprofile.user = user
-                userprofile.bolo_score += 95
-                userprofile.linkedin_url = likedin_url
-                userprofile.twitter_id = twitter_id
-                userprofile.instagarm_id = instagarm_id
+                update_dict['gender'] = gender
+                update_dict['about'] = about
+                update_dict['refrence'] = refrence
+                update_dict['extra_data'] = extra_data
+                update_dict['user'] = user
+                update_dict['bolo_score'] = 95
+                update_dict['linkedin_url'] = linkedin_url
+                update_dict['twitter_id'] = twitter_id
+                update_dict['instagarm_id'] = instagarm_id
 
                 # userprofile.follow_count += 1
                 if str(is_geo_location) =="1":
-                    userprofile.lat = lat
-                    userprofile.lang = lang
+                    update_dict['lat'] = lat
+                    update_dict['lang'] = lang
                 if click_id:
-                    userprofile.click_id = click_id
-                    click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
-                    response = urllib2.urlopen(click_url).read()
-                    userprofile.click_id_response = str(response)
-                userprofile.save()
+                    save_click_id_response.delay(userprofile.id)
+                    # userprofile.click_id = click_id
+                    # click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
+                    # response = urllib2.urlopen(click_url).read()
+                    # userprofile.click_id_response = str(response)
+                update_dict['language'] = str(language)
+                UserProfile.objects.using('default').filter(user = user).update(**update_dict)
                 if str(language):
-                    default_follow = deafult_boloindya_follow(user,str(language))
-                userprofile.language = str(language)
-                userprofile.save()
+                    default_follow = deafult_boloindya_follow.delay(user.id,str(language))
                 user.save()
                 user_tokens = get_tokens_for_user(user)
                 return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
@@ -2231,11 +2518,11 @@ def fb_profile_settings(request):
                 return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
         elif activity == 'google_login' and refrence == 'google':
             try:
-                userprofile = UserProfile.objects.get(social_identifier = extra_data['google_id'])
+                userprofile = UserProfile.objects.using('default').get(social_identifier = extra_data['google_id'])
                 user=userprofile.user
                 is_created=False
             except MultipleObjectsReturned:
-                userprofile = UserProfile.objects.filter(social_identifier = extra_data['id']).order_by('id').last()
+                userprofile = UserProfile.objects.using('default').filter(social_identifier = extra_data['google_id']).order_by('id').last()
                 user=userprofile.user
                 is_created = False
             except Exception as e:
@@ -2243,22 +2530,24 @@ def fb_profile_settings(request):
                 # user_exists,num_user = check_user(extra_data['first_name'],extra_data['last_name'])
                 #username = generate_username(extra_data['first_name'],extra_data['last_name'],num_user) if user_exists else str(str(extra_data['first_name'])+str(extra_data['last_name']))
                 username = get_random_username()
-                user = User.objects.create(username = username)
-                userprofile = UserProfile.objects.get(user = user)
+                user = User.objects.using('default').create(username = username)
+                userprofile = UserProfile.objects.using('default').get(user = user)
                 is_created = True
             if not userprofile.user.is_active:
+                log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':'You have been banned permanently for violating terms of usage.',\
+                'error':'None'})
+                print "Error in API fb_profile_settings/ :" + log
                 return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
-            cache_follow_post.delay(user.id)
-            cache_popular_post.delay(user.id,language)
             if is_created:
+                update_dict = {}
                 add_bolo_score(user.id, 'initial_signup', userprofile)
                 # user.first_name = extra_data['first_name']
                 # user.last_name = extra_data['last_name']
-                userprofile.name = extra_data['name']
-                userprofile.social_identifier = extra_data['google_id']
-                userprofile.bio = bio
+                update_dict['name'] = extra_data['name']
+                update_dict['social_identifier'] = extra_data['google_id']
+                update_dict['bio'] = bio
                 if extra_data['profile_pic']:
-                    userprofile.profile_pic = profile_pic
+                    update_dict['profile_pic'] = extra_data['profile_pic']
                 if not userprofile.d_o_b and d_o_b:
                     add_bolo_score(user.id, 'dob_added', userprofile)
                 userprofile.d_o_b = d_o_b
@@ -2271,30 +2560,32 @@ def fb_profile_settings(request):
                     # json_response = json.loads(response)
                     # userprofile.state_name = json_response['regionName']
                     # userprofile.city_name = json_response['city']
-                userprofile.gender = gender
-                userprofile.about = about
-                userprofile.refrence = refrence
-                userprofile.extra_data = extra_data
-                userprofile.user = user
-                userprofile.bolo_score += 95
-                userprofile.linkedin_url = likedin_url
-                userprofile.twitter_id = twitter_id
-                userprofile.instagarm_id = instagarm_id
+                update_dict['gender'] = gender
+                update_dict['about'] = about
+                update_dict['d_o_b'] = d_o_b
+                update_dict['refrence'] = refrence
+                update_dict['extra_data'] = extra_data
+                update_dict['user'] = user
+                update_dict['bolo_score'] = 95
+                update_dict['linkedin_url'] = linkedin_url
+                update_dict['twitter_id'] = twitter_id
+                update_dict['instagarm_id'] = instagarm_id
+                update_dict['salary_range'] = salary_range
 
                 # userprofile.follow_count += 1
                 if str(is_geo_location) =="1":
-                    userprofile.lat = lat
-                    userprofile.lang = lang
+                    update_dict['lat'] = lat
+                    update_dict['lang'] = lang
                 if click_id:
-                    userprofile.click_id = click_id
-                    click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
-                    response = urllib2.urlopen(click_url).read()
-                    userprofile.click_id_response = str(response)
-                userprofile.save()
+                    save_click_id_response.delay(userprofile.id)
+                    # userprofile.click_id = click_id
+                    # click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
+                    # response = urllib2.urlopen(click_url).read()
+                    # userprofile.click_id_response = str(response)
+                update_dict['language'] = str(language)
+                UserProfile.objects.using('default').filter(user = user).update(**update_dict)
                 if str(language):
-                    default_follow = deafult_boloindya_follow(user,str(language))
-                userprofile.language = str(language)
-                userprofile.save()
+                    default_follow = deafult_boloindya_follow.delay(user.id,str(language))
                 user.save()
                 user_tokens = get_tokens_for_user(user)
                 return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
@@ -2303,19 +2594,23 @@ def fb_profile_settings(request):
                 return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
         elif activity == 'profile_save':
             try:
-                userprofile = UserProfile.objects.get(user = request.user)
-                userprofile.name= name
-                userprofile.bio = bio
-                userprofile.about = about
+                userprofile = UserProfile.objects.using('default').get(user = request.user)
+                update_dict = {}
+                if name:
+                    update_dict['name']= name
+                if bio:
+                    update_dict['bio'] = bio
+                if about:    
+                    update_dict['about'] = about
                 if not userprofile.d_o_b and d_o_b:
                     add_bolo_score(userprofile.user.id, 'dob_added', userprofile)
-                userprofile.d_o_b = d_o_b
+                update_dict['d_o_b'] = d_o_b
                 if not userprofile.gender and gender:
                     add_bolo_score(userprofile.user.id, 'gender_added', userprofile)
                 if str(is_dark_mode_enabled) == '1':
-                    userprofile.is_dark_mode_enabled = True
+                    update_dict['is_dark_mode_enabled'] = True
                 else:
-                    userprofile.is_dark_mode_enabled = False
+                    update_dict['is_dark_mode_enabled'] = False
                 if user_ip:
                     user_ip_to_state_task.delay(request.user.id,user_ip)
                     # url = 'http://ip-api.com/json/'+user_ip
@@ -2323,84 +2618,104 @@ def fb_profile_settings(request):
                     # json_response = json.loads(response)
                     # userprofile.state_name = json_response['regionName']
                     # userprofile.city_name = json_response['city']
-                userprofile.gender = gender
-                userprofile.profile_pic =profile_pic
-                userprofile.cover_pic=cover_pic
-                userprofile.linkedin_url = likedin_url
-                userprofile.twitter_id = twitter_id
-                userprofile.instagarm_id = instagarm_id
-                userprofile.save()
+                if gender:    
+                    update_dict['gender'] = gender
+                if profile_pic:    
+                    update_dict['profile_pic'] =profile_pic
+                if cover_pic:    
+                    update_dict['cover_pic']=cover_pic
+                if linkedin_url:    
+                    update_dict['linkedin_url'] = linkedin_url
+                if twitter_id:    
+                    update_dict['twitter_id'] = twitter_id
+                if instagarm_id:    
+                    update_dict['instagarm_id'] = instagarm_id
+                if salary_range:    
+                    update_dict['salary_range'] = salary_range
                 if username:
                     if not check_username_valid(username):
                         return JsonResponse({'message': 'Username Invalid. It can contains only lower case letters,numbers and special character[ _ - .]'}, status=status.HTTP_200_OK)
-                    check_username = User.objects.filter(username = username).exclude(pk =request.user.id)
+                    check_username = User.objects.using('default').filter(username = username).exclude(pk =request.user.id)
                     if not check_username:
-                        userprofile.slug = username
+                        update_dict['slug'] = username
                         user = userprofile.user
                         user.username = username
-                        userprofile.save()
                         user.save()
                     else:
                         return JsonResponse({'message': 'Username already exist'}, status=status.HTTP_200_OK)
+                UserProfile.objects.using('default').filter(user=request.user).update(**update_dict)
                 return JsonResponse({'message': 'Profile Saved'}, status=status.HTTP_200_OK)
             except Exception as e:
-                return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+                log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                    'error':str(e)})
+                print "Error in API fb_profile_settings/ :" + log
+                return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
         elif activity == 'settings_changed':
             try:
-                userprofile = UserProfile.objects.get(user = request.user)
-                userprofile.linkedin_url = likedin_url
-                userprofile.twitter_id = twitter_id
-                userprofile.instagarm_id = instagarm_id
+                userprofile = UserProfile.objects.using('default').get(user = request.user)
+                update_dict = {}
+                update_dict['linkedin_url'] = linkedin_url
+                update_dict['twitter_id'] = twitter_id
+                update_dict['instagarm_id'] = instagarm_id
                 if sub_category_prefrences:
                     for each_sub_category in sub_category_prefrences:
-                        category = Category.objects.get(pk = each_sub_category)
+                        category = Category.objects.using('default').get(pk = each_sub_category)
                         userprofile.sub_category.add(category)
-                        userprofile.save()
                     if userprofile.sub_category.all():
                         for each_category in userprofile.sub_category.all():
                             if not str(each_category.id) in sub_category_prefrences:
                                 userprofile.sub_category.remove(each_category)
                 if language:
-                    default_follow = deafult_boloindya_follow(request.user,str(language))
-                    userprofile.language = str(language)
-                    cache_popular_post.delay(request.user.id,language)
-                    userprofile.save()
+                    default_follow = deafult_boloindya_follow.delay(request.user.id,str(language))
+                    update_dict['language'] = str(language)
+                UserProfile.objects.using('default').filter(user=request.user).update(**update_dict)
                 return JsonResponse({'message': 'Settings Chnaged'}, status=status.HTTP_200_OK)
             except Exception as e:
-                return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+                log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                    'error':str(e)})
+                print "Error in API fb_profile_settings/ :" + log
+                return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
         elif activity == 'android_login':
-            try:
-                userprofile = UserProfile.objects.get(android_did = android_did,user__is_active = True)
-                user=userprofile.user
-                is_created=False
-            except Exception as e:
-                print e
+            if not android_did:
+                return JsonResponse({'message': 'Error Occured:android_did not found',}, status=status.HTTP_400_BAD_REQUEST) 
+            user_id = get_redis_android_id(android_did)
+            if user_id:
+                try:
+                    user = User.objects.using('default').get(pk = user_id,is_active = True)
+                    is_created=False
+                    userprofile = user.st
+                except Exception as e:
+                    username = get_random_username()
+                    user = User.objects.using('default').create(username = username)
+                    userprofile = user.st
+                    is_created = True
+            else:
                 username = get_random_username()
-                user = User.objects.create(username = username)
-                userprofile = UserProfile.objects.get(user = user)
+                user = User.objects.using('default').create(username = username)
+                userprofile = user.st
                 is_created = True
             if not userprofile.is_guest_user:
-                userprofile.is_guest_user = True
-                userprofile.save()
-            cache_follow_post.delay(user.id)
-            cache_popular_post.delay(user.id,language)
+                UserProfile.objects.using('default').filter(pk = userprofile.id).update(is_guest_user = True)
             if is_created:
+                update_dict = {}
+                update_dict['android_did'] = android_did
+                set_redis_android_id(android_did,user.id)
                 add_bolo_score(user.id, 'initial_signup', userprofile)
                 if user_ip:
                     user_ip_to_state_task.delay(user.id,user_ip)
                 if str(is_geo_location) =="1":
-                    userprofile.lat = lat
-                    userprofile.lang = lang
+                    update_dict['lat'] = lat
+                    update_dict['lang'] = lang
                 if click_id:
-                    userprofile.click_id = click_id
-                    click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
-                    response = urllib2.urlopen(click_url).read()
-                    userprofile.click_id_response = str(response)
-                userprofile.save()
+                    save_click_id_response.delay(userprofile.id)
+                    # userprofile.click_id = click_id
+                    # click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
+                    # response = urllib2.urlopen(click_url).read()
+                    # userprofile.click_id_response = str(response)
+                update_dict['language'] = str(language)
+                UserProfile.objects.using('default').filter(pk = userprofile.id).update(**update_dict)
                 if str(language):
-                    default_follow = deafult_boloindya_follow(user,str(language))
-                userprofile.language = str(language)
-                userprofile.save()
+                    default_follow = deafult_boloindya_follow.delay(user.id,str(language))                
                 user.save()
                 user_tokens = get_tokens_for_user(user)
                 return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
@@ -2409,7 +2724,10 @@ def fb_profile_settings(request):
                 return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
 
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API fb_profile_settings/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 #### KYC Views ####
 
@@ -2419,7 +2737,10 @@ def get_kyc_status(request):
         user_kyc,is_created = UserKYC.objects.get_or_create(user = request.user)
         return JsonResponse({'message': 'success','user_kyc':UserKYCSerializer(user_kyc).data}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API get_kyc_status/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -2455,7 +2776,10 @@ def save_kyc_basic_info(request):
         user_kyc.save()
         return JsonResponse({'message': 'basic_info_saved'}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API save_kyc_basic_info/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def save_kyc_documents(request):
@@ -2493,7 +2817,10 @@ def save_kyc_documents(request):
                 user_kyc.save()
         return JsonResponse({'message': message}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API save_kyc_documents/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def save_kyc_selfie(request):
@@ -2513,7 +2840,10 @@ def save_kyc_selfie(request):
         user_kyc.save()
         return JsonResponse({'message': 'additional info saved'}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API save_kyc_selfie/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def save_kyc_additional_info(request):
@@ -2539,7 +2869,10 @@ def save_kyc_additional_info(request):
         user_kyc.save()
         return JsonResponse({'message': 'additional info saved'}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API save_kyc_additional_info/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def save_bank_details_info(request):
@@ -2587,7 +2920,10 @@ def save_bank_details_info(request):
         user_kyc.save()
         return JsonResponse({'message': message}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API save_bank_details_info/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def get_bolo_details(request):
@@ -2598,7 +2934,10 @@ def get_bolo_details(request):
         all_encash_details = EncashableDetail.objects.filter(user = user).order_by('-id')
         return JsonResponse({'all_encash_details': EncashableDetailSerializer(all_encash_details).data,'kyc_details':UserKYCSerializer(kyc_details).data}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API get_bolo_details/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -2631,42 +2970,48 @@ def follow_user(request):
     """
     user_following_id = request.POST.get('user_following_id',None)
     try:
+        if int(user_following_id) == int(request.user.id):
+            return JsonResponse({'message': 'You can not follow/unfollow your ownself'}, status=status.HTTP_400_BAD_REQUEST)
+
         follow,is_created = Follower.objects.get_or_create(user_follower = request.user,user_following_id=user_following_id)
-        userprofile = UserProfile.objects.get(user = request.user)
-        followed_user = UserProfile.objects.get(user_id = user_following_id)
+        userprofile = UserProfile.objects.filter(user = request.user)
+        followed_user = UserProfile.objects.filter(user_id = user_following_id)
         if is_created:
-            add_bolo_score(request.user.id, 'follow', userprofile)
-            add_bolo_score(user_following_id, 'followed', followed_user)
-            userprofile.follow_count = F('follow_count')+1
-            userprofile.save()
-            followed_user.follower_count = F('follower_count')+1
-            followed_user.save()
+            add_bolo_score(request.user.id, 'follow', userprofile[0])
+            add_bolo_score(user_following_id, 'followed', followed_user[0])
+            userprofile.update(follow_count = F('follow_count')+1)
+            followed_user.update(follower_count = F('follower_count')+1)
             update_redis_following(request.user.id,int(user_following_id),True)
             update_redis_follower(int(user_following_id),request.user.id,True)
+            update_profile_counter(request.user.id,'follow_count',1, True)
+            update_profile_counter(int(user_following_id),'follower_count',1, True)
             return JsonResponse({'message': 'Followed'}, status=status.HTTP_200_OK)
         else:
             if follow.is_active:
                 follow.is_active = False
                 follow.save()
-                userprofile.follow_count = F('follow_count')-1
-                followed_user.follower_count = F('follower_count')-1
-                userprofile.save()
-                followed_user.save()
+                userprofile.update(follow_count = F('follow_count')-1)
+                followed_user.update(follower_count = F('follower_count')-1)
                 update_redis_following(request.user.id,int(user_following_id),False)
                 update_redis_follower(int(user_following_id),request.user.id,False)
+                update_profile_counter(request.user.id,'follow_count',1, False)
+                update_profile_counter(int(user_following_id),'follower_count',1, False)
                 return JsonResponse({'message': 'Unfollowed'}, status=status.HTTP_200_OK)
             else:
                 follow.is_active = True
-                userprofile.follow_count = F('follow_count')+1
-                followed_user.follower_count = F('follower_count')+1
+                userprofile.update(follow_count = F('follow_count')+1)
+                followed_user.update(follower_count = F('follower_count')+1)
                 follow.save()
-                followed_user.save()
-                userprofile.save()
                 update_redis_following(request.user.id,int(user_following_id),True)
                 update_redis_follower(int(user_following_id),request.user.id,True)
+                update_profile_counter(request.user.id,'follow_count',1, True)
+                update_profile_counter(int(user_following_id),'follower_count',1, True)
                 return JsonResponse({'message': 'Followed'}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API follow_user/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def follow_sub_category(request):
@@ -2686,10 +3031,12 @@ def follow_sub_category(request):
             else:
                 category = Category.objects.get(pk = user_sub_category_id)
                 userprofile.sub_category.add(category)
-                userprofile.save()
                 return JsonResponse({'message': 'Followed'}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API follow_sub_category/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def like(request):
@@ -2700,7 +3047,7 @@ def like(request):
     """
     topic_id = request.POST.get('topic_id',None)
     comment_id = request.POST.get('comment_id',None)
-    userprofile = UserProfile.objects.get(user = request.user)
+    userprofile = UserProfile.objects.filter(user = request.user)
     try:
         if topic_id:
             liked,is_created = Like.objects.get_or_create(topic_id = topic_id,user = request.user)
@@ -2714,8 +3061,7 @@ def like(request):
                 acted_obj.topic_like_count = F('topic_like_count')+1
             acted_obj.save()
             add_bolo_score(request.user.id, 'liked', acted_obj)
-            userprofile.like_count = F('like_count')+1
-            userprofile.save()
+            userprofile.update(like_count = F('like_count')+1)
             return JsonResponse({'message': 'liked'}, status=status.HTTP_200_OK)
         else:
             if liked.like:
@@ -2725,8 +3071,7 @@ def like(request):
                 if topic_id:
                     acted_obj.topic_like_count = F('topic_like_count')-1
                 acted_obj.save()
-                userprofile.like_count = F('like_count')-1
-                userprofile.save()
+                userprofile.update(like_count = F('like_count')-1)
                 return JsonResponse({'message': 'unliked'}, status=status.HTTP_200_OK)
             else:
                 liked.like = True
@@ -2735,11 +3080,13 @@ def like(request):
                 if topic_id:
                     acted_obj.topic_like_count = F('topic_like_count')+1
                 acted_obj.save()
-                userprofile.like_count = F('like_count')+1
-                userprofile.save()
+                userprofile.update(like_count = F('like_count')+1)
                 return JsonResponse({'message': 'liked'}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API like/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def shareontimeline(request):
@@ -2752,77 +3099,90 @@ def shareontimeline(request):
     """
     topic_id = request.POST.get('topic_id',None)
     share_on = request.POST.get('share_on',None)
-    userprofile = UserProfile.objects.get(user = request.user)
-    if share_on == 'share_timeline':
-        try:
-            shared = ShareTopic.objects.create(topic_id = topic_id,user = request.user)
-            add_bolo_score(request.user.id, 'share_timeline', liked)
-            topic = Topic.objects.get(pk = topic_id)
-            topic.share_count = F('share_count')+1
-            topic.total_share_count = F('total_share_count')+1
-            topic.topic_share_count = F('topic_share_count')+1
-            topic.save()
-            userprofile.share_count = F('share_count')+1
-            userprofile.save()
-            return JsonResponse({'message': 'shared'}, status=status.HTTP_200_OK)
-        except Exception as e:
-            return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
-    elif share_on == 'facebook_share':
-        try:
-            shared = SocialShare.objects.create(topic_id = topic_id,user = request.user,share_type = '0')
-            topic = Topic.objects.get(pk = topic_id)
-            topic.facebook_share_count = F('facebook_share_count')+1    
-            topic.total_share_count = F('total_share_count')+1
-            topic.topic_share_count = F('topic_share_count')+1
-            topic.save()
-            add_bolo_score(request.user.id, 'facebook_share', topic)
-            userprofile.share_count = F('share_count')+1
-            userprofile.save()
-            return JsonResponse({'message': 'fb shared'}, status=status.HTTP_200_OK)
-        except Exception as e:
-            return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
-    elif share_on == 'whatsapp_share':
-        try:
-            shared = SocialShare.objects.create(topic_id = topic_id,user = request.user,share_type = '1')
-            topic = Topic.objects.get(pk = topic_id)
-            topic.whatsapp_share_count = F('whatsapp_share_count')+1
-            topic.total_share_count = F('total_share_count')+1
-            topic.topic_share_count = F('topic_share_count')+1
-            topic.save()
-            add_bolo_score(request.user.id, 'whatsapp_share', topic)
-            userprofile.share_count = F('share_count')+1
-            userprofile.save()
-            return JsonResponse({'message': 'whatsapp shared'}, status=status.HTTP_200_OK)
-        except Exception as e:
-            return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
-    elif share_on == 'linkedin_share':
-        try:
-            shared = SocialShare.objects.create(topic_id = topic_id,user = request.user,share_type = '2')
-            topic = Topic.objects.get(pk = topic_id)
-            topic.linkedin_share_count = F('linkedin_share_count')+1
-            topic.total_share_count = F('total_share_count')+1
-            topic.topic_share_count = F('topic_share_count')+1
-            topic.save()
-            add_bolo_score(request.user.id, 'linkedin_share', topic)
-            userprofile.share_count = F('share_count')+1
-            userprofile.save()
-            return JsonResponse({'message': 'linkedin shared'}, status=status.HTTP_200_OK)
-        except Exception as e:
-            return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
-    elif share_on == 'twitter_share':
-        try:
-            shared = SocialShare.objects.create(topic_id = topic_id,user = request.user,share_type = '3')
-            topic = Topic.objects.get(pk = topic_id)
-            topic.twitter_share_count = F('twitter_share_count')+1
-            topic.total_share_count = F('total_share_count')+1
-            topic.topic_share_count = F('topic_share_count')+1
-            topic.save()
-            add_bolo_score(request.user.id, 'twitter_share', topic)
-            userprofile.share_count = F('share_count')+1
-            userprofile.save()
-            return JsonResponse({'message': 'twitter shared'}, status=status.HTTP_200_OK)
-        except Exception as e:
-            return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+    if request.user.is_authenticated:
+        userprofile = UserProfile.objects.filter(user = request.user)
+        if share_on == 'share_timeline':
+            try:
+                shared = ShareTopic.objects.create(topic_id = topic_id,user = request.user)
+                add_bolo_score(request.user.id, 'share_timeline', liked)
+                topic = Topic.objects.using('default').get(pk = topic_id)
+                topic.share_count = F('share_count')+1
+                topic.total_share_count = F('total_share_count')+1
+                topic.topic_share_count = F('topic_share_count')+1
+                topic.save()
+                userprofile.update(share_count = F('share_count')+1)
+                return JsonResponse({'message': 'shared'}, status=status.HTTP_200_OK)
+            except Exception as e:
+                log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                        'error':str(e)})
+                print "Error in API shareontimeline/ :" + log
+                return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        elif share_on == 'facebook_share':
+            try:
+                shared = SocialShare.objects.create(topic_id = topic_id,user = request.user,share_type = '0')
+                topic = Topic.objects.using('default').get(pk = topic_id)
+                topic.facebook_share_count = F('facebook_share_count')+1    
+                topic.total_share_count = F('total_share_count')+1
+                topic.topic_share_count = F('topic_share_count')+1
+                topic.save()
+                add_bolo_score(request.user.id, 'facebook_share', topic)
+                userprofile.update(share_count = F('share_count')+1)
+                return JsonResponse({'message': 'fb shared'}, status=status.HTTP_200_OK)
+            except Exception as e:
+                log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                        'error':str(e)})
+                print "Error in API shareontimeline/ :" + log
+                return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        elif share_on == 'whatsapp_share':
+            try:
+                shared = SocialShare.objects.create(topic_id = topic_id,user = request.user,share_type = '1')
+                topic = Topic.objects.using('default').get(pk = topic_id)
+                topic.whatsapp_share_count = F('whatsapp_share_count')+1
+                topic.total_share_count = F('total_share_count')+1
+                topic.topic_share_count = F('topic_share_count')+1
+                topic.save()
+                add_bolo_score(request.user.id, 'whatsapp_share', topic)
+                userprofile.update(share_count = F('share_count')+1)
+                return JsonResponse({'message': 'whatsapp shared'}, status=status.HTTP_200_OK)
+            except Exception as e:
+                log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                        'error':str(e)})
+                print "Error in API shareontimeline/ :" + log
+                return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        elif share_on == 'linkedin_share':
+            try:
+                shared = SocialShare.objects.create(topic_id = topic_id,user = request.user,share_type = '2')
+                topic = Topic.objects.using('default').get(pk = topic_id)
+                topic.linkedin_share_count = F('linkedin_share_count')+1
+                topic.total_share_count = F('total_share_count')+1
+                topic.topic_share_count = F('topic_share_count')+1
+                topic.save()
+                add_bolo_score(request.user.id, 'linkedin_share', topic)
+                userprofile.update(share_count = F('share_count')+1)
+                return JsonResponse({'message': 'linkedin shared'}, status=status.HTTP_200_OK)
+            except Exception as e:
+                log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                        'error':str(e)})
+                print "Error in API shareontimeline/ :" + log
+                return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        elif share_on == 'twitter_share':
+            try:
+                shared = SocialShare.objects.create(topic_id = topic_id,user = request.user,share_type = '3')
+                topic = Topic.objects.using('default').get(pk = topic_id)
+                topic.twitter_share_count = F('twitter_share_count')+1
+                topic.total_share_count = F('total_share_count')+1
+                topic.topic_share_count = F('topic_share_count')+1
+                topic.save()
+                add_bolo_score(request.user.id, 'twitter_share', topic)
+                userprofile.update(share_count = F('share_count')+1)
+                return JsonResponse({'message': 'twitter shared'}, status=status.HTTP_200_OK)
+            except Exception as e:
+                log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                        'error':str(e)})
+                print "Error in API shareontimeline/ :" + log
+                return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return JsonResponse({'message': 'Unauthorised User',}, status=status.HTTP_400_BAD_REQUEST)
 
 def comment_view(request):
     topic_id = request.GET.get('topic_id',None)
@@ -2835,18 +3195,21 @@ def comment_view(request):
     try:
         # comment_list = comment_ids.split(',')
         # for each_comment_id in comment_list:
-        topic = Topic.objects.get(pk = topic_id)
-        # topic= comment.topic
-        topic.view_count = F('view_count') +1
-        topic.imp_count = F('imp_count') +1
-        topic.save()
-        userprofile = topic.user.st
-        userprofile.view_count = F('view_count')+1
-        userprofile.own_vb_view_count = F('own_vb_view_count') +1
-        userprofile.save()
+        # topic = Topic.objects.using('default').get(pk = topic_id)
+        # # topic= comment.topic
+        # topic.view_count = F('view_count') +1
+        # topic.imp_count = F('imp_count') +1
+        # topic.save()
+        if topic_id and request.user.is_authenticated:
+            update_redis_vb_seen_entries(topic_id,request.user.id,datetime.now())
+            update_redis_vb_seen(request.user.id,topic_id)
+        # UserProfile.objects.filter(user_id = topic.user_id).update(view_count = F('view_count')+1,own_vb_view_count = F('own_vb_view_count') +1)
         return JsonResponse({'message': 'item viewed'}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API comment_view/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def vb_seen(request):
@@ -2859,29 +3222,31 @@ def vb_seen(request):
     """
     #### add models for seen users
     try:
-        # comment_list = comment_ids.split(',')
-        # for each_comment_id in comment_list:
-        topic = Topic.objects.get(pk = topic_id)
-        # topic= comment.topic
-        topic.view_count = F('view_count')+1
-        topic.imp_count = F('imp_count') +1
-        topic.save()
-        userprofile = topic.user.st
-        userprofile.view_count = F('view_count')+1
-        userprofile.own_vb_view_count = F('own_vb_view_count') +1
-        userprofile.save()
-        all_vb_seen = get_redis_vb_seen(request.user.id)
-        # vbseen = VBseen.objects.filter(user = request.user,topic_id = topic_id)
-        if not topic_id in all_vb_seen:
-            vbseen = VBseen.objects.create(user = request.user,topic_id = topic_id)
+        # # comment_list = comment_ids.split(',')
+        # # for each_comment_id in comment_list:
+        # topic = Topic.objects.get(pk = topic_id)
+        # # topic= comment.topic
+        # topic.view_count = F('view_count')+1
+        # topic.imp_count = F('imp_count') +1
+        # topic.save()
+        # # UserProfile.objects.filter(user_id = topic.user_id).update(view_count = F('view_count')+1,own_vb_view_count = F('own_vb_view_count') +1)
+        # all_vb_seen = get_redis_vb_seen(request.user.id)
+        # if not topic_id in all_vb_seen:
+        #     vbseen = VBseen.objects.create(user = request.user,topic_id = topic_id)
+        #     update_redis_vb_seen(request.user.id,topic_id)
+        #     add_bolo_score(topic.user.id, 'vb_view', vbseen)
+        # else:
+        #     vbseen = VBseen.objects.create(user = request.user,topic_id = topic_id)
+        if topic_id and request.user.is_authenticated:
+            update_redis_vb_seen_entries(topic_id,request.user.id,datetime.now())
             update_redis_vb_seen(request.user.id,topic_id)
-            add_bolo_score(topic.user.id, 'vb_view', vbseen)
-        else:
-            vbseen = VBseen.objects.create(user = request.user,topic_id = topic_id)
         return JsonResponse({'message': 'vb seen'}, status=status.HTTP_200_OK)
 
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API vb_seen/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -2902,15 +3267,16 @@ def follow_like_list(request):
         block_hashes = TongueTwister.objects.filter(is_blocked=True).values_list('hash_tag', flat=True)
         reported_user = Report.objects.filter(reported_by=request.user,target_type=ContentType.objects.get(model='user')).distinct('target_id').values_list('target_id',flat=True)
         reported_topic = Report.objects.filter(reported_by=request.user,target_type=ContentType.objects.get(model='topic')).distinct('target_id').values_list('target_id',flat=True)
-        cache_follow_post.delay(request.user.id)
-        cache_popular_post.delay(request.user.id,request.user.st.language)
         return JsonResponse({'comment_like':list(comment_like),'topic_like':list(topic_like),'all_follow':list(all_follow),'all_follower':list(all_follower),\
             'all_category_follow':list(all_category_follow),'app_version':app_version,\
             'notification_count':notification_count, 'is_test_user':userprofile.is_test_user,'user':UserSerializer(request.user).data,\
             'detialed_category':CategorySerializer(detialed_category,many = True).data,'block_hashes':list(block_hashes),\
             'reported_user':list(reported_user),'reported_topic':list(reported_topic)},status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API follow_like_list/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def my_app_version(request):
@@ -2919,7 +3285,10 @@ def my_app_version(request):
         app_version = AppVersionSerializer(app_version).data
         return JsonResponse({'app_version':app_version}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API my_app_version/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -2941,7 +3310,10 @@ def get_follow_user(request):
         else:
             return JsonResponse({'all_follow':[]}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API get_follow_user/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class GetFollowigList(generics.ListCreateAPIView):
     serializer_class   = UserSerializer
@@ -2983,7 +3355,10 @@ def get_following_list(request):
             return JsonResponse({'result':[]}, status=status.HTTP_200_OK)
 
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API get_following_list/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def get_follower_list(request):
@@ -2999,9 +3374,11 @@ def get_follower_list(request):
             return JsonResponse({'result':[]}, status=status.HTTP_200_OK)
 
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
-
-
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API get_follower_list/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+''''
 def deafult_boloindya_follow(user,language):
     try:
         if language == '2':
@@ -3015,12 +3392,10 @@ def deafult_boloindya_follow(user,language):
         follow,is_created = Follower.objects.get_or_create(user_follower = user,user_following=bolo_indya_user)
         if is_created:
             add_bolo_score(user.id, 'follow', follow)
-            userprofile = UserProfile.objects.get(user = user)
-            bolo_indya_profile = UserProfile.objects.get(user = bolo_indya_user)
-            userprofile.follow_count = F('follow_count') + 1
-            userprofile.save()
-            bolo_indya_profile.follower_count = F('follower_count') + 1
-            bolo_indya_profile.save()
+            userprofile = UserProfile.objects.filter(user = user)
+            bolo_indya_profile = UserProfile.objects.filter(user = bolo_indya_user)
+            userprofile.update(follow_count = F('follow_count') + 1)
+            bolo_indya_profile.update(follower_count = F('follower_count') + 1)
             update_redis_following(user.id,int(bolo_indya_user.id),True)
             update_redis_follower(int(bolo_indya_user.id),user.id,True)
         if not follow.is_active:
@@ -3031,6 +3406,7 @@ def deafult_boloindya_follow(user,language):
         return True
     except:
         return False
+'''
 
 @api_view(['POST'])
 def get_bolo_score(request):
@@ -3038,7 +3414,10 @@ def get_bolo_score(request):
         userprofile = UserProfile.objects.get(user = request.user)
         return JsonResponse({'bolo_score':userprofile.bolo_score,'message':'success'}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API get_bolo_score/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 ####
 # Prediction
@@ -3243,12 +3622,16 @@ def check_url(file_path):
     except Exception as e:
         # print e,file_path
         return "403"
+
 def get_cloudfront_url(instance):
     if instance.question_video:
+        cloufront_url = settings.US_CDN_URL
+        if 'in-boloindya' in instance.question_video:
+            cloufront_url = settings.IN_CDN_URL
         regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
         find_urls_in_string = re.compile(regex, re.IGNORECASE)
         url = find_urls_in_string.search(instance.question_video)
-        return str(instance.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
+        return str(instance.question_video.replace(str(url.group()), cloufront_url))
 
 @csrf_exempt
 @api_view(['POST'])
@@ -3257,19 +3640,15 @@ def SyncDump(request):
         if request.method == "POST":
             #Storing the dump in database
             try:
-                if request.user.id == None:
-                    dump = request.POST.get('dump')
-                    dump_type = request.POST.get('dump_type')
-                    stored_data = UserJarvisDump(dump=dump, dump_type=dump_type, android_id=request.POST.get('android_id',''))
-                    stored_data.save()
-                else:
-                    user = request.user
-                    dump = request.POST.get('dump')
-                    dump_type = request.POST.get('dump_type')
-                    stored_data = UserJarvisDump(user=user, dump=dump, dump_type=dump_type, android_id=request.POST.get('android_id',''))
-                    stored_data.save()
+                data = {"dump": request.POST.get('dump'), "dump_type":request.POST.get('dump_type'),"android_id":request.POST.get('android_id',''), "created_at": datetime.now()}
+                if request.user.id:
+                    data["user_id"] = request.user.id
+                set_sync_dump_info(data)
                 return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)    
             except Exception as e:
+                log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                    'error':str(e)})
+                print "Error in API SyncDump/ :" + log
                 return JsonResponse({'message' : 'fail','error':str(e)})
     else:
         return JsonResponse({'messgae' : 'user_missing'})
@@ -3277,16 +3656,15 @@ def SyncDump(request):
 @api_view(['POST'])
 def save_android_logs(request):
     try:
-        if request.user.id == None:
-            AndroidLogs.objects.create(logs=request.POST.get('error_log', ''),log_type = request.POST.get('log_type',None), android_id=request.POST.get('android_id',''))
-            return JsonResponse({'messgae' : 'success'})
-        else:
-            AndroidLogs.objects.create(user=request.user, logs=request.POST.get('error_log', ''),log_type = request.POST.get('log_type',None), android_id=request.POST.get('android_id',''))
-            if request.POST.get('log_type',None)=='user_ip':
-                cache_follow_post.delay(request.user.id)
-                cache_popular_post.delay(request.user.id,request.user.st.language)
-            return JsonResponse({'messgae' : 'success'})
+        data = {"logs":request.POST.get('error_log', ''), "log_type":request.POST.get('log_type',None), "android_id": request.POST.get('android_id',''), "created_at": datetime.now()}
+        if request.user.id:
+            data['user_id'] = request.user.id
+        set_android_logs_info(data)
+        return JsonResponse({'messgae' : 'success'})
     except Exception as e:
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API save_android_logs/ :" + log
         return JsonResponse({'message' : 'fail','error':str(e)})
 
 @api_view(['POST'])
@@ -3305,6 +3683,9 @@ def get_hash_list(request):
             hashtaglist.append(hash_data)
         return JsonResponse({'data':hashtaglist,'message':'Success'})
     except Exception as e:
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API get_hash_list/ :" + log
         return JsonResponse({'message':'fail','error':str(e)})
 
 
@@ -3446,7 +3827,10 @@ def get_category_detail(request):
         category = Category.objects.get(pk=category_id)
         return JsonResponse({'category_details': CategorySerializer(category).data}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API get_category_detail/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def get_category_with_video_bytes(request):
@@ -3491,7 +3875,10 @@ def get_category_with_video_bytes(request):
             'popular_boloindyans': popular_bolo, 'following_user': following_user}, \
             status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API get_category_with_video_bytes/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def get_category_detail_with_views(request):
@@ -3504,7 +3891,10 @@ def get_category_detail_with_views(request):
         current_language_view = CategoryViewCounter.objects.get(category=category,language=language_id).view_count
         return JsonResponse({'category_details': CategoryWithVideoSerializer(category, context={'language_id': language_id,'user_id':request.user.id,'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True),'page':int(request.GET.get('page','1'))}).data, 'video_count': vb_count, 'all_seen':shorcountertopic(all_seen),'current_language_view':shorcountertopic(current_language_view)}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API get_category_detail_with_views/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def get_category_video_bytes(request):
@@ -3518,7 +3908,10 @@ def get_category_video_bytes(request):
         topic_page = paginator.page(1)
         return JsonResponse({'topics': CategoryVideoByteSerializer(topic_page, many=True, context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API get_category_video_bytes/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def old_algo_get_popular_video_bytes(request):
@@ -3574,17 +3967,24 @@ def old_algo_get_popular_video_bytes(request):
         topics = paginator_topics.paginate_queryset(topics, request)
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True, context={'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:' + str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API old_algo_get_popular_video_bytes/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def get_popular_video_bytes(request):
     try:
         language_id = request.GET.get('language_id', 1)
+        if int(request.GET.get('page',1)) == 1:
+            cache_popular_post(request.user.id,language_id)
         topics = get_popular_paginated_data(request.user.id,language_id,int(request.GET.get('page',1)))
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True, context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
     except Exception as e:
-        print e
-        return JsonResponse({'message': 'Error Occured:' + str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API get_popular_video_bytes/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def pubsub_popular(request):
@@ -3598,7 +3998,10 @@ def pubsub_popular(request):
         topics = paginator_topics.paginate_queryset(topics_all, request)
         return JsonResponse({'topics': PubSubPopularSerializer(topics, many=True).data}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:' + str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API pubsub_popular/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def get_user_follow_and_like_list(request):
@@ -3615,7 +4018,10 @@ def get_user_follow_and_like_list(request):
                              'notification_count':notification_count, 'user':UserSerializer(request.user).data, \
                              'block_hashes':list(block_hashes)}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API get_user_follow_and_like_list/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def get_recent_videos(request):
@@ -3667,7 +4073,10 @@ def get_recent_videos(request):
         topics = paginator_topics.paginate_queryset(topics, request)
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True, context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API get_recent_videos/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
@@ -3687,7 +4096,10 @@ def get_popular_bolo(request):
         else:
             return JsonResponse({'results': []}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API get_popular_bolo/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -3705,7 +4117,10 @@ def submit_user_feedback(request):
             return JsonResponse({'message': 'saved feedback'}, status=status.HTTP_200_OK)
         return JsonResponse({'message': 'invalid user'}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API submit_user_feedback/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 def get_authorised_user_ids():
     from django.contrib.auth.models import User,Group
@@ -3746,7 +4161,7 @@ def generate_login_data(request):
         except Exception as e:
             return JsonResponse({'message': 'Invalid User Id'}, status=status.HTTP_400_BAD_REQUEST)
     else:
-        JsonResponse({'message': 'Invalid Auth User Id'}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({'message': 'Invalid User'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -3759,7 +4174,10 @@ def get_landing_page_video(request):
         topics = Topic.objects.filter(is_removed=False, is_vb=True, language_id=language_id, is_popular=True, date__gte=enddate).order_by('-date')[0:2]
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True, context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API get_landing_page_video/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
       
 @api_view(['GET'])
 def get_ip_to_language(request):
@@ -3785,7 +4203,10 @@ def get_ip_to_language(request):
         else:
             return JsonResponse({'message': 'Error Occured: IP not in GET request',}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+'',}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API get_ip_to_language/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def set_user_email(request):
@@ -3799,7 +4220,10 @@ def set_user_email(request):
         else:
             return JsonResponse({'message': 'Email not found'}, status=status.HTTP_400_BAD_REQUEST)
     except:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API set_user_email/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def store_phone_book(request):
@@ -3819,7 +4243,10 @@ def store_phone_book(request):
         else:
             return JsonResponse({'message': 'Error Occured: phonebook empty not User not found',}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API store_phone_book/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def update_mobile_no(request):
@@ -3841,7 +4268,10 @@ def update_mobile_no(request):
         else:
             return JsonResponse({'message': 'Error Occured: mobile_no empty'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API update_mobile_no/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def verify_otp_and_update_profile(request):
@@ -3862,7 +4292,63 @@ def verify_otp_and_update_profile(request):
         else:
             return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API verify_otp_and_update_profile/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def update_mobile_no_with_country_code(request):
+    try:
+        mobile_no = request.POST.get('mobile_no',None)
+        country_code = request.POST.get('country_code', '+91')
+        if mobile_no:
+            full_mobile_no = str(country_code)+str(mobile_no)
+            old_otp = SingUpOTP.objects.filter(mobile_no=full_mobile_no,created_at__gte=datetime.now()-timedelta(minutes=5)).order_by('-id')
+            if old_otp:
+                return JsonResponse({'message':'otp send'}, status=status.HTTP_200_OK)
+            else:
+                instance = SingUpOTP.objects.create(mobile_no=full_mobile_no,otp=generateOTP(6))
+                response, response_status = send_sms(instance.mobile_no, instance.otp)
+                if not response_status:
+                    instance.is_active=False
+                    instance.save()
+                    return JsonResponse({'message': 'Error Occured: sms Api not working'}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    return JsonResponse({'message':'otp send'}, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'message': 'Error Occured: mobile_no empty'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API update_mobile_no_with_country_code/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def verify_otp_and_update_profile_with_country_code(request):
+    try:
+        mobile_no = validate_indian_number(request.POST.get('mobile_no',None))
+        country_code = request.POST.get('country_code', '+91')
+        full_mobile_no = str(country_code)+str(mobile_no)
+        otp = request.POST.get('otp',None)
+        otp_obj = SingUpOTP.objects.filter(mobile_no=full_mobile_no,otp=otp,is_active=True).order_by('-id')
+        if otp_obj:
+            otp_obj=otp_obj[0]
+            otp_obj.is_active = False
+            otp_obj.used_at = timezone.now()
+            otp_obj.for_user = request.user
+            otp_obj.save()
+            UserProfile.objects.filter(user=request.user).update(mobile_no=mobile_no, country_code=country_code)
+            userprofile=request.user.st
+            add_bolo_score(request.user.id, 'mobile_no_added', userprofile)
+            return JsonResponse({'message':'Mobile No updated','user':UserSerializer(request.user).data}, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API verify_otp_and_update_profile_with_country_code/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def verify_otp_and_update_paytm_number(request):
@@ -3882,7 +4368,10 @@ def verify_otp_and_update_paytm_number(request):
         else:
             return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API verify_otp_and_update_paytm_number/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def userprofile_update_paytm_number(request):
@@ -3890,7 +4379,10 @@ def userprofile_update_paytm_number(request):
         UserProfile.objects.filter(user=request.user).update(paytm_number=request.user.st.mobile_no)
         return JsonResponse({'message':'Success','user':UserSerializer(request.user).data}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API userprofile_update_paytm_number/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def get_refer_earn_data(request):
@@ -3912,7 +4404,10 @@ def get_refer_earn_data(request):
             user_refer_url = ReferralCode.objects.create(for_user=request.user,code=generate_refer_earn_code(),purpose='refer_n_earn',is_refer_earn_code=True).referral_url()
         return JsonResponse({'registerd_user':registerd_user_data,'invite_user':invite_users_data,'user_refer_url':user_refer_url}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API get_refer_earn_data/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def get_refer_earn_url(request):
@@ -3934,7 +4429,10 @@ def update_mobile_invited(request):
         else:
             return JsonResponse({'message': 'conatct_id not found'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+        print "Error in API update_mobile_invited/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def get_refer_earn_stat(request):
@@ -3948,7 +4446,10 @@ def get_refer_earn_stat(request):
         except ReferralCode.DoesNotExist:
             referalcode = ReferralCode.objects.get_or_create(for_user=request.user,code=generate_refer_earn_code(),is_refer_earn_code=True,purpose='refer_n_earn')
         except Exception as e:
-            return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+            log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+                'error':str(e)})
+            print "Error in API get_refer_earn_stat/ :" + log
+            return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
         downloaded =ReferralCodeUsed.objects.filter(code = referalcode, is_download = True, by_user__isnull = True).distinct('android_id')
         signedup = ReferralCodeUsed.objects.filter(code = referalcode, is_download = True, by_user__isnull = False).distinct('android_id')
         download_count = downloaded.count()
@@ -3962,7 +4463,10 @@ def get_refer_earn_stat(request):
         return JsonResponse({'message': 'success','download_count':download_count,'signedup_count':signedup_count,'users':ReferralCodeUsedStatSerializer(result_page[0].object_list,many=True).data,'total_page':result_page[1]}, status=status.HTTP_200_OK)
 
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API get_refer_earn_stat/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -3975,7 +4479,10 @@ def save_banner_response(request):
             return JsonResponse({'message': 'Data Created'}, status=status.HTTP_200_OK)
         return JsonResponse({'message': 'No Data'}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API save_banner_response/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def get_hash_discover(request):
@@ -3983,14 +4490,19 @@ def get_hash_discover(request):
         page = int(request.GET.get('page',1))
         page_size = request.GET.get('page_size', 10)
         language_id = request.GET.get('language_id','2')
-        hash_tags = TongueTwisterCounter.objects.exclude(tongue_twister__is_blocked = True).filter(language_id=language_id).order_by('-tongue_twister__is_popular', 'tongue_twister__order', \
-            '-tongue_twister__popular_date','-hash_counter')
+        #hash_tags = TongueTwisterCounter.objects.exclude(tongue_twister__is_blocked = True).filter(language_id=language_id).order_by('-tongue_twister__is_popular', 'tongue_twister__order', \
+        #    '-tongue_twister__popular_date','-hash_counter')
+        hash_tags = HashtagViewCounter.objects.exclude(hashtag__is_blocked = True).filter(language=language_id).order_by('-hashtag__is_popular', '-hashtag__order',\
+            '-hashtag__hash_counter')
         result_page = get_paginated_data(hash_tags, int(page_size), int(page))
         if result_page[1]<int(page):
             return JsonResponse({'message': 'No page exist'}, status=status.HTTP_400_BAD_REQUEST)
         return JsonResponse({'message': 'success', 'results':TongueTwisterCounterSerializer(result_page[0].object_list,many=True).data,'total_page':result_page[1]}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API get_hash_discover/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def get_hash_discover_topics(request):
@@ -3999,7 +4511,10 @@ def get_hash_discover_topics(request):
         hash_tags = TongueTwister.objects.filter(pk__in=ids.split(','))
         return JsonResponse({'message': 'success', 'results':TongueTwisterWithOnlyVideoByteSerializer(hash_tags, context={'language_id': request.GET.get('language_id','2')}, many=True).data}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API get_hash_discover_topics/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def get_m3u8_of_ids(request):
@@ -4008,7 +4523,10 @@ def get_m3u8_of_ids(request):
         topics=Topic.objects.filter(pk__in=ids.split(','))
         return JsonResponse({'message': 'success', 'results':TopicsWithOnlyContent(topics, many=True).data}, status=status.HTTP_200_OK)
     except Exception as e:
-        return JsonResponse({'message': 'Error Occured:'+str(e)+''}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API get_m3u8_of_ids/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def upload_video_to_s3_for_app(request):
@@ -4042,9 +4560,162 @@ def report(request):
         else:
             return JsonResponse({'message': 'User Unauthorised'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API report/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+def get_campaigns(request):
+    try:
+        today = datetime.today()
+        all_camps = Campaign.objects.filter(is_active=True, active_from__lte=today, active_till__gte=today).order_by('-active_from')
+        serializer_camp = CampaignSerializer(all_camps, many=True)
+        data = serializer_camp.data
+        return JsonResponse({'status': 'success','message':data}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API get_campaigns/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+def get_user_details_from_topic_id(request):
+    try:
+        topic=Topic.objects.get(pk=request.GET.get('id', None))
+        return JsonResponse({"data": UserSerializer(topic.user).data })
+    except Exception as e:
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API get_user_details_from_topic_id/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+def update_profanity_details(request):
+    try:
+        is_adult = request.POST.get('is_adult',0)
+        is_profane = request.POST.get('is_profane',0)
+        is_violent = request.POST.get('is_violent',0)
+        topic_id = request.POST.get('topic_id',None)
+        user_id = request.POST.get('user_id',None)
+        adult_content = request.POST.get('adult_content',1)
+        violent_content = request.POST.get('violent_content',1)
+        profanity_collage_url = request.POST.get('profanity_collage_url','')
+        topic = Topic.objects.get(pk=topic_id)
+        if int(is_profane)==1:
+            if int(is_adult)==1:
+                user = User.objects.get(pk=user_id)
+                topic.is_adult = True
+                topic.adult_content = adult_content
 
+                #inactive userprofile
+                user.is_active = False
+                user.save()
+            if int(is_violent)==1:
+                topic.is_violent = True
+                topic.violent_content = violent_content
 
+            #notify user
+            if not topic.is_removed:
+                topic.delete()
+                update_profile_counter(topic.user_id,'video_count',1, False)
+        topic.profanity_collage_url = profanity_collage_url
+        topic.save()
+        return JsonResponse({'message': "success"}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        print("==============")
+        print("update_profanity_details failed with {}".format(str(e)))
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API update_profanity_details/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def update_download_url_in_topic(request):
+    try:
+        topic_id = request.POST.get('topic_id', None)
+        downloaded_url = request.POST.get('download_url', None)
+        topic = Topic.objects.using('default').get(pk=topic_id)
+        topic.downloaded_url = downloaded_url
+        topic.has_downloaded_url = True
+        topic.save()
+
+        return JsonResponse({'message': "success"}, status=status.HTTP_200_OK)
+    except Exception as e:
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API update_download_url_in_topic/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_user_last_vid_lang(request):
+    try:
+        user = request.user
+
+        if user:
+            all_vids = Topic.objects.filter(user=user).order_by('-date')
+
+            language = ''
+            if all_vids:
+                last_vid = all_vids[0]
+                print(last_vid.id)
+                language = last_vid.language_id
+
+            return JsonResponse({'language_id': language}, status=status.HTTP_200_OK)
+        else:        
+            return JsonResponse({'message': 'Invalid User'}, status=status.HTTP_204_NO_CONTENT)        
+
+    except Exception as e:
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API get_user_last_vid_lang/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+def get_location(location_data):
+    if location_data:
+        location_array = json.loads(location_data)
+        country_name = ''
+        state_name = ''
+        city_name = ''
+        city_id = ''
+        state, country = None, None
+        for obj in location_array:
+            location_obj = json.loads(obj)
+            level = location_obj.get('level')
+            name = location_obj.get('name')
+            place_id = location_obj.get('place_id')
+            if(level == 'country'):
+                country_name = name
+            elif(level == 'state'):
+                state_name = name
+            elif(level == 'city'):
+                city_name = name
+                city_id = place_id
+
+        if country_name:
+            country, created = Country.objects.get_or_create(name=country_name)
+            print(1, country, created)
+        if state_name:
+            state_data = {'name' : state_name}
+            if country:
+                state_data['country'] = country
+            state, created = State.objects.get_or_create(**state_data)
+            print(2, state, created)
+        if city_name:
+            city_data = {'name': city_name}
+            if state:
+                city_data['state'] = state
+            if city_id:
+                city_data['place_id'] = city_id
+            city, created = City.objects.get_or_create(**city_data)
+            print(4, city, created)
+            return city
+    else:
+        return None
+
+class AudioFileListView(generics.ListAPIView):
+    serializer_class = MusicAlbumSerializer
+    queryset = MusicAlbum.objects.all().order_by('-id')
+    permission_classes  = (IsAuthenticatedOrReadOnly,)
+    pagination_class = LimitOffsetPagination

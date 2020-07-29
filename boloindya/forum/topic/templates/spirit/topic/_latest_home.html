@@ -1068,79 +1068,6 @@ margin-top: 38px;
 
 </style>
 
-<script type="text/javascript">
-    
-    var sliderTopicListVideos='{{topics}}';
-</script>
-
-<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
-
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
-
-<div class="jsx-639186511 page-with-header main-body">
-    <div class="jsx-1929076256">
-        <div class="jsx-1929076256 about-content">
-            <div class="jsx-1929076256 about-img">
-                <div class="jsx-1994528170 banner-video-container">
-                    <div class="video-wall" style="min-height: 540px;">
-<!--                         <h1 style="margin:auto;" class="jsx-475503780 logo-container">
-                            <img id="boloindyaLogoId" src="/media/boloindya_new_logo.png" alt="boloindya" class="jsx-475503780 logo-text">
-                        </h1> -->
-                        <h2 style="margin-bottom: 20px;"  class="slogan">Short <span style="color: #b62927">Videos</span> You <span style="color: #b62927">Love</span></h2>
-
-                    <div id="typed-strings" style="display: none;">
-                        <p>Watch and Create Value Adding Videos in Hindi</p>
-                        <p>Watch and Create Value Adding Videos in Tamil</p>
-                        <p>Watch and Create Value Adding Videos in Telugu</p>
-                        <p>Watch and Create Value Adding Videos in Bangla</p>
-                        <p>Watch and Create Value Adding Videos in Kannada</p>
-                        <p>Watch and Create Value Adding Videos in Gujarati</p>
-                        <p>Watch and Create Value Adding Videos in Marathi</p>
-                        <p>Watch and Create Value Adding Videos in Punjabi</p>
-                        <p>Watch and Create Value Adding Videos in Malayalam</p>
-                        <p>Watch and Create Value Adding Videos in Odia</p>
-                        <p>Watch and Create Value Adding Videos in English</p>
-                        <p>Watch and Create Value Adding Videos in 11&nbsp;Indian&nbsp;languages</p>
-
-                    </div>
-                    <h2 class="header-bar1" style="text-align: center;padding: 20px;">
-                        <span id="typed"></span>
-                    </h2>
-
-
-<!--                         <div class="header-bar1" style="text-align: center;padding: 20px;"><span class="mainColor">Watch</span> and <span class="mainColor">Create</span> in Your Language</div> -->
-                          <div class="owl-slider" id="slideshow">
-                                <div id="carousel" class="owl-carousel">
-                                    
-                                    {% for itemVideo in sliderVideos %}
-                                    
-
-                                    <div class="_video_feed_item1 item">
-                                        <img onClick="openVideoInPopupSlider('{{itemVideo.id}}','{{itemVideo.question_video | get_video_cdn}}','{{itemVideo.backup_url}}','{{itemVideo.question_image}}');" class="_video_card_mute _video_card_mute_left_top muteSrcId_{{itemVideo.id}}" id="mutedImageId" src="/media/sound_mute.svg">
-                                        <span id="video_play_item_{{itemVideo.id}}">
-                                            <video onClick="openVideoInPopupSlider('{{itemVideo.id}}','{{itemVideo.question_video | get_video_cdn}}','{{itemVideo.backup_url}}','{{itemVideo.question_image}}');"   id="player-{{itemVideo.id}}" preload="auto" muted autoplay poster="{{itemVideo.question_image}}" class="videoCentered videoSliderPlay">
-                                                <source src="{{itemVideo.question_video | get_video_cdn}}" type="application/x-mpegURL">
-                                                <source src="{{itemVideo.question_video}}" type="application/x-mpegURL">
-                                                <source src="{{itemVideo.backup_url}}" type="video/mp4">
-                                            </video>   
-                                        </span>
-
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                            </div>  
-                    </div>
-                </div>
-            </div>
-        </div>
-
-<!--     <section currentprofession="default" devicetype="desktop" style="margin-top: 30px;height: 92px;" class="BoloIndyaSupport" data-v-6da28080="">
-        <div class="jsx-1929076256 about-img1 bottomHeaing" style="text-align: center;">
-            <h2 >Earn Money as You Express Yourself</h2>
-
-        </div>
-    </section> -->
-
     <style type="text/css">
         .download-sms * {
     outline: none;
@@ -1231,6 +1158,81 @@ margin-top: 38px;
     margin-right: 0px;
 }
     </style>
+
+<script type="text/javascript">
+    
+    var sliderTopicListVideos='{{topics}}';
+</script>
+
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+
+<div class="jsx-639186511 page-with-header main-body">
+    <div class="jsx-1929076256">
+        <div class="jsx-1929076256 about-content">
+            <div class="jsx-1929076256 about-img">
+                <div class="jsx-1994528170 banner-video-container">
+                    <div class="video-wall" style="min-height: 540px;">
+<!--                         <h1 style="margin:auto;" class="jsx-475503780 logo-container">
+                            <img id="boloindyaLogoId" src="/media/boloindya_new_logo.png" alt="boloindya" class="jsx-475503780 logo-text">
+                        </h1> -->
+                        <h2 style="margin-bottom: 20px;"  class="slogan">Short <span style="color: #b62927">Videos</span> You <span style="color: #b62927">Love</span></h2>
+
+                    <div id="typed-strings" style="display: none;">
+                        <p>Watch and Create Value Adding Videos in Hindi</p>
+                        <p>Watch and Create Value Adding Videos in Tamil</p>
+                        <p>Watch and Create Value Adding Videos in Telugu</p>
+                        <p>Watch and Create Value Adding Videos in Bangla</p>
+                        <p>Watch and Create Value Adding Videos in Kannada</p>
+                        <p>Watch and Create Value Adding Videos in Gujarati</p>
+                        <p>Watch and Create Value Adding Videos in Marathi</p>
+                        <p>Watch and Create Value Adding Videos in Punjabi</p>
+                        <p>Watch and Create Value Adding Videos in Malayalam</p>
+                        <p>Watch and Create Value Adding Videos in Odia</p>
+                        <p>Watch and Create Value Adding Videos in English</p>
+                        <p>Watch and Create Value Adding Videos in 11&nbsp;Indian&nbsp;languages</p>
+
+                    </div>
+                    <h2 class="header-bar1" style="text-align: center;padding: 20px;">
+                        <span id="typed"></span>
+                    </h2>
+
+
+<!--                         <div class="header-bar1" style="text-align: center;padding: 20px;"><span class="mainColor">Watch</span> and <span class="mainColor">Create</span> in Your Language</div> -->
+                          <div class="owl-slider" id="slideshow">
+                                <div id="carousel" class="owl-carousel">
+                                    
+                                    {% for itemVideo in sliderVideos %}
+                                    
+
+                                    <div class="_video_feed_item1 item">
+                                        <img onClick="openVideoInPopupSlider1('{{itemVideo.id}}','{{itemVideo.question_video | get_video_cdn}}','{{itemVideo.backup_url}}','{{itemVideo.question_image}}');" class="_video_card_mute _video_card_mute_left_top muteSrcId_{{itemVideo.id}}" id="mutedImageId" src="/media/sound_mute.svg">
+                                        <span id="video_play_item_{{itemVideo.id}}">
+                                            <video onClick="openVideoInPopupSlider('{{itemVideo.id}}','{{itemVideo.question_video | get_video_cdn}}','{{itemVideo.backup_url}}','{{itemVideo.question_image}}');" id="player-{{itemVideo.id}}" preload="auto" muted autoplay poster="{{itemVideo.question_image}}" class="videoCentered videoSliderPlay">
+                                                <source src="{{itemVideo.question_video | get_video_cdn}}" type="application/x-mpegURL">
+                                                <source src="{{itemVideo.question_video}}" type="application/x-mpegURL">
+                                                <source src="{{itemVideo.backup_url}}" type="video/mp4">
+                                            </video>   
+                                        </span>
+
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>  
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<!--     <section currentprofession="default" devicetype="desktop" style="margin-top: 30px;height: 92px;" class="BoloIndyaSupport" data-v-6da28080="">
+        <div class="jsx-1929076256 about-img1 bottomHeaing" style="text-align: center;">
+            <h2 >Earn Money as You Express Yourself</h2>
+
+        </div>
+    </section> -->
+
+
 
         <div class="jsx-1929076256 about-content">
 
@@ -1424,8 +1426,8 @@ margin-top: 38px;
             slideBy: 4,
           },
           1366: {
-            items: 4,
-            slideBy: 4,
+            items: 3,
+            slideBy: 3,
           }
         }
       });
@@ -1433,6 +1435,8 @@ $(function() {
     var typed = new Typed('#typed', {
         stringsElement: '#typed-strings',
         typeSpeed: 30,
+        loop: true,
+        loopCount: 10,
         backSpeed: 30
     });
 });

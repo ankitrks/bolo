@@ -33,6 +33,8 @@
       .field-vb_score{width: 40px !important;max-width: 40px !important;padding: 5px !important;}
       .title_box{word-break: break-all;}
       .field-name{min-width: 65px !important;word-break: break-word;max-width: 70px !important;}
+      #video_div {position: fixed;bottom: 66px;right: 20px;z-index: 9999;background: black;display: none;}
+      .close_player{position: absolute;right: 10px;top: 10px;color: white;font-size: 20px;cursor: pointer;z-index: 9;}
     </style>
 {% endblock %}
 
@@ -149,6 +151,12 @@
         </script>
     {% endif %}
     <script type="text/javascript" charset="utf-8">
+        function playvideo(url) {
+            jQuery('#video_div').show();
+            jQuery('#video_iframe').attr('src', url);
+            var vid = document.getElementById("video_iframe");
+            vid.play();
+        }
         (function($) {
             var getUrlParameter = function getUrlParameter(sParam) {
                 var sPageURL = decodeURIComponent(window.location.search.substring(1)),
@@ -202,6 +210,14 @@
                     }
                     $(this).parents('td').next('td.field-is_removed').find('input[type="checkbox"]:not(:checked)').prop('disabled', attr_disabled);
                 });
+
+                jQuery('.close_player').click(function(){
+                    jQuery('#video_div').hide();
+                    jQuery('#video_iframe').attr('src', '');
+                    var vid = document.getElementById("video_iframe");
+                    vid.stop();
+                });
+
                 jQuery('.field-is_removed input[type="checkbox"]').change(function(){
                     var attr_disabled = false;
                     if($(this).is(':checked')){
@@ -293,7 +309,6 @@
 
                 jQuery.each( jQuery('.field-m2mcategory'), function(i, each_element){
                     var tr_height = jQuery(this).parents('tr').height();
-                    console.log(tr_height);
                     jQuery(each_element).css('max-height', tr_height + 'px');
                 });
 
@@ -423,4 +438,10 @@
             </footer>
         {% endif %}
     </form>
+    <div id="video_div">
+        <span class="close_player">X</span>
+        <video id="video_iframe" width="320" height="240" src="4" type="video/mp4" controls>
+            This browser does not support the video tag.
+        </video>
+    </div>
 {% endblock %}

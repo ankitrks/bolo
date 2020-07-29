@@ -301,18 +301,52 @@ function updateFollowStatus(response){
 }
 
 function openVideoInPopupSlider(divId,videoURL,backup_url,posterImage) {debugger;
-
-   if($("#player-"+divId).prop('muted')){
+    //var status=$(".videoSliderPlay").prop('muted', true);
+    muteAllPlayingVideos();
+    var statusMuteSrcId='.muteSrcId_'+divId;
+    var playerId="#player-"+divId;
+    var muteStatusD=$(playerId).prop('muted');
+   if(muteStatusD){
     //mute_icon
-    $("#player-"+divId).prop('muted', false);
+    $(playerId).prop('muted', false);
     var newSrc='/media/mute_icon.svg';
-    $('.muteSrcId_'+divId).attr('src', newSrc);
+    $(statusMuteSrcId).attr('src', newSrc);
   }else{
-      $("#player-"+divId).prop('muted', true);
+
+      $(playerId).prop('muted', true);
       var newSrc='/media/sound_mute.svg';
-      $('.muteSrcId_'+divId).attr('src', newSrc);
+      $(statusMuteSrcId).attr('src', newSrc);
   }
 }
+
+function openVideoInPopupSlider1(divId,videoURL,backup_url,posterImage) {debugger;
+    //var status=$(".videoSliderPlay").prop('muted', true);
+    var statusMuteSrcId='.muteSrcId_'+divId;
+    var playerId="#player-"+divId;
+    var muteStatusD=$(playerId).prop('muted');
+   if(muteStatusD==false){
+    //mute_icon
+    //muteAllPlayingVideos();
+        $(playerId).prop('muted', true);
+        var newSrc='/media/sound_mute.svg';
+        $(statusMuteSrcId).attr('src', newSrc);
+
+
+  }else{
+        muteAllPlayingVideos();
+        $(playerId).prop('muted', false);
+        var newSrc='/media/mute_icon.svg';
+        $(statusMuteSrcId).attr('src', newSrc);
+  }
+}
+
+
+
+    function muteAllPlayingVideos(){
+        $("video").prop('muted', true);
+        var newSrc='/media/sound_mute.svg';
+        $('._video_card_mute').attr('src', newSrc);
+    }
 
 
 
@@ -800,7 +834,9 @@ function retryLiveStream(hls, url) {
             });
 
             $(".videoCommentId").append(listCommentItems);
-            var loadMoreComment='<span class="loadMoreComment"><a onclick="loadMoreComments(\''+data.next+'\');" class="" href="javascript:void(0);">Load More Comments...</a></span';
+            if(data.next!="" && data.next!='null'){
+                var loadMoreComment='<span class="loadMoreComment"><a onclick="loadMoreComments(\''+data.next+'\');" class="" href="javascript:void(0);">Load More Comments...</a></span';
+            }
             $(".loadMoreComments").html(loadMoreComment);
             loaderBoloHide();
         });
@@ -836,7 +872,9 @@ function retryLiveStream(hls, url) {
             });
 
             $(".videoCommentId").append(listCommentItems);
-            var loadMoreComment='<span class="loadMoreComment"><a class="" onclick="loadMoreComments(\''+data.next+'\');" href="javascript:void(0);">Load More Comments...</a></span';
+            if(data.next!="" && data.next!='null'){
+                var loadMoreComment='<span class="loadMoreComment"><a class="" onclick="loadMoreComments(\''+data.next+'\');" href="javascript:void(0);">Load More Comments...</a></span';
+            }
             $(".loadMoreComments").html(loadMoreComment);
             loaderBoloHide();
             loaderBoloHideDynamic('_scroll_load_more_loading_comment');

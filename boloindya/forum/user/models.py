@@ -11,7 +11,7 @@ from django.utils import timezone
 from ..core.conf import settings
 from ..core.utils.models import AutoSlugField
 from tinymce.models import HTMLField
-from drf_spirit.utils import language_options,month_choices
+from drf_spirit.utils import language_options,month_choices, salary_choices
 from django.db.models import F,Q
 from diff_model import ModelDiffMixin
 
@@ -71,7 +71,7 @@ class UserProfile(models.Model,ModelDiffMixin):
     refrence = models.CharField(choices=refrence_options, blank = True, null = True, max_length=10,default='0')
     extra_data = models.TextField(null=True,blank=True)
     social_identifier = models.CharField(_("Social Identifier"), max_length=100, blank=True)
-    mobile_no = models.CharField(_("Mobile No"), max_length=100, blank = True, null = True)
+    mobile_no = models.CharField(_("Mobile No"), max_length=100, blank = True, null = True, db_index = True)
     follow_count = models.PositiveIntegerField(null=True,blank=True,default=0,db_index=True)
     follower_count = models.PositiveIntegerField(null=True,blank=True,default=0,db_index=True)
     question_count = models.PositiveIntegerField(null=True,blank=True,default=0)
@@ -102,6 +102,14 @@ class UserProfile(models.Model,ModelDiffMixin):
     paytm_number = models.CharField(_("Mobile No"), max_length=100, blank = True, null = True)
     android_did = models.CharField(_('android_did'),max_length=200,null=True,blank=True)
     is_guest_user = models.BooleanField(default=False)
+    boost_views_count = models.PositiveIntegerField(_("Boost View"), null=True, blank=True, default=0)
+    boost_like_count = models.PositiveIntegerField(_("Boost Like"), null=True, blank=True, default=0)
+    boost_follow_count = models.PositiveIntegerField(_("Boost Follow"), null=True, blank=True, default=0)
+    boosted_time = models.DateTimeField(null=True, blank=True)
+    boost_span = models.PositiveIntegerField(_("Boost Span(Hours)"), null=True, blank=True, default=0)
+    country_code = models.CharField(_("Country Phone Code"), max_length=20, blank = True, null = True)
+    salary_range = models.CharField(choices=salary_choices, blank = True, null = True, max_length=10,db_index=True)
+    is_insight_fix = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = _("user profile")
@@ -179,11 +187,37 @@ class UserPay(RecordTimeStamp):
     is_evaluated = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False)
     is_active = models.BooleanField(default = True)
+
     class Meta:
         verbose_name_plural = 'User\'s Pay'
 
     def __unicode__(self):
         return str(self.user)
+
+
+
+class OldMonthInsightData(RecordTimeStamp):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='user_insight_data')
+    for_year = models.PositiveIntegerField(_('year'), choices=((r,r) for r in range(2019, datetime.now().year+1)), default=current_year)
+    for_month = models.PositiveIntegerField(_('month'),choices=month_choices,default =previous_month )
+    insight_data = models.TextField(null=True,blank=True)
+
+    def __unicode__(self):
+        return str(self.user)+' - '+str(self.get_for_month_display())+' - '+str(self.get_for_year_display())
+    
+
+class InsightDataDump(RecordTimeStamp):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='insight_dump')
+    for_year = models.PositiveIntegerField(_('year'), choices=((r,r) for r in range(2019, datetime.now().year+1)), null=True,blank = True)
+    for_month = models.PositiveIntegerField(_('month'),choices=month_choices,null=True,blank=True )
+    old_insight_data = models.TextField(null=True,blank=True)
+    new_insight_data = models.TextField(null=True,blank=True)
+
+    class Meta:
+        verbose_name_plural = 'InsightDataDump\'s'
+
+    def __unicode__(self):
+        return str(self.user)+' - '+str(self.get_for_month_display())+' - '+str(self.get_for_year_display())
 
 
 
@@ -215,7 +249,7 @@ class AndroidLogs(RecordTimeStamp):
     log_type = models.CharField(_("Log Type"),null=True,blank=True,max_length=255)
     is_executed = models.BooleanField(_("is_executed"), default=False)
     android_id = models.CharField(_("android_id"), max_length=100, blank=True, null = True, editable = False)
-
+    created_at = models.DateTimeField(_("created_at"), auto_now_add = False, auto_now = False, default = datetime.now)
     def __unicode__(self):
         return str(self.user)
 
@@ -272,7 +306,7 @@ class AppPageContent(RecordTimeStamp):
         return str(self.page_name)
 
 class ReferralCode(RecordTimeStamp):
-    code = models.CharField(_("Ref Code"), max_length=20, blank=True)
+    code = models.CharField(_("Ref Code"), max_length=20, blank=True, db_index = True)
     for_user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, editable = False)
     purpose = models.CharField(_("Purpose"), max_length=50, blank=True)
     campaign_url = models.CharField(_("Playstore URL"), max_length=350, blank=True, null = True, editable = False)
@@ -332,7 +366,7 @@ class UserPhoneBook(RecordTimeStamp):
 
 class Contact(RecordTimeStamp):
     contact_name = models.CharField(_("Contact Name"), max_length=100, blank=True, null = True)
-    contact_number = models.CharField(_("Contact Number"), max_length=50, blank=True, null = True)
+    contact_number = models.CharField(_("Contact Number"), max_length=50, blank=True, null = True, db_index = True)
     contact_email = models.CharField(_("Contact Email"), max_length=200, blank=True, null = True)
     is_user_registered = models.BooleanField(default=False)
     user =  models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("User"),editable=False,null=True,blank=True)
@@ -341,6 +375,14 @@ class Contact(RecordTimeStamp):
 
     def __unicode__(self):
         return self.contact_name
+
+class DUser(models.Model):
+    name = models.CharField(_("Name"), max_length=100, blank=True, null = True)
+    gender = models.CharField(choices=gender_option, blank = True, null = True, max_length=10, default='')
+    is_used = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return self.name
 
 
 

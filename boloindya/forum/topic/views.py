@@ -17,7 +17,7 @@ from ..comment.models import MOVED
 from ..comment.forms import CommentForm
 from ..comment.utils import comment_posted
 from ..comment.models import Comment
-from .models import Topic,CricketMatch,Poll,Voting,Choice,TongueTwister,JobOpening,VBseen
+from .models import Topic,CricketMatch,Poll,Voting,Choice,TongueTwister,JobOpening,VBseen,VideoDelete
 from .forms import TopicForm
 from .forms import JobRequestForm
 from . import utils
@@ -57,8 +57,10 @@ from django.core.mail import EmailMultiAlternatives
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from .emails import send_job_request_mail
-from drf_spirit.views import deafult_boloindya_follow
-from drf_spirit.views import deafult_boloindya_follow
+from drf_spirit.views import * # deafult_boloindya_follow
+from drf_spirit.views import get_tokens_for_user
+from rest_framework.decorators import api_view
+from rest_framework import status
 
 class AutoConnectSocialAccount(DefaultSocialAccountAdapter):
 
@@ -84,7 +86,7 @@ class AutoConnectSocialAccount(DefaultSocialAccountAdapter):
             add_bolo_score(userDetails.id, 'initial_signup', userprofile)
             userprofile = UserProfile.objects.get(user = userDetails)
             if str(userprofile.language):
-                default_follow = deafult_boloindya_follow(userDetails,str(userprofile.language))
+                default_follow = deafult_boloindya_follow(userDetails.id,str(userprofile.language))
         except EmailAddress.DoesNotExist:
             return u
 
@@ -248,7 +250,7 @@ def detail(request, pk, slug):
     return render(request, 'spirit/topic/particular_topic.html', context)
 
 def share_vb_page(request, user_id, poll_id, slug):
-    topics = Topic.objects.get(id = poll_id)
+    topics = Topic.objects.using('default').get(id = poll_id)
     try:
         user_profile = UserProfile.objects.get(user_id = user_id)
     except:
@@ -365,14 +367,13 @@ def ques_ans_index(request, category_id = None, cat_slug = ''):
 def comment_likes(request):
     comment_id = request.POST.get('comment_id',None)
     comment = Comment.objects.get(pk = comment_id)
-    userprofile = request.user.st
+    userprofile = UserProfile.objects.filter(user_id= request.user.id)
     liked,is_created = Like.objects.get_or_create(comment_id = comment_id,user = request.user)
     if is_created:
             comment.likes_count = F('likes_count')+1
             comment.save()
             add_bolo_score(request.user.id, 'liked', comment)
-            userprofile.like_count = F('like_count')+1
-            userprofile.save()
+            userprofile.update(like_count = F('like_count')+1)
             return HttpResponse(json.dumps({'success':'Success'}),content_type="application/json")
     else:
         if liked.like:
@@ -380,15 +381,13 @@ def comment_likes(request):
             liked.save()
             comment.likes_count = F('likes_count')-1
             comment.save()
-            userprofile.like_count = F('like_count')-1
-            userprofile.save()
+            userprofile.update(like_count = F('like_count')-1)
         else:
             liked.like = True
             liked.save()
             comment.likes_count = F('likes_count')+1
             comment.save()
-            userprofile.like_count = F('like_count')+1
-            userprofile.save()
+            userprofile.update(like_count = F('like_count')+1)
         return HttpResponse(json.dumps({'success':'Success'}),content_type="application/json")
     return HttpResponse(json.dumps({'fail':'Fail'}),content_type="application/json")
 
@@ -869,6 +868,7 @@ def get_feed_list_by_category(request,category_slug):
 def get_topic_list_by_hashtag(request,hashtag):
     language_id=1
     popular_bolo = []
+    hash_tags = []
     tongue=[]
     category_details=""
     challengehash=""
@@ -881,9 +881,14 @@ def get_topic_list_by_hashtag(request,hashtag):
         tongue = TongueTwister.objects.filter(hash_tag__iexact=challengehash[1:]).order_by('-hash_counter')
         if len(tongue):
             tongue = tongue[0]
+        try:
+            hash_tags = TongueTwister.objects.order_by('-hash_counter')[:10]
+        except Exception as e1:
+            hash_tags = []
         context = {
             'tongue':tongue,
             'hashtag':hashtag,
+            'hash_tags':hash_tags
 
         }
         #print TongueTwister.__dict__
@@ -936,6 +941,82 @@ def new_home(request):
     #return render(request, 'spirit/topic/temporary_landing.html')
     # return render(request, 'spirit/topic/new_landing.html')
     # return render(request, 'spirit/topic/main_landing.html')
+
+
+#====================New Home =============================
+def new_home_updated(request):
+    categories = []
+    hash_tags = []
+    topics = []
+    all_slider_topic = []
+    try:
+        categories = Category.objects.filter(parent__isnull=False)[:10]
+    except Exception as e1:
+        categories = []   
+    language_id = request.GET.get('language_id', 1)
+
+    languages_with_id=settings.LANGUAGES_WITH_ID
+    languageCode =request.LANGUAGE_CODE
+    language_id=languages_with_id[languageCode]
+
+    try:
+        all_seen_vb = []
+        if request.user.is_authenticated:
+            all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__is_popular=True).distinct('topic_id').values_list('topic_id',flat=True)[:15]
+        excluded_list =[]
+        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')[:15]
+        for each in superstar_post:
+            excluded_list.append(each.id)
+        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')[:10]
+        for each in popular_user_post:
+            excluded_list.append(each.id)
+        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')[:2]
+        for each in popular_post:
+            excluded_list.append(each.id)
+        other_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,is_popular=True).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')[:2]
+        orderd_all_seen_post=[]
+        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)[:5]
+        if all_seen_post:
+            for each_id in all_seen_vb:
+                for each_vb in all_seen_post:
+                    if each_vb.id == each_id:
+                        orderd_all_seen_post.append(each_vb)
+
+        topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
+    except Exception as e1:
+        topics = []
+
+    topicsIds =[16092,25156,26248,23820,3449,4196,4218,17534,12569,12498,9681,9419,9384,8034,8024,26835,24352,14942]
+    try:
+        all_slider_topic = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=topicsIds)[:16]
+    except Exception as e1:
+        all_slider_topic = []
+
+    try:
+        hash_tags = TongueTwister.objects.order_by('-hash_counter')[:4]
+    except Exception as e1:
+        hash_tags = []
+
+    context = {
+        'categories':categories,
+        'hash_tags':hash_tags,
+        'topics':topics,
+        'sliderVideos':all_slider_topic,
+        'is_single_topic': "Yes",
+    }  
+    video_slug = request.GET.get('video',None)
+    if(video_slug != None):
+        return redirect('/video/'+video_slug)
+    else:
+        return render(request, 'spirit/topic/_new_updated_home.html',context)
+
+
+    #return render(request, 'spirit/topic/temporary_landing.html')
+    # return render(request, 'spirit/topic/new_landing.html')
+    # return render(request, 'spirit/topic/main_landing.html')
+
+#====================== End ==============================
+
 
 def trending_polyplayer(request):
     categories = []
@@ -1127,7 +1208,8 @@ def old_home(request):
     except Exception as e1:
         topics = []
 
-    topicsIds =[16092,25156,26248,23820,3449,4196,4218,17534,12569,12498,9681,9419,9384,8034,8024,26835,24352,14942]
+    #topicsIds =[16092,25156,26248,23820,3449,4196,4218,17534,12569,12498,9681,9419,9384,8034,8024,26835,24352,14942]
+    topicsIds =[16092,25156,3449,4196,4218]
     try:
         all_slider_topic = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=topicsIds)[:16]
     except Exception as e1:
@@ -1450,7 +1532,7 @@ def share_match_page(request, match_id, slug):
 
 # Share Pages Match 
 def share_challenge_page(request, hashtag):
-    challenge = TongueTwister.objects.get(hash_tag = hashtag)
+    challenge = TongueTwister.objects.using('default').get(hash_tag = hashtag)
     context = {
     'challenge': challenge,
     }
@@ -1505,3 +1587,31 @@ def testurllang(request):
     #languageCode =request.LANGUAGE_CODE
     #language_id=languages_with_id[languageCode]
 
+@api_view(['POST'])
+def delete_video(request):
+    try:
+        user = request.user
+        topic_id = request.POST.get('topic_id')
+
+        if user and topic_id:
+            topic = Topic.objects.get(id=topic_id)
+
+            if topic.user == user:
+                today = datetime.today()
+                curr_month_del_vids = VideoDelete.objects.filter(user=user, created_at__month=today.month, created_at__year=today.year)
+
+                if(curr_month_del_vids.count() < 3):
+                    result = topic.delete()
+                    if result:
+                        obj, created = VideoDelete.objects.get_or_create(user=user, video=topic)
+                        return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)
+
+                else:
+                    return JsonResponse({'message': 'You can only delete a maximum of 3 videos in a month.'}, status=status.HTTP_204_NO_CONTENT)
+            else:
+                return JsonResponse({'message': 'Not Authorized'}, status=status.HTTP_204_NO_CONTENT)        
+        else:        
+            return JsonResponse({'message': 'Invalid User or Video'}, status=status.HTTP_204_NO_CONTENT)        
+
+    except Exception as e:
+        return JsonResponse({'message': str(e.message)}, status=status.HTTP_400_BAD_REQUEST)

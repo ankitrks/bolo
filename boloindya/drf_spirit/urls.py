@@ -62,9 +62,10 @@ urlpatterns = [
     url(r'^token/refresh/$', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
 
     url(r'^otp/send/$', SingUpOTPView.as_view(), name='token_obtain_pair'),
-
+    url(r'^otp/send_with_country_code/$', SingUpOTPCountryCodeView.as_view(), name='token_obtain_pair'),
     # Get Params could be ?is_reset_password=1 OR ?is_for_change_phone=1
     url(r'^otp/verify/$', verify_otp, name='token_obtain_pair'),
+    url(r'^otp/verify_with_country_code/$', verify_otp_with_country_code, name='otp_verify_with_cc'),
     url(r'^user/user_data/$', generate_login_data, name='generate_login_data'),
 
     url(r'^save_kyc_basic_info/$', save_kyc_basic_info, name='save_kyc_basic_info'),
@@ -88,7 +89,7 @@ urlpatterns = [
     url(r'^get_auth_login_as_user_id/$', get_auth_login_as_user_id, name='get_auth_login_as_user_id'),
     url(r'^like/$', like, name='like'),
     url(r'^mention_suggestion/$', mention_suggestion, name='mention_suggestion'),
-    url(r'^get_challenge/$', GetChallenge.as_view(), name='get_challenge'),
+    url(r'^get_challenge/$', GetChallenge, name='get_challenge'),
     url(r'^get_popular_hash_tag/$', GetPopularHashTag.as_view(), name='get_popular_hash_tag'),
     url(r'^get_follow_post/$', GetFollowPost, name='get_follow_post'),
     url(r'^get_user_pay_datatbale/$', UserPayDatatableList.as_view(), name='get_user_pay_datatbale'),
@@ -130,9 +131,11 @@ urlpatterns = [
     url(r'^hashtag_suggestion/$', hashtag_suggestion, name='hashtag_suggestion'),
     url(r'^store_phone_book/$', store_phone_book, name='store_phone_book'),
     url(r'^update_mobile_no/$', update_mobile_no, name='update_mobile_no'),
+    url(r'^update_mobile_no_with_cc/$', update_mobile_no_with_country_code, name='update_mobile_no_with_cc'),
     url(r'^get_refer_earn_data/$', get_refer_earn_data, name='get_refer_earn_data'),
     url(r'^get_refer_earn_url/$', get_refer_earn_url, name='get_refer_earn_url'),
     url(r'^verify_otp_and_update_profile/$', verify_otp_and_update_profile, name='verify_otp_and_update_profile'),
+    url(r'^verify_otp_and_update_profile_with_cc/$', verify_otp_and_update_profile_with_country_code, name='verify_otp_and_update_profile_with_cc'),
     url(r'^verify_otp_and_update_paytm_number/$', verify_otp_and_update_paytm_number, name='verify_otp_and_update_paytm_number'),
     url(r'^userprofile_update_paytm_number/$', userprofile_update_paytm_number, name='userprofile_update_paytm_number'),
     url(r'^update_mobile_invited/$', update_mobile_invited, name='update_mobile_invited'),
@@ -159,8 +162,15 @@ urlpatterns = [
     url(r'^cache_user_data/$', cache_user_data,name='cache_user_data'),
     url(r'^get_hash_discover/$', get_hash_discover),
     url(r'^get_hash_discover_topics/$', get_hash_discover_topics),
+    url(r'^send_sms_link/$', send_sms_link),
 
     url(r'^get_m3u8_of_ids/$', get_m3u8_of_ids),
     url(r'^upload_video_to_s3_for_app/$', upload_video_to_s3_for_app),
     url(r'^report/$', report,name='report'),
+    url(r'^get_campaigns/$', get_campaigns,name='get_campaigns'),
+    url(r'^get_user_details_from_topic_id/$', get_user_details_from_topic_id,name='get_user_details_from_topic_id'),
+    url(r'^update_download_url_in_topic/',update_download_url_in_topic,name='update_download_url_in_topic'),
+    url(r'^update_profanity_details/',update_profanity_details,name='update_profanity_details'),
+    url(r'^get_user_last_vid_lang/$', get_user_last_vid_lang,name='get_user_last_vid_lang'),
+    url(r'^fetch_audio_list/$', AudioFileListView.as_view(),name='fetch_audio_list'),
 ]

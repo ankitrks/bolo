@@ -58,6 +58,12 @@ class TopicIndex(indexes.SearchIndex, indexes.Indexable):
     view_count = indexes.IntegerField(model_attr='view_count', indexed=True)
     vb_playtime = indexes.IntegerField(model_attr='vb_playtime', indexed=True)
     last_active = indexes.DateTimeField(model_attr='last_active', indexed=False)
+    suggestions = indexes.FacetCharField()
+
+    def prepare(self, obj):
+        prepared_data = super(TopicIndex, self).prepare(obj)
+        prepared_data['suggestions'] = prepared_data['text']
+        return prepared_data
 
     # Overridden
     def get_model(self):
@@ -104,6 +110,12 @@ class TongueTwisterIndex(indexes.SearchIndex, indexes.Indexable):
     hash_tag = indexes.EdgeNgramField(model_attr='hash_tag', indexed=True)
     hash_counter = indexes.IntegerField(model_attr='hash_counter', indexed=True)
     total_views = indexes.IntegerField(model_attr='total_views', indexed=True)
+    suggestions = indexes.FacetCharField()
+
+    def prepare(self, obj):
+        prepared_data = super(TongueTwisterIndex, self).prepare(obj)
+        prepared_data['suggestions'] = prepared_data['text']
+        return prepared_data
 
     def get_model(self):
         return TongueTwister

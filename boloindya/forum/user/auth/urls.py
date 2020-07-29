@@ -11,7 +11,7 @@ from . import views
 
 urlpatterns = [
     url(r'^login/$', views.custom_login, {'template_name': 'spirit/user/auth/login.html'}, name='login'),
-    url(r'^logout/$', views.custom_logout, {'next_page': '/', }, name='logout'),
+    url(r'^logout/$', views.custom_logout, {'next_page': '/user/login/', }, name='logout'),
 
     url(r'^register/$', views.register, name='register'),
     url(r'^resend-activation/$', views.resend_activation_email, name='resend-activation'),

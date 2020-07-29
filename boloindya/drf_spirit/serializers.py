@@ -1,13 +1,13 @@
-from rest_framework.serializers import ModelSerializer, SerializerMethodField
+from rest_framework.serializers import ModelSerializer, SerializerMethodField, RelatedField, CharField
 
 from .fields import UserReadOnlyField
-from forum.topic.models import Topic,CricketMatch,Poll,Choice,Voting,Leaderboard, Notification, TongueTwister,BoloActionHistory,VBseen, TongueTwisterCounter
+from forum.topic.models import Topic,CricketMatch,Poll,Choice,Voting,Leaderboard, Notification, TongueTwister,BoloActionHistory,VBseen, TongueTwisterCounter, HashtagViewCounter
 from django.contrib.auth.models import User
 from forum.category.models import Category,CategoryViewCounter
 from forum.comment.models import Comment
 from forum.user.models import UserProfile,AppVersion, ReferralCodeUsed, VideoCompleteRate,Contact
 from .relations import PresentableSlugRelatedField
-from .models import SingUpOTP
+from .models import SingUpOTP, Campaign, Winner, MusicAlbum
 from .utils import shortnaturaltime,shortcounterprofile,shorcountertopic,get_ranked_topics
 from django.conf import settings
 import re
@@ -17,8 +17,8 @@ from datetime import datetime,timedelta,date
 from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
 from jarvis.models import PushNotificationUser, FCMDevice, Report
 from forum.topic.utils import get_redis_category_paginated_data,get_redis_hashtag_paginated_data
+from forum.user.utils.bolo_redis import get_userprofile_counter
 
-cloufront_url = "https://d1fa4tg1fvr6nj.cloudfront.net"
 class CategorySerializer(ModelSerializer):
     class Meta:
         model = Category
@@ -44,10 +44,27 @@ class TongueTwisterSerializer(ModelSerializer):
         fields = '__all__'
 
     def get_total_videos_count(self,instance):
-        return shorcountertopic(Topic.objects.filter(hash_tags=instance,is_vb=True,is_removed=False).count())
+        try:
+            if self.context.get("language_id"):
+                language_id =  self.context.get("language_id")
+                hash_tag_counter=HashtagViewCounter.objects.get(hashtag = instance, language = language_id)
+                return shorcountertopic(hash_tag_counter.video_count)
+            else:
+                return shorcountertopic(Topic.objects.filter(hash_tags=instance,is_vb=True,is_removed=False).count())
+        except Exception as e:
+            return shorcountertopic(Topic.objects.filter(hash_tags=instance,is_vb=True,is_removed=False).count())
+            # raise e
 
     def get_total_views(self,instance):
-        return shorcountertopic(instance.total_views)
+        try:
+            if self.context.get("language_id"):
+                language_id =  self.context.get("language_id")
+                hash_tag_counter=HashtagViewCounter.objects.get(hashtag = instance, language = language_id)
+                return shorcountertopic(hash_tag_counter.view_count)
+            else:
+                return shorcountertopic(instance.total_views)    
+        except Exception as e:
+            return shorcountertopic(instance.total_views)
 
 class TongueTwisterWithVideoByteSerializer(ModelSerializer):
     total_videos_count = SerializerMethodField()
@@ -99,6 +116,7 @@ class TopicSerializer(ModelSerializer):
     date = SerializerMethodField()
     video_cdn = SerializerMethodField()
     # m2mcategory = SerializerMethodField()
+    backup_url = SerializerMethodField()
 
     def __init__(self, *args, **kwargs):
         super(TopicSerializer, self).__init__(*args, **kwargs)
@@ -133,13 +151,34 @@ class TopicSerializer(ModelSerializer):
     #     return CategoryLiteSerializer(instance.m2mcategory.all(),many=True).data
 
     def get_video_cdn(self,instance):
-        if instance.question_video:
-            regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
-            find_urls_in_string = re.compile(regex, re.IGNORECASE)
-            url = find_urls_in_string.search(instance.question_video)
-            return str(instance.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
-        else:
-            return ''
+        try:
+            if instance.question_video:
+                cloufront_url = settings.US_CDN_URL
+                if 'in-boloindya' in instance.question_video:
+                    cloufront_url = settings.IN_CDN_URL
+                regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+                find_urls_in_string = re.compile(regex, re.IGNORECASE)
+                url = find_urls_in_string.search(instance.question_video)
+                return str(instance.question_video.replace(str(url.group()), cloufront_url))
+            else:
+                return ''
+        except:
+            return instance.question_video
+
+    def get_backup_url(self,instance):
+        try:
+            if instance.question_video:
+                cloufront_url = settings.US_CDN_URL
+                if 'in-boloindya' in instance.question_video:
+                    cloufront_url = settings.IN_CDN_URL
+                regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+                find_urls_in_string = re.compile(regex, re.IGNORECASE)
+                url = find_urls_in_string.search(instance.question_video)
+                return str(instance.question_video.replace(str(url.group()), cloufront_url))
+            else:
+                return instance.question_video
+        except:
+            return instance.question_video
 
 class CommentSerializer(ModelSerializer):
     # user = UserReadOnlyField()
@@ -176,6 +215,7 @@ class TopicSerializerwithComment(ModelSerializer):
     m3u8_content = SerializerMethodField()
     audio_m3u8_content = SerializerMethodField()
     video_m3u8_content = SerializerMethodField()
+    backup_url = SerializerMethodField()
     # m2mcategory = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
 
@@ -231,13 +271,19 @@ class TopicSerializerwithComment(ModelSerializer):
     #     return CategoryLiteSerializer(instance.m2mcategory.all(),many=True).data
 
     def get_video_cdn(self,instance):
-        if instance.question_video:
-            regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
-            find_urls_in_string = re.compile(regex, re.IGNORECASE)
-            url = find_urls_in_string.search(instance.question_video)
-            return str(instance.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
-        else:
-            return ''
+        try:
+            if instance.question_video:
+                cloufront_url = settings.US_CDN_URL
+                if 'in-boloindya' in instance.question_video:
+                    cloufront_url = settings.IN_CDN_URL
+                regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+                find_urls_in_string = re.compile(regex, re.IGNORECASE)
+                url = find_urls_in_string.search(instance.question_video)
+                return str(instance.question_video.replace(str(url.group()), cloufront_url))
+            else:
+                return ''
+        except:
+            return instance.question_video
 
     def get_m3u8_content(self,instance):
         if self.context['last_updated'] and instance.date > self.context['last_updated']:
@@ -257,6 +303,21 @@ class TopicSerializerwithComment(ModelSerializer):
         else:
             return ''
 
+    def get_backup_url(self,instance):
+        try:
+            if instance.question_video:
+                cloufront_url = settings.US_CDN_URL
+                if 'in-boloindya' in instance.question_video:
+                    cloufront_url = settings.IN_CDN_URL
+                regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+                find_urls_in_string = re.compile(regex, re.IGNORECASE)
+                url = find_urls_in_string.search(instance.question_video)
+                return str(instance.question_video.replace(str(url.group()), cloufront_url))
+            else:
+                return instance.question_video
+        except:
+            return instance.question_video
+
 class SingleTopicSerializerwithComment(ModelSerializer):
     user = SerializerMethodField()
     category = PresentableSlugRelatedField(queryset=Category.objects.all(),
@@ -271,6 +332,7 @@ class SingleTopicSerializerwithComment(ModelSerializer):
     m3u8_content = SerializerMethodField()
     audio_m3u8_content = SerializerMethodField()
     video_m3u8_content = SerializerMethodField()
+    backup_url = SerializerMethodField()
     # m2mcategory = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
 
@@ -332,6 +394,11 @@ class SingleTopicSerializerwithComment(ModelSerializer):
         else:
             return ''
 
+    def get_backup_url(self,instance):
+        if instance.question_video:
+            return instance.question_video
+        return ''
+
 class UserAnswerSerializerwithComment(ModelSerializer):
     user = SerializerMethodField()
     category = PresentableSlugRelatedField(queryset=Category.objects.all(),
@@ -346,6 +413,7 @@ class UserAnswerSerializerwithComment(ModelSerializer):
     m3u8_content = SerializerMethodField()
     audio_m3u8_content = SerializerMethodField()
     video_m3u8_content = SerializerMethodField()
+    backup_url = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
 
     def __init__(self, *args, **kwargs):
@@ -403,6 +471,11 @@ class UserAnswerSerializerwithComment(ModelSerializer):
         else:
             return ''
 
+    def get_backup_url(self,instance):
+        if instance.question_video:
+            return instance.question_video
+        return ''
+
 class UserProfileSerializer(ModelSerializer):
     follow_count= SerializerMethodField()
     follower_count= SerializerMethodField()
@@ -410,16 +483,18 @@ class UserProfileSerializer(ModelSerializer):
     slug = SerializerMethodField()
     view_count = SerializerMethodField()
     own_vb_view_count = SerializerMethodField()
+    vb_count = SerializerMethodField()
+
     class Meta:
         model = UserProfile
         # fields = '__all__' 
-        exclude = ('extra_data', 'location', 'last_seen', 'last_ip', 'timezone', 'is_administrator', 'is_moderator', 'is_verified', 'last_post_on', 'last_post_hash', 'is_geo_location', 'lat', 'lang', 'click_id', 'click_id_response')
+        exclude = ('extra_data', 'location', 'last_seen', 'last_ip', 'timezone', 'is_administrator', 'is_moderator', 'is_verified', 'last_post_on', 'last_post_hash', 'is_geo_location', 'lat', 'lang', 'click_id', 'click_id_response','is_test_user')
 
     def get_follow_count(self,instance):
-        return shortcounterprofile(instance.follow_count)
+        return shortcounterprofile(get_userprofile_counter(instance.user_id)['follow_count'])
 
     def get_follower_count(self,instance):
-        return shortcounterprofile(instance.follower_count)
+        return shortcounterprofile(get_userprofile_counter(instance.user_id)['follower_count'])
 
     def get_bolo_score(self,instance):
         return shortcounterprofile(instance.bolo_score)
@@ -428,10 +503,13 @@ class UserProfileSerializer(ModelSerializer):
         return instance.user.username
 
     def get_view_count(self,instance):
-        return shorcountertopic(instance.view_count)
+        return shorcountertopic(get_userprofile_counter(instance.user_id)['view_count'])
 
     def get_own_vb_view_count(self,instance):
-        return shorcountertopic(instance.own_vb_view_count)
+        return shorcountertopic(get_userprofile_counter(instance.user_id)['view_count'])
+
+    def get_vb_count(self,instance):
+        return shortcounterprofile(get_userprofile_counter(instance.user_id)['video_count'])
 
 class ShortUserProfileSerializer(ModelSerializer):
     follow_count= SerializerMethodField()
@@ -440,16 +518,18 @@ class ShortUserProfileSerializer(ModelSerializer):
     slug = SerializerMethodField()
     view_count = SerializerMethodField()
     own_vb_view_count = SerializerMethodField()
+    vb_count = SerializerMethodField()
+
     class Meta:
         model = UserProfile
         # fields = '__all__' 
         exclude = ('social_identifier','question_count','linkedin_url','instagarm_id','twitter_id','topic_count','comment_count','refrence','mobile_no','encashable_bolo_score','total_time_spent','total_vb_playtime','is_dark_mode_enabled','paytm_number','state_name','city_name','extra_data', 'location', 'last_seen', 'last_ip', 'timezone', 'is_administrator', 'is_moderator', 'is_verified', 'last_post_on', 'last_post_hash', 'is_geo_location', 'lat', 'lang', 'click_id', 'click_id_response','gender','about','language','answer_count','share_count','like_count','is_test_user')
 
     def get_follow_count(self,instance):
-        return shortcounterprofile(instance.follow_count)
+        return shortcounterprofile(get_userprofile_counter(instance.user_id)['follow_count'])
 
     def get_follower_count(self,instance):
-        return shortcounterprofile(instance.follower_count)
+        return shortcounterprofile(get_userprofile_counter(instance.user_id)['follower_count'])
 
     def get_bolo_score(self,instance):
         return shortcounterprofile(instance.bolo_score)
@@ -458,10 +538,13 @@ class ShortUserProfileSerializer(ModelSerializer):
         return instance.user.username
 
     def get_view_count(self,instance):
-        return shorcountertopic(instance.view_count)
+        return shorcountertopic(get_userprofile_counter(instance.user_id)['view_count'])
 
     def get_own_vb_view_count(self,instance):
-        return shorcountertopic(instance.own_vb_view_count)
+        return shorcountertopic(get_userprofile_counter(instance.user_id)['view_count'])
+
+    def get_vb_count(self,instance):
+        return shortcounterprofile(get_userprofile_counter(instance.user_id)['video_count'])
 
 class ShortUserSerializer(ModelSerializer):
     userprofile = SerializerMethodField()
@@ -479,7 +562,8 @@ class UserSerializer(ModelSerializer):
         #fields = '__all__'
         exclude = ('password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login')
     def get_userprofile(self,instance):
-        return UserProfileSerializer(UserProfile.objects.get(user=instance)).data
+        if instance.is_authenticated():
+            return UserProfileSerializer(UserProfile.objects.get(user=instance)).data
 
 class BasicUserSerializer(ModelSerializer):
     name = SerializerMethodField()
@@ -682,6 +766,7 @@ class CategoryVideoByteSerializer(ModelSerializer):
     m3u8_content = SerializerMethodField()
     audio_m3u8_content = SerializerMethodField()
     video_m3u8_content = SerializerMethodField()
+    backup_url = SerializerMethodField()
 
     def __init__(self, *args, **kwargs):
         super(CategoryVideoByteSerializer, self).__init__(*args, **kwargs)
@@ -717,13 +802,19 @@ class CategoryVideoByteSerializer(ModelSerializer):
         return shorcountertopic(instance.comment_count)
 
     def get_video_cdn(self,instance):
-        if instance.question_video:
-            regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
-            find_urls_in_string = re.compile(regex, re.IGNORECASE)
-            url = find_urls_in_string.search(instance.question_video)
-            return str(instance.question_video.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
-        else:
-            return ''
+        try:
+            if instance.question_video:
+                cloufront_url = settings.US_CDN_URL
+                if 'in-boloindya' in instance.question_video:
+                    cloufront_url = settings.IN_CDN_URL
+                regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+                find_urls_in_string = re.compile(regex, re.IGNORECASE)
+                url = find_urls_in_string.search(instance.question_video)
+                return str(instance.question_video.replace(str(url.group()), cloufront_url))
+            else:
+                return ''
+        except:
+            return instance.question_video
 
     def get_m3u8_content(self,instance):
         if self.context['last_updated'] and instance.date > self.context['last_updated']:
@@ -742,6 +833,21 @@ class CategoryVideoByteSerializer(ModelSerializer):
             return instance.video_m3u8_content
         else:
             return ''
+
+    def get_backup_url(self,instance):
+        try:
+            if instance.question_video:
+                cloufront_url = settings.US_CDN_URL
+                if 'in-boloindya' in instance.question_video:
+                    cloufront_url = settings.IN_CDN_URL
+                regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+                find_urls_in_string = re.compile(regex, re.IGNORECASE)
+                url = find_urls_in_string.search(instance.question_video)
+                return str(instance.question_video.replace(str(url.group()), cloufront_url))
+            else:
+                return instance.question_video
+        except:
+            return instance.question_video
 
 
 from django.core.paginator import Paginator
@@ -938,6 +1044,23 @@ class TongueTwisterWithoutViewsSerializer(ModelSerializer):
 class TongueTwisterCounterSerializer(ModelSerializer):
     total_videos_count = SerializerMethodField()
     total_views = SerializerMethodField()
+    tongue_twister = SerializerMethodField()
+
+    class Meta:
+        model = HashtagViewCounter
+        fields = '__all__'
+
+    def get_total_videos_count(self,instance):
+        return shorcountertopic(instance.video_count)
+
+    def get_total_views(self,instance):
+        return shorcountertopic(instance.view_count)
+
+    def get_tongue_twister(self,instance):
+        return TongueTwisterWithoutViewsSerializer(instance.hashtag).data 
+'''
+    total_videos_count = SerializerMethodField()
+    total_views = SerializerMethodField()
     tongue_twister = TongueTwisterWithoutViewsSerializer()
     class Meta:
         model = TongueTwisterCounter
@@ -948,6 +1071,7 @@ class TongueTwisterCounterSerializer(ModelSerializer):
 
     def get_total_views(self,instance):
         return shorcountertopic(instance.total_views)
+'''
 
 class TopicsWithOnlyContent(ModelSerializer):
 
@@ -955,3 +1079,28 @@ class TopicsWithOnlyContent(ModelSerializer):
         model = Topic
         fields = ('m3u8_content', 'id', 'audio_m3u8_content', 'video_m3u8_content', 'question_video')
 
+class WinnerSerializer(ModelSerializer):
+
+    user = SerializerMethodField()
+
+    class Meta:
+        model = Winner
+        fields = ('user', 'rank', 'extra_text', 'video')
+    
+    def get_user(self,instance):
+        return UserSerializer(instance.user).data
+
+class CampaignSerializer(ModelSerializer):
+
+    hashtag_name = CharField(source='hashtag.hash_tag', read_only=True)
+    next_campaign_name = CharField(source='next_campaign_hashtag.hash_tag', read_only=True)
+    winners = WinnerSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = Campaign
+        fields = ('banner_img_url', 'hashtag_name', 'is_active', 'active_from', 'active_till', 'is_winner_declared', 'winners', 'next_campaign_name')
+
+class MusicAlbumSerializer(ModelSerializer):
+  class Meta:
+    model = MusicAlbum
+    fields = '__all__'

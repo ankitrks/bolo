@@ -2,145 +2,18 @@ from __future__ import absolute_import, unicode_literals
 from celery_boloindya import app
 from celery.utils.log import get_task_logger
 from django.core.mail import send_mail
+from django.conf import settings
 import os
+from datetime import datetime, timedelta
+# from HTMLParser import HTMLParser
+# from django.contrib.auth.models import User
+# from forum.topic.models import Notification
+
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 logger = get_task_logger(__name__)
 
-@app.task
-def send_notifications_task(data, pushNotification):
-    #Import files for notification
-    from datetime import datetime, timedelta
-    from forum.topic.models import Topic, VBseen
-    from forum.category.models import Category
-    from drf_spirit.models import UserLogStatistics
-    from jarvis.models import PushNotification, FCMDevice, PushNotificationUser
-    from django.core.paginator import Paginator
-    from forum.user.models import UserProfile, AndroidLogs
-    try:
-        title = data.get('title', "")
-        upper_title = data.get('upper_title', "")
-        notification_type = data.get('notification_type', "")
-        instance_id = data.get('id', "")
-        user_group = data.get('user_group', "")
-        lang = data.get('lang', "0")
-        schedule_status = data.get('schedule_status', "")
-        datepicker = data.get('datepicker', '')
-        timepicker = data.get('timepicker', '').replace(" : ", ":")
-        image_url = data.get('image_url', '')
-        particular_user_id=data.get('particular_user_id', None)
-        category_ids=data.get('category_ids', '')
 
-
-        if notification_type == '3':
-            instance_id=instance_id.replace('#', '')
-
-        pushNotification = PushNotification()
-        pushNotification.title = upper_title
-        pushNotification.description = title
-        pushNotification.language = lang
-        pushNotification.image_url = image_url
-        pushNotification.notification_type = notification_type
-        pushNotification.user_group = user_group
-        pushNotification.instance_id = instance_id
-        if data.get('days_ago', '1'):
-            pushNotification.days_ago=data.get('days_ago', '1')
-        if particular_user_id:
-            pushNotification.particular_user_id=particular_user_id
-        pushNotification.save()
-    except Exception as e:
-        logger.info(str(e))
-
-    try:
-        if schedule_status == '1':
-            if datepicker:
-                pushNotification.scheduled_time = datetime.strptime(datepicker + " " + timepicker, "%m/%d/%Y %H:%M")
-            pushNotification.is_scheduled = True
-            pushNotification.save()
-        else:
-            device = ''
-            language_filter = {'is_uninstalled': False}
-            exclude_filter = {}
-            if lang != '0':
-                language_filter = { 'user__st__language': lang, 'is_uninstalled': False}
-            if category_ids:
-                category_array=category_ids.split(',')
-                try:
-                    pushNotification.m2mcategory=Category.objects.filter(pk__in=category_array)
-                    pushNotification.save()
-                except Exception as e:
-                    logger.info(str(e))
-                language_filter['user__st__sub_category']=data.get('category', None)
-            if user_group == '8':
-                language_filter = {'is_uninstalled': False}
-                language_filter['user__pk']=data.get('particular_user_id', None)
-            elif user_group == '1':
-                end_date = datetime.today()
-                start_date = end_date - timedelta(hours=3)
-                language_filter = {'is_uninstalled': False}
-                language_filter['user__isnull']=True
-                language_filter['created_at__range']=(start_date, end_date)
-            elif user_group == '2':
-                language_filter = {'is_uninstalled': False}
-                language_filter['user__isnull']=True
-            elif user_group == '7':
-                #This list contains user IDs for test users: Gitesh, Abhishek, Varun, Maaz
-                # Anshika, Bhoomika and Akash
-                language_filter = {'is_uninstalled': False}
-                filter_list = [39342, 1465, 2801, 19, 40, 328, 23, 3142, 1494, 41, 1491]
-                language_filter['user__pk__in']=filter_list
-            elif user_group == '9':
-                hours_ago = datetime.now()-timedelta(days=int(data.get('days_ago', "1")))
-                filter_list=Topic.objects.filter(is_vb=True, date__gt=hours_ago).order_by('-user__pk').distinct('user').values_list('user__pk', flat=True)
-                print(filter_list)
-                language_filter['user__pk__in']=filter_list
-            elif user_group == '10':
-                hours_ago = datetime.now()-timedelta(days=int(data.get('days_ago', "1")))
-                filter_list=AndroidLogs.objects.filter(created_at__gt=hours_ago).order_by('-user__pk').distinct('user').values_list('user__pk', flat=True)
-                print(filter_list)
-                language_filter['user__pk__in']=filter_list
-            elif user_group == '3':
-                filter_list = VBseen.objects.distinct('user__pk').values_list('user__pk', flat=True)
-                exclude_filter={'user__pk__in': filter_list}
-            elif user_group == '4' or user_group == '5':
-                hours_ago = datetime.now()
-                if user_group == '4':
-                    hours_ago -= timedelta(days=1)
-                else:
-                    hours_ago -=  timedelta(days=2)
-                filter_list=AndroidLogs.objects.filter(created_at__gt=hours_ago).order_by('-user__pk').distinct('user').values_list('user__pk', flat=True)
-                exclude_filter={'user__pk__in': filter_list}
-            elif user_group == '6':
-                filter_list = Topic.objects.filter(is_vb=True).values_list('user__pk', flat=True)
-                exclude_filter={'user__pk__in': filter_list}
-            print(exclude_filter)
-            print(language_filter)
-            device = FCMDevice.objects.exclude(**exclude_filter).filter(**language_filter)
-            logger.info(device)
-            print(device)
-            device_pagination = Paginator(device, 1000)
-            device_list=[]
-            for index in range(1, (device_pagination.num_pages+1)):
-                device_after_slice = device_pagination.page(index)
-                logger.info(device_after_slice)
-                for each in device_after_slice:
-                    try:
-                        t = each.send_message(data={"title": title, "id": instance_id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url}, time_to_live=604800)
-                        response=t[1]['results'][0]['message_id']
-                        try:
-                            PushNotificationUser.objects.create(user=each.user, push_notification_id=pushNotification, status='2', device=each, response_dump=t)
-                        except:
-                            pass
-                    except:
-                        pass
-                    #t = each.send_message(data={})
-                    #print(t)
-                    #t = each.send_message(data={"title": title, "id": id, "title_upper": upper_title, "type": notification_type, "notification_id": pushNotification.pk, "image_url": image_url})
-                logger.info(device_list)
-            pushNotification.is_executed=True
-            pushNotification.save()
-    except Exception as e:
-        logger.info(str(e))
 
 @app.task
 def vb_create_task(topic_id):
@@ -149,15 +22,15 @@ def vb_create_task(topic_id):
     topic = Topic.objects.get(pk=topic_id)
     if not topic.is_transcoded:
         if topic.is_vb and topic.question_video:
-            data_dump, m3u8_url, job_id = transcode_media_file(topic.question_video.split('s3.amazonaws.com/')[1])
-            if m3u8_url:
-                topic.backup_url = topic.question_video
-                topic.question_video = m3u8_url
-                topic.transcode_dump = data_dump
-                topic.transcode_job_id = job_id
-                # topic.is_transcoded = True
-                topic.save()
-                topic.update_m3u8_content()
+            topic.update_m3u8_content()
+            # data_dump, m3u8_url, job_id = transcode_media_file(topic.question_video.split('s3.amazonaws.com/')[1])
+            # if m3u8_url:
+                # topic.backup_url = topic.question_video
+                # topic.question_video = m3u8_url
+                # topic.transcode_dump = data_dump
+                # topic.transcode_job_id = job_id
+                # # topic.is_transcoded = True
+                # topic.save()
                 #create_downloaded_url(topic_id)
 
 @app.task
@@ -200,7 +73,7 @@ def create_downloaded_url(topic_id):
     from forum.topic.models import Topic
     video_byte = Topic.objects.get(pk=topic_id)
     try:
-        print "start time:  ",datetime.now()
+        # print "start time: ", datetime.now()
         filename_temp = "temp_"+video_byte.backup_url.split('/')[-1]
         filename = video_byte.backup_url.split('/')[-1]
         cmd = ['ffmpeg','-i', video_byte.backup_url, '-vf',"[in]scale=540:-1,drawtext=text='@"+video_byte.user.username+"':x=10:y=H-th-20:fontsize=18:fontcolor=white[out]",settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename_temp]
@@ -214,8 +87,8 @@ def create_downloaded_url(topic_id):
         if os.path.exists(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename):
             os.remove(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename_temp)
             os.remove(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename)
-        print "bye"
-        print "End time:  ",datetime.now()
+        # print "bye"
+        # print "End time:  ",datetime.now()
     except Exception as e:
         try:
             os.remove(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename_temp)
@@ -225,32 +98,37 @@ def create_downloaded_url(topic_id):
             os.remove(settings.PROJECT_PATH+"/boloindya/scripts/watermark/"+filename)
         except:
             pass
-        print e
+        # print e
 
 @app.task
 def sync_contacts_with_user(user_id):
     from forum.user.models import UserProfile,UserPhoneBook,Contact
-    user_phonebook = UserPhoneBook.objects.get(user_id=user_id)
-    all_contact_no = list(user_phonebook.contact.all().values_list('contact_number',flat=True))
-    print all_contact_no
-    all_userprofile = UserProfile.objects.filter(mobile_no__in=all_contact_no,user__is_active=True)
-    print all_userprofile
-    if all_userprofile:
-        for each_userprofile in all_userprofile:
-            Contact.objects.filter(contact_number=each_userprofile.mobile_no).update(is_user_registered=True,user=each_userprofile.user)
+    try:
+        user_phonebook = UserPhoneBook.objects.using('default').get(user_id=user_id)
+        all_contact_no = list(user_phonebook.contact.all().values_list('contact_number',flat=True))
+        all_userprofile = UserProfile.objects.filter(mobile_no__in=all_contact_no,user__is_active=True).values('mobile_no','user_id')
+        if all_userprofile:
+            for each_userprofile in all_userprofile:
+                Contact.objects.filter(contact_number=each_userprofile['mobile_no']).update(is_user_registered=True,user_id=each_userprofile['user_id'])
+    except:
+        pass # No phonebook exist for user
 
 @app.task
 def cache_follow_post(user_id):
-    from forum.topic.utils import update_redis_paginated_data
+    from forum.topic.utils import update_redis_paginated_data, get_redis_vb_seen
     from forum.user.utils.follow_redis import get_redis_following
     from forum.user.models import UserProfile
     from forum.topic.models import Topic
     from django.db.models import Q
+    all_seen_vb = []
+    if user_id:
+        all_seen_vb = get_redis_vb_seen(user_id)
     key = 'follow_post:'+str(user_id)
     all_follower = get_redis_following(user_id)
     category_follow = UserProfile.objects.get(user_id = user_id).sub_category.all().values_list('pk', flat = True)
-    query = Topic.objects.filter(Q(user_id__in = all_follower)|Q(m2mcategory__id__in = category_follow, language_id = UserProfile.objects.get(user_id = user_id).language), \
-	is_vb = True, is_removed = False).order_by('-vb_score')
+    query = Topic.objects.filter(Q(user_id__in = all_follower)|Q(m2mcategory__id__in = category_follow, \
+        language_id = UserProfile.objects.get(user_id = user_id).language), is_vb = True, is_removed = False, is_popular = False)\
+        .exclude(pk__in = all_seen_vb).order_by('-id', '-vb_score')
     update_redis_paginated_data(key, query)
 
 @app.task
@@ -262,7 +140,8 @@ def cache_popular_post(user_id,language_id):
     all_seen_vb= []
     if user_id:
         all_seen_vb = get_redis_vb_seen(user_id)
-    query = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, is_popular = True).exclude(pk__in = all_seen_vb).order_by('-vb_score')
+    query = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, is_popular = True)\
+        .exclude(pk__in = all_seen_vb).order_by('-id', '-vb_score')
     update_redis_paginated_data(key, query)
 
 @app.task
@@ -279,7 +158,7 @@ def create_topic_notification(created,instance_id):
                 notify = Notification.objects.create(for_user_id = each,topic = instance,notification_type='1',user = instance.user)
         instance.calculate_vb_score()
     except Exception as e:
-        print e
+        # print e
         pass
 
 @app.task
@@ -290,17 +169,52 @@ def create_comment_notification(created,instance_id):
     from forum.user.utils.follow_redis import get_redis_follower
     try:
         instance = Comment.objects.get(pk=instance_id)
-        if created and not instance.is_vb:
+        if created:
             # all_follower_list = Follower.objects.filter(user_following = instance.user).values_list('user_follower_id',flat=True)
             all_follower_list = get_redis_follower(instance.user.id)
-            for each in all_follower_list:
+            mentions_ids = get_mentions_and_send_notification(instance)
+            for each in [user_id for user_id in all_follower_list if user_id not in mentions_ids]:
                 if not str(each) == str(instance.topic.user.id):
                     notify = Notification.objects.create(for_user_id = each,topic = instance,notification_type='2',user = instance.user)
-            notify_owner = Notification.objects.create(for_user = instance.topic.user ,topic = instance,notification_type='3',user = instance.user)
+            if not instance.topic.user == instance.user:
+                notify_owner = Notification.objects.create(for_user = instance.topic.user ,topic = instance,notification_type='3',user = instance.user)
     except Exception as e:
-        print e
+        # print e
         pass
 
+from HTMLParser import HTMLParser
+class MLStripper(HTMLParser):
+    def __init__(self):
+        self.reset()
+        self.fed = []
+    def handle_data(self, d):
+        self.fed.append(d)
+    def get_data(self):
+        return ''.join(self.fed)
+
+def strip_tags(html):
+    s = MLStripper()
+    s.feed(html)
+    return s.get_data()
+
+def get_mentions_and_send_notification(comment_obj):
+    from django.contrib.auth.models import User
+    from forum.topic.models import Notification
+    comment = strip_tags(comment_obj.comment)
+    mention_tag=[mention for mention in comment.split() if mention.startswith("@")]
+    user_ids = []
+    if mention_tag:
+        for each_mention in mention_tag:
+            try:
+                user = User.objects.get(username=each_mention.strip('@'))
+                user_ids.append(user.id)
+                if not user == comment_obj.user:
+                    notify_mention = Notification.objects.create(for_user = user  ,topic = comment_obj,notification_type='10',user = comment_obj.user)
+            except Exception as e:
+                # print e
+                pass
+    return user_ids
+ 
 @app.task
 def create_hash_view_count(create,instance_id):
     from forum.topic.models import Topic,TongueTwister,HashtagViewCounter
@@ -312,14 +226,15 @@ def create_hash_view_count(create,instance_id):
             language_specific_seen = language_specific_vb.aggregate(Sum('view_count'))
             language_specific_hashtag, is_created = HashtagViewCounter.objects.get_or_create(hashtag_id=instance_id,language=each_language[0])
             if language_specific_seen.has_key('view_count__sum') and language_specific_seen['view_count__sum']:
-                print "language_specific",each_language[1]," --> ",language_specific_seen['view_count__sum'],instance_id
+                # print "language_specific",each_language[1]," --> ",language_specific_seen['view_count__sum'],instance_id
                 language_specific_hashtag.view_count = language_specific_seen['view_count__sum']
             else:
                 language_specific_hashtag.view_count = 0
             language_specific_hashtag.video_count = len(language_specific_vb)
             language_specific_hashtag.save()
     except Exception as e:
-        print e
+        # print e
+        pass
 
 @app.task
 def create_thumbnail_cloudfront(topic_id):
@@ -338,7 +253,8 @@ def create_thumbnail_cloudfront(topic_id):
                 lmabda_cloudfront_url = get_modified_url(thumbnail_url, cloundfront_url)
                 response = check_url(lmabda_cloudfront_url)
     except Exception as e:
-        print e
+        # print e
+        pass
 
 @app.task
 def send_report_mail(report_id):
@@ -377,8 +293,81 @@ def send_report_mail(report_id):
         pass
     return True
 
+@app.task
+def deafult_boloindya_follow(user_id,language):
+    try:
+        from django.contrib.auth.models import User
+        from forum.user.models import Follower, UserProfile
+        from drf_spirit.utils import add_bolo_score
+        from forum.user.utils.follow_redis import update_redis_follower, update_redis_following
+        from forum.user.utils.bolo_redis import update_profile_counter
+
+        user = User.objects.get(pk=user_id)
+        if language == '2':
+            bolo_indya_user = User.objects.get(username = 'boloindya_hindi')
+        elif language == '3':
+            bolo_indya_user = User.objects.get(username = 'boloindya_tamil')
+        elif language == '4':
+            bolo_indya_user = User.objects.get(username = 'boloindya_telgu')
+        else:
+            bolo_indya_user = User.objects.get(username = 'boloindya')
+        follow,is_created = Follower.objects.get_or_create(user_follower = user,user_following=bolo_indya_user)
+        if is_created:
+            add_bolo_score(user.id, 'follow', follow)
+            userprofile = UserProfile.objects.filter(user = user).update(follow_count = F('follow_count') + 1)
+            bolo_indya_profile = UserProfile.objects.filter(user = bolo_indya_user).update(follower_count = F('follower_count') + 1)
+            update_redis_following(user.id,int(bolo_indya_user.id),True)
+            update_redis_follower(int(bolo_indya_user.id),user.id,True)
+            update_profile_counter(user.id,'follower_count',1, True)
+            update_profile_counter(bolo_indya_user.id,'follow_count',1, True)
+        if not follow.is_active:
+            follow.is_active = True
+            follow.save()
+            userprofile = UserProfile.objects.filter(user_id = user.id).update(follow_count = F('follow_count') + 1)
+            bolo_indya_profile = UserProfile.objects.filter(user_id = bolo_indya_user.id).update(follower_count = F('follower_count') + 1)
+            update_redis_following(user.id,int(bolo_indya_user.id),True)
+            update_redis_follower(int(bolo_indya_user.id),user.id,True)
+            update_profile_counter(user.id,'follower_count',1, True)
+            update_profile_counter(bolo_indya_user.id,'follow_count',1, True)
+        return True
+    except:
+        return False
+
+@app.task
+def save_click_id_response(user_profile_id):
+    import urllib2
+    from forum.user.models import Follower, UserProfile
+    userprofile = UserProfile.objects.filter(pk=user_profile_id)
+    userprofile[0].click_id = click_id
+    click_url = 'http://res.taskbucks.com/postback/res_careeranna/dAppCheck?Ad_network_transaction_id='+str(click_id)+'&eventname=register'
+    response = urllib2.urlopen(click_url).read()
+    userprofile.update(click_id_response = str(response))
 
 
+@app.task
+def send_upload_video_notification(data, pushNotification):
+    #Import files for notification
+    from jarvis.models import FCMDevice
+    import json
+    import requests
+    try:
+        title = data.get('title', "")
+        upper_title = data.get('upper_title', "")
+        notification_type = data.get('notification_type', "")
+        instance_id = data.get('id', "")
+        image_url = data.get('image_url', '')
+        particular_user_id=data.get('particular_user_id', None)
+        access =  _get_access_token()
+        
+        headers = {'Authorization': 'Bearer ' + access, 'Content-Type': 'application/json; UTF-8' }
+        fcm_message={}
+        devices=FCMDevice.objects.filter(user__pk=data.get('particular_user_id', None), is_uninstalled=False)
+        for each in devices:
+            fcm_message = {"message": {"token": each.reg_id ,"data": {"title_upper": upper_title, "title": title, "id": instance_id, "type": notification_type,"notification_id": "-1", "image_url": image_url}}}
+            resp = requests.post("https://fcm.googleapis.com/v1/projects/boloindya-1ec98/messages:send", data=json.dumps(fcm_message), headers=headers)
+        
+    except Exception as e:
+        logger.info(str(e))
 
 if __name__ == '__main__':
     app.start()

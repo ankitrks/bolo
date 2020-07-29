@@ -22,6 +22,15 @@ sys.path.append('/var/live_code/boloindya/boloindya')
 # mod_wsgi daemon mode with each site in its own daemon process, or use
 # os.environ["DJANGO_SETTINGS_MODULE"] = ".settings"
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "boloindya.settings_local")
+os.environ.setdefault("NEW_RELIC_CONFIG_FILE", "newrelic.ini")
+
+import os
+import socket
+from django.core.wsgi import get_wsgi_application
+application = get_wsgi_application()
+import newrelic.agent
+newrelic.agent.initialize("newrelic.ini")
+application = newrelic.agent.WSGIApplicationWrapper(application)
 
 # This application object is used by any WSGI server configured to use this
 # file. This includes Django's development server, if the WSGI_APPLICATION

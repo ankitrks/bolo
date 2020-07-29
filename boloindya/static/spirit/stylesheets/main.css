@@ -56,12 +56,6 @@ body{
     position:relative;
     padding:0.5rem 1.5rem;
 }
-.nav-link:focus,.nav-link:hover{
-    font-size:17px;
-    color:#000;
-    position:relative;
-    padding:0.5rem 1.5rem;
-}
 .navbar .navbar-nav li .sub-menu{
     padding:0px;
     border:none;

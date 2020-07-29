@@ -7,6 +7,8 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from forum.core.conf import settings
+from forum.topic.models import RecordTimeStamp
+from datetime import datetime
 
 class SingUpOTP(models.Model):
     mobile_no = models.CharField(_("title"), max_length=75)
@@ -183,13 +185,13 @@ class UserJarvisDump(models.Model):
         ('2', 'error_logs'),
         ('3', 'hardware_info'),
     ]
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,related_name='User',editable=False, db_index = True, blank = True, null = True)
-    dump = models.TextField(_("dump"),null=True,blank=True)
-    dump_type = models.CharField(_("dump_type"),choices=DUMP_TYPE,max_length=50)
-    sync_time = models.DateTimeField(_("sync_time"),auto_now=False,auto_now_add=True,blank=False,null=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='User', editable=False, db_index = True, blank = True, null = True)
+    dump = models.TextField(_("dump"), null = True, blank = True)
+    dump_type = models.CharField(_("dump_type"), choices=DUMP_TYPE, max_length=50, blank=True, null = True)
+    sync_time = models.DateTimeField(_("sync_time"), auto_now=False, auto_now_add=True, blank=False, null=False)
     is_executed = models.BooleanField(_("is_executed"), default=False)
     android_id = models.CharField(_("android_id"), max_length=100, blank=True, null = True, editable = False)
-
+    created_at = models.DateTimeField(_("created_at"), auto_now_add = False, auto_now = False, default = datetime.now)
     def __unicode__(self):
         return "%s" % self.dump
       
@@ -408,8 +410,7 @@ class UserFeedback(models.Model):
                 data={"from": "BoloIndya Support <support@boloindya.com>",
                       "to": ["support@boloindya.com"],
                       "cc":[self.contact_email],
-                      "bcc":["anshika@careeranna.com", "maaz@careeranna.com", \
-                            "ankit@careeranna.com", "gitesh@careeranna.com", "tanmai@boloindya.com"],
+                      "bcc":["anshika@careeranna.com", "gitesh@careeranna.com"],
                       "subject": "BoloIndya Feedback Received | " + self.user_name() + ' | ' + self.user_contact(),
                       "html": content_email
                 }
@@ -438,4 +439,50 @@ class UserFeedback(models.Model):
             print e
             return self.by_user.username
 
+class Campaign(RecordTimeStamp):
+    banner_img_url = models.TextField(_("Banner Image URL"), blank = False, null = False)
+    hashtag = models.ForeignKey('forum_topic.TongueTwister', verbose_name=_("HashTag"), related_name="campaign_hashtag",null=False,blank=False)
+    is_active = models.BooleanField(default=True)
+    active_from = models.DateTimeField(_("Active From"), auto_now=False, blank=False, null=False)
+    active_till = models.DateTimeField(_("Active Till"), auto_now=False, blank=False, null=False)
+    is_winner_declared = models.BooleanField(default=False)
+    winners = models.ManyToManyField('Winner', verbose_name=_("winner"), \
+            related_name="m2mwinner_campaign",blank=True)
+    next_campaign_hashtag = models.ForeignKey('forum_topic.TongueTwister', verbose_name=_("NextCampaignHashTag"), related_name="campaign_next_hashtag",null=True,blank=True)        
 
+class Winner(RecordTimeStamp):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = False, null = False, related_name='winner_user')
+    rank = models.PositiveSmallIntegerField(_("Rank"), blank=False, null=False)
+    extra_text = models.TextField(_("Extra Text"), blank = True, null = True)
+    video = models.ForeignKey('forum_topic.Topic', verbose_name=_("Video"), related_name="winner_video",null=False,blank=False)
+
+    def __unicode__(self):
+       return str(self.rank) +': '+ self.user.st.name
+
+class Country(RecordTimeStamp):
+    name = models.CharField(_("country_name"), max_length=100, null=True, blank=True)
+    place_id = models.CharField(_("country_place_id"), max_length=350, null=True, blank=True)
+    def __unicode__(self):
+       return str(self.name)
+
+class State(RecordTimeStamp):
+    name = models.CharField(_("state_name"), max_length=100, null=True, blank=True)
+    place_id = models.CharField(_("state_place_id"), max_length=350, null=True, blank=True)
+    country = models.ForeignKey(Country, blank = True, null = True, related_name='state_country')
+    def __unicode__(self):
+       return str(self.name)+', '+str(self.country)
+
+class City(RecordTimeStamp):
+    name = models.CharField(_("city_name"), max_length=100, null=True, blank=True)
+    place_id = models.CharField(_("city_place_id"), max_length=350, null=True, blank=True)
+    state = models.ForeignKey(State, blank = True, null = True, related_name='city_state')
+    def __unicode__(self):
+       return str(self.name)+', '+str(self.state)
+
+class MusicAlbum(models.Model):
+  title = models.CharField(_("title"),null=True,blank=True,max_length=1000)
+  s3_file_path = models.CharField(_("s3 file path"),null=True,blank=True,max_length=1000)
+  image_path = models.CharField(_("image path"),null=True,blank=True,max_length=1000)
+  author_name = models.CharField(_("author name"),null=True,blank=True,max_length=1000)
+  def __unicode__(self):
+       return str(self.title)+', '+str(self.author_name)

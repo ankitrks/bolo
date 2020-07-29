@@ -13,6 +13,7 @@ from drf_spirit.utils import language_options
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from datetime import datetime
+from forum.topic.utils import update_redis_fcm_device_entries, set_redis_fcm_token
 
 class VideoCategory(models.Model):
     category_name = models.CharField(_('Category Name'),max_length=100,null=True,blank=True)
@@ -69,7 +70,7 @@ from datetime import datetime
 class FCMDevice(AbstractDevice):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='%(app_label)s_%(class)s_user',editable=False)
     device_type = models.CharField(choices=device_options, blank = True, null = True, max_length=10, default='0')
-    created_at=models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False) # auto_now will add the current time and date whenever field is saved.
+    created_at=models.DateTimeField(auto_now=False,auto_now_add=False,blank=False,null=False, default=datetime.now) # auto_now will add the current time and date whenever field is saved.
     last_modified=models.DateTimeField(auto_now=True,auto_now_add=False)                     # while auto_now_add will save the date and time only when record is first created
     is_uninstalled=models.BooleanField(default=False)
     uninstalled_date=models.DateTimeField(auto_now=False,auto_now_add=False,blank=True,null=True)
@@ -91,8 +92,16 @@ class FCMDevice(AbstractDevice):
         device_model=request.POST.get('device_model', '')
         current_version=request.POST.get('current_version', '')
         manufacturer=request.POST.get('manufacturer', '')
+        data_dict = {'reg_id':reg_id, 'dev_id':dev_id,'device_model':device_model,\
+         'current_version':current_version, 'manufacturer':manufacturer, 'user_id':request.user.id,\
+         'device_type':request.POST.get('device_type',None),'created_at':datetime.now() }
+        if dev_id:
+            update_redis_fcm_device_entries(dev_id,data_dict)
+            if request.user.id:
+                set_redis_fcm_token(request.user.id,reg_id)
+        return JsonResponse({"status":"Success"},safe = False)
         try:
-            instance = FCMDevice.objects.filter(Q(reg_id = reg_id) | Q(dev_id = dev_id))
+            instance = FCMDevice.objects.using('default').filter(Q(reg_id = reg_id) | Q(dev_id = dev_id))
             if not len(instance):
                 print 'Not Exists'
                 raise Exception
@@ -191,6 +200,7 @@ metrics_options = (
     ('10', 'Install-Signup Map'),
     ('11', 'Uninstalls'),
     ('12', 'PlayTime'),
+    ('13', "Video Shares (Telegram)"),
 )
 
 metrics_slab_options = (
@@ -222,7 +232,7 @@ class DashboardMetrics(RecordTimeStamp):
     metrics_slab = models.CharField(choices = metrics_slab_options, blank = True, null = True, max_length = 10, default = None)
     date = models.DateTimeField(auto_now = False, auto_now_add = False, blank = False, null = False)
     week_no = models.PositiveIntegerField(null = True, blank = True, default = 0)
-    count = models.PositiveIntegerField(null = True, blank = True, default = 0)
+    count = models.BigIntegerField(null = True, blank = True, default = 0)
 
     class Meta:
         ordering = ['date']

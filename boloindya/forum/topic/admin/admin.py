@@ -11,6 +11,7 @@ from forum.topic.models import Topic, Notification, ShareTopic, CricketMatch, Po
         TongueTwister, BoloActionHistory, language_options,JobOpening,JobRequest,RankingWeight
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 from datetime import datetime,timedelta
+from forum.user.utils.bolo_redis import update_profile_counter
 
 class TopicResource(resources.ModelResource):
     class Meta:
@@ -193,6 +194,16 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
         del actions['delete_selected']
         return actions
 
+    def get_search_results(self, request, queryset, search_term):
+        final_search_term = search_term.replace('h:', '').replace('n:', '')
+        queryset, use_distinct = super(TopicAdmin, self).get_search_results(request, queryset, final_search_term)
+        if search_term:
+            if search_term.startswith('h:'):
+                queryset = queryset.filter(hash_tags__hash_tag__iexact = search_term.replace('h:', ''))
+            if search_term.startswith('n:'):
+                queryset = queryset.filter(title__icontains = search_term.replace('n:', '')).exclude(hash_tags__hash_tag__icontains = search_term.replace('n:', ''))
+        return queryset, use_distinct
+
     def save_model(self, request, obj, form, change):
         if 'title' in form.changed_data:
             obj.title = form.cleaned_data['title']
@@ -215,8 +226,10 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
             obj.is_removed = form.cleaned_data['is_removed']
             if obj.is_removed:
                 obj.delete()
+                update_profile_counter(obj.user_id,'video_count',1, False)
             else:
                 obj.restore()
+                update_profile_counter(obj.user_id,'video_count',1, True)
         
         if 'is_boosted' in form.changed_data and 'boosted_till' in form.changed_data:
             obj.is_boosted = form.cleaned_data['is_boosted']
@@ -238,13 +251,11 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
         obj.save()
         if 'language_id' in form.changed_data and obj.is_monetized:
             if form.initial['language_id'] == '1':
-                userprofile = UserProfile.objects.get(user = obj.user)
-                userprofile.save()
+                userprofile = UserProfile.objects.filter(user = obj.user)
                 reduce_bolo_score(obj.user.id, 'create_topic_en', obj, 'no_monetize')
                 obj.add_monetization()
             elif obj.language_id == '1':
-                userprofile = UserProfile.objects.get(user = obj.user)
-                userprofile.save()
+                userprofile = UserProfile.objects.filter(user = obj.user)
                 reduce_bolo_score(obj.user.id, 'create_topic', obj, 'no_monetize')
                 obj.add_monetization()
         super(TopicAdmin,self).save_model(request, obj, form, change)

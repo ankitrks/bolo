@@ -61,6 +61,8 @@ function getCreators(popularCreators){
     var creatorName="";
     if(popularCreators.first_name!=''){
         creatorName=popularCreators.first_name+' '+popularCreators.last_name;
+    }else if(popularCreators.userprofile.name!=""){
+        creatorName=popularCreators.userprofile.name;
     }else{
         creatorName=popularCreators.username;
     }
@@ -142,6 +144,7 @@ function getHashtagVideos(limit,offset){
     var listItems="";
     var itemCount=0;
     var userVideoItems="";
+    //var uri='/api/v1/get_challenge/';
     var uri='/api/v1/get_challenge/';
     var res = encodeURI(uri);
 
@@ -156,7 +159,7 @@ function getHashtagVideos(limit,offset){
             var itemCount=-1;
             videoItemList.forEach(function(itemCreator) {itemCount++;totalCountVideo++;
                 playListData.push(itemCreator);
-                userVideoItems =getVideoItem(itemCreator,totalCountVideo);
+                userVideoItems =getVideoItem(itemCreator,itemCount,totalCountVideo);
                 $("#hashTagVideosListId").append(userVideoItems);
       
             });
@@ -205,7 +208,7 @@ function loadMoreData(NextPageUrl){
                 var videoItemList=data.results;
                 var itemCount=-1;
                 videoItemList.forEach(function(itemCreator) {itemCount++;totalCountVideo++;
-                userVideoItems +=getVideoItem(itemCreator,totalCountVideo);
+                userVideoItems +=getVideoItem(itemCreator,itemCount,totalCountVideo);
                 playListData.push(itemCreator);          
       
                 });
@@ -261,9 +264,9 @@ function getCategoryVideos(){
             userVideoItems="";
             var videoItemList=response.results;
             var itemCount=0;
-            videoItemList.forEach(function(itemCreator) {itemCount++;
+            videoItemList.forEach(function(itemCreator) {itemCount++;totalCountVideo++;
                 playListData[itemCreator.id]=itemCreator;
-                userVideoItems +=getVideoItem(itemCreator,itemCreator.id);
+                userVideoItems +=getVideoItem(itemCreator,itemCreator.id,totalCountVideo);
             });
             $("#categoryVideosListId").append(userVideoItems);
             loaderBoloHideDynamic('_scroll_load_more_loading_user_videos');
@@ -274,7 +277,7 @@ function getCategoryVideos(){
     });
 }
 
-function getVideoItem(videoItem,itemCount){
+function getVideoItem(videoItem,itemCount,indexCount){
     //<a href="javascript:void(0)" onClick="openVideoInPopup(\''+videoItem.question_video+'\',\''+videoItem.question_image+'\','+itemCount+');" class="jsx-2893588005 video-feed-item-wrapper">\
     var content_title="";
     var videoTitle="";
@@ -284,7 +287,7 @@ function getVideoItem(videoItem,itemCount){
             <div class="jsx-1410658769 _ratio_">\
                 <div class="jsx-1410658769" style="padding-top: 148.438%;">\
                     <div class="jsx-1410658769 _ratio_wrapper">\
-                        <a href="/explore/'+videoItem.slug+'/'+videoItem.id+'"  class="jsx-2893588005 video-feed-item-wrapper">\
+                        <a href="javascript:void(0)" onClick="openVideoInPopup(\''+videoItem.question_video+'\',\''+videoItem.question_image+'\','+itemCount+','+indexCount+');"  class="jsx-2893588005 video-feed-item-wrapper">\
                             <div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+videoItem.question_image+');">\
                                 <div class="jsx-3077367275 video-card default">\
                                     <div class="jsx-3077367275 video-card-mask">\
@@ -899,7 +902,9 @@ function listCommentsById(singleTopicData){
       
         });
         $(".videoCommentId").append(listCommentItems);
-        var loadMoreComment='<span class="loadMoreComment"><a onclick="loadMoreComments(\''+data.next+'\');" class="" href="javascript:void(0);">Load More Comments...</a></span';
+        if(data.next!="" && data.next!='null'){
+            var loadMoreComment='<span class="loadMoreComment"><a onclick="loadMoreComments(\''+data.next+'\');" class="" href="javascript:void(0);">Load More Comments...</a></span';
+        }
         $(".loadMoreComments").html(loadMoreComment);
         loaderBoloHide();
 
@@ -931,7 +936,9 @@ function loadMoreComments(nextPageURl){
       
         });
         $(".videoCommentId").append(listCommentItems);
-        var loadMoreComment='<span class="loadMoreComment"><a class="" onclick="loadMoreComments(\''+data.next+'\');" href="javascript:void(0);">Load More Comments...</a></span';
+        if(data.next!="" && data.next!='null'){
+            var loadMoreComment='<span class="loadMoreComment"><a class="" onclick="loadMoreComments(\''+data.next+'\');" href="javascript:void(0);">Load More Comments...</a></span';
+        }
         $(".loadMoreComments").html(loadMoreComment);
         loaderBoloHide();
     });

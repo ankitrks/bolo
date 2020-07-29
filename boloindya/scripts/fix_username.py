@@ -232,20 +232,14 @@ def change_username(old_username,i=0):
         return new_username
     return new_username
 
+import random, string
 def get_random_username():
-    today_datetime = datetime.now()
-    year = str(today_datetime.year%100)
-    month = today_datetime.month
-    if month <10:
-        month = '0'+str(month)
-    else:
-        month = str(month)
-    x = 'bi'+year+month+''.join(random.choice(string.digits) for _ in range(5))
+    x = 'bi'+''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(10))
     x = x.lower()
     # x = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
     try:
         user = User.objects.get(username=x)
-        get_random_username()
+        return get_random_username()
     except:
         return x
 

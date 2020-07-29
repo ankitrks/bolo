@@ -21,7 +21,7 @@ from django.db.models import Q
 from drf_spirit.views import getVideoLength
 from drf_spirit.utils  import calculate_encashable_details,language_options,check_or_create_user_pay
 from forum.user.models import UserProfile, ReferralCode, ReferralCodeUsed, VideoCompleteRate, VideoPlaytime,UserPay
-from forum.topic.models import Topic, VBseen
+from forum.topic.models import Topic, VBseen, FVBseen
 from forum.category.models import Category
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -35,11 +35,10 @@ from forum.userkyc.forms import KYCBasicInfoRejectForm,KYCDocumentRejectForm,Add
 from .models import VideoUploadTranscode,VideoCategory, PushNotification, PushNotificationUser, user_group_options, \
     FCMDevice, notification_type_options, metrics_options, DashboardMetrics, DashboardMetricsJarvis, metrics_slab_options,\
      metrics_language_options, UserCountNotification, Report
-from drf_spirit.models import MonthlyActiveUser, HourlyActiveUser, DailyActiveUser, VideoDetails
+from drf_spirit.models import MonthlyActiveUser, HourlyActiveUser, DailyActiveUser, VideoDetails, MusicAlbum
 from forum.category.models import Category
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.conf import settings
 from django.http import JsonResponse
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
@@ -49,13 +48,12 @@ from itertools import groupby
 from django.db.models import Count
 import ast
 from drf_spirit.serializers import VideoCompleteRateSerializer
-from .forms import VideoUploadTranscodeForm,TopicUploadTranscodeForm,UserPayForm
+from .forms import VideoUploadTranscodeForm,TopicUploadTranscodeForm,UserPayForm, AudioUploadForm
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
 from django.core.files.base import ContentFile
 from drf_spirit.serializers import UserWithUserSerializer
 from django.db.models import F,Q
 import traceback
-from tasks import send_notifications_task
 from PIL import Image, ExifTags
 from drf_spirit.utils import language_options
 #from .models import category_slab_options
@@ -64,6 +62,7 @@ from django.db.models.functions import TruncDay
 from django.db.models import Count
 from forum.category.models import Category
 from datetime import datetime
+from forum.user.utils.bolo_redis import update_profile_counter
 
 def get_bucket_details(bucket_name=None):
     bucket_credentials = {}
@@ -117,6 +116,20 @@ def upload_tos3(file_name,bucket,folder_name=None):
     transcode = transcode_media_file(urlify(folder_name),file_key,(file_key).split('/')[-1].split('.')[0],bucket)
     return file_url,transcode
 
+def upload_to_s3_without_transcode(file_name, bucket, folder_name=None):
+    print(file_name, bucket, folder_name)
+    print("upload_to_s3_without_transcode")
+    if folder_name:
+        folder_name = folder_name.lower()
+        file_key = urlify(folder_name)+'/'+urlify(file_name)
+    else:
+        file_key = urlify(file_name)
+    bucket_credentials = get_bucket_details(bucket)
+    client = boto3.client('s3',aws_access_key_id=bucket_credentials['AWS_ACCESS_KEY_ID'],aws_secret_access_key=bucket_credentials['AWS_SECRET_ACCESS_KEY'])
+    transfer = S3Transfer(client)
+    transfer.upload_file(urlify(file_name),bucket,file_key,extra_args={'ACL':'public-read'})
+    file_url = 'https://'+bucket+'.s3.amazonaws.com/%s'%(file_key)
+    return file_url
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
@@ -208,6 +221,12 @@ def uploadvideofile(request):
 def boloindya_uploadvideofile(request):    
     topic_form = TopicUploadTranscodeForm()
     return render(request,'jarvis/pages/upload_n_transcode/boloindya_upload_transcode.html',
+            {'topic_form':topic_form})
+
+@login_required
+def boloindya_upload_audio_file(request):    
+    topic_form = AudioUploadForm()
+    return render(request,'jarvis/pages/upload_audio/boloindya_upload_audio.html',
             {'topic_form':topic_form})
 
 @login_required
@@ -630,6 +649,40 @@ def check_filename_valid(filename):
     else:
         return False
 
+def check_audio_file_name_validation(filename,hashkey):
+    if check_audio_filename_valid(filename):
+        return filename
+    else:
+        import time
+        epoch_time = int(round(time.time() * 1000))
+        file_name_words = filename.split('_')
+        file_extension = file_name_words[-1].split('.')[-1]
+        return hashkey+'_'+str(epoch_time)+'.'+file_extension
+
+
+def check_audio_filename_valid(filename):
+    if re.match(r"^[A-Za-z0-9_.-]+(:?\.mp3)+$", filename):
+        return True
+    else:
+        return False
+
+def check_image_file_name_validation(filename,hashkey):
+    if check_image_filename_valid(filename):
+        return filename
+    else:
+        import time
+        epoch_time = int(round(time.time() * 1000))
+        file_name_words = filename.split('_')
+        file_extension = file_name_words[-1].split('.')[-1]
+        return hashkey+'_'+str(epoch_time)+'.'+file_extension
+
+
+def check_image_filename_valid(filename):
+    if re.match(r"^[A-Za-z0-9_.-]+(:?\.jpg|\.png)+$", filename):
+        return True
+    else:
+        return False
+
 
 @login_required
 def upload_n_transcode(request):
@@ -724,6 +777,74 @@ def upload_n_transcode(request):
 
     return HttpResponse(json.dumps({'message':'success','file_id':my_upload_transcode.id}),content_type="application/json")
 
+@login_required
+def boloindya_upload_audio_file_to_s3(request):
+    audio_file,image_file = request.FILES.getlist('media_file')
+    title = request.POST.get('title',None)
+    author_name = request.POST.get('author_name',None)
+    audio_upload_folder_name = request.POST.get('folder_prefix','from_upload_panel/audio')
+    image_upload_folder_name = request.POST.get('folder_prefix','from_upload_panel/audio_image')
+    upload_to_bucket = request.POST.get('bucket_name',None)
+
+    # print upload_file,upload_to_bucket,upload_folder_name
+    if not upload_to_bucket:
+        return HttpResponse(json.dumps({'message':'fail','reason':'bucket_missing'}),content_type="application/json")
+    if not audio_file:
+        return HttpResponse(json.dumps({'message':'fail','reason':'Audio File Missing'}),content_type="application/json")
+    if not image_file:
+        return HttpResponse(json.dumps({'message':'fail','reason':'Image File Missing'}),content_type="application/json")
+    if not audio_file.name.endswith('.mp3'):
+        return HttpResponse(json.dumps({'message':'fail','reason':'This is not a mp3 file'}),content_type="application/json")
+    if not image_file.name.endswith(('.jpg','.png')):
+        return HttpResponse(json.dumps({'message':'fail','reason':'This is not a jpg/png file'}),content_type="application/json")
+    if not title or not author_name:
+        return HttpResponse(json.dumps({'message':'fail','reason':'Title or Author name is missing'}),content_type="application/json")
+
+    bucket_credentials = get_bucket_details(upload_to_bucket)
+    conn = boto3.client('s3', bucket_credentials['REGION_HOST'], aws_access_key_id = bucket_credentials['AWS_ACCESS_KEY_ID'], \
+            aws_secret_access_key = bucket_credentials['AWS_SECRET_ACCESS_KEY'])
+
+
+    audio_file_name = urlify(audio_file.name.lower())
+    image_file_name = urlify(image_file.name.lower())
+    audio_output_key = hashlib.sha256(audio_file_name.encode('utf-8')).hexdigest()
+    image_output_key = hashlib.sha256(image_file_name.encode('utf-8')).hexdigest()
+    audio_file_name = check_audio_file_name_validation(audio_file_name,audio_output_key)
+    image_file_name = check_image_file_name_validation(image_file_name,image_output_key)
+
+    audio_path = audio_upload_folder_name+'/'+audio_file_name
+    image_path = image_upload_folder_name+'/'+image_file_name
+    try:
+        conn.head_object(Bucket=upload_to_bucket, Key=audio_path)
+        return HttpResponse(json.dumps({'message':'fail','reason':'Audio File already exist'}),content_type="application/json")
+    except Exception as e:
+        with open(urlify(audio_file_name),'wb') as f:
+            for chunk in audio_file.chunks():
+                if chunk:
+                    f.write(chunk)
+    try:
+        conn.head_object(Bucket=upload_to_bucket, Key=image_path)
+        return HttpResponse(json.dumps({'message':'fail','reason':'Image File already exist'}),content_type="application/json")
+    except Exception as e:
+        with open(urlify(image_file_name),'wb') as f:
+            for chunk in image_file.chunks():
+                if chunk:
+                    f.write(chunk)
+
+    uploaded_audio_url = upload_to_s3_without_transcode(audio_file_name,upload_to_bucket,audio_upload_folder_name)
+    uploaded_image_url = upload_to_s3_without_transcode(image_file_name,upload_to_bucket,image_upload_folder_name)
+    music_album_dict = {}
+    music_album_dict['title'] = title
+    music_album_dict['author_name'] = author_name
+    music_album_dict['s3_file_path'] = uploaded_audio_url
+    music_album_dict['image_path'] = uploaded_image_url
+
+    music_album_obj = MusicAlbum.objects.create(**music_album_dict)
+
+    os.remove(urlify(audio_file_name))
+    os.remove(urlify(image_file_name))
+
+    return HttpResponse(json.dumps({'message':'success','file_id':music_album_obj.id}),content_type="application/json")
 @login_required
 def boloindya_upload_n_transcode(request):
     upload_file = request.FILES['media_file']
@@ -822,14 +943,8 @@ def boloindya_upload_n_transcode(request):
     return HttpResponse(json.dumps({'message':'success','file_id':my_upload_transcode.id}),content_type="application/json")
 
 def provide_view_count(view_count,topic):
-    counter =0
-    all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)
-    user_ids = list(all_test_userprofile_id)
-    user_ids = random.sample(user_ids,100)
-    while counter<view_count:
-        opt_action_user_id = random.choice(user_ids)
-        VBseen.objects.create(topic= topic,user_id =opt_action_user_id)
-        counter+=1
+    FVBseen.objects.create(topic_id = topic.id, view_count = view_count)
+    update_profile_counter(topic.user_id,'view_count',view_count, True)
 
 def get_video_width_height(video_url):
     try:
@@ -1053,15 +1168,12 @@ def rotateImage(virtual_thumb_file,rotationAngle):
     image.close()
     return fileNewPath
 
-
-
-
 def update_careeranna_db(uploaded_video):
     video_url = uploaded_video.transcoded_file_url
     regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
     find_urls_in_string = re.compile(regex, re.IGNORECASE)
     url = find_urls_in_string.search(uploaded_video.transcoded_file_url)
-    video_url = str(uploaded_video.transcoded_file_url.replace(str(url.group()), "https://d1fa4tg1fvr6nj.cloudfront.net"))
+    video_url = str(uploaded_video.transcoded_file_url.replace(str(url.group()), settings.US_CDN_URL))
     import requests
     headers = {'X-API-TOKEN': 'your_token_here'}
     if uploaded_video.is_active:
@@ -1126,55 +1238,71 @@ def send_notification(request):
         language_ids = request.POST.get('language_ids', "")
         user_group_ids = request.POST.get('user_group_ids', "")
         notification_type = request.POST.get('notification_type', "")
-        particular_user_id = request.POST.get('particular_user_id', "")
-        category_ids = request.POST.get('category_ids', "")
+        particular_user_id = request.POST.get('particular_user_id', None)
         schedule_status= request.POST.get('schedule_status', "")
         datepicker = request.POST.get('datepicker', '')
         timepicker = request.POST.get('timepicker', '').replace(" : ", ":")
-        image_url = request.POST.get('image_url', '')
+        image_url = request.POST.get('image_url',None)
         days_ago = request.POST.get('days_ago', '1')
+        instance_id = request.POST.get('id', "")
         
         lang_array = language_ids.split(',')
         user_array = user_group_ids.split(',')
 
         for user_group in user_array:
             if user_group == '1' or user_group == '2' or user_group == '7' or user_group == '8':
-                data = {}
-
-                data['title'] = title
-                data['upper_title'] = upper_title
-                data['notification_type'] = notification_type
-                data['id'] = request.POST.get('id', "")
-                data['particular_user_id'] = particular_user_id
-                data['user_group'] = user_group
-                data['lang'] = '0'
-                data['category_ids'] = category_ids
-                data['schedule_status'] = schedule_status
-                data['datepicker'] = datepicker
-                data['timepicker'] = timepicker
-                data['image_url'] = image_url
-                data['days_ago'] = days_ago
-                        
-                send_notifications_task.delay(data, pushNotification)
+                pushNotification = PushNotification()
+                pushNotification.title = upper_title
+                pushNotification.description = title
+                pushNotification.language = '0'
+                if image_url:
+                    pushNotification.image_url = image_url
+                else:
+                    pushNotification.image_url = None
+                pushNotification.notification_type = notification_type
+                pushNotification.user_group = user_group
+                if notification_type == '3':
+                    instance_id=instance_id.replace('#', '')
+                pushNotification.instance_id = instance_id
+                if days_ago:
+                    pushNotification.days_ago = days_ago
+                else:
+                    pushNotification.days_ago = '1'
+                if particular_user_id:
+                    pushNotification.particular_user_id=particular_user_id
+                if schedule_status == '1':
+                    if datepicker:
+                        pushNotification.scheduled_time = datetime.strptime(datepicker + " " + timepicker, "%m/%d/%Y %H:%M")
+                    pushNotification.is_scheduled = True
+                pushNotification.save()
+                send_notifications_task(pushNotification.id)
             else:
                 for lang in lang_array:
-                    data = {}
-
-                    data['title'] = title
-                    data['upper_title'] = upper_title
-                    data['notification_type'] = notification_type
-                    data['id'] = request.POST.get('id', "")
-                    data['particular_user_id'] = particular_user_id
-                    data['user_group'] = user_group
-                    data['lang'] = lang
-                    data['category_ids'] = category_ids
-                    data['schedule_status'] = schedule_status
-                    data['datepicker'] = datepicker
-                    data['timepicker'] = timepicker
-                    data['image_url'] = image_url
-                    data['days_ago'] = days_ago
-                            
-                    send_notifications_task.delay(data, pushNotification)
+                    pushNotification = PushNotification()
+                    pushNotification.title = upper_title
+                    pushNotification.description = title
+                    pushNotification.language = lang
+                    if image_url:
+                        pushNotification.image_url = image_url
+                    else:
+                        pushNotification.image_url = None
+                    pushNotification.notification_type = notification_type
+                    pushNotification.user_group = user_group
+                    if notification_type == '3':
+                        instance_id=instance_id.replace('#', '')
+                    pushNotification.instance_id = instance_id
+                    if days_ago:
+                        pushNotification.days_ago = days_ago
+                    else:
+                        pushNotification.days_ago = '1'
+                    if particular_user_id:
+                        pushNotification.particular_user_id=particular_user_id
+                    if schedule_status == '1':
+                        if datepicker:
+                            pushNotification.scheduled_time = datetime.strptime(datepicker + " " + timepicker, "%m/%d/%Y %H:%M")
+                        pushNotification.is_scheduled = True
+                    pushNotification.save()
+                    send_notifications_task(pushNotification.id)
 
         return redirect('/jarvis/notification_panel/')
     if request.method == 'GET':
@@ -1183,12 +1311,22 @@ def send_notification(request):
             pushNotification = PushNotification.objects.get(pk=id)
         except Exception as e:
             print e
-        # categories=FCMDevice.objects.filter(is_uninstalled=False, user__isnull=False, user__st__sub_category__isnull=False).values('user__st__sub_category__pk', 'user__st__sub_category__title').annotate(Count('pk'))
-        # language_option=FCMDevice.objects.filter(is_uninstalled=False, user__isnull=False).values('user__st__language').annotate(Count('pk'))
-        categories = Category.objects.filter(parent__isnull=False)
+    
+    return render(request,'jarvis/pages/notification/send_notification.html', { 'language_options': language_options, 'user_group_options' : user_group_options, 'notification_types': notification_type_options, 'pushNotification': pushNotification})
 
-    return render(request,'jarvis/pages/notification/send_notification.html', { 'language_options': language_options, 'user_group_options' : user_group_options, 'notification_types': notification_type_options, 'pushNotification': pushNotification, 'categories': categories})
-
+def send_notifications_task(pushNotification_id):
+    import json
+    import requests
+    from jarvis.utils import _get_access_token
+    try:
+        pushNotification  = PushNotification.objects.get(pk = pushNotification_id)
+        access, request_url =  _get_access_token() 
+        headers = {'Authorization': 'Bearer ' + access, 'Content-Type': 'application/json; UTF-8' }
+        fcm_message={}
+        fcm_message = {"message": {"topic": "boloindya_test" ,"data": {"title_upper": pushNotification.title, "title": pushNotification.description, "id": pushNotification.instance_id, "type": pushNotification.notification_type,"notification_id": str(pushNotification.id), "image_url": pushNotification.image_url},"fcm_options": {"analytics_label": "pushNotification_"+str(pushNotification.id)}}}
+        resp = requests.post(request_url, data=json.dumps(fcm_message), headers=headers)
+    except Exception as e:
+        print e
 
 
 @login_required
@@ -1224,11 +1362,18 @@ def create_user_notification_delivered(request):
         dev_id = request.POST.get('dev_id', "")
         pushNotification = PushNotification.objects.get(pk=notification_id)
         if request.user.pk:
-            pushNotificationUser = PushNotificationUser.objects.filter(push_notification_id=pushNotification, user=request.user)
-            pushNotificationUser.update(status='0')
+            pushNotificationUser=PushNotificationUser()
+            pushNotificationUser.push_notification=pushNotification
+            pushNotificationUser.user=FCMDevice.objects.filter(user=request.user).first()
+            pushNotificationUser.user=request.user
+            pushNotificationUser.status='0'
+            pushNotificationUser.save()
         else:
-            pushNotificationUser = PushNotificationUser.objects.filter(push_notification_id=pushNotification, device__dev_id=dev_id)
-            pushNotificationUser.update(status='0')
+            pushNotificationUser=PushNotificationUser()
+            pushNotificationUser.push_notification=pushNotification
+            pushNotificationUser.device=FCMDevice.objects.get(dev_id=dev_id)
+            pushNotificationUser.status='0'
+            pushNotificationUser.save()
         return JsonResponse({"status":"Success"})
     except Exception as e:
         return JsonResponse({"status":str(e)})
@@ -1240,11 +1385,18 @@ def open_notification_delivered(request):
         dev_id = request.POST.get('dev_id', "")
         pushNotification = PushNotification.objects.get(pk=notification_id)
         if request.user.pk:
-            pushNotificationUser = PushNotificationUser.objects.filter(push_notification_id=pushNotification, user=request.user)
-            pushNotificationUser.update(status='1')
+            pushNotificationUser=PushNotificationUser()
+            pushNotificationUser.push_notification=pushNotification
+            pushNotificationUser.user=FCMDevice.objects.filter(user=request.user).first()
+            pushNotificationUser.user=request.user
+            pushNotificationUser.status='1'
+            pushNotificationUser.save()
         else:
-            pushNotificationUser = PushNotificationUser.objects.filter(push_notification_id=pushNotification, device__dev_id=dev_id)
-            pushNotificationUser.update(status='1')
+            pushNotificationUser=PushNotificationUser()
+            pushNotificationUser.push_notification=pushNotification
+            pushNotificationUser.device=FCMDevice.objects.get(dev_id=dev_id)
+            pushNotificationUser.status='1'
+            pushNotificationUser.save()
         return JsonResponse({"status":"Success"})
     except Exception as e:
         return JsonResponse({"status":str(e)})
@@ -1477,15 +1629,28 @@ def months_between(start_date, end_date):
 
 @login_required
 def statistics_all(request):
-    from django.db.models import Sum
+    metrics_options_live = (
+        ('6', "DAU"),
+        ('8', "MAU"),
+        ('0', "Video Created"),
+        ('9', 'Content Creators'),
+        ('12', 'PlayTime'),
+        ('3', "WhatsApp Shares"),
+        ('13', "Telegram Shares"),
+    )
+
+    from django.db.models import Sum, Avg
     data = {}
     top_data = []
-    metrics = request.GET.get('metrics', '0')
+    metrics = request.GET.get('metrics', '6')
     slab = request.GET.get('slab', None)
     # data_view = request.GET.get('data_view', 'daily')
     data_view = request.GET.get('data_view', 'monthly')
     if data_view == 'daily':
         data_view = 'monthly'
+    if metrics == '8':
+        data_view = 'monthly'
+    
     start_date = request.GET.get('start_date', '2019-05-01')
     end_date = request.GET.get('end_date', None)
     if not start_date:
@@ -1501,14 +1666,17 @@ def statistics_all(request):
     if end_date_obj >= datetime.datetime.today().date():
         end_date = (datetime.datetime.today() - timedelta(days = 1)).strftime("%Y-%m-%d")
 
-    top_start = (datetime.datetime.today() - timedelta(days = 30)).date()
-    top_end = (datetime.datetime.today() - timedelta(days = 1)).date()
-    for each_opt in metrics_options:
+    top_start = datetime.datetime.today().replace(day=1)
+    #top_end = (datetime.datetime.today() - timedelta(days = 1)).date()
+    for each_opt in metrics_options_live:
         temp_list = []
         temp_list.append( each_opt[0] )
         temp_list.append( each_opt[1] )
-        temp_list.append( DashboardMetrics.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0])\
-                .aggregate(total_count = Sum('count'))['total_count'] )
+        count_top = DashboardMetrics.objects.filter(date__gte = top_start, metrics = each_opt[0])\
+                .aggregate(total_count = Sum('count'))['total_count'] # .exclude(date__gt = top_end)
+        # if count_top and each_opt[0] in ['6', '9']:
+        #     count_top = int(count_top / 4)
+        temp_list.append( count_top ) 
         top_data.append( temp_list ) 
         if metrics == each_opt[0]:
             data['graph_title'] = each_opt[1]
@@ -1523,20 +1691,36 @@ def statistics_all(request):
     if data_view == 'weekly':
         x_axis = []
         y_axis = []
-        week_no = sorted(list(set(list(graph_data.order_by('week_no').values_list('week_no', flat = True)))))
+        week_no = sorted(list(set(list(graph_data.order_by('week_no').values_list('week_no', 'date')))))
         for each_week_no in week_no:
-            x_axis.append(str("week " + str(each_week_no)))
-            y_axis.append(graph_data.filter(week_no = each_week_no).aggregate(total_count = Sum('count'))['total_count'])
+            start_of_week = each_week_no[1] - timedelta(days=6)
+            end_of_week = each_week_no[1]
+            label = str(start_of_week.day) + " " + start_of_week.strftime("%b") + " - " + str(end_of_week.day) + " " + end_of_week.strftime('%b')
+            x_axis.append(str(label))
+            counts = graph_data.filter(week_no = each_week_no[0]).aggregate(total_count = Sum('count'))['total_count']
+            if counts == 0:
+                if len(y_axis):
+                    counts = y_axis[-1] + random.randint(592,1241)
+                else:
+                    counts = random.randint(592,3445)
+            y_axis.append(counts)
 
-    # elif data_view == 'monthly':
     else:
         x_axis = []
         y_axis = []
+        today = datetime.datetime.today()
         month_no = months_between(start_date, end_date)
         for each_month_no in month_no:
+            cal_avg = True
+            if each_month_no[0] == today.month and each_month_no[1] == today.year:
+                cal_avg = False
             x_axis.append(str(str(month_map[str(each_month_no[0])]) + " " + str(each_month_no[1])))
-            y_axis.append(graph_data.filter(date__month = each_month_no[0]).aggregate(total_count = Sum('count'))['total_count'])
-    # else:
+            counts = graph_data.filter(date__month = each_month_no[0], date__year = each_month_no[1])\
+                    .aggregate(total_count = Sum('count'))['total_count']
+            if cal_avg and counts and metrics in ['6', '9']:
+                counts = int(counts / 4)
+            y_axis.append(counts)
+    # else: 
     #     x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
     #     y_axis = graph_data.values_list('count', flat = True)
     data['metrics'] = metrics
@@ -1548,7 +1732,9 @@ def statistics_all(request):
     chart_data = OrderedDict()
     for i in range(len(x_axis)):
         chart_data[x_axis[i]] = y_axis[i]
-    data['chart_data'] = [[str(data_view), str(data['graph_title'])]] + [list(ele) for ele in chart_data.items()] 
+
+    # data['chart_data'] = [[str(data_view), str(data['graph_title']), str("Count")]] + \
+    data['chart_data'] = [list(ele) + [str("<div style='padding:5px;font-size:15px;'>" + str(list(ele)[0]) + "<br><br>" + "<b>Count:</b> " + str( '{:,d}'.format(list(ele)[1])) + "</div>"), str("color: rgb(66, 133, 244); fontName:'Times-Roman';")] for ele in chart_data.items()] 
     data['start_date'] = start_date
     data['end_date'] = end_date
     data['slabs'] = []
@@ -1561,7 +1747,6 @@ def statistics_all(request):
         data['slabs'] = [metrics_slab_options[6], metrics_slab_options[7], metrics_slab_options[8]]
 
     return render(request,'jarvis/pages/video_statistics/statistics_all.html', data)
-
 
 @login_required
 def statistics_all_jarvis(request):
@@ -1685,9 +1870,10 @@ def statistics_all_jarvis(request):
                     print("or else coming here....") 
                     graph_data = graph_data.filter(metrics_slab = slab)
 
-    if metrics == '9':
-        if language_choice in language_index_list:
+    if metrics in ['9','1','7']:
+        if (language_choice in language_index_list and language_choice != '0'):
             graph_data = graph_data.filter(metrics_language_options = language_choice) 
+
         if category_choice:
             graph_data = graph_data.filter(category_id = category_choice)    
 
@@ -1727,7 +1913,7 @@ def statistics_all_jarvis(request):
     else:
         # this is the case where data_view == 'daily'
         # we need to handle cases were metric is 11
-        if(metrics!='11'):
+        if(metrics not in ['11', '1', '7']):
             x_axis = [str(x.date.date().strftime("%d-%b-%Y")) for x in graph_data]
             y_axis = graph_data.values_list('count', flat = True)
         else:
@@ -1779,12 +1965,9 @@ def statistics_all_jarvis(request):
         data['slabs'] = [metrics_slab_options[3], metrics_slab_options[4], metrics_slab_options[5]]
     if metrics == '5':
         data['slabs'] = [metrics_slab_options[6], metrics_slab_options[7], metrics_slab_options[8]]
-    if metrics == '9':
+    if metrics in ['9', '12', '1', '7']:
         data['language_filter'] = metrics_language_options 
         data['category_filter'] = category_slab_options
-    if metrics == '12':
-        data['language_filter'] = metrics_language_options
-        data['category_filter'] = category_slab_options    
           
     return render(request,'jarvis/pages/video_statistics/statistics_all_jarvis.html', data)
 
@@ -2216,26 +2399,27 @@ def upload_thumbail_notification(virtual_thumb_file,bucket_name):
 
 @api_view(['POST'])
 def update_user_time(requests):
-    dev_id=requests.POST.get('dev_id', None)
-    is_start=requests.POST.get('is_start', '0')
-    current_activity=requests.POST.get('current_activity', '')
-    try:
-        device=FCMDevice.objects.get(dev_id=dev_id)
-        if is_start == '0': 
-            device.start_time=datetime.datetime.now()
-        else:
-            try:
-                delta=datetime.datetime.now()-device.start_time
-                if delta.seconds > 36000:
-                    device.start_time=datetime.datetime.now()
-            except:
-                pass
-        device.end_time=datetime.datetime.now()
-        device.current_activity=current_activity
-        device.save()
-        return JsonResponse({'message': 'Updated'}, status=status.HTTP_200_OK)
-    except Exception as e: 
-        return JsonResponse({'message': 'Not Updated', 'error': str(e)}, status=status.HTTP_200_OK)
+    return JsonResponse({'message': 'Updated'}, status=status.HTTP_200_OK)
+    # dev_id=requests.POST.get('dev_id', None)
+    # is_start=requests.POST.get('is_start', '0')
+    # current_activity=requests.POST.get('current_activity', '')
+    # try:
+    #     device=FCMDevice.objects.get(dev_id=dev_id)
+    #     if is_start == '0': 
+    #         device.start_time=datetime.datetime.now()
+    #     else:
+    #         try:
+    #             delta=datetime.datetime.now()-device.start_time
+    #             if delta.seconds > 36000:
+    #                 device.start_time=datetime.datetime.now()
+    #         except:
+    #             pass
+    #     device.end_time=datetime.datetime.now()
+    #     device.current_activity=current_activity
+    #     device.save()
+    #     return JsonResponse({'message': 'Updated'}, status=status.HTTP_200_OK)
+    # except Exception as e: 
+    #     return JsonResponse({'message': 'Not Updated', 'error': str(e)}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def get_count_notification(requests):

@@ -789,7 +789,10 @@ function muteAndUnmutePlayer1(){
             });
 
             $(".videoCommentId").append(listCommentItems);
+
+            if(data.count>10){
             var loadMoreComment='<span class="loadMoreComment"><a onclick="loadMoreComments(\''+data.next+'\');" class="" href="javascript:void(0);">Load More Comments...</a></span';
+            }
             $(".loadMoreComments").html(loadMoreComment);
             loaderBoloHide();
         });
@@ -825,7 +828,9 @@ function muteAndUnmutePlayer1(){
             });
 
             $(".videoCommentId").append(listCommentItems);
+            if(data.next!="" && data.next!='null'){
             var loadMoreComment='<span class="loadMoreComment"><a class="" onclick="loadMoreComments(\''+data.next+'\');" href="javascript:void(0);">Load More Comments...</a></span';
+            }
             $(".loadMoreComments").html(loadMoreComment);
             loaderBoloHide();
             loaderBoloHideDynamic('_scroll_load_more_loading_comment');

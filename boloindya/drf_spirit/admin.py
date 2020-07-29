@@ -1,19 +1,19 @@
 
 from django.contrib import admin
-from .models import SingUpOTP, UserJarvisDump, UserFeedback
+from .models import SingUpOTP, UserJarvisDump, UserFeedback, Campaign, Winner
 from forum.user.models import Weight,UserProfile,AppVersion, UserProfile,AndroidLogs, AppPageContent, ReferralCode, ReferralCodeUsed, VideoPlaytime, VideoCompleteRate, UserAppTimeSpend,UserPhoneBook,Contact
 from forum.category.models import Category,CategoryViewCounter
 from import_export.admin import ImportExportModelAdmin,ExportMixin
 from import_export import resources
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
-from .models import UserFollowUnfollowDetails, UserVideoTypeDetails, VideoDetails, UserEntryPoint, UserViewedFollowersFollowing, UserInterest, VideoSharedDetails, UserSearch, UserLogStatistics
+from .models import UserFollowUnfollowDetails, UserVideoTypeDetails, MusicAlbum, VideoDetails, UserEntryPoint, UserViewedFollowersFollowing, UserInterest, VideoSharedDetails, UserSearch, UserLogStatistics
 from django.contrib.auth.models import User
 # from django.db.models import Count, Q
 from forum.topic.models import VBseen
 
-import datetime
 import pytz
 from django.utils import timezone
+from datetime import datetime, timedelta
 from django.contrib.admin.filters import DateFieldListFilter
 from django.utils.translation import gettext_lazy as _
 class CustomDateTimeFilter(DateFieldListFilter):
@@ -23,7 +23,7 @@ class CustomDateTimeFilter(DateFieldListFilter):
         if timezone.is_aware(now):
             now = timezone.localtime(now)
         today = now.date()
-        yesterday = today - datetime.timedelta(days=1)
+        yesterday = today - timedelta(days=1)
         if today.month == 12:
             next_month = today.replace(year=today.year + 1, month=1, day=1)
         else:
@@ -32,19 +32,19 @@ class CustomDateTimeFilter(DateFieldListFilter):
         self.links = (
             (_('Any date'), {}),
             (_('Today'), {
-                self.lookup_kwarg_since: str(datetime.datetime.strptime((today.strftime('%b %d, %Y') + ' 00:00:00'), '%b %d, %Y %H:%M:%S')),
-                self.lookup_kwarg_until: str(datetime.datetime.strptime((today.strftime('%b %d, %Y') + ' 23:59:59'), '%b %d, %Y %H:%M:%S')),
+                self.lookup_kwarg_since: str(datetime.strptime((today.strftime('%b %d, %Y') + ' 00:00:00'), '%b %d, %Y %H:%M:%S')),
+                self.lookup_kwarg_until: str(datetime.strptime((today.strftime('%b %d, %Y') + ' 23:59:59'), '%b %d, %Y %H:%M:%S')),
             }),
             (_('Yesterday'), {
-                self.lookup_kwarg_since: str(datetime.datetime.strptime((yesterday.strftime('%b %d, %Y') + ' 00:00:00'), '%b %d, %Y %H:%M:%S')),
-                self.lookup_kwarg_until: str(datetime.datetime.strptime((yesterday.strftime('%b %d, %Y') + ' 23:59:59'), '%b %d, %Y %H:%M:%S')),
+                self.lookup_kwarg_since: str(datetime.strptime((yesterday.strftime('%b %d, %Y') + ' 00:00:00'), '%b %d, %Y %H:%M:%S')),
+                self.lookup_kwarg_until: str(datetime.strptime((yesterday.strftime('%b %d, %Y') + ' 23:59:59'), '%b %d, %Y %H:%M:%S')),
             }),
             (_('Past 3 days'), {
-                self.lookup_kwarg_since: str(today - datetime.timedelta(days=3)),
+                self.lookup_kwarg_since: str(today - timedelta(days=3)),
                 self.lookup_kwarg_until: str(today),
             }),
             (_('Past 7 days'), {
-                self.lookup_kwarg_since: str(today - datetime.timedelta(days=7)),
+                self.lookup_kwarg_since: str(today - timedelta(days=7)),
                 self.lookup_kwarg_until: str(today),
             }),
             (_('This month'), {
@@ -53,6 +53,12 @@ class CustomDateTimeFilter(DateFieldListFilter):
             }),
         )
 
+class MusicAlbumAdmin(admin.ModelAdmin):
+    list_display = ('id', 'title', 'author_name', 's3_file_path', 'image_path')
+    list_editable = ('title', 'author_name')
+    search_fields = ('title', 'author_name')
+admin.site.register(MusicAlbum, MusicAlbumAdmin)
+
 class UserProfileResource(resources.ModelResource):
     class Meta:
         model = UserProfile
@@ -60,7 +66,7 @@ class UserProfileResource(resources.ModelResource):
         report_skipped = True
         list_filter = ('language','is_popular','is_superstar','is_business')
         fields = ( 'user__username', 'name', 'language', 'bolo_score', 'user__date_joined', 'follow_count', 'follower_count', \
-            'vb_count', 'answer_count', 'share_count', 'like_count')
+            'vb_count', 'answer_count', 'share_count', 'like_count', 'boost_views_count', 'boost_like_count', 'boost_follow_count','boost_span')
 
 class SingUpOTPAdmin(admin.ModelAdmin):
     list_display = ('mobile_no', 'otp', 'is_active', 'created_at', 'used_at', 'is_reset_password', 'is_for_change_phone', 'for_user', )
@@ -132,22 +138,32 @@ admin.site.register(User, UserAdmin)
 class UserProfileAdmin(ImportExportModelAdmin):
     search_fields = ('user__username', 'user__email', 'name', 'mobile_no', 'paytm_number')
     list_display = ('user', 'name', 'language', 'bolo_score', 'follow_count', 'follower_count', 'vb_count', 'answer_count', \
-        'share_count', 'like_count', 'is_popular','is_superstar', 'is_business')
-    list_editable = ('is_popular','is_superstar', 'is_business', 'language')
+        'share_count', 'like_count', 'is_popular','is_superstar', 'is_business', 'boost_views_count', 'boost_like_count', 'boost_follow_count','boost_span')
+    list_editable = ('is_popular','is_superstar', 'is_business', 'language', 'boost_views_count', 'boost_like_count', 'boost_follow_count','boost_span')
     list_filter = ('user__date_joined', ('user__date_joined', DateRangeFilter), 'language','is_popular','is_superstar', 'is_business')
     resource_class = UserProfileResource
+
+    def save_model(self, request, obj, form, change): 
+        if 'boost_views_count' in form.changed_data or 'boost_like_count' in form.changed_data or 'boost_follow_count' in form.changed_data or 'boost_span' in form.changed_data:
+            obj.boosted_time = datetime.now()
+            obj.save()
+        super(UserProfileAdmin,self).save_model(request, obj, form, change)
+
 admin.site.register(UserProfile,UserProfileAdmin)
 
 class ReferralCodeAdmin(admin.ModelAdmin):
+    list_per_page = 50
     change_list_template = "admin/forum_user/referralcode/change_list.html"
-    list_display = ('for_user', 'get_paytm_number', 'code', 'purpose', 'is_active', 'get_downloads', 'get_signup', 'playstore_url', \
-            'no_playstore_url', 'created_at')
-    list_filter = ('code', 'is_active', 'is_refer_earn_code', ('refcode__created_at', CustomDateTimeFilter), ('refcode__created_at', DateRangeFilter) )
+    list_display = ('for_user', 'get_paytm_number', 'code', 'purpose', 'is_active', 'playstore_url', \
+            'no_playstore_url', 'created_at') # 'get_downloads', 'get_signup'
+    # list_filter = ('code', 'is_active', 'is_refer_earn_code', ('refcode__created_at', CustomDateTimeFilter), ('refcode__created_at', DateRangeFilter) )
     search_fields = ('code', 'for_user__username', 'for_user__email', 'for_user__st__name', 'for_user__st__mobile_no', 'for_user__st__paytm_number')
 
+    """
     def changelist_view(self, request, *args, **kwargs):
         self.request = request
         return super(ReferralCodeAdmin, self).changelist_view(request, *args, **kwargs)
+    """
 
     # def get_queryset(self, request):
     #     queryset = super(ReferralCodeAdmin, self).get_queryset(request)
@@ -157,8 +173,8 @@ class ReferralCodeAdmin(admin.ModelAdmin):
     #     )
     #     return queryset
 
-    def get_ordering(self, request):
-        return ('-signup_count', )
+    #def get_ordering(self, request):
+    #    return ('-signup_count', )
 
     def get_paytm_number(self, obj):
         if obj.for_user:
@@ -166,6 +182,7 @@ class ReferralCodeAdmin(admin.ModelAdmin):
         return '-'
     get_paytm_number.short_description = 'Paytm Number'
 
+    """
     def get_downloads(self, obj):
         if self.request.GET.get('refcode__created_at__gte') or self.request.GET.get('refcode__created_at__lte') \
                 or self.request.GET.get('refcode__created_at__lt'):
@@ -211,6 +228,7 @@ class ReferralCodeAdmin(admin.ModelAdmin):
     get_signup.short_description = 'Signup'
     get_signup.allow_tags = True
     get_signup.admin_order_field = 'signup_count'
+    """
 
 admin.site.register(ReferralCode, ReferralCodeAdmin)
 
@@ -289,6 +307,13 @@ class UserFeedbackAdmin(admin.ModelAdmin):
     #     context['adminform'].form.fields['by_user'].queryset = User.objects.filter(st__is_test_user = False)
     #     return super(UserFeedbackAdmin, self).render_change_form(request, context, *args, **kwargs)
 
+class CampaignAdmin(admin.ModelAdmin):
+    list_display = ('hashtag', 'is_active', 'active_from', 'active_till', 'is_winner_declared')
+    raw_id_fields = ('hashtag', 'next_campaign_hashtag')
+
+class WinnerAdmin(admin.ModelAdmin):
+    raw_id_fields = ['user']        
+
 admin.site.register(AppVersion)
 admin.site.register(CategoryViewCounter)
 admin.site.register(AndroidLogs, AndroidLogsAdmin)
@@ -311,4 +336,6 @@ admin.site.register(VideoCompleteRate)
 admin.site.register(UserAppTimeSpend)
 admin.site.register(UserPhoneBook)
 admin.site.register(Contact)
+admin.site.register(Campaign, CampaignAdmin)
+admin.site.register(Winner, WinnerAdmin)
 

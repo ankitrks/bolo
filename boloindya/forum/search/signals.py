@@ -58,7 +58,7 @@ class BaseSignalProcessor(object):
         Given an individual model instance, determine which backends the
         delete should be sent to & delete the object on those backends.
         """
-        instance.refresh_from_db()
+        # instance.refresh_from_db()
         using_backends = self.connection_router.for_write(instance=instance)
 
         for using in using_backends:

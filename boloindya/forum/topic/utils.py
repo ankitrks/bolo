@@ -35,7 +35,7 @@ def get_redis_vb_seen(user_id):
     vb_seen_list = get_redis(key)
     if not vb_seen_list:
         vb_seen_list = list(VBseen.objects.filter(user_id = user_id).distinct('topic_id').values_list('topic_id', flat = True))
-        set_redis(key, vb_seen_list)
+        set_redis(key, vb_seen_list, False)
     return vb_seen_list
 
 def update_redis_vb_seen(user_id, topic_id):
@@ -45,7 +45,7 @@ def update_redis_vb_seen(user_id, topic_id):
         vb_seen_list = list(VBseen.objects.filter(user_id = user_id).distinct('topic_id').values_list('topic_id', flat = True))
     if int(topic_id) not in vb_seen_list:
         vb_seen_list.append(int(topic_id))
-    set_redis(key, vb_seen_list)
+    set_redis(key, vb_seen_list, False)
 
 def get_ranking_feature_weight(feature):
     ranking_feature, is_created = RankingWeight.objects.get_or_create(features = feature)
@@ -54,38 +54,43 @@ def get_ranking_feature_weight(feature):
 ## for vb_score sorted video in single category and language ##
 
 def get_redis_data(key, query, page_no):
-    topic_ids = []
-    topics = []
-    if not page_no:
-        page_no = 1
-    paginated_data = get_redis(key)
-    if not paginated_data:
-        paginated_data = update_redis_paginated_data(key, query)
-    if paginated_data and (str(page_no) in paginated_data.keys() or 'remaining' in paginated_data.keys()):
-        if str(page_no) in paginated_data.keys():
-            topic_ids = paginated_data[str(page_no)]['id_list']
-            topics = Topic.objects.filter(pk__in = topic_ids, is_removed = False)
-        elif 'remaining' in paginated_data.keys():
-            last_page_no = int(paginated_data['remaining']['last_page'])
-            try:
-                last_page_data = paginated_data[str(last_page_no)]
-            except:
-                last_page_data = paginated_data[last_page_no]
-            topics = query.exclude(id__in = last_page_data['id_list']).filter(vb_score__lte = last_page_data['scores'][-1])
-            new_page = page_no - last_page_no #(191-190)
+    try:
+        topic_ids = []
+        topics = []
+        if not page_no:
+            page_no = 1
+        paginated_data = get_redis(key)
+        if not paginated_data:
+            paginated_data = update_redis_paginated_data(key, query)
+        if paginated_data and (str(page_no) in paginated_data.keys() or 'remaining' in paginated_data.keys()):
+            if str(page_no) in paginated_data.keys():
+                topic_ids = paginated_data[str(page_no)]['id_list']
+                topics = Topic.objects.filter(pk__in = topic_ids, is_removed = False).order_by('-vb_score')
+            elif 'remaining' in paginated_data.keys():
+                last_page_no = int(paginated_data['remaining']['last_page'])
+                try:
+                    last_page_data = paginated_data[str(last_page_no)]
+                except:
+                    last_page_data = paginated_data[last_page_no]
+                topics = query.exclude(id__in = last_page_data['id_list']).filter(vb_score__lte = last_page_data['scores'][-1])
+                new_page = page_no - last_page_no #(191-190)
+                paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
+                if paginator.num_pages >= new_page:
+                    topics = paginator.page(new_page)
+                else:
+                    topics = []
+        else:
+            topics =  query.order_by('-vb_score')
             paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
-            if paginator.num_pages >= new_page:
-                topics = paginator.page(new_page)
+            if paginator.num_pages >= page_no:
+                topics = paginator.page(page_no)
             else:
                 topics = []
-    else:
-        topics =  query.order_by('-vb_score')
-        paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
-        if paginator.num_pages >= page_no:
-            topics = paginator.page(page_no)
-        else:
-            topics = []
-    return topics
+        return topics
+    except Exception as e:
+        print "Error in get redis data:",str(e)
+        return []
+
 
 def get_redis_category_paginated_data(language_id, category_id, page_no):
     key = 'cat:'+str(category_id)+':lang:'+str(language_id)
@@ -100,12 +105,15 @@ def get_redis_language_paginated_data(language_id, page_no):
     return get_redis_data(key, query, page_no)
 
 def get_redis_follow_paginated_data(user_id, page_no):
-
+    all_seen_vb = []
     key = 'follow_post:'+str(user_id)
     all_follower = get_redis_following(user_id)
     category_follow = UserProfile.objects.get(user_id = user_id).sub_category.all().values_list('pk', flat = True)
+    if user_id:
+        all_seen_vb = get_redis_vb_seen(user_id)
     query = Topic.objects.filter(Q(user_id__in = all_follower)|Q(m2mcategory__id__in = category_follow, \
-        language_id = UserProfile.objects.get(user_id = user_id).language), is_vb = True, is_removed = False).order_by('-vb_score')
+        language_id = UserProfile.objects.get(user_id = user_id).language), is_vb = True, is_removed = False, is_popular = False)\
+        .exclude(pk__in = all_seen_vb).order_by('-vb_score')
     return get_redis_data(key, query, page_no)
 
 def get_popular_paginated_data(user_id, language_id, page_no):
@@ -114,7 +122,7 @@ def get_popular_paginated_data(user_id, language_id, page_no):
     if user_id:
         all_seen_vb = get_redis_vb_seen(user_id)
     query = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, is_popular = True)\
-        .exclude(pk__in = all_seen_vb).order_by('-vb_score')
+        .exclude(pk__in = all_seen_vb).order_by('-id', '-vb_score')
     return get_redis_data(key, query, page_no)
 
 def update_redis_paginated_data(key, query, cache_max_pages = settings.CACHE_MAX_PAGES_REAL_TIME):
@@ -126,7 +134,7 @@ def update_redis_paginated_data(key, query, cache_max_pages = settings.CACHE_MAX
     page = 1
     final_data = {}
     exclude_ids = []
-    topics_df = pd.DataFrame.from_records(query.order_by('-vb_score').values('id', 'user_id', 'vb_score'))
+    topics_df = pd.DataFrame.from_records(query.values('id', 'user_id', 'vb_score'))
     if topics_df.empty:
         final_data[page] = {'id_list' : [], 'scores' : []}
     else:
@@ -163,7 +171,7 @@ def update_redis_paginated_data(key, query, cache_max_pages = settings.CACHE_MAX
                     final_data['remaining'] = {'remaining_count' : remaining_count, 'last_page' : page - 1}
                     page = None
                 page = None
-    set_redis(key, final_data)
+    set_redis(key, final_data, True)
     if key:
         return get_redis(key)
     return final_data
@@ -198,7 +206,7 @@ def get_redis_hashtag_paginated_data(language_id, hashtag_id, page_no):
                 topics = []
     else:
         topics = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, \
-            hash_tags__id = hashtag_id).order_by('-vb_score')
+            hash_tags__id = hashtag_id).order_by('-id', '-vb_score')
         paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
         if paginator.num_pages >= page_no:
             topics = list(paginator.page(page_no))
@@ -248,4 +256,35 @@ def update_redis_hashtag_paginated_data(language_id, extra_filter, cache_max_pag
         return final_data
     except:
         return {}
+
+
+def update_redis_vb_seen_entries(topic_id,user_id,created_at):
+    key = 'vb_entry:'+str(topic_id)+':'+str(user_id)
+    vb_entry_list = get_redis(key)
+    if not vb_entry_list:
+        vb_entry_list = []
+    vb_entry_list.append({'user_id':user_id,'topic_id':topic_id,'created_at':created_at})
+    set_redis(key, vb_entry_list, False)
+
+
+def update_redis_fcm_device_entries(dev_id,data_dict):
+    key = 'fcm_device:'+str(dev_id)
+    fcm_request_list = get_redis(key)
+    if not fcm_request_list:
+        fcm_request_list = []
+    fcm_request_list.append(data_dict)
+    set_redis(key, fcm_request_list, False)
+
+def set_redis_fcm_token(user_id,fcm_token):
+    key = 'fcm_token:'+str(user_id)
+    set_redis(key, fcm_token, False)
+
+def get_redis_fcm_token(user_id):
+    key = 'fcm_token:'+str(user_id)
+    return get_redis(key)
+
+def delete_redis_fcm_token(user_id):
+    key = 'bi:fcm_token:'+str(user_id)
+    delete_redis(key)
+
 

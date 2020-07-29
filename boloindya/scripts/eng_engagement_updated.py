@@ -14,6 +14,9 @@ import pandas as pd
 import gc
 import decimal
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
+from drf_spirit.utils import create_random_user
+from forum.user.utils.bolo_redis import update_profile_counter
+
 
 def run():
     counter_objects_created=0
@@ -80,11 +83,14 @@ def run():
             elif each_seen.date +timedelta(hours=21) < now and each_seen.view_count < int(750*multiplication_factor):
                 number_seen = random.randrange(1,int(750*multiplication_factor)-each_seen.view_count)
             else:
-                number_seen = 1
+                number_seen = 0
             i = 0
-            print number_seen
-            Topic.objects.filter(pk=each_seen_id).update(view_count = F('view_count')+number_seen)
-            profile_updation = UserProfile.objects.filter(user = Topic.objects.get(pk=each_seen_id).user).update(own_vb_view_count = F('own_vb_view_count')+number_seen, view_count = F('view_count')+number_seen)
+            if number_seen:
+                print number_seen
+                Topic.objects.filter(pk=each_seen_id).update(view_count = F('view_count')+number_seen)
+                FVBseen.objects.create(topic_id = each_seen_id, view_count = number_seen)
+                profile_updation = UserProfile.objects.filter(user_id = Topic.objects.get(pk=each_seen_id).user_id).update(own_vb_view_count = F('own_vb_view_count')+number_seen, view_count = F('view_count')+number_seen)
+                update_profile_counter(Topic.objects.get(pk=each_seen_id).user_id,'view_count',number_seen,True)
             print "after: views updation",datetime.now()
             print "total created: ", number_seen
             print "before: like creation",datetime.now()
@@ -101,65 +107,6 @@ def run():
             pass
 
 
-    test_counter=0
-    for each_topic_id in last_n_days_post_ids:
-        test_counter+=1
-        print test_counter,"/",len(last_n_days_post_ids)
-        action_type =['seen','comment','like','follow','share','comment_like']
-        opt_action = random.choice(action_type)
-        opt_action_user_id = random.choice(user_ids)
-        if opt_action =='comment':
-            print "before: comment creation",datetime.now()
-            # action_comment(opt_action_user_id,each_topic_id)
-            print "after: comment creation",datetime.now()
-        elif opt_action == 'like':
-            each_topic = Topic.objects.get(pk=each_topic_id)
-            if each_topic.likes_count<each_topic.view_count/random.randrange(10,21) and each_topic.likes_count < each_topic.view_count:
-                action_like(opt_action_user_id,each_topic_id)
-        elif opt_action == 'follow':
-            action_follow(opt_action_user_id,Topic.objects.get(pk=each_topic_id).user.id)
-        elif opt_action == 'share':
-            action_share(opt_action_user_id,each_topic_id)
-        # elif opt_action == 'comment_like':
-        #     all_comment_list_id = Comment.objects.filter(is_removed=False).values_list('user_id',flat=True)
-        #     comment_ids = list(all_comment_list_id)
-        #     comment_ids = random.sample(comment_ids,50)
-        #     all_comment = Comment.objects.filter(pk__in =comment_ids)
-        #     for each_comment in all_comment:
-        #         action_comment_like(opt_action_user_id,each_comment)
-        elif opt_action == 'seen':
-            action_seen(opt_action_user_id,each_topic_id)
-
-    print "######## start random action   ###########",datetime.now()
-    random_test_counter=0
-    for each_topic_id in actionable_ids:
-        random_test_counter+=1
-        print random_test_counter,"/",len(actionable_ids)
-        action_type =['seen','comment','like','follow','share','comment_like']
-        opt_action = random.choice(action_type)
-        opt_action_user_id = random.choice(user_ids)
-        if opt_action =='comment':
-            print "before: comment creation",datetime.now()
-            # action_comment(opt_action_user_id,each_topic_id)
-            print "after: comment creation",datetime.now()
-        elif opt_action == 'like':
-            each_topic = Topic.objects.get(pk=each_topic_id)
-            if each_topic.likes_count<each_topic.view_count/random.randrange(10,21) and each_topic.likes_count < each_topic.view_count:
-                action_like(opt_action_user_id,each_topic_id)
-        elif opt_action == 'follow':
-            action_follow(opt_action_user_id,random.choice(User.objects.all()).id)
-        elif opt_action == 'share':
-            action_share(opt_action_user_id,each_topic_id)
-        # elif opt_action == 'comment_like':
-        #     all_comment_list_id = Comment.objects.filter(is_removed=False).values_list('user_id',flat=True)
-        #     comment_ids = list(all_comment_list_id)
-        #     comment_ids = random.sample(comment_ids,50)
-        #     all_comment = Comment.objects.filter(pk__in =comment_ids)
-        #     for each_comment in all_comment:
-        #         action_comment_like(opt_action_user_id,each_comment)
-        elif opt_action == 'seen':
-            action_seen(opt_action_user_id,each_topic_id)
-
     print "End Time Eng_Engagment: ",datetime.now()
 
 
@@ -168,93 +115,58 @@ def check_like(topic_id,user_ids):
     now = datetime.now()
     each_like = Topic.objects.get(pk=topic_id)
     already_like = list(Like.objects.filter(topic_id = topic_id).values('user_id','topic_id'))
+    already_like_user = []
+    for each_like_dict in already_like:
+        already_like_user.append(each_like_dict['user_id'])
     user_want_like=[]
     new_vb_like =[]
     to_be_created_bolo=[]
     notific_dic= []
-    # if each_like.user.st.is_superstar:
-    #     random_counter = int(each_like.view_count*(decimal.Decimal(random.randrange(1300, 2010))/100)/100)
-    #     print "i am superstar: ",random_counter
-    # elif each_like.user.st.is_popular and not each_like.user.st.is_superstar:
-    #     random_counter = int(each_like.view_count*(decimal.Decimal(random.randrange(800, 1210))/100)/100)
-    #     print "i am popular: ",random_counter
-    # elif not each_like.user.st.is_popular and not each_like.user.st.is_superstar:
-    #     random_counter = int(each_like.view_count*(decimal.Decimal(random.randrange(500, 710))/100)/100)
-    #     print "i am normal: ",random_counter
-    # else:
-    #     random_counter = 1
-    #     print "i am non popular: ",random_counter
     number_like = int(int((each_like.vb_playtime/60)/1.5)*decimal.Decimal(random.randrange(30, 50))/100)
     print number_like,"$^#^&$&!$^!$*#$*",each_like.vb_playtime,each_like.id
 
     print number_like,"required_like"
     if number_like:
-        # if each_like.date +timedelta(minutes=10) > now and random_counter > 100 and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(6,random_counter)
-        # elif each_like.date +timedelta(minutes=10) < now and each_like.date +timedelta(minutes=30) > now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(100,random_counter-each_like.likes_count)
-        # elif each_like.date +timedelta(minutes=30) < now and each_like.date +timedelta(hours=2) > now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
-        # elif each_like.date +timedelta(hours=2) < now and each_like.date +timedelta(hours=4) > now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
-        # elif each_like.date +timedelta(hours=4) < now and each_like.date +timedelta(hours=6) > now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
-        # elif each_like.date +timedelta(hours=6) < now and each_like.date +timedelta(hours=8) > now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
-        # elif each_like.date +timedelta(hours=10) < now and each_like.date +timedelta(hours=12) > now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
-        # elif each_like.date +timedelta(hours=12) < now and each_like.date +timedelta(hours=14) > now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
-        # elif each_like.date +timedelta(hours=14) < now and each_like.date +timedelta(hours=16) > now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
-        # elif each_like.date +timedelta(hours=16) < now and each_like.likes_count < random_counter:
-        #     number_like = random.randrange(1,random_counter-each_like.likes_count)
-        # else:
-        #     number_like = 1
-
         i = 0
-        while i < number_like:
-            try:
-                opt_action_user_id = random.choice(user_ids)
-                user_want_like.append({'user_id':opt_action_user_id,'topic_id':topic_id})
-                i += 1
-            except:
-                pass
+        user_ids = list(UserProfile.objects.filter(is_test_user=True).exclude(user_id__in=already_like_user).values_list('user_id',flat=True)[:number_like])
+        i = 0
+        for each_id in user_ids:
+            user_want_like.append({'user_id':each_id,'topic_id':topic_id})
         print number_like,"number_like"
         if user_want_like:
             score = get_weight('liked')
-            if score > 0:
-                vb_like_type = ContentType.objects.get(app_label='forum_topic', model='like')
-                new_vb_like = find_set_diff(user_want_like,already_like,['user_id','topic_id'])
-                if new_vb_like:
-                    aList = [Like(**vals) for vals in new_vb_like]
-                    newly_created = Like.objects.bulk_create(aList, batch_size=10000)
-                    Topic.objects.filter(pk=topic_id).update(likes_count = F('likes_count')+len(new_vb_like))
-                    bolo_increment_user_id = [x['user_id'] for x in new_vb_like]
-                    bolo_increment_user = UserProfile.objects.filter(user_id__in = bolo_increment_user_id ).update(bolo_score =F('bolo_score')+score,like_count = F('like_count')+1)
-                    already_liked = list(Like.objects.filter(topic_id = topic_id,user_id__in=[d['user_id'] for d in new_vb_like]).values('user_id','id'))
-                    for each in already_liked:
-                        each['action_object_id'] = each['id']
-                        del each['id']
-                    to_be_created_bolo= already_liked
+            vb_like_type = ContentType.objects.get(app_label='forum_topic', model='like')
+            new_vb_like = user_want_like
+            if new_vb_like:
+                aList = [Like(**vals) for vals in new_vb_like]
+                newly_created = Like.objects.bulk_create(aList, batch_size=10000)
+                Topic.objects.filter(pk=topic_id).update(likes_count = F('likes_count')+len(new_vb_like))
+                bolo_increment_user_id = [x['user_id'] for x in new_vb_like]
+                bolo_increment_user = UserProfile.objects.filter(user_id__in = bolo_increment_user_id ).update(bolo_score =F('bolo_score')+score,like_count = F('like_count')+1)
+                already_liked = list(Like.objects.filter(topic_id = topic_id,user_id__in=[d['user_id'] for d in new_vb_like]).values('user_id','id'))
+                for each in already_liked:
+                    each['action_object_id'] = each['id']
+                    del each['id']
+                to_be_created_bolo= already_liked
+                notific_dic = copy.deepcopy(to_be_created_bolo)
+                if score > 0:
                     action = get_weight_object('liked')
-                    notific_dic = copy.deepcopy(to_be_created_bolo)
                     for each_bolo in to_be_created_bolo:
                         each_bolo['action'] = action
                         each_bolo['score'] = score
                         each_bolo['action_object_type'] = vb_like_type
                     aList = [BoloActionHistory(**vals) for vals in to_be_created_bolo]
                     newly_bolo = BoloActionHistory.objects.bulk_create(aList, batch_size=10000)
-                    for each in notific_dic:
-                        each['topic_id']=each['action_object_id']
-                        del each['action_object_id']
-                        each['topic_type']=vb_like_type
-                        each['for_user_id']=each_like.user.id
-                        each['notification_type']='5'
-                    aList = [Notification(**vals) for vals in notific_dic]
-                    notify = Notification.objects.bulk_create(aList)
-                    aList=None
-                    print "notfic completed"
+                for each in notific_dic:
+                    each['topic_id']=each['action_object_id']
+                    del each['action_object_id']
+                    each['topic_type']=vb_like_type
+                    each['for_user_id']=each_like.user.id
+                    each['notification_type']='5'
+                aList = [Notification(**vals) for vals in notific_dic]
+                notify = Notification.objects.bulk_create(aList)
+                aList=None
+                print "notfic completed"
 
         share_counter = each_like.total_share_count
         required_share = int(number_like*(random.randrange(500, 700)/100)/100)
@@ -342,11 +254,32 @@ def check_follower(topic_id,user_ids):
         required_follower = 1
 
     follower_counter = 0
-    while(follower_counter<required_follower):
-        opt_action_user_id = random.choice(user_ids)
-        action_follow(opt_action_user_id,topic.user.id)
-        follower_counter+=1
+    all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).exclude(user_id__in=get_redis_follower(topic.user.id)).values_list('user_id',flat=True)[:required_follower]
+    if len(all_test_userprofile_id) < required_follower:
+        print 'user_created:',required_follower-len(all_test_userprofile_id)
+        create_random_user(required_follower-len(all_test_userprofile_id))
+        all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).exclude(user_id__in=get_redis_follower(topic.user.id)).values_list('user_id',flat=True)[:required_follower]
+    user_ids = list(all_test_userprofile_id)
+    # for each_user_id in user_ids:
+    #     status = action_follow(each_user_id,topic.user.id)
+    #     if status:
+    #         follower_counter+=1
 
+    to_be_created_follow = []
+    score = get_weight('followed')
+    for each_user_id in user_ids:
+        my_dict={}
+        my_dict['user_follower_id'] = each_user_id
+        my_dict['user_following_id'] = userprofile.user_id
+        to_be_created_follow.append(my_dict)
+    total_created=len(to_be_created_follow)
+    aList = [Follower(**vals) for vals in to_be_created_follow]
+    newly_bolo = Follower.objects.bulk_create(aList, batch_size=10000)
+    print total_created
+    UserProfile.objects.filter(pk=userprofile.id).update(follower_count=F('follower_count')+total_created,bolo_score=F('bolo_score')+(score*total_created))
+    get_redis_following(userprofile.user_id)
+    get_redis_follower(userprofile.user_id)
+    update_profile_counter(userprofile.user_id,'follower_count',total_created, True)
 #comment
 def action_comment(user_id,topic_id):
     comment_list = ["Good way of making people understand","Your videos really help.","Your depth and understanding is commendable...you are doing a great job..stay blessed","Very very helpful, thank you","Thanks for the effort.","i really apperciate your wonderful explanation","thank you  for your research on topic.....respect....!!!!!!","Very informative ","Actually , your voice soothes mind","Thank you for your time on the research and explain on this topic. Impressive !","Thanks a lot to You !!","ur way of explaining issues is quiet different. So easy","Extremely good brief explanation","great explaination thank you for your efforts","Wow, it was an amazing explanation","Quite insightful","Thank you very much .. U gav me exactly what i was looking for","thanks fr making me understand so nicely.","These are so informative and clearing out all basic confusions","Hello... I am following all your videos","Thanks you so much  for creating my interest on studies","I am so thankful to you for providing such information","I appreciate your method to avail us such information.","you are just wonderful... thank you so much.","Thankyou so much for the great great great explanation ","Great job ...really I watched your video so carefully and honestly........ Thank you ","Well Done, very informative video with all details. keep it up brother","feeling blessed to see your videos. Love.","Very well explained, made easy to understand,, Thank you so much","This video is awesome and thanks for it.","One of the best content video available for this issue!","Thanks a tone for making such efforts.","Truly liked this","Nicely presented, this lecture made clear understanding !","Every concept explained in a very lucid way.Great great great video","u always make amazing videos","Thank you so much  ji","You are a good, knowledged person..... We have been learning from your brain, thank you for the efforts..","This is very interesting knowledge for me..I think all people. Thanks.","Very well explained, thank you","Thanks mate u have great knolwedge sharing skills","U make everything really easy to understand","u have cleared our whole concept regarding the issue thanks a lot for this","ur learning journey fruitful day by day","Excellent explaination and superb sequence selection.","No one can explain with this conviction , thank you","keep the work going","Very informative lecture","Awesome video... searching for such type of knowledgeable video","I really like your video very much","u r great I like so much this video","I am happy that your good knowledge","Very nice video. Very clear and detailed explanation. Thank you for this","The video is really explanatory. Very good work","Incredibly you shared the knowledge and view","Very informative and helpful video. Please keep it up","Could you please provide more of this type video","Very interesting and informative","Very interesting and informative","Your narrative version is imppecable...too good explaination","nice analysis keep it up","Thanks . Well explained","Point to point... thank you so much","This video is so good and easy to understand","Thank you ..... for giving this video","Superrrrrrrb. thanks for making this type of marvelous video.keep it up","Very good lecture,Thanks for sharing knowledge.","I salute your dedication .. great video...","You explain it very coherently thanks.","Your videos are very informative... Thanks","Very informative and neutral view good job","Excellent.Thankyou ","Explained very clear ...thank you.","I'm extremely thankful for these amazing videos that u make","Very informative..keep them going","Very informative & explained in a lucid manner.","very detailed explanation for a very complex topic","Fantastic video good knowledge provided by you hats off to you","nice video with full of information and understandable.","One of the best video of study","Thanxs  for giving such a nice knowledge.","wonderful explanation...","very nice explanation... doubts cleared","Well explained, most of the topics covered lucidly.","Interestingly ending the topic for peaceful resolution is appreciated.","Very beutifully explained .Hatts off....Great....","Fantastic,nicely explained.","Thanks for best Presentation.","Brilliant job dear","The video was very informative","Very well described . Thanks","Very nice video ....clear understanding of the topic..","Very informative video. Hats off to you.","You are doing a tremendous job.","appreciate your efforts your narrating is best","great source of information.","very good knowledge ","thanks for the video, very informative for all of us….","Excellent...cleared all the doubts","amazing course superb way of explaining things Impressive voice","nice love you all members please keep it up ????","very informative","fantastic explaining gestures u have!!!! made me fall for your content!!! bestie for future love to get in touch with ur positivity","really awesome","thank you ","Superb","Great!","so...nice","good knowledge","interesting","Thank you so much Ma'am","its very usefull","fine , it is good for gk","Thank you so much mam this is really great explain","Great job! thank you","Good work","It's very useful","it's a fantastic initiative......for learners.","realy it is more useful..","excellent teaching skill and the way is very interesting for understanding ,good job","beautiful presentation. enjoying the new approach to learning. thank you","it's always good to know this things thankyou please continue.","Thanks alot mam.... Unbelievable things I came to know","ur voice...wowwww","Very nice piece of information. Its Amazing !!","interesting .. good teaching...","awesome video, very interesting","wonderfully explained..!","Thanks good info","wow... amazing teaching","quite interesting","Mind blowing.....","interesting...","Gr8 JOB!","perfectly explained . very clear..👍","it's beneficial for us way it taught make good","Wonderful","Very nicely explained... Please keep enriching our knowledge with this daily trivia plan..!!!","cool...","interesting thank for the knowledge","Excellent....","awesome","knowledge is the door of the oppertunity to something get new","wow its really amazing","its so great","excellent!, ur pronunciation and teaching method are so good..... when watching this i really enjoyed.","it is wonderful....","thanks a lot","awesome graphics , awesome presentation.","Information as well as presentation both were superb. Thanks","Just wow..","love the the way u teach","I would like. please continue this course. thanks again.","amazing","Nice lactur","Excellent Explain.","I like the way u learn bcoz it's Very easy to understand nd interesting also thanks keep Guiding","Thank you so much","some point but describe easily all..best way I think it's lajawab..have. a good day..","I started today only. but I am like addicted I kept on going","Your voice made me to love the reading and learning the comoplex concepts in crystal clear .","I hv never commented till date, but must praise ur way of eliminating options n getting answers.... Superb man! N yes ur voice is the best i hv ever heard","What a voice !!!","Amazing explanation.thanks :-)","U r so talented., I just can't believe u know so many facts.. Are u a cimputed or an encyclopedia","Explanation is good","Believe me you are a genius......!!!","love ur explanation n you voice too","lovely, what an explanation.Boring things even become easier in this way","way you explain it's great and your voice so innocent..","Awesome explanation!!!","I like the sound of ur accent","Superb .. no words... Brilliant 😊","Ur voice !! And obviously very good video. Thumbs up to your dedication for helping us","thanks alot , it will really help me","great job","Bdw good explanation though..","What a voice 😍","Got to know how we have to look into a question and element the wrong one's.. thanks you","what are the points one must note or study","it's a great technique","Very informative video","wow ! thanks","great work ","thank you so much....","Your way of explaining is too good to leave","Nice ","Great, more helpful","really useful","very nice ","you really have a nice voice","Outstanding pure worth to watch this video","Good job ...","too good","Nice","Thank you so much  please aisi video or banaye","Nice explanation with logic ...","more usefull information","your voice sounds like experiance guy"," your voice is too good....","Voice 👌👌","Wonderful explanation...","Ur superb ","wow, I need these types of video more.","great analysis...waiting for next videos..thanks","brilliant!!👌","Nice explaination !","awesome video","u hav an amazing voice ....just makes me do study hard .","u explains amazingly amazing........","Nicely explained. ...........","Super teaching","Thank you very much.....","Pleasant voice 👍👍👍","It make lot of sense...","thank you ! please help with other sections also.","This was great , I mean seriously the best !","excellent clarification ","Great explanation with clear pronunciation.","good ","Awesome buddy","thnx .. keep up the good work","thankyou","Your voice very sweet and english is very perfect wao nice"," plz makes more videos on this... Plz..","Thank you very much  for a wonderful and clear explanation. Btw your voice is very pleasant. Everyone gets addicted to your voice.","Ur way of explaining things is really good..","pure explanation","Yeh !! Thanks ","Great Effort ... Thanku!!!","Plz bring more such types of analysation","Blessed with mesmerizing voice","thanks please upload some more videos of same","Gud job ya","It's easyyyyy","Thank you  more update","Nicely explained and Oh My God..the voice..amazing bro.... keep it up...need more videos","Superb  I'm speechless","THANK You! So much , helping us with your great idea, Now i understand!! Really helpful!","Shaandaar explanation Thanks ","Amazing..... :)","you are a gem... 😊😊","thank you . its really helpful","u r absolutely marvelous....","perfect","Your all videos are outstanding ","great explanation....... i learnt how to related different things to reach destinations........... thankyou ","this is brilliant keep it coming !","Gr8","One of the Best analysis I have ever seen .. n what a charismatic voice !! Too good","explaning it in less time.. is also beneficial for us thank for it....","gud job..appreciations...","I have seen all your videos. They are amazing. This is something that reached my expectations after a lot of ground work.","Excellent work . Thank you so much. Please do more videos covering all the subjects. Thank you :)","Awesome ...gr8 job ur1 hlping lot of students...","ur nailed it bro",", i wish i would be as knowledgeble as u r. U analysed it very well n ur voice made me to listen it."," Thank you so much for the great explanation and ideas that you are giving us. May God continue to bless you for your good work.","This is free therapy to me... Cheers - keep up","nice explanation... it's very clear","Excellent ","I think I have nothing to say about this vid bcoz people have already stolen all the words which I want to say Thanks for the wonderful explanation","Perfect explanations thank you ","Grt ","thanks for sharing such info as it helps students.","the way you speak... .....Simply awesome","plz u make more video bcz u analysis with all point","you're so smart.","What a voice.. Simply adorable... And very well explained ","Nice strategies to solve","Thank you so much  for your conspicuous video.. You have such a clarity of thought in handling the questions..","Impresive","nice work r","Ur voice dear so soothing. Thank you for the lesson","I was AMAZED by your Great Explanation and voice","Woahhhh....!!!!","thanks a lot","Muze bahot Pasand Aya video....Mai bhi Kuch banna chahti hu...","I liked the way , how you pronounced","You are very good ...thanks for putting enormous efforts for us","Wow.... I don't have words to explain your excellency ... Thank you so much","Very very very very nyc explanation","you are osssome.","Veryyyyy intelligent .......  plz make more videos like this ...very helpful.","There is something special in your voice... that's very motivating...☺","please make more video for other topics too...","osm approach.....","Very accurate explanations.!! We would like to see more papers solved. Thank you","👍👍👍👍 knowelegeble","thanks ","Dhnyawad 🙏","Excellent","Ghazab explanation.!","Very good explanation ..... Plz gve ur conct Nmbr","Good job ","wonderful.......Thanks","please upload other topics analysis","I m in love wd ur the way of communication","Very nicely explained ..Thank you","Soooooooooo gud....😘😍","Gud explanation.. Thank a lot ","your analysis is very much useful..actually, is paving path ...awesome","what a voice....","expecting more videos from you  ,thank u","Very Thankful to you , nice explanation to each and every question.......,......","Hi and thankss for uploading this video. Although I would request you to upload more video","thanks a lot !! thump up !!","Thanks a lot  g....","Thank you  this information..","fan ban gaya, thnq ","awesome  ji thank you so much","Very useful for future","mujhe to bhut help mili thnks wonderfull aise hi lecture provide kijiye","Please make for other topics also","Make similar video for other topics also","well explained bro","Thank you Guruji🙏🙏","Nice vdo ","thankyou for guidance","Good explanation keep rocking","thanks a lot for making ma'am","Thank you so much for this contribution and for your precious time.","thanx a lot","thanks so much","NICE ","👍😊 You're the best","Helpful","Mam you are just amazing","thank you very much! please do not stop making this in the mid way, try to continue","Very marvelous deed ","I hope this course doesn't end abruptly....","It's going to be a great approach .","pls continue it  for a life long","thank you  plzzzzz continue🙏","The great initiative","that's amazing :-)","good one","not bad...","awsum","thank u so much ..","mind blowing ","i honestly watched it out of plain curiosity.. loved it.. thankyou","👍","👍👍","👍👍👍","🙏","🙏🙏","🙏🙏🙏","👍😊","😘😍","😘😍😘😍","👌👌","👌","👌👌👌"]
@@ -398,6 +331,8 @@ def action_follow(test_user_id,any_user_id):
         followed_user.update(follower_count = F('follower_count')+1)
         update_redis_following(test_user_id,any_user_id,True)
         update_redis_follower(any_user_id,test_user_id,True)
+        update_profile_counter(followed_user.user_id,'follower_count',1, True)
+        update_profile_counter(userprofile.user_id,'follow_count',1, True)
 
 #share
 def action_share(user_id, topic_id):
@@ -476,12 +411,11 @@ def get_weight(key):
 def add_bolo_score(user_id, feature, action_object):
     score = get_weight(feature)
     if score > 0:
-        userprofile = UserProfile.objects.get(user_id = user_id)
-        userprofile.bolo_score+= int(score)
-        userprofile.save()
+        userprofile = UserProfile.objects.filter(user_id = user_id)
+        userprofile.update(bolo_score = F('bolo_score')+ int(score))
         weight_obj = get_weight_object(feature)
         if weight_obj:
-            add_to_history(userprofile.user, score, get_weight_object(feature), action_object, False)
+            add_to_history(userprofile[0].user, score, get_weight_object(feature), action_object, False)
         if feature in ['create_topic','create_topic_en']:
             from forum.topic.models import Notification
             notification_type = '8'

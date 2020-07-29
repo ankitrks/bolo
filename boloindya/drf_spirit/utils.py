@@ -4,6 +4,10 @@ from datetime import datetime
 from django.conf import settings
 import urllib2
 import re
+import random, string
+from django.db.models import F,Q
+from redis_utils import *
+import time
 
 language_options = (
     ('0', "All"),
@@ -18,6 +22,9 @@ language_options = (
     ('9', "Marathi"),
     ('10', "Punjabi"),
     ('11', "Odia"),
+    ('12', "Bhojpuri"),
+    ('13', "Haryanvi"),
+    ('14', "Sinhala"),
 
 )
 
@@ -36,6 +43,13 @@ month_choices=(
     (12, "December"),
 )
 
+salary_choices = (
+    ('1', "Less than 20000"),
+    ('2', "20000 - 40000"),
+    ('3', "40000 - 60000"),
+    ('4', "Greater than 60000"),
+)
+
 state_language={'Andaman & Nicobar Islands':'Bengali','Andhra Pradesh':'Telugu','Arunachal Pradesh':'Nishi','Assam':'Assamese','Bihar':'Hindi','Chandigarh':'Hindi','Chhattisgarh':'Hindi','Dadra & Nagar Haveli':'Hindi','Daman & Diu':'Gujarati','Delhi':'Hindi','Goa':'Konkani','Gujarat':'Gujarati','Haryana':'Hindi','Himachal Pradesh':'Hindi','Jammu and Kashmir':'Kashmiri','Jharkhand':'Hindi','Karnataka':'Kannada','Kerala':'Malayalam','Lakshadweep':'Malayalam','Madhya Pradesh':'Hindi','Maharashtra':'Marathi','Manipur':'Manipuri','Meghalaya':'Kashi','Mizoram':'Mizo','Nagaland':'Naga Languages','Odisha':'Oriya','Puducherry':'Tamil','Punjab':'Punjabi','Rajasthan':'Hindi','Sikkim':'Nepali','Tamil Nadu':'Tamil','Telangana':'Telugu','Tripura':'Bengali','Uttar Pradesh':'Hindi','Uttarakhand':'Hindi','West Bengal':'Bengali'}
 
 def add_to_history(user, score, action, action_object, is_removed):
@@ -45,7 +59,7 @@ def add_to_history(user, score, action, action_object, is_removed):
         history_obj = BoloActionHistory.objects.get( user = user, action_object_type=ContentType.objects.get_for_model(action_object), action_object_id = action_object.id, action = action )
     except Exception as e:
         print e
-        history_obj = BoloActionHistory( user = user, action_object = action_object, action = action, score = score )
+        history_obj = BoloActionHistory( user = user, action_object = action_object, action_id = action.id, score = score )
     history_obj.is_removed = is_removed
     history_obj.save()
 
@@ -68,12 +82,11 @@ def add_bolo_score(user_id, feature, action_object):
     from forum.user.models import UserProfile
     score = get_weight(feature)
     if score >0:
-        userprofile = UserProfile.objects.get(user_id = user_id)
-        userprofile.bolo_score+= int(score)
-        userprofile.save()
+        userprofile = UserProfile.objects.filter(user_id = user_id)
+        userprofile.update(bolo_score = F('bolo_score')+int(score))
         weight_obj = get_weight_object(feature)
         if weight_obj:
-            add_to_history(userprofile.user, score, get_weight_object(feature), action_object, False)
+            add_to_history(userprofile[0].user, score, get_weight_object(feature), action_object, False)
         if feature in ['create_topic','create_topic_en']:
             from forum.topic.models import Notification
             notification_type = '8'
@@ -85,14 +98,14 @@ def add_bolo_score(user_id, feature, action_object):
 def reduce_bolo_score(user_id, feature, action_object, admin_action_type=''):
     from forum.user.models import UserProfile
     score = get_weight(feature)
-    userprofile = UserProfile.objects.get(user_id = user_id)
-    userprofile.bolo_score-= int(score)
-    if userprofile.bolo_score < 95:
-        userprofile.bolo_score = 95
-    userprofile.save()
+    userprofile = UserProfile.objects.filter(user_id = user_id)
+    if userprofile[0].bolo_score < 95:
+        userprofile.update(bolo_score = 95)
+    else:
+        userprofile.update(bolo_score= F('bolo_score')-int(score))
     weight_obj = get_weight_object(feature)
     if weight_obj:
-        add_to_history(userprofile.user, score, get_weight_object(feature), action_object, True)
+        add_to_history(userprofile[0].user, score, get_weight_object(feature), action_object, True)
     if feature in ['create_topic','create_topic_en']:
         from forum.topic.models import Notification
         notification_type = '7'
@@ -166,17 +179,22 @@ def short_time(value):
 
     elif value>60 and value<3600:
         minute_value = value/float(60.0)
-        rounded = round(minute_value, 1)
+        rounded = int(round(minute_value,1)) if round(minute_value,1).is_integer() else round(minute_value,1)
         return str(rounded)+" minutes"
     elif value>3600:
         hour_value = value/float(3600.0)
-        rounded = round(hour_value, 2)
+        rounded = int(round(hour_value,1)) if round(hour_value,1).is_integer() else round(hour_value,1)
+        if rounded > 999:
+            rounded = shorcountertopic(rounded)+' hours'
+            return rounded
         return str(rounded)+" hours"
 
 def shortcounterprofile(counter):
     counter = int(counter)
-    if counter>10000 and counter< 99999:
-        return str(counter/1000.0)[:5]+'K'
+    if counter>10000 and counter < 999999:
+        return str(int(round(counter/1000.0, 1)) if round(counter/1000.0, 1).is_integer() else round(counter/1000.0, 1))+' K'
+    elif counter >= 999999:
+        return str(int(round(counter/1000000.0, 1)) if (round(counter/1000000.0, 1)).is_integer() else (round(counter/1000000.0, 1)))+' M'
     else:
         return counter
 
@@ -184,12 +202,10 @@ def shortcounterprofile(counter):
 
 def shorcountertopic(counter):
     counter = int(counter)
-    if counter>1000 and counter<= 9999:
-        return str(counter/1000.0)[:3]+'K'
-    elif counter >9999 and counter<=999999:
-        return str(counter/1000.0)[:5]+'K'
-    elif counter >999999:
-        return str(counter/1000000.0)[:5]+'M'
+    if counter >= 1000 and counter < 999999:
+        return str(int(round(counter/1000.0, 1)) if round(counter/1000.0, 1).is_integer() else round(counter/1000.0, 1))+' K'
+    elif counter >= 999999:
+        return str(int(round(counter/1000000.0, 1)) if (round(counter/1000000.0, 1)).is_integer() else (round(counter/1000000.0, 1)))+' M'
     else:
         return str(counter)
 
@@ -256,9 +272,8 @@ def calculate_encashable_details(user):
         enchashable_detail.bolo_score_details = str(bolo_details)
         for each_bolo in all_bolo_action:
             total_bolo_score_in_this_cycle += each_bolo.score
-        userprofile = UserProfile.objects.get(user = user)
-        userprofile.encashable_bolo_score = total_bolo_score_in_this_cycle
-        userprofile.save()
+        userprofile = UserProfile.objects.filter(user = user)
+        userprofile.update(encashable_bolo_score = total_bolo_score_in_this_cycle)
         all_bolo_action.update(enchashable_detail = enchashable_detail)
         enchashable_detail.bolo_score_earned = total_bolo_score_in_this_cycle
         enchashable_detail.equivalent_INR = total_money
@@ -352,6 +367,13 @@ def solr_object_to_db_object(sqs):
             result.append(each.object)
     return result
 
+def solr_userprofile_object_to_db_object(sqs):
+    result = []
+    if len(sqs) != 0:
+        for each in sqs:
+            result.append(each.object.user)
+    return result
+
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 
 def get_paginated_data(data_list,page_size,page=None, offset = None):
@@ -435,4 +457,49 @@ def get_modified_url(old_url,new_url_domain):
         url = find_urls_in_string.search(old_url)
         return str(old_url.replace(str(url.group()), new_url_domain))
 
+import random, string
+def get_random_username():
+    x = 'bi'+''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(10))
+    x = x.lower()
+    # x = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
+    try:
+        user = User.objects.get(username=x)
+        return get_random_username()
+    except:
+        return x
 
+def create_random_user(no_of_user=0):
+        from forum.user.models import DUser
+        users_data = DUser.objects.filter(is_used=False)[:no_of_user]
+        languages = language_options
+        for each_user_data in users_data:
+            name = each_user_data.name
+            username = get_random_username(name.replace(' ','_'))
+            gender = each_user_data.gender
+            language = random.choice(languages)[0]
+            status = create_user(name,username,gender,language)
+            each_user_data.is_used = True
+            each_user_data.save()
+
+def create_user(name,username,gender,language):
+    from django.contrib.auth.models import User
+    from forum.user.models import UserProfile
+    if not 'yyyy' in name:
+        try:
+            try:
+                user = User.objects.create(username = username)
+            except:
+                user = User.objects.create(username = get_random_username(username))
+            userprofile = UserProfile.objects.filter(user = user).update(**{'name':name,'language':language,'gender':gender,'is_test_user':True})
+            return True
+        except Exception as e:
+            print e
+            return False
+
+def set_android_logs_info(value):
+    key = "android_logs:" + str(datetime.now()).replace(' ', '')
+    set_redis(key, value, False)
+
+def set_sync_dump_info(value):
+    key = "sync_dump:" + str(datetime.now()).replace(' ', '')
+    set_redis(key, value, False)

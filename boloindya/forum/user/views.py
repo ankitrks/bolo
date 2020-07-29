@@ -24,6 +24,7 @@ from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from forum.user.models import AppPageContent, ReferralCode, ReferralCodeUsed
+from .utils.bolo_redis import get_referral_code_info
 
 User = get_user_model()
 
@@ -110,7 +111,10 @@ def referral_code_validate(request):
     status = 'success'
     message = 'Referral code valid!'
     try:
-        code_obj = ReferralCode.objects.exclude(is_active = False).get(code__iexact = ref_code)
+        code_obj_id = get_referral_code_info(ref_code)
+        if not code_obj_id:
+            status = 'error'
+            message = 'Invalid referral code! Please try again.'
     except Exception as e:
         status = 'error'
         message = 'Invalid referral code! Please try again.'
@@ -128,16 +132,19 @@ def referral_code_update(request):
     message = 'Referral code updated!'
     try:
         created = True
-        code_obj = ReferralCode.objects.exclude(is_active = False).get(code__iexact = ref_code)
-        if user_id: # IF no user_id, means user downloaded the app (not signup)
-            used_obj, created = ReferralCodeUsed.objects.get_or_create(code = code_obj, by_user_id = user_id)
-        else:
-            used_obj = ReferralCodeUsed.objects.create(code = code_obj)
+        code_obj_id = get_referral_code_info(ref_code)
+        # if user_id: # IF no user_id, means user downloaded the app (not signup)
+        #     used_obj, created = ReferralCodeUsed.objects.using('default').get_or_create(code_id = code_obj_id, by_user_id = user_id)
+        # else:
+        ### we are allowing duplicate values to optimize this query and duplicates values are getting deleted in refer_n_earn and update_download_signup_count scripts.
+        used_obj = ReferralCodeUsed.objects.create(code_id = code_obj_id)
         try:
             used_obj.click_id = click_id
             used_obj.pid =pid
             used_obj.referral_dump = referral_dump
             used_obj.android_id = android_id
+            if user_id:
+                used_obj.by_user_id = user_id
             used_obj.save()
         except Exception as e1:
             print e1
@@ -148,6 +155,7 @@ def referral_code_update(request):
     except Exception as e:
         status = 'error'
         message = 'Invalid referral code! Please try again.'
+        return JsonResponse({'status' : status, 'message' : message, 'error': str(e)})
     return JsonResponse({'status' : status, 'message' : message})
 
 @login_required
@@ -242,7 +250,7 @@ def getpagecontent(request):
 @csrf_exempt
 def referral_link(request,slug,user_id):
     if user_id:
-        referral_code  =ReferralCode.objects.get(for_user_id=user_id,purpose='refer_n_earn',is_refer_earn_code=True)
+        referral_code = ReferralCode.objects.using('default').get(for_user_id=user_id,purpose='refer_n_earn',is_refer_earn_code=True)
         context={'referral_code':referral_code,'userprofile':referral_code.for_user.st,'user':referral_code.for_user}
         return render(request, 'spirit/user/_referral_redirect.html', context)
     else:

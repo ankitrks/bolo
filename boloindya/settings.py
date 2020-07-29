@@ -95,10 +95,10 @@ BASE_DIR_TRANS = os.path.dirname(os.path.dirname(__file__))
 #ABSOLUTE_URL='https://www.boloindya.com'
 
 #BASE_URL='http://127.0.0.1:8000/'
-BASE_URL='https://stage.boloindya.com/'
-ABSOLUTE_URL='https://stage.boloindya.com'
-#ABSOLUTE_URL='https://www.boloindya.com'
-#BASE_URL='https://www.boloindya.com/'
+#BASE_URL='https://stage.boloindya.com/'
+#ABSOLUTE_URL='https://stage.boloindya.com'
+ABSOLUTE_URL='https://www.boloindya.com'
+BASE_URL='https://www.boloindya.com/'
 #
 # Django & Spirit settings defined below...
 #
@@ -304,28 +304,28 @@ TEMPLATES[0]['OPTIONS']['context_processors'] += [
     'djconfig.context_processors.config',
 ]
 
-# django-haystack
-
-# INSTALLED_APPS += [
-    
-# ]
-
 HAYSTACK_CONNECTIONS = {
-    'default': {
-        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
-        'URL': 'http://127.0.0.1:8983/solr/boloindya',                 # Assuming you created a core named 'boloindya'
-        'ADMIN_URL': 'http://127.0.0.1:8983/solr/admin/cores',
-        'INCLUDE_SPELLING': True,
-        # # ...or for multicore...
-        # # 'URL': 'http://127.0.0.1:8983/solr/mysite',
-    },
+      'default': {
+            # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+            # 'URL': 'http://127.0.0.1:9200/',
+            # 'INDEX_NAME': 'boloindya',
+      },
 }
 
 HAYSTACK_SIGNAL_PROCESSOR = 'forum.search.signals.RealtimeSignalProcessor'
 
+DATABASE_ROUTERS = ['utils.DBRouter']
 DATABASES = {
-
    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'boloindya',                 # Or path to database file if using sqlite3.
+        # The following settings are not used with sqlite3:
+        'USER': 'boloindya',
+        'PASSWORD': 'bng321',
+        'HOST': 'localhost',                 # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+        'PORT': '5432',                      # Set to empty string for default.
+    },
+    'read': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'boloindya',                 # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
@@ -528,21 +528,32 @@ SIMPLE_JWT = {
 
 #####Bolo Indya Prod ######
 #### S3 bucket #####
-BOLOINDYA_AWS_ACCESS_KEY_ID = 'AKIAZNK4CM5CV76OQQHQ'
-BOLOINDYA_AWS_SECRET_ACCESS_KEY = '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'
+BOLOINDYA_AWS_ACCESS_KEY_ID = 'AKIAZNK4CM5CW4W4VWP7'
+BOLOINDYA_AWS_SECRET_ACCESS_KEY = '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'
 BOLOINDYA_AWS_BUCKET_NAME = 'boloindyapp-prod'
-
+BOLOINDYA_AWS_IN_BUCKET_NAME = 'in-boloindya'
+FILE_PATH_TO_S3 = 'https://in-boloindya.s3.ap-south-1.amazonaws.com/'
 #### Transcoder settings #####
 BOLOINDYA_PIPELINE_ID_TS = '1545987947390-hpo4hx'
 BOLOINDYA_AWS_ACCESS_KEY_ID_TS = 'AKIAZNK4CM5CW4W4VWP7'
 BOLOINDYA_AWS_SECRET_ACCESS_KEY_TS = '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'
 BOLOINDYA_AWS_BUCKET_NAME_TS = 'boloindya-et'
+LAMBDA_ET_IDENTIFIER = ['/elastic-transcoder/lambda/et/']
+AMAZON_ET_IDENTIFIER = ['/elastic-transcoder/lambda/aws_et/']
+
+#### CDN Settings ######
+US_CDN_URL = "http://cdnus.boloindya.com" # Amazon CloudFront US
+# IN_CDN_URL = "https://d7lk2jr51sych.cloudfront.net" # Amazon CloudFront IN
+# IN_CDN_URL = "https://1070250973.rsc.cdn77.org" # CDN77 IN
+IN_CDN_URL = "http://storage.boloindya.com" # Akamai CDN IN
+#### CDN Settings ######
+
 #### Transcoder settings #####
 
 #####CareerAnna ######
 #### S3 bucket #####
-CAREERANNA_AWS_ACCESS_KEY_ID = 'AKIAZNK4CM5CV76OQQHQ'
-CAREERANNA_AWS_SECRET_ACCESS_KEY = '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'
+CAREERANNA_AWS_ACCESS_KEY_ID = 'AKIAZNK4CM5CW4W4VWP7'
+CAREERANNA_AWS_SECRET_ACCESS_KEY = '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'
 CAREERANNA_AWS_BUCKET_NAME = 'careeranna'
 
 #### Transcoder settings #####
@@ -551,6 +562,7 @@ CAREERANNA_AWS_ACCESS_KEY_ID_TS = 'AKIAZNK4CM5CW4W4VWP7'
 CAREERANNA_AWS_SECRET_ACCESS_KEY_TS = 'Odl4xfZTJZM0mq89XtNXf95g2zY8NwRuhp5+zp87'
 CAREERANNA_AWS_BUCKET_NAME_TS = 'elastictranscode.videos'
 #### Transcoder settings #####
+
 
 # The region of your bucket, more info:
 # http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
@@ -636,3 +648,9 @@ EXTRA_PAGES_BEYOND_MAX_PAGES = 30
 MIN_REC_TO_CACHE = REST_FRAMEWORK['PAGE_SIZE'] * 3
 LAST_N_ACTIVE_DAYS = 3
 TIME_DECAY_CONSTANT = 36 # in hours
+
+REDIS_EXPIRY_TIME = 1800 #In Seconds half hour
+USER_DATA_REDIS_EXPIRY_TIME = 43200 #12 hrs in seconds
+
+PUSH_NOTIFICATION_TEST_USER = [19, 20, 1492, 328, 41, 40]
+PUSH_NOTIFICATION_URL = "https://fcm.googleapis.com/v1/projects/boloindya-1ec98/messages:send"

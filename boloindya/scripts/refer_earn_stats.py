@@ -34,6 +34,10 @@ def get_refer_earn(each_refercode,start_date='09-04-2020'):
     end_date = datetime.strptime(str(start_date.day)+'-'+str(start_date.month)+'-'+str(start_date.year)+' 23:59:59', "%d-%m-%Y %H:%M:%S")
     current_datetime = datetime.now()-timedelta(days=1)
 
+    #delete duplicate
+    dupes_referral_code = ReferralCodeUsed.objects.exclude(by_user__isnull = True).filter(created_at__gte = datetime.now() - timedelta(hours=6)).values('code_id','by_user_id').annotate(Count('id')).filter(id__count__gt=1)
+    for referral_code in dupes_referral_code:
+        ReferralCodeUsed.objects.filter(code_id=referral_code['code_id'],by_user_id=referral_code['by_user_id']).order_by('pk')[1:].delete()
 
     downloaded =ReferralCodeUsed.objects.filter(code = each_refercode, is_download = True, by_user__isnull = True,created_at__gte=start_date,created_at__lte=end_date).distinct('android_id')
     signedup = ReferralCodeUsed.objects.filter(code = each_refercode, is_download = True, by_user__isnull = False,created_at__gte=start_date,created_at__lte=end_date).distinct('by_user_id')

@@ -8,6 +8,7 @@ from drf_spirit.utils import add_bolo_score
 from forum.comment.models import Comment
 import gc
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
+from forum.user.utils.bolo_redis import update_profile_counter
 
 def run():
     print "Start Time Eng_Engagment Action: ",datetime.now()
@@ -47,8 +48,8 @@ def run():
         #     all_comment = Comment.objects.filter(pk__in =comment_ids)
         #     for each_comment in all_comment:
         #         action_comment_like(opt_action_user_id,each_comment)
-        elif opt_action == 'seen':
-            action_seen(opt_action_user_id,each_topic_id)
+        # elif opt_action == 'seen':
+        #     action_seen(opt_action_user_id,each_topic_id)
     print "End Time Eng_Engagment Action: ",datetime.now()
 
 
@@ -90,6 +91,7 @@ def action_seen(user_id,topic_id):
     else:
        vbseen = VBseen.objects.create(user_id = user_id,topic_id = topic_id)
     topic.update(view_count = F('view_count')+1)
+    update_profile_counter(topic[0].user_id,'view_count',1,True)
     userprofile = get_userprofile(topic[0].user.id).update(view_count = F('view_count')+1,own_vb_view_count = F('own_vb_view_count')+1)
 
 #follow
@@ -104,6 +106,8 @@ def action_follow(test_user_id,any_user_id):
         followed_user.update(follower_count = F('follower_count')+1)
         update_redis_following(test_user_id,any_user_id,True)
         update_redis_follower(any_user_id,test_user_id,True)
+        update_profile_counter(any_user_id,'follower_count',1, True)
+        update_profile_counter(test_user_id,'follow_count',1, True)
 #share
 def action_share(user_id, topic_id):
     share_type =['facebook_share','whatsapp_share','linkedin_share','twitter_share']
