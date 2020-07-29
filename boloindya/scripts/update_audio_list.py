@@ -4,10 +4,13 @@ from django.conf import settings
 from drf_spirit.utils import language_options
 from redis_utils import *
 
-def run():
+def run(*args):
 	try:
+		hours = 6
+		if args:
+			hours = int(args[0])
 		now = datetime.now()
-		audio_qs = MusicAlbum.objects.filter(last_modified__gte = now-timedelta(hours=6)).values_list('language_id', flat=True)
+		audio_qs = MusicAlbum.objects.filter(last_modified__gte = now-timedelta(hours=hours)).values_list('language_id', flat=True)
 		if audio_qs:
 			unique_language_id = list(set(list(audio_qs)))
 			for lang_id in unique_language_id:
