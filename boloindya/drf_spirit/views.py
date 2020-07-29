@@ -4741,11 +4741,11 @@ def audio_list(request):
 def filter_audio_data(language_specific_audio_list, total_audio_list, language_id, page_no):
     language_specific_audio_df = pd.DataFrame(language_specific_audio_list)
     if not  language_specific_audio_df.empty:
-        language_specific_audio_df = language_specific_audio_df.sort_values(['order_no'], ascending=False)
+        language_specific_audio_df = language_specific_audio_df.sort_values(['order_no'], ascending=True)
     total_data_df = pd.DataFrame(total_audio_list)
     filtered_df = total_data_df[total_data_df['language_id']!=str(language_id)]
     filtered_df = filtered_df.astype({"language_id":int})
-    filtered_df = filtered_df.sort_values(['language_id', 'order_no'], ascending=[True, False])
+    filtered_df = filtered_df.sort_values(['language_id', 'order_no'], ascending=[True, True])
     final_df = pd.concat([language_specific_audio_df, filtered_df])
     if language_specific_audio_list:
         return final_df.head(15).to_dict('records')
