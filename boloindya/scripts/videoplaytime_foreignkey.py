@@ -2,12 +2,14 @@ from forum.user.models import VideoPlaytime
 from forum.topic.models import Topic
 from datetime import datetime
 
-
 def run():
     #only testing for march
-    all_objects = VideoPlaytime.objects.all()
-
+    all_objects = VideoPlaytime.objects.filter(video__isnull=True)
+    counter = 1
+    total_obj = len(all_objects)
     for obj in all_objects:
+        print "##########",counter," / ",total_obj,"#############"
+        counter+=1
         try:
             obj.video_id = obj.videoid
             obj.save()

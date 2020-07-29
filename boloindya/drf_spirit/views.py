@@ -55,10 +55,10 @@ from forum.comment.models import Comment,CommentHistory
 from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs,UserPay,VideoPlaytime,UserPhoneBook,Contact,ReferralCode
 from jarvis.models import FCMDevice,StateDistrictLanguage, BannerUser, Report
 from forum.topic.models import Topic,TopicHistory, ShareTopic, Like, SocialShare, Notification, CricketMatch, Poll, Choice, Voting, \
-    Leaderboard, VBseen, TongueTwister, HashtagViewCounter
+    Leaderboard, VBseen, TongueTwister, HashtagViewCounter, FVBseen
 from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following, get_redis_android_id, set_redis_android_id
-from forum.user.utils.bolo_redis import get_bolo_info_combined
+from forum.user.utils.bolo_redis import get_bolo_info_combined, get_current_month_bolo_info, get_last_month_bolo_info, get_lifetime_bolo_info , update_profile_counter
 from .serializers import *
 from tasks import * # vb_create_task,user_ip_to_state_task,sync_contacts_with_user,cache_follow_post,cache_popular_post, deafult_boloindya_follow, save_click_id_response, send_upload_video_notification
 from haystack.query import SearchQuerySet, SQ
@@ -1459,6 +1459,11 @@ def createTopic(request):
             view_count = random.randint(1,5)
             topic.view_count = view_count
             topic.save()
+            try:
+                provide_view_count(view_count,topic)
+            except:
+                pass
+            update_profile_counter(user_id,'video_count',1, True)
             categories = filter(None, categ_list.split(','))
             topic.m2mcategory.add(*categories)
             topic.location = get_location(location_array)
@@ -1487,10 +1492,6 @@ def createTopic(request):
             view_count = random.randint(10,30)
             topic.view_count = view_count
         topic.save()
-        try:
-            provide_view_count(view_count,topic)
-        except:
-            pass
         # topic.m2mcategory.add(Category.objects.get(pk=category_id))
         if not is_vb:
             userprofile = UserProfile.objects.filter(user = request.user)
@@ -1558,11 +1559,12 @@ def invoke_watermark_service(topic, user):
 
 
 def provide_view_count(view_count,topic):
-    all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)[:view_count]
-    for each_user_id in all_test_userprofile_id:
-        vb_obj = VBseen.objects.create(topic= topic,user_id =each_user_id)
-        # UserProfile.objects.filter(user=topic.user).update(view_count=F(view_count)+1,own_vb_view_count = F('own_vb_view_count')+1)
-        update_redis_vb_seen(each_user_id,topic.id)
+    try:
+        print view_count
+        FVBseen.objects.create(topic_id = topic.id, view_count = view_count)
+        update_profile_counter(topic.user_id,'view_count',view_count, True)
+    except Exception as e:
+        print e,"view"
 
 @api_view(['POST'])
 def editTopic(request):
@@ -1710,11 +1712,13 @@ def topic_delete(request):
     topic = Topic.objects.get(pk= topic_id)
     now = datetime.now()
     allowed_date = datetime.strptime('01-'+str(now.month)+'-'+str(now.year)+' 00:00:00', "%d-%m-%Y %H:%M:%S")
-
+    print request.user
     if allowed_date <= topic.date:
-        if topic.user == request.user:
+        if topic.user == request.user and not topic.is_removed:
+
             try:
                 topic.delete(is_user_deleted=True)
+                update_profile_counter(user_id,'video_count',1, False)
                 return JsonResponse({'message': 'Topic Deleted'}, status=status.HTTP_201_CREATED)
             except:
                 return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
@@ -2071,6 +2075,38 @@ def get_user_bolo_info(request):
             days = calendar.monthrange(int(year),int(month))[1]
             start_date = datetime.strptime('01-'+str(month)+'-'+str(year), "%d-%m-%Y")
             end_date = datetime.strptime(str(days)+'-'+str(month)+'-'+str(year)+' 23:59:59', "%d-%m-%Y %H:%M:%S")
+
+        if start_date and end_date and end_date > datetime.now() - timedelta(days=1):
+            data = get_current_month_bolo_info(request.user.id)
+            data['top_3_videos'] = []
+            data['monetised_video_count'] = 0
+            data['left_for_moderation'] = 0
+            data['unmonetizd_video_count'] = 0
+            data['message'] = 'success'
+            return JsonResponse(data, status=status.HTTP_200_OK)
+        elif start_date and end_date and end_date < datetime.now():
+            data = get_last_month_bolo_info(request.user.id)
+            data['top_3_videos'] = []
+            data['monetised_video_count'] = 0
+            data['left_for_moderation'] = 0
+            data['unmonetizd_video_count'] = 0
+            data['message'] = 'success'
+            return JsonResponse(data, status=status.HTTP_200_OK)
+        elif not start_date and not end_date:
+            data = get_lifetime_bolo_info(request.user.id)
+            data['top_3_videos'] = []
+            data['monetised_video_count'] = 0
+            data['left_for_moderation'] = 0
+            data['unmonetizd_video_count'] = 0
+            data['message'] = 'success'
+            return JsonResponse(data, status=status.HTTP_200_OK)
+        else:
+            log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+            print "Error in API get_user_bolo_info/ :" + log
+            return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
         if not start_date or not end_date:
             total_video = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user)
             #total_video_id = list(Topic.objects.filter(is_vb = True,user=request.user).values_list('pk',flat=True))
@@ -2090,21 +2126,18 @@ def get_user_bolo_info(request):
             all_pay = UserPay.objects.filter(user=request.user,is_active=True,for_month__gte=start_date.month,for_month__lte=start_date.month,\
                 for_year__gte=start_date.year,for_year__lte=start_date.year)
             top_3_videos = Topic.objects.filter(is_vb = True,is_removed=False,user=request.user,date__gte=start_date, date__lte=end_date).order_by('-view_count')[:3]
-            all_play_time = VideoPlaytime.objects.filter(timestamp__gte=start_date, timestamp__lte=end_date,videoid__in = total_video_id).aggregate(Sum('playtime'))
+            all_play_time = VideoPlaytime.objects.filter(timestamp__gte=start_date, timestamp__lte=end_date,video_id__in = total_video_id).aggregate(Sum('playtime'))
             if all_play_time.has_key('playtime__sum') and all_play_time['playtime__sum']:
                 video_playtime = all_play_time['playtime__sum']
-            exclude_video_id = total_video.values_list('pk',flat=True)
-            total_view_count += VBseen.objects.filter(created_at__gte = start_date, created_at__lte = end_date, topic__user = request.user).exclude(topic_id__in = exclude_video_id).count()
-            total_like_count += Like.objects.filter(created_at__gte = start_date, created_at__lte = end_date, topic__user = request.user).exclude(topic_id__in = exclude_video_id).count()
-            total_comment_count += Comment.objects.filter(date__gte = start_date, date__lte = end_date, topic__user = request.user).exclude(topic_id__in = exclude_video_id).count()
-            total_share_count += SocialShare.objects.filter(created_at__gte = start_date, created_at__lte = end_date, topic__user = request.user).exclude(topic_id__in = exclude_video_id).count()
+            # exclude_video_id = total_video.values_list('pk',flat=True)
+            # total_view_count += VBseen.objects.filter(created_at__gte = start_date, created_at__lte = end_date, topic__user = request.user).exclude(topic_id__in = exclude_video_id).count()
+            # total_like_count += Like.objects.filter(created_at__gte = start_date, created_at__lte = end_date, topic__user = request.user).exclude(topic_id__in = exclude_video_id).count()
+            # total_comment_count += Comment.objects.filter(date__gte = start_date, date__lte = end_date, topic__user = request.user).exclude(topic_id__in = exclude_video_id).count()
+            # total_share_count += SocialShare.objects.filter(created_at__gte = start_date, created_at__lte = end_date, topic__user = request.user).exclude(topic_id__in = exclude_video_id).count()
 
         for each_pay in all_pay:
             total_earn+=each_pay.amount_pay
         total_video_count = total_video.count()
-        monetised_video_count = total_video.filter(is_monetized = True).count()
-        unmonetizd_video_count= total_video.filter(is_monetized = False,is_moderated = True).count()
-        left_for_moderation = total_video.filter(is_moderated = False).count()
         for each_vb in total_video:
             total_view_count+=each_vb.view_count
             total_like_count+=each_vb.likes_count
@@ -2116,12 +2149,12 @@ def get_user_bolo_info(request):
         total_share_count = shorcountertopic(total_share_count)
         video_playtime = short_time(video_playtime)
         return JsonResponse({'message': 'success', 'total_video_count' : total_video_count, \
-                        'monetised_video_count':monetised_video_count, 'total_view_count':total_view_count,'total_comment_count':total_comment_count,\
-                        'total_like_count':total_like_count,'total_share_count':total_share_count,'left_for_moderation':left_for_moderation,\
+                        'total_view_count':total_view_count,'total_comment_count':total_comment_count,\
+                        'total_like_count':total_like_count,'total_share_count':total_share_count,\
                         'total_earn':total_earn,'video_playtime':video_playtime,'spent_time':spent_time,\
                         'top_3_videos':TopicSerializer(top_3_videos,many=True, \
                             context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),\
-                            'is_expand': request.GET.get('is_expand',True)}).data,'unmonetizd_video_count':unmonetizd_video_count,\
+                            'is_expand': request.GET.get('is_expand',True)}).data,\
                         'bolo_score':shortcounterprofile(request.user.st.bolo_score)}, status=status.HTTP_200_OK)
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
@@ -2952,6 +2985,8 @@ def follow_user(request):
             followed_user.update(follower_count = F('follower_count')+1)
             update_redis_following(request.user.id,int(user_following_id),True)
             update_redis_follower(int(user_following_id),request.user.id,True)
+            update_profile_counter(request.user.id,'follow_count',1, True)
+            update_profile_counter(int(user_following_id),'follower_count',1, True)
             return JsonResponse({'message': 'Followed'}, status=status.HTTP_200_OK)
         else:
             if follow.is_active:
@@ -2961,6 +2996,8 @@ def follow_user(request):
                 followed_user.update(follower_count = F('follower_count')-1)
                 update_redis_following(request.user.id,int(user_following_id),False)
                 update_redis_follower(int(user_following_id),request.user.id,False)
+                update_profile_counter(request.user.id,'follow_count',1, False)
+                update_profile_counter(int(user_following_id),'follower_count',1, False)
                 return JsonResponse({'message': 'Unfollowed'}, status=status.HTTP_200_OK)
             else:
                 follow.is_active = True
@@ -2969,6 +3006,8 @@ def follow_user(request):
                 follow.save()
                 update_redis_following(request.user.id,int(user_following_id),True)
                 update_redis_follower(int(user_following_id),request.user.id,True)
+                update_profile_counter(request.user.id,'follow_count',1, True)
+                update_profile_counter(int(user_following_id),'follower_count',1, True)
                 return JsonResponse({'message': 'Followed'}, status=status.HTTP_200_OK)
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
@@ -4579,7 +4618,9 @@ def update_profanity_details(request):
                 topic.violent_content = violent_content
 
             #notify user
-            topic.delete()
+            if not topic.is_removed:
+                topic.delete()
+                update_profile_counter(topic.user_id,'video_count',1, False)
         topic.profanity_collage_url = profanity_collage_url
         topic.save()
         return JsonResponse({'message': "success"}, status=status.HTTP_200_OK)

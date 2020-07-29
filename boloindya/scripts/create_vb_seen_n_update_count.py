@@ -5,13 +5,14 @@ import connection
 from redis_utils import *
 import pandas as pd
 from django.db.models import F
+from forum.user.utils.bolo_redis import update_profile_counter
 
 
 def run():
     try:
         all_entries = []
         all_keys = []
-        print 'Total: ', len(redis_cli.keys("bi:vb_entry:*:*"))
+        # print 'Total: ', len(redis_cli.keys("bi:vb_entry:*:*"))
         for key in redis_cli.keys("bi:vb_entry:*:*"):
             print key
             try:
@@ -30,6 +31,7 @@ def run():
             VBseen.objects.bulk_create(aList, batch_size=10000)
             for key,value in view_count.items():
                 Topic.objects.filter(pk=key).update(view_count = F('view_count') + value, imp_count = F('imp_count') + value)
+                update_profile_counter(Topic.objects.get(pk=key).user_id,'view_count',value,True)
             for each_key in all_keys:
                 try:
                     redis_cli.delete(each_key)

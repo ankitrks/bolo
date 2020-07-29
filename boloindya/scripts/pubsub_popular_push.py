@@ -13,5 +13,8 @@ def run():
         for index in range(1, (device_pagination.num_pages+1)):
             device = device_pagination.page(index)
             t = device.object_list.send_message(data={'pupluar_data': 'true' })
-                
     pubsub_obj.update(is_popular = True)
+
+    # removed videos from Popular if "is_pubsub_popular_push" is set to false
+    pubsub_obj_removed = Topic.objects.filter(Q(is_pubsub_popular_push=False) & Q(is_popular = True))
+    pubsub_obj_removed.update(is_popular = False)

@@ -225,12 +225,12 @@ def write_csv(n):
 			writer = csv.writer(f)
 			writer.writerow(headers)
 			for each_data in complete_data:
-				writer.writerow([x.encode('utf-8') for x in each_data])
+				writer.writerow([x for x in each_data])
 	else:
 		with open(f_name, 'a') as csvfile:  
 			csvwriter = csv.writer(csvfile)
 			for each_data in complete_data:
-				csvwriter.writerow([x.encode('utf-8') for x in each_data])
+				csvwriter.writerow([x for x in each_data])
 
 
 

@@ -1,6 +1,7 @@
 from forum.user.models import AndroidLogs, VideoPlaytime, VideoCompleteRate, UserAppTimeSpend
 from drf_spirit.models import UserJarvisDump, UserLogStatistics, ActivityTimeSpend, VideoDetails,UserTimeRecord
 from forum.topic.models import Topic
+from drf_spirit.utils import language_options
 import time
 import ast 
 from django.http import JsonResponse
@@ -44,24 +45,29 @@ def report_stats():
 				categ_name = str(each_topic_data.category)
 				lang_id = str(each_topic_data.language_id)
 
-				if(each_topic_data.language_id == '1'):
-					language_type = 'English'
-				if(each_topic_data.language_id == '2'):
-					language_type = 'Hindi'
-				if(each_topic_data.language_id == '3'):
-					language_type = 'Tamil'
-				if(each_topic_data.language_id == '4'):
-					language_type = 'Telgu'
-				if(each_topic_data.language_id == '5'):
-					language_type = 'Bengali'
-				if(each_topic_data.language_id == '6'):
-					language_type = 'Kannada'
-				if(each_topic_data.language_id == '7'):
-					language_type = 'Malyalam'
-				if(each_topic_data.language_id == '8'):
-					language_type = 'Gujrati'
-				if(each_topic_data.language_id == '9'):
-					language_type = 'Marathi'			
+				language_type = ''
+				for each_language in language_options:
+					if each_topic_data.language_id == each_language[0]:
+						language_type = each_language[1]
+
+				# if(each_topic_data.language_id == '1'):
+				# 	language_type = 'English'
+				# if(each_topic_data.language_id == '2'):
+				# 	language_type = 'Hindi'
+				# if(each_topic_data.language_id == '3'):
+				# 	language_type = 'Tamil'
+				# if(each_topic_data.language_id == '4'):
+				# 	language_type = 'Telgu'
+				# if(each_topic_data.language_id == '5'):
+				# 	language_type = 'Bengali'
+				# if(each_topic_data.language_id == '6'):
+				# 	language_type = 'Kannada'
+				# if(each_topic_data.language_id == '7'):
+				# 	language_type = 'Malyalam'
+				# if(each_topic_data.language_id == '8'):
+				# 	language_type = 'Gujrati'
+				# if(each_topic_data.language_id == '9'):
+				# 	language_type = 'Marathi'			
 
 			playtime_count_details = VideoPlaytime.objects.filter(videoid = videoid)
 			freq_playtime_count = len(playtime_count_details)
@@ -125,24 +131,27 @@ def report_additional_stats():
 				#print(each_topic_data.category)
 				#print(each_topic_data.language_id)
 				language_type =''
-				if(each_topic_data.language_id == '1'):
-					language_type = 'English'
-				if(each_topic_data.language_id == '2'):
-					language_type = 'Hindi'
-				if(each_topic_data.language_id == '3'):
-					language_type = 'Tamil'
-				if(each_topic_data.language_id == '4'):
-					language_type = 'Telgu'
-				if(each_topic_data.language_id == '5'):
-					language_type = 'Bengali'
-				if(each_topic_data.language_id == '6'):
-					language_type = 'Kannada'
-				if(each_topic_data.language_id == '7'):
-					language_type = 'Malyalam'
-				if(each_topic_data.language_id == '8'):
-					language_type = 'Gujrati'
-				if(each_topic_data.language_id == '9'):
-					language_type = 'Marathi'
+				for each_language in language_options:
+					if each_topic_data.language_id == each_language[0]:
+						language_type = each_language[1]
+				# if(each_topic_data.language_id == '1'):
+				# 	language_type = 'English'
+				# if(each_topic_data.language_id == '2'):
+				# 	language_type = 'Hindi'
+				# if(each_topic_data.language_id == '3'):
+				# 	language_type = 'Tamil'
+				# if(each_topic_data.language_id == '4'):
+				# 	language_type = 'Telgu'
+				# if(each_topic_data.language_id == '5'):
+				# 	language_type = 'Bengali'
+				# if(each_topic_data.language_id == '6'):
+				# 	language_type = 'Kannada'
+				# if(each_topic_data.language_id == '7'):
+				# 	language_type = 'Malyalam'
+				# if(each_topic_data.language_id == '8'):
+				# 	language_type = 'Gujrati'
+				# if(each_topic_data.language_id == '9'):
+				# 	language_type = 'Marathi'
 
 					
 				#print(language_type)		

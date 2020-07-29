@@ -21,7 +21,7 @@ from django.db.models import Q
 from drf_spirit.views import getVideoLength
 from drf_spirit.utils  import calculate_encashable_details,language_options,check_or_create_user_pay
 from forum.user.models import UserProfile, ReferralCode, ReferralCodeUsed, VideoCompleteRate, VideoPlaytime,UserPay
-from forum.topic.models import Topic, VBseen
+from forum.topic.models import Topic, VBseen, FVBseen
 from forum.category.models import Category
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -62,6 +62,7 @@ from django.db.models.functions import TruncDay
 from django.db.models import Count
 from forum.category.models import Category
 from datetime import datetime
+from forum.user.utils.bolo_redis import update_profile_counter
 
 def get_bucket_details(bucket_name=None):
     bucket_credentials = {}
@@ -946,14 +947,8 @@ def boloindya_upload_n_transcode(request):
     return HttpResponse(json.dumps({'message':'success','file_id':my_upload_transcode.id}),content_type="application/json")
 
 def provide_view_count(view_count,topic):
-    counter =0
-    all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)
-    user_ids = list(all_test_userprofile_id)
-    user_ids = random.sample(user_ids,100)
-    while counter<view_count:
-        opt_action_user_id = random.choice(user_ids)
-        VBseen.objects.create(topic= topic,user_id =opt_action_user_id)
-        counter+=1
+    FVBseen.objects.create(topic_id = topic.id, view_count = view_count)
+    update_profile_counter(topic.user_id,'view_count',view_count, True)
 
 def get_video_width_height(video_url):
     try:

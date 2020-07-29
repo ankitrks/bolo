@@ -11,6 +11,7 @@ from forum.topic.models import Topic, Notification, ShareTopic, CricketMatch, Po
         TongueTwister, BoloActionHistory, language_options,JobOpening,JobRequest,RankingWeight
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 from datetime import datetime,timedelta
+from forum.user.utils.bolo_redis import update_profile_counter
 
 class TopicResource(resources.ModelResource):
     class Meta:
@@ -225,8 +226,10 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
             obj.is_removed = form.cleaned_data['is_removed']
             if obj.is_removed:
                 obj.delete()
+                update_profile_counter(obj.user_id,'video_count',1, False)
             else:
                 obj.restore()
+                update_profile_counter(obj.user_id,'video_count',1, True)
         
         if 'is_boosted' in form.changed_data and 'boosted_till' in form.changed_data:
             obj.is_boosted = form.cleaned_data['is_boosted']
