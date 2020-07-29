@@ -22,7 +22,7 @@ def run(*args):
 def create_audio_paginated_data(lang_id):
 	try:
 		items_per_page = settings.REST_FRAMEWORK['PAGE_SIZE']
-		audio_list = list(MusicAlbum.objects.filter(language_id=lang_id).values('id', 'title', 'author_name', 'language_id', 's3_file_path', 'image_path'))
+		audio_list = list(MusicAlbum.objects.filter(language_id=lang_id).values('id', 'title', 'author_name', 'language_id', 's3_file_path', 'image_path', 'order_no', 'last_modified'))
 		page_no = 1
 		start_index = 0
 		end_index = items_per_page
