@@ -1088,10 +1088,13 @@ def upload_media(media_file):
 @api_view(['POST'])
 def upload_profile_image(request):
     try:
-        my_image = request.FILES['file']
-        my_image_url = upload_thumbail(my_image)
-        if my_image_url:
-            return JsonResponse({'status': 'success','body':my_image_url}, status=status.HTTP_201_CREATED)
+        my_image = request.FILES.get('file',None)
+        if request.user.is_authenticated and my_image:
+            my_image_url = upload_thumbail(my_image)
+            if my_image_url:
+                return JsonResponse({'status': 'success','body':my_image_url}, status=status.HTTP_201_CREATED)
+            else:
+                return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
@@ -1125,8 +1128,8 @@ def check_username_valid(username):
 
 @api_view(['POST'])
 def upload_video_to_s3(request):
-    media_file = request.FILES['media']
-    if media_file:
+    media_file = request.FILES.get('media',None)
+    if media_file and request.user.is_authenticated:
         media_url = upload_media(media_file)
         path = default_storage.save(media_file.name, ContentFile(media_file.read()))
         with default_storage.open(media_file.name, 'wb+') as destination:
@@ -1142,8 +1145,8 @@ def upload_video_to_s3(request):
 
 @api_view(['POST'])
 def upload_audio_to_s3(request):
-    media_file = request.FILES['media']
-    if media_file:
+    media_file = request.FILES.get('media', None)
+    if media_file and request.user.is_authenticated:
         media_url = upload_media(media_file)
         return JsonResponse({'status': 'success','body':media_url,'thumbnail':'','media_duration':''}, status=status.HTTP_201_CREATED)
     else:
@@ -4532,8 +4535,8 @@ def get_m3u8_of_ids(request):
 
 @api_view(['POST'])
 def upload_video_to_s3_for_app(request):
-    media_file = request.FILES['media']
-    if media_file:
+    media_file = request.FILES.get('media',None)
+    if media_file and request.user.is_authenticated:
         media_url = upload_media(media_file)
         path = default_storage.save(media_file.name, ContentFile(media_file.read()))
         with default_storage.open(media_file.name, 'wb+') as destination:
