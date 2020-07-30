@@ -1088,9 +1088,11 @@ def uploadCover(media_file, key):
     try:
         client = boto3.client('s3',aws_access_key_id = settings.BOLOINDYA_AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY)
         ts = time.time()
-        created_at = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
         filenameNext= str(media_file.name).split('.')
-        final_filename = str(filenameNext[0])+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[1])
+        # final_filename = str(filenameNext[0])+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[-1])
+        final_filename = "".join(filenameNext[0:len(filenameNext)-1])+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[-1])
+
+        print('final_filename', final_filename)
         client.put_object(Bucket=settings.BOLOINDYA_AWS_IN_BUCKET_NAME, Key= key + final_filename, Body=media_file, ACL='public-read')
         filepath = settings.FILE_PATH_TO_S3 + key + final_filename
         return filepath
@@ -1135,9 +1137,10 @@ def uploadPii(media_file, key):
     try:
         client = boto3.client('s3',aws_access_key_id = settings.BOLOINDYA_AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY)
         ts = time.time()
-        created_at = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
         filenameNext= str(media_file.name).split('.')
-        final_filename = str(filenameNext[0])+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[1])
+        # final_filename = str(filenameNext[0])+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[-1])
+        final_filename = "".join(filenameNext[0:len(filenameNext)-1])+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[-1])
+        print('final_filename ---pii---', final_filename)
         client.put_object(Bucket=settings.BOLOINDYA_AWS_BUCKET_PII, Key= key + final_filename, Body=media_file, ACL='private')
         filepath = settings.FILE_PATH_TO_S3_KYC + key + final_filename
         return filepath
