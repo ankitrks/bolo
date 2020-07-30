@@ -136,8 +136,8 @@ def get_user_bolo_info(user_id,month=None,year=None):
             if all_play_time.has_key('playtime__sum') and all_play_time['playtime__sum']:
                 video_playtime = all_play_time['playtime__sum']
 
-            fplaytime = get_fplaytime(total_video_id,start_date,end_date,0,0)
-            video_playtime+=fplaytime
+            # fplaytime = get_fplaytime(total_video_id,start_date,end_date,0,0)
+            # video_playtime+=fplaytime
             real_view_count = VBseen.objects.filter(topic_id__in = total_video_id).count()
             fake_view_count = FVBseen.objects.filter(topic_id__in = total_video_id).aggregate(Sum('view_count'))
             if fake_view_count.has_key('view_count__sum') and fake_view_count['view_count__sum']:
@@ -164,8 +164,8 @@ def get_user_bolo_info(user_id,month=None,year=None):
                 fake_view_count = fake_view_count['view_count__sum']
             else:
                 fake_view_count = 0
-            fplaytime = get_fplaytime(total_video_id,start_date,end_date,fake_view_count,video_playtime)
-            video_playtime+=fplaytime
+            # fplaytime = get_fplaytime(total_video_id,start_date,end_date,fake_view_count,video_playtime)
+            # video_playtime+=fplaytime
             total_view_count = real_view_count + fake_view_count
 
         for each_pay in all_pay:
@@ -353,4 +353,5 @@ def update_userprofile_all_counter(user_id):
 
 
 
-
+get_user_bolo_info(100506,07,2020)
+get_user_bolo_info(100506,None,None)
