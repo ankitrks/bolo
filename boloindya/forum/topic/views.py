@@ -1281,7 +1281,8 @@ def new_home_updated(request):
     except Exception as e1:
         topics = []
 
-    topicsIds =[16092,25156,26248,23820,3449,4196,4218,17534,12569,12498,9681,9419,9384,8034,8024,26835,24352,14942]
+    topicsIds =[239943,995295,607145,16092,25156,26248,23820,3449,4196]
+    #,17534,12569,12498,9681,9419,9384,8034,8024,26835,24352,14942
     try:
         all_slider_topic = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=topicsIds)[:16]
     except Exception as e1:
