@@ -10,6 +10,7 @@ from django.db.models import Sum
 import calendar
 from forum.user.utils.follow_redis import get_redis_follower, get_redis_following
 from forum.user.models import ReferralCode
+from django.conf import settings
 n = 30
 
 def get_bolo_info_combined(user_id):
@@ -135,13 +136,14 @@ def get_user_bolo_info(user_id,month=None,year=None):
             if all_play_time.has_key('playtime__sum') and all_play_time['playtime__sum']:
                 video_playtime = all_play_time['playtime__sum']
 
+            fplaytime = get_fplaytime(total_video_id,start_date,end_date,0)
+            video_playtime+=fplaytime
             real_view_count = VBseen.objects.filter(topic_id__in = total_video_id).count()
             fake_view_count = FVBseen.objects.filter(topic_id__in = total_video_id).aggregate(Sum('view_count'))
             if fake_view_count.has_key('view_count__sum') and fake_view_count['view_count__sum']:
                 fake_view_count = fake_view_count['view_count__sum']
             else:
                 fake_view_count = 0
-            print real_view_count, fake_view_count
             total_view_count = real_view_count + fake_view_count
            
         else:
@@ -162,7 +164,8 @@ def get_user_bolo_info(user_id,month=None,year=None):
                 fake_view_count = fake_view_count['view_count__sum']
             else:
                 fake_view_count = 0
-            print real_view_count, fake_view_count
+            fplaytime = get_fplaytime(total_video_id,start_date,end_date,fake_view_count)
+            video_playtime+=fplaytime
             total_view_count = real_view_count + fake_view_count
 
         for each_pay in all_pay:
@@ -196,6 +199,22 @@ def get_user_bolo_info(user_id,month=None,year=None):
                         'total_earn':0,'video_playtime':'0 seconds','spent_time':'0 seconds',\
                         'bolo_score':shortcounterprofile(0)}
 
+def get_fplaytime(total_video_id, start_date=None, end_date=None, fake_view_count=0):
+    #hard date afterwards this logic is used
+    if start_date and start_date >= datetime(2020,7,1):
+        if fake_view_count:
+            return fake_view_count*2
+        else:
+            return 0
+    elif not start_date:
+        fake_view_count = FVBseen.objects.filter(topic_id__in = total_video_id,created_at__gte=datetime(2020,7,1)).aggregate(Sum('view_count'))
+        if fake_view_count.has_key('view_count__sum') and fake_view_count['view_count__sum']:
+            fake_view_count = fake_view_count['view_count__sum']
+        else:
+            fake_view_count = 0
+        return fake_view_count*2
+    else:
+        return 0
 
 def set_current_month_insight_video_info(user_id, add):
     key = 'current_month_bolo_info:'+str(user_id)
@@ -312,10 +331,15 @@ def update_profile_counter(user_id, action, value, add = True):
         set_redis(key,userprofile_counter, True)
 
     if action in ['video_count','view_count']:
-        set_current_month_insight_video_info(user_id, add)
-        set_lifetime_insight_video_info(user_id, add)
+        set_current_month_bolo_info(user_id)
+        set_lifetime_bolo_info(user_id)
 
     return True
+
+def update_userprofile_all_counter(user_id):
+    set_current_month_bolo_info(user_id)
+    set_lifetime_bolo_info(user_id)
+    set_userprofile_counter(user_id)
 
 
 
