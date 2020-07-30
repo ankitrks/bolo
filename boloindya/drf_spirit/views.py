@@ -1123,7 +1123,7 @@ def upload_profile_image(request):
 def upload_cover_pic(request):
     try:
         if validateUser(request):
-            coverPic = request.FILES['file']
+            coverPic = request.FILES.get('file', None)
             key = settings.FILE_PATH_COVER_PIC
             coverPicUrl = uploadCover(coverPic, key)
             if coverPicUrl:
@@ -1156,7 +1156,7 @@ def uploadPii(media_file, key):
 def upload_pii(request):
     try:
         if validateUser(request):
-            pii_data = request.FILES['file']
+            pii_data = request.FILES.get('file', None)
             user_id = request.POST.get('user_id', '')
             key = 'kyc/'+user_id+'/'
             pii_data_url = uploadPii(pii_data, key)
