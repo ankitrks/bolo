@@ -341,8 +341,7 @@ def update_profile_counter(user_id, action, value, add = True):
         set_redis(key,userprofile_counter, True)
 
     if action in ['video_count','view_count']:
-        set_current_month_bolo_info(user_id)
-        set_lifetime_bolo_info(user_id)
+        update_userprofile_all_counter(user_id)
 
     return True
 
