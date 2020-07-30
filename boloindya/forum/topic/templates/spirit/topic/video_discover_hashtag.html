@@ -313,6 +313,10 @@
     display: block;
   }
 }
+._2WfMm {
+    overflow: inherit;
+    width: 100%;
+}
 
 @media (max-width: 991px){
 .about-content .about-img {
@@ -422,7 +426,51 @@
 }
 }
 
+._1RNJh {
+    background: #f8f8f8;
+    width: 100%!important;
+    position: fixed;
+    top: 69px;
+    z-index: 9;
+     -webkit-box-shadow: 0 0px 0px 0 hsla(0,0%,50%,.85);
+    box-shadow: 0 0px 0px 0 hsla(0,0%,50%,.85);
+}
+._explore_page_feed_wrapper{
+        margin: 256px auto;
+}
+._2WfMm nav ul li a{
+    font-family: Sailec;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 5px;
+    margin-left: 24px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #B62827;
+}
+._2WfMm nav select {
+    margin: 23px;
+    border: 1px solid #B62827;
+    box-sizing: border-box;
+    border-radius: 5px;
+}
 
+
+.category-whats-hot{
+/*    font-family: Futura;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 21px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #FFFFFF !important;
+    background: #B62827;
+    border-radius: 6px;*/
+}
 
 </style>
 <input type="hidden" name="previousVideoId" id="previousVideoId" value="">
@@ -442,17 +490,28 @@
                         </div>
             
                         <nav>
-                            <ul class="horizontal-scroll">
-                                <li class="item"  id="" style="padding-top:.5em;padding-bottom:.5em;cursor:pointer"><a href="javascript:void(0)" class="category-whats-hot">{% trans "What's Hot" %}</a>
+                            <ul class="">
+                                <li class="item "  id="" style="padding-top:.5em;padding-bottom:.5em;cursor:pointer;"><a style="color: #fff !important;height: 21px;padding: 13px 9px 8px 10px;background: #B62827;border-radius: 6px;" href="javascript:void(0)" class="category-whats-hot whatsHot active">{% trans "What's Hot" %}</a>
                                 </li>
                             
                             {%  for each_category_item in categories %}
-            
-                                <li  class="item" id="" style="padding-top:.5em;padding-bottom:.5em;cursor:pointer"><a href="/tag/{{each_category_item.slug}}/" class="category-name">{% category_title_by_language each_category_item LANGUAGE_CODE|language_name %}</a></li>
-            
+                                {% if  forloop.counter <= 6 %}
+                                <li  class="item categoryFontStyle" id="" style="padding-top:.5em;padding-bottom:.5em;cursor:pointer"><a href="/tag/{{each_category_item.slug}}/" class="category-name">{% category_title_by_language each_category_item LANGUAGE_CODE|language_name %}</a></li>
+                                {% endif %}
                             {% endfor %}
                             </ul>
+                            <select class="event-type-select popularDropdownRight">
+                                <option value="all">Filter</option>
+                                {%  for each_category_item in categories %}
+                                    {% if  forloop.counter > 6 %}
+                                        <option value="{each_category_item.slug}}">{% category_title_by_language each_category_item LANGUAGE_CODE|language_name %}</option>
+                                    {% endif %}
+                                {% endfor %}  
+
+                            </select>
+
                         </nav>
+
                     </div>
                 </div>
             </div>
