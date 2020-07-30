@@ -1718,7 +1718,7 @@ def topic_delete(request):
 
             try:
                 topic.delete(is_user_deleted=True)
-                update_profile_counter(user_id,'video_count',1, False)
+                update_profile_counter(topic.user_id,'video_count',1, False)
                 return JsonResponse({'message': 'Topic Deleted'}, status=status.HTTP_201_CREATED)
             except:
                 return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)

@@ -61,6 +61,7 @@ from drf_spirit.views import * # deafult_boloindya_follow
 from drf_spirit.views import get_tokens_for_user
 from rest_framework.decorators import api_view
 from rest_framework import status
+from forum.user.utils.bolo_redis import update_profile_counter
 
 class AutoConnectSocialAccount(DefaultSocialAccountAdapter):
 
@@ -1449,10 +1450,12 @@ def delete_video(request):
                 curr_month_del_vids = VideoDelete.objects.filter(user=user, created_at__month=today.month, created_at__year=today.year)
 
                 if(curr_month_del_vids.count() < 3):
-                    result = topic.delete()
-                    if result:
-                        obj, created = VideoDelete.objects.get_or_create(user=user, video=topic)
-                        return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)
+                    if not topic.is_removed:
+                        result = topic.delete(is_user_deleted=True)
+                        update_profile_counter(topic.user_id,'video_count',1, False)
+                        if result:
+                            obj, created = VideoDelete.objects.get_or_create(user=user, video=topic)
+                            return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)
 
                 else:
                     return JsonResponse({'message': 'You can only delete a maximum of 3 videos in a month.'}, status=status.HTTP_204_NO_CONTENT)
