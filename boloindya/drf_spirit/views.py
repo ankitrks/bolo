@@ -1095,7 +1095,6 @@ def uploadCover(media_file, key):
         client = boto3.client('s3',aws_access_key_id = settings.BOLOINDYA_AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY)
         ts = time.time()
         filenameNext= str(media_file.name).split('.')
-        # final_filename = str(filenameNext[0])+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[-1])
         final_filename = "".join(filenameNext[0:len(filenameNext)-1])+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[-1])
         client.put_object(Bucket=settings.BOLOINDYA_AWS_IN_BUCKET_NAME, Key= key + final_filename, Body=media_file, ACL='public-read')
         filepath = settings.FILE_PATH_TO_S3 + key + final_filename
@@ -1145,7 +1144,6 @@ def uploadPii(media_file, key):
         client = boto3.client('s3',aws_access_key_id = settings.BOLOINDYA_AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY)
         ts = time.time()
         filenameNext= str(media_file.name).split('.')
-        # final_filename = str(filenameNext[0])+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[-1])
         final_filename = "".join(filenameNext[0:len(filenameNext)-1])+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[-1])
         client.put_object(Bucket=settings.BOLOINDYA_AWS_BUCKET_PII, Key= key + final_filename, Body=media_file, ACL='private')
         filepath = settings.FILE_PATH_TO_S3_KYC + key + final_filename
