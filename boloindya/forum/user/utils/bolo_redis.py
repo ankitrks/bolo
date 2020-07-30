@@ -352,6 +352,3 @@ def update_userprofile_all_counter(user_id):
     set_userprofile_counter(user_id)
 
 
-
-get_user_bolo_info(100506,07,2020)
-get_user_bolo_info(100506,None,None)
