@@ -221,7 +221,7 @@ def check_follower(user_id):
             time_passed = (datetime.now() - userprofile.boosted_time).total_seconds()/3600
             if time_passed > boost_span:
                 time_passed = boost_span
-            multiplication_factor = int(multiplication_factor*decimal.Decimal(boost_span)/boost_span)
+            multiplication_factor = int(multiplication_factor*decimal.Decimal(time_passed)/boost_span)
             if userprofile.follower_count < int(400*multiplication_factor):
                 required_follower = random.randrange(1,int(400*multiplication_factor)-userprofile.follower_count)
             else:

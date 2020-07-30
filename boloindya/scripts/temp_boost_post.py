@@ -15,6 +15,7 @@ import gc
 import decimal
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
 from drf_spirit.utils import create_random_user
+from forum.user.utils.bolo_redis import update_profile_counter
 
 def run():
     counter_objects_created=0
@@ -80,6 +81,7 @@ def run():
                 Topic.objects.filter(pk=each_seen_id).update(view_count = F('view_count')+number_seen)
                 FVBseen.objects.create(topic_id = each_seen_id, view_count = number_seen)
                 profile_updation = UserProfile.objects.filter(user = Topic.objects.get(pk=each_seen_id).user).update(own_vb_view_count = F('own_vb_view_count')+number_seen, view_count = F('view_count')+number_seen)
+                update_profile_counter(Topic.objects.get(pk=each_seen_id).user_id,'view_count',number_seen,True)
             print "after: views updation",datetime.now()
             print "total created: ", number_seen
         except Exception as e:
@@ -181,9 +183,9 @@ def check_like(topic_id,user_ids):
                 each['action_object_id'] = each['id']
                 del each['id']
             to_be_created_bolo= already_liked
+            action = get_weight_object('liked')
             notific_dic = copy.deepcopy(to_be_created_bolo)
             if score > 0:
-                action = get_weight_object('liked')
                 for each_bolo in to_be_created_bolo:
                     each_bolo['action'] = action
                     each_bolo['score'] = score
