@@ -1084,6 +1084,12 @@ def upload_media(media_file):
     except:
         return None
 
+def validateUser(request):
+    if request.user.is_authenticated and not request.user.st.is_guest_user:
+        return True
+    else:
+        return False
+
 def uploadCover(media_file, key):
     try:
         client = boto3.client('s3',aws_access_key_id = settings.BOLOINDYA_AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY)
@@ -1091,8 +1097,6 @@ def uploadCover(media_file, key):
         filenameNext= str(media_file.name).split('.')
         # final_filename = str(filenameNext[0])+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[-1])
         final_filename = "".join(filenameNext[0:len(filenameNext)-1])+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[-1])
-
-        print('final_filename', final_filename)
         client.put_object(Bucket=settings.BOLOINDYA_AWS_IN_BUCKET_NAME, Key= key + final_filename, Body=media_file, ACL='public-read')
         filepath = settings.FILE_PATH_TO_S3 + key + final_filename
         return filepath
@@ -1119,11 +1123,14 @@ def upload_profile_image(request):
 @api_view(['POST'])
 def upload_cover_pic(request):
     try:
-        coverPic = request.FILES['file']
-        key = settings.FILE_PATH_COVER_PIC
-        coverPicUrl = uploadCover(coverPic, key)
-        if coverPicUrl:
-            return JsonResponse({'status': 'success','body':coverPicUrl}, status=status.HTTP_201_CREATED)
+        if validateUser(request):
+            coverPic = request.FILES['file']
+            key = settings.FILE_PATH_COVER_PIC
+            coverPicUrl = uploadCover(coverPic, key)
+            if coverPicUrl:
+                return JsonResponse({'status': 'success','body':coverPicUrl}, status=status.HTTP_201_CREATED)
+            else:
+                return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
@@ -1140,7 +1147,6 @@ def uploadPii(media_file, key):
         filenameNext= str(media_file.name).split('.')
         # final_filename = str(filenameNext[0])+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[-1])
         final_filename = "".join(filenameNext[0:len(filenameNext)-1])+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[-1])
-        print('final_filename ---pii---', final_filename)
         client.put_object(Bucket=settings.BOLOINDYA_AWS_BUCKET_PII, Key= key + final_filename, Body=media_file, ACL='private')
         filepath = settings.FILE_PATH_TO_S3_KYC + key + final_filename
         return filepath
@@ -1151,12 +1157,15 @@ def uploadPii(media_file, key):
 @api_view(['POST'])
 def upload_pii(request):
     try:
-        pii_data = request.FILES['file']
-        user_id = request.POST.get('user_id', '')
-        key = 'kyc/'+user_id+'/'
-        pii_data_url = uploadPii(pii_data, key)
-        if pii_data_url:
-            return JsonResponse({'status': 'success','body':pii_data_url}, status=status.HTTP_201_CREATED)
+        if validateUser(request):
+            pii_data = request.FILES['file']
+            user_id = request.POST.get('user_id', '')
+            key = 'kyc/'+user_id+'/'
+            pii_data_url = uploadPii(pii_data, key)
+            if pii_data_url:
+                return JsonResponse({'status': 'success','body':pii_data_url}, status=status.HTTP_201_CREATED)
+            else:
+                return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
