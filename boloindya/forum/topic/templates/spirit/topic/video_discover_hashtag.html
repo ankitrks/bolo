@@ -699,11 +699,11 @@
                                 {% endif %}
                             {% endfor %}
                             </ul>
-                            <select class="event-type-select popularDropdownRight" onchange="">
+                            <select class="event-type-select popularDropdownRight" id="hashtagChangeIdCat" onchange="onChangeCategory(this)">
                                 <option value="all">Filter</option>
                                 {%  for each_category_item in categories %}
                                     {% if  forloop.counter > 6 %}
-                                        <option value="{each_category_item.slug}}">{% category_title_by_language each_category_item LANGUAGE_CODE|language_name %}</option>
+                                        <option value="/tag/{{each_category_item.slug}}/">{% category_title_by_language each_category_item LANGUAGE_CODE|language_name %}</option>
                                     {% endif %}
                                 {% endfor %}  
 
@@ -760,6 +760,16 @@
             </div>
             
             <script src="/media/js/video_discover_hashtag.js"></script>
+
+
+            <script type="text/javascript">
+                function onChangeCategory(hashTag) {
+                    var pageName = jQuery("#hashtagChangeIdCat").val();
+                    window.location.href = pageName;
+                    return false;
+                }
+            </script>
+
             <script type="text/javascript">
                 $(function(){
                 var url = window.location.href; 

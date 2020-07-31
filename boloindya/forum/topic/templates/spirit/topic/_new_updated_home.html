@@ -1848,25 +1848,26 @@ img {
                     <nav>
                         <ul>
                             <li class="current"><a onclick="onClickRedirect('/{{LANGUAGE_CODE}}/discover/');" href="javascript:void(0);">What's Hot</a></li>
-                            <li><a href="#">#saynotodomesticviolence</a></li>
-                            <li><a href="#">#fashion</a></li>
-                            <li><a href="#">#hindi</a></li>
-                            <li><a href="#">#language</a></li>
-                            <li><a href="#">#local</a></li>
+                            
+                            {%  for each_category_item in hash_tags %}
+                                {% if  forloop.counter <= 8 %}
+                                <li  class="item categoryFontStyle" id="" style="padding-top:.5em;padding-bottom:.5em;cursor:pointer"><a onclick="onClickRedirect('/{{LANGUAGE_CODE}}/hashtag/{{each_category_item.hash_tag}}/');" href="javascript:void(0);" class="category-name">#{{each_category_item.hash_tag}}</a></li>
+                                {% endif %}
+                            {% endfor %}
                         </ul>
                     </nav>
+
                 </div>
             </div>
 
             <div class="jsx-1929076256 about-img10">
-                <select class="event-type-select popularDropdownRight">
+                <select class="event-type-select popularDropdownRight" id="hashtagChangeId" onchange="onChangeHashTag(this)">
                     <option value="all">Filter</option>
-                    <option value="music">language</option>
-                    <option value="food">local</option>
-                    <option value="art">hindi</option>
-                    <option value="fashion">Fashion</option>
-                    <option value="sport">Sport</option>
-                    <option value="history">History</option>
+                    {%  for each_category_item in hash_tags %}
+                        {% if  forloop.counter > 8 %}
+                            <option value="/{{LANGUAGE_CODE}}/hashtag/{{each_category_item.hash_tag}}/">#{{each_category_item.hash_tag}}</option>
+                        {% endif %}
+                    {% endfor %}  
                 </select>
             </div>
         </div>
@@ -2198,6 +2199,14 @@ width: 45%;
 //         backSpeed: 30
 //     });
 // });
+</script>
+
+
+<script type="text/javascript">
+    function onChangeHashTag(hashTag) {
+        var hashTagVal = jQuery("#hashtagChangeId").val();
+        onClickRedirect(hashTagVal);
+    }
 </script>
 
 <!-- Start Comments Section -->

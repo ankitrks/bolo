@@ -991,14 +991,14 @@ def new_home_updated(request):
     except Exception as e1:
         topics = []
 
-    topicsIds =[16092,25156,26248,23820,3449,4196,4218,17534,12569,12498,9681,9419,9384,8034,8024,26835,24352,14942]
+    topicsIds =[16092,25156,26248,23820,3449]
     try:
         all_slider_topic = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=topicsIds)[:16]
     except Exception as e1:
         all_slider_topic = []
 
     try:
-        hash_tags = TongueTwister.objects.order_by('-hash_counter')[:4]
+        hash_tags = TongueTwister.objects.order_by('-hash_counter')[:20]
     except Exception as e1:
         hash_tags = []
 
