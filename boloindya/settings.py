@@ -654,4 +654,5 @@ USER_DATA_REDIS_EXPIRY_TIME = 43200 #12 hrs in seconds
 
 PUSH_NOTIFICATION_TEST_USER = [19, 20, 1492, 328, 41, 40]
 PUSH_NOTIFICATION_URL = "https://fcm.googleapis.com/v1/projects/boloindya-1ec98/messages:send"
-FTIME_PLAY = 2
+FTIME_PLAY = 2 # in seconds
+FPLAYTIME_LIMIT = 180000 # in seconds 50 hours

@@ -205,7 +205,7 @@ def get_fplaytime(user_id, start_date=None, end_date=None, fake_view_count=0,pla
     if start_date and start_date >= datetime(2020,7,1):
         mwfplaytime,is_created = MonthWiseFplaytime.objects.get_or_create(user_id= user_id,for_month=start_date.month, for_year = start_date.month)
         fplaytime = fake_view_count*settings.FTIME_PLAY
-        if playtime < 180000 and end_date + timedelta(days=1) >= datetime.now():
+        if playtime < settings.FPLAYTIME_LIMIT and end_date + timedelta(days=1) >= datetime.now():
             mwfplaytime.fplaytime = fplaytime
             mwfplaytime.save()
         return mwfplaytime.fplaytime
