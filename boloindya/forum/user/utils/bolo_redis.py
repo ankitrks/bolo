@@ -1,5 +1,5 @@
 from redis_utils import *
-from forum.user.models import VideoPlaytime, UserPay, OldMonthInsightData
+from forum.user.models import VideoPlaytime, UserPay, OldMonthInsightData, MonthWiseFplaytime
 from forum.topic.models import Topic, VBseen, Like, SocialShare, FVBseen
 from forum.user.models import UserProfile, Follower
 from forum.comment.models import Comment
@@ -113,6 +113,7 @@ def get_user_bolo_info(user_id,month=None,year=None):
         total_like_count=0
         total_comment_count = 0
         total_share_count = 0
+        fplaytime = 0
         user = User.objects.get(pk=user_id)
         if month and year:
             days = calendar.monthrange(int(year),int(month))[1]
@@ -136,8 +137,8 @@ def get_user_bolo_info(user_id,month=None,year=None):
             if all_play_time.has_key('playtime__sum') and all_play_time['playtime__sum']:
                 video_playtime = all_play_time['playtime__sum']
 
-            # fplaytime = get_fplaytime(total_video_id,start_date,end_date,0,0)
-            # video_playtime+=fplaytime
+            fplaytime = get_fplaytime(user_id,start_date,end_date,0,0)
+            video_playtime+=fplaytime
             real_view_count = VBseen.objects.filter(topic_id__in = total_video_id).count()
             fake_view_count = FVBseen.objects.filter(topic_id__in = total_video_id).aggregate(Sum('view_count'))
             if fake_view_count.has_key('view_count__sum') and fake_view_count['view_count__sum']:
@@ -164,8 +165,8 @@ def get_user_bolo_info(user_id,month=None,year=None):
                 fake_view_count = fake_view_count['view_count__sum']
             else:
                 fake_view_count = 0
-            # fplaytime = get_fplaytime(total_video_id,start_date,end_date,fake_view_count,video_playtime)
-            # video_playtime+=fplaytime
+            fplaytime = get_fplaytime(user_id,start_date,end_date,fake_view_count,video_playtime)
+            video_playtime+=fplaytime
             total_view_count = real_view_count + fake_view_count
 
         for each_pay in all_pay:
@@ -199,30 +200,22 @@ def get_user_bolo_info(user_id,month=None,year=None):
                         'total_earn':0,'video_playtime':'0 seconds','spent_time':'0 seconds',\
                         'bolo_score':shortcounterprofile(0)}
 
-def get_fplaytime(total_video_id, start_date=None, end_date=None, fake_view_count=0,playtime=0):
+def get_fplaytime(user_id, start_date=None, end_date=None, fake_view_count=0,playtime=0):
     #hard date afterwards this logic is used
     if start_date and start_date >= datetime(2020,7,1):
-        if fake_view_count:
-            fake_playtime = fake_view_count*settings.FTIME_PLAY
-            if fake_playtime > playtime:
-                return fake_playtime - video_playtime
-            return 0
-        else:
-            return 0
+        mwfplaytime,is_created = MonthWiseFplaytime.objects.get_or_create(user_id= user_id,for_month=start_date.month, for_year = start_date.month)
+        fplaytime = int(fake_view_count*settings.FTIME_PLAY)
+        if playtime < settings.FPLAYTIME_LIMIT and end_date + timedelta(days=1) >= datetime.now():
+            mwfplaytime.fplaytime = fplaytime
+            mwfplaytime.save()
+        return mwfplaytime.fplaytime
     elif not start_date:
-        fake_view_count = FVBseen.objects.filter(topic_id__in = total_video_id,created_at__gte=datetime(2020,7,1)).aggregate(Sum('view_count'))
-        if fake_view_count.has_key('view_count__sum') and fake_view_count['view_count__sum']:
-            fake_view_count = fake_view_count['view_count__sum']
+        all_fplaytime = MonthWiseFplaytime.objects.filter(user_id= user_id).aggregate(Sum('fplaytime'))
+        if all_fplaytime.has_key('fplaytime__sum') and all_fplaytime['fplaytime__sum']:
+            fplaytime = all_fplaytime['fplaytime__sum']
         else:
-            fake_view_count = 0
-        video_playtime = 0
-        all_play_time = VideoPlaytime.objects.filter(timestamp__gte=datetime(2020,7,1), video_id__in = total_video_id).aggregate(Sum('playtime'))
-        if all_play_time.has_key('playtime__sum') and all_play_time['playtime__sum']:
-            video_playtime = all_play_time['playtime__sum']
-        fake_playtime = fake_view_count*settings.FTIME_PLAY
-        if fake_playtime > playtime:
-            return fake_playtime - video_playtime
-        return 0
+            fplaytime = 0
+        return fplaytime
     else:
         return 0
 
