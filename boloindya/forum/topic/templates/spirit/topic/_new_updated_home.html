@@ -1903,7 +1903,6 @@ img {
                     {% for itemVideo in sliderVideos %} 
                         <div class="column ">
                             <div class="card" style="background-color: #fff; padding: 20px;">
-<!--                             <img onClick="openVideoInPopupSlider1('{{itemVideo.id}}','{{itemVideo.question_video | get_video_cdn}}','{{itemVideo.backup_url}}','{{itemVideo.question_image}}');" class="_video_card_mute _video_card_mute_left_top muteSrcId_{{itemVideo.id}}" id="mutedImageId" src="/media/sound_mute.svg"> -->
                             <span id="video_play_item_{{itemVideo.id}}" class="min-span-height">
                                 <video  id="player-{{itemVideo.id}}" preload="auto" muted autoplay poster="{{itemVideo.question_image}}" class="videoCentered videoSliderPlay">
                                     <source src="{{itemVideo.question_video}}" type="application/x-mpegURL">

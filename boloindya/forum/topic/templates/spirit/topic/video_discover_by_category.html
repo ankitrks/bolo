@@ -1,4 +1,4 @@
-{% extends "spirit/_new_base.html" %}
+{% extends "spirit/_new_layout_base.html" %}
 {% load spirit_tags i18n %}
 {% load i18n %}
 {% load number_formate_change_tag %}
@@ -331,7 +331,195 @@ video.jsx-3382097194 {
 }
 
 </style>
-<div class="jsx-3819228898">
+
+<style type="text/css">
+    
+
+
+
+/* Create two equal columns that floats next to each other */
+.column {
+    float: left;
+    width: 32%;
+    padding: 3px;
+    height: auto;
+}
+.column1 {
+    float: left;
+    width: 33%;
+    padding: 3px 0px 10px 6px;
+    height: auto;
+}
+
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.card {
+    background: #ffffff;
+    box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.11);
+    border-radius: 2px;
+}
+
+.card img {
+    width: 100%;
+    height: 500px;
+}
+
+.header-container {
+    height: 75px !important;
+}
+
+.about-content .about-img4 {
+    position: relative;
+    width: 48%;
+    padding: 1% 0 0 1%;
+}
+
+.mainHeading {
+    font-style: normal;
+    font-weight: 500;
+    font-size: 40px;
+    line-height: 50px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #000000;
+}
+
+.rightTopHeading {
+    font-style: normal;
+    font-weight: normal;
+    font-size: 32px;
+    line-height: 44px;
+    display: flex;
+    margin-top: -82px;
+    align-items: center;
+    text-align: center;
+
+    color: #1b3042;
+}
+.downloadText {
+    font-style: normal;
+    font-weight: 500;
+    font-size: 90px;
+    line-height: 112px;
+    display: inherit;
+    align-items: center;
+    text-align: center;
+    color: #1b3042;
+}
+.textalign_center {
+    text-align: center;
+    margin-top: 30px;
+}
+.mobile1Img {
+    position: absolute;
+    width: 328.76px;
+    height: 687.97px;
+    left: 204px;
+    top: 0%;
+}
+.mobile2Img {
+    position: absolute;
+    width: 328.76px;
+    height: 687.97px;
+    left: 276.04px;
+    top: 7%;
+}
+.mobile_bottom {
+    position: absolute;
+    width: 372px;
+    height: 14px;
+    left: 264px;
+    top: 100%;
+    background: radial-gradient(58.63% 50% at 50% 50%, rgba(0, 0, 0, 0.57) 0%, rgba(0, 0, 0, 0) 100%);
+    filter: blur(7px);
+}
+
+/*============================End=========================*/
+
+/*New layout media query*/
+
+@media (max-width: 991px) {
+    .mainHeader .navbar nav .get-started-btn {
+        background: #b62827;
+        color: #fff;
+        border-radius: 100px;
+        padding: 5px 16px 5px 9px;
+        margin-right: 10px;
+    }
+    .header-container .header-content {
+        padding: 0 0px;
+    }
+
+    .mainHeader .navbar {
+        padding: 0px 0px 0px 0px;
+    }
+
+    .mainHeader .navbar nav {
+        width: 70%;
+        display: flex;
+    }
+    .hideOnMobileSite {
+        display: none !important;
+    }
+}
+
+/*End*/
+
+
+</style>
+<!-- End -->
+<style type="text/css">
+    .min-span-height{
+        max-height: 588px;
+        min-height: 588px;
+    }
+    .videoCentered{
+        height: 370px !important;
+    }
+    .videoCentered1{
+        height: 140px !important;
+    }
+    .videoRowCardBody{
+        min-height: 50px;
+    }
+
+.videoRowCardBody1{
+    min-height: 20px;
+}
+
+
+.videoRowCardBody {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+._explore_feed_header{
+    height: 33px;
+}
+
+.trendingVideoOfTheDay{
+    font-family: Sailec;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 20px;
+    display: flex;
+    align-items: center;
+    color: #B62827;
+}
+.share-layout{
+    width: 95%;
+}
+</style>
+
+
+<div class="jsx-3819228898" style="background: #f8f8f8;background-image: url(/media/background_eclipse.png);">
 
     <input type="hidden" name="id" id="currentCatId" value="{{ category_details.id}}">
     <input type="hidden" name="previousVideoId" id="previousVideoId" value="">
@@ -339,8 +527,8 @@ video.jsx-3382097194 {
 
 
 
-    <div class="jsx-606928072 share-layout">
-        <div class="share-layout-content">
+    <div class="jsx-606928072 share-layout" >
+        <div class="share-layout-content" >
             <header class="share-layout-header bottom-line share-header">
                 <div class="header-back header-left backButton"><a href="/discover/"><img src="/media/back-button.svg"></a></div>
                 <div class="jsx-2177493926 jsx-578937417 avatar round userProfilAvator" style="background-image: url({{ category_details.category_image}}); "></div>
@@ -366,14 +554,12 @@ video.jsx-3382097194 {
                     </div>
                 </div>
             </main>
-           
-
-
+        
 
         </div>
         <aside class="share-layout-aside ">
             <div class="jsx-1422783265 recommend-aside">
-                <div class="jsx-29267105 share-group">
+<!--                 <div class="jsx-29267105 share-group">
                     <a href="javascript:void(0)" onclick="social_share_page('facebook_share','{{ request.get_full_path }}')"  class="jsx-29267105">
                         <span><img src="/media/facebook.svg" class="jsx-29267105"></span>
                     </a>
@@ -383,25 +569,14 @@ video.jsx-3382097194 {
                     <a href="javascript:void(0)" onclick="social_share_page('whatsapp_share','{{ request.get_full_path }}')"  class="jsx-29267105"><span><img src="/media/whatsapp.png" class="jsx-29267105"></span>
                     </a>
 
-                </div>
+                </div> -->
                 <div class="jsx-3959364739 recommend-card">
-<!--                     <header class="jsx-3959364739">
-                        <h3 class="jsx-3959364739">{% trans "Suggested Users" %}</h3><a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a></header>
-                    <div class="_scroll_load_more_loading_creator center">
-                        <div class="boloindya-loading">Loading...</div>
-                    </div>
 
-                    <ul class="jsx-3959364739 sidebarLi" id="creatorId11">
-
-
-
-                    </ul> -->
 
                                 <header class="jsx-3959364739">
-                                    <h3 class="jsx-3959364739">{% trans "Suggested Users" %}</h3><!-- <a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a> --></header>
-<!--                                 <div class="_scroll_load_more_loading_creator center">
-                                    <div class="boloindya-loading">Loading...</div>
-                                </div> -->
+                                    <h3 class="jsx-3959364739">{% trans "Suggested Users" %}</h3>
+                                </header>
+
 
                                 <ul class="jsx-3959364739 sidebarLi" id="creatorId1">
 
@@ -436,29 +611,6 @@ video.jsx-3382097194 {
                                 </ul>
 
                 </div>
-<!--                             <div class="jsx-3959364739 recommend-card" style="margin-top: 10px;">
-                                <header class="jsx-3959364739">
-                                    <h3 style="font-size: 24px;" class="jsx-3959364739">{% trans "Trending Hashtags" %}</h3><a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a></header>
-                                <ul class="jsx-3959364739 sidebarLi" id="creatorId2">
-
-
-
-
-                                    {%  for each_hashtag_item in hash_tags %}
-                                
-                                        <li class="jsx-3959364739">
-                                            <a tag="a" class="jsx-1420774184 recommend-item" href="/hashtag/{{each_hashtag_item.hash_tag}}/">
-                                                <div class="jsx-1420774184 info-content">
-                                                    <h4 class="jsx-1420774184">#{{each_hashtag_item.hash_tag}}</h4>
-                                                    <p class="jsx-1420774184">{{each_hashtag_item.total_views | shorcountertopic}} {% trans "views" %}</p>
-                                                </div>
-                                                <div class="jsx-1420774184 arrow-right"></div>
-                                            </a>
-                                        </li>
-                                    {% endfor %}
-
-                                </ul>
-                            </div> -->
 
                 <div class="jsx-3959364739 recommend-card">
                     <header class="jsx-3959364739">
@@ -470,18 +622,17 @@ video.jsx-3382097194 {
                     </ul>
                 </div>
             </div>
-            <div class="jsx-3336228099 download-container card">
+<!--             <div class="jsx-3336228099 download-container card">
 
                 <div class="jsx-3336228099 download-content download-link">
                     <h3 class="_download_title">{% trans "Get the App" %}</h3>
                     <div class="jsx-3336228099 download-wrapper">
 
-<!--                         <a href="https://app.appsflyer.com/id835599320" target="_blank" rel="nofollow" class="jsx-3336228099"><img src="//sf-tb-sg.ibytedtos.com/obj/ttfe-malisg/store-badge/apple/en.png" alt="apple-store" class="jsx-3336228099"></a> -->
                         <a href="https://play.google.com/store/apps/details?id=com.boloindya.boloindya&hl=en_IN" target="_blank" rel="nofollow" class="jsx-3336228099"><img src="//sf-tb-sg.ibytedtos.com/obj/ttfe-malisg/store-badge/google/en.png" alt="google-store" class="jsx-3336228099"></a>
-<!--                         <a href="https://www.amazon.com/dp/B0117U0G3M/" target="_blank" rel="nofollow" class="jsx-3336228099"><img src="//sf-tb-sg.ibytedtos.com/obj/ttfe-malisg/store-badge/amazon/en.png" alt="amazon-store" class="jsx-3336228099"></a> -->
+
                     </div>
                 </div>
-            </div>
+            </div> -->
         </aside>
     </div>
 </div>

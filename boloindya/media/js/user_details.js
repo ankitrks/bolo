@@ -43,7 +43,8 @@ function getUserVideos(limit,offset){
             var videoItemList=response.results;
             jQuery("#userVideoCountId").html(response.count);
             videoItemList.forEach(function(itemCreator) {itemCount++;
-                userVideoItems =getVideoItem(itemCreator,itemCount);
+                userVideoItems =videoItemsTemplate(itemCreator,itemCount);
+                //userVideoItems =getVideoItem(itemCreator,itemCount);
                 $("#userVideosListId").append(userVideoItems);
                 playListData.push(itemCreator);
       
@@ -88,7 +89,8 @@ function loadMoreData(NextPageUrl){
                 userVideoItems="";
                 var videoItemList=data.results;
                 videoItemList.forEach(function(itemCreator) {itemCount++;
-                userVideoItems +=getVideoItem(itemCreator,itemCount);
+                userVideoItems +=videoItemsTemplate(itemCreator,itemCount);
+                //userVideoItems +=getVideoItem(itemCreator,itemCount);
                 playListData.push(itemCreator);          
       
                 });
@@ -149,6 +151,63 @@ function getVideoItem(videoItem,itemCount){
 
         return userVideoItem;
 }
+
+function videoItemsTemplate(itemVideoByte,itemCount) {
+    var content_title="";
+    var videoTitle="";
+        videoTitle=removeTags(itemVideoByte.title);
+        content_title = videoTitle.substr(0, 10) + " ..."
+
+    var popularHashTagTemplateItems ='<div class="column " style="cursor: pointer;">\
+                            <div class="card" onClick="openVideoInPopup(\''+itemVideoByte.question_video+'\',\''+itemVideoByte.question_image+'\','+itemCount+');" style="background-color: #fff; padding: 20px;">\
+                            <span id="video_play_item_'+itemVideoByte.id+'" class="min-span-height">\
+                                <video  id="player-'+itemVideoByte.id+'" preload="auto" muted autoplay poster="'+itemVideoByte.question_image+'" class="videoCentered videoSliderPlay">\
+                                </video>\
+                            </span>\
+                                <div class="card-body videoRowCardBody" style="">\
+                                    <div>\
+                                        <h5 class="title"></h5>\
+                                        <p class="desc">'+content_title+'</p>\
+                                    </div>\
+                                    <div style="display: inline-flex; justify-content: space-between;">\
+                                        <div style="margin-right: 10px;">\
+                                            <a href="#">\
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\
+                                                    <path d="M17 4.5C14.9 4.5 13.05 5.55 12 7.2C10.95 5.55 9.1 4.5 7 4.5C3.7 4.5 1 7.2 1 10.5C1 16.45 12 22.5 12 22.5C12 22.5 23 16.5 23 10.5C23 7.2 20.3 4.5 17 4.5Z" fill="#F44336"></path>\
+                                                </svg>\
+                                            </a>\
+                                        </div>\
+                                        <div style="margin-right: 10px;">\
+                                            <a href="#">\
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\
+                                                    <g clip-path="url(#clip0)">\
+                                                        <path\
+                                                            d="M11.9999 1.5C5.37181 1.5 -6.28186e-05 5.86406 -6.28186e-05 11.25C-6.28186e-05 13.4812 0.93275 15.525 2.47962 17.1703C1.78119 19.0172 0.328062 20.5828 0.304625 20.6016C-0.00475032 20.9297 -0.0891253 21.4078 0.0889997 21.8203C0.267125 22.2328 0.674937 22.5 1.12494 22.5C4.00775 22.5 6.28119 21.2953 7.64525 20.3297C8.99994 20.7563 10.4624 21 11.9999 21C18.6281 21 23.9999 16.6359 23.9999 11.25C23.9999 5.86406 18.6281 1.5 11.9999 1.5ZM11.9999 18.75C10.7484 18.75 9.51088 18.5578 8.32494 18.1828L7.26087 17.8453L6.34681 18.4922C5.6765 18.9656 4.75775 19.4953 3.6515 19.8516C3.99369 19.2844 4.3265 18.6469 4.58431 17.9672L5.08119 16.65L4.11556 15.6281C3.26712 14.7234 2.24994 13.2281 2.24994 11.25C2.24994 7.11563 6.62337 3.75 11.9999 3.75C17.3765 3.75 21.7499 7.11563 21.7499 11.25C21.7499 15.3844 17.3765 18.75 11.9999 18.75Z" fill="#545454"></path>\
+                                                    </g>\
+                                                    <defs>\
+                                                        <clipPath id="clip0">\
+                                                            <rect width="24" height="24" fill="white"></rect>\
+                                                        </clipPath>\
+                                                    </defs>\
+                                                </svg>\
+                                            </a>\
+                                        </div>\
+                                        <div>\
+                                            <a href="#">\
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\
+                                                    <path d="M3 12C3 13.654 4.346 15 6 15C6.794 15 7.512 14.685 8.049 14.18L14.04 17.604C14.022 17.734 14 17.864 14 18C14 19.654 15.346 21 17 21C18.654 21 20 19.654 20 18C20 16.346 18.654 15 17 15C16.206 15 15.488 15.315 14.951 15.82L8.96 12.397C8.978 12.266 9 12.136 9 12C9 11.864 8.978 11.734 8.96 11.603L14.951 8.18C15.488 8.685 16.206 9 17 9C18.654 9 20 7.654 20 6C20 4.346 18.654 3 17 3C15.346 3 14 4.346 14 6C14 6.136 14.022 6.266 14.04 6.397L8.049 9.82C7.496 9.29468 6.76273 9.00123 6 9C4.346 9 3 10.346 3 12Z" fill="#545454"></path>\
+                                                </svg>\
+                                            </a>\
+                                        </div>\
+                                    </div>\
+                                </div>\
+                            </div>\
+                        </div>';
+
+    return popularHashTagTemplateItems
+}
+
+
 
 $(document).ready(function(){
     getUserVideos(10,0);

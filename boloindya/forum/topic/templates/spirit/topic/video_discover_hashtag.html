@@ -29,7 +29,7 @@
         max-width: 86.5%;
     }
     ._explore_feed_wrapper{
-        margin-right: 106px;
+        margin-right: 0px;
     }
     #player{
             height: 748px !important;
@@ -436,7 +436,7 @@
     box-shadow: 0 0px 0px 0 hsla(0,0%,50%,.85);
 }
 ._explore_page_feed_wrapper{
-        margin: 256px auto;
+        margin: 156px auto;
 }
 ._2WfMm nav ul li a{
     font-family: Sailec;
@@ -472,11 +472,210 @@
     border-radius: 6px;*/
 }
 
+._explore_page_feed_wrapper{
+    min-width: 100%;
+}
+._explore_feed_item{
+    width: 100%;
+}
+
+
+
+
 </style>
+<!-- Content Layout design -->
+
+<style type="text/css">
+    
+
+.content-body .banner-header button {
+    background: #b62827;
+    color: #fff;
+    border-radius: 100px;
+    padding: 10px 30px 10px;
+    cursor: pointer;
+    border: none;
+    font-size: 24px;
+    margin-bottom: 27px;
+}
+.content-body .banner-header p {
+    font-size: 20px;
+    font-weight: 500;
+    color: #000000;
+}
+.content-body .banner-header p .signin-link a {
+    text-decoration: none;
+    color: #b62827;
+}
+
+.app-review {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.app-review .right-section {
+    padding-top: 100px;
+    text-align: center;
+}
+
+/* Create two equal columns that floats next to each other */
+.column {
+    float: left;
+    width: 30%;
+    padding: 22px;
+    height: auto; /* Should be removed. Only for demonstration */
+}
+
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.card {
+    background: #ffffff;
+    box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.11);
+    border-radius: 2px;
+}
+
+.card img {
+    width: 100%;
+    height: 500px;
+}
+
+.header-container {
+    height: 75px !important;
+}
+
+.about-content .about-img4 {
+    position: relative;
+    width: 48%;
+    padding: 1% 0 0 1%;
+}
+
+.mainHeading {
+    font-style: normal;
+    font-weight: 500;
+    font-size: 40px;
+    line-height: 50px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #000000;
+}
+
+.rightTopHeading {
+    font-style: normal;
+    font-weight: normal;
+    font-size: 32px;
+    line-height: 44px;
+    display: flex;
+    margin-top: -82px;
+    align-items: center;
+    text-align: center;
+
+    color: #1b3042;
+}
+.downloadText {
+    font-style: normal;
+    font-weight: 500;
+    font-size: 90px;
+    line-height: 112px;
+    display: inherit;
+    align-items: center;
+    text-align: center;
+    color: #1b3042;
+}
+.textalign_center {
+    text-align: center;
+    margin-top: 30px;
+}
+.mobile1Img {
+    position: absolute;
+    width: 328.76px;
+    height: 687.97px;
+    left: 204px;
+    top: 0%;
+}
+.mobile2Img {
+    position: absolute;
+    width: 328.76px;
+    height: 687.97px;
+    left: 276.04px;
+    top: 7%;
+}
+.mobile_bottom {
+    position: absolute;
+    width: 372px;
+    height: 14px;
+    left: 264px;
+    top: 100%;
+    background: radial-gradient(58.63% 50% at 50% 50%, rgba(0, 0, 0, 0.57) 0%, rgba(0, 0, 0, 0) 100%);
+    filter: blur(7px);
+}
+
+/*============================End=========================*/
+
+/*New layout media query*/
+
+@media (max-width: 991px) {
+    .mainHeader .navbar nav .get-started-btn {
+        background: #b62827;
+        color: #fff;
+        border-radius: 100px;
+        padding: 5px 16px 5px 9px;
+        margin-right: 10px;
+    }
+    .header-container .header-content {
+        padding: 0 0px;
+    }
+
+    .mainHeader .navbar {
+        padding: 0px 0px 0px 0px;
+    }
+
+    .mainHeader .navbar nav {
+        width: 70%;
+        display: flex;
+    }
+    .hideOnMobileSite {
+        display: none !important;
+    }
+}
+
+/*End*/
+
+
+</style>
+<!-- End -->
+
+
+<style type="text/css">
+    .min-span-height{
+        max-height: 588px;
+        min-height: 588px;
+    }
+    .videoCentered{
+        height: 370px !important;
+    }
+    .videoRowCardBody{
+        min-height: 50px;
+    }
+.videoRowCardBody {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+._explore_feed_header{
+    height: 33px;
+}
+</style>
+
 <input type="hidden" name="previousVideoId" id="previousVideoId" value="">
 <input type="hidden" name="nextVideoId" id="nextVideoId" value="">
 
-<body style="background: #F8F8F8;">
+<body style="background: #f8f8f8;background-image: url(/media/background_eclipse.png);">
         <div class="_1RNJh" id="subHeader">
                 <div class="_2qRoq">
                     <div class="_2WfMm">
@@ -485,7 +684,7 @@
                             <div class="discoverAndTrending">
                                 <span><a href="/{{LANGUAGE_CODE}}/discover/" class="discoverAnchor">Discover</a></span>
                                 <span style="height: 25px; border-left: thin solid #a2a2a2;"></span>
-                                <span><a href="/{{LANGUAGE_CODE}}/feed/" class="trendingAnchor">Trending</a></span>
+                                <span><a href="/{{LANGUAGE_CODE}}/trending/" class="trendingAnchor">Trending</a></span>
                             </div>
                         </div>
             
@@ -500,7 +699,7 @@
                                 {% endif %}
                             {% endfor %}
                             </ul>
-                            <select class="event-type-select popularDropdownRight">
+                            <select class="event-type-select popularDropdownRight" onchange="">
                                 <option value="all">Filter</option>
                                 {%  for each_category_item in categories %}
                                     {% if  forloop.counter > 6 %}
@@ -523,26 +722,7 @@
             
                                     <div class="_base_layout_content">
                                         <div class="_base_layout_main">
-                                            <!-- <header class="jsx-3990559340 _explore_page_main_header" >
-                                                <div class="jsx-3990559340">
-                                                    <h1 class="jsx-3990559340 _explore_page_main_title">What's Hot</h1>
-                                                    <h2 class="jsx-3990559340 _explore_page_main_desc">Be the first to watch the latest videos</h2></div>
-                                                <div class="jsx-3990559340 _explore_page_main_aside" style="margin-top: 20px;">
-                                                    <div class="jsx-885361899 jsx-3852217983 jsx-2412776336 share-group">
-                                                                <a href="javascript:void(0)" onclick="social_share_page('facebook_share','{{ request.get_full_path }}')" target="_blank" class="jsx-885361899 jsx-3852217983 jsx-2412776336">
-                                                                    <span><img src="/media/facebook_mobile.svg" class="jsx-885361899 jsx-3852217983 jsx-2412776336"></span>
-                                                                </a>
-                                                                <a href="javascript:void(0);" onclick="social_share_page('twitter_share','{{ request.get_full_path }}')" class="jsx-885361899 jsx-3852217983 jsx-2412776336">
-                                                                    <span><img src="/media/twitter_mobile.svg" class="jsx-885361899 jsx-3852217983 jsx-2412776336">
-                                                                    </span>
-                                                                </a>
-                                                                <a href="javascript:void(0);" onclick="social_share_page('whatsapp_share','{{ request.get_full_path }}')" class="jsx-885361899 jsx-3852217983 jsx-2412776336">
-                                                                    <span><img src="/media/whatsapp.svg" class="jsx-885361899 jsx-3852217983 jsx-2412776336">
-                                                                    </span>
-                                                                </a>
-                                                    </div>
-                                                </div>
-                                            </header> -->
+
                                             <div class="_explore_page_feed_wrapper" id="categoryIdList" style="min-height: 150px;">
                                                 <div class="jsx-1289101510 _explore_feed_wrapper">
                                                     <div class="">

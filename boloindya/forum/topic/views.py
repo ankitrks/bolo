@@ -542,10 +542,15 @@ def bolo_user_details(request,username=''):
         except Exception as e1:
             popular_bolo = []
 
+        try:
+            hash_tags = TongueTwister.objects.order_by('-hash_counter')[:20]
+        except Exception as e1:
+            hash_tags = []
 
         context = {
             'user_profile': user_profile,
             'user':user,
+            'hash_tags':hash_tags,
             'popular_bolo':popular_bolo,
             'topics': topics,
             'topicsCount': topicsByLang.count()
@@ -1372,14 +1377,20 @@ def boloindya_feed(request):
         hash_tags = TongueTwister.objects.order_by('-hash_counter')[:20]
     except Exception as e1:
         hash_tags = []
-    print popular_bolo.__dict__
+    #print popular_bolo.__dict__
 
+    topicsIds =[16092,25156,26248,23820,3449,4196]
+    try:
+        all_slider_topic = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=topicsIds)[:16]
+    except Exception as e1:
+        all_slider_topic = []
  
     context = {
         'categories':categories,
         'hash_tags':hash_tags,
         'topics':topics,
         'popular_bolo':popular_bolo,
+        'all_slider_topic':all_slider_topic,
         'is_single_topic': "Yes",
     }  
     video_slug = request.GET.get('video',None)
@@ -1387,7 +1398,7 @@ def boloindya_feed(request):
         return redirect('/video/'+video_slug)
     else:
         #return render(request, 'spirit/topic/boloindya_feed.html',context)
-        return render(request, 'spirit/topic/trending_feed.html',context)
+        return render(request, 'spirit/topic/_new_trending_feed.html',context)
 
 
 
