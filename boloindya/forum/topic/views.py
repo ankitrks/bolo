@@ -1220,7 +1220,7 @@ def new_home_updated(request):
         all_slider_topic = []
 
     try:
-        hash_tags = TongueTwister.objects.order_by('-hash_counter')[:4]
+        hash_tags = TongueTwister.objects.order_by('-hash_counter')[:16]
     except Exception as e1:
         hash_tags = []
 

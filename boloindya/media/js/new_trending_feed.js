@@ -645,7 +645,7 @@ function retryLiveStream(hls, url) {
 
             var likeStatus="";
 
-            likeStatus="liked";
+            likeStatus="liked";debugger;
             var likeStatusClass=jQuery("#UReactionLink").hasClass('liked');
             if(likeStatusClass==true){
                 jQuery("#UReactionLink").removeClass('liked');
@@ -667,6 +667,7 @@ function retryLiveStream(hls, url) {
 
                 }
             } 
+            
 
             //=========Check Follow User ==============
             var loginStatus=check_login_status();

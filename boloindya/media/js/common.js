@@ -398,7 +398,7 @@ function copyShareLinkMobileLink() {
   }
 
 
-function loginAndGenerateAuthRequest(){debugger;
+function loginAndGenerateAuthRequest(){
   var user_id = userLoginStatus;
   var ge_local_data="";
   var loginStatus=check_login_status();
