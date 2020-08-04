@@ -4,6 +4,7 @@ function loaderBoloShowDynamic(classLoader){
 
 }
 
+// var userLoginStatus = '{{request.user.id}}';
 function loaderBoloHideDynamic(classLoader){
     var boloLoader='';
     $('.'+classLoader).html(boloLoader);
@@ -397,7 +398,7 @@ function copyShareLinkMobileLink() {
   }
 
 
-function loginAndGenerateAuthRequest(){
+function loginAndGenerateAuthRequest(){debugger;
   var user_id = userLoginStatus;
   var ge_local_data="";
   var loginStatus=check_login_status();

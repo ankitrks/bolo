@@ -1,4 +1,4 @@
-{% extends "spirit/_new_base.html" %}
+{% extends "spirit/_new_layout_base.html" %}
 {% load i18n %}
 {% load number_formate_change_tag %}
 {% block title %}BoloIndya{% endblock %}
@@ -315,11 +315,259 @@
 
 </style>  
 
-<div class="jsx-639186511 page-with-header main-body">
+<style type="text/css">
+    
+
+.content-body .banner-header button {
+    background: #b62827;
+    color: #fff;
+    border-radius: 100px;
+    padding: 10px 30px 10px;
+    cursor: pointer;
+    border: none;
+    font-size: 24px;
+    margin-bottom: 27px;
+}
+.content-body .banner-header p {
+    font-size: 20px;
+    font-weight: 500;
+    color: #000000;
+}
+.content-body .banner-header p .signin-link a {
+    text-decoration: none;
+    color: #b62827;
+}
+
+.app-review {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.app-review .right-section {
+    padding-top: 100px;
+    text-align: center;
+}
+
+/* Create two equal columns that floats next to each other */
+.column {
+    float: left;
+    width: 32%;
+    padding: 3px;
+    height: auto;
+}
+.column1 {
+    float: left;
+    width: 33%;
+    padding: 3px 0px 10px 6px;
+    height: auto;
+}
+
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.card {
+    background: #ffffff;
+    box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.11);
+    border-radius: 2px;
+}
+
+.card img {
+    width: 100%;
+    height: 500px;
+}
+
+.header-container {
+    height: 75px !important;
+}
+
+.about-content .about-img4 {
+    position: relative;
+    width: 48%;
+    padding: 1% 0 0 1%;
+}
+
+.mainHeading {
+    font-style: normal;
+    font-weight: 500;
+    font-size: 40px;
+    line-height: 50px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #000000;
+}
+
+.rightTopHeading {
+    font-style: normal;
+    font-weight: normal;
+    font-size: 32px;
+    line-height: 44px;
+    display: flex;
+    margin-top: -82px;
+    align-items: center;
+    text-align: center;
+
+    color: #1b3042;
+}
+.downloadText {
+    font-style: normal;
+    font-weight: 500;
+    font-size: 90px;
+    line-height: 112px;
+    display: inherit;
+    align-items: center;
+    text-align: center;
+    color: #1b3042;
+}
+.textalign_center {
+    text-align: center;
+    margin-top: 30px;
+}
+.mobile1Img {
+    position: absolute;
+    width: 328.76px;
+    height: 687.97px;
+    left: 204px;
+    top: 0%;
+}
+.mobile2Img {
+    position: absolute;
+    width: 328.76px;
+    height: 687.97px;
+    left: 276.04px;
+    top: 7%;
+}
+.mobile_bottom {
+    position: absolute;
+    width: 372px;
+    height: 14px;
+    left: 264px;
+    top: 100%;
+    background: radial-gradient(58.63% 50% at 50% 50%, rgba(0, 0, 0, 0.57) 0%, rgba(0, 0, 0, 0) 100%);
+    filter: blur(7px);
+}
+
+/*============================End=========================*/
+
+/*New layout media query*/
+
+@media (max-width: 991px) {
+    .mainHeader .navbar nav .get-started-btn {
+        background: #b62827;
+        color: #fff;
+        border-radius: 100px;
+        padding: 5px 16px 5px 9px;
+        margin-right: 10px;
+    }
+    .header-container .header-content {
+        padding: 0 0px;
+    }
+
+    .mainHeader .navbar {
+        padding: 0px 0px 0px 0px;
+    }
+
+    .mainHeader .navbar nav {
+        width: 70%;
+        display: flex;
+    }
+    .hideOnMobileSite {
+        display: none !important;
+    }
+}
+
+/*End*/
+
+
+</style>
+<!-- End -->
+
+
+<style type="text/css">
+    .min-span-height{
+        max-height: 588px;
+        min-height: 588px;
+    }
+    .videoCentered{
+        height: 370px !important;
+    }
+    .videoCentered1{
+        height: 140px !important;
+    }
+    .videoRowCardBody{
+        min-height: 50px;
+    }
+
+.videoRowCardBody1{
+    min-height: 20px;
+}
+
+
+.videoRowCardBody {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+._explore_feed_header{
+    height: 33px;
+}
+
+.trendingVideoOfTheDay{
+    font-family: Sailec;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 20px;
+    display: flex;
+    align-items: center;
+    color: #B62827;
+}
+.card13 .sideSliderImageSize{
+    height: 124px;
+}
+
+@media(max-width: 991px){
+    .video-wall {
+        width: 100%;
+    }
+
+.about-content .about-img {
+    position: relative;
+    width: 90%;
+    padding: 0 0 0 0%;
+}
+.column {
+    float: left;
+    width: 100%;
+    padding: 3px;
+    height: auto;
+}
+
+.logo-container .logo-text {
+    width: 123px;
+     margin-left: -1px;
+    position: relative;
+    top: 14px;
+}
+.hamburger-menu .hamburger-menu-wrapper {
+    border: 3px solid var(--heading-color);
+    background: var(--heading-color);
+    margin-left: -4px;
+    margin-top: 13px;
+}
+
+}
+</style>
+
+<div class="jsx-639186511 page-with-header main-body" style="background: #f8f8f8;">
     <div class="jsx-1929076256">
         <div class="jsx-1929076256 about-content">
             <div class="jsx-1929076256 about-img">
-                <div class="jsx-1994528170 banner-video-container">
+                <div class="jsx-1994528170 banner-video-container" style="background: #f8f8f8;background-image: url(/media/background_eclipse.png);">
                     <div class="video-wall">
                         <div class="header-bar">{% trans "Popular Videos" %}</div>
                         <div id="js-playlists" class="playlists">

@@ -80,7 +80,7 @@ class AutoConnectSocialAccount(DefaultSocialAccountAdapter):
         try: 
             userDetails = User.objects.get(email=emailId)
             userToken=get_tokens_for_user(userDetails)
-            print(userToken)
+            #print(userToken)
 
             userprofile = UserProfile.objects.get(user = userDetails)
             add_bolo_score(userDetails.id, 'initial_signup', userprofile)

@@ -671,6 +671,43 @@
     align-items: center;
     color: #B62827;
 }
+.card13 .sideSliderImageSize{
+    height: 124px;
+}
+
+@media(max-width: 991px){
+    .video-wall {
+        width: 100%;
+    }
+
+.about-content .about-img {
+    position: relative;
+    width: 90%;
+    padding: 0 0 0 0%;
+}
+.column {
+    float: left;
+    width: 100%;
+    padding: 3px;
+    height: auto;
+}
+
+.logo-container .logo-text {
+    width: 123px;
+     margin-left: -1px;
+    position: relative;
+    top: 14px;
+}
+.hamburger-menu .hamburger-menu-wrapper {
+    border: 3px solid var(--heading-color);
+    background: var(--heading-color);
+    margin-left: -4px;
+    margin-top: 13px;
+}
+
+}
+
+
 </style>
 
 <div class="_1RNJh" id="subHeader">
@@ -687,7 +724,8 @@
 
         </div>
     </div>
-    <div class="" style="width: 100%;text-align: center;margin-top:20px;margin-bottom: 60px; "><img src="/media/twitter_banner.png"></div>
+    <div class="" style="width: 100%;text-align: center;margin-top:20px;margin-bottom: 60px; ">
+        <img style="width: 100%" src="/media/twitter_banner.png"></div>
 </div>
 
 
@@ -740,10 +778,11 @@
                                         {% if  forloop.counter < 4 %}
                                             <a target="_blank" href="/video/{{itemVideo.slug}}/{{itemVideo.id}}/">
                                                 <div class="column1 ">
-                                                    <div class="card"  style="background-color: #fff; padding: 20px;">
+                                                    <div class="card card13"  style="background-color: #fff; padding: 20px;">
                                                     <span id="video_play_item_{{itemVideo.id}}" class="min-span-height">
-                                                        <video  id="player-{{itemVideo.id}}" preload="auto" muted autoplay poster="{{itemVideo.question_image}}" class="videoCentered1 videoSliderPlay">
-                                                        </video>   
+                                                        <img class="sideSliderImageSize" src="{{itemVideo.question_image}}">
+<!--                                                         <video  id="player-{{itemVideo.id}}" preload="auto" muted autoplay poster="{{itemVideo.question_image}}" class="videoCentered1 videoSliderPlay">
+                                                        </video>    -->
                                                     </span>
 
 
