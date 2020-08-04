@@ -121,7 +121,7 @@ var video = document.getElementById('player');
       
   });
 
-function social_share(shareType){
+function social_share(shareType){debugger;
      var loginStatus= check_login_status();
      if(loginStatus==false){
         document.getElementById('gotoLoginPage').click();
