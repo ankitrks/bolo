@@ -32,7 +32,7 @@ def run():
             for each_category in Category.objects.filter(parent__isnull=False):
                 inside_start = datetime.now()
                 key = 'cat:'+str(each_category.id)+':lang:'+str(each_language[0])
-                query = Topic.objects.filter(is_vb=True,is_removed=False,m2mcategory__id = each_category.id,language_id = each_language[0])
+                query = Topic.objects.filter(is_vb=True,is_removed=False,m2mcategory__id = each_category.id,language_id = each_language[0]).order_by('-vb_score','-id')
                 final_data = update_redis_paginated_data(key, query, settings.CACHE_MAX_PAGES)
                 # print final_data
                 end = datetime.now()
@@ -56,7 +56,7 @@ def run():
         if not each_language[0] == '0':
             start = datetime.now()
             key = 'lang:'+str(each_language[0])
-            query = Topic.objects.filter(is_removed=False,is_vb=True,language_id=each_language[0])
+            query = Topic.objects.filter(is_removed=False,is_vb=True,language_id=each_language[0]).order_by('-vb_score','-id')
             final_data = update_redis_paginated_data(key, query, settings.CACHE_MAX_PAGES)
             # final_data = update_redis_language_paginated_data(each_language[0])
             # print final_data
