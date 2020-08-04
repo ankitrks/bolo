@@ -463,17 +463,57 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
             score += get_ranking_feature_weight('post_popular')
         if not self.is_boosted and self.is_popular:
             score += get_ranking_feature_weight('post_normal')
-        score += get_ranking_feature_weight('topic_play')*self.imp_count
-        score += get_ranking_feature_weight('topic_like')*self.topic_like_count
-        score += get_ranking_feature_weight('topic_share')*self.topic_share_count
+
+        if self.user.st.is_superstar:
+            score += get_ranking_feature_weight('superstar_topic_play')*self.imp_count
+            score += get_ranking_feature_weight('superstar_topic_like')*self.topic_like_count
+            score += get_ranking_feature_weight('superstar_topic_share')*self.topic_share_count
+            score += get_ranking_feature_weight('superstar_topic_comment')*self.comment_count
+
+        elif self.user.st.is_popular:
+            score += get_ranking_feature_weight('popular_topic_play')*self.imp_count
+            score += get_ranking_feature_weight('popular_topic_like')*self.topic_like_count
+            score += get_ranking_feature_weight('popular_topic_share')*self.topic_share_count
+            score += get_ranking_feature_weight('popular_topic_comment')*self.comment_count
+
+        elif not self.user.st.is_superstar and not self.user.st.is_popular:
+            score += get_ranking_feature_weight('normal_topic_play')*self.imp_count
+            score += get_ranking_feature_weight('normal_topic_like')*self.topic_like_count
+            score += get_ranking_feature_weight('normal_topic_share')*self.topic_share_count
+            score += get_ranking_feature_weight('normal_topic_comment')*self.comment_count
+
         post_time = (datetime.now() - self.created_at).total_seconds() #in hrs
-        if post_time > 604800:
-            post_time = 604800
+        if post_time > 1209600:
+            post_time = 1209600
         post_time = post_time/3600
         time_decay_constant = settings.TIME_DECAY_CONSTANT
         score = round(((time_decay_constant**2)/((float(post_time)**4)+(time_decay_constant**2)))*score ,5) #10^10 is multplied to normailze the decimal value
-        Topic.objects.filter(pk=self.id).update(vb_score = score)
+
+        threshold_value = self.get_threshold_value()
+        if not self.is_popular and threshold_value and score > threshold_value:
+            Topic.objects.filter(pk=self.id).update(is_popular = True, vb_score = score)
+        else:
+            Topic.objects.filter(pk=self.id).update(vb_score = score)
         return score
+
+    def get_threshold_value(self):
+        try:
+            if self.language_id == '1' or self.language_id == '2':
+                if self.user.st.is_superstar:
+                    return get_ranking_feature_weight('english_n_hindi_superstar_user_threshold')
+                elif self.user.st.is_popular:
+                    return get_ranking_feature_weight('english_n_hindi_popular_user_threshold')
+                else:
+                    return get_ranking_feature_weight('english_n_hindi_normal_user_threshold')
+            else:
+                if self.user.st.is_superstar:
+                    return get_ranking_feature_weight('other_lang_superstar_user_threshold')
+                elif self.user.st.is_popular:
+                    return get_ranking_feature_weight('other_lang_popular_user_threshold')
+                else:
+                    return get_ranking_feature_weight('other_lang_normal_user_threshold')
+        except:
+            return None
 
     def save(self):
         if self.pk:
@@ -482,6 +522,7 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
                 changed_fields = self.changed_fields
                 for value in changed_fields:
                     data[value] = self.get_field_diff(value)[1]
+                data['last_modified'] = datetime.now()
                 Topic.objects.filter(pk=self.pk).update(**data)
             except Exception as e:
                 super(Topic , self).save()
@@ -489,7 +530,7 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
             super(Topic , self).save()
 
 class RankingWeight(RecordTimeStamp):
-    features=models.CharField(max_length=20)
+    features=models.CharField(max_length=200)
     weight= models.FloatField(default=0,null=True)
 
     def __unicode__(self):
