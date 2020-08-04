@@ -122,7 +122,7 @@ def get_popular_paginated_data(user_id, language_id, page_no):
     if user_id:
         all_seen_vb = get_redis_vb_seen(user_id)
     query = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, is_popular = True)\
-        .exclude(pk__in = all_seen_vb).order_by('-id', '-vb_score')
+        .exclude(pk__in = all_seen_vb).order_by('-vb_score', '-id')
     return get_redis_data(key, query, page_no)
 
 def update_redis_paginated_data(key, query, cache_max_pages = settings.CACHE_MAX_PAGES_REAL_TIME):
@@ -206,13 +206,12 @@ def get_redis_hashtag_paginated_data(language_id, hashtag_id, page_no):
                 topics = []
     else:
         topics = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, \
-            hash_tags__id = hashtag_id).order_by('-id', '-vb_score')
+            hash_tags__id = hashtag_id).order_by('-vb_score', '-id')
         paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
         if paginator.num_pages >= page_no:
             topics = list(paginator.page(page_no))
         else:
             topics = []
-    print topics,"####"
     return topics
 
 def update_redis_hashtag_paginated_data(language_id, extra_filter, cache_max_pages = settings.CACHE_MAX_PAGES_REAL_TIME):
@@ -249,7 +248,7 @@ def update_redis_hashtag_paginated_data(language_id, extra_filter, cache_max_pag
                     page = 1
                     final_data = {}
                     exclude_ids = []
-                    query = Topic.objects.filter(is_removed = False, is_vb = True, hash_tags__id = each_rec, language_id = language_id)
+                    query = Topic.objects.filter(is_removed = False, is_vb = True, hash_tags__id = each_rec, language_id = language_id).order_by('-vb_score', '-id')
                     final_data = update_redis_paginated_data(key, query)            
         if key:
             return get_redis(key)
