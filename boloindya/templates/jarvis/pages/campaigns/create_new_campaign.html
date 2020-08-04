@@ -50,6 +50,22 @@ ul li {
     background: #1989CD;
     color: white;
 }
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
+.loader {
+  border: 8px solid #f3f3f3; /* Light grey */
+  border-top: 8px solid #3498db; /* Blue */
+  border-radius: 30%;
+  width: 80px;
+  height: 80px;
+  animation: spin 2s linear infinite;
+}
+
 </style>
 {% endblock styles %}
 {% block content %}
@@ -59,10 +75,12 @@ ul li {
 <section class="content">
     <form id="upload" action="" method="POST" enctype="multipart/form-data" class="form-horizontal">
         {% csrf_token %}
+
+        <!-- For banner -->
         <div class="form-group">
-            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Campaign Banner Image Upload:</label>
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Campaign Banner Image Upload: <br> (480 x 140) </label>
             <div class="col-md-8">
-                <input type="file" name="media_file" id="banner" required="True" class="form-control" onchange="readURL(this);">
+                <input type="file" name="banner_file" id="banner" class="form-control" onchange="readURL(this, '#selected_image');">
             </div>
         </div>
 
@@ -70,10 +88,31 @@ ul li {
                 <img id="selected_image" class="selected_image"/>
         </div>
 
+
+        <!-- For popup on the landing page -->
         <div class="form_group">
+            <label for="name">Show popup on app main screen? </label>
+            <input type="checkbox" id="popup_checkbox" name="popup_checkbox">
+        </div>
+
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Popup Image: <br> (960 x 1440) </label>
+            <div class="col-md-8">
+                <input type="file" name="popup_file" id="popup" class="form-control" onchange="readURL(this, '#selected_image_popup');" disabled="True">
+            </div>
+        </div>
+
+        <div class="form-group">
+                <img id="selected_image_popup" class="selected_image"/>
+        </div>
+
+        <div class="">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Set associated hashtag: </label>
             <div class="col-md-8">
                 <input type="text" name="hashtag_name" placeholder="Search Hashtags" id="search_id">
+                <span><button id="bt_new_hashtag">Add new hashtag</button>
+                    <span id="hashtag_status"></span>
+                </span>
                 <ul id="response">
                 </ul>
             </div>
@@ -94,6 +133,13 @@ ul li {
             </div>
         </div>
 
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Campaign Details/Rules: </label>
+            <div class="col-md-8">
+                <textarea type="text" id="campaign_details" name="campaign_details" class="filter_text"></textarea>
+            </div>
+        </div>        
+
         <div class="form-group video_elements">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Bucket</label>
             <div class="col-md-8">
@@ -104,7 +150,7 @@ ul li {
         </div>
         <div class="form-group">
             <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
-                <button type="submit" class="btn btn-primary submit_from_button"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Create Campaign </button>
+                <button id="create" type="submit" class="btn btn-primary submit_from_button"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Create Campaign </button>
             </div>
         </div>
     </form>
@@ -118,12 +164,42 @@ ul li {
 {% endblock content %}
 {% block center_js %}
 <script>
-    function readURL(input) {
+
+    $('#bt_new_hashtag').click(
+        function(){
+            let hashtag_status = document.getElementById('hashtag_status')
+            hashtag_status.innerHTML = '  Please wait...'
+
+            const name = $('#search_id').val()
+            $('#response').empty();
+
+            console.log("Adding new hashtag", name);
+
+            $.ajax({
+                url: '/jarvis/search_and_add_hashtag/',
+                method: 'POST',
+                data: JSON.stringify({
+                    'hashtag': name,
+                }),
+                dataType: "json",
+                contentType: 'application/json',
+                success: function(data) {
+                    hashtag_status.innerHTML = '  Created!';
+                    hashtag_id = data.id;
+                    $('#search_id').val(String(data.hash_tag));
+                }
+            });     
+            return false;       
+        }    
+    );
+    
+
+    function readURL(input, img_tag) {
         if (input.files && input.files[0]) {
             var reader = new FileReader();
 
             reader.onload = function (e) {
-                $('#selected_image')
+                $(img_tag)
                     .attr('src', e.target.result)
                     .css({
                         'width' : '30%',
@@ -137,6 +213,8 @@ ul li {
 var hashtag_id = -1;
 
 function upload(event) {
+
+    console.log("uplaod called "+event)
 
     // Check if the date are valid
     if( $('#start_date').val() && $('#end_date').val() ){
@@ -162,6 +240,7 @@ function upload(event) {
         var all_data = []
 
         data.append('hashtag_id', hashtag_id);
+        data.append('is_show_popup', $("#popup_checkbox").is(':checked'));
 
         $.ajax({
             xhr: function() {
@@ -220,12 +299,25 @@ function upload(event) {
 }
 
 
-$(function() {
-    $('#upload').submit(upload);
-});
+$('#create').click(upload);
+
+// $(function() {
+//     $('#upload').submit(upload);
+// });
 </script>
 
 <script>
+
+    $(function () {
+        $("#popup_checkbox").click(function () {
+            if ($(this).is(":checked")) {
+                $("#popup").prop("disabled", false);
+            } else {
+                $("#popup").prop("disabled", true);
+            }
+        });
+    });
+
     $(function() {
         $("#start_date").
             datepicker({

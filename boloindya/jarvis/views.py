@@ -2553,13 +2553,15 @@ def unremove_video_or_unblock(request):
 
 @login_required
 def add_campaign(request):
-    banner_image_file = request.FILES.get('media_file')
+    banner_image_file = request.FILES.get('banner_file')
     start_date_string = request.POST.get('start_date', None)
     end_date_string = request.POST.get('end_date', None)
     hashtag_id = request.POST.get('hashtag_id', None)
     banner_image_upload_folder_name = request.POST.get('folder_prefix','from_upload_panel/campaign_banner_image')
     upload_to_bucket = request.POST.get('bucket_name',None)
     campaign_id = request.POST.get('campaign_id', None)
+    is_show_popup = request.POST.get('is_show_popup', None) == 'true'
+    campaign_details = request.POST.get('campaign_details', None)
 
     if not upload_to_bucket:
         return HttpResponse(json.dumps({'message':'fail','reason':'bucket_missing'}),content_type="application/json")
@@ -2581,36 +2583,35 @@ def add_campaign(request):
     campaign_dict['hashtag'] = hashtag
     campaign_dict['active_from'] = start_date
     campaign_dict['active_till'] = end_date
+    campaign_dict['details'] = campaign_details
+
+    popup_image_file = None
+    if is_show_popup:
+        popup_image_file = request.FILES.get('popup_file')
+        campaign_dict['show_popup_on_app'] = True
+    else:
+        campaign_dict['show_popup_on_app'] = False
 
     if banner_image_file:
-        bucket_credentials = get_bucket_details(upload_to_bucket)
-        conn = boto3.client('s3', bucket_credentials['REGION_HOST'], aws_access_key_id = bucket_credentials['AWS_ACCESS_KEY_ID'], \
-                aws_secret_access_key = bucket_credentials['AWS_SECRET_ACCESS_KEY'])
-
-
-        banner_image_file_name = urlify(banner_image_file.name.lower())
-        banner_image_output_key = hashlib.sha256(banner_image_file_name.encode('utf-8')).hexdigest()
-        banner_image_file_name = check_image_file_name_validation(banner_image_file_name,banner_image_output_key)
-
-        banner_image_path = banner_image_upload_folder_name+'/'+banner_image_file_name
-        try:
-            conn.head_object(Bucket=upload_to_bucket, Key=banner_image_path)
+        banner_image_url = upload_image(upload_to_bucket, banner_image_file, banner_image_upload_folder_name)
+        if not banner_image_url:
             return HttpResponse(json.dumps({'message':'fail','reason':'Image File already exist'}),content_type="application/json")
-        except Exception as e:
-            with open(urlify(banner_image_file_name),'wb') as f:
-                for chunk in banner_image_file.chunks():
-                    if chunk:
-                        f.write(chunk)
+        else:
+            campaign_dict['banner_img_url'] = banner_image_url
 
-        uploaded_image_url = upload_to_s3_without_transcode(banner_image_file_name,upload_to_bucket,banner_image_upload_folder_name)
-        campaign_dict['banner_img_url'] = uploaded_image_url
+    if popup_image_file:
+        popup_image_url = upload_image(upload_to_bucket, popup_image_file, banner_image_upload_folder_name)
+        if not popup_image_url:
+            return HttpResponse(json.dumps({'message':'fail','reason':'Image File already exist'}),content_type="application/json")
+        else:
+            campaign_dict['popup_img_url'] = popup_image_url
 
     if campaign_id:
         #If campaign ID is supplied, then it means it is an older campaign
         campaign_obj = Campaign.objects.get(pk=campaign_id) 
 
-        is_disabled = request.POST.get('disable_campaign', False)
-        is_winner_declared = request.POST.get('is_winner_declared', False)
+        is_disabled = request.POST.get('disable_campaign', False) == 'true'
+        is_winner_declared = request.POST.get('is_winner_declared', False) == 'true'
         
         if is_disabled:
             campaign_dict['is_active'] = False
@@ -2651,10 +2652,33 @@ def add_campaign(request):
         campaign_dict['is_winner_declared'] = False
         campaign_obj = Campaign.objects.create(**campaign_dict)
 
-    if banner_image_file:
-        os.remove(urlify(banner_image_file_name))
+    print(campaign_dict)
 
     return HttpResponse(json.dumps({'message':'success', 'campaign_id':campaign_obj.id}),content_type="application/json")
+
+def upload_image(bucket, image_file, folder_name):
+    bucket_credentials = get_bucket_details(bucket)
+    conn = boto3.client('s3', bucket_credentials['REGION_HOST'], aws_access_key_id = bucket_credentials['AWS_ACCESS_KEY_ID'], \
+            aws_secret_access_key = bucket_credentials['AWS_SECRET_ACCESS_KEY'])
+
+
+    image_file_name = urlify(image_file.name.lower())
+    image_output_key = hashlib.sha256(image_file_name.encode('utf-8')).hexdigest()
+    image_file_name = check_image_file_name_validation(image_file_name,image_output_key)
+
+    image_path = folder_name+'/'+image_file_name
+    try:
+        conn.head_object(Bucket=bucket, Key=image_path)
+        return None
+    except Exception as e:
+        with open(urlify(image_file_name),'wb') as f:
+            for chunk in image_file.chunks():
+                if chunk:
+                    f.write(chunk)
+
+    image_url = upload_to_s3_without_transcode(image_file_name,bucket,folder_name)
+    os.remove(urlify(image_file_name))
+    return image_url
 
 @login_required
 def campaigns_panel(request):
@@ -2731,3 +2755,17 @@ def search_fields_for_campaign(request):
     except Exception as e:
         print(e)
         return JsonResponse({'data': [], 'error': str(e)}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def search_and_add_hashtag(request):
+    from drf_spirit.serializers import TongueTwisterWithHashSerializer
+    raw_data = json.loads(request.body)
+
+    query = raw_data['hashtag']
+
+    hashtag = TongueTwister.objects.create(hash_tag=query)
+
+    data = TongueTwisterWithHashSerializer(hashtag).data
+    return JsonResponse(data, status=status.HTTP_200_OK)
+
+

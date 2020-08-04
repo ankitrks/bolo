@@ -1098,7 +1098,7 @@ class CampaignSerializer(ModelSerializer):
 
     class Meta:
         model = Campaign
-        fields = ('banner_img_url', 'hashtag_name', 'is_active', 'active_from', 'active_till', 'is_winner_declared', 'winners', 'next_campaign_name')
+        fields = ('banner_img_url', 'hashtag_name', 'is_active', 'active_from', 'active_till', 'is_winner_declared', 'winners', 'next_campaign_name', 'show_popup_on_app', 'banner_img_url', 'popup_img_url', 'details')
 
 class MusicAlbumSerializer(ModelSerializer):
   class Meta:

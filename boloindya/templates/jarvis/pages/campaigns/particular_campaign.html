@@ -80,16 +80,37 @@ li:hover{
         </div>
 
         <div class="form-group">
-            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Change Banner: </label>
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Change Banner: <br> (480 x 140) </label>
             <div class="col-md-8">
-                <input type="file" name="media_file" id="banner" class="form-control" onchange="readURL(this);">
+                <input type="file" name="banner_file" id="banner" class="form-control" onchange="readURL(this, '#selected_image');">
             </div>
         </div>
+        
+        <!-- For popup on the landing page -->
+        <div class="form_group">
+            <label for="name">Show popup on app main screen? </label>
+            <input type="checkbox" id="popup_checkbox" name="popup_checkbox">
+        </div>
+
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Change Popup Image: <br> (960 x 1440) </label>
+            <div class="col-md-8">
+                <input type="file" name="popup_file" id="popup" class="form-control" onchange="readURL(this, '#selected_image_popup');" disabled="True">
+            </div>
+        </div>
+
+        <div class="form-group">
+                <img id="selected_image_popup" class="selected_image"/>
+        </div>
+
 
         <div class="form_group">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Associated hashtag: </label>
             <div class="col-md-8">
                 <input type="text" name="hashtag_name" placeholder="Search Hashtags" id="search_id">
+                <span><button id="bt_new_hashtag" onclick="addNewHashtag()">Add new hashtag</button>
+                    <span id="hashtag_status"></span>
+                </span>
                 <ul id="response">
                 </ul>
 
@@ -110,6 +131,12 @@ li:hover{
                 <input type="text" id="end_date" name="end_date" placeholder="End Date" class="filter_text">
             </div>
         </div>
+
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Campaign Details/Rules: </label>
+            <div class="col-md-8" style="background-color: #fff; border: thin;" id="campaign_details" contenteditable="true">
+            </div>
+        </div>        
 
         <div class="form_group">
             <label for="name">Annonuce Winners: </label>
@@ -191,12 +218,13 @@ li:hover{
 {% endblock content %}
 {% block center_js %}
 <script>
-    function readURL(input) {
+
+    function readURL(input, img_field) {
         if (input.files && input.files[0]) {
             var reader = new FileReader();
 
             reader.onload = function (e) {
-                $('#selected_image')
+                $(img_field)
                     .attr('src', e.target.result)
                     .css({
                         'width' : '30%',
@@ -208,12 +236,23 @@ li:hover{
         }
     }
 
+
     $(function () {
         $("#announce_winner").click(function () {
             if ($(this).is(":checked")) {
                 enableWinnersField();
             } else {
                 disableWinnersField();
+            }
+        });
+    });
+
+    $(function () {
+        $("#popup_checkbox").click(function () {
+            if ($(this).is(":checked")) {
+                $("#popup").prop("disabled", false);
+            } else {
+                $("#popup").prop("disabled", true);
             }
         });
     });
@@ -242,9 +281,19 @@ li:hover{
                         'width' : '30%',
                         'height' : '30%'
                     });
+
+        $("#selected_image_popup").attr("src","{{campaign.popup_img_url}}")
+                    .css({
+                        'width' : '30%',
+                        'height' : '30%'
+                    });
+
         $("#search_id").val("{{campaign.hashtag}}");
         $("#start_date").val("{{campaign.active_from|date:"d-m-Y"}}");
         $("#end_date").val("{{campaign.active_till|date:"d-m-Y"}}");
+
+        // $("#campaign_details").val("{{campaign.details|linebreaks}}");
+        document.getElementById("campaign_details").innerHTML = "{{campaign.details|linebreaks}}";
 
         var is_disabled = {{campaign.is_active|yesno:"false,true"}}
         $("#disable_campaign_cb").prop("checked", is_disabled);
@@ -252,6 +301,16 @@ li:hover{
 
         var is_winner_declared = {{campaign.is_winner_declared|yesno:"true,false"}};
         $("#announce_winner").prop("checked", is_winner_declared);
+
+        var is_show_popup = {{campaign.show_popup_on_app|yesno:"true,false"}};
+        $("#popup_checkbox").prop("checked", is_show_popup);
+        console.log("popup checkbox: "+is_show_popup);
+
+        if(is_show_popup){
+            $("#popup").prop("disabled", false);
+        } else {
+            $("#popup").prop("disabled", true);
+        }
         
         if(is_winner_declared){
             enableWinnersField();
@@ -359,6 +418,21 @@ function upload(event) {
             data.append('banner_img_url', '{{campaign.banner_img_url}}');
         }
 
+        data.append('is_show_popup', $("#popup_checkbox").is(':checked'));
+        if(!$('#popup').val()){
+            data.append('popup_img_url', $('#popup').val());
+        } else {
+            data.append('popup_img_url', '{{campaign.popup_img_url}}');
+        }
+
+        // data.append('campaign_details', $("#campaign_details").val());
+        data.append('campaign_details', $("#campaign_details").val());
+
+        console.log("Announce winners: ", $("#announce_winner").is(':checked'))
+        console.log("Disable campaign: ", $("#disable_campaign").is(':checked'))
+        console.log("Popup box: ",  $("#popup_checkbox").is(':checked'))
+        console.log("Details: ", $("#campaign_details").html())
+
         $.ajax({
             xhr: function() {
                 var xhr = new window.XMLHttpRequest();
@@ -415,6 +489,30 @@ function upload(event) {
 $(function() {
     $('#upload').submit(upload);
 });
+
+function addNewHashtag(){
+    let hashtag_status = document.getElementById('hashtag_status')
+    hashtag_status.innerHTML = '  Please wait...'
+
+    const name = $('#search_id').val()
+
+    $.ajax({
+        url: '/jarvis/search_and_add_hashtag/',
+        method: 'POST',
+        data: JSON.stringify({
+            'hashtag': name,
+        }),
+        dataType: "json",
+        contentType: 'application/json',
+        success: function(data) {
+            hashtag_status.innerHTML = '  Created!';
+            hashtag_id = data.id;
+            $('#search_id').val(String(data.hash_tag));
+            $('#response').empty();
+        }
+    })
+}    
+
 </script>
 
 <script>
