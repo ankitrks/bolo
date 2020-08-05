@@ -296,8 +296,9 @@ li:hover{
         var details = "{{ campaign.details|linebreaks }}";
         if(details == "<p>None</p>"){
             details = "";
+        } else {
+            details = parseDetails(details);
         }
-        console.log('details', details);
         document.getElementById("campaign_details").innerHTML = details;
 
         var is_disabled = {{campaign.is_active|yesno:"false,true"}}
@@ -673,6 +674,17 @@ function addNewHashtag(){
             if (elements[b].textContent.length) {
                 console.log(elements[b].textContent);
                 val += elements[b].textContent +" ";
+            }
+        }
+        return val;
+    }
+
+    function parseDetails(details) {
+        let val = "";
+        let elements = $.parseHTML(details);
+        for(var b = 0; b < elements.length; b++) {
+            if (elements[b].textContent.length) {
+                val += elements[b].textContent +"\n";
             }
         }
         return val;
