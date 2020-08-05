@@ -81,15 +81,15 @@ class UserProfileIndex(indexes.SearchIndex, indexes.Indexable):
         lookup_subcategory = {}
 
         if start_date:
-            lookup_UserProfile['reindex_at__gte'] = start_date
+            lookup_UserProfile['user__date_joined__gte'] = start_date
 
         if end_date:
-            lookup_UserProfile['reindex_at__lte'] = end_date
+            lookup_UserProfile['user__date_joined__lte'] = end_date
 
         return (self.index_queryset(using=using)
                 .filter(
                     Q(**lookup_UserProfile))
-                .order_by('pk'))
+                .order_by('-pk'))
 
     def prepare_is_test_user(self, obj):
         """
