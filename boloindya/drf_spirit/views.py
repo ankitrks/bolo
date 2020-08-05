@@ -756,13 +756,13 @@ class SolrSearchTop(BoloIndyaGenericAPIView):
                 topics = solr_object_to_db_object(result_page[0].object_list)
             response["top_vb"]=TopicSerializerwithComment(topics,many=True,context={'is_expand':is_expand,'last_updated':last_updated}).data
             users  =[]
-            sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term))
+            sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term)).order_by('-is_superstar','-is_popular')
             if not sqs:
                 suggested_word = SearchQuerySet().models(UserProfile).auto_query(search_term).spelling_suggestion()
                 if suggested_word:
-                    sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term))
+                    sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term)).order_by('-is_superstar','-is_popular')
             if not sqs:
-                sqs = SearchQuerySet().models(UserProfile).autocomplete(**{'text':search_term})
+                sqs = SearchQuerySet().models(UserProfile).autocomplete(**{'text':search_term}).order_by('-is_superstar','-is_popular')
             if sqs:
                 result_page = get_paginated_data(sqs, int(page_size), int(page))
                 users = solr_userprofile_object_to_db_object(result_page[0].object_list)
@@ -935,13 +935,13 @@ class SolrSearchUser(BoloIndyaGenericAPIView):
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
         users = []
         if search_term:
-            sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term))
+            sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term)).order_by('-is_superstar','-is_popular')
             if not sqs:
                 suggested_word = SearchQuerySet().models(UserProfile).auto_query(search_term).spelling_suggestion()
                 if suggested_word:
-                    sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term))
+                    sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term)).order_by('-is_superstar','-is_popular')
             if not sqs:
-                sqs = SearchQuerySet().models(UserProfile).autocomplete(**{'text':search_term})
+                sqs = SearchQuerySet().models(UserProfile).autocomplete(**{'text':search_term}).order_by('-is_superstar','-is_popular')
             if sqs:
                 result_page = get_paginated_data(sqs, int(page_size), int(page))
                 users = solr_userprofile_object_to_db_object(result_page[0].object_list)

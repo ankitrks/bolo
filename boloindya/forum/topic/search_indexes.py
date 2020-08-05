@@ -86,15 +86,15 @@ class TopicIndex(indexes.SearchIndex, indexes.Indexable):
         lookup_subcategory = {}
 
         if start_date:
-            lookup_topic['reindex_at__gte'] = start_date
+            lookup_topic['date__gte'] = start_date
 
         if end_date:
-            lookup_topic['reindex_at__lte'] = end_date
+            lookup_topic['date__lte'] = end_date
 
         return (self.index_queryset(using=using)
                 .filter(
                     Q(**lookup_topic))
-                .order_by('pk'))
+                .order_by('-pk'))
 
     def prepare_is_removed(self, obj):
         """
