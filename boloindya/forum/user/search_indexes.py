@@ -59,6 +59,8 @@ class UserProfileIndex(indexes.SearchIndex, indexes.Indexable):
     follower_count = indexes.IntegerField(model_attr='follower_count', indexed=True)
     language = indexes.CharField(model_attr='language', indexed=True)
     bolo_score = indexes.CharField(model_attr='bolo_score', indexed=True)
+    is_superstar = BooleanField()
+    is_popular = BooleanField()
 
     # Overridden
     def get_model(self):
@@ -89,7 +91,7 @@ class UserProfileIndex(indexes.SearchIndex, indexes.Indexable):
         return (self.index_queryset(using=using)
                 .filter(
                     Q(**lookup_UserProfile))
-                .order_by('-pk'))
+                .order_by('-is_superstar','-is_popular'))
 
     def prepare_is_test_user(self, obj):
         """
@@ -99,3 +101,21 @@ class UserProfileIndex(indexes.SearchIndex, indexes.Indexable):
         :return: whether the UserProfile is removed or not
         """
         return (obj.is_test_user)
+
+    def prepare_is_superstar(self, obj):
+        """
+        Populate the ``is_superstar`` index field
+
+        :param obj: UserProfile
+        :return: whether the UserProfile is removed or not
+        """
+        return (obj.is_superstar)
+
+    def prepare_is_popular(self, obj):
+        """
+        Populate the ``is_superstar`` index field
+
+        :param obj: UserProfile
+        :return: whether the UserProfile is removed or not
+        """
+        return (obj.is_popular)
