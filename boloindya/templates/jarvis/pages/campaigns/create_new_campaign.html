@@ -136,7 +136,8 @@ ul li {
         <div class="form-group">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Campaign Details/Rules: </label>
             <div class="col-md-8">
-                <textarea type="text" id="campaign_details" name="campaign_details" class="filter_text"></textarea>
+                <div class="col-md-8" style="background-color: #fff; border: thin; min-height: 50px" id="campaign_details" contenteditable="true">
+            </div>
             </div>
         </div>        
 
@@ -241,6 +242,7 @@ function upload(event) {
 
         data.append('hashtag_id', hashtag_id);
         data.append('is_show_popup', $("#popup_checkbox").is(':checked'));
+        data.append('campaign_details', $("#campaign_details").html());
 
         $.ajax({
             xhr: function() {

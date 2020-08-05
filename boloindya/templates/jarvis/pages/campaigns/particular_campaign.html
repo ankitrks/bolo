@@ -134,7 +134,7 @@ li:hover{
 
         <div class="form-group">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Campaign Details/Rules: </label>
-            <div class="col-md-8" style="background-color: #fff; border: thin;" id="campaign_details" contenteditable="true">
+            <div class="col-md-8" style="background-color: #fff; border: thin; min-height: 50px" id="campaign_details" contenteditable="true">
             </div>
         </div>        
 
@@ -293,7 +293,12 @@ li:hover{
         $("#end_date").val("{{campaign.active_till|date:"d-m-Y"}}");
 
         // $("#campaign_details").val("{{campaign.details|linebreaks}}");
-        document.getElementById("campaign_details").innerHTML = "{{campaign.details|linebreaks}}";
+        var details = "{{ campaign.details|linebreaks }}";
+        if(details == "<p>None</p>"){
+            details = "";
+        }
+        console.log('details', details);
+        document.getElementById("campaign_details").innerHTML = details;
 
         var is_disabled = {{campaign.is_active|yesno:"false,true"}}
         $("#disable_campaign_cb").prop("checked", is_disabled);
@@ -426,7 +431,7 @@ function upload(event) {
         }
 
         // data.append('campaign_details', $("#campaign_details").val());
-        data.append('campaign_details', $("#campaign_details").val());
+        data.append('campaign_details', $("#campaign_details").html());
 
         console.log("Announce winners: ", $("#announce_winner").is(':checked'))
         console.log("Disable campaign: ", $("#disable_campaign").is(':checked'))
@@ -646,8 +651,13 @@ function addNewHashtag(){
                             $(response_id).append('<li id="no_result">No results found ...</li>');
                         }
                         for(var i=0;i<data.data.length;i++) {
-                            console.log(data.data[i]);
-                            $(response_id).append('<li onclick="addVideoToField(\''+input_id+'\',\''+response_id+'\',\''+data.data[i].title+ '\',\''+data.data[i].id+'\', this)">'+data.data[i].title+'</li>');
+                            let title = parseTitle(data.data[i].title);
+
+                            console.log(title);
+
+                            let clickScript = '<li onclick="addVideoToField(\''+input_id+'\',\''+response_id+'\',\''+title+ '\',\''+data.data[i].id+'\', this)">'+title+'</li>';
+
+                            $(response_id).append(clickScript);
                         }
                     }
                 })
@@ -655,6 +665,18 @@ function addNewHashtag(){
                 $(response_id).empty();
             }
     };
+
+    function parseTitle(title) {
+        let val = "";
+        let elements = $.parseHTML(title);
+        for(var b = 0; b < elements.length; b++) {
+            if (elements[b].textContent.length) {
+                console.log(elements[b].textContent);
+                val += elements[b].textContent +" ";
+            }
+        }
+        return val;
+    }
 
     function addVideoToField(field, response_field, name, id, object){
         $(field).val('');
