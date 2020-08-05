@@ -123,7 +123,7 @@ function video_play_using_video_js(url,backup_url,image) {
 
       if(Hls.isSupported()) {
         var hls = new Hls();
-        hls.loadSource(url);
+        hls.loadSource(backup_url);
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED,function() {
           video.play();
@@ -136,7 +136,7 @@ function video_play_using_video_js(url,backup_url,image) {
      // Note: it would be more normal to wait on the 'canplay' event below however on Safari (where you are most likely to find built-in HLS support) the video.src URL must be on the user-driven
      // white-list before a 'canplay' event will be emitted; the last video event that can be reliably listened-for when the URL is not on the white-list is 'loadedmetadata'.
       else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = backup_url;
+        video.src = url;
         video.addEventListener('loadedmetadata',function() {
           video.play();
           loaderHide();
@@ -171,8 +171,9 @@ function openVideoInPopup(topicId){
     var preBufferDone = false;
     var video_backup="";
     var video_backup=singleItemData.question_video;
+    var video_cdn=singleItemData.video_cdn;
     //var video_backup=singleItemData.question_video;
-    video_play_using_video_js(video_backup,video_backup,videoFileImage);      
+    video_play_using_video_js(video_cdn,video_backup,videoFileImage);      
 
     var shareURL=site_base_url+singleItemData.slug+'/'+singleItemData.id+'';
 
@@ -1166,8 +1167,7 @@ function getPopularHashTagItems(itemVideoByte) {
     var popularHashTagTemplateItems ='<div class="column " style="cursor: pointer;">\
                             <div class="card" onClick="openVideoInPopup('+itemVideoByte.id+');" style="background-color: #fff; padding: 20px;">\
                             <span id="video_play_item_'+itemVideoByte.id+'" class="min-span-height">\
-                                <video  id="player-'+itemVideoByte.id+'" preload="auto" muted autoplay poster="'+itemVideoByte.question_image+'" class="videoCentered videoSliderPlay">\
-                                </video>\
+                                <img  id="player-'+itemVideoByte.id+'" src="'+itemVideoByte.question_image+'" class="videoCentered videoSliderPlay">\
                             </span>\
                                 <div class="card-body videoRowCardBody" style="">\
                                     <div>\

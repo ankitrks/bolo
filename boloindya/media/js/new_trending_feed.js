@@ -176,8 +176,7 @@ function videoItemsTemplate(itemVideoByte,totalCountVideo) {
     var popularHashTagTemplateItems ='<div class="column " style="cursor: pointer;">\
                             <div class="card" onClick="openVideoInPopup(\''+itemVideoByte.video_cdn+'\',\''+itemVideoByte.question_image+'\','+totalCountVideo+');" style="background-color: #fff; padding: 20px;">\
                             <span id="video_play_item_'+itemVideoByte.id+'" class="min-span-height">\
-                                <video  id="player-'+itemVideoByte.id+'" preload="auto" muted autoplay poster="'+itemVideoByte.question_image+'" class="videoCentered videoSliderPlay">\
-                                </video>\
+                                <img  id="player-'+itemVideoByte.id+'" src="'+itemVideoByte.question_image+'" class="videoCentered videoSliderPlay">\
                             </span>\
                                 <div class="card-body videoRowCardBody" style="">\
                                     <div>\
@@ -239,7 +238,7 @@ function video_play_using_video_js(url,backup_url,image) {
 
       if(Hls.isSupported()) {
         var hls = new Hls();
-        hls.loadSource(url);
+        hls.loadSource(backup_url);
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED,function() {
           video.play();
@@ -252,7 +251,7 @@ function video_play_using_video_js(url,backup_url,image) {
      // Note: it would be more normal to wait on the 'canplay' event below however on Safari (where you are most likely to find built-in HLS support) the video.src URL must be on the user-driven
      // white-list before a 'canplay' event will be emitted; the last video event that can be reliably listened-for when the URL is not on the white-list is 'loadedmetadata'.
       else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = backup_url;
+        video.src = url;
         video.addEventListener('loadedmetadata',function() {
           video.play();
           loaderHide();
@@ -667,7 +666,7 @@ function retryLiveStream(hls, url) {
 
                 }
             } 
-            
+
 
             //=========Check Follow User ==============
             var loginStatus=check_login_status();

@@ -522,8 +522,7 @@ function videoItemsTemplate(itemVideoByte,itemCount) {
     var popularHashTagTemplateItems ='<div class="column " style="cursor: pointer;">\
                             <div class="card" onClick="openVideoInPopup(\''+itemVideoByte.question_video+'\',\''+itemVideoByte.question_image+'\','+itemCount+');" style="background-color: #fff; padding: 20px;">\
                             <span id="video_play_item_'+itemVideoByte.id+'" class="min-span-height">\
-                                <video  id="player-'+itemVideoByte.id+'" preload="auto" muted autoplay poster="'+itemVideoByte.question_image+'" class="videoCentered videoSliderPlay">\
-                                </video>\
+                                <img  id="player-'+itemVideoByte.id+'" src="'+itemVideoByte.question_image+'" class="videoCentered videoSliderPlay">\
                             </span>\
                                 <div class="card-body videoRowCardBody" style="">\
                                     <div>\
