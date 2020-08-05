@@ -75,22 +75,13 @@ var video = document.getElementById('player');
 
   }
    
-  jQuery('#UReactionLink').on('click',function(){
+  jQuery('#UReactionLink').on('click',function(){debugger;
     var totalLikeCount= $('#totalLikeCount').val();
       var likeStatus=jQuery('#UReactionLink').hasClass('liked');
       var topicId=$("#topicID").val();
       if(likeStatus==false){
          var loginStatus= check_login_status();
-         if(loginStatus==false){
-          // if( jwplayer('player').getState() == "playing"){
-          //     jwplayer('player').pause();
-          // }
-
-          // if(!video.paused) {
-          //   video.pause();
-          //   $('.videoPlayButton').removeClass('play-button');
-          //   $('.videoPlayButton').addClass('play-button');
-          // }          
+         if(loginStatus==false){         
           document.getElementById('gotoLoginPage').click();
           //document.getElementById('openLoginPopup').click();
          }
@@ -109,10 +100,10 @@ var video = document.getElementById('player');
 
           }
           
-          updateUserLikeStatus(topicId);
+         var statusLike= updateUserLikeStatus(topicId);
       }else{
-         jQuery('#UReactionLink').removeClass('hide');
-         updateUserLikeStatus(topicId);
+         jQuery('#UReactionLink').removeClass('liked');
+         var statusUnLike=updateUserLikeStatus(topicId);
          var likeStatus=jQuery('.sp_ddXiTdIB8vm').hasClass('sx_44a25d');
          if(likeStatus==true){
               jQuery('.sp_ddXiTdIB8vm').removeClass('sx_44a25d');
@@ -130,43 +121,7 @@ var video = document.getElementById('player');
       
   });
 
-// $("#jwBox").click(function(){
-
-//   console.log(video.paused);
-//   if(video.paused) {
-//     $('.videoPlayButton').removeClass('_video_card_playbtn_wraaper');
-//     video.play();
-//   } else {
-//     video.pause();
-//     $('.videoPlayButton').removeClass('_video_card_playbtn_wraaper');
-//     $('.videoPlayButton').addClass('_video_card_playbtn_wraaper');
-//   }
-
-  // var plaerState=jwplayer('player').getState();
-
-  // if( jwplayer('player').getState() == "playing" || jwplayer(this).getState() == "buffering" ) {
-  //         jwplayer('player').pause();
-  //         $('.videoPlayButton').removeClass('_video_card_playbtn_wraaper');
-  //         $('.videoPlayButton').addClass('_video_card_playbtn_wraaper');
-          
-  //     }else{
-  //       var newSrc='/media/mute_icon.svg';
-  //       $('#mutedImageId').attr('src', newSrc);
-  //       jwplayer('player').play(true);
-  //       jwplayer('player').setMute(false);
-  //       $('.videoPlayButton').removeClass('_video_card_playbtn_wraaper');
-  //     }
-  
-//});
-
-// $('.videoPlayButton').click(function(){
-//       var newSrc='/media/mute_icon.svg';
-//       $('#mutedImageId').attr('src', newSrc);
-//       $('.videoPlayButton').removeClass('_video_card_playbtn_wraaper');
-//       video.play();
-// });
-
-function social_share(shareType){
+function social_share(shareType){debugger;
      var loginStatus= check_login_status();
      if(loginStatus==false){
         document.getElementById('gotoLoginPage').click();
@@ -363,6 +318,8 @@ $("#submit-button").click(function(){
                   jQuery('.changeLikeColor-'+commentId).removeClass('liked');
                   jQuery('.likedStatus-'+commentId).removeClass('hide');
                   jQuery('.changeLikeColor-'+commentId).addClass('liked');
+                  //likedStatus=jQuery('#UReactionLink').hasClass('liked');
+
 
 
               }else if(response.message=='unliked'){
@@ -401,8 +358,12 @@ $("#submit-button").click(function(){
             'Authorization':'Bearer '+accessToken,
           },
           data:{topic_id:topic_id},
-          success: function(response,textStatus, xhr){
+          success: function(response,textStatus, xhr){debugger;
               console.log(response);
+              if(response=='liked'){
+                return true;
+              }
+              return false;
           },
           error: function(jqXHR, textStatus, errorThrown){
               console.log(textStatus + ": " + jqXHR.status + " " + errorThrown);

@@ -1,0 +1,1346 @@
+{% load i18n %}
+<style type="text/css">
+    .jwplayer.jw-stretch-uniform .jw-media video {
+        object-fit: cover;
+    }
+    .jwplayer .jw-media video{
+        cursor: pointer;
+    }
+    #player{
+            height: 748px !important;
+    }
+
+
+
+    ._6w18 {
+        display: flex;
+        margin: 0 12px;
+        padding: 4px 0;
+    }
+    ._6w1g {
+        min-width: 29px;
+        order: 2;
+    }
+
+    ._29ak {
+        padding-left: 3px;
+    }
+    ._6w1h {
+        display: flex;
+        flex-direction: row;
+        flex-grow: 1;
+        order: 1;
+    }
+    ._18vi {
+        align-items: center;
+        display: flex;
+        flex: 1 0;
+        justify-content: center;
+    }
+    ._18vi {
+        align-items: center;
+        display: flex;
+        flex: 1 0;
+        justify-content: center;
+    }
+    ._18vi+._18vi::before {
+        content: '\20\a0\20';
+    }
+    ._18vj._18vj {
+        align-items: center;
+        color: #606770;
+        display: flex;
+        flex: 1 0;
+        font-weight: 600;
+        height: 32px;
+        justify-content: center;
+        line-height: 14px;
+        padding: 0 2px;
+        position: relative;
+        text-decoration: none;
+        transition: 400ms cubic-bezier(.08,.52,.52,1) transform;
+    }
+
+    ._666h {
+        cursor: pointer;
+    }
+    ._42ft {
+        cursor: pointer;
+        float: right;
+        display: inline-block;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+    ._18vk::before {
+        content: '';
+        display: inline-block;
+        height: 18px;
+        margin: 0 6px -3px 0;
+        min-width: 18px;
+        position: relative;
+        top: -2px;
+        width: 18px;
+    }
+
+    ._666h::before {
+        background-image: url(/media/CQy3OlLfs65.png);
+        background-repeat: no-repeat;
+        background-size: auto;
+        background-position: 0 -156px;
+    }
+    ._18vj::after {
+        bottom: -5px;
+        content: '';
+        display: block;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: -5px;
+    }
+    ._18vi {
+        align-items: center;
+        display: flex;
+        flex: 1 0;
+        justify-content: center;
+    }
+    ._18vi+._18vi::before {
+        content: '\20\a0\20';
+    }
+    ._1j6m {
+        display: flex;
+        flex: 1 0;
+        justify-content: center;
+    }
+    ._18vj._18vj {
+        align-items: center;
+        color: #606770;
+        display: flex;
+        flex: 1 0;
+        font-weight: 600;
+        height: 32px;
+        justify-content: center;
+        line-height: 14px;
+        padding: 0 2px;
+        position: relative;
+        text-decoration: none;
+        transition: 400ms cubic-bezier(.08,.52,.52,1) transform;
+    }
+
+    ._1j6m ._2nj7 {
+        align-items: center;
+        display: flex;
+        text-decoration: inherit;
+        width: 100%;
+    }
+    ._18vk::before {
+        content: '';
+        display: inline-block;
+        height: 18px;
+        margin: 0 6px -3px 0;
+        min-width: 18px;
+        position: relative;
+        top: -2px;
+        width: 18px;
+    }
+
+    ._2nj7::before {
+        background-image: url(/media/CQy3OlLfs65.png);
+        background-repeat: no-repeat;
+        background-size: auto;
+        background-position: -19px -175px;
+    }
+    ._18vj::after {
+        bottom: -5px;
+        content: '';
+        display: block;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: -5px;
+    }
+    ._18vi {
+        align-items: center;
+        display: flex;
+        flex: 1 0;
+        justify-content: center;
+    }
+    ._666k {
+        position: relative;
+        width: 100%;
+    }
+    ._8c74 {
+        position: relative;
+    }
+    ._18vj._18vj {
+        align-items: center;
+        color: #606770;
+        display: flex;
+        flex: 1 0;
+        font-weight: 600;
+        height: 32px;
+        justify-content: center;
+        line-height: 14px;
+        padding: 0 2px;
+        position: relative;
+        text-decoration: none;
+        transition: 400ms cubic-bezier(.08,.52,.52,1) transform;
+    }
+    .sp_ddXiTdIB8vm.sx_44a25c {
+        width: 18px;
+        height: 18px;
+        background-position: -38px -422px;
+    }
+    .sp_ddXiTdIB8vm.sx_44a25d {
+        width: 18px;
+        height: 18px;
+        background-position: 1px -422px;
+    }
+
+    i.img {
+        -ms-high-contrast-adjust: none;
+    }
+    ._6rk2 {
+        display: inline-block;
+        margin-right: 6px;
+    }
+
+
+    .sp_ddXiTdIB8vm {
+        background-image: url(/media/iJGOBKN9vqK.png);
+        background-size: auto;
+        background-repeat: no-repeat;
+        display: inline-block;
+        height: 20px;
+        width: 20px;
+    }
+    ._18vj::after {
+        bottom: -5px;
+        content: '';
+        display: block;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: -5px;
+    }
+    ._6w1g {
+        min-width: 29px;
+        order: 2;
+    }
+    ._29ak {
+        padding-left: 3px;
+    }
+    ._2agf._4o_4 {
+        display: inline-flex;
+    }
+
+    ._29ak a {
+        align-items: center;
+        border: none;
+        display: flex;
+        height: 32px;
+    }
+    ._4jy3, ._4jy3._42fr:active, ._4jy3._42fr._42fs {
+        line-height: 22px;
+    }
+    ._59pe, form.async_saving ._59pe, a.async_saving._59pe, ._59pe._42fr {
+        background: none;
+        border-color: transparent;
+    }
+    ._517h, ._59pe:focus, ._59pe:hover {
+        background-color: #f5f6f7;
+        border-color: #ccd0d5;
+        color: #4b4f56;
+    }
+    ._4jy0 {
+        transition: 200ms cubic-bezier(.08,.52,.52,1) background-color, 200ms cubic-bezier(.08,.52,.52,1) box-shadow, 200ms cubic-bezier(.08,.52,.52,1) transform;
+    }
+    ._4jy0 {
+        border: 1px solid;
+        border-radius: 2px;
+        box-sizing: content-box;
+        font-size: 12px;
+        -webkit-font-smoothing: antialiased;
+        font-weight: bold;
+        justify-content: center;
+        padding: 0 8px;
+        position: relative;
+        text-align: center;
+        text-shadow: none;
+        vertical-align: middle;
+    }
+    ._2agf {
+        word-wrap: normal;
+    }
+    ._42ft {
+        cursor: pointer;
+        display: inline-block;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+    ._4jy0:before {
+        content: '';
+        display: inline-block;
+        height: 20px;
+        vertical-align: middle;
+    }
+    ._3-8_ {
+        margin-right: 4px;
+    }
+    ._605a ._6vg {
+        border-radius: 50%;
+        overflow: hidden;
+    }
+    ._4jy0 .img {
+        bottom: 1px;
+        position: relative;
+        vertical-align: middle;
+    }
+    ._3vum {
+        align-items: center;
+        border-bottom: 1px solid #dadde1;
+        color: #606770;
+        display: flex;
+        line-height: 20px;
+        margin: 10px 12px 0 12px;
+        padding: 0 0 10px 0;
+    }
+    ._6w1l._6w1o {
+        padding: 8px 12px 4px 12px;
+    }
+    ._6w1l._6w1m {
+        padding: 2px 12px 8px 12px;
+    }
+
+    ._6w1l {
+        padding: 4px 12px;
+    }
+    .clearfix {
+        zoom: 1;
+    }
+    .lfloat {
+        float: left;
+    }
+    ._3mf5 {
+        border-radius: 50%;
+        display: block;
+        margin-right: 6px;
+        position: relative;
+    }
+    ._3mf1 {
+        height: 32px;
+        width: 32px;
+    }
+
+    ._3me- {
+        border-radius: 50%;
+        display: block;
+        overflow: hidden;
+    }
+    ._3mf5::after {
+        border: 1px solid rgba(0, 0, 0, .1);
+        border-radius: 50%;
+        bottom: 0;
+        content: '';
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+    ._42ef {
+        overflow: hidden;
+    }
+    ._17pg {
+        flex-grow: 1;
+    }
+    ._1rwk {
+        flex-grow: 1;
+    }
+    ._129h {
+        background-color: #f2f3f5;
+        border: 1px solid #ccd0d5;
+        border-radius: 16px;
+        display: flex;
+        justify-content: flex-end;
+    }
+    ._4w79 {
+        cursor: text;
+        flex: 1 1 auto;
+        line-height: 16px;
+        overflow: hidden;
+        padding: 8px 12px;
+    }
+    ._7c_r {
+        color: #8d949e;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    ._5rp7 {
+        position: relative;
+    }
+    ._5rp7, ._5rpb, ._5rpu {
+        height: inherit;
+        text-align: initial;
+    }
+    ._3d2q ._1p1t {
+        color: #8d949e;
+    }
+    ._7c_r ._1p1t {
+        width: 100%;
+    }
+    ._1p1t {
+        color: #90949c;
+        position: absolute;
+        z-index: 1;
+    }
+    ._7c_r ._1p1v {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap !important;
+    }
+    ._5rpb {
+        background-color: rgba(255, 255, 255, 0);
+        border-left: .1px solid transparent;
+        position: relative;
+        z-index: 1;
+    }
+    ._5rp7, ._5rpb, ._5rpu {
+        height: inherit;
+        text-align: initial;
+    }
+    ._3d2q ._5rpu {
+        background-color: transparent;
+        border: 0;
+        resize: none;
+        word-break: break-word;
+    }
+    ._5rpu[contenteditable="true"] {
+        -webkit-user-modify: read-write-plaintext-only;
+    }
+    ._5rp7, ._5rpb, ._5rpu {
+        height: inherit;
+
+    }
+    ._1mj {
+        direction: ltr;
+        text-align: left;
+    }
+
+    ._1mf {
+        position: relative;
+        white-space: pre-wrap;
+    }
+    ._1mj {
+        direction: ltr;
+        text-align: left;
+    }
+    ._1mj {
+        direction: ltr;
+        text-align: left;
+    }
+    ._4w79 {
+        cursor: text;
+        flex: 1 1 auto;
+        line-height: 16px;
+        overflow: hidden;
+        padding: 8px 12px;
+    }
+
+    ._7c_r {
+        color: #8d949e;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    ._18vj._18vj:hover{
+        background: #e9ebee;
+    }
+        
+    .sbutton {
+    position: relative;
+
+    }
+    .sbutton:hover{
+        background: #e9ebee;
+    }
+
+    .smenu {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      left: 6px;
+      margin: 0;
+      opacity: 0;
+      padding: 0;
+      position: absolute;
+      top: 36px;
+      -webkit-transition: opacity 0.2s ease-in-out, top 0.2s ease-in-out;
+      -moz-transition: opacity 0.2s ease-in-out, top 0.2s ease-in-out;
+      transition: opacity 0.2s ease-in-out, top 0.2s ease-in-out;
+    }
+
+    .smenu:after {
+      background-color: #FFF;
+    border-top: 1px solid #CCC;
+    border-left: 1px solid #CCC;
+    top: -7px;
+    content: '';
+    display: inline-block;
+    height: 10px;
+    left: 50px;
+    position: absolute;
+    width: 10px;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg)
+    }
+
+    .smenu li {
+      border-bottom: 1px solid #ccc;
+      list-style-type: none;
+      margin: 0;
+      padding: 7px;
+      width: 100px;
+    }
+
+    .smenu li:hover {
+      background-color: #fafafa;
+    }
+
+    .smenu .facebook:hover {
+    background-color: #4C66A4;
+    color: #FFF !important;
+    }
+
+    .smenu .twitter:hover {
+    background-color: #019AD2;
+    color: #FFF !important;
+    }
+
+    .smenu .googleplus:hover {
+    background-color: #D73D32;
+    color: #FFF !important;
+    }
+
+    .smenu li:last-child {
+      border-bottom: none;
+    }
+
+    .smenu li a {
+      color: #E04006;
+      text-decoration: none;
+    }
+
+    .smenu li:hover a {
+      color:#fff !important;
+    }
+
+    .smenu.share {
+      opacity: 1;
+      /*top: 45px;*/
+    }
+    .comment_block .create_new_comment {
+    width: 100%;
+    padding: 20px 0;
+    }
+    .user_avatar {
+        width: 65px;
+        height: 65px;
+        display: inline-block;
+        vertical-align: middle;
+    }
+    .comment_block .create_new_comment .input_comment {
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 10px;
+        width: calc(100% - 75px);
+    }
+    .comment_block .create_new_comment .input_comment input[type="text"] {
+        width: 100%;
+        font-family: "Lato", sans-serif;
+        font-weight: 300;
+        font-size: 1.3rem;
+        padding: 10px;
+        border: none;
+        border-bottom: 2px solid #f2f2f2;
+    }
+    .user_avatar img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+    }
+    *, ::before, ::after {
+
+        margin: 0;
+        padding: 0;
+        -webkit-box-sizing: border-box;
+        transition: all 0.2s ease;
+
+    }
+    .comment-add input {
+        display: block;
+        border: 1px solid #ccc;
+        padding: 10px;
+        width: calc(100% - 0px);
+        outline: 0;
+        background-color: #fafafa;
+        border-radius: 3px;
+    }
+    .comment-add {
+        display: block;
+        margin-bottom: 20px;
+        margin-top: 10px;
+    }
+    .chars-counter {
+        font-size: 12px;
+        color: #aaa;
+    }
+    hr {
+        border: none;
+        border-top: 1px dotted #aaa;
+    }
+    #commentInputId .hide{
+    transition-property: all;
+    transition-duration: 1s;
+    }
+    .liked{
+        color: rgb(32, 120, 244) !important;
+    }
+
+._6coi {
+    color: #90949c;
+    display: inline-block;
+    font-size: 12px;
+    line-height: 12px;
+}
+._6qw9 {
+    margin-bottom: 3px;
+    margin-left: 10px;
+    min-height: 15px;
+    padding-top: 3px;
+}
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+._6coj {
+    display: inline-block;
+}
+#facebook ._-kb span {
+    font-family: inherit;
+}
+._6qw6 {
+    display: inline-block;
+    position: relative;
+}
+
+#facebook ._-kb div {
+    font-family: inherit;
+}
+._8c74 {
+    position: relative;
+}
+._77yo::before {
+    bottom: 0;
+    content: '';
+    display: block;
+    left: -6px;
+    position: absolute;
+    right: -6px;
+    top: -4px;
+}
+#facebook ._-kb div {
+    font-family: inherit;
+}
+#facebook .accessible_elem {
+    clip: rect(1px, 1px, 1px, 1px);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+}
+
+._2r6l {
+    left: 0;
+    position: absolute;
+    top: 0;
+}
+._8c74 a {
+    color: #385898;
+    cursor: pointer;
+    text-decoration: none;
+}
+.liked a {
+    color: rgb(32, 120, 244) !important;
+}
+
+.mask {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    left: 0px;
+    z-index: 9999;
+    background-color: rgba(0, 0, 0, 0.5);
+      -webkit-transition: all .3s linear 0s;
+  transition: all .3s linear 0s;
+}
+.mask .outsharepanel {
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(67.96px);
+    background-size: 100% 100%;
+    box-sizing: border-box;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    border-radius: 9px 9px 0px 0px;
+}
+.mask .outsharepanel .title {
+    font-size: 13px;
+    line-height: 17px;
+    font-weight: 600;
+    text-align: center;
+    color: rgb(22, 24, 35);
+    padding: 12px 0px;
+}
+.mask .outsharepanel .icontainer {
+    position: relative;
+    width: 100%;
+    white-space: nowrap;
+    padding: 0px 24px 16px;
+}
+.mask .outsharepanel .icontainer .platwrap {
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    text-align: center;
+    margin-right: 17.5px;
+}
+
+.mask .outsharepanel .icontainer .platwrap span {
+    display: block;
+    font-size: 11px;
+    padding-top: 8px;
+    color: rgba(22, 24, 35, 0.75);
+    text-align: center;
+}
+.mask .outsharepanel .icontainer .platwrap {
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    text-align: center;
+    margin-right: 17.5px;
+}
+.mask .outsharepanel .icontainer .platicon {
+    width: 46px;
+    height: 46px;
+    background-size: contain;
+    margin: 0px auto;
+    background-repeat: no-repeat;
+}
+.mask .outsharepanel .icontainer:nth-child(3) {
+    padding-top: 16px;
+}
+
+.mask .outsharepanel .icontainer {
+    position: relative;
+    width: 100%;
+    white-space: nowrap;
+    padding: 0px 24px 16px;
+}
+.mask .outsharepanel .btns {
+    position: relative;
+}
+.mask .outsharepanel .btns button {
+    height: 52px;
+    width: 100%;
+    background-color: rgb(255, 255, 255);
+    font-size: 15px;
+    line-height: 18px;
+    border-width: initial;
+    border-style: none;
+    border-color: initial;
+    border-image: initial;
+}
+.loadMoreComment a{
+    font-size: 13px;
+    color: #385898;
+}
+
+.top-banner.show {
+    -webkit-transform: translateY(54px);
+    -ms-transform: translateY(54px);
+    transform: translateY(54px);
+}
+.top-banner {
+    position: fixed;
+    width: 100%;
+    height: 35px;
+    left: 0;
+    top: 0px;
+    background: rgba(0,0,0,0.85);
+    z-index: 1001;
+    color: #fff;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    -webkit-align-items: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    padding: 10px 14px 10px 16px;
+    -webkit-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+.top-banner p {
+    font-size: 15px;
+    line-height: 15px;
+}
+.top-banner p:last-child {
+    font-size: 12px;
+}
+.top-banner button {
+    width: 64px;
+    height: 28px;
+    left: 297px;
+    border: none;
+    top: 13px;
+    background: #FE2C55;
+    border-radius: 2px;
+    color: #fff;
+}
+
+@media(min-width: 992px){
+    .mobileDownPopup{
+        display: none;
+    }
+}
+
+._video_card_big_user_info_handle{
+    display: inline-block;
+}
+
+/*the container must be positioned relative:*/
+.autocomplete {
+  position: relative;
+  display: inline-block;
+  width: 100%
+}
+
+
+.autocomplete-items {
+  border: 1px solid #d4d4d4;
+  border-bottom: none;
+  position: absolute;
+  border-top: none;
+  z-index: 99;
+  /*position the autocomplete items to be the same width as the container:*/
+  top: 100%;
+  left: 0;
+  right: 0;
+}
+
+.autocomplete-items div {
+  padding: 10px;
+  cursor: pointer;
+  background-color: #fff; 
+  border-bottom: 1px solid #d4d4d4; 
+}
+
+/*when hovering an item:*/
+.autocomplete-items div:hover {
+  background-color: #e9e9e9; 
+}
+
+/*when navigating through the items using the arrow keys:*/
+.autocomplete-active {
+  background-color: DodgerBlue !important; 
+  color: #ffffff; 
+}
+.userNameMargin{
+    margin-top: 5px;
+    margin-left: 10px;
+    position: absolute;
+}
+
+
+.mentions-input-box {
+  position: relative;
+  background: #fff;
+}
+
+.mentions-input-box textarea {
+  width: 100%;
+  display: block;
+  padding: 9px;
+  border: 1px solid #dcdcdc;
+  border-radius:3px;
+  overflow: hidden;
+  background: transparent;
+  position: relative;
+  outline: 0;
+  resize: none;
+
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+.mentions-input-box .mentions-autocomplete-list {
+  display: none;
+  background: #fff;
+  border: 1px solid #b2b2b2;
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+  margin-top: -2px;
+
+  border-radius:5px;
+  border-top-right-radius:0;
+  border-top-left-radius:0;
+
+  -webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.148438);
+     -moz-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.148438);
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.148438);
+}
+
+.mentions-input-box .mentions-autocomplete-list ul {
+    margin: 0;
+    padding: 0;
+}
+
+.mentions-input-box .mentions-autocomplete-list li {
+  background-color: #fff;
+  padding: 0 5px;
+  margin: 0;
+  width: auto;
+  border-bottom: 1px solid #eee;
+  height: 26px;
+  line-height: 26px;
+  overflow: hidden;
+  cursor: pointer;
+  list-style: none;
+  white-space: nowrap;
+}
+
+.mentions-input-box .mentions-autocomplete-list li:last-child {
+  border-radius:5px;
+}
+
+.mentions-input-box .mentions-autocomplete-list li > img,
+.mentions-input-box .mentions-autocomplete-list li > div.icon {
+  width: 16px;
+  height: 16px;
+  float: left;
+  margin-top:5px;
+  margin-right: 5px;
+  -moz-background-origin:3px;
+
+  border-radius:3px;
+}
+
+.mentions-input-box .mentions-autocomplete-list li em {
+  font-weight: bold;
+  font-style: none;
+}
+
+.mentions-input-box .mentions-autocomplete-list li:hover,
+.mentions-input-box .mentions-autocomplete-list li.active {
+  background-color: #f2f2f2;
+}
+
+.mentions-input-box .mentions-autocomplete-list li b {
+  background: #ffff99;
+  font-weight: normal;
+}
+
+.mentions-input-box .mentions {
+  position: absolute;
+  left: 1px;
+  right: 0;
+  top: 1px;
+  bottom: 0;
+  padding: 9px;
+  color: #fff;
+  overflow: hidden;
+
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.mentions-input-box .mentions > div {
+  color: #fff;
+  white-space: pre-wrap;
+  width: 100%;
+}
+
+.mentions-input-box .mentions > div > strong {
+  font-weight:normal;
+  background: #d8dfea;
+}
+
+.mentions-input-box .mentions > div > strong > span {
+    color: #fff0;
+  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+}
+
+
+</style>
+
+
+<script type="text/javascript">
+    var indexRowId=0;
+    var indexRowId=$("indexId").val();
+
+</script>
+<style type="text/css">
+    .videoCentered {
+    width: 100%;
+    object-fit: cover;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    height: 100%;
+}
+
+    .tags-container {
+    display: flex;
+    flex-flow: row wrap;
+    margin-bottom: 15px;
+    width: 100%;
+    min-height: 34px;
+    padding: 2px 5px;
+    font-size: 12px;
+    line-height: 1.6;
+    background-color: transparent;
+    border: 1px solid #ccc;
+    border-radius: 1px;
+    overflow: hidden;
+    word-wrap: break-word;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+.tag:first-child {
+    margin-left: 0;
+}
+.tag {
+    position: relative;
+    margin: 8px 2px 8px 0;
+    padding: 1px 15px 1px 8px;
+    font-size: inherit;
+    font-weight: 400;
+    text-align: center;
+    color: #fff;
+    background-color: #317CAF;
+    border-radius: 3px;
+    transition: background-color .3s ease;
+    cursor: default;
+}
+.tag__name {
+    margin-right: 3px;
+}
+.tag__remove {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 20px;
+    height: 100%;
+    padding: 0 5px;
+    font-size: 16px;
+    font-weight: 400;
+    transition: opacity .3s ease;
+    opacity: .5;
+    cursor: pointer;
+    border: 0;
+    background-color: transparent;
+    color: #fff;
+    line-height: 1;
+}
+input.tag-input {
+    flex: 3;
+    border: 0;
+    outline: 0;
+}
+
+.video-meta-title.jsx-191376589 {
+    font-family: inherit;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 20px;
+    margin-bottom: 8px;
+    color: #161823;
+}
+
+.ytd-commentbox {
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    float: right;
+    -ms-flex-direction: row;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+}
+.ytd-button-renderer {
+    vertical-align: middle;
+    white-space: nowrap;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: .007px;
+    cursor: pointer;
+
+}
+ #submit-button.ytd-commentbox {
+    background-color: #ccc;
+    color: #000;
+    padding: 5px;
+}
+#cancel-button.ytd-commentbox{
+    margin-top: -5px !important;
+}
+
+#cancel-button.ytd-commentbox, #submit-button.ytd-commentbox {
+    margin-left: 8px;
+    margin-top: -10px;
+}
+
+.ytd-button-renderer.style-primary[disabled][is-paper-button] {
+    background-color: #ccc;
+    color: #000;
+    padding: 5px;
+}
+
+@media(max-width: 991px){
+    #player{
+        height: 94vh !important
+    }
+}
+
+.video-meta-title a{
+    color: blue;
+}
+
+
+
+</style>
+
+{% trans "download" as Download %}
+{% trans "like" as like %}
+{% trans "video" as video %}
+
+<input type="hidden" name="totalLikeCount" id="totalLikeCount" value="">
+<input type="hidden" name="totalCommentCount" id="totalCommentCount" value="">
+
+<div style="display: none" id="modelPopup">
+    <input type="hideon" name="indexId" id="indexId" value="">
+    <input type="hideon" name="currentPlayUserId" id="currentPlayUserId" value="">
+    <div class="_global_modal_">
+        <div class="_global_modal_mask" style="background-color: rgba(22, 22, 22, 0.9);">
+            
+        </div>
+        <div class="_global_modal_wrapper_content">
+            <div class="_global_modal_content">
+                <div class="jsx-1270455008 top-banner mobileDownPopup hide">
+                    <div class="jsx-1270455008"><p class="jsx-1270455008">Boloindya</p><p class="jsx-1270455008">{% blocktrans %} {{Download}} the app to {{like}} this {{video}} {% endblocktrans %}</p></div><div class="jsx-1270455008"><button onclick="downloadAppLink()" class="jsx-1270455008 jsx-download-app">{% trans "Get" %}</button></div>
+                </div>
+                <div class="_video_card_big_">
+
+                    <div class="_image_card_ _video_card_big_left _video_card_mute_autoshow" style="border-radius: 4px;">
+                        <div class="_video_card_play_btn_ _video_card_play_btn_light videoPlayButton"></div>
+<!--                         <div class="LoaderBalls">
+                            <div class="LoaderBalls__item"></div>
+                            <div class="LoaderBalls__item"></div>
+                            <div class="LoaderBalls__item"></div>
+                        </div> -->
+                            <video id="player" controls="" class="videoCentered"></video>
+                           <div id="jwBox" class="jwBox" style = "bottom : 15px;">
+                                <div class="video_close"></div>
+                                
+                                <!-- <div id="player1" >Loading ...</div> -->
+                                <!-- <video id="player" class="videoCentered"></video> -->
+                                <!-- <video id="video"></video> -->
+
+                            </div>
+
+                        <span class="_video_card_"></span><img onclick="muteAndUnmutePlayer();" class="_video_card_mute _video_card_mute_left_top" id="mutedImageId"  src="/media/mute_icon.svg">
+                        <div class="sidebar" id="sideBarId">
+                            <div class="jsx-2177493926 jsx-3813273378 avatar round openMobileDownloadPopup" style="background-image: url(/media/musically_100x100.jpeg); width: 48px; height: 48px; flex: 0 0 48px;"></div>
+                            <div class="jsx-949708032 boloindya-toolbar" style="margin-top: 20px;">
+                                <div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-like openMobileDownloadPopup" style="background-image: url(/media/viewIcon.svg);"><span class="jsx-949708032">2.4m</span></div>
+                                <div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-comment openMobileDownloadPopup" style="background-image: url(/media/comments.png);"><span class="jsx-949708032">14.1k</span></div>
+                                <div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-share" onclick="openShareTab()" style="background-image: url(/media/share.png);"><span class="jsx-949708032">111.1k</span></div>
+                            </div>
+                        </div>  
+                        
+                
+                    </div>
+                    <div class="_video_card_big_right hideonMobile" >
+                        <a class="_video_card_big_user_info_ userProfileURL" href="javascript:void(0)">
+                            <span class="_avatar_ _avatar_large" id="profileImageUserId" style=" margin-right: 24px;">
+                            </span>
+                            <div class="_video_card_big_user_info_names">
+                                <h2 class="_video_card_big_user_info_nickname"></h2>
+                                <h2 class="_video_card_big_user_info_handle"></h2>
+                                
+
+                            </div>
+                        </a>
+                        <span alt="" style="display: inline-block;position: relative;top: -26px;" class="_-xe _3-8_" onclick="follow_user_by_popup()">
+                            <span class="unit _4jy1 _4jy4 _517h _51sy _42ft"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChangePopup sx_5da455"></i><span class="btnTextChangePopup"> {% trans "Follow" %} </span></span>
+                        </span>
+
+                        <h1 class="jsx-191376589 jsx-861547433 jsx-3645511632 video-meta-title"><strong></strong></h1>
+                        <div class="_comments_ _comments_top _video_card_big_comments">
+                            <div class="_comments_comments_tunnel">
+                                <div class="_comments_comments_scroll comment_block">
+                                    <div>
+                                        <div class="_video_card_big_meta_info_">
+
+                                            <div class="_video_card_big_meta_info_count"><strong>507.1k {% trans "likes" %} · 2.3k {% trans "comments" %}</strong> <span><a style="display: none;" href="#">{% trans "Download" %}</a></span> </div>
+                                            <input type="hidden" name="tpoicId" id="topicID" value="" >
+                                            <input type="hidden" name="topicCreatorUsername" id="topicCreatorUsername" value="" >
+                                        </div>
+ 
+                                        <div class="_6w18">
+
+                                            <div class="_6w1h">
+                                                <span class="_18vi">
+                                                    <div class="_666k" data-testid="UFI2ReactionLink/actionLink">
+                                                        <div class="_8c74">
+                                                            <a aria-pressed="false" class=" _6a-y _3l2t  _18vj" data-testid="UReactionLink" href="javascript:void(0)" id="UReactionLink" role="button" tabindex="0">
+
+                                                                <i alt="" class="_6rk2 img sp_ddXiTdIB8vm sx_44a25c"></i>{% trans "Like" %}
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </span>
+                                                <span class="_18vi">
+                                                    <a class=" _666h  _18vj _18vk _42ft" role="button" tabindex="0" testid="UFI2CommentLink" title="Leave a comment" id="UCommentLink" href="javascript:void(0)">{% trans "Comment" %}
+                                                    </a>
+                                                </span>
+                                                <span class="_18vi sbutton">
+                                                    <span class="_1j6m">
+                                                        <a class=" _2nj7  _18vj _18vk "   href="javascript:void(0)" id="shareLinkId"  title="Send this to friends or post it on your Timeline.">{% trans "Share" %}
+                                                        </a>
+                                                    </span>
+                                                    <ul class='smenu'>
+                                                        <li class="googleplus" onclick="social_share('whatsapp_share')"><a href="javascript:void(0);">whatsapp</a></li>
+                                                        <li class="facebook"><a href="javascript:void(0);" onclick="social_share('facebook_share')">Facebook</a></li>
+                                                        <li class="twitter"><a href="javascript:void(0);" onclick="social_share('twitter_share')">Twitter</a></li>
+                                                        <li class="googleplus" onclick="copyShareLink();"><a href="javascript:void(0);">Copy Link</a></li>
+                                                    </ul>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <hr style="margin-bottom: 10px;">
+
+                                        <div class="_6w1l _6w1m _6w1o clearfix clearfix hide"  data-testid="UFI2Composer/root" id="commentInputId" direction="left">
+
+
+                                            <div class="">
+                                                
+                                                <div class="comment-add ">
+
+
+                                                    <textarea class='mention' id="comment-input" autocomplete="off" maxlength="60" placeholder="Say something nice.."></textarea>
+
+     
+                                                </div>
+
+                                                <div id="buttons1" class="style-scope ytd-commentbox">
+                                                    <div id="cancel-button" class="style-scope ytd-commentbox style-text size-default ytd-button-renderer" >
+                                                        <a class="yt-simple-endpoint style-scope ytd-button-renderer" tabindex="-1">
+                                                            Cancel
+                                                        </a>
+                                                    </div>
+                                                    <div id="submit-button" class="style-scope ytd-commentbox style-primary size-default ytd-button-renderer" >
+                                                        <a class="yt-simple-endpoint style-scope ytd-button-renderer" tabindex="-1">
+                                                            Comment
+                                                        </a>
+                                                    </div>
+
+                                                </div>
+                                                <span class="chars-counter"><span id="chars-current">0</span>/60</span>
+                                                <span class="commentError"></span>
+                                            </div>
+                                        </div>
+                                        <div class="_scroll_load_more_loading">
+                                            <div class="tiktok-loading"></div>
+                                        </div>
+                                        <span class="commentErrorStatus"></span>
+                                        <div id="currentCommentId"></div>
+                                        <div class="videoCommentId"></div>
+                                        <div class="_scroll_load_more_loading_comment">
+                                            <div class="tiktok-loading"></div>
+                                        </div>
+                                        <div class="loadMoreComments"></div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="jsx-1861775669 jsx-537314381 copy-link-container">
+                            <img src="/media/copy_link.svg" class="jsx-1861775669 jsx-537314381">
+                            <input readonly=""  class="jsx-1861775669 jsx-537314381 " id="shareInputbox" value="https://www.boloindya.com/@karansingharoraofficial/video/6758860880575827202">
+                            <p class="jsx-1861775669 jsx-537314381 " onclick="copyShareLink();">{% trans "COPY" %}</p>
+                        </div>
+                    </div>
+                    <div class="jsx-1270455008 footer1">
+                        <a href="/"><div class="jsx-1270455008" style="background-image: url(/media/footerIcon1.svg);"></div></a>
+                        <a href="/{{LANGUAGE_CODE}}/discover/">
+                        <div class="jsx-1270455008" style="background-image: url(/media/footerIcon2.svg);"></div></a>
+                        <div class="jsx-1270455008 " onclick="openMobileDownloadPopup();" style="background-image: url(/media/footer_icon3.svg);"></div>
+                        <div class="jsx-1270455008" onclick="openMobileDownloadPopup();" style="background-image: url(/media/footerIcon4.svg);"></div>
+                        <div class="jsx-1270455008" onclick="openMobileDownloadPopup();"  style="background-image: url(/media/footerIcon5.svg);"></div>
+                    </div> 
+                
+                </div>
+            </div>
+            <img class="_global_modal_cancel" onclick="removeDataFromURL();" src="/media/cancel.svg">
+        </div>
+    </div>
+</div>
+<div class="tiktok-share openShareTabId hide">
+    <div class="jsx-2679382212 outshare mask share-transiton-enter-done">
+        <div class="jsx-2679382212 outsharepanel">
+            <div class="jsx-2679382212 title">{% trans "Share to" %}</div>
+            <div class="jsx-2679382212 icontainer">
+                <div class="platwrap" >
+                    <div onclick="copyShareLinkMobile();" class="platicon i-copylink" style="background-image: url(/media/copy.svg);"></div><span>{% trans "Copy Link" %}</span>
+                    <input readonly=""  class="jsx-1861775669 jsx-537314381 hide" id="shareInputboxMobile" value="https://www.boloindya.com/@karansingharoraofficial/video/6758860880575827202">
+                </div>
+
+                <div class="platwrap" onclick="social_share('facebook_share')">
+                    <div class="platicon i-facebook"  style="background-image: url(/media/facebook_mobile.svg);"></div><span> Facebook</span></div>
+                <div class="platwrap" onclick="social_share('twitter_share')">
+                    <div class="platicon i-twitter" style="background-image: url(/media/twitter_mobile.svg);"></div><span> Twitter</span></div>
+                <div class="platwrap" onclick="social_share('whatsapp_share')">
+                    <div class="platicon i-pinterest" style="background-image: url(/media/whatsapp.svg);"></div><span> Whatsapp</span></div>
+                <p class="linkCopies"></p>
+            </div>
+
+
+            <div class="jsx-2679382212 btns">
+                <button class="jsx-2679382212 hideShareOnMobile">{% trans "Cancel" %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+<a href="/login/?next={{ request.get_full_path }}" id="gotoLoginPage" ></a> 
+<script src='https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js' type='text/javascript'></script>
+<script src='/media/js/jquery.events.input.js' type='text/javascript'></script>
+<script src='/media/js/jquery.elastic.js' type='text/javascript'></script>
+<script src='/media/js/jquery.mentionsInput.js' type='text/javascript'></script>
+<!-----------  Comment Script  ------------>
+<script src="/media/js/comment_and_play.js"></script>
+<!-----------End  ------------>
+
+

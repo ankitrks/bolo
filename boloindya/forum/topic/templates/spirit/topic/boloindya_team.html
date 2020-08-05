@@ -1,4 +1,4 @@
-{% extends "spirit/_new_home_base.html" %}
+{% extends "spirit/_new_layout_base.html" %}
 {% load spirit_tags i18n %}
 {% load i18n %}
 {% load number_formate_change_tag %}
@@ -21,16 +21,17 @@ section{
 header .main-heading {
     clear: both;
     text-align: center;
-    padding: 80px 0 20px 0;
+    padding: 80px 0 15px 0;
+    background: #f8f8f8;
 }
 header .main-heading h1 {
-    font-size: 48px;
-    line-height: 60px;
+    font-size: 30px;
+    line-height: 66px;
     max-width: 700px;
     text-align: center;
     margin: 0 auto;
-    padding: 50px 0 10px;
-    height: 140px;
+    padding: 0px 0 10px;
+    height: 108px;
 }
 
 header .main-heading p.desc {
@@ -40,7 +41,7 @@ header .main-heading p.desc {
     margin: 0 auto;
 }
 section.team {
-    padding: 50px 0;
+    padding: 0px 0;
     overflow: hidden;
     text-align: center;
 }
@@ -90,15 +91,16 @@ section.team .employee-card-front img {
     max-width: 100%;
 }
 section.team .employee-card-front .name {
-    background: rgba(0,0,0,0.5);
-    padding: 15px 0;
+    background: #B62827;
+    padding: 6px 0;
     position: absolute;
     bottom: 0;
     color: #fff;
-    width: 100%;
-    font-family: 'Lato', sans-serif;
+    width: 60%;
+    left: 22%;
+    border-radius: 100px 100px 0px 1px;
     font-weight: 700;
-    font-size: 18px;
+    font-size: 14px;
 }
 section.team .employee-card-back {
     background-color: #106973;
@@ -188,7 +190,7 @@ section.team .card .side {
 
 }
 section.team .card .back {
-    background-color: #106973;
+    background-color: #B62827;
     color: white;
     transform: rotateY(-180deg);
     -webkit-transform: rotateY(-180deg);
@@ -200,9 +202,10 @@ section.team .team_back_side h4 {
 }
 
 section.team .team_back_side p {
-    font-size: 16px;
+    font-size: 15px;
     line-height: 22px;
     padding: 12px;
+    min-height: 145px;
 }
 .sub-title{
     font-size: 12px;
@@ -212,259 +215,410 @@ section.team .team_back_side p {
     cursor: pointer;
 }
 
+.awesomTeamHead{
+font-style: normal;
+font-weight: 500;
+font-size: 30px;
+line-height: 50px;
+display: flex;
+align-items: center;
+
+color: #545454;
+}
+.borderBackSlide{
+    border: 2px groove #fff;
+    margin: 4px 4px 1px 2px;
+}
+.backIconWithglass{
+    height: 40px;
+    height: 54px;
+    margin-bottom: -5px;
+    position: relative;
+}
 </style>
 
+<div style="background: #f8f8f8;background-image: url(/media/background_eclipse.png);">
 
-
-<header id="header">
-    <div class="container">
-        <div class="main-heading">
-            <h1>Meet the <br>Bolo Indya Squad</h1>
-            <p class="desc">Because one man army only sounds good in movies, the real synergy lies in the relentless efforts, constant support, burning the midnight oil when everything seems to go for a toss and still meeting deadlines with gallons of caffeine consumed by these folks, Bolo Indya would've still been a dream!</p>
+    <header id="header" style="background-color: #E5E5E5">
+        <div class="container">
+            <div class="main-heading">
+                <h1 class="awesomTeamHead">Meet the awesome team behind Bolo Indya!</h1>
+            </div>
         </div>
-    </div>
-</header>
+    </header>
 
-<section class="team">
-    <div class="container">
+    <section class="team">
+        <div class="container">
 
-        <div class="card-container">
-          <div class="card">
-            <div class="side">
-                <div class="employee-card-front">
-                    <img src="/media/team/ankit.jpg"  alt="Boloindyaan">
-                    <div class="name">Ankit Rastogi <br> <span class="sub-title"><img src="/media/img/linkedin.png" height="30"></span></div>
+            <div class="card-container">
+              <div class="card">
+                <div class="side">
+                    <div class="employee-card-front">
+                        <img src="/media/team/Akash.png"  alt="Boloindyaan">
+                        <div class="name">Akash Utreja <!-- <span class="sub-title"><img src="/media/img/linkedin.png" height="30"></span> --></div>
+
+                    </div>
+                </div>
+                <div class="side back">
+                    <div class="borderBackSlide">
+                        <div class="team_back_side">
+                            <h4>Fullstack Developer</h4>
+                            <p>He is not just a creative mind behind the software but a passionate dancer too. He strongly belives in doing hard work and that keeps him up and motivated all the time.</p>
+                        </div>
+                        <div><img class="backIconWithglass" src="/media/background_white_with_icon.png"></div>  
+                    </div>      
+                </div>
+              </div>
+            </div>
+
+            <div class="card-container">
+              <div class="card">
+                <div class="side">
+                    <div class="employee-card-front">
+                        <img src="/media/team/Ankit.png"  alt="Boloindyaan">
+                        <div class="name">Ankit Rastogi<!-- <br> <span class="sub-title"><img src="/media/img/linkedin.png" height="30"></span> --></div>
+
+                    </div>
+                </div>
+                <div class="side back">
+                    <div class="borderBackSlide">
+                        <div class="team_back_side">
+                            <h4>Head of Engineering</h4>
+
+                            <p>Of all the languages, computer languages are his most favourite and can work with them all day long. But don’t be surprised he loves coding at night and gadgets are his absolute favourite.</p>
+                            <!-- <span class="sub-title"><a class="linkedin" href="javascript:void(0)"><img src="/media/img/linkedin.png" height="30"></a></span> -->
+                            <div><img class="backIconWithglass" src="/media/background_white_with_icon.png"></div>  
+                        </div> 
+                    </div>        
+                </div>
+              </div>
+            </div>
+
+            <div class="card-container">
+              <div class="card">
+                <div class="side">
+                    <div class="employee-card-front">
+                        <img src="/media/team/Anshika.png"  alt="Boloindyaan">
+                        <div class="name">Anshika Yadav </div>
+
+                    </div>
+                </div>
+                <div class="side back">
+                    <div class="borderBackSlide">
+                        <div class="team_back_side">
+                            <h4>User Acquisition Lead</h4>
+                            <p>The most hands on non techie of the team. Loves our users and is the most popular among them when it comes to addressing issues related to them. When not working, you can always find her either with Chai or Samara</p>
+                        </div>
+                        <div><img class="backIconWithglass" src="/media/background_white_with_icon.png"></div> 
+                    </div>        
+                </div>
+              </div>
+            </div>
+
+
+            <div class="card-container">
+              <div class="card">
+                <div class="side">
+                    <div class="employee-card-front">
+                        <img src="/media/team/Gaurang.png"  alt="Boloindyaan">
+                        <div class="name">Gaurang Sinha</div>
+
+                    </div>
+                </div>
+                <div class="side back">
+                    <div class="borderBackSlide">
+                        <div class="team_back_side">
+                            <h4>Fullstack Developer</h4>
+                            <p>He not just loves playing with technology but equally loves playing cricket. He is a movie freak and someone who is very fun, perky, and often optimistic. </p>
+                        </div> 
+                        <div><img class="backIconWithglass" src="/media/background_white_with_icon.png"></div> 
+                    </div>   
+                </div>
+              </div>
+            </div>
+            <div class="card-container">
+              <div class="card">
+                <div class="side">
+                    <div class="employee-card-front">
+                        <img src="/media/team/Gitesh.png"  alt="Boloindyaan">
+                        <div class="name">Gitesh Shastri</div>
+
+                    </div>
+                </div>
+                <div class="side back">
+                    <div class="borderBackSlide">
+                        <div class="team_back_side">
+                            <h4>Android Developer</h4>
+                            <p>He loves building apps that makes all our lives easy. He loves taking challenges and overcomes them like a pro. He loves exploring & learning new things everyday</p>
+                        </div> 
+                        <div><img class="backIconWithglass" src="/media/background_white_with_icon.png"></div> 
+                    </div>         
+                </div>
+              </div>
+            </div>
+
+            <div class="card-container">
+              <div class="card">
+                <div class="side">
+                    <div class="employee-card-front">
+                        <img src="/media/team/Ishita.png"  alt="Boloindyaan">
+                        <div class="name">Ishita </div>
+
+                    </div>
+                </div>
+                <div class="side back">
+                    <div class="borderBackSlide">
+                        <div class="team_back_side">
+                            <h4>AVP Brand & Partnerships</h4>
+
+                            <p>She is the brand guardian and is great in maintaining relationships be it with existing team or external contacts. She is someone who is dynamic, charismatic, and very social.</p>
+                        </div>
+                        <div><img class="backIconWithglass" src="/media/background_white_with_icon.png"></div>
+                    </div>       
+                </div>
+              </div>
+            </div>
+
+            <div class="card-container">
+              <div class="card">
+                <div class="side">
+                    <div class="employee-card-front">
+                        <img src="/media/team/Maaz.png"  alt="Boloindyaan">
+                        <div class="name">Maaz</div>
+
+                    </div>
+                </div>
+                <div class="side back">
+                    <div class="borderBackSlide">
+                        <div class="team_back_side">
+                            <h4>Sr Fullstack Developer</h4>
+
+                            <p>He is our newly married full stack developer who is full of life. He turns visual design and wireframe files into living, functioning websites. When life gets complicated he rides.</p>
+                        </div>
+                        <div><img class="backIconWithglass" src="/media/background_white_with_icon.png"></div>
+                    </div>
 
                 </div>
-            </div>
-            <div class="side back">
-                <div class="team_back_side">
-                    <h4>Product Management</h4>
+              </div>
+            </div>             
 
-                    <p>Superman is a fictional superhero.</p>
-                    <span class="sub-title"><a class="linkedin" href="javascript:void(0)"><img src="/media/img/linkedin.png" height="30"></a></span>
-                </div>        
+            <div class="card-container">
+              <div class="card">
+                <div class="side">
+                    <div class="employee-card-front">
+                        <img src="/media/team/Neha.png"  alt="Boloindyaan">
+                        <div class="name">Neha</div>
+
+                    </div>
+                </div>
+                <div class="side back">
+                    <div class="borderBackSlide">
+                        <div class="team_back_side">
+                            <h4>AVP Tech</h4>
+                            <p>She loves Algorithms and Codes. Apart from these two, travelling, yoga, and reading are the other things that keeps her sane. She is a go-getter and inspires all of us everyday.</p>
+                        </div>
+                        <div><img class="backIconWithglass" src="/media/background_white_with_icon.png"></div>
+                    </div>        
+                </div>
+              </div>
+            </div>             
+
+            <div class="card-container">
+              <div class="card">
+                <div class="side">
+                    <div class="employee-card-front">
+                        <img src="/media/team/Ravneet.png"  alt="Boloindyaan">
+                        <div class="name">Ravneet Kaur</div>
+
+                    </div>
+                </div>
+                <div class="side back">
+                    <div class="borderBackSlide">
+                        <div class="team_back_side">
+                            <h4 style="margin: 20px 0 12px 0;">UI UX intern</h4>
+                            <p>Our one stop solution for all designs who runs with the motto "You can't reach perfection but you can certainly achieve satisfaction" . While everything seems to go for a toss, we count on her to do the last moment magic. In her free time she loves anime and cooking.</p>
+                        </div>
+                        <div><img class="backIconWithglass" src="/media/background_white_with_icon.png"></div>
+                    </div>        
+                </div>
+              </div>
+            </div> 
+
+
+
+            <div class="card-container">
+              <div class="card">
+                <div class="side">
+                    <div class="employee-card-front">
+                        <img src="/media/team/Sagarika.png"  alt="Boloindyaan">
+                        <div class="name">Sagarika</div>
+
+                    </div>
+                </div>
+                <div class="side back">
+                    <div class="borderBackSlide">
+                        <div class="team_back_side">
+                            <h4>Content Moderator</h4>
+                            <p>She is not just good at work but a natural-born artist. She has got a euphorious voice that melts people. She is the spontaneous and energetic women of the team.</p>
+                        </div>
+                        <div><img class="backIconWithglass" src="/media/background_white_with_icon.png"></div>
+                    </div>        
+                </div>
+              </div>
+            </div> 
+
+            <div class="card-container">
+              <div class="card">
+                <div class="side">
+                    <div class="employee-card-front">
+                        <img src="/media/team/sarfaraz.png"  alt="Boloindyaan">
+                        <div class="name">Sarfaraz</div>
+
+                    </div>
+                </div>
+                <div class="side back">
+                    <div class="borderBackSlide">
+                        <div class="team_back_side">
+                            <h4>Fullstack Developer</h4>
+                            <p>He talks only when necessary but gets shit done nonetheless. He is someone who is focused on achievement, organized, and always in control.</p>
+                        </div> 
+                        <div><img class="backIconWithglass" src="/media/background_white_with_icon.png"></div>
+                    </div>        
+                </div>
+              </div>
             </div>
-          </div>
+
+
+            <div class="card-container">
+              <div class="card">
+                <div class="side">
+                    <div class="employee-card-front">
+                        <img src="/media/team/Srinidhi.png"  alt="Boloindyaan">
+                        <div class="name">Srinidhi Ramesh 
+                        </div>
+
+                    </div>
+                </div>
+                <div class="side back">
+                    <div class="borderBackSlide">
+                        <div class="team_back_side">
+                            <h4>Language Lead - Tamil</h4>
+                            <p>The most diverse and talented member of the team. While she is a perfectionist at work, her dance skills keep surprising us where she has represented the country.</p>
+                        </div>
+                        <div><img class="backIconWithglass" src="/media/background_white_with_icon.png"></div>
+                    </div>        
+                </div>
+              </div>
+            </div>   
+
+
+            <div class="card-container">
+              <div class="card">
+                <div class="side">
+                    <div class="employee-card-front">
+                        <img src="/media/team/tanmani_new.png"  alt="Boloindyaan">
+                        <div class="name">Tanmai Paul</div>
+
+                    </div>
+                </div>
+                <div class="side back">
+                    <div class="borderBackSlide">
+                        <div class="team_back_side">
+                            <h4>Co-Founder and CMO</h4>
+                            <p>Sarcasm and Tanmai are synonymous. Be it in managing digital content or talking to stakeholders. Her acumen and passion to make Bolo Indya known to all is unmatchable. A win win for ya’ll - Give her a glass of red wine and no one gets hurt.</p> 
+                        </div>
+                        <div><img class="backIconWithglass" src="/media/background_white_with_icon.png"></div>
+                    </div>         
+                </div>
+              </div>
+            </div>        
+
+            <div class="card-container">
+              <div class="card">
+                <div class="side">
+                    <div class="employee-card-front">
+                        <img src="/media/team/Tarush.png"  alt="Boloindyaan">
+                        <div class="name">Tarush Saksena</div>
+
+                    </div>
+                </div>
+                <div class="side back">
+                    <div class="borderBackSlide">
+                        <div class="team_back_side">
+                            <h4>HR Manager</h4>
+                            <p>A fun addition to the team and the most reliable one. Yet, he is the go to man for everyone in the team. He is the driving force for the team to hunt and get new awesome people join us.</p>
+                        </div>
+                        <div><img class="backIconWithglass" src="/media/background_white_with_icon.png"></div>
+                    </div>        
+                </div>
+              </div>
+            </div>
+
+            <div class="card-container">
+              <div class="card">
+                <div class="side">
+                    <div class="employee-card-front">
+                        <img src="/media/team/Varun.png"  alt="Boloindyaan">
+                        <div class="name">Varun Saxena</div>
+
+                    </div>
+                </div>
+                <div class="side back">
+                    <div class="borderBackSlide">
+                        <div class="team_back_side">
+                            <h4>Founder and CEO</h4>
+                            <p>A workaholic, who doesn’t understand normal working hours or weekends. Tough to read his mind in terms of expectations, and only he knows where Bolo Indya will be, years from now. Can never separate sales and love for JD from him.</p>
+                        </div>
+                        <div><img class="backIconWithglass" src="/media/background_white_with_icon.png"></div>
+                    </div>        
+                </div>
+              </div>
+            </div>            
+
+            <div class="card-container">
+              <div class="card">
+                <div class="side">
+                    <div class="employee-card-front">
+                        <img src="/media/team/Vipasha.png"  alt="Boloindyaan">
+                        <div class="name">Vipasha Sharma</div>
+
+                    </div>
+                </div>
+                <div class="side back">
+                    <div class="borderBackSlide">
+                        <div class="team_back_side">
+                            <h4>Social Media Manager</h4>
+                            <p>Vipasha is a passionate individual who has mastered the skill of dancing, whether it's making Bolo Indya's social media dance or her own self. The thought of pouring herself a glass of Cranberry Vodka after work keeps her going,</p>
+                        </div>
+                        <div><img class="backIconWithglass" src="/media/background_white_with_icon.png"></div>
+                    </div>        
+                </div>
+              </div>
+            </div>        
+
+<!--             <div class="card-container">
+              <div class="card">
+                <div class="side">
+                    <div class="employee-card-front">
+                        <img src="/media/team/are-you-next.png"  alt="Boloindyaan">
+                        <div class="name">Join Us <br> </div>
+
+                    </div>
+                </div>
+                <div class="side back">
+                    <div class="team_back_side">
+                        <h4>Work with us</h4>
+
+                        <p>Be a part of this awesome team.<br><br><a style="color: #fff" href="https://angel.co/company/bolo-indya/jobs">See careers</a></p>
+                        
+                    </div>        
+                </div>
+              </div>
+            </div> -->
+
+
         </div>
-
-        <div class="card-container">
-          <div class="card">
-            <div class="side">
-                <div class="employee-card-front">
-                    <img src="/media/team/anshika.jpg"  alt="Boloindyaan">
-                    <div class="name">Anshika Yadav <br> <span class="sub-title"><img src="/media/img/linkedin.png" height="30"></span></div>
-
-                </div>
-            </div>
-            <div class="side back">
-                <div class="team_back_side">
-                    <h4>Product Management</h4>
-
-                    <p>The most hands on non techie of the team. Loves our users and is the most popular among them when it comes to addressing issues related to them. When not working, you can always find her either with Chai or Samara.</p>
-                    <span class="sub-title"><a class="linkedin" href="javascript:void(0)"><img src="/media/img/linkedin.png" height="30"></a></span>
-                </div>        
-            </div>
-          </div>
-        </div>
-        <div class="card-container">
-          <div class="card">
-            <div class="side">
-                <div class="employee-card-front">
-                    <img src="/media/team/abhishek.jpg"  alt="Boloindyaan">
-                    <div class="name">Abhishek Sharma <br> <span class="sub-title"><img src="/media/img/linkedin.png" height="30"></span></div>
-
-                </div>
-            </div>
-            <div class="side back">
-                <div class="team_back_side">
-                    <h4>Full Stack Developer</h4>
-
-                    <p>A motivated learner, I believe in using the technology to solve problems faced by individuals in day-to-day life.</p>
-                    <span class="sub-title"><a class="linkedin" href="javascript:void(0)"><img src="/media/img/linkedin.png" height="30"></a></span>
-                </div>        
-            </div>
-          </div>
-        </div>
-
-        <div class="card-container">
-          <div class="card">
-            <div class="side">
-                <div class="employee-card-front">
-                    <img src="/media/team/akash.jpg"  alt="Boloindyaan">
-                    <div class="name">Akash Kumar Gautam <br> <span class="sub-title"><img src="/media/img/linkedin.png" height="30"></span></div>
-
-                </div>
-            </div>
-            <div class="side back">
-                <div class="team_back_side">
-                    <h4>Full Stack Web Developer</h4>
-
-                    <p>An experienced researcher, aiming to solve problems faced in interdisciplinary domains harnessing the potential of data science. </p>
-                    <span class="sub-title"><a class="linkedin" href="javascript:void(0)"><img src="/media/img/linkedin.png" height="30"></a></span>
-                </div>        
-            </div>
-          </div>
-        </div>
-        <div class="card-container">
-          <div class="card">
-            <div class="side">
-                <div class="employee-card-front">
-                    <img src="/media/team/Gitesh.jpg"  alt="Boloindyaan">
-                    <div class="name">Gitesh Shastri <br> <span class="sub-title"><img src="/media/img/linkedin.png" height="30"></span></div>
-
-                </div>
-            </div>
-            <div class="side back">
-                <div class="team_back_side">
-                    <h4>Full Stack Developer</h4>
-
-                    <p>Adaptive, quick learner, mix with people in no time, loves challenges.</p>
-                    <span class="sub-title"><a class="linkedin" href="javascript:void(0)"><img src="/media/img/linkedin.png" height="30"></a></span>
-                </div>        
-            </div>
-          </div>
-        </div>
-        <div class="card-container">
-          <div class="card">
-            <div class="side">
-                <div class="employee-card-front">
-                    <img src="/media/team/maaz.jpg"  alt="Boloindyaan">
-                    <div class="name">Mohammad Maaz <br> <span class="sub-title"><img src="/media/img/linkedin.png" height="30"></span></div>
-
-                </div>
-            </div>
-            <div class="side back">
-                <div class="team_back_side">
-                    <h4>Full Stack Developer</h4>
-
-                    <p>Highly functional sociopath, Tech Ethusiast, Data Collector</p>
-                    <span class="sub-title"><a class="linkedin" target="_blank" href="https://www.linkedin.com/in/nishachar5555/"><img src="/media/img/linkedin.png" height="30"></a></span>
-                </div>        
-            </div>
-          </div>
-        </div>        
-        <div class="card-container">
-          <div class="card">
-            <div class="side">
-                <div class="employee-card-front">
-                    <img src="/media/team/sarfaraz.jpg"  alt="Boloindyaan">
-                    <div class="name">Mohammad Sarfaraz Alam <br> <span class="sub-title"><img src="/media/img/linkedin.png" height="30"></span></div>
-
-                </div>
-            </div>
-            <div class="side back">
-                <div class="team_back_side">
-                    <h4>Software Engineering</h4>
-
-                    <p>Quick learning Ability,he speaks only when necessary but gets shit done nonetheless. full of wonderful adjectives.</p>
-                    <span class="sub-title"><a class="linkedin" target="_blank" href="https://www.linkedin.com/in/sarfaraz-alam-3a160b25/"><img src="/media/img/linkedin.png" height="30"></a></span>
-                </div>        
-            </div>
-          </div>
-        </div>
-        <div class="card-container">
-          <div class="card">
-            <div class="side">
-                <div class="employee-card-front">
-                    <img src="/media/team/sirinidhi.jpg"  alt="Boloindyaan">
-                    <div class="name">Srinidhi Ramesh<br> <span class="sub-title"><img src="/media/img/linkedin.png" height="30"></span></div>
-
-                </div>
-            </div>
-            <div class="side back">
-                <div class="team_back_side">
-                    <h4>Finance Manager</h4>
-
-                    <p>The most diverse and talented member of the team. While she is a perfectionist at work, her dance skills keep surprising us where she has represented the country. </p>
-                    <span class="sub-title"><a class="linkedin" target="_blank" href="https://www.linkedin.com/in/srinidhi-ramesh-8b432b140/"><img src="/media/img/linkedin.png" height="30"></a></span>
-                </div>        
-            </div>
-          </div>
-        </div>   
-        <div class="card-container">
-          <div class="card">
-            <div class="side">
-                <div class="employee-card-front">
-                    <img src="/media/team/tanmai.jpg"  alt="Boloindyaan">
-                    <div class="name">Tanmai Paul <br> <span class="sub-title"><img src="/media/img/linkedin.png" height="30"></span></div>
-
-                </div>
-            </div>
-            <div class="side back">
-                <div class="team_back_side">
-                    <h4>Co-Founder and CMO</h4>
-
-                    <p>Sarcasm and Tanmai are synonymous. Be it in managing digital content, social media or talking to stakeholders, we all can just try to match her acumen. Her passion to make brand Bolo Indya known to all is unmatchable</p>
-                    <span class="sub-title"><a class="linkedin" target="_blank" href="https://www.linkedin.com/in/tanmai-paul-6819a6164/"><img src="/media/img/linkedin.png" height="30"></a></span>
-                </div>        
-            </div>
-          </div>
-        </div>        
-
-        <div class="card-container">
-          <div class="card">
-            <div class="side">
-                <div class="employee-card-front">
-                    <img src="/media/team/tarush.jpg"  alt="Boloindyaan">
-                    <div class="name">Tarush Saksena <br> <span class="sub-title"><img src="/media/img/linkedin.png" height="30"></span></div>
-
-                </div>
-            </div>
-            <div class="side back">
-                <div class="team_back_side">
-                    <h4>Human Resources Manager</h4>
-
-                    <p>The most recent addition to the team and the most quiet one. Yet, he is going to man for everyone in the team. He is the driving force for the team to hunt and get new awesome people join us.</p>
-                    <span class="sub-title"><a class="linkedin" target="_blank" href="http://linkedin.com/in/tarush-saksena-a77249128"><img src="/media/img/linkedin.png" height="30"></a></span>
-                </div>        
-            </div>
-          </div>
-        </div>
-
-        <div class="card-container">
-          <div class="card">
-            <div class="side">
-                <div class="employee-card-front">
-                    <img src="/media/team/varun.jpg"  alt="Boloindyaan">
-                    <div class="name">Varun Saxena <br> <span class="sub-title"><img src="/media/img/linkedin.png" height="30"></span></div>
-
-                </div>
-            </div>
-            <div class="side back">
-                <div class="team_back_side">
-                    <h4>Founder and CEO</h4>
-
-                    <p>A workaholic, who doesn’t understand normal working hours or weekends. Tough to read his mind in terms of expectations, and only he knows where Bolo Indya will be, years from now. Can never separate sales and love for JD from him.</p>
-                    <span class="sub-title"><a class="linkedin" target="_blank" href="https://www.linkedin.com/in/varunsaxena11/"><img src="/media/img/linkedin.png" height="30"></a></span>
-                </div>        
-            </div>
-          </div>
-        </div>        
-
-        <div class="card-container">
-          <div class="card">
-            <div class="side">
-                <div class="employee-card-front">
-                    <img src="/media/team/are-you-next.png"  alt="Boloindyaan">
-                    <div class="name">Join Us <br> </div>
-
-                </div>
-            </div>
-            <div class="side back">
-                <div class="team_back_side">
-                    <h4>Work with us</h4>
-
-                    <p>Be a part of this awesome team.<br><br><a href="https://angel.co/company/bolo-indya/jobs">See careers</a></p>
-                    
-                </div>        
-            </div>
-          </div>
-        </div>
-
-
-    </div>
-</section>
-
+    </section>
+</div>
 
 {% endblock %}

@@ -681,6 +681,134 @@ input:checked + .slider:before {
 
 
 </style>
+
+
+
+<style type="text/css">
+  .img-replace {
+  /* replace text with an image */
+  display: inline-block;
+  overflow: hidden;
+  text-indent: 100%; 
+  color: transparent;
+  white-space: nowrap;
+}
+.bts-popup {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 99;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  -webkit-transition: opacity 0.3s 0s, visibility 0s 0.3s;
+  -moz-transition: opacity 0.3s 0s, visibility 0s 0.3s;
+  transition: opacity 0.3s 0s, visibility 0s 0.3s;
+}
+.bts-popup.is-visible {
+  opacity: 1;
+  visibility: visible;
+  -webkit-transition: opacity 0.3s 0s, visibility 0s 0s;
+  -moz-transition: opacity 0.3s 0s, visibility 0s 0s;
+  transition: opacity 0.3s 0s, visibility 0s 0s;
+}
+
+.bts-popup-container {
+  position: relative;
+  width: 90%;
+  max-width: 400px;
+  margin: 4em auto;
+  background: transparent;
+  border-radius: none; 
+  text-align: center;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+  -webkit-transform: translateY(-40px);
+  -moz-transform: translateY(-40px);
+  -ms-transform: translateY(-40px);
+  -o-transform: translateY(-40px);
+  transform: translateY(-40px);
+  /* Force Hardware Acceleration in WebKit */
+  -webkit-backface-visibility: hidden;
+  -webkit-transition-property: -webkit-transform;
+  -moz-transition-property: -moz-transform;
+  transition-property: transform;
+  -webkit-transition-duration: 0.3s;
+  -moz-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+}
+.bts-popup-container img {
+  padding: 20px 0 0 0;
+}
+.bts-popup-container p {
+  color: white;
+  padding: 0px 0px;
+}
+.bts-popup-container .bts-popup-button {
+  padding: 5px 25px;
+  border: 2px solid white;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.bts-popup-container a {
+  color: white;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+
+
+
+
+
+.bts-popup-container .bts-popup-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 30px;
+  height: 30px;
+}
+.bts-popup-container .bts-popup-close::before, .bts-popup-container .bts-popup-close::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  width: 16px;
+  height: 3px;
+  background-color: white;
+}
+.bts-popup-container .bts-popup-close::before {
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  transform: rotate(45deg);
+  left: 8px;
+}
+.bts-popup-container .bts-popup-close::after {
+  -webkit-transform: rotate(-45deg);
+  -moz-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+  right: 6px;
+  top: 13px;
+}
+.is-visible .bts-popup-container {
+  -webkit-transform: translateY(0);
+  -moz-transform: translateY(0);
+  -ms-transform: translateY(0);
+  -o-transform: translateY(0);
+  transform: translateY(0);
+}
+@media only screen and (min-width: 1170px) {
+  .bts-popup-container {
+    margin: 8em auto;
+  }
+}
+</style>
+
 <script type="text/javascript">
       $(document).ready(function(){
             var submitIcon = $('.searchbox-icon');
@@ -738,45 +866,43 @@ input:checked + .slider:before {
         <div class="jsx-639186511 ">
             <div class="jsx-3563400267 header-container">
                 <div class="jsx-3563400267 header-content" id="sub-header">
+
+    <div class="mainHeader">
+        <section class="navbar">
+          <a href="/{{LANGUAGE_CODE}}/">
+            <div class="logo">
+                <img src="/media/boloindya_new_logo.png" alt="Logo">
+            </div>
+          </a>
+            <nav>
+                <a class="jsx-475503780" href="/{{LANGUAGE_CODE}}/trending/">Explore</a>
+
+                {% if user.is_authenticated %}
+                {% else %}
+                  <a href="/login/">Sign in</a>
+                {% endif %}
+
+                
+                <a onclick="onClickRedirect('/{{LANGUAGE_CODE}}/discover/');" href="javascript:void(0);" class="get-started-btn">Get Started</a>
+            </nav>
+        </section>
+    </div>
+
 <!--                   <h3 class="jsx-475503780 logo-container">
                     <a href="">Signup</a>
                   </h3> -->
-                    <h1 class="jsx-475503780 logo-container">
+                    <h1 class="jsx-475503780 logo-container hide">
                       <a title="boloindya" class="jsx-475503780" href="{{site_base_url}}">
                         <img id="boloindyaLogoId" src="/media/boloindya_new_logo.png" alt="boloindya" class="jsx-475503780 logo-text">
                         <strong class="jsx-475503780">boloindya</strong>
                       </a>
                     </h1>
-                          <ul class="jsx-3143951235 menu-wrapper" >
-<!--                                 <li class="hideOnMobile">
-                                    <div class="_4kny _50tm">
-                                    <form class="searchbox" action="/{{LANGUAGE_CODE}}/search/" method="get">
-                                        <input type="search" placeholder="Search......" value="{{search_term}}"  autocomplete="off" name="term" class="searchbox-input" onkeyup="buttonUp();" required>
-                                        <input type="submit" class="searchbox-submit" value="">
-                                        <span class="searchbox-icon"></span>
-                                    </form>
+                          <ul class="jsx-3143951235 menu-wrapper hide" >
 
-                                    </div>
-                                </li> -->
 
-<!--                                 <li class="jsx-3143951235">
-                                  <h2 class="menu-item-link menu-item-link-active hideOnMobile"><a href="{{site_base_url}}" class="jsx-2922828392">{% trans "Home" %}</a></h2></li>
-                                <li class="jsx-3143951235">
-                                  <h2 class="menu-item-link hideOnMobile"><a href="{{site_base_url}}about/" class="jsx-2922828392">{% trans "About" %}</a></h2></li>
-                                <li class="jsx-3143951235">
-                                  <h2 class="menu-item-link hideOnMobile"><a href="{{site_base_url}}team/" class="jsx-2922828392">{% trans "Team" %}</a></h2></li> -->
-
-                                <!-- <li class="jsx-3143951235">
-                                  <h2 class="menu-item-link hideOnMobile"><a href="{{site_base_url}}careers/" class="jsx-2922828392">{% trans "Careers" %}</a></h2></li> -->
-
-<!-- 
-                                <li class="jsx-3143951235">
-                                  <h2 class="menu-item-link hideOnMobile"><a href="/feed/" title="Upload Videos"  class="jsx-2922828392 "><img src="data:image/svg+xml,%3Csvg%20width%3D%2233%22%20height%3D%2224%22%20viewBox%3D%220%200%2033%2024%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20clip-rule%3D%22evenodd%22%20d%3D%22M23.5011%202.86364C21.5703%200.948902%2019.0317%200%2016.5%200C13.9683%200%2011.44%200.949978%209.51042%202.86364C7.47747%204.87979%206.5615%207.56981%206.66875%2010.2159C2.96281%2010.3737%200%2013.3768%200%2017.0909C0%2020.906%203.11982%2024%206.96667%2024H16.0152C16.0146%2023.9848%2016.0143%2023.9696%2016.0143%2023.9543V13.3987L13.6578%2015.4739C13.274%2015.8445%2012.6191%2015.7976%2012.2519%2015.4085C11.8712%2015.0052%2011.9423%2014.2887%2012.3291%2013.9216L16.3387%2010.2614C16.5564%2010.0511%2016.7407%209.99912%2017.0031%2010C17.2675%2010.0052%2017.5261%2010.1246%2017.6674%2010.2614L21.677%2013.9216C22.0834%2014.2956%2022.1031%2015.001%2021.7543%2015.4085C21.4054%2015.816%2020.7322%2015.8445%2020.3483%2015.4739L17.9918%2013.3987V23.9543C17.9918%2023.9696%2017.9915%2023.9848%2017.9909%2024H24.9333C29.3797%2024%2033%2020.4096%2033%2016C33%2012.0296%2030.062%208.75393%2026.2281%208.13636C25.892%206.20875%2024.9993%204.34957%2023.5011%202.86364Z%22%20fill%3D%22%23161823%22%2F%3E%3C%2Fsvg%3E"></a></h2>
-                                </li>  -->
-
-                                <li class="jsx-3143951235 mobileMenuDisp">
+<!--                                 <li class="jsx-3143951235 mobileMenuDisp hide">
                                   <h2 class="menu-item-link "><a href="/feed/" class="jsx-2922828392 watchNow">{% trans "Watch now" %}</a></h2>
-                                </li> 
+                                </li>  -->
 
                                 {% if user.is_authenticated %}
                                   <li class="jsx-3143951235" id="boloSideMenu">
@@ -791,15 +917,12 @@ input:checked + .slider:before {
 
                                   </li>
                                 {% else %}
-<!--                                 <li class="jsx-3143951235" id="loginURLId">
-                                  <h2 class="menu-item-link hideOnMobile"><a href="/login/" class="jsx-2922828392">{% trans "Signin" %}</a>
-                                  </h2>
-                                </li> -->
+
                                 {% endif %}
                           </ul>
                 </div>
                 <!-- Mobile Search -->
-                <div class="_4kny _50tm">
+                <div class="_4kny _50tm hideOnMobileSite">
                     <div class="_585- hideOnDesktop" aria-label="Facebook" role="search" data-testid="facebar_root" id="js_19">
                         <form action="/{{LANGUAGE_CODE}}/search/" method="get">
                             <button value="1" class="_42ft _4jy0 _4w98 _4jy3 _517h _51sy _4w97" aria-label="Search" tabindex="-1" data-testid="facebar_search_button" type="submit"><i class="_585_"></i></button>
@@ -847,9 +970,9 @@ input:checked + .slider:before {
 
                         <div class="footer-content-column">
                             <h2>{% trans "Legal" %}</h2>
-                            <h3><a class="" href="{{site_base_url}}terms-of-service">{% trans "Terms of Service" %}</a></h3>
-                            <h3><a class="" href="{{site_base_url}}privacy-policy">{% trans "Privacy Policy" %}</a></h3>
-                            <h3><a class="" href="{{site_base_url}}bolo-action">{% trans "Bolo Action" %}</a></h3>
+                            <h3><a class="" href="/terms-of-service">{% trans "Terms of Service" %}</a></h3>
+                            <h3><a class="" href="/privacy-policy">{% trans "Privacy Policy" %}</a></h3>
+                            <h3><a class="" href="/bolo-action">{% trans "Bolo Action" %}</a></h3>
 
                         </div>
                             {% if user.is_authenticated %}
@@ -883,47 +1006,22 @@ input:checked + .slider:before {
                             </label>
                             
                           </div> -->
-                        <div class="jsx-1724846817 jsx-1667329752 language-selection">
-                            {% get_current_language as LANGUAGE_CODE %}
-                            {% get_available_languages as LANGUAGES %}
-                            {% get_language_info_list for LANGUAGES as languages %}
-                            {% for language in languages %}
-                            {% if language.code == LANGUAGE_CODE %}
-                              <p class="jsx-1724846817 jsx-1667329752">{{ language.name_local }}</p>
-                            {% endif %}
-                            {% endfor %}
-
-                            <form action="{% url 'set_language' %}" method="post">
-                                {% csrf_token %}
-                                <input name="next" type="hidden" value="{{ redirect_to }}" />
-                                <select class="jsx-1724846817 jsx-1667329752 language-selection-form" name="{% trans 'language' %}"  onchange="this.form.submit()">
-
-                                    {% get_current_language as LANGUAGE_CODE %}
-                                    {% get_available_languages as LANGUAGES %}
-                                    {% get_language_info_list for LANGUAGES as languages %}
-                                    {% for language in languages %}
-
-                                        <option
-                                            value="{{ language.code }}"
-                                            {% if language.code == LANGUAGE_CODE %} selected="selected"{% endif %}
-                                            data-content='<img src="/static/img/flags/{{ language.code }}.png"></span>
-                                            <span style="display:inline-block; width:100px; padding-left: 10px; text-shadow:none">
-                                              {{ language.name_local }}
-                                              <!-- span style="color:#999;">&nbsp;[{{ language.code }}]</span -->
-                                            </span>'>
-                                            {{ language.name_local }}
-                                        </option>
-
-                                    {% endfor %}
-
-                                </select>
-                            </form>
-                        </div> 
 
 
                     </div>
                 </div>
             </div>
+
+
+
+<div class="bts-popup" role="alert">
+    <div class="bts-popup-container">
+      <a href="https://play.google.com/store/apps/details?id=com.boloindya.boloindya&hl=en_IN">
+        <p><img src="/media/download_popup.png" alt="" width="100%" /></p>
+      </a>
+        <a href="#0" class="bts-popup-close img-replace">Close</a>
+    </div>
+</div>
 
 
 <script>
@@ -965,5 +1063,48 @@ input:checked + .slider:before {
 // }
 
 // toggleSwitch.addEventListener('change', switchTheme, false);
+
+
+function onClickRedirect(pageName){
+    window.location.href = pageName;
+    return false;
+}
+
+
+jQuery(document).ready(function($){
+  
+var mobile = (/android|blackberry|mini|windows\sce|palm/i.test(navigator.userAgent.toLowerCase()));
+if (mobile) {
+    //alert("MOBILE DEVICE DETECTED");              
+
+
+
+  window.onload = function (){
+
+    $(".bts-popup").delay(1000).addClass('is-visible');
+  }
+  
+  //open popup
+  $('.bts-popup-trigger').on('click', function(event){
+    event.preventDefault();
+    $('.bts-popup').addClass('is-visible');
+  });
+  
+  //close popup
+  $('.bts-popup').on('click', function(event){
+    if( $(event.target).is('.bts-popup-close') || $(event.target).is('.bts-popup') ) {
+      event.preventDefault();
+      $(this).removeClass('is-visible');
+    }
+  });
+  //close popup when clicking the esc keyboard button
+  $(document).keyup(function(event){
+      if(event.which=='27'){
+        $('.bts-popup').removeClass('is-visible');
+      }
+    });
+}
+
+});
 
 </script>

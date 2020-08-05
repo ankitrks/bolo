@@ -4,6 +4,7 @@ function loaderBoloShowDynamic(classLoader){
 
 }
 
+// var userLoginStatus = '{{request.user.id}}';
 function loaderBoloHideDynamic(classLoader){
     var boloLoader='';
     $('.'+classLoader).html(boloLoader);

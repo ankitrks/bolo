@@ -1,0 +1,201 @@
+
+{% load i18n %}
+
+<style type="text/css">
+  .socialImageSize{
+    height: 45px;
+}
+.paddingSocialShare{
+    padding: 5px;
+}
+._social_h::before {
+    content: '';
+    display: inline-block;
+    height: 18px;
+    margin: 0 6px -3px 0;
+    min-width: 18px;
+    position: relative;
+    top: -2px;
+    width: 18px;
+    background-image: url(/media/social_share_image.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: 0 -156px;
+
+}
+.socialShareP{
+    margin-top: 10px;
+}
+@media(max-width: 991px){
+    .page-with-header {
+        padding-top: 0px;
+    }
+    .sideImageHeight{
+        height: 200px;
+    }
+
+    .leftImage {
+        display: inline-block;
+        float: left;
+        position: absolute;
+        left: 9px;
+        top: 280px;
+    }
+    .rightImage{
+        display: inline-block;
+        float: right;
+        position: absolute;
+        right: 4px;
+        top: 280px;
+    }
+    .download_height{
+        height: 50px;
+    }
+
+    .socialImageSize {
+        height: 25px;
+    }
+
+}
+.footer-container .footer-content-wrapper{
+    padding: 38px 5px 0 50px;
+}
+.footer-container .footer-content-wrapper .footer-content-column .first-footer-column{
+    width: 44%;
+}
+.footer-container .footer-content-wrapper .footer-content-column{
+    width: 20%;
+    -webkit-flex: auto;
+    -ms-flex: auto;
+     flex: auto; 
+     max-width: 100%;
+    padding-right: 8px;
+    color: #ffffff;
+}
+.marginAndPadding{
+    margin: 20px;
+    padding: 30px;
+}
+.socialImageSize {
+    height: 22px;
+}
+.footer-container .footer-bottom-wrapper {
+    position: absolute;
+    bottom: 0;
+    padding: 15px 50px;
+}
+.footer-links{font-weight: 500;
+font-size: 18px;
+line-height: 24px;
+}
+@media (max-width: 991px){
+.footer-container .footer-content-wrapper .footer-content-column {
+    -webkit-flex: auto;
+    -ms-flex: auto;
+    margin-right: 41px;
+    flex: auto;
+    padding: 0;
+    margin-top: 32px;
+    width: 100% !important;
+}
+}
+.header-container{
+    border-bottom: 0px solid rgba(34,90,89,0.2);s
+}
+</style>
+<div class="jsx-157630181 footer-container">
+
+
+                <div class="jsx-157630181 footer-content-wrapper">
+
+                      <div class="footer-content-column first-footer-column" style="width: 40%;">
+                        <h2><img src="/media/boloindya_new_logo_footer.png" class="jsx-832362280 logo-text"></h2>
+                        <h3><p>Bolo Indya is short video platform that allows users to create,watch and share their experiences, opinions and knowledge videos in native languages of india across interest areas and earn by transforming their social capital into services, discoverable and delivered on app</p></h3>
+
+                      </div>
+
+                    <div class="footer-content-column marginAndPadding">
+                        
+                        <h3><a class="footer-links" href="/about/">{% trans "About Us" %}</a></h3>
+                        <h3><a class="footer-links" href="/team/">{% trans "Team" %}</a></h3>
+                        <h3><a class="footer-links" href="/careers/">{% trans "Careers" %}</a></h3>
+                        
+                    </div>
+
+                    <div class="footer-content-column marginAndPadding">
+                        <!-- <h2>{% trans "Legal" %}</h2> -->
+                        <h3><a class="footer-links" href="/terms-of-service">{% trans "Terms of Service" %}</a></h3>
+                        <h3><a class="footer-links" href="/privacy-policy">{% trans "Privacy Policy" %}</a></h3>
+                        <h3><a class="footer-links" href="/help_support">{% trans "Help" %}</a></h3>
+
+
+                    </div>
+
+                    <div class="footer-content-column marginAndPadding">
+                        <h3 style="margin-top:-5px;font-size: 17px; ">Get the App Today!</h3>
+                        <div style="margin-top: 26px;margin-left: -51px;">
+                            <a target="_blank" href="https://play.google.com/store/apps/details?id=com.boloindya.boloindya&hl=en_IN"><img src="/media/BUTTON2.svg"></a>
+                        </div>
+                    </div>
+
+                </div>
+
+
+<style type="text/css">
+    .footer-container .footer-content-wrapper{
+        border-top: 0px solid #979797;
+    }
+</style>
+<div class="jsx-157630181 footer-content-wrapper" style="padding: 0px 5px 0 50px;">
+        <p class="socialShareP" style="text-align: center;">
+        <a target="_blank" href="https://www.facebook.com/BoloIndya/">
+            <span class="paddingSocialShare"><img class="socialImageSize" src="/media/footer_facebook.svg"></span>
+        </a>
+        <a target="_blank" href="https://twitter.com/Bolo_Indya?s=09">
+            <span class="paddingSocialShare"><img class="socialImageSize" src="/media/footer_twitter.svg"></span>
+        </a>
+        <a target="_blank" href="https://www.instagram.com/bolo.indya/">
+            <span class="paddingSocialShare"><img class="socialImageSize" src="/media/footer_instagram.svg"></span>
+        </a>
+        <!-- <a target="_blank" href="https://www.linkedin.com/company/bolo-indya">
+            <span class="paddingSocialShare"><img class="socialImageSize" src="/media/linkedin.png"></span>
+        </a>                    -->
+            <a target="_blank" href="https://www.youtube.com/channel/UCcS07H-zu67HcM7fmDBoF-g">
+            <span class="paddingSocialShare"><img class="socialImageSize" src="/media/footer_youtube.svg"></span>
+            </a>
+        </p>
+                      
+    </div>
+    <div class="jsx-157630181 copyright" style="text-align: center;">
+        <p>© 2020 BoloIndya. All rights reserved .</p>
+    </div>
+  
+            </div>
+
+
+
+        </div>
+    </div>
+
+<input type="hidden" name="onLoadPlayCheck" id="onLoadPlayCheck" value="0">
+
+
+<!-- End of Registration Modal -->
+
+<script src="/media/js/common.js"></script>
+
+<script type="text/javascript">
+    $(function(){
+    // this will get the full URL at the address bar
+    var url = window.location.href; 
+    // passes on every "a" tag 
+    $(".menu-item-link").removeClass('menu-item-link-active');
+    $("#sub-header a").each(function() {
+            // checks if its the same on the address bar
+        if(url == (this.href)) { 
+            $(this).closest("h2").addClass("menu-item-link-active");
+        }
+    });
+});
+</script>
+

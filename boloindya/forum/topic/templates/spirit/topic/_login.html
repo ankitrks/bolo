@@ -1,4 +1,4 @@
-{% extends "spirit/_new_base.html" %}
+{% extends "spirit/_new_layout_base.html" %}
 {% load i18n %}
 {% block title %}BoloIndya{% endblock %}
 {% block content %}
@@ -132,7 +132,7 @@ input[type=text], input[type=email], input[type=number], input[type=password]{
                                           <button type="button" onClick="sendOTP();" class="submit-button hide activeNumberMode pointer"> Continue <i class="fa fa-angle-right"></i> </button>
                                           <div class="attest-message hide activeNumberMode"><span class="attest-message-text">By Proceeding you agree to the <a href="/in/terms-of-use" target="_blank" rel="noopener noreferrer"> Terms of Use</a> and <a href="/in/privacy-policy" target="_blank" rel="noopener noreferrer"> Privacy Policy</a></span></div>                        
                                       </div>
-                                      <hr class="omb_loginOr">
+<!--                                       <hr class="omb_loginOr">
                                       <div class="or-div dispMainLogin omb_spanOr" >or</div>
                                       <span  class="email-or-fb-signin dispMainLogin" >
                                           <div class="google-btn deActiveEmailMode">
@@ -140,11 +140,10 @@ input[type=text], input[type=email], input[type=number], input[type=password]{
                                                 <a id="google_login" href="/accounts/google/login?next={{next_page_url}}" class="btn btn-success"><i class="google-icon"></i><span class="googleTextAlign">Continue with Google</span></a>
                                               </div>
                                           </div>
-
                                           <div class="fb-btn deActiveEmailMode">
                                               <div class="fb-wrap "><a href="/accounts/facebook/login?next={{ next_page_url }}"><i class="fb-icon"></i><span>login with facebook</span></a></div>
                                           </div>
-                                      </span>
+                                      </span> -->
                                       
 
                                   </div>

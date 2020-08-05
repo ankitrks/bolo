@@ -81,7 +81,7 @@ class AutoConnectSocialAccount(DefaultSocialAccountAdapter):
         try: 
             userDetails = User.objects.get(email=emailId)
             userToken=get_tokens_for_user(userDetails)
-            print(userToken)
+            #print(userToken)
 
             userprofile = UserProfile.objects.get(user = userDetails)
             add_bolo_score(userDetails.id, 'initial_signup', userprofile)
@@ -543,10 +543,15 @@ def bolo_user_details(request,username=''):
         except Exception as e1:
             popular_bolo = []
 
+        try:
+            hash_tags = TongueTwister.objects.order_by('-hash_counter')[:20]
+        except Exception as e1:
+            hash_tags = []
 
         context = {
             'user_profile': user_profile,
             'user':user,
+            'hash_tags':hash_tags,
             'popular_bolo':popular_bolo,
             'topics': topics,
             'topicsCount': topicsByLang.count()
@@ -943,6 +948,8 @@ def new_home(request):
     # return render(request, 'spirit/topic/new_landing.html')
     # return render(request, 'spirit/topic/main_landing.html')
 
+
+
 def trending_polyplayer(request):
     categories = []
     hash_tags = []
@@ -1163,6 +1170,83 @@ def old_home(request):
     # return render(request, 'spirit/topic/new_landing.html')
     # return render(request, 'spirit/topic/main_landing.html')
 
+#====================New Home =============================
+def new_home_updated(request):
+    categories = []
+    hash_tags = []
+    topics = []
+    all_slider_topic = []
+    try:
+        categories = Category.objects.filter(parent__isnull=False)[:10]
+    except Exception as e1:
+        categories = []   
+    language_id = request.GET.get('language_id', 1)
+
+    languages_with_id=settings.LANGUAGES_WITH_ID
+    languageCode =request.LANGUAGE_CODE
+    language_id=languages_with_id[languageCode]
+
+    try:
+        all_seen_vb = []
+        if request.user.is_authenticated:
+            all_seen_vb = VBseen.objects.filter(user = request.user, topic__language_id=language_id, topic__is_popular=True).distinct('topic_id').values_list('topic_id',flat=True)[:15]
+        excluded_list =[]
+        superstar_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')[:15]
+        for each in superstar_post:
+            excluded_list.append(each.id)
+        popular_user_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=True,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')[:10]
+        for each in popular_user_post:
+            excluded_list.append(each.id)
+        popular_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,user__st__is_superstar = False,user__st__is_popular=False,is_popular=True).exclude(pk__in=all_seen_vb).distinct('user_id').order_by('user_id','-date')[:2]
+        for each in popular_post:
+            excluded_list.append(each.id)
+        other_post = Topic.objects.filter(is_removed = False,is_vb = True,language_id = language_id,is_popular=True).exclude(pk__in=list(all_seen_vb)+list(excluded_list)).order_by('-date')[:2]
+        orderd_all_seen_post=[]
+        all_seen_post = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=all_seen_vb)[:5]
+        if all_seen_post:
+            for each_id in all_seen_vb:
+                for each_vb in all_seen_post:
+                    if each_vb.id == each_id:
+                        orderd_all_seen_post.append(each_vb)
+
+        topics=list(superstar_post)+list(popular_user_post)+list(popular_post)+list(other_post)+list(orderd_all_seen_post)
+    except Exception as e1:
+        topics = []
+
+    topicsIds =[239943,995295,607145,16092,25156,26248,23820,3449,4196]
+    #,17534,12569,12498,9681,9419,9384,8034,8024,26835,24352,14942
+    try:
+        all_slider_topic = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=topicsIds)[:16]
+    except Exception as e1:
+        all_slider_topic = []
+
+    try:
+        hash_tags = TongueTwister.objects.order_by('-hash_counter')[:16]
+    except Exception as e1:
+        hash_tags = []
+
+    context = {
+        'categories':categories,
+        'hash_tags':hash_tags,
+        'topics':topics,
+        'sliderVideos':all_slider_topic,
+        'is_single_topic': "Yes",
+    }  
+    video_slug = request.GET.get('video',None)
+    if(video_slug != None):
+        return redirect('/video/'+video_slug)
+    else:
+        return render(request, 'spirit/topic/_new_updated_home.html',context)
+
+
+    #return render(request, 'spirit/topic/temporary_landing.html')
+    # return render(request, 'spirit/topic/new_landing.html')
+    # return render(request, 'spirit/topic/main_landing.html')
+
+#====================== End ==============================
+
+
+
 def boloindya_feed(request):
     categories = []
     hash_tags = []
@@ -1220,14 +1304,20 @@ def boloindya_feed(request):
         hash_tags = TongueTwister.objects.order_by('-hash_counter')[:20]
     except Exception as e1:
         hash_tags = []
-    print popular_bolo.__dict__
+    #print popular_bolo.__dict__
 
+    topicsIds =[16092,25156,26248,23820,3449,4196]
+    try:
+        all_slider_topic = Topic.objects.filter(is_removed=False,is_vb=True,pk__in=topicsIds)[:16]
+    except Exception as e1:
+        all_slider_topic = []
  
     context = {
         'categories':categories,
         'hash_tags':hash_tags,
         'topics':topics,
         'popular_bolo':popular_bolo,
+        'all_slider_topic':all_slider_topic,
         'is_single_topic': "Yes",
     }  
     video_slug = request.GET.get('video',None)
@@ -1235,7 +1325,7 @@ def boloindya_feed(request):
         return redirect('/video/'+video_slug)
     else:
         #return render(request, 'spirit/topic/boloindya_feed.html',context)
-        return render(request, 'spirit/topic/trending_feed.html',context)
+        return render(request, 'spirit/topic/_new_trending_feed.html',context)
 
 
 
