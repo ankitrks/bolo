@@ -511,6 +511,135 @@ video.jsx-3382097194 {
 .share-layout{
     width: 95%;
 }
+
+.recommend-card.jsx-3959364739 ul.jsx-3959364739 {
+    height: 250px;
+}
+
+/*New layout media query*/
+
+@media (max-width: 991px) {
+    .mainHeader .navbar nav .get-started-btn {
+        background: #b62827;
+        color: #fff;
+        border-radius: 100px;
+        padding: 5px 16px 5px 9px;
+        margin-right: 10px;
+    }
+    .header-container .header-content {
+        padding: 0 0px;
+    }
+
+    .mainHeader .navbar {
+        padding: 0px 0px 0px 0px;
+    }
+
+    .mainHeader .navbar nav {
+        width: 70%;
+        display: flex;
+    }
+    .hideOnMobileSite {
+        display: none !important;
+    }
+}
+
+/*End*/
+
+
+</style>
+<!-- End -->
+
+
+<style type="text/css">
+    .min-span-height{
+        max-height: 588px;
+        min-height: 588px;
+    }
+    .videoCentered{
+        height: 370px !important;
+    }
+    .videoRowCardBody{
+        min-height: 50px;
+    }
+.videoRowCardBody {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+._explore_feed_header{
+    height: 33px;
+}
+
+
+@media(max-width: 991px){
+    ._2WfMm nav {
+        padding: 5px 0 8px 8px;
+        display: inline-block;
+    }
+    .column{
+        float: left;
+        width: 50%;
+        padding: 2px;
+        height: auto;
+    }
+
+.videoCentered {
+    width: 100%;
+    object-fit: cover;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    height: 100%;
+}
+/*._1RNJh {
+    position: absolute;
+
+}*/
+._explore_feed_card {
+    width: 100%;
+    display: inline-block;
+
+}
+
+._2WfMm nav ul li a {
+    font-family: Sailec;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 0px;
+    margin-left: 24px;
+    display: inline;
+    align-items: center;
+    text-align: center;
+    color: #B62827;
+}
+
+.logo-container .logo-text {
+    width: 123px;
+    margin-left: 3px;
+    position: relative;
+    top: 14px;
+}
+.hamburger-menu .hamburger-menu-wrapper {
+    border: 3px solid var(--heading-color);
+    background: var(--heading-color);
+    margin-left: -4px;
+    margin-top: 13px;
+}
+
+._1RNJh {
+    position: fixed;
+
+}
+.column {
+    float: left;
+    width: 100%;
+    padding: 14px 5px 4px 26px;
+    height: auto;
+}
+
+
+}
 </style>
 
 
@@ -555,72 +684,49 @@ video.jsx-3382097194 {
 
         </div>
         <aside class="share-layout-aside ">
-            <div class="jsx-1422783265 recommend-aside">
-<!--                 <div class="jsx-29267105 share-group">
-                    <a href="javascript:void(0)" onclick="social_share_page('facebook_share','{{ request.get_full_path }}')"  class="jsx-29267105">
-                        <span><img src="/media/facebook.svg" class="jsx-29267105"></span>
-                    </a>
-                    <a href="javascript:void(0)" onclick="social_share_page('twitter_share','{{ request.get_full_path }}')"  class="jsx-29267105">
-                        <span><img src="/media/twitter.svg" class="jsx-29267105"></span>
-                    </a>
-                    <a href="javascript:void(0)" onclick="social_share_page('whatsapp_share','{{ request.get_full_path }}')"  class="jsx-29267105"><span><img src="/media/whatsapp.png" class="jsx-29267105"></span>
-                    </a>
 
-                </div> -->
-                <div class="jsx-3959364739 recommend-card">
-                    <header class="jsx-3959364739">
-                        <h3 class="jsx-3959364739">{% trans "Suggested Users" %}</h3><!-- <a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a> --></header>
-                    <div class="_scroll_load_more_loading_creator center">
-                        <div class="boloindya-loading">Loading...</div>
-                    </div>
-
-                    <ul class="jsx-3959364739 sidebarLi" id="creatorId">
-
-
-
-                    </ul>
-                </div>
-
-                            <div class="jsx-3959364739 recommend-card" style="margin-top: 10px;">
-                                <header class="jsx-3959364739">
-                                    <h3 style="font-size: 24px;" class="jsx-3959364739">{% trans "Trending Hashtags" %}</h3><a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a></header>
-                                <ul class="jsx-3959364739 sidebarLi" id="creatorId2">
-
-                                    {%  for each_hashtag_item in hash_tags %}
-                                
-                                        <li class="jsx-3959364739">
-                                            <a tag="a" class="jsx-1420774184 recommend-item" href="/hashtag/{{each_hashtag_item.hash_tag}}/">
-                                                <div class="jsx-1420774184 info-content">
-                                                    <h4 class="jsx-1420774184">#{{each_hashtag_item.hash_tag}}</h4>
-                                                    <p class="jsx-1420774184">{{each_hashtag_item.total_views | shorcountertopic}} {% trans "views" %}</p>
-                                                </div>
-                                                <div class="jsx-1420774184 arrow-right"></div>
-                                            </a>
-                                        </li>
-                                    {% endfor %}
-
-                                </ul>
+            <div class="_base_layout_aside_sticky" style="">
+                <div class="_base_layout_aside_wrapper">
+                    <div class="jsx-1422783265 recommend-aside">
+                        <div class="jsx-3959364739 recommend-card">
+                            <header class="jsx-3959364739">
+                                <h3 class="jsx-3959364739">{% trans "Suggested Users" %}</h3><!-- <a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a> --></header>
+                            <div class="_scroll_load_more_loading_creator center">
+                                <div class="boloindya-loading">Loading...</div>
                             </div>
 
-<!--                 <div class="jsx-3959364739 recommend-card">
-                    <header class="jsx-3959364739">
-                        <h3 class="jsx-3959364739">{% trans "Discover" %}</h3><a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a></header>
-                    <div class="_scroll_load_more_loading_discover center">
-                        <div class="boloindya-loading">Loading...</div>
-                    </div>
-                    <ul class="jsx-3959364739 sidebarLi" id="discoverId">
-                    </ul>
-                </div> -->
-            </div>
-<!--             <div class="jsx-3336228099 download-container card">
+                            <ul class="jsx-3959364739 sidebarLi" id="creatorId">
 
-                <div class="jsx-3336228099 download-content download-link">
-                    <h3 class="_download_title">{% trans "Get the App" %}</h3>
-                    <div class="jsx-3336228099 download-wrapper">
+
+
+                            </ul>
+                        </div>
+
+                        <div class="jsx-3959364739 recommend-card" style="margin-top: 10px;">
+                            <header class="jsx-3959364739">
+                                <h3 style="font-size: 24px;" class="jsx-3959364739">{% trans "Trending Hashtags" %}</h3><a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a></header>
+                            <ul class="jsx-3959364739 sidebarLi" id="creatorId2">
+
+                                {%  for each_hashtag_item in hash_tags %}
+                            
+                                    <li class="jsx-3959364739">
+                                        <a tag="a" class="jsx-1420774184 recommend-item" href="/hashtag/{{each_hashtag_item.hash_tag}}/">
+                                            <div class="jsx-1420774184 info-content">
+                                                <h4 class="jsx-1420774184">#{{each_hashtag_item.hash_tag}}</h4>
+                                                <p class="jsx-1420774184">{{each_hashtag_item.total_views | shorcountertopic}} {% trans "views" %}</p>
+                                            </div>
+                                            <div class="jsx-1420774184 arrow-right"></div>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+
+                            </ul>
+                        </div>
 
                     </div>
                 </div>
-            </div> -->
+            </div>
+
         </aside>
     </div>
 </div>

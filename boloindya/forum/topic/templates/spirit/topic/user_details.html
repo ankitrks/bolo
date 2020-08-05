@@ -45,6 +45,7 @@
         line-height: 18px;
         color: rgba(235, 235, 238, 0.75);
         margin-bottom: 12px;
+        text-align: center;
     }
     .count-infos .number {
         font-family: proxima-semibold, PingFangSC, sans-serif;
@@ -451,6 +452,7 @@
     padding: 0 0px;
     color: rgba(22,24,35,0.5);
     font-size: 14px;
+    margin-left: 3px;
 }
 .backgroundData{
 
@@ -482,7 +484,7 @@
 }
 
 .share-header .share-info{
-    width: 78%;
+    width: 85%;
 }
 .recommend-card.jsx-3959364739 header.jsx-3959364739 h3.jsx-3959364739{
     font-size: 22px;
@@ -491,13 +493,10 @@
 
 <style type="text/css">
     
-
-
-
 /* Create two equal columns that floats next to each other */
 .column {
     float: left;
-    width: 32%;
+    width: 25%;
     padding: 3px;
     height: auto;
 }
@@ -624,6 +623,13 @@
     .hideOnMobileSite {
         display: none !important;
     }
+.column {
+    float: left;
+    width: 100%;
+    padding: 1px 5px 4px 5px;
+    height: auto;
+}
+
 }
 
 /*End*/
@@ -671,7 +677,56 @@
     color: #B62827;
 }
 .share-layout{
-    width: 95%;
+    width: 100%;
+}
+
+.number.vLinke::before{
+    content: '';
+    border: 1px solid #B62827;
+    transform: rotate(90deg);
+    margin-right: 13px;
+}
+
+.btnClassEdit{
+    font-family: Sailec;
+font-style: normal;
+font-weight: 500;
+font-size: 14px;
+line-height: 21px;
+display: flex;
+float: right;
+background:#fff; 
+align-items: center;
+border: 0px solid #fff;
+color: #B62827;
+}
+.share-header .share-info {
+    padding-top: 4px;
+    margin-left: 154px;
+    flex: 1 1 auto;
+}
+.share-layout .share-layout-main{
+    padding: 10px;
+}
+.classProfImgPos{
+    position:absolute !important;top: 218px;left: 20px;
+}
+
+@media(max-width: 991px){
+   .classProfImgPos{
+        position:absolute !important;top: 218px;left: 180px;
+    } 
+.paddingTop {
+    padding-top: 89px;
+    padding-left: 37px;
+}
+.vLinke1::before{
+    content: '';
+    border: 1px solid #B62827;
+    transform: rotate(90deg);
+    margin-right: 13px;
+}
+
 }
 </style>
 <div class="jsx-3819228898" style="background: #f8f8f8;background-image: url(/media/background_eclipse.png);">
@@ -682,14 +737,14 @@
 </header>
     <input type="hidden" name="id" id="currentUserId" value="{{user.id}}">
     <!-- <input type="hidden" name="id" id="currentUserId" value="{{user_profile.id}}"> -->
-    <div class="jsx-606928072 user-page share-layout">
+    <div class="jsx-606928072 user-page share-layout" style="padding: 0px;">
         <div class="share-layout-content">
-            <header class="share-layout-header bottom-line share-header profile">
-                <div class="backgroundData hideOnDesktop" style="background-image: linear-gradient(to bottom, rgba(245, 246, 252, 0.52), rgba(184, 43, 41)), url({{ user_profile.cover_pic}});height: 150px;width: 100%; ">
+            <header class="share-layout-header bottom-line share-header profile" style="margin: 0; padding: 0">
+                <div class="backgroundData " style="background-image: linear-gradient(to bottom, rgba(245, 246, 252, 0.52), rgba(184, 43, 41)), url({{ user_profile.cover_pic}});height: 270px;width: 100%; ">
 
 
                 </div>
-                <div class="jsx-2177493926 jsx-578937417 avatar round userProfilAvator" style="background-image: url({% if user_profile.profile_pic|length > 1 %}
+                <div class="jsx-2177493926 jsx-578937417 avatar round userProfilAvator classProfImgPos" style="background-image: url({% if user_profile.profile_pic|length > 1 %}
                                 {{user_profile.profile_pic}}
                             {% else %}
                                 /media/user.svg
@@ -702,23 +757,26 @@
 {% else %}
     check-icon
 {% endif %} " ></span></span></h1>
-                    <h3 class="share-sub-title ">{{ user_profile.bio}}</h3>
+                    <h3 class="share-sub-title ">{{ user_profile.bio}} <button class="btnClassEdit"><img src="/media/edit_profile.png" style="width: 12px;"> Edit Profile</button></h3>
 
                     <ul class="jsx-1061034316 hideOnDesktop">
                         <li class="jsx-1061034316"><strong title="Videos" class="jsx-1061034316">{{topicsCount | shorcountertopic}}</strong><span class="jsx-1061034316">Videos</span></li>                        
-                        <li class="jsx-1061034316"><strong title="Following" class="jsx-1061034316">{{ user_profile.follow_count | shorcountertopic}}</strong><span class="jsx-1061034316">Following</span></li>
-                        <li class="jsx-1061034316"><strong title="Followers" class="jsx-1061034316">{{ user_profile.follower_count | shorcountertopic}}</strong><span class="jsx-1061034316">Followers</span></li>
-                        <li class="jsx-1061034316"><strong title="Likes" class="jsx-1061034316">{{ user_profile.like_count | shorcountertopic}}</strong><span class="jsx-1061034316">Likes</span></li>
+                        <li class="jsx-1061034316"><strong title="Following" class="jsx-1061034316 vLinke">{{ user_profile.follow_count | shorcountertopic}}</strong><span class="jsx-1061034316">Following</span></li>
+                        <li class="jsx-1061034316"><strong title="Followers" class="jsx-1061034316 vLinke">{{ user_profile.follower_count | shorcountertopic}}</strong><span class="jsx-1061034316">Followers</span></li>
+                        <li class="jsx-1061034316 "><strong title="Likes" class="jsx-1061034316 vLinke">{{ user_profile.like_count | shorcountertopic}}</strong><span class="jsx-1061034316">Likes</span></li>
 
                     </ul>
 
-                    <p class="count-infos hideOnMobile"><span class="number">{{ user_profile.follow_count | shorcountertopic}}</span><span class="unit"> {% trans "Following" %}</span><span class="number"> {{ user_profile.follower_count | shorcountertopic}}</span><span class="unit"> {% trans "Followers" %} </span>
-                        <span class="number"> {{ user_profile.like_count | shorcountertopic}}</span>
-                        <span class="unit"> {% trans "Likes" %}</span><span class="number"> </span>
+                    <p class="count-infos hideOnMobile"><span class="number">{{ user_profile.follow_count | shorcountertopic}}</span> <span class="unit"> {% trans "Following" %}</span><span class="number vLinke"> {{ user_profile.follower_count | shorcountertopic}}</span><span class="unit"> {% trans "Followers" %} </span>
+                        <span class="number vLinke"> {{ user_profile.like_count | shorcountertopic}}</span>
+                        <span class="unit"> {% trans "Likes" %}</span><span class="number vLinke"> </span>
                         <span class="number" id="userVideoCountId">{{topicsCount | shorcountertopic}}</span><span class="unit"> {% trans "Videos" %}</span>
                         <span class="unit " >
-                            <button style="margin-top: -5px;" onclick="follow_user_from_user('{{user_profile.id}}');" class="_4jy1 _4jy4 _517h _51sy _42ft " type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followUserStatusChange-{{user_profile.id}} followCheck sx_5da455"></i><span class="btnTextChangeUser-{{user_profile.id}}">{% trans "Follow" %}</span>
-                            </button>
+
+                            
+                            <button class="_4jy1 _4jy4 _517h _51sy _42ft ">Upload video</button>
+   <!--                          <button style="margin-top: -5px;" onclick="follow_user_from_user('{{user_profile.id}}');" class="_4jy1 _4jy4 _517h _51sy _42ft " type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followUserStatusChange-{{user_profile.id}} followCheck sx_5da455"></i><span class="btnTextChangeUser-{{user_profile.id}}">{% trans "Follow" %}</span>
+                            </button> -->
                         </span>
 
                     </p>
@@ -737,54 +795,7 @@
                 <input type="hidden" name="nextPageUrl" id="nextPageUrlId" value="">
             </main>
         </div>
-        <aside class="share-layout-aside ">
-            <div class="jsx-1422783265 recommend-aside">
 
-
-            <div class="jsx-3959364739 recommend-card" style="margin-top: 10px;">
-                    <header class="jsx-3959364739">
-                        <h3 style="font-size: 24px;" class="jsx-3959364739">{% trans "Trending Hashtags" %}</h3><a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a></header>
-                    <ul class="jsx-3959364739 sidebarLi" id="creatorId2">
-
-
-
-
-                        {%  for each_hashtag_item in hash_tags %}
-                    
-                            <li class="jsx-3959364739">
-                                <a tag="a" class="jsx-1420774184 recommend-item" href="/hashtag/{{each_hashtag_item.hash_tag}}/">
-                                    <div class="jsx-1420774184 info-content">
-                                        <h4 class="jsx-1420774184">#{{each_hashtag_item.hash_tag}}</h4>
-                                        <p class="jsx-1420774184">{{each_hashtag_item.total_views | shorcountertopic}} {% trans "views" %}</p>
-                                    </div>
-                                    <div class="jsx-1420774184 arrow-right"></div>
-                                </a>
-                            </li>
-                        {% endfor %}
-
-                    </ul>
-                </div>
-
-                <div class="jsx-3959364739 recommend-card">
-                    <header class="jsx-3959364739">
-                        <h3 class="jsx-3959364739">{% trans "Discover" %}</h3><a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a></header>
-                    <div class="_scroll_load_more_loading_discover center">
-                        <div class="boloindya-loading">Loading...</div>
-                    </div>
-                    <ul class="jsx-3959364739 sidebarLi" id="discoverId">
-                    </ul>
-                </div>
-            </div>
-<!--             <div class="jsx-3336228099 download-container card">
-
-                <div class="jsx-3336228099 download-content download-link">
-                    <h3 class="_download_title">{% trans "Get the App" %}</h3>
-                    <div class="jsx-3336228099 download-wrapper">
-
-                    </div>
-                </div>
-            </div> -->
-        </aside>
     </div>
 </div>
 

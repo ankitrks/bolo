@@ -316,7 +316,7 @@ function videoItemsTemplate(itemVideoByte,itemCount,indexCount) {
         content_title = videoTitle.substr(0, 10) + " ..."
 
     var popularHashTagTemplateItems ='<div class="column " style="cursor: pointer;">\
-                            <div class="card" onClick="openVideoInPopup(\''+itemVideoByte.question_video+'\',\''+itemVideoByte.question_image+'\','+itemCount+','+indexCount+');" style="background-color: #fff; padding: 20px;">\
+                            <div class="card" onClick="openVideoInPopup(\''+itemVideoByte.video_cdn+'\',\''+itemVideoByte.question_image+'\','+itemCount+','+indexCount+');" style="background-color: #fff; padding: 20px;">\
                             <span id="video_play_item_'+itemVideoByte.id+'" class="min-span-height">\
                                 <img  id="player-'+itemVideoByte.id+'" src="'+itemVideoByte.question_image+'" class="videoCentered videoSliderPlay">\
                             </span>\
@@ -380,7 +380,7 @@ function video_play_using_video_js(url,backup_url,image) {
 
       if(Hls.isSupported()) {
         var hls = new Hls();
-        hls.loadSource(url);
+        hls.loadSource(backup_url);
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED,function() {
           video.play();
@@ -393,7 +393,7 @@ function video_play_using_video_js(url,backup_url,image) {
      // Note: it would be more normal to wait on the 'canplay' event below however on Safari (where you are most likely to find built-in HLS support) the video.src URL must be on the user-driven
      // white-list before a 'canplay' event will be emitted; the last video event that can be reliably listened-for when the URL is not on the white-list is 'loadedmetadata'.
       else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = backup_url;
+        video.src = url;
         video.addEventListener('loadedmetadata',function() {
           video.play();
           loaderHide();

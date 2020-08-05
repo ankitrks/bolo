@@ -1038,11 +1038,11 @@ $(document).ready(function() {
   loaderHide();
     
     if (window.matchMedia("(max-width: 991px)").matches) {
-        VideoPlayByURLMobile(videom3u8,videoFileImage);
+        VideoPlayByURLMobile(videoFileCDN,videoFileImage);
         //VideoPlayByURLMobile(videoFileCDN,videoFileImage);
         /* The viewport is less than, or equal to, 700 pixels wide */
     } else {
-        video_play_using_video_js(videom3u8,videoFileBackupURL,videoFileImage);
+        video_play_using_video_js(videoFileCDN,videom3u8,videoFileImage);
       /* The viewport is greater than 700 pixels wide */
     }
     

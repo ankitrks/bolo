@@ -467,6 +467,13 @@ video.jsx-3382097194 {
     .hideOnMobileSite {
         display: none !important;
     }
+.column {
+    float: left;
+    width: 100%;
+    padding: 14px 5px 4px 26px;
+    height: auto;
+}
+    
 }
 
 /*End*/
@@ -558,81 +565,63 @@ video.jsx-3382097194 {
 
         </div>
         <aside class="share-layout-aside ">
-            <div class="jsx-1422783265 recommend-aside">
-<!--                 <div class="jsx-29267105 share-group">
-                    <a href="javascript:void(0)" onclick="social_share_page('facebook_share','{{ request.get_full_path }}')"  class="jsx-29267105">
-                        <span><img src="/media/facebook.svg" class="jsx-29267105"></span>
-                    </a>
-                    <a href="javascript:void(0)" onclick="social_share_page('twitter_share','{{ request.get_full_path }}')"  class="jsx-29267105">
-                        <span><img src="/media/twitter.svg" class="jsx-29267105"></span>
-                    </a>
-                    <a href="javascript:void(0)" onclick="social_share_page('whatsapp_share','{{ request.get_full_path }}')"  class="jsx-29267105"><span><img src="/media/whatsapp.png" class="jsx-29267105"></span>
-                    </a>
 
-                </div> -->
-                <div class="jsx-3959364739 recommend-card">
+            <div class="_base_layout_aside_sticky" style="">
+                <div class="_base_layout_aside_wrapper">
+                    <div class="jsx-1422783265 recommend-aside">
+                        <div class="jsx-3959364739 recommend-card">
 
 
-                                <header class="jsx-3959364739">
-                                    <h3 class="jsx-3959364739">{% trans "Suggested Users" %}</h3>
-                                </header>
+                                        <header class="jsx-3959364739">
+                                            <h3 class="jsx-3959364739">{% trans "Suggested Users" %}</h3>
+                                        </header>
 
 
-                                <ul class="jsx-3959364739 sidebarLi" id="creatorId1">
+                                        <ul class="jsx-3959364739 sidebarLi" id="creatorId1">
 
 
 
 
-                                    {% for each_popular_item in popular_bolo %}
-                                   
+                                            {% for each_popular_item in popular_bolo %}
+                                           
 
-                                        <li class="jsx-3959364739">
-                                            <a tag="a" class="jsx-1420774184 recommend-item" href="/{{each_popular_item.user.username}}/">
-                                                <div class="jsx-2177493926 jsx-578937417 avatar round head normal" style="background-image: url({% if each_popular_item.profile_pic|length > 1 %}
-                                    {{each_popular_item.profile_pic}}
-                                {% else %}
-                                    /media/user.svg
-                                {% endif %});"></div>
-                                                <div class="jsx-1420774184 info-content">
-                                                    <h4 class="jsx-1420774184">                                               {% if each_popular_item.name %}
-                                                       {{each_popular_item.name}} <!-- {{each_popular_item.last_name}} -->
-                                                    {% else %}
-                                                       {{each_popular_item.user.username}}
-                                                    {% endif %}</h4>
-                                                    <p class="jsx-1420774184">@{{each_popular_item.user.username}}</p>
+                                                <li class="jsx-3959364739">
+                                                    <a tag="a" class="jsx-1420774184 recommend-item" href="/{{each_popular_item.user.username}}/">
+                                                        <div class="jsx-2177493926 jsx-578937417 avatar round head normal" style="background-image: url({% if each_popular_item.profile_pic|length > 1 %}
+                                            {{each_popular_item.profile_pic}}
+                                        {% else %}
+                                            /media/user.svg
+                                        {% endif %});"></div>
+                                                        <div class="jsx-1420774184 info-content">
+                                                            <h4 class="jsx-1420774184">                                               {% if each_popular_item.name %}
+                                                               {{each_popular_item.name}} <!-- {{each_popular_item.last_name}} -->
+                                                            {% else %}
+                                                               {{each_popular_item.user.username}}
+                                                            {% endif %}</h4>
+                                                            <p class="jsx-1420774184">@{{each_popular_item.user.username}}</p>
 
-                                                </div>
-                                                <div class="jsx-1420774184 arrow-right"></div>
-                                            </a>
+                                                        </div>
+                                                        <div class="jsx-1420774184 arrow-right"></div>
+                                                    </a>
 
-                                        </li>
-                                    {% endfor %}
+                                                </li>
+                                            {% endfor %}
 
-                                </ul>
-
-                </div>
-
-                <div class="jsx-3959364739 recommend-card">
-                    <header class="jsx-3959364739">
-                        <h3 class="jsx-3959364739">{% trans "Discover" %}</h3><a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a></header>
-                    <div class="_scroll_load_more_loading_discover center">
-                        <div class="boloindya-loading">Loading...</div>
+                                        </ul>
+                        </div>
+                        <div class="jsx-3959364739 recommend-card">
+                            <header class="jsx-3959364739">
+                                <h3 class="jsx-3959364739">{% trans "Discover" %}</h3><a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a></header>
+                            <div class="_scroll_load_more_loading_discover center">
+                                <div class="boloindya-loading">Loading...</div>
+                            </div>
+                            <ul class="jsx-3959364739 sidebarLi" id="discoverId">
+                            </ul>
+                        </div>
                     </div>
-                    <ul class="jsx-3959364739 sidebarLi" id="discoverId">
-                    </ul>
                 </div>
             </div>
-<!--             <div class="jsx-3336228099 download-container card">
 
-                <div class="jsx-3336228099 download-content download-link">
-                    <h3 class="_download_title">{% trans "Get the App" %}</h3>
-                    <div class="jsx-3336228099 download-wrapper">
-
-                        <a href="https://play.google.com/store/apps/details?id=com.boloindya.boloindya&hl=en_IN" target="_blank" rel="nofollow" class="jsx-3336228099"><img src="//sf-tb-sg.ibytedtos.com/obj/ttfe-malisg/store-badge/google/en.png" alt="google-store" class="jsx-3336228099"></a>
-
-                    </div>
-                </div>
-            </div> -->
         </aside>
     </div>
 </div>
