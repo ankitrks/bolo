@@ -468,19 +468,19 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
         unique_share_count = SocialShare.objects.filter(topic_id = self.id).distinct('user_id').count()
 
         if self.user.st.is_superstar:
-            score += get_ranking_feature_weight('superstar_topic_play')*(self.imp_count + self.get_redis_imp_count())
+            score += get_ranking_feature_weight('superstar_topic_play')*self.imp_count
             score += get_ranking_feature_weight('superstar_topic_like')*self.topic_like_count
             score += get_ranking_feature_weight('superstar_topic_share')*unique_share_count
             score += get_ranking_feature_weight('superstar_topic_comment')*self.comment_count
 
         elif self.user.st.is_popular:
-            score += get_ranking_feature_weight('popular_topic_play')*(self.imp_count + self.get_redis_imp_count())
+            score += get_ranking_feature_weight('popular_topic_play')*self.imp_count
             score += get_ranking_feature_weight('popular_topic_like')*self.topic_like_count
             score += get_ranking_feature_weight('popular_topic_share')*unique_share_count
             score += get_ranking_feature_weight('popular_topic_comment')*self.comment_count
 
         elif not self.user.st.is_superstar and not self.user.st.is_popular:
-            score += get_ranking_feature_weight('normal_topic_play')*(self.imp_count + self.get_redis_imp_count())
+            score += get_ranking_feature_weight('normal_topic_play')*self.imp_count
             score += get_ranking_feature_weight('normal_topic_like')*self.topic_like_count
             score += get_ranking_feature_weight('normal_topic_share')*unique_share_count
             score += get_ranking_feature_weight('normal_topic_comment')*self.comment_count
@@ -517,13 +517,6 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
                     return get_ranking_feature_weight('other_lang_normal_user_threshold')
         except:
             return None
-
-    def get_redis_imp_count(self):
-        try:
-            imp_count = len(redis_cli.keys("bi:vb_entry:"+str(self.id)+":*"))
-        except Exception as e:
-            imp_count = 0
-        return imp_count
 
 
     def save(self):
