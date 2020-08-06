@@ -38,10 +38,15 @@ def run():
                     redis_cli.delete(each_key)
                 except Exception as e:
                     print e
-        calculate_all_vb_score_and_set_post_in_redis()
 
     except Exception as e:
         print e
+
+    try:
+        calculate_all_vb_score_and_set_post_in_redis()
+    except Exception as e:
+        print e
+
 
 
 
