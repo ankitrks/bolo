@@ -6,6 +6,7 @@ from redis_utils import *
 import pandas as pd
 from django.db.models import F
 from forum.user.utils.bolo_redis import update_profile_counter
+from scripts.update_vb_score import calculate_all_vb_score_and_set_post_in_redis
 
 
 def run():
@@ -40,6 +41,12 @@ def run():
 
     except Exception as e:
         print e
+
+    try:
+        calculate_all_vb_score_and_set_post_in_redis()
+    except Exception as e:
+        print e
+
 
 
 
