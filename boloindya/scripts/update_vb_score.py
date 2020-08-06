@@ -52,17 +52,17 @@ def run():
             print "\n\n\n\n"
     print 'Runtime  hashtag language Total is ' + str(datetime.now() - start_total)
     start_total = datetime.now()
-    for each_language in language_options:
-        if not each_language[0] == '0':
-            start = datetime.now()
-            key = 'lang:'+str(each_language[0])
-            query = Topic.objects.filter(is_removed=False,is_vb=True,language_id=each_language[0]).order_by('-vb_score','-id')
-            final_data = update_redis_paginated_data(key, query, settings.CACHE_MAX_PAGES)
-            # final_data = update_redis_language_paginated_data(each_language[0])
-            # print final_data
-            end = datetime.now()
-            print 'Runtime: Language ' + str(each_language[1]) + ' is ' + str(end - start)
-            print "\n\n\n\n"
+    # for each_language in language_options:
+    #     if not each_language[0] == '0':
+    #         start = datetime.now()
+    #         key = 'lang:'+str(each_language[0])
+    #         query = Topic.objects.filter(is_removed=False,is_vb=True,language_id=each_language[0]).order_by('-vb_score','-id')
+    #         final_data = update_redis_paginated_data(key, query, settings.CACHE_MAX_PAGES)
+    #         # final_data = update_redis_language_paginated_data(each_language[0])
+    #         # print final_data
+    #         end = datetime.now()
+    #         print 'Runtime: Language ' + str(each_language[1]) + ' is ' + str(end - start)
+    #         print "\n\n\n\n"
     print 'Runtime Language Total is ' + str(datetime.now() - start_total)
     print 'total script run time :', str(datetime.now() - now)
 

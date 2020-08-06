@@ -210,7 +210,7 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
         if 'language_id' in form.changed_data:
             obj.language_id = form.cleaned_data['language_id']
         if 'is_pubsub_popular_push' in form.changed_data:
-            obj.is_pubsub_popular_push = form.cleaned_data['is_pubsub_popular_push']
+            obj.is_popular = form.cleaned_data['is_pubsub_popular_push']
         if 'is_moderated' in form.changed_data:
             obj.is_moderated = form.cleaned_data['is_moderated']
         if 'is_monetized' in form.changed_data:
