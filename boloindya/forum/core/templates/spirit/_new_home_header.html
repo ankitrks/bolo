@@ -860,6 +860,13 @@ input:checked + .slider:before {
   ._4kny ._585-{
     display: none !important;
   }
+
+.userProfileIcon{
+    height: 50px;
+    padding: 6px 13px;
+    margin: 0px 0px;
+}
+
 </style>
 
     <div id="__next">
@@ -878,6 +885,9 @@ input:checked + .slider:before {
                 <a class="jsx-475503780" href="/{{LANGUAGE_CODE}}/trending/">Explore</a>
 
                 {% if user.is_authenticated %}
+
+                <a class="jsx-475503780 " href="/{{ user.username }}"><img src="/media/user.svg" class="userProfileIcon"></a>
+
                 {% else %}
                   <a href="/login/">Sign in</a>
                 {% endif %}

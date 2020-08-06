@@ -1105,6 +1105,13 @@ input#search-bar:focus:-ms-placeholder {
     margin: 8em auto;
   }
 }
+
+.userProfileIcon{
+    height: 50px;
+    padding: 6px 13px;
+    margin: 0px 0px;
+}
+
 </style>
 
     <div id="__next">
@@ -1124,7 +1131,7 @@ input#search-bar:focus:-ms-placeholder {
                                 </li>
 
                                 {% if user.is_authenticated %}
-
+                                  <a class="jsx-475503780 " href="/{{ user.username }}"><img src="/media/user.svg" class="userProfileIcon"></a>
                                 {% else %}
                                 <li class="jsx-3143951235">
                                   <h2 class="menu-item-link1"><a href="/login/" class="jsx-2922828399">{% trans "Sign in" %}</a></h2>
@@ -1154,6 +1161,8 @@ input#search-bar:focus:-ms-placeholder {
                                 </li>
 
                                 {% if user.is_authenticated %}
+
+
                                 <li class="jsx-3143951235" id="boloSideMenu">
 
                                     <span class="bolo-642826668 boloSideMenuClass hamburger-menu">
