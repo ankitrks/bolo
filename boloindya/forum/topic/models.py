@@ -25,6 +25,7 @@ from django.utils.html import format_html
 from django.db.models.query import QuerySet
 from django.dispatch import Signal
 from diff_model import ModelDiffMixin
+from redis_utils import *
 
 post_update = Signal()
 
@@ -464,22 +465,24 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
         if not self.is_boosted and self.is_popular:
             score += get_ranking_feature_weight('post_normal')
 
+        unique_share_count = SocialShare.objects.filter(topic_id = self.id).distinct('user_id').count()
+
         if self.user.st.is_superstar:
-            score += get_ranking_feature_weight('superstar_topic_play')*self.imp_count
+            score += get_ranking_feature_weight('superstar_topic_play')*(self.imp_count + self.get_redis_imp_count())
             score += get_ranking_feature_weight('superstar_topic_like')*self.topic_like_count
-            score += get_ranking_feature_weight('superstar_topic_share')*self.topic_share_count
+            score += get_ranking_feature_weight('superstar_topic_share')*unique_share_count
             score += get_ranking_feature_weight('superstar_topic_comment')*self.comment_count
 
         elif self.user.st.is_popular:
-            score += get_ranking_feature_weight('popular_topic_play')*self.imp_count
+            score += get_ranking_feature_weight('popular_topic_play')*(self.imp_count + self.get_redis_imp_count())
             score += get_ranking_feature_weight('popular_topic_like')*self.topic_like_count
-            score += get_ranking_feature_weight('popular_topic_share')*self.topic_share_count
+            score += get_ranking_feature_weight('popular_topic_share')*unique_share_count
             score += get_ranking_feature_weight('popular_topic_comment')*self.comment_count
 
         elif not self.user.st.is_superstar and not self.user.st.is_popular:
-            score += get_ranking_feature_weight('normal_topic_play')*self.imp_count
+            score += get_ranking_feature_weight('normal_topic_play')*(self.imp_count + self.get_redis_imp_count())
             score += get_ranking_feature_weight('normal_topic_like')*self.topic_like_count
-            score += get_ranking_feature_weight('normal_topic_share')*self.topic_share_count
+            score += get_ranking_feature_weight('normal_topic_share')*unique_share_count
             score += get_ranking_feature_weight('normal_topic_comment')*self.comment_count
 
         post_time = (datetime.now() - self.created_at).total_seconds() #in hrs
@@ -487,7 +490,7 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
             post_time = 1209600
         post_time = post_time/3600
         time_decay_constant = settings.TIME_DECAY_CONSTANT
-        score = round(((time_decay_constant**2)/((float(post_time)**4)+(time_decay_constant**2)))*score ,5) #10^10 is multplied to normailze the decimal value
+        score = round(((time_decay_constant**2)/((float(post_time)**2)+(time_decay_constant**2)))*score ,5) #10^10 is multplied to normailze the decimal value
 
         threshold_value = self.get_threshold_value()
         if not self.is_popular and threshold_value and score > threshold_value:
@@ -514,6 +517,14 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
                     return get_ranking_feature_weight('other_lang_normal_user_threshold')
         except:
             return None
+
+    def get_redis_imp_count(self):
+        try:
+            imp_count = len(redis_cli.keys("bi:vb_entry:"+str(self.id)+":*"))
+        except Exception as e:
+            imp_count = 0
+        return imp_count
+
 
     def save(self):
         if self.pk:
