@@ -232,9 +232,11 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
                 obj.restore()
                 update_profile_counter(obj.user_id,'video_count',1, True)
         
-        if 'is_boosted' in form.changed_data and 'boosted_till' in form.changed_data:
-            obj.is_boosted = form.cleaned_data['is_boosted']
-            if obj.is_boosted:
+        if 'is_boosted' in form.changed_data or 'boosted_till' in form.changed_data:
+            if 'is_boosted' in form.changed_data:
+                obj.is_boosted = form.cleaned_data['is_boosted']
+
+            if 'boosted_till' in form.changed_data:
                 obj.boosted_till = form.cleaned_data['boosted_till']
                 obj.boosted_start_time = datetime.now()
                 obj.boosted_end_time = datetime.now()+timedelta(hours=obj.boosted_till)
