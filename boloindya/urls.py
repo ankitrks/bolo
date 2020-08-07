@@ -95,7 +95,7 @@ urlpatterns = [
 ]
 
 urlpatterns += i18n_patterns(
-    url(r'^$', forum.topic.views.latest_home, name='index'),
+    url(r'^$', forum.topic.views.new_home_updated, name='index'),
     url(r'^home/$', forum.topic.views.old_home, name='old_home'),
     url(r'^new_home/$', forum.topic.views.new_home_updated, name='new_home_updated'),
     url(r'^trending/$', forum.topic.views.boloindya_feed, name='boloindya_feed'),

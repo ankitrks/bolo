@@ -728,6 +728,23 @@ color: #B62827;
 }
 
 }
+
+.viewCounterCss{
+    font-style: normal;
+    font-size: 8px;
+    line-height: 19px;
+    display: flex;
+    align-items: center;
+    color: #7d7d7d;
+}
+.viewCounterCssBig{
+    font-style: normal;
+    font-size: 10px;
+    line-height: 19px;
+    display: flex;
+    align-items: center;
+    color: #7d7d7d;
+}
 </style>
 <div class="jsx-3819228898" style="background: #f8f8f8;background-image: url(/media/background_eclipse.png);">
 <header class="jsx-3732044518 header hideOnDesktop">
@@ -802,6 +819,202 @@ color: #B62827;
 <!-----------  User Details Script  ------------>
 <script src="/media/js/user_details.js"></script>
 <!-----------End  ------------>
+
+<style type="text/css">
+    
+.descByName{
+    font-family: Sailec;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 34px;
+    display: flex;
+    align-items: center;
+
+    color: #B3B3B3;
+}
+
+.mask .outsharepanel .icontainer {
+    position: relative;
+    width: 100%;
+    text-align: center;
+    white-space: nowrap;
+    padding: 0px 24px 16px;
+}
+
+
+</style>
+
+<div class="boloindya-share openShareTabId shareOpenAndHideMobAndDesk hide">
+    <div class="jsx-2679382212 outshare mask share-transiton-enter-done">
+        <div class="jsx-2679382212 outsharepanel">
+            <div class="jsx-2679382212 title">{% trans "Share to" %}</div>
+            <div class="jsx-2679382212 icontainer">
+                <div class="platwrap" >
+                    <div onclick="copyShareLinkMobile();" class="platicon i-copylink" style="background-image: url(/media/copy.svg);"></div><span>{% trans "Copy Link" %}</span>
+                    <input readonly=""  class="jsx-1861775669 jsx-537314381 hide" id="shareInputboxMobile" value="https://www.boloindya.com/@karansingharoraofficial/video/6758860880575827202">
+                </div>
+
+<!--                 <div class="platwrap" onclick="social_share_main('facebook_share')">
+                    <div class="platicon i-facebook"  style="background-image: url(/media/facebook_mobile.svg);"></div><span> Facebook</span></div> -->
+                <div class="platwrap" onclick="social_share_main('twitter_share')">
+                    <div class="platicon i-twitter" style="background-image: url(/media/twitter_mobile.svg);"></div><span> Twitter</span></div>
+                <div class="platwrap" onclick="social_share_main('whatsapp_share')">
+                    <div class="platicon i-pinterest" style="background-image: url(/media/whatsapp.svg);"></div><span> Whatsapp</span></div>
+                <p class="linkCopies"></p>
+            </div>
+
+            <input type="hidden" name="topicId" id="topicId">
+            <input type="hidden" name="topicCreatorUsername" id="topicCreatorUsername">
+            <input type="hidden" name="topicCreatorTitle" id="topicCreatorTitle">
+
+
+            <div class="jsx-2679382212 btns">
+                <button class="jsx-2679382212 hideShareOnMobileAndDesktop">{% trans "Cancel" %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- List View Display Data -->
+
+
+<script type="text/javascript">
+    
+    $(".hideShareOnMobileAndDesktop").on('click',function(e){
+        var shareOpenAndHideMobAndDesk=$('.shareOpenAndHideMobAndDesk').hasClass('hide');
+        if(shareOpenAndHideMobAndDesk){
+            $('.shareOpenAndHideMobAndDesk').removeClass('hide');
+        }else{
+            $('.shareOpenAndHideMobAndDesk').addClass('hide');
+        }
+
+
+    });
+
+    function shareOpenAndHide(topicId,topicTitle,topicCreatorUsername) {
+
+        $("#topicId").val(topicId);
+        $("#topicCreatorTitle").val(topicCreatorTitle);
+        $("#topicCreatorUsername").val(topicCreatorUsername);
+
+        var shareOpenAndHideMobAndDesk=$('.shareOpenAndHideMobAndDesk').hasClass('hide');
+        if(shareOpenAndHideMobAndDesk){
+            $('.shareOpenAndHideMobAndDesk').removeClass('hide');
+        }else{
+            $('.shareOpenAndHideMobAndDesk').addClass('hide');
+        }
+    }
+
+
+function social_share_main(shareType){
+     var loginStatus= check_login_status();
+     if(loginStatus==false){
+        document.getElementById('gotoLoginPage').click();
+     }
+
+    var topicId=$("#topicID").val();
+    var topicCreatorUsername=$("#topicCreatorUsername").val();
+    var topicCreatorTitle=$("#topicCreatorUsername").val();
+
+    var shareURL="";
+    if(shareType=='facebook_share'){
+
+        shareURL='https://www.facebook.com/sharer/sharer.php?app_id=113869198637480&u='+site_base_url+topicCreatorUsername+'/'+topicId+'&display=popup&sdk=joey/';
+
+    }else if(shareType=='twitter_share'){
+
+        shareURL='https://twitter.com/intent/tweet?text='+topicCreatorTitle+'&url='+site_base_url+topicCreatorUsername+'/'+topicId+'/'
+    }else if(shareType=='whatsapp_share'){
+        shareURL='https://api.whatsapp.com/send?text='+site_base_url+topicCreatorUsername+'/'+topicId+'/';
+    }
+
+
+    var ge_local_data="";
+        ge_local_data = JSON.parse(localStorage.getItem("access_data"));
+    var accessToken=ge_local_data.access_token;
+
+    jQuery.ajax({
+        url:'/api/v1/shareontimeline/',
+        type:"POST",
+        headers: {
+          'Authorization':'Bearer '+accessToken,
+        },
+        data:{topic_id:topicId,share_on:shareType},
+        success: function(response,textStatus, xhr){
+            window.open(shareURL, '_blank');
+            $('.smenu').toggleClass('share');
+
+        },
+        error: function(jqXHR, textStatus, errorThrown){
+          //$("form#optForm")[0].reset();
+          jQuery(".commentErrorStatus").html('<span style="color:red;">Please Try Again...</span>').fadeOut(8000);
+          console.log(textStatus + ": " + jqXHR.status + " " + errorThrown);
+        }
+
+
+    });
+}
+
+
+  function UReactionLinkLanding(topicId){
+      //var totalLikeCount= $('#totalLikeCount').val();
+      var likeStatus=jQuery('#UReactionLinkLanding-'+topicId).hasClass('liked');
+      var topicId=topicId;
+      if(likeStatus==false){
+         var loginStatus= check_login_status();
+         if(loginStatus==false){         
+            document.getElementById('gotoLoginPage').click();
+         }
+         var likeStatus=jQuery('.sp_ddXiTdIB8vm').hasClass('sx_44a25c');
+         if(likeStatus==true){
+              jQuery('.sp_ddXiTdIB8vm').removeClass('sx_44a25c');
+              jQuery('.sp_ddXiTdIB8vm').addClass('sx_44a25d');
+         }
+ 
+          jQuery('#UReactionLinkLanding-'+topicId).addClass('liked');
+          
+          if(totalLikeCount<999){
+              totalLikeCount = Number(totalLikeCount)+1;
+              $("#likeCountId").html(totalLikeCount);
+              $('#totalLikeCount').val(totalLikeCount);
+
+          }
+          
+           var statusLike= updateUserLikeStatus(topicId);
+           var likeStatus= $('#path-'+topicId).hasClass('liked');
+           if(likeStatus){
+                $('#path-'+topicId).css({ fill: "#ccc" });
+           }else{
+                $('#path-'+topicId).css({ fill: "#ff0000" });
+           }
+         
+      }else{
+         jQuery('#UReactionLinkLanding-'+topicId).removeClass('liked');
+         var statusUnLike=updateUserLikeStatus(topicId);
+         var likeStatus=jQuery('.sp_ddXiTdIB8vm').hasClass('sx_44a25d');
+         if(likeStatus==true){
+              jQuery('.sp_ddXiTdIB8vm').removeClass('sx_44a25d');
+              jQuery('.sp_ddXiTdIB8vm').addClass('sx_44a25c');
+              jQuery('#UReactionLinkLanding-'+topicId).removeClass('liked');
+              if(totalLikeCount>0 && totalLikeCount<999 ){
+                  totalLikeCount = Number(totalLikeCount)-1;
+                  $("#likeCountId").html(totalLikeCount);
+                  $('#totalLikeCount').val(totalLikeCount);
+              }
+         }
+
+      }
+
+      
+  }
+
+</script>
+
+
+
+
+
 
 <script>
 function goBack() {

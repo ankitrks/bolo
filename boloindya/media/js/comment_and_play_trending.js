@@ -5,28 +5,10 @@ var video = document.getElementById('player');
       if(commentBoxInputStatus==true){
          var loginStatus= check_login_status();
          if(loginStatus==false){
-          // if( jwplayer('player').getState() == "playing"){
-          //     jwplayer('player').pause();
-          // } 
-
-          // if(!video.paused) {
-          //   video.pause();
-          //   $('.videoPlayButton').removeClass('play-button');
-          //   $('.videoPlayButton').addClass('play-button');
-          // }
-
-          // if( jwplayer('playerDetails').getState() == "playing"){
-          //     jwplayer('playerDetails').pause();
-          // }
-          
           document.getElementById('gotoLoginPage').click();
-          //document.getElementById('openLoginPopup').click();
-              //jQuery("#openLoginPopup").click();
          }else{
               jQuery('#commentInputId').removeClass('hide');
          }
-
-          
       }else{
          jQuery('#commentInputId').addClass('hide'); 
       }
@@ -75,7 +57,7 @@ var video = document.getElementById('player');
 
   }
    
-  jQuery('#UReactionLink').on('click',function(){debugger;
+  jQuery('#UReactionLink').on('click',function(){
     var totalLikeCount= $('#totalLikeCount').val();
       var likeStatus=jQuery('#UReactionLink').hasClass('liked');
       var topicId=$("#topicID").val();
@@ -83,7 +65,6 @@ var video = document.getElementById('player');
          var loginStatus= check_login_status();
          if(loginStatus==false){         
           document.getElementById('gotoLoginPage').click();
-          //document.getElementById('openLoginPopup').click();
          }
          var likeStatus=jQuery('.sp_ddXiTdIB8vm').hasClass('sx_44a25c');
          if(likeStatus==true){
@@ -121,7 +102,7 @@ var video = document.getElementById('player');
       
   });
 
-function social_share(shareType){debugger;
+function social_share(shareType){
      var loginStatus= check_login_status();
      if(loginStatus==false){
         document.getElementById('gotoLoginPage').click();

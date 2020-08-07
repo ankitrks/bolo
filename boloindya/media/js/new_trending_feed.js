@@ -139,10 +139,32 @@ $(window).scroll(function () {
                     //<span class="_avatar_ _avatar_respond" style="background-image: url('+profilePics+');"></span>
                   //listItems +='<div class="_video_feed_item"><div class="_ratio_"><div style="padding-top: 148.148%;"><div class="_ratio_wrapper"><a onClick="openVideoInPopup(\''+itemVideo.video_cdn+'\',\''+itemVideo.question_image+'\','+totalCountVideo+');"  class="js-video-link playlist-item '+isPlaying+'" data-mediaid="'+itemVideo.id+'"  href="javascript:void(0);"><div class="_image_card_" style="border-radius: 4px; background-image: url('+itemVideo.question_image+');"><div class="_video_card_play_btn_ _video_card_play_btn_dark _image_card_playbtn_wraaper"></div><div class="_video_card_footer_ _video_card_footer_respond _image_card_footer_wraaper"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+itemVideo.view_count+'</span></p><span class="_video_card_footer_likes1"><img src="/media/download.svg" alt="likes"> '+itemVideo.likes_count+'</span></div></div></a></div></div></div></div>'; 
 
+
+
                 });
                 $("#playlist").append(listItems);
                 $("_scroll_load_more_loading").append(listItems);
                 checkDataStatus=0;
+
+
+                var likeStatus="";
+                //itemVideoByte=itemVideo;
+                likeStatus="liked";
+                var likedCheck=userLikeAndUnlike.topic_like;debugger;
+
+                var p;
+            
+                if(undefined !== likedCheck && likedCheck.length>0){
+                    for (p = 0; p < likedCheck.length; p++) {
+                        var YtopicId=likedCheck[p]
+                        jQuery("#path-"+YtopicId).addClass('liked');
+                        $('#path-'+YtopicId).css({ fill: "#ff0000" });
+                        jQuery("#path-"+YtopicId).removeClass('likeStatusNotUpdate');
+
+                    }
+                }
+ 
+
             },
             error: function(jqXHR, textStatus, errorThrown){
               console.log(textStatus + ": " + jqXHR.status + " " + errorThrown);
@@ -171,52 +193,49 @@ function videoItemsTemplate(itemVideoByte,totalCountVideo) {
     var content_title="";
     var videoTitle="";
         videoTitle=removeTags(itemVideoByte.title);
-        content_title = videoTitle.substr(0, 10) + " ..."
+        content_title = videoTitle.substr(0, 10) + " ...";
+
+
+
 
     var popularHashTagTemplateItems ='<div class="column " style="cursor: pointer;">\
-                            <div class="card" onClick="openVideoInPopup(\''+itemVideoByte.video_cdn+'\',\''+itemVideoByte.question_image+'\','+totalCountVideo+');" style="background-color: #fff; padding: 20px;">\
-                            <span id="video_play_item_'+itemVideoByte.id+'" class="min-span-height">\
+                            <div class="card"  style="background-color: #fff; padding: 20px;">\
+                            <span onClick="openVideoInPopup(\''+itemVideoByte.video_cdn+'\',\''+itemVideoByte.question_image+'\','+totalCountVideo+');" id="video_play_item_'+itemVideoByte.id+'" class="min-span-height">\
                                 <img  id="player-'+itemVideoByte.id+'" src="'+itemVideoByte.question_image+'" class="videoCentered videoSliderPlay">\
                             </span>\
                                 <div class="card-body videoRowCardBody" style="">\
                                     <div>\
-                                        <h5 class="title"></h5>\
-                                        <p class="desc">'+content_title+'</p>\
+                                        <h5 class="title">'+content_title+'</h5>\
+                                        <p class="desc descByName">'+itemVideoByte.user.userprofile.name+'</p>\
                                     </div>\
                                     <div style="display: inline-flex; justify-content: space-between;">\
                                         <div style="margin-right: 10px;">\
                                             <a href="#">\
-                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\
-                                                    <path d="M17 4.5C14.9 4.5 13.05 5.55 12 7.2C10.95 5.55 9.1 4.5 7 4.5C3.7 4.5 1 7.2 1 10.5C1 16.45 12 22.5 12 22.5C12 22.5 23 16.5 23 10.5C23 7.2 20.3 4.5 17 4.5Z" fill="#ccc"></path>\
-                                                </svg>\
+                                                <svg width="24" height="24" viewBox="0 0 26 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 0.720001C4.4707 0.720001 0 7.0016 0 8C0 8.9958 4.4707 15.28 13 15.28C21.528 15.28 26 8.9958 26 8C26 7.0016 21.528 0.720001 13 0.720001ZM13 13.5991C9.8085 13.5991 7.2215 11.0927 7.2215 8C7.2215 4.9073 9.8085 2.3983 13 2.3983C16.1915 2.3983 18.7772 4.9073 18.7772 8C18.7772 11.0927 16.1915 13.5991 13 13.5991ZM13 8C12.4709 7.4189 13.8619 5.1998 13 5.1998C11.4036 5.1998 10.1101 6.4543 10.1101 8C10.1101 9.5457 11.4036 10.8002 13 10.8002C14.5951 10.8002 15.8899 9.5457 15.8899 8C15.8899 7.2889 13.4498 8.4927 13 8Z" fill="#545454"></path></svg>\
                                             </a>\
+                                            <span class="viewCounterCssBig">'+itemVideoByte.view_count+'</span>\
                                         </div>\
                                         <div style="margin-right: 10px;">\
-                                            <a href="#">\
+                                            <a href="javascript:void(0);" onclick="UReactionLinkLanding('+itemVideoByte.id+');">\
                                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\
-                                                    <g clip-path="url(#clip0)">\
-                                                        <path\
-                                                            d="M11.9999 1.5C5.37181 1.5 -6.28186e-05 5.86406 -6.28186e-05 11.25C-6.28186e-05 13.4812 0.93275 15.525 2.47962 17.1703C1.78119 19.0172 0.328062 20.5828 0.304625 20.6016C-0.00475032 20.9297 -0.0891253 21.4078 0.0889997 21.8203C0.267125 22.2328 0.674937 22.5 1.12494 22.5C4.00775 22.5 6.28119 21.2953 7.64525 20.3297C8.99994 20.7563 10.4624 21 11.9999 21C18.6281 21 23.9999 16.6359 23.9999 11.25C23.9999 5.86406 18.6281 1.5 11.9999 1.5ZM11.9999 18.75C10.7484 18.75 9.51088 18.5578 8.32494 18.1828L7.26087 17.8453L6.34681 18.4922C5.6765 18.9656 4.75775 19.4953 3.6515 19.8516C3.99369 19.2844 4.3265 18.6469 4.58431 17.9672L5.08119 16.65L4.11556 15.6281C3.26712 14.7234 2.24994 13.2281 2.24994 11.25C2.24994 7.11563 6.62337 3.75 11.9999 3.75C17.3765 3.75 21.7499 7.11563 21.7499 11.25C21.7499 15.3844 17.3765 18.75 11.9999 18.75Z" fill="#545454"></path>\
-                                                    </g>\
-                                                    <defs>\
-                                                        <clipPath id="clip0">\
-                                                            <rect width="24" height="24" fill="white"></rect>\
-                                                        </clipPath>\
-                                                    </defs>\
+                                                    <path class="likeStatusNotUpdate" id="path-'+itemVideoByte.id+'" d="M17 4.5C14.9 4.5 13.05 5.55 12 7.2C10.95 5.55 9.1 4.5 7 4.5C3.7 4.5 1 7.2 1 10.5C1 16.45 12 22.5 12 22.5C12 22.5 23 16.5 23 10.5C23 7.2 20.3 4.5 17 4.5Z" fill="#ccc"></path>\
                                                 </svg>\
                                             </a>\
+                                            <span class="viewCounterCssBig">'+itemVideoByte.likes_count+'</span>\
                                         </div>\
                                         <div>\
-                                            <a href="#">\
+                                            <a href="javascript:void(0)" onclick="shareOpenAndHide('+itemVideoByte.id+',\''+content_title+'\',\''+itemVideoByte.user.userprofile.name+'\');">\
                                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\
                                                     <path d="M3 12C3 13.654 4.346 15 6 15C6.794 15 7.512 14.685 8.049 14.18L14.04 17.604C14.022 17.734 14 17.864 14 18C14 19.654 15.346 21 17 21C18.654 21 20 19.654 20 18C20 16.346 18.654 15 17 15C16.206 15 15.488 15.315 14.951 15.82L8.96 12.397C8.978 12.266 9 12.136 9 12C9 11.864 8.978 11.734 8.96 11.603L14.951 8.18C15.488 8.685 16.206 9 17 9C18.654 9 20 7.654 20 6C20 4.346 18.654 3 17 3C15.346 3 14 4.346 14 6C14 6.136 14.022 6.266 14.04 6.397L8.049 9.82C7.496 9.29468 6.76273 9.00123 6 9C4.346 9 3 10.346 3 12Z" fill="#545454"></path>\
                                                 </svg>\
                                             </a>\
+                                            <span class="viewCounterCssBig">'+itemVideoByte.share_count+'</span>\
                                         </div>\
                                     </div>\
                                 </div>\
                             </div>\
                         </div>';
+
 
     return popularHashTagTemplateItems
 }

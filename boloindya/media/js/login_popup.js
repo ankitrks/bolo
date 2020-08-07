@@ -111,6 +111,13 @@ $('#phoneNo').on('keypress',function(evt){
     if (charCode > 31 && (charCode < 48 || charCode > 57)) {
         return false;
     }
+    var phoneNo = document.getElementById('phoneNo').value;
+    if(phoneNo.length>=9){debugger;
+      $("#phoneNo").removeClass('success');
+      $("#phoneNo").addClass('success');
+      $('.mobileErrorMsg').html('<span></span>');
+    }
+
     return true;
 });
 
@@ -128,8 +135,11 @@ $('#phoneNo').on('change',function(evt){
     }
     
     $("#phoneNo").removeClass('success');
-    $("#phoneNo").addClass('success');
+    $("#phoneNo").addClass('success');debugger;
     //$('.mobileErrorMsg').html();
+    if(phoneNo.value.length>9){
+      console.log('sdfsdfsd');
+    }
     $('.mobileErrorMsg').html('<span></span>');
     return true;
 });
