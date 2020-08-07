@@ -1619,7 +1619,7 @@ h1.video-meta-title.jsx-1305565323 {
 }
 ._comments_ {
     position: relative;
-    margin: -39px 0;
+    margin: -17px 0;
 }
 .video-card-container:hover .mute-icon.jsx-2126139261 {
     opacity: 1;
@@ -1647,6 +1647,10 @@ h1.video-meta-title.jsx-1305565323 {
 .video-meta-title a ,._video_card_big_comment_item_message a{
     color: #000;
     font-weight: 600
+}
+._comments_comments_scroll {
+    padding: 0px 3px;
+    margin-top: -6px;
 }
 
 
@@ -1721,8 +1725,8 @@ h1.video-meta-title.jsx-1305565323 {
                     <h2 class="jsx-140423242 user-nickname"></h2></div>
             </a>
         </div>
-        <div class="jsx-1870413825 video-infos-container">
-            <h1 class="jsx-1305565323 video-meta-title"></h1>
+        <div class="jsx-1870413825 video-infos-container videoInfoContainer">
+            <h1 class="jsx-1305565323 video-meta-title videoTitleMeta"></h1>
             <div class="jsx-319872377 action-container">
                 <div class="jsx-319872377 action-left">
                     <span class="jsx-319872377 action-wrapper like-part" >
@@ -1740,14 +1744,14 @@ h1.video-meta-title.jsx-1305565323 {
 
                 <div class="jsx-319872377 action-right">
                     <div class="jsx-885361899 jsx-3852217983 jsx-2933355696 share-group">
-                        <a href="javascript:void(0)" onclick="social_share('facebook_share')" target="_blank" class="jsx-885361899 jsx-3852217983 jsx-2933355696"><span><img src="/media/facebook_mobile.svg" class="jsx-885361899 jsx-3852217983 jsx-2933355696"></span></a>
+                        <a href="javascript:void(0)" onclick="social_share('facebook_share')" class="jsx-885361899 jsx-3852217983 jsx-2933355696"><span><img src="/media/facebook_mobile.svg" class="jsx-885361899 jsx-3852217983 jsx-2933355696"></span></a>
                         
-                        <a href="#" target="_blank" onclick="social_share('twitter_share')" class="jsx-885361899 jsx-3852217983 jsx-2933355696"><span><img src="/media/twitter_mobile.svg" class="jsx-885361899 jsx-3852217983 jsx-2933355696"></span></a>
+                        <a href="javascript:void(0)"  onclick="social_share('twitter_share')" class="jsx-885361899 jsx-3852217983 jsx-2933355696"><span><img src="/media/twitter_mobile.svg" class="jsx-885361899 jsx-3852217983 jsx-2933355696"></span></a>
 
-                        <a href="#" target="_blank" onclick="social_share('whatsapp_share')" class="jsx-885361899 jsx-3852217983 jsx-2933355696"><span><img src="/media/whatsapp.svg" class="jsx-885361899 jsx-3852217983 jsx-2933355696"></span></a>
+                        <a href="javascript:void(0)" onclick="social_share('whatsapp_share')" class="jsx-885361899 jsx-3852217983 jsx-2933355696"><span><img src="/media/whatsapp.svg" class="jsx-885361899 jsx-3852217983 jsx-2933355696"></span></a>
 
 
-                        <a href="#" onclick="copyShareLink();" class="jsx-885361899 jsx-3852217983 jsx-2933355696"><span><img src="/media/copy_url_link.svg" class="jsx-885361899 jsx-3852217983 jsx-2933355696"></span></a>
+                        <a href="javascript:void(0)" onclick="copyShareLink();" class="jsx-885361899 jsx-3852217983 jsx-2933355696"><span><img src="/media/copy_url_link.svg" class="jsx-885361899 jsx-3852217983 jsx-2933355696"></span></a>
                         
 
                     </div>
@@ -1764,6 +1768,7 @@ h1.video-meta-title.jsx-1305565323 {
                                             <div class="_video_card_big_meta_info_count1"> </div>
                                             <input type="hidden" name="tpoicId" id="topicID" value="" >
                                             <input type="hidden" name="topicCreatorUsername" id="topicCreatorUsername" value="" >
+                                            <input type="hidden" name="topicCreatorTitle" id="topicCreatorTitle" value="" >
                                         </div>
  
 

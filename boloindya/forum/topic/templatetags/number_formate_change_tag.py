@@ -11,12 +11,10 @@ register = template.Library()
 @stringfilter
 def shorcountertopic(counter):
     counter = int(counter)
-    if counter>1000 and counter<= 9999:
-        return str(counter/1000.0)[:3]+'K'
-    elif counter >9999 and counter<=999999:
-        return str(counter/1000.0)[:5]+'K'
-    elif counter >999999:
-        return str(counter/1000000.0)[:5]+'M'
+    if counter >= 1000 and counter < 999999:
+        return str(int(round(counter/1000.0, 1)) if round(counter/1000.0, 1).is_integer() else round(counter/1000.0, 1))+' K'
+    elif counter >= 999999:
+        return str(int(round(counter/1000000.0, 1)) if (round(counter/1000000.0, 1)).is_integer() else (round(counter/1000000.0, 1)))+' M'
     else:
         return str(counter)
 

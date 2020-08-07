@@ -130,6 +130,9 @@ function social_share(shareType){debugger;
 
     var topicId=$("#topicID").val();
     var topicCreatorUsername=$("#topicCreatorUsername").val();
+    //var topicCreatorTitle=$("#topicCreatorTitle").val();
+    var topicCreatorTitle=$(".videoTitleMeta").text();
+
     var shareURL="";
     if(shareType=='facebook_share'){
 
@@ -137,7 +140,7 @@ function social_share(shareType){debugger;
 
     }else if(shareType=='twitter_share'){
 
-        shareURL='https://twitter.com/intent/tweet?text='+site_base_url+topicCreatorUsername+'/'+topicId+'/&url='+site_base_url+topicCreatorUsername+'/'+topicId+'/'
+        shareURL='https://twitter.com/intent/tweet?text='+topicCreatorTitle+'&url='+site_base_url+topicCreatorUsername+'/'+topicId+'/'
     }else if(shareType=='whatsapp_share'){
         shareURL='https://api.whatsapp.com/send?text='+site_base_url+topicCreatorUsername+'/'+topicId+'/';
     }

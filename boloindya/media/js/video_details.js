@@ -166,9 +166,9 @@ function video_play_using_video_js_old(url,backup_url,image) {
   checkPlayStatus(video);
 }
 
-function video_play_using_video_js(url,backup_url,image) {
+function video_play_using_video_js(url,backup_url,image) {debugger;
     
-    var video = document.getElementById('player');
+    //var video = document.getElementById('playerDetails');
 
     fetch(url)
     .then(_ => {
@@ -207,11 +207,22 @@ function video_play_using_video_js(url,backup_url,image) {
 
 
 
-function retryLiveStream(hls, url) {
+function retryLiveStream(hls, url) {debugger;
     retrying = true;
     retryCount++;
-    hls.loadSource(url);
-    hls.startLoad();
+    fetch(url)
+    .then(_ => {
+      video.src = url;
+      return video.play();
+    })
+    .then(_ => {
+        console.log('playback started');
+        // Video playback started ;)
+    })
+    .catch(e => {
+        console.log('failed started');
+
+    });
 }
 
 function checkPlayStatus(video){
