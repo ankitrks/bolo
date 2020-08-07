@@ -110,7 +110,7 @@ function video_play_using_video_js1(url,backup_url,image) {debugger;
   checkPlayStatus(video);
 }
 
-function video_play_using_video_js(url,backup_url,image){
+function video_play_using_video_js_old(url,backup_url,image){
   
     if(Hls.isSupported()) {
     var video = document.getElementById('player-'+singleTopicId);
@@ -154,6 +154,44 @@ function video_play_using_video_js(url,backup_url,image){
       }
     }
   });
+
+}
+
+function video_play_using_video_js(url,backup_url,image) {
+    
+    var video = document.getElementById('player');
+
+    fetch(url)
+    .then(_ => {
+      video.src = url;
+      return video.play();
+    })
+    .then(_ => {
+        console.log('playback started');
+        // Video playback started ;)
+    })
+    .catch(e => {
+        console.log('failed started');
+ 
+      if(Hls.isSupported()) {
+        var hls = new Hls();
+        hls.loadSource(url);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED,function() {
+          video.play();
+          loaderHide();
+      });
+     }
+
+      else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = backup_url;
+        video.addEventListener('loadedmetadata',function() {
+          video.play();
+          loaderHide();
+        });
+      }
+
+    })
 
 }
 

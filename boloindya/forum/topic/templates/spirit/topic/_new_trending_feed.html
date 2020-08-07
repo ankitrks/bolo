@@ -705,7 +705,27 @@
 }
 
 }
+.recommend-card.jsx-3959364739 ul.jsx-3959364739{
+    height:304px
+}
 
+
+.viewCounterCss{
+    font-style: normal;
+    font-size: 8px;
+    line-height: 19px;
+    display: flex;
+    align-items: center;
+    color: #7d7d7d;
+}
+.viewCounterCssBig{
+    font-style: normal;
+    font-size: 10px;
+    line-height: 19px;
+    display: flex;
+    align-items: center;
+    color: #7d7d7d;
+}
 
 </style>
 
@@ -735,9 +755,6 @@
             <div class="jsx-1929076256 about-img">
                 <div class="jsx-1994528170 banner-video-container">
                     <div class="video-wall" style="background: #f8f8f836">
-<!--                         <header class="jsx-209879639 share-layout-header trending-header"><h1 class="jsx-822049009">{% trans "Trending" %}</h1>
-                        </header> -->
-                        <!-- <div class="header-bar"></div> -->
                         <div id="js-playlists" class="playlists">
                             <div class="playlist-switcher hideonMobile">
                                 <h4 class="js-playlist-link playlist-link"></h4>
@@ -758,8 +775,6 @@
                     </div>
                 </div>
             </div>
-
-
             <article class="jsx-1929076256 about-article">
                  <aside class="_base_layout_aside stickySidebarBackground" >
                     <div class="_base_layout_aside_sticky " style="">
@@ -767,7 +782,7 @@
 
                             <div class="jsx-2573841504 recommend-container" style="">
                                 <header class="jsx-3959364739">
-                                    <h3 style="font-size: 18px;display: inline-block;color: #B62827 !important;border-bottom: 1px solid #ccc;margin-left: 23px;padding-bottom: 10px;text-align: center;" class="jsx-3959364739 trendingVideoOfTheDay">{% trans "Trending Videos of the Day" %}</h3><!-- <a style="float: right;margin-right: 10px;" class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a> --></header>
+                                    <h3 style="font-size: 18px;display: inline-block;color: #B62827 !important;border-bottom: 1px solid #ccc;margin-left: 23px;padding-bottom: 10px;text-align: center;" class="jsx-3959364739 trendingVideoOfTheDay">{% trans "Trending Videos of the Day" %}</h3></header>
                                 <div class="jsx-2573841504 recommend-video-container">
                                     <div class="_scroll_load_more_loading_user_videos center">
                                             <div class="boloindya-loading"></div>
@@ -775,17 +790,15 @@
                                     {% for itemVideo in all_slider_topic %} 
 
                                         {% if  forloop.counter < 4 %}
-                                            <a target="_blank" href="/video/{{itemVideo.slug}}/{{itemVideo.id}}/">
+                                            
                                                 <div class="column1 ">
                                                     <div class="card card13"  style="background-color: #fff; padding: 20px;">
-                                                    <span id="video_play_item_{{itemVideo.id}}" class="min-span-height">
-                                                        <img class="sideSliderImageSize" src="{{itemVideo.question_image}}">
-<!--                                                         <video  id="player-{{itemVideo.id}}" preload="auto" muted autoplay poster="{{itemVideo.question_image}}" class="videoCentered1 videoSliderPlay">
-                                                        </video>    -->
-                                                    </span>
+                                                        <a target="_blank" href="/video/{{itemVideo.slug}}/{{itemVideo.id}}/">
+                                                            <span id="video_play_item_{{itemVideo.id}}" class="min-span-height">
+                                                                <img class="sideSliderImageSize" src="{{itemVideo.question_image}}">
+                                                            </span>
+                                                        </a>
 
-
-                                                        <!-- <img src="{{itemVideo.question_image}}" /> -->
                                                         <div class="card-body videoRowCardBody1" style="">
                                                             <div>
                                                                 <h5 class="title">
@@ -796,26 +809,17 @@
                                                             <div style="display: flex; justify-content: space-between;">
                                                                 <div style="margin-right: 10px;">
                                                                     <a href="#">
-                                                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                            <path d="M17 4.5C14.9 4.5 13.05 5.55 12 7.2C10.95 5.55 9.1 4.5 7 4.5C3.7 4.5 1 7.2 1 10.5C1 16.45 12 22.5 12 22.5C12 22.5 23 16.5 23 10.5C23 7.2 20.3 4.5 17 4.5Z" fill="#ccc"></path>
+                                                                        <svg width="24" height="24" viewBox="0 0 26 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 0.720001C4.4707 0.720001 0 7.0016 0 8C0 8.9958 4.4707 15.28 13 15.28C21.528 15.28 26 8.9958 26 8C26 7.0016 21.528 0.720001 13 0.720001ZM13 13.5991C9.8085 13.5991 7.2215 11.0927 7.2215 8C7.2215 4.9073 9.8085 2.3983 13 2.3983C16.1915 2.3983 18.7772 4.9073 18.7772 8C18.7772 11.0927 16.1915 13.5991 13 13.5991ZM13 8C12.4709 7.4189 13.8619 5.1998 13 5.1998C11.4036 5.1998 10.1101 6.4543 10.1101 8C10.1101 9.5457 11.4036 10.8002 13 10.8002C14.5951 10.8002 15.8899 9.5457 15.8899 8C15.8899 7.2889 13.4498 8.4927 13 8Z" fill="#545454"/>
                                                                         </svg>
+                                                                        <span class="viewCounterCss">{{itemVideo.view_count | shorcountertopic}}</span>
+                                                                        
                                                                     </a>
                                                                 </div>
                                                                 <div style="margin-right: 10px;">
                                                                     <a href="#">
-                                                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                            <g clip-path="url(#clip0)">
-                                                                                <path
-                                                                                    d="M11.9999 1.5C5.37181 1.5 -6.28186e-05 5.86406 -6.28186e-05 11.25C-6.28186e-05 13.4812 0.93275 15.525 2.47962 17.1703C1.78119 19.0172 0.328062 20.5828 0.304625 20.6016C-0.00475032 20.9297 -0.0891253 21.4078 0.0889997 21.8203C0.267125 22.2328 0.674937 22.5 1.12494 22.5C4.00775 22.5 6.28119 21.2953 7.64525 20.3297C8.99994 20.7563 10.4624 21 11.9999 21C18.6281 21 23.9999 16.6359 23.9999 11.25C23.9999 5.86406 18.6281 1.5 11.9999 1.5ZM11.9999 18.75C10.7484 18.75 9.51088 18.5578 8.32494 18.1828L7.26087 17.8453L6.34681 18.4922C5.6765 18.9656 4.75775 19.4953 3.6515 19.8516C3.99369 19.2844 4.3265 18.6469 4.58431 17.9672L5.08119 16.65L4.11556 15.6281C3.26712 14.7234 2.24994 13.2281 2.24994 11.25C2.24994 7.11563 6.62337 3.75 11.9999 3.75C17.3765 3.75 21.7499 7.11563 21.7499 11.25C21.7499 15.3844 17.3765 18.75 11.9999 18.75Z"
-                                                                                    fill="#545454"
-                                                                                ></path>
-                                                                            </g>
-                                                                            <defs>
-                                                                                <clipPath id="clip0">
-                                                                                    <rect width="24" height="24" fill="white"></rect>
-                                                                                </clipPath>
-                                                                            </defs>
+                                                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">                              <path d="M17 4.5C14.9 4.5 13.05 5.55 12 7.2C10.95 5.55 9.1 4.5 7 4.5C3.7 4.5 1 7.2 1 10.5C1 16.45 12 22.5 12 22.5C12 22.5 23 16.5 23 10.5C23 7.2 20.3 4.5 17 4.5Z" fill="#ccc"></path>                      
                                                                         </svg>
+                                                                        <span class="viewCounterCss">{{itemVideo.likes_count | shorcountertopic}}</span>
                                                                     </a>
                                                                 </div>
                                                                 <div>
@@ -826,13 +830,14 @@
                                                                                 fill="#545454"
                                                                             ></path>
                                                                         </svg>
+                                                                        <span class="viewCounterCss">{{itemVideo.share_count | shorcountertopic}}</span>
                                                                     </a>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </a>
+                                            
                                         {% endif %}
 
 
@@ -879,58 +884,11 @@
 
                                 </ul>
                             </div>
-<!--                             <div class="jsx-3959364739 recommend-card" style="margin-top: 10px;">
-                                <header class="jsx-3959364739">
-                                    <h3 style="font-size: 24px;" class="jsx-3959364739">{% trans "Trending Hashtags" %}</h3><a class="jsx-3959364739" href="/discover/">{% trans "See All" %}</a></header>
-                                <ul class="jsx-3959364739 sidebarLi" id="creatorId2">
-
-
-
-
-                                    {%  for each_hashtag_item in hash_tags %}
-                                
-                                        <li class="jsx-3959364739">
-                                            <a tag="a" class="jsx-1420774184 recommend-item" href="/hashtag/{{each_hashtag_item.hash_tag}}/">
-                                                <div class="jsx-1420774184 info-content">
-                                                    <h4 class="jsx-1420774184">#{{each_hashtag_item.hash_tag}}</h4>
-                                                    <p class="jsx-1420774184">{{each_hashtag_item.total_views | shorcountertopic}} {% trans "views" %}</p>
-                                                </div>
-                                                <div class="jsx-1420774184 arrow-right"></div>
-                                            </a>
-                                        </li>
-                                    {% endfor %}
-
-                                </ul>
-                            </div> -->
-
-
-
-
-
-
-
-
 
                         </div>
 
                     </div>
                 </aside>
-
-<!--         <aside class="share-layout-aside stickySidebarBackground">
-            <div class="jsx-2573841504 recommend-container">
-                <header class="jsx-3959364739">
-                    <h3 class="jsx-3959364739">{% trans "Trendinng" %}</h3><a class="jsx-3959364739" href="/feed">{% trans "See All" %}</a></header>
-                <h3 class="jsx-2573841504">{% trans "Trends" %}</h3>
-                <div class="jsx-2573841504 recommend-video-container">
-                    <div class="_scroll_load_more_loading_user_videos center">
-                            <div class="boloindya-loading"></div>
-                    </div>
-                    <ul class="jsx-2573841504" id="playlist3">
-                    </ul>
-                </div>
-            </div>
-        </aside> -->
-
 
             </article>
         </div>
@@ -971,14 +929,210 @@
 
 
 
+
 </style>
 
     
 </div>
 
 
-<!-- List View Display Data -->
 <script src="/media/js/new_trending_feed.js"></script>
+
+
+
+<style type="text/css">
+    
+.descByName{
+    font-family: Sailec;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 34px;
+    display: flex;
+    align-items: center;
+
+    color: #B3B3B3;
+}
+
+.mask .outsharepanel .icontainer {
+    position: relative;
+    width: 100%;
+    text-align: center;
+    white-space: nowrap;
+    padding: 0px 24px 16px;
+}
+
+
+</style>
+
+<div class="boloindya-share openShareTabId shareOpenAndHideMobAndDesk hide">
+    <div class="jsx-2679382212 outshare mask share-transiton-enter-done">
+        <div class="jsx-2679382212 outsharepanel">
+            <div class="jsx-2679382212 title">{% trans "Share to" %}</div>
+            <div class="jsx-2679382212 icontainer">
+                <div class="platwrap" >
+                    <div onclick="copyShareLinkMobile();" class="platicon i-copylink" style="background-image: url(/media/copy.svg);"></div><span>{% trans "Copy Link" %}</span>
+                    <input readonly=""  class="jsx-1861775669 jsx-537314381 hide" id="shareInputboxMobile" value="https://www.boloindya.com/@karansingharoraofficial/video/6758860880575827202">
+                </div>
+
+<!--                 <div class="platwrap" onclick="social_share_main('facebook_share')">
+                    <div class="platicon i-facebook"  style="background-image: url(/media/facebook_mobile.svg);"></div><span> Facebook</span></div> -->
+                <div class="platwrap" onclick="social_share_main('twitter_share')">
+                    <div class="platicon i-twitter" style="background-image: url(/media/twitter_mobile.svg);"></div><span> Twitter</span></div>
+                <div class="platwrap" onclick="social_share_main('whatsapp_share')">
+                    <div class="platicon i-pinterest" style="background-image: url(/media/whatsapp.svg);"></div><span> Whatsapp</span></div>
+                <p class="linkCopies"></p>
+            </div>
+
+            <input type="hidden" name="topicId" id="topicId">
+            <input type="hidden" name="topicCreatorUsername" id="topicCreatorUsername">
+            <input type="hidden" name="topicCreatorTitle" id="topicCreatorTitle">
+
+
+            <div class="jsx-2679382212 btns">
+                <button class="jsx-2679382212 hideShareOnMobileAndDesktop">{% trans "Cancel" %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- List View Display Data -->
+
+
+<script type="text/javascript">
+    
+    $(".hideShareOnMobileAndDesktop").on('click',function(e){
+        var shareOpenAndHideMobAndDesk=$('.shareOpenAndHideMobAndDesk').hasClass('hide');
+        if(shareOpenAndHideMobAndDesk){
+            $('.shareOpenAndHideMobAndDesk').removeClass('hide');
+        }else{
+            $('.shareOpenAndHideMobAndDesk').addClass('hide');
+        }
+
+
+    });
+
+    function shareOpenAndHide(topicId,topicTitle,topicCreatorUsername) {
+
+        $("#topicId").val(topicId);
+        $("#topicCreatorTitle").val(topicCreatorTitle);
+        $("#topicCreatorUsername").val(topicCreatorUsername);
+
+        var shareOpenAndHideMobAndDesk=$('.shareOpenAndHideMobAndDesk').hasClass('hide');
+        if(shareOpenAndHideMobAndDesk){
+            $('.shareOpenAndHideMobAndDesk').removeClass('hide');
+        }else{
+            $('.shareOpenAndHideMobAndDesk').addClass('hide');
+        }
+    }
+
+
+function social_share_main(shareType){
+     var loginStatus= check_login_status();
+     if(loginStatus==false){
+        document.getElementById('gotoLoginPage').click();
+     }
+
+    var topicId=$("#topicID").val();
+    var topicCreatorUsername=$("#topicCreatorUsername").val();
+    var topicCreatorTitle=$("#topicCreatorUsername").val();
+
+    var shareURL="";
+    if(shareType=='facebook_share'){
+
+        shareURL='https://www.facebook.com/sharer/sharer.php?app_id=113869198637480&u='+site_base_url+topicCreatorUsername+'/'+topicId+'&display=popup&sdk=joey/';
+
+    }else if(shareType=='twitter_share'){
+
+        shareURL='https://twitter.com/intent/tweet?text='+topicCreatorTitle+'&url='+site_base_url+topicCreatorUsername+'/'+topicId+'/'
+    }else if(shareType=='whatsapp_share'){
+        shareURL='https://api.whatsapp.com/send?text='+site_base_url+topicCreatorUsername+'/'+topicId+'/';
+    }
+
+
+    var ge_local_data="";
+        ge_local_data = JSON.parse(localStorage.getItem("access_data"));
+    var accessToken=ge_local_data.access_token;
+
+    jQuery.ajax({
+        url:'/api/v1/shareontimeline/',
+        type:"POST",
+        headers: {
+          'Authorization':'Bearer '+accessToken,
+        },
+        data:{topic_id:topicId,share_on:shareType},
+        success: function(response,textStatus, xhr){
+            window.open(shareURL, '_blank');
+            $('.smenu').toggleClass('share');
+
+        },
+        error: function(jqXHR, textStatus, errorThrown){
+          //$("form#optForm")[0].reset();
+          jQuery(".commentErrorStatus").html('<span style="color:red;">Please Try Again...</span>').fadeOut(8000);
+          console.log(textStatus + ": " + jqXHR.status + " " + errorThrown);
+        }
+
+
+    });
+}
+
+
+  function UReactionLinkLanding(topicId){
+      //var totalLikeCount= $('#totalLikeCount').val();
+      var likeStatus=jQuery('#UReactionLinkLanding-'+topicId).hasClass('liked');
+      var topicId=topicId;
+      if(likeStatus==false){
+         var loginStatus= check_login_status();
+         if(loginStatus==false){         
+            document.getElementById('gotoLoginPage').click();
+         }
+         var likeStatus=jQuery('.sp_ddXiTdIB8vm').hasClass('sx_44a25c');
+         if(likeStatus==true){
+              jQuery('.sp_ddXiTdIB8vm').removeClass('sx_44a25c');
+              jQuery('.sp_ddXiTdIB8vm').addClass('sx_44a25d');
+         }
+ 
+          jQuery('#UReactionLinkLanding-'+topicId).addClass('liked');
+          
+          if(totalLikeCount<999){
+              totalLikeCount = Number(totalLikeCount)+1;
+              $("#likeCountId").html(totalLikeCount);
+              $('#totalLikeCount').val(totalLikeCount);
+
+          }
+          
+           var statusLike= updateUserLikeStatus(topicId);
+           var likeStatus= $('#path-'+topicId).hasClass('liked');
+           if(likeStatus){
+                $('#path-'+topicId).css({ fill: "#ccc" });
+           }else{
+                $('#path-'+topicId).css({ fill: "#ff0000" });
+           }
+         
+      }else{
+         jQuery('#UReactionLinkLanding-'+topicId).removeClass('liked');
+         var statusUnLike=updateUserLikeStatus(topicId);
+         var likeStatus=jQuery('.sp_ddXiTdIB8vm').hasClass('sx_44a25d');
+         if(likeStatus==true){
+              jQuery('.sp_ddXiTdIB8vm').removeClass('sx_44a25d');
+              jQuery('.sp_ddXiTdIB8vm').addClass('sx_44a25c');
+              jQuery('#UReactionLinkLanding-'+topicId).removeClass('liked');
+              if(totalLikeCount>0 && totalLikeCount<999 ){
+                  totalLikeCount = Number(totalLikeCount)-1;
+                  $("#likeCountId").html(totalLikeCount);
+                  $('#totalLikeCount').val(totalLikeCount);
+              }
+         }
+
+      }
+
+      
+  }
+
+</script>
+
+
+
 <script type="text/javascript">
     
 var btnTop = $('#btnGoTop');

@@ -860,6 +860,13 @@ input:checked + .slider:before {
   ._4kny ._585-{
     display: none !important;
   }
+
+.userProfileIcon{
+    height: 50px;
+    padding: 6px 13px;
+    margin: 0px 0px;
+}
+
 </style>
 
     <div id="__next">
@@ -878,6 +885,9 @@ input:checked + .slider:before {
                 <a class="jsx-475503780" href="/{{LANGUAGE_CODE}}/trending/">Explore</a>
 
                 {% if user.is_authenticated %}
+
+                <a class="jsx-475503780 " href="/{{ user.username }}"><img src="/media/user.svg" class="userProfileIcon"></a>
+
                 {% else %}
                   <a href="/login/">Sign in</a>
                 {% endif %}
@@ -1071,40 +1081,37 @@ function onClickRedirect(pageName){
 }
 
 
-jQuery(document).ready(function($){
+// jQuery(document).ready(function($){
   
-var mobile = (/android|blackberry|mini|windows\sce|palm/i.test(navigator.userAgent.toLowerCase()));
-if (mobile) {
-    //alert("MOBILE DEVICE DETECTED");              
+// var mobile = (/android|blackberry|mini|windows\sce|palm/i.test(navigator.userAgent.toLowerCase()));
+// if (mobile) {
 
+//   window.onload = function (){
 
-
-  window.onload = function (){
-
-    $(".bts-popup").delay(1000).addClass('is-visible');
-  }
+//     $(".bts-popup").delay(1000).addClass('is-visible');
+//   }
   
-  //open popup
-  $('.bts-popup-trigger').on('click', function(event){
-    event.preventDefault();
-    $('.bts-popup').addClass('is-visible');
-  });
+//   //open popup
+//   $('.bts-popup-trigger').on('click', function(event){
+//     event.preventDefault();
+//     $('.bts-popup').addClass('is-visible');
+//   });
   
-  //close popup
-  $('.bts-popup').on('click', function(event){
-    if( $(event.target).is('.bts-popup-close') || $(event.target).is('.bts-popup') ) {
-      event.preventDefault();
-      $(this).removeClass('is-visible');
-    }
-  });
-  //close popup when clicking the esc keyboard button
-  $(document).keyup(function(event){
-      if(event.which=='27'){
-        $('.bts-popup').removeClass('is-visible');
-      }
-    });
-}
+//   //close popup
+//   $('.bts-popup').on('click', function(event){
+//     if( $(event.target).is('.bts-popup-close') || $(event.target).is('.bts-popup') ) {
+//       event.preventDefault();
+//       $(this).removeClass('is-visible');
+//     }
+//   });
+//   //close popup when clicking the esc keyboard button
+//   $(document).keyup(function(event){
+//       if(event.which=='27'){
+//         $('.bts-popup').removeClass('is-visible');
+//       }
+//     });
+// }
 
-});
+// });
 
 </script>
