@@ -31,7 +31,8 @@ post_update = Signal()
 
 class LastModifiedQueryset(models.query.QuerySet):
     def update(self, *args, **kwargs):
-        kwargs['last_modified'] = datetime.now()
+        if not kwargs.has_key('vb_score'):
+            kwargs['last_modified'] = datetime.now()
         return super(LastModifiedQueryset,self).update(*args, **kwargs)
 
 class RecordTimeStamp(models.Model):
