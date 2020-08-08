@@ -195,7 +195,9 @@ function videoItemsTemplate(itemVideoByte,totalCountVideo) {
         videoTitle=removeTags(itemVideoByte.title);
         content_title = videoTitle.substr(0, 10) + " ...";
 
-
+    var userShortName = itemVideoByte.user.userprofile.name;
+    var userShortNameq=removeTags(userShortName);
+        userShortNameq = userShortNameq.substr(0, 20) + " ...";
 
 
     var popularHashTagTemplateItems ='<div class="column " style="cursor: pointer;">\
@@ -206,7 +208,7 @@ function videoItemsTemplate(itemVideoByte,totalCountVideo) {
                                 <div class="card-body videoRowCardBody" style="">\
                                     <div>\
                                         <h5 class="title">'+content_title+'</h5>\
-                                        <p class="desc descByName">'+itemVideoByte.user.userprofile.name+'</p>\
+                                        <p class="desc descByName">'+userShortNameq+'</p>\
                                     </div>\
                                     <div style="display: inline-flex; justify-content: space-between;">\
                                         <div style="margin-right: 10px;">\

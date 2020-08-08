@@ -1131,12 +1131,17 @@ input#search-bar:focus:-ms-placeholder {
                                 </li>
 
                                 {% if user.is_authenticated %}
-                                  <a class="jsx-475503780 " href="/{{ user.username }}"><img src="/media/user.svg" class="userProfileIcon"></a>
+                                  <a class="jsx-475503780  userDetailsPageHide1" href="/{{ user.username }}"><img src="/media/user.svg" class="userProfileIcon"></a>
                                 {% else %}
                                 <li class="jsx-3143951235">
                                   <h2 class="menu-item-link1"><a href="/login/" class="jsx-2922828399">{% trans "Sign in" %}</a></h2>
                                 </li>
                                 {% endif %}
+
+                                <li class="jsx-3143951235  userDetailsPageShow1 hide">
+                                  <h2 class="menu-item-link1"><a href="/login/" class="jsx-2922828399">{% trans "Sign in" %}</a></h2>
+                                </li>
+
 
                                 <li class="hideOnMobile">
                                     <div class="_4kny _50tm">
@@ -1163,7 +1168,7 @@ input#search-bar:focus:-ms-placeholder {
                                 {% if user.is_authenticated %}
 
 
-                                <li class="jsx-3143951235" id="boloSideMenu">
+                                <li class="jsx-3143951235 userDetailsPageHide1" id="boloSideMenu">
 
                                     <span class="bolo-642826668 boloSideMenuClass hamburger-menu">
                                           <span class="bolo-642826668 hamburger-menu-wrapper">
@@ -1214,7 +1219,6 @@ input#search-bar:focus:-ms-placeholder {
                             <h3><a class="" href="/about/">{% trans "About" %}</a></h3>
                             <h3><a class="" href="/{{LANGUAGE_CODE}}/feed/" target="_blank">{% trans "Discover" %}</a></h3>
                             <h3><a class="" href="/{{LANGUAGE_CODE}}/trending/" target="_blank">{% trans "Trending" %}</a></h3>
-<!--                             <h3><a class="" href="/careers" target="_blank">{% trans "Careers" %}</a></h3> -->
                         </div>
 
 
