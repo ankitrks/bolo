@@ -416,7 +416,11 @@ function videoItemsTemplate(itemVideoByte,itemCount,indexCount) {
 function video_play_using_video_js_old(url,backup_url,image) {
     
     var video = document.getElementById('player');
-
+    var strUrl = url;
+    var backUrl = backup_url;
+    url = strUrl.replace("http://", "https://");
+    backup_url = backUrl.replace("http://", "https://");
+    
       if(Hls.isSupported()) {
         var hls = new Hls();
         hls.loadSource(backup_url);

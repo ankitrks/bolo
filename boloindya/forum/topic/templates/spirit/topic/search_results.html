@@ -958,6 +958,222 @@
 </style>
 
 
+<!-- New Card CSS -->
+
+<style type="text/css">
+    
+
+
+
+/* Create two equal columns that floats next to each other */
+.column {
+    float: left;
+    width: 32%;
+    padding: 3px;
+    height: auto;
+}
+.column1 {
+    float: left;
+    width: 33%;
+    padding: 3px 0px 10px 6px;
+    height: auto;
+}
+
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.card {
+    background: #ffffff;
+    box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.11);
+    border-radius: 2px;
+}
+
+.card img {
+    width: 100%;
+    height: 500px;
+}
+
+.header-container {
+    height: 75px !important;
+}
+
+.about-content .about-img4 {
+    position: relative;
+    width: 48%;
+    padding: 1% 0 0 1%;
+}
+
+.mainHeading {
+    font-style: normal;
+    font-weight: 500;
+    font-size: 40px;
+    line-height: 50px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #000000;
+}
+
+.rightTopHeading {
+    font-style: normal;
+    font-weight: normal;
+    font-size: 32px;
+    line-height: 44px;
+    display: flex;
+    margin-top: -82px;
+    align-items: center;
+    text-align: center;
+
+    color: #1b3042;
+}
+.downloadText {
+    font-style: normal;
+    font-weight: 500;
+    font-size: 90px;
+    line-height: 112px;
+    display: inherit;
+    align-items: center;
+    text-align: center;
+    color: #1b3042;
+}
+.textalign_center {
+    text-align: center;
+    margin-top: 30px;
+}
+.mobile1Img {
+    position: absolute;
+    width: 328.76px;
+    height: 687.97px;
+    left: 204px;
+    top: 0%;
+}
+.mobile2Img {
+    position: absolute;
+    width: 328.76px;
+    height: 687.97px;
+    left: 276.04px;
+    top: 7%;
+}
+.mobile_bottom {
+    position: absolute;
+    width: 372px;
+    height: 14px;
+    left: 264px;
+    top: 100%;
+    background: radial-gradient(58.63% 50% at 50% 50%, rgba(0, 0, 0, 0.57) 0%, rgba(0, 0, 0, 0) 100%);
+    filter: blur(7px);
+}
+
+/*============================End=========================*/
+
+/*New layout media query*/
+
+@media (max-width: 991px) {
+    .mainHeader .navbar nav .get-started-btn {
+        background: #b62827;
+        color: #fff;
+        border-radius: 100px;
+        padding: 5px 16px 5px 9px;
+        margin-right: 10px;
+    }
+    .header-container .header-content {
+        padding: 0 0px;
+    }
+
+    .mainHeader .navbar {
+        padding: 0px 0px 0px 0px;
+    }
+
+    .mainHeader .navbar nav {
+        width: 70%;
+        display: flex;
+    }
+    .hideOnMobileSite {
+        display: none !important;
+    }
+.column {
+    float: left;
+    width: 100%;
+    padding: 14px 5px 4px 26px;
+    height: auto;
+}
+    
+}
+
+/*End*/
+
+
+</style>
+<!-- End -->
+<style type="text/css">
+    .min-span-height{
+        max-height: 588px;
+        min-height: 588px;
+    }
+    .videoCentered{
+        height: 370px !important;
+    }
+    .videoCentered1{
+        height: 140px !important;
+    }
+    .videoRowCardBody{
+        min-height: 60px;
+    }
+
+.videoRowCardBody1{
+    min-height: 20px;
+}
+
+
+.videoRowCardBody {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+._explore_feed_header{
+    height: 33px;
+}
+
+.trendingVideoOfTheDay{
+    font-family: Sailec;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 20px;
+    display: flex;
+    align-items: center;
+    color: #B62827;
+}
+.share-layout{
+    width: 95%;
+}
+
+.viewCounterCss{
+    font-style: normal;
+    font-size: 8px;
+    line-height: 19px;
+    display: flex;
+    align-items: center;
+    color: #7d7d7d;
+}
+.viewCounterCssBig{
+    font-style: normal;
+    font-size: 10px;
+    line-height: 19px;
+    display: flex;
+    align-items: center;
+    color: #7d7d7d;
+}
+</style>
+
+
+<!--    end   -->
+
+
 <div style="background: #f8f8f8;background-image: url(/media/background_eclipse.png);">
 
 <section id="home-page-programs" devicetype="desktop" class="HomePage__Programs mt-36 pb-96 ">
@@ -1287,32 +1503,76 @@ function getAllResult(){
 }
 
 
-function getVideoItemSolr(videoItem,itemCount){
+function getVideoItemSolr(itemVideoByte,itemCount){
           var content_title="";
           var videoTitle="";
-              videoTitle=removeTags(videoItem.title);
-              content_title = videoTitle.substr(0, 40) + " ..."
-    var userVideoItem = '<div class="jsx-1410658769 video-feed-item">\
-            <div class="jsx-1410658769 _ratio_">\
-                <div class="jsx-1410658769" style="padding-top: 148.438%;">\
-                    <div class="jsx-1410658769 _ratio_wrapper">\
-                        <a onClick="openVideoInPopup(\''+videoItem.video_cdn+'\',\''+videoItem.question_image+'\','+itemCount+');" href="javascript:void(0)"  class="jsx-2893588005 video-feed-item-wrapper">\
-                            <div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+videoItem.question_image+');">\
-                                <div class="jsx-3077367275 video-card default">\
-                                    <div class="jsx-3077367275 video-card-mask">\
-                                        <div class="jsx-1543915374 card-footer normal no-avatar">\
-                                            <div class="jsx-1543915374"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+videoItem.view_count+'</span></p><span class="_video_card_footer_likes2"><img src="/media/download.svg" alt="likes"> '+videoItem.likes_count+'</span></div>\
+              videoTitle=removeTags(itemVideoByte.title);
+              content_title = videoTitle.substr(0, 20) + " ...";
+
+
+
+    var popularHashTagTemplateItems ='<div class="column " style="cursor: pointer;">\
+                            <div class="card"  style="background-color: #fff; padding: 20px;">\
+                            <a target="_blank" href="/explore/'+itemVideoByte.slug+'/'+itemVideoByte.id+'" >\
+                            <span id="video_play_item_'+itemVideoByte.id+'" class="min-span-height">\
+                                <img  id="player-'+itemVideoByte.id+'" src="'+itemVideoByte.question_image+'" class="videoCentered videoSliderPlay">\
+                            </span>\
+                            </a>\
+                                <div class="card-body videoRowCardBody" style="">\
+                                    <div>\
+                                        <h5 class="title">'+content_title+'</h5>\
+                                        <p class="desc descByName">'+itemVideoByte.user.userprofile.name+'</p>\
+                                    </div>\
+                                    <div style="display: inline-flex; justify-content: space-between;">\
+                                        <div style="margin-right: 10px;">\
+                                            <a href="#">\
+                                                <svg width="24" height="24" viewBox="0 0 26 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 0.720001C4.4707 0.720001 0 7.0016 0 8C0 8.9958 4.4707 15.28 13 15.28C21.528 15.28 26 8.9958 26 8C26 7.0016 21.528 0.720001 13 0.720001ZM13 13.5991C9.8085 13.5991 7.2215 11.0927 7.2215 8C7.2215 4.9073 9.8085 2.3983 13 2.3983C16.1915 2.3983 18.7772 4.9073 18.7772 8C18.7772 11.0927 16.1915 13.5991 13 13.5991ZM13 8C12.4709 7.4189 13.8619 5.1998 13 5.1998C11.4036 5.1998 10.1101 6.4543 10.1101 8C10.1101 9.5457 11.4036 10.8002 13 10.8002C14.5951 10.8002 15.8899 9.5457 15.8899 8C15.8899 7.2889 13.4498 8.4927 13 8Z" fill="#545454"></path></svg>\
+                                            </a>\
+                                            <span class="viewCounterCssBig">'+itemVideoByte.view_count+'</span>\
+                                        </div>\
+                                        <div style="margin-right: 10px;">\
+                                            <a href="javascript:void(0);" onclick="UReactionLinkLanding('+itemVideoByte.id+');">\
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\
+                                                    <path class="likeStatusNotUpdate" id="path-'+itemVideoByte.id+'" d="M17 4.5C14.9 4.5 13.05 5.55 12 7.2C10.95 5.55 9.1 4.5 7 4.5C3.7 4.5 1 7.2 1 10.5C1 16.45 12 22.5 12 22.5C12 22.5 23 16.5 23 10.5C23 7.2 20.3 4.5 17 4.5Z" fill="#ccc"></path>\
+                                                </svg>\
+                                            </a>\
+                                            <span class="viewCounterCssBig">'+itemVideoByte.likes_count+'</span>\
+                                        </div>\
+                                        <div>\
+                                            <a href="javascript:void(0)" onclick="shareOpenAndHide('+itemVideoByte.id+',\''+content_title+'\',\''+itemVideoByte.user.userprofile.name+'\');">\
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\
+                                                    <path d="M3 12C3 13.654 4.346 15 6 15C6.794 15 7.512 14.685 8.049 14.18L14.04 17.604C14.022 17.734 14 17.864 14 18C14 19.654 15.346 21 17 21C18.654 21 20 19.654 20 18C20 16.346 18.654 15 17 15C16.206 15 15.488 15.315 14.951 15.82L8.96 12.397C8.978 12.266 9 12.136 9 12C9 11.864 8.978 11.734 8.96 11.603L14.951 8.18C15.488 8.685 16.206 9 17 9C18.654 9 20 7.654 20 6C20 4.346 18.654 3 17 3C15.346 3 14 4.346 14 6C14 6.136 14.022 6.266 14.04 6.397L8.049 9.82C7.496 9.29468 6.76273 9.00123 6 9C4.346 9 3 10.346 3 12Z" fill="#545454"></path>\
+                                                </svg>\
+                                            </a>\
+                                            <span class="viewCounterCssBig">'+itemVideoByte.share_count+'</span>\
                                         </div>\
                                     </div>\
                                 </div>\
                             </div>\
-                        </a>\
-                    </div>\
-                </div>\
-            </div>\
-        </div>';
+                        </div>';
 
-        return userVideoItem;
+
+    // var userVideoItem = '<div class="jsx-1410658769 video-feed-item">\
+    //         <div class="jsx-1410658769 _ratio_">\
+    //             <div class="jsx-1410658769" style="padding-top: 148.438%;">\
+    //                 <div class="jsx-1410658769 _ratio_wrapper">\
+    //                     <a onClick="openVideoInPopup(\''+videoItem.video_cdn+'\',\''+videoItem.question_image+'\','+itemCount+');" href="javascript:void(0)"  class="jsx-2893588005 video-feed-item-wrapper">\
+    //                         <div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+videoItem.question_image+');">\
+    //                             <div class="jsx-3077367275 video-card default">\
+    //                                 <div class="jsx-3077367275 video-card-mask">\
+    //                                     <div class="jsx-1543915374 card-footer normal no-avatar">\
+    //                                         <div class="jsx-1543915374"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+videoItem.view_count+'</span></p><span class="_video_card_footer_likes2"><img src="/media/download.svg" alt="likes"> '+videoItem.likes_count+'</span></div>\
+    //                                     </div>\
+    //                                 </div>\
+    //                             </div>\
+    //                         </div>\
+    //                     </a>\
+    //                 </div>\
+    //             </div>\
+    //         </div>\
+    //     </div>';
+
+        return popularHashTagTemplateItems;
 }
 
 
@@ -2139,32 +2399,76 @@ function loadMoreData(NextPageUrl){
 
 
 
-function getVideoItem(videoItem,itemCount){
+function getVideoItem(itemVideoByte,itemCount){
+
           var content_title="";
           var videoTitle="";
-              videoTitle=removeTags(videoItem.title);
-              content_title = videoTitle.substr(0, 40) + " ..."
-    var userVideoItem = '<div class="jsx-1410658769 video-feed-item">\
-            <div class="jsx-1410658769 _ratio_">\
-                <div class="jsx-1410658769" style="padding-top: 148.438%;">\
-                    <div class="jsx-1410658769 _ratio_wrapper">\
-                        <a href="/explore/'+videoItem.slug+'/'+videoItem.id+'"  class="jsx-2893588005 video-feed-item-wrapper">\
-                            <div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+videoItem.question_image+');">\
-                                <div class="jsx-3077367275 video-card default">\
-                                    <div class="jsx-3077367275 video-card-mask">\
-                                        <div class="jsx-1543915374 card-footer normal no-avatar">\
-                                            <div class="jsx-1543915374"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+videoItem.view_count+'</span></p><span class="_video_card_footer_likes2"><img src="/media/download.svg" alt="likes"> '+videoItem.likes_count+'</span></div>\
+              videoTitle=removeTags(itemVideoByte.title);
+              content_title = videoTitle.substr(0, 20) + " ...";
+
+
+    var popularHashTagTemplateItems ='<div class="column " style="cursor: pointer;">\
+                            <div class="card"  style="background-color: #fff; padding: 20px;">\
+                            <a target="_blank" href="/explore/'+itemVideoByte.slug+'/'+itemVideoByte.id+'" >\
+                            <span id="video_play_item_'+itemVideoByte.id+'" class="min-span-height">\
+                                <img  id="player-'+itemVideoByte.id+'" src="'+itemVideoByte.question_image+'" class="videoCentered videoSliderPlay">\
+                            </span>\
+                            </a>\
+                                <div class="card-body videoRowCardBody" style="">\
+                                    <div>\
+                                        <h5 class="title">'+content_title+'</h5>\
+                                        <p class="desc descByName">'+itemVideoByte.user.userprofile.name+'</p>\
+                                    </div>\
+                                    <div style="display: inline-flex; justify-content: space-between;">\
+                                        <div style="margin-right: 10px;">\
+                                            <a href="#">\
+                                                <svg width="24" height="24" viewBox="0 0 26 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 0.720001C4.4707 0.720001 0 7.0016 0 8C0 8.9958 4.4707 15.28 13 15.28C21.528 15.28 26 8.9958 26 8C26 7.0016 21.528 0.720001 13 0.720001ZM13 13.5991C9.8085 13.5991 7.2215 11.0927 7.2215 8C7.2215 4.9073 9.8085 2.3983 13 2.3983C16.1915 2.3983 18.7772 4.9073 18.7772 8C18.7772 11.0927 16.1915 13.5991 13 13.5991ZM13 8C12.4709 7.4189 13.8619 5.1998 13 5.1998C11.4036 5.1998 10.1101 6.4543 10.1101 8C10.1101 9.5457 11.4036 10.8002 13 10.8002C14.5951 10.8002 15.8899 9.5457 15.8899 8C15.8899 7.2889 13.4498 8.4927 13 8Z" fill="#545454"></path></svg>\
+                                            </a>\
+                                            <span class="viewCounterCssBig">'+itemVideoByte.view_count+'</span>\
+                                        </div>\
+                                        <div style="margin-right: 10px;">\
+                                            <a href="javascript:void(0);" onclick="UReactionLinkLanding('+itemVideoByte.id+');">\
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\
+                                                    <path class="likeStatusNotUpdate" id="path-'+itemVideoByte.id+'" d="M17 4.5C14.9 4.5 13.05 5.55 12 7.2C10.95 5.55 9.1 4.5 7 4.5C3.7 4.5 1 7.2 1 10.5C1 16.45 12 22.5 12 22.5C12 22.5 23 16.5 23 10.5C23 7.2 20.3 4.5 17 4.5Z" fill="#ccc"></path>\
+                                                </svg>\
+                                            </a>\
+                                            <span class="viewCounterCssBig">'+itemVideoByte.likes_count+'</span>\
+                                        </div>\
+                                        <div>\
+                                            <a href="javascript:void(0)" onclick="shareOpenAndHide('+itemVideoByte.id+',\''+content_title+'\',\''+itemVideoByte.user.userprofile.name+'\');">\
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\
+                                                    <path d="M3 12C3 13.654 4.346 15 6 15C6.794 15 7.512 14.685 8.049 14.18L14.04 17.604C14.022 17.734 14 17.864 14 18C14 19.654 15.346 21 17 21C18.654 21 20 19.654 20 18C20 16.346 18.654 15 17 15C16.206 15 15.488 15.315 14.951 15.82L8.96 12.397C8.978 12.266 9 12.136 9 12C9 11.864 8.978 11.734 8.96 11.603L14.951 8.18C15.488 8.685 16.206 9 17 9C18.654 9 20 7.654 20 6C20 4.346 18.654 3 17 3C15.346 3 14 4.346 14 6C14 6.136 14.022 6.266 14.04 6.397L8.049 9.82C7.496 9.29468 6.76273 9.00123 6 9C4.346 9 3 10.346 3 12Z" fill="#545454"></path>\
+                                                </svg>\
+                                            </a>\
+                                            <span class="viewCounterCssBig">'+itemVideoByte.share_count+'</span>\
                                         </div>\
                                     </div>\
                                 </div>\
                             </div>\
-                        </a>\
-                    </div>\
-                </div>\
-            </div>\
-        </div>';
+                        </div>';
 
-        return userVideoItem;
+
+    // var userVideoItem = '<div class="jsx-1410658769 video-feed-item">\
+    //         <div class="jsx-1410658769 _ratio_">\
+    //             <div class="jsx-1410658769" style="padding-top: 148.438%;">\
+    //                 <div class="jsx-1410658769 _ratio_wrapper">\
+    //                     <a href="/explore/'+videoItem.slug+'/'+videoItem.id+'"  class="jsx-2893588005 video-feed-item-wrapper">\
+    //                         <div class="jsx-1464109409 image-card" style="border-radius: 4px; background-image: url('+videoItem.question_image+');">\
+    //                             <div class="jsx-3077367275 video-card default">\
+    //                                 <div class="jsx-3077367275 video-card-mask">\
+    //                                     <div class="jsx-1543915374 card-footer normal no-avatar">\
+    //                                         <div class="jsx-1543915374"><p class="video_card_title">'+content_title+'</p><p><span class="_video_card_footer_likes">'+videoItem.view_count+'</span></p><span class="_video_card_footer_likes2"><img src="/media/download.svg" alt="likes"> '+videoItem.likes_count+'</span></div>\
+    //                                     </div>\
+    //                                 </div>\
+    //                             </div>\
+    //                         </div>\
+    //                     </a>\
+    //                 </div>\
+    //             </div>\
+    //         </div>\
+    //     </div>';
+
+        return popularHashTagTemplateItems;
 }
 
 
@@ -2566,6 +2870,197 @@ $(".tabActiveStatus").click(function(e) {
 
 </script>
 
+
+<style type="text/css">
+    
+.descByName{
+    font-family: Sailec;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 34px;
+    display: flex;
+    align-items: center;
+
+    color: #B3B3B3;
+}
+
+.mask .outsharepanel .icontainer {
+    position: relative;
+    width: 100%;
+    text-align: center;
+    white-space: nowrap;
+    padding: 0px 24px 16px;
+}
+
+
+</style>
+
+<div class="boloindya-share openShareTabId shareOpenAndHideMobAndDesk hide">
+    <div class="jsx-2679382212 outshare mask share-transiton-enter-done">
+        <div class="jsx-2679382212 outsharepanel">
+            <div class="jsx-2679382212 title">{% trans "Share to" %}</div>
+            <div class="jsx-2679382212 icontainer">
+                <div class="platwrap" >
+                    <div onclick="copyShareLinkMobile();" class="platicon i-copylink" style="background-image: url(/media/copy.svg);"></div><span>{% trans "Copy Link" %}</span>
+                    <input readonly=""  class="jsx-1861775669 jsx-537314381 hide" id="shareInputboxMobile" value="https://www.boloindya.com/@karansingharoraofficial/video/6758860880575827202">
+                </div>
+
+<!--                 <div class="platwrap" onclick="social_share_main('facebook_share')">
+                    <div class="platicon i-facebook"  style="background-image: url(/media/facebook_mobile.svg);"></div><span> Facebook</span></div> -->
+                <div class="platwrap" onclick="social_share_main('twitter_share')">
+                    <div class="platicon i-twitter" style="background-image: url(/media/twitter_mobile.svg);"></div><span> Twitter</span></div>
+                <div class="platwrap" onclick="social_share_main('whatsapp_share')">
+                    <div class="platicon i-pinterest" style="background-image: url(/media/whatsapp.svg);"></div><span> Whatsapp</span></div>
+                <p class="linkCopies"></p>
+            </div>
+
+            <input type="hidden" name="topicId" id="topicId">
+            <input type="hidden" name="topicCreatorUsername" id="topicCreatorUsername">
+            <input type="hidden" name="topicCreatorTitle" id="topicCreatorTitle">
+
+
+            <div class="jsx-2679382212 btns">
+                <button class="jsx-2679382212 hideShareOnMobileAndDesktop">{% trans "Cancel" %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- List View Display Data -->
+
+
+<script type="text/javascript">
+    
+    $(".hideShareOnMobileAndDesktop").on('click',function(e){
+        var shareOpenAndHideMobAndDesk=$('.shareOpenAndHideMobAndDesk').hasClass('hide');
+        if(shareOpenAndHideMobAndDesk){
+            $('.shareOpenAndHideMobAndDesk').removeClass('hide');
+        }else{
+            $('.shareOpenAndHideMobAndDesk').addClass('hide');
+        }
+
+
+    });
+
+    function shareOpenAndHide(topicId,topicTitle,topicCreatorUsername) {
+
+        $("#topicId").val(topicId);
+        $("#topicCreatorTitle").val(topicCreatorTitle);
+        $("#topicCreatorUsername").val(topicCreatorUsername);
+
+        var shareOpenAndHideMobAndDesk=$('.shareOpenAndHideMobAndDesk').hasClass('hide');
+        if(shareOpenAndHideMobAndDesk){
+            $('.shareOpenAndHideMobAndDesk').removeClass('hide');
+        }else{
+            $('.shareOpenAndHideMobAndDesk').addClass('hide');
+        }
+    }
+
+
+function social_share_main(shareType){
+     var loginStatus= check_login_status();
+     if(loginStatus==false){
+        document.getElementById('gotoLoginPage').click();
+     }
+
+    var topicId=$("#topicID").val();
+    var topicCreatorUsername=$("#topicCreatorUsername").val();
+    var topicCreatorTitle=$("#topicCreatorUsername").val();
+
+    var shareURL="";
+    if(shareType=='facebook_share'){
+
+        shareURL='https://www.facebook.com/sharer/sharer.php?app_id=113869198637480&u='+site_base_url+topicCreatorUsername+'/'+topicId+'&display=popup&sdk=joey/';
+
+    }else if(shareType=='twitter_share'){
+
+        shareURL='https://twitter.com/intent/tweet?text='+topicCreatorTitle+'&url='+site_base_url+topicCreatorUsername+'/'+topicId+'/'
+    }else if(shareType=='whatsapp_share'){
+        shareURL='https://api.whatsapp.com/send?text='+site_base_url+topicCreatorUsername+'/'+topicId+'/';
+    }
+
+
+    var ge_local_data="";
+        ge_local_data = JSON.parse(localStorage.getItem("access_data"));
+    var accessToken=ge_local_data.access_token;
+
+    jQuery.ajax({
+        url:'/api/v1/shareontimeline/',
+        type:"POST",
+        headers: {
+          'Authorization':'Bearer '+accessToken,
+        },
+        data:{topic_id:topicId,share_on:shareType},
+        success: function(response,textStatus, xhr){
+            window.open(shareURL, '_blank');
+            $('.smenu').toggleClass('share');
+
+        },
+        error: function(jqXHR, textStatus, errorThrown){
+          //$("form#optForm")[0].reset();
+          jQuery(".commentErrorStatus").html('<span style="color:red;">Please Try Again...</span>').fadeOut(8000);
+          console.log(textStatus + ": " + jqXHR.status + " " + errorThrown);
+        }
+
+
+    });
+}
+
+
+  function UReactionLinkLanding(topicId){
+      //var totalLikeCount= $('#totalLikeCount').val();
+      var likeStatus=jQuery('#UReactionLinkLanding-'+topicId).hasClass('liked');
+      var topicId=topicId;
+      if(likeStatus==false){
+         var loginStatus= check_login_status();
+         if(loginStatus==false){         
+            document.getElementById('gotoLoginPage').click();
+         }
+         var likeStatus=jQuery('.sp_ddXiTdIB8vm').hasClass('sx_44a25c');
+         if(likeStatus==true){
+              jQuery('.sp_ddXiTdIB8vm').removeClass('sx_44a25c');
+              jQuery('.sp_ddXiTdIB8vm').addClass('sx_44a25d');
+         }
+ 
+          jQuery('#UReactionLinkLanding-'+topicId).addClass('liked');
+          
+          if(totalLikeCount<999){
+              totalLikeCount = Number(totalLikeCount)+1;
+              $("#likeCountId").html(totalLikeCount);
+              $('#totalLikeCount').val(totalLikeCount);
+
+          }
+          
+           var statusLike= updateUserLikeStatus(topicId);
+           var likeStatus= $('#path-'+topicId).hasClass('liked');
+           if(likeStatus){
+                $('#path-'+topicId).css({ fill: "#ccc" });
+           }else{
+                $('#path-'+topicId).css({ fill: "#ff0000" });
+           }
+         
+      }else{
+         jQuery('#UReactionLinkLanding-'+topicId).removeClass('liked');
+         var statusUnLike=updateUserLikeStatus(topicId);
+         var likeStatus=jQuery('.sp_ddXiTdIB8vm').hasClass('sx_44a25d');
+         if(likeStatus==true){
+              jQuery('.sp_ddXiTdIB8vm').removeClass('sx_44a25d');
+              jQuery('.sp_ddXiTdIB8vm').addClass('sx_44a25c');
+              jQuery('#UReactionLinkLanding-'+topicId).removeClass('liked');
+              if(totalLikeCount>0 && totalLikeCount<999 ){
+                  totalLikeCount = Number(totalLikeCount)-1;
+                  $("#likeCountId").html(totalLikeCount);
+                  $('#totalLikeCount').val(totalLikeCount);
+              }
+         }
+
+      }
+
+      
+  }
+
+</script>
 
 <!-- End Load Comments  -->
 {% endblock %}
