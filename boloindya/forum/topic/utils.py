@@ -14,7 +14,7 @@ from forum.user.models import UserProfile
 from django.db.models import F, Q
 import pandas as pd
 from django.conf import settings
-from datetime import datetime
+from datetime import datetime, timedelta
 
 def topic_viewed(request, topic):
     # Todo test detail views
@@ -191,7 +191,7 @@ def get_redis_hashtag_paginated_data(language_id, hashtag_id, page_no):
     if paginated_data and (str(page_no) in paginated_data.keys() or 'remaining' in paginated_data.keys()):
         if str(page_no) in paginated_data.keys():
             topic_ids = paginated_data[str(page_no)]['id_list']
-            topics = Topic.objects.filter(pk__in = topic_ids, is_removed = False)
+            topics = Topic.objects.filter(pk__in = topic_ids, is_removed = False).order_by('-vb_score')
         elif 'remaining' in paginated_data.keys():
             last_page_no = int(paginated_data['remaining']['last_page'])
             try:
@@ -199,7 +199,7 @@ def get_redis_hashtag_paginated_data(language_id, hashtag_id, page_no):
             except:
                 last_page_data = paginated_data[last_page_no]
             topics = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, \
-                    hash_tags__id = hashtag_id).exclude(id__in = last_page_data['id_list']).filter(vb_score__lte = last_page_data['scores'][-1])
+                    hash_tags__id = hashtag_id).exclude(id__in = last_page_data['id_list']).filter(vb_score__lte = last_page_data['scores'][-1]).order_by('-vb_score')
             new_page = page_no - last_page_no #(191-190)
             paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
             if paginator.num_pages >= new_page:
@@ -312,6 +312,9 @@ def new_algo_update_redis_paginated_data(key, query,trending = False, cache_max_
         cache_timespan = category_cache_timespan
         max_category_days_to_cache = settings.MAX_CATEGORY_DAYS_TO_CACHE
         max_time_limit_cache = max_category_days_to_cache
+    if 'hashtag' in key:
+        max_hastag_days_to_cache = settings.MAX_HASHTAG_DAYS_TO_CACHE
+        max_time_limit_cache = max_hastag_days_to_cache
 
     # print language_id, category_id, "############"
     page = 1
@@ -334,9 +337,7 @@ def new_algo_update_redis_paginated_data(key, query,trending = False, cache_max_
             while(page != None):
                 updated_df = temp_topics_df.query('id not in [' + ','.join(exclude_ids) + ']').drop_duplicates('user_id')\
                         .nlargest(items_per_page, 'vb_score', keep = 'last')
-                print updated_df
                 id_list = updated_df['id'].tolist()
-                print id_list
                 if len(id_list) >= min_count_per_page and page <= cache_max_pages:
                     exclude_ids.extend( map(str, id_list) )
                     if id_list:
