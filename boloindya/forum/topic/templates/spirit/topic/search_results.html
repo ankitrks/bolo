@@ -897,6 +897,16 @@
 }
 ._card_header_cover{
     background-image: var(--hashtag--background-image);
+    width: 116px;
+    height: 109px;
+    min-width: 55px;
+    margin-right: 20px;
+    background-size: cover;
+    cursor: pointer;
+    overflow: hidden;
+    background-repeat: no-repeat;
+    border-radius: 50%;
+
 }
 
 </style>
@@ -1180,7 +1190,6 @@
     <div class="active HomePage__Programs__filter__sticky">
         <div class="HomePage__Programs__filter HomePage__Programs__filter__all tabActiveStatus active" onclick="getAllResult();" id="searchAllId">{% trans "All" %}</div>
         <div class="HomePage__Programs__filter HomePage__Programs__filter__data tabActiveStatus" onclick="getVideoSearchResult();" id="searchVideosId">{% trans "Videos" %}</div>
-
         <div class="HomePage__Programs__filter HomePage__Programs-filter__management tabActiveStatus" onclick="getCreatorsResult();" id="searchUsersId">{% trans "Users" %}</div>
         <div class="HomePage__Programs__filter HomePage__Programs-filter__management tabActiveStatus" onclick="getSearchHashtagSuggestion();" id="searchHashTagId">{% trans "Hashtags" %}</div>
 
@@ -1345,6 +1354,13 @@
 <!-- Start Comments Section -->
 {% include "spirit/_video_play_and_comments.html" %}
 
+
+
+solr/search/top
+solr/search/hash_tag
+solr/search/user
+solr/search
+
 <script type="text/javascript">
 
     function searchClickMore(searchId){
@@ -1428,13 +1444,11 @@ function getAllResult(){
     //var uri='/api/v1/search/users/'+searchData;
     //var res = encodeURI(uri);
     var res = '/api/v1/solr/search/top/?term='+searchData;
-
-
     jQuery.ajax({
         url:res,
         type:"GET",
         data:{'language_id':language_id},
-        success: function(response,textStatus, xhr){
+        success: function(response,textStatus, xhr){debugger;
 
 
             //var responseData=JSON.parse(response);

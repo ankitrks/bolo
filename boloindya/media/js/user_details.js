@@ -404,6 +404,10 @@ function video_play_using_video_js(url,backup_url,image) {
     url = strUrl.replace("http://", "https://");
     backup_url = backUrl.replace("http://", "https://");
     
+    var posterImage = image.replace("http://", "https://");
+    image = posterImage.replace("http://", "https://");
+    video.poster = image;
+    
     fetch(url)
     .then(_ => {
       video.src = url;
@@ -473,7 +477,7 @@ function previousVideoPlay(){
     var image=singleItemData.question_image;
 
     video_play_using_video_js(file,video_backup,image);
-    $('.backgroundImg').css("background-image", "url(" + image + ")");
+    //$('.backgroundImg').css("background-image", "url(" + image + ")");
     if(current_video_play_index>0){
         $('.arrow-left').removeClass('hide');
     }else{
@@ -622,7 +626,7 @@ function nextVideoPlay(){debugger;
     var file=singleItemData.video_cdn;
     var image=singleItemData.question_image;
     video_play_using_video_js(file,video_backup,image);
-    $('.backgroundImg').css("background-image", "url(" + image + ")");
+    //$('.backgroundImg').css("background-image", "url(" + image + ")");
     if(current_video_play_index>0){
         $('.arrow-left').removeClass('hide');
     }else{
@@ -770,7 +774,7 @@ function nextVideoPlay(){debugger;
        profilePics= '/media/user.svg';
     }
 
-    $('.backgroundImg').css("background-image", "url(" + image + ")");
+    //$('.backgroundImg').css("background-image", "url(" + image + ")");
     if(current_video_play_index>0){
         $('.arrow-left').removeClass('hide');
     }else{

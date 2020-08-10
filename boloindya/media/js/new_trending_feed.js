@@ -291,6 +291,10 @@ function video_play_using_video_js(url,backup_url,image) {
     var backUrl = backup_url;
     url = strUrl.replace("http://", "https://");
     backup_url = backUrl.replace("http://", "https://");
+    var posterImage = image.replace("http://", "https://");
+    image = posterImage.replace("http://", "https://");
+    video.poster = image;
+
 
     fetch(url)
     .then(_ => {
@@ -361,7 +365,7 @@ function retryLiveStream(hls, url) {
         var image=singleItemData.question_image;
 
         video_play_using_video_js(file,video_backup,image);
-        $('.backgroundImg').css("background-image", "url(" + image + ")");
+        //$('.backgroundImg').css("background-image", "url(" + image + ")");
         if(current_video_play_index>0){
             $('.arrow-left').removeClass('hide');
         }else{
@@ -510,7 +514,7 @@ function retryLiveStream(hls, url) {
         var file=singleItemData.video_cdn;
         var image=singleItemData.question_image;
         video_play_using_video_js(file,video_backup,image);
-        $('.backgroundImg').css("background-image", "url(" + image + ")");
+        //$('.backgroundImg').css("background-image", "url(" + image + ")");
         if(current_video_play_index>0){
             $('.arrow-left').removeClass('hide');
         }else{
@@ -658,7 +662,7 @@ function retryLiveStream(hls, url) {
         var video_backup=singleItemData.question_video;
 
         video_play_using_video_js(file,video_backup,image);
-        $('.backgroundImg').css("background-image", "url(" + image + ")");
+        //$('.backgroundImg').css("background-image", "url(" + image + ")");
         if(current_video_play_index>0){
             $('.arrow-left').removeClass('hide');
         }else{

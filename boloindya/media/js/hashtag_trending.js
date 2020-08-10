@@ -450,6 +450,13 @@ function video_play_using_video_js_old(url,backup_url,image) {
 function video_play_using_video_js(url,backup_url,image) {
     
     var video = document.getElementById('player');
+    var strUrl = url;
+    var backUrl = backup_url;
+    url = strUrl.replace("http://", "https://");
+    backup_url = backUrl.replace("http://", "https://");
+    var posterImage = image.replace("http://", "https://");
+    image = posterImage.replace("http://", "https://");
+    video.poster = image;
 
     fetch(url)
     .then(_ => {
@@ -520,7 +527,7 @@ function previousVideoPlay(){
     var image=singleItemData.question_image;
 
     video_play_using_video_js(file,video_backup,image);
-    $('.backgroundImg').css("background-image", "url(" + image + ")");
+    //$('.backgroundImg').css("background-image", "url(" + image + ")");
     if(current_video_play_index>0){
         $('.arrow-left').removeClass('hide');
     }else{
@@ -669,7 +676,7 @@ function nextVideoPlay(){debugger;
     var file=singleItemData.video_cdn;
     var image=singleItemData.question_image;
     video_play_using_video_js(file,video_backup,image);
-    $('.backgroundImg').css("background-image", "url(" + image + ")");
+    //$('.backgroundImg').css("background-image", "url(" + image + ")");
     if(current_video_play_index>0){
         $('.arrow-left').removeClass('hide');
     }else{
@@ -800,7 +807,7 @@ function nextVideoPlay(){debugger;
  function openVideoInPopup(file,image,indexId){debugger;
   loaderShow();
   var singleItemData=[];
-    indexId=indexId-1;
+    indexId=indexId;
     $("#indexId").val(indexId);
     current_video_play_index=indexId;
      $('.videoPlayButton').removeClass('play-button');
@@ -816,7 +823,7 @@ function nextVideoPlay(){debugger;
     var video_backup=singleItemData.question_video;
     video_play_using_video_js(file,video_backup,image);
 
-    $('.backgroundImg').css("background-image", "url(" + image + ")");
+    //$('.backgroundImg').css("background-image", "url(" + image + ")");
     if(current_video_play_index>0){
         $('.arrow-left').removeClass('hide');
     }else{
