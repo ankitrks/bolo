@@ -1104,6 +1104,9 @@ input#search-bar:focus:-ms-placeholder {
   .bts-popup-container {
     margin: 8em auto;
   }
+
+
+
 }
 
 .userProfileIcon{
@@ -1111,6 +1114,24 @@ input#search-bar:focus:-ms-placeholder {
     padding: 6px 13px;
     margin: 0px 0px;
 }
+
+@media(max-width: 991px){
+  .getStartedButton a{
+      font-size: 8px;
+  }
+  .imgIconPro{
+    margin-top: 10px;
+  }
+
+
+}
+
+@media (max-width: 991px){
+.header-container .header-content {
+    padding: 6px 13px !important;
+}
+}
+
 
 </style>
 
@@ -1131,7 +1152,7 @@ input#search-bar:focus:-ms-placeholder {
                                 </li>
 
                                 {% if user.is_authenticated %}
-                                  <a class="jsx-475503780  userDetailsPageHide1" href="/{{ user.username }}"><img src="/media/user.svg" class="userProfileIcon"></a>
+                                  <a class="jsx-475503780 imgIconPro  userDetailsPageHide1" href="/{{ user.username }}"><img src="/media/user.svg" class="userProfileIcon"></a>
                                 {% else %}
                                 <li class="jsx-3143951235">
                                   <h2 class="menu-item-link1"><a href="/login/" class="jsx-2922828399">{% trans "Sign in" %}</a></h2>
@@ -1376,10 +1397,10 @@ if (mobile) {
 
 
 
-  // window.onload = function (){
+  window.onload = function (){
 
-  //   $(".bts-popup").delay(1000).addClass('is-visible');
-  // }
+    $(".bts-popup").delay(1000).addClass('is-visible');
+  }
   
   //open popup
   $('.bts-popup-trigger').on('click', function(event){

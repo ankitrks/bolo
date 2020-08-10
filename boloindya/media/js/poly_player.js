@@ -260,7 +260,7 @@ function retryLiveStream(hls, url) {
         var image=singleItemData.question_image;
 
         video_play_using_video_js(file,video_backup,image);
-        $('.backgroundImg').css("background-image", "url(" + image + ")");
+        //$('.backgroundImg').css("background-image", "url(" + image + ")");
         if(current_video_play_index>0){
             $('.arrow-left').removeClass('hide');
         }else{
@@ -409,7 +409,7 @@ function retryLiveStream(hls, url) {
         var file=singleItemData.video_cdn;
         var image=singleItemData.question_image;
         video_play_using_video_js(file,video_backup,image);
-        $('.backgroundImg').css("background-image", "url(" + image + ")");
+        //$('.backgroundImg').css("background-image", "url(" + image + ")");
         if(current_video_play_index>0){
             $('.arrow-left').removeClass('hide');
         }else{

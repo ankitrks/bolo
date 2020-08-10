@@ -154,7 +154,11 @@ function video_play_using_video_js(url,backup_url,image) {
     var backUrl = backup_url;
     url = strUrl.replace("http://", "https://");
     backup_url = backUrl.replace("http://", "https://");
-    
+
+    var posterImage = image.replace("http://", "https://");
+    image = posterImage.replace("http://", "https://");
+    video.poster = image;
+
     fetch(url)
     .then(_ => {
       video.src = url;
@@ -223,7 +227,7 @@ function openVideoInPopup(topicId){
 
     $("#previousVideoId").val(indexId);
     $("#nextVideoId").val(indexId);
-    $('.backgroundImg').css("background-image", "url(" + videoFileImage + ")");
+    //$('.backgroundImg').css("background-image", "url(" + videoFileImage + ")");
     if(current_video_play_index>0){
         $('.arrow-left').removeClass('hide');
     }else{
@@ -825,7 +829,7 @@ function getCreators(popularCreators){
         var image=singleItemData.question_image;
         $("#indexId").val(singleItemData.id);
         video_play_using_video_js(file,video_backup,image);
-        $('.backgroundImg').css("background-image", "url(" + image + ")");
+        //$('.backgroundImg').css("background-image", "url(" + image + ")");
         if(current_video_play_index>0){
             $('.arrow-left').removeClass('hide');
         }else{
@@ -975,7 +979,7 @@ function getCreators(popularCreators){
         var file=singleItemData.video_cdn;
         var image=singleItemData.question_image;
         video_play_using_video_js(file,video_backup,image);
-        $('.backgroundImg').css("background-image", "url(" + image + ")");
+        //$('.backgroundImg').css("background-image", "url(" + image + ")");
         if(current_video_play_index>0){
             $('.arrow-left').removeClass('hide');
         }else{
@@ -988,8 +992,6 @@ function getCreators(popularCreators){
             $('.arrow-right').removeClass('hide');
             $('.arrow-right').addClass('hide');
         }
-
-
           
         var shareURL=site_base_url+singleItemData.slug+'/'+singleItemData.id+'';
         var sideBarDetails='<div onClick="openMobileDownloadPopup();" class="jsx-2177493926 jsx-3813273378 avatar round" style="background-image: url(/media/musically_100x100.jpeg); width: 48px; height: 48px; flex: 0 0 48px;"></div><div class="jsx-949708032 boloindya-toolbar" style="margin-top: 20px;"><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-like" onClick="openMobileDownloadPopup();" style="background-image: url(/media/viewIcon.svg);"><span class="jsx-949708032">'+singleItemData.likes_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-comment" onClick="openMobileDownloadPopup();" style="background-image: url(/media/comments.svg);"><span class="jsx-949708032">'+singleItemData.comment_count+'</span></div><div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-share" onclick="openShareTab()" style="background-image: url(/media/share.svg);"><span class="jsx-949708032">'+singleItemData.total_share_count+'</span></div></div>';
