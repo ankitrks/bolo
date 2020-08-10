@@ -7,7 +7,7 @@ from datetime import datetime
 from redis_utils import * 
 from jarvis.models import FCMDevice
 from django.conf import settings 
-from forum.topic.utils import update_redis_hashtag_paginated_data, update_redis_paginated_data
+from forum.topic.utils import update_redis_hashtag_paginated_data, update_redis_paginated_data ,new_algo_update_redis_paginated_data
 
 def run():
     calculate_all_vb_score_and_set_post_in_redis()
@@ -38,7 +38,7 @@ def calculate_all_vb_score_and_set_post_in_redis():
                 inside_start = datetime.now()
                 key = 'cat:'+str(each_category.id)+':lang:'+str(each_language[0])
                 query = Topic.objects.filter(is_vb=True,is_removed=False,m2mcategory__id = each_category.id,language_id = each_language[0]).order_by('-vb_score','-id')
-                final_data = update_redis_paginated_data(key, query, settings.CACHE_MAX_PAGES)
+                final_data = new_algo_update_redis_paginated_data(key, query, trending = False)
                 # print final_data
                 end = datetime.now()
                 print 'Runtime: Category'+str(each_category.title)+' Language ' + str(each_language[1]) + ' is ' + str(end - inside_start)

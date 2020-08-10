@@ -486,12 +486,12 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
             score += get_ranking_feature_weight('normal_topic_share')*unique_share_count
             score += get_ranking_feature_weight('normal_topic_comment')*self.comment_count
 
-        post_time = (datetime.now() - self.created_at).total_seconds() #in hrs
-        if post_time > 1209600:
-            post_time = 1209600
-        post_time = post_time/3600
-        time_decay_constant = settings.TIME_DECAY_CONSTANT
-        score = round(((time_decay_constant**2)/((float(post_time)**2)+(time_decay_constant**2)))*score ,5) #10^10 is multplied to normailze the decimal value
+        # post_time = (datetime.now() - self.created_at).total_seconds() #in hrs
+        # if post_time > 1209600:
+        #     post_time = 1209600
+        # post_time = post_time/3600
+        # time_decay_constant = settings.TIME_DECAY_CONSTANT
+        # score = round(((time_decay_constant**2)/((float(post_time)**2)+(time_decay_constant**2)))*score ,5) #10^10 is multplied to normailze the decimal value
 
         threshold_value = self.get_threshold_value()
         if not self.is_popular and threshold_value and score > threshold_value:
