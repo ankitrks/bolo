@@ -163,6 +163,14 @@ function video_play_using_video_js(url,backup_url,image) {
     
     var video = document.getElementById('player');
 
+    var strUrl = url;
+    var backUrl = backup_url;
+    url = strUrl.replace("http://", "https://");
+    backup_url = backUrl.replace("http://", "https://");    
+    var posterImage = image.replace("http://", "https://");
+    image = posterImage.replace("http://", "https://");
+    video.poster = image;
+
     fetch(url)
     .then(_ => {
       video.src = url;
