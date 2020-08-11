@@ -323,38 +323,43 @@ def new_algo_update_redis_paginated_data(key, query,trending = False, cache_max_
     updated_df = {}
     exclude_ids = []
     topics_df = pd.DataFrame.from_records(query.values('id', 'user_id', 'vb_score','date'))
-    topics_df['date'] = pd.to_datetime(topics_df['date'])
+    if not topics_df.empty:
+        topics_df['date'] = pd.to_datetime(topics_df['date'])
     start_date = datetime.now()
     end_date = start_date - timedelta( hours = cache_timespan )
-    while(max_time_limit_cache > 0 ):
-        temp_final_data = {}
-        page = temp_page
-        mask = ((topics_df['date'] < pd.Timestamp(start_date)) & (topics_df['date'] > pd.Timestamp(end_date)))
-        temp_topics_df = topics_df.loc[mask]
-        if temp_topics_df.empty:
-            temp_final_data[page] = {'id_list' : [], 'scores' : []}
-        else:
-            while(page != None):
-                updated_df = temp_topics_df.query('id not in [' + ','.join(exclude_ids) + ']').drop_duplicates('user_id')\
-                        .nlargest(items_per_page, 'vb_score', keep = 'last')
-                id_list = updated_df['id'].tolist()
-                if len(id_list) >= min_count_per_page and page <= cache_max_pages:
-                    exclude_ids.extend( map(str, id_list) )
-                    if id_list:
-                        temp_final_data[page] = { 'id_list' : id_list, 'scores' : updated_df['vb_score'].tolist() }
-                        page += 1
-                        temp_page +=1
+    if not topics_df.empty:
+        while(max_time_limit_cache > 0 ):
+            temp_final_data = {}
+            temp_topics_df = pd.DataFrame(columns=['id', 'user_id', 'vb_score','date'])
+            page = temp_page
+            mask = ((topics_df['date'] < pd.Timestamp(start_date)) & (topics_df['date'] > pd.Timestamp(end_date)))
+            temp_topics_df = topics_df.loc[mask]
+            if not temp_topics_df.empty:
+                while(page != None):
+                    updated_df = temp_topics_df.query('id not in [' + ','.join(exclude_ids) + ']').drop_duplicates('user_id')\
+                            .nlargest(items_per_page, 'vb_score', keep = 'last')
+                    id_list = updated_df['id'].tolist()
+                    if len(id_list) >= min_count_per_page and page <= cache_max_pages:
+                        exclude_ids.extend( map(str, id_list) )
+                        if id_list:
+                            temp_final_data[page] = { 'id_list' : id_list, 'scores' : updated_df['vb_score'].tolist() }
+                            page += 1
+                            temp_page +=1
+                        else:
+                            page = None
                     else:
                         page = None
-                else:
-                    page = None
-        max_time_limit_cache-=1
-        start_date = end_date
-        end_date = start_date - timedelta( hours = cache_timespan )
+            max_time_limit_cache-=1
+            start_date = end_date
+            end_date = start_date - timedelta( hours = cache_timespan )
+            final_data.update(temp_final_data)
+    else topics_df.empty:
+        temp_final_data = {}
+        temp_final_data[page] = {'id_list' : [], 'scores' : []}
         final_data.update(temp_final_data)
 
     remaining_count = len(topics_df) - len(exclude_ids) - len(updated_df)
-    if remaining_count <= items_per_page * extra_pages_beyond_max_pages:
+    if remaining_count > 0 and remaining_count <= items_per_page * extra_pages_beyond_max_pages:
         page = temp_page
         remaining_page_no = (remaining_count / items_per_page) + 1
         if (remaining_count % items_per_page) > 0:
