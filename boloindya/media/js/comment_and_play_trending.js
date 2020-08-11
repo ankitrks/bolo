@@ -342,7 +342,7 @@ $("#submit-button").click(function(){
             'Authorization':'Bearer '+accessToken,
           },
           data:{topic_id:topic_id},
-          success: function(response,textStatus, xhr){debugger;
+          success: function(response,textStatus, xhr){
               console.log(response);
               if(response=='liked'){
                 return true;

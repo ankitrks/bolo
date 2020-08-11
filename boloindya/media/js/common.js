@@ -263,6 +263,16 @@ function copyShareLinkMobile() {
 
 }
 
+function copyShareLinkMobileProfile() {
+  var copyText = document.getElementById("shareInputboxProfile");
+  copyText.select();
+  copyText.setSelectionRange(0, 99999)
+  document.execCommand("copy");
+  jQuery('.linkCopiesProfile').html('<span style="color:green">Profile Link Copied...</span>').fadeOut(2000);
+
+}
+
+
 function copyShareLinkMobileLink() {
   //var copyText = $("#shareInputboxMobileSingle").val();
 

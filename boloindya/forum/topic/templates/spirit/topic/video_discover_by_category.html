@@ -678,7 +678,7 @@ video.jsx-3382097194 {
             <div class="jsx-2679382212 icontainer">
                 <div class="platwrap" >
                     <div onclick="copyShareLinkMobile();" class="platicon i-copylink" style="background-image: url(/media/copy.svg);"></div><span>{% trans "Copy Link" %}</span>
-                    <input readonly=""  class="jsx-1861775669 jsx-537314381 hide" id="shareInputboxMobile" value="https://www.boloindya.com/@karansingharoraofficial/video/6758860880575827202">
+                    <input readonly=""  class="jsx-1861775669 jsx-537314381" style="background: #f6f6f6;border: none;color: #f7f7f7;font-size: 1px;" id="shareInputboxMobile" value="https://www.boloindya.com/@karansingharoraofficial/video/6758860880575827202">
                 </div>
 
 <!--                 <div class="platwrap" onclick="social_share_main('facebook_share')">
@@ -693,6 +693,7 @@ video.jsx-3382097194 {
             <input type="hidden" name="topicId" id="topicId">
             <input type="hidden" name="topicCreatorUsername" id="topicCreatorUsername">
             <input type="hidden" name="topicCreatorTitle" id="topicCreatorTitle">
+            <input type="hidden" name="topicSlugTitle" id="topicSlugTitle">
 
 
             <div class="jsx-2679382212 btns">
@@ -718,11 +719,14 @@ video.jsx-3382097194 {
 
     });
 
-    function shareOpenAndHide(topicId,topicTitle,topicCreatorUsername) {
+    function shareOpenAndHide(topicId,topicTitle,topicCreatorUsername,slug) {
 
         $("#topicId").val(topicId);
         $("#topicCreatorTitle").val(topicCreatorTitle);
         $("#topicCreatorUsername").val(topicCreatorUsername);
+        $("#topicSlugTitle").val(slug);
+        var copyLinkData =site_base_url+slug+'/'+topicId+'/';
+        $("#shareInputboxMobile").val(copyLinkData);
 
         var shareOpenAndHideMobAndDesk=$('.shareOpenAndHideMobAndDesk').hasClass('hide');
         if(shareOpenAndHideMobAndDesk){
@@ -739,20 +743,23 @@ function social_share_main(shareType){
         document.getElementById('gotoLoginPage').click();
      }
 
-    var topicId=$("#topicID").val();
+    var topicId=$("#topicId").val();
     var topicCreatorUsername=$("#topicCreatorUsername").val();
     var topicCreatorTitle=$("#topicCreatorUsername").val();
+    var topicSlugTitle=$("#topicSlugTitle").val();
+
+    var shareCopyLinkData =site_base_url+topicSlugTitle+'/'+topicId+'/';
 
     var shareURL="";
     if(shareType=='facebook_share'){
 
-        shareURL='https://www.facebook.com/sharer/sharer.php?app_id=113869198637480&u='+site_base_url+topicCreatorUsername+'/'+topicId+'&display=popup&sdk=joey/';
+        shareURL='https://www.facebook.com/sharer/sharer.php?app_id=113869198637480&u='+shareCopyLinkData+'&display=popup&sdk=joey/';
 
     }else if(shareType=='twitter_share'){
 
-        shareURL='https://twitter.com/intent/tweet?text='+topicCreatorTitle+'&url='+site_base_url+topicCreatorUsername+'/'+topicId+'/'
+        shareURL='https://twitter.com/intent/tweet?text='+topicCreatorTitle+'&url='+shareCopyLinkData;
     }else if(shareType=='whatsapp_share'){
-        shareURL='https://api.whatsapp.com/send?text='+site_base_url+topicCreatorUsername+'/'+topicId+'/';
+        shareURL='https://api.whatsapp.com/send?text='+shareCopyLinkData;
     }
 
 
