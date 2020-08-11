@@ -427,7 +427,7 @@ function listCommentsById(singleTopicData){
 function loadMoreComments(nextPageURl){
     loaderBoloShowDynamic('_scroll_load_more_loading_comment');
     if(nextPageURl=='null'){
-        var loadMoreComment='<span class="loadMoreComment">No more comment</span';
+        var loadMoreComment='<span class="loadMoreComment"></span';
         $(".loadMoreComments").html(loadMoreComment);
         loaderBoloHideDynamic('_scroll_load_more_loading_comment');
         return false;
@@ -497,7 +497,7 @@ function getHashTagList(){
 
     loaderBoloShowDynamic('_scroll_load_more_loading_right');
     loaderBoloShowDynamic('_scroll_load_more_loading_left');
-        var playListData=[]; 
+    var playListData=[]; 
     var platlistItems;
 
     var listItems="";
@@ -1209,7 +1209,10 @@ function getPopularHashTagItems(itemVideoByte) {
     var videoTitle="";
         videoTitle=removeTags(itemVideoByte.title);
         content_title = videoTitle.substr(0, 10) + " ..."
+    var userName= '';
 
+        userName=removeTags(itemVideoByte.user.userprofile.name);
+        userName = userName.substr(0, 10) + " ..."
 
     var popularHashTagTemplateItems ='<div class="column " style="cursor: pointer;">\
                             <div class="card"  style="background-color: #fff; padding: 20px;">\
@@ -1219,7 +1222,7 @@ function getPopularHashTagItems(itemVideoByte) {
                                 <div class="card-body videoRowCardBody" style="">\
                                     <div>\
                                         <h5 class="title">'+content_title+'</h5>\
-                                        <p class="desc descByName">'+itemVideoByte.user.userprofile.name+'</p>\
+                                        <p class="desc descByName"><a class="descByName" href="/'+itemVideoByte.user.username+'">'+userName+'</a></p>\
                                     </div>\
                                     <div style="display: inline-flex; justify-content: space-between;">\
                                         <div style="margin-right: 10px;">\
@@ -1237,7 +1240,7 @@ function getPopularHashTagItems(itemVideoByte) {
                                             <span class="viewCounterCssBig">'+itemVideoByte.likes_count+'</span>\
                                         </div>\
                                         <div>\
-                                            <a href="javascript:void(0)" onclick="shareOpenAndHide('+itemVideoByte.id+',\''+content_title+'\',\''+itemVideoByte.user.userprofile.name+'\');">\
+                                            <a href="javascript:void(0)" onclick="shareOpenAndHide('+itemVideoByte.id+',\''+content_title+'\',\''+itemVideoByte.user.userprofile.name+'\',\''+itemVideoByte.slug+'\');">\
                                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\
                                                     <path d="M3 12C3 13.654 4.346 15 6 15C6.794 15 7.512 14.685 8.049 14.18L14.04 17.604C14.022 17.734 14 17.864 14 18C14 19.654 15.346 21 17 21C18.654 21 20 19.654 20 18C20 16.346 18.654 15 17 15C16.206 15 15.488 15.315 14.951 15.82L8.96 12.397C8.978 12.266 9 12.136 9 12C9 11.864 8.978 11.734 8.96 11.603L14.951 8.18C15.488 8.685 16.206 9 17 9C18.654 9 20 7.654 20 6C20 4.346 18.654 3 17 3C15.346 3 14 4.346 14 6C14 6.136 14.022 6.266 14.04 6.397L8.049 9.82C7.496 9.29468 6.76273 9.00123 6 9C4.346 9 3 10.346 3 12Z" fill="#545454"></path>\
                                                 </svg>\

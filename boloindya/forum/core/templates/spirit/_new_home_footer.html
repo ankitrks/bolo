@@ -73,7 +73,7 @@
     color: #ffffff;
 }
 .marginAndPadding{
-    margin: 20px;
+    margin: 34px;
     padding: 30px;
 }
 .socialImageSize {
@@ -101,6 +101,15 @@ line-height: 24px;
 }
 .header-container{
     border-bottom: 0px solid rgba(34,90,89,0.2);s
+}
+.onHoverRemove::after{
+    content: '';
+    text-decoration: none;
+    border-bottom: 0px solid !important;
+}
+.footer-container .footer-content-wrapper .footer-content-column a{
+    text-decoration: none;
+    border-bottom: 0px solid #000;
 }
 </style>
 <div class="jsx-157630181 footer-container">
@@ -132,7 +141,7 @@ line-height: 24px;
                     <div class="footer-content-column marginAndPadding">
                         <h3 style="margin-top:-5px;font-size: 17px; ">Get the App Today!</h3>
                         <div style="margin-top: 26px;margin-left: -51px;">
-                            <a target="_blank" href="https://play.google.com/store/apps/details?id=com.boloindya.boloindya&hl=en_IN"><img src="/media/BUTTON2.svg"></a>
+                            <a class="onHoverRemove" target="_blank" href="https://play.google.com/store/apps/details?id=com.boloindya.boloindya&hl=en_IN"><img src="/media/BUTTON2.svg"></a>
                         </div>
                     </div>
 
@@ -165,7 +174,7 @@ line-height: 24px;
                       
     </div>
     <div class="jsx-157630181 copyright" style="text-align: center;">
-        <p>© 2020 BoloIndya. All rights reserved .</p>
+        <p>© 2020 BoloIndya. All rights reserved.</p>
     </div>
   
             </div>

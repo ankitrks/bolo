@@ -429,7 +429,7 @@
 ._1RNJh {
     background: #f8f8f8;
     width: 100%!important;
-    position: sticky;
+    position: fixed;
     top: 69px;
     z-index: 9;
      -webkit-box-shadow: 0 0px 0px 0 hsla(0,0%,50%,.85);
@@ -676,6 +676,7 @@
     ._2WfMm nav {
         padding: 5px 0 8px 8px;
         display: inline-block;
+        width: 100%;
     }
     .column{
         float: left;
@@ -708,25 +709,20 @@
     font-weight: 500;
     font-size: 12px;
     line-height: 0px;
-    margin-left: 24px;
+    margin-left: 0px;
     display: inline;
     align-items: center;
     text-align: center;
     color: #B62827;
 }
 
-.logo-container .logo-text {
+/*.logo-container .logo-text {
     width: 123px;
     margin-left: 3px;
     position: relative;
     top: 14px;
-}
-.hamburger-menu .hamburger-menu-wrapper {
-    border: 3px solid var(--heading-color);
-    background: var(--heading-color);
-    margin-left: -4px;
-    margin-top: 13px;
-}
+}*/
+
 
 ._1RNJh {
     position: fixed;
@@ -754,8 +750,31 @@
 
 @media(max-width: 991px){
     ._explore_page_feed_wrapper{
-            margin-top: 254px;
+            margin-top: 150px;
     }
+    .hideMainCategoryOnMobile{
+        display: none !important;
+    }
+    ._2WfMm nav ul{
+        display: inline-flex;
+    }
+
+._2WfMm nav select {
+    margin: 7px 5px;
+    border: 1px solid #B62827;
+    box-sizing: border-box;
+    border-radius: 5px;
+    float: right;
+    height: 35px;
+}
+
+.btnInFormation{
+    color: #fff !important;
+    height: 21px;
+    width: 155px !important;
+    padding: 11px 32px 9px 22px !important;
+    background: #B62827;
+    border-radius: 6px;
 }
 
 </style>
@@ -778,17 +797,17 @@
             
                         <nav>
                             <ul class="">
-                                <li class="item "  id="" style="padding-top:.5em;padding-bottom:.5em;cursor:pointer;"><a style="color: #fff !important;height: 21px;padding: 13px 9px 8px 10px;background: #B62827;border-radius: 6px;" href="javascript:void(0)" class="category-whats-hot whatsHot active">{% trans "What's Hot" %}</a>
+                                <li class="item "  id="" style="padding-top:.5em;padding-bottom:.5em;cursor:pointer;"><a class="btnInFormation" style="color: #fff !important;height: 21px;padding: 13px 9px 8px 10px;background: #B62827;border-radius: 6px;" href="javascript:void(0)" class="category-whats-hot whatsHot active">{% trans "What's Hot" %}</a>
                                 </li>
                             
                             {%  for each_category_item in categories %}
                                 {% if  forloop.counter <= 6 %}
-                                <li  class="item categoryFontStyle" id="" style="padding-top:.5em;padding-bottom:.5em;cursor:pointer"><a href="/tag/{{each_category_item.slug}}/" class="category-name">{% category_title_by_language each_category_item LANGUAGE_CODE|language_name %}</a></li>
+                                <li  class="item categoryFontStyle hideMainCategoryOnMobile" id="" style="padding-top:.5em;padding-bottom:.5em;cursor:pointer"><a href="/tag/{{each_category_item.slug}}/" class="category-name">{% category_title_by_language each_category_item LANGUAGE_CODE|language_name %}</a></li>
                                 {% endif %}
                             {% endfor %}
                             </ul>
                             <select class="event-type-select popularDropdownRight" id="hashtagChangeIdCat" onchange="onChangeCategory(this)">
-                                <option value="all">Filter</option>
+                                <option value="all">Categories</option>
                                 {%  for each_category_item in categories %}
                                     {% if  forloop.counter > 6 %}
                                         <option value="/tag/{{each_category_item.slug}}/">{% category_title_by_language each_category_item LANGUAGE_CODE|language_name %}</option>
@@ -883,7 +902,7 @@
             <div class="jsx-2679382212 icontainer">
                 <div class="platwrap" >
                     <div onclick="copyShareLinkMobile();" class="platicon i-copylink" style="background-image: url(/media/copy.svg);"></div><span>{% trans "Copy Link" %}</span>
-                    <input readonly=""  class="jsx-1861775669 jsx-537314381 hide" id="shareInputboxMobile" value="https://www.boloindya.com/@karansingharoraofficial/video/6758860880575827202">
+                    <input readonly=""  class="jsx-1861775669 jsx-537314381" style="background: #f6f6f6;border: none;color: #f7f7f7;font-size: 1px;" id="shareInputboxMobile" value="https://www.boloindya.com/@karansingharoraofficial/video/6758860880575827202">
                 </div>
 
 <!--                 <div class="platwrap" onclick="social_share_main('facebook_share')">
@@ -898,6 +917,7 @@
             <input type="hidden" name="topicId" id="topicId">
             <input type="hidden" name="topicCreatorUsername" id="topicCreatorUsername">
             <input type="hidden" name="topicCreatorTitle" id="topicCreatorTitle">
+            <input type="hidden" name="topicSlugTitle" id="topicSlugTitle">
 
 
             <div class="jsx-2679382212 btns">
@@ -923,11 +943,14 @@
 
     });
 
-    function shareOpenAndHide(topicId,topicTitle,topicCreatorUsername) {
+    function shareOpenAndHide(topicId,topicTitle,topicCreatorUsername,slug) {
 
         $("#topicId").val(topicId);
         $("#topicCreatorTitle").val(topicCreatorTitle);
         $("#topicCreatorUsername").val(topicCreatorUsername);
+        $("#topicSlugTitle").val(slug);
+        var copyLinkData =site_base_url+slug+'/'+topicId+'/';
+        $("#shareInputboxMobile").val(copyLinkData);
 
         var shareOpenAndHideMobAndDesk=$('.shareOpenAndHideMobAndDesk').hasClass('hide');
         if(shareOpenAndHideMobAndDesk){
@@ -944,20 +967,23 @@ function social_share_main(shareType){
         document.getElementById('gotoLoginPage').click();
      }
 
-    var topicId=$("#topicID").val();
+    var topicId=$("#topicId").val();
     var topicCreatorUsername=$("#topicCreatorUsername").val();
     var topicCreatorTitle=$("#topicCreatorUsername").val();
+    var topicSlugTitle=$("#topicSlugTitle").val();
+
+    var shareCopyLinkData =site_base_url+topicSlugTitle+'/'+topicId+'/';
 
     var shareURL="";
     if(shareType=='facebook_share'){
 
-        shareURL='https://www.facebook.com/sharer/sharer.php?app_id=113869198637480&u='+site_base_url+topicCreatorUsername+'/'+topicId+'&display=popup&sdk=joey/';
+        shareURL='https://www.facebook.com/sharer/sharer.php?app_id=113869198637480&u='+shareCopyLinkData+'&display=popup&sdk=joey/';
 
     }else if(shareType=='twitter_share'){
 
-        shareURL='https://twitter.com/intent/tweet?text='+topicCreatorTitle+'&url='+site_base_url+topicCreatorUsername+'/'+topicId+'/'
+        shareURL='https://twitter.com/intent/tweet?text='+topicCreatorTitle+'&url='+shareCopyLinkData;
     }else if(shareType=='whatsapp_share'){
-        shareURL='https://api.whatsapp.com/send?text='+site_base_url+topicCreatorUsername+'/'+topicId+'/';
+        shareURL='https://api.whatsapp.com/send?text='+shareCopyLinkData;
     }
 
 

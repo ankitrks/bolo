@@ -808,7 +808,7 @@ function retryLiveStream(hls, url) {
     function loadMoreComments(nextPageURl){
         loaderBoloShowDynamic('_scroll_load_more_loading_comment');
         if(nextPageURl=='null'){
-            var loadMoreComment='<span class="loadMoreComment">No more comment</span';
+            var loadMoreComment='<span class="loadMoreComment"></span';
             $(".loadMoreComments").html(loadMoreComment);
             loaderBoloHideDynamic('_scroll_load_more_loading_comment');
             return false;

@@ -749,10 +749,12 @@ input#search-bar:focus:-ms-placeholder {
 @media(max-width: 991px){
   .logo-container .logo-text {
     width: 123px;
-    /* margin-left: -10px; */
+    margin-left: -6px;
     position: relative;
     top: 8px;
+
 }
+
 
 .header-container .header-content {
     margin-top: -10px;
@@ -952,7 +954,6 @@ input#search-bar:focus:-ms-placeholder {
 
 .menu-item-link1 a{
     text-decoration: none;
-    font-family: Futura;
     font-style: normal;
     font-weight: 500;
     font-size: 14px;
@@ -966,8 +967,8 @@ input#search-bar:focus:-ms-placeholder {
     border-radius: 100px;
     padding: 8px 14px 5px;
     text-decoration: none;
-    font-family: Futura;
-    font-style: normal;
+    font-family: inherit;
+    /*font-style: normal;*/
     font-weight: 500;
     font-size: 12px;
     margin-left:10px; 
@@ -1117,15 +1118,15 @@ input#search-bar:focus:-ms-placeholder {
 
 @media(max-width: 991px){
   .getStartedButton a{
-      font-size: 6px;
-      padding: 7px 11px 5px;
+    font-size: 6px;
+    padding: 4px;
   }
   .imgIconPro{
     margin-top: 10px;
   }
 
 .userProfileIcon {
-    height: 39px;
+    height: 34px;
     padding: 5px 12px;
     margin: 0px 0px;
 }
@@ -1136,6 +1137,17 @@ input#search-bar:focus:-ms-placeholder {
 .header-container .header-content {
     padding: 6px 13px !important;
 }
+.menu-item-link1 a{
+  font-size: 11px;
+}
+.hamburger-menu .hamburger-menu-wrapper {
+    border: 3px solid var(--heading-color);
+    background: var(--heading-color);
+    margin-left: 7px;
+    margin-top: 13px;
+}
+
+
 }
 
 
@@ -1161,12 +1173,12 @@ input#search-bar:focus:-ms-placeholder {
                                   <a class="jsx-475503780 imgIconPro  userDetailsPageHide1" href="/{{ user.username }}"><img src="/media/user.svg" class="userProfileIcon"></a>
                                 {% else %}
                                 <li class="jsx-3143951235">
-                                  <h2 class="menu-item-link1"><a href="/login/" class="jsx-2922828399">{% trans "Sign in" %}</a></h2>
+                                  <h2 class="menu-item-link1"><a href="/login/" class="jsx-2922828399">{% trans "Sign In/Sign Up" %}</a></h2>
                                 </li>
                                 {% endif %}
 
                                 <li class="jsx-3143951235  userDetailsPageShow1 hide">
-                                  <h2 class="menu-item-link1"><a href="/login/" class="jsx-2922828399">{% trans "Sign in" %}</a></h2>
+                                  <h2 class="menu-item-link1"><a href="/login/" class="jsx-2922828399">{% trans "Sign In/Sign Up" %}</a></h2>
                                 </li>
 
 

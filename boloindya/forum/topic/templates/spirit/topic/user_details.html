@@ -752,14 +752,13 @@ color: #B62827;
     <h3 class="jsx-3732044518 header-center" style="padding-top: 20px;">{{ user_profile.name}}</h3>
     <div class="header-icon header-right"><img src="/media/share_img.svg" onclick="openShareTab()"></div>
 </header>
+
     <input type="hidden" name="id" id="currentUserId" value="{{user.id}}">
     <!-- <input type="hidden" name="id" id="currentUserId" value="{{user_profile.id}}"> -->
     <div class="jsx-606928072 user-page share-layout" style="padding: 0px;">
         <div class="share-layout-content">
             <header class="share-layout-header bottom-line share-header profile" style="margin: 0; padding: 0">
                 <div class="backgroundData " style="background-image: linear-gradient(to bottom, rgba(245, 246, 252, 0.52), rgba(184, 43, 41)), url({{ user_profile.cover_pic}});height: 270px;width: 100%; ">
-
-
                 </div>
                 <div class="jsx-2177493926 jsx-578937417 avatar round userProfilAvator classProfImgPos" style="background-image: url({% if user_profile.profile_pic|length > 1 %}
                                 {{user_profile.profile_pic}}
@@ -774,6 +773,9 @@ color: #B62827;
 {% else %}
     check-icon
 {% endif %} " ></span></span></h1>
+                    <p><a href="javascript:void(0);"><img style="height: 12px;" src="/media/plus_icon.png"><span onclick="copyShareLinkMobileProfile();" style="color: #9A9A9A;font-size: 11px;"> Share Profile</span></a>
+                       <span class="linkCopiesProfile"></span> 
+                    </p>
                     <h3 class="share-sub-title ">{{ user_profile.bio}} <button class="btnClassEdit bts-popup-trigger"><img src="/media/edit_profile.png" style="width: 12px;"> Edit Profile</button></h3>
 
                     <ul class="jsx-1061034316 hideOnDesktop">
@@ -842,46 +844,11 @@ color: #B62827;
     padding: 0px 24px 16px;
 }
 
-.userDetailsPageHide1{
-    display: none;
-}
-.userDetailsPageShow1{
-    display: inline-block !important;
-    margin-left: 17px;
-}
-
 
 </style>
 
 
-<script type="text/javascript">
-var loginStatus=check_login_status();
-console.log('Login Status'+loginStatus);
-
-if(loginStatus==false){
-    var hideClassStataus=$(".userDetailsPageHide1").hasClass('userDetailsPageHide');
-    if(!hideClassStataus){
-        $(".userDetailsPageHide1").addClass('userDetailsPageHide');
-    }
-
-    var showClassStataus=$(".userDetailsPageShow1").hasClass('userDetailsPageShow');
-    if(!showClassStataus){
-        $(".userDetailsPageShow1").addClass('userDetailsPageShow');
-        $(".userDetailsPageShow1").removeClass('hide');
-    }
-
-
-
-}
-
-
-
-
-</script>
-
-
-
-
+<input readonly=""  class="jsx-1861775669 jsx-537314381" style="background: #f6f6f6;border: none;color: #f7f7f7;font-size: 1px;" id="shareInputboxProfile" value="https://www.boloindya.com/{{user.username}}">
 
 <div class="boloindya-share openShareTabId shareOpenAndHideMobAndDesk hide">
     <div class="jsx-2679382212 outshare mask share-transiton-enter-done">
@@ -890,7 +857,7 @@ if(loginStatus==false){
             <div class="jsx-2679382212 icontainer">
                 <div class="platwrap" >
                     <div onclick="copyShareLinkMobile();" class="platicon i-copylink" style="background-image: url(/media/copy.svg);"></div><span>{% trans "Copy Link" %}</span>
-                    <input readonly=""  class="jsx-1861775669 jsx-537314381 hide" id="shareInputboxMobile" value="https://www.boloindya.com/@karansingharoraofficial/video/6758860880575827202">
+                    <input readonly=""  class="jsx-1861775669 jsx-537314381" style="background: #f6f6f6;border: none;color: #f7f7f7;font-size: 1px;" id="shareInputboxMobile" value="https://www.boloindya.com/@karansingharoraofficial/video/6758860880575827202">
                 </div>
 
 <!--                 <div class="platwrap" onclick="social_share_main('facebook_share')">
@@ -905,6 +872,7 @@ if(loginStatus==false){
             <input type="hidden" name="topicId" id="topicId">
             <input type="hidden" name="topicCreatorUsername" id="topicCreatorUsername">
             <input type="hidden" name="topicCreatorTitle" id="topicCreatorTitle">
+            <input type="hidden" name="topicSlugTitle" id="topicSlugTitle">
 
 
             <div class="jsx-2679382212 btns">
@@ -930,11 +898,14 @@ if(loginStatus==false){
 
     });
 
-    function shareOpenAndHide(topicId,topicTitle,topicCreatorUsername) {
+    function shareOpenAndHide(topicId,topicTitle,topicCreatorUsername,slug) {
 
         $("#topicId").val(topicId);
         $("#topicCreatorTitle").val(topicCreatorTitle);
         $("#topicCreatorUsername").val(topicCreatorUsername);
+        $("#topicSlugTitle").val(slug);
+        var copyLinkData =site_base_url+slug+'/'+topicId+'/';
+        $("#shareInputboxMobile").val(copyLinkData);
 
         var shareOpenAndHideMobAndDesk=$('.shareOpenAndHideMobAndDesk').hasClass('hide');
         if(shareOpenAndHideMobAndDesk){
@@ -951,20 +922,23 @@ function social_share_main(shareType){
         document.getElementById('gotoLoginPage').click();
      }
 
-    var topicId=$("#topicID").val();
+    var topicId=$("#topicId").val();
     var topicCreatorUsername=$("#topicCreatorUsername").val();
     var topicCreatorTitle=$("#topicCreatorUsername").val();
+    var topicSlugTitle=$("#topicSlugTitle").val();
+
+    var shareCopyLinkData =site_base_url+topicSlugTitle+'/'+topicId+'/';
 
     var shareURL="";
     if(shareType=='facebook_share'){
 
-        shareURL='https://www.facebook.com/sharer/sharer.php?app_id=113869198637480&u='+site_base_url+topicCreatorUsername+'/'+topicId+'&display=popup&sdk=joey/';
+        shareURL='https://www.facebook.com/sharer/sharer.php?app_id=113869198637480&u='+shareCopyLinkData+'&display=popup&sdk=joey/';
 
     }else if(shareType=='twitter_share'){
 
-        shareURL='https://twitter.com/intent/tweet?text='+topicCreatorTitle+'&url='+site_base_url+topicCreatorUsername+'/'+topicId+'/'
+        shareURL='https://twitter.com/intent/tweet?text='+topicCreatorTitle+'&url='+shareCopyLinkData;
     }else if(shareType=='whatsapp_share'){
-        shareURL='https://api.whatsapp.com/send?text='+site_base_url+topicCreatorUsername+'/'+topicId+'/';
+        shareURL='https://api.whatsapp.com/send?text='+shareCopyLinkData;
     }
 
 
@@ -1048,6 +1022,7 @@ function social_share_main(shareType){
   }
 
 </script>
+
 
 
 
