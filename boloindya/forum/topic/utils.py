@@ -319,6 +319,7 @@ def new_algo_update_redis_paginated_data(key, query,trending = False, cache_max_
     # print language_id, category_id, "############"
     page = 1
     temp_page = page
+    base_page = 0
     final_data = {}
     updated_df = {}
     exclude_ids = []
@@ -350,15 +351,18 @@ def new_algo_update_redis_paginated_data(key, query,trending = False, cache_max_
                     else:
                         page = None
 
-                    if not page <= cache_max_pages:
-                        temp_page = None
+                if page > cache_max_pages or start_date < settings.DATE_TILL_CALCULATE:
+                    base_page = temp_page
+                    temp_page = None
+                    page = None
+
             start_date = end_date
             end_date = start_date - timedelta( hours = cache_timespan )
             final_data.update(temp_final_data)
 
         remaining_count = len(topics_df) - len(exclude_ids) - len(updated_df)
+        page = base_page
         if remaining_count > 0 and remaining_count <= items_per_page * extra_pages_beyond_max_pages:
-            page = temp_page
             remaining_page_no = (remaining_count / items_per_page) + 1
             if (remaining_count % items_per_page) > 0:
                 remaining_page_no += 1
@@ -370,13 +374,12 @@ def new_algo_update_redis_paginated_data(key, query,trending = False, cache_max_
                 if id_list:
                     temp_final_data[page] = { 'id_list' : id_list, 'scores' : updated_df['vb_score'].tolist() }
                     page += 1
-                    temp_page +=1
                 else:
                     page = None
         else:
             # if remaining items are too many (more than "extra_pages_beyond_max_pages" pages).
             # these will be filtered realtime then.
-            temp_final_data['remaining'] = {'remaining_count' : remaining_count, 'last_page' : temp_page - 1}
+            temp_final_data['remaining'] = {'remaining_count' : remaining_count, 'last_page' : page - 1}
             page = None
         final_data.update(temp_final_data)
     else:
