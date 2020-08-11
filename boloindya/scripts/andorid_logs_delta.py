@@ -269,11 +269,11 @@ def main():
 		# curr_time = date.today() 
 		# yesterday = curr_time - timedelta(days = 1) 
 		# print(curr_time, yesterday, 'current and yesterday')
-		today = datetime.today()
-		start_time =  (today - timedelta(days = 1)).replace(hour=0, minute=0, second=0)
-		end_time = (today - timedelta(days = 1)).replace(hour=23, minute=59, second=59)
-		# start_time = '2020-08-09'
-		# end_time = '2020-08-10'
+		# today = datetime.today()
+		# start_time =  (today - timedelta(days = 1)).replace(hour=0, minute=0, second=0)
+		# end_time = (today - timedelta(days = 1)).replace(hour=23, minute=59, second=59)
+		start_time = '2020-08-09'
+		end_time = '2020-08-10'
 
 		print(start_time, end_time)
 	chunk_size = 20
