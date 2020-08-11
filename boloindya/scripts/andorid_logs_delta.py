@@ -32,6 +32,7 @@ import math
 import boto3
 from django.conf import settings
 import pandas as pd
+from operator import itemgetter 
 
 
 
@@ -218,22 +219,30 @@ def extract_minmax_delta(log_text_dump, userid):
 				complete_data.append(data_iter)
 	
 # func for writing data into csv
-def write_csv(n):
-	complete_data.sort(key = lambda complete_data: complete_data[4], reverse = True)[:1000] 
+def process_data(complete_data):
+	complete_data = sorted(complete_data, key = itemgetter(4)) 
+	# complete_data.sort(key = lambda complete_data: complete_data[4], reverse = True)
+	complete_data = complete_data[:10000]
+	return complete_data
+
+def write_csv(complete_data):
+	# complete_data = sorted(complete_data, key = itemgetter(4)) 
+	# # complete_data.sort(key = lambda complete_data: complete_data[4], reverse = True)
+	# complete_data = complete_data[:10000]
 	headers = ['User', 'Video title', 'Player Ready', 'Time Played','StartPlayingcdn','StartPlayingcache','StartPlaying', 'Network','Device Model','Manufacturer','Play Date Time']
         f_name = 'deltarecords.csv'
-	if n==1:
+	# if n==1:
 
-		with open(f_name, 'w') as f:
-			writer = csv.writer(f)
-			writer.writerow(headers)
-			for each_data in complete_data:
-				writer.writerow([x for x in each_data])
-	else:
-		with open(f_name, 'a') as csvfile:  
-			csvwriter = csv.writer(csvfile)
-			for each_data in complete_data:
-				csvwriter.writerow([x for x in each_data])
+	with open(f_name, 'w') as f:
+		writer = csv.writer(f)
+		writer.writerow(headers)
+		for each_data in complete_data:
+			writer.writerow([x for x in each_data])
+	# else:
+	# 	with open(f_name, 'a') as csvfile:  
+	# 		csvwriter = csv.writer(csvfile)
+	# 		for each_data in complete_data:
+	# 			csvwriter.writerow([x for x in each_data])
 
 # def manage_file(filetosend):
 # 	f = open(filetosend)
@@ -304,7 +313,8 @@ def main():
 					extract_minmax_delta(each_android_dump, userid)
 			except Exception as e:
 				count=0
-		write_csv(j)
+	data = process_data(complete_data)
+	write_csv(data)
 	filetosend = os.getcwd() + "/deltarecords.csv"
 	url = upload_media(filetosend)
 	send_file_mail(url)
