@@ -269,16 +269,16 @@ def main():
 		# curr_time = date.today() 
 		# yesterday = curr_time - timedelta(days = 1) 
 		# print(curr_time, yesterday, 'current and yesterday')
-		# today = datetime.today()
-		# start_time =  (today - timedelta(days = 1)).replace(hour=0, minute=0, second=0)
-		# end_time = (today - timedelta(days = 1)).replace(hour=23, minute=59, second=59)
-		start_time = '2020-08-09'
-		end_time = '2020-08-10'
+		today = datetime.today()
+		start_time =  (today - timedelta(days = 1)).replace(hour=0, minute=0, second=0)
+		end_time = (today - timedelta(days = 1)).replace(hour=23, minute=59, second=59)
+		# start_time = '2020-08-09'
+		# end_time = '2020-08-10'
 
 		print(start_time, end_time)
-	chunk_size = 20
+	chunk_size = 10000
 	j = 0
-	total_elements = android_logs = 100#AndroidLogs.objects.filter(created_at__gte = start_time, created_at__lte = end_time).count()
+	total_elements = android_logs = AndroidLogs.objects.filter(created_at__gte = start_time, created_at__lte = end_time).count()
 	while((j*chunk_size) < total_elements):
 		android_logs = AndroidLogs.objects.filter(created_at__gte = start_time, created_at__lte = end_time).order_by('-id')[(j*chunk_size):((j+1)*chunk_size)]
 		j+=1
