@@ -133,7 +133,7 @@ def cache_follow_post(user_id):
 
 @app.task
 def cache_popular_post(user_id,language_id):
-    from forum.topic.utils import update_redis_paginated_data, get_redis_vb_seen
+    from forum.topic.utils import update_redis_paginated_data,new_algo_update_redis_paginated_data, get_redis_vb_seen
     from forum.user.utils.follow_redis import get_redis_following
     from forum.topic.models import Topic
     key = 'lang:'+str(language_id)+':popular_post:'+str(user_id)
@@ -142,7 +142,7 @@ def cache_popular_post(user_id,language_id):
         all_seen_vb = get_redis_vb_seen(user_id)
     query = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, is_popular = True)\
         .exclude(pk__in = all_seen_vb).order_by('-id', '-vb_score')
-    update_redis_paginated_data(key, query)
+    new_algo_update_redis_paginated_data(key, query, trending= True)
 
 @app.task
 def create_topic_notification(created,instance_id):

@@ -14,7 +14,7 @@ from forum.user.models import UserProfile
 from django.db.models import F, Q
 import pandas as pd
 from django.conf import settings
-from datetime import datetime
+from datetime import datetime, timedelta
 
 def topic_viewed(request, topic):
     # Todo test detail views
@@ -95,7 +95,8 @@ def get_redis_data(key, query, page_no):
 def get_redis_category_paginated_data(language_id, category_id, page_no):
     key = 'cat:'+str(category_id)+':lang:'+str(language_id)
     query = Topic.objects.filter(is_vb = True, is_removed = False, m2mcategory__id = category_id, language_id = language_id).order_by('-vb_score')
-    return get_redis_data(key, query, page_no)
+    # return get_redis_data(key, query, page_no)
+    return new_algo_get_redis_data(key, query, page_no)
     
 ## For vb_score sorted filter in single language ##
 
@@ -123,7 +124,8 @@ def get_popular_paginated_data(user_id, language_id, page_no):
         all_seen_vb = get_redis_vb_seen(user_id)
     query = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, is_popular = True)\
         .exclude(pk__in = all_seen_vb).order_by('-vb_score', '-id')
-    return get_redis_data(key, query, page_no)
+    # return get_redis_data(key, query, page_no)
+    return new_algo_get_redis_data(key, query, page_no,True)
 
 def update_redis_paginated_data(key, query, cache_max_pages = settings.CACHE_MAX_PAGES_REAL_TIME):
     items_per_page = settings.REST_FRAMEWORK['PAGE_SIZE']
@@ -189,7 +191,7 @@ def get_redis_hashtag_paginated_data(language_id, hashtag_id, page_no):
     if paginated_data and (str(page_no) in paginated_data.keys() or 'remaining' in paginated_data.keys()):
         if str(page_no) in paginated_data.keys():
             topic_ids = paginated_data[str(page_no)]['id_list']
-            topics = Topic.objects.filter(pk__in = topic_ids, is_removed = False)
+            topics = Topic.objects.filter(pk__in = topic_ids, is_removed = False).order_by('-vb_score')
         elif 'remaining' in paginated_data.keys():
             last_page_no = int(paginated_data['remaining']['last_page'])
             try:
@@ -197,7 +199,7 @@ def get_redis_hashtag_paginated_data(language_id, hashtag_id, page_no):
             except:
                 last_page_data = paginated_data[last_page_no]
             topics = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, \
-                    hash_tags__id = hashtag_id).exclude(id__in = last_page_data['id_list']).filter(vb_score__lte = last_page_data['scores'][-1])
+                    hash_tags__id = hashtag_id).exclude(id__in = last_page_data['id_list']).filter(vb_score__lte = last_page_data['scores'][-1]).order_by('-vb_score')
             new_page = page_no - last_page_no #(191-190)
             paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
             if paginator.num_pages >= new_page:
@@ -249,12 +251,136 @@ def update_redis_hashtag_paginated_data(language_id, extra_filter, cache_max_pag
                     final_data = {}
                     exclude_ids = []
                     query = Topic.objects.filter(is_removed = False, is_vb = True, hash_tags__id = each_rec, language_id = language_id).order_by('-vb_score', '-id')
-                    final_data = update_redis_paginated_data(key, query)            
+                    # final_data = update_redis_paginated_data(key, query)
+                    final_data = new_algo_update_redis_paginated_data(key,query)
         if key:
             return get_redis(key)
         return final_data
     except:
         return {}
+
+def new_algo_get_redis_data(key, query, page_no,trending = False):
+    try:
+        topic_ids = []
+        topics = []
+        if not page_no:
+            page_no = 1
+        paginated_data = get_redis(key)
+        if not paginated_data:
+            paginated_data = new_algo_update_redis_paginated_data(key, query,trending = trending)
+        if paginated_data and (str(page_no) in paginated_data.keys() or 'remaining' in paginated_data.keys()):
+            if str(page_no) in paginated_data.keys():
+                topic_ids = paginated_data[str(page_no)]['id_list']
+                topics = Topic.objects.filter(pk__in = topic_ids, is_removed = False).order_by('-vb_score')
+            elif 'remaining' in paginated_data.keys():
+                last_page_no = int(paginated_data['remaining']['last_page'])
+                try:
+                    last_page_data = paginated_data[str(last_page_no)]
+                except:
+                    last_page_data = paginated_data[last_page_no]
+                topics = query.exclude(id__in = last_page_data['id_list']).filter(vb_score__lte = last_page_data['scores'][-1])
+                new_page = page_no - last_page_no #(191-190)
+                paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
+                if paginator.num_pages >= new_page:
+                    topics = paginator.page(new_page)
+                else:
+                    topics = []
+        else:
+            topics =  query.order_by('-vb_score')
+            paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
+            if paginator.num_pages >= page_no:
+                topics = paginator.page(page_no)
+            else:
+                topics = []
+        return topics
+    except Exception as e:
+        print "Error in get redis data:",str(e)
+        return []
+
+def new_algo_update_redis_paginated_data(key, query,trending = False, cache_max_pages = settings.CACHE_MAX_PAGES_REAL_TIME):
+    items_per_page = settings.REST_FRAMEWORK['PAGE_SIZE']
+    min_count_per_page = settings.MIN_COUNT_PER_PAGE
+    # cache_max_pages = settings.CACHE_MAX_PAGES
+    extra_pages_beyond_max_pages = settings.EXTRA_PAGES_BEYOND_MAX_PAGES
+    if trending:
+        trending_cache_timespan = settings.TRENDING_CACHE_TIMESPAN
+        cache_timespan = trending_cache_timespan*24
+        max_trending_weeks_to_cache = settings.MAX_TRENDING_WEEKS_TO_CACHE
+        max_time_limit_cache = max_trending_weeks_to_cache
+    else:
+        category_cache_timespan = settings.CATEGORY_CACHE_TIMESPAN
+        cache_timespan = category_cache_timespan
+        max_category_days_to_cache = settings.MAX_CATEGORY_DAYS_TO_CACHE
+        max_time_limit_cache = max_category_days_to_cache
+    if 'hashtag' in key:
+        max_hastag_days_to_cache = settings.MAX_HASHTAG_DAYS_TO_CACHE
+        max_time_limit_cache = max_hastag_days_to_cache
+
+    # print language_id, category_id, "############"
+    page = 1
+    temp_page = page
+    final_data = {}
+    updated_df = {}
+    exclude_ids = []
+    topics_df = pd.DataFrame.from_records(query.values('id', 'user_id', 'vb_score','date'))
+    topics_df['date'] = pd.to_datetime(topics_df['date'])
+    start_date = datetime.now()
+    end_date = start_date - timedelta( hours = cache_timespan )
+    while(max_time_limit_cache > 0 ):
+        temp_final_data = {}
+        page = temp_page
+        mask = ((topics_df['date'] < pd.Timestamp(start_date)) & (topics_df['date'] > pd.Timestamp(end_date)))
+        temp_topics_df = topics_df.loc[mask]
+        if temp_topics_df.empty:
+            temp_final_data[page] = {'id_list' : [], 'scores' : []}
+        else:
+            while(page != None):
+                updated_df = temp_topics_df.query('id not in [' + ','.join(exclude_ids) + ']').drop_duplicates('user_id')\
+                        .nlargest(items_per_page, 'vb_score', keep = 'last')
+                id_list = updated_df['id'].tolist()
+                if len(id_list) >= min_count_per_page and page <= cache_max_pages:
+                    exclude_ids.extend( map(str, id_list) )
+                    if id_list:
+                        temp_final_data[page] = { 'id_list' : id_list, 'scores' : updated_df['vb_score'].tolist() }
+                        page += 1
+                        temp_page +=1
+                    else:
+                        page = None
+                else:
+                    page = None
+        max_time_limit_cache-=1
+        start_date = end_date
+        end_date = start_date - timedelta( hours = cache_timespan )
+        final_data.update(temp_final_data)
+
+    remaining_count = len(topics_df) - len(exclude_ids) - len(updated_df)
+    if remaining_count <= items_per_page * extra_pages_beyond_max_pages:
+        page = temp_page
+        remaining_page_no = (remaining_count / items_per_page) + 1
+        if (remaining_count % items_per_page) > 0:
+            remaining_page_no += 1
+        while( remaining_page_no > 0):
+            updated_df = topics_df.query('id not in [' + ','.join(exclude_ids) + ']')[:items_per_page]
+            id_list = updated_df['id'].tolist()
+            exclude_ids.extend( map(str, id_list) )
+            remaining_page_no -= 1
+            if id_list:
+                temp_final_data[page] = { 'id_list' : id_list, 'scores' : updated_df['vb_score'].tolist() }
+                page += 1
+                temp_page +=1
+            else:
+                page = None
+    else:
+        # if remaining items are too many (more than "extra_pages_beyond_max_pages" pages).
+        # these will be filtered realtime then.
+        temp_final_data['remaining'] = {'remaining_count' : remaining_count, 'last_page' : temp_page - 1}
+        page = None
+    final_data.update(temp_final_data)
+    page = None
+    set_redis(key, final_data, True)
+    if key:
+        return get_redis(key)
+    return final_data
 
 
 def update_redis_vb_seen_entries(topic_id,user_id,created_at):
