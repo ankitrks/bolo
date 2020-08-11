@@ -31,6 +31,8 @@ from django.utils import timezone
 import math
 import boto3
 from django.conf import settings
+import pandas as pd
+
 
 
 
@@ -217,6 +219,7 @@ def extract_minmax_delta(log_text_dump, userid):
 	
 # func for writing data into csv
 def write_csv(n):
+	print(n, complete_data,'--------------\n')
 	headers = ['User', 'Video title', 'Player Ready', 'Time Played','StartPlayingcdn','StartPlayingcache','StartPlaying', 'Network','Device Model','Manufacturer','Play Date Time']
         f_name = 'deltarecords.csv'
 	if n==1:
@@ -232,7 +235,14 @@ def write_csv(n):
 			for each_data in complete_data:
 				csvwriter.writerow([x for x in each_data])
 
-
+def manage_file(filetosend):
+	f = open(filetosend)
+	csv_f = csv.reader(f)
+	data = pd.DataFrame(csv_f)
+	final_data = data.sort_values(by=4, ascending=False)[:10001]
+	final_data.to_csv('deltarecords.csv', header=False, index=False) 
+	url = upload_media(filetosend)
+	return url
 
 # func for sending the csv created to the mail
 def send_file_mail(url):
@@ -269,14 +279,14 @@ def main():
 		# curr_time = date.today() 
 		# yesterday = curr_time - timedelta(days = 1) 
 		# print(curr_time, yesterday, 'current and yesterday')
-		today = datetime.today()
-		start_time =  (today - timedelta(days = 1)).replace(hour=0, minute=0, second=0)
-		end_time = (today - timedelta(days = 1)).replace(hour=23, minute=59, second=59)
-		# start_time = '2020-06-19'
-		# end_time = '2020-06-20'
+		# today = datetime.today()
+		# start_time =  (today - timedelta(days = 1)).replace(hour=0, minute=0, second=0)
+		# end_time = (today - timedelta(days = 1)).replace(hour=23, minute=59, second=59)
+		start_time = '2020-08-09'
+		end_time = '2020-08-10'
 
 		print(start_time, end_time)
-	chunk_size = 10000
+	chunk_size = 10
 	j = 0
 	total_elements = android_logs = AndroidLogs.objects.filter(created_at__gte = start_time, created_at__lte = end_time).count()
 	while((j*chunk_size) < total_elements):
@@ -296,7 +306,7 @@ def main():
 				count=0
 		write_csv(j)
 	filetosend = os.getcwd() + "/deltarecords.csv"
-	url = upload_media(filetosend)
+	url = manage_file(filetosend)
 	send_file_mail(url)
 
 def run():
