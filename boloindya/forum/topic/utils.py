@@ -351,10 +351,10 @@ def new_algo_update_redis_paginated_data(key, query,trending = False, cache_max_
                     else:
                         page = None
 
-                if page > cache_max_pages or start_date < settings.DATE_TILL_CALCULATE:
-                    base_page = temp_page
-                    temp_page = None
-                    page = None
+            if page > cache_max_pages or start_date < settings.DATE_TILL_CALCULATE:
+                base_page = temp_page
+                temp_page = None
+                page = None
 
             start_date = end_date
             end_date = start_date - timedelta( hours = cache_timespan )
