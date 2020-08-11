@@ -286,9 +286,9 @@ def main():
 		end_time = '2020-08-10'
 
 		print(start_time, end_time)
-	chunk_size = 10
+	chunk_size = 20
 	j = 0
-	total_elements = android_logs = AndroidLogs.objects.filter(created_at__gte = start_time, created_at__lte = end_time).count()
+	total_elements = android_logs = 100#AndroidLogs.objects.filter(created_at__gte = start_time, created_at__lte = end_time).count()
 	while((j*chunk_size) < total_elements):
 		android_logs = AndroidLogs.objects.filter(created_at__gte = start_time, created_at__lte = end_time).order_by('-id')[(j*chunk_size):((j+1)*chunk_size)]
 		j+=1
