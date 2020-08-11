@@ -1354,13 +1354,6 @@
 <!-- Start Comments Section -->
 {% include "spirit/_video_play_and_comments.html" %}
 
-
-
-solr/search/top
-solr/search/hash_tag
-solr/search/user
-solr/search
-
 <script type="text/javascript">
 
     function searchClickMore(searchId){
@@ -1807,7 +1800,7 @@ function popularSearchCategoryHeading(itemCategory){
         category_title='title';
     }
 
-    var popular_cat_heading_template='<div class="_explore_feed_header"><div class="jsx-2836840237 _card_header_"><a class="jsx-2836840237" href="/tag/'+itemCategory.slug+'/"><div class="jsx-2836840237 _card_header_cover" style="background-image: url('+itemCategory.category_image+');"></div></a><a title="#'+itemCategory.slug+'('+itemCategory.total_view+' views)" class="jsx-2836840237 _card_header_link" href="/tag/'+itemCategory.slug+'/"><div class="jsx-2836840237 _card_header_content"><h3 class="jsx-2836840237 _card_header_title">'+itemCategory[category_title]+'</h3><strong class="jsx-2836840237 _card_header_subTitle">'+itemCategory.total_view+' views</strong><p class="jsx-2836840237 _card_header_desc"></p></div></a><p class="jsx-2836840237 _card_header_desc_follow"><span class="unit"><button onclick="follow_category_discover('+itemCategory.id+');" class="_4jy1 _4jy4 _517h _51sy _42ft " style="float: none;" type="button" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followCategoryStatus-'+itemCategory.id+' followCheckCat sx_5da455"></i><span class="btnTextChangeCat-'+itemCategory.id+'">'+follow_trans+'</span></button></span></p></div></div>';
+    var popular_cat_heading_template='<div class="_explore_feed_header"><div class="jsx-2836840237 _card_header_"><a class="jsx-2836840237" href="/tag/'+itemCategory.slug+'/"><div class="jsx-2836840237 " style="background-image: url('+itemCategory.category_image+');"></div></a><a title="#'+itemCategory.slug+'('+itemCategory.total_view+' views)" class="jsx-2836840237 _card_header_link" href="/tag/'+itemCategory.slug+'/"><div class="jsx-2836840237 _card_header_content"><h3 class="jsx-2836840237 _card_header_title">'+itemCategory[category_title]+'</h3><strong class="jsx-2836840237 _card_header_subTitle">'+itemCategory.total_view+' views</strong><p class="jsx-2836840237 _card_header_desc"></p></div></a><p class="jsx-2836840237 _card_header_desc_follow"><span class="unit"><button onclick="follow_category_discover('+itemCategory.id+');" class="_4jy1 _4jy4 _517h _51sy _42ft " style="float: none;" type="button" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followCategoryStatus-'+itemCategory.id+' followCheckCat sx_5da455"></i><span class="btnTextChangeCat-'+itemCategory.id+'">'+follow_trans+'</span></button></span></p></div></div>';
     return popular_cat_heading_template;
 }
 
@@ -2020,7 +2013,7 @@ function getSearchMentionSuggestion(){
 
 
 function popularSearchMentionHeading(mentionItem){
-    var popular_cat_heading_template='<div class="_explore_feed_header"><div class="jsx-2836840237 _card_header_"><a class="jsx-2836840237" href="/tag/'+mentionItem.slug+'/"><div class="jsx-2836840237 _card_header_cover" style="background-image: url('+mentionItem.category_image+');"></div></a><a title="#'+mentionItem.slug+'('+mentionItem.total_view+' views)" class="jsx-2836840237 _card_header_link" href="/tag/'+mentionItem.slug+'/"><div class="jsx-2836840237 _card_header_content"><h3 class="jsx-2836840237 _card_header_title">'+mentionItem.title+'</h3><strong class="jsx-2836840237 _card_header_subTitle">'+mentionItem.total_view+' views</strong><p class="jsx-2836840237 _card_header_desc">...</p></div></a></div></div>';
+    var popular_cat_heading_template='<div class="_explore_feed_header"><div class="jsx-2836840237 _card_header_"><a class="jsx-2836840237" href="/tag/'+mentionItem.slug+'/"><div class="jsx-2836840237 " style="background-image: url('+mentionItem.category_image+');"></div></a><a title="#'+mentionItem.slug+'('+mentionItem.total_view+' views)" class="jsx-2836840237 _card_header_link" href="/tag/'+mentionItem.slug+'/"><div class="jsx-2836840237 _card_header_content"><h3 class="jsx-2836840237 _card_header_title">'+mentionItem.title+'</h3><strong class="jsx-2836840237 _card_header_subTitle">'+mentionItem.total_view+' views</strong><p class="jsx-2836840237 _card_header_desc">...</p></div></a></div></div>';
     return mention_heading_template;
 }
 
@@ -2207,8 +2200,12 @@ function popularSearchHashtagHeading(mentionItem){
     }else{
        hasgtagDefaultImage = mentionItem.picture;
     }
-
-    var hashtag_heading_template='<div class="_explore_feed_header"><div class="jsx-2836840237 _card_header_"><a class="jsx-2836840237" href="/hashtag/'+mentionItem.hash_tag+'/"><div class="jsx-2836840237 _card_header_cover"></div></a><a title="#'+mentionItem.hash_tag+'('+mentionItem.total_views+' views)" class="jsx-2836840237 _card_header_link" href="/hashtag/'+mentionItem.hash_tag+'/"><div class="jsx-2836840237 _card_header_content"><h3 class="jsx-2836840237 _card_header_title">#'+mentionItem.hash_tag+'</h3><strong class="jsx-2836840237 _card_header_subTitle">'+mentionItem.total_views+' views</strong><p class="jsx-2836840237 _card_header_desc"></p></div></a></div></div>';
+    
+    if (mentionItem.hash_tag == null){
+        var hashtag_heading_template="";
+    }else{
+        var hashtag_heading_template='<div class="_explore_feed_header"><div class="jsx-2836840237 _card_header_"><a class="jsx-2836840237" href="/hashtag/'+mentionItem.hash_tag+'/"><div class="jsx-2836840237 "></div></a><a title="#'+mentionItem.hash_tag+'('+mentionItem.total_views+' views)" class="jsx-2836840237 _card_header_link" href="/hashtag/'+mentionItem.hash_tag+'/"><div class="jsx-2836840237 _card_header_content"><h3 class="jsx-2836840237 _card_header_title">#'+mentionItem.hash_tag+'</h3><strong class="jsx-2836840237 _card_header_subTitle">'+mentionItem.total_views+' views</strong><p class="jsx-2836840237 _card_header_desc"></p></div></a></div></div>';
+    }
     return hashtag_heading_template;
 }
 

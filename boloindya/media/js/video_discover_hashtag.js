@@ -598,7 +598,7 @@ function getHashTagVideoList(hashTagId){
         var dataList=data.results;
 
         if(dataList){
-            dataList.forEach(function(itemVideoByte1){debugger;
+            dataList.forEach(function(itemVideoByte1){
                var populvideoItems ="";
                var topicListq=itemVideoByte1.topics;
                var videoItemCount=0;
@@ -955,7 +955,7 @@ function getCreators(popularCreators){
 
     }
 
-    function nextVideoPlay(){debugger;
+    function nextVideoPlay(){
         loaderShow();
         var singleItemData=[];
 
@@ -1209,7 +1209,10 @@ function getPopularHashTagItems(itemVideoByte) {
     var videoTitle="";
         videoTitle=removeTags(itemVideoByte.title);
         content_title = videoTitle.substr(0, 10) + " ..."
+    var userName= '';
 
+        userName=removeTags(itemVideoByte.user.userprofile.name);
+        userName = userName.substr(0, 10) + " ..."
 
     var popularHashTagTemplateItems ='<div class="column " style="cursor: pointer;">\
                             <div class="card"  style="background-color: #fff; padding: 20px;">\
@@ -1219,7 +1222,7 @@ function getPopularHashTagItems(itemVideoByte) {
                                 <div class="card-body videoRowCardBody" style="">\
                                     <div>\
                                         <h5 class="title">'+content_title+'</h5>\
-                                        <p class="desc descByName">'+itemVideoByte.user.userprofile.name+'</p>\
+                                        <p class="desc descByName"><a class="descByName" href="/'+itemVideoByte.user.username+'">'+userName+'</a></p>\
                                     </div>\
                                     <div style="display: inline-flex; justify-content: space-between;">\
                                         <div style="margin-right: 10px;">\
