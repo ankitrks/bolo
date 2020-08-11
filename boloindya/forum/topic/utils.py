@@ -350,7 +350,7 @@ def new_algo_update_redis_paginated_data(key, query,trending = False, cache_max_
                     page = None
         max_time_limit_cache-=1
         start_date = end_date
-        end_date = end_date - timedelta( hours = cache_timespan )
+        end_date = start_date - timedelta( hours = cache_timespan )
         final_data.update(temp_final_data)
 
     remaining_count = len(topics_df) - len(exclude_ids) - len(updated_df)

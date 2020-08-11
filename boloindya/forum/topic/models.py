@@ -463,7 +463,7 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
             score += get_ranking_feature_weight('post_superboost')
         if self.is_popular:
             score += get_ranking_feature_weight('post_popular')
-        if not self.is_boosted and self.is_popular:
+        if not self.is_boosted and not self.is_popular:
             score += get_ranking_feature_weight('post_normal')
 
         unique_share_count = SocialShare.objects.filter(topic_id = self.id).distinct('user_id').count()
