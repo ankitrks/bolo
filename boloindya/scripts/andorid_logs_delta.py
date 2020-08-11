@@ -220,7 +220,9 @@ def extract_minmax_delta(log_text_dump, userid):
 	
 # func for writing data into csv
 def process_data(complete_data):
+	print(complete_data[4], 'before\n\n')
 	complete_data = sorted(complete_data, key = itemgetter(4)) 
+	print(complete_data[4], 'after')
 	# complete_data.sort(key = lambda complete_data: complete_data[4], reverse = True)
 	complete_data = complete_data[:10000]
 	return complete_data
@@ -317,7 +319,8 @@ def main():
 	write_csv(data)
 	filetosend = os.getcwd() + "/deltarecords.csv"
 	url = upload_media(filetosend)
-	send_file_mail(url)
+	print(url)
+	# send_file_mail(url)
 
 def run():
 	main()
