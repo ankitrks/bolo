@@ -219,7 +219,7 @@ def extract_minmax_delta(log_text_dump, userid):
 	
 # func for writing data into csv
 def write_csv(n):
-	print(n, complete_data,'--------------\n')
+	complete_data.sort(key = lambda complete_data: complete_data[4], reverse = True)[:1000] 
 	headers = ['User', 'Video title', 'Player Ready', 'Time Played','StartPlayingcdn','StartPlayingcache','StartPlaying', 'Network','Device Model','Manufacturer','Play Date Time']
         f_name = 'deltarecords.csv'
 	if n==1:
@@ -235,14 +235,14 @@ def write_csv(n):
 			for each_data in complete_data:
 				csvwriter.writerow([x for x in each_data])
 
-def manage_file(filetosend):
-	f = open(filetosend)
-	csv_f = csv.reader(f)
-	data = pd.DataFrame(csv_f)
-	final_data = data.sort_values(by=4, ascending=False)[:10001]
-	final_data.to_csv('deltarecords.csv', header=False, index=False) 
-	url = upload_media(filetosend)
-	return url
+# def manage_file(filetosend):
+# 	f = open(filetosend)
+# 	csv_f = csv.reader(f)
+# 	data = pd.DataFrame(csv_f)
+# 	final_data = data.sort_values(by=4, ascending=False)[:10001]
+# 	final_data.to_csv('deltarecords.csv', header=False, index=False) 
+# 	url = upload_media(filetosend)
+# 	return url
 
 # func for sending the csv created to the mail
 def send_file_mail(url):
@@ -306,8 +306,15 @@ def main():
 				count=0
 		write_csv(j)
 	filetosend = os.getcwd() + "/deltarecords.csv"
-	url = manage_file(filetosend)
+	url = upload_media(filetosend)
 	send_file_mail(url)
 
 def run():
 	main()
+
+
+
+
+
+
+
