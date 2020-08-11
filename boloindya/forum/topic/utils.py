@@ -331,7 +331,6 @@ def new_algo_update_redis_paginated_data(key, query,trending = False, cache_max_
     if not topics_df.empty:
         while(temp_page != None):
             temp_final_data = {}
-            temp_topics_df = pd.DataFrame(columns=['id', 'user_id', 'vb_score','date'])
             page = temp_page
             mask = ((topics_df['date'] < pd.Timestamp(start_date)) & (topics_df['date'] > pd.Timestamp(end_date)))
             temp_topics_df = topics_df.loc[mask]
@@ -351,7 +350,7 @@ def new_algo_update_redis_paginated_data(key, query,trending = False, cache_max_
                     else:
                         page = None
 
-            if page > cache_max_pages or start_date < settings.DATE_TILL_CALCULATE:
+            if temp_page > cache_max_pages or start_date < settings.DATE_TILL_CALCULATE:
                 base_page = temp_page
                 temp_page = None
                 page = None
