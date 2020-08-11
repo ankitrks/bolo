@@ -87,5 +87,5 @@ urlpatterns = [
     url(r'^add_campaign/$',views.add_campaign,name = 'add_campaign'),
     url(r'^search_fields_for_campaign/$',views.search_fields_for_campaign, name='search_hashtags'),
     url(r'^particular_campaign/(?P<campaign_id>\d+)$',views.particular_campaign,name = 'particular_campaign'),
-    url(r'^search_and_add_hashtag/$',views.search_and_add_hashtag, name='search_and_add_hashtag')
+    url(r'^search_and_add_hashtag/$',views.search_and_add_hashtag, name='search_and_add_hashtag'),
 ]

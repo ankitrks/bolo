@@ -76,13 +76,18 @@ li:hover{
         {% csrf_token %}
 
         <div class="form-group">
-                <img id="selected_image" class="selected_image"/>
+                <img id="selected_image" class="selected_image" style="max-width: 100%;"/>
         </div>
 
         <div class="form-group">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Change Banner: <br> (480 x 140) </label>
             <div class="col-md-8">
                 <input type="file" name="banner_file" id="banner" class="form-control" onchange="readURL(this, '#selected_image');">
+                <br>
+                <input type="button" id="btnCrop" value="Crop" />
+                <input type="button" id="btnSave" value="Save" />
+                <input type="button" id="btnCancel" value="Cancel" />
+                <br>
             </div>
         </div>
         
@@ -217,7 +222,49 @@ li:hover{
 </section>
 {% endblock content %}
 {% block center_js %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropper/4.1.0/cropper.min.js" integrity="sha512-E+gDQcIvNXE60SjCS38ysf1mGh4ObBpKcUOp0oEaHQHQAdaN2p7GelOpgEdpTuCLoIJyLkNXiqFZbyD9Ak/Ygw==" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropper/4.1.0/cropper.css" integrity="sha512-iAcZ4OrGhQ7KDqtM+LMc+iuv63aJ9O7hPyWBzCXsrZYuhJ6jhdeh40+hf9o4QmZVu8QrH/cWy/JTmoKNOL4Urw==" crossorigin="anonymous" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropper/4.1.0/cropper.js" integrity="sha512-XL8wKq9jUbb9LMyrezd19IPRrf41omJUvZpqTXlpGXREAFbmoulbt3yBv+Lw+L007NL5tL0HRfnlXeKtvlvITg==" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropper/4.1.0/cropper.min.css" integrity="sha512-vmXqikRa5kmI3gOQygzml5nV+5NGxG8rt8KWHKj8JYYK12JUl2L8RBfWinFGTzvpwwsIRcINy9mhLyodnmzjig==" crossorigin="anonymous" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.min.js" integrity="sha512-WiGQZv8WpmQVRUFXZywo7pHIO0G/o3RyiAJZj8YXNN4AV7ReR1RYWVmZJ6y3H06blPcjJmG/sBpOVZjTSFFlzQ==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.js" integrity="sha512-mxCAjvjp0jvMdGRIEvAHOCGL6BOucqWpTBXwchElsPKNw7BEegHviDHPnYrOrzgzBiw3GD/Q1ibpA5nlFPYDMw==" crossorigin="anonymous"></script>
+
 <script>
+
+    $('#btnSave').hide();
+    $('#btnCancel').hide();
+
+    $('#btnCrop').click(function() {
+        // Get a string base 64 data url
+        $("#selected_image").cropper({
+            aspectRatio: 32/9,
+            crop: function(event){
+            }   
+        });
+
+        $('#btnCrop').hide();
+        $('#btnSave').show();
+        $('#btnCancel').show();
+     });
+
+    $('#btnCancel').click(function(){
+        closeCropper();
+    });
+
+    $('#btnSave').click(function(){
+        var croppedImageDataURL = $("#selected_image").cropper('getCroppedCanvas').toDataURL("image/png"); 
+        download(croppedImageDataURL, "cropped_file.png", "image/png");
+        closeCropper();
+    });
+
+    function closeCropper() {
+        $("#selected_image").cropper('destroy');
+        $('#btnCrop').show();
+        $('#btnSave').hide();
+        $('#btnCancel').hide();
+    }
 
     function readURL(input, img_field) {
         if (input.files && input.files[0]) {
