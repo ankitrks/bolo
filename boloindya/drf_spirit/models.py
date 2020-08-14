@@ -442,6 +442,9 @@ class UserFeedback(models.Model):
 
 class Campaign(RecordTimeStamp):
     banner_img_url = models.TextField(_("Banner Image URL"), blank = False, null = False)
+    details = models.TextField(_("Campaign Details"), blank = True, null = True)
+    show_popup_on_app = models.BooleanField(default=False)
+    popup_img_url = models.TextField(_("Popup Image URL"), blank = True, null = True)
     hashtag = models.ForeignKey('forum_topic.TongueTwister', verbose_name=_("HashTag"), related_name="campaign_hashtag",null=False,blank=False)
     is_active = models.BooleanField(default=True)
     active_from = models.DateTimeField(_("Active From"), auto_now=False, blank=False, null=False)

@@ -4656,6 +4656,17 @@ def get_campaigns(request):
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
+def get_popup_campaign(request):
+    today = datetime.today()
+    campaign = Campaign.objects.filter(show_popup_on_app=True, is_active=True, active_from__lte=today, active_till__gte=today).order_by('-active_from')
+    if campaign:
+        serializer_camp = CampaignSerializer(campaign[0])
+        data = serializer_camp.data
+        return JsonResponse({'status': 'success','message':data}, status=status.HTTP_201_CREATED)
+    else:
+        return JsonResponse({'status': 'failure'}, status=status.HTTP_201_CREATED)
+
+@api_view(['GET'])
 def get_user_details_from_topic_id(request):
     try:
         topic=Topic.objects.get(pk=request.GET.get('id', None))

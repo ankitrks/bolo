@@ -21,7 +21,7 @@ from django.db.models import Q
 from drf_spirit.views import getVideoLength
 from drf_spirit.utils  import calculate_encashable_details,language_options,check_or_create_user_pay
 from forum.user.models import UserProfile, ReferralCode, ReferralCodeUsed, VideoCompleteRate, VideoPlaytime,UserPay
-from forum.topic.models import Topic, VBseen, FVBseen
+from forum.topic.models import Topic, VBseen, FVBseen, TongueTwister
 from forum.category.models import Category
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -35,7 +35,7 @@ from forum.userkyc.forms import KYCBasicInfoRejectForm,KYCDocumentRejectForm,Add
 from .models import VideoUploadTranscode,VideoCategory, PushNotification, PushNotificationUser, user_group_options, \
     FCMDevice, notification_type_options, metrics_options, DashboardMetrics, DashboardMetricsJarvis, metrics_slab_options,\
      metrics_language_options, UserCountNotification, Report
-from drf_spirit.models import MonthlyActiveUser, HourlyActiveUser, DailyActiveUser, VideoDetails, MusicAlbum
+from drf_spirit.models import MonthlyActiveUser, HourlyActiveUser, DailyActiveUser, VideoDetails, MusicAlbum, Campaign, Winner
 from forum.category.models import Category
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -48,7 +48,7 @@ from itertools import groupby
 from django.db.models import Count
 import ast
 from drf_spirit.serializers import VideoCompleteRateSerializer
-from .forms import VideoUploadTranscodeForm,TopicUploadTranscodeForm,UserPayForm, AudioUploadForm
+from .forms import VideoUploadTranscodeForm,TopicUploadTranscodeForm,UserPayForm, AudioUploadForm, CampaignForm
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
 from django.core.files.base import ContentFile
 from drf_spirit.serializers import UserWithUserSerializer
@@ -228,6 +228,12 @@ def boloindya_upload_audio_file(request):
     topic_form = AudioUploadForm()
     return render(request,'jarvis/pages/upload_audio/boloindya_upload_audio.html',
             {'topic_form':topic_form})
+
+@login_required
+def new_campaign_page(request):    
+    campaign_form = CampaignForm()
+    return render(request,'jarvis/pages/campaigns/create_new_campaign.html',
+            {'add_campaign':campaign_form})
 
 @login_required
 def video_management(request):
@@ -849,6 +855,7 @@ def boloindya_upload_audio_file_to_s3(request):
     os.remove(urlify(image_file_name))
 
     return HttpResponse(json.dumps({'message':'success','file_id':music_album_obj.id}),content_type="application/json")
+
 @login_required
 def boloindya_upload_n_transcode(request):
     upload_file = request.FILES['media_file']
@@ -2543,5 +2550,222 @@ def unremove_video_or_unblock(request):
             return JsonResponse({'error':'report_id not found','message':'fail' }, status=status.HTTP_200_OK)
     else:
         return JsonResponse({'error':'User Not Authorised','message':'fail' }, status=status.HTTP_200_OK)
+
+@login_required
+def add_campaign(request):
+    banner_image_file = request.FILES.get('banner_file')
+    start_date_string = request.POST.get('start_date', None)
+    end_date_string = request.POST.get('end_date', None)
+    hashtag_id = request.POST.get('hashtag_id', None)
+    banner_image_upload_folder_name = request.POST.get('folder_prefix','from_upload_panel/campaign_banner_image')
+    upload_to_bucket = request.POST.get('bucket_name',None)
+    campaign_id = request.POST.get('campaign_id', None)
+    is_show_popup = request.POST.get('is_show_popup', None) == 'true'
+    campaign_details = request.POST.get('campaign_details', None)
+
+    if not upload_to_bucket:
+        return HttpResponse(json.dumps({'message':'fail','reason':'bucket_missing'}),content_type="application/json")
+    if not start_date_string or not end_date_string:
+        return HttpResponse(json.dumps({'message':'fail','reason':'Invalid dates'}),content_type="application/json")
+    if not banner_image_file:
+        if not campaign_id:
+            return HttpResponse(json.dumps({'message':'fail','reason':'Image File Missing'}),content_type="application/json")
+    elif not banner_image_file.name.endswith(('.jpg','.png', '.jpeg')):
+        return HttpResponse(json.dumps({'message':'fail','reason':'This is not a jpg/png file'}),content_type="application/json")
+    if not hashtag_id or hashtag_id == -1:
+        return HttpResponse(json.dumps({'message':'fail','reason':'Invalid Hashtag'}),content_type="application/json")
+
+    start_date = datetime.datetime.strptime(start_date_string, "%d-%m-%Y")
+    end_date = datetime.datetime.strptime(end_date_string, "%d-%m-%Y")
+    hashtag = TongueTwister.objects.filter(pk=hashtag_id)[0]
+
+    campaign_dict = {}
+    campaign_dict['hashtag'] = hashtag
+    campaign_dict['active_from'] = start_date
+    campaign_dict['active_till'] = end_date
+    campaign_dict['details'] = campaign_details
+
+    popup_image_file = None
+    if is_show_popup:
+        popup_image_file = request.FILES.get('popup_file')
+        campaign_dict['show_popup_on_app'] = True
+    else:
+        campaign_dict['show_popup_on_app'] = False
+
+    if banner_image_file:
+        banner_image_url = upload_image(upload_to_bucket, banner_image_file, banner_image_upload_folder_name)
+        if not banner_image_url:
+            return HttpResponse(json.dumps({'message':'fail','reason':'Image File already exist'}),content_type="application/json")
+        else:
+            campaign_dict['banner_img_url'] = banner_image_url
+
+    if popup_image_file:
+        popup_image_url = upload_image(upload_to_bucket, popup_image_file, banner_image_upload_folder_name)
+        if not popup_image_url:
+            return HttpResponse(json.dumps({'message':'fail','reason':'Image File already exist'}),content_type="application/json")
+        else:
+            campaign_dict['popup_img_url'] = popup_image_url
+
+    if campaign_id:
+        #If campaign ID is supplied, then it means it is an older campaign
+        campaign_obj = Campaign.objects.get(pk=campaign_id) 
+
+        is_disabled = request.POST.get('disable_campaign', False) == 'true'
+        is_winner_declared = request.POST.get('is_winner_declared', False) == 'true'
+        
+        if is_disabled:
+            campaign_dict['is_active'] = False
+        else:
+            campaign_dict['is_active'] = True
+
+        if is_winner_declared:
+            campaign_dict['is_winner_declared'] = True
+        else:
+            campaign_dict['is_winner_declared'] = False
+
+        if is_winner_declared:
+            winner_1_id = request.POST.get('winner_1', None)
+            winner_2_id = request.POST.get('winner_2', None)
+            winner_3_id = request.POST.get('winner_3', None)
+            video_1_id = request.POST.get('video_1', None)
+            video_2_id = request.POST.get('video_2', None)
+            video_3_id = request.POST.get('video_3', None)
+            
+            winners = []
+
+            if(winner_1_id):
+                winner_1 = Winner.objects.create(user=UserProfile.objects.get(pk=winner_1_id).user, rank=1, video_id=video_1_id)
+                winners.append(winner_1)
+            if(winner_2_id):
+                winner_2 = Winner.objects.create(user=UserProfile.objects.get(pk=winner_2_id).user, rank=2, video_id=video_2_id)
+                winners.append(winner_2)
+            if(winner_3_id):
+                winner_3 = Winner.objects.create(user=UserProfile.objects.get(pk=winner_3_id).user, rank=3, video_id=video_3_id)
+                winners.append(winner_3)
+            campaign_obj.winners.clear()
+            campaign_obj.winners.add(*winners)
+
+        Campaign.objects.filter(pk=campaign_id).update(**campaign_dict)
+        
+    else:    
+        #If there is no campaign ID supplied, then it means it is a new campaign
+        campaign_dict['is_winner_declared'] = False
+        campaign_obj = Campaign.objects.create(**campaign_dict)
+
+    print(campaign_dict)
+
+    return HttpResponse(json.dumps({'message':'success', 'campaign_id':campaign_obj.id}),content_type="application/json")
+
+def upload_image(bucket, image_file, folder_name):
+    bucket_credentials = get_bucket_details(bucket)
+    conn = boto3.client('s3', bucket_credentials['REGION_HOST'], aws_access_key_id = bucket_credentials['AWS_ACCESS_KEY_ID'], \
+            aws_secret_access_key = bucket_credentials['AWS_SECRET_ACCESS_KEY'])
+
+
+    image_file_name = urlify(image_file.name.lower())
+    image_output_key = hashlib.sha256(image_file_name.encode('utf-8')).hexdigest()
+    image_file_name = check_image_file_name_validation(image_file_name,image_output_key)
+
+    image_path = folder_name+'/'+image_file_name
+    try:
+        conn.head_object(Bucket=bucket, Key=image_path)
+        return None
+    except Exception as e:
+        with open(urlify(image_file_name),'wb') as f:
+            for chunk in image_file.chunks():
+                if chunk:
+                    f.write(chunk)
+
+    image_url = upload_to_s3_without_transcode(image_file_name,bucket,folder_name)
+    os.remove(urlify(image_file_name))
+    return image_url
+
+@login_required
+def campaigns_panel(request):
+    page_no = request.GET.get('page_no', '1')
+
+    campaign_list = Campaign.objects.order_by('-created_at')
+
+    total_page = campaign_list.count()/10
+    if campaign_list.count()%10:
+        total_page += 1
+    page = int(page_no) - 1
+
+    print("**", campaign_list.count(), total_page)
+
+    return render(request,'jarvis/pages/campaigns/boloindya_campaigns.html', {'campaign_list': campaign_list[page*10:page*10+10],\
+        'page_no': page_no, 'total_page': total_page})
+
+@login_required
+def particular_campaign(request, campaign_id=None):
+    campaign = Campaign.objects.get(pk=campaign_id)
+    return render(request,'jarvis/pages/campaigns/particular_campaign.html', {'campaign': campaign})
+
+
+@api_view(['POST'])
+def search_fields_for_campaign(request):
+    from drf_spirit.serializers import CategoryWithTitleSerializer, CategoryVideoByteSerializer, UserWithNameSerializer, TongueTwisterWithHashSerializer, TongueWithTitleSerializer
+    from forum.topic.models import TongueTwister
+    from django.db.models import Q
+    raw_data = json.loads(request.body)
+    query = raw_data['query']
+    result_type = raw_data['result_type']
+
+    '''
+    result_type: 
+         0 = hashtags
+         1 = users
+         2 = videos
+    '''
+
+    page=0
+    try:
+        page=int(raw_data['page'])
+    except:
+        page=0
+    data = []
+
+    try:
+        if result_type == '0':
+            challenges=TongueTwister.objects.filter(hash_tag__istartswith=query.replace("#", ""))[:10]
+            data=TongueTwisterWithHashSerializer(challenges, many=True).data
+
+        elif result_type == '1':
+            try:
+                int(query)
+                users=UserProfile.objects.filter(Q(user__pk=query)&Q(is_test_user=False)).order_by('pk').distinct('pk')[:20]
+            except: 
+                users=UserProfile.objects.filter((Q(user__username__istartswith=query)|Q(name__istartswith=query)|Q(mobile_no__istartswith=query))&Q(is_test_user=False)).order_by('pk').distinct('pk')[:20]
+            data=UserWithUserSerializer(users, many=True).data
+
+        elif result_type == '2':
+            topics=[]
+            try:
+                int(query)
+                topics=Topic.objects.filter(Q(pk=query)).order_by('title')
+            except:
+                topics=Topic.objects.filter(is_removed=False, is_vb=True, title__istartswith=query).order_by('title')
+            data=TongueWithTitleSerializer(topics[page*100:(page*100)+100], many=True).data
+        
+        else:
+            data = []
+
+        print('data:', data)
+        return JsonResponse({'data': data}, status=status.HTTP_200_OK )
+    except Exception as e:
+        print(e)
+        return JsonResponse({'data': [], 'error': str(e)}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def search_and_add_hashtag(request):
+    from drf_spirit.serializers import TongueTwisterWithHashSerializer
+    raw_data = json.loads(request.body)
+
+    query = raw_data['hashtag']
+
+    hashtag = TongueTwister.objects.create(hash_tag=query)
+
+    data = TongueTwisterWithHashSerializer(hashtag).data
+    return JsonResponse(data, status=status.HTTP_200_OK)
 
 

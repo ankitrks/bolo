@@ -80,4 +80,12 @@ urlpatterns = [
     url(r'^update_user_time/$',views.update_user_time, name='update_user_time'),
     url(r'^upload_audio_file/$',views.boloindya_upload_audio_file,name = 'upload_audio_file'),
     url(r'^upload_audio_file_to_s3/$',views.boloindya_upload_audio_file_to_s3,name = 'upload_audio_file_to_s3'),
+
+    #urls for campaign panel
+    url(r'^campaigns_panel/$',views.campaigns_panel,name = 'campaigns_panel'),
+    url(r'^new_campaign_page/$',views.new_campaign_page,name = 'campaigns_panel'),
+    url(r'^add_campaign/$',views.add_campaign,name = 'add_campaign'),
+    url(r'^search_fields_for_campaign/$',views.search_fields_for_campaign, name='search_hashtags'),
+    url(r'^particular_campaign/(?P<campaign_id>\d+)$',views.particular_campaign,name = 'particular_campaign'),
+    url(r'^search_and_add_hashtag/$',views.search_and_add_hashtag, name='search_and_add_hashtag'),
 ]

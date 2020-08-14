@@ -1,0 +1,105 @@
+{% extends "jarvis/layout/base.html" %}
+{% block styles %}
+<style>
+    #overlay {
+  position: fixed; /* Sit on top of the page content */
+  display: none; /* Hidden by default */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+  z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
+}
+.percentcomplete{
+    position: absolute;
+    top: 50%;
+    left:50%;
+    color: white;
+    transform: translate(-50%,-50%);
+}
+.video_elements{
+    display: none;
+}
+.campaign_banner{
+    display: block;
+    width: 200px;
+    height: 120px;
+}
+
+#create_new_campaign{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-width : 200px;
+}
+
+ul {
+    float:left;
+    list-style: none;
+    padding: 0px;
+    border: 1px solid black;
+    margin-top: 0px;
+    width: 100%;
+    max-height: 120px;
+    display: block;
+    overflow-y: scroll;
+    background: white;
+}
+ul li {
+    padding: 2px;
+    cursor: pointer;
+    border-bottom: 1px solid black;
+}
+#response li:hover{
+    background: #1989CD;
+    color: white;
+}
+</style>
+{% endblock styles %}
+{% block content %}
+
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+
+<section class="content">
+    <a id="create_new_campaign" href="/jarvis/new_campaign_page/" class="btn btn-primary">Create New Campaign</a>
+    <br>
+     <div class="col-xs-12 table-responsive ">
+        <table class="table table-striped nowrap" id="campaigns_table">
+            <thead>
+                <tr>
+                    <th>S No.</th>
+                    <th>Campaign Hashtag</th>
+                    <th>Campaign Banner</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for campaign in campaign_list %}
+                    <tr style="{% if not campaign.is_active %} background-color: #AEAEAE;{% endif %}">
+                        <td>{{ forloop.counter }}</td>
+                        <td><a href="/jarvis/particular_campaign/{{campaign.pk}}">{{ campaign.hashtag.hash_tag }}</a></td>
+                        <td><img id="campaign_banner" class="campaign_banner" src="{{campaign.banner_img_url}}"/></td>
+                        <td>{{campaign.active_from}}</td>
+                        <td>{{campaign.active_till}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div>
+            {% if page_no != '1' %}<a href="/jarvis/campaigns_panel/?page_no=1" >First</a> <a href="/jarvis/campaigns_panel/?page_no={{page_no|add:-1}}" >Prev</a>{% endif %} {{ page_no }} of {{ total_page }} pages {% if page_no|add:0 != total_page %}<a href="/jarvis/campaigns_panel/?page_no={{page_no|add:1}}" >Next</a> <a href="/jarvis/campaigns_panel/?page_no={{total_page}}" >Last</a>{% endif %}
+        </div>
+    </div>
+
+    <div id="overlay">
+        <div class="text"><br>
+            <br><span style="font-size:50px;" class="percentcomplete"></span></div>
+    </div>
+    <div id="csv_table">
+    </div>
+</section>
+{% endblock content %}  

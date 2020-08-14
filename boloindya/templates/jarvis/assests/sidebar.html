@@ -109,6 +109,9 @@
         {% if user|is_user_in_group:"moderator" %}
         <li class="{% if request.path in '/jarvis/upload_audio_file/'%}active{% endif %}"><a href="/jarvis/upload_audio_file/"><i class="fa fa-file-audio-o"></i> <span>Audio Management</span></a></li>
         {% endif %}
+        {% if user|is_user_in_group:"moderator" %}
+        <li class="{% if request.path in '/jarvis/campaigns_panel/'%}active{% endif %}"><a href="/jarvis/campaigns_panel/"><i class="fa fa-flag"></i> <span>Campaigns</span></a></li>
+        {% endif %}
       </ul>
 
     </section>
