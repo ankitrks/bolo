@@ -258,10 +258,10 @@ def share_vb_page(request, user_id, poll_id, slug):
         user_profile = None
     context = {
         'topic': topics,
-        'is_single_topic': poll_id,
+        'is_single_topic': "Yes",
         'user_profile': user_profile
     }
-    return render(request, 'spirit/topic/particular_topic.html', context)
+    return render(request, 'spirit/topic/video_details.html', context)
 
 def index_active(request):
     categories = Category.objects.visible().parents()
@@ -1471,11 +1471,25 @@ def share_match_page(request, match_id, slug):
 
 # Share Pages Match 
 def share_challenge_page(request, hashtag):
-    challenge = TongueTwister.objects.using('default').get(hash_tag = hashtag)
+    language_id=1
+    popular_bolo = []
+    tongue=[]
+    category_details=""
+    challengehash=""
+    languages_with_id=settings.LANGUAGES_WITH_ID
+    languageCode =request.LANGUAGE_CODE
+    language_id=languages_with_id[languageCode] 
+    challengehash = '#' + hashtag
+    tongue = TongueTwister.objects.using('default').filter(hash_tag__iexact=challengehash[1:]).order_by('-hash_counter')
+    if len(tongue):
+        tongue = tongue[0]
     context = {
-    'challenge': challenge,
+        'tongue':tongue,
+        'hashtag':hashtag,
+
     }
-    return render(request, 'spirit/topic/challenge_details.html', context)
+    #print TongueTwister.__dict__
+    return render(request, 'spirit/topic/topic_list_by_hashtag.html', context)
    
 # Share Poll Match 
 def share_poll_page(request, poll_id, slug):
@@ -1496,17 +1510,51 @@ def share_poll_page(request, poll_id, slug):
 
 # Share User  
 def share_user_page(request, user_id, username):
-    try:        
-        user = User.objects.get(id=user_id)
-        user_profile = UserProfile.objects.get(user = user)
+    #username=request.GET.get('lid');
+    language_id=1
+    languages_with_id=settings.LANGUAGES_WITH_ID
+    languageCode =request.LANGUAGE_CODE
+    language_id=languages_with_id[languageCode]
+    popular_bolo = []
+    try:      
+        user = User.objects.get(username=username)
+        #user_profile = UserProfile.objects.get(user = user)
+        user_id=user.id
+        user_profile = UserProfile.objects.filter(user=user,user__is_active = True)[0]
         topics = Topic.objects.filter(user_id=user_id, is_removed=False)
+        topicsByLang = Topic.objects.filter(user_id=user_id, is_removed=False,language_id=language_id)
+        try:
+            if language_id:
+                all_user = User.objects.filter(st__is_popular = True, st__language=language_id)[10]
+                popular_bolo=all_user
+            else:
+                all_user = User.objects.filter(st__is_popular = True)[10]
+                popular_bolo=all_user
+        except Exception as e1:
+            popular_bolo = []
+
+        try:
+            hash_tags = TongueTwister.objects.order_by('-hash_counter')[:20]
+        except Exception as e1:
+            hash_tags = []
+
         context = {
             'user_profile': user_profile,
-            'topics': topics
+            'user':user,
+            'hash_tags':hash_tags,
+            'popular_bolo':popular_bolo,
+            'topics': topics,
+            'topicsCount': topicsByLang.count()
         }
-        return render(request, 'spirit/topic/particular_user.html', context)
+        #print popular_bolo.__dict__
+
+        video_slug = request.GET.get('video',None)
+        if(video_slug != None):
+            return redirect('/video/'+video_slug)
+        else:
+            return render(request, 'spirit/topic/user_details.html', context)
     except:
-        return render(request, 'spirit/topic/temporary_landing.html')
+        return redirect('/')
 
 def login_using_api(request):
     username = request.POST.get('username', '')
