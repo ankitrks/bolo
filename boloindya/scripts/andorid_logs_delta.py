@@ -31,6 +31,9 @@ from django.utils import timezone
 import math
 import boto3
 from django.conf import settings
+import pandas as pd
+from operator import itemgetter 
+
 
 
 
@@ -215,24 +218,20 @@ def extract_minmax_delta(log_text_dump, userid):
 			if(len(data_iter)>0):
 				complete_data.append(data_iter)
 	
+def process_data(complete_data):
+	complete_data = sorted(complete_data, key = itemgetter(4), reverse = True) 
+	complete_data = complete_data[:10000]
+	return complete_data
+
 # func for writing data into csv
-def write_csv(n):
+def write_csv(complete_data):
 	headers = ['User', 'Video title', 'Player Ready', 'Time Played','StartPlayingcdn','StartPlayingcache','StartPlaying', 'Network','Device Model','Manufacturer','Play Date Time']
         f_name = 'deltarecords.csv'
-	if n==1:
-
-		with open(f_name, 'w') as f:
-			writer = csv.writer(f)
-			writer.writerow(headers)
-			for each_data in complete_data:
-				writer.writerow([x for x in each_data])
-	else:
-		with open(f_name, 'a') as csvfile:  
-			csvwriter = csv.writer(csvfile)
-			for each_data in complete_data:
-				csvwriter.writerow([x for x in each_data])
-
-
+	with open(f_name, 'w') as f:
+		writer = csv.writer(f)
+		writer.writerow(headers)
+		for each_data in complete_data:
+			writer.writerow([x for x in each_data])
 
 # func for sending the csv created to the mail
 def send_file_mail(url):
@@ -257,7 +256,7 @@ def send_file_mail(url):
 	server = smtplib.SMTP("smtp.gmail.com:587")
 	server.starttls()
 	server.login(username, password)
-	server.sendmail(emailfrom, [emailto, 'ankit@careeranna.com', 'varun@careeranna.com', 'gitesh@careeranna.com' , 'maaz@careeranna.com', 'akash.u@boloindya.com', 'gaurang.s@boloindya.com'], msg.as_string())	
+	server.sendmail(emailfrom, [emailto,'ankit@careeranna.com', 'varun@careeranna.com', 'gitesh@careeranna.com' , 'maaz@careeranna.com', 'akash.u@boloindya.com',  'gaurang.s@boloindya.com'], msg.as_string())	
 	server.quit()
 
 def main():
@@ -272,8 +271,8 @@ def main():
 		today = datetime.today()
 		start_time =  (today - timedelta(days = 1)).replace(hour=0, minute=0, second=0)
 		end_time = (today - timedelta(days = 1)).replace(hour=23, minute=59, second=59)
-		# start_time = '2020-06-19'
-		# end_time = '2020-06-20'
+		# start_time = '2020-08-09'
+		# end_time = '2020-08-10'
 
 		print(start_time, end_time)
 	chunk_size = 10000
@@ -294,10 +293,18 @@ def main():
 					extract_minmax_delta(each_android_dump, userid)
 			except Exception as e:
 				count=0
-		write_csv(j)
+	data = process_data(complete_data)
+	write_csv(data)
 	filetosend = os.getcwd() + "/deltarecords.csv"
 	url = upload_media(filetosend)
 	send_file_mail(url)
 
 def run():
 	main()
+
+
+
+
+
+
+
