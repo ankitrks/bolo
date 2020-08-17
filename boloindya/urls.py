@@ -116,6 +116,7 @@ urlpatterns += i18n_patterns(
     url(r'^get_challenge_details/$', forum.topic.views.get_challenge_details, name='get_challenge_details'),
     url(r'^(?P<username>[\w-]+)/$', forum.topic.views.bolo_user_details, name='bolo_user_details'),
     url(r'^(?P<username>[\w-]+)/(?P<id>\d+)/$', forum.topic.views.video_details, name='video_details'),
+    url(r'^(?P<username>[\w-]+)/(?P<id>\d+)/(?P<userid>\d+)/$', forum.topic.views.video_details, name='video_details'),
     url(r'^test/testurllang/$', forum.topic.views.testurllang, name='testurllang'),
     #prefix_default_language=True
     

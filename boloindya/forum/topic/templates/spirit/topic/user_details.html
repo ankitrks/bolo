@@ -709,12 +709,12 @@ color: #B62827;
     padding: 10px;
 }
 .classProfImgPos{
-    position:absolute !important;top: 218px;left: 20px;
+    position:absolute !important;top: 218px;
 }
 
 @media(max-width: 991px){
    .classProfImgPos{
-        position:absolute !important;top: 218px;left: 180px;
+        position:absolute !important;top: 218px;
     } 
 .paddingTop {
     padding-top: 89px;
@@ -760,7 +760,7 @@ color: #B62827;
             <header class="share-layout-header bottom-line share-header profile" style="margin: 0; padding: 0">
                 <div class="backgroundData " style="background-image: linear-gradient(to bottom, rgba(245, 246, 252, 0.52), rgba(184, 43, 41)), url({{ user_profile.cover_pic}});height: 270px;width: 100%; ">
                 </div>
-                <div class="jsx-2177493926 jsx-578937417 avatar round userProfilAvator classProfImgPos" style="background-image: url({% if user_profile.profile_pic|length > 1 %}
+                <div class="jsx-2177493926 jsx-578937417 avatar round userProfilAvator classProfImgPos" style="horizontal-align: middle; justify-content: center; background-image: url({% if user_profile.profile_pic|length > 1 %}
                                 {{user_profile.profile_pic}}
                             {% else %}
                                 /media/user.svg
@@ -773,10 +773,19 @@ color: #B62827;
 {% else %}
     check-icon
 {% endif %} " ></span></span></h1>
-                    <p><a href="javascript:void(0);"><img style="height: 12px;" src="/media/plus_icon.png"><span onclick="copyShareLinkMobileProfile();" style="color: #9A9A9A;font-size: 11px;"> Share Profile</span></a>
+                     
+
+<!-- <span class="unit" style="display: inline-block;position: relative;top: -49px;"> -->
+    <!-- <button onclick="follow_user('{{user_profile.id}}');" style="float: right;" class="_4jy1 _4jy4 _517h _51sy _42ft" type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-{{user_profile.id}} followCheck sx_5da455"></i><span class="btnTextChange-{{user_profile.id}}">{% trans "Follow" %}</span>
+    </button> -->
+<!-- </span> -->
+
+                    <p style="visibility: hidden;"><a href="javascript:void(0);"><img style="height: 12px;" src="/media/plus_icon.png"><span onclick="copyShareLinkMobileProfile();" style="color: #9A9A9A;font-size: 11px;"> Share Profile</span></a>
                        <span class="linkCopiesProfile"></span> 
                     </p>
-                    <h3 class="share-sub-title ">{{ user_profile.bio}} <button class="btnClassEdit bts-popup-trigger"><img src="/media/edit_profile.png" style="width: 12px;"> Edit Profile</button></h3>
+                    <button onclick="follow_user('{{user_profile.id}}');" class="_4jy1 _4jy4 _517h _51sy _42ft" type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-{{user_profile.id}} followCheck sx_5da455"></i><span class="btnTextChange-{{user_profile.id}}">{% trans "Follow" %}</span>
+                    </button>
+                    <h3 class="share-sub-title ">{{ user_profile.bio}} <button class="btnClassEdit bts-popup-trigger" style="display: none;"><img src="/media/edit_profile.png" style="width: 12px;"> Edit Profile</button></h3>
 
                     <ul class="jsx-1061034316 hideOnDesktop">
                         <li class="jsx-1061034316"><strong title="Videos" class="jsx-1061034316">{{topicsCount | shorcountertopic}}</strong><span class="jsx-1061034316">Videos</span></li>                        
@@ -857,7 +866,7 @@ color: #B62827;
             <div class="jsx-2679382212 icontainer">
                 <div class="platwrap" >
                     <div onclick="copyShareLinkMobile();" class="platicon i-copylink" style="background-image: url(/media/copy.svg);"></div><span>{% trans "Copy Link" %}</span>
-                    <input readonly=""  class="jsx-1861775669 jsx-537314381" style="background: #f6f6f6;border: none;color: #f7f7f7;font-size: 1px;" id="shareInputboxMobile" value="https://www.boloindya.com/@karansingharoraofficial/video/6758860880575827202">
+                    <!-- <input readonly=""  class="jsx-1861775669 jsx-537314381" style="background: #f6f6f6;border: none;color: #f7f7f7;font-size: 1px;" id="shareInputboxMobile" value="https://www.boloindya.com/@karansingharoraofficial/video/6758860880575827202"> -->
                 </div>
 
 <!--                 <div class="platwrap" onclick="social_share_main('facebook_share')">

@@ -441,25 +441,32 @@ def video_discover(request):
         #return render(request, 'spirit/topic/video_discover.html', context)
 
 
-def video_details(request,username='',id=''):
+def video_details(request,username='',id='', userid=''):
     
     #print topics
+
     #print user_profile.__dict__
     try:
         topics = Topic.objects.get(id = id)
     except:
         topics = None
+    
+    if userid != '':
+        user = User.objects.get(id=userid)
+    else:
+        user = User.objects.get(username=username)
 
     try:
-        user = User.objects.get(username=username)
         user_profile = UserProfile.objects.filter(user=user,user__is_active = True)[0]
         
     except:
         user_profile = None
+
     context = {
         'topic': topics,
         'is_single_topic': "Yes",
-        'user_profile': user_profile
+        'user_profile': user_profile,
+        'user': user
     }
 
     return render(request, 'spirit/topic/video_details.html', context)
@@ -547,7 +554,7 @@ def bolo_user_details(request,username=''):
             hash_tags = TongueTwister.objects.order_by('-hash_counter')[:20]
         except Exception as e1:
             hash_tags = []
-
+        
         context = {
             'user_profile': user_profile,
             'user':user,
