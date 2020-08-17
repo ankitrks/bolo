@@ -1013,13 +1013,12 @@
 
     });
 
-    function shareOpenAndHide(topicId,topicTitle,topicCreatorUsername,slug) {
-
+    function shareOpenAndHide(topicId,topicTitle,topicCreatorUsername,slug, topicCreatorUserid) {
         $("#topicId").val(topicId);
         $("#topicCreatorTitle").val(topicCreatorTitle);
         $("#topicCreatorUsername").val(topicCreatorUsername);
         $("#topicSlugTitle").val(slug);
-        var copyLinkData =site_base_url+slug+'/'+topicId+'/';
+        var copyLinkData =site_base_url+slug+'/'+topicId+'/'+topicCreatorUserid+'/';
         $("#shareInputboxMobile").val(copyLinkData);
 
         var shareOpenAndHideMobAndDesk=$('.shareOpenAndHideMobAndDesk').hasClass('hide');

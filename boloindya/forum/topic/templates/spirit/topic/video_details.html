@@ -1385,7 +1385,7 @@ $(document).ready(function() {
         <div style="height:calc(100% - 48px)" class="jsx-1270455008 main jsx-342698747 ">
             <div class="jsx-3164575034 home">
                 <div class="jsx-1270455008 top-banner mobileDownPopup hide">
-                    <div class="jsx-1270455008"><p class="jsx-1270455008">Boloindya</p><p class="jsx-1270455008">{% blocktrans %} {{Download}} the app to {{like}} this {{video}} {% endblocktrans %}</p></div><div class="jsx-1270455008"><button onclick="downloadAppLink()" class="jsx-1270455008 jsx-download-app">{% trans "Get" %}</button></div>
+                    <div class="jsx-1270455008"><p class="jsx-1270455008">BoloIndya</p><p class="jsx-1270455008">{% blocktrans %} Download the app to like this video {% endblocktrans %}</p></div><div class="jsx-1270455008"><button onclick="downloadAppLink()" class="jsx-1270455008 jsx-download-app">{% trans "Get" %}</button></div>
                 </div>
                 <div class="jsx-3164575034 loading">
                     <div class="jsx-4077079786 boloindya-loading"></div>
@@ -1417,12 +1417,12 @@ $(document).ready(function() {
 
                            </div>
                             <div class="sidebar">
-
+                                <a tag="a" class="jsx-1861775669 jsx-537314381 user-info" href="/{{user.username}}">
                                 <div class="jsx-2177493926 jsx-3813273378 avatar round" style="background-image: url({% if user_profile.profile_pic|length > 1 %}
                                 {{user_profile.profile_pic}}
                             {% else %}
                                 /media/user.svg
-                            {% endif %}); width: 48px; height: 48px; flex: 0 0 48px;"></div>
+                            {% endif %}); width: 48px; height: 48px; flex: 0 0 48px;"></div></a>
                                 <div class="jsx-949708032 boloindya-toolbar" style="margin-top: 20px;">
                                     <div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-like " onclick="openMobileDownloadPopup();" style="background-image: url(/media/viewIcon.svg);"><span class="jsx-949708032">{{topic.view_count | shorcountertopic}}</span></div>
                                     <div class="jsx-949708032 boloindya-toolbar-section boloindya-toolbar-comment" onclick="openMobileDownloadPopup();" style="background-image: url(/media/comments.svg);"><span class="jsx-949708032">{{topic.comment_count | shorcountertopic}}</span></div>
