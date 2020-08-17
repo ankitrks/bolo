@@ -1018,7 +1018,8 @@
         $("#topicCreatorTitle").val(topicCreatorTitle);
         $("#topicCreatorUsername").val(topicCreatorUsername);
         $("#topicSlugTitle").val(slug);
-        var copyLinkData =site_base_url+slug+'/'+topicId+'/'+topicCreatorUserid+'/';
+        var copyLinkData =site_base_url+"video/"+slug+'/'+topicId+'/';
+        //+topicCreatorUserid+'/';
         $("#shareInputboxMobile").val(copyLinkData);
 
         var shareOpenAndHideMobAndDesk=$('.shareOpenAndHideMobAndDesk').hasClass('hide');

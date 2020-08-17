@@ -493,7 +493,8 @@ def video_details_by_slug(request,slug='',id=''):
     context = {
         'topic': topics,
         'is_single_topic': "Yes",
-        'user_profile': user_profile
+        'user_profile': user_profile,
+        'user': user
     }
 
     return render(request, 'spirit/topic/video_details.html', context)
