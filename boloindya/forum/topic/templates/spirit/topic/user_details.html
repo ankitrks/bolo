@@ -773,10 +773,19 @@ color: #B62827;
 {% else %}
     check-icon
 {% endif %} " ></span></span></h1>
+                     
+
+<!-- <span class="unit" style="display: inline-block;position: relative;top: -49px;"> -->
+    <!-- <button onclick="follow_user('{{user_profile.id}}');" style="float: right;" class="_4jy1 _4jy4 _517h _51sy _42ft" type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-{{user_profile.id}} followCheck sx_5da455"></i><span class="btnTextChange-{{user_profile.id}}">{% trans "Follow" %}</span>
+    </button> -->
+<!-- </span> -->
+
                     <p><a href="javascript:void(0);"><img style="height: 12px;" src="/media/plus_icon.png"><span onclick="copyShareLinkMobileProfile();" style="color: #9A9A9A;font-size: 11px;"> Share Profile</span></a>
                        <span class="linkCopiesProfile"></span> 
                     </p>
-                    <h3 class="share-sub-title ">{{ user_profile.bio}} <button class="btnClassEdit bts-popup-trigger"><img src="/media/edit_profile.png" style="width: 12px;"> Edit Profile</button></h3>
+                    <button onclick="follow_user('{{user_profile.id}}');" style="float: right;" class="_4jy1 _4jy4 _517h _51sy _42ft" type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-{{user_profile.id}} followCheck sx_5da455"></i><span class="btnTextChange-{{user_profile.id}}">{% trans "Follow" %}</span>
+                    </button>
+                    <h3 class="share-sub-title ">{{ user_profile.bio}} <button class="btnClassEdit bts-popup-trigger" style="display: none;"><img src="/media/edit_profile.png" style="width: 12px;"> Edit Profile</button></h3>
 
                     <ul class="jsx-1061034316 hideOnDesktop">
                         <li class="jsx-1061034316"><strong title="Videos" class="jsx-1061034316">{{topicsCount | shorcountertopic}}</strong><span class="jsx-1061034316">Videos</span></li>                        
