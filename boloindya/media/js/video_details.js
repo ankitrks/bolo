@@ -166,50 +166,42 @@ function video_play_using_video_js_old(url,backup_url,image) {
   checkPlayStatus(video);
 }
 
-function video_play_using_video_js(url,backup_url,image) {debugger;
+function video_play_using_video_js(url,backup_url,image) {
     
     //var video = document.getElementById('playerDetails');
 
     var strUrl = url;
     var backUrl = backup_url;
-    url = strUrl.replace("http://", "https://");
+    url = strUrl.replace("http://", "https://");  
     backup_url = backUrl.replace("http://", "https://");
 
     var posterImage = image.replace("http://", "https://");
     image = posterImage.replace("http://", "https://");
     video.poster = image;
-
-    fetch(url)
-    .then(_ => {
-      video.src = url;
-      return video.play();
-    })
-    .then(_ => {
-        console.log('playback started');
-        // Video playback started ;)
-    })
-    .catch(e => {
-        console.log('failed started');
- 
-      if(Hls.isSupported()) {
-        var hls = new Hls();
-        hls.loadSource(url);
-        hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED,function() {
-          video.play();
-          loaderHide();
-      });
-     }
-
-      else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = backup_url;
+    if(url.indexOf(".m3u8")===-1){
+        video.src = url;
         video.addEventListener('loadedmetadata',function() {
           video.play();
           loaderHide();
         });
       }
+    else if(Hls.isSupported()) {
+      var hls = new Hls();
+      hls.loadSource(url);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED,function() {
+        video.play();
+        loaderHide();
+      });
+    }
 
-    });
+    else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = url;
+      video.addEventListener('loadedmetadata',function() {
+        video.play();
+        loaderHide();
+      });
+    }
     checkPlayStatus(video);
 
 }
@@ -319,7 +311,6 @@ function muteAndUnmutePlayerDet(muteDetails){
 
 }
 
-
 function VideoPlayByURL(file,image){
   loaderShow();
   var playerInstanceDe = jwplayer("playerDetails");
@@ -399,10 +390,18 @@ $(".event-delegate-maskDesk1").click(function(){
 
 
 function video_play_using_video_js_mobile(url,backup_url,image) {
-    
+    url = url.replace("http://", "https://");
     var video = document.getElementById('playerDetailsMobile');
+      if(url.indexOf(".m3u8")===-1){
+        video.src = url;
+        video.addEventListener('loadedmetadata',function() {
+          video.play();
 
-      if(Hls.isSupported()) {
+          loaderHide();
+        });
+      }
+
+      else if(Hls.isSupported()) {
         var hls = new Hls();
         hls.loadSource(url);
         hls.attachMedia(video);
@@ -439,6 +438,7 @@ function video_play_using_video_js_mobile(url,backup_url,image) {
           loaderHide();
         });
       }
+
 }
 
 
@@ -446,14 +446,14 @@ function VideoPlayByURLMobile(file,image){
   loaderShow();
   // var playerInstanceDe = jwplayer("playerDetailsMobile");
   // jwplayer('playerDetailsMobile').setMute(false);
-  var newSrc='/media/mute_icon.svg';
-  $('#mutedImageIdDe').attr('src', newSrc);
+  // var newSrc='/media/mute_icon.svg';
+  // $('#mutedImageIdDe').attr('src', newSrc);
 
 
     $('.videoPlayButton').removeClass('_video_card_playbtn_wraaper');
     var preBufferDone = false;
     video_play_using_video_js_mobile(file,file,image);
-    $('.videoPlayButtonDetails').removeClass('play-button');
+    $('.videoPlayButtonDetails').addClass('play-button');
       
     //   playerInstanceDe.setup({
     //     file: file,
