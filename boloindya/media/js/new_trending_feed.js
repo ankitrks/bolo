@@ -207,9 +207,10 @@ function videoItemsTemplate(itemVideoByte,totalCountVideo) {
                             </span>\
                                 <div class="card-body videoRowCardBody" style="">\
                                     <div>\
-                                        <h5 class="title">'+content_title+'</h5>\
-                                        <p class="desc descByName">'+userShortNameq+'</p>\
-                                    </div>\
+                                        <h5 class="title">'+ content_title + '</h5>\
+                                        <a tag="a" class="jsx-1861775669 jsx-537314381 user-info" href="/'+ itemVideoByte.user.username + '">\
+                                            <p class="desc descByName">'+ userShortNameq + '</p></a>\
+                                   </div>\
                                     <div style="display: inline-flex; justify-content: space-between;">\
                                         <div style="margin-right: 10px;">\
                                             <a href="#">\
