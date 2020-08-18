@@ -37,7 +37,7 @@ function getUserVideos(limit,offset){
     jQuery.ajax({
         url:res,
         type:"GET",
-        data:{'limit':limit,'offset':offset,'user_id':user_id,'language_id':language_id},
+        data:{'limit':limit,'offset':offset,'user_id':user_id},
         success: function(response,textStatus, xhr){
             userVideoItems="";
             var videoItemList=response.results;
