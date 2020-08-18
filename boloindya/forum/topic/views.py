@@ -1525,7 +1525,7 @@ def share_user_page(request, user_id, username):
     language_id=languages_with_id[languageCode]
     popular_bolo = []
     try:      
-        user = User.objects.get(username=username)
+        user = User.objects.get(id=user_id)
         #user_profile = UserProfile.objects.get(user = user)
         user_id=user.id
         user_profile = UserProfile.objects.filter(user=user,user__is_active = True)[0]
