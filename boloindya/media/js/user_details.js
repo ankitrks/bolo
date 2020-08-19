@@ -61,19 +61,20 @@ function getUserVideos(limit,offset){
 }
 
 function loadMoreData(NextPageUrl){
-    
     var platlistItems;
     checkDataStatus=1;
     var listItems="";
     var language_id=current_language_id;
     var uri=NextPageUrl;
+    var user_id= $("#currentUserId").val();
+    //can't directly hit next url beacuse of cors issue
+    var offset = NextPageUrl.split("offset=")[1]
     var res = encodeURI(uri);
       $.ajax(
             {
-                url:res,
-                data:{'language_id':language_id},
+                url:'/api/v1/get_vb_list/',
+                data:{'language_id':language_id, 'user_id': user_id, 'offset': offset},
                 type: "get",
-                headers: {  'Access-Control-Allow-Headers': 'https://stage.boloindya.com' },
                 beforeSend: function()
                 {
                     $('.ajax-load').show();

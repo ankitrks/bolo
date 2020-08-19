@@ -388,7 +388,7 @@ def VBList(request):
         if page_no<paginator.num_pages:
             next_offset = page_no*settings.REST_FRAMEWORK['PAGE_SIZE']+1
             user_id = request.GET.get('user_id')
-            next_link = settings.TEST_URL+'api/v1/get_vb_list/?user_id='+str(user_id)+'&offset='+str(next_offset)
+            next_link = settings.BASE_URL+'api/v1/get_vb_list/?user_id='+str(user_id)+'&offset='+str(next_offset)
     if not is_user_timeline:
         page_no = 1
     try:
