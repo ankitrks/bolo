@@ -73,7 +73,7 @@ function loadMoreData(NextPageUrl){
                 url:res,
                 data:{'language_id':language_id},
                 type: "get",
-                dataType: 'jsonp',
+                headers: {  'Access-Control-Allow-Headers': 'x-requested-with' },
                 beforeSend: function()
                 {
                     $('.ajax-load').show();
