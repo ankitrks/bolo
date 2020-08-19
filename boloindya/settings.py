@@ -667,3 +667,4 @@ PUSH_NOTIFICATION_TEST_USER = [19, 20, 1492, 328, 41, 40]
 PUSH_NOTIFICATION_URL = "https://fcm.googleapis.com/v1/projects/boloindya-1ec98/messages:send"
 FTIME_PLAY = 0.5 # in seconds
 FPLAYTIME_LIMIT = 180000 # in seconds 50 hours
+POPULAR_BOOST_TIMEDELTA = 2 # in days

@@ -142,7 +142,7 @@ def update_redis_paginated_data(key, query, cache_max_pages = settings.CACHE_MAX
     else:
         while(page != None):
             updated_df = topics_df.query('id not in [' + ','.join(exclude_ids) + ']').drop_duplicates('user_id')\
-                    .nlargest(items_per_page, 'vb_score', keep = 'last')
+                    .nlargest(items_per_page, 'vb_score', keep = 'first')
             id_list = updated_df['id'].tolist()
             if len(id_list) >= min_count_per_page and page <= cache_max_pages:
                 exclude_ids.extend( map(str, id_list) )
@@ -336,8 +336,12 @@ def new_algo_update_redis_paginated_data(key, query,trending = False, cache_max_
             temp_topics_df = topics_df.loc[mask]
             if not temp_topics_df.empty:
                 while(page != None):
-                    updated_df = temp_topics_df.query('id not in [' + ','.join(exclude_ids) + ']').drop_duplicates('user_id')\
-                            .nlargest(items_per_page, 'vb_score', keep = 'last')
+                    if trending:
+                        updated_df = temp_topics_df.query('id not in [' + ','.join(exclude_ids) + ']')\
+                                .nlargest(items_per_page, 'vb_score', keep = 'first')
+                    else:
+                        updated_df = temp_topics_df.query('id not in [' + ','.join(exclude_ids) + ']').drop_duplicates('user_id')\
+                                .nlargest(items_per_page, 'vb_score', keep = 'first')
                     id_list = updated_df['id'].tolist()
                     if len(id_list) >= min_count_per_page and page <= cache_max_pages:
                         exclude_ids.extend( map(str, id_list) )
