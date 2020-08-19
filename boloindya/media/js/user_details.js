@@ -73,7 +73,7 @@ function loadMoreData(NextPageUrl){
                 url:res,
                 data:{'language_id':language_id},
                 type: "get",
-                dataType: 'json',
+                dataType: 'jsonp',
                 beforeSend: function()
                 {
                     $('.ajax-load').show();
