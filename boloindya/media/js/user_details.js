@@ -27,7 +27,6 @@ function getUserVideos(limit,offset){
     loaderBoloShowDynamic('_scroll_load_more_loading_user_videos');
     var user_id= $("#currentUserId").val();
     var platlistItems;
-    var language_id=current_language_id;
     var listItems="";
     var userVideoItems="";
     var uri='/api/v1/get_vb_list/';
@@ -64,16 +63,15 @@ function loadMoreData(NextPageUrl){
     var platlistItems;
     checkDataStatus=1;
     var listItems="";
-    var language_id=current_language_id;
     var uri=NextPageUrl;
     var user_id= $("#currentUserId").val();
-    //can't directly hit next url beacuse of cors issue
+    //can't directly hit next url beacuse of cors header issue
     var offset = NextPageUrl.split("offset=")[1]
     var res = encodeURI(uri);
       $.ajax(
             {
                 url:'/api/v1/get_vb_list/',
-                data:{'language_id':language_id, 'user_id': user_id, 'offset': offset},
+                data:{'user_id': user_id, 'offset': offset},
                 type: "get",
                 beforeSend: function()
                 {
