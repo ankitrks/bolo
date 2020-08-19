@@ -352,6 +352,7 @@ def VBList(request):
     category__slug = False
     m2mcategory__slug = False
     popular_post = False
+    next_link = ''
     page_no = int(request.GET.get('page',1))
     if search_term:
         for term_key in search_term:
@@ -384,6 +385,10 @@ def VBList(request):
     paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
     if 'offset' in search_term and int(request.GET.get('offset') or 0):
         page_no = int(int(request.GET.get('offset') or 0)/settings.REST_FRAMEWORK['PAGE_SIZE'])+1
+        if page_no<paginator.num_pages:
+            next_offset = page_no*settings.REST_FRAMEWORK['PAGE_SIZE']+1
+            user_id = request.GET.get('user_id')
+            next_link = settings.TEST_URL+'api/v1/get_vb_list/?user_id='+str(user_id)+'&offset='+str(next_offset)
     if not is_user_timeline:
         page_no = 1
     try:
@@ -391,7 +396,7 @@ def VBList(request):
     except:
         topics = []
     return JsonResponse({"results":TopicSerializerwithComment(topics,context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),\
-		'is_expand':request.GET.get('is_expand',True)},many=True).data,"count":total_objects})
+		'is_expand':request.GET.get('is_expand',True)},many=True).data,"count":total_objects, 'next': next_link})
 
 def replace_query_param(url, key, val):
     try:

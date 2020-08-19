@@ -10,11 +10,11 @@ $(window).scroll(function() {
     //console.log('Scol+he '+scorh);
     //if($(window).scrollTop() + $(window).height() >= $(document).height()-800 && $(window).scrollTop() + $(window).height()<$(document).height()) {
     if($(window).scrollTop() + $(window).height() > $("#userVideosListId").height() && checkDataStatus==0){
-        
         var nextPageUrl=jQuery("#nextPageUrlId").val();
         if(undefined !==nextPageUrl && nextPageUrl!=""){
             page++;
             loaderBoloShowDynamic('_scroll_load_more_loading_user_videosMore');
+
             loadMoreData(nextPageUrl);
         }
 
@@ -24,7 +24,6 @@ $(window).scroll(function() {
 
 
 function getUserVideos(limit,offset){
-
     loaderBoloShowDynamic('_scroll_load_more_loading_user_videos');
     var user_id= $("#currentUserId").val();
     var platlistItems;
@@ -41,7 +40,7 @@ function getUserVideos(limit,offset){
         success: function(response,textStatus, xhr){
             userVideoItems="";
             var videoItemList=response.results;
-            jQuery("#userVideoCountId").html(response.count);
+            jQuery("#videoCountDesktop").html(response.count);
             videoItemList.forEach(function(itemCreator) {itemCount++;
                 userVideoItems =videoItemsTemplate(itemCreator,itemCount);
                 //userVideoItems =getVideoItem(itemCreator,itemCount);
@@ -53,7 +52,7 @@ function getUserVideos(limit,offset){
             //playListData=videoItemList;
             var nextPageData=response.next;
             jQuery("#nextPageUrlId").val(response.next);
-            
+
             
 
         }
@@ -110,6 +109,7 @@ function loadMoreData(NextPageUrl){
             })
             .fail(function(jqXHR, ajaxOptions, thrownError)
             {
+                console.log("error", thrownError)
                 if(jqXHR.status!=201){
                     
                 }
@@ -248,8 +248,8 @@ function videoItemsTemplate(itemVideoByte,itemCount) {
 
 
 $(document).ready(function(){
-    getUserVideos(10,0);
     getSideBarData();
+    getUserVideos(15,1);
 });
 
 
@@ -1138,4 +1138,43 @@ function loadMoreComments(nextPageURl){
 jQuery(document).ready(function(){
     followLikeList();
     userFollowLikeList();
+    getUserProfileData();
 });
+
+function getUserProfileData(){
+    user_id = document.getElementById('user_id').textContent
+    var uri='/api/v1/get_userprofile/';
+    var res = encodeURI(uri);
+    jQuery.ajax({
+        url:res,
+        type:"POST",
+        data: {
+            "user_id": user_id
+        },
+        dataType: "json",
+        success: function(response,textStatus, xhr){
+            if(response.message == 'success'){
+                document.getElementById('videoCount').textContent = response.result.userprofile.vb_count;
+                document.getElementById('viewsCount').textContent = response.result.userprofile.view_count;
+                document.getElementById('followingCount').textContent = response.result.userprofile.follow_count;
+                document.getElementById('followersCount').textContent = response.result.userprofile.follower_count;
+                //for desktop
+                document.getElementById('viewsCountDesktop').textContent = response.result.userprofile.view_count;
+                document.getElementById('videoCountDesktop').textContent = response.result.userprofile.vb_count;
+                document.getElementById('followingCountDesktop').textContent = response.result.userprofile.follow_count;
+                document.getElementById('followersCountDesktop').textContent = response.result.userprofile.follower_count;
+            }
+        },
+        error: function(data) {
+            document.getElementById('videoCount').textContent = '0';
+            document.getElementById('viewsCount').textContent = '0';
+            document.getElementById('followingCount').textContent = '0';
+            document.getElementById('followersCount').textContent = '0';
+            //desktop
+            document.getElementById('viewsCountDesktop').textContent = '0';
+            document.getElementById('videoCountDesktop').textContent = '0';
+            document.getElementById('followingCountDesktop').textContent = '0';
+            document.getElementById('followersCountDesktop').textContent = '0';
+        }
+    })
+}
