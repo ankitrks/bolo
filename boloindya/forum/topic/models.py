@@ -156,7 +156,9 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
     vb_playtime = models.PositiveIntegerField(null=True,blank=True,default=0,db_index=True)
     has_downloaded_url = models.BooleanField(default = False)
     vb_score = models.FloatField(_("Score"),null=True,blank=True,default=0,db_index=True)
-    is_boosted = models.BooleanField(_("boost"), default = False)
+    is_boosted = models.BooleanField(_("Super Boost"), default = False)
+    popular_boosted = models.BooleanField(_("Popular Boost"), default = False)
+    popular_boosted_time = models.DateTimeField(null=True,blank=True)
     boosted_till = models.PositiveIntegerField(_("boost hrs"),null=True,blank=True,default=0)
     boosted_start_time = models.DateTimeField(null=True,blank=True)
     boosted_end_time = models.DateTimeField(null=True,blank=True)
@@ -461,6 +463,10 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
 
         if self.is_boosted and self.boosted_end_time>=datetime.now():
             score += get_ranking_feature_weight('post_superboost')
+
+        if self.popular_boosted and (self.popular_boosted_time + timedelta(days = settings.POPULAR_BOOST_TIMEDELTA)) >= datetime.now():
+            score += get_ranking_feature_weight('post_popularboost')
+
         if self.is_popular:
             score += get_ranking_feature_weight('post_popular')
         if not self.is_boosted and not self.is_popular:

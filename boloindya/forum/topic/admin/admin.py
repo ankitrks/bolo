@@ -212,6 +212,10 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
         if 'is_pubsub_popular_push' in form.changed_data:
             obj.is_pubsub_popular_push = form.cleaned_data['is_pubsub_popular_push']
             obj.is_popular = form.cleaned_data['is_pubsub_popular_push']
+            obj.popular_boosted = form.cleaned_data['is_pubsub_popular_push']
+            if obj.popular_boosted:
+                obj.popular_boosted_time = datetime.now()
+
         if 'is_moderated' in form.changed_data:
             obj.is_moderated = form.cleaned_data['is_moderated']
         if 'is_monetized' in form.changed_data:
@@ -252,6 +256,9 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
                 obj.title = title[0].upper()+title[1:]
 
         obj.save()
+        if 'is_boosted' in form.changed_data or 'boosted_till' in form.changed_data or 'is_pubsub_popular_push' in form.changed_data:
+            obj.calculate_vb_score()
+
         if 'language_id' in form.changed_data and obj.is_monetized:
             if form.initial['language_id'] == '1':
                 userprofile = UserProfile.objects.filter(user = obj.user)

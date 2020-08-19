@@ -142,7 +142,7 @@ def update_redis_paginated_data(key, query, cache_max_pages = settings.CACHE_MAX
     else:
         while(page != None):
             updated_df = topics_df.query('id not in [' + ','.join(exclude_ids) + ']').drop_duplicates('user_id')\
-                    .nlargest(items_per_page, 'vb_score', keep = 'last')
+                    .nlargest(items_per_page, 'vb_score', keep = 'first')
             id_list = updated_df['id'].tolist()
             if len(id_list) >= min_count_per_page and page <= cache_max_pages:
                 exclude_ids.extend( map(str, id_list) )
@@ -305,16 +305,9 @@ def new_algo_update_redis_paginated_data(key, query,trending = False, cache_max_
     if trending:
         trending_cache_timespan = settings.TRENDING_CACHE_TIMESPAN
         cache_timespan = trending_cache_timespan*24
-        max_trending_weeks_to_cache = settings.MAX_TRENDING_WEEKS_TO_CACHE
-        max_time_limit_cache = max_trending_weeks_to_cache
     else:
-        category_cache_timespan = settings.CATEGORY_CACHE_TIMESPAN
-        cache_timespan = category_cache_timespan
-        max_category_days_to_cache = settings.MAX_CATEGORY_DAYS_TO_CACHE
-        max_time_limit_cache = max_category_days_to_cache
-    if 'hashtag' in key:
-        max_hastag_days_to_cache = settings.MAX_HASHTAG_DAYS_TO_CACHE
-        max_time_limit_cache = max_hastag_days_to_cache
+        category_n_hashtag_cache_timespan = settings.CATEGORY_N_HASHTAG_CACHE_TIMESPAN*24
+        cache_timespan = category_n_hashtag_cache_timespan
 
     # print language_id, category_id, "############"
     page = 1
@@ -336,8 +329,13 @@ def new_algo_update_redis_paginated_data(key, query,trending = False, cache_max_
             temp_topics_df = topics_df.loc[mask]
             if not temp_topics_df.empty:
                 while(page != None):
-                    updated_df = temp_topics_df.query('id not in [' + ','.join(exclude_ids) + ']').drop_duplicates('user_id')\
-                            .nlargest(items_per_page, 'vb_score', keep = 'last')
+                    if settings.ALLOW_DUPLICATE_USER_POST:
+                        updated_df = temp_topics_df.query('id not in [' + ','.join(exclude_ids) + ']')\
+                                .nlargest(items_per_page, 'vb_score', keep = 'first')
+                    else:
+                        updated_df = temp_topics_df.query('id not in [' + ','.join(exclude_ids) + ']').drop_duplicates('user_id')\
+                                .nlargest(items_per_page, 'vb_score', keep = 'first')
+
                     id_list = updated_df['id'].tolist()
                     if len(id_list) >= min_count_per_page and page <= cache_max_pages:
                         exclude_ids.extend( map(str, id_list) )
