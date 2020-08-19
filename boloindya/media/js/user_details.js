@@ -73,7 +73,7 @@ function loadMoreData(NextPageUrl){
                 url:res,
                 data:{'language_id':language_id},
                 type: "get",
-                headers: {  'Access-Control-Allow-Headers': 'x-requested-with' },
+                headers: {  'Access-Control-Allow-Headers': 'https://stage.boloindya.com' },
                 beforeSend: function()
                 {
                     $('.ajax-load').show();
