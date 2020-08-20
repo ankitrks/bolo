@@ -216,6 +216,7 @@ class TopicSerializerwithComment(ModelSerializer):
     audio_m3u8_content = SerializerMethodField()
     video_m3u8_content = SerializerMethodField()
     backup_url = SerializerMethodField()
+    likes_count = SerializerMethodField()
     # m2mcategory = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
 
@@ -267,6 +268,8 @@ class TopicSerializerwithComment(ModelSerializer):
     def get_comment_count(self,instance):
         return shorcountertopic(instance.comment_count)
 
+    def get_likes_count(self, instance):
+        return shorcountertopic(instance.likes_count)
     # def get_m2mcategory(self,instance):
     #     return CategoryLiteSerializer(instance.m2mcategory.all(),many=True).data
 
