@@ -786,20 +786,26 @@ color: #B62827;
                     <button onclick="follow_user('{{user_profile.user.id}}');" class="_4jy1 _4jy4 _517h _51sy _42ft" type="submit" value="1"><i alt="" class="_3-8_ img sp_66mIw9cKlB9 followStatusChange-{{user_profile.user.id}} followCheck sx_5da455"></i><span class="btnTextChange-{{user_profile.user.id}}">{% trans "Follow" %}</span>
                     </button>
                     <h3 class="share-sub-title ">{{ user_profile.bio}} <button class="btnClassEdit bts-popup-trigger" style="display: none;"><img src="/media/edit_profile.png" style="width: 12px;"> Edit Profile</button></h3>
-
+                    <p id="user_id" hidden>{{user.id}}<p>
                     <ul class="jsx-1061034316 hideOnDesktop">
-                        <li class="jsx-1061034316"><strong title="Videos" class="jsx-1061034316">{{topicsCount | shorcountertopic}}</strong><span class="jsx-1061034316">Videos</span></li>                        
-                        <li class="jsx-1061034316"><strong title="Following" class="jsx-1061034316 vLinke">{{ user_profile.follow_count | shorcountertopic}}</strong><span class="jsx-1061034316">Following</span></li>
-                        <li class="jsx-1061034316"><strong title="Followers" class="jsx-1061034316 vLinke">{{ user_profile.follower_count | shorcountertopic}}</strong><span class="jsx-1061034316">Followers</span></li>
-                        <li class="jsx-1061034316 "><strong title="Likes" class="jsx-1061034316 vLinke">{{ user_profile.like_count | shorcountertopic}}</strong><span class="jsx-1061034316">Likes</span></li>
-
+                        <li class="jsx-1061034316"><strong title="Videos" class="jsx-1061034316" id="videoCount"></strong><span class="jsx-1061034316">Videos</span></li>
+                        <li class="jsx-1061034316 "><strong title="View" class="jsx-1061034316 vLinke" id="viewsCount"></strong><span class="jsx-1061034316">Views</span></li>
+                        <li class="jsx-1061034316"><strong title="Followers" class="jsx-1061034316 vLinke" id="followersCount"></strong><span class="jsx-1061034316">Followers</span></li>              
+                        <li class="jsx-1061034316"><strong title="Following" class="jsx-1061034316 vLinke" id="followingCount"></strong><span class="jsx-1061034316">Following</span></li>
                     </ul>
 
-                    <p class="count-infos hideOnMobile"><span class="number">{{ user_profile.follow_count | shorcountertopic}}</span> <span class="unit"> {% trans "Following" %}</span><span class="number vLinke"> {{ user_profile.follower_count | shorcountertopic}}</span><span class="unit"> {% trans "Followers" %} </span>
-                        <span class="number vLinke"> {{ user_profile.like_count | shorcountertopic}}</span>
+                    <p class="count-infos hideOnMobile">
+                        <span class="number" id="videoCountDesktop"></span>
+                        <span class="unit"> {% trans "Videos" %}</span>
+                        <span class="number vLinke" id="viewsCountDesktop"></span>
+                        <span class="unit"> {% trans "Views" %}</span>
+                        <span class="number vLinke" id="followersCountDesktop"></span>
+                        <span class="unit"> {% trans "Followers" %} </span>
+                        <span class="number vLinke" id="followingCountDesktop"></span>
+                        <span class="unit"> {% trans "Following" %}</span>
+                        <!-- <span class="number vLinke"> {{ user_profile.like_count | shorcountertopic}}</span>
                         <span class="unit"> {% trans "Likes" %}</span><span class="number vLinke"> </span>
-                        <span class="number" id="userVideoCountId">{{topicsCount | shorcountertopic}}</span><span class="unit"> {% trans "Videos" %}</span>
-                        <span class="unit " >
+                         -->
 
                             
                             <button class="_4jy1 _4jy4 _517h _51sy _42ft bts-popup-trigger">Upload video</button>
@@ -1049,3 +1055,5 @@ function goBack() {
 <!-- End Load Comments  -->
 
 {% endblock %}
+
+
