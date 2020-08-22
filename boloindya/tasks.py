@@ -369,5 +369,21 @@ def send_upload_video_notification(data, pushNotification):
     except Exception as e:
         logger.info(str(e))
 
+@app.task
+def update_branding_url(username, batch_size=100, sleep_time=60):
+    import time
+    from django.contrib.auth.models import User
+    from drf_spirit.views import invoke_watermark_service
+    try:
+        user = User.objects.get(username=username)
+        topics = user.st_topics.all()
+        for i in range(0, len(topics), batch_size):
+            topic_chunks = topics[i:i+batch_size]
+            for each_topic in topic_chunks:
+                invoke_watermark_service(each_topic, user)
+            time.sleep(sleep_time)
+    except Exception as e:
+        print(e)
+
 if __name__ == '__main__':
     app.start()
