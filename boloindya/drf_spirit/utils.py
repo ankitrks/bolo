@@ -480,7 +480,7 @@ def create_random_user(no_of_user=0):
 
 def create_n_user(no_of_user):
     from forum.user.models import DUser
-    users_data = DUser.objects.all()[:no_of_user]
+    users_data = DUser.objects.all().order_by(random.sample(['name','-name','id','-id'],1)[0])[:no_of_user]
     total_user = len(users_data)
     languages = language_options
     counter = 1
