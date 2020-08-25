@@ -203,7 +203,7 @@ def get_user_bolo_info(user_id,month=None,year=None):
 def get_fplaytime(user_id, start_date=None, end_date=None, fake_view_count=0,playtime=0):
     #hard date afterwards this logic is used
     if start_date and start_date >= datetime(2020,7,1):
-        mwfplaytime,is_created = MonthWiseFplaytime.objects.get_or_create(user_id= user_id,for_month=start_date.month, for_year = start_date.month)
+        mwfplaytime,is_created = MonthWiseFplaytime.objects.get_or_create(user_id= user_id,for_month=start_date.month, for_year = start_date.year)
         fplaytime = int(fake_view_count*settings.FTIME_PLAY)
         if playtime < settings.FPLAYTIME_LIMIT and end_date + timedelta(days=1) >= datetime.now():
             mwfplaytime.fplaytime = fplaytime

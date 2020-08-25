@@ -19,7 +19,7 @@ def calculate_all_vb_score_and_set_post_in_redis():
     if all_post:
         last_modified_post = Topic.objects.filter(is_vb=True).order_by('-date').values_list('pk', flat=True)
     else:
-        last_modified_post = Topic.objects.filter(is_vb=True,is_removed=False,last_modified__gt=now-timedelta(hours = 12)).order_by('-date').values_list('pk', flat=True)
+        last_modified_post = Topic.objects.filter(is_vb=True,is_removed=False,last_modified__gt=now-timedelta(hours = 1)).order_by('-date').values_list('pk', flat=True)
     total_elements = len(last_modified_post)
     counter=1
     for each_post in last_modified_post:

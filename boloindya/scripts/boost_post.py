@@ -217,7 +217,7 @@ def check_follower(user_id):
             boost_span = userprofile.boost_span
         else:
             boost_span = 24
-        if userprofile.boosted_time + timedelta(hours=boost_span) > datetime.now()-timedelta(hours=1):
+        if userprofile.boosted_time + timedelta(hours=boost_span) > datetime.now()-timedelta(hours=72):
             time_passed = (datetime.now() - userprofile.boosted_time).total_seconds()/3600
             if time_passed > boost_span:
                 time_passed = boost_span
