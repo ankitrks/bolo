@@ -469,31 +469,43 @@ def get_random_username():
 
 def create_random_user(no_of_user=0):
         from forum.user.models import DUser
-        users_data = DUser.objects.filter(is_used=False)[:no_of_user]
-        languages = language_options
-        for each_user_data in users_data:
-            name = each_user_data.name
-            username = get_random_username(name.replace(' ','_'))
-            gender = each_user_data.gender
-            language = random.choice(languages)[0]
-            status = create_user(name,username,gender,language)
-            each_user_data.is_used = True
-            each_user_data.save()
+        duser_count = DUser.objects.all().count()
+        if(no_of_user>duser_count):
+            while(no_of_user>=duser_count):
+                create_n_user(duser_count)
+                no_of_user-=duser_count
+            create_n_user(no_of_user)
+        else:
+            create_n_user(no_of_user)
+
+def create_n_user(no_of_user):
+    from forum.user.models import DUser
+    users_data = DUser.objects.all().order_by(random.sample(['name','-name','id','-id'],1)[0])[:no_of_user]
+    total_user = len(users_data)
+    languages = language_options
+    counter = 1
+    for each_user_data in users_data:
+        print "########", counter , " / " , total_user , "#######"
+        counter += 1
+        name = each_user_data.name
+        username = get_random_username()
+        gender = each_user_data.gender
+        language = random.choice(languages)[0]
+        status = create_user(name,username,gender,language)
 
 def create_user(name,username,gender,language):
     from django.contrib.auth.models import User
     from forum.user.models import UserProfile
-    if not 'yyyy' in name:
+    try:
         try:
-            try:
-                user = User.objects.create(username = username)
-            except:
-                user = User.objects.create(username = get_random_username(username))
-            userprofile = UserProfile.objects.filter(user = user).update(**{'name':name,'language':language,'gender':gender,'is_test_user':True})
-            return True
-        except Exception as e:
-            print e
-            return False
+            user = User.objects.create(username = username)
+        except:
+            user = User.objects.create(username = get_random_username(username))
+        userprofile = UserProfile.objects.filter(user = user).update(**{'name':name,'language':language,'gender':gender,'is_test_user':True})
+        return True
+    except Exception as e:
+        print e
+        return False
 
 def set_android_logs_info(value):
     key = "android_logs:" + str(datetime.now()).replace(' ', '')
