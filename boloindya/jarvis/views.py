@@ -48,7 +48,7 @@ from itertools import groupby
 from django.db.models import Count
 import ast
 from drf_spirit.serializers import VideoCompleteRateSerializer
-from .forms import VideoUploadTranscodeForm,TopicUploadTranscodeForm,UserPayForm, AudioUploadForm, CampaignForm
+from .forms import VideoUploadTranscodeForm,TopicUploadTranscodeForm,UserPayForm, AudioUploadForm, CampaignForm, UserForm
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
 from django.core.files.base import ContentFile
 from drf_spirit.serializers import UserWithUserSerializer
@@ -218,7 +218,7 @@ def uploadvideofile(request):
             {'all_category':all_category,'all_upload':all_upload})
 
 @login_required
-def boloindya_uploadvideofile(request):    
+def boloindya_uploadvideofile(request):
     topic_form = TopicUploadTranscodeForm()
     return render(request,'jarvis/pages/upload_n_transcode/boloindya_upload_transcode.html',
             {'topic_form':topic_form})
@@ -2515,6 +2515,10 @@ def get_moderated_reports(request):
     if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
        return render(request,'jarvis/pages/reports/moderated_reports.html')
 
+def get_bot_user_list(request):
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
+       return render(request,'jarvis/pages/bot_management/bot_user_list.html')
+
 def remove_post_or_block_user_temporarily(request):
     if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
         report_id = request.POST.get('report_id',None)
@@ -2767,5 +2771,53 @@ def search_and_add_hashtag(request):
 
     data = TongueTwisterWithHashSerializer(hashtag).data
     return JsonResponse(data, status=status.HTTP_200_OK)
+
+
+from drf_spirit.utils import get_random_username
+from drf_spirit.views import upload_thumbail
+@login_required
+def bot_user_form(request):
+    if request.method == 'GET':
+        user_form = UserForm()
+        return render(request,'jarvis/pages/bot_management/user_form.html', {'user_form':user_form})
+    elif request.method == 'POST':
+        if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
+            try:
+                profile_pic = request.FILES['profile_pic']
+                profile_pic_url = None
+                if profile_pic:
+                    # profile_pic_url = upload_thumbail(profile_pic)
+                    profile_pic_url = "hai"
+                username = request.POST.get('username',get_random_username())
+                name = request.POST.get('name','')
+                sub_category = request.POST.getlist('sub_category',None)
+                language = request.POST.get('language','1')
+                gender = request.POST.get('gender','1')
+                about = request.POST.get('about',None)
+                bio = request.POST.get('bio',None)
+                d_o_b = request.POST.get('d_o_b',None)
+                print profile_pic_url
+                if username:
+                    try:
+                        User.objects.get(username = username)
+                        return HttpResponse(json.dumps({'message':'fail','reason':'username already taken'}),content_type="application/json")
+                    except:
+                        user = User.objects.create(username = username)
+                        UserProfile.objects.filter(user_id = user.id).update(**{'name':name, 'language':language, 'gender':gender,\
+                            'about':about, 'bio':bio, 'd_o_b':d_o_b , 'profile_pic': profile_pic_url, 'is_bot_user': True})
+                        userprofile = UserProfile.objects.get(user_id = user.id)
+                        for each_category in sub_category:
+                            userprofile.sub_category.add(Category.objects.get(pk=each_category))
+                    return HttpResponse(json.dumps({'message':'success','user_id':user.id}),content_type="application/json")
+            except Exception as e:
+                return HttpResponse(json.dumps({'message':'fail','reason':str(e)}),content_type="application/json")
+                
+        return HttpResponse(json.dumps({'message':'fail','reason':'Not Authorised'}),content_type="application/json")
+
+    return HttpResponse(json.dumps({'message':'fail','reason':'Invalid Request'}),content_type="application/json")
+
+
+            
+
 
 

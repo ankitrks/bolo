@@ -58,6 +58,12 @@ class TopicForm(forms.ModelForm):
         self.instance.reindex_at = timezone.now()
         return super(TopicForm, self).save(commit)
 
+class VideoByteForm(forms.ModelForm)
+
+    class Meta:
+        model = Topic
+        fields = ('title', 'm2mcategory', 'question_video', 'language_id', 'media_duration', 'question_image', 'user_id')
+
 class JobRequestForm(forms.ModelForm):
     initialVal=""
     class Meta:

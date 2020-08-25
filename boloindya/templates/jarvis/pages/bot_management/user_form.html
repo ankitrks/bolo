@@ -1,0 +1,122 @@
+{% extends "jarvis/layout/base.html" %}
+{% block styles %}
+<style>
+    .form_title {
+        text-align: center;
+        margin: 0 auto;
+    }
+    #overlay {
+      position: fixed; /* Sit on top of the page content */
+      display: none; /* Hidden by default */
+      width: 100%; /* Full width (cover the whole page) */
+      height: 100%; /* Full height (cover the whole page) */
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+      z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+      cursor: pointer; /* Add a pointer on hover */
+    }
+    .percentcomplete{
+    position: absolute;
+    top: 50%;
+    left:50%;
+    color: white;
+    transform: translate(-50%,-50%);
+    }
+    .video_elements{
+        display: none;
+    }
+
+</style>
+{% endblock styles %}
+{% block content %}
+<section class="content">
+    <h2 class="form_title">Bot User Creation Form</h2>
+    <form id="upload" action="" method="POST" enctype="multipart/form-data" class="form-horizontal">
+        {% csrf_token %}
+        {{ user_form }}
+        <div class="form-group">
+            <div class="col-md-offset-5" style="margin-bottom:10px;">
+                <button type="submit" class="btn btn-primary submit_from_button"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Create Bot User </button>
+            </div>
+        </div>
+    </form>
+    <div id="overlay">
+        <div class="text"><br>
+            <br><span style="font-size:50px;" class="percentcomplete"></span></div>
+    </div>
+</section>
+{% endblock content %}
+{% block center_js %}
+<script>
+$('.datepicker').datepicker({
+    format: 'dd/mm/yyyy',
+});
+
+function upload(event) {
+    if ($('.submit_from_button').hasClass("opened")) {
+        return false;
+    } else {
+        $('.submit_from_button').addClass("opened");
+        event.preventDefault();
+        $('#overlay').show();
+        var data = new FormData($('#upload').get(0));
+        var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+        var all_data = []
+        $.ajax({
+            xhr: function() {
+                var xhr = new window.XMLHttpRequest();
+                xhr.upload.addEventListener("progress", function(evt) {
+                    if (evt.lengthComputable) {
+                        var percentComplete = evt.loaded / evt.total;
+                        $('.percentcomplete').text((percentComplete * 100).toPrecision(4) + ' %');
+                        if (percentComplete === 1) {
+                            $('.percentcomplete').text('Processing');
+                        }
+                    }
+                }, false);
+                xhr.addEventListener("progress", function(evt) {
+                    if (evt.lengthComputable) {
+                        var percentComplete = evt.loaded / evt.total;
+                        $('.percentcomplete').text((percentComplete * 100).toPrecision(4) + ' %')
+                    }
+                }, false);
+                return xhr;
+            },
+            url: '/jarvis/bot_user_form/',
+            type: 'POST',
+            data: data,
+            cache: false,
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(data) {
+                $('#overlay').hide()
+                $('.submit_from_button').removeClass("opened");
+                if (data.message == 'fail') {
+                    alert(data['reason'])
+                } else if (data.message == 'success') {
+                    
+                }
+                $('.submit_from_button').removeClass("opened");
+            },
+            error: function(data) {
+                $('#overlay').hide()
+                $('.submit_from_button').removeClass("opened");
+                alert(data)
+                alert('Consult Tech')
+            },
+
+        });
+        return false;
+    }
+}
+
+
+$(function() {
+    $('#upload').submit(upload);
+});
+</script>
+{% endblock center_js %}

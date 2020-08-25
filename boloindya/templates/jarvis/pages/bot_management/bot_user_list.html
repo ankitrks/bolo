@@ -1,0 +1,112 @@
+{% extends "jarvis/layout/base.html" %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/dataTables.bootstrap4.min.css' %}">
+{% endblock styles%}
+{% block content %}
+<div style="font-size: 30px;text-align: center;">Moderated Reports</div>
+{% csrf_token %}
+<div id="user_bots" style="padding: 10px; margin: 10px;">
+        <div class="row">
+        <div class="col-xs-12 table-responsive">
+            <table class="table table-striped" id="user_bot_table">
+                <thead>
+                    <tr>
+                        <th data-data="id">Id</th>
+                        <th data-data="user.username">Username</th>
+                        <th data-data="name">Name</th>
+                        <th data-data="gender">Gender</th>
+                        <th data-data="follower_count">Follower Count</th>
+                        <th data-data="vb_count">VB Count</th>
+                        <th data-data="action">Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+        <!-- /.col -->
+    </div>
+    <div class="modal fade" id="video_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Video Play</h4>
+                </div>
+                <video class="my_video_player_laod" width="520" height="360" controls>
+                  <source class="my_video_player" src="" type="video/mp4">
+                  <source class="my_video_player" src="" type="video/ogg">
+                Your browser does not support the video tag.
+                </video>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+{% block center_js %}
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/dataTables.bootstrap4.min.js' %}"></script>
+<script>
+// $("#user_report_table").DataTable();
+$(document).ready( function () {
+  
+  var table = $('#user_bot_table').DataTable({
+        'serverSide': true,
+        'ajax': '/api/v1/bot_user_list_datatable/?format=datatables',
+        'columns': [
+          {'date':'id'},
+          {'data': 'user.username', 'name': 'user.username' ,"orderable": false,"searchable": true,
+                    "render": function(data,type,row,meta) {
+                        return row.user.username;}},
+          {'data': 'name'},
+          {'data': 'gender'},
+          {'data': 'follower_count'},
+          {'data': 'vb_count'},
+          {'data': 'action', 'name': 'action' ,"orderable": false,"searchable": false,
+                    "render": function(data,type,row,meta) { // render event defines the markup of the cell text 
+                        var  button= '<button type="button" class="btn btn-success add_video" report_id='+row.user.id+' data-toggle="modal" data-target="#video_modal">Add Video</button>' // row object contains the row data
+                        return button;}},
+        ],
+        "order": [[ 0, "desc" ]],
+        "oLanguage": {
+            "sInfo": "Showing _START_ to _END_ of _TOTAL_ items."
+        }
+    });
+  $(document).on('click','.play_video',function(){
+    var video_link = $(this).attr('video_link')
+    $(".my_video_player").attr('src',video_link)
+    $(".my_video_player_laod")[0].load()
+    $(".my_video_player_laod")[0].play()
+  })
+   $(document).on('click','.close',function(){
+    var video_link = $(this).attr('video_link')
+    $(".my_video_player_laod")[0].pause()
+  })
+   $(document).on('click','.unremove_or_unblock',function(){
+    var report_id = $(this).attr('report_id')
+    var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+    var data = {
+        'report_id':report_id,
+        'csrfmiddlewaretoken': csrfmiddlewaretoken
+    }
+    $.ajax({
+            url: '/jarvis/unremove_video_or_unblock/',
+            type: 'POST',
+            data: data,
+            dataType: "json",
+            success: function(data) {
+                if (data.message == 'fail') {
+                    alert(data.reason)
+                } else if (data.message == 'success') {
+                   table.ajax.reload();
+                   alert("Post Un Removed")
+                }
+            },
+            error: function(data) {
+                console.log(data)
+            },
+        });
+  });
+} );
+    
+</script>
+{% endblock center_js%}

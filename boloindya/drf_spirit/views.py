@@ -1906,6 +1906,11 @@ class ActiveReoprtsDatatableList(generics.ListAPIView):
                 filter_dict = {'is_active': False}
         return Report.objects.filter(**filter_dict).order_by('-id')
 
+class BotUserDatatableList(generics.ListAPIView):
+    serializer_class = BotUserDatatableSerializer
+
+    def get_queryset(self):
+        return UserProfile.objects.filter(is_bot_account = True)
 
 class KYCDocumentTypeList(generics.ListAPIView):
     serializer_class = KYCDocumnetsTypeSerializer

@@ -1,8 +1,9 @@
 from .models import *
-from django.forms import ModelForm, HiddenInput, FileInput,CharField
+from django.forms import ModelForm, HiddenInput, FileInput, CharField
 from django import forms
+from django.contrib.admin import widgets                                       
 from forum.topic.models import Topic
-from forum.user.models import UserPay
+from forum.user.models import UserPay, UserProfile
 from drf_spirit.models import MusicAlbum, Campaign
 
 class VideoUploadTranscodeForm(ModelForm):
@@ -52,3 +53,20 @@ class CampaignForm(ModelForm):
     class Meta():
         model = Campaign
         fields = '__all__'
+
+
+class UserForm(ModelForm):
+    username = forms.CharField(required=True, label='Username')
+    profile_pic = forms.FileField(required=True, label='Profile Pic')
+    d_o_b = forms.DateField(required=False, label='D.O.B')
+    class Meta():
+        model = UserProfile
+        fields = ['username','name','bio','d_o_b','gender','about','language','sub_category','profile_pic']
+
+    def __init__(self,*args,**kwargs):
+        super(UserForm,self).__init__(*args,**kwargs)
+        for field in self:
+            if not field.name == 'd_o_b':
+                field.field.widget.attrs['class'] = 'form-control'
+            else:
+                field.field.widget.attrs['class'] = 'form-control datepicker'
