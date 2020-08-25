@@ -759,7 +759,6 @@ class SolrSearchTop(BoloIndyaGenericAPIView):
             if sqs:
                 result_page = get_paginated_data(sqs, int(page_size), int(page))
                 topics = solr_object_to_db_object(result_page[0].object_list)
-                topics = [topic for topic in topics if not topic.is_removed]
             response["top_vb"]=TopicSerializerwithComment(topics,many=True,context={'is_expand':is_expand,'last_updated':last_updated}).data
             users  =[]
             sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term)).order_by('-is_superstar','-is_popular')
@@ -772,7 +771,6 @@ class SolrSearchTop(BoloIndyaGenericAPIView):
             if sqs:
                 result_page = get_paginated_data(sqs, int(page_size), int(page))
                 users = solr_userprofile_object_to_db_object(result_page[0].object_list)
-                users = [user for user in users if user.is_active]
             response["top_user"]=UserSerializer(users,many=True).data
             hash_tags  =[]
             sqs = SearchQuerySet().models(TongueTwister).raw_search('hash_tag:'+search_term)
@@ -809,7 +807,6 @@ class SolrSearchTopic(BoloIndyaGenericAPIView):
             if sqs:
                 result_page = get_paginated_data(sqs, int(page_size), int(page))
                 topics = solr_object_to_db_object(result_page[0].object_list)
-                topics = [topic for topic in topics if not topic.is_removed]
             # topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True, language_id=language_id)
             next_page_number = page+1 if page_size*page<len(sqs) else ''
             if language_id:
@@ -953,7 +950,6 @@ class SolrSearchUser(BoloIndyaGenericAPIView):
             if sqs:
                 result_page = get_paginated_data(sqs, int(page_size), int(page))
                 users = solr_userprofile_object_to_db_object(result_page[0].object_list)
-                users = [user for user in users if user.is_active]
             # users = User.objects.filter( Q(username__icontains = search_term) | Q(st__name__icontains = search_term) | Q(first_name__icontains = search_term) | \
             #        Q(last_name__icontains = search_term) )
             next_page_number = page+1 if page_size*page<len(sqs) else ''
