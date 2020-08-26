@@ -777,6 +777,29 @@ class BotUserDatatableSerializer(ModelSerializer):
 
     def get_gender(self,instance):
         return instance.get_gender_display()
+
+class TopicDatatableSerializer(ModelSerializer):
+    user = UserBaseSerializerDatatable()
+    view_count = SerializerMethodField()
+    likes_count = SerializerMethodField()
+    comment_count = SerializerMethodField()
+    date = SerializerMethodField()
+
+    class Meta:
+        model = Topic
+        fields = ('id', 'title' , 'question_video', 'question_image', 'view_count', 'likes_count', 'comment_count', 'user', 'date')
+
+    def get_date(self,instance):
+        return shortnaturaltime(instance.date)
+
+    def get_view_count(self,instance):
+        return shorcountertopic(instance.view_count)
+
+    def get_likes_count(self,instance):
+        return shorcountertopic(instance.likes_count)
+
+    def get_comment_count(self,instance):
+        return shorcountertopic(instance.comment_count)
    
 class CategoryVideoByteSerializer(ModelSerializer):
     user = SerializerMethodField()

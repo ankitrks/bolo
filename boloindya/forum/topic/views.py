@@ -1599,6 +1599,7 @@ def delete_video(request):
                     if not topic.is_removed:
                         result = topic.delete(is_user_deleted=True)
                         update_profile_counter(topic.user_id,'video_count',1, False)
+                        UserProfile.objects.filter(user_id = topic.user_id).update(vb_count = F('vb_count')-1)
                         if result:
                             obj, created = VideoDelete.objects.get_or_create(user=user, video=topic)
                             return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)

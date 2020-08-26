@@ -95,6 +95,7 @@ urlpatterns = [
     url(r'^get_user_pay_datatbale/$', UserPayDatatableList.as_view(), name='get_user_pay_datatbale'),
     url(r'^get_report_datatbale/$', ActiveReoprtsDatatableList.as_view(), name='get_report_datatbale'),
     url(r'^bot_user_list_datatable/$', BotUserDatatableList.as_view(), name='bot_user_list_datatable'),
+    url(r'^bot_video_list_datatable/$', BotVideoListDatatableList.as_view(), name='bot_video_list_datatable'),
     url(r'^get_challenge_details/$', GetChallengeDetails, name='get_challenge_details'),
     url(r'^password/set/$', password_set, name='password_set'),
     url(r'^get_profile/$', GetProfile.as_view(), name='get_profile'),
@@ -177,4 +178,5 @@ urlpatterns = [
     url(r'^fetch_audio_list/$', AudioFileListView.as_view(), name='fetch_audio_list'),
     url(r'^upload_cover_pic/$', upload_cover_pic),
     url(r'^upload_pii/$', upload_pii),
+    url(r'^create_bot_topic/$',create_bot_topic, name='create_bot_topic'),
 ]

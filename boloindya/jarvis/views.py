@@ -2515,9 +2515,12 @@ def get_moderated_reports(request):
     if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
        return render(request,'jarvis/pages/reports/moderated_reports.html')
 
+from forum.topic.forms import VideoByteForm
 def get_bot_user_list(request):
     if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
-       return render(request,'jarvis/pages/bot_management/bot_user_list.html')
+        topic_form = VideoByteForm()
+        return render(request,'jarvis/pages/bot_management/bot_user_list.html',{'topic_form': topic_form})
+    return JsonResponse({'fail':'','message':'Invalid Request' }, status=status.HTTP_200_OK)
 
 def remove_post_or_block_user_temporarily(request):
     if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
@@ -2786,8 +2789,7 @@ def bot_user_form(request):
                 profile_pic = request.FILES['profile_pic']
                 profile_pic_url = None
                 if profile_pic:
-                    # profile_pic_url = upload_thumbail(profile_pic)
-                    profile_pic_url = "hai"
+                    profile_pic_url = upload_thumbail(profile_pic)
                 username = request.POST.get('username',get_random_username())
                 name = request.POST.get('name','')
                 sub_category = request.POST.getlist('sub_category',None)
@@ -2815,6 +2817,42 @@ def bot_user_form(request):
         return HttpResponse(json.dumps({'message':'fail','reason':'Not Authorised'}),content_type="application/json")
 
     return HttpResponse(json.dumps({'message':'fail','reason':'Invalid Request'}),content_type="application/json")
+
+@login_required
+def get_bot_video_list(request):
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
+        if request.method == 'GET':
+            user_id = request.GET.get('user_id',None)
+            if user_id:
+                user = User.objects.get(pk = user_id)
+                topic_form = VideoByteForm()
+                return render(request,'jarvis/pages/bot_management/bot_video_list.html', {'user':user, 'topic_form': topic_form})
+            else:
+                HttpResponse(json.dumps({'message':'fail','reason':'user id not found'}),content_type="application/json")
+        else:
+            HttpResponse(json.dumps({'message':'fail','reason':'only method GET allowed'}),content_type="application/json")
+    else:
+        HttpResponse(json.dumps({'message':'fail','reason':'Invalid Request'}),content_type="application/json")
+
+@login_required
+def delete_bot_video(request):
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
+        if request.method == 'POST':
+            topic_id = request.POST.get('topic_id',None)
+            if topic_id:
+                topic = Topic.objects.get(pk =topic_id)
+                if not topic.is_removed:
+                    topic.delete(is_user_deleted=False)
+                    update_profile_counter(topic.user_id,'video_count',1, False)
+                    return HttpResponse(json.dumps({'message':'success','reason':'topic removed'}),content_type="application/json")
+                else:
+                    return HttpResponse(json.dumps({'message':'success','reason':'topic already removed'}),content_type="application/json")
+            else:
+                return HttpResponse(json.dumps({'message':'fail','reason':'topic id not provided'}),content_type="application/json")
+        else:
+            return HttpResponse(json.dumps({'message':'fail','reason':'only method POST allowed'}),content_type="application/json")
+    HttpResponse(json.dumps({'message':'fail','reason':'Invalid Request'}),content_type="application/json")
+
 
 
             

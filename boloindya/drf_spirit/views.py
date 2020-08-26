@@ -23,7 +23,7 @@ from django.db.models import F,Q
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.db.models import Sum
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect ,HttpResponse
 from django.forms.models import model_to_dict
 from datetime import datetime,timedelta,date
 from django.db.models.signals import post_save
@@ -67,6 +67,7 @@ from forum.topic.utils import get_redis_category_paginated_data,get_redis_hashta
 # from haystack.inputs import Raw, AutoQuery
 # from haystack.utils import Highlighter
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.decorators import login_required
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -1033,7 +1034,7 @@ def get_video_thumbnail(video_url):
     else:
         return False
 
-#from moviepy.editor import VideoFileClip
+from moviepy.video.io.VideoFileClip import VideoFileClip
 def getVideoLength(input_video):
     clip = VideoFileClip(input_video)
     dt = timedelta(seconds = int(clip.duration))
@@ -1060,6 +1061,40 @@ def getVideoLength(input_video):
         seconds='00'
     duration= minutes+":"+seconds
     return duration
+
+def getVideoLength_n_width_n_height(input_video):
+    try:
+        clip = VideoFileClip(input_video)
+        clip1 = clip.subclip(0, 3) 
+        # getting height of the clip 
+        height = clip1.h
+        width = clip1.w
+        dt = timedelta(seconds = int(clip.duration))
+        minutes = '00'
+        seconds = '00'
+        if dt.seconds/60:
+            if len(str(dt.seconds/60))==1:
+                minutes = '0'+str(dt.seconds/60)
+            else:
+                minutes = str(dt.seconds/60)
+        else:
+            minutes='00'
+        if dt.seconds:
+            if dt.seconds<60:
+                if len(str(dt.seconds))==1:
+                    seconds = '0'+str(dt.seconds)
+                else:
+                    seconds = str(dt.seconds)
+            else:
+                seconds = str(dt.seconds -(dt.seconds/60)*60)
+                if len(seconds)==1:
+                    seconds = '0'+seconds
+        else:
+            seconds='00'
+        duration= minutes+":"+seconds
+        return duration, height, width
+    except:
+        return '', 0 , 0
 
 def upload_thumbail(virtual_thumb_file):
     try:
@@ -1466,6 +1501,126 @@ def check_space_before_hash(string):
         string = check_space_before_mention(string)
     return string.strip()
 
+
+@login_required
+def create_bot_topic(request):
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
+        topic           = Topic()
+        user_id         = request.POST.get('user', None)
+        question_video  = request.FILES.get('question_video', None)
+        media_url       = upload_media(question_video)
+        title           = request.POST.get('title', '').strip()
+        language_id     = request.POST.get('language_id', '')
+        category_id     = request.POST.get('category_id', '')
+        media_duration, vb_height, vb_width  = getVideoLength_n_width_n_height(media_url) 
+        question_image  = request.POST.get('question_image', None)
+        if not question_image:
+            question_image = get_video_thumbnail(media_url)
+        question_video  = media_url
+        categ_list      = request.POST.getlist('m2mcategory', [])
+        is_boosted     = request.POST.get('is_boosted', False)
+        popular_boosted     = request.POST.get('popular_boosted', False)
+        boosted_till     = request.POST.get('boosted_till', False)
+
+        if title:
+            topic.title          = (title[0].upper()+title[1:]).strip()
+
+        if question_video:
+            topic.safe_backup_url = question_video
+            topic.backup_url      = question_video
+            topic.question_video  = question_video
+
+        topic.question_image = question_image
+
+        if question_video and not request.user.st.is_test_user:
+            already_exist_topic = Topic.objects.filter(Q(question_video=question_video)|Q(backup_url=question_video))
+            if already_exist_topic:
+                topic_json = TopicSerializerwithComment(already_exist_topic[0], context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data
+                return JsonResponse({'message': 'Video Byte Created','topic':topic_json}, status=status.HTTP_201_CREATED)
+        
+        try:
+            topic.language_id   = language_id   
+            topic.category_id   = category_id
+            topic.user_id       = user_id
+            topic.is_vb = True
+            topic.media_duration = media_duration
+            topic.question_image = question_image
+            topic.vb_width = vb_width
+            topic.vb_height = vb_height
+            view_count = random.randint(1,5)
+            topic.view_count = view_count
+            topic.save()
+            try:
+                provide_view_count(view_count,topic)
+            except:
+                pass
+            update_profile_counter(user_id,'video_count',1, True)
+            for each_category in categ_list:
+                topic.m2mcategory.add(each_category)
+            # topic.update_vb()
+            tag_list=check_space_before_hash(title).split()
+            hash_tag = copy.deepcopy(tag_list)
+            if tag_list:
+                for index, value in enumerate(tag_list):
+                    if value.startswith("#"):
+                        tag_list[index]='<a href="/get_challenge_details/?ChallengeHash='+value.strip('#')+'">'+value+'</a>'
+                title = " ".join(tag_list).strip()
+                topic.title = (title[0].upper()+title[1:]).strip()
+                # for each_tag in tag_list:
+                for index, value in enumerate(hash_tag):
+                    if value.startswith("#"):
+                        # tag,is_created = TongueTwister.objects.get_or_create(hash_tag__iexact=value.strip('#'))
+                        tag = TongueTwister.objects.using('default').filter(hash_tag__iexact=value.strip('#'))
+                        if tag.count():
+                            tag.update(hash_counter = F('hash_counter')+1)
+                            tag = tag[0]
+                        else:
+                            tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
+                        topic.hash_tags.add(tag)
+            topic.save()
+
+            if is_boosted:
+                topic.is_boosted = True
+            if boosted_till:
+                topic.boosted_till = int(boosted_till)
+                topic.boosted_start_time = datetime.now()
+                topic.boosted_end_time = datetime.now()+timedelta(hours=topic.boosted_till)
+            if popular_boosted:
+                topic.popular_boosted = True
+                topic.popular_boosted_time = datetime.now()
+            topic.save()
+            topic.calculate_vb_score()
+            userprofile = UserProfile.objects.filter(user = request.user)
+            userprofile.update(vb_count = F('vb_count')+1)
+            topic_json = TopicSerializerwithComment(topic, context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data
+            message = 'Video Byte Created'
+            data = {}
+
+            data['title'] = ' '
+            data['upper_title'] = 'Your video has been published.'
+            data['notification_type'] = '4'
+            data['id'] = ''
+            data['particular_user_id'] = request.user.id
+            data['user_group'] = '8'
+            data['lang'] = '0'
+            data['schedule_status'] = ''
+            data['datepicker'] = ''
+            data['timepicker'] = ''
+            data['image_url'] = ''
+            data['days_ago'] = ''
+
+            # topic.update_m3u8_content()
+            topic_type = ContentType.objects.get_for_model(topic)
+            notify_owner = Notification.objects.create(for_user_id = topic.user.id ,topic_id = topic.id, topic_type = topic_type, notification_type='6', user_id = topic.user.id)
+            
+            send_upload_video_notification.delay(data, {})
+            #invoke watermark
+            invoke_watermark_service(topic, User.objects.get(pk = user_id)) ## uncomment it
+            return HttpResponse(json.dumps({'message':'success','topic_id':topic.id,'topic':topic_json}),content_type="application/json")
+        except User.DoesNotExist:
+            return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+    return HttpResponse(json.dumps({'message':'fail','reason':'Invalid Request'}),content_type="application/json")
+
 @api_view(['POST'])
 def createTopic(request):
 
@@ -1798,6 +1953,7 @@ def topic_delete(request):
             try:
                 topic.delete(is_user_deleted=True)
                 update_profile_counter(topic.user_id,'video_count',1, False)
+                UserProfile.objects.filter(user_id = topic.user_id).update(vb_count = F('vb_count')-1)
                 return JsonResponse({'message': 'Topic Deleted'}, status=status.HTTP_201_CREATED)
             except:
                 return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
@@ -1911,6 +2067,17 @@ class BotUserDatatableList(generics.ListAPIView):
 
     def get_queryset(self):
         return UserProfile.objects.filter(is_bot_account = True)
+
+class BotVideoListDatatableList(generics.ListAPIView):
+    serializer_class = TopicDatatableSerializer
+    # queryset = User.objects.filter(is_active = True)
+    def get_queryset(self):
+        filter_dict = {}
+        if self.request.GET.get('user_id',None):
+            filter_dict = {'user_id': self.request.GET.get('user_id')}
+            filter_dict['is_removed'] = False
+            filter_dict['is_vb'] = True
+            return Topic.objects.filter(**filter_dict).order_by('-id')
 
 class KYCDocumentTypeList(generics.ListAPIView):
     serializer_class = KYCDocumnetsTypeSerializer
