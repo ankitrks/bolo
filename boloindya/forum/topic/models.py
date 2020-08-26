@@ -26,7 +26,7 @@ from django.db.models.query import QuerySet
 from django.dispatch import Signal
 from diff_model import ModelDiffMixin
 from redis_utils import *
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from forum.topic.queryset import LastModifiedQueryset
 
 
@@ -349,6 +349,10 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
         self.is_monetized = False
         self.is_removed = True
         self.save()
+        try:
+            post_delete.send(sender=type(self), instance=self, created=False)
+        except Exception as e:
+            print e
         userprofile = UserProfile.objects.filter(user = self.user)
         if userprofile[0].vb_count and self.is_vb:
             userprofile.update(vb_count = F('vb_count')-1)
@@ -536,6 +540,8 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
                 Topic.objects.filter(pk=self.pk).update(**data)
                 try:
                     post_save.send(sender=type(self), instance=self, created=False)
+                    if self.is_removed:
+                        post_delete.send(sender=type(self), instance=self, created=False)
                 except Exception as e:
                     print e
             except Exception as e:
