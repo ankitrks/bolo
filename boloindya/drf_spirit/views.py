@@ -758,7 +758,7 @@ class SolrSearchTop(BoloIndyaGenericAPIView):
                 sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(SQ(language_id=language_id)|SQ(language_id='1')).filter(is_removed = False)
             if sqs:
                 result_page = get_paginated_data(sqs, int(page_size), int(page))
-                topics = solr_object_to_db_object(result_page[0].object_list)
+                topics = solr_object_to_db_object(result_page[0].object_list, True)
             response["top_vb"]=TopicSerializerwithComment(topics,many=True,context={'is_expand':is_expand,'last_updated':last_updated}).data
             users  =[]
             sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term)).order_by('-is_superstar','-is_popular')
@@ -806,7 +806,7 @@ class SolrSearchTopic(BoloIndyaGenericAPIView):
                 sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
             if sqs:
                 result_page = get_paginated_data(sqs, int(page_size), int(page))
-                topics = solr_object_to_db_object(result_page[0].object_list)
+                topics = solr_object_to_db_object(result_page[0].object_list, True)
             # topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True, language_id=language_id)
             next_page_number = page+1 if page_size*page<len(sqs) else ''
             if language_id:

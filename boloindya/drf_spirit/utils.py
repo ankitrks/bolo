@@ -359,11 +359,14 @@ def check_or_create_user_pay(user_id,start_date='01-04-2019'):
     return True
 
 
-def solr_object_to_db_object(sqs):
+def solr_object_to_db_object(sqs, check_for_removed = False):
     result = []
     if len(sqs) != 0:
         for each in sqs:
-            result.append(each.object)
+            if check_for_removed and not each.object.is_removed:
+                result.append(each.object)
+            elif not check_for_removed:
+                result.append(each.object)
     return result
 
 def solr_userprofile_object_to_db_object(sqs):
