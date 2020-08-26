@@ -14,6 +14,7 @@ from tinymce.models import HTMLField
 from drf_spirit.utils import language_options,month_choices, salary_choices
 from django.db.models import F,Q
 from diff_model import ModelDiffMixin
+from forum.user.queryset import UserProfileQueryset
 
 class RecordTimeStamp(models.Model):
     created_at=models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False) # auto_now will add the current time and date whenever field is saved.
@@ -110,6 +111,8 @@ class UserProfile(models.Model,ModelDiffMixin):
     country_code = models.CharField(_("Country Phone Code"), max_length=20, blank = True, null = True)
     salary_range = models.CharField(choices=salary_choices, blank = True, null = True, max_length=10,db_index=True)
     is_insight_fix = models.BooleanField(default=False)
+
+    objects = UserProfileQueryset.as_manager()
 
     class Meta:
         verbose_name = _("user profile")

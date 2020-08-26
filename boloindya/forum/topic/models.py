@@ -26,14 +26,13 @@ from django.db.models.query import QuerySet
 from django.dispatch import Signal
 from diff_model import ModelDiffMixin
 from redis_utils import *
+from django.db.models.signals import post_save
+from forum.topic.queryset import LastModifiedQueryset
+
 
 post_update = Signal()
 
-class LastModifiedQueryset(models.query.QuerySet):
-    def update(self, *args, **kwargs):
-        if not kwargs.has_key('vb_score'):
-            kwargs['last_modified'] = datetime.now()
-        return super(LastModifiedQueryset,self).update(*args, **kwargs)
+
 
 class RecordTimeStamp(models.Model):
     objects = LastModifiedQueryset.as_manager()
@@ -535,6 +534,10 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
                     data[value] = self.get_field_diff(value)[1]
                 data['last_modified'] = datetime.now()
                 Topic.objects.filter(pk=self.pk).update(**data)
+                try:
+                    post_save.send(sender=type(self), instance=self, created=False)
+                except Exception as e:
+                    print e
             except Exception as e:
                 super(Topic , self).save()
         else:
