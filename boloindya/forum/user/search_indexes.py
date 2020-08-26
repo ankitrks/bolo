@@ -79,7 +79,7 @@ class UserProfileIndex(indexes.SearchIndex, indexes.Indexable):
         :return: UserProfile QuerySet filtered by active\
         time and ordered by pk
         """
-        lookup_UserProfile = {}
+        lookup_UserProfile = {'is_test_user':False , 'is_guest_user': False}
         lookup_subcategory = {}
 
         if start_date:
