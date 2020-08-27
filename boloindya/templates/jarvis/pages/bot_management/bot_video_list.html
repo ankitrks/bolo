@@ -37,8 +37,8 @@
 </style>
 {% endblock styles%}
 {% block content %}
-<div style="font-size: 30px;text-align: center;">{{user.username}} Video List</div>
-<p><button type="button" class="btn btn-success add_video" user_id="{{user.id}}" data-toggle="modal" data-target="#create_video_modal" style="float: right; margin:20px;"> Add Video</button></p>
+<div style="font-size: 30px;text-align: center;">{{bot_user.username}} Video List</div>
+<p><button type="button" class="btn btn-success add_video" user_id="{{bot_user.id}}" data-toggle="modal" data-target="#create_video_modal" style="float: right; margin:20px;"> Add Video</button></p>
 {% csrf_token %}
 <div id="user_bots" style="padding: 10px; margin: 10px;">
     <div class="row">
@@ -81,6 +81,35 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="edit_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Edit Video Byte Form</h4>
+                    <form id="edit_video" action="" method="POST" enctype="multipart/form-data" class="form-horizontal">
+                        {% csrf_token %}
+                        <p>
+                            <label for="id_edit_title">Title:</label>
+                            <textarea name="title" id="id_edit_title" rows="4" cols="40" columns="15" class="form-control"></textarea>
+                        </p>
+                        <p>
+                            <label for="id_username">Username:</label>
+                            <input name="username" id="id_username" class="form-control">
+                        </p>
+                        <p>
+                            <input type="hidden" name="topic_id" class="form-control" id="id_topic">
+                        </p>
+                        <div class="form-group">
+                            <div class="col-md-offset-5" style="margin-bottom:10px;">
+                                <button type="submit" class="btn btn-primary update_video_button"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Update Video Byte </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" id="video_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -112,7 +141,7 @@
 $(document).ready(function() {
     var table = $('#bot_video_list').DataTable({
         'serverSide': true,
-        'ajax': '/api/v1/bot_video_list_datatable/?format=datatables&user_id=' + {{ user.id }} + '',
+        'ajax': '/api/v1/bot_video_list_datatable/?format=datatables&user_id=' + {{ bot_user.id }} + '',
         'columns': [
             { 'data': 'id' },
             { 'data': 'title' },
@@ -120,6 +149,7 @@ $(document).ready(function() {
             { 'data': 'date' },
             {
                 'data': 'question_image',
+                "searchable": false,
                 "render": function(data, type, row, meta) {
                     var image = '  <img src="' + row.question_image + '" style="width:70px;">'
                     return image
@@ -127,6 +157,7 @@ $(document).ready(function() {
             },
             {
                 'data': 'question_video',
+                "searchable": false,
                 "render": function(data, type, row, meta) {
                     var button = '  <button type="button" class="btn btn-primary primary play_video" data-toggle="modal" data-target="#video_modal" video_link=' + row.question_video + '>Play</button>'
                     return button
@@ -140,9 +171,10 @@ $(document).ready(function() {
                 'name': 'action',
                 "orderable": false,
                 "searchable": false,
-                "render": function(data, type, row, meta) { // render event defines the markup of the cell text 
-                    // <button type="button" class="btn btn-info add_video" video_id=' + row.id + ' data-toggle="modal" data-target="#edit_modal">Edit Video</button>
-                    var button = '<button type="button" class="btn btn-danger delete_video" video_id=' + row.id + '>Delete Video</button>' // row object contains the row data
+                "render": function(data, type, row, meta) { // render event defines the markup of the cell text
+                    var title = $("<div>").html(row.title).text();
+                    var username = row.user.username
+                    var button = '<button type="button" class="btn btn-info edit_video" title="' + title + '" username="' + username + '" video_id=' + row.id + ' data-toggle="modal" data-target="#edit_modal">Edit Video</button><button type="button" class="btn btn-danger delete_video" video_id=' + row.id + '>Delete Video</button>' // row object contains the row data
                     return button;
                 }
             },
@@ -155,46 +187,104 @@ $(document).ready(function() {
         }
     });
 
-    $('.add_video').click(function(){
+    $('.add_video').click(function() {
         $("#id_user").val($(this).attr('user_id'))
     });
-    $(document).on('click','.play_video',function(){
-    var video_link = $(this).attr('video_link')
-    $(".my_video_player").attr('src',video_link)
-    $(".my_video_player_laod")[0].load()
-    $(".my_video_player_laod")[0].play()
-  });
-   $(document).on('click','.close',function(){
-    var video_link = $(this).attr('video_link')
-    $(".my_video_player_laod")[0].pause()
-  });
-   $(document).on('click','.delete_video', function(){
-    if (window.confirm("Are you sure you want delete topic id= "+$(this).attr('video_id')+" ?")) {
-        $('#overlay').show();
-        var topic_id = $(this).attr('video_id');
-        var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
-        var data = {
-            'topic_id': topic_id,
-            'csrfmiddlewaretoken': csrfmiddlewaretoken
+
+    $(document).on('click', '.edit_video', function() {
+        var title = $(this).attr('title');
+        var username = $(this).attr('username');
+        var topic_id = $(this).attr('video_id')
+        $("#edit_video").find("#id_edit_title").val(title);
+        $("#edit_video").find("#id_username").val(username);
+        $("#edit_video").find("#id_topic").val(topic_id);
+
+    });
+
+    $(document).on('click', '.play_video', function() {
+        var video_link = $(this).attr('video_link')
+        $(".my_video_player").attr('src', video_link)
+        $(".my_video_player_laod")[0].load()
+        $(".my_video_player_laod")[0].play()
+    });
+    $(document).on('click', '.close', function() {
+        var video_link = $(this).attr('video_link')
+        $(".my_video_player_laod")[0].pause()
+    });
+    $(document).on('click', '.delete_video', function(e) {
+        if (window.confirm("Are you sure you want delete topic id= " + $(this).attr('video_id') + " ?")) {
+            if ($('.delete_video').hasClass("opened")) {
+                return false;
+            } else {
+                 e.preventDefault();
+                $('.delete_video').addClass("opened");
+                $('#overlay').show();
+                var topic_id = $(this).attr('video_id');
+                var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+                var data = {
+                    'topic_id': topic_id,
+                    'csrfmiddlewaretoken': csrfmiddlewaretoken
+                }
+                console.log(data)
+                $.ajax({
+                    url: '/jarvis/delete_bot_video/',
+                    type: 'POST',
+                    data: data,
+                    cache: false,
+                    dataType: "json",
+                    success: function(data) {
+                        $('#overlay').hide()
+                        $('.delete_video').removeClass("opened");
+                        if (data.message == 'fail') {
+                            alert(data['reason'])
+                        } else if (data.message == 'success') {
+                            location.reload();
+                        }
+                        $('.delete_video').removeClass("opened");
+                    },
+                    error: function(data) {
+                        $('#overlay').hide()
+                        $('.delete_video').removeClass("opened");
+                        alert(data.message)
+                        alert(data.reason)
+                        alert('Consult Tech')
+                    },
+
+                });
+            }
         }
-        console.log(data)
-        $.ajax({
-                url: '/jarvis/delete_bot_video/',
+    });
+
+    $(document).on('click', '.update_video_button', function(e) {
+        if ($('.update_video_button').hasClass("opened")) {
+            return false;
+        } else {
+            e.preventDefault();
+            $('.update_video_button').addClass("opened");
+            $('#overlay').show();
+            var data = new FormData($('#edit_video').get(0));
+            var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+            console.log(data)
+            $.ajax({
+                url: '/api/v1/edit_bot_video/',
                 type: 'POST',
                 data: data,
                 cache: false,
                 dataType: "json",
+                processData: false,
+                contentType: false,
                 success: function(data) {
                     $('#overlay').hide()
-                    $('.add_video').removeClass("opened");
+                    $('.update_video_button').removeClass("opened");
                     if (data.message == 'fail') {
                         alert(data['reason'])
                     } else if (data.message == 'success') {
                         location.reload();
                     }
-                    $('.add_video').removeClass("opened");
+                    $('.update_video_button').removeClass("opened");
                 },
                 error: function(data) {
+                    $('.update_video_button').removeClass("opened");
                     $('#overlay').hide()
                     alert(data.message)
                     alert(data.reason)
@@ -202,14 +292,14 @@ $(document).ready(function() {
                 },
 
             });
-    }
-   });
+        }
+    });
 
     function upload(event) {
-        if ($('.add_video').hasClass("opened")) {
+        if ($('.create_video_button').hasClass("opened")) {
             return false;
         } else {
-            $('.add_video').addClass("opened");
+            $('.create_video_button').addClass("opened");
             event.preventDefault();
             $('#overlay').show();
             var data = new FormData($('#create_video').get(0));
@@ -244,7 +334,7 @@ $(document).ready(function() {
                 contentType: false,
                 success: function(data) {
                     $('#overlay').hide()
-                    $('.add_video').removeClass("opened");
+                    $('.create_video_button').removeClass("opened");
                     if (data.message == 'fail') {
                         alert(data['reason'])
                     } else if (data.message == 'success') {
@@ -252,11 +342,11 @@ $(document).ready(function() {
                         $(".close").click()
                         location.reload();
                     }
-                    $('.add_video').removeClass("opened");
+                    $('.create_video_button').removeClass("opened");
                 },
                 error: function(data) {
                     $('#overlay').hide()
-                    $('.add_video').removeClass("opened");
+                    $('.create_video_button').removeClass("opened");
                     alert(data.message)
                     alert(data.reason)
                     alert('Consult Tech')

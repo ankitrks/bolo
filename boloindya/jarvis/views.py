@@ -2824,9 +2824,9 @@ def get_bot_video_list(request):
         if request.method == 'GET':
             user_id = request.GET.get('user_id',None)
             if user_id:
-                user = User.objects.get(pk = user_id)
+                bot_user = User.objects.get(pk = user_id)
                 topic_form = VideoByteForm()
-                return render(request,'jarvis/pages/bot_management/bot_video_list.html', {'user':user, 'topic_form': topic_form})
+                return render(request,'jarvis/pages/bot_management/bot_video_list.html', {'bot_user':bot_user, 'topic_form': topic_form})
             else:
                 HttpResponse(json.dumps({'message':'fail','reason':'user id not found'}),content_type="application/json")
         else:

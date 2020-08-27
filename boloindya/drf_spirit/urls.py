@@ -179,4 +179,5 @@ urlpatterns = [
     url(r'^upload_cover_pic/$', upload_cover_pic),
     url(r'^upload_pii/$', upload_pii),
     url(r'^create_bot_topic/$',create_bot_topic, name='create_bot_topic'),
+    url(r'^edit_bot_video/$',edit_bot_video, name='edit_bot_video'),
 ]

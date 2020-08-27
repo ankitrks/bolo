@@ -105,7 +105,7 @@
             <li class="{% if request.path in '/jarvis/get_moderated_reports/'%}active{% endif %}"><a href="/jarvis/get_moderated_reports/"><i class="fa fa-share"></i>Moderated Reports</a></li>
           </ul>
         </li>
-        <li class="{% if request.path in '/jarvis/bot_user_form/,/jarvis/bot_user_list/'%}active{% endif %} treeview">
+        <li class="{% if request.path in '/jarvis/bot_user_form/,/jarvis/bot_user_list/,/jarvis/get_bot_video_list/'%}active{% endif %} treeview">
           <a href="#">
             <i class="fa fa-dashboard"></i> <span>Bot Management</span>
             <span class="pull-right-container">
@@ -114,7 +114,7 @@
           </a>
           <ul class="treeview-menu">
             <li class="{% if request.path in '/jarvis/bot_user_form/'%}active{% endif %}"><a href="/jarvis/bot_user_form/"><i class="fa fa-circle-o"></i>Bot User Froms</a></li>
-            <li class="{% if request.path in '/jarvis/bot_user_list/'%}active{% endif %}"><a href="/jarvis/bot_user_list/"><i class="fa fa-share"></i>Bot User List</a></li>
+            <li class="{% if request.path in '/jarvis/bot_user_list/,/jarvis/get_bot_video_list/'%}active{% endif %}"><a href="/jarvis/bot_user_list/"><i class="fa fa-share"></i>Bot User List</a></li>
           </ul>
         </li>
         {% endif %}

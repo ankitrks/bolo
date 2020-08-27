@@ -1621,6 +1621,59 @@ def create_bot_topic(request):
             return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
     return HttpResponse(json.dumps({'message':'fail','reason':'Invalid Request'}),content_type="application/json")
 
+@login_required
+def edit_bot_video(request):
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
+        if request.method == 'POST':
+            topic_id = request.POST.get('topic_id',None)
+            title = request.POST.get('title',None)
+            username = request.POST.get('username',None)
+            if topic_id and title and username:
+                topic = Topic.objects.get(pk =topic_id)
+                if title:
+                    title = (title[0].upper()+title[1:]).strip()
+                    tag_list=check_space_before_hash(title).split()
+                    hash_tag = copy.deepcopy(tag_list)
+                    if tag_list:
+                        for index, value in enumerate(tag_list):
+                            if value.startswith("#"):
+                                tag_list[index]='<a href="/get_challenge_details/?ChallengeHash='+value.strip('#')+'">'+value+'</a>'
+                        title = " ".join(tag_list).strip()
+                        title = (title[0].upper()+title[1:]).strip()
+                        # for each_tag in tag_list:
+                        for index, value in enumerate(hash_tag):
+                            if value.startswith("#"):
+                                # tag,is_created = TongueTwister.objects.get_or_create(hash_tag__iexact=value.strip('#'))
+                                tag = TongueTwister.objects.using('default').filter(hash_tag__iexact=value.strip('#'))
+                                if tag.count():
+                                    tag.update(hash_counter = F('hash_counter')+1)
+                                    tag = tag[0]
+                                else:
+                                    tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
+                                topic.hash_tags.add(tag)
+                    if not topic.title == title:
+                        topic.title = title
+
+                if not str(username) == str(topic.user.username):
+                    try:
+                        user = User.objects.get(username = username)
+                    except:
+                        return HttpResponse(json.dumps({'message':'fail','reason':'username not exist'}),content_type="application/json")
+                    current_user_id = topic.user.id
+                    topic.user = user
+                    topic.save()
+                    UserProfile.objects.filter(user_id = current_user_id).update(vb_count = F('vb_count') - 1)
+                    update_profile_counter(current_user_id,'video_count',1, False)
+                    UserProfile.objects.filter(user_id = user.id).update(vb_count = F('vb_count') + 1)
+                    update_profile_counter(user.id,'video_count',1, True)
+                topic.save()
+                return HttpResponse(json.dumps({'message':'success','reason':'topic edited'}),content_type="application/json")
+            else:
+                return HttpResponse(json.dumps({'message':'fail','reason':'topic id or username or title not provided'}),content_type="application/json")
+        else:
+            return HttpResponse(json.dumps({'message':'fail','reason':'only method POST allowed'}),content_type="application/json")
+    return HttpResponse(json.dumps({'message':'fail','reason':'Invalid Request'}),content_type="application/json")
+
 @api_view(['POST'])
 def createTopic(request):
 
