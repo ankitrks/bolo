@@ -98,6 +98,8 @@ function upload(event) {
                 if (data.message == 'fail') {
                     alert(data['reason'])
                 } else if (data.message == 'success') {
+                    alert('User Created: '+data.user_id)
+                    $('#upload')[0].reset();
                     
                 }
                 $('.submit_from_button').removeClass("opened");

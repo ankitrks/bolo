@@ -2806,7 +2806,7 @@ def bot_user_form(request):
                     except:
                         user = User.objects.create(username = username)
                         UserProfile.objects.filter(user_id = user.id).update(**{'name':name, 'language':language, 'gender':gender,\
-                            'about':about, 'bio':bio, 'd_o_b':d_o_b , 'profile_pic': profile_pic_url, 'is_bot_user': True})
+                            'about':about, 'bio':bio, 'd_o_b':d_o_b , 'profile_pic': profile_pic_url, 'is_bot_account': True})
                         userprofile = UserProfile.objects.get(user_id = user.id)
                         for each_category in sub_category:
                             userprofile.sub_category.add(Category.objects.get(pk=each_category))
