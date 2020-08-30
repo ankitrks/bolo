@@ -12,6 +12,7 @@ from forum.topic.models import Topic, Notification, ShareTopic, CricketMatch, Po
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 from datetime import datetime,timedelta
 from forum.user.utils.bolo_redis import update_profile_counter
+from django.db import connection
 
 class TopicResource(resources.ModelResource):
     class Meta:
@@ -48,6 +49,12 @@ from django.contrib.admin.options import (
 )
 from django.utils.translation import ugettext
 from django.utils.encoding import force_text
+import newrelic.agent
+
+newrelic.agent.initialize()
+application = newrelic.agent.register_application(timeout=10.0)
+
+
 class TopicChangeList(ChangeList):
     def __init__(self, request, model, list_display, list_display_links,
             list_filter, date_hierarchy, search_fields, list_select_related,
@@ -57,6 +64,9 @@ class TopicChangeList(ChangeList):
         #     list_filter, date_hierarchy, search_fields, list_select_related,
         #     list_per_page, list_max_show_all, list_editable, model_admin)
         # action_checkbox
+
+        newrelic.agent.set_transaction_name("Topic", "Admin Panel")
+
 
         self.list_display = ('vb_list', 'id', 'title', 'vb_score', 'name', 'duration', 'show_thumbnail', 'language_id', 'imp_count',\
             'is_moderated', 'is_monetized', 'is_removed', 'is_pubsub_popular_push', 'is_boosted', 'boosted_till', 'date', 'm2mcategory') #is_popular
@@ -106,7 +116,7 @@ class TopicChangeList(ChangeList):
 class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExportModelAdmin" NOT "admin.ModelAdmin"
     # ordering = ['is_vb', '-id']
     ordering = ('-id',)
-    list_per_page = 50
+    list_per_page = 20
     search_fields = ('title', 'user__username', 'user__st__name', )
     list_filter = (('date', DateRangeFilter), 'language_id', 'm2mcategory', 'is_moderated', 'is_monetized', 'is_removed', 'is_popular', 'is_boosted')
     filter_horizontal = ('m2mcategory', )
@@ -196,13 +206,33 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
 
     def get_search_results(self, request, queryset, search_term):
         final_search_term = search_term.replace('h:', '').replace('n:', '')
-        queryset, use_distinct = super(TopicAdmin, self).get_search_results(request, queryset, final_search_term)
-        if search_term:
-            if search_term.startswith('h:'):
-                queryset = queryset.filter(hash_tags__hash_tag__iexact = search_term.replace('h:', ''))
-            if search_term.startswith('n:'):
-                queryset = queryset.filter(title__icontains = search_term.replace('n:', '')).exclude(hash_tags__hash_tag__icontains = search_term.replace('n:', ''))
-        return queryset, use_distinct
+
+        if search_term.startswith('h:'):
+            queryset = queryset.filter(hash_tags__hash_tag__iexact = search_term.replace('h:', ''))
+        elif search_term.startswith('n:'):
+            queryset = queryset.filter(title__icontains = search_term.replace('n:', '')).exclude(hash_tags__hash_tag__icontains = search_term.replace('n:', ''))
+        elif search_term:
+            term = '%' + search_term + '%'
+            
+            with connection.cursor() as cursor:
+                query = cursor.mogrify("""
+                    select distinct id from (
+                        select forum_topic_topic.id from forum_topic_topic where title ilike %s
+                        union
+                        select forum_topic_topic.id from forum_topic_topic inner join auth_user on auth_user.id = forum_topic_topic.user_id where auth_user.username ilike %s
+                        union
+                        select forum_topic_topic.id from forum_topic_topic 
+                        inner join auth_user on auth_user.id = forum_topic_topic.user_id 
+                        inner join forum_user_userprofile on forum_user_userprofile.user_id = auth_user.id
+                        where forum_user_userprofile.name ilike %s) A
+                """, [term, term, term])
+                cursor.execute(query)
+                id_list = [row[0] for row in cursor.fetchall()]
+
+            queryset = queryset.filter(id__in=id_list)
+
+        queryset.select_related('user', 'user__userprofile')
+        return queryset, False
 
     def save_model(self, request, obj, form, change):
         if 'title' in form.changed_data:
