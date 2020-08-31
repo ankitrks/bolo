@@ -35,6 +35,9 @@
       .field-name{min-width: 65px !important;word-break: break-word;max-width: 70px !important;}
       #video_div {position: fixed;bottom: 66px;right: 20px;z-index: 9999;background: black;display: none;}
       .close_player{position: absolute;right: 10px;top: 10px;color: white;font-size: 20px;cursor: pointer;z-index: 9;}
+      .category-label-section{margin: 3px 5px}
+      .category-label{}
+      .remove-category-icon{margin-right: 5px;color:#3e9dc0;}
     </style>
 {% endblock %}
 
@@ -314,6 +317,130 @@
 
             });
         })(grp.jQuery);
+    </script>
+
+    <script type="text/javascript">
+        (function($){
+
+
+            class CategoryLabelCheckbox {
+                constructor(checkboxSection, parent, stateChangeCallback) {
+                    this.checkboxSection = $(checkboxSection)
+                    this.stateChangeCallback = stateChangeCallback
+                    this.parent = parent
+                    this.name = this.checkboxSection.text();
+
+                    this.checkbox = this.checkboxSection.children().wrap('<span></span>').parent()
+                    this.label = $(`
+                        <div class='category-label-section'>
+                            <span class="remove-category-icon">x</span>
+                            <span class='category-label'>${this.name}<span>
+                        </div>`);
+                    this.cross = this.label.find('.remove-category-icon');
+                    this.checkboxSection.prepend(this.label);
+
+                    this.element = this.checkbox.find('input')
+                    this.state = this.element.attr('checked') == 'checked' ? 'checked': 'unchecked'
+                    this.applyEvent()
+                }
+
+                get state(){
+                    return this._state
+                }
+
+                set state(val){
+                    this._state = val
+
+                    if(this._state == 'checked')
+                        this.categorySelected()
+                    else
+                        this.categoryRemoved()
+
+                    let callback = this.stateChangeCallback
+                    callback.call(this.parent, this, this._state)
+                }
+
+                hideCheckbox() {
+                    this.checkbox.hide()
+                }
+
+                showCheckbox(){
+                    this.checkbox.show()
+                }
+
+                hideLabel(){
+                    this.label.hide()
+                }
+
+                showLabel(){
+                    this.label.show()
+                }
+
+                categorySelected(){
+                    this.showLabel()
+                    this.hideCheckbox()
+                    this.element.attr('checked', true)
+                }
+
+                categoryRemoved(){
+                    this.hideLabel()
+                    this.showCheckbox()
+                    this.element.removeAttr('checked')
+                }
+
+                applyEvent(){
+                    let that = this;
+                    $(this.element).change(function(){
+                        that.state = 'checked'
+                    })
+
+                    $(this.cross).click(function(){
+                        that.state = 'unchecked'
+                    })
+                }
+            }
+
+
+            class TopicCategory {
+                constructor(section){
+                    this.categories = [];
+                    this.categorySection = $(section).find('ul') 
+                }
+
+                addCategory(category){
+                    this.categories.push(new CategoryLabelCheckbox(category, this, this.categoryStateChanged))
+                }
+
+                categoryStateChanged(category, state){
+                    if(state == 'checked')
+                        this.categorySection.prepend(category.checkboxSection)
+                    else{
+                        this.categorySection.append(category.checkboxSection)
+                    }
+                }
+
+                sort(){
+                    let that = this;
+                    $.each(this.categories, function(i, category){
+                        if(category.state == 'checked'){
+                            that.categorySection.prepend(category.checkboxSection)
+                        }
+                    })  
+                }
+                
+            }
+
+            $(document).ready(function(){
+                $.each($('.field-m2mcategory'), function(){
+                    let topicCategory = new TopicCategory(this)
+                    $.each($(this).find('li'), function(){
+                        topicCategory.addCategory(this)    
+                    })
+                    topicCategory.sort()
+                })
+            })
+
+        })(jQuery);
     </script>
 {% endblock %}
 
