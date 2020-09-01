@@ -2,7 +2,7 @@
 
 <!-- LOADING -->
 {% load i18n grp_tags admin_urls static admin_list %}
-
+{% load topic_admin %}
 <!-- STYLESHEETS -->
 {% block stylesheets %}
     {{ block.super }}
@@ -551,7 +551,9 @@
             {% endif %}
             <!-- CHANGELIST-RESULTS -->
             {% block result_list %}
-                {% result_list cl %}
+                {% with cl|sort_solr_result as cl %}
+                    {% result_list cl %}
+                {% endwith %}
             {% endblock %}
         </section>
         <!-- PAGINATION BOTTOM -->
