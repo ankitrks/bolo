@@ -315,6 +315,133 @@
             });
         })(grp.jQuery);
     </script>
+    <script type="text/javascript">
+        (function($){
+            class User{
+
+                constructor(userSection){
+                    this.csrfToken = $('[name="csrfmiddlewaretoken"]').val()
+                    this.userSection = $(userSection)
+                    this.element = this.userSection.find('input[type="text"]');
+                    this.name = this.element.val();
+                    this.userProfileID = this.getUserProfileID()
+                    this.element.hide();
+                    this.addButtons();
+                    this.applyEvents();
+                    this.initState()
+                }
+
+                applyEvents(){
+                    let that = this;
+                    this.blockButton.click(function(){
+                        if (confirm("Are you sure you want to delete user?"))
+                            that.ajaxCall(that.blockButton.attr('data-url'), that.blockUserSuccess)
+                    
+                    })
+
+                    this.unblockButton.click(function(){
+                        if (confirm("Are you sure you want to unblock user?"))
+                            that.ajaxCall(that.unblockButton.attr('data-url'), that.unblockUserSuccess)
+                    })
+
+                    this.deleteVideosButton.click(function(){
+                        if (confirm("Are you sure you want to delete user's all videos?"))
+                            that.ajaxCall(that.deleteVideosButton.attr('data-url'), that.deleteVideosSuccess)
+                    })
+
+                    this.deleteCommentButton.click(function(){
+                        if (confirm("Are you sure you want to delete user's all comments?"))
+                            that.ajaxCall(that.deleteCommentButton.attr('data-url'), that.deleteCommentsSuccess)
+                    })
+
+                }
+
+                addButtons(){
+                    this.userSection.append(`<div data-url="/api/superman/user/${this.userProfileID}/block/"><a href="#" class="block_user">Block</a></div>`);
+                    this.userSection.append(`<div data-url="/api/superman/user/${this.userProfileID}/unblock/"><a href="#" class="unblock_user">Unblock</a></div>`);
+                    this.userSection.append(`<div data-url="/api/superman/user/${this.userProfileID}/delete_videos/"><a href="#" class="delete_video">Delete Videos</a></div>`);
+                    this.userSection.append(`<div data-url="/api/superman/user/${this.userProfileID}/delete_comments/"><a href="#" class="delete_comment">Delete Comments</a></div>`);
+
+                    this.blockButton = $(this.userSection.find('.block_user').parent());
+                    this.unblockButton = $(this.userSection.find('.unblock_user').parent());
+                    this.deleteVideosButton = $(this.userSection.find('.delete_video').parent());
+                    this.deleteCommentButton = $(this.userSection.find('.delete_comment').parent());
+
+                }
+
+                initState(){
+                    this.unblockButton.hide();
+                    this.deleteVideosButton.hide();
+                    this.deleteCommentButton.hide();
+                }
+
+                getUserProfileID(){
+                    let link_split = this.userSection.find('a').attr('href').split('/');
+                    return link_split[link_split.length - 3]
+
+                }
+
+                get userState(){
+                    return this._userState
+                }
+
+                set userState(val){
+                    this._userState = val
+
+                    if(this._userState == 'blocked'){
+                        this.blockButton.hide()
+                        this.unblockButton.show();
+                        this.deleteVideosButton.show();
+                        this.deleteCommentButton.show();
+                    }
+                    else{
+                        this.blockButton.show()
+                        this.unblockButton.hide();
+                        this.deleteVideosButton.hide();
+                        this.deleteCommentButton.hide();
+                    }
+                }
+
+                blockUserSuccess(){
+                    this.userState = 'blocked'
+                }
+
+                unblockUserSuccess(){
+                    this.userState = 'unblocked'
+                }
+
+                deleteVideosSuccess(){
+                    alert("All videos deleted")
+                }
+
+                deleteCommentsSuccess(){
+                    alert("All comment deleted")
+                }
+
+                ajaxCall(url, successCallback){
+                    console.log(" ajax Url")
+                    let that = this;
+                    $.ajax({
+                        url: url,
+                        method: 'POST',
+                        headers: {'X-CSRFToken': that.csrfToken},
+                        success: function(response){
+                            successCallback.call(that, response)
+                        }
+                    })
+                }
+
+            }
+
+            $(document).ready(function(){
+                jQuery.each( jQuery('.field-name'), function(i, each_field){
+                    let user = new User(each_field);
+                });
+            })
+        })(jQuery);
+
+        
+    </script>
 {% endblock %}
 
 <!-- COLTYPE/BODYCLASS-- >
