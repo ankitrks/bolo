@@ -21,7 +21,7 @@ def run():
     counter_objects_created=0
     print "Start Time Eng_Engagment: ",datetime.now()
     now = datetime.now()
-    last_n_days_post_ids = Topic.objects.filter(is_popular = True, popular_boosted_time__gte = now-timedelta(days=1), is_vb=True, is_removed=False, user__st__boosted_time__isnull=True).order_by('-date').values_list('id',flat=True)
+    last_n_days_post_ids = Topic.objects.filter( Q(popular_boosted_time__gte = now-timedelta(days=1))|Q(date__gte =now-timedelta(days=1) ), is_popular = True, is_vb=True, is_removed=False, user__st__boosted_time__isnull=True).order_by('-date').values_list('id',flat=True)
     last_n_days_post_ids = list(last_n_days_post_ids)
 
     post_counter = 0
