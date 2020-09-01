@@ -251,26 +251,33 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
         elif search_term.startswith('n:'):
             queryset = queryset.filter(title__icontains = search_term.replace('n:', '')).exclude(hash_tags__hash_tag__icontains = search_term.replace('n:', ''))
         elif search_term:
-            sqs = SearchQuerySet().models(Topic).raw_search(search_term)[:100]
+            sqs = SearchQuerySet().models(Topic, UserProfile).raw_search(search_term)[:100]
 
             self.sqs_result = []
             self.sqs_result_dict = {}
             id_list = []
+            user_id_list = []
             for item in sqs:
-                if type(item.id) == int:
-                    _dict = {'id':item.id, 'score': item.score}
-                elif type(item.type) == str:
-                    _dict = {'id':int(item.id.split('.')[-1]), 'score': item.score}
+                if not type(item.id) in (str, unicode):
+                    continue
 
-                self.sqs_result_dict[_dict.get('id')] = _dict.get('score')
-                self.sqs_result.append(_dict)
-                id_list.append(_dict.get('id'))
+                split_data = item.id.split('.')
+
+                if split_data[1] == 'userprofile':
+                    user_id_list.append(int(split_data[-1]))
+                else:
+                    _dict = {'id':int(split_data[-1]), 'score': item.score}
+
+                    self.sqs_result_dict[_dict.get('id')] = _dict.get('score')
+                    self.sqs_result.append(_dict)
+                    id_list.append(_dict.get('id'))
+
 
             paginator = self.get_paginator(request, id_list, self.list_per_page)
             page = int(request.GET.get(PAGE_VAR, 0))
             ids = paginator.page(page+1).object_list
 
-            queryset = queryset.filter(id__in=ids)
+            queryset = queryset.filter(Q(id__in=ids) | Q(user_id__in=user_id_list))
 
         queryset.select_related('user', 'user__userprofile')
         return queryset, False
