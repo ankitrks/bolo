@@ -15,7 +15,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from fcm.models import AbstractDevice
 from django.db.models import F,Q
-from drf_spirit.utils import reduce_bolo_score, shortnaturaltime, add_bolo_score,language_options
+from drf_spirit.utils import reduce_bolo_score, shortnaturaltime, add_bolo_score,language_options, short_time
 from forum.user.models import UserProfile, Weight
 from django.http import JsonResponse
 from datetime import datetime,timedelta
@@ -127,9 +127,11 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
     # shared_post = models.ForeignKey('self', blank = True, null = True, related_name='user_shared_post')
     is_vb = models.BooleanField(_("Is Video Bytes"), default=False)
     likes_count = models.PositiveIntegerField(_("Likes count"), default=0,db_index=True)
-
     is_monetized = models.BooleanField(_("monetized"), default=False)
     is_moderated = models.BooleanField(_("moderated"), default=False)
+    last_moderated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, editable=False)
+    is_reported = models.BooleanField(_("reported"), default=False)
+    report_count = models.PositiveIntegerField(_("Report count"), default=0)
     vb_width = models.PositiveIntegerField(_("vb width"), default=0)
     vb_height = models.PositiveIntegerField(_("vb height"), default=0)
     is_thumbnail_resized = models.BooleanField(_("Thumbnail Resizd?"), default=False)
@@ -325,17 +327,24 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
         :return: List of comments in HTML
         """
         return self.comment_set.values_list('comment_html', flat=True)
+ 
+    def playtime(self):
+        return str(int(self.vb_playtime / 60)) + ' m'
 
     def name(self):
         from django.utils.html import format_html
+        user_str = '@' + self.user.username
+        if self.user.st.name:
+            user_str += '<br>' + '[' + self.user.st.name + ']'
+        
         try:
             if self.user.st.name:
                 return format_html('<a href="/superman/forum_user/userprofile/' + str(self.user.st.id) \
-                    + '/change/" target="_blank">' + self.user.st.name + '</a>' )
+                    + '/change/" target="_blank">' + user_str + '</a>' )
         except:
             pass
         return format_html('<a href="/superman/forum_user/userprofile/' + str(self.user.st.id) \
-            + '/change/" target="_blank">' + self.user.username + '</a>' )
+            + '/change/" target="_blank">' + user_str + '</a>' )
 
     def delete(self,is_user_deleted=False):
         if self.is_monetized:

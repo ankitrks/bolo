@@ -17,7 +17,7 @@
       #result_list ul li{list-style-type: none;}
       #result_list .field-m2mcategory input[type=checkbox]{display: inline-block;}
       .field-title{max-width: 360px !important;text-align: left !important;width: 100% !important;}
-      .field-title input[type="text"]{max-width: 320px !important;width: 310px !important;}
+      .field-title input[type="text"],.field-title textarea{/*max-width: 320px !important;width: 310px !important;*/width: 100%;}
       #date-form{margin-top: 5px;padding-right: 10px;}
       #grp-content{top:0;}
       header#grp-header{display: none;}
@@ -35,6 +35,8 @@
       .field-name{min-width: 65px !important;word-break: break-word;max-width: 70px !important;}
       #video_div {position: fixed;bottom: 66px;right: 20px;z-index: 9999;background: black;display: none;}
       .close_player{position: absolute;right: 10px;top: 10px;color: white;font-size: 20px;cursor: pointer;z-index: 9;}
+      table.grp-table.grp-sortable thead th{vertical-align: middle;display: table-cell;}
+      .fix_header{position: fixed;top: 0;z-index: 999;display: none;}
     </style>
 {% endblock %}
 
@@ -198,6 +200,19 @@
                     e.preventDefault();
                     showRelatedObjectLookupPopup(this);
                 });
+
+                jQuery('.column-is_moderated').append('<input type="checkbox" class = "select_all" field=".field-is_moderated">')
+                jQuery('.column-is_removed').append('<input type="checkbox" class = "select_all" field=".field-is_removed">')
+                jQuery('.column-is_pubsub_popular_push').append('<input type="checkbox" class = "select_all" field=".field-is_pubsub_popular_push">')
+
+                $(document).on('change', '.select_all', function() {
+                    var field_th = jQuery(this).attr('field');
+                    var checked = false;
+                    if(jQuery(this).is(":checked")){ checked = true; }
+                    $(field_th).find('input[type="checkbox"]').prop('checked', checked);
+                    $('.select_all[field="' + field_th + '"]').prop('checked', checked);
+                });
+
                 jQuery('.field-is_monetized').find('input[type="checkbox"]:checked').parents('td').next('td.field-is_removed')
                     .find('input[type="checkbox"]:not(:checked)').prop('disabled', 'disabled');
                 jQuery('.field-is_removed').find('input[type="checkbox"]:checked').parents('td').prev('td.field-is_monetized')
@@ -287,24 +302,31 @@
                 jQuery(document).on('click', '.edit_title', function(e){
                     e.preventDefault();
                     jQuery(this).parents('td').find('.title_box').hide();
-                    jQuery(this).parents('td').find('input[type="text"], .close_edit_box').show();
-                    var text_field = jQuery(this).parents('td').find('input[type="text"]');
+                    // jQuery(this).parents('td').find('input[type="text"], .close_edit_box').show();
+                    // var text_field = jQuery(this).parents('td').find('input[type="text"]');
+                    jQuery(this).parents('td').find('textarea, .close_edit_box').show();
+                    var text_field = jQuery(this).parents('td').find('textarea');
                     var title = $(text_field).val();
                     $(text_field).val( title.replace( /(<([^>]+)>)/ig, '') );
+                    // jQuery('.fix_header').find('th.column-title').css('width', jQuery('#result_list').find('th.column-title').width() + 'px');
                 });
 
                 jQuery(document).on('click', '.close_edit_box', function(e){
                     e.preventDefault();
                     jQuery(this).parents('td').find('.title_box').show();
-                    jQuery(this).parents('td').find('input[type="text"], .close_edit_box').hide();
+                    // jQuery(this).parents('td').find('input[type="text"], .close_edit_box').hide();
+                    jQuery(this).parents('td').find('textarea, .close_edit_box').hide();
+                    // jQuery('.fix_header').find('th.column-title').css('width', jQuery('#result_list').find('th.column-title').width() + 'px');
                 });
 
                 jQuery.each( jQuery('.field-title'), function(i, each_field){
-                    var title = $(each_field).find('input[type="text"]').val();
-                    $(each_field).find('input[type="text"]').hide();
+                    var text_field = jQuery(this).find('input[type="text"]');
+                    var text_area = '<textarea name="' + jQuery(text_field).attr('name') + '" id="' + jQuery(text_field).attr('id') + '" style="display:none;">' + jQuery(text_field).attr('value') + '</textarea>';
+                    jQuery(each_field).append(text_area);
+                    var title = $(each_field).find('textarea').text();
                     $(each_field).append('<a href="#" class="close_edit_box" style="display:none;">close</a>');
                     $(each_field).append('<div class="title_box">' + title + '&nbsp;&nbsp;<a href="#" class="edit_title">edit</a></div>');
-                    // $(each_field).find('input[type="text"]').val( title.replace( /(<([^>]+)>)/ig, '') );
+                    jQuery(text_field).remove();
                 });
 
                 jQuery.each( jQuery('.field-m2mcategory'), function(i, each_element){
@@ -312,7 +334,58 @@
                     jQuery(each_element).css('max-height', tr_height + 'px');
                 });
 
+                jQuery("label:contains('Is Superstar')").closest('.grp-module').hide();
+                jQuery("label:contains('Is Popular')").closest('.grp-module').hide();
+                jQuery("label:contains('Is Business')").closest('.grp-module').hide();
+
+                jQuery('select:has(option:contains(Superstar))').find('option:contains(Superstar)').attr('value', '?user__st__is_superstar__exact=1');
+                jQuery('select:has(option:contains(Popular))').find('option:contains(Popular)').attr('value', '?user__st__is_popular__exact=1');
+                jQuery('select:has(option:contains(Business))').find('option:contains(Business)').attr('value', '?user__st__is_business__exact=1');
+
+                jQuery('select:has(option:contains(Business))').change(function(){
+                    urlObject = new URL(window.location.href);
+                    urlObject.searchParams.delete('user__st__is_superstar__exact');
+                    urlObject.searchParams.delete('user__st__is_popular__exact');
+                    urlObject.searchParams.delete('user__st__is_business__exact');
+
+                    jQuery("label:contains('Is Superstar')").next('.grp-filter-choice').find('option[selected="selected"]').removeAttr('selected');
+                    jQuery("label:contains('Is Popular')").next('.grp-filter-choice').find('option[selected="selected"]').removeAttr('selected');
+                    jQuery("label:contains('Is Business')").next('.grp-filter-choice').find('option[selected="selected"]').removeAttr('selected');
+
+                    jQuery("label:contains('Is Superstar')").next('.grp-filter-choice').find('option').first().attr('value', urlObject.search).attr('selected', 'selected').prop('selected', 'selected');
+                    jQuery("label:contains('Is Popular')").next('.grp-filter-choice').find('option').first().attr('value', urlObject.search).attr('selected', 'selected').prop('selected', 'selected');
+                    jQuery("label:contains('Is Business')").next('.grp-filter-choice').find('option').first().attr('value', urlObject.search).attr('selected', 'selected').prop('selected', 'selected');
+                    // window.history.pushState({},"", urlObject.href);
+                });
+                $(window).on('scroll', function() {
+                    var scrollTop = $(this).scrollTop();
+                    var head_pos = jQuery('#result_list').offset().top;
+                    if( scrollTop >= head_pos && jQuery('.fix_header').is(":hidden") ){
+                        jQuery('.fix_header').show();
+                        jQuery('#result_list thead').css('visibility', 'hidden');
+                    }
+                    if(scrollTop < head_pos){
+                        jQuery('.fix_header').hide();
+                        jQuery('#result_list thead').css('visibility', 'visible');
+                    }
+                });
             });
+
+            $(window).load(function(){
+                jQuery.each( jQuery('th'), function(i, each_th){
+                    jQuery(each_th).css( 'width', jQuery(each_th).width() + 'px');
+                    // var classname = $(this).attr('class').split(' ');
+                    // $.each(classname, function(i, each_cls){
+                    //     console.log(each_cls);
+                    //     if(each_cls.startsWith('column-')){
+                    //         $('.' + each_cls.replace('column-', 'field-')).css( 'width', jQuery(each_th).width() + 'px');
+                    //     }
+                    // });
+                });
+                jQuery('.grp-changelist-results').prepend('<table cellspacing="0" class="grp-table grp-sortable fix_header"><thead>' + jQuery('#result_list').find('thead').html() + '</thead></table>');
+            });
+
+
         })(grp.jQuery);
     </script>
 {% endblock %}

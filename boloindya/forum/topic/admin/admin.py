@@ -58,10 +58,10 @@ class TopicChangeList(ChangeList):
         #     list_per_page, list_max_show_all, list_editable, model_admin)
         # action_checkbox
 
-        self.list_display = ('vb_list', 'id', 'title', 'vb_score', 'name', 'duration', 'show_thumbnail', 'language_id', 'imp_count',\
-            'is_moderated', 'is_monetized', 'is_removed', 'is_pubsub_popular_push', 'is_boosted', 'boosted_till', 'date', 'm2mcategory') #is_popular
+        self.list_display = ('vb_list', 'id', 'title', 'name', 'duration', 'show_thumbnail', 'language_id', 'playtime', 'imp_count',\
+            'date', 'is_moderated', 'is_removed', 'is_pubsub_popular_push', 'is_boosted', 'boosted_till', 'm2mcategory') #is_popular
         self.list_display_links = ['id']
-        self.list_editable = ('title', 'language_id', 'm2mcategory', 'is_pubsub_popular_push', 'is_monetized', 'is_removed', \
+        self.list_editable = ('title', 'language_id', 'm2mcategory', 'is_pubsub_popular_push', 'is_removed', \
                 'is_moderated','is_boosted','boosted_till')
         self.model = model
         self.opts = model._meta
@@ -103,12 +103,51 @@ class TopicChangeList(ChangeList):
         self.title = title % force_text(self.opts.verbose_name)
         self.pk_attname = self.lookup_opts.pk.attname
 
+from django.db.models import Q
+from django.contrib.auth.models import User
+from django.contrib.admin import SimpleListFilter
+class ModeratedFilter(SimpleListFilter):
+    title = 'Moderated by'
+    parameter_name = 'last_moderated_by__id'
+    def lookups(self, request, model_admin):
+        return list(User.objects.filter(Q(is_staff = True) | Q(is_superuser = True)).values_list('id', 'username'))
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(last_moderated_by__id=self.value())
+        return queryset
+
+class UserTypeFilter(SimpleListFilter):
+    title = 'User type'
+    parameter_name = 'user__st'
+    def lookups(self, request, model_admin):
+        return (
+            ('1', 'Superstar'),
+            ('1', 'Popular'),
+            ('1', 'Business'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() and self.value().lower() == 'superstar':
+            self.parameter_name = 'user__st__is_superstar'
+            return queryset.filter(user__st__is_superstar = True)
+        elif self.value() and self.value().lower() == 'popular':
+            self.parameter_name = 'user__st__is_popular'
+            return queryset.filter(user__st__is_popular = True)
+        elif self.value() and self.value().lower() == 'business':
+            self.parameter_name = 'user__st__is_business'
+            return queryset.filter(user__st__is_business = True)  
+        return queryset
+
 class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExportModelAdmin" NOT "admin.ModelAdmin"
     # ordering = ['is_vb', '-id']
     ordering = ('-id',)
-    list_per_page = 50
+    list_per_page = 20
     search_fields = ('title', 'user__username', 'user__st__name', )
-    list_filter = (('date', DateRangeFilter), 'language_id', 'm2mcategory', 'is_moderated', 'is_monetized', 'is_removed', 'is_popular', 'is_boosted')
+    list_filter = (('date', DateRangeFilter), 'language_id', 'm2mcategory', 'is_moderated', 'is_monetized', 'is_removed', \
+            'is_popular', 'is_boosted', 'is_reported', ModeratedFilter, UserTypeFilter, \
+            'user__st__is_superstar', 'user__st__is_popular', 'user__st__is_business')
+    
     filter_horizontal = ('m2mcategory', )
 
     fieldsets = (
@@ -131,11 +170,21 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
         }),
     )
 
+    # def formfield_for_foreignkey(self, db_field, request, **kwargs):
+    #     if db_field.name == "last_moderated_by":
+    #         kwargs["queryset"] = User.objects.filter(Q(is_staff = True) | Q(is_superuser = True))
+    #     return super(TopicAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+
     def get_changelist(self, request, **kwargs):
         return TopicChangeList
 
     def get_changelist_form(self, request, **kwargs):
         return TopicChangeListForm
+
+    def playtime(self, obj):
+        return obj.playtime()
+    playtime.short_description = "playtime"
+    playtime.admin_order_field = 'vb_playtime'
 
     def duration(self, obj):
         return obj.duration()
@@ -268,6 +317,10 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
                 userprofile = UserProfile.objects.filter(user = obj.user)
                 reduce_bolo_score(obj.user.id, 'create_topic', obj, 'no_monetize')
                 obj.add_monetization()
+
+        if form.changed_data and request.user.is_staff:
+            obj.last_moderated_by = request.user
+
         super(TopicAdmin,self).save_model(request, obj, form, change)
 
     # def comment_count(self, obj):
