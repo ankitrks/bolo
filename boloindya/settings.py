@@ -666,3 +666,5 @@ PUSH_NOTIFICATION_URL = "https://fcm.googleapis.com/v1/projects/boloindya-1ec98/
 FTIME_PLAY = 0.5 # in seconds
 FPLAYTIME_LIMIT = 180000 # in seconds 50 hours
 POPULAR_BOOST_TIMEDELTA = 2 # in days
+
+WATERMARK_SERVICE_ENDPOINT = "https://92scj7hqac.execute-api.ap-south-1.amazonaws.com/v1/invoke-watermark"

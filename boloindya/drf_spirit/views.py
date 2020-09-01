@@ -1828,7 +1828,7 @@ def createTopic(request):
 def invoke_watermark_service(topic, user):
     try:
         print("inside invoke_watermark_service")
-        url = "https://92scj7hqac.execute-api.ap-south-1.amazonaws.com/v1/invoke-watermark"
+        url = settings.WATERMARK_SERVICE_ENDPOINT
         topic_id = topic.id
         input_key = topic.question_video.split(".amazonaws.com/")[1]
         username  = user.username
@@ -1836,7 +1836,6 @@ def invoke_watermark_service(topic, user):
         duration = topic.media_duration
         payload = {"input_key": input_key, "topic_id": topic_id, "username": username,"user_id":user_id,"duration":duration}
         response = requests.request("POST", url, headers = {}, data = json.dumps(payload), files = [],timeout=60)
-        print(response)
         if response.status_code == 200:
             print("success")
         else:
@@ -2962,6 +2961,8 @@ def fb_profile_settings(request):
                         user = userprofile.user
                         user.username = username
                         user.save()
+                        # invoke watermark service to update username
+                        update_branding_url.delay(username)
                     else:
                         return JsonResponse({'message': 'Username already exist'}, status=status.HTTP_200_OK)
                 UserProfile.objects.using('default').filter(user=request.user).update(**update_dict)
