@@ -111,6 +111,7 @@ class UserProfile(models.Model,ModelDiffMixin):
     country_code = models.CharField(_("Country Phone Code"), max_length=20, blank = True, null = True)
     salary_range = models.CharField(choices=salary_choices, blank = True, null = True, max_length=10,db_index=True)
     is_insight_fix = models.BooleanField(default=False)
+    is_bot_account = models.BooleanField(default=False)
 
     objects = UserProfileQueryset.as_manager()
 

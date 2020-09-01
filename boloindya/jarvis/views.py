@@ -48,7 +48,7 @@ from itertools import groupby
 from django.db.models import Count
 import ast
 from drf_spirit.serializers import VideoCompleteRateSerializer
-from .forms import VideoUploadTranscodeForm,TopicUploadTranscodeForm,UserPayForm, AudioUploadForm, CampaignForm
+from .forms import VideoUploadTranscodeForm,TopicUploadTranscodeForm,UserPayForm, AudioUploadForm, CampaignForm, UserForm
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
 from django.core.files.base import ContentFile
 from drf_spirit.serializers import UserWithUserSerializer
@@ -218,7 +218,7 @@ def uploadvideofile(request):
             {'all_category':all_category,'all_upload':all_upload})
 
 @login_required
-def boloindya_uploadvideofile(request):    
+def boloindya_uploadvideofile(request):
     topic_form = TopicUploadTranscodeForm()
     return render(request,'jarvis/pages/upload_n_transcode/boloindya_upload_transcode.html',
             {'topic_form':topic_form})
@@ -2515,6 +2515,13 @@ def get_moderated_reports(request):
     if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
        return render(request,'jarvis/pages/reports/moderated_reports.html')
 
+from forum.topic.forms import VideoByteForm
+def get_bot_user_list(request):
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
+        topic_form = VideoByteForm()
+        return render(request,'jarvis/pages/bot_management/bot_user_list.html',{'topic_form': topic_form})
+    return JsonResponse({'fail':'','message':'Invalid Request' }, status=status.HTTP_200_OK)
+
 def remove_post_or_block_user_temporarily(request):
     if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
         report_id = request.POST.get('report_id',None)
@@ -2767,5 +2774,88 @@ def search_and_add_hashtag(request):
 
     data = TongueTwisterWithHashSerializer(hashtag).data
     return JsonResponse(data, status=status.HTTP_200_OK)
+
+
+from drf_spirit.utils import get_random_username
+from drf_spirit.views import upload_thumbail
+@login_required
+def bot_user_form(request):
+    if request.method == 'GET':
+        user_form = UserForm()
+        return render(request,'jarvis/pages/bot_management/user_form.html', {'user_form':user_form})
+    elif request.method == 'POST':
+        if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
+            try:
+                profile_pic = request.FILES['profile_pic']
+                profile_pic_url = None
+                if profile_pic:
+                    profile_pic_url = upload_thumbail(profile_pic)
+                username = request.POST.get('username',get_random_username())
+                name = request.POST.get('name','')
+                sub_category = request.POST.getlist('sub_category',None)
+                language = request.POST.get('language','1')
+                gender = request.POST.get('gender','1')
+                about = request.POST.get('about',None)
+                bio = request.POST.get('bio',None)
+                d_o_b = request.POST.get('d_o_b',None)
+                print profile_pic_url
+                if username:
+                    try:
+                        User.objects.get(username = username)
+                        return HttpResponse(json.dumps({'message':'fail','reason':'username already taken'}),content_type="application/json")
+                    except:
+                        user = User.objects.create(username = username)
+                        UserProfile.objects.filter(user_id = user.id).update(**{'name':name, 'language':language, 'gender':gender,\
+                            'about':about, 'bio':bio, 'd_o_b':d_o_b , 'profile_pic': profile_pic_url, 'is_bot_account': True})
+                        userprofile = UserProfile.objects.get(user_id = user.id)
+                        for each_category in sub_category:
+                            userprofile.sub_category.add(Category.objects.get(pk=each_category))
+                    return HttpResponse(json.dumps({'message':'success','user_id':user.id}),content_type="application/json")
+            except Exception as e:
+                return HttpResponse(json.dumps({'message':'fail','reason':str(e)}),content_type="application/json")
+                
+        return HttpResponse(json.dumps({'message':'fail','reason':'Not Authorised'}),content_type="application/json")
+
+    return HttpResponse(json.dumps({'message':'fail','reason':'Invalid Request'}),content_type="application/json")
+
+@login_required
+def get_bot_video_list(request):
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
+        if request.method == 'GET':
+            user_id = request.GET.get('user_id',None)
+            if user_id:
+                bot_user = User.objects.get(pk = user_id)
+                topic_form = VideoByteForm()
+                return render(request,'jarvis/pages/bot_management/bot_video_list.html', {'bot_user':bot_user, 'topic_form': topic_form})
+            else:
+                HttpResponse(json.dumps({'message':'fail','reason':'user id not found'}),content_type="application/json")
+        else:
+            HttpResponse(json.dumps({'message':'fail','reason':'only method GET allowed'}),content_type="application/json")
+    else:
+        HttpResponse(json.dumps({'message':'fail','reason':'Invalid Request'}),content_type="application/json")
+
+@login_required
+def delete_bot_video(request):
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
+        if request.method == 'POST':
+            topic_id = request.POST.get('topic_id',None)
+            if topic_id:
+                topic = Topic.objects.get(pk =topic_id)
+                if not topic.is_removed:
+                    topic.delete(is_user_deleted=False)
+                    update_profile_counter(topic.user_id,'video_count',1, False)
+                    return HttpResponse(json.dumps({'message':'success','reason':'topic removed'}),content_type="application/json")
+                else:
+                    return HttpResponse(json.dumps({'message':'success','reason':'topic already removed'}),content_type="application/json")
+            else:
+                return HttpResponse(json.dumps({'message':'fail','reason':'topic id not provided'}),content_type="application/json")
+        else:
+            return HttpResponse(json.dumps({'message':'fail','reason':'only method POST allowed'}),content_type="application/json")
+    HttpResponse(json.dumps({'message':'fail','reason':'Invalid Request'}),content_type="application/json")
+
+
+
+            
+
 
 

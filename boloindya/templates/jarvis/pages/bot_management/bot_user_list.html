@@ -1,0 +1,207 @@
+{% extends "jarvis/layout/base.html" %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/dataTables.bootstrap4.min.css' %}">
+<style>
+    .form_title {
+        text-align: center;
+        margin: 0 auto;
+    }
+    #overlay {
+      position: fixed; /* Sit on top of the page content */
+      display: none; /* Hidden by default */
+      width: 100%; /* Full width (cover the whole page) */
+      height: 100%; /* Full height (cover the whole page) */
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+      z-index: 99999999999999999; /* Specify a stack order in case you're using a different order for other elements */
+      cursor: pointer; /* Add a pointer on hover */
+    }
+    .percentcomplete{
+    position: absolute;
+    top: 50%;
+    left:50%;
+    color: white;
+    transform: translate(-50%,-50%);
+    }
+    .video_elements{
+        display: none;
+    }
+    #video_modal{
+       z-index: 999999999; 
+    }
+
+</style>
+{% endblock styles%}
+{% block content %}
+<div style="font-size: 30px;text-align: center;">Bot User List</div>
+{% csrf_token %}
+<div id="user_bots" style="padding: 10px; margin: 10px;">
+    <div class="row">
+        <div class="col-xs-12 table-responsive">
+            <table class="table table-striped" id="user_bot_table">
+                <thead>
+                    <tr>
+                        <th data-data="id">Id</th>
+                        <th data-data="user.username">Username</th>
+                        <th data-data="name">Name</th>
+                        <th data-data="gender">Gender</th>
+                        <th data-data="follower_count">Follower Count</th>
+                        <th data-data="vb_count">VB Count</th>
+                        <th data-data="action">Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+        <!-- /.col -->
+    </div>
+    <div class="modal fade" id="video_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Video Byte Form</h4>
+                    <form id="create_video" action="" method="POST" enctype="multipart/form-data" class="form-horizontal">
+                        {% csrf_token %}
+                        {{ topic_form.as_p }}
+                        <div class="form-group">
+                            <div class="col-md-offset-5" style="margin-bottom:10px;">
+                                <button type="submit" class="btn btn-primary create_video_button"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Create Video Byte </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="overlay">
+        <div class="text"><br>
+            <br><span style="font-size:50px;" class="percentcomplete"></span></div>
+</div>
+{% endblock content %}
+{% block center_js %}
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/dataTables.bootstrap4.min.js' %}"></script>
+<script>
+// $("#user_report_table").DataTable();
+$(document).ready(function() {
+
+    var table = $('#user_bot_table').DataTable({
+        'serverSide': true,
+        'ajax': '/api/v1/bot_user_list_datatable/?format=datatables',
+        'columns': [
+            { 'date': 'id',
+            "render": function(data, type, row, meta) { // render event defines the markup of the cell text 
+                    var button = '<strong><a  href="/jarvis/get_bot_video_list/?user_id='+row.user.id+'" class="primary" target="_blank" user_id=' + row.user.id + '>'+row.user.id+'</a></strong>' // row object contains the row data
+                    return button;
+                }},
+            {
+                'data': 'user.username',
+                'name': 'user.username',
+                "orderable": false,
+                "searchable": true,
+                "render": function(data, type, row, meta) {
+                    return row.user.username;
+                }
+            },
+            { 'data': 'name' },
+            { 'data': 'gender' },
+            { 'data': 'follower_count' },
+            { 'data': 'vb_count' },
+            {
+                'data': 'action',
+                'name': 'action',
+                "orderable": false,
+                "searchable": false,
+                "render": function(data, type, row, meta) { // render event defines the markup of the cell text 
+                    var button = '<button type="button" class="btn btn-success add_video" user_id=' + row.user.id + ' data-toggle="modal" data-target="#video_modal">Add Video</button>' // row object contains the row data
+                    return button;
+                }
+            },
+        ],
+        "order": [
+            [0, "desc"]
+        ],
+        "oLanguage": {
+            "sInfo": "Showing _START_ to _END_ of _TOTAL_ items."
+        }
+    });
+
+    $("#user_bot_table").on('click','.add_video',function(){
+        console.log($(this).attr('user_id'))
+        $("#id_user").val($(this).attr('user_id'))
+    })
+
+    function upload(event) {
+        if ($('.add_video').hasClass("opened")) {
+            return false;
+        } else {
+            $('.add_video').addClass("opened");
+            event.preventDefault();
+            $('#overlay').show();
+            var data = new FormData($('#create_video').get(0));
+            var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+            var all_data = []
+            $.ajax({
+                xhr: function() {
+                    var xhr = new window.XMLHttpRequest();
+                    xhr.upload.addEventListener("progress", function(evt) {
+                        if (evt.lengthComputable) {
+                            var percentComplete = evt.loaded / evt.total;
+                            $('.percentcomplete').text((percentComplete * 100).toPrecision(4) + ' %');
+                            if (percentComplete === 1) {
+                                $('.percentcomplete').text('Processing');
+                            }
+                        }
+                    }, false);
+                    xhr.addEventListener("progress", function(evt) {
+                        if (evt.lengthComputable) {
+                            var percentComplete = evt.loaded / evt.total;
+                            $('.percentcomplete').text((percentComplete * 100).toPrecision(4) + ' %')
+                        }
+                    }, false);
+                    return xhr;
+                },
+                url: '/api/v1/create_bot_topic/',
+                type: 'POST',
+                data: data,
+                cache: false,
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(data) {
+                    $('#overlay').hide()
+                    $('.add_video').removeClass("opened");
+                    if (data.message == 'fail') {
+                        alert(data['reason'])
+                    } else if (data.message == 'success') {
+                        $('#create_video')[0].reset();
+                        $(".close").click()
+
+                    }
+                    $('.add_video').removeClass("opened");
+                },
+                error: function(data) {
+                    $('#overlay').hide()
+                    $('.add_video').removeClass("opened");
+                    alert(data.message)
+                    alert(data.reason)
+                    alert('Consult Tech')
+                },
+
+            });
+            return false;
+        }
+    }
+
+
+    $(function() {
+        $('#create_video').submit(upload);
+    });
+});
+</script>
+{% endblock center_js%}

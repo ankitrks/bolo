@@ -95,14 +95,14 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
             related_name="hash_tag_topics",blank=True)
 
     title = models.TextField(_("title"), blank = True, null = True,db_index=True)
-    question_audio = models.CharField(_("audio title"), max_length=500, blank = True, null = True)
-    question_video = models.CharField(_("video title"), max_length=500, blank = True, null = True)
+    question_audio = models.CharField(_("audio url"), max_length=500, blank = True, null = True)
+    question_video = models.CharField(_("video url"), max_length=500, blank = True, null = True)
     slug = AutoSlugField(populate_from="title", db_index=True, blank=True)
     date = models.DateTimeField(_("date"), default=timezone.now)
     last_active = models.DateTimeField(_("last active"), default=timezone.now)
     reindex_at = models.DateTimeField(_("reindex at"), default=timezone.now)
     language_id = models.CharField(_("language"), choices=language_options, blank = True, null = True, max_length=10, default='1',db_index=True)
-    question_image = models.TextField(_("Question image"),null=True,blank=True)
+    question_image = models.TextField(_("Question url"),null=True,blank=True)
     is_popular = models.BooleanField(_("Popular"), default = False)
     is_pubsub_popular_push = models.BooleanField(_("Popular"), default = False)
 
