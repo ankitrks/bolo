@@ -63,6 +63,8 @@ def block_user(request, user_id, action):
     userprofile = UserProfile.objects.get(id=user_id)
     user = userprofile.user
 
+    delete_count = 0
+
     if action == 'block':
         user.is_active = False
         user.save()
@@ -72,13 +74,15 @@ def block_user(request, user_id, action):
         user.save()
 
     elif action == 'delete_comments':
-        for comment in user.st_comments.all():
+        for comment in user.st_comments.filter(is_removed=False):
             comment.delete()
+            delete_count += 1
 
     elif action == 'delete_videos':
-        for topic in user.st_topics.all():
+        for topic in user.st_topics.filter(is_removed=False):
             topic.delete(user.is_active)
+            delete_count += 1
 
 
-    return JsonResponse({}, status=200)
+    return JsonResponse({'delete_count': delete_count}, status=200)
 
