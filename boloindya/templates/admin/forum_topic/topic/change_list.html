@@ -292,6 +292,8 @@
                     }
                     if( !$('#id_date__gte').val() ){ delete qs_dict['date__gte']; }
                     if( !$('#id_date__lte').val() ){ delete qs_dict['date__lte']; }
+                    qs_dict['category'] = jQuery(this).find('[name="category"]').val() || qs_dict['category'] || ''
+                    qs_dict['language'] = jQuery(this).find('[name="language"]').val() || qs_dict['language'] || ''
                     var final_qs = '?';
                     for(key in qs_dict){
                         final_qs += key + '=' + qs_dict[key] + '&';

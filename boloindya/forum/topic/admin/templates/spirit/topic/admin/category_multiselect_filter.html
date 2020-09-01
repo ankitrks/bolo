@@ -1,0 +1,27 @@
+{% load i18n %}
+<div class="grp-module">
+    <div class="grp-row">
+        <label>{% blocktrans with title|capfirst as filter_title %}{{ filter_title }}{% endblocktrans %}</label>
+        <select class="grp-multi-choice" multiple id="category" onchange="categoryChanged(this)">
+            {% for choice in choices %}{{ choice }}<option value="{{ choice.query_string|iriencode }}"{% if choice.selected %} selected='selected'{% endif %}>{{ choice.display }}</option>{% endfor %}
+        </select>
+        <input type="hidden" name="category">
+    </div>
+</div>
+
+<script type="text/javascript">
+    categoryChanged = function(obj){
+        let params = [];
+        console.log("fid", jQuery(obj).attr('fid'))
+        jQuery.each(jQuery(obj).val(), function(i, val){
+            jQuery.each(val.replace("?", "").split('&'), function(i, param){
+                let k, v;
+                [k, v] = param.split("=")
+                if(k == "category")
+                    params.push(v)
+            })
+        })
+        jQuery('[name="category"]').val("" + params.join(","))
+    };
+    
+</script>

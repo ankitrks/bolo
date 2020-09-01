@@ -12,6 +12,8 @@ from forum.topic.models import Topic, Notification, ShareTopic, CricketMatch, Po
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 from datetime import datetime,timedelta
 from forum.user.utils.bolo_redis import update_profile_counter
+from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 class TopicResource(resources.ModelResource):
     class Meta:
@@ -139,21 +141,68 @@ class UserTypeFilter(SimpleListFilter):
             return queryset.filter(user__st__is_business = True)  
         return queryset
 
+class MultiSelectFilter(admin.SimpleListFilter):
+
+    def choices(self, changelist):
+        if self.value():
+            values_list = self.value().split(',')
+        else:
+            values_list = []
+        for lookup, title in self.lookup_choices:
+            yield {
+                'selected': force_text(lookup) in values_list,
+                'query_string': changelist.get_query_string({self.parameter_name: lookup}, []),
+                'display': title,
+            }
+
+class CategoryMultiSelectFilter(MultiSelectFilter):
+    title = 'Categories'
+    template = 'spirit/topic/admin/category_multiselect_filter.html'
+
+    parameter_name = 'category'
+
+    def lookups(self, request, model_admin):
+        return tuple([(category.id, category.title) for category in Category.objects.all()])
+
+    def queryset(self, request, queryset):
+        if self.value():
+            categories = Category.objects.filter(id__in=self.value().split(','))
+            return queryset.filter(category__in=categories)
+
+        return queryset
+
+
+class LanguageMultiSelectFilter(MultiSelectFilter):
+    title = 'Languages'
+    template = 'spirit/topic/admin/language_multiselect_filter.html'
+
+    parameter_name = 'language'
+
+    def lookups(self, request, model_admin):
+        return tuple([(language[0], language[1]) for language in settings.LANGUAGE_OPTIONS])
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(language_id__in=self.value().split(','))
+
+        return queryset
+
+
 class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExportModelAdmin" NOT "admin.ModelAdmin"
     # ordering = ['is_vb', '-id']
     ordering = ('-id',)
     list_per_page = 20
     search_fields = ('title', 'user__username', 'user__st__name', )
-    list_filter = (('date', DateRangeFilter), 'language_id', 'm2mcategory', 'is_moderated', 'is_monetized', 'is_removed', \
-            'is_popular', 'is_boosted', 'is_reported', ModeratedFilter, UserTypeFilter, \
-            'user__st__is_superstar', 'user__st__is_popular', 'user__st__is_business')
+    list_filter = (('date', DateRangeFilter), 'language_id', 'is_moderated', 'is_monetized', 'is_removed', \
+            'is_popular', 'is_boosted', 'is_reported', ModeratedFilter, UserTypeFilter, CategoryMultiSelectFilter,\
+            LanguageMultiSelectFilter, 'user__st__is_superstar', 'user__st__is_popular', 'user__st__is_business')
     
-    filter_horizontal = ('m2mcategory', )
+    # filter_horizontal = ('m2mcategory', )
 
     fieldsets = (
-        (None, {
-            'fields': ('title', 'm2mcategory')
-        }),
+        # (None, {
+        #     'fields': ('title', 'm2mcategory')
+        # }),
         ('VB Details', {
             'fields': ('language_id', 'media_duration','is_pubsub_popular_push','is_boosted','boosted_till'),
         }),
