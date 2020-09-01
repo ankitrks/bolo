@@ -187,30 +187,44 @@ def check_share(topic_id):
         required_whatsapp_count = random.randrange(5000,10000)
         required_other_share = random.randrange(1000,5000)
 
-    multiplication_factor = 1
+    whatsapp_multiplication_factor = 1
+    other_multiplication_factor = 1
     if required_whatsapp_count:
         whatsapp_multiplication_factor = decimal.Decimal(random.randrange(int(required_whatsapp_count/850),int(required_whatsapp_count/750)))
     if required_other_share:
         other_multiplication_factor = decimal.Decimal(random.randrange(int(required_other_share/850),int(required_other_share/750)))
 
-    if single_topic.date +timedelta(minutes=10) > now:
-        whatsapp_share_count = random.randrange(6,100)
-        other_share_count = random.randrange(6,100)
-    elif single_topic.date +timedelta(minutes=10) < now and single_topic.date +timedelta(minutes=30) > now and single_topic.whatsapp_share_count < int(100*multiplication_factor):
-        whatsapp_share_count = random.randrange(100,int(100*multiplication_factor)-single_topic.whatsapp_share_count)
-        other_share_count = random.randrange(100,int(100*other_multiplication_factor)-single_topic.other_share_count)
-    elif single_topic.date +timedelta(minutes=30) < now and single_topic.date +timedelta(hours=1) > now and single_topic.whatsapp_share_count < int(250*multiplication_factor):
-        whatsapp_share_count = random.randrange(1,int(250*multiplication_factor)-single_topic.whatsapp_share_count)
-        other_share_count = random.randrange(1,int(250*other_multiplication_factor)-single_topic.other_share_count)
-    elif single_topic.date +timedelta(hours=1) < now and single_topic.date +timedelta(hours=2) > now and single_topic.whatsapp_share_count < int(500*multiplication_factor):
-        whatsapp_share_count = random.randrange(1,int(500*multiplication_factor)-single_topic.whatsapp_share_count)
-        other_share_count = random.randrange(1,int(500*other_multiplication_factor)-single_topic.other_share_count)
-    elif single_topic.date +timedelta(hours=3) < now and single_topic.whatsapp_share_count < int(750*multiplication_factor):
-        whatsapp_share_count = random.randrange(1,int(750*multiplication_factor)-single_topic.whatsapp_share_count)
-        other_share_count = random.randrange(1,int(750*other_multiplication_factor)-single_topic.other_share_count)
-    else:
-        whatsapp_share_count = 1
-        other_share_count = 1
+    try:
+        if single_topic.date +timedelta(minutes=10) > now:
+            whatsapp_share_count = random.randrange(6,100)
+        elif single_topic.date +timedelta(minutes=10) < now and single_topic.date +timedelta(minutes=30) > now and single_topic.whatsapp_share_count < int(100*whatsapp_multiplication_factor):
+            whatsapp_share_count = random.randrange(100,int(100*whatsapp_multiplication_factor)-single_topic.whatsapp_share_count)
+        elif single_topic.date +timedelta(minutes=30) < now and single_topic.date +timedelta(hours=1) > now and single_topic.whatsapp_share_count < int(250*whatsapp_multiplication_factor):
+            whatsapp_share_count = random.randrange(1,int(250*whatsapp_multiplication_factor)-single_topic.whatsapp_share_count)
+        elif single_topic.date +timedelta(hours=1) < now and single_topic.date +timedelta(hours=2) > now and single_topic.whatsapp_share_count < int(500*whatsapp_multiplication_factor):
+            whatsapp_share_count = random.randrange(1,int(500*whatsapp_multiplication_factor)-single_topic.whatsapp_share_count)
+        elif single_topic.date +timedelta(hours=3) < now and single_topic.whatsapp_share_count < int(750*whatsapp_multiplication_factor):
+            whatsapp_share_count = random.randrange(1,int(750*whatsapp_multiplication_factor)-single_topic.whatsapp_share_count)
+        else:
+            whatsapp_share_count = 0
+    except:
+        whatsapp_share_count = 0
+
+     try:
+        if single_topic.date +timedelta(minutes=10) > now:
+            other_share_count = random.randrange(6,100)
+        elif single_topic.date +timedelta(minutes=10) < now and single_topic.date +timedelta(minutes=30) > now and single_topic.whatsapp_share_count < int(100*other_multiplication_factor):
+            other_share_count = random.randrange(100,int(100*other_multiplication_factor)-single_topic.other_share_count)
+        elif single_topic.date +timedelta(minutes=30) < now and single_topic.date +timedelta(hours=1) > now and single_topic.whatsapp_share_count < int(250*other_multiplication_factor):
+            other_share_count = random.randrange(1,int(250*other_multiplication_factor)-single_topic.other_share_count)
+        elif single_topic.date +timedelta(hours=1) < now and single_topic.date +timedelta(hours=2) > now and single_topic.whatsapp_share_count < int(500*other_multiplication_factor):
+            other_share_count = random.randrange(1,int(500*other_multiplication_factor)-single_topic.other_share_count)
+        elif single_topic.date +timedelta(hours=3) < now and single_topic.whatsapp_share_count < int(750*other_multiplication_factor):
+            other_share_count = random.randrange(1,int(750*other_multiplication_factor)-single_topic.other_share_count)
+        else:
+            other_share_count = 0
+    except:
+        other_share_count = 0
 
     if whatsapp_share_count:
         topic.update(whatsapp_share_count = F('whatsapp_share_count')+whatsapp_share_count)
