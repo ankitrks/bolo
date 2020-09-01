@@ -210,7 +210,7 @@ def check_share(topic_id):
     except:
         whatsapp_share_count = 0
 
-     try:
+    try:
         if single_topic.date +timedelta(minutes=10) > now:
             other_share_count = random.randrange(6,100)
         elif single_topic.date +timedelta(minutes=10) < now and single_topic.date +timedelta(minutes=30) > now and single_topic.whatsapp_share_count < int(100*other_multiplication_factor):
