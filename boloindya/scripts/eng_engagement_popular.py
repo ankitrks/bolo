@@ -75,7 +75,7 @@ def run():
 
         try:
             print "before: share creation",datetime.now()
-            check_share(each_seen_id)
+            #check_share(each_seen_id)
             print "after: share creation",datetime.now()
         except Exception as e:
             print e
