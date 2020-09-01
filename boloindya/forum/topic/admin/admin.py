@@ -117,6 +117,9 @@ class TopicChangeList(ChangeList):
 
 
     def get_results(self, request):
+        if not hasattr(self.model_admin, 'sqs_result'):
+            return super(TopicChangeList, self).get_results(request)
+
         paginator = self.model_admin.get_paginator(request, self.model_admin.sqs_result, self.list_per_page)
         # Get the number of objects, with admin filters applied.
         result_count = paginator.count
@@ -254,7 +257,11 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
             self.sqs_result_dict = {}
             id_list = []
             for item in sqs:
-                _dict = {'id':int(item.id.split('.')[-1]), 'score': item.score}
+                if type(item.id) == int:
+                    _dict = {'id':item.id, 'score': item.score}
+                elif type(item.type) == str:
+                    _dict = {'id':int(item.id.split('.')[-1]), 'score': item.score}
+
                 self.sqs_result_dict[_dict.get('id')] = _dict.get('score')
                 self.sqs_result.append(_dict)
                 id_list.append(_dict.get('id'))
