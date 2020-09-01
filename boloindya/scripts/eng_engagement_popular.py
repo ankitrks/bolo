@@ -116,9 +116,12 @@ def check_like(topic_id):
 
     print number_like,"number_like"
     if number_like:
-        Topic.objects.filter(pk=topic_id).update(likes_count = F('likes_count')+number_like)
-        FLike.objects.create(topic_id = topic_id, like_count = number_like)
-        print "like given"
+        if each_like.view_count > each_like.likes_count+number_like:
+            Topic.objects.filter(pk=topic_id).update(likes_count = F('likes_count')+number_like)
+            FLike.objects.create(topic_id = topic_id, like_count = number_like)
+            print "like given"
+        else:
+            check_like(topic_id)
 
 
 def check_follower(topic_id):
