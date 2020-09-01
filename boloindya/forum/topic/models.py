@@ -138,6 +138,7 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
     linkedin_share_count = models.PositiveIntegerField(null=True,blank=True,default=0)
     facebook_share_count = models.PositiveIntegerField(null=True,blank=True,default=0)
     twitter_share_count = models.PositiveIntegerField(null=True,blank=True,default=0)
+    other_share_count = models.PositiveIntegerField(null=True,blank=True,default=0)
 
     backup_url = models.TextField(_("backup url"), blank = True)
     old_backup_url = models.TextField(_("old_backup url"), blank = True)
@@ -671,6 +672,14 @@ class Like(UserInfo):
 
     def __unicode__(self):
         return str(self.topic if self.topic else self.comment)
+
+class FLike(RecordTimeStamp):
+    topic = models.ForeignKey(Topic, related_name='flike_topic',null=True,blank=True)
+    like_count = models.PositiveIntegerField(_("like_count"), default=0)
+    created_at=models.DateTimeField(default=datetime.now,blank=False,null=False)
+
+    def __unicode__(self):
+        return str(self.topic)
 
 share_type_options = (
     ('0', "facebook"),

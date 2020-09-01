@@ -12,15 +12,12 @@ from forum.user.utils.bolo_redis import update_profile_counter
 
 def run():
     print "Start Time Eng_Engagment Random: ",datetime.now()
-    all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)
+    all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True).order_by(random.choice(['id','-id','name','-name']))[:10000]
     user_ids = list(all_test_userprofile_id)
-    user_ids = random.sample(user_ids,10000)
     action_type =['comment','like','seen','follow','share','comment_like']
     opt_action = random.choice(action_type)
     now = datetime.now()
-    topic_ids = Topic.objects.filter(is_vb=True,is_removed=False).values_list('id', flat=True)
-    topic_ids = list(topic_ids)
-    actionable_ids = random.sample(topic_ids,250)
+    actionable_ids = Topic.objects.filter(is_vb=True,is_removed=False).values_list('id', flat=True).order_by(random.choice(['id','-id','title','-title','-date','date']))[:1000]
     post_counter = 0
     for each_topic_id in actionable_ids:
         post_counter+=1
