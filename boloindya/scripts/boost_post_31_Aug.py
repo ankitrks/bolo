@@ -82,7 +82,7 @@ def run():
 
         try:
             print "before: share creation",datetime.now()
-            #check_share(each_seen_id)
+            check_share(each_seen_id)
             print "after: share creation",datetime.now()
         except Exception as e:
             print e
@@ -237,6 +237,7 @@ def check_share(topic_id):
     except:
         other_share_count = 0
 
+    other_share_count = 0 #uncomment once live
     print "whatsapp_share_count",whatsapp_share_count
     print "other_share_count",other_share_count
     if whatsapp_share_count:
