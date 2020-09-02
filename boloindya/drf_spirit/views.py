@@ -4878,6 +4878,8 @@ def report(request):
             except Exception as e:
                 return JsonResponse({'message': 'Target type is not topic or user','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
             Report.objects.create(reported_by = request.user, report_type = report_type, target_type = target_type, target_id = target_id)
+            if target_type.model == 'topic':
+                topic = Topic.objects.filter(pk=target_id).update(is_reported = True, report_count = F('report_count') + 1)
             return JsonResponse({'status': 'success','message':'post reported'}, status=status.HTTP_201_CREATED)
         else:
             return JsonResponse({'message': 'User Unauthorised'}, status=status.HTTP_400_BAD_REQUEST)
