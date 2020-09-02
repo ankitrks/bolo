@@ -58,6 +58,25 @@ class TopicForm(forms.ModelForm):
         self.instance.reindex_at = timezone.now()
         return super(TopicForm, self).save(commit)
 
+class VideoByteForm(forms.ModelForm):
+    question_video = forms.FileField(required=True, label='Video File')
+
+    class Meta:
+        model = Topic
+        fields = ('title', 'category', 'm2mcategory', 'question_video', 'language_id', 'question_image', 'user' ,'is_boosted', 'popular_boosted', 'boosted_till')
+
+    def __init__(self,*args,**kwargs):
+        super(VideoByteForm,self).__init__(*args,**kwargs)
+        self.fields['title'].widget.attrs['rows'] = 4
+        self.fields['title'].widget.attrs['columns'] = 15
+        self.fields['question_image'].widget.attrs['rows'] = 4
+        self.fields['question_image'].widget.attrs['columns'] = 15
+        self.fields['user'].widget = forms.HiddenInput()
+        for field in self:
+            field.field.widget.attrs['class'] = 'form-control'
+            if field.name in ['is_boosted', 'popular_boosted']:
+                field.field.widget.attrs['class'] = 'form-check-input'
+
 class JobRequestForm(forms.ModelForm):
     initialVal=""
     class Meta:

@@ -8,6 +8,7 @@ from django.conf.urls.static import static
 from django.conf.urls.i18n import i18n_patterns
 import forum.topic.views
 import forum.admin.urls
+import forum.admin.api_urls
 import forum.user.urls
 import forum.search.urls
 import forum.category.urls
@@ -88,6 +89,7 @@ urlpatterns = [
     # url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLS
     url('grappelli/', include('grappelli.urls')), # grappelli URLS
 	url(r'^superman/', include(admin.site.urls)),
+    url(r'^api/superman/', include(forum.admin.api_urls)),
     url(r'^i18n/', include('django.conf.urls.i18n')),
     url(r'^', include(patterns, namespace='spirit', app_name='forum')),
     url(r'docs/', include_docs_urls(title='Boloindya API')),

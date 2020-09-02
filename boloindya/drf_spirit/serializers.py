@@ -117,6 +117,10 @@ class TopicSerializer(ModelSerializer):
     video_cdn = SerializerMethodField()
     # m2mcategory = SerializerMethodField()
     backup_url = SerializerMethodField()
+    likes_count = SerializerMethodField()
+    whatsapp_share_count = SerializerMethodField()
+    other_share_count = SerializerMethodField()
+    total_share_count = SerializerMethodField()
 
     def __init__(self, *args, **kwargs):
         super(TopicSerializer, self).__init__(*args, **kwargs)
@@ -180,6 +184,18 @@ class TopicSerializer(ModelSerializer):
         except:
             return instance.question_video
 
+    def get_likes_count(self, instance):
+        return shorcountertopic(instance.likes_count)
+
+    def get_whatsapp_share_count(self,instance):
+        return shorcountertopic(instance.whatsapp_share_count)
+
+    def get_other_share_count(self,instance):
+        return shorcountertopic(instance.other_share_count)
+
+    def get_total_share_count(self,instance):
+        return shorcountertopic(instance.total_share_count)
+
 class CommentSerializer(ModelSerializer):
     # user = UserReadOnlyField()
     user = SerializerMethodField()
@@ -219,6 +235,9 @@ class TopicSerializerwithComment(ModelSerializer):
     likes_count = SerializerMethodField()
     # m2mcategory = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
+    whatsapp_share_count = SerializerMethodField()
+    other_share_count = SerializerMethodField()
+    total_share_count = SerializerMethodField()
 
     def __init__(self, *args, **kwargs):
         super(TopicSerializerwithComment, self).__init__(*args, **kwargs)
@@ -321,6 +340,15 @@ class TopicSerializerwithComment(ModelSerializer):
         except:
             return instance.question_video
 
+    def get_whatsapp_share_count(self,instance):
+        return shorcountertopic(instance.whatsapp_share_count)
+
+    def get_other_share_count(self,instance):
+        return shorcountertopic(instance.other_share_count)
+
+    def get_total_share_count(self,instance):
+        return shorcountertopic(instance.total_share_count)
+
 class SingleTopicSerializerwithComment(ModelSerializer):
     user = SerializerMethodField()
     category = PresentableSlugRelatedField(queryset=Category.objects.all(),
@@ -338,6 +366,10 @@ class SingleTopicSerializerwithComment(ModelSerializer):
     backup_url = SerializerMethodField()
     # m2mcategory = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
+    likes_count = SerializerMethodField()
+    whatsapp_share_count = SerializerMethodField()
+    other_share_count = SerializerMethodField()
+    total_share_count = SerializerMethodField()
 
     def __init__(self, *args, **kwargs):
         super(SingleTopicSerializerwithComment, self).__init__(*args, **kwargs)
@@ -402,6 +434,18 @@ class SingleTopicSerializerwithComment(ModelSerializer):
             return instance.question_video
         return ''
 
+    def get_likes_count(self, instance):
+        return shorcountertopic(instance.likes_count)
+
+    def get_whatsapp_share_count(self,instance):
+        return shorcountertopic(instance.whatsapp_share_count)
+
+    def get_other_share_count(self,instance):
+        return shorcountertopic(instance.other_share_count)
+
+    def get_total_share_count(self,instance):
+        return shorcountertopic(instance.total_share_count)
+
 class UserAnswerSerializerwithComment(ModelSerializer):
     user = SerializerMethodField()
     category = PresentableSlugRelatedField(queryset=Category.objects.all(),
@@ -418,6 +462,10 @@ class UserAnswerSerializerwithComment(ModelSerializer):
     video_m3u8_content = SerializerMethodField()
     backup_url = SerializerMethodField()
     # comments = PresentableSlugRelatedField(queryset=Comment.objects.all(),presentation_serializer=CommentSerializer,slug_field='comment')
+    likes_count = SerializerMethodField()
+    whatsapp_share_count = SerializerMethodField()
+    other_share_count = SerializerMethodField()
+    total_share_count = SerializerMethodField()
 
     def __init__(self, *args, **kwargs):
         super(UserAnswerSerializerwithComment, self).__init__(*args, **kwargs)
@@ -479,6 +527,18 @@ class UserAnswerSerializerwithComment(ModelSerializer):
             return instance.question_video
         return ''
 
+    def get_likes_count(self, instance):
+        return shorcountertopic(instance.likes_count)
+
+    def get_whatsapp_share_count(self,instance):
+        return shorcountertopic(instance.whatsapp_share_count)
+
+    def get_other_share_count(self,instance):
+        return shorcountertopic(instance.other_share_count)
+
+    def get_total_share_count(self,instance):
+        return shorcountertopic(instance.total_share_count)
+
 class UserProfileSerializer(ModelSerializer):
     follow_count= SerializerMethodField()
     follower_count= SerializerMethodField()
@@ -491,7 +551,7 @@ class UserProfileSerializer(ModelSerializer):
     class Meta:
         model = UserProfile
         # fields = '__all__' 
-        exclude = ('extra_data', 'location', 'last_seen', 'last_ip', 'timezone', 'is_administrator', 'is_moderator', 'is_verified', 'last_post_on', 'last_post_hash', 'is_geo_location', 'lat', 'lang', 'click_id', 'click_id_response','is_test_user')
+        exclude = ('extra_data', 'location', 'last_seen', 'last_ip', 'timezone', 'is_administrator', 'is_moderator', 'is_verified', 'last_post_on', 'last_post_hash', 'is_geo_location', 'lat', 'lang', 'click_id', 'click_id_response','is_test_user', 'is_bot_account')
 
     def get_follow_count(self,instance):
         return shortcounterprofile(get_userprofile_counter(instance.user_id)['follow_count'])
@@ -526,7 +586,7 @@ class ShortUserProfileSerializer(ModelSerializer):
     class Meta:
         model = UserProfile
         # fields = '__all__' 
-        exclude = ('social_identifier','question_count','linkedin_url','instagarm_id','twitter_id','topic_count','comment_count','refrence','mobile_no','encashable_bolo_score','total_time_spent','total_vb_playtime','is_dark_mode_enabled','paytm_number','state_name','city_name','extra_data', 'location', 'last_seen', 'last_ip', 'timezone', 'is_administrator', 'is_moderator', 'is_verified', 'last_post_on', 'last_post_hash', 'is_geo_location', 'lat', 'lang', 'click_id', 'click_id_response','gender','about','language','answer_count','share_count','like_count','is_test_user')
+        exclude = ('social_identifier','question_count','linkedin_url','instagarm_id','twitter_id','topic_count','comment_count','refrence','mobile_no','encashable_bolo_score','total_time_spent','total_vb_playtime','is_dark_mode_enabled','paytm_number','state_name','city_name','extra_data', 'location', 'last_seen', 'last_ip', 'timezone', 'is_administrator', 'is_moderator', 'is_verified', 'last_post_on', 'last_post_hash', 'is_geo_location', 'lat', 'lang', 'click_id', 'click_id_response','gender','about','language','answer_count','share_count','like_count','is_test_user', 'is_bot_account')
 
     def get_follow_count(self,instance):
         return shortcounterprofile(get_userprofile_counter(instance.user_id)['follow_count'])
@@ -758,6 +818,48 @@ class ReportDatatableSerializer(ModelSerializer):
             return instance.target.backup_url
         else:
             return ''
+
+class BotUserDatatableSerializer(ModelSerializer):
+    user = UserBaseSerializerDatatable()
+    follower_count= SerializerMethodField()
+    vb_count = SerializerMethodField()
+    gender = SerializerMethodField()
+
+    class Meta:
+        model = UserProfile
+        fields = ('id', 'user', 'name', 'follower_count', 'follow_count', 'vb_count', 'gender')
+
+    def get_follower_count(self,instance):
+        return shortcounterprofile(get_userprofile_counter(instance.user_id)['follower_count'])
+
+    def get_vb_count(self,instance):
+        return shortcounterprofile(get_userprofile_counter(instance.user_id)['video_count'])
+
+    def get_gender(self,instance):
+        return instance.get_gender_display()
+
+class TopicDatatableSerializer(ModelSerializer):
+    user = UserBaseSerializerDatatable()
+    view_count = SerializerMethodField()
+    likes_count = SerializerMethodField()
+    comment_count = SerializerMethodField()
+    date = SerializerMethodField()
+
+    class Meta:
+        model = Topic
+        fields = ('id', 'title' , 'question_video', 'question_image', 'view_count', 'likes_count', 'comment_count', 'user', 'date')
+
+    def get_date(self,instance):
+        return shortnaturaltime(instance.date)
+
+    def get_view_count(self,instance):
+        return shorcountertopic(instance.view_count)
+
+    def get_likes_count(self,instance):
+        return shorcountertopic(instance.likes_count)
+
+    def get_comment_count(self,instance):
+        return shorcountertopic(instance.comment_count)
    
 class CategoryVideoByteSerializer(ModelSerializer):
     user = SerializerMethodField()
@@ -770,6 +872,9 @@ class CategoryVideoByteSerializer(ModelSerializer):
     audio_m3u8_content = SerializerMethodField()
     video_m3u8_content = SerializerMethodField()
     backup_url = SerializerMethodField()
+    whatsapp_share_count = SerializerMethodField()
+    other_share_count = SerializerMethodField()
+    total_share_count = SerializerMethodField()
 
     def __init__(self, *args, **kwargs):
         super(CategoryVideoByteSerializer, self).__init__(*args, **kwargs)
@@ -851,6 +956,15 @@ class CategoryVideoByteSerializer(ModelSerializer):
                 return instance.question_video
         except:
             return instance.question_video
+
+    def get_whatsapp_share_count(self,instance):
+        return shorcountertopic(instance.whatsapp_share_count)
+
+    def get_other_share_count(self,instance):
+        return shorcountertopic(instance.other_share_count)
+
+    def get_total_share_count(self,instance):
+        return shorcountertopic(instance.total_share_count)
 
 
 from django.core.paginator import Paginator

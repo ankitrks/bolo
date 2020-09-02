@@ -88,4 +88,8 @@ urlpatterns = [
     url(r'^search_fields_for_campaign/$',views.search_fields_for_campaign, name='search_hashtags'),
     url(r'^particular_campaign/(?P<campaign_id>\d+)$',views.particular_campaign,name = 'particular_campaign'),
     url(r'^search_and_add_hashtag/$',views.search_and_add_hashtag, name='search_and_add_hashtag'),
+    url(r'^bot_user_form/$',views.bot_user_form, name='bot_user_form'),
+    url(r'^bot_user_list/$',views.get_bot_user_list, name='bot_user_list'),
+    url(r'^get_bot_video_list/$',views.get_bot_video_list, name='get_bot_video_list'),
+    url(r'^delete_bot_video/$',views.delete_bot_video, name='delete_bot_video'),
 ]

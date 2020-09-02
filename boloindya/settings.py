@@ -308,7 +308,7 @@ TEMPLATES[0]['OPTIONS']['context_processors'] += [
 HAYSTACK_CONNECTIONS = {
       'default': {
             # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
-            # 'URL': 'http://127.0.0.1:9200/',
+            # 'URL': 'https://search-boloindya-aehdn5vbnfmnhacekjpr433e4a.ap-south-1.es.amazonaws.com',
             # 'INDEX_NAME': 'boloindya',
       },
 }
@@ -324,7 +324,7 @@ DATABASES = {
         'USER': 'boloindya',
         'PASSWORD': 'bng321',
         'HOST': 'localhost',                 # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': '5432',                      # Set to empty string for default.
+        'PORT': '5433',                      # Set to empty string for default.
     },
     'read': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
@@ -333,7 +333,7 @@ DATABASES = {
         'USER': 'boloindya',
         'PASSWORD': 'bng321',
         'HOST': 'localhost',                 # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': '5432',                      # Set to empty string for default.
+        'PORT': '5433',                      # Set to empty string for default.
     }
 }
 
@@ -666,3 +666,5 @@ PUSH_NOTIFICATION_URL = "https://fcm.googleapis.com/v1/projects/boloindya-1ec98/
 FTIME_PLAY = 0.5 # in seconds
 FPLAYTIME_LIMIT = 180000 # in seconds 50 hours
 POPULAR_BOOST_TIMEDELTA = 2 # in days
+
+WATERMARK_SERVICE_ENDPOINT = "https://92scj7hqac.execute-api.ap-south-1.amazonaws.com/v1/invoke-watermark"

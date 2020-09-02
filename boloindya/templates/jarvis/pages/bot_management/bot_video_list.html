@@ -1,0 +1,366 @@
+{% extends "jarvis/layout/base.html" %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/dataTables.bootstrap4.min.css' %}">
+<style>
+    .form_title {
+        text-align: center;
+        margin: 0 auto;
+    }
+    #overlay {
+      position: fixed; /* Sit on top of the page content */
+      display: none; /* Hidden by default */
+      width: 100%; /* Full width (cover the whole page) */
+      height: 100%; /* Full height (cover the whole page) */
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+      z-index: 99999999999999999; /* Specify a stack order in case you're using a different order for other elements */
+      cursor: pointer; /* Add a pointer on hover */
+    }
+    .percentcomplete{
+    position: absolute;
+    top: 50%;
+    left:50%;
+    color: white;
+    transform: translate(-50%,-50%);
+    }
+    .video_elements{
+        display: none;
+    }
+    #video_modal{
+       z-index: 999999999; 
+    }
+
+</style>
+{% endblock styles%}
+{% block content %}
+<div style="font-size: 30px;text-align: center;">{{bot_user.username}} Video List</div>
+<p><button type="button" class="btn btn-success add_video" user_id="{{bot_user.id}}" data-toggle="modal" data-target="#create_video_modal" style="float: right; margin:20px;"> Add Video</button></p>
+{% csrf_token %}
+<div id="user_bots" style="padding: 10px; margin: 10px;">
+    <div class="row">
+        <div class="col-xs-12 table-responsive">
+            <table class="table table-striped" id="bot_video_list">
+                <thead>
+                    <tr>
+                        <th data-data="id">Id</th>
+                        <th data-data="title">Title</th>
+                        <th data-data='user.username'>Username</th>
+                        <th data-data="date">Date</th>
+                        <th data-data="question_image">Thumbnail</th>
+                        <th data-data="question_video">Video Link</th>
+                        <th data-data="view_count">View Count</th>
+                        <th data-data="likes_count">Like Count</th>
+                        <th data-data="comment_count">Comment Count</th>
+                        <th data-data="action">Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+        <!-- /.col -->
+    </div>
+    <div class="modal fade" id="create_video_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Video Byte Form</h4>
+                    <form id="create_video" action="" method="POST" enctype="multipart/form-data" class="form-horizontal">
+                        {% csrf_token %}
+                        {{ topic_form.as_p }}
+                        <div class="form-group">
+                            <div class="col-md-offset-5" style="margin-bottom:10px;">
+                                <button type="submit" class="btn btn-primary create_video_button"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Create Video Byte </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="edit_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Edit Video Byte Form</h4>
+                    <form id="edit_video" action="" method="POST" enctype="multipart/form-data" class="form-horizontal">
+                        {% csrf_token %}
+                        <p>
+                            <label for="id_edit_title">Title:</label>
+                            <textarea name="title" id="id_edit_title" rows="4" cols="40" columns="15" class="form-control"></textarea>
+                        </p>
+                        <p>
+                            <label for="id_username">Username:</label>
+                            <input name="username" id="id_username" class="form-control">
+                        </p>
+                        <p>
+                            <input type="hidden" name="topic_id" class="form-control" id="id_topic">
+                        </p>
+                        <div class="form-group">
+                            <div class="col-md-offset-5" style="margin-bottom:10px;">
+                                <button type="submit" class="btn btn-primary update_video_button"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Update Video Byte </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="video_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Video Play</h4>
+                </div>
+                <div style="text-align: center;">
+                    <video class="my_video_player_laod" width="520" height="360" controls>
+                        <source class="my_video_player" src="" type="video/mp4">
+                        <source class="my_video_player" src="" type="video/ogg">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="overlay">
+    <div class="text"><br>
+        <br><span style="font-size:50px;" class="percentcomplete"></span></div>
+</div>
+{% endblock content %}
+{% block center_js %}
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/dataTables.bootstrap4.min.js' %}"></script>
+<script>
+// $("#user_report_table").DataTable();
+$(document).ready(function() {
+    var table = $('#bot_video_list').DataTable({
+        'serverSide': true,
+        'ajax': '/api/v1/bot_video_list_datatable/?format=datatables&user_id=' + {{ bot_user.id }} + '',
+        'columns': [
+            { 'data': 'id' },
+            { 'data': 'title' },
+            { 'data': 'user.username' },
+            { 'data': 'date' },
+            {
+                'data': 'question_image',
+                "searchable": false,
+                "render": function(data, type, row, meta) {
+                    var image = '  <img src="' + row.question_image + '" style="width:70px;">'
+                    return image
+                }
+            },
+            {
+                'data': 'question_video',
+                "searchable": false,
+                "render": function(data, type, row, meta) {
+                    var button = '  <button type="button" class="btn btn-primary primary play_video" data-toggle="modal" data-target="#video_modal" video_link=' + row.question_video + '>Play</button>'
+                    return button
+                }
+            },
+            { 'data': 'view_count' },
+            { 'data': 'likes_count' },
+            { 'data': 'comment_count' },
+            {
+                'data': 'action',
+                'name': 'action',
+                "orderable": false,
+                "searchable": false,
+                "render": function(data, type, row, meta) { // render event defines the markup of the cell text
+                    var title = $("<div>").html(row.title).text();
+                    var username = row.user.username
+                    var button = '<button type="button" class="btn btn-info edit_video" title="' + title + '" username="' + username + '" video_id=' + row.id + ' data-toggle="modal" data-target="#edit_modal">Edit Video</button><button type="button" class="btn btn-danger delete_video" video_id=' + row.id + '>Delete Video</button>' // row object contains the row data
+                    return button;
+                }
+            },
+        ],
+        "order": [
+            [0, "desc"]
+        ],
+        "oLanguage": {
+            "sInfo": "Showing _START_ to _END_ of _TOTAL_ items."
+        }
+    });
+
+    $('.add_video').click(function() {
+        $("#id_user").val($(this).attr('user_id'))
+    });
+
+    $(document).on('click', '.edit_video', function() {
+        var title = $(this).attr('title');
+        var username = $(this).attr('username');
+        var topic_id = $(this).attr('video_id')
+        $("#edit_video").find("#id_edit_title").val(title);
+        $("#edit_video").find("#id_username").val(username);
+        $("#edit_video").find("#id_topic").val(topic_id);
+
+    });
+
+    $(document).on('click', '.play_video', function() {
+        var video_link = $(this).attr('video_link')
+        $(".my_video_player").attr('src', video_link)
+        $(".my_video_player_laod")[0].load()
+        $(".my_video_player_laod")[0].play()
+    });
+    $(document).on('click', '.close', function() {
+        var video_link = $(this).attr('video_link')
+        $(".my_video_player_laod")[0].pause()
+    });
+    $(document).on('click', '.delete_video', function(e) {
+        if (window.confirm("Are you sure you want delete topic id= " + $(this).attr('video_id') + " ?")) {
+            if ($('.delete_video').hasClass("opened")) {
+                return false;
+            } else {
+                 e.preventDefault();
+                $('.delete_video').addClass("opened");
+                $('#overlay').show();
+                var topic_id = $(this).attr('video_id');
+                var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+                var data = {
+                    'topic_id': topic_id,
+                    'csrfmiddlewaretoken': csrfmiddlewaretoken
+                }
+                console.log(data)
+                $.ajax({
+                    url: '/jarvis/delete_bot_video/',
+                    type: 'POST',
+                    data: data,
+                    cache: false,
+                    dataType: "json",
+                    success: function(data) {
+                        $('#overlay').hide()
+                        $('.delete_video').removeClass("opened");
+                        if (data.message == 'fail') {
+                            alert(data['reason'])
+                        } else if (data.message == 'success') {
+                            location.reload();
+                        }
+                        $('.delete_video').removeClass("opened");
+                    },
+                    error: function(data) {
+                        $('#overlay').hide()
+                        $('.delete_video').removeClass("opened");
+                        alert(data.message)
+                        alert(data.reason)
+                        alert('Consult Tech')
+                    },
+
+                });
+            }
+        }
+    });
+
+    $(document).on('click', '.update_video_button', function(e) {
+        if ($('.update_video_button').hasClass("opened")) {
+            return false;
+        } else {
+            e.preventDefault();
+            $('.update_video_button').addClass("opened");
+            $('#overlay').show();
+            var data = new FormData($('#edit_video').get(0));
+            var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+            console.log(data)
+            $.ajax({
+                url: '/api/v1/edit_bot_video/',
+                type: 'POST',
+                data: data,
+                cache: false,
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(data) {
+                    $('#overlay').hide()
+                    $('.update_video_button').removeClass("opened");
+                    if (data.message == 'fail') {
+                        alert(data['reason'])
+                    } else if (data.message == 'success') {
+                        location.reload();
+                    }
+                    $('.update_video_button').removeClass("opened");
+                },
+                error: function(data) {
+                    $('.update_video_button').removeClass("opened");
+                    $('#overlay').hide()
+                    alert(data.message)
+                    alert(data.reason)
+                    alert('Consult Tech')
+                },
+
+            });
+        }
+    });
+
+    function upload(event) {
+        if ($('.create_video_button').hasClass("opened")) {
+            return false;
+        } else {
+            $('.create_video_button').addClass("opened");
+            event.preventDefault();
+            $('#overlay').show();
+            var data = new FormData($('#create_video').get(0));
+            var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+            var all_data = []
+            $.ajax({
+                xhr: function() {
+                    var xhr = new window.XMLHttpRequest();
+                    xhr.upload.addEventListener("progress", function(evt) {
+                        if (evt.lengthComputable) {
+                            var percentComplete = evt.loaded / evt.total;
+                            $('.percentcomplete').text((percentComplete * 100).toPrecision(4) + ' %');
+                            if (percentComplete === 1) {
+                                $('.percentcomplete').text('Processing');
+                            }
+                        }
+                    }, false);
+                    xhr.addEventListener("progress", function(evt) {
+                        if (evt.lengthComputable) {
+                            var percentComplete = evt.loaded / evt.total;
+                            $('.percentcomplete').text((percentComplete * 100).toPrecision(4) + ' %')
+                        }
+                    }, false);
+                    return xhr;
+                },
+                url: '/api/v1/create_bot_topic/',
+                type: 'POST',
+                data: data,
+                cache: false,
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(data) {
+                    $('#overlay').hide()
+                    $('.create_video_button').removeClass("opened");
+                    if (data.message == 'fail') {
+                        alert(data['reason'])
+                    } else if (data.message == 'success') {
+                        $('#create_video')[0].reset();
+                        $(".close").click()
+                        location.reload();
+                    }
+                    $('.create_video_button').removeClass("opened");
+                },
+                error: function(data) {
+                    $('#overlay').hide()
+                    $('.create_video_button').removeClass("opened");
+                    alert(data.message)
+                    alert(data.reason)
+                    alert('Consult Tech')
+                },
+
+            });
+            return false;
+        }
+    }
+
+
+    $(function() {
+        $('#create_video').submit(upload);
+    });
+});
+</script>
+{% endblock center_js%}

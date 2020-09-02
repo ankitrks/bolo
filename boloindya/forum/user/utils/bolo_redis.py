@@ -1,6 +1,6 @@
 from redis_utils import *
 from forum.user.models import VideoPlaytime, UserPay, OldMonthInsightData, MonthWiseFplaytime
-from forum.topic.models import Topic, VBseen, Like, SocialShare, FVBseen
+from forum.topic.models import Topic, VBseen, Like, SocialShare, FVBseen, FLike
 from forum.user.models import UserProfile, Follower
 from forum.comment.models import Comment
 from drf_spirit.utils import shorcountertopic, shortcounterprofile, short_time
@@ -130,7 +130,13 @@ def get_user_bolo_info(user_id,month=None,year=None):
             total_video = Topic.objects.filter(is_vb = True,is_removed=False, user_id=user.id) 
             #total_video_id = list(Topic.objects.filter(is_vb = True, user_id=user.id) .values_list('pk',flat=True))
             total_video_id = list(total_video.values_list('pk',flat=True))
-            total_like_count = Like.objects.filter(topic_id__in = total_video_id, is_active = True).count()
+            real_like_count = Like.objects.filter(topic_id__in = total_video_id, is_active = True).count()
+            fake_like_count = FLike.objects.filter(topic_id__in = total_video_id).aggregate(Sum('like_count'))
+            if fake_like_count.has_key('like_count__sum') and fake_like_count['like_count__sum']:
+                fake_like_count = fake_like_count['like_count__sum']
+            else:
+                fake_like_count = 0
+            total_like_count = real_like_count + fake_like_count
             total_comment_count = Comment.objects.filter(topic_id__in = total_video_id, is_removed = False).count()
             all_pay = UserPay.objects.filter( user_id=user.id, is_active=True)
             all_play_time = VideoPlaytime.objects.filter(video_id__in = total_video_id).aggregate(Sum('playtime'))
@@ -152,6 +158,13 @@ def get_user_bolo_info(user_id,month=None,year=None):
             total_video_id = list(Topic.objects.filter(is_vb = True, user_id=user.id, is_removed=False).values_list('pk',flat=True))
             # total_video_id = list(total_video.values_list('pk',flat=True))
             total_like_count = Like.objects.filter(topic_id__in = total_video_id, is_active = True, created_at__gte=start_date, created_at__lte=end_date).count()
+            real_like_count = Like.objects.filter(topic_id__in = total_video_id, created_at__gte=start_date, created_at__lte=end_date).count()
+            fake_like_count = FLike.objects.filter(topic_id__in = total_video_id, created_at__gte=start_date, created_at__lte=end_date).aggregate(Sum('like_count'))
+            if fake_like_count.has_key('like_count__sum') and fake_like_count['like_count__sum']:
+                fake_like_count = fake_like_count['like_count__sum']
+            else:
+                fake_like_count = 0
+            total_like_count = real_like_count + fake_like_count
             total_comment_count = Comment.objects.filter(topic_id__in = total_video_id, is_removed = False, date__gte=start_date, date__lte=end_date).count()
             all_pay = UserPay.objects.filter( user_id=user.id, is_active=True,for_month__gte=start_date.month,for_month__lte=start_date.month,\
                 for_year__gte=start_date.year,for_year__lte=start_date.year)
@@ -185,12 +198,12 @@ def get_user_bolo_info(user_id,month=None,year=None):
                         'total_like_count':total_like_count,'total_share_count':total_share_count,\
                         'total_earn':total_earn,'video_playtime':video_playtime,'spent_time':spent_time,\
                         'bolo_score':shortcounterprofile(user.st.bolo_score)}
-        # if start_date and end_date:
-        #     if datetime.now() > end_date + timedelta(days=2) and not datetime.now().month == start_date.month:
-        #         insight_obj, is_created = OldMonthInsightData.objects.get_or_create(user_id = user_id , for_month = start_date.month, for_year = start_date.year)
-        #         if is_created:
-        #             insight_obj.insight_data = json.dumps(data)
-        #             insight_obj.save()
+        if start_date and end_date:
+            if datetime.now() > end_date + timedelta(days=2) and not datetime.now().month == start_date.month:
+                insight_obj, is_created = OldMonthInsightData.objects.get_or_create(user_id = user_id , for_month = start_date.month, for_year = start_date.year)
+                if is_created:
+                    insight_obj.insight_data = json.dumps(data)
+                    insight_obj.save()
         return data
     except Exception as e:
         print e

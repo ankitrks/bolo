@@ -2,7 +2,7 @@
 
 <!-- LOADING -->
 {% load i18n grp_tags admin_urls static admin_list %}
-
+{% load topic_admin %}
 <!-- STYLESHEETS -->
 {% block stylesheets %}
     {{ block.super }}
@@ -17,7 +17,7 @@
       #result_list ul li{list-style-type: none;}
       #result_list .field-m2mcategory input[type=checkbox]{display: inline-block;}
       .field-title{max-width: 360px !important;text-align: left !important;width: 100% !important;}
-      .field-title input[type="text"]{max-width: 320px !important;width: 310px !important;}
+      .field-title input[type="text"],.field-title textarea{/*max-width: 320px !important;width: 310px !important;*/width: 100%;}
       #date-form{margin-top: 5px;padding-right: 10px;}
       #grp-content{top:0;}
       header#grp-header{display: none;}
@@ -35,6 +35,11 @@
       .field-name{min-width: 65px !important;word-break: break-word;max-width: 70px !important;}
       #video_div {position: fixed;bottom: 66px;right: 20px;z-index: 9999;background: black;display: none;}
       .close_player{position: absolute;right: 10px;top: 10px;color: white;font-size: 20px;cursor: pointer;z-index: 9;}
+      .category-label-section{margin: 3px 5px}
+      .category-label{}
+      .remove-category-icon{margin-right: 5px;color:#3e9dc0;}
+      table.grp-table.grp-sortable thead th{vertical-align: middle;display: table-cell;}
+      .fix_header{position: fixed;top: 0;z-index: 999;display: none;}
     </style>
 {% endblock %}
 
@@ -198,6 +203,19 @@
                     e.preventDefault();
                     showRelatedObjectLookupPopup(this);
                 });
+
+                jQuery('.column-is_moderated').append('<input type="checkbox" class = "select_all" field=".field-is_moderated">')
+                jQuery('.column-is_removed').append('<input type="checkbox" class = "select_all" field=".field-is_removed">')
+                jQuery('.column-is_pubsub_popular_push').append('<input type="checkbox" class = "select_all" field=".field-is_pubsub_popular_push">')
+
+                $(document).on('change', '.select_all', function() {
+                    var field_th = jQuery(this).attr('field');
+                    var checked = false;
+                    if(jQuery(this).is(":checked")){ checked = true; }
+                    $(field_th).find('input[type="checkbox"]').prop('checked', checked);
+                    $('.select_all[field="' + field_th + '"]').prop('checked', checked);
+                });
+
                 jQuery('.field-is_monetized').find('input[type="checkbox"]:checked').parents('td').next('td.field-is_removed')
                     .find('input[type="checkbox"]:not(:checked)').prop('disabled', 'disabled');
                 jQuery('.field-is_removed').find('input[type="checkbox"]:checked').parents('td').prev('td.field-is_monetized')
@@ -277,6 +295,8 @@
                     }
                     if( !$('#id_date__gte').val() ){ delete qs_dict['date__gte']; }
                     if( !$('#id_date__lte').val() ){ delete qs_dict['date__lte']; }
+                    qs_dict['category'] = jQuery(this).find('[name="category"]').val() || qs_dict['category'] || ''
+                    qs_dict['language'] = jQuery(this).find('[name="language"]').val() || qs_dict['language'] || ''
                     var final_qs = '?';
                     for(key in qs_dict){
                         final_qs += key + '=' + qs_dict[key] + '&';
@@ -287,24 +307,31 @@
                 jQuery(document).on('click', '.edit_title', function(e){
                     e.preventDefault();
                     jQuery(this).parents('td').find('.title_box').hide();
-                    jQuery(this).parents('td').find('input[type="text"], .close_edit_box').show();
-                    var text_field = jQuery(this).parents('td').find('input[type="text"]');
+                    // jQuery(this).parents('td').find('input[type="text"], .close_edit_box').show();
+                    // var text_field = jQuery(this).parents('td').find('input[type="text"]');
+                    jQuery(this).parents('td').find('textarea, .close_edit_box').show();
+                    var text_field = jQuery(this).parents('td').find('textarea');
                     var title = $(text_field).val();
                     $(text_field).val( title.replace( /(<([^>]+)>)/ig, '') );
+                    // jQuery('.fix_header').find('th.column-title').css('width', jQuery('#result_list').find('th.column-title').width() + 'px');
                 });
 
                 jQuery(document).on('click', '.close_edit_box', function(e){
                     e.preventDefault();
                     jQuery(this).parents('td').find('.title_box').show();
-                    jQuery(this).parents('td').find('input[type="text"], .close_edit_box').hide();
+                    // jQuery(this).parents('td').find('input[type="text"], .close_edit_box').hide();
+                    jQuery(this).parents('td').find('textarea, .close_edit_box').hide();
+                    // jQuery('.fix_header').find('th.column-title').css('width', jQuery('#result_list').find('th.column-title').width() + 'px');
                 });
 
                 jQuery.each( jQuery('.field-title'), function(i, each_field){
-                    var title = $(each_field).find('input[type="text"]').val();
-                    $(each_field).find('input[type="text"]').hide();
+                    var text_field = jQuery(this).find('input[type="text"]');
+                    var text_area = '<textarea name="' + jQuery(text_field).attr('name') + '" id="' + jQuery(text_field).attr('id') + '" style="display:none;">' + jQuery(text_field).attr('value') + '</textarea>';
+                    jQuery(each_field).append(text_area);
+                    var title = $(each_field).find('textarea').text();
                     $(each_field).append('<a href="#" class="close_edit_box" style="display:none;">close</a>');
                     $(each_field).append('<div class="title_box">' + title + '&nbsp;&nbsp;<a href="#" class="edit_title">edit</a></div>');
-                    // $(each_field).find('input[type="text"]').val( title.replace( /(<([^>]+)>)/ig, '') );
+                    jQuery(text_field).remove();
                 });
 
                 jQuery.each( jQuery('.field-m2mcategory'), function(i, each_element){
@@ -312,8 +339,314 @@
                     jQuery(each_element).css('max-height', tr_height + 'px');
                 });
 
+                jQuery("label:contains('Is Superstar')").closest('.grp-module').hide();
+                jQuery("label:contains('Is Popular')").closest('.grp-module').hide();
+                jQuery("label:contains('Is Business')").closest('.grp-module').hide();
+
+                jQuery('select:has(option:contains(Superstar))').find('option:contains(Superstar)').attr('value', '?user__st__is_superstar__exact=1');
+                jQuery('select:has(option:contains(Popular))').find('option:contains(Popular)').attr('value', '?user__st__is_popular__exact=1');
+                jQuery('select:has(option:contains(Business))').find('option:contains(Business)').attr('value', '?user__st__is_business__exact=1');
+
+                jQuery('select:has(option:contains(Business))').change(function(){
+                    urlObject = new URL(window.location.href);
+                    urlObject.searchParams.delete('user__st__is_superstar__exact');
+                    urlObject.searchParams.delete('user__st__is_popular__exact');
+                    urlObject.searchParams.delete('user__st__is_business__exact');
+
+                    jQuery("label:contains('Is Superstar')").next('.grp-filter-choice').find('option[selected="selected"]').removeAttr('selected');
+                    jQuery("label:contains('Is Popular')").next('.grp-filter-choice').find('option[selected="selected"]').removeAttr('selected');
+                    jQuery("label:contains('Is Business')").next('.grp-filter-choice').find('option[selected="selected"]').removeAttr('selected');
+
+                    jQuery("label:contains('Is Superstar')").next('.grp-filter-choice').find('option').first().attr('value', urlObject.search).attr('selected', 'selected').prop('selected', 'selected');
+                    jQuery("label:contains('Is Popular')").next('.grp-filter-choice').find('option').first().attr('value', urlObject.search).attr('selected', 'selected').prop('selected', 'selected');
+                    jQuery("label:contains('Is Business')").next('.grp-filter-choice').find('option').first().attr('value', urlObject.search).attr('selected', 'selected').prop('selected', 'selected');
+                    // window.history.pushState({},"", urlObject.href);
+                });
+                $(window).on('scroll', function() {
+                    var scrollTop = $(this).scrollTop();
+                    var head_pos = jQuery('#result_list').offset().top;
+                    if( scrollTop >= head_pos && jQuery('.fix_header').is(":hidden") ){
+                        jQuery('.fix_header').show();
+                        jQuery('#result_list thead').css('visibility', 'hidden');
+                    }
+                    if(scrollTop < head_pos){
+                        jQuery('.fix_header').hide();
+                        jQuery('#result_list thead').css('visibility', 'visible');
+                    }
+                });
             });
+
+            $(window).load(function(){
+                jQuery.each( jQuery('th'), function(i, each_th){
+                    jQuery(each_th).css( 'width', jQuery(each_th).width() + 'px');
+                    // var classname = $(this).attr('class').split(' ');
+                    // $.each(classname, function(i, each_cls){
+                    //     console.log(each_cls);
+                    //     if(each_cls.startsWith('column-')){
+                    //         $('.' + each_cls.replace('column-', 'field-')).css( 'width', jQuery(each_th).width() + 'px');
+                    //     }
+                    // });
+                });
+                jQuery('.grp-changelist-results').prepend('<table cellspacing="0" class="grp-table grp-sortable fix_header"><thead>' + jQuery('#result_list').find('thead').html() + '</thead></table>');
+            });
+
+
         })(grp.jQuery);
+    </script>
+    <script type="text/javascript">
+        (function($){
+            class User{
+
+                constructor(userSection){
+                    this.csrfToken = $('[name="csrfmiddlewaretoken"]').val()
+                    this.userSection = $(userSection)
+                    this.element = this.userSection.find('input[type="text"]');
+                    this.name = this.element.val();
+                    this.userProfileID = this.getUserProfileID()
+                    this.element.hide();
+                    this.addButtons();
+                    this.applyEvents();
+                    // this.initState()
+                    this.userState = this.getUserState()
+                    console.log(" user state", this.userState)
+                }
+
+                applyEvents(){
+                    let that = this;
+                    this.blockButton.click(function(){
+                        if (confirm("Are you sure you want to delete user?"))
+                            that.ajaxCall(that.blockButton.attr('data-url'), that.blockUserSuccess)
+                    
+                    })
+
+                    this.unblockButton.click(function(){
+                        if (confirm("Are you sure you want to unblock user?"))
+                            that.ajaxCall(that.unblockButton.attr('data-url'), that.unblockUserSuccess)
+                    })
+
+                    this.deleteVideosButton.click(function(){
+                        if (confirm("Are you sure you want to delete user's all videos?"))
+                            that.ajaxCall(that.deleteVideosButton.attr('data-url'), that.deleteVideosSuccess)
+                    })
+
+                    this.deleteCommentButton.click(function(){
+                        if (confirm("Are you sure you want to delete user's all comments?"))
+                            that.ajaxCall(that.deleteCommentButton.attr('data-url'), that.deleteCommentsSuccess)
+                    })
+
+                }
+
+                addButtons(){
+                    this.userSection.append(`<div data-url="/api/superman/user/${this.userProfileID}/block/"><a href="#" class="block_user">Block</a></div>`);
+                    this.userSection.append(`<div data-url="/api/superman/user/${this.userProfileID}/unblock/"><a href="#" class="unblock_user">Unblock</a></div>`);
+                    this.userSection.append(`<div data-url="/api/superman/user/${this.userProfileID}/delete_videos/"><a href="#" class="delete_video">Delete Videos</a></div>`);
+                    this.userSection.append(`<div data-url="/api/superman/user/${this.userProfileID}/delete_comments/"><a href="#" class="delete_comment">Delete Comments</a></div>`);
+
+                    this.blockButton = $(this.userSection.find('.block_user').parent());
+                    this.unblockButton = $(this.userSection.find('.unblock_user').parent());
+                    this.deleteVideosButton = $(this.userSection.find('.delete_video').parent());
+                    this.deleteCommentButton = $(this.userSection.find('.delete_comment').parent());
+
+                }
+
+                initState(){
+                    this.unblockButton.hide();
+                    this.deleteVideosButton.hide();
+                    this.deleteCommentButton.hide();
+                }
+
+                getUserProfileID(){
+                    let link_split = this.userSection.find('a').attr('href').split('/');
+                    return link_split[link_split.length - 3]
+                }
+
+                getUserState(){
+                    return this.userSection.find('a').attr('data-is_active') == 'true'? 'unblocked': 'blocked' ;
+                }
+
+                get userState(){
+                    return this._userState
+                }
+
+                set userState(val){
+                    this._userState = val
+
+                    if(this._userState == 'blocked'){
+                        this.blockButton.hide()
+                        this.unblockButton.show();
+                        this.deleteVideosButton.show();
+                        this.deleteCommentButton.show();
+                    }
+                    else{
+                        this.blockButton.show()
+                        this.unblockButton.hide();
+                        this.deleteVideosButton.hide();
+                        this.deleteCommentButton.hide();
+                    }
+                }
+
+                blockUserSuccess(){
+                    this.userState = 'blocked'
+                }
+
+                unblockUserSuccess(){
+                    this.userState = 'unblocked'
+                }
+
+                deleteVideosSuccess(response){
+                    alert(response.delete_count + " videos deleted")
+                }
+
+                deleteCommentsSuccess(response){
+                    alert(response.delete_count + " comment deleted")
+                }
+
+                ajaxCall(url, successCallback){
+                    console.log(" ajax Url")
+                    let that = this;
+                    $.ajax({
+                        url: url,
+                        method: 'POST',
+                        headers: {'X-CSRFToken': that.csrfToken},
+                        success: function(response){
+                            successCallback.call(that, response)
+                        }
+                    })
+                }
+
+            }
+
+            $(document).ready(function(){
+                jQuery.each( jQuery('.field-name'), function(i, each_field){
+                    let user = new User(each_field);
+                });
+            })
+        })(jQuery);
+
+        
+    </script>
+    <script type="text/javascript">
+        (function($){
+
+
+             class CategoryLabelCheckbox {
+                constructor(checkboxSection, parent, stateChangeCallback) {
+                    this.checkboxSection = $(checkboxSection)
+                    this.stateChangeCallback = stateChangeCallback
+                    this.parent = parent
+                    this.name = this.checkboxSection.text();
+
+                     this.checkbox = this.checkboxSection.children().wrap('<span></span>').parent()
+                    this.label = $(`
+                        <div class='category-label-section'>
+                            <span class="remove-category-icon">x</span>
+                            <span class='category-label'>${this.name}<span>
+                        </div>`);
+                    this.cross = this.label.find('.remove-category-icon');
+                    this.checkboxSection.prepend(this.label);
+
+                     this.element = this.checkbox.find('input')
+                    this.state = this.element.attr('checked') == 'checked' ? 'checked': 'unchecked'
+                    this.applyEvent()
+                }
+
+                 get state(){
+                    return this._state
+                }
+
+                 set state(val){
+                    this._state = val
+
+                     if(this._state == 'checked')
+                        this.categorySelected()
+                    else
+                        this.categoryRemoved()
+
+                     let callback = this.stateChangeCallback
+                    callback.call(this.parent, this, this._state)
+                }
+
+                 hideCheckbox() {
+                    this.checkbox.hide()
+                }
+
+                 showCheckbox(){
+                    this.checkbox.show()
+                }
+
+                 hideLabel(){
+                    this.label.hide()
+                }
+
+                 showLabel(){
+                    this.label.show()
+                }
+
+                 categorySelected(){
+                    this.showLabel()
+                    this.hideCheckbox()
+                    this.element.attr('checked', true)
+                }
+
+                 categoryRemoved(){
+                    this.hideLabel()
+                    this.showCheckbox()
+                    this.element.removeAttr('checked')
+                }
+
+                 applyEvent(){
+                    let that = this;
+                    $(this.element).change(function(){
+                        that.state = 'checked'
+                    })
+
+                     $(this.cross).click(function(){
+                        that.state = 'unchecked'
+                    })
+                }
+            }
+
+
+             class TopicCategory {
+                constructor(section){
+                    this.categories = [];
+                    this.categorySection = $(section).find('ul') 
+                }
+
+                 addCategory(category){
+                    this.categories.push(new CategoryLabelCheckbox(category, this, this.categoryStateChanged))
+                }
+
+                 categoryStateChanged(category, state){
+                    if(state == 'checked')
+                        this.categorySection.prepend(category.checkboxSection)
+                    else{
+                        this.categorySection.append(category.checkboxSection)
+                    }
+                }
+
+                 sort(){
+                    let that = this;
+                    $.each(this.categories, function(i, category){
+                        if(category.state == 'checked'){
+                            that.categorySection.prepend(category.checkboxSection)
+                        }
+                    })  
+                }
+
+             }
+
+             $(document).ready(function(){
+                $.each($('.field-m2mcategory'), function(){
+                    let topicCategory = new TopicCategory(this)
+                    $.each($(this).find('li'), function(){
+                        topicCategory.addCategory(this)    
+                    })
+                    topicCategory.sort()
+                })
+            })
+
+         })(jQuery);
     </script>
 {% endblock %}
 
@@ -416,7 +749,9 @@
             {% endif %}
             <!-- CHANGELIST-RESULTS -->
             {% block result_list %}
-                {% result_list cl %}
+                {% with cl|sort_solr_result as cl %}
+                    {% result_list cl %}
+                {% endwith %}
             {% endblock %}
         </section>
         <!-- PAGINATION BOTTOM -->

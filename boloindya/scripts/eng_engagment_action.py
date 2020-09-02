@@ -12,9 +12,8 @@ from forum.user.utils.bolo_redis import update_profile_counter
 
 def run():
     print "Start Time Eng_Engagment Action: ",datetime.now()
-    all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True)
+    all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).values_list('user_id',flat=True).order_by(random.choice(['id','-id','name','-name']))[:10000]
     user_ids = list(all_test_userprofile_id)
-    user_ids = random.sample(user_ids,10000)
     now = datetime.now()
     last_n_days_post_ids = Topic.objects.filter(is_vb=True,is_removed=False,date__gte=now-timedelta(days=3)).order_by('-date').values_list('id',flat=True)
     last_n_days_post_ids = list(last_n_days_post_ids)
