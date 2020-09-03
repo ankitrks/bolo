@@ -834,7 +834,9 @@
             {% endif %}
             <!-- CHANGELIST-RESULTS -->
             {% block result_list %}
-                {% result_list cl %}
+                {% with cl|sort_solr_result as cl %}                    
+                    {% result_list cl %}
+                {% endwith %}
             {% endblock %}
         </section>
         <!-- PAGINATION BOTTOM -->

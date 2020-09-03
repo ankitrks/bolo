@@ -13,7 +13,7 @@ from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 from datetime import datetime,timedelta
 from forum.user.utils.bolo_redis import update_profile_counter
 # from django.db import connection
-# from haystack.query import SearchQuerySet, SQ
+from haystack.query import SearchQuerySet, SQ
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
@@ -117,41 +117,41 @@ class TopicChangeList(ChangeList):
         self.pk_attname = self.lookup_opts.pk.attname
 
 
-    # def get_results(self, request):
-    #     if not hasattr(self.model_admin, 'sqs_result'):
-    #         return super(TopicChangeList, self).get_results(request)
+    def get_results(self, request):
+        if not hasattr(self.model_admin, 'sqs_result'):
+            return super(TopicChangeList, self).get_results(request)
 
-    #     paginator = self.model_admin.get_paginator(request, self.model_admin.sqs_result, self.list_per_page)
-    #     # Get the number of objects, with admin filters applied.
-    #     result_count = paginator.count
+        paginator = self.model_admin.get_paginator(request, self.model_admin.sqs_result, self.list_per_page)
+        # Get the number of objects, with admin filters applied.
+        result_count = paginator.count
 
-    #     # Get the total number of objects, with no admin filters applied.
-    #     if self.model_admin.show_full_result_count:
-    #         full_result_count = self.root_queryset.count()
-    #     else:
-    #         full_result_count = None
-    #     can_show_all = result_count <= self.list_max_show_all
-    #     multi_page = result_count > self.list_per_page
+        # Get the total number of objects, with no admin filters applied.
+        if self.model_admin.show_full_result_count:
+            full_result_count = self.root_queryset.count()
+        else:
+            full_result_count = None
+        can_show_all = result_count <= self.list_max_show_all
+        multi_page = result_count > self.list_per_page
 
-    #     # Get the list of objects to display on this page.
-    #     if (self.show_all and can_show_all) or not multi_page:
-    #         result_list = self.model_admin.sqs_result
-    #     else:
-    #         try:
-    #             result_list = paginator.page(self.page_num + 1).object_list
-    #         except InvalidPage:
-    #             raise IncorrectLookupParameters
+        # Get the list of objects to display on this page.
+        if (self.show_all and can_show_all) or not multi_page:
+            result_list = self.model_admin.sqs_result
+        else:
+            try:
+                result_list = paginator.page(self.page_num + 1).object_list
+            except InvalidPage:
+                raise IncorrectLookupParameters
 
-    #     self.result_count = result_count
-    #     self.show_full_result_count = self.model_admin.show_full_result_count
-    #     # Admin actions are shown if there is at least one entry
-    #     # or if entries are not counted because show_full_result_count is disabled
-    #     self.show_admin_actions = not self.show_full_result_count or bool(full_result_count)
-    #     self.full_result_count = full_result_count
-    #     self.result_list = self.queryset
-    #     self.can_show_all = can_show_all
-    #     self.multi_page = multi_page
-    #     self.paginator = paginator
+        self.result_count = result_count
+        self.show_full_result_count = self.model_admin.show_full_result_count
+        # Admin actions are shown if there is at least one entry
+        # or if entries are not counted because show_full_result_count is disabled
+        self.show_admin_actions = not self.show_full_result_count or bool(full_result_count)
+        self.full_result_count = full_result_count
+        self.result_list = self.queryset
+        self.can_show_all = can_show_all
+        self.multi_page = multi_page
+        self.paginator = paginator
 
 from django.db.models import Q
 from django.contrib.auth.models import User
@@ -340,54 +340,54 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
         del actions['delete_selected']
         return actions
 
-    def get_search_results(self, request, queryset, search_term):
-        final_search_term = search_term.replace('h:', '').replace('n:', '')
-        queryset, use_distinct = super(TopicAdmin, self).get_search_results(request, queryset, final_search_term)
-        if search_term:
-            if search_term.startswith('h:'):
-                queryset = queryset.filter(hash_tags__hash_tag__iexact = search_term.replace('h:', ''))
-            if search_term.startswith('n:'):
-                queryset = queryset.filter(title__icontains = search_term.replace('n:', '')).exclude(hash_tags__hash_tag__icontains = search_term.replace('n:', ''))
-        return queryset, use_distinct
-
     # def get_search_results(self, request, queryset, search_term):
     #     final_search_term = search_term.replace('h:', '').replace('n:', '')
+    #     queryset, use_distinct = super(TopicAdmin, self).get_search_results(request, queryset, final_search_term)
+    #     if search_term:
+    #         if search_term.startswith('h:'):
+    #             queryset = queryset.filter(hash_tags__hash_tag__iexact = search_term.replace('h:', ''))
+    #         if search_term.startswith('n:'):
+    #             queryset = queryset.filter(title__icontains = search_term.replace('n:', '')).exclude(hash_tags__hash_tag__icontains = search_term.replace('n:', ''))
+    #     return queryset, use_distinct
 
-    #     if search_term.startswith('h:'):
-    #         queryset = queryset.filter(hash_tags__hash_tag__iexact = search_term.replace('h:', ''))
-    #     elif search_term.startswith('n:'):
-    #         queryset = queryset.filter(title__icontains = search_term.replace('n:', '')).exclude(hash_tags__hash_tag__icontains = search_term.replace('n:', ''))
-    #     elif search_term:
-    #         sqs = SearchQuerySet().models(Topic, UserProfile).raw_search(search_term)[:100]
+    def get_search_results(self, request, queryset, search_term):
+        final_search_term = search_term.replace('h:', '').replace('n:', '')
 
-    #         self.sqs_result = []
-    #         self.sqs_result_dict = {}
-    #         id_list = []
-    #         user_id_list = []
-    #         for item in sqs:
-    #             if not type(item.id) in (str, unicode):
-    #                 continue
+        if search_term.startswith('h:'):
+            queryset = queryset.filter(hash_tags__hash_tag__iexact = search_term.replace('h:', ''))
+        elif search_term.startswith('n:'):
+            queryset = queryset.filter(title__icontains = search_term.replace('n:', '')).exclude(hash_tags__hash_tag__icontains = search_term.replace('n:', ''))
+        elif search_term:
+            sqs = SearchQuerySet().models(Topic, UserProfile).raw_search(search_term)[:100]
 
-    #             split_data = item.id.split('.')
+            self.sqs_result = []
+            self.sqs_result_dict = {}
+            id_list = []
+            user_id_list = []
+            for item in sqs:
+                if not type(item.id) in (str, unicode):
+                    continue
 
-    #             if split_data[1] == 'userprofile':
-    #                 user_id_list.append(int(split_data[-1]))
-    #             else:
-    #                 _dict = {'id':int(split_data[-1]), 'score': item.score}
+                split_data = item.id.split('.')
 
-    #                 self.sqs_result_dict[_dict.get('id')] = _dict.get('score')
-    #                 self.sqs_result.append(_dict)
-    #                 id_list.append(_dict.get('id'))
+                if split_data[1] == 'userprofile':
+                    user_id_list.append(int(split_data[-1]))
+                else:
+                    _dict = {'id':int(split_data[-1]), 'score': item.score}
+
+                    self.sqs_result_dict[_dict.get('id')] = _dict.get('score')
+                    self.sqs_result.append(_dict)
+                    id_list.append(_dict.get('id'))
 
 
-    #         paginator = self.get_paginator(request, id_list, self.list_per_page)
-    #         page = int(request.GET.get(PAGE_VAR, 0))
-    #         ids = paginator.page(page+1).object_list
+            paginator = self.get_paginator(request, id_list, self.list_per_page)
+            page = int(request.GET.get(PAGE_VAR, 0))
+            ids = paginator.page(page+1).object_list
 
-    #         queryset = queryset.filter(Q(id__in=ids) | Q(user_id__in=user_id_list))
+            queryset = queryset.filter(Q(id__in=ids) | Q(user_id__in=user_id_list))
 
-    #     queryset.select_related('user', 'user__userprofile')
-    #     return queryset, False
+        queryset.select_related('user', 'user__userprofile')
+        return queryset, False
 
     def save_model(self, request, obj, form, change):
         if 'title' in form.changed_data:
