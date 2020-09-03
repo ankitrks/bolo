@@ -2777,13 +2777,13 @@ def search_and_add_hashtag(request):
 
 
 from drf_spirit.utils import get_random_username
-from drf_spirit.views import upload_thumbail
 @login_required
 def bot_user_form(request):
     if request.method == 'GET':
         user_form = UserForm()
         return render(request,'jarvis/pages/bot_management/user_form.html', {'user_form':user_form})
     elif request.method == 'POST':
+        from drf_spirit.views import upload_thumbail
         if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
             try:
                 profile_pic = request.FILES['profile_pic']
