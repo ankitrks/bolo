@@ -40,6 +40,30 @@
       .remove-category-icon{margin-right: 5px;color:#3e9dc0;}
       table.grp-table.grp-sortable thead th{vertical-align: middle;display: table-cell;}
       .fix_header{position: fixed;top: 0;z-index: 999;display: none;}
+      .loader {
+          border: 16px solid #f3f3f3; /* Light grey */
+          border-top: 16px solid #3498db; /* Blue */
+          border-radius: 50%;
+          width: 120px;
+          height: 120px;
+          animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        .loader-div{z-index: 10;position: fixed;top: 45%;left: 45%;}
+        .thumbnail-hover-section{
+            z-index: 500;
+            position: fixed;
+            top: 10%;
+            left: 45%;
+            width: 400px;
+            height: 600px;
+            background-color: #FFF;
+        }
+        .thumbnail-hover-section img{width: 400px; height: 600px;}
     </style>
 {% endblock %}
 
@@ -207,6 +231,39 @@
                 jQuery('.column-is_moderated').append('<input type="checkbox" class = "select_all" field=".field-is_moderated">')
                 jQuery('.column-is_removed').append('<input type="checkbox" class = "select_all" field=".field-is_removed">')
                 jQuery('.column-is_pubsub_popular_push').append('<input type="checkbox" class = "select_all" field=".field-is_pubsub_popular_push">')
+
+                jQuery('body').append('<div class="loader-div"><div class="loader"></div></div>');
+                jQuery('.loader-div').hide();
+
+                jQuery('body').append('<div class="thumbnail-hover-section"><img src=""></div>')
+                jQuery('.thumbnail-hover-section').hide()
+
+                jQuery('.field-show_thumbnail div').mouseenter(function(){
+                    let thumbnail = jQuery('.thumbnail-hover-section')
+                    thumbnail.show()
+                    let imageSrc = jQuery(this).css('background')
+                    var pattern = /url.+\"\)/g;
+                    var result = imageSrc.match(pattern)[0].replace('url("', '').replace('")', '');
+                    thumbnail.find('img').attr('src', result)
+                })
+
+                jQuery('.field-show_thumbnail div').mouseout(function(){
+                    let thumbnail = jQuery('.thumbnail-hover-section').hide()
+                })
+
+
+                jQuery.each(jQuery('input[name$="is_pubsub_popular_push"]'), function(){
+                    let element =  jQuery(this)
+                    if(element.attr('checked')){
+                        jQuery.each(element.parents('tr.grp-row').find('td'), function(){
+                            jQuery(this).css('background-color', '#ff8080')
+                        })
+                        jQuery.each(element.parents('tr.grp-row').find('th'), function(){
+                            jQuery(this).css('background-color', '#ff8080')
+                        })
+                    }
+                })
+
 
                 $(document).on('change', '.select_all', function() {
                     var field_th = jQuery(this).attr('field');
@@ -531,7 +588,13 @@
                         method: 'POST',
                         headers: {'X-CSRFToken': that.csrfToken},
                         success: function(response){
+                            $('.loader-div').hide();
                             successCallback.call(that, response)
+                        },
+                        xhr: function() {
+                            let xhr = $.ajaxSettings.xhr();
+                            $('.loader-div').show();
+                            return xhr;
                         }
                     })
                 }
