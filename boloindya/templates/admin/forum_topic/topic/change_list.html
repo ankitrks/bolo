@@ -295,8 +295,30 @@
                     }
                     if( !$('#id_date__gte').val() ){ delete qs_dict['date__gte']; }
                     if( !$('#id_date__lte').val() ){ delete qs_dict['date__lte']; }
-                    qs_dict['category'] = jQuery(this).find('[name="category"]').val() || qs_dict['category'] || ''
-                    qs_dict['language'] = jQuery(this).find('[name="language"]').val() || qs_dict['language'] || ''
+
+                    let categorySelectedValues = [];
+                    jQuery.each(jQuery('#date-form [name="category"]:checked'), function(i, categoryValue){
+                        jQuery.each(jQuery(categoryValue).val().replace("?", "").split('&'), function(i, param){
+                            let k, v;
+                            [k, v] = param.split("=")
+                            if(k == "category")
+                                categorySelectedValues.push(v)
+                        })
+                    })
+                    qs_dict['category'] = categorySelectedValues.join(",")
+
+                    let languageSelectedValues = [];
+                    jQuery.each(jQuery('#date-form [name="language"]:checked'), function(i, categoryValue){
+                        jQuery.each(jQuery(categoryValue).val().replace("?", "").split('&'), function(i, param){
+                            let k, v;
+                            [k, v] = param.split("=")
+                            if(k == "language")
+                                languageSelectedValues.push(v)
+                        })
+                    })
+                    qs_dict['language'] = languageSelectedValues.join(",")
+
+                    console.log("qs_dict", qs_dict)
                     var final_qs = '?';
                     for(key in qs_dict){
                         final_qs += key + '=' + qs_dict[key] + '&';
