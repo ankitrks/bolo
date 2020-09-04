@@ -53,7 +53,7 @@ def run():
         return string.strip()
 
     topic_hash_tag_counter = 0
-    all_topics = Topic.objects.filter(title__icontains="#", first_hash_tag__isnull = True).values_list('pk', flat = True).order_by('-date')[:500]
+    all_topics = Topic.objects.filter(title__icontains="#", first_hash_tag__isnull = True).values_list('pk', flat = True).order_by('-date')
     for each_topic_id in all_topics:
         print "#######################topic_hash_tag_counter   ",topic_hash_tag_counter,"/",len(all_topics),"      ##########################"
         topic_hash_tag_counter+=1
