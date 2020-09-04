@@ -93,6 +93,8 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
             related_name="m2mcategories_topics",blank=True)
     hash_tags = models.ManyToManyField('forum_topic.TongueTwister', verbose_name=_("hash_tags"), \
             related_name="hash_tag_topics",blank=True)
+    first_hash_tag = models.ForeignKey('forum_topic.TongueTwister', verbose_name=_("first_hash_tag"), \
+            related_name="first_hash_tag",blank=True, null = True)
 
     title = models.TextField(_("title"), blank = True, null = True,db_index=True)
     question_audio = models.CharField(_("audio url"), max_length=500, blank = True, null = True)

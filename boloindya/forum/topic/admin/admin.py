@@ -16,6 +16,7 @@ from forum.user.utils.bolo_redis import update_profile_counter
 from haystack.query import SearchQuerySet, SQ
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+import copy
 
 class TopicResource(resources.ModelResource):
     class Meta:
@@ -432,14 +433,27 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
 
         if 'title' in form.changed_data:
             tag_list = obj.title.split()
-            hash_tag = tag_list
+            hash_tag = copy.deepcopy(tag_list)
             if tag_list:
                 for index, value in enumerate(tag_list):
                     if value.startswith("#"):
                         tag_list[index]='<a href="/get_challenge_details/?ChallengeHash='+value.strip('#')+'">'+value+'</a>'
                 title = " ".join(tag_list)
                 obj.title = title[0].upper()+title[1:]
-
+                first_hash_tag = False
+                for index, value in enumerate(hash_tag):
+                    if value.startswith("#"):
+                        # tag,is_created = TongueTwister.objects.get_or_create(hash_tag__iexact=value.strip('#'))
+                        tag = TongueTwister.objects.using('default').filter(hash_tag__iexact=value.strip('#'))
+                        if tag.count():
+                            tag.update(hash_counter = F('hash_counter')+1)
+                            tag = tag[0]
+                        else:
+                            tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
+                        obj.hash_tags.add(tag)
+                        if not first_hash_tag:
+                            obj.first_hash_tag = tag
+                            first_hash_tag = True
         obj.save()
         if 'is_boosted' in form.changed_data or 'boosted_till' in form.changed_data or 'is_pubsub_popular_push' in form.changed_data:
             obj.calculate_vb_score()
