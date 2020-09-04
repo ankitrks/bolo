@@ -12,8 +12,7 @@
       input[type="submit"],input[type="reset"]{margin-top: 8px;height: 28px;}
       
       th, td{text-align: center !important;}
-      #result_list .field-m2mcategory{display: block;max-height: 65px;overflow: auto;text-align: left !important;min-width: 150px;
-        padding: 5px 2px 10px 8px;}
+      #result_list .field-m2mcategory{text-align: left !important;padding: 5px 2px 10px 8px;}
       #result_list ul li{list-style-type: none;}
       #result_list .field-m2mcategory input[type=checkbox]{display: inline-block;}
       .field-title{max-width: 360px !important;text-align: left !important;width: 100% !important;}
@@ -71,6 +70,7 @@
         .icon-delete-video{width: 16px; height: 16px}
         .icon-delete-comment{width: 14px; height: 14px}
         .user-action{margin: 1px 3px;}
+        .field-m2mcategory li{display: inline;height: 30px}
 
     </style>
 {% endblock %}
@@ -631,12 +631,12 @@
                     this.parent = parent
                     this.name = this.checkboxSection.text();
 
-                     this.checkbox = this.checkboxSection.children().wrap('<span></span>').parent()
+                    this.checkbox = this.checkboxSection.children().wrap('<span></span>').parent()
                     this.label = $(`
-                        <div class='category-label-section'>
+                        <span class='category-label-section'>
                             <span class="remove-category-icon">x</span>
                             <span class='category-label'>${this.name}<span>
-                        </div>`);
+                        </span>`);
                     this.cross = this.label.find('.remove-category-icon');
                     this.checkboxSection.prepend(this.label);
 
@@ -704,8 +704,13 @@
 
              class TopicCategory {
                 constructor(section){
+                    this.section = $(section)
                     this.categories = [];
-                    this.categorySection = $(section).find('ul') 
+                    this.categorySection = this.section.find('ul') 
+                    this.parentTR = this.section.parents('tr')
+                    let colspan = this.parentTR.find('td').length;
+                    this.newTR = $('<tr class="'+this.parentTR.attr('class')+'"><td class="field-m2mcategory" colspan="'+colspan+'"></td></tr>')
+                    this.parentTR.after(this.newTR)
                 }
 
                  addCategory(category){
@@ -720,6 +725,12 @@
                     }
                 }
 
+                putCategoryInNewPlace(){
+                    this.newTR.find('.field-m2mcategory').append(this.categorySection)
+                    this.section.remove()
+                    this.newTR.parents('table').find('th.column-m2mcategory').remove()
+                }
+
                  sort(){
                     let that = this;
                     $.each(this.categories, function(i, category){
@@ -727,6 +738,7 @@
                             that.categorySection.prepend(category.checkboxSection)
                         }
                     })  
+                    this.putCategoryInNewPlace()
                 }
 
              }
