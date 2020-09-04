@@ -37,7 +37,7 @@
       .close_player{position: absolute;right: 10px;top: 10px;color: white;font-size: 20px;cursor: pointer;z-index: 9;}
       .category-label-section{margin: 3px 5px}
       .category-label{}
-      .remove-category-icon{margin-right: 5px;color:#3e9dc0;}
+      .remove-category-icon{margin-right: 5px;color:#3e9dc0;cursor: pointer;font-size: 14px;font-weight: 600;}
       table.grp-table.grp-sortable thead th{vertical-align: middle;display: table-cell;}
       .fix_header{position: fixed;top: 0;z-index: 999;display: none;}
       .loader {
@@ -62,8 +62,16 @@
             width: 400px;
             height: 600px;
             background-color: #FFF;
+            background-color:transparent;
         }
-        .thumbnail-hover-section img{width: 400px; height: 600px;}
+        .thumbnail-hover-section img{width: 400px; height: 600px;background-repeat: no-repeat !important;
+            object-fit: scale-down;}
+        .user-action-section{margin-top: 8px;}
+        .user-action-icon{width: 12px}
+        .icon-delete-video{width: 16px; height: 16px}
+        .icon-delete-comment{width: 14px; height: 14px}
+        .user-action{margin: 1px 3px;}
+
     </style>
 {% endblock %}
 
@@ -479,7 +487,9 @@
                 constructor(userSection){
                     this.csrfToken = $('[name="csrfmiddlewaretoken"]').val()
                     this.userSection = $(userSection)
+                    this.userSection.append('<div class="user-action-section"></div>')
                     this.element = this.userSection.find('input[type="text"]');
+                    this.userActionSection = this.userSection.find('.user-action-section')
                     this.name = this.element.val();
                     this.userProfileID = this.getUserProfileID()
                     this.element.hide();
@@ -516,15 +526,15 @@
                 }
 
                 addButtons(){
-                    this.userSection.append(`<div data-url="/api/superman/user/${this.userProfileID}/block/"><a href="#" class="block_user">Block</a></div>`);
-                    this.userSection.append(`<div data-url="/api/superman/user/${this.userProfileID}/unblock/"><a href="#" class="unblock_user">Unblock</a></div>`);
-                    this.userSection.append(`<div data-url="/api/superman/user/${this.userProfileID}/delete_videos/"><a href="#" class="delete_video">Delete Videos</a></div>`);
-                    this.userSection.append(`<div data-url="/api/superman/user/${this.userProfileID}/delete_comments/"><a href="#" class="delete_comment">Delete Comments</a></div>`);
+                    this.userActionSection.append(`<span class="user-action" data-url="/api/superman/user/${this.userProfileID}/block/" title="Block User"><a href="#" class="block_user"><img class="user-action-icon" src="/static/img/icons/block-user.png"></a></span>`);
+                    this.userActionSection.append(`<span class="user-action" data-url="/api/superman/user/${this.userProfileID}/unblock/" title="Unblock User"><a href="#" class="unblock_user"><img class="user-action-icon" src="/static/img/icons/unblock-user.png"></a></span>`);
+                    this.userActionSection.append(`<span class="user-action" data-url="/api/superman/user/${this.userProfileID}/delete_videos/" title="Delete All Videos"><a href="#" class="delete_video"><img class="user-action-icon icon-delete-video" src="/static/img/icons/delete-videos.png"></a></span>`);
+                    this.userActionSection.append(`<span class="user-action" data-url="/api/superman/user/${this.userProfileID}/delete_comments/" title="Delete All Comments"><a href="#" class="delete_comment"><img class="user-action-icon icon-delete-comment" src="/static/img/icons/delete-comments.png"></a></span>`);
 
-                    this.blockButton = $(this.userSection.find('.block_user').parent());
-                    this.unblockButton = $(this.userSection.find('.unblock_user').parent());
-                    this.deleteVideosButton = $(this.userSection.find('.delete_video').parent());
-                    this.deleteCommentButton = $(this.userSection.find('.delete_comment').parent());
+                    this.blockButton = $(this.userActionSection.find('.block_user').parent());
+                    this.unblockButton = $(this.userActionSection.find('.unblock_user').parent());
+                    this.deleteVideosButton = $(this.userActionSection.find('.delete_video').parent());
+                    this.deleteCommentButton = $(this.userActionSection.find('.delete_comment').parent());
 
                 }
 
