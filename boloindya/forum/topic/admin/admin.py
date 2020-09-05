@@ -16,6 +16,7 @@ from forum.user.utils.bolo_redis import update_profile_counter
 from haystack.query import SearchQuerySet, SQ
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from django.core.urlresolvers import reverse
 
 class TopicResource(resources.ModelResource):
     class Meta:
@@ -289,7 +290,9 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
     duration.admin_order_field = 'media_duration'
 
     def vb_list(self, obj):
-        return '<a href="?user_id=' + str(obj.user.id) +'" target="_blank" style="background-position: \
+        video_url = reverse('spirit:share_vb_page', kwargs={'user_id': str(obj.user_id),
+                        'poll_id': str(obj.id), 'slug': obj.slug or 'a'})
+        return '<a href="?user_id=' + str(obj.user.id) +'" data-video_url="'+video_url+'" target="_blank" style="background-position: \
                 0 -834px;background-image: url(/static/grappelli/images/icons-small-sf6f04fa616.png);\
                 background-repeat: no-repeat;height: 20px;display: block;"></a>'
     vb_list.allow_tags = True
