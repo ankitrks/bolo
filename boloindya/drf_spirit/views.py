@@ -1828,19 +1828,21 @@ def createTopic(request):
 
 def invoke_watermark_service(topic, user):
     try:
-        print("inside invoke_watermark_service")
-        url = settings.WATERMARK_SERVICE_ENDPOINT
-        topic_id = topic.id
-        input_key = topic.question_video.split(".amazonaws.com/")[1]
-        username  = user.username
-        user_id = user.id
-        duration = topic.media_duration
-        payload = {"input_key": input_key, "topic_id": topic_id, "username": username,"user_id":user_id,"duration":duration}
-        response = requests.request("POST", url, headers = {}, data = json.dumps(payload), files = [],timeout=60)
-        if response.status_code == 200:
-            print("success")
-        else:
-            print("failure with response code"+str(response.status_code))
+        if ".m3u8" not in topic.question_video:
+            url = settings.WATERMARK_SERVICE_ENDPOINT
+            topic_id = topic.id
+            input_key = topic.question_video.split(".amazonaws.com/")[1]
+            prefix = "in-boloindya/"
+            input_key = input_key[len(prefix):] if input_key.startswith(prefix) else input_key
+            username  = user.username
+            user_id = user.id
+            duration = topic.media_duration
+            payload = {"input_key": input_key, "topic_id": topic_id, "username": username,"user_id":user_id,"duration":duration}
+            response = requests.request("POST", url, headers = {}, data = json.dumps(payload), files = [],timeout=60)
+            if response.status_code == 200:
+                print("success")
+            else:
+                print("failure with response code"+str(response.status_code))
     except Exception as e:
         print("Exception raised {}".format(e))
 
