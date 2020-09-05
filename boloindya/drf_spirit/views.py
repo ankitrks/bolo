@@ -1568,6 +1568,7 @@ def create_bot_topic(request):
                 title = " ".join(tag_list).strip()
                 topic.title = (title[0].upper()+title[1:]).strip()
                 # for each_tag in tag_list:
+                first_hash_tag = False
                 for index, value in enumerate(hash_tag):
                     if value.startswith("#"):
                         # tag,is_created = TongueTwister.objects.get_or_create(hash_tag__iexact=value.strip('#'))
@@ -1578,6 +1579,9 @@ def create_bot_topic(request):
                         else:
                             tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
                         topic.hash_tags.add(tag)
+                        if not first_hash_tag:
+                            topic.first_hash_tag = tag
+                            first_hash_tag = True
             topic.save()
 
             if is_boosted:
@@ -1642,6 +1646,7 @@ def edit_bot_video(request):
                         title = " ".join(tag_list).strip()
                         title = (title[0].upper()+title[1:]).strip()
                         # for each_tag in tag_list:
+                        first_hash_tag = False
                         for index, value in enumerate(hash_tag):
                             if value.startswith("#"):
                                 # tag,is_created = TongueTwister.objects.get_or_create(hash_tag__iexact=value.strip('#'))
@@ -1652,6 +1657,10 @@ def edit_bot_video(request):
                                 else:
                                     tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
                                 topic.hash_tags.add(tag)
+                                if not first_hash_tag:
+                                    topic.first_hash_tag = tag
+                                    first_hash_tag = True
+
                     if not topic.title == title:
                         topic.title = title
 
@@ -1766,6 +1775,7 @@ def createTopic(request):
                 title = " ".join(tag_list).strip()
                 topic.title = (title[0].upper()+title[1:]).strip()
                 # for each_tag in tag_list:
+                first_hash_tag = False
                 for index, value in enumerate(hash_tag):
                     if value.startswith("#"):
                         # tag,is_created = TongueTwister.objects.get_or_create(hash_tag__iexact=value.strip('#'))
@@ -1776,6 +1786,9 @@ def createTopic(request):
                         else:
                             tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
                         topic.hash_tags.add(tag)
+                        if not first_hash_tag:
+                            topic.first_hash_tag = tag
+                            first_hash_tag = True
         else:
             view_count = random.randint(10,30)
             topic.view_count = view_count
@@ -1897,6 +1910,7 @@ def editTopic(request):
                     each_hashtag.save()
                 topic.title = new_title.strip()
                 if hash_tag:
+                    first_hash_tag = False
                     for index, value in enumerate(hash_tag):
                         if value.startswith("#"):
                             # tag, is_created = TongueTwister.objects.get_or_create(hash_tag__iexact=value.strip("#"))
@@ -1907,6 +1921,9 @@ def editTopic(request):
                             else:
                                 tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
                             topic.hash_tags.add(tag.id)
+                            if not first_hash_tag:
+                                topic.first_hash_tag = tag
+                                first_hash_tag = True
                 topic.save()
 
                 topic_json = TopicSerializerwithComment(topic, context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data
