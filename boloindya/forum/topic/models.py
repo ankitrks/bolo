@@ -338,14 +338,27 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
         if self.user.st.name:
             user_str += '<br>' + '[' + self.user.st.name + ']'
         
-        try:
-            if self.user.st.name:
-                return format_html('<a data-is_active="' + ('true' if self.user.is_active else 'false') + '" href="/superman/forum_user/userprofile/' + str(self.user.st.id) \
-                    + '/change/" target="_blank">' + user_str + '</a>' )
-        except:
-            pass
-        return format_html('<a data-is_active="' + ('true' if self.user.is_active else 'false') + '" href="/superman/forum_user/userprofile/' + str(self.user.st.id) \
-            + '/change/" target="_blank">' + user_str + '</a>' )
+        # try:
+        #     if self.user.st.name:
+        #         return format_html('<a data-is_active="' + ('true' if self.user.is_active else 'false') + '" href="/superman/forum_user/userprofile/' + str(self.user.st.id) \
+        #             + '/change/" target="_blank">' + user_str + '</a>' )
+        # except:
+        #     pass
+        # return format_html('<a data-is_active="' + ('true' if self.user.is_active else 'false') + '" href="/superman/forum_user/userprofile/' + str(self.user.st.id) \
+        #     + '/change/" target="_blank">' + user_str + '</a>' )
+
+        user = self.user
+
+        return format_html("""
+            <a class="user-link" data-is_active="{is_active}" data-is_popular="{is_popular}" data-is_superstar="{is_superstar}"
+                href="{profile_link}" target="_blank"> {display_name} </a>
+        """.format(**{
+                'is_active': str(user.is_active).lower(),
+                'is_popular': str(user.st.is_popular).lower() if hasattr(user, 'st') else '',
+                'is_superstar': str(user.st.is_superstar).lower() if hasattr(user, 'st') else '',
+                'profile_link': '/superman/forum_user/userprofile/' + str(self.user.st.id) + '/change/',
+                'display_name': user_str
+            }))
 
 
     def delete(self,is_user_deleted=False):

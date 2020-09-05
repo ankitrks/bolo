@@ -252,14 +252,17 @@
                 })
 
 
-                jQuery.each(jQuery('input[name$="is_pubsub_popular_push"]'), function(){
+                jQuery.each(jQuery('td.field-name'), function(){
                     let element =  jQuery(this)
-                    if(element.attr('checked')){
+                    let is_popular = element.find('.user-link').attr('data-is_popular') == 'true'? true : false
+                    let is_superstar = element.find('.user-link').attr('data-is_superstar') == 'true'? true : false
+                    console.log("is_popular", is_popular, "is_superstar", is_superstar)
+                    if(is_popular || is_superstar){
                         jQuery.each(element.parents('tr.grp-row').find('td'), function(){
-                            jQuery(this).css('background-color', '#ff8080')
+                            jQuery(this).css('background-color', 'bisque')
                         })
                         jQuery.each(element.parents('tr.grp-row').find('th'), function(){
-                            jQuery(this).css('background-color', '#ff8080')
+                            jQuery(this).css('background-color', 'bisque')
                         })
                     }
                 })
@@ -555,13 +558,20 @@
                         this.unblockButton.show();
                         this.deleteVideosButton.show();
                         this.deleteCommentButton.show();
+                        this.recalCategoryHeight()
                     }
                     else{
                         this.blockButton.show()
                         this.unblockButton.hide();
                         this.deleteVideosButton.hide();
                         this.deleteCommentButton.hide();
+                        this.recalCategoryHeight()
                     }
+                }
+
+                recalCategoryHeight(){
+                    let parent = this.userSection.parents('tr');
+                    parent.find('.field-m2mcategory').css('max-height', parent.height() + 'px');
                 }
 
                 blockUserSuccess(){
