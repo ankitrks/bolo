@@ -242,7 +242,7 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
     ordering = ('-id',)
     list_per_page = 20
     search_fields = ('title', 'user__username', 'user__st__name', )
-    list_filter = (('date', DateRangeFilter), 'language_id', 'is_moderated', 'is_monetized', 'is_removed', \
+    list_filter = (('date', DateRangeFilter), 'is_moderated', 'is_monetized', 'is_removed', \
             'is_popular', 'is_boosted', 'is_reported', ModeratedFilter, UserTypeFilter, CategoryMultiSelectFilter,\
             LanguageMultiSelectFilter, 'user__st__is_superstar', 'user__st__is_popular', 'user__st__is_business')
     
