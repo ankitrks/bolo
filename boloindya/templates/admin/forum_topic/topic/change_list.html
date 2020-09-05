@@ -64,14 +64,13 @@
             background-color: #FFF;
             background-color:transparent;
         }
-        .thumbnail-hover-section img{width: 400px; height: 600px;background-repeat: no-repeat !important;
-            object-fit: scale-down;}
+        .thumbnail-hover-section img{width: 400px; height: 600px;}
+        img.copy-link-image{width: 14px; cursor: pointer;}
         .user-action-section{margin-top: 8px;}
         .user-action-icon{width: 12px}
         .icon-delete-video{width: 16px; height: 16px}
         .icon-delete-comment{width: 14px; height: 14px}
         .user-action{margin: 1px 3px;}
-
     </style>
 {% endblock %}
 
@@ -273,6 +272,31 @@
                             jQuery(this).css('background-color', 'bisque')
                         })
                     }
+                })
+
+                const copyToClipboard = str => {
+                    const el = document.createElement('textarea');
+                    el.value = str;
+                    el.setAttribute('readonly', '');
+                    el.style.position = 'absolute';
+                    el.style.left = '-9999px';
+                    document.body.appendChild(el);
+                    el.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(el);
+                };
+
+                copyLink = function(element){
+                    let link = $(element).parents('td').find('a').attr('data-video_url')
+                    copyToClipboard(window.location.host + link)
+                }
+
+                jQuery.each(jQuery('td.field-vb_list'), function(i, element){
+                    $(element).append(`
+                        <div class="copy-link-container">
+                            <img onclick=copyLink(this) title="Copy Video Link" src="/static/img/icons/copy-link.jpg" class="copy-link-image">
+                        </div>
+                    `)
                 })
 
 
