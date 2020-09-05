@@ -250,7 +250,7 @@ def update_redis_hashtag_paginated_data(language_id, extra_filter, cache_max_pag
                     page = 1
                     final_data = {}
                     exclude_ids = []
-                    query = Topic.objects.filter(is_removed = False, is_vb = True, first_hash_tag_id = each_rec, language_id = language_id).order_by('-vb_score', '-id')
+                    query = Topic.objects.filter(is_removed = False, is_vb = True, hash_tags__id = each_rec, language_id = language_id).order_by('-vb_score', '-id')
                     # final_data = update_redis_paginated_data(key, query)
                     final_data = new_algo_update_redis_paginated_data(key,query)
         if key:
