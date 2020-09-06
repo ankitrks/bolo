@@ -191,7 +191,7 @@ class TopicSerializer(ModelSerializer):
         return shorcountertopic(instance.whatsapp_share_count)
 
     def get_other_share_count(self,instance):
-        return shorcountertopic(instance.other_share_count)
+        return shorcountertopic(instance.other_share_count + instance.linkedin_share_count + instance.facebook_share_count + instance.twitter_share_count)
 
     def get_total_share_count(self,instance):
         return shorcountertopic(instance.total_share_count)
@@ -344,7 +344,7 @@ class TopicSerializerwithComment(ModelSerializer):
         return shorcountertopic(instance.whatsapp_share_count)
 
     def get_other_share_count(self,instance):
-        return shorcountertopic(instance.other_share_count)
+        return shorcountertopic(instance.other_share_count + instance.linkedin_share_count + instance.facebook_share_count + instance.twitter_share_count)
 
     def get_total_share_count(self,instance):
         return shorcountertopic(instance.total_share_count)
@@ -441,7 +441,7 @@ class SingleTopicSerializerwithComment(ModelSerializer):
         return shorcountertopic(instance.whatsapp_share_count)
 
     def get_other_share_count(self,instance):
-        return shorcountertopic(instance.other_share_count)
+        return shorcountertopic(instance.other_share_count + instance.linkedin_share_count + instance.facebook_share_count + instance.twitter_share_count)
 
     def get_total_share_count(self,instance):
         return shorcountertopic(instance.total_share_count)
@@ -534,7 +534,7 @@ class UserAnswerSerializerwithComment(ModelSerializer):
         return shorcountertopic(instance.whatsapp_share_count)
 
     def get_other_share_count(self,instance):
-        return shorcountertopic(instance.other_share_count)
+        return shorcountertopic(instance.other_share_count + instance.linkedin_share_count + instance.facebook_share_count + instance.twitter_share_count)
 
     def get_total_share_count(self,instance):
         return shorcountertopic(instance.total_share_count)
@@ -961,7 +961,7 @@ class CategoryVideoByteSerializer(ModelSerializer):
         return shorcountertopic(instance.whatsapp_share_count)
 
     def get_other_share_count(self,instance):
-        return shorcountertopic(instance.other_share_count)
+        return shorcountertopic(instance.other_share_count + instance.linkedin_share_count + instance.facebook_share_count + instance.twitter_share_count)
 
     def get_total_share_count(self,instance):
         return shorcountertopic(instance.total_share_count)

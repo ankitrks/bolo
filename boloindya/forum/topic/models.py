@@ -364,25 +364,32 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
 
 
     def delete(self,is_user_deleted=False):
-        if self.is_monetized:
-            if self.language_id == '1':
-                reduce_bolo_score(self.user.id, 'create_topic_en', self, 'deleted')
-            else:
-                reduce_bolo_score(self.user.id, 'create_topic', self, 'deleted')
-        if not is_user_deleted:
-            notify_owner = Notification.objects.create(for_user_id = self.user.id ,topic = self, \
-                notification_type='7', user_id = self.user.id)
-        self.is_monetized = False
-        self.is_removed = True
-        self.save()
         try:
-            post_delete.send(sender=type(self), instance=self, created=False)
-        except Exception as e:
-            print e
-        userprofile = UserProfile.objects.filter(user = self.user)
-        if userprofile[0].vb_count and self.is_vb:
-            userprofile.update(vb_count = F('vb_count')-1)
-        return True
+            self.is_monetized = False
+            self.is_removed = True
+            self.save()
+
+            try:
+                post_delete.send(sender=type(self), instance=self, created=False)
+            except Exception as e:
+                print e
+
+            userprofile = UserProfile.objects.filter(user = self.user)
+            if userprofile[0].vb_count and self.is_vb:
+                userprofile.update(vb_count = F('vb_count')-1)
+
+            if self.is_monetized:
+                if self.language_id == '1':
+                    reduce_bolo_score(self.user.id, 'create_topic_en', self, 'deleted')
+                else:
+                    reduce_bolo_score(self.user.id, 'create_topic', self, 'deleted')
+            if not is_user_deleted:
+                notify_owner = Notification.objects.create(for_user_id = self.user.id ,topic = self, \
+                    notification_type='7', user_id = self.user.id)
+            
+            return True
+        except:
+            False
 
     def restore(self):
         self.is_removed = False
