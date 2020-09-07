@@ -1603,6 +1603,10 @@ def delete_video(request):
                         if result:
                             obj, created = VideoDelete.objects.get_or_create(user=user, video=topic)
                             return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)
+                        else:
+                            return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)
+                    else:
+                        return JsonResponse({'message': 'already deleted'}, status=status.HTTP_200_OK)
 
                 else:
                     return JsonResponse({'message': 'You can only delete a maximum of 3 videos in a month.'}, status=status.HTTP_204_NO_CONTENT)

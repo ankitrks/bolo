@@ -9,7 +9,6 @@ def run():
     j=0
     no_of_elemnts = Topic.objects.filter(is_vb=True, is_removed = False).count()
     while(j*default_batch_size<no_of_elemnts):
-        j+=1
         print "start time:", datetime.now()
         for each_vb in Topic.objects.filter(is_vb=True, is_removed = False).order_by('-id')[j*default_batch_size:default_batch_size*(j+1)]:
             all_play = VideoPlaytime.objects.filter(video_id = each_vb.id)
@@ -20,10 +19,10 @@ def run():
                 each_vb.update(vb_playtime = all_play_time['playtime__sum'])
             else:
                 each_vb.update(vb_playtime = 0)
+        j+=1
     j=0
     no_of_elemnts = UserProfile.objects.filter(is_test_user=False, is_guest_user = False).count()
     while(j*default_batch_size<no_of_elemnts):
-        j+=1
         for each_user in UserProfile.objects.filter(is_test_user=False, is_guest_user = False).order_by('-id')[j*default_batch_size:default_batch_size*(j+1)]:
             userprofile = UserProfile.objects.filter(pk=each_user.id)
             # all_spent = UserAppTimeSpend.objects.filter(user = each_user.user.id)
@@ -40,6 +39,7 @@ def run():
                 userprofile.update(total_vb_playtime = all_play_time['vb_playtime__sum'])
             else:
                 userprofile.update(total_vb_playtime = 0)
+            j+=1
 
 
 
