@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import urllib2
+import re
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
@@ -474,6 +475,18 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
         
         if not playback_url and self.question_video:
             playback_url = self.question_video
+
+        try:
+            cloufront_url = settings.US_CDN_URL
+            if 'in-boloindya' in playback_url:
+                cloufront_url = settings.IN_CDN_URL
+            regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+            find_urls_in_string = re.compile(regex, re.IGNORECASE)
+            url = find_urls_in_string.search(playback_url)
+            playback_url = str(playback_url.replace(str(url.group()), cloufront_url))
+            
+        except:
+            pass
 
         if self.media_duration:
             return format_html('<a href="javascript:void(0)" onclick="playvideo(\'' + playback_url + '\')">' + self.media_duration + '</a>' )
