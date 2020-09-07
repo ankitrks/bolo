@@ -3389,8 +3389,8 @@ def like(request):
     """
     topic_id = request.POST.get('topic_id',None)
     comment_id = request.POST.get('comment_id',None)
-    userprofile = UserProfile.objects.filter(user = request.user)
     try:
+        userprofile = UserProfile.objects.filter(user = request.user)
         if topic_id:
             liked,is_created = Like.objects.get_or_create(topic_id = topic_id,user = request.user)
             acted_obj = Topic.objects.get(pk = topic_id)
