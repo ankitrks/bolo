@@ -797,6 +797,7 @@ class SolrSearchTopic(BoloIndyaGenericAPIView):
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
         is_expand=self.request.GET.get('is_expand',False)
         last_updated=timestamp_to_datetime(self.request.GET.get('last_updated',False))
+        response = {"count": 0, "results": [], "next_page_number": None}
         if search_term:
             sqs = SearchQuerySet().models(Topic).raw_search(search_term).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
             if not sqs:
