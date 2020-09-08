@@ -391,6 +391,7 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
             id_list = []
             user_id_list = []
             for item in sqs:
+                print(item)
                 if not type(item.id) in (str, unicode):
                     continue
 
@@ -409,8 +410,8 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
             paginator = self.get_paginator(request, id_list, self.list_per_page)
             page = int(request.GET.get(PAGE_VAR, 0))
             ids = paginator.page(page+1).object_list
-
-            queryset = queryset.filter(Q(id__in=ids) | Q(user_id__in=user_id_list))
+            print(" user ids ", user_id_list)
+            queryset = queryset.filter(Q(id__in=ids) | Q(user_id__st__in=user_id_list))
 
         queryset.select_related('user', 'user__userprofile')
         return queryset, False
