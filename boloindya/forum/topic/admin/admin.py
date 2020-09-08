@@ -238,35 +238,13 @@ class LanguageMultiSelectFilter(MultiSelectFilter):
         return queryset
 
 
-class MediaDurationFilter(admin.SimpleListFilter):
-    title = 'Media Duration'
-    parameter_name = 'media_duration'
-
-    def lookups(self, request, model_admin):
-        return (
-            ('1', '< 16'),
-            ('2', '16 - 60'),
-            ('3', '> 60')
-        )
-
-    def queryset(self, request, queryset):
-        if self.value() == '1':
-            return queryset.filter(media_duration__lte='00:15')
-        elif self.value() == '2':
-            return queryset.filter(media_duration__lte='01:00', media_duration__gte='00:16')
-        elif self.value() == '3':
-            return queryset.filter(media_duration__gte='01:00')
-        return queryset
-
-
 class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExportModelAdmin" NOT "admin.ModelAdmin"
     # ordering = ['is_vb', '-id']
     ordering = ('-id',)
     list_per_page = 20
     search_fields = ('title', 'user__username', 'user__st__name', )
     list_filter = (('date', DateRangeFilter), 'is_moderated', 'is_monetized', 'is_removed', \
-            'is_popular', 'is_boosted', 'is_reported', MediaDurationFilter, ModeratedFilter, UserTypeFilter, CategoryMultiSelectFilter,\
-
+            'is_popular', 'is_boosted', 'is_reported', ModeratedFilter, UserTypeFilter, CategoryMultiSelectFilter,\
             LanguageMultiSelectFilter, 'user__st__is_superstar', 'user__st__is_popular', 'user__st__is_business')
     
     # filter_horizontal = ('m2mcategory', )
