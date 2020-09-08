@@ -634,8 +634,8 @@ class TongueTwister(models.Model):
     hash_counter = models.PositiveIntegerField(default=1,null=True,blank=True,db_index=True)
     total_views = models.PositiveIntegerField(default=0,null=True,blank=True,db_index=True)
     is_blocked = models.BooleanField(default=False)
-    is_popular = models.BooleanField(default=False)
-    popular_date = models.DateTimeField(_("Popular Date"),null=True,blank=True)
+    is_popular = models.BooleanField(default=False, db_index=True)
+    popular_date = models.DateTimeField(_("Popular Date"),null=True,blank=True, db_index=True)
     order = models.IntegerField(verbose_name=_('order'), default = 0)
 
     def __unicode__(self):
