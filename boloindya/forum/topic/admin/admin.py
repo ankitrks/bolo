@@ -119,41 +119,41 @@ class TopicChangeList(ChangeList):
         self.pk_attname = self.lookup_opts.pk.attname
 
 
-    def get_results(self, request):
-        if not hasattr(self.model_admin, 'sqs_result'):
-            return super(TopicChangeList, self).get_results(request)
+    # def get_results(self, request):
+    #     if not hasattr(self.model_admin, 'sqs_result'):
+    #         return super(TopicChangeList, self).get_results(request)
 
-        paginator = self.model_admin.get_paginator(request, self.model_admin.sqs_result, self.list_per_page)
-        # Get the number of objects, with admin filters applied.
-        result_count = paginator.count
+    #     paginator = self.model_admin.get_paginator(request, self.model_admin.sqs_result, self.list_per_page)
+    #     # Get the number of objects, with admin filters applied.
+    #     result_count = paginator.count
 
-        # Get the total number of objects, with no admin filters applied.
-        if self.model_admin.show_full_result_count:
-            full_result_count = self.root_queryset.count()
-        else:
-            full_result_count = None
-        can_show_all = result_count <= self.list_max_show_all
-        multi_page = result_count > self.list_per_page
+    #     # Get the total number of objects, with no admin filters applied.
+    #     if self.model_admin.show_full_result_count:
+    #         full_result_count = self.root_queryset.count()
+    #     else:
+    #         full_result_count = None
+    #     can_show_all = result_count <= self.list_max_show_all
+    #     multi_page = result_count > self.list_per_page
 
-        # Get the list of objects to display on this page.
-        if (self.show_all and can_show_all) or not multi_page:
-            result_list = self.model_admin.sqs_result
-        else:
-            try:
-                result_list = paginator.page(self.page_num + 1).object_list
-            except InvalidPage:
-                raise IncorrectLookupParameters
+    #     # Get the list of objects to display on this page.
+    #     if (self.show_all and can_show_all) or not multi_page:
+    #         result_list = self.model_admin.sqs_result
+    #     else:
+    #         try:
+    #             result_list = paginator.page(self.page_num + 1).object_list
+    #         except InvalidPage:
+    #             raise IncorrectLookupParameters
 
-        self.result_count = result_count
-        self.show_full_result_count = self.model_admin.show_full_result_count
-        # Admin actions are shown if there is at least one entry
-        # or if entries are not counted because show_full_result_count is disabled
-        self.show_admin_actions = not self.show_full_result_count or bool(full_result_count)
-        self.full_result_count = full_result_count
-        self.result_list = self.queryset
-        self.can_show_all = can_show_all
-        self.multi_page = multi_page
-        self.paginator = paginator
+    #     self.result_count = result_count
+    #     self.show_full_result_count = self.model_admin.show_full_result_count
+    #     # Admin actions are shown if there is at least one entry
+    #     # or if entries are not counted because show_full_result_count is disabled
+    #     self.show_admin_actions = not self.show_full_result_count or bool(full_result_count)
+    #     self.full_result_count = full_result_count
+    #     self.result_list = self.queryset
+    #     self.can_show_all = can_show_all
+    #     self.multi_page = multi_page
+    #     self.paginator = paginator
 
 from django.db.models import Q
 from django.contrib.auth.models import User
@@ -384,10 +384,10 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
                     id_list.append(_dict.get('id'))
 
 
-            paginator = self.get_paginator(request, id_list, self.list_per_page)
-            page = int(request.GET.get(PAGE_VAR, 0))
-            ids = paginator.page(page+1).object_list
-            queryset = queryset.filter(Q(id__in=ids) | Q(user_id__st__in=user_id_list))
+            # paginator = self.get_paginator(request, id_list, self.list_per_page)
+            # page = int(request.GET.get(PAGE_VAR, 0))
+            # ids = paginator.page(page+1).object_list
+            queryset = queryset.filter(Q(id__in=id_list) | Q(user_id__st__in=user_id_list))
 
         queryset.select_related('user', 'user__userprofile')
         return queryset, False
