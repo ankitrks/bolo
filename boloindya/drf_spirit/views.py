@@ -941,6 +941,7 @@ class SolrSearchUser(BoloIndyaGenericAPIView):
         page = int(request.GET.get('page',1))
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
         users = []
+        response = {"count": 0, "results": [], "next_page_number": None}
         if search_term:
             sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term)).order_by('-is_superstar','-is_popular')
             if not sqs:
