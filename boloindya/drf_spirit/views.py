@@ -951,7 +951,8 @@ class SolrSearchUser(BoloIndyaGenericAPIView):
                 sqs = SearchQuerySet().models(UserProfile).autocomplete(**{'text':search_term}).order_by('-is_superstar','-is_popular')
             if sqs:
                 result_page = get_paginated_data(sqs, int(page_size), int(page))
-                users = solr_userprofile_object_to_db_object(result_page[0].object_list)
+                if result_page[0]:
+                    users = solr_userprofile_object_to_db_object(result_page[0].object_list)
             # users = User.objects.filter( Q(username__icontains = search_term) | Q(st__name__icontains = search_term) | Q(first_name__icontains = search_term) | \
             #        Q(last_name__icontains = search_term) )
             next_page_number = page+1 if page_size*page<len(sqs) else ''
