@@ -3030,11 +3030,13 @@ def fb_profile_settings(request):
                 except Exception as e:
                     username = get_random_username()
                     user = User.objects.using('default').create(username = username)
+                    set_redis_android_id(android_did,user.id)
                     userprofile = user.st
                     is_created = True
             else:
                 username = get_random_username()
                 user = User.objects.using('default').create(username = username)
+                set_redis_android_id(android_did,user.id)
                 userprofile = user.st
                 is_created = True
             if not userprofile.is_guest_user:
@@ -3042,7 +3044,6 @@ def fb_profile_settings(request):
             if is_created:
                 update_dict = {}
                 update_dict['android_did'] = android_did
-                set_redis_android_id(android_did,user.id)
                 add_bolo_score(user.id, 'initial_signup', userprofile)
                 if user_ip:
                     user_ip_to_state_task.delay(user.id,user_ip)

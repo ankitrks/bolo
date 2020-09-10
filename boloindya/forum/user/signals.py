@@ -19,10 +19,10 @@ def update_or_create_user_profile(sender, instance, created, **kwargs):
     if created:
         userprofile = UserProfile.objects.create(user=user,slug=user.username)
         UserKYC.objects.create(user=user)
-        referral_code_obj = ReferralCode.objects.create(for_user=user,code=generate_refer_earn_code(),purpose='refer_n_earn',is_refer_earn_code=True)
-        key = "refcode:" + str(referral_code_obj.code)
-        data = {"ref_code_id":referral_code_obj.id, "is_active":referral_code_obj.is_active}
-        set_redis(key, data, False)
+        # referral_code_obj = ReferralCode.objects.create(for_user=user,code=generate_refer_earn_code(),purpose='refer_n_earn',is_refer_earn_code=True)
+        # key = "refcode:" + str(referral_code_obj.code)
+        # data = {"ref_code_id":referral_code_obj.id, "is_active":referral_code_obj.is_active}
+        # set_redis(key, data, False)
         post_save.send(sender=type(userprofile), instance=userprofile, created=True)
     else:
         post_save.send(sender=type(user.st), instance=user.st, created=False)
