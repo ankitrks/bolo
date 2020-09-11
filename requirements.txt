@@ -142,6 +142,7 @@ retry-decorator==1.1.1
 rsa==4.0
 s3transfer==0.2.0
 scandir==1.10.0
+sentry-sdk==0.17.4
 simplegeneric==0.8.1
 simplejson==3.16.0
 six==1.12.0
