@@ -30,6 +30,7 @@ from django.db.models.signals import post_save, post_delete
 from forum.topic.queryset import LastModifiedQueryset
 
 
+
 post_update = Signal()
 
 
@@ -364,6 +365,7 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
 
 
     def delete(self,is_user_deleted=False):
+        from forum.topic.utils import set_redis_removed_videos
         try:
             self.is_monetized = False
             self.is_removed = True
@@ -386,7 +388,7 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
             if not is_user_deleted:
                 notify_owner = Notification.objects.create(for_user_id = self.user.id ,topic = self, \
                     notification_type='7', user_id = self.user.id)
-            
+            set_redis_removed_videos(self.id)
             return True
         except:
             False

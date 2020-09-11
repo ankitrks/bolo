@@ -15,6 +15,7 @@ from django.db.models import F, Q
 import pandas as pd
 from django.conf import settings
 from datetime import datetime, timedelta
+from sentry_sdk import capture_exception
 
 def topic_viewed(request, topic):
     # Todo test detail views
@@ -421,4 +422,47 @@ def delete_redis_fcm_token(user_id):
     key = 'bi:fcm_token:'+str(user_id)
     delete_redis(key)
 
+def get_redis_hashtag_paginated_data_with_json(language_id, hashtag_id, page_no, last_updated, is_expand):
+    try:
+        if not page_no:
+            page_no = 1
+        key = 'serialized:hashtag:'+str(hashtag_id)+':lang:'+str(language_id)+':page:'+str(page_no)
+        paginated_data = get_redis(key)
+        if not paginated_data:
+            paginated_data = set_redis_hashtag_paginated_data_with_json(key, language_id, hashtag_id, page_no, last_updated, is_expand)
+        return filter_removed_videos_from_hashtag_paginated_data(paginated_data)
+    except Exception as e:
+        print(e)
+        capture_exception(e)
+
+def set_redis_hashtag_paginated_data_with_json(key, language_id, hashtag_id, page_no, last_updated, is_expand):
+    from drf_spirit.serializers import CategoryVideoByteSerializer
+    try:
+        topics = get_redis_hashtag_paginated_data(language_id,hashtag_id,page_no)
+        paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
+        page = 1
+        topic_page = paginator.page(page)
+        video_data = CategoryVideoByteSerializer(topics[:settings.REST_FRAMEWORK['PAGE_SIZE']], many=True,context={'last_updated': last_updated,'is_expand':is_expand}).data
+        set_redis(key, video_data, False)
+        return video_data
+    except Exception as e:
+        print(e)
+        capture_exception(e)
+
+def set_redis_removed_videos(topic_id):
+    try:
+        key = "removed:video:"+str(topic_id)
+        set_redis(key, topic_id, True, 10800)
+    except Exception as e:
+        print(e)
+        capture_exception(e)
+
+def filter_removed_videos_from_hashtag_paginated_data(hashtag_data):
+    try:
+        removed_videos_redis_keys = redis_cli.keys("bi:removed:video:*")
+        removed_videos_data = redis_cli.mget(removed_videos_redis_keys)
+        return list(filter(lambda x:str(x['id']) not in removed_videos_data, hashtag_data))
+    except Exception as e:
+        print(e)
+        capture_exception(e)
 

@@ -20,9 +20,11 @@ def get_redis(key):
         return None
 
 
-def set_redis(key, value, set_expiry=True):
+def set_redis(key, value, set_expiry=True, expiry_time=None):
     try:
         if set_expiry:
+            if expiry_time:
+                return redis_cli.setex("bi:"+key, expiry_time, json.dumps(value, cls=DjangoJSONEncoder))
             if 'userprofile_counter' in key or 'lifetime_bolo_info' in key or 'last_month_bolo_info' in key or 'current_month_bolo_info' in key:
                 return redis_cli.setex("bi:"+key, settings.USER_DATA_REDIS_EXPIRY_TIME, json.dumps(value, cls=DjangoJSONEncoder))
             return redis_cli.setex("bi:"+key, settings.REDIS_EXPIRY_TIME, json.dumps(value, cls=DjangoJSONEncoder))
