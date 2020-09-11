@@ -8,7 +8,7 @@ from forum.user.utils.follow_redis import *
 from forum.topic.utils import *
 
 def run():
-    duplicate_userprofile = UserProfile.objects.exclude(Q(android_did = '')|Q(android_did__isnull=True)).values('android_did').annotate(Count('user_id')).filter(user_id__count__gt=1).order_by('-user_id__count')
+    duplicate_userprofile = UserProfile.objects.exclude(Q(android_did = '')|Q(android_did__isnull=True)).exclude(android_did__icontains='duplicate').values('android_did').annotate(Count('user_id')).filter(user_id__count__gt=1).order_by('-user_id__count')
     length_of_duplicate = len(duplicate_userprofile)
     print "total duplicate ocurrence:",length_of_duplicate
     counter = 1
