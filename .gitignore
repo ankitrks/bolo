@@ -54,6 +54,8 @@ solr/server/logs/
 local_settings.py
 settings_local.py
 manage_local.py
+settings_prod.py
+manage_prod.py
 db.sqlite3
 static/
 solr/server/solr/boloindya/data/
