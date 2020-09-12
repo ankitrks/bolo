@@ -1180,6 +1180,10 @@ def old_home(request):
 
 #====================New Home =============================
 def new_home_updated(request):
+
+    if hasattr(settings, 'IS_JAVIS_SERVER') and settings.IS_JAVIS_SERVER:
+        return redirect('/jarvis/')
+
     categories = []
     hash_tags = []
     topics = []

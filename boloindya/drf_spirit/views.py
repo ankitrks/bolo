@@ -808,7 +808,8 @@ class SolrSearchTopic(BoloIndyaGenericAPIView):
                 sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
             if sqs:
                 result_page = get_paginated_data(sqs, int(page_size), int(page))
-                topics = solr_object_to_db_object(result_page[0].object_list)
+                if result_page[0]:
+                    topics = solr_object_to_db_object(result_page[0].object_list)
             # topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True, language_id=language_id)
             next_page_number = page+1 if page_size*page<len(sqs) else ''
             if language_id:
@@ -941,6 +942,7 @@ class SolrSearchUser(BoloIndyaGenericAPIView):
         page = int(request.GET.get('page',1))
         page_size = self.request.GET.get('page_size', settings.REST_FRAMEWORK['PAGE_SIZE'])
         users = []
+        response = {"count": 0, "results": [], "next_page_number": None}
         if search_term:
             sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term)).order_by('-is_superstar','-is_popular')
             if not sqs:
@@ -951,7 +953,8 @@ class SolrSearchUser(BoloIndyaGenericAPIView):
                 sqs = SearchQuerySet().models(UserProfile).autocomplete(**{'text':search_term}).order_by('-is_superstar','-is_popular')
             if sqs:
                 result_page = get_paginated_data(sqs, int(page_size), int(page))
-                users = solr_userprofile_object_to_db_object(result_page[0].object_list)
+                if result_page[0]:
+                    users = solr_userprofile_object_to_db_object(result_page[0].object_list)
             # users = User.objects.filter( Q(username__icontains = search_term) | Q(st__name__icontains = search_term) | Q(first_name__icontains = search_term) | \
             #        Q(last_name__icontains = search_term) )
             next_page_number = page+1 if page_size*page<len(sqs) else ''
@@ -3030,11 +3033,13 @@ def fb_profile_settings(request):
                 except Exception as e:
                     username = get_random_username()
                     user = User.objects.using('default').create(username = username)
+                    set_redis_android_id(android_did,user.id)
                     userprofile = user.st
                     is_created = True
             else:
                 username = get_random_username()
                 user = User.objects.using('default').create(username = username)
+                set_redis_android_id(android_did,user.id)
                 userprofile = user.st
                 is_created = True
             if not userprofile.is_guest_user:
@@ -3042,7 +3047,6 @@ def fb_profile_settings(request):
             if is_created:
                 update_dict = {}
                 update_dict['android_did'] = android_did
-                set_redis_android_id(android_did,user.id)
                 add_bolo_score(user.id, 'initial_signup', userprofile)
                 if user_ip:
                     user_ip_to_state_task.delay(user.id,user_ip)
