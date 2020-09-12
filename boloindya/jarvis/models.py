@@ -68,7 +68,7 @@ import json
 from datetime import datetime
 
 class FCMDevice(AbstractDevice):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='%(app_label)s_%(class)s_user',editable=False, db_index=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='%(app_label)s_%(class)s_user',editable=False)
     device_type = models.CharField(choices=device_options, blank = True, null = True, max_length=10, default='0')
     created_at=models.DateTimeField(auto_now=False,auto_now_add=False,blank=False,null=False, default=datetime.now) # auto_now will add the current time and date whenever field is saved.
     last_modified=models.DateTimeField(auto_now=True,auto_now_add=False)                     # while auto_now_add will save the date and time only when record is first created

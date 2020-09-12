@@ -2,8 +2,6 @@
 
 from __future__ import unicode_literals
 
-from django.apps import apps
-
 from ..comment.bookmark.models import CommentBookmark
 from .notification.models import TopicNotification
 from .unread.models import TopicUnread
@@ -33,31 +31,11 @@ def topic_viewed(request, topic):
     topic.increase_view_count()
 
 def get_redis_vb_seen(user_id):
-    userprofile = UserProfile.objects.filter(user_id=user_id).values('user_id', 'android_did')
-
-    if not len(userprofile):
-        return []
-
-    userprofile = userprofile[0]
-    FCMDevice = apps.get_model('jarvis', 'FCMDevice')
-
-    if userprofile.get('android_did'):
-        user_ids = [user_id] + list(FCMDevice.objects.filter(dev_id=userprofile.get('android_did')).values_list('user_id', flat=True))
-
-    else:
-        user_ids = [user_id] + list(UserProfile.objects.filter(android_did__in=FCMDevice.objects \
-                    .filter(user_id=user_id).values_list('dev_id', flat=True)) \
-                        .values_list('user_id', flat=True))
-
-    keys = ['vb_seen:'+str(u_id) for u_id in user_ids]
-    vb_seen_list = []
-
-    for _list in mget_redis(keys):
-        vb_seen_list += _list
-
+    key = 'vb_seen:'+str(user_id)
+    vb_seen_list = get_redis(key)
     if not vb_seen_list:
-        vb_seen_list = list(VBseen.objects.filter(user_id__in = user_ids).distinct('topic_id').values_list('topic_id', flat = True))
-        set_redis(keys[0], vb_seen_list, False)
+        vb_seen_list = list(VBseen.objects.filter(user_id = user_id).distinct('topic_id').values_list('topic_id', flat = True))
+        set_redis(key, vb_seen_list, False)
     return vb_seen_list
 
 def update_redis_vb_seen(user_id, topic_id):

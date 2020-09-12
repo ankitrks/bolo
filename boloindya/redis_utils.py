@@ -20,16 +20,6 @@ def get_redis(key):
         return None
 
 
-def mget_redis(keys):
-    try:
-        updated_keys = ['bi:%s'%key for key in keys]
-        data_list = redis_cli.mget(updated_keys)
-        return [json.loads(data)  for data in data_list if data]
-    except Exception as e:
-        logger.exception("While mgetting data for redis: %s "%str(e))
-        return []
-
-
 def set_redis(key, value, set_expiry=True):
     try:
         if set_expiry:
