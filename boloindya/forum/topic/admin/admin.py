@@ -109,7 +109,6 @@ class TopicChangeList(ChangeList):
 
         self.query = request.GET.get(SEARCH_VAR, '')
         self.queryset = self.get_queryset(request)
-        print("query", self.queryset.query.sql_with_params())
         self.get_results(request)
 
         if self.is_popup:
