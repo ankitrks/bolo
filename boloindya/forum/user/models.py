@@ -37,7 +37,7 @@ refrence_options = (
 
 
 class UserProfile(models.Model,ModelDiffMixin):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, verbose_name=_("profile"), related_name='st', editable=False, db_index=True)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, verbose_name=_("profile"), related_name='st', editable=False)
     slug = models.CharField(_("slug"), max_length=100, db_index=True, blank=True)
     location = models.CharField(_("location"), max_length=75, blank=True)
     last_seen = models.DateTimeField(_("last seen"), auto_now=True)
@@ -101,7 +101,7 @@ class UserProfile(models.Model,ModelDiffMixin):
     state_name = models.CharField(_('State Name'),max_length=200,null=True,blank=True)
     city_name = models.CharField(_('City Name'),max_length=200,null=True,blank=True)
     paytm_number = models.CharField(_("Mobile No"), max_length=100, blank = True, null = True)
-    android_did = models.CharField(_('android_did'),max_length=200,null=True,blank=True, db_index=True)
+    android_did = models.CharField(_('android_did'),max_length=200,null=True,blank=True)
     is_guest_user = models.BooleanField(default=False)
     boost_views_count = models.PositiveIntegerField(_("Boost View"), null=True, blank=True, default=0)
     boost_like_count = models.PositiveIntegerField(_("Boost Like"), null=True, blank=True, default=0)
