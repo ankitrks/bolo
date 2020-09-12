@@ -19,10 +19,20 @@ def get_redis(key):
         logger.exception("in get_redis " + str(e))
         return None
 
+def mget_redis(keys):
+    try:
+        updated_keys = ['bi:%s'%key for key in keys]
+        data_list = redis_cli.mget(updated_keys)
+        return [json.loads(data)  for data in data_list if data]
+    except Exception as e:
+        logger.exception("While mgetting data for redis: %s "%str(e))
+        return []
 
-def set_redis(key, value, set_expiry=True):
+def set_redis(key, value, set_expiry=True, expiry_time=None):
     try:
         if set_expiry:
+            if expiry_time:
+                return redis_cli.setex("bi:"+key, expiry_time, json.dumps(value, cls=DjangoJSONEncoder))
             if 'userprofile_counter' in key or 'lifetime_bolo_info' in key or 'last_month_bolo_info' in key or 'current_month_bolo_info' in key:
                 return redis_cli.setex("bi:"+key, settings.USER_DATA_REDIS_EXPIRY_TIME, json.dumps(value, cls=DjangoJSONEncoder))
             return redis_cli.setex("bi:"+key, settings.REDIS_EXPIRY_TIME, json.dumps(value, cls=DjangoJSONEncoder))
