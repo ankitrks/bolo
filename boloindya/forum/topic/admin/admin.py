@@ -109,6 +109,7 @@ class TopicChangeList(ChangeList):
 
         self.query = request.GET.get(SEARCH_VAR, '')
         self.queryset = self.get_queryset(request)
+        print("query", self.queryset.query.sql_with_params())
         self.get_results(request)
 
         if self.is_popup:
@@ -217,7 +218,7 @@ class CategoryMultiSelectFilter(MultiSelectFilter):
     def queryset(self, request, queryset):
         if self.value():
             categories = Category.objects.filter(id__in=self.value().split(','))
-            return queryset.filter(category__in=categories)
+            return queryset.filter(m2mcategory__in=categories)
 
         return queryset
 
