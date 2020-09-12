@@ -273,6 +273,10 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
     #     if db_field.name == "last_moderated_by":
     #         kwargs["queryset"] = User.objects.filter(Q(is_staff = True) | Q(is_superuser = True))
     #     return super(TopicAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+    def dispatch(self, *args, **kwargs):
+        print("here ")
+        return super(TopicAdmin, self).dispatch(*args, **kwargs)
+
 
     def get_changelist(self, request, **kwargs):
         return TopicChangeList
@@ -362,31 +366,27 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
         elif search_term.startswith('n:'):
             queryset = queryset.filter(title__icontains = search_term.replace('n:', '')).exclude(hash_tags__hash_tag__icontains = search_term.replace('n:', ''))
         elif search_term:
-            sqs = SearchQuerySet().models(Topic, UserProfile).raw_search(search_term)[:100]
+            user_sqs = SearchQuerySet().models(UserProfile).raw_search(search_term) \
+                                .order_by('-is_superstar').order_by('-is_popular').values('id', 'is_superstar',
+                                    'is_popular', 'name')[:100]
+            topic_sqs = SearchQuerySet().models(Topic).raw_search(search_term).values('id')[:100]
 
             self.sqs_result = []
             self.sqs_result_dict = {}
             id_list = []
             user_id_list = []
-            for item in sqs:
-                if not type(item.id) in (str, unicode):
+            for item in topic_sqs:
+                if not type(item.get('id')) in (str, unicode):
                     continue
 
-                split_data = item.id.split('.')
+                id_list.append(item.get('id').split('.')[-1])
 
-                if split_data[1] == 'userprofile':
-                    user_id_list.append(int(split_data[-1]))
-                else:
-                    _dict = {'id':int(split_data[-1]), 'score': item.score}
+            for item in user_sqs:
+                if not type(item.get('id')) in (str, unicode):
+                    continue
 
-                    self.sqs_result_dict[_dict.get('id')] = _dict.get('score')
-                    self.sqs_result.append(_dict)
-                    id_list.append(_dict.get('id'))
+                user_id_list.append(item.get('id').split('.')[-1])
 
-
-            # paginator = self.get_paginator(request, id_list, self.list_per_page)
-            # page = int(request.GET.get(PAGE_VAR, 0))
-            # ids = paginator.page(page+1).object_list
             queryset = queryset.filter(Q(id__in=id_list) | Q(user_id__st__in=user_id_list))
 
         queryset.select_related('user', 'user__userprofile')
