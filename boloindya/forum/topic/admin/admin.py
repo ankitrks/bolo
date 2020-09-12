@@ -273,10 +273,6 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
     #     if db_field.name == "last_moderated_by":
     #         kwargs["queryset"] = User.objects.filter(Q(is_staff = True) | Q(is_superuser = True))
     #     return super(TopicAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
-    def dispatch(self, *args, **kwargs):
-        print("here ")
-        return super(TopicAdmin, self).dispatch(*args, **kwargs)
-
 
     def get_changelist(self, request, **kwargs):
         return TopicChangeList
