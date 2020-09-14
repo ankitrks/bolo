@@ -10,6 +10,7 @@ import boto3
 from botocore.exceptions import NoCredentialsError
 from boto3.s3.transfer import S3Transfer
 from django.http import HttpResponse, HttpRequest, JsonResponse
+from django.db import connections
 import json
 import string
 import random
@@ -1638,6 +1639,48 @@ def months_between(start_date, end_date):
         cursor += timedelta(weeks=1)
     return months
 
+
+
+def get_video_create_stats(start_date, end_date, group_by, language_id=None, category_id=None):
+    date_column = "created_at::date"
+    date_format_column = "to_char(A.timeframe, 'DD-Mon-YYYY')"
+    where_clause = "created_at between %s and %s"
+    params = [start_date, end_date]
+
+    if group_by == 'weekly':
+        date_column = "date_trunc('week', created_at)"
+        date_format_column = "concat('Week ', to_char(A.timeframe, 'WW'))"
+    elif group_by == 'monthly':
+        date_column = "date_trunc('month', created_at)"
+        date_format_column = "to_char(A.timeframe, 'Mon-YYYY')"
+
+
+    from_clause = 'from forum_topic_topic tp'
+
+    if category_id:
+        from_clause += ' inner join forum_topic_topic_m2mcategory tc on tc.topic_id = tp.id '
+        where_clause += ' and tc.category_id = %s '
+        params.append(category_id)
+
+    if language_id and language_id != '0':
+        where_clause += ' and language_id = %s '
+        params.append(language_id)
+
+    query = """ SELECT %s, A.count FROM (
+                    SELECT %s as timeframe, count(1) as count %s 
+                    WHERE %s GROUP BY %s
+                ) AS A 
+                ORDER BY A.timeframe
+            """%(date_format_column, date_column, 
+                        from_clause, where_clause, date_column)
+
+    with connections['default'].cursor() as cr:
+        cr.execute(query, params)
+
+        return cr.fetchall()
+
+
+
 @login_required
 def statistics_all(request):
     metrics_options_live = (
@@ -1852,6 +1895,9 @@ def statistics_all_jarvis(request):
             temp_list.append(  VideoPlaytime.objects.filter(timestamp__gte=top_start, timestamp__lte=top_end)\
                 .aggregate(Sum('playtime'))['playtime__sum'])        
             
+        elif(each_opt[0] == '0'):
+            temp_list.append(Topic.objects.filter(created_at__gte=top_start, created_at__lte=top_end).count())
+
         else:
             temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0])\
                 .aggregate(total_count = Sum('count'))['total_count'] )
@@ -1886,9 +1932,19 @@ def statistics_all_jarvis(request):
             graph_data = graph_data.filter(metrics_language_options = language_choice) 
 
         if category_choice:
-            graph_data = graph_data.filter(category_id = category_choice)    
+            graph_data = graph_data.filter(category_id = category_choice)  
 
-    if data_view == 'weekly':
+
+    if metrics == '0':
+        x_axis = []
+        y_axis = []
+
+        for row in get_video_create_stats(start_date, end_date, data_view, language_choice, category_choice):
+            x_axis.append(str(row[0]))
+            y_axis.append(int(row[1]))
+
+
+    elif data_view == 'weekly':
         x_axis = []
         y_axis = []
         week_no = sorted(list(set(list(graph_data.order_by('week_no').values_list('week_no', flat = True)))))
@@ -1976,7 +2032,7 @@ def statistics_all_jarvis(request):
         data['slabs'] = [metrics_slab_options[3], metrics_slab_options[4], metrics_slab_options[5]]
     if metrics == '5':
         data['slabs'] = [metrics_slab_options[6], metrics_slab_options[7], metrics_slab_options[8]]
-    if metrics in ['9', '12', '1', '7']:
+    if metrics in ['9', '12', '1', '7', '0']:
         data['language_filter'] = metrics_language_options 
         data['category_filter'] = category_slab_options
           
@@ -2074,7 +2130,17 @@ def get_csv_data(request):
                 print("api p3 working fine....")
                 graph_data = graph_data.filter(Q(metrics_language_options = lang_sel) & Q(category_id = categ_sel))
 
-            if view_sel == 'weekly':
+            if metrics_sel == '0':
+                x_axis = []
+                y_axis = []
+
+                for row in get_video_create_stats(sdate, edate, view_sel, lang_sel, categ_sel):
+                    x_axis.append(str(row[0]))
+                    y_axis.append(int(row[1]))
+
+
+
+            elif view_sel == 'weekly':
                 x_axis = []
                 y_axis = []
                 week_no = sorted(list(set(list(graph_data.order_by('week_no').values_list('week_no', flat = True)))))
