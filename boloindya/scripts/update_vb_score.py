@@ -8,7 +8,7 @@ from redis_utils import *
 from jarvis.models import FCMDevice
 from django.conf import settings 
 from forum.topic.utils import update_redis_hashtag_paginated_data, update_redis_paginated_data ,new_algo_update_redis_paginated_data
-
+from scripts import update_serialized_hashtag_paginated_data
 def run():
     calculate_all_vb_score_and_set_post_in_redis()
 
@@ -68,7 +68,10 @@ def calculate_all_vb_score_and_set_post_in_redis():
     #         end = datetime.now()
     #         print 'Runtime: Language ' + str(each_language[1]) + ' is ' + str(end - start)
     #         print "\n\n\n\n"
+    update_serialized_hashtag_paginated_data.run()
+    print 'update_serialized_hashtag_paginated_data Done'
     print 'Runtime Language Total is ' + str(datetime.now() - start_total)
     print 'total script run time :', str(datetime.now() - now)
+
 
 
