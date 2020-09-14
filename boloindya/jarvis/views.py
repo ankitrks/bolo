@@ -1680,6 +1680,106 @@ def get_video_create_stats(start_date, end_date, group_by, language_id=None, cat
         return cr.fetchall()
 
 
+def get_video_creator_stats(start_date, end_date, group_by, language_id=None, category_id=None):
+    date_column = "created_at::date"
+    date_format_column = "to_char(A.timeframe, 'DD-Mon-YYYY')"
+    where_clause = "created_at between %s and %s"
+    params = [str(start_date) + ' 00:00:00', str(end_date) + ' 23:59:59']
+
+    if group_by == 'weekly':
+        date_column = "date_trunc('week', created_at)"
+        date_format_column = "concat('Week ', to_char(A.timeframe, 'WW'))"
+    elif group_by == 'monthly':
+        date_column = "date_trunc('month', created_at)"
+        date_format_column = "to_char(A.timeframe, 'Mon-YYYY')"
+
+
+    from_clause = 'from forum_topic_topic tp'
+
+    if category_id:
+        from_clause += ' inner join forum_topic_topic_m2mcategory tc on tc.topic_id = tp.id '
+        where_clause += ' and tc.category_id = %s '
+        params.append(category_id)
+
+    if language_id and language_id != '0':
+        where_clause += ' and language_id = %s '
+        params.append(language_id)
+
+    query = """ SELECT %s, A.count FROM (
+                    SELECT %s as timeframe, count(distinct user_id) as count %s 
+                    WHERE %s GROUP BY %s
+                ) AS A 
+                ORDER BY A.timeframe
+            """%(date_format_column, date_column, 
+                        from_clause, where_clause, date_column)
+
+    with connections['default'].cursor() as cr:
+        print(" == = ", cr.mogrify(query, params))
+        cr.execute(query, params)
+
+        return cr.fetchall()
+
+
+
+def get_video_new_creator_stats(start_date, end_date, group_by, language_id=None, category_id=None):
+    date_column = "created_at::date"
+    date_format_column = "to_char(C.timeframe, 'DD-Mon-YYYY')"
+
+    if group_by == 'weekly':
+        date_column = "date_trunc('week', created_at)"
+        date_format_column = "concat('Week ', to_char(C.timeframe, 'WW'))"
+    elif group_by == 'monthly':
+        date_column = "date_trunc('month', created_at)"
+        date_format_column = "to_char(C.timeframe, 'Mon-YYYY')"
+
+
+    from_clause = """
+        FROM 
+            (SELECT tp.id, tp.created_at, tp.user_id
+            %s
+            WHERE %s ) AS A
+        LEFT JOIN
+            (SELECT distinct user_id
+            FROM forum_topic_topic tp
+            WHERE %s ) AS  B on A.user_id =B.user_id
+        """
+
+    where_clause_1 = " created_at between %s and %s "
+    where_clause_2 = " created_at < %s "
+
+    params_1 = [str(start_date) + ' 00:00:00', str(end_date) + ' 23:59:59']
+    params_2 = [str(start_date) + ' 00:00:00']
+
+    internal_from_clause = "FROM forum_topic_topic tp"
+
+    if category_id:
+        internal_from_clause += ' inner join forum_topic_topic_m2mcategory tc on tc.topic_id = tp.id '
+        where_clause_1 += ' and tc.category_id = %s '
+        params_1.append(category_id)
+
+    if language_id and language_id != '0':
+        where_clause_1 += ' and language_id = %s '
+        params_1.append(language_id)
+
+
+    from_clause_updated = from_clause % (internal_from_clause, where_clause_1, where_clause_2)
+
+    query = """ SELECT %s, C.count FROM (
+                    SELECT %s as timeframe, count(distinct A.user_id) as count %s 
+                    GROUP BY %s
+                ) AS C 
+                ORDER BY C.timeframe
+            """%(date_format_column, date_column, 
+                        from_clause_updated, date_column)
+
+    with connections['default'].cursor() as cr:
+        print(" == = ", cr.mogrify(query, params_1 + params_2))
+        cr.execute(query, params_1 + params_2)
+
+        return cr.fetchall()
+
+
+
 
 @login_required
 def statistics_all(request):
@@ -1884,12 +1984,25 @@ def statistics_all_jarvis(request):
 
 
         elif(each_opt[0] == '4'):
-            temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0], metrics_slab__in = ['0', '1', '2', '9'], metrics_language_options = '0')\
-                .aggregate(total_count = Sum('count'))['total_count'] )
+            with connections['default'].cursor() as cr:
+                cr.execute("""
+                    SELECT count(distinct A.user_id) 
+                    FROM    
+                        (SELECT created_at, user_id
+                        from forum_topic_topic tp
+                        where created_at between %s and %s) AS A
+                    LEFT JOIN
+                        (SELECT distinct user_id
+                        from forum_topic_topic tp
+                        WHERE created_at::date < %s ) AS  B on A.user_id =B.user_id
+                    WHERE B.user_id is null
+                """, [top_start, top_end, top_start])
+                temp_list.append(cr.fetchall()[0][0])
+
+            
 
         elif(each_opt[0] == '9'):
-            temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0], metrics_language_options = '0')\
-                .aggregate(total_count = Sum('count'))['total_count'] )
+            temp_list.append(Topic.objects.filter(created_at__gte=top_start, created_at__lte=top_end).distinct('user_id').count())
 
         elif(each_opt[0] == '12'):
             temp_list.append(  VideoPlaytime.objects.filter(timestamp__gte=top_start, timestamp__lte=top_end)\
@@ -1898,9 +2011,9 @@ def statistics_all_jarvis(request):
         elif(each_opt[0] == '0'):
             temp_list.append(Topic.objects.filter(created_at__gte=top_start, created_at__lte=top_end).count())
 
-        else:
-            temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0])\
-                .aggregate(total_count = Sum('count'))['total_count'] )
+        # else:
+        #     temp_list.append( DashboardMetricsJarvis.objects.exclude(date__gt = top_end).filter(date__gte = top_start, metrics = each_opt[0])\
+        #         .aggregate(total_count = Sum('count'))['total_count'] )
         
 
         top_data.append(temp_list) 
@@ -1943,6 +2056,22 @@ def statistics_all_jarvis(request):
             x_axis.append(str(row[0]))
             y_axis.append(int(row[1]))
 
+    elif metrics == '9':
+        x_axis = []
+        y_axis = []
+
+        for row in get_video_creator_stats(start_date, end_date, data_view, language_choice, category_choice):
+            x_axis.append(str(row[0]))
+            y_axis.append(int(row[1]))
+
+    elif metrics == '4':
+        x_axis = []
+        y_axis = []
+
+        for row in get_video_new_creator_stats(start_date, end_date, data_view, language_choice, category_choice):
+            x_axis.append(str(row[0]))
+            y_axis.append(int(row[1]))
+        
 
     elif data_view == 'weekly':
         x_axis = []
@@ -2025,7 +2154,7 @@ def statistics_all_jarvis(request):
     data['language_filter'] = []
     data['category_filter'] = []
     if metrics == '4':
-        data['slabs'] = [metrics_slab_options[0], metrics_slab_options[1], metrics_slab_options[2], metrics_slab_options[9]]
+        # data['slabs'] = [metrics_slab_options[0], metrics_slab_options[1], metrics_slab_options[2], metrics_slab_options[9]]
         data['language_filter'] = metrics_language_options
         data['category_filter'] = category_slab_options
     if metrics == '2':
@@ -2138,6 +2267,23 @@ def get_csv_data(request):
                     x_axis.append(str(row[0]))
                     y_axis.append(int(row[1]))
 
+            elif metrics_sel == '4':
+                x_axis = []
+                y_axis = []
+
+                for row in get_video_new_creator_stats(sdate, edate, view_sel, lang_sel, categ_sel):
+                    x_axis.append(str(row[0]))
+                    y_axis.append(int(row[1]))
+                
+
+            elif metrics_sel == '9':
+                x_axis = []
+                y_axis = []
+
+                for row in get_video_creator_stats(sdate, edate, view_sel, lang_sel, categ_sel):
+                    x_axis.append(str(row[0]))
+                    y_axis.append(int(row[1]))
+                
 
 
             elif view_sel == 'weekly':
