@@ -10,9 +10,9 @@ class LastModifiedQueryset(models.query.QuerySet):
             for each_instance in self:
                 try:
                     if each_instance.is_removed:
-                        pass # post_delete.send(sender=type(each_instance), instance=each_instance, created=False)
+                        post_delete.send(sender=type(each_instance), instance=each_instance, created=False)
                     else:
-                        pass # post_save.send(sender=type(each_instance), instance=each_instance, created=False)
+                        post_save.send(sender=type(each_instance), instance=each_instance, created=False)
                 except Exception as e:
                     print e
         except Exception as e:

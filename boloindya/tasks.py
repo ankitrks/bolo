@@ -16,7 +16,7 @@ logger = get_task_logger(__name__)
 @app.task
 def topic_indexing_signal(topic_id):
     from forum.topic.models import Topic
-    from django.db.models.signals import  post_save, pos_delete
+    from django.db.models.signals import  post_save, post_delete
     topic = Topic.objects.get(pk=topic_id)
     try:
         if topic.is_removed:
