@@ -12,6 +12,7 @@ from forum.topic.models import Topic, Notification, ShareTopic, CricketMatch, Po
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 from datetime import datetime,timedelta
 from forum.user.utils.bolo_redis import update_profile_counter
+from tasks import update_profile_counter_task
 # from django.db import connection
 from haystack.query import SearchQuerySet, SQ
 from django.utils.translation import ugettext_lazy as _
@@ -415,10 +416,10 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
             obj.is_removed = form.cleaned_data['is_removed']
             if obj.is_removed:
                 obj.delete()
-                update_profile_counter(obj.user_id,'video_count',1, False)
+                update_profile_counter_task.delay(obj.user_id,'video_count',1, False)
             else:
                 obj.restore()
-                update_profile_counter(obj.user_id,'video_count',1, True)
+                update_profile_counter_task.delay(obj.user_id,'video_count',1, True)
         
         if 'is_boosted' in form.changed_data or 'boosted_till' in form.changed_data:
             if 'is_boosted' in form.changed_data:
