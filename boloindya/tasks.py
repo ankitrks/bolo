@@ -13,7 +13,18 @@ from datetime import datetime, timedelta
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings_local")
 logger = get_task_logger(__name__)
 
-
+@app.task
+def topic_indexing_signal(topic_id):
+    from forum.topic.models import Topic
+    from django.db.models.signals import  post_save, pos_delete
+    topic = Topic.objects.get(pk=topic_id)
+    try:
+        if topic.is_removed:
+            post_delete.send(sender=type(topic), instance=topic, created=False, from_celery = True)
+        else:
+            post_save.send(sender=type(topic), instance=topic, created=False, from_celery = True)
+    except Exception as e:
+        print e
 
 @app.task
 def vb_create_task(topic_id):

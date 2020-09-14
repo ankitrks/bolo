@@ -10,11 +10,13 @@ post_update = Signal()
 from forum.user.utils.follow_redis import get_redis_following
 
 @receiver(post_save, sender=Topic)
-def save_topic(sender, instance, created, **kwargs):
+def save_topic(sender, instance, created, from_celery = False, **kwargs):
     try:
         if created:
             create_topic_notification.delay(created,instance.id)
             create_thumbnail_cloudfront.delay(instance.id)
+        if not from_celery:
+            topic_indexing_signal.delay(instance.id)
     except Exception as e:
         pass
 

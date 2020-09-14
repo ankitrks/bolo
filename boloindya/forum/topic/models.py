@@ -371,10 +371,10 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
             self.is_removed = True
             self.save()
 
-            try:
-                post_delete.send(sender=type(self), instance=self, created=False)
-            except Exception as e:
-                print e
+            #try:
+            #    post_delete.send(sender=type(self), instance=self, created=False)
+            #except Exception as e:
+            #    print e
 
             userprofile = UserProfile.objects.filter(user = self.user)
             if userprofile[0].vb_count and self.is_vb:
@@ -573,12 +573,12 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
                     data[value] = self.get_field_diff(value)[1]
                 data['last_modified'] = datetime.now()
                 Topic.objects.filter(pk=self.pk).update(**data)
-                try:
-                    post_save.send(sender=type(self), instance=self, created=False)
-                    if self.is_removed:
-                        post_delete.send(sender=type(self), instance=self, created=False)
-                except Exception as e:
-                    print e
+                #try:
+                #    post_save.send(sender=type(self), instance=self, created=False)
+                #    if self.is_removed:
+                #        post_delete.send(sender=type(self), instance=self, created=False)
+                #except Exception as e:
+                #    print e
             except Exception as e:
                 super(Topic , self).save()
         else:
