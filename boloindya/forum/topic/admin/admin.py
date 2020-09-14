@@ -58,7 +58,7 @@ from django.utils.encoding import force_text
 import newrelic.agent
 
 newrelic.agent.initialize()
-application = newrelic.agent.register_application(timeout=10.0)
+application = newrelic.agent.register_application()
 
 
 class TopicChangeList(ChangeList):
@@ -71,7 +71,7 @@ class TopicChangeList(ChangeList):
         #     list_per_page, list_max_show_all, list_editable, model_admin)
         # action_checkbox
 
-        newrelic.agent.set_transaction_name("Topic", "Admin Panel")
+        newrelic.agent.set_transaction_name("/Admin/Topic/GET", "Admin Panel")
 
         self.list_display = ('vb_list', 'id', 'title', 'name', 'duration', 'show_thumbnail', 'language_id', 'playtime', 'imp_count',\
             'date', 'is_moderated', 'is_removed', 'is_pubsub_popular_push', 'is_boosted', 'boosted_till', 'm2mcategory') #is_popular
@@ -390,6 +390,7 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
         return queryset, False
 
     def save_model(self, request, obj, form, change):
+        newrelic.agent.set_transaction_name("/Admin/Topic/POST", "Admin Panel")
         if 'title' in form.changed_data:
             obj.title = form.cleaned_data['title']
         if 'language_id' in form.changed_data:
