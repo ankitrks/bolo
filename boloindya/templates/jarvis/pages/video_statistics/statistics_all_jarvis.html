@@ -112,7 +112,9 @@
         <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
         <a href="?metrics={{ top_data.0.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.0.1 }}</h6><h5 style="color: #b52828">{{ top_data.0.2|intcomma }}</h5></a>
         </div>
-
+        {% comment %}
+            
+        
         <div class ="top_box" {% if metrics == top_data.1.0 %} style = "background: bisque;"{%endif %}>
         <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
         <a href="?metrics={{ top_data.1.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.1.1 }}</h6><h5 style="color: #b52828">{{ top_data.1.2|intcomma }}</h5></a>
@@ -127,12 +129,14 @@
         <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
         <a href="?metrics={{ top_data.3.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.3.1 }}</h6><h5 style="color: #b52828">{{ top_data.3.2|intcomma }}</h5></a>
         </div>
-
+        {% endcomment %}
         <div class ="top_box" {% if metrics == top_data.4.0 %} style = "background: bisque;"{%endif %}>
         <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
         <a href="?metrics={{ top_data.4.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.4.1 }}</h6><h5 style="color: #b52828">{{ top_data.4.2|intcomma }}</h5></a>
         </div>
-
+        {% comment %}
+            
+        
         <div class ="top_box" {% if metrics == top_data.5.0 %} style = "background: bisque;"{%endif %}>
         <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
         <a href="?metrics={{ top_data.5.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.5.1 }}</h6><h5 style="color: #b52828">{{ top_data.5.2|intcomma }}</h5></a>
@@ -152,12 +156,14 @@
         <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
         <a href="?metrics={{ top_data.2.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.2.1 }}</h6><h5 style="color: #b52828">{{ top_data.2.2|intcomma }}</h5></a>
         </div> -->
-
+        {% endcomment %}
         <div class ="top_box" {% if metrics == top_data.9.0 %} style = "background: bisque;"{%endif %}>
         <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
         <a href="?metrics={{ top_data.9.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.9.1 }}</h6><h5 style="color: #b52828">{{ top_data.9.2|intcomma }}</h5></a>
         </div>
-
+        {% comment %}
+            
+        
         <div class ="top_box" {% if metrics == top_data.10.0 %} style = "background: bisque;"{%endif %}>
         <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
         <a href="?metrics={{ top_data.10.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.10.1 }}</h6><h5 style="color: #b52828">{{ top_data.10.2|intcomma }}</h4></a>
@@ -167,7 +173,7 @@
         <span style="color: grey;font-size: 8px;float: right;margin: -16px 7px 0px 0px;"><i>* last 30 days</i></span>
         <a href="?metrics={{ top_data.11.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.11.1 }}</h6><h5 style="color: #b52828">{{ top_data.11.2|intcomma }}</h4></a>
         </div>
-        
+        {% endcomment %}
         <div class="top_box" {% if metrics == top_data.12.0 %} style = "background: bisque;width: 21.8%;"{% else %}style = "width: 21.8%;"{%endif %}>
         <span style ="color: grey; font-size: 8px; float: right;margin: -16px 7px 0px 0px;">* total of last 30 days</span>
         <a href="?metrics={{ top_data.12.0 }}" class="filter_apply"><h6 style="color: #333">{{ top_data.12.1 }}</h6><h5 id="playtime_last_30" style="color: #b52828"></h4></a>
@@ -427,7 +433,10 @@
                     window.location.href =  build.substring(0, build.length - 1);
                     // window.location.href = window.location.href + "&language_choice=" + lang_selected;
                 } else {
-                    window.location.href = window.location.href + "&language_choice=" + lang_selected;
+                    if(window.location.search.length > 0)
+                        window.location.href = window.location.href + "&language_choice=" + lang_selected;
+                    else
+                        window.location.href = window.location.href + "?language_choice=" + lang_selected;
                 }
             }
 
@@ -447,7 +456,10 @@
                     console.log(build);
                     window.location.href = build.substring(0, build.length - 1);
                 } else {
-                    window.location.href = window.location.href + "&category_choice=" + categ_selected;
+                    if(window.location.search.length > 0)
+                        window.location.href = window.location.href + "&category_choice=" + categ_selected;
+                    else
+                        window.location.href = window.location.href + "?category_choice=" + categ_selected;
                 }
             }
 
