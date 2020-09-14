@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 # from forum.topic.models import Notification
 
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings_local")
 logger = get_task_logger(__name__)
 
 
@@ -384,6 +384,14 @@ def update_branding_url(username, batch_size=100, sleep_time=60):
             time.sleep(sleep_time)
     except Exception as e:
         print(e)
+
+
+
+@app.task
+def update_profile_counter_task(*args, **kwargs):
+    from forum.user.utils.bolo_redis import update_profile_counter
+    update_profile_counter(*args, **kwargs)
+
 
 if __name__ == '__main__':
     app.start()
