@@ -379,7 +379,7 @@ def get_only_active_topic(sqs,page_size,page=None, topic = []):
     if not page:
         page = 1
 
-    paginator = Paginator(data_list,page_size)
+    paginator = Paginator(sqs, page_size)
     # set_redis('paginator',paginator)
     try:
         paginated_data = paginator.page(page)
@@ -393,7 +393,7 @@ def get_only_active_topic(sqs,page_size,page=None, topic = []):
             if not each.object.is_removed:
                 topic.append(each.object)
     if len(topic) < page_size and len(sqs) > page_size*page:
-        topic = get_only_active_topic(sqs, page_size, page+1,topic)
+        topic += get_only_active_topic(sqs, page_size, page+1,topic)
 
     return topic
 
