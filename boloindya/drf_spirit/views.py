@@ -750,13 +750,13 @@ class SolrSearchTop(BoloIndyaGenericAPIView):
         response ={}
         if search_term:
             topics =[]
-            sqs = SearchQuerySet().models(Topic).raw_search(search_term).filter(SQ(language_id=language_id)|SQ(language_id='1')).filter(is_removed = False)
+            sqs = SearchQuerySet().models(Topic).raw_search(search_term).filter(SQ(language_id=language_id)|SQ(language_id='1'))
             if not sqs:
                 suggested_word = SearchQuerySet().models(Topic).auto_query(search_term).spelling_suggestion()
                 if suggested_word:
-                    sqs = SearchQuerySet().models(Topic).raw_search(suggested_word).filter(SQ(language_id=language_id)|SQ(language_id='1')).filter(is_removed = False)
+                    sqs = SearchQuerySet().models(Topic).raw_search(suggested_word).filter(SQ(language_id=language_id)|SQ(language_id='1'))
             if not sqs:
-                sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(SQ(language_id=language_id)|SQ(language_id='1')).filter(is_removed = False)
+                sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(SQ(language_id=language_id)|SQ(language_id='1'))
             if sqs:
                 topics = get_only_active_topic(sqs, int(page_size), int(page))
                 # result_page = get_paginated_data(sqs, int(page_size), int(page))
@@ -800,19 +800,19 @@ class SolrSearchTopic(BoloIndyaGenericAPIView):
         last_updated=timestamp_to_datetime(self.request.GET.get('last_updated',False))
         response = {"count": 0, "results": [], "next_page_number": None}
         if search_term:
-            sqs = SearchQuerySet().models(Topic).raw_search(search_term).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
+            sqs = SearchQuerySet().models(Topic).raw_search(search_term).filter(SQ(language_id=language_id)|SQ(language_id='1'))
             if not sqs:
                 suggested_word = SearchQuerySet().models(Topic).auto_query(search_term).spelling_suggestion()
                 if suggested_word:
-                    sqs = SearchQuerySet().models(Topic).raw_search(suggested_word).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
+                    sqs = SearchQuerySet().models(Topic).raw_search(suggested_word).filter(SQ(language_id=language_id)|SQ(language_id='1'))
             if not sqs:
-                sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
+                sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(SQ(language_id=language_id)|SQ(language_id='1'))
             if sqs:
                 topics = get_only_active_topic(sqs, int(page_size), int(page))
                 # result_page = get_paginated_data(sqs, int(page_size), int(page))
                 # if result_page[0]:
                 #     topics = solr_object_to_db_object(result_page[0].object_list)
-            # topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True, language_id=language_id)
+            #topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True, language_id=language_id)
             next_page_number = page+1 if page_size*page<len(sqs) else ''
             if language_id:
                 response ={"count":len(sqs),"results":TopicSerializerwithComment(topics,many=True,context={'is_expand':is_expand,'last_updated':last_updated}).data,"next_page_number":next_page_number} 
