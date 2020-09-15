@@ -348,6 +348,7 @@ def save_click_id_response(user_profile_id):
 def send_upload_video_notification(data, pushNotification):
     #Import files for notification
     from jarvis.models import FCMDevice
+    from jarvis.utils import _get_access_token
     import json
     import requests
     try:
