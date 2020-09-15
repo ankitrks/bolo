@@ -46,7 +46,7 @@ from .models import UserJarvisDump, UserLogStatistics, UserFeedback, Campaign, W
 from .permissions import IsOwnerOrReadOnly
 from .utils import get_weight, add_bolo_score, shorcountertopic, calculate_encashable_details, state_language, language_options,short_time,\
     solr_object_to_db_object, solr_userprofile_object_to_db_object,get_paginated_data ,shortcounterprofile, get_ranked_topics,\
-    set_android_logs_info, set_sync_dump_info, get_language_specific_audio_list, get_audio_list
+    set_android_logs_info, set_sync_dump_info, get_language_specific_audio_list, get_audio_list, get_only_active_topic
 
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
@@ -758,8 +758,9 @@ class SolrSearchTop(BoloIndyaGenericAPIView):
             if not sqs:
                 sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(SQ(language_id=language_id)|SQ(language_id='1')).filter(is_removed = False)
             if sqs:
-                result_page = get_paginated_data(sqs, int(page_size), int(page))
-                topics = solr_object_to_db_object(result_page[0].object_list)
+                topics = get_only_active_topic(sqs, int(page_size), int(page))
+                # result_page = get_paginated_data(sqs, int(page_size), int(page))
+                # topics = solr_object_to_db_object(result_page[0].object_list)
             response["top_vb"]=TopicSerializerwithComment(topics,many=True,context={'is_expand':is_expand,'last_updated':last_updated}).data
             users  =[]
             sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term)).order_by('-is_superstar','-is_popular')
@@ -807,9 +808,10 @@ class SolrSearchTopic(BoloIndyaGenericAPIView):
             if not sqs:
                 sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
             if sqs:
-                result_page = get_paginated_data(sqs, int(page_size), int(page))
-                if result_page[0]:
-                    topics = solr_object_to_db_object(result_page[0].object_list)
+                topics = get_only_active_topic(sqs, int(page_size), int(page))
+                # result_page = get_paginated_data(sqs, int(page_size), int(page))
+                # if result_page[0]:
+                #     topics = solr_object_to_db_object(result_page[0].object_list)
             # topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True, language_id=language_id)
             next_page_number = page+1 if page_size*page<len(sqs) else ''
             if language_id:
