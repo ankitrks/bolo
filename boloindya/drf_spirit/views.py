@@ -13,6 +13,7 @@ import pandas as pd
 from random import shuffle
 from collections import OrderedDict
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
+from sentry_sdk import capture_exception
 
 from django.http import JsonResponse
 from django.utils import timezone
@@ -1828,10 +1829,14 @@ def createTopic(request):
         data['image_url'] = ''
         data['days_ago'] = ''
 
-        # topic.update_m3u8_content()
-        topic_type = ContentType.objects.get_for_model(topic)
-        notify_owner = Notification.objects.create(for_user_id = topic.user.id ,topic_id = topic.id, topic_type = topic_type, notification_type='6', user_id = topic.user.id)
-        
+        try:
+            topic_type = ContentType.objects.get_for_model(topic)
+            notify_owner = Notification.objects.create(for_user_id = topic.user.id ,topic_id = topic.id, topic_type = topic_type, notification_type='6', user_id = topic.user.id)
+        except Exception as e:
+            print(e)
+            capture_exception(e)
+
+
         send_upload_video_notification.delay(data, {})
         #invoke watermark
         invoke_watermark_service(topic, request.user)
@@ -1864,6 +1869,7 @@ def invoke_watermark_service(topic, user):
                 print("failure with response code"+str(response.status_code))
     except Exception as e:
         print("Exception raised {}".format(e))
+        capture_exception(e)
 
 
 def provide_view_count(view_count,topic):
