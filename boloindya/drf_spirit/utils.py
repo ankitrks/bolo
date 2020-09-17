@@ -375,9 +375,12 @@ def solr_userprofile_object_to_db_object(sqs):
 
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 
-def get_only_active_topic(sqs,page_size,page=None, topic = []):
+def get_only_active_topic(sqs,page_size,page=None, topic = None):
     if not page:
         page = 1
+
+    if not topic:
+        topic = []
 
     paginator = Paginator(sqs, page_size)
     # set_redis('paginator',paginator)
@@ -393,8 +396,7 @@ def get_only_active_topic(sqs,page_size,page=None, topic = []):
             if not each.object.is_removed:
                 topic.append(each.object)
     if len(topic) < page_size and len(sqs) > page_size*page:
-        topic += get_only_active_topic(sqs, page_size, page+1,topic)
-
+        topic += get_only_active_topic(sqs[page*page_size:], page_size, page+1,topic)
     return topic
 
 
