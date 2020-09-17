@@ -15,9 +15,9 @@
 		    <div class="parent_block parent_header align_center"><a href="/jarvis/management/user/"><i class="fa fa-users"></i><br><span>User Management</span></a></div>
 		    <div class="parent_block parent_header align_center"><a href="/jarvis/get_user_pay_details/"><i class="fa fa-money"></i><br><span>User Payment</span></a></div>
 		    <div class="parent_block parent_header align_center"><a href="/jarvis/referral/"><i class="fa fa-envelope"></i><br><span>Referrals</span></a></div>
-		    <div class="parent_block parent_header align_center"><a href="/jarvis/get_accepted_kyc_user_list/"><i class="fa fa-book"></i><br><span>Accpeted KYC's</span></a></div>
+		    <div class="parent_block parent_header align_center"><a href="/jarvis/get_accepted_kyc_user_list/"><i class="fa fa-book"></i><br><span>Accepted KYC's</span></a></div>
 		{% endif %}
-		{% if user|is_user_in_group:"moderator" %}
+		
 		    <!-- <div class="parent_block">
 		      <div class="parent_header"><i class="fa fa-pie-chart"></i> <span>Statistics</span></div>
 		      <div>
@@ -27,6 +27,8 @@
 		      </div>
 		    </div> -->
 		    <div class="parent_block parent_header align_center"><a href="/analytics_jarvis/"><i class="fa fa-pie-chart"></i><br><span>Analytics</span></a></div>
+		    <div class="parent_block parent_header align_center"><a href="/jarvis/analytics-v2/"><i class="fa fa-pie-chart"></i><br><span>Analytics V2.0</span></a></div>
+		{% if user|is_user_in_group:"moderator" %}
 		{% endif %}
 
 		{% if user|is_user_in_group:"moderator" or user|is_user_in_group:"video_uploader" %}
