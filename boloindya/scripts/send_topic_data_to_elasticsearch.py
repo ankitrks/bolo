@@ -23,7 +23,7 @@ def get_topic_data(start_date, offset=0, limit=2000):
             SELECT tp.id, date_trunc('second', tp.created_at)::text, tp.created_at::date::text as create_date, tp.user_id, tp.language_id, array_agg(tc.category_id) as category_id
             FROM forum_topic_topic tp
             LEFT JOIN forum_topic_topic_m2mcategory tc on tc.topic_id = tp.id
-            WHERE created_at::date >= %s
+            WHERE created_at::date = %s
             GROUP BY tp.id order by tp.id offset %s limit %s
         """, [start_date, offset, limit])
 
@@ -38,7 +38,7 @@ def get_topic_count(start_date):
     with connections['default'].cursor() as cr:
         cr.execute("""
             SELECT count(1)
-            FROM forum_topic_topic where created_at::date >= %s
+            FROM forum_topic_topic where created_at::date = %s
         """, [start_date])
 
         return cr.fetchall()[0][0]
@@ -71,7 +71,7 @@ def run_by_threads(start_date, offset, offset_limit):
     while True:
         print("offset", offset)
         topic_data = get_topic_data(start_date, offset, 50000)
-        print("data fetched", topic_data)
+        print("data fetched")
         topic_data_len = len(topic_data)
         if topic_data_len == 0:
             break

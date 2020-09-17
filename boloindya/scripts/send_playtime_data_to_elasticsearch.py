@@ -28,7 +28,7 @@ def get_playtime_data(start_date, offset=0, limit=2000):
             FROM forum_user_videoplaytime pt
             INNER JOIN forum_topic_topic tp on tp.id = pt.video_id
             INNER JOIN forum_topic_topic_m2mcategory cat on cat.topic_id = tp.id
-            where pt.id in (select id from forum_user_videoplaytime where timestamp::date >= %s order by id offset %s limit %s)
+            where pt.id in (select id from forum_user_videoplaytime where timestamp::date = %s order by id offset %s limit %s)
             GROUP BY pt.id, tp.id 
         """, [start_date, offset, limit])
 
@@ -43,7 +43,7 @@ def get_topic_count(start_date):
     with connections['default'].cursor() as cr:
         cr.execute("""
             SELECT count(1)
-            FROM forum_user_videoplaytime where timestamp::date >= %s
+            FROM forum_user_videoplaytime where timestamp::date = %s
         """, [start_date])
 
         return cr.fetchall()[0][0]
@@ -75,7 +75,7 @@ def run_by_threads(start_date, offset, offset_limit):
     while True:
         print("offset", offset)
         topic_data = get_playtime_data(start_date, offset, DB_LIMIT)
-        print("data fetched", topic_data)
+        print("data fetched")
         topic_data_len = len(topic_data)
         if topic_data_len == 0:
             break
