@@ -11,9 +11,6 @@ from django.db import connections
 from django.conf import settings
 import threading
 
-import boto3
-from requests_aws4auth import AWS4Auth 
-
 
 region = 'ap-south-1'
 service = 'es'
@@ -51,8 +48,6 @@ def get_topic_count():
         return cr.fetchall()[0][0]
 
 def get_es_client():
-    # credentials = boto3.Session().get_credentials()
-    # return AWS4Auth(credentials.access_key, credentials.secret_key, region, service)
     return (settings.ES_7_CONFIG.get('username'), settings.ES_7_CONFIG.get('password'))
 
 def es_bulk_insert(doc_list, index_name):
