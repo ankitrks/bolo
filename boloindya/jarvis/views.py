@@ -2049,25 +2049,25 @@ def statistics_all_jarvis(request):
         x_axis = []
         y_axis = []
         
-        for row in get_video_create_stats_elastic(start_date, end_date, data_view, language_choice, category_choice):
-            x_axis.append(str(row.get('key_as_string')))
-            y_axis.append(row.get('doc_count'))
+        for row in get_video_create_stats(start_date, end_date, data_view, language_choice, category_choice):       
+            x_axis.append(str(row[0]))      
+            y_axis.append(int(row[1]))
 
 
     elif metrics == '9':
         x_axis = []
         y_axis = []
-        for row in get_video_creator_stats_elastic(start_date, end_date, data_view, language_choice, category_choice):
-            x_axis.append(str(row.get('key_as_string')))
-            y_axis.append(row.get('unique_users', {}).get('value'))
+        for row in get_video_creator_stats(start_date, end_date, data_view, language_choice, category_choice):
+            x_axis.append(str(row[0]))
+            y_axis.append(int(row[1]))
 
     elif metrics == '4':
         x_axis = []
         y_axis = []
 
-        for row in get_video_new_creator_stats_elastic(start_date, end_date, data_view, language_choice, category_choice):
-            x_axis.append(str(row.get('key_as_string')))
-            y_axis.append(row.get('doc_count'))
+        for row in get_video_new_creator_stats(start_date, end_date, data_view, language_choice, category_choice):
+            x_axis.append(str(row[0]))
+            y_axis.append(int(row[1]))
         
 
     elif data_view == 'weekly':
@@ -2262,9 +2262,9 @@ def get_csv_data(request):
                 x_axis = []
                 y_axis = []
 
-                for row in get_video_create_stats_elastic(sdate, edate, view_sel, lang_sel, categ_sel):
-                    x_axis.append(str(row.get('key_as_string')))
-                    y_axis.append(row.get('doc_count'))
+                for row in get_video_create_stats(sdate, edate, view_sel, lang_sel, categ_sel):
+                    x_axis.append(str(row[0]))
+                    y_axis.append(int(row[1]))
 
             elif metrics_sel == '4':
                 x_axis = []
@@ -2279,9 +2279,9 @@ def get_csv_data(request):
                 x_axis = []
                 y_axis = []
 
-                for row in get_video_creator_stats_elastic(sdate, edate, view_sel, lang_sel, categ_sel):
-                    x_axis.append(str(row.get('key_as_string')))
-                    y_axis.append(row.get('unique_users', {}).get('value'))
+                for row in get_video_creator_stats(sdate, edate, view_sel, lang_sel, categ_sel):
+                    x_axis.append(str(row[0]))
+                    y_axis.append(int(row[1]))
                 
 
 
