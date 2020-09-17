@@ -26,7 +26,7 @@ class ElasticSearch:
         if response.ok:
             return json.loads(response.text)
         else:
-            raise Exception(json.text)
+            raise Exception(response.text)
 
     def get_es_connection(self):
         return Elasticsearch( 

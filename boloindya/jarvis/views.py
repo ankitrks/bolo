@@ -3367,7 +3367,7 @@ class VideoPlaytimeAPIView(AnalyticsGraphCountsAPIView):
         params = self.request.query_params
         return [{
                 'key': row.get('key_as_string'),
-                'value': row.get('total_playtime', {}).get('value')
+                'value': int(row.get('total_playtime', {}).get('value'))/(60*60)
             } for row in get_video_playtime_stats_elastic(params.get('start_date'), params.get('end_date'),
                 params.get('view_mode'), params.get('language_id'), params.get('category_id'))]
 
