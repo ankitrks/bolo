@@ -438,7 +438,7 @@ def get_redis_hashtag_paginated_data_with_json(language_id, hashtag_id, page_no,
 def set_redis_hashtag_paginated_data_with_json(key, language_id, hashtag_id, page_no, last_updated, is_expand):
     from drf_spirit.serializers import CategoryVideoByteSerializer
     try:
-        topics = get_redis_hashtag_paginated_data(language_id,hashtag_id,page_no)
+        topics = get_redis_hashtag_paginated_data(int(language_id),int(hashtag_id),int(page_no))
         paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
         page = 1
         topic_page = paginator.page(page)

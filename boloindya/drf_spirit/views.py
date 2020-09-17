@@ -69,6 +69,10 @@ from forum.topic.utils import get_redis_category_paginated_data,get_redis_hashta
 # from haystack.utils import Highlighter
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.decorators import login_required
+import newrelic.agent
+
+newrelic.agent.initialize()
+application = newrelic.agent.register_application()
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -512,6 +516,10 @@ class GetPopularHashTag(generics.ListCreateAPIView):
     serializer_class = TongueTwisterWithVideoByteSerializer
     permission_classes = (IsOwnerOrReadOnly,)
     pagination_class = SmallSetPagination 
+
+    def dispatch(self, *args, **kwargs):
+        newrelic.agent.set_transaction_name("/get_popular_hash_tag/get", "Discover Landing Page")
+        return super(GetPopularHashTag, self).dispatch(*args, **kwargs)
 
     def get_serializer_context(self):
         """
