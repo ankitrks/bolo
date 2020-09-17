@@ -3096,8 +3096,8 @@ class JarvisAnalytics(TemplateView):
 
 
 
-def get_elastic_filters(start_date, end_date, language_id=None, category_id=None, date_field_name='create_date'):
-    filters = [{'range': {date_field_name: {
+def get_elastic_filters(start_date, end_date, language_id=None, category_id=None):
+    filters = [{'range': {'create_date': {
         'gte': start_date, 
         'lte': end_date, 
     }}}]
@@ -3209,7 +3209,7 @@ def get_video_playtime_stats_elastic(start_date, end_date, group_by, language_id
         'aggs': 
             {'playtime_count': {
                 'date_histogram': {
-                    'field': 'timestamp', 
+                    'field': 'create_date', 
                     'calendar_interval': interval,
                     'format': date_format
                 },
@@ -3218,11 +3218,13 @@ def get_video_playtime_stats_elastic(start_date, end_date, group_by, language_id
         },
         'query': {
             'bool': {
-                'filter': get_elastic_filters(start_date, end_date, language_id, category_id, 'timestamp')
+                'filter': get_elastic_filters(start_date, end_date, language_id, category_id)
             }
         },
         'size': 0
     })
+
+    # print("result", result)
 
     return result.get('aggregations', {}).get('playtime_count', {}).get('buckets')
 
@@ -3253,7 +3255,7 @@ class VideoCreatedAPIView(AnalyticsGraphCountsAPIView):
                 'key': row.get('key_as_string'),
                 'value': row.get('doc_count')
             } for row in get_video_create_stats_elastic(params.get('start_date'), params.get('end_date'),
-                params.get('view_mode'), params.get('category_id'), params.get('language_id'))]
+                params.get('view_mode'), params.get('language_id'), params.get('category_id'))]
 
     def get_counts(self):
         end_date = datetime.now()
@@ -3268,7 +3270,7 @@ class VideoCreatorAPIView(AnalyticsGraphCountsAPIView):
                 'key': row.get('key_as_string'),
                 'value': row.get('unique_users', {}).get('value')
             } for row in get_video_creator_stats_elastic(params.get('start_date'), params.get('end_date'),
-                params.get('view_mode'), params.get('category_id'), params.get('language_id'))]
+                params.get('view_mode'), params.get('language_id'), params.get('category_id'))]
 
     def get_counts(self):
         end_date = datetime.now()
@@ -3331,7 +3333,6 @@ class NewVideoCreatorAPIView(AnalyticsGraphCountsAPIView):
 
         with connections['default'].cursor() as cr:
             cr.execute(query, params_1 + params_2)
-            print("query", cr.mogrify(query, params_1 + params_2))
 
             columns = [col[0] for col in cr.description]
             return [
@@ -3368,7 +3369,7 @@ class VideoPlaytimeAPIView(AnalyticsGraphCountsAPIView):
                 'key': row.get('key_as_string'),
                 'value': row.get('total_playtime', {}).get('value')
             } for row in get_video_playtime_stats_elastic(params.get('start_date'), params.get('end_date'),
-                params.get('view_mode'), params.get('category_id'), params.get('language_id'))]
+                params.get('view_mode'), params.get('language_id'), params.get('category_id'))]
 
 
     def get_counts(self):

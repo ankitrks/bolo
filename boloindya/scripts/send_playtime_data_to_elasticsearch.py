@@ -19,18 +19,19 @@ region = 'ap-south-1'
 service = 'es'
 
 THREADS = 5 #os.cpu_count() * 3
-DB_LIMIT = 10000
+DB_LIMIT = 50000
 
 def get_playtime_data(offset=0, limit=2000):
     print("db offset", offset, "db limit ", limit)
     with connections['default'].cursor() as cr:
         cr.execute("""
             SELECT pt.id, tp.id as video_id, pt.user as user_id, pt.playtime, tp.language_id, array_agg(cat.category_id) as category_id, 
-                date_trunc('second', pt.timestamp)::text as "timestamp"
+                pt.timestamp::date::text as create_date
             FROM forum_user_videoplaytime pt
             INNER JOIN forum_topic_topic tp on tp.id = pt.video_id
             INNER JOIN forum_topic_topic_m2mcategory cat on cat.topic_id = tp.id
-            GROUP BY pt.id, tp.id offset %s limit %s
+            where pt.id in (select id from forum_user_videoplaytime order by id offset %s limit %s)
+            GROUP BY pt.id, tp.id 
         """, [offset, limit])
 
         columns = [col[0] for col in cr.description]
@@ -91,9 +92,6 @@ def run_by_threads(offset, offset_limit):
 
 
 def run():
-    es = get_es_client()
-
-    
 
     total_topic = get_topic_count()
 
