@@ -2,8 +2,6 @@
 import requests
 import boto3
 import json
-from requests_aws4auth import AWS4Auth 
-from elasticsearch import Elasticsearch, RequestsHttpConnection, helpers 
 from django.conf import settings
 
 service = 'es'
