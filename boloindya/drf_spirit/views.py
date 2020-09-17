@@ -4338,6 +4338,7 @@ def old_algo_get_popular_video_bytes(request):
 @api_view(['GET'])
 def get_popular_video_bytes(request):
     try:
+        newrelic.agent.set_transaction_name("/get_popular_video_bytes/get", "Trending Page")
         language_id = request.GET.get('language_id', 1)
         if int(request.GET.get('page',1)) == 1:
             cache_popular_post(request.user.id,language_id)
