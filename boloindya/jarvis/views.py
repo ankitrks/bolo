@@ -3279,60 +3279,91 @@ class VideoCreatorAPIView(AnalyticsGraphCountsAPIView):
 
 class NewVideoCreatorAPIView(AnalyticsGraphCountsAPIView):
     def get_data(self):
-        params = self.request.query_params
+        query_params = self.request.query_params
 
         where_clause_1 = ['created_at between %s and %s']
-        where_clause_2 = ['created_at < %s']
-        params_1 = [params.get('start_date'), params.get('end_date')]
-        params_2 = [params.get('start_date')]
+        params_1 = [query_params.get('start_date'), query_params.get('end_date')]
+
+        where_clause_2 = []
+        params_2 = []
+
+        where_clause_3 = ['created_at between %s and %s']
+        params_3 = [query_params.get('start_date'), query_params.get('end_date')]
 
         join_query = ''
 
-        if params.get('language_id'):
+        if query_params.get('language_id'):
             where_clause_1.append('language_id = %s')
+            params_1.append(query_params.get('language_id'))
             where_clause_2.append('language_id = %s')
-            params_1.append(params.get('language_id'))
-            params_2.append(params.get('language_id'))
+            params_2.append(query_params.get('language_id'))
 
-        if params.get('category_id'):
+        if query_params.get('category_id'):
             where_clause_1.append('tc.category_id = %s')
+            params_1.append(query_params.get('category_id'))
             where_clause_2.append('tc.category_id = %s')
-            params_1.append(params.get('category_id'))
-            params_2.append(params.get('category_id'))
+            params_2.append(query_params.get('category_id'))
 
             join_query = ' inner join forum_topic_topic_m2mcategory tc on tc.topic_id = tp.id '
 
         date_column = "created_at::date"
         date_format_column = "to_char(C.created_at, 'DD-Mon-YYYY')"
 
-        if params.get('view_mode') == 'weekly':
+        if query_params.get('view_mode') == 'weekly':
             date_column = "date_trunc('week', A.created_at)"
             date_format_column = "concat('Week ', to_char(C.created_at, 'WW'))"
-        elif params.get('view_mode') == 'monthly':
+        elif query_params.get('view_mode') == 'monthly':
             date_column = "date_trunc('month', A.created_at)"
             date_format_column = "to_char(C.created_at, 'Mon-YYYY')"
 
-        query = """
-            SELECT %s as key, C.count as value
-            FROM (
-                SELECT %s as created_at, count(distinct A.user_id) as count
-                FROM    
-                    (SELECT created_at, user_id
-                    from forum_topic_topic tp %s
-                    where %s) AS A
-                LEFT JOIN
-                    (SELECT distinct user_id
-                    from forum_topic_topic tp %s
-                    WHERE %s ) AS  B on A.user_id =B.user_id
-                WHERE B.user_id is null
-                GROUP BY %s
-            ) C ORDER BY C.created_at 
+        # query = """
+        #     SELECT %s as key, C.count as value
+        #     FROM (
+        #         SELECT %s as created_at, count(distinct A.user_id) as count
+        #         FROM    
+        #             (SELECT created_at, user_id
+        #             from forum_topic_topic tp %s
+        #             where %s) AS A
+        #         LEFT JOIN
+        #             (SELECT distinct user_id
+        #             from forum_topic_topic tp %s
+        #             WHERE %s ) AS  B on A.user_id =B.user_id
+        #         WHERE B.user_id is null
+        #         GROUP BY %s
+        #     ) C ORDER BY C.created_at 
 
-        """%(date_format_column, date_column, join_query, ' AND '.join(where_clause_1), 
-                join_query, ' AND '.join(where_clause_2), date_column)
+        # """%(date_format_column, date_column, join_query, ' AND '.join(where_clause), 
+        #         join_query, ' AND '.join(where_clause_2), date_column)
+
+        if where_clause_2:
+            where_clause_2 = ' AND ' + ' AND '.join(where_clause_2)
+        else:
+            where_clause_2 = ''
+
+        query = """
+            SELECT {date_format_column} as key, C.count as value
+            FROM (
+                SELECT {date_column} as created_at, count(user_id) as count
+                FROM (
+                    SELECT min(tp.created_at) as created_at, tp.user_id
+                    FROM forum_topic_topic tp {join_query}
+                    WHERE user_id in  (SELECT distinct user_id
+                        FROM forum_topic_topic tp {join_query}
+                        WHERE {where_clause_1}
+                    ) {where_clause_2}
+                    GROUP BY tp.user_id
+                ) A
+                WHERE {where_clause_3}
+                GROUP BY {date_column}
+            ) C ORDER BY C.created_at 
+        """.format(date_format_column=date_format_column, date_column=date_column, 
+                where_clause_1=' AND '.join(where_clause_1), where_clause_2=where_clause_2,
+                where_clause_3=' AND '.join(where_clause_3), join_query=join_query)
+
+        print "Query", query
 
         with connections['default'].cursor() as cr:
-            cr.execute(query, params_1 + params_2)
+            cr.execute(query, params_1 + params_2 + params_3)
 
             columns = [col[0] for col in cr.description]
             return [
