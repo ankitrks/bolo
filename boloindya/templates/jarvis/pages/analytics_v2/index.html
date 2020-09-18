@@ -239,7 +239,10 @@
 
         fetchData(){
             $('#show-report').parent().append('<i class="fa fa-refresh fa-spin"></i>')
-            $('#bar-chart').html('<i class="fa fa-refresh fa-spin" style="height: 50px; width: 50px"></i>');
+            $('#bar-chart').html('<i class="fa fa-refresh fa-spin" style="font-size: 50px;"></i>');
+            $('#data-sum').html('<i class="fa fa-refresh fa-spin"></i>')
+            $('#data-avg').html('<i class="fa fa-refresh fa-spin"></i>')
+
             this.ajaxCall()
         }
 
@@ -258,6 +261,10 @@
                     }, that.data, 'report')
                     $('#show-report').removeClass('disabled');
                     $('#show-report').parent().find('i.fa-refresh').remove()
+                    let sum = that.data.reduce(function(lastSum, item){return lastSum + item.value;}, 0);
+                    let avg = sum/that.data.length;
+                    $('#data-sum').text(sum);
+                    $('#data-avg').text(avg);
                 },
                 xhr: function(){
                     let xhr = $.ajaxSettings.xhr();
