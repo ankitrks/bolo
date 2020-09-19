@@ -288,7 +288,8 @@
 
                 copyLink = function(element){
                     let link = $(element).parents('td').find('a').attr('data-video_url')
-                    copyToClipboard(window.location.origin + link)
+                    // copyToClipboard(window.location.origin + link)
+                    copyToClipboard('https://www.boloindya.com' + link)
                 }
 
                 jQuery.each(jQuery('td.field-vb_list'), function(i, element){
