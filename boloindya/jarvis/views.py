@@ -31,7 +31,6 @@ from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 from django.conf import settings
 from forum.payment.forms import PaymentForm,PaymentCycleForm
 from django.views.generic.edit import FormView
-from datetime import datetime
 from forum.userkyc.forms import KYCBasicInfoRejectForm,KYCDocumentRejectForm,AdditionalInfoRejectForm,BankDetailRejectForm
 from .models import VideoUploadTranscode,VideoCategory, PushNotification, PushNotificationUser, user_group_options, \
     FCMDevice, notification_type_options, metrics_options, DashboardMetrics, DashboardMetricsJarvis, metrics_slab_options,\
@@ -44,7 +43,6 @@ from django.http import JsonResponse
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.timezone import make_aware
-from datetime import timedelta
 from itertools import groupby
 from django.db.models import Count
 import ast
@@ -62,7 +60,7 @@ from django.db.models.functions import TruncMonth
 from django.db.models.functions import TruncDay
 from django.db.models import Count
 from forum.category.models import Category
-from datetime import datetime
+from datetime import datetime, timedelta
 from forum.user.utils.bolo_redis import update_profile_counter
 
 def get_bucket_details(bucket_name=None):
@@ -2771,6 +2769,7 @@ def unremove_video_or_unblock(request):
 
 @login_required
 def add_campaign(request):
+    from datetime import datetime
     banner_image_file = request.FILES.get('banner_file')
     start_date_string = request.POST.get('start_date', None)
     end_date_string = request.POST.get('end_date', None)
@@ -2793,10 +2792,9 @@ def add_campaign(request):
     if not hashtag_id or hashtag_id == -1:
         return HttpResponse(json.dumps({'message':'fail','reason':'Invalid Hashtag'}),content_type="application/json")
 
-    start_date = datetime.datetime.strptime(start_date_string, "%d-%m-%Y")
-    end_date = datetime.datetime.strptime(end_date_string, "%d-%m-%Y")
+    start_date = datetime.strptime(start_date_string, "%d-%m-%Y")
+    end_date = datetime.strptime(end_date_string, "%d-%m-%Y")
     hashtag = TongueTwister.objects.filter(pk=hashtag_id)[0]
-
     campaign_dict = {}
     campaign_dict['hashtag'] = hashtag
     campaign_dict['active_from'] = start_date
