@@ -18,6 +18,7 @@ class ConnectionHolder:
     def __init__(self):
         # self._neo4j = None
         self._redis = None
+        self._redis_read_only = None
 
     # def _get_neo4j(self):
     #     if not self._neo4j:
@@ -35,3 +36,11 @@ class ConnectionHolder:
 
     def redis(self):
         return SimpleLazyObject(self._get_redis)
+
+    def _get_redis_read_only(self):
+        if not self._redis_read_only:
+            self._redis_read_only = redis.StrictRedis(host=settings.REDIS_RO_HOST, port=settings.REDIS_RO_PORT, db=settings.REDIS_RO_DB)
+        return self._redis_read_only
+
+    def redis_read_only(self):
+        return SimpleLazyObject(self._get_redis_read_only)

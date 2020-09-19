@@ -7,13 +7,13 @@ from django.conf import settings
 import connection
 
 redis_cli = connection.redis()
-
+redis_cli_read_only = connection.redis_read_only()
 logger = logging.getLogger(__name__)
 
 
 def get_redis(key):
     try:
-        data = redis_cli.get("bi:"+key)
+        data = redis_cli_read_only.get("bi:"+key)
         return json.loads(data) if data else None
     except Exception as e:
         logger.exception("in get_redis " + str(e))
@@ -22,7 +22,7 @@ def get_redis(key):
 def mget_redis(keys):
     try:
         updated_keys = ['bi:%s'%key for key in keys]
-        data_list = redis_cli.mget(updated_keys)
+        data_list = redis_cli_read_only.mget(updated_keys)
         return [json.loads(data)  for data in data_list if data]
     except Exception as e:
         logger.exception("While mgetting data for redis: %s "%str(e))

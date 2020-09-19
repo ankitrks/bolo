@@ -4345,6 +4345,10 @@ def get_popular_video_bytes(request):
         if int(request.GET.get('page',1)) == 1:
             cache_popular_post(request.user.id,language_id)
         topics = get_popular_paginated_data(request.user.id,language_id,int(request.GET.get('page',1)))
+        ''' Manual added post'''
+        #manual_added_post = Topic.objects.filter(pk=1173781)
+        #topics = list(manual_added_post) + list(topics)
+        ''' Manual added post'''
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True, context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
@@ -4951,6 +4955,24 @@ def get_campaigns(request):
         print "Error in API get_campaigns/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 """
+@api_view(['POST'])
+def get_campaigns(request):
+    try:
+        today = datetime.today()
+        data = get_redis('campaign_data')
+        if not data:
+            all_camps = Campaign.objects.filter(is_active=True, active_from__lte=today, active_till__gte=today).order_by('-active_from')
+            serializer_camp = CampaignSerializer(all_camps, many=True)
+            data = serializer_camp.data
+            set_redis('campaign_data', data, True, 900)
+        return JsonResponse({'status': 'success','message':data}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API get_campaigns/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+"""
+from redis_utils import *
 @api_view(['POST'])
 def get_campaigns(request):
     try:
