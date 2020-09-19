@@ -729,6 +729,7 @@ class SocialShare(UserInfo):
         return str(self.share_type)
 
 class Notification(UserInfo):
+    id = models.BigAutoField(primary_key=True)
     for_user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True,blank=True,editable=False)
     # device_id = models.CharField(_("Device Id"), max_length=255, blank = True, null = True)
     notification_type = models.CharField(_("notification_type"), max_length=5, default='1')

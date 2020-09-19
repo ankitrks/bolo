@@ -2870,8 +2870,6 @@ def add_campaign(request):
         campaign_dict['is_winner_declared'] = False
         campaign_obj = Campaign.objects.create(**campaign_dict)
 
-    print(campaign_dict)
-
     return HttpResponse(json.dumps({'message':'success', 'campaign_id':campaign_obj.id}),content_type="application/json")
 
 def upload_image(bucket, image_file, folder_name):

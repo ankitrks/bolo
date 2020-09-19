@@ -13,6 +13,7 @@ import pandas as pd
 from random import shuffle
 from collections import OrderedDict
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
+from sentry_sdk import capture_exception
 
 from django.http import JsonResponse
 from django.utils import timezone
@@ -46,7 +47,7 @@ from .models import UserJarvisDump, UserLogStatistics, UserFeedback, Campaign, W
 from .permissions import IsOwnerOrReadOnly
 from .utils import get_weight, add_bolo_score, shorcountertopic, calculate_encashable_details, state_language, language_options,short_time,\
     solr_object_to_db_object, solr_userprofile_object_to_db_object,get_paginated_data ,shortcounterprofile, get_ranked_topics,\
-    set_android_logs_info, set_sync_dump_info, get_language_specific_audio_list, get_audio_list
+    set_android_logs_info, set_sync_dump_info, get_language_specific_audio_list, get_audio_list, get_only_active_topic
 
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
@@ -68,6 +69,10 @@ from forum.topic.utils import get_redis_category_paginated_data,get_redis_hashta
 # from haystack.utils import Highlighter
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.decorators import login_required
+import newrelic.agent
+
+newrelic.agent.initialize()
+application = newrelic.agent.register_application()
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -512,6 +517,10 @@ class GetPopularHashTag(generics.ListCreateAPIView):
     permission_classes = (IsOwnerOrReadOnly,)
     pagination_class = SmallSetPagination 
 
+    def dispatch(self, *args, **kwargs):
+        newrelic.agent.set_transaction_name("/get_popular_hash_tag/get", "Discover Landing Page")
+        return super(GetPopularHashTag, self).dispatch(*args, **kwargs)
+
     def get_serializer_context(self):
         """
         Extra context provided to the serializer class.
@@ -750,16 +759,17 @@ class SolrSearchTop(BoloIndyaGenericAPIView):
         response ={}
         if search_term:
             topics =[]
-            sqs = SearchQuerySet().models(Topic).raw_search(search_term).filter(SQ(language_id=language_id)|SQ(language_id='1')).filter(is_removed = False)
+            sqs = SearchQuerySet().models(Topic).raw_search(search_term).filter(SQ(language_id=language_id)|SQ(language_id='1'))
             if not sqs:
                 suggested_word = SearchQuerySet().models(Topic).auto_query(search_term).spelling_suggestion()
                 if suggested_word:
-                    sqs = SearchQuerySet().models(Topic).raw_search(suggested_word).filter(SQ(language_id=language_id)|SQ(language_id='1')).filter(is_removed = False)
+                    sqs = SearchQuerySet().models(Topic).raw_search(suggested_word).filter(SQ(language_id=language_id)|SQ(language_id='1'))
             if not sqs:
-                sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(SQ(language_id=language_id)|SQ(language_id='1')).filter(is_removed = False)
+                sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(SQ(language_id=language_id)|SQ(language_id='1'))
             if sqs:
-                result_page = get_paginated_data(sqs, int(page_size), int(page))
-                topics = solr_object_to_db_object(result_page[0].object_list)
+                topics = get_only_active_topic(sqs, int(page_size), int(page))
+                # result_page = get_paginated_data(sqs, int(page_size), int(page))
+                # topics = solr_object_to_db_object(result_page[0].object_list)
             response["top_vb"]=TopicSerializerwithComment(topics,many=True,context={'is_expand':is_expand,'last_updated':last_updated}).data
             users  =[]
             sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term)).order_by('-is_superstar','-is_popular')
@@ -799,18 +809,19 @@ class SolrSearchTopic(BoloIndyaGenericAPIView):
         last_updated=timestamp_to_datetime(self.request.GET.get('last_updated',False))
         response = {"count": 0, "results": [], "next_page_number": None}
         if search_term:
-            sqs = SearchQuerySet().models(Topic).raw_search(search_term).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
+            sqs = SearchQuerySet().models(Topic).raw_search(search_term).filter(SQ(language_id=language_id)|SQ(language_id='1'))
             if not sqs:
                 suggested_word = SearchQuerySet().models(Topic).auto_query(search_term).spelling_suggestion()
                 if suggested_word:
-                    sqs = SearchQuerySet().models(Topic).raw_search(suggested_word).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
+                    sqs = SearchQuerySet().models(Topic).raw_search(suggested_word).filter(SQ(language_id=language_id)|SQ(language_id='1'))
             if not sqs:
-                sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(Q(language_id=language_id)|Q(language_id='1'),is_removed = False)
+                sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(SQ(language_id=language_id)|SQ(language_id='1'))
             if sqs:
-                result_page = get_paginated_data(sqs, int(page_size), int(page))
-                if result_page[0]:
-                    topics = solr_object_to_db_object(result_page[0].object_list)
-            # topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True, language_id=language_id)
+                topics = get_only_active_topic(sqs, int(page_size), int(page))
+                # result_page = get_paginated_data(sqs, int(page_size), int(page))
+                # if result_page[0]:
+                #     topics = solr_object_to_db_object(result_page[0].object_list)
+            #topics  = Topic.objects.filter(title__icontains = search_term,is_removed = False,is_vb=True, language_id=language_id)
             next_page_number = page+1 if page_size*page<len(sqs) else ''
             if language_id:
                 response ={"count":len(sqs),"results":TopicSerializerwithComment(topics,many=True,context={'is_expand':is_expand,'last_updated':last_updated}).data,"next_page_number":next_page_number} 
@@ -1826,10 +1837,14 @@ def createTopic(request):
         data['image_url'] = ''
         data['days_ago'] = ''
 
-        # topic.update_m3u8_content()
-        topic_type = ContentType.objects.get_for_model(topic)
-        notify_owner = Notification.objects.create(for_user_id = topic.user.id ,topic_id = topic.id, topic_type = topic_type, notification_type='6', user_id = topic.user.id)
-        
+        try:
+            topic_type = ContentType.objects.get_for_model(topic)
+            notify_owner = Notification.objects.create(for_user_id = topic.user.id ,topic_id = topic.id, topic_type = topic_type, notification_type='6', user_id = topic.user.id)
+        except Exception as e:
+            print(e)
+            capture_exception(e)
+
+
         send_upload_video_notification.delay(data, {})
         #invoke watermark
         invoke_watermark_service(topic, request.user)
@@ -1862,6 +1877,7 @@ def invoke_watermark_service(topic, user):
                 print("failure with response code"+str(response.status_code))
     except Exception as e:
         print("Exception raised {}".format(e))
+        capture_exception(e)
 
 
 def provide_view_count(view_count,topic):
@@ -4322,6 +4338,7 @@ def old_algo_get_popular_video_bytes(request):
 @api_view(['GET'])
 def get_popular_video_bytes(request):
     try:
+        newrelic.agent.set_transaction_name("/get_popular_video_bytes/get", "Trending Page")
         language_id = request.GET.get('language_id', 1)
         if int(request.GET.get('page',1)) == 1:
             cache_popular_post(request.user.id,language_id)
@@ -5114,3 +5131,8 @@ def filter_audio_data(language_specific_audio_list, total_audio_list, language_i
         start_index = start_index - language_specific_list
         end_index = start_index + items_per_page
         return filtered_df.to_dict('records')[start_index:end_index]
+
+
+@api_view(['GET'])
+def test_api_response_time(request):
+    return JsonResponse({'message':'success'}, status=status.HTTP_200_OK)
