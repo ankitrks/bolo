@@ -43,7 +43,19 @@ def run():
         print e
 
     try:
-        calculate_all_vb_score_and_set_post_in_redis()
+        total_elements = len(view_count)
+        counter = 1
+        for key,value in view_count.items():
+            try:
+                print "###########",counter,"/",total_elements,"###########"
+                topic = Topic.objects.get(pk=key)
+                print "old score:  ",topic.vb_score
+                new_score = topic.calculate_vb_score()
+                counter+=1
+                print "new score:  ",new_score
+            except Exception as e:
+                print e
+        # calculate_all_vb_score_and_set_post_in_redis()
     except Exception as e:
         print e
 
