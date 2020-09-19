@@ -5131,3 +5131,8 @@ def filter_audio_data(language_specific_audio_list, total_audio_list, language_i
         start_index = start_index - language_specific_list
         end_index = start_index + items_per_page
         return filtered_df.to_dict('records')[start_index:end_index]
+
+
+@api_view(['GET'])
+def test_api_response_time(request):
+    return JsonResponse({'message':'success'}, status=status.HTTP_200_OK)
