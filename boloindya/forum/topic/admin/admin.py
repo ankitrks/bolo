@@ -57,7 +57,7 @@ from django.utils.translation import ugettext
 from django.utils.encoding import force_text
 import newrelic.agent
 
-newrelic.agent.initialize()
+# newrelic.agent.initialize()
 application = newrelic.agent.register_application()
 
 
