@@ -70,6 +70,7 @@ from forum.topic.utils import get_redis_category_paginated_data,get_redis_hashta
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.decorators import login_required
 import newrelic.agent
+from redis_utils import *
 
 # newrelic.agent.initialize()
 application = newrelic.agent.register_application()
@@ -4931,6 +4932,7 @@ def report(request):
         print "Error in API report/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+"""
 @api_view(['POST'])
 def get_campaigns(request):
     try:
@@ -4938,6 +4940,23 @@ def get_campaigns(request):
         all_camps = Campaign.objects.filter(is_active=True, active_from__lte=today, active_till__gte=today).order_by('-active_from')
         serializer_camp = CampaignSerializer(all_camps, many=True)
         data = serializer_camp.data
+        return JsonResponse({'status': 'success','message':data}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
+            'error':str(e)})
+        print "Error in API get_campaigns/ :" + log
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+"""
+@api_view(['POST'])
+def get_campaigns(request):
+    try:
+        today = datetime.today()
+        data = get_redis('campaign_data')
+        if not data:
+            all_camps = Campaign.objects.filter(is_active=True, active_from__lte=today, active_till__gte=today).order_by('-active_from')
+            serializer_camp = CampaignSerializer(all_camps, many=True)
+            data = serializer_camp.data
+            set_redis('campaign_data', data, True, 900)
         return JsonResponse({'status': 'success','message':data}, status=status.HTTP_201_CREATED)
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\

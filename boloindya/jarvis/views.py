@@ -3070,7 +3070,7 @@ import newrelic.agent
 import psycopg2
 
 
-newrelic.agent.initialize()
+# newrelic.agent.initialize()
 application = newrelic.agent.register_application()
 
             
