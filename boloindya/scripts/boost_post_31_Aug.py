@@ -37,29 +37,42 @@ def run():
             each_seen = Topic.objects.get(pk=each_seen_id)
             print "am i popular?", each_seen.is_popular
             if each_seen.is_popular:
-                required_view_count = random.randrange(3000000,5000000)
+                if each_seen.user.st.is_superstar:
+                    required_view_count = random.randrange(1500000,3000000)
+                elif each_seen.user.st.is_popular and not each_seen.user.st.is_superstar:
+                    required_view_count = random.randrange(750000,1000000)
+                else:
+                    required_view_count = random.randrange(300000,500000)
+                # required_view_count = random.randrange(3000000,5000000)
                 if not required_view_count > each_seen.user.st.boost_views_count:
                     required_view_count = each_seen.user.st.boost_views_count
             else:
-                required_view_count = random.randrange(50000,200000)
+                if each_seen.user.st.is_superstar:
+                    required_view_count = random.randrange(40000,150000)
+                elif each_seen.user.st.is_popular and not each_seen.user.st.is_superstar:
+                    required_view_count = random.randrange(20000,50000)
+                else:
+                    required_view_count = random.randrange(4000,10000)
+                # required_view_count = random.randrange(50000,200000)
                 if not required_view_count > each_seen.user.st.boost_views_count:
                     required_view_count = each_seen.user.st.boost_views_count
+            print "required_view_count", required_view_count
             if required_view_count:
-                multiplication_factor = decimal.Decimal(random.randrange(int(required_view_count/950),int(required_view_count/750)))
+                multiplication_factor = decimal.Decimal(random.randrange(int(required_view_count/20),int(required_view_count/16)))
                 print "i am boosted: ",multiplication_factor
             else:
                 multiplication_factor = 1
                 print "i am non popular: ",multiplication_factor
             if each_seen.date +timedelta(minutes=30) > now:
                 number_seen = random.randrange(6,100)
-            elif each_seen.date +timedelta(minutes=30) < now and each_seen.date +timedelta(hours=6) > now and each_seen.view_count < int(100*multiplication_factor):
-                number_seen = random.randrange(1,int(100*multiplication_factor)-each_seen.view_count)
-            elif each_seen.date +timedelta(minutes=6) < now and each_seen.date +timedelta(hours=24) > now and each_seen.view_count < int(250*multiplication_factor):
-                number_seen = random.randrange(1,int(250*multiplication_factor)-each_seen.view_count)
-            elif each_seen.date +timedelta(hours=24) < now and each_seen.date +timedelta(hours=96) > now and each_seen.view_count < int(500*multiplication_factor):
-                number_seen = random.randrange(1,int(500*multiplication_factor)-each_seen.view_count)
-            elif each_seen.date +timedelta(hours=96) < now and each_seen.view_count < int(750*multiplication_factor):
-                number_seen = random.randrange(1,int(750*multiplication_factor)-each_seen.view_count)
+            elif each_seen.date +timedelta(minutes=30) < now and each_seen.date +timedelta(hours=6) > now and each_seen.view_count < int(4*multiplication_factor):
+                number_seen = random.randrange(1,int(4*multiplication_factor)-each_seen.view_count)
+            elif each_seen.date +timedelta(minutes=6) < now and each_seen.date +timedelta(hours=24) > now and each_seen.view_count < int(8*multiplication_factor):
+                number_seen = random.randrange(1,int(8*multiplication_factor)-each_seen.view_count)
+            elif each_seen.date +timedelta(hours=24) < now and each_seen.date +timedelta(hours=96) > now and each_seen.view_count < int(12*multiplication_factor):
+                number_seen = random.randrange(1,int(12*multiplication_factor)-each_seen.view_count)
+            elif each_seen.date +timedelta(hours=96) < now and each_seen.view_count < int(16*multiplication_factor):
+                number_seen = random.randrange(1,int(16*multiplication_factor)-each_seen.view_count)
             else:
                 number_seen = 0
             i = 0
@@ -105,28 +118,40 @@ def check_like(topic_id):
     now = datetime.now()
     each_like = Topic.objects.get(pk=topic_id)
     if each_like.is_popular:
-        required_like = random.randrange(1000000,2000000)
+        if each_like.user.st.is_superstar:
+            required_like = random.randrange(1000000,1500000)
+        elif each_like.user.st.is_popular and not each_like.user.st.is_superstar:
+            required_like = random.randrange(250000,500000)
+        else:
+            required_like = random.randrange(100000,200000)
+        # required_like = random.randrange(1000000,2000000)
         if not required_like > each_like.user.st.boost_like_count:
             required_like = each_like.user.st.boost_like_count
     else:
-        required_like = random.randrange(20000,50000)
+        if each_like.user.st.is_superstar:
+            required_like = random.randrange(20000,40000)
+        elif each_like.user.st.is_popular and not each_like.user.st.is_superstar:
+            required_like = random.randrange(10000,15000)
+        else:
+            required_like = random.randrange(2000,3000)
+        # required_like = random.randrange(20000,50000)
         if not required_like > each_like.user.st.boost_like_count:
             required_like = each_like.user.st.boost_like_count
     print "required_like",required_like
     if required_like:
-        multiplication_factor = decimal.Decimal(random.randrange(int(required_like/310),int(required_like/250)))
+        multiplication_factor = decimal.Decimal(random.randrange(int(required_like/20),int(required_like/16)))
         print "i am boosted: ",multiplication_factor
     else:
         multiplication_factor = 1
 
-    if each_like.date < now and each_like.date +timedelta(hours=1) > now and each_like.likes_count < int(63*multiplication_factor):
-        number_like = random.randrange(1,int(63*multiplication_factor)-each_like.likes_count)
-    elif each_like.date +timedelta(hours=1) < now and each_like.date +timedelta(hours=24) > now and each_like.likes_count < int(125*multiplication_factor):
-        number_like = random.randrange(1,int(125*multiplication_factor)-each_like.likes_count)
-    elif each_like.date +timedelta(hours=24) < now and each_like.date +timedelta(hours=96) > now and each_like.likes_count < int(188*multiplication_factor):
-        number_like = random.randrange(1,int(188*multiplication_factor)-each_like.likes_count)
-    elif each_like.date +timedelta(hours=96) < now and each_like.likes_count < int(250*multiplication_factor):
-        number_like = random.randrange(1,int(250*multiplication_factor)-each_like.likes_count)
+    if each_like.date < now and each_like.date +timedelta(hours=1) > now and each_like.likes_count < int(4*multiplication_factor):
+        number_like = random.randrange(1,int(4*multiplication_factor)-each_like.likes_count)
+    elif each_like.date +timedelta(hours=1) < now and each_like.date +timedelta(hours=24) > now and each_like.likes_count < int(8*multiplication_factor):
+        number_like = random.randrange(1,int(8*multiplication_factor)-each_like.likes_count)
+    elif each_like.date +timedelta(hours=24) < now and each_like.date +timedelta(hours=96) > now and each_like.likes_count < int(12*multiplication_factor):
+        number_like = random.randrange(1,int(12*multiplication_factor)-each_like.likes_count)
+    elif each_like.date +timedelta(hours=96) < now and each_like.likes_count < int(16*multiplication_factor):
+        number_like = random.randrange(1,int(16*multiplication_factor)-each_like.likes_count)
     else:
         number_like = 0
 
@@ -161,29 +186,30 @@ def check_follower(user_id):
             if userprofile.follower_count < int(400*multiplication_factor):
                 required_follower = random.randrange(1,int(400*multiplication_factor)-userprofile.follower_count)
             else:
-                required_follower = 1
+                required_follower = 0
             print required_follower
-            follower_counter = 0
-            all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).exclude(user_id__in=get_redis_follower(userprofile.user.id)).values_list('user_id',flat=True)[:required_follower]
-            if len(all_test_userprofile_id) < required_follower:
-                create_random_user(required_follower-len(all_test_userprofile_id))
+            if required_follower:
+                follower_counter = 0
                 all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).exclude(user_id__in=get_redis_follower(userprofile.user.id)).values_list('user_id',flat=True)[:required_follower]
-            user_ids = list(all_test_userprofile_id)
-            to_be_created_follow = []
-            score = get_weight('followed')
-            for each_user_id in user_ids:
-                my_dict={}
-                my_dict['user_follower_id'] = each_user_id
-                my_dict['user_following_id'] = userprofile.user_id
-                to_be_created_follow.append(my_dict)
-            total_created=len(to_be_created_follow)
-            aList = [Follower(**vals) for vals in to_be_created_follow]
-            newly_bolo = Follower.objects.bulk_create(aList, batch_size=10000)
-            print total_created
-            UserProfile.objects.filter(pk=userprofile.id).update(follower_count=F('follower_count')+total_created,bolo_score=F('bolo_score')+(score*total_created))
-            get_redis_following(userprofile.user_id)
-            get_redis_follower(userprofile.user_id)
-            update_profile_counter(userprofile.user_id,'follower_count',total_created, True)
+                if len(all_test_userprofile_id) < required_follower:
+                    create_random_user(required_follower-len(all_test_userprofile_id))
+                    all_test_userprofile_id = UserProfile.objects.filter(is_test_user=True).exclude(user_id__in=get_redis_follower(userprofile.user.id)).values_list('user_id',flat=True)[:required_follower]
+                user_ids = list(all_test_userprofile_id)
+                to_be_created_follow = []
+                score = get_weight('followed')
+                for each_user_id in user_ids:
+                    my_dict={}
+                    my_dict['user_follower_id'] = each_user_id
+                    my_dict['user_following_id'] = userprofile.user_id
+                    to_be_created_follow.append(my_dict)
+                total_created=len(to_be_created_follow)
+                aList = [Follower(**vals) for vals in to_be_created_follow]
+                newly_bolo = Follower.objects.bulk_create(aList, batch_size=10000)
+                print total_created
+                UserProfile.objects.filter(pk=userprofile.id).update(follower_count=F('follower_count')+total_created,bolo_score=F('bolo_score')+(score*total_created))
+                get_redis_following(userprofile.user_id)
+                get_redis_follower(userprofile.user_id)
+                update_profile_counter(userprofile.user_id,'follower_count',total_created, True)
     except Exception as e:
         print e
 
@@ -192,30 +218,48 @@ def check_share(topic_id):
     single_topic = Topic.objects.get(pk= topic_id)
     topic = get_topic(topic_id)
     if single_topic.is_popular:
-        required_whatsapp_count = random.randrange(250000,500000)
-        required_other_share = random.randrange(100000,200000)
+        if single_topic.user.st.is_superstar:
+            required_whatsapp_count = random.randrange(250000,500000)
+            required_other_share = random.randrange(100000,200000)
+        elif single_topic.user.st.is_popular and not single_topic.user.st.is_superstar:
+            required_whatsapp_count = random.randrange(125000,200000)
+            required_other_share = random.randrange(50000,100000)
+        else:
+            required_whatsapp_count = random.randrange(62500,125000)
+            required_other_share = random.randrange(25000,50000)
+        # required_whatsapp_count = random.randrange(250000,500000)
+        # required_other_share = random.randrange(100000,200000)
     else:
-        required_whatsapp_count = random.randrange(5000,10000)
-        required_other_share = random.randrange(1000,5000)
+        if single_topic.user.st.is_superstar:
+            required_whatsapp_count = random.randrange(5000,10000)
+            required_other_share = random.randrange(2500,5000)
+        elif single_topic.user.st.is_popular and not single_topic.user.st.is_superstar:
+            required_whatsapp_count = random.randrange(2500,5000)
+            required_other_share = random.randrange(1500,2500)
+        else:
+            required_whatsapp_count = random.randrange(1000,1500)
+            required_other_share = random.randrange(250,500)
+        # required_whatsapp_count = random.randrange(5000,10000)
+        # required_other_share = random.randrange(1000,5000)
 
     whatsapp_multiplication_factor = 1
     other_multiplication_factor = 1
     if required_whatsapp_count:
-        whatsapp_multiplication_factor = decimal.Decimal(random.randrange(int(required_whatsapp_count/250),int(required_whatsapp_count/200)))
+        whatsapp_multiplication_factor = decimal.Decimal(random.randrange(int(required_whatsapp_count/20),int(required_whatsapp_count/16)))
     if required_other_share:
-        other_multiplication_factor = decimal.Decimal(random.randrange(int(required_other_share/250),int(required_other_share/200)))
+        other_multiplication_factor = decimal.Decimal(random.randrange(int(required_other_share/20),int(required_other_share/16)))
 
     try:
         if single_topic.date +timedelta(minutes=30) > now:
             whatsapp_share_count = random.randrange(6,100)
-        elif single_topic.date +timedelta(minutes=30) < now and single_topic.date +timedelta(hours=6) > now and single_topic.whatsapp_share_count < int(50*whatsapp_multiplication_factor):
-            whatsapp_share_count = random.randrange(1,int(50*whatsapp_multiplication_factor)-single_topic.whatsapp_share_count)
-        elif single_topic.date +timedelta(hours=6) < now and single_topic.date +timedelta(hours=24) > now and single_topic.whatsapp_share_count < int(100*whatsapp_multiplication_factor):
-            whatsapp_share_count = random.randrange(1,int(100*whatsapp_multiplication_factor)-single_topic.whatsapp_share_count)
-        elif single_topic.date +timedelta(hours=24) < now and single_topic.date +timedelta(hours=96) > now and single_topic.whatsapp_share_count < int(150*whatsapp_multiplication_factor):
-            whatsapp_share_count = random.randrange(1,int(150*whatsapp_multiplication_factor)-single_topic.whatsapp_share_count)
-        elif single_topic.date +timedelta(hours=96) < now and single_topic.whatsapp_share_count < int(200*whatsapp_multiplication_factor):
-            whatsapp_share_count = random.randrange(1,int(200*whatsapp_multiplication_factor)-single_topic.whatsapp_share_count)
+        elif single_topic.date +timedelta(minutes=30) < now and single_topic.date +timedelta(hours=6) > now and single_topic.whatsapp_share_count < int(4*whatsapp_multiplication_factor):
+            whatsapp_share_count = random.randrange(1,int(4*whatsapp_multiplication_factor)-single_topic.whatsapp_share_count)
+        elif single_topic.date +timedelta(hours=6) < now and single_topic.date +timedelta(hours=24) > now and single_topic.whatsapp_share_count < int(8*whatsapp_multiplication_factor):
+            whatsapp_share_count = random.randrange(1,int(8*whatsapp_multiplication_factor)-single_topic.whatsapp_share_count)
+        elif single_topic.date +timedelta(hours=24) < now and single_topic.date +timedelta(hours=96) > now and single_topic.whatsapp_share_count < int(12*whatsapp_multiplication_factor):
+            whatsapp_share_count = random.randrange(1,int(12*whatsapp_multiplication_factor)-single_topic.whatsapp_share_count)
+        elif single_topic.date +timedelta(hours=96) < now and single_topic.whatsapp_share_count < int(16*whatsapp_multiplication_factor):
+            whatsapp_share_count = random.randrange(1,int(16*whatsapp_multiplication_factor)-single_topic.whatsapp_share_count)
         else:
             whatsapp_share_count = 0
     except:
@@ -224,14 +268,14 @@ def check_share(topic_id):
     try:
         if single_topic.date +timedelta(minutes=30) > now:
             other_share_count = random.randrange(6,100)
-        elif single_topic.date +timedelta(minutes=30) < now and single_topic.date +timedelta(hours=6) > now and single_topic.other_share_count < int(50*other_multiplication_factor):
-            other_share_count = random.randrange(1,int(50*other_multiplication_factor)-single_topic.other_share_count)
-        elif single_topic.date +timedelta(hours=6) < now and single_topic.date +timedelta(hours=24) > now and single_topic.other_share_count < int(100*other_multiplication_factor):
-            other_share_count = random.randrange(1,int(100*other_multiplication_factor)-single_topic.other_share_count)
-        elif single_topic.date +timedelta(hours=24) < now and single_topic.date +timedelta(hours=96) > now and single_topic.other_share_count < int(150*other_multiplication_factor):
-            other_share_count = random.randrange(1,int(150*other_multiplication_factor)-single_topic.other_share_count)
-        elif single_topic.date +timedelta(hours=96) < now and single_topic.other_share_count < int(200*other_multiplication_factor):
-            other_share_count = random.randrange(1,int(200*other_multiplication_factor)-single_topic.other_share_count)
+        elif single_topic.date +timedelta(minutes=30) < now and single_topic.date +timedelta(hours=6) > now and single_topic.other_share_count < int(4*other_multiplication_factor):
+            other_share_count = random.randrange(1,int(4*other_multiplication_factor)-single_topic.other_share_count)
+        elif single_topic.date +timedelta(hours=6) < now and single_topic.date +timedelta(hours=24) > now and single_topic.other_share_count < int(8*other_multiplication_factor):
+            other_share_count = random.randrange(1,int(8*other_multiplication_factor)-single_topic.other_share_count)
+        elif single_topic.date +timedelta(hours=24) < now and single_topic.date +timedelta(hours=96) > now and single_topic.other_share_count < int(12*other_multiplication_factor):
+            other_share_count = random.randrange(1,int(12*other_multiplication_factor)-single_topic.other_share_count)
+        elif single_topic.date +timedelta(hours=96) < now and single_topic.other_share_count < int(16*other_multiplication_factor):
+            other_share_count = random.randrange(1,int(16*other_multiplication_factor)-single_topic.other_share_count)
         else:
             other_share_count = 0
     except:
