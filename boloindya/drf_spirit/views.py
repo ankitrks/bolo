@@ -71,7 +71,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.decorators import login_required
 import newrelic.agent
 
-newrelic.agent.initialize()
+# newrelic.agent.initialize()
 application = newrelic.agent.register_application()
 
 def get_tokens_for_user(user):
