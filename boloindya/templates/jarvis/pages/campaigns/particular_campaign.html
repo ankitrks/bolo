@@ -201,7 +201,7 @@ li:hover{
 
         <div class="form-group">
             <label id="disable_campaign" class="col-md-3 col-sm-3 col-xs-12 control-label" for="name">Disable this campaign: </label>
-                <input type="checkbox" id="disable_campaign_cb" name="disable_campaign">
+                <input type="checkbox" id="disable_campaign_cb" name="disable_campaign" value='true'>
         </div>
 
         <div class="form-group video_elements">
@@ -449,7 +449,6 @@ function upload(event) {
         data.append('hashtag_id', hashtag_id);
         data.append('is_winner_declared', $("#announce_winner").is(':checked'));
         data.append('is_disabled', $("#disable_campaign").is(':checked'));
-
         if(winner_1 != -1){
             data.append('winner_1', winner_1);
             data.append('video_1', video_1);
@@ -480,11 +479,6 @@ function upload(event) {
 
         // data.append('campaign_details', $("#campaign_details").val());
         data.append('campaign_details', $("#campaign_details").html());
-
-        console.log("Announce winners: ", $("#announce_winner").is(':checked'))
-        console.log("Disable campaign: ", $("#disable_campaign").is(':checked'))
-        console.log("Popup box: ",  $("#popup_checkbox").is(':checked'))
-        console.log("Details: ", $("#campaign_details").html())
 
         $.ajax({
             xhr: function() {
