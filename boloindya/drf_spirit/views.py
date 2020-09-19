@@ -4937,41 +4937,6 @@ def report(request):
         print "Error in API report/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-"""
-@api_view(['POST'])
-def get_campaigns(request):
-    try:
-        today = datetime.today()
-        data = get_redis('campaign_data')
-        if not data:
-            all_camps = Campaign.objects.filter(is_active=True, active_from__lte=today, active_till__gte=today).order_by('-active_from')
-            serializer_camp = CampaignSerializer(all_camps, many=True)
-            data = serializer_camp.data
-            set_redis('campaign_data', data, True, 900)
-        return JsonResponse({'status': 'success','message':data}, status=status.HTTP_201_CREATED)
-    except Exception as e:
-        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
-            'error':str(e)})
-        print "Error in API get_campaigns/ :" + log
-        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
-"""
-@api_view(['POST'])
-def get_campaigns(request):
-    try:
-        today = datetime.today()
-        data = get_redis('campaign_data')
-        if not data:
-            all_camps = Campaign.objects.filter(is_active=True, active_from__lte=today, active_till__gte=today).order_by('-active_from')
-            serializer_camp = CampaignSerializer(all_camps, many=True)
-            data = serializer_camp.data
-            set_redis('campaign_data', data, True, 900)
-        return JsonResponse({'status': 'success','message':data}, status=status.HTTP_201_CREATED)
-    except Exception as e:
-        log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
-            'error':str(e)})
-        print "Error in API get_campaigns/ :" + log
-        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
-"""
 from redis_utils import *
 @api_view(['POST'])
 def get_campaigns(request):
@@ -5177,7 +5142,7 @@ def filter_audio_data(language_specific_audio_list, total_audio_list, language_i
         end_index = start_index + items_per_page
         return filtered_df.to_dict('records')[start_index:end_index]
 
-
 @api_view(['GET'])
 def test_api_response_time(request):
     return JsonResponse({'message':'success'}, status=status.HTTP_200_OK)
+
