@@ -1,0 +1,301 @@
+{% extends "jarvis/layout/base.html" %}
+
+{% block styles %}
+    <style type="text/css">
+        .display-inline-block{
+            display: inline-block !important;
+        }
+    </style>  
+{% endblock styles %}
+
+{% block content %}
+    
+    {% include "jarvis/pages/analytics_v2/content_header.html" %}
+
+    <section class="content">
+        {% include "jarvis/pages/analytics_v2/section_brief_counts.html" %}
+        {% include "jarvis/pages/analytics_v2/sections/filters.html" %}
+        {% include "jarvis/pages/analytics_v2/sections/chart_display.html" %}
+    </section>
+{% endblock content %}
+
+
+{% block center_js %}
+    <script type="text/javascript">
+    class GetCounts {
+        constructor(sectionId, baseUrl){
+            this.section = $("#" + sectionId);
+            this.baseUrl = baseUrl;
+        }
+
+        getCount(){
+            this.ajaxCall()
+        }
+
+        ajaxCall(){
+            let that = this;
+            $.ajax(this.baseUrl, {
+                method: 'GET',
+                success: function(response){
+                    console.log("  here ", response)
+                    that.section.find('.value-count').text(response.result.counts);
+                    that.section.find('overlay').hide();
+                },
+                xhr: function(){
+                    let xhr = $.ajaxSettings.xhr();
+                    that.section.find('overlay').show();
+                    return xhr;
+                    
+                }
+
+            })
+        }
+    }
+
+    let VideoCreatedCounts = new GetCounts('video-created-counts', '/jarvis/analytics-v2/video-created/counts/');
+    VideoCreatedCounts.getCount();
+
+    let VideoCreatorCounts = new GetCounts('video-creator-counts', '/jarvis/analytics-v2/video-creator/counts/');
+    VideoCreatorCounts.getCount();
+
+    let NewVideoCreatorCounts = new GetCounts('new-video-creator-counts', '/jarvis/analytics-v2/new-video-creator/counts/');
+    NewVideoCreatorCounts.getCount();
+
+    let VideoPlaytimeCounts = new GetCounts('video-playtime-counts', '/jarvis/analytics-v2/video-playtime/counts/');
+    VideoPlaytimeCounts.getCount();
+
+</script>
+
+<script type="text/javascript">
+
+    class exportCSVFile{
+        constructor(headers, itemsNotFormatted, fileTitle){
+            this.headers = headers
+            this.formattedItems = this.formatItems(itemsNotFormatted);
+            this.fileTitle = fileTitle
+
+            this.createFile()
+        }
+
+        formatItems(itemsNotFormatted){
+            let itemsFormatted = [];
+
+            itemsNotFormatted.forEach((item) => {
+                itemsFormatted.push({
+                    Day: item.key,
+                    Counts: item.value,
+                });
+            });
+
+            return itemsFormatted
+        }
+
+        createFile(){
+            if (this.headers) {
+                this.formattedItems.unshift(this.headers);
+            }
+
+            // Convert Object to JSON
+            var jsonObject = JSON.stringify(this.formattedItems);
+            var csv = this.convertToCSV(jsonObject);
+
+            console.log(" === csv === ", csv);
+
+            var exportedFilenmae = this.fileTitle + '.csv' || 'export.csv';
+
+            var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            if (navigator.msSaveBlob) { // IE 10+
+                navigator.msSaveBlob(blob, exportedFilenmae);
+            } else {
+                var link = document.getElementById("download-report");
+                if (link.download !== undefined) { // feature detection
+                    // Browsers that support HTML5 download attribute
+                    var url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", exportedFilenmae);
+                }
+            }
+        }
+
+        convertToCSV(objArray) {
+            console.log(" objArray ", objArray)
+            var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+            var str = '';
+
+            for (var i = 0; i < array.length; i++) {
+                var line = '';
+                for (var index in array[i]) {
+                    if (line != '') line += ','
+
+                    line += array[i][index];
+                }
+
+                str += line + '\r\n';
+            }
+
+            return str
+
+        }
+    }
+
+
+    class GraphDisplay{
+        constructor(){
+            this.sections = ['video_created', 'video_creator', 'new_video_creator', 'video_playtime']
+            this.sectionUrlMap = {
+                video_created: '/jarvis/analytics-v2/video-created/data/',
+                video_creator: '/jarvis/analytics-v2/video-creator/data/',
+                new_video_creator: '/jarvis/analytics-v2/new-video-creator/data/',
+                video_playtime: '/jarvis/analytics-v2/video-playtime/data/',
+            }
+            this.data = []
+
+            this.urlParams = this.getUrlParamDict();
+            
+            this.selectedSection = this.urlParams['section'] || 'video_created';
+            this.selectedSectionName = 'Video Created'
+
+            this.initForm()
+            this.addEvents()
+
+        }
+
+        set selectedSectionName(val){
+            this.sectionName = val
+            $('#bar-chart-title').text(this.sectionName)
+            $('#filter-section-title').text(this.sectionName)
+        }
+
+        getUrlParamDict(){
+            let params = {}
+            $.each(window.location.search.split('&'), function(i, paramStr){
+                let key, val;
+                [key, val] = paramStr.split('=');
+                params[key] = val
+            });
+            return params
+
+        }
+
+        addEvents(){
+            let that = this;
+            $('#show-report').click(function(){
+                if($(this).hasClass('disabled'))
+                    return false
+
+                that.fetchData();
+                return false
+            })
+
+            $('.analytics-section').click(function(){
+                that.selectedSection = $(this).attr('data-section_name')
+                that.selectedSectionName = $(this).find('.section-name').text()
+                that.fetchData()
+            })
+        }
+
+        getFormattedDate(date){
+            var dd = date.getDate();
+            var mm = date.getMonth()+1; 
+            var yyyy = date.getFullYear();
+            if(dd<10) 
+            {
+                dd='0'+dd;
+            } 
+
+            if(mm<10) 
+            {
+                mm='0'+mm;
+            } 
+            return yyyy+'-'+mm+'-'+dd
+        }
+
+        initForm(){
+            let date = new Date();
+            $('#end-date').val(this.getFormattedDate(date));
+            date.setDate(date.getDate() - 30);
+            $('#start-date').val(this.getFormattedDate(date));
+        }
+
+        getParams(){
+            let params = {
+                'start_date': $('#start-date').val(),
+                'end_date': $('#end-date').val(),
+                'view_mode': $('#view-mode').val(),
+            }
+
+            let category_id = $('#category').val()
+            let language_id = $('#language').val()
+
+            if(category_id)
+                params['category_id'] = category_id
+
+            if(language_id)
+                params['language_id'] = language_id
+
+            return params
+
+        }
+
+        fetchData(){
+            $('#show-report').parent().append('<i class="fa fa-refresh fa-spin"></i>')
+            $('#bar-chart').html('<i class="fa fa-refresh fa-spin" style="font-size: 50px;"></i>');
+            $('#data-sum').html('<i class="fa fa-refresh fa-spin"></i>')
+            $('#data-avg').html('<i class="fa fa-refresh fa-spin"></i>')
+
+            this.ajaxCall()
+        }
+
+        ajaxCall(){
+            let that = this;
+            console.log("========here", this.sectionUrlMap[this.selectedSection])
+            $.ajax(this.sectionUrlMap[this.selectedSection] + '?' + $.param(this.getParams()), {
+                method: 'GET',
+                success: function(response){
+                    console.log("  here ", response)
+                    that.data = response.result.data
+                    that.drawGraph(response.result.data);
+                    let file = new exportCSVFile({
+                        key: 'Day',
+                        value: 'Counts'
+                    }, that.data, 'report')
+                    $('#show-report').removeClass('disabled');
+                    $('#show-report').parent().find('i.fa-refresh').remove()
+                    let sum = that.data.reduce(function(lastSum, item){return lastSum + item.value;}, 0);
+                    let avg = sum/that.data.length;
+                    $('#data-sum').text(sum);
+                    $('#data-avg').text(avg);
+                },
+                xhr: function(){
+                    let xhr = $.ajaxSettings.xhr();
+                    $('#show-report').addClass('disabled');
+                    return xhr;
+                    
+                }
+
+            })
+        }
+
+        drawGraph(data){
+            console.log("========== drawGraph")
+            $('#bar-chart').html('');
+            let  bar = new Morris.Bar({
+                element: 'bar-chart',
+                resize: true,
+                data: data,
+                barColors: ['#00a65a'],
+                xkey: 'key',
+                ykeys: ['value'],
+                labels: ['Value'],
+                hideHover: 'auto'
+            });
+        }
+    }
+
+    $(document).ready(function(){
+        let graph = new GraphDisplay();
+        graph.fetchData()
+    });
+  
+</script>
+{% endblock center_js %}

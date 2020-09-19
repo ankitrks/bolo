@@ -1779,8 +1779,6 @@ def get_video_new_creator_stats(start_date, end_date, group_by, language_id=None
         return cr.fetchall()
 
 
-
-
 @login_required
 def statistics_all(request):
     metrics_options_live = (
@@ -2047,19 +2045,18 @@ def statistics_all_jarvis(request):
         if category_choice:
             graph_data = graph_data.filter(category_id = category_choice)  
 
-
     if metrics == '0':
         x_axis = []
         y_axis = []
-
-        for row in get_video_create_stats(start_date, end_date, data_view, language_choice, category_choice):
-            x_axis.append(str(row[0]))
+        
+        for row in get_video_create_stats(start_date, end_date, data_view, language_choice, category_choice):       
+            x_axis.append(str(row[0]))      
             y_axis.append(int(row[1]))
+
 
     elif metrics == '9':
         x_axis = []
         y_axis = []
-
         for row in get_video_creator_stats(start_date, end_date, data_view, language_choice, category_choice):
             x_axis.append(str(row[0]))
             y_axis.append(int(row[1]))
@@ -2166,6 +2163,8 @@ def statistics_all_jarvis(request):
         data['category_filter'] = category_slab_options
           
     return render(request,'jarvis/pages/video_statistics/statistics_all_jarvis.html', data)
+
+
 
 @api_view(['POST'])
 def get_total_playtime(request):
@@ -3064,8 +3063,347 @@ def delete_bot_video(request):
     HttpResponse(json.dumps({'message':'fail','reason':'Invalid Request'}),content_type="application/json")
 
 
+from django.views.generic import TemplateView
+from django.conf import settings
+from django.db.models import Sum
+from rest_framework.views import APIView
+from datetime import datetime
+import newrelic.agent
+import psycopg2
+
+
+newrelic.agent.initialize()
+application = newrelic.agent.register_application()
 
             
 
+class JarvisAnalytics(TemplateView):
+    template_name = 'jarvis/pages/analytics_v2/index.html'
 
+
+    def dispatch(self, *args, **kwargs):
+        newrelic.agent.set_transaction_name("/Admin/Analytics-V2/", "Analytics Panel")
+        return super(JarvisAnalytics, self).dispatch(*args, **kwargs)
+
+
+    def get_context_data(self, **kwargs):
+        context = {}
+        context['languages'] = [{'id': language[0], 'name': language[1]}  for language in settings.LANGUAGE_OPTIONS] 
+        context['categories'] = Category.objects.values('id', 'title')
+        return context
+
+
+
+def get_elastic_filters(start_date, end_date, language_id=None, category_id=None):
+    filters = [{'range': {'create_date': {
+        'gte': start_date, 
+        'lte': end_date, 
+    }}}]
+
+    if category_id:
+        filters.append({'term': {'category_id': int(category_id)}})
+
+    if language_id and language_id != '0':
+        filters.append({'term': {'language_id': language_id}}) 
+
+    return filters 
+
+
+def get_elastic_date_group_by(group_by):
+    if group_by == 'daily':
+        return 'day', 'dd-MMM-yyyy'
+    elif group_by == 'weekly':
+        return 'week', 'dd-MMM-yyyy'
+    if group_by == 'monthly':
+        return 'month', 'MMM-yyyy'
+
+
+def get_video_create_stats_elastic(start_date, end_date, group_by, language_id=None, category_id=None):
+    from elasticsearch_utils import ElasticSearch
+    from time import time
+
+    interval, date_format = get_elastic_date_group_by(group_by)
+    t = time()
+    result = ElasticSearch().search('topic-index', {
+        'aggs': 
+            {'total_videos': {'date_histogram': {
+                'field': 'create_date', 
+                'calendar_interval': interval,
+                'format': date_format
+            }}
+        },
+        'query': {
+            'bool': {
+                'filter': get_elastic_filters(start_date, end_date, language_id, category_id)
+            }
+        },
+        'size': 0
+    })
+
+    print("time taken", time() - t)
+
+    return result.get('aggregations', {}).get('total_videos', {}).get('buckets')
+
+
+def get_video_creator_stats_elastic(start_date, end_date, group_by, language_id=None, category_id=None):
+    from elasticsearch_utils import ElasticSearch
+
+    interval, date_format = get_elastic_date_group_by(group_by)
+    result = ElasticSearch().search('topic-index', {
+        'aggs': 
+            {'total_videos': {
+                'date_histogram': {
+                    'field': 'create_date', 
+                    'calendar_interval': interval,
+                    'format': date_format
+                },
+                "aggs": {"unique_users": {"cardinality": {"field": "user_id"}}}
+            }
+        },
+        'query': {
+            'bool': {
+                'filter': get_elastic_filters(start_date, end_date, language_id, category_id)
+            }
+        },
+        'size': 0
+    })
+
+    # print("result", result)
+
+    return result.get('aggregations', {}).get('total_videos', {}).get('buckets')
+
+
+
+# def get_video_new_creator_stats_elastic(start_date, end_date, group_by, language_id=None, category_id=None):
+#     from elasticsearch_utils import ElasticSearch
+
+#     interval, date_format = get_elastic_date_group_by(group_by)
+#     result = ElasticSearch().search('user-index', {
+#         'aggs': 
+#             {'new_users': {
+#                 'date_histogram': {
+#                     'field': 'create_date', 
+#                     'calendar_interval': interval,
+#                     'format': date_format
+#                 }
+#             }
+#         },
+#         'query': {
+#             'bool': {
+#                 'filter': get_elastic_filters(start_date, end_date, language_id, category_id)
+#             }
+#         },
+#         'size': 0
+#     })
+
+#     return result.get('aggregations', {}).get('new_users', {}).get('buckets')
+
+
+def get_video_playtime_stats_elastic(start_date, end_date, group_by, language_id=None, category_id=None):
+    from elasticsearch_utils import ElasticSearch
+
+    interval, date_format = get_elastic_date_group_by(group_by)
+    result = ElasticSearch().search('playtime-index', {
+        'aggs': 
+            {'playtime_count': {
+                'date_histogram': {
+                    'field': 'create_date', 
+                    'calendar_interval': interval,
+                    'format': date_format
+                },
+                "aggs": {"total_playtime": {"sum": {"field": "playtime"}}}
+            }
+        },
+        'query': {
+            'bool': {
+                'filter': get_elastic_filters(start_date, end_date, language_id, category_id)
+            }
+        },
+        'size': 0
+    })
+
+    # print("result", result)
+
+    return result.get('aggregations', {}).get('playtime_count', {}).get('buckets')
+
+
+class AnalyticsGraphCountsAPIView(APIView):
+    def get_counts(self):
+        return 0
+
+    def get(self, request, required_data_type, *args, **kwargs):
+        if required_data_type == 'counts':
+            return JsonResponse({
+                'result': {
+                    'counts': self.get_counts()
+                }
+            })
+        elif required_data_type == 'data':
+            return JsonResponse({
+                'result': {
+                    'data': self.get_data()
+                }
+            })
+
+
+class VideoCreatedAPIView(AnalyticsGraphCountsAPIView):
+    def get_data(self):
+        params = self.request.query_params
+        return [{
+                'key': row.get('key_as_string'),
+                'value': row.get('doc_count')
+            } for row in get_video_create_stats_elastic(params.get('start_date'), params.get('end_date'),
+                params.get('view_mode'), params.get('language_id'), params.get('category_id'))]
+
+    def get_counts(self):
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=30)
+        return Topic.objects.filter(created_at__gte=start_date, created_at__lte=end_date).count()
+        
+
+class VideoCreatorAPIView(AnalyticsGraphCountsAPIView):
+    def get_data(self):
+        params = self.request.query_params
+        return [{
+                'key': row.get('key_as_string'),
+                'value': row.get('unique_users', {}).get('value')
+            } for row in get_video_creator_stats_elastic(params.get('start_date'), params.get('end_date'),
+                params.get('view_mode'), params.get('language_id'), params.get('category_id'))]
+
+    def get_counts(self):
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=30)
+        return Topic.objects.filter(created_at__gte=start_date, created_at__lte=end_date).distinct('user_id').count()
+
+class NewVideoCreatorAPIView(AnalyticsGraphCountsAPIView):
+    def get_data(self):
+        query_params = self.request.query_params
+
+        where_clause_1 = ['created_at between %s and %s']
+        params_1 = [query_params.get('start_date'), query_params.get('end_date')]
+
+        where_clause_2 = []
+        params_2 = []
+
+        where_clause_3 = ['created_at between %s and %s']
+        params_3 = [query_params.get('start_date'), query_params.get('end_date')]
+
+        join_query = ''
+
+        if query_params.get('language_id'):
+            where_clause_1.append('language_id = %s')
+            params_1.append(query_params.get('language_id'))
+            where_clause_2.append('language_id = %s')
+            params_2.append(query_params.get('language_id'))
+
+        if query_params.get('category_id'):
+            where_clause_1.append('tc.category_id = %s')
+            params_1.append(query_params.get('category_id'))
+            where_clause_2.append('tc.category_id = %s')
+            params_2.append(query_params.get('category_id'))
+
+            join_query = ' inner join forum_topic_topic_m2mcategory tc on tc.topic_id = tp.id '
+
+        date_column = "created_at::date"
+        date_format_column = "to_char(C.created_at, 'DD-Mon-YYYY')"
+
+        if query_params.get('view_mode') == 'weekly':
+            date_column = "date_trunc('week', A.created_at)"
+            date_format_column = "concat('Week ', to_char(C.created_at, 'WW'))"
+        elif query_params.get('view_mode') == 'monthly':
+            date_column = "date_trunc('month', A.created_at)"
+            date_format_column = "to_char(C.created_at, 'Mon-YYYY')"
+
+        # query = """
+        #     SELECT %s as key, C.count as value
+        #     FROM (
+        #         SELECT %s as created_at, count(distinct A.user_id) as count
+        #         FROM    
+        #             (SELECT created_at, user_id
+        #             from forum_topic_topic tp %s
+        #             where %s) AS A
+        #         LEFT JOIN
+        #             (SELECT distinct user_id
+        #             from forum_topic_topic tp %s
+        #             WHERE %s ) AS  B on A.user_id =B.user_id
+        #         WHERE B.user_id is null
+        #         GROUP BY %s
+        #     ) C ORDER BY C.created_at 
+
+        # """%(date_format_column, date_column, join_query, ' AND '.join(where_clause), 
+        #         join_query, ' AND '.join(where_clause_2), date_column)
+
+        if where_clause_2:
+            where_clause_2 = ' AND ' + ' AND '.join(where_clause_2)
+        else:
+            where_clause_2 = ''
+
+        query = """
+            SELECT {date_format_column} as key, C.count as value
+            FROM (
+                SELECT {date_column} as created_at, count(user_id) as count
+                FROM (
+                    SELECT min(tp.created_at) as created_at, tp.user_id
+                    FROM forum_topic_topic tp {join_query}
+                    WHERE user_id in  (SELECT distinct user_id
+                        FROM forum_topic_topic tp {join_query}
+                        WHERE {where_clause_1}
+                    ) {where_clause_2}
+                    GROUP BY tp.user_id
+                ) A
+                WHERE {where_clause_3}
+                GROUP BY {date_column}
+            ) C ORDER BY C.created_at 
+        """.format(date_format_column=date_format_column, date_column=date_column, 
+                where_clause_1=' AND '.join(where_clause_1), where_clause_2=where_clause_2,
+                where_clause_3=' AND '.join(where_clause_3), join_query=join_query)
+
+        print "Query", query
+
+        with connections['default'].cursor() as cr:
+            cr.execute(query, params_1 + params_2 + params_3)
+
+            columns = [col[0] for col in cr.description]
+            return [
+                dict(zip(columns, row))
+                for row in cr.fetchall()
+            ]
+
+
+
+    def get_counts(self):
+        end_date = datetime.now().date()
+        start_date = end_date - timedelta(days=30)
+        with connections['default'].cursor() as cr:
+            cr.execute("""
+                SELECT count(distinct A.user_id) 
+                FROM    
+                    (SELECT created_at, user_id
+                    from forum_topic_topic tp
+                    where created_at between %s and %s) AS A
+                LEFT JOIN
+                    (SELECT distinct user_id
+                    from forum_topic_topic tp
+                    WHERE created_at < %s ) AS  B on A.user_id =B.user_id
+                WHERE B.user_id is null
+            """, [start_date, end_date, start_date])
+
+            return cr.fetchall()[0][0]
+        
+
+class VideoPlaytimeAPIView(AnalyticsGraphCountsAPIView):
+    def get_data(self):
+        params = self.request.query_params
+        return [{
+                'key': row.get('key_as_string'),
+                'value': int(row.get('total_playtime', {}).get('value'))/(60*60)
+            } for row in get_video_playtime_stats_elastic(params.get('start_date'), params.get('end_date'),
+                params.get('view_mode'), params.get('language_id'), params.get('category_id'))]
+
+
+    def get_counts(self):
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=30)
+        return str((VideoPlaytime.objects.filter(timestamp__gte=start_date, timestamp__lte=end_date)\
+                .aggregate(Sum('playtime'))['playtime__sum'] or O) / (60*60)) + ' Hours'
 

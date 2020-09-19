@@ -1,0 +1,58 @@
+<div class="row">
+    <div class="col-md-12">
+        <!-- general form elements -->
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title" id="filter-section-title">Quick Example</h3>
+            </div>
+            <form role="form">
+                <div class="box-body">
+                    <div class="row">
+                        <div class="form-group display-inline-block col-sm-2">
+                            <input type="date" class="form-control display-inline-block" id="start-date" placeholder="Start Date" >
+                        </div>
+                        <div class="form-group display-inline-block col-sm-2">
+                            <input type="date" class="form-control display-inline-block" id="end-date" placeholder="End Date" >
+                        </div>
+
+                        <div class="form-group display-inline-block col-sm-2">
+                            <select class="form-control display-inline-block select2 select2-hidden-accessible" data-select2-id="1" tabindex="-1" aria-hidden="true" id="view-mode">
+                                <option value="monthly" selected="selected" >Monthly</option>
+                                <option value="weekly" >Weekly</option>
+                                <option value="daily" >Daily</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group display-inline-block col-sm-2">
+                            <select class="form-control display-inline-block"  tabindex="-1" aria-hidden="true" id="category">
+                                <option selected="selected" value="">Category</option>
+                                {% for category in categories %}
+                                    <option value="{{ category.id }}">{{ category.title }}</option>
+                                {% endfor %}
+                            </select>
+                            
+                        </div>
+                        <div class="form-group display-inline-block col-sm-2">
+                            <select class="form-control display-inline-block" tabindex="-1" aria-hidden="true" id="language">
+                                <option selected="selected" value="">Language</option>
+                                {% for language in languages %}
+                                    <option value="{{ language.id }}">{{ language.name }}</option>
+                                {% endfor %}
+                            </select>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="box-footer">
+                                <button type="submit" class="btn btn-primary" id="show-report">Show Report</button>
+                            </div>    
+                        </div>
+                        
+                    </div>
+                </div>
+            </form>
+        </div>
+          <!-- /.box -->
+    </div>
+</div>
