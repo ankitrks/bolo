@@ -30,6 +30,7 @@ from datetime import datetime,timedelta,date
 from django.db.models.signals import post_save
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from redis_utils import *
 
 from rest_framework import status
 from rest_framework import generics
@@ -4937,9 +4938,12 @@ def report(request):
 def get_campaigns(request):
     try:
         today = datetime.today()
-        all_camps = Campaign.objects.filter(is_active=True, active_from__lte=today, active_till__gte=today).order_by('-active_from')
-        serializer_camp = CampaignSerializer(all_camps, many=True)
-        data = serializer_camp.data
+        data = get_redis('campaign_data')
+        if not data:
+            all_camps = Campaign.objects.filter(is_active=True, active_from__lte=today, active_till__gte=today).order_by('-active_from')
+            serializer_camp = CampaignSerializer(all_camps, many=True)
+            data = serializer_camp.data
+            set_redis('campaign_data', data, True, 900)
         return JsonResponse({'status': 'success','message':data}, status=status.HTTP_201_CREATED)
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
