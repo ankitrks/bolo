@@ -200,7 +200,7 @@ def get_redis_hashtag_paginated_data(language_id, hashtag_id, page_no):
             except:
                 last_page_data = paginated_data[last_page_no]
             topics = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, \
-                    hash_tags__id = hashtag_id).exclude(id__in = last_page_data['id_list']).filter(vb_score__lte = last_page_data['scores'][-1]).order_by('-vb_score')
+                    first_hash_tag_id = hashtag_id).exclude(id__in = last_page_data['id_list']).filter(vb_score__lte = last_page_data['scores'][-1]).order_by('-vb_score')
             new_page = page_no - last_page_no #(191-190)
             paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
             if paginator.num_pages >= new_page:
@@ -209,7 +209,7 @@ def get_redis_hashtag_paginated_data(language_id, hashtag_id, page_no):
                 topics = []
     else:
         topics = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, \
-            hash_tags__id = hashtag_id).order_by('-vb_score', '-id')
+            first_hash_tag_id = hashtag_id).order_by('-vb_score', '-id')
         paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
         if paginator.num_pages >= page_no:
             topics = list(paginator.page(page_no))
