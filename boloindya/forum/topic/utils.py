@@ -16,6 +16,7 @@ import pandas as pd
 from django.conf import settings
 from datetime import datetime, timedelta
 from sentry_sdk import capture_exception
+from drf_spirit.models import Campaign
 
 def topic_viewed(request, topic):
     # Todo test detail views
@@ -199,8 +200,12 @@ def get_redis_hashtag_paginated_data(language_id, hashtag_id, page_no):
                 last_page_data = paginated_data[str(last_page_no)]
             except:
                 last_page_data = paginated_data[last_page_no]
-            topics = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, \
-                    first_hash_tag_id = hashtag_id).exclude(id__in = last_page_data['id_list']).filter(vb_score__lte = last_page_data['scores'][-1]).order_by('-vb_score')
+            if Campaign.objects.filter(hashtag_id = hashtag_id):
+                topics = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, \
+                        hash_tags__id = hashtag_id).exclude(id__in = last_page_data['id_list']).filter(vb_score__lte = last_page_data['scores'][-1]).order_by('-vb_score')
+            else:
+                topics = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, \
+                        first_hash_tag_id = hashtag_id).exclude(id__in = last_page_data['id_list']).filter(vb_score__lte = last_page_data['scores'][-1]).order_by('-vb_score')
             new_page = page_no - last_page_no #(191-190)
             paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
             if paginator.num_pages >= new_page:
@@ -208,8 +213,12 @@ def get_redis_hashtag_paginated_data(language_id, hashtag_id, page_no):
             else:
                 topics = []
     else:
-        topics = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, \
-            first_hash_tag_id = hashtag_id).order_by('-vb_score', '-id')
+        if Campaign.objects.filter(hashtag_id = hashtag_id):
+            topics = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, \
+                hash_tags__id = hashtag_id).order_by('-vb_score', '-id')
+        else:
+            topics = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, \
+                first_hash_tag_id = hashtag_id).order_by('-vb_score', '-id')
         paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
         if paginator.num_pages >= page_no:
             topics = list(paginator.page(page_no))
@@ -251,7 +260,10 @@ def update_redis_hashtag_paginated_data(language_id, extra_filter, cache_max_pag
                     page = 1
                     final_data = {}
                     exclude_ids = []
-                    query = Topic.objects.filter(is_removed = False, is_vb = True, first_hash_tag_id = each_rec, language_id = language_id).order_by('-vb_score', '-id')
+                    if Campaign.objects.filter(hashtag_id = each_rec):
+                        query = Topic.objects.filter(is_removed = False, is_vb = True, hash_tags__id = each_rec, language_id = language_id).order_by('-vb_score', '-id')
+                    else:
+                        query = Topic.objects.filter(is_removed = False, is_vb = True, first_hash_tag_id = each_rec, language_id = language_id).order_by('-vb_score', '-id')
                     # final_data = update_redis_paginated_data(key, query)
                     final_data = new_algo_update_redis_paginated_data(key,query)
         if key:
