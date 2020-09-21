@@ -499,7 +499,7 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
         if not self.user.st.is_superstar and not self.user.st.is_popular:
             score += get_ranking_feature_weight('user_normal')
 
-        if self.is_boosted and self.boosted_end_time>=datetime.now():
+        if self.is_boosted and self.boosted_end_time and self.boosted_end_time>=datetime.now():
             score += get_ranking_feature_weight('post_superboost')
 
         if self.popular_boosted and (self.popular_boosted_time + timedelta(days = settings.POPULAR_BOOST_TIMEDELTA)) >= datetime.now():
