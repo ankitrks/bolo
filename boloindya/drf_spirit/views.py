@@ -1301,7 +1301,6 @@ def replyOnTopic(request):
     user_id and topic_id and comment_html
 
     """
-
     user_id      = request.user.id
     topic_id     = request.POST.get('topic_id', '')
     language_id  = request.user.st.language
@@ -1309,6 +1308,7 @@ def replyOnTopic(request):
     mobile_no    = request.POST.get('mobile_no', '')
     thumbnail = request.POST.get('thumbnail', '')
     media_duration = request.POST.get('media_duration', '')
+    gify_details = request.POST.get('gify_details', '')
     comment      = Comment()
 
     if request.POST.get('is_media'):
@@ -1338,6 +1338,9 @@ def replyOnTopic(request):
             comment.user_id       = user_id
             comment.topic_id      = topic_id
             comment.mobile_no     = mobile_no
+
+            if gify_details:
+                comment.gify_details  = json.dumps(json.loads(gify_details))
             comment.save()
             has_hashtag,hashtagged_title = check_hashtag(comment)
             if has_hashtag:
