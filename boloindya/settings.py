@@ -479,7 +479,7 @@ SOCIALACCOUNT_STORE_TOKENS=False
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.googlemail.com'
-EMAIL_HOST_USER = 'support@careeranna.com'
+EMAIL_HOST_USER = 'reports@boloindya.com'
 EMAIL_HOST_PASSWORD = '$upp0rt@30!1'
 EMAIL_PORT = 587
 
