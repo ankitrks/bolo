@@ -1051,34 +1051,33 @@ def get_video_thumbnail(video_url):
     else:
         return False
 
-# from moviepy.video.io.VideoFileClip import VideoFileClip
+from moviepy.video.io.VideoFileClip import VideoFileClip
 def getVideoLength(input_video):
-    pass
-    # clip = VideoFileClip(input_video)
-    # dt = timedelta(seconds = int(clip.duration))
-    # minutes = '00'
-    # seconds = '00'
-    # if dt.seconds/60:
-    #     if len(str(dt.seconds/60))==1:
-    #         minutes = '0'+str(dt.seconds/60)
-    #     else:
-    #         minutes = str(dt.seconds/60)
-    # else:
-    #     minutes='00'
-    # if dt.seconds:
-    #     if dt.seconds<60:
-    #         if len(str(dt.seconds))==1:
-    #             seconds = '0'+str(dt.seconds)
-    #         else:
-    #             seconds = str(dt.seconds)
-    #     else:
-    #         seconds = str(dt.seconds -(dt.seconds/60)*60)
-    #         if len(seconds)==1:
-    #             seconds = '0'+seconds
-    # else:
-    #     seconds='00'
-    # duration= minutes+":"+seconds
-    # return duration
+    clip = VideoFileClip(input_video)
+    dt = timedelta(seconds = int(clip.duration))
+    minutes = '00'
+    seconds = '00'
+    if dt.seconds/60:
+        if len(str(dt.seconds/60))==1:
+            minutes = '0'+str(dt.seconds/60)
+        else:
+            minutes = str(dt.seconds/60)
+    else:
+        minutes='00'
+    if dt.seconds:
+        if dt.seconds<60:
+            if len(str(dt.seconds))==1:
+                seconds = '0'+str(dt.seconds)
+            else:
+                seconds = str(dt.seconds)
+        else:
+            seconds = str(dt.seconds -(dt.seconds/60)*60)
+            if len(seconds)==1:
+                seconds = '0'+seconds
+    else:
+        seconds='00'
+    duration= minutes+":"+seconds
+    return duration
 
 def getVideoLength_n_width_n_height(input_video):
     try:
