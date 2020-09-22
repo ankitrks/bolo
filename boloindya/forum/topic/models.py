@@ -351,18 +351,29 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
         #     + '/change/" target="_blank">' + user_str + '</a>' )
 
         user = self.user
-
-        return format_html("""
-            <a class="user-link" data-is_active="{is_active}" data-is_popular="{is_popular}" data-is_superstar="{is_superstar}"
+        try:
+            return format_html("""
+                <a class="user-link" data-is_active="{is_active}" data-is_popular="{is_popular}" data-is_superstar="{is_superstar}"
                 href="{profile_link}" target="_blank"> {display_name} </a>
-        """.format(**{
+            """.format(**{
                 'is_active': str(user.is_active).lower(),
                 'is_popular': str(user.st.is_popular).lower() if hasattr(user, 'st') else '',
                 'is_superstar': str(user.st.is_superstar).lower() if hasattr(user, 'st') else '',
                 'profile_link': '/superman/forum_user/userprofile/' + str(self.user.st.id) + '/change/',
                 'display_name': user_str
             }))
-
+        except:
+            user_str = '@' + self.user.username
+            return format_html("""
+                <a class="user-link" data-is_active="{is_active}" data-is_popular="{is_popular}" data-is_superstar="{is_superstar}"
+                href="{profile_link}" target="_blank"> {display_name} </a>
+            """.format(**{
+                'is_active': str(user.is_active).lower(),
+                'is_popular': str(user.st.is_popular).lower() if hasattr(user, 'st') else '',
+                'is_superstar': str(user.st.is_superstar).lower() if hasattr(user, 'st') else '',
+                'profile_link': '/superman/forum_user/userprofile/' + str(self.user.st.id) + '/change/',
+                'display_name': user_str
+            }))
 
     def delete(self,is_user_deleted=False):
         from forum.topic.utils import set_redis_removed_videos

@@ -3405,3 +3405,8 @@ class VideoPlaytimeAPIView(AnalyticsGraphCountsAPIView):
         return str((VideoPlaytime.objects.filter(timestamp__gte=start_date, timestamp__lte=end_date)\
                 .aggregate(Sum('playtime'))['playtime__sum'] or O) / (60*60)) + ' Hours'
 
+
+def timeout_test(request):
+    import time
+    time.sleep(int(request.GET.get('tout', 65)))
+    return HttpResponse('No Timeout...')
