@@ -5153,4 +5153,6 @@ def remove_extra_char(file_name):
     Note: please update chars_to_remove list when to remove any character.
     """
     chars_to_remove = ['%0A']
-    return file_name.translate(None, ''.join(chars_to_remove))
+    for char in chars_to_remove:
+        file_name = file_name.replace(char, '')
+    return file_name
