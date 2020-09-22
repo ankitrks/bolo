@@ -74,7 +74,7 @@ class ConnectionHolder:
         return self._redis_logs
 
     def redis_logs(self):
-        return SimpleLazyObject(self._get_redis)
+        return SimpleLazyObject(self._get_redis_logs)
 
     def _get_redis_logs_read_only(self):
         if not self._redis_logs_read_only:
