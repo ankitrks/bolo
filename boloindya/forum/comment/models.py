@@ -52,7 +52,7 @@ class Comment(models.Model):
     media_duration = models.CharField(_("duration"), max_length=20, default='',null=True,blank=True)
     language_id = models.CharField(choices=language_options, blank = True, null = True, max_length=10, default='1')
     thumbnail = models.CharField(_("thumbnail"), max_length=150, default='')
-    
+    gify_details = models.TextField(blank=True, null=True)
     # is_transcoded = models.BooleanField(default = False)
     # transcode_dump = models.TextField(_("backup url"))
 
