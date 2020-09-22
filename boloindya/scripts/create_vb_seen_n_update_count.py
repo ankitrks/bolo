@@ -13,11 +13,11 @@ def run():
     try:
         all_entries = []
         all_keys = []
-        # print 'Total: ', len(redis_cli.keys("bi:vb_entry:*:*"))
-        for key in redis_cli.keys("bi:vb_entry:*:*"):
+        # print 'Total: ', len(redis_cli_vbseen.keys("bi:vb_entry:*:*"))
+        for key in redis_vbseen_read_only.keys("bi:vb_entry:*:*"):
             print key
             try:
-                data = redis_cli.get(key)
+                data = redis_vbseen_read_only.get(key)
                 data =  json.loads(data) if data else None
                 if data:
                     all_entries += data
@@ -35,7 +35,7 @@ def run():
                 update_profile_counter(Topic.objects.get(pk=key).user_id,'view_count',value,True)
             for each_key in all_keys:
                 try:
-                    redis_cli.delete(each_key)
+                    redis_cli_vbseen.delete(each_key)
                 except Exception as e:
                     print e
 
