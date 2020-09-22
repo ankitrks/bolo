@@ -19,6 +19,11 @@ class ConnectionHolder:
         # self._neo4j = None
         self._redis = None
         self._redis_read_only = None
+        self._redis_vbseen = None
+        self._redis_vbseen_read_only = None
+        self._redis_logs = None
+        self._redis_logs_read_only = None
+
 
     # def _get_neo4j(self):
     #     if not self._neo4j:
@@ -44,3 +49,37 @@ class ConnectionHolder:
 
     def redis_read_only(self):
         return SimpleLazyObject(self._get_redis_read_only)
+
+
+    def _get_redis_vbseen(self):
+        if not self._redis_vbseen:
+            self._redis_vbseen = redis.StrictRedis(host=settings.REDIS_VBSEEN_HOST, port=settings.REDIS_VBSEEN_PORT, db=settings.REDIS_VBSEEN_DB)
+        return self._redis_vbseen
+
+    def redis_vbseen(self):
+        return SimpleLazyObject(self._get_redis_vbseen)
+
+    def _get_redis_vbseen_read_only(self):
+        if not self._redis_vbseen_read_only:
+            self._redis_vbseen_read_only = redis.StrictRedis(host=settings.REDIS_VBSEEN_RO_HOST, port=settings.REDIS_VBSEEN_RO_PORT, db=settings.REDIS_VBSEEN_RO_DB)
+        return self._redis_vbseen_read_only
+
+    def redis_vbseen_read_only(self):
+        return SimpleLazyObject(self._get_redis_vbseen_read_only)
+
+
+    def _get_redis_logs(self):
+        if not self._redis_logs:
+            self._redis_logs = redis.StrictRedis(host=settings.REDIS_LOGS_HOST, port=settings.REDIS_LOGS_PORT, db=settings.REDIS_LOGS_DB)
+        return self._redis_logs
+
+    def redis_logs(self):
+        return SimpleLazyObject(self._get_redis)
+
+    def _get_redis_logs_read_only(self):
+        if not self._redis_logs_read_only:
+            self._redis_logs_read_only = redis.StrictRedis(host=settings.REDIS_LOGS_HOST, port=settings.REDIS_LOGS_PORT, db=settings.REDIS_LOGS_DB)
+        return self._redis_logs_read_only
+
+    def redis_logs_read_only(self):
+        return SimpleLazyObject(self._get_redis_logs_read_only)
