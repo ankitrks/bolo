@@ -78,7 +78,7 @@ class ConnectionHolder:
 
     def _get_redis_logs_read_only(self):
         if not self._redis_logs_read_only:
-            self._redis_logs_read_only = redis.StrictRedis(host=settings.REDIS_LOGS_HOST, port=settings.REDIS_LOGS_PORT, db=settings.REDIS_LOGS_DB)
+            self._redis_logs_read_only = redis.StrictRedis(host=settings.REDIS_LOGS_RO_HOST, port=settings.REDIS_LOGS_RO_PORT, db=settings.REDIS_LOGS_RO_DB)
         return self._redis_logs_read_only
 
     def redis_logs_read_only(self):
