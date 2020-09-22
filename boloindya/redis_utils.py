@@ -10,6 +10,8 @@ redis_cli = connection.redis()
 redis_cli_read_only = connection.redis_read_only()
 redis_cli_vbseen = connection.redis_vbseen()
 redis_vbseen_read_only = connection.redis_vbseen_read_only()
+redis_cli_logs = connection.redis_logs()
+redis_cli_logs_read_only = connection.redis_logs_read_only()
 logger = logging.getLogger(__name__)
 
 
@@ -17,6 +19,8 @@ def get_redis(key):
     try:
         if 'vb_seen:' in key or 'vb_entry:' in key:
             data = redis_vbseen_read_only.get("bi:"+key)
+        elif 'android_logs:' in key:
+            data = redis_cli_logs_read_only.get("bi:"+key)
         else:
             data = redis_cli_read_only.get("bi:"+key)
         return json.loads(data) if data else None
@@ -42,7 +46,16 @@ def set_redis(key, value, set_expiry=True, expiry_time=None):
             else:
                 return redis_cli_vbseen.set("bi:"+key, json.dumps(value, cls=DjangoJSONEncoder))
 
-        else: 
+        elif 'android_logs:' in key:
+            if set_expiry:
+                if expiry_time:
+                    return redis_cli_logs.setex("bi:"+key, expiry_time, json.dumps(value, cls=DjangoJSONEncoder))
+                if 'userprofile_counter' in key or 'lifetime_bolo_info' in key or 'last_month_bolo_info' in key or 'current_month_bolo_info' in key:
+                    return redis_cli_logs.setex("bi:"+key, settings.USER_DATA_REDIS_EXPIRY_TIME, json.dumps(value, cls=DjangoJSONEncoder))
+                return redis_cli_logs.setex("bi:"+key, settings.REDIS_EXPIRY_TIME, json.dumps(value, cls=DjangoJSONEncoder))
+            else:
+                return redis_cli_logs.set("bi:"+key, json.dumps(value, cls=DjangoJSONEncoder))
+        else:
             if set_expiry:
                 if expiry_time:
                     return redis_cli.setex("bi:"+key, expiry_time, json.dumps(value, cls=DjangoJSONEncoder))
@@ -60,6 +73,8 @@ def delete_redis(key):
     try:
         if 'vb_seen:' in key or 'vb_entry:' in key:
             return redis_cli_vbseen.delete(key)
+        elif 'android_logs:' in key:
+            return redis_cli_logs.delete(key)
         else:
             return redis_cli.delete(key)
     except Exception as e:
