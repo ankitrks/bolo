@@ -1134,7 +1134,8 @@ def upload_media(media_file):
         client = boto3.client('s3',aws_access_key_id = settings.BOLOINDYA_AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY)
         ts = time.time()
         created_at = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-        filenameNext= str(media_file.name).split('.')
+        media_file_name = remove_extra_char(str(media_file.name))
+        filenameNext= media_file_name.split('.')
         final_filename = str(urlify(filenameNext[0]))+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[1])
         client.put_object(Bucket='in-boloindya', Key='media/' + final_filename, Body=media_file, ACL='public-read')
         filepath = 'https://s3.ap-south-1.amazonaws.com/' + 'in-boloindya' + '/media/' + final_filename
@@ -5146,3 +5147,12 @@ def filter_audio_data(language_specific_audio_list, total_audio_list, language_i
 def test_api_response_time(request):
     return JsonResponse({'message':'success'}, status=status.HTTP_200_OK)
 
+def remove_extra_char(file_name):
+    """
+    Right now it is removing '/n which comes as %0A'
+    Note: please update chars_to_remove list when to remove any character.
+    """
+    chars_to_remove = ['%0A']
+    for char in chars_to_remove:
+        file_name = file_name.replace(char, '')
+    return file_name
