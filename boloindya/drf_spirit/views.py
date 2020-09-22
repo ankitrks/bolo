@@ -1330,8 +1330,20 @@ def replyOnTopic(request):
                 temp_comment=" ".join(tag_list)
                 temp_comment = temp_comment[0].upper()+temp_comment[1:]
             recent_comment = Comment.objects.filter(comment = temp_comment,topic_id=topic_id,user=request.user,date__gt=datetime.now()-timedelta(minutes=5))
+            curr_gify_details = {}
+            if gify_details:
+                curr_gify_details = json.loads(gify_details)
+                comment.gify_details  = json.dumps(curr_gify_details)
             if recent_comment:
-                return JsonResponse({'message': 'Already commented same comment'}, status=status.HTTP_400_BAD_REQUEST)
+                if gify_details:
+                    recent_gify_details = list(recent_comment.values_list('gify_details',flat=True))
+                    recent_gify_details = [value for value in recent_gify_details if value is not None]
+                    if  'id' in curr_gify_details:
+                        recent_gify_details_json = list(map(json.loads, recent_gify_details))
+                        if list(filter(lambda x:x['id']==curr_gify_details['id'] if "id" in x else False, recent_gify_details_json)):
+                            return JsonResponse({'message': 'Already commented same comment'}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    return JsonResponse({'message': 'Already commented same comment'}, status=status.HTTP_400_BAD_REQUEST)
             comment.comment       = comment_html.strip()
             comment.comment_html  = comment_html.strip()
             comment.language_id   = language_id
@@ -1339,8 +1351,6 @@ def replyOnTopic(request):
             comment.topic_id      = topic_id
             comment.mobile_no     = mobile_no
 
-            if gify_details:
-                comment.gify_details  = json.dumps(json.loads(gify_details))
             comment.save()
             has_hashtag,hashtagged_title = check_hashtag(comment)
             if has_hashtag:
