@@ -1330,12 +1330,11 @@ def replyOnTopic(request):
                 temp_comment=" ".join(tag_list)
                 temp_comment = temp_comment[0].upper()+temp_comment[1:]
             recent_comment = Comment.objects.filter(comment = temp_comment,topic_id=topic_id,user=request.user,date__gt=datetime.now()-timedelta(minutes=5))
-            curr_gify_details = {}
-            if gify_details:
-                curr_gify_details = json.loads(gify_details)
+            curr_gify_details = json.loads(gify_details)
+            if curr_gify_details:
                 comment.gify_details  = json.dumps(curr_gify_details)
             if recent_comment:
-                if gify_details:
+                if curr_gify_details:
                     recent_gify_details = list(recent_comment.values_list('gify_details',flat=True))
                     recent_gify_details = [value for value in recent_gify_details if value is not None]
                     if  'id' in curr_gify_details:
