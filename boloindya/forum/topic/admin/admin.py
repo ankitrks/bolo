@@ -90,6 +90,7 @@ class TopicChangeList(ChangeList):
         self.list_max_show_all = list_max_show_all
         self.model_admin = model_admin
         self.preserved_filters = model_admin.get_preserved_filters(request)
+        self.show_full_result_count = False
 
         # Get search parameters from the query string.
         try:
