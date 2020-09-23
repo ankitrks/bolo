@@ -428,8 +428,9 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
 
             if 'boosted_till' in form.changed_data:
                 obj.boosted_till = form.cleaned_data['boosted_till']
-                obj.boosted_start_time = datetime.now()
-                obj.boosted_end_time = datetime.now()+timedelta(hours=obj.boosted_till)
+                if obj.boosted_till:
+                    obj.boosted_start_time = datetime.now()
+                    obj.boosted_end_time = datetime.now()+timedelta(hours=obj.boosted_till)
 
         if 'title' in form.changed_data:
             tag_list = obj.title.split()
