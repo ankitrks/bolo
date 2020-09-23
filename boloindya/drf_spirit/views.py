@@ -58,7 +58,7 @@ from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs,UserPa
 from jarvis.models import FCMDevice,StateDistrictLanguage, BannerUser, Report
 from forum.topic.models import Topic,TopicHistory, ShareTopic, Like, SocialShare, Notification, CricketMatch, Poll, Choice, Voting, \
     Leaderboard, VBseen, TongueTwister, HashtagViewCounter, FVBseen
-from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
+from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen, get_language_id_mapping
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following, get_redis_android_id, set_redis_android_id
 from forum.user.utils.bolo_redis import get_bolo_info_combined, get_current_month_bolo_info, get_last_month_bolo_info, get_lifetime_bolo_info , update_profile_counter
 from .serializers import *
@@ -4251,7 +4251,8 @@ def get_category_detail_with_views(request):
         category_id = request.POST.get('category_id', None)
         language_id = request.POST.get('language_id', 1)
         category = Category.objects.get(pk=category_id)
-        vb_count = Topic.objects.filter(m2mcategory=category, is_removed=False, is_vb=True, language_id=language_id).count()
+        language_ids = get_language_id_mapping(language_id)
+        vb_count = Topic.objects.filter(m2mcategory=category, is_removed=False, is_vb=True, language_id__in=language_ids).count()
         all_seen = category.view_count
         current_language_view = CategoryViewCounter.objects.get(category=category,language=language_id).view_count
         return JsonResponse({'category_details': CategoryWithVideoSerializer(category, context={'language_id': language_id,'user_id':request.user.id,'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True),'page':int(request.GET.get('page','1'))}).data, 'video_count': vb_count, 'all_seen':shorcountertopic(all_seen),'current_language_view':shorcountertopic(current_language_view)}, status=status.HTTP_200_OK)
@@ -5145,4 +5146,3 @@ def filter_audio_data(language_specific_audio_list, total_audio_list, language_i
 @api_view(['GET'])
 def test_api_response_time(request):
     return JsonResponse({'message':'success'}, status=status.HTTP_200_OK)
-

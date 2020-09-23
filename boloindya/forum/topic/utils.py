@@ -478,3 +478,14 @@ def filter_removed_videos_from_hashtag_paginated_data(hashtag_data):
         print(e)
         capture_exception(e)
 
+def get_language_id_mapping(language_id):
+    '''
+        This is mapping for english and hindi user to get both videos data
+        for ex: User with language id with 1 will see data of  ids with 1 and 2
+    '''
+    language_mapping = {1:[1,2],2:[2,1]}
+    return language_mapping[int(language_id)] if int(language_id) in language_mapping else [language_id]
+
+def set_total_videos_count(total_video_count, language_id):
+    key = "total:video:lang"+str(language_id)
+    set_redis(key, total_video_count, False)
