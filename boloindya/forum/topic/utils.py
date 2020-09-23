@@ -348,7 +348,6 @@ def new_algo_update_redis_paginated_data(key, query,trending = False, cache_max_
                     else:
                         updated_df = temp_topics_df.query('id not in [' + ','.join(exclude_ids) + ']').drop_duplicates('user_id')\
                                 .nlargest(items_per_page, 'vb_score', keep = 'first')
-
                     id_list = updated_df['id'].tolist()
                     if len(id_list) >= min_count_per_page and page <= cache_max_pages:
                         exclude_ids.extend( map(str, id_list) )
@@ -360,7 +359,6 @@ def new_algo_update_redis_paginated_data(key, query,trending = False, cache_max_
                             page = None
                     else:
                         page = None
-
             if temp_page > cache_max_pages or start_date < settings.DATE_TILL_CALCULATE:
                 base_page = temp_page
                 temp_page = None
@@ -477,15 +475,3 @@ def filter_removed_videos_from_hashtag_paginated_data(hashtag_data):
     except Exception as e:
         print(e)
         capture_exception(e)
-
-def get_language_id_mapping(language_id):
-    '''
-        This is mapping for english and hindi user to get both videos data
-        for ex: User with language id with 1 will see data of  ids with 1 and 2
-    '''
-    language_mapping = {1:[1,2],2:[2,1]}
-    return language_mapping[int(language_id)] if int(language_id) in language_mapping else [language_id]
-
-def set_total_videos_count(total_video_count, language_id):
-    key = "total:video:lang"+str(language_id)
-    set_redis(key, total_video_count, False)

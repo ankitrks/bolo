@@ -90,7 +90,13 @@ class TongueTwisterWithVideoByteSerializer(ModelSerializer):
             user_id =  self.context.get("user_id")
         if self.context.get("page"):
             page =  int(self.context.get("page"))
-        return get_redis_hashtag_paginated_data_with_json(language_id,instance.id,page, self.context.get("last_updated",None), self.context.get("is_expand",True))
+        topics = get_redis_hashtag_paginated_data_with_json(language_id,instance.id,page, self.context.get("last_updated",None), self.context.get("is_expand",True))
+        if int(language_id) in [1,2] and not topics:
+            if int(language_id)==1:
+                topics = get_redis_hashtag_paginated_data_with_json(2,instance.id,page, self.context.get("last_updated",None), self.context.get("is_expand",True))
+            elif int(language_id)==2:
+                topics = get_redis_hashtag_paginated_data_with_json(1,instance.id,page, self.context.get("last_updated",None), self.context.get("is_expand",True))
+        return topics
 
 
 class BaseTongueTwisterSerializer(ModelSerializer):
@@ -1161,10 +1167,20 @@ class TongueTwisterCounterSerializer(ModelSerializer):
         fields = '__all__'
 
     def get_total_videos_count(self,instance):
-        return shorcountertopic(instance.video_count)
+        video_count = instance.video_count
+        if int(instance.language) in [1,2]:
+            hash_tag_counter = HashtagViewCounter.objects.filter(hashtag=instance.hashtag, language__in=[1,2])
+            hash_tag_counter_values = list(hash_tag_counter.values('video_count'))
+            video_count = sum(item['video_count'] for item in hash_tag_counter_values)
+        return shorcountertopic(video_count)
 
     def get_total_views(self,instance):
-        return shorcountertopic(instance.view_count)
+        view_count = instance.view_count
+        if int(instance.language) in [1,2]:
+            hash_tag_counter = HashtagViewCounter.objects.filter(hashtag=instance.hashtag, language__in=[1,2])
+            hash_tag_counter_values = list(hash_tag_counter.values('view_count'))
+            view_count = sum(item['view_count'] for item in hash_tag_counter_values)
+        return shorcountertopic(view_count)
 
     def get_tongue_twister(self,instance):
         return TongueTwisterWithoutViewsSerializer(instance.hashtag).data 

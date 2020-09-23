@@ -58,7 +58,7 @@ from forum.user.models import UserProfile,Follower,AppVersion,AndroidLogs,UserPa
 from jarvis.models import FCMDevice,StateDistrictLanguage, BannerUser, Report
 from forum.topic.models import Topic,TopicHistory, ShareTopic, Like, SocialShare, Notification, CricketMatch, Poll, Choice, Voting, \
     Leaderboard, VBseen, TongueTwister, HashtagViewCounter, FVBseen
-from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen, get_language_id_mapping
+from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following, get_redis_android_id, set_redis_android_id
 from forum.user.utils.bolo_redis import get_bolo_info_combined, get_current_month_bolo_info, get_last_month_bolo_info, get_lifetime_bolo_info , update_profile_counter
 from .serializers import *
@@ -501,10 +501,12 @@ def GetChallenge(request):
         page_no = int(request.GET.get('page',1))
         if 'offset' in request.GET.keys() and int(request.GET.get('offset') or 0):
             page_no = int(int(request.GET.get('offset') or 0)/settings.REST_FRAMEWORK['PAGE_SIZE'])+1
-        filter_dict = {'hash_tags':hash_tag[0]}
-        if language_id:
-            filter_dict['language_id']=language_id
         topics = get_redis_hashtag_paginated_data(language_id,hash_tag[0].id,page_no)
+        if not topics and int(language_id) in [1,2]:
+            key = 'hashtag:'+str(hash_tag[0].id)+':lang:'+str(language_id)
+            next_language_page_no = get_page_no_for_next_language(key, page_no)
+            next_language_id = 1 if int(language_id)==2 else 2
+            topics = get_redis_hashtag_paginated_data(next_language_id,hash_tag[0].id,next_language_page_no)
         my_data = TopicSerializerwithComment(topics,context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand':request.GET.get('is_expand',True)},many=True).data
         return JsonResponse({"results":my_data})
     else:
@@ -565,10 +567,15 @@ def GetChallengeDetails(request):
     language_id = request.POST.get('language_id', '2')
     challengehash = '#' + challengehash
     try:
+        language_ids = [language_id]
+        if int(language_id) in [1,2]:
+            language_ids = [1,2]
         hash_tag = TongueTwister.objects.get(hash_tag__iexact=request.POST.get('ChallengeHash'))
-        hash_tag_counter=HashtagViewCounter.objects.get(hashtag = hash_tag, language = language_id)
+        hash_tag_counter=HashtagViewCounter.objects.filter(hashtag = hash_tag, language__in = language_ids)
+        hash_tag_counter_values = list(hash_tag_counter.values('view_count','video_count'))
         #all_vb = Topic.objects.filter(hash_tags=hash_tag,is_removed=False,is_vb=True)
-        vb_count = hash_tag_counter.video_count
+        view_count = sum(item['view_count'] for item in hash_tag_counter_values)
+        vb_count = sum(item['video_count'] for item in hash_tag_counter_values)
         if hash_tag:
             tongue = hash_tag
             return JsonResponse({'message': 'success', 'hashtag':tongue.hash_tag,'vb_count':vb_count,\
@@ -577,7 +584,7 @@ def GetChallengeDetails(request):
                 'be_descpription':tongue.be_descpription,'ka_descpription':tongue.ka_descpription,\
                 'ma_descpription':tongue.ma_descpription,'gj_descpription':tongue.gj_descpription,\
                 'mt_descpription':tongue.mt_descpription,'picture':tongue.picture,\
-                'all_seen':shorcountertopic(hash_tag_counter.view_count)},status=status.HTTP_200_OK)
+                'all_seen':shorcountertopic(view_count)},status=status.HTTP_200_OK)
         else:
             return JsonResponse({'message': 'success', 'hashtag' : challengehash[1:],'vb_count':vb_count,\
                 'en_tongue_descp':'','hi_tongue_descp':'',\
@@ -585,7 +592,7 @@ def GetChallengeDetails(request):
                 'be_descpription':'','ka_descpription':'',\
                 'ma_descpription':'','gj_descpription':'',\
                 'mt_descpription':'','picture':'',\
-                'all_seen':shorcountertopic(hash_tag_counter.view_count)},status=status.HTTP_200_OK)
+                'all_seen':shorcountertopic(view_count)},status=status.HTTP_200_OK)
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
@@ -4251,7 +4258,9 @@ def get_category_detail_with_views(request):
         category_id = request.POST.get('category_id', None)
         language_id = request.POST.get('language_id', 1)
         category = Category.objects.get(pk=category_id)
-        language_ids = get_language_id_mapping(language_id)
+        language_ids = [language_id]
+        if int(language_id) in [1,2]:
+            language_ids = [1,2]
         vb_count = Topic.objects.filter(m2mcategory=category, is_removed=False, is_vb=True, language_id__in=language_ids).count()
         all_seen = category.view_count
         current_language_view = CategoryViewCounter.objects.get(category=category,language=language_id).view_count
@@ -4270,6 +4279,11 @@ def get_category_video_bytes(request):
         category = Category.objects.get(pk=category_id)
         topics = []
         topics = get_redis_category_paginated_data(language_id,category.id,int(request.POST.get('page', 2)))
+        if not topics and int(language_id) in [1,2]:
+            key = 'cat:'+str(category_id)+':lang:'+str(language_id)
+            next_language_page_no = get_page_no_for_next_language(key, int(request.POST.get('page', 2)))
+            next_language_id = 1 if int(language_id)==2 else 2
+            topics = get_redis_category_paginated_data(next_language_id,category.id,next_language_page_no)
         paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
         topic_page = paginator.page(1)
         return JsonResponse({'topics': CategoryVideoByteSerializer(topic_page, many=True, context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
@@ -5146,3 +5160,19 @@ def filter_audio_data(language_specific_audio_list, total_audio_list, language_i
 @api_view(['GET'])
 def test_api_response_time(request):
     return JsonResponse({'message':'success'}, status=status.HTTP_200_OK)
+
+def get_page_no_for_next_language(key, requested_page):
+    import math
+    items_per_page = settings.REST_FRAMEWORK['PAGE_SIZE']
+    data = get_redis(key)
+    if not data:
+        return requested_page
+    redis_keys = data.keys()
+    if 'remaining' in redis_keys:
+        redis_last_page = data['remaining']['last_page']
+        remaining_count = data['remaining']['remaining_count']
+        total_pages = int(redis_last_page + math.ceil(remaining_count/float(items_per_page)))
+    else:
+        total_pages = max(list(map(int, redis_keys)))
+    return requested_page - total_pages
+        
