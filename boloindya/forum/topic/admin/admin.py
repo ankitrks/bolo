@@ -124,16 +124,23 @@ class TopicChangeList(ChangeList):
     def get_results(self, request):
         paginator = self.model_admin.get_paginator(request, self.queryset, self.list_per_page)
         # Get the number of objects, with admin filters applied.
+        count = None
         try:
             with connections['default'].cursor() as cr:
                 sql = self.queryset.query.sql_with_params()
                 cr.execute("SELECT count_estimate(%s)", [cr.mogrify(sql[0], sql[1])])
 
-                paginator.count = cr.fetchall()[0][0]
+                count = cr.fetchall()[0][0]
         except Exception as e:
             print "While geeting approx count", str(e)
 
+        if count and count > 5000:
+            print "from apporx"
+            paginator.count = count
+
         result_count = paginator.count
+
+        print "result_count", result_count
         
         # Get the total number of objects, with no admin filters applied.
         if self.model_admin.show_full_result_count:
@@ -374,7 +381,7 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
             user_sqs = SearchQuerySet().models(UserProfile).raw_search(search_term) \
                                 .order_by('-is_superstar').order_by('-is_popular').values('id', 'is_superstar',
                                     'is_popular', 'name')[:100]
-            topic_sqs = SearchQuerySet().models(Topic).raw_search(search_term).values('id')[:100]
+            topic_sqs = SearchQuerySet().models(Topic).raw_search(search_term).values('id')[:1000]
 
             self.sqs_result = []
             self.sqs_result_dict = {}
@@ -392,15 +399,16 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
 
                 user_id_list.append(item.get('id').split('.')[-1])
 
-            with connections['default'].cursor() as cr:
-                cr.execute("""
-                    SELECT topic.id
-                    FROM forum_topic_topic topic
-                    INNER JOIN forum_user_userprofile profile on profile.user_id = topic.user_id
-                    WHERE profile.id in %s
-                """, [tuple(user_id_list)])
+            if user_id_list:
+                with connections['default'].cursor() as cr:
+                    cr.execute("""
+                        SELECT topic.id
+                        FROM forum_topic_topic topic
+                        INNER JOIN forum_user_userprofile profile on profile.user_id = topic.user_id
+                        WHERE profile.id in %s
+                    """, [tuple(user_id_list)])
 
-                id_list += [row[0] for row in cr.fetchall()]
+                    id_list += [row[0] for row in cr.fetchall()]
 
             queryset = queryset.filter(id__in=id_list)
 
