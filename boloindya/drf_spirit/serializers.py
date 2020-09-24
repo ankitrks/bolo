@@ -48,8 +48,13 @@ class TongueTwisterSerializer(ModelSerializer):
         try:
             if self.context.get("language_id"):
                 language_id =  self.context.get("language_id")
-                hash_tag_counter=HashtagViewCounter.objects.get(hashtag = instance, language = language_id)
-                return shorcountertopic(hash_tag_counter.video_count)
+                language_ids = [language_id]
+                if int(language_id) in [1,2]:
+                    language_ids = [1,2]
+                hash_tag_counter=HashtagViewCounter.objects.filter(hashtag = instance, language__in = language_ids)
+                hash_tag_counter_values = list(hash_tag_counter.values('video_count'))
+                video_count = sum(item['video_count'] for item in hash_tag_counter_values)
+                return shorcountertopic(video_count)
             else:
                 return shorcountertopic(Topic.objects.filter(hash_tags=instance,is_vb=True,is_removed=False).count())
         except Exception as e:
@@ -60,8 +65,13 @@ class TongueTwisterSerializer(ModelSerializer):
         try:
             if self.context.get("language_id"):
                 language_id =  self.context.get("language_id")
-                hash_tag_counter=HashtagViewCounter.objects.get(hashtag = instance, language = language_id)
-                return shorcountertopic(hash_tag_counter.view_count)
+                language_ids = [language_id]
+                if int(language_id) in [1,2]:
+                    language_ids = [1,2]
+                hash_tag_counter=HashtagViewCounter.objects.filter(hashtag = instance, language__in = language_ids)
+                hash_tag_counter_values = list(hash_tag_counter.values('view_count'))
+                view_count = sum(item['view_count'] for item in hash_tag_counter_values)
+                return shorcountertopic(view_count)
             else:
                 return shorcountertopic(instance.total_views)    
         except Exception as e:

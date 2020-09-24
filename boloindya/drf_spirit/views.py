@@ -817,14 +817,18 @@ class SolrSearchTopic(BoloIndyaGenericAPIView):
         is_expand=self.request.GET.get('is_expand',False)
         last_updated=timestamp_to_datetime(self.request.GET.get('last_updated',False))
         response = {"count": 0, "results": [], "next_page_number": None}
+        if int(language_id)==1:
+            language_query = SQ(language_id='2')|SQ(language_id='1')
+        else:
+            language_query = SQ(language_id=language_id)|SQ(language_id='1')
         if search_term:
-            sqs = SearchQuerySet().models(Topic).raw_search(search_term).filter(SQ(language_id=language_id)|SQ(language_id='1'))
+            sqs = SearchQuerySet().models(Topic).raw_search(search_term).filter(language_query)
             if not sqs:
                 suggested_word = SearchQuerySet().models(Topic).auto_query(search_term).spelling_suggestion()
                 if suggested_word:
-                    sqs = SearchQuerySet().models(Topic).raw_search(suggested_word).filter(SQ(language_id=language_id)|SQ(language_id='1'))
+                    sqs = SearchQuerySet().models(Topic).raw_search(suggested_word).filter(language_query)
             if not sqs:
-                sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(SQ(language_id=language_id)|SQ(language_id='1'))
+                sqs = SearchQuerySet().models(Topic).autocomplete(**{'text':search_term}).filter(language_query)
             if sqs:
                 topics = get_only_active_topic(sqs, int(page_size), int(page))
                 # result_page = get_paginated_data(sqs, int(page_size), int(page))
