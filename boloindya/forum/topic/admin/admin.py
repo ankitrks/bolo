@@ -13,7 +13,7 @@ from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 from datetime import datetime,timedelta
 from forum.user.utils.bolo_redis import update_profile_counter
 from tasks import update_profile_counter_task
-# from django.db import connection
+from django.db import connections
 from haystack.query import SearchQuerySet, SQ
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
@@ -121,41 +121,47 @@ class TopicChangeList(ChangeList):
         self.pk_attname = self.lookup_opts.pk.attname
 
 
-    # def get_results(self, request):
-    #     if not hasattr(self.model_admin, 'sqs_result'):
-    #         return super(TopicChangeList, self).get_results(request)
+    def get_results(self, request):
+        paginator = self.model_admin.get_paginator(request, self.queryset, self.list_per_page)
+        # Get the number of objects, with admin filters applied.
+        try:
+            with connections['default'].cursor() as cr:
+                sql = self.queryset.query.sql_with_params()
+                cr.execute("SELECT count_estimate(%s)", [cr.mogrify(sql[0], sql[1])])
 
-    #     paginator = self.model_admin.get_paginator(request, self.model_admin.sqs_result, self.list_per_page)
-    #     # Get the number of objects, with admin filters applied.
-    #     result_count = paginator.count
+                paginator.count = cr.fetchall()[0][0]
+        except Exception as e:
+            print "While geeting approx count", str(e)
 
-    #     # Get the total number of objects, with no admin filters applied.
-    #     if self.model_admin.show_full_result_count:
-    #         full_result_count = self.root_queryset.count()
-    #     else:
-    #         full_result_count = None
-    #     can_show_all = result_count <= self.list_max_show_all
-    #     multi_page = result_count > self.list_per_page
+        result_count = paginator.count
+        
+        # Get the total number of objects, with no admin filters applied.
+        if self.model_admin.show_full_result_count:
+            full_result_count = self.root_queryset.count()
+        else:
+            full_result_count = None
+        can_show_all = result_count <= self.list_max_show_all
+        multi_page = result_count > self.list_per_page
 
-    #     # Get the list of objects to display on this page.
-    #     if (self.show_all and can_show_all) or not multi_page:
-    #         result_list = self.model_admin.sqs_result
-    #     else:
-    #         try:
-    #             result_list = paginator.page(self.page_num + 1).object_list
-    #         except InvalidPage:
-    #             raise IncorrectLookupParameters
+        # Get the list of objects to display on this page.
+        if (self.show_all and can_show_all) or not multi_page:
+            result_list = self.queryset._clone()
+        else:
+            try:
+                result_list = paginator.page(self.page_num + 1).object_list
+            except InvalidPage:
+                raise IncorrectLookupParameters
 
-    #     self.result_count = result_count
-    #     self.show_full_result_count = self.model_admin.show_full_result_count
-    #     # Admin actions are shown if there is at least one entry
-    #     # or if entries are not counted because show_full_result_count is disabled
-    #     self.show_admin_actions = not self.show_full_result_count or bool(full_result_count)
-    #     self.full_result_count = full_result_count
-    #     self.result_list = self.queryset
-    #     self.can_show_all = can_show_all
-    #     self.multi_page = multi_page
-    #     self.paginator = paginator
+        self.result_count = result_count
+        self.show_full_result_count = self.model_admin.show_full_result_count
+        # Admin actions are shown if there is at least one entry
+        # or if entries are not counted because show_full_result_count is disabled
+        self.show_admin_actions = not self.show_full_result_count or bool(full_result_count)
+        self.full_result_count = full_result_count
+        self.result_list = result_list
+        self.can_show_all = can_show_all
+        self.multi_page = multi_page
+        self.paginator = paginator
 
 from django.db.models import Q
 from django.contrib.auth.models import User
@@ -249,6 +255,7 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
             'is_popular', 'is_boosted', 'is_reported', ModeratedFilter, UserTypeFilter, CategoryMultiSelectFilter,\
             LanguageMultiSelectFilter, 'user__st__is_superstar', 'user__st__is_popular', 'user__st__is_business')
     
+    show_full_result_count = False
     # filter_horizontal = ('m2mcategory', )
 
     fieldsets = (
@@ -385,7 +392,17 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
 
                 user_id_list.append(item.get('id').split('.')[-1])
 
-            queryset = queryset.filter(Q(id__in=id_list) | Q(user_id__st__in=user_id_list))
+            with connections['default'].cursor() as cr:
+                cr.execute("""
+                    SELECT topic.id
+                    FROM forum_topic_topic topic
+                    INNER JOIN forum_user_userprofile profile on profile.user_id = topic.user_id
+                    WHERE profile.id in %s
+                """, [tuple(user_id_list)])
+
+                id_list += [row[0] for row in cr.fetchall()]
+
+            queryset = queryset.filter(id__in=id_list)
 
         queryset.select_related('user', 'user__userprofile')
         return queryset, False
