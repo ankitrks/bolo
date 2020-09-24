@@ -28,7 +28,7 @@ import drf_spirit.views
 schema_view = get_swagger_view(title='BoloIndya API')
 
 patterns = [
-
+    url(r'^timeout/test/$', jarvis.views.timeout_test),
     url(r'^analytics_jarvis/$', jarvis.views.statistics_all_jarvis),
     url(r'^match/(?P<match_id>\d+)/(?P<slug>[\w-]+)/$', forum.topic.views.share_match_page, name='share_match_page'),
     url(r'^predict/(?P<poll_id>\d+)/(?P<slug>[\w-]+)/$', forum.topic.views.share_poll_page, name='share_poll_page'),

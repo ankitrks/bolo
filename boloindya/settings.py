@@ -237,6 +237,18 @@ REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
 REDIS_DB = 0
 
+REDIS_RO_HOST = 'localhost'
+REDIS_RO_PORT = 6379
+REDIS_RO_DB = 0
+
+REDIS_LOGS_HOST = 'localhost'
+REDIS_LOGS_PORT = 6379
+REDIS_LOGS_DB = 0
+
+REDIS_LOGS_RO_HOST = 'localhost'
+REDIS_LOGS_RO_PORT = 6379
+REDIS_LOGS_RO_DB = 0
+
 FCM_APIKEY = "AIzaSyBMF3hxMosSjE-95inmJTcaR-rNEWn2zpQ"
 FCM_DEVICE_MODEL = 'jarvis.FCMDevice'
 
@@ -479,7 +491,7 @@ SOCIALACCOUNT_STORE_TOKENS=False
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.googlemail.com'
-EMAIL_HOST_USER = 'support@careeranna.com'
+EMAIL_HOST_USER = 'reports@boloindya.com'
 EMAIL_HOST_PASSWORD = '$upp0rt@30!1'
 EMAIL_PORT = 587
 

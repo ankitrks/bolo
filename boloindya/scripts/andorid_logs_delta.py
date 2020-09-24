@@ -235,10 +235,10 @@ def write_csv(complete_data):
 
 # func for sending the csv created to the mail
 def send_file_mail(url):
-	emailfrom = "support@careeranna.com"
+	emailfrom = "reports@boloindya.com"
 	emailto = "sarfaraz@careeranna.com"
 	# filetosend = os.getcwd() + "/deltarecords.csv"
-	username = "support@careeranna.com"
+	username = "reports@boloindya.com"
 	password = "$upp0rt@30!1"				# please do not use this()
 	msg = MIMEMultipart()
 	msg["From"] = emailfrom

@@ -90,6 +90,7 @@ class TopicChangeList(ChangeList):
         self.list_max_show_all = list_max_show_all
         self.model_admin = model_admin
         self.preserved_filters = model_admin.get_preserved_filters(request)
+        self.show_full_result_count = False
 
         # Get search parameters from the query string.
         try:
@@ -428,8 +429,9 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
 
             if 'boosted_till' in form.changed_data:
                 obj.boosted_till = form.cleaned_data['boosted_till']
-                obj.boosted_start_time = datetime.now()
-                obj.boosted_end_time = datetime.now()+timedelta(hours=obj.boosted_till)
+                if obj.boosted_till:
+                    obj.boosted_start_time = datetime.now()
+                    obj.boosted_end_time = datetime.now()+timedelta(hours=obj.boosted_till)
 
         if 'title' in form.changed_data:
             tag_list = obj.title.split()
@@ -440,6 +442,12 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
                         tag_list[index]='<a href="/get_challenge_details/?ChallengeHash='+value.strip('#')+'">'+value+'</a>'
                 title = " ".join(tag_list)
                 obj.title = title[0].upper()+title[1:]
+                obj.first_hash_tag = None
+                hash_tags = obj.hash_tags.all()
+                for each_hashtag in hash_tags:
+                    each_hashtag.hash_counter = F('hash_counter')-1
+                    obj.hash_tags.remove(each_hashtag)
+                    each_hashtag.save()
                 first_hash_tag = False
                 for index, value in enumerate(hash_tag):
                     if value.startswith("#"):

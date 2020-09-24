@@ -65,11 +65,11 @@ def get_refer_earn(each_refercode,start_date='09-04-2020'):
 
 
 def send_file_mail(file_name):
-    emailfrom = "support@careeranna.com"
+    emailfrom = "reports@boloindya.com"
     emailto = "ankit@careeranna.com"
     # emailto = "maaz@careeranna.com"
     filetosend = os.getcwd() + "/"+file_name
-    username = "support@careeranna.com"
+    username = "reports@boloindya.com"
     password = "$upp0rt@30!1"               # please do not use this()
 
     msg = MIMEMultipart()

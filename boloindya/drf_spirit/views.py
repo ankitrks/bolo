@@ -1141,7 +1141,8 @@ def upload_media(media_file):
         client = boto3.client('s3',aws_access_key_id = settings.BOLOINDYA_AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY)
         ts = time.time()
         created_at = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-        filenameNext= str(media_file.name).split('.')
+        media_file_name = remove_extra_char(str(media_file.name))
+        filenameNext= media_file_name.split('.')
         final_filename = str(urlify(filenameNext[0]))+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[1])
         client.put_object(Bucket='in-boloindya', Key='media/' + final_filename, Body=media_file, ACL='public-read')
         filepath = 'https://s3.ap-south-1.amazonaws.com/' + 'in-boloindya' + '/media/' + final_filename
@@ -1308,7 +1309,6 @@ def replyOnTopic(request):
     user_id and topic_id and comment_html
 
     """
-
     user_id      = request.user.id
     topic_id     = request.POST.get('topic_id', '')
     language_id  = request.user.st.language
@@ -1316,6 +1316,7 @@ def replyOnTopic(request):
     mobile_no    = request.POST.get('mobile_no', '')
     thumbnail = request.POST.get('thumbnail', '')
     media_duration = request.POST.get('media_duration', '')
+    gify_details = request.POST.get('gify_details', '')
     comment      = Comment()
 
     if request.POST.get('is_media'):
@@ -1337,14 +1338,26 @@ def replyOnTopic(request):
                 temp_comment=" ".join(tag_list)
                 temp_comment = temp_comment[0].upper()+temp_comment[1:]
             recent_comment = Comment.objects.filter(comment = temp_comment,topic_id=topic_id,user=request.user,date__gt=datetime.now()-timedelta(minutes=5))
+            curr_gify_details = json.loads(gify_details)
+            if curr_gify_details:
+                comment.gify_details  = json.dumps(curr_gify_details)
             if recent_comment:
-                return JsonResponse({'message': 'Already commented same comment'}, status=status.HTTP_400_BAD_REQUEST)
+                if curr_gify_details:
+                    recent_gify_details = list(recent_comment.values_list('gify_details',flat=True))
+                    recent_gify_details = [value for value in recent_gify_details if value is not None]
+                    if  'id' in curr_gify_details:
+                        recent_gify_details_json = list(map(json.loads, recent_gify_details))
+                        if list(filter(lambda x:x['id']==curr_gify_details['id'] if "id" in x else False, recent_gify_details_json)):
+                            return JsonResponse({'message': 'Already commented same comment'}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    return JsonResponse({'message': 'Already commented same comment'}, status=status.HTTP_400_BAD_REQUEST)
             comment.comment       = comment_html.strip()
             comment.comment_html  = comment_html.strip()
             comment.language_id   = language_id
             comment.user_id       = user_id
             comment.topic_id      = topic_id
             comment.mobile_no     = mobile_no
+
             comment.save()
             has_hashtag,hashtagged_title = check_hashtag(comment)
             if has_hashtag:
@@ -5176,3 +5189,13 @@ def get_page_no_for_next_language(key, requested_page):
         total_pages = max(list(map(int, redis_keys)))
     return requested_page - total_pages
         
+def remove_extra_char(file_name):
+    """
+    Right now it is removing '/n which comes as %0A'
+    Note: please update chars_to_remove list when to remove any character.
+    """
+    chars_to_remove = ['%0A']
+    for char in chars_to_remove:
+        file_name = file_name.replace(char, '')
+    return file_name
+

@@ -18,6 +18,7 @@ from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
 from jarvis.models import PushNotificationUser, FCMDevice, Report
 from forum.topic.utils import get_redis_category_paginated_data,get_redis_hashtag_paginated_data, get_redis_hashtag_paginated_data_with_json
 from forum.user.utils.bolo_redis import get_userprofile_counter
+import json
 
 class CategorySerializer(ModelSerializer):
     class Meta:
@@ -199,6 +200,7 @@ class CommentSerializer(ModelSerializer):
     # user = UserReadOnlyField()
     user = SerializerMethodField()
     date = SerializerMethodField()
+    gify_details = SerializerMethodField()
     class Meta:
         model = Comment
         # fields = '__all__'
@@ -209,6 +211,9 @@ class CommentSerializer(ModelSerializer):
 
     def get_date(self,instance):
         return shortnaturaltime(instance.date)
+
+    def get_gify_details(self,instance):
+        return json.loads(instance.gify_details) if instance.gify_details else None
 
 class PubSubPopularSerializer(ModelSerializer):
     class Meta:

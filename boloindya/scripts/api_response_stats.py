@@ -171,10 +171,10 @@ random_string =random_string_generator()
 
 # func for sending the csv created to the mail
 def send_file_mail(HOST):
-    emailfrom = "support@careeranna.com"
+    emailfrom = "reports@boloindya.com"
     emailto = ['maaz@careeranna.com','ankit@careeranna.com','akash.g@careeranna.com','gitesh@careeranna.com','abhishek@careeranna.com']
     filetosend = os.getcwd() + "/api_response_time.csv"
-    username = "support@careeranna.com"
+    username = "reports@boloindya.com"
     password = "$upp0rt@30!1"               # please do not use this()
 
     msg = MIMEMultipart()
