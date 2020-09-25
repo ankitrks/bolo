@@ -587,10 +587,10 @@ class ShortUserProfileSerializer(ModelSerializer):
         exclude = ('social_identifier','question_count','linkedin_url','instagarm_id','twitter_id','topic_count','comment_count','refrence','mobile_no','encashable_bolo_score','total_time_spent','total_vb_playtime','is_dark_mode_enabled','paytm_number','state_name','city_name','extra_data', 'location', 'last_seen', 'last_ip', 'timezone', 'is_administrator', 'is_moderator', 'is_verified', 'last_post_on', 'last_post_hash', 'is_geo_location', 'lat', 'lang', 'click_id', 'click_id_response','gender','about','language','answer_count','share_count','like_count','is_test_user', 'is_bot_account')
 
     def get_follow_count(self,instance):
-        return shortcounterprofile(get_userprofile_counter(instance.user_id)['follow_count'])
+        return shortcounterprofile(instance.userprofile_counter['follow_count'])
 
     def get_follower_count(self,instance):
-        return shortcounterprofile(get_userprofile_counter(instance.user_id)['follower_count'])
+        return shortcounterprofile(instance.userprofile_counter['follower_count'])
 
     def get_bolo_score(self,instance):
         return shortcounterprofile(instance.bolo_score)
@@ -599,13 +599,13 @@ class ShortUserProfileSerializer(ModelSerializer):
         return instance.user.username
 
     def get_view_count(self,instance):
-        return shorcountertopic(get_userprofile_counter(instance.user_id)['view_count'])
+        return shorcountertopic(instance.userprofile_counter['view_count'])
 
     def get_own_vb_view_count(self,instance):
-        return shorcountertopic(get_userprofile_counter(instance.user_id)['view_count'])
+        return shorcountertopic(instance.userprofile_counter['view_count'])
 
     def get_vb_count(self,instance):
-        return shortcounterprofile(get_userprofile_counter(instance.user_id)['video_count'])
+        return shortcounterprofile(instance.userprofile_counter['video_count'])
 
 class ShortUserSerializer(ModelSerializer):
     userprofile = SerializerMethodField()

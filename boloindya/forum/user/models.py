@@ -13,8 +13,10 @@ from ..core.utils.models import AutoSlugField
 from tinymce.models import HTMLField
 from drf_spirit.utils import language_options,month_choices, salary_choices
 from django.db.models import F,Q
+from django.utils.functional import cached_property
 from diff_model import ModelDiffMixin
 from forum.user.queryset import UserProfileQueryset
+
 
 class RecordTimeStamp(models.Model):
     created_at=models.DateTimeField(auto_now=False,auto_now_add=True,blank=False,null=False) # auto_now will add the current time and date whenever field is saved.
@@ -161,6 +163,12 @@ class UserProfile(models.Model,ModelDiffMixin):
         
     def __unicode__(self):
         return self.slug
+
+    @cached_property
+    def userprofile_counter(self):
+        from forum.user.utils.bolo_redis import get_userprofile_counter
+        return get_userprofile_counter(self.user_id)
+
 
 def current_year():
     return datetime.now().year
