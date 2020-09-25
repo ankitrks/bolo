@@ -16,7 +16,7 @@ from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
 from datetime import datetime,timedelta,date
 from forum.topic.utils import get_redis_vb_seen,update_redis_vb_seen
 from jarvis.models import PushNotificationUser, FCMDevice, Report
-from forum.topic.utils import get_redis_category_paginated_data,get_redis_hashtag_paginated_data, get_redis_hashtag_paginated_data_with_json
+from forum.topic.utils import get_redis_category_paginated_data,get_redis_hashtag_paginated_data, get_redis_hashtag_paginated_data_with_json, get_campaign_paginated_data
 from forum.user.utils.bolo_redis import get_userprofile_counter
 import json
 
@@ -91,7 +91,12 @@ class TongueTwisterWithVideoByteSerializer(ModelSerializer):
             user_id =  self.context.get("user_id")
         if self.context.get("page"):
             page =  int(self.context.get("page"))
-        return get_redis_hashtag_paginated_data_with_json(language_id,instance.id,page, self.context.get("last_updated",None), self.context.get("is_expand",True))
+
+        if Campaign.objects.filter(hashtag_id = instance.id):
+            topics = get_campaign_paginated_data(language_id, instance.id, page) 
+            return CategoryVideoByteSerializer(topics, many=True,context={'last_updated': self.context.get("last_updated",None),'is_expand':self.context.get("is_expand",True)}).data
+        else:
+            return get_redis_hashtag_paginated_data_with_json(language_id,instance.id,page, self.context.get("last_updated",None), self.context.get("is_expand",True))
 
 
 class BaseTongueTwisterSerializer(ModelSerializer):
