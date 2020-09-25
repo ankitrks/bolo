@@ -128,7 +128,7 @@ class TopicChangeList(ChangeList):
         try:
             with connections['default'].cursor() as cr:
                 sql = self.queryset.query.sql_with_params()
-                cr.execute("SELECT count_estimate(%s)", [cr.mogrify(sql[0], sql[1])])
+                cr.execute("analyze forum_topic_topic; SELECT count_estimate(%s)", [cr.mogrify(sql[0], sql[1])])
 
                 count = cr.fetchall()[0][0]
         except Exception as e:
