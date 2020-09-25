@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-
+import json
 from ..comment.bookmark.models import CommentBookmark
 from .notification.models import TopicNotification
 from .unread.models import TopicUnread
@@ -477,4 +477,17 @@ def filter_removed_videos_from_hashtag_paginated_data(hashtag_data):
     except Exception as e:
         print(e)
         capture_exception(e)
+
+
+def get_campaign_paginated_data(language_id, hashtag_id, page_no):
+    key = 'hashtag:'+str(hashtag_id)+':lang:'+str(language_id)
+    redis_data = redis_cli_read_only.hget(key, str(page_no))
+
+    if not redis_data:
+        return []
+
+    redis_data = json.loads(redis_data)
+
+    topics = Topic.objects.filter(id__in=redis_data.get('id_list'))
+    return sorted(topics, key=lambda x: redis_data.get('id_list').index(x.id))
 

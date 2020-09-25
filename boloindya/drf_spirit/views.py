@@ -65,7 +65,7 @@ from .serializers import *
 from tasks import * # vb_create_task,user_ip_to_state_task,sync_contacts_with_user,cache_follow_post,cache_popular_post, deafult_boloindya_follow, save_click_id_response, send_upload_video_notification
 from haystack.query import SearchQuerySet, SQ
 from django.core.exceptions import MultipleObjectsReturned
-from forum.topic.utils import get_redis_category_paginated_data,get_redis_hashtag_paginated_data,get_redis_language_paginated_data,get_redis_follow_paginated_data, get_popular_paginated_data, update_redis_vb_seen_entries
+from forum.topic.utils import get_redis_category_paginated_data,get_redis_hashtag_paginated_data,get_redis_language_paginated_data,get_redis_follow_paginated_data, get_popular_paginated_data, update_redis_vb_seen_entries, get_campaign_paginated_data
 # from haystack.inputs import Raw, AutoQuery
 # from haystack.utils import Highlighter
 from django.contrib.contenttypes.models import ContentType
@@ -504,7 +504,12 @@ def GetChallenge(request):
         filter_dict = {'hash_tags':hash_tag[0]}
         if language_id:
             filter_dict['language_id']=language_id
-        topics = get_redis_hashtag_paginated_data(language_id,hash_tag[0].id,page_no)
+
+        if Campaign.objects.filter(hashtag_id = hash_tag[0].id):
+            topics = get_campaign_paginated_data(language_id, hash_tag[0].id, page_no)
+        else:
+            topics = get_redis_hashtag_paginated_data(language_id,hash_tag[0].id,page_no)
+
         my_data = TopicSerializerwithComment(topics,context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand':request.GET.get('is_expand',True)},many=True).data
         return JsonResponse({"results":my_data})
     else:
