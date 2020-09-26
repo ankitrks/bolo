@@ -72,6 +72,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.decorators import login_required
 import newrelic.agent
 from redis_utils import *
+from rest_framework.views import APIView
+from django.db import connections
 
 # newrelic.agent.initialize()
 application = newrelic.agent.register_application()
@@ -4373,6 +4375,246 @@ def get_popular_video_bytes(request):
                 'error':str(e)})
         print "Error in API get_popular_video_bytes/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+def get_video_cdn(question_video):
+    try:
+        if question_video:
+            cloufront_url = settings.US_CDN_URL
+            if 'in-boloindya' in question_video:
+                cloufront_url = settings.IN_CDN_URL
+            regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+            find_urls_in_string = re.compile(regex, re.IGNORECASE)
+            url = find_urls_in_string.search(question_video)
+            return str(question_video.replace(str(url.group()), cloufront_url))
+        else:
+            return ''
+    except:
+        return question_video
+
+
+def get_backup_url(question_video):
+    try:
+        if question_video:
+            cloufront_url = settings.US_CDN_URL
+            if 'in-boloindya' in question_video:
+                cloufront_url = settings.IN_CDN_URL
+            regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+            find_urls_in_string = re.compile(regex, re.IGNORECASE)
+            url = find_urls_in_string.search(question_video)
+            return str(question_video.replace(str(url.group()), cloufront_url))
+        else:
+            return question_video
+    except:
+        return question_video
+
+
+def convert_to_dict_format(item):
+    _dict = {}
+    for key, val in item.iteritems():
+        key_parts = key.split('__', 1)
+
+        if len(key_parts) == 2:
+            if _dict.get(key_parts[0]):
+                _dict[key_parts[0]].update({key_parts[1]: val})
+            else:
+                _dict[key_parts[0]] = {key_parts[1]: val}
+        elif len(key_parts) == 1:
+            _dict[key_parts[0]] = val
+
+
+    for key, val in _dict.iteritems():
+        if type(val) == dict:
+            _dict[key] = convert_to_dict_format(val)
+
+    return _dict
+
+from time import time
+
+def get_video_bytes_and_its_related_data(id_list, last_updated=None):
+    query = """
+            SELECT  t.id, t.view_count, t.likes_count, t.comment_count, t.date, t.m3u8_content, 
+                    t.audio_m3u8_content, t.video_m3u8_content, t.backup_url, t.whatsapp_share_count, 
+                    t.other_share_count, t.total_share_count, t.created_at, t.last_modified, t.title, 
+                    t.question_audio, t.question_video, t.slug, t.language_id, t.question_image, t.is_popular, 
+                    t.is_pubsub_popular_push, t.is_media, t.media_duration, t.thumbnail, t.share_count, 
+                    t.imp_count, t.topic_like_count, t.topic_share_count, t.is_vb, t.is_monetized, t.is_moderated, 
+                    t.is_reported, t.report_count, t.vb_width, t.vb_height, t.is_thumbnail_resized, 
+                    t.linkedin_share_count, t.facebook_share_count, t.twitter_share_count, t.old_backup_url, 
+                    t.safe_backup_url, t.downloaded_url, t.vb_playtime, t.has_downloaded_url, t.vb_score, 
+                    t.is_boosted, t.popular_boosted, t.popular_boosted_time, t.boosted_till, t.boosted_start_time, 
+                    t.boosted_end_time, t.is_logo_checked, t.time_deleted, t.plag_text, t.is_violent, 
+                    t.violent_content, t.is_adult, t.adult_content, t.logo_detected, t.profanity_collage_url, 
+                    t.category_id as category, t.first_hash_tag_id as first_hash_tag, 
+                    t.last_moderated_by_id as last_moderated_by, t.location_id as location, 
+                    array_agg(distinct c.category_id) as m2mcategory, array_agg(distinct h.tonguetwister_id) as hash_tags,
+                    u.id as user__id, u.is_active as user__is_active, u.username as user__username,
+                    p.id as user__userprofile__id, p.bolo_score as user__userprofile__bolo_score, p.slug as user__userprofile__slug, 
+                    p.is_expert as user__userprofile__is_expert, p.is_popular as user__userprofile__is_popular, 
+                    p.is_superstar as user__userprofile__is_superstar, p.is_business as user__userprofile__is_business, 
+                    p.cover_pic as user__userprofile__cover_pic, p.profile_pic as user__userprofile__profile_pic, 
+                    p.name as user__userprofile__name, p.bio as user__userprofile__bio, p.d_o_b as user__userprofile__d_o_b, 
+                    p.android_did as user__userprofile__android_did, p.is_guest_user as user__userprofile__is_guest_user, 
+                    p.boost_views_count as user__userprofile__boost_views_count, p.boost_like_count as user__userprofile__boost_like_count, 
+                    p.boost_follow_count as user__userprofile__boost_follow_count, p.boosted_time as user__userprofile__boosted_time, 
+                    p.boost_span as user__userprofile__boost_span, p.country_code as user__userprofile__country_code, 
+                    p.salary_range as user__userprofile__salary_range, p.is_insight_fix as user__userprofile__is_insight_fix, 
+                    p.user_id as user__userprofile__user, array_agg(distinct uc.category_id) as user__userprofile__sub_category
+            FROM forum_topic_topic t
+                INNER JOIN forum_topic_topic_m2mcategory c on c.topic_id = t.id
+                INNER JOIN forum_topic_topic_hash_tags h on h.topic_id = t.id
+                INNER JOIN auth_user u on u.id = t.user_id
+                INNER JOIN forum_user_userprofile p on p.user_id = t.user_id
+                INNER JOIN forum_user_userprofile_sub_category uc on uc.userprofile_id = p.id
+            WHERE t.id in %s
+            GROUP BY t.id, u.id, p.id
+            ORDER BY t.vb_score DESC, t.id DESC
+        """
+
+    with connections['default'].cursor() as cr:
+        t = time()
+        cr.execute(query, [tuple(id_list)])
+
+        columns = [col[0] for col in cr.description]
+        result = [
+            dict(zip(columns, row))
+            for row in cr.fetchall()
+        ]
+
+        # print "time to fetch data = ", time() - t
+
+    converted_list = []
+
+    t = time()
+
+    for item in result:
+        item['video_cdn'] = get_video_cdn(item.get('question_video'))
+        item['backup_url'] =  get_backup_url(item.get('question_video'))
+        item['whatsapp_share_count'] = shorcountertopic(item.get('whatsapp_share_count'))
+        item['other_share_count'] = shorcountertopic(item.get('other_share_count') + item.get('linkedin_share_count') + item.get('facebook_share_count') + item.get('twitter_share_count'))
+        item['total_share_count'] = shorcountertopic(item.get('total_share_count'))
+        
+        item['view_count'] = shorcountertopic(item.get('view_count'))
+        item['likes_count'] = shorcountertopic(item.get('likes_count'))
+        item['comment_count'] = shorcountertopic(item.get('comment_count'))
+
+        if last_updated and item.get('date') > self.context['last_updated']:
+            item['m3u8_content'] = item.get('m3u8_content')
+            item['audio_m3u8_content'] = item.get('audio_m3u8_content')
+            item['video_m3u8_content'] = item.get('video_m3u8_content')
+        else:
+            item['m3u8_content'] = ''
+            item['audio_m3u8_content'] = ''
+            item['video_m3u8_content'] = ''
+
+
+        item['date'] = shortnaturaltime(item.get('date'))
+
+        userprofile_counter = get_userprofile_counter(item.get('user__id'))
+
+        item['user__userprofile__follow_count'] = shortcounterprofile(userprofile_counter['follow_count'])
+        item['user__userprofile__follower_count'] = shortcounterprofile(userprofile_counter['follower_count'])
+        item['user__userprofile__bolo_score'] = shortcounterprofile(item.get('user__userprofile__bolo_score'))
+        item['user__userprofile__slug'] = item['user__username']
+        item['user__userprofile__view_count'] = shorcountertopic(userprofile_counter['view_count'])
+        item['user__userprofile__own_vb_view_count'] = shorcountertopic(userprofile_counter['view_count'])
+        item['user__userprofile__vb_count'] = shortcounterprofile(userprofile_counter['video_count'])
+
+
+        converted_list.append(convert_to_dict_format(item))
+
+    # print "time to convert data  = ", time() - t
+
+    return converted_list
+
+
+class PopularVideoBytes(APIView):
+    def get(self, request, *args, **kwargs):
+        newrelic.agent.set_transaction_name("/get_popular_video_bytes_v2/get", "Trending Page")
+
+        language_id = request.GET.get('language_id', 1)
+        page_number = int(request.GET.get('page',1))
+
+        return JsonResponse({
+                'topics': get_video_bytes_and_its_related_data(
+                                    self.get_tranding_topic_data(request.user.id, language_id, page_number),
+                                    request.GET.get('last_updated', None)
+                                    )
+            }, status=status.HTTP_200_OK) 
+
+
+    def get_tranding_topic_data(self, user_id, language_id, page_number):
+        key = 'lang:'+str(language_id)+':trending_post:'+str(user_id)
+        previous_topic_ids = []
+
+        if page_number == 1:
+            # print "deleting key for page 1", key
+            redis_cli.delete(key)
+        else:
+            id_list = redis_cli_read_only.hget(key, str(page_number))
+
+            if id_list:
+                print " from redis id list", id_list
+                return json.loads(id_list)
+            
+            for topics_ids in redis_cli_read_only.hgetall(key):
+                previous_topic_ids += topics_ids
+
+        # print "recalculating trendings"
+
+
+        all_seen_vb= []
+        if user_id:
+            all_seen_vb = get_redis_vb_seen(user_id)
+
+        exclude_list = previous_topic_ids + all_seen_vb
+
+        # print "previous_topic_ids", previous_topic_ids
+        # print "all_seen_vb", all_seen_vb
+
+        cache_timespan = settings.TRENDING_CACHE_TIMESPAN*24
+        start_date = datetime.now()
+        end_date = (start_date - timedelta( hours = cache_timespan ))
+
+        topics_df = pd.DataFrame.from_records(Topic.objects.filter(is_vb = True, is_removed = False, 
+            language_id = language_id, is_popular = True, date__gte=end_date.date(), date__lte=start_date.date())\
+            .exclude(pk__in = exclude_list).order_by('-id', '-vb_score').values('id', 'user_id', 'vb_score','date'))
+
+        exclude_ids = []
+        items_per_page = 15
+        max_page_creation_limit = 3
+        page_created = 0
+        start_page_id_list = []
+
+        while page_created < max_page_creation_limit:
+            if settings.ALLOW_DUPLICATE_USER_POST:
+                selected_df = topics_df.query('id not in [' + ','.join(exclude_ids) + ']')\
+                        .nlargest(items_per_page, 'vb_score', keep = 'first')
+            else:
+                selected_df = topics_df.query('id not in [' + ','.join(exclude_ids) + ']').drop_duplicates('user_id')\
+                        .nlargest(items_per_page, 'vb_score', keep = 'first')
+
+            id_list = selected_df['id'].tolist()
+            # print "id_list", id_list
+            # print "vb score", selected_df['vb_score'].tolist()
+
+            redis_cli.hset(key, str(page_number), json.dumps(id_list))
+            exclude_ids += map(str, id_list)
+
+            if page_created == 0:
+                start_page_id_list = id_list
+
+            page_number += 1
+            page_created += 1
+
+        # print redis_cli_read_only.hgetall(key)
+
+        # print "return after calcuating all"
+
+        return start_page_id_list
+
+
+
 
 @api_view(['GET'])
 def pubsub_popular(request):
