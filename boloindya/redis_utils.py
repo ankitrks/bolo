@@ -15,6 +15,7 @@ redis_cli_logs_read_only = connection.redis_logs_read_only()
 logger = logging.getLogger(__name__)
 
 
+
 def get_redis(key):
     try:
         if 'vb_seen:' in key or 'vb_entry:' in key:
@@ -97,3 +98,25 @@ def set_atomic_redis(key,value,set_expiry=True):
             except Exception as e:
                 print e
                 logger.exception("in set_atomic_redis " + str(e))
+
+
+
+def set_s_redis(key, value):
+    try:
+        return redis_cli.sadd('bi:'+key, value)
+    except Exception as e:
+        logger.exception("in set_sredis " + str(e))
+
+
+def get_smembers_redis(key):
+    try:
+        return redis_cli.smembers('bi:'+key)
+    except Exception as e:
+        logger.exception("in get_smembers_redis " + str(e))
+
+
+def sremove_redis(key, element):
+    try:
+        redis_cli.srem('bi:'+key, element)
+    except Exception as e:
+        logger.exception("in get_smembers_redis " + str(e))

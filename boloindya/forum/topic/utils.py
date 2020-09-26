@@ -461,16 +461,17 @@ def set_redis_hashtag_paginated_data_with_json(key, language_id, hashtag_id, pag
 
 def set_redis_removed_videos(topic_id):
     try:
-        key = "removed:video:"+str(topic_id)
-        set_redis(key, topic_id, True, 10800)
+        key = "removed:videos"
+        set_s_redis(key, topic_id)
     except Exception as e:
         print(e)
         capture_exception(e)
 
+
+
 def filter_removed_videos_from_hashtag_paginated_data(hashtag_data):
     try:
-        removed_videos_redis_keys = redis_cli.keys("bi:removed:video:*")
-        removed_videos_data = redis_cli.mget(removed_videos_redis_keys)
+        removed_videos_data = list(get_smembers_redis("removed:videos"))
         return list(filter(lambda x:str(x['id']) not in removed_videos_data, hashtag_data))
     except Exception as e:
         print(e)

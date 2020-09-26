@@ -412,6 +412,7 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
             userprofile.update(vb_count = F('vb_count')+1)
         # Bolo actions will be added only when the monetization is enabled
         # add_bolo_score(self.user.id, 'create_topic', self)
+        sremove_redis("removed:videos", self.id)
         return True
 
     def no_monetization(self):
