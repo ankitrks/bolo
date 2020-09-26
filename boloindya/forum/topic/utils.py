@@ -348,7 +348,6 @@ def new_algo_update_redis_paginated_data(key, query,trending = False, cache_max_
                     else:
                         updated_df = temp_topics_df.query('id not in [' + ','.join(exclude_ids) + ']').drop_duplicates('user_id')\
                                 .nlargest(items_per_page, 'vb_score', keep = 'first')
-
                     id_list = updated_df['id'].tolist()
                     if len(id_list) >= min_count_per_page and page <= cache_max_pages:
                         exclude_ids.extend( map(str, id_list) )
@@ -360,7 +359,6 @@ def new_algo_update_redis_paginated_data(key, query,trending = False, cache_max_
                             page = None
                     else:
                         page = None
-
             if temp_page > cache_max_pages or start_date < settings.DATE_TILL_CALCULATE:
                 base_page = temp_page
                 temp_page = None
@@ -478,7 +476,6 @@ def filter_removed_videos_from_hashtag_paginated_data(hashtag_data):
         print(e)
         capture_exception(e)
 
-
 def get_campaign_paginated_data(language_id, hashtag_id, page_no):
     key = 'hashtag:'+str(hashtag_id)+':lang:'+str(language_id)
     redis_data = redis_cli_read_only.hget(key, str(page_no))
@@ -490,4 +487,3 @@ def get_campaign_paginated_data(language_id, hashtag_id, page_no):
 
     topics = Topic.objects.filter(id__in=redis_data.get('id_list'))
     return sorted(topics, key=lambda x: redis_data.get('id_list').index(x.id))
-
