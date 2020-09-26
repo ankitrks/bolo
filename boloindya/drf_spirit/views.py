@@ -576,6 +576,12 @@ def GetChallengeDetails(request):
         #all_vb = Topic.objects.filter(hash_tags=hash_tag,is_removed=False,is_vb=True)
         view_count = sum(item['view_count'] for item in hash_tag_counter_values)
         vb_count = sum(item['video_count'] for item in hash_tag_counter_values)
+        if vb_count < 999:
+            vb_count = Topic.objects.filter(first_hash_tag=hash_tag,is_removed=False,is_vb=True, language_id__in = language_ids).count()
+            all_view_count = Topic.objects.filter(first_hash_tag=hash_tag,is_removed=False,is_vb=True, language_id__in = language_ids).aggregate(Sum('view_count'))
+            if all_view_count.has_key('view_count__sum') and all_view_count['view_count__sum']:
+                view_count = all_view_count['view_count__sum']
+
         if hash_tag:
             tongue = hash_tag
             return JsonResponse({'message': 'success', 'hashtag':tongue.hash_tag,'vb_count':vb_count,\
