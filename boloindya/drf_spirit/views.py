@@ -4432,6 +4432,7 @@ def convert_to_dict_format(item):
 from time import time
 
 def get_video_bytes_and_its_related_data(id_list, last_updated=None):
+    print "topic ids", id_list
     query = """
             SELECT  t.id, t.view_count, t.likes_count, t.comment_count, t.date, t.m3u8_content, 
                     t.audio_m3u8_content, t.video_m3u8_content, t.backup_url, t.whatsapp_share_count, 
@@ -4461,11 +4462,11 @@ def get_video_bytes_and_its_related_data(id_list, last_updated=None):
                     p.salary_range as user__userprofile__salary_range, p.is_insight_fix as user__userprofile__is_insight_fix, 
                     p.user_id as user__userprofile__user, array_agg(distinct uc.category_id) as user__userprofile__sub_category
             FROM forum_topic_topic t
-                INNER JOIN forum_topic_topic_m2mcategory c on c.topic_id = t.id
-                INNER JOIN forum_topic_topic_hash_tags h on h.topic_id = t.id
-                INNER JOIN auth_user u on u.id = t.user_id
-                INNER JOIN forum_user_userprofile p on p.user_id = t.user_id
-                INNER JOIN forum_user_userprofile_sub_category uc on uc.userprofile_id = p.id
+                LEFT JOIN forum_topic_topic_m2mcategory c on c.topic_id = t.id
+                LEFT JOIN forum_topic_topic_hash_tags h on h.topic_id = t.id
+                LEFT JOIN auth_user u on u.id = t.user_id
+                LEFT JOIN forum_user_userprofile p on p.user_id = t.user_id
+                LEFT JOIN forum_user_userprofile_sub_category uc on uc.userprofile_id = p.id
             WHERE t.id in %s
             GROUP BY t.id, u.id, p.id
             ORDER BY t.vb_score DESC, t.id DESC
@@ -4481,6 +4482,7 @@ def get_video_bytes_and_its_related_data(id_list, last_updated=None):
             for row in cr.fetchall()
         ]
 
+        print " id_list after fetch", [i.get('id') for i in result]
         # print "time to fetch data = ", time() - t
 
     converted_list = []
@@ -4557,8 +4559,8 @@ class PopularVideoBytes(APIView):
                 print " from redis id list", id_list
                 return json.loads(id_list)
             
-            for topics_ids in redis_cli_read_only.hgetall(key):
-                previous_topic_ids += topics_ids
+            for topics_ids in redis_cli_read_only.hgetall(key).values():
+                previous_topic_ids += json.loads(topics_ids)
 
         # print "recalculating trendings"
 
@@ -4569,7 +4571,7 @@ class PopularVideoBytes(APIView):
 
         exclude_list = previous_topic_ids + all_seen_vb
 
-        # print "previous_topic_ids", previous_topic_ids
+        print "previous_topic_ids", previous_topic_ids
         # print "all_seen_vb", all_seen_vb
 
         cache_timespan = settings.TRENDING_CACHE_TIMESPAN*24
@@ -4607,7 +4609,7 @@ class PopularVideoBytes(APIView):
             page_number += 1
             page_created += 1
 
-        # print redis_cli_read_only.hgetall(key)
+        print redis_cli_read_only.hgetall(key)
 
         # print "return after calcuating all"
 
