@@ -4,6 +4,7 @@ from sentry_sdk import capture_exception
 
 def run():
     try:
+        delete_redis("removed:videos")
         for key in redis_cli.keys("bi:serialized:hashtag:*:lang:*:page:*"):
             splited_key = key.split(":")
             hashtag_id = splited_key[3]
