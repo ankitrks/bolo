@@ -4463,8 +4463,6 @@ def convert_to_dict_format(item):
 
     return _dict
 
-from time import time
-
 def get_video_bytes_and_its_related_data(id_list, last_updated=None):
     print "topic ids", id_list
     query = """
@@ -4507,7 +4505,7 @@ def get_video_bytes_and_its_related_data(id_list, last_updated=None):
         """
 
     with connections['default'].cursor() as cr:
-        t = time()
+        t = time.time()
         cr.execute(query, [tuple(id_list)])
 
         columns = [col[0] for col in cr.description]
@@ -4517,11 +4515,11 @@ def get_video_bytes_and_its_related_data(id_list, last_updated=None):
         ]
 
         print " id_list after fetch", [i.get('id') for i in result]
-        # print "time to fetch data = ", time() - t
+        # print "time to fetch data = ", time.time() - t
 
     converted_list = []
 
-    t = time()
+    t = time.time()
 
     for item in result:
         item['video_cdn'] = get_video_cdn(item.get('question_video'))
@@ -4559,7 +4557,7 @@ def get_video_bytes_and_its_related_data(id_list, last_updated=None):
 
         converted_list.append(convert_to_dict_format(item))
 
-    # print "time to convert data  = ", time() - t
+    # print "time to convert data  = ", time.time() - t
 
     return converted_list
 
