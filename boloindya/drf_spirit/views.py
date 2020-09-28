@@ -4574,12 +4574,12 @@ class PopularVideoBytes(APIView):
 
         topics = Topic.objects.filter(is_vb = True, is_removed = False, 
             language_id = language_id, is_popular = True, date__gte=end_date.date(), date__lte=start_date.date())\
-            .exclude(pk__in = exclude_list).order_by('-id', '-vb_score').values('id', 'user_id', 'vb_score','date')[:100]
+            .exclude(pk__in = exclude_list).order_by('-id', '-vb_score').values('id', 'user_id', 'vb_score','date')
 
-        if not len(topics):
+        if len(topics) < 20:
             topics = Topic.objects.filter(is_vb = True, is_removed = False, 
                 language_id = language_id, is_popular = True, date__lte=end_date.date())\
-                .exclude(pk__in = exclude_list).order_by('-id', '-vb_score').values('id', 'user_id', 'vb_score','date')[:100]
+                .exclude(pk__in = exclude_list).order_by('-id', '-vb_score').values('id', 'user_id', 'vb_score','date')[:1000]
 
 
         topics_df = pd.DataFrame.from_records(topics)
