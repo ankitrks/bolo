@@ -1,3 +1,4 @@
+
 import os
 import sys
 import json
@@ -14,7 +15,7 @@ import threading
 import pandas as pd
 
 import connection
-from boloindya.tasks import strip_tags
+from tasks import strip_tags
 
 redis_cli = connection.redis()
 SLOT_SIZE = 2
@@ -187,6 +188,5 @@ class AggregateHashtagTopics:
 def run():
     instance = AggregateHashtagTopics()
     topic_ids = instance.create_pages(instance.get_hashtag_topics())
-    instance.create_csv()
-    instance.send_topic_list_to_mail()
-    
+    # instance.create_csv()
+    # instance.send_topic_list_to_mail()
