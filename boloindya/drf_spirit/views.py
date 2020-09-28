@@ -4464,7 +4464,9 @@ def convert_to_dict_format(item):
     return _dict
 
 def get_video_bytes_and_its_related_data(id_list, last_updated=None):
-    print "topic ids", id_list
+    if not len(id_list):
+        return []
+
     query = """
             SELECT  t.id, t.view_count, t.likes_count, t.comment_count, t.date, t.m3u8_content, 
                     t.audio_m3u8_content, t.video_m3u8_content, t.backup_url, t.whatsapp_share_count, 
@@ -4505,7 +4507,6 @@ def get_video_bytes_and_its_related_data(id_list, last_updated=None):
         """
 
     with connections['default'].cursor() as cr:
-        t = time.time()
         cr.execute(query, [tuple(id_list)])
 
         columns = [col[0] for col in cr.description]
@@ -4514,12 +4515,7 @@ def get_video_bytes_and_its_related_data(id_list, last_updated=None):
             for row in cr.fetchall()
         ]
 
-        print " id_list after fetch", [i.get('id') for i in result]
-        # print "time to fetch data = ", time.time() - t
-
     converted_list = []
-
-    t = time.time()
 
     for item in result:
         item['video_cdn'] = get_video_cdn(item.get('question_video'))
@@ -4556,8 +4552,6 @@ def get_video_bytes_and_its_related_data(id_list, last_updated=None):
 
 
         converted_list.append(convert_to_dict_format(item))
-
-    # print "time to convert data  = ", time.time() - t
 
     return converted_list
 
@@ -4610,9 +4604,17 @@ class PopularVideoBytes(APIView):
         start_date = datetime.now()
         end_date = (start_date - timedelta( hours = cache_timespan ))
 
-        topics_df = pd.DataFrame.from_records(Topic.objects.filter(is_vb = True, is_removed = False, 
+        topics = Topic.objects.filter(is_vb = True, is_removed = False, 
             language_id = language_id, is_popular = True, date__gte=end_date.date(), date__lte=start_date.date())\
-            .exclude(pk__in = exclude_list).order_by('-id', '-vb_score').values('id', 'user_id', 'vb_score','date'))
+            .exclude(pk__in = exclude_list).order_by('-id', '-vb_score').values('id', 'user_id', 'vb_score','date')[:1000]
+
+        if len(topics) < 20:
+            topics = Topic.objects.filter(is_vb = True, is_removed = False, 
+                language_id = language_id, is_popular = True, date__lte=end_date.date())\
+                .exclude(pk__in = exclude_list).order_by('-id', '-vb_score').values('id', 'user_id', 'vb_score','date')[:1000]
+
+
+        topics_df = pd.DataFrame.from_records(topics)
 
         exclude_ids = []
         items_per_page = 15
@@ -4627,6 +4629,9 @@ class PopularVideoBytes(APIView):
             else:
                 selected_df = topics_df.query('id not in [' + ','.join(exclude_ids) + ']').drop_duplicates('user_id')\
                         .nlargest(items_per_page, 'vb_score', keep = 'first')
+
+            if selected_df.empty:
+                break
 
             id_list = selected_df['id'].tolist()
             # print "id_list", id_list
