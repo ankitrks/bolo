@@ -141,9 +141,18 @@ def cache_follow_post(user_id):
     key = 'follow_post:'+str(user_id)
     all_follower = get_redis_following(user_id)
     category_follow = UserProfile.objects.get(user_id = user_id).sub_category.all().values_list('pk', flat = True)
-    query = Topic.objects.filter(Q(user_id__in = all_follower)|Q(m2mcategory__id__in = category_follow, \
-        language_id__in = language_ids), is_vb = True, is_removed = False, is_popular = False)\
+
+    user_topic_ids = Topic.objects.filter(user_id__in=all_follower, is_vb = True, is_removed = False, is_popular = False)\
+            .exclude(pk__in = all_seen_vb).order_by('-id', '-vb_score').values_list('pk', flat=True)[:1000]
+
+    category_language_topic_ids = Topic.objects.filter(m2mcategory__id__in = category_follow, \
+        language_id = UserProfile.objects.get(user_id = user_id).language, is_vb = True, is_removed = False, is_popular = False)\
+            .exclude(pk__in = all_seen_vb).order_by('-id', '-vb_score').values_list('pk', flat=True)[:1000]
+
+    query = Topic.objects.filter(id__in=list(category_language_topic_ids)+list(user_topic_ids), is_vb = True, is_removed = False, is_popular = False)\
         .exclude(pk__in = all_seen_vb).order_by('-id', '-vb_score')
+
+
     update_redis_paginated_data(key, query)
 
 @app.task
