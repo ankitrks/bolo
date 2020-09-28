@@ -412,6 +412,7 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
             userprofile.update(vb_count = F('vb_count')+1)
         # Bolo actions will be added only when the monetization is enabled
         # add_bolo_score(self.user.id, 'create_topic', self)
+        sremove_redis("removed:videos", self.id)
         return True
 
     def no_monetization(self):
@@ -476,6 +477,16 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
         duration = str(duration.hour)+":"+str(duration.minute)+":"+str(duration.second)
         return duration
 
+    def get_cloudfront_url(self, playback_url):
+        import re
+        cloufront_url = settings.US_CDN_URL
+        if 'in-boloindya' in playback_url:
+            cloufront_url = settings.IN_CDN_URL
+        regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
+        find_urls_in_string = re.compile(regex, re.IGNORECASE)
+        url = find_urls_in_string.search(playback_url)
+        return str(playback_url.replace(str(url.group()), cloufront_url))
+
     def duration(self):
         playback_url = ''
         if  self.question_video and '.mp4' in self.question_video:
@@ -488,6 +499,7 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
         if not playback_url and self.question_video:
             playback_url = self.question_video
 
+        playback_url = self.get_cloudfront_url(playback_url)
         if self.media_duration:
             return format_html('<a href="javascript:void(0)" onclick="playvideo(\'' + playback_url + '\')">' + self.media_duration + '</a>' )
         return format_html('<a href="javascript:void(0)" onclick="playvideo(' + playback_url + ')">play</a>' )

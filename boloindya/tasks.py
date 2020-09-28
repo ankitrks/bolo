@@ -132,13 +132,17 @@ def cache_follow_post(user_id):
     from forum.topic.models import Topic
     from django.db.models import Q
     all_seen_vb = []
+    language_id = UserProfile.objects.get(user_id = user_id).language
+    language_ids = [language_id]
+    if int(language_id) in [1,2]:
+        language_ids = [1,2]
     if user_id:
         all_seen_vb = get_redis_vb_seen(user_id)
     key = 'follow_post:'+str(user_id)
     all_follower = get_redis_following(user_id)
     category_follow = UserProfile.objects.get(user_id = user_id).sub_category.all().values_list('pk', flat = True)
     query = Topic.objects.filter(Q(user_id__in = all_follower)|Q(m2mcategory__id__in = category_follow, \
-        language_id = UserProfile.objects.get(user_id = user_id).language), is_vb = True, is_removed = False, is_popular = False)\
+        language_id__in = language_ids), is_vb = True, is_removed = False, is_popular = False)\
         .exclude(pk__in = all_seen_vb).order_by('-id', '-vb_score')
     update_redis_paginated_data(key, query)
 
@@ -151,7 +155,10 @@ def cache_popular_post(user_id,language_id):
     all_seen_vb= []
     if user_id:
         all_seen_vb = get_redis_vb_seen(user_id)
-    query = Topic.objects.filter(is_vb = True, is_removed = False, language_id = language_id, is_popular = True)\
+    language_ids = [language_id]
+    if int(language_id) in [1,2]:
+        language_ids = [1,2]
+    query = Topic.objects.filter(is_vb = True, is_removed = False, language_id__in = language_ids, is_popular = True)\
         .exclude(pk__in = all_seen_vb).order_by('-id', '-vb_score')
     new_algo_update_redis_paginated_data(key, query, trending= True)
 
