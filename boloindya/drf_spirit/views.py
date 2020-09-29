@@ -502,11 +502,15 @@ def GetChallenge(request):
         if 'offset' in request.GET.keys() and int(request.GET.get('offset') or 0):
             page_no = int(int(request.GET.get('offset') or 0)/settings.REST_FRAMEWORK['PAGE_SIZE'])+1
         topics = get_redis_hashtag_paginated_data(language_id,hash_tag[0].id,page_no)
-        if not topics and int(language_id) in [1,2]:
+        if len(topics)<settings.REST_FRAMEWORK['PAGE_SIZE'] and int(language_id) in [1,2]:
             key = 'hashtag:'+str(hash_tag[0].id)+':lang:'+str(language_id)
-            next_language_page_no = get_page_no_for_next_language(key, page_no)
-            next_language_id = 1 if int(language_id)==2 else 2
-            topics = get_redis_hashtag_paginated_data(next_language_id,hash_tag[0].id,next_language_page_no)
+            is_required, next_language_page_no = get_page_no_for_next_language(key, page_no)
+            if is_required:
+                next_language_id = 1 if int(language_id)==2 else 2
+                if topics:
+                    topics = topics | get_redis_hashtag_paginated_data(next_language_id,hash_tag[0].id,next_language_page_no)
+                else:
+                    topics = get_redis_hashtag_paginated_data(next_language_id,hash_tag[0].id,next_language_page_no)
         my_data = TopicSerializerwithComment(topics,context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand':request.GET.get('is_expand',True)},many=True).data
         return JsonResponse({"results":my_data})
     else:
@@ -4306,14 +4310,18 @@ def get_category_video_bytes(request):
         category = Category.objects.get(pk=category_id)
         topics = []
         topics = get_redis_category_paginated_data(language_id,category.id,int(request.POST.get('page', 2)))
-        if not topics and int(language_id) in [1,2]:
+        if len(topics)< settings.REST_FRAMEWORK['PAGE_SIZE'] and int(language_id) in [1,2]:
             key = 'cat:'+str(category_id)+':lang:'+str(language_id)
-            next_language_page_no = get_page_no_for_next_language(key, int(request.POST.get('page', 2)))
-            next_language_id = 1 if int(language_id)==2 else 2
-            topics = get_redis_category_paginated_data(next_language_id,category.id,next_language_page_no)
-        paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
-        topic_page = paginator.page(1)
-        return JsonResponse({'topics': CategoryVideoByteSerializer(topic_page, many=True, context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
+            is_required, next_language_page_no = get_page_no_for_next_language(key, int(request.POST.get('page', 2)))
+            if is_required:
+                next_language_id = 1 if int(language_id)==2 else 2
+                if topics:
+                    topics = topics | get_redis_category_paginated_data(next_language_id,category.id,next_language_page_no)
+                else:
+                    topics = get_redis_category_paginated_data(next_language_id,category.id,next_language_page_no)
+        # paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
+        # topic_page = paginator.page(1)
+        return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True, context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
@@ -5193,15 +5201,20 @@ def get_page_no_for_next_language(key, requested_page):
     items_per_page = settings.REST_FRAMEWORK['PAGE_SIZE']
     data = get_redis(key)
     if not data:
-        return requested_page
+        return True, requested_page
     redis_keys = data.keys()
+    next_page = requested_page+1
+    if str(next_page) in data:
+        return False, 0
+    elif str(next_page) not in data and 'remaining' in redis_keys:
+        return False, 0
     if 'remaining' in redis_keys:
         redis_last_page = data['remaining']['last_page']
         remaining_count = data['remaining']['remaining_count']
         total_pages = int(redis_last_page + math.ceil(remaining_count/float(items_per_page)))
     else:
         total_pages = max(list(map(int, redis_keys)))
-    return requested_page - total_pages
+    return True, requested_page - total_pages + 1
         
 def remove_extra_char(file_name):
     """
