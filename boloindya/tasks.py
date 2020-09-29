@@ -146,7 +146,7 @@ def cache_follow_post(user_id):
             .exclude(pk__in = all_seen_vb).order_by('-id', '-vb_score').values_list('pk', flat=True)[:1000])
 
     if len(topic_ids) < 100:
-        topic_ids += len(Topic.objects.filter(m2mcategory__id__in = category_follow, \
+        topic_ids += list(Topic.objects.filter(m2mcategory__id__in = category_follow, \
             language_id = UserProfile.objects.get(user_id = user_id).language, is_vb = True, is_removed = False, is_popular = False)\
                 .exclude(pk__in = all_seen_vb).order_by('-id', '-vb_score').values_list('pk', flat=True)[:1000])
 
