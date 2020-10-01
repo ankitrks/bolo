@@ -4540,16 +4540,15 @@ def get_video_bytes_and_its_related_data(id_list, last_updated=None):
 
         # item['date'] = shortnaturaltime(item.get('date'))
 
-        # userprofile_counter = get_userprofile_counter(item.get('user__id'))
+        userprofile_counter = get_userprofile_counter(item.get('user__id'))
 
-        # item['user__userprofile__follow_count'] = shortcounterprofile(userprofile_counter['follow_count'])
-        # item['user__userprofile__follower_count'] = shortcounterprofile(userprofile_counter['follower_count'])
-        # item['user__userprofile__bolo_score'] = shortcounterprofile(item.get('user__userprofile__bolo_score'))
-        # item['user__userprofile__slug'] = item['user__username']
-        # item['user__userprofile__view_count'] = shorcountertopic(userprofile_counter['view_count'])
-        # item['user__userprofile__own_vb_view_count'] = shorcountertopic(userprofile_counter['view_count'])
-        # item['user__userprofile__vb_count'] = shortcounterprofile(userprofile_counter['video_count'])
-
+        item['user__userprofile__follow_count'] = shortcounterprofile(userprofile_counter['follow_count'])
+        item['user__userprofile__follower_count'] = shortcounterprofile(userprofile_counter['follower_count'])
+        item['user__userprofile__bolo_score'] = shortcounterprofile(item.get('user__userprofile__bolo_score'))
+        item['user__userprofile__slug'] = item['user__username']
+        item['user__userprofile__view_count'] = shorcountertopic(userprofile_counter['view_count'])
+        item['user__userprofile__own_vb_view_count'] = shorcountertopic(userprofile_counter['view_count'])
+        item['user__userprofile__vb_count'] = shortcounterprofile(userprofile_counter['video_count'])
 
         converted_list.append(convert_to_dict_format(item))
 
