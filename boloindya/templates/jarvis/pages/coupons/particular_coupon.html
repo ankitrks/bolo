@@ -1,0 +1,450 @@
+{% extends "jarvis/layout/base.html" %}
+{% block styles %}
+<style>
+    #overlay {
+  position: fixed; /* Sit on top of the page content */
+  display: none; /* Hidden by default */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+  z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
+}
+.percentcomplete{
+    position: absolute;
+    top: 50%;
+    left:50%;
+    color: white;
+    transform: translate(-50%,-50%);
+}
+.video_elements{
+    display: none;
+}
+.selected_image{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#center_announce{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#disable_campaign{
+    color: red;
+}
+
+ul {
+    float:left;
+    list-style: none;
+    padding: 0px;
+    border: 1px solid black;
+    margin-top: 0px;
+    width: 100%;
+    max-height: 120px;
+    display: block;
+    overflow-y: scroll;
+    background: white;
+}
+ul li {
+    padding: 2px;
+    cursor: pointer;
+    border-bottom: 1px solid black;
+}
+li:hover{
+    background: #1989CD;
+    color: white;
+}
+.form_group_1{
+    margin-top:100px;
+}
+
+</style>
+{% endblock styles %}
+{% block content %}
+
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+
+<section class="content">
+    <form id="upload" action="" method="POST" enctype="multipart/form-data" class="form-horizontal">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Brand Name: </label>
+            <div class="col-md-8">
+                <input type="text" name="brand_name" placeholder="Enter Brand Name" id="brand_name">
+            </div>
+        </div>
+
+        <div class="form-group">
+                <img id="selected_active_image" class="selected_active_image" style="max-width: 100%;"/>
+        </div>
+
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Change Active Banner: <br> (480 x 140) </label>
+            <div class="col-md-8">
+                <input type="file" name="active_banner_file" id="active_banner" class="form-control" onchange="readURL(this, '#selected_active_image');">
+            </div>
+        </div>
+
+
+        <div class="form-group">
+                <img id="selected_inactive_image" class="selected_inactive_image" style="max-width: 100%;"/>
+        </div>
+
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Change Inactive Banner: <br> (480 x 140) </label>
+            <div class="col-md-8">
+                <input type="file" name="inactive_banner_file" id="inactive_banner" class="form-control" onchange="readURL(this, '#selected_active_image');">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Active From: </label>
+            <div class="col-md-8">
+                <input type="text" id="start_date" name="start_date" placeholder="Start Date" class="filter_text">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Active Till: </label>
+            <div class="col-md-8">
+                <input type="text" id="end_date" name="end_date" placeholder="End Date" class="filter_text">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Bolo Coins To Be Redeemed: </label>
+            <div class="col-md-8">
+                <input type="text" name="coins" placeholder="Enter Coins" id="coins">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Discount Code: </label>
+            <div class="col-md-8">
+                <input type="text" name="coupon_code" placeholder="Enter Code" id="coupon_code">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Discount To Be Given: </label>
+            <div class="col-md-8">
+                <input type="text" name="discount" placeholder="ex:- 10%,20% etc" id="discount">
+            </div>
+        </div>    
+
+        <div class="form-group">
+            <label id="is_active_coupon_label" class="col-md-3 col-sm-3 col-xs-12 control-label" for="name">Active: </label>
+                <input type="checkbox" id="is_active_coupon" name="is_active_coupon" value='true'>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-0 col-sm-1 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
+                <button id="update" type="submit" class="btn btn-primary submit_from_button"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Save Changes & Publish</button>
+            </div>
+            <div class="col-md-1 col-sm-3 col-xs-12 col-md-offset-1" style="margin-bottom:10px;">
+                <button id="save" type="submit" class="btn btn-primary submit_from_button"> <span class="glyphicon glyphicon-floppy-save" style="margin-right:5px"></span>Save as Draft</button>
+            </div>
+        </div>
+        <div class="form-group video_elements">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Bucket</label>
+            <div class="col-md-8">
+                <select name="bucket_name" id="bucket_name" required="True" class="form-control">
+                    <option value="in-boloindya" selected>Boloindya Prod</option>
+                </select>
+            </div>
+        </div>
+    </form>
+    <div id="overlay">
+        <div class="text"><br>
+            <br><span style="font-size:50px;" class="percentcomplete"></span></div>
+    </div>
+    <div id="csv_table">
+    </div>
+</section>
+{% endblock content %}
+{% block center_js %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropper/4.1.0/cropper.min.js" integrity="sha512-E+gDQcIvNXE60SjCS38ysf1mGh4ObBpKcUOp0oEaHQHQAdaN2p7GelOpgEdpTuCLoIJyLkNXiqFZbyD9Ak/Ygw==" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropper/4.1.0/cropper.css" integrity="sha512-iAcZ4OrGhQ7KDqtM+LMc+iuv63aJ9O7hPyWBzCXsrZYuhJ6jhdeh40+hf9o4QmZVu8QrH/cWy/JTmoKNOL4Urw==" crossorigin="anonymous" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropper/4.1.0/cropper.js" integrity="sha512-XL8wKq9jUbb9LMyrezd19IPRrf41omJUvZpqTXlpGXREAFbmoulbt3yBv+Lw+L007NL5tL0HRfnlXeKtvlvITg==" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropper/4.1.0/cropper.min.css" integrity="sha512-vmXqikRa5kmI3gOQygzml5nV+5NGxG8rt8KWHKj8JYYK12JUl2L8RBfWinFGTzvpwwsIRcINy9mhLyodnmzjig==" crossorigin="anonymous" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.min.js" integrity="sha512-WiGQZv8WpmQVRUFXZywo7pHIO0G/o3RyiAJZj8YXNN4AV7ReR1RYWVmZJ6y3H06blPcjJmG/sBpOVZjTSFFlzQ==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.js" integrity="sha512-mxCAjvjp0jvMdGRIEvAHOCGL6BOucqWpTBXwchElsPKNw7BEegHviDHPnYrOrzgzBiw3GD/Q1ibpA5nlFPYDMw==" crossorigin="anonymous"></script>
+
+<script>
+
+    $('#btnSave').hide();
+    $('#btnCancel').hide();
+
+    $('#btnCrop').click(function() {
+        // Get a string base 64 data url
+        $("#selected_image").cropper({
+            aspectRatio: 32/9,
+            crop: function(event){
+            }   
+        });
+
+        $('#btnCrop').hide();
+        $('#btnSave').show();
+        $('#btnCancel').show();
+     });
+
+    $('#btnCancel').click(function(){
+        closeCropper();
+    });
+
+    $('#btnSave').click(function(){
+        var croppedImageDataURL = $("#selected_image").cropper('getCroppedCanvas').toDataURL("image/png"); 
+        download(croppedImageDataURL, "cropped_file.png", "image/png");
+        closeCropper();
+    });
+
+    function closeCropper() {
+        $("#selected_image").cropper('destroy');
+        $('#btnCrop').show();
+        $('#btnSave').hide();
+        $('#btnCancel').hide();
+    }
+
+    function readURL(input, img_field) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $(img_field)
+                    .attr('src', e.target.result)
+                    .css({
+                        'width' : '30%',
+                        'height' : '30%'
+                    })
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+
+    $(function () {
+        $("#announce_winner").click(function () {
+            if ($(this).is(":checked")) {
+                enableWinnersField();
+            } else {
+                disableWinnersField();
+            }
+        });
+    });
+
+    $(function () {
+        $("#popup_checkbox").click(function () {
+            if ($(this).is(":checked")) {
+                $("#popup").prop("disabled", false);
+            } else {
+                $("#popup").prop("disabled", true);
+            }
+        });
+    });
+
+    function enableWinnersField(){
+        $("#rank_1_user").prop("disabled", false);
+        $("#rank_2_user").prop("disabled", false);
+        $("#rank_3_user").prop("disabled", false);
+        $("#rank_1_video").prop("disabled", false);
+        $("#rank_2_video").prop("disabled", false);
+        $("#rank_3_video").prop("disabled", false);
+    }
+
+    function disableWinnersField(){
+        $("#rank_1_user").prop("disabled", true);
+        $("#rank_2_user").prop("disabled", true);
+        $("#rank_3_user").prop("disabled", true);
+        $("#rank_1_video").prop("disabled", true);
+        $("#rank_2_video").prop("disabled", true);
+        $("#rank_3_video").prop("disabled", true);   
+    }
+
+    $(document).ready(function(){
+        $("#brand_name").val("{{coupon.brand_name}}");
+        $("#selected_active_image").attr("src","{{coupon.active_banner_img_url}}")
+                    .css({
+                        'width' : '30%',
+                        'height' : '30%',
+                        'display':'block',
+                        'margin-left': 'auto',
+                        'margin-right': 'auto'
+                    });
+
+        $("#selected_inactive_image").attr("src","{{coupon.inactive_banner_img_url}}")
+                    .css({
+                        'width' : '30%',
+                        'height' : '30%',
+                        'display':'block',
+                        'margin-left': 'auto',
+                        'margin-right': 'auto'
+                    });
+
+        $("#start_date").val("{{coupon.active_from|date:"d-m-Y"}}");
+        $("#end_date").val("{{coupon.active_till|date:"d-m-Y"}}");
+
+        $("#coins").val("{{coupon.coins_required}}");
+        $("#coupon_code").val("{{coupon.coupon_code}}");
+        $("#discount").val("{{coupon.discount_given}}");
+
+
+        var is_active = {{coupon.is_active|yesno:"true,false"}};
+        $("#is_active_coupon").prop("checked", is_active);
+    });
+
+function upload(event) {
+    // Check if the date are valid
+    if( $('#start_date').val() && $('#end_date').val() ){
+    } else {
+        alert("Please enter both dates");
+        return false;
+    }
+
+    if ($('.submit_from_button').hasClass("opened")) {
+        return false;
+    } else {
+        $('.submit_from_button').addClass("opened");
+        event.preventDefault();
+        $('#overlay').show();
+        var data = new FormData($('#upload').get(0));
+        var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+        var all_data = []
+        if (event.data.is_draft){
+            data.append('is_draft',true);
+        }
+        else{
+            data.append('is_draft',false);
+        }
+        data.append('coupon_id', '{{coupon.id}}');
+        data.append('is_active', $("#is_active_coupon").is(':checked'));
+        if($('#active_banner').val()){
+            data.append('active_banner_img_url', $('#active_banner').val());
+        } else {
+            data.append('active_banner_img_url', '{{coupon.active_banner_img_url}}');
+        }
+
+        if($('#inactive_banner').val()){
+            data.append('inactive_banner_img_url', $('#inactive_banner').val());
+        } else {
+            data.append('inactive_banner_img_url', '{{coupon.active_banner_img_url}}');
+        }
+        var url = new URL(window.location.href);
+        var user_id = url.searchParams.get("user_id");
+        data.append('user_id',user_id)
+        $.ajax({
+            xhr: function() {
+                var xhr = new window.XMLHttpRequest();
+                xhr.upload.addEventListener("progress", function(evt) {
+                    if (evt.lengthComputable) {
+                        var percentComplete = evt.loaded / evt.total;
+                        console.log(percentComplete);
+                        $('.percentcomplete').text((percentComplete * 100).toPrecision(4) + ' %');
+                        if (percentComplete === 1) {
+                            $('.percentcomplete').text('Processing');
+                        }
+                    }
+                }, false);
+                xhr.addEventListener("progress", function(evt) {
+                    if (evt.lengthComputable) {
+                        var percentComplete = evt.loaded / evt.total;
+                        console.log(percentComplete);
+                        $('.percentcomplete').text((percentComplete * 100).toPrecision(4) + ' %')
+                    }
+                }, false);
+                return xhr;
+            },
+            url: '/jarvis/add_coupon/',
+            type: 'POST',
+            data: data,
+            cache: false,
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(data) {
+                $('#overlay').hide()
+                $('.submit_from_button').removeClass("opened");
+                if (data.message == 'fail') {
+                    alert(data['reason'])
+                } else if (data.message == 'success') {
+                    alert("Changes done.")
+                }
+                $('.submit_from_button').removeClass("opened");
+            },
+            error: function(data) {
+                $('#overlay').hide()
+                $('.submit_from_button').removeClass("opened");
+                console.log(data)
+                alert(data)
+                alert('Consult Tech')
+            },
+
+        });
+        return false;
+    }
+}
+
+
+$('#update').click({is_draft: false}, upload);
+$('#save').click({is_draft: true}, upload);
+
+function addNewHashtag(){
+    let hashtag_status = document.getElementById('hashtag_status')
+    hashtag_status.innerHTML = '  Please wait...'
+
+    const name = $('#search_id').val()
+
+    $.ajax({
+        url: '/jarvis/search_and_add_hashtag/',
+        method: 'POST',
+        data: JSON.stringify({
+            'hashtag': name,
+        }),
+        dataType: "json",
+        contentType: 'application/json',
+        success: function(data) {
+            hashtag_status.innerHTML = '  Created!';
+            hashtag_id = data.id;
+            $('#search_id').val(String(data.hash_tag));
+            $('#response').empty();
+        }
+    })
+}    
+
+</script>
+
+<script>
+    $(function() {
+        $("#start_date").
+            datepicker({
+                format: "dd-mm-yyyy",
+                startDate: new Date()
+            }).on("changeDate", function (selected) {
+                var minDate = new Date(selected.date.valueOf());
+                $("#end_date").datepicker('setStartDate', minDate);
+            }); 
+    });
+    $(function() {
+        $("#end_date").
+            datepicker({
+                format: "dd-mm-yyyy",
+                startDate: new Date()
+            }).on('changeDate', function (selected) {
+            var maxDate = new Date(selected.date.valueOf());
+            $('#start_date').datepicker('setEndDate', maxDate);
+        });
+    });
+
+</script>
+
+{% endblock center_js %}
