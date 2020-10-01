@@ -47,6 +47,7 @@ from itertools import groupby
 from django.db.models import Count
 import ast
 from drf_spirit.serializers import VideoCompleteRateSerializer
+from coupon.serializers import CouponSerializer
 from .forms import VideoUploadTranscodeForm,TopicUploadTranscodeForm,UserPayForm, AudioUploadForm, CampaignForm, UserForm
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imencode
 from django.core.files.base import ContentFile
@@ -62,6 +63,10 @@ from django.db.models import Count
 from forum.category.models import Category
 from datetime import datetime, timedelta
 from forum.user.utils.bolo_redis import update_profile_counter
+from rest_framework import generics
+from coupon.models import Coupon, UserCoupon
+from coupon.forms import CouponForm
+import pandas as pd
 
 def get_bucket_details(bucket_name=None):
     bucket_credentials = {}
@@ -3410,3 +3415,122 @@ def timeout_test(request):
     import time
     time.sleep(int(request.GET.get('tout', 65)))
     return HttpResponse('No Timeout...')
+
+@login_required
+def new_coupon_page(request):
+    coupon_form = CouponForm()
+    return render(request,'jarvis/pages/coupons/create_new_coupons.html',
+            {'add_coupons':coupon_form})
+
+@login_required
+def add_coupon(request):
+    active_banner_image_file = request.FILES.get('active_banner_file')
+    inactive_banner_image_file = request.FILES.get('inactive_banner_file')
+    start_date_string = request.POST.get('start_date', None)
+    end_date_string = request.POST.get('end_date', None)
+    banner_image_upload_folder_name = request.POST.get('folder_prefix','from_upload_panel/coupon_banner_image')
+    upload_to_bucket = request.POST.get('bucket_name',None)
+    coupon_id = request.POST.get('coupon_id', None)
+    coins = request.POST.get('coins',None)
+    coupon_code = request.POST.get('coupon_code',None)
+    brand_name = request.POST.get('brand_name',None)
+    discount = request.POST.get('discount',None)
+    is_draft = request.POST.get('is_draft',None)
+
+    if not brand_name:
+        return JsonResponse({'message':'fail','reason':'Brand Name Missing'}, status=status.HTTP_200_OK)
+    if not coins.isdigit():
+        return JsonResponse({'message':'fail','reason':'Bolo Coins Invalid, Please enter a number'}, status=status.HTTP_200_OK)
+    if not coupon_code:
+        return JsonResponse({'message':'fail','reason':'Discount Code Missing'}, status=status.HTTP_200_OK)
+    if not discount:
+        return JsonResponse({'message':'fail','reason':'Discount Missing'}, status=status.HTTP_200_OK)
+    if not upload_to_bucket:
+        return JsonResponse({'message':'fail','reason':'bucket_missing'}, status=status.HTTP_200_OK)
+    if not start_date_string or not end_date_string:
+        return JsonResponse({'message':'fail','reason':'Invalid dates'}, status=status.HTTP_200_OK)
+    if not active_banner_image_file:
+        if not coupon_id:
+            return JsonResponse({'message':'fail','reason':'Active Banner Image File Missing'}, status=status.HTTP_200_OK)
+    elif not active_banner_image_file.name.endswith(('.jpg','.png', '.jpeg')):
+        return JsonResponse({'message':'fail','reason':'This is not a jpg/png file'}, status=status.HTTP_200_OK)
+    if not inactive_banner_image_file:
+        if not coupon_id:
+            return JsonResponse({'message':'fail','reason':'Inactive Banner Image File Missing'}, status=status.HTTP_200_OK)
+    elif not inactive_banner_image_file.name.endswith(('.jpg','.png', '.jpeg')):
+        return JsonResponse({'message':'fail','reason':'This is not a jpg/png file'}, status=status.HTTP_200_OK)
+
+    start_date = datetime.strptime(start_date_string, "%d-%m-%Y")
+    end_date = datetime.strptime(end_date_string, "%d-%m-%Y")
+    is_draft = True if is_draft=='true' else False
+    coupon_dict = {}
+    coupon_dict['active_from'] = start_date
+    coupon_dict['active_till'] = end_date
+    coupon_dict['brand_name'] = brand_name
+    coupon_dict['coins_required'] = int(coins)
+    coupon_dict['coupon_code'] = coupon_code
+    coupon_dict['discount_given'] = discount
+    coupon_dict['is_draft'] = is_draft
+    if active_banner_image_file:
+        active_banner_image_url = upload_image(upload_to_bucket, active_banner_image_file, banner_image_upload_folder_name)
+        if not active_banner_image_url:
+            return JsonResponse({'message':'fail','reason':'Image File already exist'}, status=status.HTTP_200_OK)
+        else:
+            coupon_dict['active_banner_img_url'] = active_banner_image_url
+
+    if inactive_banner_image_file:
+        inactive_banner_image_url = upload_image(upload_to_bucket, inactive_banner_image_file, banner_image_upload_folder_name)
+        if not inactive_banner_image_url:
+            return JsonResponse({'message':'fail','reason':'Image File already exist'}, status=status.HTTP_200_OK)
+        else:
+            coupon_dict['inactive_banner_img_url'] = inactive_banner_image_url
+
+    if coupon_id:
+        #If coupon ID is supplied, then it means it is an older coupon
+        coupon_obj = Coupon.objects.get(pk=coupon_id) 
+        is_active = request.POST.get('is_active_coupon', False)=='true'
+        if is_active:
+            coupon_dict['is_active'] = True
+        else:
+            coupon_dict['is_active'] = False
+        Coupon.objects.filter(pk=coupon_id).update(**coupon_dict)
+        
+    else:    
+        #If there is no coupon ID supplied, then it means it is a new coupon
+        coupon_obj = Coupon.objects.create(**coupon_dict)
+
+    return JsonResponse({'message':'success', 'coupon_id':coupon_obj.id}, status=status.HTTP_200_OK)
+
+@login_required
+def particular_coupon(request, coupon_id=None):
+    coupon = Coupon.objects.get(pk=coupon_id)
+    return render(request,'jarvis/pages/coupons/particular_coupon.html', {'coupon': coupon})
+
+@login_required
+def coupon_report_pannel(request):
+    page_no = request.GET.get('page_no', '1')
+    all_coupons = Coupon.objects.order_by('-created_at')
+    df1 =  pd.DataFrame.from_records(all_coupons.values('id','brand_name', 'coupon_code', 'discount_given', 'active_till'))
+    all_user_coupons = UserCoupon.objects.all()
+    df2 = pd.DataFrame.from_records(all_user_coupons.values('user_id','coupon_id'))
+    df1["redeem_count"] = df1["id"].map(df2["coupon_id"].value_counts()).fillna(0).astype(int)
+    final_data = df1.to_dict('records')
+    total_page = len(final_data)//10
+    if len(final_data)%10:
+        total_page += 1
+    page = int(page_no) - 1
+
+    # print("**", coupon_list.count(), total_page)
+
+    return render(request,'jarvis/pages/coupons/boloindya_coupons_report.html', {'coupon_list': final_data[page*10:page*10+10],\
+        'page_no': page_no, 'total_page': total_page, 'page_adder': str((int(page_no)-1)*10)})
+
+class CouponDatableList(generics.ListAPIView):
+    serializer_class = CouponSerializer
+
+    def get_queryset(self):
+        return Coupon.objects.order_by('-created_at')
+
+@login_required
+def coupon_list_datable(request):
+    return render(request,'jarvis/pages/coupons/boloindya_coupons.html')
