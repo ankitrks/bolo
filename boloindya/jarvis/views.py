@@ -3512,13 +3512,17 @@ def coupon_report_pannel(request):
     all_coupons = Coupon.objects.order_by('-created_at')
     df1 =  pd.DataFrame.from_records(all_coupons.values('id','brand_name', 'coupon_code', 'discount_given', 'active_till'))
     all_user_coupons = UserCoupon.objects.all()
-    df2 = pd.DataFrame.from_records(all_user_coupons.values('user_id','coupon_id'))
-    df1["redeem_count"] = df1["id"].map(df2["coupon_id"].value_counts()).fillna(0).astype(int)
-    final_data = df1.to_dict('records')
-    total_page = len(final_data)//10
-    if len(final_data)%10:
-        total_page += 1
-    page = int(page_no) - 1
+    final_data = []
+    page = 1
+    total_page = 1
+    if all_user_coupons:
+        df2 = pd.DataFrame.from_records(all_user_coupons.values('user_id','coupon_id'))
+        df1["redeem_count"] = df1["id"].map(df2["coupon_id"].value_counts()).fillna(0).astype(int)
+        final_data = df1.to_dict('records')
+        total_page = len(final_data)//10
+        if len(final_data)%10:
+            total_page += 1
+        page = int(page_no) - 1
 
     # print("**", coupon_list.count(), total_page)
 
