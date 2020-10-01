@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-
+import json
 from ..comment.bookmark.models import CommentBookmark
 from .notification.models import TopicNotification
 from .unread.models import TopicUnread
@@ -461,17 +461,30 @@ def set_redis_hashtag_paginated_data_with_json(key, language_id, hashtag_id, pag
 
 def set_redis_removed_videos(topic_id):
     try:
-        key = "removed:video:"+str(topic_id)
-        set_redis(key, topic_id, True, 10800)
+        key = "removed:videos"
+        set_s_redis(key, topic_id)
     except Exception as e:
         print(e)
         capture_exception(e)
 
+
+
 def filter_removed_videos_from_hashtag_paginated_data(hashtag_data):
     try:
-        removed_videos_redis_keys = redis_cli.keys("bi:removed:video:*")
-        removed_videos_data = redis_cli.mget(removed_videos_redis_keys)
+        removed_videos_data = list(get_smembers_redis("removed:videos"))
         return list(filter(lambda x:str(x['id']) not in removed_videos_data, hashtag_data))
     except Exception as e:
         print(e)
         capture_exception(e)
+
+def get_campaign_paginated_data(language_id, hashtag_id, page_no):
+    key = 'hashtag:'+str(hashtag_id)+':lang:'+str(language_id)
+    redis_data = redis_cli_read_only.hget(key, str(page_no))
+
+    if not redis_data:
+        return []
+
+    redis_data = json.loads(redis_data)
+
+    topics = Topic.objects.filter(id__in=redis_data.get('id_list'))
+    return sorted(topics, key=lambda x: redis_data.get('id_list').index(x.id))

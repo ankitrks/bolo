@@ -1,0 +1,160 @@
+{% extends "jarvis/layout/base.html" %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/dataTables.bootstrap4.min.css' %}">
+<style>
+    #overlay {
+  position: fixed; /* Sit on top of the page content */
+  display: none; /* Hidden by default */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+  z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
+}
+.percentcomplete{
+    position: absolute;
+    top: 50%;
+    left:50%;
+    color: white;
+    transform: translate(-50%,-50%);
+}
+.video_elements{
+    display: none;
+}
+.coupon_banner{
+    display: block;
+    width: 200px;
+    height: 120px;
+}
+
+#create_new_coupon{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-width : 200px;
+}
+
+ul {
+    float:left;
+    list-style: none;
+    padding: 0px;
+    border: 1px solid black;
+    margin-top: 0px;
+    width: 100%;
+    max-height: 120px;
+    display: block;
+    overflow-y: scroll;
+    background: white;
+}
+ul li {
+    padding: 2px;
+    cursor: pointer;
+    border-bottom: 1px solid black;
+}
+#response li:hover{
+    background: #1989CD;
+    color: white;
+}
+</style>
+{% endblock styles %}
+{% block content %}
+
+<section class="content">
+    <a id="create_new_coupon" href="/jarvis/new_coupon_page" class="btn btn-primary">Add New Coupon</a>
+    <br>
+     <div class="col-xs-12 table-responsive ">
+        <table class="table table-striped nowrap" id="coupons_table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>S No.</th>
+                    <th>Brand Name</th>
+                    <th>Active banner</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Live/Draft</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</section>
+  <script src="//code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+  <script src="//cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+<script>
+  $(document).ready(function() {
+      var oTable = $('#coupons_table').DataTable({
+          'serverSide': true,
+          'ajax': '/jarvis/coupon_list/?format=datatables',
+          "order": [[ 4, 'desc' ]],
+          initComplete: function () {
+                this.api().columns(6).every( function () {
+                var column = this;
+                $('#dataTables-example .head .head_hide').html('');
+
+                var select = $('<select id="formfilter" class="filterdropdown"><option value="">Live/Draft (All)</option></select>')
+                    .appendTo( $(column.header()).empty())
+                    .on( 'change', function () {
+                        var val = $.fn.dataTable.util.escapeRegex(
+                            $(this).val()
+                        );
+                        column.search( val ? '^'+val+'$' : '', true, false )
+                            .draw();
+                    });
+
+                column.data().unique().sort().each( function ( d, j ) {
+                    if (d){
+                        select.append( '<option value="'+d+'">Draft</option>' )
+                    }
+                    else{
+                        select.append( '<option value="'+d+'">Live</option>' )
+                    }
+                });
+            });},
+          'columns': [
+              {'data': 'id', "bSortable": false},
+              {'data': null,"bSortable": false,
+              render: function (data, type, row, meta) {
+                     return meta.row + meta.settings._iDisplayStart + 1;
+                    }},
+              {'data': 'brand_name', 'name': 'brand_name',"bSortable": false,
+                "render": function(data, type, row, meta){
+                    console.log(row)
+                    return '<a href="/jarvis/particular_coupon/'+row.id+'">'+ row.brand_name+'</a>'
+                }},
+              {'data': 'active_banner_img_url',"bSortable": false,
+                "render": function(data, type, row, meta){
+                    data ='<img id="coupon_banner" class="coupon_banner" src="'+row.active_banner_img_url+'"/>'
+                    return data}
+                },
+              {'data': 'active_from', 
+                "render": function(data, type, row, meta){
+                    return moment(data).format('MMMM Do,YYYY')}
+                },
+              {'data': 'active_till',
+                "render": function(data, type, row, meta){
+                    return moment(data).format('MMMM Do,YYYY')}
+                },
+              {'data': 'is_draft',"bSortable": false,
+              "render": function(data, type, row, meta) {
+                    if(row.is_draft){
+                        button = '<svg height="25" width="25"><circle cx="10" cy="10" r="10" fill="red" /></svg>'
+                    }
+                    else{
+                        button = '<svg height="25" width="25"><circle cx="10" cy="10" r="10" fill="green" /></svg>'
+                    }
+                    return button
+                }},
+
+          ],
+
+      });
+      oTable.column(0).visible(false);
+  });
+</script>
+{% endblock content %}  

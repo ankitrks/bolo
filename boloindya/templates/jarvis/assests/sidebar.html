@@ -124,6 +124,20 @@
         {% if user|is_user_in_group:"moderator" %}
         <li class="{% if request.path in '/jarvis/campaigns_panel/'%}active{% endif %}"><a href="/jarvis/campaigns_panel/"><i class="fa fa-flag"></i> <span>Campaigns</span></a></li>
         {% endif %}
+        {% if user|is_user_in_group:"moderator" %}
+          <li class="{% if request.path in '/api/v1/coupon_pannel/,/api/v1/coupon_report_pannel/'%}active{% endif %} treeview">
+            <a href="#">
+              <i class="fa fa-dashboard"></i> <span>Boloindya Coupon Upload</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li class="{% if request.path in '/jarvis/coupon_pannel/'%}active{% endif %}"><a href="/jarvis/coupon_pannel/"><i class="fa fa-money"></i> <span>Coupon Management</span></a></li>
+              <li class="{% if request.path in '/jarvis/coupon_report_pannel/'%}active{% endif %}"><a href="/jarvis/coupon_report_pannel/"><i class="fa fa-table"></i> <span>Coupon Report</span></a></li>
+            </ul>
+          </li>
+        {% endif %}
       </ul>
 
     </section>

@@ -162,6 +162,7 @@ INSTALLED_APPS = [
     'jarvis',
     'tinymce',
     'chartjs',
+    'coupon'
     
     # 'forum.core.tests'
 ]
@@ -680,3 +681,7 @@ FPLAYTIME_LIMIT = 180000 # in seconds 50 hours
 POPULAR_BOOST_TIMEDELTA = 2 # in days
 
 WATERMARK_SERVICE_ENDPOINT = "https://92scj7hqac.execute-api.ap-south-1.amazonaws.com/v1/invoke-watermark"
+
+ANIMATED_VIDEO_URL = 'https://in-boloindya.s3.ap-south-1.amazonaws.com/from_upload_panel/coupon_animated_video/congratulations_image.gif'
+
+GET_COUPONS_API_PAGE_SIZE = 5

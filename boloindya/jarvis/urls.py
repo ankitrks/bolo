@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from django.conf.urls import url, include
 from jarvis import views
+from jarvis.views import CouponDatableList
 urlpatterns = [
     url(r'^$',views.home,name='jarvis-home'),
 
@@ -97,4 +98,11 @@ urlpatterns = [
     url(r'^bot_user_list/$',views.get_bot_user_list, name='bot_user_list'),
     url(r'^get_bot_video_list/$',views.get_bot_video_list, name='get_bot_video_list'),
     url(r'^delete_bot_video/$',views.delete_bot_video, name='delete_bot_video'),
+
+    url(r'^new_coupon_page/$', views.new_coupon_page),
+    url(r'^add_coupon/$', views.add_coupon),
+    url(r'^particular_coupon/(?P<coupon_id>\d+)$',views.particular_coupon),
+    url(r'^coupon_report_pannel/$', views.coupon_report_pannel),
+    url(r'^coupon_list/$',CouponDatableList.as_view()),
+    url(r'^coupon_pannel/$', views.coupon_list_datable)
 ]
