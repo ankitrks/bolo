@@ -575,7 +575,13 @@ class UserProfileSerializer(ModelSerializer):
     class Meta:
         model = UserProfile
         # fields = '__all__' 
-        exclude = ('extra_data', 'location', 'last_seen', 'last_ip', 'timezone', 'is_administrator', 'is_moderator', 'is_verified', 'last_post_on', 'last_post_hash', 'is_geo_location', 'lat', 'lang', 'click_id', 'click_id_response','is_test_user', 'is_bot_account')
+        exclude = ('social_identifier', 'question_count', 'linkedin_url', 'instagarm_id', 'twitter_id', 'topic_count', 'comment_count',\
+            'refrence', 'mobile_no', 'encashable_bolo_score', 'total_time_spent', 'total_vb_playtime',\
+            'is_dark_mode_enabled', 'paytm_number', 'state_name', 'city_name', 'extra_data', 'location', \
+            'last_seen', 'last_ip', 'timezone', 'is_administrator', 'is_moderator', 'is_verified', 'last_post_on', \
+            'last_post_hash', 'is_geo_location', 'lat', 'lang', 'click_id', 'click_id_response', 'gender', 'about', 'language', 'answer_count',\
+            'share_count', 'like_count', 'is_test_user', 'is_bot_account', 'salary_range', 'boost_views_count', 'boost_like_count', \
+            'boost_follow_count', 'boosted_time', 'boost_span', 'd_o_b', 'is_insight_fix')
 
     def get_follow_count(self,instance):
         return shortcounterprofile(get_userprofile_counter(instance.user_id)['follow_count'])
@@ -610,7 +616,13 @@ class ShortUserProfileSerializer(ModelSerializer):
     class Meta:
         model = UserProfile
         # fields = '__all__' 
-        exclude = ('social_identifier','question_count','linkedin_url','instagarm_id','twitter_id','topic_count','comment_count','refrence','mobile_no','encashable_bolo_score','total_time_spent','total_vb_playtime','is_dark_mode_enabled','paytm_number','state_name','city_name','extra_data', 'location', 'last_seen', 'last_ip', 'timezone', 'is_administrator', 'is_moderator', 'is_verified', 'last_post_on', 'last_post_hash', 'is_geo_location', 'lat', 'lang', 'click_id', 'click_id_response','gender','about','language','answer_count','share_count','like_count','is_test_user', 'is_bot_account')
+        exclude = ('social_identifier', 'question_count', 'linkedin_url', 'instagarm_id', 'twitter_id', 'topic_count', 'comment_count',\
+            'refrence', 'mobile_no', 'encashable_bolo_score', 'total_time_spent', 'total_vb_playtime',\
+            'is_dark_mode_enabled', 'paytm_number', 'state_name', 'city_name', 'extra_data', 'location', \
+            'last_seen', 'last_ip', 'timezone', 'is_administrator', 'is_moderator', 'is_verified', 'last_post_on', \
+            'last_post_hash', 'is_geo_location', 'lat', 'lang', 'click_id', 'click_id_response', 'gender', 'about', 'language', 'answer_count',\
+            'share_count', 'like_count', 'is_test_user', 'is_bot_account', 'salary_range', 'boost_views_count', 'boost_like_count', \
+            'boost_follow_count', 'boosted_time', 'boost_span', 'd_o_b', 'is_insight_fix')
 
     def get_follow_count(self,instance):
         return shortcounterprofile(instance.userprofile_counter['follow_count'])
@@ -638,7 +650,7 @@ class ShortUserSerializer(ModelSerializer):
     class Meta:
         model = User
         #fields = '__all__'
-        exclude = ('first_name','last_name','email','password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login')
+        exclude = ('password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login', 'email')
     def get_userprofile(self,instance):
         return ShortUserProfileSerializer(UserProfile.objects.get(user=instance)).data
 
@@ -647,7 +659,7 @@ class UserSerializer(ModelSerializer):
     class Meta:
         model = User
         #fields = '__all__'
-        exclude = ('password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login')
+        exclude = ('password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login', 'email')
     def get_userprofile(self,instance):
         if instance.is_authenticated():
             return UserProfileSerializer(UserProfile.objects.get(user=instance)).data
@@ -657,7 +669,7 @@ class BasicUserSerializer(ModelSerializer):
     profile_pic = SerializerMethodField()
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name','username','name','profile_pic')
+        fields = ('id', 'first_name', 'last_name', 'username', 'name', 'profile_pic')
         # exclude = ('password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login')
     def get_name(self,instance):
         return instance.st.name
@@ -793,7 +805,14 @@ class UserWithUserSerializer(ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('social_identifier', 'question_count', 'linkedin_url', 'instagarm_id', 'twitter_id', 'topic_count', 'comment_count',\
+            'refrence', 'mobile_no', 'encashable_bolo_score', 'total_time_spent', 'total_vb_playtime',\
+            'is_dark_mode_enabled', 'paytm_number', 'state_name', 'city_name', 'extra_data', 'location', \
+            'last_seen', 'last_ip', 'timezone', 'is_administrator', 'is_moderator', 'is_verified', 'last_post_on', \
+            'last_post_hash', 'is_geo_location', 'lat', 'lang', 'click_id', 'click_id_response', 'gender', 'about', 'language', 'answer_count',\
+            'share_count', 'like_count', 'is_test_user', 'is_bot_account', 'salary_range', 'boost_views_count', 'boost_like_count', \
+            'boost_follow_count', 'boosted_time', 'boost_span', 'd_o_b', 'is_insight_fix')
 
     def get_user(self,instance):
         return UserWithoutUserProfileSerializer(instance.user).data
@@ -811,7 +830,7 @@ class UserWithoutUserProfileSerializer(ModelSerializer):
     class Meta:
         model = User
         #fields = '__all__'
-        exclude = ('password', )
+        exclude = ('password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login', 'email')
 
 class UserBaseSerializerDatatable(ModelSerializer):
     class Meta:
@@ -1065,7 +1084,7 @@ class UserOnlySerializer(ModelSerializer):
     class Meta:
         model = User
         #fields = '__all__'
-        exclude = ('password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login')
+        exclude = ('password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login', 'email')
 
 class FCMDeviceSerializer(ModelSerializer):
 
