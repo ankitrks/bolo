@@ -485,7 +485,9 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
         regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
         find_urls_in_string = re.compile(regex, re.IGNORECASE)
         url = find_urls_in_string.search(playback_url)
-        return str(playback_url.replace(str(url.group()), cloufront_url))
+        if playback_url:
+            return str(playback_url.replace(str(url.group()), cloufront_url))
+        return ''
 
     def duration(self):
         playback_url = ''
