@@ -518,10 +518,7 @@ def GetChallenge(request):
                 is_required, next_language_page_no = get_page_no_for_next_language(key, page_no)
                 if is_required:
                     next_language_id = 1 if int(language_id)==2 else 2
-                    if topics:
-                        topics = topics | get_redis_hashtag_paginated_data(next_language_id,hash_tag[0].id,next_language_page_no)
-                    else:
-                        topics = get_redis_hashtag_paginated_data(next_language_id,hash_tag[0].id,next_language_page_no)
+                    topics += get_redis_hashtag_paginated_data(next_language_id,hash_tag[0].id,next_language_page_no)
 
         my_data = TopicSerializerwithComment(topics,context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand':request.GET.get('is_expand',True)},many=True).data
         return JsonResponse({"results":my_data})
@@ -591,8 +588,9 @@ def GetChallengeDetails(request):
         hash_tag_counter_values = list(hash_tag_counter.values('view_count','video_count'))
         #all_vb = Topic.objects.filter(hash_tags=hash_tag,is_removed=False,is_vb=True)
         view_count = sum(item['view_count'] for item in hash_tag_counter_values)
-        vb_count = sum(item['video_count'] for item in hash_tag_counter_values)
-        if vb_count < 999:
+        vb_count_values = [item['video_count'] for item in hash_tag_counter_values]
+        vb_count = sum(vb_count_values)
+        if any(value<999 for value in vb_count_values):
             vb_count = Topic.objects.filter(first_hash_tag=hash_tag,is_removed=False,is_vb=True, language_id__in = language_ids).count()
             all_view_count = Topic.objects.filter(first_hash_tag=hash_tag,is_removed=False,is_vb=True, language_id__in = language_ids).aggregate(Sum('view_count'))
             if all_view_count.has_key('view_count__sum') and all_view_count['view_count__sum']:
@@ -4327,10 +4325,7 @@ def get_category_video_bytes(request):
             is_required, next_language_page_no = get_page_no_for_next_language(key, int(request.POST.get('page', 2)))
             if is_required:
                 next_language_id = 1 if int(language_id)==2 else 2
-                if topics:
-                    topics = topics | get_redis_category_paginated_data(next_language_id,category.id,next_language_page_no)
-                else:
-                    topics = get_redis_category_paginated_data(next_language_id,category.id,next_language_page_no)
+                topics += get_redis_category_paginated_data(next_language_id,category.id,next_language_page_no)
         # paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
         # topic_page = paginator.page(1)
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True, context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
@@ -4612,13 +4607,17 @@ class PopularVideoBytes(APIView):
         start_date = datetime.now()
         end_date = (start_date - timedelta( hours = cache_timespan ))
 
+        language_ids = [language_id]
+        if int(language_id) in [1,2]:
+            language_ids = [1,2]
+
         topics = Topic.objects.filter(is_vb = True, is_removed = False, 
-            language_id = language_id, is_popular = True, date__gte=end_date.date(), date__lte=start_date.date())\
+            language_id__in = language_ids, is_popular = True, date__gte=end_date.date(), date__lte=start_date.date())\
             .exclude(pk__in = exclude_list).order_by('-id', '-vb_score').values('id', 'user_id', 'vb_score','date')[:1000]
 
         if len(topics) < 20:
             topics = Topic.objects.filter(is_vb = True, is_removed = False, 
-                language_id = language_id, is_popular = True, date__lte=end_date.date())\
+                language_id__in = language_ids, is_popular = True, date__lte=end_date.date())\
                 .exclude(pk__in = exclude_list).order_by('-id', '-vb_score').values('id', 'user_id', 'vb_score','date')[:1000]
 
 
