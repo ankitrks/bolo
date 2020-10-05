@@ -98,13 +98,19 @@ def reduce_user_bolo_score(user_id, score):
 def get_user_coupons(request):
     try:
         if request.user.is_authenticated:
+            page_no = request.GET.get('page',1)
             user_coupons = UserCoupon.objects.filter(user=request.user)
             all_coupons = Coupon.objects.all()
             df2 = pd.DataFrame.from_records(user_coupons.values('user_id','coupon_id'))
             df1 = pd.DataFrame.from_records(all_coupons.values('id', 'active_banner_img_url', 'inactive_banner_img_url','brand_name','coins_required','coupon_code','discount_given','active_till','active_from'))
             final_df=pd.merge(df1,df2, how='inner',left_on=['id'],right_on=['coupon_id'])
             result = final_df.to_dict('records')
-            return JsonResponse({'message': 'success', 'data':  result}, status=status.HTTP_200_OK)
+            paginator = Paginator(result, settings.GET_USER_COUPONS_API_PAGE_SIZE)
+            try:
+                result = paginator.page(page_no).object_list
+            except:
+                result = []
+            return JsonResponse({'message': 'success', 'page_size': settings.GET_USER_COUPONS_API_PAGE_SIZE,'data':  result}, status=status.HTTP_200_OK)
         else:
             return JsonResponse({'message':'Unauthorised User', 'data':[]}, status=status.HTTP_401_UNAUTHORIZED)
     except Exception as e:
