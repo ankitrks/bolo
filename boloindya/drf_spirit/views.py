@@ -990,7 +990,48 @@ class SolrSearchUser(BoloIndyaGenericAPIView):
         users = []
         response = {"count": 0, "results": [], "next_page_number": None}
         if search_term:
-            sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term)).order_by('-is_superstar','-is_popular')
+
+            if len(search_term.split(" ")) > 1:
+                query = {
+                        "query": {
+                            "bool": {
+                                "must": [{ "match": { "text":   search_term  }}],
+                                "should": [
+                                    { "term": {"text": search_term }},
+                                    { "term": {"is_superstar": True }},
+                                    { "term": {"is_popular": True }}
+                                ],
+                                "filter": [{ "term":  { "django_ct": "forum_user.userprofile" }}]
+                            }},
+                        "from": (page - 1) * page_size,
+                        "size": page_size
+                        }
+
+
+                host = settings.HAYSTACK_CONNECTIONS['default']['URL'] + '/_search'
+                result = requests.get(host, json=query).json()
+
+                hits = result.get('hits')
+
+                if hits.get('total') > 0:
+
+                    user_ids = []
+                    for item in hits.get('hits'):
+                        user_ids.append(item.get('_source', []).get('django_id'))
+
+                    users = User.objects.filter(st__id__in=user_ids)
+
+                    if len(users) > 0:
+                        next_page_number = page+1 if page_size*page<hits.get('total') else ''
+                        response = {
+                            "count" : hits.get('total'),
+                            "results" : UserSerializer(users, many=True).data,
+                            "next_page_number" : next_page_number
+                        }
+
+                    return JsonResponse(response, safe = False)
+
+            sqs = SearchQuerySet().models(UserProfile).auto_query(search_term).order_by('-is_superstar','-is_popular')
             if not sqs:
                 suggested_word = SearchQuerySet().models(UserProfile).auto_query(search_term).spelling_suggestion()
                 if suggested_word:
