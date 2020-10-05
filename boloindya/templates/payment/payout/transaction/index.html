@@ -1,0 +1,56 @@
+{% extends "payment/base.html" %}
+
+{% load static %}
+
+
+{% block center_content %}
+<div class="row">
+    <div class="col-sm-12"  style="margin-left: 10px">
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title">All Transactions</h3>
+            </div>
+            <div class="box-body">
+                <div >
+                    <div id="transactionTable"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock center_content %}
+
+
+{% block local_js %}
+<script type="text/javascript">
+$("#transactionTable").jsGrid({
+    width: "100%",
+    height: "700px",
+    inserting: false,
+    editing: false,
+    sorting: true,
+    paging: true,
+    pageLoading: true,
+    autoload: true,
+    fields: [
+        { title: "Beneficiary", name: "beneficiary_name", type: "text", width: 50},
+        { title: "Amount", name: "amount", type: "number", width: 20 },
+        { title: "State", name: "state", type: "text", width: 30 },
+        { title: "PG State", name: "pg_state", type: "text", width: 40 },
+        { title: "Transaction ID", name: "transaction_id", type: "text", width: 40 },
+        { title: "Transaction Date", name: "transaction_date", type: "text", width: 50 },
+        { title: "PG Response", name: "payment_gateway_response", type: "text", width: 50 },
+    ],
+    controller: {
+        loadData: function(filter) {
+            console.log("------ loadData ", filter)
+            return $.ajax({
+                type: "GET",
+                url: "/api/v1/payment/transaction/",
+                data: filter
+            });
+        },
+    }
+});
+</script>
+{% endblock local_js %}
