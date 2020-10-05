@@ -4521,8 +4521,7 @@ def get_video_bytes_and_its_related_data(id_list, last_updated=None):
                     t.is_reported, t.report_count, t.vb_width, t.vb_height, t.is_thumbnail_resized, 
                     t.linkedin_share_count, t.facebook_share_count, t.twitter_share_count, t.old_backup_url, 
                     t.safe_backup_url, t.downloaded_url, t.vb_playtime, t.has_downloaded_url, t.vb_score, 
-                    t.is_boosted, t.popular_boosted, t.popular_boosted_time, t.boosted_till, t.boosted_start_time, 
-                    t.boosted_end_time, t.is_logo_checked, t.time_deleted, t.plag_text, t.is_violent, 
+                    t.is_logo_checked, t.time_deleted, t.plag_text, t.is_violent, 
                     t.violent_content, t.is_adult, t.adult_content, t.logo_detected, t.profanity_collage_url, 
                     t.category_id as category, t.first_hash_tag_id as first_hash_tag, 
                     t.last_moderated_by_id as last_moderated_by, t.location_id as location, 
@@ -4534,10 +4533,8 @@ def get_video_bytes_and_its_related_data(id_list, last_updated=None):
                     p.cover_pic as user__userprofile__cover_pic, p.profile_pic as user__userprofile__profile_pic, 
                     p.name as user__userprofile__name, p.bio as user__userprofile__bio, p.d_o_b as user__userprofile__d_o_b, 
                     p.android_did as user__userprofile__android_did, p.is_guest_user as user__userprofile__is_guest_user, 
-                    p.boost_views_count as user__userprofile__boost_views_count, p.boost_like_count as user__userprofile__boost_like_count, 
-                    p.boost_follow_count as user__userprofile__boost_follow_count, p.boosted_time as user__userprofile__boosted_time, 
-                    p.boost_span as user__userprofile__boost_span, p.country_code as user__userprofile__country_code, 
-                    p.salary_range as user__userprofile__salary_range, p.is_insight_fix as user__userprofile__is_insight_fix, 
+                    p.country_code as user__userprofile__country_code, 
+                    p.is_insight_fix as user__userprofile__is_insight_fix, 
                     p.user_id as user__userprofile__user, array_agg(distinct uc.category_id) as user__userprofile__sub_category
             FROM forum_topic_topic t
                 LEFT JOIN forum_topic_topic_m2mcategory c on c.topic_id = t.id
