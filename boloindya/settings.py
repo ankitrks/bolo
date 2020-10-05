@@ -162,8 +162,8 @@ INSTALLED_APPS = [
     'jarvis',
     'tinymce',
     'chartjs',
-    'coupon'
-    
+    'coupon',
+    'bipayments'
     # 'forum.core.tests'
 ]
 
