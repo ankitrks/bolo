@@ -12,6 +12,7 @@ from rest_framework import status, generics
 
 from .models import Coupon, UserCoupon
 from forum.user.models import UserProfile
+from drf_spirit.utils import shorcountertopic
 
 from datetime import datetime, timedelta
 import pandas as pd
@@ -51,7 +52,7 @@ def get_coupons(request):
                         result = paginator.page(page_no).object_list
                     except:
                         result = []
-                return JsonResponse({'message': 'success', 'user_coins': user_coins, 'video_url': settings.ANIMATED_VIDEO_URL, 'data':  result}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'success', 'user_coins': user_coins, 'video_url': settings.ANIMATED_VIDEO_URL, 'user_coins_formatted': shorcountertopic(user_coins),'data':  result}, status=status.HTTP_200_OK)
             #post request
             elif request.method == 'POST':
                 coupon_id = request.POST.get('coupon_id',None)
@@ -63,7 +64,8 @@ def get_coupons(request):
                         updated_user_details = reduce_user_bolo_score(request.user.id, coupon_obj.coins_required)
                         if 'bolo_score' in updated_user_details['result']:
                             UserCoupon(user_id=user_id, coupon=coupon_obj).save()
-                            result = {"coupon_code": coupon_obj.coupon_code,"user_coins": updated_user_details['result']['bolo_score']}
+                            updated_user_coins = updated_user_details['result']['bolo_score']
+                            result = {"coupon_code": coupon_obj.coupon_code,"user_coins": updated_user_coins, "user_coins_formatted": shorcountertopic(updated_user_coins)}
                             return JsonResponse({'status': 'success', 'data':  result}, status=status.HTTP_200_OK)
                         else:
                             return JsonResponse({'message':'Service temporarily unavailable, try again later.', 'data':[]}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
