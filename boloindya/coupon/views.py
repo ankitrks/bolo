@@ -103,6 +103,11 @@ def get_user_coupons(request):
             all_coupons = Coupon.objects.all()
             df2 = pd.DataFrame.from_records(user_coupons.values('user_id','coupon_id'))
             df1 = pd.DataFrame.from_records(all_coupons.values('id', 'active_banner_img_url', 'inactive_banner_img_url','brand_name','coins_required','coupon_code','discount_given','active_till','active_from'))
+            timezone = pytz.timezone('Asia/Calcutta')
+            today = datetime.now(timezone).date()
+            df1['active_till'] = df1['active_till'].dt.date
+            df1['active_from'] = df1['active_from'].dt.date
+            df1['is_expired'] = np.where(df1['active_till']<today, True, False)
             final_df=pd.merge(df1,df2, how='inner',left_on=['id'],right_on=['coupon_id'])
             result = final_df.to_dict('records')
             paginator = Paginator(result, settings.GET_USER_COUPONS_API_PAGE_SIZE)
