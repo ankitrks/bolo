@@ -3408,7 +3408,7 @@ class VideoPlaytimeAPIView(AnalyticsGraphCountsAPIView):
         end_date = datetime.now()
         start_date = end_date - timedelta(days=30)
         return str((VideoPlaytime.objects.filter(timestamp__gte=start_date, timestamp__lte=end_date)\
-                .aggregate(Sum('playtime'))['playtime__sum'] or O) / (60*60)) + ' Hours'
+                .aggregate(Sum('playtime'))['playtime__sum'] or 0) / (60*60)) + ' Hours'
 
 
 def timeout_test(request):

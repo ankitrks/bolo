@@ -517,7 +517,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
+        # 'rest_framework.renderers.BrowsableAPIRenderer',
         'rest_framework_datatables.renderers.DatatablesRenderer',
     ),
     'DEFAULT_FILTER_BACKENDS': (
@@ -542,50 +542,42 @@ SIMPLE_JWT = {
 #import django
 #django.setup()
 
-#####Bolo Indya Prod ######
-#### S3 bucket #####
-BOLOINDYA_AWS_ACCESS_KEY_ID = 'AKIAZNK4CM5CW4W4VWP7'
-BOLOINDYA_AWS_SECRET_ACCESS_KEY = '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'
-BOLOINDYA_AWS_BUCKET_NAME = 'boloindyapp-prod'
-BOLOINDYA_AWS_IN_BUCKET_NAME = 'in-boloindya'
-BOLOINDYA_AWS_BUCKET_PII = 'test-boloindya'
-FILE_PATH_TO_S3 = 'https://in-boloindya.s3.ap-south-1.amazonaws.com/'
-FILE_PATH_TO_S3_KYC = 'https://test-boloindya.s3.amazonaws.com/'
+AWS_ACCESS_KEY_ID = 'XXXXXXXX'
+AWS_SECRET_ACCESS_KEY = 'XXXXXXXXXXXXXXXXX'
+BOLOINDYA_AWS_ACCESS_KEY_ID = AWS_ACCESS_KEY_ID
+BOLOINDYA_AWS_SECRET_ACCESS_KEY = AWS_SECRET_ACCESS_KEY
+BOLOINDYA_AWS_ACCESS_KEY_ID_TS = AWS_ACCESS_KEY_ID
+BOLOINDYA_AWS_SECRET_ACCESS_KEY_TS = AWS_SECRET_ACCESS_KEY
+CAREERANNA_AWS_ACCESS_KEY_ID = AWS_ACCESS_KEY_ID
+CAREERANNA_AWS_SECRET_ACCESS_KEY = AWS_SECRET_ACCESS_KEY
+CAREERANNA_AWS_ACCESS_KEY_ID_TS = AWS_ACCESS_KEY_ID
+CAREERANNA_AWS_SECRET_ACCESS_KEY_TS = AWS_SECRET_ACCESS_KEY
+
+
+BOLOINDYA_AWS_BUCKET_NAME = 'XXXXXXXX'
+BOLOINDYA_AWS_IN_BUCKET_NAME = 'XXXXXXXX'
+BOLOINDYA_AWS_BUCKET_PII = 'XXXXXXXX'
+FILE_PATH_TO_S3 = 'XXXXXXXX'
+FILE_PATH_TO_S3_KYC = 'XXXXXXXX'
 FILE_PATH_COVER_PIC = 'public/cover_photo/'
-#### Transcoder settings #####
-BOLOINDYA_PIPELINE_ID_TS = '1545987947390-hpo4hx'
-BOLOINDYA_AWS_ACCESS_KEY_ID_TS = 'AKIAZNK4CM5CW4W4VWP7'
-BOLOINDYA_AWS_SECRET_ACCESS_KEY_TS = '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'
-BOLOINDYA_AWS_BUCKET_NAME_TS = 'boloindya-et'
+
+
+BOLOINDYA_PIPELINE_ID_TS = 'XXXXXXXX'
+BOLOINDYA_AWS_BUCKET_NAME_TS = 'XXXXXXXX'
 LAMBDA_ET_IDENTIFIER = ['/elastic-transcoder/lambda/et/']
 AMAZON_ET_IDENTIFIER = ['/elastic-transcoder/lambda/aws_et/']
 
 #### CDN Settings ######
 US_CDN_URL = "http://cdnus.boloindya.com" # Amazon CloudFront US
-# IN_CDN_URL = "https://d7lk2jr51sych.cloudfront.net" # Amazon CloudFront IN
-# IN_CDN_URL = "https://1070250973.rsc.cdn77.org" # CDN77 IN
 IN_CDN_URL = "http://storage.boloindya.com" # Akamai CDN IN
 #### CDN Settings ######
 
 #### Transcoder settings #####
-
-#####CareerAnna ######
-#### S3 bucket #####
-CAREERANNA_AWS_ACCESS_KEY_ID = 'AKIAZNK4CM5CW4W4VWP7'
-CAREERANNA_AWS_SECRET_ACCESS_KEY = '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'
 CAREERANNA_AWS_BUCKET_NAME = 'careeranna'
-
-#### Transcoder settings #####
-CAREERANNA_PIPELINE_ID_TS = '1545115329326-xs95pe'
-CAREERANNA_AWS_ACCESS_KEY_ID_TS = 'AKIAZNK4CM5CW4W4VWP7'
-CAREERANNA_AWS_SECRET_ACCESS_KEY_TS = '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'
+CAREERANNA_PIPELINE_ID_TS = 'XXXXXXXX'
 CAREERANNA_AWS_BUCKET_NAME_TS = 'elastictranscode.videos'
-#### Transcoder settings #####
-
-
-# The region of your bucket, more info:
-# http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
 REGION_HOST = 'us-east-1'
+#### Transcoder settings #####
 
 FCM_MAX_RECIPIENTS = 1000
 
@@ -689,3 +681,4 @@ ANIMATED_VIDEO_URL = 'https://in-boloindya.s3.ap-south-1.amazonaws.com/from_uplo
 GET_COUPONS_API_PAGE_SIZE = 5
 
 PAYTM_TXN_COUNTER_KEY = 'PAYTM_ORDER_COUNTER'
+GET_USER_COUPONS_API_PAGE_SIZE = 10
