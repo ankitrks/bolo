@@ -6,18 +6,29 @@
 
 
 <div class="row">
-    <div class="col-sm-11"  style="margin-left: 10px">
+    <div class="col-sm-12"  style="margin-left: 10px">
         <div class="box">
             <div class="box-header with-border">
                 <h3 class="box-title">Top Users</h3>
             </div>
             <div class="box-body">
-                <div class="col-sm-4">
-                    <select name="month">
-                        {% for month in all_month %}
-                            <option value="{{ month.value }}">{{ month.name }}</option>
-                        {% endfor %}
-                    </select>
+                <div class="row" style="margin-bottom: 10px">
+                    <div class="col-sm-6">
+                        <select name="month">
+                            {% for month in all_month %}
+                                <option value="{{ month.value }}">{{ month.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="input-group">
+                            <input type="text" name="q" class="form-control" placeholder="Search...">
+                            <span class="input-group-btn">
+                                <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
                 </div>
                 <div>
                     <div id="topUserTable"></div>
@@ -65,7 +76,7 @@ jsGrid.fields.html = MyHTMLField;
 
 $("#topUserTable").jsGrid({
     width: "100%",
-    height: "400px",
+    height: "600px",
 
     inserting: false,
     editing: false,
@@ -87,7 +98,12 @@ $("#topUserTable").jsGrid({
         loadData: function(filter) {
             console.log("------ loadData ", filter)
             filter['page'] = filter['pageIndex']
-            filter['selectedMonth'] = $('[name=month]').val()
+            filter['selectedMonth'] = $('[name=month]').val();
+
+            let q = $('[name="q"]').val()
+            if(q)
+                filter['q'] = q
+
             return $.ajax({
                 type: "GET",
                 url: "/api/v1/payment/top-user",
@@ -102,6 +118,10 @@ let grid = $("#topUserTable").data("JSGrid");
 $('[name=month]').change(function(){
     grid.reset()
 });
+
+$('#search-btn').click(function(){
+    grid.reset()
+})
 
 $(document).on('click', '.pay', function(){
     let paymentForm = $('#paymentForm');

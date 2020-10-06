@@ -3,6 +3,7 @@ from datetime import datetime
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth.models import User
 
 from payment.paytm_api import generate_order_id, verify_beneficiary, wallet_transfer, account_transfer, upi_transfer
 
@@ -20,6 +21,11 @@ VERIFICATION_STATUS_CHOICES = (
     ('failed', 'Failed')
 )
 
+BENEFICIARY_TYPE_CHOICES = (
+    ('emp_salary', 'Employee Salary'),
+    ('creator_payout', 'Creator Payout')
+)
+
 
 class Beneficiary(models.Model):
     name = models.CharField(_("Name"), max_length=100)
@@ -27,12 +33,17 @@ class Beneficiary(models.Model):
     payment_method = models.CharField(_("Payment Method"), choices=PAYMENT_METHOD_CHOICES, max_length=20)
     paytm_number = models.CharField(_("Paytm Number"), max_length=20, blank=True, null=True)
     upi = models.CharField(_("UPI"), max_length=50, null=True, blank=True)
-    account_number = models.IntegerField(_("Account Number"), null=True, blank=True)
+    account_number = models.CharField(_("Account Number"), null=True, blank=True, max_length=50)
     bank_ifsc = models.CharField(_("Bank IFSC"), max_length=30, null=True, blank=True)
     verification_status = models.CharField(_("Bank IFSC"), max_length=30, 
                                 choices=VERIFICATION_STATUS_CHOICES, default='pending')
     is_active = models.BooleanField(_("Is active"), default=True)
     verification_txn_id = models.CharField(_("Verification TXN ID"), max_length=30, null=True, blank=True)
+    created_by = models.ForeignKey(User, related_name='created_beneficiary')
+    created_at = models.DateTimeField(_("Created At"), auto_now_add=True, auto_now=False)
+    modified_at = models.DateTimeField(_("Created At"), auto_now_add=False, auto_now=True)
+    modified_by = models.ForeignKey(User, related_name='modified_beneficiary')
+    beneficiary_type = models.CharField(_("Beneficiary Type"), max_length=30, choices=BENEFICIARY_TYPE_CHOICES, default='creator_payout')
 
     def __str__(self):
         return self.name

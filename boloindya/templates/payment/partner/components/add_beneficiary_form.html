@@ -23,6 +23,13 @@
                             </select>
                         </div>
                         <div class="form-group">
+                            <label>Beneficiary Type</label>
+                            <select class="form-control" name="beneficiary_type">
+                                <option value="emp_salary">Employee Salary</option>
+                                <option value="creator_payout">Creator Payout</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label>Paytm Number</label>
                             <input type="text" class="form-control" name="paytm_number" >
                         </div>
@@ -32,18 +39,22 @@
                         </div>
                         <div class="form-group">
                             <label>Account Number</label>
-                            <input type="number" class="form-control" name="account_number">
+                            <input type="text" class="form-control" name="account_number">
                         </div>
                         <div class="form-group">
                             <label>Bank IFCS</label>
                             <input type="text" class="form-control" name="bank_ifsc">
                         </div>
                     </div>
+                    <input type="hidden" name="is_active" value="true">
               </form>
             </div>
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal" id="exit_add_beneficiary_form">Close</button>
                 <button type="submit" class="btn btn-primary" id="save_beneficiary">Save</button>
+                <button class="buttonload btn disabled" id="save_beneficiary_loading" style="display: none">
+                    <i class="fa fa-refresh fa-spin"></i>Loading
+                </button>
             </div>
         </div>
         <!-- /.modal-content -->
