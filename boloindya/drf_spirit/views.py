@@ -513,11 +513,12 @@ def GetChallenge(request):
                     topics = get_campaign_paginated_data(1, hash_tag[0].id, page_no)
         else:
             topics = get_redis_hashtag_paginated_data(language_id,hash_tag[0].id,page_no)
-            if not topics and int(language_id) in [1,2]:
+            if len(topics)<settings.REST_FRAMEWORK['PAGE_SIZE'] and int(language_id) in [1,2]:
                 key = 'hashtag:'+str(hash_tag[0].id)+':lang:'+str(language_id)
-                next_language_page_no = get_page_no_for_next_language(key, page_no)
-                next_language_id = 1 if int(language_id)==2 else 2
-                topics = get_redis_hashtag_paginated_data(next_language_id,hash_tag[0].id,next_language_page_no)
+                is_required, next_language_page_no = get_page_no_for_next_language(key, page_no)
+                if is_required:
+                    next_language_id = 1 if int(language_id)==2 else 2
+                    topics += get_redis_hashtag_paginated_data(next_language_id,hash_tag[0].id,next_language_page_no)
 
         my_data = TopicSerializerwithComment(topics,context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand':request.GET.get('is_expand',True)},many=True).data
         return JsonResponse({"results":my_data})
@@ -587,8 +588,9 @@ def GetChallengeDetails(request):
         hash_tag_counter_values = list(hash_tag_counter.values('view_count','video_count'))
         #all_vb = Topic.objects.filter(hash_tags=hash_tag,is_removed=False,is_vb=True)
         view_count = sum(item['view_count'] for item in hash_tag_counter_values)
-        vb_count = sum(item['video_count'] for item in hash_tag_counter_values)
-        if vb_count < 999:
+        vb_count_values = [item['video_count'] for item in hash_tag_counter_values]
+        vb_count = sum(vb_count_values)
+        if any(value<999 for value in vb_count_values):
             vb_count = Topic.objects.filter(first_hash_tag=hash_tag,is_removed=False,is_vb=True, language_id__in = language_ids).count()
             all_view_count = Topic.objects.filter(first_hash_tag=hash_tag,is_removed=False,is_vb=True, language_id__in = language_ids).aggregate(Sum('view_count'))
             if all_view_count.has_key('view_count__sum') and all_view_count['view_count__sum']:
@@ -990,7 +992,48 @@ class SolrSearchUser(BoloIndyaGenericAPIView):
         users = []
         response = {"count": 0, "results": [], "next_page_number": None}
         if search_term:
-            sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term)).order_by('-is_superstar','-is_popular')
+
+            if len(search_term.split(" ")) > 1:
+                query = {
+                        "query": {
+                            "bool": {
+                                "must": [{ "match": { "text":   search_term  }}],
+                                "should": [
+                                    { "term": {"text": search_term }},
+                                    { "term": {"is_superstar": True }},
+                                    { "term": {"is_popular": True }}
+                                ],
+                                "filter": [{ "term":  { "django_ct": "forum_user.userprofile" }}]
+                            }},
+                        "from": (page - 1) * page_size,
+                        "size": page_size
+                        }
+
+
+                host = settings.HAYSTACK_CONNECTIONS['default']['URL'] + '/_search'
+                result = requests.get(host, json=query).json()
+
+                hits = result.get('hits')
+
+                if hits.get('total') > 0:
+
+                    user_ids = []
+                    for item in hits.get('hits'):
+                        user_ids.append(item.get('_source', []).get('django_id'))
+
+                    users = User.objects.filter(st__id__in=user_ids)
+
+                    if len(users) > 0:
+                        next_page_number = page+1 if page_size*page<hits.get('total') else ''
+                        response = {
+                            "count" : hits.get('total'),
+                            "results" : UserSerializer(users, many=True).data,
+                            "next_page_number" : next_page_number
+                        }
+
+                    return JsonResponse(response, safe = False)
+
+            sqs = SearchQuerySet().models(UserProfile).auto_query(search_term).order_by('-is_superstar','-is_popular')
             if not sqs:
                 suggested_word = SearchQuerySet().models(UserProfile).auto_query(search_term).spelling_suggestion()
                 if suggested_word:
@@ -4318,14 +4361,15 @@ def get_category_video_bytes(request):
         category = Category.objects.get(pk=category_id)
         topics = []
         topics = get_redis_category_paginated_data(language_id,category.id,int(request.POST.get('page', 2)))
-        if not topics and int(language_id) in [1,2]:
+        if len(topics)< settings.REST_FRAMEWORK['PAGE_SIZE'] and int(language_id) in [1,2]:
             key = 'cat:'+str(category_id)+':lang:'+str(language_id)
-            next_language_page_no = get_page_no_for_next_language(key, int(request.POST.get('page', 2)))
-            next_language_id = 1 if int(language_id)==2 else 2
-            topics = get_redis_category_paginated_data(next_language_id,category.id,next_language_page_no)
-        paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
-        topic_page = paginator.page(1)
-        return JsonResponse({'topics': CategoryVideoByteSerializer(topic_page, many=True, context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
+            is_required, next_language_page_no = get_page_no_for_next_language(key, int(request.POST.get('page', 2)))
+            if is_required:
+                next_language_id = 1 if int(language_id)==2 else 2
+                topics += get_redis_category_paginated_data(next_language_id,category.id,next_language_page_no)
+        # paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
+        # topic_page = paginator.page(1)
+        return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True, context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
@@ -4477,8 +4521,7 @@ def get_video_bytes_and_its_related_data(id_list, last_updated=None):
                     t.is_reported, t.report_count, t.vb_width, t.vb_height, t.is_thumbnail_resized, 
                     t.linkedin_share_count, t.facebook_share_count, t.twitter_share_count, t.old_backup_url, 
                     t.safe_backup_url, t.downloaded_url, t.vb_playtime, t.has_downloaded_url, t.vb_score, 
-                    t.is_boosted, t.popular_boosted, t.popular_boosted_time, t.boosted_till, t.boosted_start_time, 
-                    t.boosted_end_time, t.is_logo_checked, t.time_deleted, t.plag_text, t.is_violent, 
+                    t.is_logo_checked, t.time_deleted, t.plag_text, t.is_violent, 
                     t.violent_content, t.is_adult, t.adult_content, t.logo_detected, t.profanity_collage_url, 
                     t.category_id as category, t.first_hash_tag_id as first_hash_tag, 
                     t.last_moderated_by_id as last_moderated_by, t.location_id as location, 
@@ -4490,10 +4533,8 @@ def get_video_bytes_and_its_related_data(id_list, last_updated=None):
                     p.cover_pic as user__userprofile__cover_pic, p.profile_pic as user__userprofile__profile_pic, 
                     p.name as user__userprofile__name, p.bio as user__userprofile__bio, p.d_o_b as user__userprofile__d_o_b, 
                     p.android_did as user__userprofile__android_did, p.is_guest_user as user__userprofile__is_guest_user, 
-                    p.boost_views_count as user__userprofile__boost_views_count, p.boost_like_count as user__userprofile__boost_like_count, 
-                    p.boost_follow_count as user__userprofile__boost_follow_count, p.boosted_time as user__userprofile__boosted_time, 
-                    p.boost_span as user__userprofile__boost_span, p.country_code as user__userprofile__country_code, 
-                    p.salary_range as user__userprofile__salary_range, p.is_insight_fix as user__userprofile__is_insight_fix, 
+                    p.country_code as user__userprofile__country_code, 
+                    p.is_insight_fix as user__userprofile__is_insight_fix, 
                     p.user_id as user__userprofile__user, array_agg(distinct uc.category_id) as user__userprofile__sub_category
             FROM forum_topic_topic t
                 LEFT JOIN forum_topic_topic_m2mcategory c on c.topic_id = t.id
@@ -4603,13 +4644,17 @@ class PopularVideoBytes(APIView):
         start_date = datetime.now()
         end_date = (start_date - timedelta( hours = cache_timespan ))
 
+        language_ids = [language_id]
+        if int(language_id) in [1,2]:
+            language_ids = [1,2]
+
         topics = Topic.objects.filter(is_vb = True, is_removed = False, 
-            language_id = language_id, is_popular = True, date__gte=end_date.date(), date__lte=start_date.date())\
+            language_id__in = language_ids, is_popular = True, date__gte=end_date.date(), date__lte=start_date.date())\
             .exclude(pk__in = exclude_list).order_by('-id', '-vb_score').values('id', 'user_id', 'vb_score','date')[:1000]
 
         if len(topics) < 20:
             topics = Topic.objects.filter(is_vb = True, is_removed = False, 
-                language_id = language_id, is_popular = True, date__lte=end_date.date())\
+                language_id__in = language_ids, is_popular = True, date__lte=end_date.date())\
                 .exclude(pk__in = exclude_list).order_by('-id', '-vb_score').values('id', 'user_id', 'vb_score','date')[:1000]
 
 
@@ -5449,15 +5494,20 @@ def get_page_no_for_next_language(key, requested_page):
     items_per_page = settings.REST_FRAMEWORK['PAGE_SIZE']
     data = get_redis(key)
     if not data:
-        return requested_page
+        return True, requested_page
     redis_keys = data.keys()
+    next_page = requested_page+1
+    if str(next_page) in data:
+        return False, 0
+    elif str(next_page) not in data and 'remaining' in redis_keys:
+        return False, 0
     if 'remaining' in redis_keys:
         redis_last_page = data['remaining']['last_page']
         remaining_count = data['remaining']['remaining_count']
         total_pages = int(redis_last_page + math.ceil(remaining_count/float(items_per_page)))
     else:
         total_pages = max(list(map(int, redis_keys)))
-    return requested_page - total_pages
+    return True, requested_page - total_pages + 1
         
 def remove_extra_char(file_name):
     """
