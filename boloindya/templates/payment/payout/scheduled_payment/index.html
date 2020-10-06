@@ -1,0 +1,85 @@
+{% extends "payment/base.html" %}
+
+
+{% block center_content %}
+<div class="row">
+    <div class="col-sm-12"  style="margin-left: 10px">
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title">Top Users</h3>
+            </div>
+            <div class="box-body">
+                <div >
+                    <div id="scheduledPaymentTable"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+{% endblock center_content %}
+
+
+{% block local_js %}
+    <script type="text/javascript">
+
+        let days_choices = []
+
+        for(let i=1; i<=31; i++)
+            days_choices.push({
+                text: i.toString(),
+                value: i
+            })
+
+        $("#scheduledPaymentTable").jsGrid({
+            width: "100%",
+            height: "400px",
+
+            inserting: false,
+            editing: false,
+            sorting: true,
+            paging: true,
+            pageLoading: true,
+            autoload: true,
+            fields: [
+                { title: "ID", name: "id", type: "number", visible:false },
+                { title: "Created At", name: "created_at", type: "text", width: 90, validate: "required" },
+                { title: "Amount", name: "amount", type: "number", width: 50 },
+                { title: "Payment Day", name: "payment_date", type: "select", width: 50, 
+                    items: days_choices,
+                    valueField: "value",             // name of property of item to be used as value
+                    textField: "text", 
+                },
+                { title: "Created By", name: "created_by", type: "text", width: 50 },
+                { title: "Active", type: "checkbox", name: "is_active", sorting: false, width:22 },
+                { type: "control" }
+            ],
+            controller: {
+                loadData: function(filter) {
+                    console.log("------ loadData ", filter)
+                    return $.ajax({
+                        type: "GET",
+                        url: "/api/v1/payment/schedule-payment/",
+                        data: filter
+                    });
+                },
+                
+                updateItem: function(item) {
+                    return $.ajax({
+                        type: "PUT",
+                        url: "/api/v1/payment/partner/"+item.id + "/",
+                        data: item
+                    });
+                },
+                
+                deleteItem: function(item) {
+                    return $.ajax({
+                        type: "DELETE",
+                        url: "/api/v1/payment/partner/"+item.id,
+                        data: item
+                    });
+                }
+            }
+        });
+    </script>
+{% endblock local_js %} 

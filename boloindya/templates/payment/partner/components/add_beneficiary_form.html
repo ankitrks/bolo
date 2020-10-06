@@ -1,0 +1,52 @@
+<div class="modal fade" id="modal-add-beneficiary" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Add New Beneficiary</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form role="form" id="beneficiaryForm">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" class="form-control" name="name">
+                        </div>
+                        <div class="form-group">
+                            <label>Payment Method</label>
+                            <select class="form-control" name="payment_method">
+                                <option value="paytm_wallet">Paytm Wallet</option>
+                                <option value="upi">UPI</option>
+                                <option value="account_transfer">Account Transfer</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Paytm Number</label>
+                            <input type="text" class="form-control" name="paytm_number" >
+                        </div>
+                        <div class="form-group">
+                            <label>UPI</label>
+                            <input type="text" class="form-control" name="upi">
+                        </div>
+                        <div class="form-group">
+                            <label>Account Number</label>
+                            <input type="number" class="form-control" name="account_number">
+                        </div>
+                        <div class="form-group">
+                            <label>Bank IFCS</label>
+                            <input type="text" class="form-control" name="bank_ifsc">
+                        </div>
+                    </div>
+              </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="exit_add_beneficiary_form">Close</button>
+                <button type="submit" class="btn btn-primary" id="save_beneficiary">Save</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>

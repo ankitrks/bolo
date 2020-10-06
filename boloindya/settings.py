@@ -162,8 +162,10 @@ INSTALLED_APPS = [
     'jarvis',
     'tinymce',
     'chartjs',
-    'coupon'
-    
+    'coupon',
+    'payment',
+    'payment.partner',
+    'payment.payout',
     # 'forum.core.tests'
 ]
 
@@ -678,4 +680,5 @@ ANIMATED_VIDEO_URL = 'https://in-boloindya.s3.ap-south-1.amazonaws.com/from_uplo
 
 GET_COUPONS_API_PAGE_SIZE = 5
 
+PAYTM_TXN_COUNTER_KEY = 'PAYTM_ORDER_COUNTER'
 GET_USER_COUPONS_API_PAGE_SIZE = 10
