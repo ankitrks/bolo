@@ -2,6 +2,15 @@ from datetime import datetime, timedelta
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connections
+from django.conf import settings
+
+import os
+import sys
+import json
+
+os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
+sys.path.append( '/'.join(os.path.realpath(__file__).split('/')[:5]) )
+
 
 
 def month_year_iter(start_month, start_year, end_month, end_year):
@@ -15,9 +24,7 @@ def month_year_iter(start_month, start_year, end_month, end_year):
         yield "%s-%s-01"%(start_year, str(start_month).zfill(2))
 
 
-class Command(BaseCommand):
-    help = "Create payments entries"
-
+class AggregateTopUsers:
     temp_tables = [{
         'name': 'temp_top_user_video_count',
         'create_query': """
@@ -56,7 +63,7 @@ class Command(BaseCommand):
             """
     }]
 
-    def handle(self, *args, **options):
+    def start(self):
         cr = connections['default'].cursor()
 
         for temp_table in self.temp_tables:
@@ -98,19 +105,21 @@ class Command(BaseCommand):
         """, [month_start, month_end])
 
         cr.execute("""
-            INSERT INTO temp_top_user_follower_count(user_id, follower_count)  
-                SELECT user_following_id AS user_id, count(*)
-                FROM forum_user_follower
-                WHERE created_at BETWEEN %s AND %s AND is_active
-                GROUP BY user_following_id
+            INSERT INTO temp_top_user_playtime(user_id, playtime)  
+                SELECT t.user_id AS user_id, sum(p.playtime) as playtime
+                FROM forum_user_videoplaytime p
+                INNER JOIN forum_topic_topic t on p.video_id = t.id
+                WHERE p."timestamp" BETWEEN %s AND %s AND NOT t.is_removed
+                GROUP BY t.user_id
         """, [month_start, month_end])
 
         cr.execute("""
-            INSERT INTO temp_top_user_follower_count(user_id, follower_count)  
-                SELECT user_following_id AS user_id, count(*)
-                FROM forum_user_follower
-                WHERE created_at BETWEEN %s AND %s AND is_active
-                GROUP BY user_following_id
+            INSERT INTO temp_top_user_view_count(user_id, view_count)  
+                SELECT t.user_id AS user_id, count(*)
+                FROM forum_topic_vbseen s
+                INNER JOIN forum_topic_topic t on s.topic_id = t.id
+                WHERE s.created_at BETWEEN %s AND %s AND NOT t.is_removed
+                GROUP BY t.user_id
         """, [month_start, month_end])
 
         print("Temp table filled")
@@ -118,10 +127,13 @@ class Command(BaseCommand):
         cr.execute("""
             INSERT INTO partner_topuser(agg_month, boloindya_id, name, username, video_count, follower_count, playtime, view_count)
             SELECT A.agg_month::date as agg_month, A.boloindya_id, COALESCE(p.name, p.slug, '') as name, 
-                COALESCE(p.slug, '') as username, A.video_count, A.follower_count, 0 as playtime, 0 as view_count FROM (
-                    SELECT %s as agg_month, COALESCE(vc.user_id, fc.user_id) as boloindya_id, COALESCE(video_count, 0) as video_count, 
-                        COALESCE(follower_count, 0) as follower_count FROM temp_top_user_video_count vc
+                COALESCE(p.slug, '') as username, A.video_count, A.follower_count, A.playtime, A.view_count FROM (
+                    SELECT %s as agg_month, COALESCE(vc.user_id, fc.user_id, pt.user_id, vic.user_id) as boloindya_id, COALESCE(video_count, 0) as video_count, 
+                        COALESCE(follower_count, 0) as follower_count, COALESCE(playtime, 0) as playtime, COALESCE(view_count, 0) as view_count
+                    FROM temp_top_user_video_count vc
                     FULL OUTER JOIN temp_top_user_follower_count fc on fc.user_id = vc.user_id
+                    FULL OUTER JOIN temp_top_user_playtime pt on pt.user_id = vc.user_id and pt.user_id = fc.user_id 
+                    FULL OUTER JOIN temp_top_user_view_count vic on vic.user_id = vc.user_id and vic.user_id = pt.user_id and vic.user_id = fc.user_id 
                 ) A
             LEFT JOIN forum_user_userprofile p on p.user_id = A.boloindya_id
         """, [month_start + ' 00:00:00'])
@@ -130,5 +142,9 @@ class Command(BaseCommand):
 
         cr.execute("DELETE FROM temp_top_user_video_count")
         cr.execute("DELETE FROM temp_top_user_follower_count")
+        cr.execute("DELETE FROM temp_top_user_playtime")
+        cr.execute("DELETE FROM temp_top_user_view_count")
     
 
+def run():
+    AggregateTopUsers().start()
