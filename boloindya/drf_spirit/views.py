@@ -5524,7 +5524,7 @@ def remove_extra_char(file_name):
         file_name = file_name.replace(char, '')
     return file_name
 
-class GetUserNotiFicationCount(APIView):
+class GetUserNotificationCount(APIView):
     def get(self, request, *args, **kwargs):
         try:
             if request.user.is_authenticated:

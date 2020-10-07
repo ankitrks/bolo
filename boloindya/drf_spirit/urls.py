@@ -182,5 +182,5 @@ urlpatterns = [
     url(r'^create_bot_topic/$',create_bot_topic, name='create_bot_topic'),
     url(r'^edit_bot_video/$',edit_bot_video, name='edit_bot_video'),
     url(r'^test_api_response_time/$', test_api_response_time),
-    url(r'^get_user_notification_count/', GetUserNotiFicationCount.as_view())
+    url(r'^get_user_notification_count/', GetUserNotificationCount.as_view())
 ]
