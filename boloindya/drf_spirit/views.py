@@ -5543,7 +5543,6 @@ class GetUserNotificationCount(APIView):
             }, status=status.HTTP_200_OK)
 
     def get_notification_count_str(self):
-        base = settings.USER_NOTIFICATIONS_LIMIT-1
-        if self.notification_count < base:
-            base = self.notification_count
-        return str(base)+"+"
+        if self.notification_count < settings.USER_NOTIFICATIONS_LIMIT:
+            return str(self.notification_count)
+        return str(settings.USER_NOTIFICATIONS_LIMIT-1)+"+"
