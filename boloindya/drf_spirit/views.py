@@ -2616,6 +2616,7 @@ def verify_otp(request):
     user_ip = request.POST.get('user_ip',None)
     is_reset_password = False
     is_for_change_phone = False
+    is_signup = False
     all_category_follow = []
     if request.POST.get('is_reset_password') and request.POST.get('is_reset_password') == '1':
         is_reset_password = True # inverted because of exclude
@@ -2630,7 +2631,7 @@ def verify_otp(request):
                 message = 'User Logged In'
                 user_tokens = get_tokens_for_user(user)
                 return JsonResponse({'message': message, 'username' : mobile_no, \
-                        'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+                        'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data, 'is_signup' : is_signup}, status=status.HTTP_200_OK)
 
             # exclude_dict = {'is_active' : True, 'is_reset_password' : is_reset_password,"mobile_no":mobile_no, "otp":otp}
             exclude_dict = {'is_reset_password' : is_reset_password,"mobile_no":mobile_no, "otp":otp,"created_at__gte":datetime.now()-timedelta(hours=2)}
@@ -2646,7 +2647,7 @@ def verify_otp(request):
             # otp_obj.update(used_at = timezone.now())
             if not is_reset_password and not is_for_change_phone and otp_obj:
                 if mobile_no in ['7726080653']:
-                    return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
+                    return JsonResponse({'message': 'Invalid Mobile No / OTP', 'is_signup' : is_signup}, status=status.HTTP_400_BAD_REQUEST)
                 try:
                     userprofile = UserProfile.objects.using('default').get(mobile_no = mobile_no)
                 except:
@@ -2659,10 +2660,11 @@ def verify_otp(request):
                         userprofile = None
                 if userprofile:
                     if not userprofile.user.is_active:
-                        return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
+                        return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.', 'is_signup' : is_signup}, status=status.HTTP_400_BAD_REQUEST)
                     user = userprofile.user
                     message = 'User Logged In'
                 else:
+                    is_signup = True
                     user = User.objects.using('default').create(username = get_random_username())
                     message = 'User created'
                     userprofile = UserProfile.objects.using('default').get(user = user)
@@ -2694,12 +2696,12 @@ def verify_otp(request):
                 # otp_obj.for_user = user
                 # otp_obj.save()
                 return JsonResponse({'message': message, 'username' : mobile_no, \
-                        'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
-            return JsonResponse({'message': 'OTP Validated', 'username' : mobile_no}, status=status.HTTP_200_OK)
+                        'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data, 'is_signup' : is_signup}, status=status.HTTP_200_OK)
+            return JsonResponse({'message': 'OTP Validated', 'username' : mobile_no, 'is_signup' : is_signup}, status=status.HTTP_200_OK)
         except Exception as e:
-            return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'message': 'Invalid Mobile No / OTP', 'is_signup' : is_signup}, status=status.HTTP_400_BAD_REQUEST)
     else:
-        return JsonResponse({'message': 'No Mobile No / OTP provided'}, status=status.HTTP_204_NO_CONTENT)
+        return JsonResponse({'message': 'No Mobile No / OTP provided', 'is_signup' : is_signup}, status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['POST'])
 def verify_otp_with_country_code(request):
@@ -2722,6 +2724,7 @@ def verify_otp_with_country_code(request):
     user_ip = request.POST.get('user_ip',None)
     is_reset_password = False
     is_for_change_phone = False
+    is_signup = False
     all_category_follow = []
     if request.POST.get('is_reset_password') and request.POST.get('is_reset_password') == '1':
         is_reset_password = True # inverted because of exclude
@@ -2735,7 +2738,7 @@ def verify_otp_with_country_code(request):
             message = 'User Logged In'
             user_tokens = get_tokens_for_user(user)
             return JsonResponse({'message': message, 'username' : mobile_no, \
-                    'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+                    'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data, 'is_signup' : is_signup}, status=status.HTTP_200_OK)
         mobile_with_country_code = str(country_code)+str(mobile_no)
         try:
             # exclude_dict = {'is_active' : True, 'is_reset_password' : is_reset_password,"mobile_no":mobile_no, "otp":otp}
@@ -2752,7 +2755,7 @@ def verify_otp_with_country_code(request):
             # otp_obj.update(used_at = timezone.now())
             if not is_reset_password and not is_for_change_phone and otp_obj:
                 if mobile_no in ['7726080653']:
-                    return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
+                    return JsonResponse({'message': 'Invalid Mobile No / OTP', 'is_signup' : is_signup}, status=status.HTTP_400_BAD_REQUEST)
                 try:
                     userprofile = UserProfile.objects.using('default').get(mobile_no = mobile_no)
                 except:
@@ -2765,10 +2768,11 @@ def verify_otp_with_country_code(request):
                         userprofile = None
                 if userprofile:
                     if not userprofile.user.is_active:
-                        return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
+                        return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.', 'is_signup' : is_signup}, status=status.HTTP_400_BAD_REQUEST)
                     user = userprofile.user
                     message = 'User Logged In'
                 else:
+                    is_signup = True
                     user = User.objects.using('default').create(username = get_random_username())
                     message = 'User created'
                     userprofile = UserProfile.objects.using('default').get(user = user)
@@ -2801,13 +2805,13 @@ def verify_otp_with_country_code(request):
                 # otp_obj.for_user = user
                 # otp_obj.save()
                 return JsonResponse({'message': message, 'username' : mobile_no, \
-                        'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+                        'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data, 'is_signup' : is_signup}, status=status.HTTP_200_OK)
             # otp_obj.save()
-            return JsonResponse({'message': 'OTP Validated', 'username' : mobile_no}, status=status.HTTP_200_OK)
+            return JsonResponse({'message': 'OTP Validated', 'username' : mobile_no, 'is_signup' : is_signup}, status=status.HTTP_200_OK)
         except Exception as e:
-            return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'message': 'Invalid Mobile No / OTP', 'is_signup' : is_signup}, status=status.HTTP_400_BAD_REQUEST)
     else:
-        return JsonResponse({'message': 'No Mobile No / OTP provided'}, status=status.HTTP_204_NO_CONTENT)
+        return JsonResponse({'message': 'No Mobile No / OTP provided', 'is_signup' : is_signup}, status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['POST'])
 def password_set(request):
@@ -2887,6 +2891,7 @@ def fb_profile_settings(request):
     sub_category_prefrences = request.POST.get('categories',None)
     is_dark_mode_enabled = request.POST.get('is_dark_mode_enabled',None)
     android_did = request.POST.get('android_did',None)
+    is_signup = False
     try:
         sub_category_prefrences = sub_category_prefrences.split(',')
     except:
@@ -2916,7 +2921,7 @@ def fb_profile_settings(request):
                 log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':'You have been banned permanently for violating terms of usage.',\
                 'error':'None'})
                 print "Error in API fb_profile_settings/ :" + log
-                return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
+                return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.', 'is_signup' : is_created}, status=status.HTTP_400_BAD_REQUEST)
             if is_created:
                 add_bolo_score(user.id, 'initial_signup', userprofile)
                 update_dict = {}
@@ -2963,10 +2968,10 @@ def fb_profile_settings(request):
                     default_follow = deafult_boloindya_follow.delay(user.id,str(language))
                 user.save()
                 user_tokens = get_tokens_for_user(user)
-                return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data, 'is_signup' : is_created}, status=status.HTTP_200_OK)
             else:
                 user_tokens = get_tokens_for_user(user)
-                return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data, 'is_signup' : is_created}, status=status.HTTP_200_OK)
         elif activity == 'google_login' and refrence == 'google':
             try:
                 userprofile = UserProfile.objects.using('default').get(social_identifier = extra_data['google_id'])
@@ -2988,7 +2993,7 @@ def fb_profile_settings(request):
                 log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':'You have been banned permanently for violating terms of usage.',\
                 'error':'None'})
                 print "Error in API fb_profile_settings/ :" + log
-                return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
+                return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.', 'is_signup' : is_created}, status=status.HTTP_400_BAD_REQUEST)
             if is_created:
                 update_dict = {}
                 add_bolo_score(user.id, 'initial_signup', userprofile)
@@ -3039,10 +3044,10 @@ def fb_profile_settings(request):
                     default_follow = deafult_boloindya_follow.delay(user.id,str(language))
                 user.save()
                 user_tokens = get_tokens_for_user(user)
-                return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data, 'is_signup' : is_created}, status=status.HTTP_200_OK)
             else:
                 user_tokens = get_tokens_for_user(user)
-                return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data, 'is_signup' : is_created}, status=status.HTTP_200_OK)
         elif activity == 'profile_save':
             try:
                 userprofile = UserProfile.objects.using('default').get(user = request.user)
@@ -3085,7 +3090,7 @@ def fb_profile_settings(request):
                     update_dict['salary_range'] = salary_range
                 if username:
                     if not check_username_valid(username):
-                        return JsonResponse({'message': 'Username Invalid. It can contains only lower case letters,numbers and special character[ _ - .]'}, status=status.HTTP_200_OK)
+                        return JsonResponse({'message': 'Username Invalid. It can contains only lower case letters,numbers and special character[ _ - .]', 'is_signup' : is_signup}, status=status.HTTP_200_OK)
                     check_username = User.objects.using('default').filter(username = username).exclude(pk =request.user.id)
                     if not check_username:
                         update_dict['slug'] = username
@@ -3095,14 +3100,14 @@ def fb_profile_settings(request):
                         # invoke watermark service to update username
                         update_branding_url.delay(username)
                     else:
-                        return JsonResponse({'message': 'Username already exist'}, status=status.HTTP_200_OK)
+                        return JsonResponse({'message': 'Username already exist', 'is_signup' : is_signup}, status=status.HTTP_200_OK)
                 UserProfile.objects.using('default').filter(user=request.user).update(**update_dict)
-                return JsonResponse({'message': 'Profile Saved'}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'Profile Saved', 'is_signup' : is_signup}, status=status.HTTP_200_OK)
             except Exception as e:
                 log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                     'error':str(e)})
                 print "Error in API fb_profile_settings/ :" + log
-                return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e), 'is_signup' : is_signup}, status=status.HTTP_400_BAD_REQUEST)
         elif activity == 'settings_changed':
             try:
                 userprofile = UserProfile.objects.using('default').get(user = request.user)
@@ -3122,15 +3127,15 @@ def fb_profile_settings(request):
                     default_follow = deafult_boloindya_follow.delay(request.user.id,str(language))
                     update_dict['language'] = str(language)
                 UserProfile.objects.using('default').filter(user=request.user).update(**update_dict)
-                return JsonResponse({'message': 'Settings Chnaged'}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'Settings Chnaged', 'is_signup' : is_signup}, status=status.HTTP_200_OK)
             except Exception as e:
                 log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                     'error':str(e)})
                 print "Error in API fb_profile_settings/ :" + log
-                return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e), 'is_signup' : is_signup}, status=status.HTTP_400_BAD_REQUEST)
         elif activity == 'android_login':
             if not android_did:
-                return JsonResponse({'message': 'Error Occured:android_did not found',}, status=status.HTTP_400_BAD_REQUEST) 
+                return JsonResponse({'message': 'Error Occured:android_did not found', 'is_signup' : is_signup}, status=status.HTTP_400_BAD_REQUEST) 
             user_id = get_redis_android_id(android_did)
             if user_id:
                 try:
@@ -3172,16 +3177,16 @@ def fb_profile_settings(request):
                     default_follow = deafult_boloindya_follow.delay(user.id,str(language))                
                 user.save()
                 user_tokens = get_tokens_for_user(user)
-                return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data, 'is_signup' : is_created}, status=status.HTTP_200_OK)
             else:
                 user_tokens = get_tokens_for_user(user)
-                return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data, 'is_signup' : is_created}, status=status.HTTP_200_OK)
 
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
         print "Error in API fb_profile_settings/ :" + log
-        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e), 'is_signup' : is_signup}, status=status.HTTP_400_BAD_REQUEST)
 
 #### KYC Views ####
 
@@ -5519,3 +5524,22 @@ def remove_extra_char(file_name):
         file_name = file_name.replace(char, '')
     return file_name
 
+class GetUserNotificationCount(APIView):
+    def get(self, request, *args, **kwargs):
+        try:
+            if request.user.is_authenticated:
+                notification_count = Notification.objects.filter(for_user= request.user,status=0).count()
+                return JsonResponse({
+                    'notification_count': notification_count, 'limit': settings.USER_NOTIFICATIONS_LIMIT, 'notification_count_str': self.get_notification_count_str()
+                }, status=status.HTTP_200_OK)
+            else:
+                return JsonResponse({
+                'notification_count': 0, 'limit': settings.USER_NOTIFICATIONS_LIMIT, 'notification_count_str': self.get_notification_count_str()
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({
+                'notification_count': 0, 'limit': settings.USER_NOTIFICATIONS_LIMIT, 'notification_count_str': self.get_notification_count_str()
+            }, status=status.HTTP_200_OK)
+
+    def get_notification_count_str(self):
+        return str(settings.USER_NOTIFICATIONS_LIMIT-1)+"+"
