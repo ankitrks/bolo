@@ -20,6 +20,9 @@ BASE_URL = "https://staging-dashboard.paytm.com/bpay/api/v1"
 def generate_order_id():
     key = settings.PAYTM_TXN_COUNTER_KEY
     counter = redis_cli.get(key)
+    if not counter:
+        redis_cli.set(settings.PAYTM_TXN_COUNTER_KEY, 1)
+        counter = u'1'
     redis_cli.incr(key)
     return 'TXN_%s'%counter.decode().zfill(6)
 

@@ -1,9 +1,16 @@
 from datetime import datetime
+from copy import deepcopy
 
 from django.views.generic import TemplateView, DetailView
+from django.db import connections
+from django.db.models import Q
 
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import ListAPIView
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
 
 from payment.utils import PageNumberPaginationRemastered
 from payment.permission import UserPaymentPermissionView
@@ -19,16 +26,50 @@ class BeneficiaryViewSet(UserPaymentPermissionView, ModelViewSet):
     queryset = Beneficiary.objects.all()
     serializer_class = BeneficiarySerializer
     pagination_class = PageNumberPaginationRemastered
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (SessionAuthentication,)
 
     def create(self, request, *args, **kwargs):
-        print("request data create BeneficiaryViewSet", request.data)
-        return super().create(request, *args, **kwargs)
+        data = deepcopy(request.data)
+        print "request.user", request.user
+        data.update({
+            'created_by': request.user.id,
+            'modified_by': request.user.id
+        })
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
 
     def partial_update(self, request, *args, **kwargs):
-        print("request data partial_update BeneficiaryViewSet", request.data)
         kwargs['partial'] = True
         return self.update(request, *args, **kwargs)
 
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        data = deepcopy(request.data)
+        data['modified_by'] = request.user.id
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
+
+    def get_queryset(self):
+        q = self.request.query_params.get('q')
+        if q:
+            self.queryset = self.queryset.filter(Q(name__icontains=q) | Q(paytm_number=q) | Q(upi=q) | Q(account_number=q))
+
+        return self.queryset
 
 class BeneficiaryDetailTemplateView(UserPaymentPermissionView, DetailView):
     template_name = "payment/partner/beneficiary/beneficiary_details.html" 
@@ -87,21 +128,34 @@ class TopUserListView(UserPaymentPermissionView, ListAPIView):
     pagination_class = PageNumberPaginationRemastered
 
     def get_queryset(self):
-        print("request", self.request.__dict__)
+        print("request", self.request.query_params)
+        query_params = self.request.query_params
         queryset = self.queryset
 
         sort_field = '-video_count'
         
-        if self.request.query_params.get('sortField'):
-            sort_field = self.request.query_params.get('sortField')
+        if query_params.get('sortField'):
+            sort_field = query_params.get('sortField')
 
-        if self.request.query_params.get('sortOrder') == 'desc':
+        if query_params.get('sortOrder') == 'desc':
             sort_field = '-' + sort_field
 
-        if self.request.query_params.get('selectedMonth'):
-            print("selectedMonth", self.request.query_params.get('selectedMonth'))
-            date = datetime.strptime(self.request.query_params.get('selectedMonth'), '%Y-%m-%d')
-            self.queryset = self.queryset.filter(agg_month=self.request.query_params.get('selectedMonth'))
+        if query_params.get('selectedMonth'):
+            print("selectedMonth", query_params.get('selectedMonth'))
+            date = datetime.strptime(query_params.get('selectedMonth'), '%Y-%m-%d')
+            self.queryset = self.queryset.filter(agg_month=query_params.get('selectedMonth'))
+
+        if query_params.get('q'):
+            q = query_params.get('q')
+            with connections['default'].cursor() as cursor:
+                cursor.execute("""
+                    SELECT user_id
+                    FROM forum_user_userprofile
+                    WHERE name ilike %s or slug = %s
+                """, ['%' + q +'%', q])
+                ids = [row[0] for row in cursor.fetchall()]
+
+            self.queryset = self.queryset.filter(boloindya_id__in=ids)
 
 
         query = self.queryset.query.sql_with_params()
