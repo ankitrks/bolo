@@ -3472,14 +3472,14 @@ def add_coupon(request):
     coupon_dict['discount_given'] = discount
     coupon_dict['is_draft'] = is_draft
     if active_banner_image_file:
-        active_banner_image_url = upload_image(upload_to_bucket, active_banner_image_file, banner_image_upload_folder_name)
+        active_banner_image_url = upload_coupon_image(upload_to_bucket, active_banner_image_file, banner_image_upload_folder_name)
         if not active_banner_image_url:
             return JsonResponse({'message':'fail','reason':'Image File already exist'}, status=status.HTTP_200_OK)
         else:
             coupon_dict['active_banner_img_url'] = active_banner_image_url
 
     if inactive_banner_image_file:
-        inactive_banner_image_url = upload_image(upload_to_bucket, inactive_banner_image_file, banner_image_upload_folder_name)
+        inactive_banner_image_url = upload_coupon_image(upload_to_bucket, inactive_banner_image_file, banner_image_upload_folder_name)
         if not inactive_banner_image_url:
             return JsonResponse({'message':'fail','reason':'Image File already exist'}, status=status.HTTP_200_OK)
         else:
@@ -3538,6 +3538,7 @@ class CouponDatableList(generics.ListAPIView):
 @login_required
 def coupon_list_datable(request):
     return render(request,'jarvis/pages/coupons/boloindya_coupons.html')
+
 
 
 def month_year_iter(start_month, start_year, end_month, end_year):
@@ -3615,3 +3616,33 @@ class TopUserListView(ListAPIView):
         query = self.queryset.query.sql_with_params()
 
         return self.queryset.order_by(sort_field)
+
+def upload_coupon_image(bucket, image_file, folder_name):
+    '''
+        This function is clone of upload_image and it just add 
+        timestamp in file name to allow images with same name
+    '''
+    bucket_credentials = get_bucket_details(bucket)
+    conn = boto3.client('s3', bucket_credentials['REGION_HOST'], aws_access_key_id = bucket_credentials['AWS_ACCESS_KEY_ID'], \
+            aws_secret_access_key = bucket_credentials['AWS_SECRET_ACCESS_KEY'])
+
+
+    image_file_name = urlify(image_file.name.lower())
+    image_output_key = hashlib.sha256(image_file_name.encode('utf-8')).hexdigest()
+    image_file_name = check_image_file_name_validation(image_file_name,image_output_key)
+    image_file_name = str(datetime.now()).replace(' ', '') +"_"+ image_file_name
+    image_path = folder_name+'/'+image_file_name
+
+    try:
+        conn.head_object(Bucket=bucket, Key=image_path)
+        return None
+    except Exception as e:
+        with open(urlify(image_file_name),'wb') as f:
+            for chunk in image_file.chunks():
+                if chunk:
+                    f.write(chunk)
+
+    image_url = upload_to_s3_without_transcode(image_file_name,bucket,folder_name)
+    os.remove(urlify(image_file_name))
+    return image_url
+

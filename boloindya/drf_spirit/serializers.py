@@ -584,6 +584,7 @@ class UserProfileSerializer(ModelSerializer):
     view_count = SerializerMethodField()
     own_vb_view_count = SerializerMethodField()
     vb_count = SerializerMethodField()
+    bolo_score_new = SerializerMethodField()
 
     class Meta:
         model = UserProfile
@@ -616,6 +617,12 @@ class UserProfileSerializer(ModelSerializer):
 
     def get_vb_count(self,instance):
         return shortcounterprofile(get_userprofile_counter(instance.user_id)['video_count'])
+
+    def get_bolo_score_new(self,instance):
+        '''
+            This counter is specific w.r.t shorcountertopic function
+        '''
+        return shorcountertopic(instance.bolo_score)
 
 class ShortUserProfileSerializer(ModelSerializer):
     follow_count= SerializerMethodField()
