@@ -5527,19 +5527,23 @@ def remove_extra_char(file_name):
 class GetUserNotificationCount(APIView):
     def get(self, request, *args, **kwargs):
         try:
+            self.notification_count = 0
             if request.user.is_authenticated:
-                notification_count = Notification.objects.filter(for_user= request.user,status=0).count()
+                self.notification_count = Notification.objects.filter(for_user= request.user,status=0).count()
                 return JsonResponse({
-                    'notification_count': notification_count, 'limit': settings.USER_NOTIFICATIONS_LIMIT, 'notification_count_str': self.get_notification_count_str()
+                    'notification_count': self.notification_count, 'limit': settings.USER_NOTIFICATIONS_LIMIT, 'notification_count_str': self.get_notification_count_str()
                 }, status=status.HTTP_200_OK)
             else:
                 return JsonResponse({
-                'notification_count': 0, 'limit': settings.USER_NOTIFICATIONS_LIMIT, 'notification_count_str': self.get_notification_count_str()
+                'notification_count': self.notification_count, 'limit': settings.USER_NOTIFICATIONS_LIMIT, 'notification_count_str': self.get_notification_count_str()
             }, status=status.HTTP_200_OK)
         except Exception as e:
             return JsonResponse({
-                'notification_count': 0, 'limit': settings.USER_NOTIFICATIONS_LIMIT, 'notification_count_str': self.get_notification_count_str()
+                'notification_count': self.notification_count, 'limit': settings.USER_NOTIFICATIONS_LIMIT, 'notification_count_str': self.get_notification_count_str()
             }, status=status.HTTP_200_OK)
 
     def get_notification_count_str(self):
-        return str(settings.USER_NOTIFICATIONS_LIMIT-1)+"+"
+        base = settings.USER_NOTIFICATIONS_LIMIT-1
+        if self.notification_count < base:
+            base = self.notification_count
+        return str(base)+"+"
