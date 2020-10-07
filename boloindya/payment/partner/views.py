@@ -1,5 +1,7 @@
 from datetime import datetime
 from copy import deepcopy
+import csv
+import io
 
 from django.views.generic import TemplateView, DetailView
 from django.db import connections
@@ -7,6 +9,7 @@ from django.db.models import Q
 
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import ListAPIView
+from rest_framework.views import APIView
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -15,7 +18,7 @@ from rest_framework import status
 from payment.utils import PageNumberPaginationRemastered
 from payment.permission import UserPaymentPermissionView
 from payment.partner.models import Beneficiary, TopUser
-from payment.partner.serializers import BeneficiarySerializer, TopUserSerializer
+from payment.partner.serializers import BeneficiarySerializer
 
 
 class BeneficiaryTemplateView(UserPaymentPermissionView, TemplateView):
@@ -85,80 +88,47 @@ class BeneficiaryDetailTemplateView(UserPaymentPermissionView, DetailView):
             
         return context
 
+class BeneficiaryBulkCreateAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (SessionAuthentication,)
 
 
-def month_year_iter(start_month, start_year, end_month, end_year):
-    yield "%s-%s-01"%(start_year, str(start_month).zfill(2))
+    def post(self, request, *args, **kwargs):
+        csvfile = csv.DictReader(io.StringIO(request.data.get('beneficiary_file').read().decode('utf-8')))
+        user_ids = [row.get('user_id') for row in csvfile]
 
-    while start_month < end_month or start_year < end_year:
-        start_month += 1
-
-        if start_month > 12:
-            start_year += 1
-            start_month = 1
-
-        yield "%s-%s-01"%(start_year, str(start_month).zfill(2))
+        print 'user_ids', user_ids
+        if not user_ids:
+            return Response({})
 
 
+        cursor = connections['default'].cursor()
+        cursor.execute("""
+            SELECT user_id as boloindya_id, COALESCE(name, slug, '') as name, paytm_number  
+            FROM forum_user_userprofile 
+            WHERE user_id in %s
+        """, [tuple(user_ids)])
 
-class TopUserTemplateView(UserPaymentPermissionView, TemplateView):
-    template_name = "payment/partner/top_users/index.html"
+        columns = [col[0] for col in cursor.description]
+        user_data_list = [
+            dict(zip(columns, row))
+            for row in cursor.fetchall()
+        ]
 
-
-    def get_context_data(self, **kwargs):
-        print("request", self.request.__dict__)
-        context = super(TopUserTemplateView, self).get_context_data(**kwargs)
-        today = datetime.now().date()
-
-        context['all_month'] = sorted([{
-            'name': datetime.strptime(month, '%Y-%m-%d').strftime('%B %Y'),
-            'value': month
-        } for month in month_year_iter(1, 2020, today.month, today.year)], key=lambda x: x.get('value'), reverse=True)
-
-        print("All months", context['all_month'])
-        return context
-
-
-
-
-
-class TopUserListView(UserPaymentPermissionView, ListAPIView):
-    queryset = TopUser.objects.all()
-    serializer_class = TopUserSerializer
-    pagination_class = PageNumberPaginationRemastered
-
-    def get_queryset(self):
-        print("request", self.request.query_params)
-        query_params = self.request.query_params
-        queryset = self.queryset
-
-        sort_field = '-video_count'
+        print "user_data_list", user_data_list
+        beneficiary_list = []
         
-        if query_params.get('sortField'):
-            sort_field = query_params.get('sortField')
+        for user_data in user_data_list:
+            user_data.update({
+                'payment_method': 'paytm_wallet',
+                'verification_status': 'pending',
+                'created_by_id': request.user.id,
+                'modified_by_id':request.user.id
+            })
+            beneficiary_list.append(Beneficiary(**user_data))
 
-        if query_params.get('sortOrder') == 'desc':
-            sort_field = '-' + sort_field
+        print "beneficiary_list", beneficiary_list
 
-        if query_params.get('selectedMonth'):
-            print("selectedMonth", query_params.get('selectedMonth'))
-            date = datetime.strptime(query_params.get('selectedMonth'), '%Y-%m-%d')
-            self.queryset = self.queryset.filter(agg_month=query_params.get('selectedMonth'))
+        Beneficiary.objects.bulk_create(beneficiary_list)
 
-        if query_params.get('q'):
-            q = query_params.get('q')
-            with connections['default'].cursor() as cursor:
-                cursor.execute("""
-                    SELECT user_id
-                    FROM forum_user_userprofile
-                    WHERE name ilike %s or slug = %s
-                """, ['%' + q +'%', q])
-                ids = [row[0] for row in cursor.fetchall()]
-
-            self.queryset = self.queryset.filter(boloindya_id__in=ids)
-
-
-        query = self.queryset.query.sql_with_params()
-        print(query[0]%query[1])
-
-        return self.queryset.order_by(sort_field)
+        return Response({})

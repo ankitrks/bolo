@@ -28,7 +28,7 @@ from django.views.generic.base import RedirectView
 
 
 urlpatterns = [
-    url(r'^$', RedirectView.as_view(url='/payment/partner/top-users'), name='home'),
+    url(r'^$', RedirectView.as_view(url='/payment/partner/beneficiary'), name='home'),
     url('admin/', admin.site.urls),
     url('payout/', include('payment.payout.urls')),
     url('partner/', include('payment.partner.urls')),

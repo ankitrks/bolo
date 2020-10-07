@@ -166,6 +166,7 @@ INSTALLED_APPS = [
     'payment',
     'payment.partner',
     'payment.payout',
+    'simple_history',
     # 'forum.core.tests'
 ]
 
@@ -281,6 +282,7 @@ MIDDLEWARE_CLASSES = [
     'forum.user.middleware.LastSeenMiddleware',
     'forum.user.middleware.ActiveUserMiddleware',
     'forum.core.middleware.PrivateForumMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
 TEMPLATES = [
