@@ -7,6 +7,8 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
 
+from rest_framework import serializers
+
 from payment.paytm_api import generate_order_id, verify_beneficiary, wallet_transfer, account_transfer, upi_transfer
 
 from payment.payout.models import Transaction
@@ -67,9 +69,13 @@ class Beneficiary(models.Model):
 
 
     def transfer(self, amount):
-        print "self.verification_status", self.verification_status
+        if not self.is_active:
+            raise serializers.ValidationError("Beneficiary is not active!!")
+
+            
         if self.verification_status != 'verified':
-            return False
+            raise serializers.ValidationError("Beneficiary is not verified!!")
+
 
         txn_id = generate_order_id()
         if self.payment_method == 'paytm_wallet':

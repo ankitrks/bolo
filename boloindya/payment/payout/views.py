@@ -33,7 +33,7 @@ class ScheduledPaymentModelViewSet(ModelViewSet):
     queryset = ScheduledPayment.objects.all()
     serializer_class = ScheduledPaymentSerializer
     pagination_class = PageNumberPaginationRemastered
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, PaymentPermission)
     authentication_classes = (SessionAuthentication,)
 
     def create(self, request, *args, **kwargs):
@@ -66,9 +66,15 @@ class TransactionListAPIView(ListAPIView):
     queryset = Transaction.objects.all().order_by('-transaction_date')
     serializer_class = TransactionSerializer
     pagination_class = PageNumberPaginationRemastered
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, PaymentPermission)
     authentication_classes = (SessionAuthentication,)
 
+
+    def get_queryset(self):
+        if self.request.query_params.get('pk'):
+            return self.queryset.filter(beneficiary_id=self.request.query_params.get('pk'))
+
+        return self.queryset
 
 class PayAPIView(APIView):
     serializer_class = PaySerializer

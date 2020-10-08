@@ -16,7 +16,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from payment.utils import PageNumberPaginationRemastered
-from payment.permission import UserPaymentPermissionView
+from payment.permission import UserPaymentPermissionView, PaymentPermission
 from payment.partner.models import Beneficiary, TopUser
 from payment.partner.serializers import BeneficiarySerializer
 
@@ -29,7 +29,7 @@ class BeneficiaryViewSet(UserPaymentPermissionView, ModelViewSet):
     queryset = Beneficiary.objects.all()
     serializer_class = BeneficiarySerializer
     pagination_class = PageNumberPaginationRemastered
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, PaymentPermission)
     authentication_classes = (SessionAuthentication,)
 
     def create(self, request, *args, **kwargs):
@@ -89,7 +89,7 @@ class BeneficiaryDetailTemplateView(UserPaymentPermissionView, DetailView):
         return context
 
 class BeneficiaryBulkCreateAPIView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, PaymentPermission)
     authentication_classes = (SessionAuthentication,)
 
 
