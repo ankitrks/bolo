@@ -20,14 +20,6 @@ class AddGiphyCommentsToVideo:
 		self.number_of_likes = kwargs.get('number_of_likes',0)
 
 	def start(self):
-		# 1. get random 13-27 percent of like to get number of comments
-		# 3. fetch exisiting comment's user ids = u_ids
-		# 4. fetch number of required comments 
-		# 5. fetch test user excluding exisiting u_ids
-		# 6. fetch gif details
-		# 7. create dictionary
-		# 8. Bulk create
-		# remove NA rows from final_df
 		try:
 			print("starting adding comment on topic_id "+str(self.topic_id)+" with like counts "+ str(self.number_of_likes))
 			required_comments = int(decimal.Decimal(random.randrange(int(self.number_of_likes*0.13), int(self.number_of_likes*0.27))))
@@ -68,7 +60,6 @@ class AddGiphyCommentsToVideo:
 			else:
 				print("empty comment data, please check")
 		except Exception as e:
-			#add sentry
 			print(e)
 
 	def get_giphy_data(self, required_comments):
