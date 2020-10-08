@@ -1204,7 +1204,7 @@ def upload_thumbail(virtual_thumb_file):
     except:
         return None
 
-def upload_media(media_file):
+def upload_media(media_file, key="media/"):
     try:
         from jarvis.views import urlify
         client = boto3.client('s3',aws_access_key_id = settings.BOLOINDYA_AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY)
@@ -1213,10 +1213,11 @@ def upload_media(media_file):
         media_file_name = remove_extra_char(str(media_file.name))
         filenameNext= media_file_name.split('.')
         final_filename = str(urlify(filenameNext[0]))+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[1])
-        client.put_object(Bucket='in-boloindya', Key='media/' + final_filename, Body=media_file, ACL='public-read')
-        filepath = 'https://s3.ap-south-1.amazonaws.com/' + 'in-boloindya' + '/media/' + final_filename
+        client.put_object(Bucket=settings.BOLOINDYA_AWS_IN_BUCKET_NAME, Key=key + final_filename, Body=media_file, ACL='public-read')
+        filepath = 'https://s3.ap-south-1.amazonaws.com/' + settings.BOLOINDYA_AWS_IN_BUCKET_NAME + '/'+ key + final_filename
         return filepath
-    except:
+    except Exception as e:
+        print(e)
         return None
 
 def validateUser(request):
@@ -5546,3 +5547,12 @@ class GetUserNotificationCount(APIView):
         if self.notification_count < settings.USER_NOTIFICATIONS_LIMIT:
             return str(self.notification_count)
         return str(settings.USER_NOTIFICATIONS_LIMIT-1)+"+"
+
+class UploadVideoThumbnail(APIView):
+    def post(self, request, *args, **kwargs):
+        media_file = request.FILES.get('media',None)
+        if media_file and request.user.is_authenticated:
+            media_url = upload_media(media_file, "public/video_byte_thumbnails/")
+            return JsonResponse({'status': 'success','body':media_url}, status=status.HTTP_201_CREATED)
+        else:
+            return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
