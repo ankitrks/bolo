@@ -6,11 +6,15 @@ from payment.payout.models import ScheduledPayment, Transaction
 
 
 class ScheduledPaymentSerializer(serializers.ModelSerializer):
+    created_by_name = serializers.SerializerMethodField()
+
     class Meta:
         model = ScheduledPayment
         fields = '__all__'
         read_only_fields = ('id',)
 
+    def get_created_by_name(self, instance):
+        return instance.created_by and instance.created_by.username or ''
 
 
 class TransactionSerializer(serializers.ModelSerializer):

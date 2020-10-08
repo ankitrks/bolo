@@ -51,9 +51,15 @@
                                   <b>Views Count</b> <a class="pull-right">{{ detail.view_count }}</a>
                                 </li>
                             </ul>
-                            <div>
-                                <button class="btn btn-primary">Verify</button>
-                            </div>
+
+                            {% if object.verification_status == 'verified' %}
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <button class="btn btn-primary" id="pay" data-toggle="modal" data-target="#modal-pay-creator">Pay</button>
+                                    </div>
+                                </div>    
+                            {% endif %}
+                            
                         </div>
                     <!-- /.box-body -->
                     </div>
@@ -132,7 +138,7 @@
                         </div>
 
                         <div class="tab-pane" id="transaction">
-
+                            <div id="pastTransactions"></div>
                         </div>
                     </div>
                 </div>
@@ -141,6 +147,7 @@
     </div><!-- /.container-fluid -->
 </section>
 {% include "payment/partner/components/schedule_payment_form.html" %}
+{% include "payment/partner/components/pay_modal.html" %}
 {% endblock center_content %}
 
 
@@ -206,20 +213,42 @@
 <script type="text/javascript">
     jQuery(document).ready(function(){
         jQuery(document).on('click', '#set_payment', function(){
-            jQuery.ajax(`/api/v1/payment/beneficiary/${ $('[name=beneficiary_id]').val() }/schedule-payment/`, {
+            let data = $('#SchedulePaymentForm').serializeArray()
+            let formData = {}
+            $.each(data, (i, item) => {formData[item.name] = item.value})
+
+            jQuery.ajax(`/api/v1/payment/beneficiary/${ $('[name=beneficiary]').val() }/schedule-payment/`, {
                 method: 'POST',
                 headers: headers,
-                data: {
-                    payment_date: $('#day_of_payment').val(),
-                    amount: $('#amount').val(),
-                    beneficiary: $('[name=beneficiary_id]').val()
-                },
+                data: formData,
                 success: function(response){
                     Swal.fire(
                       'Success!',
                       'Payment scheduled successfully!',
                       'success'
                     )
+                    $("#set_payment").show();
+                    $("#set_payment_loading").hide();
+                    $("#scheduledPaymentTable").data("JSGrid").reset();
+                    $('#schedule_payment_form_close').click()
+                },
+                error: function(error){
+                    console.log(error)
+                    $("#set_payment").show();
+                    $("#set_payment_loading").hide();
+                    Swal.fire({
+                        title: 'Error!',
+                        text: error.responseText.slice(0, 150),
+                        icon: 'error',
+                        confirmButtonText: 'Close'
+                    })
+                },
+                xhr: function(){
+                    let xhr = $.ajaxSettings.xhr();
+                    $("#set_payment").hide();
+                    $("#set_payment_loading").show();
+                    return xhr;
+                    
                 }
             })
         })
@@ -256,7 +285,7 @@
             valueField: "value",             // name of property of item to be used as value
             textField: "text", 
         },
-        { title: "Created By", name: "created_by", type: "text", width: 50 },
+        { title: "Created By", name: "created_by_name", type: "text", width: 50 },
         { title: "Active", type: "checkbox", name: "is_active", sorting: false, width:22 },
         { type: "control" }
     ],
@@ -291,5 +320,76 @@
         }
     }
 });
+</script>
+<script type="text/javascript">
+    $("#pay_beneficiary").click(function(){
+        $.ajax("/api/v1/payment/beneficiary/"+$("[name=pk]").val()+"/pay", {
+            method: 'POST',
+            data: {
+                amount: $("#modal-pay-creator").find("[name=amount]").val()
+            },
+            headers: headers,
+            success: function(response){
+                Swal.fire(
+                  'Success!',
+                  'Payment done successfully!',
+                  'success'
+                )
+                $("#pay_beneficiary").show();
+                $("#pay_beneficiary_loading").hide();
+                $("#modal-pay-creator-close").click();
+            },
+            error: function(error){
+                console.log(error)
+                $("#pay_beneficiary").show();
+                $("#pay_beneficiary_loading").hide();
+                Swal.fire({
+                    title: 'Error!',
+                    text: error.responseText.slice(0, 150),
+                    icon: 'error',
+                    confirmButtonText: 'Close'
+                })
+            },
+            xhr: function(){
+                let xhr = $.ajaxSettings.xhr();
+                $("#pay_beneficiary").hide();
+                $("#pay_beneficiary_loading").show();
+                return xhr;
+                
+            }
+        })
+    });
+</script>
+<script type="text/javascript">
+    $("#pastTransactions").jsGrid({
+        width: "100%",
+        height: "700px",
+        inserting: false,
+        editing: false,
+        sorting: true,
+        paging: true,
+        pageLoading: true,
+        autoload: true,
+        fields: [
+            { title: "Amount", name: "amount", type: "number", width: 20 },
+            { title: "State", name: "state", type: "text", width: 30 },
+            { title: "PG State", name: "pg_state", type: "text", width: 40 },
+            { title: "Transaction ID", name: "transaction_id", type: "text", width: 40 },
+            { title: "Transaction Date", name: "transaction_date", type: "text", width: 50 },
+            { title: "PG Response", name: "payment_gateway_response", type: "text", width: 50 },
+        ],
+        controller: {
+            loadData: function(filter) {
+                console.log("------ loadData ", filter)
+                filter['pk'] = $("[name=pk]").val();
+                return $.ajax({
+                    type: "GET",
+                    url: "/api/v1/payment/transaction/",
+                    data: filter,
+                    headers: headers
+                });
+            },
+        }
+    });
 </script>
 {% endblock local_js %}
