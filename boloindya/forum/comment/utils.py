@@ -6,7 +6,7 @@ from ..topic.notification.models import TopicNotification, UNDEFINED
 from ..topic.unread.models import TopicUnread
 from .history.models import CommentHistory
 from .poll.utils.render_static import post_render_static_polls
-
+from redis_utils import *
 
 def comment_posted(comment, mentions):
     TopicNotification.create_maybe(user=comment.user, comment=comment, action=UNDEFINED)
@@ -26,3 +26,8 @@ def post_comment_update(comment):
 
     comment.comment_html = post_render_static_polls(comment)
     CommentHistory.create(comment)
+
+def update_giphy_redis(data):
+    key = "giphy_details:"
+    for value in data:
+        set_s_redis(key, value)

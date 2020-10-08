@@ -16,6 +16,7 @@ import decimal
 from forum.user.utils.follow_redis import get_redis_follower,update_redis_follower,get_redis_following,update_redis_following
 from drf_spirit.utils import create_random_user
 from forum.user.utils.bolo_redis import update_profile_counter
+from scripts.add_giphy_comments_to_video import *
 
 def run():
     counter_objects_created=0
@@ -81,8 +82,13 @@ def run():
             print e
         try:
             print "before: like creation",datetime.now()
-            check_like(each_seen_id)
+            number_of_likes_added = check_like(each_seen_id)
             print "after: like creation",datetime.now()
+
+            print "before: comment creation",datetime.now()
+            if number_of_likes_added:
+                AddGiphyCommentsToVideo(topic_id = each_seen_id, number_of_likes = number_of_likes_added).start()
+            print "after: comment creation",datetime.now()
         except Exception as e:
             print e
 
@@ -147,6 +153,7 @@ def check_like(topic_id):
             print "like given"
         else:
             check_like(topic_id)
+    return number_like
 
 
 def check_follower(topic_id):
