@@ -6,6 +6,7 @@ from simple_history.models import HistoricalRecords
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
+from django.conf import settings
 
 from rest_framework import serializers
 
@@ -69,6 +70,9 @@ class Beneficiary(models.Model):
 
 
     def transfer(self, amount):
+        if not settings.ALLOW_PAYMENT_TRANSACTION:
+            raise serializers.ValidationError("Transaction not allowed!!")
+
         if not self.is_active:
             raise serializers.ValidationError("Beneficiary is not active!!")
 

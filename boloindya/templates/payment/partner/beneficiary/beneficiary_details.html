@@ -338,6 +338,7 @@
                 $("#pay_beneficiary").show();
                 $("#pay_beneficiary_loading").hide();
                 $("#modal-pay-creator-close").click();
+                $("#pastTransactions").data("JSGrid").reset();
             },
             error: function(error){
                 console.log(error)
