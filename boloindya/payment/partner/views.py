@@ -1,3 +1,4 @@
+
 from datetime import datetime
 from copy import deepcopy
 import csv
@@ -17,7 +18,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
-from boloindya.redis_utils import get_redis, set_redis
+from redis_utils import get_redis, set_redis
 from drf_spirit.views import generateOTP, send_sms
 
 from payment.utils import PageNumberPaginationRemastered
@@ -51,7 +52,6 @@ class BeneficiaryViewSet(ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
 
     def partial_update(self, request, *args, **kwargs):
         kwargs['partial'] = True

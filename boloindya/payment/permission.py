@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.conf import settings
 from django.http import HttpResponseForbidden
 
-from boloindya.redis_utils import get_redis, set_redis
+from redis_utils import get_redis, set_redis
 
 class UserPaymentPermissionView(LoginRequiredMixin, UserPassesTestMixin):
     def test_func(self):
