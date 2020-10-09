@@ -25,6 +25,9 @@ from django.conf.urls import include, url
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic.base import RedirectView
+from django.contrib.auth.decorators import login_required
+
+from payment.partner.views import OptVerificationView
 
 
 urlpatterns = [
@@ -32,6 +35,7 @@ urlpatterns = [
     url('admin/', admin.site.urls),
     url('payout/', include('payment.payout.urls')),
     url('partner/', include('payment.partner.urls')),
+    url('otp-verification', login_required(OptVerificationView.as_view())),
 ]
 
 

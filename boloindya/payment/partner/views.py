@@ -6,6 +6,8 @@ import io
 from django.views.generic import TemplateView, DetailView
 from django.db import connections
 from django.db.models import Q
+from django.views.generic import FormView
+from django.conf import settings
 
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import ListAPIView
@@ -15,17 +17,22 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
+from boloindya.redis_utils import get_redis, set_redis
+from drf_spirit.views import generateOTP, send_sms
+
 from payment.utils import PageNumberPaginationRemastered
 from payment.permission import UserPaymentPermissionView, PaymentPermission
 from payment.partner.models import Beneficiary, TopUser
 from payment.partner.serializers import BeneficiarySerializer
+from payment.partner.forms import OTPForm
+
 
 
 class BeneficiaryTemplateView(UserPaymentPermissionView, TemplateView):
     template_name = "payment/partner/beneficiary/index.html"
 
 
-class BeneficiaryViewSet(UserPaymentPermissionView, ModelViewSet):
+class BeneficiaryViewSet(ModelViewSet):
     queryset = Beneficiary.objects.all()
     serializer_class = BeneficiarySerializer
     pagination_class = PageNumberPaginationRemastered
@@ -132,3 +139,42 @@ class BeneficiaryBulkCreateAPIView(APIView):
         Beneficiary.objects.bulk_create(beneficiary_list)
 
         return Response({})
+
+
+class OptVerificationView(FormView):
+    template_name = 'payment/otp_verification.html'
+    form_class = OTPForm
+    success_url = 'payment/partner/beneficiary'
+
+    def get_context_data(self, **kwargs):
+        context = super(OptVerificationView, self).get_context_data(**kwargs)
+        otp = generateOTP(6)
+        user_phone = self.get_user_phone_number()
+
+        if user_phone:
+            send_sms(user_phone, otp)
+            set_redis('payment:user:%s:otp'%self.request.user.id, otp, True, 300)
+
+        context['user_phone'] = user_phone
+        return context
+
+    def get_user_phone_number(self):
+        cr = connections['default'].cursor()
+        cr.execute("SELECT mobile_no FROM forum_user_userprofile WHERE user_id = %s ", [self.request.user.id])
+        result = cr.fetchall()
+
+        if result:
+            return result[0][0]
+
+        return False
+
+
+    def form_valid(self, form):
+        otp = self.request.POST.get('otp')
+        print "request data", self.request.POST
+        stored_otp = get_redis('payment:user:%s:otp'%self.request.user.id)
+        print "stored_otp", stored_otp
+        if stored_otp and stored_otp.encode('UTF-8') == otp:
+            set_redis(settings.PAYMENT_SESSION_KEY%(self.request.user.id), True, True, settings.PAYMENT_SESSION_EXPIRE_TIME)
+            return super(OptVerificationView, self).form_valid(form)
+

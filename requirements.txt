@@ -169,3 +169,4 @@ redis-py-cluster==2.0.99rc2
 pycrypto==2.6.1
 paytmchecksum==1.7.0
 django-jsonfield==1.4.0
+django-simple-history
