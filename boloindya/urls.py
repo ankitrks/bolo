@@ -18,6 +18,8 @@ import drf_spirit.urls
 import jarvis.urls
 import allauth
 import coupon.urls
+import payment.urls
+import booking.urls
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -67,6 +69,7 @@ patterns = [
     url(r'^api/v1/docs/$', schema_view),
     url(r'^api/v1/', include(drf_spirit.urls, namespace='api')),
     url(r'^api/v1/', include(coupon.urls, namespace='api')),
+    url(r'^api/v1/', include(booking.urls, namespace='api')),
     url(r'^api/v2/fetch_audio_list', drf_spirit.views.audio_list),
     url(r'fcm/', include('fcm.urls')),
     url(r'^jarvis/',include('jarvis.urls', namespace='jarvis')),
