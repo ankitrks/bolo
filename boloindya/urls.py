@@ -14,6 +14,7 @@ import forum.search.urls
 import forum.category.urls
 import forum.topic.urls
 import forum.comment.urls
+import forum.booking.urls
 import drf_spirit.urls
 import jarvis.urls
 import allauth
@@ -100,6 +101,7 @@ urlpatterns = [
     url(r'^accounts/', include('allauth.urls')),
     url(r'^payment/', include(payment.urls, namespace='payment')),
     url(r'^api/v1/payment/', include('payment.api_urls', namespace='payment')),
+    url(r'^booking/', include(forum.booking.urls)),
 ]
 
 urlpatterns += i18n_patterns(
