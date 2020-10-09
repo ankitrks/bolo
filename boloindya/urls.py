@@ -14,6 +14,7 @@ import forum.search.urls
 import forum.category.urls
 import forum.topic.urls
 import forum.comment.urls
+import forum.booking.urls
 import drf_spirit.urls
 import jarvis.urls
 import allauth
@@ -99,6 +100,7 @@ urlpatterns = [
     url(r'docs/', include_docs_urls(title='Boloindya API')),
     url(r'^tinymce/', include('tinymce.urls')),
     url(r'^accounts/', include('allauth.urls')),
+    url(r'^booking/', include(forum.booking.urls)),
 ]
 
 urlpatterns += i18n_patterns(
