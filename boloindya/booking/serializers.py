@@ -3,6 +3,7 @@ from .models import Booking
 
 class BookingSerializer(ModelSerializer):
 	creator_id = SerializerMethodField()
+	creator_name = SerializerMethodField()
 	class Meta:
 		model = Booking
 		# fields = ('__all__')
@@ -10,3 +11,6 @@ class BookingSerializer(ModelSerializer):
 
 	def get_creator_id(self, instance):
 		return instance.creator_id
+
+	def get_creator_name(self, instance):
+		return instance.creator.username

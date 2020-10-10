@@ -38,6 +38,7 @@ class BookingSlot(RecordTimeStamp):
 	booking = models.ForeignKey(Booking, blank = False, null = False, related_name='booking_slot', on_delete=models.CASCADE)
 	start_time = models.DateTimeField(auto_now=False, blank=False, null=False)
 	end_time = models.DateTimeField(auto_now=False, blank=False, null=False)
+	channel_id = models.TextField(null = True)
 
 class UserBooking(RecordTimeStamp):
 	booking = models.ForeignKey(Booking, blank = False, null = False, related_name='user_booking', on_delete=models.CASCADE)
