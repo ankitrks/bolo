@@ -162,7 +162,7 @@ INSTALLED_APPS = [
     'jarvis',
     'tinymce',
     'chartjs',
-    'coupon'
+    'coupon',
     
     # 'forum.core.tests'
     'booking'
@@ -693,4 +693,3 @@ GET_USER_COUPONS_API_PAGE_SIZE = 10
 USER_NOTIFICATIONS_LIMIT = 10
 
 GET_BOOKINGS_API_PAGE_SIZE = 5
-

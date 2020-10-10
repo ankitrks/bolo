@@ -18,7 +18,6 @@ import drf_spirit.urls
 import jarvis.urls
 import allauth
 import coupon.urls
-import payment.urls
 import booking.urls
 
 # Uncomment the next two lines to enable the admin:
