@@ -693,5 +693,5 @@ GET_USER_COUPONS_API_PAGE_SIZE = 10
 USER_NOTIFICATIONS_LIMIT = 10
 
 GET_BOOKINGS_API_PAGE_SIZE = 5
-BOOKING_SLOT_URL = 'https://www.boloindya.com/bookings/'
+BOOKING_SLOT_URL = 'https://www.boloindya.com/booking/'
 
