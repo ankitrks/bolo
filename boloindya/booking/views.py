@@ -67,14 +67,15 @@ class BookingDetails(APIView):
 			
 			booking_slots = list(BookingSlot.objects.filter(booking_id=booking_details['id']).values('id', 'start_time', 'end_time'))
 			booking_details['is_booked'] = False
-			booking_details['slots'] = booking_slots
+
+			booking_details['slots'] = self.get_slots_data(booking_slots)#booking_slots
 			booking_details['booked_slot'] = None
 			if user_booking:
 				booking_details['is_booked'] = True
 				booked_slot = [booking_slots.pop(index) for index,value in enumerate(booking_slots) if value['id'] in user_booking]
-				booking_details['slots'] = booking_slots#[value['start_time'] for value in booking_slots]
+				booking_details['slots'] = self.get_slots_data(booking_slots)
 				if booked_slot:
-					booking_details['booked_slot'] = booked_slot[0]
+					booking_details['booked_slot'] = self.get_slots_data(booked_slot)[0]
 
 			return JsonResponse({'message': 'success', 'data':  booking_details}, status=status.HTTP_200_OK)
 		except Exception as e:
@@ -102,6 +103,22 @@ class BookingDetails(APIView):
 			print(e)
 			return JsonResponse({'message': str(e),'data':[]}, status=status.HTTP_400_BAD_REQUEST)
 
+	def get_slots_data(self,booking_slots):
+		booking_slots_df = pd.DataFrame.from_records(booking_slots)
+		slots = []
+		if not booking_slots_df.empty:
+			booking_slots_df['date'] = booking_slots_df['start_time'].dt.date
+			unique_dates = booking_slots_df['date'].unique()
+			booking_slots_df['start_time'] = booking_slots_df['start_time'].dt.strftime('%H:%M:%S').astype(str)
+			booking_slots_df['end_time'] = booking_slots_df['end_time'].dt.strftime('%H:%M:%S').astype(str)
+			for date in unique_dates:
+				new_slots = {}
+				temp = booking_slots_df[booking_slots_df['date']==date]
+				temp.drop(['date'], axis=1, inplace=True)
+				new_slots['date'] = date
+				new_slots['time'] = temp.to_dict('records')
+				slots.append(new_slots)
+		return slots
 
 class UserBookingList(APIView):
 	def get(self, request, *args, **kwargs):
