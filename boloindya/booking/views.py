@@ -14,6 +14,7 @@ from .serializers import BookingSerializer
 from .models import Booking, UserBooking, BookingSlot
 from .utils import booking_options
 # Create your views here.
+from datetime import datetime, timedelta
 import pandas as pd
 import numpy as np
 
@@ -45,7 +46,6 @@ class BookingDetails(APIView):
 					already_booked = UserBooking.objects.filter(user_id=request.user.id, booking_id=booking_id)
 					if not already_booked:
 						UserBooking(user_id=request.user.id, booking_id=booking_id, booking_slot_id=booking_slot_id).save()
-						Booking.objects.filter(id=booking_id).update(available_slots= F('available_slots')-1)
 						booking_count = UserBooking.objects.filter(booking_id=booking_id).count()
 						result = {}
 						result['message'] = 'You have successfully booked this session'
@@ -67,10 +67,10 @@ class BookingDetails(APIView):
 		try:
 			booking = Booking.objects.get(id=booking_id)
 			booking_details = BookingSerializer(booking).data
-			booking_details['is_slot_available'] = True if  booking_details['available_slots'] > 0 else False
 			user_booking = list(UserBooking.objects.filter(user_id=user_id, booking_id=booking_details['id']).values_list('booking_slot_id', flat=True))
 			
-			booking_slots = list(BookingSlot.objects.filter(booking_id=booking_details['id']).values('id', 'start_time', 'end_time', 'channel_id'))
+			booking_slots = list(BookingSlot.objects.filter(booking_id=booking_details['id'],end_time__gt=datetime.now()).values('id', 'start_time', 'end_time', 'channel_id'))
+			booking_details['is_slot_available'] = True if len(booking_slots) else False
 			booking_details['is_booked'] = False
 
 			booking_details['slots'] = self.get_slots_data(booking_slots)#booking_slots
@@ -97,12 +97,14 @@ class BookingDetails(APIView):
 
 	def get_booking_list(self, user_id, page_no):
 		try:
-			bookings = Booking.objects.all().values('id', 'creator_id', 'title', 'thumbnail_img_url','available_slots')
+			bookings = Booking.objects.all().values('id', 'creator_id', 'title', 'thumbnail_img_url')
 			user_bookings = UserBooking.objects.filter(user_id=user_id).values('booking_id')
 			bookings_df = pd.DataFrame.from_records(bookings)
 			user_bookings_df = pd.DataFrame.from_records(user_bookings)
+			bookings_df['is_slot_available'] = False
 			if not bookings_df.empty:
-				bookings_df['is_slot_available'] = np.where(bookings_df['available_slots']>0,True, False)
+				booking_slots_df = pd.DataFrame.from_records(BookingSlot.objects.filter(end_time__gt=datetime.now()).values('end_time','booking_id'))
+				bookings_df['is_slot_available'] = np.where(bookings_df['id'].isin(booking_slots_df['booking_id'].unique()),True, False)
 			if not user_bookings_df.empty:
 				bookings_df['is_booked'] = np.where(bookings_df['id'].isin(user_bookings_df['booking_id'].unique()), True, False)
 			result = bookings_df.to_dict('records')
