@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.db.models import F
+from django.contrib.auth.models import User
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -188,9 +189,11 @@ class MySlotsList(APIView):
 					if not booked_slots_df.empty:
 						final_df = pd.merge(booking_slots_df, booked_slots_df,left_on='id',right_on='booking_slot_id')
 						if not final_df.empty:
-							final_df = final_df.rename(columns={'user_id': 'booked_by'})
+							users = User.objects.filter(id__in=final_df['user_id'].unique()).values('username','id')
+							user_df = pd.DataFrame.from_records(users)
+							final_df = pd.merge(final_df,user_df,left_on='user_id',right_on='id')
+							final_df = final_df.rename(columns={'username': 'booked_by'})
 							final_df.drop(['booking_slot_id'], axis=1,inplace=True)
-							final_df['booked_by'] = final_df['booked_by'].astype(int)
 							final_df = final_df.replace({"booking_status": booking_options})
 							final_df['channel_url'] = settings.BOOKING_SLOT_URL+final_df['channel_id']
 							result = final_df.to_dict('records')
