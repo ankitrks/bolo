@@ -20,7 +20,7 @@ import numpy as np
 class BookingDetails(APIView):
 	def get(self, request, *args, **kwargs):
 		try:
-			if request.user.is_authenticated:
+			if request.user.is_authenticated and str(request.user.id) in settings.ALLOW_BOOKINGS_FOR:
 				booking_id = request.GET.get('booking_id',None)
 				if booking_id:
 					return self.get_booking_detail(booking_id, request.user.id)
@@ -36,7 +36,7 @@ class BookingDetails(APIView):
 
 	def post(self, request, *args, **kwargs):
 		try:
-			if request.user.is_authenticated:
+			if request.user.is_authenticated and str(request.user.id) in settings.ALLOW_BOOKINGS_FOR:
 				# booking_id = request.POST.get('booking_id', None)
 				booking_slot_id = request.POST.get('booking_slot_id', None)
 				booking_slot = list(BookingSlot.objects.filter(pk=booking_slot_id).values('start_time', 'id', 'end_time', 'booking_id','channel_id'))
@@ -137,7 +137,7 @@ class BookingDetails(APIView):
 class UserBookingList(APIView):
 	def get(self, request, *args, **kwargs):
 		try:
-			if request.user.is_authenticated:
+			if request.user.is_authenticated and str(request.user.id) in settings.ALLOW_BOOKINGS_FOR:
 				page_no = request.GET.get('page',1)
 				user_bookings = list(UserBooking.objects.filter(user_id=request.user.id).values('booking_id', 'booking_slot_id', 'booking_status'))
 				user_booking_ids = [value['booking_id'] for value in user_bookings]
