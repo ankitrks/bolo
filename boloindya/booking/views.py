@@ -51,15 +51,15 @@ class BookingDetails(APIView):
 						result = {}
 						result['message'] = 'You have successfully booked this session'
 						booking_slot[0]['channel_url'] = settings.BOOKING_SLOT_URL+booking_slot[0]['channel_id']
-						result['booked_slot'] = booking_slot[0]
+						result['data'] = booking_slot[0]
 						result['count'] = booking_count
 						return JsonResponse(result, status=status.HTTP_200_OK)
 					else:
-						return JsonResponse({'message': "Already Booked",'data':[]}, status=status.HTTP_200_OK)
+						return JsonResponse({'message': "Already Booked",'data':{}}, status=status.HTTP_200_OK)
 				else:
-					return JsonResponse({'message': "Invalid Slot Id",'data':[]}, status=status.HTTP_400_BAD_REQUEST)
+					return JsonResponse({'message': "Invalid Slot Id",'data':{}}, status=status.HTTP_400_BAD_REQUEST)
 			else:
-				return JsonResponse({'message':'Unauthorised User', 'data':[]}, status=status.HTTP_401_UNAUTHORIZED)
+				return JsonResponse({'message':'Unauthorised User', 'data':{}}, status=status.HTTP_401_UNAUTHORIZED)
 		except Exception as e:
 			print(e)
 			return JsonResponse({'message': str(e),'data':[]}, status=status.HTTP_400_BAD_REQUEST)
