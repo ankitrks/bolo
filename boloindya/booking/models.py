@@ -34,3 +34,6 @@ class UserBooking(RecordTimeStamp):
 	user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = False, null = False, related_name='user_bookings')
 	booking_slot = models.ForeignKey(BookingSlot, blank = False, null = False, related_name='booking_slot_user')
 	booking_status = models.CharField(choices = booking_options,default=0, blank = True, null = True, max_length = 10)
+
+	class Meta:
+		unique_together = ('user', 'booking_slot',)
