@@ -192,8 +192,8 @@ class MySlotsList(APIView):
 							users = User.objects.filter(id__in=final_df['user_id'].unique()).values('username','id')
 							user_df = pd.DataFrame.from_records(users)
 							final_df = pd.merge(final_df,user_df,left_on='user_id',right_on='id')
-							final_df = final_df.rename(columns={'username': 'booked_by'})
-							final_df.drop(['booking_slot_id'], axis=1,inplace=True)
+							final_df = final_df.rename(columns={'username': 'booked_by', 'id_x': 'slot_id'})
+							final_df.drop(['booking_slot_id', 'id_y', 'user_id'], axis=1,inplace=True)
 							final_df = final_df.replace({"booking_status": booking_options})
 							final_df['channel_url'] = settings.BOOKING_SLOT_URL+final_df['channel_id']
 							result = final_df.to_dict('records')
