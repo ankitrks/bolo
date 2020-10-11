@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.conf import settings
 from django.core.paginator import Paginator
-from django.db.models import F
+from django.db.models import F, Q
 from django.contrib.auth.models import User
 
 from rest_framework import status
@@ -44,7 +44,7 @@ class BookingDetails(APIView):
 				booking_slot = list(BookingSlot.objects.filter(pk=booking_slot_id).values('start_time', 'id', 'end_time', 'booking_id','channel_id'))
 				if booking_slot:
 					booking_id = booking_slot[0]['booking_id']
-					already_booked = UserBooking.objects.filter(user_id=request.user.id, booking_id=booking_id)
+					already_booked = UserBooking.objects.filter(Q(user_id=request.user.id, booking_id=booking_id) | Q(booking_slot_id=booking_slot_id))
 					if not already_booked:
 						UserBooking(user_id=request.user.id, booking_id=booking_id, booking_slot_id=booking_slot_id).save()
 						booking_count = UserBooking.objects.filter(booking_id=booking_id).count()
