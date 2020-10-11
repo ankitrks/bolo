@@ -77,9 +77,12 @@ class BookingDetails(APIView):
 
 			booking_details['slots'] = self.get_slots_data(booking_slots)#booking_slots
 			booking_details['booked_slot'] = None
+
 			if user_booking:
-				booking_details['booked_slot'] = self.get_slots_data(list(BookingSlot.objects.filter(id__in=user_booking).values('id', 'start_time', 'end_time', 'channel_id')))[0]
-				booking_details['is_booked'] = True
+				user_booking_slot = list(BookingSlot.objects.filter(id__in=user_booking, end_time__gt=datetime.now()).values('id', 'start_time', 'end_time', 'channel_id'))
+				if user_booking_slot:
+					booking_details['booked_slot'] = self.get_slots_data(user_booking_slot)[0]
+					booking_details['is_booked'] = True
 
 
 			return JsonResponse({'message': 'success', 'data':  booking_details}, status=status.HTTP_200_OK)
@@ -96,7 +99,8 @@ class BookingDetails(APIView):
 			bookings_df['is_slot_available'] = False
 			if not bookings_df.empty:
 				booking_slots_df = pd.DataFrame.from_records(BookingSlot.objects.filter(end_time__gt=datetime.now()).values('end_time','booking_id'))
-				bookings_df['is_slot_available'] = np.where(bookings_df['id'].isin(booking_slots_df['booking_id'].unique()),True, False)
+				if not booking_slots_df.empty:
+					bookings_df['is_slot_available'] = np.where(bookings_df['id'].isin(booking_slots_df['booking_id'].unique()),True, False)
 			if not user_bookings_df.empty:
 				bookings_df['is_booked'] = np.where(bookings_df['id'].isin(user_bookings_df['booking_id'].unique()), True, False)
 			result = bookings_df.to_dict('records')
