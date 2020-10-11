@@ -13,4 +13,5 @@ class BookingSerializer(ModelSerializer):
 		return instance.creator_id
 
 	def get_creator_name(self, instance):
-		return instance.creator.username
+		user = instance.creator
+		return (user.first_name+user.last_name) or (user.username)
