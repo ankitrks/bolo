@@ -156,6 +156,7 @@ class UserBookingList(APIView):
 					user_booking_df = pd.DataFrame.from_records(user_bookings)
 
 					final_df = pd.merge(pd.merge(bookings_df,booking_slot_df,left_on='id',right_on='booking_id'),user_booking_df,on='booking_id')
+					final_df = update_slot_status(final_df)
 					final_df.drop(['booking_id'], axis=1, inplace=True)
 					final_df['channel_url'] = settings.BOOKING_SLOT_URL+final_df['channel_id']
 					final_df = final_df.replace({"booking_status": booking_options})
@@ -188,6 +189,7 @@ class MySlotsList(APIView):
 					final_df = booking_slots_df
 					if not booked_slots_df.empty:
 						final_df = pd.merge(booking_slots_df, booked_slots_df,left_on='id',right_on='booking_slot_id')
+						final_df = update_slot_status(final_df)
 						if not final_df.empty:
 							users = User.objects.filter(id__in=final_df['user_id'].unique()).values('username','id')
 							user_df = pd.DataFrame.from_records(users)
@@ -208,3 +210,9 @@ class MySlotsList(APIView):
 		except Exception as e:
 			print(e)
 			return JsonResponse({'message': str(e),'data':[]}, status=status.HTTP_400_BAD_REQUEST)
+
+
+def update_slot_status(slots_df):
+	slots_df['booking_status'] = np.where(slots_df['end_time']<datetime.now(), '2', slots_df.booking_status)
+	slots_df['booking_status'] = np.where((slots_df['start_time']<=datetime.now())&(slots_df['end_time']>=datetime.now()), '1', slots_df.booking_status)
+	return slots_df
