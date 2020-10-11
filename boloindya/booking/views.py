@@ -70,27 +70,17 @@ class BookingDetails(APIView):
 			booking_details = BookingSerializer(booking).data
 			user_booking = list(UserBooking.objects.filter(user_id=user_id, booking_id=booking_details['id']).values_list('booking_slot_id', flat=True))
 			
-			booking_slots = list(BookingSlot.objects.filter(booking_id=booking_details['id'],end_time__gt=datetime.now()).values('id', 'start_time', 'end_time', 'channel_id'))
+			already_booked_ids = UserBooking.objects.filter(booking_id=booking_id).values('booking_slot_id')
+			booking_slots = list(BookingSlot.objects.filter(booking_id=booking_details['id'],end_time__gt=datetime.now()).exclude(id__in=already_booked_ids).values('id', 'start_time', 'end_time', 'channel_id'))
 			booking_details['is_slot_available'] = True if len(booking_slots) else False
 			booking_details['is_booked'] = False
 
 			booking_details['slots'] = self.get_slots_data(booking_slots)#booking_slots
 			booking_details['booked_slot'] = None
 			if user_booking:
-				# booked_slot = [booking_slots.pop(index) for index,value in enumerate(booking_slots) if value['id'] in user_booking]
-				booked_slot = []
-				remaining_slots = []
-				for slot in booking_slots:
-					if slot['id'] in user_booking:
-						booked_slot.append(slot)
-					else:
-						remaining_slots.append(slot)
+				booking_details['booked_slot'] = self.get_slots_data(list(BookingSlot.objects.filter(id__in=user_booking).values('id', 'start_time', 'end_time', 'channel_id')))[0]
+				booking_details['is_booked'] = True
 
-				booking_details['slots'] = self.get_slots_data(remaining_slots)
-				if booked_slot:
-					booking_details['is_booked'] = True
-					booking_details['booked_slot'] = self.get_slots_data(booked_slot)[0]
-					
 
 			return JsonResponse({'message': 'success', 'data':  booking_details}, status=status.HTTP_200_OK)
 		except Exception as e:
