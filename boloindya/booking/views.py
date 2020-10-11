@@ -186,23 +186,19 @@ class MySlotsList(APIView):
 					booked_slots_df = pd.DataFrame.from_records(booked_slots)
 					final_df = booking_slots_df
 					if not booked_slots_df.empty:
-						final_df = pd.merge(booking_slots_df, booked_slots_df,left_on='id',right_on='booking_slot_id',how='left')
-						final_df = final_df.rename(columns={'user_id': 'booked_by'})
-						final_df = final_df.where(pd.notnull(final_df), None)
-						final_df.drop(['booking_slot_id'], axis=1,inplace=True)
-						#adding status availble
-						final_df['booking_status'] = final_df['booking_status'].fillna('3')
-					else:
-						final_df['booked_by'] = None
-						final_df['booking_status'] = '3'
-					final_df = final_df.replace({"booking_status": booking_options})
-					final_df['channel_url'] = settings.BOOKING_SLOT_URL+final_df['channel_id']
-					result = final_df.to_dict('records')
-					paginator = Paginator(result, settings.GET_BOOKINGS_API_PAGE_SIZE)
-					try:
-						result = paginator.page(page_no).object_list
-					except:
-						result = []
+						final_df = pd.merge(booking_slots_df, booked_slots_df,left_on='id',right_on='booking_slot_id')
+						if not final_df.empty:
+							final_df = final_df.rename(columns={'user_id': 'booked_by'})
+							final_df.drop(['booking_slot_id'], axis=1,inplace=True)
+							final_df['booked_by'] = final_df['booked_by'].astype(int)
+							final_df = final_df.replace({"booking_status": booking_options})
+							final_df['channel_url'] = settings.BOOKING_SLOT_URL+final_df['channel_id']
+							result = final_df.to_dict('records')
+							paginator = Paginator(result, settings.GET_BOOKINGS_API_PAGE_SIZE)
+							try:
+								result = paginator.page(page_no).object_list
+							except:
+								result = []
 				return JsonResponse({'message': 'success', 'data':  result}, status=status.HTTP_200_OK)
 			else:
 				return JsonResponse({'message':'Unauthorised User', 'data':[]}, status=status.HTTP_401_UNAUTHORIZED)
