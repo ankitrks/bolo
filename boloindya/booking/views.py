@@ -76,7 +76,6 @@ class BookingDetails(APIView):
 			booking_details['slots'] = self.get_slots_data(booking_slots)#booking_slots
 			booking_details['booked_slot'] = None
 			if user_booking:
-				booking_details['is_booked'] = True
 				# booked_slot = [booking_slots.pop(index) for index,value in enumerate(booking_slots) if value['id'] in user_booking]
 				booked_slot = []
 				remaining_slots = []
@@ -88,7 +87,9 @@ class BookingDetails(APIView):
 
 				booking_details['slots'] = self.get_slots_data(remaining_slots)
 				if booked_slot:
+					booking_details['is_booked'] = True
 					booking_details['booked_slot'] = self.get_slots_data(booked_slot)[0]
+					
 
 			return JsonResponse({'message': 'success', 'data':  booking_details}, status=status.HTTP_200_OK)
 		except Exception as e:
@@ -165,6 +166,44 @@ class UserBookingList(APIView):
 						result = []
 				return JsonResponse({'message': 'success', 'data':  result}, status=status.HTTP_200_OK)
 
+			else:
+				return JsonResponse({'message':'Unauthorised User', 'data':[]}, status=status.HTTP_401_UNAUTHORIZED)
+		except Exception as e:
+			print(e)
+			return JsonResponse({'message': str(e),'data':[]}, status=status.HTTP_400_BAD_REQUEST)
+
+class MySlotsList(APIView):
+	def get(self, request, *args, **kwargs):
+		try:
+			if request.user.is_authenticated:
+				page_no = request.GET.get('page',1)
+				booking_ids = Booking.objects.filter(creator_id=request.user.id).values('id')
+				booking_slots = BookingSlot.objects.filter(booking_id__in=booking_ids).values('start_time','end_time','channel_id','id')
+				booking_slots_df = pd.DataFrame.from_records(booking_slots)
+				result = []
+				if not booking_slots_df.empty:
+					booked_slots = UserBooking.objects.filter(booking_slot_id__in=booking_slots_df['id'].unique()).values('booking_slot_id', 'booking_status', 'user_id')
+					booked_slots_df = pd.DataFrame.from_records(booked_slots)
+					final_df = booking_slots_df
+					if not booked_slots_df.empty:
+						final_df = pd.merge(booking_slots_df, booked_slots_df,left_on='id',right_on='booking_slot_id',how='left')
+						final_df = final_df.rename(columns={'user_id': 'booked_by'})
+						final_df = final_df.where(pd.notnull(final_df), None)
+						final_df.drop(['booking_slot_id'], axis=1,inplace=True)
+						#adding status availble
+						final_df['booking_status'] = final_df['booking_status'].fillna('3')
+					else:
+						final_df['booked_by'] = None
+						final_df['booking_status'] = '3'
+					final_df = final_df.replace({"booking_status": booking_options})
+					final_df['channel_url'] = settings.BOOKING_SLOT_URL+final_df['channel_id']
+					result = final_df.to_dict('records')
+					paginator = Paginator(result, settings.GET_BOOKINGS_API_PAGE_SIZE)
+					try:
+						result = paginator.page(page_no).object_list
+					except:
+						result = []
+				return JsonResponse({'message': 'success', 'data':  result}, status=status.HTTP_200_OK)
 			else:
 				return JsonResponse({'message':'Unauthorised User', 'data':[]}, status=status.HTTP_401_UNAUTHORIZED)
 		except Exception as e:

@@ -3,5 +3,6 @@ from .views import *
 
 urlpatterns = [
 	url(r'^bookings/$', BookingDetails.as_view()),
-	url(r'^user_bookings/', UserBookingList.as_view())
+	url(r'^user_bookings/', UserBookingList.as_view()),
+	url(r'^myslots/',MySlotsList.as_view())
 ]
