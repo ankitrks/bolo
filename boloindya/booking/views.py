@@ -12,7 +12,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 
 from .serializers import BookingSerializer
-from .models import Booking, UserBooking, BookingSlot
+from .models import Booking, UserBooking, BookingSlot, AppConfig
 from .utils import booking_options
 # Create your views here.
 from datetime import datetime, timedelta
@@ -22,7 +22,8 @@ import numpy as np
 class BookingDetails(APIView):
 	def get(self, request, *args, **kwargs):
 		try:
-			if request.user.is_authenticated and str(request.user.id) in settings.ALLOW_BOOKINGS_FOR:
+			allowed_user_ids = AppConfig.objects.get(feature_id="0").user_ids
+			if request.user.is_authenticated and str(request.user.id) in allowed_user_ids:
 				booking_id = request.GET.get('booking_id',None)
 				if booking_id:
 					return self.get_booking_detail(booking_id, request.user.id)
@@ -38,7 +39,8 @@ class BookingDetails(APIView):
 
 	def post(self, request, *args, **kwargs):
 		try:
-			if request.user.is_authenticated and str(request.user.id) in settings.ALLOW_BOOKINGS_FOR:
+			allowed_user_ids = AppConfig.objects.get(feature_id="0").user_ids
+			if request.user.is_authenticated and str(request.user.id) in allowed_user_ids:
 				# booking_id = request.POST.get('booking_id', None)
 				booking_slot_id = request.POST.get('booking_slot_id', None)
 				booking_slot = list(BookingSlot.objects.filter(pk=booking_slot_id).values('start_time', 'id', 'end_time', 'booking_id','channel_id'))
@@ -71,7 +73,7 @@ class BookingDetails(APIView):
 			user_booking = list(UserBooking.objects.filter(user_id=user_id, booking_id=booking_details['id']).values_list('booking_slot_id', flat=True))
 			
 			already_booked_ids = UserBooking.objects.filter(booking_id=booking_id).values('booking_slot_id')
-			booking_slots = list(BookingSlot.objects.filter(booking_id=booking_details['id'],end_time__gt=datetime.now()).exclude(id__in=already_booked_ids).values('id', 'start_time', 'end_time', 'channel_id'))
+			booking_slots = list(BookingSlot.objects.filter(booking_id=booking_details['id'],end_time__gt=datetime.now()).exclude(id__in=already_booked_ids).order_by('start_time').values('id', 'start_time', 'end_time', 'channel_id'))
 			booking_details['is_slot_available'] = True if len(booking_slots) else False
 			booking_details['is_booked'] = False
 
@@ -135,7 +137,8 @@ class BookingDetails(APIView):
 class UserBookingList(APIView):
 	def get(self, request, *args, **kwargs):
 		try:
-			if request.user.is_authenticated and str(request.user.id) in settings.ALLOW_BOOKINGS_FOR:
+			allowed_user_ids = AppConfig.objects.get(feature_id="0").user_ids
+			if request.user.is_authenticated and str(request.user.id) in allowed_user_ids:
 				page_no = request.GET.get('page',1)
 				user_bookings = list(UserBooking.objects.filter(user_id=request.user.id).values('booking_id', 'booking_slot_id', 'booking_status'))
 				user_booking_ids = [value['booking_id'] for value in user_bookings]
@@ -171,7 +174,8 @@ class UserBookingList(APIView):
 class MySlotsList(APIView):
 	def get(self, request, *args, **kwargs):
 		try:
-			if request.user.is_authenticated:
+			allowed_user_ids = AppConfig.objects.get(feature_id="0").user_ids
+			if request.user.is_authenticated and str(request.user.id) in allowed_user_ids:
 				page_no = request.GET.get('page',1)
 				booking_ids = Booking.objects.filter(creator_id=request.user.id).values('id')
 				booking_slots = BookingSlot.objects.filter(booking_id__in=booking_ids).values('start_time','end_time','channel_id','id')
