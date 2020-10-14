@@ -52,4 +52,4 @@ class AppConfig(models.Model):
 	user_ids = ArrayField(models.CharField(max_length=200), blank=True)
 
 	def __str__(self):
-		return self.feature_name
+		return self.feature_id
