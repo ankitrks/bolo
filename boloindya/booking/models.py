@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.conf import settings
+from django.contrib.postgres.fields import ArrayField
 
 from forum.topic.models import RecordTimeStamp
 # Create your models here.
@@ -37,3 +38,18 @@ class UserBooking(RecordTimeStamp):
 
 	class Meta:
 		unique_together = ('user', 'booking_slot',)
+
+feature_options = (
+	('0', "Allow Bookings For"),
+)
+
+class AppConfig(models.Model):
+	"""
+		This table is for to allow some user a specific fetaure just add that
+		feature in feature_options
+	"""
+	feature_id = models.CharField(choices = feature_options,default="0", blank = True, null = True, max_length = 10)
+	user_ids = ArrayField(models.CharField(max_length=200), blank=True)
+
+	def __str__(self):
+		return self.feature_id
