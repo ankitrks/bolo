@@ -9,7 +9,6 @@ from forum.topic.models import RecordTimeStamp
 # Create your models here.
 import uuid
 
-
 class Booking(RecordTimeStamp):
 	creator = models.ForeignKey(settings.AUTH_USER_MODEL, blank = False, null = False, related_name='bookings')
 	title = models.TextField(blank = False, null = False)
@@ -18,6 +17,12 @@ class Booking(RecordTimeStamp):
 	thumbnail_img_url = models.TextField(blank = False, null = False, default='')
 	booking_count = models.PositiveIntegerField(default=0)
 	like_count = models.PositiveIntegerField(default=0)
+	profile_pic_img_url = models.TextField(blank = False, null = False, default='')
+	price = models.PositiveIntegerField(default=0)
+	hash_tags = models.ManyToManyField('forum_topic.TongueTwister',
+			related_name="hash_tag_bookings",blank=True)
+	category = models.ForeignKey('forum_category.Category', related_name="category_booking",null=True,blank=True)
+	language_ids = ArrayField(models.CharField(max_length=200), blank=True, default=list)
 
 booking_options = (
 	('0', "Booked"),
@@ -53,3 +58,8 @@ class AppConfig(models.Model):
 
 	def __str__(self):
 		return self.feature_id
+
+class PayOutConfig(models.Model):
+	commission_for_popular = models.CharField(max_length=10)
+	commission_default = models.CharField(max_length=10)
+	tnc_text = models.TextField(blank = True, null = True)

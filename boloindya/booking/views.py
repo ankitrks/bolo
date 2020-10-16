@@ -11,13 +11,18 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.views import APIView
 
-from .serializers import BookingSerializer
-from .models import Booking, UserBooking, BookingSlot, AppConfig
+from forum.topic.models import TongueTwister
+from .serializers import BookingSerializer, PayOutConfigSerializer
+from .models import Booking, UserBooking, BookingSlot, AppConfig, PayOutConfig
 from .utils import booking_options
 # Create your views here.
 from datetime import datetime, timedelta
+from drf_spirit.views import remove_extra_char
 import pandas as pd
 import numpy as np
+import time
+import boto3
+import json
 
 class BookingDetails(APIView):
 	def get(self, request, *args, **kwargs):
@@ -214,3 +219,97 @@ def update_slot_status(slots_df):
 	slots_df['booking_status'] = np.where(slots_df['end_time']<datetime.now(), '2', slots_df.booking_status)
 	slots_df['booking_status'] = np.where((slots_df['start_time']<=datetime.now())&(slots_df['end_time']>=datetime.now()), '1', slots_df.booking_status)
 	return slots_df
+
+class CreateBooking(APIView):
+	def post(self, request, *args, **kwargs):
+		try:
+			allowed_user_ids = AppConfig.objects.get(feature_id="0").user_ids
+			if request.user.is_authenticated and str(request.user.id) in allowed_user_ids:
+				title = request.POST.get('title','')
+				description = request.POST.get('description','')
+				promo_profile_pic = request.FILES.get('promo_profile_pic','')
+				promo_banner = request.FILES.get('promo_banner','')
+				slots = request.POST.get('slots','')
+				price_per_user = request.POST.get('price_per_user',0)
+				language_ids = request.POST.get('language_selected',[])
+				hash_tags = request.POST.get('hashtags', None)
+				category_id = request.POST.get('category_selected',None)
+
+				if not promo_profile_pic.name.endswith(('.jpg','.png', '.jpeg')):
+					return JsonResponse({'message':'fail','reason':'This is not a jpg/png file'}, status=status.HTTP_200_OK)
+				if not promo_banner.name.endswith(('.jpg','.png', '.jpeg')):
+					return JsonResponse({'message':'fail','reason':'This is not a jpg/png file'}, status=status.HTTP_200_OK)
+
+				#uplodds file
+				key = "public/booking_shows/"
+				profile_pic_img_url = upload_media(promo_profile_pic, key)
+				banner_img_url = upload_media(promo_banner, key)
+				thumbnail_img_url = self.get_thumbnail_url(banner_img_url,key)
+				#thumbnail pending
+
+				if language_ids:
+					language_ids = json.loads(language_ids)
+				booking = Booking(creator_id = request.user.id, title=title,description=description,price=price_per_user,category_id = category_id, language_ids = language_ids, banner_img_url = banner_img_url, thumbnail_img_url=thumbnail_img_url, profile_pic_img_url=profile_pic_img_url)
+				booking.save()
+
+				hash_tags_to_add = []
+				if hash_tags:
+					hash_tags = json.loads(hash_tags)
+					for index, value in enumerate(hash_tags):
+						if value.startswith("#"):
+							try:
+								tag = TongueTwister.objects.using('default').get(hash_tag__iexact=value.strip('#'))
+							except :
+								tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
+							hash_tags_to_add.append(tag)
+				if hash_tags_to_add:
+					booking.hash_tags.add(*hash_tags_to_add)
+
+				#slots create
+				booking_slots = []
+				booking_id = booking.id
+				if slots:
+					slots = json.loads(slots)
+					for value in slots:
+						booking_slots.append({"start_time": value["start_time"], "end_time": value["end_time"], "booking_id": booking_id})
+						slot_list = [BookingSlot(**vals) for vals in booking_slots]
+					BookingSlot.objects.bulk_create(slot_list)
+				return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)
+			else:
+				return JsonResponse({'message':'Unauthorised User'}, status=status.HTTP_401_UNAUTHORIZED)
+		except Exception as e:
+			print(e)
+			return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+	def get_thumbnail_url(self, banner_img_url, key):
+		try:
+			final_file_name = key+banner_img_url.split('/')[-1]
+			thumbnail_img_url = "http://in-boloindya.s3-website.ap-south-1.amazonaws.com/180x240/"+final_file_name
+			return thumbnail_img_url
+		except:
+			return ''
+
+def upload_media(media_file, key):
+	try:
+		from jarvis.views import urlify
+		client = boto3.client('s3',aws_access_key_id = settings.BOLOINDYA_AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY)
+		ts = time.time()
+		created_at = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+		media_file_name = remove_extra_char(str(media_file.name))
+		filenameNext= media_file_name.split('.')
+		final_filename = str(urlify(filenameNext[0]))+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[1])
+		client.put_object(Bucket=settings.BOLOINDYA_AWS_IN_BUCKET_NAME, Key=key + final_filename, Body=media_file, ACL='public-read')
+		filepath = 'https://s3.ap-south-1.amazonaws.com/' + settings.BOLOINDYA_AWS_IN_BUCKET_NAME + "/"+ key + final_filename
+		return filepath
+	except Exception as e:
+		print(e)
+		return ''
+
+class PayOutConfigDetails(APIView):
+	def get(self, request, *args, **kwargs):
+		try:
+			payout_obj = PayOutConfig.objects.last()
+			return JsonResponse({'message': 'success', 'data': PayOutConfigSerializer(payout_obj).data}, status=status.HTTP_200_OK)
+		except Exception as e:
+			print(e)
+			return JsonResponse({'message': str(e), 'data':{}}, status=status.HTTP_400_BAD_REQUEST)
