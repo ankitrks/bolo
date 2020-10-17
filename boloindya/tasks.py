@@ -420,12 +420,12 @@ def update_profile_counter_task(*args, **kwargs):
     update_profile_counter(*args, **kwargs)
 
 @app.task
-def upload_booking_media(booking_id, promo_profile_pic, promo_banner, profile_pic_name, promo_banner_name):
+def upload_event_media(event_id, promo_profile_pic, promo_banner, profile_pic_name, promo_banner_name):
     from booking.views import upload_media, get_thumbnail_url
-    from booking.models import Booking
+    from booking.models import Event
     key = "public/booking_shows/"
     try:
-        booking = Booking.objects.filter(pk=booking_id)
+        booking = Event.objects.filter(pk=event_id)
         profile_pic_img_url = upload_media(promo_profile_pic, profile_pic_name, key)
         banner_img_url = upload_media(promo_banner, promo_banner_name, key)
         thumbnail_img_url = get_thumbnail_url(banner_img_url,key)

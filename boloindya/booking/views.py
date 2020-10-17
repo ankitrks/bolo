@@ -15,12 +15,12 @@ from rest_framework.views import APIView
 
 from forum.topic.models import TongueTwister
 from .serializers import BookingSerializer, PayOutConfigSerializer
-from .models import Booking, UserBooking, BookingSlot, AppConfig, PayOutConfig
+from .models import *
 from .utils import booking_options
 # Create your views here.
 from datetime import datetime, timedelta
 from drf_spirit.views import remove_extra_char
-from tasks import upload_booking_media
+from tasks import upload_event_media
 import pandas as pd
 import numpy as np
 import time
@@ -224,94 +224,6 @@ def update_slot_status(slots_df):
 	slots_df['booking_status'] = np.where((slots_df['start_time']<=datetime.now())&(slots_df['end_time']>=datetime.now()), '1', slots_df.booking_status)
 	return slots_df
 
-class CreateBooking(APIView):
-	def post(self, request, *args, **kwargs):
-		import datetime
-		try:
-			allowed_user_ids = AppConfig.objects.get(feature_id="0").user_ids
-			if request.user.is_authenticated and str(request.user.id) in allowed_user_ids:
-				title = request.POST.get('title','')
-				description = request.POST.get('description','')
-				promo_profile_pic = request.FILES.get('promo_profile_pic','')
-				promo_banner = request.FILES.get('promo_banner','')
-				slots = request.POST.get('slots','')
-				price_per_user = request.POST.get('price_per_user',0)
-				language_ids = request.POST.get('language_selected',[])
-				hash_tags = request.POST.get('hashtags', None)
-				category_id = request.POST.get('category_selected',None)
-
-				if not promo_profile_pic.name.endswith(('.jpg','.png', '.jpeg')):
-					return JsonResponse({'message':'fail','reason':'This is not a jpg/png file'}, status=status.HTTP_200_OK)
-				if not promo_banner.name.endswith(('.jpg','.png', '.jpeg')):
-					return JsonResponse({'message':'fail','reason':'This is not a jpg/png file'}, status=status.HTTP_200_OK)
-
-				if language_ids:
-					language_ids = json.loads(language_ids)
-				booking = Booking(creator_id = request.user.id, title=title,description=description,price=price_per_user,category_id = category_id, language_ids = language_ids)
-				booking.save()
-
-				#upload image
-				self.download_and_upload_bookings(booking.id, promo_profile_pic, promo_banner)
-
-				hash_tags_to_add = []
-				if hash_tags:
-					hash_tags = json.loads(hash_tags)
-					for index, value in enumerate(hash_tags):
-						if value.startswith("#"):
-							try:
-								tag = TongueTwister.objects.using('default').get(hash_tag__iexact=value.strip('#'))
-							except :
-								tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
-							hash_tags_to_add.append(tag)
-				if hash_tags_to_add:
-					booking.hash_tags.add(*hash_tags_to_add)
-
-				#slots create
-				booking_slots = []
-				booking_id = booking.id
-				if slots:
-					slots = json.loads(slots)
-					start_date = datetime.datetime.strptime(slots['start_date'], "%Y-%m-%d").date()
-					end_date = datetime.datetime.strptime(slots['end_date'], "%Y-%m-%d").date()
-					while(start_date<=end_date):
-						for value in slots['time']:
-							start_time = get_time(value['start_time'])
-							end_time = get_time(value['end_time'])
-
-							booking_slot_start_time = datetime.datetime.combine(start_date,start_time)
-							booking_slot_end_time = datetime.datetime.combine(start_date,end_time)
-							booking_slots.append({"start_time": booking_slot_start_time, "end_time": booking_slot_end_time, "booking_id": booking_id})
-						start_date+=datetime.timedelta(days=1)
-					slot_list = [BookingSlot(**vals) for vals in booking_slots]
-					BookingSlot.objects.bulk_create(slot_list)
-				return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)
-			else:
-				return JsonResponse({'message':'Unauthorised User'}, status=status.HTTP_401_UNAUTHORIZED)
-		except Exception as e:
-			print(e)
-			return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-	def download_and_upload_bookings(self, booking_id, promo_profile_pic, promo_banner):
-		try:
-			#upload images async
-			path = default_storage.save(promo_profile_pic.name, ContentFile(promo_profile_pic.read()))
-			with default_storage.open(promo_profile_pic.name, 'wb+') as destination:
-				for chunk in promo_profile_pic.chunks():
-					destination.write(chunk)
-			tmp_profile_file = os.path.join(settings.MEDIA_ROOT, path)
-
-			path = default_storage.save(promo_banner.name, ContentFile(promo_banner.read()))
-			with default_storage.open(promo_banner.name, 'wb+') as destination:
-				for chunk in promo_banner.chunks():
-					destination.write(chunk)
-			tmp_banner_file = os.path.join(settings.MEDIA_ROOT, path)
-
-			upload_booking_media.delay(booking_id, tmp_profile_file, tmp_banner_file, promo_profile_pic.name, promo_banner.name)
-			os.remove(tmp_profile_file)
-			os.remove(tmp_banner_file)
-		except Exception as e:
-			print(e)
-
 def get_time(time):
 	"""
 		This function takes string time in format HH:MM
@@ -353,3 +265,114 @@ class PayOutConfigDetails(APIView):
 		except Exception as e:
 			print(e)
 			return JsonResponse({'message': str(e), 'data':{}}, status=status.HTTP_400_BAD_REQUEST)
+
+class EventDetails(APIView):
+	# def get(self, request, *args, **kwargs):
+	# 	try:
+	# 		events = Event.objects.all().order_by('id').values('id', 'title', 'thumbnail_img_url', 'banner_img_url', 'profile_pic_img_url','price')
+	# 		# user_bookings = UserBooking.objects.filter(user_id=user_id).values('booking_id')
+	# 		bookings_df = pd.DataFrame.from_records(bookings)
+	# 		user_bookings_df = pd.DataFrame.from_records(user_bookings)
+	# 		bookings_df['is_slot_available'] = False
+	# 		if not bookings_df.empty:
+	# 			booking_slots_df = pd.DataFrame.from_records(BookingSlot.objects.filter(end_time__gt=datetime.now()).values('end_time','booking_id'))
+	# 			if not booking_slots_df.empty:
+	# 				bookings_df['is_slot_available'] = np.where(bookings_df['id'].isin(booking_slots_df['booking_id'].unique()),True, False)
+	# 		if not user_bookings_df.empty:
+	# 			bookings_df['is_booked'] = np.where(bookings_df['id'].isin(user_bookings_df['booking_id'].unique()), True, False)
+	# 		result = bookings_df.to_dict('records')
+	# 		paginator = Paginator(result, settings.GET_BOOKINGS_API_PAGE_SIZE)
+	# 		try:
+	# 			result = paginator.page(page_no).object_list
+	# 		except:
+	# 			result = []
+	# 		return JsonResponse({'message': 'success', 'data':  result}, status=status.HTTP_200_OK)
+	# 	except Exception as e:
+	# 		pass
+
+	def post(self, request, *args, **kwargs):
+		import datetime
+		try:
+			allowed_user_ids = AppConfig.objects.get(feature_id="0").user_ids
+			if request.user.is_authenticated and str(request.user.id) in allowed_user_ids:
+				title = request.POST.get('title','')
+				description = request.POST.get('description','')
+				promo_profile_pic = request.FILES.get('promo_profile_pic','')
+				promo_banner = request.FILES.get('promo_banner','')
+				slots = request.POST.get('slots','')
+				price_per_user = request.POST.get('price_per_user',0)
+				language_ids = request.POST.get('language_selected',[])
+				hash_tags = request.POST.get('hashtags', None)
+				category_id = request.POST.get('category_selected',None)
+
+				if not promo_profile_pic.name.endswith(('.jpg','.png', '.jpeg')):
+					return JsonResponse({'message':'fail','reason':'This is not a jpg/png file'}, status=status.HTTP_200_OK)
+				if not promo_banner.name.endswith(('.jpg','.png', '.jpeg')):
+					return JsonResponse({'message':'fail','reason':'This is not a jpg/png file'}, status=status.HTTP_200_OK)
+
+				if language_ids:
+					language_ids = json.loads(language_ids)
+				event = Event(creator_id = request.user.id, title=title,description=description,price=price_per_user,category_id = category_id, language_ids = language_ids)
+				event.save()
+
+				#upload image
+				self.download_and_upload_events(event.id, promo_profile_pic, promo_banner)
+
+				hash_tags_to_add = []
+				if hash_tags:
+					hash_tags = json.loads(hash_tags)
+					for index, value in enumerate(hash_tags):
+						if value.startswith("#"):
+							try:
+								tag = TongueTwister.objects.using('default').get(hash_tag__iexact=value.strip('#'))
+							except :
+								tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
+							hash_tags_to_add.append(tag)
+				if hash_tags_to_add:
+					event.hash_tags.add(*hash_tags_to_add)
+
+				#slots create
+				event_slots = []
+				event_id = event.id
+				if slots:
+					slots = json.loads(slots)
+					start_date = datetime.datetime.strptime(slots['start_date'], "%Y-%m-%d").date()
+					end_date = datetime.datetime.strptime(slots['end_date'], "%Y-%m-%d").date()
+					while(start_date<=end_date):
+						for value in slots['time']:
+							start_time = get_time(value['start_time'])
+							end_time = get_time(value['end_time'])
+
+							event_slot_start_time = datetime.datetime.combine(start_date,start_time)
+							event_slot_end_time = datetime.datetime.combine(start_date,end_time)
+							event_slots.append({"start_time": event_slot_start_time, "end_time": event_slot_end_time, "event_id": event_id})
+						start_date+=datetime.timedelta(days=1)
+					slot_list = [EventSlot(**vals) for vals in event_slots]
+					EventSlot.objects.bulk_create(slot_list)
+				return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)
+			else:
+				return JsonResponse({'message':'Unauthorised User'}, status=status.HTTP_401_UNAUTHORIZED)
+		except Exception as e:
+			print(e)
+			return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+	def download_and_upload_events(self, event_id, promo_profile_pic, promo_banner):
+		try:
+			#upload images async
+			path = default_storage.save(promo_profile_pic.name, ContentFile(promo_profile_pic.read()))
+			with default_storage.open(promo_profile_pic.name, 'wb+') as destination:
+				for chunk in promo_profile_pic.chunks():
+					destination.write(chunk)
+			tmp_profile_file = os.path.join(settings.MEDIA_ROOT, path)
+
+			path = default_storage.save(promo_banner.name, ContentFile(promo_banner.read()))
+			with default_storage.open(promo_banner.name, 'wb+') as destination:
+				for chunk in promo_banner.chunks():
+					destination.write(chunk)
+			tmp_banner_file = os.path.join(settings.MEDIA_ROOT, path)
+
+			upload_event_media.delay(event_id, tmp_profile_file, tmp_banner_file, promo_profile_pic.name, promo_banner.name)
+			os.remove(tmp_profile_file)
+			os.remove(tmp_banner_file)
+		except Exception as e:
+			print(e)
