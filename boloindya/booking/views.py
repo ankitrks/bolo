@@ -226,6 +226,7 @@ def update_slot_status(slots_df):
 
 class CreateBooking(APIView):
 	def post(self, request, *args, **kwargs):
+		import datetime
 		try:
 			allowed_user_ids = AppConfig.objects.get(feature_id="0").user_ids
 			if request.user.is_authenticated and str(request.user.id) in allowed_user_ids:
@@ -270,9 +271,18 @@ class CreateBooking(APIView):
 				booking_id = booking.id
 				if slots:
 					slots = json.loads(slots)
-					for value in slots:
-						booking_slots.append({"start_time": value["start_time"], "end_time": value["end_time"], "booking_id": booking_id})
-						slot_list = [BookingSlot(**vals) for vals in booking_slots]
+					start_date = datetime.datetime.strptime(slots['start_date'], "%Y-%m-%d").date()
+					end_date = datetime.datetime.strptime(slots['end_date'], "%Y-%m-%d").date()
+					while(start_date<=end_date):
+						for value in slots['time']:
+							start_time = get_time(value['start_time'])
+							end_time = get_time(value['end_time'])
+
+							booking_slot_start_time = datetime.datetime.combine(start_date,start_time)
+							booking_slot_end_time = datetime.datetime.combine(start_date,end_time)
+							booking_slots.append({"start_time": booking_slot_start_time, "end_time": booking_slot_end_time, "booking_id": booking_id})
+						start_date+=datetime.timedelta(days=1)
+					slot_list = [BookingSlot(**vals) for vals in booking_slots]
 					BookingSlot.objects.bulk_create(slot_list)
 				return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)
 			else:
@@ -301,6 +311,15 @@ class CreateBooking(APIView):
 			os.remove(tmp_banner_file)
 		except Exception as e:
 			print(e)
+
+def get_time(time):
+	"""
+		This function takes string time in format HH:MM
+		and return a time object
+	"""
+	import datetime
+	time_list = list(map(int, time.split(":")))
+	return datetime.time(hour=time_list[0], minute=time_list[1])
 
 def get_thumbnail_url(banner_img_url, key):
 	try:
