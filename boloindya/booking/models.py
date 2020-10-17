@@ -107,6 +107,6 @@ class EventBooking(RecordTimeStamp):
 	event_slot = models.ForeignKey(EventSlot, related_name='event_slot_event_bookings')
 	state = models.CharField(choices = event_booking_state_options,default='0', max_length = 10)
 	payment_status = models.CharField(choices = event_booking_payment_options,default='0', max_length = 10)
-	booking_id = models.TextField(blank = True, null = True)
+	payment_gateway_order_id = models.TextField(blank = True, null = True)
 	transaction_id = models.TextField(blank = True, null = True)
 	payment_method = models.TextField(blank = True, null = True ,default="RazorPay")

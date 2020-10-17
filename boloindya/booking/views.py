@@ -267,28 +267,21 @@ class PayOutConfigDetails(APIView):
 			return JsonResponse({'message': str(e), 'data':{}}, status=status.HTTP_400_BAD_REQUEST)
 
 class EventDetails(APIView):
-	# def get(self, request, *args, **kwargs):
-	# 	try:
-	# 		events = Event.objects.all().order_by('id').values('id', 'title', 'thumbnail_img_url', 'banner_img_url', 'profile_pic_img_url','price')
-	# 		# user_bookings = UserBooking.objects.filter(user_id=user_id).values('booking_id')
-	# 		bookings_df = pd.DataFrame.from_records(bookings)
-	# 		user_bookings_df = pd.DataFrame.from_records(user_bookings)
-	# 		bookings_df['is_slot_available'] = False
-	# 		if not bookings_df.empty:
-	# 			booking_slots_df = pd.DataFrame.from_records(BookingSlot.objects.filter(end_time__gt=datetime.now()).values('end_time','booking_id'))
-	# 			if not booking_slots_df.empty:
-	# 				bookings_df['is_slot_available'] = np.where(bookings_df['id'].isin(booking_slots_df['booking_id'].unique()),True, False)
-	# 		if not user_bookings_df.empty:
-	# 			bookings_df['is_booked'] = np.where(bookings_df['id'].isin(user_bookings_df['booking_id'].unique()), True, False)
-	# 		result = bookings_df.to_dict('records')
-	# 		paginator = Paginator(result, settings.GET_BOOKINGS_API_PAGE_SIZE)
-	# 		try:
-	# 			result = paginator.page(page_no).object_list
-	# 		except:
-	# 			result = []
-	# 		return JsonResponse({'message': 'success', 'data':  result}, status=status.HTTP_200_OK)
-	# 	except Exception as e:
-	# 		pass
+	def get(self, request, *args, **kwargs):
+		try:
+			allowed_user_ids = AppConfig.objects.get(feature_id="0").user_ids
+			if request.user.is_authenticated and str(request.user.id) in allowed_user_ids:
+				event_id = request.GET.get('event_id',None)
+				if event_id:
+					return self.get_event_detail(event_id)
+				else:
+					page_no = request.GET.get('page',1)
+					return self.get_event_list(page_no)	
+			else:
+				return JsonResponse({'message':'Unauthorised User'}, status=status.HTTP_401_UNAUTHORIZED)
+		except Exception as e:
+			print(e)
+			return JsonResponse({'message': str(e), 'data':{}}, status=status.HTTP_400_BAD_REQUEST)
 
 	def post(self, request, *args, **kwargs):
 		import datetime
@@ -356,6 +349,56 @@ class EventDetails(APIView):
 			print(e)
 			return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+	def get_event_detail(self, event_id):
+		event = Event.objects.filter(id=event_id)#.values('id', 'title', 'thumbnail_img_url', 'banner_img_url', 'profile_pic_img_url','price', 'description')
+		event_slots = []
+		result = {}
+		if event:
+			event_slots = event[0].event_slot.all()
+		event = event.values('id', 'title', 'thumbnail_img_url', 'banner_img_url', 'profile_pic_img_url','price', 'description')
+		event_df = pd.DataFrame.from_records(event)
+		event_slots_df = pd.DataFrame.from_records(event_slots.values('start_time','end_time','event_id'))
+		if not event_slots_df.empty:
+			event_slots_df = event_slots_df.groupby(by=["event_id"]).agg({'start_time': 'min', 'end_time': 'max'})[['start_time','end_time']].reset_index()
+			event_slots_df['start_time'] = event_slots_df['start_time'].dt.date
+			event_slots_df['end_time'] = event_slots_df['end_time'].dt.date
+			final_df = pd.merge(event_df, event_slots_df, left_on='id', right_on='event_id')
+			final_df.drop(['event_id'], axis=1, inplace=True)
+			result = final_df.to_dict('records')
+			if result:
+				[value.update({"slots":[{"start_time": value['start_time'], "end_time": value['end_time']}]}) for value in result]
+			for value in result:
+				value.pop('start_time',None)
+				value.pop('end_time',None)
+			if result:
+				result = result[0]
+		return JsonResponse({'message': 'success', 'data':  result}, status=status.HTTP_200_OK)
+
+	def get_event_list(self, page_no):
+		events = Event.objects.filter(is_approved=False).order_by('id').values('id', 'title', 'thumbnail_img_url', 'banner_img_url', 'profile_pic_img_url','price', 'description')
+		events_df = pd.DataFrame.from_records(events)
+		result = []
+		if not events_df.empty:
+			event_slots_df = pd.DataFrame.from_records(EventSlot.objects.filter().values('start_time','end_time','event_id'))
+			if not event_slots_df.empty:
+				event_slots_df = event_slots_df.groupby(by=["event_id"]).agg({'start_time': 'min', 'end_time': 'max'})[['start_time','end_time']].reset_index()
+				event_slots_df['start_time'] = event_slots_df['start_time'].dt.date
+				event_slots_df['end_time'] = event_slots_df['end_time'].dt.date
+				final_df = pd.merge(events_df, event_slots_df, left_on='id', right_on='event_id')
+				final_df.drop(['event_id'], axis=1, inplace=True)
+				result = final_df.to_dict('records')
+				if result:
+					[value.update({"slots":[{"start_time": value['start_time'], "end_time": value['end_time']}]}) for value in result]
+				for value in result:
+					value.pop('start_time',None)
+					value.pop('end_time',None)
+		paginator = Paginator(result, settings.GET_BOOKINGS_API_PAGE_SIZE)
+		try:
+			result = paginator.page(page_no).object_list
+		except:
+			result = []
+		return JsonResponse({'message': 'success', 'data':  result}, status=status.HTTP_200_OK)
+
 	def download_and_upload_events(self, event_id, promo_profile_pic, promo_banner):
 		try:
 			#upload images async
@@ -376,3 +419,44 @@ class EventDetails(APIView):
 			os.remove(tmp_banner_file)
 		except Exception as e:
 			print(e)
+
+class EventSlotsDetails(APIView):
+	def get(self, request, *args, **kwargs):
+		try:
+			allowed_user_ids = AppConfig.objects.get(feature_id="0").user_ids
+			if request.user.is_authenticated and str(request.user.id) in allowed_user_ids:
+				page_no = request.GET.get('page',1)
+				event_id = request.GET.get("event_id",None)
+				event = Event.objects.get(id=event_id)
+				available_event_slots = list(event.event_slot.filter(state="0", end_time__gt=datetime.now()).order_by('start_time').values('start_time', 'end_time', 'channel_id'))
+				result = get_slots_date_and_time_payload(available_event_slots)
+				paginator = Paginator(result, settings.GET_BOOKINGS_API_PAGE_SIZE)
+				try:
+					result = paginator.page(page_no).object_list
+				except:
+					result = []
+
+				return JsonResponse({'message': 'success', 'data': result}, status=status.HTTP_200_OK)
+			else:
+				return JsonResponse({'message':'Unauthorised User'}, status=status.HTTP_401_UNAUTHORIZED)
+		except Exception as e:
+			print(e)
+			return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+def get_slots_date_and_time_payload(booking_slots):
+		booking_slots_df = pd.DataFrame.from_records(booking_slots)
+		slots = []
+		if not booking_slots_df.empty:
+			booking_slots_df['date'] = booking_slots_df['start_time'].dt.date
+			unique_dates = booking_slots_df['date'].unique()
+			booking_slots_df['start_time'] = booking_slots_df['start_time'].dt.strftime('%H:%M:%S').astype(str)
+			booking_slots_df['end_time'] = booking_slots_df['end_time'].dt.strftime('%H:%M:%S').astype(str)
+			booking_slots_df['channel_url'] = settings.BOOKING_SLOT_URL+booking_slots_df['channel_id']
+			for date in unique_dates:
+				new_slots = {}
+				temp = booking_slots_df[booking_slots_df['date']==date]
+				temp.drop(['date'], axis=1, inplace=True)
+				new_slots['date'] = date
+				new_slots['time'] = temp.to_dict('records')
+				slots.append(new_slots)
+		return slots
