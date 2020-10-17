@@ -7,6 +7,8 @@ from django.conf import settings
 from django.core.paginator import Paginator
 from django.db.models import F, Q
 from django.contrib.auth.models import User
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -18,11 +20,13 @@ from .utils import booking_options
 # Create your views here.
 from datetime import datetime, timedelta
 from drf_spirit.views import remove_extra_char
+from tasks import upload_booking_media
 import pandas as pd
 import numpy as np
 import time
 import boto3
 import json
+import os
 
 class BookingDetails(APIView):
 	def get(self, request, *args, **kwargs):
@@ -240,17 +244,13 @@ class CreateBooking(APIView):
 				if not promo_banner.name.endswith(('.jpg','.png', '.jpeg')):
 					return JsonResponse({'message':'fail','reason':'This is not a jpg/png file'}, status=status.HTTP_200_OK)
 
-				#uplodds file
-				key = "public/booking_shows/"
-				profile_pic_img_url = upload_media(promo_profile_pic, key)
-				banner_img_url = upload_media(promo_banner, key)
-				thumbnail_img_url = self.get_thumbnail_url(banner_img_url,key)
-				#thumbnail pending
-
 				if language_ids:
 					language_ids = json.loads(language_ids)
-				booking = Booking(creator_id = request.user.id, title=title,description=description,price=price_per_user,category_id = category_id, language_ids = language_ids, banner_img_url = banner_img_url, thumbnail_img_url=thumbnail_img_url, profile_pic_img_url=profile_pic_img_url)
+				booking = Booking(creator_id = request.user.id, title=title,description=description,price=price_per_user,category_id = category_id, language_ids = language_ids)
 				booking.save()
+
+				#upload image
+				self.download_and_upload_bookings(booking.id, promo_profile_pic, promo_banner)
 
 				hash_tags_to_add = []
 				if hash_tags:
@@ -281,21 +281,42 @@ class CreateBooking(APIView):
 			print(e)
 			return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-	def get_thumbnail_url(self, banner_img_url, key):
+	def download_and_upload_bookings(self, booking_id, promo_profile_pic, promo_banner):
 		try:
-			final_file_name = key+banner_img_url.split('/')[-1]
-			thumbnail_img_url = "http://in-boloindya.s3-website.ap-south-1.amazonaws.com/180x240/"+final_file_name
-			return thumbnail_img_url
-		except:
-			return ''
+			#upload images async
+			path = default_storage.save(promo_profile_pic.name, ContentFile(promo_profile_pic.read()))
+			with default_storage.open(promo_profile_pic.name, 'wb+') as destination:
+				for chunk in promo_profile_pic.chunks():
+					destination.write(chunk)
+			tmp_profile_file = os.path.join(settings.MEDIA_ROOT, path)
 
-def upload_media(media_file, key):
+			path = default_storage.save(promo_banner.name, ContentFile(promo_banner.read()))
+			with default_storage.open(promo_banner.name, 'wb+') as destination:
+				for chunk in promo_banner.chunks():
+					destination.write(chunk)
+			tmp_banner_file = os.path.join(settings.MEDIA_ROOT, path)
+
+			upload_booking_media.delay(booking_id, tmp_profile_file, tmp_banner_file, promo_profile_pic.name, promo_banner.name)
+			os.remove(tmp_profile_file)
+			os.remove(tmp_banner_file)
+		except Exception as e:
+			print(e)
+
+def get_thumbnail_url(banner_img_url, key):
+	try:
+		final_file_name = key+banner_img_url.split('/')[-1]
+		thumbnail_img_url = "http://in-boloindya.s3-website.ap-south-1.amazonaws.com/180x240/"+final_file_name
+		return thumbnail_img_url
+	except:
+		return ''
+
+def upload_media(media_file, file_name, key):
 	try:
 		from jarvis.views import urlify
 		client = boto3.client('s3',aws_access_key_id = settings.BOLOINDYA_AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY)
 		ts = time.time()
 		created_at = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-		media_file_name = remove_extra_char(str(media_file.name))
+		media_file_name = remove_extra_char(str(file_name))
 		filenameNext= media_file_name.split('.')
 		final_filename = str(urlify(filenameNext[0]))+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[1])
 		client.put_object(Bucket=settings.BOLOINDYA_AWS_IN_BUCKET_NAME, Key=key + final_filename, Body=media_file, ACL='public-read')
