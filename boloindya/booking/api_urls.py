@@ -8,4 +8,5 @@ urlpatterns = [
 	url(r'^payout/tnc/', PayOutConfigDetails.as_view()),
 	url(r'^events/$', EventDetails.as_view()),
 	url(r'^event/slots/$', EventSlotsDetails.as_view()),
+	url(r'^event/bookings/$', EventBookingDetails.as_view())
 ]

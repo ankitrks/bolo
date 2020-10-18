@@ -423,25 +423,61 @@ class EventDetails(APIView):
 class EventSlotsDetails(APIView):
 	def get(self, request, *args, **kwargs):
 		try:
-			allowed_user_ids = AppConfig.objects.get(feature_id="0").user_ids
-			if request.user.is_authenticated and str(request.user.id) in allowed_user_ids:
+			if request.user.is_authenticated:
 				page_no = request.GET.get('page',1)
-				event_id = request.GET.get("event_id",None)
-				event = Event.objects.get(id=event_id)
-				available_event_slots = list(event.event_slot.filter(state="0", end_time__gt=datetime.now()).order_by('start_time').values('start_time', 'end_time', 'channel_id'))
-				result = get_slots_date_and_time_payload(available_event_slots)
-				paginator = Paginator(result, settings.GET_BOOKINGS_API_PAGE_SIZE)
-				try:
-					result = paginator.page(page_no).object_list
-				except:
-					result = []
-
-				return JsonResponse({'message': 'success', 'data': result}, status=status.HTTP_200_OK)
+				event_id = request.GET.get('event_id',None)
+				print(event_id)
+				if event_id:
+					print("here")
+					return self.get_event_slots(event_id, page_no)
+				else:
+					return self.get_creator_slots(request.user.id, page_no)
 			else:
 				return JsonResponse({'message':'Unauthorised User'}, status=status.HTTP_401_UNAUTHORIZED)
 		except Exception as e:
 			print(e)
 			return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+	def get_event_slots(self, event_id, page_no):
+		event = Event.objects.get(id=event_id)
+		available_event_slots = list(event.event_slot.filter(state="0", end_time__gt=datetime.now()).order_by('start_time').values('start_time', 'end_time', 'channel_id'))
+		result = get_slots_date_and_time_payload(available_event_slots)
+		paginator = Paginator(result, settings.GET_BOOKINGS_API_PAGE_SIZE)
+		try:
+			result = paginator.page(page_no).object_list
+		except:
+			result = []
+
+		return JsonResponse({'message': 'success', 'data': result}, status=status.HTTP_200_OK)
+
+	def get_creator_slots(self, user_id, page_no):
+		event_ids = Event.objects.filter(creator_id=user_id).values('id')
+		event_slots = EventSlot.objects.filter(event_id__in=event_ids).values('start_time','end_time','channel_id','id')
+		event_slots_df = pd.DataFrame.from_records(event_slots)
+		result = []
+		if not event_slots_df.empty:
+			#ask for slot which have payment success
+			event_booked_slots = EventBooking.objects.filter(event_slot_id__in=event_slots_df['id'].unique()).values('event_slot_id', 'user_id')
+			event_booked_slots_df = pd.DataFrame.from_records(event_booked_slots)
+			final_df = event_slots_df
+			if not event_booked_slots_df.empty:
+				final_df = pd.merge(event_slots_df, event_booked_slots_df,left_on='id',right_on='event_slot_id')
+				final_df = update_event_slot_status(final_df)
+				if not final_df.empty:
+					users = User.objects.filter(id__in=final_df['user_id'].unique()).values('username','id')
+					user_df = pd.DataFrame.from_records(users)
+					final_df = pd.merge(final_df,user_df,left_on='user_id',right_on='id')
+					final_df = final_df.rename(columns={'username': 'booked_by', 'id_x': 'slot_id'})
+					final_df.drop(['event_slot_id', 'id_y', 'user_id'], axis=1,inplace=True)
+					final_df = final_df.replace({"event_status": booking_options})
+					final_df['channel_url'] = settings.BOOKING_SLOT_URL+final_df['channel_id']
+					result = final_df.to_dict('records')
+					paginator = Paginator(result, settings.GET_BOOKINGS_API_PAGE_SIZE)
+					try:
+						result = paginator.page(page_no).object_list
+					except:
+						result = []
+		return JsonResponse({'message': 'success', 'data':  result}, status=status.HTTP_200_OK)
 
 def get_slots_date_and_time_payload(booking_slots):
 		booking_slots_df = pd.DataFrame.from_records(booking_slots)
@@ -460,3 +496,71 @@ def get_slots_date_and_time_payload(booking_slots):
 				new_slots['time'] = temp.to_dict('records')
 				slots.append(new_slots)
 		return slots
+
+
+class EventBookingDetails(APIView):
+	def get(self, request, *args, **kwargs):
+		try:
+			if request.user.is_authenticated:
+				page_no = request.GET.get('page',1)
+				event_bookings = list(EventBooking.objects.filter(user_id=request.user.id).values('event_id', 'event_slot_id'))
+				event_booking_ids = [value['event_id'] for value in event_bookings]
+				user_booking_slot_ids = [value['event_slot_id'] for value in event_bookings]
+				events = Event.objects.filter(id__in=event_booking_ids).values('id','title','thumbnail_img_url')
+				event_slots = EventSlot.objects.filter(id__in=user_booking_slot_ids).values('start_time','end_time', 'id','event_id','channel_id')
+
+				result = []
+				print(event_bookings)
+				if event_bookings:
+					events_df = pd.DataFrame.from_records(events)
+					event_slot_df = pd.DataFrame.from_records(event_slots).drop(['id'], axis=1)
+					event_booking_df = pd.DataFrame.from_records(event_bookings)
+
+					final_df = pd.merge(pd.merge(events_df,event_slot_df,left_on='id',right_on='event_id'),event_booking_df,on='event_id')
+					final_df = update_event_slot_status(final_df)
+					final_df.drop(['event_id'], axis=1, inplace=True)
+					final_df['channel_url'] = settings.BOOKING_SLOT_URL+final_df['channel_id']
+					final_df = final_df.replace({"event_status": booking_options})
+					result = final_df.to_dict('records')
+					paginator = Paginator(result, settings.GET_BOOKINGS_API_PAGE_SIZE)
+					try:
+						result = paginator.page(page_no).object_list
+					except:
+						result = []
+				return JsonResponse({'message': 'success', 'data':  result}, status=status.HTTP_200_OK)
+		except Exception as e:
+			print(e)
+			return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+	def post(self, request, *args, **kwargs):
+		try:
+			if request.user.is_authenticated:
+				event_slot_id = request.POST.get('event_slot_id', None)
+				event_slot = list(EventSlot.objects.filter(pk=event_slot_id).values('start_time', 'id', 'end_time', 'event_id','channel_id'))
+				if event_slot:
+					event_id = event_slot[0]['event_id']
+					already_booked = EventBooking.objects.filter(Q(user_id=request.user.id, event_id=event_id) | Q(event_slot_id=event_slot_id))
+					if not already_booked:
+						EventBooking(user_id=request.user.id, event_id=event_id, event_slot_id=event_slot_id).save()
+						event_count = EventBooking.objects.filter(event_id=event_id).count()
+						result = {}
+						result['message'] = 'You have successfully booked this session'
+						event_slot[0]['channel_url'] = settings.BOOKING_SLOT_URL+event_slot[0]['channel_id']
+						result['data'] = event_slot[0]
+						result['count'] = event_count
+						return JsonResponse(result, status=status.HTTP_200_OK)
+					else:
+						return JsonResponse({'message': "Already Booked",'data':{}}, status=status.HTTP_200_OK)
+				else:
+					return JsonResponse({'message': "Invalid Slot Id",'data':{}}, status=status.HTTP_400_BAD_REQUEST)
+			else:
+				return JsonResponse({'message':'Unauthorised User', 'data':{}}, status=status.HTTP_401_UNAUTHORIZED)
+		except Exception as e:
+			print(e)
+			return JsonResponse({'message': str(e),'data':[]}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+def update_event_slot_status(slots_df):
+	slots_df['event_status'] = np.where(slots_df['end_time']<datetime.now(), '2', '0')
+	slots_df['event_status'] = np.where((slots_df['start_time']<=datetime.now())&(slots_df['end_time']>=datetime.now()), '1', '0')
+	return slots_df

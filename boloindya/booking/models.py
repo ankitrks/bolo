@@ -92,21 +92,21 @@ class EventSlot(RecordTimeStamp):
 	state = models.CharField(choices = event_slot_options,default='0', blank = True, null = True, max_length = 10)
 
 event_booking_state_options = (
-	('0', "Draft"),
-	('1', "Booked"),
-	('2', "Cancelled")
+	('draft', "Draft"),
+	('booked', "Booked"),
+	('cancelled', "Cancelled")
 	)
 event_booking_payment_options = (
-	('0', "Pending"),
-	('1', "Success"),
-	('2', "Failed")
+	('pending', "Pending"),
+	('success', "Success"),
+	('failed', "Failed")
 	)
 class EventBooking(RecordTimeStamp):
 	event = models.ForeignKey(Event, related_name='event_event_bookings', on_delete=models.CASCADE)
 	user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='user_event_bookings')
 	event_slot = models.ForeignKey(EventSlot, related_name='event_slot_event_bookings')
-	state = models.CharField(choices = event_booking_state_options,default='0', max_length = 10)
-	payment_status = models.CharField(choices = event_booking_payment_options,default='0', max_length = 10)
+	state = models.CharField(choices = event_booking_state_options,default='draft', max_length = 10)
+	payment_status = models.CharField(choices = event_booking_payment_options,default='pending', max_length = 10)
 	payment_gateway_order_id = models.TextField(blank = True, null = True)
 	transaction_id = models.TextField(blank = True, null = True)
 	payment_method = models.TextField(blank = True, null = True ,default="RazorPay")
