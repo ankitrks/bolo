@@ -20,6 +20,7 @@ import jarvis.urls
 import allauth
 import coupon.urls
 import booking.urls
+import payment.urls
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -101,6 +102,7 @@ urlpatterns = [
     url(r'^tinymce/', include('tinymce.urls')),
     url(r'^accounts/', include('allauth.urls')),
     url(r'^booking/', include(forum.booking.urls)),
+    url(r'^payment/', include(payment.urls)),
 ]
 
 urlpatterns += i18n_patterns(

@@ -120,3 +120,10 @@ def sremove_redis(key, element):
         redis_cli.srem('bi:'+key, element)
     except Exception as e:
         logger.exception("in get_smembers_redis " + str(e))
+
+
+def incr_redis(key):
+    try:
+        redis_cli.incr(key)
+    except:
+        logger.exception("in incr_redis " + str(e))
