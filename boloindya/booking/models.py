@@ -81,15 +81,15 @@ class Event(RecordTimeStamp):
 	is_approved = models.BooleanField(default=False)
 
 event_slot_options = (
-	('0', "Available"),
-	('1', "Booked")
+	('available', "Available"),
+	('booked', "Booked")
 	)
 class EventSlot(RecordTimeStamp):
 	event = models.ForeignKey(Event, related_name='event_slot', on_delete=models.CASCADE)
 	start_time = models.DateTimeField(auto_now=False, blank=False, null=False)
 	end_time = models.DateTimeField(auto_now=False, blank=False, null=False)
 	channel_id = models.TextField(null = True, blank=True, default=uuid.uuid4)
-	state = models.CharField(choices = event_slot_options,default='0', blank = True, null = True, max_length = 10)
+	state = models.CharField(choices = event_slot_options,default='available', blank = True, null = True, max_length = 10)
 
 event_booking_state_options = (
 	('draft', "Draft"),

@@ -375,7 +375,7 @@ class EventDetails(APIView):
 		return JsonResponse({'message': 'success', 'data':  result}, status=status.HTTP_200_OK)
 
 	def get_event_list(self, page_no):
-		events = Event.objects.filter(is_approved=False).order_by('id').values('id', 'title', 'thumbnail_img_url', 'banner_img_url', 'profile_pic_img_url','price', 'description')
+		events = Event.objects.filter(is_approved=True).order_by('id').values('id', 'title', 'thumbnail_img_url', 'banner_img_url', 'profile_pic_img_url','price', 'description')
 		events_df = pd.DataFrame.from_records(events)
 		result = []
 		if not events_df.empty:
@@ -440,7 +440,7 @@ class EventSlotsDetails(APIView):
 
 	def get_event_slots(self, event_id, page_no):
 		event = Event.objects.get(id=event_id)
-		available_event_slots = list(event.event_slot.filter(state="0", end_time__gt=datetime.now()).order_by('start_time').values('start_time', 'end_time', 'channel_id'))
+		available_event_slots = list(event.event_slot.filter(state="available", end_time__gt=datetime.now()).order_by('start_time').values('start_time', 'end_time', 'channel_id'))
 		result = get_slots_date_and_time_payload(available_event_slots)
 		paginator = Paginator(result, settings.GET_BOOKINGS_API_PAGE_SIZE)
 		try:
