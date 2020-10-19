@@ -298,9 +298,9 @@ class EventDetails(APIView):
 				hash_tags = request.POST.get('hashtags', None)
 				category_id = request.POST.get('category_selected',None)
 
-				if not promo_profile_pic.name.endswith(('.jpg','.png', '.jpeg')):
+				if promo_profile_pic and not promo_profile_pic.name.endswith(('.jpg','.png', '.jpeg')):
 					return JsonResponse({'message':'fail','reason':'This is not a jpg/png file'}, status=status.HTTP_200_OK)
-				if not promo_banner.name.endswith(('.jpg','.png', '.jpeg')):
+				if promo_banner and not promo_banner.name.endswith(('.jpg','.png', '.jpeg')):
 					return JsonResponse({'message':'fail','reason':'This is not a jpg/png file'}, status=status.HTTP_200_OK)
 
 				if language_ids:
@@ -402,19 +402,22 @@ class EventDetails(APIView):
 	def download_and_upload_events(self, event_id, promo_profile_pic, promo_banner):
 		try:
 			#upload images async
-			path = default_storage.save(promo_profile_pic.name, ContentFile(promo_profile_pic.read()))
-			with default_storage.open(promo_profile_pic.name, 'wb+') as destination:
-				for chunk in promo_profile_pic.chunks():
-					destination.write(chunk)
-			tmp_profile_file = os.path.join(settings.MEDIA_ROOT, path)
-
-			path = default_storage.save(promo_banner.name, ContentFile(promo_banner.read()))
-			with default_storage.open(promo_banner.name, 'wb+') as destination:
-				for chunk in promo_banner.chunks():
-					destination.write(chunk)
-			tmp_banner_file = os.path.join(settings.MEDIA_ROOT, path)
-
-			upload_event_media.delay(event_id, tmp_profile_file, tmp_banner_file, promo_profile_pic.name, promo_banner.name)
+			tmp_profile_file, promo_profile_pic_name, tmp_banner_file, promo_banner_name = None, None, None, None
+			if promo_profile_pic:
+				path = default_storage.save(promo_profile_pic.name, ContentFile(promo_profile_pic.read()))
+				with default_storage.open(promo_profile_pic.name, 'wb+') as destination:
+					for chunk in promo_profile_pic.chunks():
+						destination.write(chunk)
+				tmp_profile_file = os.path.join(settings.MEDIA_ROOT, path)
+				promo_profile_pic_name = promo_profile_pic.name
+			if promo_banner:
+				path = default_storage.save(promo_banner.name, ContentFile(promo_banner.read()))
+				with default_storage.open(promo_banner.name, 'wb+') as destination:
+					for chunk in promo_banner.chunks():
+						destination.write(chunk)
+				tmp_banner_file = os.path.join(settings.MEDIA_ROOT, path)
+				promo_banner_name = promo_banner.name
+			upload_event_media.delay(event_id, tmp_profile_file, tmp_banner_file, promo_profile_pic_name, promo_banner_name)
 			os.remove(tmp_profile_file)
 			os.remove(tmp_banner_file)
 		except Exception as e:

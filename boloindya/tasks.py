@@ -423,14 +423,22 @@ def update_profile_counter_task(*args, **kwargs):
 def upload_event_media(event_id, promo_profile_pic, promo_banner, profile_pic_name, promo_banner_name):
     from booking.views import upload_media, get_thumbnail_url
     from booking.models import Event
+    import os
     key = "public/booking_shows/"
     try:
+        banner_img_url, thumbnail_img_url, profile_pic_img_url = None, None, None
         booking = Event.objects.filter(pk=event_id)
-        profile_pic_img_url = upload_media(promo_profile_pic, profile_pic_name, key)
-        banner_img_url = upload_media(promo_banner, promo_banner_name, key)
-        thumbnail_img_url = get_thumbnail_url(banner_img_url,key)
+        if promo_profile_pic:
+            profile_pic_img_url = upload_media(promo_profile_pic, profile_pic_name, key)
+            os.remove(promo_profile_pic)
+        if promo_banner:
+            banner_img_url = upload_media(promo_banner, promo_banner_name, key)
+            os.remove(promo_banner)
+        if banner_img_url:
+            thumbnail_img_url = get_thumbnail_url(banner_img_url,key)
         booking.update(banner_img_url = banner_img_url, thumbnail_img_url=thumbnail_img_url, profile_pic_img_url=profile_pic_img_url)
     except Exception as e:
+        booking.update(banner_img_url = banner_img_url, thumbnail_img_url=thumbnail_img_url, profile_pic_img_url=profile_pic_img_url)
         print(e)
 
 if __name__ == '__main__':
