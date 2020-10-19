@@ -5,10 +5,10 @@ import json
 
 def run():
 	booking_ids = list(Booking.objects.all().values_list('id',flat=True))
-	print(booking_ids)
 	for booking_id in booking_ids:
 		print("starting for booking id "+str(booking_id))
 		booking_json  = Booking.objects.filter(id=booking_id).values("creator_id","title","description","banner_img_url","thumbnail_img_url","like_count")[0]
+		booking_json['is_approved'] = True
 		event = Event(**booking_json)
 		event.save()
 		booking_slots = BookingSlot.objects.filter(booking_id=booking_id).values('id','start_time','end_time','channel_id')

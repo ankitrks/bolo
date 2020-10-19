@@ -370,11 +370,11 @@ class EventDetails(APIView):
 		return JsonResponse({'message': 'success', 'data':  result}, status=status.HTTP_200_OK)
 
 	def get_event_list(self, page_no):
-		events = Event.objects.filter(is_approved=True).order_by('id').values('id', 'title', 'thumbnail_img_url', 'banner_img_url', 'profile_pic_img_url','price', 'description')
+		events = Event.objects.filter(is_approved=True, is_active = True).order_by('id').values('id', 'title', 'thumbnail_img_url', 'banner_img_url', 'profile_pic_img_url','price', 'description')
 		events_df = pd.DataFrame.from_records(events)
 		result = []
 		if not events_df.empty:
-			event_slots_df = pd.DataFrame.from_records(EventSlot.objects.filter().values('start_time','end_time','event_id'))
+			event_slots_df = pd.DataFrame.from_records(EventSlot.objects.filter(end_time__gt=datetime.now()).values('start_time','end_time','event_id'))
 			if not event_slots_df.empty:
 				event_slots_df = event_slots_df.groupby(by=["event_id"]).agg({'start_time': 'min', 'end_time': 'max'})[['start_time','end_time']].reset_index()
 				event_slots_df['start_time'] = event_slots_df['start_time'].dt.date
@@ -510,11 +510,11 @@ class EventBookingDetails(APIView):
 					event_slot_df = pd.DataFrame.from_records(event_slots).drop(['id'], axis=1)
 					event_booking_df = pd.DataFrame.from_records(event_bookings)
 					final_df = pd.merge(pd.merge(events_df,event_slot_df,left_on='id',right_on='event_id'),event_booking_df,on='event_id')
-					# final_df = update_event_slot_status(final_df)
+					final_df = update_event_slot_status(final_df)
 					final_df.drop(['event_id'], axis=1, inplace=True)
 					final_df['channel_url'] = settings.BOOKING_SLOT_URL+final_df['channel_id']
-					# final_df = final_df.replace({"event_status": booking_options})
-					final_df = final_df.rename(columns={'state_x': 'event_slot_status', 'state_y': 'event_booking_status'})
+					final_df = final_df.replace({"event_status": booking_options})
+					final_df = final_df.rename(columns={'state_x': 'event_slot_status', 'state_y': 'event_booking_status', 'event_status': 'session_state'})
 					result = final_df.to_dict('records')
 					paginator = Paginator(result, settings.GET_BOOKINGS_API_PAGE_SIZE)
 					try:
