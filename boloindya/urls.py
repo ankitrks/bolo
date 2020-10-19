@@ -14,13 +14,13 @@ import forum.search.urls
 import forum.category.urls
 import forum.topic.urls
 import forum.comment.urls
-import forum.booking.urls
 import drf_spirit.urls
 import jarvis.urls
 import allauth
 import coupon.urls
 import booking.urls
 import payment.urls
+import booking.api_urls
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -70,7 +70,7 @@ patterns = [
     url(r'^api/v1/docs/$', schema_view),
     url(r'^api/v1/', include(drf_spirit.urls, namespace='api')),
     url(r'^api/v1/', include(coupon.urls, namespace='api')),
-    url(r'^api/v1/', include(booking.urls, namespace='api')),
+    url(r'^api/v1/', include(booking.api_urls, namespace='api')),
     url(r'^api/v2/fetch_audio_list', drf_spirit.views.audio_list),
     url(r'fcm/', include('fcm.urls')),
     url(r'^jarvis/',include('jarvis.urls', namespace='jarvis')),
@@ -101,7 +101,7 @@ urlpatterns = [
     url(r'docs/', include_docs_urls(title='Boloindya API')),
     url(r'^tinymce/', include('tinymce.urls')),
     url(r'^accounts/', include('allauth.urls')),
-    url(r'^booking/', include(forum.booking.urls)),
+    url(r'^booking/', include(booking.urls)),
     url(r'^payment/', include(payment.urls)),
 ]
 

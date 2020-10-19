@@ -1,4 +1,6 @@
 import requests
+import hmac
+import hashlib
 
 from redis_utils import get_redis, set_redis, incr_redis
 
@@ -16,6 +18,10 @@ def get_receipt():
         incr_redis('RAZORPAY_RECEIPT_NO')
 
     return 'receipt_no_%s'%receipt_number 
+
+
+def get_auth():
+    return (USERNAME, PASSWORD)
     
 
 def create_order(amount, currency="INR", receipt=None, notes=None):
@@ -37,12 +43,12 @@ def create_order(amount, currency="INR", receipt=None, notes=None):
 
 def get_order(order_id):
     url = ''.join([BASE_URL, '/orders/', order_id])
-    response = request.get(url)
+    response = requests.get(url, auth=get_auth())
 
     if response.ok:
         return response.json()
     else:
-        print repsonse.text
+        print response.text
     
 
 
