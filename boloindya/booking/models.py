@@ -73,6 +73,7 @@ class Event(RecordTimeStamp):
 	category = models.ForeignKey('forum_category.Category', related_name="category_events",null=True,blank=True)
 	language_ids = ArrayField(models.CharField(max_length=200), blank=True, default=list)
 	is_approved = models.BooleanField(default=False)
+	is_active = models.BooleanField(default=True)
 
 event_slot_options = (
 	('available', "Available"),
