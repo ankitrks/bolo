@@ -114,5 +114,5 @@ class EventBooking(RecordTimeStamp):
 	def save(self, *args, **kwargs):
 		super(EventBooking, self).save(*args, **kwargs)
 		if not self.booking_number:
-			self.booking_number = 'booking_' + str(self.pk)
+			self.booking_number = 'BOOKING_' + str(self.pk)
 			self.save()
