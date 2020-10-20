@@ -33,6 +33,8 @@ class RazorpayPaymentView(TemplateView):
 
 
 class RazorpayCallbackView(TemplateView):
+    template_name = 'payment/payin/payment_success.html'
+
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
         return super(RazorpayCallbackView, self).dispatch(*args, **kwargs)
@@ -44,6 +46,7 @@ class RazorpayCallbackView(TemplateView):
         if is_signature_verified(data.get('razorpay_order_id'), data.get('razorpay_payment_id'), data.get('razorpay_signature')):
             if self.request.GET.get('type') == 'booking':
                 update_booking_payment_status(data.get('razorpay_order_id'), 'success', data.get('razorpay_payment_id'))
+                return self.render_to_response({})
 
 
 class RazorpayWebhookView(TemplateView):
