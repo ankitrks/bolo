@@ -163,7 +163,7 @@ INSTALLED_APPS = [
     'tinymce',
     'chartjs',
     'coupon',
-    
+    'payment',
     # 'forum.core.tests'
     'booking'
 ]
