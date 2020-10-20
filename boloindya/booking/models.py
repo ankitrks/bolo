@@ -17,12 +17,6 @@ class Booking(RecordTimeStamp):
 	thumbnail_img_url = models.TextField(blank = False, null = False, default='')
 	booking_count = models.PositiveIntegerField(default=0)
 	like_count = models.PositiveIntegerField(default=0)
-	profile_pic_img_url = models.TextField(blank = False, null = False, default='')
-	price = models.PositiveIntegerField(default=0)
-	hash_tags = models.ManyToManyField('forum_topic.TongueTwister',
-			related_name="hash_tag_bookings",blank=True)
-	category = models.ForeignKey('forum_category.Category', related_name="category_booking",null=True,blank=True)
-	language_ids = ArrayField(models.CharField(max_length=200), blank=True, default=list)
 
 booking_options = (
 	('0', "Booked"),
@@ -79,17 +73,19 @@ class Event(RecordTimeStamp):
 	category = models.ForeignKey('forum_category.Category', related_name="category_events",null=True,blank=True)
 	language_ids = ArrayField(models.CharField(max_length=200), blank=True, default=list)
 	is_approved = models.BooleanField(default=False)
+	is_active = models.BooleanField(default=True)
 
 event_slot_options = (
 	('available', "Available"),
-	('booked', "Booked")
+	('booked', "Booked"),
+	('hold',"Hold")
 	)
 class EventSlot(RecordTimeStamp):
 	event = models.ForeignKey(Event, related_name='event_slot', on_delete=models.CASCADE)
 	start_time = models.DateTimeField(auto_now=False, blank=False, null=False)
 	end_time = models.DateTimeField(auto_now=False, blank=False, null=False)
 	channel_id = models.TextField(null = True, blank=True, default=uuid.uuid4)
-	state = models.CharField(choices = event_slot_options,default='available', blank = True, null = True, max_length = 10)
+	state = models.CharField(choices = event_slot_options,default='available', blank = True, null = True, max_length = 25)
 
 event_booking_state_options = (
 	('draft', "Draft"),
@@ -97,6 +93,8 @@ event_booking_state_options = (
 	('cancelled', "Cancelled")
 	)
 event_booking_payment_options = (
+	('draft', "Draft"),
+	("initiated","Initiated"),
 	('pending', "Pending"),
 	('success', "Success"),
 	('failed', "Failed")
@@ -105,8 +103,16 @@ class EventBooking(RecordTimeStamp):
 	event = models.ForeignKey(Event, related_name='event_event_bookings', on_delete=models.CASCADE)
 	user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='user_event_bookings')
 	event_slot = models.ForeignKey(EventSlot, related_name='event_slot_event_bookings')
-	state = models.CharField(choices = event_booking_state_options,default='draft', max_length = 10)
-	payment_status = models.CharField(choices = event_booking_payment_options,default='pending', max_length = 10)
+	state = models.CharField(choices = event_booking_state_options,default='draft', max_length = 25)
+	payment_status = models.CharField(choices = event_booking_payment_options,default='draft', max_length = 25)
 	payment_gateway_order_id = models.TextField(blank = True, null = True)
 	transaction_id = models.TextField(blank = True, null = True)
 	payment_method = models.TextField(blank = True, null = True ,default="RazorPay")
+	booking_number = models.TextField(blank = True, null = True)
+	remark = models.TextField(blank = True, null = True)
+
+	def save(self, *args, **kwargs):
+		super(EventBooking, self).save(*args, **kwargs)
+		if not self.booking_number:
+			self.booking_number = 'booking_' + str(self.pk)
+			self.save()

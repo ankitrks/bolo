@@ -66,6 +66,7 @@ from forum.user.utils.bolo_redis import update_profile_counter
 from rest_framework import generics
 from coupon.models import Coupon, UserCoupon
 from coupon.forms import CouponForm
+from booking.models import Event
 import pandas as pd
 
 def get_bucket_details(bucket_name=None):
@@ -3538,3 +3539,19 @@ class CouponDatableList(generics.ListAPIView):
 @login_required
 def coupon_list_datable(request):
     return render(request,'jarvis/pages/coupons/boloindya_coupons.html')
+
+@login_required
+def event_list(request):
+    page_no = request.GET.get('page_no', '1')
+
+    event_list = Event.objects.order_by('-created_at')
+
+    total_page = event_list.count()/10
+    if event_list.count()%10:
+        total_page += 1
+    page = int(page_no) - 1
+
+    print("**", event_list.count(), total_page)
+
+    return render(request,'jarvis/pages/events/boloindya_events.html', {'event_list': event_list[page*10:page*10+10],\
+        'page_no': page_no, 'total_page': total_page})

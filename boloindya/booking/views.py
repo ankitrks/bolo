@@ -14,6 +14,7 @@ from django.views.generic import RedirectView
 from rest_framework import status
 from rest_framework.views import APIView
 
+from forum.user.models import UserProfile
 from forum.topic.models import TongueTwister
 from .serializers import BookingSerializer, PayOutConfigSerializer
 from .models import *
@@ -34,8 +35,7 @@ from payment.razorpay import create_order
 class BookingDetails(APIView):
 	def get(self, request, *args, **kwargs):
 		try:
-			allowed_user_ids = AppConfig.objects.get(feature_id="0").user_ids
-			if request.user.is_authenticated and str(request.user.id) in allowed_user_ids:
+			if request.user.is_authenticated:
 				booking_id = request.GET.get('booking_id',None)
 				if booking_id:
 					return self.get_booking_detail(booking_id, request.user.id)
@@ -51,8 +51,7 @@ class BookingDetails(APIView):
 
 	def post(self, request, *args, **kwargs):
 		try:
-			allowed_user_ids = AppConfig.objects.get(feature_id="0").user_ids
-			if request.user.is_authenticated and str(request.user.id) in allowed_user_ids:
+			if request.user.is_authenticated:
 				# booking_id = request.POST.get('booking_id', None)
 				booking_slot_id = request.POST.get('booking_slot_id', None)
 				booking_slot = list(BookingSlot.objects.filter(pk=booking_slot_id).values('start_time', 'id', 'end_time', 'booking_id','channel_id'))
@@ -149,8 +148,7 @@ class BookingDetails(APIView):
 class UserBookingList(APIView):
 	def get(self, request, *args, **kwargs):
 		try:
-			allowed_user_ids = AppConfig.objects.get(feature_id="0").user_ids
-			if request.user.is_authenticated and str(request.user.id) in allowed_user_ids:
+			if request.user.is_authenticated:
 				page_no = request.GET.get('page',1)
 				user_bookings = list(UserBooking.objects.filter(user_id=request.user.id).values('booking_id', 'booking_slot_id', 'booking_status'))
 				user_booking_ids = [value['booking_id'] for value in user_bookings]
@@ -186,8 +184,7 @@ class UserBookingList(APIView):
 class MySlotsList(APIView):
 	def get(self, request, *args, **kwargs):
 		try:
-			allowed_user_ids = AppConfig.objects.get(feature_id="0").user_ids
-			if request.user.is_authenticated and str(request.user.id) in allowed_user_ids:
+			if request.user.is_authenticated:
 				page_no = request.GET.get('page',1)
 				booking_ids = Booking.objects.filter(creator_id=request.user.id).values('id')
 				booking_slots = BookingSlot.objects.filter(booking_id__in=booking_ids).values('start_time','end_time','channel_id','id')
@@ -255,6 +252,8 @@ def upload_media(media_file, file_name, key):
 		final_filename = str(urlify(filenameNext[0]))+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[1])
 		client.put_object(Bucket=settings.BOLOINDYA_AWS_IN_BUCKET_NAME, Key=key + final_filename, Body=media_file, ACL='public-read')
 		filepath = 'https://s3.ap-south-1.amazonaws.com/' + settings.BOLOINDYA_AWS_IN_BUCKET_NAME + "/"+ key + final_filename
+		if os.path.exists(media_file):
+			os.remove(media_file)
 		return filepath
 	except Exception as e:
 		print(e)
@@ -272,8 +271,7 @@ class PayOutConfigDetails(APIView):
 class EventDetails(APIView):
 	def get(self, request, *args, **kwargs):
 		try:
-			allowed_user_ids = AppConfig.objects.get(feature_id="0").user_ids
-			if request.user.is_authenticated and str(request.user.id) in allowed_user_ids:
+			if request.user.is_authenticated:
 				event_id = request.GET.get('event_id',None)
 				if event_id:
 					return self.get_event_detail(event_id)
@@ -289,8 +287,7 @@ class EventDetails(APIView):
 	def post(self, request, *args, **kwargs):
 		import datetime
 		try:
-			allowed_user_ids = AppConfig.objects.get(feature_id="0").user_ids
-			if request.user.is_authenticated and str(request.user.id) in allowed_user_ids:
+			if request.user.is_authenticated:
 				title = request.POST.get('title','')
 				description = request.POST.get('description','')
 				promo_profile_pic = request.FILES.get('promo_profile_pic','')
@@ -367,6 +364,7 @@ class EventDetails(APIView):
 			event_slots_df['end_time'] = event_slots_df['end_time'].dt.date
 			final_df = pd.merge(event_df, event_slots_df, left_on='id', right_on='event_id')
 			final_df.drop(['event_id'], axis=1, inplace=True)
+
 			result = final_df.to_dict('records')
 			if result:
 				[value.update({"slots":[{"start_time": value['start_time'], "end_time": value['end_time']}]}) for value in result]
@@ -378,11 +376,11 @@ class EventDetails(APIView):
 		return JsonResponse({'message': 'success', 'data':  result}, status=status.HTTP_200_OK)
 
 	def get_event_list(self, page_no):
-		events = Event.objects.filter(is_approved=True).order_by('id').values('id', 'title', 'thumbnail_img_url', 'banner_img_url', 'profile_pic_img_url','price', 'description')
+		events = Event.objects.filter(is_approved=True, is_active = True).order_by('id').values('id', 'title', 'thumbnail_img_url', 'banner_img_url', 'profile_pic_img_url','price', 'description')
 		events_df = pd.DataFrame.from_records(events)
 		result = []
 		if not events_df.empty:
-			event_slots_df = pd.DataFrame.from_records(EventSlot.objects.filter().values('start_time','end_time','event_id'))
+			event_slots_df = pd.DataFrame.from_records(EventSlot.objects.filter(end_time__gt=datetime.now()).values('start_time','end_time','event_id'))
 			if not event_slots_df.empty:
 				event_slots_df = event_slots_df.groupby(by=["event_id"]).agg({'start_time': 'min', 'end_time': 'max'})[['start_time','end_time']].reset_index()
 				event_slots_df['start_time'] = event_slots_df['start_time'].dt.date
@@ -411,18 +409,18 @@ class EventDetails(APIView):
 				with default_storage.open(promo_profile_pic.name, 'wb+') as destination:
 					for chunk in promo_profile_pic.chunks():
 						destination.write(chunk)
-				tmp_profile_file = os.path.join(settings.MEDIA_ROOT, path)
+				tmp_profile_file = os.path.join(settings.TEMP_UPLOAD_FILE_PATH, path)
 				promo_profile_pic_name = promo_profile_pic.name
 			if promo_banner:
 				path = default_storage.save(promo_banner.name, ContentFile(promo_banner.read()))
 				with default_storage.open(promo_banner.name, 'wb+') as destination:
 					for chunk in promo_banner.chunks():
 						destination.write(chunk)
-				tmp_banner_file = os.path.join(settings.MEDIA_ROOT, path)
+				tmp_banner_file = os.path.join(settings.TEMP_UPLOAD_FILE_PATH, path)
 				promo_banner_name = promo_banner.name
 			upload_event_media.delay(event_id, tmp_profile_file, tmp_banner_file, promo_profile_pic_name, promo_banner_name)
-			os.remove(tmp_profile_file)
 			os.remove(tmp_banner_file)
+			os.remove(tmp_profile_file)
 		except Exception as e:
 			print(e)
 
@@ -432,9 +430,7 @@ class EventSlotsDetails(APIView):
 			if request.user.is_authenticated:
 				page_no = request.GET.get('page',1)
 				event_id = request.GET.get('event_id',None)
-				print(event_id)
 				if event_id:
-					print("here")
 					return self.get_event_slots(event_id, page_no)
 				else:
 					return self.get_creator_slots(request.user.id, page_no)
@@ -446,7 +442,7 @@ class EventSlotsDetails(APIView):
 
 	def get_event_slots(self, event_id, page_no):
 		event = Event.objects.get(id=event_id)
-		available_event_slots = list(event.event_slot.filter(state="available", end_time__gt=datetime.now()).order_by('start_time').values('start_time', 'end_time', 'channel_id'))
+		available_event_slots = list(event.event_slot.filter(state="available", end_time__gt=datetime.now()).order_by('start_time').values('start_time', 'end_time', 'channel_id','id'))
 		result = get_slots_date_and_time_payload(available_event_slots)
 		paginator = Paginator(result, settings.GET_BOOKINGS_API_PAGE_SIZE)
 		try:
@@ -462,8 +458,7 @@ class EventSlotsDetails(APIView):
 		event_slots_df = pd.DataFrame.from_records(event_slots)
 		result = []
 		if not event_slots_df.empty:
-			#ask for slot which have payment success
-			event_booked_slots = EventBooking.objects.filter(event_slot_id__in=event_slots_df['id'].unique()).values('event_slot_id', 'user_id')
+			event_booked_slots = EventBooking.objects.filter(event_slot_id__in=event_slots_df['id'].unique(),state="booked",payment_status="success").values('event_slot_id', 'user_id')
 			event_booked_slots_df = pd.DataFrame.from_records(event_booked_slots)
 			final_df = event_slots_df
 			if not event_booked_slots_df.empty:
@@ -522,24 +517,23 @@ class EventBookingDetails(APIView):
 		try:
 			if request.user.is_authenticated:
 				page_no = request.GET.get('page',1)
-				event_bookings = list(EventBooking.objects.filter(user_id=request.user.id).values('event_id', 'event_slot_id'))
+				event_bookings = list(EventBooking.objects.filter(user_id=request.user.id).values('event_id', 'event_slot_id','payment_status','state'))
 				event_booking_ids = [value['event_id'] for value in event_bookings]
 				user_booking_slot_ids = [value['event_slot_id'] for value in event_bookings]
 				events = Event.objects.filter(id__in=event_booking_ids).values('id','title','thumbnail_img_url')
-				event_slots = EventSlot.objects.filter(id__in=user_booking_slot_ids).values('start_time','end_time', 'id','event_id','channel_id')
+				event_slots = EventSlot.objects.filter(id__in=user_booking_slot_ids).values('start_time','end_time', 'id','event_id','channel_id','state')
 
 				result = []
-				print(event_bookings)
 				if event_bookings:
 					events_df = pd.DataFrame.from_records(events)
 					event_slot_df = pd.DataFrame.from_records(event_slots).drop(['id'], axis=1)
 					event_booking_df = pd.DataFrame.from_records(event_bookings)
-
 					final_df = pd.merge(pd.merge(events_df,event_slot_df,left_on='id',right_on='event_id'),event_booking_df,on='event_id')
 					final_df = update_event_slot_status(final_df)
 					final_df.drop(['event_id'], axis=1, inplace=True)
 					final_df['channel_url'] = settings.BOOKING_SLOT_URL+final_df['channel_id']
 					final_df = final_df.replace({"event_status": booking_options})
+					final_df = final_df.rename(columns={'state_x': 'event_slot_status', 'state_y': 'event_booking_status', 'event_status': 'session_state'})
 					result = final_df.to_dict('records')
 					paginator = Paginator(result, settings.GET_BOOKINGS_API_PAGE_SIZE)
 					try:
@@ -554,17 +548,22 @@ class EventBookingDetails(APIView):
 		try:
 			if request.user.is_authenticated:
 				event_slot_id = request.POST.get('event_slot_id', None)
-				event_slot = list(EventSlot.objects.filter(pk=event_slot_id).values('start_time', 'id', 'end_time', 'event_id','channel_id'))
+				name = request.POST.get('name',None)
+				if name:
+					UserProfile.objects.filter(user_id=request.user.id).update(name=name)
+				event_slot = list(EventSlot.objects.filter(pk=event_slot_id).values('start_time', 'end_time', 'event_id','channel_id'))
 				if event_slot:
 					event_id = event_slot[0]['event_id']
-					already_booked = EventBooking.objects.filter(Q(user_id=request.user.id, event_id=event_id) | Q(event_slot_id=event_slot_id))
+					already_booked = EventBooking.objects.filter(user_id=request.user.id, event_slot_id=event_slot_id, state="booked",payment_status="success")
 					if not already_booked:
-						EventBooking(user_id=request.user.id, event_id=event_id, event_slot_id=event_slot_id).save()
+						event_booking = EventBooking(user_id=request.user.id, event_id=event_id, event_slot_id=event_slot_id)
+						event_booking.save()
 						event_count = EventBooking.objects.filter(event_id=event_id).count()
 						result = {}
 						result['message'] = 'You have successfully booked this session'
 						event_slot[0]['channel_url'] = settings.BOOKING_SLOT_URL+event_slot[0]['channel_id']
 						result['data'] = event_slot[0]
+						result['data']['id'] = event_booking.id
 						result['count'] = event_count
 						return JsonResponse(result, status=status.HTTP_200_OK)
 					else:

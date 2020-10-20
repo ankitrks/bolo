@@ -430,15 +430,12 @@ def upload_event_media(event_id, promo_profile_pic, promo_banner, profile_pic_na
         booking = Event.objects.filter(pk=event_id)
         if promo_profile_pic:
             profile_pic_img_url = upload_media(promo_profile_pic, profile_pic_name, key)
-            os.remove(promo_profile_pic)
         if promo_banner:
             banner_img_url = upload_media(promo_banner, promo_banner_name, key)
-            os.remove(promo_banner)
         if banner_img_url:
             thumbnail_img_url = get_thumbnail_url(banner_img_url,key)
         booking.update(banner_img_url = banner_img_url, thumbnail_img_url=thumbnail_img_url, profile_pic_img_url=profile_pic_img_url)
     except Exception as e:
-        booking.update(banner_img_url = banner_img_url, thumbnail_img_url=thumbnail_img_url, profile_pic_img_url=profile_pic_img_url)
         print(e)
 
 if __name__ == '__main__':
