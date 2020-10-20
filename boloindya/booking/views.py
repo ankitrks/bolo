@@ -249,6 +249,8 @@ def upload_media(media_file, file_name, key):
 		final_filename = str(urlify(filenameNext[0]))+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[1])
 		client.put_object(Bucket=settings.BOLOINDYA_AWS_IN_BUCKET_NAME, Key=key + final_filename, Body=media_file, ACL='public-read')
 		filepath = 'https://s3.ap-south-1.amazonaws.com/' + settings.BOLOINDYA_AWS_IN_BUCKET_NAME + "/"+ key + final_filename
+		if os.path.exists(media_file):
+			os.remove(media_file)
 		return filepath
 	except Exception as e:
 		print(e)
@@ -410,11 +412,12 @@ class EventDetails(APIView):
 				with default_storage.open(promo_banner.name, 'wb+') as destination:
 					for chunk in promo_banner.chunks():
 						destination.write(chunk)
+				print(path)
 				tmp_banner_file = os.path.join(settings.MEDIA_ROOT, path)
 				promo_banner_name = promo_banner.name
 			upload_event_media.delay(event_id, tmp_profile_file, tmp_banner_file, promo_profile_pic_name, promo_banner_name)
-			os.remove(tmp_profile_file)
 			os.remove(tmp_banner_file)
+			os.remove(tmp_profile_file)
 		except Exception as e:
 			print(e)
 
