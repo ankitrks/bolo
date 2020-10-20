@@ -247,7 +247,7 @@ def upload_media(media_file, file_name, key):
 		media_file_name = remove_extra_char(str(file_name))
 		filenameNext= media_file_name.split('.')
 		final_filename = str(urlify(filenameNext[0]))+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[1])
-		client.put_object(Bucket=settings.BOLOINDYA_AWS_IN_BUCKET_NAME, Key=key + final_filename, Body=media_file, ACL='public-read')
+		response = client.upload_file(media_file, settings.BOLOINDYA_AWS_IN_BUCKET_NAME,key + final_filename)
 		filepath = 'https://s3.ap-south-1.amazonaws.com/' + settings.BOLOINDYA_AWS_IN_BUCKET_NAME + "/"+ key + final_filename
 		if os.path.exists(media_file):
 			os.remove(media_file)
