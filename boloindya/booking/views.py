@@ -361,6 +361,7 @@ class EventDetails(APIView):
 			event_slots_df['end_time'] = event_slots_df['end_time'].dt.date
 			final_df = pd.merge(event_df, event_slots_df, left_on='id', right_on='event_id')
 			final_df.drop(['event_id'], axis=1, inplace=True)
+
 			result = final_df.to_dict('records')
 			if result:
 				[value.update({"slots":[{"start_time": value['start_time'], "end_time": value['end_time']}]}) for value in result]
@@ -405,15 +406,14 @@ class EventDetails(APIView):
 				with default_storage.open(promo_profile_pic.name, 'wb+') as destination:
 					for chunk in promo_profile_pic.chunks():
 						destination.write(chunk)
-				tmp_profile_file = os.path.join(settings.MEDIA_ROOT, path)
+				tmp_profile_file = os.path.join(settings.TEMP_UPLOAD_FILE_PATH, path)
 				promo_profile_pic_name = promo_profile_pic.name
 			if promo_banner:
 				path = default_storage.save(promo_banner.name, ContentFile(promo_banner.read()))
 				with default_storage.open(promo_banner.name, 'wb+') as destination:
 					for chunk in promo_banner.chunks():
 						destination.write(chunk)
-				print(path)
-				tmp_banner_file = os.path.join(settings.MEDIA_ROOT, path)
+				tmp_banner_file = os.path.join(settings.TEMP_UPLOAD_FILE_PATH, path)
 				promo_banner_name = promo_banner.name
 			upload_event_media.delay(event_id, tmp_profile_file, tmp_banner_file, promo_profile_pic_name, promo_banner_name)
 			os.remove(tmp_banner_file)
@@ -535,17 +535,19 @@ class EventBookingDetails(APIView):
 				name = request.POST.get('name',None)
 				if name:
 					UserProfile.objects.filter(user_id=request.user.id).update(name=name)
-				event_slot = list(EventSlot.objects.filter(pk=event_slot_id).values('start_time', 'id', 'end_time', 'event_id','channel_id'))
+				event_slot = list(EventSlot.objects.filter(pk=event_slot_id).values('start_time', 'end_time', 'event_id','channel_id'))
 				if event_slot:
 					event_id = event_slot[0]['event_id']
 					already_booked = EventBooking.objects.filter(user_id=request.user.id, event_slot_id=event_slot_id, state="booked",payment_status="success")
 					if not already_booked:
-						EventBooking(user_id=request.user.id, event_id=event_id, event_slot_id=event_slot_id).save()
+						event_booking = EventBooking(user_id=request.user.id, event_id=event_id, event_slot_id=event_slot_id)
+						event_booking.save()
 						event_count = EventBooking.objects.filter(event_id=event_id).count()
 						result = {}
 						result['message'] = 'You have successfully booked this session'
 						event_slot[0]['channel_url'] = settings.BOOKING_SLOT_URL+event_slot[0]['channel_id']
 						result['data'] = event_slot[0]
+						result['data']['id'] = event_booking.id
 						result['count'] = event_count
 						return JsonResponse(result, status=status.HTTP_200_OK)
 					else:
