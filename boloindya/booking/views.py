@@ -505,10 +505,14 @@ class BookingPaymentRedirectView(RedirectView):
 		print "request data", self.request.resolver_match.kwargs
 		booking_id = self.request.resolver_match.kwargs.get('booking_id')
 		booking = EventBooking.objects.select_related('event').get(id=booking_id)
+
+		booking.payment_status = 'initiated'
+
 		if not booking.payment_gateway_order_id:
 			order = create_order(booking.event.price, "INR", receipt=booking.booking_number, notes={})
 			booking.payment_gateway_order_id = order.get('id')
-			booking.save()
+
+		booking.save()
 		return '/payment/razorpay/%s/pay?type=booking'%(booking.payment_gateway_order_id)
 
 		

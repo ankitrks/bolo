@@ -60,7 +60,6 @@ def update_booking_payment_status(order_id, payment_status, transaction_id=None)
             UPDATE booking_eventbooking
             SET 
                 payment_status = 'failed'
-                state = 'cancelled'
             WHERE payment_gateway_order_id = %s
             RETURNING id
         """, [order_id])
