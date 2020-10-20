@@ -1,38 +1,51 @@
-<button id="rzp-button1">Pay</button>
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<script>
-var options = {
-    "key": "{{ key }}",
-    "amount": "{{ order.amount }}",
-    "currency": "{{ order.currency }}",
-    "name": "BoloIndya",
-    "description": "Session Booking",
-    "image": "https://example.com/your_logo",
-    "order_id": "{{ order.id }}",
-    "callback_url": "http://localhost:8000/payment/razorpay/callback?type={{ type }}",
-    "prefill": {
-        "name": "Shadab", //"{{ name }}",
-        "email": "shadabmohammad1@gmail.com", //"{{ email }}",
-        "contact": "8273481843" // "{{ mobile }}"
-    },
-    "notes": {
-        "address": "BoloIndya Corporate Office"
-    },
-    "theme": {
-        "color": "#F37254"
-    }
-};
-var rzp1 = new Razorpay(options);
-rzp1.on('payment.failed', function (response){
-        alert(response.error.code);
-        alert(response.error.description);
-        alert(response.error.source);
-        alert(response.error.step);
-        alert(response.error.reason);
-        alert(response.error.metadata);
-});
-document.getElementById('rzp-button1').onclick = function(e){
-    rzp1.open();
-    e.preventDefault();
-}
-</script>
+
+<html>
+    <head>
+        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    </head>
+    <body>
+        <script>
+            var data = {
+                        callback_url: 'http://localhost:8000/payment/razorpay/callback?type={{ type }}',
+                        amount: "{{ order.amount }}",
+                        currency: "{{ order.currency }}",
+                        email: "{{ email }}",
+                        contact: "{{ mobile }}",
+                        notes: {
+                            address: 'Ground Floor, SJR Cyber, Laskar Hosur Road, Bengaluru',
+                        },
+                        order_id: "order_Fr4aaJeoylyvMH", //"{{ order.id }}",
+                    };
+
+
+            var options = {
+                "key": "{{ key }}", // Enter the Key ID generated from the Dashboard
+                "amount": "{{ order.amount }}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                "currency": "{{ order.currency }}",
+                "name": "BoloIndya",
+                "description": "Booking Transaction",
+                "image": "https://www.boloindya.com/media/boloindya_new_logo.png",
+                "order_id": 'order_Fr5PBNsdNi0l43', // "{{ order.id }}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                "callback_url": "http://localhost:8000/payment/razorpay/callback?type={{ type }}",
+                "prefill": {
+                    "name": "{{ name }}",
+                    "email": "{{ email }}",
+                    "contact": "{{ mobile }}"
+                },
+                "notes": {
+                    "address": "BoloIndya Corporate Office"
+                },
+                "theme": {
+                    "color": "#b62927"
+                }
+            };
+            var razorpay = new Razorpay(options);
+            razorpay.on('payment.failed', function (response){
+                    console.log(response)
+            });
+            razorpay.open();
+            
+        </script>
+        
+    </body>
+</html>

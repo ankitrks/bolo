@@ -13,6 +13,7 @@ def dictfetchall(cursor):
 
 def execute_query(query, params):
     cursor = connections['default'].cursor()
+    print "query", cursor.mogrify(query, params)
     cursor.execute(query, params)
     return dictfetchall(cursor)
 

@@ -29,6 +29,8 @@ import boto3
 import json
 import os
 
+from payment.razorpay import create_order
+
 class BookingDetails(APIView):
 	def get(self, request, *args, **kwargs):
 		try:
@@ -508,6 +510,10 @@ class BookingPaymentRedirectView(RedirectView):
 		print "request data", self.request.resolver_match.kwargs
 		booking_id = self.request.resolver_match.kwargs.get('booking_id')
 		booking = EventBooking.objects.select_related('event').get(id=booking_id)
+		if not booking.payment_gateway_order_id:
+			order = create_order(booking.event.price, "INR", receipt=booking.booking_number, notes={})
+			booking.payment_gateway_order_id = order.id
+			booking.save()
 		return '/payment/razorpay/%s/pay?type=booking'%(booking.payment_gateway_order_id)
 
 		
