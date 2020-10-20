@@ -406,18 +406,18 @@ class EventDetails(APIView):
 				with default_storage.open(promo_profile_pic.name, 'wb+') as destination:
 					for chunk in promo_profile_pic.chunks():
 						destination.write(chunk)
-				tmp_profile_file = os.path.join(settings.TEMP_UPLOAD_FILE_PATH, path)
+				tmp_profile_file = os.path.join(settings.MEDIA_ROOT, path)
 				promo_profile_pic_name = promo_profile_pic.name
 			if promo_banner:
 				path = default_storage.save(promo_banner.name, ContentFile(promo_banner.read()))
 				with default_storage.open(promo_banner.name, 'wb+') as destination:
 					for chunk in promo_banner.chunks():
 						destination.write(chunk)
-				tmp_banner_file = os.path.join(settings.TEMP_UPLOAD_FILE_PATH, path)
+				tmp_banner_file = os.path.join(settings.MEDIA_ROOT, path)
 				promo_banner_name = promo_banner.name
 			upload_event_media.delay(event_id, tmp_profile_file, tmp_banner_file, promo_profile_pic_name, promo_banner_name)
-			os.remove(tmp_banner_file)
-			os.remove(tmp_profile_file)
+			# os.remove(tmp_banner_file)
+			# os.remove(tmp_profile_file)
 		except Exception as e:
 			print(e)
 
