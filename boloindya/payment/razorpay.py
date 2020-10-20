@@ -22,6 +22,15 @@ def get_receipt():
 
 def get_auth():
     return (USERNAME, PASSWORD)
+
+
+def razorpay_get(url):
+    response = requests.get(url, auth=get_auth())
+
+    if response.ok:
+        return response.json()
+    else:
+        print response.text
     
 
 def create_order(amount, currency="INR", receipt=None, notes=None):
@@ -49,7 +58,10 @@ def get_order(order_id):
         return response.json()
     else:
         print response.text
-    
+
+def get_order_payments(order_id):
+    url = ''.join([BASE_URL, '/orders/', order_id, '/payments'])
+    return razorpay_get(url)
 
 
 def is_signature_verified(order_id, payment_id, signature):
