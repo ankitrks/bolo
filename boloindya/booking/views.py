@@ -551,7 +551,7 @@ class EventBookingDetails(APIView):
 					final_df.drop(['event_id_y','id'], axis=1, inplace=True)
 					final_df['channel_url'] = settings.BOOKING_SLOT_URL+final_df['channel_id']
 					final_df = final_df.replace({"event_status": booking_options})
-					final_df = final_df.rename(columns={'state_x': 'event_slot_status', 'state_y': 'event_booking_status', 'event_status': 'session_state', 'id_x': 'id', 'event_id_x':'event_id'})
+					final_df = final_df.rename(columns={'state_x': 'event_booking_status', 'state_y': 'event_slot_status', 'event_status': 'session_state', 'id_x': 'id', 'event_id_x':'event_id'})
 					result = final_df.to_dict('records')
 					paginator = Paginator(result, settings.GET_BOOKINGS_API_PAGE_SIZE)
 					try:
