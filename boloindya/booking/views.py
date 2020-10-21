@@ -16,6 +16,7 @@ from rest_framework.views import APIView
 
 from forum.user.models import UserProfile
 from forum.topic.models import TongueTwister
+from forum.user.utils.bolo_redis import get_userprofile_counter
 from .serializers import BookingSerializer, PayOutConfigSerializer
 from .models import *
 from .utils import booking_options
@@ -376,11 +377,13 @@ class EventDetails(APIView):
 		return JsonResponse({'message': 'success', 'data':  result}, status=status.HTTP_200_OK)
 
 	def get_event_list(self, page_no):
-		events = Event.objects.filter(is_approved=True, is_active = True).order_by('id').values('id', 'title', 'thumbnail_img_url', 'banner_img_url', 'profile_pic_img_url','price', 'description')
+		events = Event.objects.filter(is_approved=True, is_active = True).values('id', 'title', 'thumbnail_img_url', 'banner_img_url', 'profile_pic_img_url','price', 'description', 'creator_id')
 		events_df = pd.DataFrame.from_records(events)
 		result = []
 		if not events_df.empty:
+			events_df['followers_count'] = events_df['creator_id'].apply(lambda user_id: get_userprofile_counter(user_id)['follower_count'])
 			event_slots_df = pd.DataFrame.from_records(EventSlot.objects.all().values('start_time','end_time','event_id','state'))
+			events_df = events_df.sort_values(by=['followers_count'], ascending=False)
 			if not event_slots_df.empty:
 				#fetch available slots event only
 				available_slots_event_ids = event_slots_df.groupby(by=["state"])['event_id'].unique().reset_index()
