@@ -6,24 +6,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment Confirmation</title>
     <style>
+        .payment-body{
+            background: #100B20;
+            color: white;
+            font-family: Avenir;
+            font-style: normal;
+        }
 
+        img-center {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .center {
+            text-align: center;
+        }
+
+        .payment-header{
+            height: 50px;
+            background: #B62827;
+            line-height: 50px;
+            align-items: center;
+            text-align: center;
+        }
+        div{
+            margin-bottom: 30px;
+        }
+        .flexbox{
+            display: flex;
+        }
+        .success-icon{
+            height: 19px;
+            margin-left: 10px;
+            margin-right: 10px
+        }
+        .banner-image{
+            height: 250px
+        }
+        .text{
+            margin-left: 20px
+        }
+        .confirmation-text{
+            font-weight: 600;
+        }
+        .redirect-image{
+            height: 30px
+        }
     </style>
 </head>
-<body>
-    <div>
-        <img src="/media/img/payment/success_banner.png" alt="">
+<body class="payment-body">
+    <div class="payment-header">
+        Payment Confirmation
     </div>
-    <div>
-        <span>Your payment is confirmed</span>
-        <img src="/media/img/payment/success_icon.png" >
-    </div
-    <div>
+    <div class="center">
+        <img class="banner-image" src="/media/img/payment/success_banner.png" alt="">
+    </div>
+    <div class="flexbox text confirmation-text">
+        <span class="">Your payment is confirmed</span>
+        <img class="success-icon" src="/media/img/payment/success_icon.png" >
+    </div>
+    <div class="text">
         <p>
-            Morbi et blandit urna. Nam malesuada quam in ultricies finibus. Aliquam sit amet condimentum felis. Ut mauris sapien, luctus ac sodales id, placerat a libero. Vestibulum et risus arcu. Donec eget vehicula dui. Aliquam a scelerisque quam. Curabitur pellentesque lacus vitae purus ultricies, quis pellentesque odio fermentum. Nam at vehicula enim, ac convallis nisl.
+            Morbi et blandit urna. Nam malesuada quam in ultricies finibus. Aliquam sit amet condimentum felis. Ut mauris sapien, luctus ac sodales id, placerat a libero. Vestibulum et risus arcu. Donec eget vehicula dui. Aliquam a scelerisque quam.
         </p>
     </div>
-    <div>
-        <a href="/bookings/" ><img src="/media/img/payment/check_booking_button.png" ></a>
+    <div class="center">
+        <a href="/bookings/" ><img  class="redirect-image" src="/media/img/payment/check_booking_button.png" ></a>
     </div>
 </body>
 </html>
