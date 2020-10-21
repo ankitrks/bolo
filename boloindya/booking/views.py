@@ -386,13 +386,12 @@ class EventDetails(APIView):
 			events_df = events_df.sort_values(by=['followers_count'], ascending=False)
 			if not event_slots_df.empty:
 				#fetch available slots event only
-				available_slots_event_ids = event_slots_df.groupby(by=["state"])['event_id'].unique().reset_index()
-				available_slots_event_ids = available_slots_event_ids[available_slots_event_ids['state']=="available"]
-				available_events = []
-				if not available_slots_event_ids.empty:
-					available_events = available_slots_event_ids['event_id'][0]
+				available_slots_event_df = event_slots_df[(event_slots_df['end_time']>=datetime.now()) & (event_slots_df['state']=="available")]
+				available_events_ids = []
+				if not available_slots_event_df.empty:
+					available_events_ids = available_slots_event_df['event_id'].unique()
 				event_slots_df = event_slots_df.groupby(by=["event_id"]).agg({'start_time': 'min', 'end_time': 'max'})[['start_time','end_time']].reset_index()
-				event_slots_df = event_slots_df[(event_slots_df['end_time']>=datetime.now()) & (event_slots_df['event_id'].isin(available_events))]
+				event_slots_df = event_slots_df[(event_slots_df['end_time']>=datetime.now()) & (event_slots_df['event_id'].isin(available_events_ids))]
 				event_slots_df['start_time'] = event_slots_df['start_time'].dt.date
 				event_slots_df['end_time'] = event_slots_df['end_time'].dt.date
 				final_df = pd.merge(events_df, event_slots_df, left_on='id', right_on='event_id')
