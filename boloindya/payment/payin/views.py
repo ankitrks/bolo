@@ -5,18 +5,19 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 
 from payment.razorpay import get_order, is_signature_verified
 from payment.helpers import get_user_info, get_booking_info, update_booking_payment_status
 
-KEY = "rzp_test_CRX59NwqZqFS8P"
+razorpay_credentials = settings.RAZORPAY
 
 class RazorpayPaymentView(TemplateView):
     template_name = 'payment/payin/booking_payment.html'
 
     def get_context_data(self, **kwargs):
         context = super(RazorpayPaymentView, self).get_context_data(**kwargs)
-        context['key'] = KEY
+        context['key'] = razorpay_credentials.get('USERNAME')
         context['callback_url'] = self.request.META.get('HTTP_HOST') + "/payment/razorpay/callback?type=%s"%self.request.GET.get('type')
         if self.request.GET.get('type') == 'booking':
             booking_info = get_booking_info(self.request.resolver_match.kwargs.get('order_id'))

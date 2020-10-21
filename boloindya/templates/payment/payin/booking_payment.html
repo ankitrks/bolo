@@ -2,6 +2,11 @@
 <html>
     <head>
         <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+        <style>
+            iframe.razorpay-checkout-frame #modal-close{
+                display: none;
+            }
+        </style>
     </head>
     <body>
         <script>
@@ -25,6 +30,11 @@
                 },
                 "theme": {
                     "color": "#b62927"
+                },
+                "modal": {
+                    "ondismiss": function(){
+                        window.location.reload();
+                    }
                 }
             };
             var razorpay = new Razorpay(options);
@@ -32,6 +42,7 @@
                     console.log(response)
             });
             razorpay.open();
+            
             
         </script>
         

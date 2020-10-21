@@ -2,10 +2,11 @@ import requests
 import hmac
 import hashlib
 
-from redis_utils import get_redis, set_redis, incr_redis
+from django.conf import settings
 
-USERNAME = "rzp_test_CRX59NwqZqFS8P"
-PASSWORD = "KvlNmjCSx8DzGbJFhtrk17Un"
+razorpay_credentials = settings.RAZORPAY
+
+from redis_utils import get_redis, set_redis, incr_redis
 
 BASE_URL = "https://api.razorpay.com/v1"
 
@@ -21,7 +22,7 @@ def get_receipt():
 
 
 def get_auth():
-    return (USERNAME, PASSWORD)
+    return (razorpay_credentials.get('USERNAME'), razorpay_credentials.get('PASSWORD'))
 
 
 def razorpay_get(url):
@@ -43,7 +44,7 @@ def create_order(amount, currency="INR", receipt=None, notes=None):
         "notes": notes if notes else {}
     }
     print "post data", post_data
-    response = requests.post(url, data=post_data, auth=(USERNAME, PASSWORD))
+    response = requests.post(url, data=post_data, auth=(razorpay_credentials.get('USERNAME'), razorpay_credentials.get('PASSWORD')))
     if response.ok:
         return response.json()
     else:
@@ -66,7 +67,7 @@ def get_order_payments(order_id):
 
 def is_signature_verified(order_id, payment_id, signature):
     if signature == hmac.new(
-                        PASSWORD, 
+                        razorpay_credentials.get('PASSWORD'), 
                         msg=str(order_id) + "|" + str(payment_id), 
                         digestmod=hashlib.sha256).hexdigest():
         return True
