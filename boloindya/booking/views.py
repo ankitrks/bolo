@@ -16,6 +16,7 @@ from rest_framework.views import APIView
 
 from forum.user.models import UserProfile
 from forum.topic.models import TongueTwister
+from forum.user.utils.bolo_redis import get_userprofile_counter
 from .serializers import BookingSerializer, PayOutConfigSerializer
 from .models import *
 from .utils import booking_options
@@ -376,14 +377,21 @@ class EventDetails(APIView):
 		return JsonResponse({'message': 'success', 'data':  result}, status=status.HTTP_200_OK)
 
 	def get_event_list(self, page_no):
-		events = Event.objects.filter(is_approved=True, is_active = True).order_by('id').values('id', 'title', 'thumbnail_img_url', 'banner_img_url', 'profile_pic_img_url','price', 'description')
+		events = Event.objects.filter(is_approved=True, is_active = True).values('id', 'title', 'thumbnail_img_url', 'banner_img_url', 'profile_pic_img_url','price', 'description', 'creator_id')
 		events_df = pd.DataFrame.from_records(events)
 		result = []
 		if not events_df.empty:
-			event_slots_df = pd.DataFrame.from_records(EventSlot.objects.all().values('start_time','end_time','event_id'))
+			events_df['followers_count'] = events_df['creator_id'].apply(lambda user_id: get_userprofile_counter(user_id)['follower_count'])
+			event_slots_df = pd.DataFrame.from_records(EventSlot.objects.all().values('start_time','end_time','event_id','state'))
+			events_df = events_df.sort_values(by=['followers_count'], ascending=False)
 			if not event_slots_df.empty:
+				#fetch available slots event only
+				available_slots_event_df = event_slots_df[(event_slots_df['end_time']>=datetime.now()) & (event_slots_df['state']=="available")]
+				available_events_ids = []
+				if not available_slots_event_df.empty:
+					available_events_ids = available_slots_event_df['event_id'].unique()
 				event_slots_df = event_slots_df.groupby(by=["event_id"]).agg({'start_time': 'min', 'end_time': 'max'})[['start_time','end_time']].reset_index()
-				event_slots_df = event_slots_df[event_slots_df['end_time']>=datetime.now()]
+				event_slots_df = event_slots_df[(event_slots_df['end_time']>=datetime.now()) & (event_slots_df['event_id'].isin(available_events_ids))]
 				event_slots_df['start_time'] = event_slots_df['start_time'].dt.date
 				event_slots_df['end_time'] = event_slots_df['end_time'].dt.date
 				final_df = pd.merge(events_df, event_slots_df, left_on='id', right_on='event_id')
@@ -543,7 +551,7 @@ class EventBookingDetails(APIView):
 					final_df.drop(['event_id_y','id'], axis=1, inplace=True)
 					final_df['channel_url'] = settings.BOOKING_SLOT_URL+final_df['channel_id']
 					final_df = final_df.replace({"event_status": booking_options})
-					final_df = final_df.rename(columns={'state_x': 'event_slot_status', 'state_y': 'event_booking_status', 'event_status': 'session_state', 'id_x': 'id', 'event_id_x':'event_id'})
+					final_df = final_df.rename(columns={'state_x': 'event_booking_status', 'state_y': 'event_slot_status', 'event_status': 'session_state', 'id_x': 'id', 'event_id_x':'event_id'})
 					result = final_df.to_dict('records')
 					paginator = Paginator(result, settings.GET_BOOKINGS_API_PAGE_SIZE)
 					try:
