@@ -377,10 +377,16 @@ class EventDetails(APIView):
 		events_df = pd.DataFrame.from_records(events)
 		result = []
 		if not events_df.empty:
-			event_slots_df = pd.DataFrame.from_records(EventSlot.objects.all().values('start_time','end_time','event_id'))
+			event_slots_df = pd.DataFrame.from_records(EventSlot.objects.all().values('start_time','end_time','event_id','state'))
 			if not event_slots_df.empty:
+				#fetch available slots event only
+				available_slots_event_ids = event_slots_df.groupby(by=["state"])['event_id'].unique().reset_index()
+				available_slots_event_ids = available_slots_event_ids[available_slots_event_ids['state']=="available"]
+				available_events = []
+				if not available_slots_event_ids.empty:
+					available_events = available_slots_event_ids['event_id'][0]
 				event_slots_df = event_slots_df.groupby(by=["event_id"]).agg({'start_time': 'min', 'end_time': 'max'})[['start_time','end_time']].reset_index()
-				event_slots_df = event_slots_df[event_slots_df['end_time']>=datetime.now()]
+				event_slots_df = event_slots_df[(event_slots_df['end_time']>=datetime.now()) & (event_slots_df['event_id'].isin(available_events))]
 				event_slots_df['start_time'] = event_slots_df['start_time'].dt.date
 				event_slots_df['end_time'] = event_slots_df['end_time'].dt.date
 				final_df = pd.merge(events_df, event_slots_df, left_on='id', right_on='event_id')
