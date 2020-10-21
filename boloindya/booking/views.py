@@ -377,9 +377,10 @@ class EventDetails(APIView):
 		events_df = pd.DataFrame.from_records(events)
 		result = []
 		if not events_df.empty:
-			event_slots_df = pd.DataFrame.from_records(EventSlot.objects.filter(end_time__gt=datetime.now()).values('start_time','end_time','event_id'))
+			event_slots_df = pd.DataFrame.from_records(EventSlot.objects.all().values('start_time','end_time','event_id'))
 			if not event_slots_df.empty:
 				event_slots_df = event_slots_df.groupby(by=["event_id"]).agg({'start_time': 'min', 'end_time': 'max'})[['start_time','end_time']].reset_index()
+				event_slots_df = event_slots_df[event_slots_df['end_time']>=datetime.now()]
 				event_slots_df['start_time'] = event_slots_df['start_time'].dt.date
 				event_slots_df['end_time'] = event_slots_df['end_time'].dt.date
 				final_df = pd.merge(events_df, event_slots_df, left_on='id', right_on='event_id')
@@ -501,7 +502,7 @@ class EventBookingDetails(APIView):
 		try:
 			if request.user.is_authenticated:
 				page_no = request.GET.get('page',1)
-				event_bookings = list(EventBooking.objects.filter(user_id=request.user.id).values('event_id', 'event_slot_id','payment_status','state'))
+				event_bookings = list(EventBooking.objects.filter(user_id=request.user.id).values('event_id', 'event_slot_id','payment_status','state', 'id'))
 				event_booking_ids = [value['event_id'] for value in event_bookings]
 				user_booking_slot_ids = [value['event_slot_id'] for value in event_bookings]
 				events = Event.objects.filter(id__in=event_booking_ids).values('id','title','thumbnail_img_url')
@@ -510,14 +511,17 @@ class EventBookingDetails(APIView):
 				result = []
 				if event_bookings:
 					events_df = pd.DataFrame.from_records(events)
-					event_slot_df = pd.DataFrame.from_records(event_slots).drop(['id'], axis=1)
+					event_slot_df = pd.DataFrame.from_records(event_slots)#.drop(['id'], axis=1)
 					event_booking_df = pd.DataFrame.from_records(event_bookings)
-					final_df = pd.merge(pd.merge(events_df,event_slot_df,left_on='id',right_on='event_id'),event_booking_df,on='event_id')
+
+					event_bookings_merged_df = pd.merge(event_booking_df,events_df,left_on="event_id",right_on="id",how="left")
+					event_bookings_merged_df = event_bookings_merged_df.drop(['id_y'], axis=1)
+					final_df = pd.merge(event_bookings_merged_df, event_slot_df, left_on="event_slot_id", right_on="id",how="left")
 					final_df = update_event_slot_status(final_df)
-					final_df.drop(['event_id'], axis=1, inplace=True)
+					final_df.drop(['event_id_y','id'], axis=1, inplace=True)
 					final_df['channel_url'] = settings.BOOKING_SLOT_URL+final_df['channel_id']
 					final_df = final_df.replace({"event_status": booking_options})
-					final_df = final_df.rename(columns={'state_x': 'event_slot_status', 'state_y': 'event_booking_status', 'event_status': 'session_state'})
+					final_df = final_df.rename(columns={'state_x': 'event_slot_status', 'state_y': 'event_booking_status', 'event_status': 'session_state', 'id_x': 'id', 'event_id_x':'event_id'})
 					result = final_df.to_dict('records')
 					paginator = Paginator(result, settings.GET_BOOKINGS_API_PAGE_SIZE)
 					try:
