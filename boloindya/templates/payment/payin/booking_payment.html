@@ -14,7 +14,7 @@
                 "description": "Booking Transaction",
                 "image": "https://www.boloindya.com/media/boloindya_new_logo.png",
                 "order_id": "{{ order.id }}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-                "callback_url": "/payment/razorpay/callback?type={{ type }}",
+                "callback_url": "{{ callback_url }}",
                 "prefill": {
                     "name": "{{ name }}",
                     "email": "{{ email }}",
