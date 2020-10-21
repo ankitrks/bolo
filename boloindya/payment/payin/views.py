@@ -18,7 +18,7 @@ class RazorpayPaymentView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(RazorpayPaymentView, self).get_context_data(**kwargs)
         context['key'] = razorpay_credentials.get('USERNAME')
-        context['callback_url'] = self.request.META.get('HTTP_HOST') + "/payment/razorpay/callback?type=%s"%self.request.GET.get('type')
+        context['callback_url'] = "https://" + self.request.META.get('HTTP_HOST') + "/payment/razorpay/callback?type=%s"%self.request.GET.get('type')
         if self.request.GET.get('type') == 'booking':
             booking_info = get_booking_info(self.request.resolver_match.kwargs.get('order_id'))
             if booking_info:
@@ -51,7 +51,7 @@ class RazorpayCallbackView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(RazorpayCallbackView, self).get_context_data(**kwargs)
-        context["booking_deeplink_url"] = self.request.META.get('HTTP_HOST') + "/bookings/"
+        context["booking_deeplink_url"] = "https://" + self.request.META.get('HTTP_HOST') + "/bookings/"
         return context
     
 
