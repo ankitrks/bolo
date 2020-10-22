@@ -272,15 +272,12 @@ class PayOutConfigDetails(APIView):
 class EventDetails(APIView):
 	def get(self, request, *args, **kwargs):
 		try:
-			if request.user.is_authenticated:
-				event_id = request.GET.get('event_id',None)
-				if event_id:
-					return self.get_event_detail(event_id)
-				else:
-					page_no = request.GET.get('page',1)
-					return self.get_event_list(page_no)	
+			event_id = request.GET.get('event_id',None)
+			if event_id:
+				return self.get_event_detail(event_id)
 			else:
-				return JsonResponse({'message':'Unauthorised User'}, status=status.HTTP_401_UNAUTHORIZED)
+				page_no = request.GET.get('page',1)
+				return self.get_event_list(page_no)
 		except Exception as e:
 			print(e)
 			return JsonResponse({'message': str(e), 'data':{}}, status=status.HTTP_400_BAD_REQUEST)
@@ -450,15 +447,11 @@ class EventSlotsDetails(APIView):
 			return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 	def get_event_slots(self, event_id, page_no):
-		event = Event.objects.get(id=event_id)
-		available_event_slots = list(event.event_slot.filter(state="available", end_time__gt=datetime.now()).order_by('start_time').values('start_time', 'end_time', 'channel_id','id'))
-		result = get_slots_date_and_time_payload(available_event_slots)
-		paginator = Paginator(result, settings.GET_EVENT_SLOT_API_PAGE_SIZE)
+		available_event_slots = list(EventSlot.objects.filter(event_id=event_id, state="available", end_time__gt=datetime.now()).order_by('start_time').values('start_time', 'end_time', 'channel_id','id'))
 		try:
-			result = paginator.page(page_no).object_list
+			result = get_slots_date_and_time_payload(available_event_slots, page_no)
 		except:
 			result = []
-
 		return JsonResponse({'message': 'success', 'data': result}, status=status.HTTP_200_OK)
 
 	def get_creator_slots(self, user_id, page_no):
@@ -489,7 +482,9 @@ class EventSlotsDetails(APIView):
 						result = []
 		return JsonResponse({'message': 'success', 'data':  result}, status=status.HTTP_200_OK)
 
-def get_slots_date_and_time_payload(booking_slots):
+def get_slots_date_and_time_payload(booking_slots,page_no):
+		start_index = (int(page_no)-1)*settings.GET_EVENT_SLOT_API_PAGE_SIZE
+		end_index = start_index + settings.GET_EVENT_SLOT_API_PAGE_SIZE - 1
 		booking_slots_df = pd.DataFrame.from_records(booking_slots)
 		slots = []
 		if not booking_slots_df.empty:
@@ -498,13 +493,13 @@ def get_slots_date_and_time_payload(booking_slots):
 			booking_slots_df['start_time'] = booking_slots_df['start_time'].dt.strftime('%H:%M:%S').astype(str)
 			booking_slots_df['end_time'] = booking_slots_df['end_time'].dt.strftime('%H:%M:%S').astype(str)
 			booking_slots_df['channel_url'] = settings.BOOKING_SLOT_URL+booking_slots_df['channel_id']
-			for date in unique_dates:
-				new_slots = {}
-				temp = booking_slots_df[booking_slots_df['date']==date]
-				temp.drop(['date'], axis=1, inplace=True)
-				new_slots['date'] = date
-				new_slots['time'] = temp.to_dict('records')
-				slots.append(new_slots)
+		for date in unique_dates[start_index:end_index+1]:
+			new_slots = {}
+			temp = booking_slots_df[booking_slots_df['date']==date]
+			temp.drop(['date'], axis=1, inplace=True)
+			new_slots['date'] = date
+			new_slots['time'] = temp.to_dict('records')
+			slots.append(new_slots)
 		return slots
 
 
