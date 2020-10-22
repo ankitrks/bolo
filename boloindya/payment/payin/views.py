@@ -18,7 +18,7 @@ class RazorpayPaymentView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(RazorpayPaymentView, self).get_context_data(**kwargs)
         context['key'] = razorpay_credentials.get('USERNAME')
-        context['callback_url'] = "https://" + self.request.META.get('HTTP_HOST') + "/payment/razorpay/callback?type=%s"%self.request.GET.get('type')
+        context['callback_url'] = "/payment/razorpay/callback?type=%s"%self.request.GET.get('type')
         if self.request.GET.get('type') == 'booking':
             booking_info = get_booking_info(self.request.resolver_match.kwargs.get('order_id'))
             if booking_info:
@@ -35,9 +35,11 @@ class RazorpayPaymentView(TemplateView):
 
 class RazorpayCallbackView(TemplateView):
     template_name = 'payment/payin/payment_success.html'
+    failed_template_name = 'payment/payin/payment_failed.html'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
+        self.is_payment_success = False
         return super(RazorpayCallbackView, self).dispatch(*args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -45,16 +47,21 @@ class RazorpayCallbackView(TemplateView):
         print "request post,data", request.POST
         data = request.POST
         if is_signature_verified(data.get('razorpay_order_id'), data.get('razorpay_payment_id'), data.get('razorpay_signature')):
+            self.is_payment_success = True
             if self.request.GET.get('type') == 'booking':
                 update_booking_payment_status(data.get('razorpay_order_id'), 'success', data.get('razorpay_payment_id'))
-                return self.render_to_response({})
+                return self.render_to_response(self.get_context_data(**kwargs))
 
     def get_context_data(self, **kwargs):
         context = super(RazorpayCallbackView, self).get_context_data(**kwargs)
         context["booking_deeplink_url"] = "https://" + self.request.META.get('HTTP_HOST') + "/bookings/"
         return context
     
-
+    def get_template_names(self):
+        if self.is_payment_success:
+            return [self.template_name]
+        else:
+            return [self.failed_template_name]
 
 class RazorpayWebhookView(TemplateView):
     @method_decorator(csrf_exempt)
