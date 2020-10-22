@@ -490,12 +490,11 @@ def get_slots_date_and_time_payload(booking_slots,page_no):
 			booking_slots_df['start_time'] = booking_slots_df['start_time'].dt.strftime('%H:%M:%S').astype(str)
 			booking_slots_df['end_time'] = booking_slots_df['end_time'].dt.strftime('%H:%M:%S').astype(str)
 			booking_slots_df['channel_url'] = settings.BOOKING_SLOT_URL+booking_slots_df['channel_id']
+		booking_slots_df_group = booking_slots_df.groupby('date')
 		for date in unique_dates[start_index:end_index+1]:
 			new_slots = {}
-			temp = booking_slots_df[booking_slots_df['date']==date]
-			temp.drop(['date'], axis=1, inplace=True)
+			new_slots['time'] = booking_slots_df_group.get_group(date).to_dict('records')
 			new_slots['date'] = date
-			new_slots['time'] = temp.to_dict('records')
 			slots.append(new_slots)
 		return slots
 
