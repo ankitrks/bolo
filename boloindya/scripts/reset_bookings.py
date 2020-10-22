@@ -59,8 +59,8 @@ def run():
         WHERE 
             booking.state = 'draft' AND 
             booking.payment_status != 'success' AND
-            slot.state = 'hold'
-            OR true
+            slot.state = 'hold' AND
+            booking.created_at < now() - interval '12 minutes'
     """, [])
 
     pool = Pool(processes=8)
