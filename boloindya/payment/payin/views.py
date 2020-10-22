@@ -50,7 +50,9 @@ class RazorpayCallbackView(TemplateView):
             self.is_payment_success = True
             if self.request.GET.get('type') == 'booking':
                 update_booking_payment_status(data.get('razorpay_order_id'), 'success', data.get('razorpay_payment_id'))
-                return self.render_to_response(self.get_context_data(**kwargs))
+            
+        return self.render_to_response(self.get_context_data(**kwargs))
+
 
     def get_context_data(self, **kwargs):
         context = super(RazorpayCallbackView, self).get_context_data(**kwargs)
