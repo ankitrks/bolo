@@ -453,7 +453,7 @@ class EventSlotsDetails(APIView):
 		event = Event.objects.get(id=event_id)
 		available_event_slots = list(event.event_slot.filter(state="available", end_time__gt=datetime.now()).order_by('start_time').values('start_time', 'end_time', 'channel_id','id'))
 		result = get_slots_date_and_time_payload(available_event_slots)
-		paginator = Paginator(result, settings.GET_BOOKINGS_API_PAGE_SIZE)
+		paginator = Paginator(result, settings.GET_EVENT_SLOT_API_PAGE_SIZE)
 		try:
 			result = paginator.page(page_no).object_list
 		except:
