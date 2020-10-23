@@ -13,10 +13,11 @@ from payment.razorpay import get_order_payments
 from payment.helpers import execute_query
 
 def update_booking_state(slot_id, booking_id, order_id):
-    order_status = get_order_payments(order_id)
-    for payment in order_status.get('items'):
-        if payment.get('status') == 'captured':
-            return {'status': 'paid', 'transaction_id': payment.get('id'), 'args': (slot_id, booking_id, order_id)}
+    if order_id:
+        order_status = get_order_payments(order_id)
+        for payment in order_status.get('items'):
+            if payment.get('status') == 'captured':
+                return {'status': 'paid', 'transaction_id': payment.get('id'), 'args': (slot_id, booking_id, order_id)}
     return {'status': 'failed', 'args': (slot_id, booking_id, order_id)}
 
 def update_paid_bookings(payment_info_list):
