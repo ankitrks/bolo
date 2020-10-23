@@ -537,7 +537,6 @@ class EventBookingDetails(APIView):
 					events_df = pd.DataFrame.from_records(events)
 					event_slot_df = pd.DataFrame.from_records(event_slots)#.drop(['id'], axis=1)
 					event_booking_df = pd.DataFrame.from_records(event_bookings)
-
 					event_bookings_merged_df = pd.merge(event_booking_df,events_df,left_on="event_id",right_on="id",how="left")
 					event_bookings_merged_df = event_bookings_merged_df.drop(['id_y'], axis=1)
 					final_df = pd.merge(event_bookings_merged_df, event_slot_df, left_on="event_slot_id", right_on="id",how="left")
@@ -591,6 +590,6 @@ class EventBookingDetails(APIView):
 
 
 def update_event_slot_status(slots_df):
-	slots_df['event_status'] = np.where(slots_df['end_time']<datetime.now(), '2', '0')
 	slots_df['event_status'] = np.where((slots_df['start_time']<=datetime.now())&(slots_df['end_time']>=datetime.now()), '1', '0')
+	slots_df['event_status'] = np.where(slots_df['end_time']<datetime.now(), '2', slots_df.event_status)
 	return slots_df

@@ -42,7 +42,10 @@ def update_paid_bookings(payment_info_list):
         RETURNING booking.id
     """, [tuple([value.get('booking_id') for value in payment_info_list])])
 
-def update_failed_bookings(slot_ids):
+def update_failed_bookings(booking_info):
+    slot_ids = [value.get('slot_id') for value in booking_info]
+    booking_ids = [value.get('booking_id') for value in booking_info]
+
     execute_query("""
         UPDATE booking_eventslot
         SET 
@@ -50,6 +53,15 @@ def update_failed_bookings(slot_ids):
         WHERE id in %s
         RETURNING id
     """, [tuple(slot_ids)])
+
+    execute_query("""
+        UPDATE booking_eventbooking
+        SET 
+            payment_status = 'failed',
+            state = 'cancelled'
+        WHERE id in %s
+        RETURNING id;
+    """, [tuple(booking_ids)])
 
 def run():
     pending_bookings = execute_query("""
@@ -86,7 +98,8 @@ def run():
                 'booking_id': resp.get('args')[1]
             })
         else:
-            failed_bookings.append(resp.get('args')[0])
+            failed_bookings.append({'slot_id': resp.get('args')[0],
+                                    'booking_id': resp.get('args')[1]})
 
     print "paid bookings", paid_bookings
     print "failed booking", failed_bookings
