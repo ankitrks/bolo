@@ -509,6 +509,9 @@ class BookingPaymentRedirectView(RedirectView):
 		booking_id = self.request.resolver_match.kwargs.get('booking_id')
 		booking = EventBooking.objects.select_related('event').get(id=booking_id)
 
+		if booking.state=="cancelled" and booking.payment_status=="failed":
+			return 'payment/payin/payment_failed.html'
+
 		booking.payment_status = 'initiated'
 		booking.event_slot.state = 'hold'
 		booking.event_slot.save()
