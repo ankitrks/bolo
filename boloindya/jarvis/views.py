@@ -3555,3 +3555,31 @@ def event_list(request):
 
     return render(request,'jarvis/pages/events/boloindya_events.html', {'event_list': event_list[page*10:page*10+10],\
         'page_no': page_no, 'total_page': total_page})
+
+def event_update(request):
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
+        event_id = request.POST.get('event_id',None)
+        approve_toggle_value = request.POST.get('approve_toggle_value',None)
+        active_toggle_value = request.POST.get('active_toggle_value',None)
+        if event_id:
+            if approve_toggle_value:
+                is_approved = None
+                if approve_toggle_value=='true':
+                    is_approved = True
+                elif approve_toggle_value == 'false':
+                    is_approved = False
+                Event.objects.filter(pk=event_id).update(is_approved=is_approved)
+            elif active_toggle_value:
+                is_active = None
+                if active_toggle_value=='true':
+                    is_active = True
+                elif active_toggle_value == 'false':
+                    is_active = False
+                Event.objects.filter(pk=event_id).update(is_active=is_active)
+            else:
+                return JsonResponse({'error':'Something went wrong!','message':'fail' }, status=status.HTTP_200_OK)
+            return JsonResponse({'sucess':'event updated','message':'success' }, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'error':'event_id not found','message':'fail' }, status=status.HTTP_200_OK)
+    else:
+        return JsonResponse({'error':'User Not Authorised','message':'fail' }, status=status.HTTP_200_OK)

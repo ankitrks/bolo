@@ -106,4 +106,5 @@ urlpatterns = [
     url(r'^coupon_list/$',CouponDatableList.as_view()),
     url(r'^coupon_pannel/$', views.coupon_list_datable),
     url(r'^event_bookings/$',views.event_list),
+    url(r'^event/update/$', views.event_update)
 ]
