@@ -510,7 +510,7 @@ class BookingPaymentRedirectView(RedirectView):
 		booking = EventBooking.objects.select_related('event').get(id=booking_id)
 
 		if booking.state=="cancelled" and booking.payment_status=="failed":
-			return 'payment/payin/payment_failed.html'
+			return '/payment/payment_failed'
 
 		booking.payment_status = 'initiated'
 		booking.event_slot.state = 'hold'
@@ -521,7 +521,7 @@ class BookingPaymentRedirectView(RedirectView):
 			booking.payment_gateway_order_id = order.get('id')
 
 		booking.save()
-		return '/payment/razorpay/%s/pay?type=booking'%(booking.payment_gateway_order_id)
+		return '/payment/razorpay/%s/pay?type=booking&booking_id=%s'%(booking.payment_gateway_order_id,booking.id)
 
 		
 class EventBookingDetails(APIView):

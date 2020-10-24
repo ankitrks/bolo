@@ -43,7 +43,12 @@
             });
             razorpay.open();
             
-            
+            redirectTime = "{{ payment_timeout }}";
+            redirectURL = "{{ payment_retry_url }}";
+            function timedRedirect() {
+                setTimeout("location.href = redirectURL;",redirectTime);
+            }
+            timedRedirect()
         </script>
         
     </body>

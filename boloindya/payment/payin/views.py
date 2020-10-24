@@ -19,17 +19,17 @@ class RazorpayPaymentView(TemplateView):
         context = super(RazorpayPaymentView, self).get_context_data(**kwargs)
         context['key'] = razorpay_credentials.get('USERNAME')
         context['callback_url'] = "/payment/razorpay/callback?type=%s"%self.request.GET.get('type')
+        context['payment_retry_url'] = "http://" + self.request.META.get('HTTP_HOST') + "/booking/"+ self.request.GET.get('booking_id')+ "/pay"
+        context['payment_timeout'] = settings.PAYMENT_FAILURE_TIMEOUT
         if self.request.GET.get('type') == 'booking':
             booking_info = get_booking_info(self.request.resolver_match.kwargs.get('order_id'))
             if booking_info:
                 booking_info = booking_info[0]
-            print("booking_info", booking_info)
             context['order'] = get_order(booking_info.get('order_id'))
             
             context['name'] = booking_info.get('name')
             context['email'] = booking_info.get('email')
             context['mobile'] = booking_info.get('mobile')
-            
         return context
 
 
@@ -73,3 +73,6 @@ class RazorpayWebhookView(TemplateView):
     def post(self, request, *args, **kwargs):
         print "request get data", request.GET
         print "request post,data", request.POST
+
+class PaymentFaliureView(TemplateView):
+    template_name = "payment/payin/payment_failed.html"
