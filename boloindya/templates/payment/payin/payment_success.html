@@ -1,0 +1,77 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Confirmation</title>
+    <style>
+        .payment-body{
+            background: #100B20;
+            color: white;
+            font-family: Avenir;
+            font-style: normal;
+        }
+
+        img-center {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .center {
+            text-align: center;
+        }
+
+        .payment-header{
+            height: 50px;
+            background: #B62827;
+            line-height: 50px;
+            align-items: center;
+            text-align: center;
+        }
+        div{
+            margin-bottom: 30px;
+        }
+        .flexbox{
+            display: flex;
+        }
+        .success-icon{
+            height: 19px;
+            margin-left: 10px;
+            margin-right: 10px
+        }
+        .banner-image{
+            height: 250px
+        }
+        .text{
+            margin-left: 20px
+        }
+        .confirmation-text{
+            font-weight: 600;
+        }
+        .redirect-image{
+            height: 30px
+        }
+    </style>
+</head>
+<body class="payment-body">
+    <div class="payment-header">
+        Payment Confirmation
+    </div>
+    <div class="center">
+        <img class="banner-image" src="/media/img/payment/success_banner.png" alt="">
+    </div>
+    <div class="flexbox text confirmation-text">
+        <span class="">Your payment is confirmed</span>
+        <img class="success-icon" src="/media/img/payment/success_icon.png" >
+    </div>
+    <div class="text">
+        <p>
+            Thankyou for booking your session with us. Your account has been charged and your transaction is successful.
+        </p>
+    </div>
+    <div class="center">
+        <a href="{{ booking_deeplink_url }}" ><img  class="redirect-image" src="/media/img/payment/check_booking_button.png" ></a>
+    </div>
+</body>
+</html>

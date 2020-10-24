@@ -66,6 +66,7 @@ from forum.user.utils.bolo_redis import update_profile_counter
 from rest_framework import generics
 from coupon.models import Coupon, UserCoupon
 from coupon.forms import CouponForm
+from booking.models import Event
 import pandas as pd
 
 def get_bucket_details(bucket_name=None):
@@ -3538,3 +3539,47 @@ class CouponDatableList(generics.ListAPIView):
 @login_required
 def coupon_list_datable(request):
     return render(request,'jarvis/pages/coupons/boloindya_coupons.html')
+
+@login_required
+def event_list(request):
+    page_no = request.GET.get('page_no', '1')
+
+    event_list = Event.objects.order_by('-created_at')
+
+    total_page = event_list.count()/10
+    if event_list.count()%10:
+        total_page += 1
+    page = int(page_no) - 1
+
+    print("**", event_list.count(), total_page)
+
+    return render(request,'jarvis/pages/events/boloindya_events.html', {'event_list': event_list[page*10:page*10+10],\
+        'page_no': page_no, 'total_page': total_page})
+
+def event_update(request):
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
+        event_id = request.POST.get('event_id',None)
+        approve_toggle_value = request.POST.get('approve_toggle_value',None)
+        active_toggle_value = request.POST.get('active_toggle_value',None)
+        if event_id:
+            if approve_toggle_value:
+                is_approved = None
+                if approve_toggle_value=='true':
+                    is_approved = True
+                elif approve_toggle_value == 'false':
+                    is_approved = False
+                Event.objects.filter(pk=event_id).update(is_approved=is_approved)
+            elif active_toggle_value:
+                is_active = None
+                if active_toggle_value=='true':
+                    is_active = True
+                elif active_toggle_value == 'false':
+                    is_active = False
+                Event.objects.filter(pk=event_id).update(is_active=is_active)
+            else:
+                return JsonResponse({'error':'Something went wrong!','message':'fail' }, status=status.HTTP_200_OK)
+            return JsonResponse({'sucess':'event updated','message':'success' }, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'error':'event_id not found','message':'fail' }, status=status.HTTP_200_OK)
+    else:
+        return JsonResponse({'error':'User Not Authorised','message':'fail' }, status=status.HTTP_200_OK)

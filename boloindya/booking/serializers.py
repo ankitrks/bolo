@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
-from .models import Booking
+from .models import Booking, PayOutConfig, Event
 
 class BookingSerializer(ModelSerializer):
 	creator_id = SerializerMethodField()
@@ -15,3 +15,13 @@ class BookingSerializer(ModelSerializer):
 	def get_creator_name(self, instance):
 		user = instance.creator
 		return (user.first_name+user.last_name) or (user.username)
+
+class PayOutConfigSerializer(ModelSerializer):
+	class Meta:
+		model = PayOutConfig
+		fields = ('__all__')
+
+class EventSerializer(ModelSerializer):
+	class Meta:
+		model = Event
+		fields = ('__all__')

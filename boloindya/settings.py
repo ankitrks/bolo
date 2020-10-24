@@ -163,7 +163,7 @@ INSTALLED_APPS = [
     'tinymce',
     'chartjs',
     'coupon',
-    
+    'payment',
     # 'forum.core.tests'
     'booking'
 ]
@@ -695,3 +695,10 @@ USER_NOTIFICATIONS_LIMIT = 10
 GET_BOOKINGS_API_PAGE_SIZE = 5
 BOOKING_SLOT_URL = 'https://www.boloindya.com/booking/'
 ALLOW_BOOKINGS_FOR = ["14864736", "267344", "14552437", "14453942", "547841"]
+GET_EVENT_SLOT_API_PAGE_SIZE = 8
+RAZORPAY = {
+    'USERNAME': "rzp_test_CRX59NwqZqFS8P",
+    'PASSWORD': "KvlNmjCSx8DzGbJFhtrk17Un"
+}
+PAYMENT_FAILURE_TIMEOUT = 12*60*1000
+

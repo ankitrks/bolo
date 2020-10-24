@@ -1,8 +1,6 @@
 from django.conf.urls import include, url
-from .views import *
+from .views import BookingPaymentRedirectView
 
 urlpatterns = [
-	url(r'^bookings/$', BookingDetails.as_view()),
-	url(r'^user_bookings/', UserBookingList.as_view()),
-	url(r'^myslots/',MySlotsList.as_view())
+	url(r'^(?P<booking_id>[\d]+)/pay$', BookingPaymentRedirectView.as_view()),
 ]
