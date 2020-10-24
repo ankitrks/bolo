@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from django.conf.urls import url, include
 from jarvis import views
 from jarvis.views import CouponDatableList
+from django.contrib.auth.decorators import login_required
 urlpatterns = [
     url(r'^$',views.home,name='jarvis-home'),
 
@@ -71,11 +72,11 @@ urlpatterns = [
 
     # url for rendering analytics panel
     url(r'^analytics/$', views.analytics),
-    url(r'^analytics-v2/$', views.JarvisAnalytics.as_view()),
-    url(r'^analytics-v2/video-created/(?P<required_data_type>\w+)/$', views.VideoCreatedAPIView.as_view()),
-    url(r'^analytics-v2/video-creator/(?P<required_data_type>\w+)/$', views.VideoCreatorAPIView.as_view()),
-    url(r'^analytics-v2/new-video-creator/(?P<required_data_type>\w+)/$', views.NewVideoCreatorAPIView.as_view()),
-    url(r'^analytics-v2/video-playtime/(?P<required_data_type>\w+)/$', views.VideoPlaytimeAPIView.as_view()),
+    url(r'^analytics-v2/$', login_required(views.JarvisAnalytics.as_view())),
+    url(r'^analytics-v2/video-created/(?P<required_data_type>\w+)/$', login_required(views.VideoCreatedAPIView.as_view())),
+    url(r'^analytics-v2/video-creator/(?P<required_data_type>\w+)/$', login_required(views.VideoCreatorAPIView.as_view())),
+    url(r'^analytics-v2/new-video-creator/(?P<required_data_type>\w+)/$', login_required(views.NewVideoCreatorAPIView.as_view())),
+    url(r'^analytics-v2/video-playtime/(?P<required_data_type>\w+)/$', login_required(views.VideoPlaytimeAPIView.as_view())),
     url(r'^analytics_jarvis/get_csvdata/$', views.get_csv_data),
     url(r'^analytics_jarvis/get_playdata/$', views.get_playdata), 
     url(r'^analytics_jarvis/get_totalplaytime/$', views.get_total_playtime),  
@@ -106,5 +107,7 @@ urlpatterns = [
     url(r'^coupon_list/$',CouponDatableList.as_view()),
     url(r'^coupon_pannel/$', views.coupon_list_datable),
     url(r'^event_bookings/$',views.event_list),
-    url(r'^event/update/$', views.event_update)
+    url(r'^event/update/$', views.event_update),
+    url(r'^top-users$', login_required(views.TopUserTemplateView.as_view()), name='top_users'),
+    url(r'^api/top-users$', login_required(views.TopUserListView.as_view())),
 ]

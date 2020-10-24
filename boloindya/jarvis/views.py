@@ -3409,7 +3409,7 @@ class VideoPlaytimeAPIView(AnalyticsGraphCountsAPIView):
         end_date = datetime.now()
         start_date = end_date - timedelta(days=30)
         return str((VideoPlaytime.objects.filter(timestamp__gte=start_date, timestamp__lte=end_date)\
-                .aggregate(Sum('playtime'))['playtime__sum'] or O) / (60*60)) + ' Hours'
+                .aggregate(Sum('playtime'))['playtime__sum'] or 0) / (60*60)) + ' Hours'
 
 
 def timeout_test(request):
@@ -3473,14 +3473,14 @@ def add_coupon(request):
     coupon_dict['discount_given'] = discount
     coupon_dict['is_draft'] = is_draft
     if active_banner_image_file:
-        active_banner_image_url = upload_image(upload_to_bucket, active_banner_image_file, banner_image_upload_folder_name)
+        active_banner_image_url = upload_coupon_image(upload_to_bucket, active_banner_image_file, banner_image_upload_folder_name)
         if not active_banner_image_url:
             return JsonResponse({'message':'fail','reason':'Image File already exist'}, status=status.HTTP_200_OK)
         else:
             coupon_dict['active_banner_img_url'] = active_banner_image_url
 
     if inactive_banner_image_file:
-        inactive_banner_image_url = upload_image(upload_to_bucket, inactive_banner_image_file, banner_image_upload_folder_name)
+        inactive_banner_image_url = upload_coupon_image(upload_to_bucket, inactive_banner_image_file, banner_image_upload_folder_name)
         if not inactive_banner_image_url:
             return JsonResponse({'message':'fail','reason':'Image File already exist'}, status=status.HTTP_200_OK)
         else:
@@ -3583,3 +3583,100 @@ def event_update(request):
             return JsonResponse({'error':'event_id not found','message':'fail' }, status=status.HTTP_200_OK)
     else:
         return JsonResponse({'error':'User Not Authorised','message':'fail' }, status=status.HTTP_200_OK)
+
+def month_year_iter(start_month, start_year, end_month, end_year):
+    yield "%s-%s-01"%(start_year, str(start_month).zfill(2))
+
+    while start_month < end_month or start_year < end_year:
+        start_month += 1
+
+        if start_month > 12:
+            start_year += 1
+            start_month = 1
+
+        yield "%s-%s-01"%(start_year, str(start_month).zfill(2))
+
+from rest_framework.generics import ListAPIView
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.permissions import IsAuthenticated
+from payment.partner.models import TopUser
+from payment.partner.serializers import TopUserSerializer
+from payment.utils import PageNumberPaginationRemastered
+
+class TopUserTemplateView(TemplateView):
+    template_name = "jarvis/pages/top_users/index.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(TopUserTemplateView, self).get_context_data(**kwargs)
+        today = datetime.now().date()
+
+        context['all_month'] = sorted([{
+            'name': datetime.strptime(month, '%Y-%m-%d').strftime('%B %Y'),
+            'value': month
+        } for month in month_year_iter(1, 2020, today.month, today.year)], key=lambda x: x.get('value'), reverse=True)
+
+        return context
+
+
+class TopUserListView(ListAPIView):
+    queryset = TopUser.objects.all()
+    serializer_class = TopUserSerializer
+    pagination_class = PageNumberPaginationRemastered
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (SessionAuthentication,)
+
+    def get_queryset(self):
+        query_params = self.request.query_params
+        queryset = self.queryset
+
+        sort_field = '-video_count'
+        
+        if query_params.get('sortField'):
+            sort_field = query_params.get('sortField')
+
+        if query_params.get('sortOrder') == 'desc':
+            sort_field = '-' + sort_field
+
+        if query_params.get('selectedMonth'):
+            date = datetime.strptime(query_params.get('selectedMonth'), '%Y-%m-%d')
+            self.queryset = self.queryset.filter(agg_month=query_params.get('selectedMonth'))
+
+        if query_params.get('q'):
+            q = query_params.get('q')
+            with connections['default'].cursor() as cursor:
+                cursor.execute("""
+                    SELECT user_id
+                    FROM forum_user_userprofile
+                    WHERE name ilike %s or slug = %s
+                """, ['%' + q +'%', q])
+                ids = [row[0] for row in cursor.fetchall()]
+            self.queryset = self.queryset.filter(boloindya_id__in=ids)
+        query = self.queryset.query.sql_with_params()
+        return self.queryset.order_by(sort_field)
+
+def upload_coupon_image(bucket, image_file, folder_name):
+    '''
+        This function is clone of upload_image and it just add 
+        timestamp in file name to allow images with same name
+    '''
+    bucket_credentials = get_bucket_details(bucket)
+    conn = boto3.client('s3', bucket_credentials['REGION_HOST'], aws_access_key_id = bucket_credentials['AWS_ACCESS_KEY_ID'], \
+            aws_secret_access_key = bucket_credentials['AWS_SECRET_ACCESS_KEY'])
+    image_file_name = urlify(image_file.name.lower())
+    image_output_key = hashlib.sha256(image_file_name.encode('utf-8')).hexdigest()
+    image_file_name = check_image_file_name_validation(image_file_name,image_output_key)
+    image_file_name = str(datetime.now()).replace(' ', '') +"_"+ image_file_name
+    image_path = folder_name+'/'+image_file_name
+
+    try:
+        conn.head_object(Bucket=bucket, Key=image_path)
+        return None
+    except Exception as e:
+        with open(urlify(image_file_name),'wb') as f:
+            for chunk in image_file.chunks():
+                if chunk:
+                    f.write(chunk)
+
+    image_url = upload_to_s3_without_transcode(image_file_name,bucket,folder_name)
+    os.remove(urlify(image_file_name))
+    return image_url

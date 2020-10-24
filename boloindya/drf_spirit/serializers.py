@@ -584,11 +584,18 @@ class UserProfileSerializer(ModelSerializer):
     view_count = SerializerMethodField()
     own_vb_view_count = SerializerMethodField()
     vb_count = SerializerMethodField()
+    bolo_score_new = SerializerMethodField()
 
     class Meta:
         model = UserProfile
         # fields = '__all__' 
-        exclude = ('extra_data', 'location', 'last_seen', 'last_ip', 'timezone', 'is_administrator', 'is_moderator', 'is_verified', 'last_post_on', 'last_post_hash', 'is_geo_location', 'lat', 'lang', 'click_id', 'click_id_response','is_test_user', 'is_bot_account')
+        exclude = ('social_identifier', 'question_count', 'linkedin_url', 'instagarm_id', 'twitter_id', 'topic_count', 'comment_count',\
+            'refrence', 'mobile_no', 'encashable_bolo_score', 'total_time_spent', 'total_vb_playtime',\
+            'is_dark_mode_enabled', 'paytm_number', 'state_name', 'city_name', 'extra_data', 'location', \
+            'last_seen', 'last_ip', 'timezone', 'is_administrator', 'is_moderator', 'is_verified', 'last_post_on', \
+            'last_post_hash', 'is_geo_location', 'lat', 'lang', 'click_id', 'click_id_response', 'gender', 'about', 'language', 'answer_count',\
+            'share_count', 'like_count', 'is_test_user', 'is_bot_account', 'salary_range', 'boost_views_count', 'boost_like_count', \
+            'boost_follow_count', 'boosted_time', 'boost_span', 'd_o_b', 'is_insight_fix')
 
     def get_follow_count(self,instance):
         return shortcounterprofile(get_userprofile_counter(instance.user_id)['follow_count'])
@@ -611,6 +618,12 @@ class UserProfileSerializer(ModelSerializer):
     def get_vb_count(self,instance):
         return shortcounterprofile(get_userprofile_counter(instance.user_id)['video_count'])
 
+    def get_bolo_score_new(self,instance):
+        '''
+            This counter is specific w.r.t shorcountertopic function
+        '''
+        return shorcountertopic(instance.bolo_score)
+
 class ShortUserProfileSerializer(ModelSerializer):
     follow_count= SerializerMethodField()
     follower_count= SerializerMethodField()
@@ -623,7 +636,13 @@ class ShortUserProfileSerializer(ModelSerializer):
     class Meta:
         model = UserProfile
         # fields = '__all__' 
-        exclude = ('social_identifier','question_count','linkedin_url','instagarm_id','twitter_id','topic_count','comment_count','refrence','mobile_no','encashable_bolo_score','total_time_spent','total_vb_playtime','is_dark_mode_enabled','paytm_number','state_name','city_name','extra_data', 'location', 'last_seen', 'last_ip', 'timezone', 'is_administrator', 'is_moderator', 'is_verified', 'last_post_on', 'last_post_hash', 'is_geo_location', 'lat', 'lang', 'click_id', 'click_id_response','gender','about','language','answer_count','share_count','like_count','is_test_user', 'is_bot_account')
+        exclude = ('social_identifier', 'question_count', 'linkedin_url', 'instagarm_id', 'twitter_id', 'topic_count', 'comment_count',\
+            'refrence', 'mobile_no', 'encashable_bolo_score', 'total_time_spent', 'total_vb_playtime',\
+            'is_dark_mode_enabled', 'paytm_number', 'state_name', 'city_name', 'extra_data', 'location', \
+            'last_seen', 'last_ip', 'timezone', 'is_administrator', 'is_moderator', 'is_verified', 'last_post_on', \
+            'last_post_hash', 'is_geo_location', 'lat', 'lang', 'click_id', 'click_id_response', 'gender', 'about', 'language', 'answer_count',\
+            'share_count', 'like_count', 'is_test_user', 'is_bot_account', 'salary_range', 'boost_views_count', 'boost_like_count', \
+            'boost_follow_count', 'boosted_time', 'boost_span', 'd_o_b', 'is_insight_fix')
 
     def get_follow_count(self,instance):
         return shortcounterprofile(instance.userprofile_counter['follow_count'])
@@ -651,7 +670,7 @@ class ShortUserSerializer(ModelSerializer):
     class Meta:
         model = User
         #fields = '__all__'
-        exclude = ('first_name','last_name','email','password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login')
+        exclude = ('password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login', 'email')
     def get_userprofile(self,instance):
         return ShortUserProfileSerializer(UserProfile.objects.get(user=instance)).data
 
@@ -660,7 +679,7 @@ class UserSerializer(ModelSerializer):
     class Meta:
         model = User
         #fields = '__all__'
-        exclude = ('password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login')
+        exclude = ('password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login', 'email')
     def get_userprofile(self,instance):
         if instance.is_authenticated():
             return UserProfileSerializer(UserProfile.objects.get(user=instance)).data
@@ -670,7 +689,7 @@ class BasicUserSerializer(ModelSerializer):
     profile_pic = SerializerMethodField()
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name','username','name','profile_pic')
+        fields = ('id', 'first_name', 'last_name', 'username', 'name', 'profile_pic')
         # exclude = ('password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login')
     def get_name(self,instance):
         return instance.st.name
@@ -806,7 +825,14 @@ class UserWithUserSerializer(ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('social_identifier', 'question_count', 'linkedin_url', 'instagarm_id', 'twitter_id', 'topic_count', 'comment_count',\
+            'refrence', 'mobile_no', 'encashable_bolo_score', 'total_time_spent', 'total_vb_playtime',\
+            'is_dark_mode_enabled', 'paytm_number', 'state_name', 'city_name', 'extra_data', 'location', \
+            'last_seen', 'last_ip', 'timezone', 'is_administrator', 'is_moderator', 'is_verified', 'last_post_on', \
+            'last_post_hash', 'is_geo_location', 'lat', 'lang', 'click_id', 'click_id_response', 'gender', 'about', 'language', 'answer_count',\
+            'share_count', 'like_count', 'is_test_user', 'is_bot_account', 'salary_range', 'boost_views_count', 'boost_like_count', \
+            'boost_follow_count', 'boosted_time', 'boost_span', 'd_o_b', 'is_insight_fix')
 
     def get_user(self,instance):
         return UserWithoutUserProfileSerializer(instance.user).data
@@ -824,7 +850,7 @@ class UserWithoutUserProfileSerializer(ModelSerializer):
     class Meta:
         model = User
         #fields = '__all__'
-        exclude = ('password', )
+        exclude = ('password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login', 'email')
 
 class UserBaseSerializerDatatable(ModelSerializer):
     class Meta:
@@ -1078,7 +1104,7 @@ class UserOnlySerializer(ModelSerializer):
     class Meta:
         model = User
         #fields = '__all__'
-        exclude = ('password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login')
+        exclude = ('password', 'user_permissions', 'groups', 'date_joined', 'is_staff', 'is_superuser', 'last_login', 'email')
 
 class FCMDeviceSerializer(ModelSerializer):
 
@@ -1206,18 +1232,29 @@ class TongueTwisterCounterSerializer(ModelSerializer):
 
     def get_total_videos_count(self,instance):
         video_count = instance.video_count
-        if int(instance.language) in [1,2]:
-            hash_tag_counter = HashtagViewCounter.objects.filter(hashtag=instance.hashtag, language__in=[1,2])
+        language_ids = [1,2]
+        if int(instance.language) in language_ids:
+            hash_tag_counter = HashtagViewCounter.objects.filter(hashtag=instance.hashtag, language__in=language_ids)
             hash_tag_counter_values = list(hash_tag_counter.values('video_count'))
-            video_count = sum(item['video_count'] for item in hash_tag_counter_values)
+            video_count_values = [item['video_count'] for item in hash_tag_counter_values]
+            video_count = sum(video_count_values)
+            if any(value<999 for value in video_count_values):
+                video_count = Topic.objects.filter(first_hash_tag=instance.hashtag,is_removed=False,is_vb=True, language_id__in = language_ids).count()
         return shorcountertopic(video_count)
 
     def get_total_views(self,instance):
         view_count = instance.view_count
-        if int(instance.language) in [1,2]:
-            hash_tag_counter = HashtagViewCounter.objects.filter(hashtag=instance.hashtag, language__in=[1,2])
-            hash_tag_counter_values = list(hash_tag_counter.values('view_count'))
+        language_ids = [1,2]
+        if int(instance.language) in language_ids:
+            hash_tag_counter = HashtagViewCounter.objects.filter(hashtag=instance.hashtag, language__in=language_ids)
+            hash_tag_counter_values = list(hash_tag_counter.values('view_count','video_count'))
             view_count = sum(item['view_count'] for item in hash_tag_counter_values)
+            video_count_values = [item['video_count'] for item in hash_tag_counter_values]
+            video_count = sum(video_count_values)
+            if any(value<999 for value in video_count_values):
+                all_view_count = Topic.objects.filter(first_hash_tag=instance.hashtag,is_removed=False,is_vb=True, language_id__in = language_ids).aggregate(Sum('view_count'))
+                if all_view_count.has_key('view_count__sum') and all_view_count['view_count__sum']:
+                    view_count = all_view_count['view_count__sum']
         return shorcountertopic(view_count)
 
     def get_tongue_twister(self,instance):

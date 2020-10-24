@@ -534,11 +534,12 @@ def GetChallenge(request):
 
         else:
             topics = get_redis_hashtag_paginated_data(language_id,hash_tag[0].id,page_no)
-            if not topics and int(language_id) in [1,2]:
+            if len(topics)<settings.REST_FRAMEWORK['PAGE_SIZE'] and int(language_id) in [1,2]:
                 key = 'hashtag:'+str(hash_tag[0].id)+':lang:'+str(language_id)
-                next_language_page_no = get_page_no_for_next_language(key, page_no)
-                next_language_id = 1 if int(language_id)==2 else 2
-                topics = get_redis_hashtag_paginated_data(next_language_id,hash_tag[0].id,next_language_page_no)
+                is_required, next_language_page_no = get_page_no_for_next_language(key, page_no)
+                if is_required:
+                    next_language_id = 1 if int(language_id)==2 else 2
+                    topics += get_redis_hashtag_paginated_data(next_language_id,hash_tag[0].id,next_language_page_no)
 
             if len(topics) < settings.REST_FRAMEWORK['PAGE_SIZE'] and int(language_id) in [1, 2]:
                 try:
@@ -628,8 +629,9 @@ def GetChallengeDetails(request):
         hash_tag_counter_values = list(hash_tag_counter.values('view_count','video_count'))
         #all_vb = Topic.objects.filter(hash_tags=hash_tag,is_removed=False,is_vb=True)
         view_count = sum(item['view_count'] for item in hash_tag_counter_values)
-        vb_count = sum(item['video_count'] for item in hash_tag_counter_values)
-        if vb_count < 999:
+        vb_count_values = [item['video_count'] for item in hash_tag_counter_values]
+        vb_count = sum(vb_count_values)
+        if any(value<999 for value in vb_count_values):
             vb_count = Topic.objects.filter(first_hash_tag=hash_tag,is_removed=False,is_vb=True, language_id__in = language_ids).count()
             all_view_count = Topic.objects.filter(first_hash_tag=hash_tag,is_removed=False,is_vb=True, language_id__in = language_ids).aggregate(Sum('view_count'))
             if all_view_count.has_key('view_count__sum') and all_view_count['view_count__sum']:
@@ -1031,7 +1033,48 @@ class SolrSearchUser(BoloIndyaGenericAPIView):
         users = []
         response = {"count": 0, "results": [], "next_page_number": None}
         if search_term:
-            sqs = SearchQuerySet().models(UserProfile).filter(search_break_word(search_term)).order_by('-is_superstar','-is_popular')
+
+            if len(search_term.split(" ")) > 1:
+                query = {
+                        "query": {
+                            "bool": {
+                                "must": [{ "match": { "text":   search_term  }}],
+                                "should": [
+                                    { "term": {"text": search_term }},
+                                    { "term": {"is_superstar": True }},
+                                    { "term": {"is_popular": True }}
+                                ],
+                                "filter": [{ "term":  { "django_ct": "forum_user.userprofile" }}]
+                            }},
+                        "from": (page - 1) * page_size,
+                        "size": page_size
+                        }
+
+
+                host = settings.HAYSTACK_CONNECTIONS['default']['URL'] + '/_search'
+                result = requests.get(host, json=query).json()
+
+                hits = result.get('hits')
+
+                if hits.get('total') > 0:
+
+                    user_ids = []
+                    for item in hits.get('hits'):
+                        user_ids.append(item.get('_source', []).get('django_id'))
+
+                    users = User.objects.filter(st__id__in=user_ids)
+
+                    if len(users) > 0:
+                        next_page_number = page+1 if page_size*page<hits.get('total') else ''
+                        response = {
+                            "count" : hits.get('total'),
+                            "results" : UserSerializer(users, many=True).data,
+                            "next_page_number" : next_page_number
+                        }
+
+                    return JsonResponse(response, safe = False)
+
+            sqs = SearchQuerySet().models(UserProfile).auto_query(search_term).order_by('-is_superstar','-is_popular')
             if not sqs:
                 suggested_word = SearchQuerySet().models(UserProfile).auto_query(search_term).spelling_suggestion()
                 if suggested_word:
@@ -1202,7 +1245,7 @@ def upload_thumbail(virtual_thumb_file):
     except:
         return None
 
-def upload_media(media_file):
+def upload_media(media_file, key="media/"):
     try:
         from jarvis.views import urlify
         client = boto3.client('s3',aws_access_key_id = settings.BOLOINDYA_AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY)
@@ -1211,10 +1254,11 @@ def upload_media(media_file):
         media_file_name = remove_extra_char(str(media_file.name))
         filenameNext= media_file_name.split('.')
         final_filename = str(urlify(filenameNext[0]))+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[1])
-        client.put_object(Bucket='in-boloindya', Key='media/' + final_filename, Body=media_file, ACL='public-read')
-        filepath = 'https://s3.ap-south-1.amazonaws.com/' + 'in-boloindya' + '/media/' + final_filename
+        client.put_object(Bucket=settings.BOLOINDYA_AWS_IN_BUCKET_NAME, Key=key + final_filename, Body=media_file, ACL='public-read')
+        filepath = 'https://s3.ap-south-1.amazonaws.com/' + settings.BOLOINDYA_AWS_IN_BUCKET_NAME + '/'+ key + final_filename
         return filepath
-    except:
+    except Exception as e:
+        print(e)
         return None
 
 def validateUser(request):
@@ -2614,6 +2658,7 @@ def verify_otp(request):
     user_ip = request.POST.get('user_ip',None)
     is_reset_password = False
     is_for_change_phone = False
+    is_signup = False
     all_category_follow = []
     if request.POST.get('is_reset_password') and request.POST.get('is_reset_password') == '1':
         is_reset_password = True # inverted because of exclude
@@ -2628,7 +2673,7 @@ def verify_otp(request):
                 message = 'User Logged In'
                 user_tokens = get_tokens_for_user(user)
                 return JsonResponse({'message': message, 'username' : mobile_no, \
-                        'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+                        'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data, 'is_signup' : is_signup}, status=status.HTTP_200_OK)
 
             # exclude_dict = {'is_active' : True, 'is_reset_password' : is_reset_password,"mobile_no":mobile_no, "otp":otp}
             exclude_dict = {'is_reset_password' : is_reset_password,"mobile_no":mobile_no, "otp":otp,"created_at__gte":datetime.now()-timedelta(hours=2)}
@@ -2644,7 +2689,7 @@ def verify_otp(request):
             # otp_obj.update(used_at = timezone.now())
             if not is_reset_password and not is_for_change_phone and otp_obj:
                 if mobile_no in ['7726080653']:
-                    return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
+                    return JsonResponse({'message': 'Invalid Mobile No / OTP', 'is_signup' : is_signup}, status=status.HTTP_400_BAD_REQUEST)
                 try:
                     userprofile = UserProfile.objects.using('default').get(mobile_no = mobile_no)
                 except:
@@ -2657,10 +2702,11 @@ def verify_otp(request):
                         userprofile = None
                 if userprofile:
                     if not userprofile.user.is_active:
-                        return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
+                        return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.', 'is_signup' : is_signup}, status=status.HTTP_400_BAD_REQUEST)
                     user = userprofile.user
                     message = 'User Logged In'
                 else:
+                    is_signup = True
                     user = User.objects.using('default').create(username = get_random_username())
                     message = 'User created'
                     userprofile = UserProfile.objects.using('default').get(user = user)
@@ -2692,12 +2738,12 @@ def verify_otp(request):
                 # otp_obj.for_user = user
                 # otp_obj.save()
                 return JsonResponse({'message': message, 'username' : mobile_no, \
-                        'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
-            return JsonResponse({'message': 'OTP Validated', 'username' : mobile_no}, status=status.HTTP_200_OK)
+                        'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data, 'is_signup' : is_signup}, status=status.HTTP_200_OK)
+            return JsonResponse({'message': 'OTP Validated', 'username' : mobile_no, 'is_signup' : is_signup}, status=status.HTTP_200_OK)
         except Exception as e:
-            return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'message': 'Invalid Mobile No / OTP', 'is_signup' : is_signup}, status=status.HTTP_400_BAD_REQUEST)
     else:
-        return JsonResponse({'message': 'No Mobile No / OTP provided'}, status=status.HTTP_204_NO_CONTENT)
+        return JsonResponse({'message': 'No Mobile No / OTP provided', 'is_signup' : is_signup}, status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['POST'])
 def verify_otp_with_country_code(request):
@@ -2720,6 +2766,7 @@ def verify_otp_with_country_code(request):
     user_ip = request.POST.get('user_ip',None)
     is_reset_password = False
     is_for_change_phone = False
+    is_signup = False
     all_category_follow = []
     if request.POST.get('is_reset_password') and request.POST.get('is_reset_password') == '1':
         is_reset_password = True # inverted because of exclude
@@ -2733,7 +2780,7 @@ def verify_otp_with_country_code(request):
             message = 'User Logged In'
             user_tokens = get_tokens_for_user(user)
             return JsonResponse({'message': message, 'username' : mobile_no, \
-                    'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+                    'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data, 'is_signup' : is_signup}, status=status.HTTP_200_OK)
         mobile_with_country_code = str(country_code)+str(mobile_no)
         try:
             # exclude_dict = {'is_active' : True, 'is_reset_password' : is_reset_password,"mobile_no":mobile_no, "otp":otp}
@@ -2750,7 +2797,7 @@ def verify_otp_with_country_code(request):
             # otp_obj.update(used_at = timezone.now())
             if not is_reset_password and not is_for_change_phone and otp_obj:
                 if mobile_no in ['7726080653']:
-                    return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
+                    return JsonResponse({'message': 'Invalid Mobile No / OTP', 'is_signup' : is_signup}, status=status.HTTP_400_BAD_REQUEST)
                 try:
                     userprofile = UserProfile.objects.using('default').get(mobile_no = mobile_no)
                 except:
@@ -2763,10 +2810,11 @@ def verify_otp_with_country_code(request):
                         userprofile = None
                 if userprofile:
                     if not userprofile.user.is_active:
-                        return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
+                        return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.', 'is_signup' : is_signup}, status=status.HTTP_400_BAD_REQUEST)
                     user = userprofile.user
                     message = 'User Logged In'
                 else:
+                    is_signup = True
                     user = User.objects.using('default').create(username = get_random_username())
                     message = 'User created'
                     userprofile = UserProfile.objects.using('default').get(user = user)
@@ -2799,13 +2847,13 @@ def verify_otp_with_country_code(request):
                 # otp_obj.for_user = user
                 # otp_obj.save()
                 return JsonResponse({'message': message, 'username' : mobile_no, \
-                        'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+                        'access_token':user_tokens['access'], 'refresh_token':user_tokens['refresh'],'user':UserSerializer(user).data, 'is_signup' : is_signup}, status=status.HTTP_200_OK)
             # otp_obj.save()
-            return JsonResponse({'message': 'OTP Validated', 'username' : mobile_no}, status=status.HTTP_200_OK)
+            return JsonResponse({'message': 'OTP Validated', 'username' : mobile_no, 'is_signup' : is_signup}, status=status.HTTP_200_OK)
         except Exception as e:
-            return JsonResponse({'message': 'Invalid Mobile No / OTP'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'message': 'Invalid Mobile No / OTP', 'is_signup' : is_signup}, status=status.HTTP_400_BAD_REQUEST)
     else:
-        return JsonResponse({'message': 'No Mobile No / OTP provided'}, status=status.HTTP_204_NO_CONTENT)
+        return JsonResponse({'message': 'No Mobile No / OTP provided', 'is_signup' : is_signup}, status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['POST'])
 def password_set(request):
@@ -2885,6 +2933,7 @@ def fb_profile_settings(request):
     sub_category_prefrences = request.POST.get('categories',None)
     is_dark_mode_enabled = request.POST.get('is_dark_mode_enabled',None)
     android_did = request.POST.get('android_did',None)
+    is_signup = False
     try:
         sub_category_prefrences = sub_category_prefrences.split(',')
     except:
@@ -2914,7 +2963,7 @@ def fb_profile_settings(request):
                 log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':'You have been banned permanently for violating terms of usage.',\
                 'error':'None'})
                 print "Error in API fb_profile_settings/ :" + log
-                return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
+                return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.', 'is_signup' : is_created}, status=status.HTTP_400_BAD_REQUEST)
             if is_created:
                 add_bolo_score(user.id, 'initial_signup', userprofile)
                 update_dict = {}
@@ -2961,10 +3010,10 @@ def fb_profile_settings(request):
                     default_follow = deafult_boloindya_follow.delay(user.id,str(language))
                 user.save()
                 user_tokens = get_tokens_for_user(user)
-                return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data, 'is_signup' : is_created}, status=status.HTTP_200_OK)
             else:
                 user_tokens = get_tokens_for_user(user)
-                return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data, 'is_signup' : is_created}, status=status.HTTP_200_OK)
         elif activity == 'google_login' and refrence == 'google':
             try:
                 userprofile = UserProfile.objects.using('default').get(social_identifier = extra_data['google_id'])
@@ -2986,7 +3035,7 @@ def fb_profile_settings(request):
                 log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':'You have been banned permanently for violating terms of usage.',\
                 'error':'None'})
                 print "Error in API fb_profile_settings/ :" + log
-                return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.'}, status=status.HTTP_400_BAD_REQUEST)
+                return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.', 'is_signup' : is_created}, status=status.HTTP_400_BAD_REQUEST)
             if is_created:
                 update_dict = {}
                 add_bolo_score(user.id, 'initial_signup', userprofile)
@@ -3037,10 +3086,10 @@ def fb_profile_settings(request):
                     default_follow = deafult_boloindya_follow.delay(user.id,str(language))
                 user.save()
                 user_tokens = get_tokens_for_user(user)
-                return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data, 'is_signup' : is_created}, status=status.HTTP_200_OK)
             else:
                 user_tokens = get_tokens_for_user(user)
-                return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data, 'is_signup' : is_created}, status=status.HTTP_200_OK)
         elif activity == 'profile_save':
             try:
                 userprofile = UserProfile.objects.using('default').get(user = request.user)
@@ -3083,7 +3132,7 @@ def fb_profile_settings(request):
                     update_dict['salary_range'] = salary_range
                 if username:
                     if not check_username_valid(username):
-                        return JsonResponse({'message': 'Username Invalid. It can contains only lower case letters,numbers and special character[ _ - .]'}, status=status.HTTP_200_OK)
+                        return JsonResponse({'message': 'Username Invalid. It can contains only lower case letters,numbers and special character[ _ - .]', 'is_signup' : is_signup}, status=status.HTTP_200_OK)
                     check_username = User.objects.using('default').filter(username = username).exclude(pk =request.user.id)
                     if not check_username:
                         update_dict['slug'] = username
@@ -3093,14 +3142,14 @@ def fb_profile_settings(request):
                         # invoke watermark service to update username
                         update_branding_url.delay(username)
                     else:
-                        return JsonResponse({'message': 'Username already exist'}, status=status.HTTP_200_OK)
+                        return JsonResponse({'message': 'Username already exist', 'is_signup' : is_signup}, status=status.HTTP_200_OK)
                 UserProfile.objects.using('default').filter(user=request.user).update(**update_dict)
-                return JsonResponse({'message': 'Profile Saved'}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'Profile Saved', 'is_signup' : is_signup}, status=status.HTTP_200_OK)
             except Exception as e:
                 log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                     'error':str(e)})
                 print "Error in API fb_profile_settings/ :" + log
-                return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e), 'is_signup' : is_signup}, status=status.HTTP_400_BAD_REQUEST)
         elif activity == 'settings_changed':
             try:
                 userprofile = UserProfile.objects.using('default').get(user = request.user)
@@ -3120,15 +3169,15 @@ def fb_profile_settings(request):
                     default_follow = deafult_boloindya_follow.delay(request.user.id,str(language))
                     update_dict['language'] = str(language)
                 UserProfile.objects.using('default').filter(user=request.user).update(**update_dict)
-                return JsonResponse({'message': 'Settings Chnaged'}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'Settings Chnaged', 'is_signup' : is_signup}, status=status.HTTP_200_OK)
             except Exception as e:
                 log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                     'error':str(e)})
                 print "Error in API fb_profile_settings/ :" + log
-                return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e), 'is_signup' : is_signup}, status=status.HTTP_400_BAD_REQUEST)
         elif activity == 'android_login':
             if not android_did:
-                return JsonResponse({'message': 'Error Occured:android_did not found',}, status=status.HTTP_400_BAD_REQUEST) 
+                return JsonResponse({'message': 'Error Occured:android_did not found', 'is_signup' : is_signup}, status=status.HTTP_400_BAD_REQUEST) 
             user_id = get_redis_android_id(android_did)
             if user_id:
                 try:
@@ -3170,16 +3219,16 @@ def fb_profile_settings(request):
                     default_follow = deafult_boloindya_follow.delay(user.id,str(language))                
                 user.save()
                 user_tokens = get_tokens_for_user(user)
-                return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'User created', 'username' : user.username,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data, 'is_signup' : is_created}, status=status.HTTP_200_OK)
             else:
                 user_tokens = get_tokens_for_user(user)
-                return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data}, status=status.HTTP_200_OK)
+                return JsonResponse({'message': 'User Logged In', 'username' :user.username ,'access':user_tokens['access'],'refresh':user_tokens['refresh'],'user':UserSerializer(user).data, 'is_signup' : is_created}, status=status.HTTP_200_OK)
 
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
         print "Error in API fb_profile_settings/ :" + log
-        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e), 'is_signup' : is_signup}, status=status.HTTP_400_BAD_REQUEST)
 
 #### KYC Views ####
 
@@ -4359,14 +4408,15 @@ def get_category_video_bytes(request):
         category = Category.objects.get(pk=category_id)
         topics = []
         topics = get_redis_category_paginated_data(language_id,category.id,int(request.POST.get('page', 2)))
-        if not topics and int(language_id) in [1,2]:
+        if len(topics)< settings.REST_FRAMEWORK['PAGE_SIZE'] and int(language_id) in [1,2]:
             key = 'cat:'+str(category_id)+':lang:'+str(language_id)
-            next_language_page_no = get_page_no_for_next_language(key, int(request.POST.get('page', 2)))
-            next_language_id = 1 if int(language_id)==2 else 2
-            topics = get_redis_category_paginated_data(next_language_id,category.id,next_language_page_no)
-        paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
-        topic_page = paginator.page(1)
-        return JsonResponse({'topics': CategoryVideoByteSerializer(topic_page, many=True, context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
+            is_required, next_language_page_no = get_page_no_for_next_language(key, int(request.POST.get('page', 2)))
+            if is_required:
+                next_language_id = 1 if int(language_id)==2 else 2
+                topics += get_redis_category_paginated_data(next_language_id,category.id,next_language_page_no)
+        # paginator = Paginator(topics, settings.REST_FRAMEWORK['PAGE_SIZE'])
+        # topic_page = paginator.page(1)
+        return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True, context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
@@ -4518,8 +4568,7 @@ def get_video_bytes_and_its_related_data(id_list, last_updated=None):
                     t.is_reported, t.report_count, t.vb_width, t.vb_height, t.is_thumbnail_resized, 
                     t.linkedin_share_count, t.facebook_share_count, t.twitter_share_count, t.old_backup_url, 
                     t.safe_backup_url, t.downloaded_url, t.vb_playtime, t.has_downloaded_url, t.vb_score, 
-                    t.is_boosted, t.popular_boosted, t.popular_boosted_time, t.boosted_till, t.boosted_start_time, 
-                    t.boosted_end_time, t.is_logo_checked, t.time_deleted, t.plag_text, t.is_violent, 
+                    t.is_logo_checked, t.time_deleted, t.plag_text, t.is_violent, 
                     t.violent_content, t.is_adult, t.adult_content, t.logo_detected, t.profanity_collage_url, 
                     t.category_id as category, t.first_hash_tag_id as first_hash_tag, 
                     t.last_moderated_by_id as last_moderated_by, t.location_id as location, 
@@ -4531,10 +4580,8 @@ def get_video_bytes_and_its_related_data(id_list, last_updated=None):
                     p.cover_pic as user__userprofile__cover_pic, p.profile_pic as user__userprofile__profile_pic, 
                     p.name as user__userprofile__name, p.bio as user__userprofile__bio, p.d_o_b as user__userprofile__d_o_b, 
                     p.android_did as user__userprofile__android_did, p.is_guest_user as user__userprofile__is_guest_user, 
-                    p.boost_views_count as user__userprofile__boost_views_count, p.boost_like_count as user__userprofile__boost_like_count, 
-                    p.boost_follow_count as user__userprofile__boost_follow_count, p.boosted_time as user__userprofile__boosted_time, 
-                    p.boost_span as user__userprofile__boost_span, p.country_code as user__userprofile__country_code, 
-                    p.salary_range as user__userprofile__salary_range, p.is_insight_fix as user__userprofile__is_insight_fix, 
+                    p.country_code as user__userprofile__country_code, 
+                    p.is_insight_fix as user__userprofile__is_insight_fix, 
                     p.user_id as user__userprofile__user, array_agg(distinct uc.category_id) as user__userprofile__sub_category
             FROM forum_topic_topic t
                 LEFT JOIN forum_topic_topic_m2mcategory c on c.topic_id = t.id
@@ -4644,13 +4691,17 @@ class PopularVideoBytes(APIView):
         start_date = datetime.now()
         end_date = (start_date - timedelta( hours = cache_timespan ))
 
+        language_ids = [language_id]
+        if int(language_id) in [1,2]:
+            language_ids = [1,2]
+
         topics = Topic.objects.filter(is_vb = True, is_removed = False, 
-            language_id = language_id, is_popular = True, date__gte=end_date.date(), date__lte=start_date.date())\
+            language_id__in = language_ids, is_popular = True, date__gte=end_date.date(), date__lte=start_date.date())\
             .exclude(pk__in = exclude_list).order_by('-id', '-vb_score').values('id', 'user_id', 'vb_score','date')[:1000]
 
         if len(topics) < 20:
             topics = Topic.objects.filter(is_vb = True, is_removed = False, 
-                language_id = language_id, is_popular = True, date__lte=end_date.date())\
+                language_id__in = language_ids, is_popular = True, date__lte=end_date.date())\
                 .exclude(pk__in = exclude_list).order_by('-id', '-vb_score').values('id', 'user_id', 'vb_score','date')[:1000]
 
 
@@ -5490,15 +5541,20 @@ def get_page_no_for_next_language(key, requested_page):
     items_per_page = settings.REST_FRAMEWORK['PAGE_SIZE']
     data = get_redis(key)
     if not data:
-        return requested_page
+        return True, requested_page
     redis_keys = data.keys()
+    next_page = requested_page+1
+    if str(next_page) in data:
+        return False, 0
+    elif str(next_page) not in data and 'remaining' in redis_keys:
+        return False, 0
     if 'remaining' in redis_keys:
         redis_last_page = data['remaining']['last_page']
         remaining_count = data['remaining']['remaining_count']
         total_pages = int(redis_last_page + math.ceil(remaining_count/float(items_per_page)))
     else:
         total_pages = max(list(map(int, redis_keys)))
-    return requested_page - total_pages
+    return True, requested_page - total_pages + 1
         
 def remove_extra_char(file_name):
     """
@@ -5510,3 +5566,34 @@ def remove_extra_char(file_name):
         file_name = file_name.replace(char, '')
     return file_name
 
+class GetUserNotificationCount(APIView):
+    def get(self, request, *args, **kwargs):
+        try:
+            self.notification_count = 0
+            if request.user.is_authenticated:
+                self.notification_count = Notification.objects.filter(for_user= request.user,status=0).count()
+                return JsonResponse({
+                    'notification_count': self.notification_count, 'limit': settings.USER_NOTIFICATIONS_LIMIT, 'notification_count_str': self.get_notification_count_str()
+                }, status=status.HTTP_200_OK)
+            else:
+                return JsonResponse({
+                'notification_count': self.notification_count, 'limit': settings.USER_NOTIFICATIONS_LIMIT, 'notification_count_str': self.get_notification_count_str()
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({
+                'notification_count': self.notification_count, 'limit': settings.USER_NOTIFICATIONS_LIMIT, 'notification_count_str': self.get_notification_count_str()
+            }, status=status.HTTP_200_OK)
+
+    def get_notification_count_str(self):
+        if self.notification_count < settings.USER_NOTIFICATIONS_LIMIT:
+            return str(self.notification_count)
+        return str(settings.USER_NOTIFICATIONS_LIMIT-1)+"+"
+
+class UploadVideoThumbnail(APIView):
+    def post(self, request, *args, **kwargs):
+        media_file = request.FILES.get('media',None)
+        if media_file and request.user.is_authenticated:
+            media_url = upload_media(media_file, "public/video_byte_thumbnails/")
+            return JsonResponse({'status': 'success','body':media_url}, status=status.HTTP_201_CREATED)
+        else:
+            return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)

@@ -14,6 +14,7 @@ import forum.search.urls
 import forum.category.urls
 import forum.topic.urls
 import forum.comment.urls
+import forum.booking.urls
 import drf_spirit.urls
 import jarvis.urls
 import allauth
@@ -67,7 +68,6 @@ patterns = [
     url(r'^category/', include(forum.category.urls, namespace='category')),
     url(r'^topic/', include(forum.topic.urls, namespace='topic')),
     url(r'^comment/', include(forum.comment.urls, namespace='comment')),
-    url(r'^api/v1/docs/$', schema_view),
     url(r'^api/v1/', include(drf_spirit.urls, namespace='api')),
     url(r'^api/v1/', include(coupon.urls, namespace='api')),
     url(r'^api/v1/', include(booking.api_urls, namespace='api')),
@@ -88,7 +88,8 @@ patterns = [
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-
+if settings.DEBUG:
+    patterns.append(url(r'^api/v1/docs/$', schema_view))
 
 
 urlpatterns = [
@@ -101,8 +102,9 @@ urlpatterns = [
     url(r'docs/', include_docs_urls(title='Boloindya API')),
     url(r'^tinymce/', include('tinymce.urls')),
     url(r'^accounts/', include('allauth.urls')),
+    url(r'^payment/', include(payment.urls, namespace='payment')),
+    url(r'^api/v1/payment/', include('payment.api_urls', namespace='payment')),
     url(r'^booking/', include(booking.urls)),
-    url(r'^payment/', include(payment.urls)),
 ]
 
 urlpatterns += i18n_patterns(
