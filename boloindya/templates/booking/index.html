@@ -6,27 +6,39 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Basic Communication</title>
-  <link rel="stylesheet" href='{% static "Agora_Web_SDK_FULL/assets/common.css" %}' />
+  <title>Bolo Indya | Video Session</title>
+  <!-- <link rel="stylesheet" href='{% static "Agora_Web_SDK_FULL/assets/common.css" %}' /> -->
   <style type="text/css">
-    .display-none{
-      display: none
-    }
+    .toast, .display-none{display: none}
+    .remote_video_panel, .remote_video_panel div{width: 70px !important;height: 90px !important;display: -webkit-inline-box !important;border-radius: 5px;}
+    .full_screen_stream{position: fixed;padding: 0;margin: 0;top: 0;left: 0;width: 100% !important;height: 100% !important;background: #000;}
+    .full_screen_stream video{width: 100%;background: #000;position: fixed !important;}
+    .agora-theme .video-grid{display: block !important;}
+    .agora-theme .autoplay-fallback::after{content: '' !important;}
+    .remote_video_panel{margin-right: 5px;}
+    #videoElement{z-index: 1;position: fixed;top: 25%;width: 50%;left: 25%;border-radius: 5px;}
+    .btn{background: #CB3B3D;border: none;color: #fff;padding: 5px 17px;cursor: pointer;border-radius: 100px;height: 65px;color: black;font-weight: bold;margin: 5px;}
+    .btn img{position: relative;left: 2px;width: 30px;top:1px;}
+    #leave, #mute{background: grey;color: #333;}
+    #unmute{background: #CB3B3D;}
+    #local_stream video{z-index: 9;}
   </style>
 </head>
 <body class="agora-theme">
-  <div class="navbar-fixed">
-    <nav class="agora-navbar">
-      <div class="nav-wrapper agora-primary-bg valign-wrapper">
-        <h5 class="left-align">Basic Communication</h5>
-        <a href="https://github.com/AgoraIO/Basic-Video-Call/tree/master/One-to-One-Video/Agora-Web-Tutorial-1to1" class="agora-github-pin"></a>
-      </div>
-    </nav>
-  </div>
+  <img src="/media/img/favicon.ico" style="width: 50px;height: 50px;position: fixed;right: 10px;top: 10px;z-index: 99;">
+  <!-- <div style="z-index: 999;position: fixed;color: #fff;font-family: monospace;font-size: 18px;">
+    <span>Video Session: <b></b>Ankit Rastogi</span><br>
+    <span>Time: <b></b>03:00PM - 04:00PM</span>
+  </div> -->
+  <!-- <div id="preview" class="full-mobile">
+    <h4 style="z-index: 999;
+    position: fixed;color: #fff;font-family: monospace;font-size: 18px;left: 41%;top: 12%;">Video Preview</h4>
+    <video autoplay playsinline id="videoElement"></video>
+  </div> -->
   <form id="form" class="row col l12 s12">
     <div class="row container col l12 s12">
       <div class="col" style="min-width: 433px; max-width: 443px">
-        <div class="card" style="margin-top: 0px; margin-bottom: 0px;">
+        <div class="cards" style="margin-top: 0px; margin-bottom: 0px;">
           <div class="row card-content" style="margin-bottom: 0px;">
               <div class="input-field display-none">
                 <label for="appID" class="active">App ID</label>
@@ -40,12 +52,17 @@
                 <label for="token" class="active">Token</label>
                 <input type="text" placeholder="token" name="token" value="{{ token }}">
               </div>
-              <div class="row" style="margin: 0">
+              <div class="row" style="margin: 0;text-align: center;width: 100%;position: fixed;left: 0;bottom: 70px;z-index: 999;">
                 <div class="col s12">
-                <button class="btn btn-raised btn-primary waves-effect waves-light" id="join">JOIN</button>
-                <button class="btn btn-raised btn-primary waves-effect waves-light" id="leave">LEAVE</button>
-                <button class="btn btn-raised btn-primary waves-effect waves-light" id="publish">PUBLISH</button>
-                <button class="btn btn-raised btn-primary waves-effect waves-light" id="unpublish">UNPUBLISH</button>
+                <button class="btn btn-raised btn-primary waves-effect waves-light" id="join"><img src="/media/img/join_call.png"><!-- <br><span style="font-size: 13px;">JOIN</span> --></button>
+                <button class="btn btn-raised btn-primary waves-effect waves-light display-none" id="leave"><img src="/media/img/leave_call.png"><!-- <br><span style="font-size: 13px;">LEAVE</span> --></button>
+                <!-- <button class="btn btn-raised btn-primary waves-effect waves-light" id="publish">PUBLISH</button>
+                <button class="btn btn-raised btn-primary waves-effect waves-light" id="unpublish">UNPUBLISH</button> -->
+                <span id="mdiv" class="display-none">
+                  <button class="btn btn-raised btn-primary waves-effect waves-light" id="mute"><img src="/media/img/mute_b.png" style="left:0px;"></button>
+                  <button class="btn btn-raised btn-primary waves-effect waves-light display-none" id="unmute"><img src="/media/img/mute.png" style="left:0px;"></button>
+                </span>
+
                 </div>
               </div>
           </div>
@@ -111,23 +128,27 @@
           </li>
         </ul>
       </div>
-      <div class="col s7">
+      <div class="">
+        <!-- <div id="local_stream" class="video-placeholder full_screen_stream"></div> -->
+        <!-- <div id="local_video_info" class="video-profile hide"></div>
+        <div id="video_autoplay_local" class="autoplay-fallback hide"></div> -->
         <div class="video-grid" id="video">
-          <div class="video-view">
-            <div id="local_stream" class="video-placeholder"></div>
-            <div id="local_video_info" class="video-profile hide"></div>
-            <div id="video_autoplay_local" class="autoplay-fallback hide"></div>
-          </div>
+          <!-- <div class="video-view"></div> -->
+          <div id="local_stream" class="video-placeholder full_screen_stream tap_to_zoom"></div>
         </div>
       </div>
     </div>
   </form>
   <script src='{% static "Agora_Web_SDK_FULL/vendor/jquery.min.js" %}'></script>
   <script src='{% static "Agora_Web_SDK_FULL/vendor/materialize.min.js" %}'></script>
-  <script src='{% static "Agora_Web_SDK_FULL/AgoraRTCSDK-3.2.1.js" %}'></script>
+  <script src='/media/Agora_Web_SDK_FULL/AgoraRTCSDK-3.2.1.js'></script>
   <script>
     console.log("agora sdk version: " + AgoraRTC.VERSION + " compatible: " + AgoraRTC.checkSystemRequirements());
     var resolutions = [
+      {
+        name: "720p",
+        value: "720p",
+      },
       {
         name: "default",
         value: "default",
@@ -135,10 +156,6 @@
       {
         name: "480p",
         value: "480p",
-      },
-      {
-        name: "720p",
-        value: "720p",
       },
       {
         name: "1080p",
@@ -194,11 +211,22 @@
       return obj
     }
 
+    function reshuffle_frame(){
+      if( $('.remote_video_panel:not(#local_stream)').length > 0 ){
+        $('#local_stream').addClass('remote_video_panel').removeClass('full_screen_stream'); 
+        $('.remote_video_panel:not(#local_stream)').first().addClass('full_screen_stream');
+      }
+      else{
+        $('#local_stream').addClass('full_screen_stream').removeClass('remote_video_panel'); 
+      }
+    }
+
     function addView (id, show) {
+      // alert('call add')
       if (!$("#" + id)[0]) {
         $("<div/>", {
           id: "remote_video_panel_" + id,
-          class: "video-view",
+          class: "video-view remote_video_panel tap_to_zoom",
         }).appendTo("#video")
 
         $("<div/>", {
@@ -206,21 +234,32 @@
           class: "video-placeholder",
         }).appendTo("#remote_video_panel_" + id)
 
-        $("<div/>", {
-          id: "remote_video_info_" + id,
-          class: "video-profile " + (show ? "" :  "hide"),
-        }).appendTo("#remote_video_panel_" + id)
+        // $("<div/>", {
+        //   id: "remote_video_info_" + id,
+        //   class: "video-profile " + (show ? "" :  "hide"),
+        // }).appendTo("#remote_video_panel_" + id)
 
-        $("<div/>", {
-          id: "video_autoplay_"+ id,
-          class: "autoplay-fallback hide",
-        }).appendTo("#remote_video_panel_" + id)
+        // $("<div/>", {
+        //   id: "video_autoplay_"+ id,
+        //   class: "autoplay-fallback hide",
+        // }).appendTo("#remote_video_panel_" + id)
       }
+      reshuffle_frame();
+      $('audio[muted], video[muted]').removeAttr('muted');
+
     }
     function removeView (id) {
+      // alert('call remove')
       if ($("#remote_video_panel_" + id)[0]) {
         $("#remote_video_panel_"+id).remove()
       }
+      reshuffle_frame();
+      // if( $('.remote_video_panel').length < 1 ){
+      //   $('#local_stream').addClass('full_screen_stream').removeClass('remote_video_panel');
+      // }
+      // else{
+      //   $('.remote_video_panel').first().addClass('full_screen_stream');
+      // }
     }
 
     function getDevices (next) {
@@ -429,6 +468,9 @@
           rtc.localStream.init(function () {
             console.log("init local stream success")
             // play stream with html element id "local_stream"
+            rtc.localStream.setVideoProfile("1080p_3");
+            // rtc.localStream.setVideoProfile("120p_1");
+            
             rtc.localStream.play("local_stream")
 
             // publish local stream
@@ -539,7 +581,7 @@
           $("<option/>", {
             value: audio.value,
             text: audio.name,
-          }).appendTo("#microphoneId")
+          }).appendTo("#microphoneId");
         })
         devices.videos.forEach(function (video) {
           $("<option/>", {
@@ -554,20 +596,51 @@
             text: resolution.name
           }).appendTo("#cameraResolution")
         })
-        M.AutoInit()
+        M.AutoInit();
+        $('option[value="720p"]').prop('selected', 'selected').attr('selected', 'selected');
       })
 
       var fields = ["appID", "channel"]
 
       // This will start the join functions with all the configuration selected by the user.
       $("#join").on("click", function (e) {
-        console.log("join")
+        console.log("join");
+        $('#local_stream').html('');
         e.preventDefault();
+        $('#preview, #join').hide();
+        $('#leave, #mdiv').show();
         var params = serializeformData(); // Data is feteched and serilized from the form element.
         if (validator(params, fields)) {
           join(rtc, params)
         }
-      })
+
+        // navigator.getUserMedia = navigator.getUserMedia ||
+        //              navigator.webkitGetUserMedia ||
+        //              navigator.mozGetUserMedia;
+
+        // if (navigator.getUserMedia) {
+        //    navigator.getUserMedia({ audio: true, video: { width: 1280, height: 720 } },
+        //       function(stream) {
+        //          alert("Accessed the Microphone");
+        //       },
+        //       function(err) {
+        //          alert("The following error occured: " + err.name);
+        //       }
+        //     );
+        // } else {
+        //    alert("getUserMedia not supported");
+        // }
+
+      });
+      // $("#join_wo_publish").on("click", function (e) {
+      //   console.log("join_wo_publish")
+      //   e.preventDefault();
+      //   var params = serializeformData(); // Data is feteched and serilized from the form element.
+      //   if (validator(params, fields)) {
+      //     join(rtc, params);
+      //     unpublish(rtc);
+      //   }
+      // })
       // This publishes the video feed to Agora
       $("#publish").on("click", function (e) {
         console.log("publish")
@@ -592,13 +665,54 @@
         e.preventDefault()
         var params = serializeformData()
         if (validator(params, fields)) {
-          leave(rtc)
+          leave(rtc);
+          $('#preview, #join').show();
+          $('#leave, #mdiv').hide();
+          location.reload();
         }
-      })
+        // $('#local_stream').addClass('full_screen_stream').removeClass('remote_video_panel');
+        // start_local_stream();
+      });
+      $("#mute").on("click", function (e) {
+        e.preventDefault();
+        rtc.localStream.muteAudio();
+        $('#mute').hide();
+        $('#unmute').show();
+      });
+      $("#unmute").on("click", function (e) {
+        e.preventDefault();
+        rtc.localStream.unmuteAudio();
+        $('#unmute').hide();
+        $('#mute').show();
+      });
+
     });
 
+  function start_local_stream(){
+    rtc.localStream = AgoraRTC.createStream({
+      streamID: rtc.params.uid,
+      audio: true,
+      video: true,
+      screen: false,
+    });
+    rtc.localStream.init(function () {
+      rtc.localStream.play("local_stream")
+      // publish local stream
+      publish(rtc)
+    }, function (err)  {
+      Toast.error("stream init failed, please open console see more detail")
+      console.error("init local stream failed ", err)
+    });
+  }
+
   $(document).ready(function(){
-    $("#join").click();
+    start_local_stream();
+    $('video').on("click", function (e) {
+      alert('1')
+      // $('.full_screen_stream').removeClass('full_screen_stream');
+      // $(this).parents('.tap_to_zoom').addClass('full_screen_stream');    
+    });
+
   });
   </script>
 </html>

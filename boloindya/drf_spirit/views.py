@@ -511,6 +511,27 @@ def GetChallenge(request):
                     topics = get_campaign_paginated_data(2, hash_tag[0].id, page_no)
                 elif int(language_id) == 2:
                     topics = get_campaign_paginated_data(1, hash_tag[0].id, page_no)
+
+            if len(topics) < settings.REST_FRAMEWORK['PAGE_SIZE'] and int(language_id) in [1, 2]:
+                try:
+                    hash_tag_counter=HashtagViewCounter.objects.filter(hashtag = hash_tag, language = language_id)
+                    hash_tag_counter_values = list(hash_tag_counter.values('view_count','video_count'))
+                    view_count = sum(item['view_count'] for item in hash_tag_counter_values)
+                    vb_count_values = [item['video_count'] for item in hash_tag_counter_values]
+                    vb_count = sum(vb_count_values)
+                    orig_page_total = vb_count / settings.REST_FRAMEWORK['PAGE_SIZE']
+                    extra_no = 0
+                    if vb_count % settings.REST_FRAMEWORK['PAGE_SIZE'] > 0:
+                        orig_page_total += 1
+                        extra_no = 1
+                    updated_page_no = page_no - orig_page_total + extra_no
+                    if int(language_id) == 1 and updated_page_no > 0:
+                        topics += get_campaign_paginated_data(2, hash_tag[0].id, updated_page_no)
+                    elif int(language_id) == 2 and updated_page_no > 0:
+                        topics += get_campaign_paginated_data(1, hash_tag[0].id, updated_page_no)
+                except:
+                    pass
+
         else:
             topics = get_redis_hashtag_paginated_data(language_id,hash_tag[0].id,page_no)
             if len(topics)<settings.REST_FRAMEWORK['PAGE_SIZE'] and int(language_id) in [1,2]:
@@ -519,6 +540,26 @@ def GetChallenge(request):
                 if is_required:
                     next_language_id = 1 if int(language_id)==2 else 2
                     topics += get_redis_hashtag_paginated_data(next_language_id,hash_tag[0].id,next_language_page_no)
+
+            if len(topics) < settings.REST_FRAMEWORK['PAGE_SIZE'] and int(language_id) in [1, 2]:
+                try:
+                    hash_tag_counter=HashtagViewCounter.objects.filter(hashtag = hash_tag, language = language_id)
+                    hash_tag_counter_values = list(hash_tag_counter.values('view_count','video_count'))
+                    view_count = sum(item['view_count'] for item in hash_tag_counter_values)
+                    vb_count_values = [item['video_count'] for item in hash_tag_counter_values]
+                    vb_count = sum(vb_count_values)
+                    orig_page_total = vb_count / settings.REST_FRAMEWORK['PAGE_SIZE']
+                    extra_no = 0
+                    if vb_count % settings.REST_FRAMEWORK['PAGE_SIZE'] > 0:
+                        orig_page_total += 1
+                        extra_no = 1
+                    updated_page_no = page_no - orig_page_total + extra_no
+                    if int(language_id) == 1 and updated_page_no > 0:
+                        topics += get_campaign_paginated_data(2, hash_tag[0].id, updated_page_no)
+                    elif int(language_id) == 2 and updated_page_no > 0:
+                        topics += get_campaign_paginated_data(1, hash_tag[0].id, updated_page_no)
+                except:
+                    pass
 
         my_data = TopicSerializerwithComment(topics,context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand':request.GET.get('is_expand',True)},many=True).data
         return JsonResponse({"results":my_data})

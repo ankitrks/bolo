@@ -66,6 +66,7 @@ from forum.user.utils.bolo_redis import update_profile_counter
 from rest_framework import generics
 from coupon.models import Coupon, UserCoupon
 from coupon.forms import CouponForm
+from booking.models import Event
 import pandas as pd
 
 def get_bucket_details(bucket_name=None):
@@ -3539,7 +3540,49 @@ class CouponDatableList(generics.ListAPIView):
 def coupon_list_datable(request):
     return render(request,'jarvis/pages/coupons/boloindya_coupons.html')
 
+@login_required
+def event_list(request):
+    page_no = request.GET.get('page_no', '1')
 
+    event_list = Event.objects.order_by('-created_at')
+
+    total_page = event_list.count()/10
+    if event_list.count()%10:
+        total_page += 1
+    page = int(page_no) - 1
+
+    print("**", event_list.count(), total_page)
+
+    return render(request,'jarvis/pages/events/boloindya_events.html', {'event_list': event_list[page*10:page*10+10],\
+        'page_no': page_no, 'total_page': total_page})
+
+def event_update(request):
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
+        event_id = request.POST.get('event_id',None)
+        approve_toggle_value = request.POST.get('approve_toggle_value',None)
+        active_toggle_value = request.POST.get('active_toggle_value',None)
+        if event_id:
+            if approve_toggle_value:
+                is_approved = None
+                if approve_toggle_value=='true':
+                    is_approved = True
+                elif approve_toggle_value == 'false':
+                    is_approved = False
+                Event.objects.filter(pk=event_id).update(is_approved=is_approved)
+            elif active_toggle_value:
+                is_active = None
+                if active_toggle_value=='true':
+                    is_active = True
+                elif active_toggle_value == 'false':
+                    is_active = False
+                Event.objects.filter(pk=event_id).update(is_active=is_active)
+            else:
+                return JsonResponse({'error':'Something went wrong!','message':'fail' }, status=status.HTTP_200_OK)
+            return JsonResponse({'sucess':'event updated','message':'success' }, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'error':'event_id not found','message':'fail' }, status=status.HTTP_200_OK)
+    else:
+        return JsonResponse({'error':'User Not Authorised','message':'fail' }, status=status.HTTP_200_OK)
 
 def month_year_iter(start_month, start_year, end_month, end_year):
     yield "%s-%s-01"%(start_year, str(start_month).zfill(2))
@@ -3556,11 +3599,9 @@ def month_year_iter(start_month, start_year, end_month, end_year):
 from rest_framework.generics import ListAPIView
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
-
 from payment.partner.models import TopUser
 from payment.partner.serializers import TopUserSerializer
 from payment.utils import PageNumberPaginationRemastered
-
 
 class TopUserTemplateView(TemplateView):
     template_name = "jarvis/pages/top_users/index.html"
@@ -3609,12 +3650,8 @@ class TopUserListView(ListAPIView):
                     WHERE name ilike %s or slug = %s
                 """, ['%' + q +'%', q])
                 ids = [row[0] for row in cursor.fetchall()]
-
             self.queryset = self.queryset.filter(boloindya_id__in=ids)
-
-
         query = self.queryset.query.sql_with_params()
-
         return self.queryset.order_by(sort_field)
 
 def upload_coupon_image(bucket, image_file, folder_name):
@@ -3625,8 +3662,6 @@ def upload_coupon_image(bucket, image_file, folder_name):
     bucket_credentials = get_bucket_details(bucket)
     conn = boto3.client('s3', bucket_credentials['REGION_HOST'], aws_access_key_id = bucket_credentials['AWS_ACCESS_KEY_ID'], \
             aws_secret_access_key = bucket_credentials['AWS_SECRET_ACCESS_KEY'])
-
-
     image_file_name = urlify(image_file.name.lower())
     image_output_key = hashlib.sha256(image_file_name.encode('utf-8')).hexdigest()
     image_file_name = check_image_file_name_validation(image_file_name,image_output_key)
@@ -3645,4 +3680,3 @@ def upload_coupon_image(bucket, image_file, folder_name):
     image_url = upload_to_s3_without_transcode(image_file_name,bucket,folder_name)
     os.remove(urlify(image_file_name))
     return image_url
-

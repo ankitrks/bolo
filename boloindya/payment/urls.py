@@ -18,17 +18,13 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-
-
 from django.contrib import admin
 from django.conf.urls import include, url
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic.base import RedirectView
 from django.contrib.auth.decorators import login_required
-
 from payment.partner.views import OptVerificationView
-
 
 urlpatterns = [
     url(r'^$', RedirectView.as_view(url='/payment/partner/beneficiary'), name='home'),
@@ -36,11 +32,8 @@ urlpatterns = [
     url('payout/', include('payment.payout.urls')),
     url('partner/', include('payment.partner.urls')),
     url('otp-verification', login_required(OptVerificationView.as_view())),
+    url(r'', include('payment.payin.urls')),
 ]
-
 
 if settings.DEBUG :
     urlpatterns += static(settings.STATIC_URL, document_root=settings.MEDIA_ROOT)
-
-
-print urlpatterns
