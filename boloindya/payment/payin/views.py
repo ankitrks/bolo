@@ -39,7 +39,7 @@ class RazorpayPaymentView(RedirectView):
     def get_redirect_url(self, *args, **kawrgs):
         context = {}
         context['key'] = razorpay_credentials.get('USERNAME')
-        context['callback_url'] = "/payment/razorpay/callback?type=%s"%self.request.GET.get('type')
+        context['callback_url'] = "https://" + self.request.META.get('HTTP_HOST') + "/payment/razorpay/callback?type=%s"%self.request.GET.get('type')
         context['payment_retry_url'] = "https://" + self.request.META.get('HTTP_HOST') + "/payment/payment_failed"
         context['payment_timeout'] = settings.PAYMENT_FAILURE_TIMEOUT
         if self.request.GET.get('type') == 'booking':
