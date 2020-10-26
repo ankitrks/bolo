@@ -408,23 +408,24 @@ class EventDetails(APIView):
 
 	def download_and_upload_events(self, event_id, promo_profile_pic, promo_banner):
 		try:
+			from jarvis.views import urlify
 			#upload images async
-			tmp_profile_file, promo_profile_pic_name, tmp_banner_file, promo_banner_name = None, None, None, None
+			promo_profile_pic_path, promo_profile_pic_name, banner_file_path, promo_banner_name = None, None, None, None
 			if promo_profile_pic:
-				path = default_storage.save(promo_profile_pic.name, ContentFile(promo_profile_pic.read()))
-				with default_storage.open(promo_profile_pic.name, 'wb+') as destination:
-					for chunk in promo_profile_pic.chunks():
-						destination.write(chunk)
-				tmp_profile_file = os.path.join(settings.MEDIA_ROOT, path)
 				promo_profile_pic_name = promo_profile_pic.name
+				promo_profile_pic_path = '/tmp/'+urlify(promo_profile_pic.name)
+				with open(promo_profile_pic_path,'wb') as f:
+					for chunk in promo_profile_pic.chunks():
+						if chunk:
+							f.write(chunk)
 			if promo_banner:
-				path = default_storage.save(promo_banner.name, ContentFile(promo_banner.read()))
-				with default_storage.open(promo_banner.name, 'wb+') as destination:
-					for chunk in promo_banner.chunks():
-						destination.write(chunk)
-				tmp_banner_file = os.path.join(settings.MEDIA_ROOT, path)
 				promo_banner_name = promo_banner.name
-			upload_event_media.delay(event_id, tmp_profile_file, tmp_banner_file, promo_profile_pic_name, promo_banner_name)
+				banner_file_path = '/tmp/'+urlify(promo_banner.name)
+				with open(banner_file_path,'wb') as f:
+					for chunk in promo_banner.chunks():
+						if chunk:
+							f.write(chunk)
+			upload_event_media.delay(event_id, promo_profile_pic_path, banner_file_path, promo_profile_pic_name, promo_banner_name)
 			# os.remove(tmp_banner_file)
 			# os.remove(tmp_profile_file)
 		except Exception as e:
