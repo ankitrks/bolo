@@ -106,7 +106,7 @@ class BookingDetails(APIView):
 
 	def get_booking_list(self, user_id, page_no):
 		try:
-			bookings = Booking.objects.all().order_by('id').values('id', 'creator_id', 'title', 'thumbnail_img_url')
+			bookings = Booking.objects.filter(is_active=True).order_by('id').values('id', 'creator_id', 'title', 'thumbnail_img_url')
 			user_bookings = UserBooking.objects.filter(user_id=user_id).values('booking_id')
 			bookings_df = pd.DataFrame.from_records(bookings)
 			user_bookings_df = pd.DataFrame.from_records(user_bookings)
