@@ -24,7 +24,7 @@
 
         .payment-header{
             height: 50px;
-            background: #B62827;
+            background: #09b6b3;
             line-height: 50px;
             align-items: center;
             text-align: center;
@@ -52,6 +52,21 @@
         .redirect-image{
             height: 30px
         }
+        .button {
+          background-color: #09b6b3;
+          border: none;
+          color: white;
+          padding: 15px;
+          text-align: center;
+          text-decoration: none;
+          display: inline-block;
+          font-size: 16px;
+          cursor: pointer;
+          width: 150px;
+          height: 43px;
+          box-sizing: border-box;
+          border-radius: 5px;
+        }
     </style>
 </head>
 <body class="payment-body">
@@ -71,7 +86,7 @@
         </p>
     </div>
     <div class="center">
-        <a href="{{ booking_deeplink_url }}" ><img  class="redirect-image" src="/media/img/payment/check_booking_button.png" ></a>
+        <a href="{{ booking_deeplink_url }}" ><button class="redirect-image button">Check Booking</button></a>
     </div>
 </body>
 </html>
