@@ -158,3 +158,6 @@ class CommentHistory(RecordTimeStamp):
 
     def __unicode__(self):
         return str(self.comment)
+
+class GiphyDetails(RecordTimeStamp):
+    giphy_id = models.TextField(_("giphy_id"), unique=True)

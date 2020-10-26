@@ -691,6 +691,8 @@ GET_USER_COUPONS_API_PAGE_SIZE = 10
 
 USER_NOTIFICATIONS_LIMIT = 10
 
+GIPHY_TRENDING_API_ENDPOINT = "https://api.giphy.com/v1/gifs/trending?api_key=So1i3hYO5bMuezxbboUVnSiRUsmMkiRh&rating=g"
+GIPHY_DATA_LIMIT = 5000
 
 GET_BOOKINGS_API_PAGE_SIZE = 5
 BOOKING_SLOT_URL = 'https://www.boloindya.com/booking/'
