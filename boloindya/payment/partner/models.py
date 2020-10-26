@@ -1,9 +1,14 @@
 import json
 from datetime import datetime
 
+from simple_history.models import HistoricalRecords
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
+from django.conf import settings
+
+from rest_framework import serializers
 
 from payment.paytm_api import generate_order_id, verify_beneficiary, wallet_transfer, account_transfer, upi_transfer
 
@@ -44,6 +49,7 @@ class Beneficiary(models.Model):
     modified_at = models.DateTimeField(_("Created At"), auto_now_add=False, auto_now=True)
     modified_by = models.ForeignKey(User, related_name='modified_beneficiary')
     beneficiary_type = models.CharField(_("Beneficiary Type"), max_length=30, choices=BENEFICIARY_TYPE_CHOICES, default='creator_payout')
+    history = HistoricalRecords()
 
     def __str__(self):
         return self.name
@@ -64,6 +70,17 @@ class Beneficiary(models.Model):
 
 
     def transfer(self, amount):
+        if not settings.ALLOW_PAYMENT_TRANSACTION:
+            raise serializers.ValidationError("Transaction not allowed!!")
+
+        if not self.is_active:
+            raise serializers.ValidationError("Beneficiary is not active!!")
+
+            
+        if self.verification_status != 'verified':
+            raise serializers.ValidationError("Beneficiary is not verified!!")
+
+
         txn_id = generate_order_id()
         if self.payment_method == 'paytm_wallet':
             response = wallet_transfer(txn_id, self.paytm_number, amount)
@@ -81,7 +98,7 @@ class Beneficiary(models.Model):
         else:
             state = 'pending'
 
-        Transaction.objects.create(
+        print "creating transaction", Transaction.objects.create(
             beneficiary=self,
             amount=amount,
             state=state,

@@ -1,32 +1,43 @@
+
 from datetime import datetime
 from copy import deepcopy
+import csv
+import io
 
 from django.views.generic import TemplateView, DetailView
 from django.db import connections
 from django.db.models import Q
+from django.views.generic import FormView
+from django.conf import settings
 
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import ListAPIView
+from rest_framework.views import APIView
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
+from redis_utils import get_redis, set_redis
+from drf_spirit.views import generateOTP, send_sms
+
 from payment.utils import PageNumberPaginationRemastered
-from payment.permission import UserPaymentPermissionView
+from payment.permission import UserPaymentPermissionView, PaymentPermission
 from payment.partner.models import Beneficiary, TopUser
-from payment.partner.serializers import BeneficiarySerializer, TopUserSerializer
+from payment.partner.serializers import BeneficiarySerializer
+from payment.partner.forms import OTPForm
+
 
 
 class BeneficiaryTemplateView(UserPaymentPermissionView, TemplateView):
     template_name = "payment/partner/beneficiary/index.html"
 
 
-class BeneficiaryViewSet(UserPaymentPermissionView, ModelViewSet):
+class BeneficiaryViewSet(ModelViewSet):
     queryset = Beneficiary.objects.all()
     serializer_class = BeneficiarySerializer
     pagination_class = PageNumberPaginationRemastered
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, PaymentPermission)
     authentication_classes = (SessionAuthentication,)
 
     def create(self, request, *args, **kwargs):
@@ -41,7 +52,6 @@ class BeneficiaryViewSet(UserPaymentPermissionView, ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
 
     def partial_update(self, request, *args, **kwargs):
         kwargs['partial'] = True
@@ -85,80 +95,86 @@ class BeneficiaryDetailTemplateView(UserPaymentPermissionView, DetailView):
             
         return context
 
+class BeneficiaryBulkCreateAPIView(APIView):
+    permission_classes = (IsAuthenticated, PaymentPermission)
+    authentication_classes = (SessionAuthentication,)
 
 
-def month_year_iter(start_month, start_year, end_month, end_year):
-    yield "%s-%s-01"%(start_year, str(start_month).zfill(2))
+    def post(self, request, *args, **kwargs):
+        csvfile = csv.DictReader(io.StringIO(request.data.get('beneficiary_file').read().decode('utf-8')))
+        user_ids = [row.get('user_id') for row in csvfile]
 
-    while start_month < end_month or start_year < end_year:
-        start_month += 1
-
-        if start_month > 12:
-            start_year += 1
-            start_month = 1
-
-        yield "%s-%s-01"%(start_year, str(start_month).zfill(2))
+        print 'user_ids', user_ids
+        if not user_ids:
+            return Response({})
 
 
+        cursor = connections['default'].cursor()
+        cursor.execute("""
+            SELECT user_id as boloindya_id, COALESCE(name, slug, '') as name, paytm_number  
+            FROM forum_user_userprofile 
+            WHERE user_id in %s
+        """, [tuple(user_ids)])
 
-class TopUserTemplateView(UserPaymentPermissionView, TemplateView):
-    template_name = "payment/partner/top_users/index.html"
+        columns = [col[0] for col in cursor.description]
+        user_data_list = [
+            dict(zip(columns, row))
+            for row in cursor.fetchall()
+        ]
 
+        print "user_data_list", user_data_list
+        beneficiary_list = []
+        
+        for user_data in user_data_list:
+            user_data.update({
+                'payment_method': 'paytm_wallet',
+                'verification_status': 'pending',
+                'created_by_id': request.user.id,
+                'modified_by_id':request.user.id
+            })
+            beneficiary_list.append(Beneficiary(**user_data))
+
+        print "beneficiary_list", beneficiary_list
+
+        Beneficiary.objects.bulk_create(beneficiary_list)
+
+        return Response({})
+
+
+class OptVerificationView(FormView):
+    template_name = 'payment/otp_verification.html'
+    form_class = OTPForm
+    success_url = 'payment/partner/beneficiary'
 
     def get_context_data(self, **kwargs):
-        print("request", self.request.__dict__)
-        context = super(TopUserTemplateView, self).get_context_data(**kwargs)
-        today = datetime.now().date()
+        context = super(OptVerificationView, self).get_context_data(**kwargs)
+        otp = generateOTP(6)
+        user_phone = self.get_user_phone_number()
 
-        context['all_month'] = sorted([{
-            'name': datetime.strptime(month, '%Y-%m-%d').strftime('%B %Y'),
-            'value': month
-        } for month in month_year_iter(1, 2020, today.month, today.year)], key=lambda x: x.get('value'), reverse=True)
+        if user_phone:
+            send_sms(user_phone, otp)
+            set_redis('payment:user:%s:otp'%self.request.user.id, otp, True, 300)
 
-        print("All months", context['all_month'])
+        context['user_phone'] = user_phone
         return context
 
+    def get_user_phone_number(self):
+        cr = connections['default'].cursor()
+        cr.execute("SELECT mobile_no FROM forum_user_userprofile WHERE user_id = %s ", [self.request.user.id])
+        result = cr.fetchall()
+
+        if result:
+            return result[0][0]
+
+        return False
 
 
+    def form_valid(self, form):
+        otp = self.request.POST.get('otp')
+        print "request data", self.request.POST
+        stored_otp = get_redis('payment:user:%s:otp'%self.request.user.id)
+        print "stored_otp", stored_otp
+        if stored_otp and stored_otp.encode('UTF-8') == otp:
+            set_redis(settings.PAYMENT_SESSION_KEY%(self.request.user.id), True, True, settings.PAYMENT_SESSION_EXPIRE_TIME)
+            return super(OptVerificationView, self).form_valid(form)
 
-
-class TopUserListView(UserPaymentPermissionView, ListAPIView):
-    queryset = TopUser.objects.all()
-    serializer_class = TopUserSerializer
-    pagination_class = PageNumberPaginationRemastered
-
-    def get_queryset(self):
-        print("request", self.request.query_params)
-        query_params = self.request.query_params
-        queryset = self.queryset
-
-        sort_field = '-video_count'
-        
-        if query_params.get('sortField'):
-            sort_field = query_params.get('sortField')
-
-        if query_params.get('sortOrder') == 'desc':
-            sort_field = '-' + sort_field
-
-        if query_params.get('selectedMonth'):
-            print("selectedMonth", query_params.get('selectedMonth'))
-            date = datetime.strptime(query_params.get('selectedMonth'), '%Y-%m-%d')
-            self.queryset = self.queryset.filter(agg_month=query_params.get('selectedMonth'))
-
-        if query_params.get('q'):
-            q = query_params.get('q')
-            with connections['default'].cursor() as cursor:
-                cursor.execute("""
-                    SELECT user_id
-                    FROM forum_user_userprofile
-                    WHERE name ilike %s or slug = %s
-                """, ['%' + q +'%', q])
-                ids = [row[0] for row in cursor.fetchall()]
-
-            self.queryset = self.queryset.filter(boloindya_id__in=ids)
-
-
-        query = self.queryset.query.sql_with_params()
-        print(query[0]%query[1])
-
-        return self.queryset.order_by(sort_field)

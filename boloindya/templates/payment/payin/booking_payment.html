@@ -1,0 +1,55 @@
+
+<html>
+    <head>
+        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+        <style>
+            iframe.razorpay-checkout-frame #modal-close{
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+        <script>
+
+            var options = {
+                "key": "{{ key }}", // Enter the Key ID generated from the Dashboard
+                "amount": "{{ order.amount }}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                "currency": "{{ order.currency }}",
+                "name": "BoloIndya",
+                "description": "Booking Transaction",
+                "image": "https://www.boloindya.com/media/boloindya_new_logo.png",
+                "order_id": "{{ order.id }}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                "callback_url": window.location.origin + "{{ callback_url }}",
+                "prefill": {
+                    "name": "{{ name }}",
+                    "email": "{{ email }}",
+                    "contact": "{{ mobile }}"
+                },
+                "notes": {
+                    "address": "BoloIndya Corporate Office"
+                },
+                "theme": {
+                    "color": "#09b6b3"
+                },
+                "modal": {
+                    "ondismiss": function(){
+                        window.location.reload();
+                    }
+                }
+            };
+            var razorpay = new Razorpay(options);
+            razorpay.on('payment.failed', function (response){
+                    console.log(response)
+            });
+            razorpay.open();
+            
+            redirectTime = "{{ payment_timeout }}";
+            redirectURL = "{{ payment_retry_url }}";
+            function timedRedirect() {
+                setTimeout("location.href = redirectURL;",redirectTime);
+            }
+            timedRedirect()
+        </script>
+        
+    </body>
+</html>

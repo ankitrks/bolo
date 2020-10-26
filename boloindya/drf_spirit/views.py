@@ -511,6 +511,27 @@ def GetChallenge(request):
                     topics = get_campaign_paginated_data(2, hash_tag[0].id, page_no)
                 elif int(language_id) == 2:
                     topics = get_campaign_paginated_data(1, hash_tag[0].id, page_no)
+
+            if len(topics) < settings.REST_FRAMEWORK['PAGE_SIZE'] and int(language_id) in [1, 2]:
+                try:
+                    hash_tag_counter=HashtagViewCounter.objects.filter(hashtag = hash_tag, language = language_id)
+                    hash_tag_counter_values = list(hash_tag_counter.values('view_count','video_count'))
+                    view_count = sum(item['view_count'] for item in hash_tag_counter_values)
+                    vb_count_values = [item['video_count'] for item in hash_tag_counter_values]
+                    vb_count = sum(vb_count_values)
+                    orig_page_total = vb_count / settings.REST_FRAMEWORK['PAGE_SIZE']
+                    extra_no = 0
+                    if vb_count % settings.REST_FRAMEWORK['PAGE_SIZE'] > 0:
+                        orig_page_total += 1
+                        extra_no = 1
+                    updated_page_no = page_no - orig_page_total + extra_no
+                    if int(language_id) == 1 and updated_page_no > 0:
+                        topics += get_campaign_paginated_data(2, hash_tag[0].id, updated_page_no)
+                    elif int(language_id) == 2 and updated_page_no > 0:
+                        topics += get_campaign_paginated_data(1, hash_tag[0].id, updated_page_no)
+                except:
+                    pass
+
         else:
             topics = get_redis_hashtag_paginated_data(language_id,hash_tag[0].id,page_no)
             if len(topics)<settings.REST_FRAMEWORK['PAGE_SIZE'] and int(language_id) in [1,2]:
@@ -519,6 +540,26 @@ def GetChallenge(request):
                 if is_required:
                     next_language_id = 1 if int(language_id)==2 else 2
                     topics += get_redis_hashtag_paginated_data(next_language_id,hash_tag[0].id,next_language_page_no)
+
+            if len(topics) < settings.REST_FRAMEWORK['PAGE_SIZE'] and int(language_id) in [1, 2]:
+                try:
+                    hash_tag_counter=HashtagViewCounter.objects.filter(hashtag = hash_tag, language = language_id)
+                    hash_tag_counter_values = list(hash_tag_counter.values('view_count','video_count'))
+                    view_count = sum(item['view_count'] for item in hash_tag_counter_values)
+                    vb_count_values = [item['video_count'] for item in hash_tag_counter_values]
+                    vb_count = sum(vb_count_values)
+                    orig_page_total = vb_count / settings.REST_FRAMEWORK['PAGE_SIZE']
+                    extra_no = 0
+                    if vb_count % settings.REST_FRAMEWORK['PAGE_SIZE'] > 0:
+                        orig_page_total += 1
+                        extra_no = 1
+                    updated_page_no = page_no - orig_page_total + extra_no
+                    if int(language_id) == 1 and updated_page_no > 0:
+                        topics += get_campaign_paginated_data(2, hash_tag[0].id, updated_page_no)
+                    elif int(language_id) == 2 and updated_page_no > 0:
+                        topics += get_campaign_paginated_data(1, hash_tag[0].id, updated_page_no)
+                except:
+                    pass
 
         my_data = TopicSerializerwithComment(topics,context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand':request.GET.get('is_expand',True)},many=True).data
         return JsonResponse({"results":my_data})
@@ -1204,7 +1245,7 @@ def upload_thumbail(virtual_thumb_file):
     except:
         return None
 
-def upload_media(media_file):
+def upload_media(media_file, key="media/"):
     try:
         from jarvis.views import urlify
         client = boto3.client('s3',aws_access_key_id = settings.BOLOINDYA_AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY)
@@ -1213,10 +1254,11 @@ def upload_media(media_file):
         media_file_name = remove_extra_char(str(media_file.name))
         filenameNext= media_file_name.split('.')
         final_filename = str(urlify(filenameNext[0]))+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[1])
-        client.put_object(Bucket='in-boloindya', Key='media/' + final_filename, Body=media_file, ACL='public-read')
-        filepath = 'https://s3.ap-south-1.amazonaws.com/' + 'in-boloindya' + '/media/' + final_filename
+        client.put_object(Bucket=settings.BOLOINDYA_AWS_IN_BUCKET_NAME, Key=key + final_filename, Body=media_file, ACL='public-read')
+        filepath = 'https://s3.ap-south-1.amazonaws.com/' + settings.BOLOINDYA_AWS_IN_BUCKET_NAME + '/'+ key + final_filename
         return filepath
-    except:
+    except Exception as e:
+        print(e)
         return None
 
 def validateUser(request):
@@ -5546,3 +5588,12 @@ class GetUserNotificationCount(APIView):
         if self.notification_count < settings.USER_NOTIFICATIONS_LIMIT:
             return str(self.notification_count)
         return str(settings.USER_NOTIFICATIONS_LIMIT-1)+"+"
+
+class UploadVideoThumbnail(APIView):
+    def post(self, request, *args, **kwargs):
+        media_file = request.FILES.get('media',None)
+        if media_file and request.user.is_authenticated:
+            media_url = upload_media(media_file, "public/video_byte_thumbnails/")
+            return JsonResponse({'status': 'success','body':media_url}, status=status.HTTP_201_CREATED)
+        else:
+            return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)

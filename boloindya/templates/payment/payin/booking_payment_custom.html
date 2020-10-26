@@ -1,0 +1,205 @@
+
+<html>
+    <head>
+        <script type="text/javascript" src="https://checkout.razorpay.com/v1/razorpay.js"></script>
+    </head>
+    <body>
+        <div>
+            <div id="modeOfPayment">
+                <div>
+                    <input type="radio" name="modeOfPayment" value="credit">Credit Card
+                </div>
+                <div>
+                    <input type="radio" name="modeOfPayment" value="debit">Debit Card
+                </div>
+                <div>
+                    <input type="radio" name="modeOfPayment" value="netbanking">Internet Banking
+                </div>
+            </div>
+            <form id="credit" class="paymentInfo">
+                <div>
+                    Card Holder Name<input type="text" name="name">
+                </div>
+                <div>
+                    Credit Card Number<input type="text" name="number"> 
+                </div>
+                <div>
+                    Expiry  <input type="text" placeholder="MM" name="expiry_month">/
+                    <input type="text" placeholder="YY" name="expiry_year">
+                </div>
+                <div>
+                    CVV <input type="text" placeholder="CVV" name="cvv">
+                </div>
+            </form>
+            <form id="debit" class="paymentInfo">
+                <div>
+                    Card Holder Name<input type="text" name="name">
+                </div>
+                <div>
+                    Debit Card Number<input type="text" name="number"> 
+                </div>
+                <div>
+                    Expiry  <input type="text" placeholder="MM" name="expiry_month">/
+                    <input type="text" placeholder="YY" name="expiry_year">
+                </div>
+                <div>
+                    CVV <input type="text" placeholder="CVV" name="cvv">
+                </div>
+            </form>
+            <form id="netbanking" class="paymentInfo">
+                <select name="bankOptions" id="">
+                    <option value="hdfc">HDFC</option>
+                    <option value="sbi">SBI</option>
+                </select>
+            </form>
+            <form id="upi" class="paymentInfo">
+                UPI<input type="text">
+            </form>
+
+            <button id="pay">Pay</button>
+            
+        </div>
+        <script>
+
+            const serializeFormData = function(form){
+                let data = {};
+                for(const element of form.elements){
+                    data[element.getAttribute('name')] = element.value;
+                }
+                return data;
+            }
+
+            class Payment {
+                constructor(){
+                    this._modeOfPayment;
+                    this._initEvents();
+                    this.initRazorpay()
+                    
+                }
+
+                _initEvents(params) {
+                    let that = this;
+                    document.querySelectorAll("input[name='modeOfPayment']").forEach(function(item){
+                        item.addEventListener("change", function(event){
+                            that.modeOfPayment = this.getAttribute('value');
+                        })
+                    })
+
+                    document.querySelector("button#pay").addEventListener('click', function(){
+                        that.startPayment.call(that)
+                    })
+
+                    this.hideAllOptionsDiv()
+                }
+
+                hideAllOptionsDiv() {
+                    let allMOPInputs = document.querySelectorAll("form.paymentInfo")
+                    allMOPInputs.forEach(function(item){
+                        item.style.display = 'none';
+                    })
+                }
+
+                initRazorpay(){
+                    this.razorpay = new Razorpay({
+                        key: '{{ key }}',
+                        // logo, displayed in the payment processing popup
+                        image: 'https://i.imgur.com/n5tjHFD.png',
+                    });
+
+                    let that = this;
+                    this.razorpay.once('ready', function(response) {
+                        console.log(response.methods);
+                        that.setupModeOfPayment(response.methods);
+                    })
+                }
+
+                setupModeOfPayment(methods){
+                    if(methods.credit_card)
+                        document.querySelector('form#credit').setAttribute('data-isActive', true)
+                    else
+                        document.querySelector('input[type=radio][value=credit]').parentElement.style.display = 'none'
+
+                    if(methods.debit_card)
+                        document.querySelector('form#debit').setAttribute('data-isActive', true)
+                    else
+                        document.querySelector('input[type=radio][value=debit]').parentElement.style.display = 'none'
+
+                    if(methods.upi)
+                        document.querySelector('form#upi').setAttribute('data-isActive', true)
+                    else
+                        document.querySelector('input[type=radio][value=upi]').parentElement.style.display = 'none'
+
+                    if(methods.netbanking){
+                        console.log(methods.netbanking)
+                        let options = []
+                
+                        for (const [key, value] of Object.entries(methods.netbanking)){
+                            options.push('<option value="' + key + '" >' + value + '</option>')
+                        }
+                        
+                        document.querySelector('select[name=bankOptions]').innerHTML = options.join()
+                    }else
+                        document.querySelector('input[type=radio][value=netbanking]').parentElement.style.display = 'none'
+                }
+
+                get modeOfPayment(){
+                    return this._modeOfPayment;
+                }
+
+                set modeOfPayment(value){
+                    this._modeOfPayment = value;
+                    this.hideAllOptionsDiv();
+                    document.querySelector('#' + value).style.display = 'block'
+                }
+
+                startPayment(){
+                    var data = {
+                        callback_url: 'http://localhost:8000/payment/razorpay/callback?type={{ type }}',
+                        amount: "{{ order.amount }}",
+                        currency: "{{ order.currency }}",
+                        email: "{{ email }}",
+                        contact: "{{ mobile }}",
+                        notes: {
+                            address: 'Ground Floor, SJR Cyber, Laskar Hosur Road, Bengaluru',
+                        },
+                        order_id: "order_Fr4aaJeoylyvMH", //"{{ order.id }}",
+                    };
+
+                    var updatedData, card;
+                    console.log("model  of payment", this.modeOfPayment)
+
+                    switch(this.modeOfPayment){
+                        case "credit": 
+                            card = serializeFormData(document.querySelector('form#credit'))
+                            updatedData = {'method': 'card'}
+                            for(const [key, val] of Object.entries(card)){
+                                updatedData['card['+key+']'] = val
+                            }
+                            break;
+                        case "debit":
+                            card = serializeFormData(document.querySelector('form#debit'))
+                            updatedData = {'method': 'card'}
+                            for(const [key, val] of Object.entries(card)){
+                                updatedData['card['+key+']'] = val
+                            }
+                            break;
+                        case "netbanking":
+                            updatedData = {
+                                'method': 'netbanking',
+                                'bank': document.querySelector('select[name=bankOptions]').value
+                            }
+                    }
+                    data = Object.assign(data, updatedData)
+                    this.razorpay.createPayment(data);
+                    this.razorpay.on('payment.failed', function(response){
+                        console.log(response)
+                    });
+                }
+
+            }
+
+            new Payment()
+        </script>
+        
+    </body>
+</html>

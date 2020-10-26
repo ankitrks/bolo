@@ -1,0 +1,231 @@
+{% extends "jarvis/layout/base.html" %}
+
+{% load static %}
+
+{% block styles %}
+    <link type="text/css" rel="stylesheet" href='{% static "AdminLTE/plugins/jsgrid/jsgrid.min.css" %}' />
+    <link type="text/css" rel="stylesheet" href='{% static "AdminLTE/plugins/jsgrid/jsgrid-theme.min.css" %}' />
+{% endblock styles %}
+
+{% block content %}
+
+
+<div class="row">
+    <div class="col-sm-12"  style="margin-left: 10px">
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title">Top Users</h3>
+            </div>
+            <div class="box-body">
+                <div class="row" style="margin-bottom: 10px">
+                    <div class="col-sm-6">
+                        <select name="month">
+                            {% for month in all_month %}
+                                <option value="{{ month.value }}">{{ month.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="input-group">
+                            <input type="text" name="q" class="form-control" placeholder="Search...">
+                            <span class="input-group-btn">
+                                <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <a id="exportUser" class="btn btn-primary">Export User</a>
+                    </div>
+                </div>
+                <div>
+                    <div id="topUserTable"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+
+{% block center_js %}
+<script src='{% static "AdminLTE/plugins/jsgrid/jsgrid.min.js" %}'></script>
+<script type="text/javascript">
+
+var MyHTMLField = function(config) {
+    jsGrid.Field.call(this, config);
+};
+ 
+MyHTMLField.prototype = new jsGrid.Field({
+ 
+    css: "html-field",            // redefine general property 'css'
+    align: "center",              // redefine general property 'align'
+ 
+    itemTemplate: function(value) {
+        let data;
+        $.each(this._grid.data, function(i, _info){
+            if(value == _info.id){
+                data = _info;
+                return false;
+            }
+        })
+        // return `
+        //     <button class="btn btn-primary pay" data-target="#modal-pay-creator" 
+        //             data-toggle="modal" data-id="${ data.id }" data-paytm_number="${ data.paytm_number }"
+        //             data-user_id="${ data.boloindya_id }">
+        //         Pay
+        //     </button>`;
+        return `
+            <input type="checkbox" name="mark_for_export" value="${ data.id }"/>
+        `
+    },
+ 
+ 
+});
+ 
+jsGrid.fields.html = MyHTMLField;
+
+$("#topUserTable").jsGrid({
+    width: "100%",
+    height: "600px",
+
+    inserting: false,
+    editing: false,
+    sorting: true,
+    paging: true,
+    pageLoading: true,
+    autoload: true,
+    fields: [
+        { title: "", name: "id", type: "html", width: 10 },
+        { title: "Month", name: "agg_month", type: "text", width: 90 },
+        { title: "Name", name: "name", type: "text", width: 90 },
+        { title: "BI ID", name: "boloindya_id", type: "number", width: 50 },
+        { title: "Video Count", name: "video_count", type: "number", width: 75 },
+        { title: "Follower Count", name: "follower_count", type: "number", width: 50 },
+        { title: "Playtime", name: "playtime", type: "number", width: 50 },
+        { title: "View Count", name: "view_count", type: "number", width: 50 },
+        // { title: "Action", name: "id", type: "html", width: 50},
+    ],
+    controller: {
+        loadData: function(filter) {
+            console.log("------ loadData ", filter)
+            filter['page'] = filter['pageIndex']
+            filter['selectedMonth'] = $('[name=month]').val();
+
+            let q = $('[name="q"]').val()
+            if(q)
+                filter['q'] = q
+
+            return $.ajax({
+                type: "GET",
+                url: "/jarvis/api/top-users",
+                data: filter
+            });
+        },
+    }
+});
+
+let grid = $("#topUserTable").data("JSGrid");
+
+$('[name=month]').change(function(){
+    grid.reset()
+});
+
+$('#search-btn').click(function(){
+    grid.reset()
+})
+
+class exportCSVFile{
+        constructor(headers, itemsNotFormatted, fileTitle){
+            this.headers = headers
+            this.formattedItems = this.formatItems(itemsNotFormatted);
+            this.fileTitle = fileTitle
+
+            this.createFile()
+        }
+
+        formatItems(itemsNotFormatted){
+            let itemsFormatted = [];
+
+            itemsNotFormatted.forEach((item) => {
+                itemsFormatted.push({
+                    "User ID": item.user_id,
+                });
+            });
+
+            return itemsFormatted
+        }
+
+        createFile(){
+            if (this.headers) {
+                this.formattedItems.unshift(this.headers);
+            }
+
+            // Convert Object to JSON
+            var jsonObject = JSON.stringify(this.formattedItems);
+            var csv = this.convertToCSV(jsonObject);
+
+            console.log(" === csv === ", csv);
+
+            var exportedFilenmae = this.fileTitle + '.csv' || 'export.csv';
+
+            var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            if (navigator.msSaveBlob) { // IE 10+
+                navigator.msSaveBlob(blob, exportedFilenmae);
+            } else {
+                var link = document.getElementById("exportUser");
+                if (link.download !== undefined) { // feature detection
+                    // Browsers that support HTML5 download attribute
+                    var url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", exportedFilenmae);
+                    link.click();
+                }
+            }
+        }
+
+        convertToCSV(objArray) {
+            console.log(" objArray ", objArray)
+            var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+            var str = '';
+
+            for (var i = 0; i < array.length; i++) {
+                var line = '';
+                for (var index in array[i]) {
+                    if (line != '') line += ','
+
+                    line += array[i][index];
+                }
+
+                str += line + '\r\n';
+            }
+
+            return str
+
+        }
+    }
+
+
+$(document).on('click', '#exportUser', function(){
+    let array = []; 
+    
+    $.each(grid.data, function(i, data){
+        $("input[name=mark_for_export]:checked").each(function() { 
+            if(parseInt($(this).attr('value')) == data.id){
+                array.push({'user_id':data.boloindya_id}); 
+                return false;
+            }
+        })
+    }); 
+
+    console.log("array", array);
+    let file = new exportCSVFile({
+        key: 'user_id',
+    }, array, 'report')
+    
+});
+
+
+
+</script>
+{% endblock center_js %}

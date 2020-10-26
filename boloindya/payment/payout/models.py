@@ -1,5 +1,6 @@
-
 import jsonfield
+
+from simple_history.models import HistoricalRecords
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -30,6 +31,7 @@ class ScheduledPayment(models.Model):
     modified_at = models.DateTimeField(_("Modified at"), null=True, blank=True)
     is_active = models.BooleanField(_("Is Active"), default=True)
     added_for_payment = models.BooleanField(_("Added for Payment"), default=False)
+    history = HistoricalRecords()
 
 
 

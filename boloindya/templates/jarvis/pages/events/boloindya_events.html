@@ -1,0 +1,200 @@
+{% extends "jarvis/layout/base.html" %}
+{% block styles %}
+<style>
+    #overlay {
+  position: fixed; /* Sit on top of the page content */
+  display: none; /* Hidden by default */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+  z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
+}
+.percentcomplete{
+    position: absolute;
+    top: 50%;
+    left:50%;
+    color: white;
+    transform: translate(-50%,-50%);
+}
+.video_elements{
+    display: none;
+}
+.campaign_banner{
+    display: block;
+    width: 200px;
+    height: 120px;
+}
+
+#create_new_campaign{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-width : 200px;
+}
+
+ul {
+    float:left;
+    list-style: none;
+    padding: 0px;
+    border: 1px solid black;
+    margin-top: 0px;
+    width: 100%;
+    max-height: 120px;
+    display: block;
+    overflow-y: scroll;
+    background: white;
+}
+ul li {
+    padding: 2px;
+    cursor: pointer;
+    border-bottom: 1px solid black;
+}
+#response li:hover{
+    background: #1989CD;
+    color: white;
+}
+</style>
+{% endblock styles %}
+{% block content %}
+
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+
+<section class="content">
+    {% csrf_token %}
+    <br>
+     <div class="col-xs-12 table-responsive ">
+        <table class="table table-striped nowrap" id="campaigns_table">
+            <thead>
+                <tr>
+                    <th>S No.</th>
+                    <th>Event ID</th>
+                    <th>Event Creator</th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Banner Image</th>
+                    <th>Profile Picture</th>
+                    <th>Price</th>
+                    <th>Hash Tags</th>
+                    <th>Category</th>
+                    <th>Languages</th>
+                    <th>Is Approved</th>
+                    <th>Is Active</th>
+                    <th>Approve/Unapprove</th>
+                    <th>Active/Inactive</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in event_list %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ event.id }}</td>
+                        <td>{{ event.creator.username }}</td>
+                        <td>{{ event.title }}</td>
+                        <td>{{ event.description }}</td>
+                        <td><img id="campaign_banner" class="campaign_banner" src="{{event.banner_img_url}}"/></td>
+                        <td><img id="campaign_banner" class="campaign_banner" src="{{event.profile_pic_img_url}}"/></td>
+                        <td>{{ event.price }}</td>
+                        <td>{% for value in event.hash_tags.all.values %}
+                            {{ value.hash_tag }},
+                        {% endfor %}</td>
+                        <td>{{ event.category }}</td>
+                        <td>{{ event.language_ids }}</td>
+                        <td>{{ event.is_approved }}</td>
+                        <td>{{ event.is_active }}</td>
+                        <td><button style="font-size:10px;" type="button" class="btn btn-success toggle_approve_event" event_id={{event.id}} value="approve">Approve</button><button style="font-size:10px;" type="button" class="btn btn-danger toggle_approve_event" event_id={{event.id}} value="unapprove">Unapprove</button> </td>
+                        <td> <button style="font-size:10px;" type="button" class="btn btn-success toggle_active_event" event_id={{event.id}} value="active">Active</button><button style="font-size:10px;" type="button" class="btn btn-danger toggle_active_event" event_id={{event.id}} value="inactive">Inactive</button></td>
+                    </tr>
+                {% endfor %}    
+            </tbody>
+        </table>
+        <div>
+            {% if page_no != '1' %}<a href="/jarvis/event_bookings/?page_no=1" >First</a> <a href="/jarvis/event_bookings/?page_no={{page_no|add:-1}}" >Prev</a>{% endif %} {{ page_no }} of {{ total_page }} pages {% if page_no|add:0 != total_page %}<a href="/jarvis/event_bookings/?page_no={{page_no|add:1}}" >Next</a> <a href="/jarvis/event_bookings/?page_no={{total_page}}" >Last</a>{% endif %}
+        </div>
+    </div>
+
+    <div id="overlay">
+        <div class="text"><br>
+            <br><span style="font-size:50px;" class="percentcomplete"></span></div>
+    </div>
+    <div id="csv_table">
+    </div>
+</section>
+<script>
+    $(document).ready( function () {
+        $(document).on('click','.toggle_approve_event',function(){
+            var event_id = $(this).attr('event_id')
+            var toggle_status = $(this).attr('value')
+            if (toggle_status == "unapprove"){
+                var toggle_value = false;
+            }
+            else if (toggle_status == "approve"){
+                var toggle_value = true;
+            }
+            console.log(toggle_value)
+            var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+            var data = {
+                'event_id':event_id,
+                'csrfmiddlewaretoken': csrfmiddlewaretoken,
+                'approve_toggle_value': toggle_value
+            }
+            $.ajax({
+                    url: '/jarvis/event/update/',
+                    type: 'POST',
+                    data: data,
+                    dataType: "json",
+                    success: function(data) {
+                        if (data.message == 'fail') {
+                            alert(data.reason)
+                        } else if (data.message == 'success') {
+                           alert("Event Updated, To see changes please reload")
+                        }
+                    },
+                    error: function(data) {
+                        console.log(data)
+                    },
+                });
+            
+      })
+        $(document).on('click','.toggle_active_event',function(){
+            var event_id = $(this).attr('event_id')
+            var toggle_status = $(this).attr('value')
+            if (toggle_status == "inactive"){
+                var toggle_value = false;
+            }
+            else if (toggle_status == "active"){
+                var toggle_value = true;
+            }
+            console.log(toggle_value)
+            var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+            var data = {
+                'event_id':event_id,
+                'csrfmiddlewaretoken': csrfmiddlewaretoken,
+                'active_toggle_value': toggle_value
+            }
+            $.ajax({
+                    url: '/jarvis/event/update/',
+                    type: 'POST',
+                    data: data,
+                    dataType: "json",
+                    success: function(data) {
+                        if (data.message == 'fail') {
+                            alert(data.reason)
+                        } else if (data.message == 'success') {
+                           alert("Event Updated, To see changes please reload")
+                        }
+                    },
+                    error: function(data) {
+                        console.log(data)
+                    },
+                });
+            
+      })
+});
+</script>
+{% endblock content %} 
+

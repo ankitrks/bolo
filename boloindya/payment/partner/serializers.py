@@ -29,8 +29,6 @@ class BeneficiarySerializer(serializers.ModelSerializer):
             if not response.get('status') in ['SUCCESS', 'ACCEPTED']:
                 raise serializers.ValidationError("Bank Account detail not correct!!")            
 
-        data['verification_status'] = 'verified'
-
         return data
 
 

@@ -166,7 +166,9 @@ INSTALLED_APPS = [
     'payment',
     'payment.partner',
     'payment.payout',
+    'simple_history',
     # 'forum.core.tests'
+    'booking'
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -281,6 +283,7 @@ MIDDLEWARE_CLASSES = [
     'forum.user.middleware.LastSeenMiddleware',
     'forum.user.middleware.ActiveUserMiddleware',
     'forum.core.middleware.PrivateForumMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
 TEMPLATES = [
@@ -681,9 +684,23 @@ ANIMATED_VIDEO_URL = 'https://in-boloindya.s3.ap-south-1.amazonaws.com/from_uplo
 GET_COUPONS_API_PAGE_SIZE = 5
 
 PAYTM_TXN_COUNTER_KEY = 'PAYTM_ORDER_COUNTER'
+PAYMENT_SESSION_KEY = 'payment:%s:session'
+PAYMENT_SESSION_EXPIRE_TIME = 1800
+ALLOW_PAYMENT_TRANSACTION = True
 GET_USER_COUPONS_API_PAGE_SIZE = 10
 
 USER_NOTIFICATIONS_LIMIT = 10
 
 GIPHY_TRENDING_API_ENDPOINT = "https://api.giphy.com/v1/gifs/trending?api_key=So1i3hYO5bMuezxbboUVnSiRUsmMkiRh&rating=g"
 GIPHY_DATA_LIMIT = 5000
+
+GET_BOOKINGS_API_PAGE_SIZE = 5
+BOOKING_SLOT_URL = 'https://www.boloindya.com/booking/'
+ALLOW_BOOKINGS_FOR = ["14864736", "267344", "14552437", "14453942", "547841"]
+GET_EVENT_SLOT_API_PAGE_SIZE = 8
+RAZORPAY = {
+    'USERNAME': "rzp_test_CRX59NwqZqFS8P",
+    'PASSWORD': "KvlNmjCSx8DzGbJFhtrk17Un"
+}
+PAYMENT_FAILURE_TIMEOUT = 12*60*1000
+CA_DOMAIN = 'https://www.careeranna.com'
