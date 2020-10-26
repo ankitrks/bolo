@@ -701,3 +701,4 @@ RAZORPAY = {
     'PASSWORD': "KvlNmjCSx8DzGbJFhtrk17Un"
 }
 PAYMENT_FAILURE_TIMEOUT = 12*60*1000
+CA_DOMAIN = 'https://www.careeranna.com'
