@@ -593,7 +593,7 @@ class UserProfileSerializer(ModelSerializer):
             'refrence', 'mobile_no', 'encashable_bolo_score', 'total_time_spent', 'total_vb_playtime',\
             'is_dark_mode_enabled', 'paytm_number', 'state_name', 'city_name', 'extra_data', 'location', \
             'last_seen', 'last_ip', 'timezone', 'is_administrator', 'is_moderator', 'is_verified', 'last_post_on', \
-            'last_post_hash', 'is_geo_location', 'lat', 'lang', 'click_id', 'click_id_response', 'gender', 'about', 'language', 'answer_count',\
+            'last_post_hash', 'is_geo_location', 'lat', 'lang', 'click_id', 'click_id_response', 'gender', 'language', 'answer_count',\
             'share_count', 'like_count', 'is_test_user', 'is_bot_account', 'salary_range', 'boost_views_count', 'boost_like_count', \
             'boost_follow_count', 'boosted_time', 'boost_span', 'd_o_b', 'is_insight_fix')
 
@@ -604,7 +604,10 @@ class UserProfileSerializer(ModelSerializer):
         return shortcounterprofile(get_userprofile_counter(instance.user_id)['follower_count'])
 
     def get_bolo_score(self,instance):
-        return shortcounterprofile(instance.bolo_score)
+        if instance.bolo_score:
+            return shortcounterprofile(instance.bolo_score)
+        else: 
+            return 0
 
     def get_slug(self,instance):
         return instance.user.username
@@ -622,7 +625,10 @@ class UserProfileSerializer(ModelSerializer):
         '''
             This counter is specific w.r.t shorcountertopic function
         '''
-        return shorcountertopic(instance.bolo_score)
+        if instance.bolo_score:
+            return shorcountertopic(instance.bolo_score)
+        else:
+            return 0
 
 class ShortUserProfileSerializer(ModelSerializer):
     follow_count= SerializerMethodField()
