@@ -253,8 +253,6 @@ def upload_media(media_file, file_name, key):
 		final_filename = str(urlify(filenameNext[0]))+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[1])
 		response = client.upload_file(media_file, settings.BOLOINDYA_AWS_IN_BUCKET_NAME,key + final_filename)
 		filepath = 'https://s3.ap-south-1.amazonaws.com/' + settings.BOLOINDYA_AWS_IN_BUCKET_NAME + "/"+ key + final_filename
-		if os.path.exists(media_file):
-			os.remove(media_file)
 		return filepath
 	except Exception as e:
 		print(e)
@@ -412,22 +410,24 @@ class EventDetails(APIView):
 			#upload images async
 			promo_profile_pic_path, promo_profile_pic_name, banner_file_path, promo_banner_name = None, None, None, None
 			if promo_profile_pic:
-				promo_profile_pic_name = promo_profile_pic.name
-				promo_profile_pic_path = '/tmp/'+urlify(promo_profile_pic.name)
+				ts1 = time.time()
+				promo_profile_pic_name_temp= promo_profile_pic.name.split('.')
+				promo_profile_pic_name = str(urlify(promo_profile_pic_name_temp[0]))+"_"+ str(ts1).replace(".", "")+"."+str(promo_profile_pic_name_temp[1])
+				promo_profile_pic_path = '/tmp/'+promo_profile_pic_name
 				with open(promo_profile_pic_path,'wb') as f:
 					for chunk in promo_profile_pic.chunks():
 						if chunk:
 							f.write(chunk)
 			if promo_banner:
-				promo_banner_name = promo_banner.name
-				banner_file_path = '/tmp/'+urlify(promo_banner.name)
+				ts2 = time.time()
+				promo_banner_temp= promo_banner.name.split('.')
+				promo_banner_name = str(urlify(promo_banner_temp[0]))+"_"+ str(ts2).replace(".", "")+"."+str(promo_banner_temp[1])
+				banner_file_path = '/tmp/'+promo_banner_name
 				with open(banner_file_path,'wb') as f:
 					for chunk in promo_banner.chunks():
 						if chunk:
 							f.write(chunk)
 			upload_event_media.delay(event_id, promo_profile_pic_path, banner_file_path, promo_profile_pic_name, promo_banner_name)
-			# os.remove(tmp_banner_file)
-			# os.remove(tmp_profile_file)
 		except Exception as e:
 			print(e)
 
