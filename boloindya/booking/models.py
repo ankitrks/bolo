@@ -17,6 +17,7 @@ class Booking(RecordTimeStamp):
 	thumbnail_img_url = models.TextField(blank = False, null = False, default='')
 	booking_count = models.PositiveIntegerField(default=0)
 	like_count = models.PositiveIntegerField(default=0)
+	is_active = models.BooleanField(default=False)
 
 booking_options = (
 	('0', "Booked"),
