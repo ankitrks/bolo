@@ -101,20 +101,22 @@ def get_user_coupons(request):
             page_no = request.GET.get('page',1)
             user_coupons = UserCoupon.objects.filter(user=request.user)
             all_coupons = Coupon.objects.all()
-            df2 = pd.DataFrame.from_records(user_coupons.values('coupon_id'))
-            df1 = pd.DataFrame.from_records(all_coupons.values('id','brand_name','coupon_code','discount_given','active_till'))
-            timezone = pytz.timezone('Asia/Calcutta')
-            today = datetime.now(timezone).date()
-            df1['active_till'] = df1['active_till'].dt.date
-            df1['is_expired'] = np.where(df1['active_till']<today, True, False)
-            final_df=pd.merge(df1,df2, how='inner',left_on=['id'],right_on=['coupon_id'])
-            result = final_df.to_dict('records')
-            paginator = Paginator(result, settings.GET_USER_COUPONS_API_PAGE_SIZE)
-            try:
-                result = paginator.page(page_no).object_list
-            except:
-                result = []
-            return JsonResponse({'message': 'success', 'page_size': settings.GET_USER_COUPONS_API_PAGE_SIZE,'data':  result}, status=status.HTTP_200_OK)
+            if all_coupons and user_coupons:
+                df2 = pd.DataFrame.from_records(user_coupons.values('coupon_id'))
+                df1 = pd.DataFrame.from_records(all_coupons.values('id','brand_name','coupon_code','discount_given','active_till'))
+                timezone = pytz.timezone('Asia/Calcutta')
+                today = datetime.now(timezone).date()
+                df1['active_till'] = df1['active_till'].dt.date
+                df1['is_expired'] = np.where(df1['active_till']<today, True, False)
+                final_df=pd.merge(df1,df2, how='inner',left_on=['id'],right_on=['coupon_id'])
+                result = final_df.to_dict('records')
+                paginator = Paginator(result, settings.GET_USER_COUPONS_API_PAGE_SIZE)
+                try:
+                    result = paginator.page(page_no).object_list
+                except:
+                    result = []
+                return JsonResponse({'message': 'success', 'page_size': settings.GET_USER_COUPONS_API_PAGE_SIZE,'data':  result}, status=status.HTTP_200_OK)
+            return JsonResponse({'message': 'success', 'page_size': settings.GET_USER_COUPONS_API_PAGE_SIZE,'data':  []}, status=status.HTTP_200_OK)
         else:
             return JsonResponse({'message':'Unauthorised User', 'data':[]}, status=status.HTTP_401_UNAUTHORIZED)
     except Exception as e:
