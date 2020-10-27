@@ -90,7 +90,14 @@ ul li {
   $(document).ready(function() {
       var oTable = $('#coupons_table').DataTable({
           'serverSide': true,
-          'ajax': '/jarvis/coupon_list/?format=datatables',
+          'ajax': {
+            url: '/jarvis/coupon_list/?format=datatables',
+            "beforeSend": function(xhr){
+            xhr.setRequestHeader("Authorization",
+               "Bearer {{token}}");
+            }
+          }
+            ,
           "order": [[ 4, 'desc' ]],
           initComplete: function () {
                 this.api().columns(6).every( function () {
