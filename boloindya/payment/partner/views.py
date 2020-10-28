@@ -123,9 +123,22 @@ class BeneficiaryBulkCreateAPIView(APIView):
         ]
 
         print "user_data_list", user_data_list
+
+        cursor.execute("""
+            SELECT boloindya_id from partner_beneficiary where boloindya_id in %s
+        """, [tuple(user_ids)])
+
+        already_created_beneficiary = [row[0] for row in cursor.fetchall()]
+
+        print "already created beneficiary", already_created_beneficiary
+
         beneficiary_list = []
         
         for user_data in user_data_list:
+            print "comparing", user_data.get('boloindya_id'), already_created_beneficiary
+            if user_data.get('boloindya_id') in already_created_beneficiary:
+                continue
+
             user_data.update({
                 'payment_method': 'paytm_wallet',
                 'verification_status': 'pending',
