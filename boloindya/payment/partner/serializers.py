@@ -19,6 +19,10 @@ class BeneficiarySerializer(serializers.ModelSerializer):
         return '<a href="'+reverse('payment:beneficiary-view', kwargs={'pk': instance.id})+'">' + instance.name + '</a>'
 
     def validate(self, data):
+        print "self", self.partial
+        if self.partial:
+            return data 
+
         if data.get('payment_method') == 'account_transfer' and (not data.get('bank_ifsc') or not data.get('bank_ifsc')):
             raise serializers.ValidationError("Bank IFSC is also required")
 
@@ -32,7 +36,6 @@ class BeneficiarySerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("UPI is required")
 
         return data
-
 
 class TopUserSerializer(serializers.ModelSerializer):
     class Meta:

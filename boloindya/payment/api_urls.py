@@ -19,11 +19,13 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-
 from django.conf.urls import include, url
+
+from payment.views import LogoutView
 
 
 urlpatterns = [
+    url('logout', LogoutView.as_view()),
     url('', include('payment.payout.api_urls')),
     url('', include('payment.partner.api_urls')),
     url('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

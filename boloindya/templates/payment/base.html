@@ -151,6 +151,48 @@ function getCookie(cname) {
     return "";
 }
 </script>
+<script type="text/javascript"> 
+    let timer, currSeconds = 0, idleTimeout = 5; 
+
+    function resetTimer() { 
+        clearInterval(timer); 
+        currSeconds = 0; 
+        timer = setInterval(startIdleTimer, 1000); 
+    } 
+
+    window.onload = resetTimer; 
+    window.onmousemove = resetTimer; 
+    window.onmousedown = resetTimer; 
+    window.ontouchstart = resetTimer; 
+    window.onclick = resetTimer; 
+    window.onkeypress = resetTimer; 
+
+    function startIdleTimer() { 
+        currSeconds++; 
+        if(currSeconds > idleTimeout){
+            logoutSession()
+        }
+    } 
+
+    function logoutSession(){
+        
+        let headers =  {
+            'Authorization': 'Token ' + getCookie('session_id'),
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+        console.log("logging out", headers)
+        $.ajax({
+            type: "POST",
+            url: "/api/v1/payment/logout",
+            headers: headers,
+            success: function(response){
+                currSeconds = 0
+                if(alert('Session Expired!!')){}
+                else    window.location.reload(); 
+            }
+        });
+    }
+	</script> 
 
 {% block local_js %}
 
