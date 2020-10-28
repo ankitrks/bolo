@@ -236,7 +236,7 @@ def write_csv(complete_data):
 # func for sending the csv created to the mail
 def send_file_mail(url):
 	emailfrom = "reports@boloindya.com"
-	emailto = "sarfaraz@careeranna.com"
+	emailto = "varun@boloindya.com"
 	# filetosend = os.getcwd() + "/deltarecords.csv"
 	username = "reports@boloindya.com"
 	password = "$upp0rt@30!1"				# please do not use this()
@@ -244,9 +244,9 @@ def send_file_mail(url):
 	msg["From"] = emailfrom
 	msg["To"] = emailto
 	msg["Subject"] = "Bolo Indya: Weekly users buffering report date: " + str(datetime.now().date())
-	msg.preamble = ""	
+	msg.preamble = ""
 	# attachment = open(filetosend, "rb") 
-	file_stream = MIMEBase('application', 'octet-stream') 
+	file_stream = MIMEBase('application', 'octet-stream')
 	body = 'Please click and download the report\n ' + url
 	msg.attach(MIMEText(body, 'plain')) 
 	# file_stream.set_payload((attachment).read()) 
@@ -256,7 +256,7 @@ def send_file_mail(url):
 	server = smtplib.SMTP("smtp.gmail.com:587")
 	server.starttls()
 	server.login(username, password)
-	server.sendmail(emailfrom, [emailto,'ankit@careeranna.com', 'varun@careeranna.com', 'gitesh@careeranna.com' , 'maaz@careeranna.com', 'akash.u@boloindya.com',  'gaurang.s@boloindya.com'], msg.as_string())	
+	server.sendmail(emailfrom, [emailto,'ankit@boloindya.com', 'varun@boloindya.com', 'akash.u@boloindya.com'], msg.as_string())
 	server.quit()
 
 def main():
