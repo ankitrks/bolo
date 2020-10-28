@@ -274,8 +274,11 @@ class EventDetails(APIView):
 			if event_id:
 				return self.get_event_detail(event_id)
 			else:
-				page_no = request.GET.get('page',1)
-				return self.get_event_list(page_no)
+				if request.user.is_authenticated:
+					page_no = request.GET.get('page',1)
+					return self.get_event_list(page_no)
+				else:
+					return JsonResponse({'message':'Unauthorised User'}, status=status.HTTP_401_UNAUTHORIZED)
 		except Exception as e:
 			print(e)
 			return JsonResponse({'message': str(e), 'data':{}}, status=status.HTTP_400_BAD_REQUEST)
