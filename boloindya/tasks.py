@@ -443,5 +443,15 @@ def upload_event_media(event_id, promo_profile_pic, promo_banner, profile_pic_na
     except Exception as e:
         print(e)
 
+@app.task
+def send_mail_to_payout_admins(message, title=''):
+    send_mail(
+        'BoloIndya Payout Alert!! %s'%title,
+        message,
+        'reports@boloindya.com',
+        settings.PAYOUT_ADMINS,
+        fail_silently=False,
+    )
+
 if __name__ == '__main__':
     app.start()

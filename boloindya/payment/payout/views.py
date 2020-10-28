@@ -1,3 +1,4 @@
+import json
 from copy import deepcopy
 
 from django.shortcuts import render
@@ -15,7 +16,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from payment.permission import UserPaymentPermissionView, PaymentPermission
-from payment.utils import PageNumberPaginationRemastered
+from payment.utils import PageNumberPaginationRemastered, log_message
 from payment.partner.models import Beneficiary
 from payment.payout.models import ScheduledPayment, Transaction
 from payment.payout.serializers import ScheduledPaymentSerializer, TransactionSerializer, PaySerializer
@@ -46,6 +47,12 @@ class ScheduledPaymentModelViewSet(ModelViewSet):
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
+
+        log_message("%s scheduled a payment with data:\n%s)"%(\
+                        request.user, json.dumps(data, indent=4)), 
+                    "Payment Scheduled", 'transaction', True)
+
+
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
@@ -83,7 +90,6 @@ class PayAPIView(APIView):
     authentication_classes = (SessionAuthentication,)
 
     def post(self, request, *args, **kwargs):
-        print("request data", request.data)
         user_id = request.data.get('user_id')
 
         try:
@@ -98,7 +104,10 @@ class PayAPIView(APIView):
         beneficiary = Beneficiary.objects.filter(id=beneficiary_id)
         if beneficiary:
             beneficiary = beneficiary[0]
-            
+
+        log_message("Payment made by %s for %s with amount %s.\nData\n%s"%(\
+                        request.user, beneficiary.name, amount, json.dumps(request.data, indent=4)), 
+                    "Payment Made", 'transaction', True)
 
         beneficiary.transfer(amount)
 

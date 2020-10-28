@@ -14,6 +14,8 @@ from payment.paytm_api import generate_order_id, verify_beneficiary, wallet_tran
 
 from payment.payout.models import Transaction
 
+from payment.utils import log_message
+
 PAYMENT_METHOD_CHOICES = (
     ('paytm_wallet', 'PayTM Wallet'),
     ('upi', 'UPI'),
@@ -93,8 +95,14 @@ class Beneficiary(models.Model):
 
         if response.get('status') == 'SUCCESS':
             state = 'success'
+            log_message("Payment success for beneficiary %s of amount %s.\nPayment Gateway Response\n%s"%(\
+                        self.name, amount, json.dumps(response, indent=4)), 
+                    "Payment Success", 'transaction', True)
         elif response.get('status') == 'FAILURE':
             state = 'failed'
+            log_message("Payment failed for beneficiary %s of amount %s.\nPayment Gateway Response\n%s"%(\
+                        self.name, amount, json.dumps(response, indent=4)), 
+                    "Payment Failed", 'transaction', True)
         else:
             state = 'pending'
 

@@ -3,6 +3,7 @@ from datetime import datetime
 from copy import deepcopy
 import csv
 import io
+import json
 
 from django.views.generic import TemplateView, DetailView
 from django.db import connections
@@ -21,7 +22,7 @@ from rest_framework import status
 from redis_utils import get_redis, set_redis
 from drf_spirit.views import generateOTP, send_sms
 
-from payment.utils import PageNumberPaginationRemastered
+from payment.utils import PageNumberPaginationRemastered, log_message
 from payment.permission import UserPaymentPermissionView, PaymentPermission
 from payment.partner.models import Beneficiary, TopUser
 from payment.partner.serializers import BeneficiarySerializer
@@ -50,6 +51,9 @@ class BeneficiaryViewSet(ModelViewSet):
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
+        log_message("%s added new beneficiary named %s\nData:\n%s)"%(\
+                        request.user, data.get('name'), json.dumps(data, indent=4)), 
+                    "Beneficiary added", 'transaction', True)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
@@ -66,6 +70,10 @@ class BeneficiaryViewSet(ModelViewSet):
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
+
+        log_message("%s updated beneficiary data %s\nData:\n%s)"%(\
+                        request.user, request.data.get('name'), json.dumps(request.data, indent=4)), 
+                    "Beneficiary updated", 'transaction', False)
 
         if getattr(instance, '_prefetched_objects_cache', None):
             # If 'prefetch_related' has been applied to a queryset, we need to
@@ -92,6 +100,8 @@ class BeneficiaryDetailTemplateView(UserPaymentPermissionView, DetailView):
 
         if top_user:
             context['detail'] = top_user[0]
+
+        log_message("%s opened beneficiary detail page"%self.request.user)
             
         return context
 
@@ -104,7 +114,6 @@ class BeneficiaryBulkCreateAPIView(APIView):
         csvfile = csv.DictReader(io.StringIO(request.data.get('beneficiary_file').read().decode('utf-8')))
         user_ids = [row.get('user_id') for row in csvfile]
 
-        print 'user_ids', user_ids
         if not user_ids:
             return Response({})
 
@@ -122,20 +131,17 @@ class BeneficiaryBulkCreateAPIView(APIView):
             for row in cursor.fetchall()
         ]
 
-        print "user_data_list", user_data_list
-
         cursor.execute("""
             SELECT boloindya_id from partner_beneficiary where boloindya_id in %s
         """, [tuple(user_ids)])
 
         already_created_beneficiary = [row[0] for row in cursor.fetchall()]
 
-        print "already created beneficiary", already_created_beneficiary
 
         beneficiary_list = []
+        log_user_data = []
         
         for user_data in user_data_list:
-            print "comparing", user_data.get('boloindya_id'), already_created_beneficiary
             if user_data.get('boloindya_id') in already_created_beneficiary:
                 continue
 
@@ -146,8 +152,13 @@ class BeneficiaryBulkCreateAPIView(APIView):
                 'modified_by_id':request.user.id
             })
             beneficiary_list.append(Beneficiary(**user_data))
+            log_user_data.append(user_data)
 
-        print "beneficiary_list", beneficiary_list
+
+        log_message("%s created beneficiary in bulk with data:\n%s)"%(\
+                        request.user, json.dumps(log_user_data, indent=4)), 
+                    "Beneficiary Bulk Created", 'transaction', True)
+
 
         Beneficiary.objects.bulk_create(beneficiary_list)
 
@@ -168,6 +179,8 @@ class OptVerificationView(FormView):
             send_sms(user_phone, otp)
             set_redis('payment:user:%s:otp'%self.request.user.id, otp, True, 300)
 
+        log_message("%s landed on OTP varification page."%self.request.user)
+
         context['user_phone'] = user_phone
         return context
 
@@ -184,10 +197,9 @@ class OptVerificationView(FormView):
 
     def form_valid(self, form):
         otp = self.request.POST.get('otp')
-        print "request data", self.request.POST
         stored_otp = get_redis('payment:user:%s:otp'%self.request.user.id)
-        print "stored_otp", stored_otp
         if stored_otp and stored_otp.encode('UTF-8') == otp:
             set_redis(settings.PAYMENT_SESSION_KEY%(self.request.user.id), True, True, settings.PAYMENT_SESSION_EXPIRE_TIME)
+            log_message("OTP succesfully verified for user %s"%self.request.user)
             return super(OptVerificationView, self).form_valid(form)
 
