@@ -36,20 +36,20 @@ def run():
             each_seen = Topic.objects.get(pk=each_seen_id)
             if each_seen.is_popular:
                 if each_seen.user.st.is_superstar:
-                    required_view_count = random.randrange(1500000,3000000)
+                    required_view_count = random.randrange(125000,500000)
                 elif each_seen.user.st.is_popular and not each_seen.user.st.is_superstar:
-                    required_view_count = random.randrange(750000,1000000)
+                    required_view_count = random.randrange(50000,100000)
                 else:
-                    required_view_count = random.randrange(300000,500000)
+                    required_view_count = random.randrange(20000,50000)
 
                 # required_view_count = random.randrange(3000000,5000000)
             else:
                 if each_seen.user.st.is_superstar:
-                    required_view_count = random.randrange(40000,150000)
+                    required_view_count = random.randrange(25000,50000)
                 elif each_seen.user.st.is_popular and not each_seen.user.st.is_superstar:
-                    required_view_count = random.randrange(20000,50000)
+                    required_view_count = random.randrange(10000,20000)
                 else:
-                    required_view_count = random.randrange(4000,10000)
+                    required_view_count = random.randrange(2000,10000)
                 # required_view_count = random.randrange(50000,200000)
             if required_view_count:
                 multiplication_factor = decimal.Decimal(random.randrange(int(required_view_count/20),int(required_view_count/16)))
@@ -114,19 +114,19 @@ def check_like(topic_id):
     each_like = Topic.objects.get(pk=topic_id)
     if each_like.is_popular:
         if each_like.user.st.is_superstar:
-            required_like = random.randrange(1000000,1500000)
+            required_like = random.randrange(3000,5000)
         elif each_like.user.st.is_popular and not each_like.user.st.is_superstar:
-            required_like = random.randrange(250000,500000)
+            required_like = random.randrange(2000,4000)
         else:
-            required_like = random.randrange(100000,200000)
+            required_like = random.randrange(1000,3000)
         # required_like = random.randrange(1000000,2000000)
     else:
         if each_like.user.st.is_superstar:
-            required_like = random.randrange(20000,40000)
+            required_like = random.randrange(1500,2000)
         elif each_like.user.st.is_popular and not each_like.user.st.is_superstar:
-            required_like = random.randrange(10000,15000)
+            required_like = random.randrange(1000,1500)
         else:
-            required_like = random.randrange(2000,3000)
+            required_like = random.randrange(500,1000)
         # required_like = random.randrange(20000,50000)
     if required_like:
         multiplication_factor = decimal.Decimal(random.randrange(int(required_like/20),int(required_like/16)))
@@ -217,27 +217,27 @@ def check_share(topic_id):
     topic = get_topic(topic_id)
     if single_topic.is_popular:
         if single_topic.user.st.is_superstar:
-            required_whatsapp_count = random.randrange(250000,500000)
-            required_other_share = random.randrange(100000,200000)
+            required_whatsapp_count = random.randrange(1000,2000)
+            required_other_share = random.randrange(750,1000)
         elif single_topic.user.st.is_popular and not single_topic.user.st.is_superstar:
-            required_whatsapp_count = random.randrange(125000,200000)
-            required_other_share = random.randrange(50000,100000)
+            required_whatsapp_count = random.randrange(400,750)
+            required_other_share = random.randrange(500,750)
         else:
-            required_whatsapp_count = random.randrange(62500,125000)
-            required_other_share = random.randrange(25000,50000)
+            required_whatsapp_count = random.randrange(200,400)
+            required_other_share = random.randrange(100,200)
 
         # required_whatsapp_count = random.randrange(250000,500000)
         # required_other_share = random.randrange(100000,200000)
     else:
         if single_topic.user.st.is_superstar:
-            required_whatsapp_count = random.randrange(5000,10000)
-            required_other_share = random.randrange(2500,5000)
+            required_whatsapp_count = random.randrange(500,1000)
+            required_other_share = random.randrange(750,1000)
         elif single_topic.user.st.is_popular and not single_topic.user.st.is_superstar:
-            required_whatsapp_count = random.randrange(2500,5000)
-            required_other_share = random.randrange(1500,2500)
+            required_whatsapp_count = random.randrange(200,500)
+            required_other_share = random.randrange(500,750)
         else:
-            required_whatsapp_count = random.randrange(1000,1500)
-            required_other_share = random.randrange(250,500)
+            required_whatsapp_count = random.randrange(100,200)
+            required_other_share = random.randrange(10,50)
         # required_whatsapp_count = random.randrange(5000,10000)
         # required_other_share = random.randrange(1000,5000)
 
