@@ -726,3 +726,9 @@ RAZORPAY = {
 }
 PAYMENT_FAILURE_TIMEOUT = 12*60*1000
 CA_DOMAIN = 'https://www.careeranna.com'
+
+WEB_ENGAGE = {
+    'host': 'https://api.webengage.com',
+    'licence': '14507cd31',
+    'key': '1c216f7e-98a7-41b4-9364-24b4ce432351'
+}
