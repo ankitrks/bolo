@@ -78,6 +78,9 @@ ul li {
                     <th>Event Description</th>
                     <th>Booking Status</th>
                     <th>Payment Status</th>
+                    <th>Event Slot Start Time</th>
+                    <th>Event Slot End Time</th>
+                    <th>Price</th>
                     <th>Booked By</th>
                 </tr>
             </thead>
@@ -91,6 +94,9 @@ ul li {
                         <td>{{ event_booking.event.description }}</td>
                         <td>{{ event_booking.state }}</td>
                         <td>{{ event_booking.payment_status }}</td>
+                        <td>{{ event_booking.event_slot.start_time}}</td>
+                        <td>{{ event_booking.event_slot.end_time}}</td>
+                        <td>{{ event_booking.event.price}}</td>
                         <td>{{ event_booking.user.username }}</td>
                     </tr>
                 {% endfor %}    
