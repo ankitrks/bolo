@@ -137,7 +137,18 @@
               <li class="{% if request.path in '/jarvis/coupon_report_pannel/'%}active{% endif %}"><a href="/jarvis/coupon_report_pannel/"><i class="fa fa-table"></i> <span>Coupon Report</span></a></li>
             </ul>
           </li>
-          <li class="{% if request.path in '/jarvis/event_bookings/'%}active{% endif %}"><a href="/jarvis/event_bookings/"><i class="fa fa-flag"></i> <span>Event Bookings</span></a></li>
+          <li class="{% if request.path in '/api/v1/coupon_pannel/,/api/v1/coupon_report_pannel/'%}active{% endif %} treeview">
+            <a href="#">
+              <i class="fa fa-dashboard"></i> <span>Event Management</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li class="{% if request.path in '/jarvis/events/'%}active{% endif %}"><a href="/jarvis/events/"><i class="fa fa-flag"></i> <span>Event</span></a></li>
+              <li class="{% if request.path in '/jarvis/event_bookings/'%}active{% endif %}"><a href="/jarvis/event_bookings/"><i class="fa fa-flag"></i> <span>Event Bookings</span></a></li>
+            </ul>
+          </li>
         {% endif %}
       </ul>
 
