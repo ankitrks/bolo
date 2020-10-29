@@ -628,27 +628,45 @@ LOGGING = {
                 'filename': LOG_DIRS[0] + 'django_request.log',
                 'formatter':'verbose',
         },
+        'payment': {
+            'level':'INFO',
+            'class':'logging.FileHandler',
+            'filename': LOG_DIRS[0] + 'payment_info.log',
+            'formatter':'verbose',
+        },
+        'payment_transaction': {
+            'level':'INFO',
+            'class':'logging.FileHandler',
+            'filename': LOG_DIRS[0] + 'payment_transaction_info.log',
+            'formatter':'verbose',
+        }
     },
     'loggers': {
-
         'boloindya': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True
         },
-
         'django.request':{
              'handlers':['file'],
              'level':'INFO',
              'propagate':True,
         },
-
         'logger.log': {
             'handlers': ['console'],
             'level': 'INFO',
             'propagate': True
         },
-
+        'payment_log': {
+            'handlers': ['payment'],
+            'level': 'INFO',
+            'propagate': True
+        },
+        'transaction_log': {
+            'handlers': ['payment_transaction'],
+            'level': 'INFO',
+            'propagate': True
+        }
     },
 }
 
@@ -685,7 +703,11 @@ GET_COUPONS_API_PAGE_SIZE = 5
 
 PAYTM_TXN_COUNTER_KEY = 'PAYTM_ORDER_COUNTER'
 PAYMENT_SESSION_KEY = 'payment:%s:session'
-PAYMENT_SESSION_EXPIRE_TIME = 1800
+PAYMENT_SESSION_EXPIRE_TIME = 600
+MAX_PAYOUT_AMOUNT = 20000
+PAYOUT_ADMINS = [
+    'shadabmohammad1@gmail.com'
+]
 ALLOW_PAYMENT_TRANSACTION = True
 GET_USER_COUPONS_API_PAGE_SIZE = 10
 

@@ -1,5 +1,3 @@
-
-
 from django.db import connections
 
 def dictfetchall(cursor):

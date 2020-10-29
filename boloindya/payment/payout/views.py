@@ -1,9 +1,11 @@
+import json
 from copy import deepcopy
 
 from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.db import connections
 from django.http import JsonResponse
+from django.conf import settings
 
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import ListAPIView
@@ -14,7 +16,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from payment.permission import UserPaymentPermissionView, PaymentPermission
-from payment.utils import PageNumberPaginationRemastered
+from payment.utils import PageNumberPaginationRemastered, log_message
 from payment.partner.models import Beneficiary
 from payment.payout.models import ScheduledPayment, Transaction
 from payment.payout.serializers import ScheduledPaymentSerializer, TransactionSerializer, PaySerializer
@@ -45,6 +47,12 @@ class ScheduledPaymentModelViewSet(ModelViewSet):
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
+
+        log_message("%s scheduled a payment with data:\n%s)"%(\
+                        request.user, json.dumps(data, indent=4)), 
+                    "Payment Scheduled", 'transaction', True)
+
+
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
@@ -82,15 +90,26 @@ class PayAPIView(APIView):
     authentication_classes = (SessionAuthentication,)
 
     def post(self, request, *args, **kwargs):
-        print("request data", request.data)
         user_id = request.data.get('user_id')
+
+        try:
+            amount = float(request.data.get('amount', '0'))
+        except:
+            amount = 0
+
+        assert amount >= 1 and amount <= settings.MAX_PAYOUT_AMOUNT, "Amount should be between %s and %s"%(1, settings.MAX_PAYOUT_AMOUNT)
+
         beneficiary_id = self.request.parser_context.get('kwargs', {}).get('beneficiary')
 
         beneficiary = Beneficiary.objects.filter(id=beneficiary_id)
         if beneficiary:
             beneficiary = beneficiary[0]
 
-        beneficiary.transfer(request.data.get('amount'))
+        log_message("Payment made by %s for %s with amount %s.\nData\n%s"%(\
+                        request.user, beneficiary.name, amount, json.dumps(request.data, indent=4)), 
+                    "Payment Made", 'transaction', True)
+
+        beneficiary.transfer(amount)
 
         return JsonResponse({
                 'status': 'success'
