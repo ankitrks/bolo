@@ -22,7 +22,11 @@ class AddGiphyCommentsToVideo:
 	def start(self):
 		try:
 			print("starting adding comment on topic_id "+str(self.topic_id)+" with like counts "+ str(self.number_of_likes))
-			required_comments = int(decimal.Decimal(random.randrange(int(self.number_of_likes*0.13), int(self.number_of_likes*0.27))))
+			topic = Topic.objects.get(pk= self.topic_id)
+			if topic.is_popular:
+				required_comments = int(decimal.Decimal(random.randrange(int(self.number_of_likes*0.05), int(self.number_of_likes*0.12))))
+			else:
+				required_comments = int(decimal.Decimal(random.randrange(int(self.number_of_likes*0.03), int(self.number_of_likes*0.07))))
 			print("required comments "+ str(required_comments))
 
 			exisiting_comments = Topic.objects.get(pk=self.topic_id).topic_comment.all()
