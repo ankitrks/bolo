@@ -9,7 +9,7 @@ def get_firebase_remote_config():
 	SCOPES = ['https://www.googleapis.com/auth/firebase.remoteconfig']
 	SERVICE_ACCOUNT_FILE = settings.FIREBASE_SERVICE_ACCOUNT_FILE_PATH
 	if not os.path.exists(SERVICE_ACCOUNT_FILE):
-		SERVICE_ACCOUNT_FILE = get_service_account_file()
+		get_service_account_file()
 	credentials = service_account.Credentials.from_service_account_file(
 		SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 	authed_session = AuthorizedSession(credentials)
