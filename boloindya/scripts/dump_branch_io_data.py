@@ -62,8 +62,8 @@ def run(*args):
     if 'runall' in args:
         start_date = datetime.strptime('2020-10-20', '%Y-%m-%d')
     else:
-        start_date = datetime.now()
-    end_date = datetime.now()
+        start_date = datetime.now() - timedelta(days=1)
+    end_date = datetime.now() - timedelta(days=1)
 
     while start_date <= end_date:
         print "running for date", start_date.date()
