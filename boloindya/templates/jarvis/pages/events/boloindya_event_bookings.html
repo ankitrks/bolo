@@ -72,48 +72,38 @@ ul li {
             <thead>
                 <tr>
                     <th>S No.</th>
-                    <th>Event ID</th>
-                    <th>Event Creator</th>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Banner Image</th>
-                    <th>Profile Picture</th>
+                    <th>Event Booking ID</th>
+                    <th>Creator User Name</th>
+                    <th>Event Title</th>
+                    <th>Event Description</th>
+                    <th>Booking Status</th>
+                    <th>Payment Status</th>
+                    <th>Event Slot Start Time</th>
+                    <th>Event Slot End Time</th>
                     <th>Price</th>
-                    <th>Hash Tags</th>
-                    <th>Category</th>
-                    <th>Languages</th>
-                    <th>Is Approved</th>
-                    <th>Is Active</th>
-                    <th>Approve/Unapprove</th>
-                    <th>Active/Inactive</th>
+                    <th>Booked By</th>
                 </tr>
             </thead>
             <tbody>
-                {% for event in event_list %}
+                {% for event_booking in event_booking_list %}
                     <tr>
                         <td>{{ forloop.counter }}</td>
-                        <td>{{ event.id }}</td>
-                        <td>{{ event.creator.username }}</td>
-                        <td>{{ event.title }}</td>
-                        <td>{{ event.description }}</td>
-                        <td><img id="campaign_banner" class="campaign_banner" src="{{event.banner_img_url}}"/></td>
-                        <td><img id="campaign_banner" class="campaign_banner" src="{{event.profile_pic_img_url}}"/></td>
-                        <td>{{ event.price }}</td>
-                        <td>{% for value in event.hash_tags.all.values %}
-                            {{ value.hash_tag }},
-                        {% endfor %}</td>
-                        <td>{{ event.category }}</td>
-                        <td>{{ event.language_ids }}</td>
-                        <td>{{ event.is_approved }}</td>
-                        <td>{{ event.is_active }}</td>
-                        <td><button style="font-size:10px;" type="button" class="btn btn-success toggle_approve_event" event_id={{event.id}} value="approve">Approve</button><button style="font-size:10px;" type="button" class="btn btn-danger toggle_approve_event" event_id={{event.id}} value="unapprove">Unapprove</button> </td>
-                        <td> <button style="font-size:10px;" type="button" class="btn btn-success toggle_active_event" event_id={{event.id}} value="active">Active</button><button style="font-size:10px;" type="button" class="btn btn-danger toggle_active_event" event_id={{event.id}} value="inactive">Inactive</button></td>
+                        <td>{{ event_booking.id }}</td>
+                        <td>{{ event_booking.event.creator.username }}</td>
+                        <td>{{ event_booking.event.title }}</td>
+                        <td>{{ event_booking.event.description }}</td>
+                        <td>{{ event_booking.state }}</td>
+                        <td>{{ event_booking.payment_status }}</td>
+                        <td>{{ event_booking.event_slot.start_time}}</td>
+                        <td>{{ event_booking.event_slot.end_time}}</td>
+                        <td>{{ event_booking.event.price}}</td>
+                        <td>{{ event_booking.user.username }}</td>
                     </tr>
                 {% endfor %}    
             </tbody>
         </table>
         <div>
-            {% if page_no != '1' %}<a href="/jarvis/events/?page_no=1" >First</a> <a href="/jarvis/events/?page_no={{page_no|add:-1}}" >Prev</a>{% endif %} {{ page_no }} of {{ total_page }} pages {% if page_no|add:0 != total_page %}<a href="/jarvis/events/?page_no={{page_no|add:1}}" >Next</a> <a href="/jarvis/events/?page_no={{total_page}}" >Last</a>{% endif %}
+            {% if page_no != '1' %}<a href="/jarvis/event_bookings/?page_no=1" >First</a> <a href="/jarvis/event_bookings/?page_no={{page_no|add:-1}}" >Prev</a>{% endif %} {{ page_no }} of {{ total_page }} pages {% if page_no|add:0 != total_page %}<a href="/jarvis/event_bookings/?page_no={{page_no|add:1}}" >Next</a> <a href="/jarvis/event_bookings/?page_no={{total_page}}" >Last</a>{% endif %}
         </div>
     </div>
 
