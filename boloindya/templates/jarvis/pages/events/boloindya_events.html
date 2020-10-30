@@ -113,7 +113,7 @@ ul li {
             </tbody>
         </table>
         <div>
-            {% if page_no != '1' %}<a href="/jarvis/event_bookings/?page_no=1" >First</a> <a href="/jarvis/event_bookings/?page_no={{page_no|add:-1}}" >Prev</a>{% endif %} {{ page_no }} of {{ total_page }} pages {% if page_no|add:0 != total_page %}<a href="/jarvis/event_bookings/?page_no={{page_no|add:1}}" >Next</a> <a href="/jarvis/event_bookings/?page_no={{total_page}}" >Last</a>{% endif %}
+            {% if page_no != '1' %}<a href="/jarvis/events/?page_no=1" >First</a> <a href="/jarvis/events/?page_no={{page_no|add:-1}}" >Prev</a>{% endif %} {{ page_no }} of {{ total_page }} pages {% if page_no|add:0 != total_page %}<a href="/jarvis/events/?page_no={{page_no|add:1}}" >Next</a> <a href="/jarvis/events/?page_no={{total_page}}" >Last</a>{% endif %}
         </div>
     </div>
 
