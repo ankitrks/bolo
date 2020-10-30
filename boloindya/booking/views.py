@@ -479,7 +479,7 @@ class EventSlotsDetails(APIView):
 					final_df = final_df.replace({"event_status": booking_options})
 					final_df['channel_url'] = settings.BOOKING_SLOT_URL+final_df['channel_id']
 					result = final_df.to_dict('records')
-					paginator = Paginator(result, settings.GET_BOOKINGS_API_PAGE_SIZE)
+					paginator = Paginator(result, settings.CREATOR_SLOTS_API_PAGE)
 					try:
 						result = paginator.page(page_no).object_list
 					except:
@@ -585,8 +585,11 @@ class EventBookingDetails(APIView):
 			if request.user.is_authenticated:
 				event_slot_id = request.POST.get('event_slot_id', None)
 				name = request.POST.get('name',None)
+				email = request.POST.get('email',None)
 				if name:
 					UserProfile.objects.filter(user_id=request.user.id).update(name=name)
+				if email:
+					User.objects.filter(id=request.user.id).update(email=email)
 				event_slot = list(EventSlot.objects.filter(pk=event_slot_id).values('start_time', 'end_time', 'event_id','channel_id'))
 				if event_slot:
 					event_id = event_slot[0]['event_id']
