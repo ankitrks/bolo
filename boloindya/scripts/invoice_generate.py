@@ -105,7 +105,7 @@ class InvoiceGenerator:
    #                          password='bolo@indya@varun', 
    #                          use_tls=True)
 			email_from = self.firebase_remote_config['parameters']['invoice_email_from']['defaultValue']['value']
-			to_emails = ['akash.u@boloindya.com']
+			to_emails = [data['email']]
 			subject = self.firebase_remote_config['parameters']['event_email_subject_prefix']['defaultValue']['value'] + " | "+ data['title']
 			pdf_path = data['media_file']
 			html_message = render_to_string('payment/email_body.html', {'username': data['username'], 'booking_id': data['event_booking_id']})
