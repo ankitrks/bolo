@@ -1,6 +1,6 @@
-
-
 from django.db import connections
+
+from tasks import webengage_event
 
 def dictfetchall(cursor):
     "Return all rows from a cursor as a dict"
@@ -63,3 +63,27 @@ def update_booking_payment_status(order_id, payment_status, transaction_id=None)
             WHERE payment_gateway_order_id = %s
             RETURNING id
         """, [order_id])
+
+    booking_event_data = get_event_webengage_data(order_id)
+    print "booking_event_data", order_id, booking_event_data
+    if len(booking_event_data) > 0:
+        booking_event_data = booking_event_data[0]
+
+    webengage_event.delay({
+        "userId": booking_event_data.pop('booking_user_id'),
+        "eventName": "Booking Payment %s"%payment_status.capitalize(),
+        "eventData": booking_event_data
+    })
+
+
+def get_event_webengage_data(order_id):
+    return execute_query("""
+        SELECT b.user_id as booking_user_id, b.id as event_booking_id, e.id as event_id, s.id as event_slot_id, s.state as slot_status,
+            b.state as booking_status, b.payment_status as payment_status, b.user_id as creator_id,
+            e.creator_id as booker_id, to_char(s.start_time, 'YYYY-MM-DD HH24:MI:SS') as slot_start_time,
+            to_char(s.end_time, 'YYYY-MM-DD HH24:MI:SS') as slot_end_time
+        FROM booking_eventbooking b
+        INNER JOIN booking_eventslot s on s.id = b.event_slot_id
+        INNER JOIN booking_event e on e.id = b.event_id
+        WHERE b.payment_gateway_order_id = %s
+    """, [order_id])

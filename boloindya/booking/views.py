@@ -23,7 +23,7 @@ from .utils import booking_options
 # Create your views here.
 from datetime import datetime, timedelta
 from drf_spirit.views import remove_extra_char
-from tasks import upload_event_media
+from tasks import upload_event_media, webengage_event
 import pandas as pd
 import numpy as np
 import time
@@ -479,7 +479,7 @@ class EventSlotsDetails(APIView):
 					final_df = final_df.replace({"event_status": booking_options})
 					final_df['channel_url'] = settings.BOOKING_SLOT_URL+final_df['channel_id']
 					result = final_df.to_dict('records')
-					paginator = Paginator(result, settings.GET_BOOKINGS_API_PAGE_SIZE)
+					paginator = Paginator(result, settings.CREATOR_SLOTS_API_PAGE)
 					try:
 						result = paginator.page(page_no).object_list
 					except:
@@ -519,6 +519,24 @@ class BookingPaymentRedirectView(RedirectView):
 		booking.payment_status = 'initiated'
 		booking.event_slot.state = 'hold'
 		booking.event_slot.save()
+
+		webengage_event.delay({
+			"userId": booking.user_id,
+			"eventName": "Booking Payment Initiated",
+			"eventData": {
+				"event_booking_id": booking.id,
+				"event_id": booking.event.id,
+				"event_slot_id": booking.event_slot_id,
+				"slot_status": booking.event_slot.state,
+				"booking_status": booking.state,
+				"payment_status": booking.payment_status,
+				"creator_id": booking.user_id,
+				"booker_id": booking.event.creator_id,
+				"slot_start_time": booking.event_slot.start_time.strftime("%Y-%m-%d %H:%M:%S"),
+				"slot_end_time": booking.event_slot.end_time.strftime("%Y-%m-%d %H:%M:%S"),
+			}
+
+		})
 
 		if not booking.payment_gateway_order_id:
 			order = create_order(booking.event.price, "INR", receipt=booking.booking_number, notes={})
@@ -567,8 +585,11 @@ class EventBookingDetails(APIView):
 			if request.user.is_authenticated:
 				event_slot_id = request.POST.get('event_slot_id', None)
 				name = request.POST.get('name',None)
+				email = request.POST.get('email',None)
 				if name:
 					UserProfile.objects.filter(user_id=request.user.id).update(name=name)
+				if email:
+					User.objects.filter(id=request.user.id).update(email=email)
 				event_slot = list(EventSlot.objects.filter(pk=event_slot_id).values('start_time', 'end_time', 'event_id','channel_id'))
 				if event_slot:
 					event_id = event_slot[0]['event_id']

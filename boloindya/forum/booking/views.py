@@ -7,9 +7,22 @@ from datetime import datetime, timedelta
 
 class BookingCallView(TemplateView):
     template_name = 'booking/index.html'
+    failed_template_name = '403.html'
 
     def get(self, request, channel_id, *args, **kwargs):
         self.channel_id = channel_id
+        self.is_allowed = False
+        try:
+            if request.is_authenticated:
+                allowed_user_ids = []
+                event_slot = EventSlot.objects.select_related('event').get(channel_id=channel_id)
+                allowed_user_ids.append(event_slot.event.creator_id)
+                allowed_user_ids+= list(event_slot.event_slot_event_bookings.filter(payment_status='success').values_list('user_id',flat=True))
+
+                if request.user.id in allowed_user_ids:
+                    self.is_allowed = True
+        except:
+            pass
         return super(BookingCallView, self).get(request, channel_id, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -29,3 +42,9 @@ class BookingCallView(TemplateView):
             'is_active': is_active
         })
         return context
+
+    def get_template_names(self):
+        if self.is_allowed:
+            return [self.template_name]
+        else:
+            return [self.failed_template_name]

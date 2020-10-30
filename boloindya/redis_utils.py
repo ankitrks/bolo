@@ -71,6 +71,7 @@ def set_redis(key, value, set_expiry=True, expiry_time=None):
 
 
 def delete_redis(key):
+    key = "bi:" + key
     try:
         if 'vb_seen:' in key or 'vb_entry:' in key:
             return redis_cli_vbseen.delete(key)

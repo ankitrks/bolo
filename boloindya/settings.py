@@ -628,27 +628,45 @@ LOGGING = {
                 'filename': LOG_DIRS[0] + 'django_request.log',
                 'formatter':'verbose',
         },
+        'payment': {
+            'level':'INFO',
+            'class':'logging.FileHandler',
+            'filename': LOG_DIRS[0] + 'payment_info.log',
+            'formatter':'verbose',
+        },
+        'payment_transaction': {
+            'level':'INFO',
+            'class':'logging.FileHandler',
+            'filename': LOG_DIRS[0] + 'payment_transaction_info.log',
+            'formatter':'verbose',
+        }
     },
     'loggers': {
-
         'boloindya': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True
         },
-
         'django.request':{
              'handlers':['file'],
              'level':'INFO',
              'propagate':True,
         },
-
         'logger.log': {
             'handlers': ['console'],
             'level': 'INFO',
             'propagate': True
         },
-
+        'payment_log': {
+            'handlers': ['payment'],
+            'level': 'INFO',
+            'propagate': True
+        },
+        'transaction_log': {
+            'handlers': ['payment_transaction'],
+            'level': 'INFO',
+            'propagate': True
+        }
     },
 }
 
@@ -685,7 +703,11 @@ GET_COUPONS_API_PAGE_SIZE = 5
 
 PAYTM_TXN_COUNTER_KEY = 'PAYTM_ORDER_COUNTER'
 PAYMENT_SESSION_KEY = 'payment:%s:session'
-PAYMENT_SESSION_EXPIRE_TIME = 1800
+PAYMENT_SESSION_EXPIRE_TIME = 600
+MAX_PAYOUT_AMOUNT = 20000
+PAYOUT_ADMINS = [
+    'shadabmohammad1@gmail.com'
+]
 ALLOW_PAYMENT_TRANSACTION = True
 GET_USER_COUPONS_API_PAGE_SIZE = 10
 
@@ -698,6 +720,7 @@ GET_BOOKINGS_API_PAGE_SIZE = 5
 BOOKING_SLOT_URL = 'https://www.boloindya.com/booking/'
 ALLOW_BOOKINGS_FOR = ["14864736", "267344", "14552437", "14453942", "547841"]
 GET_EVENT_SLOT_API_PAGE_SIZE = 8
+CREATOR_SLOTS_API_PAGE = 8
 RAZORPAY = {
     'USERNAME': "rzp_test_CRX59NwqZqFS8P",
     'PASSWORD': "KvlNmjCSx8DzGbJFhtrk17Un"
@@ -707,3 +730,15 @@ CA_DOMAIN = 'https://www.careeranna.com'
 
 FIREBASE_REMOTE_CONFIG_URL = 'https://firebaseremoteconfig.googleapis.com/v1/projects/boloindya-1ec98/remoteConfig'
 FIREBASE_SERVICE_ACCOUNT_FILE_PATH = '/var/live_code/boloindya_firebase_remote_config.json'
+
+BRANCH_IO_CONFIG = {
+    "branch_key": "key_live_hdT5Kigo9L1ux40B60wCGobdBynnZ8kl", 
+    "branch_secret": "secret_live_neb2MHmQDrvjzf3lUaHvo80PpWT4EVyK",
+    "s3-bucket": "branch-io-data-dump"
+}
+
+WEB_ENGAGE = {
+    'host': 'https://api.webengage.com',
+    'licence': '14507cd31',
+    'key': '1c216f7e-98a7-41b4-9364-24b4ce432351'
+}
