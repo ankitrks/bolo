@@ -3,8 +3,6 @@ import sys
 import requests
 from datetime import datetime, timedelta
 
-s3_bucket_name = 'branch-io-data-dump'
-
 from multiprocessing import Process, Pool
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
@@ -18,6 +16,8 @@ def run_command(cmd):
     os.system(cmd)
 
 def run_command_in_parallel(command_list):
+    if not command_list:
+        return 
     pool = Pool(processes=len(command_list))
     for cmd in command_list:
         pool.apply_async(run_command, args=(cmd,))
@@ -25,7 +25,7 @@ def run_command_in_parallel(command_list):
     pool.close()
     pool.join()
 
-def create_dirs(dir_list):
+def create_dirs(date, dir_list):
     run_command(" && ".join(["mkdir -p /tmp/%s/%s"%(date, d) for d in dir_list]))
 
 def create_file_commands(date, api_data):
@@ -51,7 +51,7 @@ def get_data(date):
 
 def dump_data(date):
     api_data = get_data(date)
-    create_dirs(api_data.keys())
+    create_dirs(date, api_data.keys())
     download_command_list, file_path_list = create_file_commands(date, api_data)
     run_command_in_parallel(download_command_list)
     run_command_in_parallel(create_aws_upload_command(file_path_list))
@@ -64,10 +64,9 @@ def run(*args):
     else:
         start_date = datetime.now()
     end_date = datetime.now()
-    print "start date", start_date.date()
-    print 'end_date', end_date.date()
-    return 
+
     while start_date <= end_date:
+        print "running for date", start_date.date()
         dump_data(str(start_date.date()))
-        start_date += start_date + timedelta(days=1)
+        start_date += timedelta(days=1)
     
