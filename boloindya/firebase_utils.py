@@ -19,4 +19,4 @@ def get_firebase_remote_config():
 def get_service_account_file():
 	client = boto3.client('s3',aws_access_key_id = settings.BOLOINDYA_AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY)
 	file_name = 'boloindya_firebase_remote_config.json'
-	client.download_file(settings.BOLOINDYA_EVENT_INVOICE_BUCKET_NAME, file_name, '/tmp/'+file_name)
+	client.download_file(settings.BOLOINDYA_EVENT_INVOICE_BUCKET_NAME, file_name, settings.FIREBASE_SERVICE_ACCOUNT_FILE_PATH)
