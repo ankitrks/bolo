@@ -476,7 +476,7 @@ class EventSlotsDetails(APIView):
 					final_df = final_df.replace({"event_status": booking_options})
 					final_df['channel_url'] = settings.BOOKING_SLOT_URL+final_df['channel_id']
 					result = final_df.to_dict('records')
-					paginator = Paginator(result, settings.GET_BOOKINGS_API_PAGE_SIZE)
+					paginator = Paginator(result, settings.CREATOR_SLOTS_API_PAGE)
 					try:
 						result = paginator.page(page_no).object_list
 					except:
