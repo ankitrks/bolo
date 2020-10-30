@@ -66,7 +66,7 @@ from forum.user.utils.bolo_redis import update_profile_counter
 from rest_framework import generics
 from coupon.models import Coupon, UserCoupon
 from coupon.forms import CouponForm
-from booking.models import Event
+from booking.models import Event, EventBooking
 from drf_spirit.views import get_tokens_for_user
 import pandas as pd
 
@@ -3573,6 +3573,25 @@ def event_list(request):
         print("**", event_list.count(), total_page)
 
         return render(request,'jarvis/pages/events/boloindya_events.html', {'event_list': event_list[page*10:page*10+10],\
+            'page_no': page_no, 'total_page': total_page})
+    else:
+        return JsonResponse({'error':'User Not Authorised','message':'fail' }, status=status.HTTP_200_OK)
+
+@login_required
+def event_booking_list(request):
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)) or request.user.is_staff:
+        page_no = request.GET.get('page_no', '1')
+
+        event_booking_list = EventBooking.objects.select_related('event').order_by('-created_at')
+
+        total_page = event_booking_list.count()/10
+        if event_booking_list.count()%10:
+            total_page += 1
+        page = int(page_no) - 1
+
+        print("**", event_booking_list.count(), total_page)
+
+        return render(request,'jarvis/pages/events/boloindya_event_bookings.html', {'event_booking_list': event_booking_list[page*10:page*10+10],\
             'page_no': page_no, 'total_page': total_page})
     else:
         return JsonResponse({'error':'User Not Authorised','message':'fail' }, status=status.HTTP_200_OK)
