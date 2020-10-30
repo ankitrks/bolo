@@ -100,6 +100,9 @@ event_booking_payment_options = (
 	('success', "Success"),
 	('failed', "Failed")
 	)
+event_booking_payment_mode_options = (
+	('card','Card'),
+	)
 class EventBooking(RecordTimeStamp):
 	event = models.ForeignKey(Event, related_name='event_event_bookings', on_delete=models.CASCADE)
 	user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='user_event_bookings')
@@ -111,9 +114,23 @@ class EventBooking(RecordTimeStamp):
 	payment_method = models.TextField(blank = True, null = True ,default="RazorPay")
 	booking_number = models.TextField(blank = True, null = True)
 	remark = models.TextField(blank = True, null = True)
+	invoice_sent = models.BooleanField(default=False)
+	payment_mode = models.CharField(choices = event_booking_payment_mode_options,default='card', max_length = 25)
 
 	def save(self, *args, **kwargs):
 		super(EventBooking, self).save(*args, **kwargs)
 		if not self.booking_number:
 			self.booking_number = 'BOOKING_' + str(self.pk)
 			self.save()
+
+class EventBookingInvoice(RecordTimeStamp):
+	consumer = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='user_event_booking_invoice')
+	event_creator = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='creator_event_booking_invoice')
+	price = models.DecimalField(max_digits = 10, decimal_places = 2,default=0.0)
+	tax = models.DecimalField(max_digits = 10, decimal_places = 2,default=0.0)
+	igst_percentage =  models.DecimalField(max_digits = 10, decimal_places = 2, default=18.0)
+	net_amount_payble = models.DecimalField(max_digits = 10, decimal_places = 2,default=0.0)
+	event_booking = models.ForeignKey(EventBooking, related_name='event_booking_invoice', on_delete=models.CASCADE)
+	payment_mode = models.TextField(blank = True, null = True)
+	discount = models.PositiveIntegerField(default=0)
+	invoice_pdf_url = models.TextField(blank = True, null = True)
