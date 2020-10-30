@@ -23,7 +23,7 @@ from .utils import booking_options
 # Create your views here.
 from datetime import datetime, timedelta
 from drf_spirit.views import remove_extra_char
-from tasks import upload_event_media
+from tasks import upload_event_media, webengage_event
 import pandas as pd
 import numpy as np
 import time
@@ -519,6 +519,24 @@ class BookingPaymentRedirectView(RedirectView):
 		booking.payment_status = 'initiated'
 		booking.event_slot.state = 'hold'
 		booking.event_slot.save()
+
+		webengage_event.delay({
+			"userId": booking.user_id,
+			"eventName": "Booking Payment Initiated",
+			"eventData": {
+				"event_booking_id": booking.id,
+				"event_id": booking.event.id,
+				"event_slot_id": booking.event_slot_id,
+				"slot_status": booking.event_slot.state,
+				"booking_status": booking.state,
+				"payment_status": booking.payment_status,
+				"creator_id": booking.user_id,
+				"booker_id": booking.event.creator_id,
+				"slot_start_time": booking.event_slot.start_time.strftime("%Y-%m-%d %H:%M:%S"),
+				"slot_end_time": booking.event_slot.end_time.strftime("%Y-%m-%d %H:%M:%S"),
+			}
+
+		})
 
 		if not booking.payment_gateway_order_id:
 			order = create_order(booking.event.price, "INR", receipt=booking.booking_number, notes={})

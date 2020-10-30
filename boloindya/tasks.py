@@ -5,6 +5,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 import os
 from datetime import datetime, timedelta
+import requests
 # from HTMLParser import HTMLParser
 # from django.contrib.auth.models import User
 # from forum.topic.models import Notification
@@ -452,6 +453,25 @@ def send_mail_to_payout_admins(message, title=''):
         settings.PAYOUT_ADMINS,
         fail_silently=False,
     )
+
+@app.task
+def webengage(event_type, data):
+    url = "%s/v1/accounts/%s/%s"%(settings.WEB_ENGAGE.get('host'), settings.WEB_ENGAGE.get('licence'), event_type)
+    response = requests.post(url, json=data, headers={
+        "Authorization": "Bearer %s"%settings.WEB_ENGAGE.get('key'),
+        "Content-Type": "application/json"
+    })
+
+    print "response text", response.text
+
+@app.task
+def webengage_user(data):
+    return webengage('users', data)
+
+@app.task
+def webengage_event(data):
+    print "registering event====="
+    return webengage('events', data)
 
 if __name__ == '__main__':
     app.start()
