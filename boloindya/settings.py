@@ -727,6 +727,12 @@ RAZORPAY = {
 PAYMENT_FAILURE_TIMEOUT = 12*60*1000
 CA_DOMAIN = 'https://www.careeranna.com'
 
+BRANCH_IO_CONFIG = {
+    "branch_key": "key_live_hdT5Kigo9L1ux40B60wCGobdBynnZ8kl", 
+    "branch_secret": "secret_live_neb2MHmQDrvjzf3lUaHvo80PpWT4EVyK",
+    "s3-bucket": "branch-io-data-dump"
+}
+
 WEB_ENGAGE = {
     'host': 'https://api.webengage.com',
     'licence': '14507cd31',
