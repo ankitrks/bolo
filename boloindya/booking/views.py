@@ -564,8 +564,11 @@ class EventBookingDetails(APIView):
 			if request.user.is_authenticated:
 				event_slot_id = request.POST.get('event_slot_id', None)
 				name = request.POST.get('name',None)
+				email = request.POST.get('email',None)
 				if name:
 					UserProfile.objects.filter(user_id=request.user.id).update(name=name)
+				if email:
+					User.objects.filter(id=request.user.id).update(email=email)
 				event_slot = list(EventSlot.objects.filter(pk=event_slot_id).values('start_time', 'end_time', 'event_id','channel_id'))
 				if event_slot:
 					event_id = event_slot[0]['event_id']
