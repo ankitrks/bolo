@@ -556,7 +556,7 @@ CAREERANNA_AWS_SECRET_ACCESS_KEY = AWS_SECRET_ACCESS_KEY
 CAREERANNA_AWS_ACCESS_KEY_ID_TS = AWS_ACCESS_KEY_ID
 CAREERANNA_AWS_SECRET_ACCESS_KEY_TS = AWS_SECRET_ACCESS_KEY
 
-
+BOLOINDYA_EVENT_INVOICE_BUCKET_NAME = 'XXXXXXX'
 BOLOINDYA_AWS_BUCKET_NAME = 'XXXXXXXX'
 BOLOINDYA_AWS_IN_BUCKET_NAME = 'XXXXXXXX'
 BOLOINDYA_AWS_BUCKET_PII = 'XXXXXXXX'
@@ -720,12 +720,22 @@ GET_BOOKINGS_API_PAGE_SIZE = 5
 BOOKING_SLOT_URL = 'https://www.boloindya.com/booking/'
 ALLOW_BOOKINGS_FOR = ["14864736", "267344", "14552437", "14453942", "547841"]
 GET_EVENT_SLOT_API_PAGE_SIZE = 8
+CREATOR_SLOTS_API_PAGE = 8
 RAZORPAY = {
     'USERNAME': "rzp_test_CRX59NwqZqFS8P",
     'PASSWORD': "KvlNmjCSx8DzGbJFhtrk17Un"
 }
 PAYMENT_FAILURE_TIMEOUT = 12*60*1000
 CA_DOMAIN = 'https://www.careeranna.com'
+
+FIREBASE_REMOTE_CONFIG_URL = 'https://firebaseremoteconfig.googleapis.com/v1/projects/boloindya-1ec98/remoteConfig'
+FIREBASE_SERVICE_ACCOUNT_FILE_PATH = '/var/live_code/boloindya_firebase_remote_config.json'
+
+BRANCH_IO_CONFIG = {
+    "branch_key": "key_live_hdT5Kigo9L1ux40B60wCGobdBynnZ8kl", 
+    "branch_secret": "secret_live_neb2MHmQDrvjzf3lUaHvo80PpWT4EVyK",
+    "s3-bucket": "branch-io-data-dump"
+}
 
 WEB_ENGAGE = {
     'host': 'https://api.webengage.com',

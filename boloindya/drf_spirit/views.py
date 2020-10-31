@@ -5597,3 +5597,14 @@ class UploadVideoThumbnail(APIView):
             return JsonResponse({'status': 'success','body':media_url}, status=status.HTTP_201_CREATED)
         else:
             return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def send_push_notification(request):
+    from tasks import send_fcm_push_notifications
+    data = request.data
+    response = send_fcm_push_notifications(data.get('device_id'), data.get('title'), data.get('body'), media_url=data.get('media_url'))
+
+    if response.ok:
+        return JsonResponse(response.json(), status=200)
+    else:
+        return JsonResponse({"message": response.text}, status=500)

@@ -99,6 +99,7 @@ pyenv/
 .pyenv
 enpy/
 .enpy/
+.env3/
 
 # Spyder project settings
 .spyderproject
