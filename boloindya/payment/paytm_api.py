@@ -10,11 +10,11 @@ import connection
 
 redis_cli = connection.redis()
 
-MID = "BoloIn12971942663959"
-MERCHANT_KEY = "P8FnonGG#zFOAxMT"
-subwalletGuid = "308420a2-e6cf-11ea-a379-fa163e429e83"
-
-BASE_URL = "https://staging-dashboard.paytm.com/bpay/api/v1"
+PAYTM_CONFIG = settings.PAYTM_CONFIG
+MID = PAYTM_CONFIG.get('MID')
+MERCHANT_KEY = PAYTM_CONFIG.get('MERCHANT_KEY')
+subwalletGuid = PAYTM_CONFIG.get('subwalletGuid')
+BASE_URL = PAYTM_CONFIG.get('BASE_URL')
 
 
 def generate_order_id():
