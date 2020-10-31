@@ -473,5 +473,68 @@ def webengage_event(data):
     print "registering event====="
     return webengage('events', data)
 
+
+def send_apns_push_notification(device, device_id, title, body = None, media_url = None, extra_data = None):
+    print("send_apns_push_notification to", device.user_id)
+
+    device.send_message(message = {
+        "title": title if title else '',
+        "body": body if body else ''
+        },
+        category = "rich-apns",
+        extra = {
+            'media-url': media_url,
+            'data': extra_data,
+        } 
+    )
+
+
+def send_fcm_push_notifications(device_id, title, body, click_action = None, media_url = None, extra_data = None):
+
+    notification = {
+        "title": title,
+        "body": body,
+        "notification_info": json.dumps(extra_data) if extra_data else None
+    }
+
+    if media_url:
+        notification["icon"] = media_url
+
+    if click_action:
+        notification['click_action'] = click_action
+
+    resp = requests.post(
+        'https://fcm.googleapis.com/fcm/send',
+        json={ 
+            # "notification": notification,
+            "data": notification,
+            "to" : device_id
+        },
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'key=' + settings.FCM_DJANGO_SETTINGS.get("FCM_SERVER_KEY")
+        }
+    )
+
+    return resp
+
+@app.task
+def send_push_notification(message, notification_info, user_id_list, media_url = None):
+    from ngmodels.notification.models import FCMDevice
+    print("sending push notifications")
+    # gcm_devices = GCMDevice.objects.filter(user_id__in = user_id_list)                                                                                             
+    apns_devices = APNSDevice.objects.filter(user_id__in = user_id_list)
+    fcm_devices = FCMDevice.objects.filter(user_id__in = user_id_list, is_active = True)
+
+    # device_id = "e4Xao00ggNg:APA91bHdldyXfqyc9PUabZd_VlwFzSSpe7kgrSDVDeUtbQGTILAwUn8ViZq2V10ZhUndJuzhlqVeymTDVobBxyjWTtp-dq8RgEXeqc1DmwJWv8BHeArcraZKokc9HQx1H6EQTT6MpUyB"
+    print("sending push notifications to fcm")
+    for device in fcm_devices: 
+        send_fcm_push_notifications(device.device_id, '', message, notification_info.get('click_action'), media_url, notification_info)         
+
+
+    for device in apns_devices:
+        send_apns_push_notification(device, device.registration_id, '', message, media_url, notification_info)
+
+
 if __name__ == '__main__':
     app.start()
