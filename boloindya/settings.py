@@ -744,7 +744,9 @@ WEB_ENGAGE = {
 }
 
 FCM_DJANGO_SETTINGS = {
-    "FCM_SERVER_KEY": "AAAAh1fN2aI:APA91bGAUd0e45pJxMBDLM3qu5LuNPU4GHouxtZ4cpCgrFS2Ls-AuKTsNeDXtnsOTm_ZMfCAqignmtWbn7ucXQJ3JseeGqhA12vmiqzCAOSH9eBuEXDLMEn1YNvpLC6nnzWXc_g7tVKP"
+    "FCM_SERVER_KEY": "AAAAh1fN2aI:APA91bGAUd0e45pJxMBDLM3qu5LuNPU4GHouxtZ4cpCgrFS2Ls-AuKTsNeDXtnsOTm_ZMfCAqignmtWbn7ucXQJ3JseeGqhA12vmiqzCAOSH9eBuEXDLMEn1YNvpLC6nnzWXc_g7tVKP",
+    "CLOUD_MSG_URL": "https://fcm.googleapis.com/v1/projects/boloindya-1ec98/messages:send",
+    "CLOUD_MSG_SCOPE": ['https://www.googleapis.com/auth/firebase.messaging']
 }
 
 
