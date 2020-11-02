@@ -1036,7 +1036,7 @@ class Notification(UserInfo):
             name = str(self.topic.user.st.name or self.topic.user.username)
             title = "'%s'"%self.topic.event.title
             notific['title'] = '%s has booked your session %s'%(name, title)
-            notific['hindi_title'] = '%s ने आपका %s सत्र बुक कर दिया है '%(name, title)
+            notific['hindi_title'] = '%s ने आपका सत्र %s बुक कर दिया है '%(name, title)
             notific['tamil_title'] = '%s உங்கள் அமர்வை முன்பதிவு செய்துள்ளது %s'%(name, title)
             notific['telgu_title'] = '%s మీ సెషన్‌ను బుక్ చేసింది %s'%(name, title)
             notific['bengali_title'] = '%s আপনার সেশন বুক করেছে %s'%(name, title)
@@ -1046,8 +1046,8 @@ class Notification(UserInfo):
             notific['marathi_title'] = '%s आपले सत्र आरक्षित केले आहे %s'%(name, title)
             notific['punjabi_title'] = '%s ਆਪਣੀ ਟਿੱਪਣੀ ਵਿਚ ਤੁਹਾਡਾ ਜ਼ਿਕਰ ਕੀਤਾ ਹੈ: %s'%(name, title)
             notific['odia_title'] = '%s ତୁମର ଅଧିବେଶନ ବୁକ୍ କରିସାରିଛି | %s'%(name, title)
-            notific['bhojpuri_title'] = '%s अपना सत्र %s बुक कर लिया है'%(name, title)
-            notific['haryanvi_title'] = '%s अपना सत्र %s बुक कर लिया है'%(name, title)
+            notific['bhojpuri_title'] = '%s ने आपका सत्र %s बुक कर लिया है'%(name, title)
+            notific['haryanvi_title'] = '%s ने आपका सत्र %s बुक कर लिया है'%(name, title)
             notific['sinhala_title'] = '%s ඔබගේ සැසිය වෙන්කරවා ඇත %s'%(name, title)
             notific['notification_type'] = '11'
             notific['instance_id'] = self.topic.id
