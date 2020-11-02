@@ -193,6 +193,7 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
     adult_content = models.PositiveIntegerField(null=True,blank=True,default=0)
     logo_detected = models.BooleanField(default=False)
     profanity_collage_url = models.TextField(_("profanity collage url"), blank = True, null = True)
+    is_sticky = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.title
