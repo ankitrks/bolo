@@ -82,8 +82,8 @@ def update_booking_payment_status(order_id, payment_status, transaction_id=None)
         if booking_info.get('creator_device_id'):
             send_fcm_push_notifications(
                 booking_info.get('creator_device_id'), 
+                "Bolo Meet Booking Alert",
                 "%s has booked your session '%s'"%(booking_info.get('booker'), booking_info.get('title')), 
-                ''
             )
 
     elif payment_status == 'failed':

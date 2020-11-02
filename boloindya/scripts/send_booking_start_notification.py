@@ -21,7 +21,7 @@ def send_notification_in_parallel(notification_data_list):
     pool = Pool(processes=len(notification_data_list))
     for notification_data in notification_data_list:
         pool.apply_async(send_fcm_push_notifications, 
-                        args=(notification_data.get('device_id'), notification_data.get('title'), ''))
+                        args=(notification_data.get('device_id'), notification_data.get('title'), notification_data.get('body')))
 
     pool.close()
     pool.join()
@@ -31,7 +31,8 @@ def prepare_notification(booking):
     if booking.get('creator_device_id'):
         return {
             "device_id": booking.get('creator_device_id'),
-            "title": "Your bolo meet '%s' with '%s' is about to start in %s minutes."%(
+            "title": 'Bolo Meet Reminder',
+            "body": "Your online session '%s' starts in %s minutes."%(
                 booking.get("title"), booking.get("booker"), booking.get("time_remaining")
             ) 
         }
@@ -39,7 +40,8 @@ def prepare_notification(booking):
     if booking.get('booker_device_id'):
         return {
             "device_id": booking.get('booker_device_id'),
-            "title": "Your bolo meet '%s' with '%s' is about to start in %s minutes."%(
+            "title": 'Bolo Meet Reminder',
+            "body": "Your online session '%s' starts in %s minutes."%(
                 booking.get("title"), booking.get("creator"), booking.get("time_remaining")
             ) 
         }
