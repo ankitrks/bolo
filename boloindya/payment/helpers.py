@@ -64,8 +64,8 @@ def update_booking_payment_status(order_id, payment_status, transaction_id=None)
                 INNER JOIN django_content_type ct on ct.app_label = 'booking' and ct.model = 'eventbooking'
                 WHERE b.payment_gateway_order_id = %s
             RETURNING forum_topic_notification.id;
-            SELECT b.id, e.title, coalesce(cp.name, cp.slug) as creator, coalesce(bp.name, bp.slug) as booker, 
-                cf.reg_id as creator_device_id,
+            SELECT b.id, e.title, coalesce(NULLIF(cp.name, ''), cp.slug) as creator, 
+                coalesce(NULLIF(bp.name,''), bp.slug) as booker, cf.reg_id as creator_device_id,
                 (EXTRACT(EPOCH FROM (s.start_time - now()))/60)::numeric::integer as time_remaining
             FROM booking_eventbooking b
             INNER JOIN booking_eventslot s on s.id = b.event_slot_id

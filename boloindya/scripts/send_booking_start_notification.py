@@ -49,8 +49,8 @@ def run():
     notification_data_list = []
 
     bookings_data_for_creator = execute_query("""
-        select b.id, e.title, coalesce(cp.name, cp.slug) as creator, coalesce(bp.name, bp.slug) as booker, 
-            cf.reg_id as creator_device_id,
+        select b.id, e.title, coalesce(NULLIF(cp.name, ''), cp.slug) as creator, 
+            coalesce(NULLIF(bp.name,''), bp.slug) as booker, cf.reg_id as creator_device_id,
             (EXTRACT(EPOCH FROM (s.start_time - now()))/60)::numeric::integer as time_remaining
         from booking_eventbooking b
         inner join booking_eventslot s on s.id = b.event_slot_id
@@ -66,8 +66,8 @@ def run():
 
 
     bookings_data_for_booker = execute_query("""
-        select b.id, e.title, coalesce(cp.name, cp.slug) as creator, coalesce(bp.name, bp.slug) as booker, 
-            cf.reg_id as creator_device_id,
+        select b.id, e.title, coalesce(NULLIF(cp.name, ''), cp.slug) as creator, 
+            coalesce(NULLIF(bp.name,''), bp.slug) as booker, cf.reg_id as creator_device_id,
             (EXTRACT(EPOCH FROM (s.start_time - now()))/60)::numeric::integer as time_remaining
         from booking_eventbooking b
         inner join booking_eventslot s on s.id = b.event_slot_id

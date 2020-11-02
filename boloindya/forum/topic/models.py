@@ -1031,6 +1031,31 @@ class Notification(UserInfo):
             notific['created_at'] = shortnaturaltime(self.created_at)
             notific['actor_profile_pic'] = self.user.st.profile_pic
 
+        elif self.notification_type=='11':
+            name = str(self.topic.user.st.name or self.topic.user.username)
+            title = "'%s'"%self.topic.event.title
+            notific['title'] = '%s has booked your session %s'%(name, title)
+            notific['hindi_title'] = '%s ने आपका %s सत्र बुक कर दिया है '%(name, title)
+            notific['tamil_title'] = '%s உங்கள் அமர்வை முன்பதிவு செய்துள்ளது %s'%(name, title)
+            notific['telgu_title'] = '%s మీ సెషన్‌ను బుక్ చేసింది %s'%(name, title)
+            notific['bengali_title'] = '%s আপনার সেশন বুক করেছে %s'%(name, title)
+            notific['kannada_title'] = '%s ನಿಮ್ಮ ಅಧಿವೇಶನವನ್ನು ಕಾಯ್ದಿರಿಸಿದೆ %s'%(name, title)
+            notific['malayalam_title'] = '%s നിങ്ങളുടെ സെഷൻ ബുക്ക് ചെയ്തു %s'%(name, title)
+            notific['gujrati_title'] = '%s તમારું સત્ર બુક કરાવ્યું છે %s'%(name, title)
+            notific['marathi_title'] = '%s आपले सत्र आरक्षित केले आहे %s'%(name, title)
+            notific['punjabi_title'] = '%s ਆਪਣੀ ਟਿੱਪਣੀ ਵਿਚ ਤੁਹਾਡਾ ਜ਼ਿਕਰ ਕੀਤਾ ਹੈ: %s'%(name, title)
+            notific['odia_title'] = '%s ତୁମର ଅଧିବେଶନ ବୁକ୍ କରିସାରିଛି | %s'%(name, title)
+            notific['bhojpuri_title'] = '%s अपना सत्र %s बुक कर लिया है'%(name, title)
+            notific['haryanvi_title'] = '%s अपना सत्र %s बुक कर लिया है'%(name, title)
+            notific['sinhala_title'] = '%s ඔබගේ සැසිය වෙන්කරවා ඇත %s'%(name, title)
+            notific['notification_type'] = '11'
+            notific['instance_id'] = self.topic.id
+            notific['topic_id'] = self.topic.id
+            notific['read_status'] = self.status
+            notific['id'] = self.id
+            notific['created_at'] = shortnaturaltime(self.created_at)
+            notific['actor_profile_pic'] = self.topic.user.st.profile_pic
+
         return notific
 
     @staticmethod
