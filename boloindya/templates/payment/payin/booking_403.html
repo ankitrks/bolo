@@ -2,12 +2,14 @@
 
 {% load i18n %}
 
-{% block title %}403{% endblock %}
-
 {% block content %}
-
-    <h4 style="padding-left:20px; padding-top:20px;">
-        Error 403: {% trans "You do not have sufficient permissions to access this page" %}. :(
-    </h4>
+	<style>
+		.lguser{
+			visibility: hidden;
+		}
+	</style>
+    <h5 style="max-width:70%;padding-left:30px; padding-top:20px;">
+        {% trans "You do not have sufficient permissions to access this page" %}.
+    </h5>
 
 {% endblock %}
