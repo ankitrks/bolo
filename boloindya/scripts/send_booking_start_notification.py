@@ -33,7 +33,7 @@ def prepare_notification(booking):
             "device_id": booking.get('creator_device_id'),
             "title": 'Bolo Meet Reminder',
             "body": "Your online session '%s' starts in %s minutes."%(
-                booking.get("title"), booking.get("booker"), booking.get("time_remaining")
+                booking.get("title"), booking.get("time_remaining")
             ) 
         }
 
@@ -42,7 +42,7 @@ def prepare_notification(booking):
             "device_id": booking.get('booker_device_id'),
             "title": 'Bolo Meet Reminder',
             "body": "Your online session '%s' starts in %s minutes."%(
-                booking.get("title"), booking.get("creator"), booking.get("time_remaining")
+                booking.get("title"), booking.get("time_remaining")
             ) 
         }
 
