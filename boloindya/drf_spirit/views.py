@@ -4492,7 +4492,8 @@ def get_popular_video_bytes(request):
         topics = get_popular_paginated_data(request.user.id,language_id,int(request.GET.get('page',1)))
         ''' Manual added post'''
         manual_added_post = Topic.objects.filter(is_sticky=True)
-        topics = list(manual_added_post) + list(topics)
+        if manual_added_post:
+            topics = list(manual_added_post) + list(topics)
         ''' Manual added post'''
         return JsonResponse({'topics': CategoryVideoByteSerializer(topics, many=True, context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data}, status=status.HTTP_200_OK)
     except Exception as e:
