@@ -7,6 +7,7 @@ from django.contrib.postgres.fields import ArrayField
 
 from forum.topic.models import RecordTimeStamp
 # Create your models here.
+from datetime import date
 import uuid
 
 class Booking(RecordTimeStamp):
@@ -134,3 +135,13 @@ class EventBookingInvoice(RecordTimeStamp):
 	payment_mode = models.TextField(blank = True, null = True)
 	discount = models.PositiveIntegerField(default=0)
 	invoice_pdf_url = models.TextField(blank = True, null = True)
+	invoice_number = models.TextField(blank = True, null = True)
+
+	def save(self, *args, **kwargs):
+		super(EventBookingInvoice, self).save(*args, **kwargs)
+		if not self.invoice_number:
+			today = date.today()
+			current_month_invoice = EventBookingInvoice.objects.filter(created_at__year=today.year,created_at__month=today.month).count()
+			next_invoice_counter = "%03d" % (current_month_invoice + 1,)
+			self.invoice_number = str(today.strftime('%y'))+str(today.month)+str(next_invoice_counter)
+			self.save()

@@ -12,7 +12,7 @@ from drf_spirit.views import remove_extra_char
 from multiprocessing.pool import ThreadPool
 from io import BytesIO
 from xhtml2pdf import pisa
-from datetime import datetime
+from datetime import datetime, date
 import inflect
 import boto3
 import math
@@ -36,7 +36,7 @@ class InvoiceGenerator:
 				event_title = event_booking.event.title
 				user_email = event_booking.user.email
 				username = event_booking.user.username
-				net_amount_payble, price, tax= self.get_price_breakup(event_price)
+				net_amount_payble, price, tax = self.get_price_breakup(event_price)
 				data['price'] = price
 				data['net_amount_payble'] = net_amount_payble
 				data['tax'] = tax
@@ -48,7 +48,7 @@ class InvoiceGenerator:
 				event_booking_invoice = EventBookingInvoice(**data)
 				event_booking_invoice.save()
 
-				response = self.create_pdf(event_booking_invoice.id, event_price, username, event_title, event_booking.payment_mode)
+				response = self.create_pdf(event_booking_invoice.invoice_number, event_price, username, event_title, event_booking.payment_mode)
 				response['title'] = event_title
 				response['email'] = user_email
 				response['username'] = username
@@ -63,7 +63,7 @@ class InvoiceGenerator:
 			print("error")
 			print(e)
 
-	def create_pdf(self, invoice_id, price, username, description, payment_mode):
+	def create_pdf(self, invoice_number, price, username, description, payment_mode):
 		netAmount, price, tax= self.get_price_breakup(price)
 		context = {}
 		context['net_amount_payble'] = netAmount
@@ -78,7 +78,7 @@ class InvoiceGenerator:
 		context['description'] = description
 		context['payment_mode'] = payment_mode
 		context['invoice_date'] = datetime.today().strftime('%d-%m-%Y')
-		context['invoice_number'] = invoice_id
+		context['invoice_number'] = invoice_number
 		html = render_to_string('payment/invoice.html',context)
 		pdf_file_name = 'invoice_{}_{}.pdf'.format(username, int(time.time()))
 		pdf_path = '/tmp/'+pdf_file_name
