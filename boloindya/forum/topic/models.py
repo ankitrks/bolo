@@ -1045,8 +1045,8 @@ class Notification(UserInfo):
             notific['marathi_title'] = '%s आपले सत्र आरक्षित केले आहे %s'%(name, title)
             notific['punjabi_title'] = '%s ਆਪਣੀ ਟਿੱਪਣੀ ਵਿਚ ਤੁਹਾਡਾ ਜ਼ਿਕਰ ਕੀਤਾ ਹੈ: %s'%(name, title)
             notific['odia_title'] = '%s ତୁମର ଅଧିବେଶନ ବୁକ୍ କରିସାରିଛି | %s'%(name, title)
-            notific['bhojpuri_title'] = '%s ने अपना सत्र %s बुक कर लिया है'%(name, title)
-            notific['haryanvi_title'] = '%s ने अपना सत्र %s बुक कर लिया है'%(name, title)
+            notific['bhojpuri_title'] = '%s ने आपका सत्र %s बुक कर लिया है'%(name, title)
+            notific['haryanvi_title'] = '%s ने आपका सत्र %s बुक कर लिया है'%(name, title)
             notific['sinhala_title'] = '%s ඔබගේ සැසිය වෙන්කරවා ඇත %s'%(name, title)
             notific['notification_type'] = '11'
             notific['instance_id'] = self.topic.id
