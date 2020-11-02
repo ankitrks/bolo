@@ -1,6 +1,7 @@
 from django.db import connections
 
-from tasks import webengage_event
+from tasks import webengage_event, send_fcm_push_notifications
+
 
 def dictfetchall(cursor):
     "Return all rows from a cursor as a dict"
@@ -40,7 +41,7 @@ def get_booking_info(order_id):
     
 def update_booking_payment_status(order_id, payment_status, transaction_id=None):
     if payment_status == 'success':
-        execute_query("""
+        result = execute_query("""
             UPDATE booking_eventbooking
             SET 
                 transaction_id = %s,
@@ -53,8 +54,38 @@ def update_booking_payment_status(order_id, payment_status, transaction_id=None)
                 state = 'booked'
             FROM booking_eventbooking booking
             WHERE booking.payment_gateway_order_id = %s and booking.event_slot_id = slot.id
-            RETURNING booking.id
-        """, [transaction_id, order_id, order_id])
+            RETURNING booking.id;
+            INSERT into forum_topic_notification
+                SELECT nextval('forum_topic_notification_id_seq'), now() as created_at, now() as modified_at, true as is_active, 
+                        '11' as notification_type, false as is_read, null as read_at, b.id as topic_id, e.creator_id as for_user_id, 
+                        ct.id as topic_type_id, b.user_id as user_id, 0 as status
+                FROM booking_eventbooking b
+                INNER JOIN booking_event e on e.id = b.event_id
+                INNER JOIN django_content_type ct on ct.app_label = 'booking' and ct.model = 'eventbooking'
+                WHERE b.payment_gateway_order_id = %s
+            RETURNING forum_topic_notification.id;
+            SELECT b.id, e.title, coalesce(cp.name, cp.slug) as creator, coalesce(bp.name, bp.slug) as booker, 
+                cf.reg_id as creator_device_id,
+                (EXTRACT(EPOCH FROM (s.start_time - now()))/60)::numeric::integer as time_remaining
+            FROM booking_eventbooking b
+            INNER JOIN booking_eventslot s on s.id = b.event_slot_id
+            INNER JOIN booking_event e on e.id = b.event_id
+            LEFT JOIN jarvis_fcmdevice cf on cf.user_id = e.creator_id
+            LEFT JOIN forum_user_userprofile cp on cp.user_id = e.creator_id
+            LEFT JOIN forum_user_userprofile bp on bp.user_id = b.user_id
+            WHERE b.payment_gateway_order_id = %s
+        """, [transaction_id, order_id, order_id, order_id, order_id])
+
+        if result:
+            booking_info = result[0]
+
+        if booking_info.get('creator_device_id'):
+            send_fcm_push_notifications(
+                booking_info.get('creator_device_id'), 
+                "%s has booked your session '%s'"%(booking_info.get('booker'), booking_info.get('title')), 
+                ''
+            )
+
     elif payment_status == 'failed':
         execute_query("""
             UPDATE booking_eventbooking

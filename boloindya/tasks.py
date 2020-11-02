@@ -473,5 +473,51 @@ def webengage_event(data):
     print "registering event====="
     return webengage('events', data)
 
+
+# def send_fcm_push_notifications(device_id, title, body = None, media_url = None, extra_data = None):
+#     message = messaging.MulticastMessage(
+#         notification=messaging.Notification(
+#             title=title,
+#             body=body
+#         ),
+#         data=extra_data,
+#         tokens=[device_id],
+#     )
+#     response = messaging.send_multicast(message)
+#     print('Successfully sent message:', response)
+
+from oauth2client.service_account import ServiceAccountCredentials
+
+def _get_firebase_access_token():
+    """Retrieve a valid access token that can be used to authorize requests.
+    :return: Access token.
+    """
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(
+        'boloindya/firebase-service.json', settings.FCM_DJANGO_SETTINGS.get('CLOUD_MSG_SCOPE'))
+    access_token_info = credentials.get_access_token()
+    return access_token_info.access_token
+
+
+def send_fcm_push_notifications(device_id, title, body = None, media_url = None, extra_data = None):
+    return requests.post(
+        settings.FCM_DJANGO_SETTINGS.get('CLOUD_MSG_URL'),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": "Bearer %s"%_get_firebase_access_token()
+        },
+        json={
+            "message":{
+                "token": device_id,
+                "notification":{
+                "title": title,
+                "body": body
+                },
+            "android": {
+                "direct_boot_ok": True,
+                },
+            }
+        }
+    )
+
 if __name__ == '__main__':
     app.start()
