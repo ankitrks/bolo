@@ -52,7 +52,7 @@ class InvoiceGenerator:
 				response['title'] = event_title
 				response['email'] = user_email
 				response['username'] = username
-				response['event_booking_id'] = event_booking.id
+				response['event_booking_id'] = event_booking_invoice.invoice_number
 				self.send_email(response)
 				invoice_url = self.upload_media(response)
 				event_booking_invoice.invoice_pdf_url = invoice_url

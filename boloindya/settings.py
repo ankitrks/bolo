@@ -751,3 +751,5 @@ FCM_DJANGO_SETTINGS = {
 
 
 BOOKING_NOTIFICATION_CHECK_TIME = '10 minutes'
+
+TEMP_LOG_FILE_PATH = '/var/live_code/event_upload.txt'
