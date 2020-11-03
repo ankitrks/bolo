@@ -22,12 +22,11 @@
             {% endfor %}
         </tbody>
     </table>
-
+    <div>
+            {% if page_no != '1' %}<a href="/jarvis/get_kyc_user_list/?page_no=1" >First</a> <a href="/jarvis/get_kyc_user_list/?page_no={{page_no|add:-1}}" >Prev</a>{% endif %} {{ page_no }} of {{ total_page }} pages {% if page_no|add:0 != total_page %}<a href="/jarvis/get_kyc_user_list/?page_no={{page_no|add:1}}" >Next</a> <a href="/jarvis/get_kyc_user_list/?page_no={{total_page}}" >Last</a>{% endif %}
+    </div>
 </div>
 </section>
 {% endblock content %}
 {% block center_js %}
-<script>
-    $('#all_kyc').DataTable();
-</script>
 {% endblock center_js %}
