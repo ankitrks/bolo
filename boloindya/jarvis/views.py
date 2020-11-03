@@ -407,16 +407,16 @@ def get_pending_kyc_user_list(request):
 
 def get_accepted_kyc_user_list(request):
     if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
-
+        page_size = settings.USER_ACCEPTED_KYC_PAGE_SIZE
         page_no = request.GET.get('page_no', '1')
         all_kyc = UserKYC.objects.filter(is_kyc_completed=True)
 
-        total_page = all_kyc.count()/10
-        if all_kyc.count()%10:
+        total_page = all_kyc.count()/page_size
+        if all_kyc.count()%page_size:
             total_page += 1
         page = int(page_no) - 1
 
-        return render(request,'jarvis/pages/userkyc/accepted_kyc.html', {'all_kyc': all_kyc[page*10:page*10+10],\
+        return render(request,'jarvis/pages/userkyc/accepted_kyc.html', {'all_kyc': all_kyc[page*page_size:page*page_size+page_size],\
             'page_no': page_no, 'total_page': total_page})
 
 def get_user_pay_details(request):
