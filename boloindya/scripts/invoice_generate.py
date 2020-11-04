@@ -99,18 +99,18 @@ class InvoiceGenerator:
 
 	def send_email(self, data):
 		if data['email']:
-			# connection = get_connection(host='smtp.googlemail.com', 
-   #                          port=587, 
-   #                          username='support@boloindya.com', 
-   #                          password='bolo@indya@varun', 
-   #                          use_tls=True)
+			connection = get_connection(host=settings.EMAIL_HOST, 
+							port=settings.EMAIL_PORT, 
+							username=settings.INVOICE_EMAIL_HOST_USER, 
+							password=settings.INVOICE_EMAIL_HOST_PASSWORD, 
+							use_tls=True)
 			email_from = self.firebase_remote_config['parameters']['invoice_email_from']['defaultValue']['value']
 			to_emails = [data['email']]
 			subject = self.firebase_remote_config['parameters']['event_email_subject_prefix']['defaultValue']['value'] + " | "+ data['title']
 			pdf_path = data['media_file']
 			html_message = render_to_string('payment/email_body.html', {'username': data['username'], 'booking_id': data['event_booking_id']})
 			plain_message = strip_tags(html_message)
-			email = EmailMessage(subject, plain_message	, from_email=email_from, to=to_emails)
+			email = EmailMessage(subject, plain_message	, from_email=email_from, to=to_emails, connection=connection)
 			email.attach_file(pdf_path)
 			email.send()
 
