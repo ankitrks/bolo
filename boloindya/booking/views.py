@@ -244,8 +244,6 @@ def get_thumbnail_url(banner_img_url, key):
 
 def upload_media(media_file, file_name, key):
 	try:
-		f = open(settings.TEMP_LOG_FILE_PATH, 'a')
-		f.write("\nInside upload media function\n")
 		from jarvis.views import urlify
 		client = boto3.client('s3',aws_access_key_id = settings.BOLOINDYA_AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY)
 		ts = time.time()
@@ -255,12 +253,8 @@ def upload_media(media_file, file_name, key):
 		final_filename = str(urlify(filenameNext[0]))+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[1])
 		response = client.upload_file(media_file, settings.BOLOINDYA_AWS_IN_BUCKET_NAME,key + final_filename)
 		filepath = 'https://s3.ap-south-1.amazonaws.com/' + settings.BOLOINDYA_AWS_IN_BUCKET_NAME + "/"+ key + final_filename
-		f.write(filepath)
-		f.close()
 		return filepath
 	except Exception as e:
-		f.write("\nError Inside upload_media: "+str(e))
-		f.close()
 		print(e)
 		return ''
 
@@ -436,15 +430,8 @@ class EventDetails(APIView):
 					for chunk in promo_banner.chunks():
 						if chunk:
 							f.write(chunk)
-			f = open(settings.TEMP_LOG_FILE_PATH, 'a')
-			f.write("======\n")
-			f.write("calling celery function to uplad files\n")
-			f.write("starting celery task upload event media function with arguments "+str(event_id)+", "+str(promo_profile_pic_path)+", "+str(banner_file_path)+", "+str(promo_profile_pic_name)+", "+str(promo_banner_name))
-			upload_event_media.delay(event_id, promo_profile_pic_path, banner_file_path, promo_profile_pic_name, promo_banner_name)
-			f.close()
+			upload_event_media(event_id, promo_profile_pic_path, banner_file_path, promo_profile_pic_name, promo_banner_name)
 		except Exception as e:
-			f.write("\n Error: download_and_upload_events function "+str(e))
-			f.close()
 			print(e)
 
 class EventSlotsDetails(APIView):
