@@ -427,7 +427,6 @@ def upload_event_media(event_id, promo_profile_pic, promo_banner, profile_pic_na
     import os
     key = "public/booking_shows/"
     try:
-        f = open(settings.TEMP_LOG_FILE_PATH, 'a')
         banner_img_url, thumbnail_img_url, profile_pic_img_url = None, None, None
         booking = Event.objects.filter(pk=event_id)
         if promo_profile_pic:
@@ -436,25 +435,14 @@ def upload_event_media(event_id, promo_profile_pic, promo_banner, profile_pic_na
             banner_img_url = upload_media(promo_banner, promo_banner_name, key)
         if banner_img_url:
             thumbnail_img_url = get_thumbnail_url(banner_img_url,key)
-        f.write("\nprofile_pic_img_url, banner_img_url, thumbnail_img_url")
-        f.write("\nprfile_img_url: "+str(profile_pic_img_url))
-        f.write("\nbanner_img_url: "+str(banner_img_url))
-        f.write("\nthumbnail_img_url: "+str(thumbnail_img_url))
         if profile_pic_img_url and banner_img_url and thumbnail_img_url:
-            f.write("\n updating details in event object")
             booking.update(banner_img_url = banner_img_url, thumbnail_img_url=thumbnail_img_url, profile_pic_img_url=profile_pic_img_url)
             if os.path.exists(promo_banner):
                 os.remove(promo_banner)
             if os.path.exists(promo_profile_pic):
                 os.remove(promo_profile_pic)
-        f.write("\ncompleted upload event media execution")
-        f.write("\n=====")
-        f.close()
     except Exception as e:
         print(e)
-        f.write("\nError inside celery task: "+str(e))
-        f.write("\n=====")
-        f.close()
 
 @app.task
 def send_mail_to_payout_admins(message, title=''):
