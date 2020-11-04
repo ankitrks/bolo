@@ -428,6 +428,7 @@ def upload_event_media(event_id, promo_profile_pic, promo_banner, profile_pic_na
     key = "public/booking_shows/"
     try:
         f = open(settings.TEMP_LOG_FILE_PATH, 'a')
+        f.write("\n Inside celery")
         banner_img_url, thumbnail_img_url, profile_pic_img_url = None, None, None
         booking = Event.objects.filter(pk=event_id)
         if promo_profile_pic:

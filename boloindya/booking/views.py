@@ -245,7 +245,7 @@ def get_thumbnail_url(banner_img_url, key):
 def upload_media(media_file, file_name, key):
 	try:
 		f = open(settings.TEMP_LOG_FILE_PATH, 'a')
-		f.write("\nInside upload media function")
+		f.write("\nInside upload media function\n")
 		from jarvis.views import urlify
 		client = boto3.client('s3',aws_access_key_id = settings.BOLOINDYA_AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY)
 		ts = time.time()
@@ -440,9 +440,11 @@ class EventDetails(APIView):
 			f.write("======\n")
 			f.write("calling celery function to uplad files\n")
 			f.write("starting celery task upload event media function with arguments "+str(event_id)+", "+str(promo_profile_pic_path)+", "+str(banner_file_path)+", "+str(promo_profile_pic_name)+", "+str(promo_banner_name))
-			f.close()
 			upload_event_media.delay(event_id, promo_profile_pic_path, banner_file_path, promo_profile_pic_name, promo_banner_name)
+			f.close()
 		except Exception as e:
+			f.write("\n Error: download_and_upload_events function "+str(e))
+			f.close()
 			print(e)
 
 class EventSlotsDetails(APIView):
