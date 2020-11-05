@@ -37,6 +37,9 @@ ad_state_options = (
 	('active', "Active"),
 	('inactive', "Inactive"),
 	)
+frequency_type_options = (
+	('constant', "Constant"),
+	('variable', "Variable"),)
 class Ad(RecordTimeStamp):
 	brand = models.ForeignKey(Brand, related_name='brand_ad', on_delete=models.CASCADE)
 	title = models.TextField(blank = True, null = True)
@@ -46,7 +49,7 @@ class Ad(RecordTimeStamp):
 	product = models.ForeignKey(Product, related_name='product_ad', on_delete=models.CASCADE)
 	ad_type =  models.CharField(max_length = 25)
 	video_file_url = models.TextField(blank = True, null = True)
-	frequency_type = models.TextField(blank = True, null = True)
+	frequency_type = models.CharField(choices = frequency_type_options,default='constant', blank = True, null = True, max_length = 25)
 	product_link = models.TextField(blank = True, null = True)
 	state = models.CharField(choices = ad_state_options,default='draft', blank = True, null = True, max_length = 25)
 	budget = models.PositiveIntegerField(default=0)

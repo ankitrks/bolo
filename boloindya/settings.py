@@ -169,7 +169,7 @@ INSTALLED_APPS = [
     'simple_history',
     # 'forum.core.tests'
     'booking',
-    'brand_advertisement'
+    'advertisement'
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
