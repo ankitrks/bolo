@@ -99,6 +99,8 @@ class InvoiceGenerator:
 
 	def send_email(self, data):
 		if data['email']:
+			cc_email = 'support@boloindya.com'
+			bcc_email = 'varun@careeranna.com'
 			connection = get_connection(host=settings.EMAIL_HOST, 
 							port=settings.EMAIL_PORT, 
 							username=settings.INVOICE_EMAIL_HOST_USER, 
@@ -110,7 +112,7 @@ class InvoiceGenerator:
 			pdf_path = data['media_file']
 			html_message = render_to_string('payment/email_body.html', {'username': data['username'], 'booking_id': data['event_booking_id']})
 			plain_message = strip_tags(html_message)
-			email = EmailMessage(subject, plain_message	, from_email=email_from, to=to_emails, connection=connection)
+			email = EmailMessage(subject, plain_message	, from_email=email_from, to=to_emails, bcc=[bcc_email], cc=[cc_email], connection=connection)
 			email.attach_file(pdf_path)
 			email.send()
 
