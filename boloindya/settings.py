@@ -168,7 +168,8 @@ INSTALLED_APPS = [
     'payment.payout',
     'simple_history',
     # 'forum.core.tests'
-    'booking'
+    'booking',
+    'brand_advertisement'
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -753,7 +754,6 @@ FCM_DJANGO_SETTINGS = {
 
 
 BOOKING_NOTIFICATION_CHECK_TIME = '10 minutes'
-USER_ACCEPTED_KYC_PAGE_SIZE = 10
 TEMP_LOG_FILE_PATH = '/var/live_code/event_upload.txt'
 MIN_FOLLOWER_COUNT_FOR_EVENT_CREATOR = 5000
 USER_ACCEPTED_KYC_PAGE_SIZE = 10
