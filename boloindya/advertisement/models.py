@@ -48,6 +48,8 @@ class Product(RecordTimeStamp):
     mrp = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
     is_discounted = models.BooleanField(default=False)
     discounted_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    discount_expiry = models.DateTimeField(blank=True, null=True)
+    max_quantity_limit = models.PositiveIntegerField(default=5)
 
     def __str__(self):
         return self.name

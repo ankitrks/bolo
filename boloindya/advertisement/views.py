@@ -15,6 +15,16 @@ class AdDetailAPIView(RetrieveAPIView):
     serializer_class = AdSerializer
 
 
+class ProductDetailAPIView(RetrieveAPIView):
+    queryset = Ad.objects.filter(state='active')
+    serializer_class = ProductSerializer    
+
+    def get_object(self):
+        obj = super(ProductDetailAPIView, self).get_object()
+        return obj.product
+
+
+
 class ReviewListAPIView(ListAPIView):
     queryset = ProductReview.objects.all()
 

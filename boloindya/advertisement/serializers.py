@@ -1,3 +1,5 @@
+from django.contrib.humanize.templatetags.humanize import intcomma
+
 from rest_framework import serializers
 
 from advertisement.models import Ad, ProductReview, Order, Product
@@ -24,9 +26,11 @@ class AdSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     product_images = serializers.SerializerMethodField()
     product_id = serializers.CharField(source='id', read_only=True)
-    product_title = serializers.CharField(source='title', read_only=True)
+    product_title = serializers.CharField(source='name', read_only=True)
     product_description = serializers.CharField(source='description', read_only=True)
-    discounted_price = serializers.CharField(source='price', read_only=True)
+    discounted_price = serializers.SerializerMethodField()
+    mrp = serializers.SerializerMethodField()
+    rating_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -34,7 +38,16 @@ class ProductSerializer(serializers.ModelSerializer):
                     'currency', 'mrp', 'is_discounted', 'discounted_price', 'discount_expiry')
 
     def get_product_images(self, instance):
-        return instance.images.all().values_list('url')
+        return instance.images.all().values_list('compressed_image', flat=True)
+
+    def get_rating_count(self, instance):
+        return intcomma(instance.rating_count)
+
+    def get_mrp(self, instance):
+        return "Rs %s"%instance.mrp
+
+    def get_discounted_price(self, instance):
+        return "Rs %s"%instance.discounted_price
 
 
 class ReviewSerializer(serializers.ModelSerializer):
