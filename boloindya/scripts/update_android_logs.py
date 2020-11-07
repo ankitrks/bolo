@@ -11,6 +11,7 @@ def run():
                 data =  json.loads(data) if data else None
                 # print data['log_type'], len(data['log_type'])
                 if data and data.has_key('log_type') and len(data['log_type']) < 255:
+                    data['logs'] = data['logs'].decode("utf-8", errors="replace").replace("\x00", "\uFFFD")
                     all_entries += [data]
                     all_keys.append(key)
             except Exception as e:
