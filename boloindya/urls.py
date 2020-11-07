@@ -22,6 +22,7 @@ import coupon.urls
 import booking.urls
 import payment.urls
 import booking.api_urls
+import advertisement.urls
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -105,6 +106,7 @@ urlpatterns = [
     url(r'^payment/', include(payment.urls, namespace='payment')),
     url(r'^api/v1/payment/', include('payment.api_urls', namespace='payment')),
     url(r'^booking/', include(booking.urls)),
+    url(r'^advertisement/',include(advertisement.urls))
 ]
 
 urlpatterns += i18n_patterns(
