@@ -4555,6 +4555,12 @@ def convert_to_dict_format(item):
 
     return _dict
 
+def get_ad_to_display():
+    from django.test import Client
+    c = Client()
+    return [c.get('/api/v1/ad/1').json()]
+
+
 def get_video_bytes_and_its_related_data(id_list, last_updated=None):
     if not len(id_list):
         return []
@@ -4583,7 +4589,8 @@ def get_video_bytes_and_its_related_data(id_list, last_updated=None):
                     p.android_did as user__userprofile__android_did, p.is_guest_user as user__userprofile__is_guest_user, 
                     p.country_code as user__userprofile__country_code, 
                     p.is_insight_fix as user__userprofile__is_insight_fix, 
-                    p.user_id as user__userprofile__user, array_agg(distinct uc.category_id) as user__userprofile__sub_category
+                    p.user_id as user__userprofile__user, array_agg(distinct uc.category_id) as user__userprofile__sub_category,
+                    'video_byte' as type
             FROM forum_topic_topic t
                 LEFT JOIN forum_topic_topic_m2mcategory c on c.topic_id = t.id
                 LEFT JOIN forum_topic_topic_hash_tags h on h.topic_id = t.id
@@ -4708,6 +4715,9 @@ class PopularVideoBytes(APIView):
 
         topics_df = pd.DataFrame.from_records(topics)
 
+        if topics_df.empty:
+            return []
+
         exclude_ids = []
         items_per_page = 15
         max_page_creation_limit = 3
@@ -4744,6 +4754,22 @@ class PopularVideoBytes(APIView):
 
         return start_page_id_list
 
+
+class PopularVideoBytesV2(PopularVideoBytes):
+    def get(self, request, *args, **kwargs):
+        newrelic.agent.set_transaction_name("/get_popular_video_bytes_v2/get", "Trending Page")
+
+        language_id = request.GET.get('language_id', 1)
+        page_number = int(request.GET.get('page',1))
+
+        ad_list = get_ad_to_display()
+
+        return JsonResponse({
+                'topics': ad_list + get_video_bytes_and_its_related_data(
+                                    self.get_tranding_topic_data(request.user.id, language_id, page_number),
+                                    request.GET.get('last_updated', None)
+                                    )
+            }, status=status.HTTP_200_OK) 
 
 
 

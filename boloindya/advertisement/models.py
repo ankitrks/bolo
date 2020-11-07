@@ -15,6 +15,9 @@ class RecordTimeStamp(models.Model):
 class ProductCategory(RecordTimeStamp):
     name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.name
+
 class Brand(RecordTimeStamp):
     name = models.CharField(max_length=100)
     company_logo = models.CharField(blank=True, null=True, max_length=200)
@@ -27,6 +30,9 @@ class Brand(RecordTimeStamp):
     signed_nda_doc_file_url = models.CharField(blank=True, null=True, max_length=200)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL,related_name='created_brands')
     last_modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,related_name='modified_brands')
+
+    def __str__(self):
+        return self.name
 
 
 class Product(RecordTimeStamp):
@@ -42,6 +48,9 @@ class Product(RecordTimeStamp):
     mrp = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
     is_discounted = models.BooleanField(default=False)
     discounted_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+
+    def __str__(self):
+        return self.name
 
 
 class ProductImage(models.Model):
@@ -79,6 +88,8 @@ class Ad(RecordTimeStamp):
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='created_ads')
     last_modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='modify_ads')
 
+    def __str__(self):
+        return self.title
 
 
 class Frequency(RecordTimeStamp):
@@ -129,3 +140,14 @@ class ProductReview(RecordTimeStamp):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
     rating = models.DecimalField(max_digits=2, decimal_places=1)
+
+
+class CTA(models.Model):
+    ad = models.ForeignKey(Ad, related_name='cta')
+    title = models.CharField(max_length=200)
+    code = models.CharField(max_length=200)
+    enable_time = models.PositiveIntegerField(null=True, blank=True)
+    action = models.CharField(max_length=200, null=True, blank=True)
+
+    def __str__(self):
+        return self.title

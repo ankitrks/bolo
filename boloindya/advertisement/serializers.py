@@ -3,17 +3,22 @@ from rest_framework import serializers
 from advertisement.models import Ad, ProductReview, Order, Product
 
 class AdSerializer(serializers.ModelSerializer):
-    ad_id = serializers.CharField(source='id', read_only=True)
+    ad_id = serializers.IntegerField(source='id', read_only=True)
     brand_name = serializers.CharField(source='brand.name', read_only=True)
-    brand_image = serializers.CharField(source='brand.image', read_only=True)
+    brand_image = serializers.CharField(source='brand.company_logo', read_only=True)
+    ad_video = serializers.CharField(source='video_file_url', read_only=True)
     cta = serializers.SerializerMethodField()
+    type = serializers.SerializerMethodField()
 
     class Meta:
         model = Ad
-        fields = ('ad_id', 'brand_name', 'brand_image', 'ad_video', 'thumbnail', 'ad_length')
+        fields = ('ad_id', 'brand_name', 'brand_image', 'ad_video', 'thumbnail', 'ad_length', 'cta', 'type')
 
     def get_cta(self, instance):
         return instance.cta.all().values('title', 'code', 'enable_time', 'action')
+
+    def get_type(self, instance):
+        return 'ad'
 
 
 class ProductSerializer(serializers.ModelSerializer):

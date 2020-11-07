@@ -10,7 +10,7 @@ from django.conf.urls import include, url
 from advertisement.views import AdDetailAPIView, ReviewListAPIView, OrderListCreateAPIView, CityListAPIView
 
 urlpatterns = [
-    url(r'^ad/(?P<pk>\d+)$', AdDetailAPIView.as_view()),
+    url(r'^(?P<pk>\d+)$', AdDetailAPIView.as_view()),
     url(r'^product/(?P<pk>\d+)/review$', ReviewListAPIView.as_view()),
     url(r'^order$', OrderListCreateAPIView.as_view()),
     url(r'^city-list$', CityListAPIView.as_view()),
