@@ -142,6 +142,7 @@ class ProductReview(RecordTimeStamp):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
     rating = models.DecimalField(max_digits=2, decimal_places=1)
+    product_id = models.ForeignKey(Product, related_name='reviews', on_delete=models.CASCADE)
 
 
 class CTA(models.Model):

@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.contrib.humanize.templatetags.humanize import intcomma
 
 from rest_framework import serializers
@@ -31,6 +32,7 @@ class ProductSerializer(serializers.ModelSerializer):
     discounted_price = serializers.SerializerMethodField()
     mrp = serializers.SerializerMethodField()
     rating_count = serializers.SerializerMethodField()
+    discount_expiry = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -48,6 +50,9 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_discounted_price(self, instance):
         return "Rs %s"%instance.discounted_price
+
+    def get_discount_expiry(self, instance):
+        return datetime.strftime(instance.discount_expiry, "%d-%m-%y %H:%M:%S")
 
 
 class ReviewSerializer(serializers.ModelSerializer):
