@@ -1,0 +1,362 @@
+{% extends "advertisement/base.html" %}
+{% block styles %}
+<style>
+    #overlay {
+  position: fixed; /* Sit on top of the page content */
+  display: none; /* Hidden by default */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+  z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
+}
+.percentcomplete{
+    position: absolute;
+    top: 50%;
+    left:50%;
+    color: white;
+    transform: translate(-50%,-50%);
+}
+.video_elements{
+    display: none;
+}
+</style>
+{% endblock styles %}
+{% block content %}
+<section class="content">
+    <form id="upload" action="" method="POST" enctype="multipart/form-data" class="form-horizontal">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Brand Name: </label>
+            <div class="col-md-8">
+                <input type="text" name="brand_name" placeholder="Enter Brand Name" id="brand_name">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Brand ID:</label>
+            <div class="col-md-8">
+                <input type="text" name="brand_id" placeholder="Enter Brand Name" id="brand_id">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Ad Category:</label>
+            <div class="col-md-8">
+                <select name="ad_type" >
+                    <option value="" disabled selected>Select Ad Category</option>
+                    <option value="shop_now">Shop Now</option>
+                    <option value="install_now">Install Now</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Video Options:</label>
+            <input type="radio" id="upload_radio_btn" name="toggler" value="1" checked>
+            <label >Upload</label>&nbsp;&nbsp;&nbsp;
+            <input type="radio" id="link_radio_btn" name="toggler" value="2">
+            <label >link</label>
+        </div>
+        <div class="form-group toHide" id="blk-1">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Ad Video: </label>
+            <div class="col-md-8">
+                <input type="file" id="ad_video_file" class="form-control">
+            </div>
+        </div>
+        <div class="form-group toHide" id="blk-2" style="display:none">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Video Link:</label>
+            <div class="col-md-8">
+                <input type="text" placeholder="Enter Video Link" id="ad_video_link">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Title:</label>
+            <div class="col-md-8">
+                <input type="text" name="title" placeholder="Enter Title" id="title">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Start Date: </label>
+            <div class="col-md-8">
+                <input type="text" id="start_date" name="start_date" placeholder="Start Date" class="filter_text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">End Date: </label>
+            <div class="col-md-8">
+                <input type="text" id="end_date" name="end_date" placeholder="End Date" class="filter_text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Frequency:</label>
+            <input type="radio" id="upload_radio_btn" name="toggler_frequency" value="3" checked>
+            <label >Constant</label>&nbsp;&nbsp;&nbsp;
+            <input type="radio" id="link_radio_btn" name="toggler_frequency" value="4">
+            <label >Variable</label>
+        </div>
+        <div class="form-group toHideFrequency" id="blk-3">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Every: </label>
+            <div class="col-md-8">
+                <input type="text" name="scrolls" placeholder="Enter scroll" id="scrolls">
+            </div>
+        </div>
+        <div class="form-group toHideFrequency" id="blk-4"  style="display: none;">
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+            <div class="after-add-more form-group product_details">                               
+                <div class="form-group">
+                    <label for="name" id="dynamic_freq_lable" class="col-md-3 col-sm-3 col-xs-12 control-label">1st time after: </label>
+                    <div class="col-md-4">
+                        <input type="text" name="scrolls" placeholder="Enter scroll" id="scrolls">
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group change">
+                            <a class="btn btn-success add-more">+ Add More Frequency</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="after-add-more-cta form-group">                               
+            <div class="form-group">
+                <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">CTA: </label>
+                <div class="col-md-4">
+                    <input type="text" name="cta" placeholder="Enter CTA" id="cta">
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group change-cta">
+                        <a class="btn btn-success add-more-cta">+ Add More CTA</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Description:</label>
+            <div class="col-md-8">
+                <input type="text" name="description" class="form-control" placeholder="Enter Description" id="description">
+            </div>
+        </div>
+        <div class="form-group video_elements">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Bucket</label>
+            <div class="col-md-8">
+                <select name="bucket_name" id="bucket_name" required="True" class="form-control">
+                    <option value="in-boloindya" selected>Boloindya Prod</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
+                <button type="submit" class="btn btn-primary submit_from_button"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Upload </button>
+            </div>
+        </div>
+    </form>
+    <div id="overlay">
+        <div class="text"><br>
+            <br><span style="font-size:50px;" class="percentcomplete"></span></div>
+    </div>
+    <div id="csv_table">
+    </div>
+</section>
+{% endblock content %}
+{% block center_js %}
+
+<script>
+    $(document).ready(function() {
+        var frequnecy = 1;
+    $("body").on("click",".add-more",function(){ 
+        frequnecy = frequnecy+1
+        var freq_time = ordinal_suffix_of(frequnecy)
+        var dynamic_freq_text = freq_time + "time after"
+        var html = $(".after-add-more").first().clone();
+        $(html).find("input").val('');
+        $(html).find(".change").html("<label for=''>&nbsp;</label><br/><a class='btn btn-danger remove'>- Remove Frequency</a>");
+        $(html).find("#dynamic_freq_lable").empty();
+        $(html).find("#dynamic_freq_lable").append(dynamic_freq_text);
+        $(".after-add-more").last().after(html);
+    });
+    $("body").on("click",".remove",function(){ 
+        $(this).parents(".after-add-more").remove();
+    });
+
+
+    $("body").on("click",".add-more-cta",function(){ 
+        var html = $(".after-add-more-cta").first().clone();
+        $(html).find("input").val('');
+        $(html).find(".change-cta").html("<label for=''>&nbsp;</label><br/><a class='btn btn-danger remove-cta'>- Remove CTA</a>");
+        $(".after-add-more-cta").last().after(html);
+    });
+    $("body").on("click",".remove-cta",function(){ 
+        $(this).parents(".after-add-more-cta").remove();
+    });
+
+    $(function() {
+    $("[name=toggler]").click(function(){
+        $('.toHide').hide();
+        $("#blk-"+$(this).val()).show();
+    });
+    $("[name=toggler_frequency]").click(function(){
+        $('.toHideFrequency').hide();
+        $("#blk-"+$(this).val()).show();
+    });
+    $(function() {
+        $("#start_date").
+            datepicker({
+                format: "dd-mm-yyyy"
+            });
+    });
+    $(function() {
+        $("#end_date").
+            datepicker({
+                format: "dd-mm-yyyy"
+            });
+    });
+ });
+});
+
+function ordinal_suffix_of(i) {
+    var j = i % 10,
+        k = i % 100;
+    if (j == 1 && k != 11) {
+        return i + "st";
+    }
+    if (j == 2 && k != 12) {
+        return i + "nd";
+    }
+    if (j == 3 && k != 13) {
+        return i + "rd";
+    }
+    return i + "th";
+}
+
+function upload(event) {
+    if ($('.submit_from_button').hasClass("opened")) {
+        return false;
+    } else {
+        $('.submit_from_button').addClass("opened");
+        event.preventDefault();
+        $('#overlay').show();
+        var data = new FormData($('#upload').get(0));
+        console.log(data)
+        var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+        $.ajax({
+            xhr: function() {
+                var xhr = new window.XMLHttpRequest();
+                xhr.upload.addEventListener("progress", function(evt) {
+                    if (evt.lengthComputable) {
+                        var percentComplete = evt.loaded / evt.total;
+                        console.log(percentComplete);
+                        $('.percentcomplete').text((percentComplete * 100).toPrecision(4) + ' %');
+                        if (percentComplete === 1) {
+                            $('.percentcomplete').text('Processing');
+                        }
+                    }
+                }, false);
+                xhr.addEventListener("progress", function(evt) {
+                    if (evt.lengthComputable) {
+                        var percentComplete = evt.loaded / evt.total;
+                        console.log(percentComplete);
+                        $('.percentcomplete').text((percentComplete * 100).toPrecision(4) + ' %')
+                    }
+                }, false);
+                return xhr;
+            },
+            url: '/advertisement/brand/onboard/',
+            type: 'POST',
+            data: data,
+            cache: false,
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(data) {
+                $('#overlay').hide()
+                $('.submit_from_button').removeClass("opened");
+                if (data.message == 'fail') {
+                    alert(data['reason'])
+                } else if (data.message == 'success') {
+                    alert("uploading done")
+                    location.reload();
+                }
+                $('.submit_from_button').removeClass("opened");
+                console.log(data)
+            },
+            error: function(data) {
+                $('#overlay').hide()
+                $('.submit_from_button').removeClass("opened");
+                console.log(data)
+                alert(data)
+                alert('Consult Tech')
+            },
+
+        });
+        return false;
+    }
+}
+
+
+$(function() {
+    $('#upload').submit(upload);
+    // $('#free_video').click(function() {
+    //     if ($(this).is(':checked')) {
+    //         $('.video_elements').show();
+    //     } else {
+    //         $('.video_elements').hide()
+    //     }
+    // });
+    // $('#id_gender').change(function () {
+    // var gender_id = $(this).val();
+    // var language_id = $("#id_language_id").val();
+    // var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+    // $.ajax({
+    //     type: 'POST',
+    //     url: '/jarvis/get_filtered_user/',
+    //     data: {
+    //         'gender_id': gender_id,
+    //         'language_id':language_id,
+    //         'csrfmiddlewaretoken':csrfmiddlewaretoken
+    //     },
+    //     success: function (data) {
+    //         // the next thing you want to do 
+    //         var $user_id = $('#id_user_id');
+    //         $user_id.empty();
+    //         filtered_user = data.filtered_user
+    //         $user_id.append('<option>User Name --- VB Count</option>');
+    //         for (var i = 0; i < filtered_user.length; i++) {
+    //             $user_id.append('<option value=' + filtered_user[i][0] + '>' + filtered_user[i][1]+' --- (' +filtered_user[i][2] + ')</option>');
+    //         }
+
+    //         // //manually trigger a change event for the contry so that the change handler will get triggered
+    //         // $country.change();
+    //     }
+    // });
+    // });
+    // $('#id_language_id').change(function () {
+    // var gender_id = $(this).val();
+    // var language_id = $("#id_gender").val();
+    // var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+    // $.ajax({
+    //     type: 'POST',
+    //     url: '/jarvis/get_filtered_user/',
+    //     data: {
+    //         'gender_id': gender_id,
+    //         'language_id':language_id,
+    //         'csrfmiddlewaretoken':csrfmiddlewaretoken
+    //     },
+    //     success: function (data) {
+    //         // the next thing you want to do 
+    //         var $user_id = $('#id_user_id');
+    //         $user_id.empty();
+    //         filtered_user = data.filtered_user
+    //         $user_id.append('<option>User Name --- VB Count</option>');
+    //         for (var i = 0; i < filtered_user.length; i++) {
+    //             $user_id.append('<option value=' + filtered_user[i][0] + '>' + filtered_user[i][1]+' --- (' +filtered_user[i][2] + ')</option>');
+    //         }
+
+    //         // //manually trigger a change event for the contry so that the change handler will get triggered
+    //         // $country.change();
+    //     }
+    // });
+    // });
+});
+</script>
+{% endblock center_js %}
