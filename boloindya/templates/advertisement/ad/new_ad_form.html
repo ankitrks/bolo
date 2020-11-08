@@ -14,6 +14,27 @@
   z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
   cursor: pointer; /* Add a pointer on hover */
 }
+#response li:hover{
+    background: #1989CD;
+    color: white;
+}
+ul {
+    float:left;
+    list-style: none;
+    padding: 0px;
+    border: 1px solid black;
+    margin-top: 0px;
+    width: 100%;
+    max-height: 120px;
+    display: block;
+    overflow-y: scroll;
+    background: white;
+}
+ul li {
+    padding: 2px;
+    cursor: pointer;
+    border-bottom: 1px solid black;
+}
 .percentcomplete{
     position: absolute;
     top: 50%;
@@ -30,57 +51,68 @@
 <section class="content">
     <form id="upload" action="" method="POST" enctype="multipart/form-data" class="form-horizontal">
         {% csrf_token %}
-        <div class="form-group">
+        <div class="">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Brand Name: </label>
             <div class="col-md-8">
-                <input type="text" name="brand_name" placeholder="Enter Brand Name" id="brand_name">
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Brand ID:</label>
-            <div class="col-md-8">
-                <input type="text" name="brand_id" placeholder="Enter Brand Name" id="brand_id">
+                <input type="text" name="brand_name" placeholder="Enter Brand Name" id="search_id" required>
+                <ul id="response">
+                </ul>
             </div>
         </div>
         <div class="form-group">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Ad Category:</label>
             <div class="col-md-8">
-                <select name="ad_type" >
+                <select name="ad_type" required>
                     <option value="" disabled selected>Select Ad Category</option>
-                    <option value="shop_now">Shop Now</option>
-                    <option value="install_now">Install Now</option>
+                    {% for category in ad_type_options %}
+                        <option value="{{ category.id }}">{{category.value}}</option>
+                    {% endfor %}
                 </select>
             </div>
         </div>
         <div class="form-group">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Video Options:</label>
-            <input type="radio" id="upload_radio_btn" name="toggler" value="1" checked>
+            <input type="radio" id="upload_radio_btn" name="toggler" value="upload" checked>
             <label >Upload</label>&nbsp;&nbsp;&nbsp;
-            <input type="radio" id="link_radio_btn" name="toggler" value="2">
+            <input type="radio" id="link_radio_btn" name="toggler" value="link">
             <label >link</label>
         </div>
-        <div class="form-group toHide" id="blk-1">
+        <div class="form-group toHide" id="blk-upload">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Ad Video: </label>
             <div class="col-md-8">
-                <input type="file" id="ad_video_file" class="form-control">
+                <input type="file" name="video_file" id="video_file" class="form-control">
             </div>
         </div>
-        <div class="form-group toHide" id="blk-2" style="display:none">
+        <div class="form-group toHide" id="blk-link" style="display:none">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Video Link:</label>
             <div class="col-md-8">
-                <input type="text" placeholder="Enter Video Link" id="ad_video_link">
+                <input type="text" name="video_file_link" placeholder="Enter Video Link" id="video_file_link">
+            </div>
+        </div>
+        <div class="">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Product Name: </label>
+            <div class="col-md-8">
+                <input type="text" name="product_name" placeholder="Enter Product Name" id="search_id_product" required>
+                <ul id="response_product">
+                </ul>
             </div>
         </div>
         <div class="form-group">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Title:</label>
             <div class="col-md-8">
-                <input type="text" name="title" placeholder="Enter Title" id="title">
+                <input type="text" name="title" placeholder="Enter Title" id="title" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">No End Date:</label>
+            <div class="col-md-8">
+                <input type="checkbox" id="popup_end_date_checkbox" name="popup_end_date_checkbox">
             </div>
         </div>
         <div class="form-group">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Start Date: </label>
             <div class="col-md-8">
-                <input type="text" id="start_date" name="start_date" placeholder="Start Date" class="filter_text">
+                <input type="text" id="start_date" name="start_date" placeholder="Start Date" class="filter_text" required>
             </div>
         </div>
         <div class="form-group">
@@ -91,18 +123,18 @@
         </div>
         <div class="form-group">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Frequency:</label>
-            <input type="radio" id="upload_radio_btn" name="toggler_frequency" value="3" checked>
+            <input type="radio" id="upload_radio_btn" name="toggler_frequency" value="constant" checked>
             <label >Constant</label>&nbsp;&nbsp;&nbsp;
-            <input type="radio" id="link_radio_btn" name="toggler_frequency" value="4">
+            <input type="radio" id="link_radio_btn" name="toggler_frequency" value="variable">
             <label >Variable</label>
         </div>
-        <div class="form-group toHideFrequency" id="blk-3">
+        <div class="form-group toHideFrequency" id="blk-constant">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Every: </label>
             <div class="col-md-8">
                 <input type="text" name="scrolls" placeholder="Enter scroll" id="scrolls">
             </div>
         </div>
-        <div class="form-group toHideFrequency" id="blk-4"  style="display: none;">
+        <div class="form-group toHideFrequency" id="blk-variable"  style="display: none;">
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
             <div class="after-add-more form-group product_details">                               
                 <div class="form-group">
@@ -122,7 +154,7 @@
             <div class="form-group">
                 <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">CTA: </label>
                 <div class="col-md-4">
-                    <input type="text" name="cta" placeholder="Enter CTA" id="cta">
+                    <input type="text" name="cta" placeholder="Enter CTA" id="cta" required>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group change-cta">
@@ -134,7 +166,7 @@
         <div class="form-group">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Description:</label>
             <div class="col-md-8">
-                <input type="text" name="description" class="form-control" placeholder="Enter Description" id="description">
+                <input type="text" name="description" class="form-control" placeholder="Enter Description" id="description" required>
             </div>
         </div>
         <div class="form-group video_elements">
@@ -147,7 +179,10 @@
         </div>
         <div class="form-group">
             <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
-                <button type="submit" class="btn btn-primary submit_from_button"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Upload </button>
+                <button id="save" type="submit" class="btn btn-primary submit_from_button"> <span class="glyphicon glyphicon-floppy-save" style="margin-right:5px"></span>Save as Draft</button>
+            </div>
+            <div class="col-md-0 col-sm-1 col-xs-12" style="margin-bottom:10px;">
+                <button id="create" type="submit" class="btn btn-primary submit_from_button"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Save & Publish</button>
             </div>
         </div>
     </form>
@@ -193,10 +228,18 @@
     $(function() {
     $("[name=toggler]").click(function(){
         $('.toHide').hide();
+        // [].forEach.call(document.querySelectorAll('#video_file'), function(el) {
+        //     el.value = '';
+        // });
+        $('#video_file').val('')
+        $('#video_file_link').val('')
         $("#blk-"+$(this).val()).show();
     });
     $("[name=toggler_frequency]").click(function(){
         $('.toHideFrequency').hide();
+        [].forEach.call(document.querySelectorAll('#scrolls'), function(el) {
+            el.value = '';
+        });
         $("#blk-"+$(this).val()).show();
     });
     $(function() {
@@ -213,7 +256,15 @@
     });
  });
 });
-
+$(function () {
+    $("#popup_end_date_checkbox").click(function () {
+        if ($(this).is(":checked")) {
+            $("#end_date").prop("disabled", true);
+        } else {
+            $("#end_date").prop("disabled", false);
+        }
+    });
+});
 function ordinal_suffix_of(i) {
     var j = i % 10,
         k = i % 100;
@@ -229,7 +280,136 @@ function ordinal_suffix_of(i) {
     return i + "th";
 }
 
+var loading = 0;
+$('#search_id').keyup(function(){
+        var query = $('#search_id').val();
+        
+        if (query.length > 2 && loading == 0) {
+            loading = 1;
+            $('#response').empty();
+            $('#response').append('<li id="loading">Loading ...</li>');
+            var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+            $.ajax({
+                url: '/advertisement/search_fields_for_ad/',
+                method: 'POST',
+                data: JSON.stringify({
+                    'query': query,
+                    'result_type': '0'
+                }),
+                headers: { "X-CSRFToken": csrfmiddlewaretoken },
+                dataType: "json",
+                contentType: 'application/json',
+                success: function(data) {
+                    loading = 0;
+                    $('#loading').hide();
+                    $('#response').empty();
+                    if (data.data.length == 0) {
+                        $('#response').append('<li id="no_result">No results found ...</li>');
+                    }
+                    for(var i=0;i<data.data.length;i++) {
+                        $('#response').append('<li onclick="addIdToField(\''+data.data[i].name+'\', \''+data.data[i].id+'\', this)">'+data.data[i].name+'</li>');
+                    }
+                }
+            })
+        } else {
+            $('#response').empty();
+        }
+})
+
+function addIdToField(brand_name, id, title) {
+    clearResponse();
+    brand_id = id
+    $('#search_id').val(String(brand_name));
+}
+
+function clearResponse() {
+    $('#search_id').val('');
+    $('#response').empty();
+}
+
+var loading = 0;
+$('#search_id_product').keyup(function(){
+        var query = $('#search_id_product').val();
+        
+        if (query.length > 2 && loading == 0) {
+            loading = 1;
+            $('#response_product').empty();
+            $('#response_product').append('<li id="loading">Loading ...</li>');
+            var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+            $.ajax({
+                url: '/advertisement/search_fields_for_ad/',
+                method: 'POST',
+                data: JSON.stringify({
+                    'query': query,
+                    'result_type': '1'
+                }),
+                headers: { "X-CSRFToken": csrfmiddlewaretoken },
+                dataType: "json",
+                contentType: 'application/json',
+                success: function(data) {
+                    loading = 0;
+                    $('#loading').hide();
+                    $('#response_product').empty();
+                    if (data.data.length == 0) {
+                        $('#response_product').append('<li id="no_result">No results found ...</li>');
+                    }
+                    for(var i=0;i<data.data.length;i++) {
+                        $('#response_product').append('<li onclick="addIdToFieldProduct(\''+data.data[i].name+'\', \''+data.data[i].id+'\', this)">'+data.data[i].name+'</li>');
+                    }
+                }
+            })
+        } else {
+            $('#response_product').empty();
+        }
+})
+
+function addIdToFieldProduct(product_name, id, title) {
+    clearResponseProduct();
+    product_id = id
+    $('#search_id_product').val(String(product_name));
+}
+
+function clearResponseProduct() {
+    $('#search_id_product').val('');
+    $('#response_product').empty();
+}
+
+$(function() {
+        $("#start_date").
+            datepicker({
+                format: "dd-mm-yyyy",
+                startDate: new Date()
+            }).on("changeDate", function (selected) {
+                var minDate = new Date(selected.date.valueOf());
+                $("#end_date").datepicker('setStartDate', minDate);
+            }); 
+    });
+    $(function() {
+        $("#end_date").
+            datepicker({
+                format: "dd-mm-yyyy",
+                startDate: new Date()
+            }).on('changeDate', function (selected) {
+            var maxDate = new Date(selected.date.valueOf());
+            $('#start_date').datepicker('setEndDate', maxDate);
+        });
+    });
+
+var brand_id=-1
+var product_id=-1
 function upload(event) {
+
+    
+    if(!$('#search_id').val() || brand_id == -1){
+        alert("Invalid or empty brand name");
+        return false;
+    }
+
+    if(!$('#search_id_product').val() || product_id == -1){
+        alert("Invalid or empty product name");
+        return false;
+    }
+
     if ($('.submit_from_button').hasClass("opened")) {
         return false;
     } else {
@@ -237,6 +417,14 @@ function upload(event) {
         event.preventDefault();
         $('#overlay').show();
         var data = new FormData($('#upload').get(0));
+        data.append('brand_id', brand_id);
+        data.append('product_id', product_id);
+        if (event.data.is_draft){
+            data.append('is_draft',true);
+        }
+        else{
+            data.append('is_draft',false);
+        }
         console.log(data)
         var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
         $.ajax({
@@ -261,7 +449,7 @@ function upload(event) {
                 }, false);
                 return xhr;
             },
-            url: '/advertisement/brand/onboard/',
+            url: '/advertisement/create/ad/',
             type: 'POST',
             data: data,
             cache: false,
@@ -295,68 +483,8 @@ function upload(event) {
 
 
 $(function() {
-    $('#upload').submit(upload);
-    // $('#free_video').click(function() {
-    //     if ($(this).is(':checked')) {
-    //         $('.video_elements').show();
-    //     } else {
-    //         $('.video_elements').hide()
-    //     }
-    // });
-    // $('#id_gender').change(function () {
-    // var gender_id = $(this).val();
-    // var language_id = $("#id_language_id").val();
-    // var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
-    // $.ajax({
-    //     type: 'POST',
-    //     url: '/jarvis/get_filtered_user/',
-    //     data: {
-    //         'gender_id': gender_id,
-    //         'language_id':language_id,
-    //         'csrfmiddlewaretoken':csrfmiddlewaretoken
-    //     },
-    //     success: function (data) {
-    //         // the next thing you want to do 
-    //         var $user_id = $('#id_user_id');
-    //         $user_id.empty();
-    //         filtered_user = data.filtered_user
-    //         $user_id.append('<option>User Name --- VB Count</option>');
-    //         for (var i = 0; i < filtered_user.length; i++) {
-    //             $user_id.append('<option value=' + filtered_user[i][0] + '>' + filtered_user[i][1]+' --- (' +filtered_user[i][2] + ')</option>');
-    //         }
-
-    //         // //manually trigger a change event for the contry so that the change handler will get triggered
-    //         // $country.change();
-    //     }
-    // });
-    // });
-    // $('#id_language_id').change(function () {
-    // var gender_id = $(this).val();
-    // var language_id = $("#id_gender").val();
-    // var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
-    // $.ajax({
-    //     type: 'POST',
-    //     url: '/jarvis/get_filtered_user/',
-    //     data: {
-    //         'gender_id': gender_id,
-    //         'language_id':language_id,
-    //         'csrfmiddlewaretoken':csrfmiddlewaretoken
-    //     },
-    //     success: function (data) {
-    //         // the next thing you want to do 
-    //         var $user_id = $('#id_user_id');
-    //         $user_id.empty();
-    //         filtered_user = data.filtered_user
-    //         $user_id.append('<option>User Name --- VB Count</option>');
-    //         for (var i = 0; i < filtered_user.length; i++) {
-    //             $user_id.append('<option value=' + filtered_user[i][0] + '>' + filtered_user[i][1]+' --- (' +filtered_user[i][2] + ')</option>');
-    //         }
-
-    //         // //manually trigger a change event for the contry so that the change handler will get triggered
-    //         // $country.change();
-    //     }
-    // });
-    // });
+    $('#create').click({is_draft: false}, upload);
+    $('#save').click({is_draft: true}, upload);
 });
 </script>
 {% endblock center_js %}

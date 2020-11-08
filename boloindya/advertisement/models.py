@@ -71,15 +71,17 @@ frequency_type_options = (
     ('constant', "Constant"),
     ('variable', "Variable"),
 )
-
+ad_type_options = (
+	('shop_now','Shop Now'),
+	('install_now','Install Now'),)
 class Ad(RecordTimeStamp):
     brand = models.ForeignKey(Brand, related_name='ads', on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
     start_time = models.DateTimeField(auto_now=False)
-    end_time = models.DateTimeField(auto_now=False)
+    end_time = models.DateTimeField(auto_now=False, null=True)
     product = models.ForeignKey(Product, related_name='ads', on_delete=models.CASCADE)
-    ad_type =  models.CharField(max_length=25)
+    ad_type =  models.CharField(max_length=25, choices=ad_type_options, default='shop_now')
     video_file_url = models.CharField(blank=True, null=True, max_length=200)
     thumbnail = models.CharField(blank=True, null=True, max_length=200)
     ad_length = models.PositiveIntegerField(default=0)
