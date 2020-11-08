@@ -14,6 +14,7 @@ class RecordTimeStamp(models.Model):
 
 class ProductCategory(RecordTimeStamp):
     name = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
@@ -30,6 +31,7 @@ class Brand(RecordTimeStamp):
     signed_nda_doc_file_url = models.CharField(blank=True, null=True, max_length=200)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL,related_name='created_brands')
     last_modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,related_name='modified_brands')
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
@@ -50,9 +52,16 @@ class Product(RecordTimeStamp):
     discounted_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
     discount_expiry = models.DateTimeField(blank=True, null=True)
     max_quantity_limit = models.PositiveIntegerField(default=5)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
+
+    @property
+    def final_amount(self):
+        if self.is_discounted:
+            return self.discounted_price
+        return self.mrp
 
 
 class ProductImage(models.Model):
@@ -100,17 +109,35 @@ class Frequency(RecordTimeStamp):
     scroll = models.PositiveIntegerField(default=0)
 
 
+class State(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
+class City(models.Model):
+    name = models.CharField(max_length=100)
+    state = models.ForeignKey(State, related_name='cities')
+
+    def __str__(self):
+        return self.name
+
+
 class Address(RecordTimeStamp):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,related_name='addresses')
-    name = models.CharField(blank=True, null=True, max_length=50)
-    phone_number = models.CharField(blank=True, null=True, max_length=20)
+    name = models.CharField(max_length=50)
+    mobile = models.CharField(max_length=20)
     alternate_number = models.CharField(blank=True, null=True, max_length=20)
     email = models.CharField(blank=True, null=True, max_length=50)
-    address_1 = models.CharField(blank=True, null =True, max_length=200)
-    address_2 = models.CharField(blank=True, null =True, max_length=200)
-    city = models.CharField(blank=True, null=True, max_length=50)
-    state = models.CharField(blank=True, null=True, max_length=50)
-    pincode = models.PositiveIntegerField(blank=True, null = True)
+    address1 = models.CharField(blank=True, null =True, max_length=200)
+    address2 = models.CharField(blank=True, null =True, max_length=200)
+    address3 = models.CharField(blank=True, null =True, max_length=200)
+    city = models.ForeignKey(City, related_name='addresses')
+    state = models.ForeignKey(State, related_name='addresses')
+    pincode = models.PositiveIntegerField()
+    is_active = models.BooleanField(default=True)
+
 
 
 ORDER_STATE_CHOICES = (
@@ -134,15 +161,22 @@ class Order(RecordTimeStamp):
     shipping_address = models.ForeignKey(Address, related_name='orders')
     date = models.DateTimeField(auto_now_add=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    product = models.ForeignKey(Product, related_name='orders', on_delete=models.CASCADE)
+    tax = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+
+
+class OrderLine(models.Model):
+    order = models.ForeignKey(Order, related_name='lines', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, related_name='order_lines', on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    tax = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
 
 
 class ProductReview(RecordTimeStamp):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
     rating = models.DecimalField(max_digits=2, decimal_places=1)
-    product_id = models.ForeignKey(Product, related_name='reviews', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, related_name='reviews', on_delete=models.CASCADE)
 
 
 class CTA(models.Model):
@@ -154,18 +188,3 @@ class CTA(models.Model):
 
     def __str__(self):
         return self.title
-
-
-class State(models.Model):
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-
-
-class City(models.Model):
-    name = models.CharField(max_length=100)
-    state = models.ForeignKey(State, related_name='cities')
-
-    def __str__(self):
-        return self.name

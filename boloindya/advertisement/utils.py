@@ -39,3 +39,13 @@ def convert_to_dict_format(item):
             _dict[key] = convert_to_dict_format(val)
 
     return _dict
+
+
+def filter_data_from_dict(keys, _dict):
+    new_dict = {}
+
+    for key in keys:
+        if _dict.get(key):
+            new_dict[key] = _dict.get(key)
+
+    return new_dict
