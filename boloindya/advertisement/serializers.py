@@ -105,12 +105,31 @@ class OrderSerializer(serializers.ModelSerializer):
 
         for line in lines:
             line['order_id'] = order.id
-            line['amount'] = line.get('product').final_amount
+            line['amount'] = line.get('product').final_amount * line.get('quantity')
             l = OrderLine.objects.create(**line)
             order.amount += line['amount']
 
         order.save()
         return order
+
+    def update(self, instance, validated_data):
+        print "Instance", instance
+        print "validated data", validated_data
+
+        address = instance.shipping_address
+        for attr, value in validated_data.pop('shipping_address').iteritems():
+            setattr(address, attr, value)
+        address.save()
+
+        line = instance.lines.all()[0]
+        for attr, value in validated_data.pop('lines')[0].iteritems():
+            setattr(line, attr, value)
+        line.amount = line.product.final_amount * line.quantity
+        line.save()
+
+        instance.amount = line.product.final_amount * line.quantity
+        
+        return instance
 
 
 class OrderCreateSerializer(serializers.Serializer):

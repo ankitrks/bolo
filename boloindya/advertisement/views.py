@@ -78,8 +78,13 @@ class OrderCreateAPIView(APIView):
             }],
             'shipping_address': address_data
         }
-        order = client.post('/api/v1/ad/order/', order_data, HTTP_AUTHORIZATION=request_meta.get('HTTP_AUTHORIZATION'), format='json').json()
+
+        if request_data.get('order_id'):
+            order = client.patch('/api/v1/ad/order/%s/'%request_data.pop('order_id'), order_data, HTTP_AUTHORIZATION=request_meta.get('HTTP_AUTHORIZATION'), format='json').json()
+        else:
+            order = client.post('/api/v1/ad/order/', order_data, HTTP_AUTHORIZATION=request_meta.get('HTTP_AUTHORIZATION'), format='json').json()
         return Response(order, status=status.HTTP_201_CREATED)
+
 
 
 class CityListAPIView(APIView):
