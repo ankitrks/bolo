@@ -87,8 +87,8 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ('id', 'shipping_address', 'lines', 'amount')
-        read_only_fields = ('id',)
+        fields = ('id', 'shipping_address', 'lines', 'amount' ,'state', 'payment_status', 'date')
+        read_only_fields = ('id', 'state', 'payment_status', 'date')
         depth = 1
 
     def create(self, validated_data):
@@ -109,6 +109,7 @@ class OrderSerializer(serializers.ModelSerializer):
             l = OrderLine.objects.create(**line)
             order.amount += line['amount']
 
+        order.order_number = 'ORDER_%d'%order.id
         order.save()
         return order
 

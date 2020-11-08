@@ -149,8 +149,13 @@ ORDER_STATE_CHOICES = (
 
 ORDER_PAYMENT_CHOICES = (
     ('pending', 'Pending'),
+    ('initiated', 'Initiated'),
     ('success', 'Success'),
     ('failed', 'Failed')
+)
+
+PAYMENT_METHOD_CHOICES = (
+    ('card', 'Card'),
 )
 
 
@@ -162,6 +167,9 @@ class Order(RecordTimeStamp):
     date = models.DateTimeField(auto_now_add=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     tax = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    payment_gateway_order_id = models.CharField(max_length=30, null=True, blank=True)
+    payment_method = models.CharField(choices=PAYMENT_METHOD_CHOICES, max_length=20, null=True, blank=True)
+    order_number = models.CharField(max_length=30, null=True, blank=True)
 
 
 class OrderLine(models.Model):

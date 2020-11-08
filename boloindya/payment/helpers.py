@@ -38,6 +38,17 @@ def get_booking_info(order_id):
         INNER JOIN booking_event event ON event.id = booking.event_id
         WHERE booking.payment_gateway_order_id = %s
     """, [order_id])
+
+
+def get_ad_order_info(order_id):
+    return execute_query("""
+        SELECT a.name, a.mobile, o.amount, o.payment_gateway_order_id as order_id, u.email as email
+        from advertisement_order o
+        inner join advertisement_address a on a.id = o.shipping_address_id
+        inner join auth_user u on u.id = o.user_id
+        where o.payment_gateway_order_id = %s
+    """, [order_id])
+
     
 def update_booking_payment_status(order_id, payment_status, transaction_id=None):
     if payment_status == 'success':
@@ -106,6 +117,26 @@ def update_booking_payment_status(order_id, payment_status, transaction_id=None)
         "eventData": booking_event_data
     })
 
+
+def update_ad_order_payment_status(order_id, payment_status, transaction_id=None):
+    if payment_status == "success":
+        execute_query("""
+            UPDATE advertisement_order
+            SET 
+                payment_status = 'success',
+                state = 'pending_for_approval'
+            WHERE payment_gateway_order_id = %s
+            RETURNING id;
+        """, [order_id])
+
+    elif payment_status == "failed":
+        execute_query("""
+            UPDATE advertisement_order
+            SET 
+                payment_status = 'failed',
+            WHERE payment_gateway_order_id = %s
+            RETURNING id;
+        """, [order_id])
 
 def get_event_webengage_data(order_id):
     return execute_query("""

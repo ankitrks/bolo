@@ -5,6 +5,7 @@ from copy import deepcopy
 from django.shortcuts import render
 from django.db.models import Sum
 from django.test import Client
+from django.views.generic import RedirectView
 
 from rest_framework.generics import RetrieveAPIView, ListAPIView, ListCreateAPIView, CreateAPIView
 from rest_framework.viewsets import ModelViewSet
@@ -13,11 +14,13 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from payment.razorpay import create_order
 
 from advertisement.utils import query_fetch_data, convert_to_dict_format, filter_data_from_dict
 from advertisement.models import Ad, ProductReview, Order, Product, Address, OrderLine
 from advertisement.serializers import (AdSerializer, ReviewSerializer, OrderSerializer, ProductSerializer, AddressSerializer, 
                                         OrderCreateSerializer, OrderLineSerializer)
+
 
 
 class AdDetailAPIView(RetrieveAPIView):
@@ -48,10 +51,16 @@ class AddressViewset(ModelViewSet):
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
 
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user)
+
 
 class OrderViewset(ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
+
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user)
 
 
 class OrderCreateAPIView(APIView):
@@ -113,3 +122,37 @@ class CityListAPIView(APIView):
                 })
 
         return Response({'results': state.values()}, status=200)
+
+class OrderPaymentRedirectView(RedirectView):
+
+    def get_redirect_url(self, *args, **kawrgs):
+        print "request data", self.request.resolver_match.kwargs
+        order_id = self.request.resolver_match.kwargs.get('order_id')
+        order = Order.objects.get(id=order_id)
+
+        order.payment_status = 'initiated'
+
+        # webengage_event.delay({
+        #     "userId": booking.user_id,
+        #     "eventName": "Booking Payment Initiated",
+        #     "eventData": {
+        #         "event_booking_id": booking.id,
+        #         "event_id": booking.event.id,
+        #         "event_slot_id": booking.event_slot_id,
+        #         "slot_status": booking.event_slot.state,
+        #         "booking_status": booking.state,
+        #         "payment_status": booking.payment_status,
+        #         "creator_id": booking.user_id,
+        #         "booker_id": booking.event.creator_id,
+        #         "slot_start_time": booking.event_slot.start_time.strftime("%Y-%m-%d %H:%M:%S"),
+        #         "slot_end_time": booking.event_slot.end_time.strftime("%Y-%m-%d %H:%M:%S"),
+        #     }
+
+        # })
+
+        if not order.payment_gateway_order_id:
+            razorpay_order = create_order(order.amount, "INR", receipt=order.order_number, notes={})
+            order.payment_gateway_order_id = razorpay_order.get('id')
+
+        order.save()
+        return '/payment/razorpay/%s/pay?type=order&order_id=%s'%(order.payment_gateway_order_id, order.id)
