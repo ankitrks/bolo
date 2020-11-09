@@ -9,3 +9,4 @@ redis_vbseen_read_only = _connection.redis_vbseen_read_only
 redis_logs = _connection.redis_logs
 redis_logs_read_only = _connection.redis_logs_read_only
 # neo4j = _connection.neo4j
+dynamo_client = _connection.dynamo_client

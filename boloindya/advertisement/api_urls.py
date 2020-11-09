@@ -3,7 +3,7 @@ from django.conf.urls import include, url
 from rest_framework import routers
 
 from advertisement.views import (AdDetailAPIView, ReviewListAPIView, CityListAPIView, ProductDetailAPIView,
-                                    AddressViewset, OrderViewset, OrderCreateAPIView)
+                                    AddressViewset, OrderViewset, OrderCreateAPIView, AdEventCreateAPIView)
 
 router = routers.SimpleRouter()
 router.register('address', AddressViewset)
@@ -17,7 +17,7 @@ urlpatterns += [
     url(r'^product/(?P<product_id>\d+)/review$', ReviewListAPIView.as_view()),
     url(r'^city-list$', CityListAPIView.as_view()),
     url(r'^place-order$', OrderCreateAPIView.as_view()),
-
+    url(r'^event$', AdEventCreateAPIView.as_view()),
 ]
 
 print "urlpatterns", urlpatterns

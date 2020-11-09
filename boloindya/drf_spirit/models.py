@@ -495,3 +495,11 @@ class MusicAlbum(models.Model):
        return str(self.title)+', '+str(self.author_name)
     class Meta:
         ordering = ['order_no']
+
+
+class SystemParameter(models.Model):
+    name = models.CharField(max_length=200)
+    value = models.TextField()
+
+    def __unicode__(self):
+        return '%s = %s'%(self.name, self.value)

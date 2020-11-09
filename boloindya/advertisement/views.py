@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from copy import deepcopy
+from datetime import datetime
 
 from django.shortcuts import render
 from django.db.models import Sum
@@ -14,10 +15,12 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from dynamodb_api import create as dynamodb_create
+
 from payment.razorpay import create_order
 
 from advertisement.utils import query_fetch_data, convert_to_dict_format, filter_data_from_dict
-from advertisement.models import Ad, ProductReview, Order, Product, Address, OrderLine
+from advertisement.models import Ad, ProductReview, Order, Product, Address, OrderLine, AdEvent
 from advertisement.serializers import (AdSerializer, ReviewSerializer, OrderSerializer, ProductSerializer, AddressSerializer, 
                                         OrderCreateSerializer, OrderLineSerializer)
 
@@ -156,3 +159,14 @@ class OrderPaymentRedirectView(RedirectView):
 
         order.save()
         return '/payment/razorpay/%s/pay?type=order&order_id=%s'%(order.payment_gateway_order_id, order.id)
+
+
+class AdEventCreateAPIView(APIView):
+    def post(self, request, *args, **kwargs):
+        data = deepcopy(request.data)
+        data.update({
+            'user_id': request.user.id,
+            'created_at': datetime.now()
+        })
+        dynamodb_create(AdEvent, data)
+        return Response({'message': 'SUCCESS'}, status=201)
