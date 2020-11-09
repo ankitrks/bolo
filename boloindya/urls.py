@@ -100,6 +100,7 @@ urlpatterns = [
     url('grappelli/', include('grappelli.urls')), # grappelli URLS
 	url(r'^superman/', include(admin.site.urls)),
     url(r'^api/superman/', include(forum.admin.api_urls)),
+    url(r'^_nested_admin/', include('nested_admin.urls')),
     url(r'^i18n/', include('django.conf.urls.i18n')),
     url(r'^', include(patterns, namespace='spirit', app_name='forum')),
     url(r'docs/', include_docs_urls(title='Boloindya API')),
@@ -110,7 +111,7 @@ urlpatterns = [
     url(r'^booking/', include(booking.urls)),
     url(r'^api/v1/ad/', include('advertisement.api_urls', namespace='ad')),
     url(r'^api/v2/', include('drf_spirit.api_urls_v2')),
-    url(r'^advertisement/',include(advertisement.urls))
+    url(r'^ad/', include(advertisement.urls)),
 ]
 
 urlpatterns += i18n_patterns(

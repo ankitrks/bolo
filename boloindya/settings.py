@@ -169,7 +169,8 @@ INSTALLED_APPS = [
     'simple_history',
     # 'forum.core.tests'
     'booking',
-    'advertisement'
+    'advertisement',
+    'nested_admin'
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
