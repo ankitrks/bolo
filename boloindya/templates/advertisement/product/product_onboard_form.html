@@ -40,37 +40,31 @@
             </div>
         </div>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-        <div class="after-add-more form-group product_details">
+        <div class="after-add-more form-group product_details" style="display: none;">
             <div class="row">
                 <div class="row">
-                    <div class="col-md-2">                                
+                    <div class="col-md-3">                                
                         <div class="form-group">
                             <label class="control-label">Product Name: </label>
                             <input type="text" name="product_name" placeholder="Enter Product Name" id="product_name">
                         </div>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         <div class="form-group">
                             <label class="control-label">Product ID: </label>
                             <input type="text" name="product_id" placeholder="Enter Product ID" id="product_id">
                         </div>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         <div class="form-group">
                             <label class="control-label">Product Link</label>
                             <input type="text" name="product_link" placeholder="Enter Product Link" id="product_link">
                         </div>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         <div class="form-group">
                             <label class="control-label">Product Price</label>
                             <input type="text" name="product_price" placeholder="Enter Product Price" id="product_price">
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group change">
-                            <label for="">&nbsp;</label><br/>
-                            <a class="btn btn-success add-more">+ Add More</a>
                         </div>
                     </div>
                 </div>
@@ -87,36 +81,48 @@
                             <input type='file' name='files[]' multiple />
                         </div>
                     </div>
-                    <div class="col-md-2">                                
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="">&nbsp;</label><br/>
+                            <a class="btn btn-danger remove">- Remove</a>
+                        </div>
+                    </div>
+                    <!-- <div class="col-md-2">                                
                         <div class="form-group">
                             <label for="">&nbsp;</label><br/>
                             <a class="btn btn-success add-more-reviews">+ Add Reviews</a>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
-                <div class="row">
-                    <div class="after-add-more-reviews form-group product_details" id="reviews-div" style="display: none;">
+                <!-- <div class="row">
+                    <div class="after-add-more-reviews form-group" id="reviews-div" style="display: none;">
                         <div class="col-md-2">                                
                             <div class="form-group">
-                                <label class="control-label">Product Name: </label>
-                                <input type="text" name="product_name" placeholder="Enter Product Name" id="product_name">
+                                <label class="control-label">Title: </label>
+                                <input type="text" name="product_name" placeholder="Enter Title" id="product_name">
                             </div>
                         </div>
                         <div class="col-md-2">
                             <div class="form-group">
-                                <label class="control-label">Product ID: </label>
-                                <input type="text" name="product_id" placeholder="Enter Product ID" id="product_id">
+                                <label class="control-label">Description:</label>: </label>
+                                <input type="text" name="product_id" placeholder="Enter Description" id="product_id">
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <div class="form-group">
-                                <label for="">&nbsp;</label><br/>
+                                <label class="control-label">Rating:</label>: </label>
+                                <input type="text" name="product_id" placeholder="Enter Rating" id="product_id">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
                                 <a class="btn btn-danger remove-reviews">- Remove</a>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </div> -->
+                <!-- </div> -->
             </div>
+        <hr>
         </div>
         <div class="form-group video_elements">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Bucket</label>
@@ -126,8 +132,18 @@
                 </select>
             </div>
         </div>
+        <!-- <div class="col-md-4">
+            <div class="form-group change">
+                <label for="">&nbsp;</label><br/>
+                <a class="btn btn-success add-more">+ Add More</a>
+            </div>
+        </div> -->
         <div class="form-group">
             <div class="col-md-1 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
+                <a class="btn btn-success add-more">+ Add More</a>
+                <!-- <a class="btn btn-success add-more">+ Add More</a> -->
+            </div>
+            <div class="col-md-1 col-sm-3 col-xs-12 col-md-offset-1" style="margin-bottom:10px;">
                 <button type="submit" class="btn btn-primary submit_from_button"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Submit</button>
             </div>
         </div>
@@ -146,8 +162,10 @@
     $(document).ready(function() {
     $("body").on("click",".add-more",function(){ 
         var html = $(".after-add-more").first().clone();
+        html.removeAttr('style');
         html.find('input').val('');
-          $(html).find(".change").html("<label for=''>&nbsp;</label><br/><a class='btn btn-danger remove'>- Remove</a>");
+        $(html).find(".redundant_review").remove()
+        $(html).find(".change").html("<label for=''>&nbsp;</label><br/><a class='btn btn-danger remove'>- Remove</a>");
         $(".after-add-more").last().after(html);
     });
     $("body").on("click",".remove",function(){ 
@@ -164,6 +182,7 @@
         var html = $(".after-add-more-reviews").first().clone();
         html.removeAttr('style');
         html.find('input').val('');
+        html.addClass('redundant_review')
         $(".after-add-more-reviews").last().after(html);
         // }
     });
