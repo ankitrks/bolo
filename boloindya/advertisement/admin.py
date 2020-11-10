@@ -91,17 +91,20 @@ class ProductImageFields(forms.ModelForm):
 class ProductReviewInline(nested_admin.NestedStackedInline):
     model = ProductReview
     fields = ('title','description','rating')
+    extra = 0
 
 class ProductImageInline(nested_admin.NestedStackedInline):
     model = ProductImage
     form = ProductImageFields
     fields = ('file_image','original_image',)
     readonly_fields = ('original_image',)
+    extra = 0
 
 class ProductInline(nested_admin.NestedStackedInline):
     model = Product
     fields = ('name','link','product_category','mrp','description','rating')
     inlines = [ProductReviewInline, ProductImageInline]
+    extra = 0
 
 
 class BrandInline(admin.TabularInline):

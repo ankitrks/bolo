@@ -108,7 +108,7 @@ class CityListAPIView(APIView):
 
 from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
-from .models import ProductCategory, Brand, Product, Frequency, CTA, ad_type_options
+from .models import ProductCategory, Brand, Product, Frequency, CTA, ad_type_options, CTA_OPTIONS
 from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from rest_framework import status
@@ -216,12 +216,16 @@ def ad_creation_form(request):
     if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)):
         if request.method == 'GET':
             ad_type_options_values = []
+            cta_options_values = []
+            for value1, value2 in CTA_OPTIONS:
+                cta_options_values.append({'id':value1, 'value':value2})
             for value1, value2 in ad_type_options:
                 ad_type_options_values.append({'id':value1, 'value':value2})
             print(ad_type_options_values)
-            return render(request,'advertisement/ad/new_ad_form.html', {'ad_type_options':ad_type_options_values})
+            return render(request,'advertisement/ad/new_ad_form.html', {'ad_type_options':ad_type_options_values,'cta_options': cta_options_values})
         elif request.method == 'POST':
             try:
+                print(request.POST)
                 s3_client = boto3.client('s3',aws_access_key_id = settings.BOLOINDYA_AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY)
                 scrolls = request.POST.getlist('scrolls',None)
                 start_date = request.POST.get('start_date',None)
@@ -233,11 +237,16 @@ def ad_creation_form(request):
                 product_id = request.POST.get('product_id',None)
                 description = request.POST.get('description',None)
                 ad_type = request.POST.get('ad_type',None)
-                cta = request.POST.getlist('cta',None)
+                cta_type_1 = request.POST.getlist('cta_type_1',None)
+                cta_type_2 = request.POST.getlist('cta_type_2',None)
                 is_draft = request.POST.get('is_draft',None)
                 ad_video_file = request.FILES.get('video_file',None)
                 ad_video_file_link = request.POST.get('video_file_link',None)
                 upload_to_bucket = request.POST.get('bucket_name',None)
+                mrp = request.POST.get('mrp',None)
+                discount = request.POST.get('discount',None)
+                playstore_link = request.POST.get('playstore_link', None)
+                website_link = request.POST.get('website_link', None)
                 ad_folder_key = request.POST.get('folder_prefix','from_upload_panel/advertisement/ad/')
                 if all(freq=='' for freq in scrolls):
                     return HttpResponse(json.dumps({'message':'fail','reason':'No Frequnecy scroll provided'}),content_type="application/json")
@@ -249,10 +258,8 @@ def ad_creation_form(request):
                     return HttpResponse(json.dumps({'message':'fail','reason':'Please upload valid ad video file'}),content_type="application/json")
                 if toggler=='upload' and not (ad_video_file.name.endswith('.mp4') or ad_video_file.name.endswith('.mov')):
                     return HttpResponse(json.dumps({'message':'fail','reason':'This is not a mp4  mov file'}),content_type="application/json")
-                print("===")
-                print(toggler,ad_video_file, ad_video_file_link)
-
-
+                if mrp and discount and float(mrp)<float(discount):
+                    return HttpResponse(json.dumps({'message':'fail','reason':'Discount can not be more than mrp'}),content_type="application/json")
 
                 start_date = datetime.strptime(start_date, "%d-%m-%Y")
                 is_draft = True if is_draft=='true' else False
@@ -261,7 +268,6 @@ def ad_creation_form(request):
                     state = "draft"
                 ad_dict = {}
                 ad_dict['brand_id'] = brand_id
-                ad_dict['title'] = title
                 ad_dict['description'] = description
                 ad_dict['start_time'] = start_date
                 if end_date:
@@ -270,7 +276,8 @@ def ad_creation_form(request):
                     ad_dict['video_file_url'] = ad_video_file_link
                 ad_dict['frequency_type'] = toggler_frequency
                 ad_dict['created_by_id'] = request.user.id
-                ad_dict['product_id'] = product_id
+                if product_id!='-1':
+                    ad_dict['product_id'] = product_id
                 ad_dict['state'] = state
                 if ad_video_file:
                     ad_folder_key_url = upload_media(s3_client, ad_video_file, ad_folder_key)
@@ -286,8 +293,17 @@ def ad_creation_form(request):
                     if value:
                         Frequency(ad_id=ad_obj.id,sequence=index+1,scroll=value).save()
                 #add cta
-                for value in cta:
-                    CTA(ad_id=ad_obj.id, title=value).save()
+                cta_options_values = {}
+                for value1, value2 in CTA_OPTIONS:
+                    cta_options_values[value1] = value2
+                for value in cta_type_1+cta_type_2:
+                    action = None
+                    if value=="install_now":
+                        action = playstore_link
+                    elif value=="learn_more":
+                        action = website_link
+                    title = cta_options_values[value]
+                    CTA(ad_id=ad_obj.id, title=title, action=action).save()
 
                 return HttpResponse(json.dumps({'message':'success', 'ad_id':ad_obj.id}),content_type="application/json")
             except Exception as e:
@@ -351,7 +367,7 @@ def search_fields_for_advertisement(request):
             data = list(Brand.objects.filter(name__istartswith=query).values('id','name'))
             return JsonResponse({'data': data}, status=status.HTTP_200_OK )
         elif result_type == '1':
-            data = list(Product.objects.filter(name__istartswith=query).values('id','name'))
+            data = list(Product.objects.filter(name__istartswith=query).values('id','name','mrp','description'))
             return JsonResponse({'data': data}, status=status.HTTP_200_OK )
     except Exception as e:
         print(e)

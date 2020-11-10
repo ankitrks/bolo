@@ -86,11 +86,11 @@ ad_type_options = (
 	('install_now','Install Now'),)
 class Ad(RecordTimeStamp):
     brand = models.ForeignKey(Brand, related_name='ads', on_delete=models.CASCADE)
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=200, null=True)
     description = models.TextField(blank=True, null=True)
     start_time = models.DateTimeField(auto_now=False)
     end_time = models.DateTimeField(auto_now=False, null=True)
-    product = models.ForeignKey(Product, related_name='ads', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, related_name='ads', on_delete=models.CASCADE, null=True)
     ad_type =  models.CharField(max_length=25, choices=ad_type_options, default='shop_now')
     video_file_url = models.CharField(blank=True, null=True, max_length=200)
     thumbnail = models.CharField(blank=True, null=True, max_length=200)
@@ -189,6 +189,12 @@ class ProductReview(RecordTimeStamp):
     rating = models.DecimalField(max_digits=2, decimal_places=1)
     product = models.ForeignKey(Product, related_name='reviews', on_delete=models.CASCADE)
 
+CTA_OPTIONS = (
+    ('install_now', 'Install Now'),
+    ('learn_more', 'Learn More'),
+    ('shop_now', 'Shop Now'),
+    ('skip', 'Skip')
+)
 
 class CTA(models.Model):
     ad = models.ForeignKey(Ad, related_name='cta')
