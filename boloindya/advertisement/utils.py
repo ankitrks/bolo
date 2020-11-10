@@ -1,5 +1,11 @@
 from django.db import connections
 
+from collections import OrderedDict
+
+from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
+
+
 def dictfetchall(cursor):
     "Return all rows from a cursor as a dict"
     columns = [col[0] for col in cursor.description]
@@ -49,3 +55,12 @@ def filter_data_from_dict(keys, _dict):
             new_dict[key] = _dict.get(key)
 
     return new_dict
+
+class PageNumberPaginationRemastered(PageNumberPagination):
+    def get_paginated_response(self, data):
+        return Response(OrderedDict([
+            ('itemsCount', self.page.paginator.count),
+            ('next', self.get_next_link()),
+            ('previous', self.get_previous_link()),
+            ('data', data)
+        ]))

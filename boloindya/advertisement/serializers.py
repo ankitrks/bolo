@@ -12,10 +12,14 @@ class AdSerializer(serializers.ModelSerializer):
     ad_video = serializers.CharField(source='video_file_url', read_only=True)
     cta = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
+    product_name = serializers.CharField(source='product.name', read_only=True)
+    product_id = serializers.CharField(source='product.id', read_only=True)
+    price = serializers.CharField(source='product.final_amount', read_only=True)
 
     class Meta:
         model = Ad
-        fields = ('ad_id', 'brand_name', 'brand_image', 'ad_video', 'thumbnail', 'ad_length', 'cta', 'type')
+        fields = ('ad_id', 'brand_name', 'brand_image', 'ad_video', 'thumbnail', 'ad_length', 'cta', 'type', 
+                    'title', 'start_time', 'end_time', 'frequency', 'product_id', 'product_name', 'price', 'ad_type')
 
     def get_cta(self, instance):
         return list(instance.cta.all().values('title', 'code', 'enable_time', 'action'))

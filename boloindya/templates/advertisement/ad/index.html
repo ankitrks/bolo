@@ -1,0 +1,288 @@
+{% extends 'advertisement/base.html' %}
+
+{% block center_content %}
+<div class="row">
+    <div class="col-sm-12"  style="margin-left: 10px margin-right: 10px">
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title">Ad Dashboard</h3>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2">
+                        <div class="small-box bg-aqua">
+                            <div class="inner">
+                                <h3 class="value-count">20</h3>
+                                <p class="section-name">Ongoing Ad (Current)</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-bag"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2">
+                        <div class="small-box bg-green">
+                            <div class="inner">
+                                <h3 class="value-count">20</h3>
+                                <p class="section-name">Upcoming Ad (Current)</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-stats-bars"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2">
+                        <div class="small-box bg-yellow">
+                            <div class="inner">
+                                <h3 class="value-count">20</h3>
+                                <p class="section-name">Added to draft (all)</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-person-add"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2">
+                        <div class="small-box bg-red">
+                            <div class="inner">
+                                <h3 class="value-count">20</h3>
+                                <p class="section-name">Onboarded Products (Live)</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-pie-graph"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2">
+                        <div class="small-box bg-aqua">
+                            <div class="inner">
+                                <h3 class="value-count">20000</h3>
+                                <p class="section-name">Impressions (Date)</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-bag"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2">
+                        <div class="small-box bg-green">
+                            <div class="inner">
+                                <h3 class="value-count">20</h3>
+                                <p class="section-name">No. of skips (Date)</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-stats-bars"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2">
+                        <div class="small-box bg-yellow">
+                            <div class="inner">
+                                <h3 class="value-count">20</h3>
+                                <p class="section-name">Install clicks (Date)</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-person-add"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2">
+                        <div class="small-box bg-red">
+                            <div class="inner">
+                                <h3 class="value-count">20</h3>
+                                <p class="section-name">Shop Now clicks (Date)</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-pie-graph"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2">
+                        <div class="small-box bg-aqua">
+                            <div class="inner">
+                                <h3 class="value-count">20</h3>
+                                <p class="section-name">Onboarded Brands (Live)</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-bag"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2">
+                        <div class="small-box bg-green">
+                            <div class="inner">
+                                <h3 class="value-count">20</h3>
+                                <p class="section-name">Learn More (Date)</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-stats-bars"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12"  style="margin-left: 10px">
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title">Ad</h3>
+            </div>
+            <div class="box-body">
+                <div class="row" style="margin-bottom: 10px">
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <input type="text" name="q" class="form-control" placeholder="Search...">
+                            <span class="input-group-btn">
+                                <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-left: 10px">
+                    <div class="row" id="adTable"></div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock center_content %}
+
+{% block local_js %}
+<script type="text/javascript">
+let headers = {}
+
+var MyHTMLField = function(config) {
+    jsGrid.Field.call(this, config);
+};
+
+var MyFunctionField = function(config) {
+    jsGrid.Field.call(this, config);
+};
+
+MyHTMLField.prototype = new jsGrid.Field({
+    css: "html-field",            // redefine general property 'css'
+    align: "center",              // redefine general property 'align'
+    itemTemplate: function(value) {
+        return this.template
+    },
+});
+
+MyFunctionField.prototype = new jsGrid.Field({
+    css: "function-field",            // redefine general property 'css'
+    align: "center",              // redefine general property 'align'
+
+    itemTemplate: function(value, a, b) {
+        return this.template
+        let data, that=this;
+        console.log("value====", value, a, b, this)
+        $.each(this._grid.data, function(i, _info){
+            if(that.name == _info.id){
+                data = _info;
+                return false;
+            }
+        })
+        // return `
+        //     <button class="btn btn-primary pay" data-target="#modal-pay-creator" 
+        //             data-toggle="modal" data-id="${ data.id }" data-paytm_number="${ data.paytm_number }"
+        //             data-user_id="${ data.boloindya_id }">
+        //         Pay
+        //     </button>`;
+        return `
+            <input type="checkbox" name="mark_for_export" value="${ value }"/>
+        `
+    },
+})
+
+jsGrid.fields.function = MyHTMLField;
+
+$("#adTable").jsGrid({
+    width: "100%",
+    height: "600px",
+
+    inserting: false,
+    editing: false,
+    sorting: true,
+    paging: true,
+    pageLoading: true,
+    autoload: true,
+    pageSize: 15,
+    fields: [
+        { title: " ", name: "ad_id", type: "html", template: `<input type="checkbox" name="mark_for_export" value=""/>`},
+        { title: "Sr. No.", name: "ad_id", type: "number"},
+        { title: "Brand ID", name: "brand_id", type: "text"},
+        { title: "Brand Name", name: "brand_name", type: "text"},
+        { title: "Title", name: "title", type: "text"},
+        { title: "Start Date", name: "start_time", type: "text"},
+        { title: "End Date", name: "end_time", type: "text"},
+        { title: "Frequency", name: "frequency", type: "html", template: `
+            <a>Detail</a>
+        `},
+        { title: "Video", name: "ad_video", type: "html", template: `
+            <img src='/media/img/icons/video.png' style="width:30px"> 
+        `},
+        { title: "Product ID", name: "product_id", type: "number"},
+        { title: "Product Name", name: "product_name", type: "text"},
+        { title: "Price", name: "price", type: "number"},
+        { title: "Ad Type", name: "ad_type", type: "text"},
+        { title: "Action", name: "ad_id", type: "html", template: `
+            <span>
+                <button class="btn btn-primary">Edit</button>
+                <button class="btn btn-warning">Pause</button>
+                <button class="btn btn-danger">Del</button>
+            </span>
+        `},
+    ],
+    controller: {
+        loadData: function(filter) {
+            console.log("------ loadData ", filter)
+            let q = $('[name="q"]').val()
+            if(q)
+                filter['q'] = q
+            filter['page'] = filter['pageIndex']
+
+            return $.ajax({
+                type: "GET",
+                url: "/api/v1/ad/ad",
+                data: filter,
+                headers: headers
+            });
+        },
+        
+        insertItem: function(item) {
+            return $.ajax({
+                type: "POST",
+                url: "/api/v1/ad/ad",
+                data: item,
+                headers: headers
+            });
+        },
+        
+        updateItem: function(item) {
+            return $.ajax({
+                type: "PUT",
+                url: "/api/v1/ad/ad/"+item.ad_id + "/",
+                data: item,
+                headers: headers
+            });
+        },
+        
+        deleteItem: function(item) {
+            return $.ajax({
+                type: "DELETE",
+                url: "/api/v1/ad/ad/"+item.ad_id,
+                data: item,
+                headers: headers
+            });
+        }
+    }
+});
+
+let grid = $("#beneficiaryTable").data("JSGrid");
+</script>
+{% endblock local_js %}

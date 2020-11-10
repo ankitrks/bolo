@@ -4,11 +4,12 @@ from rest_framework import routers
 
 from advertisement.views import (AdDetailAPIView, ReviewListAPIView, CityListAPIView, ProductDetailAPIView,
                                     AddressViewset, OrderViewset, OrderCreateAPIView, AdEventCreateAPIView,
-                                    GetAdForUserAPIView)
+                                    GetAdForUserAPIView, AdViewset)
 
 router = routers.SimpleRouter()
 router.register('address', AddressViewset)
 router.register('order', OrderViewset)
+router.register('ad', AdViewset)
 
 urlpatterns = router.urls
 

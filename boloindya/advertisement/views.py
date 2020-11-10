@@ -6,7 +6,7 @@ from datetime import datetime
 from django.shortcuts import render
 from django.db.models import Sum
 from django.test import Client
-from django.views.generic import RedirectView
+from django.views.generic import RedirectView, TemplateView, DetailView
 
 from rest_framework.generics import RetrieveAPIView, ListAPIView, ListCreateAPIView, CreateAPIView
 from rest_framework.viewsets import ModelViewSet
@@ -19,7 +19,7 @@ from dynamodb_api import create as dynamodb_create
 from redis_utils import get_redis
 from payment.razorpay import create_order
 
-from advertisement.utils import query_fetch_data, convert_to_dict_format, filter_data_from_dict
+from advertisement.utils import query_fetch_data, convert_to_dict_format, filter_data_from_dict, PageNumberPaginationRemastered
 from advertisement.models import Ad, ProductReview, Order, Product, Address, OrderLine, AdEvent
 from advertisement.serializers import (AdSerializer, ReviewSerializer, OrderSerializer, ProductSerializer, AddressSerializer, 
                                         OrderCreateSerializer, OrderLineSerializer)
@@ -39,6 +39,11 @@ class ProductDetailAPIView(RetrieveAPIView):
         obj = super(ProductDetailAPIView, self).get_object()
         return obj.product
 
+
+class AdViewset(ModelViewSet):
+    queryset = Ad.objects.all()
+    serializer_class = AdSerializer
+    pagination_class = PageNumberPaginationRemastered
 
 
 class ReviewListAPIView(ListAPIView):
@@ -186,4 +191,12 @@ class GetAdForUserAPIView(APIView):
         return Response({
             'results': user_ad
         })
+
+
+class AdTemplateView(TemplateView):
+    template_name = 'advertisement/ad/index.html'
+
+
+class OrderTemplateView(TemplateView):
+    template_name = 'advertisement/order/index.html'
 
