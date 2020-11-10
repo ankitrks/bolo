@@ -15,17 +15,30 @@ class AdSerializer(serializers.ModelSerializer):
     product_name = serializers.CharField(source='product.name', read_only=True)
     product_id = serializers.CharField(source='product.id', read_only=True)
     price = serializers.CharField(source='product.final_amount', read_only=True)
+    start_date = serializers.SerializerMethodField(read_only=True)
+    end_date = serializers.SerializerMethodField(read_only=True)
+    frequency = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Ad
         fields = ('ad_id', 'brand_name', 'brand_image', 'ad_video', 'thumbnail', 'ad_length', 'cta', 'type', 
-                    'title', 'start_time', 'end_time', 'frequency', 'product_id', 'product_name', 'price', 'ad_type')
+                    'title', 'start_date', 'end_date', 'frequency', 'frequency_type', 'product_id', 'product_name', 'price', 'ad_type')
 
     def get_cta(self, instance):
         return list(instance.cta.all().values('title', 'code', 'enable_time', 'action'))
 
     def get_type(self, instance):
         return 'ad'
+
+    def get_start_date(self, instance):
+        return datetime.strftime(instance.start_time, '%d-%m-%Y')
+
+    def get_end_date(self, instance):
+        return datetime.strftime(instance.end_time, '%d-%m-%Y')
+
+    def get_frequency(self, instance):
+        return list(instance.frequency.all().values('scroll', 'sequence'))
+
 
 
 class ProductSerializer(serializers.ModelSerializer):

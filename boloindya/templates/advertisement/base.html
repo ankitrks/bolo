@@ -152,6 +152,36 @@ function getCookie(cname) {
 }
 </script>
 
+<script>
+var MyHTMLField = function(config) {
+    jsGrid.Field.call(this, config);
+};
+
+var MyFunctionField = function(config) {
+    jsGrid.Field.call(this, config);
+};
+
+MyHTMLField.prototype = new jsGrid.Field({
+    css: "html-field",            // redefine general property 'css'
+    align: "center",              // redefine general property 'align'
+    itemTemplate: function(value) {
+        return this.template
+    },
+});
+
+MyFunctionField.prototype = new jsGrid.Field({
+    css: "function-field",            // redefine general property 'css'
+    align: "center",              // redefine general property 'align'
+
+    itemTemplate: function(value, data) {
+        return this.rendererFunction.call(this, value, data)
+    },
+})
+
+jsGrid.fields.html = MyHTMLField;
+jsGrid.fields.renderer = MyFunctionField;
+</script>
+
 {% block local_js %}
 
 {% endblock local_js %}

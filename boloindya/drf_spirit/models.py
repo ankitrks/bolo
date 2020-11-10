@@ -503,3 +503,10 @@ class SystemParameter(models.Model):
 
     def __unicode__(self):
         return '%s = %s'%(self.name, self.value)
+
+
+class DatabaseCounter(models.Model):
+    name = models.CharField(max_length=200)
+    query = models.TextField()
+    count = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)

@@ -81,6 +81,11 @@ frequency_type_options = (
     ('variable', "Variable"),
 )
 
+AD_TYPE_CHOICES = (
+    ('install', 'Install'),
+    ('shop_now', 'Shop Now')
+)
+
 class Ad(RecordTimeStamp):
     brand = models.ForeignKey(Brand, related_name='ads', on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
@@ -88,7 +93,7 @@ class Ad(RecordTimeStamp):
     start_time = models.DateTimeField(auto_now=False)
     end_time = models.DateTimeField(auto_now=False)
     product = models.ForeignKey(Product, related_name='ads', on_delete=models.CASCADE)
-    ad_type =  models.CharField(max_length=25)
+    ad_type =  models.CharField(max_length=25, choices=AD_TYPE_CHOICES)
     video_file_url = models.CharField(blank=True, null=True, max_length=200)
     thumbnail = models.CharField(blank=True, null=True, max_length=200)
     ad_length = models.PositiveIntegerField(default=0)
@@ -220,7 +225,7 @@ class Skipped(AdEventAbstract):
 
 
 class Clicked(AdEventAbstract):
-    pass
+    cta = models.CharField(max_length=50, null=True, blank=True)
 
 
 class Playtime(AdEventAbstract):

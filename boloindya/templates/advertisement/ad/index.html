@@ -151,55 +151,28 @@
         </div>
     </div>
 </div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="frequencyModal" tabindex="-1" role="dialog" aria-labelledby="frequencyModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+            </div>
+            <div class="modal-body">
+                
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock center_content %}
 
 {% block local_js %}
 <script type="text/javascript">
 let headers = {}
-
-var MyHTMLField = function(config) {
-    jsGrid.Field.call(this, config);
-};
-
-var MyFunctionField = function(config) {
-    jsGrid.Field.call(this, config);
-};
-
-MyHTMLField.prototype = new jsGrid.Field({
-    css: "html-field",            // redefine general property 'css'
-    align: "center",              // redefine general property 'align'
-    itemTemplate: function(value) {
-        return this.template
-    },
-});
-
-MyFunctionField.prototype = new jsGrid.Field({
-    css: "function-field",            // redefine general property 'css'
-    align: "center",              // redefine general property 'align'
-
-    itemTemplate: function(value, a, b) {
-        return this.template
-        let data, that=this;
-        console.log("value====", value, a, b, this)
-        $.each(this._grid.data, function(i, _info){
-            if(that.name == _info.id){
-                data = _info;
-                return false;
-            }
-        })
-        // return `
-        //     <button class="btn btn-primary pay" data-target="#modal-pay-creator" 
-        //             data-toggle="modal" data-id="${ data.id }" data-paytm_number="${ data.paytm_number }"
-        //             data-user_id="${ data.boloindya_id }">
-        //         Pay
-        //     </button>`;
-        return `
-            <input type="checkbox" name="mark_for_export" value="${ value }"/>
-        `
-    },
-})
-
-jsGrid.fields.function = MyHTMLField;
 
 $("#adTable").jsGrid({
     width: "100%",
@@ -213,30 +186,51 @@ $("#adTable").jsGrid({
     autoload: true,
     pageSize: 15,
     fields: [
-        { title: " ", name: "ad_id", type: "html", template: `<input type="checkbox" name="mark_for_export" value=""/>`},
-        { title: "Sr. No.", name: "ad_id", type: "number"},
-        { title: "Brand ID", name: "brand_id", type: "text"},
-        { title: "Brand Name", name: "brand_name", type: "text"},
-        { title: "Title", name: "title", type: "text"},
-        { title: "Start Date", name: "start_time", type: "text"},
-        { title: "End Date", name: "end_time", type: "text"},
-        { title: "Frequency", name: "frequency", type: "html", template: `
-            <a>Detail</a>
-        `},
+        { title: " ", name: "ad_id", type: "renderer", rendererFunction: function(value, data){
+            return `<input type="checkbox" name="mark_for_export" value="${ value }"/>`
+        }, width: 22, align: "center",},
+        { title: "Sr. No.", name: "ad_id", type: "number", width: 30, align: "center"},
+        { title: "Brand ID", name: "brand_id", type: "text", align: "center", width: 40},
+        { title: "Brand Name", name: "brand_name", type: "text", align: "center"},
+        { title: "Start Date", name: "start_date", type: "text", width: 60, align: "center"},
+        { title: "End Date", name: "end_date", type: "text", width: 60, align: "center"},
+        { title: "Frequency", name: "frequency", type: "renderer", rendererFunction: function(value, data){
+            console.log("freq val", value, data)
+            let html= `<div><b>Type: ${ data.frequency_type }</b></div>`
+
+            if(data.frequency_type == 'constant'){
+                html += `<div>Scrolls: ${ data.frequency[0]['scroll'] }</div>`
+            }
+            else if(data.frequency_type == 'variable'){
+                html += `<table>
+                    <tr>
+                        <th>Sequence</th>
+                        <th>Scroll</th>
+                    </tr>`
+                data.frequency.forEach(function(val){
+                    html += `<tr>
+                        <td>${ val.sequence }</td>
+                        <td>${ val.scroll }</td>
+                    </tr>`
+                })
+                html += '</table>'
+            }
+            return `<a class="frequency-element" data-toggle="modal" data-target="#frequencyModal" data-modalbody="${ html }">Detail</a>`
+        }, align: "center"},
         { title: "Video", name: "ad_video", type: "html", template: `
             <img src='/media/img/icons/video.png' style="width:30px"> 
         `},
-        { title: "Product ID", name: "product_id", type: "number"},
-        { title: "Product Name", name: "product_name", type: "text"},
-        { title: "Price", name: "price", type: "number"},
-        { title: "Ad Type", name: "ad_type", type: "text"},
+        { title: "Product ID", name: "product_id", type: "number", align: "center", width: 40},
+        { title: "Product Name", name: "product_name", type: "text", align: "center"},
+        { title: "Price", name: "price", type: "number", align: "center", width: 50},
+        { title: "Ad Type", name: "ad_type", type: "text", align: "center"},
         { title: "Action", name: "ad_id", type: "html", template: `
             <span>
                 <button class="btn btn-primary">Edit</button>
                 <button class="btn btn-warning">Pause</button>
                 <button class="btn btn-danger">Del</button>
             </span>
-        `},
+        `, width: 100},
     ],
     controller: {
         loadData: function(filter) {
@@ -280,9 +274,13 @@ $("#adTable").jsGrid({
                 headers: headers
             });
         }
-    }
+    },
 });
 
 let grid = $("#beneficiaryTable").data("JSGrid");
+$(document).on('click', '.frequency-element', function(){
+    console.log("elemetn clicked", $(this).attr('data-modalbody'))
+    $($(this).attr('data-target')).find('.modal-body').html($(this).attr('data-modalbody'))
+})
 </script>
 {% endblock local_js %}
