@@ -4555,10 +4555,12 @@ def convert_to_dict_format(item):
 
     return _dict
 
-def get_ad_to_display():
-    from django.test import Client
-    c = Client()
-    return [c.get('/api/v1/ad/1').json()]
+def get_ad_to_display(user_id, extra_data):
+    from rest_framework.test import APIClient
+    c = APIClient()
+    params_list = ['%s=%s'%(key, val) for key, val in extra_data.iteritems()]
+    params_list.append('user_id=%s'%user_id)
+    return c.get('/api/v1/ad/for-user?%s'%('&'.join(params_list),)).json().get('results')
 
 
 def get_video_bytes_and_its_related_data(id_list, last_updated=None):
@@ -4762,14 +4764,33 @@ class PopularVideoBytesV2(PopularVideoBytes):
         language_id = request.GET.get('language_id', 1)
         page_number = int(request.GET.get('page',1))
 
-        ad_list = get_ad_to_display()
+        ad_list = get_ad_to_display(request.user.id, request.GET)
+        ad_infused_popular_posts = self.infuse_ads(ad_list, get_video_bytes_and_its_related_data(
+                                        self.get_tranding_topic_data(request.user.id, language_id, page_number),
+                                        request.GET.get('last_updated', None)
+                                    ))
 
         return JsonResponse({
-                'topics': ad_list + get_video_bytes_and_its_related_data(
-                                    self.get_tranding_topic_data(request.user.id, language_id, page_number),
-                                    request.GET.get('last_updated', None)
-                                    )
+                'topics': ad_infused_popular_posts
             }, status=status.HTTP_200_OK) 
+
+    def infuse_ads(self, ads, popular_posts):
+        popular_posts = [{'id': 1}, {'id':2}, {'id':3}, {'id':4}, {'id':5}, {'id':6}, {'id':7}, {'id':8}, {'id':9}, {'id':10}, {'id':11}, 
+                            {'id':12}, {'id':13}, {'id':14}, {'id':15}]
+        post_count = 0
+        sequence = (int(self.request.GET.get('page', 1)) - 1) * settings.REST_FRAMEWORK.get('PAGE_SIZE')
+        ad_infused_posts = []
+
+        while post_count < len(popular_posts):
+            if ads.get(str(sequence)):
+                ad_infused_posts.append(ads.get(str(sequence)))
+            else:
+                ad_infused_posts.append(popular_posts[post_count])
+                post_count += 1
+            sequence += 1
+
+        return ad_infused_posts
+
 
 
 

@@ -108,6 +108,12 @@ class Frequency(RecordTimeStamp):
     sequence = models.PositiveIntegerField(default=0)
     scroll = models.PositiveIntegerField(default=0)
 
+    def __unicode__(self):
+        if self.ad.frequency_type == 'constant':
+            return '%s at every %s scrolls'%(self.ad, self.scroll)
+        elif self.ad.frequency_type == 'variable':
+            return '%s after %s scrolls'%(self.ad, self.scroll)
+
 
 class State(models.Model):
     name = models.CharField(max_length=100)

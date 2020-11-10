@@ -18,7 +18,7 @@ class AdSerializer(serializers.ModelSerializer):
         fields = ('ad_id', 'brand_name', 'brand_image', 'ad_video', 'thumbnail', 'ad_length', 'cta', 'type')
 
     def get_cta(self, instance):
-        return instance.cta.all().values('title', 'code', 'enable_time', 'action')
+        return list(instance.cta.all().values('title', 'code', 'enable_time', 'action'))
 
     def get_type(self, instance):
         return 'ad'
@@ -40,7 +40,7 @@ class ProductSerializer(serializers.ModelSerializer):
                     'currency', 'mrp', 'is_discounted', 'discounted_price', 'discount_expiry')
 
     def get_product_images(self, instance):
-        return instance.images.all().values_list('compressed_image', flat=True)
+        return list(instance.images.all().values_list('compressed_image', flat=True))
 
     def get_rating_count(self, instance):
         return intcomma(instance.rating_count)

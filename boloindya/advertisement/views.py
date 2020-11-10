@@ -16,7 +16,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from dynamodb_api import create as dynamodb_create
-
+from redis_utils import get_redis
 from payment.razorpay import create_order
 
 from advertisement.utils import query_fetch_data, convert_to_dict_format, filter_data_from_dict
@@ -170,3 +170,20 @@ class AdEventCreateAPIView(APIView):
         })
         dynamodb_create(AdEvent, data)
         return Response({'message': 'SUCCESS'}, status=201)
+
+
+class GetAdForUserAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        params = request.query_params
+        user_ad = {}
+        ad_pool = get_redis('ad:pool')
+        next_position = 0
+
+        for scroll in sorted(map(int, ad_pool.keys())):
+            next_position += scroll
+            user_ad[str(next_position)] = get_redis('ad:%s'%ad_pool.get(str(scroll))[0].get('id'))  # Todo: Need to imporve it
+
+        return Response({
+            'results': user_ad
+        })
+
