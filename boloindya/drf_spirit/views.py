@@ -4651,8 +4651,10 @@ class PopularVideoBytes(APIView):
         language_id = request.GET.get('language_id', 1)
         page_number = int(request.GET.get('page',1))
 
+        stick_posts = get_video_bytes_and_its_related_data(Topic.objects.filter(is_sticky=True).values_list('id', flat=True))
+
         return JsonResponse({
-                'topics': get_video_bytes_and_its_related_data(
+                'topics': stick_posts + get_video_bytes_and_its_related_data(
                                     self.get_tranding_topic_data(request.user.id, language_id, page_number),
                                     request.GET.get('last_updated', None)
                                     )
