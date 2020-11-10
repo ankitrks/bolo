@@ -290,7 +290,7 @@ $('#search_id').keyup(function(){
             $('#response').append('<li id="loading">Loading ...</li>');
             var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
             $.ajax({
-                url: '/advertisement/search_fields_for_ad/',
+                url: '/ad/search_fields_for_ad/',
                 method: 'POST',
                 data: JSON.stringify({
                     'query': query,
@@ -337,7 +337,7 @@ $('#search_id_product').keyup(function(){
             $('#response_product').append('<li id="loading">Loading ...</li>');
             var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
             $.ajax({
-                url: '/advertisement/search_fields_for_ad/',
+                url: '/ad/search_fields_for_ad/',
                 method: 'POST',
                 data: JSON.stringify({
                     'query': query,
@@ -449,7 +449,7 @@ function upload(event) {
                 }, false);
                 return xhr;
             },
-            url: '/advertisement/create/ad/',
+            url: '/ad/create/',
             type: 'POST',
             data: data,
             cache: false,

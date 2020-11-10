@@ -222,8 +222,7 @@ def ad_creation_form(request):
             return render(request,'advertisement/ad/new_ad_form.html', {'ad_type_options':ad_type_options_values})
         elif request.method == 'POST':
             try:
-                print(request.POST)
-                print(request.FILES)
+                s3_client = boto3.client('s3',aws_access_key_id = settings.BOLOINDYA_AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY)
                 scrolls = request.POST.getlist('scrolls',None)
                 start_date = request.POST.get('start_date',None)
                 end_date = request.POST.get('end_date',None)
@@ -274,7 +273,7 @@ def ad_creation_form(request):
                 ad_dict['product_id'] = product_id
                 ad_dict['state'] = state
                 if ad_video_file:
-                    ad_folder_key_url = upload_media(ad_video_file, ad_folder_key)
+                    ad_folder_key_url = upload_media(s3_client, ad_video_file, ad_folder_key)
                     if not ad_folder_key_url:
                         return HttpResponse(json.dumps({'message':'fail','reason':'Failed to upload signed contract file'}),content_type="application/json")
                     else:

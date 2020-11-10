@@ -8,10 +8,85 @@ from django import forms
 from .views import upload_media
 from advertisement.models import *
 import boto3
+from string import Template
+from django.utils.safestring import mark_safe
 
+class CompanyLogoWidget(forms.widgets.Widget):
+    def render(self, name, value, attrs=None, **kwargs):
+        if value:
+            html =  Template("""<div>
+                <input type="file" name="company_logo" id="id_company_logo" class="form-control">
+                <img src="$link" width="100" height="100"/>
+                </div>""")
+            return mark_safe(html.substitute(link=value))
+        else:
+            html =  Template("""
+                <input type="file" name="company_logo" id="id_company_logo">
+                """)
+            return mark_safe(html.substitute(link=value))
+
+class SignedContractDocFileWidget(forms.widgets.Widget):
+    def render(self, name, value, attrs=None, **kwargs):
+        if value:
+            html =  Template("""<div>
+                <input type="file" name="signed_contract_doc_file_url" id="id_signed_contract_doc_file_url" class="form-control">
+                <img src="$link" width="100" height="100"/>
+                </div>""")
+            return mark_safe(html.substitute(link=value))
+        else:
+            html =  Template("""<div>
+                <input type="file" name="signed_contract_doc_file_url" id="id_signed_contract_doc_file_url" class="form-control">
+                </div>""")
+            return mark_safe(html.substitute(link=value))
+
+class SignedOtherDocFileWidget(forms.widgets.Widget):
+    def render(self, name, value, attrs=None, **kwargs):
+        if value:
+            html =  Template("""<div>
+                <input type="file" name="signed_other_doc_file_url" id="id_signed_other_doc_file_url" class="form-control">
+                <img src="$link" width="100" height="100"/>
+                </div>""")
+            return mark_safe(html.substitute(link=value))
+        else:
+            html =  Template("""<div>
+                <input type="file" name="signed_other_doc_file_url" id="id_signed_other_doc_file_url" class="form-control">
+                </div>""")
+            return mark_safe(html.substitute(link=value))
+
+class SignedNdaDocFileWidget(forms.widgets.Widget):
+    def render(self, name, value, attrs=None, **kwargs):
+        if value:
+            html =  Template("""<div>
+                <input type="file" name="signed_nda_doc_file_url" id="id_signed_nda_doc_file_url" class="form-control">
+                <img src="$link" width="100" height="100"/>
+                </div>""")
+            return mark_safe(html.substitute(link=value))
+        else:
+            html =  Template("""<div>
+                <input type="file" name="signed_nda_doc_file_url" id="id_signed_nda_doc_file_url" class="form-control">
+                </div>""")
+            return mark_safe(html.substitute(link=value))
+
+class ProductImageWidget(forms.widgets.Widget):
+    def render(self, name, value, attrs=None, **kwargs):
+        if value:
+            html =  Template("""<div>
+                <input type="file" name="original_image" id="id_original_image" class="form-control">
+                <img src="$link" width="100" height="100"/>
+                </div>""")
+            return mark_safe(html.substitute(link=value))
+        else:
+            html =  Template("""<div>
+                <input type="file" name="original_image" id="id_original_image" class="form-control">
+                </div>""")
+            return mark_safe(html.substitute(link=value))
 
 class ProductImageFields(forms.ModelForm):
-    original_image = forms.FileField()
+    file_image = forms.FileField(required=False)
+
+    class Meta:
+        model = ProductImage
+        fields = ('original_image',)
 
 class ProductReviewInline(nested_admin.NestedStackedInline):
     model = ProductReview
@@ -20,7 +95,8 @@ class ProductReviewInline(nested_admin.NestedStackedInline):
 class ProductImageInline(nested_admin.NestedStackedInline):
     model = ProductImage
     form = ProductImageFields
-    fields = ('original_image',)
+    fields = ('file_image','original_image',)
+    readonly_fields = ('original_image',)
 
 class ProductInline(nested_admin.NestedStackedInline):
     model = Product
@@ -32,17 +108,17 @@ class BrandInline(admin.TabularInline):
     model = Brand
 
 class BrandExtraFieldsForm(forms.ModelForm):
-    company_logo = forms.FileField()
-    signed_contract_doc_file_url = forms.FileField()
-    signed_other_doc_file_url = forms.FileField()
-    signed_nda_doc_file_url = forms.FileField()
+    company_logo = forms.FileField(widget=CompanyLogoWidget, required=False)
+    signed_contract_doc_file_url = forms.FileField(widget=SignedContractDocFileWidget, required=False)
+    signed_other_doc_file_url = forms.FileField(widget=SignedOtherDocFileWidget, required=False)
+    signed_nda_doc_file_url = forms.FileField(widget=SignedNdaDocFileWidget, required=False)
     class Meta:
         fields = ('name','poc','phone_number','email','is_active')
         model = Brand
 
 class BrandAdmin(nested_admin.NestedModelAdmin):
     form = BrandExtraFieldsForm
-    list_display = ('name','company_logo','brand_id','poc','phone_number','email','signed_contract_doc_file_url','signed_other_doc_file_url','signed_nda_doc_file_url','is_active')
+    list_display = ('name','brand_id','poc','phone_number','email','is_active')
     inlines = [ProductInline]
 
     def __init__(self, *args, **kwargs):
@@ -50,32 +126,42 @@ class BrandAdmin(nested_admin.NestedModelAdmin):
         super(BrandAdmin,self).__init__(*args, **kwargs)
 
     def save_model(self, request, obj, form, change):
-        if not obj.pk:
-            input_data = form.cleaned_data
-            brand_folder_key = 'from_upload_panel/advertisement/brand/'
-            obj.phone_number = input_data['phone_number']
-            obj.name = input_data['name']
-            obj.email = input_data['email']
-            obj.poc = input_data['poc']
-            obj.is_active = input_data['is_active']
-            obj.company_logo = upload_media(self.s3_client, input_data['company_logo'],brand_folder_key)
-            obj.signed_nda_doc_file_url = upload_media(self.s3_client, input_data['signed_nda_doc_file_url'], brand_folder_key)
-            obj.signed_other_doc_file_url = upload_media(self.s3_client, input_data['signed_other_doc_file_url'], brand_folder_key)
-            obj.signed_contract_doc_file_url = upload_media(self.s3_client,input_data['signed_contract_doc_file_url'], brand_folder_key)
-            obj.created_by_id = request.user.id
-            obj.save()
-            super(BrandAdmin, self).save_model(request, obj, form, change)
+        input_data = form.cleaned_data
+        company_logo = request.FILES.get('company_logo',None)
+        signed_nda_doc_file_url = request.FILES.get('signed_nda_doc_file_url',None)
+        signed_contract_doc_file_url = request.FILES.get('signed_contract_doc_file_url',None)
+        signed_other_doc_file_url = request.FILES.get('signed_other_doc_file_url',None)
+        brand_folder_key = 'from_upload_panel/advertisement/brand/'
+        obj.phone_number = input_data['phone_number']
+        obj.name = input_data['name']
+        obj.email = input_data['email']
+        obj.poc = input_data['poc']
+        obj.is_active = input_data['is_active']
+        if company_logo:
+            obj.company_logo = upload_media(self.s3_client, company_logo,brand_folder_key)
+        if signed_nda_doc_file_url:
+            obj.signed_nda_doc_file_url = upload_media(self.s3_client, signed_nda_doc_file_url, brand_folder_key)
+        if signed_other_doc_file_url:
+            obj.signed_other_doc_file_url = upload_media(self.s3_client, signed_other_doc_file_url, brand_folder_key)
+        if signed_contract_doc_file_url:
+            obj.signed_contract_doc_file_url = upload_media(self.s3_client,signed_contract_doc_file_url, brand_folder_key)
+        obj.created_by_id = request.user.id
+        obj.save()
+        super(BrandAdmin, self).save_model(request, obj, form, change)
 
     def save_related(self, request, form, formsets, change):
         product_images_folder_prefix = 'from_upload_panel/advertisement/product/'
         for formset in formsets:
             instances = formset.save(commit=False)
             #this is because in product image we have image as extra field
+            print(instances,formset.cleaned_data)
             if any([isinstance(obj, ProductImage) for obj in instances]):
-                for (cleaned_data,instance) in zip(formset.cleaned_data, instances):
+                cleaned_dataset = formset.cleaned_data
+                cleaned_dataset = list(filter(lambda obj: obj and obj['file_image'], cleaned_dataset))
+                for (cleaned_data,instance) in zip(cleaned_dataset, instances):
                     if cleaned_data:
                         instance.product_id = cleaned_data['product_id']
-                        instance.original_image = upload_media(self.s3_client,cleaned_data['original_image'], product_images_folder_prefix)
+                        instance.original_image = upload_media(self.s3_client,cleaned_data['file_image'], product_images_folder_prefix)
                         instance.save()
             for instance in instances:
                 if isinstance(instance, ProductImage):
@@ -86,11 +172,6 @@ class BrandAdmin(nested_admin.NestedModelAdmin):
 
         super(BrandAdmin, self).save_related(request, form, formsets, change)
 
-
-# class AdAdmin(admin.ModelAdmin):
-#     list_display = ('brand', 'title', 'description', 'start_time','end_time','product','ad_type','video_file_url','ad_length','thumbnail','frequency_type','product_link','state','budget')
-#     fields = ('brand', 'title', 'description', 'start_time','end_time','product','ad_type','video_file_url','ad_length','thumbnail','frequency_type','product_link','state','budget')
-#     inlines = [BrandInline,ProductInline]
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
@@ -105,17 +186,16 @@ class ProductAdmin(nested_admin.NestedModelAdmin):
         super(ProductAdmin,self).__init__(*args, **kwargs)
 
     def save_model(self, request, obj, form, change):
-        if not obj.pk:
-            input_data = form.cleaned_data
-            obj.name = input_data['name']
-            obj.product_category = input_data['product_category']
-            obj.brand = input_data['brand']
-            obj.mrp = input_data['mrp']
-            obj.link = input_data['link']
-            obj.description = input_data['description']
-            obj.created_by_id = request.user.id
-            obj.save()
-            super(ProductAdmin, self).save_model(request, obj, form, change)
+        input_data = form.cleaned_data
+        obj.name = input_data['name']
+        obj.product_category = input_data['product_category']
+        obj.brand = input_data['brand']
+        obj.mrp = input_data['mrp']
+        obj.link = input_data['link']
+        obj.description = input_data['description']
+        obj.created_by_id = request.user.id
+        obj.save()
+        super(ProductAdmin, self).save_model(request, obj, form, change)
 
     def save_related(self, request, form, formsets, change):
         product_images_folder_prefix = 'from_upload_panel/advertisement/product/'
@@ -123,10 +203,12 @@ class ProductAdmin(nested_admin.NestedModelAdmin):
             instances = formset.save(commit=False)
             print(instances, formset.cleaned_data)
             if any([isinstance(obj, ProductImage) for obj in instances]):
-                for (cleaned_data,instance) in zip(formset.cleaned_data, instances):
-                    if cleaned_data:
+                cleaned_dataset = formset.cleaned_data
+                cleaned_dataset = list(filter(lambda obj: obj and obj['file_image'], cleaned_dataset))
+                for (cleaned_data,instance) in zip(cleaned_dataset, instances):
+                    if cleaned_data and cleaned_data['file_image']:
                         instance.product_id = cleaned_data['product_id']
-                        instance.original_image = upload_media(self.s3_client,cleaned_data['original_image'], product_images_folder_prefix)
+                        instance.original_image = upload_media(self.s3_client,cleaned_data['file_image'], product_images_folder_prefix)
                         instance.save()
             for instance in instances:
                 if isinstance(instance, ProductImage):
