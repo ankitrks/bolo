@@ -693,7 +693,7 @@ function addNewHashtag(){
                             $(response_id).append('<li id="no_result">No results found ...</li>');
                         }
                         for(var i=0;i<data.data.length;i++) {
-                            let title = parseTitle(data.data[i].title);
+                            let title = parseTitle(data.data[i].title.replace(/'/g, ''));
 
                             console.log(title);
 
