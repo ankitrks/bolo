@@ -4,13 +4,20 @@ from django.contrib.auth.models import User
 
 from rest_framework import serializers
 
-from advertisement.models import Ad, ProductReview, Order, Product, Address, OrderLine
+from advertisement.models import Ad, ProductReview, Order, Product, Address, OrderLine, Brand
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'email')
+
+
+class BrandSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Brand
+        fields = ('id', 'name', 'company_logo')
+
 
 class AdSerializer(serializers.ModelSerializer):
     ad_id = serializers.IntegerField(source='id', read_only=True)
@@ -25,6 +32,7 @@ class AdSerializer(serializers.ModelSerializer):
     start_date = serializers.SerializerMethodField(read_only=True)
     end_date = serializers.SerializerMethodField(read_only=True)
     frequency = serializers.SerializerMethodField(read_only=True)
+    state = serializers.SerializerMethodField()
 
     class Meta:
         model = Ad
@@ -47,7 +55,10 @@ class AdSerializer(serializers.ModelSerializer):
     def get_frequency(self, instance):
         return list(instance.frequency.all().values('scroll', 'sequence'))
 
-
+    def get_state(self, instance):
+        if instance.state == 'active' and instance.start_time >= datetime.now():
+            return 'upcoming'
+        return instance.state
 
 class ProductSerializer(serializers.ModelSerializer):
     product_images = serializers.SerializerMethodField()
@@ -58,11 +69,12 @@ class ProductSerializer(serializers.ModelSerializer):
     mrp = serializers.SerializerMethodField()
     rating_count = serializers.SerializerMethodField()
     discount_expiry = serializers.SerializerMethodField()
+    brand = BrandSerializer()
 
     class Meta:
         model = Product
         fields = ('product_id', 'product_title', 'product_description', 'product_images', 'rating_count', 'rating',
-                    'currency', 'mrp', 'is_discounted', 'discounted_price', 'discount_expiry')
+                    'currency', 'mrp', 'is_discounted', 'discounted_price', 'discount_expiry', 'brand')
 
     def get_product_images(self, instance):
         return list(instance.images.all().values_list('compressed_image', flat=True))
@@ -77,7 +89,9 @@ class ProductSerializer(serializers.ModelSerializer):
         return "Rs %s"%instance.discounted_price
 
     def get_discount_expiry(self, instance):
-        return datetime.strftime(instance.discount_expiry, "%d-%m-%y %H:%M:%S")
+        if instance.discount_expiry:
+            return datetime.strftime(instance.discount_expiry, "%d-%m-%y %H:%M:%S")
+        return ''
 
 
 class ReviewSerializer(serializers.ModelSerializer):

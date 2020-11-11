@@ -3,19 +3,18 @@
 
 {% block local_css %}
     <style>
-        .activeAd{
+        .ongoingAd{
             background-color: #87cb41 !important
         }
-        .pausedAd{
+        .inactiveAd{
             background-color: #fbd458 !important
         }
-        .stoppedAd{
+        .completedAd{
             background-color: #b92a25 !important
         }
         .draftAd{
             background-color: #737373 !important
         }
-
     </style>
 {% endblock local_css %}
 
@@ -348,21 +347,21 @@ $("#adTable").jsGrid({
                 return 'Action'
             },  
             itemTemplate: function(value, item){
-                if(item.state=='active'){
+                if(item.state=='ongoing' ) {
                     return `
                         <span>
                             <button class="btn btn-primary" data-id="${ item.ad_id }" onclick="editAd(${ item.ad_id })">Edit</button>
                             <button class="btn btn-warning" data-id="${ item.ad_id }" onclick="pauseAd(${ item.ad_id })">Pause</button>
-                            <button class="btn btn-danger" data-id="${ item.ad_id }">Del</button>
+                            <button class="btn btn-danger" data-id="${ item.ad_id }" onclick="deleteAd(${ item.ad_id })">Del</button>
                         </span>
                     `
                 }
-                else if(item.state=='inactive'){
+                else if(item.state=='inactive' || item.state=='upcoming'){
                     return `
                         <span>
                             <button class="btn btn-primary" data-id="${ item.ad_id }" onclick="editAd(${ item.ad_id })">Edit</button>
-                            <button class="btn btn-success" data-id="${ item.ad_id }" onclick="restartAd(${ item.ad_id })">Restart</button>
-                            <button class="btn btn-danger" data-id="${ item.ad_id }">Del</button>
+                            <button class="btn btn-success" data-id="${ item.ad_id }" onclick="startAd(${ item.ad_id })">Start</button>
+                            <button class="btn btn-danger" data-id="${ item.ad_id }" onclick="deleteAd(${ item.ad_id })">Del</button>
                         </span>
                     `
                 }
@@ -371,7 +370,14 @@ $("#adTable").jsGrid({
                         <span>
                             <button class="btn btn-primary" data-id="${ item.ad_id }" onclick="editAd(${ item.ad_id })">Edit</button>
                             <button class="btn btn-success" data-id="${ item.ad_id }" onclick="goLiveAd(${ item.ad_id })">Go Live</button>
-                            <button class="btn btn-danger" data-id="${ item.ad_id }">Del</button>
+                            <button class="btn btn-danger" data-id="${ item.ad_id }" onclick="deleteAd(${ item.ad_id })">Del</button>
+                        </span>
+                    `
+                }
+                else if(item.state=='completed' || item.state=='deleted' ){
+                    return `
+                        <span>
+                            <button class="btn btn-success" data-id="${ item.ad_id }" onclick="restartAd(${ item.ad_id })">Restart</button>
                         </span>
                     `
                 }
@@ -379,14 +385,14 @@ $("#adTable").jsGrid({
         width: 100, align: "center"},
     ],
     rowClass: function (item, itemIndex){
-        if(item.state=='active')
-            return "activeAd"
-        else if(item.state=='inactive')
-            return "pausedAd"
+        if(item.state=='ongoing')
+            return "ongoingAd"
+        else if(item.state=='inactive' || item.state=='upcoming')
+            return "inactiveAd"
         else if(item.state=='draft')
             return "draftAd"
-        //else if(item.state=='inactive')
-        //   return "inactiveAd"
+        else if(item.state=='completed' || item.state=='deleted' )
+            return "completedAd"
     },
     controller: {
         loadData: function(filter) {
@@ -472,11 +478,19 @@ let pauseAd = function(adId){
 }
 
 let restartAd = function(adId){
-    updateAd(adId, {'state': 'active'})
+    updateAd(adId, {'state': 'ongoing'})
+}
+
+let startAd = function(adId){
+    updateAd(adId, {'state': 'ongoing'})
 }
 
 let goLiveAd = function(adId){
-    updateAd(adId, {'state': 'active'})
+    updateAd(adId, {'state': 'ongoing'})
+}
+
+let deleteAd = function(adId){
+    updateAd(adId, {'state': 'deleted'})
 }
 
 let editAd = function(adId){

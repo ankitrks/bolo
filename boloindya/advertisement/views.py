@@ -68,11 +68,11 @@ class JarvisAdViewset(ModelViewSet):
         
         if section:
             if section == 'ongoing':
-                queryset = queryset.filter(state='active', start_time__lte=datetime.now(), end_time__gte=datetime.now())
+                queryset = queryset.filter(state='ongoing')
             elif section == 'upcoming':
-                queryset = queryset.filter(state__in=['active', 'draft'], start_time__gte=datetime.now())
+                queryset = queryset.filter(state__in=['active'], start_time__gte=datetime.now())
             elif section == 'history':
-                queryset = queryset.filter(end_time__lte=datetime.now())
+                queryset = queryset.filter(state='completed')
             elif section == 'draft':
                 queryset = queryset.filter(state='draft')
             
@@ -102,6 +102,32 @@ class JarvisOrderViewset(ModelViewSet):
 
         if order_date:
             queryset = queryset.filter(date__date=order_date)
+
+        if page_size:
+            self.pagination_class.page_size = int(page_size)
+
+        return queryset.order_by('id')
+
+class JarvisProductViewset(ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    pagination_class = deepcopy(PageNumberPaginationRemastered)
+
+    def get_queryset(self):
+        queryset = self.queryset
+        q = self.request.query_params.get('q')
+        page_size = self.request.query_params.get('page_size')
+
+        if q:
+            try:
+                q = int(q)
+                queryset = queryset.filter(Q(id=q) | Q(brand_id=q))
+            except Exception as e:
+                queryset = queryset.filter(Q(name__icontains=q) | Q(brand__name__icontains=q))
+
+
+        # if order_date:
+        #     queryset = queryset.filter(date__date=order_date)
 
         if page_size:
             self.pagination_class.page_size = int(page_size)
@@ -263,7 +289,7 @@ class DashBoardCountAPIView(APIView):
         today = datetime.now()
 
         query_list = (
-            ('ongoing_ad', Ad.objects.filter(state='active', start_time__lte=today, end_time__gte=today), Value('i', 0, lock=lock)),
+            ('ongoing_ad', Ad.objects.filter(state='ongoing'), Value('i', 0, lock=lock)),
             ('upcoming_ad', Ad.objects.filter(start_time__gte=today), Value('i', 0, lock=lock)),
             ('added_to_draft', Ad.objects.filter(state='draft'), Value('i', 0, lock=lock)),
             ('onboarded_products', Product.objects.filter(is_active=True), Value('i', 0, lock=lock)),
@@ -276,6 +302,8 @@ class DashBoardCountAPIView(APIView):
             ('lifetime_order', Order.objects.all(), Value('i', 0, lock=lock)),
             ('unique_order', Order.objects.all().distinct('user_id'), Value('i', 0, lock=lock)),
             ('month_order', Order.objects.filter(date__gte='%s-%s-01'%(today.year, today.month)), Value('i', 0, lock=lock)),
+            ('onboarded_brands', Brand.objects.all(), Value('i', 0, lock=lock)),
+            ('unique_products', Product.objects.all(), Value('i', 0, lock=lock)),
         )
 
         processes = []
@@ -309,4 +337,5 @@ class AdTemplateView(TemplateView):
 class OrderTemplateView(TemplateView):
     template_name = 'advertisement/order/index.html'
 
-
+class ProductTemplateView(TemplateView):
+    template_name = 'advertisement/product/index.html'
