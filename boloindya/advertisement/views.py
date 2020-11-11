@@ -191,7 +191,6 @@ def brand_onboard_form(request):
         brand_dict['brand_id'] = brand_id
         brand_dict['product_category_id'] = product_category_id
         brand_dict['created_by_id'] = creator_id
-        print(brand_dict)
         brand_obj = Brand.objects.create(**brand_dict)
 
         #create product
@@ -218,14 +217,13 @@ def ad_creation_form(request):
             ad_type_options_values = []
             cta_options_values = []
             for value1, value2 in CTA_OPTIONS:
-                cta_options_values.append({'id':value1, 'value':value2})
+                if value1!='skip':
+                    cta_options_values.append({'id':value1, 'value':value2})
             for value1, value2 in ad_type_options:
                 ad_type_options_values.append({'id':value1, 'value':value2})
-            print(ad_type_options_values)
             return render(request,'advertisement/ad/new_ad_form.html', {'ad_type_options':ad_type_options_values,'cta_options': cta_options_values})
         elif request.method == 'POST':
             try:
-                print(request.POST)
                 s3_client = boto3.client('s3',aws_access_key_id = settings.BOLOINDYA_AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY)
                 scrolls = request.POST.getlist('scrolls',None)
                 start_date = request.POST.get('start_date',None)
@@ -247,6 +245,7 @@ def ad_creation_form(request):
                 discount = request.POST.get('discount',None)
                 playstore_link = request.POST.get('playstore_link', None)
                 website_link = request.POST.get('website_link', None)
+                ad_id = request.POST.get('ad_id', None)
                 ad_folder_key = request.POST.get('folder_prefix','from_upload_panel/advertisement/ad/')
                 if all(freq=='' for freq in scrolls):
                     return HttpResponse(json.dumps({'message':'fail','reason':'No Frequnecy scroll provided'}),content_type="application/json")
@@ -272,12 +271,18 @@ def ad_creation_form(request):
                 ad_dict['start_time'] = start_date
                 if end_date:
                     ad_dict['end_time'] = datetime.strptime(end_date, "%d-%m-%Y")
+                else:
+                    ad_dict['end_time'] = None
                 if toggler=='link' and ad_video_file_link:
                     ad_dict['video_file_url'] = ad_video_file_link
                 ad_dict['frequency_type'] = toggler_frequency
                 ad_dict['created_by_id'] = request.user.id
                 if product_id!='-1':
+                    discount_price = float(mrp) - float(discount)
+                    Product.objects.filter(id=product_id).update(is_discounted=True, discounted_price=discount_price)
                     ad_dict['product_id'] = product_id
+                else:
+                    ad_dict['product_id'] = None
                 ad_dict['state'] = state
                 if ad_video_file:
                     ad_folder_key_url = upload_media(s3_client, ad_video_file, ad_folder_key)
@@ -285,13 +290,20 @@ def ad_creation_form(request):
                         return HttpResponse(json.dumps({'message':'fail','reason':'Failed to upload signed contract file'}),content_type="application/json")
                     else:
                         ad_dict['video_file_url'] = ad_folder_key_url
-                ad_obj = Ad.objects.create(**ad_dict)
+                if not ad_id:
+                    ad_obj = Ad.objects.create(**ad_dict)
+                    ad_id = ad_obj.id
+                else:
+                    ad_obj = Ad.objects.filter(id=ad_id)
+                    ad_obj.update(**ad_dict)
+                    ad_obj[0].cta.all().delete()
+                    ad_obj[0].frequency.all().delete()
 
                 scrolls = list(filter(bool,scrolls))
                 #create frequency objects
                 for index,value in enumerate(scrolls):
                     if value:
-                        Frequency(ad_id=ad_obj.id,sequence=index+1,scroll=value).save()
+                        Frequency(ad_id=ad_id,sequence=index+1,scroll=value).save()
                 #add cta
                 cta_options_values = {}
                 for value1, value2 in CTA_OPTIONS:
@@ -302,10 +314,10 @@ def ad_creation_form(request):
                         action = playstore_link
                     elif value=="learn_more":
                         action = website_link
-                    title = cta_options_values[value]
-                    CTA(ad_id=ad_obj.id, title=title, action=action).save()
+                    # title = cta_options_values[value]
+                    CTA(ad_id=ad_id, title=value, action=action).save()
 
-                return HttpResponse(json.dumps({'message':'success', 'ad_id':ad_obj.id}),content_type="application/json")
+                return HttpResponse(json.dumps({'message':'success', 'ad_id':ad_id}),content_type="application/json")
             except Exception as e:
                 return HttpResponse(json.dumps({'message':'fail','reason':str(e)}),content_type="application/json")
 
@@ -439,5 +451,24 @@ def brand_management(request):
 
 @login_required
 def product_management(request):
-    print("here")
     return render(request,'advertisement/product/product_onboard_form_admin.html',{})
+
+@login_required
+def particular_ad(request, ad_id=None):
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)) or request.user.is_staff:
+        ad_type_options_values = []
+        cta_options_values = []
+        for value1, value2 in CTA_OPTIONS:
+            if value1!='skip':
+                cta_options_values.append({'id':value1, 'value':value2})
+        for value1, value2 in ad_type_options:
+            ad_type_options_values.append({'id':value1, 'value':value2})
+        ad = Ad.objects.get(pk=ad_id)
+        # selected_ctas = list(ad.cta.all().values_list('title',flat=True))
+        # selected_ctas = list(map(str, selected_ctas))
+        selected_ctas = {}
+        for cta in ad.cta.all():
+            selected_ctas['value'] = cta.title
+        return render(request,'advertisement/ad/particular_ad.html', {'ad': ad, 'ad_type_options':ad_type_options_values,'cta_options': cta_options_values,'selected_cta':selected_ctas})
+    else:
+        return JsonResponse({'error':'User Not Authorised','message':'fail' }, status=status.HTTP_200_OK)

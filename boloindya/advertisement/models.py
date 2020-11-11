@@ -103,7 +103,7 @@ class Ad(RecordTimeStamp):
     last_modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='modify_ads')
 
     def __str__(self):
-        return self.title
+        return str(self.id)
 
 
 class Frequency(RecordTimeStamp):
@@ -198,7 +198,7 @@ CTA_OPTIONS = (
 
 class CTA(models.Model):
     ad = models.ForeignKey(Ad, related_name='cta')
-    title = models.CharField(max_length=200)
+    title = models.CharField(choices=ORDER_STATE_CHOICES, default="skip" ,max_length=200)
     code = models.CharField(max_length=200)
     enable_time = models.PositiveIntegerField(null=True, blank=True)
     action = models.CharField(max_length=200, null=True, blank=True)

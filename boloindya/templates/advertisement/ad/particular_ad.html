@@ -74,10 +74,6 @@ ul li {
 #checkboxes label {
   display: block;
 }
-
-#checkboxes label:hover {
-  background-color: #1e90ff;
-}
 .arrow {
   border: solid black;
   border-width: 0 3px 3px 0;
@@ -106,7 +102,7 @@ ul li {
         <div class="form-group">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Ad Category:</label>
             <div class="col-md-8">
-                <select name="ad_type" required>
+                <select name="ad_type" id="ad_type" required>
                     <option value="" disabled selected>Select Ad Category</option>
                     {% for category in ad_type_options %}
                         <option value="{{ category.id }}">{{category.value}}</option>
@@ -125,6 +121,12 @@ ul li {
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Ad Video: </label>
             <div class="col-md-8">
                 <input type="file" name="video_file" id="video_file" class="form-control">
+                <div class="mp4_player" id="mp4_player" style="display:none">
+                    <video width="400" controls>
+                      <source src="{{ ad.video_file_url }}" type="video/mp4">
+                      Your browser does not support HTML5 video.
+                    </video>
+                </div>
             </div>
         </div>
         <div class="form-group toHide" id="blk-link" style="display:none">
@@ -153,7 +155,7 @@ ul li {
         <div class="form-group">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">CTA 2:</label>
             <div class="col-md-8">
-                <select name="cta_type_2" required>
+                <select name="cta_type_2" id="cta_type_2" required>
                     <option value="" disabled selected>Select CTA</option>
                     <option value="skip"> Skip</option>
                 </select>
@@ -212,15 +214,15 @@ ul li {
         </div>
         <div class="form-group">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Frequency:</label>
-            <input type="radio" id="upload_radio_btn" name="toggler_frequency" value="constant" checked>
+            <input type="radio" id="constant-radio-btn-freq" name="toggler_frequency" value="constant" checked>
             <label >Constant</label>&nbsp;&nbsp;&nbsp;
-            <input type="radio" id="link_radio_btn" name="toggler_frequency" value="variable">
+            <input type="radio" id="variable-radio-btn-freq" name="toggler_frequency" value="variable">
             <label >Variable</label>
         </div>
         <div class="form-group toHideFrequency" id="blk-constant">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Every: </label>
             <div class="col-md-8">
-                <input type="text" name="scrolls" placeholder="Enter scroll" id="scrolls">
+                <input type="text" name="scrolls" placeholder="Enter scroll" id="scrolls-constant-1">
             </div>
         </div>
         <div class="form-group toHideFrequency" id="blk-variable"  style="display: none;">
@@ -229,7 +231,7 @@ ul li {
                 <div class="form-group">
                     <label for="name" id="dynamic_freq_lable" class="col-md-3 col-sm-3 col-xs-12 control-label">1st time after: </label>
                     <div class="col-md-4">
-                        <input type="text" name="scrolls" placeholder="Enter scroll" id="scrolls">
+                        <input type="text" name="scrolls" placeholder="Enter scroll" id="scrolls-variable-1">
                     </div>
                     <div class="col-md-4">
                         <div class="form-group change">
@@ -270,63 +272,135 @@ ul li {
 
 <script>
     $(document).ready(function() {
+        //prefilled details
+        $("#search_id").val("{{ad.brand}}");
+        brand_id = "{{ad.brand.id}}"
+        $("#ad_type").val("{{ad.ad_type}}");
+        var video_file_url = "{{ad.video_file_url}}"
+        if (video_file_url.includes("amazonaws.com")){
+            //upload
+            $("#upload_radio_btn").prop('checked', true);
+            $("#blk-link").hide()
+            $("#blk-upload").show()
+            $("#mp4_player").show()
+        }
+        else{
+            $("#link_radio_btn").prop('checked', true);
+            $("#blk-upload").hide()
+            $("#blk-link").show()
+            $("#video_file_link").val(video_file_url)
+        }
+        {% for cta in ad.cta.all %}
+            $("#{{cta}}_cta").prop("checked",true);
+            if ('{{cta}}'=='install_now'){
+                $('#blk-link-playstore').show();
+                $('#playstore_link').val('{{cta.action}}')
+            }
+            if ('{{cta}}'=='learn_more'){
+                $('#blk-link-website').show();
+                $('#website_link').val('{{cta.action}}')
+            }
+            if ('{{cta}}'=='shop_now'){
+                $('#blk-link-product').show();
+                $('#search_id_product').val('{{ad.product}}')
+                $('#mrp').val('{{ad.product.mrp}}')
+                $('#description').val('{{ad.product.description}}')
+                product_id = '{{ad.product.id}}'
+                var discount = '{{ad.product.mrp}}' - '{{ad.product.discounted_price}}' 
+                $('#discount').val(discount)
+                // $('#playstore_link').val('{{cta.action}}')
+            }
+            if ('{{cta}}'=='skip'){
+                $('#cta_type_2').val('skip')
+            }
+        {% endfor %}
+        $("#start_date").val("{{ad.start_time|date:"d-m-Y"}}");
+        if("{{ad.end_time}}"!="None"){
+            $("#end_date").val("{{ad.end_time|date:"d-m-Y"}}");
+        }
+        else{
+            $('#popup_end_date_checkbox').prop("checked",true);
+            $("#end_date").prop("disabled", true);
+        }
+        if ("{{ad.frequency_type}}"=="variable"){
+            {% for freq in ad.frequency.all %}
+                var counter = "{{ forloop.counter }}"
+                var variable_id = "#scrolls-variable-"+counter;
+                console.log('{{freq.scroll}}', variable_id);
+                $(variable_id).prop('value', '{{freq.scroll}}');
+                if ("{{ ad.frequency.all|length }}"!=counter){
+                    var temp_counter = parseInt(counter)+1;
+                    var freq_time = ordinal_suffix_of(temp_counter)
+                    var dynamic_freq_text = freq_time + " time after"
+                    var html = $(".after-add-more").first().clone();
+                    $(html).find("input").prop('id','scrolls-variable-'+temp_counter);
+                    $(html).find("input").val('');
+                    $(html).find(".change").html("<label for=''>&nbsp;</label><br/><a class='btn btn-danger remove'>- Remove Frequency</a>");
+                    $(html).find("#dynamic_freq_lable").empty();
+                    $(html).find("#dynamic_freq_lable").append(dynamic_freq_text);
+                    $(".after-add-more").last().after(html);
+                }
+            {% endfor %}
+            $('#blk-constant').hide()
+            $('#blk-variable').show()
+            $('#variable-radio-btn-freq').prop("checked",true);
+        }
+        if ("{{ad.frequency_type}}"=="constant"){
+            {% for freq in ad.frequency.all %}
+                $("#scrolls-constant-1").val('{{freq.scroll}}');
+            {% endfor %}
+            $('#blk-constant').show()
+            $('#blk-variable').hide()
+            $('#constant-radio-btn-freq').prop("checked",true);
+        }
+
         var frequnecy = 1;
-    $("body").on("click",".add-more",function(){ 
-        frequnecy = frequnecy+1
-        var freq_time = ordinal_suffix_of(frequnecy)
-        var dynamic_freq_text = freq_time + "time after"
-        var html = $(".after-add-more").first().clone();
-        $(html).find("input").val('');
-        $(html).find(".change").html("<label for=''>&nbsp;</label><br/><a class='btn btn-danger remove'>- Remove Frequency</a>");
-        $(html).find("#dynamic_freq_lable").empty();
-        $(html).find("#dynamic_freq_lable").append(dynamic_freq_text);
-        $(".after-add-more").last().after(html);
-    });
-    $("body").on("click",".remove",function(){ 
-        $(this).parents(".after-add-more").remove();
-    });
-
-
-    $("body").on("click",".add-more-cta",function(){ 
-        var html = $(".after-add-more-cta").first().clone();
-        $(html).find("input").val('');
-        $(html).find(".change-cta").html("<label for=''>&nbsp;</label><br/><a class='btn btn-danger remove-cta'>- Remove CTA</a>");
-        $(".after-add-more-cta").last().after(html);
-    });
-    $("body").on("click",".remove-cta",function(){ 
-        $(this).parents(".after-add-more-cta").remove();
-    });
-
-    $(function() {
-    $("[name=toggler]").click(function(){
-        $('.toHide').hide();
-        // [].forEach.call(document.querySelectorAll('#video_file'), function(el) {
-        //     el.value = '';
-        // });
-        $('#video_file').val('')
-        $('#video_file_link').val('')
-        $("#blk-"+$(this).val()).show();
-    });
-    $("[name=toggler_frequency]").click(function(){
-        $('.toHideFrequency').hide();
-        [].forEach.call(document.querySelectorAll('#scrolls'), function(el) {
-            el.value = '';
+        $("body").on("click",".add-more",function(){ 
+            frequnecy = frequnecy+1
+            var freq_time = ordinal_suffix_of(frequnecy)
+            var dynamic_freq_text = freq_time + "time after"
+            var html = $(".after-add-more").first().clone();
+            $(html).find("input").prop('id','scrolls-variable-'+frequnecy);
+            $(html).find("input").val('');
+            $(html).find(".change").html("<label for=''>&nbsp;</label><br/><a class='btn btn-danger remove'>- Remove Frequency</a>");
+            $(html).find("#dynamic_freq_lable").empty();
+            $(html).find("#dynamic_freq_lable").append(dynamic_freq_text);
+            $(".after-add-more").last().after(html);
         });
-        $("#blk-"+$(this).val()).show();
-    });
-    $(function() {
-        $("#start_date").
-            datepicker({
-                format: "dd-mm-yyyy"
+        $("body").on("click",".remove",function(){ 
+            $(this).parents(".after-add-more").remove();
+        });
+
+        $(function() {
+        $("[name=toggler]").click(function(){
+            $('.toHide').hide();
+            // [].forEach.call(document.querySelectorAll('#video_file'), function(el) {
+            //     el.value = '';
+            // });
+            $('#video_file').val('')
+            $('#video_file_link').val('')
+            $("#blk-"+$(this).val()).show();
+        });
+        $("[name=toggler_frequency]").click(function(){
+            $('.toHideFrequency').hide();
+            [].forEach.call(document.querySelectorAll('[name="scrolls"]'), function(el) {
+                el.value = '';
             });
-    });
-    $(function() {
-        $("#end_date").
-            datepicker({
-                format: "dd-mm-yyyy"
-            });
-    });
- });
+            $("#blk-"+$(this).val()).show();
+        });
+        $(function() {
+            $("#start_date").
+                datepicker({
+                    format: "dd-mm-yyyy"
+                });
+        });
+        $(function() {
+            $("#end_date").
+                datepicker({
+                    format: "dd-mm-yyyy"
+                });
+        });
+     });
 });
 
 var expanded = false;
@@ -359,6 +433,7 @@ $('#shop_now_cta').change(function(){
     if($(this).is(':checked')){
        $('#blk-link-product').show();
     } else {
+        product_id=-1
         $('#blk-link-product').hide();
     }
 });
@@ -460,6 +535,7 @@ $('#search_id_product').keyup(function(){
                     if (data.data.length == 0) {
                         $('#response_product').append('<li id="no_result">No results found ...</li>');
                     }
+                    console.log(data)
                     for(var i=0;i<data.data.length;i++) {
                         $('#response_product').append('<li onclick="addIdToFieldProduct(\''+data.data[i].name+'\', \''+data.data[i].id+'\',\''+data.data[i].mrp+'\',\''+data.data[i].description+'\')">'+data.data[i].name+'</li>');
                     }
@@ -473,7 +549,6 @@ $('#search_id_product').keyup(function(){
 function addIdToFieldProduct(product_name, id, mrp, description) {
     clearResponseProduct();
     product_id = id
-    mrp = mrp
     $('#mrp').val(mrp)
     $('#description').val(description)
     $('#search_id_product').val(String(product_name));
@@ -534,6 +609,7 @@ function upload(event) {
         event.preventDefault();
         $('#overlay').show();
         var data = new FormData($('#upload').get(0));
+        data.append('ad_id',"{{ad.id}}")
         data.append('brand_id', brand_id);
         data.append('product_id', product_id);
         if ($('#shop_now_cta').is(':checked')){
@@ -545,6 +621,7 @@ function upload(event) {
         else{
             data.append('is_draft',false);
         }
+        console.log(data)
         var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
         $.ajax({
             xhr: function() {
@@ -585,10 +662,12 @@ function upload(event) {
                     location.reload();
                 }
                 $('.submit_from_button').removeClass("opened");
+                console.log(data)
             },
             error: function(data) {
                 $('#overlay').hide()
                 $('.submit_from_button').removeClass("opened");
+                console.log(data)
                 alert(data)
                 alert('Consult Tech')
             },
