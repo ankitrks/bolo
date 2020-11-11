@@ -5,7 +5,7 @@ from .views import OrderPaymentRedirectView, OrderTemplateView, AdTemplateView, 
 urlpatterns = [
     url(r'^brand/onboard/$',brand_onboard_form),
     url(r'product/onboard/$',product_onboard_form),
-    url(r'^create/$',ad_creation_form),
+    url(r'^onboard/$',ad_creation_form),
     url(r'^search_fields_for_ad/$', search_fields_for_advertisement),
     url(r'^order/(?P<order_id>[\d]+)/pay/$', OrderPaymentRedirectView.as_view()),
     url(r'^brand/onboard/admin/$',brand_management),
