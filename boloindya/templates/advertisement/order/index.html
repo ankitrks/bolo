@@ -1,4 +1,262 @@
 {% extends 'advertisement/base.html' %}
 
+
 {% block center_content %}
+<div class="row">
+    <div class="col-sm-12"  style="margin-left: 10px margin-right: 10px">
+        <div class="box">
+            <div class="box-header with-border">
+                <h1 class="box-title" id="pageTitle">User Order Dashboard</h1>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2" id="lifetimeOrder">
+                        <div class="small-box bg-aqua">
+                            <div class="inner">
+                                <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
+                                <p class="section-name">Lifetime Order</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-bag"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2" id="uniqueOrder">
+                        <div class="small-box bg-green">
+                            <div class="inner">
+                                <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
+                                <p class="section-name">Number of Unique Order</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-stats-bars"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2" id="monthOrder">
+                        <div class="small-box bg-yellow">
+                            <div class="inner">
+                                <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
+                                <p class="section-name">Month's Order</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-person-add"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12"  style="margin-left: 10px">
+        <div class="box">
+            <div class="box-body">
+                <div class="row" style="margin-bottom: 10px">
+                    <div class="col-sm-3">
+                        <div class="input-group">
+                            <input type="text" name="q" class="form-control" placeholder="Search...">
+                            <span class="input-group-btn">
+                                <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="row">
+                            <div class="col-sm-2">
+                                <a id="exportAds"><i class="fa fa-download"></i></a>
+                            </div>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <select class="form-control">
+                                        <option value="csv" selected>CSV</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="input-group">
+                            <select class="form-control" id="pageSize">
+                                <option value="10" selected>10 Pages</option>
+                                <option value="20">20 Pages</option>
+                                <option value="50">50 Pages</option>
+                                <option value="100">100 Pages</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-left: 10px">
+                    <div class="row" id="userOrderTable"></div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock center_content %}
+
+{% block local_js %}
+<script type="text/javascript">
+let headers = {}
+
+
+$("#userOrderTable").jsGrid({
+    width: "100%",
+    height: "600px",
+
+    inserting: false,
+    editing: false,
+    sorting: true,
+    paging: true,
+    pageLoading: true,
+    autoload: true,
+    filtering: true,
+    sorter: "start_date",
+    pageSize: $("#pageSize").val(),
+    fields: [
+        { title: "Sr. No.", name: "id", type: "number", width: 30, align: "center", filtering: false},
+        { title: "User Name", name: "user.username", type: "text", align: "center", filtering: false},
+        { title: "Name", name: "shipping_address.name", type: "text", width: 60, align: "center", filtering: false},
+        { title: "Phone", name: "shipping_address.mobile", type: "text", width: 60, align: "center", filtering: false},
+        { title: "Email", name: "shipping_address.email", type: "text", width: 60, align: "center", filtering: false},
+        { title: "Shipping Address", itemTemplate: function(_, item){
+                return item.shipping_address.address1 + ', ' + item.shipping_address.address2
+            }
+        },
+        { title: "Order Date", name: "date", type: "text", width: 60, align: "center"},
+        { title: "Order Amount", name: "amount", type: "number", align: "center", width: 40},
+        { title: "Product Detail", name: "lines.0.product.product_title", type: "text", align: "center", filtering: false},
+    ],
+    controller: {
+        loadData: function(filter) {
+            let q = $('[name="q"]').val()
+            if(q)
+                filter['q'] = q
+            filter['page'] = filter['pageIndex']
+            filter['page_size'] = $("#pageSize").val()
+
+            return $.ajax({
+                type: "GET",
+                url: "/api/v1/ad/jarvis/order/",
+                data: filter,
+                headers: headers
+            });
+        },
+        
+    },
+});
+
+let grid = $("#userOrderTable").data("JSGrid");
+
+$('#search-btn').click(function(){
+    grid.reset()
+});
+
+$(document).on('change', '#pageSize', function(){
+    grid.reset()
+})
+
+</script>
+<script>
+    $(document).ready(function(){
+        $.ajax('/api/v1/ad/dashboard-counts', {
+            method: 'GET',
+            success: function(response){
+                $("#lifetimeOrder").find('.value-count').text(response.lifetime_order)
+                $("#uniqueOrder").find('.value-count').text(response.unique_order)
+                $("#monthOrder").find('.value-count').text(response.month_order)
+
+            }
+        })
+
+    })
+</script>
+<script>
+    class exportCSVFile{
+        constructor(headers, itemsNotFormatted, fileTitle){
+            this.headers = headers
+            this.formattedItems = this.formatItems(itemsNotFormatted);
+            this.fileTitle = fileTitle
+
+            this.createFile()
+        }
+
+        formatItems(itemsNotFormatted){
+            let itemsFormatted = [];
+
+            itemsNotFormatted.forEach((item) => {
+                console.log("item", item)
+                itemsFormatted.push({
+                    "Sr. No": item.id || '',
+                    "User Name": item.user.username || '', 
+                    "Name": item.shipping_address.name || '',
+                    "Phone": item.shipping_address.mobile || '',
+                    "Email": item.user.email || '',
+                    "Order Date": item.date || '',
+                    "Order Amount": item.amount || '',
+                    "Product Detail": (item.lines.length && item.lines[0].product.product_title) || '',
+                    "Shipping Address": item.shipping_address.address1 + ', ' + item.shipping_address.address2 ,
+                });
+            });
+
+            return itemsFormatted
+        }
+
+        createFile(){
+            if (this.headers) {
+                this.formattedItems.unshift(this.headers);
+            }
+
+            // Convert Object to JSON
+            var jsonObject = JSON.stringify(this.formattedItems);
+            var csv = this.convertToCSV(jsonObject);
+
+            console.log(" === csv === ", csv);
+
+            var exportedFilename = this.fileTitle + '.csv' || 'export.csv';
+
+            var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            if (navigator.msSaveBlob) { // IE 10+
+                navigator.msSaveBlob(blob, exportedFilename);
+            } else {
+                var link = document.getElementById("exportAds");
+                if (link.download !== undefined) { // feature detection
+                    // Browsers that support HTML5 download attribute
+                    var url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", exportedFilename);
+                    link.click();
+                }
+            }
+        }
+
+        convertToCSV(objArray) {
+            console.log(" objArray ", objArray)
+            var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+            var str = '';
+
+            for (var i = 0; i < array.length; i++) {
+                var line = '';
+                for (var index in array[i]) {
+                    if (line != '') line += ','
+
+                    line += array[i][index];
+                }
+
+                str += line + '\r\n';
+            }
+
+            return str
+
+        }
+    }
+
+$(document).on('click', '#exportAds', function(){
+    let file = new exportCSVFile(["Sr. No", "User Name", "Name", "Phone", "Email", "Order Date", 
+                                    "Order Amount", "Product Detail", "Shipping Address"], grid.data, 'report')
+});
+</script>
+{% endblock local_js %}

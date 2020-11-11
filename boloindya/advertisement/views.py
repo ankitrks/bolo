@@ -42,7 +42,7 @@ class ProductDetailAPIView(RetrieveAPIView):
         return obj.product
 
 
-class AdViewset(ModelViewSet):
+class JarvisAdViewset(ModelViewSet):
     queryset = Ad.objects.all()
     serializer_class = AdSerializer
     pagination_class = deepcopy(PageNumberPaginationRemastered)
@@ -53,6 +53,7 @@ class AdViewset(ModelViewSet):
         page_size = self.request.query_params.get('page_size')
         brand_name = self.request.query_params.get('brand_name')
         product_name = self.request.query_params.get('product_name')
+        section = self.request.query_params.get('section')
 
         if q:
             try:
@@ -64,12 +65,48 @@ class AdViewset(ModelViewSet):
             queryset = queryset.filter(brand__name__icontains=brand_name)
         if product_name:
             queryset = queryset.filter(product__name__icontains=product_name)
+        
+        if section:
+            if section == 'ongoing':
+                queryset = queryset.filter(state='active', start_time__lte=datetime.now(), end_time__gte=datetime.now())
+            elif section == 'upcoming':
+                queryset = queryset.filter(state__in=['active', 'draft'], start_time__gte=datetime.now())
+            elif section == 'history':
+                queryset = queryset.filter(end_time__lte=datetime.now())
+            elif section == 'draft':
+                queryset = queryset.filter(state='draft')
+            
 
         if page_size:
             self.pagination_class.page_size = int(page_size)
 
         return queryset.order_by('id')
 
+
+class JarvisOrderViewset(ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    pagination_class = deepcopy(PageNumberPaginationRemastered)
+
+    def get_queryset(self):
+        queryset = self.queryset
+        q = self.request.query_params.get('q')
+        page_size = self.request.query_params.get('page_size')
+        order_date = self.request.query_params.get('date')
+        section = self.request.query_params.get('section')
+
+        if q:
+            queryset = queryset.filter(Q(shipping_address__name__icontains=q) | Q(shipping_address__mobile__icontains=q) | 
+                                        Q(user__email__icontains=q))
+
+
+        if order_date:
+            queryset = queryset.filter(date__date=order_date)
+
+        if page_size:
+            self.pagination_class.page_size = int(page_size)
+
+        return queryset.order_by('id')
 
 
 class ReviewListAPIView(ListAPIView):
@@ -223,10 +260,11 @@ from multiprocessing.sharedctypes import Value
 class DashBoardCountAPIView(APIView):
     def get(self, request, *args, **kwargs):
         lock = Lock()
+        today = datetime.now()
 
         query_list = (
-            ('ongoing_ad', Ad.objects.filter(state='active', start_time__lte=datetime.now(), end_time__gte=datetime.now()), Value('i', 0, lock=lock)),
-            ('upcoming_ad', Ad.objects.filter(start_time__gte=datetime.now()), Value('i', 0, lock=lock)),
+            ('ongoing_ad', Ad.objects.filter(state='active', start_time__lte=today, end_time__gte=today), Value('i', 0, lock=lock)),
+            ('upcoming_ad', Ad.objects.filter(start_time__gte=today), Value('i', 0, lock=lock)),
             ('added_to_draft', Ad.objects.filter(state='draft'), Value('i', 0, lock=lock)),
             ('onboarded_products', Product.objects.filter(is_active=True), Value('i', 0, lock=lock)),
             ('impressions', Seen.objects.all(), Value('i', 0, lock=lock)),
@@ -234,7 +272,10 @@ class DashBoardCountAPIView(APIView):
             ('install_click', Clicked.objects.filter(cta='install'), Value('i', 0, lock=lock)),
             ('shop_now_click', Clicked.objects.filter(cta='shop_now'), Value('i', 0, lock=lock)),
             ('brand_onboarded', Brand.objects.filter(is_active=True), Value('i', 0, lock=lock)),
-            ('learn_more_click', Clicked.objects.filter(cta='learn_more'), Value('i', 0, lock=lock))
+            ('learn_more_click', Clicked.objects.filter(cta='learn_more'), Value('i', 0, lock=lock)),
+            ('lifetime_order', Order.objects.all(), Value('i', 0, lock=lock)),
+            ('unique_order', Order.objects.all().distinct('user_id'), Value('i', 0, lock=lock)),
+            ('month_order', Order.objects.filter(date__gte='%s-%s-01'%(today.year, today.month)), Value('i', 0, lock=lock)),
         )
 
         processes = []

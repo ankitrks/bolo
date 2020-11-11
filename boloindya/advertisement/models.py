@@ -74,6 +74,9 @@ ad_state_options = (
     ('draft', "Draft"),
     ('active', "Active"),
     ('inactive', "Inactive"),
+    ('deleted', "Deleted"),
+    ('ongoing', "Ongoing"),
+    ('completed', "Completed"),
 )
 
 frequency_type_options = (

@@ -24,7 +24,7 @@
     <div class="col-sm-12"  style="margin-left: 10px margin-right: 10px">
         <div class="box">
             <div class="box-header with-border">
-                <h3 class="box-title">Ad Dashboard</h3>
+                <h1 class="box-title" id="pageTitle">Ad Dashboard</h1>
             </div>
             <div class="box-body">
                 <div class="row">
@@ -236,15 +236,44 @@
         </div>
     </div>
 </div>
-
-
-
-
 {% endblock center_content %}
 
 {% block local_js %}
 <script type="text/javascript">
 let headers = {}
+
+let url = new URL(window.location.href);
+
+
+let adSection = url.searchParams.get("section");;
+console.log("Ad section", adSection);
+
+
+///////  Section Based Modification   ////
+$(document).ready(function(){
+    let sectionName;
+
+    switch(adSection){
+        case 'ongoing': 
+            sectionName = 'Ongoing Ads';
+            break;
+        case 'upcoming':
+            sectionName = 'Upcoming Ads';
+            break;
+        case 'draft':
+            sectionName = 'Ad drafts'
+            break
+        case 'history':
+            sectionName = 'Ad History'
+            break
+        default:
+            sectionName = 'Ad Dashboard'
+    }
+    $('#pageTitle').html(sectionName)
+})
+
+
+///////////////////////////
 
 let adType = [{
     'id': '',
@@ -364,12 +393,15 @@ $("#adTable").jsGrid({
             let q = $('[name="q"]').val()
             if(q)
                 filter['q'] = q
+            if(adSection)
+                filter['section'] = adSection
+
             filter['page'] = filter['pageIndex']
             filter['page_size'] = $("#pageSize").val()
 
             return $.ajax({
                 type: "GET",
-                url: "/api/v1/ad/ad/",
+                url: "/api/v1/ad/jarvis/ad/",
                 data: filter,
                 headers: headers
             });
@@ -378,7 +410,7 @@ $("#adTable").jsGrid({
         updateItem: function(item) {
             return $.ajax({
                 type: "PATCH",
-                url: "/api/v1/ad/ad/"+item.ad_id + "/",
+                url: "/api/v1/ad/jarvis/ad/"+item.ad_id + "/",
                 data: item,
                 headers: headers
             });
@@ -387,7 +419,7 @@ $("#adTable").jsGrid({
         deleteItem: function(item) {
             return $.ajax({
                 type: "DELETE",
-                url: "/api/v1/ad/ad/"+item.ad_id,
+                url: "/api/v1/ad/jarvis/ad/"+item.ad_id,
                 data: item,
                 headers: headers
             });
@@ -408,7 +440,7 @@ let grid = $("#adTable").data("JSGrid");
 let updateAd = function(adId, data){
     return $.ajax({
         type: "PATCH",
-        url: "/api/v1/ad/ad/"+adId+ "/",
+        url: "/api/v1/ad/jarvis/ad/"+adId+ "/",
         data: data,
         headers: headers,
         success: function(response){

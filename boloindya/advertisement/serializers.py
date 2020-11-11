@@ -1,9 +1,16 @@
 from datetime import datetime
 from django.contrib.humanize.templatetags.humanize import intcomma
+from django.contrib.auth.models import User
 
 from rest_framework import serializers
 
 from advertisement.models import Ad, ProductReview, Order, Product, Address, OrderLine
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'email')
 
 class AdSerializer(serializers.ModelSerializer):
     ad_id = serializers.IntegerField(source='id', read_only=True)
@@ -93,6 +100,7 @@ class AddressSerializer(serializers.ModelSerializer):
 
 
 class OrderLineSerializer(serializers.ModelSerializer):
+    product = ProductSerializer()
     class Meta:
         model = OrderLine
         fields = ['product', 'quantity', 'amount']
@@ -102,12 +110,18 @@ class OrderLineSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     lines = OrderLineSerializer(many=True)
     shipping_address = AddressSerializer()
+    user = UserSerializer()
+    date = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
-        fields = ('id', 'shipping_address', 'lines', 'amount' ,'state', 'payment_status', 'date')
-        read_only_fields = ('id', 'state', 'payment_status', 'date')
+        fields = ('id', 'shipping_address', 'lines', 'amount' ,'state', 'payment_status', 'date', 'user')
+        read_only_fields = ('id', 'state', 'payment_status', 'date', 'user')
         depth = 1
+
+    def get_date(self, instance):
+        return datetime.strftime(instance.date, '%d-%m-%Y')
+
 
     def create(self, validated_data):
         user = self._context.get('request').user
