@@ -4,7 +4,7 @@ from rest_framework import routers
 
 from advertisement.views import (AdDetailAPIView, ReviewListAPIView, CityListAPIView, ProductDetailAPIView,
                                     AddressViewset, OrderViewset, OrderCreateAPIView, AdEventCreateAPIView,
-                                    GetAdForUserAPIView, AdViewset)
+                                    GetAdForUserAPIView, AdViewset, DashBoardCountAPIView)
 
 router = routers.SimpleRouter()
 router.register('address', AddressViewset)
@@ -21,6 +21,7 @@ urlpatterns += [
     url(r'^place-order$', OrderCreateAPIView.as_view()),
     url(r'^event$', AdEventCreateAPIView.as_view()),
     url(r'^for-user$', GetAdForUserAPIView.as_view()),
+    url(r'^dashboard-counts$', DashBoardCountAPIView.as_view()),
 ]
 
 print "urlpatterns", urlpatterns

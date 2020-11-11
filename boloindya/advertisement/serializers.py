@@ -22,7 +22,8 @@ class AdSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ad
         fields = ('ad_id', 'brand_name', 'brand_image', 'ad_video', 'thumbnail', 'ad_length', 'cta', 'type', 
-                    'title', 'start_date', 'end_date', 'frequency', 'frequency_type', 'product_id', 'product_name', 'price', 'ad_type')
+                    'title', 'start_date', 'end_date', 'frequency', 'frequency_type', 'product_id', 'product_name', 
+                    'price', 'ad_type', 'state')
 
     def get_cta(self, instance):
         return list(instance.cta.all().values('title', 'code', 'enable_time', 'action'))

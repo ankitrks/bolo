@@ -2,9 +2,10 @@
 from __future__ import unicode_literals
 from copy import deepcopy
 from datetime import datetime
+from multiprocessing import Process, Pool, Manager, Lock
 
 from django.shortcuts import render
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.test import Client
 from django.views.generic import RedirectView, TemplateView, DetailView
 
@@ -20,7 +21,8 @@ from redis_utils import get_redis
 from payment.razorpay import create_order
 
 from advertisement.utils import query_fetch_data, convert_to_dict_format, filter_data_from_dict, PageNumberPaginationRemastered
-from advertisement.models import Ad, ProductReview, Order, Product, Address, OrderLine, AdEvent
+from advertisement.models import (Ad, ProductReview, Order, Product, Address, OrderLine, AdEvent,
+                                    Seen, Skipped, Clicked, Brand)
 from advertisement.serializers import (AdSerializer, ReviewSerializer, OrderSerializer, ProductSerializer, AddressSerializer, 
                                         OrderCreateSerializer, OrderLineSerializer)
 
@@ -43,7 +45,31 @@ class ProductDetailAPIView(RetrieveAPIView):
 class AdViewset(ModelViewSet):
     queryset = Ad.objects.all()
     serializer_class = AdSerializer
-    pagination_class = PageNumberPaginationRemastered
+    pagination_class = deepcopy(PageNumberPaginationRemastered)
+
+    def get_queryset(self):
+        queryset = self.queryset
+        q = self.request.query_params.get('q')
+        page_size = self.request.query_params.get('page_size')
+        brand_name = self.request.query_params.get('brand_name')
+        product_name = self.request.query_params.get('product_name')
+
+        if q:
+            try:
+                q = int(q)
+                queryset = queryset.filter(Q(product_id=q) | Q(brand_id=q))
+            except Exception as e:
+                queryset = queryset.filter(Q(product__name__icontains=q) | Q(brand__name__icontains=q))
+        if brand_name:
+            queryset = queryset.filter(brand__name__icontains=brand_name)
+        if product_name:
+            queryset = queryset.filter(product__name__icontains=product_name)
+
+        if page_size:
+            self.pagination_class.page_size = int(page_size)
+
+        return queryset.order_by('id')
+
 
 
 class ReviewListAPIView(ListAPIView):
@@ -192,6 +218,48 @@ class GetAdForUserAPIView(APIView):
             'results': user_ad
         })
 
+from multiprocessing.sharedctypes import Value
+
+class DashBoardCountAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        lock = Lock()
+
+        query_list = (
+            ('ongoing_ad', Ad.objects.filter(state='active', start_time__lte=datetime.now(), end_time__gte=datetime.now()), Value('i', 0, lock=lock)),
+            ('upcoming_ad', Ad.objects.filter(start_time__gte=datetime.now()), Value('i', 0, lock=lock)),
+            ('added_to_draft', Ad.objects.filter(state='draft'), Value('i', 0, lock=lock)),
+            ('onboarded_products', Product.objects.filter(is_active=True), Value('i', 0, lock=lock)),
+            ('impressions', Seen.objects.all(), Value('i', 0, lock=lock)),
+            ('skips', Skipped.objects.all(), Value('i', 0, lock=lock)),
+            ('install_click', Clicked.objects.filter(cta='install'), Value('i', 0, lock=lock)),
+            ('shop_now_click', Clicked.objects.filter(cta='shop_now'), Value('i', 0, lock=lock)),
+            ('brand_onboarded', Brand.objects.filter(is_active=True), Value('i', 0, lock=lock)),
+            ('learn_more_click', Clicked.objects.filter(cta='learn_more'), Value('i', 0, lock=lock))
+        )
+
+        processes = []
+
+        for args in query_list:
+            print "creating process"
+            self.get_count(*args)
+            # processes.append(Process(target=self.get_count, args=args))
+
+        print "processes", processes
+        # for p in processes:
+        #     p.start()
+
+        # print "processed started"
+        # for p in processes:
+        #     p.join()
+
+        # print "prcessed joinede"
+        print "returnong response"
+        return Response({args[0]: args[2].value  for args in query_list})
+
+    def get_count(self, key, query, val_container):
+        print "getting count "
+        val_container.value = query.count()
+        print "writing done"
 
 class AdTemplateView(TemplateView):
     template_name = 'advertisement/ad/index.html'
@@ -199,4 +267,5 @@ class AdTemplateView(TemplateView):
 
 class OrderTemplateView(TemplateView):
     template_name = 'advertisement/order/index.html'
+
 
