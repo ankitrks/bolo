@@ -1,0 +1,631 @@
+{% extends 'advertisement/base.html' %}
+
+
+{% block local_css %}
+    <style>
+        .ongoingAd{
+            background-color: #87cb41 !important
+        }
+        .inactiveAd{
+            background-color: #fbd458 !important
+        }
+        .completedAd{
+            background-color: #b92a25 !important
+        }
+        .draftAd{
+            background-color: #737373 !important
+        }
+    </style>
+{% endblock local_css %}
+
+{% block center_content %}
+<div class="row">
+    <div class="col-sm-12"  style="margin-left: 10px margin-right: 10px">
+        <div class="box">
+            <div class="box-header with-border">
+                <h1 class="box-title" id="pageTitle">Ad Dashboard</h1>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2" id="ongoingAd">
+                        <div class="small-box bg-aqua">
+                            <div class="inner">
+                                <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
+                                <p class="section-name">Ongoing Ad (Current)</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-bag"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2" id="upcomingAd">
+                        <div class="small-box bg-green">
+                            <div class="inner">
+                                <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
+                                <p class="section-name">Upcoming Ad (Current)</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-stats-bars"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2" id="draftAd">
+                        <div class="small-box bg-yellow">
+                            <div class="inner">
+                                <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
+                                <p class="section-name">Added to draft (all)</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-person-add"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2" id="onboardedProduct">
+                        <div class="small-box bg-red">
+                            <div class="inner">
+                                <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
+                                <p class="section-name">Onboarded Products (Live)</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-pie-graph"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2" id="impression">
+                        <div class="small-box bg-aqua">
+                            <div class="inner">
+                                <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
+                                <p class="section-name">Impressions (Date)</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-bag"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2" id="skips">
+                        <div class="small-box bg-green">
+                            <div class="inner">
+                                <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
+                                <p class="section-name">No. of skips (Date)</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-stats-bars"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2" id="installClick">
+                        <div class="small-box bg-yellow">
+                            <div class="inner">
+                                <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
+                                <p class="section-name">Install clicks (Date)</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-person-add"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2" id="shopNowClick">
+                        <div class="small-box bg-red">
+                            <div class="inner">
+                                <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
+                                <p class="section-name">Shop Now clicks (Date)</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-pie-graph"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2" id="onboardedBrand">
+                        <div class="small-box bg-aqua">
+                            <div class="inner">
+                                <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
+                                <p class="section-name">Onboarded Brands (Live)</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-bag"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2" id="learnMore">
+                        <div class="small-box bg-green">
+                            <div class="inner">
+                                <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
+                                <p class="section-name">Learn More (Date)</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-stats-bars"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12"  style="margin-left: 10px">
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title">Ad</h3>
+            </div>
+            <div class="box-body">
+                <div class="row" style="margin-bottom: 10px">
+                    <div class="col-sm-3">
+                        <div class="input-group">
+                            <input type="text" name="q" class="form-control" placeholder="Search...">
+                            <span class="input-group-btn">
+                                <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="">
+                            <button class="btn" />Pause</button>
+                            <button class="btn" />Restart</button>
+                            <button class="btn" />Start</button>
+                            <button class="btn" />Go Live</button>
+                            <button class="btn" />Del</button>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="row">
+                            <div class="col-sm-2">
+                                <a id="exportAds"><i class="fa fa-download"></i></a>
+                            </div>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <select class="form-control">
+                                        <option value="csv" selected>CSV</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="input-group">
+                            <select class="form-control" id="pageSize">
+                                <option value="10" selected>10 Pages</option>
+                                <option value="20">20 Pages</option>
+                                <option value="50">50 Pages</option>
+                                <option value="100">100 Pages</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-left: 10px">
+                    <div class="row" id="adTable"></div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="frequencyModal" tabindex="-1" role="dialog" aria-labelledby="frequencyModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+            </div>
+            <div class="modal-body">
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="videoMadal" tabindex="-1" role="dialog" aria-labelledby="videoMadal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Video</h4>
+            </div>
+            <div class="modal-body">
+                <video width="480" height="320" controls>
+                    <source id="adVideoSource" src="" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock center_content %}
+
+{% block local_js %}
+<script type="text/javascript">
+let headers = {}
+
+let url = new URL(window.location.href);
+
+
+let adSection = url.searchParams.get("section");;
+console.log("Ad section", adSection);
+
+
+///////  Section Based Modification   ////
+$(document).ready(function(){
+    let sectionName;
+
+    switch(adSection){
+        case 'ongoing': 
+            sectionName = 'Ongoing Ads';
+            break;
+        case 'upcoming':
+            sectionName = 'Upcoming Ads';
+            break;
+        case 'draft':
+            sectionName = 'Ad drafts'
+            break
+        case 'history':
+            sectionName = 'Ad History'
+            break
+        default:
+            sectionName = 'Ad Dashboard'
+    }
+    $('#pageTitle').html(sectionName)
+})
+
+
+///////////////////////////
+
+let adType = [{
+    'id': '',
+    'name': '<Ad Type>'
+},{
+    'id': 'install',
+    'name': 'Install'
+},{
+    'id': 'shop_now',
+    'name': 'Shop Now'
+}]
+
+$("#adTable").jsGrid({
+    width: "100%",
+    height: "600px",
+
+    inserting: false,
+    editing: false,
+    sorting: true,
+    paging: true,
+    pageLoading: true,
+    autoload: true,
+    filtering: true,
+    sorter: "start_date",
+    pageSize: $("#pageSize").val(),
+    fields: [
+        { title: " ", name: "ad_id", type: "renderer", rendererFunction: function(value, data){
+            return `<input type="checkbox" name="mark_for_action" value="${ value }"/>`
+        }, width: 22, align: "center",},
+        { title: "Sr. No.", name: "ad_id", type: "number", width: 30, align: "center", filtering: false},
+        { title: "Brand ID", name: "brand_id", type: "text", align: "center", width: 40, filtering: false},
+        { title: "Brand Name", name: "brand_name", type: "text", align: "center"},
+        { title: "Start Date", name: "start_date", type: "text", width: 60, align: "center", filtering: false},
+        { title: "End Date", name: "end_date", type: "text", width: 60, align: "center", filtering: false},
+        { title: "Frequency", name: "frequency", type: "renderer", rendererFunction: function(value, data){
+            let html= `<div><b>Type: ${ data.frequency_type }</b></div>`
+            if(data.frequency.length == 0)
+                return ''
+
+            if(data.frequency_type == 'constant'){
+                html += `<div>Scrolls: ${ data.frequency[0]['scroll'] }</div>`
+            }
+            else if(data.frequency_type == 'variable'){
+                html += `<table>
+                    <tr>
+                        <th>Sequence</th>
+                        <th>Scroll</th>
+                    </tr>`
+                data.frequency.forEach(function(val){
+                    html += `<tr>
+                        <td>${ val.sequence }</td>
+                        <td>${ val.scroll }</td>
+                    </tr>`
+                })
+                html += '</table>'
+            }
+            return `<a class="frequency-element" data-toggle="modal" data-target="#frequencyModal" data-modalbody="${ html }">Detail</a>`
+        }, align: "center"},
+        { title: "Video", itemTemplate: function(_, item){
+            return `
+                <a class="adVideo" data-toggle="modal" data-target="#videoMadal" data-src="${ item.ad_video }">
+                    <img src='/media/img/icons/video.png' style="width:30px">
+                <a>`
+            }
+        },
+        { title: "Product ID", name: "product_id", type: "number", align: "center", width: 40, filtering: false},
+        { title: "Product Name", name: "product_name", type: "text", align: "center"},
+        { title: "Price", name: "price", type: "number", align: "center", width: 50},
+        { title: "Ad Type", name: "ad_type", type: "select", items: adType, valueField: "id", textField: "name" },
+        { 
+            headerTemplate: function(){
+                return 'Action'
+            },  
+            itemTemplate: function(value, item){
+                if(item.state=='ongoing' ) {
+                    return `
+                        <span>
+                            <button class="btn btn-primary" data-id="${ item.ad_id }" onclick="editAd(${ item.ad_id })">Edit</button>
+                            <button class="btn btn-warning" data-id="${ item.ad_id }" onclick="pauseAd(${ item.ad_id })">Pause</button>
+                            <button class="btn btn-danger" data-id="${ item.ad_id }" onclick="deleteAd(${ item.ad_id })">Del</button>
+                        </span>
+                    `
+                }
+                else if(item.state=='inactive' || item.state=='upcoming'){
+                    return `
+                        <span>
+                            <button class="btn btn-primary" data-id="${ item.ad_id }" onclick="editAd(${ item.ad_id })">Edit</button>
+                            <button class="btn btn-success" data-id="${ item.ad_id }" onclick="startAd(${ item.ad_id })">Start</button>
+                            <button class="btn btn-danger" data-id="${ item.ad_id }" onclick="deleteAd(${ item.ad_id })">Del</button>
+                        </span>
+                    `
+                }
+                else if(item.state=='draft'){
+                    return `
+                        <span>
+                            <button class="btn btn-primary" data-id="${ item.ad_id }" onclick="editAd(${ item.ad_id })">Edit</button>
+                            <button class="btn btn-success" data-id="${ item.ad_id }" onclick="goLiveAd(${ item.ad_id })">Go Live</button>
+                            <button class="btn btn-danger" data-id="${ item.ad_id }" onclick="deleteAd(${ item.ad_id })">Del</button>
+                        </span>
+                    `
+                }
+                else if(item.state=='completed' || item.state=='deleted' ){
+                    return `
+                        <span>
+                            <button class="btn btn-success" data-id="${ item.ad_id }" onclick="restartAd(${ item.ad_id })">Restart</button>
+                        </span>
+                    `
+                }
+            }, 
+        width: 100, align: "center"},
+    ],
+    rowClass: function (item, itemIndex){
+        if(item.state=='ongoing')
+            return "ongoingAd"
+        else if(item.state=='inactive' || item.state=='upcoming')
+            return "inactiveAd"
+        else if(item.state=='draft')
+            return "draftAd"
+        else if(item.state=='completed' || item.state=='deleted' )
+            return "completedAd"
+    },
+    controller: {
+        loadData: function(filter) {
+            let q = $('[name="q"]').val()
+            if(q)
+                filter['q'] = q
+            if(adSection)
+                filter['section'] = adSection
+
+            filter['page'] = filter['pageIndex']
+            filter['page_size'] = $("#pageSize").val()
+
+            return $.ajax({
+                type: "GET",
+                url: "/api/v1/ad/jarvis/ad/",
+                data: filter,
+                headers: headers
+            });
+        },
+        
+        updateItem: function(item) {
+            return $.ajax({
+                type: "PATCH",
+                url: "/api/v1/ad/jarvis/ad/"+item.ad_id + "/",
+                data: item,
+                headers: headers
+            });
+        },
+        
+        deleteItem: function(item) {
+            return $.ajax({
+                type: "DELETE",
+                url: "/api/v1/ad/jarvis/ad/"+item.ad_id,
+                data: item,
+                headers: headers
+            });
+        }
+    },
+    onDataLoaded: function(gridInstance){
+        $.each($(gridInstance.grid._body).find("tr.jsgrid-row"), function(i, row){
+            $(row).removeClass("jsgrid-row")
+        })
+        $.each($(gridInstance.grid._body).find("tr.jsgrid-alt-row"), function(i, row){
+            $(row).removeClass("jsgrid-alt-row")
+        })
+    }
+});
+
+let grid = $("#adTable").data("JSGrid");
+
+let updateAd = function(adId, data){
+    return $.ajax({
+        type: "PATCH",
+        url: "/api/v1/ad/jarvis/ad/"+adId+ "/",
+        data: data,
+        headers: headers,
+        success: function(response){
+            grid.reset()
+        }
+    });
+}
+
+$('#search-btn').click(function(){
+    grid.reset()
+});
+
+$(document).on('click', '.frequency-element', function(){
+    console.log("elemetn clicked", $(this).attr('data-modalbody'))
+    $($(this).attr('data-target')).find('.modal-body').html($(this).attr('data-modalbody'))
+})
+
+$(document).on('click', '.adVideo', function(){
+    console.log("data src", $(this).attr('data-src'))
+    $("#adVideoSource").attr('src', $(this).attr('data-src'))
+})
+
+$(document).on('change', '#pageSize', function(){
+    grid.reset()
+})
+
+let pauseAd = function(adId){
+    updateAd(adId, {'state': 'inactive'})
+}
+
+let restartAd = function(adId){
+    updateAd(adId, {'state': 'ongoing'})
+}
+
+let startAd = function(adId){
+    updateAd(adId, {'state': 'ongoing'})
+}
+
+let goLiveAd = function(adId){
+    updateAd(adId, {'state': 'ongoing'})
+}
+
+let deleteAd = function(adId){
+    updateAd(adId, {'state': 'deleted'})
+}
+
+let editAd = function(adId){
+    let editWindow = window.open("/superman/advertisement/ad/"+adId+"/change/", "_blank")
+    console.log("editWindow", editWindow)
+    editWindow.onunload = function() {
+        console.log("here=== ")
+        grid.reset()
+    };
+    editWindow.onmouseout = function() {
+        console.log("here=== 2222")
+        grid.reset()
+    };
+}
+
+</script>
+<script>
+    $(document).ready(function(){
+        $.ajax('/api/v1/ad/dashboard-counts', {
+            method: 'GET',
+            success: function(response){
+                $("#ongoingAd").find('.value-count').text(response.ongoing_ad)
+                $("#upcomingAd").find('.value-count').text(response.upcoming_ad)
+                $("#draftAd").find('.value-count').text(response.added_to_draft)
+                $("#onboardedProduct").find('.value-count').text(response.onboarded_products)
+                $("#impression").find('.value-count').text(response.impressions)
+                $("#skips").find('.value-count').text(response.skips)
+                $("#installClick").find('.value-count').text(response.install_click)
+                $("#shopNowClick").find('.value-count').text(response.shop_now_click)
+                $("#onboardedBrand").find('.value-count').text(response.brand_onboarded)
+                $("#learnMore").find('.value-count').text(response.learn_more_click)
+            }
+        })
+
+    })
+</script>
+<script>
+    class exportCSVFile{
+        constructor(headers, itemsNotFormatted, fileTitle){
+            this.headers = headers
+            this.formattedItems = this.formatItems(itemsNotFormatted);
+            this.fileTitle = fileTitle
+
+            this.createFile()
+        }
+
+        formatItems(itemsNotFormatted){
+            let itemsFormatted = [];
+
+            itemsNotFormatted.forEach((item) => {
+                itemsFormatted.push({
+                    "AD ID": item.ad_id || '',
+                    "Brand ID": item.brand_id || '', 
+                    "Brand Name": item.brand_name || '',
+                    "Start Date": item.start_date || '',
+                    "End Date": item.end_date || '',
+                    "Video": item.video_link || '',
+                    "Product ID": item.product_id || '',
+                    "Product Name": item.product_name || '',
+                    "Price": item.price || '',
+                    "Ad Type": item.ad_type || '',
+                    "State": item.state || '',
+                    "Frequency": JSON.stringify(item.frequency || []).toString(),
+                });
+            });
+
+            return itemsFormatted
+        }
+
+        createFile(){
+            if (this.headers) {
+                this.formattedItems.unshift(this.headers);
+            }
+
+            // Convert Object to JSON
+            var jsonObject = JSON.stringify(this.formattedItems);
+            var csv = this.convertToCSV(jsonObject);
+
+            console.log(" === csv === ", csv);
+
+            var exportedFilename = this.fileTitle + '.csv' || 'export.csv';
+
+            var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            if (navigator.msSaveBlob) { // IE 10+
+                navigator.msSaveBlob(blob, exportedFilename);
+            } else {
+                var link = document.getElementById("exportAds");
+                if (link.download !== undefined) { // feature detection
+                    // Browsers that support HTML5 download attribute
+                    var url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", exportedFilename);
+                    link.click();
+                }
+            }
+        }
+
+        convertToCSV(objArray) {
+            console.log(" objArray ", objArray)
+            var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+            var str = '';
+
+            for (var i = 0; i < array.length; i++) {
+                var line = '';
+                for (var index in array[i]) {
+                    if (line != '') line += ','
+
+                    line += array[i][index];
+                }
+
+                str += line + '\r\n';
+            }
+
+            return str
+
+        }
+    }
+
+$(document).on('click', '#exportAds', function(){
+    let array = []; 
+    
+    $.each(grid.data, function(i, data){
+        $("input[name=mark_for_action]:checked").each(function() { 
+            if(parseInt($(this).attr('value')) == data.ad_id){
+                array.push(data); 
+                return false;
+            }
+        })
+    }); 
+
+    console.log("array", array);
+    let file = new exportCSVFile(["AD ID", "Brand ID", "Brand Name", "Start Date", 
+                                "End Date", "Video", "Product ID", 
+                                "Product Name", "Price", "Ad Type", "State", "Frequency"], array, 'report')
+    
+});
+</script>
+{% endblock local_js %}

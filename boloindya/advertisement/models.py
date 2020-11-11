@@ -75,15 +75,21 @@ ad_state_options = (
     ('draft', "Draft"),
     ('active', "Active"),
     ('inactive', "Inactive"),
+    ('deleted', "Deleted"),
+    ('ongoing', "Ongoing"),
+    ('completed', "Completed"),
 )
 
 frequency_type_options = (
     ('constant', "Constant"),
     ('variable', "Variable"),
 )
-ad_type_options = (
-	('shop_now','Shop Now'),
-	('install_now','Install Now'),)
+
+AD_TYPE_CHOICES = (
+    ('install', 'Install'),
+    ('shop_now', 'Shop Now')
+)
+
 class Ad(RecordTimeStamp):
     brand = models.ForeignKey(Brand, related_name='ads', on_delete=models.CASCADE)
     title = models.CharField(max_length=200, null=True)
@@ -91,7 +97,7 @@ class Ad(RecordTimeStamp):
     start_time = models.DateTimeField(auto_now=False)
     end_time = models.DateTimeField(auto_now=False, null=True)
     product = models.ForeignKey(Product, related_name='ads', on_delete=models.CASCADE, null=True)
-    ad_type =  models.CharField(max_length=25, choices=ad_type_options, default='shop_now')
+    ad_type =  models.CharField(max_length=25, choices=AD_TYPE_CHOICES, default='shop_now')
     video_file_url = models.CharField(blank=True, null=True, max_length=200)
     thumbnail = models.CharField(blank=True, null=True, max_length=200)
     ad_length = models.PositiveIntegerField(default=0)
@@ -110,6 +116,12 @@ class Frequency(RecordTimeStamp):
     ad = models.ForeignKey(Ad, related_name='frequency')
     sequence = models.PositiveIntegerField(default=0)
     scroll = models.PositiveIntegerField(default=0)
+
+    def __unicode__(self):
+        if self.ad.frequency_type == 'constant':
+            return '%s at every %s scrolls'%(self.ad, self.scroll)
+        elif self.ad.frequency_type == 'variable':
+            return '%s after %s scrolls'%(self.ad, self.scroll)
 
 
 class State(models.Model):
@@ -205,3 +217,31 @@ class CTA(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class AdEventAbstract(RecordTimeStamp):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='%(class)s')
+    ad = models.ForeignKey(Brand, related_name='%(class)s', on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True
+
+
+class Seen(AdEventAbstract):
+    pass
+
+class Skipped(AdEventAbstract):
+    pass
+
+
+class Clicked(AdEventAbstract):
+    cta = models.CharField(max_length=50, null=True, blank=True)
+
+
+class Playtime(AdEventAbstract):
+    playtime = models.PositiveIntegerField(default=0)
+
+
+""" DynamoDB models """
+AdEvent = 'AdEvent_%s'%settings.DYNAMODB_ENV
+Counter = 'Counter_%s'%settings.DYNAMODB_ENV

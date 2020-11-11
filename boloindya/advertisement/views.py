@@ -1,11 +1,13 @@
 # # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from copy import deepcopy
+from datetime import datetime
+from multiprocessing import Process, Pool, Manager, Lock
 
 from django.shortcuts import render
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.test import Client
-from django.views.generic import RedirectView
+from django.views.generic import RedirectView, TemplateView, DetailView
 
 from rest_framework.generics import RetrieveAPIView, ListAPIView, ListCreateAPIView, CreateAPIView
 from rest_framework.viewsets import ModelViewSet
@@ -15,10 +17,13 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from dynamodb_api import create as dynamodb_create
+from redis_utils import get_redis
 from payment.razorpay import create_order
 
-from advertisement.utils import query_fetch_data, convert_to_dict_format, filter_data_from_dict
-from advertisement.models import Ad, ProductReview, Order, Product, Address, OrderLine
+from advertisement.utils import query_fetch_data, convert_to_dict_format, filter_data_from_dict, PageNumberPaginationRemastered
+from advertisement.models import (Ad, ProductReview, Order, Product, Address, OrderLine, AdEvent,
+                                    Seen, Skipped, Clicked, Brand)
 from advertisement.serializers import (AdSerializer, ReviewSerializer, OrderSerializer, ProductSerializer, AddressSerializer, 
                                         OrderCreateSerializer, OrderLineSerializer)
 
@@ -37,6 +42,98 @@ class ProductDetailAPIView(RetrieveAPIView):
         obj = super(ProductDetailAPIView, self).get_object()
         return obj.product
 
+
+class JarvisAdViewset(ModelViewSet):
+    queryset = Ad.objects.all()
+    serializer_class = AdSerializer
+    pagination_class = deepcopy(PageNumberPaginationRemastered)
+
+    def get_queryset(self):
+        queryset = self.queryset
+        q = self.request.query_params.get('q')
+        page_size = self.request.query_params.get('page_size')
+        brand_name = self.request.query_params.get('brand_name')
+        product_name = self.request.query_params.get('product_name')
+        section = self.request.query_params.get('section')
+
+        if q:
+            try:
+                q = int(q)
+                queryset = queryset.filter(Q(product_id=q) | Q(brand_id=q))
+            except Exception as e:
+                queryset = queryset.filter(Q(product__name__icontains=q) | Q(brand__name__icontains=q))
+        if brand_name:
+            queryset = queryset.filter(brand__name__icontains=brand_name)
+        if product_name:
+            queryset = queryset.filter(product__name__icontains=product_name)
+        
+        if section:
+            if section == 'ongoing':
+                queryset = queryset.filter(state='ongoing')
+            elif section == 'upcoming':
+                queryset = queryset.filter(state__in=['active'], start_time__gte=datetime.now())
+            elif section == 'history':
+                queryset = queryset.filter(state='completed')
+            elif section == 'draft':
+                queryset = queryset.filter(state='draft')
+            
+
+        if page_size:
+            self.pagination_class.page_size = int(page_size)
+
+        return queryset.order_by('id')
+
+
+class JarvisOrderViewset(ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    pagination_class = deepcopy(PageNumberPaginationRemastered)
+
+    def get_queryset(self):
+        queryset = self.queryset
+        q = self.request.query_params.get('q')
+        page_size = self.request.query_params.get('page_size')
+        order_date = self.request.query_params.get('date')
+        section = self.request.query_params.get('section')
+
+        if q:
+            queryset = queryset.filter(Q(shipping_address__name__icontains=q) | Q(shipping_address__mobile__icontains=q) | 
+                                        Q(user__email__icontains=q))
+
+
+        if order_date:
+            queryset = queryset.filter(date__date=order_date)
+
+        if page_size:
+            self.pagination_class.page_size = int(page_size)
+
+        return queryset.order_by('id')
+
+class JarvisProductViewset(ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    pagination_class = deepcopy(PageNumberPaginationRemastered)
+
+    def get_queryset(self):
+        queryset = self.queryset
+        q = self.request.query_params.get('q')
+        page_size = self.request.query_params.get('page_size')
+
+        if q:
+            try:
+                q = int(q)
+                queryset = queryset.filter(Q(id=q) | Q(brand_id=q))
+            except Exception as e:
+                queryset = queryset.filter(Q(name__icontains=q) | Q(brand__name__icontains=q))
+
+
+        # if order_date:
+        #     queryset = queryset.filter(date__date=order_date)
+
+        if page_size:
+            self.pagination_class.page_size = int(page_size)
+
+        return queryset.order_by('id')
 
 
 class ReviewListAPIView(ListAPIView):
@@ -108,7 +205,7 @@ class CityListAPIView(APIView):
 
 from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
-from .models import ProductCategory, Brand, Product, Frequency, CTA, ad_type_options, CTA_OPTIONS
+from .models import ProductCategory, Brand, Product, Frequency, CTA, AD_TYPE_CHOICES as ad_type_options, CTA_OPTIONS
 from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from rest_framework import status
@@ -472,3 +569,88 @@ def particular_ad(request, ad_id=None):
         return render(request,'advertisement/ad/particular_ad.html', {'ad': ad, 'ad_type_options':ad_type_options_values,'cta_options': cta_options_values,'selected_cta':selected_ctas})
     else:
         return JsonResponse({'error':'User Not Authorised','message':'fail' }, status=status.HTTP_200_OK)
+
+class AdEventCreateAPIView(APIView):
+    def post(self, request, *args, **kwargs):
+        data = deepcopy(request.data)
+        data.update({
+            'user_id': request.user.id,
+            'created_at': datetime.now()
+        })
+        dynamodb_create(AdEvent, data)
+        return Response({'message': 'SUCCESS'}, status=201)
+
+
+class GetAdForUserAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        params = request.query_params
+        user_ad = {}
+        ad_pool = get_redis('ad:pool')
+        next_position = 0
+
+        for scroll in sorted(map(int, ad_pool.keys())):
+            next_position += scroll
+            user_ad[str(next_position)] = get_redis('ad:%s'%ad_pool.get(str(scroll))[0].get('id'))  # Todo: Need to imporve it
+
+        return Response({
+            'results': user_ad
+        })
+
+from multiprocessing.sharedctypes import Value
+
+class DashBoardCountAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        lock = Lock()
+        today = datetime.now()
+
+        query_list = (
+            ('ongoing_ad', Ad.objects.filter(state='ongoing'), Value('i', 0, lock=lock)),
+            ('upcoming_ad', Ad.objects.filter(start_time__gte=today), Value('i', 0, lock=lock)),
+            ('added_to_draft', Ad.objects.filter(state='draft'), Value('i', 0, lock=lock)),
+            ('onboarded_products', Product.objects.filter(is_active=True), Value('i', 0, lock=lock)),
+            ('impressions', Seen.objects.all(), Value('i', 0, lock=lock)),
+            ('skips', Skipped.objects.all(), Value('i', 0, lock=lock)),
+            ('install_click', Clicked.objects.filter(cta='install'), Value('i', 0, lock=lock)),
+            ('shop_now_click', Clicked.objects.filter(cta='shop_now'), Value('i', 0, lock=lock)),
+            ('brand_onboarded', Brand.objects.filter(is_active=True), Value('i', 0, lock=lock)),
+            ('learn_more_click', Clicked.objects.filter(cta='learn_more'), Value('i', 0, lock=lock)),
+            ('lifetime_order', Order.objects.all(), Value('i', 0, lock=lock)),
+            ('unique_order', Order.objects.all().distinct('user_id'), Value('i', 0, lock=lock)),
+            ('month_order', Order.objects.filter(date__gte='%s-%s-01'%(today.year, today.month)), Value('i', 0, lock=lock)),
+            ('onboarded_brands', Brand.objects.all(), Value('i', 0, lock=lock)),
+            ('unique_products', Product.objects.all(), Value('i', 0, lock=lock)),
+        )
+
+        processes = []
+
+        for args in query_list:
+            print "creating process"
+            self.get_count(*args)
+            # processes.append(Process(target=self.get_count, args=args))
+
+        print "processes", processes
+        # for p in processes:
+        #     p.start()
+
+        # print "processed started"
+        # for p in processes:
+        #     p.join()
+
+        # print "prcessed joinede"
+        print "returnong response"
+        return Response({args[0]: args[2].value  for args in query_list})
+
+    def get_count(self, key, query, val_container):
+        print "getting count "
+        val_container.value = query.count()
+        print "writing done"
+
+class AdTemplateView(TemplateView):
+    template_name = 'advertisement/ad/index.html'
+
+
+class OrderTemplateView(TemplateView):
+    template_name = 'advertisement/order/index.html'
+
+class ProductTemplateView(TemplateView):
+    template_name = 'advertisement/product/index.html'

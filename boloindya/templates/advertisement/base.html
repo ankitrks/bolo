@@ -41,28 +41,45 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
   <link rel="stylesheet" href="{% static 'css/dataTables.bootstrap4.min.css' %}">
   <link rel="stylesheet" type="text/css" href="content-edit.min.css">
-  {% block styles %}
+
+  <link type="text/css" rel="stylesheet" href='{% static "AdminLTE/plugins/jsgrid/jsgrid.min.css" %}' />
+  <link type="text/css" rel="stylesheet" href='{% static "AdminLTE/plugins/jsgrid/jsgrid-theme.min.css" %}' />
+  {% block local_css %}
   
-  {% endblock styles %}
+  {% endblock local_css %}
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
 <div class="wrapper">
-  {% include 'advertisement/header.html' %}
-  
+  {% include 'jarvis/assests/header.html' %}
   <!-- Left side column. contains the logo and sidebar -->
-  {% include 'advertisement/sidebar.html' %}
+  {% include 'jarvis/assests/sidebar.html' %}
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
-    {% block content %}
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0 text-dark">{% block page_title %}{% endblock page_title %}</h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item active">Dashboard v1</li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+    {% block center_content %}
 
 
-    {% endblock content %}
+    {% endblock center_content %}
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
-
   <!-- Add the sidebar's background. This div must be placed
        immediately after the control sidebar -->
 </div>
@@ -115,8 +132,59 @@
       });
       // $('.sidebar-toggle').click();
 </script>
-{% block center_js %}
+<script src='{% static "AdminLTE/plugins/jsgrid/jsgrid.min.js" %}'></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script type="text/javascript">
+function getCookie(cname) {
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for(var i = 0; i <ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+</script>
 
-{% endblock center_js %}
+<script>
+var MyHTMLField = function(config) {
+    jsGrid.Field.call(this, config);
+};
+
+var MyFunctionField = function(config) {
+    jsGrid.Field.call(this, config);
+};
+
+MyHTMLField.prototype = new jsGrid.Field({
+    css: "html-field",            // redefine general property 'css'
+    align: "center",              // redefine general property 'align'
+    itemTemplate: function(value) {
+        return this.template
+    },
+});
+
+MyFunctionField.prototype = new jsGrid.Field({
+    css: "function-field",            // redefine general property 'css'
+    align: "center",              // redefine general property 'align'
+
+    itemTemplate: function(value, data) {
+        return this.rendererFunction.call(this, value, data)
+    },
+})
+
+jsGrid.fields.html = MyHTMLField;
+jsGrid.fields.renderer = MyFunctionField;
+</script>
+
+{% block local_js %}
+
+{% endblock local_js %}
+
 </body>
 </html>

@@ -1,9 +1,23 @@
 from datetime import datetime
 from django.contrib.humanize.templatetags.humanize import intcomma
+from django.contrib.auth.models import User
 
 from rest_framework import serializers
 
-from advertisement.models import Ad, ProductReview, Order, Product, Address, OrderLine
+from advertisement.models import Ad, ProductReview, Order, Product, Address, OrderLine, Brand
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'email')
+
+
+class BrandSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Brand
+        fields = ('id', 'name', 'company_logo')
+
 
 class AdSerializer(serializers.ModelSerializer):
     ad_id = serializers.IntegerField(source='id', read_only=True)
@@ -12,17 +26,39 @@ class AdSerializer(serializers.ModelSerializer):
     ad_video = serializers.CharField(source='video_file_url', read_only=True)
     cta = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
+    product_name = serializers.CharField(source='product.name', read_only=True)
+    product_id = serializers.CharField(source='product.id', read_only=True)
+    price = serializers.CharField(source='product.final_amount', read_only=True)
+    start_date = serializers.SerializerMethodField(read_only=True)
+    end_date = serializers.SerializerMethodField(read_only=True)
+    frequency = serializers.SerializerMethodField(read_only=True)
+    state = serializers.SerializerMethodField()
 
     class Meta:
         model = Ad
-        fields = ('ad_id', 'brand_name', 'brand_image', 'ad_video', 'thumbnail', 'ad_length', 'cta', 'type')
+        fields = ('ad_id', 'brand_name', 'brand_image', 'ad_video', 'thumbnail', 'ad_length', 'cta', 'type', 
+                    'title', 'start_date', 'end_date', 'frequency', 'frequency_type', 'product_id', 'product_name', 
+                    'price', 'ad_type', 'state')
 
     def get_cta(self, instance):
-        return instance.cta.all().values('title', 'code', 'enable_time', 'action')
+        return list(instance.cta.all().values('title', 'code', 'enable_time', 'action'))
 
     def get_type(self, instance):
         return 'ad'
 
+    def get_start_date(self, instance):
+        return datetime.strftime(instance.start_time, '%d-%m-%Y')
+
+    def get_end_date(self, instance):
+        return datetime.strftime(instance.end_time, '%d-%m-%Y')
+
+    def get_frequency(self, instance):
+        return list(instance.frequency.all().values('scroll', 'sequence'))
+
+    def get_state(self, instance):
+        if instance.state == 'active' and instance.start_time >= datetime.now():
+            return 'upcoming'
+        return instance.state
 
 class ProductSerializer(serializers.ModelSerializer):
     product_images = serializers.SerializerMethodField()
@@ -33,14 +69,15 @@ class ProductSerializer(serializers.ModelSerializer):
     mrp = serializers.SerializerMethodField()
     rating_count = serializers.SerializerMethodField()
     discount_expiry = serializers.SerializerMethodField()
+    brand = BrandSerializer()
 
     class Meta:
         model = Product
         fields = ('product_id', 'product_title', 'product_description', 'product_images', 'rating_count', 'rating',
-                    'currency', 'mrp', 'is_discounted', 'discounted_price', 'discount_expiry')
+                    'currency', 'mrp', 'is_discounted', 'discounted_price', 'discount_expiry', 'brand')
 
     def get_product_images(self, instance):
-        return instance.images.all().values_list('compressed_image', flat=True)
+        return list(instance.images.all().values_list('compressed_image', flat=True))
 
     def get_rating_count(self, instance):
         return intcomma(instance.rating_count)
@@ -52,7 +89,9 @@ class ProductSerializer(serializers.ModelSerializer):
         return "Rs %s"%instance.discounted_price
 
     def get_discount_expiry(self, instance):
-        return datetime.strftime(instance.discount_expiry, "%d-%m-%y %H:%M:%S")
+        if instance.discount_expiry:
+            return datetime.strftime(instance.discount_expiry, "%d-%m-%y %H:%M:%S")
+        return ''
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -75,6 +114,7 @@ class AddressSerializer(serializers.ModelSerializer):
 
 
 class OrderLineSerializer(serializers.ModelSerializer):
+    product = ProductSerializer()
     class Meta:
         model = OrderLine
         fields = ['product', 'quantity', 'amount']
@@ -84,12 +124,18 @@ class OrderLineSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     lines = OrderLineSerializer(many=True)
     shipping_address = AddressSerializer()
+    user = UserSerializer()
+    date = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
-        fields = ('id', 'shipping_address', 'lines', 'amount' ,'state', 'payment_status', 'date')
-        read_only_fields = ('id', 'state', 'payment_status', 'date')
+        fields = ('id', 'shipping_address', 'lines', 'amount' ,'state', 'payment_status', 'date', 'user')
+        read_only_fields = ('id', 'state', 'payment_status', 'date', 'user')
         depth = 1
+
+    def get_date(self, instance):
+        return datetime.strftime(instance.date, '%d-%m-%Y')
+
 
     def create(self, validated_data):
         user = self._context.get('request').user

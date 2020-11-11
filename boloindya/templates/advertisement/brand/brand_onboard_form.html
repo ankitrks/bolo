@@ -1,5 +1,5 @@
 {% extends "advertisement/base.html" %}
-{% block styles %}
+{% block local_css %}
 <style>
     #overlay {
   position: fixed; /* Sit on top of the page content */
@@ -28,8 +28,8 @@
     padding-left: 50px;
 }
 </style>
-{% endblock styles %}
-{% block content %}
+{% endblock local_css %}
+{% block center_content %}
 <section class="content">
     <form id="upload" action="" method="POST" enctype="multipart/form-data" class="form-horizontal">
         {% csrf_token %}
@@ -152,8 +152,8 @@
     <div id="csv_table">
     </div>
 </section>
-{% endblock content %}
-{% block center_js %}
+{% endblock center_content %}
+{% block local_js %}
 
 <script>
     $(document).ready(function() {
@@ -298,4 +298,4 @@ $(function() {
     // });
 });
 </script>
-{% endblock center_js %}
+{% endblock local_js %}

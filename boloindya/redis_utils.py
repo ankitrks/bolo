@@ -26,6 +26,7 @@ def get_redis(key):
             data = redis_cli_read_only.get("bi:"+key)
         return json.loads(data) if data else None
     except Exception as e:
+        print "Exception in get_redis", str(e)
         logger.exception("in get_redis " + str(e))
         return None
 
@@ -66,6 +67,7 @@ def set_redis(key, value, set_expiry=True, expiry_time=None):
             else:
                 return redis_cli.set("bi:"+key, json.dumps(value, cls=DjangoJSONEncoder))
     except Exception as e:
+        print "Exception in set_redis", str(e)
         logger.exception("in set_redis " + str(e))
         return e
 
