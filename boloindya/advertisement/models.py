@@ -37,6 +37,17 @@ class Brand(RecordTimeStamp):
         return self.name
 
 
+class Tax(models.Model):
+    name = models.CharField(max_length=20)
+    percentage = models.FloatField()
+
+    def __unicode__(self):
+        return "%s = %s"%(self.name, self.percentage)
+
+    def get_value(self, base_amount):
+        return (self.percentage * float(base_amount)) / 100.0
+
+
 class Product(RecordTimeStamp):
     brand = models.ForeignKey(Brand, related_name='products', on_delete=models.CASCADE)
     link = models.CharField(blank=True, null=True, max_length=200)
@@ -53,6 +64,7 @@ class Product(RecordTimeStamp):
     discount_expiry = models.DateTimeField(blank=True, null=True)
     max_quantity_limit = models.PositiveIntegerField(default=5)
     is_active = models.BooleanField(default=True)
+    taxes = models.ManyToManyField(Tax)
 
     def __str__(self):
         return self.name
@@ -62,6 +74,19 @@ class Product(RecordTimeStamp):
         if self.is_discounted:
             return self.discounted_price
         return self.mrp
+
+    @property
+    def base_amount(self):
+        amount = float(self.final_amount)
+
+        if not self.taxes:
+            return round(amount, 2)
+        
+        return round(amount / sum([1] + [tax.percentage/100.0 for tax in self.taxes.all()]), 2)
+
+    def get_tax_value(self, percentage):
+        base_amount = self.base_amount
+        return round(base_amount * percentage / 100.0, 2)
 
 
 class ProductImage(models.Model):
@@ -152,7 +177,6 @@ class Address(RecordTimeStamp):
     state = models.ForeignKey(State, related_name='addresses')
     pincode = models.PositiveIntegerField()
     is_active = models.BooleanField(default=True)
-
 
 
 ORDER_STATE_CHOICES = (

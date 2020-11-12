@@ -15,6 +15,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.test import APIClient
+from rest_framework.pagination import PageNumberPagination
 
 from dynamodb_api import create as dynamodb_create
 from redis_utils import get_redis
@@ -29,12 +30,12 @@ from advertisement.serializers import (AdSerializer, ReviewSerializer, OrderSeri
 
 
 class AdDetailAPIView(RetrieveAPIView):
-    queryset = Ad.objects.filter(state='active')
+    queryset = Ad.objects.filter(is_deleted=False)
     serializer_class = AdSerializer
 
 
 class ProductDetailAPIView(RetrieveAPIView):
-    queryset = Ad.objects.filter(state='active')
+    queryset = Ad.objects.filter(is_deleted=False)
     serializer_class = ProductSerializer    
 
     def get_object(self):
@@ -138,6 +139,7 @@ class JarvisProductViewset(ModelViewSet):
 class ReviewListAPIView(ListAPIView):
     queryset = ProductReview.objects.all()
     serializer_class = ReviewSerializer
+    pagination_class = PageNumberPagination
 
     def get_queryset(self):
         product_id = self.request.parser_context.get('kwargs', {}).get('product_id')
@@ -271,6 +273,10 @@ class GetAdForUserAPIView(APIView):
         params = request.query_params
         user_ad = {}
         ad_pool = get_redis('ad:pool')
+
+        if not ad_pool:
+            return Response({'results': {}})
+
         next_position = 0
 
         for scroll in sorted(map(int, ad_pool.keys())):
