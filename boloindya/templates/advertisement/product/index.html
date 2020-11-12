@@ -1,6 +1,19 @@
 {% extends 'advertisement/base.html' %}
 
 
+{% block local_css %}
+    <style>
+        .download-icon{
+            font-size: 24px;
+            padding-top: 3px;
+        }
+        #pocModal .modal-body{
+            /* margin: 5%; */
+        }
+    </style>
+{% endblock local_css %}
+
+
 {% block center_content %}
 <div class="row">
     <div class="col-sm-12"  style="margin-left: 10px margin-right: 10px">
@@ -43,37 +56,40 @@
         <div class="box">
             <div class="box-body">
                 <div class="row" style="margin-bottom: 10px">
-                    <div class="col-sm-3">
+                    <div class="col-sm-4">
                         <div class="input-group">
-                            <input type="text" name="q" class="form-control" placeholder="Search...">
+                            <input type="text" name="q" class="form-control" placeholder="Search by Product ID, Brand ID, Product Name, Brand Name ">
                             <span class="input-group-btn">
                                 <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
                                 </button>
                             </span>
                         </div>
                     </div>
-                    <div class="col-sm-2">
-                        <div class="row">
-                            <div class="col-sm-2">
+                    <div class="col-sm-4">
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="row" style="float: right; padding-right: 20px">
+                            <div class="col-sm-2 download-icon">
                                 <a id="exportAds"><i class="fa fa-download"></i></a>
                             </div>
-                            <div class="col-sm-10">
+                            <div class="col-sm-4">
                                 <div class="input-group">
                                     <select class="form-control">
                                         <option value="csv" selected>CSV</option>
                                     </select>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-2">
-                        <div class="input-group">
-                            <select class="form-control" id="pageSize">
-                                <option value="10" selected>10 Pages</option>
-                                <option value="20">20 Pages</option>
-                                <option value="50">50 Pages</option>
-                                <option value="100">100 Pages</option>
-                            </select>
+                            <div class="col-sm-6">
+                                <div class="input-group">
+                                    <select class="form-control" id="pageSize">
+                                        <option value="10" selected>10 Records</option>
+                                        <option value="20">20 Records</option>
+                                        <option value="50">50 Records</option>
+                                        <option value="100">100 Records</option>
+                                        <option value="500">500 Records</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -87,7 +103,7 @@
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="frequencyModal" tabindex="-1" role="dialog" aria-labelledby="frequencyModal">
+<div class="modal fade" id="pocModal" tabindex="-1" role="dialog" aria-labelledby="pocModal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -122,17 +138,50 @@ $("#userOrderTable").jsGrid({
     pageSize: $("#pageSize").val(),
     fields: [
         { title: "Sr. No.", name: "product_id", type: "number", width: 30, align: "center", filtering: false},
-        { title: "Product Id", name: "product_id", type: "text", align: "center", filtering: false},
-        { title: "Product Name", name: "product_title", type: "text", width: 60, align: "center", filtering: false},
+        { title: "Product Id", name: "product_id", type: "text", align: "center"},
+        { title: "Product Name", name: "product_title", type: "text", width: 60, align: "center"},
         { title: "Product Link", name: "shipping_address.mobile", type: "text", width: 60, align: "center", filtering: false},
         { title: "Product Price", name: "discounted_price", type: "text", width: 60, align: "center", filtering: false},
-        { title: "Brand Logo", name: "brand.company_logo", type: "text", width: 60, align: "center"},
+        { title: "Brand Logo", name: "brand.company_logo", type: "text", width: 60, align: "center", filtering: false},
         { title: "Brand ID", name: "brand.id", type: "number", align: "center", width: 40},
-        { title: "Brand Name", name: "brand.name", type: "text", align: "center", filtering: false},
+        { title: "Brand Name", name: "brand.name", type: "text", align: "center"},
         { 
             title: "POC",
             itemTemplate: function(value, item){
-                return `<a class="poc-element" data-toggle="modal" data-target="#pocModal" data-modalbody=>Detail</a>`
+                return `<a class="pocElement" data-toggle="modal" data-target="#pocModal">Detail
+                    <div style='display: none' class="pocData">
+                        <div class='row'>
+                            <div class='col-sm-5'>POC</div>
+                            <div class='col-sm-1'>:</div>
+                            <div class='col-sm-5'>${ item.brand.poc || '' }</div>
+                        </div>
+                        <div class='row'>
+                            <div class='col-sm-5'>Mobile</div>
+                            <div class='col-sm-1'>:</div>
+                            <div class='col-sm-5'>${ item.brand.phone_number || '' }</div>
+                        </div>
+                        <div class='row'>
+                            <div class='col-sm-5'>Email</div>
+                            <div class='col-sm-1'>:</div>
+                            <div class='col-sm-5'>${ item.brand.email || '' }</div>
+                        </div>
+                        <div class='row'>
+                            <div class='col-sm-5'>Signed Contract Document</div>
+                            <div class='col-sm-1'>:</div>
+                            <div class='col-sm-5'>${ item.brand.signed_contract_doc_file_url || '' }</div>
+                        </div>
+                        <div class='row'>
+                            <div class='col-sm-5'>Signed Other Document</div>
+                            <div class='col-sm-1'>:</div>
+                            <div class='col-sm-5'>${ item.brand.signed_other_doc_file_url || '' }</div>
+                        </div>
+                        <div class='row'>
+                            <div class='col-sm-5'>Signed NDA Document</div>
+                            <div class='col-sm-1'>:</div>
+                            <div class='col-sm-5'>${ item.brand.signed_nda_doc_file_url || '' }</div>
+                        </div>
+                    </div>
+                    </a>`
             }, 
             width: 50, align: "center"
         },
@@ -178,6 +227,12 @@ $('#search-btn').click(function(){
 
 $(document).on('change', '#pageSize', function(){
     grid.reset()
+})
+
+
+$(document).on('click', '.pocElement', function(){
+    console.log("here", )
+    $('#pocModal').find('.modal-body').html($(this).find('.pocData').html())
 })
 
 </script>

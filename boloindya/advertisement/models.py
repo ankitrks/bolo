@@ -106,6 +106,7 @@ class Ad(RecordTimeStamp):
     budget = models.PositiveIntegerField(default=0)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='created_ads')
     last_modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='modify_ads')
+    is_deleted = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
