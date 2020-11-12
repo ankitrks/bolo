@@ -55,6 +55,8 @@ class JarvisAdViewset(ModelViewSet):
         brand_name = self.request.query_params.get('brand_name')
         product_name = self.request.query_params.get('product_name')
         section = self.request.query_params.get('section')
+        start_date = self.request.query_params.get('start_date')
+        end_date = self.request.query_params.get('end_date')
 
         if q:
             try:
@@ -76,6 +78,11 @@ class JarvisAdViewset(ModelViewSet):
                 queryset = queryset.filter(state='completed')
             elif section == 'draft':
                 queryset = queryset.filter(state='draft')
+
+        if start_date:
+            queryset = queryset.filter(start_time__date__gte=datetime.strptime(start_date, '%d-%m-%Y'))
+        if end_date:
+            queryset = queryset.filter(end_time__date__lte=datetime.strptime(end_date, '%d-%m-%Y'))
             
 
         if page_size:
@@ -102,7 +109,8 @@ class JarvisOrderViewset(ModelViewSet):
 
 
         if order_date:
-            queryset = queryset.filter(date__date=order_date)
+            start_date, end_date = order_date.split(' - ')
+            queryset = queryset.filter(date__date__gte=datetime.strptime(start_date, '%d-%m-%Y'), date__date__lte=datetime.strptime(end_date, '%d-%m-%Y'))
 
         if page_size:
             self.pagination_class.page_size = int(page_size)

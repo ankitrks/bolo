@@ -20,7 +20,7 @@ from drf_spirit.models import SystemParameter
 
 def save_ad_data_in_redis(ad):
     print "setting data", 'ad:%s'%ad.id,  AdSerializer(ad).data
-    set_redis('ad:%s'%ad.id, AdSerializer(ad).data)
+    set_redis('ad:%s'%ad.id, AdSerializer(ad).data, False)
 
 
 def save_ad_data_in_redis_in_parallel(ad_ids):
@@ -74,6 +74,6 @@ def run():
         elif ad.get('frequency_type') == 'variable':
             ad_sequence_dict.setdefault(str(ad.get('scroll')), []).append(ad)
 
-    set_redis('ad:pool', ad_sequence_dict)
+    set_redis('ad:pool', ad_sequence_dict, False)
     save_ad_data_in_redis_in_parallel([ad.get('id') for ad in result])
     print json.dumps(ad_sequence_dict, indent=3)
