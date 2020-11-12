@@ -64,3 +64,10 @@ class PageNumberPaginationRemastered(PageNumberPagination):
             ('previous', self.get_previous_link()),
             ('data', data)
         ]))
+
+CTA_OPTIONS = {
+    'install_now': 'Install Now',
+    'learn_more': 'Learn More',
+    'shop_now': 'Shop Now',
+    'skip': 'Skip'
+}

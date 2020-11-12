@@ -86,8 +86,9 @@ frequency_type_options = (
 )
 
 AD_TYPE_CHOICES = (
-    ('install', 'Install'),
-    ('shop_now', 'Shop Now')
+    ('install_now', 'Install Now'),
+    ('shop_now', 'Shop Now'),
+    ('learn_more','Learn More')
 )
 
 class Ad(RecordTimeStamp):
@@ -201,16 +202,9 @@ class ProductReview(RecordTimeStamp):
     rating = models.DecimalField(max_digits=2, decimal_places=1)
     product = models.ForeignKey(Product, related_name='reviews', on_delete=models.CASCADE)
 
-CTA_OPTIONS = (
-    ('install_now', 'Install Now'),
-    ('learn_more', 'Learn More'),
-    ('shop_now', 'Shop Now'),
-    ('skip', 'Skip')
-)
-
 class CTA(models.Model):
     ad = models.ForeignKey(Ad, related_name='cta')
-    title = models.CharField(choices=ORDER_STATE_CHOICES, default="skip" ,max_length=200)
+    title = models.CharField(max_length=200)
     code = models.CharField(max_length=200)
     enable_time = models.PositiveIntegerField(null=True, blank=True)
     action = models.CharField(max_length=200, null=True, blank=True)

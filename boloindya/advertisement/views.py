@@ -205,7 +205,8 @@ class CityListAPIView(APIView):
 
 from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
-from .models import ProductCategory, Brand, Product, Frequency, CTA, AD_TYPE_CHOICES as ad_type_options, CTA_OPTIONS
+from .models import ProductCategory, Brand, Product, Frequency, CTA, AD_TYPE_CHOICES as ad_type_options
+from .utils import CTA_OPTIONS
 from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from rest_framework import status
@@ -313,7 +314,7 @@ def ad_creation_form(request):
         if request.method == 'GET':
             ad_type_options_values = []
             cta_options_values = []
-            for value1, value2 in CTA_OPTIONS:
+            for value1, value2 in CTA_OPTIONS.items():
                 if value1!='skip':
                     cta_options_values.append({'id':value1, 'value':value2})
             for value1, value2 in ad_type_options:
@@ -321,6 +322,7 @@ def ad_creation_form(request):
             return render(request,'advertisement/ad/new_ad_form.html', {'ad_type_options':ad_type_options_values,'cta_options': cta_options_values})
         elif request.method == 'POST':
             try:
+                print(request.POST)
                 s3_client = boto3.client('s3',aws_access_key_id = settings.BOLOINDYA_AWS_ACCESS_KEY_ID,aws_secret_access_key = settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY)
                 scrolls = request.POST.getlist('scrolls',None)
                 start_date = request.POST.get('start_date',None)
@@ -332,8 +334,9 @@ def ad_creation_form(request):
                 product_id = request.POST.get('product_id',None)
                 description = request.POST.get('description',None)
                 ad_type = request.POST.get('ad_type',None)
-                cta_type_1 = request.POST.getlist('cta_type_1',None)
-                cta_type_2 = request.POST.getlist('cta_type_2',None)
+                cta_type_1 = request.POST.get('cta_type_1',None)
+                cta_type_2 = request.POST.get('cta_type_2',None)
+                cta_type_1_text = request.POST.get('cta_type_1_text',None)
                 is_draft = request.POST.get('is_draft',None)
                 ad_video_file = request.FILES.get('video_file',None)
                 ad_video_file_link = request.POST.get('video_file_link',None)
@@ -357,7 +360,7 @@ def ad_creation_form(request):
                 if mrp and discount and float(mrp)<float(discount):
                     return HttpResponse(json.dumps({'message':'fail','reason':'Discount can not be more than mrp'}),content_type="application/json")
 
-                start_date = datetime.strptime(start_date, "%d-%m-%Y")
+                start_date = datetime.strptime(start_date, "%m/%d/%Y %I:%M %p")
                 is_draft = True if is_draft=='true' else False
                 state = "active"
                 if is_draft:
@@ -367,7 +370,7 @@ def ad_creation_form(request):
                 ad_dict['description'] = description
                 ad_dict['start_time'] = start_date
                 if end_date:
-                    ad_dict['end_time'] = datetime.strptime(end_date, "%d-%m-%Y")
+                    ad_dict['end_time'] = datetime.strptime(end_date, "%m/%d/%Y %I:%M %p")
                 else:
                     ad_dict['end_time'] = None
                 if toggler=='link' and ad_video_file_link:
@@ -402,20 +405,27 @@ def ad_creation_form(request):
                     if value:
                         Frequency(ad_id=ad_id,sequence=index+1,scroll=value).save()
                 #add cta
-                cta_options_values = {}
-                for value1, value2 in CTA_OPTIONS:
-                    cta_options_values[value1] = value2
-                for value in cta_type_1+cta_type_2:
+                cta_list = []
+                if cta_type_1:
+                    cta_list.append(cta_type_1)
+                if cta_type_2:
+                    cta_list.append(cta_type_2)
+                for value in cta_list:
                     action = None
-                    if value=="install_now":
-                        action = playstore_link
-                    elif value=="learn_more":
-                        action = website_link
-                    # title = cta_options_values[value]
-                    CTA(ad_id=ad_id, title=value, action=action).save()
+                    print(value)
+                    title = CTA_OPTIONS[value]
+                    if value!="skip":
+                        if cta_type_1_text:
+                            title = cta_type_1_text
+                        if value=="install_now":
+                            action = playstore_link
+                        elif value=="learn_more":
+                            action = website_link
+                    CTA(ad_id=ad_id, title=title, action=action, code=value).save()
 
                 return HttpResponse(json.dumps({'message':'success', 'ad_id':ad_id}),content_type="application/json")
             except Exception as e:
+                print(e)
                 return HttpResponse(json.dumps({'message':'fail','reason':str(e)}),content_type="application/json")
 
 
@@ -555,18 +565,14 @@ def particular_ad(request, ad_id=None):
     if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)) or request.user.is_staff:
         ad_type_options_values = []
         cta_options_values = []
-        for value1, value2 in CTA_OPTIONS:
+        for value1, value2 in CTA_OPTIONS.items():
             if value1!='skip':
                 cta_options_values.append({'id':value1, 'value':value2})
         for value1, value2 in ad_type_options:
             ad_type_options_values.append({'id':value1, 'value':value2})
         ad = Ad.objects.get(pk=ad_id)
-        # selected_ctas = list(ad.cta.all().values_list('title',flat=True))
-        # selected_ctas = list(map(str, selected_ctas))
-        selected_ctas = {}
-        for cta in ad.cta.all():
-            selected_ctas['value'] = cta.title
-        return render(request,'advertisement/ad/particular_ad.html', {'ad': ad, 'ad_type_options':ad_type_options_values,'cta_options': cta_options_values,'selected_cta':selected_ctas})
+        
+        return render(request,'advertisement/ad/particular_ad.html', {'ad': ad, 'ad_type_options':ad_type_options_values,'cta_options': cta_options_values})
     else:
         return JsonResponse({'error':'User Not Authorised','message':'fail' }, status=status.HTTP_200_OK)
 

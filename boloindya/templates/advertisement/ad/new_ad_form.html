@@ -106,7 +106,7 @@ ul li {
         <div class="form-group">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Ad Category:</label>
             <div class="col-md-8">
-                <select name="ad_type" required>
+                <select name="ad_type" id="ad_type" required>
                     <option value="" disabled selected>Select Ad Category</option>
                     {% for category in ad_type_options %}
                         <option value="{{ category.id }}">{{category.value}}</option>
@@ -135,20 +135,12 @@ ul li {
         </div>
         <div class="form-group">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">CTA 1:</label>
-            <div class="multiselect col-md-8">
-                <div class="selectBox" onclick="showCheckboxes()">
-                  <select>
-                    <option>Select an option</option>
-                  </select>
-                  <div class="overSelect"></div>
-                </div>
-                <div id="checkboxes">
-                    {% for cta in cta_options %}
-                        <label for="one">
-                        <input name="cta_type_1" type="checkbox" id="{{cta.id}}_cta" value={{cta.id}} />{{cta.value}}</label>
-                    {% endfor %}
-                </div>
-            </div>
+            <select name="cta_type_1" id="cta_type_1" required>
+                <option value="" disabled selected>Select CTA</option>
+            </select>
+            &nbsp;
+            <label for="name" >CTA Text:</label>
+            <input type="text" name="cta_type_1_text" placeholder="Enter CTA text" id="cta_type_1_text">
         </div>
         <div class="form-group">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">CTA 2:</label>
@@ -196,18 +188,15 @@ ul li {
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Start Date: </label>
             <div class="col-md-8">
                 <input type="text" id="start_date" name="start_date" placeholder="Start Date" class="filter_text" required>
+
             </div>
         </div>
         <div class="form-group">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">End Date: </label>
             <div class="col-md-3">
-                <input type="text" id="end_date" name="end_date" placeholder="End Date" class="filter_text">
-            </div>
-            <div class="form-group">
-                <label for="name" class="col-md-1 col-sm-3 col-xs-12 control-label">No End Date:</label>
-                <div class="col-md-1">
-                    <input type="checkbox" id="popup_end_date_checkbox" name="popup_end_date_checkbox">
-                </div>
+                <input type="text" id="end_date" name="end_date" placeholder="End Date" class="filter_text">&nbsp;&nbsp;
+                <input type="checkbox" id="popup_end_date_checkbox" name="popup_end_date_checkbox">
+                <label for="name" >No End Date</label>
             </div>
         </div>
         <div class="form-group">
@@ -250,10 +239,11 @@ ul li {
         <div class="form-group">
             <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
                 <button id="save" type="submit" class="btn btn-primary submit_from_button"> <span class="glyphicon glyphicon-floppy-save" style="margin-right:5px"></span>Save as Draft</button>
+                <button id="create" type="submit" class="btn btn-primary submit_from_button" style="margin-left:50px;"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Save & Publish</button>
             </div>
-            <div class="col-md-0 col-sm-1 col-xs-12" style="margin-bottom:10px;">
+            <!-- <div  style="margin-bottom:10px;">
                 <button id="create" type="submit" class="btn btn-primary submit_from_button"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Save & Publish</button>
-            </div>
+            </div> -->
         </div>
     </form>
     <div id="overlay">
@@ -266,6 +256,12 @@ ul li {
 {% endblock center_content %}
 {% block local_js %}
 
+<script src="https://code.jquery.com/ui/1.11.3/jquery-ui.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>                       
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/css/bootstrap-datetimepicker.min.css" />
 
 
 <script>
@@ -314,18 +310,19 @@ ul li {
         });
         $("#blk-"+$(this).val()).show();
     });
-    $(function() {
-        $("#start_date").
-            datepicker({
-                format: "dd-mm-yyyy"
-            });
-    });
-    $(function() {
-        $("#end_date").
-            datepicker({
-                format: "dd-mm-yyyy"
-            });
-    });
+    // $(function() {
+    //     $("#start_date").
+    //         datetimepicker({
+    //             format:'d.m.Y H:i',
+    //             inline:true,
+    //         });
+    // });
+    // $(function() {
+    //     $("#end_date").
+    //         datepicker({
+    //             format: "dd-mm-yyyy"
+    //         });
+    // });
  });
 });
 
@@ -341,31 +338,56 @@ function showCheckboxes() {
     expanded = false;
   }
 }
-$('#install_now_cta').change(function(){
-    if($(this).is(':checked')){
+$('#ad_type').on('change', function (e) {
+    var optionSelected = $("option:selected", this);
+    var valueSelected = this.value;
+    var textSelected = $("option:selected", this).text();
+    if (valueSelected.trim()=="install_now"){
         $('#blk-link-playstore').show();
-    } else {
-        $('#blk-link-playstore').hide();
-    }
-});
-$('#learn_more_cta').change(function(){
-    if($(this).is(':checked')){
-       $('#blk-link-website').show();
-    } else {
         $('#blk-link-website').hide();
-    }
-});
-$('#shop_now_cta').change(function(){
-    if($(this).is(':checked')){
-       $('#blk-link-product').show();
-    } else {
         $('#blk-link-product').hide();
+        $('#cta_type_1')
+        .empty()
+        .append('<option selected="selected" value="">Select CTA</option>')
+        .append($("<option></option>")
+                    .attr("value", "install_now")
+                    .text("Install Now"));
+        $('#cta_type_1')
+        .append($("<option></option>")
+                    .attr("value", "learn_more")
+                    .text("Learn More"));
+    }
+    else if(valueSelected.trim()=="learn_more"){
+        $('#blk-link-website').show();
+        $('#blk-link-playstore').hide();
+        $('#blk-link-product').hide();
+        $('#cta_type_1')
+        .empty()
+        .append('<option selected="selected" value="">Select CTA</option>')
+        .append($("<option></option>")
+                    .attr("value", "install_now")
+                    .text("Install Now"));
+         $('#cta_type_1')
+         .append($("<option></option>")
+                    .attr("value", "learn_more")
+                    .text("Learn More"));
+    }
+    else if(valueSelected.trim()=="shop_now"){
+        $('#blk-link-product').show();
+        $('#blk-link-playstore').hide();
+        $('#blk-link-website').hide();
+        $('#cta_type_1')
+        .empty()
+        .append('<option selected="selected" value="">Select CTA</option>')
+        .append($("<option></option>")
+                    .attr("value", "shop_now")
+                    .text("Shop Now"));
     }
 });
 $(function () {
     $("#popup_end_date_checkbox").click(function () {
         if ($(this).is(":checked")) {
-            $("#end_date").val('').datepicker("refresh");
+            $("#end_date").val('').datetimepicker("refresh");
             $("#end_date").prop("disabled", true);
         } else {
             $("#end_date").prop("disabled", false);
@@ -490,23 +512,15 @@ $('select').on('change', function (e) {
 });
 
 $(function() {
-        $("#start_date").
-            datepicker({
-                format: "dd-mm-yyyy",
-                startDate: new Date()
-            }).on("changeDate", function (selected) {
-                var minDate = new Date(selected.date.valueOf());
-                $("#end_date").datepicker('setStartDate', minDate);
-            }); 
-    });
-    $(function() {
-        $("#end_date").
-            datepicker({
-                format: "dd-mm-yyyy",
-                startDate: new Date()
-            }).on('changeDate', function (selected) {
-            var maxDate = new Date(selected.date.valueOf());
-            $('#start_date').datepicker('setEndDate', maxDate);
+        $('#start_date').datetimepicker();
+        $('#end_date').datetimepicker({
+          useCurrent: false //Important! See issue #1075
+        });
+        $("#start_date").on("dp.change", function(e) {
+          $('#end_date').data("DateTimePicker").minDate(e.date);
+        });
+        $("#end_date").on("dp.change", function(e) {
+          $('#start_date').data("DateTimePicker").maxDate(e.date);
         });
     });
 
@@ -536,7 +550,8 @@ function upload(event) {
         var data = new FormData($('#upload').get(0));
         data.append('brand_id', brand_id);
         data.append('product_id', product_id);
-        if ($('#shop_now_cta').is(':checked')){
+        var cta_type_1 = $("#cta_type_1 option:selected").val();
+        if (cta_type_1.trim()=="shop_now"){
             data.append('mrp',$('#mrp').val())
         }
         if (event.data.is_draft){
@@ -568,7 +583,7 @@ function upload(event) {
                 }, false);
                 return xhr;
             },
-            url: '/ad/create/',
+            url: '/ad/onboard/',
             type: 'POST',
             data: data,
             cache: false,
