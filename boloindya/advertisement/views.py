@@ -44,7 +44,7 @@ class ProductDetailAPIView(RetrieveAPIView):
 
 
 class JarvisAdViewset(ModelViewSet):
-    queryset = Ad.objects.all()
+    queryset = Ad.objects.filter(is_deleted=False)
     serializer_class = AdSerializer
     pagination_class = deepcopy(PageNumberPaginationRemastered)
 
@@ -71,7 +71,7 @@ class JarvisAdViewset(ModelViewSet):
             if section == 'ongoing':
                 queryset = queryset.filter(state='ongoing')
             elif section == 'upcoming':
-                queryset = queryset.filter(state__in=['active'], start_time__gte=datetime.now())
+                queryset = queryset.filter(state='active')
             elif section == 'history':
                 queryset = queryset.filter(state='completed')
             elif section == 'draft':

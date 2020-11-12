@@ -16,8 +16,12 @@ class UserSerializer(serializers.ModelSerializer):
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:
         model = Brand
-        fields = ('id', 'name', 'company_logo')
-
+        fields = ('id', 'name', 'company_logo', 'poc', 'phone_number', 'email', 
+                        'signed_contract_doc_file_url', 'signed_other_doc_file_url', 
+                        'signed_nda_doc_file_url')
+        read_only_fields = ('poc', 'phone_number', 'email', 
+                        'signed_contract_doc_file_url', 'signed_other_doc_file_url', 
+                        'signed_nda_doc_file_url')
 
 class AdSerializer(serializers.ModelSerializer):
     ad_id = serializers.IntegerField(source='id', read_only=True)
@@ -32,13 +36,12 @@ class AdSerializer(serializers.ModelSerializer):
     start_date = serializers.SerializerMethodField(read_only=True)
     end_date = serializers.SerializerMethodField(read_only=True)
     frequency = serializers.SerializerMethodField(read_only=True)
-    state = serializers.SerializerMethodField()
 
     class Meta:
         model = Ad
         fields = ('ad_id', 'brand_name', 'brand_image', 'ad_video', 'thumbnail', 'ad_length', 'cta', 'type', 
                     'title', 'start_date', 'end_date', 'frequency', 'frequency_type', 'product_id', 'product_name', 
-                    'price', 'ad_type', 'state')
+                    'price', 'ad_type', 'state', 'is_deleted')
 
     def get_cta(self, instance):
         return list(instance.cta.all().values('title', 'code', 'enable_time', 'action'))
@@ -55,10 +58,7 @@ class AdSerializer(serializers.ModelSerializer):
     def get_frequency(self, instance):
         return list(instance.frequency.all().values('scroll', 'sequence'))
 
-    def get_state(self, instance):
-        if instance.state == 'active' and instance.start_time >= datetime.now():
-            return 'upcoming'
-        return instance.state
+
 
 class ProductSerializer(serializers.ModelSerializer):
     product_images = serializers.SerializerMethodField()
