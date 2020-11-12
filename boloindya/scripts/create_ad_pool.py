@@ -2,6 +2,7 @@
 import os
 import sys
 import json
+from datetime import datetime
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
 sys.path.append( '/'.join(os.path.realpath(__file__).split('/')[:5]) )
@@ -19,7 +20,7 @@ from drf_spirit.models import SystemParameter
 
 def save_ad_data_in_redis(ad):
     print "setting data", 'ad:%s'%ad.id,  AdSerializer(ad).data
-    set_redis('ad:%s'%ad.id, AdSerializer(ad).data)
+    set_redis('ad:%s'%ad.id, AdSerializer(ad).data, False)
 
 
 def save_ad_data_in_redis_in_parallel(ad_ids):
@@ -45,13 +46,19 @@ def run():
     cursor = connections['default'].cursor()
     ad_sequence_dict = {}
     max_scroll = 20
+    now = datetime.now()
+
+    Ad.objects.filter(start_time__lte=now, end_time__gte=now)\
+                .exclude(state__in=['completed', 'ongoing', 'inactive'], is_deleted=True)\
+                .update(state='ongoing')
+
+    Ad.objects.filter(end_time__lte=now).exclude(state__in=['completed'], is_deleted=True).update(state='completed')
 
     cursor.execute("""
         SELECT ad.title, ad.id, ad.frequency_type, freq.sequence, freq.scroll
         FROM advertisement_ad ad
         INNER JOIN advertisement_frequency freq on freq.ad_id = ad.id
-        WHERE 
-            now() BETWEEN start_time AND end_time AND state = 'active'
+        WHERE  state = 'ongoing'
     """)
     result = dictfetchall(cursor)
 
@@ -67,6 +74,6 @@ def run():
         elif ad.get('frequency_type') == 'variable':
             ad_sequence_dict.setdefault(str(ad.get('scroll')), []).append(ad)
 
-    set_redis('ad:pool', ad_sequence_dict)
+    set_redis('ad:pool', ad_sequence_dict, False)
     save_ad_data_in_redis_in_parallel([ad.get('id') for ad in result])
     print json.dumps(ad_sequence_dict, indent=3)

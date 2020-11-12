@@ -4775,8 +4775,6 @@ class PopularVideoBytesV2(PopularVideoBytes):
             }, status=status.HTTP_200_OK) 
 
     def infuse_ads(self, ads, popular_posts):
-        popular_posts = [{'id': 1}, {'id':2}, {'id':3}, {'id':4}, {'id':5}, {'id':6}, {'id':7}, {'id':8}, {'id':9}, {'id':10}, {'id':11}, 
-                            {'id':12}, {'id':13}, {'id':14}, {'id':15}]
         post_count = 0
         sequence = (int(self.request.GET.get('page', 1)) - 1) * settings.REST_FRAMEWORK.get('PAGE_SIZE')
         ad_infused_posts = []

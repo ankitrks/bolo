@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 from rest_framework import serializers
 
-from advertisement.models import Ad, ProductReview, Order, Product, Address, OrderLine, Brand
+from advertisement.models import Ad, ProductReview, Order, Product, Address, OrderLine, Brand, Tax
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -31,8 +31,8 @@ class AdSerializer(serializers.ModelSerializer):
     cta = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
     product_name = serializers.CharField(source='product.name', read_only=True)
-    product_id = serializers.CharField(source='product.id', read_only=True)
-    price = serializers.CharField(source='product.final_amount', read_only=True)
+    product_id = serializers.IntegerField(source='product.id', read_only=True)
+    price = serializers.FloatField(source='product.final_amount', read_only=True)
     start_date = serializers.SerializerMethodField(read_only=True)
     end_date = serializers.SerializerMethodField(read_only=True)
     frequency = serializers.SerializerMethodField(read_only=True)
@@ -53,28 +53,32 @@ class AdSerializer(serializers.ModelSerializer):
         return datetime.strftime(instance.start_time, '%d-%m-%Y')
 
     def get_end_date(self, instance):
-        return datetime.strftime(instance.end_time, '%d-%m-%Y')
+        if instance.end_time:
+            return datetime.strftime(instance.end_time, '%d-%m-%Y')
 
     def get_frequency(self, instance):
         return list(instance.frequency.all().values('scroll', 'sequence'))
 
 
+class TaxSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tax
+        fields = ('name', 'percentage')
 
 class ProductSerializer(serializers.ModelSerializer):
     product_images = serializers.SerializerMethodField()
     product_id = serializers.CharField(source='id', read_only=True)
     product_title = serializers.CharField(source='name', read_only=True)
     product_description = serializers.CharField(source='description', read_only=True)
-    discounted_price = serializers.SerializerMethodField()
-    mrp = serializers.SerializerMethodField()
     rating_count = serializers.SerializerMethodField()
     discount_expiry = serializers.SerializerMethodField()
     brand = BrandSerializer()
+    tax = TaxSerializer(source='taxes', many=True)
 
     class Meta:
         model = Product
         fields = ('product_id', 'product_title', 'product_description', 'product_images', 'rating_count', 'rating',
-                    'currency', 'mrp', 'is_discounted', 'discounted_price', 'discount_expiry', 'brand')
+                    'currency', 'mrp', 'is_discounted', 'discounted_price', 'discount_expiry', 'brand', 'tax', 'base_amount')
 
     def get_product_images(self, instance):
         return list(instance.images.all().values_list('compressed_image', flat=True))
@@ -82,24 +86,37 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_rating_count(self, instance):
         return intcomma(instance.rating_count)
 
-    def get_mrp(self, instance):
-        return "Rs %s"%instance.mrp
-
-    def get_discounted_price(self, instance):
-        return "Rs %s"%instance.discounted_price
-
     def get_discount_expiry(self, instance):
         if instance.discount_expiry:
             return datetime.strftime(instance.discount_expiry, "%d-%m-%y %H:%M:%S")
         return ''
 
+    def to_representation(self, instance):
+        data = super(ProductSerializer, self).to_representation(instance)
+        data.update({
+            'rating': float(instance.rating),
+            'mrp': float(instance.mrp),
+            'discounted_price': float(instance.discounted_price)
+        })
+        tax = data.get('tax')
+        for t in data.get('tax'):
+            t['value'] = instance.get_tax_value(t.get('percentage'))
+        return data
+
 
 class ReviewSerializer(serializers.ModelSerializer):
-    review_id = serializers.CharField(source='id', read_only=True)
+    review_id = serializers.IntegerField(source='id', read_only=True)
 
     class Meta:
         model = ProductReview
         fields = ('review_id', 'title', 'description', 'rating')
+
+    def to_representation(self, instance):
+        data = super(ReviewSerializer, self).to_representation(instance)
+        data.update({
+            'rating': float(instance.rating),
+        })
+        return data
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -114,17 +131,23 @@ class AddressSerializer(serializers.ModelSerializer):
 
 
 class OrderLineSerializer(serializers.ModelSerializer):
-    product = ProductSerializer()
     class Meta:
         model = OrderLine
         fields = ['product', 'quantity', 'amount']
         read_only_fields = ['amount']
 
+    def to_representation(self, instance):
+        data = super(OrderLineSerializer, self).to_representation(instance)
+        data.update({
+            'product': ProductSerializer(instance.product).data,
+        })
+        return data
+
 
 class OrderSerializer(serializers.ModelSerializer):
     lines = OrderLineSerializer(many=True)
     shipping_address = AddressSerializer()
-    user = UserSerializer()
+    user = UserSerializer(read_only=True)
     date = serializers.SerializerMethodField()
 
     class Meta:
@@ -175,6 +198,7 @@ class OrderSerializer(serializers.ModelSerializer):
         line.save()
 
         instance.amount = line.product.final_amount * line.quantity
+        instance.payment_gateway_order_id = None
         
         return instance
 

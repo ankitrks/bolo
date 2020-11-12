@@ -192,11 +192,11 @@
                     </div>
                     <div class="col-sm-4">
                         <div class="">
-                            <button class="btn" />Pause</button>
-                            <button class="btn" />Restart</button>
-                            <button class="btn" />Start</button>
-                            <button class="btn" />Go Live</button>
-                            <button class="btn" />Del</button>
+                            <button class="btn" >Pause</button>
+                            <button class="btn" >Restart</button>
+                            <button class="btn" >Start</button>
+                            <button class="btn" >Go Live</button>
+                            <button class="btn" >Del</button>
                         </div>
                     </div>
                     <div class="col-sm-4">
@@ -339,8 +339,8 @@ $("#adTable").jsGrid({
         { title: "Sr. No.", name: "ad_id", type: "number", width: 30, align: "center", filtering: false},
         { title: "Brand ID", name: "brand_id", type: "text", align: "center", width: 40, filtering: false},
         { title: "Brand Name", name: "brand_name", type: "text", align: "center"},
-        { title: "Start Date", name: "start_date", type: "text", width: 60, align: "center", filtering: false},
-        { title: "End Date", name: "end_date", type: "text", width: 60, align: "center", filtering: false},
+        { title: "Start Date", name: "start_date", type: "text", width: 60, align: "center", css: "date-field"},
+        { title: "End Date", name: "end_date", type: "text", width: 60, align: "center", css: "date-field"},
         { title: "Frequency", name: "frequency", type: "renderer", rendererFunction: function(value, data){
             let html= `<div class='.freq-popover-width' style='margin-width: 300px'>`
             if(data.frequency.length == 0)
@@ -389,6 +389,7 @@ $("#adTable").jsGrid({
                 return 'Action'
             },  
             itemTemplate: function(value, item){
+                console.log("here", value,item)
                 if(item.state=='ongoing' ) {
                     return `
                         <span>
@@ -424,6 +425,9 @@ $("#adTable").jsGrid({
                     `
                 }
             }, 
+            filterTemplate: function() {
+                return "<button class='btn' id='filterResult'>Filter</button>";
+            },
         width: 100, align: "center"},
     ],
     rowClass: function (item, itemIndex){
@@ -483,6 +487,9 @@ $("#adTable").jsGrid({
             })
         }
         $('[data-toggle="popover"]').popover({html: true, container: 'body', width: '300px'})
+        $('.date-field').find('input').datepicker({
+            format: 'dd-mm-yyyy',
+        });
     }
 });
 
@@ -504,6 +511,10 @@ let updateAd = function(adId, data){
 $('#search-btn').click(function(){
     grid.reset()
 });
+
+$(document).on('click', "button#filterResult", function(){
+    grid.reset()
+})
 
 $(document).on('click', '.frequency-element', function(){
     console.log("elemetn clicked", $(this).attr('data-modalbody'))

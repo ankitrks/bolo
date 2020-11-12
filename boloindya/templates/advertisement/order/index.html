@@ -68,7 +68,9 @@
                         <div class="input-group">
                             <input type="text" name="q" class="form-control" placeholder="Search by Name, Phone No, Email ID">
                             <span class="input-group-btn">
-                                <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
+                                <button type="submit" name="search" id="search-btn" class="btn btn-flat" style="margin-right: 10px;"><i class="fa fa-search"></i>
+                                </button>
+                                <button id="filter-btn" class="btn btn-flat" style="margin-left: 10px;"><i class="glyphicon glyphicon-filter"></i>
                                 </button>
                             </span>
                         </div>
@@ -139,8 +141,8 @@ $("#userOrderTable").jsGrid({
                 return item.shipping_address.address1 + ', ' + item.shipping_address.address2
             }
         },
-        { title: "Order Date", name: "date", type: "text", width: 60, align: "center"},
-        { title: "Order Amount", name: "amount", type: "number", align: "center", width: 40},
+        { title: "Order Date", name: "date", type: "text", width: 60, align: "center", css: "daterange-field"},
+        { title: "Order Amount", name: "amount", type: "number", align: "center", width: 40, css: 'range-field'},
         { title: "Product Detail", name: "lines.0.product.product_title", type: "text", align: "center", filtering: false},
     ],
     controller: {
@@ -160,6 +162,17 @@ $("#userOrderTable").jsGrid({
         },
         
     },
+    onDataLoaded: function(gridInstance){
+        $('.daterange-field').find('input').daterangepicker({
+            locale: {
+                format: 'DD-MM-YYYY'
+            }
+        });
+        $('.range-field').find('input').after(`<div class="slidecontainer">
+                                    <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+                                </div>`)
+        
+    }
 });
 
 let grid = $("#userOrderTable").data("JSGrid");
@@ -169,6 +182,10 @@ $('#search-btn').click(function(){
 });
 
 $(document).on('change', '#pageSize', function(){
+    grid.reset()
+})
+
+$(document).on('click', '#filter-btn', function(){
     grid.reset()
 })
 
