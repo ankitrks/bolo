@@ -142,7 +142,7 @@ $("#userOrderTable").jsGrid({
             }
         },
         { title: "Order Date", name: "date", type: "text", width: 60, align: "center", css: "daterange-field"},
-        { title: "Order Amount", name: "amount", type: "number", align: "center", width: 40},
+        { title: "Order Amount", name: "amount", type: "number", align: "center", width: 40, css: 'range-field'},
         { title: "Product Detail", name: "lines.0.product.product_title", type: "text", align: "center", filtering: false},
     ],
     controller: {
@@ -168,6 +168,10 @@ $("#userOrderTable").jsGrid({
                 format: 'DD-MM-YYYY'
             }
         });
+        $('.range-field').find('input').after(`<div class="slidecontainer">
+                                    <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+                                </div>`)
+        
     }
 });
 

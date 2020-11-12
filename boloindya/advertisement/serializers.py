@@ -131,17 +131,23 @@ class AddressSerializer(serializers.ModelSerializer):
 
 
 class OrderLineSerializer(serializers.ModelSerializer):
-    product = ProductSerializer()
     class Meta:
         model = OrderLine
         fields = ['product', 'quantity', 'amount']
         read_only_fields = ['amount']
 
+    def to_representation(self, instance):
+        data = super(OrderLineSerializer, self).to_representation(instance)
+        data.update({
+            'product': ProductSerializer(instance.product).data,
+        })
+        return data
+
 
 class OrderSerializer(serializers.ModelSerializer):
     lines = OrderLineSerializer(many=True)
     shipping_address = AddressSerializer()
-    user = UserSerializer()
+    user = UserSerializer(read_only=True)
     date = serializers.SerializerMethodField()
 
     class Meta:
@@ -192,6 +198,7 @@ class OrderSerializer(serializers.ModelSerializer):
         line.save()
 
         instance.amount = line.product.final_amount * line.quantity
+        instance.payment_gateway_order_id = None
         
         return instance
 
