@@ -424,7 +424,7 @@ def ad_creation_form(request):
 
                 start_date = datetime.strptime(start_date, "%m/%d/%Y %I:%M %p")
                 is_draft = True if is_draft=='true' else False
-                state = "active"
+                state = None
                 if is_draft:
                     state = "draft"
                 ad_dict = {}
@@ -446,7 +446,6 @@ def ad_creation_form(request):
                     ad_dict['product_id'] = product_id
                 else:
                     ad_dict['product_id'] = None
-                ad_dict['state'] = state
                 if ad_video_file:
                     ad_folder_key_url = upload_media(s3_client, ad_video_file, ad_folder_key)
                     if not ad_folder_key_url:
@@ -454,9 +453,14 @@ def ad_creation_form(request):
                     else:
                         ad_dict['video_file_url'] = ad_folder_key_url
                 if not ad_id:
+                    if not state:
+                        state = "active"
+                    ad_dict['state'] = state
                     ad_obj = Ad.objects.create(**ad_dict)
                     ad_id = ad_obj.id
                 else:
+                    if state:
+                        ad_dict['state'] = state
                     ad_obj = Ad.objects.filter(id=ad_id)
                     ad_obj.update(**ad_dict)
                     ad_obj[0].cta.all().delete()
