@@ -221,6 +221,9 @@ class Order(RecordTimeStamp):
     payment_method = models.CharField(choices=PAYMENT_METHOD_CHOICES, max_length=20, null=True, blank=True)
     order_number = models.CharField(max_length=30, null=True, blank=True)
 
+    @property
+    def amount_including_tax(self):
+        return sum([line.product.amount_including_tax * line.quantity for line in self.lines.all()])
 
 class OrderLine(models.Model):
     order = models.ForeignKey(Order, related_name='lines', on_delete=models.CASCADE)

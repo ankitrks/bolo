@@ -4776,15 +4776,16 @@ class PopularVideoBytesV2(PopularVideoBytes):
 
     def infuse_ads(self, ads, popular_posts):
         post_count = 0
+        popular_posts = [{'id': '1'}, {'id': '1'}, {'id': '1'}, {'id': '1'}, {'id': '1'}]
         sequence = (int(self.request.GET.get('page', 1)) - 1) * settings.REST_FRAMEWORK.get('PAGE_SIZE')
         ad_infused_posts = []
 
         while post_count < len(popular_posts):
             if ads.get(str(sequence + post_count)):
                 ad_infused_posts.append(ads.get(str(sequence + post_count)))
-            else:
-                ad_infused_posts.append(popular_posts[post_count])
-                post_count += 1
+    
+            ad_infused_posts.append(popular_posts[post_count])
+            post_count += 1
 
         return ad_infused_posts
 
