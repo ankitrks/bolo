@@ -1,6 +1,6 @@
 import requests
 import json
-
+from datetime import datetime
 from paytmchecksum import PaytmChecksum
 
 from django.conf import settings
@@ -29,6 +29,7 @@ def generate_order_id():
 
 def paytm_api_request(path, post_data, x_checksum):
     url = BASE_URL + path
+    print "url", url, post_data, MID
     return requests.post(url,  data=post_data, 
                         headers={
                             "Content-type": "application/json", 
@@ -71,7 +72,7 @@ def account_transfer(orderId, beneficiaryAccount, beneficiaryIFSC, amount):
         "beneficiaryIFSC"    : beneficiaryIFSC,
         "amount"             : amount,
         "purpose"            : "SALARY_DISBURSEMENT",
-        "date"               : datetime.now().strptime('%Y-%m-%d'),
+        "date"               : datetime.strftime(datetime.now(),'%Y-%m-%d'),
         "transferMode"       : "IMPS"
     }
     post_data = json.dumps(paytmParams)
