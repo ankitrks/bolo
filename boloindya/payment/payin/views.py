@@ -13,6 +13,7 @@ from payment.helpers import get_user_info, get_booking_info, update_booking_paym
 
 razorpay_credentials = settings.RAZORPAY
 
+"""
 class RazorpayPaymentView(TemplateView):
     template_name = 'payment/payin/booking_payment.html'
 
@@ -72,7 +73,7 @@ class RazorpayPaymentView(RedirectView):
         import urllib
         params = urllib.urlencode(context)
         return settings.CA_DOMAIN + '/boloindya/payment_status/?' + params
-"""
+
 
 class RazorpayCallbackView(TemplateView):
     template_name = 'payment/payin/payment_success.html'
