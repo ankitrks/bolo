@@ -203,6 +203,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
         instance.amount = line.product.final_amount * line.quantity
         instance.payment_gateway_order_id = None
+        instance.save()
         
         return instance
 

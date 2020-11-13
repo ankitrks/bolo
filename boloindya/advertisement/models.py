@@ -92,7 +92,7 @@ class Product(RecordTimeStamp):
     @property
     def total_tax(self):
         base_amount = self.final_amount
-        return sum([base_amount * float(tax.percentage) for tax in self.taxes.all()])
+        return sum([base_amount * float(tax.percentage)/100.0 for tax in self.taxes.all()])
 
 
     def get_tax_value(self, percentage):
