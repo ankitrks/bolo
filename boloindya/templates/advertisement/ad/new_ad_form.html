@@ -145,7 +145,7 @@ ul li {
         <div class="form-group">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">CTA 2:</label>
             <div class="col-md-8">
-                <select name="cta_type_2" required>
+                <select name="cta_type_2" id="cta_type_2" required>
                     <option value="" disabled selected>Select CTA</option>
                     <option value="skip"> Skip</option>
                 </select>
@@ -256,7 +256,7 @@ ul li {
 {% endblock center_content %}
 {% block local_js %}
 
-<script src="https://code.jquery.com/ui/1.11.3/jquery-ui.js"></script>
+<script src="htmltps://code.jquery.com/ui/1.11.3/jquery-ui.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>                       
@@ -540,7 +540,20 @@ function upload(event) {
             return false;
         }
     }
-
+    if (!$("#cta_type_1").val()){
+            alert("select cta type 1");
+            return false;
+        }
+    console.log("test")
+    console.log($("#cta_type_2").val())
+    if (!$("#cta_type_2").val()){
+        alert("select cta type 2");
+        return false;
+    }
+    if (!$("#ad_type").val()){
+         alert("Please select Ad Category");
+         return false;
+    }
     if ($('.submit_from_button').hasClass("opened")) {
         return false;
     } else {
