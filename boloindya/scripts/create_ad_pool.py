@@ -24,13 +24,14 @@ def save_ad_data_in_redis(ad):
 
 
 def save_ad_data_in_redis_in_parallel(ad_ids):
-    pool = Pool(processes=8)
+    # pool = Pool(processes=8)
 
     for ad in Ad.objects.filter(id__in=ad_ids):
-        pool.apply_async(save_ad_data_in_redis, args=(ad,))
+        # pool.apply_async(save_ad_data_in_redis, args=(ad,))
+        save_ad_data_in_redis(ad)
 
-    pool.close()
-    pool.join()
+    # pool.close()
+    # pool.join()
 
 
 def dictfetchall(cursor):
@@ -48,17 +49,17 @@ def run():
     max_scroll = 20
     now = datetime.now()
 
-    Ad.objects.filter(start_time__lte=now, end_time__gte=now)\
-                .exclude(state__in=['completed', 'ongoing', 'inactive'], is_deleted=True)\
-                .update(state='ongoing')
+    #Ad.objects.filter(start_time__lte=now, end_time__gte=now)\
+    #            .exclude(state__in=['completed', 'ongoing', 'inactive'], is_deleted=True)\
+    #            .update(state='ongoing')
 
-    Ad.objects.filter(end_time__lte=now).exclude(state__in=['completed'], is_deleted=True).update(state='completed')
+    #Ad.objects.filter(end_time__lte=now).exclude(state__in=['completed'], is_deleted=True).update(state='completed')
 
     cursor.execute("""
         SELECT ad.title, ad.id, ad.frequency_type, freq.sequence, freq.scroll
         FROM advertisement_ad ad
         INNER JOIN advertisement_frequency freq on freq.ad_id = ad.id
-        WHERE  state = 'ongoing'
+        WHERE  state = 'ongoing' and not is_deleted
     """)
     result = dictfetchall(cursor)
 

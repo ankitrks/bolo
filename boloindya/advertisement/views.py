@@ -157,6 +157,12 @@ class ReviewListAPIView(ListAPIView):
     queryset = ProductReview.objects.all()
     serializer_class = ReviewSerializer
 
+    def get_queryset(self):
+        if self.request.parser_context.get('kwargs', {}).get('product_id'):
+            return self.queryset.filter(beneficiary_id=self.request.parser_context.get('kwargs', {}).get('product_id'))
+
+        return []
+
 
 # class OrderListCreateAPIView(ListCreateAPIView):
 #     queryset = Order.objects.all()

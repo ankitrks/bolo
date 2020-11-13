@@ -107,6 +107,7 @@ class RazorpayCallbackView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(RazorpayCallbackView, self).get_context_data(**kwargs)
         context["booking_deeplink_url"] = "https://" + self.request.META.get('HTTP_HOST') + "/bookings/"
+        context["order_deeplink_url"] = "https://" + self.request.META.get('HTTP_HOST') + "/orders/"
         return context
     
     def get_template_names(self):
