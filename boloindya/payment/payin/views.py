@@ -97,6 +97,7 @@ class RazorpayCallbackView(TemplateView):
             elif self.request.GET.get('type') == 'order':
                 update_ad_order_payment_status(data.get('razorpay_order_id'), 'success', data.get('razorpay_payment_id'))
         else:
+            data = data.get('error[metadata]')
             if self.request.GET.get('type') == 'booking':
                 update_booking_payment_status(data.get('razorpay_order_id'), 'failed', data.get('razorpay_payment_id'))
             elif self.request.GET.get('type') == 'order':
@@ -125,7 +126,7 @@ class RazorpayCallbackView(TemplateView):
 class RazorpayWebhookView(TemplateView):
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
-        return super(RazorpayCallbackView, self).dispatch(*args, **kwargs)
+        return super(RazorpayWebhookView, self).dispatch(*args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         print "request get data", request.GET
