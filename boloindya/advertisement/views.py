@@ -16,6 +16,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.test import APIClient
+from rest_framework.pagination import PageNumberPagination
 
 from dynamodb_api import create as dynamodb_create
 from redis_utils import get_redis
@@ -30,12 +31,12 @@ from advertisement.serializers import (AdSerializer, ReviewSerializer, OrderSeri
 
 
 class AdDetailAPIView(RetrieveAPIView):
-    queryset = Ad.objects.filter(state='active')
+    queryset = Ad.objects.filter(is_deleted=False)
     serializer_class = AdSerializer
 
 
 class ProductDetailAPIView(RetrieveAPIView):
-    queryset = Ad.objects.filter(state='active')
+    queryset = Ad.objects.filter(is_deleted=False)
     serializer_class = ProductSerializer    
 
     def get_object(self):
@@ -44,7 +45,7 @@ class ProductDetailAPIView(RetrieveAPIView):
 
 
 class JarvisAdViewset(ModelViewSet):
-    queryset = Ad.objects.all()
+    queryset = Ad.objects.filter(is_deleted=False)
     serializer_class = AdSerializer
     pagination_class = deepcopy(PageNumberPaginationRemastered)
 
@@ -55,6 +56,8 @@ class JarvisAdViewset(ModelViewSet):
         brand_name = self.request.query_params.get('brand_name')
         product_name = self.request.query_params.get('product_name')
         section = self.request.query_params.get('section')
+        start_date = self.request.query_params.get('start_date')
+        end_date = self.request.query_params.get('end_date')
 
         if q:
             try:
@@ -71,11 +74,16 @@ class JarvisAdViewset(ModelViewSet):
             if section == 'ongoing':
                 queryset = queryset.filter(state='ongoing')
             elif section == 'upcoming':
-                queryset = queryset.filter(state__in=['active'], start_time__gte=datetime.now())
+                queryset = queryset.filter(state='active')
             elif section == 'history':
                 queryset = queryset.filter(state='completed')
             elif section == 'draft':
                 queryset = queryset.filter(state='draft')
+
+        if start_date:
+            queryset = queryset.filter(start_time__date__gte=datetime.strptime(start_date, '%d-%m-%Y'))
+        if end_date:
+            queryset = queryset.filter(end_time__date__lte=datetime.strptime(end_date, '%d-%m-%Y'))
             
 
         if page_size:
@@ -102,7 +110,8 @@ class JarvisOrderViewset(ModelViewSet):
 
 
         if order_date:
-            queryset = queryset.filter(date__date=order_date)
+            start_date, end_date = order_date.split(' - ')
+            queryset = queryset.filter(date__date__gte=datetime.strptime(start_date, '%d-%m-%Y'), date__date__lte=datetime.strptime(end_date, '%d-%m-%Y'))
 
         if page_size:
             self.pagination_class.page_size = int(page_size)
@@ -138,12 +147,14 @@ class JarvisProductViewset(ModelViewSet):
 
 class ReviewListAPIView(ListAPIView):
     queryset = ProductReview.objects.all()
+    serializer_class = ReviewSerializer
 
 
 class OrderListCreateAPIView(ListCreateAPIView):
     queryset = Order.objects.all()
     queryset = ProductReview.objects.all()
     serializer_class = ReviewSerializer
+    pagination_class = PageNumberPagination
 
     def get_queryset(self):
         product_id = self.request.parser_context.get('kwargs', {}).get('product_id')
@@ -192,16 +203,39 @@ class OrderCreateAPIView(APIView):
         }
 
         if request_data.get('order_id'):
-            order = client.patch('/api/v1/ad/order/%s/'%request_data.pop('order_id'), order_data, HTTP_AUTHORIZATION=request_meta.get('HTTP_AUTHORIZATION'), format='json').json()
+            response = client.patch('/api/v1/ad/order/%s/'%request_data.pop('order_id'), order_data, HTTP_AUTHORIZATION=request_meta.get('HTTP_AUTHORIZATION'), format='json')
         else:
-            order = client.post('/api/v1/ad/order/', order_data, HTTP_AUTHORIZATION=request_meta.get('HTTP_AUTHORIZATION'), format='json').json()
-        return Response(order, status=status.HTTP_201_CREATED)
+            response = client.post('/api/v1/ad/order/', order_data, HTTP_AUTHORIZATION=request_meta.get('HTTP_AUTHORIZATION'), format='json')
+        return Response(response.json(), status=response.status_code)
 
 
 
 class CityListAPIView(APIView):
     def get(self, request, *args, **kwargs):
-        return {}
+        state = {}
+
+        for row in query_fetch_data("""
+                        select state.id as state_id, state.name as state, city.id as city_id, city.name as city
+                        from advertisement_city city
+                        inner join advertisement_state state on state.id = city.state_id
+                    """):
+            state_id = row.get('state_id')
+            if not state.get(state_id):
+                state[state_id] = {
+                    'state_id': state_id,
+                    'state': row.get('state'),
+                    'cities': [{
+                        'city': row.get('city'),
+                        'city_id': row.get('city_id')
+                    }]
+                }
+            else:
+                state[state_id]['cities'].append({
+                    'city': row.get('city'),
+                    'city_id': row.get('city_id')
+                })
+
+        return Response({'results': state.values()}, status=200)
 
 from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
@@ -598,6 +632,10 @@ class GetAdForUserAPIView(APIView):
         params = request.query_params
         user_ad = {}
         ad_pool = get_redis('ad:pool')
+
+        if not ad_pool:
+            return Response({'results': {}})
+
         next_position = 0
 
         for scroll in sorted(map(int, ad_pool.keys())):

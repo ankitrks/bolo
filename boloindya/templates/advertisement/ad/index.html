@@ -15,7 +15,40 @@
         .draftAd{
             background-color: #737373 !important
         }
+        .download-icon{
+            font-size: 24px;
+            padding-top: 3px;
+        }
+        .popover{
+            max-width: 100%
+        }
+        .frequency-border{
+            border-width: 1px;
+            border-style: solid;
+            text-align: center
+        }.
+        .freq-popover-width{
+            width: 300px
+        }
+        .video-popover-body{
+            height: 320px;
+            width: 480px;
+            position: fixed;
+            left: 600px;
+            top: 200px;
+            background-color: black;
+            z-index: 10;
+            display: none
+        }
+        .video-popover-body .close{
+            color: white;
+            padding-right: 5px;
+            opacity: 0.8
+        }
     </style>
+    <style>
+
+</style>
 {% endblock local_css %}
 
 {% block center_content %}
@@ -31,7 +64,7 @@
                         <div class="small-box bg-aqua">
                             <div class="inner">
                                 <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
-                                <p class="section-name">Ongoing Ad (Current)</p>
+                                <p class="section-name">Ongoing Ad</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-bag"></i>
@@ -42,7 +75,7 @@
                         <div class="small-box bg-green">
                             <div class="inner">
                                 <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
-                                <p class="section-name">Upcoming Ad (Current)</p>
+                                <p class="section-name">Upcoming Ad</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-stats-bars"></i>
@@ -53,7 +86,7 @@
                         <div class="small-box bg-yellow">
                             <div class="inner">
                                 <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
-                                <p class="section-name">Added to draft (all)</p>
+                                <p class="section-name">Added to draft</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-person-add"></i>
@@ -64,7 +97,7 @@
                         <div class="small-box bg-red">
                             <div class="inner">
                                 <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
-                                <p class="section-name">Onboarded Products (Live)</p>
+                                <p class="section-name">Onboarded Products</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-pie-graph"></i>
@@ -75,7 +108,7 @@
                         <div class="small-box bg-aqua">
                             <div class="inner">
                                 <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
-                                <p class="section-name">Impressions (Date)</p>
+                                <p class="section-name">Impressions</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-bag"></i>
@@ -86,7 +119,7 @@
                         <div class="small-box bg-green">
                             <div class="inner">
                                 <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
-                                <p class="section-name">No. of skips (Date)</p>
+                                <p class="section-name">No. of skips</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-stats-bars"></i>
@@ -97,7 +130,7 @@
                         <div class="small-box bg-yellow">
                             <div class="inner">
                                 <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
-                                <p class="section-name">Install clicks (Date)</p>
+                                <p class="section-name">Install clicks</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-person-add"></i>
@@ -108,7 +141,7 @@
                         <div class="small-box bg-red">
                             <div class="inner">
                                 <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
-                                <p class="section-name">Shop Now clicks (Date)</p>
+                                <p class="section-name">Shop Now clicks</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-pie-graph"></i>
@@ -119,7 +152,7 @@
                         <div class="small-box bg-aqua">
                             <div class="inner">
                                 <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
-                                <p class="section-name">Onboarded Brands (Live)</p>
+                                <p class="section-name">Onboarded Brands</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-bag"></i>
@@ -130,7 +163,7 @@
                         <div class="small-box bg-green">
                             <div class="inner">
                                 <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
-                                <p class="section-name">Learn More (Date)</p>
+                                <p class="section-name">Learn More</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-stats-bars"></i>
@@ -146,14 +179,11 @@
 <div class="row">
     <div class="col-sm-12"  style="margin-left: 10px">
         <div class="box">
-            <div class="box-header with-border">
-                <h3 class="box-title">Ad</h3>
-            </div>
             <div class="box-body">
                 <div class="row" style="margin-bottom: 10px">
-                    <div class="col-sm-3">
+                    <div class="col-sm-4">
                         <div class="input-group">
-                            <input type="text" name="q" class="form-control" placeholder="Search...">
+                            <input type="text" name="q" class="form-control" placeholder="Search by Brand Id, Product ID, Brand Name, Product Name">
                             <span class="input-group-btn">
                                 <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
                                 </button>
@@ -162,35 +192,36 @@
                     </div>
                     <div class="col-sm-4">
                         <div class="">
-                            <button class="btn" />Pause</button>
-                            <button class="btn" />Restart</button>
-                            <button class="btn" />Start</button>
-                            <button class="btn" />Go Live</button>
-                            <button class="btn" />Del</button>
+                            <button class="btn" id="bulkPause">Pause</button>
+                            <button class="btn" id="bulkRestart">Restart</button>
+                            <!-- <button class="btn" id="bulkStart">Start</button> -->
+                            <button class="btn" id="bulkLive">Go Live</button>
+                            <button class="btn" id="bulkDel">Del</button>
                         </div>
                     </div>
-                    <div class="col-sm-2">
-                        <div class="row">
-                            <div class="col-sm-2">
+                    <div class="col-sm-4">
+                        <div class="row" style="float:right; padding-right:20px;">
+                            <div class="col-sm-2 download-icon">
                                 <a id="exportAds"><i class="fa fa-download"></i></a>
                             </div>
-                            <div class="col-sm-10">
+                            <div class="col-sm-4">
                                 <div class="input-group">
                                     <select class="form-control">
                                         <option value="csv" selected>CSV</option>
                                     </select>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-2">
-                        <div class="input-group">
-                            <select class="form-control" id="pageSize">
-                                <option value="10" selected>10 Pages</option>
-                                <option value="20">20 Pages</option>
-                                <option value="50">50 Pages</option>
-                                <option value="100">100 Pages</option>
-                            </select>
+                            <div class="col-sm-6">
+                                <div class="input-group">
+                                    <select class="form-control" id="pageSize">
+                                        <option value="10" selected>10 Records</option>
+                                        <option value="20">20 Records</option>
+                                        <option value="50">50 Records</option>
+                                        <option value="100">100 Records</option>
+                                        <option value="500">500 Records</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -206,51 +237,39 @@
 
 <!-- Modal -->
 <div class="modal fade" id="frequencyModal" tabindex="-1" role="dialog" aria-labelledby="frequencyModal">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog" role="document" style="height: 50px; width: 100px">
         <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
-            </div>
             <div class="modal-body">
-                
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <div class="modal-content"> 
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="modal fade" id="videoMadal" tabindex="-1" role="dialog" aria-labelledby="videoMadal">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="myModalLabel">Video</h4>
-            </div>
-            <div class="modal-body">
-                <video width="480" height="320" controls>
-                    <source id="adVideoSource" src="" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
-            </div>
-        </div>
-    </div>
+<div class="video-popover-body">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <video width="480" height="320" controls id="adVideo">
+        <source id="adVideoSource" src="" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
 </div>
 {% endblock center_content %}
 
 {% block local_js %}
 <script type="text/javascript">
+
 let headers = {}
+let sectionName;
 
 let url = new URL(window.location.href);
-
-
 let adSection = url.searchParams.get("section");;
 console.log("Ad section", adSection);
 
 
 ///////  Section Based Modification   ////
 $(document).ready(function(){
-    let sectionName;
 
     switch(adSection){
         case 'ongoing': 
@@ -273,6 +292,21 @@ $(document).ready(function(){
 
 
 ///////////////////////////
+
+function ordinal_suffix_of(i) {
+    var j = i % 10,
+        k = i % 100;
+    if (j == 1 && k != 11) {
+        return i + "st";
+    }
+    if (j == 2 && k != 12) {
+        return i + "nd";
+    }
+    if (j == 3 && k != 13) {
+        return i + "rd";
+    }
+    return i + "th";
+}
 
 let adType = [{
     'id': '',
@@ -300,40 +334,48 @@ $("#adTable").jsGrid({
     pageSize: $("#pageSize").val(),
     fields: [
         { title: " ", name: "ad_id", type: "renderer", rendererFunction: function(value, data){
-            return `<input type="checkbox" name="mark_for_action" value="${ value }"/>`
+            return `<input type="checkbox" name="mark_for_action" value="${ value }" data-state="${ data.state }"/>`
         }, width: 22, align: "center",},
         { title: "Sr. No.", name: "ad_id", type: "number", width: 30, align: "center", filtering: false},
         { title: "Brand ID", name: "brand_id", type: "text", align: "center", width: 40, filtering: false},
         { title: "Brand Name", name: "brand_name", type: "text", align: "center"},
-        { title: "Start Date", name: "start_date", type: "text", width: 60, align: "center", filtering: false},
-        { title: "End Date", name: "end_date", type: "text", width: 60, align: "center", filtering: false},
+        { title: "Start Date", name: "start_date", type: "text", width: 60, align: "center", css: "date-field"},
+        { title: "End Date", name: "end_date", type: "text", width: 60, align: "center", css: "date-field"},
         { title: "Frequency", name: "frequency", type: "renderer", rendererFunction: function(value, data){
-            let html= `<div><b>Type: ${ data.frequency_type }</b></div>`
+            let html= `<div class='.freq-popover-width' style='margin-width: 300px'>`
             if(data.frequency.length == 0)
                 return ''
 
             if(data.frequency_type == 'constant'){
-                html += `<div>Scrolls: ${ data.frequency[0]['scroll'] }</div>`
+                html += `
+                    <div class='row'>
+                        <div class='col-sm-6 frequency-border'><b>Type</b></div>
+                        <div class='col-sm-6 frequency-border'><b>Scroll</b></div>
+                    </div>
+                    <div class='row'>
+                        <div class='col-sm-6 frequency-border'>Constant</div>
+                        <div class='col-sm-6 frequency-border'>${ data.frequency[0]['scroll'] }</div>
+                    </div>`
             }
             else if(data.frequency_type == 'variable'){
-                html += `<table>
-                    <tr>
-                        <th>Sequence</th>
-                        <th>Scroll</th>
-                    </tr>`
+                html += `
+                    <div class='row'>
+                        <div class='col-sm-6 frequency-border'><b>Variable</b></div>
+                        <div class='col-sm-6 frequency-border'><b>Scroll</b></div>
+                    </div>`
                 data.frequency.forEach(function(val){
-                    html += `<tr>
-                        <td>${ val.sequence }</td>
-                        <td>${ val.scroll }</td>
-                    </tr>`
+                    html += `<div class='row'>
+                        <div class='col-sm-6 frequency-border'>${ ordinal_suffix_of(val.sequence) }</div>
+                        <div class='col-sm-6 frequency-border'>${ val.scroll }</div>
+                    </div>`
                 })
-                html += '</table>'
+                html += '</div>'
             }
-            return `<a class="frequency-element" data-toggle="modal" data-target="#frequencyModal" data-modalbody="${ html }">Detail</a>`
+            return `<a class="frequency-element" data-toggle="popover" data-html="true"  data-content="${ html }">Detail</a>`
         }, align: "center"},
-        { title: "Video", itemTemplate: function(_, item){
+        { title: "Video", align: "center", width: 40, itemTemplate: function(_, item){
             return `
-                <a class="adVideo" data-toggle="modal" data-target="#videoMadal" data-src="${ item.ad_video }">
+                <a class="adVideo" data-src="${ item.ad_video }">
                     <img src='/media/img/icons/video.png' style="width:30px">
                 <a>`
             }
@@ -347,6 +389,7 @@ $("#adTable").jsGrid({
                 return 'Action'
             },  
             itemTemplate: function(value, item){
+                console.log("here", value,item)
                 if(item.state=='ongoing' ) {
                     return `
                         <span>
@@ -356,7 +399,7 @@ $("#adTable").jsGrid({
                         </span>
                     `
                 }
-                else if(item.state=='inactive' || item.state=='upcoming'){
+                else if(item.state=='inactive' || item.state=='upcoming' || item.state=='active'){
                     return `
                         <span>
                             <button class="btn btn-primary" data-id="${ item.ad_id }" onclick="editAd(${ item.ad_id })">Edit</button>
@@ -382,12 +425,15 @@ $("#adTable").jsGrid({
                     `
                 }
             }, 
+            filterTemplate: function() {
+                return "<button class='btn' id='filterResult'>Filter</button>";
+            },
         width: 100, align: "center"},
     ],
     rowClass: function (item, itemIndex){
         if(item.state=='ongoing')
             return "ongoingAd"
-        else if(item.state=='inactive' || item.state=='upcoming')
+        else if(item.state=='inactive' || item.state=='upcoming' || item.state=='active')
             return "inactiveAd"
         else if(item.state=='draft')
             return "draftAd"
@@ -432,18 +478,25 @@ $("#adTable").jsGrid({
         }
     },
     onDataLoaded: function(gridInstance){
-        $.each($(gridInstance.grid._body).find("tr.jsgrid-row"), function(i, row){
-            $(row).removeClass("jsgrid-row")
-        })
-        $.each($(gridInstance.grid._body).find("tr.jsgrid-alt-row"), function(i, row){
-            $(row).removeClass("jsgrid-alt-row")
-        })
+        if(sectionName == 'Ad Dashboard'){
+            $.each($(gridInstance.grid._body).find("tr.jsgrid-row"), function(i, row){
+                $(row).removeClass("jsgrid-row")
+            })
+            $.each($(gridInstance.grid._body).find("tr.jsgrid-alt-row"), function(i, row){
+                $(row).removeClass("jsgrid-alt-row")
+            })
+        }
+        $('[data-toggle="popover"]').popover({html: true, container: 'body', width: '300px'})
+        $('.date-field').find('input').datepicker({
+            format: 'dd-mm-yyyy',
+        });
     }
 });
 
 let grid = $("#adTable").data("JSGrid");
 
 let updateAd = function(adId, data){
+    console.log("ad data", data)
     return $.ajax({
         type: "PATCH",
         url: "/api/v1/ad/jarvis/ad/"+adId+ "/",
@@ -459,26 +512,75 @@ $('#search-btn').click(function(){
     grid.reset()
 });
 
+$(document).on('click', "button#filterResult", function(){
+    grid.reset()
+})
+
 $(document).on('click', '.frequency-element', function(){
     console.log("elemetn clicked", $(this).attr('data-modalbody'))
-    $($(this).attr('data-target')).find('.modal-body').html($(this).attr('data-modalbody'))
+    $($(this).attr('data-target')).find('.modal-content').html($(this).attr('data-modalbody'))
 })
 
 $(document).on('click', '.adVideo', function(){
     console.log("data src", $(this).attr('data-src'))
     $("#adVideoSource").attr('src', $(this).attr('data-src'))
+    $("#adVideoSource").parents('.video-popover-body').show()
+    let vid = document.getElementById("adVideo"); 
+    vid.play()
+})
+
+$(document).on('click', '.video-popover-body .close', function(){
+    $("#adVideoSource").parents('.video-popover-body').hide()
+    let vid = document.getElementById("adVideo"); 
+    vid.pause()
 })
 
 $(document).on('change', '#pageSize', function(){
     grid.reset()
 })
 
+$(document).on('click', 'input[name=mark_for_action]', function(){
+    let ongoing = $('input[name=mark_for_action][data-state=ongoing]:checked').length > 0
+    let draft = $('input[name=mark_for_action][data-state=draft]:checked').length > 0
+    let completed = $('input[name=mark_for_action][data-state=completed]:checked').length > 0
+    let upcoming =  $('input[name=mark_for_action][data-state=inactive]:checked').length > 0 || 
+                    $('input[name=mark_for_action][data-state=upcoming]:checked').length > 0 ||
+                    $('input[name=mark_for_action][data-state=active]:checked').length > 0
+
+    console.log("state", ongoing,upcoming, draft, completed )
+
+    console.log("bulkPause", ongoing && !upcoming && !draft && !completed)
+    if(ongoing && !upcoming && !draft && !completed) $("#bulkPause").show()
+    else $("#bulkPause").hide()
+
+    console.log("bulkRestart", ongoing && !upcoming && !draft && !completed)
+    if(!ongoing && !upcoming && !draft && completed) $("#bulkRestart").show()
+    else $("#bulkRestart").hide()
+
+    if(!ongoing && !upcoming && draft && !completed) $("#bulkLive").show()
+    else $("#bulkLive").hide()
+
+    console.log("bulkDel", ongoing && upcoming && draft && !completed)
+    if(!completed) $("#bulkDel").show()
+    else $("#bulkDel").hide()
+
+    if(!ongoing && !upcoming && !draft && !completed){
+        $("#bulkPause").show()
+        $("#bulkRestart").show()
+        $("#bulkLive").show()
+        $("#bulkDel").show()
+    }
+
+})
+
 let pauseAd = function(adId){
-    updateAd(adId, {'state': 'inactive'})
+    if (confirm("Are you sure?"))
+        updateAd(adId, {'state': 'completed'})
 }
 
 let restartAd = function(adId){
-    updateAd(adId, {'state': 'ongoing'})
+    if (confirm("Are you sure?"))
+        updateAd(adId, {'state': 'ongoing'})
 }
 
 let startAd = function(adId){
@@ -486,22 +588,28 @@ let startAd = function(adId){
 }
 
 let goLiveAd = function(adId){
-    updateAd(adId, {'state': 'ongoing'})
+    if (confirm("Are you sure?"))
+        updateAd(adId, {'state': 'ongoing'})
 }
 
 let deleteAd = function(adId){
-    updateAd(adId, {'state': 'deleted'})
+    // swal.fire("Are you sure?",{
+    //     buttons: {
+    //         cancel: true,
+    //         confirm: "Confirm",
+    //     },
+    // });
+    if (confirm("Are you sure?"))
+        updateAd(adId, {'is_deleted': true})
 }
 
 let editAd = function(adId){
-    let editWindow = window.open("/superman/advertisement/ad/"+adId+"/change/", "_blank")
+    let editWindow = window.open("/ad/edit/"+adId+"/", "_blank")
     console.log("editWindow", editWindow)
     editWindow.onunload = function() {
-        console.log("here=== ")
         grid.reset()
     };
     editWindow.onmouseout = function() {
-        console.log("here=== 2222")
         grid.reset()
     };
 }
