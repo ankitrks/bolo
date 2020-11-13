@@ -43,6 +43,7 @@ django-import-export==1.2.0
 django-infinite-scroll-pagination==0.2.0
 django-jet==1.0.8
 django-jsonfield==1.4.0
+django-nested-admin==3.3.2
 django-rest-swagger==2.2.0
 django-simple-history==2.12.0
 django-tinymce==2.8.0
@@ -143,6 +144,7 @@ pysolr==3.8.1
 python-bidi==0.4.2
 python-dateutil==2.8.0
 python-magic==0.4.13
+python-monkey-business==1.0.0
 python-openid==2.2.5
 pytz==2018.9
 pyu2f==0.1.4

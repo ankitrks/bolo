@@ -3,6 +3,8 @@ from django.utils.functional import SimpleLazyObject
 
 import redis
 from rediscluster import RedisCluster
+
+import boto3
 # from neo4j.v1 import GraphDatabase, basic_auth
 
 # neo4j_host = settings.NEO4J_DATABASES['default']['HOST']
@@ -24,6 +26,7 @@ class ConnectionHolder:
         self._redis_vbseen_read_only = None
         self._redis_logs = None
         self._redis_logs_read_only = None
+        self._dynamo_client = None
 
         self.startup_nodes = [{"host": settings.REDIS_CL_HOST, "port": settings.REDIS_CL_PORT}]
 
@@ -88,3 +91,12 @@ class ConnectionHolder:
 
     def redis_logs_read_only(self):
         return SimpleLazyObject(self._get_redis_logs_read_only)
+
+
+    def _get_dynamo_client(self):
+        if not self._dynamo_client:
+            self._dynamo_client = boto3.client('dynamodb', **settings.DYNAMO_CONFIG)
+        return self._dynamo_client
+
+    def dynamo_client(self):
+        return SimpleLazyObject(self._get_dynamo_client)

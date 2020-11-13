@@ -4555,6 +4555,14 @@ def convert_to_dict_format(item):
 
     return _dict
 
+def get_ad_to_display(user_id, extra_data):
+    from rest_framework.test import APIClient
+    c = APIClient()
+    params_list = ['%s=%s'%(key, val) for key, val in extra_data.iteritems()]
+    params_list.append('user_id=%s'%user_id)
+    return c.get('/api/v1/ad/for-user?%s'%('&'.join(params_list),)).json().get('results')
+
+
 def get_video_bytes_and_its_related_data(id_list, last_updated=None):
     if not len(id_list):
         return []
@@ -4583,7 +4591,8 @@ def get_video_bytes_and_its_related_data(id_list, last_updated=None):
                     p.android_did as user__userprofile__android_did, p.is_guest_user as user__userprofile__is_guest_user, 
                     p.country_code as user__userprofile__country_code, 
                     p.is_insight_fix as user__userprofile__is_insight_fix, 
-                    p.user_id as user__userprofile__user, array_agg(distinct uc.category_id) as user__userprofile__sub_category
+                    p.user_id as user__userprofile__user, array_agg(distinct uc.category_id) as user__userprofile__sub_category,
+                    'video_byte' as type
             FROM forum_topic_topic t
                 LEFT JOIN forum_topic_topic_m2mcategory c on c.topic_id = t.id
                 LEFT JOIN forum_topic_topic_hash_tags h on h.topic_id = t.id
@@ -4713,6 +4722,9 @@ class PopularVideoBytes(APIView):
 
         topics_df = pd.DataFrame.from_records(topics)
 
+        if topics_df.empty:
+            return []
+
         exclude_ids = []
         items_per_page = 15
         max_page_creation_limit = 3
@@ -4748,6 +4760,39 @@ class PopularVideoBytes(APIView):
         # print "return after calcuating all"
 
         return start_page_id_list
+
+
+class PopularVideoBytesV2(PopularVideoBytes):
+    def get(self, request, *args, **kwargs):
+        newrelic.agent.set_transaction_name("/get_popular_video_bytes_v2/get", "Trending Page")
+
+        language_id = request.GET.get('language_id', 1)
+        page_number = int(request.GET.get('page',1))
+
+        ad_list = get_ad_to_display(request.user.id, request.GET)
+        ad_infused_popular_posts = self.infuse_ads(ad_list, get_video_bytes_and_its_related_data(
+                                        self.get_tranding_topic_data(request.user.id, language_id, page_number),
+                                        request.GET.get('last_updated', None)
+                                    ))
+
+        return JsonResponse({
+                'topics': ad_infused_popular_posts
+            }, status=status.HTTP_200_OK) 
+
+    def infuse_ads(self, ads, popular_posts):
+        post_count = 0
+        popular_posts = [{'id': '1'}, {'id': '1'}, {'id': '1'}, {'id': '1'}, {'id': '1'}]
+        sequence = (int(self.request.GET.get('page', 1)) - 1) * settings.REST_FRAMEWORK.get('PAGE_SIZE')
+        ad_infused_posts = []
+
+        while post_count < len(popular_posts):
+            if ads.get(str(sequence + post_count)):
+                ad_infused_posts.append(ads.get(str(sequence + post_count)))
+    
+            ad_infused_posts.append(popular_posts[post_count])
+            post_count += 1
+
+        return ad_infused_posts
 
 
 

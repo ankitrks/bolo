@@ -16,12 +16,15 @@ import forum.topic.urls
 import forum.comment.urls
 import forum.booking.urls
 import drf_spirit.urls
+import drf_spirit.api_urls_v2
 import jarvis.urls
 import allauth
 import coupon.urls
 import booking.urls
 import payment.urls
 import booking.api_urls
+import advertisement.api_urls
+import advertisement.urls
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -97,6 +100,7 @@ urlpatterns = [
     url('grappelli/', include('grappelli.urls')), # grappelli URLS
 	url(r'^superman/', include(admin.site.urls)),
     url(r'^api/superman/', include(forum.admin.api_urls)),
+    url(r'^_nested_admin/', include('nested_admin.urls')),
     url(r'^i18n/', include('django.conf.urls.i18n')),
     url(r'^', include(patterns, namespace='spirit', app_name='forum')),
     url(r'docs/', include_docs_urls(title='Boloindya API')),
@@ -105,6 +109,9 @@ urlpatterns = [
     url(r'^payment/', include(payment.urls, namespace='payment')),
     url(r'^api/v1/payment/', include('payment.api_urls', namespace='payment')),
     url(r'^booking/', include(booking.urls)),
+    url(r'^api/v1/ad/', include('advertisement.api_urls', namespace='ad')),
+    url(r'^api/v2/', include('drf_spirit.api_urls_v2')),
+    url(r'^ad/', include(advertisement.urls)),
 ]
 
 urlpatterns += i18n_patterns(

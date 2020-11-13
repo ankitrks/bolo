@@ -1,0 +1,19 @@
+{% extends "advertisement/base.html" %}
+{% load jarvis_tag %}
+{% block content %} 
+	<style type="text/css">
+		.parent_block{display: inline-block;width: 23%;border: 1px dashed #333;vertical-align: middle;height: 150px;padding: 10px;margin: 10px;border-radius: 5px;background: white;}
+		.parent_header{text-align: center;margin-bottom: 20px;}
+		.parent_header i{font-size: 25px;}
+		.parent_header span{font-size: 20px;}
+		.align_center{text-align: center;padding-top: 50px;}
+	</style>
+{% endblock content %}
+
+{% block center_js %}
+	<script>
+		jQuery(document).ready(function(){
+			$('.sidebar-toggle').click();
+		});
+	</script>
+{% endblock center_js %}

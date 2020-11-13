@@ -11,7 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 # TODO: Remove this whole module in Spirit 0.6
 
 import warnings
-
+import boto3
 
 import os
 PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -168,7 +168,9 @@ INSTALLED_APPS = [
     'payment.payout',
     'simple_history',
     # 'forum.core.tests'
-    'booking'
+    'booking',
+    'advertisement',
+    'nested_admin'
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -753,7 +755,15 @@ FCM_DJANGO_SETTINGS = {
 
 
 BOOKING_NOTIFICATION_CHECK_TIME = '10 minutes'
-USER_ACCEPTED_KYC_PAGE_SIZE = 10
 TEMP_LOG_FILE_PATH = '/var/live_code/event_upload.txt'
 MIN_FOLLOWER_COUNT_FOR_EVENT_CREATOR = 5000
 USER_ACCEPTED_KYC_PAGE_SIZE = 10
+
+""" DynamoDB Config """
+DYNAMODB_ENV = 'STAGE'
+credentials = boto3.Session().get_credentials()
+DYNAMO_CONFIG = {
+    'aws_access_key_id': credentials.access_key,
+    'aws_secret_access_key': credentials.secret_key,
+    'region_name': 'ap-south-1',
+}

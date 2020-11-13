@@ -1,0 +1,301 @@
+{% extends "advertisement/base.html" %}
+{% block local_css %}
+<style>
+    #overlay {
+  position: fixed; /* Sit on top of the page content */
+  display: none; /* Hidden by default */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+  z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
+}
+.percentcomplete{
+    position: absolute;
+    top: 50%;
+    left:50%;
+    color: white;
+    transform: translate(-50%,-50%);
+}
+.video_elements{
+    display: none;
+}
+.product_details{
+    padding-left: 50px;
+}
+</style>
+{% endblock local_css %}
+{% block center_content %}
+<section class="content">
+    <form id="upload" action="" method="POST" enctype="multipart/form-data" class="form-horizontal">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="name" class="col-md-1 col-sm-3 col-xs-12 control-label">Brand Name: </label>
+            <div class="col-md-8">
+                <input type="text" name="brand_name" placeholder="Enter Brand Name" id="brand_name">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-1 col-sm-3 col-xs-12 control-label">Company Logo: </label>
+            <div class="col-md-8">
+                <input type="file" name="company_logo" id="audio_file" required="True" class="form-control">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-1 col-sm-3 col-xs-12 control-label">Brand ID:</label>
+            <div class="col-md-8">
+                <input type="text" name="brand_id" placeholder="Enter Brand ID" id="brand_id">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-1 col-sm-3 col-xs-12 control-label">Category:</label>
+            <div class="col-md-8">
+                <select name="product_category" >
+                    <option value="" disabled selected>Select Category</option>
+                    {% for category in product_categories %}
+                        <option value="{{category.id}}">{{category.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <div class="after-add-more form-group product_details">
+            <div class="col-md-2">                                
+                <div class="form-group">
+                    <label class="control-label">Product Name: </label>
+                    <input type="text" name="product_name" placeholder="Enter Product Name" id="product_name">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label class="control-label">Product ID: </label>
+                    <input type="text" name="product_id" placeholder="Enter Product ID" id="product_id">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label class="control-label">Product Link</label>
+                    <input type="text" name="product_link" placeholder="Enter Product Link" id="product_link">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label class="control-label">Product Price</label>
+                    <input type="text" name="product_price" placeholder="Enter Product Price" id="product_price">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group change">
+                    <label for="">&nbsp;</label><br/>
+                    <a class="btn btn-success add-more">+ Add More</a>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-1 col-sm-3 col-xs-12 control-label">POC:</label>
+            <div class="col-md-8">
+                <input type="text" name="poc" placeholder="Enter POC" id="poc">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-1 col-sm-3 col-xs-12 control-label">Phone no.:</label>
+            <div class="col-md-8">
+                <input type="text" name="phone_number" placeholder="Enter Phone Number" id="phone_number">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-1 col-sm-3 col-xs-12 control-label">Email ID:</label>
+            <div class="col-md-8">
+                <input type="text" name="email" placeholder="Enter Email" id="email">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-1 col-sm-3 col-xs-12 control-label">Signed Contract Document: </label>
+            <div class="col-md-8">
+                <input type="file" name="signed_contract_doc_file_url" id="signed_contract_doc_file_url" required="True" class="form-control">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-1 col-sm-3 col-xs-12 control-label">Signed Other Document: </label>
+            <div class="col-md-8">
+                <input type="file" name="signed_other_doc_file_url" id="signed_other_doc_file_url" required="True" class="form-control">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-1 col-sm-3 col-xs-12 control-label">Signed NDA Document: </label>
+            <div class="col-md-8">
+                <input type="file" name="signed_nda_doc_file_url" id="signed_nda_doc_file_url" required="True" class="form-control">
+            </div>
+        </div>
+        <div class="form-group video_elements">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Bucket</label>
+            <div class="col-md-8">
+                <select name="bucket_name" id="bucket_name" required="True" class="form-control">
+                    <option value="in-boloindya" selected>Boloindya Prod</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
+                <button type="submit" class="btn btn-primary submit_from_button"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Submit</button>
+            </div>
+        </div>
+    </form>
+    <div id="overlay">
+        <div class="text"><br>
+            <br><span style="font-size:50px;" class="percentcomplete"></span></div>
+    </div>
+    <div id="csv_table">
+    </div>
+</section>
+{% endblock center_content %}
+{% block local_js %}
+
+<script>
+    $(document).ready(function() {
+    $("body").on("click",".add-more",function(){ 
+        var html = $(".after-add-more").first().clone();
+        html.find('input').val('');
+          $(html).find(".change").html("<label for=''>&nbsp;</label><br/><a class='btn btn-danger remove'>- Remove</a>");
+        $(".after-add-more").last().after(html);
+    });
+    $("body").on("click",".remove",function(){ 
+        $(this).parents(".after-add-more").remove();
+    });
+});
+
+function upload(event) {
+    if ($('.submit_from_button').hasClass("opened")) {
+        return false;
+    } else {
+        $('.submit_from_button').addClass("opened");
+        event.preventDefault();
+        $('#overlay').show();
+        var data = new FormData($('#upload').get(0));
+        console.log(data)
+        var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+        $.ajax({
+            xhr: function() {
+                var xhr = new window.XMLHttpRequest();
+                xhr.upload.addEventListener("progress", function(evt) {
+                    if (evt.lengthComputable) {
+                        var percentComplete = evt.loaded / evt.total;
+                        console.log(percentComplete);
+                        $('.percentcomplete').text((percentComplete * 100).toPrecision(4) + ' %');
+                        if (percentComplete === 1) {
+                            $('.percentcomplete').text('Processing');
+                        }
+                    }
+                }, false);
+                xhr.addEventListener("progress", function(evt) {
+                    if (evt.lengthComputable) {
+                        var percentComplete = evt.loaded / evt.total;
+                        console.log(percentComplete);
+                        $('.percentcomplete').text((percentComplete * 100).toPrecision(4) + ' %')
+                    }
+                }, false);
+                return xhr;
+            },
+            url: '/advertisement/brand/onboard/',
+            type: 'POST',
+            data: data,
+            cache: false,
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(data) {
+                $('#overlay').hide()
+                $('.submit_from_button').removeClass("opened");
+                if (data.message == 'fail') {
+                    alert(data['reason'])
+                } else if (data.message == 'success') {
+                    alert("uploading done")
+                    location.reload();
+                }
+                $('.submit_from_button').removeClass("opened");
+                console.log(data)
+            },
+            error: function(data) {
+                $('#overlay').hide()
+                $('.submit_from_button').removeClass("opened");
+                console.log(data)
+                alert(data)
+                alert('Consult Tech')
+            },
+
+        });
+        return false;
+    }
+}
+
+
+$(function() {
+    $('#upload').submit(upload);
+    // $('#free_video').click(function() {
+    //     if ($(this).is(':checked')) {
+    //         $('.video_elements').show();
+    //     } else {
+    //         $('.video_elements').hide()
+    //     }
+    // });
+    // $('#id_gender').change(function () {
+    // var gender_id = $(this).val();
+    // var language_id = $("#id_language_id").val();
+    // var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+    // $.ajax({
+    //     type: 'POST',
+    //     url: '/jarvis/get_filtered_user/',
+    //     data: {
+    //         'gender_id': gender_id,
+    //         'language_id':language_id,
+    //         'csrfmiddlewaretoken':csrfmiddlewaretoken
+    //     },
+    //     success: function (data) {
+    //         // the next thing you want to do 
+    //         var $user_id = $('#id_user_id');
+    //         $user_id.empty();
+    //         filtered_user = data.filtered_user
+    //         $user_id.append('<option>User Name --- VB Count</option>');
+    //         for (var i = 0; i < filtered_user.length; i++) {
+    //             $user_id.append('<option value=' + filtered_user[i][0] + '>' + filtered_user[i][1]+' --- (' +filtered_user[i][2] + ')</option>');
+    //         }
+
+    //         // //manually trigger a change event for the contry so that the change handler will get triggered
+    //         // $country.change();
+    //     }
+    // });
+    // });
+    // $('#id_language_id').change(function () {
+    // var gender_id = $(this).val();
+    // var language_id = $("#id_gender").val();
+    // var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+    // $.ajax({
+    //     type: 'POST',
+    //     url: '/jarvis/get_filtered_user/',
+    //     data: {
+    //         'gender_id': gender_id,
+    //         'language_id':language_id,
+    //         'csrfmiddlewaretoken':csrfmiddlewaretoken
+    //     },
+    //     success: function (data) {
+    //         // the next thing you want to do 
+    //         var $user_id = $('#id_user_id');
+    //         $user_id.empty();
+    //         filtered_user = data.filtered_user
+    //         $user_id.append('<option>User Name --- VB Count</option>');
+    //         for (var i = 0; i < filtered_user.length; i++) {
+    //             $user_id.append('<option value=' + filtered_user[i][0] + '>' + filtered_user[i][1]+' --- (' +filtered_user[i][2] + ')</option>');
+    //         }
+
+    //         // //manually trigger a change event for the contry so that the change handler will get triggered
+    //         // $country.change();
+    //     }
+    // });
+    // });
+});
+</script>
+{% endblock local_js %}

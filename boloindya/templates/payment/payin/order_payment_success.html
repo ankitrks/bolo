@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Confirmation</title>
+    <style>
+        .payment-body{
+            background: #100B20;
+            color: white;
+            font-family: Avenir;
+            font-style: normal;
+        }
+
+        img-center {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .center {
+            text-align: center;
+        }
+
+        .payment-header{
+            height: 50px;
+            background: #222020;
+            line-height: 50px;
+            align-items: center;
+            text-align: center;
+        }
+        div{
+            margin-bottom: 30px;
+        }
+        .flexbox{
+            display: flex;
+        }
+        .success-icon{
+            height: 19px;
+            margin-left: 10px;
+            margin-right: 10px
+        }
+        .banner-image{
+            height: 250px
+        }
+        .text{
+            margin-left: 20px
+        }
+        .confirmation-text{
+            font-weight: 600;
+        }
+        .redirect-image{
+            height: 30px
+        }
+        .button {
+          background-color: #09b6b3;
+          border: none;
+          color: white;
+          padding: 15px;
+          text-align: center;
+          text-decoration: none;
+          display: inline-block;
+          font-size: 16px;
+          cursor: pointer;
+          width: 150px;
+          height: 43px;
+          box-sizing: border-box;
+          border-radius: 5px;
+        }
+        .my-order-button{
+            background: url(/media/img/payment/button.jpg);
+            color: white; 
+            text-decoration: none; 
+            font-size: 14px;
+            height: 20px;
+            width: 40px;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body class="payment-body">
+    <div class="payment-header">
+        Thankyou
+    </div>
+    <div class="center">
+        <img class="banner-image" src="/media/img/payment/order-success-icon.png" alt="">
+    </div>
+    <div class="flexbox text confirmation-text">
+        <span class=""></span>
+    </div>
+    <div class="text center">
+        <p>
+            Thankyou for shopping with us!
+        </p>
+    </div>
+    <div class="center">
+        <a href="{{ order_deeplink_url }}" class="my-order-button">My Orders</a>
+    </div>
+</body>
+</html>

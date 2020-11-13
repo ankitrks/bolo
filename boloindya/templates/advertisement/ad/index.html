@@ -1,0 +1,742 @@
+{% extends 'advertisement/base.html' %}
+
+
+{% block local_css %}
+    <style>
+        .ongoingAd{
+            background-color: #87cb41 !important
+        }
+        .inactiveAd{
+            background-color: #fbd458 !important
+        }
+        .completedAd{
+            background-color: #b92a25 !important
+        }
+        .draftAd{
+            background-color: #737373 !important
+        }
+        .download-icon{
+            font-size: 24px;
+            padding-top: 3px;
+        }
+        .popover{
+            max-width: 100%
+        }
+        .frequency-border{
+            border-width: 1px;
+            border-style: solid;
+            text-align: center
+        }.
+        .freq-popover-width{
+            width: 300px
+        }
+        .video-popover-body{
+            height: 320px;
+            width: 480px;
+            position: fixed;
+            left: 600px;
+            top: 200px;
+            background-color: black;
+            z-index: 10;
+            display: none
+        }
+        .video-popover-body .close{
+            color: white;
+            padding-right: 5px;
+            opacity: 0.8
+        }
+        .popover{
+            width: 200px !important
+       }
+    </style>
+    <style>
+
+</style>
+{% endblock local_css %}
+
+{% block center_content %}
+<div class="row">
+    <div class="col-sm-12"  style="margin-left: 10px margin-right: 10px">
+        <div class="box">
+            <div class="box-header with-border">
+                <h1 class="box-title" id="pageTitle">Ad Dashboard</h1>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2" id="ongoingAd">
+                        <div class="small-box bg-aqua">
+                            <div class="inner">
+                                <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
+                                <p class="section-name">Ongoing Ad</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-bag"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2" id="upcomingAd">
+                        <div class="small-box bg-green">
+                            <div class="inner">
+                                <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
+                                <p class="section-name">Upcoming Ad</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-stats-bars"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2" id="draftAd">
+                        <div class="small-box bg-yellow">
+                            <div class="inner">
+                                <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
+                                <p class="section-name">Added to draft</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-person-add"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2" id="onboardedProduct">
+                        <div class="small-box bg-red">
+                            <div class="inner">
+                                <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
+                                <p class="section-name">Onboarded Products</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-pie-graph"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2" id="impression">
+                        <div class="small-box bg-aqua">
+                            <div class="inner">
+                                <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
+                                <p class="section-name">Impressions</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-bag"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2" id="skips">
+                        <div class="small-box bg-green">
+                            <div class="inner">
+                                <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
+                                <p class="section-name">No. of skips</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-stats-bars"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2" id="installClick">
+                        <div class="small-box bg-yellow">
+                            <div class="inner">
+                                <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
+                                <p class="section-name">Install clicks</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-person-add"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2" id="shopNowClick">
+                        <div class="small-box bg-red">
+                            <div class="inner">
+                                <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
+                                <p class="section-name">Shop Now clicks</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-pie-graph"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2" id="onboardedBrand">
+                        <div class="small-box bg-aqua">
+                            <div class="inner">
+                                <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
+                                <p class="section-name">Onboarded Brands</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-bag"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-xs-2 col-md-2 col-xl-2" id="learnMore">
+                        <div class="small-box bg-green">
+                            <div class="inner">
+                                <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
+                                <p class="section-name">Learn More</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-stats-bars"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12"  style="margin-left: 10px">
+        <div class="box">
+            <div class="box-body">
+                <div class="row" style="margin-bottom: 10px">
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <input type="text" name="q" class="form-control" placeholder="Search by Brand Id, Product ID, Brand Name, Product Name">
+                            <span class="input-group-btn">
+                                <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="">
+                            <button class="btn" id="bulkPause">Pause</button>
+                            <button class="btn" id="bulkRestart">Restart</button>
+                            <!-- <button class="btn" id="bulkStart">Start</button> -->
+                            <button class="btn" id="bulkLive">Go Live</button>
+                            <button class="btn" id="bulkDel">Del</button>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="row" style="float:right; padding-right:20px;">
+                            <div class="col-sm-2 download-icon">
+                                <a id="exportAds"><i class="fa fa-download"></i></a>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="input-group">
+                                    <select class="form-control">
+                                        <option value="csv" selected>CSV</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="input-group">
+                                    <select class="form-control" id="pageSize">
+                                        <option value="10" selected>10 Records</option>
+                                        <option value="20">20 Records</option>
+                                        <option value="50">50 Records</option>
+                                        <option value="100">100 Records</option>
+                                        <option value="500">500 Records</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-left: 10px">
+                    <div class="row" id="adTable"></div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="frequencyModal" tabindex="-1" role="dialog" aria-labelledby="frequencyModal">
+    <div class="modal-dialog" role="document" style="height: 50px; width: 100px">
+        <div class="modal-content">
+            <div class="modal-body">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <div class="modal-content"> 
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="video-popover-body">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <video width="480" height="320" controls id="adVideo">
+        <source id="adVideoSource" src="" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</div>
+{% endblock center_content %}
+
+{% block local_js %}
+<script type="text/javascript">
+
+let sectionName;
+
+let url = new URL(window.location.href);
+let adSection = url.searchParams.get("section");;
+console.log("Ad section", adSection);
+
+
+///////  Section Based Modification   ////
+$(document).ready(function(){
+
+    switch(adSection){
+        case 'ongoing': 
+            sectionName = 'Ongoing Ads';
+            break;
+        case 'upcoming':
+            sectionName = 'Upcoming Ads';
+            break;
+        case 'draft':
+            sectionName = 'Ad drafts'
+            break
+        case 'history':
+            sectionName = 'Ad History'
+            break
+        default:
+            sectionName = 'Ad Dashboard'
+    }
+    $('#pageTitle').html(sectionName)
+})
+
+
+///////////////////////////
+
+function ordinal_suffix_of(i) {
+    var j = i % 10,
+        k = i % 100;
+    if (j == 1 && k != 11) {
+        return i + "st";
+    }
+    if (j == 2 && k != 12) {
+        return i + "nd";
+    }
+    if (j == 3 && k != 13) {
+        return i + "rd";
+    }
+    return i + "th";
+}
+
+let adType = [{
+    'id': '',
+    'name': '<Ad Type>'
+},{
+    'id': 'install',
+    'name': 'Install'
+},{
+    'id': 'shop_now',
+    'name': 'Shop Now'
+}]
+
+$("#adTable").jsGrid({
+    width: "100%",
+    height: "600px",
+
+    inserting: false,
+    editing: false,
+    sorting: true,
+    paging: true,
+    pageLoading: true,
+    autoload: true,
+    filtering: true,
+    sorter: "start_date",
+    pageSize: $("#pageSize").val(),
+    fields: [
+        { title: " ", name: "ad_id", type: "renderer", rendererFunction: function(value, data){
+            return `<input type="checkbox" name="mark_for_action" value="${ value }" data-state="${ data.state }"/>`
+        }, width: 22, align: "center",},
+        { title: "Sr. No.", name: "ad_id", type: "number", width: 30, align: "center", filtering: false},
+        { title: "Brand ID", name: "brand_id", type: "text", align: "center", width: 40, filtering: false},
+        { title: "Brand Name", name: "brand_name", type: "text", align: "center"},
+        { title: "Start Date", name: "start_date", type: "text", width: 60, align: "center", css: "date-field"},
+        { title: "End Date", name: "end_date", type: "text", width: 60, align: "center", css: "date-field"},
+        { title: "Frequency", name: "frequency", type: "renderer", rendererFunction: function(value, data){
+            let html= `<div class='.freq-popover-width' style='margin-width: 300px'>`
+            if(data.frequency.length == 0)
+                return ''
+
+            if(data.frequency_type == 'constant'){
+                html += `
+                    <div class='row'>
+                        <div class='col-sm-6 frequency-border'><b>Type</b></div>
+                        <div class='col-sm-6 frequency-border'><b>Scroll</b></div>
+                    </div>
+                    <div class='row'>
+                        <div class='col-sm-6 frequency-border'>Constant</div>
+                        <div class='col-sm-6 frequency-border'>${ data.frequency[0]['scroll'] }</div>
+                    </div>`
+            }
+            else if(data.frequency_type == 'variable'){
+                html += `
+                    <div class='row'>
+                        <div class='col-sm-6 frequency-border'><b>Variable</b></div>
+                        <div class='col-sm-6 frequency-border'><b>Scroll</b></div>
+                    </div>`
+                data.frequency.forEach(function(val){
+                    html += `<div class='row'>
+                        <div class='col-sm-6 frequency-border'>${ ordinal_suffix_of(val.sequence) }</div>
+                        <div class='col-sm-6 frequency-border'>${ val.scroll }</div>
+                    </div>`
+                })
+                html += '</div>'
+            }
+            return `<a class="frequency-element" data-toggle="popover" data-html="true"  data-content="${ html }">Detail</a>`
+        }, align: "center"},
+        { title: "Video", align: "center", width: 40, itemTemplate: function(_, item){
+            return `
+                <a class="adVideo" data-src="${ item.ad_video }">
+                    <img src='/media/img/icons/video.png' style="width:30px">
+                <a>`
+            }
+        },
+        { title: "Product ID", name: "product_id", type: "number", align: "center", width: 40, filtering: false},
+        { title: "Product Name", name: "product_name", type: "text", align: "center"},
+        { title: "Price", name: "price", type: "number", align: "center", width: 50},
+        { title: "Ad Type", name: "ad_type", type: "select", items: adType, valueField: "id", textField: "name" },
+        { 
+            headerTemplate: function(){
+                return 'Action'
+            },  
+            itemTemplate: function(value, item){
+                console.log("here", value,item)
+                if(item.state=='ongoing' ) {
+                    return `
+                        <span>
+                            <button class="btn btn-primary" data-id="${ item.ad_id }" onclick="editAd(${ item.ad_id })">Edit</button>
+                            <button class="btn btn-warning" data-id="${ item.ad_id }" onclick="pauseAd(${ item.ad_id })">Pause</button>
+                            <button class="btn btn-danger" data-id="${ item.ad_id }" onclick="deleteAd(${ item.ad_id })">Del</button>
+                        </span>
+                    `
+                }
+                else if(item.state=='inactive' || item.state=='upcoming' || item.state=='active'){
+                    return `
+                        <span>
+                            <button class="btn btn-primary" data-id="${ item.ad_id }" onclick="editAd(${ item.ad_id })">Edit</button>
+                            <button class="btn btn-success" data-id="${ item.ad_id }" onclick="startAd(${ item.ad_id })">Start</button>
+                            <button class="btn btn-danger" data-id="${ item.ad_id }" onclick="deleteAd(${ item.ad_id })">Del</button>
+                        </span>
+                    `
+                }
+                else if(item.state=='draft'){
+                    return `
+                        <span>
+                            <button class="btn btn-primary" data-id="${ item.ad_id }" onclick="editAd(${ item.ad_id })">Edit</button>
+                            <button class="btn btn-success" data-id="${ item.ad_id }" onclick="goLiveAd(${ item.ad_id })">Go Live</button>
+                            <button class="btn btn-danger" data-id="${ item.ad_id }" onclick="deleteAd(${ item.ad_id })">Del</button>
+                        </span>
+                    `
+                }
+                else if(item.state=='completed' || item.state=='deleted' ){
+                    return `
+                        <span>
+                            <button class="btn btn-success" data-id="${ item.ad_id }" onclick="restartAd(${ item.ad_id })">Restart</button>
+                        </span>
+                    `
+                }
+            }, 
+            filterTemplate: function() {
+                return "<button class='btn' id='filterResult'>Filter</button>";
+            },
+        width: 100, align: "center"},
+    ],
+    rowClass: function (item, itemIndex){
+        if(item.state=='ongoing')
+            return "ongoingAd"
+        else if(item.state=='inactive' || item.state=='upcoming' || item.state=='active')
+            return "inactiveAd"
+        else if(item.state=='draft')
+            return "draftAd"
+        else if(item.state=='completed' || item.state=='deleted' )
+            return "completedAd"
+    },
+    controller: {
+        loadData: function(filter) {
+            let q = $('[name="q"]').val()
+            if(q)
+                filter['q'] = q
+            if(adSection)
+                filter['section'] = adSection
+
+            filter['page'] = filter['pageIndex']
+            filter['page_size'] = $("#pageSize").val()
+
+            return $.ajax({
+                type: "GET",
+                url: "/api/v1/ad/jarvis/ad/",
+                data: filter,
+                headers: headers
+            });
+        },
+        
+        updateItem: function(item) {
+            return $.ajax({
+                type: "PATCH",
+                url: "/api/v1/ad/jarvis/ad/"+item.ad_id + "/",
+                data: item,
+                headers: headers
+            });
+        },
+        
+        deleteItem: function(item) {
+            return $.ajax({
+                type: "DELETE",
+                url: "/api/v1/ad/jarvis/ad/"+item.ad_id,
+                data: item,
+                headers: headers
+            });
+        }
+    },
+    onDataLoaded: function(gridInstance){
+        if(sectionName == 'Ad Dashboard'){
+            $.each($(gridInstance.grid._body).find("tr.jsgrid-row"), function(i, row){
+                $(row).removeClass("jsgrid-row")
+            })
+            $.each($(gridInstance.grid._body).find("tr.jsgrid-alt-row"), function(i, row){
+                $(row).removeClass("jsgrid-alt-row")
+            })
+        }
+        $('[data-toggle="popover"]').popover({html: true, container: 'body', width: '300px'})
+        $('.date-field').find('input').datepicker({
+            format: 'dd-mm-yyyy',
+        });
+    }
+});
+
+let grid = $("#adTable").data("JSGrid");
+
+let updateAd = function(adId, data){
+    console.log("ad data", data)
+    return $.ajax({
+        type: "PATCH",
+        url: "/api/v1/ad/jarvis/ad/"+adId+ "/",
+        data: data,
+        headers: headers,
+        success: function(response){
+            grid.reset()
+        }
+    });
+}
+
+$('#search-btn').click(function(){
+    grid.reset()
+});
+
+$(document).on('click', "button#filterResult", function(){
+    grid.reset()
+})
+
+$(document).on('click', '.frequency-element', function(){
+    console.log("elemetn clicked", $(this).attr('data-modalbody'))
+    $($(this).attr('data-target')).find('.modal-content').html($(this).attr('data-modalbody'))
+})
+
+$(document).on('click', '.adVideo', function(){
+    console.log("data src", $(this).attr('data-src'))
+    $("#adVideoSource").attr('src', $(this).attr('data-src'))
+    $("#adVideoSource").parents('.video-popover-body').show()
+    let vid = document.getElementById("adVideo"); 
+    vid.src = $(this).attr('data-src')
+    vid.play()
+})
+
+$(document).on('click', '.video-popover-body .close', function(){
+    $("#adVideoSource").parents('.video-popover-body').hide()
+    let vid = document.getElementById("adVideo"); 
+    vid.pause()
+})
+
+$(document).on('change', '#pageSize', function(){
+    grid.reset()
+})
+
+$(document).on('click', 'input[name=mark_for_action]', function(){
+    let ongoing = $('input[name=mark_for_action][data-state=ongoing]:checked').length > 0
+    let draft = $('input[name=mark_for_action][data-state=draft]:checked').length > 0
+    let completed = $('input[name=mark_for_action][data-state=completed]:checked').length > 0
+    let upcoming =  $('input[name=mark_for_action][data-state=inactive]:checked').length > 0 || 
+                    $('input[name=mark_for_action][data-state=upcoming]:checked').length > 0 ||
+                    $('input[name=mark_for_action][data-state=active]:checked').length > 0
+
+    console.log("state", ongoing,upcoming, draft, completed )
+
+    console.log("bulkPause", ongoing && !upcoming && !draft && !completed)
+    if(ongoing && !upcoming && !draft && !completed) $("#bulkPause").show()
+    else $("#bulkPause").hide()
+
+    console.log("bulkRestart", ongoing && !upcoming && !draft && !completed)
+    if(!ongoing && !upcoming && !draft && completed) $("#bulkRestart").show()
+    else $("#bulkRestart").hide()
+
+    if(!ongoing && !upcoming && draft && !completed) $("#bulkLive").show()
+    else $("#bulkLive").hide()
+
+    console.log("bulkDel", ongoing && upcoming && draft && !completed)
+    if(!completed) $("#bulkDel").show()
+    else $("#bulkDel").hide()
+
+    if(!ongoing && !upcoming && !draft && !completed){
+        $("#bulkPause").show()
+        $("#bulkRestart").show()
+        $("#bulkLive").show()
+        $("#bulkDel").show()
+    }
+
+})
+
+let pauseAd = function(adId){
+    if (confirm("Are you sure?"))
+        updateAd(adId, {'state': 'completed'})
+}
+
+let restartAd = function(adId){
+    if (confirm("Are you sure?"))
+        updateAd(adId, {'state': 'ongoing'})
+}
+
+let startAd = function(adId){
+    updateAd(adId, {'state': 'ongoing'})
+}
+
+let goLiveAd = function(adId){
+    if (confirm("Are you sure?"))
+        updateAd(adId, {'state': 'ongoing'})
+}
+
+let deleteAd = function(adId){
+    // swal.fire("Are you sure?",{
+    //     buttons: {
+    //         cancel: true,
+    //         confirm: "Confirm",
+    //     },
+    // });
+    if (confirm("Are you sure?"))
+        updateAd(adId, {'is_deleted': true})
+}
+
+let editAd = function(adId){
+    let editWindow = window.open("/ad/edit/"+adId, "_blank")
+    console.log("editWindow", editWindow)
+    editWindow.onunload = function() {
+        grid.reset()
+    };
+    editWindow.onmouseout = function() {
+        grid.reset()
+    };
+}
+
+</script>
+<script>
+    $(document).ready(function(){
+        $.ajax('/api/v1/ad/dashboard-counts', {
+            method: 'GET',
+            success: function(response){
+                $("#ongoingAd").find('.value-count').text(response.ongoing_ad)
+                $("#upcomingAd").find('.value-count').text(response.upcoming_ad)
+                $("#draftAd").find('.value-count').text(response.added_to_draft)
+                $("#onboardedProduct").find('.value-count').text(response.onboarded_products)
+                $("#impression").find('.value-count').text(response.impressions)
+                $("#skips").find('.value-count').text(response.skips)
+                $("#installClick").find('.value-count').text(response.install_click)
+                $("#shopNowClick").find('.value-count').text(response.shop_now_click)
+                $("#onboardedBrand").find('.value-count').text(response.brand_onboarded)
+                $("#learnMore").find('.value-count').text(response.learn_more_click)
+            }
+        })
+
+    })
+</script>
+<script>
+    class exportCSVFile{
+        constructor(headers, itemsNotFormatted, fileTitle){
+            this.headers = headers
+            this.formattedItems = this.formatItems(itemsNotFormatted);
+            this.fileTitle = fileTitle
+
+            this.createFile()
+        }
+
+        formatItems(itemsNotFormatted){
+            let itemsFormatted = [];
+
+            itemsNotFormatted.forEach((item) => {
+                itemsFormatted.push({
+                    "AD ID": item.ad_id || '',
+                    "Brand ID": item.brand_id || '', 
+                    "Brand Name": item.brand_name || '',
+                    "Start Date": item.start_date || '',
+                    "End Date": item.end_date || '',
+                    "Video": item.video_link || '',
+                    "Product ID": item.product_id || '',
+                    "Product Name": item.product_name || '',
+                    "Price": item.price || '',
+                    "Ad Type": item.ad_type || '',
+                    "State": item.state || '',
+                    "Frequency": JSON.stringify(item.frequency || []).toString(),
+                });
+            });
+
+            return itemsFormatted
+        }
+
+        createFile(){
+            if (this.headers) {
+                this.formattedItems.unshift(this.headers);
+            }
+
+            // Convert Object to JSON
+            var jsonObject = JSON.stringify(this.formattedItems);
+            var csv = this.convertToCSV(jsonObject);
+
+            console.log(" === csv === ", csv);
+
+            var exportedFilename = this.fileTitle + '.csv' || 'export.csv';
+
+            var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            if (navigator.msSaveBlob) { // IE 10+
+                navigator.msSaveBlob(blob, exportedFilename);
+            } else {
+                var link = document.getElementById("exportAds");
+                if (link.download !== undefined) { // feature detection
+                    // Browsers that support HTML5 download attribute
+                    var url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", exportedFilename);
+                    link.click();
+                }
+            }
+        }
+
+        convertToCSV(objArray) {
+            console.log(" objArray ", objArray)
+            var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+            var str = '';
+
+            for (var i = 0; i < array.length; i++) {
+                var line = '';
+                for (var index in array[i]) {
+                    if (line != '') line += ','
+
+                    line += array[i][index];
+                }
+
+                str += line + '\r\n';
+            }
+
+            return str
+
+        }
+    }
+
+$(document).on('click', '#exportAds', function(){
+    let array = []; 
+    
+    $.each(grid.data, function(i, data){
+        $("input[name=mark_for_action]:checked").each(function() { 
+            if(parseInt($(this).attr('value')) == data.ad_id){
+                array.push(data); 
+                return false;
+            }
+        })
+    }); 
+
+    console.log("array", array);
+    let file = new exportCSVFile(["AD ID", "Brand ID", "Brand Name", "Start Date", 
+                                "End Date", "Video", "Product ID", 
+                                "Product Name", "Price", "Ad Type", "State", "Frequency"], array, 'report')
+    
+});
+</script>
+{% endblock local_js %}

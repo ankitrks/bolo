@@ -6,7 +6,7 @@ from forum.category.models import Category,CategoryViewCounter
 from import_export.admin import ImportExportModelAdmin,ExportMixin
 from import_export import resources
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
-from .models import UserFollowUnfollowDetails, UserVideoTypeDetails, MusicAlbum, VideoDetails, UserEntryPoint, UserViewedFollowersFollowing, UserInterest, VideoSharedDetails, UserSearch, UserLogStatistics
+from .models import UserFollowUnfollowDetails, UserVideoTypeDetails, MusicAlbum, VideoDetails, UserEntryPoint, UserViewedFollowersFollowing, UserInterest, VideoSharedDetails, UserSearch, UserLogStatistics, DatabaseRecordCount
 from django.contrib.auth.models import User
 # from django.db.models import Count, Q
 from forum.topic.models import VBseen
@@ -339,4 +339,6 @@ admin.site.register(UserPhoneBook)
 admin.site.register(Contact)
 admin.site.register(Campaign, CampaignAdmin)
 admin.site.register(Winner, WinnerAdmin)
+admin.site.register(DatabaseRecordCount)
+
 

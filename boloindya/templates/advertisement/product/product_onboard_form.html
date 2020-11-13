@@ -1,0 +1,269 @@
+{% extends "advertisement/base.html" %}
+{% block local_css %}
+<style>
+    #overlay {
+  position: fixed; /* Sit on top of the page content */
+  display: none; /* Hidden by default */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+  z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
+}
+.percentcomplete{
+    position: absolute;
+    top: 50%;
+    left:50%;
+    color: white;
+    transform: translate(-50%,-50%);
+}
+.video_elements{
+    display: none;
+}
+.product_details{
+    padding-left: 50px;
+}
+</style>
+{% endblock local_css %}
+{% block center_content %}
+<section class="content">
+    <form id="upload" action="" method="POST" enctype="multipart/form-data" class="form-horizontal">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="name" class="col-md-1 col-sm-3 col-xs-12 control-label">Brand ID:</label>
+            <div class="col-md-8">
+                <input type="text" name="brand_id" placeholder="Enter Brand ID" id="brand_id">
+            </div>
+        </div>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <div class="after-add-more form-group product_details" style="display: none;">
+            <div class="row">
+                <div class="row">
+                    <div class="col-md-3">                                
+                        <div class="form-group">
+                            <label class="control-label">Product Name: </label>
+                            <input type="text" name="product_name" placeholder="Enter Product Name" id="product_name">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="control-label">Product ID: </label>
+                            <input type="text" name="product_id" placeholder="Enter Product ID" id="product_id">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="control-label">Product Link</label>
+                            <input type="text" name="product_link" placeholder="Enter Product Link" id="product_link">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="control-label">Product Price</label>
+                            <input type="text" name="product_price" placeholder="Enter Product Price" id="product_price">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2">                                
+                        <div class="form-group">
+                            <label class="control-label">Description: </label>
+                            <input type="text" name="product_name" placeholder="Enter Description" id="product_name">
+                        </div>
+                    </div>
+                    <div class="col-md-2">                                
+                        <div class="form-group">
+                            <label class="control-label">Select Files: </label>
+                            <input type='file' name='files[]' multiple />
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="">&nbsp;</label><br/>
+                            <a class="btn btn-danger remove">- Remove</a>
+                        </div>
+                    </div>
+                    <!-- <div class="col-md-2">                                
+                        <div class="form-group">
+                            <label for="">&nbsp;</label><br/>
+                            <a class="btn btn-success add-more-reviews">+ Add Reviews</a>
+                        </div>
+                    </div> -->
+                </div>
+                <!-- <div class="row">
+                    <div class="after-add-more-reviews form-group" id="reviews-div" style="display: none;">
+                        <div class="col-md-2">                                
+                            <div class="form-group">
+                                <label class="control-label">Title: </label>
+                                <input type="text" name="product_name" placeholder="Enter Title" id="product_name">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label class="control-label">Description:</label>: </label>
+                                <input type="text" name="product_id" placeholder="Enter Description" id="product_id">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label class="control-label">Rating:</label>: </label>
+                                <input type="text" name="product_id" placeholder="Enter Rating" id="product_id">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <a class="btn btn-danger remove-reviews">- Remove</a>
+                            </div>
+                        </div>
+                    </div> -->
+                <!-- </div> -->
+            </div>
+        <hr>
+        </div>
+        <div class="form-group video_elements">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Bucket</label>
+            <div class="col-md-8">
+                <select name="bucket_name" id="bucket_name" required="True" class="form-control">
+                    <option value="in-boloindya" selected>Boloindya Prod</option>
+                </select>
+            </div>
+        </div>
+        <!-- <div class="col-md-4">
+            <div class="form-group change">
+                <label for="">&nbsp;</label><br/>
+                <a class="btn btn-success add-more">+ Add More</a>
+            </div>
+        </div> -->
+        <div class="form-group">
+            <div class="col-md-1 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
+                <a class="btn btn-success add-more">+ Add More</a>
+                <!-- <a class="btn btn-success add-more">+ Add More</a> -->
+            </div>
+            <div class="col-md-1 col-sm-3 col-xs-12 col-md-offset-1" style="margin-bottom:10px;">
+                <button type="submit" class="btn btn-primary submit_from_button"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Submit</button>
+            </div>
+        </div>
+    </form>
+    <div id="overlay">
+        <div class="text"><br>
+            <br><span style="font-size:50px;" class="percentcomplete"></span></div>
+    </div>
+    <div id="csv_table">
+    </div>
+</section>
+{% endblock center_content %}
+{% block local_js %}
+
+<script>
+    $(document).ready(function() {
+    $("body").on("click",".add-more",function(){ 
+        var html = $(".after-add-more").first().clone();
+        html.removeAttr('style');
+        html.find('input').val('');
+        $(html).find(".redundant_review").remove()
+        $(html).find(".change").html("<label for=''>&nbsp;</label><br/><a class='btn btn-danger remove'>- Remove</a>");
+        $(".after-add-more").last().after(html);
+    });
+    $("body").on("click",".remove",function(){ 
+        $(this).parents(".after-add-more").remove();
+    });
+
+    //reviews
+    $("body").on("click",".add-more-reviews",function(){
+        // var div = document.getElementById("reviews-div")
+        // if (div.style.display == 'none') {
+        //     div.style.display = 'block';
+        // }
+        // else{
+        var html = $(".after-add-more-reviews").first().clone();
+        html.removeAttr('style');
+        html.find('input').val('');
+        html.addClass('redundant_review')
+        $(".after-add-more-reviews").last().after(html);
+        // }
+    });
+    $("body").on("click",".remove-reviews",function(){ 
+        $(this).parents(".after-add-more-reviews").remove();
+    });
+});
+
+
+function upload(event) {
+    if ($('.submit_from_button').hasClass("opened")) {
+        return false;
+    } else {
+        $('.submit_from_button').addClass("opened");
+        event.preventDefault();
+        $('#overlay').show();
+        var data = new FormData($('#upload').get(0));
+        console.log(data)
+        var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
+        $.ajax({
+            xhr: function() {
+                var xhr = new window.XMLHttpRequest();
+                xhr.upload.addEventListener("progress", function(evt) {
+                    if (evt.lengthComputable) {
+                        var percentComplete = evt.loaded / evt.total;
+                        console.log(percentComplete);
+                        $('.percentcomplete').text((percentComplete * 100).toPrecision(4) + ' %');
+                        if (percentComplete === 1) {
+                            $('.percentcomplete').text('Processing');
+                        }
+                    }
+                }, false);
+                xhr.addEventListener("progress", function(evt) {
+                    if (evt.lengthComputable) {
+                        var percentComplete = evt.loaded / evt.total;
+                        console.log(percentComplete);
+                        $('.percentcomplete').text((percentComplete * 100).toPrecision(4) + ' %')
+                    }
+                }, false);
+                return xhr;
+            },
+            url: '/advertisement/product/onboard/',
+            type: 'POST',
+            data: data,
+            cache: false,
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(data) {
+                $('#overlay').hide()
+                $('.submit_from_button').removeClass("opened");
+                if (data.message == 'fail') {
+                    alert(data['reason'])
+                } else if (data.message == 'success') {
+                    $('#brand_id').val('')
+                    $('#product_name').val('')
+                    $('#product_id').val('')
+                    $('#product_price').val('')
+                    $('#product_link').val('')
+                    alert("uploading done")
+                    location.reload();
+                }
+                $('.submit_from_button').removeClass("opened");
+                console.log(data)
+            },
+            error: function(data) {
+                $('#overlay').hide()
+                $('.submit_from_button').removeClass("opened");
+                console.log(data)
+                alert(data)
+                alert('Consult Tech')
+            },
+
+        });
+        return false;
+    }
+}
+
+
+$(function() {
+    $('#upload').submit(upload);
+});
+</script>
+{% endblock local_js %}
