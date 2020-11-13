@@ -73,8 +73,8 @@ class Product(RecordTimeStamp):
     @property
     def final_amount(self):
         if self.is_discounted:
-            return self.discounted_price
-        return self.mrp
+            return float(self.discounted_price)
+        return float(self.mrp)
 
     @property
     def base_amount(self):
@@ -85,9 +85,18 @@ class Product(RecordTimeStamp):
         
         return round(amount / sum([1] + [tax.percentage/100.0 for tax in self.taxes.all()]), 2)
 
+    @property
+    def amount_including_tax(self):
+        return float(self.final_amount) + float(self.total_tax)
+
+    @property
+    def total_tax(self):
+        base_amount = self.final_amount
+        return sum([base_amount * float(tax.percentage) for tax in self.taxes.all()])
+
+
     def get_tax_value(self, percentage):
-        base_amount = self.base_amount
-        return round(base_amount * percentage / 100.0, 2)
+        return round(float(self.final_amount) * percentage / 100.0, 2)
 
 
 class ProductImage(models.Model):

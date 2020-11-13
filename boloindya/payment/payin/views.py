@@ -77,6 +77,8 @@ class RazorpayPaymentView(RedirectView):
 class RazorpayCallbackView(TemplateView):
     template_name = 'payment/payin/payment_success.html'
     failed_template_name = 'payment/payin/payment_failed.html'
+    order_success_template_name = 'payment/payin/order_payment_success.html'
+    order_failed_template_name = 'payment/payin/order_payment_failed.html'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
@@ -109,8 +111,13 @@ class RazorpayCallbackView(TemplateView):
     
     def get_template_names(self):
         if self.is_payment_success:
+            if self.request.GET.get('type') == 'order':
+                return [self.order_success_template_name]
             return [self.template_name]
+            
         else:
+            if self.request.GET.get('type') == 'order':
+                return [self.order_failed_template_name]
             return [self.failed_template_name]
 
 class RazorpayWebhookView(TemplateView):

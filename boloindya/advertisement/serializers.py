@@ -78,7 +78,10 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ('product_id', 'product_title', 'product_description', 'product_images', 'rating_count', 'rating',
-                    'currency', 'mrp', 'is_discounted', 'discounted_price', 'discount_expiry', 'brand', 'tax', 'base_amount')
+                    'currency', 'mrp', 'is_discounted', 'discounted_price', 'discount_expiry', 'brand', 'tax',
+                    'amount_including_tax', 'total_tax')
+
+        read_only_fields = ('amount_including_tax', 'total_tax')
 
     def get_product_images(self, instance):
         return list(instance.images.all().values_list('compressed_image', flat=True))
@@ -216,7 +219,7 @@ class OrderCreateSerializer(serializers.Serializer):
     quantity = serializers.IntegerField(required=True)
 
     class Meta:
-        fields = ('name', 'address1', 'address2', 'address3', 'mobile', 'pincode', 'city_id', 'state_id', 'product_id', 'quantity')
+        fields = ('name', 'address1', 'address2', 'address3', 'mobile', 'pincode', 'city_id', 'state_id', 'product_id', 'quantity', 'email')
 
     def create(self, validated_data):
         print "validated_data", validated_data

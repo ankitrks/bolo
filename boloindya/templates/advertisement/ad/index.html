@@ -45,6 +45,9 @@
             padding-right: 5px;
             opacity: 0.8
         }
+        .popover{
+            width: 200px !important
+       }
     </style>
     <style>
 
@@ -260,7 +263,6 @@
 {% block local_js %}
 <script type="text/javascript">
 
-let headers = {}
 let sectionName;
 
 let url = new URL(window.location.href);
@@ -526,6 +528,7 @@ $(document).on('click', '.adVideo', function(){
     $("#adVideoSource").attr('src', $(this).attr('data-src'))
     $("#adVideoSource").parents('.video-popover-body').show()
     let vid = document.getElementById("adVideo"); 
+    vid.src = $(this).attr('data-src')
     vid.play()
 })
 
@@ -604,7 +607,7 @@ let deleteAd = function(adId){
 }
 
 let editAd = function(adId){
-    let editWindow = window.open("/ad/edit/"+adId+"/", "_blank")
+    let editWindow = window.open("/ad/edit/"+adId, "_blank")
     console.log("editWindow", editWindow)
     editWindow.onunload = function() {
         grid.reset()

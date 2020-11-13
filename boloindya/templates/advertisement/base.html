@@ -151,6 +151,10 @@ function getCookie(cname) {
     }
     return "";
 }
+let headers =  {
+    'Authorization': 'Token ' + getCookie('session_id'),
+    'X-CSRFToken': getCookie('csrftoken')
+}
 </script>
 
 <script>

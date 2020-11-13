@@ -12,6 +12,8 @@ from django.views.generic import RedirectView, TemplateView, DetailView
 from rest_framework.generics import RetrieveAPIView, ListAPIView, ListCreateAPIView, CreateAPIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.authentication import SessionAuthentication
 
 from rest_framework.response import Response
 from rest_framework import status
@@ -48,6 +50,8 @@ class JarvisAdViewset(ModelViewSet):
     queryset = Ad.objects.filter(is_deleted=False)
     serializer_class = AdSerializer
     pagination_class = deepcopy(PageNumberPaginationRemastered)
+    permission_classes = (IsAdminUser,)
+    authentication_classes = (SessionAuthentication,)
 
     def get_queryset(self):
         queryset = self.queryset
@@ -96,6 +100,8 @@ class JarvisOrderViewset(ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     pagination_class = deepcopy(PageNumberPaginationRemastered)
+    permission_classes = (IsAdminUser,)
+    authentication_classes = (SessionAuthentication,)
 
     def get_queryset(self):
         queryset = self.queryset
@@ -122,6 +128,8 @@ class JarvisProductViewset(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     pagination_class = deepcopy(PageNumberPaginationRemastered)
+    permission_classes = (IsAdminUser,)
+    authentication_classes = (SessionAuthentication,)
 
     def get_queryset(self):
         queryset = self.queryset
@@ -150,15 +158,15 @@ class ReviewListAPIView(ListAPIView):
     serializer_class = ReviewSerializer
 
 
-class OrderListCreateAPIView(ListCreateAPIView):
-    queryset = Order.objects.all()
-    queryset = ProductReview.objects.all()
-    serializer_class = ReviewSerializer
-    pagination_class = PageNumberPagination
+# class OrderListCreateAPIView(ListCreateAPIView):
+#     queryset = Order.objects.all()
+#     queryset = ProductReview.objects.all()
+#     serializer_class = ReviewSerializer
+#     pagination_class = PageNumberPagination
 
-    def get_queryset(self):
-        product_id = self.request.parser_context.get('kwargs', {}).get('product_id')
-        return self.queryset.filter(product_id=product_id)
+#     def get_queryset(self):
+#         product_id = self.request.parser_context.get('kwargs', {}).get('product_id')
+#         return self.queryset.filter(product_id=product_id)
 
 
 class AddressViewset(ModelViewSet):
@@ -178,6 +186,7 @@ class OrderViewset(ModelViewSet):
 
 
 class OrderCreateAPIView(APIView):
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         client = APIClient()
@@ -203,7 +212,12 @@ class OrderCreateAPIView(APIView):
         }
 
         if request_data.get('order_id'):
-            response = client.patch('/api/v1/ad/order/%s/'%request_data.pop('order_id'), order_data, HTTP_AUTHORIZATION=request_meta.get('HTTP_AUTHORIZATION'), format='json')
+            order_id = request_data.get('order_id')
+
+            if type(order_id) == list:
+                order_id = order_id[0]
+
+            response = client.patch('/api/v1/ad/order/%s/'%order_id, order_data, HTTP_AUTHORIZATION=request_meta.get('HTTP_AUTHORIZATION'), format='json')
         else:
             response = client.post('/api/v1/ad/order/', order_data, HTTP_AUTHORIZATION=request_meta.get('HTTP_AUTHORIZATION'), format='json')
         return Response(response.json(), status=response.status_code)
@@ -211,6 +225,7 @@ class OrderCreateAPIView(APIView):
 
 
 class CityListAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, *args, **kwargs):
         state = {}
 
@@ -643,6 +658,9 @@ class GetAdForUserAPIView(APIView):
 from multiprocessing.sharedctypes import Value
 
 class DashBoardCountAPIView(APIView):
+    permission_classes = (IsAdminUser,)
+    authentication_classes = (SessionAuthentication,)
+
     def get(self, request, *args, **kwargs):
         lock = Lock()
         today = datetime.now()

@@ -120,7 +120,6 @@
 
 {% block local_js %}
 <script type="text/javascript">
-let headers = {}
 
 
 $("#userOrderTable").jsGrid({
@@ -142,7 +141,13 @@ $("#userOrderTable").jsGrid({
         { title: "Product Name", name: "product_title", type: "text", width: 60, align: "center"},
         { title: "Product Link", name: "shipping_address.mobile", type: "text", width: 60, align: "center", filtering: false},
         { title: "Product Price", name: "discounted_price", type: "text", width: 60, align: "center", filtering: false},
-        { title: "Brand Logo", name: "brand.company_logo", type: "text", width: 60, align: "center", filtering: false},
+        { title: "Brand Logo", align: "center", width: 60, itemTemplate: function(_, item){
+            return `
+                <span class="brandImg" data-src="${ item.brand.company_logo }">
+                    <img src='${ item.brand.company_logo }' style="width:30px">
+                </span>`
+            }
+        },
         { title: "Brand ID", name: "brand.id", type: "number", align: "center", width: 40},
         { title: "Brand Name", name: "brand.name", type: "text", align: "center"},
         { 
@@ -264,11 +269,11 @@ $(document).on('click', '.pocElement', function(){
             itemsNotFormatted.forEach((item) => {
                 console.log("item", item)
                 itemsFormatted.push({
-                    "Sr. No": item.id || '',
-                    "User Name": item.user.username || '', 
-                    "Name": item.shipping_address.name || '',
-                    "Phone": item.shipping_address.mobile || '',
-                    "Email": item.user.email || '',
+                    "Product ID": item.id || '',
+                    "Product Name": item.user.username || '', 
+                    "Product Link": item.shipping_address.name || '',
+                    "Price": item.shipping_address.mobile || '',
+                    "Brand Logo": item.user.email || '',
                     "Order Date": item.date || '',
                     "Order Amount": item.amount || '',
                     "Product Detail": (item.lines.length && item.lines[0].product.product_title) || '',
