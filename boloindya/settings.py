@@ -761,7 +761,7 @@ USER_ACCEPTED_KYC_PAGE_SIZE = 10
 
 """ DynamoDB Config """
 DYNAMODB_ENV = 'STAGE'
-credentials = boto3.Session().get_credentials()
+#credentials = boto3.Session().get_credentials()
 #DYNAMO_CONFIG = {
 #    'aws_access_key_id': credentials.access_key,
 #    'aws_secret_access_key': credentials.secret_key,
