@@ -64,7 +64,7 @@
                         <div class="small-box bg-aqua">
                             <div class="inner">
                                 <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
-                                <p class="section-name">Ongoing Ad (Current)</p>
+                                <p class="section-name">Ongoing Ad</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-bag"></i>
@@ -75,7 +75,7 @@
                         <div class="small-box bg-green">
                             <div class="inner">
                                 <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
-                                <p class="section-name">Upcoming Ad (Current)</p>
+                                <p class="section-name">Upcoming Ad</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-stats-bars"></i>
@@ -86,7 +86,7 @@
                         <div class="small-box bg-yellow">
                             <div class="inner">
                                 <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
-                                <p class="section-name">Added to draft (all)</p>
+                                <p class="section-name">Added to draft</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-person-add"></i>
@@ -97,7 +97,7 @@
                         <div class="small-box bg-red">
                             <div class="inner">
                                 <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
-                                <p class="section-name">Onboarded Products (Live)</p>
+                                <p class="section-name">Onboarded Products</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-pie-graph"></i>
@@ -108,7 +108,7 @@
                         <div class="small-box bg-aqua">
                             <div class="inner">
                                 <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
-                                <p class="section-name">Impressions (Date)</p>
+                                <p class="section-name">Impressions</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-bag"></i>
@@ -119,7 +119,7 @@
                         <div class="small-box bg-green">
                             <div class="inner">
                                 <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
-                                <p class="section-name">No. of skips (Date)</p>
+                                <p class="section-name">No. of skips</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-stats-bars"></i>
@@ -130,7 +130,7 @@
                         <div class="small-box bg-yellow">
                             <div class="inner">
                                 <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
-                                <p class="section-name">Install clicks (Date)</p>
+                                <p class="section-name">Install clicks</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-person-add"></i>
@@ -141,7 +141,7 @@
                         <div class="small-box bg-red">
                             <div class="inner">
                                 <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
-                                <p class="section-name">Shop Now clicks (Date)</p>
+                                <p class="section-name">Shop Now clicks</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-pie-graph"></i>
@@ -152,7 +152,7 @@
                         <div class="small-box bg-aqua">
                             <div class="inner">
                                 <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
-                                <p class="section-name">Onboarded Brands (Live)</p>
+                                <p class="section-name">Onboarded Brands</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-bag"></i>
@@ -163,7 +163,7 @@
                         <div class="small-box bg-green">
                             <div class="inner">
                                 <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
-                                <p class="section-name">Learn More (Date)</p>
+                                <p class="section-name">Learn More</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-stats-bars"></i>
@@ -192,11 +192,11 @@
                     </div>
                     <div class="col-sm-4">
                         <div class="">
-                            <button class="btn" >Pause</button>
-                            <button class="btn" >Restart</button>
-                            <button class="btn" >Start</button>
-                            <button class="btn" >Go Live</button>
-                            <button class="btn" >Del</button>
+                            <button class="btn" id="bulkPause">Pause</button>
+                            <button class="btn" id="bulkRestart">Restart</button>
+                            <!-- <button class="btn" id="bulkStart">Start</button> -->
+                            <button class="btn" id="bulkLive">Go Live</button>
+                            <button class="btn" id="bulkDel">Del</button>
                         </div>
                     </div>
                     <div class="col-sm-4">
@@ -334,7 +334,7 @@ $("#adTable").jsGrid({
     pageSize: $("#pageSize").val(),
     fields: [
         { title: " ", name: "ad_id", type: "renderer", rendererFunction: function(value, data){
-            return `<input type="checkbox" name="mark_for_action" value="${ value }"/>`
+            return `<input type="checkbox" name="mark_for_action" value="${ value }" data-state="${ data.state }"/>`
         }, width: 22, align: "center",},
         { title: "Sr. No.", name: "ad_id", type: "number", width: 30, align: "center", filtering: false},
         { title: "Brand ID", name: "brand_id", type: "text", align: "center", width: 40, filtering: false},
@@ -539,12 +539,48 @@ $(document).on('change', '#pageSize', function(){
     grid.reset()
 })
 
+$(document).on('click', 'input[name=mark_for_action]', function(){
+    let ongoing = $('input[name=mark_for_action][data-state=ongoing]:checked').length > 0
+    let draft = $('input[name=mark_for_action][data-state=draft]:checked').length > 0
+    let completed = $('input[name=mark_for_action][data-state=completed]:checked').length > 0
+    let upcoming =  $('input[name=mark_for_action][data-state=inactive]:checked').length > 0 || 
+                    $('input[name=mark_for_action][data-state=upcoming]:checked').length > 0 ||
+                    $('input[name=mark_for_action][data-state=active]:checked').length > 0
+
+    console.log("state", ongoing,upcoming, draft, completed )
+
+    console.log("bulkPause", ongoing && !upcoming && !draft && !completed)
+    if(ongoing && !upcoming && !draft && !completed) $("#bulkPause").show()
+    else $("#bulkPause").hide()
+
+    console.log("bulkRestart", ongoing && !upcoming && !draft && !completed)
+    if(!ongoing && !upcoming && !draft && completed) $("#bulkRestart").show()
+    else $("#bulkRestart").hide()
+
+    if(!ongoing && !upcoming && draft && !completed) $("#bulkLive").show()
+    else $("#bulkLive").hide()
+
+    console.log("bulkDel", ongoing && upcoming && draft && !completed)
+    if(!completed) $("#bulkDel").show()
+    else $("#bulkDel").hide()
+
+    if(!ongoing && !upcoming && !draft && !completed){
+        $("#bulkPause").show()
+        $("#bulkRestart").show()
+        $("#bulkLive").show()
+        $("#bulkDel").show()
+    }
+
+})
+
 let pauseAd = function(adId){
-    updateAd(adId, {'state': 'completed'})
+    if (confirm("Are you sure?"))
+        updateAd(adId, {'state': 'completed'})
 }
 
 let restartAd = function(adId){
-    updateAd(adId, {'state': 'ongoing'})
+    if (confirm("Are you sure?"))
+        updateAd(adId, {'state': 'ongoing'})
 }
 
 let startAd = function(adId){
@@ -552,22 +588,28 @@ let startAd = function(adId){
 }
 
 let goLiveAd = function(adId){
-    updateAd(adId, {'state': 'ongoing'})
+    if (confirm("Are you sure?"))
+        updateAd(adId, {'state': 'ongoing'})
 }
 
 let deleteAd = function(adId){
-    updateAd(adId, {'is_deleted': true})
+    // swal.fire("Are you sure?",{
+    //     buttons: {
+    //         cancel: true,
+    //         confirm: "Confirm",
+    //     },
+    // });
+    if (confirm("Are you sure?"))
+        updateAd(adId, {'is_deleted': true})
 }
 
 let editAd = function(adId){
-    let editWindow = window.open("/superman/advertisement/ad/"+adId+"/change/", "_blank")
+    let editWindow = window.open("/ad/edit/"+adId+"/", "_blank")
     console.log("editWindow", editWindow)
     editWindow.onunload = function() {
-        console.log("here=== ")
         grid.reset()
     };
     editWindow.onmouseout = function() {
-        console.log("here=== 2222")
         grid.reset()
     };
 }
