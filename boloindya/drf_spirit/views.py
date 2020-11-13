@@ -4780,12 +4780,11 @@ class PopularVideoBytesV2(PopularVideoBytes):
         ad_infused_posts = []
 
         while post_count < len(popular_posts):
-            if ads.get(str(sequence)):
-                ad_infused_posts.append(ads.get(str(sequence)))
+            if ads.get(str(sequence + post_count)):
+                ad_infused_posts.append(ads.get(str(sequence + post_count)))
             else:
                 ad_infused_posts.append(popular_posts[post_count])
                 post_count += 1
-            sequence += 1
 
         return ad_infused_posts
 

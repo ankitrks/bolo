@@ -156,6 +156,7 @@ class JarvisProductViewset(ModelViewSet):
 class ReviewListAPIView(ListAPIView):
     queryset = ProductReview.objects.all()
     serializer_class = ReviewSerializer
+    pagination_class = PageNumberPagination
 
     def get_queryset(self):
         if self.request.parser_context.get('kwargs', {}).get('product_id'):
@@ -186,6 +187,7 @@ class AddressViewset(ModelViewSet):
 class OrderViewset(ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
+    pagination_class = PageNumberPagination
 
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
@@ -607,7 +609,7 @@ class OrderPaymentRedirectView(RedirectView):
         # })
 
         if not order.payment_gateway_order_id:
-            razorpay_order = create_order(order.amount, "INR", receipt=order.order_number, notes={})
+            razorpay_order = create_order(order.amount_including_tax, "INR", receipt=order.order_number, notes={})
             order.payment_gateway_order_id = razorpay_order.get('id')
 
         order.save()
@@ -660,7 +662,7 @@ class GetAdForUserAPIView(APIView):
         next_position = 0
 
         for scroll in sorted(map(int, ad_pool.keys())):
-            next_position += scroll
+            next_position = scroll
             user_ad[str(next_position)] = get_redis('ad:%s'%ad_pool.get(str(scroll))[0].get('id'))  # Todo: Need to imporve it
 
         return Response({

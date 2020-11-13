@@ -130,13 +130,14 @@ def update_ad_order_payment_status(order_id, payment_status, transaction_id=None
         """, [order_id])
 
     elif payment_status == "failed":
-        execute_query("""
-            UPDATE advertisement_order
-            SET 
-                payment_status = 'failed',
-            WHERE payment_gateway_order_id = %s
-            RETURNING id;
-        """, [order_id])
+        # execute_query("""
+        #     UPDATE advertisement_order
+        #     SET 
+        #         payment_status = 'failed',
+        #     WHERE payment_gateway_order_id = %s
+        #     RETURNING id;
+        # """, [order_id])
+        pass
 
 def get_event_webengage_data(order_id):
     return execute_query("""
