@@ -159,7 +159,7 @@ class ReviewListAPIView(ListAPIView):
 
     def get_queryset(self):
         if self.request.parser_context.get('kwargs', {}).get('product_id'):
-            return self.queryset.filter(beneficiary_id=self.request.parser_context.get('kwargs', {}).get('product_id'))
+            return self.queryset.filter(product_id=self.request.parser_context.get('kwargs', {}).get('product_id'))
 
         return []
 

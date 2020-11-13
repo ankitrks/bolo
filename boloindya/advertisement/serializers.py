@@ -175,11 +175,12 @@ class OrderSerializer(serializers.ModelSerializer):
         validated_data['shipping_address_id'] = address.id
         order = Order.objects.create(**validated_data)
 
+        order.amount = 0.0
         for line in lines:
             line['order_id'] = order.id
             line['amount'] = line.get('product').final_amount * line.get('quantity')
             l = OrderLine.objects.create(**line)
-            order.amount += line['amount']
+            order.amount += float(line['amount'])
 
         order.order_number = 'ORDER_%d'%order.id
         order.save()
