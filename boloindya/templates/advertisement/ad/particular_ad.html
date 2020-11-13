@@ -340,11 +340,14 @@ ul li {
                     $('#discount').val(discount)
                 }
             }
+            else{
+                $("#cta_type_2").val("{{cta.code}}")
+            }
         {% endfor %}
         
-        $("#start_date").val("{{ad.start_time|date:"d-m-Y"}}");
+        $("#start_date").val("{{ad.start_time|date:"m/d/Y h:i P"}}");
         if("{{ad.end_time}}"!="None"){
-            $("#end_date").val("{{ad.end_time|date:"d-m-Y"}}");
+            $("#end_date").val("{{ad.end_time|date:"m/d/Y h:i P"}}");
         }
         else{
             $('#popup_end_date_checkbox').prop("checked",true);
@@ -645,7 +648,18 @@ function upload(event) {
             return false;
         }
     }
-
+    if (!$("#ad_type").val()){
+         alert("Please select Ad Category");
+         return false;
+    }
+    if (!$("#cta_type_1").val()){
+            alert("select cta type 1");
+            return false;
+    }
+    if (!$("#cta_type_2").val()){
+        alert("select cta type 2");
+        return false;
+    }
     if ($('.submit_from_button').hasClass("opened")) {
         return false;
     } else {
@@ -656,6 +670,7 @@ function upload(event) {
         data.append('ad_id',"{{ad.id}}")
         data.append('brand_id', brand_id);
         data.append('product_id', product_id);
+
         var cta_type_1 = $("#cta_type_1 option:selected").val();
         if (cta_type_1.trim()=="shop_now"){
             data.append('mrp',$('#mrp').val())

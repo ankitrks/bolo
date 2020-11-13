@@ -408,10 +408,15 @@ def ad_creation_form(request):
                     return HttpResponse(json.dumps({'message':'fail','reason':'Invalid Start Date'}),content_type="application/json")
                 if toggler=='link' and not ad_video_file_link:
                     return HttpResponse(json.dumps({'message':'fail','reason':'Please enter ad video link'}),content_type="application/json")
-                if toggler=='upload' and not ad_video_file:
-                    return HttpResponse(json.dumps({'message':'fail','reason':'Please upload valid ad video file'}),content_type="application/json")
-                if toggler=='upload' and not (ad_video_file.name.endswith('.mp4') or ad_video_file.name.endswith('.mov')):
-                    return HttpResponse(json.dumps({'message':'fail','reason':'This is not a mp4  mov file'}),content_type="application/json")
+                if toggler=='upload':
+                    if not ad_id:
+                        if not ad_video_file:
+                            return HttpResponse(json.dumps({'message':'fail','reason':'Please upload valid ad video file'}),content_type="application/json")
+                        if not (ad_video_file.name.endswith('.mp4') or ad_video_file.name.endswith('.mov')):
+                            return HttpResponse(json.dumps({'message':'fail','reason':'This is not a mp4  mov file'}),content_type="application/json")
+                    else:
+                        if ad_video_file and not (ad_video_file.name.endswith('.mp4') or ad_video_file.name.endswith('.mov')):
+                            return HttpResponse(json.dumps({'message':'fail','reason':'This is not a mp4  mov file'}),content_type="application/json")
                 if mrp and discount and float(mrp)<float(discount):
                     return HttpResponse(json.dumps({'message':'fail','reason':'Discount can not be more than mrp'}),content_type="application/json")
 
@@ -424,6 +429,7 @@ def ad_creation_form(request):
                 ad_dict['brand_id'] = brand_id
                 ad_dict['description'] = description
                 ad_dict['start_time'] = start_date
+                ad_dict['ad_type'] = ad_type
                 if end_date:
                     ad_dict['end_time'] = datetime.strptime(end_date, "%m/%d/%Y %I:%M %p")
                 else:
@@ -442,7 +448,7 @@ def ad_creation_form(request):
                 if ad_video_file:
                     ad_folder_key_url = upload_media(s3_client, ad_video_file, ad_folder_key)
                     if not ad_folder_key_url:
-                        return HttpResponse(json.dumps({'message':'fail','reason':'Failed to upload signed contract file'}),content_type="application/json")
+                        return HttpResponse(json.dumps({'message':'fail','reason':'Failed to upload video file'}),content_type="application/json")
                     else:
                         ad_dict['video_file_url'] = ad_folder_key_url
                 if not ad_id:
