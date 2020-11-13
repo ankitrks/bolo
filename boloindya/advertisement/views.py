@@ -440,7 +440,7 @@ def ad_creation_form(request):
                     ad_dict['video_file_url'] = ad_video_file_link
                 ad_dict['frequency_type'] = toggler_frequency
                 ad_dict['created_by_id'] = request.user.id
-                if product_id!='-1':
+                if ad_type=="shop_now" and product_id!='-1':
                     discount_price = float(mrp) - float(discount)
                     Product.objects.filter(id=product_id).update(is_discounted=True, discounted_price=discount_price)
                     ad_dict['product_id'] = product_id

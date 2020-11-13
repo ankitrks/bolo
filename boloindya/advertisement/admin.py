@@ -171,7 +171,11 @@ class BrandAdmin(nested_admin.NestedModelAdmin):
                     continue
                 elif isinstance(instance, Product):
                     instance.created_by_id = request.user.id
-                instance.save()
+                    instance.save()
+                    tax = Tax.objects.first()
+                    instance.taxes.add(tax)
+                else:
+                    instance.save()
 
         super(BrandAdmin, self).save_related(request, form, formsets, change)
 
@@ -198,6 +202,8 @@ class ProductAdmin(nested_admin.NestedModelAdmin):
         obj.description = input_data['description']
         obj.created_by_id = request.user.id
         obj.save()
+        tax = Tax.objects.first()
+        obj.taxes.add(tax)
         super(ProductAdmin, self).save_model(request, obj, form, change)
 
     def save_related(self, request, form, formsets, change):
