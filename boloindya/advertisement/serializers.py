@@ -84,7 +84,7 @@ class ProductSerializer(serializers.ModelSerializer):
         read_only_fields = ('amount_including_tax', 'total_tax')
 
     def get_product_images(self, instance):
-        return list(instance.images.all().values_list('compressed_image', flat=True))
+        return list(instance.images.all().values_list('original_image', flat=True))
 
     def get_rating_count(self, instance):
         return intcomma(instance.rating_count)
@@ -96,10 +96,13 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super(ProductSerializer, self).to_representation(instance)
+        review_count = instance.reviews.count()
         data.update({
             'rating': float(instance.rating),
             'mrp': float(instance.mrp),
-            'discounted_price': float(instance.discounted_price)
+            'discounted_price': float(instance.discounted_price),
+            'rating_count': intcomma(review_count),
+            'rating': sum([float(r.rating) for r in instance.reviews.all()])/review_count if review_count !=0 else 0
         })
         tax = data.get('tax')
         for t in data.get('tax'):
