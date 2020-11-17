@@ -481,12 +481,12 @@ def ad_creation_form(request):
                     action = None
                     print(value)
                     title = CTA_OPTIONS[value]
-                    if value!="skip":
-                        if cta_type_1_text:
-                            title = cta_type_1_text
-                        if value=="install_now":
+                    if value.strip()!="skip":
+                        # if cta_type_1_text:
+                        #     title = cta_type_1_text
+                        if value.strip()=="install_now":
                             action = playstore_link
-                        elif value=="learn_more":
+                        elif value.strip()=="learn_more":
                             action = website_link
                     CTA(ad_id=ad_id, title=title, action=action, code=value).save()
 

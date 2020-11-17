@@ -198,7 +198,7 @@ $("#userOrderTable").jsGrid({
                 return `
                     <span>
                         <button class="btn btn-primary" data-id="${ item.product_id }" onclick="editProduct(${ item.product_id })">Edit</button>
-                        <button class="btn btn-danger" data-id="${ item.product_id }">Del</button>
+                        <button class="btn btn-danger" data-id="${ item.product_id }" onclick="deleteProduct(${ item.product_id })">Delete</button>
                     </span>
                 `
             }, 
@@ -225,6 +225,21 @@ $("#userOrderTable").jsGrid({
 });
 
 let grid = $("#userOrderTable").data("JSGrid");
+
+let deleteProduct = function(productId){
+    console.log(productId)
+    if (confirm("Are you sure?"))
+    {
+        return $.ajax({
+        type: "DELETE",
+        url: "/api/v1/ad/jarvis/product/"+productId+ "/",
+        headers: headers,
+        success: function(response){
+            grid.reset()
+            }
+        });
+    }
+}
 
 $('#search-btn').click(function(){
     grid.reset()
