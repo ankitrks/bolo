@@ -21,13 +21,13 @@ def split(value, key):
 def convert_video_cdn(transcoded_file_url):
     if transcoded_file_url:
 		video_url = transcoded_file_url
-		text_to_search='elastictranscode.videos/'
-		replacement_text=''
-		transcoded_file_url=transcoded_file_url.replace(text_to_search, replacement_text)
+		# text_to_search='elastictranscode.videos/'
+		# replacement_text=''
+		# transcoded_file_url=transcoded_file_url.replace(text_to_search, replacement_text)
 		regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
 		find_urls_in_string = re.compile(regex, re.IGNORECASE)
 		url = find_urls_in_string.search(transcoded_file_url)
-		video_url = str(transcoded_file_url.replace(str(url.group()), "https://d1snej155psmk8.cloudfront.net"))   
+		video_url = str(transcoded_file_url.replace(str(url.group()), "https://cdn.careeranna.com"))   
 		return video_url
     else:
         return ''
