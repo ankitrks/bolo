@@ -638,7 +638,9 @@ def particular_ad(request, ad_id=None):
         for value1, value2 in ad_type_options:
             ad_type_options_values.append({'id':value1, 'value':value2})
         ad = Ad.objects.get(pk=ad_id)
-        product_desc = ad.product.description.replace("\r"," ").replace("\n"," ")
+        product_desc = ""
+        if ad.product:
+            product_desc = ad.product.description.replace("\r"," ").replace("\n"," ")
         return render(request,'advertisement/ad/particular_ad.html', {'ad': ad, 'ad_type_options':ad_type_options_values,'cta_options': cta_options_values,'desc': product_desc})
     else:
         return JsonResponse({'error':'User Not Authorised','message':'fail' }, status=status.HTTP_200_OK)
