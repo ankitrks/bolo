@@ -1,5 +1,6 @@
 import os
 import sys
+from datetime import datetime, timedelta
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
 sys.path.append( '/'.join(os.path.realpath(__file__).split('/')[:5]) )
@@ -21,7 +22,8 @@ def process_record_in_parallel():
     pool = Pool(processes=4)
 
     for record in DatabaseRecordCount.objects.filter(is_active=True):
-        pool.apply_async(execute_query, args=(record,))
+        if record.last_updated < datetime.now() - timedelta(seconds=record.update_time):
+            pool.apply_async(execute_query, args=(record,))
 
     pool.close()
     pool.join()

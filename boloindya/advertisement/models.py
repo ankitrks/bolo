@@ -4,6 +4,24 @@ from __future__ import unicode_literals
 from django.db import models
 from django.conf import settings
 
+from dynamodb_api import create as dynamodb_create
+
+
+""" DynamoDB models """
+AdEvent = 'AdEvent_%s'%settings.DYNAMODB_ENV
+Counter = 'Counter_%s'%settings.DYNAMODB_ENV
+Event = 'Event_%s'%settings.DYNAMODB_ENV
+
+
+""" RDS Models """
+
+class ModelRemastered(models.Model):
+    def save(self, data):
+        instance = super(ModelRemastered, self).save()
+        dynamodb_create(Event, {
+            ''
+        })
+
 
 class RecordTimeStamp(models.Model):
     created_at = models.DateTimeField(auto_now=False, auto_now_add=True, blank=False, null=False)
@@ -273,6 +291,14 @@ class Playtime(AdEventAbstract):
     playtime = models.PositiveIntegerField(default=0)
 
 
-""" DynamoDB models """
-AdEvent = 'AdEvent_%s'%settings.DYNAMODB_ENV
-Counter = 'Counter_%s'%settings.DYNAMODB_ENV
+class Install(AdEventAbstract):
+    pass
+
+class ShopNow(AdEventAbstract):
+    pass
+
+class LearnMore(AdEventAbstract):
+    pass
+
+class PlaceOrder(AdEventAbstract):
+    pass
