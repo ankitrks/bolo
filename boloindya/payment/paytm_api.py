@@ -60,7 +60,7 @@ def wallet_transfer(orderId, beneficiaryPhoneNo, amount):
     }
     post_data = json.dumps(paytmParams)
 
-    return paytm_api_request('/disburse/order/wallet/allowance', post_data,
+    return paytm_api_request('/disburse/order/wallet/gratification', post_data,
                         PaytmChecksum.generateSignature(post_data, MERCHANT_KEY))
 
 
@@ -85,12 +85,11 @@ def upi_transfer(orderId, upiId, amount):
     paytmParams = {
         "subwalletGuid"      : subwalletGuid,
         "orderId"            : orderId,
-        "beneficiaryAccount" : beneficiaryAccount,
-        "beneficiaryIFSC"    : beneficiaryIFSC,
+        "beneficiaryVPA"     : upiId,
         "amount"             : amount,
         "purpose"            : "SALARY_DISBURSEMENT",
-        "date"               : datetime.now().strptime('%Y-%m-%d'),
-        "transferMode"       : "IMPS"
+        "date"               : datetime.strftime(datetime.now(),'%Y-%m-%d'),
+        "transferMode"       : "UPI"
     }
     post_data = json.dumps(paytmParams)
 
