@@ -307,19 +307,6 @@ ul li {
         });
         $("#blk-"+$(this).val()).show();
     });
-    // $(function() {
-    //     $("#start_date").
-    //         datetimepicker({
-    //             format:'d.m.Y H:i',
-    //             inline:true,
-    //         });
-    // });
-    // $(function() {
-    //     $("#end_date").
-    //         datepicker({
-    //             format: "dd-mm-yyyy"
-    //         });
-    // });
  });
 });
 
@@ -480,7 +467,8 @@ $('#search_id_product').keyup(function(){
                         $('#response_product').append('<li id="no_result">No results found ...</li>');
                     }
                     for(var i=0;i<data.data.length;i++) {
-                        $('#response_product').append('<li onclick="addIdToFieldProduct(\''+data.data[i].name+'\', \''+data.data[i].id+'\',\''+data.data[i].mrp+'\',\''+data.data[i].description+'\')">'+data.data[i].name+'</li>');
+                        var desc = data.data[i].description.replace(/[\r\n]+/g," ");
+                        $('#response_product').append('<li onclick="addIdToFieldProduct(\''+data.data[i].name+'\', \''+data.data[i].id+'\',\''+data.data[i].mrp+'\',\''+desc+'\')">'+data.data[i].name+'</li>');
                     }
                 }
             })
@@ -489,12 +477,11 @@ $('#search_id_product').keyup(function(){
         }
 })
 
-function addIdToFieldProduct(product_name, id, mrp, description) {
-    clearResponseProduct();
+function addIdToFieldProduct(product_name, id, mrp, description) { clearResponseProduct();
     product_id = id
     mrp = mrp
     $('#mrp').val(mrp)
-    $('#description').val(description)
+    $('#description').val(String(description))
     $('#search_id_product').val(String(product_name));
 }
 

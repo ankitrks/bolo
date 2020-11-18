@@ -330,7 +330,7 @@ ul li {
                                 .text("Shop Now"));
                     $('#search_id_product').val('{{ad.product}}')   
                     $('#mrp').val('{{ad.product.mrp}}')
-                    $('#description').val('{{ad.product.description}}')
+                    $('#description').val('{{desc}}')
                     product_id = '{{ad.product.id}}'
                     var discount = '{{ad.product.mrp}}' - '{{ad.product.discounted_price}}' 
                     $('#discount').val(discount)
@@ -414,18 +414,6 @@ ul li {
                 el.value = '';
             });
             $("#blk-"+$(this).val()).show();
-        });
-        $(function() {
-            $("#start_date").
-                datepicker({
-                    format: "dd-mm-yyyy"
-                });
-        });
-        $(function() {
-            $("#end_date").
-                datepicker({
-                    format: "dd-mm-yyyy"
-                });
         });
      });
 });
@@ -588,7 +576,8 @@ $('#search_id_product').keyup(function(){
                     }
                     console.log(data)
                     for(var i=0;i<data.data.length;i++) {
-                        $('#response_product').append('<li onclick="addIdToFieldProduct(\''+data.data[i].name+'\', \''+data.data[i].id+'\',\''+data.data[i].mrp+'\',\''+data.data[i].description+'\')">'+data.data[i].name+'</li>');
+                        var desc = data.data[i].description.replace(/[\r\n]+/g," ");
+                        $('#response_product').append('<li onclick="addIdToFieldProduct(\''+data.data[i].name+'\', \''+data.data[i].id+'\',\''+data.data[i].mrp+'\',\''+desc+'\')">'+data.data[i].name+'</li>');
                     }
                 }
             })
