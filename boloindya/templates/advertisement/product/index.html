@@ -140,7 +140,7 @@ $("#userOrderTable").jsGrid({
         { title: "Product Id", name: "product_id", type: "text", align: "center"},
         { title: "Product Name", name: "product_title", type: "text", width: 60, align: "center"},
         { title: "Product Link", name: "shipping_address.mobile", type: "text", width: 60, align: "center", filtering: false},
-        { title: "Product Price", name: "discounted_price", type: "text", width: 60, align: "center", filtering: false},
+        { title: "Product Price", name: "mrp", type: "text", width: 60, align: "center", filtering: false},
         { title: "Brand Logo", align: "center", width: 60, itemTemplate: function(_, item){
             return `
                 <span class="brandImg" data-src="${ item.brand.company_logo }">

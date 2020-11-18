@@ -38,7 +38,7 @@ class Brand(RecordTimeStamp):
         return self.name
 
     def clean(self):
-        if Brand.objects.filter(name__exact=self.name):
+        if Brand.objects.filter(name__iexact=self.name):
             raise ValidationError({
                 'name': [
                     ValidationError(
