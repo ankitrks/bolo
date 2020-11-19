@@ -80,8 +80,8 @@ class DownloadView(View):
                 if d is False: d = None
 
                 # Spreadsheet apps tend to detect formulas on leading =, + and -
-                if type(d) is str and d.startswith(('=', '-', '+')):
-                    d = "'" + d
+                #if type(d) is str and d.startswith(('=', '-', '+')):
+                #    d = "'" + d
 
                 row.append(d)
             writer.writerow(row)
@@ -95,15 +95,15 @@ class AdOrderDownload(DownloadView):
     def get_query_with_params(self):
         query = """
             select 
-                o.id, order_number, to_char(o.created_at, 'DD-MM-YYYY HH:MI:SS') as order_date, product.name as product_name, line.quantity as quantity,
+                o.id, order_number, to_char(o.created_at, 'DD-MM-YYYY HH:MI:SS') as order_date, brand.name as brand_name, product.name as product_name, line.quantity as quantity,
                 o.amount as order_amount, (tax.percentage/100.0 * o.amount ) + o.amount as paid_amount, o.payment_status, o.state, u.id as user_id,
                 address.name as customer_name, address.email as customer_email, address.mobile as customer_mobile, 
                 concat(address.address1, ', ', address.address2, ', ', city.name, ', ', st.name, ' - ', address.pincode)  as customer_address
             from advertisement_order o
-            inner join auth_user u on o.user_id = u.id
-            inner join forum_user_userprofile profile on profile.user_id = o.user_id
-            inner join advertisement_orderline line on line.order_id = o.id
-            inner join advertisement_product product on product.id = line.product_id
+            left join auth_user u on o.user_id = u.id
+            left join forum_user_userprofile profile on profile.user_id = o.user_id
+            left join advertisement_orderline line on line.order_id = o.id
+            left join advertisement_product product on product.id = line.product_id
             left join advertisement_brand brand on brand.id = product.brand_id
             left join advertisement_product_taxes product_tax on product_tax.product_id = product.id
             left join advertisement_tax tax on tax.id = product_tax.tax_id
