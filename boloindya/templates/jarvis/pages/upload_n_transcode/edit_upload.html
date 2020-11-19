@@ -14,14 +14,14 @@
         <p class="lead" id="mp4url">{{ my_video.s3_file_url}}</p>
         <a href="#" data-clipboard-target="#mp4url" class="copy-text">Copy URL</a>
     </div>
-    <div>
+    <!-- <div>
         <h3>Transcoded file URL</h3>
         <p class="lead" id="m3u8url">{{ my_video.transcoded_file_url}}</p>
         <a href="#" data-clipboard-target="#m3u8url" class="copy-text">Copy URL</a>
-    </div>
+    </div> -->
     <div>
         <h3>CDN file URL</h3>
-        <p class="lead" id="cdnurl">{{ my_video.transcoded_file_url | convert_video_cdn}}</p>
+        <p class="lead" id="cdnurl">{{ my_video.s3_file_url | convert_video_cdn}}</p>
         <a href="javascript:void(0)" data-clipboard-target="#cdnurl" class="copy-text">Copy URL</a>
     </div>
     <div>
