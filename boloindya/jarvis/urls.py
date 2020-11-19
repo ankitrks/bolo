@@ -111,4 +111,6 @@ urlpatterns = [
     url(r'^event/update/$', views.event_update),
     url(r'^top-users$', login_required(views.TopUserTemplateView.as_view()), name='top_users'),
     url(r'^api/top-users$', login_required(views.TopUserListView.as_view())),
+    url(r'^event_booking_list/$',views.EventBookingDatableList.as_view()),
+    url(r'^event_booking_pannel/$', views.event_booking_list_datable),
 ]
