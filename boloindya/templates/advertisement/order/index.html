@@ -7,6 +7,14 @@
             font-size: 24px;
             padding-top: 3px;
         }
+        .column-filter{
+            margin-left: 5px;
+            color: blue;
+        }
+        .popover{
+            max-width: 100%;
+            width: 200px !important
+        }
     </style>
 {% endblock local_css %}
 
@@ -84,7 +92,7 @@
                             </div>
                             <div class="col-sm-4">
                                 <div class="input-group">
-                                    <select class="form-control">
+                                    <select class="form-control" name="download-file-type">
                                         <option value="csv" selected>CSV</option>
                                     </select>
                                 </div>
@@ -111,10 +119,55 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade in" id="paymentStatusFilterModal" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">Payment Status Filter</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-group" >
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" value='pending' name='payment_status'>
+                            Pending
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" value='success' name='payment_status'>
+                            Success
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox"  value='initiated' name='payment_status'>
+                            Initiated
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox"  value='failed' name='payment_status'>
+                            Failed
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary center" id="applyPaymentStatusFilter">Apply</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock center_content %}
 
 {% block local_js %}
 <script type="text/javascript">
+let paymentStatusFilter = []
 
 $("#userOrderTable").jsGrid({
     width: "100%",
@@ -122,11 +175,11 @@ $("#userOrderTable").jsGrid({
 
     inserting: false,
     editing: false,
-    sorting: true,
+    sorting: false,
     paging: true,
     pageLoading: true,
     autoload: true,
-    filtering: true,
+    filtering: false,
     sorter: "start_date",
     pageSize: $("#pageSize").val(),
     fields: [
@@ -141,6 +194,12 @@ $("#userOrderTable").jsGrid({
         },
         { title: "Order Date", name: "date", type: "text", width: 60, align: "center", css: "daterange-field"},
         { title: "Order Amount", name: "amount", type: "number", align: "center", width: 40, css: 'range-field'},
+        { title: "Payment Status", name: "payment_status", type: "text", width: 60, align: "center", headerTemplate: function() {
+            return `<span>Shadab</span>
+                    <span id='paymentStatusFilterButton' data-toggle="modal" data-target="#paymentStatusFilterModal">
+                        <i class="fa fa-caret-square-o-down column-filter"></i>
+                    </span>`
+        }},
         { title: "Product Detail", name: "lines.0.product.product_title", type: "text", align: "center", filtering: false},
     ],
     controller: {
@@ -150,6 +209,7 @@ $("#userOrderTable").jsGrid({
                 filter['q'] = q
             filter['page'] = filter['pageIndex']
             filter['page_size'] = $("#pageSize").val()
+            filter['payment_status'] = paymentStatusFilter.join(',')
 
             return $.ajax({
                 type: "GET",
@@ -166,6 +226,17 @@ $("#userOrderTable").jsGrid({
                 format: 'DD-MM-YYYY'
             }
         });
+
+        // $('[data-toggle="popover"]').popover({html: true, container: 'body', width: '300px'})
+        // $('#paymentStatusFilterButton').popover({
+        //     placement: 'bottom',
+        //     html: true,
+        //     content: function(){
+        //         console.log('popover html', $('#paymentStatusFilterOption').html())
+        //         return $('#paymentStatusFilterOption').html();
+        //     },
+        //     container: 'body'
+        // })
         
     }
 });
@@ -280,8 +351,33 @@ $(document).on('click', '#filter-btn', function(){
     }
 
 $(document).on('click', '#exportAds', function(){
-    let file = new exportCSVFile(["Sr. No", "User Name", "Name", "Phone", "Email", "Order Date", 
-                                    "Order Amount", "Product Detail", "Shipping Address"], grid.data, 'report')
+    // let file = new exportCSVFile(["Sr. No", "User Name", "Name", "Phone", "Email", "Order Date", 
+    //                                 "Order Amount", "Product Detail", "Shipping Address"], grid.data, 'report')
+    let fileType = $('[name=download-file-type]').val();
+    let params = {}
+    
+    if(fileType)
+        params['format'] = fileType
+    
+    if(paymentStatusFilter.length > 0)
+        params['payment_status'] = paymentStatusFilter.join(',')
+
+    window.open('/report/ad/order/download?' + $.param(params), '_self')
 });
+
+// $(document).on('click', '#paymentStatusFilterButton', function(){
+    
+// })
+
+$(document).on('click', '#applyPaymentStatusFilter', function(){
+    let filters = []
+    $.each($('[name=payment_status]:checked'), function(i, v){
+        filters.push($(this).val())
+    })
+    paymentStatusFilter = filters
+    grid.reset()
+    $("#paymentStatusFilterModal button.close").click()
+})
+
 </script>
 {% endblock local_js %}

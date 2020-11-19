@@ -25,6 +25,7 @@ import payment.urls
 import booking.api_urls
 import advertisement.api_urls
 import advertisement.urls
+import report.urls
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -112,6 +113,7 @@ urlpatterns = [
     url(r'^api/v1/ad/', include('advertisement.api_urls', namespace='ad')),
     url(r'^api/v2/', include('drf_spirit.api_urls_v2')),
     url(r'^ad/', include(advertisement.urls)),
+    url(r'^report/', include(report.urls)),
 ]
 
 urlpatterns += i18n_patterns(
