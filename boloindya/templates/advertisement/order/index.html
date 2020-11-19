@@ -32,7 +32,7 @@
                         <div class="small-box bg-aqua">
                             <div class="inner">
                                 <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
-                                <p class="section-name">Lifetime Order</p>
+                                <p class="section-name">Lifetime Orders</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-bag"></i>
@@ -43,7 +43,7 @@
                         <div class="small-box bg-green">
                             <div class="inner">
                                 <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
-                                <p class="section-name">Number of Unique Order</p>
+                                <p class="section-name">Unique Orders</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-stats-bars"></i>
@@ -54,7 +54,7 @@
                         <div class="small-box bg-yellow">
                             <div class="inner">
                                 <h3 class="value-count"><i class="fa fa-refresh fa-spin"></i></h3>
-                                <p class="section-name">Month's Order</p>
+                                <p class="section-name">Month's Orders</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-person-add"></i>
@@ -195,7 +195,7 @@ $("#userOrderTable").jsGrid({
         { title: "Order Date", name: "date", type: "text", width: 60, align: "center", css: "daterange-field"},
         { title: "Order Amount", name: "amount", type: "number", align: "center", width: 40, css: 'range-field'},
         { title: "Payment Status", name: "payment_status", type: "text", width: 60, align: "center", headerTemplate: function() {
-            return `<span>Shadab</span>
+            return `<span>Status</span>
                     <span id='paymentStatusFilterButton' data-toggle="modal" data-target="#paymentStatusFilterModal">
                         <i class="fa fa-caret-square-o-down column-filter"></i>
                     </span>`
