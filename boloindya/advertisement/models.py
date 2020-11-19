@@ -3,7 +3,8 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.conf import settings
-
+from django.core.exceptions import ValidationError
+from django.utils.translation import ugettext_lazy as _
 
 class RecordTimeStamp(models.Model):
     created_at = models.DateTimeField(auto_now=False, auto_now_add=True, blank=False, null=False)
@@ -35,6 +36,19 @@ class Brand(RecordTimeStamp):
 
     def __str__(self):
         return self.name
+
+    def clean(self):
+        if Brand.objects.filter(name__iexact=self.name):
+            raise ValidationError({
+                'name': [
+                    ValidationError(
+                        message=_("Already Brand Exist with same name"),
+                        code='invalid',
+                        params={},
+                    )
+                ]
+            })
+            super(Brand, self).clean()
 
 
 class Tax(models.Model):

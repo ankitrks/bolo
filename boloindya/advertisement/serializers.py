@@ -36,12 +36,13 @@ class AdSerializer(serializers.ModelSerializer):
     start_date = serializers.SerializerMethodField(read_only=True)
     end_date = serializers.SerializerMethodField(read_only=True)
     frequency = serializers.SerializerMethodField(read_only=True)
+    brand_obj_id = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Ad
         fields = ('ad_id', 'brand_name', 'brand_image', 'ad_video', 'thumbnail', 'ad_length', 'cta', 'type', 
                     'title', 'start_date', 'end_date', 'frequency', 'frequency_type', 'product_id', 'product_name', 
-                    'price', 'ad_type', 'state', 'is_deleted')
+                    'price', 'ad_type', 'state', 'is_deleted', 'brand_obj_id')
 
     def get_cta(self, instance):
         return list(instance.cta.all().values('title', 'code', 'enable_time', 'action'))
@@ -59,6 +60,8 @@ class AdSerializer(serializers.ModelSerializer):
     def get_frequency(self, instance):
         return list(instance.frequency.all().values('scroll', 'sequence'))
 
+    def get_brand_obj_id(self, instance):
+        return instance.brand.id
 
 class TaxSerializer(serializers.ModelSerializer):
     class Meta:

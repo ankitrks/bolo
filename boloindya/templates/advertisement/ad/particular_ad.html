@@ -140,9 +140,6 @@ ul li {
             <select name="cta_type_1" id="cta_type_1" required>
                 <option value="" disabled selected>Select CTA</option>
             </select>
-            &nbsp;
-            <label for="name" >CTA Text:</label>
-            <input type="text" name="cta_type_1_text" placeholder="Enter CTA text" id="cta_type_1_text">
         </div>
         <div class="form-group">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">CTA 2:</label>
@@ -289,7 +286,6 @@ ul li {
         
         {% for cta in ad.cta.all %}
             if("{{cta.code}}"!="skip"){
-                $("#cta_type_1_text").val("{{cta.title}}")
                 if ("{{ad.ad_type}}"=="install_now"){
                     $('#blk-link-playstore').show();
                     $('#blk-link-website').hide();
@@ -334,7 +330,7 @@ ul li {
                                 .text("Shop Now"));
                     $('#search_id_product').val('{{ad.product}}')   
                     $('#mrp').val('{{ad.product.mrp}}')
-                    $('#description').val('{{ad.product.description}}')
+                    $('#description').val('{{desc}}')
                     product_id = '{{ad.product.id}}'
                     var discount = '{{ad.product.mrp}}' - '{{ad.product.discounted_price}}' 
                     $('#discount').val(discount)
@@ -418,18 +414,6 @@ ul li {
                 el.value = '';
             });
             $("#blk-"+$(this).val()).show();
-        });
-        $(function() {
-            $("#start_date").
-                datepicker({
-                    format: "dd-mm-yyyy"
-                });
-        });
-        $(function() {
-            $("#end_date").
-                datepicker({
-                    format: "dd-mm-yyyy"
-                });
         });
      });
 });
@@ -592,7 +576,8 @@ $('#search_id_product').keyup(function(){
                     }
                     console.log(data)
                     for(var i=0;i<data.data.length;i++) {
-                        $('#response_product').append('<li onclick="addIdToFieldProduct(\''+data.data[i].name+'\', \''+data.data[i].id+'\',\''+data.data[i].mrp+'\',\''+data.data[i].description+'\')">'+data.data[i].name+'</li>');
+                        var desc = data.data[i].description.replace(/[\r\n]+/g," ");
+                        $('#response_product').append('<li onclick="addIdToFieldProduct(\''+data.data[i].name+'\', \''+data.data[i].id+'\',\''+data.data[i].mrp+'\',\''+desc+'\')">'+data.data[i].name+'</li>');
                     }
                 }
             })

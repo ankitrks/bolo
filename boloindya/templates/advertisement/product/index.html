@@ -140,7 +140,7 @@ $("#userOrderTable").jsGrid({
         { title: "Product Id", name: "product_id", type: "text", align: "center"},
         { title: "Product Name", name: "product_title", type: "text", width: 60, align: "center"},
         { title: "Product Link", name: "shipping_address.mobile", type: "text", width: 60, align: "center", filtering: false},
-        { title: "Product Price", name: "discounted_price", type: "text", width: 60, align: "center", filtering: false},
+        { title: "Product Price", name: "mrp", type: "text", width: 60, align: "center", filtering: false},
         { title: "Brand Logo", align: "center", width: 60, itemTemplate: function(_, item){
             return `
                 <span class="brandImg" data-src="${ item.brand.company_logo }">
@@ -198,7 +198,7 @@ $("#userOrderTable").jsGrid({
                 return `
                     <span>
                         <button class="btn btn-primary" data-id="${ item.product_id }" onclick="editProduct(${ item.product_id })">Edit</button>
-                        <button class="btn btn-danger" data-id="${ item.product_id }">Del</button>
+                        <button class="btn btn-danger" data-id="${ item.product_id }" onclick="deleteProduct(${ item.product_id })">Del</button>
                     </span>
                 `
             }, 
@@ -225,6 +225,21 @@ $("#userOrderTable").jsGrid({
 });
 
 let grid = $("#userOrderTable").data("JSGrid");
+
+let deleteProduct = function(productId){
+    console.log(productId)
+    if (confirm("Are you sure?"))
+    {
+        return $.ajax({
+        type: "DELETE",
+        url: "/api/v1/ad/jarvis/product/"+productId+ "/",
+        headers: headers,
+        success: function(response){
+            grid.reset()
+            }
+        });
+    }
+}
 
 $('#search-btn').click(function(){
     grid.reset()

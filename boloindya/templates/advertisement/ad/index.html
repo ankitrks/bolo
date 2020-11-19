@@ -339,7 +339,11 @@ $("#adTable").jsGrid({
             return `<input type="checkbox" name="mark_for_action" value="${ value }" data-state="${ data.state }"/>`
         }, width: 22, align: "center",},
         { title: "Sr. No.", name: "ad_id", type: "number", width: 30, align: "center", filtering: false},
-        { title: "Brand ID", name: "brand_id", type: "text", align: "center", width: 40, filtering: false},
+        { title: "Brand ID", name: "brand_id", type: "renderer", align: "center", width: 40, filtering: false, rendererFunction: function(value, data){
+            return data.brand_obj_id;
+        }
+
+        },
         { title: "Brand Name", name: "brand_name", type: "text", align: "center"},
         { title: "Start Date", name: "start_date", type: "text", width: 60, align: "center", css: "date-field"},
         { title: "End Date", name: "end_date", type: "text", width: 60, align: "center", css: "date-field"},
@@ -654,7 +658,7 @@ let editAd = function(adId){
             itemsNotFormatted.forEach((item) => {
                 itemsFormatted.push({
                     "AD ID": item.ad_id || '',
-                    "Brand ID": item.brand_id || '', 
+                    "Brand ID": item.brand_obj_id || '',
                     "Brand Name": item.brand_name || '',
                     "Start Date": item.start_date || '',
                     "End Date": item.end_date || '',
